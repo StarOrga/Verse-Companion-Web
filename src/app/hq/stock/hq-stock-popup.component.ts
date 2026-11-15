@@ -421,7 +421,6 @@ export interface StockStart {
     `
       :host { display: contents; }
       .pop { display: flex; flex-direction: column; gap: var(--sc-space-3, 12px); height: min(70vh, 44rem); height: min(70dvh, 44rem); min-height: 0; }
-      @media (max-width: 720px) { .pop { height: calc(100dvh - 5.5rem - env(safe-area-inset-bottom, 0px)); } }
       h3 { margin: 0; font: 600 1.05rem / 1.2 var(--sc-font-display); }
       .muted { color: var(--sc-fg-2); margin: 0; }
       .ok { margin: 0; color: var(--sc-accent); }
