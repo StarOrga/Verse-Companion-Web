@@ -61,12 +61,22 @@
 //     surplus priority (F1b step 2) walks the columns in dock order, so the
 //     first cooler fills before the second. The ship-wide coolant balance (F4)
 //     is untouched — it is a balance, not a column.
-// F4  Coolant
-//        used  = Σ_powered items ( coolant.consume × count )
-//        total = Σ_powered items ( coolant.generate × count )
-//        percent = round(used / total × 100)
-//     Only the numerator moves when a group is cut; the denominator is fixed by
-//     the installed coolers (B-C3).
+// F4  Coolant — the in-game cooling USAGE (#352: "100% Kühlleistung gegeben
+//     und man nutzt wie viel? 130% ist 30% zu wenig"):
+//        share(item) = allocated(column) / demand(column), capped at 1
+//                      (0 when the column is cut or has no channel; 1 for an
+//                      idle column and for the power plants)
+//        used    = Σ_items ( coolant.consume × count × share )
+//        total   = Σ_items ( coolant.generate × count × share )
+//        percent = round(used / total × 100)   — > 100 % = not enough cooling
+//     Both sides follow the allocation the same way the EM model does (#967):
+//     a consumer run at half its segments draws half its coolant, a cooler run
+//     at 2 of 3 segments puts out 2/3 of its stated `coolant.generate`. The
+//     data carries one figure per resource state at FULL draw and no curve, so
+//     the linear share is the model, not a game constant. The power plants'
+//     own coolant draw stays at its stated value (the data gives no load curve
+//     for it). With every column at full demand this equals the plain
+//     Σ consume / Σ generate of the installed items.
 // F5  Signatures
 //        EM/IR = the EM model at the current allocation (codex-em-model.ts,
 //        #967): item = nominal × assigned / full segments, reactor follows load
@@ -75,7 +85,10 @@
 //     with the allocation (B-C3).
 //
 // Presets: `auto` = minimums first, then the surplus by group order (F1b);
-// `stealth` = every group at its minimum (F2); `reset` = auto, no cuts, SCM.
+// `stealth` = the lowest-EM state the pilot would fly (#352, see
+// `stealthPowerState`): weapons, shields, quantum, tractor, radar and life
+// support cut, the drive at its lowest usable level, the coolers at the least
+// that keeps cooling usage ≤ 100 % (F4); `reset` = auto, no cuts, SCM.
 // Flight modes: SCM gives the quantum drive no channel; NAV powers the quantum
 // drive and drops the shield channel (B-C4, tooltip part-07:253). If a build
 // carries no per-state data at all we still apply that channel rule — it is a
@@ -875,14 +888,29 @@ export function computePowerSheet(input: PowerSheetInput): PowerSheet {
   const overBudget =
     budgetTotal !== null && (budgetMinimum > budgetTotal || budgetUsed > budgetTotal);
 
-  // F4/F5 over the powered set. Power plants (group null) always run, and so
-  // does a PASSIVE shield generator — it is not on the net, but it is installed
-  // and it radiates (R2).
-  const powered = entries
-    .filter((e) => e.key === null || poweredColumns.has(e.key))
-    .map((e) => e.draw);
-  const coolantUsedRaw = round(powered.reduce((s, d) => s + d.coolantConsume, 0));
-  const coolantTotalRaw = round(draws.reduce((s, d) => s + d.coolantGenerate, 0));
+  // The ship's signature = what every POWERED component emits in its current
+  // state (cooler IR/EM, power plant / shield / quantum EM, …), scaled by the
+  // hull armor's signal factor — the same armor item the game multiplies the
+  // emissions by (#242 follow-up: Eclipse 0.6, Centurion IR 0.4, Vanguard 1.334).
+  const armorSignal = armorSignalMultipliers(findArmorPayload(input.occupants));
+  // #967 — the CURRENT figure from the same EM model as idle / max / quantum:
+  // each item gets its column's share (allocated / demanded) of its full
+  // segments; cut or channel-less columns are off; the reactor follows the load.
+  const columnShare = new Map<PowerColumnKey, number>();
+  for (const g of groups) {
+    columnShare.set(g.key, poweredColumns.has(g.key) ? (g.demand > 0 ? Math.min(1, g.allocated / g.demand) : 1) : -1);
+  }
+  // F4 — every draw weighted by its column's share of the allocation. Without
+  // a reactor budget there is no allocation to weigh by: the stated full-draw
+  // figures stand (cut columns still drop out).
+  const shareOf = (key: PowerColumnKey | null): number => {
+    if (key === null) return 1;
+    const share = columnShare.get(key) ?? 0;
+    if (share < 0) return 0;
+    return budgetTotal === null ? 1 : share;
+  };
+  const coolantUsedRaw = round(entries.reduce((s, e) => s + e.draw.coolantConsume * shareOf(e.key), 0));
+  const coolantTotalRaw = round(entries.reduce((s, e) => s + e.draw.coolantGenerate * shareOf(e.key), 0));
   const hasCoolantData = draws.some((d) => d.coolantGenerate > 0 || d.coolantConsume > 0);
   if (!hasCoolantData && anyResourceData && !schemaTooOld) {
     gapKeys.push('codex.energy.gap.noCoolingData');
@@ -899,18 +927,6 @@ export function computePowerSheet(input: PowerSheetInput): PowerSheet {
       hasCoolantData && hasConsumeData && coolantTotalRaw > 0 ? Math.round((coolantUsedRaw / coolantTotalRaw) * 100) : null,
   };
 
-  // The ship's signature = what every POWERED component emits in its current
-  // state (cooler IR/EM, power plant / shield / quantum EM, …), scaled by the
-  // hull armor's signal factor — the same armor item the game multiplies the
-  // emissions by (#242 follow-up: Eclipse 0.6, Centurion IR 0.4, Vanguard 1.334).
-  const armorSignal = armorSignalMultipliers(findArmorPayload(input.occupants));
-  // #967 — the CURRENT figure from the same EM model as idle / max / quantum:
-  // each item gets its column's share (allocated / demanded) of its full
-  // segments; cut or channel-less columns are off; the reactor follows the load.
-  const columnShare = new Map<PowerColumnKey, number>();
-  for (const g of groups) {
-    columnShare.set(g.key, poweredColumns.has(g.key) ? (g.demand > 0 ? Math.min(1, g.allocated / g.demand) : 1) : -1);
-  }
   const current = emModelAssigned(
     entries.map((e) => {
       const item = emModelItem(e.draw);
@@ -1037,6 +1053,75 @@ export function resetPowerState(): {
   preset: PowerPreset;
 } {
   return { cutGroups: new Set<PowerColumnKey>(), levels: {}, mode: 'scm', preset: 'auto' };
+}
+
+/** The groups the stealth preset switches off (#352): everything that is not
+ * the drive or the cooling — weapons, shields, quantum, tractor, radar, life
+ * support. Each of them radiates EM while it holds power. */
+export const STEALTH_CUT_GROUPS: readonly PowerGroup[] = ['weapons', 'shields', 'quantum', 'tractor', 'radar', 'life'];
+
+/**
+ * `Schleichen` — the lowest-EM state a pilot would actually fly (#352):
+ *   1. every group in {@link STEALTH_CUT_GROUPS} is cut;
+ *   2. the drive (`thrusters`) is pinned at its gold minimum (F2), or at ONE
+ *      segment when the data gives it no minimum — zero would park the ship;
+ *   3. every cooler unit starts at its gold minimum; while the cooling usage
+ *      (F4) is above 100 %, the cooler units are raised one segment at a time
+ *      in dock order until it fits or all run at capacity;
+ *   4. then surplus cooler units are cut from the last one backwards as long
+ *      as the usage stays ≤ 100 % — the first unit always stays on.
+ * Without coolant data the coolers simply stay at their minimum. The result
+ * goes through the normal deal (preset `stealth` = minimums + pins), so it
+ * stays inside the reactor's supply like any pin (F1c).
+ */
+export function stealthPowerState(
+  input: Pick<PowerSheetInput, 'occupants' | 'shipStats' | 'schemaVersion' | 'mode'>,
+): { cutGroups: ReadonlySet<PowerColumnKey>; levels: PowerLevels } {
+  const cut = new Set<PowerColumnKey>(STEALTH_CUT_GROUPS);
+  const levels: Partial<Record<PowerColumnKey, number>> = {};
+  const run = (): PowerSheet =>
+    computePowerSheet({ ...input, preset: 'stealth', cutGroups: cut, levels });
+  const base = run();
+  const drive = base.groups.find((g) => g.key === 'thrusters');
+  if (drive && drive.state !== 'absent' && drive.state !== 'noChannel' && drive.capacity > 0) {
+    levels.thrusters = Math.min(drive.capacity, Math.max(drive.minimum, 1));
+  }
+  const coolerRows = base.groups.filter((g) => g.unit !== null && g.state !== 'absent');
+  for (const g of coolerRows) levels[g.key] = g.minimum;
+  const over = (sheet: PowerSheet): boolean => sheet.coolant.percent !== null && sheet.coolant.percent > 100;
+  let sheet = run();
+  while (over(sheet)) {
+    const next = coolerRows.find((g) => (levels[g.key] ?? 0) < g.capacity);
+    if (!next) break;
+    const before = sheet.groups.find((r) => r.key === next.key)?.allocated ?? 0;
+    levels[next.key] = (levels[next.key] ?? 0) + 1;
+    sheet = run();
+    // the reactor had no free segment for the raise — stop, never loop
+    if ((sheet.groups.find((r) => r.key === next.key)?.allocated ?? 0) <= before) {
+      levels[next.key] = before;
+      sheet = run();
+      break;
+    }
+  }
+  if (sheet.coolant.percent !== null) {
+    for (let i = coolerRows.length - 1; i >= 1; i--) {
+      const key = coolerRows[i].key;
+      cut.add(key);
+      if (over(run())) {
+        cut.delete(key);
+        break;
+      }
+      delete levels[key];
+    }
+  }
+  return { cutGroups: cut, levels };
+}
+
+/** Cooling usage → the dock's "x % Luft" / "x % zu wenig" line (#352): the
+ * in-game reading, where 100 % is exactly the installed cooling. */
+export function coolingMargin(percent: number | null): { over: boolean; pct: number } | null {
+  if (percent === null) return null;
+  return percent > 100 ? { over: true, pct: percent - 100 } : { over: false, pct: 100 - percent };
 }
 
 /** Tolerant parse of a serialized column-key list — unknown keys are dropped. */

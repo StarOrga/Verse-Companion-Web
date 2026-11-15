@@ -1738,7 +1738,7 @@
         "ir": "Your heat signature. It rises with the cooling load and with everything that draws power. Low IR means thermal sensors pick you up later.",
         "em": "The sum of every powered component. Shields and coolers are the biggest items — cut a group and its share disappears. What a part emits comes from the game files; energy weapons carry 0 there.",
         "crossSection": "How large you look on radar. It comes from the hull, not the equipment — no loadout changes it.",
-        "coolingLoad": "How much of the installed cooling capacity is in use right now. Above 100 % the ship runs hot and the IR signature spikes."
+        "coolingLoad": "How much cooling is in use right now — counted like in game: 100 % is exactly what the switched-on coolers deliver with the power they get. 30 % means 70 % headroom, 130 % means 30 % short: the ship runs hot and the IR signature spikes. Leanest just below 100 %."
       },
       "fact": {
         "ir": "IR",
@@ -1763,7 +1763,8 @@
       "preset": {
         "stealth": "Stealth",
         "auto": "Auto",
-        "reset": "Reset"
+        "reset": "Reset",
+        "stealthHint": "Lowest EM signature: weapons, shields, quantum, tractor, radar and life support off, drive at the bare minimum, coolers only as far as cooling stays below 100 %."
       },
       "gap": {
         "noReactorData": "No reactor data in this build — the power budget stays empty until the extract carries it.",
@@ -1780,7 +1781,9 @@
         "ir": "Infrared",
         "em": "Electromagnetic",
         "crossSection": "Cross-section"
-      }
+      },
+      "coolingHeadroom": "{{pct}} % headroom",
+      "coolingDeficit": "{{pct}} % short"
     },
     "swap": {
       "open": "Swap component",
