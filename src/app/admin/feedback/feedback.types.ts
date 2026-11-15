@@ -101,6 +101,8 @@ export function refKind(row: FeedbackRow): 'issue' | 'ship' {
   return /\/issues\/\d+/.test(row.ship_ref ?? '') ? 'issue' : 'ship';
 }
 
+import type { FeedbackOrigin } from '../../feedback/feedback.types';
+
 export interface FeedbackAuthor {
   display_name: string | null;
   username: string | null;
@@ -136,6 +138,11 @@ export interface FeedbackRow {
    */
   seq?: number | null;
   author_id: string | null;
+  /**
+   * Who filed it: 'human' (default), or a machine sender ('posthog' signal, 'service' health) shown as
+   * the PostHog-Wächter. Optional so fixture rows and pre-migration reads keep compiling.
+   */
+  origin?: FeedbackOrigin;
   body: string;
   status: FeedbackStatus;
   ship_ref: string | null;
