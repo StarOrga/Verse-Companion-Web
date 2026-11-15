@@ -148,6 +148,9 @@ export function editionQueryPrefix(classNameSlug: string): string {
   return classNameSlug.split('_').slice(0, QUERY_PREFIX_SEGMENTS).join('_');
 }
 
+/** What the edition rule reads off a record — a catalog row, or a rank-cohort member. */
+export type EditionKeyed = Pick<CodexListRow, 'classNameSlug' | 'nameLocalized'>;
+
 interface Link {
   readonly base: string;
   /** Set for rule (b); `null` for a same-name duplicate, labelled from the class name. */
@@ -155,7 +158,7 @@ interface Link {
 }
 
 /** Nearest ancestor of every row, when the rule accepts it. */
-function directLinks<T extends CodexListRow>(rows: readonly T[]): Map<string, Link> {
+function directLinks<T extends EditionKeyed>(rows: readonly T[]): Map<string, Link> {
   const byClass = new Map<string, T>();
   for (const row of rows) byClass.set(row.classNameSlug, row);
 
@@ -193,7 +196,7 @@ function rootOf(links: Map<string, Link>, classNameSlug: string): string {
 }
 
 /** family root → the records it absorbed, by the rule in the module comment. */
-function collectGroups<T extends CodexListRow>(rows: readonly T[]): Map<string, EditionRef[]> {
+function collectGroups<T extends EditionKeyed>(rows: readonly T[]): Map<string, EditionRef[]> {
   const links = directLinks(rows);
   const groups = new Map<string, EditionRef[]>();
   for (const [classNameSlug, link] of links) {
@@ -209,6 +212,18 @@ function collectGroups<T extends CodexListRow>(rows: readonly T[]): Map<string, 
     else groups.set(base, [ref]);
   }
   return groups;
+}
+
+/**
+ * Every absorbed record's family root (`DRAK_Caterpillar_Pirate` → `DRAK_Caterpillar`), by the same rule
+ * as the grid; a record that heads its family or stands alone is not in the map. The rank comparison
+ * groups (#968) read it to count each hull once.
+ */
+export function editionFamilyRoots(rows: readonly EditionKeyed[]): Map<string, string> {
+  const links = directLinks(rows);
+  const out = new Map<string, string>();
+  for (const classNameSlug of links.keys()) out.set(classNameSlug, rootOf(links, classNameSlug));
+  return out;
 }
 
 function byEditionName(a: EditionRef, b: EditionRef): number {
