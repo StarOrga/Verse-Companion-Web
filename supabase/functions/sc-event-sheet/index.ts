@@ -14,7 +14,8 @@
 // stay) -> sc_event_sheet_apply(..., 'ai') = draft + public sheet + one history row. Sources (all best-effort, a failed
 // one is skipped): the event's own comm-link by id (sc_events.url) and a title search over ALL comm-links of the
 // Comm-Link Wiki API (the newest 200 alone miss every older edition), the newest 200 for weekly-roundup mentions, the
-// community wiki page (resolved case-insensitively, this edition's section first) and the RSI page's meta tags. An
+// community wiki page (resolved case-insensitively, this edition's section first), the RSI page's meta tags and CIG staff
+// posts on Spectrum (v3; confidence by source authority, see docs/contracts/event-sheet.md). An
 // edition without a post of its own (announced later) reads the previous edition's posts as a labelled hint; its
 // fields stay <= 0.6 and wait in the admin review. Fields under 0.8 stay unknown publicly. Key only here
 // (ANTHROPIC_API_KEY); model override SC_EVENT_SHEET_MODEL. verify_jwt=false (supabase/config.toml): pg_cron has only
