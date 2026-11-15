@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.13",
+  "current": "0.270.14",
   "releases": [
+    {
+      "version": "0.270.14",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "A concept link opens the concept full screen in a new tab; the in-app page with a sub-header in between is gone."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.270.13",
       "date": "2026-11-15",
