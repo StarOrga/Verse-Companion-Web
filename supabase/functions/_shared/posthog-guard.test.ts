@@ -136,7 +136,7 @@ test('nextHealth counts failures, goes red on the third, recovers on success', (
   assert.equal(back.consecutive_failures, 0);
   assert.equal(serviceTransition(row.level, back.level), 'recovered');
   assert.equal(serviceTransition('error', 'error'), 'none');
-  assert.equal(nextHealth(null, { ok: false, keyMissing: true }, 'xai', 3600, NOW).level, 'error');
+  assert.equal(nextHealth(null, { ok: false, keyMissing: true }, 'uex', 3600, NOW).level, 'error');
   assert.equal(nextHealth(null, { ok: false, skipped: true }, 'readme', 3600, NOW).level, 'unknown');
   assert.equal(nextHealth(null, { ok: true, passiveErrorRate: 0.3 }, 'claude', 3600, NOW).level, 'warn');
 });
@@ -211,14 +211,14 @@ test('errors card is unknown, not ok, when only the errors query failed (codex r
 
 test('httpFailureNote appends the provider reason, masks keys, ignores HTML', () => {
   assert.equal(
-    httpFailureNote(403, JSON.stringify({ code: 'permission-denied', error: 'Your team has no credits. Purchase credits at console.x.ai.' })),
-    'HTTP 403 (permission-denied: Your team has no credits. Purchase credits at console.x.ai.)',
+    httpFailureNote(403, JSON.stringify({ code: 'permission-denied', error: 'Your team has no credits.' })),
+    'HTTP 403 (permission-denied: Your team has no credits.)',
   );
   assert.equal(
     httpFailureNote(401, JSON.stringify({ type: 'error', error: { type: 'authentication_error', message: 'invalid x-api-key' } })),
     'HTTP 401 (authentication_error: invalid x-api-key)',
   );
-  assert.equal(httpFailureNote(400, JSON.stringify({ error: 'bad key xai-abcdef1234567890' })), 'HTTP 400 (bad key ***)');
+  assert.equal(httpFailureNote(400, JSON.stringify({ error: 'bad key sk-abcdef1234567890' })), 'HTTP 400 (bad key ***)');
   assert.equal(httpFailureNote(502, '<html>Bad Gateway</html>'), 'HTTP 502');
   assert.equal(httpFailureNote(500, ''), 'HTTP 500');
   assert.equal(httpFailureNote(500, '{}'), 'HTTP 500');

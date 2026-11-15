@@ -90,7 +90,7 @@ const SEARCH_DEBOUNCE_MS = 250;
               </li>
             }
           </ul>
-          <a class="sc-btn cta" routerLink="/login" [queryParams]="{ redirect: hangarLink }">
+          <a scAction tier="primary" class="cta" routerLink="/login" [queryParams]="{ redirect: hangarLink }">
             {{ 'hangar.teaser.cta' | translate }}
           </a>
         </div>
@@ -108,7 +108,7 @@ const SEARCH_DEBOUNCE_MS = 250;
             <strong>{{ wishes.count() }}</strong>
             <span>{{ 'hangar.counts.wishlist' | translate }}</span>
           </a>
-          <button type="button" class="sc-btn import-btn" (click)="importOpen.set(!importOpen())">
+          <button type="button" scAction tier="secondary" class="import-btn" (click)="importOpen.set(!importOpen())">
             {{ 'hangar.import.open' | translate }}
           </button>
         </div>
@@ -314,7 +314,7 @@ const SEARCH_DEBOUNCE_MS = 250;
             <input class="ld-name" type="text" [ngModel]="newLoadoutName()" (ngModelChange)="newLoadoutName.set($event)"
                    [attr.placeholder]="'hangar.roleLoadouts.namePlaceholder' | translate"
                    [attr.aria-label]="'hangar.roleLoadouts.namePlaceholder' | translate" />
-            <button class="sc-btn small" type="button" [disabled]="!newLoadoutName().trim()" (click)="createLoadout()">
+            <button scAction tier="secondary" type="button" [disabled]="!newLoadoutName().trim()" (click)="createLoadout()">
               {{ 'hangar.roleLoadouts.create' | translate }}
             </button>
           </div>
@@ -353,33 +353,33 @@ const SEARCH_DEBOUNCE_MS = 250;
                            (ngModelChange)="renameDraft.set($event)"
                            (keyup.enter)="saveRename(l.id)" (keyup.escape)="cancelRename()"
                            [attr.aria-label]="'hangar.roleLoadouts.rename' | translate" />
-                    <button class="sc-btn tiny" type="button" [disabled]="!renameDraft().trim()"
+                    <button scAction tier="secondary" type="button" [disabled]="!renameDraft().trim()"
                             (click)="saveRename(l.id)">
                       {{ 'hangar.detail.save' | translate }}
                     </button>
-                    <button class="sc-btn tiny ghost" type="button" (click)="cancelRename()">
+                    <button scAction tier="secondary" type="button" (click)="cancelRename()">
                       {{ 'hangar.roleLoadouts.cancel' | translate }}
                     </button>
                   </div>
                 } @else {
                   <div class="ld-actions">
-                    <button class="sc-btn tiny" type="button" (click)="startRename(l)">
+                    <button scAction tier="secondary" type="button" (click)="startRename(l)">
                       {{ 'hangar.roleLoadouts.rename' | translate }}
                     </button>
-                    <button class="sc-btn tiny" type="button"
+                    <button scAction tier="secondary" type="button"
                             [attr.aria-expanded]="openOwnShare() === l.id"
                             (click)="toggleOwnShare(l.id)">
                       {{ 'hangar.roleLoadouts.share' | translate }}
                     </button>
                     @if (confirmDeleteId() === l.id) {
-                      <button class="sc-btn tiny danger" type="button" (click)="deleteLoadout(l.id)">
+                      <button scAction tier="secondary" tone="danger" type="button" (click)="deleteLoadout(l.id)">
                         {{ 'hangar.roleLoadouts.deleteConfirm' | translate }}
                       </button>
-                      <button class="sc-btn tiny ghost" type="button" (click)="confirmDeleteId.set(null)">
+                      <button scAction tier="secondary" type="button" (click)="confirmDeleteId.set(null)">
                         {{ 'hangar.roleLoadouts.cancel' | translate }}
                       </button>
                     } @else {
-                      <button class="sc-btn tiny ghost" type="button" (click)="confirmDeleteId.set(l.id)">
+                      <button scAction tier="secondary" tone="danger" type="button" (click)="confirmDeleteId.set(l.id)">
                         {{ 'hangar.configs.delete' | translate }}
                       </button>
                     }
@@ -424,7 +424,7 @@ const SEARCH_DEBOUNCE_MS = 250;
                   </p>
                   <button
                     type="button"
-                    class="sc-btn tiny shared-toggle"
+                    scAction tier="secondary" class="shared-toggle"
                     [attr.aria-expanded]="openShare() === s.share_id"
                     (click)="toggleShare(s.share_id)">
                     {{ (openShare() === s.share_id ? 'share.sharedWithMe.hide' : 'share.sharedWithMe.show') | translate }}
@@ -432,7 +432,7 @@ const SEARCH_DEBOUNCE_MS = 250;
                   @if (adoptedShares().has(s.share_id)) {
                     <span class="hint" role="status">{{ 'hq.friends.stock.adopted' | translate }}</span>
                   } @else {
-                    <button type="button" class="sc-btn tiny shared-toggle" [disabled]="social.busy()" (click)="adoptShared(s)">
+                    <button type="button" scAction tier="secondary" class="shared-toggle" [disabled]="social.busy()" (click)="adoptShared(s)">
                       {{ 'hq.friends.stock.adopt' | translate }}
                     </button>
                   }
@@ -478,9 +478,7 @@ const SEARCH_DEBOUNCE_MS = 250;
     .benefit strong { font-family: var(--sc-font-display); font-size: 0.9rem;
       letter-spacing: 0.04em; color: var(--sc-accent); }
     .benefit span { color: var(--sc-fg-2); font-size: 0.85rem; line-height: 1.5; }
-    .teaser .cta { align-self: flex-start; text-decoration: none;
-      color: var(--sc-bg-0); background: var(--sc-accent); border-color: var(--sc-accent); }
-    .teaser .cta:hover { background: transparent; color: var(--sc-accent); }
+    .teaser .cta { align-self: flex-start; }
     .counts { display: flex; gap: 8px; }
     a.count-chip { color: inherit; text-decoration: none; }
     a.count-chip:hover, a.count-chip:focus-visible { border-color: var(--sc-accent); outline: none; }
@@ -571,8 +569,6 @@ const SEARCH_DEBOUNCE_MS = 250;
     .ld-open { display: flex; flex-direction: column; gap: 6px; color: inherit; text-decoration: none; }
     .ld-actions, .ld-rename { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
     .ld-rename .ld-name { flex: 1 1 140px; min-width: 0; }
-    .sc-btn.danger { border-color: var(--sc-danger); color: var(--sc-danger); }
-    .sc-btn.danger:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
 
     .shared-block { margin-top: 22px; }
     .shared-block h2 { margin: 0 0 4px; font-size: 1rem; }
@@ -586,23 +582,11 @@ const SEARCH_DEBOUNCE_MS = 250;
     .si-slot { flex: 0 0 92px; color: var(--sc-fg-2); text-transform: uppercase; letter-spacing: 0.06em; font-size: max(0.68rem, var(--sc-fs-floor)); }
     .si-name { flex: 1 1 120px; min-width: 0; overflow-wrap: anywhere; }
 
-    /* 48px, not 44: two overlapping scale(0.994) shell animations shave a
-       hair off every measured box, so a 44px target measures 43. */
-    @media (pointer: coarse) {
-      .shared-toggle { min-height: 48px; }
-    }
     @media (max-width: 560px) {
       .shared-toggle { width: 100%; }
       .si-slot { flex: 1 1 100%; }
     }
 
-    .sc-btn { padding: 8px 14px; border-radius: 6px; background: var(--sc-bg-1); border: 1px solid var(--sc-accent); color: var(--sc-accent); font-family: var(--sc-font-display); font-size: max(0.72rem, var(--sc-fs-floor)); letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; }
-    .sc-btn:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
-    .sc-btn:disabled { opacity: 0.5; cursor: default; }
-    .sc-btn.small { padding: 7px 12px; font-size: max(0.7rem, var(--sc-fs-floor)); }
-    .sc-btn.tiny { padding: 4px 9px; font-size: max(0.64rem, var(--sc-fs-floor)); }
-    .sc-btn.ghost { border-color: var(--sc-border); color: var(--sc-fg-1); }
-    .sc-btn.ghost:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
 
     .empty { text-align: center; padding: 36px 20px; color: var(--sc-fg-1); }
     .empty p { color: var(--sc-fg-2); margin: 6px 0 0; }

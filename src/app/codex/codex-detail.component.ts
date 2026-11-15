@@ -4447,7 +4447,7 @@ export class CodexDetailComponent implements OnInit {
   private readonly holoNarrowestScope = computed<RankScope>(() => {
     const target = this.rankShipInput();
     const cohort = this.rankCohort();
-    return target && cohort ? narrowestRankScope(target, cohort, { careerByClass: true }) : 'role';
+    return target && cohort ? narrowestRankScope(target, cohort, { careerByClass: true, foldVariants: true }) : 'role';
   });
   /**
    * Classic card: the account-wide choice, Alle when never chosen (untouched).
@@ -4564,6 +4564,7 @@ export class CodexDetailComponent implements OnInit {
       scope: this.rankScope(),
       rim: 'p95',
       careerByClass: true,
+      foldVariants: true,
     });
   });
 

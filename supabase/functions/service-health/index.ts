@@ -2,9 +2,9 @@
 //
 // pg_cron (hourly :13) POSTs here. Probes (all free, no LLM tokens): Anthropic GET /v1/models (ANTHROPIC_API_KEY and
 // TRANSLATE_ANTHROPIC_API_KEY), PostHog GET /api/projects/@current/ (personal key; without it only ingest reachability),
-// Supabase (own DB read), R2 worker HEAD, UEX GET /categories, RSI status index.json, xAI GET /v1/models (GROK_API_KEY),
+// Supabase (own DB read), R2 worker HEAD, UEX GET /categories, RSI status index.json,
 // readme.io GET dash.readme.com/api/v1 (README_IO_API_KEY). A missing key is "error" for claude/uex (they are required),
-// "unknown" (skipped) for xai/readme/posthog-without-key (optional integrations). The claude row also folds in the
+// "unknown" (skipped) for readme/posthog-without-key (optional integrations). The claude row also folds in the
 // passive ai_calls error rate of the last 24 h. Levels follow d-thresh (posthog-guard.ts serviceLevel).
 // A service turning red files an origin='service' board item (same cap/dedupe as posthog-signal); turning ok again posts
 // a system message and sets the item to shipped ("Dienst wieder erreichbar") only while no human touched it.
@@ -73,11 +73,6 @@ async function probe(service: ServiceName, db: Db): Promise<ProbeResult> {
     }
     case 'rsi':
       return http('https://status.robertsspaceindustries.com/index.json');
-    case 'xai': {
-      const key = Deno.env.get('GROK_API_KEY');
-      if (!key) return { ok: false, skipped: true, note: 'GROK_API_KEY nicht gesetzt' };
-      return http('https://api.x.ai/v1/models', { headers: { authorization: `Bearer ${key}` } });
-    }
     case 'readme': {
       const key = Deno.env.get('README_IO_API_KEY');
       if (!key) return { ok: false, skipped: true, note: 'README_IO_API_KEY nicht gesetzt' };

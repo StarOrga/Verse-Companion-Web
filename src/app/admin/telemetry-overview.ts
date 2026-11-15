@@ -104,6 +104,7 @@ export function posthogRoot(cards: readonly OverviewCard[]): string {
 }
 
 /** Services the server names by id; anything else renders verbatim. */
+<<<<<<< HEAD
 export const KNOWN_SERVICES = ['claude', 'posthog', 'supabase', 'r2', 'uex', 'rsi', 'xai', 'readme'] as const;
 
 /** A feedback topic a finding already became — what the checked speech bubble links to. */
@@ -125,3 +126,8 @@ export function topicsByTitle(
   }
   return out;
 }
+||||||| 939377ac8
+export const KNOWN_SERVICES = ['claude', 'posthog', 'supabase', 'r2', 'uex', 'rsi', 'xai', 'readme'] as const;
+=======
+export const KNOWN_SERVICES = ['claude', 'posthog', 'supabase', 'r2', 'uex', 'rsi', 'readme'] as const;
+>>>>>>> origin/main

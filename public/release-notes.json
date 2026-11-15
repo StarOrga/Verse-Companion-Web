@@ -1,7 +1,105 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.4",
+  "current": "0.270.9",
   "releases": [
+    {
+      "version": "0.270.9",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Telemetry: a finding that already has a feedback topic shows a speech bubble with a check mark that opens that topic."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.270.8",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Removed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The unused xAI (Grok) provider is gone: no more hourly xAI check, no Grok fallback for event summaries, and no xAI entry in the service list."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.270.7",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Hangar: every action button uses the shared action control — one main step per view, red tone for delete (#970)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.270.6",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader 0.81.1: 3D package re-runs no longer rewrite the 17 MB part index after every package — a fully cached pass is minutes instead of hours."
+            },
+            {
+              "title": "",
+              "text": "Data Uploader: a statement timeout on a catalog batch splits the batch at once instead of resending it unchanged; silhouette batches start smaller."
+            },
+            {
+              "title": "",
+              "text": "Data Uploader log: failed model conversions name the converter's real exception, cached ships are summarised in one line, and a Windows shutdown under a running job is recorded with its resume point."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.270.5",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex rank: a ship's place and the group median now count each hull once — editions and duplicate records of one hull no longer inflate a comparison group (#968)."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Social pages: every action button uses the shared action control (one main step per page, red tone for report and delete) (#970)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.270.4",
       "date": "2026-11-15",
