@@ -463,3 +463,56 @@ describe('ScPopupComponent fill / bodyFill / float', () => {
     });
   });
 });
+
+@Component({
+  standalone: true,
+  imports: [ScPopupComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <button type="button" class="page-btn">Seite</button>
+    <sc-popup kind="panel" title="Panel" [backdrop]="false" [backClose]="false" [float]="float()">
+      <button type="button" class="in">Innen</button>
+    </sc-popup>
+    <sc-popup kind="menu" title="Menü" [backdrop]="false" class="mn"><button type="button">M</button></sc-popup>
+  `,
+})
+class PhonePanelHostComponent {
+  readonly float = signal(false);
+}
+
+describe('ScPopupComponent non-modal panel while full screen on a phone', () => {
+  useViewport(375, 700);
+
+  async function mountPanel(float: boolean) {
+    TestBed.configureTestingModule({ providers: [provideTranslateService()] });
+    const f = TestBed.createComponent(PhonePanelHostComponent);
+    f.componentInstance.float.set(float);
+    document.body.appendChild(f.nativeElement);
+    f.detectChanges();
+    await new Promise<void>((r) => setTimeout(r));
+    await new Promise<void>((r) => requestAnimationFrame(() => r()));
+    return f;
+  }
+
+  it('is trapped: aria-modal and the page behind it is inert', async () => {
+    const f = await mountPanel(false);
+    const root = f.nativeElement as HTMLElement;
+    const panel = root.querySelector<HTMLElement>('.scp-frame[data-kind="panel"]')!;
+    expect(panel.getAttribute('aria-modal')).toBe('true');
+    expect(root.querySelector<HTMLElement>('.page-btn')!.closest('[inert]')).not.toBeNull();
+    // The menu card stays non-modal.
+    expect(root.querySelector('.scp-frame[data-kind="menu"]')!.hasAttribute('aria-modal')).toBe(false);
+    f.destroy();
+    root.remove();
+  });
+
+  it('a floating card keeps its non-modal behaviour', async () => {
+    const f = await mountPanel(true);
+    const root = f.nativeElement as HTMLElement;
+    const panel = root.querySelector<HTMLElement>('.scp-frame[data-kind="panel"]')!;
+    expect(panel.hasAttribute('aria-modal')).toBe(false);
+    expect(root.querySelector<HTMLElement>('.page-btn')!.closest('[inert]')).toBeNull();
+    f.destroy();
+    root.remove();
+  });
+});

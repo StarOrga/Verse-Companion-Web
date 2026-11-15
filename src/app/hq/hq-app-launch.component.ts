@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, Injector, computed, effect, inject, input, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DesktopCapabilityService } from '../core/desktop-capability.service';
+import { logWarn } from '../core/log';
 import { isPlainLeftClick } from '../core/modified-click.util';
 import { SCC_LAUNCH_GRACE_MS, SCC_LAUNCH_WAIT_MS, SccAppLauncherService } from '../desktop/scc-app-launcher.service';
 import { SCC_INSTALLER_URL } from '../news/verse-status-chip.component';
@@ -54,7 +55,8 @@ const CONNECTED_HINT_MS = 2000;
         [attr.aria-busy]="status() === 'starting'"
         (click)="onClick($event)"
       >{{ (mode() === 'download' ? 'hq.app.downloadCta' : 'hq.app.launch') | translate }}</a>
-      <div class="live" role="status">
+      <!-- The notice frame is the one live region (role="status" from the scaffold); a second one around it would announce twice. -->
+      <div class="live">
         @if (status() !== 'idle') {
           <sc-popup class="toast" kind="notice" [title]="'hq.app.' + status() | translate" scToastSlot scPopupMotion scPopupMotionOrigin="br" animate.leave="pm-out">
             <svg popupIcon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -164,7 +166,14 @@ export class HqAppLaunchComponent {
     this.status.set('starting');
     // Seen here before: no download hangs on the answer, so give a cold start time to come to the front.
     const known = this.launcher.launchedBefore();
-    const answered = await this.launcher.launch(known ? SCC_LAUNCH_GRACE_MS : SCC_LAUNCH_WAIT_MS);
+    let answered = false;
+    try {
+      answered = await this.launcher.launch(known ? SCC_LAUNCH_GRACE_MS : SCC_LAUNCH_WAIT_MS);
+    } catch (err) {
+      logWarn('hq-app-launch', 'launch failed', { err: String(err) });
+      if (run === this.run) this.status.set('idle');
+      return;
+    }
     if (run !== this.run) return;
     if (answered) {
       this.status.set('started');

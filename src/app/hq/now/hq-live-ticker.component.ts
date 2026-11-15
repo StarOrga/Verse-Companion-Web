@@ -30,8 +30,8 @@ const TICK_MS = 30_000;
     @if (visible()) {
       @let st = status();
       @let pg = page()!;
-      <div class="dock" [class.above-footer]="pg === 'statistik'" [attr.data-state]="st" [scPopoverDismiss]="open()" (dismissed)="close()">
-        @if (open()) {
+      <div class="dock" [class.above-footer]="pg === 'statistik'" [attr.data-state]="st" [scPopoverDismiss]="shown()" (dismissed)="close()">
+        @if (shown()) {
           <sc-popup class="aussicht" id="hq-app-aussicht" kind="panel" [backdrop]="false" [eyebrow]="'hq.title' | translate" [title]="'hq.appStatus.aussicht.title' | translate" (closed)="close()">
             <p class="a-text">{{ 'hq.appStatus.aussicht.' + pg | translate }}</p>
             @if (pg === 'jetzt') {
@@ -44,7 +44,7 @@ const TICK_MS = 30_000;
           </sc-popup>
         }
         <div class="chip">
-          <button type="button" class="face" [attr.aria-controls]="open() ? 'hq-app-aussicht' : null" [attr.aria-expanded]="open()" [scTooltip]="'hq.appStatus.aussicht.toggle' | translate" (click)="toggle()">
+          <button type="button" class="face" [attr.aria-controls]="shown() ? 'hq-app-aussicht' : null" [attr.aria-expanded]="shown()" [scTooltip]="'hq.appStatus.aussicht.toggle' | translate" (click)="toggle()">
             <i class="mark" aria-hidden="true"></i>
             <b class="state">{{ 'hq.appStatus.state.' + st | translate }}</b>
             @switch (st) {
@@ -164,12 +164,22 @@ export class HqLiveTickerComponent {
 
   /** The page's Aussicht is open (by the reader, or by itself while the app is missing). */
   protected readonly open = signal(false);
+  /** Below 750 px the Aussicht is hidden by CSS: it must not be mounted either (a hidden panel would take a history entry). */
+  private readonly narrow = signal(typeof matchMedia === 'function' && matchMedia('(max-width: 749px)').matches);
+  /** The Aussicht is open and actually on screen. */
+  protected readonly shown = computed(() => this.open() && !this.narrow());
   /** Pages on which the reader closed the Aussicht while the app was missing. */
   private readonly seen = signal(readAussichtSeen(this.readStorage()));
 
   constructor() {
     const t = setInterval(() => this.clock.set(Date.now()), TICK_MS);
     inject(DestroyRef).onDestroy(() => clearInterval(t));
+    if (typeof matchMedia === 'function') {
+      const mq = matchMedia('(max-width: 749px)');
+      const onMq = () => this.narrow.set(mq.matches);
+      mq.addEventListener('change', onMq);
+      inject(DestroyRef).onDestroy(() => mq.removeEventListener('change', onMq));
+    }
     // A new page or a new state decides afresh: open by itself only while the app is missing and only once per page.
     effect(() => {
       const page = this.page();

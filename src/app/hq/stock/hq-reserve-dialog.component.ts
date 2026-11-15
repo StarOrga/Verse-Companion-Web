@@ -26,7 +26,7 @@ import type { DeckCrate } from './hq-stock-deck';
   imports: [FormsModule, TranslatePipe, ScActionDirective, ScPopupComponent, ScSelectComponent, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <sc-popup kind="dialog" [eyebrow]="subtitle()" [title]="(editing() ? 'hq.bestand.deck.rsv.titleEdit' : 'hq.bestand.deck.rsv.title') | translate" (closed)="closed.emit(changed())">
+    <sc-popup kind="dialog" [eyebrow]="subtitle()" [title]="(editing() ? 'hq.bestand.deck.rsv.titleEdit' : 'hq.bestand.deck.rsv.title') | translate" (closed)="onPopupClosed()">
         <div class="pbody">
           @if (error(); as e) { <p class="dlg-err" role="alert">{{ e | translate }}</p> }
 
@@ -141,6 +141,11 @@ export class HqReserveDialogComponent {
 
   protected readonly today = expiryToField(new Date().toISOString());
   protected readonly busy = signal(false);
+
+  /** ✕ / Escape / Back while a save runs are ignored (the scaffold keeps its history entry for the next Back). */
+  protected onPopupClosed(): void {
+    if (!this.busy()) this.closed.emit(this.changed());
+  }
   protected readonly error = signal<string | null>(null);
   protected readonly changed = signal(false);
   protected readonly friendId = signal<string | null>(null);

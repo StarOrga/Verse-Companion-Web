@@ -142,7 +142,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
         <button type="button" scAction tier="secondary" [disabled]="picks().size === 0" (click)="picks.set(emptyPicks)"><span>{{ 'cart.clear' | translate }}</span></button>
       </ng-container>
       <span popupStatus class="cart-status">
-        <span class="cart-sum">{{ 'cart.summary' | translate: { n: cart.count(), g: cart.groups().length } }}</span>
+        <span class="cart-sum">{{ summaryKey() | translate: { n: cart.count(), g: cart.groups().length } }}</span>
         <span class="sel-count" role="status"><b>{{ selectedCount() }}</b> {{ 'cart.selected' | translate }}</span>
         @if (ns.newBlock()) {
           <span class="full-hint" role="status">{{ 'cart.slotsFullHint' | translate }}</span>
@@ -240,6 +240,10 @@ export class WishCartDialogComponent {
 
   /** The selection: position key -> picked quantity (the whole quantity unless a split was made in Planen). */
   protected readonly picks = signal<ReadonlyMap<string, number>>(this.emptyPicks);
+  /** "1 Position · 1 Gruppe", "5 Positionen · 1 Gruppe", else the plural form. */
+  protected readonly summaryKey = computed(() =>
+    this.cart.count() === 1 ? 'cart.summaryOne' : this.cart.groups().length === 1 ? 'cart.summaryOneGroup' : 'cart.summary',
+  );
   protected readonly selectedCount = computed(() => this.picks().size);
   protected readonly pickParams = computed(() => hqNachschubPickLink([...this.picks()].map(([key, qty]) => ({ key, qty }))).queryParams ?? {});
 

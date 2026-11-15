@@ -90,7 +90,7 @@ type Step = 1 | 2;
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- A click beside the sheet does not close it (the picks would be lost): the X, Abbrechen or Escape do. -->
-    <sc-popup kind="large" [eyebrow]="'hq.title' | translate" [title]="(mode() === 'new' ? 'hq.flow.titleNew' : 'hq.flow.titleEdit') | translate" (closed)="closed.emit()">
+    <sc-popup kind="large" [eyebrow]="'hq.title' | translate" [title]="(mode() === 'new' ? 'hq.flow.titleNew' : 'hq.flow.titleEdit') | translate" (closed)="onPopupClosed()">
         <ol popupTools class="steps" [attr.aria-label]="'hq.flow.stepsAria' | translate" [style.display]="kind() === 'sell' ? 'none' : null">
           @for (s of stepList; track s) {
             <li [class.on]="step() === s" [class.past]="step() > s" [attr.aria-current]="step() === s ? 'step' : null">
@@ -529,6 +529,11 @@ export class HqNachschubFlowComponent {
   private nameTouched = false;
   protected readonly error = signal<string | null>(null);
   protected readonly busy = signal(false);
+
+  /** ✕ / Escape / Back while a save runs are ignored (the scaffold keeps its history entry for the next Back). */
+  protected onPopupClosed(): void {
+    if (!this.busy()) this.closed.emit();
+  }
   private readonly splits = signal<ReadonlyMap<string, LineSplit>>(new Map());
   private readonly modes = signal<ReadonlyMap<string, LineMode>>(new Map());
   private readonly leftOut = signal<ReadonlySet<string>>(new Set());

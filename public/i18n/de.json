@@ -8662,6 +8662,8 @@
   "cart": {
     "title": "Wunschliste",
     "summary": "{{n}} Positionen · {{g}} Gruppen",
+    "summaryOne": "1 Position · 1 Gruppe",
+    "summaryOneGroup": "{{n}} Positionen · 1 Gruppe",
     "close": "Schließen",
     "empty": "Die Wunschliste ist leer.",
     "emptyHint": "Leg Gegenstände aus dem Codex oder der Suche hierher.",

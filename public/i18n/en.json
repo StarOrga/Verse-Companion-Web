@@ -8662,6 +8662,8 @@
   "cart": {
     "title": "Wishlist",
     "summary": "{{n}} items · {{g}} groups",
+    "summaryOne": "1 item · 1 group",
+    "summaryOneGroup": "{{n}} items · 1 group",
     "close": "Close",
     "empty": "The wishlist is empty.",
     "emptyHint": "Put items from the Codex or the search here.",

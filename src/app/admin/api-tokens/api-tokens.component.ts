@@ -1,7 +1,9 @@
 import { toErrorKey } from '../../core/describe-error';
+import { logWarn } from '../../core/log';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -488,7 +490,10 @@ export class ApiTokensComponent implements OnInit {
 
   constructor() {
     useAutoRefresh(() => this.refresh(), { enabled: () => !this.busy() });
+    inject(DestroyRef).onDestroy(() => clearTimeout(this.copiedTimer));
   }
+
+  private copiedTimer: ReturnType<typeof setTimeout> | undefined;
 
   readonly allScopes = API_TOKEN_SCOPES;
   readonly readmeUrl = README_IO_URL;
@@ -629,8 +634,10 @@ export class ApiTokensComponent implements OnInit {
       await navigator.clipboard.writeText(text);
       this.copied.set(true);
       this.tokenCopied.set(true);
-      setTimeout(() => this.copied.set(false), 2500);
-    } catch {
+      clearTimeout(this.copiedTimer);
+      this.copiedTimer = setTimeout(() => this.copied.set(false), 2500);
+    } catch (err) {
+      logWarn('api-tokens', 'clipboard write failed, text selected for manual copy', { err: String(err) });
       // Fallback: select the text so the user can ctrl+c manually
       const sel = window.getSelection();
       const el = document.querySelector('.reveal-token');

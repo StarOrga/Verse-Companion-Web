@@ -144,7 +144,6 @@ export class HqPlaceSelectComponent {
     else if (ev.key === 'Home') this.active.set(0);
     else if (ev.key === 'End') this.active.set(n - 1);
     else if (ev.key === 'Enter') this.pick(this.flat()[this.active()] ?? null);
-    else if (ev.key === 'Escape') this.close(true);
     else return;
     ev.preventDefault();
     ev.stopPropagation();

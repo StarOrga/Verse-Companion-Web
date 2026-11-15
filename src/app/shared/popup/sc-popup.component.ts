@@ -153,8 +153,8 @@ let uid = 0;
       <div
         class="scp-frame"
         scDialog
-        [scDialogModal]="isModal()"
-        [scDialogInert]="isModal()"
+        [scDialogModal]="trapped()"
+        [scDialogInert]="trapped()"
         [scDialogInitialFocus]="initialFocus()"
         [scDialogReturnFocus]="returnFocus()"
         (scDialogEscape)="closed.emit('escape')"
@@ -164,7 +164,7 @@ let uid = 0;
         [attr.data-float]="float() ? '' : null"
         [attr.data-access]="access()"
         [attr.role]="frameRole()"
-        [attr.aria-modal]="isModal() ? 'true' : null"
+        [attr.aria-modal]="trapped() ? 'true' : null"
         [attr.aria-labelledby]="hasHead() ? titleId : null"
         [attr.aria-label]="!hasHead() && title() ? title() : null"
         [attr.aria-describedby]="describedBy()"
@@ -246,6 +246,15 @@ export class ScPopupComponent implements OnInit, OnDestroy {
   readonly layer: number;
 
   readonly isModal = computed(() => this.modal() ?? (this.kind() === 'dialog' || this.kind() === 'large'));
+  /** Opened at phone width: a panel is full screen there, so the page behind it is not reachable (see `trapped`). */
+  private readonly phoneAtOpen = typeof matchMedia === 'function' && matchMedia(SC_POPUP_PHONE_QUERY).matches;
+  /**
+   * Focus is contained (Tab trap + inert page, aria-modal): every modal, and a non-modal panel / dialog
+   * while it covers the whole phone screen (a floating card and a menu keep their non-modal behaviour).
+   */
+  readonly trapped = computed(
+    () => this.isModal() || (this.phoneAtOpen && this.kind() !== 'menu' && this.kind() !== 'notice' && !this.float()),
+  );
   readonly hasBackdrop = computed(() => this.backdrop() ?? this.isModal());
   readonly hasHead = computed(() => this.kind() === 'panel' || this.kind() === 'dialog' || this.kind() === 'large');
   readonly showEyebrow = computed(() => this.hasHead() && !!this.eyebrow());

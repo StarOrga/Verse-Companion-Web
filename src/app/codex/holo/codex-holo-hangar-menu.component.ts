@@ -50,7 +50,7 @@ export interface HangarExemplar {
         <sc-popup class="menu" kind="menu" [backdrop]="false" [title]="'codex.holo.hangar.menuAria' | translate" (closed)="open.set(false)">
         <div id="holo-hangar-menu" role="menu" tabindex="-1" [attr.aria-label]="'codex.holo.hangar.menuAria' | translate" (keydown)="onMenuKey($event)">
           <div class="gh" role="presentation">{{ 'codex.holo.hangar.loadouts' | translate }}</div>
-          <a role="menuitemradio" class="row" [class.on]="activeId() === null" [attr.aria-checked]="activeId() === null"
+          <a role="menuitemradio" class="row" [class.on]="activeId() === null" [attr.aria-checked]="activeId() === null" [attr.cdkFocusInitial]="(activeId() === null) ? '' : null"
              [routerLink]="werkLink().commands" [queryParams]="werkLink().queryParams" (click)="open.set(false)">
             <i class="radio" aria-hidden="true"></i>
             <span class="txt"><b>{{ 'codex.holo.hangar.werk' | translate }}</b>
@@ -60,7 +60,7 @@ export interface HangarExemplar {
             </span>
           </a>
           @for (e of exemplars(); track e.id) {
-            <a role="menuitemradio" class="row" [class.on]="activeId() === e.id" [attr.aria-checked]="activeId() === e.id"
+            <a role="menuitemradio" class="row" [class.on]="activeId() === e.id" [attr.aria-checked]="activeId() === e.id" [attr.cdkFocusInitial]="(activeId() === e.id) ? '' : null"
                [routerLink]="e.link.commands" [queryParams]="e.link.queryParams" (click)="open.set(false)">
               <i class="radio" aria-hidden="true"></i>
               <span class="txt">
@@ -111,7 +111,7 @@ export interface HangarExemplar {
             }
             <!-- A wish that carries a loadout (D1): opened like an exemplar, its parts become the draft. -->
             @for (w of wishes(); track w.id) {
-              <a role="menuitemradio" class="row wish" [class.on]="activeId() === w.id" [attr.aria-checked]="activeId() === w.id"
+              <a role="menuitemradio" class="row wish" [class.on]="activeId() === w.id" [attr.aria-checked]="activeId() === w.id" [attr.cdkFocusInitial]="(activeId() === w.id) ? '' : null"
                  [routerLink]="w.link.commands" [queryParams]="w.link.queryParams" (click)="open.set(false)">
                 <i class="radio" aria-hidden="true"></i>
                 <span class="txt">
@@ -232,7 +232,7 @@ export class CodexHoloHangarMenuComponent {
 
   toggle(): void {
     this.open.update((v) => !v);
-    if (this.open()) queueMicrotask(() => this.focusItem('checked'));
+    // The scaffold focuses the `cdkFocusInitial` item (the checked one) once the popup has rendered.
   }
 
   protected fire<T>(out: { emit(v: T): void }, value: T): void {
@@ -264,10 +264,5 @@ export class CodexHoloHangarMenuComponent {
 
   private items(): HTMLElement[] {
     return Array.from(this.host.querySelectorAll<HTMLElement>('[role^="menuitem"]:not([disabled])'));
-  }
-
-  private focusItem(which: 'checked'): void {
-    const el = which === 'checked' ? this.host.querySelector<HTMLElement>('[aria-checked="true"]') : null;
-    (el ?? this.items()[0])?.focus({ preventScroll: true });
   }
 }

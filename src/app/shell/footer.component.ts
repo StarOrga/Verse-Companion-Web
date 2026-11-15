@@ -33,13 +33,13 @@ import { BRAND_NAME } from '../core/brand';
           <button type="button" class="sf-badge-btn" aria-haspopup="dialog"
                   [attr.aria-expanded]="bubble() === 'pinned'"
                   [attr.aria-describedby]="bubble() === 'peek' ? 'sf-bubble' : null"
-                  (click)="togglePinned()" (focus)="peek()" (keydown.escape)="bubble.set('closed')">
+                  (click)="togglePinned()" (focus)="peekOnFocus()" (keydown.escape)="bubble.set('closed')">
             <img src="icons/made-by-community.png" [alt]="'footer.badgeAlt' | translate" width="32" height="32" />
             <span class="sf-word">{{ 'footer.madeByCommunity' | translate }}</span>
           </button>
           @if (bubble() === 'pinned') {
             <div class="sf-bubble sf-pinned" id="sf-bubble">
-              <sc-popup kind="panel" [title]="'footer.disclaimerTitle' | translate" [backClose]="false" (closed)="bubble.set('closed')">
+              <sc-popup kind="panel" [title]="'footer.disclaimerTitle' | translate" [backClose]="false" (closed)="closePinned()">
                 <ng-container *ngTemplateOutlet="disclaimerBody" />
               </sc-popup>
             </div>
@@ -391,6 +391,13 @@ export class FooterComponent {
   /** Disclaimer bubble: hover / focus peeks, a click pins it (then it is a real dialog). */
   protected readonly bubble = signal<'closed' | 'peek' | 'pinned'>('closed');
   protected peek(): void { if (this.bubble() === 'closed') this.bubble.set('peek'); }
+  /** Closing the pinned bubble returns focus to the badge: that focus must not open the peek again. */
+  private noPeekUntil = 0;
+  protected peekOnFocus(): void { if (Date.now() >= this.noPeekUntil) this.peek(); }
+  protected closePinned(): void {
+    this.noPeekUntil = Date.now() + 400;
+    this.bubble.set('closed');
+  }
   protected unpeek(): void { if (this.bubble() === 'peek') this.bubble.set('closed'); }
   protected togglePinned(): void { this.bubble.set(this.bubble() === 'pinned' ? 'closed' : 'pinned'); }
   /** A press beside the pinned bubble closes it (a popover rule); a press on the badge is the toggle's own. */
