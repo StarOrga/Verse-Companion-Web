@@ -14,6 +14,7 @@ import {
 } from '@angular/core';
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
+import { ScPopupComponent } from './popup/sc-popup.component';
 import { ColumnFacet, ColumnKind, SortDir } from '../codex/table-column-menu';
 
 /**
@@ -61,6 +62,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 @Component({
   selector: 'sc-column-menu',
   standalone: true,
+  imports: [ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <span class="cm-wrap">
@@ -83,6 +85,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
       </details>
     </span>
     <ng-template #panelTpl>
+      <sc-popup kind="menu" [backdrop]="false" [title]="sortLabel()" (closed)="closeDetails()">
       <div class="cm-panel" (keydown)="onPanelKeydown($event)">
         <p class="cm-title">{{ sortLabel() }}</p>
         <div class="cm-sortrow">
@@ -131,6 +134,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
           <button type="button" class="cm-clear" (click)="doClear()">{{ clearLabel() }}</button>
         </div>
       </div>
+      </sc-popup>
     </ng-template>
   `,
   styles: [`
@@ -154,9 +158,8 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
     /* MEDIUM-5: positioned by the CDK overlay (flexibleConnectedTo the kebab
        button) rather than position: absolute inside .cm-pop — see the module
        doc comment above the imports. */
-    .cm-panel { width: min(var(--sc-ov-menu), calc(100vw - 32px));
-      background: var(--sc-bg-2); border: 1px solid var(--sc-border); border-radius: var(--radius-md, 4px);
-      box-shadow: 0 10px 28px rgb(0 0 0 / .6); padding: 8px; display: flex; flex-direction: column; gap: 6px;
+    /* Content only: frame, border, shadow and the menu width come from sc-popup. */
+    .cm-panel { display: flex; flex-direction: column; gap: 6px;
       text-transform: none; letter-spacing: normal; font-weight: 400; }
     .cm-title { margin: 4px 0 0; font-size: max(11px, var(--sc-fs-floor)); text-transform: uppercase; letter-spacing: 0.06em; color: var(--sc-fg-2); }
     .cm-sortrow { display: flex; gap: 4px; }
@@ -271,7 +274,7 @@ export class ScColumnMenuComponent {
   /** Closes both the native `<details>` (so `.cm-kebab` stops reading as open)
    * and the portaled panel — used wherever a close is triggered from outside
    * the native `toggle` event (Escape, Clear, backdrop click, scroll-close). */
-  private closeDetails(): void {
+  protected closeDetails(): void {
     this.disposeOverlay();
     const det = this.detEl()?.nativeElement;
     if (det) det.open = false;

@@ -37,7 +37,7 @@ import { hangarRedirectLink, hqStockLink, type HqPageLink } from '../../hq/hq-ro
 import { placeLabel } from '../../hq/now/hq-live.util';
 import { WishCartService } from '../../shell/cart/wish-cart.service';
 import { ScActionDirective } from '../action/sc-action.directive';
-import { ScDialogDirective } from '../dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../popup/sc-popup.component';
 import { ScTooltipDirective } from '../tooltip/sc-tooltip.directive';
 import { UndoToastService } from '../undo-toast/undo-toast.service';
 import { PATH_ICONS } from './path-icons';
@@ -87,7 +87,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
 @Component({
   selector: 'sc-item-path',
   standalone: true,
-  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScActionDirective, ScDialogDirective, ScTooltipDirective],
+  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.ip-primary]': "level() === 'primary'" },
   template: `
@@ -198,14 +198,12 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
     <ng-template #pop>
       @if (mode() === 'error') {
         <!-- A refusal (tone info) reads neutral and politely; only a real failure is an alert in the danger tone. -->
-        <div class="rp" [class.err]="errorTone() === 'error'" [attr.role]="errorTone() === 'error' ? 'alert' : 'status'">{{ errorKey() | translate }}</div>
+        <sc-popup class="rp" [class.err]="errorTone() === 'error'" [attr.role]="errorTone() === 'error' ? 'alert' : 'status'"
+                  kind="notice" [title]="'pathCtl.whereTitle' | translate">{{ errorKey() | translate }}</sc-popup>
       } @else {
-        <div class="rp" role="dialog" tabindex="-1" scDialog scDialogInitialFocus="first" [scDialogReturnFocus]="anchor()"
-             [attr.aria-label]="'pathCtl.whereTitle' | translate" (scDialogEscape)="closePop()">
-          <div class="rp-h">
-            <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.inventar; track $index) { <path [attr.d]="d" /> }</svg>
-            <b>{{ 'pathCtl.whereTitle' | translate }}</b>
-          </div>
+        <sc-popup class="rp" kind="panel" [title]="'pathCtl.whereTitle' | translate" [eyebrow]="name() ?? ''"
+                  [returnFocus]="anchor()" (closed)="closePop()">
+          <svg popupIcon class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.inventar; track $index) { <path [attr.d]="d" /> }</svg>
           <div class="places">
             @for (p of placeOptions(); track p; let first = $first) {
               <button type="button" class="place" [class.on]="first" (click)="choosePlace(p)">{{ placeText(p) }}</button>
@@ -219,7 +217,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
               <button scAction tier="secondary" type="button" (click)="choosePlace(placeInput.value)"><span>{{ 'pathCtl.store' | translate }}</span></button>
             </div>
           }
-        </div>
+        </sc-popup>
       }
     </ng-template>
   `,
@@ -299,16 +297,8 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
     }
     .txt:focus-visible, .alink:focus-visible, .place:focus-visible, .st button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
 
-    .rp {
-      box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; width: min(310px, calc(100vw - 16px)); padding: 12px;
-      max-height: 60vh; max-height: 60dvh; overflow-y: auto;
-      border: 1px solid color-mix(in srgb, var(--sc-accent) 30%, var(--sc-border)); border-radius: 12px;
-      background: var(--sc-bg-1); color: var(--sc-fg-0); font-size: 0.875rem; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.65);
-    }
-    .rp:focus { outline: none; }
-    .rp.err { color: var(--sc-danger); border-color: color-mix(in srgb, var(--sc-danger) 55%, transparent); }
-    .rp-h { display: flex; align-items: center; gap: 8px; color: var(--sc-accent); }
-    .rp-h b { font-weight: 600; color: var(--sc-fg-0); }
+    /* Frame, ✕, width and the phone full screen come from sc-popup; only content rules stay. */
+    .rp.err { color: var(--sc-danger); }
     .alink { display: inline-flex; align-items: center; min-height: var(--sc-tap-min, 0px); color: var(--sc-accent); font-size: 0.8125rem; text-decoration: none; }
     .alink:hover { text-decoration: underline; text-underline-offset: 3px; }
     .st { display: inline-flex; align-items: center; gap: 2px; flex: none; }
@@ -339,7 +329,6 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
       .path { grid-template-columns: minmax(0, 1fr); }
       .stop + .stop::before { display: none; }
       .pill { flex-wrap: wrap; border-radius: 18px; }
-      .rp { width: calc(100vw - 16px); }
     }
   `],
 })
