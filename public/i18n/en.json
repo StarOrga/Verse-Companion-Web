@@ -1659,13 +1659,11 @@
       "holoOverlay": {
         "label": "3D view: {{name}}",
         "fullscreen": "Fullscreen",
-        "exitFullscreen": "Exit fullscreen",
-        "close": "Close the 3D view"
+        "exitFullscreen": "Exit fullscreen"
       },
       "partPopup": {
         "label": "Component: {{name}}",
         "eyebrow": "Component",
-        "close": "Close component",
         "noValues": "No values known for this component."
       },
       "stageLaunchers": "{{n}} launchers",
@@ -1876,7 +1874,6 @@
     "picker": {
       "title": "Pick a component — {{port}} · S{{size}}",
       "installed": "fitted: {{name}}",
-      "close": "Close",
       "searchPlaceholder": "Search … name, manufacturer, damage type",
       "searchLabel": "Search components",
       "compareWith": "Compare with",
@@ -2421,7 +2418,6 @@
       "flightMissing": "Flight characteristics live in the vehicle definition, which our P4K extractor does not resolve yet — the rows stay here so they fill in by themselves once it does."
     },
     "inspect": {
-      "close": "Close",
       "hardpoint": "Hardpoint",
       "parameters": "Parameters",
       "general": "General",
@@ -2705,7 +2701,6 @@
       "eyebrow": "Codex index",
       "filtersAria": "Filters",
       "filtersTitle": "Filters",
-      "closeFilters": "Close filters",
       "filterButton": "Filters ({{count}})",
       "showResults": "Show {{count}} results",
       "areaLabel": "Area",
@@ -3116,8 +3111,7 @@
       "pickSlot": "Slot in {{set}}",
       "replaces": "Replaces the current piece",
       "done": "{{item}} is now in {{slot}} of {{set}}",
-      "toSet": "To the set",
-      "close": "Close"
+      "toSet": "To the set"
     }
   },
   "news": {

@@ -1659,13 +1659,11 @@
       "holoOverlay": {
         "label": "3D-Ansicht: {{name}}",
         "fullscreen": "Vollbild",
-        "exitFullscreen": "Vollbild verlassen",
-        "close": "3D-Ansicht schließen"
+        "exitFullscreen": "Vollbild verlassen"
       },
       "partPopup": {
         "label": "Bauteil: {{name}}",
         "eyebrow": "Bauteil",
-        "close": "Bauteil schließen",
         "noValues": "Für dieses Bauteil liegen keine Werte vor."
       },
       "stageLaunchers": "{{n}} Werfer",
@@ -1876,7 +1874,6 @@
     "picker": {
       "title": "Bauteil wählen — {{port}} · S{{size}}",
       "installed": "eingebaut: {{name}}",
-      "close": "Schließen",
       "searchPlaceholder": "Suchen … Name, Hersteller, Schadensart",
       "searchLabel": "Bauteile durchsuchen",
       "compareWith": "Vergleichen mit",
@@ -2421,7 +2418,6 @@
       "flightMissing": "Die Flugeigenschaften stehen in der Vehicle-Definition, die unser P4K-Extractor noch nicht auflöst — die Zeilen bleiben stehen und füllen sich von selbst, sobald er es tut."
     },
     "inspect": {
-      "close": "Schließen",
       "hardpoint": "Hardpoint",
       "parameters": "Parameter",
       "general": "Allgemein",
@@ -2705,7 +2701,6 @@
       "eyebrow": "Codex-Index",
       "filtersAria": "Filter",
       "filtersTitle": "Filter",
-      "closeFilters": "Filter schließen",
       "filterButton": "Filter ({{count}})",
       "showResults": "{{count}} Treffer anzeigen",
       "areaLabel": "Bereich",
@@ -3116,8 +3111,7 @@
       "pickSlot": "Platz in {{set}}",
       "replaces": "Ersetzt das aktuelle Teil",
       "done": "{{item}} liegt jetzt in {{slot}} von {{set}}",
-      "toSet": "Zum Set",
-      "close": "Schließen"
+      "toSet": "Zum Set"
     }
   },
   "news": {
