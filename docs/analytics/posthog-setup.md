@@ -86,6 +86,16 @@ const send = async ({ method, path, body }) => {
 
 (paths are relative: `/api/environments/@current/…` and `/api/projects/@current/…`, the tab's own origin.)
 
+Getting the plan into the tab: the page's CSP blocks a fetch to `localhost`, so put a hidden `<input type="file">`
+on the page and hand it the `--emit-plan` output with the browser tool's file upload, then `JSON.parse(await file.text())`.
+
+**Applied once on 2026-11-15** this way (project 226518): dashboards „Läuft es?“ (1116461, 13 tiles),
+„Wird es genutzt?“ (1116462, 28), „Was kostet es?“ (1116463, 9), 36 actions, flag `telemetry-saver` (inactive).
+All 50 insights computed without error (`?refresh=force_blocking`). Every HogQL tile and the server-side queries
+of `telemetry-overview` / `posthog-signal` were run against `/api/environments/226518/query/` first — two traps
+found there: `fn` is a HogQL keyword (lambda) and must not be an alias, and `session_replay_events` has
+`start_time`, not `min_first_timestamp`. The billing API names the LLM product `llm_analytics`.
+
 ## 6. Check
 
 - Three dashboards exist, each tile loads (a HogQL tile on an event that has not arrived yet is simply empty).
