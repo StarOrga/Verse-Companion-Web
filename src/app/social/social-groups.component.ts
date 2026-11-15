@@ -7,6 +7,7 @@ import { FriendsService } from './friends.service';
 import { edgeLabel } from './friends.types';
 import { SocialService } from './social.service';
 import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, friendPath, isValidGroupName } from './social.types';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /**
  * Groups (C18, R2): an owner-private list of friends, kind org or
@@ -16,7 +17,7 @@ import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, frien
 @Component({
   selector: 'sc-social-groups',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, ScSegmentedComponent],
+  imports: [ScActionDirective, TranslatePipe, RouterLink, ScSegmentedComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="sc-card section" id="social-groups">
@@ -36,7 +37,7 @@ import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, frien
                [attr.maxlength]="nameMax"
                [placeholder]="'social.groups.namePlaceholder' | translate"
                [attr.aria-label]="'social.groups.namePlaceholder' | translate" autocomplete="off" />
-        <button type="submit" class="sc-btn sc-btn-primary" [disabled]="social.busy() || !nameValid()">
+        <button type="submit" scAction tier="secondary" [disabled]="social.busy() || !nameValid()">
           {{ 'social.groups.create' | translate }}
         </button>
       </form>
@@ -44,7 +45,7 @@ import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, frien
       @if (social.loadError(); as key) {
         <div class="load-error" role="alert">
           <span>{{ key | translate }}</span>
-          <button type="button" class="sc-btn micro" (click)="reload()">{{ 'errors.retry' | translate }}</button>
+          <button type="button" scAction tier="secondary" (click)="reload()">{{ 'errors.retry' | translate }}</button>
         </div>
       } @else if (social.groups().length === 0) {
         <p class="empty-inline">{{ 'social.groups.empty' | translate }}</p>
@@ -56,10 +57,10 @@ import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, frien
                 <span class="group-name">{{ g.name }}</span>
                 <span class="kind">{{ 'social.group.kind.' + g.kind | translate }}</span>
                 <span class="group-actions">
-                  <button type="button" class="sc-btn micro" [disabled]="social.busy()" (click)="rename(g)">
+                  <button type="button" scAction tier="secondary" [disabled]="social.busy()" (click)="rename(g)">
                     {{ 'social.groups.rename' | translate }}
                   </button>
-                  <button type="button" class="sc-btn micro danger" [disabled]="social.busy()" (click)="remove(g)">
+                  <button type="button" scAction tier="secondary" tone="danger" [disabled]="social.busy()" (click)="remove(g)">
                     {{ 'social.groups.delete' | translate }}
                   </button>
                 </span>
@@ -126,10 +127,7 @@ import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, frien
     .chip:hover:not(:disabled) { border-color: var(--sc-accent); }
     .chip.on { border-color: var(--sc-accent); background: rgba(0, 212, 255, 0.12); color: var(--sc-accent); }
     .chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-    .sc-btn.micro { padding: 4px 10px; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.04em; }
-    .sc-btn.micro.danger { color: var(--sc-danger); border-color: var(--sc-danger); }
-    .sc-btn.micro.danger:hover:not(:disabled) { background: var(--sc-danger); color: var(--sc-bg-0); }
-    @media (pointer: coarse) { .sc-btn, .chip { min-height: 48px; } }
+    @media (pointer: coarse) { .chip { min-height: 48px; } }
   `],
 })
 export class SocialGroupsComponent implements OnInit {

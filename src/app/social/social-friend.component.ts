@@ -15,6 +15,7 @@ import { REPORT_CATEGORIES, REPORT_REASON_MAX, ReportCategory, edgeLabel, isVali
 import { SocialCompareComponent } from './social-compare.component';
 import { SocialService } from './social.service';
 import { FriendOverview, OverviewShared } from './social.types';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 type View = { kind: 'loading' } | { kind: 'missing' } | { kind: 'error'; key: string } | { kind: 'ok'; data: FriendOverview };
 
@@ -27,7 +28,7 @@ type View = { kind: 'loading' } | { kind: 'missing' } | { kind: 'error'; key: st
 @Component({
   selector: 'sc-social-friend',
   standalone: true,
-  imports: [TranslatePipe, ScDatePipe, RouterLink, PageHeaderComponent, SocialCompareComponent, ScTooltipDirective, NgTemplateOutlet, ScSelectComponent, ItemPathComponent],
+  imports: [ScActionDirective, TranslatePipe, ScDatePipe, RouterLink, PageHeaderComponent, SocialCompareComponent, ScTooltipDirective, NgTemplateOutlet, ScSelectComponent, ItemPathComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
@@ -45,7 +46,7 @@ type View = { kind: 'loading' } | { kind: 'missing' } | { kind: 'error'; key: st
           <sc-page-header [crumbs]="crumbs" [rememberAs]="'social.page.title' | translate" />
           <div class="load-error" role="alert">
             <span>{{ errorKey() | translate }}</span>
-            <button type="button" class="sc-btn" (click)="load()">{{ 'errors.retry' | translate }}</button>
+            <button type="button" scAction tier="secondary" (click)="load()">{{ 'errors.retry' | translate }}</button>
           </div>
         }
         @case ('ok') {
@@ -60,10 +61,10 @@ type View = { kind: 'loading' } | { kind: 'missing' } | { kind: 'error'; key: st
                 }
               </span>
               <div phActions class="actions">
-                <a class="sc-btn" routerLink="/hq/locker">{{ 'social.friendPage.share' | translate }}</a>
-                <button type="button" class="sc-btn" [disabled]="friends.busy()" (click)="remove()">{{ 'friends.actions.remove' | translate }}</button>
-                <button type="button" class="sc-btn" [disabled]="friends.busy()" (click)="block()">{{ 'friends.actions.block' | translate }}</button>
-                <button type="button" class="sc-btn danger" [disabled]="friends.busy()" (click)="reportOpen.set(true)">{{ 'friends.actions.report' | translate }}</button>
+                <a scAction tier="secondary" routerLink="/hq/locker">{{ 'social.friendPage.share' | translate }}</a>
+                <button type="button" scAction tier="secondary" [disabled]="friends.busy()" (click)="remove()">{{ 'friends.actions.remove' | translate }}</button>
+                <button type="button" scAction tier="secondary" [disabled]="friends.busy()" (click)="block()">{{ 'friends.actions.block' | translate }}</button>
+                <button type="button" scAction tier="secondary" tone="danger" [disabled]="friends.busy()" (click)="reportOpen.set(true)">{{ 'friends.actions.report' | translate }}</button>
               </div>
             </sc-page-header>
 
@@ -92,8 +93,8 @@ type View = { kind: 'loading' } | { kind: 'missing' } | { kind: 'error'; key: st
                             [placeholder]="'friends.report.reasonPlaceholder' | translate"></textarea>
                 </label>
                 <div class="report-actions">
-                  <button type="button" class="sc-btn sc-btn-primary" [disabled]="friends.busy()" (click)="submitReport()">{{ 'friends.report.submit' | translate }}</button>
-                  <button type="button" class="sc-btn" (click)="reportOpen.set(false)">{{ 'friends.report.cancel' | translate }}</button>
+                  <button type="button" scAction tier="primary" [disabled]="friends.busy()" (click)="submitReport()">{{ 'friends.report.submit' | translate }}</button>
+                  <button type="button" scAction tier="secondary" (click)="reportOpen.set(false)">{{ 'friends.report.cancel' | translate }}</button>
                 </div>
               </div>
             }
@@ -177,9 +178,6 @@ type View = { kind: 'loading' } | { kind: 'missing' } | { kind: 'error'; key: st
       padding: 10px 14px; border-radius: 4px; background: rgba(248, 113, 113, 0.1); border: 1px solid var(--sc-danger); color: var(--sc-danger);
     }
     .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .actions .sc-btn { text-decoration: none; display: inline-flex; align-items: center; }
-    .sc-btn.danger { color: var(--sc-danger); border-color: var(--sc-danger); }
-    .sc-btn.danger:hover:not(:disabled) { background: var(--sc-danger); color: var(--sc-bg-0); }
     .online-dot { display: inline-block; width: 10px; height: 10px; margin-left: 10px; border-radius: 50%; background: var(--sc-success); }
     .cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
     @media (max-width: 760px) { .cols { grid-template-columns: minmax(0, 1fr); } }
@@ -192,7 +190,6 @@ type View = { kind: 'loading' } | { kind: 'missing' } | { kind: 'error'; key: st
     .tag { color: var(--sc-warning); }
     .path { margin-inline-start: auto; }
     .flagship { margin: 0 0 6px; }
-    @media (pointer: coarse) { .actions .sc-btn { min-height: 48px; } }
   `],
 })
 export class SocialFriendComponent {

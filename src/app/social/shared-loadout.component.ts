@@ -6,6 +6,7 @@ import { ScDatePipe } from '../core/locale/sc-date.pipe';
 import { RoleLoadoutItem } from '../hangar/hangar.types';
 import { LoadoutShareService } from './loadout-share.service';
 import { SharedLoadoutView, isValidShareToken, shareItems } from './loadout-share.types';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /**
  * The public read-only view of a shared loadout (`/shared/loadout/:token`).
@@ -25,7 +26,7 @@ import { SharedLoadoutView, isValidShareToken, shareItems } from './loadout-shar
 @Component({
   selector: 'sc-shared-loadout',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, ScDatePipe],
+  imports: [ScActionDirective, TranslatePipe, RouterLink, ScDatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
@@ -68,12 +69,12 @@ import { SharedLoadoutView, isValidShareToken, shareItems } from './loadout-shar
         </div>
 
         <p class="footnote">{{ 'share.view.footnote' | translate }}</p>
-        <a class="sc-btn" routerLink="/about">{{ 'share.view.aboutCta' | translate }}</a>
+        <a scAction tier="secondary" routerLink="/about">{{ 'share.view.aboutCta' | translate }}</a>
       } @else {
         <div class="sc-card state">
           <p class="state__title">{{ 'share.view.unavailable.title' | translate }}</p>
           <p>{{ 'share.view.unavailable.body' | translate }}</p>
-          <a class="sc-btn" routerLink="/about">{{ 'share.view.aboutCta' | translate }}</a>
+          <a scAction tier="secondary" routerLink="/about">{{ 'share.view.aboutCta' | translate }}</a>
         </div>
       }
     </section>
@@ -132,20 +133,13 @@ import { SharedLoadoutView, isValidShareToken, shareItems } from './loadout-shar
     .state__title { color: var(--sc-fg-0); font-weight: 600; margin: 0 0 6px; }
     .footnote { color: var(--sc-fg-2); font-size: max(0.74rem, var(--sc-fs-floor)); margin: 0; }
 
-    /* Deliberately only positioning + the touch height here: .sc-btn's look
-       is global (styles.scss) and this page renders on the bare public
-       layout, so it should look like /about's buttons, not like the
-       hangar's locally-restyled ones. */
-    .sc-btn {
-      align-self: flex-start;
-      text-decoration: none;
-      min-height: 48px;
-    }
-    .state .sc-btn { align-self: center; margin-top: 14px; }
+    /* Only positioning here: the look is the global scAction. */
+    .sc-action { align-self: flex-start; }
+    .state .sc-action { align-self: center; margin-top: 14px; }
 
     @media (max-width: 560px) {
       .slot-label { flex: 1 1 100%; }
-      .sc-btn { align-self: stretch; justify-content: center; }
+      .sc-action { align-self: stretch; justify-content: center; }
     }
   `],
 })
