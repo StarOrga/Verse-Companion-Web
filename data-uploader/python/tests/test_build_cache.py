@@ -147,6 +147,65 @@ def test_an_unchanged_hull_is_taken_from_the_previous_patch(tmp_path):
     assert (out / "models" / "AEGS_Gladius_standard.glb").read_bytes() == b"glb"
 
 
+def _prev_hull(tmp_path, entry_extra: dict):
+    files = {"Data/Ships/h.cga": b"hull", "Data/Ships/p.mtl": b"paint"}
+    prev = tmp_path / "skins-4.2"
+    cfg = HullExportConfig(cgf_converter=Path("c.exe"), out_dir=tmp_path / "o",
+                           work_dir=tmp_path / "w", reuse_dirs=[prev], pipeline="p1")
+    exp = Hull3DExporter(_P4K(files), cfg)
+    spec = ShipSpec("S", "Data/Ships/h.cga", "Data", [Paint("Data/Ships/p.mtl", "standard")])
+    src = exp.hull_src(spec, spec.paints[0])
+    (prev / "S" / "models").mkdir(parents=True)
+    (prev / "S" / "models" / "S_standard.glb").write_bytes(b"glb")
+    (prev / "S" / "skins.json").write_text(json.dumps({
+        "format": EXPORT_FORMAT,
+        "skins": [{"id": "standard", "model": "models/S_standard.glb", "hull_src": src,
+                   **entry_extra}]}))
+    (tmp_path / "o" / "S" / "models").mkdir(parents=True)
+    return exp._reuse_hull(spec, spec.paints[0], tmp_path / "o" / "S", src)
+
+
+def test_an_over_budget_hull_from_an_older_fit_search_is_built_again(tmp_path):
+    # 8.38 MB, built before the bisection: the same inputs, but not reused.
+    assert _prev_hull(tmp_path, {"model_mb": 8.38}) is None
+
+
+def test_an_over_budget_hull_from_the_current_fit_search_is_reused(tmp_path):
+    from sc_extract.hull3d import FIT_REVISION
+    got = _prev_hull(tmp_path, {"model_mb": 3.1, "fit": FIT_REVISION})
+    assert got is not None and got["reused"] and got["fit"] == FIT_REVISION
+
+
+def test_a_hull_within_the_budget_is_reused_without_a_fit_marker(tmp_path):
+    got = _prev_hull(tmp_path, {"model_mb": 1.44})
+    assert got is not None and "fit" not in got
+
+
+def test_needs_refit_only_for_over_budget_models_of_an_older_search():
+    from sc_extract.hull3d import FIT_REVISION, needs_refit
+    m = {"model": "models/S.glb"}
+    assert needs_refit({**m, "model_mb": 8.38}, 1_500_000)
+    assert not needs_refit({**m, "model_mb": 8.38, "fit": FIT_REVISION}, 1_500_000)
+    assert not needs_refit({**m, "model_mb": 1.5}, 1_500_000)
+    assert not needs_refit({**m, "model_mb": 8.38}, 0)  # budget off
+    assert not needs_refit({"model": None, "model_mb": 8.38}, 1_500_000)
+
+
+def test_a_cached_ship_with_an_over_budget_hull_is_built_again(tmp_path):
+    from sc_extract.hull3d import FIT_REVISION
+    from sc_extract.skin_export_app import _cached_catalog
+    stamp = {"game_build": "100", "pipeline": "p1"}
+    (tmp_path / "S").mkdir(parents=True)
+    cat = {"ship": "S", "format": EXPORT_FORMAT, "stamp": stamp,
+           "skins": [{"id": "standard", "model": "models/S_standard.glb", "model_mb": 8.38}]}
+    (tmp_path / "S" / "skins.json").write_text(json.dumps(cat))
+    assert _cached_catalog(tmp_path, "S", stamp, 1_500_000) is None
+    assert _cached_catalog(tmp_path, "S", stamp, 0) is not None  # budget off
+    cat["skins"][0]["fit"] = FIT_REVISION
+    (tmp_path / "S" / "skins.json").write_text(json.dumps(cat))
+    assert _cached_catalog(tmp_path, "S", stamp, 1_500_000) is not None
+
+
 def test_a_changed_hull_is_not_taken_from_the_previous_patch(tmp_path):
     files = {"Data/Ships/h.cga": b"hull v2", "Data/Ships/p.mtl": b"paint"}
     prev = tmp_path / "skins-4.2"

@@ -41,7 +41,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from . import stage_timing
 from .events import count, done, error, log, phase, progress
-from .hull3d import EXPORT_FORMAT, Hull3DExporter, HullExportConfig
+from .hull3d import EXPORT_FORMAT, Hull3DExporter, HullExportConfig, needs_refit
 from .live_limits import LiveLimits
 from .ship_discovery import SHIPS_ROOT, ShipDiscovery, ShipRef
 from .ship_export import parse_ship
@@ -438,7 +438,8 @@ class _ShipRun:
         args, cfg, pkg = self.args, self.cfg, self.pkg
         t0, before = time.perf_counter(), stage_timing.snapshot()
         if args.skip_existing:
-            prev = _cached_catalog(args.out, ref.ship_id, getattr(args, "stamp", None))
+            prev = _cached_catalog(args.out, ref.ship_id, getattr(args, "stamp", None),
+                           _budget_bytes(args))
             if prev is not None:
                 log("info", f"{ref.ship_id}: cached — skipping build")
                 count(ref.ship_id, _cached_model_count(prev))
@@ -503,7 +504,8 @@ class _ShipRun:
 
 
 def _cached_catalog(out: Path, ship_id: str,
-                    stamp: Optional[Dict[str, str]] = None) -> Optional[dict]:
+                    stamp: Optional[Dict[str, str]] = None,
+                    max_model_bytes: int = 0) -> Optional[dict]:
     """The ship's skins.json if it is a build of the CURRENT format — a cache
     from the textured per-skin export must be rebuilt, or its textured glbs
     would be uploaded again — and, given a ``stamp``, of the same game build
@@ -530,7 +532,16 @@ def _cached_catalog(out: Path, ship_id: str,
             return None
         if new_conv and old_conv != new_conv and _cached_model_count(prev) == 0:
             return None
+    # A hull left over budget by an older over-budget search goes back through
+    # the build; its hull_src still matches, so this skip and the hull reuse
+    # in hull3d are the two places that must let it through.
+    if any(needs_refit(s, max_model_bytes) for s in prev.get("skins", [])):
+        return None
     return prev
+
+
+def _budget_bytes(args) -> int:
+    return int((getattr(args, "max_model_mb", 0) or 0) * 1e6)
 
 
 def _cached_model_count(prev: dict) -> int:
@@ -546,7 +557,8 @@ def _fully_cached(args, ref: ShipRef) -> Optional[dict]:
     """Entry for a ship the parent can answer without a worker (no P4K)."""
     if not args.skip_existing:
         return None
-    prev = _cached_catalog(args.out, ref.ship_id, getattr(args, "stamp", None))
+    prev = _cached_catalog(args.out, ref.ship_id, getattr(args, "stamp", None),
+                           _budget_bytes(args))
     if prev is None:
         return None
     if args.package and not (args.out / ref.ship_id / "package.json").exists():

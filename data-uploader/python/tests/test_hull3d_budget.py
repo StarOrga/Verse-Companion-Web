@@ -147,13 +147,57 @@ def test_gate_refuses_a_hull_whose_first_rung_has_holes(tmp_path: Path) -> None:
     assert not (tmp_path / "web.glb").exists()
 
 
+_TEAR = ("+z", "-x")
+
+
 def test_gate_keeps_last_gap_free_rung_when_simplify_tears(tmp_path: Path) -> None:
-    ex, calls, ref = _gated_exporter(tmp_path, [(1_500_000, ()), (900_000, ("+z", "-x"))])
+    # Every bisection step between 0 and the tearing 0.0005 tears too.
+    ex, calls, ref = _gated_exporter(tmp_path, [(1_500_000, ())] + [(900_000, _TEAR)] * 4)
     size = ex._optimize_to_budget(tmp_path / "raw.glb", tmp_path / "web.glb", "standard",
                                   reference=ref)
     assert size == 1_500_000  # over budget, but whole
-    assert calls == [0.0, 0.0005]
+    assert calls == [0.0, 0.0005, 0.00025, 0.000125, 0.0000625]
+    assert ex.last_integrity is not None
     assert sorted(p.name for p in tmp_path.glob("web*")) == ["web.glb"]
+
+
+def test_tearing_rung_bisects_to_the_best_gap_free_attempt(tmp_path: Path) -> None:
+    # 0.00025 holds (still over budget), 0.000375 tears, 0.0003125 holds.
+    ex, calls, ref = _gated_exporter(tmp_path, [
+        (4_000_000, ()), (900_000, _TEAR), (2_000_000, ()), (900_000, _TEAR), (1_700_000, ())])
+    size = ex._optimize_to_budget(tmp_path / "raw.glb", tmp_path / "web.glb", "standard",
+                                  reference=ref)
+    assert size == 1_700_000
+    assert calls == [0.0, 0.0005, 0.00025, 0.000375, 0.0003125]
+    assert ex.last_integrity.ok  # the report of the hull that was kept
+    assert sorted(p.name for p in tmp_path.glob("web*")) == ["web.glb"]
+
+
+def test_bisection_stops_at_the_first_gap_free_attempt_within_budget(tmp_path: Path) -> None:
+    ex, calls, ref = _gated_exporter(tmp_path, [
+        (4_000_000, ()), (900_000, _TEAR), (950_000, ())])
+    size = ex._optimize_to_budget(tmp_path / "raw.glb", tmp_path / "web.glb", "standard",
+                                  reference=ref)
+    assert size == 950_000
+    assert calls == [0.0, 0.0005, 0.00025]
+
+
+def test_bisection_starts_from_the_last_gap_free_rung(tmp_path: Path) -> None:
+    # 0 and 0.0005 hold but stay over budget, 0.001 tears: bisect 0.0005..0.001.
+    ex, calls, ref = _gated_exporter(tmp_path, [
+        (4_000_000, ()), (3_000_000, ()), (900_000, _TEAR), (950_000, ())])
+    size = ex._optimize_to_budget(tmp_path / "raw.glb", tmp_path / "web.glb", "standard",
+                                  reference=ref)
+    assert size == 950_000
+    assert calls == [0.0, 0.0005, 0.001, 0.00075]
+
+
+def test_hull_that_fits_a_rung_never_bisects(tmp_path: Path) -> None:
+    # The common case is unchanged: over budget at 0, fits at 0.0005.
+    ex, calls, ref = _gated_exporter(tmp_path, [(1_500_000, ()), (900_000, ())])
+    assert ex._optimize_to_budget(tmp_path / "raw.glb", tmp_path / "web.glb", "standard",
+                                  reference=ref) == 900_000
+    assert calls == [0.0, 0.0005]
 
 
 def test_gate_passes_clean_hull_within_budget(tmp_path: Path) -> None:
