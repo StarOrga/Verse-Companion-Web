@@ -1,7 +1,61 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.0",
+  "current": "0.270.2",
   "releases": [
+    {
+      "version": "0.270.2",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "With admin access the header no longer runs past a 1280 px window or breaks onto two rows at 1440 px: the admin entries fold into the Admin menu below 1600 px."
+            },
+            {
+              "title": "",
+              "text": "Popup row cascades keep their exact 30 ms rhythm even on a busy machine."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.270.1",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Swap picker on phones: the \"compare with\" and \"delta against\" switches no longer run off the screen; their labels sit above them and the hint wraps."
+            },
+            {
+              "title": "",
+              "text": "The image viewer no longer closes on a click beside the picture; use ✕ or Escape."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "One quantity stepper everywhere (wish cart, wish list, HQ Nachschub), with labelled −/+ buttons and touch-sized targets."
+            },
+            {
+              "title": "",
+              "text": "Choice pills in the HQ dialogs (claim channel, Nachschub target, wish/sell, buy/mine, mode, kind) share one control with arrow-key support."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.270.0",
       "date": "2026-11-15",
