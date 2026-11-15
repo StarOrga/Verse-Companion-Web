@@ -512,8 +512,20 @@ def _cached_catalog(out: Path, ship_id: str,
         return None
     if not isinstance(prev, dict) or prev.get("format") != EXPORT_FORMAT:
         return None
-    if stamp is not None and prev.get("stamp") != stamp:
-        return None
+    if stamp is not None:
+        # The converter's raw digest rides along in the stamp but does not
+        # decide by itself: an output-equivalent converter build is keyed like
+        # the old one (build_cache.CONVERTER_ALIASES), so a ship WITH a model
+        # stays cached. A ship that ended without one is built once more by a
+        # converter it was not tried with — that build may be the one that
+        # converts it (v2.0.0-sc.1: the 25 hulls v2.0.0 overflowed on).
+        old = dict(prev.get("stamp") or {})
+        new = dict(stamp)
+        old_conv, new_conv = old.pop("converter", None), new.pop("converter", None)
+        if old != new:
+            return None
+        if new_conv and old_conv != new_conv and _cached_model_count(prev) == 0:
+            return None
     return prev
 
 
@@ -736,10 +748,14 @@ def main() -> int:
         # without opening the P4K; only the rest needs a worker.
         # Build stamp: a cached ship only counts when it came from this game
         # build and this pipeline (see `_cached_catalog`).
-        from .build_cache import pipeline_tag
+        from .build_cache import file_digest, pipeline_tag
         args.stamp = {"game_build": args.game_build,
                       "pipeline": pipeline_tag(args.converter, args.cache_salt,
                                                recipe=args.recipe)}
+        try:
+            args.stamp["converter"] = file_digest(args.converter)
+        except OSError:
+            pass
         jobs: List[Tuple[int, ShipRef]] = []
         for i, ref in enumerate(refs):
             entry = _fully_cached(args, ref)

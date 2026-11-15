@@ -206,7 +206,12 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // 6: liveries come from the DataCore (names, which ship they fit, their
     //    .mtl) via the build manifest, and `<mesh>_ext.mtl` counts as the
     //    base material — the Starlancer MAX / TAC had no 3D hull at all.
-    revision: 6,
+    // 7: cgf-converter v2.0.0-sc.1 + a texture-free retry for hull materials
+    //    the converter cannot read — the hulls v2.0.0 overflowed on (Galaxy,
+    //    Polaris, Perseus, Constellations, Vulture, Hull B …), every Vanguard,
+    //    the Salvation and the Blade now build. Cached models are kept (the
+    //    build is keyed as v2.0.0); only the ships that had none are built.
+    revision: 7,
     phases: [],
     sources: [
       'data-uploader/python/sc_extract/assets3d/',
