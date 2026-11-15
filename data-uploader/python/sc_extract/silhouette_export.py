@@ -76,11 +76,9 @@ def _short_scratch_root(work_dir: Path) -> Path:
 
 
 def _stderr_tail(r: Any) -> str:
-    """The converter's last stderr line, so an rc=1 names its cause in the log."""
-    raw = getattr(r, "stderr", None) or getattr(r, "stdout", None) or b""
-    text = raw.decode("utf-8", "replace") if isinstance(raw, (bytes, bytearray)) else str(raw)
-    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-    return f": {lines[-1][:200]}" if lines else ""
+    """The converter's cause of an rc=1, for the log (`converter_report`)."""
+    from .converter_report import converter_reason
+    return converter_reason(r)
 
 
 class SilhouetteSkip(Exception):

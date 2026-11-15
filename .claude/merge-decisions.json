@@ -35,6 +35,16 @@
         "hunks": [
           "ef1b2643e01e"
         ]
+      },
+      {
+        "ship": "claude/data-uploader-logs-duplicates-4a5319",
+        "by": "JerryT2T",
+        "value": "regenerated count incl. this branch's new files",
+        "decided": true,
+        "at": "2026-11-15T14:09:55.079Z",
+        "hunks": [
+          "c43d6d4ce439"
+        ]
       }
     ],
     ".claude/project-map.md›data-uploader/python›count": [
@@ -47,6 +57,16 @@
         "hunks": [
           "1f59b7e28021"
         ]
+      },
+      {
+        "ship": "claude/data-uploader-logs-duplicates-4a5319",
+        "by": "JerryT2T",
+        "value": "regenerated count incl. this branch's new files",
+        "decided": true,
+        "at": "2026-11-15T14:09:55.079Z",
+        "hunks": [
+          "da9db685b437"
+        ]
       }
     ],
     ".claude/project-map.md›data-uploader›count": [
@@ -58,6 +78,16 @@
         "at": "2026-11-11T17:59:08.204Z",
         "hunks": [
           "453e9c79e111"
+        ]
+      },
+      {
+        "ship": "claude/data-uploader-logs-duplicates-4a5319",
+        "by": "JerryT2T",
+        "value": "regenerated count incl. this branch's new files",
+        "decided": true,
+        "at": "2026-11-15T14:09:55.079Z",
+        "hunks": [
+          "06c7d39acf99"
         ]
       }
     ],
@@ -251,6 +281,16 @@
         "hunks": [
           "45b13116b78a"
         ]
+      },
+      {
+        "ship": "claude/data-uploader-logs-duplicates-4a5319",
+        "by": "JerryT2T",
+        "value": "regenerated count incl. this branch's new files",
+        "decided": true,
+        "at": "2026-11-15T14:09:55.079Z",
+        "hunks": [
+          "1ac2ea1f3954"
+        ]
       }
     ],
     ".claude/project-map.md›migrations/›count": [
@@ -392,6 +432,23 @@
           "7520f3f77ce0",
           "a66f6dd4a918",
           "6df19e13b07f"
+        ]
+      }
+    ],
+    "data-uploader/python/sc_extract/silhouette_export.py›_stderr_tail›body": [
+      {
+        "ship": "#1106",
+        "by": "Jerry",
+        "value": "last stderr/stdout line"
+      },
+      {
+        "ship": "claude/data-uploader-logs-duplicates-4a5319",
+        "by": "JerryT2T",
+        "value": "delegates to converter_report.converter_reason (superset: innermost exception, else last [ERR line, else last line)",
+        "decided": true,
+        "at": "2026-11-15T13:51:56.046Z",
+        "hunks": [
+          "1b62e2b65e2a"
         ]
       }
     ],

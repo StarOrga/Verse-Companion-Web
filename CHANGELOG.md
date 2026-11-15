@@ -4,6 +4,18 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.270.7] - 2026-11-15
+
+### Changed
+- Hangar: every action button uses the shared action control — one main step per view, red tone for delete (#970).
+
+## [0.270.6] - 2026-11-15
+
+### Fixed
+- Data Uploader 0.81.1: 3D package re-runs no longer rewrite the 17 MB part index after every package — a fully cached pass is minutes instead of hours.
+- Data Uploader: a statement timeout on a catalog batch splits the batch at once instead of resending it unchanged; silhouette batches start smaller.
+- Data Uploader log: failed model conversions name the converter's real exception, cached ships are summarised in one line, and a Windows shutdown under a running job is recorded with its resume point.
+
 ## [0.270.5] - 2026-11-15
 
 ### Fixed
