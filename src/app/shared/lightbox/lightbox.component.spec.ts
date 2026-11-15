@@ -53,6 +53,15 @@ describe('LightboxComponent', () => {
     expect(el.querySelector('a.ab:not([download])')?.getAttribute('href')).toBe('https://example.com/a');
   });
 
+  it('does not close on a click beside the picture (it has its own close button)', () => {
+    let closed = 0;
+    fixture.componentInstance.closed.subscribe(() => closed++);
+    const scrim = (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>('.root.overlay');
+    expect(scrim).not.toBeNull();
+    scrim!.click();
+    expect(closed).toBe(0);
+  });
+
   it('emits closed from the close button', () => {
     let closed = 0;
     fixture.componentInstance.closed.subscribe(() => closed++);
