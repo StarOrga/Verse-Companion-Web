@@ -671,6 +671,7 @@ export class LoginComponent {
     }
     this.busy.set(true);
     this.errorMsg.set(null);
+    this.analytics.track('auth:provider_select', { provider: 'email' });
     const { email, password } = this.form.getRawValue();
     try {
       const { error } = await this.auth.signInWithPassword(email, password);
@@ -721,6 +722,7 @@ export class LoginComponent {
   }
 
   private async signInWithOAuthProvider(provider: 'google' | 'discord') {
+    this.analytics.track('auth:provider_select', { provider });
     if (this.previewLocked()) {
       // Same reasoning as onSubmit(): sc.viewAs is sessionStorage, so it
       // survives the OAuth round trip and would loop back to /login too.

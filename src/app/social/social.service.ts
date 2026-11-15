@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal, Injector } from '@angular/core';
+import { AnalyticsService } from '../core/analytics.service';
 import { toErrorKey } from '../core/describe-error';
 import { SupabaseClientProvider } from '../core/supabase.client';
 import {
@@ -39,6 +40,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class SocialService {
   private readonly injector = inject(Injector);
+  private readonly analytics = inject(AnalyticsService);
   /** Resolved on first use: holding this service (every HQ page does) creates no Supabase client. */
   private get sb(): SupabaseClientProvider {
     return this.injector.get(SupabaseClientProvider);
@@ -120,7 +122,10 @@ export class SocialService {
   /** Mints the link or returns the live one. The RPC is idempotent. */
   async createInvite(): Promise<FriendInvite | null> {
     const invite = await this.act<FriendInvite | null>('create_friend_invite', undefined, null);
-    if (invite) this.invite.set(invite);
+    if (invite) {
+      this.invite.set(invite);
+      this.analytics.track('social:invite_create');
+    }
     return invite;
   }
 
@@ -150,7 +155,9 @@ export class SocialService {
   }
 
   async redeemInvite(token: string): Promise<InviteRedeemResult | null> {
-    return this.act<InviteRedeemResult | null>('redeem_friend_invite', { p_token: token }, null);
+    const res = await this.act<InviteRedeemResult | null>('redeem_friend_invite', { p_token: token }, null);
+    if (res) this.analytics.track('social:invite_accept');
+    return res;
   }
 
   // --- Groups --------------------------------------------------------------
@@ -208,6 +215,12 @@ export class SocialService {
   // --- Shares --------------------------------------------------------------
 
   async shareEinsatz(einsatzId: string, to: ShareAudience): Promise<ShareVerdict | null> {
+    const verdict = await this.shareEinsatzRaw(einsatzId, to);
+    if (verdict) this.analytics.track('social:share_create', { kind: 'einsatz' });
+    return verdict;
+  }
+
+  private async shareEinsatzRaw(einsatzId: string, to: ShareAudience): Promise<ShareVerdict | null> {
     if ('teamId' in to) {
       return this.act<ShareVerdict | null>('share_einsatz_with_group', { p_einsatz: einsatzId, p_group: to.teamId }, null);
     }
@@ -225,12 +238,16 @@ export class SocialService {
   }
 
   async shareShipConfig(configId: string, to: Exclude<ShareAudience, { teamId: string }>): Promise<ShareVerdict | null> {
-    return this.act<ShareVerdict | null>('share_ship_config', { p_config: configId, ...audienceArgs(to) }, null);
+    const verdict = await this.act<ShareVerdict | null>('share_ship_config', { p_config: configId, ...audienceArgs(to) }, null);
+    if (verdict) this.analytics.track('social:share_create', { kind: 'ship_config' });
+    return verdict;
   }
 
   /** Fans out to the group's current friends now. Later members do not get the set. Null on failure. */
   async shareLoadoutWithGroup(loadoutId: string, groupId: string): Promise<number | null> {
-    return this.act<number | null>('share_loadout_with_group', { p_loadout: loadoutId, p_group: groupId }, null);
+    const n = await this.act<number | null>('share_loadout_with_group', { p_loadout: loadoutId, p_group: groupId }, null);
+    if (n !== null) this.analytics.track('social:share_create', { kind: 'loadout' });
+    return n;
   }
 
   /** The audience of one Einsatz or ship variant, owner view. Null on failure. */

@@ -34,6 +34,7 @@ import { ScDatePipe } from '../core/locale/sc-date.pipe';
       }
 
       <sc-app-download-panel
+        app="starscape"
         icon="⬆"
         [title]="'desktop.appTitle'"
         desc="desktop.appDesc"

@@ -1,0 +1,16 @@
+{
+  "$comment": "One action per real workflow, matching its key steps. Legacy-name bridge actions are generated elsewhere from LEGACY_EVENT_NAMES.",
+  "actions": [
+    { "id": "wf_onboard_done", "name": "Workflow: Erster Einstieg abgeschlossen", "description": "Anmeldung und erstes Schiff im Hangar.", "steps": [{ "event": "auth:user_sign_in" }, { "event": "hangar:ship_add" }], "match": "any" },
+    { "id": "wf_codex_research", "name": "Workflow: Codex-Recherche", "description": "Suche geöffnet und Treffer oder Detailseite geöffnet.", "steps": [{ "event": "search:result_open" }, { "event": "codex:entry_view" }], "match": "any" },
+    { "id": "wf_codex_compare_or_loadout", "name": "Workflow: Vergleichen oder Loadout bauen", "description": "Vergleich gestartet, Holotisch eingeschaltet oder Loadout angelegt/geteilt.", "steps": [{ "event": "codex:compare_start" }, { "event": "codex:holotable_open" }, { "event": "hangar:loadout_create" }, { "event": "hangar:loadout_share" }], "match": "any" },
+    { "id": "wf_error_seen", "name": "Workflow: Fehler gesehen", "description": "Ein Fehlerzustand wurde angezeigt.", "steps": [{ "event": "app:error_show" }], "match": "any" },
+    { "id": "wf_hangar_fleet", "name": "Workflow: Flotte pflegen", "description": "Import, Schiff hinzugefügt oder Flaggschiff gewählt.", "steps": [{ "event": "hangar:fleet_import" }, { "event": "hangar:ship_add" }, { "event": "hangar:flagship_select" }], "match": "any" },
+    { "id": "wf_hq_planning", "name": "Workflow: Planen und Nachschub", "description": "Einsatz geplant oder geändert, Nachschub, Inventar oder Wunschliste gepflegt.", "steps": [{ "event": "hq:plan_create" }, { "event": "hq:plan_update" }, { "event": "hq:supply_add" }, { "event": "hq:inventory_add" }, { "event": "hq:wish_add" }], "match": "any" },
+    { "id": "wf_feedback_given", "name": "Workflow: Feedback gegeben", "description": "Feedback abgeschickt oder eine Antwort gelesen.", "steps": [{ "event": "feedback:item_submit" }, { "event": "feedback:reply_view" }], "match": "any" },
+    { "id": "wf_desktop_adoption", "name": "Workflow: Desktop-Programm geholt", "description": "Download angeklickt oder Programm per Deep-Link gestartet.", "steps": [{ "event": "desktop:download_start" }, { "event": "desktop:app_start" }], "match": "any" },
+    { "id": "wf_verse_engaged", "name": "Workflow: Verse erkundet", "description": "Tor geöffnet, Patch-Linie geöffnet, Sternenkarte offen oder Stern verdient.", "steps": [{ "event": "verse:door_open" }, { "event": "verse:patch_open" }, { "event": "verse:starmap_open" }, { "event": "verse:star_earn" }], "match": "any" },
+    { "id": "wf_social_connected", "name": "Workflow: Freunde verbinden", "description": "Einladung erzeugt oder angenommen, Freundschaft angenommen, etwas geteilt.", "steps": [{ "event": "social:invite_create" }, { "event": "social:invite_accept" }, { "event": "social:friend_request_accept" }, { "event": "social:share_create" }], "match": "any" },
+    { "id": "wf_admin_tools", "name": "Workflow: Admin-Werkzeuge", "description": "Ein Admin-Werkzeug wurde geöffnet.", "steps": [{ "event": "admin:tool_open" }], "match": "any" }
+  ]
+}

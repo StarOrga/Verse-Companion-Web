@@ -53,6 +53,7 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
       }
 
       <sc-app-download-panel
+        app="uploader"
         icon="⬆"
         [title]="'desktop.appTitle'"
         desc="desktop.appDesc"

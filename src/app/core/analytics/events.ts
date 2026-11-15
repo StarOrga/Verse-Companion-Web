@@ -24,7 +24,7 @@ export type EventArea = (typeof EVENT_AREAS)[number];
 /** The fixed present-tense verb list; an event name's last word(s) must be one of these. */
 export const EVENT_VERBS = [
   'view', 'open', 'close', 'create', 'add', 'remove', 'update', 'change', 'submit', 'send', 'start', 'finish', 'fail',
-  'share', 'search', 'select', 'toggle', 'import', 'export', 'earn', 'request', 'sign_in', 'sign_out', 'show',
+  'share', 'search', 'select', 'toggle', 'import', 'export', 'earn', 'request', 'sign_in', 'sign_out', 'show', 'accept',
 ] as const;
 export type EventVerb = (typeof EVENT_VERBS)[number];
 
@@ -53,7 +53,16 @@ export const EVENTS = {
   'auth:user_sign_out': ev('auth', 'Abmeldung durchgeführt.'),
   'auth:access_request': ev<{ duplicate: boolean }>('auth', 'Zugang angefragt (duplicate = Adresse war schon bekannt).'),
 
+  'auth:login_view': ev('auth', 'Die Anmeldeseite wurde angezeigt (Einstieg des Login-Trichters).'),
+  'auth:provider_select': ev<{ provider: 'email' | 'google' | 'discord' }>('auth', 'Ein Anmeldeweg wurde gewählt (Anbieter), noch vor dem Ergebnis.'),
+  'auth:session_start': ev<{ role: string }>('auth', 'Eine angemeldete Sitzung hat begonnen (einmal je Seitenaufruf, Rolle als Eigenschaft).'),
+
   // --- codex -------------------------------------------------------------
+  'codex:entry_view': ev<{ kind: string; class_name: string }>('codex', 'Eine Codex-Detailseite wurde geöffnet (Schiff, Bauteil, Waffe, Mission, Bauplan; Art + Klassenname).'),
+  'codex:section_view': ev<{ section: 'fps' | 'keybinds' | 'upcoming' | 'upcoming_entry' }>('codex', 'Ein Codex-Abschnitt abseits der Detailseiten wurde geöffnet.'),
+  'codex:compare_start': ev<{ kind: string; count: number }>('codex', 'Der Vergleich wurde möglich: das zweite Objekt liegt im Vergleichsfach.'),
+  'codex:holotable_open': ev<{ kind: string }>('codex', 'Der Holotisch einer Detailseite wurde bewusst eingeschaltet.'),
+  'codex:filter_change': ev<{ kind: string; filter_count: number }>('codex', 'Im Codex-Index wurden Filter angewendet (Art, Anzahl aktiver Filter, nie die Werte).'),
   'codex:ship_link_create': ev<{ shipSlug: string }>('codex', 'Ein Codex-Schiff wurde mit einem Hangar-Schiff verknüpft.'),
   'codex:ship_link_remove': ev<{ shipSlug: string }>('codex', 'Die Verknüpfung eines Codex-Schiffs wurde gelöst.'),
   'codex:ship_link_update': ev<{ shipSlug: string }>('codex', 'Eine Schiffsverknüpfung wurde zur bevorzugten befördert.'),
@@ -66,6 +75,22 @@ export const EVENTS = {
   'hangar:loadout_create': ev<{ role: string }>('hangar', 'Ein Loadout wurde angelegt.'),
   'hangar:fleet_import': ev<{ ships_imported: number; total_in_file: number; source: 'extension' | 'file' }>('hangar', 'Eine Flotte wurde importiert (Datei oder Erweiterung).'),
   'hangar:extension_import': ev<{ ships_offered: number }>('hangar', 'Die Browser-Erweiterung hat Schiffe zum Import übergeben.'),
+
+  'hangar:loadout_share': ev<{ channel: 'link' }>('hangar', 'Ein Loadout wurde als Link geteilt (nie der Token).'),
+
+  // --- hq ----------------------------------------------------------------
+  'hq:page_view': ev<{ page: string }>('hq', 'Eine Seite des Hangar-Headquarters wurde geöffnet (Start, Inventar, Jetzt, Planen, Statistik).'),
+  'hq:plan_create': ev<{ steps: number }>('hq', 'Ein Einsatz wurde geplant (Anzahl Schritte).'),
+  'hq:plan_update': ev<{ change: 'status' | 'step' | 'remove' }>('hq', 'Ein Einsatz wurde geändert (Status, Schritt oder entfernt).'),
+  'hq:inventory_add': ev<{ unit: 'pcs' | 'scu' }>('hq', 'Ein Bestand wurde ins Inventar gebucht.'),
+  'hq:supply_add': ev<{ qty: number }>('hq', 'Ein Nachschub-Posten wurde angelegt.'),
+  'hq:wish_add': ev<{ kind: string }>('hq', 'Ein Eintrag wurde auf die Wunschliste gesetzt.'),
+  'hq:events_view': ev('hq', 'Der Ereignis-Abschnitt des HQ wurde angezeigt.'),
+
+  // --- search ------------------------------------------------------------
+  'search:palette_open': ev<{ surface: 'palette' | 'codex_bar' }>('search', 'Die Suche wurde geöffnet (Palette oder Codex-Leiste).'),
+  'search:result_open': ev<{ area: string; rank: number; new_tab: boolean }>('search', 'Ein Suchtreffer wurde geöffnet (Bereich, Rang in der Liste; nie der Suchtext).'),
+  'search:miss_show': ev<{ area: string }>('search', 'Eine Suche blieb ohne Treffer (Bereich; nie der Suchtext).'),
 
   // --- settings ----------------------------------------------------------
   'settings:username_update': ev('settings', 'Der Benutzername wurde gespeichert.'),
@@ -82,6 +107,33 @@ export const EVENTS = {
   'verse:door_open': ev<{ door: 'news' | 'patches' | 'gallery' }>('verse', 'Eines der drei Tore (News, Patches, Galerie) wurde geöffnet.'),
   'verse:star_earn': ev<{ patch_line: string; star_key: string; sun?: boolean }>('verse', 'Ein Explorer-Stern wurde verdient (sun = Kometentreffer).'),
   'verse:starscape_share': ev<{ image_id: string; channel: 'native' | 'copy' }>('verse', 'Ein Starscape-Bild wurde geteilt.'),
+  'verse:briefing_view': ev('verse', 'Das Verse-Briefing (Startseite des Verse-Hubs) wurde angezeigt.'),
+  'verse:starmap_open': ev<{ page: 'explorer' | 'constellations' }>('verse', 'Die Sternenkarte oder die eigenen Sternbilder wurden geöffnet.'),
+  'verse:patch_open': ev<{ line: string }>('verse', 'Eine Patch-Linie im Verse-Hub wurde geöffnet.'),
+
+  // --- news --------------------------------------------------------------
+  'news:article_open': ev('news', 'Ein News-Artikel wurde geöffnet (kein Titel, keine ID).'),
+
+  // --- social ------------------------------------------------------------
+  'social:invite_create': ev('social', 'Ein persönlicher Freundes-Einladungslink wurde erzeugt (nie der Token).'),
+  'social:invite_view': ev('social', 'Eine Einladungsseite wurde über einen Link geöffnet (nie der Token).'),
+  'social:invite_accept': ev('social', 'Eine Einladung wurde angenommen (Freundschaft eingelöst).'),
+  'social:friend_request_accept': ev('social', 'Eine Freundschaftsanfrage wurde angenommen.'),
+  'social:share_create': ev<{ kind: 'einsatz' | 'ship_config' | 'loadout' }>('social', 'Etwas wurde mit Freunden geteilt (Einsatz, Schiffsvariante, Loadout).'),
+  'social:shared_open': ev<{ kind: 'loadout' | 'hangar_loadout' | 'kartograph_badge' }>('social', 'Ein geteilter Inhalt wurde über einen Link geöffnet (nie der Token).'),
+
+  // --- feedback ----------------------------------------------------------
+  'feedback:composer_open': ev<{ surface: string }>('feedback', 'Das Feedback-Fenster wurde geöffnet.'),
+  'feedback:item_submit': ev<{ kind: string; length_bucket: 'short' | 'medium' | 'long'; attachments: number }>('feedback', 'Ein Feedback wurde abgeschickt (Art, Längen-Klasse, Anzahl Anhänge; nie der Text).'),
+  'feedback:reply_view': ev('feedback', 'Eine Antwort auf das eigene Feedback wurde gelesen.'),
+
+  // --- desktop -----------------------------------------------------------
+  'desktop:download_start': ev<{ app: 'uploader' | 'starscape'; surface: string }>('desktop', 'Der Download eines Desktop-Programms wurde angeklickt.'),
+  'desktop:app_start': ev<{ app: 'scc' }>('desktop', 'Ein Desktop-Programm wurde per Deep-Link aus dem Web gestartet.'),
+  'desktop:apps_view': ev<{ app: 'hub' | 'uploader' | 'starscape' | 'extension' }>('desktop', 'Eine Seite der Programme (Hub, Uploader, Starscape, Erweiterung) wurde geöffnet.'),
+
+  // --- admin -------------------------------------------------------------
+  'admin:tool_open': ev<{ tool: string }>('admin', 'Ein Admin-Werkzeug wurde geöffnet (Rolle steht als Person-Eigenschaft).'),
 } as const;
 
 export type EventName = keyof typeof EVENTS;

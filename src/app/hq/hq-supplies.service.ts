@@ -1,6 +1,7 @@
 import { DestroyRef, Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { formatQuantity } from '../codex/codex-format';
+import { AnalyticsService } from '../core/analytics.service';
 import { toErrorKey } from '../core/describe-error';
 import { logWarn } from '../core/log';
 import { SupabaseClientProvider } from '../core/supabase.client';
@@ -143,6 +144,7 @@ interface CacheShape {
 export class HqSuppliesService {
   private readonly sb = inject(SupabaseClientProvider);
   private readonly auth = inject(AuthService);
+  private readonly analytics = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
 
   /** True once the signed-in account's first pull finished (live auto-apply waits for it). */
@@ -261,6 +263,7 @@ export class HqSuppliesService {
         dirty: true,
       };
       this.commit([...this.rows(), row]);
+      this.analytics.track('hq:supply_add', { qty: q });
       return { id: row.id, prevQty: 0, prevAmount: null };
     }
   }

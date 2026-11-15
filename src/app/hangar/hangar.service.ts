@@ -874,6 +874,7 @@ export class HangarService {
       this.error.set(toErrorKey('hangar', 'createShareLink', error, { configId: config.id }));
       return null;
     }
+    this.analytics.track('hangar:loadout_share', { channel: 'link' });
     return mapHangarShareLink(data as Record<string, unknown>);
   }
 
