@@ -97,7 +97,7 @@ import { ScActionDirective } from '../shared/action/sc-action.directive';
       flex: 1 1 200px; min-width: 0; padding: 9px 12px; background: var(--sc-bg-1); color: var(--sc-fg-0);
       border: 1px solid var(--sc-border); border-radius: 4px; font: inherit; font-size: max(0.9rem, var(--sc-fs-input));
     }
-    .text-input:focus { outline: none; border-color: var(--sc-accent); box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.25); }
+    .text-input:focus { outline: none; border-color: var(--sc-accent); }
     .found {
       display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 12px; padding: 10px 12px;
       border: 1px solid var(--sc-border); border-radius: 4px; background: var(--sc-bg-1);

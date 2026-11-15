@@ -121,7 +121,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
       height: 28px; margin-bottom: 4px; padding: 0 9px; border: 0; border-radius: 7px; outline: none;
       background: var(--sc-bg-0); color: var(--sc-fg-0); font: inherit; font-size: max(0.78rem, var(--sc-fs-floor));
     }
-    .mini:focus-visible { box-shadow: 0 0 0 2px var(--sc-accent); }
+    .mini:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .opts { display: flex; flex-direction: column; gap: 2px; }
     .opt {
       display: flex; justify-content: space-between; gap: var(--sc-space-3); padding: 4px 8px; margin: 0; border: 0;

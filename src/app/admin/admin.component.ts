@@ -727,7 +727,6 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
     .filter-search:focus {
       outline: none;
       border-color: var(--sc-accent);
-      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.25);
     }
     .filter-count {
       color: var(--sc-fg-2);
@@ -1038,7 +1037,6 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
     .invite-form input[type=email]:focus {
       outline: none;
       border-color: var(--sc-accent);
-      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.25);
     }
     .invite-form input[type=email]:disabled {
       opacity: 0.4;
