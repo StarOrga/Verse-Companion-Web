@@ -4,6 +4,12 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.271.3] - 2026-11-16
+
+### Fixed
+- Text fields no longer get an extra frame when you click into them. The focus ring now shows only while you move through the page with Tab; a clicked field just recolours the border it already has. This covers the search field in the header, the quick search and every input in settings, social, hangar, Codex and admin.
+- With Tab, the ring of the round search field now follows the field itself instead of drawing a rectangle inside it.
+
 ## [0.271.2] - 2026-11-15
 
 ### Fixed
