@@ -78,8 +78,6 @@ interface Box {
       .card { position: absolute; pointer-events: auto; right: var(--sc-space-3, 12px); bottom: var(--sc-space-3, 12px); }
       .points { margin: 0 0 var(--sc-gap-3); padding-left: 1.1rem; display: grid; gap: var(--sc-gap-2); color: var(--sc-fg-1); font-size: 0.9rem; }
       .text { margin: 0 0 var(--sc-gap-3); color: var(--sc-fg-1); font-size: 0.9rem; }
-      .count { margin: 0 0 4px; color: var(--sc-fg-2); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
-      .points { margin: 0; }
       /* Phone: the scaffold's panel is full screen, which would cover the very element the tour
          rings. The coach mark stays a card at the bottom (scaffold change request: a coach-mark flag). */
       @media (max-width: 720px) {

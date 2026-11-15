@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import { ScSelectComponent, ScSelectOption } from '../shared/sc-select.component';
 import { SupabaseClientProvider } from '../core/supabase.client';
 import { RoleService } from '../auth/role.service';
@@ -17,7 +17,6 @@ import { AppDownloadEntry, AppDownloadPanelComponent } from './app-download-pane
 import { DOWNLOAD_RING, ReleaseRing } from './desktop-access';
 import { DesktopReleaseService, ReleaseInfo, hashFingerprint } from './desktop-release.service';
 import { ScDatePipe } from '../core/locale/sc-date.pipe';
-import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 
 /**
  * The Data Upload page (`/apps/uploader`). Since admin feedback eb9c6ec3 it renders
@@ -36,9 +35,8 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
     TranslatePipe,
     P4kHistoryComponent,
     AppDownloadPanelComponent,
-    ScDialogDirective,
+    ScPopupComponent,
     ScSelectComponent,
-    ScTooltipDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -114,24 +112,10 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
     </section>
 
     @if (historyOpen()) {
-      <div class="hx-back" (click)="historyOpen.set(false)">
-        <div class="hx-dialog"
-             role="dialog"
-             aria-modal="true"
-             scDialog (scDialogEscape)="historyOpen.set(false)"
-             [attr.aria-label]="'desktop.bundleHistory' | translate"
-             (click)="$event.stopPropagation()">
-          <div class="hx-head">
-            <span class="hx-t">{{ 'desktop.bundleHistory' | translate }}</span>
-            <button type="button" class="hx-close" (click)="historyOpen.set(false)"
-                    [attr.aria-label]="'desktop.close' | translate"
-                    [scTooltip]="'desktop.close' | translate">✕</button>
-          </div>
-          <div class="hx-scroll">
-            <sc-p4k-history [embedded]="true" />
-          </div>
-        </div>
-      </div>
+      <sc-popup kind="dialog" access="collab" [eyebrow]="'desktop.historyEyebrow' | translate"
+                [title]="'desktop.bundleHistory' | translate" (closed)="historyOpen.set(false)">
+        <sc-p4k-history [embedded]="true" />
+      </sc-popup>
     }
   `,
   styles: [`
@@ -173,45 +157,6 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
     .promote .pmsg { font-size: 0.8rem; color: var(--sc-accent); }
     .promote .pmsg.err { color: var(--sc-danger); }
 
-    /* Bundle history popup — identical shell to the Codex access panel's. */
-    .hx-back {
-      position: fixed; inset: 0; z-index: 1200;
-      display: flex; align-items: center; justify-content: center; padding: 24px;
-      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
-    }
-    .hx-dialog {
-      display: flex; flex-direction: column;
-      width: min(1100px, 96vw); max-height: 88vh; max-height: 88dvh;
-      background: var(--sc-bg-1); border: 1px solid var(--sc-border);
-      border-radius: 10px; overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-    }
-    .hx-head {
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      padding: 12px 16px; background: var(--sc-bg-2);
-      border-bottom: 1px solid var(--sc-border);
-    }
-    .hx-t {
-      font-family: var(--sc-font-display); font-size: 0.82rem;
-      letter-spacing: 0.08em; text-transform: uppercase; color: var(--sc-fg-1);
-    }
-    .hx-close {
-      background: transparent; border: 0; color: var(--sc-fg-2);
-      font-size: 1rem; cursor: pointer; padding: 4px;
-      /* A real hit area, not the glyph's own 16px. */
-      display: inline-flex; align-items: center; justify-content: center;
-      min-width: max(36px, var(--sc-tap-min)); min-height: max(36px, var(--sc-tap-min));
-      border-radius: 6px;
-    }
-    .hx-close:hover { color: var(--sc-fg-0); }
-    .hx-scroll { overflow-y: auto; padding: 0 4px 4px; }
-
-    @media (max-width: 640px) {
-      /* The popup ends above the feedback launcher, which stays on top of
-         every dialog (z-index 1400) and would sit on the version list. */
-      .hx-back { padding: 8px; padding-bottom: var(--sc-fab-clear-block); }
-      .hx-dialog { max-height: 100%; }
-    }
   `],
 })
 export class DesktopDownloadComponent {
