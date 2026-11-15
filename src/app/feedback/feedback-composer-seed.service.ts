@@ -39,16 +39,33 @@ export interface ComposerSeed {
  *   A counter, like `PanelNavigationService`: the FAB mounts + un-minimizes
  *   the panel on every bump, the embedded board opens its composer. Neither
  *   has to be reset afterwards.
+ *
+ * TOPIC REQUESTS
+ *   Once a finding already became a topic, the telemetry page opens THAT topic
+ *   instead of seeding a second one: `requestTopic` parks the id (one-shot,
+ *   like a seed, so a board that mounts only afterwards still finds it) and
+ *   bumps `panelRequests`, which the FAB follows without the embedded board
+ *   unfolding its composer. `created` counts topics written from any board,
+ *   so a page that shows "already a topic" can look again.
  */
 @Injectable({ providedIn: 'root' })
 export class FeedbackComposerSeedService {
   private readonly _seeds = signal<ReadonlyMap<string, ComposerSeed>>(new Map());
   private readonly _openRequests = signal(0);
+  private readonly _topicRequests = signal(0);
+  private readonly _pendingTopic = signal<string | null>(null);
+  private readonly _created = signal(0);
 
   /** Scopes that currently hold a seed — what a composer watches. */
   readonly pendingScopes = computed(() => new Set(this._seeds().keys()));
   /** Bumped every time a page asks for the admin feedback panel to open. */
   readonly openRequests = this._openRequests.asReadonly();
+  /** Bumped on every composer OR topic request — what the FAB follows to bring the panel on screen. */
+  readonly panelRequests = computed(() => this._openRequests() + this._topicRequests());
+  /** The topic a page asked the board to open; null once a board took it. */
+  readonly pendingTopic = this._pendingTopic.asReadonly();
+  /** Bumped after a board wrote a new topic. */
+  readonly created = this._created.asReadonly();
 
   /** Park a seed for the composer with this draft scope. Replaces an older one. */
   plant(scope: string, seed: ComposerSeed): void {
@@ -70,5 +87,23 @@ export class FeedbackComposerSeedService {
   /** Ask the shell to open the admin feedback panel with its composer unfolded. */
   requestOpen(): void {
     this._openRequests.update((n) => n + 1);
+  }
+
+  /** Ask the shell to open the admin feedback panel on an existing topic. */
+  requestTopic(id: string): void {
+    this._pendingTopic.set(id);
+    this._topicRequests.update((n) => n + 1);
+  }
+
+  /** Take (and clear) the requested topic id; null when there is none. */
+  takeTopic(): string | null {
+    const id = this._pendingTopic();
+    if (id !== null) this._pendingTopic.set(null);
+    return id;
+  }
+
+  /** A board wrote a new topic. */
+  noteCreated(): void {
+    this._created.update((n) => n + 1);
   }
 }
