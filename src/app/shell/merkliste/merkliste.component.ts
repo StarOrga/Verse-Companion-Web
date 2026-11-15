@@ -54,7 +54,7 @@ interface WishLine {
       </button>
       @if (open()) {
         <div class="panel" [id]="panelId" scPopupMotion scPopupMotionItems=".qrow" scPopupMotionOrigin="tr" animate.leave="pm-out">
-          <sc-popup kind="panel" [eyebrow]="'quick.wish' | translate" [title]="'quick.wishTitle' | translate: { n: cart.count() }"
+          <sc-popup kind="panel" [eyebrow]="'quick.wish' | translate" [title]="(cart.count() === 1 ? 'quick.wishTitleOne' : 'quick.wishTitle') | translate: { n: cart.count() }"
                     [returnFocus]="trigger" [backClose]="false" (closed)="close()">
           @for (l of lines(); track l.item.key) {
             <div class="qrow">

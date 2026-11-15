@@ -6554,7 +6554,6 @@
     "log": {
       "undo": "Rückgängig",
       "title": "Protokoll",
-      "close": "Schließen",
       "empty": "Noch keine Ereignisse.",
       "showAll": "Alle anzeigen",
       "more": "Mehr laden",
@@ -6720,7 +6719,6 @@
       "loading": "Statistik wird geladen …",
       "zero": "Im gewählten Zeitraum nichts erfasst.",
       "details": "Details",
-      "close": "Schließen",
       "day": "Tag",
       "week": "Woche",
       "tile": {
@@ -8659,7 +8657,9 @@
       "item": "Gegenstände",
       "blueprint": "Blaupausen",
       "news": "News"
-    }
+    },
+    "wishTitle": "{{n}} Positionen gemerkt",
+    "wishTitleOne": "1 Position gemerkt"
   },
   "cart": {
     "title": "Wunschliste",

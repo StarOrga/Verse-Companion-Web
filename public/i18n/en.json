@@ -6554,7 +6554,6 @@
     "log": {
       "undo": "Undo",
       "title": "Log",
-      "close": "Close",
       "empty": "No events yet.",
       "showAll": "Show all",
       "more": "Load more",
@@ -6720,7 +6719,6 @@
       "loading": "Loading statistics …",
       "zero": "Nothing recorded in this range.",
       "details": "Details",
-      "close": "Close",
       "day": "Day",
       "week": "Week",
       "tile": {
@@ -8659,7 +8657,9 @@
       "item": "Items",
       "blueprint": "Blueprints",
       "news": "News"
-    }
+    },
+    "wishTitle": "{{n}} items saved",
+    "wishTitleOne": "1 item saved"
   },
   "cart": {
     "title": "Wishlist",
