@@ -1,3 +1,4 @@
+import { AnalyticsService } from '../core/analytics.service';
 import { DOCUMENT, Injectable, inject, signal } from '@angular/core';
 import { SCC_INSTALLER_URL } from '../news/verse-status-chip.component';
 
@@ -36,6 +37,7 @@ const LAUNCHED_BEFORE_KEY = 'sc.sccApp.launchedBefore';
 @Injectable({ providedIn: 'root' })
 export class SccAppLauncherService {
   private readonly doc = inject(DOCUMENT);
+  private readonly analytics = inject(AnalyticsService);
   private inflight: Promise<boolean> | null = null;
   /** {@link launchedBefore} as a signal, so a button can follow it. */
   readonly remembered = signal(this.launchedBefore());
@@ -45,6 +47,7 @@ export class SccAppLauncherService {
    * A call while an attempt runs joins it (and its wait).
    */
   launch(waitMs = SCC_LAUNCH_WAIT_MS): Promise<boolean> {
+    if (!this.inflight) this.analytics.track('desktop:app_launch', { app: 'scc' });
     this.inflight ??= this.attempt(waitMs).finally(() => {
       this.inflight = null;
     });

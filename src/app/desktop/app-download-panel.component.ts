@@ -1,3 +1,4 @@
+import { AnalyticsService } from '../core/analytics.service';
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { DesktopCapabilityService } from '../core/desktop-capability.service';
@@ -96,7 +97,8 @@ export interface AppDownloadEntry {
               [scTooltip]="tooltip(e)"
               target="_blank"
               rel="noopener noreferrer"
-              download>
+              download
+              (click)="trackDownload()">
               <span class="ap-arrow" aria-hidden="true">↓</span>
               <span class="ap-label">{{ e.labelKey ? (e.labelKey | translate) : e.label }}</span>
               @if (e.version) { <span class="ap-btn-ver">v{{ e.version }}</span> }
@@ -194,6 +196,7 @@ export interface AppDownloadEntry {
 export class AppDownloadPanelComponent {
   private readonly i18n = inject(TranslateService);
   private readonly device = inject(DesktopCapabilityService);
+  private readonly analytics = inject(AnalyticsService);
 
   /**
    * Is the visitor on a device that could not install this app anyway? The one
@@ -206,6 +209,8 @@ export class AppDownloadPanelComponent {
 
   /** Small glyph identifying the app (🖥️ Starscape, ⬆ Uploader). */
   readonly icon = input('🖥️');
+  /** Which app this panel downloads — only for the analytics event, null = not reported. */
+  readonly app = input<'uploader' | 'starscape' | null>(null);
   /** i18n key for the app name. */
   readonly title = input.required<string>();
   /** i18n key for the one-line description. */
@@ -226,6 +231,11 @@ export class AppDownloadPanelComponent {
   }
 
   /** Size + hash never take visible space — they live in the button tooltip. */
+  trackDownload(): void {
+    const app = this.app();
+    if (app) this.analytics.track('desktop:download_click', { app, surface: 'panel' });
+  }
+
   tooltip(e: AppDownloadEntry): string {
     const label = e.labelKey ? this.i18n.instant(e.labelKey) : (e.label ?? e.key);
     const parts: string[] = [label];

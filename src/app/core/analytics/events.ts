@@ -113,8 +113,6 @@ export const EVENTS = {
 
   // --- news --------------------------------------------------------------
   'news:article_open': ev('news', 'Ein News-Artikel wurde geöffnet (kein Titel, keine ID).'),
-  'news:channel_select': ev<{ channel: string }>('news', 'Ein News-Kanal wurde als Filter gewählt.'),
-  'news:patch_stability_view': ev<{ line: string }>('news', 'Die Stabilitäts-Anzeige eines Patches wurde angezeigt.'),
 
   // --- social ------------------------------------------------------------
   'social:invite_create': ev('social', 'Ein persönlicher Freundes-Einladungslink wurde erzeugt (nie der Token).'),
@@ -128,11 +126,10 @@ export const EVENTS = {
   'feedback:composer_open': ev<{ surface: string }>('feedback', 'Das Feedback-Fenster wurde geöffnet.'),
   'feedback:item_submit': ev<{ kind: string; length_bucket: 'short' | 'medium' | 'long'; attachments: number }>('feedback', 'Ein Feedback wurde abgeschickt (Art, Längen-Klasse, Anzahl Anhänge; nie der Text).'),
   'feedback:reply_view': ev('feedback', 'Eine Antwort auf das eigene Feedback wurde gelesen.'),
-  'feedback:attachment_add': ev<{ source: 'file' | 'paste' | 'capture' }>('feedback', 'Ein Anhang wurde zum Feedback hinzugefügt.'),
 
   // --- desktop -----------------------------------------------------------
   'desktop:download_click': ev<{ app: 'uploader' | 'starscape'; surface: string }>('desktop', 'Der Download eines Desktop-Programms wurde angeklickt.'),
-  'desktop:app_launch': ev<{ app: 'uploader' | 'starscape' | 'scc' }>('desktop', 'Ein Desktop-Programm wurde per Deep-Link aus dem Web gestartet.'),
+  'desktop:app_launch': ev<{ app: 'scc' }>('desktop', 'Ein Desktop-Programm wurde per Deep-Link aus dem Web gestartet.'),
   'desktop:apps_view': ev<{ app: 'hub' | 'uploader' | 'starscape' | 'extension' }>('desktop', 'Eine Seite der Programme (Hub, Uploader, Starscape, Erweiterung) wurde geöffnet.'),
 
   // --- admin -------------------------------------------------------------
