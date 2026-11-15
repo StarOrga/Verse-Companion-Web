@@ -40,6 +40,7 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createFeedMemo } from '../fetch-verse-news/feed-memo.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -391,7 +392,7 @@ async function buildPayload(): Promise<string> {
 const PAYLOAD_MEMO_TTL_MS = 30 * 60 * 1000;
 const payloadMemo = createFeedMemo<string>(PAYLOAD_MEMO_TTL_MS, () => true);
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withPosthog('rsi-upcoming-ships', async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS_HEADERS });
 
   if (!SUPABASE_URL || !SERVICE_KEY) {
@@ -421,4 +422,4 @@ Deno.serve(async (req: Request) => {
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
     });
   }
-});
+}));

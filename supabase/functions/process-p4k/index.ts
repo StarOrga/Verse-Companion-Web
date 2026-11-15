@@ -6,6 +6,7 @@
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { withPosthog } from '../_shared/posthog.ts';
 
 interface RequestBody { upload_id: string }
 
@@ -27,7 +28,7 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withPosthog('process-p4k', async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS_HEADERS });
   if (req.method !== 'POST') return json({ error: 'POST required' }, 405);
 
@@ -87,7 +88,7 @@ Deno.serve(async (req: Request) => {
     }).eq('id', row.id);
     return json({ ok: false, error: msg }, 500);
   }
-});
+}));
 
 function parseHeader(buf: Uint8Array, row: Record<string, unknown>): ParseResult {
   const notes: string[] = [];

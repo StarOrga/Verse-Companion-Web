@@ -181,22 +181,44 @@ function keepAlive(p: Promise<unknown>): void {
   if (rt?.waitUntil) rt.waitUntil(p);
 }
 
-/** Reports thrown errors and 5xx responses as `$exception`; the outcome reaches the caller unchanged. */
-export function withPosthog(fn: string, handler: (req: Request) => Promise<Response>): (req: Request) => Promise<Response> {
+export const CRON_RUN_EVENT = 'server:cron_run_finish';
+
+/** The cron-run outcome event: a 5xx or a throw is a failure, everything else (incl. 429 throttle) is a healthy run. */
+export function buildCronRun(fn: string, status: number | null, durationMs: number, error?: unknown): BatchEvent {
+  const ok = error === undefined && status != null && status < 500;
+  const props: Record<string, unknown> = { ok, duration_ms: Math.round(durationMs), http_status: status };
+  if (error !== undefined) props.error = redactText(error instanceof Error ? error.message : String(error), 200);
+  return buildCapture(CRON_RUN_EVENT, props, { fn });
+}
+
+/**
+ * Reports thrown errors and 5xx responses as `$exception`; the outcome reaches the caller unchanged.
+ * `opts.cron` (pg_cron driven functions) additionally reports every run's outcome as `server:cron_run_finish`.
+ */
+export function withPosthog(
+  fn: string,
+  handler: (req: Request) => Response | Promise<Response>,
+  opts: { cron?: boolean } = {},
+): (req: Request) => Promise<Response> {
   return async (req: Request): Promise<Response> => {
+    const started = Date.now();
     let res: Response;
     try {
       res = await handler(req);
     } catch (e) {
-      const p = captureServerException(fn, e, { handled: false, http_method: req.method });
+      const events = [buildException(fn, e, { handled: false, http_method: req.method })];
+      if (opts.cron) events.push(buildCronRun(fn, null, Date.now() - started, e));
+      const p = captureBatch(events);
       keepAlive(p);
       await p;
       throw e;
     }
+    const events: BatchEvent[] = [];
     if (res.status >= 500) {
-      const p = captureServerException(fn, new Error(`HTTP ${res.status}`), { handled: true, http_status: res.status, http_method: req.method });
-      keepAlive(p);
+      events.push(buildException(fn, new Error(`HTTP ${res.status}`), { handled: true, http_status: res.status, http_method: req.method }));
     }
+    if (opts.cron) events.push(buildCronRun(fn, res.status, Date.now() - started));
+    if (events.length) keepAlive(captureBatch(events));
     return res;
   };
 }

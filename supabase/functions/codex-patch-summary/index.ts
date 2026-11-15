@@ -15,6 +15,8 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { buildPrompt, digestIsEmpty, parseSummary, type DiffDigest } from './_summary.ts';
+import { callClaude } from '../_shared/ai-ledger.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const MODEL = Deno.env.get('CODEX_SUMMARY_MODEL') ?? 'claude-sonnet-5-5';
 const AI_TIMEOUT_MS = 45_000;
@@ -24,18 +26,11 @@ const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
 async function askClaude(prompt: string, key: string): Promise<string> {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: MODEL, max_tokens: 600, messages: [{ role: 'user', content: prompt }] }),
-    signal: AbortSignal.timeout(AI_TIMEOUT_MS),
-  });
-  if (!res.ok) throw new Error(`anthropic ${res.status}`);
-  const body = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
+  const body = await callClaude('codex-patch-summary', key, { model: MODEL, max_tokens: 600, messages: [{ role: 'user', content: prompt }] }, AI_TIMEOUT_MS);
   return body.content?.find((c) => c.type === 'text')?.text ?? '';
 }
 
-Deno.serve(async (req) => {
+Deno.serve(withPosthog('codex-patch-summary', async (req) => {
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
   if (!serviceKey || req.headers.get('authorization') !== `Bearer ${serviceKey}`) return json({ error: 'forbidden' }, 403);
@@ -70,4 +65,4 @@ Deno.serve(async (req) => {
     console.error(`codex-patch-summary ${buildId}: ${(e as Error).message}`);
     return json({ ok: true, status: 'model_failed' });
   }
-});
+}));

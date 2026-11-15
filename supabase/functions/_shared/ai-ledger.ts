@@ -8,7 +8,7 @@
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { costUsd, type TokenUsage } from './ai-pricing.ts';
-import { captureAiGeneration, redactText } from './posthog.ts';
+import { buildAiGeneration, captureBatch, redactText, type AiGeneration } from './posthog.ts';
 
 export interface AiCallRow {
   function: string;
@@ -45,34 +45,42 @@ export function toDbRow(row: AiCallRow): Record<string, unknown> {
   };
 }
 
-export async function recordAiCall(row: AiCallRow): Promise<void> {
+function genOf(row: AiCallRow): AiGeneration {
+  return {
+    fn: row.function,
+    model: row.model,
+    provider: row.provider,
+    inputTokens: row.input_tokens,
+    outputTokens: row.output_tokens,
+    cacheRead: row.cache_read_tokens,
+    cacheWrite: row.cache_write_tokens,
+    costUsd: row.cost_usd,
+    latencyMs: row.latency_ms,
+    ok: row.ok,
+    status: row.status,
+    error: row.error,
+  };
+}
+
+/** Several rows in one insert + one PostHog batch (batch results). Never throws. */
+export async function recordAiCalls(rows: AiCallRow[]): Promise<void> {
+  if (rows.length === 0) return;
   const url = Deno.env.get('SUPABASE_URL') ?? '';
   const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-  const writes: Promise<unknown>[] = [
-    captureAiGeneration({
-      fn: row.function,
-      model: row.model,
-      provider: row.provider,
-      inputTokens: row.input_tokens,
-      outputTokens: row.output_tokens,
-      cacheRead: row.cache_read_tokens,
-      cacheWrite: row.cache_write_tokens,
-      costUsd: row.cost_usd,
-      latencyMs: row.latency_ms,
-      ok: row.ok,
-      status: row.status,
-      error: row.error,
-    }),
-  ];
+  const writes: Promise<unknown>[] = [captureBatch(rows.map((r) => buildAiGeneration(genOf(r))))];
   if (url && key) {
     const db = createClient(url, key, { auth: { persistSession: false } });
     writes.push(
-      Promise.resolve(db.from('ai_calls').insert(toDbRow(row))).then(({ error }) => {
+      Promise.resolve(db.from('ai_calls').insert(rows.map(toDbRow))).then(({ error }) => {
         if (error) console.warn(`[ai-ledger] insert failed: ${redactText(error.message, 120)}`);
       }),
     );
   }
   try { await Promise.allSettled(writes); } catch { /* never throws */ }
+}
+
+export function recordAiCall(row: AiCallRow): Promise<void> {
+  return recordAiCalls([row]);
 }
 
 export interface ClaudeUsage {

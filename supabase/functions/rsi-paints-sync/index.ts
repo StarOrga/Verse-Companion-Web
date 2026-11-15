@@ -18,6 +18,7 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { RSI_BASE, normalizeName, readListing, toPaintRow } from './_paints.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const PAGE_SIZE = 40;
 const DEFAULT_MAX_PAGES = 60;
@@ -46,7 +47,7 @@ async function fetchPage(page: number, products: number[]): Promise<unknown> {
   return await res.json();
 }
 
-Deno.serve(async (req) => {
+Deno.serve(withPosthog('rsi-paints-sync', async (req) => {
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
   if (!serviceKey || req.headers.get('authorization') !== `Bearer ${serviceKey}`) return json({ error: 'forbidden' }, 403);
@@ -118,4 +119,4 @@ Deno.serve(async (req) => {
     console.error(`rsi-paints-sync: ${(e as Error).message}`);
     return json({ error: 'sync_failed', message: (e as Error).message }, 502);
   }
-});
+}));

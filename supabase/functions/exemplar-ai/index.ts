@@ -11,6 +11,8 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { CORS, buildPrompt, parseReply, parseRequest, preflight } from './_exemplar.ts';
+import { callClaude } from '../_shared/ai-ledger.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const MODEL = Deno.env.get('EXEMPLAR_AI_MODEL') ?? 'claude-sonnet-5-5';
 const json = (body: unknown, status = 200) =>
@@ -33,18 +35,11 @@ function rateLimited(userId: string, now = Date.now()): boolean {
 }
 
 async function askClaude(prompt: string, key: string): Promise<string> {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: MODEL, max_tokens: 120, messages: [{ role: 'user', content: prompt }] }),
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (!res.ok) throw new Error(`anthropic ${res.status}`);
-  const body = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
+  const body = await callClaude('exemplar-ai', key, { model: MODEL, max_tokens: 120, messages: [{ role: 'user', content: prompt }] }, 15_000);
   return body.content?.find((c) => c.type === 'text')?.text ?? '';
 }
 
-Deno.serve(async (req) => {
+Deno.serve(withPosthog('exemplar-ai', async (req) => {
   const pre = preflight(req.method);
   if (pre) return pre;
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
@@ -72,4 +67,4 @@ Deno.serve(async (req) => {
     console.error(`exemplar-ai: ${(e as Error).message}`);
     return json({ ok: true, status: 'model_failed' });
   }
-});
+}));

@@ -37,6 +37,7 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { ROADMAP_BOARD_ID, RoadmapPayload, parseRoadmapBoard } from './roadmap.ts';
 import { PatchOutline, isValidSlug, parseThreadOutline } from './patch-outline.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -246,7 +247,7 @@ function parseNotesParam(raw: string | null): string[] {
 
 // --------------------- server ---------------------
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withPosthog('rsi-roadmap', async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS_HEADERS });
 
   if (!SUPABASE_URL || !SERVICE_KEY) {
@@ -295,4 +296,4 @@ Deno.serve(async (req: Request) => {
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
     });
   }
-});
+}));

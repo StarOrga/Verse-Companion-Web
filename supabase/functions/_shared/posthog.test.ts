@@ -1,7 +1,7 @@
 // node --test supabase/functions/_shared/posthog.test.ts
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildAiGeneration, buildCapture, buildException, redactText, serverDistinctId, withPosthog } from './posthog.ts';
+import { CRON_RUN_EVENT, buildAiGeneration, buildCapture, buildCronRun, buildException, redactText, serverDistinctId, withPosthog } from './posthog.ts';
 import { PRICES } from '../translate-orchestrator/_cost.ts';
 import { LIST_PRICES, costUsd, priceFor } from './ai-pricing.ts';
 
@@ -85,4 +85,15 @@ test('cost: tokens, cache, batch discount, dated model ids, unknown model', () =
   assert.equal(priceFor('claude-haiku-4-5-20251001').in, 1);
   assert.equal(priceFor('mystery').out, 40);
   assert.equal(costUsd('claude-sonnet-5-5', { cache_read_input_tokens: 1_000_000 }), 0.4);
+});
+
+test('cron run outcome: 429 throttle is healthy, 5xx and a throw are failures', () => {
+  const ok = buildCronRun('sc-events-sync', 429, 12.4);
+  assert.equal(ok.event, CRON_RUN_EVENT);
+  assert.equal(ok.properties.ok, true);
+  assert.equal(ok.properties.duration_ms, 12);
+  assert.equal(buildCronRun('x', 503, 1).properties.ok, false);
+  const thrown = buildCronRun('x', null, 1, new Error('boom'));
+  assert.equal(thrown.properties.ok, false);
+  assert.equal(thrown.properties.error, 'boom');
 });
