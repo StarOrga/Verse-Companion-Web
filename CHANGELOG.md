@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.269.1] - 2026-11-15
+
+### Fixed
+- The patch-tip update (one announced target, ±1 day) now actually reaches the database: its migration shared a version number with another one and would have been skipped.
+
 ## [0.269.0] - 2026-11-15
 
 ### Changed
