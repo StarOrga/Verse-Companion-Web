@@ -59,9 +59,20 @@
     "dialog": {
       "confirm": "Bestätigen",
       "cancel": "Abbrechen",
-      "close": "Schließen"
+      "close": "Schließen",
+      "save": "Speichern",
+      "apply": "Übernehmen",
+      "done": "Fertig",
+      "previous": "Zurück",
+      "next": "Weiter"
     },
-    "undo": "Rückgängig"
+    "undo": "Rückgängig",
+    "popup": {
+      "access": {
+        "admin": "Nur für Admins sichtbar",
+        "collab": "Nur für Admins und Collaborators sichtbar"
+      }
+    }
   },
   "date": {
     "relative": {

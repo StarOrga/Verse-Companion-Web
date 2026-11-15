@@ -59,9 +59,20 @@
     "dialog": {
       "confirm": "Confirm",
       "cancel": "Cancel",
-      "close": "Close"
+      "close": "Close",
+      "save": "Save",
+      "apply": "Apply",
+      "done": "Done",
+      "previous": "Previous",
+      "next": "Next"
     },
-    "undo": "Undo"
+    "undo": "Undo",
+    "popup": {
+      "access": {
+        "admin": "Visible to admins only",
+        "collab": "Visible to admins and collaborators only"
+      }
+    }
   },
   "date": {
     "relative": {

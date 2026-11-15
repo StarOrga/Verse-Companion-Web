@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { ScConfirmDialogComponent } from './sc-confirm-dialog.component';
+import { ModalInertService } from './modal-inert.service';
 
 export type ScConfirmTone = 'default' | 'danger';
 
@@ -29,7 +30,11 @@ export const SC_CONFIRM_DEFAULT_CANCEL_KEY = 'common.dialog.cancel';
  * App-styled replacement for `window.confirm` / `window.prompt`. Renders
  * `sc-confirm-dialog` in a CDK overlay (top layer via popover in CDK 22,
  * centred, backdrop, scroll blocked) and resolves a Promise once the user
- * decides. Backdrop click, Escape and a navigation all count as "cancel".
+ * decides. Escape, the ✕, Abbrechen and a navigation count as "cancel"; a
+ * backdrop click does nothing (a modal closes only through its own controls).
+ *
+ * Stacking (popup-aufbau r1-stack): a confirm over an open modal dialog gets a
+ * transparent backdrop, so the page does not darken a second time.
  *
  * Only one dialog at a time: a second call while one is open resolves as
  * cancelled right away, so a double click on "Delete" never stacks two.
@@ -37,6 +42,7 @@ export const SC_CONFIRM_DEFAULT_CANCEL_KEY = 'common.dialog.cancel';
 @Injectable({ providedIn: 'root' })
 export class ScConfirmService {
   private readonly overlay = inject(Overlay);
+  private readonly inert = inject(ModalInertService);
   private open = false;
 
   confirm(o: ScConfirmOptions): Promise<boolean> {
@@ -54,7 +60,7 @@ export class ScConfirmService {
 
     const overlayRef: OverlayRef = this.overlay.create({
       hasBackdrop: true,
-      backdropClass: 'sc-dialog-backdrop',
+      backdropClass: this.inert.depth > 0 ? ['sc-dialog-backdrop', 'sc-dialog-backdrop--stacked'] : 'sc-dialog-backdrop',
       panelClass: 'sc-dialog-pane',
       positionStrategy: this.overlay.position().global().centerHorizontally().centerVertically(),
       scrollStrategy: this.overlay.scrollStrategies.block(),

@@ -1,0 +1,191 @@
+/* sc-popup — design d3 "Kommando-Spalte" (docs/concepts/20261115-0216-popup-aufbau/rounds/01.html,
+   `.ps-d3 …`). Global (ViewEncapsulation.None) so projected content and the CDK overlay pane
+   see one rule set. Widths only through the OVERLAY SIZES tokens of styles.scss. */
+
+.sc-popup {
+  --sc-popup-rail: var(--sc-accent);
+  display: block;
+  max-inline-size: 100%;
+  color: var(--sc-fg-0);
+}
+
+/* ---- inline popup with its own scrim: fixed stage, frame centred ---- */
+.sc-popup.sc-popup--staged {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sc-popup-z, 1300);
+  display: grid;
+  place-items: center;
+  padding: var(--sc-rand, 16px);
+}
+.sc-popup .scp-scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--sc-scrim);
+}
+/* r1-stack: the second layer's scrim does not darken further. */
+.sc-popup[data-layer='2'] .scp-scrim,
+.sc-popup[data-layer='3'] .scp-scrim { background: transparent; }
+
+/* ---- the frame (.ps-pop) ---- */
+.sc-popup .scp-frame {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  inline-size: min(var(--scp-w, var(--sc-ov-m)), calc(100vw - 32px));
+  max-inline-size: 100%;
+  max-block-size: var(--sc-ov-max-h);
+  margin: 0;
+  border: 1px solid var(--sc-sub-rule, var(--sc-border));
+  border-radius: 6px;
+  background: var(--sc-sub-fill, var(--sc-bg-1));
+  box-shadow: 0 30px 80px color-mix(in srgb, var(--sc-depth, #000) 55%, transparent);
+  overflow: hidden;
+  text-align: start;
+}
+.sc-popup .scp-frame[data-size='menu'] { --scp-w: var(--sc-ov-menu); }
+.sc-popup .scp-frame[data-size='s'] { --scp-w: var(--sc-ov-s); }
+.sc-popup .scp-frame[data-size='m'] { --scp-w: var(--sc-ov-m); }
+.sc-popup .scp-frame[data-size='area'] { inline-size: var(--sc-ov-area); }
+.sc-popup .scp-frame[data-kind='notice'] { --scp-w: var(--sc-toast-w); }
+
+/* r1-role: the top edge carries the role colour; the content stays in the normal colours. */
+.sc-popup .scp-frame[data-access] { border-top: 2px solid var(--scp-access); }
+.sc-popup .scp-frame[data-access='admin'] { --scp-access: var(--sc-accent-hot); }
+.sc-popup .scp-frame[data-access='collab'] { --scp-access: var(--sc-accent-collab); }
+
+/* ---- the rail (.ps-rail): kind colour + symbol + vertical eyebrow ---- */
+.sc-popup .scp-rail {
+  inline-size: 46px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  box-sizing: border-box;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--sc-popup-rail) 28%, transparent),
+    color-mix(in srgb, var(--sc-popup-rail) 8%, transparent)
+  );
+  border-inline-end: 2px solid var(--sc-popup-rail);
+  color: var(--sc-popup-rail);
+}
+.sc-popup .scp-sym { display: grid; place-items: center; }
+.sc-popup .scp-sym svg {
+  inline-size: 18px;
+  block-size: 18px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sc-popup .scp-sym:has(> :not(.scp-sym-default)) .scp-sym-default { display: none; }
+.sc-popup .scp-ev {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--sc-popup-rail);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-block-size: 100%;
+}
+
+/* ---- main column: head / body (scrolls alone, r1-scroll) / footer ---- */
+.sc-popup .scp-main {
+  flex: 1;
+  min-inline-size: 0;
+  min-block-size: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 18px 14px;
+}
+.sc-popup .scp-h {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex: none;
+}
+.sc-popup .scp-title {
+  flex: 1;
+  min-inline-size: 0;
+  margin: 0;
+  font: 600 17px/1.3 var(--sc-font-display);
+  letter-spacing: 0.03em;
+  color: var(--sc-fg-0);
+  overflow-wrap: anywhere;
+}
+.sc-popup .scp-tools { display: flex; gap: 6px; flex: none; }
+.sc-popup .scp-tools:empty { display: none; }
+.sc-popup .scp-x { color: var(--sc-fg-1); flex: none; }
+.sc-popup .scp-b {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  min-inline-size: 0;
+  margin-top: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: var(--sc-fg-1);
+}
+.sc-popup .scp-f {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  flex: none;
+}
+.sc-popup .scp-f:not(:has(.scp-acts > *, .scp-st > *)) { display: none; }
+.sc-popup .scp-acts { display: contents; }
+.sc-popup .scp-sp { flex: 1; }
+.sc-popup .scp-st { color: var(--sc-fg-1); font-size: 12px; }
+
+/* ---- menu + notice: narrow rail, no head ---- */
+.sc-popup .scp-frame:is([data-kind='menu'], [data-kind='notice']) .scp-rail {
+  inline-size: 36px;
+  padding: 10px 0;
+}
+.sc-popup .scp-frame[data-kind='menu'] .scp-main { padding: 6px; }
+.sc-popup .scp-frame[data-kind='notice'] .scp-main { padding: 12px 14px; }
+.sc-popup .scp-frame:is([data-kind='menu'], [data-kind='notice']) .scp-b { margin-top: 0; }
+
+/* ---- phone (the one overlay breakpoint): dialog, panel and large = full screen ---- */
+@media (max-width: 720px) {
+  .sc-popup.sc-popup--staged { padding: 0; }
+  .sc-popup .scp-frame:is([data-kind='dialog'], [data-kind='panel'], [data-kind='large']) {
+    position: fixed;
+    inset: 0;
+    z-index: var(--sc-popup-z, 1300);
+    inline-size: 100%;
+    block-size: 100vh;
+    block-size: 100dvh;
+    max-block-size: none;
+    border: 0;
+    border-radius: 0;
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px)
+      env(safe-area-inset-left, 0px);
+  }
+  .sc-popup .scp-frame[data-access]:is([data-kind='dialog'], [data-kind='panel'], [data-kind='large']) {
+    border-top: 2px solid var(--scp-access);
+  }
+  .sc-popup .scp-frame:is([data-kind='dialog'], [data-kind='panel'], [data-kind='large']) .scp-main {
+    padding: 12px 14px calc(12px + var(--sc-safe-bottom, 0px));
+  }
+  /* "für Fettfinger": every control of the scaffold at least 48 px. */
+  .sc-popup .scp-x,
+  .sc-popup .scp-tools > .sc-action--tertiary {
+    inline-size: 48px;
+    block-size: 48px;
+  }
+  .sc-popup .scp-acts > .sc-action { min-block-size: 48px; }
+  .sc-popup .scp-frame:is([data-kind='dialog'], [data-kind='panel'], [data-kind='large']) .scp-f {
+    padding-inline-end: var(--sc-fab-clear-inline, 0px);
+  }
+}
