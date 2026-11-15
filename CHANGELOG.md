@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Prebuild guard `check-legacy-actions` fails the build on a new legacy `.sc-btn` / `.btn` / `.link-btn` button (#970).
 
+## [0.270.22] - 2026-11-15
+
+### Fixed
+- Admin event datasheets: the crawl + AI pipeline now reads every event that has no current sheet (past editions and announced 2957 events, not only the running ones), finds each event by its own comm-link, a year-aware comm-link title search and the wiki page regardless of case, and "Fehlende auswerten" on /admin/events backfills them all at once. Estimated values of unannounced editions wait for admin approval.
+
 ## [0.270.21] - 2026-11-15
 
 ### Fixed
