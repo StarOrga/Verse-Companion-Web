@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Prebuild guard `check-legacy-actions` fails the build on a new legacy `.sc-btn` / `.btn` / `.link-btn` button (#970).
 
+## [0.270.20] - 2026-11-15
+
+### Changed
+- Codex: in "New in this patch" the component types (Armour and the others) switch every 24 s instead of every 8 s, so each one stays on the holotable long enough to read.
+
 ## [0.270.19] - 2026-11-15
 
 ### Fixed

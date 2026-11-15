@@ -169,7 +169,7 @@ export class CodexLandingHolotableComponent {
   readonly switchNo = input(0);
   /** Bumps on every rotation step: restarts the rim progress. */
   readonly cycle = input(0);
-  readonly cycleMs = input(8000);
+  readonly cycleMs = input(24000);
   /** A paint preview is open — the landing holds the rotation meanwhile. */
   readonly paintOpen = model(false);
 

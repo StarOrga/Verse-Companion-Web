@@ -1,7 +1,49 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.19",
+  "current": "0.271.0",
   "releases": [
+    {
+      "version": "0.271.0",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Every remaining action button in Admin, Codex, settings, Starscape, the consent banner, the phone hand-off, the feedback panel, the P4K history, the extension install page and About now uses the one action control (scAction). Each view shows at most one primary step, and destructive actions use the danger tone (#970)."
+            }
+          ]
+        },
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Prebuild guard check-legacy-actions fails the build on a new legacy .sc-btn / .btn / .link-btn button (#970)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.270.20",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex: in \"New in this patch\" the component types (Armour and the others) switch every 24 s instead of every 8 s, so each one stays on the holotable long enough to read."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.270.19",
       "date": "2026-11-15",

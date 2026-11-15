@@ -252,7 +252,7 @@ export class CodexLandingCodexPaneComponent {
   readonly paused = input(false);
   readonly still = input(false);
   readonly cycle = input(0);
-  readonly cycleMs = input(8000);
+  readonly cycleMs = input(24000);
   readonly switchNo = input(0);
   readonly pick = output<number>();
   /** A plain left click on an entry: that entry goes onto this page's table and is held. */
