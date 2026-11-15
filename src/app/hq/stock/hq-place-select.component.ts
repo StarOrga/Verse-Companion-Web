@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScPopoverDismissDirective } from '../../shared/popover/sc-popover-dismiss.directive';
 import { type PlaceGroup, groupPlaces, placeInfo, placeSub } from './hq-stock-places';
 
@@ -12,7 +13,7 @@ import { type PlaceGroup, groupPlaces, placeInfo, placeSub } from './hq-stock-pl
 @Component({
   selector: 'sc-hq-place-select',
   standalone: true,
-  imports: [TranslatePipe, ScPopoverDismissDirective],
+  imports: [TranslatePipe, ScPopoverDismissDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <span class="wrap" [scPopoverDismiss]="open()" (dismissed)="close(false)">
@@ -23,7 +24,7 @@ import { type PlaceGroup, groupPlaces, placeInfo, placeSub } from './hq-stock-pl
         <i aria-hidden="true">▾</i>
       </button>
       @if (open()) {
-        <div class="panel" role="group" [attr.aria-label]="'hq.bestand.deck.placeAria' | translate" (keydown)="onKey($event)">
+        <sc-popup class="panel" kind="menu" [backdrop]="false" [title]="'hq.bestand.deck.placeAria' | translate" (closed)="close(true)" (keydown)="onKey($event)">
           <input #search type="search" class="srch" [value]="term()" (input)="term.set($any($event.target).value); active.set(0)"
                  [placeholder]="'hq.bestand.deck.placeSearch' | translate" [attr.aria-label]="'hq.bestand.deck.placeSearch' | translate"
                  role="combobox" aria-expanded="true" [attr.aria-controls]="listId" [attr.aria-activedescendant]="listId + '-' + active()" />
@@ -44,7 +45,7 @@ import { type PlaceGroup, groupPlaces, placeInfo, placeSub } from './hq-stock-pl
               }
             }
           </ul>
-        </div>
+        </sc-popup>
       }
     </span>
   `,
@@ -58,11 +59,13 @@ import { type PlaceGroup, groupPlaces, placeInfo, placeSub } from './hq-stock-pl
       .trig svg { width: 14px; height: 14px; flex: none; fill: none; stroke: var(--sc-accent); stroke-width: 1.8; }
       .tv { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: start; }
       .trig i { color: var(--sc-fg-2); font-style: normal; }
-      .panel { position: absolute; z-index: 30; top: calc(100% + 6px); right: 0; width: max(100%, 16rem); display: flex; flex-direction: column; gap: 6px; max-height: min(60dvh, 28rem); padding: 8px; border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-bg-1); box-shadow: 0 12px 32px rgb(0 0 0 / .5); }
+      .panel { position: absolute; z-index: 30; top: calc(100% + 6px); right: 0; }
+      .panel .srch { margin-bottom: 6px; }
       .srch { min-height: 32px; padding: 0 10px; border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-0); color: var(--sc-fg); font: inherit; font-size: 0.8rem; }
-      .list { margin: 0; padding: 0; list-style: none; overflow-y: auto; }
-      .sys { padding: 8px 8px 2px; color: var(--sc-fg-2); font: 600 0.62rem / 1 var(--sc-font-display, inherit); letter-spacing: .14em; text-transform: uppercase; }
-      .body { padding: 4px 8px 2px 14px; color: var(--sc-fg-2); font-size: 0.7rem; }
+      .srch { inline-size: 100%; box-sizing: border-box; }
+      .list { margin: 0; padding: 0; list-style: none; }
+      .sys { padding: 8px 8px 2px; color: var(--sc-fg-2); font: 600 max(0.62rem, var(--sc-fs-floor)) / 1 var(--sc-font-display, inherit); letter-spacing: .14em; text-transform: uppercase; }
+      .body { padding: 4px 8px 2px 14px; color: var(--sc-fg-2); font-size: max(0.7rem, var(--sc-fs-floor)); }
       .opt { display: flex; justify-content: space-between; gap: 10px; min-height: 32px; align-items: center; padding: 0 8px 0 20px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
       .opt:first-child { padding-left: 8px; }
       .opt b { color: var(--sc-fg-2); font-weight: 500; font-variant-numeric: tabular-nums; }
@@ -70,10 +73,7 @@ import { type PlaceGroup, groupPlaces, placeInfo, placeSub } from './hq-stock-pl
       .opt.act, .opt:hover { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); opacity: 1; }
       .opt[aria-selected='true'] { color: var(--sc-accent); }
       @media (pointer: coarse) { .trig, .opt, .srch { min-height: 48px; } }
-      @media (max-width: 599px) {
-        :host { flex: 1 1 100%; max-width: none; }
-        .panel { position: fixed; inset: auto 0 0 0; width: auto; max-height: min(70dvh, 28rem); padding-bottom: calc(8px + var(--sc-float-bottom, 0px)); border-radius: 14px 14px 0 0; }
-      }
+      @media (max-width: 599px) { :host { flex: 1 1 100%; max-width: none; } }
     `,
   ],
 })
@@ -144,7 +144,6 @@ export class HqPlaceSelectComponent {
     else if (ev.key === 'Home') this.active.set(0);
     else if (ev.key === 'End') this.active.set(n - 1);
     else if (ev.key === 'Enter') this.pick(this.flat()[this.active()] ?? null);
-    else if (ev.key === 'Escape') this.close(true);
     else return;
     ev.preventDefault();
     ev.stopPropagation();

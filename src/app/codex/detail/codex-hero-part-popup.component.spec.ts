@@ -58,7 +58,7 @@ describe('CodexHeroPartPopupComponent', () => {
     const { fixture, el } = setup(() => Promise.resolve(null));
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(el.querySelector('.hpp-name')?.textContent).toContain('FR-66');
+    expect(el.querySelector('.scp-title')?.textContent).toContain('FR-66');
     expect(el.querySelectorAll('.hpp-stats > div').length).toBe(2);
     // No package: no 3D stage.
     expect(el.querySelector('.hpp-stage')).toBeNull();
@@ -74,7 +74,7 @@ describe('CodexHeroPartPopupComponent', () => {
     const { fixture, el } = setup(() => new Promise(() => undefined));
     let closed = 0;
     fixture.componentInstance.closed.subscribe(() => closed++);
-    (el.querySelector('.hpp-close') as HTMLButtonElement).click();
+    (el.querySelector('.scp-x') as HTMLButtonElement).click();
     expect(closed).toBe(1);
   });
 });

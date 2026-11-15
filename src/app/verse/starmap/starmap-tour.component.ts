@@ -11,7 +11,8 @@ import {
   signal,
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 
 /** The steps of the tour: `[data-tour]` marks the real element a step lights up. */
 export const STARMAP_TOUR_STEPS = ['stage', 'patch', 'comet', 'guess', 'rank'] as const;
@@ -35,40 +36,37 @@ interface Box {
 @Component({
   selector: 'sc-starmap-tour',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, ScDialogDirective],
+  imports: [TranslatePipe, ScActionDirective, ScPopupComponent],
   template: `
     @if (step() >= 0 && box(); as b) {
       <i class="ring" aria-hidden="true"
          [style.top.px]="b.top" [style.left.px]="b.left" [style.width.px]="b.width" [style.height.px]="b.height"></i>
     }
-    <section class="card" role="dialog" scDialog [scDialogModal]="false" [scDialogReturnFocus]="returnTo()"
-             (scDialogEscape)="closed.emit()" [attr.aria-label]="'starmap.tour.title' | translate">
+    <sc-popup class="card" kind="panel" [float]="true" initialFocus="container" [returnFocus]="returnTo()" (closed)="closed.emit()"
+              [eyebrow]="step() < 0 ? ('starmap.tour.eyebrow' | translate) : ('starmap.tour.progress' | translate: { n: step() + 1, total: steps().length })"
+              [title]="step() < 0 ? ('starmap.tour.title' | translate) : ('starmap.tour.step.' + current() + '.title' | translate)">
       @if (step() < 0) {
-        <h2>{{ 'starmap.tour.title' | translate }}</h2>
         <ul class="points">
           <li>{{ 'starmap.tour.p1' | translate }}</li>
           <li>{{ 'starmap.tour.p2' | translate }}</li>
           <li>{{ 'starmap.tour.p3' | translate }}</li>
         </ul>
-        <div class="row">
-          <button type="button" class="btn" (click)="go(0)">{{ 'starmap.tour.start' | translate }}</button>
-          <button type="button" class="btn ghost" (click)="closed.emit()">{{ 'starmap.tour.close' | translate }}</button>
-        </div>
       } @else {
-        <p class="count">{{ 'starmap.tour.progress' | translate: { n: step() + 1, total: steps().length } }}</p>
-        <h2>{{ 'starmap.tour.step.' + current() + '.title' | translate }}</h2>
         <p class="text" role="status">{{ 'starmap.tour.step.' + current() + '.text' | translate }}</p>
-        <div class="row">
-          <button type="button" class="btn ghost" [disabled]="step() === 0" (click)="go(step() - 1)">{{ 'starmap.tour.back' | translate }}</button>
-          @if (step() < steps().length - 1) {
-            <button type="button" class="btn" (click)="go(step() + 1)">{{ 'starmap.tour.next' | translate }}</button>
-          } @else {
-            <button type="button" class="btn" (click)="closed.emit()">{{ 'starmap.tour.done' | translate }}</button>
-          }
-          <button type="button" class="btn ghost" (click)="closed.emit()">{{ 'starmap.tour.close' | translate }}</button>
-        </div>
       }
-    </section>
+      <ng-container popupActions>
+        @if (step() < 0) {
+          <button type="button" scAction tier="primary" (click)="go(0)">{{ 'starmap.tour.start' | translate }}</button>
+        } @else {
+          @if (step() < steps().length - 1) {
+            <button type="button" scAction tier="primary" (click)="go(step() + 1)">{{ 'starmap.tour.next' | translate }}</button>
+          } @else {
+            <button type="button" scAction tier="primary" (click)="closed.emit()">{{ 'starmap.tour.done' | translate }}</button>
+          }
+          <button type="button" scAction [disabled]="step() === 0" (click)="go(step() - 1)">{{ 'starmap.tour.back' | translate }}</button>
+        }
+      </ng-container>
+    </sc-popup>
   `,
   styles: [
     `
@@ -76,27 +74,17 @@ interface Box {
       .ring { position: absolute; box-sizing: border-box; border-radius: 12px; pointer-events: none;
         border: 2px solid var(--sc-accent); box-shadow: 0 0 0 9999px color-mix(in srgb, var(--sc-bg-0) 62%, transparent), 0 0 24px color-mix(in srgb, var(--sc-accent) 45%, transparent);
         transition: top 0.25s ease, left 0.25s ease, width 0.25s ease, height 0.25s ease; }
-      .card { position: absolute; pointer-events: auto; right: var(--sc-space-3, 12px); bottom: var(--sc-space-3, 12px); width: min(380px, calc(100% - 24px));
-        box-sizing: border-box; padding: var(--sc-pad-3); border-radius: 12px; outline: none; max-height: 70dvh; overflow-y: auto;
-        background: color-mix(in srgb, var(--sc-bg-0) 96%, transparent); border: 1px solid var(--sc-accent);
-        box-shadow: 0 16px 40px rgb(0 0 0 / 50%); animation: tour-in 0.2s ease-out both; }
-      h2 { margin: 0 0 var(--sc-gap-2); font: 600 1rem var(--sc-font-display); color: var(--sc-fg-0); }
+      /* Frame, head, ✕, footer and width come from <sc-popup kind="panel">; only its place
+         (bottom right of the sky, a coach mark that must not hide the ringed element). */
+      .card { position: absolute; pointer-events: auto; right: var(--sc-space-3, 12px); bottom: var(--sc-space-3, 12px); }
       .points { margin: 0 0 var(--sc-gap-3); padding-left: 1.1rem; display: grid; gap: var(--sc-gap-2); color: var(--sc-fg-1); font-size: 0.9rem; }
       .text { margin: 0 0 var(--sc-gap-3); color: var(--sc-fg-1); font-size: 0.9rem; }
-      .count { margin: 0 0 4px; color: var(--sc-fg-2); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
-      .row { display: flex; gap: 6px; flex-wrap: wrap; }
-      .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 0 12px; border-radius: 8px;
-        border: 1px solid var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-fg-0); font: 0.8rem inherit; cursor: pointer; }
-      .btn.ghost { background: transparent; border-color: var(--sc-border); color: var(--sc-fg-1); }
-      .btn:hover:not(:disabled), .btn:focus-visible { border-color: var(--sc-accent); color: var(--sc-fg-0); outline: none; }
-      .btn:focus-visible { box-shadow: 0 0 0 2px var(--sc-accent); }
-      .btn:disabled { opacity: 0.45; cursor: default; }
-      @media (pointer: coarse) { .btn { min-height: var(--sc-tap-min, 48px); min-width: var(--sc-tap-min, 48px); } }
-      @keyframes tour-in { from { opacity: 0; } to { opacity: 1; } }
-      @media (max-width: 900px), (max-height: 700px) {
-        .card { position: fixed; inset: auto 8px var(--sc-float-bottom, 8px) 8px; width: auto; }
+      /* Phone: the scaffold's panel is full screen, which would cover the very element the tour
+         rings. The coach mark stays a card at the bottom (the scaffold's float input). */
+      @media (max-width: 720px) {
+        .card { position: fixed; inset: auto 8px var(--sc-float-bottom, 8px) 8px; }
+        .card { --sc-popup-max-h: 70dvh; }
       }
-      @media (prefers-reduced-motion: reduce) { .card { animation: none; } .ring { transition: none; } }
     `,
   ],
 })

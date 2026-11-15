@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, output, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import { ScSelectComponent, ScSelectOption } from '../shared/sc-select.component';
 import { ScSegmentOption, ScSegmentedComponent } from '../shared/segmented-control.component';
 import { FriendsService } from './friends.service';
@@ -23,16 +24,11 @@ import {
 @Component({
   selector: 'sc-social-visibility-dialog',
   standalone: true,
-  imports: [TranslatePipe, ScDialogDirective, ScSelectComponent, ScSegmentedComponent],
+  imports: [TranslatePipe, ScPopupComponent, ScActionDirective, ScSelectComponent, ScSegmentedComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="backdrop"></div>
-    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="social-vis-title"
-             scDialog (scDialogEscape)="closed.emit()">
-      <header>
-        <h3 id="social-vis-title">{{ 'social.visibility.title' | translate }}</h3>
-        <button type="button" class="sc-btn micro" (click)="closed.emit()">{{ 'social.visibility.done' | translate }}</button>
-      </header>
+    <sc-popup kind="dialog" [eyebrow]="'social.visibility.eyebrow' | translate" [title]="'social.visibility.title' | translate"
+              (closed)="closed.emit()">
       <div class="body">
         @if (social.error(); as key) {
           <div class="flash error" role="alert">{{ key | translate }}</div>
@@ -40,7 +36,7 @@ import {
         @if (social.loadError(); as key) {
           <div class="flash error" role="alert">
             {{ key | translate }}
-            <button type="button" class="sc-btn micro" (click)="reload()">{{ 'errors.retry' | translate }}</button>
+            <button type="button" scAction (click)="reload()">{{ 'errors.retry' | translate }}</button>
           </div>
         }
         @if (general(); as g) {
@@ -95,26 +91,18 @@ import {
           <p class="hint">{{ 'social.visibility.loading' | translate }}</p>
         }
       </div>
-    </section>
+    </sc-popup>
   `,
   styles: [`
-    :host { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; }
-    .backdrop { position: absolute; inset: 0; background: rgb(0 0 0 / 0.6); }
-    .dialog {
-      position: relative; width: min(600px, calc(100vw - 2 * var(--sc-space-3, 12px))); max-height: 88vh; max-height: 88dvh;
-      display: flex; flex-direction: column; background: var(--sc-surface, #111); border: 1px solid var(--sc-border);
-      border-radius: var(--sc-radius, 10px);
-    }
-    header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: var(--sc-space-3, 12px) var(--sc-space-4, 16px); border-bottom: 1px solid var(--sc-border); }
-    h3 { margin: 0; font-size: 1.1rem; }
+    :host { display: contents; }
     h4 { margin: var(--sc-space-4, 16px) 0 var(--sc-space-1, 4px); font-size: 0.9rem; font-family: var(--sc-font-display); letter-spacing: 0.05em; }
     h4:first-child { margin-top: 0; }
-    .body { overflow-y: auto; padding: var(--sc-space-3, 12px) var(--sc-space-4, 16px) var(--sc-space-4, 16px); }
+    .body { padding-top: 0; }
     .hint { display: block; color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor)); margin: 0; }
     .hint.empty { margin-top: 8px; font-style: italic; }
     .flash.error {
-      padding: 10px 14px; border-radius: 4px; font-size: 0.9rem; margin-bottom: 10px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap;
-      background: rgba(248, 113, 113, 0.1); border: 1px solid var(--sc-danger); color: var(--sc-danger);
+      padding: var(--sc-space-3) var(--sc-space-4); border-radius: 4px; font-size: 0.9rem; margin-bottom: var(--sc-space-3); display: flex; gap: var(--sc-space-3); align-items: center; justify-content: space-between; flex-wrap: wrap;
+      background: color-mix(in srgb, var(--sc-danger) 10%, transparent); border: 1px solid var(--sc-danger); color: var(--sc-danger);
     }
     .facets { list-style: none; margin: 8px 0 12px; padding: 0; }
     .facets li { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: var(--sc-space-2, 8px) 0; border-bottom: 1px solid var(--sc-border); }
@@ -126,13 +114,12 @@ import {
       border: 1px solid var(--sc-border); background: var(--sc-bg-2); cursor: pointer;
     }
     .switch .knob { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--sc-fg-2); transition: transform 0.15s ease, background 0.15s ease; }
-    .switch.on { border-color: var(--sc-accent); background: rgba(0, 212, 255, 0.15); }
+    .switch.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 15%, transparent); }
     .switch.on .knob { transform: translateX(18px); background: var(--sc-accent); }
     .switch:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .switch:disabled { opacity: 0.6; cursor: default; }
-    .sc-btn.micro { padding: 4px 10px; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.04em; }
     @media (prefers-reduced-motion: reduce) { .switch .knob { transition: none; } }
-    @media (pointer: coarse) { .switch { min-height: 48px; width: 56px; border-radius: 24px; } .switch .knob { top: 14px; } .sc-btn { min-height: 48px; } }
+    @media (pointer: coarse) { .switch { min-height: 48px; width: 56px; border-radius: 24px; } .switch .knob { top: 14px; } }
   `],
 })
 export class SocialVisibilityDialogComponent implements OnInit {

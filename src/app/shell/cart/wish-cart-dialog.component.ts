@@ -5,9 +5,8 @@ import { polyHitLink, type PolyHitKind } from '../../codex/codex-poly-search';
 import { isPlainLeftClick } from '../../core/modified-click.util';
 import { hqNachschubPickLink } from '../../hq/hq-routes';
 import { pickedShare, setPicked, toggleGroup, type FlowGroup } from '../../hq/plan/hq-nachschub-flow.util';
-import { HQ_DIALOG_STYLES } from '../../hq/plan/hq-dialog.styles';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScEntryDirective } from '../../shared/entry-motion/entry-motion';
 import { PATH_ICONS } from '../../shared/item-path/path-icons';
 import { SilThumbComponent } from '../../shared/sil-thumb/sil-thumb.component';
@@ -34,25 +33,13 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
 @Component({
   selector: 'sc-wish-cart',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, ScActionDirective, ScDialogDirective, ScEntryDirective, ScTooltipDirective, SilThumbComponent],
+  imports: [RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScEntryDirective, ScTooltipDirective, SilThumbComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <!-- The scrim does not close the cart (a selection would be lost): the X, Escape or the browser's back do. -->
-    <div class="scrim">
-      <section class="sheet cart" role="dialog" aria-modal="true" scDialog [scEntry]="'cart'" (scDialogEscape)="cart.close()"
-               [attr.aria-label]="'cart.title' | translate" data-cart>
-        <header class="dlg-head ce" style="--ce: 0">
-          <span class="dlg-ic" aria-hidden="true"><svg viewBox="0 0 24 24">@for (d of wishPath; track $index) { <path [attr.d]="d" /> }</svg></span>
-          <h2 class="dlg-title">
-            {{ 'cart.title' | translate }}
-            <small>{{ 'cart.summary' | translate: { n: cart.count(), g: cart.groups().length } }}</small>
-          </h2>
-          <button type="button" scAction tier="tertiary" [attr.aria-label]="'cart.close' | translate" [scTooltip]="'cart.close' | translate" scTooltipTier="label" (click)="cart.close()">
-            <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="close[0]" /></svg>
-          </button>
-        </header>
-
-        <div class="dlg-body cart-body">
+    <!-- The scrim does not close the cart (a selection would be lost): the X, Escape or the browser's back do. The cart owns ?cart=1, so no extra history entry. -->
+    <sc-popup kind="large" [scEntry]="'cart'" [eyebrow]="'hq.title' | translate" [title]="'cart.title' | translate" [backClose]="false" (closed)="cart.close()" data-cart>
+      <svg popupIcon viewBox="0 0 24 24">@for (d of wishPath; track $index) { <path [attr.d]="d" /> }</svg>
+      <div class="cart-body">
           @if (cart.count() === 0) {
             <div class="empty">
               <p class="empty-t">{{ 'cart.empty' | translate }}</p>
@@ -94,11 +81,11 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
                           </a>
                           <span class="foot">
                             <span class="step" role="group" [attr.aria-label]="'cart.qtyOf' | translate: { name: cart.nameOf(it) }">
-                              <button type="button" [disabled]="it.qty <= 1" [attr.aria-label]="'cart.less' | translate" (click)="bump(it, -1)">
+                              <button type="button" [disabled]="it.qty <= 1" [attr.aria-label]="'cart.less' | translate" [scTooltip]="'cart.less' | translate" scTooltipTier="label" (click)="bump(it, -1)">
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="minus[0]" /></svg>
                               </button>
                               <b>{{ it.qty }}@if (it.kind === 'material') { <small class="unit"> {{ 'blueprint.detail.unitScu' | translate }}</small> }</b>
-                              <button type="button" [disabled]="it.qty >= 999" [attr.aria-label]="'cart.more' | translate" (click)="bump(it, 1)">
+                              <button type="button" [disabled]="it.qty >= 999" [attr.aria-label]="'cart.more' | translate" [scTooltip]="'cart.more' | translate" scTooltipTier="label" (click)="bump(it, 1)">
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="plus[0]" /></svg>
                               </button>
                             </span>
@@ -146,33 +133,32 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
         </section>
       }
 
-        <footer class="dlg-foot ce" style="--ce: 6">
-          <span class="sel-count" role="status"><b>{{ selectedCount() }}</b> {{ 'cart.selected' | translate }}</span>
-          <span class="sp"></span>
-          @if (ns.newBlock()) {
-            <span class="full-hint" role="status">{{ 'cart.slotsFullHint' | translate }}</span>
-          }
-          <button type="button" scAction tier="secondary" [disabled]="picks().size === 0" (click)="picks.set(emptyPicks)"><span>{{ 'cart.clear' | translate }}</span></button>
-          <a scAction tier="primary" class="go" [class.off]="picks().size === 0" [attr.aria-disabled]="picks().size === 0 ? 'true' : null" [attr.role]="picks().size === 0 ? 'link' : null"
-             [routerLink]="picks().size === 0 ? null : ['/hq']" [fragment]="'planen'" [queryParams]="pickParams()" (click)="onGo($event)">
-            <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">@for (d of nachschubPath; track $index) { <path [attr.d]="d" /> }</svg>
-            <span>{{ (ns.newBlock() ? 'cart.toExisting' : 'cart.toNachschub') | translate }}</span>
-          </a>
-        </footer>
-      </section>
-    </div>
+      <ng-container popupActions>
+        <a scAction tier="primary" class="go" [class.off]="picks().size === 0" [attr.aria-disabled]="picks().size === 0 ? 'true' : null" [attr.role]="picks().size === 0 ? 'link' : null"
+           [routerLink]="picks().size === 0 ? null : ['/hq']" [fragment]="'planen'" [queryParams]="pickParams()" (click)="onGo($event)">
+          <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">@for (d of nachschubPath; track $index) { <path [attr.d]="d" /> }</svg>
+          <span>{{ (ns.newBlock() ? 'cart.toExisting' : 'cart.toNachschub') | translate }}</span>
+        </a>
+        <button type="button" scAction tier="secondary" [disabled]="picks().size === 0" (click)="picks.set(emptyPicks)"><span>{{ 'cart.clear' | translate }}</span></button>
+      </ng-container>
+      <span popupStatus class="cart-status">
+        <span class="cart-sum">{{ summaryKey() | translate: { n: cart.count(), g: cart.groups().length } }}</span>
+        <span class="sel-count" role="status"><b>{{ selectedCount() }}</b> {{ 'cart.selected' | translate }}</span>
+        @if (ns.newBlock()) {
+          <span class="full-hint" role="status">{{ 'cart.slotsFullHint' | translate }}</span>
+        }
+      </span>
+    </sc-popup>
   `,
   styles: [
-    HQ_DIALOG_STYLES,
     `
       :host { display: contents; }
-      .dlg-foot { flex-wrap: wrap; }
-      .full-hint { color: var(--sc-fg-2); font-size: max(0.82rem, var(--sc-fs-floor, 0.75rem)); max-width: 46ch; flex: 1 1 18ch; }
-      .cart { --dlg-w: min(1180px, 100%); --dlg-h: min(860px, 100%); }
-      .cart-body { gap: 14px; }
+      .cart-status { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; justify-content: flex-end; }
+      .cart-sum { color: var(--sc-fg-2); }
+      .full-hint { color: var(--sc-fg-2); font-size: max(0.82rem, var(--sc-fs-floor, 0.75rem)); max-width: 46ch; }
+      .cart-body { display: flex; flex-direction: column; gap: var(--sc-space-4); }
       .groups { flex: none; }
-      /* Passt dazu sits outside the scrolling groups: a long wishlist never pushes it below the fold. */
-      .sugs { flex: none; margin: 0 var(--sc-space-4, 16px) 12px; }
+      .sugs { flex: none; margin-top: var(--sc-space-4); }
       .groups { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
       .group {
         --n: 1; flex: var(--n) 1 calc(var(--n) * 168px); min-width: min(100%, 168px); display: flex; flex-direction: column;
@@ -197,7 +183,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       .foot { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; gap: 4px; }
       .step { display: inline-flex; align-items: center; border: 1px solid var(--sc-border); border-radius: 999px; overflow: hidden; }
       .step button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; background: transparent; color: var(--sc-fg-1); cursor: pointer; }
-      .step button:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); }
+      @media (hover: hover) { .step button:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); } }
       .step button:disabled { opacity: 0.4; cursor: default; }
       .step button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       .step svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
@@ -211,7 +197,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       .chk:checked::after { content: ''; width: 5px; height: 10px; border: solid var(--sc-bg-0); border-width: 0 2.4px 2.4px 0; transform: translateY(-1px) rotate(45deg); }
       .chk:indeterminate::after { content: ''; width: 10px; height: 2.4px; background: var(--sc-bg-0); border-radius: 2px; }
       .chk:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-      .sugs { padding: 10px 14px 12px; border: 1px solid color-mix(in srgb, var(--sc-warning) 35%, transparent); border-radius: 12px; background: linear-gradient(90deg, color-mix(in srgb, var(--sc-warning) 7%, transparent), transparent); }
+      .sugs { padding: var(--sc-space-3) var(--sc-space-4); border: 1px solid color-mix(in srgb, var(--sc-warning) 35%, transparent); border-radius: 12px; background: linear-gradient(90deg, color-mix(in srgb, var(--sc-warning) 7%, transparent), transparent); }
       .s-head { margin: 0 0 8px; font: 600 0.78rem/1.2 var(--sc-font-display, inherit); letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-warning); }
       .s-head small { font: 500 0.78rem var(--sc-font-body, inherit); letter-spacing: 0; text-transform: none; color: var(--sc-fg-2); margin-left: 6px; }
       .s-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -231,11 +217,13 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
         .group { flex-basis: 100%; }
         .s-row { grid-template-columns: 1fr; }
       }
-      /* Phone: the feedback launcher stays above the sheet (it must stay reachable), so the footer keeps its lane free. */
-      @media (max-width: 640px) { .dlg-foot { padding-inline-end: var(--sc-fab-clear-inline); } }
-      @media (min-width: 641px) and (max-width: 720px) { .dlg-foot { padding-inline-end: calc(var(--sc-fab-clear-inline) - var(--sc-space-4, 16px)); } }
+      /* Phone: 1-2 tile columns instead of --n, so the stepper + remove row fits a tile. */
+      @media (max-width: 749px) {
+        .tiles { grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); }
+      }
       @media (pointer: coarse), (max-width: 749px) {
         .step button { width: 44px; height: 44px; }
+        .foot { flex-wrap: wrap; }
         .chk { width: 24px; height: 24px; }
       }
     `,
@@ -257,6 +245,10 @@ export class WishCartDialogComponent {
 
   /** The selection: position key -> picked quantity (the whole quantity unless a split was made in Planen). */
   protected readonly picks = signal<ReadonlyMap<string, number>>(this.emptyPicks);
+  /** "1 Position · 1 Gruppe", "5 Positionen · 1 Gruppe", else the plural form. */
+  protected readonly summaryKey = computed(() =>
+    this.cart.count() === 1 ? 'cart.summaryOne' : this.cart.groups().length === 1 ? 'cart.summaryOneGroup' : 'cart.summary',
+  );
   protected readonly selectedCount = computed(() => this.picks().size);
   protected readonly pickParams = computed(() => hqNachschubPickLink([...this.picks()].map(([key, qty]) => ({ key, qty }))).queryParams ?? {});
 

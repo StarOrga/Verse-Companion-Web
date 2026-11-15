@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScPopoverDismissDirective } from '../../shared/popover/sc-popover-dismiss.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { HoloDiffMarkerComponent } from './holo-diff-marker';
 
 /** A navigation target of the menu (router commands + query params). */
@@ -32,7 +33,7 @@ export interface HangarExemplar {
 @Component({
   selector: 'sc-codex-holo-hangar-menu',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, ScPopoverDismissDirective, HoloDiffMarkerComponent],
+  imports: [TranslatePipe, RouterLink, ScPopoverDismissDirective, HoloDiffMarkerComponent, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="hm" [scPopoverDismiss]="open()" (dismissed)="open.set(false)">
@@ -46,9 +47,10 @@ export interface HangarExemplar {
         <span class="car" aria-hidden="true">▾</span>
       </button>
       @if (open()) {
-        <div class="menu" id="holo-hangar-menu" role="menu" tabindex="-1" [attr.aria-label]="'codex.holo.hangar.menuAria' | translate" (keydown)="onMenuKey($event)">
+        <sc-popup class="menu" kind="menu" [backdrop]="false" [title]="'codex.holo.hangar.menuAria' | translate" (closed)="open.set(false)">
+        <div id="holo-hangar-menu" role="menu" tabindex="-1" [attr.aria-label]="'codex.holo.hangar.menuAria' | translate" (keydown)="onMenuKey($event)">
           <div class="gh" role="presentation">{{ 'codex.holo.hangar.loadouts' | translate }}</div>
-          <a role="menuitemradio" class="row" [class.on]="activeId() === null" [attr.aria-checked]="activeId() === null"
+          <a role="menuitemradio" class="row" [class.on]="activeId() === null" [attr.aria-checked]="activeId() === null" [attr.cdkFocusInitial]="(activeId() === null) ? '' : null"
              [routerLink]="werkLink().commands" [queryParams]="werkLink().queryParams" (click)="open.set(false)">
             <i class="radio" aria-hidden="true"></i>
             <span class="txt"><b>{{ 'codex.holo.hangar.werk' | translate }}</b>
@@ -58,7 +60,7 @@ export interface HangarExemplar {
             </span>
           </a>
           @for (e of exemplars(); track e.id) {
-            <a role="menuitemradio" class="row" [class.on]="activeId() === e.id" [attr.aria-checked]="activeId() === e.id"
+            <a role="menuitemradio" class="row" [class.on]="activeId() === e.id" [attr.aria-checked]="activeId() === e.id" [attr.cdkFocusInitial]="(activeId() === e.id) ? '' : null"
                [routerLink]="e.link.commands" [queryParams]="e.link.queryParams" (click)="open.set(false)">
               <i class="radio" aria-hidden="true"></i>
               <span class="txt">
@@ -109,7 +111,7 @@ export interface HangarExemplar {
             }
             <!-- A wish that carries a loadout (D1): opened like an exemplar, its parts become the draft. -->
             @for (w of wishes(); track w.id) {
-              <a role="menuitemradio" class="row wish" [class.on]="activeId() === w.id" [attr.aria-checked]="activeId() === w.id"
+              <a role="menuitemradio" class="row wish" [class.on]="activeId() === w.id" [attr.aria-checked]="activeId() === w.id" [attr.cdkFocusInitial]="(activeId() === w.id) ? '' : null"
                  [routerLink]="w.link.commands" [queryParams]="w.link.queryParams" (click)="open.set(false)">
                 <i class="radio" aria-hidden="true"></i>
                 <span class="txt">
@@ -136,6 +138,7 @@ export interface HangarExemplar {
           }
           @if (errorKey(); as err) { <p class="err" role="alert">{{ err | translate }}</p> }
         </div>
+        </sc-popup>
       }
     </div>
   `,
@@ -153,17 +156,17 @@ export interface HangarExemplar {
     .hb .car { color: var(--sc-accent); font-size: 10px; }
     .hb:hover, .hb.open { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); border-color: var(--sc-accent); }
     .hb:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-    .menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; width: 290px; max-width: calc(100vw - 24px);
-      max-height: min(70vh, 560px); max-height: min(70dvh, 560px); overflow: auto; box-sizing: border-box;
-      display: flex; flex-direction: column; gap: 2px; padding: 8px;
-      border: 1px solid color-mix(in srgb, var(--sc-accent) 40%, var(--sc-border)); border-radius: 12px;
-      background: var(--sc-bg-1); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5); }
+    /* Anchored under its button; frame and width (menu tier) come from sc-popup. */
+    .menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; max-width: calc(100vw - 24px);
+      /* The scaffold body scrolls; cap the frame here instead of a second scroller inside it. */
+      --sc-popup-max-h: min(70dvh, 560px); }
+    [role='menu'] { display: flex; flex-direction: column; gap: 2px; }
     .gh { padding: 4px 10px 2px; font-size: max(9px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); }
     hr { width: 100%; margin: 6px 0; border: 0; border-top: 1px solid var(--sc-border); }
     .row, .add, .go, .act { display: flex; align-items: flex-start; gap: 9px; width: 100%; box-sizing: border-box; min-height: 32px; padding: 7px 10px;
       border: 0; border-radius: 8px; background: none; color: var(--sc-fg-1); font: inherit; font-size: max(12.5px, var(--sc-fs-floor));
       text-align: start; text-decoration: none; cursor: pointer; }
-    .row:hover, .add:hover:not(:disabled), .go:hover, .act:hover { background: color-mix(in srgb, var(--sc-accent) 10%, transparent); color: var(--sc-fg-0); }
+    @media (hover: hover) { .row:hover, .add:hover:not(:disabled), .go:hover, .act:hover { background: color-mix(in srgb, var(--sc-accent) 10%, transparent); color: var(--sc-fg-0); } }
     .row:focus-visible, .add:focus-visible, .go:focus-visible, .act:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .row.on { background: color-mix(in srgb, var(--sc-accent) 12%, transparent); color: var(--sc-fg-0); }
     .radio { flex: none; width: 12px; height: 12px; margin-top: 3px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--sc-fg-2); }
@@ -231,7 +234,7 @@ export class CodexHoloHangarMenuComponent {
 
   toggle(): void {
     this.open.update((v) => !v);
-    if (this.open()) queueMicrotask(() => this.focusItem('checked'));
+    // The scaffold focuses the `cdkFocusInitial` item (the checked one) once the popup has rendered.
   }
 
   protected fire<T>(out: { emit(v: T): void }, value: T): void {
@@ -263,10 +266,5 @@ export class CodexHoloHangarMenuComponent {
 
   private items(): HTMLElement[] {
     return Array.from(this.host.querySelectorAll<HTMLElement>('[role^="menuitem"]:not([disabled])'));
-  }
-
-  private focusItem(which: 'checked'): void {
-    const el = which === 'checked' ? this.host.querySelector<HTMLElement>('[aria-checked="true"]') : null;
-    (el ?? this.items()[0])?.focus({ preventScroll: true });
   }
 }

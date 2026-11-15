@@ -95,7 +95,7 @@ describe('HqLiveTickerComponent (App-Status)', () => {
 
   it('closing the Aussicht while the app is missing is remembered per page', () => {
     const { f, dock } = mount('planen');
-    (dock!.querySelector('.a-x') as HTMLButtonElement).click();
+    (dock!.querySelector('.scp-x') as HTMLButtonElement).click();
     f.detectChanges();
     expect(dock!.querySelector('.aussicht')).toBeNull();
     expect(JSON.parse(localStorage.getItem(AUSSICHT_SEEN_KEY)!)).toEqual(['planen']);

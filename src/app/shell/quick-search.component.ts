@@ -14,6 +14,7 @@ import { AnalyticsService } from '../core/analytics.service';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import { CodexSearchEngine } from '../codex/search/codex-search-engine';
 import { CodexSearchResultsComponent } from '../codex/search/codex-search-results.component';
@@ -31,7 +32,7 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
 @Component({
   selector: 'sc-quick-search',
   standalone: true,
-  imports: [TranslatePipe, ScDialogDirective, ScTooltipDirective, CodexSearchResultsComponent],
+  imports: [TranslatePipe, ScDialogDirective, ScActionDirective, ScTooltipDirective, CodexSearchResultsComponent],
   providers: [CodexSearchEngine],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -78,12 +79,10 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
               [attr.aria-label]="'codex.search.bar.label' | translate"
               [attr.placeholder]="'codex.search.bar.placeholder' | translate" />
             <!-- The phone sheet has no backdrop to tap and no Esc key: closing needs a control. -->
-            <button type="button" class="qs-close" (click)="close()"
+            <button type="button" scAction tier="tertiary" class="qs-close" (click)="close()"
                     [attr.aria-label]="'codex.search.bar.close' | translate"
                     [scTooltip]="'codex.search.bar.close' | translate" scTooltipTier="label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
-                <line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" />
-              </svg>
+              <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
             </button>
           </div>
           <sc-codex-search-results
@@ -116,8 +115,7 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
 
     .overlay {
       position: fixed; inset: 0; z-index: 100;
-      background: rgba(0, 0, 0, 0.68);
-      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+      background: var(--sc-scrim);
       display: flex; justify-content: center; align-items: flex-start;
       padding: 12vh 16px 16px;
     }
@@ -136,15 +134,8 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
       color: var(--sc-fg-0); font-family: inherit; font-size: max(1rem, var(--sc-fs-input));
     }
     .qs-input::-webkit-search-cancel-button { display: none; }
-    .qs-close {
-      flex: none; display: inline-flex; align-items: center; justify-content: center;
-      width: 36px; height: 36px; margin-right: -8px; border: 0; border-radius: 6px;
-      background: none; color: var(--sc-fg-2); cursor: pointer;
-    }
-    .qs-close svg { width: 18px; height: 18px; }
-    .qs-close:hover { color: var(--sc-fg-0); background: var(--sc-bg-2); }
-    .qs-close:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-    @media (pointer: coarse) { .qs-close { width: 48px; height: 48px; } }
+    /* Sonderform: own frame, but scrim + ✕ are the scaffold's (--sc-scrim, tertiary scAction). */
+    .qs-close { flex: none; margin-right: -8px; color: var(--sc-fg-1); }
     /* The results are the scroll port; the field stays put above them. */
     .qs-results { flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; }
 

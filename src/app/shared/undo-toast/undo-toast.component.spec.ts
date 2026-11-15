@@ -17,7 +17,7 @@ describe('UndoToastComponent', () => {
     svc.offer({ messageKey: 'starmap.guess.undoToast', messageParams: { name: 'Gladius' }, commit, onUndo });
     f.detectChanges();
     const toast = f.nativeElement.querySelector('.toast') as HTMLElement;
-    expect(toast.getAttribute('role')).toBe('status');
+    expect(toast.querySelector('.scp-frame')!.getAttribute('role')).toBe('status');
     expect(toast.textContent).toContain('starmap.guess.undoToast');
     const btn = toast.querySelector('button.undo') as HTMLButtonElement;
     expect(btn.textContent).toContain('common.undo');

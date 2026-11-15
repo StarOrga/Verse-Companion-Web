@@ -71,7 +71,7 @@ describe('WishCartDialogComponent (Warenkorb)', () => {
     const groups = Array.from(el.querySelectorAll('section.group')).map((g) => g.classList.contains('bp'));
     expect(groups).toEqual([false, false, true]);
     expect(el.querySelectorAll('.tile').length).toBe(4);
-    expect(el.querySelector('.dlg-title small')!.textContent).toContain('cart.summary');
+    expect(el.querySelector('.cart-sum')!.textContent).toContain('cart.summary');
   });
 
   it('the Codex page is a real anchor on the tile (the arrow); the silhouette box never stretches (contain)', () => {
@@ -98,7 +98,7 @@ describe('WishCartDialogComponent (Warenkorb)', () => {
   it('a click beside the cart keeps it open (the selection would be lost)', () => {
     const { el } = setup(rows);
     const close = vi.spyOn(TestBed.inject(WishCartService), 'close').mockReturnValue(undefined as never);
-    el.querySelector<HTMLElement>('.scrim')!.click();
+    el.querySelector<HTMLElement>('.scp-scrim')!.click();
     expect(close).not.toHaveBeenCalled();
   });
 

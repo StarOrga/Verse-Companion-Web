@@ -2,6 +2,8 @@ import { ScPopupMotionDirective } from '../popup-motion/sc-popup-motion.directiv
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { ToastSlotDirective } from '../toast-stack/toast-stack';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ScActionDirective } from '../action/sc-action.directive';
+import { ScPopupComponent } from '../popup/sc-popup.component';
 import { UndoToastService } from './undo-toast.service';
 
 /**
@@ -14,52 +16,43 @@ import { UndoToastService } from './undo-toast.service';
 @Component({
   selector: 'sc-undo-toast',
   standalone: true,
-  imports: [ScPopupMotionDirective, ToastSlotDirective, TranslatePipe],
+  imports: [ScPopupMotionDirective, ToastSlotDirective, TranslatePipe, ScActionDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @for (p of shown(); track p.id) {
-      <div class="toast" scToastSlot scPopupMotion scPopupMotionOrigin="br" animate.leave="pm-out" role="status" aria-live="polite" [class.paused]="svc.held()"
+      <div class="toast" scToastSlot scPopupMotion scPopupMotionOrigin="br" animate.leave="pm-out" [class.paused]="svc.held()"
            (mouseenter)="svc.hold('hover', true)" (mouseleave)="svc.hold('hover', false)"
            (focusin)="svc.hold('focus', true)" (focusout)="svc.hold('focus', false)">
-        <span class="msg">{{ p.messageKey | translate: p.messageParams }}</span>
-        <button type="button" class="undo" (click)="svc.undo()">{{ 'common.undo' | translate }}</button>
-        <i class="drain" aria-hidden="true" [style.animation-duration.ms]="svc.duration"></i>
+        <sc-popup kind="notice" [title]="p.messageKey | translate: p.messageParams">
+          <svg popupIcon viewBox="0 0 24 24"><path d="M5 12l4 4 10-10" /></svg>
+          <div class="row">
+            <span class="msg">{{ p.messageKey | translate: p.messageParams }}</span>
+            <button type="button" scAction tier="secondary" class="undo" (click)="svc.undo()">{{ 'common.undo' | translate }}</button>
+          </div>
+          <i class="drain" aria-hidden="true" [style.animation-duration.ms]="svc.duration"></i>
+        </sc-popup>
       </div>
     }
   `,
   styles: [`
     :host { display: contents; }
+    /* Position only (bottom right, above the launcher); frame, width, rail and symbol come from <sc-popup kind="notice">. */
     .toast {
       position: fixed; z-index: 1450;
       inset-inline-end: var(--sc-fab-gutter, 16px);
       bottom: calc(var(--sc-toast-bottom, var(--sc-fab-clear-block, 80px)) + var(--sc-toast-offset, 0px));
-      width: min(var(--sc-toast-w, 24rem), calc(100vw - 2 * var(--sc-fab-gutter, 16px)));
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 10px 12px 16px; border-radius: 14px; overflow: hidden;
-      background: color-mix(in srgb, var(--sc-bg-1) 96%, transparent);
-      border: 1px solid color-mix(in srgb, var(--sc-accent) 45%, var(--sc-border));
-      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55), 0 0 30px color-mix(in srgb, var(--sc-accent) 14%, transparent);
     }
+    .row { display: flex; align-items: center; gap: 12px; }
     .msg { flex: 1; min-width: 0; font-size: 0.9rem; color: var(--sc-fg-0); }
-    .undo {
-      flex: none; height: 36px; padding: 0 16px; border-radius: 999px; cursor: pointer;
-      font: 600 max(0.8rem, var(--sc-fs-floor)) var(--sc-font-display); letter-spacing: 0.12em; text-transform: uppercase;
-      background: none; color: var(--sc-accent);
-      border: 1px solid color-mix(in srgb, var(--sc-accent) 55%, transparent);
-      transition: background 0.15s, color 0.15s;
-    }
-    .undo:hover { background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-fg-0); }
-    .undo:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-    @media (pointer: coarse) { .undo { height: 48px; } }
+    .undo { flex: none; }
     .drain {
-      position: absolute; inset: auto 0 0 0; height: 2px; background: var(--sc-accent); transform-origin: left center;
+      display: block; height: 2px; margin-top: 10px; background: var(--sc-accent); transform-origin: left center;
       animation: toast-drain linear forwards;
     }
     .toast.paused .drain { animation-play-state: paused; }
     @keyframes toast-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
     @keyframes toast-drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
     @media (prefers-reduced-motion: reduce) {
-      .undo { transition: none; }
       @keyframes toast-fade { from { opacity: 0; } to { opacity: 1; } }
     }
   `],

@@ -22,6 +22,8 @@
    below the feedback panel (1400) and the bundle-history popups (1200). */
 .cdk-overlay-container { z-index: 1500; }
 .sc-dialog-backdrop { background: rgb(0 0 0 / 55%); }
+/* r1-stack (popup-aufbau): a confirm over an open dialog keeps the page at the first layer's dim. */
+.sc-dialog-backdrop.sc-dialog-backdrop--stacked { background: transparent; }
 
 :root {
   /* The app is dark-only (body.sc-theme-dark): native popups, spinners,
@@ -580,6 +582,52 @@ html[data-sc-layout] { scroll-padding-top: var(--sc-bar-h); }
     /* The β FAB stacks above the share button's lane; toasts ride above the β FAB. */
     --sc-toast-bottom: calc(var(--sc-beta-fab-bottom) + var(--sc-beta-fab-lane) + var(--sc-view-fab-lane, 0px));
   }
+}
+
+/* ---- POPUP FIELD (in-field label) ----
+   Concept popup-aufbau a2: inside a popup the label sits in the empty field and shrinks to the
+   field's top edge once a value is in or the field has focus. Still a real <label>, so assistive
+   tech reads it; the input needs placeholder=" " (the empty-state test). A non-input control
+   (sc-select) sets .is-filled on the wrapper instead.
+     <label class="sc-float-field">
+       <input class="sc-input" placeholder=" " ... />
+       <span class="sc-float-label">{{ 'x.label' | translate }}</span>
+     </label> */
+.sc-float-field {
+  position: relative;
+  display: block;
+  min-inline-size: 0;
+}
+.sc-float-field > .sc-input {
+  padding-top: 20px;
+  padding-bottom: 6px;
+  min-block-size: max(48px, var(--sc-tap-min, 0px));
+}
+.sc-float-field > .sc-float-label {
+  position: absolute;
+  inset-inline-start: 15px;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  max-inline-size: calc(100% - 30px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--sc-fg-1);
+  font-size: max(1em, var(--sc-fs-input, 1em));
+  pointer-events: none;
+  transition: transform 0.15s ease, font-size 0.15s ease, top 0.15s ease, color 0.15s ease;
+}
+.sc-float-field > .sc-input:focus + .sc-float-label,
+.sc-float-field > .sc-input:not(:placeholder-shown) + .sc-float-label,
+.sc-float-field.is-filled > .sc-float-label {
+  inset-block-start: 6px;
+  transform: none;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+.sc-float-field > .sc-input:focus + .sc-float-label { color: var(--sc-accent); }
+@media (prefers-reduced-motion: reduce) {
+  .sc-float-field > .sc-float-label { transition: none; }
 }
 
 /* ---- HEAD STRIP ----

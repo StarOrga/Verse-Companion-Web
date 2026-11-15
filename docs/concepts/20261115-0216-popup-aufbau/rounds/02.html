@@ -1,0 +1,135 @@
+<section data-iteration="2" data-iteration-template="free" data-final-report>
+  <p class="fr-sentence">Alle 49 Popups stehen jetzt auf einem Gerüst im Stil der Kommando-Spalte; auf dem Handy sind sie Vollbild, und Zurück schließt erst das Fenster.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🧱</span><span><b>Ein Gerüst</b>: Farbspalte, Titel, ✕ und Fuß sitzen überall gleich.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">📱</span><span>Auf dem Handy <b>Vollbild</b>, Zurück schließt erst das Popup.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🔒</span><span>Dialoge schließen <b>nie per Klick daneben</b>, Admin-Popups mit roter Kante.</span></li>
+      </ul>
+      <a class="fr-try" href="https://versecompanion-alpha.vercel.app/hq" target="_blank" rel="noopener noreferrer">▶ {{final.open_live}}</a>
+      <p class="fr-try-auth">🔑 Mit deinem eigenen Konto anmelden; Merkliste über das Herz oben rechts</p>
+    </div>
+    <div class="fr-ba" data-label-before="Rechner" data-label-after="Handy">
+      <figure class="fr-shot"><img src="20261115-0216-popup-aufbau/shots/polish-merkliste-desktop.png" alt="Merkliste als Panel mit Farbspalte und senkrechter Augenbraue"><figcaption>Merkliste am Rechner</figcaption></figure>
+      <figure class="fr-shot"><img src="20261115-0216-popup-aufbau/shots/polish-apitoken-phone.png" alt="API-Token-Dialog als Vollbild auf dem Handy"><figcaption>Dialog als Vollbild am Handy</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="6990 Tests grün nach dem Merge mit main, Anforderung: keine roten Tests (geschätzt).">
+        <span class="fr-meter-name">🧱 Stabilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">6990 ✓</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 85%" data-tip="Fokus bleibt im Popup, Escape und Zurück schließen, Tippziele 48 px; offen: Segment-Chips im Bauteil-Tausch auf 375 px abgeschnitten (geschätzt).">
+        <span class="fr-meter-name">♿ Barrierefreiheit</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">~85 %</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Sechs eigene Popup-Stile ersetzt durch ein Gerüst; Kopf, ✕, Fuß und Breite kommen aus einer Stelle (geschätzt).">
+        <span class="fr-meter-name">🛠 Wartbarkeit</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">6 → 1</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="5 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ✓ {{final.level_interplay}} · ✓ {{final.level_local}} · ✓ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_prod}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_live}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 4 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-swap-apply"
+          data-issue-title="[DESIGN] Swap picker: decide on an apply button and prev/next tools"
+          data-issue-type="design"
+          data-issue-body="Concept 20261115-0216-popup-aufbau (design d3) showed the swap picker with a primary 'Übernehmen' first in the footer and ‹ › tools before the X. The real picker applies a part on a row click and has no previous/next data, so neither was built. Decide whether the picker should switch to select-then-apply."
+          data-oq-origin="shortfall"
+          data-route-default="ignore"
+          data-route-reason="bewusst">
+        <span class="oq-label">Tausch ohne Übernehmen</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Der Bauteil-Tausch übernimmt beim Klick auf die Zeile, darum fehlen „Übernehmen“ und ‹ › aus dem Entwurf.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Codex · Bauteil tauschen</dd>
+          <dt>{{final.fund_why}}</dt><dd>✕ Weglassen — ein Knopf ohne Funktion wäre schlechter.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-swap-chips"
+          data-issue-title="[BUG] Swap picker segment chips are clipped at 375 px"
+          data-issue-type="bug"
+          data-issue-body="On a 375 px phone the segmented controls in the swap picker toolbar ('Nur Geschützturm', 'Eingebaut') and their hint text are cut off. Pre-existing, not caused by the popup scaffold; a wrap attempt on .pick-scope did not help. Needs a look at the sc-segmented layout. Screenshot: docs/concepts/20261115-0216-popup-aufbau/shots/polish-swap-phone.png"
+          data-issue-module="codex"
+          data-oq-origin="found"
+          data-route-default="issue"
+          data-route-reason="vorbestehend">
+        <span class="oq-label">Chips am Handy abgeschnitten</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Die Umschalter „Nur Geschützturm“ und „Eingebaut“ sind auf 375 px abgeschnitten.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Codex · Bauteil tauschen, Handy</dd>
+          <dt>{{final.fund_why}}</dt><dd>📌 Issue — gab es schon vorher, braucht das Segment-Layout.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-lightbox-scrim"
+          data-issue-title="[BUG] Lightbox closes on a scrim click although it has a close button"
+          data-issue-type="bug"
+          data-issue-body="CLAUDE.md: only a lightbox WITHOUT a close button may close on a click beside it. src/app/shared/lightbox/lightbox.component.ts closes on a scrim click and also shows an X. Pre-existing behaviour, left unchanged by the popup scaffold migration."
+          data-issue-module="shared"
+          data-oq-origin="found"
+          data-route-default="now"
+          data-route-reason="klein">
+        <span class="oq-label">Bildbetrachter-Schleier</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Der Bildbetrachter hat ein ✕ und schließt trotzdem per Klick daneben.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Bildbetrachter (Galerien)</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — eine Zeile, Regel aus der Projektanleitung.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-stepper"
+          data-issue-title="[REFACTOR] One shared quantity stepper and segmented pills inside popups"
+          data-issue-type="refactor"
+          data-issue-body="Polish scan (docs/concepts/20261115-0216-popup-aufbau/briefs/polish-findings.md #25-#28): the quantity stepper is copied in wish-cart and merkliste; HQ event-claim and nachschub-target hand-roll segmented pills although ScSegmentedComponent exists; hq-place-select and the hangar menu each implement arrow-key menu navigation. Structural, so not applied in the polish pass."
+          data-oq-origin="found"
+          data-route-default="issue"
+          data-route-reason="strukturell">
+        <span class="oq-label">Doppelte Bedienelemente</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Mengen-Stepper, Pillen-Umschalter und Menü-Pfeiltasten sind mehrfach eigen gebaut.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Wunschkorb, Merkliste, HQ-Dialoge, Hangar-Menü</dd>
+          <dt>{{final.fund_why}}</dt><dd>📌 Issue — Umbau, nicht Teil des Feinschliffs.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Branch <code>claude/modest-napier-9d1e5a</code> · Stand <code>c69be8662</code> · Bereiche: shared/popup, hq, codex, shell, news, verse</li>
+      <li><code>src/app/shared/popup/sc-popup.component.ts</code>, <code>popup-history.ts</code>, <code>sc-popup.scss</code></li>
+      <li>Tests: 584 Dateien, 6990 grün, 1 übersprungen · typecheck, lint, build grün</li>
+      <li>Abweichungen: Hinzufügen-zum-Set als Panel (verankert), Vergleich behält die eingeklappte Leiste, alle Arten in Akzentfarbe</li>
+      <li>Briefs, QA-, Harden- und Polish-Funde: <code>docs/concepts/20261115-0216-popup-aufbau/briefs/</code></li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-confirm-stack" data-crit="mid" data-guide="">Bestätigen über einem Dialog am Handy ansehen</li>
+      <li data-todo-id="t-hq-forms" data-crit="mid" data-guide="">HQ-Dialoge mit Feldern einmal durchklicken</li>
+    </ul>
+  </section>
+  <section data-handoffs hidden aria-label="{{final.group_handoffs}}">
+    <ul>
+      <li data-todo-id="h-testcart" data-crit="low" data-guide="">Quantanium im Testkonto wieder merken</li>
+    </ul>
+  </section>
+</section>

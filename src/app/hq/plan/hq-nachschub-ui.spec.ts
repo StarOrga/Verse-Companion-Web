@@ -331,10 +331,10 @@ describe('Nachschub board, panel and dialogs', () => {
     const got: boolean[] = [];
     f.componentInstance.confirmed.subscribe((b) => got.push(b));
     expect(el.querySelector('.hint')?.textContent).toContain('hq.remove.backOn');
-    click(f, el.querySelector('.dlg-foot button:last-child'));
+    click(f, el.querySelector('.scp-acts button:first-child'));
     click(f, el.querySelector('.opt sc-tristate button'));
     expect(el.querySelector('.hint')?.textContent).toContain('hq.remove.backOff');
-    click(f, el.querySelector('.dlg-foot button:last-child'));
+    click(f, el.querySelector('.scp-acts button:first-child'));
     expect(got).toEqual([true, false]);
   });
 
@@ -532,9 +532,9 @@ describe('HqNachschubFlowComponent', () => {
     expect(el.querySelector('.name-field input')).not.toBeNull();
     let closes = 0;
     f.componentInstance.closed.subscribe(() => closes++);
-    click(f, el.querySelector('.scrim'));
+    click(f, el.querySelector('.scp-scrim'));
     expect(closes).toBe(0);
-    click(f, el.querySelector('.dlg-head [scAction]'));
+    click(f, el.querySelector('.scp-x'));
     expect(closes).toBe(1);
   });
 
@@ -545,12 +545,12 @@ describe('HqNachschubFlowComponent', () => {
     expect(el.querySelector('.tally')?.textContent).toContain('hq.flow.picked');
     expect(el.querySelectorAll('.grp li.on').length).toBe(3);
     // Next stays off until something is picked.
-    expect((el.querySelector('.dlg-foot button:last-child') as HTMLButtonElement).disabled).toBe(false);
+    expect((el.querySelector('.scp-acts button[tier=primary]') as HTMLButtonElement).disabled).toBe(false);
   });
 
   it('cannot go on without a pick', () => {
     const { el } = setup();
-    expect((el.querySelector('.dlg-foot button:last-child') as HTMLButtonElement).disabled).toBe(true);
+    expect((el.querySelector('.scp-acts button[tier=primary]') as HTMLButtonElement).disabled).toBe(true);
   });
 
   it('walks the two steps and creates the Nachschub with its Einsätze, crafting last', async () => {
@@ -559,7 +559,7 @@ describe('HqNachschubFlowComponent', () => {
     const done: unknown[] = [];
     f.componentInstance.done.subscribe((r) => done.push(r));
     click(f, el.querySelector('.pick-bar button'));
-    click(f, el.querySelector('.dlg-foot button:last-child')); // Weiter
+    click(f, el.querySelector('.scp-acts button[tier=primary]')); // Weiter
     await whenIdle(f);
     expect(el.querySelectorAll('.steps li').length).toBe(2);
     expect(el.querySelector('.steps li.on b')?.textContent).toBe('2');
@@ -578,7 +578,7 @@ describe('HqNachschubFlowComponent', () => {
     expect(item.querySelector('button.leave')).not.toBeNull();
     expect(el.querySelectorAll('.ecard').length).toBe(cards.length);
 
-    click(f, el.querySelector('.dlg-foot button:last-child')); // Nachschub anlegen
+    click(f, el.querySelector('.scp-acts button[tier=primary]')); // Nachschub anlegen
     await whenIdle(f);
     expect(created).toHaveBeenCalledTimes(1);
     const arg = vi.mocked(created).mock.lastCall![0] as { picks: { key: string; qty: number }[]; name: string };
@@ -593,11 +593,11 @@ describe('HqNachschubFlowComponent', () => {
     const { f, el, created } = setup(WISH, new Map(), true);
     const einsatz = TestBed.inject(HqEinsatzService);
     click(f, el.querySelector('.pick-bar button'));
-    click(f, el.querySelector('.dlg-foot button:last-child'));
+    click(f, el.querySelector('.scp-acts button[tier=primary]'));
     await whenIdle(f);
     const cards = el.querySelectorAll('.ecard').length;
     expect(cards).toBeGreaterThanOrEqual(2);
-    click(f, el.querySelector('.dlg-foot button:last-child')); // Nachschub anlegen: the wishlist is empty from here on
+    click(f, el.querySelector('.scp-acts button[tier=primary]')); // Nachschub anlegen: the wishlist is empty from here on
     await whenIdle(f);
     expect(created).toHaveBeenCalledTimes(1);
     expect(einsatz.ofPackage('new').length).toBe(cards);
@@ -627,7 +627,7 @@ describe('HqNachschubFlowComponent', () => {
 
   async function toStep2(r: ReturnType<typeof setup>) {
     click(r.f, r.el.querySelector('.pick-bar button'));
-    click(r.f, r.el.querySelector('.dlg-foot button:last-child'));
+    click(r.f, r.el.querySelector('.scp-acts button[tier=primary]'));
     await whenIdle(r.f);
   }
   const itemRow = (el: HTMLElement) => [...el.querySelectorAll('.mats li')].find((li) => li.textContent?.includes('Medpen'))!;
@@ -669,7 +669,7 @@ describe('HqNachschubFlowComponent', () => {
     click(f, el.querySelector('.grp li sc-tristate button'));
     const more = [...el.querySelectorAll('.grp li .step')];
     click(f, more[0]); // less
-    click(f, el.querySelector('.dlg-foot button:last-child'));
+    click(f, el.querySelector('.scp-acts button[tier=primary]'));
     await whenIdle(f);
     expect(itemRow(el).textContent).toContain('×11');
   });
@@ -738,7 +738,7 @@ describe('HqNachschubFlowComponent', () => {
       expect(cards.length).toBeGreaterThan(0);
       // Only the open lines count: the ticked titan line is not proposed again.
       expect(el.textContent).not.toContain('titan');
-      click(f, el.querySelector('.dlg-foot button:last-child'));
+      click(f, el.querySelector('.scp-acts button[tier=primary]'));
       await whenIdle(f);
       const made = einsatz.ofPackage('p1');
       expect(made.length).toBe(cards.length);
@@ -756,11 +756,11 @@ describe('HqNachschubFlowComponent', () => {
 
   it('new mode shows the slot number only while a slot is free (never a taken one)', () => {
     const { f, el } = setup();
-    expect(el.querySelector('.dlg-title small')?.textContent).toContain('hq.flow.slotOf');
+    expect(el.querySelector('.scp-st')?.textContent).toContain('hq.flow.slotOf');
     const fake = TestBed.inject(NachschubService) as unknown as { packages: { set(v: Nachschub[]): void } };
     fake.packages.set(Array.from({ length: 7 }, (_, i) => nach(`n${i}`, `N${i}`, i + 1)));
     f.detectChanges();
-    expect(el.querySelector('.dlg-title small')).toBeNull();
+    expect(el.querySelector('.scp-st')?.textContent?.trim()).toBe('');
   });
 
   it('AUD-L10: the flow numbers the new Nachschub like the board tile (next display place), not the DB slot', () => {

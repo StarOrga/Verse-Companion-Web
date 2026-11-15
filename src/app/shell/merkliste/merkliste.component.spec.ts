@@ -66,6 +66,9 @@ describe('MerklisteComponent (wishlist popout)', () => {
     expect(f.el.querySelectorAll('.qrow').length).toBe(7);
     const all = f.el.querySelector<HTMLAnchorElement>('a.all')!;
     expect(all.textContent).toContain('quick.allWish');
+    // The count is footer status text on the right, not part of the action label.
+    expect(all.textContent).not.toContain('quick.allWishCount');
+    expect(f.el.querySelector('.scp-st .all-count')?.textContent).toContain('quick.allWishCount');
     expect(all.getAttribute('href')).toBe('/codex/index?cart=1');
     // A plain click opens the cart in place.
     all.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));
@@ -112,7 +115,7 @@ describe('MerklisteComponent (wishlist popout)', () => {
   it('closes on Escape and frees the slot', () => {
     const f = mount(many(1));
     open(f);
-    f.el.querySelector('.panel')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    f.el.querySelector('.panel .scp-frame')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     f.fixture.detectChanges();
     expect(f.el.querySelector('.panel')).toBeNull();
     expect(f.popouts.active()).toBeNull();

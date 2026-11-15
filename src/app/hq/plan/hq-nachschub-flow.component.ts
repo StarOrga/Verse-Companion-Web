@@ -8,7 +8,7 @@ import { toErrorKey } from '../../core/describe-error';
 import { humanizeClassName } from '../../codex/codex-format';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import type { StepKind } from '../../shared/step/sc-step.component';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScSelectComponent, type ScSelectOption } from '../../shared/sc-select.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { ScTristateComponent } from '../../shared/tristate/sc-tristate.component';
@@ -30,7 +30,7 @@ import {
   positionKey,
 } from '../nachschub/nachschub.model';
 import { NachschubService, type NachschubResult } from '../nachschub/nachschub.service';
-import { NACHSCHUB_ICON_PATHS, STEP_ICON_PATHS, TRANSPORT_WHEELS } from '../nachschub/step-icons';
+import { STEP_ICON_PATHS, TRANSPORT_WHEELS } from '../nachschub/step-icons';
 import { HqNeedSourcesService, bestSource } from './hq-need-sources.service';
 import { HqNachschubSellFormComponent } from './hq-nachschub-sell-form.component';
 import type { MapPlace } from './map/hq-map.types';
@@ -59,7 +59,7 @@ import {
   setBuyPart,
   unplacedLines,
 } from './einsatz-proposal';
-import { HQ_DIALOG_STYLES } from './hq-dialog.styles';
+import { HQ_POPUP_CONTENT_STYLES } from './hq-popup-content.styles';
 import {
   type FlowGroup,
   type FlowRow,
@@ -86,39 +86,28 @@ type Step = 1 | 2;
 @Component({
   selector: 'sc-hq-nachschub-flow',
   standalone: true,
-  imports: [NgTemplateOutlet, TranslatePipe, FormsModule, RouterLink, ScActionDirective, ScDialogDirective, HqEventEndComponent, HqWishSearchComponent, ScSelectComponent, ScTooltipDirective, ScTristateComponent, HqNachschubSellFormComponent],
+  imports: [NgTemplateOutlet, TranslatePipe, FormsModule, RouterLink, ScActionDirective, ScPopupComponent, HqEventEndComponent, HqWishSearchComponent, ScSelectComponent, ScTooltipDirective, ScTristateComponent, HqNachschubSellFormComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- A click beside the sheet does not close it (the picks would be lost): the X, Abbrechen or Escape do. -->
-    <div class="scrim">
-      <div class="sheet" role="dialog" aria-modal="true" scDialog (scDialogEscape)="closed.emit()" aria-labelledby="flow-title">
-        <header class="dlg-head">
-          <span class="dlg-ic"><svg viewBox="0 0 24 24" aria-hidden="true">@for (p of tray; track p) { <path [attr.d]="p" /> }</svg></span>
-          <h2 id="flow-title" class="dlg-title">
-            {{ (mode() === 'new' ? 'hq.flow.titleNew' : 'hq.flow.titleEdit') | translate }}
-            @if (mode() === 'new' && nextSlot() !== null) { <small>{{ 'hq.flow.slotOf' | translate: { n: nextSlot(), max: maxSlots } }}</small> }
-          </h2>
-          <ol class="steps" [attr.aria-label]="'hq.flow.stepsAria' | translate" [style.display]="kind() === 'sell' ? 'none' : null">
-            @for (s of stepList; track s) {
-              <li [class.on]="step() === s" [class.past]="step() > s" [attr.aria-current]="step() === s ? 'step' : null">
-                <b>{{ s }}</b><span>{{ 'hq.flow.step.' + s | translate }}</span>
-              </li>
-            }
-          </ol>
-          <button type="button" scAction tier="tertiary" [attr.aria-label]="'hq.flow.close' | translate" [scTooltip]="'hq.flow.close' | translate" scTooltipTier="label" (click)="closed.emit()">
-            <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-          </button>
-        </header>
-
-        <div class="dlg-body">
+    <sc-popup kind="large" [eyebrow]="'hq.title' | translate" [title]="(mode() === 'new' ? 'hq.flow.titleNew' : 'hq.flow.titleEdit') | translate" (closed)="onPopupClosed()">
+        <ol popupTools class="steps" [attr.aria-label]="'hq.flow.stepsAria' | translate" [style.display]="kind() === 'sell' ? 'none' : null">
+          @for (s of stepList; track s) {
+            <li [class.on]="step() === s" [class.past]="step() > s" [attr.aria-current]="step() === s ? 'step' : null">
+              <b>{{ s }}</b><span>{{ 'hq.flow.step.' + s | translate }}</span>
+            </li>
+          }
+        </ol>
+        <div class="pbody">
           @if (error(); as e) { <p class="dlg-err" role="alert">{{ e | translate }}</p> }
 
-          <label class="name-field">
-            <span>{{ 'hq.flow.nameLabel' | translate }}</span>
-            <input type="text" class="input" [maxlength]="nameMax" [ngModel]="name()" (ngModelChange)="onName($event)"
-                   [placeholder]="'hq.flow.namePlaceholder' | translate" />
+          <div class="name-field">
+            <label class="sc-float-field">
+              <input type="text" class="sc-input" [maxlength]="nameMax" [ngModel]="name()" (ngModelChange)="onName($event)" placeholder=" " />
+              <span class="sc-float-label">{{ 'hq.flow.nameLabel' | translate }}</span>
+            </label>
             <small>{{ name().length }}/{{ nameMax }}</small>
-          </label>
+          </div>
 
           @if (mode() === 'new') {
             <div class="seg kind" role="group" [attr.aria-label]="'hq.nachschub.sellForm.kindAria' | translate">
@@ -341,27 +330,25 @@ type Step = 1 | 2;
             </div>
           }
         </div>
-
-        <footer class="dlg-foot">
-          <button type="button" scAction tier="secondary" (click)="closed.emit()">{{ 'common.dialog.cancel' | translate }}</button>
-          <span class="sp"></span>
+        <ng-container popupActions>
           @if (kind() === 'sell' && mode() === 'new') {
             <button type="button" scAction tier="primary" [busy]="busy()" [disabled]="busy() || sellLines().length === 0" (click)="saveSell()">{{ 'hq.flow.create' | translate }}</button>
           } @else {
-          @if (step() > 1) {
-            <button type="button" scAction tier="secondary" (click)="back()">{{ 'hq.flow.back' | translate }}</button>
+            @if (step() < 2) {
+              <button type="button" scAction tier="primary" [disabled]="!canNext()" (click)="next()">{{ 'hq.flow.next' | translate }}</button>
+            } @else {
+              <button type="button" scAction tier="primary" [busy]="busy()" [disabled]="busy() || !canSave()" (click)="save()">
+                {{ (mode() === 'new' ? 'hq.flow.create' : 'hq.flow.saveEdit') | translate }}
+              </button>
+            }
+            @if (step() > 1) {
+              <button type="button" scAction tier="secondary" (click)="back()">{{ 'hq.flow.back' | translate }}</button>
+            }
           }
-          @if (step() < 2) {
-            <button type="button" scAction tier="primary" [disabled]="!canNext()" (click)="next()">{{ 'hq.flow.next' | translate }}</button>
-          } @else {
-            <button type="button" scAction tier="primary" [busy]="busy()" [disabled]="busy() || !canSave()" (click)="save()">
-              {{ (mode() === 'new' ? 'hq.flow.create' : 'hq.flow.saveEdit') | translate }}
-            </button>
-          }
-          }
-        </footer>
-      </div>
-    </div>
+          <button type="button" scAction tier="secondary" (click)="closed.emit()">{{ 'common.dialog.cancel' | translate }}</button>
+        </ng-container>
+        @if (mode() === 'new' && nextSlot() !== null) { <span popupStatus>{{ 'hq.flow.slotOf' | translate: { n: nextSlot(), max: maxSlots } }}</span> }
+    </sc-popup>
 
     <ng-template #leave let-l>
       <button type="button" scAction tier="tertiary" tone="danger" class="leave" [attr.aria-label]="'hq.flow.leaveOut' | translate: { name: l.name }"
@@ -414,9 +401,8 @@ type Step = 1 | 2;
   `,
   styles: [
     `.evsec { display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); margin-bottom: var(--sc-space-3, 12px); } .evsec h3 { margin: 0; font: 600 1rem var(--sc-font-display, inherit); } .evcard { border: 1px solid var(--sc-border); border-radius: 10px; padding: var(--sc-space-2, 8px) var(--sc-space-3, 12px); background: var(--sc-bg-0); } .evcard.on { border-color: var(--sc-accent); } .evcard header { display: flex; align-items: center; gap: var(--sc-space-2, 8px); } .evcard h4 { margin: 0; flex: 1; min-width: 0; overflow-wrap: anywhere; } .evcard ul { list-style: none; margin: 6px 0 0; padding: 0 0 0 28px; display: flex; flex-direction: column; gap: 4px; } .evcard li { display: flex; align-items: center; gap: var(--sc-space-2, 8px); }`,
-    HQ_DIALOG_STYLES,
+    HQ_POPUP_CONTENT_STYLES,
     `
-      .sheet { --dlg-w: 1040px; --dlg-h: 760px; height: min(100%, var(--dlg-h)); }
       .steps { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--sc-space-2, 8px); flex: none; }
       .steps li { display: inline-flex; align-items: center; gap: 6px; color: var(--sc-fg-2); font-size: 0.82rem; }
       .steps li b { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--sc-border); font: 600 0.75rem var(--sc-font-display, inherit); }
@@ -448,10 +434,7 @@ type Step = 1 | 2;
       .share { position: absolute; left: 8px; right: 8px; bottom: 1px; height: 2px; border-radius: 2px; background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
       .share i { display: block; height: 100%; border-radius: inherit; background: var(--sc-accent); }
       .name-field { display: grid; gap: 4px; max-width: 460px; flex: none; }
-      .name-field span { color: var(--sc-fg-2); font-size: 0.82rem; }
       .name-field small { color: var(--sc-fg-2); justify-self: end; }
-      .input { min-height: 40px; padding: 0 var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-bg-0); color: var(--sc-fg); font: inherit; }
-      .input:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-color: var(--sc-accent); }
       .sum { border: 1px solid var(--sc-border); border-radius: 12px; background: var(--sc-bg-0); padding: var(--sc-space-3, 12px); min-width: 0; }
       .sum h3 { margin: 0 0 6px; font: 600 0.95rem var(--sc-font-display, inherit); }
       .sum h3 small { font: 400 0.78rem var(--sc-font-body, inherit); color: var(--sc-fg-2); margin-left: 6px; }
@@ -532,7 +515,6 @@ export class HqNachschubFlowComponent {
 
   protected readonly stepList: readonly Step[] = [1, 2];
   protected readonly nameMax = NACHSCHUB_NAME_MAX;
-  protected readonly tray = NACHSCHUB_ICON_PATHS;
   protected readonly icons = STEP_ICON_PATHS;
   protected readonly wheels = TRANSPORT_WHEELS;
 
@@ -547,6 +529,11 @@ export class HqNachschubFlowComponent {
   private nameTouched = false;
   protected readonly error = signal<string | null>(null);
   protected readonly busy = signal(false);
+
+  /** ✕ / Escape / Back while a save runs are ignored (the scaffold keeps its history entry for the next Back). */
+  protected onPopupClosed(): void {
+    if (!this.busy()) this.closed.emit();
+  }
   private readonly splits = signal<ReadonlyMap<string, LineSplit>>(new Map());
   private readonly modes = signal<ReadonlyMap<string, LineMode>>(new Map());
   private readonly leftOut = signal<ReadonlySet<string>>(new Set());

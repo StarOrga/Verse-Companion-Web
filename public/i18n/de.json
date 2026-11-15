@@ -59,9 +59,20 @@
     "dialog": {
       "confirm": "Bestätigen",
       "cancel": "Abbrechen",
-      "close": "Schließen"
+      "close": "Schließen",
+      "save": "Speichern",
+      "apply": "Übernehmen",
+      "done": "Fertig",
+      "previous": "Zurück",
+      "next": "Weiter"
     },
-    "undo": "Rückgängig"
+    "undo": "Rückgängig",
+    "popup": {
+      "access": {
+        "admin": "Nur für Admins sichtbar",
+        "collab": "Nur für Admins und Collaborators sichtbar"
+      }
+    }
   },
   "date": {
     "relative": {
@@ -339,7 +350,6 @@
         "open": "Patch-Zusammenfassung {{patch}} öffnen",
         "unread": "Neue Zusammenfassung",
         "title": "Was {{patch}} verändert",
-        "source": "KI-Zusammenfassung",
         "notes": "Patch-Notes bei CIG",
         "notesOverview": "Alle Patch-Notes bei CIG"
       },
@@ -761,8 +771,8 @@
       }
     },
     "weaponDetail": {
+      "eyebrow": "Waffe",
       "intro": "Die 17 Spalten im Picker sind nicht alles. Hier steht, was eine Schiffswaffe im P4K wirklich mitbringt — gegliedert nach Herkunft, mit dem Struct daneben. Cyan = vorhanden, gold-gestrichelt = nicht in den Spieldateien.",
-      "close": "Schließen",
       "card": {
         "damageChannels": "Schaden je Kanal",
         "fireBallistics": "Feuer & Ballistik",
@@ -1647,13 +1657,11 @@
       "holoOverlay": {
         "label": "3D-Ansicht: {{name}}",
         "fullscreen": "Vollbild",
-        "exitFullscreen": "Vollbild verlassen",
-        "close": "3D-Ansicht schließen"
+        "exitFullscreen": "Vollbild verlassen"
       },
       "partPopup": {
         "label": "Bauteil: {{name}}",
         "eyebrow": "Bauteil",
-        "close": "Bauteil schließen",
         "noValues": "Für dieses Bauteil liegen keine Werte vor."
       },
       "stageLaunchers": "{{n}} Werfer",
@@ -1845,12 +1853,11 @@
       "tray": "Vergleich ({{count}})",
       "open": "Vergleich öffnen",
       "clear": "Leeren",
-      "remove": "Entfernen",
+      "remove": "{{name}} entfernen",
       "property": "Eigenschaft",
       "close": "Schließen",
       "noCommon": "Keine vergleichbaren Werte für diese Auswahl.",
       "diffOnly": "Nur Unterschiede",
-      "showAll": "Alle Zeilen",
       "mixedKind": "Nur Gleiches mit Gleichem: im Tray liegen bereits {{kind}}-Einträge. Leeren, um etwas anderes zu vergleichen."
     },
     "portCategory": {
@@ -1867,7 +1874,6 @@
     "picker": {
       "title": "Bauteil wählen — {{port}} · S{{size}}",
       "installed": "eingebaut: {{name}}",
-      "close": "Schließen",
       "searchPlaceholder": "Suchen … Name, Hersteller, Schadensart",
       "searchLabel": "Bauteile durchsuchen",
       "compareWith": "Vergleichen mit",
@@ -2412,7 +2418,6 @@
       "flightMissing": "Die Flugeigenschaften stehen in der Vehicle-Definition, die unser P4K-Extractor noch nicht auflöst — die Zeilen bleiben stehen und füllen sich von selbst, sobald er es tut."
     },
     "inspect": {
-      "close": "Schließen",
       "hardpoint": "Hardpoint",
       "parameters": "Parameter",
       "general": "Allgemein",
@@ -2696,7 +2701,6 @@
       "eyebrow": "Codex-Index",
       "filtersAria": "Filter",
       "filtersTitle": "Filter",
-      "closeFilters": "Filter schließen",
       "filterButton": "Filter ({{count}})",
       "showResults": "{{count}} Treffer anzeigen",
       "areaLabel": "Bereich",
@@ -3107,8 +3111,7 @@
       "pickSlot": "Platz in {{set}}",
       "replaces": "Ersetzt das aktuelle Teil",
       "done": "{{item}} liegt jetzt in {{slot}} von {{set}}",
-      "toSet": "Zum Set",
-      "close": "Schließen"
+      "toSet": "Zum Set"
     }
   },
   "news": {
@@ -3333,7 +3336,6 @@
         "olderHide": "Ältere Patches einklappen"
       },
       "dossier": {
-        "close": "Dossier schließen",
         "toc": "Abschnitte",
         "unknown": "Zu Alpha {{line}} liegen keine Patch-Daten vor.",
         "section": {
@@ -3348,7 +3350,8 @@
           "nextPast": "Was kam danach?"
         },
         "noteOf": "Änderungen in {{version}} · Teil von Alpha {{line}}",
-        "wholeLine": "Ganzen Patch {{line}} ansehen"
+        "wholeLine": "Ganzen Patch {{line}} ansehen",
+        "eyebrow": "Patch"
       },
       "prep": {
         "source": "laut Spectrum-Post („Important Build Info“)",
@@ -3469,7 +3472,7 @@
       }
     },
     "detail": {
-      "back": "Zurück"
+      "eyebrow": "Verse News"
     },
     "openExternal": "Öffnet {{host}}",
     "relative": {
@@ -3975,11 +3978,9 @@
         "title": "API-Token erstellen",
         "subtitle": "Namen + ein oder mehrere Scopes wählen. Der Klartext-Token wird EINMALIG angezeigt — vor dem Schließen sichern.",
         "nameLabel": "Name",
-        "namePlaceholder": "z.B. Discord-Bot, persönliches CLI",
         "scopesLabel": "Scopes",
         "create": "Token erstellen",
         "creating": "Erstelle…",
-        "cancel": "Abbrechen",
         "errorTitle": "Token konnte nicht erstellt werden"
       },
       "scopeDescriptions": {
@@ -3999,7 +4000,8 @@
         "ack": "Ich hab's gesichert",
         "tokenLabel": "Klartext-Token"
       },
-      "revokeTitle": "Token widerrufen?"
+      "revokeTitle": "Token widerrufen?",
+      "eyebrow": "API-Tokens"
     },
     "filter": {
       "searchPlaceholder": "Name, Username oder E-Mail suchen…",
@@ -4419,7 +4421,8 @@
     "access": {
       "fullPage": "Volle Data-Upload-Seite",
       "note": "Nur Windows · Anmeldung mit deinem Verse-Companion-Konto · lädt Daten hoch, keinen Code."
-    }
+    },
+    "historyEyebrow": "Uploader"
   },
   "download": {
     "title": "Download",
@@ -6525,7 +6528,6 @@
     "log": {
       "undo": "Rückgängig",
       "title": "Protokoll",
-      "close": "Schließen",
       "empty": "Noch keine Ereignisse.",
       "showAll": "Alle anzeigen",
       "more": "Mehr laden",
@@ -6691,7 +6693,6 @@
       "loading": "Statistik wird geladen …",
       "zero": "Im gewählten Zeitraum nichts erfasst.",
       "details": "Details",
-      "close": "Schließen",
       "day": "Tag",
       "week": "Woche",
       "tile": {
@@ -7484,7 +7485,6 @@
       "p2": "Unter der Kuppel liegen zwei Herausforderungen: der Kometen-Tipp auf den LIVE-Tag des nächsten Patches und das Erkennen des Schiffs hinter der Form.",
       "p3": "Mit entzündeten Sternen steigst du als Kartograph auf. Das Wappen oben rechts öffnet deine Rangseite mit Serie, Belohnungen und den Hintergründen.",
       "start": "Zeig es mir",
-      "close": "Schließen",
       "back": "Zurück",
       "next": "Weiter",
       "done": "Fertig",
@@ -7510,13 +7510,13 @@
           "title": "Dein Kartograph-Rang",
           "text": "Jeder entzündete Stern bringt dich im Rang weiter: Stufen bei 1, 3, 7, 12, 18, 26 und 35 Sternen, vom Beobachter bis zum Hüter des Atlas. Jede schaltet etwas frei, vom Abzeichen über Begleiter und Bernsteintönung bis zu Wappen-Details ab Stufe 5. Auf der Rangseite liegen deine Serie, ihre Belohnungen und alle Hintergrund-Formate."
         }
-      }
+      },
+      "eyebrow": "Sternenkarte"
     },
     "more": {
       "title": "Extras"
     },
     "card": {
-      "close": "Schließen",
       "eyebrowDone": "Stern {{n}} · leuchtet",
       "eyebrowNext": "Stern {{n}} · nächster Vorschlag",
       "eyebrowOpen": "Stern {{n}} · offen",
@@ -7915,7 +7915,7 @@
   "appNotice": {
     "aria": "App-Hinweis",
     "eyebrow": "App",
-    "close": "Schließen",
+    "later": "Später",
     "download": "Herunterladen",
     "scc": {
       "line": "Verse Companion App für deinen Desktop",
@@ -8394,7 +8394,6 @@
         "stats": "Vergleichswerte"
       },
       "title": "Was Freunde sehen",
-      "done": "Fertig",
       "general": "Allgemein",
       "generalHint": "Gilt für alle Freunde, sofern du unten nichts anderes für einen Freund einstellst. Änderungen werden sofort gespeichert.",
       "facetHint": {
@@ -8411,7 +8410,8 @@
       "on": "An",
       "off": "Aus",
       "result": "Dieser Freund sieht:",
-      "nothing": "nichts davon"
+      "nothing": "nichts davon",
+      "eyebrow": "Social"
     },
     "teams": {
       "title": "Gruppen",
@@ -8611,8 +8611,9 @@
     "toNachschub": "In einen Nachschub: {{name}}",
     "wish": "Wunschliste",
     "emptyWish": "Noch nichts auf der Wunschliste.",
-    "allWish": "Ganze Wunschliste · {{n}} Positionen",
-    "allWishOne": "Ganze Wunschliste · 1 Position",
+    "allWish": "Ganze Wunschliste",
+    "allWishCount": "{{n}} Positionen",
+    "allWishCountOne": "1 Position",
     "section": {
       "inventar": "Inventar",
       "hangar": "Hangar",
@@ -8630,11 +8631,15 @@
       "item": "Gegenstände",
       "blueprint": "Blaupausen",
       "news": "News"
-    }
+    },
+    "wishTitle": "{{n}} Positionen gemerkt",
+    "wishTitleOne": "1 Position gemerkt"
   },
   "cart": {
     "title": "Wunschliste",
     "summary": "{{n}} Positionen · {{g}} Gruppen",
+    "summaryOne": "1 Position · 1 Gruppe",
+    "summaryOneGroup": "{{n}} Positionen · 1 Gruppe",
     "close": "Schließen",
     "empty": "Die Wunschliste ist leer.",
     "emptyHint": "Leg Gegenstände aus dem Codex oder der Suche hierher.",

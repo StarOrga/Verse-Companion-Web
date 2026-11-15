@@ -56,15 +56,15 @@ describe('CodexComponentModalComponent', () => {
 
   it('renders nothing while no component is selected', () => {
     const el = render(null);
-    expect(el.querySelector('.cm-backdrop')).toBeNull();
+    expect(el.querySelector('sc-popup')).toBeNull();
   });
 
   it('leads with the item identity and the hardpoint it sits on', () => {
     const el = render(PANTHER);
-    expect(el.querySelector('.cm-titles h2')?.textContent?.trim()).toBe(
+    expect(el.querySelector('.scp-title')?.textContent?.trim()).toBe(
       'CF-337 Panther Repeater',
     );
-    expect(el.querySelector('.cm-size')?.textContent?.trim()).toBe('3× S3');
+    expect(el.querySelector('.scp-ev')?.textContent?.trim()).toBe('Gun · 3× S3');
     expect(el.querySelector('.cm-meta-txt')?.textContent?.trim()).toBe('KLA · Gun');
     expect(el.querySelector('.cm-port')?.textContent).toContain('Hardpoint Weapon Top Left');
   });
@@ -93,14 +93,14 @@ describe('CodexComponentModalComponent', () => {
     let closes = 0;
     fixture.componentInstance.closed.subscribe(() => closes++);
     const el = render(PANTHER);
-    (el.querySelector('.cm-backdrop') as HTMLElement).click();
+    (el.querySelector('.scp-scrim') as HTMLElement).click();
     expect(closes).toBe(0);
-    // The close plays the horizon motion reversed (60 % of the open) before the host hears of it.
-    (el.querySelector('.cm-close') as HTMLButtonElement).click();
-    expect(el.querySelector('.cm-backdrop')?.classList.contains('pm-out')).toBe(true);
+    // The close plays its collapse to a line (about half the open time) before the host hears of it.
+    (el.querySelector('.scp-x') as HTMLButtonElement).click();
+    expect(el.querySelector('sc-popup')?.classList.contains('pm-out')).toBe(true);
     await vi.waitFor(() => expect(closes).toBe(1), { timeout: 3000 });
     render(PANTHER)
-      .querySelector('.cm-panel')!
+      .querySelector('.scp-frame')!
       .dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     await vi.waitFor(() => expect(closes).toBe(2), { timeout: 3000 });
   });
@@ -114,15 +114,15 @@ describe('CodexComponentModalComponent', () => {
   it('moves focus into the dialog when it opens', async () => {
     const el = render(PANTHER);
     await fixture.whenStable();
-    expect(document.activeElement).toBe(el.querySelector('.cm-panel'));
-    expect(el.querySelector('.cm-panel')!.classList).toContain('sc-dialog');
+    expect(document.activeElement).toBe(el.querySelector('.scp-frame'));
+    expect(el.querySelector('.scp-frame')!.classList).toContain('sc-dialog');
   });
 
   it('stays open when the detail link is ctrl+clicked into a new tab, closes on a plain click', () => {
     let closes = 0;
     fixture.componentInstance.closed.subscribe(() => closes++);
     const el = render(PANTHER);
-    const link = el.querySelector('.cm-open') as HTMLAnchorElement;
+    const link = el.querySelector('.scp-acts a') as HTMLAnchorElement;
     // Swallow the browser default AFTER the page's handlers, so no real tab
     // opens. On the link itself: the panel stops propagation, so a listener on
     // window would never see the click.

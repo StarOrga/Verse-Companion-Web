@@ -38,6 +38,7 @@ import { KartographCrestComponent } from '../verse/starmap/kartograph-crest.comp
 import { rankProgressOf } from '../verse/starmap/starmap.model';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import { ScPopupMotionDirective } from '../shared/popup-motion/sc-popup-motion.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import { AppsMenuComponent } from './apps-menu.component';
 import { HeaderPopoutService } from './header-popout.service';
 import { ScActionDirective } from '../shared/action/sc-action.directive';
@@ -79,7 +80,7 @@ import { avatarUrlOf } from './avatar-url';
 @Component({
   selector: 'sc-shell',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe, FooterComponent, QuickSearchComponent, VerseStatusChipComponent, FeedbackFabComponent, UserFeedbackFabComponent, StarToastComponent, UndoToastComponent, AccountNoticeComponent, CodexSearchBarComponent, FeedbackSpotsComponent, FeedbackCaptureComponent, BetaFabComponent, ViewToggleFabComponent, NgTemplateOutlet, FusionBarComponent, ShellSceneComponent, MainHeaderComponent, ScTooltipDirective, KartographCrestComponent, AppsMenuComponent, MerklisteComponent, ScActionDirective, WishCartDialogComponent, SlowNavigationComponent, ScPopupMotionDirective],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe, FooterComponent, QuickSearchComponent, VerseStatusChipComponent, FeedbackFabComponent, UserFeedbackFabComponent, StarToastComponent, UndoToastComponent, AccountNoticeComponent, CodexSearchBarComponent, FeedbackSpotsComponent, FeedbackCaptureComponent, BetaFabComponent, ViewToggleFabComponent, NgTemplateOutlet, FusionBarComponent, ShellSceneComponent, MainHeaderComponent, ScTooltipDirective, KartographCrestComponent, AppsMenuComponent, MerklisteComponent, ScActionDirective, WishCartDialogComponent, SlowNavigationComponent, ScPopupMotionDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[class.verse-overlay]': 'verseOverlay()',
@@ -201,6 +202,9 @@ import { avatarUrlOf } from './avatar-url';
             @if (adminMenuOpen()) {
               <div class="dropdown admin-dropdown" role="menu" [attr.aria-label]="'nav.adminMenu' | translate"
                    (keydown)="onAdminMenuKeydown($event)">
+                <sc-popup kind="menu" access="admin" [backdrop]="false" initialFocus="container" [title]="'nav.adminMenu' | translate"
+                          (closed)="closeAdminMenu(true)">
+                <div class="dd-body">
                 <a class="dropdown-item elevated" role="menuitem" routerLink="/admin"
                    (click)="onAdminMenuNavigate($event)">
                   <span class="di-label">{{ 'nav.admin' | translate }}</span>
@@ -216,6 +220,8 @@ import { avatarUrlOf } from './avatar-url';
                   <span class="di-label">{{ 'nav.translations' | translate }}</span>
                   <span class="sc-sr-only">{{ 'nav.adminOnly' | translate }}</span>
                 </a>
+                </div>
+                </sc-popup>
               </div>
             }
           </div>
@@ -309,6 +315,9 @@ import { avatarUrlOf } from './avatar-url';
 
           @if (menuShown()) {
             <div class="dropdown" role="menu" scPopupMotion scPopupMotionItems=".dropdown-item" scPopupMotionOrigin="tr" (keydown)="onMenuKeydown($event)">
+              <sc-popup kind="menu" [backdrop]="false" initialFocus="container" [title]="'nav.accountMenu' | translate: { count: 0 }"
+                        (closed)="onMenuPopupClosed()">
+              <div class="dd-body">
               <div class="dropdown-header">
                 <div class="dh-id">
                   <span class="dh-name">{{ displayName() }}</span>
@@ -435,6 +444,8 @@ import { avatarUrlOf } from './avatar-url';
                   {{ 'nav.viewAs.exit' | translate }}
                 </button>
               }
+              </div>
+              </sc-popup>
             </div>
           }
         </div>
@@ -679,7 +690,7 @@ import { avatarUrlOf } from './avatar-url';
     .admin-more-btn.active { box-shadow: inset 0 -2px 0 var(--sc-accent-hot); }
     .admin-more-btn .caret { width: 14px; height: 14px; transition: transform 0.16s; }
     .admin-more-btn[aria-expanded='true'] .caret { transform: rotate(180deg); }
-    .admin-dropdown { left: 0; right: auto; width: min(var(--sc-ov-menu), calc(100vw - 32px)); }
+    .admin-dropdown { left: 0; right: auto; }
     .actions {
       display: flex;
       gap: 8px;
@@ -719,20 +730,9 @@ import { avatarUrlOf } from './avatar-url';
       box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.35);
     }
 
-    .dropdown {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      width: min(var(--sc-ov-menu), calc(100vw - 32px));
-      display: flex;
-      flex-direction: column;
-      padding: 6px;
-      background: linear-gradient(180deg, var(--sc-bg-2), var(--sc-bg-1));
-      border: 1px solid var(--sc-border);
-      border-radius: 8px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), var(--sc-glow);
-      z-index: 30;
-    }
+    /* Position at the trigger only: frame, width, rail and role edge come from <sc-popup kind="menu">. */
+    .dropdown { position: absolute; top: calc(100% + 8px); right: 0; z-index: 30; }
+    .dd-body { display: flex; flex-direction: column; }
     .dropdown-header {
       display: flex;
       align-items: center;
@@ -1500,6 +1500,19 @@ export class ShellComponent implements AfterViewInit {
     if (menus.length && !menus.some((m) => m.contains(event.target as Node))) {
       this.closeMenu();
     }
+  }
+
+  /**
+   * Escape inside the menu's frame never reaches `document` (`[scDialog]` stops it), so the
+   * scaffold's `closed` event folds the menu away and gives focus back to its avatar button.
+   */
+  onMenuPopupClosed() {
+    // Two account menus can be mounted (header + bar): the one holding focus is the one that closed.
+    const root = this.host.nativeElement as HTMLElement;
+    const holder = (document.activeElement as HTMLElement | null)?.closest('.profile-menu') ?? root.querySelector('.profile-menu');
+    const trigger = holder?.querySelector<HTMLElement>('.avatar-btn');
+    this.closeMenu();
+    trigger?.focus({ preventScroll: true });
   }
 
   @HostListener('document:keydown.escape')

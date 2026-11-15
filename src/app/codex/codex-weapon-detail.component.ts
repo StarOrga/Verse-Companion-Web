@@ -1,4 +1,4 @@
-import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -22,7 +22,6 @@ import {
 import { countermeasureKind, decoysToOutshine, isCountermeasureLauncher } from './codex-countermeasure';
 import { toFiniteNumber } from '../hangar/loadout-stats';
 import { swapAimStats, swapResourceStats } from './swap-table';
-import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import { sustainedDps } from './codex-sustained-dps';
 
 /** Everything the weapon detail window needs about one hardpoint occupant. */
@@ -92,20 +91,12 @@ function num(v: number | null, format: 'int' | 'dec' | 'perSec' | 'seconds' | 'm
 @Component({
   selector: 'sc-codex-weapon-detail',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective, ScDialogDirective],
+  imports: [TranslatePipe, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (entry(); as e) {
-      <div class="wd-backdrop">
-        <article class="wd-panel sc-card" role="dialog" aria-modal="true" aria-labelledby="wd-title"
-                 tabindex="-1" (click)="$event.stopPropagation()"
-                 scDialog scDialogInitialFocus="container" (scDialogEscape)="closed.emit()">
-          <header class="wd-head">
-            <h2 id="wd-title">{{ e.name }}{{ e.size != null ? ' · S' + e.size : '' }}</h2>
-            <button type="button" class="wd-close" (click)="closed.emit()"
-                    [attr.aria-label]="'codex.weaponDetail.close' | translate"
-                    [scTooltip]="'codex.weaponDetail.close' | translate">✕</button>
-          </header>
+      <sc-popup kind="dialog" [title]="e.name" [eyebrow]="eyebrow()" initialFocus="container" (closed)="closed.emit()">
+        <div class="wd-body">
           <p class="note info">{{ 'codex.weaponDetail.intro' | translate }}</p>
 
           <div class="val-grid">
@@ -122,23 +113,13 @@ function num(v: number | null, format: 'int' | 'dec' | 'perSec' | 'seconds' | 'm
               </section>
             }
           </div>
-        </article>
-      </div>
+        </div>
+      </sc-popup>
     }
   `,
   styles: [`
     :host { display: contents; }
-    .wd-backdrop { position: fixed; inset: 0; z-index: 145;
-      background: color-mix(in srgb, var(--sc-bg-0) 60%, transparent);
-      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-      display: flex; justify-content: center; align-items: flex-start; padding: 6vh 16px 16px; overflow-y: auto; }
-    .wd-panel { position: relative; width: 100%; max-width: var(--sc-ov-m); max-height: var(--sc-ov-max-h); overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column;
-      gap: 12px; padding: 18px 20px 20px; border-color: color-mix(in srgb, var(--sc-accent) 45%, transparent); }
-    .wd-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-    .wd-head h2 { margin: 0; font-size: 1.05rem; }
-    .wd-close { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; background: var(--sc-bg-0);
-      border: 1px solid var(--sc-border); color: var(--sc-fg-1); cursor: pointer; font-size: 0.9rem; }
-    .wd-close:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
+    .wd-body { display: flex; flex-direction: column; gap: 12px; }
     .note.info { margin: 0; font-size: max(0.76rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
 
     .val-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--sc-gap-2, 10px); }
@@ -155,11 +136,6 @@ function num(v: number | null, format: 'int' | 'dec' | 'perSec' | 'seconds' | 'm
     .val-card.miss .row .v { color: var(--sc-warn); }
     .src { margin: 4px 0 0; font-size: max(11px, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     .val-card.miss .src { color: var(--sc-warn); opacity: 0.8; }
-
-    @media (max-width: 720px) {
-      .wd-backdrop { padding: 0; }
-      .wd-panel { max-width: none; width: 100%; min-height: 100vh; min-height: 100dvh; border-radius: 0; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)); max-height: none; }
-    }
   `],
 })
 export class CodexWeaponDetailComponent {
@@ -176,6 +152,14 @@ export class CodexWeaponDetailComponent {
     this.i18n.onLangChange.pipe(takeUntilDestroyed()).subscribe((e) => this.lang.set(e.lang));
 
     // Focus in, Tab trap, Escape and focus return: [scDialog] (audit S15).
+  }
+
+  /** Rail eyebrow: "Weapon · S3 · Nose". */
+  eyebrow(): string {
+    const e = this.entry();
+    if (!e) return '';
+    this.lang();
+    return [this.i18n.instant('codex.weaponDetail.eyebrow'), e.size != null ? 'S' + e.size : null, e.port].filter(Boolean).join(' · ');
   }
 
   dashText(): string {

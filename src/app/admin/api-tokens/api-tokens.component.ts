@@ -1,14 +1,17 @@
 import { toErrorKey } from '../../core/describe-error';
+import { logWarn } from '../../core/log';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
   signal,
 } from '@angular/core';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import {
   API_TOKEN_SCOPES,
@@ -31,7 +34,7 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
 @Component({
   selector: 'sc-api-tokens',
   standalone: true,
-  imports: [ScDatePipe, TranslatePipe, ScDialogDirective],
+  imports: [ScDatePipe, TranslatePipe, ScPopupComponent, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
@@ -146,23 +149,23 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
     </section>
 
     @if (dialogOpen()) {
-      <div class="dialog-backdrop"></div>
-      <div class="dialog sc-card" role="dialog" aria-modal="true" aria-labelledby="tok-create-title"
-           scDialog [scDialogReturnFocus]="newTokenBtn" (scDialogEscape)="onCreateEscape()">
-        <h2 id="tok-create-title">{{ 'admin.tokens.dialog.title' | translate }}</h2>
+      <sc-popup kind="dialog" access="admin" [returnFocus]="newTokenBtn"
+                [eyebrow]="'admin.tokens.eyebrow' | translate" [title]="'admin.tokens.dialog.title' | translate"
+                (closed)="onCreateEscape()">
         <p class="hint">{{ 'admin.tokens.dialog.subtitle' | translate }}</p>
 
-        <form (submit)="onCreateSubmit($event)">
-          <label class="field">
-            <span class="field-label">{{ 'admin.tokens.dialog.nameLabel' | translate }}</span>
+        <form id="tok-create-form" (submit)="onCreateSubmit($event)">
+          <label class="sc-float-field field">
             <input
+              class="sc-input"
               type="text"
               [value]="newName()"
               (input)="newName.set(asInput($event))"
-              [placeholder]="'admin.tokens.dialog.namePlaceholder' | translate"
+              placeholder=" "
               [disabled]="creating()"
               maxlength="80"
               required>
+            <span class="sc-float-label">{{ 'admin.tokens.dialog.nameLabel' | translate }}</span>
           </label>
 
           <fieldset class="field scopes-field">
@@ -186,47 +189,44 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
             </div>
           }
 
-          <div class="dialog-actions">
-            <button type="button" class="sc-btn" (click)="closeCreateDialog()" [disabled]="creating()">
-              {{ 'admin.tokens.dialog.cancel' | translate }}
-            </button>
-            <button
-              type="submit"
-              class="sc-btn sc-btn-primary"
-              [disabled]="creating() || !canSubmit()">
-              {{ (creating() ? 'admin.tokens.dialog.creating' : 'admin.tokens.dialog.create') | translate }}
-            </button>
-          </div>
         </form>
-      </div>
+        <ng-container popupActions>
+          <button type="submit" form="tok-create-form" scAction tier="primary" [busy]="creating()"
+                  [disabled]="creating() || !canSubmit()">
+            {{ (creating() ? 'admin.tokens.dialog.creating' : 'admin.tokens.dialog.create') | translate }}
+          </button>
+          <button type="button" scAction tier="secondary" (click)="closeCreateDialog()" [disabled]="creating()">
+            {{ 'common.dialog.cancel' | translate }}
+          </button>
+        </ng-container>
+      </sc-popup>
     }
 
     @if (revealedToken(); as r) {
-      <div class="dialog-backdrop reveal-backdrop"></div>
-      <div class="dialog reveal-dialog sc-card" role="dialog" aria-modal="true" aria-labelledby="tok-reveal-title"
-           scDialog [scDialogReturnFocus]="newTokenBtn" (scDialogEscape)="onRevealEscape()">
-        <h2 class="reveal-title" id="tok-reveal-title">{{ 'admin.tokens.reveal.title' | translate }}</h2>
+      <sc-popup kind="dialog" access="admin" [returnFocus]="newTokenBtn"
+                [eyebrow]="'admin.tokens.eyebrow' | translate" [title]="'admin.tokens.reveal.title' | translate"
+                (closed)="onRevealEscape()">
         <div class="reveal-warning">
           <strong>!</strong>
           <span>{{ 'admin.tokens.reveal.warning' | translate }}</span>
         </div>
 
-        <label class="field">
-          <span class="field-label">{{ 'admin.tokens.reveal.tokenLabel' | translate }}</span>
+        <div class="field" role="group" aria-labelledby="tok-reveal-label">
+          <span class="field-label" id="tok-reveal-label">{{ 'admin.tokens.reveal.tokenLabel' | translate }}</span>
           <div class="reveal-token-row">
             <code class="reveal-token mono">{{ r.plaintext }}</code>
-            <button type="button" class="sc-btn" (click)="copyToClipboard(r.plaintext)">
+            <button type="button" scAction (click)="copyToClipboard(r.plaintext)">
               {{ (copied() ? 'admin.tokens.reveal.copied' : 'admin.tokens.reveal.copy') | translate }}
             </button>
           </div>
-        </label>
+        </div>
 
-        <div class="dialog-actions">
-          <button type="button" class="sc-btn sc-btn-primary" (click)="acknowledgeReveal()">
+        <ng-container popupActions>
+          <button type="button" scAction tier="primary" (click)="acknowledgeReveal()">
             {{ 'admin.tokens.reveal.ack' | translate }}
           </button>
-        </div>
-      </div>
+        </ng-container>
+      </sc-popup>
     }
   `,
   styles: [`
@@ -380,35 +380,7 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
       color: var(--sc-bg-0);
     }
 
-    .dialog-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(5, 8, 16, 0.7);
-      backdrop-filter: blur(4px);
-      z-index: 50;
-    }
-    .reveal-backdrop { background: rgba(5, 8, 16, 0.85); }
-    .dialog {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: min(560px, 92vw);
-      z-index: 51;
-      max-height: 90vh;
-      max-height: 90dvh;
-      overflow-y: auto;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), var(--sc-glow);
-    }
-    .dialog h2 {
-      margin: 0 0 0.4em;
-      font-size: 1.1rem;
-      letter-spacing: 0.04em;
-    }
-    .reveal-title {
-      color: var(--sc-accent);
-    }
-
+    /* Dialog frame, head, ✕, footer and width come from <sc-popup kind="dialog">. */
     .field {
       display: flex;
       flex-direction: column;
@@ -421,20 +393,6 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
       letter-spacing: 0.08em;
       color: var(--sc-fg-2);
       font-family: var(--sc-font-display);
-    }
-    .field input[type=text] {
-      padding: 8px 12px;
-      background: var(--sc-bg-1);
-      color: var(--sc-fg-0);
-      border: 1px solid var(--sc-border);
-      border-radius: 4px;
-      font: inherit;
-      font-size: max(0.9rem, var(--sc-fs-input));
-    }
-    .field input[type=text]:focus {
-      outline: none;
-      border-color: var(--sc-accent);
-      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.25);
     }
 
     .scopes-field {
@@ -476,7 +434,7 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
       background: rgba(251, 191, 36, 0.1);
       border: 1px solid var(--sc-warning);
       border-radius: 6px;
-      margin: 16px 0 0;
+      margin: var(--sc-space-4) 0 0;
       color: var(--sc-warning);
       font-weight: 600;
       font-size: 0.92rem;
@@ -510,15 +468,6 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
       user-select: all;
     }
 
-    .dialog-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 20px;
-      padding-top: 16px;
-      border-top: 1px solid var(--sc-border);
-    }
-
     @media (max-width: 640px) {
       .head { flex-direction: column; align-items: stretch; }
       .head-actions .sc-btn { flex: 1; justify-content: center; }
@@ -531,15 +480,6 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
       .reveal-token-row { flex-direction: column; }
       /* The token table scrolls inside its card instead of the page. */
       .table { min-width: 620px; }
-      /* A dialog taller than the screen starts at the top and scrolls, rather
-         than being centred with its title above the visible area. */
-      .dialog {
-        top: 8px; transform: translateX(-50%);
-        /* ...and ends above the feedback launcher, which stays on top of every
-           dialog (z-index 1400) and would otherwise sit on "Create token". */
-        max-height: calc(100vh - 8px - var(--sc-fab-clear-block));
-        max-height: calc(100dvh - 8px - var(--sc-fab-clear-block));
-      }
     }
   `],
 })
@@ -550,7 +490,10 @@ export class ApiTokensComponent implements OnInit {
 
   constructor() {
     useAutoRefresh(() => this.refresh(), { enabled: () => !this.busy() });
+    inject(DestroyRef).onDestroy(() => clearTimeout(this.copiedTimer));
   }
+
+  private copiedTimer: ReturnType<typeof setTimeout> | undefined;
 
   readonly allScopes = API_TOKEN_SCOPES;
   readonly readmeUrl = README_IO_URL;
@@ -691,8 +634,10 @@ export class ApiTokensComponent implements OnInit {
       await navigator.clipboard.writeText(text);
       this.copied.set(true);
       this.tokenCopied.set(true);
-      setTimeout(() => this.copied.set(false), 2500);
-    } catch {
+      clearTimeout(this.copiedTimer);
+      this.copiedTimer = setTimeout(() => this.copied.set(false), 2500);
+    } catch (err) {
+      logWarn('api-tokens', 'clipboard write failed, text selected for manual copy', { err: String(err) });
       // Fallback: select the text so the user can ctrl+c manually
       const sel = window.getSelection();
       const el = document.querySelector('.reveal-token');

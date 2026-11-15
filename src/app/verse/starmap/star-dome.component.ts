@@ -3,7 +3,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { map } from 'rxjs';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import type { VersePoint } from '../data/verse.models';
 import {
@@ -45,7 +46,7 @@ export function formatDay(value: string | null, lang: string, withWeekday = fals
 @Component({
   selector: 'sc-star-dome',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe, ScTooltipDirective, ScDialogDirective],
+  imports: [RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective],
   template: `
     <div class="fig" [class.celebrate]="celebrate()" [style.--tc]="tCelebrate() + 's'">
       @if (celebrate()) {
@@ -90,29 +91,28 @@ export function formatDay(value: string | null, lang: string, withWeekday = fals
           </button>
         }
         @if (card(); as c) {
-          <div class="card" role="dialog" scDialog [scDialogModal]="false" (scDialogEscape)="close()"
-               [attr.aria-label]="taskTitle(c) | translate"
-               [class.flip]="c.x < 50" [style.left.%]="c.x < 50 ? null : c.x" [style.right.%]="c.x < 50 ? 100 - c.x : null"
-               [style.top.%]="c.y">
-            <button type="button" class="x" [attr.aria-label]="'starmap.card.close' | translate"
-                    [scTooltip]="'starmap.card.close' | translate" scTooltipTier="label" (click)="close()">×</button>
-            <small>{{ cardEyebrow(c) | translate: { n: c.rank + 1 } }}</small>
-            <b>{{ taskTitle(c) | translate }}</b>
+          <sc-popup class="card" kind="panel" (closed)="close()"
+                    [eyebrow]="cardEyebrow(c) | translate: { n: c.rank + 1 }" [title]="taskTitle(c) | translate"
+                    [class.flip]="c.x < 50" [style.left.%]="c.x < 50 ? null : c.x" [style.right.%]="c.x < 50 ? 100 - c.x : null"
+                    [style.top.%]="c.y">
             @if (c.state === 'done') {
               <p>{{ 'starmap.card.doneOn' | translate: { date: doneDate(c.task) } }}</p>
             } @else if (c.task) {
               <p>{{ 'starmap.task.' + c.task.i18nKey + '.how' | translate }}</p>
               @if (c.task.locked) {
                 <p class="muted">{{ lockedKey(c.task) | translate }}</p>
-              } @else if (c.task.link !== selfLink && c.task.key !== 'comet') {
-                <a class="go" [routerLink]="c.task.link">{{ 'starmap.task.' + c.task.i18nKey + '.link' | translate }} ›</a>
-              } @else {
+              } @else if (c.task.link === selfLink || c.task.key === 'comet') {
                 <p class="muted">{{ 'starmap.card.here' | translate }}</p>
               }
             } @else {
               <p>{{ 'starmap.card.empty' | translate }}</p>
             }
-          </div>
+            @if (c.task && !c.task.locked && c.state !== 'done' && c.task.link !== selfLink && c.task.key !== 'comet') {
+              <ng-container popupActions>
+                <a scAction tier="primary" [routerLink]="c.task.link">{{ 'starmap.task.' + c.task.i18nKey + '.link' | translate }} ›</a>
+              </ng-container>
+            }
+          </sc-popup>
         }
       </div>
     </div>
@@ -165,23 +165,17 @@ export function formatDay(value: string | null, lang: string, withWeekday = fals
         100% { opacity: 1; transform: none; filter: none; } }
       @keyframes sd-breathe { 0%, 100% { opacity: 0.28; transform: scale(0.94); } 50% { opacity: 0.42; transform: scale(1.04); } }
       @keyframes sd-pulse { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 0; transform: scale(1.6); } }
-      .card { position: absolute; z-index: 4; width: min(280px, 70vw); margin: 0 0 0 4.5%; padding: var(--sc-pad-2) var(--sc-pad-2) var(--sc-pad-2);
-        translate: 0 -50%; border-radius: 12px; box-sizing: border-box; outline: none;
-        background: color-mix(in srgb, var(--sc-bg-0) 95%, transparent); border: 1px solid color-mix(in srgb, var(--sc-accent) 50%, transparent);
- box-shadow: 0 16px 40px rgb(0 0 0 / 50%), 0 0 30px color-mix(in srgb, var(--sc-accent) 10%, transparent);
-        animation: sd-in 0.25s ease-out both; }
-      .card.flip { margin: 0 4.5% 0 0; }
-      .card small { display: block; padding-right: 28px; font: 0.66rem var(--sc-font-display); letter-spacing: 0.2em; text-transform: uppercase; color: var(--sc-accent); }
-      .card b { display: block; font-size: 1.05rem; font-weight: 600; margin: 6px 0 4px; color: var(--sc-fg-0); }
+      /* Frame, head, ✕ and width come from <sc-popup kind="panel">; only its place next to
+         the star is set here. Above the phone breakpoint only: there the scaffold is full
+         screen and a transform on the host would trap its fixed frame. */
+      .card { position: absolute; z-index: 4; }
+      @media (min-width: 721px) {
+        .card { margin: 0 0 0 4.5%; translate: 0 -50%; animation: sd-in 0.25s ease-out both; }
+        .card.flip { margin: 0 4.5% 0 0; }
+      }
       .card p { margin: 0 0 var(--sc-gap-2); font-size: 0.82rem; line-height: 1.45; color: var(--sc-fg-1); }
       .card p:last-child { margin-bottom: 0; }
       .muted { color: var(--sc-fg-2) !important; }
-      .x { position: absolute; right: 8px; top: 8px; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--sc-border);
-        background: none; color: var(--sc-fg-2); font: 0.9rem/1 inherit; cursor: pointer; padding: 0; }
-      .x:hover, .x:focus-visible { color: var(--sc-fg-0); border-color: var(--sc-accent); outline: none; }
-      .go { display: inline-flex; align-items: center; min-height: 36px; padding: 0 var(--sc-pad-2); border-radius: 4px; background: var(--sc-accent);
-        color: var(--sc-bg-0); font: 0.75rem var(--sc-font-display); letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; }
-      .go:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       /* Completion celebration (once per patch line, on the visit after the last star): a bloom from the
          figure's heart, the outline flares, the stars pulse one after another, a few sparks drift out. */
       .bloom { position: absolute; z-index: 1; left: 50%; top: 50%; width: 70%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%;
@@ -198,9 +192,6 @@ export function formatDay(value: string | null, lang: string, withWeekday = fals
       @keyframes sd-flare { 0%, 100% { stroke-width: 0.4; opacity: 0.85; } 40% { stroke-width: 0.9; opacity: 1; filter: drop-shadow(0 0 1.2px #fff); } }
       @keyframes sd-cheer { 0%, 100% { transform: none; filter: none; } 45% { transform: scale(1.55); filter: brightness(1.8) drop-shadow(0 0 6px #fff); } }
       @media (pointer: coarse) { .star { min-width: var(--sc-tap-min, 48px); min-height: var(--sc-tap-min, 48px); } }
-      @media (max-width: 640px) {
-        .card { position: absolute; left: 4% !important; right: 4% !important; width: auto; margin: 0; translate: 0 18px; }
-      }
       @media (prefers-reduced-motion: reduce) {
         .ln, .ent, .card, .st .h, .st .bl, .sv { animation: none !important; }
         .bloom, .spark { display: none; }

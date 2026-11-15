@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject, input, output, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { PatchSummaryView } from './codex-landing-data.types';
 
 /**
@@ -11,7 +12,7 @@ import { PatchSummaryView } from './codex-landing-data.types';
 @Component({
   selector: 'sc-codex-landing-news',
   standalone: true,
-  imports: [TranslatePipe, ScDialogDirective],
+  imports: [TranslatePipe, ScPopupComponent, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (summary(); as s) {
@@ -22,21 +23,17 @@ import { PatchSummaryView } from './codex-landing-data.types';
         <span aria-hidden="true">{{ 'codex.landing.news.button' | translate }}</span> <b aria-hidden="true">{{ s.patchVersion }}</b>
       </button>
       @if (open()) {
-        <div class="pop" role="dialog" scDialog [scDialogModal]="false"
-             [attr.aria-label]="'codex.landing.news.title' | translate: { patch: s.patchVersion }" (scDialogEscape)="open.set(false)">
-          <div class="pop-head">
-            <span class="label">{{ 'codex.landing.news.title' | translate: { patch: s.patchVersion } }}</span>
-            <span class="mono">{{ 'codex.landing.news.source' | translate }}</span>
-          </div>
+        <sc-popup class="pop" kind="panel" [title]="'codex.landing.news.title' | translate: { patch: s.patchVersion }"
+                  [eyebrow]="'codex.title' | translate" (closed)="open.set(false)">
           <ul>
             @for (line of s.lines; track $index) { <li><b aria-hidden="true">›</b><span>{{ line }}</span></li> }
           </ul>
-          <p class="pop-foot">
-            <a [href]="s.patchNotesUrl" target="_blank" rel="noopener noreferrer">
+          <ng-container popupActions>
+            <a scAction [href]="s.patchNotesUrl" target="_blank" rel="noopener noreferrer">
               {{ (s.patchNotesIsThread ? 'codex.landing.news.notes' : 'codex.landing.news.notesOverview') | translate }} <i aria-hidden="true">↗</i>
             </a>
-          </p>
-        </div>
+          </ng-container>
+        </sc-popup>
       }
     }
   `,
@@ -45,40 +42,28 @@ import { PatchSummaryView } from './codex-landing-data.types';
       :host { position: relative; display: block; }
       .news {
         position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 14px 0 12px;
-        border-radius: 999px; border: 1px solid rgba(82, 193, 230, 0.35); background: rgba(10, 30, 44, 0.72); cursor: pointer;
+        border-radius: 999px; border: 1px solid color-mix(in srgb, var(--sc-accent) 35%, transparent); background: color-mix(in srgb, var(--sc-bg-1) 72%, transparent); cursor: pointer;
         font: 600 max(10px, 0.62rem) var(--sc-font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-1);
       }
       .news svg { width: 15px; height: 15px; color: var(--sc-accent); }
       .news b { font: 400 12px var(--font-monospace, 'Share Tech Mono', monospace); letter-spacing: 0; color: var(--sc-fg-0); }
       .news:hover, .news.on { border-color: var(--sc-accent); color: var(--sc-fg-0); }
-      .news.on { background: rgba(82, 193, 230, 0.14); }
+      .news.on { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
       .news:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .dot {
         position: absolute; top: 6px; left: 22px; width: 8px; height: 8px; border-radius: 50%;
-        background: var(--sc-accent); box-shadow: 0 0 0 2px #0b1f2c, 0 0 10px rgba(82, 193, 230, 0.9);
+        background: var(--sc-accent); box-shadow: 0 0 0 2px var(--sc-bg-0), 0 0 10px color-mix(in srgb, var(--sc-accent) 90%, transparent);
       }
-      .pop {
-        position: absolute; right: 0; top: calc(100% + 10px); z-index: 8;
-        width: min(390px, 100vw - 2 * var(--sc-page-gutter)); padding: 14px 14px 12px;
-        border: 1px solid transparent; border-radius: var(--sc-sub-radius, 5px); text-align: left;
-        background: var(--sc-sub-fill) padding-box, var(--sc-sub-edge) border-box;
-        box-shadow: 0 0 22px rgba(82, 193, 230, 0.18), 0 24px 48px rgba(0, 0, 0, 0.6);
-      }
-      .pop:focus { outline: none; }
-      .pop-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 0 4px; }
-      .label { font: 600 max(9px, 0.56rem) var(--sc-font-display); letter-spacing: 0.18em; text-transform: uppercase; color: var(--sc-fg-1); }
-      .mono { font: 400 11px var(--font-monospace, 'Share Tech Mono', monospace); color: var(--sc-fg-2); }
-      ul { list-style: none; margin: 8px 0 10px; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+      /* Positioned at its trigger; width and frame come from sc-popup. */
+      .pop { position: absolute; right: 0; top: calc(100% + 10px); z-index: 8; }
+      /* Phone: the popup frame is fixed full-screen; lift the wrapper onto the popup layer (above the shell header). */
+      @media (max-width: 720px) { .pop { z-index: var(--sc-popup-z, 1300); } }
+      ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
       li { display: flex; gap: 10px; padding: 8px 6px; font-size: 13px; line-height: 1.35; color: var(--sc-fg-0); }
       li b { flex: 0 0 14px; font-weight: 400; text-align: center; color: var(--sc-accent); }
-      .pop-foot { margin: 0; padding: 10px 4px 0; border-top: 1px solid var(--sc-border); font-size: 11px; }
-      .pop-foot a { display: inline-flex; align-items: center; gap: 5px; min-height: 24px; color: var(--sc-accent); text-decoration: none; }
-      .pop-foot a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-      .pop-foot i { font-style: normal; }
       @media (max-width: 720px) {
         .news { min-height: 32px; padding: 0 10px; font-size: 9px; }
         .dot { top: 4px; left: 18px; }
-        .pop { position: fixed; left: 14px; right: 14px; top: 72px; width: auto; }
       }
     `,
   ],

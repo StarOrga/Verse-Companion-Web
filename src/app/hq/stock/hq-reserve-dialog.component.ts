@@ -4,12 +4,12 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { toErrorKey } from '../../core/describe-error';
 import { FriendsService } from '../../social/friends.service';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { ScSelectComponent, type ScSelectOption } from '../../shared/sc-select.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { HqInventoryService } from '../data/hq-inventory.service';
-import { HQ_DIALOG_STYLES } from '../plan/hq-dialog.styles';
+import { HQ_POPUP_CONTENT_STYLES } from '../plan/hq-popup-content.styles';
 import { type IndexedReservation, defaultAmount, expiryToField, freeForQuality, indexedReservations, reserveTarget } from './hq-reserve';
 import { parseAmount } from './hq-stock-counter';
 import type { DeckCrate } from './hq-stock-deck';
@@ -23,21 +23,11 @@ import type { DeckCrate } from './hq-stock-deck';
 @Component({
   selector: 'sc-hq-reserve-dialog',
   standalone: true,
-  imports: [FormsModule, TranslatePipe, ScActionDirective, ScDialogDirective, ScSelectComponent, ScTooltipDirective],
+  imports: [FormsModule, TranslatePipe, ScActionDirective, ScPopupComponent, ScSelectComponent, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="scrim">
-      <div class="sheet" role="dialog" aria-modal="true" scDialog (scDialogEscape)="closed.emit(changed())" aria-labelledby="rsv-title">
-        <header class="dlg-head">
-          <span class="dlg-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="lock" /></svg></span>
-          <h2 id="rsv-title" class="dlg-title">{{ (editing() ? 'hq.bestand.deck.rsv.titleEdit' : 'hq.bestand.deck.rsv.title') | translate }}
-            <small>{{ subtitle() }}</small></h2>
-          <button type="button" scAction tier="tertiary" [attr.aria-label]="'hq.flow.close' | translate" [scTooltip]="'hq.flow.close' | translate" scTooltipTier="label" (click)="closed.emit(changed())">
-            <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-          </button>
-        </header>
-
-        <div class="dlg-body">
+    <sc-popup kind="dialog" [eyebrow]="subtitle()" [title]="(editing() ? 'hq.bestand.deck.rsv.titleEdit' : 'hq.bestand.deck.rsv.title') | translate" (closed)="onPopupClosed()">
+        <div class="pbody">
           @if (error(); as e) { <p class="dlg-err" role="alert">{{ e | translate }}</p> }
 
           @if (existing().length) {
@@ -73,22 +63,21 @@ import type { DeckCrate } from './hq-stock-deck';
                 <sc-select [options]="friendOptions()" [value]="friendId()" [allowEmpty]="true" placeholderKey="hq.bestand.deck.rsv.noFriend"
                            [ariaLabel]="'hq.bestand.deck.rsv.friend' | translate" (valueChange)="friendId.set($event)" />
               </label>
-              <label class="fld">
-                <span>{{ 'hq.bestand.deck.rsv.note' | translate }}</span>
-                <input type="text" class="input" maxlength="120" autocomplete="off" [ngModel]="note()" (ngModelChange)="note.set($event)"
-                       [placeholder]="'hq.bestand.deck.rsv.notePlaceholder' | translate" />
+              <label class="fld sc-float-field">
+                <input type="text" class="sc-input" maxlength="120" autocomplete="off" placeholder=" " [ngModel]="note()" (ngModelChange)="note.set($event)" />
+                <span class="sc-float-label">{{ 'hq.bestand.deck.rsv.note' | translate }}</span>
               </label>
             </div>
             <div class="row">
               @if (single()) {
-                <label class="fld">
-                  <span>{{ 'hq.bestand.deck.rsv.amount' | translate }}</span>
-                  <span class="amt">
-                    <input type="text" class="input num" inputmode="decimal" autocomplete="off" [ngModel]="amountText()" (ngModelChange)="amountText.set($event)"
+                <div class="fld amt">
+                  <label class="sc-float-field num">
+                    <input type="text" class="sc-input" inputmode="decimal" autocomplete="off" placeholder=" " [ngModel]="amountText()" (ngModelChange)="amountText.set($event)"
                            [attr.aria-invalid]="amountBad() ? 'true' : null" />
-                    <i>{{ 'hq.bestand.deck.rsv.of' | translate: { free: fmt(free()) } }}</i>
-                  </span>
-                </label>
+                    <span class="sc-float-label">{{ 'hq.bestand.deck.rsv.amount' | translate }}</span>
+                  </label>
+                  <i>{{ 'hq.bestand.deck.rsv.of' | translate: { free: fmt(free()) } }}</i>
+                </div>
                 @if (qualityOptions().length) {
                   <label class="fld">
                     <span>{{ 'hq.bestand.deck.rsv.quality' | translate }}</span>
@@ -99,9 +88,9 @@ import type { DeckCrate } from './hq-stock-deck';
               } @else {
                 <p class="hint">{{ 'hq.bestand.deck.rsv.multi' | translate: { n: crates().length } }}</p>
               }
-              <label class="fld">
-                <span>{{ 'hq.bestand.deck.rsv.expiry' | translate }}</span>
-                <input type="date" class="input" [ngModel]="expiryDay()" (ngModelChange)="expiryDay.set($event)" [min]="today" />
+              <label class="fld sc-float-field is-filled">
+                <input type="date" class="sc-input" [ngModel]="expiryDay()" (ngModelChange)="expiryDay.set($event)" [min]="today" />
+                <span class="sc-float-label">{{ 'hq.bestand.deck.rsv.expiry' | translate }}</span>
               </label>
             </div>
             @if (friendId()) { <p class="hint">{{ 'hq.bestand.deck.rsv.notify' | translate }}</p> }
@@ -109,20 +98,17 @@ import type { DeckCrate } from './hq-stock-deck';
             @if (amountBad()) { <p class="dlg-err" role="alert">{{ 'hq.bestand.deck.rsv.amountBad' | translate: { free: fmt(free()) } }}</p> }
           </section>
         </div>
-
-        <footer class="dlg-foot">
-          <span class="sp"></span>
-          @if (editing()) { <button type="button" scAction tier="secondary" (click)="cancelEdit()">{{ 'hq.bestand.deck.rsv.newOne' | translate }}</button> }
-          <button type="button" scAction tier="secondary" (click)="closed.emit(changed())">{{ 'common.dialog.cancel' | translate }}</button>
+        <ng-container popupActions>
           <button type="button" scAction tier="primary" [busy]="busy()" [disabled]="busy() || !canSave()" (click)="save()">
             {{ (editing() ? 'hq.bestand.deck.rsv.saveEdit' : 'hq.bestand.deck.reserve') | translate }}
           </button>
-        </footer>
-      </div>
-    </div>
+          @if (editing()) { <button type="button" scAction tier="secondary" (click)="cancelEdit()">{{ 'hq.bestand.deck.rsv.newOne' | translate }}</button> }
+          <button type="button" scAction tier="secondary" (click)="closed.emit(changed())">{{ 'common.dialog.close' | translate }}</button>
+        </ng-container>
+    </sc-popup>
   `,
   styles: [
-    HQ_DIALOG_STYLES,
+    HQ_POPUP_CONTENT_STYLES,
     `
       .have, .form { padding: var(--sc-space-3, 12px); border: 1px dashed var(--sc-border); border-radius: 10px; display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); }
       .have > small, .form > small { color: var(--sc-fg-2); }
@@ -135,15 +121,12 @@ import type { DeckCrate } from './hq-stock-deck';
       .acts svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .row { display: flex; flex-wrap: wrap; gap: var(--sc-space-3, 12px); }
       .fld { flex: 1 1 11rem; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-      .fld > span:first-child { color: var(--sc-fg-2); font-size: 0.82rem; }
+      .fld > span:first-child:not(.sc-float-label) { color: var(--sc-fg-2); font-size: 0.82rem; }
       .amt { display: flex; align-items: center; gap: var(--sc-space-2, 8px); }
       .amt i { font-style: normal; color: var(--sc-fg-2); font-size: 0.8rem; white-space: nowrap; }
-      .num { width: 7rem; }
-      .input { min-height: 40px; padding: 0 var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-0); color: var(--sc-fg-0); font: inherit; color-scheme: dark; }
-      .input:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-      .input[aria-invalid='true'] { border-color: var(--sc-warning); }
+      .num { width: 9rem; }
+      .sc-input[aria-invalid='true'] { border-color: var(--sc-warning); }
       .hint { margin: 0; color: var(--sc-fg-2); font-size: 0.82rem; }
-      @media (pointer: coarse) { .input { min-height: 48px; } }
     `,
   ],
 })
@@ -156,9 +139,13 @@ export class HqReserveDialogComponent {
   private readonly confirm = inject(ScConfirmService);
   private readonly i18n = inject(TranslateService);
 
-  protected readonly lock = 'M7 11V8a5 5 0 0 1 10 0v3M5 11h14v9H5z';
   protected readonly today = expiryToField(new Date().toISOString());
   protected readonly busy = signal(false);
+
+  /** ✕ / Escape / Back while a save runs are ignored (the scaffold keeps its history entry for the next Back). */
+  protected onPopupClosed(): void {
+    if (!this.busy()) this.closed.emit(this.changed());
+  }
   protected readonly error = signal<string | null>(null);
   protected readonly changed = signal(false);
   protected readonly friendId = signal<string | null>(null);

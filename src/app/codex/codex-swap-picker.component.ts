@@ -1,5 +1,6 @@
 import { ScPopupMotionDirective, ensurePopupMotionStyles } from '../shared/popup-motion/sc-popup-motion.directive';
-import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ItemPathComponent } from '../shared/item-path/item-path.component';
 import { searchMatcher } from './codex-search';
 import { logWarn } from '../core/log';
@@ -208,38 +209,28 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
 @Component({
   selector: 'sc-codex-swap-picker',
   standalone: true,
-  imports: [ItemPathComponent, TranslatePipe, RouterLink, ScSegmentedComponent, ScColumnMenuComponent, ScTooltipDirective, ScDialogDirective, ScPopupMotionDirective],
+  imports: [ItemPathComponent, TranslatePipe, RouterLink, ScSegmentedComponent, ScColumnMenuComponent, ScTooltipDirective, ScPopupComponent, ScActionDirective, ScPopupMotionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (target(); as t) {
-      <div class="pick-veil" scPopupMotion="large" scPopupMotionPlate=".pick-win" scPopupMotionFoot=".pick-foot">
-        <!-- [scDialog]: focus in, Tab trap, Escape, focus back to the opener
-             (audit S15). An open sc-select consumes its own Escape first. -->
-        <article class="pick-win" role="dialog" aria-modal="true"
-                 aria-labelledby="pick-title"
-                 scDialog (scDialogEscape)="dismiss()"
-                 (click)="$event.stopPropagation()">
-          <header class="pick-head">
-            <div class="pick-titles">
-              <h2 id="pick-title">{{ 'codex.picker.title' | translate: { port: slotLabel(t), size: t.size ?? '' } }}</h2>
-              @if (t.name) {
-                <p class="pick-installed">{{ 'codex.picker.installed' | translate: { name: t.name } }}</p>
-              } @else {
-                <p class="pick-installed">{{ 'codex.swap.installedNone' | translate }}</p>
-              }
-              @if (t.count > 1) {
-                <p class="pick-applies">{{ 'codex.swap.appliesToMany' | translate: { count: t.count, port: t.port } }}</p>
-              } @else {
-                <p class="pick-applies">{{ 'codex.swap.appliesToOne' | translate: { port: slotLabel(t) } }}</p>
-              }
-            </div>
-            <button type="button" class="pick-clear" (click)="clearSlot()">
-              {{ 'codex.swap.clearSlot' | translate }}
-            </button>
-            <button type="button" class="pick-close" (click)="dismiss()"
-                    [attr.aria-label]="'codex.picker.close' | translate"
-                    [scTooltip]="'codex.picker.close' | translate">✕</button>
-          </header>
+      <sc-popup kind="large" [title]="'codex.picker.title' | translate: { port: slotLabel(t), size: t.size ?? '' }"
+                [eyebrow]="eyebrow(t)" [initialFocus]="'first'" [bodyFill]="true" style="--sc-popup-body-gap: var(--sc-space-3)"
+                scPopupMotion="large" scPopupMotionPlate=".scp-frame" scPopupMotionFoot=".scp-f"
+                (closed)="dismiss()">
+          <!-- sc-popup: focus in, Tab trap, Escape, focus back to the opener
+               (audit S15). An open sc-select consumes its own Escape first. -->
+          <div class="pick-titles">
+            @if (t.name) {
+              <p class="pick-installed">{{ 'codex.picker.installed' | translate: { name: t.name } }}</p>
+            } @else {
+              <p class="pick-installed">{{ 'codex.swap.installedNone' | translate }}</p>
+            }
+            @if (t.count > 1) {
+              <p class="pick-applies">{{ 'codex.swap.appliesToMany' | translate: { count: t.count, port: t.port } }}</p>
+            } @else {
+              <p class="pick-applies">{{ 'codex.swap.appliesToOne' | translate: { port: slotLabel(t) } }}</p>
+            }
+          </div>
 
           @if (t.fitInferred) {
             <p class="pick-hint inferred">{{ 'codex.swap.fitInferred' | translate }}</p>
@@ -256,7 +247,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
           } @else {
             <div class="pick-scope">
               <label class="pick-search">
-                <span class="sr-only">{{ 'codex.picker.searchLabel' | translate }}</span>
+                <span class="sc-sr-only">{{ 'codex.picker.searchLabel' | translate }}</span>
                 <input #search cdkFocusInitial type="search" autocomplete="off" [value]="query()"
                        (input)="setQuery($event)"
                        [attr.placeholder]="'codex.picker.searchPlaceholder' | translate" />
@@ -288,9 +279,11 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
 
               <p class="pick-count">{{ 'codex.picker.count' | translate: { n: rows().length, total: candidates().length } }}</p>
 
-              <details class="pick-cols">
-                <summary class="pick-cols-sum">{{ 'codex.picker.columns' | translate }} ▾</summary>
-                <div class="pick-cols-pop">
+              <div class="pick-cols">
+                <button type="button" class="pick-cols-sum" [attr.aria-expanded]="colsOpen()" (click)="colsOpen.set(!colsOpen())">{{ 'codex.picker.columns' | translate }} ▾</button>
+                @if (colsOpen()) {
+                <sc-popup class="pick-cols-pop" kind="menu" [backdrop]="false" [title]="'codex.picker.columns' | translate" (closed)="colsOpen.set(false)">
+                  <div class="pc-body">
                   @for (v of catalogue; track v.key) {
                     @if (v.key !== NAME_KEY && !unavailable().has(v.key)) {
                       <label class="pc-row">
@@ -316,8 +309,10 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
                   <button type="button" class="pc-reset" (click)="resetColumns()">
                     {{ 'codex.picker.menu.clear' | translate }}
                   </button>
-                </div>
-              </details>
+                  </div>
+                </sc-popup>
+                }
+              </div>
             </div>
 
             @if (rows().length === 0) {
@@ -482,48 +477,25 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
             }
           }
 
-          <footer class="pick-foot">
-            @if (missingColumnsText(); as missing) {
-              <p class="pick-missing">{{ 'codex.picker.footerMissing' | translate: { fields: missing } }}</p>
-            }
-          </footer>
-        </article>
-      </div>
+          <ng-container popupActions>
+            <button scAction type="button" (click)="clearSlot()">{{ 'codex.swap.clearSlot' | translate }}</button>
+          </ng-container>
+          @if (missingColumnsText(); as missing) {
+            <span popupStatus class="pick-missing">{{ 'codex.picker.footerMissing' | translate: { fields: missing } }}</span>
+          }
+      </sc-popup>
     }
   `,
   styles: [`
     :host { display: contents; }
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-    /* Concept part-01:403-404. padding 3.2rem 4.5rem at the mock's 13px root
-       = 42px 58px. The picker is a modal dialog: it closes only on its X or
-       Escape (#1025), never on the veil, so the veil does not read as clickable. */
-    .pick-veil { position: fixed; inset: 0; z-index: 150;
-      background: color-mix(in srgb, var(--sc-bg-0) 60%, transparent);
-      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-      display: grid; place-items: center; padding: 42px 58px; overflow-y: auto; }
-    .pick-hint.inferred { text-align: left; margin: 0 18px; font-size: max(0.75rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
+    .pick-hint.inferred { text-align: left; margin: 0; font-size: max(0.75rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
       border-left: 2px solid color-mix(in srgb, var(--sc-warn) 55%, transparent); padding-left: 8px; }
 
-    .pick-win { position: relative; width: 100%; max-width: var(--sc-ov-area); max-height: min(100%, var(--sc-ov-max-h));
-      display: flex; flex-direction: column; background: var(--sc-bg-1);
-      border: 1px solid color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0));
-      border-radius: var(--radius-md, 4px); box-shadow: 0 24px 70px rgb(0 0 0 / .7);
-      overflow: hidden; padding: 16px 18px 14px; gap: 10px; cursor: default; }
-
-    .pick-head { display: flex; align-items: flex-start; gap: 10px;
-      background: linear-gradient(180deg, var(--sc-bg-2), var(--sc-bg-1));
-      margin: -16px -18px 0; padding: 12px 16px; }
+    /* The popup body is the one scroller; the table box inside it keeps its own scroll. */
     .pick-titles { flex: 1 1 auto; min-width: 0; }
-    .pick-titles h2 { margin: 0; font-size: 1.02rem; }
     .pick-installed { margin: 3px 0 0; font-size: max(0.74rem, var(--sc-fs-floor)); color: var(--sc-fg-1); overflow-wrap: anywhere; }
     .pick-applies { margin: 2px 0 0; font-size: max(0.7rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
-    .pick-clear { flex: 0 0 auto; padding: 5px 10px; border-radius: 6px; background: var(--sc-bg-0);
-      border: 1px dashed var(--sc-border); color: var(--sc-fg-1); font: inherit; font-size: max(0.72rem, var(--sc-fs-floor)); cursor: pointer; }
-    .pick-clear:hover { border-color: var(--sc-danger); color: var(--sc-danger); }
-    .pick-close { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; background: var(--sc-bg-0);
-      border: 1px solid var(--sc-border); color: var(--sc-fg-1); cursor: pointer; font-size: 0.9rem; }
-    .pick-close:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
     .pick-msg { margin: 6px 0; font-size: 0.8rem; color: var(--sc-fg-2); }
     .pick-msg.err { color: var(--sc-danger); }
     .pick-retry { align-self: flex-start; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-accent); color: var(--sc-accent); font-family: inherit; font-size: max(0.78rem, var(--sc-fs-floor)); cursor: pointer; }
@@ -572,10 +544,17 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
     .pick-cols { position: relative; align-self: flex-end; }
     .pick-cols-sum { cursor: pointer; padding: 6px 10px; border-radius: 6px; background: var(--sc-bg-0);
       border: 1px solid var(--sc-border); color: var(--sc-fg-1); font-size: max(0.76rem, var(--sc-fs-floor)); list-style: none; }
+    .pick-cols-sum { min-block-size: var(--sc-tap-min); }
+    .pick-cols-sum:focus-visible, .pc-reset:focus-visible, .fc button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .pick-cols-sum::-webkit-details-marker { display: none; }
-    .pick-cols-pop { position: absolute; top: calc(100% + 4px); right: 0; z-index: 6; width: 220px; max-height: 320px;
-      overflow-y: auto; background: var(--sc-bg-2); border: 1px solid var(--sc-border); border-radius: var(--radius-md, 4px);
-      box-shadow: 0 10px 28px rgb(0 0 0 / .6); padding: 8px; display: flex; flex-direction: column; gap: 3px; }
+    .pick-cols-pop { position: absolute; top: calc(100% + 4px); left: 0; z-index: 6;
+      /* The host is capped at its containing block (the narrow button, .sc-popup caps it at 100%): give it the menu width, so labels are not cut off. */
+      inline-size: min(var(--sc-ov-menu), calc(100vw - 2 * var(--sc-space-4))); max-inline-size: none; }
+    /* Phone: the menu opens inline below the button (full toolbar width) instead of hanging off the screen edge. */
+    @media (max-width: 720px) {
+      .pick-cols-pop { position: static; inline-size: 100%; margin-top: var(--sc-space-1); }
+    }
+    .pc-body { display: flex; flex-direction: column; gap: 3px; max-height: min(320px, 45dvh); overflow-y: auto; }
     .pc-row { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
     .pc-row.off { color: var(--sc-fg-2); cursor: not-allowed; }
     /* LOW-6: the unavailable columns render as a disabled fieldset group, not
@@ -584,7 +563,8 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
       border-top: 1px dashed var(--sc-border); }
     .pc-unavail { margin: 0 0 2px; padding: 0; font-size: 11px; color: var(--sc-fg-2); font-style: italic; }
     .pc-reset { margin-top: 6px; padding: 4px 8px; border-radius: 4px; background: transparent;
-      border: 1px solid var(--sc-border); color: var(--sc-fg-2); font: inherit; font-size: 11px; cursor: pointer; align-self: flex-start; }
+      border: 1px solid var(--sc-border); color: var(--sc-fg-2); font: inherit; font-size: 11px; cursor: pointer; align-self: flex-start;
+      min-block-size: var(--sc-tap-min); }
 
     /* MEDIUM-5: the column-menu popover used to be an absolutely-positioned
        child of the th cell, so this scroll box had to drop its own clipping
@@ -596,7 +576,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
        Overlay (see column-menu.component.ts), so .pick-scroll never has to
        relax its overflow at all — it stays a normal, always-scrollable
        container regardless of any open menu. */
-    .pick-scroll { overflow: auto; border: 1px solid var(--sc-border); border-radius: var(--radius-md, 4px); flex: 1 1 auto; }
+    .pick-scroll { min-height: 0; overflow: auto; border: 1px solid var(--sc-border); border-radius: var(--radius-md, 4px); flex: 1 1 auto; }
     /* Concept table.wt part-01:621-622 - 11px body, and a 9px / .08em head
        that must NOT wrap: without white-space:nowrap a two-word column title
        broke over two lines and doubled the height of the whole header band.
@@ -668,20 +648,19 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
     .fc { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 999px;
       border: 1px solid color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0));
       background: color-mix(in srgb, var(--sc-accent) 10%, transparent); color: var(--sc-accent); font-size: 11px; }
-    .fc button { background: transparent; border: none; color: inherit; cursor: pointer; font: inherit; padding: 0; }
+    .fc button { background: transparent; border: none; color: inherit; cursor: pointer; font: inherit; padding: 0;
+      min-block-size: var(--sc-tap-min); min-inline-size: var(--sc-tap-min); }
 
     .pick-cues { display: flex; justify-content: space-between; font-size: 11px; color: var(--sc-fg-2); margin-top: 2px; }
 
-    .pick-foot { padding-top: 6px; }
     .pick-missing { margin: 0; font-size: 11px; color: var(--sc-fg-2); font-style: italic; }
 
-    /* Tablet: a wide sheet with a little air; phone: full-screen takeover. */
-    @media (max-width: 1080px) { .pick-veil { padding: 24px 16px; } }
     @media (max-width: 720px) {
-      .pick-veil { padding: 0; }
-      .pick-win { max-width: none; width: 100%; border-radius: 0; padding-bottom: env(safe-area-inset-bottom, 0px); height: 100vh; height: 100dvh; max-height: 100dvh; }
-      .pick-scope { flex-direction: column; align-items: stretch; }
-      .pick-count, .pick-cols { align-self: flex-start; }
+      .pick-scope { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+      .pick-search { flex: 0 0 auto; min-width: 0; max-inline-size: 100%; }
+      .pick-count { align-self: flex-start; }
+      .pick-cols { align-self: stretch; min-inline-size: 0; }
+      .pick-cols-sum { align-self: flex-start; }
       .pick-count { margin-left: 0; }
     }
   `],
@@ -727,18 +706,27 @@ export class CodexSwapPickerComponent {
    */
   readonly portTypes = signal<string[]>([]);
   readonly typeFilter = signal<string>(TYPE_ALL);
+  /** The column chooser menu (an `sc-popup kind="menu"` under its button). */
+  readonly colsOpen = signal(false);
+
+  /** Rail eyebrow: "Slot · S3". */
+  eyebrow(t: SwapTarget): string {
+    return [this.slotLabel(t), t.size != null ? `S${t.size}` : ''].filter(Boolean).join(' · ');
+  }
 
   private readonly search = viewChild<ElementRef<HTMLInputElement>>('search');
   private readonly motion = viewChild(ScPopupMotionDirective);
   private dismissing = false;
 
-  /** Close through the horizon motion (the open reversed in 60 % of the time), then tell the host. */
+  /** Close through the popup motion (a collapse to a line, about half the open time), then tell the host. */
   dismiss(): void {
     const m = this.motion();
     if (!m) { this.closed.emit(); return; }
     if (this.dismissing) return;
     this.dismissing = true;
-    void m.exit().then(() => { this.dismissing = false; this.closed.emit(); });
+    // A rejected or never-settling exit must not leave the picker unable to close: finish either way.
+    const safety = new Promise<void>((resolve) => setTimeout(resolve, 1500));
+    void Promise.race([m.exit().catch(() => undefined), safety]).then(() => { this.dismissing = false; this.closed.emit(); });
   }
   private loadToken = 0;
 
@@ -882,7 +870,7 @@ export class CodexSwapPickerComponent {
 
   /**
    * How many table rows are in the DOM. A fresh list starts with FIRST_ROWS and grows by
-   * ROW_SLICE per frame: the plate stays invisible for its first 450 ms (pm-plate delay), so
+   * ROW_SLICE per frame: the plate's fill starts only at 42 % of 900 ms, so
    * the whole table is built across those frames instead of in the open's first one, and the
    * cascade (rows from 1000 ms on) sees the finished table.
    */

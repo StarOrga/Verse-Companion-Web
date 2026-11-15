@@ -5,7 +5,7 @@ import { isPlainLeftClick } from '../../core/modified-click.util';
 import { hqNachschubPickLink } from '../../hq/hq-routes';
 import { NACHSCHUB_ICON_PATHS } from '../../hq/nachschub/step-icons';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { SilThumbComponent } from '../../shared/sil-thumb/sil-thumb.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { ScPopupMotionDirective } from '../../shared/popup-motion/sc-popup-motion.directive';
@@ -41,7 +41,7 @@ interface WishLine {
 @Component({
   selector: 'sc-merkliste',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, ScActionDirective, ScDialogDirective, ScTooltipDirective, ScPopupMotionDirective, SilThumbComponent],
+  imports: [RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective, ScPopupMotionDirective, SilThumbComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mk">
@@ -53,8 +53,9 @@ interface WishLine {
         </svg>
       </button>
       @if (open()) {
-        <div class="panel" [id]="panelId" role="dialog" scPopupMotion scPopupMotionItems=".qrow" scPopupMotionOrigin="tr" animate.leave="pm-out" scDialog [scDialogModal]="false" [scDialogReturnFocus]="trigger"
-             (scDialogEscape)="close()" [attr.aria-label]="'quick.wish' | translate">
+        <div class="panel" [id]="panelId" scPopupMotion scPopupMotionItems=".qrow" scPopupMotionOrigin="tr" animate.leave="pm-out">
+          <sc-popup kind="panel" [eyebrow]="'quick.wish' | translate" [title]="(cart.count() === 1 ? 'quick.wishTitleOne' : 'quick.wishTitle') | translate: { n: cart.count() }"
+                    [returnFocus]="trigger" [backClose]="false" (closed)="close()">
           @for (l of lines(); track l.item.key) {
             <div class="qrow">
               <a class="open" [routerLink]="l.row.target!.link" [queryParams]="l.row.target!.queryParams" [fragment]="l.row.target!.fragment ?? undefined" (click)="onOpen($event)">
@@ -62,11 +63,11 @@ interface WishLine {
                 <span class="rt"><b>{{ l.row.title }}</b>@if (sub(l.row); as s) { <small>{{ s | translate }}</small> }</span>
               </a>
               <span class="step" role="group" [attr.aria-label]="'cart.qtyOf' | translate: { name: l.row.title }">
-                <button type="button" [disabled]="l.item.qty <= 1" [attr.aria-label]="'cart.less' | translate" (click)="bump(l.item, -1)">
+                <button type="button" [disabled]="l.item.qty <= 1" [attr.aria-label]="'cart.less' | translate" [scTooltip]="'cart.less' | translate" scTooltipTier="label" (click)="bump(l.item, -1)">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="minus[0]" /></svg>
                 </button>
                 <b>{{ l.item.qty }}</b>
-                <button type="button" [disabled]="l.item.qty >= 999" [attr.aria-label]="'cart.more' | translate" (click)="bump(l.item, 1)">
+                <button type="button" [disabled]="l.item.qty >= 999" [attr.aria-label]="'cart.more' | translate" [scTooltip]="'cart.more' | translate" scTooltipTier="label" (click)="bump(l.item, 1)">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="plus[0]" /></svg>
                 </button>
               </span>
@@ -84,7 +85,11 @@ interface WishLine {
           } @empty {
             <p class="empty">{{ 'quick.emptyWish' | translate }}</p>
           }
-          <a class="all" [attr.href]="svc.cartHref()" (click)="onCart($event)">{{ (cart.count() === 1 ? 'quick.allWishOne' : 'quick.allWish') | translate: { n: cart.count() } }}</a>
+          <ng-container popupActions>
+            <a scAction class="all" [attr.href]="svc.cartHref()" (click)="onCart($event)">{{ 'quick.allWish' | translate }}</a>
+          </ng-container>
+          <span popupStatus class="all-count" role="status">{{ (cart.count() === 1 ? 'quick.allWishCountOne' : 'quick.allWishCount') | translate: { n: cart.count() } }}</span>
+          </sc-popup>
         </div>
       }
     </div>
@@ -102,16 +107,8 @@ interface WishLine {
       .trigger:hover, .trigger.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
       .trigger.on { box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-accent) 18%, transparent); }
       .trigger:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-      /*
-       * 27rem (432 px): a row is thumb 52 + gap 8 + name + stepper 84 + two 32 px icons + gaps 12, inside 14 px panel
-       * padding and 4 px row padding on each side. That leaves ~190 px for the name: "Aegis Avenger Warlock" (21 characters
-       * at 0.85rem semibold, ~165 px) stays on one line; a longer name wraps to a second line, never an ellipsis.
-       */
-      .panel {
-        position: absolute; top: calc(100% + 8px); right: 0; z-index: 60; width: min(27rem, calc(100vw - 32px));
-        max-height: min(40rem, calc(100dvh - 120px)); overflow: auto; padding: 8px 14px 6px; border-radius: 12px;
-        border: 1px solid var(--sc-border); background: var(--sc-bg-1); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.65);
-      }
+      /* Only the position at the trigger; frame, width, head and ✕ come from <sc-popup kind="panel">. */
+      .panel { position: absolute; top: calc(100% + 8px); right: 0; z-index: 60; }
       .qrow { display: grid; grid-template-columns: minmax(0, 1fr) auto 32px 32px; align-items: center; gap: 4px; min-height: 50px; padding: 2px 4px; border: 1px solid transparent; border-radius: 8px; }
       .qrow:hover, .qrow:focus-within { background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }
       .open { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: 8px; min-width: 0; min-height: 44px; border-radius: 8px; color: var(--sc-fg-0); text-decoration: none; }
@@ -129,23 +126,10 @@ interface WishLine {
       .step button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       .step svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
       .step b { min-width: 2ch; text-align: center; font-variant-numeric: tabular-nums; font-size: 0.85rem; font-weight: 600; color: var(--sc-fg-0); }
-      .all { display: inline-flex; align-items: center; min-height: 36px; margin-top: 4px; padding: 0 4px; border: 0; background: none; font: inherit; font-size: 0.85rem; color: var(--sc-accent); text-decoration: none; cursor: pointer; }
-      .all:hover { text-decoration: underline; }
-      .all:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
       .empty { margin: 8px 4px; color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor, 0.75rem)); }
-      /* Phone: a sheet above the feedback launcher's lane, never cut by the mobile URL bar. */
-      @media (max-width: 749px) {
-        .mk { position: static; }
-        .panel {
-          position: fixed; left: 8px; right: 8px; top: auto; width: auto;
-          bottom: calc(var(--sc-float-bottom) + var(--sc-fab-clear-block, 0px));
-          max-height: calc(100vh - 120px); max-height: calc(100dvh - 120px);
-        }
-      }
       /* Touch floor of the gate: 48 px (a 44 px value measures 43), by pointer, not by width, so tablets pass too. */
       @media (pointer: coarse), (max-width: 749px) {
         .trigger { width: 48px; height: 48px; }
-        .all { min-height: 48px; }
         .qrow { grid-template-columns: minmax(0, 1fr) auto 48px 48px; min-height: 56px; }
         .step button { width: 48px; height: 48px; }
       }

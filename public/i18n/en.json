@@ -59,9 +59,20 @@
     "dialog": {
       "confirm": "Confirm",
       "cancel": "Cancel",
-      "close": "Close"
+      "close": "Close",
+      "save": "Save",
+      "apply": "Apply",
+      "done": "Done",
+      "previous": "Previous",
+      "next": "Next"
     },
-    "undo": "Undo"
+    "undo": "Undo",
+    "popup": {
+      "access": {
+        "admin": "Visible to admins only",
+        "collab": "Visible to admins and collaborators only"
+      }
+    }
   },
   "date": {
     "relative": {
@@ -339,7 +350,6 @@
         "open": "Open patch summary {{patch}}",
         "unread": "New summary",
         "title": "What {{patch}} changes",
-        "source": "AI summary",
         "notes": "Patch notes at CIG",
         "notesOverview": "All patch notes at CIG"
       },
@@ -761,8 +771,8 @@
       }
     },
     "weaponDetail": {
+      "eyebrow": "Weapon",
       "intro": "The picker's 17 columns are not everything. This is what a ship weapon really carries in the P4K — grouped by origin, with the struct named beside it. Cyan = present, gold dashed = not in the game files.",
-      "close": "Close",
       "card": {
         "damageChannels": "Damage per channel",
         "fireBallistics": "Fire & ballistics",
@@ -1647,13 +1657,11 @@
       "holoOverlay": {
         "label": "3D view: {{name}}",
         "fullscreen": "Fullscreen",
-        "exitFullscreen": "Exit fullscreen",
-        "close": "Close the 3D view"
+        "exitFullscreen": "Exit fullscreen"
       },
       "partPopup": {
         "label": "Component: {{name}}",
         "eyebrow": "Component",
-        "close": "Close component",
         "noValues": "No values known for this component."
       },
       "stageLaunchers": "{{n}} launchers",
@@ -1845,12 +1853,11 @@
       "tray": "Compare ({{count}})",
       "open": "Open comparison",
       "clear": "Clear",
-      "remove": "Remove",
+      "remove": "Remove {{name}}",
       "property": "Property",
       "close": "Close",
       "noCommon": "No comparable values for this mix of entries.",
       "diffOnly": "Differences only",
-      "showAll": "All rows",
       "mixedKind": "Like-for-like only: the tray already holds {{kind}} entries. Clear it to compare something else."
     },
     "portCategory": {
@@ -1867,7 +1874,6 @@
     "picker": {
       "title": "Pick a component — {{port}} · S{{size}}",
       "installed": "fitted: {{name}}",
-      "close": "Close",
       "searchPlaceholder": "Search … name, manufacturer, damage type",
       "searchLabel": "Search components",
       "compareWith": "Compare with",
@@ -2412,7 +2418,6 @@
       "flightMissing": "Flight characteristics live in the vehicle definition, which our P4K extractor does not resolve yet — the rows stay here so they fill in by themselves once it does."
     },
     "inspect": {
-      "close": "Close",
       "hardpoint": "Hardpoint",
       "parameters": "Parameters",
       "general": "General",
@@ -2696,7 +2701,6 @@
       "eyebrow": "Codex index",
       "filtersAria": "Filters",
       "filtersTitle": "Filters",
-      "closeFilters": "Close filters",
       "filterButton": "Filters ({{count}})",
       "showResults": "Show {{count}} results",
       "areaLabel": "Area",
@@ -3107,8 +3111,7 @@
       "pickSlot": "Slot in {{set}}",
       "replaces": "Replaces the current piece",
       "done": "{{item}} is now in {{slot}} of {{set}}",
-      "toSet": "To the set",
-      "close": "Close"
+      "toSet": "To the set"
     }
   },
   "news": {
@@ -3333,7 +3336,6 @@
         "olderHide": "Collapse older patches"
       },
       "dossier": {
-        "close": "Close dossier",
         "toc": "Sections",
         "unknown": "No patch data for Alpha {{line}}.",
         "section": {
@@ -3348,7 +3350,8 @@
           "nextPast": "What came next?"
         },
         "noteOf": "Changes in {{version}} · part of Alpha {{line}}",
-        "wholeLine": "View the whole {{line}} patch"
+        "wholeLine": "View the whole {{line}} patch",
+        "eyebrow": "Patch"
       },
       "prep": {
         "source": "per the Spectrum post (\"Important Build Info\")",
@@ -3469,7 +3472,7 @@
       }
     },
     "detail": {
-      "back": "Back"
+      "eyebrow": "Verse News"
     },
     "openExternal": "Opens {{host}}",
     "relative": {
@@ -3975,11 +3978,9 @@
         "title": "Create API token",
         "subtitle": "Pick a friendly name + one or more scopes. The plaintext token is shown ONCE — save it before closing.",
         "nameLabel": "Name",
-        "namePlaceholder": "e.g. Discord Bot, Personal CLI",
         "scopesLabel": "Scopes",
         "create": "Create token",
         "creating": "Creating…",
-        "cancel": "Cancel",
         "errorTitle": "Could not create token"
       },
       "scopeDescriptions": {
@@ -3999,7 +4000,8 @@
         "ack": "I have saved it",
         "tokenLabel": "Plaintext token"
       },
-      "revokeTitle": "Revoke token?"
+      "revokeTitle": "Revoke token?",
+      "eyebrow": "API tokens"
     },
     "filter": {
       "searchPlaceholder": "Search name, username or email…",
@@ -4419,7 +4421,8 @@
     "access": {
       "fullPage": "Full Data Upload page",
       "note": "Windows only · signs in with your Verse Companion account · uploads data, never code."
-    }
+    },
+    "historyEyebrow": "Uploader"
   },
   "download": {
     "title": "Download",
@@ -6525,7 +6528,6 @@
     "log": {
       "undo": "Undo",
       "title": "Log",
-      "close": "Close",
       "empty": "No events yet.",
       "showAll": "Show all",
       "more": "Load more",
@@ -6691,7 +6693,6 @@
       "loading": "Loading statistics …",
       "zero": "Nothing recorded in this range.",
       "details": "Details",
-      "close": "Close",
       "day": "Day",
       "week": "Week",
       "tile": {
@@ -7484,7 +7485,6 @@
       "p2": "Two challenges sit under the dome: the comet tip for the LIVE day of the next patch, and recognising the ship behind the shape.",
       "p3": "Lit stars raise your Kartograph rank. The crest top right opens your rank page with the series, its rewards and the wallpapers.",
       "start": "Show me",
-      "close": "Close",
       "back": "Back",
       "next": "Next",
       "done": "Done",
@@ -7510,13 +7510,13 @@
           "title": "Your Kartograph rank",
           "text": "Every lit star moves your rank on: tiers at 1, 3, 7, 12, 18, 26 and 35 stars, from Observer to Keeper of the Atlas. Each unlocks something, from the shareable badge and companions to the amber tint and crest details from tier 5. Your series, its rewards and every wallpaper format live on the rank page."
         }
-      }
+      },
+      "eyebrow": "Star map"
     },
     "more": {
       "title": "Extras"
     },
     "card": {
-      "close": "Close",
       "eyebrowDone": "Star {{n}} · lit",
       "eyebrowNext": "Star {{n}} · suggested next",
       "eyebrowOpen": "Star {{n}} · open",
@@ -7915,7 +7915,7 @@
   "appNotice": {
     "aria": "App notice",
     "eyebrow": "App",
-    "close": "Close",
+    "later": "Later",
     "download": "Download",
     "scc": {
       "line": "Verse Companion App for your desktop",
@@ -8394,7 +8394,6 @@
         "stats": "Comparison numbers"
       },
       "title": "What friends see",
-      "done": "Done",
       "general": "In general",
       "generalHint": "Applies to all friends unless you set something else for one below. Changes are saved at once.",
       "facetHint": {
@@ -8411,7 +8410,8 @@
       "on": "On",
       "off": "Off",
       "result": "This friend sees:",
-      "nothing": "none of it"
+      "nothing": "none of it",
+      "eyebrow": "Social"
     },
     "teams": {
       "title": "Groups",
@@ -8611,8 +8611,9 @@
     "toNachschub": "Into a Nachschub: {{name}}",
     "wish": "Wishlist",
     "emptyWish": "Nothing on the wishlist yet.",
-    "allWish": "Whole wishlist · {{n}} items",
-    "allWishOne": "Whole wishlist · 1 item",
+    "allWish": "Whole wishlist",
+    "allWishCount": "{{n}} items",
+    "allWishCountOne": "1 item",
     "section": {
       "inventar": "Inventory",
       "hangar": "Hangar",
@@ -8630,11 +8631,15 @@
       "item": "Items",
       "blueprint": "Blueprints",
       "news": "News"
-    }
+    },
+    "wishTitle": "{{n}} items saved",
+    "wishTitleOne": "1 item saved"
   },
   "cart": {
     "title": "Wishlist",
     "summary": "{{n}} items · {{g}} groups",
+    "summaryOne": "1 item · 1 group",
+    "summaryOneGroup": "{{n}} items · 1 group",
     "close": "Close",
     "empty": "The wishlist is empty.",
     "emptyHint": "Put items from the Codex or the search here.",
