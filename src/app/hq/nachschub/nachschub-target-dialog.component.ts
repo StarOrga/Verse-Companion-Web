@@ -127,6 +127,9 @@ export class NachschubTargetDialogComponent {
   protected readonly picked = signal<string | null>(null);
   /** New Nachschub first (disabled with its reason as tooltip while no slot is free), then the existing ones. */
   protected readonly targetOptions = computed<readonly ScSegmentOption[]>(() => {
+    // Explicit dependency on the language signal: the ready-made "append to X" labels must follow a
+    // language switch (instant() reads it today too; this keeps it true if that ever changes).
+    this.i18n.currentLang();
     const block = this.newBlock();
     return [
       { value: 'new', labelKey: this.intent() === 'sell' ? 'hq.nachschub.target.newSell' : 'hq.nachschub.target.new', disabled: block !== null, titleKey: block ?? undefined },

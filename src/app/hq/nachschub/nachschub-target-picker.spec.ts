@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { HqEinsatzService } from '../data/hq-einsatz.service';
 import type { Nachschub, NachschubLineInput } from './nachschub.model';
 import { NachschubService } from './nachschub.service';
@@ -179,6 +179,16 @@ describe('NachschubTargetDialogComponent', () => {
     fixture.detectChanges();
     expect(el.querySelector('[role=alert]')?.textContent).toContain('hq.nachschub.slotsFull');
     expect(closed).toEqual([]);
+  });
+
+  it('relabels the existing Nachschub options when the language changes', () => {
+    packages.set([pkg('s0', 1)]);
+    const { fixture, el } = setup('pickup');
+    const i18n = TestBed.inject(TranslateService);
+    i18n.setTranslation('xx', { hq: { nachschub: { target: { append: 'XX {{name}}' } } } });
+    i18n.use('xx');
+    fixture.detectChanges();
+    expect(radios(el)[1].textContent).toContain('XX ');
   });
 
   it('blocks "new" and falls back to an existing Nachschub when all 7 slots are in use', () => {
