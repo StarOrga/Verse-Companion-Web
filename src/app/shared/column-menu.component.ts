@@ -15,6 +15,7 @@ import {
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { ScPopupComponent } from './popup/sc-popup.component';
+import { ScTooltipDirective } from './tooltip/sc-tooltip.directive';
 import { ColumnFacet, ColumnKind, SortDir } from '../codex/table-column-menu';
 
 /**
@@ -62,7 +63,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 @Component({
   selector: 'sc-column-menu',
   standalone: true,
-  imports: [ScPopupComponent],
+  imports: [ScPopupComponent, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <span class="cm-wrap">
@@ -81,6 +82,8 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
           class="cm-kebab"
           [class.active]="open() || hasFilter()"
           [attr.aria-label]="menuOpenLabel()"
+          [scTooltip]="menuOpenLabel()"
+          scTooltipTier="label"
         >⋮</summary>
       </details>
     </span>
@@ -107,11 +110,11 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
         @if (kind() === 'numeric') {
           <p class="cm-title">{{ rangeLabel() }}</p>
           <div class="cm-range">
-            <label class="sr-only" [attr.for]="fromId()">{{ fromLabel() }}</label>
+            <label class="sc-sr-only" [attr.for]="fromId()">{{ fromLabel() }}</label>
             <input #fromInput type="number" [id]="fromId()" [value]="range()?.min ?? ''"
                    (change)="applyRange(fromInput.value, toInput.value)" />
             <span class="cm-dash" aria-hidden="true">–</span>
-            <label class="sr-only" [attr.for]="toId()">{{ toLabel() }}</label>
+            <label class="sc-sr-only" [attr.for]="toId()">{{ toLabel() }}</label>
             <input #toInput type="number" [id]="toId()" [value]="range()?.max ?? ''"
                    (change)="applyRange(fromInput.value, toInput.value)" />
           </div>
@@ -138,10 +141,12 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
     </ng-template>
   `,
   styles: [`
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .cm-wrap { display: inline-flex; align-items: center; gap: 2px; width: 100%; }
     .cm-label { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 3px;
       background: transparent; border: none; color: inherit; font: inherit; cursor: pointer; text-align: inherit; padding: 0; }
+    .cm-label:focus-visible, .cm-kebab:focus-visible, .cm-sortbtn:focus-visible, .cm-secondary:focus-visible {
+      outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .cm-sortbtn:hover, .cm-secondary:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
     .cm-arrow { color: var(--sc-accent); }
     /* LOW-3: unit floor per UI-spec §0 — an explicit max() rather than a
        relative 0.85em, which derives from a 12px head and lands near 10px. */

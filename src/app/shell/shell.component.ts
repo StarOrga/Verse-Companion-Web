@@ -202,7 +202,9 @@ import { avatarUrlOf } from './avatar-url';
             @if (adminMenuOpen()) {
               <div class="dropdown admin-dropdown" role="menu" [attr.aria-label]="'nav.adminMenu' | translate"
                    (keydown)="onAdminMenuKeydown($event)">
-                <sc-popup kind="menu" access="admin" [backdrop]="false" initialFocus="container" [title]="'nav.adminMenu' | translate">
+                <sc-popup kind="menu" access="admin" [backdrop]="false" initialFocus="container" [title]="'nav.adminMenu' | translate"
+                          (closed)="closeAdminMenu(true)">
+                <div class="dd-body">
                 <a class="dropdown-item elevated" role="menuitem" routerLink="/admin"
                    (click)="onAdminMenuNavigate($event)">
                   <span class="di-label">{{ 'nav.admin' | translate }}</span>
@@ -218,6 +220,7 @@ import { avatarUrlOf } from './avatar-url';
                   <span class="di-label">{{ 'nav.translations' | translate }}</span>
                   <span class="sc-sr-only">{{ 'nav.adminOnly' | translate }}</span>
                 </a>
+                </div>
                 </sc-popup>
               </div>
             }
@@ -314,6 +317,7 @@ import { avatarUrlOf } from './avatar-url';
             <div class="dropdown" role="menu" scPopupMotion scPopupMotionItems=".dropdown-item" scPopupMotionOrigin="tr" (keydown)="onMenuKeydown($event)">
               <sc-popup kind="menu" [backdrop]="false" initialFocus="container" [title]="'nav.accountMenu' | translate: { count: 0 }"
                         (closed)="onMenuPopupClosed()">
+              <div class="dd-body">
               <div class="dropdown-header">
                 <div class="dh-id">
                   <span class="dh-name">{{ displayName() }}</span>
@@ -440,6 +444,7 @@ import { avatarUrlOf } from './avatar-url';
                   {{ 'nav.viewAs.exit' | translate }}
                 </button>
               }
+              </div>
               </sc-popup>
             </div>
           }
@@ -727,7 +732,7 @@ import { avatarUrlOf } from './avatar-url';
 
     /* Position at the trigger only: frame, width, rail and role edge come from <sc-popup kind="menu">. */
     .dropdown { position: absolute; top: calc(100% + 8px); right: 0; z-index: 30; }
-    .dropdown .scp-b { display: flex; flex-direction: column; }
+    .dd-body { display: flex; flex-direction: column; }
     .dropdown-header {
       display: flex;
       align-items: center;

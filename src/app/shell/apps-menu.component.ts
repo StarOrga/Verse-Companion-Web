@@ -46,7 +46,7 @@ export interface AppEntry {
   id: 'scc' | 'starscape' | 'uploader';
   nameKey: string;
   descKey: string;
-  /** Collaborator-gated app: head painted in the hot accent (no badge, the colour is the signal). */
+  /** Collaborator-gated app: head painted in the collab accent (no badge, the colour is the signal). */
   elevated: boolean;
   /** The stable download, or null when no release resolved (uploader -> its page). */
   href: string | null;
@@ -56,7 +56,7 @@ export interface AppEntry {
 /**
  * `<sc-apps-menu>` - the "Apps" menu next to the avatar (main header and docked
  * subheader). Lists the public desktop apps (SCC App, Starscape) and, for
- * collaborators and admins, the Data Uploader in the hot accent, labelled in words.
+ * collaborators and admins, the Data Uploader in the collab accent (the colour is the signal).
  * Each entry is a real anchor to the download; version and size are read lazily
  * from the release resolvers on first open. Renders nothing on a device that
  * cannot install a desktop app (same rule as the download menu).
@@ -81,6 +81,7 @@ export interface AppEntry {
         @if (open()) {
           <div class="pop" [id]="panelId" scPopupMotion scPopupMotionItems=".entry" scPopupMotionOrigin="tr" animate.leave="pm-out">
           <sc-popup kind="menu" [backdrop]="false" [title]="'appsMenu.aria' | translate" (closed)="onPopupClosed()">
+            <div class="pbody">
             @for (app of apps(); track app.id) {
               @if (app.href) {
                 <a class="entry" [class.elevated]="app.elevated" [href]="app.href" rel="noopener noreferrer" download (click)="onPick($event)">
@@ -94,6 +95,7 @@ export interface AppEntry {
             }
             <!-- Stable only: beta/alpha are picked inside each app after sign-in. -->
             <p class="hint">{{ 'appsMenu.footer' | translate }}</p>
+            </div>
           </sc-popup>
           </div>
         }
@@ -129,7 +131,7 @@ export interface AppEntry {
     /* Only the position at the trigger; frame, width, rail and edge come from <sc-popup kind="menu">. */
     .pop { position: absolute; top: calc(100% + 8px); right: 0; z-index: 60; }
     .pop sc-popup { display: block; }
-    .pop .scp-b { display: flex; flex-direction: column; gap: 2px; }
+    .pbody { display: flex; flex-direction: column; gap: 2px; }
     .entry {
       display: flex; gap: 12px; align-items: flex-start; padding: 10px; border-radius: 8px;
       color: var(--sc-fg-0); text-decoration: none; min-height: 48px;

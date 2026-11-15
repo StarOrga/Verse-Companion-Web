@@ -39,6 +39,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
           <div class="panel">
             <sc-popup kind="panel" size="menu" [title]="'beta.chip.title' | translate" [access]="staff() ? 'collab' : null"
                       [backClose]="false" (closed)="open.set(false)">
+            <div class="pbody">
             @for (a of areas(); track a) {
               <button type="button" role="switch" class="sw"
                       [attr.aria-checked]="beta.state()[a]"
@@ -51,6 +52,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
               </button>
             }
             @if (staff()) { <p class="sc-sr-only">{{ 'beta.chip.note' | translate }}</p> }
+            </div>
             </sc-popup>
           </div>
         }
@@ -85,8 +87,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
     .mark { font-family: var(--sc-font-display); font-weight: 700; font-size: 1.1rem; }
     /* Position only (opens upward from the FAB); frame, width, head and ✕ come from <sc-popup kind="panel">. */
     .panel { display: block; }
-    .panel .scp-b { display: flex; flex-direction: column; gap: var(--sc-space-1); }
-    .note { margin: var(--sc-space-1) 0 0; font-size: max(0.7rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
+    .pbody { display: flex; flex-direction: column; gap: var(--sc-space-1); }
     .sw {
       display: flex; align-items: center; justify-content: space-between; gap: var(--sc-space-3);
       min-height: var(--sc-tap-min); padding: 0 var(--sc-space-2); border: 0; border-radius: 8px;
@@ -95,7 +96,6 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
     .sw:hover { background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
     .sw:disabled { opacity: 0.45; cursor: not-allowed; }
     .label { font-size: max(0.82rem, var(--sc-fs-floor)); }
-    .only { margin-inline-start: var(--sc-space-1); font-size: max(0.7rem, var(--sc-fs-floor)); color: var(--sc-accent-collab); text-transform: uppercase; letter-spacing: 0.06em; }
     .knob-track { position: relative; flex: none; width: 38px; height: 22px; border-radius: 999px;
       background: var(--sc-bg-2); border: 1px solid var(--sc-border); transition: background 0.16s; }
     .knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;

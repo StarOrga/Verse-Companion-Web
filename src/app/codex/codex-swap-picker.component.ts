@@ -247,7 +247,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
           } @else {
             <div class="pick-scope">
               <label class="pick-search">
-                <span class="sr-only">{{ 'codex.picker.searchLabel' | translate }}</span>
+                <span class="sc-sr-only">{{ 'codex.picker.searchLabel' | translate }}</span>
                 <input #search cdkFocusInitial type="search" autocomplete="off" [value]="query()"
                        (input)="setQuery($event)"
                        [attr.placeholder]="'codex.picker.searchPlaceholder' | translate" />
@@ -283,6 +283,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
                 <button type="button" class="pick-cols-sum" [attr.aria-expanded]="colsOpen()" (click)="colsOpen.set(!colsOpen())">{{ 'codex.picker.columns' | translate }} ▾</button>
                 @if (colsOpen()) {
                 <sc-popup class="pick-cols-pop" kind="menu" [backdrop]="false" [title]="'codex.picker.columns' | translate" (closed)="colsOpen.set(false)">
+                  <div class="pc-body">
                   @for (v of catalogue; track v.key) {
                     @if (v.key !== NAME_KEY && !unavailable().has(v.key)) {
                       <label class="pc-row">
@@ -308,6 +309,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
                   <button type="button" class="pc-reset" (click)="resetColumns()">
                     {{ 'codex.picker.menu.clear' | translate }}
                   </button>
+                  </div>
                 </sc-popup>
                 }
               </div>
@@ -486,7 +488,6 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
   `,
   styles: [`
     :host { display: contents; }
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
     .pick-hint.inferred { text-align: left; margin: 0; font-size: max(0.75rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
       border-left: 2px solid color-mix(in srgb, var(--sc-warn) 55%, transparent); padding-left: 8px; }
@@ -545,7 +546,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
       border: 1px solid var(--sc-border); color: var(--sc-fg-1); font-size: max(0.76rem, var(--sc-fs-floor)); list-style: none; }
     .pick-cols-sum::-webkit-details-marker { display: none; }
     .pick-cols-pop { position: absolute; top: calc(100% + 4px); right: 0; z-index: 6; }
-    .pick-cols-pop .scp-b { display: flex; flex-direction: column; gap: 3px; max-height: 320px; }
+    .pc-body { display: flex; flex-direction: column; gap: 3px; max-height: 320px; overflow-y: auto; }
     .pc-row { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
     .pc-row.off { color: var(--sc-fg-2); cursor: not-allowed; }
     /* LOW-6: the unavailable columns render as a disabled fieldset group, not
@@ -710,7 +711,9 @@ export class CodexSwapPickerComponent {
     if (!m) { this.closed.emit(); return; }
     if (this.dismissing) return;
     this.dismissing = true;
-    void m.exit().then(() => { this.dismissing = false; this.closed.emit(); });
+    // A rejected or never-settling exit must not leave the picker unable to close: finish either way.
+    const safety = new Promise<void>((resolve) => setTimeout(resolve, 1500));
+    void Promise.race([m.exit().catch(() => undefined), safety]).then(() => { this.dismissing = false; this.closed.emit(); });
   }
   private loadToken = 0;
 

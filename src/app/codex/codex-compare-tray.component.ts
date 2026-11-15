@@ -167,6 +167,7 @@ interface PinnedRef {
     .toggle:hover { background: color-mix(in srgb, var(--sc-accent) 26%, transparent); }
     .clear { margin-left: auto; padding: 5px 12px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-border); color: var(--sc-fg-2); font-family: inherit; font-size: max(0.74rem, var(--sc-fs-floor)); cursor: pointer; }
     .clear:hover { color: var(--sc-accent); border-color: var(--sc-accent); }
+    .chip-link:focus-visible, .chip-x:focus-visible, .toggle:focus-visible, .clear:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
 
     .panel { min-width: 0; }
     .muted { color: var(--sc-fg-2); margin: 0; font-size: 0.84rem; }
@@ -179,7 +180,7 @@ interface PinnedRef {
     .col-link:hover { text-decoration: underline; }
     .col-kind { display: block; font-size: max(0.62rem, var(--sc-fs-floor)); text-transform: uppercase; letter-spacing: 0.06em; color: var(--sc-fg-2); }
     .cmp td.na { color: var(--sc-fg-2); }
-    .cmp td.best { color: #8fe5b5; font-weight: 500; background: color-mix(in srgb, #5fd698 13%, transparent); }
+    .cmp td.best { color: var(--sc-success); font-weight: 500; background: color-mix(in srgb, var(--sc-success) 13%, transparent); }
     .cmp td.worst { color: var(--sc-fg-2); }
     .cmp tr.grp td { padding-top: 12px; font-size: max(0.66rem, var(--sc-fs-floor)); text-transform: uppercase; letter-spacing: 0.08em;
       color: var(--sc-accent); border-bottom: 1px solid color-mix(in srgb, var(--sc-accent) 30%, transparent); }
