@@ -78,7 +78,7 @@ import { ScActionDirective } from '../../shared/action/sc-action.directive';
     `
       :host { display: block; }
       .shared { display: grid; gap: var(--sc-space-2, 8px); }
-      .tile { display: none; width: 100%; white-space: normal; }
+      .tile { display: none; width: 100%; min-height: var(--sc-tap-min, 44px); white-space: normal; }
       @container (max-width: 520px) { .inline { display: none; } .tile { display: flex; } }
       h3 { margin: 0; font: 600 1.1rem / 1.2 var(--sc-font-display); }
       .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sc-space-2, 8px); }
