@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.270.17] - 2026-11-15
+
+### Fixed
+- Data Uploader 0.81.2: the 25 ships that never got a 3D model (Galaxy, Polaris, Perseus, Salvation, the Constellations, all Vanguards, Vulture, Hull B, Blade, Guardian MX, San'tok.yāi …) now build one. The uploader runs a fixed geometry converter; every existing model stays exactly as it was, so nothing is rebuilt.
+
 ## [0.270.16] - 2026-11-15
 
 ### Fixed
