@@ -1,9 +1,9 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.7",
+  "current": "0.270.8",
   "releases": [
     {
-      "version": "0.270.7",
+      "version": "0.270.8",
       "date": "2026-11-15",
       "sections": [
         {
@@ -13,6 +13,22 @@
             {
               "title": "",
               "text": "The unused xAI (Grok) provider is gone: no more hourly xAI check, no Grok fallback for event summaries, and no xAI entry in the service list."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.270.7",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Hangar: every action button uses the shared action control — one main step per view, red tone for delete (#970)."
             }
           ]
         }
