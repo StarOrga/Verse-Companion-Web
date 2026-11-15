@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.270.13] - 2026-11-15
+
+### Fixed
+- Codex "New in": the hotfix build carries the live patch label (4.10.3) instead of the older branch name, entries are grouped by category with a header per block, and unnamed entries no longer show raw keys.
+
 ## [0.270.12] - 2026-11-15
 
 ### Changed

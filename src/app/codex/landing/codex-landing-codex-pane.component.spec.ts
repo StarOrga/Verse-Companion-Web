@@ -160,6 +160,7 @@ describe('Codex landing pane', () => {
       ],
       'armor',
       item('armor', 'I_armor'),
+      600,
     );
     settle();
     expect(rowsShown()).toEqual(['Tool 0', 'Ship 0', 'Ship 1', 'Gun 0']);
@@ -169,7 +170,7 @@ describe('Codex landing pane', () => {
     expect(host.querySelector('.ph')!.textContent).toContain('neu in');
   });
 
-  it('lists every completely new entry first, each with a "neu" tag, then the updated ones (#328)', () => {
+  it('groups the entries by category under its name, the active one first, each new before updated (#328, #360)', () => {
     const ships = entries(3, 'S', 'Ship').map((e, i) => ({ ...e, ...(i === 2 ? { isNew: true } : { updated: true }) }));
     const guns = entries(2, 'W', 'Gun').map((e, i) => ({ ...e, ...(i === 0 ? { isNew: true } : { updated: true }) }));
     const tools = entries(1, 'T', 'Tool').map((e) => ({ ...e, isNew: true }));
@@ -181,13 +182,16 @@ describe('Codex landing pane', () => {
       ],
       'fpsWeapon',
       null,
+      600,
     );
     settle();
-    expect(rowsShown()).toEqual(['Gun 0', 'Tool 0', 'Ship 2', 'Gun 1', 'Ship 0', 'Ship 1']);
-    const rows = Array.from(host.querySelectorAll<HTMLElement>('.new li:not(.cut)'));
+    expect(rowsShown()).toEqual(['Gun 0', 'Gun 1', 'Tool 0', 'Ship 2', 'Ship 0', 'Ship 1']);
+    const heads = Array.from(host.querySelectorAll<HTMLElement>('.new li.grp-cat .grp-nm')).map((n) => n.textContent!.trim());
+    expect(heads, 'the active block needs no header, its tab names it').toEqual(['Werkzeuge', 'Raumschiffe']);
+    const rows = Array.from(host.querySelectorAll<HTMLElement>('.new li:not(.cut):not(.grp)'));
     const fresh = rows.map((li) => !!li.querySelector('.upd.fresh'));
-    expect(fresh).toEqual([true, true, true, false, false, false]);
-    rows.slice(0, 3).forEach((li) => expect(li.querySelector('.upd.fresh')!.textContent!.trim()).toBe('neu'));
+    expect(fresh).toEqual([true, false, true, true, false, false]);
+    expect(rows[0].querySelector('.upd.fresh')!.textContent!.trim()).toBe('neu');
   });
 
   it('the more link names new & updated entries; in discovery mode it only says "weitere"', () => {
@@ -233,6 +237,29 @@ describe('Codex landing pane', () => {
     settle();
     expect(rowsShown()).toEqual(['Ship 0', 'Ship 1']);
     expect(host.querySelector('a.more')).toBeNull();
+  });
+
+  it('a tab with nothing new never seems to hold the ships: they stand under their own header (#360)', () => {
+    mount(
+      [
+        { category: 'ship', entries: entries(2, 'S', 'Ship').map((e) => ({ ...e, isNew: true })) },
+        { category: 'tool', entries: entries(3, 'T', 'Tool'), discover: true },
+      ],
+      'tool',
+      null,
+    );
+    settle();
+    const first = host.querySelector<HTMLElement>('.new li')!;
+    expect(first.classList).toContain('grp-cat');
+    expect(first.textContent).toContain('Raumschiffe');
+    expect(rowsShown()).toEqual(['Ship 0', 'Ship 1']);
+    expect(host.querySelector('.ph')!.textContent, 'a category header is no earlier patch').not.toContain('zuletzt');
+  });
+
+  it("the active category's own list needs no header", () => {
+    mount([{ category: 'ship', entries: entries(2, 'S', 'Ship') }], 'ship', null);
+    settle();
+    expect(host.querySelector('.new li.grp')).toBeNull();
   });
 
   it("\"+ N weitere\" counts only the active category; a click names the entry's own category", () => {

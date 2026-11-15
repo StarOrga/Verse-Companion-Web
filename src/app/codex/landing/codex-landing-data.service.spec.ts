@@ -3,7 +3,10 @@ import { LandingPaint } from './codex-landing-data.types';
 import {
   classCohort,
   dedupeByName,
+  entryName,
   factsFor,
+  landingName,
+  namedRows,
   withClassStats,
   isNewPaint,
   overviewFor,
@@ -109,6 +112,28 @@ describe('dedupeByName', () => {
   it('keeps distinct names and rows without a name', () => {
     const rows = [r('X', null), r('Y', null), r('Z', 'Zed')];
     expect(dedupeByName(rows).length).toBe(3);
+  });
+});
+
+describe('names on the landing (#360)', () => {
+  const r = (classNameSlug: string, nameLocalized: string | null) => ({ classNameSlug, nameLocalized });
+
+  it('takes a real display name, never a missing name, an @-key, the "!" marker or the class name', () => {
+    expect(landingName(r('GRIN_TractorBeam_S1', 'SureGrip S1 Tractor Beam'))).toBe('SureGrip S1 Tractor Beam');
+    expect(landingName(r('ANVL_Liberator_Thruster_Main', null))).toBeNull();
+    expect(landingName(r('asad_rifle_energy_01', '@item_Nameasad_rifle_energy_01'))).toBeNull();
+    expect(landingName(r('X_Armor', '! GERMAN TRANSLATION NOT FOUND !'))).toBeNull();
+    expect(landingName(r('DRAK_Marauder', 'drak_marauder'))).toBeNull();
+    expect(landingName(r('X', '   '))).toBeNull();
+  });
+
+  it('outside ships drops unnamed records; ships stay and fall back to a humanised name', () => {
+    const rows = [r('ANVL_Liberator_Thruster_Main', null), r('GRIN_TractorBeam_S1', 'SureGrip S1 Tractor Beam')];
+    expect(namedRows('component', rows).map((x) => x.classNameSlug)).toEqual(['GRIN_TractorBeam_S1']);
+    expect(namedRows('tool', rows).length).toBe(1);
+    expect(namedRows('ship', [r('ANVL_Liberator', null), r('RSI_Galaxy', 'RSI Galaxy')]).length).toBe(2);
+    expect(entryName(r('ANVL_Liberator', null))).toBe('ANVL Liberator');
+    expect(entryName(r('RSI_Galaxy', 'RSI Galaxy'))).toBe('RSI Galaxy');
   });
 });
 
