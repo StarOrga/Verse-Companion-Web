@@ -137,6 +137,7 @@ export const EVENTS = {
 
   // --- admin -------------------------------------------------------------
   'admin:tool_open': ev<{ tool: string }>('admin', 'Ein Admin-Werkzeug wurde geöffnet (Rolle steht als Person-Eigenschaft).'),
+  'admin:user_accept': ev<{ source: 'people_list' }>('admin', 'Ein Admin hat ein selbst registriertes, nie freigeschaltetes Konto in der Personenliste freigeschaltet (nie E-Mail oder Id).'),
 } as const;
 
 export type EventName = keyof typeof EVENTS;

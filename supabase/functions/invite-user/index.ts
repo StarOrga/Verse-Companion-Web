@@ -98,12 +98,8 @@ Deno.serve(withPosthog('invite-user', async (req: Request): Promise<Response> =>
   } = await userClient.auth.getUser();
   if (authErr || !user) return json({ error: 'unauthorized' }, 401);
 
-  const { data: callerProfile, error: profErr } = await userClient
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (profErr || callerProfile?.role !== 'admin') {
+  const { data: isAdmin, error: adminErr } = await userClient.rpc('is_admin');
+  if (adminErr || isAdmin !== true) {
     return json({ error: 'forbidden' }, 403);
   }
 
@@ -201,10 +197,30 @@ Deno.serve(withPosthog('invite-user', async (req: Request): Promise<Response> =>
     return json({ status: 'allowlisted', ok: true, email, role });
   }
 
+  // The sign-up gate (hook_before_user_created, migration 20261115233000) lets an
+  // e-mail account be created only while an admin invite for the address is in
+  // flight; this stamp is that signal. Not fatal on its own: before the
+  // migration the column does not exist, and afterwards a missing stamp makes
+  // the invite below fail with the hook's own error.
+  const { error: stampErr } = await adminClient
+    .from('allowed_emails')
+    .update({ invite_started_at: new Date().toISOString() })
+    .eq('email', email);
+  if (stampErr) console.warn('[invite-user] invite stamp not written:', stampErr.message);
+
   const { data: inviteData, error: inviteErr } =
     await adminClient.auth.admin.inviteUserByEmail(email, {
       redirectTo: INVITE_REDIRECT,
     });
+
+  // One-shot: the stamp only has to cover the invite call above. Cleared on
+  // success AND failure, so a failed invite leaves no window in which a
+  // password sign-up for the address would pass the gate.
+  const { error: clearErr } = await adminClient
+    .from('allowed_emails')
+    .update({ invite_started_at: null })
+    .eq('email', email);
+  if (clearErr && !stampErr) console.warn('[invite-user] invite stamp not cleared:', clearErr.message);
 
   if (inviteErr || !inviteData?.user) {
     const msg = inviteErr?.message ?? 'invite failed';

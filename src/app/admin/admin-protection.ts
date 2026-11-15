@@ -35,3 +35,12 @@ export function isRoleChangeBlocked(u: ProtectableUser, newRole: Role): boolean 
 export function isDeleteBlocked(u: ProtectableUser): boolean {
   return isProtectedAccount(u);
 }
+
+/**
+ * Was this account never approved (`profiles.is_approved = false`)? The RPC
+ * field is optional (the client deploys before the migration), so a missing or
+ * null value counts as approved — no pill, no action.
+ */
+export function isUnapprovedAccount(u: { is_approved?: boolean | null }): boolean {
+  return u.is_approved === false;
+}

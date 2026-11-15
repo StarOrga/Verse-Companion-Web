@@ -28,16 +28,20 @@ site_url = "http://localhost:4200"
 # redirect URL" (https://supabase.com/docs/guides/auth/redirect-urls).
 # Belt-and-suspenders: login.component also stashes cb+state in sessionStorage
 # so the round-trip survives even if the dashboard list lags behind this file.
+#
+# NEVER list a host we do not control, and never a `*.vercel.app` wildcard: a
+# redirect URL is where Supabase delivers the sign-in code, so whoever owns the
+# host can take over the session of anyone who follows a crafted sign-in link.
+# The two retired hosts (sc-companion, star-citizen-companion-website) became
+# free project names on Vercel when they were removed on 2026-11-08 and were
+# dropped from this list and from production on 2026-11-15, together with the
+# `https://*.vercel.app/**` entry production carried. Preview deployments
+# therefore return an OAuth sign-in to the production site; use password
+# sign-in there. See .claude/deep-knowledge/supabase.md § Sign-up gate.
 additional_redirect_urls = [
   "http://localhost:4200/news",
   "http://localhost:4200/uploader/auth",
   "http://localhost:4200/uploader/auth?**",
-  "https://sc-companion.vercel.app/news",
-  "https://sc-companion.vercel.app/uploader/auth",
-  "https://sc-companion.vercel.app/uploader/auth?**",
-  "https://star-citizen-companion-website.vercel.app/news",
-  "https://star-citizen-companion-website.vercel.app/uploader/auth",
-  "https://star-citizen-companion-website.vercel.app/uploader/auth?**",
   "https://versecompanion-alpha.vercel.app/news",
   "https://versecompanion-alpha.vercel.app/uploader/auth",
   "https://versecompanion-alpha.vercel.app/uploader/auth?**"
@@ -45,6 +49,15 @@ additional_redirect_urls = [
 jwt_expiry = 3600
 enable_signup = true
 enable_anonymous_sign_ins = false
+
+# Sign-up gate (migration 20261115233000): no account is created unless the
+# e-mail is on public.allowed_emails. Like the redirect list, this block only
+# configures the LOCAL stack; production has the same hook enabled in its auth
+# config (hook_before_user_created_enabled / _uri). To sign up a local user,
+# insert the address into public.allowed_emails first.
+[auth.hook.before_user_created]
+enabled = true
+uri = "pg-functions://postgres/public/hook_before_user_created"
 
 [auth.email]
 enable_signup = true

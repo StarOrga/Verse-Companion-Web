@@ -136,6 +136,7 @@
     "continueDiscord": "Mit Discord fortfahren",
     "inviteOnly": "Zugang nur auf Einladung. Bitte einen Admin um eine Einladung.",
     "deniedInvite": "Dieser Account wurde noch nicht eingeladen. Die Seite ist nur auf Einladung zugänglich — bitte einen Admin um eine Einladung.",
+    "deniedSignup": "Dieses Konto ist noch nicht freigeschaltet. Der Zugang ist nur auf Einladung möglich — bitte zuerst Zugang anfragen und dich danach erneut anmelden.",
     "unavailable": {
       "title": "Dein Zugang konnte nicht geprüft werden",
       "body": "Dein Profil ließ sich gerade nicht laden — meist ein kurzer Aussetzer direkt nach der Anmeldung. Du bist weiterhin angemeldet.",
@@ -3895,6 +3896,13 @@
       "copyFailed": "Link konnte nicht kopiert werden — bitte manuell kopieren."
     },
     "people": {
+      "unapproved": "Nicht freigeschaltet",
+      "unapprovedTip": "Dieses Konto hat sich selbst registriert, wurde nie freigeschaltet und hat keinen Zugriff auf die App.",
+      "approve": "Freischalten",
+      "approveTitle": "Konto freischalten?",
+      "approveConfirm": "{{email}} freischalten? Das Konto bekommt als Betrachter Zugriff auf die App; eine höhere Rolle vergibst du danach.",
+      "unapprovedOne": "{{n}} Konto ohne Freigabe",
+      "unapprovedMany": "{{n}} Konten ohne Freigabe",
       "title": "Personen",
       "subtitle": "Accounts und noch offene Einladungen in einer Liste. Eine Einladung verschwindet daraus, sobald sich die Adresse anmeldet.",
       "invitedPill": "Eingeladen",
@@ -7021,7 +7029,8 @@
         "cargo-ship": "Frachtschiff",
         "mining-ship": "Bergbauschiff",
         "medical-ship": "Medizinschiff",
-        "any-ship": "Beliebiges Schiff"
+        "any-ship": "Beliebiges Schiff",
+        "none": "Keine"
       },
       "progress": {
         "title": "Fortschritt",
