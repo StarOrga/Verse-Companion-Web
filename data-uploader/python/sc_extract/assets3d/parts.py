@@ -416,6 +416,9 @@ class PartStore:
             cmd += ["-mtl", os.path.relpath(mtl, mesh.parent).replace("\\", "/")]
         produced = mesh.with_suffix(".glb")
         produced.unlink(missing_ok=True)
+        # One line per converter call: it resets the host's stall watchdog
+        # before a part that may take minutes, and names the part if it hangs.
+        self.log("info", f"  convert {geometry_path}")
         with stage_timing.timed("convert"):
             r = subprocess.run(cmd, cwd=str(root), capture_output=True, timeout=600)
             if self._bad_material(r, produced) and material_path and self.exists(material_path):
