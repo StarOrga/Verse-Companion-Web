@@ -138,8 +138,8 @@ describe('NachschubTargetDialogComponent', () => {
 
   it('asks the aUEC goal for a sale into a new Nachschub and rejects an unusable goal', async () => {
     const { fixture, el, closed } = setup('sell');
-    expect(el.querySelector('input.input')).not.toBeNull();
-    const input = el.querySelector<HTMLInputElement>('input.input')!;
+    expect(el.querySelector('input.sc-input')).not.toBeNull();
+    const input = el.querySelector<HTMLInputElement>('input.sc-input')!;
     input.value = 'abc';
     input.dispatchEvent(new Event('input'));
     fixture.detectChanges();
@@ -163,7 +163,7 @@ describe('NachschubTargetDialogComponent', () => {
     expect(sellTargets.length).toBe(2);
     sellTargets[1].click();
     fixture.detectChanges();
-    expect(el.querySelector('input.input')).toBeNull();
+    expect(el.querySelector('input.sc-input')).toBeNull();
     primary(el).click();
     await fixture.whenStable();
     expect(addToNachschub).toHaveBeenCalledWith('b', expect.any(Array));

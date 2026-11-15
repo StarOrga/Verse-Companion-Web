@@ -78,15 +78,15 @@ describe('HqPlanComponent', () => {
 
     it('opens a new Nachschub while a slot is free, straight on its Einsätze (the selection is made already)', async () => {
       const el = await pick(3);
-      expect(el.querySelector('sc-hq-nachschub-flow .dlg-title')?.textContent).toContain('hq.flow.titleNew');
+      expect(el.querySelector('sc-hq-nachschub-flow .scp-title')?.textContent).toContain('hq.flow.titleNew');
       expect(el.querySelector('sc-hq-nachschub-flow .steps li.on b')?.textContent).toBe('2');
     });
 
     it('with all 7 slots taken it adds to an existing Nachschub instead of a doomed "new" flow', async () => {
       const el = await pick(7);
-      const title = el.querySelector('sc-hq-nachschub-flow .dlg-title');
+      const title = el.querySelector('sc-hq-nachschub-flow .scp-title');
       expect(title?.textContent).toContain('hq.flow.titleEdit');
-      expect(title?.querySelector('small')).toBeNull();
+      expect(el.querySelector('sc-hq-nachschub-flow .scp-st')?.textContent?.trim()).toBe('');
     });
   });
 
