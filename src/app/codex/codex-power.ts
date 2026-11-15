@@ -900,9 +900,15 @@ export function computePowerSheet(input: PowerSheetInput): PowerSheet {
   for (const g of groups) {
     columnShare.set(g.key, poweredColumns.has(g.key) ? (g.demand > 0 ? Math.min(1, g.allocated / g.demand) : 1) : -1);
   }
-  // F4 — every draw weighted by its column's share of the allocation.
-  const shareOf = (key: PowerColumnKey | null): number =>
-    key === null ? 1 : Math.max(0, columnShare.get(key) ?? 0);
+  // F4 — every draw weighted by its column's share of the allocation. Without
+  // a reactor budget there is no allocation to weigh by: the stated full-draw
+  // figures stand (cut columns still drop out).
+  const shareOf = (key: PowerColumnKey | null): number => {
+    if (key === null) return 1;
+    const share = columnShare.get(key) ?? 0;
+    if (share < 0) return 0;
+    return budgetTotal === null ? 1 : share;
+  };
   const coolantUsedRaw = round(entries.reduce((s, e) => s + e.draw.coolantConsume * shareOf(e.key), 0));
   const coolantTotalRaw = round(entries.reduce((s, e) => s + e.draw.coolantGenerate * shareOf(e.key), 0));
   const hasCoolantData = draws.some((d) => d.coolantGenerate > 0 || d.coolantConsume > 0);
