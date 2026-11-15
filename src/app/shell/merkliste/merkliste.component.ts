@@ -63,11 +63,11 @@ interface WishLine {
                 <span class="rt"><b>{{ l.row.title }}</b>@if (sub(l.row); as s) { <small>{{ s | translate }}</small> }</span>
               </a>
               <span class="step" role="group" [attr.aria-label]="'cart.qtyOf' | translate: { name: l.row.title }">
-                <button type="button" [disabled]="l.item.qty <= 1" [attr.aria-label]="'cart.less' | translate" (click)="bump(l.item, -1)">
+                <button type="button" [disabled]="l.item.qty <= 1" [attr.aria-label]="'cart.less' | translate" [scTooltip]="'cart.less' | translate" scTooltipTier="label" (click)="bump(l.item, -1)">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="minus[0]" /></svg>
                 </button>
                 <b>{{ l.item.qty }}</b>
-                <button type="button" [disabled]="l.item.qty >= 999" [attr.aria-label]="'cart.more' | translate" (click)="bump(l.item, 1)">
+                <button type="button" [disabled]="l.item.qty >= 999" [attr.aria-label]="'cart.more' | translate" [scTooltip]="'cart.more' | translate" scTooltipTier="label" (click)="bump(l.item, 1)">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="plus[0]" /></svg>
                 </button>
               </span>

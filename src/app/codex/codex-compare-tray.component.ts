@@ -53,8 +53,8 @@ interface PinnedRef {
               <li class="chip">
                 <a [routerLink]="['/codex', r.kind, r.className]" class="chip-link">{{ chipName(r) }}</a>
                 <button type="button" class="chip-x" (click)="remove(r.key)"
-                        [attr.aria-label]="'codex.compare.remove' | translate"
-                        [scTooltip]="'codex.compare.remove' | translate">×</button>
+                        [attr.aria-label]="'codex.compare.remove' | translate: { name: chipName(r) }"
+                        [scTooltip]="'codex.compare.remove' | translate: { name: chipName(r) }" scTooltipTier="label">×</button>
               </li>
             }
           </ul>
@@ -128,7 +128,7 @@ interface PinnedRef {
           </div>
           <ng-container popupActions>
             <button scAction type="button" [class.on]="diffOnly()" (click)="toggleDiffOnly()" [attr.aria-pressed]="diffOnly()">
-              {{ (diffOnly() ? 'codex.compare.showAll' : 'codex.compare.diffOnly') | translate }}
+              {{ 'codex.compare.diffOnly' | translate }}
             </button>
           </ng-container>
         </sc-popup>
@@ -161,7 +161,8 @@ interface PinnedRef {
     }
     .chip-link { color: var(--sc-fg-0); text-decoration: none; max-width: 280px; /* overlay-size: exception — a chip label, not the tray box */ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .chip-link:hover { color: var(--sc-accent); }
-    .chip-x { border: none; background: transparent; color: var(--sc-fg-2); cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0 4px; border-radius: 50%; }
+    .chip-x { border: none; background: transparent; color: var(--sc-fg-2); cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0 var(--sc-space-1); border-radius: 50%;
+      min-block-size: max(24px, var(--sc-tap-min)); min-inline-size: max(24px, var(--sc-tap-min)); }
     .chip-x:hover { color: var(--sc-accent); }
     .toggle { padding: 5px 14px; border-radius: 6px; background: color-mix(in srgb, var(--sc-accent) 16%, transparent); border: 1px solid var(--sc-accent); color: var(--sc-accent); font-family: var(--sc-font-display); font-size: max(0.72rem, var(--sc-fs-floor)); letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; }
     .toggle:hover { background: color-mix(in srgb, var(--sc-accent) 26%, transparent); }

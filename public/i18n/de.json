@@ -1855,12 +1855,11 @@
       "tray": "Vergleich ({{count}})",
       "open": "Vergleich öffnen",
       "clear": "Leeren",
-      "remove": "Entfernen",
+      "remove": "{{name}} entfernen",
       "property": "Eigenschaft",
       "close": "Schließen",
       "noCommon": "Keine vergleichbaren Werte für diese Auswahl.",
       "diffOnly": "Nur Unterschiede",
-      "showAll": "Alle Zeilen",
       "mixedKind": "Nur Gleiches mit Gleichem: im Tray liegen bereits {{kind}}-Einträge. Leeren, um etwas anderes zu vergleichen."
     },
     "portCategory": {

@@ -214,7 +214,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
   template: `
     @if (target(); as t) {
       <sc-popup kind="large" [title]="'codex.picker.title' | translate: { port: slotLabel(t), size: t.size ?? '' }"
-                [eyebrow]="eyebrow(t)" [initialFocus]="'first'" [bodyFill]="true" style="--sc-popup-body-gap: 10px"
+                [eyebrow]="eyebrow(t)" [initialFocus]="'first'" [bodyFill]="true" style="--sc-popup-body-gap: var(--sc-space-3)"
                 scPopupMotion="large" scPopupMotionPlate=".scp-frame" scPopupMotionFoot=".scp-f"
                 (closed)="dismiss()">
           <!-- sc-popup: focus in, Tab trap, Escape, focus back to the opener
@@ -544,9 +544,11 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
     .pick-cols { position: relative; align-self: flex-end; }
     .pick-cols-sum { cursor: pointer; padding: 6px 10px; border-radius: 6px; background: var(--sc-bg-0);
       border: 1px solid var(--sc-border); color: var(--sc-fg-1); font-size: max(0.76rem, var(--sc-fs-floor)); list-style: none; }
+    .pick-cols-sum { min-block-size: var(--sc-tap-min); }
+    .pick-cols-sum:focus-visible, .pc-reset:focus-visible, .fc button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
     .pick-cols-sum::-webkit-details-marker { display: none; }
     .pick-cols-pop { position: absolute; top: calc(100% + 4px); right: 0; z-index: 6; }
-    .pc-body { display: flex; flex-direction: column; gap: 3px; max-height: 320px; overflow-y: auto; }
+    .pc-body { display: flex; flex-direction: column; gap: 3px; max-height: min(320px, 45dvh); overflow-y: auto; }
     .pc-row { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
     .pc-row.off { color: var(--sc-fg-2); cursor: not-allowed; }
     /* LOW-6: the unavailable columns render as a disabled fieldset group, not
@@ -555,7 +557,8 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
       border-top: 1px dashed var(--sc-border); }
     .pc-unavail { margin: 0 0 2px; padding: 0; font-size: 11px; color: var(--sc-fg-2); font-style: italic; }
     .pc-reset { margin-top: 6px; padding: 4px 8px; border-radius: 4px; background: transparent;
-      border: 1px solid var(--sc-border); color: var(--sc-fg-2); font: inherit; font-size: 11px; cursor: pointer; align-self: flex-start; }
+      border: 1px solid var(--sc-border); color: var(--sc-fg-2); font: inherit; font-size: 11px; cursor: pointer; align-self: flex-start;
+      min-block-size: var(--sc-tap-min); }
 
     /* MEDIUM-5: the column-menu popover used to be an absolutely-positioned
        child of the th cell, so this scroll box had to drop its own clipping
@@ -639,7 +642,8 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
     .fc { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 999px;
       border: 1px solid color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0));
       background: color-mix(in srgb, var(--sc-accent) 10%, transparent); color: var(--sc-accent); font-size: 11px; }
-    .fc button { background: transparent; border: none; color: inherit; cursor: pointer; font: inherit; padding: 0; }
+    .fc button { background: transparent; border: none; color: inherit; cursor: pointer; font: inherit; padding: 0;
+      min-block-size: var(--sc-tap-min); min-inline-size: var(--sc-tap-min); }
 
     .pick-cues { display: flex; justify-content: space-between; font-size: 11px; color: var(--sc-fg-2); margin-top: 2px; }
 

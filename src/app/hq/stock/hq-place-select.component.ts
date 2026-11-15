@@ -64,8 +64,8 @@ import { type PlaceGroup, groupPlaces, placeInfo, placeSub } from './hq-stock-pl
       .srch { min-height: 32px; padding: 0 10px; border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-0); color: var(--sc-fg); font: inherit; font-size: 0.8rem; }
       .srch { inline-size: 100%; box-sizing: border-box; }
       .list { margin: 0; padding: 0; list-style: none; }
-      .sys { padding: 8px 8px 2px; color: var(--sc-fg-2); font: 600 0.62rem / 1 var(--sc-font-display, inherit); letter-spacing: .14em; text-transform: uppercase; }
-      .body { padding: 4px 8px 2px 14px; color: var(--sc-fg-2); font-size: 0.7rem; }
+      .sys { padding: 8px 8px 2px; color: var(--sc-fg-2); font: 600 max(0.62rem, var(--sc-fs-floor)) / 1 var(--sc-font-display, inherit); letter-spacing: .14em; text-transform: uppercase; }
+      .body { padding: 4px 8px 2px 14px; color: var(--sc-fg-2); font-size: max(0.7rem, var(--sc-fs-floor)); }
       .opt { display: flex; justify-content: space-between; gap: 10px; min-height: 32px; align-items: center; padding: 0 8px 0 20px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
       .opt:first-child { padding-left: 8px; }
       .opt b { color: var(--sc-fg-2); font-weight: 500; font-variant-numeric: tabular-nums; }

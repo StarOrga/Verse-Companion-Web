@@ -81,11 +81,11 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
                           </a>
                           <span class="foot">
                             <span class="step" role="group" [attr.aria-label]="'cart.qtyOf' | translate: { name: cart.nameOf(it) }">
-                              <button type="button" [disabled]="it.qty <= 1" [attr.aria-label]="'cart.less' | translate" (click)="bump(it, -1)">
+                              <button type="button" [disabled]="it.qty <= 1" [attr.aria-label]="'cart.less' | translate" [scTooltip]="'cart.less' | translate" scTooltipTier="label" (click)="bump(it, -1)">
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="minus[0]" /></svg>
                               </button>
                               <b>{{ it.qty }}@if (it.kind === 'material') { <small class="unit"> {{ 'blueprint.detail.unitScu' | translate }}</small> }</b>
-                              <button type="button" [disabled]="it.qty >= 999" [attr.aria-label]="'cart.more' | translate" (click)="bump(it, 1)">
+                              <button type="button" [disabled]="it.qty >= 999" [attr.aria-label]="'cart.more' | translate" [scTooltip]="'cart.more' | translate" scTooltipTier="label" (click)="bump(it, 1)">
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="plus[0]" /></svg>
                               </button>
                             </span>
@@ -156,9 +156,9 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       .cart-status { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; justify-content: flex-end; }
       .cart-sum { color: var(--sc-fg-2); }
       .full-hint { color: var(--sc-fg-2); font-size: max(0.82rem, var(--sc-fs-floor, 0.75rem)); max-width: 46ch; }
-      .cart-body { display: flex; flex-direction: column; gap: 14px; }
+      .cart-body { display: flex; flex-direction: column; gap: var(--sc-space-4); }
       .groups { flex: none; }
-      .sugs { flex: none; margin-top: 14px; }
+      .sugs { flex: none; margin-top: var(--sc-space-4); }
       .groups { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
       .group {
         --n: 1; flex: var(--n) 1 calc(var(--n) * 168px); min-width: min(100%, 168px); display: flex; flex-direction: column;
@@ -183,7 +183,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       .foot { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; gap: 4px; }
       .step { display: inline-flex; align-items: center; border: 1px solid var(--sc-border); border-radius: 999px; overflow: hidden; }
       .step button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; background: transparent; color: var(--sc-fg-1); cursor: pointer; }
-      .step button:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); }
+      @media (hover: hover) { .step button:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); } }
       .step button:disabled { opacity: 0.4; cursor: default; }
       .step button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
       .step svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
@@ -197,7 +197,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       .chk:checked::after { content: ''; width: 5px; height: 10px; border: solid var(--sc-bg-0); border-width: 0 2.4px 2.4px 0; transform: translateY(-1px) rotate(45deg); }
       .chk:indeterminate::after { content: ''; width: 10px; height: 2.4px; background: var(--sc-bg-0); border-radius: 2px; }
       .chk:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-      .sugs { padding: 10px 14px 12px; border: 1px solid color-mix(in srgb, var(--sc-warning) 35%, transparent); border-radius: 12px; background: linear-gradient(90deg, color-mix(in srgb, var(--sc-warning) 7%, transparent), transparent); }
+      .sugs { padding: var(--sc-space-3) var(--sc-space-4); border: 1px solid color-mix(in srgb, var(--sc-warning) 35%, transparent); border-radius: 12px; background: linear-gradient(90deg, color-mix(in srgb, var(--sc-warning) 7%, transparent), transparent); }
       .s-head { margin: 0 0 8px; font: 600 0.78rem/1.2 var(--sc-font-display, inherit); letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-warning); }
       .s-head small { font: 500 0.78rem var(--sc-font-body, inherit); letter-spacing: 0; text-transform: none; color: var(--sc-fg-2); margin-left: 6px; }
       .s-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -217,8 +217,13 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
         .group { flex-basis: 100%; }
         .s-row { grid-template-columns: 1fr; }
       }
+      /* Phone: 1-2 tile columns instead of --n, so the stepper + remove row fits a tile. */
+      @media (max-width: 749px) {
+        .tiles { grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); }
+      }
       @media (pointer: coarse), (max-width: 749px) {
         .step button { width: 44px; height: 44px; }
+        .foot { flex-wrap: wrap; }
         .chk { width: 24px; height: 24px; }
       }
     `,

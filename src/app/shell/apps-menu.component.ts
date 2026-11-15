@@ -146,10 +146,10 @@ export interface AppEntry {
     .txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
     .txt strong { font-family: var(--sc-font-display); font-size: 0.86rem; font-weight: 600; }
     .desc {
-      font-size: 0.76rem; line-height: 1.35; color: var(--sc-fg-2);
+      font-size: max(0.76rem, var(--sc-fs-floor)); line-height: 1.35; color: var(--sc-fg-2);
       display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
     }
-    .meta { font-size: 0.72rem; color: var(--sc-fg-2); font-variant-numeric: tabular-nums; }
+    .meta { font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2); font-variant-numeric: tabular-nums; }
     .entry.elevated { margin-top: 4px; border-top: 1px solid color-mix(in srgb, var(--sc-accent-collab) 40%, transparent); border-radius: 0 0 8px 8px; }
     .entry.elevated .ico { color: var(--sc-accent-collab); background: color-mix(in srgb, var(--sc-accent-collab) 14%, transparent); }
     .entry.elevated strong { color: var(--sc-accent-collab); }
@@ -157,7 +157,7 @@ export interface AppEntry {
     .entry.elevated:focus-visible { box-shadow: inset 0 0 0 2px var(--sc-accent-collab); }
     .hint {
       margin: 4px 0 0; padding: 8px 10px 4px; border-top: 1px solid var(--sc-border);
-      font-size: 0.72rem; line-height: 1.4; color: var(--sc-fg-2);
+      font-size: max(0.72rem, var(--sc-fs-floor)); line-height: 1.4; color: var(--sc-fg-2);
     }
     /* Phones: the Apps button leaves the header (desktop apps are not installable there). */
     @media (max-width: 749px) { :host { display: none; } }

@@ -1855,12 +1855,11 @@
       "tray": "Compare ({{count}})",
       "open": "Open comparison",
       "clear": "Clear",
-      "remove": "Remove",
+      "remove": "Remove {{name}}",
       "property": "Property",
       "close": "Close",
       "noCommon": "No comparable values for this mix of entries.",
       "diffOnly": "Differences only",
-      "showAll": "All rows",
       "mixedKind": "Like-for-like only: the tray already holds {{kind}} entries. Clear it to compare something else."
     },
     "portCategory": {
