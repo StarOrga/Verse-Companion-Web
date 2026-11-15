@@ -1,0 +1,98 @@
+{
+  "concept": "20261115-0215-popup-animation",
+  "iterations": [
+    {
+      "iteration": 1,
+      "action": "iterate",
+      "favorite": "d1",
+      "decisions": [
+        {
+          "id": "r1-dur",
+          "value": "staged",
+          "rec": "short",
+          "deviates": true
+        },
+        {
+          "id": "r1-close",
+          "value": "own",
+          "rec": "own",
+          "deviates": false
+        },
+        {
+          "id": "r1-stagger",
+          "value": "short",
+          "rec": "short",
+          "deviates": false
+        },
+        {
+          "id": "r1-origin",
+          "value": "anchored",
+          "rec": "anchored",
+          "deviates": false
+        },
+        {
+          "id": "r1-input",
+          "value": "now",
+          "rec": "now",
+          "deviates": false
+        },
+        {
+          "id": "r1-interrupt",
+          "value": "continue",
+          "rec": "continue",
+          "deviates": false
+        },
+        {
+          "id": "r1-scope",
+          "value": [
+            "menus",
+            "dialogs",
+            "large",
+            "toasts",
+            "overlay",
+            "search",
+            "panels"
+          ],
+          "rec": "menus dialogs large toasts overlay search panels",
+          "deviates": false,
+          "note": "beim bildbetrachter gern auch nochmal rkrtitisch die animation reviewen sollte ähnlich sein nur eher zoom charakter aber halt auch holografisch !"
+        },
+        {
+          "id": "r1-reduced",
+          "value": "none",
+          "rec": "fade",
+          "deviates": true
+        },
+        {
+          "id": "r1-phone",
+          "value": "full",
+          "rec": "sheet",
+          "deviates": true,
+          "note": "naja, eingie buttons sind ja oben,  wenn man die drückt kommt ein popup / popout, dann wäre ein blatt von unten  komisch, gern eine vollbild überblendung mti ggf. animation di ändlich ist und wenn möglich auch von der quelle des klicks (wenn es eine gibt kommt wie in dekstop!)"
+        }
+      ],
+      "annotations": [
+        {
+          "id": "r1-d1-menu-a1",
+          "answer": "sehr gut!"
+        },
+        {
+          "id": "r1-d1-menu-a2",
+          "answer": "etwas länger ein ticken wäre ok, was ich doof finde sind die horizontalen vielen sacan linien bevor der eigentliche inhalt erschient. Gern das nochmal reviewen, gern eine bessere, alternative dafür speeeeziell finden"
+        },
+        {
+          "id": "r1-d1-dlg-a3",
+          "answer": "sehr gut!"
+        },
+        {
+          "id": "r1-d1-big-a4",
+          "answer": "sehr gut, aber bitte wie ein hologramm hochwertig und nciht wie   ein grk lag"
+        }
+      ],
+      "screens": {
+        "d1-toast": "top"
+      },
+      "response": "Round 2: favourite Hologramm-Projektion kept (spark, light line, collapse to line). Three takes of the materialisation replacing the scanlines (Lichtgitter, Vektor-Aufriss, Interferenz-Welle); rows as soft light edge without flicker; timings 300/500/900 ms; new pages Bildbetrachter (holo zoom from thumbnail) and Handy (fullscreen from the button). No analysis view: every round-1 question answered."
+    }
+  ]
+}
