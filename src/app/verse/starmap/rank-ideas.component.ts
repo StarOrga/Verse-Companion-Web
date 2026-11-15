@@ -3,6 +3,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { RoleService } from '../../auth/role.service';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
+import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { VerseApiService } from '../data/verse-api.service';
 import type { VerseRankIdea } from '../data/verse.models';
 import { RANK_TIER_AT, RANK_TIER_KEYS } from './starmap.model';
@@ -23,12 +24,12 @@ export const IDEA_MIN = 3;
 @Component({
   selector: 'sc-rank-ideas',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, ScActionDirective],
+  imports: [TranslatePipe, ScActionDirective, ScTooltipDirective],
   template: `
     @if (load() !== 'absent') {
       <section class="ideas" aria-labelledby="ri-title">
         <h4 id="ri-title">{{ 'starmap.ideas.title' | translate }}</h4>
-        <p class="muted small">{{ 'starmap.ideas.lead' | translate }}</p>
+        <p class="muted lead">{{ 'starmap.ideas.lead' | translate }}</p>
 
         @if (open()) {
           <form class="compose" (submit)="$event.preventDefault(); submit()">
@@ -42,7 +43,10 @@ export const IDEA_MIN = 3;
             @if (status(); as s) { <p class="small" [class.err]="statusError()" role="status">{{ s | translate }}</p> }
           </form>
         } @else {
-          <p class="muted lock">{{ 'starmap.ideas.locked' | translate: { name: (tierName | translate), stars: needStars } }}</p>
+          <p class="lock">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><rect x="3" y="7" width="10" height="7" rx="1.5" /><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" /></svg>
+            <span>{{ 'starmap.ideas.locked' | translate: { name: (tierName | translate), stars: needStars } }}</span>
+          </p>
         }
 
         @if (load() === 'error') {
@@ -65,7 +69,10 @@ export const IDEA_MIN = 3;
                   <span class="votes muted small">{{ 'starmap.ideas.votes' | translate: { count: i.votes } }}</span>
                 }
                 @if (isAdmin() && !i.archived) {
-                  <button type="button" scAction tier="secondary" tone="hot" [busy]="archiving() === i.id" (click)="archive(i)">{{ 'starmap.ideas.archive' | translate }}</button>
+                  <button type="button" scAction tier="tertiary" tone="hot" [busy]="archiving() === i.id" (click)="archive(i)"
+                          [attr.aria-label]="'starmap.ideas.archive' | translate" [scTooltip]="'starmap.ideas.archive' | translate" scTooltipTier="label">
+                    <svg class="ico" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><rect x="2" y="3" width="12" height="3" rx="1" /><path d="M3 6v7h10V6M6.5 9h3" /></svg>
+                  </button>
                 }
               </li>
             } @empty {
@@ -81,7 +88,14 @@ export const IDEA_MIN = 3;
     `
       :host { display: block; align-self: stretch; }
       .ideas { display: flex; flex-direction: column; gap: var(--sc-gap-2); }
-      h4 { font: 600 0.85rem var(--sc-font-display); margin: var(--sc-gap-2) 0 0; color: var(--sc-fg-0); }
+      h4 { font: 600 0.9rem var(--sc-font-display); margin: 0; color: var(--sc-fg-0); }
+      .lead { font-size: 0.85rem; line-height: 1.45; margin-top: -4px; max-width: var(--sc-measure, 62ch); }
+      /* Locked: a quiet hint, not an error - dashed outline, muted text, small lock. */
+      .lock { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: 10px; font-size: 0.8rem; line-height: 1.45;
+        color: var(--sc-fg-2); border: 1px dashed color-mix(in srgb, var(--sc-fg-2) 35%, transparent);
+        background: color-mix(in srgb, var(--sc-bg-0) 35%, transparent); max-width: var(--sc-measure, 62ch); }
+      .lock svg { flex: none; margin-top: 2px; fill: none; stroke: currentColor; stroke-width: 1.4; }
+      .ico { fill: none; stroke: currentColor; stroke-width: 1.4; }
       p { margin: 0; }
       .muted { color: var(--sc-fg-2); }
       .small { font-size: 0.75rem; }
@@ -94,7 +108,9 @@ export const IDEA_MIN = 3;
       .compose textarea[aria-invalid='true'] { border-color: var(--sc-warning); }
       .row { display: flex; align-items: center; gap: var(--sc-gap-2); }
       .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-      .list li { display: flex; align-items: center; gap: var(--sc-gap-2); flex-wrap: wrap; padding: 6px 0; border-bottom: 1px solid var(--sc-border); }
+      .list li { display: flex; align-items: center; gap: var(--sc-gap-2); flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--sc-border); font-size: 0.85rem; }
+      .list li:last-child { border-bottom: 0; }
+      .vote { min-width: 64px; font-variant-numeric: tabular-nums; }
       .body { flex: 1 1 14rem; overflow-wrap: anywhere; color: var(--sc-fg-1); }
       .vote.on { border-color: var(--sc-accent); color: var(--sc-accent); }
       .archived .body { color: var(--sc-fg-2); text-decoration: line-through; }
