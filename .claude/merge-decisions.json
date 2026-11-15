@@ -492,6 +492,16 @@
         "hunks": [
           "0a1b232b53f3"
         ]
+      },
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "regenerated from the merged CHANGELOG (0.270.0 is this release)",
+        "decided": true,
+        "at": "2026-11-15T05:53:43.708Z",
+        "hunks": [
+          "2b4701e35b79"
+        ]
       }
     ],
     "public/release-notes.json›current›version": [
