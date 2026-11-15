@@ -3896,6 +3896,13 @@
       "copyFailed": "Could not copy the link — copy it manually."
     },
     "people": {
+      "unapproved": "Not approved",
+      "unapprovedTip": "This account signed up on its own, was never approved and has no access to the app.",
+      "approve": "Approve",
+      "approveTitle": "Approve account?",
+      "approveConfirm": "Approve {{email}}? The account gets access to the app with its current role.",
+      "unapprovedOne": "{{n}} account not approved",
+      "unapprovedMany": "{{n}} accounts not approved",
       "title": "People",
       "subtitle": "Accounts and still-open invitations in one list. An invitation drops out of it the moment the address signs in.",
       "invitedPill": "Invited",

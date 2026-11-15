@@ -3896,6 +3896,13 @@
       "copyFailed": "Link konnte nicht kopiert werden — bitte manuell kopieren."
     },
     "people": {
+      "unapproved": "Nicht freigeschaltet",
+      "unapprovedTip": "Dieses Konto hat sich selbst registriert, wurde nie freigeschaltet und hat keinen Zugriff auf die App.",
+      "approve": "Freischalten",
+      "approveTitle": "Konto freischalten?",
+      "approveConfirm": "{{email}} freischalten? Das Konto bekommt mit seiner aktuellen Rolle Zugriff auf die App.",
+      "unapprovedOne": "{{n}} Konto ohne Freigabe",
+      "unapprovedMany": "{{n}} Konten ohne Freigabe",
       "title": "Personen",
       "subtitle": "Accounts und noch offene Einladungen in einer Liste. Eine Einladung verschwindet daraus, sobald sich die Adresse anmeldet.",
       "invitedPill": "Eingeladen",
