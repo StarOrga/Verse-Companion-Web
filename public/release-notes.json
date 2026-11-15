@@ -1,9 +1,9 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.9",
+  "current": "0.270.10",
   "releases": [
     {
-      "version": "0.270.9",
+      "version": "0.270.10",
       "date": "2026-11-15",
       "sections": [
         {
@@ -13,6 +13,44 @@
             {
               "title": "",
               "text": "Desktop app: signing in from Verse Companion versions up to 0.109.1 no longer ends on the 404 page — /desktop/connect forwards to /apps/starscape/connect and keeps the sign-in handoff (cb, state)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.270.9",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The \"new version\" notice is now a toast in the bottom-right stack (like undo), stays until you reload."
+            },
+            {
+              "title": "",
+              "text": "All toasts line up with the round buttons at the bottom right; on phones they share one edge with the compare tray."
+            },
+            {
+              "title": "",
+              "text": "The compare tray uses the same frame as the toasts and shows real names in its chips."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Popups (undo, apps, wishlist) no longer show square corners around their rounded frame."
+            },
+            {
+              "title": "",
+              "text": "Popup side rails no longer show a generic stand-in icon; only a fitting icon or a thin accent edge."
             }
           ]
         }

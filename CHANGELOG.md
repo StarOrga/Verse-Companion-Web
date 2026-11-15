@@ -4,10 +4,21 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.270.9] - 2026-11-15
+## [0.270.10] - 2026-11-15
 
 ### Fixed
 - Desktop app: signing in from Verse Companion versions up to 0.109.1 no longer ends on the 404 page — /desktop/connect forwards to /apps/starscape/connect and keeps the sign-in handoff (cb, state).
+
+## [0.270.9] - 2026-11-15
+
+### Changed
+- The "new version" notice is now a toast in the bottom-right stack (like undo), stays until you reload.
+- All toasts line up with the round buttons at the bottom right; on phones they share one edge with the compare tray.
+- The compare tray uses the same frame as the toasts and shows real names in its chips.
+
+### Fixed
+- Popups (undo, apps, wishlist) no longer show square corners around their rounded frame.
+- Popup side rails no longer show a generic stand-in icon; only a fitting icon or a thin accent edge.
 
 ## [0.270.8] - 2026-11-15
 
