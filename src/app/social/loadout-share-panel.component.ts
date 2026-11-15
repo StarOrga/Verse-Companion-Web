@@ -17,6 +17,7 @@ import { LoadoutShareService } from './loadout-share.service';
 import { SocialService } from './social.service';
 import { friendPath } from './social.types';
 import { LoadoutShareRow, isLinkShare, shareLinkFor } from './loadout-share.types';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /**
  * "Share this loadout" — friends and/or a public link (feedback cf0ddf7d
@@ -32,7 +33,7 @@ import { LoadoutShareRow, isLinkShare, shareLinkFor } from './loadout-share.type
 @Component({
   selector: 'sc-loadout-share-panel',
   standalone: true,
-  imports: [TranslatePipe, ScDatePipe, ScSelectComponent, RouterLink],
+  imports: [ScActionDirective, TranslatePipe, ScDatePipe, ScSelectComponent, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="sc-card share-card">
@@ -69,7 +70,7 @@ import { LoadoutShareRow, isLinkShare, shareLinkFor } from './loadout-share.type
                 </span>
                 <button
                   type="button"
-                  class="sc-btn micro"
+                  scAction tier="secondary"
                   [disabled]="shares.busy()"
                   (click)="revoke(s.id)">
                   {{ 'share.revoke' | translate }}
@@ -91,7 +92,7 @@ import { LoadoutShareRow, isLinkShare, shareLinkFor } from './loadout-share.type
             />
             <button
               type="button"
-              class="sc-btn sc-btn-primary"
+              scAction tier="primary"
               [disabled]="shares.busy() || !pickedFriend()"
               (click)="shareWithFriend()">
               {{ 'share.friends.share' | translate }}
@@ -120,7 +121,7 @@ import { LoadoutShareRow, isLinkShare, shareLinkFor } from './loadout-share.type
             />
             <button
               type="button"
-              class="sc-btn sc-btn-primary"
+              scAction tier="secondary"
               [disabled]="shares.busy() || groupBusy() || !pickedGroup()"
               (click)="shareWithGroup()">
               {{ 'share.groups.share' | translate }}
@@ -144,17 +145,17 @@ import { LoadoutShareRow, isLinkShare, shareLinkFor } from './loadout-share.type
               [value]="linkUrl()"
               [attr.aria-label]="'share.link.url' | translate"
               (focus)="selectAll($event)" />
-            <button type="button" class="sc-btn" (click)="copy()">
+            <button type="button" scAction tier="secondary" (click)="copy()">
               {{ (copied() ? 'share.link.copied' : 'share.link.copy') | translate }}
             </button>
             <!-- A real anchor: middle click and "open in new tab" are browser
                  features that only work on one. -->
-            <a class="sc-btn" [href]="linkUrl()" target="_blank" rel="noopener noreferrer">
+            <a scAction tier="secondary" [href]="linkUrl()" target="_blank" rel="noopener noreferrer">
               {{ 'share.link.open' | translate }}
             </a>
             <button
               type="button"
-              class="sc-btn micro danger"
+              scAction tier="secondary" tone="danger"
               [disabled]="shares.busy()"
               (click)="revoke(l.id)">
               {{ 'share.link.revoke' | translate }}
@@ -164,7 +165,7 @@ import { LoadoutShareRow, isLinkShare, shareLinkFor } from './loadout-share.type
         } @else if (!loading()) {
           <button
             type="button"
-            class="sc-btn sc-btn-primary"
+            scAction tier="secondary"
             [disabled]="shares.busy()"
             (click)="createLink()">
             {{ 'share.link.create' | translate }}
@@ -228,32 +229,8 @@ import { LoadoutShareRow, isLinkShare, shareLinkFor } from './loadout-share.type
     .sc-select { flex: 1 1 180px; min-width: 0; }
     .text-input:focus { outline: none; border-color: var(--sc-accent); }
 
-    .sc-btn {
-      padding: 8px 14px;
-      border-radius: 6px;
-      background: var(--sc-bg-1);
-      border: 1px solid var(--sc-accent);
-      color: var(--sc-accent);
-      font-family: var(--sc-font-display);
-      font-size: max(0.72rem, var(--sc-fs-floor));
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      cursor: pointer;
-    }
-    .sc-btn:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
-    .sc-btn:disabled { opacity: 0.5; cursor: default; }
-    .sc-btn.sc-btn-primary { background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-    .sc-btn.micro { padding: 5px 10px; font-size: max(0.66rem, var(--sc-fs-floor)); }
-    .sc-btn.danger { border-color: var(--sc-danger); color: var(--sc-danger); }
-    .sc-btn.danger:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-
-    /* 48px, not 44: two overlapping scale(0.994) shell animations shave a
-       hair off every measured box, so a 44px target measures 43. */
     @media (pointer: coarse) {
-      .sc-btn, .text-input { min-height: 48px; }
+      .text-input { min-height: 48px; }
     }
     @media (max-width: 560px) {
       .pick-row, .link-row { flex-direction: column; align-items: stretch; }
@@ -261,8 +238,8 @@ import { LoadoutShareRow, isLinkShare, shareLinkFor } from './loadout-share.type
          axis — so the "flex: 1 1 260px" above would become a 260px-TALL
          input. Reset the basis before it becomes a height. */
       .link-row .text-input, .pick-row .sc-select { flex: 0 0 auto; width: 100%; }
-      .pick-row .sc-btn, .link-row .sc-btn { width: 100%; justify-content: center; }
-      .share-row .sc-btn { width: 100%; justify-content: center; }
+      .pick-row .sc-action, .link-row .sc-action { width: 100%; justify-content: center; }
+      .share-row .sc-action { width: 100%; justify-content: center; }
     }
   `],
 })

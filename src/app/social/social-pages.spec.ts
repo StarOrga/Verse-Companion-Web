@@ -284,7 +284,7 @@ describe('SocialInviteLandingComponent', () => {
       redeem_friend_invite: () => ({ verdict: 'accepted', user_id: 'a', display_name: null, username: 'pilot_a' }),
     }, [route(TOKEN), auth(true)]);
     const { fixture, el } = await mount(SocialInviteLandingComponent);
-    el.querySelector<HTMLButtonElement>('button.sc-btn-primary')?.click();
+    el.querySelector<HTMLButtonElement>('button.sc-action--primary')?.click();
     await settle(fixture);
     expect(rpc).toHaveBeenCalledWith('redeem_friend_invite', { p_token: TOKEN });
     expect(el.querySelector('a[href="/social/pilot_a"]')).not.toBeNull();
