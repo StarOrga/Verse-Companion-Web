@@ -25,19 +25,17 @@ describe('FusionSearchChipComponent — X takes room only on hover / focus', () 
     fixture.nativeElement.remove();
   });
 
-  it('widens for the X once the chip holds focus', async () => {
+  it('widens for the X in its revealed state (hover / focus-within / open share one rule)', async () => {
     const fixture = mount();
-    const cx = remove(fixture.nativeElement);
-    const idle = (fixture.nativeElement as HTMLElement).getBoundingClientRect().width;
-    cx.focus();
-    // :focus-within only matches while the test page itself holds focus; a full parallel run can steal it.
-    if (!document.hasFocus()) {
-      fixture.nativeElement.remove();
-      return;
-    }
+    const host = fixture.nativeElement as HTMLElement;
+    const cx = remove(host);
+    const idle = host.getBoundingClientRect().width;
+    // Hover and :focus-within cannot be driven reliably in a headless runner; the open state uses
+    // the very same selector list, so it proves the revealed geometry deterministically.
+    host.classList.add('open');
     for (let i = 0; i < 20 && cx.getBoundingClientRect().width <= 15; i++) await wait(50);
     expect(cx.getBoundingClientRect().width).toBeGreaterThan(15);
-    expect((fixture.nativeElement as HTMLElement).getBoundingClientRect().width).toBeGreaterThan(idle);
-    fixture.nativeElement.remove();
+    expect(host.getBoundingClientRect().width).toBeGreaterThan(idle);
+    host.remove();
   });
 });
