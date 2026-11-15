@@ -5814,7 +5814,7 @@
   "conceptPage": {
     "title": "Concept page",
     "back": "Back to feedback",
-    "openTab": "Open in new tab",
+    "retry": "Try again",
     "loading": "Opening the concept page…",
     "forbidden": "This concept page is only available to admins.",
     "notFound": "This concept page does not exist (any more).",

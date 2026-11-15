@@ -2,15 +2,15 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
-import { ConceptPageComponent, conceptFrameUrl } from './concept-page.component';
+import { CONCEPT_FRAME_NAVIGATE, ConceptPageComponent, conceptFrameUrl } from './concept-page.component';
 import { ConceptPageService, ConceptTicket, ConceptTicketFailure } from './concept-page.service';
+import { renderFeedbackBody } from '../feedback/markdown.util';
 
 /**
- * `/concept/:id` (admin feedback #224): the page mints a ticket for the
- * concept id and frames the app's loader for the document the edge function
- * serves (#330). It never
- * renders concept content itself, so the assertions are about the frame
- * and the three failure copies.
+ * `/concept/:id` (admin feedback #224, full-screen since e4428abd): the route
+ * mints a ticket and replaces itself with the app's loader for the document
+ * the edge function serves (#330) — no in-app page, no sub-header, no iframe.
+ * What it still renders are the failure copies.
  */
 const ID = '2c8f6c5e-0b8d-4d7e-9c7a-4d9f1e2a3b4c';
 const TICKET: ConceptTicket = {
@@ -20,6 +20,7 @@ const TICKET: ConceptTicket = {
 };
 
 async function mount(mint: () => Promise<ConceptTicket>) {
+  const navigate = vi.fn().mockName('navigate');
   await TestBed.configureTestingModule({
     imports: [ConceptPageComponent],
     providers: [
@@ -27,13 +28,14 @@ async function mount(mint: () => Promise<ConceptTicket>) {
       provideTranslateService({ fallbackLang: 'en' }),
       { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({ id: ID })) } },
       { provide: ConceptPageService, useValue: { mintTicket: mint } },
+      { provide: CONCEPT_FRAME_NAVIGATE, useValue: navigate },
     ],
   }).compileComponents();
   const fixture = TestBed.createComponent(ConceptPageComponent);
   fixture.detectChanges();
   await fixture.whenStable();
   fixture.detectChanges();
-  return { fixture, cmp: fixture.componentInstance, el: fixture.nativeElement as HTMLElement };
+  return { fixture, navigate, cmp: fixture.componentInstance, el: fixture.nativeElement as HTMLElement };
 }
 
 describe('ConceptPageComponent', () => {
@@ -47,50 +49,57 @@ describe('ConceptPageComponent', () => {
     expect(decodeURIComponent(frame.split('#')[1])).toBe(TICKET.url);
   });
 
-  it('frames the loader for the ticketed document once the ticket is minted (#330)', async () => {
+  it('goes straight to the full-screen loader once the ticket is minted (e4428abd)', async () => {
     const mint = vi.fn().mockName('mintTicket').mockResolvedValue(TICKET);
-    const { cmp, el } = await mount(mint);
+    const { navigate, el } = await mount(mint);
 
     expect(mint).toHaveBeenCalledWith(ID);
-    expect(cmp.state()).toBe('ready');
-    const frame = el.querySelector('iframe.frame') as HTMLIFrameElement | null;
-    expect(frame).not.toBeNull();
+    expect(navigate).toHaveBeenCalledTimes(1);
+    expect(navigate).toHaveBeenCalledWith(conceptFrameUrl(ID, TICKET.url));
     // Never the function URL itself: Supabase serves its html as text/plain.
-    expect(frame!.getAttribute('src')).toBe(conceptFrameUrl(ID, TICKET.url));
-    expect(frame!.getAttribute('src')).not.toMatch(/^https:/);
-    // The document runs its own scripts and same-origin fetches, nothing more.
-    expect(frame!.getAttribute('sandbox')).toContain('allow-scripts');
-    expect(frame!.getAttribute('sandbox')).toContain('allow-same-origin');
-    expect(frame!.getAttribute('referrerpolicy')).toBe('no-referrer');
-    expect(el.querySelector('.title')?.textContent?.trim()).toBe('Layout Bewaffnung');
-  });
-
-  it('keeps every navigation a real anchor', async () => {
-    const { el } = await mount(() => Promise.resolve(TICKET));
-    const back = el.querySelector('a.back') as HTMLAnchorElement | null;
-    expect(back).not.toBeNull();
-    expect(back!.getAttribute('href')).toBe('/admin/feedback');
-    const open = el.querySelector('a.open') as HTMLAnchorElement | null;
-    expect(open).not.toBeNull();
-    expect(open!.getAttribute('href')).toBe(conceptFrameUrl(ID, TICKET.url));
-    expect(open!.getAttribute('target')).toBe('_blank');
-    expect(open!.getAttribute('rel')).toContain('noopener');
-  });
-
-  it('shows the admin-only copy and no frame when the function refuses', async () => {
-    const { cmp, el } = await mount(() => Promise.reject(new ConceptTicketFailure('forbidden')));
-    expect(cmp.state()).toBe('forbidden');
+    expect(navigate.mock.calls[0][0]).not.toMatch(/^https:/);
+    // No intermediate page: no frame, no header, no "open in new tab".
     expect(el.querySelector('iframe')).toBeNull();
+    expect(el.querySelector('header')).toBeNull();
     expect(el.querySelector('a.open')).toBeNull();
-    expect(el.querySelector('.msg.err')?.textContent).toContain('conceptPage.forbidden');
   });
 
-  it('tells a missing concept apart from a broken one', async () => {
+  it('shows the admin-only copy, a real back anchor and never leaves when the function refuses', async () => {
+    const { cmp, el, navigate } = await mount(() => Promise.reject(new ConceptTicketFailure('forbidden')));
+    expect(cmp.state()).toBe('forbidden');
+    expect(navigate).not.toHaveBeenCalled();
+    expect(el.querySelector('.msg.err')?.textContent).toContain('conceptPage.forbidden');
+    const back = el.querySelector('a.back') as HTMLAnchorElement | null;
+    expect(back?.getAttribute('href')).toBe('/admin/feedback');
+  });
+
+  it('tells a missing concept apart from a broken one, and the broken one can retry', async () => {
     const missing = await mount(() => Promise.reject(new ConceptTicketFailure('notFound')));
     expect(missing.el.querySelector('.msg.err')?.textContent).toContain('conceptPage.notFound');
+    expect(missing.el.querySelector('button.retry')).toBeNull();
     TestBed.resetTestingModule();
-    const broken = await mount(() => Promise.reject(new Error('network')));
+
+    const mint = vi.fn().mockName('mintTicket').mockRejectedValueOnce(new Error('network')).mockResolvedValue(TICKET);
+    const broken = await mount(mint);
     expect(broken.cmp.state()).toBe('error');
     expect(broken.el.querySelector('.msg.err')?.textContent).toContain('conceptPage.error');
+    (broken.el.querySelector('button.retry') as HTMLButtonElement).click();
+    await broken.fixture.whenStable();
+    expect(mint).toHaveBeenCalledTimes(2);
+    expect(broken.navigate).toHaveBeenCalledWith(conceptFrameUrl(ID, TICKET.url));
+  });
+});
+
+describe('concept links in the feedback thread', () => {
+  it('open the concept route in a new tab as a real anchor (e4428abd)', () => {
+    const url = `https://versecompanion-alpha.vercel.app/concept/${ID}`;
+    for (const body of [url, `[Konzept](${url})`]) {
+      const host = document.createElement('div');
+      host.innerHTML = renderFeedbackBody(body).html;
+      const a = host.querySelector('a') as HTMLAnchorElement | null;
+      expect(a?.getAttribute('href')).toBe(url);
+      expect(a?.getAttribute('target')).toBe('_blank');
+      expect(a?.getAttribute('rel')).toContain('noopener');
+    }
   });
 });

@@ -13,8 +13,22 @@ through the concept exactly like the local `docs/concepts/*.html` pages
 (choices, notes, submit). The local pages need a Python bridge on his machine;
 the routine has none. So the page is **hosted**: the html lives in
 `public.concept_pages`, the `concept-page` edge function serves it and answers
-the engine's bridge protocol, and the Angular route `/concept/<id>` frames it
-through the app's static loader `/concept-frame/<id>.html`.
+the engine's bridge protocol, and the Angular route `/concept/<id>` hands it
+to the app's static loader `/concept-frame/<id>.html`.
+
+### Full-screen, no in-app page (feedback `e4428abd`)
+
+Until 2026-11 `/concept/<id>` rendered inside the app shell: a sub-header
+("Zurück zum Feedback", title, "In neuem Tab öffnen") above an iframe of the
+loader. The admin did not want that intermediate page. Now the route sits
+**outside the shell** (guards `authGuard` + `approvedGuard` + `roleGuard('admin')`),
+mints the ticket and `location.replace()`s itself with the loader URL — the
+exact target the old "open in new tab" link had, so the ticket travels the
+same way as before (fragment only). Thread links already open in a new tab
+(`target="_blank"`, `markdown.util.ts`), so a click in the feedback panel
+opens the concept full-screen in a new tab; Back in that tab skips the
+minting hop. The route itself only shows the minting moment and the failure
+copies (forbidden / not found / error with retry, plus a back anchor).
 
 ### Why the loader (#330)
 
@@ -26,7 +40,7 @@ on the default `*.supabase.co` domain as `Content-Type: text/plain` with
 out either — such documents inherit the app's CSP, which forbids inline
 scripts. So the document is rendered on the **app origin**:
 
-1. `/concept/<id>` mints the ticket and frames
+1. `/concept/<id>` mints the ticket and replaces itself with
    `/concept-frame/<id>.html#<encoded ticketed function URL>`.
 2. `vercel.json` rewrites `/concept-frame/:file` to `public/concept-frame.html`
    and gives that path its own header set (CSP with `script-src 'self'
@@ -60,7 +74,7 @@ does not apply the rewrite — check a hosted page on a deployment.
 |---|---|---|
 | Table `concept_pages` | `supabase/migrations/20260914160000_concept_pages.sql` | `html`, `decisions` (what the page submitted), `draft` (note mirror), `submitted_at`, `processed_at`, `reload_counter`. Admin-only SELECT, **no client write policy** — the routine and the function write with the service role |
 | Edge function `concept-page` | `supabase/functions/concept-page/` | `POST /ticket` (admin JWT → 12-h HMAC ticket + document URL), `GET /:id?t=` (the html with the shim injected), `/:id/decisions`, `/reload`, `/heartbeat`, `/draft`, `/attachments` (501) — the exact protocol the concept engine expects from the local bridge |
-| Angular route `/concept/:id` | `src/app/admin/concepts/` | `roleGuard('admin')`; mints the ticket with the session and frames the loader `/concept-frame/<id>.html#<function URL>`. Back link to `/admin/feedback`, "open in new tab" (same loader URL) |
+| Angular route `/concept/:id` | `src/app/admin/concepts/` | Outside the shell, `authGuard` + `approvedGuard` + `roleGuard('admin')`; mints the ticket with the session and `location.replace()`s to the loader `/concept-frame/<id>.html#<function URL>` (full-screen, no in-app page). Failure copies with a back link to `/admin/feedback` |
 | Loader | `public/concept-frame.html` + `vercel.json` (rewrite + own headers) | Fetches the ticketed document as text and writes it into its app-origin document (#330) |
 | Routine tooling | `scripts/routine-gate.mjs concept-publish` / `concept-read` | Publish/republish a page, read the submission back |
 
