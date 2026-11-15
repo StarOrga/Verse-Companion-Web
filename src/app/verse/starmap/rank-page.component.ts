@@ -280,7 +280,8 @@ export function rankWallpaperOptions(st: VerseExplorerState, first: VerseExplore
       figcaption { display: flex; flex-direction: column; gap: 2px; }
       figcaption b { font: 600 0.95rem var(--sc-font-display); color: var(--sc-fg-0); }
       figcaption small { font-size: max(12px, 0.75rem); color: var(--sc-fg-2); }
-      .dl { display: flex; flex-wrap: wrap; gap: var(--sc-gap-2); align-items: center; font-size: max(12px, 0.8rem); }
+      .dl { display: flex; flex-wrap: wrap; gap: var(--sc-gap-2); align-items: center; }
+      .dl .sc-action { font-size: max(12px, 0.78rem); }
 
       .block { margin-bottom: clamp(28px, 5vw, 48px); }
       .sec { margin: 0 0 14px; font: 400 0.8rem var(--sc-font-display); letter-spacing: 0.22em; text-transform: uppercase; color: var(--sc-fg-2); }
