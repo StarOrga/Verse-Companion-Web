@@ -657,6 +657,12 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
 
     @media (max-width: 720px) {
       .pick-scope { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+      /* Phone: label above its switch, the switch spans the column and scrolls inside its own pill
+         when the labels are wider than the screen, the hint wraps below - nothing runs off the edge. */
+      .pick-seg { flex-wrap: wrap; min-inline-size: 0; }
+      .pick-seg-label { flex: 1 0 100%; }
+      .pick-seg sc-segmented { display: block; inline-size: 100%; }
+      .pick-preview-hint { flex: 1 0 100%; max-width: none; }
       .pick-search { flex: 0 0 auto; min-width: 0; max-inline-size: 100%; }
       .pick-count { align-self: flex-start; }
       .pick-cols { align-self: stretch; min-inline-size: 0; }

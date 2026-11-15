@@ -117,8 +117,8 @@ scripts/  (80) — Build / utility scripts
   perf/  (2)
   playwright/  (1)
   routine-watcher-chaos/  (2)
-src/  (1375) — Source code
-  app/  (1368) — Application code
+src/  (1377) — Source code
+  app/  (1370) — Application code
     admin/  (66)
     auth/  (37)
     codex/  (393)
@@ -132,7 +132,7 @@ src/  (1375) — Source code
     p4k/  (6)
     release-notes/  (5)
     settings/  (4)
-    shared/  (83)
+    shared/  (85)
     shell/  (94)
     social/  (41)
     starscape/  (13)

@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - With admin access the header no longer runs past a 1280 px window or breaks onto two rows at 1440 px: the admin entries fold into the Admin menu below 1600 px.
 - Popup row cascades keep their exact 30 ms rhythm even on a busy machine.
 
+## [0.270.1] - 2026-11-15
+
+### Fixed
+- Swap picker on phones: the "compare with" and "delta against" switches no longer run off the screen; their labels sit above them and the hint wraps.
+- The image viewer no longer closes on a click beside the picture; use ✕ or Escape.
+
+### Changed
+- One quantity stepper everywhere (wish cart, wish list, HQ Nachschub), with labelled −/+ buttons and touch-sized targets.
+- Choice pills in the HQ dialogs (claim channel, Nachschub target, wish/sell, buy/mine, mode, kind) share one control with arrow-key support.
+
 ## [0.270.0] - 2026-11-15
 
 ### Added

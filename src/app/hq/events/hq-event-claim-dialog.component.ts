@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output, si
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
+import { ScSegmentedComponent, type ScSegmentOption } from '../../shared/segmented-control.component';
 import { ScTristateComponent } from '../../shared/tristate/sc-tristate.component';
 import { HQ_POPUP_CONTENT_STYLES } from '../plan/hq-popup-content.styles';
 import { EventHqService } from './event-hq.service';
@@ -19,18 +20,15 @@ export const CLAIM_CHANNELS: readonly ClaimChannel[] = ['pledge', 'ingame', 'bot
 @Component({
   selector: 'sc-hq-event-claim-dialog',
   standalone: true,
-  imports: [TranslatePipe, ScActionDirective, ScPopupComponent, ScTristateComponent],
+  imports: [TranslatePipe, ScActionDirective, ScPopupComponent, ScTristateComponent, ScSegmentedComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <sc-popup kind="dialog" [eyebrow]="'hq.title' | translate" [title]="'hq.events.claim.title' | translate: { name: reward().name }" (closed)="closed.emit()">
       <div class="pbody">
         <fieldset class="chan">
           <legend>{{ 'hq.events.claim.channel' | translate }}</legend>
-          <span class="seg" role="group">
-            @for (c of channels; track c) {
-              <button type="button" [attr.aria-pressed]="channel() === c" (click)="channel.set(c)">{{ 'hq.events.channel.' + c | translate }}</button>
-            }
-          </span>
+          <sc-segmented variant="chips" [options]="channelOptions" [value]="channel()" [ariaLabel]="'hq.events.claim.channel' | translate"
+                        (valueChange)="channel.set($any($event))" />
           @if (byApp()) { <small class="dlg-msg">{{ 'hq.events.claim.byApp' | translate }}</small> }
         </fieldset>
         <div class="opt">
@@ -60,10 +58,6 @@ export const CLAIM_CHANNELS: readonly ClaimChannel[] = ['pledge', 'ingame', 'bot
     HQ_POPUP_CONTENT_STYLES,
     `.chan { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); }
      .chan legend { padding: 0; font-weight: 600; margin-bottom: 4px; }
-     .seg { display: inline-flex; gap: 4px; flex-wrap: wrap; }
-     .seg button { padding: 6px 12px; border: 1px solid var(--sc-border); border-radius: 999px; background: var(--sc-bg-0); color: var(--sc-fg-1); font: inherit; cursor: pointer; }
-     .seg button[aria-pressed='true'] { border-color: var(--sc-accent); color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
-     .seg button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
      .opt span { flex: 1; } .sub { margin-inline-start: 28px; } .hint { color: var(--sc-fg-2); font-size: 0.85rem; }`,
   ],
 })
@@ -74,7 +68,7 @@ export class HqEventClaimDialogComponent {
   readonly claimed = output<void>();
 
   private readonly events = inject(EventHqService);
-  protected readonly channels = CLAIM_CHANNELS;
+  protected readonly channelOptions: readonly ScSegmentOption[] = CLAIM_CHANNELS.map((c) => ({ value: c, labelKey: 'hq.events.channel.' + c }));
   private readonly existing = computed(() => this.events.stateOf(this.eventId()).claimed[this.reward().id] ?? null);
   /** The SCC-App set the channel (a live claim) - shown, still changeable here. */
   protected readonly byApp = computed(() => this.existing()?.by === 'live');
