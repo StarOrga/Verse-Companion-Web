@@ -337,6 +337,23 @@
         ]
       }
     ],
+    ".claude/project-map.md›src-counts›count": [
+      {
+        "ship": "#1146",
+        "by": "Jerry",
+        "value": "src 1378 / app 1371"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "generated counts of the merged tree",
+        "decided": true,
+        "at": "2026-11-15T16:02:02.965Z",
+        "hunks": [
+          "c0342f654b62"
+        ]
+      }
+    ],
     ".claude/project-map.md›src›count": [
       {
         "ship": "claude/batch-901bea",
@@ -402,6 +419,23 @@
         "at": "2026-11-15T04:18:13.845Z",
         "hunks": [
           "72caeb6e4c42"
+        ]
+      }
+    ],
+    ".claude/project-map.md›tracked-files›count": [
+      {
+        "ship": "#1148",
+        "by": "Jerry",
+        "value": "3131 tracked files"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "generated count of the merged tree (pre-commit regenerates gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-15T16:02:02.965Z",
+        "hunks": [
+          "54c86e87bf73"
         ]
       }
     ],
