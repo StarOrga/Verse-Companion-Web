@@ -1,7 +1,43 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.265.3",
+  "current": "0.265.5",
   "releases": [
+    {
+      "version": "0.265.5",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Concepts: an admin-only concept page for the HQ storage area: its own search over item, location and quantity, three quantity modes (one location, split across locations, nearby locations), a stable tab bar, and point notes by Ctrl/⌘+click that now also work on the mock."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.265.4",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Starscape app: the wallpaper follows your rank like the website — Companions from tier 3 and the Amber tint from tier 4."
+            },
+            {
+              "title": "",
+              "text": "Rank page: the extras (community star map, sun collection, badge and reward ideas) are tidy cards now; the locked ideas section reads as a calm hint, and the comet tip header wraps cleanly on phones."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.265.3",
       "date": "2026-11-15",
