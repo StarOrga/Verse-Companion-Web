@@ -2173,7 +2173,8 @@ html.sc-unfocused {
   background: var(--sc-action-t);
   color: var(--sc-action-on);
   font-family: var(--sc-font-display);
-  font-size: 0.78rem;
+  /* Touch screens raise it to the 12px readable floor (mobile gate). */
+  font-size: max(0.78rem, var(--sc-fs-floor));
   line-height: 1.2;
   letter-spacing: 0.05em;
   text-transform: uppercase;
