@@ -294,6 +294,67 @@ describe('catalog upload — transient failures', () => {
     expect(Math.max(...landed)).toBeLessThanOrEqual(2);
   });
 
+  it('splits a timed-out batch at once instead of resending it unchanged', async () => {
+    // Field log 2026-11-15: every timed-out silhouette chunk was first resent
+    // unchanged (retry 1/4 … 3/4) — the split, the only real fix, came last.
+    rmSync(outDir, { recursive: true, force: true });
+    outDir = makeOutDir(6);
+    const store = new UploadJobStore(diskIO());
+    store.save(createJob('j1', outDir, { channel: 'LIVE', patchVersion: '4.0.0', buildNumber: '9999' }, 1));
+    const sizes: number[] = [];
+    vi.stubGlobal('fetch', async (_url: string, init: { body: string }) => {
+      const body = JSON.parse(init.body) as { op: string; table?: string; rows?: unknown[] };
+      if (body.op === 'upsert' && body.table === 'codex_ships') {
+        const n = body.rows?.length ?? 0;
+        sizes.push(n);
+        if (n > 2) {
+          return {
+            ok: false,
+            status: 503,
+            json: async () => ({ error: 'ingest_timeout', message: 'canceling statement due to statement timeout' }),
+          };
+        }
+      }
+      return { ok: true, status: 200, json: async () => ({ build_id: 'build-fixed-1' }) };
+    });
+
+    const res = await uploadCatalog('token', outDir, () => {}, {
+      ...catalogHooks(store, createPauseControl()),
+      backoffMs: () => 0,
+    });
+    expect(res.ok).toBe(true);
+    // 6 → 3 + 3 → (2 + 1) + (2 + 1): every oversized batch went out exactly once.
+    expect(sizes.filter((n) => n === 6)).toHaveLength(1);
+    expect(sizes.filter((n) => n === 3)).toHaveLength(2);
+    expect(sizes.filter((n) => n <= 2).reduce((a, b) => a + b, 0)).toBe(6);
+  });
+
+  it('still retries a single-row timeout, where no split is left', async () => {
+    rmSync(outDir, { recursive: true, force: true });
+    outDir = makeOutDir(1);
+    const store = new UploadJobStore(diskIO());
+    store.save(createJob('j1', outDir, { channel: 'LIVE', patchVersion: '4.0.0', buildNumber: '9999' }, 1));
+    let attempts = 0;
+    vi.stubGlobal('fetch', async (_url: string, init: { body: string }) => {
+      const body = JSON.parse(init.body) as { op: string; table?: string };
+      if (body.op === 'upsert' && body.table === 'codex_ships' && ++attempts < 3) {
+        return {
+          ok: false,
+          status: 503,
+          json: async () => ({ error: 'ingest_timeout', message: 'canceling statement due to statement timeout' }),
+        };
+      }
+      return { ok: true, status: 200, json: async () => ({ build_id: 'build-fixed-1' }) };
+    });
+
+    const res = await uploadCatalog('token', outDir, () => {}, {
+      ...catalogHooks(store, createPauseControl()),
+      backoffMs: () => 0,
+    });
+    expect(res.ok).toBe(true);
+    expect(attempts).toBe(3);
+  });
+
   it('keeps the reduced batch size for the rest of the phase', async () => {
     // 600 rows = two default chunks. Once the first chunk proves 500 is too
     // heavy, the SECOND one must not rediscover that the hard way — otherwise
