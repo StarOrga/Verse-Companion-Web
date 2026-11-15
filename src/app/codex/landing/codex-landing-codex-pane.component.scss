@@ -78,6 +78,9 @@
 .new li.grp { align-items: flex-end; min-height: 28px; padding: 0 8px 3px; border-top: 1px solid var(--sc-border); }
 .new li.grp:first-child { border-top: 0; }
 .new li.grp:hover { background: none; }
+// A category block's header (#360): its glyph before the name, so the rows under it read as that category.
+.new li.grp-cat { align-items: center; gap: 6px; padding-bottom: 0; }
+.grp-gl { font-style: normal; font-size: 11px; color: var(--sc-fg-2); }
 .grp-nm {
   font: 600 max(9.5px, 0.58rem) / 1.2 var(--sc-font-display); letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--sc-fg-2); white-space: nowrap;

@@ -4,10 +4,30 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.270.12] - 2026-11-15
+## [0.270.16] - 2026-11-15
 
 ### Fixed
 - Desktop app: signing in from Verse Companion versions up to 0.109.1 no longer ends on the 404 page — /desktop/connect forwards to /apps/starscape/connect and keeps the sign-in handoff (cb, state).
+
+## [0.270.15] - 2026-11-15
+
+### Fixed
+- Ship energy panel (classic view): the readiness verdict shows a short label with the full reason in a tooltip, and the cooling-load numbers moved into their tooltip, so nothing runs past the field any more.
+
+## [0.270.14] - 2026-11-15
+
+### Changed
+- A concept link opens the concept full screen in a new tab; the in-app page with a sub-header in between is gone.
+
+## [0.270.13] - 2026-11-15
+
+### Fixed
+- Codex "New in": the hotfix build carries the live patch label (4.10.3) instead of the older branch name, entries are grouped by category with a header per block, and unnamed entries no longer show raw keys.
+
+## [0.270.12] - 2026-11-15
+
+### Changed
+- HQ: retry, undo, crew, sharing and stock buttons use the shared action control — one main step per view, red tone for revoke and remove (#970).
 
 ## [0.270.11] - 2026-11-15
 
