@@ -1399,7 +1399,6 @@
         "actionGroup": {
           "flight_control": "Flugsteuerung",
           "weapons": "Waffen",
-          "targeting": "Zielerfassung",
           "shields": "Schilde",
           "power": "Energie",
           "mfd_hud": "MFD / HUD",
@@ -2348,7 +2347,16 @@
         "targeting": "Zielerfassung",
         "slowestMissileNote": "Lock-Zeit der langsamsten Rakete.",
         "hintDps": "{{value}} DPS",
-        "hintAlpha": "{{value}} Alpha"
+        "hintAlpha": "{{value}} Alpha",
+        "colMissile": "Rakete",
+        "colTracking": "Zielsignal",
+        "colCount": "Anzahl",
+        "colWarhead": "Sprengkopf",
+        "colMissileTotal": "Schaden gesamt",
+        "salvoNote": "Eine Salve aller Raketen auf einmal — einmaliger Schaden, nicht in der Waffen-DPS enthalten.",
+        "salvoPartial": "Nicht für jede Rakete liegen Sprengkopf-Werte vor; die Salve zählt nur die bekannten.",
+        "noWarheadData": "Für diese Raketen enthält der Datenstand noch keine Sprengkopf-Werte.",
+        "hintMissiles": "{{value}} Raketen-Salve"
       },
       "defensive": {
         "title": "Verteidigung",

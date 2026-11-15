@@ -26,7 +26,9 @@ const OFFENSIVE: OffensivePanel = {
   mixedRangeWarning: false,
   projectileSpeed: 1200,
   missileCount: 0,
+  missileRows: [],
   missileSalvoDamage: null,
+  missileSalvoPartial: false,
   missileLockTime: null,
   missileLockNoteSlowest: false,
   missileRange: null,
@@ -107,6 +109,60 @@ describe('analysis panels', () => {
       expect(el.querySelector('tfoot')!.textContent).toContain(formatNumber(1636.88));
       expect(el.querySelectorAll('.dmg-bar-row').length).toBe(1);
       expect(el.querySelector('dl.fact-grid dd')!.textContent).toContain(`${formatNumber(1800)} m`);
+    });
+
+    // feedback #350: the missiles get their own table, apart from the gun totals
+    it('lists every missile kind with its warhead and the salvo, apart from the gun table', () => {
+      const fixture = mount(CodexOffensivePanelComponent, {
+        panel: {
+          ...OFFENSIVE,
+          missileCount: 6,
+          missileRows: [
+            { className: 'MISL_S03_CS_FSKI_Tempest', size: 3, category: 'missile', signal: 'cs', count: 2, damage: 2500, totalDamage: 5000 },
+            { className: 'MISL_S02_IR_NOVP_Rattler', size: 2, category: 'missile', signal: 'ir', count: 4, damage: 1370, totalDamage: 5480 },
+          ],
+          missileSalvoDamage: 10480,
+          missileLockTime: 3,
+          missileRange: 5000,
+          missileLockNoteSlowest: true,
+        },
+      });
+      const el = root(fixture);
+      const tables = el.querySelectorAll('table.analysis-table');
+      expect(tables.length).toBe(2);
+      const rows = Array.from(tables[1].querySelectorAll('tbody tr'));
+      expect(rows.length).toBe(2);
+      expect(rows[1].textContent).toContain('S2');
+      expect(rows[1].textContent).toContain('codex.missile.signal.ir');
+      expect(rows[1].textContent).toContain('4×');
+      expect(rows[1].textContent).toContain(formatNumber(5480));
+      expect(tables[1].querySelector('tfoot')!.textContent).toContain(formatNumber(10480));
+      // the gun total stays the guns' own figure
+      expect(tables[0].querySelector('tfoot')!.textContent).not.toContain(formatNumber(10480));
+      expect(el.textContent).toContain('codex.analysis.offensive.salvoNote');
+    });
+
+    it('lists missiles without warhead data by name and count, no damage columns', () => {
+      const fixture = mount(CodexOffensivePanelComponent, {
+        panel: {
+          ...OFFENSIVE,
+          missileCount: 4,
+          missileRows: [{ className: 'MISL_S02_IR_NOVP_Rattler', size: 2, category: 'missile', signal: 'ir', count: 4, damage: null, totalDamage: null }],
+        },
+      });
+      const el = root(fixture);
+      const missiles = el.querySelectorAll('table.analysis-table')[1];
+      expect(missiles.querySelectorAll('thead th').length).toBe(4);
+      expect(missiles.querySelector('tfoot')).toBeNull();
+      expect(el.textContent).toContain('codex.analysis.offensive.noWarheadData');
+    });
+
+    it('the folded peek names the missile salvo separately', () => {
+      const fixture = mount(CodexOffensivePanelComponent, {
+        panel: { ...OFFENSIVE, missileCount: 4, missileSalvoDamage: 5480 },
+        startCollapsed: true,
+      });
+      expect(root(fixture).querySelector('.head-peek')!.textContent).toContain('codex.analysis.offensive.hintMissiles');
     });
 
     it('folding again brings the peek back', () => {

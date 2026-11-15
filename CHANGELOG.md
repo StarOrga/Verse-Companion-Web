@@ -4,7 +4,7 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.264.0] - 2026-11-15
+## [0.265.0] - 2026-11-15
 
 ### Added
 - Rank page: reward ideas with voting from tier 5 (Astrograf, 18 stars); admins can archive ideas. Replaces the old "suggest a top entry" form.
@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Star map on phones: the comet strip no longer sits under the bottom search bar and feedback launcher.
+
+## [0.264.0] - 2026-11-15
+
+### Added
+- Codex: the Offensive analysis of the classic ship view lists the mounted missiles in their own table (name, size, tracking signal, count, damage per missile and in total) with the full salvo, kept apart from the guns DPS. Missiles were missing before because their warhead damage was read from the place guns keep it.
 
 ## [0.263.3] - 2026-11-15
 

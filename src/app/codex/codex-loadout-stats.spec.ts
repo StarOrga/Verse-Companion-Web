@@ -40,6 +40,28 @@ function gun(opts: {
   };
 }
 
+function missile(opts: { className?: string; size?: number; damage?: number; lockTime?: number; range?: number }): SummaryOccupant {
+  return {
+    section: 'missiles',
+    kind: 'item',
+    payload: {
+      entityKind: 'item',
+      className: opts.className ?? 'MISL_S02_IR_NOVP_Rattler',
+      attachType: 'Missile',
+      subType: 'Missile',
+      size: opts.size ?? 2,
+      stats: {
+        SCItemMissileParams: {
+          ...(opts.damage != null ? { 'explosionParams.damage.DamagePhysical': opts.damage } : {}),
+          ...(opts.lockTime != null ? { 'targetingParams.lockTime': opts.lockTime } : {}),
+          ...(opts.range != null ? { 'targetingParams.lockRangeMax': opts.range } : {}),
+        },
+      },
+    },
+    count: 1,
+  };
+}
+
 function shield(opts: { hp?: number; regen?: number; delayDamaged?: number; delayDowned?: number; className?: string; count?: number }): SummaryOccupant {
   return {
     section: 'shields',
@@ -251,6 +273,56 @@ describe('codex-loadout-stats — buildOffensivePanel', () => {
     const panel = buildOffensivePanel([gun({})]);
     expect(panel.missileCount).toBe(0);
     expect(panel.missileSalvoDamage).toBeNull();
+  });
+
+  // feedback #350: the warhead lives in SCItemMissileParams, not in an impact record
+  it('reads every carried missile, collapses identical ones and sums the salvo', () => {
+    const rack: SummaryOccupant = {
+      section: 'missiles',
+      kind: 'weapon',
+      payload: { entityKind: 'weapon', className: 'MRCK_S04_CNOU_Quad_S02', attachType: 'MissileLauncher', size: 4 },
+      count: 1,
+    };
+    const panel = buildOffensivePanel([
+      gun({}),
+      rack,
+      missile({ className: 'MISL_S02_IR_NOVP_Rattler', size: 2, damage: 1370, lockTime: 2.5, range: 5000 }),
+      missile({ className: 'MISL_S02_IR_NOVP_Rattler', size: 2, damage: 1370, lockTime: 2.5, range: 5000 }),
+      missile({ className: 'MISL_S03_CS_FSKI_Tempest', size: 3, damage: 2500, lockTime: 3, range: 7000 }),
+    ]);
+    expect(panel.missileCount).toBe(3);
+    expect(panel.missileRows).toEqual([
+      { className: 'MISL_S03_CS_FSKI_Tempest', size: 3, category: 'missile', signal: 'cs', count: 1, damage: 2500, totalDamage: 2500 },
+      { className: 'MISL_S02_IR_NOVP_Rattler', size: 2, category: 'missile', signal: 'ir', count: 2, damage: 1370, totalDamage: 2740 },
+    ]);
+    expect(panel.missileSalvoDamage).toBe(5240);
+    expect(panel.missileSalvoPartial).toBe(false);
+    expect(panel.missileLockTime).toBe(3);
+    expect(panel.missileRange).toBe(5000);
+    expect(panel.missileSignalTypes.sort()).toEqual(['cs', 'ir']);
+    // guns stay guns: the salvo never lands in the gun alpha
+    expect(panel.footerAlpha).toBe(40);
+  });
+
+  it('counts missiles without warhead data but leaves them out of the salvo', () => {
+    const panel = buildOffensivePanel([
+      missile({ className: 'MISL_S02_IR_NOVP_Rattler', size: 2, damage: 1370 }),
+      missile({ className: 'MISL_S02_EM_TALN_Dominator' }),
+    ]);
+    expect(panel.missileCount).toBe(2);
+    expect(panel.missileSalvoDamage).toBe(1370);
+    expect(panel.missileSalvoPartial).toBe(true);
+    expect(panel.missileRows.find((r) => r.signal === 'em')?.damage).toBeNull();
+
+    const bare = buildOffensivePanel([missile({ className: 'MISL_S02_EM_TALN_Dominator' })]);
+    expect(bare.missileCount).toBe(1);
+    expect(bare.missileSalvoDamage).toBeNull();
+    expect(bare.missileSalvoPartial).toBe(false);
+  });
+
+  it('feeds the missile KPI from the same warhead figure', () => {
+    const sheet = computeKpiSheet([missile({ damage: 1370 }), missile({ damage: 1370 })], null);
+    expect(sheet.missiles).toBe(2740);
   });
 
   it('takes the MINIMUM range across guns as the effective range, noting the outlier', () => {

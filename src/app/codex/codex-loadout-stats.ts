@@ -21,6 +21,14 @@ import { equippedMass, itemMass, SummaryOccupant } from './ship-summary-panels';
 import { findStat, toFiniteNumber } from '../hangar/loadout-stats';
 import { KpiKey, MissionDef } from './codex-mission';
 import { sustainedDps, weaponParamsOf } from './codex-sustained-dps';
+import {
+  MissileCategory,
+  MissileSignal,
+  isMissileRow,
+  missileCategoryOf,
+  readCombatMetrics,
+  trackingSignalOf,
+} from './codex-missile';
 
 export type { SummaryOccupant };
 
@@ -46,6 +54,24 @@ function entityKindOf(o: SummaryOccupant): string {
 
 function classNameOf(payload: unknown): string {
   return ((payload as { className?: string } | null | undefined)?.className ?? '').trim();
+}
+
+/**
+ * A missile, torpedo or rocket the loadout carries — wherever its rack sits.
+ * The extract files every one of them under attach type `Missile`; the rack
+ * itself (`MissileLauncher`) is no warhead and never counts.
+ */
+function isMissileOccupant(o: SummaryOccupant): boolean {
+  return isMissileRow({ attach_type: (o.payload as { attachType?: unknown } | null | undefined)?.attachType });
+}
+
+/**
+ * One missile's warhead: the explosion damage in `stats.SCItemMissileParams`
+ * (feedback #350 — the old gun-style impact read found nothing on a missile,
+ * so the section never appeared), an impact-damage record as the fallback.
+ */
+function missileDamageOf(o: SummaryOccupant): number | null {
+  return usable(readCombatMetrics(o.payload).damage ?? null) ?? alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);
 }
 
 // ── KPI sheet ─────────────────────────────────────────────────────────────────
@@ -180,8 +206,8 @@ export function computeKpiSheet(
         }
       }
     }
-    if (o.section === 'missiles') {
-      const alpha = alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);
+    if (isMissileOccupant(o)) {
+      const alpha = missileDamageOf(o);
       if (alpha !== null) {
         missileDamage += alpha * o.count;
         missileCount += o.count;
@@ -382,6 +408,19 @@ export interface WeaponRow {
   burstDps: number | null;
 }
 
+/** One kind of missile on the loadout, identical ones collapsed. */
+export interface MissileRow {
+  className: string;
+  size: number | null;
+  category: MissileCategory | null;
+  signal: MissileSignal | null;
+  count: number;
+  /** One warhead; null when the build carries no warhead numbers. */
+  damage: number | null;
+  /** damage × count; null with `damage`. */
+  totalDamage: number | null;
+}
+
 export interface OffensivePanel {
   weaponCount: number;
   weaponRows: WeaponRow[];
@@ -396,12 +435,17 @@ export interface OffensivePanel {
   longestRangeGun: string | null;
   mixedRangeWarning: boolean;
   projectileSpeed: number | null;
+  /** Every missile, torpedo and rocket on the racks — with or without warhead data. */
   missileCount: number;
+  missileRows: MissileRow[];
+  /** Σ warhead damage of every missile fired at once — a burst, never a DPS. */
   missileSalvoDamage: number | null;
+  /** True when some missiles lack warhead data, so the salvo sum leaves them out. */
+  missileSalvoPartial: boolean;
   missileLockTime: number | null;
   missileLockNoteSlowest: boolean;
   missileRange: number | null;
-  missileSignalTypes: string[];
+  missileSignalTypes: MissileSignal[];
   gapKeys: string[];
 }
 
@@ -470,25 +514,43 @@ export function buildOffensivePanel(occupants: readonly SummaryOccupant[]): Offe
 
   let missileCount = 0;
   let missileDamage = 0;
+  let missileWithDamage = 0;
   let missileMaxLock: number | null = null;
   let missileMinRange: number | null = null;
-  const signalTypes = new Set<string>();
+  const signalTypes = new Set<MissileSignal>();
+  const missileRows = new Map<string, MissileRow>();
   for (const o of occupants) {
-    if (o.section !== 'missiles') continue;
-    const p = o.payload as { weaponParams?: Record<string, unknown>; subType?: string | null } | null;
-    const alpha = alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);
-    if (alpha !== null) {
-      missileDamage += alpha * o.count;
-      missileCount += o.count;
+    if (!isMissileOccupant(o)) continue;
+    const p = o.payload as { className?: string; size?: number | null; subType?: unknown } | null;
+    const className = classNameOf(p) || 'unknown';
+    const damage = missileDamageOf(o);
+    missileCount += o.count;
+    if (damage !== null) {
+      missileDamage += damage * o.count;
+      missileWithDamage += o.count;
     }
-    const lock = usable(
-      toFiniteNumber(p?.weaponParams?.['lockTime'] ?? p?.weaponParams?.['timeToLock'] ?? null),
-    );
+    const row = missileRows.get(className);
+    if (row) {
+      row.count += o.count;
+      row.totalDamage = row.damage !== null ? row.damage * row.count : null;
+    } else {
+      const signal = trackingSignalOf(className);
+      missileRows.set(className, {
+        className,
+        size: usable(toFiniteNumber(p?.size ?? null)),
+        category: missileCategoryOf(p?.subType),
+        signal,
+        count: o.count,
+        damage,
+        totalDamage: damage !== null ? damage * o.count : null,
+      });
+    }
+    const metrics = readCombatMetrics(o.payload);
+    const lock = metrics.lockTime ?? null;
     if (lock !== null) missileMaxLock = missileMaxLock === null ? lock : Math.max(missileMaxLock, lock);
-    const ammo = o.ammoPayload as { speed?: number | null; lifetime?: number | null } | undefined;
-    const range = projectileRange(ammo?.speed, ammo?.lifetime);
+    const range = metrics.range ?? null;
     if (range !== null) missileMinRange = missileMinRange === null ? range : Math.min(missileMinRange, range);
-    const sig = (p?.subType ?? '').trim();
+    const sig = trackingSignalOf(className);
     if (sig) signalTypes.add(sig);
   }
 
@@ -510,7 +572,12 @@ export function buildOffensivePanel(occupants: readonly SummaryOccupant[]): Offe
     mixedRangeWarning,
     projectileSpeed,
     missileCount,
-    missileSalvoDamage: missileCount > 0 ? usable(missileDamage) : null,
+    // Biggest warhead first: the row that decides the salvo leads.
+    missileRows: [...missileRows.values()].sort(
+      (a, b) => (b.size ?? 0) - (a.size ?? 0) || (b.damage ?? 0) - (a.damage ?? 0) || a.className.localeCompare(b.className),
+    ),
+    missileSalvoDamage: missileWithDamage > 0 ? usable(missileDamage) : null,
+    missileSalvoPartial: missileWithDamage > 0 && missileWithDamage < missileCount,
     missileLockTime: missileMaxLock,
     missileLockNoteSlowest: missileMaxLock !== null,
     missileRange: missileMinRange,

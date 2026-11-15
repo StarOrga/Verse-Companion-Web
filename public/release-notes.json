@@ -1,9 +1,9 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.264.0",
+  "current": "0.265.0",
   "releases": [
     {
-      "version": "0.264.0",
+      "version": "0.265.0",
       "date": "2026-11-15",
       "sections": [
         {
@@ -53,6 +53,22 @@
             {
               "title": "",
               "text": "Star map on phones: the comet strip no longer sits under the bottom search bar and feedback launcher."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.264.0",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex: the Offensive analysis of the classic ship view lists the mounted missiles in their own table (name, size, tracking signal, count, damage per missile and in total) with the full salvo, kept apart from the guns DPS. Missiles were missing before because their warhead damage was read from the place guns keep it."
             }
           ]
         }
