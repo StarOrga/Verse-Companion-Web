@@ -1,0 +1,492 @@
+<section data-iteration="1" data-iteration-template="design" data-tab-label="Runde 1" data-design-set="alternatives" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]},"designs":{},"screens":{"d1-toast":"top"},"views":{},"favorite":"d1"}</script>
+<style>
+:is([data-design], .design-ov-scale) .pa{position:relative;height:100%;min-height:600px;overflow:hidden;background:radial-gradient(ellipse 80% 60% at 50% -10%,#12354a 0%,#0a1c2a 55%,#061724 100%);color:#c8e4f1;font:13px/1.45 Inter,system-ui,"Segoe UI",sans-serif;--a:#52c1e6;--mut:#7fa3b6;--hl:rgba(82,193,230,.24);--ink:#f2fafe;--dg:#ff7b72;--edge:rgba(130,220,255,.35);--fill:linear-gradient(180deg,#0c2333,#071a27)}
+:is([data-design], .design-ov-scale) .pa :where(button,a){font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-decoration:none}
+:is([data-design], .design-ov-scale) .pa :where(h3,h4,p,table){margin:0}
+:is([data-design], .design-ov-scale) .pa-bar{position:absolute;left:32px;right:32px;top:72px;height:50px;display:flex;align-items:center;gap:22px;padding:0 14px;border:1px solid var(--edge);border-radius:6px;background:linear-gradient(180deg,rgba(14,40,56,.9),rgba(7,26,39,.9))}
+:is([data-design], .design-ov-scale) .pa-logo{font:700 13px/1 Orbitron,"Segoe UI",sans-serif;letter-spacing:.16em;color:var(--ink)}
+:is([data-design], .design-ov-scale) .pa-nav{display:flex;gap:18px;color:var(--mut);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+:is([data-design], .design-ov-scale) .pa-nav .on{color:var(--a)}
+:is([data-design], .design-ov-scale) .pa-sp{flex:1}
+:is([data-design], .design-ov-scale) .pa-trig{position:relative;width:34px;height:34px;border-radius:8px;display:grid;place-items:center;color:var(--a);border:1px solid var(--hl)}
+:is([data-design], .design-ov-scale) .pa-trig.pa-apps{margin-right:70px}
+:is([data-design], .design-ov-scale) .pa-body{position:absolute;left:48px;right:48px;top:146px;bottom:24px}
+:is([data-design], .design-ov-scale) .pa-crumb{color:var(--mut);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+:is([data-design], .design-ov-scale) .pa-h1{font:700 26px/1.2 Orbitron,"Segoe UI",sans-serif;color:var(--ink);letter-spacing:.06em;margin:4px 0 16px}
+:is([data-design], .design-ov-scale) .pa-body{display:flex;flex-direction:column}
+:is([data-design], .design-ov-scale) .pa-grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(120px,1fr);gap:14px}
+:is([data-design], .design-ov-scale) .pa-card,:is([data-design], .design-ov-scale) .pa-grid > i{position:relative;border:1px solid var(--edge);border-radius:6px;background:var(--fill);display:block}
+:is([data-design], .design-ov-scale) .pa-card{padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+:is([data-design], .design-ov-scale) .pa-card b{color:var(--ink);font:600 14px/1.2 Orbitron,"Segoe UI",sans-serif;letter-spacing:.05em}
+:is([data-design], .design-ov-scale) .pa-card small{color:var(--mut);font-size:11px}
+:is([data-design], .design-ov-scale) .pa-card .pa-trig{position:absolute;right:10px;bottom:10px;width:auto;height:28px;padding:0 10px;font-size:12px}
+:is([data-design], .design-ov-scale) .pa-pop{position:absolute;z-index:5;border:1px solid var(--edge);border-radius:8px;background:linear-gradient(180deg,#0d2a3c,#081d2b);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.3);color:#c8e4f1}
+:is([data-design], .design-ov-scale) .pa-menu{top:128px;right:136px;width:270px;padding:8px;transform-origin:top right}
+:is([data-design], .design-ov-scale) .pa-it{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:6px}
+:is([data-design], .design-ov-scale) .pa-it i{width:26px;height:26px;border-radius:6px;background:rgba(82,193,230,.14);border:1px solid var(--hl);display:block}
+:is([data-design], .design-ov-scale) .pa-it.pa-collab{color:#e3a487}
+:is([data-design], .design-ov-scale) .pa-it.pa-collab i{background:rgba(194,122,90,.16);border-color:rgba(194,122,90,.45)}
+:is([data-design], .design-ov-scale) .pa-it:first-child{background:rgba(82,193,230,.1)}
+:is([data-design], .design-ov-scale) .pa-stage{position:absolute;inset:0;display:grid;place-items:center;z-index:5;pointer-events:none}
+:is([data-design], .design-ov-scale) .pa-stage > *{pointer-events:auto}
+:is([data-design], .design-ov-scale) .pa-scrim{position:absolute;inset:0;z-index:4;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.6))}
+:is([data-design], .design-ov-scale) .pa-dlg{position:relative;width:420px;padding:20px 22px 16px;transform-origin:50% 50%}
+:is([data-design], .design-ov-scale) .pa-dlg h4,:is([data-design], .design-ov-scale) .pa-big h4{font:600 17px/1.3 Orbitron,"Segoe UI",sans-serif;color:var(--ink);letter-spacing:.03em}
+:is([data-design], .design-ov-scale) .pa-dlg p{margin:8px 0 18px;color:#a9c6d4}
+:is([data-design], .design-ov-scale) .pa-act{display:flex;justify-content:flex-end;gap:8px}
+:is([data-design], .design-ov-scale) .pa-btn{height:34px;padding:0 16px;border-radius:17px;border:1px solid var(--hl);display:inline-grid;place-items:center;position:relative}
+:is([data-design], .design-ov-scale) .pa-btn.pa-danger{background:rgba(255,123,114,.14);border-color:rgba(255,123,114,.6);color:#ffb3ad}
+:is([data-design], .design-ov-scale) .pa-big{position:relative;width:min(860px,88%);padding:0 0 12px;transform-origin:50% 60%}
+:is([data-design], .design-ov-scale) .pa-big header{display:flex;align-items:flex-start;gap:12px;padding:16px 20px 12px;border-bottom:1px solid var(--hl)}
+:is([data-design], .design-ov-scale) .pa-big header small{display:block;color:var(--a);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+:is([data-design], .design-ov-scale) .pa-x{position:relative;margin-left:auto;width:30px;height:30px;border-radius:8px;border:1px solid var(--hl);display:grid;place-items:center;color:var(--mut)}
+:is([data-design], .design-ov-scale) .pa-chips{display:flex;gap:6px;padding:10px 20px}
+:is([data-design], .design-ov-scale) .pa-chips span{height:24px;padding:0 10px;border-radius:12px;border:1px solid var(--hl);display:inline-grid;place-items:center;font-size:11px;color:var(--mut)}
+:is([data-design], .design-ov-scale) .pa-chips span:first-child{color:var(--a);border-color:var(--a)}
+:is([data-design], .design-ov-scale) .pa-tbl{width:calc(100% - 40px);margin:0 20px;border-collapse:collapse;font-size:12px}
+:is([data-design], .design-ov-scale) .pa-tbl th{text-align:left;color:var(--mut);font-weight:500;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--hl)}
+:is([data-design], .design-ov-scale) .pa-tbl td{padding:8px;border-bottom:1px solid rgba(130,220,255,.08)}
+:is([data-design], .design-ov-scale) .pa-tbl tr.pa-cur-row td{background:rgba(82,193,230,.1);color:var(--ink)}
+:is([data-design], .design-ov-scale) .pa-foot{margin:10px 20px 0;color:var(--mut);font-size:11px}
+:is([data-design], .design-ov-scale) .pa-toast{right:110px;bottom:110px;width:330px;padding:12px 14px;display:flex;align-items:center;gap:12px;transform-origin:100% 100%}
+:is([data-design], .design-ov-scale) .pa-toast b{flex:1;color:var(--ink);font-weight:600}
+:is([data-design], .design-ov-scale) .pa-toast .pa-btn{height:28px;font-size:12px}
+:is([data-design], .design-ov-scale) .pa-cur{position:absolute;inset:-7px;border-radius:12px;border:2px solid #eaffff;opacity:0;pointer-events:none;animation:pa-cur 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-cur.pa-cur-x{animation-name:pa-cur-x}
+:is([data-design], .design-ov-scale) .pa-layer{position:absolute;pointer-events:none;display:block}
+@keyframes pa-cur{0%,5.2%{opacity:0;transform:scale(1.5)}7.6%{opacity:1;transform:scale(1)}9.4%{opacity:.9;transform:scale(.9)}12%,100%{opacity:0;transform:scale(1)}}
+@keyframes pa-cur-x{0%,67.2%{opacity:0;transform:scale(1.5)}69.6%{opacity:1;transform:scale(1)}71.4%{opacity:.9;transform:scale(.9)}74%,100%{opacity:0;transform:scale(1)}}
+
+:is([data-design], .design-ov-scale) .pa-d1 .pa-pop{box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 24px rgba(82,193,230,.12)}
+:is([data-design], .design-ov-scale) .pa-d1 .pa-spark{width:18px;height:18px;margin:-9px;border-radius:50%;background:radial-gradient(circle,#fff 0,#bff1ff 30%,rgba(82,193,230,.4) 60%,transparent 72%);opacity:0}
+:is([data-design], .design-ov-scale) .pa-d1 .pa-scan{height:2px;left:0;right:0;background:linear-gradient(90deg,transparent,#c9f2ff 14%,#eaffff 50%,#c9f2ff 86%,transparent);box-shadow:0 0 12px #8fe3ff,0 0 26px rgba(82,193,230,.6);opacity:0}
+:is([data-design], .design-ov-scale) .pa-d1 .pa-lines{inset:0;border-radius:inherit;background:repeating-linear-gradient(180deg,rgba(143,227,255,.22) 0 1px,transparent 1px 4px);mix-blend-mode:screen;opacity:0}
+
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-menu .pa-spark{top:50%;left:50%}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-menu .pa-scan{top:-1px;transform-origin:right center}
+@keyframes pa1-spark-m{0%,10%{opacity:0;transform:scale(.2)}11.2%{opacity:1;transform:scale(1.1)}16.4%{opacity:0;transform:scale(2)}77.6%{opacity:0;transform:scale(.4)}78.6%{opacity:.9;transform:scale(.8)}82%,100%{opacity:0;transform:scale(.3)}}
+@keyframes pa1-scan-m{0%,10.8%{opacity:0;transform:scaleX(0)}11.2%{opacity:1;transform:scaleX(0);animation-timing-function:cubic-bezier(.2,.8,.2,1)}14%{opacity:1;transform:scaleX(1)}20%{opacity:.45;transform:scaleX(1)}72.4%{opacity:.45;transform:scaleX(1)}73.2%{opacity:1;transform:scaleX(1)}76%{opacity:1;transform:scaleX(1)}78%{opacity:1;transform:scaleX(0)}78.4%,100%{opacity:0;transform:scaleX(0)}}
+@keyframes pa1-panel-m{0%,10.6%{opacity:0;clip-path:inset(-4px -90px 100% -90px)}10.8%{opacity:1;clip-path:inset(-4px -90px 100% -90px)}13.2%{opacity:1;clip-path:inset(-4px -90px 100% -90px);animation-timing-function:cubic-bezier(.2,.8,.2,1)}17.6%{opacity:1;clip-path:inset(-90px)}73.2%{opacity:1;clip-path:inset(-90px)}76%{opacity:1;clip-path:inset(-4px -90px 100% -90px)}78%{opacity:1;clip-path:inset(-4px -90px 100% -90px)}78.2%,100%{opacity:0;clip-path:inset(-4px -90px 100% -90px)}}
+@keyframes pa1-lines{0%,13.2%{opacity:0}14%{opacity:.8}23%{opacity:0}72.8%{opacity:0}73.6%{opacity:.7}76%,100%{opacity:0}}
+@keyframes pa1-item{0%,14.8%{opacity:0;filter:brightness(2.2)}16%{opacity:.9;filter:brightness(1.9)}16.8%{opacity:.35}18%{opacity:1;filter:brightness(1.3)}20%{opacity:1;filter:none}72%{opacity:1;filter:none}73%{opacity:0;filter:brightness(2)}100%{opacity:0}}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-menu .pa-spark{animation:pa1-spark-m 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-menu .pa-scan{animation:pa1-scan-m 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-menu .pa-menu{animation:pa1-panel-m 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d1 .pa-lines{animation:pa1-lines 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-menu .pa-it{animation:pa1-item 5000ms linear infinite;animation-delay:calc(var(--i) * 40ms)}
+
+@keyframes pa1-scrim-dlg{0%,10%{opacity:0}16%{opacity:1}74.4%{opacity:1}79.2%,100%{opacity:0}}
+@keyframes pa1-scan-dlg{0%,10.8%{opacity:0;transform:scaleX(0)}11.2%{opacity:1;transform:scaleX(0);animation-timing-function:cubic-bezier(.2,.8,.2,1)}14.44%{opacity:1;transform:scaleX(1)}18.4%{opacity:0;transform:scaleX(1)}72.8%{opacity:0;transform:scaleX(1)}75.6%{opacity:1;transform:scaleX(1)}77.6%{opacity:1;transform:scaleX(0)}78%,100%{opacity:0;transform:scaleX(0)}}
+@keyframes pa1-panel-dlg{0%,10.6%{opacity:0;clip-path:inset(calc(50% - 3px) -60px calc(50% - 3px) -60px)}10.8%{opacity:1;clip-path:inset(calc(50% - 3px) -60px calc(50% - 3px) -60px)}14.22%{opacity:1;clip-path:inset(calc(50% - 3px) -60px calc(50% - 3px) -60px);animation-timing-function:cubic-bezier(.2,.8,.2,1)}18.4%{opacity:1;clip-path:inset(-90px)}72.4%{opacity:1;clip-path:inset(-90px)}75.6%{opacity:1;clip-path:inset(calc(50% - 3px) -60px calc(50% - 3px) -60px)}77.6%{opacity:1;clip-path:inset(calc(50% - 3px) -60px calc(50% - 3px) -60px)}77.8%,100%{opacity:0;clip-path:inset(calc(50% - 3px) -60px calc(50% - 3px) -60px)}}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-dlg .pa-scrim{animation:pa1-scrim-dlg 5000ms linear infinite;background:radial-gradient(circle,rgba(143,227,255,.16) 1px,transparent 1.6px) 0 0/22px 22px,linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.66))}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-dlg .pa-scan{top:50%;margin-top:-1px;left:-50px;right:-50px;transform-origin:center;animation:pa1-scan-dlg 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-dlg .pa-dlg{animation:pa1-panel-dlg 5000ms linear infinite}
+
+@keyframes pa1-scrim-big{0%,10%{opacity:0}16%{opacity:1}74.4%{opacity:1}79.2%,100%{opacity:0}}
+@keyframes pa1-scan-big{0%,10.8%{opacity:0;transform:scaleX(0)}11.2%{opacity:1;transform:scaleX(0);animation-timing-function:cubic-bezier(.2,.8,.2,1)}15.88%{opacity:1;transform:scaleX(1)}21.6%{opacity:0;transform:scaleX(1)}72.8%{opacity:0;transform:scaleX(1)}75.6%{opacity:1;transform:scaleX(1)}77.6%{opacity:1;transform:scaleX(0)}78%,100%{opacity:0;transform:scaleX(0)}}
+@keyframes pa1-panel-big{0%,10.6%{opacity:0;clip-path:inset(calc(50% - 3px) -60px calc(50% - 3px) -60px)}10.8%{opacity:1;clip-path:inset(calc(50% - 3px) -60px calc(50% - 3px) -60px)}15.57%{opacity:1;clip-path:inset(calc(50% - 3px) -60px calc(50% - 3px) -60px);animation-timing-function:cubic-bezier(.2,.8,.2,1)}21.6%{opacity:1;clip-path:inset(-90px)}72.4%{opacity:1;clip-path:inset(-90px)}75.6%{opacity:1;clip-path:inset(calc(50% - 3px) -60px calc(50% - 3px) -60px)}77.6%{opacity:1;clip-path:inset(calc(50% - 3px) -60px calc(50% - 3px) -60px)}77.8%,100%{opacity:0;clip-path:inset(calc(50% - 3px) -60px calc(50% - 3px) -60px)}}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-big .pa-scrim{animation:pa1-scrim-big 5000ms linear infinite;background:radial-gradient(circle,rgba(143,227,255,.16) 1px,transparent 1.6px) 0 0/22px 22px,linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.66))}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-big .pa-scan{top:50%;margin-top:-1px;left:-50px;right:-50px;transform-origin:center;animation:pa1-scan-big 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-big .pa-big{animation:pa1-panel-big 5000ms linear infinite}
+
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-dlg .pa-dlg > :not(.pa-layer),:is([data-design], .design-ov-scale) .pa-d1.pa-s-big .pa-big header,:is([data-design], .design-ov-scale) .pa-d1.pa-s-big .pa-chips{animation:pa1-item 5000ms linear infinite}
+@keyframes pa1-row{0%,20%{opacity:0;transform:translateX(-6px);filter:brightness(2.4)}21.2%{opacity:.9;filter:brightness(1.9)}21.8%{opacity:.4}22.8%{opacity:1;transform:none;filter:brightness(1.3)}25.2%{filter:none}72%{opacity:1;filter:none}72.8%{opacity:0}100%{opacity:0}}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-big .pa-tbl tr{animation:pa1-row 5000ms linear infinite;animation-delay:calc(var(--i) * 35ms)}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-big .pa-foot{animation:pa1-item 5000ms linear infinite;animation-delay:300ms}
+
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-toast .pa-scan{bottom:-1px;transform-origin:right center;animation:pa1-scan-m 5000ms linear infinite}
+@keyframes pa1-toast{0%,10.6%{opacity:0;clip-path:inset(100% -90px -4px -90px)}10.8%{opacity:1;clip-path:inset(100% -90px -4px -90px)}13.2%{opacity:1;clip-path:inset(100% -90px -4px -90px);animation-timing-function:cubic-bezier(.2,.8,.2,1)}17.2%{opacity:1;clip-path:inset(-90px)}73.2%{opacity:1;clip-path:inset(-90px)}76%{opacity:1;clip-path:inset(100% -90px -4px -90px)}78%{opacity:1;clip-path:inset(100% -90px -4px -90px)}78.2%,100%{opacity:0;clip-path:inset(100% -90px -4px -90px)}}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-toast .pa-toast{animation:pa1-toast 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d1.pa-s-toast .pa-toast > :not(.pa-layer){animation:pa1-item 5000ms linear infinite}
+
+:is([data-design], .design-ov-scale) .pa-d2 .pa-pop{border-radius:4px}
+:is([data-design], .design-ov-scale) .pa-d2 .pa-clamp{width:14px;height:14px;border:2px solid #bff1ff;filter:drop-shadow(0 0 4px #52c1e6);opacity:0}
+:is([data-design], .design-ov-scale) .pa-d2 .pa-clamp.tl{left:-5px;top:-5px;border-right:0;border-bottom:0;--cx:-9px;--cy:-9px}
+:is([data-design], .design-ov-scale) .pa-d2 .pa-clamp.tr{right:-5px;top:-5px;border-left:0;border-bottom:0;--cx:9px;--cy:-9px}
+:is([data-design], .design-ov-scale) .pa-d2 .pa-clamp.bl{left:-5px;bottom:-5px;border-right:0;border-top:0;--cx:-9px;--cy:9px}
+:is([data-design], .design-ov-scale) .pa-d2 .pa-clamp.br{right:-5px;bottom:-5px;border-left:0;border-top:0;--cx:9px;--cy:9px}
+:is([data-design], .design-ov-scale) .pa-d2 .pa-streak{height:1.5px;width:160px;background:linear-gradient(90deg,transparent,#dff6ff);box-shadow:0 0 8px #8fe3ff;opacity:0;transform-origin:right center}
+:is([data-design], .design-ov-scale) .pa-d2 .pa-tunnel{position:absolute;inset:0;z-index:4;pointer-events:none;background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(191,241,255,.0) 0deg 5deg,rgba(191,241,255,.35) 5deg 5.6deg,rgba(191,241,255,0) 5.6deg 11deg);-webkit-mask:radial-gradient(circle at 50% 50%,transparent 12%,#000 40%,transparent 75%);mask:radial-gradient(circle at 50% 50%,transparent 12%,#000 40%,transparent 75%);opacity:0}
+@keyframes pa2-clamp{0%,14.8%{opacity:0;transform:translate(var(--cx),var(--cy))}15.6%{opacity:1;transform:translate(var(--cx),var(--cy));animation-timing-function:cubic-bezier(.5,0,.2,1.4)}17.6%{opacity:1;transform:none}26%{opacity:.85;transform:none}72%{opacity:.85;transform:none}73.2%{opacity:1;transform:translate(var(--cx),var(--cy))}74%,100%{opacity:0;transform:translate(var(--cx),var(--cy))}}
+:is([data-design], .design-ov-scale) .pa-d2 .pa-clamp{animation:pa2-clamp 5000ms linear infinite}
+
+@keyframes pa2-panel-m{0%,10%{opacity:0;transform:scale(.12);filter:blur(5px)}10.4%{opacity:1;transform:scale(.12);filter:blur(5px);animation-timing-function:cubic-bezier(.3,0,.2,1)}15.2%{opacity:1;transform:scale(1.045);filter:blur(0)}17%{transform:scale(.99)}18.6%{transform:scale(1)}72%{opacity:1;transform:scale(1);filter:blur(0);animation-timing-function:cubic-bezier(.6,0,.9,.4)}73.2%{transform:scale(1.02)}76.8%{opacity:0;transform:scale(.08,.25);filter:blur(6px)}100%{opacity:0;transform:scale(.08,.25)}}
+@keyframes pa2-streak{0%,10.2%{opacity:0;transform:scaleX(.1)}10.8%{opacity:.95;transform:scaleX(.3)}14%{opacity:.6;transform:scaleX(1)}16.4%{opacity:0;transform:scaleX(1)}72.8%{opacity:0;transform:scaleX(1)}74%{opacity:.9;transform:scaleX(1)}76.8%,100%{opacity:0;transform:scaleX(.1)}}
+@keyframes pa2-item{0%,14%{opacity:0;transform:translateX(10px)}17.2%{opacity:1;transform:none}72%{opacity:1;transform:none}72.8%{opacity:0}100%{opacity:0}}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-menu .pa-menu{animation:pa2-panel-m 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-menu .pa-it{animation:pa2-item 5000ms linear infinite;animation-delay:calc(var(--i) * 25ms)}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-menu .pa-streak{right:50%;top:50%;width:190px;animation:pa2-streak 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-menu .pa-streak.s1{rotate:-22deg}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-menu .pa-streak.s2{rotate:-38deg;width:150px}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-menu .pa-streak.s3{rotate:-54deg;width:120px}
+
+@keyframes pa2-panel-dlg{0%,10%{opacity:0;transform:scale(.3);filter:blur(10px)}10.4%{opacity:.6;transform:scale(.3);filter:blur(10px);animation-timing-function:cubic-bezier(.3,0,.2,1)}16%{opacity:1;transform:scale(1.03);filter:blur(0)}18%{transform:scale(.995)}19.6%{transform:scale(1)}72%{opacity:1;transform:scale(1);filter:blur(0);animation-timing-function:cubic-bezier(.6,0,.9,.4)}72.8%{transform:scale(1.015)}76.8%{opacity:0;transform:scale(.4);filter:blur(10px)}100%{opacity:0;transform:scale(.4)}}
+@keyframes pa2-tunnel-dlg{0%,10%{opacity:0;transform:scale(.6)}11.2%{opacity:.9;transform:scale(.8)}17.2%{opacity:0;transform:scale(1.5)}72.8%{opacity:0;transform:scale(1.5)}74%{opacity:.7;transform:scale(1.3)}77.2%,100%{opacity:0;transform:scale(.6)}}
+@keyframes pa2-lean-dlg{0%,10%{transform:none;filter:none}16%{transform:scale(.965);filter:brightness(.6) blur(1.5px)}72.8%{transform:scale(.965);filter:brightness(.6) blur(1.5px)}77.2%,100%{transform:none;filter:none}}
+@keyframes pa2-scrim-dlg{0%,10%{opacity:0}16%{opacity:.7}72.8%{opacity:.7}77.2%,100%{opacity:0}}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-dlg .pa-dlg{animation:pa2-panel-dlg 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-dlg .pa-tunnel{animation:pa2-tunnel-dlg 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-dlg .pa-body,:is([data-design], .design-ov-scale) .pa-d2.pa-s-dlg .pa-bar{animation:pa2-lean-dlg 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-dlg .pa-scrim{animation:pa2-scrim-dlg 5000ms linear infinite}
+
+@keyframes pa2-panel-big{0%,10%{opacity:0;transform:scale(.3);filter:blur(10px)}10.4%{opacity:.6;transform:scale(.3);filter:blur(10px);animation-timing-function:cubic-bezier(.3,0,.2,1)}17.6%{opacity:1;transform:scale(1.03);filter:blur(0)}19.6%{transform:scale(.995)}21.2%{transform:scale(1)}72%{opacity:1;transform:scale(1);filter:blur(0);animation-timing-function:cubic-bezier(.6,0,.9,.4)}72.8%{transform:scale(1.015)}76.8%{opacity:0;transform:scale(.4);filter:blur(10px)}100%{opacity:0;transform:scale(.4)}}
+@keyframes pa2-tunnel-big{0%,10%{opacity:0;transform:scale(.6)}11.2%{opacity:.9;transform:scale(.8)}18.8%{opacity:0;transform:scale(1.5)}72.8%{opacity:0;transform:scale(1.5)}74%{opacity:.7;transform:scale(1.3)}77.2%,100%{opacity:0;transform:scale(.6)}}
+@keyframes pa2-lean-big{0%,10%{transform:none;filter:none}17.6%{transform:scale(.965);filter:brightness(.6) blur(1.5px)}72.8%{transform:scale(.965);filter:brightness(.6) blur(1.5px)}77.2%,100%{transform:none;filter:none}}
+@keyframes pa2-scrim-big{0%,10%{opacity:0}17.6%{opacity:.7}72.8%{opacity:.7}77.2%,100%{opacity:0}}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-big .pa-big{animation:pa2-panel-big 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-big .pa-tunnel{animation:pa2-tunnel-big 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-big .pa-body,:is([data-design], .design-ov-scale) .pa-d2.pa-s-big .pa-bar{animation:pa2-lean-big 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-big .pa-scrim{animation:pa2-scrim-big 5000ms linear infinite}
+
+@keyframes pa2-row{0%,16.4%{opacity:0;transform:translateX(18px)}19.2%{opacity:1;transform:none}72%{opacity:1;transform:none}72.8%{opacity:0}100%{opacity:0}}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-big .pa-tbl tr{animation:pa2-row 5000ms linear infinite;animation-delay:calc(var(--i) * 25ms)}
+
+@keyframes pa2-toast{0%,10%{opacity:0;transform:translateX(160%) scaleX(1.3);filter:blur(4px)}10.4%{opacity:1;animation-timing-function:cubic-bezier(.25,0,.2,1)}15.6%{transform:translateX(-8px);filter:blur(0)}17.6%{transform:none}72%{opacity:1;transform:none;filter:blur(0);animation-timing-function:cubic-bezier(.6,0,.9,.4)}76%{opacity:0;transform:translateX(160%) scaleX(1.3);filter:blur(4px)}100%{opacity:0;transform:translateX(160%)}}
+@keyframes pa2-tail{0%,10.4%{opacity:0}11.2%{opacity:.9}16%{opacity:0}72.4%{opacity:0}73.6%{opacity:.9}76%,100%{opacity:0}}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-toast .pa-toast{animation:pa2-toast 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-toast .pa-streak{left:100%;top:50%;width:220px;transform-origin:left center;background:linear-gradient(90deg,#dff6ff,transparent);animation:pa2-tail 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-toast .pa-streak.s2{top:30%;width:140px}
+:is([data-design], .design-ov-scale) .pa-d2.pa-s-toast .pa-streak.s3{top:70%;width:180px}
+
+:is([data-design], .design-ov-scale) .pa-d3 .pa-pop{background:linear-gradient(180deg,rgba(18,52,72,.78),rgba(8,29,43,.86));-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-color:rgba(200,236,250,.28);border-radius:12px;overflow:hidden}
+:is([data-design], .design-ov-scale) .pa-d3 .pa-sheen{top:0;left:0;width:45%;height:1px;background:linear-gradient(90deg,transparent,#eaffff,transparent);opacity:0}
+@keyframes pa3-sheen{0%,14%{opacity:0;transform:translateX(-100%)}15.2%{opacity:.9}26%{opacity:0;transform:translateX(240%)}100%{opacity:0;transform:translateX(240%)}}
+:is([data-design], .design-ov-scale) .pa-d3 .pa-sheen{animation:pa3-sheen 5000ms linear infinite}
+@keyframes pa3-pop{0%,10%{opacity:0;transform:translateY(-4px) scale(.97);animation-timing-function:cubic-bezier(.2,.8,.2,1)}14%{opacity:1;transform:none}72%{opacity:1;transform:none;animation-timing-function:cubic-bezier(.4,0,1,1)}74.8%{opacity:0;transform:scale(.985)}100%{opacity:0;transform:scale(.985)}}
+@keyframes pa3-dlg{0%,10%{opacity:0;transform:translateY(8px) scale(.97);animation-timing-function:cubic-bezier(.2,.8,.2,1)}14.8%{opacity:1;transform:none}72%{opacity:1;transform:none;animation-timing-function:cubic-bezier(.4,0,1,1)}74.8%{opacity:0;transform:scale(.985)}100%{opacity:0;transform:scale(.985)}}
+@keyframes pa3-big{0%,10%{opacity:0;transform:translateY(12px) scale(.985);animation-timing-function:cubic-bezier(.2,.8,.2,1)}15.6%{opacity:1;transform:none}72%{opacity:1;transform:none;animation-timing-function:cubic-bezier(.4,0,1,1)}75.2%{opacity:0;transform:scale(.99)}100%{opacity:0;transform:scale(.99)}}
+@keyframes pa3-scrim{0%,10%{opacity:0}14.8%{opacity:1}72%{opacity:1}75.2%,100%{opacity:0}}
+@keyframes pa3-toast{0%,10%{opacity:0;transform:translateX(12px);animation-timing-function:cubic-bezier(.2,.8,.2,1)}14%{opacity:1;transform:none}72%{opacity:1;transform:none;animation-timing-function:cubic-bezier(.4,0,1,1)}74.8%{opacity:0;transform:translateX(6px)}100%{opacity:0}}
+:is([data-design], .design-ov-scale) .pa-d3.pa-s-menu .pa-menu{animation:pa3-pop 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d3.pa-s-dlg .pa-dlg{animation:pa3-dlg 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d3.pa-s-big .pa-big{animation:pa3-big 5000ms linear infinite}
+:is([data-design], .design-ov-scale) .pa-d3 .pa-scrim{animation:pa3-scrim 5000ms linear infinite;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+:is([data-design], .design-ov-scale) .pa-d3.pa-s-toast .pa-toast{animation:pa3-toast 5000ms linear infinite}
+</style>
+<header class="iteration-intro">
+  <h2>Runde 1 · Wie Popups auf- und zugehen</h2>
+  <p>Drei Bewegungen für dieselben vier Popup-Arten: ein Menü, einen Dialog, ein Großfenster und einen Hinweis. Jede Seite spielt Öffnen und Schließen in einer Schleife von 5 Sekunden ab, Klick auf die Auslöser im Mock wechselt die Art. Inhalt und Aufbau sind in allen drei Varianten gleich; wie ein Popup aufgebaut ist, klärt das zweite Concept „Popup-Aufbau“.</p>
+  <p>Fest steht: Es bewegen sich nur Lage, Größe, Deckkraft, Ausschnitt und Filter, Fokus und Escape bleiben bei <code>scDialog</code>, und „Bewegung reduzieren“ bekommt immer eine ruhige Fassung. Heute läuft die Kamera-Welt-Bewegung (<code>scPopupMotion</code>) nur an 11 Popups; die Fragen zu Tempo, Herkunft und Geltung stehen unter „Fragen“.</p>
+</header>
+<section data-design="d1" data-nav-label="Hologramm-Projektion" data-design-active="true" data-screen-fit="full" data-design-motto="Licht baut das Fenster" data-design-traits="Funke und Scanlinie am Auslöser|Fenster entrollt sich aus einer Lichtlinie|Inhalt flackert zeilenweise herein" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;&gt;&lt;path d=&quot;M3 12h18&quot;/&gt;&lt;path d=&quot;M6 8h12M6 16h12&quot; opacity=&quot;.5&quot;/&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;2&quot;/&gt;&lt;/svg&gt;" data-design-color="#8fe3ff" data-ov-demo=".pa-menu">
+  <section id="d1-menu" data-nav-label="Menü" data-screen data-screen-active="true"><div class="pa pa-d1 pa-s-menu"><div class="pa-bar"><span class="pa-logo">VERSE COMPANION</span><span class="pa-nav"><span>Verse</span><span class="on">Codex</span><span>HQ</span></span><span class="pa-sp"></span><button type="button" class="pa-trig pa-apps" aria-label="Apps" data-m="d1-apps" data-screen-link="d1-menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="pa-layer pa-spark"></span><span class="pa-cur" aria-hidden="true"></span></button></div>
+<div class="pa-body"><div class="pa-crumb">Codex › Hangar</div><h3 class="pa-h1">Dein Hangar</h3><div class="pa-grid">
+<div class="pa-card"><b>Gladius</b><small>Aegis · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d1-dlg">Entfernen</button></div>
+<div class="pa-card"><b>Arrow</b><small>Anvil · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d1-big">Bauteil tauschen</button></div>
+<div class="pa-card"><b>Cutlass Black</b><small>Drake · Mehrzweck</small><button type="button" class="pa-trig" data-screen-link="d1-toast">♡ Merken</button></div>
+<i></i><i></i><i></i><i></i><i></i></div></div><div class="pa-pop pa-menu" role="menu" data-m="d1-menu"><span class="pa-layer pa-scan"></span><span class="pa-layer pa-lines"></span><a class="pa-it" style="--i:0" href="#" onclick="return false"><i></i>Starscape-Hintergrund</a><a class="pa-it" style="--i:1" href="#" onclick="return false"><i></i>Desktop-App</a><a class="pa-it pa-collab" style="--i:2" href="#" onclick="return false"><i></i>Data Uploader</a><a class="pa-it" style="--i:3" href="#" onclick="return false"><i></i>Feedback senden</a></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d1-menu-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;d1-apps&quot;]" style="--anno-x:50%;--anno-y:90%"><button class="anno-pin" type="button" data-anno-pin="r1-d1-menu-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-menu-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d1-menu-a1" data-anno-bubble="r1-d1-menu-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-menu-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-menu-a1"><span class="anno-bubble-question">Ein Funke am Auslöser zeigt, wer das Menü geöffnet hat. Hilfreich oder Spielerei?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-menu-a1" data-annotation="r1-d1-menu-a1" data-attachable placeholder="{{anno.answer_placeholder}}">sehr gut!</textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-menu-a1"></div></div></div></div><div class="anno" data-anno="r1-d1-menu-a2" data-anno-side="left" data-anno-target="[data-m=&quot;d1-menu&quot;]" style="--anno-x:30%;--anno-y:60%"><button class="anno-pin" type="button" data-anno-pin="r1-d1-menu-a2" aria-expanded="false" aria-controls="anno-bubble-r1-d1-menu-a2" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d1-menu-a2" data-anno-bubble="r1-d1-menu-a2" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-menu-a2" aria-expanded="false" aria-controls="anno-bubble-r1-d1-menu-a2"><span class="anno-bubble-question">Die Scanlinien liegen eine halbe Sekunde über dem Inhalt. Länger, kürzer oder weg?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-menu-a2" data-annotation="r1-d1-menu-a2" data-attachable placeholder="{{anno.answer_placeholder}}">etwas länger ein ticken wäre ok, was ich doof finde sind die horizontalen vielen sacan linien bevor der eigentliche inhalt erschient. Gern das nochmal reviewen, gern eine bessere, alternative dafür speeeeziell finden </textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-menu-a2"></div></div></div></div></div></section>
+  <section id="d1-dlg" data-nav-label="Dialog" data-screen hidden><div class="pa pa-d1 pa-s-dlg"><div class="pa-bar"><span class="pa-logo">VERSE COMPANION</span><span class="pa-nav"><span>Verse</span><span class="on">Codex</span><span>HQ</span></span><span class="pa-sp"></span><button type="button" class="pa-trig pa-apps" aria-label="Apps" data-m="d1-apps" data-screen-link="d1-menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button></div>
+<div class="pa-body"><div class="pa-crumb">Codex › Hangar</div><h3 class="pa-h1">Dein Hangar</h3><div class="pa-grid">
+<div class="pa-card"><b>Gladius</b><small>Aegis · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d1-dlg">Entfernen<span class="pa-cur" aria-hidden="true"></span></button></div>
+<div class="pa-card"><b>Arrow</b><small>Anvil · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d1-big">Bauteil tauschen</button></div>
+<div class="pa-card"><b>Cutlass Black</b><small>Drake · Mehrzweck</small><button type="button" class="pa-trig" data-screen-link="d1-toast">♡ Merken</button></div>
+<i></i><i></i><i></i><i></i><i></i></div></div><div class="pa-scrim"></div><div class="pa-stage"><div class="pa-pop pa-dlg" role="dialog" data-m="d1-dlg"><span class="pa-layer pa-scan"></span><span class="pa-layer pa-lines"></span><h4>Gladius aus dem Hangar entfernen?</h4><p>Das Schiff verschwindet aus deinem Bestand und aus allen Listen. Rückgängig geht danach 10 Sekunden lang.</p><div class="pa-act"><button type="button" class="pa-btn" data-screen-link="d1-menu">Abbrechen<span class="pa-cur pa-cur-x" aria-hidden="true"></span></button><button type="button" class="pa-btn pa-danger">Entfernen</button></div></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d1-dlg-a3" data-anno-side="right" data-anno-target="[data-m=&quot;d1-dlg&quot;]" style="--anno-x:96%;--anno-y:50%"><button class="anno-pin" type="button" data-anno-pin="r1-d1-dlg-a3" aria-expanded="false" aria-controls="anno-bubble-r1-d1-dlg-a3" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d1-dlg-a3" data-anno-bubble="r1-d1-dlg-a3" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-dlg-a3" aria-expanded="false" aria-controls="anno-bubble-r1-d1-dlg-a3"><span class="anno-bubble-question">Beim Schließen fällt der Dialog zu einer Linie zusammen. Liest sich das als „abgebrochen“ oder als „erledigt“?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-dlg-a3" data-annotation="r1-d1-dlg-a3" data-attachable placeholder="{{anno.answer_placeholder}}">sehr gut! </textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-dlg-a3"></div></div></div></div></div></section>
+  <section id="d1-big" data-nav-label="Großfenster" data-screen hidden><div class="pa pa-d1 pa-s-big"><div class="pa-bar"><span class="pa-logo">VERSE COMPANION</span><span class="pa-nav"><span>Verse</span><span class="on">Codex</span><span>HQ</span></span><span class="pa-sp"></span><button type="button" class="pa-trig pa-apps" aria-label="Apps" data-m="d1-apps" data-screen-link="d1-menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button></div>
+<div class="pa-body"><div class="pa-crumb">Codex › Hangar</div><h3 class="pa-h1">Dein Hangar</h3><div class="pa-grid">
+<div class="pa-card"><b>Gladius</b><small>Aegis · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d1-dlg">Entfernen</button></div>
+<div class="pa-card"><b>Arrow</b><small>Anvil · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d1-big">Bauteil tauschen<span class="pa-cur" aria-hidden="true"></span></button></div>
+<div class="pa-card"><b>Cutlass Black</b><small>Drake · Mehrzweck</small><button type="button" class="pa-trig" data-screen-link="d1-toast">♡ Merken</button></div>
+<i></i><i></i><i></i><i></i><i></i></div></div><div class="pa-scrim"></div><div class="pa-stage"><div class="pa-pop pa-big" role="dialog" data-m="d1-big"><span class="pa-layer pa-scan"></span><span class="pa-layer pa-lines"></span><header><div><small>Waffe · S3 · Nase</small><h4>Bauteil tauschen</h4></div><button type="button" class="pa-x" aria-label="Schließen" data-screen-link="d1-menu">✕<span class="pa-cur pa-cur-x" aria-hidden="true"></span></button></header><div class="pa-chips"><span>Alle</span><span>Ballistisch</span><span>Energie</span><span>Verbaut</span></div><table class="pa-tbl"><thead><tr><th>Waffe</th><th>Größe</th><th>Alpha</th><th>Feuerrate</th></tr></thead><tbody><tr style="--i:0" class="pa-cur-row"><td>Mantis GT-220</td><td>S3</td><td>42</td><td>1.200</td></tr><tr style="--i:1"><td>CF-337 Panther</td><td>S3</td><td>38</td><td>1.100</td></tr><tr style="--i:2"><td>Attrition-3</td><td>S3</td><td>51</td><td>0.950</td></tr><tr style="--i:3"><td>Deadbolt III</td><td>S3</td><td>96</td><td>0.330</td></tr><tr style="--i:4"><td>M5A Cannon</td><td>S3</td><td>140</td><td>0.150</td></tr><tr style="--i:5"><td>Lightstrike III</td><td>S3</td><td>33</td><td>1.400</td></tr></tbody></table><p class="pa-foot">Werte aus 4.10.2-LIVE · 18 passende Waffen</p></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d1-big-a4" data-anno-side="right" data-anno-target="[data-m=&quot;d1-big&quot;]" style="--anno-x:96%;--anno-y:62%"><button class="anno-pin" type="button" data-anno-pin="r1-d1-big-a4" aria-expanded="false" aria-controls="anno-bubble-r1-d1-big-a4" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d1-big-a4" data-anno-bubble="r1-d1-big-a4" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-big-a4" aria-expanded="false" aria-controls="anno-bubble-r1-d1-big-a4"><span class="anno-bubble-question">Zeilen flackern einzeln herein wie ein Hologramm. Passt Flackern zu einer Tabelle, die du lesen willst?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-big-a4" data-annotation="r1-d1-big-a4" data-attachable placeholder="{{anno.answer_placeholder}}">sehr gut, aber bitte wie ein hologramm hochwertig und nciht wie   ein grk lag </textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-big-a4"></div></div></div></div></div></section>
+  <section id="d1-toast" data-nav-label="Hinweis" data-screen hidden><div class="pa pa-d1 pa-s-toast"><div class="pa-bar"><span class="pa-logo">VERSE COMPANION</span><span class="pa-nav"><span>Verse</span><span class="on">Codex</span><span>HQ</span></span><span class="pa-sp"></span><button type="button" class="pa-trig pa-apps" aria-label="Apps" data-m="d1-apps" data-screen-link="d1-menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button></div>
+<div class="pa-body"><div class="pa-crumb">Codex › Hangar</div><h3 class="pa-h1">Dein Hangar</h3><div class="pa-grid">
+<div class="pa-card"><b>Gladius</b><small>Aegis · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d1-dlg">Entfernen</button></div>
+<div class="pa-card"><b>Arrow</b><small>Anvil · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d1-big">Bauteil tauschen</button></div>
+<div class="pa-card"><b>Cutlass Black</b><small>Drake · Mehrzweck</small><button type="button" class="pa-trig" data-screen-link="d1-toast">♡ Merken<span class="pa-cur" aria-hidden="true"></span></button></div>
+<i></i><i></i><i></i><i></i><i></i></div></div><div class="pa-pop pa-toast" role="status" data-m="d1-toast"><span class="pa-layer pa-scan"></span><span class="pa-layer pa-lines"></span><b>Cutlass Black ist gemerkt</b><button type="button" class="pa-btn">Rückgängig</button></div></div></section>
+</section>
+<section data-design="d2" data-nav-label="Quantensprung" hidden data-screen-fit="full" data-design-motto="Fenster springen an ihren Platz" data-design-traits="Flug vom Auslöser mit Spur|Überschwingen und Eckklammern beim Landen|Seite weicht bei großen Fenstern zurück" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;&gt;&lt;path d=&quot;M4 18 18 4&quot;/&gt;&lt;path d=&quot;M12 4h6v6&quot;/&gt;&lt;path d=&quot;M3 13l4-4M8 21l4-4&quot; opacity=&quot;.5&quot;/&gt;&lt;/svg&gt;" data-design-color="#b79cf2" data-ov-demo=".pa-menu">
+  <section id="d2-menu" data-nav-label="Menü" data-screen data-screen-active="true"><div class="pa pa-d2 pa-s-menu"><div class="pa-bar"><span class="pa-logo">VERSE COMPANION</span><span class="pa-nav"><span>Verse</span><span class="on">Codex</span><span>HQ</span></span><span class="pa-sp"></span><button type="button" class="pa-trig pa-apps" aria-label="Apps" data-m="d2-apps" data-screen-link="d2-menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="pa-layer pa-streak s1"></span><span class="pa-layer pa-streak s2"></span><span class="pa-layer pa-streak s3"></span><span class="pa-cur" aria-hidden="true"></span></button></div>
+<div class="pa-body"><div class="pa-crumb">Codex › Hangar</div><h3 class="pa-h1">Dein Hangar</h3><div class="pa-grid">
+<div class="pa-card"><b>Gladius</b><small>Aegis · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d2-dlg">Entfernen</button></div>
+<div class="pa-card"><b>Arrow</b><small>Anvil · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d2-big">Bauteil tauschen</button></div>
+<div class="pa-card"><b>Cutlass Black</b><small>Drake · Mehrzweck</small><button type="button" class="pa-trig" data-screen-link="d2-toast">♡ Merken</button></div>
+<i></i><i></i><i></i><i></i><i></i></div></div><div class="pa-pop pa-menu" role="menu" data-m="d2-menu"><span class="pa-layer pa-clamp tl"></span><span class="pa-layer pa-clamp tr"></span><span class="pa-layer pa-clamp bl"></span><span class="pa-layer pa-clamp br"></span><a class="pa-it" style="--i:0" href="#" onclick="return false"><i></i>Starscape-Hintergrund</a><a class="pa-it" style="--i:1" href="#" onclick="return false"><i></i>Desktop-App</a><a class="pa-it pa-collab" style="--i:2" href="#" onclick="return false"><i></i>Data Uploader</a><a class="pa-it" style="--i:3" href="#" onclick="return false"><i></i>Feedback senden</a></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d2-menu-a1" data-anno-side="left" data-anno-target="[data-m=&quot;d2-menu&quot;]" style="--anno-x:0%;--anno-y:96%"><button class="anno-pin" type="button" data-anno-pin="r1-d2-menu-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-menu-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d2-menu-a1" data-anno-bubble="r1-d2-menu-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-menu-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-menu-a1"><span class="anno-bubble-question">Die Eckklammern rasten beim Landen ein und bleiben stehen. Sollen sie danach verschwinden?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-menu-a1" data-annotation="r1-d2-menu-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-menu-a1"></div></div></div></div><div class="anno" data-anno="r1-d2-menu-a2" data-anno-side="left" data-anno-target="[data-m=&quot;d2-menu&quot;]" style="--anno-x:20%;--anno-y:4%"><button class="anno-pin" type="button" data-anno-pin="r1-d2-menu-a2" aria-expanded="false" aria-controls="anno-bubble-r1-d2-menu-a2" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d2-menu-a2" data-anno-bubble="r1-d2-menu-a2" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-menu-a2" aria-expanded="false" aria-controls="anno-bubble-r1-d2-menu-a2"><span class="anno-bubble-question">Die Spur zeigt den Flugweg vom Auslöser. Zu viel für ein Menü, das du oft öffnest?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-menu-a2" data-annotation="r1-d2-menu-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-menu-a2"></div></div></div></div></div></section>
+  <section id="d2-dlg" data-nav-label="Dialog" data-screen hidden><div class="pa pa-d2 pa-s-dlg"><div class="pa-bar"><span class="pa-logo">VERSE COMPANION</span><span class="pa-nav"><span>Verse</span><span class="on">Codex</span><span>HQ</span></span><span class="pa-sp"></span><button type="button" class="pa-trig pa-apps" aria-label="Apps" data-m="d2-apps" data-screen-link="d2-menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button></div>
+<div class="pa-body"><div class="pa-crumb">Codex › Hangar</div><h3 class="pa-h1">Dein Hangar</h3><div class="pa-grid">
+<div class="pa-card"><b>Gladius</b><small>Aegis · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d2-dlg">Entfernen<span class="pa-cur" aria-hidden="true"></span></button></div>
+<div class="pa-card"><b>Arrow</b><small>Anvil · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d2-big">Bauteil tauschen</button></div>
+<div class="pa-card"><b>Cutlass Black</b><small>Drake · Mehrzweck</small><button type="button" class="pa-trig" data-screen-link="d2-toast">♡ Merken</button></div>
+<i></i><i></i><i></i><i></i><i></i></div></div><div class="pa-scrim"></div><div class="pa-tunnel"></div><div class="pa-stage"><div class="pa-pop pa-dlg" role="dialog" data-m="d2-dlg"><span class="pa-layer pa-clamp tl"></span><span class="pa-layer pa-clamp tr"></span><span class="pa-layer pa-clamp bl"></span><span class="pa-layer pa-clamp br"></span><h4>Gladius aus dem Hangar entfernen?</h4><p>Das Schiff verschwindet aus deinem Bestand und aus allen Listen. Rückgängig geht danach 10 Sekunden lang.</p><div class="pa-act"><button type="button" class="pa-btn" data-screen-link="d2-menu">Abbrechen<span class="pa-cur pa-cur-x" aria-hidden="true"></span></button><button type="button" class="pa-btn pa-danger">Entfernen</button></div></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d2-dlg-a3" data-anno-side="right" data-anno-target="[data-m=&quot;d2-dlg&quot;]" style="--anno-x:96%;--anno-y:30%"><button class="anno-pin" type="button" data-anno-pin="r1-d2-dlg-a3" aria-expanded="false" aria-controls="anno-bubble-r1-d2-dlg-a3" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d2-dlg-a3" data-anno-bubble="r1-d2-dlg-a3" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-dlg-a3" aria-expanded="false" aria-controls="anno-bubble-r1-d2-dlg-a3"><span class="anno-bubble-question">Der Dialog schießt 3 % über sein Ziel und federt zurück. Spürbar genug oder schon wackelig?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-dlg-a3" data-annotation="r1-d2-dlg-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-dlg-a3"></div></div></div></div></div></section>
+  <section id="d2-big" data-nav-label="Großfenster" data-screen hidden><div class="pa pa-d2 pa-s-big"><div class="pa-bar"><span class="pa-logo">VERSE COMPANION</span><span class="pa-nav"><span>Verse</span><span class="on">Codex</span><span>HQ</span></span><span class="pa-sp"></span><button type="button" class="pa-trig pa-apps" aria-label="Apps" data-m="d2-apps" data-screen-link="d2-menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button></div>
+<div class="pa-body"><div class="pa-crumb">Codex › Hangar</div><h3 class="pa-h1">Dein Hangar</h3><div class="pa-grid">
+<div class="pa-card"><b>Gladius</b><small>Aegis · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d2-dlg">Entfernen</button></div>
+<div class="pa-card"><b>Arrow</b><small>Anvil · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d2-big">Bauteil tauschen<span class="pa-cur" aria-hidden="true"></span></button></div>
+<div class="pa-card"><b>Cutlass Black</b><small>Drake · Mehrzweck</small><button type="button" class="pa-trig" data-screen-link="d2-toast">♡ Merken</button></div>
+<i></i><i></i><i></i><i></i><i></i></div></div><div class="pa-scrim"></div><div class="pa-tunnel"></div><div class="pa-stage"><div class="pa-pop pa-big" role="dialog" data-m="d2-big"><span class="pa-layer pa-clamp tl"></span><span class="pa-layer pa-clamp tr"></span><span class="pa-layer pa-clamp bl"></span><span class="pa-layer pa-clamp br"></span><header><div><small>Waffe · S3 · Nase</small><h4>Bauteil tauschen</h4></div><button type="button" class="pa-x" aria-label="Schließen" data-screen-link="d2-menu">✕<span class="pa-cur pa-cur-x" aria-hidden="true"></span></button></header><div class="pa-chips"><span>Alle</span><span>Ballistisch</span><span>Energie</span><span>Verbaut</span></div><table class="pa-tbl"><thead><tr><th>Waffe</th><th>Größe</th><th>Alpha</th><th>Feuerrate</th></tr></thead><tbody><tr style="--i:0" class="pa-cur-row"><td>Mantis GT-220</td><td>S3</td><td>42</td><td>1.200</td></tr><tr style="--i:1"><td>CF-337 Panther</td><td>S3</td><td>38</td><td>1.100</td></tr><tr style="--i:2"><td>Attrition-3</td><td>S3</td><td>51</td><td>0.950</td></tr><tr style="--i:3"><td>Deadbolt III</td><td>S3</td><td>96</td><td>0.330</td></tr><tr style="--i:4"><td>M5A Cannon</td><td>S3</td><td>140</td><td>0.150</td></tr><tr style="--i:5"><td>Lightstrike III</td><td>S3</td><td>33</td><td>1.400</td></tr></tbody></table><p class="pa-foot">Werte aus 4.10.2-LIVE · 18 passende Waffen</p></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d2-big-a4" data-anno-side="right" data-anno-target="[data-m=&quot;d2-big&quot;]" style="--anno-x:96%;--anno-y:20%"><button class="anno-pin" type="button" data-anno-pin="r1-d2-big-a4" aria-expanded="false" aria-controls="anno-bubble-r1-d2-big-a4" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d2-big-a4" data-anno-bubble="r1-d2-big-a4" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-big-a4" aria-expanded="false" aria-controls="anno-bubble-r1-d2-big-a4"><span class="anno-bubble-question">Die Seite weicht zurück, während das Fenster aus der Tiefe kommt. Passt der Sprung zum Bauteiltausch?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-big-a4" data-annotation="r1-d2-big-a4" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-big-a4"></div></div></div></div></div></section>
+  <section id="d2-toast" data-nav-label="Hinweis" data-screen hidden><div class="pa pa-d2 pa-s-toast"><div class="pa-bar"><span class="pa-logo">VERSE COMPANION</span><span class="pa-nav"><span>Verse</span><span class="on">Codex</span><span>HQ</span></span><span class="pa-sp"></span><button type="button" class="pa-trig pa-apps" aria-label="Apps" data-m="d2-apps" data-screen-link="d2-menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button></div>
+<div class="pa-body"><div class="pa-crumb">Codex › Hangar</div><h3 class="pa-h1">Dein Hangar</h3><div class="pa-grid">
+<div class="pa-card"><b>Gladius</b><small>Aegis · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d2-dlg">Entfernen</button></div>
+<div class="pa-card"><b>Arrow</b><small>Anvil · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d2-big">Bauteil tauschen</button></div>
+<div class="pa-card"><b>Cutlass Black</b><small>Drake · Mehrzweck</small><button type="button" class="pa-trig" data-screen-link="d2-toast">♡ Merken<span class="pa-cur" aria-hidden="true"></span></button></div>
+<i></i><i></i><i></i><i></i><i></i></div></div><div class="pa-pop pa-toast" role="status" data-m="d2-toast"><span class="pa-layer pa-clamp tl"></span><span class="pa-layer pa-clamp tr"></span><span class="pa-layer pa-clamp bl"></span><span class="pa-layer pa-clamp br"></span><span class="pa-layer pa-streak s1"></span><span class="pa-layer pa-streak s2"></span><span class="pa-layer pa-streak s3"></span><b>Cutlass Black ist gemerkt</b><button type="button" class="pa-btn">Rückgängig</button></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d2-toast-a5" data-anno-side="left" data-anno-target="[data-m=&quot;d2-toast&quot;]" style="--anno-x:2%;--anno-y:50%"><button class="anno-pin" type="button" data-anno-pin="r1-d2-toast-a5" aria-expanded="false" aria-controls="anno-bubble-r1-d2-toast-a5" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d2-toast-a5" data-anno-bubble="r1-d2-toast-a5" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-toast-a5" aria-expanded="false" aria-controls="anno-bubble-r1-d2-toast-a5"><span class="anno-bubble-question">Der Hinweis fliegt von rechts herein. Lenkt das ab, wenn du gerade woanders liest?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-toast-a5" data-annotation="r1-d2-toast-a5" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-toast-a5"></div></div></div></div></div></section>
+</section>
+<section data-design="d3" data-nav-label="Glas-Blende" hidden data-screen-fit="full" data-design-motto="Schnell, ruhig, überall gleich" data-design-traits="Unter 250 ms, kaum Bewegung|Milchglas mit weichem Hintergrund|Ein einziger Lichtschimmer als Schmuck" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;&gt;&lt;rect x=&quot;4&quot; y=&quot;5&quot; width=&quot;16&quot; height=&quot;14&quot; rx=&quot;3&quot;/&gt;&lt;path d=&quot;M7 8h6&quot; opacity=&quot;.6&quot;/&gt;&lt;/svg&gt;" data-design-color="#7fd8a8" data-ov-demo=".pa-menu">
+  <section id="d3-menu" data-nav-label="Menü" data-screen data-screen-active="true"><div class="pa pa-d3 pa-s-menu"><div class="pa-bar"><span class="pa-logo">VERSE COMPANION</span><span class="pa-nav"><span>Verse</span><span class="on">Codex</span><span>HQ</span></span><span class="pa-sp"></span><button type="button" class="pa-trig pa-apps" aria-label="Apps" data-m="d3-apps" data-screen-link="d3-menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="pa-cur" aria-hidden="true"></span></button></div>
+<div class="pa-body"><div class="pa-crumb">Codex › Hangar</div><h3 class="pa-h1">Dein Hangar</h3><div class="pa-grid">
+<div class="pa-card"><b>Gladius</b><small>Aegis · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d3-dlg">Entfernen</button></div>
+<div class="pa-card"><b>Arrow</b><small>Anvil · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d3-big">Bauteil tauschen</button></div>
+<div class="pa-card"><b>Cutlass Black</b><small>Drake · Mehrzweck</small><button type="button" class="pa-trig" data-screen-link="d3-toast">♡ Merken</button></div>
+<i></i><i></i><i></i><i></i><i></i></div></div><div class="pa-pop pa-menu" role="menu" data-m="d3-menu"><span class="pa-layer pa-sheen"></span><a class="pa-it" style="--i:0" href="#" onclick="return false"><i></i>Starscape-Hintergrund</a><a class="pa-it" style="--i:1" href="#" onclick="return false"><i></i>Desktop-App</a><a class="pa-it pa-collab" style="--i:2" href="#" onclick="return false"><i></i>Data Uploader</a><a class="pa-it" style="--i:3" href="#" onclick="return false"><i></i>Feedback senden</a></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d3-menu-a1" data-anno-side="left" data-anno-target="[data-m=&quot;d3-menu&quot;]" style="--anno-x:30%;--anno-y:2%"><button class="anno-pin" type="button" data-anno-pin="r1-d3-menu-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-menu-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d3-menu-a1" data-anno-bubble="r1-d3-menu-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d3-menu-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-menu-a1"><span class="anno-bubble-question">Ein Lichtschimmer läuft nach dem Öffnen einmal über die Oberkante. Behalten oder ganz ohne Schmuck?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d3-menu-a1" data-annotation="r1-d3-menu-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d3-menu-a1"></div></div></div></div></div></section>
+  <section id="d3-dlg" data-nav-label="Dialog" data-screen hidden><div class="pa pa-d3 pa-s-dlg"><div class="pa-bar"><span class="pa-logo">VERSE COMPANION</span><span class="pa-nav"><span>Verse</span><span class="on">Codex</span><span>HQ</span></span><span class="pa-sp"></span><button type="button" class="pa-trig pa-apps" aria-label="Apps" data-m="d3-apps" data-screen-link="d3-menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button></div>
+<div class="pa-body"><div class="pa-crumb">Codex › Hangar</div><h3 class="pa-h1">Dein Hangar</h3><div class="pa-grid">
+<div class="pa-card"><b>Gladius</b><small>Aegis · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d3-dlg">Entfernen<span class="pa-cur" aria-hidden="true"></span></button></div>
+<div class="pa-card"><b>Arrow</b><small>Anvil · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d3-big">Bauteil tauschen</button></div>
+<div class="pa-card"><b>Cutlass Black</b><small>Drake · Mehrzweck</small><button type="button" class="pa-trig" data-screen-link="d3-toast">♡ Merken</button></div>
+<i></i><i></i><i></i><i></i><i></i></div></div><div class="pa-scrim"></div><div class="pa-stage"><div class="pa-pop pa-dlg" role="dialog" data-m="d3-dlg"><span class="pa-layer pa-sheen"></span><h4>Gladius aus dem Hangar entfernen?</h4><p>Das Schiff verschwindet aus deinem Bestand und aus allen Listen. Rückgängig geht danach 10 Sekunden lang.</p><div class="pa-act"><button type="button" class="pa-btn" data-screen-link="d3-menu">Abbrechen<span class="pa-cur pa-cur-x" aria-hidden="true"></span></button><button type="button" class="pa-btn pa-danger">Entfernen</button></div></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d3-dlg-a2" data-anno-side="right" data-anno-target="[data-m=&quot;d3-dlg&quot;]" style="--anno-x:96%;--anno-y:40%"><button class="anno-pin" type="button" data-anno-pin="r1-d3-dlg-a2" aria-expanded="false" aria-controls="anno-bubble-r1-d3-dlg-a2" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d3-dlg-a2" data-anno-bubble="r1-d3-dlg-a2" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d3-dlg-a2" aria-expanded="false" aria-controls="anno-bubble-r1-d3-dlg-a2"><span class="anno-bubble-question">Der Dialog hebt sich 8 px und wächst von 97 auf 100 %. Wirkt das zu brav für Verse Companion?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d3-dlg-a2" data-annotation="r1-d3-dlg-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d3-dlg-a2"></div></div></div></div></div></section>
+  <section id="d3-big" data-nav-label="Großfenster" data-screen hidden><div class="pa pa-d3 pa-s-big"><div class="pa-bar"><span class="pa-logo">VERSE COMPANION</span><span class="pa-nav"><span>Verse</span><span class="on">Codex</span><span>HQ</span></span><span class="pa-sp"></span><button type="button" class="pa-trig pa-apps" aria-label="Apps" data-m="d3-apps" data-screen-link="d3-menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button></div>
+<div class="pa-body"><div class="pa-crumb">Codex › Hangar</div><h3 class="pa-h1">Dein Hangar</h3><div class="pa-grid">
+<div class="pa-card"><b>Gladius</b><small>Aegis · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d3-dlg">Entfernen</button></div>
+<div class="pa-card"><b>Arrow</b><small>Anvil · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d3-big">Bauteil tauschen<span class="pa-cur" aria-hidden="true"></span></button></div>
+<div class="pa-card"><b>Cutlass Black</b><small>Drake · Mehrzweck</small><button type="button" class="pa-trig" data-screen-link="d3-toast">♡ Merken</button></div>
+<i></i><i></i><i></i><i></i><i></i></div></div><div class="pa-scrim"></div><div class="pa-stage"><div class="pa-pop pa-big" role="dialog" data-m="d3-big"><span class="pa-layer pa-sheen"></span><header><div><small>Waffe · S3 · Nase</small><h4>Bauteil tauschen</h4></div><button type="button" class="pa-x" aria-label="Schließen" data-screen-link="d3-menu">✕<span class="pa-cur pa-cur-x" aria-hidden="true"></span></button></header><div class="pa-chips"><span>Alle</span><span>Ballistisch</span><span>Energie</span><span>Verbaut</span></div><table class="pa-tbl"><thead><tr><th>Waffe</th><th>Größe</th><th>Alpha</th><th>Feuerrate</th></tr></thead><tbody><tr style="--i:0" class="pa-cur-row"><td>Mantis GT-220</td><td>S3</td><td>42</td><td>1.200</td></tr><tr style="--i:1"><td>CF-337 Panther</td><td>S3</td><td>38</td><td>1.100</td></tr><tr style="--i:2"><td>Attrition-3</td><td>S3</td><td>51</td><td>0.950</td></tr><tr style="--i:3"><td>Deadbolt III</td><td>S3</td><td>96</td><td>0.330</td></tr><tr style="--i:4"><td>M5A Cannon</td><td>S3</td><td>140</td><td>0.150</td></tr><tr style="--i:5"><td>Lightstrike III</td><td>S3</td><td>33</td><td>1.400</td></tr></tbody></table><p class="pa-foot">Werte aus 4.10.2-LIVE · 18 passende Waffen</p></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d3-big-a3" data-anno-side="right" data-anno-target="[data-m=&quot;d3-big&quot;]" style="--anno-x:96%;--anno-y:30%"><button class="anno-pin" type="button" data-anno-pin="r1-d3-big-a3" aria-expanded="false" aria-controls="anno-bubble-r1-d3-big-a3" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d3-big-a3" data-anno-bubble="r1-d3-big-a3" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d3-big-a3" aria-expanded="false" aria-controls="anno-bubble-r1-d3-big-a3"><span class="anno-bubble-question">Der Hintergrund wird weich, während das Fenster aufgeht. Stärker weichzeichnen oder nur abdunkeln?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d3-big-a3" data-annotation="r1-d3-big-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d3-big-a3"></div></div></div></div></div></section>
+  <section id="d3-toast" data-nav-label="Hinweis" data-screen hidden><div class="pa pa-d3 pa-s-toast"><div class="pa-bar"><span class="pa-logo">VERSE COMPANION</span><span class="pa-nav"><span>Verse</span><span class="on">Codex</span><span>HQ</span></span><span class="pa-sp"></span><button type="button" class="pa-trig pa-apps" aria-label="Apps" data-m="d3-apps" data-screen-link="d3-menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button></div>
+<div class="pa-body"><div class="pa-crumb">Codex › Hangar</div><h3 class="pa-h1">Dein Hangar</h3><div class="pa-grid">
+<div class="pa-card"><b>Gladius</b><small>Aegis · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d3-dlg">Entfernen</button></div>
+<div class="pa-card"><b>Arrow</b><small>Anvil · Leichter Jäger</small><button type="button" class="pa-trig" data-screen-link="d3-big">Bauteil tauschen</button></div>
+<div class="pa-card"><b>Cutlass Black</b><small>Drake · Mehrzweck</small><button type="button" class="pa-trig" data-screen-link="d3-toast">♡ Merken<span class="pa-cur" aria-hidden="true"></span></button></div>
+<i></i><i></i><i></i><i></i><i></i></div></div><div class="pa-pop pa-toast" role="status" data-m="d3-toast"><span class="pa-layer pa-sheen"></span><b>Cutlass Black ist gemerkt</b><button type="button" class="pa-btn">Rückgängig</button></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d3-toast-a4" data-anno-side="left" data-anno-target="[data-m=&quot;d3-toast&quot;]" style="--anno-x:2%;--anno-y:50%"><button class="anno-pin" type="button" data-anno-pin="r1-d3-toast-a4" aria-expanded="false" aria-controls="anno-bubble-r1-d3-toast-a4" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d3-toast-a4" data-anno-bubble="r1-d3-toast-a4" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d3-toast-a4" aria-expanded="false" aria-controls="anno-bubble-r1-d3-toast-a4"><span class="anno-bubble-question">Der Hinweis gleitet nur 12 px herein. Merkst du ihn so aus dem Augenwinkel?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d3-toast-a4" data-annotation="r1-d3-toast-a4" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d3-toast-a4"></div></div></div></div></div></section>
+</section>
+
+<section data-view="r1-v-fragen" data-view-kind="analysis" data-analysis="full" data-nav-label="Fragen" hidden>
+  <section id="r1-briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>Neun Fragen zur Bewegung, die für jede der drei Varianten gleich gelten: wie schnell, woher und für welche Popups.</p>
+    <p data-briefing-why>Die Varianten zeigen den Stil, hier geht es um Tempo und Regeln dahinter. Überall ist eine Empfehlung vorbelegt.</p>
+    <div data-briefing-potential data-viz="kpi" data-viz-spec='{"value":"1,5 s","unit":"weniger","label":"Wartezeit je Großfenster"}'>1,5 s weniger</div>
+    <a data-briefing-topic="r1-t-tempo" data-share="45">Tempo</a>
+    <a data-briefing-topic="r1-t-raum" data-share="25">Herkunft und Eingabe</a>
+    <a data-briefing-topic="r1-t-geltung" data-share="30">Geltung</a>
+    <p data-briefing-duration>≈ 5 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><p>Neun Fragen in drei Themen, jede mit einer Empfehlung.</p></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Menü öffnen","value":800},{"label":"Panel öffnen","value":960},{"label":"Großfenster öffnen","value":1960}],"unit":"ms","hl":"Großfenster öffnen"}'></div>
+        <p>Die Dauern stammen aus popup-motion.scss auf dem Stand von main. Im Browser gemessen ist davon nichts.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="r1-t-tempo" data-topic data-nav-label="Tempo">
+    <div data-alevel="2" data-title="Tempo">
+      <div data-slot="short"><p>Großfenster brauchen fast 2 s zum Öffnen und 1,2 s zum Schließen.</p></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Öffnen heute","value":1960},{"label":"Schließen heute","value":1176},{"label":"Öffnen Vorschlag","value":450},{"label":"Schließen Vorschlag","value":220}],"unit":"ms","hl":"Öffnen heute"}'></div>
+        <p>Wer im Codex fünf Bauteile tauscht, sieht zehn Animationen. Jede Sekunde davon ist Wartezeit, weil der Inhalt erst am Ende steht.</p>
+      </div>
+    </div>
+
+    <section id="r1-dur" data-nav-label="Dauer beim Öffnen" data-decision="r1-dur" data-decision-mode="single" data-label="Dauer beim Öffnen" data-rec="short" data-rec-why="Übliche Richtwerte für Bewegung in Oberflächen liegen bei 200 bis 500 ms; darüber nimmt man das Warten bewusst wahr." data-applies-to="alle Popups" data-finding="r1-dur-f"><input type="hidden" name="dm-r1-dur-hes" value="{&quot;ms&quot;:12515,&quot;revisits&quot;:0,&quot;median&quot;:12515}">
+      <p data-applies>Gilt für: alle Popups</p>
+      <p data-situation>Bis die letzte Zeile in „Bauteil tauschen“ steht, vergehen 1,96 s; wer fünf Teile tauscht, wartet so fast 10 s auf Animation.</p>
+      <h3 data-question>Wie lange darf das Öffnen dauern, bis du arbeiten kannst?</h3>
+      <p data-stakes>Wie viel Inszenierung jede Variante überhaupt zeigen kann.</p>
+      <div data-options>
+        <label data-opt="short" data-recommended><input type="radio" name="dm-r1-dur" value="short"><span data-opt-label>Klein 200, Dialog 300, Groß 450 ms</span><span data-opt-consequence>Spürbar, aber nie im Weg; große Fenster dürfen etwas mehr zeigen.</span></label>
+        <label data-opt="fast"><input type="radio" name="dm-r1-dur" value="fast"><span data-opt-label>Überall unter 200 ms</span><span data-opt-consequence>Fühlt sich sofort an, für Licht- und Sprungeffekte bleibt kaum Zeit.</span></label>
+        <label data-opt="staged"><input type="radio" name="dm-r1-dur" value="staged" checked><span data-opt-label>Klein 300, Dialog 500, Groß 900 ms</span><span data-opt-consequence>Inszenierter, bei häufigen Fenstern wie dem Bauteiltausch schon zäh.</span></label>
+        <label data-opt="today"><input type="radio" name="dm-r1-dur" value="today"><span data-opt-label>Wie heute: 800 ms klein, 1,96 s groß</span><span data-opt-consequence>Der Kamera-Welt-Auftritt bleibt, die Wartezeit auch.</span></label>
+      </div>
+      <textarea data-comment="r1-dur-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Dauer beim Öffnen">
+        <div data-slot="short"><p>Das Großfenster braucht zweieinhalbmal so lang wie ein Menü.</p></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Menü","value":800},{"label":"Panel","value":960},{"label":"Großfenster","value":1960}],"unit":"ms","hl":"Großfenster"}'></div>
+          <p>Menüs und Panels liegen knapp unter einer Sekunde.</p>
+        </div>
+        <div data-example><pre>.pm-small { --pm-total: 800; }
+.pm-large { --pm-total: 1960; }
+.pm-panel { --pm-total: 960; }</pre></div>
+      </div>
+    </section>
+
+    <section id="r1-close" data-nav-label="Schließen" data-decision="r1-close" data-decision-mode="single" data-label="Schließen" data-rec="own" data-rec-why="Schließen folgt fast immer auf eine erledigte Aktion; da zählt der Rückweg, nicht der Auftritt." data-applies-to="alle Popups" data-finding="r1-close-f"><input type="hidden" name="dm-r1-close-hes" value="{&quot;ms&quot;:15258,&quot;revisits&quot;:0,&quot;median&quot;:12515}">
+      <p data-applies>Gilt für: alle Popups</p>
+      <p data-situation>Nach „Übernehmen“ reagiert die Seite erst 1,2 s später wieder, weil ein Großfenster beim Schließen sein Öffnen rückwärts abspielt.</p>
+      <h3 data-question>Wie geht ein Popup zu?</h3>
+      <div data-options>
+        <label data-opt="own" data-recommended><input type="radio" name="dm-r1-close" value="own" checked><span data-opt-label>Eigenes kurzes Ausblenden, etwa halb so lang wie das Öffnen</span><span data-opt-consequence>Nach einer Aktion bist du sofort zurück; die Bewegung deutet die Herkunft nur an.</span></label>
+        <label data-opt="reverse"><input type="radio" name="dm-r1-close" value="reverse"><span data-opt-label>Öffnen rückwärts in 60 % der Zeit, wie heute</span><span data-opt-consequence>Symmetrisch, aber nach jeder Aktion wartest du.</span></label>
+        <label data-opt="instant"><input type="radio" name="dm-r1-close" value="instant"><span data-opt-label>Sofort weg, ohne Animation</span><span data-opt-consequence>Am schnellsten, wirkt aber abgehackt neben einem animierten Öffnen.</span></label>
+      </div>
+      <textarea data-comment="r1-close-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Schließen">
+        <div data-slot="short"><p>Schließen dauert heute 60 % des Öffnens.</p></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Menü schließen","value":480},{"label":"Großfenster schließen","value":1176},{"label":"Vorschlag Großfenster","value":220}],"unit":"ms","hl":"Großfenster schließen"}'></div>
+          <p>Auch das Apps-Menü braucht fast eine halbe Sekunde, bis es weg ist.</p>
+        </div>
+        <div data-example><pre>/** A close plays the open reversed in this share of the time. */
+export const POPUP_MOTION_CLOSE_SHARE = 0.6;</pre></div>
+      </div>
+    </section>
+
+    <section id="r1-stagger" data-nav-label="Zeilen und Einträge" data-decision="r1-stagger" data-decision-mode="single" data-label="Zeilen und Einträge" data-rec="short" data-rec-why="Sechs Zeilen reichen für den Eindruck eines Aufbaus; der Rest liegt meist ohnehin unter dem Rand." data-applies-to="Popups mit Listen und Tabellen" data-finding="r1-stagger-f"><input type="hidden" name="dm-r1-stagger-hes" value="{&quot;ms&quot;:7669,&quot;revisits&quot;:0,&quot;median&quot;:12515}">
+      <p data-applies>Gilt für: Popups mit Listen und Tabellen</p>
+      <p data-situation>Die zehnte Zeile einer Tabelle steht erst fast 1,9 s nach dem Klick, weil Zeilen im 70-ms-Takt nacheinander kommen.</p>
+      <h3 data-question>Wie kommen Zeilen und Einträge herein?</h3>
+      <div data-options>
+        <label data-opt="short" data-recommended><input type="radio" name="dm-r1-stagger" value="short" checked><span data-opt-label>Kurze Kaskade: die ersten 6 Zeilen, 30 ms Abstand</span><span data-opt-consequence>Man sieht den Aufbau, nach 0,2 s steht alles.</span></label>
+        <label data-opt="none"><input type="radio" name="dm-r1-stagger" value="none"><span data-opt-label>Alle Zeilen gleichzeitig</span><span data-opt-consequence>Am ruhigsten; der Inhalt geht auf wie ein Bild.</span></label>
+        <label data-opt="long"><input type="radio" name="dm-r1-stagger" value="long"><span data-opt-label>Lange Kaskade wie im Codex-Index, 70 ms je Zeile</span><span data-opt-consequence>Spaciger Aufbau, bei langen Tabellen fast 2 s.</span></label>
+      </div>
+      <textarea data-comment="r1-stagger-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Zeilen und Einträge">
+        <div data-slot="short"><p>Die Kaskade beginnt erst nach einer Sekunde.</p></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Zeile 1","value":1260},{"label":"Zeile 5","value":1540},{"label":"Zeile 10","value":1890}],"unit":"ms","hl":"Zeile 10"}'></div>
+          <p>Betrifft Bauteiltausch, Komponenten-Fenster und Vergleich.</p>
+        </div>
+        <div data-example><pre>.pm-row {
+  --d: calc(1000 + var(--pm-i, 0) * 70); --t: 260;
+}</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <section id="r1-t-raum" data-topic data-nav-label="Herkunft und Eingabe">
+    <div data-alevel="2" data-title="Herkunft und Eingabe">
+      <div data-slot="short"><p>Woher ein Popup kommt und ab wann es Eingaben annimmt.</p></div>
+      <div data-slot="long">
+        <p>Menüs und Hinweise wachsen heute aus einer Ecke, Dialoge erscheinen ohne Herkunft, Großfenster steigen von unten. Die drei Varianten setzen das gleich um; die Fragen hier gelten für jede.</p>
+      </div>
+    </div>
+
+    <section id="r1-origin" data-nav-label="Herkunft" data-decision="r1-origin" data-decision-mode="single" data-label="Herkunft" data-rec="anchored" data-rec-why="Ein verankertes Popup gehört räumlich zum Knopf, ein Dialog unterbricht die ganze Seite." data-applies-to="alle Popups" data-finding="r1-origin-f" data-finding-quant="false"><input type="hidden" name="dm-r1-origin-hes" value="{&quot;ms&quot;:6760,&quot;revisits&quot;:0,&quot;median&quot;:12515}">
+      <p data-applies>Gilt für: alle Popups</p>
+      <p data-situation>Ob ein Fenster zu deinem Klick gehört, zeigt die Bewegung nur bei Menüs; ein Dialog springt ohne Herkunft auf.</p>
+      <h3 data-question>Woher kommt ein Popup?</h3>
+      <div data-options>
+        <label data-opt="anchored" data-recommended><input type="radio" name="dm-r1-origin" value="anchored" checked><span data-opt-label>Verankerte aus ihrem Auslöser, Dialoge aus der Bildmitte</span><span data-opt-consequence>Menüs und Hinweise zeigen, woher sie kommen; Dialoge stehen ruhig im Zentrum.</span></label>
+        <label data-opt="centre"><input type="radio" name="dm-r1-origin" value="centre"><span data-opt-label>Alle aus der Bildmitte</span><span data-opt-consequence>Einheitlich, aber ein Menü oben rechts wirkt losgelöst vom Knopf.</span></label>
+        <label data-opt="trigger"><input type="radio" name="dm-r1-origin" value="trigger"><span data-opt-label>Alle aus dem Auslöser, auch Dialoge</span><span data-opt-consequence>Starke Verbindung zum Klick; ein Dialog fliegt dann quer über die Seite.</span></label>
+      </div>
+      <textarea data-comment="r1-origin-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Herkunft">
+        <div data-slot="short"><p>Drei Popup-Arten, drei verschiedene Herkünfte.</p></div>
+        <div data-slot="long"><p>Großfenster steigen dagegen von unten hinter einem Horizont auf.</p></div>
+        <div data-example><pre>Apps-Menü          wächst aus dem Knopf oben rechts
+Bestätigen         erscheint ohne Bewegung in der Mitte
+Bauteil tauschen   steigt von unten hinter einem Horizont auf</pre></div>
+      </div>
+    </section>
+
+    <section id="r1-input" data-nav-label="Eingaben beim Öffnen" data-decision="r1-input" data-decision-mode="single" data-label="Eingaben beim Öffnen" data-rec="now" data-rec-why="Bei 200 bis 450 ms Öffnen trifft man einen halb sichtbaren Knopf kaum; verlorene Tastendrücke ärgern mehr." data-applies-to="alle Popups mit Eingabe oder Knöpfen" data-finding="r1-input-f" data-finding-quant="false"><input type="hidden" name="dm-r1-input-hes" value="{&quot;ms&quot;:4275,&quot;revisits&quot;:0,&quot;median&quot;:12515}">
+      <p data-applies>Gilt für: alle Popups mit Eingabe oder Knöpfen</p>
+      <p data-situation>Wer nach dem Öffnen sofort tippt, verliert die ersten Buchstaben, wenn ein Popup erst nach seiner Animation den Fokus bekommt.</p>
+      <h3 data-question>Ab wann nimmt ein Popup Eingaben an?</h3>
+      <div data-options>
+        <label data-opt="now" data-recommended><input type="radio" name="dm-r1-input" value="now" checked><span data-opt-label>Sofort beim Öffnen, die Animation läuft darunter weiter</span><span data-opt-consequence>Kein Buchstabe geht verloren, schnelle Klicks werden nie gebremst.</span></label>
+        <label data-opt="after"><input type="radio" name="dm-r1-input" value="after"><span data-opt-label>Erst wenn die Animation fertig ist</span><span data-opt-consequence>Keine Klicks auf halb sichtbare Knöpfe, dafür kurze Totzeiten.</span></label>
+      </div>
+      <textarea data-comment="r1-input-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Eingaben beim Öffnen">
+        <div data-slot="short"><p>Die Schnellsuche lebt davon, dass man sofort tippt.</p></div>
+        <div data-slot="long"><p>Betrifft vor allem Schnellsuche, Bestätigen und Formulare in HQ-Dialogen.</p></div>
+        <div data-example><pre>Strg + K           Suche öffnet
+„gladius“ tippen   sofort danach
+Fokus sofort       → gladius
+Fokus nach 300 ms  → ius</pre></div>
+      </div>
+    </section>
+
+    <section id="r1-interrupt" data-nav-label="Schneller zweiter Klick" data-decision="r1-interrupt" data-decision-mode="single" data-label="Schneller zweiter Klick" data-rec="continue" data-rec-why="Umkehren an der aktuellen Stelle vermeidet das Flackern bei schnellem Klicken." data-applies-to="Menüs, Panels, Hinweise" data-finding="r1-interrupt-f" data-finding-quant="false"><input type="hidden" name="dm-r1-interrupt-hes" value="{&quot;ms&quot;:7605,&quot;revisits&quot;:0,&quot;median&quot;:12515}">
+      <p data-applies>Gilt für: Menüs, Panels, Hinweise</p>
+      <p data-situation>Klickst du ein Menü zu und gleich wieder auf, springt es auf null zurück und baut sich komplett neu auf.</p>
+      <h3 data-question>Was passiert bei einem schnellen zweiten Klick?</h3>
+      <div data-options>
+        <label data-opt="continue" data-recommended><input type="radio" name="dm-r1-interrupt" value="continue" checked><span data-opt-label>Kehrt an der aktuellen Stelle um</span><span data-opt-consequence>Kein Sprung; das Popup läuft von dort zurück, wo es gerade ist.</span></label>
+        <label data-opt="restart"><input type="radio" name="dm-r1-interrupt" value="restart"><span data-opt-label>Startet von vorn, wie heute</span><span data-opt-consequence>Einfach zu bauen; bei schnellem Klicken flackert es.</span></label>
+      </div>
+      <textarea data-comment="r1-interrupt-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Schneller zweiter Klick">
+        <div data-slot="short"><p>Ein Neustart setzt jede Teil-Animation auf null.</p></div>
+        <div data-slot="long"><p>Das betrifft alles, was während des Schließens noch im Bild ist.</p></div>
+        <div data-example><pre>restart(): void {
+  cl.remove('pm-out');
+  cl.add('pm-in');
+  this.replay(); // every layer back to 0 ms
+}</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <section id="r1-t-geltung" data-topic data-nav-label="Geltung">
+    <div data-alevel="2" data-title="Geltung">
+      <div data-slot="short"><p>11 Popups bewegen sich gemeinsam, die übrigen eigen oder gar nicht.</p></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Gemeinsame Bewegung","value":11},{"label":"Eigene Bewegung","value":15},{"label":"Ohne Bewegung","value":8}],"unit":"Popups","hl":"Eigene Bewegung"}'></div>
+        <p>Gezählt aus dem Code auf dem Stand von main, die beiden unteren Zahlen gerundet.</p>
+      </div>
+    </div>
+
+    <section id="r1-scope" data-nav-label="Welche Popups" data-decision="r1-scope" data-decision-mode="multi" data-label="Welche Popups" data-rec="menus dialogs large toasts overlay search panels" data-rec-why="Ein Popup, das anders aufgeht als die übrigen, fällt sofort auf; nur der Bildbetrachter braucht eine eigene Zoom-Bewegung aus dem Vorschaubild." data-applies-to="alle Popup-Arten" data-finding="r1-scope-f"><input type="hidden" name="dm-r1-scope-hes" value="{&quot;ms&quot;:35925,&quot;revisits&quot;:0,&quot;median&quot;:12515}">
+      <p data-applies>Gilt für: alle Popup-Arten</p>
+      <p data-situation>Nur 11 von rund 35 Popups bewegen sich gemeinsam; 8 springen ohne jede Bewegung auf, 15 bringen ihre eigene mit.</p>
+      <h3 data-question>Welche Popups bekommen die gemeinsame Bewegung?</h3>
+      <div data-options>
+        <label data-opt="menus" data-recommended><input type="checkbox" name="dm-r1-scope.menus" checked><span data-opt-label>Menüs und Popover: Apps, Konto, Merkliste, Admin</span><span data-opt-consequence>Alle verankerten Listen öffnen gleich.</span></label>
+        <label data-opt="dialogs" data-recommended><input type="checkbox" name="dm-r1-scope.dialogs" checked><span data-opt-label>Dialoge: Bestätigen, HQ-Dialoge, Wunschkorb</span><span data-opt-consequence>Ersetzt die eigene Einblendung der HQ-Dialoge.</span></label>
+        <label data-opt="large" data-recommended><input type="checkbox" name="dm-r1-scope.large" checked><span data-opt-label>Großfenster: Bauteil tauschen, Komponente, Vergleich</span><span data-opt-consequence>Wie heute dabei, nur im neuen Stil.</span></label>
+        <label data-opt="toasts" data-recommended><input type="checkbox" name="dm-r1-scope.toasts" checked><span data-opt-label>Hinweise: Merken, Rückgängig, App-Meldungen</span><span data-opt-consequence>Wie heute dabei, nur im neuen Stil.</span></label>
+        <label data-opt="overlay" data-recommended><input type="checkbox" name="dm-r1-scope.overlay" checked><span data-opt-label>Overlay-Seiten mit eigener Adresse: News, Bestand, Kommend</span><span data-opt-consequence>Ersetzt das eigene Hochgleiten der Overlay-Seiten.</span></label>
+        <label data-opt="search" data-recommended><input type="checkbox" name="dm-r1-scope.search" checked><span data-opt-label>Schnellsuche</span><span data-opt-consequence>Bekommt erstmals eine Bewegung; tippen geht trotzdem sofort.</span></label>
+        <label data-opt="panels" data-recommended><input type="checkbox" name="dm-r1-scope.panels" checked><span data-opt-label>Eck-Panels: Beta-Schalter, Übergabe aufs Handy</span><span data-opt-consequence>Aus der Ecke ihres Knopfs, wie Menüs.</span></label>
+        <label data-opt="lightbox"><input type="checkbox" name="dm-r1-scope.lightbox"><span data-opt-label>Bildbetrachter</span><span data-opt-consequence>Bekäme dieselbe Bewegung statt eines Zooms aus dem Vorschaubild.</span></label>
+      </div>
+      <textarea data-comment="r1-scope-note" placeholder="Notiz (optional)">beim bildbetrachter gern auch nochmal rkrtitisch die animation reviewen sollte ähnlich sein nur eher zoom charakter aber halt auch holografisch !</textarea>
+      <div data-alevel="3" data-title="Welche Popups">
+        <div data-slot="short"><p>Vier Wege, ein Popup zu öffnen.</p></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Gemeinsame Bewegung","value":11},{"label":"Eigene Bewegung","value":15},{"label":"Ohne Bewegung","value":8}],"unit":"Popups","hl":"Ohne Bewegung"}'></div>
+          <p>Die Liste im Beispiel nennt, wer heute womit aufgeht.</p>
+        </div>
+        <div data-example><pre>gemeinsam  Apps, Konto, Merkliste, Hinweise, Bauteil tauschen, Vergleich
+dlg-in     HQ-Dialoge, Wunschkorb (220 ms)
+sheet-in   Overlay-Seiten (160 ms)
+grow       Übergabe aufs Handy (180 ms)
+keine      Bestätigen, Schnellsuche, Beta-Schalter, Admin-Menü</pre></div>
+      </div>
+    </section>
+
+    <section id="r1-reduced" data-nav-label="Weniger Bewegung" data-decision="r1-reduced" data-decision-mode="single" data-label="Weniger Bewegung" data-rec="fade" data-rec-why="Ein Einblenden ist keine Bewegung im Sinne der Einstellung und mildert den harten Schnitt." data-applies-to="Leute mit „Bewegung reduzieren“" data-finding="r1-reduced-f" data-finding-quant="false"><input type="hidden" name="dm-r1-reduced-hes" value="{&quot;ms&quot;:23109,&quot;revisits&quot;:2,&quot;median&quot;:12515}">
+      <p data-applies>Gilt für: Leute mit „Bewegung reduzieren“</p>
+      <p data-situation>Wer „Bewegung reduzieren“ eingestellt hat, bekommt 160 ms Einblenden ohne Effektschichten; Größen- und Lageänderungen fallen ganz weg.</p>
+      <h3 data-question>Was sehen Leute mit „Bewegung reduzieren“?</h3>
+      <div data-options>
+        <label data-opt="fade" data-recommended><input type="radio" name="dm-r1-reduced" value="fade"><span data-opt-label>Kurzes Einblenden, 120 ms</span><span data-opt-consequence>Kein Ruck und keine Bewegung, trotzdem kein harter Schnitt.</span></label>
+        <label data-opt="none"><input type="radio" name="dm-r1-reduced" value="none" checked><span data-opt-label>Gar keine Animation</span><span data-opt-consequence>Für sehr empfindliche Leute am sichersten, wirkt aber hart.</span></label>
+        <label data-opt="static"><input type="radio" name="dm-r1-reduced" value="static"><span data-opt-label>Einblenden plus ruhende Lichtkante</span><span data-opt-consequence>Der Stil bleibt erkennbar, ohne dass sich etwas bewegt.</span></label>
+      </div>
+      <textarea data-comment="r1-reduced-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Weniger Bewegung">
+        <div data-slot="short"><p>Die ruhige Fassung gibt es schon, offen ist nur ihre Form.</p></div>
+        <div data-slot="long"><p>Gilt für jede der drei Varianten gleich.</p></div>
+        <div data-example><pre>@media (prefers-reduced-motion: reduce) {
+  .pm-small.pm-in { animation: pm-fade-in 160ms linear; }
+}</pre></div>
+      </div>
+    </section>
+
+    <section id="r1-phone" data-nav-label="Dialoge auf dem Handy" data-decision="r1-phone" data-decision-mode="single" data-label="Dialoge auf dem Handy" data-rec="sheet" data-rec-why="Ein Blatt am unteren Rand liegt im Daumenbereich und hat eine natürliche Richtung." data-applies-to="Dialoge und Großfenster auf dem Handy" data-finding="r1-phone-f" data-finding-quant="false"><input type="hidden" name="dm-r1-phone-hes" value="{&quot;ms&quot;:63039,&quot;revisits&quot;:0,&quot;median&quot;:12515}">
+      <p data-applies>Gilt für: Dialoge und Großfenster auf dem Handy</p>
+      <p data-situation>Auf dem Handy liegen HQ-Dialoge schon als Blatt am unteren Rand, gleiten aber nur 8 px hoch; das Blatt wirkt, als wäre es schon dagewesen.</p>
+      <h3 data-question>Wie öffnen Dialoge auf dem Handy?</h3>
+      <div data-options>
+        <label data-opt="sheet" data-recommended><input type="radio" name="dm-r1-phone" value="sheet"><span data-opt-label>Als Blatt von unten hochgleiten</span><span data-opt-consequence>So kennt man es aus Handy-Apps; die Richtung zeigt, wohin es wieder geht.</span></label>
+        <label data-opt="same"><input type="radio" name="dm-r1-phone" value="same"><span data-opt-label>Wie am Rechner, nur schmaler</span><span data-opt-consequence>Ein Stil überall, auf kleinen Bildschirmen wirkt das zierlich.</span></label>
+        <label data-opt="full"><input type="radio" name="dm-r1-phone" value="full" checked><span data-opt-label>Vollbild mit Überblendung</span><span data-opt-consequence>Viel Platz, aber kein Blick mehr auf die Seite dahinter.</span></label>
+      </div>
+      <textarea data-comment="r1-phone-note" placeholder="Notiz (optional)">naja, eingie buttons sind ja oben,  wenn man die drückt kommt ein popup / popout, dann wäre ein blatt von unten  komisch, gern eine vollbild überblendung mti ggf. animation di ändlich ist und wenn möglich auch von der quelle des klicks (wenn es eine gibt kommt wie in dekstop!)</textarea>
+      <div data-alevel="3" data-title="Dialoge auf dem Handy">
+        <div data-slot="short"><p>Das Blatt gibt es schon, nur seine Bewegung fehlt.</p></div>
+        <div data-slot="long"><p>Ab 640 px Breite und darunter.</p></div>
+        <div data-example><pre>@media (max-width: 640px) {
+  .scrim { padding: 0; align-items: end; }
+  .sheet { width: 100%; border-radius: 16px 16px 0 0; }
+}</pre></div>
+      </div>
+    </section>
+  </section>
+</section>
+
+</section>
