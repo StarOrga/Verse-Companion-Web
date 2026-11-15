@@ -9,7 +9,8 @@ import {
   viewChild,
 } from '@angular/core';
 import { ScPopupMotionDirective, ensurePopupMotionStyles } from '../shared/popup-motion/sc-popup-motion.directive';
-import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { isPlainLeftClick } from '../core/modified-click.util';
@@ -71,33 +72,24 @@ export interface ComponentInspectEntry {
 @Component({
   selector: 'sc-codex-component-modal',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, ScTooltipDirective, ScDialogDirective, ScPopupMotionDirective],
+  imports: [RouterLink, TranslatePipe, ScTooltipDirective, ScPopupComponent, ScActionDirective, ScPopupMotionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (entry(); as e) {
-      <div class="cm-backdrop" scPopupMotion="large" scPopupMotionPlate=".cm-panel" scPopupMotionRows=".cm-headline .hs, .cm-table tbody tr" scPopupMotionFoot=".cm-foot">
-        <article class="cm-panel sc-card" role="dialog" aria-modal="true" tabindex="-1"
-                 [attr.aria-label]="e.name" (click)="$event.stopPropagation()"
-                 scDialog scDialogInitialFocus="container" (scDialogEscape)="dismiss()">
-          <header class="cm-head">
-            <div class="cm-ident">
-              @if (badge(); as b) { <span class="cm-size">{{ b }}</span> }
-              <div class="cm-titles">
-                <h2>{{ e.name }}</h2>
-                <p class="cm-meta">
-                  @if (metaLine(); as m) { <span class="cm-meta-txt">{{ m }}</span> }
-                  @for (ch of channels(); track ch) {
-                    <span class="chip dmg">{{ ('codex.damage.' + ch) | translate }}</span>
-                  }
-                  @if (e.grade) { <span class="chip">{{ e.grade }}</span> }
-                </p>
-                <p class="cm-port">{{ 'codex.inspect.hardpoint' | translate }}: {{ e.port }}</p>
-              </div>
-            </div>
-            <button type="button" class="cm-close" (click)="dismiss()"
-                    [attr.aria-label]="'codex.inspect.close' | translate"
-                    [scTooltip]="'codex.inspect.close' | translate">✕</button>
-          </header>
+      <sc-popup kind="large" [title]="e.name" [eyebrow]="eyebrow()" initialFocus="container"
+                scPopupMotion="large" scPopupMotionPlate=".scp-frame" scPopupMotionRows=".cm-headline .hs, .cm-table tbody tr" scPopupMotionFoot=".scp-f"
+                (closed)="dismiss()">
+        <div class="cm-body">
+          <div class="cm-ident">
+            <p class="cm-meta">
+              @if (metaLine(); as m) { <span class="cm-meta-txt">{{ m }}</span> }
+              @for (ch of channels(); track ch) {
+                <span class="chip dmg">{{ ('codex.damage.' + ch) | translate }}</span>
+              }
+              @if (e.grade) { <span class="chip">{{ e.grade }}</span> }
+            </p>
+            <p class="cm-port">{{ 'codex.inspect.hardpoint' | translate }}: {{ e.port }}</p>
+          </div>
 
           @if (headline().length > 0) {
             <dl class="cm-headline">
@@ -177,47 +169,23 @@ export interface ComponentInspectEntry {
             <p class="cm-empty">{{ 'codex.inspect.noStats' | translate }}</p>
           }
 
-          <footer class="cm-foot">
-            @if (e.kind) {
-              <a class="cm-open" [routerLink]="['/codex', e.kind, e.className]" (click)="onOpenDetail($event)">
-                {{ 'codex.inspect.openDetail' | translate }} →
-              </a>
-            }
-            <code class="cm-cls">{{ e.className }}</code>
-          </footer>
-        </article>
-      </div>
+        </div>
+        <ng-container popupActions>
+          @if (e.kind) {
+            <a scAction tier="primary" [routerLink]="['/codex', e.kind, e.className]" (click)="onOpenDetail($event)">
+              {{ 'codex.inspect.openDetail' | translate }} →
+            </a>
+          }
+        </ng-container>
+        <code popupStatus class="cm-cls">{{ e.className }}</code>
+      </sc-popup>
     }
   `,
   styles: [`
     :host { display: contents; }
-    .cm-backdrop {
-      position: fixed; inset: 0; z-index: 140;
-      background: rgba(0, 0, 0, 0.72);
-      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-      display: flex; justify-content: center; align-items: flex-start;
-      padding: 6vh 16px 16px; overflow-y: auto;
-    }
-    .cm-panel {
-      position: relative; width: 100%; max-width: var(--sc-ov-m); max-height: var(--sc-ov-max-h); overflow-y: auto; overscroll-behavior: contain;
-      display: flex; flex-direction: column; gap: 14px; padding: 18px 20px 20px;
-      border-color: color-mix(in srgb, var(--sc-accent) 45%, transparent);
-      animation: cm-in .18s ease;
-    }
-    @keyframes cm-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-    @media (prefers-reduced-motion: reduce) { .cm-panel { animation: none; } }
-    /* Focused on open so Tab starts inside; the dialog itself needs no ring. */
-    .cm-panel:focus { outline: none; }
-
-    .cm-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-    .cm-ident { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
-    .cm-size { flex: 0 0 auto; font-size: max(0.72rem, var(--sc-fs-floor)); font-weight: 600; line-height: 1.5;
-      padding: 2px 8px; border-radius: 4px; white-space: nowrap; font-variant-numeric: tabular-nums;
-      color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent);
-      border: 1px solid color-mix(in srgb, var(--sc-accent) 45%, transparent); }
-    .cm-titles { min-width: 0; }
-    .cm-titles h2 { margin: 0; font-size: 1.05rem; line-height: 1.2; overflow-wrap: anywhere; }
-    .cm-meta { margin: 4px 0 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .cm-body { display: flex; flex-direction: column; gap: 14px; }
+    .cm-ident { min-width: 0; }
+    .cm-meta { margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .cm-meta-txt { font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2); overflow-wrap: anywhere; }
     .cm-port { margin: 4px 0 0; font-size: max(0.68rem, var(--sc-fs-floor)); color: var(--sc-fg-2); overflow-wrap: anywhere; }
     .chip { font-size: max(0.58rem, var(--sc-fs-floor)); letter-spacing: 0.04em; text-transform: uppercase;
@@ -228,10 +196,6 @@ export interface ComponentInspectEntry {
     .chip.dmg { color: var(--sc-warn);
       border-color: color-mix(in srgb, var(--sc-warn) 45%, transparent);
       background: color-mix(in srgb, var(--sc-warn) 10%, transparent); }
-    .cm-close { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%;
-      background: var(--sc-bg-0); border: 1px solid var(--sc-border); color: var(--sc-fg-1);
-      cursor: pointer; font-size: 0.9rem; line-height: 1; }
-    .cm-close:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
 
     .cm-headline { margin: 0; padding: 10px 12px; border-radius: 8px; background: var(--sc-bg-0);
       border: 1px solid var(--sc-border); display: flex; flex-wrap: wrap; gap: 6px 20px; }
@@ -254,17 +218,9 @@ export interface ComponentInspectEntry {
 
     .cm-empty { margin: 0; font-size: max(0.78rem, var(--sc-fs-floor)); color: var(--sc-fg-2); font-style: italic; }
     .cm-hint { margin: 0; font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2); font-style: italic; line-height: 1.4; }
-    .cm-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--sc-border); }
-    .cm-open { font-size: max(0.78rem, var(--sc-fs-floor)); color: var(--sc-accent); text-decoration: none; }
-    .cm-open:hover { text-decoration: underline; }
     .cm-cls { font-size: max(0.68rem, var(--sc-fs-floor)); color: var(--sc-fg-2); font-family: var(--sc-font-mono, monospace);
       overflow-wrap: anywhere; }
 
-    @media (max-width: 720px) {
-      .cm-backdrop { padding: 0; }
-      .cm-panel { max-width: none; width: 100%; min-height: 100vh; min-height: 100dvh; border-radius: 0; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)); max-height: none; }
-    }
   `],
 })
 export class CodexComponentModalComponent {
@@ -279,7 +235,7 @@ export class CodexComponentModalComponent {
   private readonly motion = viewChild(ScPopupMotionDirective);
   private dismissing = false;
 
-  /** Close through the horizon motion (the open reversed in 60 % of the time), then tell the host. */
+  /** Close through the popup motion (a collapse to a line, about half the open time), then tell the host. */
   dismiss(): void {
     const mo = this.motion();
     if (!mo) { this.closed.emit(); return; }
@@ -298,6 +254,11 @@ export class CodexComponentModalComponent {
    */
   onOpenDetail(ev: MouseEvent): void {
     if (isPlainLeftClick(ev)) this.closed.emit();
+  }
+
+  /** Rail eyebrow: "Gun · 3× S3". */
+  eyebrow(): string {
+    return [this.entry()?.typeLabel, this.badge()].filter(Boolean).join(' · ');
   }
 
   /** "3× S3" / "S3" / "3×" — never a guessed size. */

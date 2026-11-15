@@ -201,7 +201,7 @@ describe('CodexSwapPickerComponent', () => {
     (el.querySelector('.pick-veil') as HTMLElement).click();
     expect(spy).not.toHaveBeenCalled();
     (el.querySelector('.pick-close') as HTMLElement).click();
-    // The close plays the horizon motion reversed first (60 % of the open), then tells the host.
+    // The close plays its collapse to a line first (about half the open time), then tells the host.
     expect(el.querySelector('.pick-veil')?.classList.contains('pm-out')).toBe(true);
     await vi.waitFor(() => expect(spy).toHaveBeenCalled(), { timeout: 3000 });
   });
@@ -301,7 +301,7 @@ describe('CodexSwapPickerComponent', () => {
     const emitted = vi.mocked(spy).mock.lastCall![0] as SwapPick;
     expect(emitted.className).toBe(FACTORY);
     expect(emitted.target).toBe(TARGET);
-    // The pick closes through the reverse horizon motion, then tells the host.
+    // The pick closes through its collapse to a line, then tells the host.
     expect(el.querySelector('.pick-veil')?.classList.contains('pm-out')).toBe(true);
     const closed = vi.fn();
     fixture.componentInstance.closed.subscribe(closed);

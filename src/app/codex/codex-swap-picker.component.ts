@@ -732,7 +732,7 @@ export class CodexSwapPickerComponent {
   private readonly motion = viewChild(ScPopupMotionDirective);
   private dismissing = false;
 
-  /** Close through the horizon motion (the open reversed in 60 % of the time), then tell the host. */
+  /** Close through the popup motion (a collapse to a line, about half the open time), then tell the host. */
   dismiss(): void {
     const m = this.motion();
     if (!m) { this.closed.emit(); return; }
@@ -882,7 +882,7 @@ export class CodexSwapPickerComponent {
 
   /**
    * How many table rows are in the DOM. A fresh list starts with FIRST_ROWS and grows by
-   * ROW_SLICE per frame: the plate stays invisible for its first 450 ms (pm-plate delay), so
+   * ROW_SLICE per frame: the plate's fill starts only at 42 % of 900 ms, so
    * the whole table is built across those frames instead of in the open's first one, and the
    * cascade (rows from 1000 ms on) sees the finished table.
    */
