@@ -5719,7 +5719,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
       </header>
       <style>html[data-template="design"] [data-page-header] { display: none; }</style>
       <main>
-<section data-iteration="1" data-iteration-template="decision" data-wide data-tab-label="Runde 1" id="iter-1" hidden>
+<section data-iteration="1" data-iteration-template="decision" data-wide data-tab-label="Runde 1" id="iter-1" data-active>
 <style>
 [data-iteration="1"] {
   --k-bg0: #0d2635; --k-bg1: #123246; --k-bg2: #0b2130; --k-fg0: #e8ebed; --k-fg1: #9fb3c8; --k-fg2: #84a0b6;
@@ -5980,7 +5980,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
 
   <section id="k-mock" data-nav-label="Entwurf">
     <h2>Entwurf: Das überarbeitete Lager</h2>
-    <p class="lead">Probier es aus: Tipp „Eisen“ ein, setz den Ort auf „Stanton“ oder „Hurston“ und die Menge auf 30, dann wechsle zwischen den drei Knöpfen. Die Beispieldaten sind erfunden: Eisen an sieben Orten, dazu Kupfer, Titan und Quantanium. Mit <kbd>Strg</kbd> + Klick setzt du an jede Stelle des Entwurfs eine Notiz.</p>
+    <p class="lead">Probier es aus: Tipp „Eisen“ ein, setz den Ort auf „Stanton“ oder „Hurston“, dann wechsle zwischen den drei Knöpfen. Bei 20 SCU reicht ein Ort allein, bei 30 SCU nicht mehr. Die Beispieldaten sind erfunden: Eisen an sieben Orten, dazu Kupfer, Titan und Quantanium. Mit <kbd>Strg</kbd> + Klick setzt du an jede Stelle des Entwurfs eine Notiz.</p>
     <div class="k-mk" id="k-mk" data-bar="static" aria-label="Entwurf der Lagerseite">
       <div class="k-head" data-pin>
         <span class="k-ti" aria-hidden="true">▦</span>
@@ -5996,7 +5996,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
       <div class="k-search" data-pin>
         <div class="k-fld" data-pin><span>Gegenstand oder Ort</span><input aria-label="Gegenstand oder Ort" id="k-q" type="search" autocomplete="off" placeholder="z. B. Eisen oder Area18" value="Eisen"></div>
         <div class="k-fld" data-pin><span>Ort</span><input aria-label="Ort" id="k-place" type="search" autocomplete="off" placeholder="Ort, Planet oder System" value="Stanton"></div>
-        <div class="k-fld" data-pin><span>Menge ab (SCU)</span><input aria-label="Menge ab (SCU)" id="k-qty" type="number" min="0" step="1" value="30"></div>
+        <div class="k-fld" data-pin><span>Menge ab (SCU)</span><input aria-label="Menge ab (SCU)" id="k-qty" type="number" min="0" step="1" value="20"></div>
       </div>
       <div class="k-modes" id="k-modes" data-pin>
         <span class="k-mode" role="button" tabindex="0" data-pin data-mode="one" aria-pressed="true">An einem Ort</span>
@@ -6012,6 +6012,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
   <section id="k-notes" data-nav-label="Notizen">
     <h2>Notizen</h2>
     <p class="lead">Was fehlt, was stört, was im Lager sonst noch nicht funktioniert. Bilder bitte in den Feedback-Thread, die Seite kann keine Anhänge annehmen.</p>
+    <p class="lead">Abschicken: Soll noch etwas anders werden, schick „Zur nächsten Runde“, dann baue ich Runde 2. Passt es so, klick im Panel rechts auf den Pfeil ▾ neben „Zur nächsten Runde“ und dann auf „Jetzt umsetzen“. Ich baue dann nur den Bereich „Lager“ um.</p>
     <textarea data-comment="notes" placeholder="Deine Anmerkungen …"></textarea>
   </section>
 
@@ -6078,13 +6079,13 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
         : '<div class="k-empty">An keinem Ort liegen ' + want + ' SCU allein. Probier „Verteilt“ oder „Nah beisammen“.</div>';
     } else if (mode === 'split') {
       const pick = []; for (const r of [...rows].sort((a, b) => b[2] - a[2])) { if (sum(pick) >= want || pick.length >= MAX) break; pick.push(r); }
-      html = sum(pick) >= want ? card(pick.length + ' Orte, ' + sum(pick) + ' SCU', 'Spanne: ' + spanWord(span(pick)), span(pick) >= 1000 ? 'warn' : '', pick, true, true)
+      html = sum(pick) >= want ? card(pick.length === 1 ? pick[0][1] : pick.length + ' Orte, ' + sum(pick) + ' SCU', 'Spanne: ' + spanWord(span(pick)), span(pick) >= 1000 ? 'warn' : '', pick, true, true)
         : '<div class="k-empty">Auch mit ' + MAX + ' Orten kommen nur ' + sum(pick) + ' SCU zusammen.</div>';
     } else {
       const groups = [];
       rows.forEach((a) => {
         const g = []; for (const r of [...rows].sort((x, y) => dist(a[1], x[1]) - dist(a[1], y[1]) || y[2] - x[2])) { if (sum(g) >= want || g.length >= MAX) break; g.push(r); }
-        if (sum(g) >= want) groups.push(g);
+        if (sum(g) >= want && g.every((r) => sum(g) - r[2] < want)) groups.push(g);
       });
       const key = (g) => g.map((r) => r[1]).sort().join('|');
       const uniq = [...new Map(groups.map((g) => [key(g), g])).values()].sort((x, y) => span(x) - span(y) || x.length - y.length || sum(y) - sum(x)).slice(0, 3);
