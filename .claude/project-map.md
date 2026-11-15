@@ -117,12 +117,12 @@ scripts/  (80) — Build / utility scripts
   perf/  (2)
   playwright/  (1)
   routine-watcher-chaos/  (2)
-src/  (1377) — Source code
-  app/  (1370) — Application code
+src/  (1378) — Source code
+  app/  (1371) — Application code
     admin/  (66)
     auth/  (37)
     codex/  (393)
-    core/  (97)
+    core/  (98)
     desktop/  (28)
     feedback/  (42)
     hangar/  (31)

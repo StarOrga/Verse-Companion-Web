@@ -77,7 +77,7 @@ const STARSCAPE_FALLBACK_URL =
     /* Position only (bottom right, above the launcher); frame, width, rail and symbol come from <sc-popup kind="notice">. */
     .toast {
       position: fixed; z-index: 1440; cursor: pointer;
-      inset-inline-end: var(--sc-fab-gutter, 16px);
+      inset-inline-end: var(--sc-toast-end, 24px);
       bottom: calc(var(--sc-toast-bottom, var(--sc-fab-clear-block, 80px)) + var(--sc-toast-offset, 0px));
     }
     .toast.open { cursor: default; }
