@@ -341,7 +341,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
     .lg-hero {
       align-self: end;
       min-width: 0;
-      max-width: 480px;
+      max-width: 540px;
       padding: 0 var(--sc-page-gutter, 24px) clamp(28px, 7vh, 72px) clamp(24px, 6vw, 96px);
       text-shadow: 0 1px 12px rgba(2, 8, 14, 0.8);
     }
@@ -350,7 +350,8 @@ type Panel = 'signIn' | 'apply' | 'reset';
     h1 {
       margin: 0;
       font-family: var(--sc-font-display);
-      font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+      font-size: clamp(1.6rem, 2.7vw, 2.5rem);
+      white-space: nowrap;
       line-height: 1.1;
       /* Brand art, not a state: the hot accent in the hero gradient is deliberate (audit D10). */
       background: linear-gradient(90deg, var(--sc-accent), var(--sc-accent-hot));
@@ -573,15 +574,18 @@ type Panel = 'signIn' | 'apply' | 'reset';
       .lg-scene { bottom: auto; height: calc(clamp(170px, 30dvh, 260px) + 72px); }
       .lg-main { grid-row: 2 / 4; grid-template-columns: minmax(0, 1fr); grid-template-rows: clamp(98px, calc(30dvh - 72px), 188px) auto; }
       .lg-hero { align-self: end; max-width: none; padding: 0 var(--sc-page-gutter, 16px) 14px; }
-      .brand-logo { width: 44px; height: 44px; }
-      h1 { font-size: clamp(1.4rem, 6.4vw, 1.9rem); }
+      .join { margin: 0; font-size: clamp(1.25rem, 5.6vw, 1.6rem); }
       .tag { margin-top: 4px; font-size: 0.85rem; }
-      .join, .pitch, .perks, .hero-cta-slot { display: none; }
+      .lg-hero { display: flex; flex-direction: column-reverse; }
+      .pitch, .perks, .hero-cta-slot { display: none; }
       .lg-panel { border-left: 0; border-top: 1px solid var(--sc-border); box-shadow: 0 -18px 40px rgba(0, 0, 0, 0.35); justify-content: flex-start; }
       .lg-panel::before { display: none; }
       .lg-foot { flex-direction: column; align-items: stretch; }
       .lg-foot-links { justify-content: center; }
+      /* The header keeps the shell's brand plate; the band carries the invitation, the
+         word mark stays the page heading for assistive tech only (no second brand plate). */
       .lg-nav a:first-child { display: none; }
+      .brand { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     }
     @media (max-width: 860px) and (prefers-reduced-motion: no-preference) {
       .lg-panel { animation-name: lg-panel-up; }

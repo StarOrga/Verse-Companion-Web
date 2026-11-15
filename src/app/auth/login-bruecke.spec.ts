@@ -28,7 +28,7 @@ describe('LoginComponent — Bruecke layout', () => {
         provideRouter([]),
         { provide: AccessRequestService, useValue: { submit: () => Promise.resolve({ kind: 'ok' }) } },
         { provide: AuthService, useValue: { ready: () => false, realUser: () => null } },
-        { provide: AnalyticsService, useValue: { track: () => {} } },
+        { provide: AnalyticsService, useValue: { track: () => undefined } },
         { provide: SupabaseClientProvider, useValue: { client: {} } },
         { provide: VerseBodiesService, useValue: { attach } },
       ],

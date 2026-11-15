@@ -90,9 +90,9 @@ export const LOGIN_PLANET_ATTACH_MS = 1800;
 
     .ls-world {
       position: absolute;
-      left: 60%;
-      top: 47%;
-      width: min(108vh, 88%);
+      left: 74%;
+      top: 44%;
+      width: min(100vh, 82%);
       aspect-ratio: 1;
       translate: -50% -50%;
     }
@@ -103,7 +103,7 @@ export const LOGIN_PLANET_ATTACH_MS = 1800;
     .ls-gl { width: 100%; height: 100%; opacity: 0; transition: opacity 0.7s ease; }
     .ls-gl.on { opacity: 1; }
     /* Night side: keeps the hero copy (bottom left) on a dark ground, WebGL or not. */
-    .ls-shade { background: radial-gradient(circle at 30% 28%, transparent 46%, rgba(2, 8, 14, 0.55) 72%, rgba(2, 8, 14, 0.9) 100%); }
+    .ls-shade { background: radial-gradient(circle at 64% 30%, transparent 46%, rgba(2, 8, 14, 0.55) 72%, rgba(2, 8, 14, 0.9) 100%); }
     .ls-atm {
       inset: -3%;
       background: radial-gradient(circle, transparent 64%, rgba(120, 210, 245, 0.30) 69%, rgba(82, 193, 230, 0.10) 74%, transparent 78%);
@@ -111,9 +111,9 @@ export const LOGIN_PLANET_ATTACH_MS = 1800;
     }
     .ls-ring {
       position: absolute;
-      left: 60%;
-      top: 47%;
-      width: min(160vh, 130%);
+      left: 74%;
+      top: 44%;
+      width: min(150vh, 124%);
       aspect-ratio: 5 / 1;
       translate: -50% -50%;
       rotate: -14deg;
@@ -121,6 +121,7 @@ export const LOGIN_PLANET_ATTACH_MS = 1800;
       border: 1px solid color-mix(in srgb, var(--sc-accent) 32%, transparent);
       border-top-color: transparent;
       opacity: 0.8;
+      mask-image: linear-gradient(90deg, transparent 8%, #000 52%);
     }
     .ls-sweep {
       position: absolute;
@@ -148,7 +149,11 @@ export const LOGIN_PLANET_ATTACH_MS = 1800;
       color: var(--sc-fg-2);
     }
     .ls-readout b { color: var(--sc-accent); font-weight: 500; }
-    .ls-vignette { background: radial-gradient(120% 90% at 40% 40%, transparent 55%, rgba(1, 5, 9, 0.75) 100%); }
+    .ls-vignette {
+      background:
+        linear-gradient(90deg, rgba(2, 6, 10, 0.72) 0%, rgba(2, 6, 10, 0.35) 32%, transparent 52%),
+        radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(1, 5, 9, 0.75) 100%);
+    }
 
     @media (prefers-reduced-motion: no-preference) {
       .ls-stars, .ls-nebula { animation: ls-void 0.9s var(--ls-expo) both; }
@@ -179,8 +184,8 @@ export const LOGIN_PLANET_ATTACH_MS = 1800;
 
     /* Phones: a band on top — the planet fills its right, the HUD stays out. */
     @media (max-width: 860px) {
-      .ls-world { left: 72%; top: 62%; width: min(150vw, 560px); }
-      .ls-ring { left: 72%; top: 62%; width: 200vw; }
+      .ls-world { left: 82%; top: 64%; width: min(118vw, 520px); }
+      .ls-ring { left: 82%; top: 64%; width: 190vw; }
       .ls-hud { display: none; }
     }
   `],
