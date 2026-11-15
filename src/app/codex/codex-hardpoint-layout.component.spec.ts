@@ -143,13 +143,20 @@ describe('CodexHardpointLayoutComponent', () => {
     const perItem = Array.from(el.querySelectorAll('.slot-stats dd')).map((d) => d.textContent?.trim());
     expect(perItem[0]).toBe('43.65');
     // 4263fed1: the total lives INSIDE the card, top right, and says "Gesamt";
-    // every per-item stat says how many units it stands for ("3× Alphaschaden").
+    // the damage says how many units it stands for ("3× Alphaschaden"); the
+    // values every gun shares — speed, range, penetration — read once (#351).
     const fig = el.querySelector('button.slot-btn .fig.total')!;
     expect(fig).toBeTruthy();
     expect(fig.querySelector('.fig-l')?.textContent?.trim()).toBe('codex.module.total');
     expect(el.querySelector('.main > .fig')).toBeNull(); // no longer a column beside the card
-    const mults = Array.from(el.querySelectorAll('.slot-stats dt .mult')).map((m) => m.textContent?.trim());
-    expect(mults).toEqual(['3×', '3×', '3×', '3×']);
+    const stats = Array.from(el.querySelectorAll('.slot-stats .stat'));
+    expect(stats.map((st) => st.querySelector('dt .mult')?.textContent?.trim() ?? null)).toEqual([
+      '3×',
+      null,
+      null,
+      null,
+    ]);
+    expect(perItem.slice(1, 3)).toEqual(['1,480 m/s', '1,924 m']);
   });
 
   it('drops "Gesamt" and the "3×" prefix once the block is split into single rows', () => {
@@ -223,8 +230,13 @@ describe('CodexHardpointLayoutComponent', () => {
     expect(el.querySelector('.fig .n')?.textContent?.trim()).toBe('150 m');
     expect(el.querySelector('.fig.total')).toBeNull();
     expect(el.querySelector('.fig-l')).toBeNull();
-    // …while the per-item run still says how many beams each value stands for
-    expect(el.querySelector('.slot-stats dt .mult')?.textContent?.trim()).toBe('2×');
+    // …reach and pull are per beam and read once; only the pooled power draw
+    // says how many beams it stands for (#351).
+    const multed = Array.from(el.querySelectorAll('.slot-stats .stat'))
+      .filter((st) => st.querySelector('dt .mult'))
+      .map((st) => st.textContent);
+    expect(multed.length).toBe(1);
+    expect(multed[0]).toContain('codex.equipped.powerDraw');
   });
 
   it('asks for a re-extract under a beam whose build predates its numbers', () => {
@@ -319,10 +331,13 @@ describe('CodexHardpointLayoutComponent', () => {
     expect(fig.querySelector('.fig-l')?.textContent?.trim()).toBe('codex.module.total');
     expect(fig.querySelector('.n')?.textContent?.trim()).toBe('130.95');
     expect(kid.querySelector('.kid-line > .fig')).toBeNull();
-    // Per-unit values stay per unit, prefixed with how many units they cover.
+    // The damage keeps the "3×" reminder; the speed every gun shares reads
+    // once, without it (#351).
     expect(
-      Array.from(kid.querySelectorAll('.slot-stats dt .mult')).map((m) => m.textContent?.trim()),
-    ).toEqual(['3×', '3×']);
+      Array.from(kid.querySelectorAll('.slot-stats .stat')).map(
+        (st) => st.querySelector('dt .mult')?.textContent?.trim() ?? null,
+      ),
+    ).toEqual(['3×', null]);
     expect(
       Array.from(kid.querySelectorAll('.slot-stats dd')).map((d) => d.textContent?.trim()),
     ).toEqual(['43.65', '1,480 m/s']);
