@@ -32,7 +32,12 @@ describe('FusionSearchChipComponent — X takes room only on hover / focus', () 
     const idle = host.getBoundingClientRect().width;
     // Hover and :focus-within cannot be driven reliably in a headless runner; the open state uses
     // the very same selector list, so it proves the revealed geometry deterministically.
-    host.classList.add('open');
+    // Through the component state, not classList: the host binding [class.open]="menuOpen()" owns that
+    // class. Transitions off: the geometry is under test, and a throttled headless page (CI) may not
+    // advance a 0.18 s width transition within the wait loop.
+    for (const el of host.querySelectorAll<HTMLElement>('.cx, .dd, .lbl')) el.style.transition = 'none';
+    fixture.componentInstance.menuOpen.set(true);
+    fixture.detectChanges();
     for (let i = 0; i < 20 && cx.getBoundingClientRect().width <= 15; i++) await wait(50);
     expect(cx.getBoundingClientRect().width).toBeGreaterThan(15);
     expect(host.getBoundingClientRect().width).toBeGreaterThan(idle);
