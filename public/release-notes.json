@@ -1,7 +1,33 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.17",
+  "current": "0.270.18",
   "releases": [
+    {
+      "version": "0.270.18",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Sign-in, password, star map, briefing and news retry buttons use the shared action control — the sign-in form keeps the page's one main step (#970)."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Main action buttons keep a readable 12 px label on touch screens."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.270.17",
       "date": "2026-11-15",
