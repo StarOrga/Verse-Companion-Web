@@ -190,6 +190,27 @@ export function serviceLevel(i: { keyMissing?: boolean; consecutiveFailures: num
 
 export interface ProbeResult { ok: boolean; keyMissing?: boolean; skipped?: boolean; note?: string; passiveErrorRate?: number | null }
 
+/** Probe note for a failed HTTP probe. A provider that answers a JSON error body (`{code, error}` like xAI, or
+ *  `{error: {type, message}}` like Anthropic) gets its reason appended, so the admin sees e.g. "no credits" vs. a
+ *  missing endpoint permission instead of a bare "HTTP 403". Anything that looks like an API key is masked, the text
+ *  is single-line and capped at 200 characters. Non-JSON bodies (HTML error pages) stay out. */
+export function httpFailureNote(status: number, body: string): string {
+  const base = `HTTP ${status}`;
+  let parsed: unknown;
+  try { parsed = JSON.parse(body); } catch { return base; }
+  if (!parsed || typeof parsed !== 'object') return base;
+  const o = parsed as Record<string, unknown>;
+  const nested = o.error && typeof o.error === 'object' ? (o.error as Record<string, unknown>) : null;
+  const code = typeof o.code === 'string' ? o.code : typeof nested?.type === 'string' ? nested.type : '';
+  const msg = typeof o.error === 'string' ? o.error : typeof nested?.message === 'string' ? nested.message : typeof o.message === 'string' ? o.message : '';
+  const detail = [code, msg].filter(Boolean).join(': ')
+    .replace(/\b(?:xai|sk|sbp|phx|ghp)[-_][A-Za-z0-9_-]{6,}/g, '***')
+    .replace(/\s+/g, ' ').trim();
+  if (!detail) return base;
+  const full = `${base} (${detail})`;
+  return full.length > 200 ? `${full.slice(0, 199)}…` : full;
+}
+
 /** Next stored row after one probe. error_rate is an exponential average over ~24 hourly probes (no probe history
  *  table); a passive rate (ai_calls) wins when higher. */
 export function nextHealth(prev: HealthRow | null, p: ProbeResult, service: string, expectedEverySec: number, now: Date): HealthRow {

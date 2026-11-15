@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildItemBody, canAutoCloseServiceItem, checkSignalSecret, constantTimeEqual, decideBoardAction, funnelSignal, intervalToSec,
-  lcpSignal, nextHealth, parseBilling, quotaRef, quotaStatus, saverTarget, serviceLevel, serviceTransition, ROUTINE_LINE,
+  httpFailureNote, lcpSignal, nextHealth, parseBilling, quotaRef, quotaStatus, saverTarget, serviceLevel, serviceTransition, ROUTINE_LINE,
 } from './posthog-guard.ts';
 import { aiCard, attentionCount, errorsCard, queryReachable, feedbackPrefill, quotaCard, servicesCard, sortCards, type Card } from '../telemetry-overview/_cards.ts';
 
@@ -207,4 +207,20 @@ test('errors card is unknown, not ok, when only the errors query failed (codex r
   assert.equal(errorsCard([], reach, 0, 'p').level, 'unknown');
   assert.equal(errorsCard([], queryReachable(true, []), 0, 'p').level, 'ok');
   assert.equal(queryReachable(false, []), false);
+});
+
+test('httpFailureNote appends the provider reason, masks keys, ignores HTML', () => {
+  assert.equal(
+    httpFailureNote(403, JSON.stringify({ code: 'permission-denied', error: 'Your team has no credits. Purchase credits at console.x.ai.' })),
+    'HTTP 403 (permission-denied: Your team has no credits. Purchase credits at console.x.ai.)',
+  );
+  assert.equal(
+    httpFailureNote(401, JSON.stringify({ type: 'error', error: { type: 'authentication_error', message: 'invalid x-api-key' } })),
+    'HTTP 401 (authentication_error: invalid x-api-key)',
+  );
+  assert.equal(httpFailureNote(400, JSON.stringify({ error: 'bad key xai-abcdef1234567890' })), 'HTTP 400 (bad key ***)');
+  assert.equal(httpFailureNote(502, '<html>Bad Gateway</html>'), 'HTTP 502');
+  assert.equal(httpFailureNote(500, ''), 'HTTP 500');
+  assert.equal(httpFailureNote(500, '{}'), 'HTTP 500');
+  assert.ok(httpFailureNote(403, JSON.stringify({ error: 'x'.repeat(500) })).length <= 200);
 });
