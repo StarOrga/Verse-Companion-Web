@@ -4,6 +4,7 @@ import {
   clickPowerPip,
   computePowerSheet,
   coolerUnitCount,
+  coolingMargin,
   migrateLegacyCoolerDraft,
   occupantDraw,
   parseCoolerUnit,
@@ -12,6 +13,7 @@ import {
   withPowerSignature,
   POWER_GROUP_ORDER,
   resetPowerState,
+  stealthPowerState,
   togglePowerGroup,
   type PowerColumnKey,
 } from './codex-power';
@@ -515,8 +517,13 @@ describe('cooler units (590230e3, F1d)', () => {
     const irDelta = cut.facts.find((f) => f.key === 'ir')!.delta!;
     expect(irDelta).toBeLessThan(0);
     expect(irDelta).toBeGreaterThanOrEqual(-7130);
-    // the ship-wide coolant balance is untouched by the split
-    expect(auto.coolant.total).toBe(68);
+    // F4 (#352): each unit puts out the share of its coolant its segments
+    // fund — the auto deal leaves both UltraFlows at 2 of 3 segments
+    expect(col(auto, 'cooler1').allocated).toBe(2);
+    expect(col(auto, 'cooler2').allocated).toBe(2);
+    expect(auto.coolant.total).toBeCloseTo((68 * 2) / 3, 2);
+    // a cut unit cools nothing
+    expect(cut.coolant.total).toBeCloseTo((34 * 2) / 3, 2);
   });
 
   it('a ship without coolers keeps ONE empty cooling column so the row never shifts', () => {
@@ -567,5 +574,89 @@ describe('withPowerSignature — the ranking sheet takes the signature of the st
     const none = withPowerSignature({ ...baseSheet, ir: null, emLoad: null }, [], null, null);
     expect(none.ir).toBeNull();
     expect(none.emLoad).toBeNull();
+  });
+});
+
+describe('cooling usage like in game (#352)', () => {
+  it('reads 100 % as exactly the cooling the switched-on coolers deliver', () => {
+    const s = computePowerSheet({ occupants: nomad });
+    // all columns funded in full: Σ consume 31 / Σ generate 34
+    expect(s.coolant).toEqual({ used: 31, total: 34, percent: 91 });
+    expect(coolingMargin(s.coolant.percent)).toEqual({ over: false, pct: 9 });
+  });
+
+  it('scales a cooler's output and a consumer's draw with the segments they get', () => {
+    // cooler pinned to 1 of 3 segments → 34 / 3 cooling; radar at 1 of 3 → 8 / 3 draw
+    const s = computePowerSheet({ occupants: nomad, levels: { cooler1: 1, radar: 1 } });
+    expect(s.coolant.total).toBeCloseTo(34 / 3, 2);
+    expect(s.coolant.used).toBeCloseTo(9 + 6 + 2 / 3 + 4 + 8 / 3 + 2, 2);
+    expect(s.coolant.percent).toBeGreaterThan(100);
+  });
+
+  it('turns usage into headroom or shortfall', () => {
+    expect(coolingMargin(30)).toEqual({ over: false, pct: 70 });
+    expect(coolingMargin(130)).toEqual({ over: true, pct: 30 });
+    expect(coolingMargin(100)).toEqual({ over: false, pct: 0 });
+    expect(coolingMargin(null)).toBeNull();
+  });
+});
+
+describe('stealthPowerState (#352)', () => {
+  const col = (s: ReturnType<typeof computePowerSheet>, key: PowerColumnKey) => s.groups.find((g) => g.key === key)!;
+  const apply = (occupants: SummaryOccupant[]) => {
+    const st = stealthPowerState({ occupants });
+    return { st, sheet: computePowerSheet({ occupants, preset: 'stealth', cutGroups: st.cutGroups, levels: st.levels }) };
+  };
+
+  it('cuts weapons, shields, quantum, tractor, radar and life support', () => {
+    const { st, sheet } = apply(nomad);
+    for (const g of ['weapons', 'shields', 'quantum', 'tractor', 'radar', 'life'] as const) {
+      expect(st.cutGroups.has(g)).toBe(true);
+    }
+    expect(col(sheet, 'weapons').state).toBe('off');
+    expect(col(sheet, 'shields').allocated).toBe(0);
+    expect(sheet.weaponsCut).toBe(true);
+  });
+
+  it('keeps the drive usable at one segment when the data gives it no minimum', () => {
+    const { sheet } = apply(nomad);
+    expect(col(sheet, 'thrusters').allocated).toBe(1);
+    expect(col(sheet, 'thrusters').state).toBe('active');
+  });
+
+  it('runs the cooler at its minimum when that already cools below 100 %', () => {
+    const { sheet } = apply(nomad);
+    expect(col(sheet, 'cooler1').allocated).toBe(2);
+    // thrusters 4 + cooler 2 × 2/3 against 34 × 2/3
+    expect(sheet.coolant.percent).toBe(24);
+    expect(sheet.budgetUsed).toBe(3);
+  });
+
+  it('lowers EM against the old minimum-only deal', () => {
+    const minimumsOnly = computePowerSheet({ occupants: nomad, preset: 'stealth' });
+    const { sheet } = apply(nomad);
+    const em = (s: typeof sheet) => s.facts.find((f) => f.key === 'em')!.value!;
+    expect(em(sheet)).toBeLessThan(em(minimumsOnly));
+  });
+
+  it('raises the coolers only as far as usage needs to drop to 100 % or below', () => {
+    const hotDrive = nomad.map((o) =>
+      o === thrusters
+        ? occ({ section: 'structure', componentKind: 'Thruster', className: 'MAIN_THRUSTER', resource: { 'power.consumeSegments': 1, 'coolant.consume': 30 } })
+        : o,
+    );
+    const { sheet } = apply(hotDrive);
+    // at 2 of 3 segments: 31.3 / 22.7 = 138 % → the third segment: 32 / 34 = 94 %
+    expect(col(sheet, 'cooler1').allocated).toBe(3);
+    expect(sheet.coolant.percent).toBe(94);
+  });
+
+  it('switches a second cooler off when the first alone keeps usage ≤ 100 %', () => {
+    const twoCoolers = nomad.map((o) => (o === coolers ? { ...o, count: 2 } : o));
+    const { st, sheet } = apply(twoCoolers);
+    expect(st.cutGroups.has('cooler2')).toBe(true);
+    expect(st.cutGroups.has('cooler1')).toBe(false);
+    expect(col(sheet, 'cooler1').allocated).toBe(2);
+    expect(sheet.coolant.percent).toBeLessThanOrEqual(100);
   });
 });

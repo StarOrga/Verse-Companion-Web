@@ -121,15 +121,21 @@ describe('CodexEnergyDockComponent', () => {
     expect(c['sheet']().weaponsCut).toBe(false);
   });
 
-  it('stealth preset drives every eligible group to its minimum', async () => {
+  it('stealth preset leaves only the drive and the cooling on, cooling ≤ 100 % (#352)', async () => {
     const fixture = await setup();
     const c = fixture.componentInstance;
     c['setPreset']('stealth');
     fixture.detectChanges();
     const sheet = c['sheet']();
     for (const g of sheet.groups) {
-      if (g.state === 'active') expect(g.allocated).toBe(g.minimum);
+      if (g.state === 'active') expect(['thrusters', 'coolers']).toContain(g.group);
     }
+    expect(sheet.weaponsCut).toBe(true);
+    if (sheet.coolant.percent !== null) expect(sheet.coolant.percent).toBeLessThanOrEqual(100);
+    // back to Auto drops the stealth cuts again
+    c['setPreset']('auto');
+    fixture.detectChanges();
+    expect(c['sheet']().cutGroups.size).toBe(0);
   });
 
   it('NAV mode gives the quantum drive a channel and drops the shield channel', async () => {
@@ -548,7 +554,9 @@ describe('CodexEnergyDockComponent', () => {
     c['setPreset']('stealth');
     fixture.detectChanges();
     expect(rowOf(c, 'shields').pinned).toBe(false);
-    expect(rowOf(c, 'shields').allocated).toBe(2);
+    // #352 — stealth switches the shields off instead of idling them
+    expect(rowOf(c, 'shields').cut).toBe(true);
+    expect(rowOf(c, 'shields').allocated).toBe(0);
 
     // shields lowered to 2 frees the segment cooler2's raise needs (#351)
     const pw = encodePowerParam({ ...DEFAULT_POWER_DRAFT, levels: { shields: 2, cooler2: 3 } })!;
