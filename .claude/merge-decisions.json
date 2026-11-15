@@ -395,6 +395,23 @@
         ]
       }
     ],
+    "data-uploader/python/sc_extract/silhouette_export.py›_stderr_tail›body": [
+      {
+        "ship": "#1106",
+        "by": "Jerry",
+        "value": "last stderr/stdout line"
+      },
+      {
+        "ship": "claude/data-uploader-logs-duplicates-4a5319",
+        "by": "JerryT2T",
+        "value": "delegates to converter_report.converter_reason (superset: innermost exception, else last [ERR line, else last line)",
+        "decided": true,
+        "at": "2026-11-15T13:51:56.046Z",
+        "hunks": [
+          "1b62e2b65e2a"
+        ]
+      }
+    ],
     "data-uploader/src/lib/subthemes.ts›ships›revision": [
       {
         "ship": "claude/loading-screen-elements-transitions-980216",
