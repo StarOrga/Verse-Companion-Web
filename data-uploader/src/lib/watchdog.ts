@@ -22,12 +22,18 @@
 export interface WatchdogOptions {
   /** Idle time (ms) with no `pet()` before `onTimeout` fires. */
   timeoutMs: number;
-  /** Fired at most once, with the elapsed idle time in ms. Must not throw. */
+  /**
+   * Fired at most once, with the idle time in ms since the countdown was last
+   * (re)armed — never less than `timeoutMs`, more when the timer fired late.
+   * Must not throw.
+   */
   onTimeout: (idleMs: number) => void;
   /** Injectable timer setter (defaults to global setTimeout). */
   setTimer?: (fn: () => void, ms: number) => ReturnType<typeof setTimeout>;
   /** Injectable timer clearer (defaults to global clearTimeout). */
   clearTimer?: (handle: ReturnType<typeof setTimeout>) => void;
+  /** Injectable wall clock in ms (defaults to Date.now). */
+  now?: () => number;
 }
 
 export interface Watchdog {
@@ -35,6 +41,11 @@ export interface Watchdog {
   start: () => void;
   /** Signal progress — resets the countdown. No-op after a fire or stop. */
   pet: () => void;
+  /**
+   * Pause the countdown without ending it (system suspend): nothing fires
+   * until the next `start()`/`pet()` re-arms it with a fresh window.
+   */
+  hold: () => void;
   /** Stop for good — no further timeouts. Idempotent; call in `finally`. */
   stop: () => void;
   /** True once `onTimeout` has fired (so callers can label a late result). */
@@ -44,19 +55,22 @@ export interface Watchdog {
 export function createWatchdog(opts: WatchdogOptions): Watchdog {
   const setTimer = opts.setTimer ?? ((fn, ms) => setTimeout(fn, ms));
   const clearTimer = opts.clearTimer ?? ((h) => clearTimeout(h));
+  const now = opts.now ?? Date.now;
 
   let handle: ReturnType<typeof setTimeout> | null = null;
   let stopped = false;
   let fired = false;
+  let armedAt = 0;
 
   const arm = (): void => {
+    armedAt = now();
     handle = setTimer(() => {
       handle = null;
       if (stopped || fired) return;
       fired = true;
       // Best-effort: a watchdog that itself throws would defeat the purpose.
       try {
-        opts.onTimeout(opts.timeoutMs);
+        opts.onTimeout(Math.max(opts.timeoutMs, now() - armedAt));
       } catch {
         /* swallow — reporting a stall must never create a new failure */
       }
@@ -82,6 +96,9 @@ export function createWatchdog(opts: WatchdogOptions): Watchdog {
       if (stopped || fired) return;
       disarm();
       arm();
+    },
+    hold(): void {
+      disarm();
     },
     stop(): void {
       stopped = true;

@@ -1,6 +1,6 @@
 // FIRST: a dev run gets its own userData before anything reads it (#632).
 import './dev-user-data.js';
-import { app, BrowserWindow, Menu, ipcMain, dialog, shell, clipboard } from 'electron';
+import { app, BrowserWindow, Menu, ipcMain, dialog, shell, clipboard, powerMonitor } from 'electron';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { existsSync } from 'node:fs';
@@ -18,7 +18,15 @@ import { runOAuthFlow } from '../lib/oauth.js';
 import { raiseWindow } from '../lib/window-focus.js';
 import { settleInitialVisibility, shouldStartHidden } from '../lib/window-visibility.js';
 import { uploadBundle, type UploadPayload } from '../lib/uploader.js';
-import { createWatchdog } from '../lib/watchdog.js';
+import { createWatchdog, type Watchdog } from '../lib/watchdog.js';
+import {
+  jobStallReport,
+  newStallTracker,
+  noteStallEvent,
+  stallTimeoutFor,
+  type StallEvent,
+  type StallTracker,
+} from '../lib/job-stall.js';
 import { RELEASE_TOKEN, TOOL_VERSION, API_BASE, WEB_BASE, SUPABASE_ANON_KEY } from '../lib/release-token.js';
 import { effectiveRing, highestRingFor, isRingPref, type ReleaseRing, type RingPref } from '../lib/update-ring.js';
 import {
@@ -1005,20 +1013,58 @@ function reportExtractOutcome(
 }
 
 // A long-running native job (Python extract / cgf-converter skin export) that
-// stops emitting events for this long is treated as WEDGED and reported to
-// crash telemetry — a silent hang produces no exception on its own, so without
-// this it would be invisible server-side. Generous enough to clear the longest
-// legitimately-opaque stages ("open" the archive, "datacore" decompress).
-const JOB_STALL_MS = 5 * 60_000;
+// stops emitting events for its stall window (`lib/job-stall.ts`: 5 min, 20 min
+// for the 3D build) is treated as WEDGED and reported to crash telemetry — a
+// silent hang produces no exception on its own, so without this it would be
+// invisible server-side. The report says where the job was (phase, counter,
+// last log line) and how long it actually waited.
 
-/** Fire a one-shot stall crash report for a wedged native job. */
-function reportJobStall(kind: string, idleMs: number, jobId: string): void {
-  void reportCrash({
-    errorType: 'hang',
-    name: 'JobStall',
-    message: `${kind} job made no progress for ${Math.round(idleMs / 1000)}s`,
-    stack: null,
-    extra: { kind, jobId, idleMs },
+interface StallWatch {
+  watchdog: Watchdog;
+  tracker: StallTracker;
+  /** Armed by `startJobStall` — a resume never arms one whose job never ran. */
+  started: boolean;
+}
+
+/** Every live job's watchdog — a system suspend/resume reaches them all. */
+const stallWatches = new Set<StallWatch>();
+
+/** A stall watchdog for one native job, sized for its kind. */
+function watchJobStall(kind: string, jobId: string): StallWatch {
+  const tracker = newStallTracker();
+  const watchdog = createWatchdog({
+    timeoutMs: stallTimeoutFor(kind),
+    onTimeout: (idle) => void reportCrash(jobStallReport(kind, jobId, idle, tracker)),
+  });
+  const watch = { watchdog, tracker, started: false };
+  stallWatches.add(watch);
+  return watch;
+}
+
+/** Sign of life from the sidecar: remember where it is, reset the clock. */
+function petJobStall(watch: StallWatch, ev: StallEvent): void {
+  noteStallEvent(watch.tracker, ev);
+  watch.watchdog.pet();
+}
+
+function startJobStall(watch: StallWatch): void {
+  watch.started = true;
+  watch.watchdog.start();
+}
+
+function endJobStall(watch: StallWatch): void {
+  watch.watchdog.stop();
+  stallWatches.delete(watch);
+}
+
+// Standby is not a stall: the clock halts on suspend and restarts with a fresh
+// window on resume, so the time the PC slept never counts as silence.
+function wireStallPower(): void {
+  powerMonitor.on('suspend', () => {
+    for (const w of stallWatches) w.watchdog.hold();
+  });
+  powerMonitor.on('resume', () => {
+    for (const w of stallWatches) if (w.started) w.watchdog.start();
   });
 }
 
@@ -1033,10 +1079,6 @@ ipcMain.handle('sc:extract:start', async (event, req: ExtractRequest): Promise<E
   // sidecar starts — main owns them (see `main/resources.ts`).
   const w = resources.workers();
   req = { ...req, workers: w.dump, memCapMb: w.memCapMb };
-  const watchdog = createWatchdog({
-    timeoutMs: JOB_STALL_MS,
-    onTimeout: (idle) => reportJobStall('extract', idle, jobId),
-  });
   // A new extraction means every earlier extract on disk is superseded — drop
   // them all BEFORE the sidecar starts writing, so two full extracts never sit
   // side by side and fill the drive. The dir this run is about to fill and any
@@ -1057,6 +1099,7 @@ ipcMain.handle('sc:extract:start', async (event, req: ExtractRequest): Promise<E
 
   hub.start('extract');
   const job = newActiveJob('extract', req.outDir);
+  const stall = watchJobStall('extract', jobId);
   const handle = startExtraction(req, (ev: PythonExtractEvent) => {
     // A heartbeat pulse only says "the process is alive", not "it progressed" —
     // it must not pet the stall watchdog (a spinning hang would never trip it)
@@ -1065,7 +1108,7 @@ ipcMain.handle('sc:extract:start', async (event, req: ExtractRequest): Promise<E
       safeSend(event.sender, 'sc:extract:event', { jobId, ...ev });
       return;
     }
-    watchdog.pet(); // every event is a sign of life — reset the stall timer
+    petJobStall(stall, ev); // every event is a sign of life — reset the stall timer
     collectDiagnostic(job.diagnostics, ev, Date.now() - job.startedAt);
     // Mirror into main's hub so the tray shows extraction progress even while
     // the window is hidden.
@@ -1084,7 +1127,7 @@ ipcMain.handle('sc:extract:start', async (event, req: ExtractRequest): Promise<E
   // Hand the sidecar to its governor: it gets the limits in effect NOW,
   // and every later switch reaches it without restarting the extraction.
   resources.registerJob(jobId, handle.pid);
-  watchdog.start();
+  startJobStall(stall);
   try {
     const final = await handle.promise;
     hub.finish('extract', final.ok ? 'done' : 'error');
@@ -1101,7 +1144,7 @@ ipcMain.handle('sc:extract:start', async (event, req: ExtractRequest): Promise<E
     reportJobLog('extract', jobId, job, { ok: false, error: message }, { channel: req.channel, patchVersion: req.patchVersion });
     return { ok: false, error: message };
   } finally {
-    watchdog.stop();
+    endJobStall(stall);
     activeJobs.delete(jobId);
     // Deregister BEFORE the OS can recycle the pid — a later switch must never
     // re-prioritise whatever process inherited this number.
@@ -1142,20 +1185,17 @@ ipcMain.handle('sc:skin:start', async (event, req: SkinExportRequest): Promise<S
     items: pk.pkgItems,
     armor: pk.pkgArmor,
   };
-  const watchdog = createWatchdog({
-    timeoutMs: JOB_STALL_MS,
-    onTimeout: (idle) => reportJobStall('skin', idle, jobId),
-  });
+  const stall = watchJobStall('skin', jobId);
   const job = newActiveJob('skin', req.outDir);
   const handle = startSkinExport(req, (ev) => {
-    watchdog.pet();
+    petJobStall(stall, ev);
     collectDiagnostic(job.diagnostics, ev, Date.now() - job.startedAt);
     safeSend(event.sender, 'sc:skin:event', { jobId, ...ev });
   });
   job.cancel = handle.cancel;
   activeJobs.set(jobId, job);
   resources.registerJob(jobId, handle.pid);
-  watchdog.start();
+  startJobStall(stall);
   try {
     const final = await handle.promise;
     // The build is killed from two places that mean opposite things: an
@@ -1174,7 +1214,7 @@ ipcMain.handle('sc:skin:start', async (event, req: SkinExportRequest): Promise<S
     reportJobLog('skin', jobId, job, { ok: false });
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   } finally {
-    watchdog.stop();
+    endJobStall(stall);
     activeJobs.delete(jobId);
     resources.unregisterJob(jobId);
   }
@@ -1273,23 +1313,20 @@ ipcMain.handle(
   'sc:silhouette:start',
   async (event, req: SilhouetteBuildRequest): Promise<SilhouetteBuildFinal> => {
     const jobId = `silhouette-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    const watchdog = createWatchdog({
-      timeoutMs: JOB_STALL_MS,
-      onTimeout: (idle) => reportJobStall('silhouette', idle, jobId),
-    });
+    const stall = watchJobStall('silhouette', jobId);
     // Conversions at once follow the limits, also while the build runs.
     const live = resources.openLiveLimits(jobId, 'silhouette');
     req = { ...req, workers: live.workers, maxWorkers: live.maxWorkers, liveLimitsPath: live.path };
     const job = newActiveJob('silhouette', req.outDir);
     const handle = startSilhouetteBuild(req, (ev) => {
-      watchdog.pet();
+      petJobStall(stall, ev);
       collectDiagnostic(job.diagnostics, ev, Date.now() - job.startedAt);
       safeSend(event.sender, 'sc:silhouette:event', { jobId, ...ev });
     });
     job.cancel = handle.cancel;
     activeJobs.set(jobId, job);
     resources.registerJob(jobId, handle.pid);
-    watchdog.start();
+    startJobStall(stall);
     try {
       const final = await handle.promise;
       // Same pause/cancel-vs-crash disambiguation as `sc:skin:start` — a
@@ -1305,7 +1342,7 @@ ipcMain.handle(
       reportJobLog('silhouette', jobId, job, { ok: false });
       return { ok: false, error: err instanceof Error ? err.message : String(err) };
     } finally {
-      watchdog.stop();
+      endJobStall(stall);
       activeJobs.delete(jobId);
       resources.unregisterJob(jobId);
     }
@@ -1457,6 +1494,7 @@ app.on('second-instance', () => {
 });
 
 app.whenReady().then(() => {
+  wireStallPower();
   // Every discovery (auto-run, cleanup, Install step) probes the install the
   // operator chose before first — falls back to the search when it is gone.
   setRememberedInstall(getSettings().gamePath);

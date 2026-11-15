@@ -29,6 +29,22 @@
       ]
     },
     {
+      "version": "0.270.21",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader 0.81.4: the 3D build no longer reports a false \"no progress\" stall while a large part is converting — skin jobs get 20 minutes, every converter call logs the part it works on, standby no longer counts, and a real stall report names the phase, counter and last log line."
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.270.20",
       "date": "2026-11-15",
       "sections": [
