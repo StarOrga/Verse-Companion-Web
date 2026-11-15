@@ -49,9 +49,9 @@ select is(
   '{}'::jsonb, 'another provider with a verified address passes');
 select ok(public.hook_before_user_created('{"user":{"email":"pgtap-invited@example.test","app_metadata":{"provider":"email"}}}') ? 'error',
   'a password sign-up for an allowlisted address is rejected while no invite is in flight');
-update public.allowed_emails set invite_started_at = now() - interval '11 minutes' where email = 'pgtap-invited@example.test';
+update public.allowed_emails set invite_started_at = now() - interval '3 minutes' where email = 'pgtap-invited@example.test';
 select ok(public.hook_before_user_created('{"user":{"email":"pgtap-invited@example.test","app_metadata":{"provider":"email"}}}') ? 'error',
-  '... and when the invite stamp is older than ten minutes');
+  '... and when the invite stamp is older than two minutes');
 update public.allowed_emails set invite_started_at = now() where email = 'pgtap-invited@example.test';
 select is(
   public.hook_before_user_created('{"user":{"email":"pgtap-invited@example.test","app_metadata":{"provider":"email"}}}'),

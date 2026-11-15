@@ -78,14 +78,16 @@
 --                    unverified address)
 --   email            only while an admin invite for that address is in flight
 --                    (invite-user stamps allowed_emails.invite_started_at just
---                    before inviteUserByEmail). The login page offers no
+--                    before inviteUserByEmail and clears it right after, on
+--                    success and on failure; the 2-minute limit only covers a
+--                    function that died in between). The login page offers no
 --                    password sign-up, so nothing reachable is lost; a direct
 --                    POST /auth/v1/signup is what this closes.
 alter table public.allowed_emails add column if not exists invite_started_at timestamptz;
 
 comment on column public.allowed_emails.invite_started_at is
-  'Stamped by the invite-user edge function right before it sends an invite mail. '
-  'hook_before_user_created() lets an e-mail (password / invite) account be created only within 10 minutes of it.';
+  'Stamped by the invite-user edge function right before it sends an invite mail and cleared right after. '
+  'hook_before_user_created() lets an e-mail (password / invite) account be created only within 2 minutes of it.';
 
 create or replace function public.hook_before_user_created(event jsonb)
 returns jsonb
@@ -110,7 +112,7 @@ begin
     if coalesce(v_listed, false) then
       if v_provider = 'google' and v_verified <> 'false' then
         return '{}'::jsonb;
-      elsif v_provider = 'email' and v_invite is not null and v_invite > now() - interval '10 minutes' then
+      elsif v_provider = 'email' and v_invite is not null and v_invite > now() - interval '2 minutes' then
         return '{}'::jsonb;
       elsif v_provider not in ('google', 'email', '') and v_verified = 'true' then
         return '{}'::jsonb;

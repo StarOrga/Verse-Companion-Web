@@ -213,6 +213,15 @@ Deno.serve(withPosthog('invite-user', async (req: Request): Promise<Response> =>
       redirectTo: INVITE_REDIRECT,
     });
 
+  // One-shot: the stamp only has to cover the invite call above. Cleared on
+  // success AND failure, so a failed invite leaves no window in which a
+  // password sign-up for the address would pass the gate.
+  const { error: clearErr } = await adminClient
+    .from('allowed_emails')
+    .update({ invite_started_at: null })
+    .eq('email', email);
+  if (clearErr && !stampErr) console.warn('[invite-user] invite stamp not cleared:', clearErr.message);
+
   if (inviteErr || !inviteData?.user) {
     const msg = inviteErr?.message ?? 'invite failed';
     if (/already.*registered|exists/i.test(msg)) {

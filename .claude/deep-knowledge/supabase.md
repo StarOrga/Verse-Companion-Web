@@ -180,9 +180,9 @@ data). Three layers now, outermost first:
    `allowed_emails` (compared in lower case) that also arrives through a path
    proving the mailbox — Google unless it reports `email_verified = false`,
    any other OAuth provider only with `email_verified = true`, an e-mail
-   (password / invite) account only within 10 minutes of
+   (password / invite) account only within 2 minutes of
    `allowed_emails.invite_started_at`, which `invite-user` stamps right before
-   `inviteUserByEmail` — or the bootstrap founder of a database without an
+   `inviteUserByEmail` and clears right after — or the bootstrap founder of a database without an
    admin. Without the path rule anybody who knew an allowlisted, not-yet-joined
    address could `POST /auth/v1/signup` with their own password and be approved
    at its role once the real owner clicked the confirmation mail. Otherwise it answers
