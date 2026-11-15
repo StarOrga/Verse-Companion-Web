@@ -2,26 +2,33 @@
 // data sheet (docs/contracts/event-sheet.md), so the HQ never depends on someone typing it in.
 //
 //   POST {}                         pg_cron (every 6 h): picks the events that need a pass (new comm-link, running
-//                                   event once a day, upcoming event, one last pass after the end), max 3 LLM calls.
+//                                   event once a day, upcoming event, one last pass after the end, and - backfill -
+//                                   every event never read by the current extractor), max 4 parallel LLM calls.
 //   POST { eventId, force? }        re-extract ONE event; service-role key or a signed-in admin only.
-//   -> { ok, runs: [{ eventId, status, ... }] }
+//   POST { backfill: true }         one automatic pass without the 10-min throttle; service-role key or admin only
+//                                   (the admin page's "Fehlende auswerten" loops it until `due` is 0).
+//   -> { ok, runs: [{ eventId, status, ... }], due }
 //
-// Flow per event: gather text (Comm-Link Wiki API; community wiki extract; the RSI page's meta tags - RSI serves
-// nothing else to a plain fetch, so a failed/empty source is simply skipped) -> Anthropic tool call with the sheet
-// schema -> sheetFromModel (normalise, sanity-check, confidence gate) -> mergeSheets with the stored draft (admin
-// decisions stay) -> sc_event_sheet_apply(..., 'ai') = draft + public sheet + one history row. Fields under 0.8 stay
-// unknown publicly and wait in the admin review. The key lives only here (ANTHROPIC_API_KEY); model override
-// SC_EVENT_SHEET_MODEL. verify_jwt=false (supabase/config.toml): pg_cron has only the publishable key; the automatic
-// mode is throttled and capped, the targeted mode checks the caller itself.
+// Flow per event: gather text -> Anthropic tool call with the sheet schema -> sheetFromModel (normalise, sanity-check,
+// confidence gate) -> calendar dates for an unknown start/end -> mergeSheets with the stored draft (admin decisions
+// stay) -> sc_event_sheet_apply(..., 'ai') = draft + public sheet + one history row. Sources (all best-effort, a failed
+// one is skipped): the event's own comm-link by id (sc_events.url) and a title search over ALL comm-links of the
+// Comm-Link Wiki API (the newest 200 alone miss every older edition), the newest 200 for weekly-roundup mentions, the
+// community wiki page (resolved case-insensitively, this edition's section first) and the RSI page's meta tags. An
+// edition without a post of its own (announced later) reads the previous edition's posts as a labelled hint; its
+// fields stay <= 0.6 and wait in the admin review. Fields under 0.8 stay unknown publicly. Key only here
+// (ANTHROPIC_API_KEY); model override SC_EVENT_SHEET_MODEL. verify_jwt=false (supabase/config.toml): pg_cron has only
+// the publishable key; the automatic mode is throttled and capped, the targeted/backfill modes check the caller.
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { normalizeSheet, type EventSheet } from '../_shared/event-sheet.ts';
 import { callClaude } from '../_shared/ai-ledger.ts';
 import {
-  EXTRACTOR_VERSION, MAX_LLM_CALLS_PER_RUN, SHEET_TOOL_NAME, SHEET_TOOL_SCHEMA,
-  bundleSources, buildPrompt, extractMeta, hashText, mergeSheets, nameStem, parseModelAnswer, parseWikiExtract,
-  pickEvents, selectSources, sheetFromModel,
+  EXTRACTOR_MAJOR, EXTRACTOR_VERSION, MAX_LLM_CALLS_PER_RUN, SHEET_TOOL_NAME, SHEET_TOOL_SCHEMA,
+  actorIdFor, bundleSources, buildPrompt, commLinkIdFromUrl, extractMeta, fillDatesFromCalendar, hashText, mergeSheets,
+  parseActorId, parseModelAnswer, parseWikiExtract, pickEvents, previousEditionSources, searchTerms, selectSources,
+  sheetFromModel, wikiEditionText,
   type EventInfo, type LinkInfo, type RunState, type SourceItem, CORS, preflight,
 } from './_extract.ts';
 import { withPosthog } from '../_shared/posthog.ts';
@@ -49,40 +56,66 @@ function toLink(raw: unknown): LinkInfo | null {
   return { id: r.id, title: r.title.trim(), url: r.rsi_url, publishedAt: new Date(r.created_at).toISOString(), body: typeof en === 'string' ? en.slice(0, 60000) : '' };
 }
 
-async function fetchLinks(): Promise<LinkInfo[]> {
-  const links: LinkInfo[] = [];
-  for (let page = 1; page <= 2; page++) {
-    try {
-      const body = (await getJson(`${COMM_LINK_API}?page%5Bsize%5D=100&page%5Bnumber%5D=${page}`)) as { data?: unknown };
-      for (const item of Array.isArray(body.data) ? body.data : []) {
-        const l = toLink(item);
-        if (l) links.push(l);
-      }
-    } catch (e) {
+const linksOf = (body: unknown): LinkInfo[] => {
+  const data = (body as { data?: unknown } | null)?.data;
+  return (Array.isArray(data) ? data : data ? [data] : []).map(toLink).filter((l): l is LinkInfo => l !== null);
+};
+
+/** The newest 200 comm-links (weekly roundups that mention the running events). */
+async function fetchRecentLinks(): Promise<LinkInfo[]> {
+  const pages = await Promise.all([1, 2].map((page) =>
+    getJson(`${COMM_LINK_API}?page%5Bsize%5D=100&page%5Bnumber%5D=${page}`).then(linksOf).catch((e) => {
       console.warn(`[sc-event-sheet] comm-link page ${page}: ${(e as Error).message}`);
-    }
-  }
-  return links;
+      return [] as LinkInfo[];
+    })));
+  return pages.flat();
 }
 
-/** Extra text beyond the comm-links; every failure is swallowed (these sources are best-effort). */
-async function fetchExtraSources(event: EventInfo): Promise<SourceItem[]> {
-  const out: SourceItem[] = [];
-  const stem = nameStem(event.name);
-  try {
-    const wiki = parseWikiExtract(await getJson(`${WIKI_API}?action=query&format=json&prop=extracts&explaintext=1&redirects=1&titles=${encodeURIComponent(stem)}`));
-    if (wiki) out.push({ kind: 'wiki', label: `Star Citizen Wiki: ${stem} (community)`, url: `https://starcitizen.tools/${encodeURIComponent(stem.replace(/ /g, '_'))}`, text: wiki.slice(0, 7000) });
-  } catch { /* wiki unreachable: fine */ }
-  if (event.url) {
+/** Every comm-link whose TITLE names the event (all editions, any age) plus its own post by id. */
+async function fetchEventLinks(event: EventInfo): Promise<LinkInfo[]> {
+  const asks = searchTerms(event.name).map((t) => getJson(`${COMM_LINK_API}?filter%5Btitle%5D=${encodeURIComponent(t)}&page%5Bsize%5D=50`));
+  const own = event.source_comm_link_id ?? commLinkIdFromUrl(event.url);
+  if (own !== null) asks.push(getJson(`${COMM_LINK_API}/${own}`));
+  const got = await Promise.allSettled(asks);
+  return got.flatMap((g) => (g.status === 'fulfilled' ? linksOf(g.value) : []));
+}
+
+/** The community wiki page for the event, its title resolved case-insensitively ("Pirate Week" lives at "Pirate week"). */
+async function fetchWiki(event: EventInfo): Promise<SourceItem | null> {
+  for (const term of searchTerms(event.name)) {
     try {
-      const res = await fetch(event.url, { headers: { 'user-agent': USER_AGENT, accept: 'text/html' }, signal: AbortSignal.timeout(12_000) });
-      if (res.ok) {
-        const meta = extractMeta((await res.text()).slice(0, 200_000));
-        if (meta) out.push({ kind: event.url.includes('/spectrum/') ? 'spectrum' : 'comm-link', label: 'RSI page meta tags', url: event.url, text: meta });
-      }
-    } catch { /* RSI blocks or serves a shell: fine */ }
+      const found = (await getJson(`${WIKI_API}?action=opensearch&format=json&limit=1&search=${encodeURIComponent(term)}`)) as unknown[];
+      const title = Array.isArray(found?.[1]) && typeof found[1][0] === 'string' ? found[1][0] : null;
+      if (!title || title.toLowerCase() !== term.toLowerCase()) continue;
+      const text = parseWikiExtract(await getJson(`${WIKI_API}?action=query&format=json&prop=extracts&explaintext=1&redirects=1&titles=${encodeURIComponent(title)}`));
+      if (text) return { kind: 'wiki', label: `Star Citizen Wiki: ${title} (community)`, url: `https://starcitizen.tools/${encodeURIComponent(title.replace(/ /g, '_'))}`, text: wikiEditionText(text, event) };
+    } catch { /* wiki unreachable: fine */ }
   }
-  return out;
+  return null;
+}
+
+/** The RSI page's meta tags (RSI serves nothing else to a plain fetch). */
+async function fetchMeta(event: EventInfo): Promise<SourceItem | null> {
+  if (!event.url) return null;
+  try {
+    const res = await fetch(event.url, { headers: { 'user-agent': USER_AGENT, accept: 'text/html' }, signal: AbortSignal.timeout(12_000) });
+    if (!res.ok) return null;
+    const meta = extractMeta((await res.text()).slice(0, 200_000));
+    return meta ? { kind: event.url.includes('/spectrum/') ? 'spectrum' : 'comm-link', label: 'RSI page meta tags', url: event.url, text: meta } : null;
+  } catch { return null; /* RSI blocks or serves a shell: fine */ }
+}
+
+interface Gathered { event: EventInfo; sources: SourceItem[]; own: boolean; bundle: string; hash: string }
+
+async function gather(event: EventInfo, recent: readonly LinkInfo[]): Promise<Gathered> {
+  const [eventLinks, wiki, meta] = await Promise.all([fetchEventLinks(event), fetchWiki(event), fetchMeta(event)]);
+  const seen = new Set<number>();
+  const links = [...eventLinks, ...recent].filter((l) => (seen.has(l.id) ? false : (seen.add(l.id), true)));
+  const posts = selectSources(event, links);
+  const own = posts.length > 0;
+  const sources = [...posts, ...(own ? [] : previousEditionSources(event, links)), ...(wiki ? [wiki] : []), ...(meta ? [meta] : [])];
+  const bundle = bundleSources(sources);
+  return { event, sources, own, bundle, hash: hashText(`${EXTRACTOR_VERSION}\n${bundle}`) };
 }
 
 async function askModel(prompt: string, key: string): Promise<unknown> {
@@ -105,12 +138,14 @@ Deno.serve(withPosthog('sc-event-sheet', async (req) => {
   const url = Deno.env.get('SUPABASE_URL') ?? '';
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
   const db = createClient(url, serviceKey, { auth: { persistSession: false } });
-  const body = (await req.json().catch(() => ({}))) as { eventId?: unknown; force?: unknown };
+  const body = (await req.json().catch(() => ({}))) as { eventId?: unknown; force?: unknown; backfill?: unknown };
   const targeted = typeof body.eventId === 'string' && body.eventId.length > 0 ? body.eventId : null;
+  const backfill = !targeted && body.backfill === true;
   const force = body.force === true;
 
-  // Targeted runs: the service-role key or a signed-in admin. The automatic mode needs no caller trust (throttled + capped).
-  if (targeted) {
+  // Targeted runs and backfill passes: the service-role key or a signed-in admin. The automatic mode needs no caller
+  // trust (throttled + capped).
+  if (targeted || backfill) {
     const auth = req.headers.get('authorization') ?? '';
     let allowed = auth === `Bearer ${serviceKey}`;
     if (!allowed && auth) {
@@ -124,16 +159,18 @@ Deno.serve(withPosthog('sc-event-sheet', async (req) => {
   const key = Deno.env.get('ANTHROPIC_API_KEY');
   if (!key) return json({ ok: true, runs: [], status: 'no_key' });
 
-  // Past AI runs: when, and on which source text (actor_id = `sc-event-sheet:<hash>`).
+  // Past AI runs: when, on which source text and by which extractor (actor_id = `sc-event-sheet:<major>:<hash>`).
   const { data: hist, error: histErr } = await db.from('sc_event_sheet_history')
-    .select('event_id, created_at, actor_id').eq('actor_kind', 'ai').order('created_at', { ascending: false }).limit(300);
+    .select('event_id, created_at, actor_id').eq('actor_kind', 'ai').order('created_at', { ascending: false }).limit(500);
   if (histErr) return json({ error: `history: ${histErr.message}` }, 500);
   const state = new Map<string, RunState>();
   for (const h of (hist ?? []) as Array<{ event_id: string; created_at: string; actor_id: string | null }>) {
-    if (!state.has(h.event_id)) state.set(h.event_id, { lastAiAt: h.created_at, lastHash: h.actor_id?.startsWith('sc-event-sheet:') ? h.actor_id.slice(15) : null });
+    if (state.has(h.event_id)) continue;
+    const a = parseActorId(h.actor_id);
+    state.set(h.event_id, { lastAiAt: h.created_at, lastHash: a.hash, stale: a.major !== EXTRACTOR_MAJOR });
   }
   const newest = (hist ?? [])[0]?.created_at as string | undefined;
-  if (!targeted && newest && Date.now() - Date.parse(newest) < GLOBAL_THROTTLE_MS) {
+  if (!targeted && !backfill && newest && Date.now() - Date.parse(newest) < GLOBAL_THROTTLE_MS) {
     return json({ ok: true, runs: [], status: 'throttled' }, 429);
   }
 
@@ -142,7 +179,7 @@ Deno.serve(withPosthog('sc-event-sheet', async (req) => {
   if (rowsErr) return json({ error: `events: ${rowsErr.message}` }, 500);
   const events = (rows ?? []) as EventInfo[];
 
-  const links = await fetchLinks();
+  const recent = await fetchRecentLinks();
   let picked: EventInfo[];
   if (targeted) {
     const one = events.find((e) => e.id === targeted);
@@ -151,36 +188,51 @@ Deno.serve(withPosthog('sc-event-sheet', async (req) => {
   } else {
     const latestLinkAt = new Map<string, string>();
     for (const e of events) {
-      const newestLink = selectSources(e, links).map((s) => s.label.match(/\((\d{4}-\d{2}-\d{2})\)$/)?.[1] ?? '').sort().pop();
+      const newestLink = selectSources(e, recent).map((s) => s.label.match(/\((\d{4}-\d{2}-\d{2})\)$/)?.[1] ?? '').sort().pop();
       if (newestLink) latestLinkAt.set(e.id, `${newestLink}T23:59:59Z`);
     }
     picked = pickEvents(events, state, latestLinkAt, new Date());
   }
 
+  // 1. Sources for every picked event (parallel, network only). 2. Unchanged text needs no model. 3. Up to the cap
+  // of LLM calls in parallel - sequential calls would not fit the 150 s wall clock - the rest waits for the next run.
+  const gathered = await Promise.all(picked.map((e) => gather(e, recent).catch((err) => ({ event: e, error: (err as Error).message }))));
   const runs: Array<Record<string, unknown>> = [];
-  let calls = 0;
-  for (const event of picked) {
-    if (calls >= MAX_LLM_CALLS_PER_RUN && !targeted) { runs.push({ eventId: event.id, status: 'deferred' }); continue; }
-    try {
-      const sources = [...selectSources(event, links), ...(await fetchExtraSources(event))];
-      const bundle = bundleSources(sources);
-      const hash = hashText(bundle);
-      if (!force && bundle && state.get(event.id)?.lastHash === hash) { runs.push({ eventId: event.id, status: 'unchanged' }); continue; }
-      calls++;
-      const answer = await askModel(buildPrompt(event, bundle), key);
-      if (!answer) { runs.push({ eventId: event.id, status: 'model_failed' }); continue; }
-      const fresh = sheetFromModel(answer, event);
+  const work: Gathered[] = [];
+  for (const g of gathered) {
+    if ('error' in g) { runs.push({ eventId: g.event.id, status: 'failed', error: g.error.slice(0, 300) }); continue; }
+    const st = state.get(g.event.id);
+    if (!force && st && !st.stale && st.lastHash === g.hash) { runs.push({ eventId: g.event.id, status: 'unchanged' }); continue; }
+    work.push(g);
+  }
+  const cap = targeted ? 1 : MAX_LLM_CALLS_PER_RUN;
+  const now = work.slice(0, cap);
+  for (const g of work.slice(cap)) runs.push({ eventId: g.event.id, status: 'deferred' });
 
-      const { data: draft } = await db.from('sc_event_sheet_drafts').select('sheet').eq('event_id', event.id).maybeSingle();
-      const merged: EventSheet = mergeSheets(draft?.sheet ? normalizeSheet(draft.sheet) : null, fresh.sheet);
+  let calls = 0;
+  const results = await Promise.all(now.map(async (g): Promise<Record<string, unknown>> => {
+    try {
+      // No text at all: no model call; the sheet still gets the calendar dates, and the event counts as read.
+      let answer: unknown = { fields: {} };
+      if (g.bundle) {
+        calls++;
+        answer = await askModel(buildPrompt(g.event, g.bundle), key);
+        if (!answer) return { eventId: g.event.id, status: 'model_failed' };
+      }
+      const fresh = sheetFromModel(answer, g.event, { ownSources: g.own });
+      const dated = fillDatesFromCalendar(fresh.sheet, g.event);
+      const { data: draft } = await db.from('sc_event_sheet_drafts').select('sheet').eq('event_id', g.event.id).maybeSingle();
+      const merged: EventSheet = mergeSheets(draft?.sheet ? normalizeSheet(draft.sheet) : null, dated);
       const { error: applyErr } = await db.rpc('sc_event_sheet_apply', {
-        p_event_id: event.id, p_sheet: merged, p_actor_kind: 'ai', p_actor_id: `sc-event-sheet:${hash}`,
+        p_event_id: g.event.id, p_sheet: merged, p_actor_kind: 'ai', p_actor_id: actorIdFor(g.hash),
       });
       if (applyErr) throw new Error(`apply: ${applyErr.message}`);
-      runs.push({ eventId: event.id, status: 'written', sources: sources.length, issues: fresh.issues, extractor: EXTRACTOR_VERSION });
+      return { eventId: g.event.id, status: 'written', sources: g.sources.length, ownSources: g.own, issues: fresh.issues, extractor: EXTRACTOR_VERSION };
     } catch (e) {
-      runs.push({ eventId: event.id, status: 'failed', error: (e as Error).message.slice(0, 300) });
+      return { eventId: g.event.id, status: 'failed', error: (e as Error).message.slice(0, 300) };
     }
-  }
-  return json({ ok: true, llmCalls: calls, runs });
+  }));
+  runs.push(...results);
+  const due = runs.filter((r) => r.status === 'deferred').length;
+  return json({ ok: true, llmCalls: calls, due, runs });
 }, { cron: true }));

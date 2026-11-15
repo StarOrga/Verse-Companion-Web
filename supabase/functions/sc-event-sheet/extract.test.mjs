@@ -11,6 +11,8 @@ import {
 import {
   MAX_LINKS_PER_EVENT, SHEET_TOOL_SCHEMA, buildPrompt, bundleSources, excerptAround, extractMeta, hashText, mergeSheets,
   nameStem, parseModelAnswer, CORS, preflight, parseWikiExtract, pickEvents, sanityCheck, selectSources, sheetFromModel,
+  actorIdFor, commLinkIdFromUrl, editionYears, fillDatesFromCalendar, parseActorId, previousEditionSources, searchTerms, wikiEditionText,
+  EXTRACTOR_MAJOR, NO_OWN_SOURCE_MAX_CONFIDENCE,
 } from './_extract.ts';
 // Static JSON imports: the Deno parity run (edge-functions-deploy.yml) grants no --allow-read.
 import fx_day_of_the_vara_2956 from './fixtures/day-of-the-vara-2956.json' with { type: 'json' };
@@ -276,7 +278,13 @@ test('pickEvents: new and running events first, hidden/cancelled/old skipped, ca
     ['just-ended', { lastAiAt: '2026-11-05T00:00:00Z', lastHash: 'a' }],         // last pass was before the end: one more
   ]);
   const ids = pickEvents(events, state, new Map(), now).map((x) => x.id);
-  assert.deepEqual(ids, ['running-stale', 'just-ended']);
+  // backfill: never-read events outside the window follow the window's own needs (#364: 28 of 30 sheets stayed empty)
+  assert.deepEqual(ids, ['running-stale', 'just-ended', 'far', 'ended-long']);
+  // read by the current extractor: the window rules alone; read only by an older major: due again
+  const read = new Map([...state, ['far', { lastAiAt: '2026-11-01T00:00:00Z', lastHash: 'b' }], ['ended-long', { lastAiAt: '2026-11-01T00:00:00Z', lastHash: 'b', stale: true }]]);
+  assert.deepEqual(pickEvents(events, read, new Map(), now).map((x) => x.id), ['running-stale', 'just-ended', 'ended-long']);
+  // older than the backfill reach: skipped
+  assert.equal(pickEvents([e('ancient', '2024-01-01', '2024-01-10')], new Map(), new Map(), now).length, 0);
   // a newer related comm-link makes a fresh running event due again
   const withLink = pickEvents(events, state, new Map([['running-fresh', '2026-11-08T10:00:00Z']]), now).map((x) => x.id);
   assert.ok(withLink.includes('running-fresh'));
@@ -316,4 +324,80 @@ test('a CORS preflight is answered, so the admin re-extract works from the brows
   assert.match(res.headers.get('access-control-allow-headers'), /x-client-info/);
   assert.equal(preflight('POST'), null);
   assert.equal(CORS['Access-Control-Allow-Origin'], '*');
+});
+
+// ------------------------------------------------------------------------------------------------ #364: sheets stayed empty
+
+const ev364 = (extra = {}) => ({ id: 'sf-2956', series: 'stella-fortuna', name: 'Stella Fortuna 2956', start_date: '2026-03-12', end_date: '2026-03-30', date_status: 'confirmed', status: 'scheduled', url: 'https://robertsspaceindustries.com/comm-link/transmission/21077-This-Week-In-Star-Citizen', source_comm_link_id: null, ...extra });
+
+test('#364 search terms, edition years and the comm-link id inside an event url', () => {
+  assert.deepEqual(searchTerms('Stella Fortuna 2956'), ['Stella Fortuna']);
+  assert.deepEqual(searchTerms('Invictus Launch Week / DefenseCon 2957'), ['Invictus Launch Week / DefenseCon', 'Invictus Launch Week', 'DefenseCon']);
+  assert.deepEqual(searchTerms('Drake DefenseCon 2956'), ['Drake DefenseCon', 'DefenseCon']);
+  assert.deepEqual(searchTerms('Red Festival 2957'), ['Red Festival']);
+  assert.deepEqual(editionYears({ start_date: '2026-03-12' }), ['2026', '2956']);
+  assert.deepEqual(editionYears({ start_date: '2027-03-11' }, -1), ['2026', '2956']);
+  assert.equal(commLinkIdFromUrl('https://robertsspaceindustries.com/comm-link/transmission/21077-This-Week-In-Star-Citizen'), 21077);
+  assert.equal(commLinkIdFromUrl('https://robertsspaceindustries.com/en/comm-link/transmission/21374-This-Week-In-Star-Citizen'), 21374);
+  assert.equal(commLinkIdFromUrl('https://robertsspaceindustries.com/comm-link/transmission/21301'), 21301);
+  assert.equal(commLinkIdFromUrl('https://robertsspaceindustries.com/en/ship-showdown-2956/winners'), null);
+  assert.equal(commLinkIdFromUrl(''), null);
+});
+
+test('#364 selectSources: the url post by id, this edition by title year whatever its import date, never another year', () => {
+  const twis = `${'intro '.repeat(400)}Stella Fortuna is in full swing until March 30, and the verse has been draped in gold and green.${' outro'.repeat(400)}`;
+  const links = [
+    link(21077, 'This Week in Star Citizen', '2026-03-23T16:00:00Z', twis),
+    link(21060, 'Stella Fortuna 2956', '2026-09-01T00:00:00Z', 'own post, re-imported with a later date'),
+    link(20500, 'Stella Fortuna 2955', '2026-03-01T00:00:00Z', 'last year, re-imported inside the window'),
+  ];
+  const src = selectSources(ev364(), links);
+  assert.deepEqual(src.map((s) => s.url.match(/transmission\/(\d+)/)[1]), ['21077', '21060']);
+  assert.ok(src[0].text.includes('until March 30') && src[0].text.length < twis.length, 'a weekly roundup as source post is cut to its mentions');
+});
+
+test('#364 an edition without a post of its own reads the previous edition, labelled, and stays in review', () => {
+  const next = ev364({ id: 'sf-2957', name: 'Stella Fortuna 2957', start_date: '2027-03-11', end_date: '2027-03-29', date_status: 'estimated', url: '' });
+  const links = [link(21070, 'Stella Fortuna 2956 FAQ', '2026-03-12T00:00:00Z', 'Fly to Mars-themed venues in Stanton.'), link(1, 'Stella Fortuna 2954', '2024-03-12T00:00:00Z', 'old')];
+  assert.equal(selectSources(next, links).length, 0);
+  const prev = previousEditionSources(next, links);
+  assert.equal(prev.length, 1);
+  assert.match(prev[0].label, /^PREVIOUS EDITION \(2956\), not this one: Stella Fortuna 2956 FAQ/);
+  assert.match(buildPrompt(next, bundleSources(prev)), /PREVIOUS EDITION describe last year/);
+  const { sheet, issues } = sheetFromModel({ fields: { venues: { value: ['verse'], confidence: 0.95, source: 'comm-link' } } }, next, { ownSources: false });
+  assert.equal(sheet.fields.venues.confidence, NO_OWN_SOURCE_MAX_CONFIDENCE);
+  assert.equal(sheet.fields.venues.review, 'pending');
+  assert.ok(issues.some((i) => /no source of this edition/.test(i)));
+  // with a post of its own nothing is capped
+  assert.equal(sheetFromModel({ fields: { venues: { value: ['verse'], confidence: 0.95, source: 'comm-link' } } }, next).sheet.fields.venues.review, 'auto');
+});
+
+test('#364 wiki: this edition\'s section first, then the intro; other editions dropped', () => {
+  const page = 'Stella Fortuna is a holiday.\n\n\n== Stella Fortuna 2025 ==\nRacing gear 2025.\n\n\n== Stella Fortuna 2026 ==\nRacing packs 2026.\n\n\n== Gallery ==\n';
+  const text = wikiEditionText(page, { start_date: '2026-03-12' });
+  assert.ok(text.startsWith('== Stella Fortuna 2026 ==\nRacing packs 2026.'));
+  assert.ok(text.includes('Stella Fortuna is a holiday.'));
+  assert.ok(!text.includes('Racing gear 2025'));
+  assert.equal(wikiEditionText('Just an intro.', { start_date: '2026-03-12' }), 'Just an intro.');
+});
+
+test('#364 calendar dates fill an unknown start/end: confirmed = released, estimated = review; a model date wins', () => {
+  const empty = sheetFromModel({ fields: {} }).sheet;
+  const confirmed = fillDatesFromCalendar(empty, ev364());
+  assert.deepEqual([confirmed.fields.start.value, confirmed.fields.end.value], ['2026-03-12', '2026-03-30']);
+  assert.equal(confirmed.fields.start.source, 'official');
+  assert.equal(publicSheet(confirmed).fields.end.value, '2026-03-30');
+  const estimated = fillDatesFromCalendar(empty, ev364({ date_status: 'estimated' }));
+  assert.equal(estimated.fields.start.review, 'pending');
+  assert.equal(publicSheet(estimated).fields.start.value, null);
+  const fromModel = sheetFromModel({ fields: { start: { value: '2026-03-13', confidence: 0.95, source: 'comm-link' } } }, ev364()).sheet;
+  assert.equal(fillDatesFromCalendar(fromModel, ev364()).fields.start.value, '2026-03-13');
+});
+
+test('#364 history actor id carries the extractor major; v1 ids read as major 1', () => {
+  assert.equal(actorIdFor('abc'), `sc-event-sheet:${EXTRACTOR_MAJOR}:abc`);
+  assert.deepEqual(parseActorId(actorIdFor('abc')), { hash: 'abc', major: EXTRACTOR_MAJOR });
+  assert.deepEqual(parseActorId('sc-event-sheet:c6w7km'), { hash: 'c6w7km', major: 1 });
+  assert.deepEqual(parseActorId(null), { hash: null, major: 0 });
+  assert.ok(EXTRACTOR_MAJOR >= 2, 'v1 sheets must be read again by the new sources');
 });
