@@ -7,7 +7,10 @@ import { hqPageOfFragment } from '../../hq/hq-routes';
 import { AnalyticsService } from '../analytics.service';
 
 /** A catalogue event derived from a router URL: name + properties, or null when the page carries no domain meaning. */
-export type PageEvent = { run: (a: AnalyticsService) => void; key: string };
+export interface PageEvent {
+  run: (a: AnalyticsService) => void;
+  key: string;
+}
 
 /** Codex single-segment sections under `/codex/<section>`. */
 const CODEX_SECTIONS = ['fps', 'keybinds', 'upcoming'] as const;
