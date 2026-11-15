@@ -350,6 +350,7 @@ test('#364 selectSources: the url post by id, this edition by title year whateve
     link(21077, 'This Week in Star Citizen', '2026-03-23T16:00:00Z', twis),
     link(21060, 'Stella Fortuna 2956', '2026-09-01T00:00:00Z', 'own post, re-imported with a later date'),
     link(20500, 'Stella Fortuna 2955', '2026-03-01T00:00:00Z', 'last year, re-imported inside the window'),
+    link(20400, 'Stella Fortuna 2951 Contest', '2026-03-02T00:00:00Z', 'Stella Fortuna contest of 2951, mentioned in its body'),
   ];
   const src = selectSources(ev364(), links);
   assert.deepEqual(src.map((s) => s.url.match(/transmission\/(\d+)/)[1]), ['21077', '21060']);

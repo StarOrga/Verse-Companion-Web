@@ -84,8 +84,9 @@ async function fetchEventLinks(event: EventInfo): Promise<LinkInfo[]> {
 async function fetchWiki(event: EventInfo): Promise<SourceItem | null> {
   for (const term of searchTerms(event.name)) {
     try {
-      const found = (await getJson(`${WIKI_API}?action=opensearch&format=json&limit=1&search=${encodeURIComponent(term)}`)) as unknown[];
-      const title = Array.isArray(found?.[1]) && typeof found[1][0] === 'string' ? found[1][0] : null;
+      const found = (await getJson(`${WIKI_API}?action=opensearch&format=json&limit=1&search=${encodeURIComponent(term)}`)) as unknown[] | null;
+      const titles: unknown[] = Array.isArray(found) && Array.isArray(found[1]) ? (found[1] as unknown[]) : [];
+      const title = typeof titles[0] === 'string' ? titles[0] : null;
       if (!title || title.toLowerCase() !== term.toLowerCase()) continue;
       const text = parseWikiExtract(await getJson(`${WIKI_API}?action=query&format=json&prop=extracts&explaintext=1&redirects=1&titles=${encodeURIComponent(title)}`));
       if (text) return { kind: 'wiki', label: `Star Citizen Wiki: ${title} (community)`, url: `https://starcitizen.tools/${encodeURIComponent(title.replace(/ /g, '_'))}`, text: wikiEditionText(text, event) };

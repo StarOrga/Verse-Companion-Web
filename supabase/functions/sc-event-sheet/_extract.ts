@@ -128,7 +128,8 @@ export function selectSources(event: EventInfo, links: readonly LinkInfo[]): Sou
   for (const l of titled) push(l, l.body);
   // Weekly roundups and patch notes only matter where they talk about the event.
   const mentionOf = (l: LinkInfo) => terms.find((t) => l.body.toLowerCase().includes(t.toLowerCase()));
-  const mentions = links.filter((l) => inWindow(l) && !used.has(l.id) && mentionOf(l))
+  const otherEdition = (l: LinkInfo) => namesEvent(l.title, terms) && !thisEdition(l);
+  const mentions = links.filter((l) => inWindow(l) && !used.has(l.id) && !otherEdition(l) && mentionOf(l))
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
   for (const l of mentions) push(l, excerptAround(l.body, mentionOf(l) ?? stem));
   return out;
