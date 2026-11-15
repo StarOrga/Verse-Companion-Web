@@ -1,69 +1,7 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.0",
+  "current": "0.269.0",
   "releases": [
-    {
-      "version": "0.270.0",
-      "date": "2026-11-15",
-      "sections": [
-        {
-          "category": "Added",
-          "label": "",
-          "items": [
-            {
-              "title": "",
-              "text": "Every popup now shares one frame in the \"Kommando-Spalte\" look: a coloured strip on the left with the popup's symbol and a vertical area label, the title and ✕ in the head, actions left in the footer with the main action first, and only the content scrolls."
-            },
-            {
-              "title": "",
-              "text": "Admin-only popups carry a red top edge, admin-and-collaborator popups a copper one."
-            },
-            {
-              "title": "",
-              "text": "On phones dialogs, panels and large windows open fullscreen; the back gesture closes the popup first and only then leaves the page."
-            }
-          ]
-        },
-        {
-          "category": "Changed",
-          "label": "",
-          "items": [
-            {
-              "title": "",
-              "text": "Dialogs never close on a click beside them; Escape closes them and focus returns to where it was. The confirm dialog gets an ✕."
-            },
-            {
-              "title": "",
-              "text": "Popup widths follow the four overlay sizes everywhere; the apps menu, wish list, hand-off and wish cart lost their own widths."
-            },
-            {
-              "title": "",
-              "text": "Form fields in popups carry their label inside the field."
-            },
-            {
-              "title": "",
-              "text": "Toasts have no ✕; the app notice offers \"Später\" instead."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "version": "0.269.1",
-      "date": "2026-11-15",
-      "sections": [
-        {
-          "category": "Fixed",
-          "label": "",
-          "items": [
-            {
-              "title": "",
-              "text": "The patch-tip update (one announced target, ±1 day) now actually reaches the database: its migration shared a version number with another one and would have been skipped."
-            }
-          ]
-        }
-      ]
-    },
     {
       "version": "0.269.0",
       "date": "2026-11-15",

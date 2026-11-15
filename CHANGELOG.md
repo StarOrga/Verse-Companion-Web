@@ -4,19 +4,6 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.270.0] - 2026-11-15
-
-### Added
-- Every popup now shares one frame in the "Kommando-Spalte" look: a coloured strip on the left with the popup's symbol and a vertical area label, the title and ✕ in the head, actions left in the footer with the main action first, and only the content scrolls.
-- Admin-only popups carry a red top edge, admin-and-collaborator popups a copper one.
-- On phones dialogs, panels and large windows open fullscreen; the back gesture closes the popup first and only then leaves the page.
-
-### Changed
-- Dialogs never close on a click beside them; Escape closes them and focus returns to where it was. The confirm dialog gets an ✕.
-- Popup widths follow the four overlay sizes everywhere; the apps menu, wish list, hand-off and wish cart lost their own widths.
-- Form fields in popups carry their label inside the field.
-- Toasts have no ✕; the app notice offers "Später" instead.
-
 ## [0.269.1] - 2026-11-15
 
 ### Fixed
