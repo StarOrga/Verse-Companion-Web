@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, signal, viewChildren } from '@angul
 import { TestBed } from '@angular/core/testing';
 import {
   POPUP_LARGE_OPEN_CLASS,
+  POPUP_MOTION_CLOSE,
   POPUP_MOTION_ROW_STEP_MS,
   POPUP_MOTION_TIMING,
   PopupMotionKind,
@@ -160,6 +161,30 @@ describe('ScPopupMotionDirective (Vektor-Aufriss)', () => {
     void motionOf(f, '.veil').exit();
     expect(root.classList.contains(POPUP_LARGE_OPEN_CLASS)).toBe(false);
     f.destroy();
+  });
+
+  it('C2: a window that grows while it opens keeps the frame on its real box', async () => {
+    const f = mount((c) => { c.showSmall.set(false); c.showLarge.set(true); });
+    await f.whenStable();
+    const win = f.nativeElement.querySelector('.win') as HTMLElement;
+    expect(frame()?.getBoundingClientRect().height).toBeCloseTo(400, 0);
+    win.style.height = '700px';
+    await sleep(60);
+    const box = frame()!.getBoundingClientRect();
+    expect(box.height).toBeCloseTo(700, 0);
+    expect(box.top).toBeCloseTo(win.getBoundingClientRect().top, 0);
+    f.destroy();
+  });
+
+  it('C2: on close the line is nearly gone before the spark builds', () => {
+    const line = POPUP_MOTION_CLOSE.line();
+    const spark = POPUP_MOTION_CLOSE.spark();
+    const sparkStart = spark.find((k) => Number(k['opacity']) === 0 && Number(k.offset) > 0.5)!.offset!;
+    const lineGone = line.find((k) => String(k['transform']).includes('0.01'))!.offset!;
+    expect(Number(sparkStart)).toBeGreaterThanOrEqual(0.8);
+    expect(Number(lineGone)).toBeLessThanOrEqual(0.9);
+    // The ease-out shrink has the line well below half length when the spark starts.
+    expect(line.find((k) => k.offset === 0.7)?.easing).toBe('cubic-bezier(0.2, 0.8, 0.2, 1)');
   });
 
   it('settles after the open: every effect is gone, the faint resting edge stays', async () => {

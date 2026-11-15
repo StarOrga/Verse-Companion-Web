@@ -236,14 +236,15 @@ export const POPUP_MOTION_CLOSE = {
     { offset: 0, opacity: 0, transform: 'scaleX(1)' },
     { offset: 0.55, opacity: 0, transform: 'scaleX(1)', easing: 'ease-out' },
     { offset: 0.68, opacity: 1, transform: 'scaleX(1)' },
-    { offset: 0.72, opacity: 1, transform: 'scaleX(1)', easing: E_IN },
-    { offset: 0.93, opacity: 0.9, transform: 'scaleX(0.01)' },
-    { offset: 0.96, opacity: 0, transform: 'scaleX(0)' },
+    // Ease-out: the line is mostly gone before the spark builds (the pin: never both at full size).
+    { offset: 0.7, opacity: 1, transform: 'scaleX(1)', easing: E_OUT },
+    { offset: 0.88, opacity: 0.9, transform: 'scaleX(0.01)' },
+    { offset: 0.92, opacity: 0, transform: 'scaleX(0)' },
     { offset: 1, opacity: 0, transform: 'scaleX(0)' },
   ],
   spark: (): Frames => [
     { offset: 0, opacity: 0, transform: 'scale(0.3)' },
-    { offset: 0.74, opacity: 0, transform: 'scale(0.3)', easing: E_OUT },
+    { offset: 0.8, opacity: 0, transform: 'scale(0.3)', easing: E_OUT },
     { offset: 0.93, opacity: 1, transform: 'scale(1)' },
     { offset: 1, opacity: 0, transform: 'scale(0.7)' },
   ],
@@ -352,6 +353,7 @@ export class ScPopupMotionDirective implements OnInit, OnDestroy {
   private startedAt = 0;
   private timer: ReturnType<typeof setTimeout> | null = null;
   private rowObserver: MutationObserver | null = null;
+  private sizeObserver: ResizeObserver | null = null;
   private leaveObserver: MutationObserver | null = null;
   private exiting: Promise<void> | null = null;
   private resolveExit: (() => void) | null = null;
@@ -418,6 +420,7 @@ export class ScPopupMotionDirective implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.stopSizeWatch();
     this.rowObserver?.disconnect();
     this.setLarge(false);
     // With `animate.leave` Angular adds the class after the destroy hooks: watch one more turn.
@@ -477,6 +480,7 @@ export class ScPopupMotionDirective implements OnInit, OnDestroy {
     this.run = run;
     rows.forEach((el, i) => this.animateRow(el, i));
     this.watchRows(panel);
+    this.watchSize(panel, f);
     const tail = rows.length ? (POPUP_MOTION_STAGGER_ROWS - 1) * POPUP_MOTION_ROW_STEP_MS : 0;
     this.later(T + tail + 30, () => this.settle());
   }
@@ -503,9 +507,38 @@ export class ScPopupMotionDirective implements OnInit, OnDestroy {
     this.rowObserver.observe(panel, { childList: true, subtree: true });
   }
 
+  /**
+   * A window that lays out its content after the first frame (async data, a table built later)
+   * grows while it opens: the overlay frame follows its box, so the line and the outline stay on
+   * the window's real edge instead of a stale, smaller rectangle.
+   */
+  private watchSize(panel: HTMLElement, f: { line: HTMLElement; spark: HTMLElement }): void {
+    if (typeof ResizeObserver === 'undefined') return;
+    this.sizeObserver = new ResizeObserver(() => {
+      if (this.phase !== 'opening' || !this.frame) return;
+      const geo = this.geometry(panel);
+      if (!geo) return;
+      const s = this.frame.style;
+      s.left = `${geo.rect.left}px`;
+      s.top = `${geo.rect.top}px`;
+      s.width = `${geo.rect.width}px`;
+      s.height = `${geo.rect.height}px`;
+      f.line.style.transformOrigin = `${geo.zoom ? geo.rect.width / 2 : geo.sparkX}px 50%`;
+      f.spark.style.left = `${geo.sparkX}px`;
+      f.spark.style.top = `${geo.sparkY}px`;
+    });
+    this.sizeObserver.observe(panel);
+  }
+
+  private stopSizeWatch(): void {
+    this.sizeObserver?.disconnect();
+    this.sizeObserver = null;
+  }
+
   /** Open over: drop every effect (the window is back to its own styles), the faint edge stays. */
   private settle(): void {
     this.timer = null;
+    this.stopSizeWatch();
     this.rowObserver?.disconnect();
     this.rowObserver = null;
     this.cancelRun();
@@ -519,6 +552,7 @@ export class ScPopupMotionDirective implements OnInit, OnDestroy {
 
   private close(): void {
     this.setLarge(false);
+    this.stopSizeWatch();
     this.rowObserver?.disconnect();
     this.rowObserver = null;
     this.clearTimer();
