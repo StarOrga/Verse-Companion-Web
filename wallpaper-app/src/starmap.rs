@@ -334,6 +334,10 @@ pub struct RenderOptions {
     pub nebula: bool,
     pub road: bool,
     pub supernova: bool,
+    /// Older patch lines as faint companions (web: tier-3 reward, default on). Off = only `[0]` is drawn unless `road`.
+    pub companions: bool,
+    /// Warm amber tint of the own constellation, glow and veil (web: tier-4 reward, default off).
+    pub tint: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -442,13 +446,40 @@ fn background(c: &mut Canvas, rnd_dither: &mut u32) {
     c.mark(0, 0, c.w, c.h);
 }
 
-fn draw_constellation(c: &mut Canvas, k: &RenderConstellation, b: &BoxF, u: f64, large: bool) {
+/// Own-figure style of `draw_constellation` (mirror of `FigureStyle` in constellation-render.ts).
+#[derive(Clone, Copy)]
+struct FigureStyle {
+    /// Soft glow under the own lines (default look only: no nebula reward).
+    magic: bool,
+    /// RGB of the own lines.
+    line: (f64, f64, f64),
+    /// Inner colour of the lit-star glow.
+    glow_inner: Rgba,
+}
+
+const BLUE_LINE: (f64, f64, f64) = (150.0, 190.0, 255.0);
+const AMBER_LINE: (f64, f64, f64) = (255.0, 205.0, 140.0);
+/// Lit-star glow core: the desktop figure is the big one, so white 0.9 as before (amber when tinted).
+const BLUE_GLOW: Rgba = Rgba(255.0, 255.0, 255.0, 0.9);
+const AMBER_GLOW: Rgba = Rgba(255.0, 238.0, 212.0, 0.9);
+
+fn draw_constellation(c: &mut Canvas, k: &RenderConstellation, b: &BoxF, u: f64, large: bool, st: FigureStyle) {
     let pts: Vec<Point> = k.points.iter().map(|p| map_point(*p, b)).collect();
     let lit = lit_indices(&k.points, k.star_count);
     let any_lit = !lit.is_empty();
     if pts.len() > 1 {
-        let col = Rgba(150.0, 190.0, 255.0, if any_lit { 0.42 } else { 0.14 });
+        let col = Rgba(st.line.0, st.line.1, st.line.2, if any_lit { 0.42 } else { 0.14 });
         let lw = if large { 1.6 } else { 0.8 } * u;
+        if st.magic && large && any_lit {
+            // Soft glow: two wider, very faint strokes behind the line (no blur, deterministic).
+            for (mul, alpha) in [(7.0, 0.08), (3.4, 0.13)] {
+                let g = Rgba(st.line.0, st.line.1, st.line.2, alpha);
+                for i in 0..pts.len() {
+                    let (a, z) = (pts[i], pts[(i + 1) % pts.len()]);
+                    c.line(a.0, a.1, z.0, z.1, lw * mul, g, 1.0, 0.0, Blend::Over);
+                }
+            }
+        }
         for i in 0..pts.len() {
             let (a, z) = (pts[i], pts[(i + 1) % pts.len()]);
             c.line(a.0, a.1, z.0, z.1, lw, col, 1.0, 0.0, Blend::Over);
@@ -457,7 +488,7 @@ fn draw_constellation(c: &mut Canvas, k: &RenderConstellation, b: &BoxF, u: f64,
     let s = if large { 1.0 } else { 0.45 };
     for (i, &(x, y)) in pts.iter().enumerate() {
         if lit.contains(&i) {
-            c.glow(x, y, 3.2 * 9.0 * s * u, Rgba(255.0, 255.0, 255.0, 0.9), Rgba(120.0, 170.0, 255.0, 0.0), 1.0, Blend::Over);
+            c.glow(x, y, 3.2 * 9.0 * s * u, st.glow_inner, Rgba(120.0, 170.0, 255.0, 0.0), 1.0, Blend::Over);
             c.disc(x, y, 3.2 * s * u, hex(0xffffff, 1.0), 1.0, Blend::Over);
         } else {
             c.disc(x, y, 2.2 * s * u, Rgba(200.0, 215.0, 255.0, 0.28), 1.0, Blend::Over);
@@ -501,6 +532,22 @@ pub fn render_into(px: &mut [u32], o: &RenderOptions) -> Layout {
         c.glow(x, y, r, Rgba(cr, cg, cb, na), Rgba(cr, cg, cb, 0.0), 1.0, Blend::Lighter);
     }
 
+    // The constellation list is needed before the starfield: the veil sits behind it.
+    let older = o.companions || o.road;
+    let list: Vec<&RenderConstellation> = o.constellations.iter().take(if older { 7 } else { 1 }).collect();
+    let boxes = constellation_boxes(w, h, list.len());
+    // Magic default look (no nebula reward): a soft veil centred on the own constellation, under the stars.
+    let magic = !o.nebula;
+    if magic && !list.is_empty() {
+        let (vx, vy) = centroid(&list[0].points, &boxes[0]);
+        let (inner, outer) = if o.tint {
+            (Rgba(200.0, 130.0, 70.0, 0.15), Rgba(200.0, 130.0, 70.0, 0.0))
+        } else {
+            (Rgba(70.0, 120.0, 220.0, 0.18), Rgba(70.0, 120.0, 220.0, 0.0))
+        };
+        c.glow(vx, vy, 380.0 * u, inner, outer, 1.0, Blend::Over);
+    }
+
     // 3 — starfield, three layers.
     let area = (w / u) * (h / u) / 1e6;
     let layers: [(f64, (f64, f64), (f64, f64), bool); 3] = [
@@ -527,8 +574,6 @@ pub fn render_into(px: &mut [u32], o: &RenderOptions) -> Layout {
     }
 
     // 4 — road through the centroids, oldest → newest.
-    let list: Vec<&RenderConstellation> = o.constellations.iter().take(7).collect();
-    let boxes = constellation_boxes(w, h, list.len());
     if o.road && list.len() > 1 {
         let mut cs: Vec<Point> = list.iter().zip(&boxes).map(|(k, b)| centroid(&k.points, b)).collect();
         cs.reverse();
@@ -537,7 +582,8 @@ pub fn render_into(px: &mut [u32], o: &RenderOptions) -> Layout {
 
     // 5 — constellations.
     for (i, (k, b)) in list.iter().zip(&boxes).enumerate() {
-        draw_constellation(&mut c, k, b, u, i == 0);
+        let (line, glow_inner) = if o.tint && i == 0 { (AMBER_LINE, AMBER_GLOW) } else { (BLUE_LINE, BLUE_GLOW) };
+        draw_constellation(&mut c, k, b, u, i == 0, FigureStyle { magic: magic && i == 0, line, glow_inner });
     }
 
     // 6 — supernova burst + the subtle SCC hint.
@@ -643,7 +689,23 @@ mod tests {
             nebula: true,
             road: true,
             supernova: false,
+            companions: true,
+            tint: false,
         }
+    }
+
+    #[test]
+    fn magic_sky_adds_veil_and_glow_only_without_nebula_and_tint_goes_amber() {
+        let render_with = |nebula: bool, tint: bool, companions: bool| {
+            let o = RenderOptions { nebula, tint, companions, road: false, ..opts("4.4", 320, 180) };
+            render(&o).0
+        };
+        let plain = render_with(true, false, true);
+        let magic = render_with(false, false, true);
+        assert_ne!(plain, magic, "no nebula reward: the veil and line glow change the sky");
+        assert_eq!(magic, render_with(false, false, true), "still deterministic");
+        assert_ne!(magic, render_with(false, true, true), "tier-4 tint recolours it");
+        assert_ne!(magic, render_with(false, false, false), "companions off drops the older constellation");
     }
 
     #[test]
@@ -735,7 +797,7 @@ mod preview {
                 list[0].sun = false;
             }
             list.extend([older("4.3", 7, true), older("4.2", 4, false), older("4.1", 2, true)]);
-            let o = RenderOptions { width: 3840, height: 2160, seed: "4.4".into(), constellations: list, nebula: true, road: true, supernova: nova };
+            let o = RenderOptions { width: 3840, height: 2160, seed: "4.4".into(), constellations: list, nebula: true, road: true, supernova: nova, companions: true, tint: false };
             let t0 = std::time::Instant::now();
             let (px, _) = render(&o);
             eprintln!("{name}: 3840x2160 in {} ms", t0.elapsed().as_millis());
