@@ -104,6 +104,13 @@ def _reject_shell_meta(argv: List[str]) -> None:
             raise ValueError(f"refusing shell exec: metacharacter in {a!r}")
 
 
+def _describe_gltf_args(args: List[str]) -> str:
+    """``"<command> <input file name>"`` for the log line before an optimizer call."""
+    command = args[0] if args else "?"
+    src = next((a for a in args[1:] if a.lower().endswith((".glb", ".gltf"))), None)
+    return f"{command} {Path(src).name}" if src else command
+
+
 def _noop(level: str, msg: str) -> None:  # default logger
     pass
 
@@ -291,6 +298,9 @@ class Hull3DExporter:
                "-objectdir", str(objectdir), "-loglevel", "Error"]
         if mtl_rel:
             cmd += ["-mtl", mtl_rel]
+        # One line per converter call: it resets the host's stall watchdog
+        # before a hull that may take minutes, and names the hull if it hangs.
+        self.log("info", f"  convert {cga_disk.name}")
         with stage_timing.timed("convert"):
             r = subprocess.run(cmd, cwd=str(cga_disk.parent), capture_output=True, timeout=600)
             if mtl_rel and self._bad_material(r, produced):
@@ -326,6 +336,9 @@ class Hull3DExporter:
         import os
         import sys
         host_argv = os.environ.get("SC_GLTF_TRANSFORM_ARGV")
+        # Same as the converter: a sign of life before a call that may run for
+        # minutes, naming the file it works on.
+        self.log("info", f"  gltf-transform {_describe_gltf_args(args)}")
         if host_argv:
             # Host (Electron) provides the runtime: a JSON argv prefix that runs
             # the bundled @gltf-transform/cli through its OWN Node, so the
