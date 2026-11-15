@@ -48,7 +48,6 @@ tiles behind it); the timeline closes up.
 - **Cost:** CSS animations only, all one-shot; one `setTimeout` drops the staging class when the timeline ends.
   No `requestAnimationFrame` loop, nothing runs after ~3.1 s.
 - **Reduced motion:** no veil, no word, no stagger — the wall paints at once (also guarded in CSS).
-||||||| d4b6e3eed
 
 
 ## B3.2 motion spec
