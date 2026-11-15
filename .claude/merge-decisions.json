@@ -1,6 +1,18 @@
 {
   "version": 1,
   "aspects": {
+    ".claude/project-map.md›concepts/›file-count": [
+      {
+        "ship": "claude/popup-popout-animation-concepts-0f27ef",
+        "by": "Claude",
+        "value": "regenerated count (generated file)",
+        "decided": true,
+        "at": "2026-11-15T03:47:20.631Z",
+        "hunks": [
+          "8813a48ccb83"
+        ]
+      }
+    ],
     ".claude/project-map.md›data-uploader/python/tests›count": [
       {
         "ship": "claude/ship-data-extraction-validation-8d0c76",
@@ -34,6 +46,18 @@
         "at": "2026-11-11T17:59:08.204Z",
         "hunks": [
           "453e9c79e111"
+        ]
+      }
+    ],
+    ".claude/project-map.md›docs/›file-count": [
+      {
+        "ship": "claude/popup-popout-animation-concepts-0f27ef",
+        "by": "Claude",
+        "value": "regenerated count (generated file)",
+        "decided": true,
+        "at": "2026-11-15T03:47:20.631Z",
+        "hunks": [
+          "24dd5f97b34d"
         ]
       }
     ],
@@ -100,6 +124,16 @@
         "at": "2026-11-14T01:14:04.002Z",
         "hunks": [
           "6eca56561b47"
+        ]
+      },
+      {
+        "ship": "claude/popup-popout-animation-concepts-0f27ef",
+        "by": "Claude",
+        "value": "regenerated count (generated file)",
+        "decided": true,
+        "at": "2026-11-15T03:47:20.631Z",
+        "hunks": [
+          "bf1e7bff654c"
         ]
       }
     ],
@@ -285,6 +319,16 @@
         "at": "2026-11-15T01:08:18.190Z",
         "hunks": [
           "d28c55f926af"
+        ]
+      },
+      {
+        "ship": "claude/popup-popout-animation-concepts-0f27ef",
+        "by": "Claude",
+        "value": "0.267.0 (this release supersedes 0.266.0)",
+        "decided": true,
+        "at": "2026-11-15T03:56:33.574Z",
+        "hunks": [
+          "001c225b3d56"
         ]
       }
     ],
