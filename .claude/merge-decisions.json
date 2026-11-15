@@ -365,6 +365,36 @@
         ]
       }
     ],
+    ".claude/project-map.md›tree›counts": [
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "regenerated from the merged tree (generated file)",
+        "decided": true,
+        "at": "2026-11-15T05:15:20.861Z",
+        "hunks": [
+          "b09195af4ad1",
+          "8986c179380e",
+          "9aad2de52fa2",
+          "6dea0a6d8a00",
+          "f820f08a9e90"
+        ]
+      },
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "regenerated from the merged tree (generated file)",
+        "decided": true,
+        "at": "2026-11-15T05:27:23.865Z",
+        "hunks": [
+          "9dfd63747e70",
+          "f3997d770056",
+          "7520f3f77ce0",
+          "a66f6dd4a918",
+          "6df19e13b07f"
+        ]
+      }
+    ],
     "data-uploader/src/lib/subthemes.ts›ships›revision": [
       {
         "ship": "claude/loading-screen-elements-transitions-980216",
@@ -394,6 +424,42 @@
         ]
       }
     ],
+    "docs/concepts/20261115-0216-popup-aufbau.html›page›content": [
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "branch: concept owner session keeps the baked round 1 (the round exactly as the user submitted it) and the round-2 final report; the pre-submission r1-phone -> r1-back edit from #1123 is superseded by the user answer r1-back (Erst Fenster, dann Seite), recorded in briefs/implement.md",
+        "decided": true,
+        "at": "2026-11-15T05:05:26.249Z",
+        "hunks": [
+          "635c41ef7c37"
+        ]
+      }
+    ],
+    "docs/concepts/20261115-0216-popup-aufbau/page.json›lastBuild›value": [
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "branch: concept owner session keeps the baked round 1 (the round exactly as the user submitted it) and the round-2 final report; the pre-submission r1-phone -> r1-back edit from #1123 is superseded by the user answer r1-back (Erst Fenster, dann Seite), recorded in briefs/implement.md",
+        "decided": true,
+        "at": "2026-11-15T05:05:26.249Z",
+        "hunks": [
+          "86bd7b8adf46"
+        ]
+      }
+    ],
+    "docs/concepts/20261115-0216-popup-aufbau/rounds/01.html›round-1›content": [
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "branch: concept owner session keeps the baked round 1 (the round exactly as the user submitted it) and the round-2 final report; the pre-submission r1-phone -> r1-back edit from #1123 is superseded by the user answer r1-back (Erst Fenster, dann Seite), recorded in briefs/implement.md",
+        "decided": true,
+        "at": "2026-11-15T05:05:26.249Z",
+        "hunks": [
+          "d45b14a0c427"
+        ]
+      }
+    ],
     "public/i18n/de.json›starmap.comet›rule/ruleVersion/modeAria": [
       {
         "ship": "claude/focus-borders-starmap-4c0ef0",
@@ -403,6 +469,28 @@
         "at": "2026-11-15T03:41:15.606Z",
         "hunks": [
           "945b49237638"
+        ]
+      }
+    ],
+    "public/release-notes.json›current›value": [
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "regenerated from the merged CHANGELOG (0.268.1 is on main)",
+        "decided": true,
+        "at": "2026-11-15T05:15:20.861Z",
+        "hunks": [
+          "bccf0efc9319"
+        ]
+      },
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "regenerated from the merged CHANGELOG",
+        "decided": true,
+        "at": "2026-11-15T05:36:56.343Z",
+        "hunks": [
+          "0a1b232b53f3"
         ]
       }
     ],
@@ -487,84 +575,6 @@
         "at": "2026-11-11T23:19:52.365Z",
         "hunks": [
           "65f4d0fd9795"
-        ]
-      }
-    ],
-    "docs/concepts/20261115-0216-popup-aufbau.html›page›content": [
-      {
-        "ship": "claude/modest-napier-9d1e5a",
-        "by": "Claude",
-        "value": "branch: concept owner session keeps the baked round 1 (the round exactly as the user submitted it) and the round-2 final report; the pre-submission r1-phone -> r1-back edit from #1123 is superseded by the user answer r1-back (Erst Fenster, dann Seite), recorded in briefs/implement.md",
-        "decided": true,
-        "at": "2026-11-15T05:05:26.249Z",
-        "hunks": [
-          "635c41ef7c37"
-        ]
-      }
-    ],
-    "docs/concepts/20261115-0216-popup-aufbau/page.json›lastBuild›value": [
-      {
-        "ship": "claude/modest-napier-9d1e5a",
-        "by": "Claude",
-        "value": "branch: concept owner session keeps the baked round 1 (the round exactly as the user submitted it) and the round-2 final report; the pre-submission r1-phone -> r1-back edit from #1123 is superseded by the user answer r1-back (Erst Fenster, dann Seite), recorded in briefs/implement.md",
-        "decided": true,
-        "at": "2026-11-15T05:05:26.249Z",
-        "hunks": [
-          "86bd7b8adf46"
-        ]
-      }
-    ],
-    "docs/concepts/20261115-0216-popup-aufbau/rounds/01.html›round-1›content": [
-      {
-        "ship": "claude/modest-napier-9d1e5a",
-        "by": "Claude",
-        "value": "branch: concept owner session keeps the baked round 1 (the round exactly as the user submitted it) and the round-2 final report; the pre-submission r1-phone -> r1-back edit from #1123 is superseded by the user answer r1-back (Erst Fenster, dann Seite), recorded in briefs/implement.md",
-        "decided": true,
-        "at": "2026-11-15T05:05:26.249Z",
-        "hunks": [
-          "d45b14a0c427"
-        ]
-      }
-    ],
-    ".claude/project-map.md›tree›counts": [
-      {
-        "ship": "claude/modest-napier-9d1e5a",
-        "by": "Claude",
-        "value": "regenerated from the merged tree (generated file)",
-        "decided": true,
-        "at": "2026-11-15T05:15:20.861Z",
-        "hunks": [
-          "b09195af4ad1",
-          "8986c179380e",
-          "9aad2de52fa2",
-          "6dea0a6d8a00",
-          "f820f08a9e90"
-        ]
-      },
-      {
-        "ship": "claude/modest-napier-9d1e5a",
-        "by": "Claude",
-        "value": "regenerated from the merged tree (generated file)",
-        "decided": true,
-        "at": "2026-11-15T05:27:23.865Z",
-        "hunks": [
-          "9dfd63747e70",
-          "f3997d770056",
-          "7520f3f77ce0",
-          "a66f6dd4a918",
-          "6df19e13b07f"
-        ]
-      }
-    ],
-    "public/release-notes.json›current›value": [
-      {
-        "ship": "claude/modest-napier-9d1e5a",
-        "by": "Claude",
-        "value": "regenerated from the merged CHANGELOG (0.268.1 is on main)",
-        "decided": true,
-        "at": "2026-11-15T05:15:20.861Z",
-        "hunks": [
-          "bccf0efc9319"
         ]
       }
     ],
