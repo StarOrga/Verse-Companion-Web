@@ -120,17 +120,33 @@ describe('power distribution (R1)', () => {
     expect(down.overBudget).toBe(false);
   });
 
-  it('a pin above the free budget prints the deficit instead of trimming a neighbour', () => {
+  it('a pin claims only what is free — never more than the reactor supplies (#351)', () => {
     const s = sheet({ occupants: nomadOccupants(), levels: { cooler1: 3, cooler2: 3 } });
-    expect(row(s, 'cooler1').allocated).toBe(3);
-    expect(row(s, 'cooler2').allocated).toBe(3);
-    expect(s.budgetUsed).toBe(16);
+    // the auto deal already spends all 14: the raised pins stay where they were
+    expect(row(s, 'cooler1').allocated).toBe(2);
+    expect(row(s, 'cooler2').allocated).toBe(2);
+    expect(s.budgetUsed).toBe(14);
     expect(s.budgetTotal).toBe(14);
-    expect(s.overBudget).toBe(true);
-    expect(s.ready).toBe(false);
+    expect(s.overBudget).toBe(false);
     // nobody else lost anything
     expect(row(s, 'weapons').allocated).toBe(3);
     expect(row(s, 'shields').allocated).toBe(4);
+  });
+
+  it('segments a cut or a lowered pin frees are free for a raised pin, in dock order', () => {
+    const cut = sheet({ occupants: nomadOccupants(), cutGroups: ['weapons'], levels: { cooler1: 3, cooler2: 3 } });
+    expect(row(cut, 'cooler1').allocated).toBe(3);
+    expect(row(cut, 'cooler2').allocated).toBe(3);
+    expect(cut.budgetUsed).toBe(13);
+    // switching the weapons back on trims the raised pins, never the budget
+    const back = sheet({ occupants: nomadOccupants(), levels: { cooler1: 3, cooler2: 3 } });
+    expect(back.budgetUsed).toBeLessThanOrEqual(14);
+    const lowered = sheet({ occupants: nomadOccupants(), levels: { shields: 2, cooler1: 3, cooler2: 3 } });
+    expect(row(lowered, 'shields').allocated).toBe(2);
+    expect(row(lowered, 'cooler1').allocated).toBe(3);
+    expect(row(lowered, 'cooler2').allocated).toBe(3);
+    expect(lowered.budgetUsed).toBe(14);
+    expect(lowered.overBudget).toBe(false);
   });
 
   it('a pin below the gold floor is honoured and flagged', () => {

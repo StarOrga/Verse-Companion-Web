@@ -1250,11 +1250,11 @@ export class CodexEnergyDockComponent {
     });
     effect(() => {
       this.position();
+      untracked(() => this.measureEdgeRoom());
+    });
+    effect(() => {
       this.effectivePosition();
-      untracked(() => {
-        this.measureEdgeRoom();
-        this.alignEdgeTop();
-      });
+      untracked(() => this.alignEdgeTop());
     });
   }
 
