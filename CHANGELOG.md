@@ -4,6 +4,16 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.270.1] - 2026-11-15
+
+### Fixed
+- Swap picker on phones: the "compare with" and "delta against" switches no longer run off the screen; their labels sit above them and the hint wraps.
+- The image viewer no longer closes on a click beside the picture; use ✕ or Escape.
+
+### Changed
+- One quantity stepper everywhere (wish cart, wish list, HQ Nachschub), with labelled −/+ buttons and touch-sized targets.
+- Choice pills in the HQ dialogs (claim channel, Nachschub target, wish/sell, buy/mine, mode, kind) share one control with arrow-key support.
+
 ## [0.270.0] - 2026-11-15
 
 ### Added
