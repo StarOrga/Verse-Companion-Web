@@ -11,8 +11,6 @@ import { PeopleRow, mergePeopleRows } from './people-rows';
 import { ScDatePipe } from '../core/locale/sc-date.pipe';
 import { ScSelectComponent, ScSelectOption } from '../shared/sc-select.component';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
-import { SearchMissesComponent } from './search-misses.component';
-import { SilhouetteCoverageComponent } from './silhouette-coverage.component';
 // Pure function, no Angular dependency — the same "vor 3 Std." formatter the
 // news surfaces use (and the `news.relative.*` keys it is documented to read).
 import { relativeTime } from '../news/relative-time';
@@ -149,7 +147,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
 @Component({
   selector: 'sc-admin',
   standalone: true,
-  imports: [ScDatePipe, ScSelectComponent, TranslatePipe, ScTooltipDirective, SilhouetteCoverageComponent, SearchMissesComponent, ScActionDirective],
+  imports: [ScDatePipe, ScSelectComponent, TranslatePipe, ScTooltipDirective, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
@@ -168,16 +166,92 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
         mail attached, because the last action was the admin's and the
         applicant has to be told.
       -->
-      <div class="sc-card requests-card">
-        <div class="invite-head">
-          <h2>
-            {{ 'admin.requests.title' | translate }}
-            @if (accessRequests().length > 0) {
-              <span class="req-count">{{ accessRequests().length }}</span>
-            }
-          </h2>
-          <p class="hint">{{ 'admin.requests.subtitle' | translate }}</p>
+      <!--
+        ONE access panel (concept 2026-11-15, P16): the open requests are the
+        panel's list, the invitation is its "+" and the share link its second
+        icon. The invite form used to be a card of its own below the reports.
+      -->
+      <div class="sc-card requests-card access-card">
+        <div class="access-head">
+          <div class="invite-head">
+            <h2>
+              {{ 'admin.requests.title' | translate }}
+              @if (accessRequests().length > 0) {
+                <span class="req-count">{{ accessRequests().length }}</span>
+              }
+            </h2>
+            <p class="hint">{{ 'admin.requests.subtitle' | translate }}</p>
+          </div>
+          <div class="access-tools">
+            <!-- C7: copy action, not a navigation — stays a <button>. -->
+            <button type="button" scAction tier="tertiary" class="share-btn"
+                    [attr.aria-label]="'admin.share.button' | translate"
+                    [scTooltip]="'admin.share.button' | translate" scTooltipTier="label"
+                    (click)="copyShareLink()">
+              <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+                <path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4" />
+              </svg>
+            </button>
+            <button type="button" scAction tier="tertiary" class="invite-toggle"
+                    [class.open]="inviteOpen()"
+                    [attr.aria-expanded]="inviteOpen()"
+                    aria-controls="admin-invite-form"
+                    [attr.aria-label]="'admin.register.open' | translate"
+                    [scTooltip]="'admin.register.open' | translate" scTooltipTier="label"
+                    (click)="inviteOpen.set(!inviteOpen())">
+              <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </button>
+          </div>
         </div>
+
+        @if (inviteOpen()) {
+          <div class="invite-pane">
+            <p class="hint">{{ 'admin.register.subtitle' | translate }}</p>
+            <form id="admin-invite-form" class="invite-form" (submit)="onRegisterSubmit($event)">
+              <input type="email"
+                     [value]="inviteEmail()"
+                     (input)="inviteEmail.set(asInput($event))"
+                     [placeholder]="'admin.register.emailPlaceholder' | translate"
+                     [attr.aria-label]="'admin.register.emailPlaceholder' | translate"
+                     [disabled]="inviteBusy()"
+                     required>
+              <sc-select
+                class="role-select"
+                [options]="roleOptions"
+                [allowEmpty]="false"
+                [value]="inviteRole()"
+                (valueChange)="inviteRole.set(asRole($event))"
+                [ariaLabel]="'admin.col.role' | translate"
+                [disabled]="inviteBusy()" />
+              <label class="send-invite">
+                <input type="checkbox"
+                       [checked]="sendInvite()"
+                       (change)="sendInvite.set(asChecked($event))"
+                       [disabled]="inviteBusy()">
+                {{ 'admin.register.sendInvite' | translate }}
+              </label>
+              <button type="submit"
+                      scAction tier="primary"
+                      [disabled]="inviteBusy() || !inviteEmail().includes('@')">
+                {{ inviteBusy() ? ('admin.register.sending' | translate) : ('admin.register.send' | translate) }}
+              </button>
+            </form>
+          </div>
+        }
+        @if (inviteMsg(); as m) {
+          <div class="invite-msg" [class.error]="m.kind === 'error'" [class.success]="m.kind === 'success'">
+            {{ m.key | translate: m.params }}
+          </div>
+        }
+        @if (shareMsg(); as m) {
+          <div class="invite-msg" [class.error]="m.kind === 'error'" [class.success]="m.kind === 'success'" role="status">
+            {{ m.text }}
+          </div>
+        }
+
 
         @if (accessErrorMsg()) {
           <div class="err">
@@ -398,64 +472,6 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
         </div>
       }
 
-      <div class="sc-card invite-card">
-        <div class="invite-head">
-          <h2>{{ 'admin.register.title' | translate }}</h2>
-          <p class="hint">{{ 'admin.register.subtitle' | translate }}</p>
-        </div>
-        <form class="invite-form" (submit)="onRegisterSubmit($event)">
-          <input type="email"
-                 [value]="inviteEmail()"
-                 (input)="inviteEmail.set(asInput($event))"
-                 [placeholder]="'admin.register.emailPlaceholder' | translate"
-                 [attr.aria-label]="'admin.register.emailPlaceholder' | translate"
-                 [disabled]="inviteBusy()"
-                 required>
-          <sc-select
-            class="role-select"
-            [options]="roleOptions"
-            [allowEmpty]="false"
-            [value]="inviteRole()"
-            (valueChange)="inviteRole.set(asRole($event))"
-            [ariaLabel]="'admin.col.role' | translate"
-            [disabled]="inviteBusy()" />
-          <label class="send-invite">
-            <input type="checkbox"
-                   [checked]="sendInvite()"
-                   (change)="sendInvite.set(asChecked($event))"
-                   [disabled]="inviteBusy()">
-            {{ 'admin.register.sendInvite' | translate }}
-          </label>
-          <button type="submit"
-                  scAction tier="primary"
-                  [disabled]="inviteBusy() || !inviteEmail().includes('@')">
-            {{ inviteBusy() ? ('admin.register.sending' | translate) : ('admin.register.send' | translate) }}
-          </button>
-          <!-- C7: copy action, not a navigation — stays a <button>. -->
-          <button type="button"
-                  scAction tier="secondary" class="share-btn"
-                  (click)="copyShareLink()">
-            {{ 'admin.share.button' | translate }}
-          </button>
-        </form>
-        @if (inviteMsg(); as m) {
-          <div class="invite-msg" [class.error]="m.kind === 'error'" [class.success]="m.kind === 'success'">
-            {{ m.key | translate: m.params }}
-          </div>
-        }
-        @if (shareMsg(); as m) {
-          <div class="invite-msg" [class.error]="m.kind === 'error'" [class.success]="m.kind === 'success'" role="status">
-            {{ m.text }}
-          </div>
-        }
-      </div>
-
-      <!-- Holotable silhouette coverage of the current build (#647). -->
-      <sc-silhouette-coverage />
-
-      <!-- Searches without a hit, counted anonymously (search concept 2026-11-02, C10). -->
-      <sc-search-misses />
-
       <!--
         ONE people list (feedback 5e2facd9). The allowlist used to have its own
         card above this table, which meant every invited address that had since
@@ -465,6 +481,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
         on that address), carrying its own timer and a withdraw action, and it
         disappears from the list the moment it turns into an account row.
       -->
+      <div class="sc-card people-card">
       <div class="invite-head people-head">
         <h2>{{ 'admin.people.title' | translate }}</h2>
         <p class="hint">{{ 'admin.people.subtitle' | translate }}</p>
@@ -482,11 +499,11 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
       }
 
       @if (peopleLoading()) {
-        <div class="sc-card empty">{{ 'admin.loading' | translate }}</div>
+        <div class="empty">{{ 'admin.loading' | translate }}</div>
       } @else if (people().length === 0) {
-        <div class="sc-card empty">—</div>
+        <div class="empty">—</div>
       } @else {
-        <div class="filter-bar sc-card">
+        <div class="filter-bar">
           <input type="search"
                  class="filter-search"
                  [value]="search()"
@@ -510,7 +527,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
           }
         </div>
 
-        <div class="sc-card table-scroll">
+        <div class="table-scroll">
         <table class="table">
           <thead>
             <tr>
@@ -686,6 +703,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
         </table>
         </div>
       }
+      </div>
     </section>
   `,
   styles: [`
@@ -945,14 +963,28 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
     .muted-zero { color: var(--sc-fg-2); }
 
 
-    .invite-card {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    /* Access panel (P16): requests + the invitation's "+" and share icons. */
+    .access-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .access-tools { display: flex; gap: 6px; flex: none; }
+    .invite-toggle .sc-action-icon { transition: transform 0.18s ease; }
+    .invite-toggle.open .sc-action-icon { transform: rotate(45deg); }
+    .invite-pane {
+      display: flex; flex-direction: column; gap: 10px;
+      margin-top: 12px; padding: 12px 14px;
+      border: 1px solid var(--sc-border); border-radius: 4px;
+      background: rgba(255, 255, 255, 0.02);
     }
-    /* The people list has no card of its own (filter bar + table each are one),
-       so its heading sits directly on the page background. */
-    .people-head { margin-top: 4px; }
+    .invite-pane .hint { margin: 0; }
+    .access-card .invite-msg { margin-top: 10px; }
+    @media (prefers-reduced-motion: reduce) {
+      .invite-toggle .sc-action-icon { transition: none; }
+    }
+
+    /* People: ONE panel — head, search/filter bar and the table. */
+    .people-card { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+    .people-head { padding: 16px 18px 6px; }
+    .people-card .filter-bar { border-bottom: 1px solid var(--sc-border); }
+    .people-card > .err { margin: 0 14px 10px; }
     /* Access requests (feedback 56f328ea) */
     .req-count {
       display: inline-block;
@@ -1258,6 +1290,8 @@ export class AdminComponent implements OnInit {
   readonly inviteRole = signal<Role>('collaborator');
   readonly sendInvite = signal(false);
   readonly inviteBusy = signal(false);
+  /** The invite form behind the access panel's "+" (P16); closed until asked for. */
+  readonly inviteOpen = signal(false);
   /** i18n key (+ params), never raw text. */
   readonly inviteMsg = signal<AdminFlash | null>(null);
 

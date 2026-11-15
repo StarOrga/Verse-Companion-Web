@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideTranslateService } from '@ngx-translate/core';
-import { P4kHistoryComponent } from './p4k-history.component';
+import { P4kHistoryComponent, groupBundlesByPatch, leadingBundleIds, leadingChanges, patchStateOf, reenableTargets } from './p4k-history.component';
 import { ChannelTag, P4kBundleRow, P4kService } from './p4k.service';
 import { RoleService } from '../auth/role.service';
 import { ScConfirmService } from '../shared/dialog/sc-confirm.service';
@@ -41,6 +41,7 @@ function setupWithMocks(bundles: P4kBundleRow[], isAdmin = false) {
   const svc = {
     setDisabled: vi.fn().mockName('setDisabled').mockResolvedValue(undefined),
     deleteBundle: vi.fn().mockName('deleteBundle').mockResolvedValue(undefined),
+    applyStates: vi.fn().mockName('applyStates').mockResolvedValue(undefined),
     bundles: signal(bundles),
     busy: signal(false),
     errorMsg: signal<string | null>(null),
@@ -139,32 +140,6 @@ describe('P4kHistoryComponent — superseded vs disabled', () => {
 describe('P4kHistoryComponent — admin actions ask in the app dialog', () => {
   const bundle = () => row('live', '4.8.0', 88, '2026-06-01T00:00:00Z');
 
-  it('does not disable when the reason prompt is cancelled', async () => {
-    const { fixture, svc, dialog } = setupWithMocks([bundle()], true);
-    dialog.prompt.mockResolvedValue(null);
-    await fixture.componentInstance.disable(bundle());
-    expect(dialog.prompt).toHaveBeenCalledWith(
-      expect.objectContaining({ titleKey: 'p4k.prompts.disableTitle', inputLabelKey: 'p4k.prompts.reasonLabel' }),
-    );
-    expect(svc.setDisabled).not.toHaveBeenCalled();
-  });
-
-  it('disables with the trimmed reason', async () => {
-    const { fixture, svc, dialog } = setupWithMocks([bundle()], true);
-    dialog.prompt.mockResolvedValue(' alt ');
-    const b = bundle();
-    await fixture.componentInstance.disable(b);
-    expect(svc.setDisabled).toHaveBeenCalledWith(b.id, true, 'alt');
-  });
-
-  it('disables with null for an empty reason', async () => {
-    const { fixture, svc, dialog } = setupWithMocks([bundle()], true);
-    dialog.prompt.mockResolvedValue('   ');
-    const b = bundle();
-    await fixture.componentInstance.disable(b);
-    expect(svc.setDisabled).toHaveBeenCalledWith(b.id, true, null);
-  });
-
   it('does not delete when the question is cancelled', async () => {
     const { fixture, svc, dialog } = setupWithMocks([bundle()], true);
     dialog.confirm.mockResolvedValue(false);
@@ -175,14 +150,89 @@ describe('P4kHistoryComponent — admin actions ask in the app dialog', () => {
     expect(svc.deleteBundle).not.toHaveBeenCalled();
   });
 
-  it('re-enables only after confirmation', async () => {
-    const { fixture, svc, dialog } = setupWithMocks([bundle()], true);
-    const b = bundle();
+});
+});
+
+describe('P4kHistoryComponent — per patch, leading, delete (B4.5)', () => {
+  const at = (r: P4kBundleRow, patch: Partial<P4kBundleRow>): P4kBundleRow => ({ ...r, ...patch });
+  const a = row('live', '4.8.0', 88, '2026-06-01T00:00:00Z');
+  const b = row('live', '4.8.0', 90, '2026-06-02T00:00:00Z');
+  const p = row('ptu', '4.8.0', 70, '2026-06-03T00:00:00Z');
+
+  it('the leading upload is the newest active one per patch and channel', () => {
+    expect([...leadingBundleIds([a, b, p])].sort()).toEqual([b.id, p.id].sort());
+    expect([...leadingBundleIds([a, at(b, { disabled: true }), p])].sort()).toEqual([a.id, p.id].sort());
+  });
+
+  it('choosing a leading upload enables it and steps back the other active one of the same channel only', () => {
+    const changes = leadingChanges([at(a, { disabled: true }), b, p], at(a, { disabled: true }), 'why');
+    expect(changes).toEqual([
+      { id: a.id, disabled: false, reason: null },
+      { id: b.id, disabled: true, reason: 'why' },
+    ]);
+  });
+
+  it('a superseded upload is never re-enabled as leading', () => {
+    const old = at(a, { disabled: true, superseded_at: '2026-06-02T00:00:00Z' });
+    expect(leadingChanges([old, b], old, 'why')).toEqual([{ id: b.id, disabled: true, reason: 'why' }]);
+  });
+
+  it('patch state: on / off (by hand) / history (only superseded)', () => {
+    const [g] = groupBundlesByPatch([a, b]);
+    expect(patchStateOf(g)).toBe('on');
+    const [off] = groupBundlesByPatch([at(a, { disabled: true }), at(b, { disabled: true })]);
+    expect(patchStateOf(off)).toBe('off');
+    expect(reenableTargets(off).map((u) => u.id)).toEqual([b.id]);
+    const [hist] = groupBundlesByPatch([at(a, { disabled: true, superseded_at: 'x' })]);
+    expect(patchStateOf(hist)).toBe('history');
+  });
+
+  it('deactivates the whole patch with one trimmed reason, and not when cancelled', async () => {
+    const { fixture, svc, dialog } = setupWithMocks([a, b, p], true);
+    const [g] = groupBundlesByPatch([a, b, p]);
+    dialog.prompt.mockResolvedValue(null);
+    await fixture.componentInstance.disablePatch(g);
+    expect(svc.applyStates).not.toHaveBeenCalled();
+    dialog.prompt.mockResolvedValue(' alt ');
+    await fixture.componentInstance.disablePatch(g);
+    expect(dialog.prompt).toHaveBeenCalledWith(expect.objectContaining({ titleKey: 'p4k.prompts.disablePatchTitle', tone: 'danger' }));
+    expect(svc.applyStates).toHaveBeenCalledWith(
+      [p, b, a].map((u) => ({ id: u.id, disabled: true, reason: 'alt' })),
+    );
+  });
+
+  it('re-enables a patch only after confirmation', async () => {
+    const offA = at(a, { disabled: true });
+    const { fixture, svc, dialog } = setupWithMocks([offA], true);
+    const [g] = groupBundlesByPatch([offA]);
     dialog.confirm.mockResolvedValue(false);
-    await fixture.componentInstance.reenable(b);
-    expect(svc.setDisabled).not.toHaveBeenCalled();
+    await fixture.componentInstance.reenablePatch(g);
+    expect(svc.applyStates).not.toHaveBeenCalled();
     dialog.confirm.mockResolvedValue(true);
-    await fixture.componentInstance.reenable(b);
-    expect(svc.setDisabled).toHaveBeenCalledWith(b.id, false, null);
+    await fixture.componentInstance.reenablePatch(g);
+    expect(svc.applyStates).toHaveBeenCalledWith([{ id: a.id, disabled: false, reason: null }]);
+  });
+
+  it('shows the patch action on the patch head and "use as leading" only on a non-leading upload', () => {
+    const fixture = setup([a, b], true);
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.patch-head .patch-acts')).toBeTruthy();
+    (el.querySelector('.patch-main') as HTMLElement).click();
+    fixture.detectChanges();
+    const rows = Array.from(el.querySelectorAll('.up-row')) as HTMLElement[];
+    expect(rows[0].querySelector('.badge.lead')).toBeTruthy();
+    expect(rows[0].textContent).not.toContain('p4k.actions.lead');
+    expect(rows[1].textContent).toContain('p4k.actions.lead');
+    expect(rows[1].textContent).toContain('p4k.actions.delete');
+  });
+
+  it('on the timeline the newest patch starts open', () => {
+    TestBed.resetTestingModule();
+    const fixture = setup([a, row('live', '4.9.0', 90, '2026-07-01T00:00:00Z')]);
+    fixture.componentRef.setInput('timeline', true);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelectorAll('.up-row').length).toBe(1);
+    expect(el.querySelector('.hist-list.timeline .patch.now .patch-ver')!.textContent).toContain('4.9.0');
   });
 });

@@ -3632,7 +3632,10 @@
     "actions": {
       "disable": "Disable",
       "reenable": "Re-enable",
-      "delete": "Delete"
+      "delete": "Delete",
+      "disablePatch": "Disable patch",
+      "reenablePatch": "Re-enable patch",
+      "lead": "Use as leading"
     },
     "diff": {
       "title": "Diff details (vs. previous build)",
@@ -3650,11 +3653,20 @@
       "delete": "Permanently delete bundle \"{{name}}\"?\n\nThis cannot be undone.",
       "disableTitle": "Disable bundle “{{name}}”?",
       "reasonLabel": "Reason (optional)",
-      "deleteTitle": "Delete bundle?"
+      "deleteTitle": "Delete bundle?",
+      "disablePatchTitle": "Disable patch {{name}} ({{count}} active uploads)?",
+      "reenablePatch": "Re-enable patch {{name}}? Per channel its newest upload leads again.",
+      "leadTitle": "Use “{{name}}” as leading?",
+      "leadMessage": "The other active uploads of the same patch and channel are disabled (with a note) and stay in the history."
     },
     "superseded": {
       "badge": "Superseded",
       "title": "Superseded by a newer upload"
+    },
+    "leading": {
+      "badge": "Leading",
+      "tip": "The Codex uses this bundle for its patch and channel.",
+      "reason": "Stepped back: {{name}} was chosen as leading."
     }
   },
   "profile": {
@@ -3887,7 +3899,8 @@
         "role_assign_failed": "Invited, but the role could not be assigned.",
         "existing_account_not_updated": "The email is on the allowlist, but the existing account was not changed — most likely a protected admin.",
         "user_exists": "This email is already registered. The allowlist was updated anyway."
-      }
+      },
+      "open": "Invite someone"
     },
     "share": {
       "button": "Copy share link",
@@ -4385,15 +4398,6 @@
         "saveEdit": "Save text",
         "resolved": "Alert resolved."
       }
-    },
-    "searchMisses": {
-      "title": "Often without hits",
-      "subtitle": "Searches without a single hit, counted anonymously (text and count only).",
-      "query": "Search",
-      "hits": "Count",
-      "last": "Last",
-      "empty": "No search without hits yet.",
-      "retry": "Reload"
     }
   },
   "desktop": {
@@ -4421,7 +4425,21 @@
       "fullPage": "Full Data Upload page",
       "note": "Windows only · signs in with your Verse Companion account · uploads data, never code."
     },
-    "historyEyebrow": "Uploader"
+    "historyEyebrow": "Uploader",
+    "build": {
+      "title": "Current build",
+      "since": "since {{date}}",
+      "quality": "Quality {{q}}",
+      "none": "No active bundle yet."
+    },
+    "steps": {
+      "title": "Setup",
+      "done": "Set up — you have uploaded before.",
+      "doneSr": "done",
+      "s1": "Download and start the uploader",
+      "s2": "Sign in with your Verse Companion account",
+      "s3": "Choose your Star Citizen folder — the uploader reads Data.p4k and uploads the bundles"
+    }
   },
   "download": {
     "title": "Download",
