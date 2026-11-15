@@ -13,6 +13,7 @@ import { CodexCategoryIconComponent } from './codex-category-icon.component';
 import { FallbackImageComponent } from './fallback-image.component';
 import { NeuroFieldDirective } from '../core/neuro-field.directive';
 import { BetaService } from '../core/beta.service';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ItemPathComponent } from '../shared/item-path/item-path.component';
 import { pathLevelFor } from './path-level.util';
 import { OverlayFrameComponent } from '../shared/overlay-frame/overlay-frame.component';
@@ -47,7 +48,7 @@ import { NavOriginService, PageCrumb, originTrail } from '../shared/page-header/
 @Component({
   selector: 'sc-upcoming-detail',
   standalone: true,
-  imports: [PageHeaderComponent, ItemPathComponent, 
+  imports: [PageHeaderComponent, ItemPathComponent, ScActionDirective,
     NgTemplateOutlet,
     OverlayFrameComponent,
     NeuroFieldDirective,
@@ -104,7 +105,7 @@ import { NavOriginService, PageCrumb, originTrail } from '../shared/page-header/
 
               @if (s.rsiUrl) {
                 <!-- Secondary, never the primary destination any more (#130). -->
-                <a class="sc-btn ghost" [href]="s.rsiUrl" target="_blank" rel="noopener noreferrer">
+                <a scAction tier="secondary" [href]="s.rsiUrl" target="_blank" rel="noopener noreferrer">
                   {{ 'codex.upcomingDetail.rsiLink' | translate }}
                   <span class="ext" aria-hidden="true">↗</span>
                 </a>
@@ -179,9 +180,6 @@ import { NavOriginService, PageCrumb, originTrail } from '../shared/page-header/
     .notice { margin: 4px 0 0; color: var(--sc-fg-2); font-size: 0.86rem; line-height: 1.5; }
 
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
-    .actions .sc-btn { cursor: pointer; text-decoration: none; }
-    .actions .ghost { color: var(--sc-fg-1); border-color: var(--sc-border); }
-    .actions .ghost:hover { background: var(--sc-bg-2); color: var(--sc-fg-0); box-shadow: none; }
 
 
 

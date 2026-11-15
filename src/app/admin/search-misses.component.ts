@@ -1,3 +1,4 @@
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SupabaseClientProvider } from '../core/supabase.client';
@@ -21,7 +22,7 @@ const LIMIT = 50;
 @Component({
   selector: 'sc-search-misses',
   standalone: true,
-  imports: [TranslatePipe, ScDatePipe],
+  imports: [TranslatePipe, ScDatePipe, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="sc-card misses-card">
@@ -30,7 +31,7 @@ const LIMIT = 50;
       @if (errorKey(); as key) {
         <div class="err" role="alert">
           <span><strong>{{ 'admin.errorTitle' | translate }}:</strong> {{ key | translate }}</span>
-          <button type="button" class="sc-btn" (click)="load()" [disabled]="loading()">{{ 'admin.searchMisses.retry' | translate }}</button>
+          <button type="button" scAction tier="secondary" (click)="load()" [disabled]="loading()">{{ 'admin.searchMisses.retry' | translate }}</button>
         </div>
       } @else if (loading() && rows() === null) {
         <div class="empty">{{ 'admin.loading' | translate }}</div>

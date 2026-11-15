@@ -1,3 +1,4 @@
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { POSTHOG_GUARD_PROFILE_ID } from '../../feedback/feedback.types';
 import { ShellChromeService } from '../../shell/fusion-bar/shell-chrome.service';
 import { logWarn } from '../../core/log';
@@ -220,6 +221,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
     RoutineStatusDirective,
     ScTooltipDirective,
     CharCounterComponent,
+    ScActionDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -608,12 +610,12 @@ type AvatarTone = 'adm' | 'col' | 'usr';
           @if (feed) {
             <div class="card-links">
               @if (inReview(m)) {
-                <button class="sc-btn micro" (click)="acceptReview(m)" [disabled]="busy()">
+                <button scAction tier="secondary" (click)="acceptReview(m)" [disabled]="busy()">
                   ✓ {{ 'adminFeedback.review.accept' | translate }}
                 </button>
               }
               @if (areaLink(m); as href) {
-                <a class="link-btn" [routerLink]="href" (click)="onViewInApp($event)" [scTooltip]="'adminFeedback.stream.viewTitle' | translate: { area: (areaLabelKey(areaOf(m)!) | translate) }">
+                <a scAction tier="secondary" [routerLink]="href" (click)="onViewInApp($event)" [scTooltip]="'adminFeedback.stream.viewTitle' | translate: { area: (areaLabelKey(areaOf(m)!) | translate) }">
                   ▸ {{ 'adminFeedback.stream.view' | translate }}
                 </a>
               }
@@ -717,7 +719,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
         @if (answerOptionsFor(m); as ao) {
           <div class="answer-options" role="group" [attr.aria-label]="'adminFeedback.sheet.options' | translate">
             @for (o of ao.options; track o) {
-              <button type="button" class="sc-btn micro option" (click)="answerWithOption(m, o)" [disabled]="busy() || answering()">{{ o }}</button>
+              <button type="button" scAction tier="secondary" class="option" (click)="answerWithOption(m, o)" [disabled]="busy() || answering()">{{ o }}</button>
             }
           </div>
         }
@@ -735,7 +737,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
             <span class="deploy-lag" [scTooltip]="'adminFeedback.deployLagHint' | translate">⏳ {{ 'adminFeedback.deployLag' | translate }}</span>
           }
           <a
-            class="link-btn quiet ref"
+            scAction tier="tertiary" class="ref"
             [href]="m.ship_ref"
             target="_blank"
             rel="noopener noreferrer"
@@ -858,7 +860,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
                  reply, so it needs neither a button nor a box of its own. -->
             @if (untriaged(m) && !archived(m) && !inReview(m)) {
               <div class="inline-actions">
-                <button class="sc-btn micro" (click)="releaseToRoutine(m)" [disabled]="busy()">
+                <button scAction tier="secondary" (click)="releaseToRoutine(m)" [disabled]="busy()">
                   {{ 'adminFeedback.userTopic.release' | translate }}
                 </button>
               </div>
@@ -953,7 +955,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
                 <button
                   composerAction
                   type="button"
-                  class="sc-btn micro sign-off"
+                  scAction tier="secondary" class="sign-off"
                   (click)="acceptReview(m)"
                   [disabled]="busy()"
                   [scTooltip]="'adminFeedback.review.hint' | translate">
@@ -1017,7 +1019,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
             </div>
           </div>
           <div class="sh-composer">
-            <button type="button" class="sc-btn sc-btn-primary done-btn" (click)="closeFilters()">{{ 'adminFeedback.filters.done' | translate }}</button>
+            <button type="button" scAction tier="primary" class="done-btn" (click)="closeFilters()">{{ 'adminFeedback.filters.done' | translate }}</button>
           </div>
         </div>
       }
@@ -1059,8 +1061,8 @@ type AvatarTone = 'adm' | 'col' | 'usr';
               <sc-char-counter [used]="declineNote().length" [max]="maxChars" />
             </div>
             <div class="inline-actions">
-              <button class="sc-btn micro danger" type="submit" [disabled]="busy()">{{ 'adminFeedback.decline.confirm' | translate }}</button>
-              <button class="sc-btn micro" type="button" (click)="cancelDeclineForm()">{{ 'adminFeedback.decline.cancel' | translate }}</button>
+              <button scAction tier="secondary" tone="danger" type="submit" [disabled]="busy()">{{ 'adminFeedback.decline.confirm' | translate }}</button>
+              <button scAction tier="secondary" type="button" (click)="cancelDeclineForm()">{{ 'adminFeedback.decline.cancel' | translate }}</button>
             </div>
           </form>
         </div>
@@ -1210,11 +1212,9 @@ type AvatarTone = 'adm' | 'col' | 'usr';
     /* Hover: the title takes the accent and a tappable micro button lifts a
        pixel — enough to say "this reacts", never enough to move the layout. */
     .topic-title, .card-head { transition: color 0.16s ease; }
-    .sc-btn.micro, .link-btn, .load-more, .new-topic-bar, .tb-btn, .f-chip { transition: transform 0.16s ease, border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease; }
-    .sc-btn.micro:hover:not(:disabled), .link-btn:hover { transform: translateY(-1px); }
-    .sc-btn.micro:active:not(:disabled), .link-btn:active { transform: none; transition-duration: 0.06s; }
+    .load-more, .new-topic-bar, .tb-btn, .f-chip { transition: transform 0.16s ease, border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease; }
     .card-head { display: flex; align-items: flex-start; gap: 10px; width: 100%; min-height: 44px; padding: 0; background: transparent; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; border-radius: 6px; }
-    .card-head:focus-visible, .band-head:focus-visible, .tb-btn:focus-visible, .sh-btn:focus-visible, .read-more:focus-visible, .link-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.32); }
+    .card-head:focus-visible, .band-head:focus-visible, .tb-btn:focus-visible, .sh-btn:focus-visible, .read-more:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.32); }
     .f-row:focus-visible, .menu-item:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--sc-accent); }
     .ch-body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
     .ch-title-line { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
@@ -1233,15 +1233,11 @@ type AvatarTone = 'adm' | 'col' | 'usr';
     .chip.area { border-style: dashed; }
     .chip.new, .chip.hot { border-color: var(--sc-accent); color: var(--sc-accent); }
     .card-links, .inline-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
-    .link-btn { display: inline-flex; align-items: center; min-height: 36px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--sc-accent); color: var(--sc-accent); font-size: max(0.78rem, var(--sc-fs-floor)); font-weight: 600; text-decoration: none; }
-    .link-btn.quiet { border-color: var(--sc-border); color: var(--sc-fg-1); }
     /* The PR / issue arrow sits on the far right of its row and stays quiet
        until you look for it (feedback d08f1983). */
-    .link-btn.ref { margin-left: auto; min-width: 36px; justify-content: center; padding: 0 8px; border-color: transparent; color: var(--sc-fg-2); font-size: 1rem; }
+    .ref { margin-left: auto; }
     .deploy-lag { margin-left: auto; font-size: max(0.75rem, var(--sc-fs-floor)); color: var(--sc-warning); white-space: nowrap; }
-    .deploy-lag + .link-btn.ref { margin-left: 0; }
-    .link-btn.ref:hover { border-color: var(--sc-border); color: var(--sc-fg-1); }
-    .link-btn:hover { background: rgba(0, 212, 255, 0.08); }
+    .deploy-lag + .ref { margin-left: 0; }
 
     /* ---- Avatar (role colours; red = elevated access) ---- */
     .av { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; font-size: max(0.7rem, var(--sc-fs-floor)); font-weight: 700; letter-spacing: 0.02em; background: rgba(120, 150, 190, 0.28); color: #b9c9de; }
@@ -1292,16 +1288,6 @@ type AvatarTone = 'adm' | 'col' | 'usr';
     /* A message that enters the thread — one more revealed behind "…", or the
        reply just sent — rises in the same way a row does. */
     .thread .msg, .band-empty { animation: fb-rise 200ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-    .sc-btn.micro { padding: 6px 12px; min-height: 40px; font-size: max(0.72rem, var(--sc-fs-floor)); letter-spacing: 0.04em; }
-    .sc-btn.micro.option { min-height: 44px; }
-    /* Touch: links reach the 48px touch minimum (micro buttons via the global
-       .sc-btn.sc-btn.micro.micro rule); the dense 36/40px rows stay for mouse users. */
-    @media (pointer: coarse) {
-      .link-btn { min-height: var(--sc-tap-min); }
-      .link-btn.ref { min-width: var(--sc-tap-min); }
-    }
-    .sc-btn.danger { border-color: var(--sc-danger); color: var(--sc-danger); }
-    .sc-btn.danger:hover:not(:disabled) { background: var(--sc-danger); color: #fff; box-shadow: none; }
     .proc-note { margin: 0; font-size: max(0.8rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     .reopen-hint { margin: 0; font-size: max(0.78rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     .author-channel { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border: 1px dashed var(--sc-accent); border-radius: 8px; }

@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ExtensionBridgeService } from '../hangar/extension-bridge.service';
@@ -29,7 +30,7 @@ const EXTENSION_ZIP_URL =
 @Component({
   selector: 'sc-extension-install',
   standalone: true,
-  imports: [TranslatePipe, RouterLink],
+  imports: [ScActionDirective, TranslatePipe, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page sc-card-page">
@@ -40,7 +41,7 @@ const EXTENSION_ZIP_URL =
         <div class="sc-card ok wide">
           <strong>{{ 'extension.install.detected.title' | translate }}</strong>
           <p>{{ 'extension.install.detected.text' | translate }}</p>
-          <a class="sc-btn" href="https://robertsspaceindustries.com/en/account/pledges"
+          <a scAction tier="secondary" href="https://robertsspaceindustries.com/en/account/pledges"
              target="_blank" rel="noopener noreferrer">
             {{ 'extension.install.detected.openHangar' | translate }}
           </a>
@@ -94,10 +95,10 @@ const EXTENSION_ZIP_URL =
           }
         </ol>
         <div class="row">
-          <a class="sc-btn sc-btn-primary" [href]="extensionZipUrl" target="_blank" rel="noopener noreferrer">
+          <a scAction tier="primary" [href]="extensionZipUrl" target="_blank" rel="noopener noreferrer">
             {{ 'extension.install.how.downloadCta' | translate }}
           </a>
-          <a class="sc-btn" [href]="repoUrl" target="_blank" rel="noopener noreferrer">
+          <a scAction tier="secondary" [href]="repoUrl" target="_blank" rel="noopener noreferrer">
             {{ 'extension.install.how.browseCta' | translate }}
           </a>
         </div>
@@ -108,7 +109,7 @@ const EXTENSION_ZIP_URL =
       <div class="sc-card">
         <h2>{{ 'extension.install.alt.title' | translate }}</h2>
         <p>{{ 'extension.install.alt.text' | translate }}</p>
-        <a class="sc-btn" routerLink="/hq/hangar">{{ 'extension.install.alt.cta' | translate }}</a>
+        <a scAction tier="secondary" routerLink="/hq/hangar">{{ 'extension.install.alt.cta' | translate }}</a>
       </div>
 
       <p class="disclaimer">{{ 'extension.install.disclaimer' | translate }}</p>
@@ -144,7 +145,6 @@ const EXTENSION_ZIP_URL =
       }
       .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
       .browsers { margin-top: 10px; }
-      .sc-btn-primary { background: var(--sc-accent); color: var(--sc-bg-0); border-color: var(--sc-accent); }
       .disclaimer { color: var(--sc-fg-2); font-size: max(0.74rem, var(--sc-fs-floor)); line-height: 1.6; max-width: var(--sc-measure); }
     `,
   ],

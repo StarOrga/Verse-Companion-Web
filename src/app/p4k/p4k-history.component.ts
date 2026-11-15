@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, signal } from '@angular/core';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { DecimalPipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { BundleDiffSummary, ChannelTag, P4kBundleRow, P4kService } from './p4k.service';
@@ -11,7 +12,7 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 @Component({
   selector: 'sc-p4k-history',
   standalone: true,
-  imports: [ScDatePipe, DecimalPipe, TranslatePipe, ScTooltipDirective],
+  imports: [ScActionDirective, ScDatePipe, DecimalPipe, TranslatePipe, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="hist">
@@ -154,15 +155,15 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
                                 <!-- superseded = history; re-enabling would create a second
                                      active bundle for the same key, so only allow delete -->
                               } @else if (b.disabled) {
-                                <button class="sc-btn micro" (click)="reenable(b)" [disabled]="svc.busy()">
+                                <button type="button" scAction tier="secondary" (click)="reenable(b)" [disabled]="svc.busy()">
                                   {{ 'p4k.actions.reenable' | translate }}
                                 </button>
                               } @else {
-                                <button class="sc-btn micro danger" (click)="disable(b)" [disabled]="svc.busy()">
+                                <button type="button" scAction tier="secondary" tone="danger" (click)="disable(b)" [disabled]="svc.busy()">
                                   {{ 'p4k.actions.disable' | translate }}
                                 </button>
                               }
-                              <button class="sc-btn micro danger" (click)="remove(b)" [disabled]="svc.busy()">
+                              <button type="button" scAction tier="secondary" tone="danger" (click)="remove(b)" [disabled]="svc.busy()">
                                 {{ 'p4k.actions.delete' | translate }}
                               </button>
                             </div>
@@ -367,9 +368,6 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
     .expand-btn:hover { background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
 
     .acts { display: flex; gap: 6px; flex-wrap: wrap; }
-    .sc-btn.micro { padding: 4px 10px; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.04em; }
-    .sc-btn.micro.danger { color: var(--sc-danger); border-color: var(--sc-danger); }
-    .sc-btn.micro.danger:hover:not(:disabled) { background: var(--sc-danger); color: var(--sc-bg-0); }
 
     /* Diff detail (per-upload expand). */
     .diff-detail { padding: 10px 14px 12px 34px; }

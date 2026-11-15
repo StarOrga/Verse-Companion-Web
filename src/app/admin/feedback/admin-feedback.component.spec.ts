@@ -475,15 +475,15 @@ describe('AdminFeedbackComponent — the stream', () => {
   it('puts a delivered row\'s deep link and PR link on the feed card, as real anchors — with unique ids', async () => {
     const { el } = await mount(fixtureTables());
     const done = el.querySelector('#fb-card-d1-feed')!;
-    const view = done.querySelector('a.link-btn[href="/codex"]');
+    const view = done.querySelector('a.sc-action[href="/codex"]');
     expect(view).not.toBeNull();
     const pending = el.querySelector('#fb-card-r1-feed')!;
-    expect(pending.querySelector('a.link-btn[href^="https://github.com"]')?.getAttribute('rel')).toBe('noopener noreferrer');
+    expect(pending.querySelector('a.sc-action[href^="https://github.com"]')?.getAttribute('rel')).toBe('noopener noreferrer');
     // r1 is in "Du bist dran" AND in the feed: two cards, two ids.
     expect(el.querySelectorAll('#fb-card-r1').length).toBe(1);
     expect(el.querySelectorAll('#fb-card-r1-feed').length).toBe(1);
     // Red is the admin avatar and the one primary CTA: the feed's ✓ is not red.
-    expect(pending.querySelector('.card-links .sc-btn.hot')).toBeNull();
+    expect(pending.querySelector('.card-links .sc-action--hot')).toBeNull();
   });
 
   /**
@@ -511,7 +511,7 @@ describe('AdminFeedbackComponent — the stream', () => {
     expect(yours.querySelectorAll('button').length).toBe(1);
 
     const feed = el.querySelector('#fb-card-r9-feed')!;
-    expect(feed.querySelector('.card-links .sc-btn')?.textContent).toContain('adminFeedback.review.accept');
+    expect(feed.querySelector('.card-links .sc-action')?.textContent).toContain('adminFeedback.review.accept');
 
     cmp.openTopic('r9');
     fixture.detectChanges();

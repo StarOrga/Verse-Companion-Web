@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, viewChild } from '@angular/core';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ScDatePipe } from '../core/locale/sc-date.pipe';
@@ -24,7 +25,7 @@ const HIGHLIGHTS = 4;
 @Component({
   selector: 'sc-about',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, ScDatePipe],
+  imports: [ScActionDirective, TranslatePipe, RouterLink, ScDatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page sc-card-page">
@@ -44,7 +45,7 @@ const HIGHLIGHTS = 4;
               <li><strong>{{ h.title }}</strong>@if (h.text) { <span>{{ h.text }}</span> }</li>
             }
           </ul>
-          <a class="cta" routerLink="/release-notes">{{ 'legal.about.new.cta' | translate }}</a>
+          <a scAction tier="secondary" routerLink="/release-notes">{{ 'legal.about.new.cta' | translate }}</a>
         </article>
         @if (earlier().length) {
           <div class="earlier wide">
@@ -63,7 +64,7 @@ const HIGHLIGHTS = 4;
         <div class="sc-card wide feature state" role="alert">
           <span class="eyebrow">{{ 'legal.about.new.eyebrow' | translate }}</span>
           <p class="state-text">{{ err | translate }}</p>
-          <button type="button" class="cta" (click)="retry()">{{ 'errors.retry' | translate }}</button>
+          <button type="button" scAction tier="secondary" (click)="retry()">{{ 'errors.retry' | translate }}</button>
         </div>
       } @else if (notesLoading()) {
         <div class="sc-card wide feature state" aria-busy="true">
@@ -181,14 +182,7 @@ const HIGHLIGHTS = 4;
       color: var(--sc-fg-2); font-size: 0.9rem; overflow-wrap: anywhere;
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .cta {
-      display: inline-flex; align-items: center; min-height: var(--sc-tap-min, 40px); padding: 0 18px;
-      border: 1px solid var(--sc-accent); border-radius: 999px; text-decoration: none;
-      font-family: var(--sc-font-display); letter-spacing: 0.05em;
-      background: color-mix(in srgb, var(--sc-accent) 8%, transparent);
-    }
-    .cta:hover { background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-    .cta:focus-visible, .mini:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    .mini:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .earlier-title { font-size: 0.85rem; color: var(--sc-fg-2); text-transform: uppercase; letter-spacing: 0.1em; }
     .earlier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
     .mini { display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: inherit; padding: 14px 16px; }

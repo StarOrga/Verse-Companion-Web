@@ -369,10 +369,10 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
         }
 
         <button
-          class="sc-btn send"
-          [class.sc-btn-primary]="!compact()"
-          [class.micro]="compact()"
-          [class.hot]="primaryHot()"
+          scAction
+          class="send"
+          [tier]="compact() ? 'secondary' : 'primary'"
+          [tone]="primaryHot() ? 'hot' : 'default'"
           [class.key]="iconSend()"
           [scTooltip]="sendHintKey() | translate"
           [attr.aria-label]="sendLabel() | translate"
@@ -530,11 +530,8 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
       background: var(--sc-bg-1);
       color: var(--sc-fg-0);
     }
-    /* The ONE red call to action a sheet gets (red = the admin's own move; the
-       viewer's composer never sets it). Dark text on the red, like the primary
-       accent button, keeps the label readable. */
-    .sc-btn.hot { background: var(--sc-accent-hot); border-color: var(--sc-accent-hot); color: var(--sc-bg-0); }
-    .sc-btn.hot:hover:not(:disabled) { background: var(--sc-accent-hot); filter: brightness(1.12); box-shadow: none; }
+    /* The ONE red call to action a sheet gets is the send action's tone="hot"
+       (red = the admin's own move; the viewer's composer never sets it). */
     .grow > .input:focus {
       outline: none;
       border-color: var(--sc-accent);
@@ -550,9 +547,9 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
     /* What the surface projects into this row is part of the same band — the
        opened topic's "Abgenommen" sign-off is a micro button and would
        otherwise be the one control left standing short next to the tiles.
-       Reaching for the projection attribute rather than for .sc-btn on
+       Reaching for the projection attribute rather than for .sc-action on
        purpose: the attachment strip lives in this row too, and its lightbox
-       carries .sc-btn micro buttons that hold their own 48px tap size. */
+       carries scAction buttons that hold their own tap size. */
     .foot ::ng-deep [composerAction] { min-height: var(--sc-composer-action-h); }
     /* Sits in the send row like a control, not like body text: the same
        vertical rhythm as the micro button beside it, and it may never be the
@@ -586,12 +583,11 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
       outline-offset: 0;
       border-radius: 4px;
     }
-    .sc-btn.micro { padding: 4px 10px; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.04em; }
     /* The key-symbol send button (admin feedback 187574ed): the label is the
        shortcut that triggers it, so it is square-ish and the glyph carries the
        size instead of the word. The words are still there for anyone who needs
        them — as the accessible name and as the tooltip. */
-    .sc-btn.send.key {
+    .send.key {
       min-width: 46px;
       padding: 6px 12px;
       font-size: 1rem;

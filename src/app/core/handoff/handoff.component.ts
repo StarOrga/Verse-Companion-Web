@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../auth/auth.service';
@@ -22,7 +23,7 @@ const CODE_SHAPE = /^[A-Za-z0-9_-]{43}$/;
 @Component({
   selector: 'sc-handoff',
   standalone: true,
-  imports: [RouterLink, TranslatePipe],
+  imports: [ScActionDirective, RouterLink, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="wrap">
@@ -30,10 +31,10 @@ const CODE_SHAPE = /^[A-Za-z0-9_-]{43}$/;
         <h1>{{ 'handoff.title' | translate }}</h1>
         @if (errorKey(); as key) {
           <p class="lead" role="alert">{{ key | translate }}</p>
-          <a routerLink="/login" class="sc-btn sc-btn-primary">{{ 'handoff.toLogin' | translate }}</a>
+          <a routerLink="/login" scAction tier="primary">{{ 'handoff.toLogin' | translate }}</a>
         } @else if (account(); as who) {
           <p class="lead">{{ 'handoff.confirm.lead' | translate }}</p>
-          <button type="button" class="sc-btn sc-btn-primary" [disabled]="busy()" (click)="signIn()">
+          <button type="button" scAction tier="primary" [busy]="busy()" [disabled]="busy()" (click)="signIn()">
             {{ 'handoff.confirm.signInAs' | translate: { account: who } }}
           </button>
         } @else {

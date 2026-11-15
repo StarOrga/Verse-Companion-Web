@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ConsentService } from './consent.service';
 
@@ -11,7 +12,7 @@ import { ConsentService } from './consent.service';
 @Component({
   selector: 'sc-consent-banner',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [ScActionDirective, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (!consent.decided()) {
@@ -21,10 +22,10 @@ import { ConsentService } from './consent.service';
           <span>{{ 'consent.banner.text' | translate }}</span>
         </div>
         <div class="actions">
-          <button type="button" class="sc-btn sc-btn-primary" (click)="consent.acceptAll()">
+          <button type="button" scAction tier="primary" (click)="consent.acceptAll()">
             {{ 'consent.banner.acceptAll' | translate }}
           </button>
-          <button type="button" class="sc-btn" (click)="consent.essentialOnly()">
+          <button type="button" scAction tier="secondary" (click)="consent.essentialOnly()">
             {{ 'consent.banner.essentialOnly' | translate }}
           </button>
         </div>
@@ -70,14 +71,9 @@ import { ConsentService } from './consent.service';
     }
     .text span { color: var(--sc-fg-2); font-size: max(0.78rem, var(--sc-fs-floor)); line-height: 1.45; }
     .actions { display: flex; gap: 8px; flex: 0 0 auto; }
-    .sc-btn-primary {
-      background: var(--sc-accent);
-      color: var(--sc-bg-0);
-      border-color: var(--sc-accent);
-    }
     @media (max-width: 560px) {
       .actions { flex: 1 1 100%; }
-      .actions .sc-btn { flex: 1; justify-content: center; }
+      .actions .sc-action { flex: 1; justify-content: center; }
     }
   `],
 })

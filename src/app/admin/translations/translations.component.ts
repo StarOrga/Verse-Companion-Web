@@ -1,3 +1,4 @@
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { toErrorKey } from '../../core/describe-error';
@@ -38,6 +39,7 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
     TranslationSourcesComponent,
     TranslationOutreachComponent,
     TranslationAlertsComponent,
+    ScActionDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -73,7 +75,7 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
     } @else if (loadError()) {
       <div class="sc-card state error" role="alert">
         <p>{{ loadError()! | translate }}</p>
-        <button type="button" class="sc-btn" (click)="load()">{{ 'admin.translations.retry' | translate }}</button>
+        <button type="button" scAction tier="secondary" (click)="load()">{{ 'admin.translations.retry' | translate }}</button>
       </div>
     } @else if (loading()) {
       <div class="sc-card state" role="status">{{ 'admin.translations.loading' | translate }}</div>
@@ -124,11 +126,11 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
               </span>
               <span class="grow"></span>
               @if (l.approved) {
-                <button type="button" class="sc-btn micro" [disabled]="busy()" (click)="startFull(l)">
+                <button type="button" scAction tier="secondary" [disabled]="busy()" (click)="startFull(l)">
                   {{ 'admin.translations.languages.fullRun' | translate }}
                 </button>
               }
-              <button type="button" class="sc-btn micro" [class.danger]="l.approved" [disabled]="busy()"
+              <button type="button" scAction tier="secondary" [tone]="l.approved ? 'danger' : 'default'" [disabled]="busy()"
                       (click)="toggleLanguage(l)">
                 {{ (l.approved ? 'admin.translations.languages.revoke' : 'admin.translations.languages.approve') | translate }}
               </button>
@@ -140,7 +142,7 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
       <section class="sc-card block">
         <div class="block-head">
           <h2>{{ 'admin.translations.jobs.title' | translate }}</h2>
-          <button type="button" class="sc-btn micro" (click)="reloadJobs()">{{ 'admin.translations.refresh' | translate }}</button>
+          <button type="button" scAction tier="secondary" (click)="reloadJobs()">{{ 'admin.translations.refresh' | translate }}</button>
         </div>
         @if (jobs().length === 0) {
           <p class="hint">{{ 'admin.translations.jobs.empty' | translate }}</p>
@@ -182,12 +184,12 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
                     <td>{{ j.created_at | scDate: 'datetime' }}</td>
                     <td class="actions">
                       @if (canApprove(j.status)) {
-                        <button type="button" class="sc-btn micro sc-btn-primary" [disabled]="busy()" (click)="approve(j)">
+                        <button type="button" scAction tier="secondary" [disabled]="busy()" (click)="approve(j)">
                           {{ 'admin.translations.jobs.approve' | translate }}
                         </button>
                       }
                       @if (canCancel(j.status)) {
-                        <button type="button" class="sc-btn micro danger" [disabled]="busy()" (click)="cancel(j)">
+                        <button type="button" scAction tier="secondary" tone="danger" [disabled]="busy()" (click)="cancel(j)">
                           {{ 'admin.translations.jobs.cancel' | translate }}
                         </button>
                       }
@@ -250,7 +252,6 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
       .jobs .num { text-align: end; font-variant-numeric: tabular-nums; }
       .jobs .actions { display: flex; gap: var(--sc-space-2); }
       .err-line { color: var(--sc-danger); font-size: 0.78rem; white-space: normal; max-width: 28ch; }
-      .sc-btn.danger { border-color: var(--sc-danger); color: var(--sc-danger); }
     `,
   ],
 })
