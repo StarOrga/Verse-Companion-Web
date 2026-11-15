@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Small texts on the rank page, the patch-tip hint and the data sheet now meet the 12 px mobile minimum.
 
+## [0.267.1] - 2026-11-15
+
+### Changed
+- /verse HQ: the comm mast now towers over the hangar, the hall is lit on both flanks, the departing fighter shows its landing gear, the storage yard is two flat rows of containers instead of a pyramid, the runway lamps under the entrance blink from both outer ends in to the centre and stay within the hangar width, and the hangar carries the number "1".
+
 ## [0.267.0] - 2026-11-15
 
 ### Added
