@@ -706,14 +706,20 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                 <span class="rule" aria-hidden="true"></span>
                 <!-- #345: the whole loadout back to stock, right at its heading,
                      only while something differs from it. Each slot keeps its
-                     own reset icon in the rows below. -->
-                @if (draftChangedCount() > 0 && !draftReadOnly()) {
-                  <button type="button" scAction tier="tertiary" class="head-reset"
-                          [attr.aria-label]="'codex.loadout.resetAll' | translate"
-                          [scTooltip]="'codex.loadout.resetAll' | translate" scTooltipTier="label"
-                          (click)="resetWholeLoadout()">
-                    <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.35-5.65M4 4v4.5h4.5" /></svg>
-                  </button>
+                     own reset icon in the rows below. Its slot is held open
+                     even while there is nothing to reset, so the icon coming
+                     and going never moves the heading (#345 follow-up). -->
+                @if (!draftReadOnly()) {
+                  <span class="head-reset-slot">
+                    @if (draftChangedCount() > 0) {
+                      <button type="button" scAction tier="tertiary" class="head-reset"
+                              [attr.aria-label]="'codex.loadout.resetAll' | translate"
+                              [scTooltip]="'codex.loadout.resetAll' | translate" scTooltipTier="label"
+                              (click)="resetWholeLoadout()">
+                        <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.35-5.65M4 4v4.5h4.5" /></svg>
+                      </button>
+                    }
+                  </span>
                 }
               </h2>
               <!-- The "no stock guns in this extract" disclosure used to sit here,
@@ -1436,8 +1442,14 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .col-head .head-note { flex: 0 0 auto; text-transform: none; letter-spacing: normal; }
     .col-head .head-note p { margin: 0 0 6px; }
     .col-head .head-note p:last-child { margin-bottom: 0; }
-    .col-head .head-reset { flex: 0 0 auto; width: 26px; height: 26px; margin-block: -4px; }
-    @media (pointer: coarse) { .col-head .head-reset { width: 48px; height: 48px; margin-block: -12px; } }
+    /* A fixed-width slot that exists whether or not the icon is in it, so the
+       rule never grows or shrinks as the loadout leaves and returns to stock. */
+    .col-head .head-reset-slot { flex: 0 0 26px; display: inline-flex; justify-content: center; align-items: center; height: 18px; }
+    .col-head .head-reset { flex: 0 0 auto; width: 26px; height: 26px; }
+    @media (pointer: coarse) {
+      .col-head .head-reset-slot { flex-basis: 48px; height: 24px; }
+      .col-head .head-reset { width: 48px; height: 48px; }
+    }
     .col-analyse { display: flex; flex-direction: column; gap: 12px; }
     /* The shorter column stays on screen (the longer one fills the grid row,
        so it has no sticky travel at all). It parks under the sticky KPI strip

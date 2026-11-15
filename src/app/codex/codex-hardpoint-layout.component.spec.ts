@@ -1168,6 +1168,12 @@ describe('CodexHardpointLayoutComponent', () => {
       expect(b.classList.contains('sc-action--tertiary')).toBe(true);
       expect(b.getAttribute('aria-label')).toBe('codex.loadout.revert');
     }
+    // #345 follow-up: each icon rides in its row's favourite/hangar cell, left of the ⓘ.
+    for (const b of resets) {
+      const cell = b.closest('.tools');
+      expect(cell).toBeTruthy();
+      expect(cell!.nextElementSibling?.classList.contains('slot-swap')).toBe(true);
+    }
     el.querySelector<HTMLButtonElement>('.kid button.kid-revert')!.click();
     resets.find((b) => !b.classList.contains('kid-revert'))!.click();
     expect(emitted).toEqual([['Hardpoint Weapon Wing Left.Hardpoint Class 3'], ['Hardpoint Weapon Top Left']]);
@@ -1176,5 +1182,19 @@ describe('CodexHardpointLayoutComponent', () => {
   it('shows no reset icon on a slot that still carries its stock item', () => {
     const el = render([{ section: 'weapons', slots: [PANTHER, VARIPUCK] }]);
     expect(el.querySelector('button.slot-revert')).toBeNull();
+  });
+
+  // #345 follow-up: a swap must not shift the row — the info button stays where it was.
+  it('keeps the info button in place when a row is swapped and gets its reset icon', () => {
+    const infoLeft = (swapped: boolean): number => {
+      const el = render([
+        { section: 'weapons', slots: [swapped ? { ...PANTHER, draftState: 'changed', draftPaths: ['Hardpoint Weapon Top Left'] } : PANTHER] },
+      ]);
+      const info = el.querySelector<HTMLElement>('.main > button.slot-swap')!;
+      return info.getBoundingClientRect().left;
+    };
+    const stock = infoLeft(false);
+    const swapped = infoLeft(true);
+    expect(Math.abs(swapped - stock)).toBeLessThan(1);
   });
 });
