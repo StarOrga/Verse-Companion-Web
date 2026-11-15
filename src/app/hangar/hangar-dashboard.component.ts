@@ -503,7 +503,7 @@ const SEARCH_DEBOUNCE_MS = 250;
     .add-ship { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; }
     .search-row { display: flex; }
     .search { flex: 1; padding: 9px 14px; border-radius: 8px; background: var(--sc-bg-0); border: 1px solid var(--sc-border); color: var(--sc-fg-0); font-family: inherit; font-size: max(0.9rem, var(--sc-fs-input)); }
-    .search:focus { outline: none; border-color: var(--sc-accent); box-shadow: 0 0 0 2px rgba(0,212,255,0.22); }
+    .search:focus { outline: none; border-color: var(--sc-accent); }
     .state { margin: 0; color: var(--sc-fg-2); font-size: 0.82rem; }
     .results { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; max-height: 300px; overflow-y: auto; }
     .result-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; background: var(--sc-bg-0); border: 1px solid var(--sc-border); }

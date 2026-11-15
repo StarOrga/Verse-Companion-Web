@@ -5,6 +5,7 @@ import { appConfig } from './app/app.config';
 import { captureAuthLinkType } from './app/auth/auth-link';
 import { captureAuthReturnError } from './app/auth/auth-return-error';
 import { armBootSplashFailsafe } from './app/core/boot-splash';
+import { trackTabbing } from './app/core/focus-modality';
 
 // Read the auth-mail link type off the URL BEFORE anything can create a
 // Supabase client: `detectSessionInUrl` strips the fragment it consumes, and
@@ -14,5 +15,7 @@ captureAuthLinkType();
 // Same for an OAuth return that carries an auth error (rejected sign-up).
 captureAuthReturnError();
 armBootSplashFailsafe();
+// Before bootstrap, so the listeners stay outside Angular: a keydown must not schedule a render.
+trackTabbing();
 
 bootstrapApplication(AppComponent, appConfig).catch((err) => logError('app', 'bootstrap failed', err));

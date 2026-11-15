@@ -602,7 +602,7 @@ interface FacetOption {
       background: var(--sc-bg-0); border: 1px solid var(--sc-border); color: var(--sc-fg-0);
       font-family: inherit; font-size: max(0.92rem, var(--sc-fs-input));
     }
-    .search:focus { outline: none; border-color: var(--sc-accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--sc-accent) 22%, transparent); }
+    .search:focus { outline: none; border-color: var(--sc-accent); }
     /* The field has its own clear button; the browser's would be a second x (audit L16). */
     input[type='search']::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; display: none; }
     .search-clear {
