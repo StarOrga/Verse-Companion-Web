@@ -548,8 +548,12 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
     .pick-cols-sum:focus-visible, .pc-reset:focus-visible, .fc button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
     .pick-cols-sum::-webkit-details-marker { display: none; }
     .pick-cols-pop { position: absolute; top: calc(100% + 4px); left: 0; z-index: 6;
-      /* The host is capped at its containing block (the narrow button): give it the menu width, so labels are not cut off. */
-      inline-size: min(var(--sc-ov-menu), calc(100vw - 2 * var(--sc-space-4))); }
+      /* The host is capped at its containing block (the narrow button, .sc-popup caps it at 100%): give it the menu width, so labels are not cut off. */
+      inline-size: min(var(--sc-ov-menu), calc(100vw - 2 * var(--sc-space-4))); max-inline-size: none; }
+    /* Phone: the menu opens inline below the button (full toolbar width) instead of hanging off the screen edge. */
+    @media (max-width: 720px) {
+      .pick-cols-pop { position: static; inline-size: 100%; margin-top: var(--sc-space-1); }
+    }
     .pc-body { display: flex; flex-direction: column; gap: 3px; max-height: min(320px, 45dvh); overflow-y: auto; }
     .pc-row { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
     .pc-row.off { color: var(--sc-fg-2); cursor: not-allowed; }
@@ -652,8 +656,11 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
     .pick-missing { margin: 0; font-size: 11px; color: var(--sc-fg-2); font-style: italic; }
 
     @media (max-width: 720px) {
-      .pick-scope { flex-direction: column; align-items: stretch; }
-      .pick-count, .pick-cols { align-self: flex-start; }
+      .pick-scope { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+      .pick-search { flex: 0 0 auto; min-width: 0; max-inline-size: 100%; }
+      .pick-count { align-self: flex-start; }
+      .pick-cols { align-self: stretch; min-inline-size: 0; }
+      .pick-cols-sum { align-self: flex-start; }
       .pick-count { margin-left: 0; }
     }
   `],
