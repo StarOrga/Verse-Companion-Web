@@ -113,23 +113,26 @@
 .upd {
   flex: 0 0 auto; font-style: normal; font-size: max(9.5px, 0.58rem); letter-spacing: 0.06em; color: var(--sc-fg-2); white-space: nowrap;
 }
-// The "+ N weitere" place stays reserved, so the list's height does not jump when the link comes and goes.
-.more-slot { min-height: 28px; }
 // Under the list; on a capped pane at its bottom.
 .foot { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; margin-top: auto; }
+// "Alle …" (scAction secondary, the pane's main step) with "+ N neue & aktualisierte" hanging off it:
+// one group, the pill dominant, the text link its quieter cut joined by a hairline elbow.
+.cta { display: flex; flex-direction: column; align-items: flex-start; max-width: 100%; margin-top: 4px; }
+.all { max-width: 100%; }
+// The "+ N" place stays reserved, so the list's height does not jump when the link comes and goes.
+.more-slot { position: relative; min-height: 28px; margin-left: 18px; padding-left: 12px; }
+.more-slot:has(.more)::before {
+  content: ''; position: absolute; left: 0; top: 0; height: 50%; width: 8px; pointer-events: none;
+  border-left: 1px solid color-mix(in srgb, var(--sc-accent) 45%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--sc-accent) 45%, transparent);
+  border-bottom-left-radius: 3px;
+}
 .more {
-  display: inline-flex; align-items: center; gap: 4px; min-height: 28px; padding: 0 8px; text-decoration: none;
-  font: 500 max(11px, 0.72rem) / 1.2 var(--sc-font-body); color: var(--sc-accent);
+  display: inline-flex; align-items: center; gap: 4px; min-height: 28px; padding: 0 4px; text-decoration: none;
+  font: 500 max(11px, 0.72rem) / 1.2 var(--sc-font-body); color: var(--sc-fg-1);
 }
-.more:hover, .more:focus-visible { text-decoration: underline; }
-.all {
-  display: inline-flex; align-items: center; gap: 6px; margin: 4px 0 0 8px; min-height: 32px; padding: 0 12px;
-  border: 1px solid rgba(82, 193, 230, 0.55); border-radius: 4px; text-decoration: none;
-  font: 600 max(11px, 0.72rem) / 1.2 var(--sc-font-body); color: var(--sc-accent);
-  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
-}
-.all:hover, .all:focus-visible { border-color: var(--sc-accent); background: rgba(82, 193, 230, 0.1); color: var(--sc-fg-0); }
-.more:focus-visible, .all:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+.more:hover, .more:focus-visible { color: var(--sc-accent); text-decoration: underline; }
+.more:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 .keys {
   display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; margin-top: 10px; padding: 6px 2px 0;
   border-top: 1px solid var(--sc-border); text-decoration: none;
@@ -158,7 +161,7 @@
 }
 // Touch screens: readable labels and 48px rows (mobile gate).
 @media (pointer: coarse) {
-  .ph, .keys, .here, .soon, .upd, .more, .new a, .tab, .all { font-size: 12px; }
+  .ph, .keys, .here, .soon, .upd, .more, .new a, .tab { font-size: 12px; }
   .tab, .new a, .new li.grp, .more, .all, .keys, .more-slot { min-height: 48px; }
   .grp-nm { font-size: 11px; }
   .tab { min-width: 48px; padding: 0 4px; }

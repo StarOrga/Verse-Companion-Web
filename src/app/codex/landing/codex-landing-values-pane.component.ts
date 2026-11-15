@@ -1,32 +1,36 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, computed, effect, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { LandingItem } from './codex-landing-data.types';
-import { barOf, compareValue, splitCallouts, valueLabel, valueText } from './codex-landing-values';
+import { LandingItem, LandingOverviewField, LandingValue } from './codex-landing-data.types';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { splitCallouts, valueLabel, valueText } from './codex-landing-values';
 import { CodexLandingCalloutSetService, hasLoadoutSet, valuesForSet } from './codex-landing-callout-set.service';
 import { CodexLandingSetToggleComponent } from './codex-landing-set-toggle.component';
 
-interface BarRow {
+interface SheetRow {
   key: string;
   label: string;
   text: string;
-  bar: { fill: number; avg: number | null } | null;
-  worse: boolean;
-  /** Shown as a callout at the hologram on wide screens — listed here only where the callouts give way. */
+  /** Also a callout at the hologram on wide screens: listed after the sheet's own values, so a short sheet cuts these first. */
   callout: boolean;
 }
 
+/** The data sheet lists this many values (admin feedback 2026-11-15: "viele (7!) Werte"). */
+export const SHEET_ROWS = 7;
+
 /**
- * The data sheet (round 4, design "Zugewandte Kante"): a light pane with no
- * box, only a glowing edge on its outer side, projected out of the screen edge. Bars for the
- * values that are not callouts (value vs. class mean, the mean as a yellow
- * tick), then the way to the detail page. Re-scans its content on every
- * rotation step.
+ * The data sheet (round 5): a light pane with no box, only a glowing edge on
+ * its outer side, projected out of the screen edge. On top the identity the
+ * hologram's arm leaves out (manufacturer, role/type, size), then a plain
+ * list of up to {@link SHEET_ROWS} values (label left, value right, no bars:
+ * the class comparison stands at the hologram and on the detail page), then
+ * the item's main action "<Name> ansehen" at the bottom, mirroring the Codex
+ * list's "Alle …" on the left. Re-scans its content on every rotation step.
  */
 @Component({
   selector: 'sc-codex-landing-values-pane',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, CodexLandingSetToggleComponent],
+  imports: [RouterLink, TranslatePipe, ScActionDirective, CodexLandingSetToggleComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.still]': 'still()' },
   template: `
@@ -35,6 +39,18 @@ interface BarRow {
       @for (k of [key()]; track k) {
         <section class="body" [class.boot]="boot()" [attr.aria-label]="'codex.landing.values.more' | translate">
           <h2 class="ph">{{ 'codex.landing.values.more' | translate }}</h2>
+          @if (it.eyebrow.manufacturer || idLine().length) {
+            <div class="id">
+              @if (it.eyebrow.manufacturer) { <p class="maker">{{ it.eyebrow.manufacturer }}</p> }
+              @if (idLine().length) {
+                <p class="cls">
+                  @for (f of idLine(); track f.id; let last = $last) {
+                    <span class="sc-sr-only">{{ 'codex.landing.overview.' + f.id | translate }}:</span>{{ f.value }}@if (!last) {<span class="sep" aria-hidden="true">·</span>}
+                  }
+                </p>
+              }
+            </div>
+          }
           @if (canSwitch()) {
             <!-- Where the callouts give way (< 1100px), the Flug / Loadout switch moves here (#884). -->
             <sc-codex-landing-set-toggle class="set" />
@@ -42,23 +58,16 @@ interface BarRow {
           @if (rows().length) {
             <dl class="rows">
               @for (r of rows(); track r.key; let i = $index) {
-                <div class="row" [class.callout]="r.callout" [class.worse]="r.worse" [style.--i]="i">
+                <div class="row" [class.callout]="r.callout" [style.--i]="i">
                   <dt>{{ r.label }}</dt>
                   <dd class="flash">{{ r.text }}</dd>
-                  @if (r.bar; as b) {
-                    <span class="bar" aria-hidden="true">
-                      <i [style.width.%]="b.fill"></i>
-                      @if (b.avg !== null) { <u [style.left.%]="b.avg"></u> }
-                    </span>
-                  }
                 </div>
               }
             </dl>
-            @if (hasBars()) {
-              <p class="legend"><u aria-hidden="true"></u>{{ 'codex.landing.values.legend' | translate }}</p>
-            }
           }
-          <a class="go" [routerLink]="it.detailRoute">{{ 'codex.landing.values.toPage' | translate: { name: it.name } }} <i aria-hidden="true">↗</i></a>
+          <a class="go" scAction tier="secondary" [routerLink]="it.detailRoute">
+            <span class="go-t">{{ 'codex.landing.values.view' | translate: { name: it.name } }}</span><i aria-hidden="true">↗</i>
+          </a>
           <i class="sweep" aria-hidden="true"></i>
         </section>
       }
@@ -84,50 +93,46 @@ interface BarRow {
         background: rgba(220, 250, 255, 0.85); box-shadow: 0 0 12px 2px rgba(130, 220, 255, 0.7); border-radius: 1px;
       }
       .body {
-        position: relative; display: flex; flex-direction: column; align-items: flex-start; text-align: left;
-        /* The sheet fills the pane, so its box is exactly as tall as the projector edge beside it (#320). */
+        position: relative; display: flex; flex-direction: column; align-items: stretch; text-align: left;
+        /* The sheet fills the pane, so its box is exactly as tall as the projector edge beside it and the Codex list (#320). */
         flex: 1 1 auto; min-height: 0; overflow: hidden;
-        padding: 16px 18px 16px 0;
+        padding: 16px 18px 14px 0;
         background: repeating-linear-gradient(180deg, rgba(150, 230, 255, 0.035) 0 1px, transparent 1px 4px);
         clip-path: inset(0 0 100% 0);
         animation: pane-in 0.7s cubic-bezier(0.3, 0.6, 0.3, 1) var(--pane-at, 2.6s) both;
       }
       .body:not(.boot) { --pane-at: 1.5s; }
       .ph {
-        margin: 0 0 14px; font: 600 max(10px, 0.62rem) / 1.2 var(--sc-font-display); letter-spacing: 0.24em;
+        flex: 0 0 auto; margin: 0 0 10px; font: 600 max(10px, 0.62rem) / 1.2 var(--sc-font-display); letter-spacing: 0.24em;
         text-transform: uppercase; color: var(--sc-accent);
       }
-      .set { display: none; margin: -6px 0 12px; }
-      .rows { display: flex; flex-direction: column; gap: 12px; width: 100%; margin: 0; }
-      /* The pane stands right of the stage: label toward the hologram, value at the outer edge. */
-      .row { display: grid; grid-template-columns: 1fr auto; align-items: baseline; column-gap: 10px; row-gap: 6px; }
-      .row dt { grid-column: 1; grid-row: 1; justify-self: start; font: 600 max(9.5px, 0.6rem) / 1.2 var(--sc-font-display); letter-spacing: 0.16em; text-transform: uppercase; color: var(--sc-fg-2); }
-      .row dd { grid-column: 2; grid-row: 1; margin: 0; font: 600 max(13px, 0.86rem) / 1 var(--cx-mono); font-variant-numeric: tabular-nums; color: var(--sc-fg-0); white-space: nowrap; }
-      .bar { grid-column: 1 / -1; position: relative; height: 3px; border-radius: 2px; background: rgba(82, 193, 230, 0.13); }
-      .bar i {
-        position: absolute; right: 0; top: 0; bottom: 0; border-radius: 2px;
-        background: linear-gradient(270deg, rgba(82, 193, 230, 0.5), #8fe3ff);
-        box-shadow: 0 0 6px rgba(130, 220, 255, 0.45);
-        transform-origin: 100% 50%;
-        animation: bar-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--pane-at, 2.6s) + 0.25s + var(--i) * 0.07s) both;
+      /* Identity: what the hologram's arm leaves out (manufacturer, role/type, size). */
+      .id { flex: 0 0 auto; margin: 0; padding-bottom: 10px; border-bottom: 1px solid color-mix(in srgb, var(--sc-accent) 22%, transparent); }
+      .maker {
+        margin: 0; font: 600 max(11px, 0.74rem) / 1.25 var(--sc-font-display); letter-spacing: 0.14em; text-transform: uppercase;
+        color: var(--sc-fg-0); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       }
-      /* Bars grow out of the hologram's side (left) toward the screen edge. */
-      .bar u { position: absolute; top: -3px; bottom: -3px; width: 1.5px; margin-left: -0.75px; background: var(--sc-warning); box-shadow: 0 0 4px color-mix(in srgb, var(--sc-warning) 70%, transparent); }
-      .bar i { left: 0; right: auto; transform-origin: 0 50%; }
-      .row.callout { display: none; }
-      /* Past the sheet's height: only the button to the detail page carries the rest (fitRows). */
+      .cls { margin: 4px 0 0; font: 400 max(11px, 0.72rem) / 1.3 var(--sc-font-body); color: var(--sc-fg-2); }
+      .cls .sep { margin: 0 6px; color: var(--sc-fg-3, var(--sc-fg-2)); }
+      .set { display: none; flex: 0 0 auto; margin: 0; }
+      /* The values: a plain list, label toward the hologram, value at the outer edge. */
+      .rows { flex: 0 0 auto; display: flex; flex-direction: column; width: 100%; margin: 0; }
+      .row {
+        display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 6px 0;
+        border-bottom: 1px solid color-mix(in srgb, var(--sc-accent) 9%, transparent);
+      }
+      .row:last-child { border-bottom: 0; }
+      .row dt {
+        min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        font: 600 max(9.5px, 0.6rem) / 1.2 var(--sc-font-display); letter-spacing: 0.16em; text-transform: uppercase; color: var(--sc-fg-2);
+      }
+      .row dd { flex: none; margin: 0; font: 600 max(13px, 0.84rem) / 1 var(--cx-mono); font-variant-numeric: tabular-nums; color: var(--sc-fg-0); white-space: nowrap; }
+      /* Past the sheet's height: only the action carries the rest (fitRows). */
       .row.cut { display: none !important; }
-      .row.worse .bar i { background: linear-gradient(90deg, color-mix(in srgb, var(--sc-warning) 45%, transparent), var(--sc-warning)); box-shadow: none; }
-      .legend { display: flex; align-items: center; gap: 6px; margin: 12px 0 0; font-size: max(10px, 0.62rem); color: var(--sc-fg-2); }
-      .legend u { display: inline-block; width: 1.5px; height: 10px; background: var(--sc-warning); }
-      .go {
-        display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; min-height: 34px; padding: 0 14px;
-        border: 1px solid rgba(82, 193, 230, 0.55); border-radius: 4px; text-decoration: none;
-        font: 600 max(11px, 0.72rem) / 1.2 var(--sc-font-body); color: var(--sc-accent);
-        transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
-      }
-      .go:hover, .go:focus-visible { border-color: var(--sc-accent); background: rgba(82, 193, 230, 0.1); color: var(--sc-fg-0); }
-      .go:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+      /* The item's main step, at the pane's foot like "Alle …" in the Codex list (scAction secondary, styles.scss). */
+      .go { flex: 0 0 auto; align-self: flex-start; max-width: 100%; margin-top: auto; }
+      .rows, .id, .set { margin-bottom: 12px; }
+      .go-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
       /* The re-scan line: a body-tall track slides its top edge down (transform only). */
       .sweep {
         position: absolute; left: 0; right: 0; top: 0; height: 100%; pointer-events: none; opacity: 0;
@@ -140,27 +145,20 @@ interface BarRow {
       .body:not(.boot) .flash { animation: flash 1.1s ease-out calc(var(--pane-at) + 0.45s) both; }
       @keyframes pane-in { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
       @keyframes sweep { 0% { transform: translateY(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(100%); opacity: 0; } }
-      @keyframes bar-in { from { transform: scaleX(0); } to { transform: scaleX(1); } }
       @keyframes flash { 0% { color: inherit; } 22% { color: #fff; text-shadow: 0 0 14px #8fe3ff, 0 0 3px #fff; } 100% { text-shadow: none; } }
-      :host(.still) .body, :host(.still) .bar i, :host(.still) .sweep, :host(.still) .flash { animation: none; clip-path: none; }
+      :host(.still) .body, :host(.still) .sweep, :host(.still) .flash { animation: none; clip-path: none; }
       :host(.still) .sweep { display: none; }
-      @media (prefers-reduced-motion: reduce) { .body, .bar i, .sweep, .flash { animation: none !important; clip-path: none; } .sweep { display: none; } }
-      @media (max-width: 1099px) { .row.callout { display: grid; } .set { display: block; } }
+      @media (prefers-reduced-motion: reduce) { .body, .sweep, .flash { animation: none !important; clip-path: none; } .sweep { display: none; } }
+      @media (max-width: 1099px) { .set { display: block; } }
       /* Touch screens: the dense holo labels stay readable and the link tappable (mobile gate). */
       @media (pointer: coarse) {
-        .ph, .row dt, .legend { font-size: 12px; }
-        .go { min-height: 48px; font-size: 12px; }
+        .ph, .row dt, .cls { font-size: 12px; }
       }
       @media (max-width: 720px) {
         :host { justify-content: flex-start; }
         .edge { display: none; }
-        .body { align-items: stretch; text-align: left; padding: 12px 0; }
-        .row { grid-template-columns: 1fr auto; }
-        .row dt { grid-column: 1; justify-self: start; }
-        .row dd { grid-column: 2; }
-        .bar { transform: none; }
-        .bar u { transform: none; }
-        .go { align-self: flex-start; }
+        .body { padding: 12px 0; }
+        .go { margin-top: 12px; }
       }
     `,
   ],
@@ -180,21 +178,23 @@ export class CodexLandingValuesPaneComponent {
     return it ? `${it.category}:${it.className}` : '';
   });
 
-  /** Bars for the non-callout values; the callout values follow (hidden where the callouts stand). */
-  readonly rows = computed<BarRow[]>(() => {
+  /** Role/type/part, size and class under the manufacturer; the manufacturer itself has its own line. */
+  readonly idLine = computed(() =>
+    (this.item()?.overview ?? []).filter((f): f is LandingOverviewField & { value: string } => f.id !== 'manufacturer' && !!f.value),
+  );
+
+  /**
+   * Up to {@link SHEET_ROWS} values: the ones that are no callout first, then
+   * the callout values (on wide screens they also stand at the hologram, so a
+   * short sheet cuts them first).
+   */
+  readonly rows = computed<SheetRow[]>(() => {
     this.lang();
     const it = this.item();
     if (!it) return [];
     const { callouts, rest } = splitCallouts(it.category, valuesForSet(it, this.calloutSet.set()));
-    const toRow = (v: (typeof rest)[number], callout: boolean): BarRow => ({
-      key: v.key,
-      label: valueLabel(this.translate, v.key),
-      text: valueText(v),
-      bar: barOf(v),
-      worse: compareValue(v)?.worse ?? false,
-      callout,
-    });
-    return [...rest.map((v) => toRow(v, false)), ...callouts.map((c) => toRow(c.value, true))];
+    const toRow = (v: LandingValue, callout: boolean): SheetRow => ({ key: v.key, label: valueLabel(this.translate, v.key), text: valueText(v), callout });
+    return [...rest.map((v) => toRow(v, false)), ...callouts.map((c) => toRow(c.value, true))].slice(0, SHEET_ROWS);
   });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
@@ -214,7 +214,7 @@ export class CodexLandingValuesPaneComponent {
     });
   }
 
-  /** Shows as many rows (in priority order) as the sheet's height holds; the "to the page" button always stays. */
+  /** Shows as many rows (in priority order) as the sheet's height holds; the action to the detail page always stays. */
   fitRows(): void {
     const body = this.host.nativeElement.querySelector<HTMLElement>('.body');
     if (!body) return;
@@ -225,13 +225,7 @@ export class CodexLandingValuesPaneComponent {
     const over = (): boolean => !!go && go.getBoundingClientRect().bottom + (parseFloat(getComputedStyle(body).paddingBottom) || 0) > body.getBoundingClientRect().bottom + 1;
     const shown = rows.filter((r) => r.getClientRects().length > 0);
     for (let i = shown.length - 1; i >= 0 && over(); i--) shown[i].classList.add('cut');
-    const legend = body.querySelector<HTMLElement>('.legend');
-    if (legend) {
-      const anyBar = shown.some((r) => !r.classList.contains('cut') && r.querySelector('.bar u'));
-      legend.style.display = anyBar ? '' : 'none';
-    }
   }
 
   readonly canSwitch = computed(() => hasLoadoutSet(this.item()));
-  readonly hasBars = computed(() => this.rows().some((r) => !r.callout && r.bar?.avg !== null && !!r.bar));
 }

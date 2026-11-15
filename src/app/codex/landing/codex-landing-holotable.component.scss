@@ -36,29 +36,50 @@
 }
 :host(.lit) .halo { opacity: 1; }
 
-// ── Beam: volumetric trapezoid from the emitter up, rays + rising motes ──
+// ── Beam: a projection out of a point of light (round 5, admin feedback 2026-11-15) ──
+// No trapezoid: one conic fan from the emitter point, brightest along the axis and fading
+// to nothing at its sides (no hard edge), dimming with the distance from the source (radial
+// mask). Inside it fine light streaks radiate from the source, horizontal scanlines cross
+// it and a few motes rise. Everything is static gradients; only opacity (breathe, a slow
+// stepped flicker of the streaks) and the motes' transform animate — compositor work only.
 .beam {
-  position: absolute; left: 15%; right: 15%; top: calc(var(--ht) - 6%); bottom: calc(-1 * var(--cy));
-  clip-path: polygon(47.4% 100%, 52.6% 100%, 100% 0, 0 0);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent), linear-gradient(0deg, #000 55%, transparent);
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent), linear-gradient(0deg, #000 55%, transparent);
-  mask-composite: intersect;
-  background: linear-gradient(0deg, rgba(175, 238, 255, 0.42), rgba(82, 193, 230, 0.12) 58%, transparent);
+  position: absolute; left: 4%; right: 4%; top: calc(var(--ht) - 8%); bottom: calc(-1 * var(--cy));
+  --fan: conic-gradient(from -44deg at 50% 100%,
+    transparent 0deg, rgba(82, 193, 230, 0.06) 12deg, rgba(130, 220, 252, 0.2) 30deg, rgba(200, 245, 255, 0.36) 41deg,
+    rgba(235, 252, 255, 0.46) 44deg, rgba(200, 245, 255, 0.36) 47deg, rgba(130, 220, 252, 0.2) 58deg, rgba(82, 193, 230, 0.06) 76deg,
+    transparent 88deg, transparent 360deg);
+  background: var(--fan);
+  -webkit-mask-image: radial-gradient(ellipse 58% 100% at 50% 100%, #000 0%, rgba(0, 0, 0, 0.7) 38%, rgba(0, 0, 0, 0.25) 72%, transparent 100%);
+  mask-image: radial-gradient(ellipse 58% 100% at 50% 100%, #000 0%, rgba(0, 0, 0, 0.7) 38%, rgba(0, 0, 0, 0.25) 72%, transparent 100%);
   mix-blend-mode: screen;
   pointer-events: none;
+  overflow: hidden;
   transform-origin: 50% 100%;
   transform: scaleY(0);
   opacity: 0;
 }
 :host(.lit) .beam { animation: beam-extend 0.95s cubic-bezier(0.2, 0.7, 0.2, 1) 0.4s both, beam-breathe 3.6s ease-in-out 1.35s infinite; }
+// Light streaks radiating from the source: two repeating fans with different periods, so
+// they never read as a regular comb; masked to the beam's own fan.
 .beam .rays {
   position: absolute; inset: 0;
-  background: repeating-linear-gradient(90deg, transparent 0 7%, rgba(200, 245, 255, 0.07) 7% 7.6%, transparent 7.6% 13%);
+  background:
+    repeating-conic-gradient(from -44deg at 50% 100%, transparent 0deg 2.1deg, rgba(215, 248, 255, 0.16) 2.1deg 2.45deg, transparent 2.45deg 4.6deg),
+    repeating-conic-gradient(from -41deg at 50% 100%, transparent 0deg 5.3deg, rgba(190, 240, 255, 0.11) 5.3deg 5.9deg, transparent 5.9deg 7.7deg);
+  -webkit-mask-image: var(--fan);
+  mask-image: var(--fan);
   animation: rays 5s steps(1) infinite;
 }
-.beam .motes {
+// Fine horizontal scanlines, denser near the source.
+.beam .lines {
   position: absolute; inset: 0;
+  background: repeating-linear-gradient(180deg, rgba(210, 248, 255, 0.1) 0 1px, transparent 1px 4px);
+  -webkit-mask-image: var(--fan);
+  mask-image: var(--fan);
+}
+// Rising motes: a layer two beams tall slides up by one beam (transform, not background-position).
+.beam .motes {
+  position: absolute; left: 0; right: 0; top: 0; height: 200%;
   background:
     radial-gradient(1px 1px at 41% 12%, rgba(255, 255, 255, 0.9), transparent),
     radial-gradient(1px 1px at 57% 27%, rgba(255, 255, 255, 0.7), transparent),
@@ -68,13 +89,20 @@
     radial-gradient(1px 1px at 52% 88%, rgba(255, 255, 255, 0.8), transparent),
     radial-gradient(1px 1px at 29% 36%, rgba(220, 250, 255, 0.55), transparent),
     radial-gradient(1px 1px at 70% 8%, rgba(220, 250, 255, 0.55), transparent);
-  background-size: 100% 50%;
+  background-size: 100% 25%;
+  will-change: transform;
   animation: motes 9s linear infinite;
 }
+// The source: a white-hot point on the emitter with a short, fading shaft above it.
 .beam .core {
-  position: absolute; left: 50%; top: 6%; bottom: 0; width: 4px; transform: translateX(-50%);
-  background: linear-gradient(0deg, #f4feff, rgba(170, 235, 255, 0.45) 50%, transparent);
-  filter: blur(1.4px);
+  position: absolute; left: 50%; bottom: 0; width: 3px; height: 70%; transform: translateX(-50%);
+  background: linear-gradient(0deg, #f4feff, rgba(170, 235, 255, 0.35) 40%, transparent);
+  filter: blur(1.2px);
+}
+.beam .core::before {
+  content: ''; position: absolute; left: 50%; bottom: -10px; width: 46px; height: 22px; transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #ffffff, rgba(200, 245, 255, 0.75) 30%, rgba(82, 193, 230, 0.25) 65%, transparent);
 }
 
 // ── The piece: everything of ONE item; it is swapped per rotation step ──
@@ -267,7 +295,6 @@
 }
 .k-eye > span:nth-child(2) { color: var(--sc-accent); }
 // The maker gets its own line under "Neu · Kategorie", flush with the text after the tick.
-.k-maker { flex: 1 0 100%; padding-left: 21px; color: var(--sc-fg-2); letter-spacing: 0.18em; }
 .k-tick { width: 14px; height: 1px; background: var(--sc-accent); box-shadow: 0 0 6px var(--sc-accent); }
 .k-sep { color: rgba(159, 179, 200, 0.5); }
 .k-name {
@@ -382,9 +409,10 @@
 }
 
 // Out of view (scPauseOffscreen on the host — codex-landing.component.html sets the
-// attribute): the endless loops stand still. The beam's motes alone animate
+// attribute): the endless loops stand still. Until round 5 the beam's motes animated
 // background-position, a main-thread repaint every frame — ~5 % of the main thread
-// for as long as the landing was open, seen or not (profiled 2026-11-03). Nothing
+// for as long as the landing was open, seen or not (profiled 2026-11-03); they slide
+// by transform now, but every running loop still forces frames at monitor rate. Nothing
 // inside a leaving piece is touched: [animate.leave] waits for its animations.
 :host([data-sc-offscreen]) {
   .beam, .beam .rays, .beam .motes, .skirt .band { animation-play-state: paused; }
