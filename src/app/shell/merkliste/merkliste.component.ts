@@ -53,10 +53,10 @@ interface WishLine {
       </button>
       @if (open()) {
         <div class="panel" [id]="panelId" scPopupMotion scPopupMotionItems=".qrow" scPopupMotionOrigin="tr" animate.leave="pm-out">
-          <sc-popup kind="panel" [eyebrow]="'quick.wish' | translate" [title]="(cart.count() === 1 ? 'quick.wishTitleOne' : 'quick.wishTitle') | translate: { n: cart.count() }"
+          <!-- No rail icon, no eyebrow: at its trigger the panel carries only the accent edge, like the account menu.
+               The title is the list's name; the count stands once, in the footer. -->
+          <sc-popup kind="panel" [title]="'quick.wish' | translate"
                     [returnFocus]="trigger" [backClose]="false" (closed)="close()">
-          <!-- The rail carries the trigger's heart: the same mark that opened the panel. -->
-          <svg popupIcon viewBox="0 0 24 24">@for (d of icon; track $index) { <path [attr.d]="d" /> }</svg>
           @for (l of lines(); track l.item.key) {
             <div class="qrow">
               <a class="open" [routerLink]="l.row.target!.link" [queryParams]="l.row.target!.queryParams" [fragment]="l.row.target!.fragment ?? undefined" (click)="onOpen($event)">

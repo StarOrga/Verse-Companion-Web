@@ -124,9 +124,22 @@
   gap: 8px;
   flex: none;
 }
-.sc-popup .scp-title {
+.sc-popup .scp-hd {
   flex: 1;
   min-inline-size: 0;
+}
+/* A light popout's eyebrow: a small line above the title (its rail is only the accent edge). */
+.sc-popup .scp-ev-in {
+  display: block;
+  margin-bottom: 2px;
+  font-size: max(10.5px, var(--sc-fs-floor));
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--sc-popup-rail);
+  overflow-wrap: anywhere;
+}
+.sc-popup .scp-title {
   margin: 0;
   font: 600 17px/1.3 var(--sc-font-display);
   font-size: max(17px, var(--sc-fs-floor));
@@ -176,7 +189,10 @@
 .sc-popup .scp-frame[data-kind='notice'] .scp-rail { padding-top: 21px; }
 .sc-popup .scp-frame:is([data-kind='menu'], [data-kind='notice']) .scp-b { margin-top: 0; }
 
-/* ---- no symbol, no eyebrow: the rail is only the accent edge (no generic stand-in icon) ---- */
+/* ---- no symbol, no eyebrow, or a light popout at its trigger: the rail is only the accent edge
+        (no generic stand-in icon) ---- */
+.sc-popup .scp-frame[data-light] .scp-rail > * { display: none; }
+.sc-popup .scp-frame[data-light] .scp-rail,
 .sc-popup .scp-frame .scp-rail:not(:has(.scp-sym > *, .scp-ev)) {
   inline-size: 3px;
   padding: 0;

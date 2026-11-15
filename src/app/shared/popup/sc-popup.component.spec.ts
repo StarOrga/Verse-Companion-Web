@@ -79,7 +79,8 @@ describe('ScPopupComponent', () => {
 
   const kinds: { kind: ScPopupKind; head: boolean; close: boolean; eyebrow: boolean; size: string }[] = [
     { kind: 'menu', head: false, close: false, eyebrow: false, size: 'menu' },
-    { kind: 'panel', head: true, close: true, eyebrow: true, size: 's' },
+    // A non-modal panel is a light popout: no vertical eyebrow in the rail (see the test below).
+    { kind: 'panel', head: true, close: true, eyebrow: false, size: 's' },
     { kind: 'dialog', head: true, close: true, eyebrow: true, size: 'm' },
     { kind: 'large', head: true, close: true, eyebrow: true, size: 'area' },
     { kind: 'notice', head: false, close: false, eyebrow: false, size: '' },
@@ -126,6 +127,32 @@ describe('ScPopupComponent', () => {
       f.destroy();
       TestBed.resetTestingModule();
     }
+  });
+
+  it('a light popout (non-modal panel) shows only the accent edge: no rail symbol, the eyebrow a line above the title', async () => {
+    const f = mount((h) => {
+      h.kind.set('panel');
+      h.icon.set(true);
+    });
+    await settle();
+    const el = frame(f.nativeElement);
+    expect(el.hasAttribute('data-light')).toBe(true);
+    const rail = el.querySelector<HTMLElement>('.scp-rail')!;
+    expect(Math.round(rail.getBoundingClientRect().width)).toBe(3);
+    expect(getComputedStyle(rail.querySelector('.scp-sym')!).display).toBe('none');
+    const inline = el.querySelector<HTMLElement>('.scp-h .scp-ev-in')!;
+    expect(inline.textContent!.trim()).toBe('Nachschub');
+    expect(inline.getBoundingClientRect().bottom).toBeLessThanOrEqual(el.querySelector('.scp-title')!.getBoundingClientRect().top + 1);
+    f.destroy();
+    TestBed.resetTestingModule();
+    // A dialog keeps the rail with symbol and vertical eyebrow.
+    const g = mount((h) => h.icon.set(true));
+    await settle();
+    const dlg = frame(g.nativeElement);
+    expect(dlg.hasAttribute('data-light')).toBe(false);
+    expect(dlg.querySelector('.scp-rail .scp-ev')).not.toBeNull();
+    expect(dlg.querySelector('.scp-ev-in')).toBeNull();
+    g.destroy();
   });
 
   it('the ✕ is a tertiary scAction with aria-label and closes with reason "close"', async () => {

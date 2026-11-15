@@ -35,7 +35,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
       </button>
       @if (open()) {
         <div class="popup">
-          <sc-popup kind="panel" [eyebrow]="'nav.accountMenu' | translate" [title]="'handoff.title' | translate" [backClose]="false" (closed)="close()">
+          <sc-popup kind="panel" [title]="'handoff.title' | translate" [backClose]="false" (closed)="close()">
           <ol class="steps">
             @for (n of steps; track n) {
               <li [class.current]="step() === n">

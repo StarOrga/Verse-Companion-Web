@@ -32,7 +32,7 @@ const TICK_MS = 30_000;
       @let pg = page()!;
       <div class="dock" [class.above-footer]="pg === 'statistik'" [attr.data-state]="st" [scPopoverDismiss]="shown()" (dismissed)="close()">
         @if (shown()) {
-          <sc-popup class="aussicht" id="hq-app-aussicht" kind="panel" [backdrop]="false" [eyebrow]="'hq.title' | translate" [title]="'hq.appStatus.aussicht.title' | translate" (closed)="close()">
+          <sc-popup class="aussicht" id="hq-app-aussicht" kind="panel" [backdrop]="false" [title]="'hq.appStatus.aussicht.title' | translate" (closed)="close()">
             <p class="a-text">{{ 'hq.appStatus.aussicht.' + pg | translate }}</p>
             @if (pg === 'jetzt') {
               <ul class="a-list">
@@ -132,7 +132,12 @@ const TICK_MS = 30_000;
       [data-state='tracking'] { --_tone: var(--sc-success); --_ring: color-mix(in srgb, var(--sc-success) 38%, transparent); }
       [data-state='tracking'] .mark { width: 10px; height: 10px; margin: 1px; background: var(--sc-success); box-shadow: 0 0 8px var(--sc-success); }
 
-      .aussicht { position: absolute; left: 0; bottom: calc(100% + var(--sc-space-2, 8px)); text-align: start; }
+      /* The host is shrink-wrapped by the chip it is positioned against (a 200px chip made a 200px card that
+         broke its title into three lines), so it states the s tier itself. */
+      .aussicht {
+        position: absolute; left: 0; bottom: calc(100% + var(--sc-space-2, 8px)); text-align: start;
+        inline-size: min(var(--sc-ov-s), calc(100vw - var(--_left) - var(--sc-rand, 16px))); max-inline-size: none;
+      }
       .a-text { margin: 0; color: var(--sc-fg-1); line-height: 1.45; }
       .a-list { margin: var(--sc-space-2, 8px) 0 0; padding-left: 1.1em; color: var(--sc-fg-2); }
       .a-list li + li { margin-top: 2px; }

@@ -6924,6 +6924,7 @@
     },
     "app": {
       "launch": "Start app",
+      "launchNow": "Start now",
       "starting": "Starting the app …",
       "started": "The app is starting. Sign in there and your data will come through here.",
       "downloading": "App not found: the download is running now (about 500 MB). Run the setup afterwards.",
@@ -6932,7 +6933,7 @@
       "download": "Download app",
       "downloadCta": "Download app",
       "downloadStarted": "The download is running (about 500 MB). Run the setup afterwards.",
-      "tipDownload": "Downloads the installer right away. If the app is already installed, start it once: as soon as it connects, this says “Start app”. You can always find it again under Apps at the top right.",
+      "tipDownload": "Downloads the installer right away. If the app is already installed, start it once: as soon as it connects, you start it from here. You can always find it again under Apps at the top right.",
       "tipLaunch": "Opens the app on your PC. If it does not answer, the download starts. You can always find it again under Apps at the top right.",
       "close": "Close"
     },
@@ -8638,9 +8639,7 @@
       "item": "Items",
       "blueprint": "Blueprints",
       "news": "News"
-    },
-    "wishTitle": "{{n}} items saved",
-    "wishTitleOne": "1 item saved"
+    }
   },
   "cart": {
     "title": "Wishlist",

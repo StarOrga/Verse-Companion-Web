@@ -26,7 +26,7 @@ import { LiveContract } from './hq-live.util';
       <span class="count mono">{{ contracts().length }}</span>
     </button>
     @if (open()) {
-      <sc-popup class="panel" kind="panel" [backdrop]="false" [eyebrow]="'hq.title' | translate" [title]="'hq.now.missions.title' | translate" (closed)="open.set(false)">
+      <sc-popup class="panel" kind="panel" [backdrop]="false" [title]="'hq.now.missions.title' | translate" (closed)="open.set(false)">
         @if (contracts().length === 0) {
           <p class="none">{{ 'hq.now.missions.none' | translate }}</p>
         } @else {

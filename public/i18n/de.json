@@ -6924,6 +6924,7 @@
     },
     "app": {
       "launch": "App starten",
+      "launchNow": "Jetzt starten",
       "starting": "App wird gestartet …",
       "started": "App startet. Melde dich dort an, dann kommen deine Daten hierher.",
       "downloading": "App nicht gefunden: Der Download läuft jetzt (rund 500 MB). Führe danach das Setup aus.",
@@ -6932,7 +6933,7 @@
       "download": "App downloaden",
       "downloadCta": "App downloaden",
       "downloadStarted": "Der Download läuft (rund 500 MB). Führe danach das Setup aus.",
-      "tipDownload": "Lädt den Installer direkt herunter. Ist die App schon installiert, starte sie einmal: Sobald sie sich verbindet, steht hier „App starten“. Unter Apps oben rechts findest du sie jederzeit wieder.",
+      "tipDownload": "Lädt den Installer direkt herunter. Ist die App schon installiert, starte sie einmal: Sobald sie sich verbindet, startest du sie von hier. Unter Apps oben rechts findest du sie jederzeit wieder.",
       "tipLaunch": "Öffnet die App auf deinem PC. Falls sie nicht antwortet, startet der Download. Unter Apps oben rechts findest du sie jederzeit wieder.",
       "close": "Schließen"
     },
@@ -8638,9 +8639,7 @@
       "item": "Gegenstände",
       "blueprint": "Blaupausen",
       "news": "News"
-    },
-    "wishTitle": "{{n}} Positionen gemerkt",
-    "wishTitleOne": "1 Position gemerkt"
+    }
   },
   "cart": {
     "title": "Wunschliste",

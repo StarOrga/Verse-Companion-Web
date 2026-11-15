@@ -856,7 +856,9 @@ import { avatarUrlOf } from './avatar-url';
        integrations / view-as). Plain <hr>, matching .dropdown-sep's border
        tone rather than a browser-default rule. */
     .menu-sep {
-      width: 100%;
+      /* Stretched by the flex column, never width: 100% — with the 2px side margins that
+         overflowed the menu by 4px and gave it a horizontal scrollbar. */
+      align-self: stretch;
       margin: 6px 2px 4px;
       border: 0;
       border-top: 1px solid var(--sc-border);

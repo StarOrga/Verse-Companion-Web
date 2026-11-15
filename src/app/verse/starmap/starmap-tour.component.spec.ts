@@ -41,7 +41,8 @@ describe('StarmapTourComponent', () => {
     await f.whenStable();
     f.detectChanges();
     expect(q('.ring')).not.toBeNull();
-    expect(q('.scp-ev')).not.toBeNull();
+    // A coach mark is a light popout: its step count is a line above the title, not in the rail.
+    expect(q('.scp-ev-in')).not.toBeNull();
     // stage -> patch -> rank (comet and guess are absent from this panel): 3 steps
     const next = () => {
       const b = f.nativeElement.querySelectorAll('.scp-f button');

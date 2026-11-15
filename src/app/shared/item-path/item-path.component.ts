@@ -203,7 +203,6 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
       } @else {
         <sc-popup class="rp" kind="panel" [title]="'pathCtl.whereTitle' | translate" [eyebrow]="name() ?? ''"
                   [returnFocus]="anchor()" (closed)="closePop()">
-          <svg popupIcon class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.inventar; track $index) { <path [attr.d]="d" /> }</svg>
           <div class="places">
             @for (p of placeOptions(); track p; let first = $first) {
               <button type="button" class="place" [class.on]="first" (click)="choosePlace(p)">{{ placeText(p) }}</button>
