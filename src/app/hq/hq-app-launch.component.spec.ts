@@ -63,7 +63,16 @@ describe('HqAppLaunchComponent', () => {
     expect(launcher.launch).toHaveBeenCalledWith(SCC_LAUNCH_WAIT_MS);
     expect(launcher.downloadInstaller).toHaveBeenCalledTimes(1);
     expect(f.componentInstance.status()).toBe('downloading');
-    expect((f.nativeElement as HTMLElement).querySelector('[role="status"] .toast')).toBeTruthy();
+    expect((f.nativeElement as HTMLElement).querySelector('.toast [role="status"]')).toBeTruthy();
+    // One live region only: the notice frame, not a second wrapper around it.
+    expect((f.nativeElement as HTMLElement).querySelectorAll('[role="status"]').length).toBe(1);
+  });
+
+  it('a failing launch is logged and the status resets instead of staying on "starting"', async () => {
+    const { f, launcher } = mount(false);
+    launcher.launch.mockRejectedValueOnce(new Error('boom'));
+    await clickPlain(f);
+    expect(f.componentInstance.status()).toBe('idle');
   });
 
   it('never auto-downloads once this browser has seen the app answer', async () => {
