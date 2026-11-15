@@ -303,6 +303,23 @@
         ]
       }
     ],
+    ".claude/project-map.md›migrations-count›count": [
+      {
+        "ship": "#1148",
+        "by": "Jerry",
+        "value": "migrations 183"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "generated count of the merged tree",
+        "decided": true,
+        "at": "2026-11-15T17:48:29.462Z",
+        "hunks": [
+          "3a473fd5a36a"
+        ]
+      }
+    ],
     ".claude/project-map.md›migrations/›count": [
       {
         "ship": "feat/verse-rank-followup",
@@ -398,6 +415,23 @@
         ]
       }
     ],
+    ".claude/project-map.md›supabase-count›count": [
+      {
+        "ship": "#1148",
+        "by": "Jerry",
+        "value": "supabase 426"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "generated count of the merged tree",
+        "decided": true,
+        "at": "2026-11-15T17:48:29.462Z",
+        "hunks": [
+          "60ee2da538de"
+        ]
+      }
+    ],
     ".claude/project-map.md›supabase-tree›counts": [
       {
         "ship": "fix/codex-atomic-rebuild",
@@ -458,6 +492,21 @@
         "at": "2026-11-15T16:02:02.965Z",
         "hunks": [
           "54c86e87bf73"
+        ]
+      },
+      {
+        "ship": "#1145",
+        "by": "Jerry",
+        "value": "3133 tracked files"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "generated count of the merged tree",
+        "decided": true,
+        "at": "2026-11-15T17:48:29.462Z",
+        "hunks": [
+          "4dfefe9d74ef"
         ]
       }
     ],
