@@ -5,6 +5,7 @@ import { ScSelectComponent, ScSelectOption } from '../../shared/sc-select.compon
 import { FriendsService } from '../../social/friends.service';
 import { SocialService } from '../../social/social.service';
 import { FriendShareKind, FriendShareRow, friendPath } from '../../social/social.types';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 
 export type FriendShareSubject = FriendShareKind | 'loadout';
 
@@ -25,12 +26,12 @@ export function audienceOf(value: string | null): { friendId: string } | { group
 @Component({
   selector: 'sc-hq-friend-share',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, ScSelectComponent],
+  imports: [TranslatePipe, RouterLink, ScSelectComponent, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (available()) {
       <div class="fs">
-        <button type="button" class="sc-btn tiny ghost" [attr.aria-expanded]="open()" (click)="toggle()">
+        <button type="button" scAction tier="secondary" [attr.aria-expanded]="open()" (click)="toggle()">
           {{ 'hq.friends.share.open' | translate }}
         </button>
         @if (open()) {
@@ -43,7 +44,7 @@ export function audienceOf(value: string | null): { friendId: string } | { group
             <div class="pick">
               <sc-select [options]="options()" [value]="choice()" [ariaLabel]="'hq.friends.share.audience' | translate"
                          placeholderKey="hq.friends.share.choose" (valueChange)="choice.set($event)" />
-              <button type="button" class="sc-btn small" [disabled]="!choice() || social.busy()" (click)="share()">
+              <button type="button" scAction tier="secondary" [disabled]="!choice() || social.busy()" (click)="share()">
                 {{ 'hq.friends.share.send' | translate }}
               </button>
             </div>
@@ -62,7 +63,7 @@ export function audienceOf(value: string | null): { friendId: string } | { group
                     } @else {
                       <span>{{ r.group_name }} <span class="kind">({{ 'social.group.kind.' + r.group_kind | translate }})</span></span>
                     }
-                    <button type="button" class="sc-btn tiny ghost" (click)="revoke(r)">{{ 'hq.friends.share.revoke' | translate }}</button>
+                    <button type="button" scAction tier="secondary" tone="danger" (click)="revoke(r)">{{ 'hq.friends.share.revoke' | translate }}</button>
                   </li>
                 }
               </ul>
@@ -87,7 +88,6 @@ export function audienceOf(value: string | null): { friendId: string } | { group
       a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .flash { margin: 0; color: var(--sc-accent); }
       .err { margin: 0; color: var(--sc-danger); }
-      @media (pointer: coarse) { .sc-btn { min-height: 48px; } }
     `,
   ],
 })
