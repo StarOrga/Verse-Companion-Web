@@ -103,8 +103,7 @@ export class AnalyticsService {
    */
   init(): void {
     if (!this.configured) return;
-    // Central place where an error state reaches the user: `toErrorKey` reports here.
-    setErrorShownSink((scope, key) => this.track('app:error_show', { scope, key }));
+    this.bindErrorSink();
     // Explicit injector: init() is called from ngOnInit, outside an injection context.
     effect(
       () => {
@@ -125,6 +124,11 @@ export class AnalyticsService {
   track<E extends EventName>(event: E, ...args: TrackArgs<E>): void {
     const props = args[0] as EventProps[E] | undefined;
     this.capture(event, props as Record<string, unknown> | undefined);
+  }
+
+  /** Central place where an error state reaches the user: `toErrorKey` reports here. */
+  private bindErrorSink(): void {
+    setErrorShownSink((scope, key) => this.track('app:error_show', { scope, key }));
   }
 
   /** Internal sender (pageviews + `track`); not part of the feature-facing API. */

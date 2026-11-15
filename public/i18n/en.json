@@ -4533,7 +4533,7 @@
         "title": "In short",
         "noAds": "No advertising, no ad networks.",
         "signIn": "There are exactly two ways to sign in: e-mail address and password, or your Google account. The Google route is optional and does send data to Google.",
-        "noTracking": "No advertising trackers. Product analytics via PostHog (EU) only run if you allow them — off by default.",
+        "noTracking": "No advertising trackers. Product analytics via PostHog (EU) only run if you allow them — off by default. Our own server reports its errors and run times without any personal data.",
         "minimal": "Only the data the features need — nothing is sold or shared for marketing.",
         "euHosting": "Application data is stored in the EU (Supabase, region eu-central-1 / Frankfurt)."
       },
@@ -4580,7 +4580,8 @@
         "supabase": "Supabase (database, authentication, file storage) — EU region eu-central-1 (Frankfurt); processes your account and application data on our behalf.",
         "vercel": "Vercel Inc. (hosting, CDN) — delivery of the static app.",
         "google": "Google Sign-In (Google Ireland Limited / Google LLC) — only if you choose to sign in with Google; details in the \"Signing in with Google\" section.",
-        "posthog": "PostHog (product analytics and error diagnostics) — EU cloud (eu.i.posthog.com); captures anonymous usage events, page load times and errors, and only after you consent.",
+        "posthog": "PostHog (product analytics and error diagnostics) — EU cloud; requests go through this site's own address (/ingest). Only after you consent it captures usage events, page load times, dead clicks and heatmaps, and errors. Sessions in which an error occurs are recorded for replay with all inputs masked. If you are signed in, PostHog sees a pseudonymous ID (a salted hash of your account ID) and your role (viewer, collaborator or admin) — never your e-mail address or name.",
+        "posthogServer": "PostHog (server side) — our own server functions report their errors and run times to PostHog (EU cloud), without IP address, user ID or content. This does not depend on your consent because no personal data is involved.",
         "fonts": "Google Fonts — font files are loaded from Google servers; Google may see your IP address.",
         "rsiMedia": "Images in the Verse news are partly loaded straight from Roberts Space Industries servers (media.robertsspaceindustries.com, theverse.robertsspaceindustries.com) — RSI sees your IP address while they load.",
         "gameApis": "Public Star Citizen data: status.robertsspaceindustries.com and api.star-citizen.wiki (read-only, no account data is sent)."
@@ -5459,7 +5460,7 @@
       },
       "statistics": {
         "label": "Statistics",
-        "desc": "Anonymous usage statistics and anonymous error reports (PostHog, EU servers) to understand which areas get used and where things break. Off by default, no identification, no session recording. Turning this off deletes the stored values."
+        "desc": "Anonymous usage statistics and anonymous error reports (PostHog, EU servers) to understand which areas get used and where things break. Off by default. Signed in, you appear under a pseudonymous ID with your role only — never your name or e-mail; sessions with an error may be recorded with all inputs masked. Turning this off deletes the stored values."
       }
     }
   },
