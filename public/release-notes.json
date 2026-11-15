@@ -1,9 +1,9 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.4",
+  "current": "0.270.5",
   "releases": [
     {
-      "version": "0.270.4",
+      "version": "0.270.5",
       "date": "2026-11-15",
       "sections": [
         {
@@ -23,6 +23,22 @@
             {
               "title": "",
               "text": "Social pages: every action button uses the shared action control (one main step per page, red tone for report and delete) (#970)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.270.4",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The hourly service check now records the reason a provider gives for a refused request (for example missing credits or a blocked key) instead of a bare HTTP status, with any key in it masked."
             }
           ]
         }

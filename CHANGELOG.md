@@ -4,13 +4,18 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.270.4] - 2026-11-15
+## [0.270.5] - 2026-11-15
 
 ### Fixed
 - Codex rank: a ship's place and the group median now count each hull once — editions and duplicate records of one hull no longer inflate a comparison group (#968).
 
 ### Changed
 - Social pages: every action button uses the shared action control (one main step per page, red tone for report and delete) (#970).
+
+## [0.270.4] - 2026-11-15
+
+### Fixed
+- The hourly service check now records the reason a provider gives for a refused request (for example missing credits or a blocked key) instead of a bare HTTP status, with any key in it masked.
 
 ## [0.270.3] - 2026-11-15
 
