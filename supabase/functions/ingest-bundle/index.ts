@@ -15,6 +15,7 @@
 //         409 { error: 'duplicate' }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+import { withPosthog } from '../_shared/posthog.ts';
 
 interface IngestBody {
   channel?: string;
@@ -44,7 +45,7 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('ingest-bundle', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -183,4 +184,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
     superseded_id: row?.superseded_id ?? null,
     diff_summary: row?.diff_summary ?? null,
   });
-});
+}));

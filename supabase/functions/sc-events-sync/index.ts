@@ -23,10 +23,13 @@
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { callClaude, recordAiCall } from '../_shared/ai-ledger.ts';
+import { costUsd } from '../_shared/ai-pricing.ts';
 import {
   type Candidate, type CommLink, type EventRow, FAMILIES, PARSER_VERSION, type Unsure,
   isIsoDate, isPlausible, matchCommLinks, parseCommLink, planUpserts,
 } from './matcher.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const API = 'https://api.star-citizen.wiki/api/comm-links';
 const PAGES = 3; // 3 x 100 newest Comm-Links ≈ 4–6 months of posts
@@ -113,30 +116,40 @@ async function askAi(u: Unsure): Promise<AiVerdict | null> {
   const anthropic = Deno.env.get('ANTHROPIC_API_KEY');
   const openai = Deno.env.get('OPENAI_API_KEY');
   if (anthropic) {
-    const res = await fetchJson('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-api-key': anthropic, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({
-        model: Deno.env.get('SC_EVENTS_AI_MODEL') ?? 'claude-haiku-4-5',
-        max_tokens: 200,
-        messages: [{ role: 'user', content: aiPrompt(u) }],
-      }),
-    }, AI_TIMEOUT_MS) as { content?: Array<{ type: string; text?: string }> };
+    const res = await callClaude('sc-events-sync', anthropic, {
+      model: Deno.env.get('SC_EVENTS_AI_MODEL') ?? 'claude-haiku-4-5',
+      max_tokens: 200,
+      messages: [{ role: 'user', content: aiPrompt(u) }],
+    }, AI_TIMEOUT_MS);
     return parseVerdict(res.content?.find((c) => c.type === 'text')?.text ?? '');
   }
   const grok = Deno.env.get('GROK_API_KEY');
   if (openai || grok) {
     // xAI's API is OpenAI-compatible; GROK_API_KEY is already set for other functions.
     const endpoint = openai ? 'https://api.openai.com/v1/chat/completions' : 'https://api.x.ai/v1/chat/completions';
-    const res = await fetchJson(endpoint, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', authorization: `Bearer ${openai ?? grok}` },
-      body: JSON.stringify({
-        model: Deno.env.get('SC_EVENTS_AI_MODEL') ?? (openai ? 'gpt-4o-mini' : 'grok-3-mini'),
-        response_format: { type: 'json_object' },
-        messages: [{ role: 'user', content: aiPrompt(u) }],
-      }),
-    }, AI_TIMEOUT_MS) as { choices?: Array<{ message?: { content?: string } }> };
+    const model = Deno.env.get('SC_EVENTS_AI_MODEL') ?? (openai ? 'gpt-4o-mini' : 'grok-3-mini');
+    const provider = openai ? 'openai' : 'xai';
+    const started = Date.now();
+    let res: { choices?: Array<{ message?: { content?: string } }>; usage?: { prompt_tokens?: number; completion_tokens?: number } };
+    try {
+      res = await fetchJson(endpoint, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${openai ?? grok}` },
+        body: JSON.stringify({
+          model,
+          response_format: { type: 'json_object' },
+          messages: [{ role: 'user', content: aiPrompt(u) }],
+        }),
+      }, AI_TIMEOUT_MS) as typeof res;
+    } catch (e) {
+      await recordAiCall({ function: 'sc-events-sync', model, provider, latency_ms: Date.now() - started, ok: false, error: (e as Error).message });
+      throw e;
+    }
+    const usage = { input_tokens: res.usage?.prompt_tokens, output_tokens: res.usage?.completion_tokens };
+    await recordAiCall({
+      function: 'sc-events-sync', model, provider, input_tokens: usage.input_tokens, output_tokens: usage.output_tokens,
+      cost_usd: res.usage ? costUsd(model, usage) : undefined, latency_ms: Date.now() - started, ok: true,
+    });
     return parseVerdict(res.choices?.[0]?.message?.content ?? '');
   }
   return null;
@@ -170,7 +183,7 @@ async function resolveUnsure(unsure: Unsure[], knownIds: Set<number>): Promise<{
 
 // ------------------------------------------------------------------ handler
 
-Deno.serve(async (req) => {
+Deno.serve(withPosthog('sc-events-sync', async (req) => {
   // POST only: pg_cron posts, and a GET would let any link or <img> on the web start a run.
   if (req.method !== 'POST') return json({ error: 'method not allowed' }, 405);
   const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } });
@@ -231,4 +244,4 @@ Deno.serve(async (req) => {
   } catch (e) {
     return await finish({ status: 'failed', error: (e as Error).message.slice(0, 2000) });
   }
-});
+}, { cron: true }));

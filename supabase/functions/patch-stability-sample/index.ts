@@ -45,6 +45,7 @@ import {
   topReplyMetrics,
 } from './parsers.ts';
 import { ChannelBuild, groupChannelBuilds, newestHotfixDate, patchVersionPlan } from './channels.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const RSI_BASE = 'https://robertsspaceindustries.com';
 const SPECTRUM_LIST_URL = `${RSI_BASE}/api/spectrum/forum/channel/threads`;
@@ -458,7 +459,7 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-Deno.serve(async (req) => {
+Deno.serve(withPosthog('patch-stability-sample', async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS_HEADERS });
   if (!SUPABASE_URL || !SERVICE_KEY) return json({ ok: false, error: 'service role not configured' }, 500);
   const url = new URL(req.url);
@@ -477,4 +478,4 @@ Deno.serve(async (req) => {
     console.error('patch-stability-sample failed:', err);
     return json({ ok: false, error: String(err) }, 500);
   }
-});
+}, { cron: true }));

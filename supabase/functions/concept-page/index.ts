@@ -71,6 +71,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 import { buildShim } from './shim.ts';
 import { buildEchoBody, isReplayOf, type ConceptSubmission } from './echo.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const TICKET_TTL_SEC = 12 * 60 * 60;
 const MAX_BODY_BYTES = 1_000_000;
@@ -251,7 +252,7 @@ function mergeDraft(current: unknown, body: DraftBody): Record<string, string> {
 
 // ── handler ──────────────────────────────────────────────────────────────────
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('concept-page', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
@@ -481,4 +482,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
   }
 
   return json({ error: 'not_found' }, 404);
-});
+}));

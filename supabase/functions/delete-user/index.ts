@@ -22,6 +22,7 @@
 // function entirely cannot delete a protected account.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+import { withPosthog } from '../_shared/posthog.ts';
 
 interface DeleteBody {
   userId?: string;
@@ -40,7 +41,7 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('delete-user', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -145,4 +146,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
   }
 
   return json({ ok: true, userId, deletedSelf: userId === user.id });
-});
+}));
