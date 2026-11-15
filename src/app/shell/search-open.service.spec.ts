@@ -14,10 +14,10 @@ describe('SearchOpenService', () => {
     const s = service();
     const palette = vi.fn().mockName('palette');
     const bar = vi.fn().mockName('bar');
-    s.register('palette', palette);
+    s.register({}, palette);
     expect(s.open()).toBe(true);
     expect(palette).toHaveBeenCalledTimes(1);
-    const off = s.register('bar', bar);
+    const off = s.register({}, bar);
     expect(s.open()).toBe(true);
     expect(bar).toHaveBeenCalledTimes(1);
     expect(palette).toHaveBeenCalledTimes(1);
@@ -29,7 +29,7 @@ describe('SearchOpenService', () => {
   it('openAfterRender waits for the next render, then opens', async () => {
     const s = service();
     const bar = vi.fn().mockName('bar');
-    s.register('bar', bar);
+    s.register({}, bar);
     s.openAfterRender();
     expect(bar).not.toHaveBeenCalled();
     TestBed.inject(ApplicationRef).tick();

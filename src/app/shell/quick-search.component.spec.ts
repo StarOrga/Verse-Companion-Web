@@ -72,7 +72,7 @@ describe('QuickSearchComponent', () => {
       unregister();
     });
 
-    it('SearchOpenService (the wishes' "Wunsch suchen"): no bar → the palette opens, a bar on the page → it is activated instead', () => {
+    it('SearchOpenService (the wish action): no bar, the palette opens; a bar on the page is activated instead', () => {
       const fixture = create();
       expect(TestBed.inject(SearchOpenService).open()).toBe(true);
       fixture.detectChanges();

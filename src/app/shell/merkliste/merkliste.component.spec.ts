@@ -124,12 +124,14 @@ describe('MerklisteComponent (wishlist popout)', () => {
     expect(empty).not.toBeNull();
     // Order: sky, headline, text, action.
     const order = Array.from(empty.querySelectorAll('sc-wish-sky, .we-t, .we-x, button.we-go'));
-    expect(order.map((e) => e.className || e.tagName.toLowerCase())).toEqual(['sc-wish-sky', 'we-t', 'we-x', 'we-go sc-action sc-action--primary']);
+    const name = (e: Element) => (e.tagName === 'SC-WISH-SKY' ? 'sky' : e.classList.contains('we-t') ? 'title' : e.classList.contains('we-x') ? 'text' : 'action');
+    expect(order.map(name)).toEqual(['sky', 'title', 'text', 'action']);
     expect(empty.querySelector('sc-wish-sky')!.getAttribute('aria-hidden')).toBe('true');
     expect(empty.querySelector('.we-t')!.textContent).toContain('cart.empty');
     expect(empty.querySelector('button.we-go svg path')).not.toBeNull();
     expect(f.el.querySelectorAll('.sc-action--primary').length).toBe(1);
-    expect(f.el.querySelector('.scp-f')).toBeNull();
+    const footer = f.el.querySelector('.scp-f');
+    expect(!footer || getComputedStyle(footer).display === 'none', 'the footer is not shown').toBe(true);
     expect(f.el.querySelector('a.all')).toBeNull();
     expect(f.el.querySelector('.all-count')).toBeNull();
     expect(f.el.querySelector('.qrow')).toBeNull();

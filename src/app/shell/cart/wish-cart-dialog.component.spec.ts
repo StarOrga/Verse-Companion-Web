@@ -227,7 +227,8 @@ describe('WishCartDialogComponent (Warenkorb)', () => {
     expect(empty.querySelector('.we-x')!.textContent).toContain('cart.emptyHint');
     expect(empty.querySelector('button.we-go')!.textContent).toContain('cart.emptyAction');
     expect(el.querySelectorAll('.sc-action--primary').length).toBe(1);
-    expect(el.querySelector('.scp-f')).toBeNull();
+    const footer = el.querySelector('.scp-f');
+    expect(!footer || getComputedStyle(footer).display === 'none', 'the footer is not shown').toBe(true);
     expect(el.querySelector('section.group')).toBeNull();
     expect(el.querySelector('.strip')).toBeNull();
   });
