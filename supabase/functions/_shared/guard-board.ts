@@ -1,10 +1,13 @@
 // Board writer of the PostHog guard (service role). Applies the H5 rules: max 3 new machine items per UTC day,
 // the same external_ref = one item (repeat → system thread message), overflow → one summary item per day.
 // Imported by posthog-signal and service-health (Deno only; the decisions live in posthog-guard.ts and are tested).
+import type { SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 import { MAX_MACHINE_ITEMS_PER_DAY, buildSummaryBody, decideBoardAction, isSummaryRef, summaryRef, utcDay, type Origin } from './posthog-guard.ts';
 
+// Untyped service-role client: the generated Database types do not exist for these tables, so an explicit
+// any-schema client keeps rows typed as any instead of never (and keeps createClient() results assignable).
 // deno-lint-ignore no-explicit-any
-type Db = any;
+export type Db = SupabaseClient<any, 'public', any>;
 
 export interface MachineFinding {
   origin: Exclude<Origin, 'human'>;

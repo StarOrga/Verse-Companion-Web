@@ -12,10 +12,12 @@
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import type { Db } from '../_shared/guard-board.ts';
+import { diagR2, presignDiagLog } from '../_shared/diag-log.ts';
 import { billing, hogql, personalKey, projectId } from '../_shared/posthog-api.ts';
 import { captureServerException, withPosthog } from '../_shared/posthog.ts';
 import { fromDbHealth, parseBilling, quotaStatus, type QuotaRow } from '../_shared/posthog-guard.ts';
-import { aiCard, attentionCount, desktopCard, errorsCard, projectUrl, quotaCard, servicesCard, sortCards, usageCard, type Card, type Mover, type NewIssue } from './_cards.ts';
+import { aiCard, attentionCount, desktopCard, diagKeyOf, errorsCard, projectUrl, quotaCard, servicesCard, sortCards, usageCard, type Card, type DiagItem, type Mover, type NewIssue } from './_cards.ts';
 
 const FN = 'telemetry-overview';
 const CACHE_MS = 5 * 60_000;
@@ -29,7 +31,7 @@ const cache = new Map<string, { at: number; data: unknown }>();
 
 const hogTs = (iso: string) => iso.slice(0, 19).replace('T', ' ');
 
-async function build(db: ReturnType<typeof createClient>, userId: string): Promise<unknown> {
+async function build(db: Db, userId: string): Promise<unknown> {
   const now = new Date();
   const seen = await db.from('admin_telemetry_seen').select('seen_at').eq('user_id', userId).maybeSingle();
   const lastVisitAt: string | null = seen.data?.seen_at ?? null;
@@ -39,7 +41,7 @@ async function build(db: ReturnType<typeof createClient>, userId: string): Promi
   const pid = hasKey ? await projectId() : null;
   const base = projectUrl(pid);
 
-  const [bill, errs, daily, movers, desk] = hasKey
+  const [bill, errs, daily, movers, desk, diagRows] = hasKey
     ? await Promise.all([
         billing(),
         hogql(`select toString(properties.$exception_issue_id) i, any(toString(properties.$exception_types)) t, count() c, any(toString(properties.source)) s, any(toString(properties.$lib)) l, min(timestamp) f
@@ -50,8 +52,10 @@ async function build(db: ReturnType<typeof createClient>, userId: string): Promi
           from events where event = '$pageview' and timestamp >= now() - interval 14 day group by p order by abs(cur - prev) desc limit 3`, 'overview-movers'),
         hogql(`select toString(properties.product) p, toString(properties.app_version) v, count(distinct distinct_id) n from events
           where properties.source = 'desktop' and timestamp >= now() - interval 7 day group by p, v order by n desc limit 20`, 'overview-desktop'),
+        hogql(`select toString(properties.product) p, toString(properties.app_version) v, toString(properties.message) m, toString(properties.log_url) u from events
+          where event = 'desktop:job_diagnostics_report' and properties.log_url is not null and timestamp >= now() - interval 7 day order by timestamp desc limit 3`, 'overview-desktop-diag'),
       ])
-    : [null, null, null, null, null];
+    : [null, null, null, null, null, null];
 
   // quota
   const parsed = parseBilling(bill);
@@ -98,13 +102,25 @@ async function build(db: ReturnType<typeof createClient>, userId: string): Promi
   const mv: Mover[] = (movers ?? []).map((r) => ({ label: String(r[0]), cur: Number(r[1]), prev: Number(r[2]) }));
   const deskRows = (desk ?? []).map((r) => ({ product: String(r[0]), version: String(r[1]), installs: Number(r[2]) }));
 
+  // D2: diagnostic logs live in R2 as r2:// refs — hand the admin a presigned 24 h link inside the feedback body
+  const r2 = diagR2();
+  const diag: DiagItem[] = [];
+  for (const r of diagRows ?? []) {
+    const key = diagKeyOf(String(r[3]));
+    let logLink: string | null = null;
+    if (r2 && key) {
+      try { logLink = await presignDiagLog(r2, key, 24 * 3600); } catch { logLink = null; }
+    }
+    diag.push({ product: String(r[0]), version: String(r[1]), message: String(r[2] || 'Diagnose'), logLink });
+  }
+
   const cards = sortCards([
     quotaCard(quotas, posthogReachable, now),
     errorsCard(issues, posthogReachable, waiting.count ?? 0, base),
     servicesCard(health, base),
     usageCard(dailyCounts, mv, posthogReachable && daily != null, base),
     aiC,
-    desktopCard(deskRows, posthogReachable && desk != null, base),
+    desktopCard(deskRows, posthogReachable && desk != null, base, diag),
   ]);
   return { generatedAt: now.toISOString(), lastVisitAt, posthogReachable, attention: attentionCount(cards), cards, quotas };
 }
