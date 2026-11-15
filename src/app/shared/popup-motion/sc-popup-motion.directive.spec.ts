@@ -176,6 +176,17 @@ describe('ScPopupMotionDirective (Vektor-Aufriss)', () => {
     f.destroy();
   });
 
+  it('destroyed mid-open: the frame goes and every running effect is released', async () => {
+    const f = mount((c) => { c.showSmall.set(false); c.showDialog.set(true); });
+    await f.whenStable();
+    const el = f.nativeElement.querySelector('.dialog') as HTMLElement;
+    const running = el.getAnimations({ subtree: true });
+    expect(running.length).toBeGreaterThan(0);
+    f.destroy();
+    expect(frame()).toBeNull();
+    expect(running.every((a) => a.playState === 'idle')).toBe(true);
+  });
+
   it('C2: on close the line is nearly gone before the spark builds', () => {
     const line = POPUP_MOTION_CLOSE.line();
     const spark = POPUP_MOTION_CLOSE.spark();

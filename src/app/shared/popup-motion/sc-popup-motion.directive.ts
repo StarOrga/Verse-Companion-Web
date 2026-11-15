@@ -428,6 +428,8 @@ export class ScPopupMotionDirective implements OnInit, OnDestroy {
     if (leave) setTimeout(() => leave.disconnect(), 0);
     if (this.phase !== 'closing') {
       this.clearTimer();
+      // Destroyed mid-open: release the running effects too, not only the frame.
+      this.cancelRun();
       this.frame?.remove();
       this.frame = null;
     }
