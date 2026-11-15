@@ -186,6 +186,8 @@
       "resumed": "Resuming upload…",
       "resumeLost": "The upload cannot be resumed — the extracted data is no longer available.",
       "resumeLostHint": "Please discard the upload and run the extraction again.",
+      "restartedAfterUpdate": "An update changed the metadata extraction ({{list}}) — so the interrupted upload starts over at the extraction. Unchanged data is skipped.",
+      "restartedUnknownOrigin": "The interrupted upload was started by an older uploader version — it starts over at the extraction so no mixed data is uploaded. Unchanged data is skipped.",
       "discard": "Discard",
       "discardConfirm": {
         "title": "Discard upload?",
@@ -227,6 +229,8 @@
   },
   "update": {
     "available": "Update available: v{{version}} — downloading in background…",
+    "installRunningTitle": "Update still installing",
+    "installRunningBody": "The Data Uploader starts on its own as soon as the installation has finished.",
     "progress": "Downloading update: {{pct}}%",
     "downloaded": "Update v{{version}} is downloaded and ready to install.",
     "install": "Install now",
