@@ -18,6 +18,9 @@ import {
   readRecentSearches,
   targetUrl,
 } from './codex-search-model';
+import { FakeCall, fakeSupabase } from '../../testing/fake-supabase';
+import { AnalyticsService } from '../../core/analytics.service';
+import { MISS_DEBOUNCE_MS } from './search-signals.service';
 
 function hit(kind: PolySearchHit['kind'], slug: string, over: Partial<PolySearchHit> = {}): PolySearchHit {
   return {
@@ -131,13 +134,22 @@ describe('CodexSearchEngine', () => {
   let searchAll: Mock;
   let addedShipsMemo: Mock;
   let engine: CodexSearchEngine;
+  let calls: FakeCall[];
+  let track: Mock;
 
   beforeEach(() => {
     localStorage.removeItem(RECENT_SEARCHES_KEY);
     searchAll = vi.fn().mockName('searchAll');
     addedShipsMemo = vi.fn().mockName('addedShipsMemo').mockResolvedValue([]);
+    // Never the real client: these specs used to send search_log_miss('gladius')
+    // to the cloud project on every run — the 1292 "gladius" misses of 15.11. (B4.9).
+    const fake = fakeSupabase();
+    calls = fake.calls;
+    track = vi.fn().mockName('track');
     TestBed.configureTestingModule({
       providers: [
+        fake.provider,
+        { provide: AnalyticsService, useValue: { track } },
         CodexSearchEngine,
         provideRouter([]),
         provideTranslateService({ fallbackLang: 'en' }),
@@ -255,6 +267,28 @@ describe('CodexSearchEngine', () => {
     expect(engine.keyAction(key('Enter', { ctrlKey: true }))).toBe('open-new-tab');
     expect(engine.keyAction(key('Enter', { metaKey: true }))).toBe('open-new-tab');
     expect(engine.keyAction(key('Escape'))).toBe('escape');
+  }));
+
+  it('a zero-hit search reaches PostHog once with its text and never writes to the database (B4.8/B4.9)', fakeAsync(() => {
+    searchAll.mockResolvedValue({ hits: [], totals: {} });
+    engine.searchFor('  Gladius ');
+    tick();
+    tick(MISS_DEBOUNCE_MS);
+    engine.searchFor('gladius');
+    tick();
+    tick(MISS_DEBOUNCE_MS);
+    const misses = track.mock.calls.filter(([name]) => name === 'search:miss_show');
+    expect(misses).toEqual([['search:miss_show', { area: 'all', term: 'gladius' }]]);
+    expect(calls.some((c) => c.op === 'rpc' && c.target === 'search_log_miss')).toBe(false);
+  }));
+
+  it('caps the reported search text at 80 characters', fakeAsync(() => {
+    searchAll.mockResolvedValue({ hits: [], totals: {} });
+    engine.searchFor('x'.repeat(200));
+    tick();
+    tick(MISS_DEBOUNCE_MS);
+    const miss = track.mock.calls.find(([name]) => name === 'search:miss_show');
+    expect((miss?.[1] as { term: string }).term.length).toBe(80);
   }));
 
   it('Enter before the debounce fired runs the search instead of opening anything', fakeAsync(() => {

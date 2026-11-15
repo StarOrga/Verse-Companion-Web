@@ -18,6 +18,11 @@ Every event carries `app_version` / `release`; production source maps are upload
 
 **Never sent:** e-mail, name, user id in clear, IP-derived data on server/desktop events, free text typed by a user,
 search terms, prompts or model output, tokens/secrets, URLs with query strings, log content (only the R2 reference).
+**One exception:** `search:miss_show` carries the text of a zero-hit search (`term`, trimmed/lower-cased, max 80
+chars, once per term and session, consent-gated) — it replaced the DB counter `search_misses` and the admin card
+"Häufig ohne Treffer" (dropped in `20261115213000_drop_search_misses.sql`); read it in the tile "Suchen ohne Treffer"
+on "Wird es genutzt?". The old counter's 1292 × "gladius" (2026-11-15) came from unit tests hitting the cloud project,
+not from readers — specs that reach search code must provide `fakeSupabase()`.
 
 ## Naming
 

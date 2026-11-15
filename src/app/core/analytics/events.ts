@@ -90,7 +90,7 @@ export const EVENTS = {
   // --- search ------------------------------------------------------------
   'search:palette_open': ev<{ surface: 'palette' | 'codex_bar' }>('search', 'Die Suche wurde geöffnet (Palette oder Codex-Leiste).'),
   'search:result_open': ev<{ area: string; rank: number; new_tab: boolean }>('search', 'Ein Suchtreffer wurde geöffnet (Bereich, Rang in der Liste; nie der Suchtext).'),
-  'search:miss_show': ev<{ area: string }>('search', 'Eine Suche blieb ohne Treffer (Bereich; nie der Suchtext).'),
+  'search:miss_show': ev<{ area: string; term: string }>('search', 'Eine Suche blieb ohne Treffer: Bereich und Suchtext (getrimmt, klein, max. 80 Zeichen; einmal je Begriff und Sitzung) — die einzige Stelle, an der ein Suchtext gesendet wird.'),
 
   // --- settings ----------------------------------------------------------
   'settings:username_update': ev('settings', 'Der Benutzername wurde gespeichert.'),
