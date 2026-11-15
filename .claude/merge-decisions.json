@@ -394,6 +394,16 @@
         "hunks": [
           "001c225b3d56"
         ]
+      },
+      {
+        "ship": "claude/posthog-integration-telemetry-c2e543",
+        "by": "JerryT2T",
+        "value": "0.268.0 (supersedes 0.267.1; both entries kept in CHANGELOG)",
+        "decided": true,
+        "at": "2026-11-15T04:26:31.419Z",
+        "hunks": [
+          "6282ff402f2b"
+        ]
       }
     ],
     "public/release-notes.json›root›current": [
