@@ -95,6 +95,22 @@ test('billing parser maps products and tolerates junk', () => {
   assert.equal(parseBilling({}), null);
 });
 
+test('billing parser reads the live free-plan shape (llm_analytics, usage_limit = free allocation)', () => {
+  // Shape as GET /api/billing/ returned it for project 226518 on 2026-11-15.
+  const r = parseBilling({
+    billing_period: { current_period_start: '2026-11-14T15:20:36.128Z', current_period_end: '2026-12-14T15:20:36.128Z', interval: 'month' },
+    products: [
+      { type: 'product_analytics', current_usage: 81, free_allocation: 1000000, usage_limit: 1000000 },
+      { type: 'session_replay', current_usage: 0, free_allocation: 5000, usage_limit: 5000 },
+      { type: 'feature_flags', current_usage: 0, free_allocation: 1000000, usage_limit: 1000000 },
+      { type: 'error_tracking', current_usage: 2, free_allocation: 100000, usage_limit: 100000 },
+      { type: 'llm_analytics', current_usage: 0, free_allocation: 100000, usage_limit: 100000 },
+      { type: 'logs_retention_custom', current_usage: 0, free_allocation: 0, usage_limit: null },
+    ],
+  });
+  assert.deepEqual(r!.rows.map((x) => x.product).sort(), ['events', 'exceptions', 'flags', 'llm', 'replay']);
+});
+
 test('service level per d-thresh', () => {
   const ok = { consecutiveFailures: 0, errorRate: 0, lastOkAt: NOW.toISOString(), lastCheckAt: NOW.toISOString(), expectedEverySec: 3600, now: NOW };
   assert.equal(serviceLevel(ok), 'ok');

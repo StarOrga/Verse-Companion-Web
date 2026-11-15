@@ -113,7 +113,8 @@ const BILLING_TYPE: Record<string, QuotaProduct> = {
   product_analytics: 'events',
   error_tracking: 'exceptions',
   session_replay: 'replay',
-  llm_observability: 'llm',
+  llm_analytics: 'llm',
+  llm_observability: 'llm', // older name of llm_analytics
   feature_flags: 'flags',
 };
 
