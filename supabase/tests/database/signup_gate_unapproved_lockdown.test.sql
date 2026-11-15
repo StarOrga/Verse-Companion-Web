@@ -13,7 +13,7 @@
 --   list_users_for_admin()            returns is_approved.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(24);
+select plan(30);
 
 -- Fixture -------------------------------------------------------------------
 insert into public.allowed_emails (email, role) values ('PgTap-Invited@example.test', 'collaborator');
@@ -30,17 +30,34 @@ update public.profiles set is_approved = true where id = '00000000-0000-4000-a00
 update public.profiles set role = 'admin', is_approved = true where id = '00000000-0000-4000-a000-00000000f004';
 
 -- 1. The hook ---------------------------------------------------------------
+-- Allowlisted is necessary, not sufficient: the path must prove the mailbox.
 select is(
-  public.hook_before_user_created('{"user":{"email":"pgtap-stranger@example.test"}}') -> 'error' ->> 'message',
-  'signup_not_allowed', 'a stranger''s sign-up is rejected');
+  public.hook_before_user_created('{"user":{"email":"pgtap-stranger@example.test","app_metadata":{"provider":"google"},"user_metadata":{"email_verified":true}}}') -> 'error' ->> 'message',
+  'signup_not_allowed', 'a stranger''s verified Google sign-up is rejected');
 select is(
-  (public.hook_before_user_created('{"user":{"email":"pgtap-stranger@example.test"}}') -> 'error' ->> 'http_code')::int,
+  (public.hook_before_user_created('{"user":{"email":"pgtap-stranger@example.test","app_metadata":{"provider":"google"},"user_metadata":{"email_verified":true}}}') -> 'error' ->> 'http_code')::int,
   403, 'the rejection is a 403');
 select is(
-  public.hook_before_user_created('{"user":{"email":"pgtap-invited@EXAMPLE.test"}}'),
-  '{}'::jsonb, 'an allowlisted address passes, whatever its case');
+  public.hook_before_user_created('{"user":{"email":"pgtap-invited@EXAMPLE.test","app_metadata":{"provider":"google"},"user_metadata":{"email_verified":true}}}'),
+  '{}'::jsonb, 'an allowlisted address passes through Google, whatever its case');
+select ok(public.hook_before_user_created('{"user":{"email":"pgtap-invited@example.test","app_metadata":{"provider":"google"},"user_metadata":{"email_verified":false}}}') ? 'error',
+  'Google reporting an unverified address is rejected');
+select ok(public.hook_before_user_created('{"user":{"email":"pgtap-invited@example.test","app_metadata":{"provider":"discord"}}}') ? 'error',
+  'another provider without a verified address is rejected');
+select is(
+  public.hook_before_user_created('{"user":{"email":"pgtap-invited@example.test","app_metadata":{"provider":"discord"},"user_metadata":{"email_verified":true}}}'),
+  '{}'::jsonb, 'another provider with a verified address passes');
+select ok(public.hook_before_user_created('{"user":{"email":"pgtap-invited@example.test","app_metadata":{"provider":"email"}}}') ? 'error',
+  'a password sign-up for an allowlisted address is rejected while no invite is in flight');
+update public.allowed_emails set invite_started_at = now() - interval '11 minutes' where email = 'pgtap-invited@example.test';
+select ok(public.hook_before_user_created('{"user":{"email":"pgtap-invited@example.test","app_metadata":{"provider":"email"}}}') ? 'error',
+  '... and when the invite stamp is older than ten minutes');
+update public.allowed_emails set invite_started_at = now() where email = 'pgtap-invited@example.test';
+select is(
+  public.hook_before_user_created('{"user":{"email":"pgtap-invited@example.test","app_metadata":{"provider":"email"}}}'),
+  '{}'::jsonb, 'an e-mail account passes while an admin invite is in flight');
+select ok(public.hook_before_user_created('{"user":{"email":"pgtap-invited@example.test"}}') ? 'error', 'a sign-up without a provider is rejected');
 select ok(public.hook_before_user_created('{"user":{"email":""}}') ? 'error', 'an empty e-mail is rejected');
-select ok(public.hook_before_user_created('{"user":{"phone":"+490000"}}') ? 'error', 'a sign-up without e-mail is rejected');
 select ok(public.hook_before_user_created('{}') ? 'error', 'an empty event is rejected');
 
 select ok(not has_function_privilege('anon', 'public.hook_before_user_created(jsonb)', 'execute'),
@@ -84,7 +101,7 @@ select set_config('request.jwt.claims',
   '{"sub":"00000000-0000-4000-a000-00000000f001","role":"authenticated"}', true);
 
 select throws_ok($$
-  insert into public.verse_seen (user_id) values ('00000000-0000-4000-a000-00000000f001')
+  insert into public.verse_seen (user_id, item_key) values ('00000000-0000-4000-a000-00000000f001', 'pgtap')
 $$, '42501', null, 'an unapproved account cannot write a self-scoped table (approved gate)');
 
 select throws_ok($$

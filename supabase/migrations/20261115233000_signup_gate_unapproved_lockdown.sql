@@ -19,7 +19,10 @@
 --
 --   1. hook_before_user_created(jsonb)  the Supabase Auth "before user
 --        created" hook: no account is created unless the e-mail is on
---        allowed_emails (or is the bootstrap founder of an empty database).
+--        allowed_emails AND comes through a path that proves the mailbox
+--        (verified OAuth, or an admin invite in flight:
+--        allowed_emails.invite_started_at), or is the bootstrap founder of
+--        an empty database.
 --        ENABLING it is project auth config, not SQL (Management API /
 --        dashboard: hook_before_user_created_enabled + _uri
 --        pg-functions://postgres/public/hook_before_user_created). Until it is
@@ -63,6 +66,27 @@
 --
 -- search_path is empty, so the citext `=` operator (schema public) is out of
 -- reach: compare lower(text) explicitly instead of relying on it.
+--
+-- Being on the allowlist is not enough: the account must also come from
+-- somebody who has shown they own the mailbox (red-team review 2026-11-15).
+-- Otherwise anyone who knows an allowlisted, not-yet-joined address could
+-- create the account with a password of their own; handle_new_user() approves
+-- it at the allowlisted role, and the real owner only has to click the
+-- confirmation mail they were expecting.
+--   google           trusted unless the provider says email_verified = false
+--   other OAuth      only with email_verified = true (Discord can report an
+--                    unverified address)
+--   email            only while an admin invite for that address is in flight
+--                    (invite-user stamps allowed_emails.invite_started_at just
+--                    before inviteUserByEmail). The login page offers no
+--                    password sign-up, so nothing reachable is lost; a direct
+--                    POST /auth/v1/signup is what this closes.
+alter table public.allowed_emails add column if not exists invite_started_at timestamptz;
+
+comment on column public.allowed_emails.invite_started_at is
+  'Stamped by the invite-user edge function right before it sends an invite mail. '
+  'hook_before_user_created() lets an e-mail (password / invite) account be created only within 10 minutes of it.';
+
 create or replace function public.hook_before_user_created(event jsonb)
 returns jsonb
 language plpgsql
@@ -71,11 +95,26 @@ security definer
 set search_path = ''
 as $$
 declare
-  v_email text := lower(nullif(btrim(coalesce(event -> 'user' ->> 'email', '')), ''));
+  v_email    text := lower(nullif(btrim(coalesce(event -> 'user' ->> 'email', '')), ''));
+  v_provider text := lower(coalesce(event -> 'user' -> 'app_metadata' ->> 'provider', ''));
+  v_verified text := lower(coalesce(event -> 'user' -> 'user_metadata' ->> 'email_verified', ''));
+  v_invite   timestamptz;
+  v_listed   boolean := false;
 begin
   if v_email is not null then
-    if exists (select 1 from public.allowed_emails a where lower(a.email::text) = v_email) then
-      return '{}'::jsonb;
+    select true, a.invite_started_at into v_listed, v_invite
+      from public.allowed_emails a
+     where lower(a.email::text) = v_email
+     limit 1;
+
+    if coalesce(v_listed, false) then
+      if v_provider = 'google' and v_verified <> 'false' then
+        return '{}'::jsonb;
+      elsif v_provider = 'email' and v_invite is not null and v_invite > now() - interval '10 minutes' then
+        return '{}'::jsonb;
+      elsif v_provider not in ('google', 'email', '') and v_verified = 'true' then
+        return '{}'::jsonb;
+      end if;
     end if;
 
     -- Bootstrap: the founder of a database that has no admin yet (a fresh

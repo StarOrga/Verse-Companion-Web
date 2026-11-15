@@ -1824,7 +1824,9 @@ export class AdminComponent implements OnInit {
     this.busy.set(true);
     this.approveMsg.set(null);
     const { data, error } = await this.sb.client.functions.invoke('invite-user', {
-      body: { email: u.email, role: u.role, sendInvite: false },
+      // Always as viewer: an unapproved row's role column was never a decision
+      // anybody made for an approved account. A higher role is a second, explicit step.
+      body: { email: u.email, role: 'viewer', sendInvite: false },
     });
     const payload = (data ?? {}) as RegisterResponse;
     if (error || payload.error || payload.status !== 'approved_existing') {

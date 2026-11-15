@@ -177,8 +177,15 @@ data). Three layers now, outermost first:
 1. **No account without an allowlist row.** Supabase Auth calls
    `public.hook_before_user_created(event jsonb)` before it creates an account
    (OAuth, e-mail sign-up, invite alike). It allows only an address on
-   `allowed_emails` (compared in lower case) or the bootstrap founder of a
-   database without an admin, and otherwise answers
+   `allowed_emails` (compared in lower case) that also arrives through a path
+   proving the mailbox — Google unless it reports `email_verified = false`,
+   any other OAuth provider only with `email_verified = true`, an e-mail
+   (password / invite) account only within 10 minutes of
+   `allowed_emails.invite_started_at`, which `invite-user` stamps right before
+   `inviteUserByEmail` — or the bootstrap founder of a database without an
+   admin. Without the path rule anybody who knew an allowlisted, not-yet-joined
+   address could `POST /auth/v1/signup` with their own password and be approved
+   at its role once the real owner clicked the confirmation mail. Otherwise it answers
    `{ error: { http_code: 403, message: 'signup_not_allowed' } }`. EXECUTE is
    for `supabase_auth_admin` only — callable by a client it would be an "is
    this address invited?" oracle. **The hook is switched on in the project's
@@ -218,12 +225,11 @@ an account-takeover path through a crafted sign-in link. Until 2026-11-15 the
 list held both. Preview deployments therefore return an OAuth sign-in to the
 production site.
 
-Known residual: Discord can report an unverified e-mail. Supabase then creates
-the account unconfirmed and mails a confirmation to that address; if the real
-owner of an allowlisted, not-yet-joined address confirms a sign-up somebody
-else started, that somebody is in. Only relevant between "allowlisted" and
-"first sign-in"; closing it means allowing new accounts through Google and
-invite mails only.
+Not verified live (it would need a fresh Google account or a real invite
+mail): that the hook's event carries `app_metadata.provider` and
+`user_metadata.email_verified` exactly as the Supabase docs sample shows. If a
+legitimate, allowlisted person is refused with `signup_not_allowed`, look
+there first; an invite mail is the way in meanwhile.
 
 ## Protected admin accounts (`protected_admins`)
 

@@ -3900,7 +3900,7 @@
       "unapprovedTip": "Dieses Konto hat sich selbst registriert, wurde nie freigeschaltet und hat keinen Zugriff auf die App.",
       "approve": "Freischalten",
       "approveTitle": "Konto freischalten?",
-      "approveConfirm": "{{email}} freischalten? Das Konto bekommt mit seiner aktuellen Rolle Zugriff auf die App.",
+      "approveConfirm": "{{email}} freischalten? Das Konto bekommt als Betrachter Zugriff auf die App; eine höhere Rolle vergibst du danach.",
       "unapprovedOne": "{{n}} Konto ohne Freigabe",
       "unapprovedMany": "{{n}} Konten ohne Freigabe",
       "title": "Personen",

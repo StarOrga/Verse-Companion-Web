@@ -3900,7 +3900,7 @@
       "unapprovedTip": "This account signed up on its own, was never approved and has no access to the app.",
       "approve": "Approve",
       "approveTitle": "Approve account?",
-      "approveConfirm": "Approve {{email}}? The account gets access to the app with its current role.",
+      "approveConfirm": "Approve {{email}}? The account gets access to the app as a viewer; assign a higher role afterwards.",
       "unapprovedOne": "{{n}} account not approved",
       "unapprovedMany": "{{n}} accounts not approved",
       "title": "People",
