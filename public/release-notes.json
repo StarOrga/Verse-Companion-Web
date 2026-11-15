@@ -1,9 +1,9 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.271.3",
+  "current": "0.271.4",
   "releases": [
     {
-      "version": "0.271.3",
+      "version": "0.271.4",
       "date": "2026-11-16",
       "sections": [
         {
@@ -13,6 +13,48 @@
             {
               "title": "",
               "text": "Admin event datasheets: confidence now follows who states a value: RSI comm-links, RSI pages and Spectrum posts by CIG staff (now read) give 85–95 % and publish directly, the wiki and the previous edition stay in review. Rewards are captured in full (mode rewards, entry gifts, contest prizes; for unannounced editions the previous year's as a suggestion), and prerequisites read \"None\" when nothing was found (#364)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.271.3",
+      "date": "2026-11-16",
+      "sections": [
+        {
+          "category": "Security",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Sign-up gate: an account is only created for an invited address, through a verified Google / OAuth sign-in or an admin invite. A direct sign-in no longer leaves an unapproved account behind."
+            },
+            {
+              "title": "",
+              "text": "Unapproved and suspended accounts count as viewers for every role check and can no longer write to their own rows, the star-map game tables or their profile name."
+            },
+            {
+              "title": "",
+              "text": "AI functions and the translation overlay require an approved account; deleting an account removes its invitation."
+            },
+            {
+              "title": "",
+              "text": "Login redirects are limited to the production site (a wildcard and two retired hosts were allowed before)."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Admin people list marks accounts that were never approved and approves them with one click."
+            },
+            {
+              "title": "",
+              "text": "The login page explains a rejected sign-up and points to the access request."
             }
           ]
         }
