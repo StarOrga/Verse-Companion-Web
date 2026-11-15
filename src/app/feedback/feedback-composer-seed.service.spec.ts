@@ -34,4 +34,18 @@ describe('FeedbackComposerSeedService', () => {
     svc.requestOpen();
     expect(svc.openRequests()).toBe(2);
   });
+
+  it('parks one requested topic, counts it as a panel request and hands it out once', () => {
+    expect(svc.panelRequests()).toBe(0);
+    svc.requestTopic('abc');
+    expect(svc.panelRequests()).toBe(1);
+    expect(svc.openRequests()).toBe(0);
+    expect(svc.takeTopic()).toBe('abc');
+    expect(svc.takeTopic()).toBeNull();
+  });
+
+  it('counts created topics', () => {
+    svc.noteCreated();
+    expect(svc.created()).toBe(1);
+  });
 });

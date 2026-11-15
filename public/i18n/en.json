@@ -4886,6 +4886,7 @@
       "desktop": "Desktop"
     },
     "toFeedback": "Turn into feedback",
+    "openFeedback": "Open feedback topic",
     "quotaFeedback": "Saving proposal as feedback",
     "upgrade": "Plan in PostHog ↗",
     "boardWaitingOne": "{{n}} board item waits for an answer",
