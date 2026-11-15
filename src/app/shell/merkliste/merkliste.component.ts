@@ -6,6 +6,7 @@ import { hqNachschubPickLink } from '../../hq/hq-routes';
 import { NACHSCHUB_ICON_PATHS } from '../../hq/nachschub/step-icons';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
+import { ScQtyStepperComponent } from '../../shared/qty-stepper/qty-stepper.component';
 import { SilThumbComponent } from '../../shared/sil-thumb/sil-thumb.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { ScPopupMotionDirective } from '../../shared/popup-motion/sc-popup-motion.directive';
@@ -21,8 +22,6 @@ export const WISH_PANEL_SHOWN = 7;
 /** The wishlist trigger icon: a heart. */
 const WISH_ICON = ['M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.4a4.2 4.2 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20z'] as const;
 const TRASH = ['M4.5 7h15M10 7V4.5h4V7M6.5 7l1 13h9l1-13M10 11v5.5M14 11v5.5'] as const;
-const PLUS = ['M12 5v14M5 12h14'] as const;
-const MINUS = ['M5 12h14'] as const;
 
 /** One row of the wishlist panel: the position (quantity, removal, Nachschub) and how it is drawn. */
 interface WishLine {
@@ -41,7 +40,7 @@ interface WishLine {
 @Component({
   selector: 'sc-merkliste',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective, ScPopupMotionDirective, SilThumbComponent],
+  imports: [RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective, ScPopupMotionDirective, SilThumbComponent, ScQtyStepperComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mk">
@@ -62,15 +61,9 @@ interface WishLine {
                 <span class="rimg"><sc-sil-thumb [kind]="l.row.kind ?? l.row.type" [className]="l.row.className ?? l.row.id" /></span>
                 <span class="rt"><b>{{ l.row.title }}</b>@if (sub(l.row); as s) { <small>{{ s | translate }}</small> }</span>
               </a>
-              <span class="step" role="group" [attr.aria-label]="'cart.qtyOf' | translate: { name: l.row.title }">
-                <button type="button" [disabled]="l.item.qty <= 1" [attr.aria-label]="'cart.less' | translate" [scTooltip]="'cart.less' | translate" scTooltipTier="label" (click)="bump(l.item, -1)">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="minus[0]" /></svg>
-                </button>
-                <b>{{ l.item.qty }}</b>
-                <button type="button" [disabled]="l.item.qty >= 999" [attr.aria-label]="'cart.more' | translate" [scTooltip]="'cart.more' | translate" scTooltipTier="label" (click)="bump(l.item, 1)">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="plus[0]" /></svg>
-                </button>
-              </span>
+              <sc-qty-stepper class="step" [value]="l.item.qty" [groupLabel]="'cart.qtyOf' | translate: { name: l.row.title }"
+                              [lessLabel]="'cart.less' | translate" [moreLabel]="'cart.more' | translate"
+                              (valueChange)="bump(l.item, $event - l.item.qty)" />
               <a scAction tier="tertiary" class="move" [routerLink]="['/hq']" [fragment]="'planen'" [queryParams]="pickParams(l.item)"
                  [attr.aria-label]="'quick.toNachschub' | translate: { name: l.row.title }" [scTooltip]="'quick.toNachschub' | translate: { name: l.row.title }" scTooltipTier="label"
                  (click)="onOpen($event)">
@@ -119,19 +112,11 @@ interface WishLine {
       .open:hover .rt b { color: var(--sc-accent); }
       .rt small { font-size: max(0.72rem, var(--sc-fs-floor, 0.75rem)); color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       /* Stepper (not an action): same look as the cart dialog's. */
-      .step { display: inline-flex; align-items: center; border: 1px solid var(--sc-border); border-radius: 999px; overflow: hidden; }
-      .step button { display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; background: transparent; color: var(--sc-fg-1); cursor: pointer; }
-      .step button:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); }
-      .step button:disabled { opacity: 0.4; cursor: default; }
-      .step button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
-      .step svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-      .step b { min-width: 2ch; text-align: center; font-variant-numeric: tabular-nums; font-size: 0.85rem; font-weight: 600; color: var(--sc-fg-0); }
       .empty { margin: 8px 4px; color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor, 0.75rem)); }
       /* Touch floor of the gate: 48 px (a 44 px value measures 43), by pointer, not by width, so tablets pass too. */
       @media (pointer: coarse), (max-width: 749px) {
         .trigger { width: 48px; height: 48px; }
         .qrow { grid-template-columns: minmax(0, 1fr) auto 48px 48px; min-height: 56px; }
-        .step button { width: 48px; height: 48px; }
       }
     `,
   ],
@@ -145,8 +130,6 @@ export class MerklisteComponent {
   protected readonly panelId = 'sc-merkliste-panel';
   protected readonly icon = WISH_ICON;
   protected readonly trash = TRASH;
-  protected readonly plus = PLUS;
-  protected readonly minus = MINUS;
   protected readonly nachschub = NACHSCHUB_ICON_PATHS;
   protected readonly open = signal(false);
 

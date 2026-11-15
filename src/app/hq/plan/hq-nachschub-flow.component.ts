@@ -11,6 +11,8 @@ import type { StepKind } from '../../shared/step/sc-step.component';
 import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScSelectComponent, type ScSelectOption } from '../../shared/sc-select.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { ScQtyStepperComponent } from '../../shared/qty-stepper/qty-stepper.component';
+import { ScSegmentedComponent, type ScSegmentOption } from '../../shared/segmented-control.component';
 import { ScTristateComponent } from '../../shared/tristate/sc-tristate.component';
 import { EventHqService } from '../events/event-hq.service';
 import { HqEventEndComponent } from '../events/hq-event-end.component';
@@ -86,7 +88,7 @@ type Step = 1 | 2;
 @Component({
   selector: 'sc-hq-nachschub-flow',
   standalone: true,
-  imports: [NgTemplateOutlet, TranslatePipe, FormsModule, RouterLink, ScActionDirective, ScPopupComponent, HqEventEndComponent, HqWishSearchComponent, ScSelectComponent, ScTooltipDirective, ScTristateComponent, HqNachschubSellFormComponent],
+  imports: [NgTemplateOutlet, TranslatePipe, FormsModule, RouterLink, ScActionDirective, ScPopupComponent, HqEventEndComponent, HqWishSearchComponent, ScSelectComponent, ScTooltipDirective, ScTristateComponent, HqNachschubSellFormComponent, ScQtyStepperComponent, ScSegmentedComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- A click beside the sheet does not close it (the picks would be lost): the X, Abbrechen or Escape do. -->
@@ -110,10 +112,8 @@ type Step = 1 | 2;
           </div>
 
           @if (mode() === 'new') {
-            <div class="seg kind" role="group" [attr.aria-label]="'hq.nachschub.sellForm.kindAria' | translate">
-              <button type="button" [attr.aria-pressed]="kind() === 'wish'" (click)="kind.set('wish')">{{ 'hq.nachschub.sellForm.wish' | translate }}</button>
-              <button type="button" [attr.aria-pressed]="kind() === 'sell'" (click)="kind.set('sell')">{{ 'hq.nachschub.sellForm.sell' | translate }}</button>
-            </div>
+            <sc-segmented class="seg kind compact" [options]="kindOptions" [value]="kind()" [ariaLabel]="'hq.nachschub.sellForm.kindAria' | translate"
+                          (valueChange)="kind.set($any($event))" />
           }
 
           @if (kind() === 'sell' && mode() === 'new') {
@@ -195,11 +195,10 @@ type Step = 1 | 2;
                             <sc-tristate variant="checkbox" [label]="r.name || r.className" [value]="q >= r.qty ? 1 : q > 0 ? 0.5 : 0" (toggled)="onRow(g, r, q)" />
                             <span class="nm">{{ rowName(r) }}</span>
                             @if (q > 0) {
-                              <span class="stepper" role="group" [attr.aria-label]="'hq.flow.qtyOf' | translate: { name: rowName(r) }">
-                                <button type="button" class="step" [disabled]="q <= 1" [attr.aria-label]="'hq.flow.less' | translate" [scTooltip]="'hq.flow.less' | translate" scTooltipTier="label" (click)="onQty(g, r, q - 1)">−</button>
-                                <b class="n mono">{{ q }}<small> / {{ r.qty }}</small></b>
-                                <button type="button" class="step" [disabled]="q >= r.qty" [attr.aria-label]="'hq.flow.more' | translate" [scTooltip]="'hq.flow.more' | translate" scTooltipTier="label" (click)="onQty(g, r, q + 1)">+</button>
-                              </span>
+                              <sc-qty-stepper class="stepper" [value]="q" [max]="r.qty" [groupLabel]="'hq.flow.qtyOf' | translate: { name: rowName(r) }"
+                                              [lessLabel]="'hq.flow.less' | translate" [moreLabel]="'hq.flow.more' | translate" (valueChange)="onQty(g, r, $event)">
+                                <span class="n mono">{{ q }}<small> / {{ r.qty }}</small></span>
+                              </sc-qty-stepper>
                               <span class="share" aria-hidden="true"><i [style.width.%]="(100 * q) / r.qty"></i></span>
                             } @else {
                               <b class="n mono">×{{ r.qty }}</b>
@@ -246,15 +245,12 @@ type Step = 1 | 2;
                             @if (isExcluded(l)) {
                               <ng-container *ngTemplateOutlet="restore; context: { $implicit: l }" />
                             } @else {
-                              <span class="seg" role="group" [attr.aria-label]="'hq.flow.methodOf' | translate: { name: l.name }">
-                                <button type="button" [attr.aria-pressed]="sp.buy === l.qty" (click)="split(l, l.qty)">{{ 'hq.step.kind.buy' | translate }}</button>
-                                <button type="button" [attr.aria-pressed]="sp.mine === l.qty" (click)="split(l, 0)">{{ 'hq.step.kind.mine' | translate }}</button>
-                              </span>
-                              <span class="stepper" role="group" [attr.aria-label]="'hq.flow.splitOf' | translate: { name: l.name }">
-                                <button type="button" class="step" [disabled]="sp.buy <= 0" [attr.aria-label]="'hq.flow.lessBuy' | translate" [scTooltip]="'hq.flow.lessBuy' | translate" scTooltipTier="label" (click)="split(l, sp.buy - 1)">−</button>
-                                <b class="n mono">{{ sp.buy }}<small> / {{ sp.mine }}</small></b>
-                                <button type="button" class="step" [disabled]="sp.buy >= l.qty" [attr.aria-label]="'hq.flow.moreBuy' | translate" [scTooltip]="'hq.flow.moreBuy' | translate" scTooltipTier="label" (click)="split(l, sp.buy + 1)">+</button>
-                              </span>
+                              <sc-segmented class="seg compact" [options]="wayOptions" [value]="sp.buy === l.qty ? 'buy' : sp.mine === l.qty ? 'mine' : null"
+                                            [ariaLabel]="'hq.flow.methodOf' | translate: { name: l.name }" (valueChange)="split(l, $event === 'buy' ? l.qty : 0)" />
+                              <sc-qty-stepper class="stepper" [value]="sp.buy" [min]="0" [max]="l.qty" [groupLabel]="'hq.flow.splitOf' | translate: { name: l.name }"
+                                              [lessLabel]="'hq.flow.lessBuy' | translate" [moreLabel]="'hq.flow.moreBuy' | translate" (valueChange)="split(l, $event)">
+                                <span class="n mono">{{ sp.buy }}<small> / {{ sp.mine }}</small></span>
+                              </sc-qty-stepper>
                               <ng-container *ngTemplateOutlet="wayOut; context: { $implicit: l }" />
                               <ng-container *ngTemplateOutlet="leave; context: { $implicit: l }" />
                             }
@@ -276,11 +272,8 @@ type Step = 1 | 2;
                             } @else {
                               @let modes = modesOf(l);
                               @if (modes.length) {
-                                <span class="seg" role="group" [attr.aria-label]="'hq.flow.modeOf' | translate: { name: l.name }">
-                                  @for (m of modes; track m) {
-                                    <button type="button" [attr.aria-pressed]="modeNow(l) === m" (click)="setMode(l, m)">{{ 'hq.step.kind.' + m | translate }}</button>
-                                  }
-                                </span>
+                                <sc-segmented class="seg compact" [options]="modeOptions(modes)" [value]="modeNow(l)"
+                                              [ariaLabel]="'hq.flow.modeOf' | translate: { name: l.name }" (valueChange)="setMode(l, $any($event))" />
                               }
                               <ng-container *ngTemplateOutlet="wayOut; context: { $implicit: l }" />
                               <ng-container *ngTemplateOutlet="leave; context: { $implicit: l }" />
@@ -426,11 +419,6 @@ type Step = 1 | 2;
       .nm { flex: 1; min-width: 0; overflow-wrap: anywhere; }
       .n { color: var(--sc-fg-1); white-space: nowrap; }
       .n small { color: var(--sc-fg-2); font-size: 0.75rem; }
-      .stepper { display: inline-flex; align-items: center; gap: 4px; }
-      .step { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-1); color: var(--sc-fg); font: inherit; cursor: pointer; }
-      .step:hover:not(:disabled) { border-color: var(--sc-accent); }
-      .step:disabled { opacity: 0.4; cursor: default; }
-      .step:focus-visible, .seg button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .share { position: absolute; left: 8px; right: 8px; bottom: 1px; height: 2px; border-radius: 2px; background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
       .share i { display: block; height: 100%; border-radius: inherit; background: var(--sc-accent); }
       .name-field { display: grid; gap: 4px; max-width: 460px; flex: none; }
@@ -458,9 +446,6 @@ type Step = 1 | 2;
       .mats { border: 1px solid var(--sc-border); border-radius: 12px; background: var(--sc-bg-0); padding: var(--sc-space-3, 12px); }
       .mats h4, .have { margin: 0 0 6px; color: var(--sc-fg-2); font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; }
       .mats li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 6px 0; border-bottom: 1px solid color-mix(in srgb, var(--sc-border) 60%, transparent); }
-      .seg { display: inline-flex; padding: 2px; border: 1px solid var(--sc-border); border-radius: 999px; }
-      .seg button { min-height: 26px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: var(--sc-fg-2); font: inherit; font-size: 0.78rem; cursor: pointer; }
-      .seg button[aria-pressed='true'] { color: var(--sc-fg); background: color-mix(in srgb, var(--sc-accent) 22%, transparent); box-shadow: 0 0 0 1px var(--sc-accent); }
       .hint { margin: 6px 0 0; color: var(--sc-fg-2); font-size: 0.78rem; }
       .cards { display: grid; gap: var(--sc-space-2, 8px); }
       .ecard { padding: 8px 12px; border: 1px solid color-mix(in srgb, var(--sc-accent) 22%, var(--sc-border)); border-radius: 10px; background: var(--sc-bg-0); }
@@ -485,7 +470,6 @@ type Step = 1 | 2;
       .cmark { flex: none; width: 1em; text-align: center; font-weight: 700; }
       .mats .for { margin-left: 6px; color: var(--sc-fg-2); font-size: 0.75rem; }
       button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-      @media (pointer: coarse) { .step { width: 44px; height: 44px; } .seg button { min-height: 44px; } }
     `,
   ],
 })
@@ -794,6 +778,28 @@ export class HqNachschubFlowComponent {
 
   protected split(l: ProposalLine, buy: number): void {
     this.splits.update((m) => new Map(m).set(l.key, setBuyPart(l, buy)));
+  }
+
+  /** Wunsch / Verkauf of a new Nachschub. */
+  protected readonly kindOptions: readonly ScSegmentOption[] = [
+    { value: 'wish', labelKey: 'hq.nachschub.sellForm.wish' },
+    { value: 'sell', labelKey: 'hq.nachschub.sellForm.sell' },
+  ];
+  /** Kaufen / Abbauen of a material line (sc-segmented, popup-aufbau polish #26). */
+  protected readonly wayOptions: readonly ScSegmentOption[] = [
+    { value: 'buy', labelKey: 'hq.step.kind.buy' },
+    { value: 'mine', labelKey: 'hq.step.kind.mine' },
+  ];
+  private readonly modeOptionCache = new Map<string, readonly ScSegmentOption[]>();
+  /** One stable options array per mode set, so the OnPush control is not fed a new array every pass. */
+  protected modeOptions(modes: readonly LineMode[]): readonly ScSegmentOption[] {
+    const key = modes.join('|');
+    let o = this.modeOptionCache.get(key);
+    if (!o) {
+      o = modes.map((m) => ({ value: m, labelKey: 'hq.step.kind.' + m }));
+      this.modeOptionCache.set(key, o);
+    }
+    return o;
   }
 
   protected modesOf(l: ProposalLine): LineMode[] {
