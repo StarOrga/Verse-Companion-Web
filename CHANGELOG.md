@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Small texts on the rank page, the patch-tip hint and the data sheet now meet the 12 px mobile minimum.
 
+## [0.268.1] - 2026-11-15
+
+### Fixed
+- Admin telemetry: the attention line uses the singular when exactly one topic needs attention
+
 ## [0.268.0] - 2026-11-15
 
 ### Added

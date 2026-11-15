@@ -88,6 +88,12 @@ describe('TelemetryStatsComponent', () => {
     expect((invokes(fake.calls)[0].args as { method: string }).method).toBe('GET');
   });
 
+  it('uses the singular sentence when exactly one card needs attention', async () => {
+    const { el } = await mount(answerWith({ ...ATTENTION, attention: 1 }));
+    const status = el.querySelector('[data-status]')!;
+    expect(status.textContent).toContain('telemetry.status.attentionOne');
+  });
+
   it('shows the attention strip with the since-line, level icon and a text alternative', async () => {
     const { el } = await mount(answerWith(ATTENTION));
     const status = el.querySelector('[data-status]')!;
