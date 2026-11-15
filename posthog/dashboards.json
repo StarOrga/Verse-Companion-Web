@@ -29,7 +29,7 @@
     },
     {
       "name": "Wird es genutzt?",
-      "description": "Nutzung: aktive Nutzer, Wiederkehr, Lebenszyklus, Klebrigkeit, Bereiche und die sieben Flows (Onboarding, Codex, Fehler, Hangar, Feedback, Desktop, Verse).",
+      "description": "Nutzung: aktive Nutzer, Wiederkehr, Lebenszyklus, Klebrigkeit, Bereiche und die acht Flows (Onboarding, Codex, Fehler, Hangar, Feedback, Desktop, Verse, Wunsch).",
       "tiles": [
         { "name": "Aktive Nutzer täglich (DAU)", "desc": "Eindeutige Personen mit Seitenaufruf, mit Einwilligung.", "type": "trends", "series": [{ "event": "$pageview", "name": "DAU", "math": "dau" }] },
         { "name": "Aktive Nutzer wöchentlich (WAU)", "desc": "Eindeutige Personen pro Woche.", "type": "trends", "series": [{ "event": "$pageview", "name": "WAU", "math": "weekly_active" }], "range": "-90d", "interval": "week" },
@@ -41,6 +41,7 @@
         { "name": "Flow Feedback", "desc": "posthog/flows.json", "type": "funnel", "flow": "feedback" },
         { "name": "Flow Desktop", "desc": "posthog/flows.json", "type": "funnel", "flow": "desktop" },
         { "name": "Flow Verse", "desc": "posthog/flows.json", "type": "funnel", "flow": "verse" },
+        { "name": "Flow Wunsch", "desc": "posthog/flows.json", "type": "funnel", "flow": "wish" },
         { "name": "Zugang: Anfrage → Anmeldung", "desc": "Wie viele Anfragen zur ersten Anmeldung führen.", "type": "funnel", "steps": ["auth:access_request", "auth:user_sign_in"] },
         { "name": "Hangar: Schiff → Konfiguration → Loadout", "desc": "Wie weit Hangar-Nutzer kommen.", "type": "funnel", "steps": ["hangar:ship_add", "hangar:ship_config_update", "hangar:loadout_create"] },
         { "name": "Wiederkehr: Seitenaufruf wöchentlich", "desc": "Wöchentliche Retention aller Besucher mit Einwilligung.", "type": "retention", "target": "$pageview", "returning": "$pageview" },

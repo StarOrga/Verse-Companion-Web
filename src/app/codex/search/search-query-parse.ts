@@ -66,7 +66,7 @@ function option(value: string, labelKey: string, labelParams: Record<string, str
   return { value, labelKey, labelParams, count: null };
 }
 
-const WISHED_WORDS = new Set(['gemerkt', 'wunschliste', 'wished', 'wishlist']);
+const WISHED_WORDS = new Set(['gemerkt', 'wunschliste', 'wuensche', 'wunsche', 'wunsch', 'wished', 'wishlist', 'wishes']);
 const NEEDED_WORDS = new Set(['nachschub', 'needed', 'missing']);
 const STOCK_WORDS = new Set(['lager', 'inventar', 'inventory', 'stock']);
 

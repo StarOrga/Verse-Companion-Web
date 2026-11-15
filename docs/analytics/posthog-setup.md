@@ -52,7 +52,7 @@ npm run analytics:sync                 # event descriptions, after the first eve
 
 `posthog:apply` is idempotent by name (dashboards, insights, actions; feature flags by key): it looks the object up and PATCHes,
 else POSTs. It creates the three dashboards from `posthog/dashboards.json` (`Läuft es?`, `Wird es genutzt?`, `Was kostet es?`),
-the seven flow funnels from `posthog/flows.json` (a missing file only skips those tiles), the workflow actions from
+the eight flow funnels from `posthog/flows.json` (a missing file only skips those tiles), the workflow actions from
 `posthog/actions.json`, one `Bridge: <new name>` action per renamed event (from `LEGACY_EVENT_NAMES`) and the feature flag
 `telemetry-saver` (inactive). Edit the JSON, re-run — nothing is duplicated; renaming a tile creates a new one (delete the old
 one in PostHog).

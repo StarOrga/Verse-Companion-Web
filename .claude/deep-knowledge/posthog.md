@@ -35,7 +35,7 @@ the per-area table on „Wird es genutzt?“ lists every catalogue event by `cat
 | Dashboard | Answers | Tiles (examples) |
 |---|---|---|
 | **Läuft es?** | Is something broken? | errors by source (web/server/desktop), new error issues, cron failures per function, server errors per function (service health), LCP/INP p75, desktop crash rate, error → return/paths/lifecycle |
-| **Wird es genutzt?** | Who uses what, do they come back? | DAU/WAU, events per area, the seven flows as funnels (`posthog/flows.json`: onboard, codex, error, hangar, feedback, desktop, verse), retention, lifecycle, stickiness, paths |
+| **Wird es genutzt?** | Who uses what, do they come back? | DAU/WAU, events per area, the eight flows as funnels (`posthog/flows.json`: onboard, codex, error, hangar, feedback, desktop, verse, wish), retention, lifecycle, stickiness, paths |
 | **Was kostet es?** | What does it cost / use up? | `$ai_generation` cost by function and model, tokens, error rate and latency p95, event volume by event (quota optimisation), replay count |
 
 ## Ask PostHog first (analysis and diagnosis)

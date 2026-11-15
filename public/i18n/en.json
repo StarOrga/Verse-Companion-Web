@@ -999,7 +999,7 @@
         "partsTotal": "{{n}} parts",
         "partSize": "Size",
         "partGrade": "Grade",
-        "iconWishlist": "Wishlist",
+        "iconWishlist": "Wishes",
         "iconSupply": "Supplies",
         "iconStock": "Inventory",
         "previewTitle": "Detail page preview",
@@ -1208,8 +1208,8 @@
         "saveBuild": "Save build as exemplar",
         "anotherCopy": "Another {{name}} into the hangar",
         "openHangar": "Open in hangar",
-        "wishlist": "Wishlist",
-        "toWishlist": "Add to wishlist",
+        "wishlist": "Wishes",
+        "toWishlist": "Add to wishes",
         "wishAgain": "Wish for another",
         "nameTitle": "Exemplar name",
         "nameLabel": "Name",
@@ -1219,7 +1219,7 @@
         "wishWithOne": "with 1 swapped part",
         "wishWithMany": "with {{n}} swapped parts",
         "wishName": "Wish: {{name}}",
-        "wishLoadoutUnavailable": "On the wishlist — its loadout cannot be stored there yet."
+        "wishLoadoutUnavailable": "Among your wishes — its loadout cannot be stored there yet."
       },
       "partType": {
         "gatling": "Gatling",
@@ -2894,18 +2894,18 @@
       "removeSammlung": "Remove from collection",
       "removeSammlungTitle": "Remove from collection?",
       "removeSammlungBody": "{{name}} leaves your collection.",
-      "noneShip": "Not in your hangar, not on your wishlist.",
-      "noneItem": "Not in your inventory, not on your wishlist.",
-      "noneSammlung": "Not in your collection, not on your wishlist.",
-      "wished": "{{n}}× on your wishlist.",
+      "noneShip": "Not in your hangar, not among your wishes.",
+      "noneItem": "Not in your inventory, not among your wishes.",
+      "noneSammlung": "Not in your collection, not among your wishes.",
+      "wished": "{{n}}× among your wishes.",
       "signedOut": "Sign in to wish for it or mark it as yours.",
       "signIn": "Sign in",
-      "toWishlist": "Wishlist",
+      "toWishlist": "Wishes",
       "toHangar": "Hangar",
       "toInventar": "Inventory",
       "toSammlung": "Collections",
-      "openWishlist": "Open wishlist",
-      "wishQtyAria": "Quantity on the wishlist: {{name}}",
+      "openWishlist": "Open wishes",
+      "wishQtyAria": "Quantity among your wishes: {{name}}",
       "qtyAria": "Quantity in the inventory: {{name}}",
       "less": "One less",
       "more": "One more",
@@ -3487,7 +3487,7 @@
       "title": "Upcoming Ships",
       "addedOne": "1 new ship on the ship matrix",
       "addedMany": "{{count}} new ships on the ship matrix",
-      "wishedUpdated": "{{count}} ships on your wishlist changed status",
+      "wishedUpdated": "{{count}} ships among your wishes changed status",
       "more": "+{{count}} more",
       "open": "Open upcoming ships",
       "dismiss": "Dismiss notice"
@@ -4631,7 +4631,7 @@
     "subtitle": "Your personal fleet: ship configurations, component loadouts and role sets — built on the live game data in the Codex.",
     "counts": {
       "owned": "Owned",
-      "wishlist": "Wishlist"
+      "wishlist": "Wishes"
     },
     "flagship": {
       "set": "Set as flagship",
@@ -4649,7 +4649,7 @@
     },
     "status": {
       "owned": "Owned",
-      "wishlist": "Wishlist"
+      "wishlist": "Wishes"
     },
     "add": {
       "title": "Add ship",
@@ -4755,7 +4755,7 @@
       "subtitle": "Sign in to build your fleet — free, invite-based during alpha.",
       "save": {
         "title": "Save your ships",
-        "text": "Keep your whole fleet in one place: owned ships and wishlist, with custom names and notes."
+        "text": "Keep your whole fleet in one place: owned ships and wishes, with custom names and notes."
       },
       "overview": {
         "title": "Fleet overview",
@@ -5881,7 +5881,7 @@
       "archive": "Archive",
       "archiveAria": "Archive, {{n}} Nachschübe",
       "introTitle": "No Nachschub yet",
-      "introText": "Tap a plus and take things from your wishlist with you. They become a Nachschub with Einsätze that you work through step by step in Jetzt.",
+      "introText": "Tap a plus and take things from your wishes with you. They become a Nachschub with Einsätze that you work through step by step in Jetzt.",
       "newAriaEvent": "New Nachschub in slot {{n}} – event available"
     },
     "remove": {
@@ -5889,8 +5889,8 @@
       "titleEmpty": "Empty \"{{name}}\"?",
       "msgRemove": "The Nachschub goes away. Open positions: {{n}}.",
       "msgEmpty": "The Nachschub stays, its open positions leave it. Open positions: {{n}}.",
-      "back": "Open positions back onto the wishlist",
-      "backOn": "They are counted up on the wishlist.",
+      "back": "Open positions back to your wishes",
+      "backOn": "They are counted up among your wishes.",
       "backOff": "They are dropped for good.",
       "confirmRemove": "Delete",
       "confirmEmpty": "Empty"
@@ -5910,7 +5910,7 @@
         "1": "Select",
         "2": "Einsätze"
       },
-      "emptyWish": "Your wishlist is empty.",
+      "emptyWish": "Make a wish",
       "all": "Take everything",
       "none": "Take nothing",
       "picked": "{{n}} positions · {{p}} pieces",
@@ -5959,18 +5959,18 @@
       "saveEdit": "Save",
       "close": "Close",
       "namePlaceholder": "Leave empty to get a suggestion",
-      "wishTitle": "Wishlist",
-      "emptyHintSearch": "Search above for what you need and put it on the wishlist.",
+      "wishTitle": "Wishes",
+      "emptyHintSearch": "Search above for what you need and make it a wish.",
       "search": {
-        "label": "More for the wishlist",
+        "label": "More for your wishes",
         "placeholder": "Search an item, ship or material",
         "searching": "Searching …",
         "none": "Nothing found.",
         "results": "Search results",
-        "onList": "on the wishlist",
-        "add": "To the wishlist",
-        "addAria": "Put “{{name}}” on the wishlist",
-        "addFailed": "That could not be put on the wishlist. Try again."
+        "onList": "among your wishes",
+        "add": "Add to wishes",
+        "addAria": "Add “{{name}}” to your wishes",
+        "addFailed": "That could not be added to your wishes. Try again."
       },
       "craft": {
         "aria": "What crafting {{name}} takes",
@@ -6045,7 +6045,7 @@
       "used48": "last 48 h",
       "catchUp": "Catch up",
       "catchUpAll": "Catch up on all",
-      "catchUpOne": "\"{{name}}\" to the wishlist",
+      "catchUpOne": "\"{{name}}\" to your wishes",
       "addItem": "Add an entry by hand",
       "addShip": "Add a ship",
       "addShipLabel": "Name of the ship",
@@ -6063,7 +6063,7 @@
       "range": "{{from}}–{{to}} of {{total}}",
       "prev": "Previous page",
       "next": "Next page",
-      "hintWish": "on the wishlist: {{n}}",
+      "hintWish": "among your wishes: {{n}}",
       "hintNachschub": "in the Nachschub \"{{name}}\"",
       "bpPick": {
         "hint": "Pick from the Codex so materials and the Codex page match.",
@@ -6135,7 +6135,7 @@
           "ground": "Ground vehicle",
           "multirole": "Multi-role"
         },
-        "wishCount": "{{n}} on the wishlist",
+        "wishCount": "{{n}} among your wishes",
         "artAria": "Kind",
         "art": {
           "blueprints": "Blueprints",
@@ -6148,7 +6148,7 @@
         "baysAria": "Loading bays by place",
         "byQuality": "{{name}} by quality",
         "resSummary": "{{qty}} at {{n}} places",
-        "toWishlist": "Add to wishlist",
+        "toWishlist": "Add to wishes",
         "bandTip": "Q {{from}}–{{to}}: {{qty}}, {{res}} of it reserved",
         "qUnknown": "Q ?",
         "qUnknownLong": "Quality unknown",
@@ -6173,7 +6173,7 @@
         },
         "pickup": "Plan pick-up",
         "alsoIn": "Also in your storage",
-        "inCodex": "In the Codex: “{{q}}” – onto the wishlist",
+        "inCodex": "In the Codex: “{{q}}” – to your wishes",
         "setItems": "{{n}} pieces",
         "addSet": "Create set",
         "setName": "Set name",
@@ -6211,7 +6211,7 @@
         "reserveLabel": "For whom or what?",
         "reserveNeedsNote": "A reservation needs a purpose.",
         "codexTier": "Also in the Codex",
-        "onWishlist": "On the wishlist",
+        "onWishlist": "Among your wishes",
         "rsv": {
           "title": "Reserve",
           "titleEdit": "Edit reservation",
@@ -6258,7 +6258,7 @@
     },
     "nachschub": {
       "slotsFull": "All 7 Nachschub slots are in use. Finish or delete one to free a slot.",
-      "nothingPicked": "Pick at least one item from the wishlist.",
+      "nothingPicked": "Pick at least one item from your wishes.",
       "sellGoalInvalid": "Enter a goal of at least 1 aUEC.",
       "target": {
         "minQ": "min. Q {{q}}",
@@ -6288,7 +6288,7 @@
       },
       "sellForm": {
         "kindAria": "What is the Nachschub for?",
-        "wish": "From the wishlist",
+        "wish": "From your wishes",
         "sell": "Make money",
         "goal": "Goal in aUEC",
         "goalPlaceholder": "e.g. 1,500,000",
@@ -6353,10 +6353,10 @@
           "buy": "Buy"
         }
       },
-      "linesFull": "Your Nachschub list is full (100 positions). Remove some positions first, then the wishlist can move in.",
+      "linesFull": "Your Nachschub list is full (100 positions). Remove some positions first, then your wishes can move in.",
       "partial": "{{count}} positions stayed behind: your Nachschub list is full.",
-      "wishlistFailed": "The wishlist could not be changed. Nothing was moved.",
-      "wishCapped": "{{count}} units no longer fit on the wishlist (999 per entry at most) and are lost.",
+      "wishlistFailed": "Your wishes could not be changed. Nothing was moved.",
+      "wishCapped": "{{count}} units no longer fit among your wishes (999 per entry at most) and are lost.",
       "gone": "This Nachschub no longer exists (deleted on another device). The view is refreshing.",
       "capReached": "You reached the limit of stored Nachschübe. Delete old ones from the archive and it works again."
     },
@@ -6388,14 +6388,14 @@
       "emptyHint": "Search for an item and add it to Supplies: Plan then shows where to get it and how to get there.",
       "tabsAria": "Lists",
       "tabs": {
-        "wish": "Wishlist",
+        "wish": "Wishes",
         "nachschub": "Supplies"
       },
       "wish": {
-        "empty": "Nothing on the wishlist yet.",
-        "emptyHint": "Search for an item or a ship and put it on the wishlist. From here it moves to Supplies with one click.",
+        "empty": "Make a wish",
+        "emptyHint": "Search for an item or a ship and make it a wish. From here it moves to Supplies with one click.",
         "toNachschub": "To Supplies",
-        "remove": "Take {{name}} off the wishlist",
+        "remove": "Take {{name}} off your wishes",
         "notYet": "not in the game yet"
       },
       "got": "Got it",
@@ -6816,7 +6816,7 @@
         "noMatch": "Nothing matches these filters.",
         "empty": "Nothing in your inventory yet.",
         "ships": "Ships at terminal",
-        "onWishlist": "To the wishlist"
+        "onWishlist": "Add to wishes"
       },
       "retry": "Try again",
       "destroyed": "Last destroyed: {{at}}",
@@ -7065,7 +7065,7 @@
       },
       "abortDialog": {
         "title": "Abort {{name}}?",
-        "message": "Progress stays saved and nothing goes back to the wishlist. You can resume the event from the archive any time."
+        "message": "Progress stays saved and nothing goes back to your wishes. You can resume the event from the archive any time."
       }
     },
     "appStatus": {
@@ -7964,7 +7964,7 @@
         "gallery": "Gallery",
         "fps": "FPS"
       },
-      "wished": "Wishlist",
+      "wished": "Wishes",
       "needed": "Needed",
       "section": {
         "weapons": "Weapons",
@@ -8068,7 +8068,7 @@
     },
     "signIn": {
       "title": "Sign in?",
-      "message": "Wishlist, inventory and supplies belong to your account. Sign in to save this.",
+      "message": "Wishes, inventory and supplies belong to your account. Sign in to save this.",
       "confirm": "Go to sign-in"
     },
     "done": {
@@ -8216,7 +8216,7 @@
         "t": "\"inventory\" before a word searches only your inventory"
       },
       {
-        "t": "\"wishlist\" before a word searches only your wishlist. Wished items always come first"
+        "t": "\"wishes\" or \"wishlist\" before a word searches only your wishes. Wished items always come first"
       },
       {
         "t": "In the hangar \"patrol\" finds your loadout"
@@ -8405,7 +8405,7 @@
       "general": "In general",
       "generalHint": "Applies to all friends unless you set something else for one below. Changes are saved at once.",
       "facetHint": {
-        "hangar": "Your ships (including the wishlist), without notes and without configurations.",
+        "hangar": "Your ships (including wishes), without notes and without configurations.",
         "flagship": "The ship you pinned at the top of your hangar.",
         "presence": "Whether you are online right now. Never an exact time.",
         "stats": "Numbers such as ships, sets, missions, active days and Kartograph rank."
@@ -8564,7 +8564,7 @@
       "flagship": "Flagship",
       "hangarHidden": "This friend does not show you their hangar.",
       "hangarEmpty": "The hangar is empty.",
-      "wishlist": "Wishlist",
+      "wishlist": "Wishes",
       "kindSet": "Set",
       "kindVariant": "Variant",
       "kindEinsatz": "Mission",
@@ -8594,8 +8594,8 @@
   },
   "itemPath": {
     "done": {
-      "wishOn": "\"{{name}}\" is on your wishlist",
-      "wishOff": "\"{{name}}\" is off your wishlist",
+      "wishOn": "\"{{name}}\" is among your wishes",
+      "wishOff": "\"{{name}}\" is no longer among your wishes",
       "inventar": "\"{{name}}\" now lies in {{where}}",
       "hangar": "\"{{name}}\" is in your hangar",
       "undone": "Undone",
@@ -8605,7 +8605,7 @@
       "hangarOff": "\"{{name}}\" is out of your hangar",
       "hangarCopy": "You now have {{n}}× \"{{name}}\" in your hangar",
       "ownWish": "\"{{name}}\" is yours – wish fulfilled",
-      "ownWishLeft": "\"{{name}}\" is yours – {{left}} more on your wishlist"
+      "ownWishLeft": "\"{{name}}\" is yours – {{left}} more among your wishes"
     },
     "err": {
       "failed": "That did not work. Try again.",
@@ -8617,11 +8617,11 @@
   },
   "quick": {
     "toNachschub": "Into a Nachschub: {{name}}",
-    "wish": "Wishlist",
-    "emptyWish": "Nothing on the wishlist yet.",
-    "allWish": "Whole wishlist",
-    "allWishCount": "{{n}} items",
-    "allWishCountOne": "1 item",
+    "wish": "Wishes",
+    "emptyWish": "Make a wish",
+    "allWish": "All wishes",
+    "allWishCount": "{{n}} wishes",
+    "allWishCountOne": "1 wish",
     "section": {
       "inventar": "Inventory",
       "hangar": "Hangar",
@@ -8642,12 +8642,12 @@
     }
   },
   "cart": {
-    "title": "Wishlist",
-    "summary": "{{n}} items · {{g}} groups",
-    "summaryOne": "1 item · 1 group",
-    "summaryOneGroup": "{{n}} items · 1 group",
+    "title": "Wishes",
+    "summary": "{{n}} wishes · {{g}} groups",
+    "summaryOne": "1 wish · 1 group",
+    "summaryOneGroup": "{{n}} wishes · 1 group",
     "close": "Close",
-    "empty": "The wishlist is empty.",
+    "empty": "Make a wish",
     "emptyHint": "Put items from the Codex or the search here.",
     "group": {
       "weapons": "Weapons",
@@ -8666,8 +8666,8 @@
     "more": "More",
     "remove": "Remove {{name}}",
     "removeGroup": "Remove group {{name}}",
-    "removed": "{{name}} removed from the wishlist",
-    "removedGroup": "{{name}} removed ({{n}} items)",
+    "removed": "{{name}} removed from your wishes",
+    "removedGroup": "{{name}} removed ({{n}} wishes)",
     "selected": "selected",
     "clear": "Deselect all",
     "toNachschub": "Into a Nachschub",
@@ -8685,7 +8685,7 @@
     "suggest": {
       "title": "Goes with it",
       "count": "{{n}} suggestions",
-      "add": "to the wishlist",
+      "add": "to your wishes",
       "dismiss": "Do not suggest {{name}}"
     },
     "slotsFullHint": "All 7 Nachschub slots are in use. The selection goes into an existing Nachschub.",
@@ -8694,14 +8694,14 @@
   },
   "pathCtl": {
     "node": {
-      "wish": "Wishlist",
+      "wish": "Wishes",
       "inventar": "Inventory",
       "hangar": "Hangar",
       "sammlung": "Collections"
     },
     "tip": {
-      "wishOff": "Put on the wishlist",
-      "wishOn": "{{qty}}× on the wishlist · open the wishlist",
+      "wishOff": "Add to wishes",
+      "wishOn": "{{qty}}× among your wishes · open wishes",
       "inventarOff": "Put into the inventory",
       "inventarOn": "{{qty}}× in the inventory · show in HQ",
       "hangarOff": "Put into the hangar",
@@ -8710,7 +8710,7 @@
       "sammlungOn": "In the collection · show in HQ"
     },
     "go": {
-      "wish": "To the wishlist",
+      "wish": "Add to wishes",
       "inventar": "Into the inventory",
       "hangar": "Into the hangar",
       "sammlung": "To the collections"
@@ -8723,8 +8723,8 @@
     },
     "less": "Less",
     "more": "More",
-    "openCart": "Open the wishlist",
-    "wishOff": "Not on the wishlist yet.",
+    "openCart": "Open wishes",
+    "wishOff": "Not among your wishes yet.",
     "ownOn": {
       "inventar": "{{n}}× in the inventory",
       "hangar": "In the hangar",
@@ -8774,8 +8774,8 @@
   },
   "blueprintWish": {
     "craftTimes": "How many times to craft",
-    "button": "Material ×{{n}} to the wishlist",
-    "done": "{{n}}× {{name}}: material put on the wishlist"
+    "button": "Material ×{{n}} to your wishes",
+    "done": "{{n}}× {{name}}: material added to your wishes"
   },
   "adminEvents": {
     "eyebrow": "Admin",
