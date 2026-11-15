@@ -57,13 +57,13 @@ describe('CodexHeroHoloOverlayComponent', () => {
     expect(Math.round(r.height)).toBe(Math.round(box.height));
     // Non-modal: nothing outside is made inert.
     expect((el.querySelector('.beside') as HTMLElement).closest('[inert]')).toBeNull();
-    expect(o.querySelector('.hho')!.getAttribute('aria-modal')).toBeNull();
+    expect(o.querySelector('.scp-frame')!.getAttribute('aria-modal')).toBeNull();
   });
 
   it('closes on its X', () => {
     const { fixture, overlay, open } = setup();
     open();
-    (overlay()!.querySelector('.hho-close') as HTMLButtonElement).click();
+    (overlay()!.querySelector('.scp-x') as HTMLButtonElement).click();
     fixture.detectChanges();
     expect(overlay()).toBeNull();
   });
@@ -78,7 +78,7 @@ describe('CodexHeroHoloOverlayComponent', () => {
     expect(getComputedStyle(overlay()!).position).toBe('fixed');
     expect(full.getAttribute('aria-pressed')).toBe('true');
 
-    const section = overlay()!.querySelector('.hho') as HTMLElement;
+    const section = overlay()!.querySelector('.scp-frame') as HTMLElement;
     section.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
     fixture.detectChanges();
     expect(overlay()!.classList.contains('full')).toBe(false);
