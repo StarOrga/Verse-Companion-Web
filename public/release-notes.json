@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.14",
+  "current": "0.270.15",
   "releases": [
+    {
+      "version": "0.270.15",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Ship energy panel (classic view): the readiness verdict shows a short label with the full reason in a tooltip, and the cooling-load numbers moved into their tooltip, so nothing runs past the field any more."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.270.14",
       "date": "2026-11-15",
