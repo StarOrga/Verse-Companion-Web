@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { LiveContract } from './hq-live.util';
 
@@ -8,7 +8,7 @@ import { LiveContract } from './hq-live.util';
 @Component({
   selector: 'sc-hq-missions-popover',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective, ScDialogDirective],
+  imports: [TranslatePipe, ScTooltipDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <button
@@ -26,15 +26,7 @@ import { LiveContract } from './hq-live.util';
       <span class="count mono">{{ contracts().length }}</span>
     </button>
     @if (open()) {
-      <div
-        class="panel"
-        role="dialog"
-        scDialog
-        [scDialogModal]="false"
-        [attr.aria-label]="'hq.now.missions.title' | translate"
-        (scDialogEscape)="open.set(false)"
-      >
-        <h3>{{ 'hq.now.missions.title' | translate }}</h3>
+      <sc-popup class="panel" kind="panel" [backdrop]="false" [eyebrow]="'hq.title' | translate" [title]="'hq.now.missions.title' | translate" (closed)="open.set(false)">
         @if (contracts().length === 0) {
           <p class="none">{{ 'hq.now.missions.none' | translate }}</p>
         } @else {
@@ -47,7 +39,7 @@ import { LiveContract } from './hq-live.util';
             }
           </ul>
         }
-      </div>
+      </sc-popup>
     }
   `,
   styles: [
@@ -61,12 +53,7 @@ import { LiveContract } from './hq-live.util';
       .icon:hover { border-color: var(--sc-accent); }
       .icon svg { width: 20px; height: 20px; fill: none; stroke: var(--sc-accent); stroke-width: 1.8; stroke-linejoin: round; }
       .count { font-weight: 700; }
-      .panel {
-        position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; width: min(320px, calc(100vw - 2 * var(--sc-page-gutter, 16px)));
-        padding: var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: var(--sc-radius, 10px); background: var(--sc-surface, #111);
-        box-shadow: 0 8px 28px rgb(0 0 0 / 0.4);
-      }
-      h3 { margin: 0 0 var(--sc-space-2, 8px); font-size: 0.95rem; }
+      .panel { position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; }
       ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); }
       li { display: flex; flex-direction: column; }
       li span, .none { color: var(--sc-fg-2); font-size: max(0.85rem, var(--sc-fs-floor)); }

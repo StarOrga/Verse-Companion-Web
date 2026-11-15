@@ -4,6 +4,8 @@ import { DesktopCapabilityService } from '../core/desktop-capability.service';
 import { isPlainLeftClick } from '../core/modified-click.util';
 import { SCC_LAUNCH_GRACE_MS, SCC_LAUNCH_WAIT_MS, SccAppLauncherService } from '../desktop/scc-app-launcher.service';
 import { SCC_INSTALLER_URL } from '../news/verse-status-chip.component';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import { ScPopupMotionDirective } from '../shared/popup-motion/sc-popup-motion.directive';
 import { ToastSlotDirective } from '../shared/toast-stack/toast-stack';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
@@ -36,7 +38,7 @@ const CONNECTED_HINT_MS = 2000;
 @Component({
   selector: 'sc-hq-app-launch',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective, ScPopupMotionDirective, ToastSlotDirective],
+  imports: [TranslatePipe, ScTooltipDirective, ScPopupMotionDirective, ToastSlotDirective, ScPopupComponent, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (canInstall()) {
@@ -54,26 +56,30 @@ const CONNECTED_HINT_MS = 2000;
       >{{ (mode() === 'download' ? 'hq.app.downloadCta' : 'hq.app.launch') | translate }}</a>
       <div class="live" role="status">
         @if (status() !== 'idle') {
-          <div class="toast" [class.ok]="done()" scToastSlot scPopupMotion scPopupMotionOrigin="br" animate.leave="pm-out">
-            <i class="ico" aria-hidden="true">
+          <sc-popup class="toast" kind="notice" [title]="'hq.app.' + status() | translate" scToastSlot scPopupMotion scPopupMotionOrigin="br" animate.leave="pm-out">
+            <svg popupIcon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               @if (done()) {
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+                <path d="M5 12.5l4.5 4.5L19 7.5" />
               } @else if (status() === 'starting') {
-                <span class="spin"></span>
+                <path d="M12 4a8 8 0 1 0 8 8" />
               } @else {
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10m0 0l-4-4m4 4l4-4M5 19h14" /></svg>
+                <path d="M12 4v10m0 0l-4-4m4 4l4-4M5 19h14" />
               }
-            </i>
-            <span class="txt">{{ 'hq.app.' + status() | translate }}</span>
-            @if (status() === 'downloading') {
-              <button type="button" class="act" (click)="start()">{{ 'hq.app.retry' | translate }}</button>
-            } @else if (status() === 'noResponse') {
-              <a class="act" [href]="url" rel="noopener noreferrer">{{ 'hq.app.download' | translate }}</a>
-            }
-            @if (!done()) {
-              <button type="button" class="x" [attr.aria-label]="'hq.app.close' | translate" [scTooltip]="'hq.app.close' | translate" (click)="dismiss()">×</button>
-            }
-          </div>
+            </svg>
+            <span class="txt" aria-hidden="true">{{ 'hq.app.' + status() | translate }}</span>
+            <ng-container popupActions>
+                @if (status() === 'downloading') {
+                  <button type="button" scAction tier="secondary" (click)="start()">{{ 'hq.app.retry' | translate }}</button>
+                } @else if (status() === 'noResponse') {
+                  <a scAction tier="secondary" [href]="url" rel="noopener noreferrer">{{ 'hq.app.download' | translate }}</a>
+                }
+                @if (!done()) {
+                  <button type="button" scAction tier="tertiary" [attr.aria-label]="'hq.app.close' | translate" [scTooltip]="'hq.app.close' | translate" (click)="dismiss()">
+                    <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                  </button>
+                }
+            </ng-container>
+          </sc-popup>
         }
       </div>
     }
@@ -97,44 +103,13 @@ const CONNECTED_HINT_MS = 2000;
       /* Inside the HQ status chip (sc-hq-live-ticker): the same pill, one size down, so it fits the 32px chip. */
       .pill.chip { min-height: 24px; padding: 0 10px; font-size: max(0.76rem, var(--sc-fs-floor)); }
       @media (pointer: coarse) { .pill, .pill.chip { min-height: 48px; } }
-      /* The star-toast look of sc-app-notice, bottom right; scToastSlot stacks it above a toast that is already up. */
+      /* Bottom right; scToastSlot stacks it above a toast that is already up. Frame, rail and width come from sc-popup. */
       .toast {
         position: fixed; z-index: 1440;
         inset-inline-end: var(--sc-fab-gutter, 16px);
         bottom: calc(var(--sc-toast-bottom, var(--sc-fab-clear-block, 80px)) + var(--sc-toast-offset, 0px));
-        width: min(var(--sc-toast-w, 24rem), calc(100vw - 2 * var(--sc-fab-gutter, 16px)));
-        display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
-        padding: 10px 12px; border-radius: 14px;
-        background: color-mix(in srgb, var(--sc-bg-1) 96%, transparent);
-        border: 1px solid color-mix(in srgb, var(--sc-accent) 45%, var(--sc-border));
-        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55), 0 0 30px color-mix(in srgb, var(--sc-accent) 14%, transparent);
       }
-      .toast.ok { border-color: color-mix(in srgb, var(--sc-success) 55%, var(--sc-border)); }
-      .ico {
-        flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center;
-        background: color-mix(in srgb, var(--sc-accent) 12%, transparent); color: var(--sc-accent);
-      }
-      .ok .ico { background: color-mix(in srgb, var(--sc-success) 14%, transparent); color: var(--sc-success); }
-      .ico svg { width: 20px; height: 20px; }
-      .spin {
-        width: 18px; height: 18px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--sc-accent) 30%, transparent);
-        border-top-color: var(--sc-accent); animation: hq-app-spin 0.9s linear infinite;
-      }
-      .txt { flex: 1 1 10rem; min-width: 0; font-size: max(0.88rem, var(--sc-fs-floor)); line-height: 1.4; color: var(--sc-fg-0); }
-      .act {
-        display: inline-flex; align-items: center; min-height: var(--sc-tap-min, 44px); padding: 0 16px; border-radius: 999px;
-        border: 1px solid var(--sc-accent); background: none; color: var(--sc-accent); font: inherit; font-weight: 600;
-        text-decoration: none; cursor: pointer;
-      }
-      .act:hover { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
-      .x {
-        flex: none; width: 32px; height: 32px; border-radius: 50%; padding: 0; cursor: pointer; font-size: 16px; line-height: 1;
-        background: none; border: 1px solid var(--sc-border); color: var(--sc-fg-2);
-      }
-      .x:hover { color: var(--sc-fg-0); border-color: var(--sc-accent); }
-      .act:focus-visible, .x:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-      @keyframes hq-app-spin { to { transform: rotate(360deg); } }
-      @media (prefers-reduced-motion: reduce) { .spin { animation-duration: 3s; } }
+      .txt { font-size: max(0.88rem, var(--sc-fs-floor)); line-height: 1.4; color: var(--sc-fg-0); }
     `,
   ],
 })

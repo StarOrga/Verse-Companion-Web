@@ -24,14 +24,14 @@ export interface PickedBlueprint {
   imports: [TranslatePipe, ScActionDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <sc-popup kind="large" [eyebrow]="'hq.bestand.addBlueprint' | translate" [title]="'hq.bestand.bpPick.label' | translate" (closed)="closed.emit()">
+    <sc-popup kind="large" [eyebrow]="'hq.title' | translate" [title]="'hq.bestand.addBlueprint' | translate" (closed)="closed.emit()">
         <div class="pbody">
           <p class="hint">{{ 'hq.bestand.bpPick.hint' | translate }}</p>
           <label class="sc-float-field">
             <input #q class="sc-input" type="search" name="bp-q" autocomplete="off" maxlength="80" [value]="term()"
                    placeholder=" " (input)="onInput($any($event.target).value)"
                    aria-describedby="bp-pick-msg" />
-            <span class="sc-float-label">{{ 'hq.bestand.bpPick.placeholder' | translate }}</span>
+            <span class="sc-float-label">{{ 'hq.bestand.bpPick.label' | translate }}</span>
           </label>
           <p id="bp-pick-msg" class="msg" role="status">
             @if (error(); as k) {
