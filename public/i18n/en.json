@@ -136,6 +136,7 @@
     "continueDiscord": "Continue with Discord",
     "inviteOnly": "Access is invite-only. Ask an admin to invite you.",
     "deniedInvite": "This account hasn't been invited yet. The site is invite-only — ask an admin to send you an invitation.",
+    "deniedSignup": "This account is not approved yet. Access is invite-only — request access first, then sign in again.",
     "unavailable": {
       "title": "We couldn't verify your access",
       "body": "Your profile could not be loaded just now — usually a brief hiccup right after signing in. You are still signed in.",
