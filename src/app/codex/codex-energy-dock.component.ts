@@ -341,19 +341,25 @@ let uidSeq = 0;
                 @if (coolMargin(); as m) {
                   <span class="margin" [class.over]="m.over">{{ (m.over ? 'codex.energy.coolingDeficit' : 'codex.energy.coolingHeadroom') | translate: { pct: m.pct } }}</span>
                 }
-                <span class="sub">{{ 'codex.energy.coolingValue' | translate: { used: sheet().coolant.used, total: sheet().coolant.total } }}</span>
               } @else {
                 <span class="gapv">{{ coolantGapKey() | translate }}</span>
               }
               <div class="tipbox" [id]="heatTipId" role="tooltip">
                 <b>{{ 'codex.energy.fact.coolingLoad' | translate }}</b>
                 <p>{{ 'codex.energy.tooltip.coolingLoad' | translate }}</p>
+                @if (sheet().coolant.percent !== null) {
+                  <p class="sub">{{ 'codex.energy.coolingValue' | translate: { used: sheet().coolant.used, total: sheet().coolant.total } }}</p>
+                }
               </div>
             </div>
 
-            <div class="md-ok" [class.no]="!sheet().ready">
+            <!-- #352: the full verdict did not fit the narrow facts column —
+                 the short verdict stays visible, the reason sits in the
+                 tooltip (aria-describedby, long-press on touch). -->
+            <div class="md-ok" [class.no]="!sheet().ready" tabindex="0"
+              [scTooltip]="sheet().readinessKey | translate">
               <span aria-hidden="true">{{ sheet().ready ? '✓' : '✕' }}</span>
-              {{ sheet().readinessKey | translate }}
+              {{ (sheet().ready ? 'codex.energy.readiness.shortOk' : 'codex.energy.readiness.shortNo') | translate }}
             </div>
           </div>
         </div>
@@ -789,13 +795,15 @@ let uidSeq = 0;
       }
       .tipbox p.gapv,
       .tipbox p.demand,
-      .tipbox p.warnv {
+      .tipbox p.warnv,
+      .tipbox p.sub {
         margin-block-start: 4px;
       }
       .tipbox p.demand {
         font-variant-numeric: tabular-nums;
       }
-      .tipbox p.warnv {
+      .tipbox p.warnv,
+      .tipbox p.sub {
         color: var(--sc-warn);
       }
       .tipw:hover .tipbox,
@@ -916,6 +924,14 @@ let uidSeq = 0;
       }
       .md-ok.no {
         color: var(--sc-warn);
+      }
+      .md-ok {
+        justify-self: start;
+        cursor: help;
+      }
+      .md-heat {
+        flex-wrap: wrap;
+        row-gap: 2px;
       }
       /* Five values, no wrap, in a fixed 100%-wide box below 640px: the last
          two fell off the screen, and a fixed element makes no scrollbar to get
