@@ -2,7 +2,7 @@
      rewrites it on every tab switch. body overflow is set by that function,
      the inline style below is only the first-paint value. -->
 <!DOCTYPE html>
-<html lang="de" data-theme="dark" data-page-version="2026-11-10T12:00:00" data-template="decision">
+<html lang="de" data-theme="dark" data-page-version="2026-11-15T12:00:00" data-template="decision">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -6183,7 +6183,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
 </script>
 </section>
 
-<section data-iteration="2" data-iteration-template="decision" data-wide data-tab-label="Runde 2" id="iter-2" data-active>
+<section data-iteration="2" data-iteration-template="decision" data-wide data-tab-label="Runde 2" id="iter-2" hidden>
 <style>
 [data-iteration="2"] {
   --k-bg0: #0d2635; --k-bg1: #123246; --k-bg2: #103246; --k-fg0: #e8ebed; --k-fg1: #9fb3c8; --k-fg2: #84a0b6;
@@ -6669,6 +6669,701 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
 })();
 </script>
 </section>
+
+<section data-iteration="3" data-iteration-template="decision" data-wide data-tab-label="Runde 3" id="iter-3" data-active>
+<style>
+[data-iteration="3"] {
+  --k-bg0: #0d2635; --k-bg1: #123246; --k-bg2: #103246; --k-fg0: #e8ebed; --k-fg1: #9fb3c8; --k-fg2: #84a0b6;
+  --k-border: rgba(82, 193, 230, 0.18); --k-accent: #52c1e6;
+  --k-off: #e5484d; --k-def: #5b8def; --k-mov: #9b8cc8; --k-sig: #c8a84b;
+}
+[data-iteration="3"] .iteration-intro { display: block; margin-bottom: 1rem; }
+[data-iteration="3"] .iteration-intro p { max-width: 86ch; line-height: 1.6; }
+[data-iteration="3"] .k-iter { display: inline-block; font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--k-accent); border: 1px solid color-mix(in srgb, var(--k-accent) 45%, transparent); border-radius: 3px; padding: .1rem .5rem; margin-bottom: .5rem; }
+[data-iteration="3"] .k-next { margin: .8rem 0 0; padding: .8rem 1rem; border: 1px solid color-mix(in srgb, #3fb950 55%, transparent); border-radius: 6px; background: rgba(63,185,80,.08); max-width: 86ch; }
+[data-iteration="3"] .k-next h3 { margin: 0 0 .3rem; font-size: .98rem; color: #7ee093; }
+[data-iteration="3"] .k-next p { margin: 0; font-size: .88rem; }
+[data-iteration="3"] .k-changes { margin: .8rem 0 0; padding: .7rem 1rem .7rem 1.1rem; border-left: 3px solid var(--k-accent); background: rgba(82,193,230,.06); max-width: 86ch; }
+[data-iteration="3"] .k-changes h3 { margin: 0 0 .35rem; font-size: .95rem; }
+[data-iteration="3"] .k-changes ul { margin: 0; padding-left: 1.1rem; font-size: .86rem; line-height: 1.55; }
+[data-iteration="3"] > section[id] { margin: 2.4rem 0 0; padding-top: 1.4rem; border-top: 1px solid var(--k-border); }
+[data-iteration="3"] > section[id] > h2 { font-size: 1.15rem; margin: 0 0 .35rem; }
+[data-iteration="3"] .lead { color: var(--text-secondary); font-size: .9rem; margin: 0 0 .8rem; max-width: 86ch; line-height: 1.6; }
+[data-iteration="3"] code { font-size: .85em; }
+[data-iteration="3"] .k-h3 { font-size: .98rem; margin: 1.6rem 0 .5rem; }
+[data-iteration="3"] .k-sw { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: .45rem; background: var(--c); box-shadow: 0 0 0 1px rgba(255,255,255,.12); }
+[data-iteration="3"] .k-issue { margin: .45rem 0 0; font-size: .78rem; line-height: 1.45; color: #f0c27b; }
+[data-iteration="3"] .k-label { display: block; font-size: .8rem; color: var(--k-fg1); margin: 1rem 0 .35rem; }
+[data-iteration="3"] textarea[data-comment] { width: 100%; min-height: 80px; background: var(--input-bg, #0d1117); color: var(--text-primary); border: 1px solid var(--border-default, #30363d); border-radius: 4px; padding: .6rem .7rem; font: inherit; font-size: .88rem; box-sizing: border-box; }
+
+/* Collapsed alternatives */
+[data-iteration="3"] details.k-alt { margin-top: 12px; border: 1px solid var(--k-border); border-radius: 4px; background: rgba(18,50,70,.35); }
+[data-iteration="3"] details.k-alt > summary { cursor: pointer; padding: .5rem .8rem; font-size: .82rem; color: var(--k-fg1); list-style: none; display: flex; align-items: center; gap: .5rem; }
+[data-iteration="3"] details.k-alt > summary::-webkit-details-marker { display: none; }
+[data-iteration="3"] details.k-alt > summary::before { content: '▸'; color: var(--k-accent); transition: transform .15s; }
+[data-iteration="3"] details.k-alt[open] > summary::before { transform: rotate(90deg); }
+[data-iteration="3"] details.k-alt > summary:focus-visible { outline: 2px solid var(--k-accent); outline-offset: 2px; }
+[data-iteration="3"] details.k-alt > .k-alt-body { padding: 0 .8rem .8rem; }
+
+/* Decisions */
+[data-iteration="3"] .k-dec { border: 1px solid var(--k-border); border-radius: 4px; background: var(--k-bg1); padding: .7rem .8rem; color: var(--k-fg0); }
+[data-iteration="3"] [data-decision] + [data-decision] > .k-dec { margin-top: 10px; }
+[data-iteration="3"] .k-dec h4 { margin: 0 0 .2rem; font-size: .88rem; }
+[data-iteration="3"] .k-dec p { margin: 0 0 .5rem; font-size: .78rem; color: var(--k-fg1); line-height: 1.45; }
+[data-iteration="3"] .k-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+[data-iteration="3"] .k-pill { position: relative; display: inline-flex; align-items: center; gap: .45rem; padding: .35rem .7rem; border: 1px solid var(--k-border); border-radius: 999px; font-size: .78rem; color: var(--k-fg1); cursor: pointer; background: var(--k-bg0); }
+[data-iteration="3"] .k-pill input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+[data-iteration="3"] .k-pill:has(input:checked) { border-color: var(--k-accent); color: var(--k-fg0); background: rgba(82,193,230,.12); }
+[data-iteration="3"] .k-pill:has(input:focus-visible) { outline: 2px solid var(--k-accent); outline-offset: 2px; }
+[data-iteration="3"] .k-pill i { font-style: normal; font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; color: #7ee093; }
+[data-iteration="3"] .k-pill .k-sw { width: 11px; height: 11px; margin: 0; }
+
+/* Symbol cards: the pick is visible, alternatives fold */
+[data-iteration="3"] .k-symgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: .6rem; align-items: start; }
+[data-iteration="3"] .k-sym { border: 1px solid var(--k-border); border-radius: 4px; background: var(--k-bg1); padding: .7rem .8rem .8rem; color: var(--k-fg0); display: flex; flex-direction: column; gap: .5rem; }
+[data-iteration="3"] .k-sym-h { display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
+[data-iteration="3"] .k-sym-h b { font-size: .9rem; }
+[data-iteration="3"] .k-sym-h small { font-size: .72rem; color: var(--k-fg2); }
+[data-iteration="3"] .k-sym-h .k-sw { width: 10px; height: 10px; margin: 0; }
+[data-iteration="3"] .k-sym-top { display: grid; grid-template-columns: 96px 1fr; gap: 10px; align-items: center; }
+[data-iteration="3"] .k-opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }
+[data-iteration="3"] .k-opt { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .35rem; padding: .55rem .3rem .45rem; border: 1px solid var(--k-border); border-radius: 4px; background: var(--k-bg0); cursor: pointer; text-align: center; }
+[data-iteration="3"] .k-opt input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+[data-iteration="3"] .k-opt svg { width: 28px; height: 28px; fill: none; stroke: var(--c); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+[data-iteration="3"] .k-opt.pick svg { width: 44px; height: 44px; }
+[data-iteration="3"] .k-opt span { font-size: .72rem; line-height: 1.25; color: var(--k-fg1); }
+[data-iteration="3"] .k-opt em { font-style: normal; font-size: .6rem; letter-spacing: .08em; text-transform: uppercase; color: var(--k-fg2); }
+[data-iteration="3"] .k-opt em.new { color: #f0c27b; }
+[data-iteration="3"] .k-opt:hover { border-color: color-mix(in srgb, var(--c) 55%, transparent); }
+[data-iteration="3"] .k-opt:has(input:checked) { border-color: var(--c); background: color-mix(in srgb, var(--c) 12%, var(--k-bg0)); }
+[data-iteration="3"] .k-opt:has(input:checked) span { color: var(--k-fg0); }
+[data-iteration="3"] .k-opt:has(input:focus-visible) { outline: 2px solid var(--k-accent); outline-offset: 2px; }
+[data-iteration="3"] .k-opt.none svg { stroke: var(--k-fg2); }
+[data-iteration="3"] .k-verdict { margin: 0; font-size: .76rem; line-height: 1.45; color: var(--k-fg1); }
+[data-iteration="3"] .k-verdict b { color: var(--k-fg0); font-weight: 600; }
+[data-iteration="3"] .k-sym details.k-alt { margin-top: 2px; }
+
+/* Final summary beside the mock */
+[data-iteration="3"] .k-sum { border: 1px solid var(--k-border); border-radius: 4px; background: var(--k-bg1); padding: .8rem .9rem; color: var(--k-fg0); font-size: .82rem; }
+[data-iteration="3"] .k-sum h4 { margin: 0 0 .5rem; font-size: .9rem; }
+[data-iteration="3"] .k-sum dl { display: grid; grid-template-columns: auto 1fr; gap: .35rem .8rem; margin: 0; }
+[data-iteration="3"] .k-sum dt { color: var(--k-fg2); }
+[data-iteration="3"] .k-sum dd { margin: 0; }
+[data-iteration="3"] .k-sum .k-sw { width: 11px; height: 11px; margin-right: .35rem; }
+[data-iteration="3"] .k-mini { display: grid; grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap: 6px; margin-top: .7rem; padding: 8px; border-radius: 4px; background: #071722; }
+[data-iteration="3"] .k-mini svg { width: 22px; height: 22px; justify-self: center; fill: none; stroke: var(--c); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Holo strip + columns */
+[data-iteration="3"] .k-holo { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-radius: 6px; padding: 12px; margin-top: .6rem;
+  background: radial-gradient(ellipse 120% 100% at 50% 0%, #0f2c3d, #061520); box-shadow: 0 0 0 1px var(--k-border); color: var(--k-fg0); font: 12px/1.4 Inter, system-ui, sans-serif; }
+@media (max-width: 720px) { [data-iteration="3"] .k-holo { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 10px; } }
+[data-iteration="3"] .k-ha { padding: 4px 10px 8px; border-inline-start: 1px solid rgba(143,227,255,.16); box-shadow: inset 0 2px 0 var(--p); }
+[data-iteration="3"] .k-ha:last-child { border-inline-end: 1px solid rgba(143,227,255,.16); }
+[data-iteration="3"] [data-p="off"] { --p: var(--k-off); }
+[data-iteration="3"] [data-p="def"] { --p: var(--k-def); }
+[data-iteration="3"] [data-p="mov"] { --p: var(--k-mov); }
+[data-iteration="3"] [data-p="sig"] { --p: var(--k-sig); }
+[data-iteration="3"] .k-ha h5 { display: flex; align-items: center; gap: 6px; margin: 6px 0 6px; font-family: Orbitron, Inter, sans-serif; font-weight: 400; text-transform: uppercase; font-size: 9.5px; letter-spacing: .14em; color: var(--p); }
+[data-iteration="3"] .k-ha p { margin: 0; color: var(--k-fg2); font-size: 11px; }
+[data-iteration="3"] .k-ha ul { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+[data-iteration="3"] .k-ha li { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--k-fg1); }
+[data-iteration="3"] .k-ha li .k-ico { stroke: var(--p); }
+[data-iteration="3"] .k-holo[data-icons="off"] .k-ico { display: none !important; }
+
+/* Comparison table */
+[data-iteration="3"] .k-cmp-wrap { overflow-x: auto; margin-top: .6rem; border-radius: 6px; box-shadow: 0 0 0 1px var(--k-border); background: radial-gradient(ellipse 120% 100% at 50% 0%, #0f2c3d, #061520); }
+[data-iteration="3"] .k-cmp { width: 100%; border-collapse: collapse; font-size: .82rem; color: var(--k-fg0); min-width: 640px; }
+[data-iteration="3"] .k-cmp th, [data-iteration="3"] .k-cmp td { text-align: left; padding: .45rem .7rem; border-bottom: 1px solid var(--k-border); vertical-align: middle; }
+[data-iteration="3"] .k-cmp th { font-size: .64rem; letter-spacing: .12em; text-transform: uppercase; color: var(--k-fg2); font-weight: 600; }
+[data-iteration="3"] .k-cmp tr.grp td { font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--k-accent); background: rgba(82,193,230,.05); padding-top: .55rem; }
+[data-iteration="3"] .k-cmp td.sy { white-space: nowrap; }
+[data-iteration="3"] .k-cmp td.sy svg { fill: none; stroke: var(--c); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+[data-iteration="3"] .k-cmp td.sy svg.big { width: 24px; height: 24px; margin-right: 10px; }
+[data-iteration="3"] .k-cmp td.sy svg.small { width: 16px; height: 16px; }
+[data-iteration="3"] .k-cmp td small { display: block; color: var(--k-fg2); font-size: .72rem; }
+[data-iteration="3"] .k-st { display: inline-block; font-size: .64rem; letter-spacing: .06em; text-transform: uppercase; border-radius: 3px; padding: .05rem .4rem; margin-top: .15rem; border: 1px solid; }
+[data-iteration="3"] .k-st.go { color: #7ee093; border-color: color-mix(in srgb, #7ee093 45%, transparent); }
+[data-iteration="3"] .k-st.prep { color: #f0c27b; border-color: color-mix(in srgb, #f0c27b 45%, transparent); }
+[data-iteration="3"] .k-st.no { color: var(--k-fg2); border-color: var(--k-border); }
+
+/* Mock of the classic loadout column */
+[data-iteration="3"] .k-stage { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, 1fr); gap: 18px; align-items: start; margin-top: .8rem; }
+@media (max-width: 980px) { [data-iteration="3"] .k-stage { grid-template-columns: 1fr; } }
+[data-iteration="3"] .k-side { position: sticky; top: 1rem; }
+[data-iteration="3"] .k-mk { --s: 60%; border-radius: 6px; padding: 16px; color: var(--k-fg0);
+  font: 13px/1.4 Inter, system-ui, "Segoe UI", sans-serif;
+  background: radial-gradient(ellipse 130% 95% at 58% 0%, #0f2c3d 0%, #0b2130 45%, #071722 100%); box-shadow: 0 0 0 1px var(--k-border); }
+[data-iteration="3"] .k-mk[data-strength="soft"] { --s: 35%; }
+[data-iteration="3"] .k-mk[data-strength="full"] { --s: 100%; }
+[data-iteration="3"] .k-mk[data-turrets="own"] [data-tv="merged"], [data-iteration="3"] .k-mk[data-turrets="merged"] [data-tv="own"] { display: none; }
+[data-iteration="3"] .k-mk-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+[data-iteration="3"] .k-mk-top b { font-family: Orbitron, Inter, sans-serif; font-weight: 500; letter-spacing: .08em; font-size: 14px; text-transform: uppercase; }
+[data-iteration="3"] .k-mk-top small { color: var(--k-fg2); font-size: 11px; }
+[data-iteration="3"] .k-col { display: flex; flex-direction: column; gap: 12px; }
+[data-iteration="3"] .k-blk { --p: var(--k-accent); --pb: color-mix(in srgb, var(--p) var(--s), transparent);
+  border-radius: 4px; background: var(--k-bg1); border: 1px solid var(--k-border); padding: 10px 12px; }
+[data-iteration="3"] .k-blk.sub { background: var(--k-bg2); padding: 8px 10px; }
+[data-iteration="3"] .k-blk.fixed { background: transparent; opacity: .78; --pb: color-mix(in srgb, var(--p) 30%, transparent); }
+[data-iteration="3"] .k-blk.sys { --pb: var(--k-border); }
+[data-iteration="3"] .k-blk.sys > .k-bh { color: var(--k-fg1); }
+[data-iteration="3"] .k-mk[data-form="top"] .k-blk { box-shadow: inset 0 2px 0 var(--pb); }
+[data-iteration="3"] .k-mk[data-form="full"] .k-blk { border-color: var(--pb); }
+[data-iteration="3"] .k-mk[data-form="glow"] .k-blk { border-color: var(--pb); box-shadow: 0 0 14px -4px var(--pb), inset 0 0 18px -10px var(--pb); }
+[data-iteration="3"] .k-bh { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 0 -12px 8px; padding: 0 12px 8px; border-bottom: 1px solid var(--k-border);
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .14em; font-weight: 600; color: var(--p); }
+[data-iteration="3"] .k-blk.sub > .k-bh { margin: 0 -10px 8px; padding: 0 10px 7px; }
+[data-iteration="3"] .k-ico { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+[data-iteration="3"] .k-slot .k-ico { stroke: var(--p); }
+[data-iteration="3"] .k-ct { font-size: 10px; padding: 0 6px; border-radius: 8px; font-weight: 400; letter-spacing: .04em; background: rgba(132,160,182,.18); color: var(--k-fg2); }
+[data-iteration="3"] .k-tag { font-size: 9.5px; letter-spacing: .06em; color: var(--k-fg2); font-weight: 400; border: 1px solid var(--k-border); border-radius: 2px; padding: 0 5px; text-transform: none; }
+[data-iteration="3"] .k-caret { margin-left: auto; font-weight: 400; color: var(--k-accent); font-size: 10px; letter-spacing: .06em; text-transform: none; }
+[data-iteration="3"] .k-slots { display: flex; flex-direction: column; gap: 6px; }
+[data-iteration="3"] .k-slot { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 3px; background: #0a1c26; border: 1px solid var(--k-border); font-size: 12px; }
+[data-iteration="3"] .k-sz { font-family: ui-monospace, Consolas, monospace; font-size: 10px; color: var(--k-accent); border: 1px solid color-mix(in srgb, var(--k-accent) 40%, transparent); border-radius: 2px; padding: 0 3.5px; }
+[data-iteration="3"] .k-slot b { font-weight: 500; }
+[data-iteration="3"] .k-slot small { margin-left: auto; color: var(--k-fg2); font-size: 11px; font-variant-numeric: tabular-nums; }
+[data-iteration="3"] .k-sub { display: flex; flex-direction: column; gap: 8px; }
+[data-iteration="3"] .k-peek { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11.5px; color: var(--k-fg2); }
+[data-iteration="3"] .k-peek b { color: var(--k-fg1); font-weight: 400; }
+[data-iteration="3"] .k-cap { font-size: .74rem; color: var(--text-tertiary); margin: .35rem 0 0; }
+</style>
+
+  <div class="iteration-intro">
+    <span class="k-iter">Iteration 3</span>
+    <h2>Alles übernommen: so sähe es aus</h2>
+    <p>Deine 21 Entscheidungen aus Runde 2 sind übernommen und vorgewählt, deine Notizen sind eingearbeitet. Ganz oben steht das Ergebnis: die klassische Ansicht so, wie sie gebaut würde, darunter der vorbereitete Holotisch und die Liste aller Symbole. Die Alternativen, die du nicht gewählt hast, sind eingeklappt. Du findest sie unter „Alternativen“ in jedem Abschnitt.</p>
+    <div class="k-next">
+      <h3>Nächster Schritt</h3>
+      <p>Passt es so, dann gib es frei: im Panel rechts auf den Pfeil ▾ neben „Zur nächsten Runde“ und dann „Jetzt umsetzen“. Ich baue dann die klassische Ansicht genau so um, setze die Farben im Holotisch ein und lege die Holotisch-Symbole nur bereit. Soll noch etwas anders werden, schreib es in die Notiz des Abschnitts und schick „Zur nächsten Runde“.</p>
+    </div>
+    <div class="k-changes">
+      <h3>Was aus deinen Notizen geworden ist</h3>
+      <ul>
+        <li><b>Kühlung = Thermometer:</b> Der Kühler trägt jetzt das Thermometer. Der Bereich „Signatur &amp; Kühlung“ behält die Signaturwelle. Die Lamellen liegen bei den Alternativen.</li>
+        <li><b>Bemannte Türme:</b> neues Symbol „Turm mit Schütze“. Es gehört zur selben Familie wie der ferngesteuerte Turm: gleicher Turm, statt der Funkbögen eine Person. Heute zählt der Codex bemannte Türme zu den ferngesteuerten. Mit eigenem Symbol bekommen sie einen eigenen Block.</li>
+        <li><b>Holotisch vorbereitet:</b> Die Farben sind gesetzt, die Symbole sind als Vorschlag zu sehen, und es gibt eine Vergleichsliste Klassisch ↔ Holotisch zum Vorlegen bei Jerre.</li>
+        <li><b>Rot:</b> Offensive bleibt Holo-Rot, wie in Spielen üblich. Dass Admin-Markierungen auch rot sind, hast du bewusst so entschieden. Der Warnhinweis ist weg.</li>
+      </ul>
+    </div>
+  </div>
+
+  <section id="k3-final" data-nav-label="So sähe es aus">
+    <h2>So sähe es aus: die klassische Ansicht</h2>
+    <p class="lead">Ein Beispielschiff mit beiden Turmarten, die Werte sind erfunden. Umgesetzt ist alles, was du gewählt hast: Linie oben mit 2 px bei 60 %, die Überschrift in der Bereichsfarbe, „Antrieb &amp; Systeme“ außen neutral mit farbigen Unterbereichen und die Zelle gedämpft.</p>
+    <div class="k-stage">
+      <div class="k-mk" id="k3-mk" data-form="top" data-strength="mid" data-turrets="own" aria-label="Nachbau der klassischen Ansicht">
+        <div class="k-mk-top"><b>Ausrüstung</b><small>Werkskonfiguration · Beispielwerte</small></div>
+        <div class="k-col">
+          <div class="k-blk" data-p="off" data-area="weapons">
+            <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Bewaffnung <span class="k-ct">4</span><span class="k-caret">Ausblenden</span></div>
+            <div class="k-slots">
+              <div class="k-slot"><span class="k-sz">S3</span><b>M5A Laserkanone</b><small>Flügel · 2×</small></div>
+              <div class="k-slot"><span class="k-sz">S3</span><b>CF-337 Panther Repeater</b><small>Nase · 2×</small></div>
+            </div>
+          </div>
+          <div class="k-blk" data-p="off" data-area="remoteTurrets" data-tv="own">
+            <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Ferngesteuerte Türme <span class="k-ct">1</span><span class="k-caret">Anzeigen</span></div>
+            <div class="k-peek"><span><b>2× S2</b> CF-227</span><span>unten</span></div>
+          </div>
+          <div class="k-blk" data-p="off" data-area="mannedTurrets" data-tv="own">
+            <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Bemannte Türme <span class="k-ct">1</span><span class="k-caret">Anzeigen</span></div>
+            <div class="k-peek"><span><b>2× S3</b> CF-337</span><span>Heck</span></div>
+          </div>
+          <div class="k-blk" data-p="off" data-area="turretsMerged" data-tv="merged">
+            <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Türme <span class="k-ct">2</span><span class="k-caret">Ausblenden</span></div>
+            <div class="k-slots">
+              <div class="k-slot" data-row="remoteTurrets"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg><b>Ferngesteuert · 2× CF-227</b><small>unten</small></div>
+              <div class="k-slot" data-row="mannedTurrets"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg><b>Bemannt · 2× CF-337</b><small>Heck</small></div>
+            </div>
+          </div>
+          <div class="k-blk" data-p="off" data-area="missiles">
+            <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Raketen <span class="k-ct">8</span><span class="k-caret">Anzeigen</span></div>
+            <div class="k-peek"><span><b>8× S2</b> Dominator II</span><span>EM-Lenkung</span></div>
+          </div>
+          <div class="k-blk" data-p="off" data-area="pod">
+            <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Pods <span class="k-ct">1</span><span class="k-caret">Anzeigen</span></div>
+            <div class="k-peek"><span><b>1× S2</b> Treibstoff-Pod</span></div>
+          </div>
+          <div class="k-blk" data-p="def" data-area="shields">
+            <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Schild-Generatoren <span class="k-ct">2</span><span class="k-caret">Ausblenden</span></div>
+            <div class="k-slots">
+              <div class="k-slot"><span class="k-sz">S1</span><b>FR-66</b><small>2×</small></div>
+            </div>
+          </div>
+          <div class="k-blk sys" data-p="mov" data-area="systems">
+            <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Antrieb &amp; Systeme <span class="k-ct">6</span><span class="k-caret">Ausblenden</span></div>
+            <div class="k-sub">
+              <div class="k-blk sub" data-p="mov" data-area="powerPlants">
+                <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Generator</div>
+                <div class="k-slots"><div class="k-slot"><span class="k-sz">S1</span><b>JS-300</b><small>1×</small></div></div>
+              </div>
+              <div class="k-blk sub" data-p="mov" data-area="quantum">
+                <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Quantenantrieb</div>
+                <div class="k-slots"><div class="k-slot"><span class="k-sz">S1</span><b>Atlas</b><small>1×</small></div></div>
+              </div>
+              <div class="k-blk sub" data-p="sig" data-area="coolers">
+                <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Kühler</div>
+                <div class="k-slots"><div class="k-slot"><span class="k-sz">S1</span><b>Bracer</b><small>2×</small></div></div>
+              </div>
+              <div class="k-blk sub" data-p="sig" data-area="radar">
+                <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Radar &amp; Sensoren</div>
+                <div class="k-slots"><div class="k-slot"><span class="k-sz">S1</span><b>Surveyor</b><small>1×</small></div></div>
+              </div>
+              <div class="k-blk sub" data-p="sig" data-area="lifeSupport">
+                <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Lebenserhaltung</div>
+                <div class="k-slots"><div class="k-slot"><span class="k-sz">S0</span><b>Lebenserhaltung (Standard)</b><small>1×</small></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="k-blk" data-p="def" data-area="countermeasures">
+            <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Gegenmaßnahmen <span class="k-ct">2</span><span class="k-tag">nicht konfigurierbar</span></div>
+            <div class="k-peek"><span><b>Köder</b> 24 Schuss</span><span><b>Störsignal</b> 12 Schuss</span></div>
+          </div>
+          <div class="k-blk fixed" data-p="def" data-area="structure">
+            <div class="k-bh"><svg class="k-ico" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Zelle &amp; feste Systeme <span class="k-ct">31</span><span class="k-tag">nicht konfigurierbar</span><span class="k-caret">Anzeigen</span></div>
+            <div class="k-peek"><span>Triebwerke, Treibstoff, Sitze, Steuerung</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="k-side">
+        <div class="k-sum">
+          <h4>Das wird umgesetzt</h4>
+          <dl>
+            <dt>Offensive</dt><dd><span class="k-sw" id="k3-sum-off-sw" style="--c:#e5484d"></span><span id="k3-sum-off">Holo-Rot #e5484d</span></dd>
+            <dt>Verteidigung</dt><dd><span class="k-sw" id="k3-sum-def-sw" style="--c:#5b8def"></span><span id="k3-sum-def">Blau #5b8def</span></dd>
+            <dt>Bewegung</dt><dd><span class="k-sw" style="--c:#9b8cc8"></span>Violett #9b8cc8, bleibt</dd>
+            <dt>Signatur</dt><dd><span class="k-sw" style="--c:#c8a84b"></span>Gold #c8a84b, bleibt</dd>
+            <dt>Umrandung</dt><dd id="k3-sum-border">Linie oben, 2 px, 60 %</dd>
+            <dt>Türme</dt><dd id="k3-sum-turrets">zwei Blöcke: ferngesteuert und bemannt</dd>
+          </dl>
+          <div class="k-mini" id="k3-mini" aria-label="Alle gewählten Symbole in ihrer Farbe"></div>
+          <p class="k-issue">Bekannt: Rot ist auch die Admin-Farbe. Das hast du bewusst so entschieden.</p>
+        </div>
+
+        <details class="k-alt">
+          <summary>Alternativen: Farben und Umrandung</summary>
+          <div class="k-alt-body">
+            <div data-decision="i3-c-off" data-label="Farbe Offensive">
+              <div class="k-dec">
+                <h4>Farbe Offensive</h4>
+                <div class="k-pills" data-mkctl="off">
+                  <label class="k-pill"><input type="radio" name="dec-i3-c-off" value="holo-rot" data-v="#e5484d" data-t="Holo-Rot #e5484d" checked><span class="k-sw" style="--c:#e5484d"></span>Holo-Rot #e5484d <i>gewählt</i></label>
+                  <label class="k-pill"><input type="radio" name="dec-i3-c-off" value="waffen-orange" data-v="#e8864a" data-t="Waffen-Orange #e8864a"><span class="k-sw" style="--c:#e8864a"></span>Waffen-Orange #e8864a</label>
+                  <label class="k-pill"><input type="radio" name="dec-i3-c-off" value="admin-rot" data-v="#ff5722" data-t="Admin-Rot #ff5722"><span class="k-sw" style="--c:#ff5722"></span>Admin-Rot #ff5722</label>
+                </div>
+              </div>
+            </div>
+            <div data-decision="i3-c-def" data-label="Farbe Verteidigung">
+              <div class="k-dec">
+                <h4>Farbe Verteidigung</h4>
+                <div class="k-pills" data-mkctl="def">
+                  <label class="k-pill"><input type="radio" name="dec-i3-c-def" value="blau" data-v="#5b8def" data-t="Blau #5b8def" checked><span class="k-sw" style="--c:#5b8def"></span>Blau #5b8def <i>gewählt</i></label>
+                  <label class="k-pill"><input type="radio" name="dec-i3-c-def" value="tiefblau" data-v="#3f6fd8" data-t="Tiefblau #3f6fd8"><span class="k-sw" style="--c:#3f6fd8"></span>Tiefblau #3f6fd8</label>
+                </div>
+              </div>
+            </div>
+            <div data-decision="i3-b-form" data-label="Form der Umrandung">
+              <div class="k-dec">
+                <h4>Form der Umrandung</h4>
+                <div class="k-pills" data-mkctl="form">
+                  <label class="k-pill"><input type="radio" name="dec-i3-b-form" value="linie-oben" data-v="top" data-t="Linie oben, 2 px" checked>Linie oben, 2 px <i>gewählt</i></label>
+                  <label class="k-pill"><input type="radio" name="dec-i3-b-form" value="voller-rahmen" data-v="full" data-t="Voller Rahmen, 1 px">Voller Rahmen, 1 px</label>
+                  <label class="k-pill"><input type="radio" name="dec-i3-b-form" value="rahmen-leuchten" data-v="glow" data-t="Rahmen mit Holo-Leuchten">Rahmen mit Holo-Leuchten</label>
+                </div>
+              </div>
+            </div>
+            <div data-decision="i3-b-strength" data-label="Stärke der Farbe">
+              <div class="k-dec">
+                <h4>Stärke der Farbe</h4>
+                <div class="k-pills" data-mkctl="strength">
+                  <label class="k-pill"><input type="radio" name="dec-i3-b-strength" value="dezent-35" data-v="soft" data-t="35 %">Dezent, 35 %</label>
+                  <label class="k-pill"><input type="radio" name="dec-i3-b-strength" value="mittel-60" data-v="mid" data-t="60 %" checked>Mittel, 60 % <i>gewählt</i></label>
+                  <label class="k-pill"><input type="radio" name="dec-i3-b-strength" value="voll-100" data-v="full" data-t="100 %">Voll, 100 %</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+    <label class="k-label" for="k3-final-note">Notiz zur klassischen Ansicht</label>
+    <textarea id="k3-final-note" data-comment="i3-final-note" placeholder="Was soll an der klassischen Ansicht noch anders werden? Leer lassen, wenn es passt."></textarea>
+  </section>
+
+  <section id="k3-holo" data-nav-label="Holotisch (vorbereitet)">
+    <h2>Holotisch: Farben gesetzt, Symbole vorbereitet</h2>
+    <p class="lead">Zum Vorlegen bei Jerre. Die Farben kommen gleich mit in den Holotisch: <code>--holo-p-offensive</code> ist heute Cyan und wird Holo-Rot, <code>--holo-p-defensive</code> wird Blau. Damit bedeutet eine Farbe in beiden Ansichten dasselbe. Die Symbole liegen danach im Code bereit, im Holotisch erscheinen sie erst, wenn ihr sie freigebt. Hier sind sie als Vorschlag zu sehen.</p>
+
+    <h3 class="k-h3">Bereichsleiste</h3>
+    <div class="k-holo" id="k3-holo-strip" aria-label="Holotisch-Bereiche mit Farben und vorbereiteten Symbolen">
+      <div class="k-ha" data-p="off"><h5><svg class="k-ico" data-area="offensive" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Offensive</h5><p>4 Waffen · 2 Türme · 8 Raketen</p></div>
+      <div class="k-ha" data-p="def"><h5><svg class="k-ico" data-area="defensive" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Verteidigung</h5><p>2 Schilde · 2 Werfer · Zelle</p></div>
+      <div class="k-ha" data-p="mov"><h5><svg class="k-ico" data-area="movement" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Bewegung</h5><p>Quantenantrieb · Generator</p></div>
+      <div class="k-ha" data-p="sig"><h5><svg class="k-ico" data-area="signature" viewBox="0 0 24 24" aria-hidden="true"><path d=""/></svg>Signatur &amp; Kühlung</h5><p>2 Kühler · Radar · Lebenserhaltung</p></div>
+    </div>
+
+    <h3 class="k-h3">„Bauteile im Detail“, je Bereich eine Spalte</h3>
+    <div class="k-holo" id="k3-holo-cols" aria-label="Bauteile je Holotisch-Bereich mit vorbereiteten Symbolen"></div>
+    <p class="k-cap">So ordnet der Holotisch die Bauteile heute den vier Bereichen zu. Die bemannten Türme stünden bei Offensive.</p>
+
+    <div data-decision="i3-holo-scope" data-label="Umfang im Holotisch" style="margin-top: 14px">
+      <div class="k-dec">
+        <h4>Was jetzt in den Holotisch kommt</h4>
+        <p>Vorgewählt ist, was du geschrieben hast: Farben jetzt, Symbole nur vorbereiten.</p>
+        <div class="k-pills" data-holoctl>
+          <label class="k-pill"><input type="radio" name="dec-i3-holo-scope" value="farben-jetzt-symbole-vorbereitet" data-v="prep" checked>Farben jetzt, Symbole nur vorbereiten <i>deine Notiz</i></label>
+          <label class="k-pill"><input type="radio" name="dec-i3-holo-scope" value="farben-und-symbole-jetzt" data-v="go">Farben und Symbole jetzt</label>
+          <label class="k-pill"><input type="radio" name="dec-i3-holo-scope" value="holotisch-unveraendert" data-v="no">Holotisch noch nicht ändern</label>
+        </div>
+      </div>
+    </div>
+    <label class="k-label" for="k3-holo-note">Notiz zum Holotisch</label>
+    <textarea id="k3-holo-note" data-comment="i3-holo-note" placeholder="Was Jerre dazu gesagt hat, oder was im Holotisch anders sein soll …"></textarea>
+  </section>
+
+  <section id="k3-list" data-nav-label="Alle Symbole">
+    <h2>Alle gewählten Symbole auf einen Blick</h2>
+    <p class="lead">Die Vergleichsliste für Klassisch und Holotisch. Jede Zeile zeigt das Symbol groß und in 16 px, der Größe in einer Überschrift. Daneben steht, wo es in der klassischen Ansicht sitzt und wo es im Holotisch sitzen würde. So siehst du schnell, welche Symbole auch in den Holotisch passen.</p>
+    <div class="k-cmp-wrap">
+      <table class="k-cmp" id="k3-cmp">
+        <thead><tr><th>Symbol</th><th>Bereich</th><th>Klassische Ansicht</th><th>Holotisch</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <label class="k-label" for="k3-list-note">Notiz zur Liste</label>
+    <textarea id="k3-list-note" data-comment="i3-list-note" placeholder="Welche Symbole sollen nicht in den Holotisch? Welche sehen sich zu ähnlich?"></textarea>
+  </section>
+
+  <section id="k3-sym" data-nav-label="Symbole im Einzelnen">
+    <h2>Die Symbole im Einzelnen</h2>
+    <p class="lead">Jede Karte zeigt deine Wahl, sie ist vorgewählt. Die anderen Fassungen und „kein Symbol“ liegen eingeklappt unter „Alternativen“. Gelb markiert ist, was in dieser Runde neu ist.</p>
+
+    <h3 class="k-h3">Die vier Holotisch-Bereiche</h3>
+    <div class="k-symgrid" id="k3-symgrid-holo"></div>
+
+    <h3 class="k-h3">Die Blöcke der klassischen Ansicht</h3>
+    <div class="k-symgrid" id="k3-symgrid-blocks"></div>
+
+    <div data-decision="i3-turret-place" data-label="Bemannte Türme in der klassischen Ansicht" style="margin-top: 12px">
+      <div class="k-dec">
+        <h4>Wo die bemannten Türme stehen</h4>
+        <p>Heute laufen bemannte Türme im Block „Ferngesteuerte Türme“ mit. Das Modell oben folgt dieser Wahl.</p>
+        <div class="k-pills" data-mkctl="turrets">
+          <label class="k-pill"><input type="radio" name="dec-i3-turret-place" value="eigener-block" data-v="own" data-t="zwei Blöcke: ferngesteuert und bemannt" checked>Eigener Block „Bemannte Türme“ <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-i3-turret-place" value="ein-block-symbol-pro-zeile" data-v="merged" data-t="ein Block „Türme“, Symbol pro Zeile">Ein Block „Türme“, Symbol pro Zeile</label>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="k-h3">Unterbereiche in „Antrieb &amp; Systeme“</h3>
+    <div class="k-symgrid" id="k3-symgrid-subs"></div>
+
+    <label class="k-label" for="k3-sym-note">Notiz zu den Symbolen</label>
+    <textarea id="k3-sym-note" data-comment="i3-sym-note" placeholder="Passt ein Symbol noch nicht? Schreib, was es zeigen soll."></textarea>
+  </section>
+
+  <section id="k3-notes" data-nav-label="Notizen">
+    <h2>Notizen</h2>
+    <p class="lead">Alles, was in keinen Abschnitt passt. Bilder bitte in den Feedback-Thread, die Seite kann keine Anhänge annehmen.</p>
+    <textarea data-comment="i3-notes" placeholder="Deine Anmerkungen …"></textarea>
+  </section>
+
+<script>
+(function () {
+  'use strict';
+  var root = document.getElementById('iter-3');
+  if (!root) return;
+  var C = { off: '#e5484d', def: '#5b8def', mov: '#9b8cc8', sig: '#c8a84b' };
+  // opts: [value, label, path, tag, isNew]; the first entry is the pick.
+  // cls / holo: where the symbol sits in each view (comparison list).
+  var AREAS = {
+    holo: [
+      { id: 'offensive', name: 'Offensive', p: 'off', sub: 'Holotisch-Bereich',
+        cls: 'kein eigener Block', clsHint: 'gibt Bewaffnung, Türmen, Raketen und Pods die Farbe', holo: 'Bereichsleiste',
+        verdict: '<b>Gewählt.</b> Fadenkreuz für Zielen, die Raute ist die Grundform der Holotisch-Marker.',
+        opts: [
+        ['fadenkreuz-raute', 'Fadenkreuz in Raute', 'M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3', 'gewählt'],
+        ['pfeilspitzen', 'Doppelte Spitze', 'M4 20L12 4l8 16 M8 14h8 M12 4v16']] },
+      { id: 'defensive', name: 'Verteidigung', p: 'def', sub: 'Holotisch-Bereich',
+        cls: 'kein eigener Block', clsHint: 'gibt Schilden, Gegenmaßnahmen und Zelle die Farbe', holo: 'Bereichsleiste',
+        verdict: '<b>Gewählt.</b> Der Schild ist schon das Codex-Symbol für Verteidigung.',
+        issue: 'Bekannt: Die Schild-Generatoren tragen auch einen Schild, mit ⏻ darin. Im Holotisch stehen beide nahe beieinander.',
+        opts: [
+        ['schild', 'Schild', 'M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z', 'gewählt'],
+        ['schild-ring', 'Schild mit Kern', 'M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z M12 8v8 M8.5 11.5h7']] },
+      { id: 'movement', name: 'Bewegung', p: 'mov', sub: 'Holotisch-Bereich',
+        cls: 'kein eigener Block', clsHint: 'gibt Generator und Quantenantrieb die Farbe', holo: 'Bereichsleiste',
+        verdict: '<b>Gewählt.</b> Der Doppel-Chevron steht für Vorwärts und Schub.',
+        opts: [
+        ['doppelchevron', 'Doppel-Chevron', 'M5 6l6 6-6 6 M13 6l6 6-6 6', 'gewählt'],
+        ['flugbahn', 'Flugbahn', 'M3 19c7 0 7-12 14-12h4 M18 4l3 3-3 3 M3 19h.01']] },
+      { id: 'signature', name: 'Signatur & Kühlung', p: 'sig', sub: 'Holotisch-Bereich',
+        cls: 'kein eigener Block', clsHint: 'gibt Kühler, Radar und Lebenserhaltung die Farbe', holo: 'Bereichsleiste',
+        verdict: '<b>Gewählt.</b> Signatur = Signaturwelle, wie in deiner Notiz. Die Kühlung zeigt das Thermometer am Kühler. Wer beide Zeichen im Bereichskopf will: Alternative „Welle + Thermometer“.',
+        opts: [
+        ['signaturwellen', 'Signaturwellen', 'M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8', 'gewählt'],
+        ['welle-thermometer', 'Welle + Thermometer', 'M4.5 5a1.5 1.5 0 0 1 3 0v9.2a3 3 0 1 1-3 0z M6 9v6 M13 12h.01 M15.5 9a4 4 0 0 1 0 6 M18.5 6a8 8 0 0 1 0 12', 'neu', 1]] }
+    ],
+    blocks: [
+      { id: 'weapons', name: 'Bewaffnung', p: 'off', sub: 'Offensive',
+        cls: 'Blocküberschrift', holo: 'Spalte Offensive',
+        verdict: '<b>Gewählt.</b> Doppellauf auf einer Halterung, wie ein Geschütz am Schiff, nicht wie eine Handwaffe.',
+        opts: [
+        ['kanonenlauf-halterung', 'Kanonenlauf auf Halterung', 'M3 9.5h11v4H3z M14 10.5h7 M14 12.5h7 M7.5 13.5v3.5 M4 17h7', 'gewählt'],
+        ['fadenkreuz', 'Fadenkreuz', 'M12 2V6 M12 18V22 M2 12H6 M18 12H22 M8 12A4 4 0 0 1 16 12A4 4 0 0 1 8 12 M12 12H12.01', 'heute im Codex']] },
+      { id: 'remoteTurrets', name: 'Ferngesteuerte Türme', p: 'off', sub: 'Offensive',
+        cls: 'Blocküberschrift', holo: 'Spalte Offensive',
+        verdict: '<b>Gewählt.</b> Turm mit zwei Läufen, das Funksignal kommt von außen: gesteuert von einem anderen Sitz.',
+        opts: [
+        ['turm-fernsteuerung', 'Turm mit Fernsteuerung', 'M3 21h16 M5.5 21a5.5 5.5 0 0 1 11 0 M8.2 16.6L4 10.6 M9.7 15.6L5.5 9.6 M21.5 2.5h.01 M17.5 2.5a4 4 0 0 0 4 4 M13.5 2.5a8 8 0 0 0 8 8', 'gewählt'],
+        ['kuppel-zwei-laeufe', 'Turm ohne Funk', 'M4 19h16 M6.5 19a5.5 5.5 0 0 1 11 0 M10 13.8L7.5 6 M14 13.8L16.5 6']] },
+      { id: 'mannedTurrets', name: 'Bemannte Türme', p: 'off', sub: 'Offensive · neu',
+        cls: 'Blocküberschrift (neuer Block)', holo: 'Spalte Offensive',
+        verdict: '<b>Neu, aus deiner Notiz.</b> Derselbe Turm wie beim ferngesteuerten, statt der Funkbögen sitzt eine Person daneben: Hier schießt jemand vor Ort. B setzt den Schützen in die Kuppel, das wird in 16 px aber eng.',
+        opts: [
+        ['turm-schuetze', 'A · Turm mit Schütze', 'M3 21h16 M5.5 21a5.5 5.5 0 0 1 11 0 M8.2 16.6L4 10.6 M9.7 15.6L5.5 9.6 M17 4.5a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M15.5 12.5a3.5 3.5 0 0 1 7 0', 'neu', 1],
+        ['schuetze-in-kuppel', 'B · Schütze in der Kuppel', 'M3 21h18 M5 21a7 7 0 0 1 14 0 M10 14.3L7.5 5 M14 14.3L16.5 5 M10.6 17.4a1.4 1.4 0 1 0 2.8 0a1.4 1.4 0 1 0-2.8 0 M9 21a3 2.4 0 0 1 6 0', 'neu', 1]] },
+      { id: 'missiles', name: 'Raketen', p: 'off', sub: 'Offensive',
+        cls: 'Blocküberschrift', holo: 'Spalte Offensive',
+        verdict: '<b>Gewählt.</b> Spitze, Leitwerk und Düse lesen sich auch in 16 px als Rakete.',
+        opts: [
+        ['rakete', 'Rakete', 'M12 2c2 2 3 4.5 3 7.5V17H9V9.5C9 6.5 10 4 12 2z M9 13l-3 3v4l3-2 M15 13l3 3v4l-3-2 M10.5 20.5h3', 'gewählt'],
+        ['sprengkopf-ziel', 'Sprengkopf im Ziel', 'M12 2v4 M12 18v4 M2 12h4 M18 12h4 M12 8l3 4-3 4-3-4z']] },
+      { id: 'pod', name: 'Pods', p: 'off', sub: 'Offensive',
+        cls: 'Blocküberschrift', holo: 'Spalte Offensive',
+        verdict: '<b>Gewählt: Fassung A.</b> Band oben, darunter ein großes „+“ für Unterstützung.',
+        opts: [
+        ['kapsel-plus', 'A · Band oben, großes Plus', 'M8 2h8a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3z M5 6.5h14 M5 12.5h14 M12 14.8v4.6 M9.7 17.1h4.6', 'gewählt'],
+        ['kapsel-plus-mitte', 'B · hohes Band, kleines Plus', 'M8 2h8a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3z M5 6.5h14 M5 14h14 M12 16.3v3.4 M10.3 18h3.4']] },
+      { id: 'shields', name: 'Schild-Generatoren', p: 'def', sub: 'Verteidigung',
+        cls: 'Blocküberschrift', holo: 'Spalte Verteidigung',
+        verdict: '<b>Gewählt: Schild mit Power.</b> Das ⏻ im Schild heißt: Dieses Teil erzeugt den Schild.',
+        issue: 'Bekannt: ähnelt dem Schild der Verteidigung. Unterschied ist das ⏻. In der klassischen Ansicht erscheint nur dieses.',
+        opts: [
+        ['schild-power', 'Schild mit Power', 'M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z M9.5 9.8a3.5 3.5 0 1 0 5 0 M12 7.5v4.5', 'gewählt'],
+        ['schildkuppel-power', 'Schildkuppel mit Power', 'M3 20h18 M4.5 20a7.5 7.5 0 0 1 15 0 M8 20a4 4 0 0 1 8 0 M9.9 4.4a3 3 0 1 0 4.2 0 M12 2.5v3.5']] },
+      { id: 'systems', name: 'Antrieb & Systeme', p: 'mov', sub: 'Bewegung + Signatur',
+        cls: 'Blocküberschrift, außen neutral', holo: 'kein Platz', holoHint: 'der Holotisch teilt Bewegung und Signatur getrennt auf',
+        verdict: '<b>Gewählt.</b> Der Baustein ist schon das Codex-Symbol für Systeme und fasst fünf Unterbereiche zusammen.',
+        opts: [
+        ['chip', 'Baustein', 'M9 2V5 M15 2V5 M9 19V22 M15 19V22 M2 9H5 M2 15H5 M19 9H22 M19 15H22 M5 5H19V19H5Z M9 9H15V15H9Z', 'gewählt'],
+        ['triebwerk', 'Triebwerk', 'M8 3H16L14.5 13H9.5Z M9.5 13C9.5 17 8.5 19 12 22C15.5 19 14.5 17 14.5 13', 'heute im Codex']] },
+      { id: 'countermeasures', name: 'Gegenmaßnahmen', p: 'def', sub: 'Verteidigung',
+        cls: 'Blocküberschrift', holo: 'Spalte Verteidigung',
+        verdict: '<b>Gewählt.</b> Der Fächer zeigt ausgestoßene Flares, die häufigste Gegenmaßnahme im Spiel.',
+        opts: [
+        ['koederfaecher', 'Köderfächer', 'M12 21v-7 M12 14L6.5 6.5 M12 14V4.5 M12 14l5.5-7.5 M6.5 5a1.4 1.4 0 1 0 0 .01 M12 3a1.4 1.4 0 1 0 0 .01 M17.5 5a1.4 1.4 0 1 0 0 .01', 'gewählt'],
+        ['stoerwelle', 'Störwelle', 'M3 12c1.5-3 3-3 4.5 0s3 3 4.5 0 3-3 4.5 0 3 3 4.5 0 M4 5l16 14']] },
+      { id: 'structure', name: 'Zelle & feste Systeme', p: 'def', sub: 'Verteidigung',
+        cls: 'Blocküberschrift, gedämpft', holo: 'Spalte Verteidigung',
+        verdict: '<b>Gewählt.</b> Das Spantgitter zeigt das tragende Gerüst der Zelle.',
+        issue: 'Bekannt: Allein gesehen kann es wie eine Kiste wirken. Der Name steht immer daneben.',
+        opts: [
+        ['spantgitter', 'Spantgitter', 'M4 4h16v16H4z M4 12h16 M12 4v16 M4 4l8 8 M20 20l-8-8', 'gewählt'],
+        ['rumpf', 'Rumpf', 'M12 2C13.6 4.3 14.5 7.4 14.5 11L14.5 15L18 19L14.5 18L13 22L11 22L9.5 18L6 19L9.5 15L9.5 11C9.5 7.4 10.4 4.3 12 2Z', 'heute im Codex']] }
+    ],
+    subs: [
+      { id: 'powerPlants', name: 'Generator', p: 'mov', sub: 'Bewegung',
+        cls: 'Unterbereich', holo: 'Spalte Bewegung',
+        verdict: '<b>Gewählt.</b> Der Blitz ist schon das Codex-Symbol für den Generator.',
+        opts: [
+        ['blitz', 'Blitz', 'M13 2L4 14H10L9 22L20 9H13Z', 'gewählt'],
+        ['reaktor', 'Reaktor', 'M12 12a2 2 0 1 0 0 .01 M12 3a9 4 0 0 1 0 18a9 4 0 0 1 0-18 M4.2 7.5a9 4 60 0 1 15.6 9 M19.8 7.5a9 4 -60 0 1-15.6 9']] },
+      { id: 'quantum', name: 'Quantenantrieb', p: 'mov', sub: 'Bewegung',
+        cls: 'Unterbereich', holo: 'Spalte Bewegung',
+        verdict: '<b>Gewählt.</b> Der Ring mit der Bahn ist schon das Codex-Symbol für den Quantenantrieb.',
+        opts: [
+        ['quantenring', 'Quantenring', 'M12 9A3 3 0 1 1 11.99 9 M4 12C8 8.6 16 8.6 20 12C16 15.4 8 15.4 4 12 M10.3 4.3C13.7 8.3 13.7 15.7 10.3 19.7', 'gewählt'],
+        ['sprung', 'Sprung', 'M3 12h11 M10 7l5 5-5 5 M18 5v14 M21 8v8']] },
+      { id: 'coolers', name: 'Kühler', p: 'sig', sub: 'Signatur & Kühlung',
+        cls: 'Unterbereich', holo: 'Spalte Signatur & Kühlung',
+        verdict: '<b>Neu, aus deiner Notiz:</b> Kühlung = Thermometer. Die Lamellen, die in Runde 2 noch vorgewählt waren, liegen bei den Alternativen.',
+        opts: [
+        ['thermometer', 'Thermometer', 'M10 4a2 2 0 0 1 4 0v9.5a4 4 0 1 1-4 0z M12 9v6 M17 6h3 M17 10h3', 'neu', 1],
+        ['lamellen', 'Kühllamellen', 'M4 5h16 M4 9h16 M4 13h16 M5 18c1.7 2 3.4 2 5 0s3.4-2 5 0 3.4 2 4 0', 'Wahl aus Runde 2'],
+        ['schneeflocke', 'Schneeflocke', 'M12 2V22 M3 7L21 17 M21 7L3 17 M5.5 4.2L7 8L11 7 M18.5 4.2L17 8L13 7 M5.5 19.8L7 16L11 17 M18.5 19.8L17 16L13 17', 'heute im Codex']] },
+      { id: 'radar', name: 'Radar & Sensoren', p: 'sig', sub: 'Signatur & Kühlung',
+        cls: 'Unterbereich', holo: 'Spalte Signatur & Kühlung',
+        verdict: '<b>Gewählt.</b> Radarschirm mit Zeiger, klar von den Signaturwellen getrennt.',
+        opts: [
+        ['radarschirm', 'Radarschirm', 'M12 12l6.4-6.4 M20 12a8 8 0 1 1-8-8 M16 12a4 4 0 1 1-4-4 M12 12h.01', 'gewählt'],
+        ['schuessel', 'Antennenschüssel', 'M4 14a8 8 0 0 0 10-10z M9 9l6-6 M15 3a2 2 0 1 0 0 .01 M7 18l-2 3h8l-2-3']] },
+      { id: 'lifeSupport', name: 'Lebenserhaltung', p: 'sig', sub: 'Signatur & Kühlung',
+        cls: 'Unterbereich', holo: 'Spalte Signatur & Kühlung',
+        verdict: '<b>Gewählt.</b> „O₂“ ist im Spiel das Zeichen für Sauerstoff, auch im Anzug-HUD.',
+        opts: [
+        ['o2', 'O₂', 'M3 11.5a6 6 0 1 0 12 0a6 6 0 1 0-12 0 M16.8 15.6a2.1 2.1 0 1 1 3.4 1.7L16.8 21H21', 'gewählt'],
+        ['atemblase', 'Atemblasen', 'M9 14a5 5 0 1 0 0 .01 M17 7a3 3 0 1 0 0 .01 M18 16a2 2 0 1 0 0 .01', 'Wahl aus Runde 1']] }
+    ]
+  };
+  // The holotisch's "Bauteile im Detail" columns (codex-holo-stage PART_AREAS, plus the new manned turrets).
+  var HOLO_COLS = [
+    { area: 'offensive', name: 'Offensive', p: 'off', items: ['weapons', 'remoteTurrets', 'mannedTurrets', 'missiles', 'pod'] },
+    { area: 'defensive', name: 'Verteidigung', p: 'def', items: ['shields', 'countermeasures', 'structure'] },
+    { area: 'movement', name: 'Bewegung', p: 'mov', items: ['quantum', 'powerPlants'] },
+    { area: 'signature', name: 'Signatur & Kühlung', p: 'sig', items: ['coolers', 'radar', 'lifeSupport'] }
+  ];
+  var NS = 'http://www.w3.org/2000/svg';
+  function svg(d, cls) {
+    var s = document.createElementNS(NS, 'svg');
+    s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('aria-hidden', 'true');
+    if (cls) s.setAttribute('class', cls);
+    var p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); s.appendChild(p);
+    return s;
+  }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  var PATHS = {}, DEFAULT = {}, META = {};
+  function tile(a, o, i) {
+    var l = el('label', 'k-opt' + (i === 0 ? ' pick' : '') + (o[2] ? '' : ' none'));
+    var inp = document.createElement('input'); inp.type = 'radio'; inp.name = 'dec-i3-sym-' + a.id; inp.value = o[0];
+    if (i === 0) { inp.checked = true; inp.defaultChecked = true; }
+    inp.setAttribute('aria-label', a.name + ': ' + o[1]);
+    l.appendChild(inp);
+    l.appendChild(svg(o[2] || 'M5 5l14 14 M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18'));
+    l.appendChild(el('span', null, o[1]));
+    if (o[3]) { var e = el('em', o[4] ? 'new' : null, o[3]); l.appendChild(e); }
+    PATHS[a.id][o[0]] = o[2];
+    return l;
+  }
+  function card(a) {
+    var box = el('div', 'k-sym');
+    box.setAttribute('data-decision', 'i3-sym-' + a.id);
+    box.setAttribute('data-label', 'Symbol ' + a.name);
+    box.setAttribute('data-p', a.p);
+    var h = el('div', 'k-sym-h');
+    h.append(el('span', 'k-sw'), el('b', null, a.name), el('small', null, a.sub));
+    box.appendChild(h);
+    PATHS[a.id] = {}; DEFAULT[a.id] = a.opts[0][0]; META[a.id] = a;
+    var top = el('div', 'k-sym-top');
+    top.appendChild(tile(a, a.opts[0], 0));
+    var v = el('p', 'k-verdict'); v.innerHTML = a.verdict; top.appendChild(v);
+    box.appendChild(top);
+    if (a.issue) box.appendChild(el('p', 'k-issue', a.issue));
+    var alts = a.opts.slice(1).concat([['kein-symbol', 'kein Symbol', '']]);
+    var det = el('details', 'k-alt');
+    det.appendChild(el('summary', null, 'Alternativen (' + alts.length + ')'));
+    var body = el('div', 'k-alt-body');
+    var grid = el('div', 'k-opts');
+    alts.forEach(function (o, i) { grid.appendChild(tile(a, o, i + 1)); });
+    body.appendChild(grid); det.appendChild(body); box.appendChild(det);
+    return box;
+  }
+  [['holo', 'k3-symgrid-holo'], ['blocks', 'k3-symgrid-blocks'], ['subs', 'k3-symgrid-subs']].forEach(function (g) {
+    var host = document.getElementById(g[1]);
+    if (host && !host.children.length) AREAS[g[0]].forEach(function (a) { host.appendChild(card(a)); });
+  });
+  var cols = document.getElementById('k3-holo-cols');
+  if (cols && !cols.children.length) HOLO_COLS.forEach(function (c) {
+    var col = el('div', 'k-ha'); col.setAttribute('data-p', c.p);
+    var h5 = el('h5'); var ai = svg('', 'k-ico'); ai.setAttribute('data-area', c.area); h5.append(ai, document.createTextNode(c.name));
+    col.appendChild(h5);
+    var ul = el('ul');
+    c.items.forEach(function (id) {
+      var li = el('li'); var ic = svg('', 'k-ico'); ic.setAttribute('data-area', id);
+      li.append(ic, el('span', null, META[id] ? META[id].name : id));
+      ul.appendChild(li);
+    });
+    col.appendChild(ul); cols.appendChild(col);
+  });
+  var mk = document.getElementById('k3-mk');
+  var mini = document.getElementById('k3-mini');
+  var cmp = root.querySelector('#k3-cmp tbody');
+  function pathFor(id) {
+    var c = root.querySelector('input[name="dec-i3-sym-' + id + '"]:checked');
+    var key = c ? c.value : DEFAULT[id];
+    return (PATHS[id] && PATHS[id][key]) || '';
+  }
+  function setIco(ico, d) {
+    if (!ico) return;
+    ico.style.display = d ? '' : 'none';
+    ico.querySelector('path').setAttribute('d', d);
+  }
+  function checked(name) { return root.querySelector('input[name="' + name + '"]:checked'); }
+  function setText(id, t) { var n = document.getElementById(id); if (n && t) n.textContent = t; }
+  var STATUS = {
+    prep: ['prep', 'vorbereitet'],
+    go: ['go', 'wird umgesetzt'],
+    no: ['no', 'nicht geplant']
+  };
+  function sync() {
+    var off = checked('dec-i3-c-off'), def = checked('dec-i3-c-def');
+    C.off = off ? off.getAttribute('data-v') : '#e5484d';
+    C.def = def ? def.getAttribute('data-v') : '#5b8def';
+    root.style.setProperty('--k-off', C.off);
+    root.style.setProperty('--k-def', C.def);
+    setText('k3-sum-off', off && off.getAttribute('data-t'));
+    setText('k3-sum-def', def && def.getAttribute('data-t'));
+    var so = document.getElementById('k3-sum-off-sw'); if (so) so.style.setProperty('--c', C.off);
+    var sd = document.getElementById('k3-sum-def-sw'); if (sd) sd.style.setProperty('--c', C.def);
+    var fm = checked('dec-i3-b-form'), st = checked('dec-i3-b-strength'), tp = checked('dec-i3-turret-place');
+    if (fm && st) setText('k3-sum-border', fm.getAttribute('data-t') + ', ' + st.getAttribute('data-t'));
+    setText('k3-sum-turrets', tp && tp.getAttribute('data-t'));
+    root.querySelectorAll('.k-sym[data-p]').forEach(function (box) {
+      var c = C[box.getAttribute('data-p')];
+      box.style.setProperty('--c', c);
+      var sw = box.querySelector('.k-sw'); if (sw) sw.style.setProperty('--c', c);
+    });
+    if (mk) {
+      root.querySelectorAll('[data-mkctl]').forEach(function (grp) {
+        var c = grp.querySelector('input:checked');
+        var k = grp.getAttribute('data-mkctl');
+        if (c && k !== 'off' && k !== 'def') mk.setAttribute('data-' + k, c.getAttribute('data-v'));
+      });
+      mk.querySelectorAll('[data-area]').forEach(function (blk) {
+        var a = blk.getAttribute('data-area');
+        setIco(blk.querySelector(':scope > .k-bh .k-ico'), a === 'turretsMerged' ? pathFor('remoteTurrets') : pathFor(a));
+      });
+      mk.querySelectorAll('[data-row]').forEach(function (row) { setIco(row.querySelector('.k-ico'), pathFor(row.getAttribute('data-row'))); });
+    }
+    root.querySelectorAll('#k3-holo-strip .k-ico[data-area], #k3-holo-cols .k-ico[data-area]').forEach(function (ico) { setIco(ico, pathFor(ico.getAttribute('data-area'))); });
+    var scope = checked('dec-i3-holo-scope');
+    var sv = scope ? scope.getAttribute('data-v') : 'prep';
+    if (mini) {
+      mini.textContent = '';
+      ['holo', 'blocks', 'subs'].forEach(function (g) {
+        AREAS[g].forEach(function (a) {
+          var d = pathFor(a.id); if (!d) return;
+          var s = svg(d); s.style.setProperty('--c', C[a.p]);
+          s.removeAttribute('aria-hidden'); s.setAttribute('role', 'img'); s.setAttribute('aria-label', a.name);
+          mini.appendChild(s);
+        });
+      });
+    }
+    if (cmp) {
+      cmp.textContent = '';
+      [['holo', 'Holotisch-Bereiche'], ['blocks', 'Blöcke der klassischen Ansicht'], ['subs', 'Unterbereiche in „Antrieb & Systeme“']].forEach(function (g) {
+        var gr = el('tr', 'grp'); var gtd = el('td', null, g[1]); gtd.colSpan = 4; gr.appendChild(gtd); cmp.appendChild(gr);
+        AREAS[g[0]].forEach(function (a) {
+          var d = pathFor(a.id);
+          var tr = el('tr');
+          var sy = el('td', 'sy'); sy.style.setProperty('--c', C[a.p]);
+          if (d) { sy.append(svg(d, 'big'), svg(d, 'small')); } else { sy.textContent = 'kein Symbol'; }
+          var nm = el('td'); nm.appendChild(el('span', 'k-sw')); nm.firstChild.style.setProperty('--c', C[a.p]); nm.appendChild(document.createTextNode(a.name));
+          var cl = el('td', null, a.cls);
+          if (a.clsHint) cl.appendChild(el('small', null, a.clsHint));
+          if (a.cls.indexOf('kein') !== 0) { cl.appendChild(el('br')); cl.appendChild(el('span', 'k-st go', 'wird umgesetzt')); }
+          var ho = el('td', null, a.holo);
+          if (a.holoHint) ho.appendChild(el('small', null, a.holoHint));
+          if (a.holo !== 'kein Platz') { var s2 = STATUS[sv]; ho.appendChild(el('br')); ho.appendChild(el('span', 'k-st ' + s2[0], s2[1])); }
+          tr.append(sy, nm, cl, ho);
+          cmp.appendChild(tr);
+        });
+      });
+    }
+  }
+  root.addEventListener('change', sync);
+  sync();
+  setTimeout(sync, 400);
+})();
+</script>
+</section>
+
 
 </main>
     </div>
