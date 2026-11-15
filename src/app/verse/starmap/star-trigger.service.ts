@@ -68,7 +68,7 @@ export class StarTriggerService {
         // Not the newest ship (or the guess is still open): stay retryable.
         if (!res.ok || res.data === 'guess_first') this.done.delete(id);
         if (res.ok && res.data === 'earned') {
-          this.analytics.captureVerse('verse_star_earned', { patch_line: line, star_key: key });
+          this.analytics.track('verse:star_earn', { patch_line: line, star_key: key });
         }
         return;
       }
@@ -77,7 +77,7 @@ export class StarTriggerService {
         this.done.delete(id);
         return;
       }
-      if (res.data) this.analytics.captureVerse('verse_star_earned', { patch_line: line, star_key: key });
+      if (res.data) this.analytics.track('verse:star_earn', { patch_line: line, star_key: key });
     } catch {
       /* a star must never break the page that triggered it */
     }

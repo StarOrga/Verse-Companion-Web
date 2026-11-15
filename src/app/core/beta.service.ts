@@ -102,7 +102,7 @@ export class BetaService {
     if (!BETA_AREAS.includes(area)) return;
     this.choices.update((c) => ({ ...c, [area]: enabled }));
     writeChoices(this.choices());
-    this.analytics.captureVerse('beta_toggle', { area, enabled });
+    this.analytics.track('settings:beta_toggle', { area, enabled });
   }
 
   toggle(area: BetaArea): void {

@@ -39,7 +39,7 @@ describe('LoginComponent — signed-out preview lock', () => {
         provideRouter([]),
         { provide: AccessRequestService, useValue: { submit: () => Promise.resolve({ kind: 'ok' }) } },
         { provide: AuthService, useValue: { ready: () => false, realUser: () => null, signInWithPassword, signInWithGoogle, signInWithDiscord } },
-        { provide: AnalyticsService, useValue: { capture: () => {} } },
+        { provide: AnalyticsService, useValue: { track: () => {} } },
         { provide: SupabaseClientProvider, useValue: { client: {} } },
         { provide: ImpersonationService, useValue: { viewAs: () => viewAs, exit } },
       ],

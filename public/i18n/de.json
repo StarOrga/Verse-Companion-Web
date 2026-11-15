@@ -4533,7 +4533,7 @@
         "title": "Kurz gefasst",
         "noAds": "Keine Werbung, keine Werbenetzwerke.",
         "signIn": "Anmelden kannst du dich auf genau zwei Wegen: mit E-Mail-Adresse und Passwort oder mit deinem Google-Konto. Der Google-Weg ist freiwillig und gibt Daten an Google.",
-        "noTracking": "Keine Werbe-Tracker. Produkt-Analytik über PostHog (EU) läuft nur, wenn du sie erlaubst — Voreinstellung ist aus.",
+        "noTracking": "Keine Werbe-Tracker. Produkt-Analytik über PostHog (EU) läuft nur, wenn du sie erlaubst — Voreinstellung ist aus. Unser eigener Server meldet seine Fehler und Laufzeiten ohne jeden Personenbezug.",
         "minimal": "Nur die Daten, die die Funktionen brauchen — nichts wird verkauft oder zu Marketingzwecken geteilt.",
         "euHosting": "Anwendungsdaten liegen in der EU (Supabase, Region eu-central-1 / Frankfurt)."
       },
@@ -4580,7 +4580,8 @@
         "supabase": "Supabase (Datenbank, Authentifizierung, Datei-Speicher) — EU-Region eu-central-1 (Frankfurt); verarbeitet deine Konto- und Anwendungsdaten in unserem Auftrag.",
         "vercel": "Vercel Inc. (Hosting, CDN) — Auslieferung der statischen App.",
         "google": "Google Sign-In (Google Ireland Limited / Google LLC) — nur wenn du dich bewusst mit Google anmeldest; Details im Abschnitt „Anmeldung mit Google\".",
-        "posthog": "PostHog (Produkt-Analytik und Fehlerdiagnose) — EU-Cloud (eu.i.posthog.com); erfasst anonyme Nutzungsereignisse, Ladezeiten der Seiten und Fehler, und das nur nach deiner Zustimmung.",
+        "posthog": "PostHog (Produkt-Analytik und Fehlerdiagnose) — EU-Cloud; die Anfragen laufen über die eigene Adresse dieser Seite (/ingest). Nur nach deiner Zustimmung werden Nutzungsereignisse, Ladezeiten der Seiten, tote Klicks und Heatmaps sowie Fehler erfasst. Sitzungen, in denen ein Fehler auftritt, werden zur Wiedergabe aufgezeichnet — alle Eingaben maskiert. Bist du angemeldet, sieht PostHog eine pseudonyme ID (ein gesalzener Hash deiner Konto-ID) und deine Rolle (Viewer, Collaborator oder Admin) — nie deine E-Mail-Adresse oder deinen Namen.",
+        "posthogServer": "PostHog (serverseitig) — unsere eigenen Server-Funktionen melden ihre Fehler und Laufzeiten an PostHog (EU-Cloud), ohne IP-Adresse, Nutzer-ID oder Inhalte. Das hängt nicht von deiner Zustimmung ab, weil keine personenbezogenen Daten beteiligt sind.",
         "fonts": "Google Fonts — Schriftdateien werden von Google-Servern geladen; Google kann dabei deine IP-Adresse sehen.",
         "rsiMedia": "Bilder in den Verse-News kommen teils direkt von Servern von Roberts Space Industries (media.robertsspaceindustries.com, theverse.robertsspaceindustries.com) — beim Laden sieht RSI deine IP-Adresse.",
         "gameApis": "Öffentliche Star-Citizen-Daten: status.robertsspaceindustries.com und api.star-citizen.wiki (nur lesend, es werden keine Kontodaten übertragen)."
@@ -5459,7 +5460,7 @@
       },
       "statistics": {
         "label": "Statistik",
-        "desc": "Anonyme Nutzungsstatistiken und anonyme Fehlerberichte (PostHog, EU-Server), um zu verstehen welche Bereiche genutzt werden und wo etwas schiefgeht. Standardmäßig aus, keine Identifizierung, keine Sitzungsaufzeichnung. Beim Abschalten werden die gespeicherten Werte gelöscht."
+        "desc": "Anonyme Nutzungsstatistiken und anonyme Fehlerberichte (PostHog, EU-Server), um zu verstehen welche Bereiche genutzt werden und wo etwas schiefgeht. Standardmäßig aus. Angemeldet erscheinst du unter einer pseudonymen ID mit deiner Rolle — nie mit Namen oder E-Mail; Sitzungen mit einem Fehler werden ggf. mit maskierten Eingaben aufgezeichnet. Beim Abschalten werden die gespeicherten Werte gelöscht."
       }
     }
   },

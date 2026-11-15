@@ -16,7 +16,7 @@ describe('HangarImportComponent', () => {
   let ships: ReturnType<typeof signal<{ shipClassName: string }[]>>;
   let codex: { getShipsByClassNames: Mock; listByKind: Mock };
   let hangar: { ships: unknown; addShip: Mock; updateShip: Mock };
-  let analytics: { capture: Mock };
+  let analytics: { track: Mock };
 
   function row(slug: string, name: string): CodexListRow {
     return { classNameSlug: slug, nameLocalized: name } as CodexListRow;
@@ -33,7 +33,7 @@ describe('HangarImportComponent', () => {
       addShip: vi.fn().mockName('addShip').mockImplementation(async (slug: string) => ({ id: 'id-' + slug })),
       updateShip: vi.fn().mockName('updateShip').mockResolvedValue(true),
     };
-    analytics = { capture: vi.fn().mockName('capture') };
+    analytics = { track: vi.fn().mockName('track') };
     TestBed.configureTestingModule({
       imports: [HangarImportComponent],
       providers: [
@@ -151,7 +151,7 @@ describe('HangarImportComponent', () => {
       expect(order).toEqual(['add', 'update']);
       expect(imported).toBe(1);
       expect(badges()).toEqual(['hangar.add.already']);
-      expect(analytics.capture).toHaveBeenCalled();
+      expect(analytics.track).toHaveBeenCalled();
     });
 
     it('does not set a customName when the nickname equals the type name', async () => {
@@ -174,7 +174,7 @@ describe('HangarImportComponent', () => {
       fixture.detectChanges();
 
       expect(imported).toBe(0);
-      expect(analytics.capture).not.toHaveBeenCalled();
+      expect(analytics.track).not.toHaveBeenCalled();
       expect(badges()).toEqual(['hangar.import.exact']);
     });
   });

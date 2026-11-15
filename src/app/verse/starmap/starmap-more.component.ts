@@ -217,7 +217,7 @@ export class StarmapMoreComponent {
         constellation: wallpaperConstellations(st, p)[0],
       });
       const channel = await shareImage(blob, `sc-kartograph-${badge.rank}.png`, badgeCaption(this.t, badge).title, url);
-      if (channel) this.analytics.captureVerse('starscape_share', { image_id: `kartograph-${badge.rank}-${badge.patch}`, channel });
+      if (channel) this.analytics.track('verse:starscape_share', { image_id: `kartograph-${badge.rank}-${badge.patch}`, channel });
       if (channel === 'copy') {
         this.sgStatus.set('starmap.gallery.copied');
       }

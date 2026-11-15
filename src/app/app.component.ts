@@ -7,7 +7,7 @@ import { FriendsService } from './social/friends.service';
 import { emptyGraph } from './social/friends.types';
 import { SocialPresenceService } from './social/social-presence.service';
 import { AnalyticsService } from './core/analytics.service';
-import { WebVitalsService } from './core/web-vitals.service';
+import { AnalyticsIdentityService } from './core/analytics/analytics-identity.service';
 import { ConsentBannerComponent } from './core/consent-banner.component';
 import { LocaleService } from './core/locale/locale.service';
 import { dismissBootSplash } from './core/boot-splash';
@@ -114,7 +114,7 @@ export class AppComponent implements OnInit {
   private readonly friends = inject(FriendsService);
   private readonly sb = inject(SupabaseClientProvider);
   private readonly analytics = inject(AnalyticsService);
-  private readonly webVitals = inject(WebVitalsService);
+  private readonly analyticsIdentity = inject(AnalyticsIdentityService);
   private readonly locale = inject(LocaleService);
   readonly swUpdate = inject(SwUpdateService);
   private readonly routeRecovery = inject(RouteLoadRecoveryService);
@@ -223,8 +223,8 @@ export class AppComponent implements OnInit {
     this.routeRecovery.init();
     // No-op without a configured key or statistics consent (#139).
     this.analytics.init();
-    // Real-user load metrics, sent once per page load — same statistics consent gate.
-    this.webVitals.init();
+    // Identifies a signed-in user (salted hash + role) once statistics consent holds.
+    this.analyticsIdentity.init();
     // C7 — one-shot: reads UTM params off THIS load's URL; no-op without
     // params or (yet) consent. Must run after init() so it shares the same
     // lazy-loaded PostHog client once consent is granted.

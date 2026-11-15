@@ -222,7 +222,7 @@ export class HangarService {
     }
     const ship = mapHangarShip(data as HangarShipRow);
     this.ships.set([ship, ...this.ships()]);
-    this.analytics.capture('hangar_ship_added', {
+    this.analytics.track('hangar:ship_add', {
       ship_class: shipClassName,
       status,
       ship_count: this.ships().length,
@@ -376,7 +376,7 @@ export class HangarService {
       this.setFlagship(null);
     }
     if (removed) {
-      this.analytics.capture('hangar_ship_removed', {
+      this.analytics.track('hangar:ship_remove', {
         ship_class: removed.shipClassName,
         status: removed.status,
         ship_count: this.ships().length,
@@ -404,7 +404,7 @@ export class HangarService {
     this.writeFlagship(shipClassName);
     void this.persistFlagshipRemote(shipClassName);
     if (shipClassName) {
-      this.analytics.capture('hangar_flagship_set', { ship_class: shipClassName });
+      this.analytics.track('hangar:flagship_select', { ship_class: shipClassName });
     }
   }
 
@@ -635,7 +635,7 @@ export class HangarService {
       return null;
     }
     const config = mapHangarShipConfig(data as HangarShipConfigRow);
-    this.analytics.capture('hangar_ship_config_saved', { role: config.role });
+    this.analytics.track('hangar:ship_config_update', { role: config.role });
     return config;
   }
 
@@ -710,7 +710,7 @@ export class HangarService {
     }
     const loadout = mapHangarRoleLoadout(data as HangarRoleLoadoutRow);
     this.roleLoadouts.set([loadout, ...this.roleLoadouts()]);
-    this.analytics.capture('hangar_loadout_created', { role });
+    this.analytics.track('hangar:loadout_create', { role });
     return loadout;
   }
 

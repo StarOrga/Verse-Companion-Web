@@ -116,7 +116,7 @@ describe('SettingsComponent layout', () => {
             setRegion: () => undefined,
           },
         },
-        { provide: AnalyticsService, useValue: { capture: () => undefined } },
+        { provide: AnalyticsService, useValue: { track: () => undefined } },
         // Account-synced (profiles.ui_prefs): stubbed so the spec never reads a profile.
         {
           provide: RoutineTintPrefsService,
