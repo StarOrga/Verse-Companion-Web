@@ -4,7 +4,7 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.267.0] - 2026-11-15
+## [0.268.0] - 2026-11-15
 
 ### Changed
 - Focus indication is now a soft glow that only appears when navigating by keyboard — no more hard rings after a mouse click.
@@ -16,6 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Small texts on the rank page, the patch-tip hint and the data sheet now meet the 12 px mobile minimum.
+
+## [0.267.0] - 2026-11-15
+
+### Added
+- Popups open as a hologram "Vektor-Aufriss": a spark at the trigger, a short light line, the outline unrolling from it, the window filling from the top and the content resolving from blur; closing collapses back into the spark.
+- Large windows get a scrim with a faint dot grid instead of the horizon and star plate.
+
+### Changed
+- Open and close timings are staged per popup kind (menu 300 ms, dialog 500 ms, large window 900 ms); a re-open reverses from where the close stands; reduced motion shows popups instantly.
+- The page no longer zooms in behind a large window.
 
 ## [0.266.0] - 2026-11-15
 

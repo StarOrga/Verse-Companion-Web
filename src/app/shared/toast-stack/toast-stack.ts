@@ -1,13 +1,13 @@
 import { Directive, ElementRef, Injectable, NgZone, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
-import { POPUP_MOTION_CLOSE_SHARE, POPUP_MOTION_REDUCED_MS, POPUP_MOTION_TOTAL } from '../popup-motion/sc-popup-motion.directive';
+import { popupMotionCloseMs } from '../popup-motion/sc-popup-motion.directive';
 
 /**
  * How long a closing toast keeps its slot: the small popup close (`animate.leave="pm-out"`,
- * the open reversed in 60 % of the time) plus a frame, so the stack above it only closes the
+ * its own 160 ms collapse; nothing under reduced motion) plus a frame, so the stack above it only closes the
  * gap once the toast has really gone.
  */
 export function toastLeaveMs(reduced: boolean): number {
-  return reduced ? POPUP_MOTION_REDUCED_MS : Math.round(POPUP_MOTION_TOTAL.small * POPUP_MOTION_CLOSE_SHARE) + 30;
+  return popupMotionCloseMs('small', reduced) + 30;
 }
 
 /**
