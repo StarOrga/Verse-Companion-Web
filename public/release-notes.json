@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.7",
+  "current": "0.270.8",
   "releases": [
+    {
+      "version": "0.270.8",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Removed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The unused xAI (Grok) provider is gone: no more hourly xAI check, no Grok fallback for event summaries, and no xAI entry in the service list."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.270.7",
       "date": "2026-11-15",

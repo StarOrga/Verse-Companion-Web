@@ -42,7 +42,7 @@ const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g;
 const BEARER_HEADER = /Bearer\s+[^\s'",]+/gi;
 const JWT = /eyJ[\w-]+\.[\w-]+\.[\w-]+/g;
 const KEY_PARAM = /([?&](?:apikey|api_key|key|token|access_token)=)[^&\s'")]+/gi;
-const SECRET_LIKE = /\b(?:sk-[\w-]{16,}|sbp_\w{16,}|sb_secret_[\w-]{10,}|xai-[\w-]{16,})\b/g;
+const SECRET_LIKE = /\b(?:sk-[\w-]{16,}|sbp_\w{16,}|sb_secret_[\w-]{10,})\b/g;
 
 /** Same intent as the web's redactErrorText, plus server secrets; capped. */
 export function redactText(text: string, max = MAX_TEXT): string {
@@ -108,7 +108,7 @@ export function buildException(fn: string, err: unknown, extra: Record<string, u
 export interface AiGeneration {
   fn: string;
   model: string;
-  provider?: 'anthropic' | 'openai' | 'xai';
+  provider?: 'anthropic' | 'openai';
   inputTokens?: number;
   outputTokens?: number;
   cacheRead?: number;

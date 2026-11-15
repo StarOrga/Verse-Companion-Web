@@ -14,7 +14,6 @@ export const LIST_PRICES: Record<string, ModelPrice> = {
   'claude-haiku-5-5': { in: 0.1, out: 0.5 },
   'claude-haiku-4-5': { in: 1, out: 5 },
   'gpt-4o-mini': { in: 0.15, out: 0.6 },
-  'grok-3-mini': { in: 0.3, out: 0.5 },
 };
 
 /** Unknown model: price like the dearest Claude so the ledger never under-reports. */
