@@ -4848,6 +4848,7 @@
     "cardUnavailable": "Keine Daten verfügbar.",
     "status": {
       "attention": "{{n}} Dinge brauchen Aufmerksamkeit",
+      "attentionOne": "1 Ding braucht Aufmerksamkeit",
       "calm": "Alles ruhig, nichts zu tun",
       "blind": "Kein vollständiges Bild, PostHog nicht erreichbar",
       "since": "Seit deinem letzten Besuch am {{date}}",
