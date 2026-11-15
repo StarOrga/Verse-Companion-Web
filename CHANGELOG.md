@@ -4,6 +4,21 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.267.1] - 2026-11-15
+
+### Changed
+- /verse HQ: the comm mast now towers over the hangar, the hall is lit on both flanks, the departing fighter shows its landing gear, the storage yard is two flat rows of containers instead of a pyramid, the runway lamps under the entrance blink from both outer ends in to the centre and stay within the hangar width, and the hangar carries the number "1".
+
+## [0.267.0] - 2026-11-15
+
+### Added
+- Popups open as a hologram "Vektor-Aufriss": a spark at the trigger, a short light line, the outline unrolling from it, the window filling from the top and the content resolving from blur; closing collapses back into the spark.
+- Large windows get a scrim with a faint dot grid instead of the horizon and star plate.
+
+### Changed
+- Open and close timings are staged per popup kind (menu 300 ms, dialog 500 ms, large window 900 ms); a re-open reverses from where the close stands; reduced motion shows popups instantly.
+- The page no longer zooms in behind a large window.
+
 ## [0.266.0] - 2026-11-15
 
 ### Changed
