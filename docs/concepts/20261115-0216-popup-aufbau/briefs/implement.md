@@ -7,6 +7,12 @@ Submitted: round 1, action `implement`, 2026-11-15. Only one round exists — ro
 
 Related, NOT this brief: the open/close animation is a separate concept (`docs/concepts/20261115-0215-popup-animation.html`, run by another session). Build the scaffold so open/close motion has exactly one home (the existing `src/app/shared/popup-motion/` directive stays the hook) — do not design or change the animation itself.
 
+## Superseding decision (2026-11-15, from the concept „Popup-Animation“)
+
+The user decided in the Popup-Animation concept: **on phones every dialog, panel and large window becomes FULLSCREEN**, growing from the click source (no bottom sheet). This settles r1-phone below and replaces its `sheet` value; the r1-phone note ("teste gut, ob nicht alles Vollbild besser ist … für Fettfinger …") is answered by it. Menus and notices are not covered by that decision and stay as they are (menu card, toast). The growth-from-the-click-source motion is the animation concept's work; the scaffold only has to render the fullscreen state (radius 0, 100% × 100dvh, safe-area padding, ≥ 48 px targets) and keep the motion hook.
+
+The replacement question **r1-back** („Was schließt die Zurück-Geste?“) was added to round 1 after the user submitted, so it is unanswered here — see the session for the user's answer before building back-gesture handling.
+
 ## Fixed before round 1 (from the round intro, not up for discussion)
 
 - A modal popup closes only through ✕, Abbrechen or Escape, never through a click on its scrim — **today `sc-confirm-dialog` still closes on a scrim click: fix it.**
