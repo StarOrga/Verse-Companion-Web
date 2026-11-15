@@ -4,6 +4,17 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.266.0] - 2026-11-15
+
+### Changed
+- Codex: the "Schleichen" preset now works like silent running in the game: weapons, shields, quantum, tractor, radar and life support off, the drive at its minimum and the coolers only as high as needed to stay under 100 % cooling; a second cooler that is not needed goes off.
+- Codex: the cooling meter is computed like in the game (100 % = output of the active coolers at their power), shows the headroom or the shortfall in percent and marks more than 100 % as a warning.
+
+## [0.265.5] - 2026-11-15
+
+### Added
+- Concepts: an admin-only concept page for the HQ storage area: its own search over item, location and quantity, three quantity modes (one location, split across locations, nearby locations), a stable tab bar, and point notes by Ctrl/⌘+click that now also work on the mock.
+
 ## [0.265.4] - 2026-11-15
 
 ### Changed

@@ -68,6 +68,7 @@ import {
   parsePowerGroups,
   parsePowerLevels,
   resetPowerState,
+  stealthPowerState,
   togglePowerGroup,
 } from '../codex-power';
 import type { SummaryOccupant } from '../ship-summary-panels';
@@ -438,7 +439,7 @@ let uidSeq = 0;
       .hp-cooling .va { fill: none; stroke: var(--sc-accent); stroke-width: 7; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; }
       /* Overload, not a comparison: the cooling cannot hold what is asked of it
          — an error, not a hint (same rule as the energy dock). Stays danger red. */
-      .hp-cooling .va.over { stroke: var(--sc-danger); }
+      .hp-cooling .va.over { stroke: var(--sc-warning); }
       .hp-cooling text { font-family: var(--hs-mono); font-size: 12px; fill: var(--sc-fg-0); text-anchor: middle; }
       .hp-cooling text.l { font-family: var(--sc-font-display); font-size: 5.5px; letter-spacing: 0.14em; fill: var(--sc-fg-2); text-transform: uppercase; }
       .hp-cool-txt { display: grid; gap: 1px; }
@@ -889,9 +890,25 @@ export class CodexHoloStripComponent {
     this.persistDraft();
   }
 
+  /** A preset is a full re-deal — it clears every pin. `Schleichen` sets its
+   * own cuts and pins (#352, `stealthPowerState`); leaving it for `Auto`
+   * drops them again, any other cut stays. */
   protected setPreset(preset: PowerPreset): void {
+    const from = this.preset();
     this.preset.set(preset);
-    this.levels.set({});
+    if (preset === 'stealth') {
+      const next = stealthPowerState({
+        occupants: this.occupants(),
+        shipStats: this.shipStats(),
+        schemaVersion: this.schemaVersion(),
+        mode: this.mode(),
+      });
+      this.cutGroups.set(next.cutGroups);
+      this.levels.set(next.levels);
+    } else {
+      if (from === 'stealth') this.cutGroups.set(new Set<PowerColumnKey>());
+      this.levels.set({});
+    }
     this.persistDraft();
   }
 

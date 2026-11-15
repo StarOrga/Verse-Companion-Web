@@ -1,7 +1,43 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.265.4",
+  "current": "0.266.0",
   "releases": [
+    {
+      "version": "0.266.0",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex: the \"Schleichen\" preset now works like silent running in the game: weapons, shields, quantum, tractor, radar and life support off, the drive at its minimum and the coolers only as high as needed to stay under 100 % cooling; a second cooler that is not needed goes off."
+            },
+            {
+              "title": "",
+              "text": "Codex: the cooling meter is computed like in the game (100 % = output of the active coolers at their power), shows the headroom or the shortfall in percent and marks more than 100 % as a warning."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.265.5",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Concepts: an admin-only concept page for the HQ storage area: its own search over item, location and quantity, three quantity modes (one location, split across locations, nearby locations), a stable tab bar, and point notes by Ctrl/⌘+click that now also work on the mock."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.265.4",
       "date": "2026-11-15",
