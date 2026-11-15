@@ -112,4 +112,43 @@ describe('createWatchdog', () => {
     expect(() => clock.advance(500)).not.toThrow();
     expect(wd.timedOut()).toBe(true);
   });
+
+  it('reports the real idle time when the timer fires late', () => {
+    const clock = fakeClock();
+    let wall = 0;
+    let reportedIdle = -1;
+    const wd = createWatchdog({
+      timeoutMs: 1000,
+      onTimeout: (idle) => (reportedIdle = idle),
+      setTimer: clock.setTimer as never,
+      clearTimer: clock.clearTimer as never,
+      now: () => wall,
+    });
+    wd.start();
+    wall = 4500; // the event loop got to the timer late
+    clock.advance(1000);
+    expect(reportedIdle).toBe(4500);
+  });
+
+  it('hold() pauses the countdown until the next start()', () => {
+    const clock = fakeClock();
+    let fired = 0;
+    const wd = createWatchdog({
+      timeoutMs: 1000,
+      onTimeout: () => fired++,
+      setTimer: clock.setTimer as never,
+      clearTimer: clock.clearTimer as never,
+    });
+    wd.start();
+    clock.advance(900);
+    wd.hold(); // system suspend
+    clock.advance(10_000);
+    expect(fired).toBe(0);
+    expect(clock.pending()).toBe(0);
+    wd.start(); // resume — a fresh full window
+    clock.advance(999);
+    expect(fired).toBe(0);
+    clock.advance(1);
+    expect(fired).toBe(1);
+  });
 });
