@@ -585,7 +585,7 @@ describe('cooling usage like in game (#352)', () => {
     expect(coolingMargin(s.coolant.percent)).toEqual({ over: false, pct: 9 });
   });
 
-  it('scales a cooler's output and a consumer's draw with the segments they get', () => {
+  it('scales cooler output and consumer draw with the segments they get', () => {
     // cooler pinned to 1 of 3 segments → 34 / 3 cooling; radar at 1 of 3 → 8 / 3 draw
     const s = computePowerSheet({ occupants: nomad, levels: { cooler1: 1, radar: 1 } });
     expect(s.coolant.total).toBeCloseTo(34 / 3, 2);
