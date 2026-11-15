@@ -7,6 +7,13 @@
         "Authorization": "Bearer ${SUPABASE_ACCESS_TOKEN:-}"
       }
     },
+    "posthog": {
+      "type": "http",
+      "url": "https://mcp-eu.posthog.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${POSTHOG_PERSONAL_API_KEY:-}"
+      }
+    },
     "vercel": {
       "type": "http",
       "url": "https://mcp.vercel.com/jeremytreder-6210s-projects/versecompanion-alpha"

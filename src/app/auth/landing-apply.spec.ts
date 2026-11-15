@@ -29,7 +29,7 @@ describe('LoginComponent — landing + apply', () => {
         provideRouter([]),
         { provide: AccessRequestService, useValue: { submit } },
         { provide: AuthService, useValue: { ready: () => false, realUser: () => null, signInWithPassword: () => Promise.resolve({ error: null }), signInWithGoogle: () => Promise.resolve({ error: null }) } },
-        { provide: AnalyticsService, useValue: { capture: () => {} } },
+        { provide: AnalyticsService, useValue: { track: () => {} } },
         { provide: SupabaseClientProvider, useValue: { client: {} } },
       ],
     });

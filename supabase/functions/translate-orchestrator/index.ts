@@ -35,6 +35,7 @@ import { draftOutreach, importSeed, listSources, syncSources } from './_sources.
 import { buildOverlayMeta } from './_io.ts';
 import { writeAlerts } from './_alerts.ts';
 import { makeLearnDb } from './_learn_db.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 function logWarn(msg: string, data?: Record<string, unknown>): void {
   console.warn(`translate-orchestrator: ${msg}`, data ? JSON.stringify(data) : '');
@@ -60,7 +61,7 @@ function bearer(req: Request): string {
   return h.startsWith('Bearer ') ? h.slice(7).trim() : '';
 }
 
-Deno.serve(async (req) => {
+Deno.serve(withPosthog('translate-orchestrator', async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -185,4 +186,4 @@ Deno.serve(async (req) => {
     logError('translate-orchestrator failed', { op, error: String((e as Error)?.message ?? e) });
     return json({ error: 'translate.internal' }, 500);
   }
-});
+}, { cron: true }));

@@ -37,6 +37,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 
 import { PAGES } from './content.ts';
 import { ReadmeApi, classify, pickBranch } from './readme-api.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -79,7 +80,7 @@ function jwtRole(token: string): string | null {
   }
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('readme-sync', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST' && req.method !== 'GET') {
     return json({ error: 'method not allowed' }, 405);
@@ -216,4 +217,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
       })),
     },
   });
-});
+}));

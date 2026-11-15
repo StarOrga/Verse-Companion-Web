@@ -145,7 +145,7 @@ export class HangarImportPageComponent implements OnInit {
     this.payload.set(payload);
     this.rows.set(payload.ships);
     this.phase.set('ready');
-    this.analytics.capture('hangar_extension_handover', { ships_offered: payload.ships.length });
+    this.analytics.track('hangar:extension_import', { ships_offered: payload.ships.length });
   }
 
   capturedLabel(): string {

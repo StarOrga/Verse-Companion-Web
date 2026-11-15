@@ -17,12 +17,14 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { normalizeSheet, type EventSheet } from '../_shared/event-sheet.ts';
+import { callClaude } from '../_shared/ai-ledger.ts';
 import {
   EXTRACTOR_VERSION, MAX_LLM_CALLS_PER_RUN, SHEET_TOOL_NAME, SHEET_TOOL_SCHEMA,
   bundleSources, buildPrompt, extractMeta, hashText, mergeSheets, nameStem, parseModelAnswer, parseWikiExtract,
   pickEvents, selectSources, sheetFromModel,
   type EventInfo, type LinkInfo, type RunState, type SourceItem, CORS, preflight,
 } from './_extract.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const MODEL = Deno.env.get('SC_EVENT_SHEET_MODEL') ?? 'claude-sonnet-5-5';
 const COMM_LINK_API = 'https://api.star-citizen.wiki/api/comm-links';
@@ -84,10 +86,7 @@ async function fetchExtraSources(event: EventInfo): Promise<SourceItem[]> {
 }
 
 async function askModel(prompt: string, key: string): Promise<unknown> {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({
+  const body = await callClaude<{ content?: unknown }>('sc-event-sheet', key, {
       model: MODEL,
       max_tokens: 6000,
       tools: [{ name: SHEET_TOOL_NAME, description: 'Record the structured data sheet of the event.', input_schema: SHEET_TOOL_SCHEMA }],
@@ -95,14 +94,11 @@ async function askModel(prompt: string, key: string): Promise<unknown> {
       // and parseModelAnswer falls back to a JSON text block.
       tool_choice: { type: 'auto' },
       messages: [{ role: 'user', content: prompt }],
-    }),
-    signal: AbortSignal.timeout(90_000),
-  });
-  if (!res.ok) throw new Error(`anthropic ${res.status}`);
-  return parseModelAnswer(((await res.json()) as { content?: unknown }).content);
+    }, 90_000);
+  return parseModelAnswer(body.content);
 }
 
-Deno.serve(async (req) => {
+Deno.serve(withPosthog('sc-event-sheet', async (req) => {
   const pre = preflight(req.method);
   if (pre) return pre;
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
@@ -187,4 +183,4 @@ Deno.serve(async (req) => {
     }
   }
   return json({ ok: true, llmCalls: calls, runs });
-});
+}, { cron: true }));

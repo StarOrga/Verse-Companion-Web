@@ -45,6 +45,7 @@ import {
 import { edgeCodecs } from './image-codecs.ts';
 import { createFeedMemo } from './feed-memo.ts';
 import { pickScheduledDeployment, type ScheduledDeployment } from './scheduled-deployment.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 type Channel = 'comm-link' | 'spectrum' | 'status' | 'patch' | 'youtube';
 
@@ -1766,7 +1767,7 @@ async function buildFeed(): Promise<BuiltFeed> {
   };
 }
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withPosthog('fetch-verse-news', async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS_HEADERS });
 
   const { value: feed, fresh } = await feedMemo.get(buildFeed);
@@ -1797,4 +1798,4 @@ Deno.serve(async (req: Request) => {
   }
 
   return response;
-});
+}));

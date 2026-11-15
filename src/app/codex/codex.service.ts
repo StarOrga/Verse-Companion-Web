@@ -1,4 +1,5 @@
 import { toErrorKey } from '../core/describe-error';
+import { AnalyticsService } from '../core/analytics.service';
 import { withPowerSignature } from './codex-power';
 import { logWarn } from '../core/log';
 import { Injectable, NgZone, computed, inject, signal } from '@angular/core';
@@ -567,6 +568,7 @@ export class CodexService {
    */
   private readonly upcoming = inject(UpcomingShipsService);
   private readonly prefs = inject(CodexPrefsService);
+  private readonly analytics = inject(AnalyticsService);
   private readonly zone = inject(NgZone);
 
   /** Memoized {@link weaponFacets} read, invalidated by a change of build. */
@@ -2659,6 +2661,7 @@ export class CodexService {
     // Adding a 5th bumps the oldest pin (FIFO) instead of silently refusing.
     const next = cur.length >= CodexService.COMPARE_MAX ? cur.slice(1) : cur;
     this._compare.set([...next, key]);
+    if (next.length === 1) this.analytics.track('codex:compare_start', { kind, count: 2 });
   }
 
   unpin(key: string): void {

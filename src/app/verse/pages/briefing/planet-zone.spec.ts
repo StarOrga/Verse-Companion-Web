@@ -193,7 +193,7 @@ describe('Verse hub — Funkfeuer 2 stage (beta shell)', () => {
         provideTranslateService({}),
         // A real download settles outside fakeAsync's clock: generate the planet in fake time instead.
         { provide: PLANET_SOURCES, useValue: () => Promise.reject(new Error('specs generate the planet')) },
-        { provide: AnalyticsService, useValue: { captureVerse: vi.fn(), flags: () => ({}) } },
+        { provide: AnalyticsService, useValue: { track: vi.fn(), flags: () => ({}) } },
         { provide: BriefingGalleryFillService, useValue: { items: signal<VerseDigestItem[]>([]), load: () => Promise.resolve() } },
         { provide: BetaService, useValue: { isEnabled: (a: string) => () => !!beta()[a] } },
         { provide: AuthService, useValue: { isAuthenticated: signal(false), user: signal(null) } },

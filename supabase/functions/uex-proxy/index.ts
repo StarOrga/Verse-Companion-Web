@@ -15,6 +15,7 @@
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { ALLOWED_RESOURCES, upstreamUrl } from './allow.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -28,7 +29,7 @@ const UEX_TOKEN = Deno.env.get('UEX_API_TOKEN') ?? '';
 
 // The allow-list and the param filter live in ./allow.ts (tested in allow.test.ts).
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withPosthog('uex-proxy', async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS_HEADERS });
 
   const json = (body: unknown, status = 200, cacheSeconds = 0) =>
@@ -83,4 +84,4 @@ Deno.serve(async (req: Request) => {
   } finally {
     clearTimeout(timer);
   }
-});
+}));

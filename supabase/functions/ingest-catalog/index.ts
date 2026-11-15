@@ -116,6 +116,7 @@ import type { PublishDeps, PublishResult } from './_locale-publish.ts';
 import { CLEAR_OP_TABLES, isLegacyNatkeyConflict, isRebuildUnavailable, prepareRebuild, refusedSwitchStatus } from './_rebuild.ts';
 import type { RebuildPlan } from './_rebuild.ts';
 import { copyBuildLocales } from './_locale-copy.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -461,7 +462,7 @@ async function translationAfterPublish(
   console.log(`ingest-catalog: translation ${buildId}: ${JSON.stringify(r)}`);
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -1022,4 +1023,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
     }
     return json({ error: 'ingest_failed', code: err?.code ?? null, message: msg }, 500);
   }
-});
+}));

@@ -1,5 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { AuthService } from '../../auth/auth.service';
+import { AnalyticsService } from '../../core/analytics.service';
 import { SupabaseClientProvider } from '../../core/supabase.client';
 import { logWarn } from '../../core/log';
 import { normalizeShipName } from '../../codex/upcoming-ships.service';
@@ -59,6 +60,7 @@ export function upcomingClassName(name: string): string {
 export class WishlistStore {
   private readonly sb = inject(SupabaseClientProvider);
   private readonly auth = inject(AuthService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly rows = signal<readonly WishRow[]>([]);
   readonly loaded = signal(false);
@@ -143,6 +145,7 @@ export class WishlistStore {
         return false;
       }
       this.rows.update((rs) => [mapWishRow(data as Record<string, unknown>), ...rs]);
+      this.analytics.track('hq:wish_add', { kind: entry.kind });
       return true;
     } catch (err) {
       logWarn('wishlist', 'add failed', err);

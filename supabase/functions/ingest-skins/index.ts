@@ -100,6 +100,7 @@ import {
   droppedBlueprints,
   parseBlueprintObjects,
 } from './_blueprints.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const BUCKET = 'ship-skins';
 const SAFE_ID = /^[A-Za-z0-9_-]+$/;
@@ -464,7 +465,7 @@ async function handleBlueprint(
   return json({ ok: true, rows: before.length, pruned });
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('ingest-skins', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -726,4 +727,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
   }
 
   return json({ error: 'invalid_body', message: "action must be 'sign' or 'commit'" }, 400);
-});
+}));

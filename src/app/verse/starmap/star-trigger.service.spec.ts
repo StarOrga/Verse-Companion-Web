@@ -31,7 +31,7 @@ describe('StarTriggerService', () => {
       data: { patchLine: '4.4', className: 'RSI_Zeus', kind: 'ship', points: [] },
     });
     analytics = {
-      captureVerse: vi.fn().mockName("AnalyticsService.captureVerse")
+      track: vi.fn().mockName("AnalyticsService.track")
     } as unknown as MockedObject<AnalyticsService>;
     TestBed.configureTestingModule({
       providers: [
@@ -48,14 +48,14 @@ describe('StarTriggerService', () => {
     await TestBed.inject(StarTriggerService).earn('cx-keybinds');
     expect(api.earnStar).toHaveBeenCalledTimes(1);
     expect(api.earnStar).toHaveBeenCalledWith('4.4', 'cx-keybinds');
-    expect(analytics.captureVerse).toHaveBeenCalledTimes(1);
-    expect(analytics.captureVerse).toHaveBeenCalledWith('verse_star_earned', { patch_line: '4.4', star_key: 'cx-keybinds' });
+    expect(analytics.track).toHaveBeenCalledTimes(1);
+    expect(analytics.track).toHaveBeenCalledWith('verse:star_earn', { patch_line: '4.4', star_key: 'cx-keybinds' });
   });
 
   it('ignores keys outside the offered pool', async () => {
     await TestBed.inject(StarTriggerService).earn('cx-blueprint');
     expect(api.earnStar).not.toHaveBeenCalled();
-    expect(analytics.captureVerse).not.toHaveBeenCalled();
+    expect(analytics.track).not.toHaveBeenCalled();
   });
 
   it('is a silent no-op when signed out', async () => {
@@ -76,7 +76,7 @@ describe('StarTriggerService', () => {
   it('does not report an already-earned star and never throws', async () => {
     api.earnStar.mockResolvedValue({ ok: true, data: false });
     await TestBed.inject(StarTriggerService).earn('cx-fps');
-    expect(analytics.captureVerse).not.toHaveBeenCalled();
+    expect(analytics.track).not.toHaveBeenCalled();
     api.starPool.mockRejectedValue(new Error('offline'));
     await expect(TestBed.inject(StarTriggerService).earn('cx-keybinds')).resolves.not.toThrow();
   });
@@ -89,8 +89,8 @@ describe('StarTriggerService', () => {
     expect(api.claimNewShip).toHaveBeenCalledWith('4.4', 'rsi_zeus');
     expect(api.earnStar).not.toHaveBeenCalled();
     expect(api.constellation).not.toHaveBeenCalled();
-    expect(analytics.captureVerse).toHaveBeenCalledTimes(1);
-    expect(analytics.captureVerse).toHaveBeenCalledWith('verse_star_earned', { patch_line: '4.4', star_key: 'cx-newship' });
+    expect(analytics.track).toHaveBeenCalledTimes(1);
+    expect(analytics.track).toHaveBeenCalledWith('verse:star_earn', { patch_line: '4.4', star_key: 'cx-newship' });
   });
 
   it('keeps cx-newship retryable while the guess is still open, and ignores non-vehicles', async () => {

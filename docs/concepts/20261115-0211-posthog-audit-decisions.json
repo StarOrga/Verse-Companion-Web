@@ -1,0 +1,453 @@
+[
+  {
+    "iteration": 1,
+    "action": "iterate",
+    "submittedAt": "2026-11-15T01:37:42.600Z",
+    "decisions": [
+      {
+        "id": "d-flags",
+        "label": "Flag-Wartezeit",
+        "mode": "yesnoalt",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-maps",
+        "label": "Lesbare Fehler",
+        "mode": "yesnoalt",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-proxy",
+        "label": "Werbeblocker",
+        "mode": "yesnoalt",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "note": "ja genau, außerdem in telemetrie könnten wir keine doppelführung von errors machen bzw. ggf. nur noch top 3 oder so und posthog link! Weil ja alles zu posthog gerouted werden sollte, auch die infos der telemetrie der desktop app"
+      },
+      {
+        "id": "d-vitals",
+        "label": "Web Vitals doppelt",
+        "mode": "single",
+        "value": "ph",
+        "rec": "ph",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-identify",
+        "label": "Wiederkehr messen",
+        "mode": "single",
+        "value": "role",
+        "rec": "hashed",
+        "deviates": true,
+        "note": "ayber bitte im admin panel unter telemetrie sichtbar machen wenn >80% von irgendeinen freikontingent von posthog augebrraucht ist mit call to action! => Entweder ki generierter feedback vorschlag, also man kann die warnung in ein feedback umwandeln oder cta zu posthog selber dort bezahlte fversion aufzusteigen! Beides wäre ja eine lösung (optimieren der applikation wie viel gesendet wird vs mehr kontingent kaufen)"
+      },
+      {
+        "id": "d-replay",
+        "label": "Fehlerkontext",
+        "mode": "single",
+        "value": "onerror",
+        "rec": "onerror",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-clicks",
+        "label": "Tote Klicks",
+        "mode": "multi",
+        "value": [
+          "dead",
+          "heat"
+        ],
+        "rec": "dead heat",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-events",
+        "label": "Fehlende Events",
+        "mode": "multi",
+        "value": [
+          "errshown",
+          "codex",
+          "feedback",
+          "login",
+          "search"
+        ],
+        "rec": "errshown codex feedback login",
+        "deviates": true,
+        "note": "Keine dopplujngen anostnen aber wirklich breit aufstsellen. Dabei eine eigene auch abgespeicherte im projekt namenskonvention einfügen und in posthog auch bitte als folgeactions mit cdp edge chrome plugin zugriff workflows definieren, welche dann diese realen workflows abbilden etc. \nAlso in posthog bitte reports anlegen die nützlifch sind, dabei bitte 30% einfache reports und 70% die übergreifende flows ziegen usw.! Gerade auch die wo man events gut kennen sollte. Bitte auch entsprechende dashboards (maximal 3) in posthog. Am ende sollte alles was erfasst wird auch über diese drei dashboards zugänglich sein direkt oder indirekt, damit der admin sich in posthog zurec ht findet!"
+      },
+      {
+        "id": "d-srv",
+        "label": "Was der Server meldet",
+        "mode": "multi",
+        "value": [
+          "fn",
+          "cron",
+          "ai",
+          "uploader"
+        ],
+        "rec": "fn cron ai",
+        "deviates": true,
+        "note": "wir nehmen sonstige telemitrie raus, wir machen alles nur noch über posthog und ggf. spiegeln von posthog die infos wieder zurück ins admin panel. Single source of trouth!"
+      },
+      {
+        "id": "d-llm",
+        "label": "Claude-Aufrufe",
+        "mode": "single",
+        "value": "meta",
+        "rec": "meta",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-legal",
+        "label": "Ohne Einwilligung",
+        "mode": "verify",
+        "value": "ok",
+        "rec": "ok",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-trigger",
+        "label": "Auslöser",
+        "mode": "single",
+        "value": "both",
+        "rec": "both",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-ai",
+        "label": "Wer analysiert",
+        "mode": "single",
+        "value": "routine",
+        "rec": "routine",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-mode",
+        "label": "Was danach passiert",
+        "mode": "single",
+        "value": "diagnose",
+        "rec": "diagnose",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-author",
+        "label": "Absender",
+        "mode": "single",
+        "value": "system",
+        "rec": "system",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-cap",
+        "label": "Obergrenze",
+        "mode": "slider",
+        "value": 3,
+        "rec": "3",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-secret",
+        "label": "Zugangsschlüssel",
+        "mode": "yesnoalt",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-place",
+        "label": "Wo es steht",
+        "mode": "single",
+        "value": "tab",
+        "rec": "tab",
+        "deviates": false,
+        "note": "Räume wegen dieser intensiven änderunge btte nochmal das amdin telemetrie panel auf und rethink es! Analysiere mit devops agents recherchiert best practices für geleegenheitsadmins und rethink komplett den inhalt der seite und die visualisierung! basierend auf dem neuen vverfahren posthog first! Die seite soll aufmerksam machen, top 3 infos jeweils anzeigen um zu teasern was das tehema dort gerade jeweils ist aber nicht zum reinfujchsen in einzelne fflows oder events etc. sein, da kommt posthog ins spiel"
+      },
+      {
+        "id": "d-svc",
+        "label": "Welche Dienste",
+        "mode": "multi",
+        "value": [
+          "claude",
+          "posthog",
+          "supa",
+          "r2",
+          "uex",
+          "rsi",
+          "xai",
+          "readme"
+        ],
+        "rec": "claude posthog supa r2 uex rsi",
+        "deviates": true,
+        "note": ""
+      },
+      {
+        "id": "d-usage",
+        "label": "Claude-Verbrauch",
+        "mode": "single",
+        "value": "ledger",
+        "rec": "ledger",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-health",
+        "label": "Wie der Status entsteht",
+        "mode": "single",
+        "value": "both",
+        "rec": "both",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-thresh",
+        "label": "Ampel-Regeln",
+        "mode": "verify",
+        "value": "ok",
+        "rec": "ok",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-escalate",
+        "label": "Rot wird Aufgabe",
+        "mode": "yesnoalt",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "iteration": 2,
+    "action": "implement",
+    "favorite": "karten",
+    "submittedAt": "2026-11-15T01:55:42.488Z",
+    "decisions": [
+      {
+        "id": "r2-desktop",
+        "label": "Weg der Desktop-Daten",
+        "mode": "single",
+        "value": "fwd",
+        "rec": "fwd",
+        "deviates": false,
+        "none": false,
+        "untouched": true,
+        "note": ""
+      },
+      {
+        "id": "r2-logs",
+        "label": "Diagnose-Logs",
+        "mode": "single",
+        "value": "r2",
+        "rec": "r2",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "r2-old",
+        "label": "Alte Telemetrie",
+        "mode": "single",
+        "value": "now",
+        "rec": "parallel",
+        "deviates": true,
+        "none": false,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "r2-convert",
+        "label": "Feedback-Knopf",
+        "mode": "yesnoalt",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "r2-quota-scope",
+        "label": "Welche Kontingente",
+        "mode": "multi",
+        "value": [
+          "events",
+          "exceptions",
+          "replay",
+          "llm",
+          "flags"
+        ],
+        "rec": "events exceptions replay llm",
+        "deviates": true,
+        "none": false,
+        "untouched": false,
+        "note": "könnten wir in dem zug nicht feature flags auch nutzen? z. B. für die admin / collaborateur funktionen? Das sind doch feature flags weil wir ja elemente anzeigen zbw. nicht anzeigen und das je rolle?! oder ist das security technisch doof!?"
+      },
+      {
+        "id": "r2-forecast",
+        "label": "Hochrechnung",
+        "mode": "yesnoalt",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "r2-throttle",
+        "label": "Notbremse",
+        "mode": "single",
+        "value": "lowfirst",
+        "rec": "lowfirst",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "r2-naming",
+        "label": "Namensschema",
+        "mode": "single",
+        "value": "ph",
+        "rec": "ph",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "r2-catalog",
+        "label": "Wo der Katalog lebt",
+        "mode": "single",
+        "value": "typed",
+        "rec": "typed",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "r2-areas",
+        "label": "Welche Bereiche",
+        "mode": "multi",
+        "value": [
+          "codex",
+          "hq",
+          "verse",
+          "news",
+          "social",
+          "search",
+          "settings",
+          "auth",
+          "feedback",
+          "desktop",
+          "admin"
+        ],
+        "rec": "codex hq verse news social search settings auth feedback desktop",
+        "deviates": true,
+        "none": false,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "r2-ascode",
+        "label": "Wie der Aufbau entsteht",
+        "mode": "single",
+        "value": "",
+        "rec": "defs",
+        "deviates": true,
+        "none": true,
+        "untouched": false,
+        "note": "Mir geht es darum, dass wenn wir hier alles machen, haben wir ja in posthog viele daten, aber posthog beietet jha auch tolle visualisierungen und dashbaords etc. diese sollst du dort in posthog konfigurieren, dass wenn ein admin nicht zu einenm thema / warning abspringt sondern eeinfach mal für einen überblick dort hin geht, stöbern kann! Wenn du es per api machne kannst super oder posthog mcp ansonsten diese dashboards und berichte und flows und co. in posthog per browser automatisiert durch diech erstellen / konfigurieren, überprüfen und etesten !"
+      },
+      {
+        "id": "r2-dash",
+        "label": "Schnitt der Dashboards",
+        "mode": "single",
+        "value": "question",
+        "rec": "question",
+        "deviates": false,
+        "none": false,
+        "untouched": true,
+        "note": ""
+      },
+      {
+        "id": "r2-knowledge",
+        "label": "Projektwissen für Claude",
+        "mode": "multi",
+        "value": [
+          "doc",
+          "claudemd",
+          "routine",
+          "skills"
+        ],
+        "rec": "doc claudemd routine skills",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "r2-flows",
+        "label": "Wichtigste Abläufe",
+        "mode": "order",
+        "value": [
+          "onboard",
+          "codex",
+          "error",
+          "hangar",
+          "feedback",
+          "desktop",
+          "verse"
+        ],
+        "rec": "onboard,codex,error,hangar,feedback,desktop,verse",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": ""
+      }
+    ]
+  }
+]

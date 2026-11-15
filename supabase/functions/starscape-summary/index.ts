@@ -24,6 +24,7 @@ import {
 } from './image-select.ts';
 import { Orbitron_700, Orbitron_500, Rajdhani_500, Rajdhani_600 } from './fonts.ts';
 import { onceUntilSuccess } from './once-until-success.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -311,7 +312,7 @@ function pngResponse(bytes: Uint8Array): Response {
   });
 }
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withPosthog('starscape-summary', async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS_HEADERS });
 
   const url = new URL(req.url);
@@ -380,4 +381,4 @@ Deno.serve(async (req: Request) => {
       });
     }
   }
-});
+}));

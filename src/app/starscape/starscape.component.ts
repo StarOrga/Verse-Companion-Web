@@ -958,7 +958,7 @@ export class StarscapeComponent implements OnInit {
     const nav = typeof navigator !== 'undefined' ? navigator : undefined;
     const hint = (key: string) => (from === 'tile' ? this.flashTileHint(key) : this.flashShareHint(key));
     if (nav?.share) {
-      this.analytics.captureVerse('starscape_share', { image_id: w.imageId, channel: 'native' });
+      this.analytics.track('verse:starscape_share', { image_id: w.imageId, channel: 'native' });
       try {
         await nav.share({ title: w.title ?? 'Starscape', url });
       } catch {
@@ -973,7 +973,7 @@ export class StarscapeComponent implements OnInit {
     }
     try {
       await clipboard.writeText(url);
-      this.analytics.captureVerse('starscape_share', { image_id: w.imageId, channel: 'copy' });
+      this.analytics.track('verse:starscape_share', { image_id: w.imageId, channel: 'copy' });
       hint('starscape.share.copied');
     } catch {
       hint('starscape.share.failed');

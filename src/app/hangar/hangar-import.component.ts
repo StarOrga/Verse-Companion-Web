@@ -358,7 +358,7 @@ export class HangarImportComponent {
     this.doneCount.set(done);
     this.importing.set(false);
     if (done > 0) {
-      this.analytics.capture('hangar_fleet_imported', {
+      this.analytics.track('hangar:fleet_import', {
         ships_imported: done,
         total_in_file: next.length,
         source: this.embedded() ? 'extension' : 'file',

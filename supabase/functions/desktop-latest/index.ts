@@ -33,6 +33,7 @@
 //         404 no_release
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -148,7 +149,7 @@ function toLatestYaml(release: ReleaseRow): string {
   ].join('\n') + '\n';
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('desktop-latest', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'GET') return jsonResp({ error: 'method_not_allowed' }, 405, { Allow: 'GET, OPTIONS' });
 
@@ -239,7 +240,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
   // Role known here → clamp the requested channel to the caller's tier.
   return await respondForChannel(userClient, req, resolveChannel(req), true, product);
-});
+}));
 
 async function respondForChannel(
   client: ReturnType<typeof createClient>,

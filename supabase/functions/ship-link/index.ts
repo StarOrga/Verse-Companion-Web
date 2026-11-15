@@ -34,6 +34,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 import { normalizeRsiPledgeShipUrl, normalizeShipSlug } from './_rsi-url.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -87,7 +88,7 @@ type Body = {
   url?: unknown;
 };
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('ship-link', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -209,4 +210,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
     .eq('ship_slug', shipSlug);
   if (error) return json({ error: 'db_error', message: error.message }, 500);
   return json({ ok: true });
-});
+}));

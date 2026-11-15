@@ -8,12 +8,13 @@
 //         403 { ok: false, error: "unknown_token" | "revoked" }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+import { withPosthog } from '../_shared/posthog.ts';
 
 interface Body {
   token?: string;
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('verify-release-token', async (req: Request): Promise<Response> => {
   if (req.method !== 'POST') {
     return new Response('method not allowed', { status: 405 });
   }
@@ -71,4 +72,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
     JSON.stringify({ ok: true, release: { id: data.id, version: data.version } }),
     { status: 200, headers: { 'content-type': 'application/json' } },
   );
-});
+}));

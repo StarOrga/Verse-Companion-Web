@@ -1,3 +1,4 @@
+import { AnalyticsService } from '../core/analytics.service';
 import { toErrorKey } from '../core/describe-error';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { SupabaseClientProvider } from '../core/supabase.client';
@@ -32,6 +33,7 @@ export class UserFeedbackService {
   private readonly sb = inject(SupabaseClientProvider);
   private readonly auth = inject(AuthService);
   private readonly imp = inject(ImpersonationService);
+  private readonly analytics = inject(AnalyticsService);
 
   private readonly _topics = signal<AuthorFeedbackRow[]>([]);
   private readonly _threads = signal<AuthorThreadMap>(new Map());
@@ -168,6 +170,7 @@ export class UserFeedbackService {
 
     const news = topicsWithNews(this._topics(), this._threads(), this._readState());
     this._newsSinceOpen.set(new Set(news));
+    if (news.length > 0) this.analytics.track('feedback:reply_view');
     await this.writeReadState(news);
   }
 
@@ -258,6 +261,12 @@ export class UserFeedbackService {
       this._error.set(error.code === '54000' ? 'rate' : toErrorKey('feedback', 'submit', error));
       return false;
     }
+    const len = payload.text.trim().length;
+    this.analytics.track('feedback:item_submit', {
+      kind: payload.area ?? 'none',
+      length_bucket: len < 80 ? 'short' : len < 400 ? 'medium' : 'long',
+      attachments: payload.images.length,
+    });
     await this.refresh();
     return true;
   }

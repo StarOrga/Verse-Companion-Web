@@ -53,6 +53,7 @@
 //         500 { error: 'server_misconfigured' }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS = {
   // `*` is correct here despite the sensitive response: the call carries the
@@ -71,7 +72,7 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('desktop-session', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -143,4 +144,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
     expires_at: session.expires_at ?? null,
     email,
   });
-});
+}));
