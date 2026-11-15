@@ -7,6 +7,7 @@ import { hqNachschubPickLink } from '../../hq/hq-routes';
 import { pickedShare, setPicked, toggleGroup, type FlowGroup } from '../../hq/plan/hq-nachschub-flow.util';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
+import { ScQtyStepperComponent } from '../../shared/qty-stepper/qty-stepper.component';
 import { ScEntryDirective } from '../../shared/entry-motion/entry-motion';
 import { PATH_ICONS } from '../../shared/item-path/path-icons';
 import { SilThumbComponent } from '../../shared/sil-thumb/sil-thumb.component';
@@ -19,7 +20,6 @@ import { WishCartService } from './wish-cart.service';
 
 const TRASH = ['M4.5 7h15M10 7V4.5h4V7M6.5 7l1 13h9l1-13M10 11v5.5M14 11v5.5'] as const;
 const PLUS = ['M12 5v14M5 12h14'] as const;
-const MINUS = ['M5 12h14'] as const;
 const CLOSE = ['M6 6l12 12M18 6L6 18'] as const;
 const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
 
@@ -33,7 +33,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
 @Component({
   selector: 'sc-wish-cart',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScEntryDirective, ScTooltipDirective, SilThumbComponent],
+  imports: [RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScEntryDirective, ScTooltipDirective, SilThumbComponent, ScQtyStepperComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- The scrim does not close the cart (a selection would be lost): the X, Escape or the browser's back do. The cart owns ?cart=1, so no extra history entry. -->
@@ -80,15 +80,11 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
                             <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="openIcon[0]" /></svg>
                           </a>
                           <span class="foot">
-                            <span class="step" role="group" [attr.aria-label]="'cart.qtyOf' | translate: { name: cart.nameOf(it) }">
-                              <button type="button" [disabled]="it.qty <= 1" [attr.aria-label]="'cart.less' | translate" [scTooltip]="'cart.less' | translate" scTooltipTier="label" (click)="bump(it, -1)">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="minus[0]" /></svg>
-                              </button>
-                              <b>{{ it.qty }}@if (it.kind === 'material') { <small class="unit"> {{ 'blueprint.detail.unitScu' | translate }}</small> }</b>
-                              <button type="button" [disabled]="it.qty >= 999" [attr.aria-label]="'cart.more' | translate" [scTooltip]="'cart.more' | translate" scTooltipTier="label" (click)="bump(it, 1)">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="plus[0]" /></svg>
-                              </button>
-                            </span>
+                            <sc-qty-stepper class="step" [value]="it.qty" [groupLabel]="'cart.qtyOf' | translate: { name: cart.nameOf(it) }"
+                                            [lessLabel]="'cart.less' | translate" [moreLabel]="'cart.more' | translate"
+                                            (valueChange)="bump(it, $event - it.qty)">
+                              {{ it.qty }}@if (it.kind === 'material') { <small class="unit"> {{ 'blueprint.detail.unitScu' | translate }}</small> }
+                            </sc-qty-stepper>
                             <button type="button" scAction tier="tertiary" tone="danger"
                                     [attr.aria-label]="'cart.remove' | translate: { name: cart.nameOf(it) }"
                                     [scTooltip]="'cart.remove' | translate: { name: cart.nameOf(it) }" scTooltipTier="label" (click)="cart.remove([it])">
@@ -181,14 +177,6 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       .nm { font-size: 0.82rem; font-weight: 600; color: var(--sc-fg-0); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .sub { font-size: max(0.72rem, var(--sc-fs-floor, 0.75rem)); color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .foot { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; gap: 4px; }
-      .step { display: inline-flex; align-items: center; border: 1px solid var(--sc-border); border-radius: 999px; overflow: hidden; }
-      .step button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; background: transparent; color: var(--sc-fg-1); cursor: pointer; }
-      @media (hover: hover) { .step button:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); } }
-      .step button:disabled { opacity: 0.4; cursor: default; }
-      .step button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
-      .step svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-      .step b .unit { font-size: 0.68rem; font-weight: 600; color: var(--sc-fg-2); }
-      .step b { min-width: 2ch; text-align: center; font-variant-numeric: tabular-nums; font-size: 0.85rem; }
       .chk {
         appearance: none; -webkit-appearance: none; width: 20px; height: 20px; flex: none; margin: 0; display: grid; place-content: center; cursor: pointer;
         border: 1.5px solid color-mix(in srgb, var(--sc-accent) 55%, var(--sc-border)); border-radius: 6px; background: color-mix(in srgb, var(--sc-bg-0) 70%, transparent);
@@ -222,7 +210,6 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
         .tiles { grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); }
       }
       @media (pointer: coarse), (max-width: 749px) {
-        .step button { width: 44px; height: 44px; }
         .foot { flex-wrap: wrap; }
         .chk { width: 24px; height: 24px; }
       }
@@ -238,7 +225,6 @@ export class WishCartDialogComponent {
   protected readonly nachschubPath = NACHSCHUB_ICON_PATHS;
   protected readonly trash = TRASH;
   protected readonly plus = PLUS;
-  protected readonly minus = MINUS;
   protected readonly close = CLOSE;
   protected readonly openIcon = OPEN;
   protected readonly emptyPicks: ReadonlyMap<string, number> = new Map();

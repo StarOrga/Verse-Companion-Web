@@ -255,7 +255,7 @@ describe('Nachschub board, panel and dialogs', () => {
       const mission = [...form.querySelectorAll('.seg button')].find((b) => b.textContent?.includes('hq.step.kind.mission'))!;
       click(f, mission);
       expect(save.disabled).toBe(false);
-      const more = form.querySelectorAll('.stepper .step')[1] as HTMLButtonElement;
+      const more = form.querySelectorAll('.stepper .qs-btn')[1] as HTMLButtonElement;
       click(f, more);
       click(f, save);
       await f.whenStable();
@@ -609,7 +609,7 @@ describe('HqNachschubFlowComponent', () => {
     await toStep2(r);
     const alu = () => [...r.el.querySelectorAll('.mats li')].find((li) => li.textContent?.includes('Aluminium'))!;
     const seg = (label: string) => [...alu().querySelectorAll('.seg button')].find((b) => b.textContent?.includes(label)) as HTMLButtonElement;
-    const pressed = () => [...alu().querySelectorAll('.seg button')].map((b) => b.getAttribute('aria-pressed'));
+    const pressed = () => [...alu().querySelectorAll('.seg button')].map((b) => b.getAttribute('aria-checked'));
     // No shop known: mined by default.
     expect(pressed()).toEqual(['false', 'true']);
     click(r.f, seg('hq.step.kind.mine'));
@@ -619,7 +619,7 @@ describe('HqNachschubFlowComponent', () => {
     click(r.f, seg('hq.step.kind.buy'));
     expect(pressed()).toEqual(['true', 'false']);
     // A mixed split: "Abbauen" mines all of it (it used to buy all).
-    click(r.f, alu().querySelector('.stepper button.step'));
+    click(r.f, alu().querySelector('.stepper button.qs-btn'));
     expect(pressed()).toEqual(['false', 'false']);
     click(r.f, seg('hq.step.kind.mine'));
     expect(pressed()).toEqual(['false', 'true']);
@@ -781,7 +781,7 @@ describe('HqNachschubFlowComponent', () => {
     const groups = [...el.querySelectorAll('.grp')];
     click(f, groups[1].querySelector('header sc-tristate button'));
     const aluminium = groups[1].querySelectorAll('li')[1];
-    for (let i = 0; i < 8; i++) click(f, aluminium.querySelector('.stepper .step'));
+    for (let i = 0; i < 8; i++) click(f, aluminium.querySelector('.stepper .qs-btn'));
     const bp = groups[1].querySelectorAll('li')[0];
     expect(bp.querySelector('.stepper .n')?.textContent?.trim()).toContain('1');
   });

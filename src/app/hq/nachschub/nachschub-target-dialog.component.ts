@@ -4,6 +4,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { toErrorKey } from '../../core/describe-error';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
+import { ScSegmentedComponent, type ScSegmentOption } from '../../shared/segmented-control.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { HQ_POPUP_CONTENT_STYLES } from '../plan/hq-popup-content.styles';
 import { HqEinsatzService } from '../data/hq-einsatz.service';
@@ -22,7 +23,7 @@ import type { NachschubTargetIntent, NachschubTargetResult } from './nachschub-t
 @Component({
   selector: 'sc-nachschub-target-dialog',
   standalone: true,
-  imports: [FormsModule, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective],
+  imports: [FormsModule, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective, ScSegmentedComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <sc-popup kind="dialog" [eyebrow]="'hq.nachschub.target.intent.' + intent() | translate" [title]="'hq.nachschub.target.title' | translate" (closed)="closed.emit(null)">
@@ -33,16 +34,8 @@ import type { NachschubTargetIntent, NachschubTargetResult } from './nachschub-t
 
           <section class="mix" aria-labelledby="ntd-where">
             <small id="ntd-where">{{ 'hq.nachschub.target.where' | translate }}</small>
-            <div class="seg" role="radiogroup" aria-labelledby="ntd-where">
-              <button type="button" role="radio" [attr.aria-checked]="target() === 'new'" [class.on]="target() === 'new'" [disabled]="newBlock() !== null" (click)="picked.set('new')">
-                {{ (intent() === 'sell' ? 'hq.nachschub.target.newSell' : 'hq.nachschub.target.new') | translate }}
-              </button>
-              @for (n of existing(); track n.id) {
-                <button type="button" role="radio" [attr.aria-checked]="target() === n.id" [class.on]="target() === n.id" (click)="picked.set(n.id)">
-                  {{ 'hq.nachschub.target.append' | translate: { name: n.name } }}
-                </button>
-              }
-            </div>
+            <sc-segmented class="seg" variant="chips" [options]="targetOptions()" [value]="target()" [ariaLabel]="'hq.nachschub.target.where' | translate"
+                          (valueChange)="picked.set($event)" />
             @if (newBlock(); as b) { <p class="hint">{{ b | translate }}</p> }
           </section>
 
@@ -97,11 +90,7 @@ import type { NachschubTargetIntent, NachschubTargetResult } from './nachschub-t
     `
       .mix { padding: var(--sc-space-3, 12px); border: 1px dashed var(--sc-border); border-radius: 10px; display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); }
       .mix small { color: var(--sc-fg-2); }
-      .seg { display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); }
-      .seg button { min-height: 36px; padding: 0 var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 999px; background: var(--sc-bg-0); color: var(--sc-fg-1); font: inherit; cursor: pointer; }
-      .seg button.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); }
-      .seg button:disabled { opacity: 0.5; cursor: not-allowed; }
-      .seg button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+      .seg { display: block; }
       .hint { margin: 0; color: var(--sc-fg-2); font-size: 0.82rem; }
       .sc-input[aria-invalid='true'] { border-color: var(--sc-warning); }
       .lines, .stops { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); }
@@ -114,7 +103,6 @@ import type { NachschubTargetIntent, NachschubTargetResult } from './nachschub-t
       .stops li > span:not(.mv) { color: var(--sc-fg-2); font-size: 0.82rem; flex: 1; }
       .mv { display: inline-flex; margin-left: auto; }
       button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-      @media (pointer: coarse) { .seg button { min-height: 44px; } }
     `,
   ],
 })
@@ -137,6 +125,14 @@ export class NachschubTargetDialogComponent {
   protected readonly existing = computed(() => targetsFor(this.intent(), this.ns.packages()));
   protected readonly newBlock = computed(() => newNachschubBlock(this.ns.packages()));
   protected readonly picked = signal<string | null>(null);
+  /** New Nachschub first (disabled with its reason as tooltip while no slot is free), then the existing ones. */
+  protected readonly targetOptions = computed<readonly ScSegmentOption[]>(() => {
+    const block = this.newBlock();
+    return [
+      { value: 'new', labelKey: this.intent() === 'sell' ? 'hq.nachschub.target.newSell' : 'hq.nachschub.target.new', disabled: block !== null, titleKey: block ?? undefined },
+      ...this.existing().map((n) => ({ value: n.id, label: this.i18n.instant('hq.nachschub.target.append', { name: n.name }) as string })),
+    ];
+  });
   /** The chosen target: the player's pick, else a new one while a slot is free, else the first existing one. */
   protected readonly target = computed<string>(() => this.picked() ?? (this.newBlock() === null ? 'new' : (this.existing()[0]?.id ?? 'new')));
   protected readonly canSave = computed(() => {
