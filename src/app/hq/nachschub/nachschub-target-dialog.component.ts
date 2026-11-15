@@ -3,16 +3,15 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { toErrorKey } from '../../core/describe-error';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
-import { HQ_DIALOG_STYLES } from '../plan/hq-dialog.styles';
+import { HQ_POPUP_CONTENT_STYLES } from '../plan/hq-popup-content.styles';
 import { HqEinsatzService } from '../data/hq-einsatz.service';
 import { gatherToSteps } from '../data/hq-gather';
 import { newNachschubBlock, parseSellGoal, type NachschubLineInput } from './nachschub.model';
 import { NachschubService, type NachschubResult } from './nachschub.service';
 import { moveLineStop, routeOrdered, targetsFor } from './nachschub-target.util';
 import type { NachschubTargetIntent, NachschubTargetResult } from './nachschub-target-picker';
-import { NACHSCHUB_ICON_PATHS } from './step-icons';
 
 /**
  * "Aus dem Bestand planen" (round 3, a3-s8): where does the Bestand selection go? Into a new Nachschub or into an
@@ -23,20 +22,11 @@ import { NACHSCHUB_ICON_PATHS } from './step-icons';
 @Component({
   selector: 'sc-nachschub-target-dialog',
   standalone: true,
-  imports: [FormsModule, TranslatePipe, ScActionDirective, ScDialogDirective, ScTooltipDirective],
+  imports: [FormsModule, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="scrim">
-      <div class="sheet" role="dialog" aria-modal="true" scDialog (scDialogEscape)="closed.emit(null)" aria-labelledby="ntd-title">
-        <header class="dlg-head">
-          <span class="dlg-ic"><svg viewBox="0 0 24 24" aria-hidden="true">@for (p of tray; track p) { <path [attr.d]="p" /> }</svg></span>
-          <h2 id="ntd-title" class="dlg-title">{{ 'hq.nachschub.target.title' | translate }}<small>{{ 'hq.nachschub.target.intent.' + intent() | translate }}</small></h2>
-          <button type="button" scAction tier="tertiary" [attr.aria-label]="'hq.flow.close' | translate" [scTooltip]="'hq.flow.close' | translate" scTooltipTier="label" (click)="closed.emit(null)">
-            <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-          </button>
-        </header>
-
-        <div class="dlg-body">
+    <sc-popup kind="dialog" [eyebrow]="'hq.nachschub.target.intent.' + intent() | translate" [title]="'hq.nachschub.target.title' | translate" (closed)="closed.emit(null)">
+        <div class="pbody">
           @if (error(); as e) { <p class="dlg-err" role="alert">{{ e | translate }}</p> }
 
           <p class="dlg-msg lead">{{ 'hq.nachschub.target.lead' | translate: { n: work().length } }}</p>
@@ -57,10 +47,10 @@ import { NACHSCHUB_ICON_PATHS } from './step-icons';
           </section>
 
           @if (intent() === 'sell' && target() === 'new') {
-            <label class="goal">
-              <span>{{ 'hq.nachschub.target.goal' | translate }}</span>
-              <input type="text" class="input" inputmode="numeric" autocomplete="off" [ngModel]="goalText()" (ngModelChange)="onGoal($event)"
-                     [attr.aria-invalid]="goalBad() ? 'true' : null" [attr.aria-describedby]="goalBad() ? 'ntd-goal-err' : null" [placeholder]="'hq.nachschub.target.goalPlaceholder' | translate" />
+            <label class="sc-float-field">
+              <input type="text" class="sc-input" inputmode="numeric" autocomplete="off" placeholder=" " [ngModel]="goalText()" (ngModelChange)="onGoal($event)"
+                     [attr.aria-invalid]="goalBad() ? 'true' : null" [attr.aria-describedby]="goalBad() ? 'ntd-goal-err' : null" />
+              <span class="sc-float-label">{{ 'hq.nachschub.target.goal' | translate }}</span>
             </label>
             @if (goalBad()) { <p class="dlg-err" id="ntd-goal-err" role="alert">{{ 'hq.nachschub.sellGoalInvalid' | translate }}</p> }
           }
@@ -94,19 +84,16 @@ import { NACHSCHUB_ICON_PATHS } from './step-icons';
             }
           </ol>
         </div>
-
-        <footer class="dlg-foot">
-          <span class="sp"></span>
-          <button type="button" scAction tier="secondary" (click)="closed.emit(null)">{{ 'common.dialog.cancel' | translate }}</button>
+        <ng-container popupActions>
           <button type="button" scAction tier="primary" [busy]="busy()" [disabled]="busy() || !canSave()" (click)="save()">
             {{ (target() === 'new' ? 'hq.nachschub.target.create' : 'hq.nachschub.target.add') | translate }}
           </button>
-        </footer>
-      </div>
-    </div>
+          <button type="button" scAction tier="secondary" (click)="closed.emit(null)">{{ 'common.dialog.cancel' | translate }}</button>
+        </ng-container>
+    </sc-popup>
   `,
   styles: [
-    HQ_DIALOG_STYLES,
+    HQ_POPUP_CONTENT_STYLES,
     `
       .mix { padding: var(--sc-space-3, 12px); border: 1px dashed var(--sc-border); border-radius: 10px; display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); }
       .mix small { color: var(--sc-fg-2); }
@@ -116,11 +103,7 @@ import { NACHSCHUB_ICON_PATHS } from './step-icons';
       .seg button:disabled { opacity: 0.5; cursor: not-allowed; }
       .seg button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
       .hint { margin: 0; color: var(--sc-fg-2); font-size: 0.82rem; }
-      .goal { display: flex; flex-direction: column; gap: 4px; }
-      .goal span { color: var(--sc-fg-2); font-size: 0.82rem; }
-      .input { min-height: 40px; padding: 0 var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-0); color: var(--sc-fg-0); font: inherit; }
-      .input:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
-      .input[aria-invalid='true'] { border-color: var(--sc-warning); }
+      .sc-input[aria-invalid='true'] { border-color: var(--sc-warning); }
       .lines, .stops { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); }
       .lines > li { padding: var(--sc-space-2, 8px) var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-bg-0); }
       .ln { margin: 0 0 4px; }
@@ -144,7 +127,6 @@ export class NachschubTargetDialogComponent {
   private readonly einsatz = inject(HqEinsatzService);
   private readonly i18n = inject(TranslateService);
 
-  protected readonly tray = NACHSCHUB_ICON_PATHS;
   protected readonly busy = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly goalText = signal('');
