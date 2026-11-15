@@ -65,9 +65,26 @@ pub struct State {
     pub patches: Vec<Patch>,
     pub rewards: Rewards,
     pub streak_best: u32,
+    /// Lit stars over all patch lines: the server's `kartograph.stars`, else the sum of
+    /// every patch's stars (at most 7 each) - the same fallback the website uses.
+    pub stars: u32,
+}
+
+/// Lit stars needed for each of the 7 rank tiers (mirror of `RANK_TIER_AT` in the website's
+/// `starmap.model.ts`).
+pub const RANK_TIER_AT: [u32; 7] = [1, 3, 7, 12, 18, 26, 35];
+
+/// Rank tier 0..=7 for a lit-star count; 0 = not ranked yet.
+pub fn rank_tier(stars: u32) -> u32 {
+    RANK_TIER_AT.iter().filter(|&&at| stars >= at).count() as u32
 }
 
 impl State {
+    /// The reader's rank tier (0..=7) from the lit stars.
+    pub fn rank_tier(&self) -> u32 {
+        rank_tier(self.stars)
+    }
+
     /// The wallpapers the app offers: patches the server unlocked AND that carry
     /// a constellation shape, newest first, capped at [`APP_MAX_PATCHES`].
     pub fn app_wallpapers(&self) -> Vec<&Patch> {
@@ -175,6 +192,13 @@ pub fn parse_state_with(json: &str, local_day: fn(i64) -> u32) -> Option<State> 
             supernova: flag("supernova"),
         };
     }
+    let summed: u32 = out.patches.iter().map(|p| p.star_count.min(7)).sum();
+    out.stars = root
+        .get("kartograph")
+        .and_then(|k| k.get("stars"))
+        .and_then(Json::as_f64)
+        .map(|n| n.max(0.0) as u32)
+        .unwrap_or(summed);
     out.streak_best = root
         .get("streak")
         .and_then(|s| s.get("best"))
@@ -567,6 +591,23 @@ mod tests {
         assert_eq!(p.points.unwrap()[0], (0.1, 0.2));
         assert!(s.rewards.live && s.rewards.meteor && !s.rewards.supernova);
         assert_eq!(s.streak_best, 6);
+        // no kartograph.stars in this payload: the stars fall back to the patch sum
+        assert_eq!(s.stars, 7);
+    }
+
+    #[test]
+    fn reads_kartograph_stars_and_folds_them_into_tiers() {
+        let json = state_json(&[patch_json("4.3", 5, false, false, "\"2026-10-08T17:00:00+00:00\"")]).replace(r#""rank":2"#, r#""rank":0,"stars":18"#);
+        let s = parse_state_with(&json, utc).expect("parses");
+        assert_eq!(s.stars, 18);
+        assert_eq!(s.rank_tier(), 5);
+        assert_eq!(rank_tier(0), 0);
+        assert_eq!(rank_tier(2), 1);
+        assert_eq!(rank_tier(3), 2);
+        assert_eq!(rank_tier(11), 3);
+        assert_eq!(rank_tier(12), 4);
+        assert_eq!(rank_tier(35), 7);
+        assert_eq!(rank_tier(99), 7);
     }
 
     #[test]
