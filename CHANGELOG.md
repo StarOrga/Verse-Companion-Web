@@ -10,12 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - With admin access the header no longer runs past a 1280 px window or breaks onto two rows at 1440 px: the admin entries fold into the Admin menu below 1600 px.
 - Popup row cascades keep their exact 30 ms rhythm even on a busy machine.
 
-## [0.270.2] - 2026-11-15
-
-### Fixed
-- With admin access the header no longer runs past a 1280 px window or breaks onto two rows at 1440 px: the admin entries fold into the Admin menu below 1600 px.
-- Popup row cascades keep their exact 30 ms rhythm even on a busy machine.
-
 ## [0.270.1] - 2026-11-15
 
 ### Fixed
