@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.12",
+  "current": "0.270.13",
   "releases": [
+    {
+      "version": "0.270.13",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex \"New in\": the hotfix build carries the live patch label (4.10.3) instead of the older branch name, entries are grouped by category with a header per block, and unnamed entries no longer show raw keys."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.270.12",
       "date": "2026-11-15",
