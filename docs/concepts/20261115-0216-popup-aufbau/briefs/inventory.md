@@ -25,6 +25,7 @@ All paths are under `src/app/`.
 | account_menu | `shell/shell.component.ts` (`#accountMenu`, `.dropdown`) | own | no | none (`--sc-ov-menu`, `shell.component.ts:726`) |
 | admin_menu | `shell/shell.component.ts` (`.admin-dropdown`) | own | no | none (token, `shell.component.ts:682`) |
 | column_menu | `shared/column-menu.component.ts` | own (class `.cm-panel`, not the codex modal) | no | none (token, `column-menu.component.ts:157`) |
+| weapon_detail | `codex/codex-weapon-detail.component.ts` | own (`.wd-backdrop`, `wd-panel sc-card`, text ✕, no rail) — migrated in the QA fix round to `<sc-popup kind="dialog">`, eyebrow "Waffe · S3 · port" | yes (text ✕ → scaffold ✕) | none (token `--sc-ov-m`) |
 | hangar_menu | `codex/holo/codex-holo-hangar-menu.component.ts` | own | no | `codex-holo-hangar-menu.component.ts:156` 290px |
 | place_select | `hq/stock/hq-place-select.component.ts` | own | no | `hq-place-select.component.ts:61` panel `max(100%,16rem)`; `:53` host 11–18rem |
 | merkliste | `shell/merkliste/merkliste.component.ts` | own | no | `merkliste.component.ts:111` 27rem |

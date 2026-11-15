@@ -162,8 +162,9 @@ const STALE_AFTER_MS = 5 * 60 * 1000;
     .dot.status-unknown { background: var(--sc-fg-2); }
 
     /* Frame, head, ✕ and width come from <sc-popup kind="panel">; only its place
-       under the chip is set here. */
-    .vs-panel { position: absolute; top: calc(100% + 8px); right: 0; z-index: 30; }
+       under the chip is set here. The host is shrink-wrapped by the 110 px chip box it
+       is positioned against, so it states the s tier itself. */
+    .vs-panel { position: absolute; top: calc(100% + 8px); right: 0; z-index: 30; inline-size: min(var(--sc-ov-s), calc(100vw - 32px)); }
     .vs-body { display: flex; flex-direction: column; gap: 8px; }
     .svc-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 5px; }
     .svc-list li {

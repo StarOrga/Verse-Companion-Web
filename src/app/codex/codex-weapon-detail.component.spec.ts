@@ -52,13 +52,13 @@ describe('CodexWeaponDetailComponent', () => {
 
   it('renders nothing when there is no entry', () => {
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.wd-panel')).toBeNull();
+    expect(fixture.nativeElement.querySelector('sc-popup')).toBeNull();
   });
 
   it('opens with the weapon name as the dialog title', () => {
     fixture.componentRef.setInput('entry', entry());
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('#wd-title').textContent).toContain('Panther Repeater');
+    expect(fixture.nativeElement.querySelector('.scp-title').textContent).toContain('Panther Repeater');
   });
 
   it('renders a present value in the damage-channels card', () => {
@@ -112,7 +112,7 @@ describe('CodexWeaponDetailComponent', () => {
     const spy = vi.fn();
     fixture.componentInstance.closed.subscribe(spy);
     (fixture.nativeElement as HTMLElement)
-      .querySelector('.wd-panel')!
+      .querySelector('.scp-frame')!
       .dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     expect(spy).toHaveBeenCalled();
   });

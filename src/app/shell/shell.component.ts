@@ -312,7 +312,8 @@ import { avatarUrlOf } from './avatar-url';
 
           @if (menuShown()) {
             <div class="dropdown" role="menu" scPopupMotion scPopupMotionItems=".dropdown-item" scPopupMotionOrigin="tr" (keydown)="onMenuKeydown($event)">
-              <sc-popup kind="menu" [backdrop]="false" initialFocus="container" [title]="'nav.accountMenu' | translate: { count: 0 }">
+              <sc-popup kind="menu" [backdrop]="false" initialFocus="container" [title]="'nav.accountMenu' | translate: { count: 0 }"
+                        (closed)="onMenuPopupClosed()">
               <div class="dropdown-header">
                 <div class="dh-id">
                   <span class="dh-name">{{ displayName() }}</span>
@@ -1494,6 +1495,19 @@ export class ShellComponent implements AfterViewInit {
     if (menus.length && !menus.some((m) => m.contains(event.target as Node))) {
       this.closeMenu();
     }
+  }
+
+  /**
+   * Escape inside the menu's frame never reaches `document` (`[scDialog]` stops it), so the
+   * scaffold's `closed` event folds the menu away and gives focus back to its avatar button.
+   */
+  onMenuPopupClosed() {
+    // Two account menus can be mounted (header + bar): the one holding focus is the one that closed.
+    const root = this.host.nativeElement as HTMLElement;
+    const holder = (document.activeElement as HTMLElement | null)?.closest('.profile-menu') ?? root.querySelector('.profile-menu');
+    const trigger = holder?.querySelector<HTMLElement>('.avatar-btn');
+    this.closeMenu();
+    trigger?.focus({ preventScroll: true });
   }
 
   @HostListener('document:keydown.escape')

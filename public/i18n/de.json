@@ -773,8 +773,8 @@
       }
     },
     "weaponDetail": {
+      "eyebrow": "Waffe",
       "intro": "Die 17 Spalten im Picker sind nicht alles. Hier steht, was eine Schiffswaffe im P4K wirklich mitbringt — gegliedert nach Herkunft, mit dem Struct daneben. Cyan = vorhanden, gold-gestrichelt = nicht in den Spieldateien.",
-      "close": "Schließen",
       "card": {
         "damageChannels": "Schaden je Kanal",
         "fireBallistics": "Feuer & Ballistik",

@@ -773,8 +773,8 @@
       }
     },
     "weaponDetail": {
+      "eyebrow": "Weapon",
       "intro": "The picker's 17 columns are not everything. This is what a ship weapon really carries in the P4K — grouped by origin, with the struct named beside it. Cyan = present, gold dashed = not in the game files.",
-      "close": "Close",
       "card": {
         "damageChannels": "Damage per channel",
         "fireBallistics": "Fire & ballistics",
