@@ -640,7 +640,7 @@ type Cell = { kind: 'add' } | { kind: 'ship'; ship: HangarShip } | { kind: 'bp';
       .tile .nm.tile-link { color: inherit; text-decoration: none; }
       .tile-link::after { content: ''; position: absolute; inset: 0; border-radius: 12px; }
       .tile-link:focus-visible { outline: none; }
-      .tile-link:focus-visible::after { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+      .tile-link:focus-visible::after { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       .tile:has(.tile-link):hover { border-color: var(--sc-accent); transform: translateY(-1px); }
       .tile .qty { position: absolute; top: 8px; right: 12px; font: 700 1rem var(--sc-font-display, inherit); color: var(--sc-accent); pointer-events: none; }
       .tile .where { color: var(--sc-fg-2); font-size: 0.74rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }

@@ -141,8 +141,8 @@ import { HqLink, hqHangar, hqLocker, hqOps, hqSet, ownShipLink, personalShipLink
       .tile-link { color: var(--sc-accent); text-decoration: none; align-self: flex-start; }
       .tile-link:hover { text-decoration: underline; }
       .tile-main:focus-visible, .tile-link:focus-visible, .chip:focus-visible {
-        outline: 2px solid var(--sc-accent);
-        outline-offset: 2px;
+        outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+        outline-offset: 0;
       }
       .tile--soon { border-style: dashed; }
       .soon-tag {

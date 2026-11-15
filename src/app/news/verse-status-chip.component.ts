@@ -221,7 +221,7 @@ const STALE_AFTER_MS = 5 * 60 * 1000;
       }
       .vs-chip:hover { border-color: transparent; }
       .vs-chip:focus-visible {
-        box-shadow: none; outline: 2px solid var(--sc-accent); outline-offset: -4px;
+        box-shadow: none; outline: 1px solid transparent; box-shadow: var(--sc-focus-ring-inset); outline-offset: 0;
       }
     }
   `],

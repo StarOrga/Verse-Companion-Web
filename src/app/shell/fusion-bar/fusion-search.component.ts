@@ -475,7 +475,7 @@ const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
     .input::-webkit-search-cancel-button { display: none; }
     .close:focus-visible, .cta:focus-visible, .retry:focus-visible, .expand:focus-visible,
     .collapse:focus-visible, .sum-b:focus-visible, .dym-b:focus-visible {
-      outline: 2px solid var(--sc-accent); outline-offset: 1px;
+      outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); outline-offset: 0;
     }
     .hint { display: inline-flex; gap: var(--sc-space-1); flex: none; }
     kbd {
@@ -564,7 +564,7 @@ const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
     /* The whole row is the anchor: its hit area stretches under the CTA and icons, which sit above. */
     .hit::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
     .hit:focus-visible { outline: none; }
-    .hit:focus-visible::after { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .hit:focus-visible::after { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     /* Leading icon: line art inline, no box, no background (r3 owner call). */
     .ico { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 28px; color: color-mix(in oklab, var(--sc-accent) 70%, var(--sc-fg-1)); }
     .ico svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
@@ -668,7 +668,7 @@ const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
     }
     .mag svg { width: 22px; height: 22px; color: var(--sc-accent); }
     .mag:hover { color: var(--sc-fg-0); background: var(--sc-bg-2); }
-    .mag:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
+    .mag:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     :host(.bottom:not(.open)) .fchip { display: none; }
     @media (pointer: coarse) {
       .hint, .keys { display: none; }

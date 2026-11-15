@@ -232,8 +232,8 @@ export const ADMIN_HUB_TILES: readonly AdminHubTile[] = ADMIN_HUB_GROUPS.flatMap
         transform: translateY(-2px);
       }
       .tile:focus-visible {
-        outline: 2px solid var(--sc-accent-hot);
-        outline-offset: 2px;
+        outline: 1px solid transparent; box-shadow: var(--sc-focus-ring-hot);
+        outline-offset: 0;
       }
       .tile-icon {
         grid-row: 1 / span 2;

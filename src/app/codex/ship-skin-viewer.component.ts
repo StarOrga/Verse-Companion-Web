@@ -391,8 +391,8 @@ const GLB_HEAD_TIMEOUT_MS = 10_000;
         transform: rotate(90deg);
       }
       .head-toggle:focus-visible {
-        outline: 2px solid var(--sc-accent);
-        outline-offset: 2px;
+        outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+        outline-offset: 0;
         border-radius: 4px;
       }
       @media (prefers-reduced-motion: reduce) {
@@ -565,8 +565,8 @@ const GLB_HEAD_TIMEOUT_MS = 10_000;
         border-color: #3a4150;
       }
       .list li:focus-visible {
-        outline: 2px solid var(--sc-accent);
-        outline-offset: 1px;
+        outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+        outline-offset: 0;
       }
       .list li.no3d {
         opacity: 0.7;

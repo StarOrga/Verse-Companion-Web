@@ -228,8 +228,8 @@ export interface GearSlotRow {
       }
       a.gear-tile:hover { border-color: var(--tint); background: color-mix(in srgb, var(--tint) 9%, transparent); }
       a.gear-tile:focus-visible {
-        outline: 2px solid var(--tint);
-        outline-offset: 1px;
+        outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+        outline-offset: 0;
         background: color-mix(in srgb, var(--tint) 9%, transparent);
       }
       .empty .gear-tile { border-style: dashed; border-color: var(--idle); background: var(--idle-bg); }

@@ -292,8 +292,8 @@ import { BRAND_NAME } from '../core/brand';
     }
     .disclaimer-toggle:hover { color: var(--sc-fg-1); }
     .disclaimer-toggle:focus-visible {
-      outline: 1px solid var(--sc-accent);
-      outline-offset: 2px;
+      outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+      outline-offset: 0;
       border-radius: 2px;
     }
     .whatsnew {

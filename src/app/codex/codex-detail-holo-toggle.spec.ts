@@ -13,7 +13,9 @@ import { signal } from '@angular/core';
 import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
+import { By } from '@angular/platform-browser';
 import { CodexDetailComponent } from './codex-detail.component';
+import { CodexHoloStageComponent } from './holo/codex-holo-stage.component';
 import { CodexService, ResolvedEntity } from './codex.service';
 import { HangarService } from '../hangar/hangar.service';
 import { AuthService } from '../auth/auth.service';
@@ -310,5 +312,30 @@ describe('CodexDetailComponent — Holotable / classic view toggle', () => {
     expect(keys).toContain('boost');
     expect(keys).toContain('ir');
     expect(keys.length).toBeGreaterThan(fixture.componentInstance.kpiCells().length);
+  });
+
+  describe('a ship without a 3D model', () => {
+    const stageOf = (fixture: ComponentFixture<CodexDetailComponent>) =>
+      fixture.debugElement.query(By.directive(CodexHoloStageComponent)).componentInstance as CodexHoloStageComponent;
+
+    it('opens on the Akte by default', async () => {
+      const fixture = await setup();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(stageOf(fixture).activeView()).toBe('akte');
+    });
+
+    it('does not override a view the reader already picked', async () => {
+      const fixture = await setup();
+      const c = fixture.componentInstance;
+      const stage = stageOf(fixture);
+      stage.akteOpen.set(false);
+      c['noModelSlug'].set(null);
+      c.onStageViewChange();
+      c['noModelSlug'].set(c.detail()!.classNameSlug);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(stage.activeView()).not.toBe('akte');
+    });
   });
 });

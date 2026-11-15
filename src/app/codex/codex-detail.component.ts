@@ -821,7 +821,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
         <ng-container [ngTemplateOutlet]="infoBlocks" />
         }
         } @else {
-          <sc-codex-holo-stage animate.enter="view-in"
+          <sc-codex-holo-stage animate.enter="view-in" (viewChange)="onStageViewChange()"
             [detail]="detail()!"
             [displayName]="displayName()"
             [manufacturerName]="manufacturerName()"
@@ -1921,6 +1921,21 @@ export class CodexDetailComponent implements OnInit {
     return cls ? (this.hangar.ships().find((s) => s.shipClassName === cls && s.status === 'owned') ?? null) : null;
   });
   private readonly ownCardRef = viewChild(CodexOwnCardComponent);
+  private readonly holoStage = viewChild(CodexHoloStageComponent);
+  /** The ship whose catalog came back without any 3D model; null = unknown or has one. */
+  private readonly noModelSlug = signal<string | null>(null);
+  /** The reader switched the view on this page, so the no-model default must not override it. */
+  private readonly viewPicked = signal(false);
+  /** A ship without a 3D model opens on the Akte (once per page load, only while the reader has not chosen). */
+  private readonly akteDefault = effect(() => {
+    const slug = this.noModelSlug();
+    const stage = this.holoStage();
+    if (!slug || !stage || this.viewPicked() || this.detail()?.classNameSlug !== slug) return;
+    untracked(() => {
+      stage.akteOpen.set(true);
+      this.noModelSlug.set(null);
+    });
+  });
   private readonly swapPicker = viewChild<CodexSwapPickerComponent>('swapPicker');
   /** The head's "Nicht im Hangar / Inventar": the ownership card comes into view and lights up (C2). */
   revealOwnCard(): void {
@@ -3265,6 +3280,8 @@ export class CodexDetailComponent implements OnInit {
     this.editionOptions.set([]);
     this.modelOptions.set([]);
     this.akteLiveries.set([]);
+    this.noModelSlug.set(null);
+    this.viewPicked.set(false);
     this.rankCohort.set(null);
     this.rankCohortLoading.set(false);
     this.rankCohortFailed.set(false);
@@ -3555,7 +3572,7 @@ export class CodexDetailComponent implements OnInit {
 
   /** The paints of this record for the Akte's Lackierung tiles (ship_skins, C21). Best effort. */
   private async loadShipLiveries(className: string): Promise<void> {
-    const { skins } = await this.shipSkins.listSkins(className);
+    const { skins, error } = await this.shipSkins.listSkins(className);
     if (this.detail()?.classNameSlug !== className) return;
     const tiles: AkteLivery[] = skins.map((s) => ({
       id: s.skinId,
@@ -3565,6 +3582,13 @@ export class CodexDetailComponent implements OnInit {
     // The factory paint leads; it carries the official image.
     tiles.sort((a, b) => Number(b.id === AKTE_STANDARD_LIVERY) - Number(a.id === AKTE_STANDARD_LIVERY));
     this.akteLiveries.set(tiles);
+    // No catalog error and no skin with a model: the 3D view cannot show anything, so the Akte leads.
+    if (!error && !skins.some((s) => !!s.modelPath)) this.noModelSlug.set(className);
+  }
+
+  /** The reader picked a view on the bottom row: from here on the default no longer decides. */
+  onStageViewChange(): void {
+    this.viewPicked.set(true);
   }
 
   /** Reverse lookup: crafting blueprints that consume this entity as an ingredient. */
