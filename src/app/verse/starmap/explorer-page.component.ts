@@ -152,7 +152,7 @@ function isComplete(p: VerseExplorerPatch): boolean {
 
           <div class="tracks">
             @if (cometTarget(); as ct) {
-              <sc-comet-track class="track comet" data-tour="comet" [patchLine]="ct.patchLine" [comet]="ct.comet" />
+              <sc-comet-track class="track comet" data-tour="comet" [patchLine]="ct.patchLine" [comet]="ct.comet" [current]="selected() === fallback()" />
             }
             @if (p.guess.state !== 'unavailable') {
               <sc-guess-track class="track guess" data-tour="guess" [patchLine]="p.patchLine" [guess]="p.guess" />
@@ -285,11 +285,11 @@ export class ExplorerPageComponent {
   readonly name = currentPatchName;
 
   /**
-   * Where the comet flies: on the newest map the patch still in testing (the
-   * tip is for its LIVE day; the server always names one, the PTU line or live
-   * + 1); on an older map that patch's own, closed comet. Without an upcoming
-   * patch the newest map must not headline its LIVE patch's closed comet, so
-   * the rail is hidden (a tipped / hit / missed record still shows).
+   * Where the comet flies: on the newest map the next patch CIG announced (a
+   * new line in testing → `upcoming`); without one the newest map hands its own
+   * comet to the rail, which then tips an announced x.y.z on the live line or
+   * shows the quiet "no patch tip" state (`current`). An older map shows that
+   * patch's own, closed comet. Nothing is ever inferred as "live + 1".
    */
   readonly cometTarget = computed<{ patchLine: string; comet: VerseComet } | null>(() => {
     const p = this.selected();
@@ -297,7 +297,6 @@ export class ExplorerPageComponent {
     const up = this.state()?.upcoming;
     if (p === this.fallback()) {
       if (up) return up;
-      if (p.comet.state === 'none' && p.comet.locked) return null;
     }
     return { patchLine: p.patchLine, comet: p.comet };
   });

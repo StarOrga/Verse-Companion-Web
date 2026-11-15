@@ -14,7 +14,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { VerseApiService } from '../data/verse-api.service';
 import type { VersePoint } from '../data/verse.models';
 import { BADGE_SIZE, renderKartographBadge } from './constellation-render';
-import { FALLBACK_POINTS, KartographBadge, STARS_PER_PATCH, parseBadge } from './starmap.model';
+import { SINGLE_STAR, KartographBadge, STARS_PER_PATCH, parseBadge } from './starmap.model';
 
 /** Caption strings of a badge, shared by the public page and the share export. */
 export function badgeCaption(t: TranslateService, b: KartographBadge): { title: string; subtitle: string } {
@@ -71,7 +71,7 @@ export class KartographBadgeComponent {
   readonly size = BADGE_SIZE;
   private readonly query = toSignal(this.route.queryParamMap, { initialValue: this.route.snapshot.queryParamMap });
   readonly badge = computed(() => parseBadge(this.query()));
-  private readonly points = signal<readonly VersePoint[]>(FALLBACK_POINTS);
+  private readonly points = signal<readonly VersePoint[]>(SINGLE_STAR);
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   private readonly lang = toSignal(this.t.onLangChange);
 

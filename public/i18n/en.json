@@ -467,8 +467,7 @@
       "values": {
         "key": "Key values",
         "more": "Data sheet",
-        "legend": "Class average",
-        "toPage": "To the {{name}} page"
+        "view": "View {{name}}"
       },
       "set": {
         "label": "Values",
@@ -7342,15 +7341,15 @@
     "sun": {
       "faded": {
         "aria": "Sun: faded",
-        "tip": "The sun is faded. Set your patch tip below on the day {{patch}} goes LIVE – land within ±2 days and the sun lights up."
+        "tip": "The sun is faded. Set your patch tip below on the day {{patch}} goes LIVE – land within ±1 day and the sun lights up."
       },
       "tipped": {
         "aria": "Sun: patch tip set, waiting for the LIVE day",
-        "tip": "Your patch tip is set: the sun glows until {{patch}} goes LIVE. Land within ±2 days and it lights up."
+        "tip": "Your patch tip is set: the sun glows until {{patch}} goes LIVE. Land within ±1 day and it lights up."
       },
       "hit": {
         "aria": "Sun: lit",
-        "tip": "Hit: your patch tip landed at most 2 days from the LIVE day, the sun is lit."
+        "tip": "Hit: your patch tip landed at most 1 day from the LIVE day, the sun is lit."
       }
     },
     "export": {
@@ -7554,9 +7553,9 @@
     "comet": {
       "kind": "Patch tip",
       "ruleAria": "Patch tip rules",
-      "rule": "Tip the day {{patch}} goes LIVE – one click on a day sets your patch tip, one tip per patch. Land within ±2 days and the comet lights a sun for your collection on the rank page. Tips close once {{patch}} is LIVE or the LIVE date was officially announced.",
-      "ruleVersion": "Tip the day {{patch}} goes LIVE – a concrete patch of the line, one tip per patch. Tips close once {{patch}} is LIVE or its LIVE date was officially announced. The patch star only comes with the line tip.",
-      "modeAria": "Tip target",
+      "rule": "Tip the day {{patch}} goes LIVE – one click on a day sets your patch tip, one tip per patch. Land within ±1 day and the comet lights a sun for your collection on the rank page. Tips close once {{patch}} is LIVE or the LIVE date was officially announced.",
+      "ruleVersion": "Tip the day {{patch}} goes LIVE – one tip per patch. Tips close once {{patch}} is LIVE or its LIVE date was officially announced. The patch star only comes with the line tip.",
+      "noTip": "There is currently no patch tip – CIG has not announced another patch.",
       "state": {
         "none": "open",
         "tipped": "set · waiting for LIVE",

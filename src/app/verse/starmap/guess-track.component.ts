@@ -36,13 +36,9 @@ export function shortShipName(name: string): string {
         </svg>
         {{ 'starmap.guess.kind' | translate }}
       </span>
-      <b>{{ headKey() | translate: { name: answerName() } }}</b>
+      <b [scTooltip]="'starmap.guess.state.' + g.state | translate" scTooltipTier="label">{{ headKey() | translate: { name: answerName() } }}</b>
       <button type="button" class="info" [attr.aria-label]="'starmap.guess.ruleAria' | translate"
               [scTooltip]="'starmap.guess.rule' | translate">i</button>
-      <span class="state">
-        <i class="ring" [class.done]="g.state === 'correct'" [class.closed]="g.state === 'wrong'"></i>
-        {{ 'starmap.guess.state.' + g.state | translate }}
-      </span>
     </div>
     @if (loadError()) {
       <p class="err" role="alert">
