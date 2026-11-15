@@ -28,7 +28,7 @@ export interface SheetField<T> {
   readonly value: T | null;
   /** 0..1. Admin-set values carry 1. */
   readonly confidence: number;
-  /** Open: 'official' | 'comm-link' | 'spectrum' | 'wiki' | 'ai' | 'admin' | 'seed' | 'unknown' ... */
+  /** Open: 'comm-link' | 'rsi-page' | 'spectrum-cig' | 'wiki' | 'previous-edition' | 'calendar' | 'default' | 'ai' | 'admin' | 'unknown' ... */
   readonly source: string;
   readonly review: FieldReview;
 }
@@ -155,6 +155,16 @@ function isoDate(raw: unknown): string | null {
   return Number.isFinite(Date.parse(s)) ? s : null;
 }
 
+/**
+ * "No gear needed" (#364): the leaf `{gear:'none'}`. Owner rule: prerequisites read "keine" whenever nothing was found,
+ * never "unknown". Only valid as the whole tree; inside an AND/OR group it is dropped.
+ */
+export const NO_PREREQ_GEAR = 'none';
+export function noPrerequisites(): PrereqNode { return { gear: NO_PREREQ_GEAR, label: null }; }
+export function isNoPrereq(node: PrereqNode | null | undefined): boolean {
+  return !!node && 'gear' in node && node.gear === NO_PREREQ_GEAR;
+}
+
 /** Patch / game package / edition are obligatory or irrelevant: never a prerequisite (pin ev-flow, C4). */
 const FORBIDDEN_GEAR = /(^|-)(patch|alpha|beta|live|ptu|game-?package|package|starter|squadron-?42|sq-?42|edition|account)(-|$)/;
 export function isForbiddenGear(gear: string): boolean {
@@ -239,7 +249,7 @@ function normPrereq(raw: unknown, depth = 0): PrereqNode | null {
   if (!isRec(raw) || depth > 4) return null;
   if (typeof raw['gear'] === 'string') {
     const gear = slug(raw['gear']);
-    if (!gear || isForbiddenGear(gear)) return null;
+    if (!gear || isForbiddenGear(gear) || (gear === NO_PREREQ_GEAR && depth > 0)) return null;
     return { gear, label: textOrNull(raw['label'], 80) };
   }
   const op = raw['op'] === 'or' ? 'or' : raw['op'] === 'and' ? 'and' : null;
@@ -346,6 +356,6 @@ export function approveField(sheet: EventSheet, key: EventSheetFieldKey): EventS
 /** Gear ids of a prerequisite tree flattened (for chips / tests). */
 export function prereqGear(node: PrereqNode | null): string[] {
   if (!node) return [];
-  if ('gear' in node) return [node.gear];
+  if ('gear' in node) return node.gear === NO_PREREQ_GEAR ? [] : [node.gear];
   return node.items.flatMap((n) => prereqGear(n));
 }
