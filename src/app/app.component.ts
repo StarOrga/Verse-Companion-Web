@@ -8,6 +8,7 @@ import { emptyGraph } from './social/friends.types';
 import { SocialPresenceService } from './social/social-presence.service';
 import { AnalyticsService } from './core/analytics.service';
 import { AnalyticsIdentityService } from './core/analytics/analytics-identity.service';
+import { PageEventsService } from './core/analytics/page-events.service';
 import { ConsentBannerComponent } from './core/consent-banner.component';
 import { LocaleService } from './core/locale/locale.service';
 import { dismissBootSplash } from './core/boot-splash';
@@ -115,6 +116,7 @@ export class AppComponent implements OnInit {
   private readonly sb = inject(SupabaseClientProvider);
   private readonly analytics = inject(AnalyticsService);
   private readonly analyticsIdentity = inject(AnalyticsIdentityService);
+  private readonly pageEvents = inject(PageEventsService);
   private readonly locale = inject(LocaleService);
   readonly swUpdate = inject(SwUpdateService);
   private readonly routeRecovery = inject(RouteLoadRecoveryService);
@@ -195,6 +197,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.pageEvents.start();
     // Activate synchronously on boot so the first paint is already translated;
     // the effect above only handles subsequent changes.
     const initial = this.locale.language();
