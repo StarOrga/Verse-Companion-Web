@@ -9,6 +9,7 @@ import { WishlistStore } from '../../hq/data/wishlist.store';
 import { placeOfName } from '../../hq/plan/map/hq-places';
 import type { MapPlace } from '../../hq/plan/map/hq-map.types';
 import type { BuyOption } from '../uex-shop.service';
+import { formatNumber } from '../codex-format';
 import { BUY_TOP, ShopRow, WikeloNeed, groupShops, haveOf, rankShops, shopSource, toShopRows } from './codex-holo-buy';
 import { foldText, fuzzyFilter } from './codex-holo-fuzzy';
 
@@ -227,7 +228,7 @@ export class CodexHoloBuyTabComponent {
   }
 
   protected fmt(n: number): string {
-    return new Intl.NumberFormat(this.t.currentLang || 'de').format(n);
+    return formatNumber(n);
   }
 
   /** Put the ship on the wishlist with `src` as where it is bought; an existing wish only changes its source. */
