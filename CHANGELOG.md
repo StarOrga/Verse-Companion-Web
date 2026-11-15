@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.270.12] - 2026-11-15
+
+### Changed
+- HQ: retry, undo, crew, sharing and stock buttons use the shared action control — one main step per view, red tone for revoke and remove (#970).
+
 ## [0.270.11] - 2026-11-15
 
 ### Added
