@@ -17,6 +17,7 @@ import {
   edgeLabel,
   isExpiringSoon,
 } from './friends.types';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /**
  * The requests / friends / outgoing / blocked sections of the Social page
@@ -26,7 +27,7 @@ import {
 @Component({
   selector: 'sc-friends',
   standalone: true,
-  imports: [TranslatePipe, ScDatePipe, ScSelectComponent, RouterLink, ScTooltipDirective],
+  imports: [ScActionDirective, TranslatePipe, ScDatePipe, ScSelectComponent, RouterLink, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
@@ -66,19 +67,19 @@ import {
                   </span>
                 </span>
                 <span class="edge-actions">
-                  <button type="button" class="sc-btn micro sc-btn-primary"
+                  <button type="button" scAction tier="secondary"
                           [disabled]="friends.busy()" (click)="respond(e, true)">
                     {{ 'friends.actions.accept' | translate }}
                   </button>
-                  <button type="button" class="sc-btn micro"
+                  <button type="button" scAction tier="secondary"
                           [disabled]="friends.busy()" (click)="respond(e, false)">
                     {{ 'friends.actions.decline' | translate }}
                   </button>
-                  <button type="button" class="sc-btn micro"
+                  <button type="button" scAction tier="secondary"
                           [disabled]="friends.busy()" (click)="block(e)">
                     {{ 'friends.actions.block' | translate }}
                   </button>
-                  <button type="button" class="sc-btn micro danger"
+                  <button type="button" scAction tier="secondary" tone="danger"
                           [disabled]="friends.busy()" (click)="openReport(e)">
                     {{ 'friends.actions.report' | translate }}
                   </button>
@@ -97,7 +98,7 @@ import {
           <div class="empty-state">
             <p class="empty-inline">{{ 'friends.list.empty' | translate }}</p>
             <p class="hint">{{ 'social.page.emptyHint' | translate }}</p>
-            <button type="button" class="sc-btn sc-btn-primary" (click)="inviteRequested.emit()">
+            <button type="button" scAction tier="secondary" (click)="inviteRequested.emit()">
               {{ 'social.page.emptyCta' | translate }}
             </button>
           </div>
@@ -120,16 +121,16 @@ import {
                   </span>
                 </span>
                 <span class="edge-actions">
-                  <a class="sc-btn micro" [routerLink]="friendLink(e)">{{ 'social.page.openFriend' | translate }}</a>
-                  <button type="button" class="sc-btn micro"
+                  <a scAction tier="secondary" [routerLink]="friendLink(e)">{{ 'social.page.openFriend' | translate }}</a>
+                  <button type="button" scAction tier="secondary"
                           [disabled]="friends.busy()" (click)="removeFriend(e)">
                     {{ 'friends.actions.remove' | translate }}
                   </button>
-                  <button type="button" class="sc-btn micro"
+                  <button type="button" scAction tier="secondary"
                           [disabled]="friends.busy()" (click)="block(e)">
                     {{ 'friends.actions.block' | translate }}
                   </button>
-                  <button type="button" class="sc-btn micro danger"
+                  <button type="button" scAction tier="secondary" tone="danger"
                           [disabled]="friends.busy()" (click)="openReport(e)">
                     {{ 'friends.actions.report' | translate }}
                   </button>
@@ -162,7 +163,7 @@ import {
                   </span>
                 </span>
                 <span class="edge-actions">
-                  <button type="button" class="sc-btn micro"
+                  <button type="button" scAction tier="secondary"
                           [disabled]="friends.busy()" (click)="withdraw(e)">
                     {{ 'friends.actions.withdraw' | translate }}
                   </button>
@@ -186,7 +187,7 @@ import {
                   <span class="edge-meta">{{ e.since | scDate }}</span>
                 </span>
                 <span class="edge-actions">
-                  <button type="button" class="sc-btn micro"
+                  <button type="button" scAction tier="secondary"
                           [disabled]="friends.busy()" (click)="unblock(e)">
                     {{ 'friends.actions.unblock' | translate }}
                   </button>
@@ -227,11 +228,11 @@ import {
               [placeholder]="'friends.report.reasonPlaceholder' | translate"></textarea>
           </label>
           <div class="report-actions">
-            <button type="button" class="sc-btn sc-btn-primary"
+            <button type="button" scAction tier="primary"
                     [disabled]="friends.busy()" (click)="submitReport(t)">
               {{ 'friends.report.submit' | translate }}
             </button>
-            <button type="button" class="sc-btn" (click)="cancelReport()">
+            <button type="button" scAction tier="secondary" (click)="cancelReport()">
               {{ 'friends.report.cancel' | translate }}
             </button>
           </div>
@@ -257,7 +258,6 @@ import {
     .online-dot { display: inline-block; width: 8px; height: 8px; margin-left: 8px; border-radius: 50%; background: var(--sc-success); vertical-align: middle; }
     .empty-state { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 10px; }
     .empty-state .empty-inline { margin: 0; }
-    a.sc-btn { text-decoration: none; display: inline-flex; align-items: center; }
     .count {
       display: inline-block;
       min-width: 20px;
@@ -347,23 +347,12 @@ import {
     .expiry.soon { color: var(--sc-warning); }
     .edge-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
-    .sc-btn.micro {
-      padding: 4px 10px;
-      font-size: max(0.7rem, var(--sc-fs-floor));
-      letter-spacing: 0.04em;
-    }
-    .sc-btn.micro.danger { color: var(--sc-danger); border-color: var(--sc-danger); }
-    .sc-btn.micro.danger:hover:not(:disabled) { background: var(--sc-danger); color: var(--sc-bg-0); }
-
-    /* 48px tap targets on touch: two overlapping scale(0.994) animations in
-       the shell shave a hair off every measured box, so 44 measures as 43. */
     @media (pointer: coarse) {
-      .edge-actions .sc-btn { min-height: 48px; }
       .edge-actions { width: 100%; }
     }
     @media (max-width: 560px) {
       .edge-actions { width: 100%; }
-      .edge-actions .sc-btn { flex: 1 1 auto; }
+      .edge-actions .sc-action { flex: 1 1 auto; }
     }
 
     .report-card { border-color: var(--sc-danger); }

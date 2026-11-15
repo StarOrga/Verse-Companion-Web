@@ -287,8 +287,10 @@ class Hull3DExporter:
         # paths), so the freshly-produced output file is the success signal —
         # robust now that any stale glb was unlinked above. rc is logged only.
         if not produced.exists() or produced.stat().st_size < 4096:
+            from .converter_report import converter_reason
             raise RuntimeError(
-                f"cgf-converter produced no usable glb for {cga_disk.name} (rc={r.returncode})")
+                f"cgf-converter produced no usable glb for {cga_disk.name} "
+                f"(rc={r.returncode}{converter_reason(r)})")
         produced.replace(out_glb)
 
     @staticmethod

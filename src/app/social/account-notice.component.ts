@@ -4,6 +4,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../auth/auth.service';
 import { ScDatePipe } from '../core/locale/sc-date.pipe';
 import { AccountStatusService } from './account-status.service';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /**
  * The moderation banner in the shell (feedback cf0ddf7d phase 2).
@@ -24,7 +25,7 @@ import { AccountStatusService } from './account-status.service';
 @Component({
   selector: 'sc-account-notice',
   standalone: true,
-  imports: [TranslatePipe, ScDatePipe],
+  imports: [ScActionDirective, TranslatePipe, ScDatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (account.warning(); as w) {
@@ -40,7 +41,7 @@ import { AccountStatusService } from './account-status.service';
         </div>
         <button
           type="button"
-          class="sc-btn notice__ack"
+          scAction tier="secondary" class="notice__ack"
           (click)="acknowledge()">
           {{ 'moderation.warning.acknowledge' | translate }}
         </button>
@@ -76,13 +77,8 @@ import { AccountStatusService } from './account-status.service';
     .notice__meta { margin: 0; color: var(--sc-fg-2); font-size: max(0.74rem, var(--sc-fs-floor)); }
     .notice__ack { flex: 0 0 auto; }
 
-    /* 48px, not 44: two overlapping scale(0.994) shell animations shave a
-       hair off every measured box, so a 44px target measures 43. */
-    @media (pointer: coarse) {
-      .notice__ack { min-height: 48px; }
-    }
     @media (max-width: 560px) {
-      .notice__ack { width: 100%; min-height: 48px; }
+      .notice__ack { width: 100%; }
     }
   `],
 })

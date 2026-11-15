@@ -139,7 +139,7 @@ class _PackageBuilder:
                                            raw_glb=self._interior_raw)
             res = build_ship_package(ship_id, self.source, self.reader, self.store,
                                      hull_glb, self.out / ship_id, interior)
-            self.store.save_index()
+            self.store.checkpoint()
         except Exception as exc:  # noqa: BLE001 — the hull still ships
             log("warn", f"{ship_id}: package failed: {type(exc).__name__}: {exc}")
             return {"error": str(exc)[:300]}
@@ -220,10 +220,13 @@ class _PackageBuilder:
             progress(f"{kind}-packages", current=i + 1, total=len(classes))
             try:
                 res = build(cls)
-                self.store.save_index()
             except Exception as exc:  # noqa: BLE001 — one class never costs the run
                 log("warn", f"{cls}: {kind} package failed: {type(exc).__name__}: {exc}")
                 continue
+            finally:
+                # Throttled: rewriting the ~17 MB index after every class was
+                # most of this loop's time (`parts.INDEX_SAVE_INTERVAL_S`).
+                self.store.checkpoint()
             if res is None:
                 skipped.append(cls)
                 continue
@@ -246,6 +249,7 @@ class _PackageBuilder:
             log("info", f"{cls}: {kind} package root {row['rootBytes'] / 1e3:.0f} kB, "
                         f"{row['parts']} part(s), {row['withPart']}/{len(pl)} placements "
                         f"with geometry")
+        self.store.flush()
         if skipped:
             log("warn", skipped_summary(kind, skipped))
         return rows
@@ -547,7 +551,9 @@ def _fully_cached(args, ref: ShipRef) -> Optional[dict]:
         return None
     if args.package and not (args.out / ref.ship_id / "package.json").exists():
         return None
-    log("info", f"{ref.ship_id}: cached — skipping build")
+    # No per-ship line: on a resumed run ~300 of them filled the host's info
+    # cap and hid every later line (3D cache, package summary). The caller
+    # logs one summary instead.
     count(ref.ship_id, _cached_model_count(prev))
     return _cached_entry(args.out.resolve(), ref.ship_id)
 
@@ -598,6 +604,8 @@ def _worker_main(args, wid: int, tasks, events_q, active=None) -> None:
         events_q.put({"type": "__ship", "worker": wid, "idx": idx,
                       "entry": entry, "barren": barren})
     pkg = run.pkg
+    if pkg:
+        pkg.store.flush()
     events_q.put({"type": "__exit", "worker": wid,
                   "timing": stage_timing.snapshot(),
                   "parts": [r["parts"] for r in pkg.rows if "parts" in r] if pkg else [],
@@ -763,6 +771,9 @@ def main() -> int:
                 results[i] = (entry, None)
             else:
                 jobs.append((i, ref))
+        if len(jobs) < len(refs):
+            log("info", f"{len(refs) - len(jobs)} of {len(refs)} ship(s) cached — skipping build; "
+                        f"{len(jobs)} to build")
         # Cross-patch reuse (build_cache): a new patch's dir starts from the
         # previous patch's content-addressed stores, and every hull, part and
         # interior whose P4K inputs and pipeline are byte-identical is taken
@@ -856,6 +867,8 @@ def main() -> int:
             run_result["itemPackages"] = run.pkg.standalone("items", args.item, args.max_packages)
         if run is not None and run.pkg and args.armor:
             run_result["armorPackages"] = run.pkg.standalone("armor", args.armor_class, args.max_packages)
+        if run is not None and run.pkg:
+            run.pkg.store.flush()  # rows of in-process ships since the last checkpoint
         if args.package or args.fps or args.items:
             if run is not None and run.pkg:
                 pkg_parts.extend(r["parts"] for r in run.pkg.rows if "parts" in r)
