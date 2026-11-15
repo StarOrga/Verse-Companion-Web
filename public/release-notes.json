@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.263.1",
+  "current": "0.263.2",
   "releases": [
+    {
+      "version": "0.263.2",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Concepts: the area-symbols and holo-table-border concept page has a third round that shows the classic view with every choice made so far, keeps the alternatives collapsed and adds the open points (cooler as thermometer, manned turrets, what goes into the holo table now)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.263.1",
       "date": "2026-11-14",
