@@ -217,6 +217,10 @@ pub fn options_for(state: &State, key: &str, w: i32, h: i32) -> Option<RenderOpt
         nebula: state.rewards.nebula,
         road: state.rewards.road,
         supernova,
+        // The explorer payload carries no lit-star total / tier, so the tier-3 and tier-4 rewards
+        // cannot be decided here: companions keep the app's existing behaviour, the tint stays off.
+        companions: true,
+        tint: false,
     })
 }
 

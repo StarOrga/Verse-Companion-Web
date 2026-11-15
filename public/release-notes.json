@@ -1,7 +1,63 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.264.0",
+  "current": "0.265.0",
   "releases": [
+    {
+      "version": "0.265.0",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Rank page: reward ideas with voting from tier 5 (Astrograf, 18 stars); admins can archive ideas. Replaces the old \"suggest a top entry\" form."
+            },
+            {
+              "title": "",
+              "text": "Comet: an x.y.z tip that hits earns a sun splinter; three splinters make a small sun in the sun collection. Splinters never count as stars."
+            },
+            {
+              "title": "",
+              "text": "New rank rewards: Companions (tier 3, older patch constellations faintly in your sky) and Amber tint (tier 4)."
+            },
+            {
+              "title": "",
+              "text": "Verse hub: the star-map planet shows a dot when the rank page has something new."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Rank tiers now count lit stars (1 · 3 · 7 · 12 · 18 · 26 · 35) instead of completed star maps, so every star moves the bar."
+            },
+            {
+              "title": "",
+              "text": "Comet: the x.y.z tip comes first when a hotfix target is known; the target is now also detected from Evocati patch notes on Spectrum, before PTU or EPTU exist."
+            },
+            {
+              "title": "",
+              "text": "Wallpapers: your constellation glows softly with a faint blue veil behind it, and 4K, phone and ultrawide are available from tier 1. The Starscape app draws the same glow and veil."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Star map on phones: the comet strip no longer sits under the bottom search bar and feedback launcher."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.264.0",
       "date": "2026-11-15",
