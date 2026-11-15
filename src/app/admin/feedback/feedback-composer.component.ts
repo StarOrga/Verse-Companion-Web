@@ -23,6 +23,14 @@ import type { FeedbackArea, FeedbackAreaView } from '../../feedback/feedback-are
 import { isImageAttachment } from '../../feedback/feedback-images.util';
 import { PageScreenshotService } from '../../feedback/page-screenshot.service';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import {
+  DictationError,
+  DictationTrigger,
+  SpeechDictationService,
+  isDictationHotkey,
+  recognitionLang,
+} from '../../feedback/speech-dictation.service';
 import { FeedbackLineTarget, FeedbackSpotService, withReferenceLine } from '../../feedback/feedback-spot.service';
 import {
   AnnotationResult,
@@ -175,6 +183,7 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
     FeedbackAreaPickerComponent,
     CharCounterComponent,
     ScTooltipDirective,
+    ScActionDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -189,6 +198,7 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
       [class.large]="large()"
       [class.frameless]="frameless()"
       [class.drag-active]="dragActive()"
+      (keydown)="onComposerKeydown($event)"
       (dragover)="onDragOver($event)"
       (dragleave)="onDragLeave($event)"
       (drop)="onDrop($event)">
@@ -301,6 +311,32 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
           (add)="fileInput.click()"
           (capture)="captureScreenshot()"
           (annotate)="onAnnotated($event)" />
+
+        <!-- Dictation (admin feedback #359): speak instead of type. The words
+             land at the caret, live while they are still a guess. Alt+M / ⌥M
+             toggles it from anywhere in the box, and the tooltip names the key.
+             Where the browser has no speech recognition the button stays,
+             aria-disabled, and its tooltip says why — a missing button would
+             read as "this app cannot", the disabled one as "this browser
+             cannot". -->
+        <button
+          type="button"
+          scAction
+          tier="tertiary"
+          class="mic"
+          [class.listening]="listening()"
+          [attr.aria-pressed]="dictation.supported ? listening() : null"
+          [attr.aria-disabled]="dictation.supported ? null : 'true'"
+          [attr.aria-label]="micLabel()"
+          [scTooltip]="micLabel()"
+          scTooltipTier="label"
+          (click)="toggleDictation('button')">
+          <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="9" y="3" width="6" height="11" rx="3" />
+            <path d="M5.5 11a6.5 6.5 0 0 0 13 0" />
+            <path d="M12 17.5V21" />
+          </svg>
+        </button>
 
         <!-- Whatever the surrounding surface wants decided right here, LEFT of
              the send button (admin feedback 187574ed: the opened topic's
@@ -563,6 +599,29 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
       letter-spacing: 0.02em;
     }
 
+    /* The mic sits in the send band at the band's height, like the tiles. */
+    .foot .mic {
+      width: var(--sc-composer-action-h);
+      height: var(--sc-composer-action-h);
+      color: var(--sc-fg-1);
+    }
+    /* The tooltip is what explains an unsupported browser, so the disabled
+       button still has to receive the pointer (the global rule turns it off). */
+    .foot .mic[aria-disabled='true'] { pointer-events: auto; }
+    .foot .mic.listening {
+      color: var(--sc-accent);
+      background: color-mix(in srgb, var(--sc-accent) 16%, transparent);
+      box-shadow: 0 0 0 1px var(--sc-accent);
+      animation: mic-pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes mic-pulse {
+      0%, 100% { box-shadow: 0 0 0 1px var(--sc-accent); }
+      50% { box-shadow: 0 0 0 1px var(--sc-accent), 0 0 0 5px color-mix(in srgb, var(--sc-accent) 22%, transparent); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .foot .mic.listening { animation: none; }
+    }
+
     @media (max-width: 720px) {
       /* Still ONE row on a phone (admin feedback 187574ed) — at 36px the chips
          no longer need a band of their own, so the send button stays beside
@@ -585,6 +644,14 @@ export class FeedbackComposerComponent implements OnDestroy, FeedbackLineTarget 
   private readonly detachSpotTarget = this.spots.attachTarget(this);
   /** The reference line this box inserted last — replaced, not stacked, by the next. */
   private referenceLine: string | null = null;
+  /** Speech-to-text (admin feedback #359); public for the template. */
+  readonly dictation = inject(SpeechDictationService);
+  /**
+   * The field as it was when the running dictation began, split at the caret:
+   * the spoken words go between the two halves and are rewritten on every
+   * recognition event. Null while this box is not dictating.
+   */
+  private dictationSplit: { before: string; after: string } | null = null;
   /** The chip row, when shown — the source of the Codex view suffix it displays. */
   private readonly areaPickerRef = viewChild(FeedbackAreaPickerComponent);
 
@@ -722,6 +789,21 @@ export class FeedbackComposerComponent implements OnDestroy, FeedbackLineTarget 
   readonly sending = signal(false);
   readonly errorMsg = signal<string | null>(null);
 
+  /** The app language, kept as a signal so the mic label follows a switch. */
+  private readonly lang = signal(this.translate.getCurrentLang() ?? '');
+  private readonly langSub = this.translate.onLangChange.subscribe((e) => this.lang.set(e.lang));
+
+  /** This box holds the microphone. */
+  readonly listening = computed(() => this.dictation.owner() === this);
+
+  /** Name and tooltip of the mic button — what a click does now, with the key that does the same. */
+  readonly micLabel = computed(() => {
+    this.lang();
+    if (!this.dictation.supported) return this.translate.instant('adminFeedback.compose.dictateUnsupported');
+    const key = this.listening() ? 'adminFeedback.compose.dictateStop' : 'adminFeedback.compose.dictate';
+    return this.translate.instant(key, { key: this.dictation.hotkeyLabel });
+  });
+
   /** A draft for this composer exists in the store. */
   readonly hasStoredDraft = computed(() => {
     const scope = this.draftScope();
@@ -811,6 +893,8 @@ export class FeedbackComposerComponent implements OnDestroy, FeedbackLineTarget 
   }
 
   ngOnDestroy(): void {
+    this.endDictation();
+    this.langSub.unsubscribe();
     this.detachSpotTarget();
     // Closing the panel, collapsing the topic or navigating away must not cost
     // the last few characters sitting in the debounce window.
@@ -841,6 +925,9 @@ export class FeedbackComposerComponent implements OnDestroy, FeedbackLineTarget 
     };
     const handler = this.onSubmit();
     if (!handler) return;
+    // The words are in the payload already; the session must not keep writing
+    // into a box that is about to be emptied.
+    this.endDictation();
     this.sending.set(true);
     this.errorMsg.set(null);
     try {
@@ -907,6 +994,8 @@ export class FeedbackComposerComponent implements OnDestroy, FeedbackLineTarget 
   private activeScope: string | null = null;
 
   private switchScope(previous: string | null, next: string | null): void {
+    // A dictation started for one topic must not write into the next one.
+    this.endDictation();
     if (previous) void this.drafts.flush(previous);
     this.draft.set('');
     this.attachments.set([]);
@@ -1023,6 +1112,9 @@ export class FeedbackComposerComponent implements OnDestroy, FeedbackLineTarget 
    * 0a0fad31).
    */
   onInput(e: Event): void {
+    // Typing while dictating: the field is the truth again and the session
+    // ends — its split of the old text no longer describes the box.
+    this.endDictation();
     const el = e.target as HTMLTextAreaElement;
     const value = clampFeedbackText(el.value);
     if (el.value !== value) {
@@ -1125,6 +1217,86 @@ export class FeedbackComposerComponent implements OnDestroy, FeedbackLineTarget 
     this.draftRestored.set(false);
     this.saveDraft();
     el.focus();
+  }
+
+  // ---- Dictation (admin feedback #359) ----------------------------------
+
+  /** Alt+M / ⌥M anywhere in the box — the field, the tiles, the mic itself. */
+  onComposerKeydown(e: KeyboardEvent): void {
+    if (!isDictationHotkey(e)) return;
+    e.preventDefault();
+    this.toggleDictation('hotkey');
+  }
+
+  /** Start or stop speaking into this box. */
+  toggleDictation(via: DictationTrigger): void {
+    if (!this.dictation.supported) return;
+    if (this.listening()) {
+      // Graceful: the words still being recognised arrive, then the session ends.
+      this.dictation.stop(this);
+      return;
+    }
+    const el = this.ta()?.nativeElement;
+    const value = this.draft();
+    const start = el ? Math.min(el.selectionStart ?? value.length, value.length) : value.length;
+    const end = el ? Math.min(el.selectionEnd ?? start, value.length) : value.length;
+    this.dictationSplit = { before: value.slice(0, start), after: value.slice(Math.max(start, end)) };
+    this.errorMsg.set(null);
+    const started = this.dictation.start(
+      this,
+      recognitionLang(this.lang()),
+      {
+        onText: (finalText, interim) => this.writeDictation(finalText + interim),
+        onEnd: () => (this.dictationSplit = null),
+        onError: (error) => this.showDictationError(error),
+      },
+      via,
+    );
+    if (!started) this.dictationSplit = null;
+  }
+
+  /** Drop this box's session, keeping whatever it already wrote. */
+  private endDictation(): void {
+    this.dictationSplit = null;
+    this.dictation.abort(this);
+  }
+
+  /**
+   * Put the spoken words between the two halves of the field. A space joins
+   * them to the text on either side unless that side already ends (or starts)
+   * with whitespace — or, on the right, with punctuation. Goes through the same
+   * clamp as every other write, so dictation cannot pass the character cap.
+   */
+  private writeDictation(spoken: string): void {
+    const split = this.dictationSplit;
+    if (!split) return;
+    const words = spoken.trim();
+    const lead = words && split.before && !/\s$/.test(split.before) ? ' ' : '';
+    const trail = words && split.after && !/^[\s.,;:!?)\]]/.test(split.after) ? ' ' : '';
+    const head = split.before + lead + words + trail;
+    const next = clampFeedbackText(head + split.after);
+    const caret = Math.min(head.length, next.length);
+    const el = this.ta()?.nativeElement;
+    if (el) {
+      el.value = next;
+      // The caret follows the words only where the field has focus; the field
+      // is never focused from here, so a phone does not pop its keyboard up.
+      if (document.activeElement === el) el.setSelectionRange(caret, caret);
+    }
+    this.draft.set(next);
+    this.draftRestored.set(false);
+    this.saveDraft();
+  }
+
+  private showDictationError(error: DictationError): void {
+    const key: Record<DictationError, string> = {
+      denied: 'adminFeedback.compose.dictateDenied',
+      noMic: 'adminFeedback.compose.dictateNoMic',
+      noSpeech: 'adminFeedback.compose.dictateNoSpeech',
+      network: 'adminFeedback.compose.dictateNetwork',
+      failed: 'adminFeedback.compose.dictateFailed',
+    };
+    this.errorMsg.set(this.translate.instant(key[error]));
   }
 
   // ---- Image attachments -------------------------------------------------

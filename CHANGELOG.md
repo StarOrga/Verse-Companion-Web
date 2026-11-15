@@ -4,10 +4,15 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.270.11] - 2026-11-15
+## [0.270.12] - 2026-11-15
 
 ### Fixed
 - Desktop app: signing in from Verse Companion versions up to 0.109.1 no longer ends on the 404 page — /desktop/connect forwards to /apps/starscape/connect and keeps the sign-in handoff (cb, state).
+
+## [0.270.11] - 2026-11-15
+
+### Added
+- Feedback composers have a microphone button for dictation (Alt+M / ⌥M), shown in its tooltip; spoken text appears live at the cursor.
 
 ## [0.270.10] - 2026-11-15
 
