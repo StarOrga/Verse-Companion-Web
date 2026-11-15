@@ -34,3 +34,15 @@ describe('admin-protection', () => {
     expect(isDeleteBlocked(founder)).toBe(true);
   });
 });
+
+import { isUnapprovedAccount } from './admin-protection';
+
+describe('isUnapprovedAccount', () => {
+  it('treats only an explicit false as unapproved', () => {
+    expect(isUnapprovedAccount({})).toBe(false);
+    expect(isUnapprovedAccount({ is_approved: undefined })).toBe(false);
+    expect(isUnapprovedAccount({ is_approved: null })).toBe(false);
+    expect(isUnapprovedAccount({ is_approved: true })).toBe(false);
+    expect(isUnapprovedAccount({ is_approved: false })).toBe(true);
+  });
+});

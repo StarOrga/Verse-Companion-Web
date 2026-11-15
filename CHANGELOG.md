@@ -4,10 +4,22 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.271.3] - 2026-11-16
+## [0.271.4] - 2026-11-16
 
 ### Fixed
 - Admin event datasheets: confidence now follows who states a value: RSI comm-links, RSI pages and Spectrum posts by CIG staff (now read) give 85–95 % and publish directly, the wiki and the previous edition stay in review. Rewards are captured in full (mode rewards, entry gifts, contest prizes; for unannounced editions the previous year's as a suggestion), and prerequisites read "None" when nothing was found (#364).
+
+## [0.271.3] - 2026-11-16
+
+### Security
+- Sign-up gate: an account is only created for an invited address, through a verified Google / OAuth sign-in or an admin invite. A direct sign-in no longer leaves an unapproved account behind.
+- Unapproved and suspended accounts count as viewers for every role check and can no longer write to their own rows, the star-map game tables or their profile name.
+- AI functions and the translation overlay require an approved account; deleting an account removes its invitation.
+- Login redirects are limited to the production site (a wildcard and two retired hosts were allowed before).
+
+### Changed
+- Admin people list marks accounts that were never approved and approves them with one click.
+- The login page explains a rejected sign-up and points to the access request.
 
 ## [0.271.2] - 2026-11-15
 
