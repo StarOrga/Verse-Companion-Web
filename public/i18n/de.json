@@ -3669,7 +3669,10 @@
     "actions": {
       "disable": "Deaktivieren",
       "reenable": "Reaktivieren",
-      "delete": "Löschen"
+      "delete": "Löschen",
+      "disablePatch": "Patch deaktivieren",
+      "reenablePatch": "Patch reaktivieren",
+      "lead": "Als führend nutzen"
     },
     "diff": {
       "title": "Diff-Details (vs. vorheriger Build)",
@@ -3687,11 +3690,20 @@
       "delete": "Bundle \"{{name}}\" endgültig löschen?\n\nDies kann nicht rückgängig gemacht werden.",
       "disableTitle": "Bundle „{{name}}“ deaktivieren?",
       "reasonLabel": "Grund (optional)",
-      "deleteTitle": "Bundle löschen?"
+      "deleteTitle": "Bundle löschen?",
+      "disablePatchTitle": "Patch {{name}} deaktivieren ({{count}} aktive Uploads)?",
+      "reenablePatch": "Patch {{name}} wieder aktivieren? Je Kanal führt wieder sein neuester Upload.",
+      "leadTitle": "„{{name}}“ als führend nutzen?",
+      "leadMessage": "Die anderen aktiven Uploads desselben Patches und Kanals werden deaktiviert (mit Vermerk) und bleiben in der Historie."
     },
     "superseded": {
       "badge": "Ersetzt",
       "title": "Ersetzt durch neueren Upload"
+    },
+    "leading": {
+      "badge": "Führend",
+      "tip": "Dieses Bundle nutzt der Codex für Patch und Kanal.",
+      "reason": "Zurückgestellt: {{name}} wurde als führend gewählt."
     }
   },
   "profile": {
@@ -3924,7 +3936,8 @@
         "role_assign_failed": "Eingeladen, aber die Rolle konnte nicht gesetzt werden.",
         "existing_account_not_updated": "Die E-Mail steht in der Allowlist, aber der bestehende Account wurde nicht geändert — vermutlich ein geschützter Admin.",
         "user_exists": "Diese E-Mail ist bereits registriert. Die Allowlist wurde trotzdem aktualisiert."
-      }
+      },
+      "open": "Person einladen"
     },
     "share": {
       "button": "Share-Link kopieren",
@@ -4048,7 +4061,7 @@
     },
     "requests": {
       "title": "Einladungsanfragen",
-      "subtitle": "Bewerbungen von der Startseite. Annehmen registriert die E-Mail wie über das Formular unten — plus Einladungsmail: Der Link darin führt direkt auf die Seite, auf der sich die Person ihr eigenes Passwort setzt. Wir vergeben nie ein Passwort.",
+      "subtitle": "Bewerbungen von der Startseite. Annehmen registriert die E-Mail wie über das Einladen-Formular hinter dem + — plus Einladungsmail: Der Link darin führt direkt auf die Seite, auf der sich die Person ihr eigenes Passwort setzt. Wir vergeben nie ein Passwort.",
       "empty": "Keine offenen Anfragen.",
       "accept": "Annehmen",
       "decline": "Ablehnen",
@@ -4422,15 +4435,6 @@
         "saveEdit": "Text speichern",
         "resolved": "Hinweis erledigt."
       }
-    },
-    "searchMisses": {
-      "title": "Häufig ohne Treffer",
-      "subtitle": "Suchen ohne einen einzigen Treffer, anonym gezählt (nur Text und Anzahl).",
-      "query": "Suche",
-      "hits": "Anzahl",
-      "last": "Zuletzt",
-      "empty": "Noch keine Suche ohne Treffer.",
-      "retry": "Erneut laden"
     }
   },
   "desktop": {
@@ -4458,7 +4462,21 @@
       "fullPage": "Volle Data-Upload-Seite",
       "note": "Nur Windows · Anmeldung mit deinem Verse-Companion-Konto · lädt Daten hoch, keinen Code."
     },
-    "historyEyebrow": "Uploader"
+    "historyEyebrow": "Uploader",
+    "build": {
+      "title": "Neuestes Bundle",
+      "since": "seit {{date}}",
+      "quality": "Qualität {{q}}",
+      "none": "Noch kein aktives Bundle."
+    },
+    "steps": {
+      "title": "Einrichtung",
+      "done": "Eingerichtet — du hast schon hochgeladen.",
+      "doneSr": "erledigt",
+      "s1": "Uploader herunterladen und starten",
+      "s2": "Mit deinem Verse-Companion-Konto anmelden",
+      "s3": "Star-Citizen-Ordner wählen — der Uploader liest Data.p4k und lädt die Bundles hoch"
+    }
   },
   "download": {
     "title": "Download",

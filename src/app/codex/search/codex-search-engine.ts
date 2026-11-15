@@ -589,14 +589,13 @@ export class CodexSearchEngine {
     }
   }
 
-  /** A committed search with nothing anywhere is counted (anonymous text only). */
+  /** A committed search with nothing anywhere is reported (PostHog `search:miss_show`, area + text). */
   private noteMissIfEmpty(seq: number, term: string): void {
     setTimeout(() => {
       if (seq !== this.seq || this.loading()) return;
       try {
         if (this.hits().length === 0 && this.result().empty) {
-          this.trySignals()?.logMiss(term);
-          this.injector.get(AnalyticsService).track('search:miss_show', { area: this.activeChips()[0]?.id ?? 'all' });
+          this.trySignals()?.logMiss(term, this.activeChips()[0]?.id ?? 'all');
         }
       } catch {
         /* counting a miss must never break a search */
