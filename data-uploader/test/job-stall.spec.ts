@@ -47,7 +47,7 @@ describe('jobStallReport', () => {
     const t = newStallTracker();
     noteStallEvent(t, { type: 'phase', phase: 'bundle' });
     noteStallEvent(t, { type: 'progress', stage: 'armor-packages', current: 133, total: 4456 });
-    noteStallEvent(t, { type: 'log', level: 'info', message: 'convert C:\Users\jerry\x\a.cgf' });
+    noteStallEvent(t, { type: 'log', level: 'info', message: 'convert C:/Users/jerry/x/a.cgf' });
     const r = jobStallReport('skin', 'skin-1', 1_234_567, t);
     expect(r.name).toBe('JobStall');
     // Stage name only — no counters in the grouping text.
@@ -59,7 +59,7 @@ describe('jobStallReport', () => {
       timeoutMs: SKIN_STALL_MS,
       phase: 'bundle',
       counter: 'armor-packages 133/4456',
-      lastLog: 'convert C:\Users\<user>\x\a.cgf',
+      lastLog: 'convert C:/Users/<user>/x/a.cgf',
     });
   });
 
