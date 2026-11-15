@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import qrcode from 'qrcode-generator';
 import { HandoffConnection, HandoffService, handoffTargetPath } from '../../core/handoff/handoff.service';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 
 /**
@@ -19,7 +20,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 @Component({
   selector: 'sc-handoff-button',
   standalone: true,
-  imports: [TranslatePipe, ScDialogDirective, ScTooltipDirective],
+  imports: [TranslatePipe, ScPopupComponent, ScActionDirective, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="wrap">
@@ -33,9 +34,8 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
         </svg>
       </button>
       @if (open()) {
-        <div class="popup" scDialog role="dialog" [attr.aria-label]="'handoff.title' | translate"
-             (keydown.escape)="close()">
-          <p class="title">{{ 'handoff.title' | translate }}</p>
+        <div class="popup">
+          <sc-popup kind="panel" [title]="'handoff.title' | translate" [backClose]="false" (closed)="close()">
           <ol class="steps">
             @for (n of steps; track n) {
               <li [class.current]="step() === n">
@@ -47,17 +47,17 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
           <div class="status" aria-live="polite">
             @if (errorKey(); as key) {
               <p class="err" role="alert">{{ key | translate }}</p>
-              <button type="button" class="btn" (click)="start()">{{ 'handoff.retry' | translate }}</button>
+              <button type="button" scAction (click)="start()">{{ 'handoff.retry' | translate }}</button>
             } @else if (svc.status() === 'connected') {
               <p class="ok">{{ 'handoff.connected' | translate }}@if (svc.device(); as d) { <span class="dev">· {{ d }}</span>}</p>
               <p class="hint">{{ 'handoff.revokeNote' | translate }}</p>
-              <button type="button" class="btn" (click)="revoke(null)">{{ 'handoff.revoke' | translate }}</button>
+              <button type="button" scAction (click)="revoke(null)">{{ 'handoff.revoke' | translate }}</button>
             } @else if (svc.status() === 'pending' && qr(); as src) {
               <img class="qr" [src]="src" [alt]="'handoff.qrAlt' | translate" width="160" height="160" />
               <p class="hint">{{ 'handoff.expires' | translate }}</p>
             } @else if (svc.status() === 'expired' || svc.status() === 'revoked') {
               <p class="hint">{{ (svc.status() === 'expired' ? 'handoff.expired' : 'handoff.revoked') | translate }}</p>
-              <button type="button" class="btn" (click)="start()">{{ 'handoff.retry' | translate }}</button>
+              <button type="button" scAction (click)="start()">{{ 'handoff.retry' | translate }}</button>
             } @else {
               <p class="hint">{{ 'handoff.loading' | translate }}</p>
             }
@@ -69,11 +69,12 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
               @for (ph of phones(); track ph.id) {
                 <div class="phone">
                   <span>{{ ph.device ?? ('handoff.noDevice' | translate) }}</span>
-                  <button type="button" class="btn small" (click)="revoke(ph.id)">{{ 'handoff.revoke' | translate }}</button>
+                  <button type="button" scAction class="small" (click)="revoke(ph.id)">{{ 'handoff.revoke' | translate }}</button>
                 </div>
               }
             </div>
           }
+          </sc-popup>
         </div>
       }
     </div>
@@ -97,18 +98,8 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
     }
     .round:hover { border-color: var(--sc-accent); }
     .round:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-    .popup {
-      position: absolute; left: 0; bottom: calc(100% + var(--sc-space-2));
-      width: min(440px, calc(100vw - 2 * var(--sc-space-4)));
-      padding: var(--sc-space-4); transform-origin: bottom left;
-      background: color-mix(in srgb, var(--sc-bg-1) 96%, transparent);
-      border: 1px solid var(--sc-border); border-radius: 14px;
-      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45); backdrop-filter: blur(10px);
-      animation: grow 0.18s ease-out;
-    }
-    @keyframes grow { from { opacity: 0; transform: scale(0.85); } }
-    .title { margin: 0 0 var(--sc-space-3); font-family: var(--sc-font-display); letter-spacing: 0.06em;
-      text-transform: uppercase; font-size: max(0.78rem, var(--sc-fs-floor)); color: var(--sc-fg-1); }
+    /* Position only (grows out of the round button); frame, width, head and ✕ come from <sc-popup kind="panel">. */
+    .popup { position: absolute; left: 0; bottom: calc(100% + var(--sc-space-2)); transform-origin: bottom left; }
     .steps { list-style: none; margin: 0 0 var(--sc-space-3); padding: 0; display: flex; gap: var(--sc-space-3); }
     .steps li { flex: 1 1 0; display: flex; flex-direction: column; gap: var(--sc-space-1);
       font-size: max(0.74rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
@@ -125,17 +116,12 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
     .ok { color: var(--sc-accent); font-weight: 600; }
     .err { color: var(--sc-danger); }
     .hint, .dev { color: var(--sc-fg-2); }
-    .btn { min-height: var(--sc-tap-min); padding: 0 var(--sc-space-3); cursor: pointer; font: inherit;
-      color: var(--sc-fg-1); background: none; border: 1px solid var(--sc-border); border-radius: 999px; }
-    .btn:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
-    .btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
     .phones { margin-top: var(--sc-space-3); }
     .sub { margin: 0 0 var(--sc-space-1); color: var(--sc-fg-2); font-size: max(0.72rem, var(--sc-fs-floor)); }
     .phone { display: flex; align-items: center; justify-content: space-between; gap: var(--sc-space-3);
       font-size: max(0.78rem, var(--sc-fs-floor)); }
     /* Phones (the bar's breakpoint): the bar sits at the bottom, the QR hand-off is for the desk. */
     @media (max-width: 720px) { .wrap { display: none; } }
-    @media (prefers-reduced-motion: reduce) { .popup { animation: none; } }
   `],
 })
 export class HandoffButtonComponent implements OnDestroy {

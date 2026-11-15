@@ -14,6 +14,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import { ScPopupMotionDirective } from '../shared/popup-motion/sc-popup-motion.directive';
 import { HeaderPopoutService } from './header-popout.service';
 import { environment } from '../../environments/environment';
@@ -63,7 +64,7 @@ export interface AppEntry {
 @Component({
   selector: 'sc-apps-menu',
   standalone: true,
-  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScTooltipDirective, ScPopupMotionDirective],
+  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScTooltipDirective, ScPopupMotionDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (offered()) {
@@ -78,7 +79,8 @@ export interface AppEntry {
           </svg>
         </button>
         @if (open()) {
-          <div class="pop" [id]="panelId" role="group" scPopupMotion scPopupMotionItems=".entry" scPopupMotionOrigin="tr" animate.leave="pm-out" [attr.aria-label]="'appsMenu.aria' | translate">
+          <div class="pop" [id]="panelId" scPopupMotion scPopupMotionItems=".entry" scPopupMotionOrigin="tr" animate.leave="pm-out">
+          <sc-popup kind="menu" [backdrop]="false" [title]="'appsMenu.aria' | translate" (closed)="onPopupClosed()">
             @for (app of apps(); track app.id) {
               @if (app.href) {
                 <a class="entry" [class.elevated]="app.elevated" [href]="app.href" rel="noopener noreferrer" download (click)="onPick($event)">
@@ -92,6 +94,7 @@ export interface AppEntry {
             }
             <!-- Stable only: beta/alpha are picked inside each app after sign-in. -->
             <p class="hint">{{ 'appsMenu.footer' | translate }}</p>
+          </sc-popup>
           </div>
         }
       </div>
@@ -123,13 +126,10 @@ export interface AppEntry {
     .trigger:hover, .trigger.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
     .trigger.on { box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-accent) 18%, transparent); }
     .trigger:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-    .pop {
-      position: absolute; top: calc(100% + 8px); right: 0; z-index: 60;
-      /* 22rem: the chosen two-line copy per app fits at this width (20rem wrapped it to three). */
-      width: min(22rem, calc(100vw - 32px)); display: flex; flex-direction: column; gap: 2px;
-      padding: 6px; border-radius: 12px; border: 1px solid var(--sc-border);
-      background: var(--sc-bg-1); box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
-    }
+    /* Only the position at the trigger; frame, width, rail and edge come from <sc-popup kind="menu">. */
+    .pop { position: absolute; top: calc(100% + 8px); right: 0; z-index: 60; }
+    .pop sc-popup { display: block; }
+    .pop .scp-b { display: flex; flex-direction: column; gap: 2px; }
     .entry {
       display: flex; gap: 12px; align-items: flex-start; padding: 10px; border-radius: 8px;
       color: var(--sc-fg-0); text-decoration: none; min-height: 48px;
@@ -290,8 +290,8 @@ export class AppsMenuComponent {
     if (this.open() && !this.host.nativeElement.contains(ev.target as Node)) this.closeMenu();
   }
 
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
+  /** Escape inside the menu (scDialog in the scaffold): fold away, focus back on the trigger. */
+  onPopupClosed(): void {
     if (!this.open()) return;
     this.closeMenu();
     this.trigger()?.nativeElement.focus();

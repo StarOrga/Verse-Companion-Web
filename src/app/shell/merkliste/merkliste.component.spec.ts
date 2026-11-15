@@ -112,7 +112,7 @@ describe('MerklisteComponent (wishlist popout)', () => {
   it('closes on Escape and frees the slot', () => {
     const f = mount(many(1));
     open(f);
-    f.el.querySelector('.panel')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    f.el.querySelector('.panel .scp-frame')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     f.fixture.detectChanges();
     expect(f.el.querySelector('.panel')).toBeNull();
     expect(f.popouts.active()).toBeNull();
