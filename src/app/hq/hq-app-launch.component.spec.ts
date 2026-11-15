@@ -73,7 +73,7 @@ describe('HqAppLaunchComponent', () => {
     expect(launcher.launch).toHaveBeenCalledWith(SCC_LAUNCH_GRACE_MS);
     expect(launcher.downloadInstaller).not.toHaveBeenCalled();
     expect(f.componentInstance.status()).toBe('noResponse');
-    expect((f.nativeElement as HTMLElement).querySelector('.toast a.act')?.getAttribute('href')).toBe(SCC_INSTALLER_URL);
+    expect((f.nativeElement as HTMLElement).querySelector('.toast .scp-acts a')?.getAttribute('href')).toBe(SCC_INSTALLER_URL);
   });
 
   it('leaves a modified click to the browser', () => {
@@ -130,7 +130,7 @@ describe('HqAppLaunchComponent', () => {
       await vi.advanceTimersByTimeAsync(0);
       f.detectChanges();
       expect(f.componentInstance.status()).toBe('started');
-      expect((f.nativeElement as HTMLElement).querySelector('.toast .x')).toBeNull();
+      expect((f.nativeElement as HTMLElement).querySelector('.toast .scp-acts button[tier=tertiary]')).toBeNull();
       connected.set(true);
       f.detectChanges();
       await vi.advanceTimersByTimeAsync(1900);
@@ -159,7 +159,7 @@ describe('HqAppLaunchComponent', () => {
   it('keeps the close button on a failure', async () => {
     const { f } = mount(false);
     await clickPlain(f);
-    expect((f.nativeElement as HTMLElement).querySelector('.toast .x')).toBeTruthy();
+    expect((f.nativeElement as HTMLElement).querySelector('.toast .scp-acts button[tier=tertiary]')).toBeTruthy();
   });
 
   it('closes the hint', async () => {
