@@ -96,9 +96,7 @@
   },
   "auth": {
     "previewLocked": {
-      "title": "You are previewing as a signed-out visitor",
-      "body": "Signing in will not work here — the preview overrides what the app shows you, even after a successful sign-in. Leave the preview first.",
-      "exit": "Leave preview and sign in"
+      "body": "Signing in will not work here — the preview overrides what the app shows you, even after a successful sign-in. Leave the preview in the banner at the top first."
     },
     "tagline": "Your terminal to the verse",
     "email": "Email",
@@ -154,7 +152,13 @@
       },
       "applyCta": "Apply for access",
       "applyInline": "Apply now",
-      "backToSignIn": "Back to sign-in"
+      "backToSignIn": "Back to sign-in",
+      "headerNav": "Site navigation",
+      "consoleAria": "Sign-in console",
+      "scene": {
+        "approach": "Approach",
+        "target": "microTech · Stanton"
+      }
     },
     "apply": {
       "title": "Apply for access",
