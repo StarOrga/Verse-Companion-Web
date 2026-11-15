@@ -8,6 +8,7 @@ import {
   SC_CONFIRM_DEFAULT_CONFIRM_KEY,
   ScConfirmService,
 } from './sc-confirm.service';
+import { ModalInertService } from './modal-inert.service';
 
 describe('ScConfirmService', () => {
   let service: ScConfirmService;
@@ -66,10 +67,43 @@ describe('ScConfirmService', () => {
     expect(await p).toBe(false);
   });
 
+  it('has a close button beside Cancel that cancels', async () => {
+    const p = service.confirm({ titleKey: 't' });
+    await settle();
+    const x = q<HTMLButtonElement>('sc-confirm-dialog .scp-x')!;
+    expect(x).not.toBeNull();
+    expect(x.getAttribute('aria-label')).toBe('common.dialog.close');
+    x.click();
+    expect(await p).toBe(false);
+  });
+
+  it('puts the confirm button first, in reading order', async () => {
+    const p = service.confirm({ titleKey: 't' });
+    await settle();
+    const btns = Array.from(document.querySelectorAll('sc-confirm-dialog .scp-f button'));
+    expect(btns.map((b) => b.classList.contains('confirm'))).toEqual([true, false]);
+    q<HTMLButtonElement>('sc-confirm-dialog .cancel')!.click();
+    await p;
+  });
+
+  it('keeps the dim of the first layer when stacked over an open modal', async () => {
+    const inert = TestBed.inject(ModalInertService);
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    inert.register(host);
+    const p = service.confirm({ titleKey: 't' });
+    await settle();
+    expect(q('.sc-dialog-backdrop')!.classList).toContain('sc-dialog-backdrop--stacked');
+    q<HTMLButtonElement>('sc-confirm-dialog .cancel')!.click();
+    await p;
+    inert.unregister(host);
+    host.remove();
+  });
+
   it('renders an alertdialog labelled by its title and described by its message', async () => {
     const p = service.confirm({ titleKey: 't', messageKey: 'm' });
     await settle();
-    const form = q<HTMLElement>('sc-confirm-dialog form')!;
+    const form = q<HTMLElement>('sc-confirm-dialog [role="alertdialog"]')!;
     expect(form.getAttribute('role')).toBe('alertdialog');
     expect(q(`#${form.getAttribute('aria-labelledby')}`)?.textContent?.trim()).toBe('t');
     expect(q(`#${form.getAttribute('aria-describedby')}`)?.textContent?.trim()).toBe('m');

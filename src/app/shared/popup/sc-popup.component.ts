@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  NgZone,
+  OnDestroy,
+  OnInit,
   ViewEncapsulation,
-  booleanAttribute,
   computed,
   inject,
   input,
@@ -15,6 +17,7 @@ import { ModalInertService } from '../dialog/modal-inert.service';
 import { ScActionDirective } from '../action/sc-action.directive';
 import { ScTooltipDirective } from '../tooltip/sc-tooltip.directive';
 import { logWarn } from '../../core/log';
+import { pushPopupEntry, releasePopupEntry } from './popup-history';
 
 /** The five popup kinds (concept 20261115-0216-popup-aufbau, r1-types). */
 export type ScPopupKind = 'menu' | 'panel' | 'dialog' | 'large' | 'notice';
@@ -22,8 +25,11 @@ export type ScPopupKind = 'menu' | 'panel' | 'dialog' | 'large' | 'notice';
 export type ScPopupSize = 'menu' | 's' | 'm' | 'area';
 /** Who can reach the popup: the top edge takes the role colour (r1-role). */
 export type ScPopupAccess = 'admin' | 'collab' | null;
-/** Why the popup asks to close: its ✕ or Escape. */
-export type ScPopupCloseReason = 'close' | 'escape';
+/** Why the popup asks to close: its ✕, Escape, or the browser / phone back gesture. */
+export type ScPopupCloseReason = 'close' | 'escape' | 'back';
+
+/** The one overlay breakpoint of styles.scss: below it dialog / panel / large are full screen. */
+export const SC_POPUP_PHONE_QUERY = '(max-width: 720px)';
 
 const DEFAULT_SIZE: Record<Exclude<ScPopupKind, 'notice'>, ScPopupSize> = {
   menu: 'menu',
@@ -90,10 +96,16 @@ let uid = 0;
  * - `initialFocus` 'first' (default: `cdkFocusInitial`, else first tabbable) | 'container'.
  * - `returnFocus`  explicit focus return target (default: the opener).
  * - `describedBy`  id for aria-describedby (a confirm's message).
- * - `closeOnBack`  RESERVED seam for the phone back gesture (r1-back is undecided). No effect yet.
+ * - `backClose`  the back gesture closes this popup first (r1-back "Erst Fenster, dann Seite"):
+ *               one history entry on open, back closes the topmost popup only, ✕/Escape/
+ *               Abbrechen pop the entry again. Default: large always; dialog + panel when
+ *               opened at phone width (where they are full screen); never menu / notice.
+ *               Pass `false` for a popup that already owns a URL (wish cart `?cart=1`,
+ *               overlay-frame child routes) so it gets no second entry.
  *
  * Output
- * - `closed` ('close' | 'escape'): the ✕ or Escape. A scrim click NEVER closes a modal.
+ * - `closed` ('close' | 'escape' | 'back'): the ✕, Escape or the back gesture. A scrim click
+ *   NEVER closes a modal.
  *   The host decides what closing means (remove the `@if`, resolve a promise, play
  *   `[scPopupMotion]`'s exit first).
  *
@@ -199,7 +211,7 @@ let uid = 0;
     </ng-template>
   `,
 })
-export class ScPopupComponent {
+export class ScPopupComponent implements OnInit, OnDestroy {
   readonly kind = input<ScPopupKind>('dialog');
   readonly title = input<string>('');
   readonly eyebrow = input<string>('');
@@ -212,8 +224,8 @@ export class ScPopupComponent {
   readonly returnFocus = input<HTMLElement | null>(null);
   /** id of the element that describes the popup (a confirm's message). */
   readonly describedBy = input<string | null>(null);
-  /** Reserved: what the phone back gesture closes is undecided (r1-back). No effect yet. */
-  readonly closeOnBack = input(false, { transform: booleanAttribute });
+  /** null = auto (large always, dialog/panel at phone width); false for a popup that owns a URL. */
+  readonly backClose = input<boolean | null>(null);
 
   readonly closed = output<ScPopupCloseReason>();
 
@@ -234,8 +246,34 @@ export class ScPopupComponent {
     return this.size() ?? DEFAULT_SIZE[k];
   });
 
+  private readonly zone = inject(NgZone);
+  private historyId: string | null = null;
+
   constructor() {
     this.layer = inject(ModalInertService).depth + 1;
     if (this.layer > 2) logWarn('popup', 'more than two modal layers: only one confirm may stand over a dialog', { layer: this.layer });
+  }
+
+  ngOnInit(): void {
+    if (!this.wantsHistoryEntry()) return;
+    this.historyId = pushPopupEntry(() => {
+      this.historyId = null;
+      this.zone.run(() => this.closed.emit('back'));
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.historyId) releasePopupEntry(this.historyId);
+    this.historyId = null;
+  }
+
+  private wantsHistoryEntry(): boolean {
+    if (typeof window === 'undefined' || typeof history === 'undefined') return false;
+    const explicit = this.backClose();
+    if (explicit !== null) return explicit && this.hasHead();
+    const k = this.kind();
+    if (k === 'large') return true;
+    if (k !== 'dialog' && k !== 'panel') return false;
+    return typeof matchMedia === 'function' && matchMedia(SC_POPUP_PHONE_QUERY).matches;
   }
 }
