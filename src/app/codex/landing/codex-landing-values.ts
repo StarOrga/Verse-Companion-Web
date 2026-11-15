@@ -218,12 +218,3 @@ export function compareValue(v: LandingValue): ValueComparison | null {
   return { kind: 'delta', delta, avg: avgText, worse };
 }
 
-/** Bar fill (value) and average tick, both in % of the class maximum; null without class data. */
-export function barOf(v: LandingValue): { fill: number; avg: number | null } | null {
-  const max = Math.max(v.classMax ?? 0, v.value);
-  if (!(max > 0)) return null;
-  const clamp = (n: number) => Math.max(2, Math.min(100, Math.round((n / max) * 100)));
-  const avg = v.classAvg && v.classAvg > 0 ? clamp(v.classAvg) : null;
-  if (avg === null && !v.classMax) return null;
-  return { fill: clamp(v.value), avg };
-}
