@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.10",
+  "current": "0.270.11",
   "releases": [
+    {
+      "version": "0.270.11",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Feedback composers have a microphone button for dictation (Alt+M / ⌥M), shown in its tooltip; spoken text appears live at the cursor."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.270.10",
       "date": "2026-11-15",
