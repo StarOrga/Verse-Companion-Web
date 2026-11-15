@@ -630,7 +630,9 @@ export class LoginComponent {
       return p.toString();
     };
     const search = clean(url.search.replace(/^\?/, ''));
-    const hash = clean(url.hash.replace(/^#/, ''));
+    // A plain anchor ("#section") is no parameter list: leave it as it is.
+    const rawHash = url.hash.replace(/^#/, '');
+    const hash = /(^|&)error(_code|_description)?=/.test(rawHash) ? clean(rawHash) : rawHash;
     const next = url.pathname + (search ? `?${search}` : '') + (hash ? `#${hash}` : '');
     if (next !== url.pathname + url.search + url.hash) window.history.replaceState(window.history.state, '', next);
   }
