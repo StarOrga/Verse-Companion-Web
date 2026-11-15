@@ -5467,10 +5467,9 @@
       "all": "Alle",
       "newest": "Neueste",
       "top": "Community Top",
-      "mine": "Meine Votes",
-      "mineCount": "Meine Votes · {{n}}",
-      "mineSignedOut": "Melde dich an, um deine bewerteten Wallpaper zu sehen",
-      "emptyMine": "Du hast noch kein Wallpaper bewertet. Tippe auf den Daumen bei einem Bild, dann landet es hier."
+      "sammlung": "Sammlung",
+      "sammlungSignedOut": "Melde dich an, um deine Sammlung zu sehen",
+      "emptySammlung": "Deine Sammlung ist noch leer. Gib einem Bild den Daumen hoch, dann landet es hier."
     },
     "lightboxAria": "Hintergrundbild",
     "source": {
@@ -5522,6 +5521,10 @@
       "cta": "Für Windows holen",
       "note": "Nur Windows · ~0,3 MB · jederzeit über das Tray-Menü beendet",
       "dismiss": "Nicht mehr anzeigen"
+    },
+    "stage": {
+      "new": "Neu",
+      "sammlung": "Sammlung"
     }
   },
   "userFeedback": {

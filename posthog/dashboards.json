@@ -46,6 +46,7 @@
         { "name": "Wiederkehr: Seitenaufruf wöchentlich", "desc": "Wöchentliche Retention aller Besucher mit Einwilligung.", "type": "retention", "target": "$pageview", "returning": "$pageview" },
         { "name": "Wiederkehr nach der Anmeldung", "desc": "Wer sich anmeldet, kommt wieder.", "type": "retention", "target": "auth:user_sign_in", "returning": "$pageview" },
         { "name": "Hangar-Wiederkehr", "desc": "Wer ein Schiff hinzufügt, tut es wieder.", "type": "retention", "target": "hangar:ship_add", "returning": "hangar:ship_add" },
+        { "name": "Galerie: gewählte Ansichten", "desc": "verse:gallery_filter_select je Ansicht (mine = Sammlung).", "type": "trends", "series": [{ "event": "verse:gallery_filter_select" }], "breakdown": "filter", "display": "ActionsBar" },
         { "name": "Verse-Wiederkehr", "desc": "Wer ein Tor öffnet, kommt zurück ins Verse.", "type": "retention", "target": "verse:door_open", "returning": "verse:door_open" },
         { "name": "Einstellungen-Wiederkehr", "desc": "Wer Einstellungen ändert, kommt wieder.", "type": "retention", "target": "settings:language_change", "returning": "$pageview" },
         { "name": "Lebenszyklus der Nutzer", "desc": "Neu, wiederkehrend, wiederbelebt, ruhend.", "type": "lifecycle", "series": [{ "event": "$pageview" }] },

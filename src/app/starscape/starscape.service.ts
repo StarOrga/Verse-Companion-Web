@@ -97,7 +97,10 @@ export const STARSCAPE_FILTERS: readonly StarscapeFilterOption[] = [
   { id: 'all', labelKey: 'starscape.filter.all' },
   { id: 'newest', labelKey: 'starscape.filter.newest' },
   { id: 'top', labelKey: 'starscape.filter.top' },
-  { id: 'mine', labelKey: 'starscape.filter.mine' },
+  // 'mine' keeps its id (the desktop tray app keys off it) but reads as the
+  // reader's Sammlung: the same set, the wallpapers they up-voted (batch
+  // concept 20261115-2122, P1 — „Statt meine Votes, pack hier Sammlung rein!“).
+  { id: 'mine', labelKey: 'starscape.filter.sammlung' },
 ];
 
 /** Id of the default view. */
