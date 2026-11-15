@@ -50,7 +50,7 @@ export const EVENTS = {
 
   // --- auth --------------------------------------------------------------
   'auth:user_sign_in': ev<{ provider: 'email' | 'google' | 'discord' }>('auth', 'Anmeldung erfolgreich (Anbieter).'),
-  'auth:user_sign_out': ev('auth', 'Abmeldung.'),
+  'auth:user_sign_out': ev('auth', 'Abmeldung durchgeführt.'),
   'auth:access_request': ev<{ duplicate: boolean }>('auth', 'Zugang angefragt (duplicate = Adresse war schon bekannt).'),
 
   // --- codex -------------------------------------------------------------
