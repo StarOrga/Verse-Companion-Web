@@ -2,7 +2,8 @@ import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ScDialogDirective } from '../dialog/sc-dialog.directive';
+import { ScActionDirective } from '../action/sc-action.directive';
+import { ScPopupComponent } from '../popup/sc-popup.component';
 import { ScTooltipDirective } from '../tooltip/sc-tooltip.directive';
 import { OverlayOriginService } from './overlay-origin.service';
 
@@ -17,8 +18,7 @@ export interface OverlayNeighbour {
  * trap via `[scDialog]`.
  *
  * Two modes, decided by `OverlayOriginService`:
- * - overlay (opened from its list): fixed takeover - centred sheet on desktop,
- *   wide sheet on tablet, full-screen (`dvh`) on phones; Escape and the
+ * - overlay (opened from its list): an `<sc-popup kind="large">` (its frame, ✕, scrim, phone full screen come from the scaffold; it owns a URL, so no extra history entry unless `popup`); Escape and the
  *   close button emit `closed` (a click on the scrim does not), the host closes via `OverlayOriginService.close()` (history back, never a pushed entry).
  * - page (direct load / refresh / shared link): the same content flows in the
  *   page frame, no scrim, no dialog semantics.
@@ -27,79 +27,55 @@ export interface OverlayNeighbour {
 @Component({
   selector: 'sc-overlay-frame',
   standalone: true,
-  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScDialogDirective, ScTooltipDirective],
+  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (overlay()) {
-      <div class="scrim">
-        <div class="sheet" role="dialog" aria-modal="true" scDialog (scDialogEscape)="closed.emit()"
-             [attr.aria-label]="heading()">
-          <ng-container *ngTemplateOutlet="inner" />
-        </div>
-      </div>
+      <sc-popup kind="large" [title]="heading()" [eyebrow]="eyebrow()" [backClose]="popup() ? null : false" (closed)="closed.emit()">
+        <ng-container popupTools>
+          <ng-container *ngTemplateOutlet="steppers" />
+        </ng-container>
+        <div class="content"><ng-content /></div>
+      </sc-popup>
     } @else {
-      <div class="sheet page"><ng-container *ngTemplateOutlet="inner" /></div>
+      <div class="sheet page">
+        <header class="bar">
+          <h2 class="ttl">{{ heading() }}</h2>
+          <span class="nav"><ng-container *ngTemplateOutlet="steppers" /></span>
+        </header>
+        <div class="content"><ng-content /></div>
+      </div>
     }
-    <ng-template #inner>
-      <header class="bar">
-        <h2 class="ttl">{{ heading() }}</h2>
-        <span class="nav">
-          @if (prev(); as p) {
-            <a class="nb" [routerLink]="p.commands" [replaceUrl]="true" [attr.aria-label]="'overlay.prev' | translate"
-               [scTooltip]="'overlay.prev' | translate" scTooltipTier="label">‹</a>
-          }
-          @if (next(); as n) {
-            <a class="nb" [routerLink]="n.commands" [replaceUrl]="true" [attr.aria-label]="'overlay.next' | translate"
-               [scTooltip]="'overlay.next' | translate" scTooltipTier="label">›</a>
-          }
-          @if (overlay()) {
-            <button type="button" class="nb x" (click)="closed.emit()" [attr.aria-label]="'overlay.close' | translate"
-                    [scTooltip]="'overlay.close' | translate" scTooltipTier="label">✕</button>
-          }
-        </span>
-      </header>
-      <div class="content"><ng-content /></div>
+    <ng-template #steppers>
+      @if (prev(); as p) {
+        <a scAction tier="tertiary" [routerLink]="p.commands" [replaceUrl]="true" [attr.aria-label]="'overlay.prev' | translate"
+           [scTooltip]="'overlay.prev' | translate" scTooltipTier="label">
+          <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
+        </a>
+      }
+      @if (next(); as n) {
+        <a scAction tier="tertiary" [routerLink]="n.commands" [replaceUrl]="true" [attr.aria-label]="'overlay.next' | translate"
+           [scTooltip]="'overlay.next' | translate" scTooltipTier="label">
+          <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+        </a>
+      }
     </ng-template>
   `,
   styles: [`
     :host { display: block; }
-    .scrim {
-      position: fixed; inset: 0; z-index: 150; display: grid; place-items: center; padding: 32px;
-      background: color-mix(in srgb, var(--sc-bg-0) 62%, transparent);
-      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-    }
-    .sheet {
-      display: flex; flex-direction: column; min-height: 0; background: var(--sc-bg-1);
-      border: 1px solid var(--sc-border); border-radius: 16px; overflow: hidden;
-    }
-    .scrim .sheet { width: min(100%, var(--sc-ov-area)); max-height: min(100%, var(--sc-ov-max-h)); box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55); }
-    .bar { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--sc-border); flex: 0 0 auto; }
+    .sheet { display: flex; flex-direction: column; min-height: 0; }
+    .bar { display: flex; align-items: center; gap: 12px; padding: 10px 0; flex: 0 0 auto; }
     .ttl { margin: 0; flex: 1 1 auto; min-width: 0; font-size: 1.05rem; overflow-wrap: anywhere; }
     .nav { display: inline-flex; gap: 6px; flex: 0 0 auto; }
-    .nb {
-      display: inline-grid; place-items: center; min-width: 36px; min-height: max(36px, var(--sc-tap-min)); border-radius: 999px;
-      border: 1px solid var(--sc-border); background: var(--sc-bg-0); color: var(--sc-fg-1); font: inherit; text-decoration: none; cursor: pointer;
-    }
-    .nb:hover, .nb:focus-visible { border-color: var(--sc-accent); color: var(--sc-accent); text-decoration: none; }
-    .content { padding: 14px; overflow: auto; min-height: 0; }
     .content :where(p, li) { max-width: var(--sc-measure, 70ch); }
-    .page .bar { border-bottom: 0; padding-inline: 0; }
-    .page .content { overflow: visible; padding-inline: 0; }
-    @media (max-width: 1080px) { .scrim { padding: 16px; } }
-    @media (max-width: 720px) {
-      .scrim { padding: 0; place-items: stretch; }
-      .scrim .sheet { width: 100%; max-height: none; height: 100vh; height: 100dvh; border-radius: 0; border: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
-    }
-    @media (prefers-reduced-motion: no-preference) {
-      .scrim .sheet { animation: sheet-in 160ms ease-out; }
-    }
-    @keyframes sheet-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
   `],
 })
 export class OverlayFrameComponent {
   private readonly origin = inject(OverlayOriginService);
 
   readonly heading = input.required<string>();
+  /** Optional area / subject shown vertically in the popup rail (overlay mode only). */
+  readonly eyebrow = input('');
   readonly prev = input<OverlayNeighbour | null>(null);
   readonly next = input<OverlayNeighbour | null>(null);
   readonly closed = output<void>();
