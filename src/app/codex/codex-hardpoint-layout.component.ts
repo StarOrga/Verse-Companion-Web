@@ -26,7 +26,7 @@ import {
 import type { SummaryOccupant } from './ship-summary-panels';
 import {
   EquippedStat,
-  EquippedStatFormat,
+  statAddsUp,
   GroupedSlot,
   commonPortLabel,
   formatEquippedStat,
@@ -96,27 +96,9 @@ export interface LayoutChild {
   draftPaths?: string[];
 }
 
-/**
- * Stat formats whose value does NOT add up across identical units — a reach,
- * a speed, a duration, an angle, a ratio, a size class. A collapsed run of
- * such rows quotes ONE unit's value and drops "Gesamt": two SureGrips do not
- * reach 300 m (feedback #233), where three Panthers do deal 3× the alpha.
- */
-const PER_UNIT_FORMATS: ReadonlySet<EquippedStatFormat> = new Set<EquippedStatFormat>([
-  'seconds',
-  'metres',
-  'metresDec',
-  'mps',
-  'gm',
-  'kms',
-  'size',
-  'percent',
-  'degrees',
-]);
-
 /** The stat scaled to `mult` units where that is a sum, unchanged where it is not. */
 function scaledFigure(stat: EquippedStat, mult: number): { stat: EquippedStat; summed: boolean } {
-  if (mult <= 1 || PER_UNIT_FORMATS.has(stat.format)) return { stat, summed: false };
+  if (mult <= 1 || !statAddsUp(stat)) return { stat, summed: false };
   return { stat: { ...stat, value: stat.value * mult }, summed: true };
 }
 
@@ -512,15 +494,17 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                       <span class="slot-port">{{ portLabel(row) }}</span>
                       @if (secondaryStats(row); as rest) {
                         @if (rest.length) {
-                          <!-- Per-item values. A collapsed run says how many
-                               units each one stands for ("3× Alphaschaden
-                               43,65") so the per-unit number is never read
-                               as the total; a split block drops the prefix. -->
+                          <!-- Per-item values. An AMOUNT on a collapsed run
+                               says how many units it stands for ("3×
+                               Alphaschaden 43,65") so it is never read as the
+                               total; a value every unit shares (range, speed,
+                               fire rate) reads once, unprefixed (#351). A
+                               split block drops the prefix entirely. -->
                           <dl class="slot-stats">
                             @for (st of rest; track st.labelKey) {
                               <div class="stat" [scTooltip]="st.hintKey ? (st.hintKey | translate) : null">
                                 <dt>
-                                  @if (row.count > 1) { <span class="mult">{{ row.count }}×</span> }
+                                  @if (row.count > 1 && addsUp(st)) { <span class="mult">{{ row.count }}×</span> }
                                   {{ st.labelKey | translate }}
                                   @if (st.derived) {
                                     <span class="derived"
@@ -698,7 +682,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                                   @for (st of kid.stats; track st.labelKey) {
                                     <div class="stat" [scTooltip]="st.hintKey ? (st.hintKey | translate) : null">
                                       <dt>
-                                        @if (kidMult(row, kid) > 1) { <span class="mult">{{ kidMult(row, kid) }}×</span> }
+                                        @if (kidMult(row, kid) > 1 && addsUp(st)) { <span class="mult">{{ kidMult(row, kid) }}×</span> }
                                         {{ st.labelKey | translate }}
                                         @if (st.derived) {
                                           <span class="derived"
@@ -1655,6 +1639,11 @@ export class CodexHardpointLayoutComponent {
       unitKey: stat.labelKey,
       total: scaled.summed,
     };
+  }
+
+  /** Only amounts that pool across a stacked run carry the "3×" reminder (#351). */
+  addsUp(stat: EquippedStat): boolean {
+    return statAddsUp(stat);
   }
 
   fmtStat(stat: EquippedStat): string {
