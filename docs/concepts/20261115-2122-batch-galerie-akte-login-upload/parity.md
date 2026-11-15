@@ -34,7 +34,12 @@ besides the single 1800 ms attach.
 `prefers-reduced-motion: reduce`: every animation is `none` — the page renders the final frame at once; the body
 engine is created with `still: true` (draws one frame, never turns) and is attached immediately.
 
-Phones (≤ 860 px): the scene becomes a band on top (`clamp(170px, 30dvh, 260px)`), the hero copy collapses to the
-word mark; the panel rises from below (translateY(24px)) instead of from the right. Same timings.
+Phones (≤ 860 px): the scene becomes a band on top (`clamp(170px, 30dvh, 260px)` under the header), the header keeps
+the shell's brand plate and the band carries „Join the Club.“ + tagline (the hero word mark stays the page `<h1>` for
+assistive tech only, no second brand plate); the panel rises from below (translateY(24px)) instead of from the right.
+Same timings.
+
+Panel switches after the intro (apply / reset / back): the host gets `.switched` and the console's content crossfades
+in 220 ms (translateY 8px → 0) — the 1100 ms intro stagger never replays.
 
 Without WebGL / before the maps load: the CSS disc (radial gradients, no SVG filters — cheap first paint) stays.
