@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, Injector, afterNextRender, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Injector, afterNextRender, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { toErrorKey } from '../core/describe-error';
 import { useAutoRefresh } from '../core/auto-refresh';
+import { isPlainLeftClick } from '../core/modified-click.util';
 import { logWarn } from '../core/log';
 import { ScDatePipe } from '../core/locale/sc-date.pipe';
 import { SupabaseClientProvider } from '../core/supabase.client';
@@ -20,11 +21,16 @@ import {
   mergeRefresh,
   posthogRoot,
   sparkPoints,
+  topicsByTitle,
   type FeedbackText,
+  type LinkedTopic,
   type Overview,
   type OverviewCard,
   type OverviewItem,
 } from './telemetry-overview';
+
+/** How far back a finding's topic is looked for — older ones are history, a recurrence deserves a new topic. */
+const TOPIC_LOOKBACK_MS = 30 * 24 * 60 * 60 * 1000;
 
 /** Status strip variants: something to do, a blind spot (PostHog unreachable), or really quiet. */
 type StatusKind = 'attention' | 'blind' | 'calm';
@@ -35,7 +41,8 @@ type StatusKind = 'attention' | 'blind' | 'calm';
  * One read (`telemetry-overview`) feeds six topic cards in the server's urgency order. Each card is a teaser:
  * level icon + text, one KPI, delta or forecast, the top three findings and a way into PostHog — no lists to wade
  * through, no second copy of what PostHog already shows. Every top finding can become a feedback topic; the
- * composer is only pre-filled, the admin sends it.
+ * composer is only pre-filled, the admin sends it. A finding that already became a topic (admin feedback #358)
+ * shows a checked speech bubble instead, a real anchor to that topic on the board.
  */
 @Component({
   selector: 'sc-telemetry-stats',
@@ -136,10 +143,18 @@ type StatusKind = 'attention' | 'blind' | 'calm';
                     </span>
                     @if (it.value) { <span class="muted val">{{ it.value }}</span> }
                     @if (it.feedback; as fb) {
+                      @if (topicFor(fb); as t) {
+                        <a scAction tier="tertiary" class="to-fb done" [attr.href]="topicHref(t)"
+                           [scTooltip]="'telemetry.openFeedback' | translate" scTooltipTier="label"
+                           [attr.aria-label]="'telemetry.openFeedback' | translate" (click)="openTopic($event, t.id)">
+                          <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H9l-4 4V5zM9 10l2 2 4-4" /></svg>
+                        </a>
+                      } @else {
                       <button scAction tier="tertiary" type="button" class="to-fb" [scTooltip]="'telemetry.toFeedback' | translate" scTooltipTier="label"
                               [attr.aria-label]="'telemetry.toFeedback' | translate" (click)="toFeedback(fb, it.badge)">
                         <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H9l-4 4V5zM12 8v4M10 10h4" /></svg>
                       </button>
+                      }
                     }
                   </li>
                 }
@@ -252,6 +267,9 @@ export class TelemetryStatsComponent {
   private seenSent = false;
   private destroyed = false;
 
+  /** Topics already written from a finding, by the finding's title (the seeded body's first line). */
+  readonly topics = signal<ReadonlyMap<string, LinkedTopic>>(new Map());
+
   readonly postHogUrl = computed(() => posthogRoot(this.overview()?.cards ?? []));
 
   readonly status = computed<StatusKind>(() => {
@@ -270,6 +288,53 @@ export class TelemetryStatsComponent {
     this.destroyRef.onDestroy(() => (this.destroyed = true));
     void this.load();
     useAutoRefresh(() => this.load(true), { enabled: () => !this.busy() && !this.errorKey() });
+    // A topic sent from the panel next to this page flips its finding's icon without waiting for the next poll.
+    let created = this.seeds.created();
+    effect(() => {
+      const n = this.seeds.created();
+      if (n === created) return;
+      created = n;
+      void this.linkTopics();
+    });
+  }
+
+  topicFor(fb: FeedbackText): LinkedTopic | null {
+    return this.topics().get(fb.title.trim()) ?? null;
+  }
+
+  topicHref(t: LinkedTopic): string {
+    return `/admin/feedback?topic=${encodeURIComponent(t.id)}`;
+  }
+
+  /**
+   * "Feedback-Thema öffnen": a plain left click opens the topic in the docked panel and the page stays (or, with
+   * the launcher switched off, routes to the board); a Ctrl/middle click is the browser's — the board in a new tab.
+   * A plain href instead of routerLink: RouterLink would navigate even after preventDefault.
+   */
+  openTopic(event: MouseEvent, id: string): void {
+    if (!isPlainLeftClick(event)) return;
+    event.preventDefault();
+    if (this.fabPrefs.show()) this.seeds.requestTopic(id);
+    else void this.router.navigate(['/admin/feedback'], { queryParams: { topic: id } });
+  }
+
+  /** Which findings already are a topic: recent topics whose first line is a finding's title. */
+  private async linkTopics(): Promise<void> {
+    const since = new Date(Date.now() - TOPIC_LOOKBACK_MS).toISOString();
+    const { data, error } = await this.supabase.client
+      .from('admin_feedback')
+      .select('id, seq, body')
+      .gte('created_at', since)
+      .order('created_at', { ascending: false })
+      .limit(500);
+    if (this.destroyed) return;
+    if (error) {
+      // The create icon stays — the worst case is a second topic, which the board shows anyway.
+      logWarn('telemetry', 'link feedback topics failed', { error });
+      return;
+    }
+    const titles = (this.overview()?.cards ?? []).flatMap((c) => c.top.map((it) => it.feedback?.title).filter((t): t is string => !!t));
+    this.topics.set(topicsByTitle(Array.isArray(data) ? data : [], titles));
   }
 
   glyph(level: string): string {
@@ -324,6 +389,7 @@ export class TelemetryStatsComponent {
       if (!this.first || !refresh) this.first = next;
       this.overview.set(refresh && this.overview() && this.first ? mergeRefresh(this.first, next) : next);
       this.markSeen();
+      void this.linkTopics();
     } finally {
       this.busy.set(false);
     }

@@ -17,7 +17,7 @@ import {
   untracked,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { SupabaseClientProvider } from '../../core/supabase.client';
@@ -1930,6 +1930,28 @@ export class AdminFeedbackComponent implements OnInit {
   /** Any sheet over the stream — the stream hides behind it. */
   readonly overlayOpen = computed(() => this.openRow() !== null || this.filtersOpen() || this.declineTopicRow() !== null);
 
+  /**
+   * A topic someone outside the board asked to see (the telemetry page's
+   * "already a topic" link): `?topic=<id>` on the full board, a
+   * `FeedbackComposerSeedService.requestTopic` for the docked panel. It opens
+   * as soon as the row is loaded — the first poll may still be on the wire.
+   */
+  private readonly wantedTopic = signal<string | null>(null);
+  private readonly route = inject(ActivatedRoute, { optional: true });
+  private readonly takeTopicRequest = effect(() => {
+    if (this.seeds.pendingTopic() === null) return;
+    const id = untracked(() => this.seeds.takeTopic());
+    if (id) this.wantedTopic.set(id);
+  });
+  private readonly openWantedTopic = effect(() => {
+    const id = this.wantedTopic();
+    if (!id || !this.messages().some((m) => m.id === id)) return;
+    untracked(() => {
+      this.wantedTopic.set(null);
+      this.openTopic(id);
+    });
+  });
+
   openTopic(id: string): void {
     this.openId.set(id);
     this.focusSheet();
@@ -2235,6 +2257,9 @@ export class AdminFeedbackComponent implements OnInit {
 
   async ngOnInit() {
     purgeRetiredKeys();
+    // Only the routed board reads the URL — the docked panel shares the root route's query.
+    const linked = this.embedded() ? null : this.route?.snapshot.queryParamMap.get('topic');
+    if (linked) this.wantedTopic.set(linked);
     await this.refresh();
     // The marker compares against the previous visit; this one starts now.
     this.stampLastSeen();
@@ -2488,6 +2513,7 @@ export class AdminFeedbackComponent implements OnInit {
       this.errorMsg.set(toErrorKey('admin-feedback', 'create topic', error));
       return false;
     }
+    this.seeds.noteCreated();
     await this.refresh();
     return true;
   }

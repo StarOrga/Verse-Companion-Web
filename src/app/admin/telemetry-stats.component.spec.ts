@@ -2,11 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { provideTranslateService } from '@ngx-translate/core';
+import { FeedbackFabPrefsService } from '../core/feedback-fab-prefs.service';
 import { FeedbackComposerSeedService } from '../feedback/feedback-composer-seed.service';
 import { draftScopes } from '../feedback/feedback-draft.types';
 import { FakeCall, FakeResult, fakeSupabase } from '../testing/fake-supabase';
 import { TelemetryStatsComponent } from './telemetry-stats.component';
-import { mergeRefresh, sortCards, sparkPoints, type Overview, type OverviewCard } from './telemetry-overview';
+import { mergeRefresh, sortCards, sparkPoints, topicsByTitle, type Overview, type OverviewCard } from './telemetry-overview';
 
 const P = 'https://eu.posthog.com/project/7';
 const FB = (title: string) => ({ title, body: `${title}\n\nProblem\n\nPostHog: ${P}/x` });
@@ -138,6 +139,39 @@ describe('TelemetryStatsComponent', () => {
     expect(seed.area).toBe('desktop');
   });
 
+  it('shows a checked speech bubble linking the topic a finding already became, and opens it in the panel', async () => {
+    const topics = [
+      { id: 'other', seq: 3, body: 'Something else' },
+      { id: 'zstd-topic', seq: 358, body: `${FB('Fehler: zstd').body}\n\n[sc-view:holo]` },
+    ];
+    const { el, harness } = await mount((call) =>
+      call.op === 'from' && call.target === 'admin_feedback' ? { data: topics } : answerWith(ATTENTION)(call));
+    TestBed.inject(FeedbackFabPrefsService).setShow(true);
+    const seeds = TestBed.inject(FeedbackComposerSeedService);
+    const rows = el.querySelectorAll('[data-card="errors"] .list li');
+    expect(rows[0].querySelector('button.to-fb')).not.toBeNull();
+    const link = rows[2].querySelector('a.to-fb.done') as HTMLAnchorElement;
+    expect(link).not.toBeNull();
+    expect(rows[2].querySelector('button.to-fb')).toBeNull();
+    expect(link.getAttribute('href')).toBe('/admin/feedback?topic=zstd-topic');
+    expect(link.getAttribute('aria-label')).toBe('telemetry.openFeedback');
+    link.click();
+    await settle(harness);
+    expect(seeds.takeTopic()).toBe('zstd-topic');
+    expect(seeds.take(draftScopes.adminNew)).toBeNull();
+  });
+
+  it('looks for linked topics again once a board wrote a new one', async () => {
+    let topics: { id: string; seq: number; body: string }[] = [];
+    const { el, harness } = await mount((call) =>
+      call.op === 'from' && call.target === 'admin_feedback' ? { data: topics } : answerWith(ATTENTION)(call));
+    expect(el.querySelector('[data-card="errors"] a.to-fb.done')).toBeNull();
+    topics = [{ id: 't1', seq: 1, body: FB('Fehler: TypeError').body }];
+    TestBed.inject(FeedbackComposerSeedService).noteCreated();
+    await settle(harness);
+    expect(el.querySelector('[data-card="errors"] .list li:nth-child(1) a.to-fb.done')).not.toBeNull();
+  });
+
   it('offers the quota card both CTAs: saving proposal as feedback and the plan link', async () => {
     const { el, harness } = await mount(answerWith(ATTENTION));
     const seeds = TestBed.inject(FeedbackComposerSeedService);
@@ -208,6 +242,19 @@ describe('telemetry overview helpers', () => {
   it('sorts error, warn, ok, unknown and the design order inside a level', () => {
     const cards = ['desktop', 'ai', 'usage', 'services', 'errors', 'quota'].map((id, i) => ({ id, level: i === 3 ? 'warn' : 'ok' }) as OverviewCard);
     expect(sortCards(cards).map((c) => c.id)).toEqual(['services', 'quota', 'errors', 'usage', 'ai', 'desktop']);
+  });
+
+  it('links a topic by its first line, the newest one when a title was written twice', () => {
+    const map = topicsByTitle(
+      [
+        { id: 'new', seq: 9, body: 'Fehler: A\n\nedited text' },
+        { id: 'old', seq: 2, body: 'Fehler: A\n\nProblem' },
+        { id: 'inside', seq: 3, body: 'Intro\nFehler: B' },
+      ],
+      ['Fehler: A', 'Fehler: B'],
+    );
+    expect(map.get('Fehler: A')).toEqual({ id: 'new', seq: 9 });
+    expect(map.has('Fehler: B')).toBe(false);
   });
 
   it('draws a flat series as a centred line', () => {
