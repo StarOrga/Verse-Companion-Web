@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.18",
+  "current": "0.270.19",
   "releases": [
+    {
+      "version": "0.270.19",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader 0.81.3: big ship hulls (Polaris, Galaxy, Constellations …) are simplified as far as they stay gap-free instead of being kept unsimplified when the first simplify step tore them — Polaris 8.38 → 4.20 MB, Galaxy 3.23 → 1.41 MB. Hulls within the size budget are unchanged."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.270.18",
       "date": "2026-11-15",
