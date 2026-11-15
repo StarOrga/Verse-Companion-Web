@@ -1,0 +1,1073 @@
+<section data-iteration="2" data-iteration-template="design" data-design-set="alternatives" data-tab-label="Runde 2" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]},"designs":{},"screens":{},"views":{},"favorite":"karten"}</script>
+  <style>
+    .mock-page { max-width: 1180px; margin: 0 auto; padding: 28px 32px 48px; font-family: Inter, system-ui, sans-serif; color: #e8ebed; background: #0d2635; border-radius: 10px; box-sizing: border-box; }
+    .mock-page * { box-sizing: border-box; }
+    .mock-crumbs { font-size: 12px; color: #9fb3c8; margin-bottom: 6px; }
+    .mock-crumbs a { color: #52c1e6; text-decoration: none; }
+    .mock-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 20px; }
+    .mock-eyebrow { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #9fb3c8; }
+    .mock-h1 { font-family: Orbitron, Inter, sans-serif; font-size: 26px; margin: 2px 0 4px; letter-spacing: .04em; }
+    .mock-sub { margin: 0; color: #9fb3c8; font-size: 14px; }
+    .mock-aside { display: flex; gap: 10px; align-items: center; font-size: 12px; color: #9fb3c8; }
+    .mock-pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(82,193,230,.35); color: #52c1e6; border-radius: 999px; padding: 6px 14px; font-size: 13px; background: transparent; text-decoration: none; white-space: nowrap; }
+    .mock-pill.mock-strong { background: rgba(82,193,230,.14); }
+    .mock-pill.mock-warn { border-color: rgba(240,194,123,.45); color: #f0c27b; }
+    .mock-tick { width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 11px; flex: none; }
+    .mock-ok { background: rgba(95,214,152,.16); color: #5fd698; }
+    .mock-warnc { background: rgba(240,194,123,.18); color: #f0c27b; }
+    .mock-err { background: rgba(255,130,130,.16); color: #ff8282; }
+    .mock-muted { color: #9fb3c8; }
+    .mock-delta-up { color: #5fd698; font-size: 12px; }
+    .mock-delta-down { color: #f0c27b; font-size: 12px; }
+    .mock-badge { font-size: 11px; padding: 2px 8px; border-radius: 6px; background: #164664; color: #9fb3c8; white-space: nowrap; }
+    .mock-status { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 10px; background: #123246; border: 1px solid rgba(82,193,230,.18); margin-bottom: 18px; }
+    .mock-status-text { font-size: 16px; font-weight: 600; }
+    .mock-status-since { margin-left: auto; font-size: 12px; color: #9fb3c8; }
+    /* Design 1 — Themen-Karten */
+    .mock-d1-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .mock-d1-card { background: #123246; border: 1px solid rgba(82,193,230,.18); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .mock-d1-card.mock-d1-alert { border-color: rgba(240,194,123,.55); }
+    .mock-d1-card.mock-d1-error { border-color: rgba(255,130,130,.5); }
+    .mock-d1-top { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #9fb3c8; }
+    .mock-d1-kpi { font-size: 28px; font-weight: 700; line-height: 1.1; }
+    .mock-d1-kpi small { font-size: 13px; font-weight: 400; color: #9fb3c8; margin-left: 6px; }
+    .mock-d1-spark { height: 26px; width: 100%; }
+    .mock-d1-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+    .mock-d1-list li { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+    .mock-d1-list .mock-d1-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .mock-d1-cta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
+    .mock-d1-bar { height: 8px; border-radius: 4px; background: #164664; position: relative; }
+    .mock-d1-bar span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: #f0c27b; }
+    .mock-d1-bar i { position: absolute; top: -4px; bottom: -4px; width: 2px; background: #e8ebed; }
+    .mock-d1-calm { font-size: 13px; color: #9fb3c8; }
+    /* Design 2 — Inbox */
+    .mock-d2-h2 { font-size: 15px; margin: 4px 0 10px; display: flex; gap: 8px; align-items: center; }
+    .mock-d2-count { background: rgba(240,194,123,.18); color: #f0c27b; border-radius: 999px; padding: 1px 9px; font-size: 12px; }
+    .mock-d2-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+    .mock-d2-row { display: grid; grid-template-columns: 22px minmax(0,1fr) auto; gap: 12px; align-items: start; background: #123246; border: 1px solid rgba(82,193,230,.18); border-radius: 10px; padding: 14px 16px; }
+    .mock-d2-title { font-weight: 600; font-size: 14px; }
+    .mock-d2-meta { font-size: 12px; color: #9fb3c8; margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .mock-d2-acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .mock-d2-calm { display: flex; gap: 10px; flex-wrap: wrap; }
+    .mock-d2-chip { display: inline-flex; gap: 8px; align-items: center; padding: 8px 12px; border-radius: 10px; background: #103246; border: 1px solid rgba(82,193,230,.14); font-size: 13px; }
+    .mock-d2-empty { text-align: center; padding: 34px 16px; background: #123246; border-radius: 12px; border: 1px solid rgba(95,214,152,.3); margin-bottom: 22px; }
+    .mock-d2-empty b { display: block; font-size: 18px; margin: 8px 0 4px; }
+    /* Design 3 — Digest */
+    .mock-d3-letter { background: #123246; border: 1px solid rgba(82,193,230,.18); border-radius: 12px; padding: 22px 26px; margin-bottom: 18px; max-width: 760px; }
+    .mock-d3-letter h2 { font-size: 17px; margin: 0 0 12px; }
+    .mock-d3-letter p { margin: 0 0 12px; line-height: 1.6; font-size: 14px; }
+    .mock-d3-letter a { color: #52c1e6; text-decoration: none; border-bottom: 1px solid rgba(82,193,230,.4); }
+    .mock-d3-letter .mock-d3-act { display: inline-flex; gap: 8px; margin-left: 6px; }
+    .mock-d3-table { width: 100%; max-width: 760px; border-collapse: collapse; font-size: 13px; }
+    .mock-d3-table th { text-align: left; color: #9fb3c8; font-weight: 500; padding: 8px 10px; border-bottom: 1px solid rgba(82,193,230,.18); }
+    .mock-d3-table td { padding: 9px 10px; border-bottom: 1px solid rgba(82,193,230,.08); }
+    .mock-d3-table a { color: #52c1e6; text-decoration: none; }
+  </style>
+  <header class="iteration-intro">
+    <h2>Runde 2 · Telemetrie neu, PostHog zuerst</h2>
+    <p>Drei Entwürfe der Admin-Seite; die offenen Grundsatzfragen stehen unter „Analyse“.</p>
+  </header>
+
+  <!-- ═════════ Design 1 · Themen-Karten ═════════ -->
+  <section data-design="karten" data-nav-label="Themen-Karten" data-design-active="true"
+           data-design-motto="Fünf Themen, ein Blick."
+           data-design-traits="Feste Karte pro Thema, nach Dringlichkeit sortiert|Zahl, Trend und Top 3 je Karte|Ruhige Themen bleiben sichtbar"
+           data-design-icon="grid" data-design-color="#3fb68b">
+    <section id="r2-d1-s1" data-nav-label="Mit Handlungsbedarf" data-screen data-screen-active="true" data-screen-fit="full">
+      <div class="mock-page">
+        <div class="mock-crumbs"><a href="#">Admin</a> › Telemetrie</div>
+        <div class="mock-head">
+          <div><div class="mock-eyebrow">Betrieb</div><div class="mock-h1">Telemetrie</div><p class="mock-sub">Was gerade wichtig ist. Details liegen in PostHog.</p></div>
+          <div class="mock-aside">Stand 02:40 <a class="mock-pill" href="#">PostHog öffnen ↗</a></div>
+        </div>
+        <div class="mock-status mock-d1-status">
+          <span class="mock-tick mock-warnc">!</span>
+          <span class="mock-status-text">2 Dinge brauchen Aufmerksamkeit</span>
+          <span class="mock-status-since">Seit deinem letzten Besuch am Mo 10.11., 21:40</span>
+        </div>
+        <div class="mock-d1-grid">
+          <div class="mock-d1-card mock-d1-alert mock-d1-quota">
+            <div class="mock-d1-top"><span class="mock-tick mock-warnc">!</span> PostHog-Kontingent</div>
+            <div class="mock-d1-kpi">84 %<small>der Events · Prognose 168 %</small></div>
+            <div class="mock-d1-bar"><span style="width:84%"></span><i style="left:50%"></i></div>
+            <ul class="mock-d1-list">
+              <li><span class="mock-d1-name">$pageview</span><span class="mock-muted">41 %</span></li>
+              <li><span class="mock-d1-name">$web_vitals</span><span class="mock-muted">22 %</span></li>
+              <li><span class="mock-d1-name">hangar:*</span><span class="mock-muted">9 %</span></li>
+            </ul>
+            <div class="mock-d1-cta mock-d1-quota-cta"><a class="mock-pill mock-warn" href="#">Sparvorschlag als Feedback</a><a class="mock-pill" href="#">Plan in PostHog ↗</a></div>
+          </div>
+          <div class="mock-d1-card mock-d1-error mock-d1-errors">
+            <div class="mock-d1-top"><span class="mock-tick mock-err">×</span> Fehler · Web, Server, Desktop</div>
+            <div class="mock-d1-kpi">4<small>neue Fehlergruppen</small></div>
+            <ul class="mock-d1-list mock-d1-errlist">
+              <li><span class="mock-badge">Web</span><span class="mock-d1-name">TypeError in Hangar-Schiffsseite</span><span class="mock-muted">9 Nutzer</span></li>
+              <li><span class="mock-badge">Server</span><span class="mock-d1-name">patch-teaser: Claude überlastet</span><span class="mock-muted">12×</span></li>
+              <li><span class="mock-badge">Desktop</span><span class="mock-d1-name">Uploader: zstd-Fehler beim Entpacken</span><span class="mock-muted">5 Inst.</span></li>
+            </ul>
+            <div class="mock-d1-cta"><a class="mock-pill" href="#">Fehler in PostHog ↗</a><span class="mock-badge">1 Board-Eintrag wartet auf Antwort</span></div>
+          </div>
+          <div class="mock-d1-card">
+            <div class="mock-d1-top"><span class="mock-tick mock-warnc">!</span> Externe Dienste</div>
+            <div class="mock-d1-kpi">1<small>von 9 gestört</small></div>
+            <ul class="mock-d1-list">
+              <li><span class="mock-tick mock-warnc">!</span><span class="mock-d1-name">UEX · 25 % Fehler seit 01:10</span></li>
+              <li><span class="mock-tick mock-ok">✓</span><span class="mock-d1-name">Claude API · 0,6 % Fehler</span></li>
+              <li><span class="mock-tick mock-ok">✓</span><span class="mock-d1-name">7 weitere ohne Befund</span></li>
+            </ul>
+            <div class="mock-d1-cta"><a class="mock-pill" href="#">Dienste in PostHog ↗</a></div>
+          </div>
+          <div class="mock-d1-card">
+            <div class="mock-d1-top"><span class="mock-tick mock-ok">✓</span> Nutzung · 7 Tage</div>
+            <div class="mock-d1-kpi">142<small>aktive Nutzer</small> <span class="mock-delta-up">+12 %</span></div>
+            <svg class="mock-d1-spark" viewBox="0 0 120 26" preserveAspectRatio="none"><polyline fill="none" stroke="#52c1e6" stroke-width="2" points="0,20 20,18 40,19 60,14 80,12 100,9 120,6"/></svg>
+            <ul class="mock-d1-list">
+              <li><span class="mock-d1-name">Codex-Schiffe geöffnet</span><span class="mock-delta-up">+18 %</span></li>
+              <li><span class="mock-d1-name">Hangar-Import</span><span class="mock-delta-down">−9 %</span></li>
+              <li><span class="mock-d1-name">Login abgeschlossen</span><span class="mock-delta-down">71 % (−4)</span></li>
+            </ul>
+            <div class="mock-d1-cta"><a class="mock-pill" href="#">Dashboard Nutzung ↗</a></div>
+          </div>
+          <div class="mock-d1-card">
+            <div class="mock-d1-top"><span class="mock-tick mock-ok">✓</span> KI-Kosten · November</div>
+            <div class="mock-d1-kpi">6,40 $<small>Prognose 11,20 $</small></div>
+            <ul class="mock-d1-list">
+              <li><span class="mock-d1-name">translate-orchestrator</span><span class="mock-muted">4,10 $</span></li>
+              <li><span class="mock-d1-name">sc-events-sync</span><span class="mock-muted">1,30 $</span></li>
+              <li><span class="mock-d1-name">patch-teaser</span><span class="mock-muted">0,62 $</span></li>
+            </ul>
+            <div class="mock-d1-cta"><a class="mock-pill" href="#">Kosten in PostHog ↗</a></div>
+          </div>
+          <div class="mock-d1-card">
+            <div class="mock-d1-top"><span class="mock-tick mock-ok">✓</span> Desktop-Apps</div>
+            <div class="mock-d1-kpi">38<small>aktive Installationen</small></div>
+            <ul class="mock-d1-list">
+              <li><span class="mock-d1-name">Uploader 0.58.2</span><span class="mock-muted">31</span></li>
+              <li><span class="mock-d1-name">Starscape 0.21.0</span><span class="mock-muted">19</span></li>
+              <li><span class="mock-d1-name">Abbrüche diese Woche</span><span class="mock-muted">3</span></li>
+            </ul>
+            <div class="mock-d1-cta"><a class="mock-pill" href="#">Desktop in PostHog ↗</a></div>
+          </div>
+        </div>
+      </div>
+      <div class="anno-layer" data-anno-layer>
+        <div class="anno" data-anno="r2-d1-s1-a1" data-anno-side="bottom" data-anno-target=".mock-d1-status .mock-status-since">
+          <button class="anno-pin" type="button" data-anno-pin="r2-d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r2-d1-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+          <div class="anno-bubble" id="anno-bubble-r2-d1-s1-a1" data-anno-bubble="r2-d1-s1-a1" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="r2-d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r2-d1-s1-a1">
+              <span class="anno-bubble-question">„Seit deinem letzten Besuch“ pro Admin merken, oder immer die letzten 7 Tage?</span>
+            </button>
+            <div class="anno-bubble-body">
+              <textarea class="anno-answer" data-comment="anno-r2-d1-s1-a1" data-annotation="r2-d1-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+              <div class="attach-slot" data-attach-slot="anno-r2-d1-s1-a1"></div>
+            </div>
+          </div>
+        </div>
+        <div class="anno" data-anno="r2-d1-s1-a2" data-anno-side="right" data-anno-target=".mock-d1-quota-cta">
+          <button class="anno-pin" type="button" data-anno-pin="r2-d1-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r2-d1-s1-a2" aria-label="{{anno.pin_label}}">2</button>
+          <div class="anno-bubble" id="anno-bubble-r2-d1-s1-a2" data-anno-bubble="r2-d1-s1-a2" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="r2-d1-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r2-d1-s1-a2">
+              <span class="anno-bubble-question">Sparvorschlag und Upgrade gleich stark, oder Sparen als erster Schritt?</span>
+            </button>
+            <div class="anno-bubble-body">
+              <textarea class="anno-answer" data-comment="anno-r2-d1-s1-a2" data-annotation="r2-d1-s1-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+              <div class="attach-slot" data-attach-slot="anno-r2-d1-s1-a2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="anno" data-anno="r2-d1-s1-a3" data-anno-side="right" data-anno-target=".mock-d1-errlist">
+          <button class="anno-pin" type="button" data-anno-pin="r2-d1-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r2-d1-s1-a3" aria-label="{{anno.pin_label}}">3</button>
+          <div class="anno-bubble" id="anno-bubble-r2-d1-s1-a3" data-anno-bubble="r2-d1-s1-a3" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="r2-d1-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r2-d1-s1-a3">
+              <span class="anno-bubble-question">Den Board-Status (Diagnose da, wartet) direkt an jedem Fehler zeigen?</span>
+            </button>
+            <div class="anno-bubble-body">
+              <textarea class="anno-answer" data-comment="anno-r2-d1-s1-a3" data-annotation="r2-d1-s1-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+              <div class="attach-slot" data-attach-slot="anno-r2-d1-s1-a3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="r2-d1-s2" data-nav-label="Alles ruhig" data-screen hidden data-screen-fit="full">
+      <div class="mock-page">
+        <div class="mock-crumbs"><a href="#">Admin</a> › Telemetrie</div>
+        <div class="mock-head">
+          <div><div class="mock-eyebrow">Betrieb</div><div class="mock-h1">Telemetrie</div><p class="mock-sub">Was gerade wichtig ist. Details liegen in PostHog.</p></div>
+          <div class="mock-aside">Stand 02:40 <a class="mock-pill" href="#">PostHog öffnen ↗</a></div>
+        </div>
+        <div class="mock-status">
+          <span class="mock-tick mock-ok">✓</span>
+          <span class="mock-status-text">Alles ruhig, nichts zu tun</span>
+          <span class="mock-status-since">Seit deinem letzten Besuch am Mo 10.11., 21:40</span>
+        </div>
+        <div class="mock-d1-grid">
+          <div class="mock-d1-card"><div class="mock-d1-top"><span class="mock-tick mock-ok">✓</span> Fehler · Web, Server, Desktop</div><div class="mock-d1-kpi">0<small>neue Fehlergruppen</small></div><p class="mock-d1-calm">Keine neuen Fehler seit Mo 10.11.</p><div class="mock-d1-cta"><a class="mock-pill" href="#">Fehler in PostHog ↗</a></div></div>
+          <div class="mock-d1-card"><div class="mock-d1-top"><span class="mock-tick mock-ok">✓</span> Externe Dienste</div><div class="mock-d1-kpi">9<small>von 9 ohne Befund</small></div><p class="mock-d1-calm">Letzte Prüfung 02:00.</p><div class="mock-d1-cta"><a class="mock-pill" href="#">Dienste in PostHog ↗</a></div></div>
+          <div class="mock-d1-card"><div class="mock-d1-top"><span class="mock-tick mock-ok">✓</span> PostHog-Kontingent</div><div class="mock-d1-kpi">31 %<small>der Events · Prognose 62 %</small></div><div class="mock-d1-bar"><span style="width:31%;background:#5fd698"></span><i style="left:50%"></i></div><div class="mock-d1-cta"><a class="mock-pill" href="#">Plan in PostHog ↗</a></div></div>
+          <div class="mock-d1-card"><div class="mock-d1-top"><span class="mock-tick mock-ok">✓</span> Nutzung · 7 Tage</div><div class="mock-d1-kpi">138<small>aktive Nutzer</small> <span class="mock-delta-up">+3 %</span></div><svg class="mock-d1-spark" viewBox="0 0 120 26" preserveAspectRatio="none"><polyline fill="none" stroke="#52c1e6" stroke-width="2" points="0,14 20,13 40,15 60,12 80,13 100,12 120,11"/></svg><div class="mock-d1-cta"><a class="mock-pill" href="#">Dashboard Nutzung ↗</a></div></div>
+          <div class="mock-d1-card"><div class="mock-d1-top"><span class="mock-tick mock-ok">✓</span> KI-Kosten · November</div><div class="mock-d1-kpi">3,10 $<small>Prognose 6,20 $</small></div><div class="mock-d1-cta"><a class="mock-pill" href="#">Kosten in PostHog ↗</a></div></div>
+          <div class="mock-d1-card"><div class="mock-d1-top"><span class="mock-tick mock-ok">✓</span> Desktop-Apps</div><div class="mock-d1-kpi">36<small>aktive Installationen</small></div><div class="mock-d1-cta"><a class="mock-pill" href="#">Desktop in PostHog ↗</a></div></div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ═════════ Design 2 · Inbox ═════════ -->
+  <section data-design="inbox" data-nav-label="Aufmerksamkeits-Inbox" hidden
+           data-design-motto="Nur was dich braucht."
+           data-design-traits="Eine Liste über alle Themen hinweg|Jede Zeile mit Aktion und Feedback-Knopf|Ruhige Themen schrumpfen auf eine Zeile"
+           data-design-icon="list" data-design-color="#c9a227">
+    <section id="r2-d2-s1" data-nav-label="Mit Handlungsbedarf" data-screen data-screen-active="true" data-screen-fit="full">
+      <div class="mock-page">
+        <div class="mock-crumbs"><a href="#">Admin</a> › Telemetrie</div>
+        <div class="mock-head">
+          <div><div class="mock-eyebrow">Betrieb</div><div class="mock-h1">Telemetrie</div><p class="mock-sub">Was gerade wichtig ist. Details liegen in PostHog.</p></div>
+          <div class="mock-aside">Stand 02:40 <a class="mock-pill" href="#">PostHog öffnen ↗</a></div>
+        </div>
+        <div class="mock-d2-h2">Braucht Aufmerksamkeit <span class="mock-d2-count">3</span> <span class="mock-muted" style="font-weight:400;font-size:12px;margin-left:auto">seit Mo 10.11., 21:40</span></div>
+        <div class="mock-d2-list">
+          <div class="mock-d2-row mock-d2-first">
+            <span class="mock-tick mock-err">×</span>
+            <div><div class="mock-d2-title">Neuer Fehler: TypeError in der Hangar-Schiffsseite</div>
+              <div class="mock-d2-meta"><span class="mock-badge">Fehler · Web</span> 37× seit 06:12 · 9 Nutzer · seit 0.262.0 · Diagnose liegt auf dem Board</div></div>
+            <div class="mock-d2-acts mock-d2-acts-first"><a class="mock-pill" href="#">In PostHog ↗</a><a class="mock-pill mock-strong" href="#">Zum Board-Eintrag</a></div>
+          </div>
+          <div class="mock-d2-row">
+            <span class="mock-tick mock-warnc">!</span>
+            <div><div class="mock-d2-title">Kontingent: 84 % der Events verbraucht, Prognose 168 %</div>
+              <div class="mock-d2-meta"><span class="mock-badge">PostHog</span> Tag 15 von 30 · größter Verursacher $pageview (41 %)</div></div>
+            <div class="mock-d2-acts"><a class="mock-pill mock-warn" href="#">Sparvorschlag als Feedback</a><a class="mock-pill" href="#">Plan ↗</a></div>
+          </div>
+          <div class="mock-d2-row">
+            <span class="mock-tick mock-warnc">!</span>
+            <div><div class="mock-d2-title">UEX antwortet unzuverlässig: 25 % Fehler seit 01:10</div>
+              <div class="mock-d2-meta"><span class="mock-badge">Dienst</span> HQ-Nachschub zeigt alte Preise</div></div>
+            <div class="mock-d2-acts"><a class="mock-pill" href="#">In PostHog ↗</a><a class="mock-pill" href="#">In Feedback umwandeln</a></div>
+          </div>
+        </div>
+        <div class="mock-d2-h2">Ruhig</div>
+        <div class="mock-d2-calm mock-d2-calmrow">
+          <a class="mock-d2-chip" href="#"><span class="mock-tick mock-ok">✓</span> Nutzung 142 aktiv <span class="mock-delta-up">+12 %</span></a>
+          <a class="mock-d2-chip" href="#"><span class="mock-tick mock-ok">✓</span> KI-Kosten 6,40 $ · Prognose 11,20 $</a>
+          <a class="mock-d2-chip" href="#"><span class="mock-tick mock-ok">✓</span> 8 von 9 Diensten</a>
+          <a class="mock-d2-chip" href="#"><span class="mock-tick mock-ok">✓</span> Desktop 38 Installationen</a>
+          <a class="mock-d2-chip" href="#"><span class="mock-tick mock-ok">✓</span> 3 weitere Fehlergruppen, je 1 Nutzer</a>
+        </div>
+      </div>
+      <div class="anno-layer" data-anno-layer>
+        <div class="anno" data-anno="r2-d2-s1-a1" data-anno-side="left" data-anno-target=".mock-d2-acts-first">
+          <button class="anno-pin" type="button" data-anno-pin="r2-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r2-d2-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+          <div class="anno-bubble" id="anno-bubble-r2-d2-s1-a1" data-anno-bubble="r2-d2-s1-a1" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="r2-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r2-d2-s1-a1">
+              <span class="anno-bubble-question">„In Feedback umwandeln“ nur zeigen, solange es noch keinen Board-Eintrag gibt?</span>
+            </button>
+            <div class="anno-bubble-body">
+              <textarea class="anno-answer" data-comment="anno-r2-d2-s1-a1" data-annotation="r2-d2-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+              <div class="attach-slot" data-attach-slot="anno-r2-d2-s1-a1"></div>
+            </div>
+          </div>
+        </div>
+        <div class="anno" data-anno="r2-d2-s1-a2" data-anno-side="top" data-anno-target=".mock-d2-calmrow">
+          <button class="anno-pin" type="button" data-anno-pin="r2-d2-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r2-d2-s1-a2" aria-label="{{anno.pin_label}}">2</button>
+          <div class="anno-bubble" id="anno-bubble-r2-d2-s1-a2" data-anno-bubble="r2-d2-s1-a2" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="r2-d2-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r2-d2-s1-a2">
+              <span class="anno-bubble-question">Reicht eine Zeile für ruhige Themen, oder fehlt dir dann der Überblick?</span>
+            </button>
+            <div class="anno-bubble-body">
+              <textarea class="anno-answer" data-comment="anno-r2-d2-s1-a2" data-annotation="r2-d2-s1-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+              <div class="attach-slot" data-attach-slot="anno-r2-d2-s1-a2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="anno" data-anno="r2-d2-s1-a3" data-anno-side="right" data-anno-target=".mock-d2-first .mock-d2-title">
+          <button class="anno-pin" type="button" data-anno-pin="r2-d2-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r2-d2-s1-a3" aria-label="{{anno.pin_label}}">3</button>
+          <div class="anno-bubble" id="anno-bubble-r2-d2-s1-a3" data-anno-bubble="r2-d2-s1-a3" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="r2-d2-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r2-d2-s1-a3">
+              <span class="anno-bubble-question">Reihenfolge nach Schwere oder nach Zeitpunkt?</span>
+            </button>
+            <div class="anno-bubble-body">
+              <textarea class="anno-answer" data-comment="anno-r2-d2-s1-a3" data-annotation="r2-d2-s1-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+              <div class="attach-slot" data-attach-slot="anno-r2-d2-s1-a3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="r2-d2-s2" data-nav-label="Alles ruhig" data-screen hidden data-screen-fit="full">
+      <div class="mock-page">
+        <div class="mock-crumbs"><a href="#">Admin</a> › Telemetrie</div>
+        <div class="mock-head">
+          <div><div class="mock-eyebrow">Betrieb</div><div class="mock-h1">Telemetrie</div><p class="mock-sub">Was gerade wichtig ist. Details liegen in PostHog.</p></div>
+          <div class="mock-aside">Stand 02:40 <a class="mock-pill" href="#">PostHog öffnen ↗</a></div>
+        </div>
+        <div class="mock-d2-empty"><span class="mock-tick mock-ok" style="width:34px;height:34px;font-size:18px">✓</span><b>Nichts braucht dich gerade</b><span class="mock-muted">Seit Mo 10.11., 21:40 ist nichts Neues aufgetaucht. Letzte Prüfung 02:00.</span></div>
+        <div class="mock-d2-h2">Ruhig</div>
+        <div class="mock-d2-calm">
+          <a class="mock-d2-chip" href="#"><span class="mock-tick mock-ok">✓</span> Fehler: 0 neu</a>
+          <a class="mock-d2-chip" href="#"><span class="mock-tick mock-ok">✓</span> Nutzung 138 aktiv <span class="mock-delta-up">+3 %</span></a>
+          <a class="mock-d2-chip" href="#"><span class="mock-tick mock-ok">✓</span> Kontingent 31 % · Prognose 62 %</a>
+          <a class="mock-d2-chip" href="#"><span class="mock-tick mock-ok">✓</span> KI-Kosten 3,10 $</a>
+          <a class="mock-d2-chip" href="#"><span class="mock-tick mock-ok">✓</span> 9 von 9 Diensten</a>
+          <a class="mock-d2-chip" href="#"><span class="mock-tick mock-ok">✓</span> Desktop 36 Installationen</a>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ═════════ Design 3 · Wochen-Digest ═════════ -->
+  <section data-design="digest" data-nav-label="Wochen-Digest" hidden
+           data-design-motto="Lesen statt suchen."
+           data-design-traits="Klartext-Sätze statt Kacheln|Jeder Satz verlinkt nach PostHog|Kompakte Kennzahl-Tabelle am Ende"
+           data-design-icon="book" data-design-color="#b07cc6">
+    <section id="r2-d3-s1" data-nav-label="Mit Handlungsbedarf" data-screen data-screen-active="true" data-screen-fit="full">
+      <div class="mock-page">
+        <div class="mock-crumbs"><a href="#">Admin</a> › Telemetrie</div>
+        <div class="mock-head">
+          <div><div class="mock-eyebrow">Betrieb</div><div class="mock-h1">Telemetrie</div><p class="mock-sub">Was gerade wichtig ist. Details liegen in PostHog.</p></div>
+          <div class="mock-aside">Stand 02:40 <a class="mock-pill" href="#">PostHog öffnen ↗</a></div>
+        </div>
+        <div class="mock-d3-letter mock-d3-text">
+          <h2>Seit deinem letzten Besuch am Mo 10.11.</h2>
+          <p><b>Ein neuer Fehler trifft Nutzer:</b> Die Hangar-Schiffsseite wirft seit Release 0.262.0 einen TypeError, 37-mal bei 9 Nutzern. Die Routine hat eine Diagnose auf das Board gelegt und wartet auf dein „Mach“. <span class="mock-d3-act"><a href="#">Fehler ↗</a><a href="#">Board-Eintrag</a></span></p>
+          <p><b>Das PostHog-Kontingent reicht so nicht bis Monatsende:</b> 84 % der Events sind an Tag 15 verbraucht, hochgerechnet 168 %. Fast die Hälfte sind Seitenaufrufe. <span class="mock-d3-act mock-d3-quota"><a href="#">Sparvorschlag als Feedback</a><a href="#">Plan ↗</a></span></p>
+          <p><b>UEX wackelt:</b> Seit 01:10 schlägt jeder vierte Abruf fehl, der HQ-Nachschub zeigt deshalb alte Preise. <span class="mock-d3-act"><a href="#">Dienst ↗</a></span></p>
+          <p class="mock-muted">Sonst ruhig: 142 aktive Nutzer (+12 %), KI-Kosten 6,40 $ im November, alle anderen Dienste ohne Befund.</p>
+        </div>
+        <table class="mock-d3-table mock-d3-kpis">
+          <thead><tr><th>Thema</th><th>Stand</th><th>Trend</th><th></th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Fehler</td><td>4 neue Gruppen</td><td class="mock-delta-down">+4</td><td><span class="mock-tick mock-err">×</span></td><td><a href="#">PostHog ↗</a></td></tr>
+            <tr><td>Kontingent</td><td>84 % · Prognose 168 %</td><td class="mock-delta-down">+21 Pkt</td><td><span class="mock-tick mock-warnc">!</span></td><td><a href="#">PostHog ↗</a></td></tr>
+            <tr><td>Externe Dienste</td><td>8 von 9 ohne Befund</td><td class="mock-delta-down">−1</td><td><span class="mock-tick mock-warnc">!</span></td><td><a href="#">PostHog ↗</a></td></tr>
+            <tr><td>Nutzung</td><td>142 aktiv (7 T)</td><td class="mock-delta-up">+12 %</td><td><span class="mock-tick mock-ok">✓</span></td><td><a href="#">PostHog ↗</a></td></tr>
+            <tr><td>KI-Kosten</td><td>6,40 $ · Prognose 11,20 $</td><td class="mock-muted">±0</td><td><span class="mock-tick mock-ok">✓</span></td><td><a href="#">PostHog ↗</a></td></tr>
+            <tr><td>Desktop-Apps</td><td>38 Installationen</td><td class="mock-delta-up">+2</td><td><span class="mock-tick mock-ok">✓</span></td><td><a href="#">PostHog ↗</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="anno-layer" data-anno-layer>
+        <div class="anno" data-anno="r2-d3-s1-a1" data-anno-side="right" data-anno-target=".mock-d3-text h2">
+          <button class="anno-pin" type="button" data-anno-pin="r2-d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r2-d3-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+          <div class="anno-bubble" id="anno-bubble-r2-d3-s1-a1" data-anno-bubble="r2-d3-s1-a1" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="r2-d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r2-d3-s1-a1">
+              <span class="anno-bubble-question">Sätze von der Routine (KI) schreiben lassen, oder fest aus Regeln bauen?</span>
+            </button>
+            <div class="anno-bubble-body">
+              <textarea class="anno-answer" data-comment="anno-r2-d3-s1-a1" data-annotation="r2-d3-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+              <div class="attach-slot" data-attach-slot="anno-r2-d3-s1-a1"></div>
+            </div>
+          </div>
+        </div>
+        <div class="anno" data-anno="r2-d3-s1-a2" data-anno-side="right" data-anno-target=".mock-d3-kpis">
+          <button class="anno-pin" type="button" data-anno-pin="r2-d3-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r2-d3-s1-a2" aria-label="{{anno.pin_label}}">2</button>
+          <div class="anno-bubble" id="anno-bubble-r2-d3-s1-a2" data-anno-bubble="r2-d3-s1-a2" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="r2-d3-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r2-d3-s1-a2">
+              <span class="anno-bubble-question">Braucht es die Tabelle unter dem Text, oder reicht der Text?</span>
+            </button>
+            <div class="anno-bubble-body">
+              <textarea class="anno-answer" data-comment="anno-r2-d3-s1-a2" data-annotation="r2-d3-s1-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+              <div class="attach-slot" data-attach-slot="anno-r2-d3-s1-a2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="anno" data-anno="r2-d3-s1-a3" data-anno-side="left" data-anno-target=".mock-d3-quota">
+          <button class="anno-pin" type="button" data-anno-pin="r2-d3-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r2-d3-s1-a3" aria-label="{{anno.pin_label}}">3</button>
+          <div class="anno-bubble" id="anno-bubble-r2-d3-s1-a3" data-anno-bubble="r2-d3-s1-a3" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="r2-d3-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r2-d3-s1-a3">
+              <span class="anno-bubble-question">Den Digest zusätzlich als wöchentliche Push-Nachricht an Admins schicken?</span>
+            </button>
+            <div class="anno-bubble-body">
+              <textarea class="anno-answer" data-comment="anno-r2-d3-s1-a3" data-annotation="r2-d3-s1-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+              <div class="attach-slot" data-attach-slot="anno-r2-d3-s1-a3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="r2-d3-s2" data-nav-label="Alles ruhig" data-screen hidden data-screen-fit="full">
+      <div class="mock-page">
+        <div class="mock-crumbs"><a href="#">Admin</a> › Telemetrie</div>
+        <div class="mock-head">
+          <div><div class="mock-eyebrow">Betrieb</div><div class="mock-h1">Telemetrie</div><p class="mock-sub">Was gerade wichtig ist. Details liegen in PostHog.</p></div>
+          <div class="mock-aside">Stand 02:40 <a class="mock-pill" href="#">PostHog öffnen ↗</a></div>
+        </div>
+        <div class="mock-d3-letter">
+          <h2>Seit deinem letzten Besuch am Mo 10.11.</h2>
+          <p><b>Nichts braucht dich.</b> Keine neuen Fehler, alle 9 Dienste ohne Befund, das Kontingent reicht hochgerechnet zu 62 %.</p>
+          <p class="mock-muted">138 aktive Nutzer (+3 %), KI-Kosten 3,10 $ im November, 36 Desktop-Installationen. <a href="#">Dashboards in PostHog ↗</a></p>
+        </div>
+        <table class="mock-d3-table">
+          <thead><tr><th>Thema</th><th>Stand</th><th>Trend</th><th></th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Fehler</td><td>0 neu</td><td class="mock-muted">±0</td><td><span class="mock-tick mock-ok">✓</span></td><td><a href="#">PostHog ↗</a></td></tr>
+            <tr><td>Kontingent</td><td>31 % · Prognose 62 %</td><td class="mock-muted">+4 Pkt</td><td><span class="mock-tick mock-ok">✓</span></td><td><a href="#">PostHog ↗</a></td></tr>
+            <tr><td>Externe Dienste</td><td>9 von 9</td><td class="mock-muted">±0</td><td><span class="mock-tick mock-ok">✓</span></td><td><a href="#">PostHog ↗</a></td></tr>
+            <tr><td>Nutzung</td><td>138 aktiv (7 T)</td><td class="mock-delta-up">+3 %</td><td><span class="mock-tick mock-ok">✓</span></td><td><a href="#">PostHog ↗</a></td></tr>
+            <tr><td>KI-Kosten</td><td>3,10 $</td><td class="mock-muted">±0</td><td><span class="mock-tick mock-ok">✓</span></td><td><a href="#">PostHog ↗</a></td></tr>
+            <tr><td>Desktop-Apps</td><td>36 Installationen</td><td class="mock-muted">±0</td><td><span class="mock-tick mock-ok">✓</span></td><td><a href="#">PostHog ↗</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <!-- ═════════ Analyse · Grundsatzfragen ═════════ -->
+  <section data-view="r2-analyse" data-view-kind="analysis" data-analysis="full" data-nav-label="Analyse" hidden>
+    <section id="r2-briefing" data-analysis-briefing data-nav-label="Briefing">
+      <p data-briefing-what>Fest steht aus Runde 1: alle 23 Empfehlungen, Rolle als Person-Eigenschaft, alle Dienste und alle Server-Signale. Neu: PostHog wird die einzige Quelle, die Admin-Seite spiegelt nur.</p>
+      <p data-briefing-why>Diese Fragen entscheiden, was beim Umbau wegfällt und wie PostHog eingerichtet wird.</p>
+      <div data-briefing-potential data-viz="kpi"
+           data-viz-spec='{"value":"1","unit":"Quelle","label":"statt Supabase-Telemetrie plus PostHog"}'>1 Quelle</div>
+      <a data-briefing-topic="r2-t-source" data-share="35">Eine Quelle: PostHog</a>
+      <a data-briefing-topic="r2-t-setup" data-share="30">PostHog-Aufbau</a>
+      <a data-briefing-topic="r2-t-events" data-share="20">Event-Katalog</a>
+      <a data-briefing-topic="r2-t-quota" data-share="15">Kontingent im Blick</a>
+      <p data-briefing-duration>≈ 8 min</p>
+      <div data-alevel="1" data-title="Briefing">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"1","unit":"Quelle"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Web, Server, Desktop","value":"senden an PostHog"},{"label":"PostHog","value":"3 Dashboards, Alarme"},{"label":"Admin-Seite","value":"Top 3 je Thema + Link"},{"label":"Board","value":"Diagnose + Vorschlag"}]}'></div>
+          <p>Fest steht außerdem: keine Doppelführung von Fehlern im Admin, Kontingent-Warnung ab 80 % mit zwei Auswegen, breiter Event-Katalog mit gespeicherter Konvention, höchstens drei Dashboards, 30 % einfache und 70 % übergreifende Berichte.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Thema A · Eine Quelle -->
+    <section id="r2-t-source" data-topic data-nav-label="Eine Quelle: PostHog">
+      <div data-alevel="2" data-title="Eine Quelle: PostHog">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"3","unit":"Desktop-Produkte","label":"senden heute an die eigene Tabelle"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Uploader (Electron)","value":3},{"label":"Starscape (Rust)","value":2},{"label":"Desktop-App","value":2}],"unit":"Event-Arten"}'></div>
+          <p>Alle drei senden signiert an eine Supabase-Funktion, die Admin-Seite liest daraus. Diese Strecke soll in PostHog aufgehen.</p>
+        </div>
+      </div>
+
+      <section id="r2-desktop" data-nav-label="Weg der Desktop-Daten" data-decision="r2-desktop" data-decision-mode="single"
+               data-label="Weg der Desktop-Daten" data-rec="fwd"
+               data-rec-why="Kein App-Update nötig, Signatur und Zustimmung der Apps bleiben, und ein Schalter stellt um."
+               data-applies-to="Uploader, Starscape, Desktop-App" data-finding="r2-f-desktop">
+        <p data-applies>Gilt für: Uploader, Starscape, Desktop-App</p>
+        <p data-situation>Wer die Desktop-Apps selbst umbaut, muss drei Release-Wege neu ausliefern und alte Versionen senden weiter ins Leere.</p>
+        <h3 data-question>Wie kommen Desktop-Daten nach PostHog?</h3>
+        <p data-stakes>Ob alte App-Versionen weiter gezählt werden</p>
+        <div data-options>
+          <label data-opt="fwd" data-recommended>
+            <input type="radio" name="dm-r2-desktop" value="fwd" checked>
+            <span data-opt-label>Die Telemetrie-Funktion leitet an PostHog weiter</span>
+            <span data-opt-consequence>Sofort für alle Versionen; die Apps bleiben unverändert.</span>
+          </label>
+          <label data-opt="sdk">
+            <input type="radio" name="dm-r2-desktop" value="sdk">
+            <span data-opt-label>Die Apps senden selbst an PostHog</span>
+            <span data-opt-consequence>Reicher (Sitzungen, Fehler-Stacks), aber drei App-Releases und alte Versionen fallen raus.</span>
+          </label>
+          <label data-opt="phased">
+            <input type="radio" name="dm-r2-desktop" value="phased">
+            <span data-opt-label>Erst weiterleiten, beim nächsten App-Release selbst senden</span>
+            <span data-opt-consequence>Kein Bruch, später reichere Daten; zwei Wege für eine Weile.</span>
+          </label>
+        </div>
+        <textarea data-comment="r2-desktop-note" placeholder="Notiz (optional)"></textarea>
+        <input type="hidden" name="dm-r2-desktop-none" value="">
+        <input type="hidden" name="dm-r2-desktop-hes" value="{&quot;ms&quot;:7770,&quot;revisits&quot;:0,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-desktop-touched" value="">
+        <input type="hidden" name="dm-r2-desktop-issue" value="">
+        <input type="hidden" name="dm-r2-desktop-epic" value="">
+        <div data-alevel="3" data-title="Weg der Desktop-Daten">
+          <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Ein Endpunkt, eine Signatur, drei Produkte."}'></div></div>
+          <div data-slot="long">
+            <div data-viz="flow" data-viz-spec='{"steps":[{"label":"App","value":"signiertes Event"},{"label":"ingest-telemetry","value":"prüft Signatur"},{"label":"PostHog","value":"statt eigener Tabelle"}]}'></div>
+            <p>Die Funktion prüft schon Signatur und Grenzen, sie tauscht nur das Ziel.</p>
+          </div>
+          <div data-example><pre>// ingest-telemetry heute
+await admin.from('telemetry_events').insert(rows);
+
+// vorgeschlagen
+await posthogBatch(rows.map(toPosthogEvent));   // product, version, channel als Properties
+// distinct_id = gehashte installId, $process_person_profile = false</pre></div>
+        </div>
+      </section>
+
+      <section id="r2-logs" data-nav-label="Diagnose-Logs" data-decision="r2-logs" data-decision-mode="single"
+               data-label="Diagnose-Logs" data-rec="r2"
+               data-rec-why="PostHog ist nicht für Dateien gebaut; ein Link mit Ablaufdatum hält Events klein."
+               data-applies-to="Uploader-Läufe mit Warnungen" data-finding="r2-f-logs">
+        <p data-applies>Gilt für: Uploader-Läufe mit Warnungen</p>
+        <p data-situation>Ein Uploader-Lauf mit Warnungen liefert ein Log, aus dem die Admin-Seite heute einen Feedback-Eintrag samt Datei baut; ein PostHog-Event kann so eine Datei nicht sinnvoll tragen.</p>
+        <h3 data-question>Wo liegen Diagnose-Logs künftig?</h3>
+        <p data-stakes>Ob „Log als Feedback anhängen“ erhalten bleibt</p>
+        <div data-options>
+          <label data-opt="r2" data-recommended>
+            <input type="radio" name="dm-r2-logs" value="r2" checked>
+            <span data-opt-label>Datei in R2, 30 Tage, Link im PostHog-Event</span>
+            <span data-opt-consequence>Feedback-Knopf hängt die Datei weiter an; Speicher kostet fast nichts.</span>
+          </label>
+          <label data-opt="cut">
+            <input type="radio" name="dm-r2-logs" value="cut">
+            <span data-opt-label>Gekürzt direkt ins Event (letzte 200 Zeilen)</span>
+            <span data-opt-consequence>Alles an einem Ort, aber lange Logs gehen verloren.</span>
+          </label>
+          <label data-opt="keep">
+            <input type="radio" name="dm-r2-logs" value="keep">
+            <span data-opt-label>Logs bleiben in der eigenen Tabelle</span>
+            <span data-opt-consequence>Zwei Quellen für Uploader-Fehler.</span>
+          </label>
+        </div>
+        <textarea data-comment="r2-logs-note" placeholder="Notiz (optional)"></textarea>
+        <input type="hidden" name="dm-r2-logs-none" value="">
+        <input type="hidden" name="dm-r2-logs-hes" value="{&quot;ms&quot;:13459,&quot;revisits&quot;:0,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-logs-touched" value="1">
+        <input type="hidden" name="dm-r2-logs-issue" value="">
+        <input type="hidden" name="dm-r2-logs-epic" value="">
+        <div data-alevel="3" data-title="Diagnose-Logs">
+          <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Logs stehen heute im Fehlertext der eigenen Tabelle."}'></div></div>
+          <div data-slot="long">
+            <div data-viz="compare" data-viz-spec='{"before":{"label":"Event mit Log","value":300},"after":{"label":"Event mit Link","value":1},"unit":"KB"}'></div>
+            <p>Der R2-Worker existiert schon für die 3D-Modelle.</p>
+          </div>
+          <div data-example><pre>{ "event": "uploader:job_finish",
+  "properties": { "outcome": "failed", "warnings": 14, "errors": 2,
+    "log_url": "https://sc-assets…/diag/2026-11-15/7f3a.log", "log_bytes": 284112 } }</pre></div>
+        </div>
+      </section>
+
+      <section id="r2-old" data-nav-label="Alte Telemetrie" data-decision="r2-old" data-decision-mode="single"
+               data-label="Alte Telemetrie" data-rec="parallel"
+               data-rec-why="Zwei Wochen parallel zeigen, ob PostHog dieselben Zahlen liefert, bevor etwas gelöscht wird."
+               data-applies-to="Tabelle telemetry_events und ihre Admin-Abschnitte" data-finding="r2-f-old">
+        <p data-applies>Gilt für: eigene Telemetrie-Tabelle und ihre Admin-Abschnitte</p>
+        <p data-situation>Wird die eigene Tabelle sofort gelöscht, fällt ein Fehler in der neuen Strecke erst auf, wenn die Zahlen fehlen.</p>
+        <h3 data-question>Was passiert mit der alten Telemetrie?</h3>
+        <p data-stakes>Risiko beim Umstieg und Speicher im 500-MB-Budget</p>
+        <div data-options>
+          <label data-opt="parallel" data-recommended>
+            <input type="radio" name="dm-r2-old" value="parallel">
+            <span data-opt-label>14 Tage parallel schreiben, dann Tabelle löschen</span>
+            <span data-opt-consequence>Vergleich möglich; danach eine Quelle, Speicher frei.</span>
+          </label>
+          <label data-opt="now">
+            <input type="radio" name="dm-r2-old" value="now" checked>
+            <span data-opt-label>Sofort umstellen und löschen</span>
+            <span data-opt-consequence>Am schnellsten; ein Fehler in der Weiterleitung verliert Daten.</span>
+          </label>
+          <label data-opt="archive">
+            <input type="radio" name="dm-r2-old" value="archive">
+            <span data-opt-label>Umstellen, Altdaten als Datei archivieren</span>
+            <span data-opt-consequence>Historie bleibt nachlesbar, aber nicht mehr in der App.</span>
+          </label>
+        </div>
+        <textarea data-comment="r2-old-note" placeholder="Notiz (optional)"></textarea>
+        <input type="hidden" name="dm-r2-old-none" value="">
+        <input type="hidden" name="dm-r2-old-hes" value="{&quot;ms&quot;:11304,&quot;revisits&quot;:0,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-old-touched" value="1">
+        <input type="hidden" name="dm-r2-old-issue" value="">
+        <input type="hidden" name="dm-r2-old-epic" value="">
+        <div data-alevel="3" data-title="Alte Telemetrie">
+          <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Alpha-Regel erlaubt das Löschen von Alt-Tabellen."}'></div></div>
+          <div data-slot="long">
+            <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Tag 0","value":"beide Ziele"},{"label":"Tag 1–14","value":"Zahlen vergleichen"},{"label":"Tag 15","value":"Tabelle + RPC weg"}]}'></div>
+            <p>Die Migration dokumentiert das Löschen, wie die Alpha-Regel verlangt.</p>
+          </div>
+          <div data-example><pre>Wegfallen nach dem Umstieg:
+  telemetry_events, get_telemetry_stats()
+  Admin-Abschnitte: nach Version, nach Kanal, Absturzarten, letzte Abstürze,
+  Abbrüche, Diagnosen  →  ersetzt durch die Top 3 + PostHog-Link</pre></div>
+        </div>
+      </section>
+
+      <section id="r2-convert" data-nav-label="Feedback-Knopf" data-decision="r2-convert" data-decision-mode="yesnoalt"
+               data-label="Feedback-Knopf" data-rec="yes"
+               data-rec-why="Das gibt es heute für Diagnosen; es macht aus jedem Signal ohne Abtippen eine Aufgabe."
+               data-applies-to="jedes Top-3-Element der Admin-Seite" data-finding="r2-f-convert">
+        <p data-applies>Gilt für: jedes Top-3-Element der Admin-Seite</p>
+        <p data-situation>Fehler, Dienste und Kontingent müsste ein Admin abtippen, um daraus eine Aufgabe zu machen; per Klick geht das nur bei Uploader-Diagnosen.</p>
+        <h3 data-question>Soll jedes Top-3-Element „In Feedback umwandeln“ bekommen?</h3>
+        <p data-stakes>Wie schnell ein Admin aus einem Signal eine Aufgabe macht</p>
+        <div data-options>
+          <label data-opt="yes" data-recommended>
+            <input type="radio" name="dm-r2-convert" value="yes" checked>
+            <span data-opt-label>Ja, mit vorausgefülltem Text und PostHog-Link</span>
+            <span data-opt-consequence>Gleicher Weg wie heute bei Diagnosen, nur für alle Themen.</span>
+          </label>
+          <label data-opt="no">
+            <input type="radio" name="dm-r2-convert" value="no">
+            <span data-opt-label>Nein, das erledigt der Wächter allein</span>
+            <span data-opt-consequence>Weniger Knöpfe; was unter der Schwelle bleibt, wird nie Aufgabe.</span>
+          </label>
+          <label data-opt="alt">
+            <input type="radio" name="dm-r2-convert" value="alt">
+            <span data-opt-label>Anders</span>
+            <input type="text" name="dm-r2-convert-alt" placeholder="Dein Weg" value="">
+          </label>
+        </div>
+        <textarea data-comment="r2-convert-note" placeholder="Notiz (optional)"></textarea>
+        <input type="hidden" name="dm-r2-convert-none" value="">
+        <input type="hidden" name="dm-r2-convert-hes" value="{&quot;ms&quot;:5095,&quot;revisits&quot;:0,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-convert-touched" value="1">
+        <input type="hidden" name="dm-r2-convert-issue" value="">
+        <input type="hidden" name="dm-r2-convert-epic" value="">
+        <div data-alevel="3" data-title="Feedback-Knopf">
+          <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Diagnose → Feedback gibt es schon."}'></div></div>
+          <div data-slot="long">
+            <div data-viz="bars" data-viz-spec='{"items":[{"label":"Diagnosen","value":1},{"label":"Fehler","value":0},{"label":"Dienste","value":0},{"label":"Kontingent","value":0}],"unit":"mit Knopf"}'></div>
+            <p>Der vorhandene Mechanismus füllt den Composer vor.</p>
+          </div>
+          <div data-example><pre>Composer, vorausgefüllt:
+  „UEX antwortet unzuverlässig: 25 % Fehler seit 01:10.
+   PostHog: eu.posthog.com/project/…/insights/…
+   Bitte Ursache prüfen und Fallback vorschlagen.“</pre></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- Thema B · Kontingent -->
+    <section id="r2-t-quota" data-topic data-nav-label="Kontingent im Blick">
+      <div data-alevel="2" data-title="Kontingent im Blick">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"5","unit":"Freikontingente","label":"die die App berührt"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Events","value":1000},{"label":"Feature-Flag-Abfragen","value":1000},{"label":"Exceptions","value":100},{"label":"KI-Events","value":100},{"label":"Replays","value":5}],"unit":"Tsd./Monat frei"}'></div>
+          <p>PostHog meldet Verbrauch über eine Abrechnungs-Schnittstelle; der Lese-Key braucht dafür ein zusätzliches Recht.</p>
+        </div>
+      </div>
+
+      <section id="r2-quota-scope" data-nav-label="Welche Kontingente" data-decision="r2-quota-scope" data-decision-mode="multi"
+               data-label="Welche Kontingente" data-rec="events exceptions replay llm"
+               data-rec-why="Diese vier wachsen mit den Beschlüssen aus Runde 1."
+               data-applies-to="Kontingent-Anzeige und -Warnung" data-finding="r2-f-quota-scope">
+        <p data-applies>Gilt für: Kontingent-Anzeige und -Warnung</p>
+        <p data-situation>Mit Replay, Server-Fehlern und KI-Events füllen sich vier Freikontingente statt einem; ist eines voll, verwirft PostHog im Freiplan den Rest des Monats.</p>
+        <h3 data-question>Welche Kontingente beobachtet die Seite?</h3>
+        <p data-stakes>Wie früh ein Datenverlust angekündigt wird</p>
+        <div data-options>
+          <label data-opt="events" data-recommended><input type="checkbox" name="dm-r2-quota-scope.events" checked><span data-opt-label>Events (1 Mio.)</span><span data-opt-consequence>Das größte und wichtigste.</span></label>
+          <label data-opt="exceptions" data-recommended><input type="checkbox" name="dm-r2-quota-scope.exceptions" checked><span data-opt-label>Exceptions (100 000)</span><span data-opt-consequence>Ein schlechtes Release kann es an einem Tag füllen.</span></label>
+          <label data-opt="replay" data-recommended><input type="checkbox" name="dm-r2-quota-scope.replay" checked><span data-opt-label>Replays (5 000)</span><span data-opt-consequence>Hängt an der Zahl der Fehler-Sitzungen.</span></label>
+          <label data-opt="llm" data-recommended><input type="checkbox" name="dm-r2-quota-scope.llm" checked><span data-opt-label>KI-Events (100 000)</span><span data-opt-consequence>Je Claude-Aufruf ein Event.</span></label>
+          <label data-opt="flags"><input type="checkbox" name="dm-r2-quota-scope.flags" checked><span data-opt-label>Feature-Flag-Abfragen (1 Mio.)</span><span data-opt-consequence>Kaum genutzt, solange es keine Flags gibt.</span></label>
+        </div>
+        <textarea data-comment="r2-quota-scope-note" placeholder="Notiz (optional)">könnten wir in dem zug nicht feature flags auch nutzen? z. B. für die admin / collaborateur funktionen? Das sind doch feature flags weil wir ja elemente anzeigen zbw. nicht anzeigen und das je rolle?! oder ist das security technisch doof!?</textarea>
+        <input type="hidden" name="dm-r2-quota-scope-none" value="">
+        <input type="hidden" name="dm-r2-quota-scope-hes" value="{&quot;ms&quot;:58560,&quot;revisits&quot;:1,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-quota-scope-touched" value="1">
+        <input type="hidden" name="dm-r2-quota-scope-issue" value="">
+        <input type="hidden" name="dm-r2-quota-scope-epic" value="">
+        <div data-alevel="3" data-title="Welche Kontingente">
+          <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Abrechnungs-API mit Leserecht billing:read."}'></div></div>
+          <div data-slot="long">
+            <div data-viz="bars" data-viz-spec='{"items":[{"label":"Events","value":31},{"label":"Exceptions","value":4},{"label":"Replays","value":0},{"label":"KI-Events","value":0}],"unit":"% heute (geschätzt)","hl":"Events"}'></div>
+            <p>Replay und KI-Events starten erst mit dem Umbau.</p>
+          </div>
+          <div data-example><pre>GET https://eu.posthog.com/api/billing/
+Authorization: Bearer phx_…   (Scope billing:read)
+→ products[].usage, .limit, .current_period_end</pre></div>
+        </div>
+      </section>
+
+      <section id="r2-forecast" data-nav-label="Hochrechnung" data-decision="r2-forecast" data-decision-mode="yesnoalt"
+               data-label="Hochrechnung" data-rec="yes"
+               data-rec-why="Bei 80 % am Tag 15 ist die Hälfte des Monats schon zu spät."
+               data-applies-to="Kontingent-Warnung" data-finding="r2-f-forecast">
+        <p data-applies>Gilt für: Kontingent-Warnung</p>
+        <p data-situation>Wer bei 80 % zum ersten Mal warnt, warnt an einem schnellen Tag erst, wenn die zweite Monatshälfte schon verloren ist.</p>
+        <h3 data-question>Zusätzlich warnen, wenn die Hochrechnung über 100 % liegt?</h3>
+        <p data-stakes>Zeitpunkt der ersten Warnung</p>
+        <div data-options>
+          <label data-opt="yes" data-recommended>
+            <input type="radio" name="dm-r2-forecast" value="yes" checked>
+            <span data-opt-label>Ja, Hochrechnung über 100 % ist schon gelb</span>
+            <span data-opt-consequence>Warnung oft Tage früher; 80 % bleibt die zweite Schwelle.</span>
+          </label>
+          <label data-opt="no">
+            <input type="radio" name="dm-r2-forecast" value="no">
+            <span data-opt-label>Nein, nur der Ist-Stand ab 80 %</span>
+            <span data-opt-consequence>Einfacher, aber oft spät.</span>
+          </label>
+          <label data-opt="alt">
+            <input type="radio" name="dm-r2-forecast" value="alt">
+            <span data-opt-label>Anders</span>
+            <input type="text" name="dm-r2-forecast-alt" placeholder="Deine Regel" value="">
+          </label>
+        </div>
+        <textarea data-comment="r2-forecast-note" placeholder="Notiz (optional)"></textarea>
+        <input type="hidden" name="dm-r2-forecast-none" value="">
+        <input type="hidden" name="dm-r2-forecast-hes" value="{&quot;ms&quot;:12141,&quot;revisits&quot;:1,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-forecast-touched" value="1">
+        <input type="hidden" name="dm-r2-forecast-issue" value="">
+        <input type="hidden" name="dm-r2-forecast-epic" value="">
+        <div data-alevel="3" data-title="Hochrechnung">
+          <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Prognose = Verbrauch ÷ vergangene Tage × Monatstage."}'></div></div>
+          <div data-slot="long">
+            <div data-viz="spark" data-viz-spec='{"points":[5,11,18,26,34,42,50,58,66,74,84],"label":"Verbrauch in % an einem Beispiel-Monat, Tag 1–15"}'></div>
+            <p>Im Beispiel wäre die Hochrechnung ab Tag 4 über 100 %.</p>
+          </div>
+          <div data-example><pre>Tag 4:  26 % verbraucht → Prognose 195 %  → gelb (neu)
+Tag 12: 80 % verbraucht                  → gelb (heute die erste Warnung)</pre></div>
+        </div>
+      </section>
+
+      <section id="r2-throttle" data-nav-label="Notbremse" data-decision="r2-throttle" data-decision-mode="single"
+               data-label="Notbremse" data-rec="lowfirst"
+               data-rec-why="Wenn etwas wegfallen muss, dann Komfortdaten, nie Fehler."
+               data-applies-to="kurz vor einem vollen Kontingent" data-finding="r2-f-throttle">
+        <p data-applies>Gilt für: kurz vor einem vollen Kontingent</p>
+        <p data-situation>Ist ein Freikontingent voll, verwirft PostHog ab dann alles, auch die Fehler, die der Wächter für Board-Einträge braucht.</p>
+        <h3 data-question>Soll die App kurz vor dem Limit selbst bremsen?</h3>
+        <p data-stakes>Ob Fehler am Monatsende noch ankommen</p>
+        <div data-options>
+          <label data-opt="lowfirst" data-recommended>
+            <input type="radio" name="dm-r2-throttle" value="lowfirst" checked>
+            <span data-opt-label>Ab 95 %: Replay und Heatmaps pausieren, Fehler nie</span>
+            <span data-opt-consequence>Fehler und Kern-Events kommen bis Monatsende an.</span>
+          </label>
+          <label data-opt="sample">
+            <input type="radio" name="dm-r2-throttle" value="sample">
+            <span data-opt-label>Ab 95 %: alle Nicht-Fehler-Events zur Hälfte sampeln</span>
+            <span data-opt-consequence>Mehr Puffer, aber Zahlen werden ungenau.</span>
+          </label>
+          <label data-opt="none">
+            <input type="radio" name="dm-r2-throttle" value="none">
+            <span data-opt-label>Keine Automatik, nur die Warnung</span>
+            <span data-opt-consequence>Ein Admin muss reagieren, sonst ist der Rest weg.</span>
+          </label>
+        </div>
+        <textarea data-comment="r2-throttle-note" placeholder="Notiz (optional)"></textarea>
+        <input type="hidden" name="dm-r2-throttle-none" value="">
+        <input type="hidden" name="dm-r2-throttle-hes" value="{&quot;ms&quot;:5816,&quot;revisits&quot;:0,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-throttle-touched" value="1">
+        <input type="hidden" name="dm-r2-throttle-issue" value="">
+        <input type="hidden" name="dm-r2-throttle-epic" value="">
+        <div data-alevel="3" data-title="Notbremse">
+          <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Freiplan: über dem Limit wird verworfen."}'></div></div>
+          <div data-slot="long">
+            <div data-viz="compare" data-viz-spec='{"before":{"label":"Fehler ab vollem Limit","value":0},"after":{"label":"mit Notbremse","value":100},"unit":"% ankommend"}'></div>
+            <p>Die App liest dafür ein Feature Flag, das der Kontingent-Wächter setzt.</p>
+          </div>
+          <div data-example><pre>Flag "telemetry-saver" = true   (gesetzt bei Prognose ≥ 95 %)
+→ App: disable_session_recording, enable_heatmaps = false
+→ $exception, Server-Events, Kern-Events unverändert</pre></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- Thema C · Event-Katalog -->
+    <section id="r2-t-events" data-topic data-nav-label="Event-Katalog">
+      <div data-alevel="2" data-title="Event-Katalog">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"30 → ≈ 110","unit":"Events","label":"nach breitem Ausbau"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"heute","value":30},{"label":"nach Ausbau (Schätzung)","value":110}],"unit":"Event-Namen"}'></div>
+          <p>Bei über hundert Namen entscheidet die Konvention, ob ein Admin in PostHog etwas findet.</p>
+        </div>
+      </div>
+
+      <section id="r2-naming" data-nav-label="Namensschema" data-decision="r2-naming" data-decision-mode="single"
+               data-label="Namensschema" data-rec="ph"
+               data-rec-why="PostHogs eigene Empfehlung; die Historie ist erst Tage alt, Umbenennen kostet jetzt fast nichts."
+               data-applies-to="alle Event-Namen" data-finding="r2-f-naming">
+        <p data-applies>Gilt für: alle Event-Namen</p>
+        <p data-situation>Bei hundert Event-Namen findet in PostHog niemand das richtige, wenn drei Schreibweisen gemischt sind, wie schon bei den 30 heutigen.</p>
+        <h3 data-question>Nach welchem Schema heißen Events?</h3>
+        <p data-stakes>Auffindbarkeit in PostHog und Umbenennung der 30 bestehenden</p>
+        <div data-options>
+          <label data-opt="ph" data-recommended>
+            <input type="radio" name="dm-r2-naming" value="ph" checked>
+            <span data-opt-label>PostHog-Schema bereich:objekt_verb (Präsens)</span>
+            <span data-opt-consequence>hangar:ship_add, codex:ship_view; die 30 alten Namen bekommen eine Action als Brücke.</span>
+          </label>
+          <label data-opt="keep">
+            <input type="radio" name="dm-r2-naming" value="keep">
+            <span data-opt-label>Bestehendes bereich_objekt_verb (Vergangenheit) festschreiben</span>
+            <span data-opt-consequence>Keine Umbenennung; codex_ship_opened, weicht von PostHogs Doku ab.</span>
+          </label>
+          <label data-opt="words">
+            <input type="radio" name="dm-r2-naming" value="words">
+            <span data-opt-label>Lesbare Wörter „Objekt Verb“</span>
+            <span data-opt-consequence>„Ship Added“; gut lesbar, im Code fehleranfällig.</span>
+          </label>
+        </div>
+        <textarea data-comment="r2-naming-note" placeholder="Notiz (optional)"></textarea>
+        <input type="hidden" name="dm-r2-naming-none" value="">
+        <input type="hidden" name="dm-r2-naming-hes" value="{&quot;ms&quot;:6023,&quot;revisits&quot;:0,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-naming-touched" value="1">
+        <input type="hidden" name="dm-r2-naming-issue" value="">
+        <input type="hidden" name="dm-r2-naming-epic" value="">
+        <div data-alevel="3" data-title="Namensschema">
+          <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Drei Schreibweisen in 30 Events."}'></div></div>
+          <div data-slot="long">
+            <div data-viz="donut" data-viz-spec='{"parts":[{"label":"bereich_objekt_verb","value":19},{"label":"bereich_verb_objekt","value":8},{"label":"ohne Bereich","value":3}]}'></div>
+            <p>PostHog empfiehlt feste Verben im Präsens und Namen nie mit Personendaten.</p>
+          </div>
+          <div data-example><pre>heute                       PostHog-Schema
+hangar_ship_added           hangar:ship_add
+verse_door_open             verse:door_open
+settings_language_changed   settings:language_change
+user_signed_in              auth:session_start
+web_vitals                  (entfällt, PostHog misst selbst)</pre></div>
+        </div>
+      </section>
+
+      <section id="r2-catalog" data-nav-label="Wo der Katalog lebt" data-decision="r2-catalog" data-decision-mode="single"
+               data-label="Wo der Katalog lebt" data-rec="typed"
+               data-rec-why="Nur eine Liste im Code kann der Build prüfen; PostHog bekommt sie automatisch mit Beschreibung."
+               data-applies-to="Event-Katalog und Konvention" data-finding="r2-f-catalog">
+        <p data-applies>Gilt für: Event-Katalog und Konvention</p>
+        <p data-situation>Ein Event, das nur im Code steht, taucht in PostHog ohne Beschreibung auf; ein Tippfehler im Namen erzeugt still ein zweites Event.</p>
+        <h3 data-question>Wo lebt der Katalog?</h3>
+        <p data-stakes>Ob Doppelungen und Tippfehler auffallen</p>
+        <div data-options>
+          <label data-opt="typed" data-recommended>
+            <input type="radio" name="dm-r2-catalog" value="typed" checked>
+            <span data-opt-label>Typisierte Liste im Code, Build prüft, PostHog wird synchronisiert</span>
+            <span data-opt-consequence>Unbekannte Namen brechen den Build; Beschreibungen erscheinen in PostHog.</span>
+          </label>
+          <label data-opt="doc">
+            <input type="radio" name="dm-r2-catalog" value="doc">
+            <span data-opt-label>Nur eine Doku-Seite im Repo</span>
+            <span data-opt-consequence>Schnell geschrieben, veraltet aber unbemerkt.</span>
+          </label>
+          <label data-opt="ph">
+            <input type="radio" name="dm-r2-catalog" value="ph">
+            <span data-opt-label>Nur in PostHogs Datenverwaltung</span>
+            <span data-opt-consequence>Admins sehen es dort, der Code weiß nichts davon.</span>
+          </label>
+        </div>
+        <textarea data-comment="r2-catalog-note" placeholder="Notiz (optional)"></textarea>
+        <input type="hidden" name="dm-r2-catalog-none" value="">
+        <input type="hidden" name="dm-r2-catalog-hes" value="{&quot;ms&quot;:41509,&quot;revisits&quot;:1,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-catalog-touched" value="1">
+        <input type="hidden" name="dm-r2-catalog-issue" value="">
+        <input type="hidden" name="dm-r2-catalog-epic" value="">
+        <div data-alevel="3" data-title="Wo der Katalog lebt">
+          <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Heute ist nur der Verse-Teil typisiert."}'></div></div>
+          <div data-slot="long">
+            <div data-viz="compare" data-viz-spec='{"before":{"label":"typisierte Events heute","value":5},"after":{"label":"mit Katalog","value":110},"unit":"Events"}'></div>
+            <p>Ein Prebuild-Wächter dieser Art gibt es schon für native Dialoge.</p>
+          </div>
+          <div data-example><pre>// src/app/core/analytics/events.ts
+export const EVENTS = {
+  'codex:ship_view': { area: 'codex', desc: 'Schiffsseite geöffnet', props: { ship: 'class_name' } },
+  …
+} as const;
+analytics.track('codex:ship_view', { ship })   // unbekannter Name = Typfehler
+
+npm run analytics:sync   → PostHog event_definitions (Beschreibung, Tags, verified)</pre></div>
+        </div>
+      </section>
+
+      <section id="r2-areas" data-nav-label="Welche Bereiche" data-decision="r2-areas" data-decision-mode="multi"
+               data-label="Welche Bereiche" data-rec="codex hq verse news social search settings auth feedback desktop"
+               data-rec-why="„Wirklich breit“: jeder Bereich, den Nutzer sehen; Admin-Klicks trennt die Rolle."
+               data-applies-to="Ausbau der Events" data-finding="r2-f-areas">
+        <p data-applies>Gilt für: Ausbau der Events</p>
+        <p data-situation>Codex, HQ, News, Freunde und Suche senden heute kein einziges Produkt-Event; gerade dort entsteht die meiste Nutzung.</p>
+        <h3 data-question>Welche Bereiche werden vollständig vermessen?</h3>
+        <p data-stakes>Umfang des Ausbaus und des Event-Kontingents</p>
+        <div data-options>
+          <label data-opt="codex" data-recommended><input type="checkbox" name="dm-r2-areas.codex" checked><span data-opt-label>Codex</span><span data-opt-consequence>Schiffe, Gegenstände, Vergleich, Holotisch, Filter.</span></label>
+          <label data-opt="hq" data-recommended><input type="checkbox" name="dm-r2-areas.hq" checked><span data-opt-label>HQ</span><span data-opt-consequence>Planen, Bestand, Nachschub, Events.</span></label>
+          <label data-opt="verse" data-recommended><input type="checkbox" name="dm-r2-areas.verse" checked><span data-opt-label>Verse</span><span data-opt-consequence>Sternkarte, Rang, Briefing (heute teilweise).</span></label>
+          <label data-opt="news" data-recommended><input type="checkbox" name="dm-r2-areas.news" checked><span data-opt-label>News und Patches</span><span data-opt-consequence>Artikel, Kanäle, Patch-Stabilität.</span></label>
+          <label data-opt="social" data-recommended><input type="checkbox" name="dm-r2-areas.social" checked><span data-opt-label>Freunde und Teilen</span><span data-opt-consequence>Einladungen, geteilte Loadouts.</span></label>
+          <label data-opt="search" data-recommended><input type="checkbox" name="dm-r2-areas.search" checked><span data-opt-label>Suche</span><span data-opt-consequence>Treffer ja/nein, ohne Suchtext.</span></label>
+          <label data-opt="settings" data-recommended><input type="checkbox" name="dm-r2-areas.settings" checked><span data-opt-label>Einstellungen</span><span data-opt-consequence>Heute schon da, wird umbenannt.</span></label>
+          <label data-opt="auth" data-recommended><input type="checkbox" name="dm-r2-areas.auth" checked><span data-opt-label>Anmeldung</span><span data-opt-consequence>Funnel-Schritte.</span></label>
+          <label data-opt="feedback" data-recommended><input type="checkbox" name="dm-r2-areas.feedback" checked><span data-opt-label>Feedback</span><span data-opt-consequence>Absenden, Antwort gelesen.</span></label>
+          <label data-opt="desktop" data-recommended><input type="checkbox" name="dm-r2-areas.desktop" checked><span data-opt-label>Desktop-Apps</span><span data-opt-consequence>Installation, Upload, Starscape.</span></label>
+          <label data-opt="admin"><input type="checkbox" name="dm-r2-areas.admin" checked><span data-opt-label>Admin-Bereich</span><span data-opt-consequence>Zeigt, welche Admin-Werkzeuge genutzt werden.</span></label>
+        </div>
+        <textarea data-comment="r2-areas-note" placeholder="Notiz (optional)"></textarea>
+        <input type="hidden" name="dm-r2-areas-none" value="">
+        <input type="hidden" name="dm-r2-areas-hes" value="{&quot;ms&quot;:10257,&quot;revisits&quot;:1,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-areas-touched" value="1">
+        <input type="hidden" name="dm-r2-areas-issue" value="">
+        <input type="hidden" name="dm-r2-areas-epic" value="">
+        <div data-alevel="3" data-title="Welche Bereiche">
+          <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"5","unit":"Bereiche ohne Events"}'></div></div>
+          <div data-slot="long">
+            <div data-viz="bars" data-viz-spec='{"items":[{"label":"Hangar","value":8},{"label":"Einstellungen","value":7},{"label":"Verse","value":5},{"label":"Codex","value":0},{"label":"HQ","value":0},{"label":"News","value":0},{"label":"Freunde","value":0},{"label":"Suche","value":0}],"unit":"Events","hl":"Codex"}'></div>
+            <p>Gezählt aus allen Capture-Aufrufen im App-Code.</p>
+          </div>
+          <div data-example><pre>codex:ship_view      codex:compare_start    codex:filter_apply
+hq:plan_create       hq:supply_request      news:article_open
+social:invite_send   search:result_open     auth:login_step_complete
+desktop:upload_finish  starscape:image_share</pre></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- Thema D · PostHog-Aufbau -->
+    <section id="r2-t-setup" data-topic data-nav-label="PostHog-Aufbau">
+      <div data-alevel="2" data-title="PostHog-Aufbau">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"3","unit":"Dashboards","label":"höchstens, alles erreichbar"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="donut" data-viz-spec='{"parts":[{"label":"einfache Berichte","value":30},{"label":"übergreifende Abläufe","value":70}]}'></div>
+          <p>Fest steht das Verhältnis und die Obergrenze. Offen sind, wie der Aufbau entsteht, wie die drei Dashboards geschnitten sind und welche Abläufe zuerst kommen.</p>
+        </div>
+      </div>
+
+      <section id="r2-ascode" data-nav-label="Wie der Aufbau entsteht" data-decision="r2-ascode" data-decision-mode="single"
+               data-label="Wie der Aufbau entsteht" data-rec="defs"
+               data-rec-why="PostHog hat ein offizielles Werkzeug für Dashboards und Berichte als Code; geklickte Einstellungen lassen sich nicht prüfen oder wiederholen."
+               data-applies-to="Actions, Berichte, Dashboards, Alarme in PostHog" data-finding="r2-f-ascode">
+        <p data-applies>Gilt für: Actions, Berichte, Dashboards, Alarme in PostHog</p>
+        <p data-situation>Per Browser geklickte Berichte stehen nirgends im Repo; ändert sich ein Event-Name, bricht ein Bericht still, und niemand kann ihn wiederherstellen.</p>
+        <h3 data-question>Wie entstehen Berichte und Dashboards?</h3>
+        <p data-context>Du hattest das Edge-Plugin genannt. Es bleibt für das Anlegen des Schlüssels; die Frage ist, was danach den Aufbau hält.</p>
+        <p data-stakes>Wartbarkeit, wenn Events dazukommen oder umbenannt werden</p>
+        <div data-options>
+          <label data-opt="defs" data-recommended>
+            <input type="radio" name="dm-r2-ascode" value="defs">
+            <span data-opt-label>Als Code im Repo mit PostHogs „Definitions“</span>
+            <span data-opt-consequence>Versioniert, im CI angewendet; ein umbenanntes Event bricht den Build statt den Bericht.</span>
+          </label>
+          <label data-opt="api">
+            <input type="radio" name="dm-r2-ascode" value="api">
+            <span data-opt-label>Eigenes Skript gegen die REST-API</span>
+            <span data-opt-consequence>Volle Kontrolle; Suchen-und-Aktualisieren selbst schreiben.</span>
+          </label>
+          <label data-opt="browser">
+            <input type="radio" name="dm-r2-ascode" value="browser">
+            <span data-opt-label>Per Edge-Plugin in der PostHog-Oberfläche klicken</span>
+            <span data-opt-consequence>Schnell sichtbar; nicht wiederholbar, nicht prüfbar.</span>
+          </label>
+        </div>
+        <textarea data-comment="r2-ascode-note" placeholder="Notiz (optional)">Mir geht es darum, dass wenn wir hier alles machen, haben wir ja in posthog viele daten, aber posthog beietet jha auch tolle visualisierungen und dashbaords etc. diese sollst du dort in posthog konfigurieren, dass wenn ein admin nicht zu einenm thema / warning abspringt sondern eeinfach mal für einen überblick dort hin geht, stöbern kann! Wenn du es per api machne kannst super oder posthog mcp ansonsten diese dashboards und berichte und flows und co. in posthog per browser automatisiert durch diech erstellen / konfigurieren, überprüfen und etesten !</textarea>
+        <input type="hidden" name="dm-r2-ascode-none" value="1">
+        <input type="hidden" name="dm-r2-ascode-hes" value="{&quot;ms&quot;:129674,&quot;revisits&quot;:1,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-ascode-touched" value="1">
+        <input type="hidden" name="dm-r2-ascode-issue" value="">
+        <input type="hidden" name="dm-r2-ascode-epic" value="">
+        <div data-alevel="3" data-title="Wie der Aufbau entsteht">
+          <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"posthog-definitions: Dashboards, Insights, Actions als TypeScript."}'></div></div>
+          <div data-slot="long">
+            <div data-viz="flow" data-viz-spec='{"steps":[{"label":"events.ts","value":"Katalog"},{"label":"posthog/*.ts","value":"Berichte, Dashboards"},{"label":"CI","value":"apply nach Merge"},{"label":"PostHog","value":"aktuell"}]}'></div>
+            <p>Der Schlüssel braucht dafür zusätzlich Schreibrechte auf Insights, Dashboards und Actions.</p>
+          </div>
+          <div data-example><pre>// posthog/dashboards/laeuft-es.ts
+export default dashboard('Läuft es?', [
+  trends('Neue Fehlergruppen', { event: '$exception', breakdown: 'source' }),
+  funnel('Login', ['auth:login_start', 'auth:login_step_complete', 'auth:session_start']),
+])
+// npx posthog-definitions apply   (EU-Host, Personal Key)</pre></div>
+        </div>
+      </section>
+
+      <section id="r2-dash" data-nav-label="Schnitt der Dashboards" data-decision="r2-dash" data-decision-mode="single"
+               data-label="Schnitt der Dashboards" data-rec="question"
+               data-rec-why="Gelegenheits-Admins kommen mit einer Frage, nicht mit einem Systemteil im Kopf."
+               data-applies-to="die drei PostHog-Dashboards" data-finding="r2-f-dash">
+        <p data-applies>Gilt für: die drei PostHog-Dashboards</p>
+        <p data-situation>Mit drei Dashboards muss jeder Bericht einen eindeutigen Platz haben, sonst sucht ein Admin in allen dreien.</p>
+        <h3 data-question>Wonach werden die drei Dashboards geschnitten?</h3>
+        <p data-stakes>Wo ein Admin nach einem Deep-Link aus der Admin-Seite landet</p>
+        <div data-options>
+          <label data-opt="question" data-recommended>
+            <input type="radio" name="dm-r2-dash" value="question" checked>
+            <span data-opt-label>Nach Frage: Läuft es? · Wird es genutzt? · Was kostet es?</span>
+            <span data-opt-consequence>Fehler und Dienste · Abläufe und Bindung · KI und Kontingent.</span>
+          </label>
+          <label data-opt="surface">
+            <input type="radio" name="dm-r2-dash" value="surface">
+            <span data-opt-label>Nach Oberfläche: Web · Server · Desktop</span>
+            <span data-opt-consequence>Klar für Technik; ein Ablauf über Web und Desktop zerfällt.</span>
+          </label>
+          <label data-opt="depth">
+            <input type="radio" name="dm-r2-dash" value="depth">
+            <span data-opt-label>Nach Tiefe: Überblick · Abläufe · Technik</span>
+            <span data-opt-consequence>Ein Einstieg für alle; Fehler und Kosten teilen sich „Technik“.</span>
+          </label>
+        </div>
+        <textarea data-comment="r2-dash-note" placeholder="Notiz (optional)"></textarea>
+        <input type="hidden" name="dm-r2-dash-none" value="">
+        <input type="hidden" name="dm-r2-dash-hes" value="{&quot;ms&quot;:19217,&quot;revisits&quot;:0,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-dash-touched" value="">
+        <input type="hidden" name="dm-r2-dash-issue" value="">
+        <input type="hidden" name="dm-r2-dash-epic" value="">
+        <div data-alevel="3" data-title="Schnitt der Dashboards">
+          <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Jede Karte der Admin-Seite verlinkt auf genau ein Dashboard."}'></div></div>
+          <div data-slot="long">
+            <div data-viz="bars" data-viz-spec='{"items":[{"label":"Läuft es?","value":12},{"label":"Wird es genutzt?","value":16},{"label":"Was kostet es?","value":6}],"unit":"Berichte (Entwurf)"}'></div>
+            <p>Grobe Verteilung für etwa 34 Berichte beim Fragen-Schnitt.</p>
+          </div>
+          <div data-example><pre>Admin-Karte        → PostHog-Dashboard
+Fehler, Dienste    → Läuft es?
+Nutzung, Desktop   → Wird es genutzt?
+KI, Kontingent     → Was kostet es?</pre></div>
+        </div>
+      </section>
+
+      <section id="r2-knowledge" data-nav-label="Projektwissen für Claude" data-decision="r2-knowledge" data-decision-mode="multi"
+               data-label="Projektwissen für Claude" data-rec="doc claudemd routine skills"
+               data-rec-why="Nur was im Repo steht, kennt jede Session, auch die Routine und Cloud-Sessions."
+               data-applies-to="git-getrackte Claude-Anweisungen im Repo" data-finding="r2-f-knowledge">
+        <p data-applies>Gilt für: git-getrackte Claude-Anweisungen im Repo</p>
+        <p data-situation>Eine neue Session weiß nicht, dass es PostHog-Daten gibt; sie rät bei Analysen und baut Events am Katalog vorbei, solange nur eine persönliche Memory davon weiß.</p>
+        <h3 data-question>Wo soll das PostHog-Wissen für Claude stehen?</h3>
+        <p data-context>Fest steht nach deiner Notiz: es kommt ins Repo, nicht nur in die Memory.</p>
+        <p data-stakes>Ob Analysen und Umsetzungen PostHog von selbst einbeziehen</p>
+        <div data-options>
+          <label data-opt="doc" data-recommended><input type="checkbox" name="dm-r2-knowledge.doc" checked><span data-opt-label>Eigene Wissensdatei unter .claude/deep-knowledge</span><span data-opt-consequence>Katalog, Dashboards, Abfragen per MCP, Kontingente, Datenschutz-Grenzen.</span></label>
+          <label data-opt="claudemd" data-recommended><input type="checkbox" name="dm-r2-knowledge.claudemd" checked><span data-opt-label>Regel in CLAUDE.md</span><span data-opt-consequence>„Neue Funktion = Events aus dem Katalog; Analyse = erst PostHog fragen.“</span></label>
+          <label data-opt="routine" data-recommended><input type="checkbox" name="dm-r2-knowledge.routine" checked><span data-opt-label>Feedback-Routine bekommt PostHog-Zugriff</span><span data-opt-consequence>Prompt-Kopie im Repo und MCP-Eintrag, damit Diagnosen Daten sehen.</span></label>
+          <label data-opt="skills" data-recommended><input type="checkbox" name="dm-r2-knowledge.skills" checked><span data-opt-label>Projekt-Erweiterungen der Skills</span><span data-opt-consequence>Konzept- und Ship-Erweiterung fragen: welche Events, welcher Bericht?</span></label>
+        </div>
+        <textarea data-comment="r2-knowledge-note" placeholder="Notiz (optional)"></textarea>
+        <input type="hidden" name="dm-r2-knowledge-none" value="">
+        <input type="hidden" name="dm-r2-knowledge-hes" value="{&quot;ms&quot;:13299,&quot;revisits&quot;:0,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-knowledge-touched" value="1">
+        <input type="hidden" name="dm-r2-knowledge-issue" value="">
+        <input type="hidden" name="dm-r2-knowledge-epic" value="">
+        <div data-alevel="3" data-title="Projektwissen für Claude">
+          <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Neun Wissensdateien im Repo, keine zu PostHog."}'></div></div>
+          <div data-slot="long">
+            <div data-viz="bars" data-viz-spec='{"items":[{"label":"Supabase","value":1},{"label":"Speicher","value":1},{"label":"Feedback-Watcher","value":1},{"label":"PostHog","value":0}],"unit":"Wissensdateien","hl":"PostHog"}'></div>
+            <p>Die Deep-Knowledge-Liste in CLAUDE.md verweist auf jede dieser Dateien.</p>
+          </div>
+          <div data-example><pre>CLAUDE.md → Deep Knowledge
+  - `.claude/deep-knowledge/posthog.md` — Event-Katalog und Schema, die drei Dashboards,
+    Abfragen per MCP/HogQL, Kontingente, was nie gesendet wird
+
+CLAUDE.md → Key Rules
+  - Neue Nutzer-Aktion = Event aus src/app/core/analytics/events.ts; Analyse = erst PostHog</pre></div>
+        </div>
+      </section>
+
+      <section id="r2-flows" data-nav-label="Wichtigste Abläufe" data-decision="r2-flows" data-decision-mode="order"
+               data-label="Wichtigste Abläufe" data-rec="onboard,codex,error,hangar,feedback,desktop,verse"
+               data-rec-why="Erst der Einstieg, dann der meistgenutzte Bereich, dann was Nutzer verlieren lässt."
+               data-applies-to="die übergreifenden Berichte (70 %)" data-finding="r2-f-flows">
+        <p data-applies>Gilt für: die übergreifenden Berichte (70 %)</p>
+        <p data-situation>Übergreifende Berichte zeigen, wo Nutzer aussteigen; ohne Reihenfolge entstehen zuerst die leichten statt der wichtigen.</p>
+        <h3 data-question>In welcher Reihenfolge kommen die Abläufe?</h3>
+        <p data-context>Ziehen zum Umsortieren; oben = zuerst gebaut.</p>
+        <p data-stakes>Welche Funnels, Pfade und Bindungs-Berichte zuerst stehen</p>
+        <input type="hidden" name="dm-r2-flows" value="onboard,codex,error,hangar,feedback,desktop,verse">
+        <div data-options>
+          <div data-opt="onboard"><span data-opt-label>Erstbesuch → Anmeldung → erstes Schiff im Hangar</span><span data-opt-consequence>Funnel und Bindung nach 7 Tagen.</span></div>
+          <div data-opt="codex"><span data-opt-label>Codex: Suche → Schiff → Vergleich oder Loadout</span><span data-opt-consequence>Pfade aus der Suche.</span></div>
+          <div data-opt="error"><span data-opt-label>Fehler gesehen → Absprung oder weiter</span><span data-opt-consequence>Wie teuer ein Fehler wirklich ist.</span></div>
+          <div data-opt="hangar"><span data-opt-label>Hangar: Import → Flotte → Flaggschiff</span><span data-opt-consequence>Funnel des Imports.</span></div>
+          <div data-opt="feedback"><span data-opt-label>Feedback → Antwort gelesen → ausgeliefert</span><span data-opt-consequence>Schließt sich der Kreis für Nutzer?</span></div>
+          <div data-opt="desktop"><span data-opt-label>Desktop: Installation → erster Upload → Daten im Codex</span><span data-opt-consequence>Über Web und Desktop hinweg.</span></div>
+          <div data-opt="verse"><span data-opt-label>Verse: Briefing → Tür → Stern verdient</span><span data-opt-consequence>Wiederkehr über Wochen.</span></div>
+        </div>
+        <textarea data-comment="r2-flows-note" placeholder="Notiz (optional)"></textarea>
+        <input type="hidden" name="dm-r2-flows-hes" value="{&quot;ms&quot;:3549,&quot;revisits&quot;:0,&quot;median&quot;:11723}">
+        <input type="hidden" name="dm-r2-flows-touched" value="1">
+        <input type="hidden" name="dm-r2-flows-issue" value="">
+        <input type="hidden" name="dm-r2-flows-epic" value="">
+        <div data-alevel="3" data-title="Wichtigste Abläufe">
+          <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Sieben Abläufe, die über Bereiche gehen."}'></div></div>
+          <div data-slot="long">
+            <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Erstbesuch","value":"100 %"},{"label":"Anmeldung","value":"?"},{"label":"erstes Schiff","value":"?"},{"label":"Woche 2","value":"?"}]}'></div>
+            <p>Heute lässt sich keine dieser Stufen messen.</p>
+          </div>
+          <div data-example><pre>Funnel „Einstieg“ (PostHog)
+  $pageview /login  →  auth:session_start  →  hangar:ship_add  →  wiederkehr 7 T
+  Aufschlüsselung: Herkunft (UTM), Gerät</pre></div>
+        </div>
+      </section>
+    </section>
+  </section>
+</section>
