@@ -38,8 +38,10 @@ export function fpsEquipMode(): boolean {
  * query. Pinned in app.routes.spec.ts (AUD-144). Old aliases (news, hangar,
  * codex/set, tools/extension, ...) are NOT bridged any more (alpha cleanup,
  * concept 2026-10-30): they fall through to '**', the real 404 page. The app bridges (/hangar/import, /starscape,
- * /uploader/auth, /desktop/connect) went on 2026-11-08: every binary that called them talks to
+ * /uploader/auth) went on 2026-11-08: every binary that called them talks to
  * the removed sc-companion host, so they could no longer be reached.
+ * /desktop/connect is the exception: installed desktop builds (<= v0.109) still
+ * open it on THIS host, so it redirects to /apps/starscape/connect (below).
  */
 export const routes: Routes = [
   {
@@ -151,6 +153,14 @@ export const routes: Routes = [
           import('./auth/access-unavailable.component').then((m) => m.AccessUnavailableComponent),
       },
     ],
+  },
+  {
+    // Legacy entry of the desktop Connect flow: installed builds (<= v0.109)
+    // open /desktop/connect?cb=...&state=... . Relative string redirect so the
+    // query (cb, state) survives (AUD-144); pinned in app.routes.spec.ts.
+    path: 'desktop/connect',
+    pathMatch: 'full',
+    redirectTo: 'apps/starscape/connect',
   },
   {
     // Read-auth handoff for the SCC Electron app — open to ANY approved,
