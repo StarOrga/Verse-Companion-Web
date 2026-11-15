@@ -86,7 +86,7 @@
     "@starorga/star-ui": "github:StarOrga/StarUI#v0.2.0",
     "@supabase/supabase-js": "^2.119.0",
     "modern-screenshot": "^4.7.0",
-    "posthog-js": "^1.444.0",
+    "posthog-js": "^1.447.15",
     "qrcode-generator": "^2.0.4",
     "rxjs": "~7.8.0",
     "three": "^0.183.2",
@@ -109,9 +109,9 @@
     "playwright": "^1.65.0",
     "png-to-ico": "^3.0.2",
     "pngjs": "^7.0.0",
-    "supabase": "^3.0.0",
+    "supabase": "^3.1.0",
     "typescript": "~6.0.3",
-    "typescript-eslint": "8.72.1",
+    "typescript-eslint": "8.72.2",
     "vitest": "^5.1.0"
   },
   "overrides": {
