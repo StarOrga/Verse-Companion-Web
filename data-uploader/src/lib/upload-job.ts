@@ -97,7 +97,7 @@ export interface UploadJobState {
   catalog: CatalogStage;
   silhouettes: SilhouetteStage;
   skins: SkinStage;
-  /** Absent on jobs written before 0.81.4 — see `resume-compat.ts`. */
+  /** Absent on jobs written before 0.81.5 — see `resume-compat.ts`. */
   origin?: JobOrigin | null;
   error?: string | null;
 }

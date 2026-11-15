@@ -20,7 +20,7 @@
  *     still skip what is unchanged).
  *   - nothing changed → `keep`, resume exactly where it stopped.
  *
- * A job from before origins were recorded (≤ 0.81.3) is judged by the
+ * A job from before origins were recorded (≤ 0.81.4) is judged by the
  * extract's own `tool_version`: the same uploader version keeps it, anything
  * else cannot be proven compatible and restarts — wrongly restarting costs a
  * re-run, wrongly resuming leaves mixed data.
