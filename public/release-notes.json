@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.265.2",
+  "current": "0.265.3",
   "releases": [
+    {
+      "version": "0.265.3",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "HQ: in the recent changes list the item name uses the full width between amount and bookmark button; location and time share one line below it."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.265.2",
       "date": "2026-11-15",
