@@ -171,7 +171,7 @@ export class MyConstellationsComponent implements AfterViewInit {
         `${BRAND_NAME} · ${p.patchLine}`,
         `${location.origin}/verse/explorer`,
       );
-      if (channel) this.analytics.captureVerse('starscape_share', { image_id: `constellation-${p.patchLine}`, channel });
+      if (channel) this.analytics.track('verse:starscape_share', { image_id: `constellation-${p.patchLine}`, channel });
       if (channel === 'copy') this.status.set('starmap.gallery.copied');
     } catch (err) {
       logWarn('starmap', 'share render failed', err);

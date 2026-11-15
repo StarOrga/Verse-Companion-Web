@@ -72,7 +72,7 @@ function configure(sb: ReturnType<typeof fakeSupabase>, router: ReturnType<typeo
       AuthService,
       { provide: SupabaseClientProvider, useValue: sb },
       { provide: Router, useValue: router },
-      { provide: AnalyticsService, useValue: { capture: (): void => {} } },
+      { provide: AnalyticsService, useValue: { track: (): void => {} } },
     ],
   });
 }

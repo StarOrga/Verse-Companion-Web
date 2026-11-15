@@ -25,6 +25,7 @@ import {
   hashCode,
   validateTargetPath,
 } from './_handoff.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -39,7 +40,7 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('handoff-create', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -111,4 +112,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
   }
 
   return json({ id: row.id, code, expires_at: expiresAt });
-});
+}));

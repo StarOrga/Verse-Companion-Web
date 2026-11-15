@@ -100,7 +100,7 @@ Prebuild-Guards ✔, `gate:mobile:quick` grün ✔.
 Deploy-Workflow nach dem Merge.
 
 Noch nicht untersucht: LCP liegt in der Lab-Messung auf `/verse` und `/codex`
-bei ~3 s (vor wie nach den Änderungen) — mit echten `web_vitals`-Daten aus
+bei ~3 s (vor wie nach den Änderungen) — mit echten Web-Vitals-Daten aus
 PostHog prüfen, ob das echte Nutzer betrifft, bevor man es angeht.
 
 ## 4. Offen — in dieser Reihenfolge
@@ -223,12 +223,11 @@ committen → pushen → hier abhaken.
     Regression). Gewinn klein: zone.js ≈ 40 ms Haupt-Thread pro Laden,
     11,6 kB gz.
 
-11. ~~**Echte Nutzerdaten**~~ — erledigt (`core/web-vitals.service.ts`):
-    Ereignis `web_vitals` (area = erstes Pfadsegment, navigation, ttfb, fcp,
-    lcp, cls, inp, long_tasks, long_task_ms, connection), einmal pro Laden beim
-    Verlassen/Ausblenden, nur mit Statistik-Einwilligung. Datenschutzerklärung
-    nennt jetzt „Ladezeiten“ (Stand November 2026). In PostHog auswerten, um zu
-    sehen, wo echte Nutzer hängen — die Lab-Messung sieht keine echten Geräte.
+11. ~~**Echte Nutzerdaten**~~ — erledigt: PostHogs eigene Web-Vitals-Erfassung
+    (`capture_performance: { web_vitals: true }`, LCP/INP/CLS/FCP), nur mit
+    Statistik-Einwilligung; der frühere eigene `web_vitals`-Dienst entfiel
+    (Telemetrie-Audit, November 2026). In PostHog auswerten, um zu sehen, wo
+    echte Nutzer hängen — die Lab-Messung sieht keine echten Geräte.
 
 12. **Abschluss**: voller Lauf (`npm run lint`, `npm test`, `npm run test:gate`,
     `npm run test:functions`, `npm run build`), Nachmessung mit dem Profiler,

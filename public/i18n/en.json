@@ -4535,7 +4535,7 @@
         "title": "In short",
         "noAds": "No advertising, no ad networks.",
         "signIn": "There are exactly two ways to sign in: e-mail address and password, or your Google account. The Google route is optional and does send data to Google.",
-        "noTracking": "No advertising trackers. Product analytics via PostHog (EU) only run if you allow them — off by default.",
+        "noTracking": "No advertising trackers. Product analytics via PostHog (EU) only run if you allow them — off by default. Our own server reports its errors and run times without any personal data.",
         "minimal": "Only the data the features need — nothing is sold or shared for marketing.",
         "euHosting": "Application data is stored in the EU (Supabase, region eu-central-1 / Frankfurt)."
       },
@@ -4582,7 +4582,8 @@
         "supabase": "Supabase (database, authentication, file storage) — EU region eu-central-1 (Frankfurt); processes your account and application data on our behalf.",
         "vercel": "Vercel Inc. (hosting, CDN) — delivery of the static app.",
         "google": "Google Sign-In (Google Ireland Limited / Google LLC) — only if you choose to sign in with Google; details in the \"Signing in with Google\" section.",
-        "posthog": "PostHog (product analytics and error diagnostics) — EU cloud (eu.i.posthog.com); captures anonymous usage events, page load times and errors, and only after you consent.",
+        "posthog": "PostHog (product analytics and error diagnostics) — EU cloud; requests go through this site's own address (/ingest). Only after you consent it captures usage events, page load times, dead clicks and heatmaps, and errors. Sessions in which an error occurs are recorded for replay with all inputs masked. If you are signed in, PostHog sees a pseudonymous ID (a salted hash of your account ID) and your role (viewer, collaborator or admin) — never your e-mail address or name.",
+        "posthogServer": "PostHog (server side) — our own server functions report their errors and run times to PostHog (EU cloud), without IP address, user ID or content. This does not depend on your consent because no personal data is involved. The desktop apps forward their crash reports (and usage counts, if you allow it in the app) the same way — tied only to a pre-hashed installation identifier, never to your account.",
         "fonts": "Google Fonts — font files are loaded from Google servers; Google may see your IP address.",
         "rsiMedia": "Images in the Verse news are partly loaded straight from Roberts Space Industries servers (media.robertsspaceindustries.com, theverse.robertsspaceindustries.com) — RSI sees your IP address while they load.",
         "gameApis": "Public Star Citizen data: status.robertsspaceindustries.com and api.star-citizen.wiki (read-only, no account data is sent)."
@@ -4834,110 +4835,84 @@
     "open": "Search"
   },
   "telemetry": {
-    "title": "Telemetry & Crash Stats",
-    "subtitle": "Anonymous crash reports and opt-in usage from every desktop client.",
-    "refresh": "Refresh",
-    "loading": "Loading telemetry…",
-    "empty": "No data in this window.",
+    "eyebrow": "Operations",
+    "title": "Telemetry",
+    "subtitle": "What matters right now. The details live in PostHog.",
+    "asOf": "As of",
+    "openPosthog": "Open PostHog ↗",
+    "loading": "Loading telemetry …",
     "errorTitle": "Error",
-    "generatedAt": "Generated",
-    "window": {
-      "7": "Last 7 days",
-      "30": "Last 30 days",
-      "90": "Last 90 days",
-      "label": "Time range",
-      "short": {
-        "7": "7d",
-        "30": "30d",
-        "90": "90d"
-      }
+    "retry": "Try again",
+    "unavailable": "Data from PostHog is not available. The cards only show what is known without PostHog; this is not an all-clear.",
+    "cardUnavailable": "No data available.",
+    "status": {
+      "attention": "{{n}} things need attention",
+      "calm": "All quiet, nothing to do",
+      "blind": "No complete picture, PostHog unreachable",
+      "since": "Since your last visit on {{date}}",
+      "firstVisit": "First visit, looking back over the last 7 days"
     },
-    "totals": {
-      "crashes": "Crashes",
-      "usage": "Usage events",
-      "installs": "Installs",
-      "sessions": "Sessions"
+    "level": {
+      "ok": "OK",
+      "warn": "Warning",
+      "error": "Problem",
+      "unknown": "No data"
     },
-    "byVersion": "Crashes by version",
-    "crashesByType": "Crashes by type",
-    "crashesByRole": "By process",
-    "recent": "Recent crashes",
-    "aborts": {
-      "title": "Aborted extractions",
-      "hint": "An aborted P4K extraction cannot be resumed — the scan restarts from zero. Aborted uploads are deliberately not counted here; those simply resume.",
-      "byReason": "By reason",
-      "recent": "Recent aborts",
-      "reason": {
-        "cancelled": "Cancelled by user",
-        "quit": "App quit",
-        "error": "Error"
-      },
-      "col": {
-        "reason": "Reason",
-        "phase": "Phase",
-        "progress": "Progress"
-      }
+    "card": {
+      "quota": "PostHog quota",
+      "errors": "Errors · web, server, desktop",
+      "services": "External services",
+      "usage": "Usage · 7 days",
+      "ai": "AI cost · {{month}}",
+      "desktop": "Desktop apps"
     },
-    "product": {
-      "label": "Product",
-      "scc-app": "Verse Companion App",
-      "data-uploader": "Verse Data Uploader",
-      "all": "All",
-      "starscape": "Starscape"
+    "unit": {
+      "quotaPct": "of the tightest free quota",
+      "newErrors": "new error groups",
+      "servicesDown": "disrupted",
+      "activeUsers": "active users today",
+      "aiCostUsd": "this month",
+      "desktopInstalls": "active installations"
     },
-    "col": {
-      "at": "When",
-      "version": "Version",
-      "role": "Process",
-      "name": "Error",
-      "message": "Message"
+    "forecast": "forecast {{value}}",
+    "barLabel": "{{pct}} % used, {{month}} % of the month elapsed",
+    "sparkLabel": "Active users per day, last 7 days",
+    "badge": {
+      "web": "Web",
+      "server": "Server",
+      "desktop": "Desktop"
     },
-    "products": {
-      "title": "Products side by side",
-      "hint": "Every client in the selected window. Pick a card to scope everything below to that product.",
-      "crashesShort": "crashes",
-      "healthy": "No crashes",
-      "silent": "No data",
-      "lastSeen": "Last seen",
-      "never": "Never reported"
+    "toFeedback": "Turn into feedback",
+    "quotaFeedback": "Saving proposal as feedback",
+    "upgrade": "Plan in PostHog ↗",
+    "boardWaitingOne": "{{n}} board item waits for an answer",
+    "boardWaitingMany": "{{n}} board items wait for an answer",
+    "calm": {
+      "quotaCalm": "All free quotas are sufficient.",
+      "errorsCalm": "No new errors since your last visit.",
+      "servicesCalm": "All services without findings.",
+      "usageCalm": "No notable movement.",
+      "aiCalm": "No spend so far.",
+      "desktopCalm": "No desktop data in the last 7 days."
     },
-    "detail": {
-      "title": "Details"
+    "link": {
+      "billing": "Billing ↗",
+      "errorTracking": "Errors in PostHog ↗",
+      "serviceHealth": "Services in PostHog ↗",
+      "webAnalytics": "Usage in PostHog ↗",
+      "dashboards": "Dashboards ↗",
+      "llmObservability": "Cost in PostHog ↗",
+      "desktopEvents": "Desktop in PostHog ↗"
     },
-    "byChannel": "By release ring",
-    "usageByMetric": "Usage by event",
-    "channel": {
-      "stable": "Stable",
-      "beta": "Beta",
-      "alpha": "Alpha",
-      "dev": "Dev"
-    },
-    "diagnostics": {
-      "title": "Warnings & errors from uploader logs",
-      "hint": "Verse Data Uploader runs that wrote [warn] or [err] lines to their log – including runs that otherwise finished fine. Unfold a row for the transcript; “Report as topic” opens the feedback panel with a pre-filled topic and the log attached. Nothing is sent until you press send.",
-      "byOutcome": "By outcome",
-      "recent": "Recent runs",
-      "warningsShort": "warn.",
-      "errorsShort": "errors",
-      "reported": "Handed to composer",
-      "noLines": "No transcript was sent.",
-      "report": "Report as topic",
-      "reportHint": "Opens a new feedback topic, pre-filled and with the log attached – editable, not sent yet.",
-      "outcome": {
-        "ok": "Completed",
-        "failed": "Failed",
-        "cancelled": "Cancelled by user",
-        "quit": "App quit"
-      },
-      "kind": {
-        "extract": "Extraction",
-        "skin": "Skin export"
-      },
-      "topic": {
-        "head": "Verse Data Uploader {{version}} ({{ring}}) logged {{warnings}} warning(s) and {{errors}} error(s) during {{kind}} ({{outcome}}) – game {{game}}, OS {{os}}, telemetry event #{{id}}.",
-        "ask": "Please analyse the attached log: find the cause of the warnings/errors, judge whether data is missing or extracted wrongly because of them, and implement a fix in the Verse Data Uploader (data-uploader/) or the Python sidecar (data-uploader/python/sc_extract). If the message is harmless, lower the log level or handle the cause quietly so it stops surfacing as a warning.",
-        "excerpt": "Log excerpt:"
-      }
+    "service": {
+      "claude": "Claude API",
+      "posthog": "PostHog",
+      "supabase": "Supabase",
+      "r2": "Cloudflare R2",
+      "uex": "UEX",
+      "rsi": "RSI",
+      "xai": "xAI",
+      "readme": "readme.io"
     }
   },
   "adminFeedback": {
@@ -5275,7 +5250,11 @@
       "more": "More actions"
     },
     "deleteTitle": "Delete message?",
-    "threadsStale": "Replies could not be loaded — some cards may be filed under an outdated state."
+    "threadsStale": "Replies could not be loaded — some cards may be filed under an outdated state.",
+    "guard": {
+      "name": "PostHog-Wächter",
+      "title": "PostHog guard (created automatically)"
+    }
   },
   "feedbackFab": {
     "open": "Open feedback",
@@ -5461,7 +5440,7 @@
       },
       "statistics": {
         "label": "Statistics",
-        "desc": "Anonymous usage statistics and anonymous error reports (PostHog, EU servers) to understand which areas get used and where things break. Off by default, no identification, no session recording. Turning this off deletes the stored values."
+        "desc": "Anonymous usage statistics and anonymous error reports (PostHog, EU servers) to understand which areas get used and where things break. Off by default. Signed in, you appear under a pseudonymous ID with your role only — never your name or e-mail; sessions with an error may be recorded with all inputs masked. Turning this off deletes the stored values."
       }
     }
   },
@@ -7891,7 +7870,7 @@
       },
       "telemetry": {
         "title": "Telemetry",
-        "text": "Usage, products and diagnostics of the desktop apps."
+        "text": "What matters right now: quota, errors, services, usage and cost at a glance."
       },
       "feedback": {
         "title": "Feedback",

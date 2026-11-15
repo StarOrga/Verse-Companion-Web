@@ -92,7 +92,7 @@ describe('star map components', () => {
         provideRouter([]),
         provideTranslateService({}),
         { provide: AuthService, useValue: { isAuthenticated: authed } },
-        { provide: AnalyticsService, useValue: { captureVerse: vi.fn().mockName('captureVerse'), flags: () => ({}) } },
+        { provide: AnalyticsService, useValue: { track: vi.fn().mockName('track'), flags: () => ({}) } },
         {
           provide: VerseApiService,
           useValue: {

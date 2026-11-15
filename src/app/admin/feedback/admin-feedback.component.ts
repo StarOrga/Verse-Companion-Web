@@ -1,3 +1,4 @@
+import { POSTHOG_GUARD_PROFILE_ID } from '../../feedback/feedback.types';
 import { ShellChromeService } from '../../shell/fusion-bar/shell-chrome.service';
 import { logWarn } from '../../core/log';
 import { toErrorKey } from '../../core/describe-error';
@@ -542,7 +543,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
             class="card-head"
             (click)="openTopic(m.id)"
             [scTooltip]="'adminFeedback.stream.openTopic' | translate">
-            <ng-container [ngTemplateOutlet]="avatar" [ngTemplateOutletContext]="{ $implicit: m.author, self: m.author_id === selfId() }"></ng-container>
+            <ng-container [ngTemplateOutlet]="avatar" [ngTemplateOutletContext]="{ $implicit: m.author, self: m.author_id === selfId(), machine: isMachine(m.origin, m.author_id) }"></ng-container>
             <span class="ch-body">
               <span class="ch-title-line">
                 @if (topicNo(m); as no) {
@@ -624,10 +625,17 @@ type AvatarTone = 'adm' | 'col' | 'usr';
 
       <!-- Role-coloured avatar: admin red (elevated access), collaborator light
            blue, user grey-blue. Initials, never a photo. -->
-      <ng-template #avatar let-a let-self="self" let-focusable="focusable">
+      <ng-template #avatar let-a let-self="self" let-focusable="focusable" let-machine="machine">
         <!-- Own Tab stop only outside the card-head button (no nested interaction);
-             inside it the aria-label already joins the button's name. -->
-        <span class="av" role="img" [attr.tabindex]="focusable ? 0 : null" [class]="'av ' + toneOf(a)" [scTooltip]="roleTitle(a)" scTooltipTier="label" [attr.aria-label]="roleTitle(a)">{{ initials(a, self) }}</span>
+             inside it the aria-label already joins the button's name.
+             A machine sender (PostHog-Wächter) draws a chip glyph, never initials. -->
+        @if (machine) {
+          <span class="av bot" role="img" data-sender="guard" [attr.tabindex]="focusable ? 0 : null" [scTooltip]="'adminFeedback.guard.title' | translate" scTooltipTier="label" [attr.aria-label]="'adminFeedback.guard.title' | translate">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="10" height="8" rx="2"/><path d="M8 2v2.5M5.5 8h.01M10.5 8h.01M6 10.5h4"/></svg>
+          </span>
+        } @else {
+          <span class="av" role="img" [attr.tabindex]="focusable ? 0 : null" [class]="'av ' + toneOf(a)" [scTooltip]="roleTitle(a)" scTooltipTier="label" [attr.aria-label]="roleTitle(a)">{{ initials(a, self) }}</span>
+        }
       </ng-template>
 
       <!-- The flight path: four stations, filled up to the current one; a
@@ -684,7 +692,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
               <span class="who">{{ (msg.from_admin ? 'adminFeedback.userTopic.fromTeam' : 'adminFeedback.userTopic.fromAuthor') | translate }}</span>
               @if (msg.is_question) { <span class="chip">{{ 'adminFeedback.userTopic.questionBadge' | translate }}</span> }
             } @else {
-              <ng-container [ngTemplateOutlet]="avatar" [ngTemplateOutletContext]="{ $implicit: msg.author, self: msg.author_id === selfId(), focusable: true }"></ng-container>
+              <ng-container [ngTemplateOutlet]="avatar" [ngTemplateOutletContext]="{ $implicit: msg.author, self: msg.author_id === selfId(), focusable: true, machine: isMachine(null, msg.author_id) }"></ng-container>
               <span class="who">{{ authorLabelFor(msg) }}</span>
             }
             <span class="msg-ts">{{ msg.created_at | scDate: 'datetime' }}</span>
@@ -1238,6 +1246,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
     /* ---- Avatar (role colours; red = elevated access) ---- */
     .av { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; font-size: max(0.7rem, var(--sc-fs-floor)); font-weight: 700; letter-spacing: 0.02em; background: rgba(120, 150, 190, 0.28); color: #b9c9de; }
     .av.adm { background: var(--sc-accent-hot); color: var(--sc-bg-0); border: 1px solid var(--sc-accent-hot); }
+    .av.bot { background: rgba(82, 193, 230, 0.12); color: var(--sc-accent); border: 1px dashed var(--sc-accent); }
     .av.col { background: rgba(158, 203, 255, 0.2); color: #9ecbff; border: 1px solid rgba(158, 203, 255, 0.55); }
     .msg-head .av { width: 22px; height: 22px; font-size: max(0.62rem, var(--sc-fs-floor)); }
 
@@ -2129,7 +2138,13 @@ export class AdminFeedbackComponent implements OnInit {
     return applySignedUrls(renderFeedbackBody(body), this.signer.signed());
   }
 
+  /** True for the PostHog-Wächter: a machine-origin item (no author) or a reply from the guard profile. */
+  isMachine(origin: string | null | undefined, authorId: string | null): boolean {
+    return (!!origin && origin !== 'human') || authorId === POSTHOG_GUARD_PROFILE_ID;
+  }
+
   authorLabel(m: FeedbackRow): string {
+    if (this.isMachine(m.origin, m.author_id)) return this.translate.instant('adminFeedback.guard.name');
     if (m.author_id && m.author_id === this.selfId()) return this.translate.instant('adminFeedback.you');
     return m.author?.display_name
       ?? (m.author?.username ? `@${m.author.username}` : null)
@@ -2137,6 +2152,7 @@ export class AdminFeedbackComponent implements OnInit {
   }
 
   authorLabelFor(msg: FeedbackMessage): string {
+    if (msg.author_id === POSTHOG_GUARD_PROFILE_ID) return this.translate.instant('adminFeedback.guard.name');
     if (msg.is_system) return this.translate.instant('adminFeedback.kind.ai');
     if (msg.author_id && msg.author_id === this.selfId()) return this.translate.instant('adminFeedback.you');
     return msg.author?.display_name
@@ -2313,7 +2329,7 @@ export class AdminFeedbackComponent implements OnInit {
       .from('admin_feedback')
       // `author.role` colours the avatar; admins may read every profile
       // (policy profiles_admin_read_all), so no projection is needed.
-      .select('id, seq, author_id, body, status, ship_ref, processing_note, created_at, updated_at, shipped_at, processed_at, reviewed_at, source, triaged, decision_note, area, summary, complex, author:profiles(display_name, username, role)')
+      .select('id, seq, author_id, origin, body, status, ship_ref, processing_note, created_at, updated_at, shipped_at, processed_at, reviewed_at, source, triaged, decision_note, area, summary, complex, author:profiles(display_name, username, role)')
       .order('created_at', { ascending: true });
     if (error) {
       this.errorMsg.set(toErrorKey('admin-feedback', 'load board', error));

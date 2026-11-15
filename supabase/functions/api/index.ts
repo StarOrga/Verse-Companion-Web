@@ -32,6 +32,7 @@ import * as components from './handlers/components.ts';
 import * as keybinds from './handlers/keybinds.ts';
 import * as openapi from './openapi.ts';
 import * as docs from './docs.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
 const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
@@ -65,4 +66,4 @@ const handle = router.handler((_req, _url) => {
   };
 });
 
-Deno.serve(handle);
+Deno.serve(withPosthog('api', handle));

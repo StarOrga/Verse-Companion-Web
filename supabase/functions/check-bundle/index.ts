@@ -11,6 +11,7 @@
 //         403 { error: 'forbidden' }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -25,7 +26,7 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('check-bundle', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'GET') return json({ error: 'method_not_allowed' }, 405);
 
@@ -98,4 +99,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
     uploaded_at: row.created_at,
     uploader_email: uploaderEmail,
   });
-});
+}));

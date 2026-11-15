@@ -1,4 +1,5 @@
 import { BetaService } from '../../core/beta.service';
+import { AnalyticsService } from '../../core/analytics.service';
 import { DestroyRef, Injectable, Injector, computed, inject, signal } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
@@ -363,6 +364,7 @@ export class CodexSearchEngine {
     this.remember();
     if (row.type === 'hit') {
       this.trySignals()?.recordOpen(row.hit.kind, row.hit.classNameSlug);
+      this.trackOpen(row.hit.kind, null, false);
       this.navOrigin.noteSearchArrival(this.term(), row.target.link);
     }
   }
@@ -377,13 +379,20 @@ export class CodexSearchEngine {
    * search, and tell the page history that a hit's page was reached from this
    * search, so its breadcrumb leads back to the results (NavOriginService).
    */
-  opening(opt: SearchOption): void {
+  opening(opt: SearchOption, newTabFlag = false): void {
     if (opt.type !== 'hit' && opt.type !== 'more') return;
     this.remember();
     if (opt.type === 'hit') {
       this.navOrigin.noteSearchArrival(this.term(), opt.target.link);
       this.trySignals()?.recordOpen(opt.hit.kind, opt.hit.classNameSlug);
+      this.trackOpen(opt.hit.kind, opt.id, newTabFlag);
     }
+  }
+
+  /** One `search:result_open`: the area is the hit's kind, the rank its place in the list; never the term. */
+  private trackOpen(area: string, optionId: string | null, newTab: boolean): void {
+    const index = optionId ? this.options().findIndex((o) => o.id === optionId) : -1;
+    this.injector.get(AnalyticsService).track('search:result_open', { area, rank: index + 1, new_tab: newTab });
   }
 
   forgetRecent(): void {
@@ -459,7 +468,7 @@ export class CodexSearchEngine {
       this.searchFor(opt.term);
       return 'searched';
     }
-    this.opening(opt);
+    this.opening(opt, newTab);
     if (newTab) {
       window.open(this.location.prepareExternalUrl(targetUrl(opt.target)), '_blank', 'noopener');
       return 'new-tab';
@@ -585,7 +594,10 @@ export class CodexSearchEngine {
     setTimeout(() => {
       if (seq !== this.seq || this.loading()) return;
       try {
-        if (this.hits().length === 0 && this.result().empty) this.trySignals()?.logMiss(term);
+        if (this.hits().length === 0 && this.result().empty) {
+          this.trySignals()?.logMiss(term);
+          this.injector.get(AnalyticsService).track('search:miss_show', { area: this.activeChips()[0]?.id ?? 'all' });
+        }
       } catch {
         /* counting a miss must never break a search */
       }

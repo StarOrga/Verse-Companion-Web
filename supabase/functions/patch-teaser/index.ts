@@ -19,6 +19,8 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { VERSION_RE, buildPrompt, parseTeaser, type OutlineNode } from './_teaser.ts';
 import { RETRY_COOLDOWN_MS, liveVersionOfSlug, pickSweepTargets, wantedVersions } from './_sweep.ts';
+import { callClaude } from '../_shared/ai-ledger.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const MODEL = Deno.env.get('PATCH_TEASER_MODEL') ?? 'claude-sonnet-5-5';
 const SPECTRUM_LIST_URL = 'https://robertsspaceindustries.com/api/spectrum/forum/channel/threads';
@@ -29,14 +31,7 @@ const json = (body: unknown, status = 200) =>
 type Admin = any;
 
 async function askClaude(prompt: string, key: string): Promise<string> {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: MODEL, max_tokens: 200, messages: [{ role: 'user', content: prompt }] }),
-    signal: AbortSignal.timeout(30_000),
-  });
-  if (!res.ok) throw new Error(`anthropic ${res.status}`);
-  const body = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
+  const body = await callClaude('patch-teaser', key, { model: MODEL, max_tokens: 200, messages: [{ role: 'user', content: prompt }] }, 30_000);
   return body.content?.find((c) => c.type === 'text')?.text ?? '';
 }
 
@@ -112,7 +107,7 @@ async function sweep(admin: Admin, serviceKey: string): Promise<Response> {
   }
 }
 
-Deno.serve(async (req) => {
+Deno.serve(withPosthog('patch-teaser', async (req) => {
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
   let body: { sweep?: boolean; version?: string; slug?: string; force?: boolean };
@@ -138,4 +133,4 @@ Deno.serve(async (req) => {
     console.error(`patch-teaser ${version}: ${(e as Error).message}`);
     return json({ ok: true, status: 'model_failed' });
   }
-});
+}, { cron: true }));

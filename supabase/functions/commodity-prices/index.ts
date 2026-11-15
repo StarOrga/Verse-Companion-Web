@@ -11,6 +11,7 @@
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { CACHE_SECONDS, TtlCache, normalizeCommodities, normalizePrices, upstreamFor } from './prices.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -22,7 +23,7 @@ const UEX_TIMEOUT_MS = 12_000;
 const UEX_TOKEN = Deno.env.get('UEX_API_TOKEN') ?? '';
 const cache = new TtlCache<unknown>(CACHE_SECONDS * 1000);
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withPosthog('commodity-prices', async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS_HEADERS });
   const json = (body: unknown, status = 200, cacheSeconds = 0) =>
     new Response(JSON.stringify(body), {
@@ -70,4 +71,4 @@ Deno.serve(async (req: Request) => {
   } finally {
     clearTimeout(timer);
   }
-});
+}));

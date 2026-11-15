@@ -1110,7 +1110,7 @@ export class VerseBriefingComponent {
 
   openItem(item: VerseDigestItem): void {
     void this.api.markSeen([item.key]);
-    this.analytics.captureVerse('verse_top_open', {
+    this.analytics.track('verse:top_open', {
       key: item.key,
       kind: item.kind,
       rank: item.rank,
@@ -1119,6 +1119,6 @@ export class VerseBriefingComponent {
   }
 
   openDoor(door: VerseDoor): void {
-    this.analytics.captureVerse('verse_door_open', { door });
+    this.analytics.track('verse:door_open', { door });
   }
 }

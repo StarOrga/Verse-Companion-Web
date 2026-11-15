@@ -29,13 +29,13 @@ function chain(result: () => unknown): unknown {
 describe('ShipLinkService', () => {
   let invoke: Mock;
   let tables: Record<string, { data: unknown; error: unknown }>;
-  let capture: Mock;
+  let track: Mock;
   let user: ReturnType<typeof signal<{ id: string } | null>>;
 
   function setup(): ShipLinkService {
     invoke = vi.fn().mockName('invoke').mockResolvedValue({ data: { ok: true }, error: null });
     tables = {};
-    capture = vi.fn().mockName('capture');
+    track = vi.fn().mockName('track');
     user = signal<{ id: string } | null>({ id: 'u1' });
     const client = {
       from: (t: string) => chain(() => tables[t] ?? { data: null, error: null }),
@@ -45,7 +45,7 @@ describe('ShipLinkService', () => {
       providers: [
         { provide: SupabaseClientProvider, useValue: { client, realClient: client } },
         { provide: AuthService, useValue: { user } },
-        { provide: AnalyticsService, useValue: { capture } },
+        { provide: AnalyticsService, useValue: { track } },
       ],
     });
     return TestBed.inject(ShipLinkService);
@@ -105,7 +105,7 @@ describe('ShipLinkService', () => {
       body: { action: 'set', shipSlug: 'avenger', url: URL_A },
     });
     expect(svc.effectiveLink('avenger')).toBe(URL_A);
-    expect(capture).toHaveBeenCalledWith('ship_link_set', { shipSlug: 'avenger' });
+    expect(track).toHaveBeenCalledWith('codex:ship_link_create', { shipSlug: 'avenger' });
 
     expect(await svc.removeMyLink('avenger')).toBeNull();
     expect(svc.effectiveLink('avenger')).toBeNull();

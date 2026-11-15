@@ -17,6 +17,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Small texts on the rank page, the patch-tip hint and the data sheet now meet the 12 px mobile minimum.
 
+## [0.268.0] - 2026-11-15
+
+### Added
+- PostHog as the single telemetry source: typed event catalogue across all areas, error-only session replay, dead clicks and heatmaps, source maps, `/ingest` proxy
+- Server-side PostHog: errors and cron runs of every edge function, Claude call costs (`ai_calls` ledger + `$ai_generation`), desktop telemetry forwarding
+- „PostHog-Wächter“: new errors, trend breaks, quota warnings and service outages land on the admin feedback board with problem, PostHog link and a proposed fix
+- Admin telemetry page as topic cards, including external services (Claude, PostHog, Supabase, R2, UEX, RSI, xAI, readme.io)
+- PostHog dashboards, actions and flags as code (`npm run posthog:apply`)
+
+### Removed
+- Own `telemetry_events` table and stats RPC, own web-vitals capture
+
 ## [0.267.1] - 2026-11-15
 
 ### Changed

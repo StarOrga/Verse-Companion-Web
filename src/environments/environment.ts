@@ -22,6 +22,8 @@ export const environment = {
   // sent, regardless of consent. Fill in to activate. EU region per admin call.
   posthog: {
     key: 'phc_Am939BozLUF73xus4GT5KKEKRx44xL5syfXHZDvL97iZ',
-    host: 'https://eu.i.posthog.com',
+    // Same-origin proxy (vercel.json rewrite / dev-server proxy.conf.json): ad blockers and the CSP stay out of it.
+    host: '/ingest',
+    uiHost: 'https://eu.posthog.com',
   },
 };

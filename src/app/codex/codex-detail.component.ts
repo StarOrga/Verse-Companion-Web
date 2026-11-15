@@ -11,6 +11,7 @@ import { noteOpenedPage } from '../shell/merkliste/merkliste-opened';
 import { CompareIconComponent } from './compare-icon.component';
 import { ingredientTokenOfCrate } from '../hq/stock/hq-stock-ref';
 import { logWarn } from '../core/log';
+import { AnalyticsService } from '../core/analytics.service';
 import { toErrorKey } from '../core/describe-error';
 import { AccountPrefsService } from '../core/account-prefs.service';
 import {
@@ -1774,6 +1775,7 @@ export class CodexDetailComponent implements OnInit {
     return this.route.snapshot.fragment === SHIP_SOURCE_FRAGMENT;
   }
   private readonly router = inject(Router);
+  private readonly analytics = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly t = inject(TranslateService);
   private readonly hangar = inject(HangarService);
@@ -2332,6 +2334,7 @@ export class CodexDetailComponent implements OnInit {
       this.draftStore.reset();
     }
     this.holoView.set(next);
+    if (next) this.analytics.track('codex:holotable_open', { kind: this.kind() ?? 'unknown' });
     try {
       localStorage.setItem(CodexDetailComponent.HOLO_VIEW_STORAGE_KEY, next ? 'holo' : 'classic');
     } catch {

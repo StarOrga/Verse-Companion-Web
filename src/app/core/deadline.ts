@@ -20,7 +20,7 @@ export const READ_TIMEOUT_MS = 20_000;
 
 /**
  * Read-only RPCs the client calls — checked against supabase/migrations on 1b08612.
- * All `stable` except get_telemetry_stats (declared volatile, body is SELECT-only).
+ * All `stable`.
  * NOT here: hangar_follow_snapshot — it writes the follower's sync copy.
  * A new RPC joins only if it is `stable`/`immutable` or provably writes nothing.
  */
@@ -41,7 +41,6 @@ export const READ_RPCS: ReadonlySet<string> = new Set([
   'starscape_release_for_channel',
   'starscape_latest_release',
   'desktop_release_for_channel',
-  'get_telemetry_stats',
   'list_users_for_admin',
   'list_reports_for_admin',
   'list_allowed_emails',

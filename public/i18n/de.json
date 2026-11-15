@@ -4535,7 +4535,7 @@
         "title": "Kurz gefasst",
         "noAds": "Keine Werbung, keine Werbenetzwerke.",
         "signIn": "Anmelden kannst du dich auf genau zwei Wegen: mit E-Mail-Adresse und Passwort oder mit deinem Google-Konto. Der Google-Weg ist freiwillig und gibt Daten an Google.",
-        "noTracking": "Keine Werbe-Tracker. Produkt-Analytik über PostHog (EU) läuft nur, wenn du sie erlaubst — Voreinstellung ist aus.",
+        "noTracking": "Keine Werbe-Tracker. Produkt-Analytik über PostHog (EU) läuft nur, wenn du sie erlaubst — Voreinstellung ist aus. Unser eigener Server meldet seine Fehler und Laufzeiten ohne jeden Personenbezug.",
         "minimal": "Nur die Daten, die die Funktionen brauchen — nichts wird verkauft oder zu Marketingzwecken geteilt.",
         "euHosting": "Anwendungsdaten liegen in der EU (Supabase, Region eu-central-1 / Frankfurt)."
       },
@@ -4582,7 +4582,8 @@
         "supabase": "Supabase (Datenbank, Authentifizierung, Datei-Speicher) — EU-Region eu-central-1 (Frankfurt); verarbeitet deine Konto- und Anwendungsdaten in unserem Auftrag.",
         "vercel": "Vercel Inc. (Hosting, CDN) — Auslieferung der statischen App.",
         "google": "Google Sign-In (Google Ireland Limited / Google LLC) — nur wenn du dich bewusst mit Google anmeldest; Details im Abschnitt „Anmeldung mit Google\".",
-        "posthog": "PostHog (Produkt-Analytik und Fehlerdiagnose) — EU-Cloud (eu.i.posthog.com); erfasst anonyme Nutzungsereignisse, Ladezeiten der Seiten und Fehler, und das nur nach deiner Zustimmung.",
+        "posthog": "PostHog (Produkt-Analytik und Fehlerdiagnose) — EU-Cloud; die Anfragen laufen über die eigene Adresse dieser Seite (/ingest). Nur nach deiner Zustimmung werden Nutzungsereignisse, Ladezeiten der Seiten, tote Klicks und Heatmaps sowie Fehler erfasst. Sitzungen, in denen ein Fehler auftritt, werden zur Wiedergabe aufgezeichnet — alle Eingaben maskiert. Bist du angemeldet, sieht PostHog eine pseudonyme ID (ein gesalzener Hash deiner Konto-ID) und deine Rolle (Viewer, Collaborator oder Admin) — nie deine E-Mail-Adresse oder deinen Namen.",
+        "posthogServer": "PostHog (serverseitig) — unsere eigenen Server-Funktionen melden ihre Fehler und Laufzeiten an PostHog (EU-Cloud), ohne IP-Adresse, Nutzer-ID oder Inhalte. Das hängt nicht von deiner Zustimmung ab, weil keine personenbezogenen Daten beteiligt sind. Die Desktop-Apps melden Abstürze (und, wenn du es in der App erlaubst, Nutzungszahlen) über diesen Weg weiter — nur mit einer vorab gehashten Kennung der Installation, nie mit deinem Konto.",
         "fonts": "Google Fonts — Schriftdateien werden von Google-Servern geladen; Google kann dabei deine IP-Adresse sehen.",
         "rsiMedia": "Bilder in den Verse-News kommen teils direkt von Servern von Roberts Space Industries (media.robertsspaceindustries.com, theverse.robertsspaceindustries.com) — beim Laden sieht RSI deine IP-Adresse.",
         "gameApis": "Öffentliche Star-Citizen-Daten: status.robertsspaceindustries.com und api.star-citizen.wiki (nur lesend, es werden keine Kontodaten übertragen)."
@@ -4834,110 +4835,84 @@
     "open": "Suche"
   },
   "telemetry": {
-    "title": "Telemetrie & Crash-Statistik",
-    "subtitle": "Anonyme Crash-Reports und Opt-in-Nutzung aus allen Desktop-Clients.",
-    "refresh": "Aktualisieren",
-    "loading": "Telemetrie wird geladen…",
-    "empty": "Keine Daten in diesem Zeitraum.",
+    "eyebrow": "Betrieb",
+    "title": "Telemetrie",
+    "subtitle": "Was gerade wichtig ist. Details liegen in PostHog.",
+    "asOf": "Stand",
+    "openPosthog": "PostHog öffnen ↗",
+    "loading": "Telemetrie wird geladen …",
     "errorTitle": "Fehler",
-    "generatedAt": "Erzeugt",
-    "window": {
-      "7": "Letzte 7 Tage",
-      "30": "Letzte 30 Tage",
-      "90": "Letzte 90 Tage",
-      "label": "Zeitraum",
-      "short": {
-        "7": "7 T",
-        "30": "30 T",
-        "90": "90 T"
-      }
+    "retry": "Erneut versuchen",
+    "unavailable": "Daten aus PostHog nicht verfügbar. Die Karten zeigen nur, was ohne PostHog bekannt ist; ein ruhiges Bild ist das nicht.",
+    "cardUnavailable": "Keine Daten verfügbar.",
+    "status": {
+      "attention": "{{n}} Dinge brauchen Aufmerksamkeit",
+      "calm": "Alles ruhig, nichts zu tun",
+      "blind": "Kein vollständiges Bild, PostHog nicht erreichbar",
+      "since": "Seit deinem letzten Besuch am {{date}}",
+      "firstVisit": "Erster Besuch, Rückblick auf die letzten 7 Tage"
     },
-    "totals": {
-      "crashes": "Abstürze",
-      "usage": "Nutzungs-Events",
-      "installs": "Installationen",
-      "sessions": "Sitzungen"
+    "level": {
+      "ok": "In Ordnung",
+      "warn": "Achtung",
+      "error": "Problem",
+      "unknown": "Keine Daten"
     },
-    "byVersion": "Abstürze nach Version",
-    "crashesByType": "Abstürze nach Typ",
-    "crashesByRole": "Nach Prozess",
-    "recent": "Letzte Abstürze",
-    "aborts": {
-      "title": "Abgebrochene Extraktionen",
-      "hint": "Eine abgebrochene P4K-Extraktion lässt sich nicht fortsetzen — der Scan beginnt wieder bei null. Abgebrochene Uploads zählen hier bewusst nicht mit, die laufen einfach weiter.",
-      "byReason": "Nach Grund",
-      "recent": "Letzte Abbrüche",
-      "reason": {
-        "cancelled": "Vom Nutzer abgebrochen",
-        "quit": "App beendet",
-        "error": "Fehler"
-      },
-      "col": {
-        "reason": "Grund",
-        "phase": "Phase",
-        "progress": "Fortschritt"
-      }
+    "card": {
+      "quota": "PostHog-Kontingent",
+      "errors": "Fehler · Web, Server, Desktop",
+      "services": "Externe Dienste",
+      "usage": "Nutzung · 7 Tage",
+      "ai": "KI-Kosten · {{month}}",
+      "desktop": "Desktop-Apps"
     },
-    "product": {
-      "label": "Produkt",
-      "scc-app": "Verse Companion App",
-      "data-uploader": "Verse Data Uploader",
-      "all": "Alle",
-      "starscape": "Starscape"
+    "unit": {
+      "quotaPct": "des knappsten Freikontingents",
+      "newErrors": "neue Fehlergruppen",
+      "servicesDown": "gestört",
+      "activeUsers": "aktive Nutzer heute",
+      "aiCostUsd": "diesen Monat",
+      "desktopInstalls": "aktive Installationen"
     },
-    "col": {
-      "at": "Wann",
-      "version": "Version",
-      "role": "Prozess",
-      "name": "Fehler",
-      "message": "Nachricht"
+    "forecast": "Prognose {{value}}",
+    "barLabel": "{{pct}} % verbraucht, {{month}} % des Monats vorbei",
+    "sparkLabel": "Aktive Nutzer pro Tag, letzte 7 Tage",
+    "badge": {
+      "web": "Web",
+      "server": "Server",
+      "desktop": "Desktop"
     },
-    "products": {
-      "title": "Produkte im Vergleich",
-      "hint": "Alle Clients im gewählten Zeitraum. Eine Karte anklicken, um nur dieses Produkt auszuwerten.",
-      "crashesShort": "Abstürze",
-      "healthy": "Ohne Absturz",
-      "silent": "Keine Daten",
-      "lastSeen": "Zuletzt",
-      "never": "Noch nie gemeldet"
+    "toFeedback": "In Feedback umwandeln",
+    "quotaFeedback": "Sparvorschlag als Feedback",
+    "upgrade": "Plan in PostHog ↗",
+    "boardWaitingOne": "{{n}} Board-Eintrag wartet auf Antwort",
+    "boardWaitingMany": "{{n}} Board-Einträge warten auf Antwort",
+    "calm": {
+      "quotaCalm": "Alle Freikontingente reichen.",
+      "errorsCalm": "Keine neuen Fehler seit deinem letzten Besuch.",
+      "servicesCalm": "Alle Dienste ohne Befund.",
+      "usageCalm": "Keine auffälligen Bewegungen.",
+      "aiCalm": "Keine Ausgaben bisher.",
+      "desktopCalm": "Keine Desktop-Daten in den letzten 7 Tagen."
     },
-    "detail": {
-      "title": "Details"
+    "link": {
+      "billing": "Abrechnung ↗",
+      "errorTracking": "Fehler in PostHog ↗",
+      "serviceHealth": "Dienste in PostHog ↗",
+      "webAnalytics": "Nutzung in PostHog ↗",
+      "dashboards": "Dashboards ↗",
+      "llmObservability": "Kosten in PostHog ↗",
+      "desktopEvents": "Desktop in PostHog ↗"
     },
-    "byChannel": "Nach Release-Ring",
-    "usageByMetric": "Nutzung nach Ereignis",
-    "channel": {
-      "stable": "Stable",
-      "beta": "Beta",
-      "alpha": "Alpha",
-      "dev": "Dev"
-    },
-    "diagnostics": {
-      "title": "Warnungen & Fehler aus Uploader-Logs",
-      "hint": "Läufe des Verse Data Uploaders, die [warn]- oder [err]-Zeilen ins Log geschrieben haben – auch wenn sie sauber durchgelaufen sind. Eine Zeile aufklappen zeigt das Protokoll; „Als Thema melden“ öffnet das Feedback-Panel mit vorausgefülltem Thema und dem Log als Anhang. Gesendet wird erst, wenn du auf Senden drückst.",
-      "byOutcome": "Nach Ausgang",
-      "recent": "Letzte Läufe",
-      "warningsShort": "Warn.",
-      "errorsShort": "Fehler",
-      "reported": "Als Thema übergeben",
-      "noLines": "Kein Protokoll übermittelt.",
-      "report": "Als Thema melden",
-      "reportHint": "Öffnet ein neues Feedback-Thema, vorausgefüllt und mit dem Log als Anhang – änderbar, noch nicht gesendet.",
-      "outcome": {
-        "ok": "Durchgelaufen",
-        "failed": "Fehlgeschlagen",
-        "cancelled": "Vom Nutzer abgebrochen",
-        "quit": "App beendet"
-      },
-      "kind": {
-        "extract": "Extraktion",
-        "skin": "Skin-Export"
-      },
-      "topic": {
-        "head": "Verse Data Uploader {{version}} ({{ring}}) hat beim Lauf „{{kind}}“ ({{outcome}}) {{warnings}} Warnung(en) und {{errors}} Fehler protokolliert – Spiel {{game}}, OS {{os}}, Telemetrie-Event #{{id}}.",
-        "ask": "Bitte das angehängte Log analysieren: Ursache der Warnungen/Fehler finden, einschätzen ob dadurch Daten fehlen oder falsch extrahiert wurden, und einen Fix im Verse Data Uploader (data-uploader/) bzw. im Python-Sidecar (data-uploader/python/sc_extract) umsetzen. Falls die Meldung harmlos ist: Log-Level senken oder die Ursache still abfangen, damit sie nicht wieder als Warnung auftaucht.",
-        "excerpt": "Auszug aus dem Log:"
-      }
+    "service": {
+      "claude": "Claude API",
+      "posthog": "PostHog",
+      "supabase": "Supabase",
+      "r2": "Cloudflare R2",
+      "uex": "UEX",
+      "rsi": "RSI",
+      "xai": "xAI",
+      "readme": "readme.io"
     }
   },
   "adminFeedback": {
@@ -5275,7 +5250,11 @@
       "more": "Weitere Aktionen"
     },
     "deleteTitle": "Nachricht löschen?",
-    "threadsStale": "Antworten konnten nicht geladen werden — die Einordnung einzelner Karten kann veraltet sein."
+    "threadsStale": "Antworten konnten nicht geladen werden — die Einordnung einzelner Karten kann veraltet sein.",
+    "guard": {
+      "name": "PostHog-Wächter",
+      "title": "PostHog-Wächter (automatisch erstellt)"
+    }
   },
   "feedbackFab": {
     "open": "Feedback öffnen",
@@ -5461,7 +5440,7 @@
       },
       "statistics": {
         "label": "Statistik",
-        "desc": "Anonyme Nutzungsstatistiken und anonyme Fehlerberichte (PostHog, EU-Server), um zu verstehen welche Bereiche genutzt werden und wo etwas schiefgeht. Standardmäßig aus, keine Identifizierung, keine Sitzungsaufzeichnung. Beim Abschalten werden die gespeicherten Werte gelöscht."
+        "desc": "Anonyme Nutzungsstatistiken und anonyme Fehlerberichte (PostHog, EU-Server), um zu verstehen welche Bereiche genutzt werden und wo etwas schiefgeht. Standardmäßig aus. Angemeldet erscheinst du unter einer pseudonymen ID mit deiner Rolle — nie mit Namen oder E-Mail; Sitzungen mit einem Fehler werden ggf. mit maskierten Eingaben aufgezeichnet. Beim Abschalten werden die gespeicherten Werte gelöscht."
       }
     }
   },
@@ -7891,7 +7870,7 @@
       },
       "telemetry": {
         "title": "Telemetrie",
-        "text": "Nutzung, Produkte und Diagnosen der Desktop-Apps."
+        "text": "Was gerade wichtig ist: Kontingent, Fehler, Dienste, Nutzung und Kosten auf einen Blick."
       },
       "feedback": {
         "title": "Feedback",

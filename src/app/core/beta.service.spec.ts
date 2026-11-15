@@ -6,11 +6,11 @@ import { BETA_STORAGE_KEY, BetaService, betaAreaOf } from './beta.service';
 
 describe('BetaService', () => {
   let flags: WritableSignal<Record<string, boolean | string>>;
-  let captureVerse: Mock;
+  let track: Mock;
 
   function create(): BetaService {
     TestBed.configureTestingModule({
-      providers: [{ provide: AnalyticsService, useValue: { flags: () => flags(), captureVerse } }],
+      providers: [{ provide: AnalyticsService, useValue: { flags: () => flags(), track } }],
     });
     return TestBed.inject(BetaService);
   }
@@ -19,7 +19,7 @@ describe('BetaService', () => {
     localStorage.removeItem(BETA_STORAGE_KEY);
     localStorage.removeItem('sc.verse.beta');
     flags = signal<Record<string, boolean | string>>({});
-    captureVerse = vi.fn().mockName('captureVerse');
+    track = vi.fn().mockName('track');
   });
 
   afterEach(() => {
@@ -51,7 +51,7 @@ describe('BetaService', () => {
     expect(svc.state()).toEqual({ verse: true, codex: false, shell: false });
     expect(svc.isEnabled('codex')()).toBe(false);
     expect(JSON.parse(localStorage.getItem(BETA_STORAGE_KEY) ?? '{}')).toEqual({ verse: true, codex: false });
-    expect(captureVerse).toHaveBeenCalledWith('beta_toggle', { area: 'codex', enabled: false });
+    expect(track).toHaveBeenCalledWith('settings:beta_toggle', { area: 'codex', enabled: false });
     TestBed.resetTestingModule();
     expect(create().state()).toEqual({ verse: true, codex: false, shell: false });
   });

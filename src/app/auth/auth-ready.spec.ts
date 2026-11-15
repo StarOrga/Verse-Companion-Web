@@ -24,7 +24,7 @@ describe('AuthService.whenReady', () => {
       providers: [
         provideRouter([]),
         { provide: SupabaseClientProvider, useValue: sb },
-        { provide: AnalyticsService, useValue: { capture: (): void => {} } },
+        { provide: AnalyticsService, useValue: { track: (): void => {} } },
       ],
     });
     return TestBed.inject(AuthService);

@@ -671,13 +671,14 @@ export class LoginComponent {
     }
     this.busy.set(true);
     this.errorMsg.set(null);
+    this.analytics.track('auth:provider_select', { provider: 'email' });
     const { email, password } = this.form.getRawValue();
     try {
       const { error } = await this.auth.signInWithPassword(email, password);
       if (error) {
         this.errorMsg.set(authErrorKey(error, 'sign-in'));
       } else {
-        this.analytics.capture('user_signed_in', { provider: 'email' });
+        this.analytics.track('auth:user_sign_in', { provider: 'email' });
         // navigateByUrl handles path + query string in one call
         // (router.navigate(['/path?q=1']) treats the whole thing as a single segment).
         await this.router.navigateByUrl(this.safeRedirectTarget());
@@ -704,7 +705,7 @@ export class LoginComponent {
 
     if (result.kind === 'ok' || result.kind === 'duplicate') {
       this.applyDone.set(true);
-      this.analytics.capture('access_requested', { duplicate: result.kind === 'duplicate' });
+      this.analytics.track('auth:access_request', { duplicate: result.kind === 'duplicate' });
       return;
     }
     this.applyError.set(
@@ -721,6 +722,7 @@ export class LoginComponent {
   }
 
   private async signInWithOAuthProvider(provider: 'google' | 'discord') {
+    this.analytics.track('auth:provider_select', { provider });
     if (this.previewLocked()) {
       // Same reasoning as onSubmit(): sc.viewAs is sessionStorage, so it
       // survives the OAuth round trip and would loop back to /login too.
@@ -752,7 +754,7 @@ export class LoginComponent {
       this.errorMsg.set(authErrorKey(error, `${provider} sign-in`));
       this.busy.set(false);
     } else {
-      this.analytics.capture(`user_signed_in_with_${provider}`, { provider });
+      this.analytics.track('auth:user_sign_in', { provider });
     }
   }
 }

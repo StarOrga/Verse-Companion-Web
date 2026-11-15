@@ -1,3 +1,4 @@
+import { AnalyticsService } from '../../core/analytics.service';
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, output, signal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -180,6 +181,7 @@ export class HqEventSectionComponent {
   constructor() {
     this.events.ensure();
     this.events.startLive(inject(DestroyRef));
+    inject(AnalyticsService).track('hq:events_view');
   }
 
   protected state = (id: string) => this.events.stateOf(id);

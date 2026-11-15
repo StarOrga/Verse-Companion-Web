@@ -246,3 +246,19 @@ verify_jwt = false
 # a targeted re-extract ({eventId}) checks the caller itself (service-role key or signed-in admin). The sheet is only
 # written through the service_role/admin RPC sc_event_sheet_apply.
 verify_jwt = false
+
+[functions.posthog-signal]
+# JWT verification OFF: the PostHog alert webhook cannot send a Supabase JWT and pg_cron has only the publishable key.
+# Webhook mode authenticates by header x-signal-secret (POSTHOG_SIGNAL_SECRET, constant-time compare, 401 otherwise);
+# the cron modes only read PostHog and write capped board items, throttled via guard_runs.
+verify_jwt = false
+
+[functions.service-health]
+# JWT verification OFF: pg_cron (service-health job, 20261115030100_posthog_guard.sql) calls it with the publishable key.
+# Token-free probes only, throttled via guard_runs; x-signal-secret bypasses the throttle for manual runs.
+verify_jwt = false
+
+[functions.telemetry-overview]
+# JWT verification OFF for the same reason as ingest-catalog (the platform gate rejects asymmetric session tokens):
+# the function itself resolves the caller with auth.getUser() and requires public.is_admin() (403 otherwise).
+verify_jwt = false
