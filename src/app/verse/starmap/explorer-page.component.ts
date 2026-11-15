@@ -238,6 +238,10 @@ function isComplete(p: VerseExplorerPatch): boolean {
         .tracks { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; row-gap: 22px; }
         .tracks .track { display: block; grid-row: auto; }
       }
+      /* Phones: the last track (the comet strip, its open state) ends above the launcher / bottom-bar lane, not under it. */
+      @media (max-width: 720px) {
+        .map { padding-block-end: var(--sc-beta-fab-bottom, var(--sc-fab-clear-block)); }
+      }
       @media (prefers-reduced-motion: reduce) {
         .cele { animation: ex-cele-still 6.5s linear 0.2s both; }
         .rank { transition: none; }
