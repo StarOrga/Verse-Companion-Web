@@ -14,7 +14,8 @@
 // stay) -> sc_event_sheet_apply(..., 'ai') = draft + public sheet + one history row. Sources (all best-effort, a failed
 // one is skipped): the event's own comm-link by id (sc_events.url) and a title search over ALL comm-links of the
 // Comm-Link Wiki API (the newest 200 alone miss every older edition), the newest 200 for weekly-roundup mentions, the
-// community wiki page (resolved case-insensitively, this edition's section first) and the RSI page's meta tags. An
+// community wiki page (resolved case-insensitively, this edition's section first), the RSI page's meta tags and CIG staff
+// posts on Spectrum (v3; confidence by source authority, see docs/contracts/event-sheet.md). An
 // edition without a post of its own (announced later) reads the previous edition's posts as a labelled hint; its
 // fields stay <= 0.6 and wait in the admin review. Fields under 0.8 stay unknown publicly. Key only here
 // (ANTHROPIC_API_KEY); model override SC_EVENT_SHEET_MODEL. verify_jwt=false (supabase/config.toml): pg_cron has only
@@ -27,10 +28,11 @@ import { callClaude } from '../_shared/ai-ledger.ts';
 import { effectiveForce } from './_force.ts';
 import {
   EXTRACTOR_MAJOR, EXTRACTOR_VERSION, MAX_LLM_CALLS_PER_RUN, SHEET_TOOL_NAME, SHEET_TOOL_SCHEMA,
-  actorIdFor, bundleSources, buildPrompt, commLinkIdFromUrl, extractMeta, fillDatesFromCalendar, hashText, mergeSheets,
-  parseActorId, parseModelAnswer, parseWikiExtract, pickEvents, previousEditionSources, searchTerms, selectSources,
-  sheetFromModel, wikiEditionText,
-  type EventInfo, type LinkInfo, type RunState, type SourceItem, CORS, preflight,
+  actorIdFor, bundleSources, buildPrompt, commLinkIdFromUrl, defaultPrerequisites, editionYears, extractMeta,
+  fillDatesFromCalendar, hashText, isSpectrumStaff, mergeSheets, nameStem, parseActorId, parseModelAnswer,
+  parseWikiExtract, pickEvents, previousEditionSources, searchTerms, selectSources, selectSpectrum, sheetFromModel,
+  wikiEditionText,
+  type EventInfo, type LinkInfo, type RunState, type SourceItem, type SpectrumPost, CORS, preflight,
 } from './_extract.ts';
 import { withPosthog } from '../_shared/posthog.ts';
 
@@ -103,19 +105,77 @@ async function fetchMeta(event: EventInfo): Promise<SourceItem | null> {
     const res = await fetch(event.url, { headers: { 'user-agent': USER_AGENT, accept: 'text/html' }, signal: AbortSignal.timeout(12_000) });
     if (!res.ok) return null;
     const meta = extractMeta((await res.text()).slice(0, 200_000));
-    return meta ? { kind: event.url.includes('/spectrum/') ? 'spectrum' : 'comm-link', label: 'RSI page meta tags', url: event.url, text: meta } : null;
+    return meta ? { kind: event.url.includes('/spectrum/') ? 'spectrum' : 'rsi-page', label: 'RSI page meta tags', url: event.url, text: meta } : null;
   } catch { return null; /* RSI blocks or serves a shell: fine */ }
+}
+
+const SPECTRUM_SEARCH = 'https://robertsspaceindustries.com/api/spectrum/search/content/extended';
+/** Spectrum answers ErrThrottleLimit to a burst (4 quick searches were enough): one search at a time, spaced. */
+const SPECTRUM_GAP_MS = 1200;
+let spectrumQueue: Promise<unknown> = Promise.resolve();
+
+/**
+ * Posts and replies of CIG staff about this edition (#364): one relevance search for "<name stem> <in-game year>" in the
+ * Star Citizen community (tavern 1); only staff hits are kept (selectSpectrum). Best effort: throttled or down -> [].
+ */
+function fetchSpectrum(event: EventInfo): Promise<SourceItem[]> {
+  const text = `${nameStem(event.name)} ${editionYears(event)[1]}`;
+  const run = spectrumQueue.then(async () => {
+    try {
+      const res = await fetch(SPECTRUM_SEARCH, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-tavern-id': '1', accept: 'application/json', 'user-agent': USER_AGENT },
+        body: JSON.stringify({ community_id: '1', text, type: ['op', 'reply'], page: 1, visibility: 'nonerased' }),
+        signal: AbortSignal.timeout(12_000),
+      });
+      const body = (await res.json().catch(() => null)) as { success?: unknown; code?: unknown; data?: { hits?: { hits?: unknown[] } } } | null;
+      if (!res.ok || body?.success !== 1) {
+        console.warn(`[sc-event-sheet] spectrum search "${text}": ${res.status} ${String(body?.code ?? '')}`);
+        return [];
+      }
+      return selectSpectrum(event, (body.data?.hits?.hits ?? []).map(toSpectrumPost).filter((p): p is SpectrumPost => p !== null));
+    } catch (e) {
+      console.warn(`[sc-event-sheet] spectrum search "${text}": ${(e as Error).message}`);
+      return [];
+    } finally {
+      await new Promise((r) => setTimeout(r, SPECTRUM_GAP_MS));
+    }
+  });
+  spectrumQueue = run.catch(() => undefined);
+  return run;
+}
+
+function toSpectrumPost(raw: unknown): SpectrumPost | null {
+  const h = raw as { _id?: unknown; _index?: unknown; _source?: Record<string, unknown>; details?: Record<string, Record<string, unknown> | undefined> } | null;
+  const s = h?._source;
+  const d = h?.details ?? {};
+  if (!s || typeof s.body !== 'string' || typeof s.time_created !== 'string') return null;
+  const thread = d.thread ?? {};
+  const member = d.member as { isGM?: unknown; displayname?: unknown; nickname?: unknown } | undefined;
+  const subject = typeof s.subject === 'string' && s.subject ? s.subject : typeof thread.subject === 'string' ? thread.subject : '';
+  return {
+    id: String(h?._id ?? ''),
+    threadSlug: typeof thread.slug === 'string' ? thread.slug : '',
+    subject,
+    body: s.body.slice(0, 20_000),
+    author: typeof member?.displayname === 'string' ? member.displayname : '',
+    createdAt: s.time_created,
+    staff: isSpectrumStaff(member, s.highlight_role_id),
+    reply: String(h?._index ?? '').includes('reply'),
+    channel: typeof d.channel?.name === 'string' ? d.channel.name : '',
+  };
 }
 
 interface Gathered { event: EventInfo; sources: SourceItem[]; own: boolean; bundle: string; hash: string }
 
 async function gather(event: EventInfo, recent: readonly LinkInfo[]): Promise<Gathered> {
-  const [eventLinks, wiki, meta] = await Promise.all([fetchEventLinks(event), fetchWiki(event), fetchMeta(event)]);
+  const [eventLinks, wiki, meta, staff] = await Promise.all([fetchEventLinks(event), fetchWiki(event), fetchMeta(event), fetchSpectrum(event)]);
   const seen = new Set<number>();
   const links = [...eventLinks, ...recent].filter((l) => (seen.has(l.id) ? false : (seen.add(l.id), true)));
   const posts = selectSources(event, links);
-  const own = posts.length > 0;
-  const sources = [...posts, ...(own ? [] : previousEditionSources(event, links)), ...(wiki ? [wiki] : []), ...(meta ? [meta] : [])];
+  // Official text of THIS edition: its comm-links or CIG staff posts on Spectrum (the RSI page's meta tags alone are too thin).
+  const own = posts.length > 0 || staff.length > 0;
+  const sources = [...posts, ...staff, ...(own ? [] : previousEditionSources(event, links)), ...(meta ? [meta] : []), ...(wiki ? [wiki] : [])];
   const bundle = bundleSources(sources);
   return { event, sources, own, bundle, hash: hashText(`${EXTRACTOR_VERSION}\n${bundle}`) };
 }
@@ -222,8 +282,8 @@ Deno.serve(withPosthog('sc-event-sheet', async (req) => {
         answer = await askModel(buildPrompt(g.event, g.bundle), key);
         if (!answer) return { eventId: g.event.id, status: 'model_failed' };
       }
-      const fresh = sheetFromModel(answer, g.event, { ownSources: g.own });
-      const dated = fillDatesFromCalendar(fresh.sheet, g.event);
+      const fresh = sheetFromModel(answer, g.event, { ownSources: g.own, sources: g.sources });
+      const dated = defaultPrerequisites(fillDatesFromCalendar(fresh.sheet, g.event));
       const { data: draft } = await db.from('sc_event_sheet_drafts').select('sheet').eq('event_id', g.event.id).maybeSingle();
       const merged: EventSheet = mergeSheets(draft?.sheet ? normalizeSheet(draft.sheet) : null, dated);
       const { error: applyErr } = await db.rpc('sc_event_sheet_apply', {

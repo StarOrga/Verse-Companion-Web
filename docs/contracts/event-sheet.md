@@ -42,7 +42,10 @@ mechanism is flexible** - nothing is locked to today's events. Every value may b
 - `prerequisites` (C4) is an estimate of the gear needed: `{op:"and"|"or", items:[...]}` or a leaf
   `{gear, label|null}`. Gear ids are open (suggestions: `fps-combat-set`, `combat-ship`, `salvage-ship`, ...). The
   normaliser **drops** patch / alpha / game package / edition / account entries (`isForbiddenGear`); a group of one
-  collapses to its member, empty groups vanish.
+  collapses to its member, empty groups vanish. **"No gear needed" is the leaf `{gear:"none"}`** (`noPrerequisites`,
+  `isNoPrereq`; only as the whole tree, dropped inside a group). Owner rule (#364): prerequisites nothing was found for
+  read "none", never unknown - the extractor fills it (`defaultPrerequisites`, source `default`, 0.8 = released) and a
+  default never displaces a found value in `mergeSheets`.
 
 ## Review (C3)
 
@@ -95,3 +98,30 @@ confirmed calendar row, no named source: confidence drops) -> `gateSheet` (< 0.8
 draft (admin `approved`/`edited` fields stay; a `rejected` reading stays rejected while repeated; an unknown reading never wipes a
 known value; a weak new reading never displaces a released value) -> `sc_event_sheet_apply(..., 'ai', 'sc-event-sheet:<major>:<hash>')`,
 i.e. every run writes a history row. Pending fields are unknown publicly and show in the admin draft.
+
+### Source authority and confidence (extractor v3, #364 follow-up)
+
+The model no longer picks the confidence. Per field it names the sources behind the value (`basis`: SOURCE numbers of the
+bundle) and `support` (`stated` / `inferred` / `conflicting`); `scoreField` turns the strongest cited authority into
+the number (`AUTHORITY_CONFIDENCE`):
+
+| Authority | Sources | stated | inferred | field `source` |
+| --- | --- | --- | --- | --- |
+| official | RSI comm-link of this edition, RSI page, CIG staff post or reply on Spectrum | 0.95 | 0.85 | `comm-link` / `rsi-page` / `spectrum-cig` |
+| community | starcitizen.tools wiki | 0.65 | 0.5 | `wiki` |
+| previous | last year's official posts (edition not announced yet) | 0.55 | 0.45 | `previous-edition` |
+
+`conflicting` = 0.35; no usable citation = the model's own number capped at 0.6, source `ai`. Calendar dates carry
+source `calendar`. So official text is released (>= 0.8), community and previous-edition readings wait in the review.
+Diagnosis: v2 let the model choose, and it gave official RSI text 0.3-0.7.
+
+**Spectrum (CIG staff only):** one relevance search per event, `POST /api/spectrum/search/content/extended`
+`{community_id:"1", text:"<name stem> <in-game year>", type:["op","reply"], page:1, visibility:"nonerased"}` with
+`X-Tavern-Id: 1` (no `sort` = relevance; `sort:"relevance"` is refused). A hit is staff when the member has
+`isGM`, the post has a `highlight_role_id` (staff role) or the name ends in `-CIG`; community posts are never read.
+`selectSpectrum` keeps up to 3 staff posts of this edition (subject year, else written near the dates; a mere mention
+is cut to the passage). Spectrum answers `ErrThrottleLimit` to a burst, so the searches run one at a time, 1.2 s apart.
+A staff post counts as this edition's own source (no previous-edition fallback then).
+
+**Rewards** = everything handed out (mode rewards, participation gifts, contest prizes, goals), not store sales. For an
+edition not announced yet the previous edition's rewards are kept as an expected hint (`previous-edition`, review).
