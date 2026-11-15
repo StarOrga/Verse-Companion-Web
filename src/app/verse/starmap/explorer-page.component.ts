@@ -15,7 +15,7 @@ import { VerseHeaderComponent } from '../shared/verse-header.component';
 import { GuessTrackComponent } from './guess-track.component';
 import { StarDomeComponent } from './star-dome.component';
 import { StarmapTourComponent } from './starmap-tour.component';
-import { STARS_PER_PATCH, defaultPatch, hasRankNews, hasTierReward, patchMapView, rankNewsItems, rankProgress, readRankSeen } from './starmap.model';
+import { STARS_PER_PATCH, defaultPatch, hasRankNews, hasTierReward, patchMapView, rankNewsItems, rankProgressOf, readRankSeen } from './starmap.model';
 
 export { wallpaperConstellations } from './wallpaper';
 
@@ -102,8 +102,7 @@ function isComplete(p: VerseExplorerPatch): boolean {
       @let st = state()!;
       @let p = selected()!;
       @let v = view()!;
-      @let k = st.kartograph;
-      @let ranked = k.unlocked && k.rank >= 1;
+      @let ranked = rankTierNo() >= 1;
       <div #mapEl class="page" [attr.aria-label]="'starmap.stageAria' | translate: { patch: name(p.patchLine) }" role="region">
         <sc-verse-header planet="starmap" [title]="'verse.area.starmap' | translate"
                          [subtitle]="'starmap.map.subtitle' | translate: { total: total }">
@@ -117,7 +116,7 @@ function isComplete(p: VerseExplorerPatch): boolean {
              [scTooltip]="(ranked ? 'starmap.rank.link' : 'starmap.rank.none') | translate: { name: tierName }" scTooltipTier="label">
             @if (rankNews()) { <span class="news-dot" aria-hidden="true"></span> }
             @if (ranked) {
-              <sc-kartograph-crest [rank]="k.rank" [size]="40" state="current" [framed]="crestFramed()" [orbit]="crestOrbit()" />
+              <sc-kartograph-crest [tier]="rankTierNo()" [size]="40" state="current" [framed]="crestFramed()" [orbit]="crestOrbit()" />
             } @else {
               <svg class="rank-empty" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
                 <path d="M20 4 33 9v10c0 8-5.6 14-13 17C12.6 33 7 27 7 19V9z" />
@@ -239,6 +238,10 @@ function isComplete(p: VerseExplorerPatch): boolean {
         .tracks { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; row-gap: 22px; }
         .tracks .track { display: block; grid-row: auto; }
       }
+      /* Phones: the last track (the comet strip, its open state) ends above the launcher / bottom-bar lane, not under it. */
+      @media (max-width: 720px) {
+        .map { padding-block-end: var(--sc-beta-fab-bottom, var(--sc-fab-clear-block)); }
+      }
       @media (prefers-reduced-motion: reduce) {
         .cele { animation: ex-cele-still 6.5s linear 0.2s both; }
         .rank { transition: none; }
@@ -304,7 +307,8 @@ export class ExplorerPageComponent {
     return p?.guess.answerName ?? p?.constellation?.name ?? null;
   });
   /** The rank tier of the head crest and its rank rewards (frame from tier 5, orbit at tier 7). */
-  private readonly rankTier = computed(() => rankProgress(this.state()?.kartograph ?? { unlocked: false, rank: 0 }));
+  private readonly rankTier = computed(() => rankProgressOf(this.state()));
+  readonly rankTierNo = computed(() => this.rankTier().tier);
   readonly rankKey = computed(() => this.rankTier().key);
   readonly crestFramed = computed(() => hasTierReward(this.rankTier().tier, 'frame'));
   readonly crestOrbit = computed(() => hasTierReward(this.rankTier().tier, 'orbit'));
