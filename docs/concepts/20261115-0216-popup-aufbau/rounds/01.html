@@ -126,12 +126,13 @@
   :is([data-design], .design-ov-scale) .ps-nav{display:none}
   :is([data-design], .design-ov-scale) .ps-trig{margin-right:0}
   :is([data-design], .design-ov-scale) .ps-page{left:10px;right:10px;top:72px;grid-template-columns:1fr 1fr}
-  :is([data-design], .design-ov-scale) .ps-stage{place-items:end stretch;padding:0}
-  :is([data-design], .design-ov-scale) .ps-stage .ps-pop,:is([data-design], .design-ov-scale) .ps-anchor .ps-pop{width:100%}
-  :is([data-design], .design-ov-scale) .ps-anchor{left:0;right:0;top:auto;bottom:0}
-  :is([data-design], .design-ov-scale) .ps-d1 .ps-stage .ps-pop,:is([data-design], .design-ov-scale) .ps-d1 .ps-anchor .ps-pop,:is([data-design], .design-ov-scale) .ps-d3 .ps-stage .ps-pop,:is([data-design], .design-ov-scale) .ps-d3 .ps-anchor .ps-pop{border-radius:16px 16px 0 0;border-bottom:0}
-  :is([data-design], .design-ov-scale) .ps-stage .ps-k-big{height:100%}
-  :is([data-design], .design-ov-scale) .ps-d1 .ps-stage .ps-k-big,:is([data-design], .design-ov-scale) .ps-d3 .ps-stage .ps-k-big{border-radius:0}
+  :is([data-design], .design-ov-scale) .ps-stage{place-items:stretch;padding:0}
+  :is([data-design], .design-ov-scale) .ps-anchor{inset:0}
+  :is([data-design], .design-ov-scale) .ps-stage .ps-pop,:is([data-design], .design-ov-scale) .ps-anchor .ps-pop{width:100%;height:100%}
+  :is([data-design], .design-ov-scale) .ps-d1 .ps-stage .ps-pop,:is([data-design], .design-ov-scale) .ps-d1 .ps-anchor .ps-pop,:is([data-design], .design-ov-scale) .ps-d3 .ps-stage .ps-pop,:is([data-design], .design-ov-scale) .ps-d3 .ps-anchor .ps-pop{border-radius:0;border:0}
+  :is([data-design], .design-ov-scale) .ps-d1 .ps-b,:is([data-design], .design-ov-scale) .ps-d3 .ps-b{flex:1}
+  :is([data-design], .design-ov-scale) .ps-d2 .ps-stage .ps-pop,:is([data-design], .design-ov-scale) .ps-d2 .ps-anchor .ps-pop{display:flex;flex-direction:column;padding:10px 8px}
+  :is([data-design], .design-ov-scale) .ps-d2 .ps-stage .ps-frame,:is([data-design], .design-ov-scale) .ps-d2 .ps-anchor .ps-frame{flex:1}
   :is([data-design], .design-ov-scale) .ps-board{left:10px;right:10px;top:72px;grid-template-columns:1fr}
   :is([data-design], .design-ov-scale) .ps-board .ps-k-big{grid-column:auto}
   :is([data-design], .design-ov-scale) .ps-board .ps-pop{width:100%}
@@ -142,7 +143,7 @@
 <header class="iteration-intro">
   <h2>Runde 1 · Ein Gerüst für alle Popups</h2>
   <p>Drei Gerüste für dieselben Popups: alle fünf Arten auf einen Blick, ein Bestätigen, ein Dialog mit Formular, ein Großfenster und ein Panel. Der Inhalt ist frei, gleich bleiben Kopf, Schließen, Fuß und Breiten. Wie sie auf- und zugehen, klärt das Concept „Popup-Animation“.</p>
-  <p>Fest steht: Ein modales Popup schließt nur über ✕, Abbrechen oder Escape, nie per Klick daneben (heute tut das noch „Bestätigen“); Knöpfe sind <code>scAction</code> mit höchstens einer Hauptaktion je Popup; jedes Popup hat genau einen Titel. Unter „Fragen“ stehen neun Regeln, unter „Zuordnung“ die rund 45 heutigen Popups mit einem Vorschlag, welcher Art sie angehören.</p>
+  <p>Fest steht: Ein modales Popup schließt nur über ✕, Abbrechen oder Escape, nie per Klick daneben (heute tut das noch „Bestätigen“); Knöpfe sind <code>scAction</code> mit höchstens einer Hauptaktion je Popup; jedes Popup hat genau einen Titel; auf dem Handy wird jedes Dialog-, Panel- und Großfenster-Popup zum Vollbild (entschieden im Concept „Popup-Animation“, die Handy-Ansicht unten links zeigt es). Unter „Fragen“ stehen neun Regeln, unter „Zuordnung“ die rund 45 heutigen Popups mit einem Vorschlag, welcher Art sie angehören.</p>
 </header>
 <section data-design="d1" data-nav-label="Kopfleiste" data-design-active="true" data-screen-fit="full" data-design-motto="Kopf, Inhalt, Fuß wie überall" data-design-traits="Kopfzeile mit Symbol, Augenbraue und ✕ rechts|Fußleiste mit Status links, Hauptaktion rechts außen|Runde Ecken, ruhige Trennlinien" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;&gt;&lt;rect x=&quot;3&quot; y=&quot;4&quot; width=&quot;18&quot; height=&quot;16&quot; rx=&quot;3&quot;/&gt;&lt;path d=&quot;M3 9h18M3 16h18&quot;/&gt;&lt;/svg&gt;" data-design-color="#8fe3ff">
   <section id="d1-all" data-nav-label="Alle Arten" data-screen data-screen-active="true"><div class="ps ps-d1"><div class="ps-board"><div class="ps-pop ps-k-menu" data-m="d1-all-menu"><div class="ps-b"><a class="ps-it" href="#" onclick="return false"><i></i>Starscape-Hintergrund</a><a class="ps-it" href="#" onclick="return false"><i></i>Desktop-App</a><a class="ps-it ps-col" href="#" onclick="return false"><i></i>Data Uploader</a><a class="ps-it" href="#" onclick="return false"><i></i>Feedback senden</a></div></div><div class="ps-pop ps-k-panel" data-m="d1-all-panel"><header class="ps-h"><span class="ps-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span><div class="ps-tt"><small class="ps-eb">Merkliste</small><h4>3 Schiffe gemerkt</h4></div><button type="button" class="ps-x" aria-label="Schließen"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header><div class="ps-b"><div class="ps-row"><b>Gladius</b><small>Aegis</small><span class="ps-step"><b>−</b><i>1</i><b>+</b></span></div><div class="ps-row"><b>Cutlass Black</b><small>Drake</small><span class="ps-step"><b>−</b><i>2</i><b>+</b></span></div><div class="ps-row"><b>Arrow</b><small>Anvil</small><span class="ps-step"><b>−</b><i>1</i><b>+</b></span></div></div><footer class="ps-f"><span class="ps-sp"></span><button type="button" class="ps-btn">Alle ansehen ›</button></footer></div><div class="ps-pop ps-k-dlg ps-t-danger" data-m="d1-all-dlg"><header class="ps-h"><span class="ps-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></span><div class="ps-tt"><small class="ps-eb">Hangar</small><h4>Gladius entfernen?</h4></div><button type="button" class="ps-x" aria-label="Schließen"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header><div class="ps-b"><p>Das Schiff verschwindet aus deinem Bestand und aus allen Listen. Rückgängig geht danach 10 Sekunden lang.</p></div><footer class="ps-f"><span class="ps-sp"></span><button type="button" class="ps-btn" data-screen-link="d1-all">Abbrechen</button><button type="button" class="ps-btn ps-dng">Entfernen</button></footer></div><div class="ps-pop ps-k-big" data-m="d1-all-big"><header class="ps-h"><span class="ps-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg></span><div class="ps-tt"><small class="ps-eb">Waffe · S3 · Nase</small><h4>Bauteil tauschen</h4><span class="ps-sub">Gladius · Werksausstattung 4.10.2-LIVE</span></div><span class="ps-tools"><button type="button" class="ps-tool" aria-label="Vorheriges Bauteil">‹</button><button type="button" class="ps-tool" aria-label="Nächstes Bauteil">›</button></span><button type="button" class="ps-x" aria-label="Schließen"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header><div class="ps-b"><div class="ps-chips"><span>Alle</span><span>Ballistisch</span><span>Energie</span><span>Verbaut</span></div><table class="ps-tbl"><thead><tr><th>Waffe</th><th>Größe</th><th>Alpha</th><th>Feuerrate</th></tr></thead><tbody><tr class="on"><td>Mantis GT-220</td><td>S3</td><td>42</td><td>1.200</td></tr><tr><td>CF-337 Panther</td><td>S3</td><td>38</td><td>1.100</td></tr><tr><td>Attrition-3</td><td>S3</td><td>51</td><td>0.950</td></tr><tr><td>Deadbolt III</td><td>S3</td><td>96</td><td>0.330</td></tr><tr><td>M5A Cannon</td><td>S3</td><td>140</td><td>0.150</td></tr></tbody></table></div><footer class="ps-f"><span class="ps-st">18 passende Waffen</span><span class="ps-sp"></span><button type="button" class="ps-btn" data-screen-link="d1-all">Abbrechen</button><button type="button" class="ps-btn ps-pri">Übernehmen</button></footer></div><div class="ps-pop ps-k-toast" data-m="d1-all-toast"><span class="ps-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4 10-10"/></svg></span><div class="ps-b"><div class="ps-tmsg"><b>Cutlass Black ist gemerkt</b><button type="button" class="ps-btn">Rückgängig</button></div><div class="ps-prog"><i></i></div></div></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d1-all-a1" data-anno-side="right" data-anno-target="[data-m=&quot;d1-all-menu&quot;]" style="--anno-x:96%;--anno-y:30%"><button class="anno-pin" type="button" data-anno-pin="r1-d1-all-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-all-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d1-all-a1" data-anno-bubble="r1-d1-all-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-all-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-all-a1"><span class="anno-bubble-question">Menüs haben keinen Kopf und kein ✕. Soll das Konto-Menü trotzdem einen Kopf mit deinem Namen behalten?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-all-a1" data-annotation="r1-d1-all-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-all-a1"></div></div></div></div></div></section>
@@ -328,7 +329,7 @@ Bestätigen      kein ✕</pre></div>
 
   <section id="r1-t-bau" data-topic data-nav-label="Bau und Rollen">
     <div data-alevel="2" data-title="Bau und Rollen">
-      <div data-slot="short"><p>Ein Gerüst im Code, eine Regel fürs Handy, eine für Admin-Popups.</p></div>
+      <div data-slot="short"><p>Ein Gerüst im Code, eine Regel für Zurück, eine für Admin-Popups.</p></div>
       <div data-slot="long"><p>Dieselbe Kopf-Fuß-Struktur steckt heute in mehreren Stylesheets; eine Änderung am Kopf muss an jeder Stelle einzeln gemacht werden.</p></div>
     </div>
 
@@ -352,22 +353,22 @@ Bestätigen      kein ✕</pre></div>
       </div>
     </section>
 
-    <section id="r1-phone" data-nav-label="Auf dem Handy" data-decision="r1-phone" data-decision-mode="single" data-label="Auf dem Handy" data-rec="sheet" data-rec-why="Ein Blatt am unteren Rand liegt im Daumenbereich; Großfenster brauchen den ganzen Bildschirm für ihre Tabellen." data-applies-to="Panels, Dialoge, Großfenster auf dem Handy" data-finding="r1-phone-f" data-finding-quant="false">
-      <p data-applies>Gilt für: Panels, Dialoge, Großfenster auf dem Handy</p>
-      <p data-situation>Drei Regeln für dieselbe Bildschirmbreite: HQ-Dialoge werden zum Blatt unten, die Schnellsuche wird Vollbild, die Merkliste klebt am unteren Rand.</p>
-      <h3 data-question>Wie sehen Popups auf dem Handy aus?</h3>
+    <section id="r1-back" data-nav-label="Zurück-Geste" data-decision="r1-back" data-decision-mode="single" data-label="Zurück-Geste" data-rec="full" data-rec-why="Was den ganzen Bildschirm füllt, wirkt wie eine eigene Seite; die Zurück-Geste soll es schließen, nicht die Seite darunter." data-applies-to="Popups auf Handy und Rechner" data-finding="r1-back-f" data-finding-quant="false">
+      <p data-applies>Gilt für: Popups auf Handy und Rechner</p>
+      <p data-situation>Hat ein Vollbild-Popup keine eigene Adresse, verlässt die Zurück-Geste auf dem Handy die ganze Seite statt nur das Fenster.</p>
+      <h3 data-question>Was schließt die Zurück-Geste?</h3>
       <div data-options>
-        <label data-opt="sheet" data-recommended><input type="radio" name="dm-r1-phone" value="sheet" checked><span data-opt-label>Dialoge und Panels als Blatt von unten, Großfenster als Vollbild</span><span data-opt-consequence>So zeigt es die Handy-Ansicht der Varianten.</span></label>
-        <label data-opt="full"><input type="radio" name="dm-r1-phone" value="full"><span data-opt-label>Alles als Vollbild</span><span data-opt-consequence>Viel Platz, aber auch ein kurzes Bestätigen verdeckt dann die ganze Seite.</span></label>
-        <label data-opt="desk"><input type="radio" name="dm-r1-phone" value="desk"><span data-opt-label>Wie am Rechner, nur schmaler</span><span data-opt-consequence>Ein Bild überall, Knöpfe liegen aber oft außerhalb des Daumenbereichs.</span></label>
+        <label data-opt="full" data-recommended><input type="radio" name="dm-r1-back" value="full" checked><span data-opt-label>Jedes Popup, das auf dem Handy Vollbild ist, und alle Großfenster</span><span data-opt-consequence>Zurück schließt erst das Fenster, dann die Seite; Menüs und Hinweise bleiben außen vor.</span></label>
+        <label data-opt="url"><input type="radio" name="dm-r1-back" value="url"><span data-opt-label>Nur Popups mit eigener Adresse, wie heute</span><span data-opt-consequence>Wunschkorb und Overlay-Seiten schließen per Zurück, andere Fenster nicht.</span></label>
+        <label data-opt="none"><input type="radio" name="dm-r1-back" value="none"><span data-opt-label>Keins, Zurück verlässt immer die Seite</span><span data-opt-consequence>Einheitlich, aber mit der Wischgeste ist die Seite samt Fenster weg.</span></label>
       </div>
-      <textarea data-comment="r1-phone-note" placeholder="Notiz (optional)"></textarea>
-      <div data-alevel="3" data-title="Auf dem Handy">
-        <div data-slot="short"><p>Drei Popups, drei Handy-Regeln.</p></div>
-        <div data-slot="long"><p>Umschalten auf die Handy-Ansicht unten links zeigt die Empfehlung an jeder Variante.</p></div>
-        <div data-example><pre>HQ-Dialog     ≤ 640 px  Blatt am unteren Rand
-Schnellsuche  ≤ 720 px  Vollbild
-Merkliste     ≤ 749 px  festes Blatt unten</pre></div>
+      <textarea data-comment="r1-back-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Zurück-Geste">
+        <div data-slot="short"><p>Nur Popups mit eigener Adresse reagieren heute auf Zurück.</p></div>
+        <div data-slot="long"><p>Auf dem Handy werden Popups künftig Vollbild, deshalb zählt die Geste dort mehr.</p></div>
+        <div data-example><pre>Wunschkorb   ?cart=1           Zurück schließt das Fenster
+Overlay      eigene Route      Zurück schließt das Fenster
+Bestätigen   keine Adresse     Zurück verlässt die Seite</pre></div>
       </div>
     </section>
 
