@@ -62,6 +62,8 @@ export const EVENTS = {
   'codex:section_view': ev<{ section: 'fps' | 'keybinds' | 'upcoming' | 'upcoming_entry' }>('codex', 'Ein Codex-Abschnitt abseits der Detailseiten wurde geöffnet.'),
   'codex:compare_start': ev<{ kind: string; count: number }>('codex', 'Der Vergleich wurde möglich: das zweite Objekt liegt im Vergleichsfach.'),
   'codex:holotable_open': ev<{ kind: string }>('codex', 'Der Holotisch einer Detailseite wurde bewusst eingeschaltet.'),
+  'codex:buy_open': ev<{ kind: string; tab_remembered: boolean }>('codex', 'Der Reiter Kaufen der Holotisch-Akte wurde geöffnet (Art; ob er die gemerkte Wahl war).'),
+  'codex:wish_add': ev<{ kind: string; source: 'shop' | 'wikelo' }>('codex', 'Ein Eintrag wurde aus dem Reiter Kaufen auf die Wunschliste gesetzt (Quelle: Laden oder Wikelo-Tausch).'),
   'codex:filter_change': ev<{ kind: string; filter_count: number }>('codex', 'Im Codex-Index wurden Filter angewendet (Art, Anzahl aktiver Filter, nie die Werte).'),
   'codex:ship_link_create': ev<{ shipSlug: string }>('codex', 'Ein Codex-Schiff wurde mit einem Hangar-Schiff verknüpft.'),
   'codex:ship_link_remove': ev<{ shipSlug: string }>('codex', 'Die Verknüpfung eines Codex-Schiffs wurde gelöst.'),
