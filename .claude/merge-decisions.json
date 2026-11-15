@@ -85,6 +85,66 @@
         ]
       }
     ],
+    ".claude/project-map.md›generated›codex counts": [
+      {
+        "ship": "claude/focus-borders-starmap-4c0ef0",
+        "by": "JerryT2T",
+        "value": "main's generated map",
+        "decided": true,
+        "at": "2026-11-15T04:52:34.188Z",
+        "hunks": [
+          "b4c95acad10d"
+        ]
+      }
+    ],
+    ".claude/project-map.md›generated›file counts": [
+      {
+        "ship": "claude/focus-borders-starmap-4c0ef0",
+        "by": "JerryT2T",
+        "value": "main's generated map (counts regenerate on every commit)",
+        "decided": true,
+        "at": "2026-11-15T04:52:34.188Z",
+        "hunks": [
+          "0759fc3cc06c"
+        ]
+      }
+    ],
+    ".claude/project-map.md›generated›migrations counts": [
+      {
+        "ship": "claude/focus-borders-starmap-4c0ef0",
+        "by": "JerryT2T",
+        "value": "main's generated map",
+        "decided": true,
+        "at": "2026-11-15T04:52:34.188Z",
+        "hunks": [
+          "653f38c9851d"
+        ]
+      }
+    ],
+    ".claude/project-map.md›generated›src counts": [
+      {
+        "ship": "claude/focus-borders-starmap-4c0ef0",
+        "by": "JerryT2T",
+        "value": "main's generated map",
+        "decided": true,
+        "at": "2026-11-15T04:52:34.188Z",
+        "hunks": [
+          "6d5490606f15"
+        ]
+      }
+    ],
+    ".claude/project-map.md›generated›supabase counts": [
+      {
+        "ship": "claude/focus-borders-starmap-4c0ef0",
+        "by": "JerryT2T",
+        "value": "main's generated map",
+        "decided": true,
+        "at": "2026-11-15T04:52:34.188Z",
+        "hunks": [
+          "3a7ebd466094"
+        ]
+      }
+    ],
     ".claude/project-map.md›header›file-count": [
       {
         "ship": "claude/batch-901bea",
