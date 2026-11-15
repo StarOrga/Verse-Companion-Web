@@ -131,14 +131,30 @@ export function aiCard(i: { monthCostUsd: number; day: number; daysInMonth: numb
   };
 }
 
-export function desktopCard(rows: { product: string; version: string; installs: number }[], reachable: boolean, projectUrl: string): Card {
+/** A desktop job-diagnostics report: `logLink` is a presigned 24 h URL of the stored r2:// log (null when R2 is not configured). */
+export interface DiagItem { product: string; version: string; message: string; logLink: string | null }
+
+/** `r2://<bucket>/<key>` → `<key>` (null for anything else). */
+export function diagKeyOf(ref: string): string | null {
+  const m = /^r2:\/\/[^/]+\/(.+)$/.exec(ref);
+  return m ? m[1] : null;
+}
+
+export function desktopCard(rows: { product: string; version: string; installs: number }[], reachable: boolean, projectUrl: string, diag: DiagItem[] = []): Card {
   const links = [{ labelKey: 'desktopEvents', url: `${projectUrl}/activity/explore` }];
   if (!reachable) return { id: 'desktop', level: 'unknown', kpi: { value: null, display: '–', unitKey: 'desktopInstalls' }, top: [], links };
   const total = rows.reduce((s, r) => s + r.installs, 0);
   return {
     id: 'desktop', level: 'ok', kpi: { value: total, display: fmt(total), unitKey: 'desktopInstalls' },
-    top: rows.slice(0, 3).map((r) => ({ label: `${r.product} ${r.version}`, value: fmt(r.installs), badge: 'desktop' as const })),
-    links, calmKey: 'desktopCalm',
+    top: [
+      // newest job-diagnostics reports first; the presigned log link rides in the feedback body
+      ...diag.slice(0, 3).map((d) => ({
+        label: `${d.product} ${d.version}: ${d.message}`, value: 'Log', badge: 'desktop' as const, level: 'warn' as Level,
+        feedback: feedbackPrefill(`Desktop-Diagnose: ${d.message}`, `Job-Diagnose der Desktop-App ${d.product} ${d.version}.${d.logLink ? ` Log (24 h gültig): ${d.logLink}` : ''}`, `${projectUrl}/activity/explore`),
+      })),
+      ...rows.map((r) => ({ label: `${r.product} ${r.version}`, value: fmt(r.installs), badge: 'desktop' as const })),
+    ].slice(0, 3),
+    links, calmKey: diag.length ? undefined : 'desktopCalm',
   };
 }
 

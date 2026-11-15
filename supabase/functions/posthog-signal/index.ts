@@ -15,7 +15,7 @@
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
-import { fileFinding, throttled } from '../_shared/guard-board.ts';
+import { fileFinding, throttled, type Db } from '../_shared/guard-board.ts';
 import { billing, hogql, personalKey, projectId, setSaverFlag, getSaverFlag } from '../_shared/posthog-api.ts';
 import { captureServerException, withPosthog } from '../_shared/posthog.ts';
 import {
@@ -35,7 +35,7 @@ const link = async (path: string) => {
   return id ? `${POSTHOG_HOST}/project/${id}${path}` : `${POSTHOG_HOST}${path}`;
 };
 
-async function webhook(db: ReturnType<typeof createClient>, req: Request): Promise<Response> {
+async function webhook(db: Db, req: Request): Promise<Response> {
   const sig = parseSignal(await req.json().catch(() => null));
   if (!sig) return json({ ok: false, error: 'bad_payload' }, 400);
   const url = sig.url ?? (await link(`/error_tracking/${sig.issueId}`));
@@ -45,7 +45,7 @@ async function webhook(db: ReturnType<typeof createClient>, req: Request): Promi
   return json({ ok: true, ...r });
 }
 
-async function trends(db: ReturnType<typeof createClient>): Promise<Response> {
+async function trends(db: Db): Promise<Response> {
   const today = utcDay(new Date());
   const out: Record<string, unknown> = {};
 
@@ -94,7 +94,7 @@ async function trends(db: ReturnType<typeof createClient>): Promise<Response> {
   return json({ ok: true, ...out });
 }
 
-async function quota(db: ReturnType<typeof createClient>): Promise<Response> {
+async function quota(db: Db): Promise<Response> {
   const now = new Date();
   const parsed = parseBilling(await billing());
   if (!parsed) return json({ ok: false, error: 'billing_unavailable' });
@@ -152,4 +152,4 @@ const handler = async (req: Request): Promise<Response> => {
   }
 };
 
-Deno.serve(withPosthog(FN, handler));
+Deno.serve(withPosthog(FN, handler, { cron: true }));

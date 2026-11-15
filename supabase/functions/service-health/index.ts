@@ -13,7 +13,7 @@
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
-import { fileFinding, throttled } from '../_shared/guard-board.ts';
+import { fileFinding, throttled, type Db } from '../_shared/guard-board.ts';
 import { pingProject, personalKey } from '../_shared/posthog-api.ts';
 import { captureServerException, withPosthog } from '../_shared/posthog.ts';
 import {
@@ -37,7 +37,6 @@ async function http(url: string, init: RequestInit = {}, okIf: (s: number) => bo
 
 const anthropic = (key: string) => http('https://api.anthropic.com/v1/models?limit=1', { headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01' } });
 
-type Db = ReturnType<typeof createClient>;
 
 async function probe(service: ServiceName, db: Db): Promise<ProbeResult> {
   switch (service) {
@@ -141,4 +140,4 @@ const handler = async (req: Request): Promise<Response> => {
   }
 };
 
-Deno.serve(withPosthog(FN, handler));
+Deno.serve(withPosthog(FN, handler, { cron: true }));
