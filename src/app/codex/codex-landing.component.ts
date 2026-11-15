@@ -25,8 +25,8 @@ import { CodexLandingNewsComponent } from './landing/codex-landing-news.componen
 import { CLAIM_MS, ClaimCursor, buildClaims } from './landing/codex-landing-claims';
 import { PauseOffscreenDirective } from '../shared/pause-offscreen.directive';
 
-/** One rotation step (brief A4: ≈ 8 s per category). */
-export const ROTATION_MS = 8000;
+/** One rotation step: ≈ 24 s per category (brief A4 had 8 s; three times slower per admin feedback #363). */
+export const ROTATION_MS = 24000;
 /** New items listed per category in the Codex list before "+ N weitere in der Suche". */
 
 /**
