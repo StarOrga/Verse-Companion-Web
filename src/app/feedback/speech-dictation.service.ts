@@ -155,8 +155,7 @@ export class SpeechDictationService {
       if (this.rec !== rec) return;
       let finalText = '';
       let interim = '';
-      for (let i = 0; i < ev.results.length; i++) {
-        const r = ev.results[i];
+      for (const r of Array.from(ev.results)) {
         const t = r[0]?.transcript ?? '';
         if (r.isFinal) finalText += t;
         else interim += t;

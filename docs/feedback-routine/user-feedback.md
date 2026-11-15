@@ -196,6 +196,23 @@ pretending to have a thumbnail.
 > picture of arbitrary text. The composer says the same thing to the sender
 > (`userFeedback.imageHint`), so the rule is visible from both ends.
 
+### Dictation (admin feedback #359)
+
+Every composer — new topic, thread reply, the viewer's launcher — carries a mic
+button in its send row: speak instead of type. `SpeechDictationService`
+(`src/app/feedback/`) wraps the browser's Web Speech API (`SpeechRecognition` /
+`webkitSpeechRecognition`, continuous with interim results, language from the
+app language: `de-DE` / `en-US`). The words land at the caret — live while
+still a guess, replaced by the final ones — and go through the same character
+clamp and draft store as typing. **Alt+M** (⌥M on Apple platforms) toggles it
+anywhere in the box; the tooltip names the key. Typing, sending, switching the
+topic or closing the box ends the session. Firefox has no recognizer: the button
+stays, aria-disabled, and its tooltip says so. The browser does the recognition
+itself (Chrome sends the audio to its own speech service), so the CSP is
+untouched; the `Permissions-Policy` in `vercel.json` allows `microphone=(self)`
+for the app (the concept frame keeps `microphone=()`). Starting a session sends
+`feedback:dictation_start` (`via: button | hotkey`), never the text.
+
 ### "Nicht umsetzen & löschen" (declining a user topic)
 
 For a user-submitted topic the admin's delete button (behind the card's "Weitere
