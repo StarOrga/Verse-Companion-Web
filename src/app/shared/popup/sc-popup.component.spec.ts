@@ -375,7 +375,7 @@ describe('ScPopupComponent on a phone', () => {
   imports: [ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <sc-popup kind="dialog" title="Wunschliste" eyebrow="Merkliste">
+    <sc-popup kind="dialog" title="Wunschliste" eyebrow="Merkliste" [backClose]="false">
       <label><input type="checkbox" /> Position</label>
       <span popupStatus>3 von 5 gewählt</span>
     </sc-popup>
@@ -389,7 +389,7 @@ class PhoneHostComponent {}
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="slot" style="position: relative; width: 300px; height: 260px">
-      <sc-popup kind="panel" size="fill" [bodyFill]="true" [float]="float" title="Fill" style="--sc-popup-body-gap: 7px">
+      <sc-popup kind="panel" size="fill" [bodyFill]="true" [float]="float" [backClose]="false" title="Fill" style="display: block; height: 100%; --sc-popup-body-gap: 7px">
         <div class="inner">x</div>
       </sc-popup>
     </div>

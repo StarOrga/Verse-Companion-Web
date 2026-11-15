@@ -87,7 +87,7 @@ let uid = 0;
  *               panel→s, dialog→m, large→area; a notice takes `--sc-toast-w`. A two-button
  *               question passes `size="s"`.
  *               `fill`: no width token, the frame fills its host (a 3D panel over a picture, a part
- *               popup): the host gives the size, `--sc-popup-radius` / `--sc-popup-border-w` on the
+ *               popup): the host gives the size (and `<sc-popup>` itself `display: block; height: 100%`), `--sc-popup-radius` / `--sc-popup-border-w` on the
  *               host square it off for a full-screen use.
  * - `bodyFill`  the body is a flex column that fills the height (gap `--sc-popup-body-gap`) instead of
  *               scrolling itself: for content that owns its scroller (a table box, a viewer).
