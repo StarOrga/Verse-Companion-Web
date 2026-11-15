@@ -76,6 +76,7 @@ import {
   getCachedSnapshot,
   runSync,
 } from './session.js';
+import { holdForRunningInstall, holdingForInstall } from './install-guard.js';
 import * as uploadJob from './upload-session.js';
 import * as resources from './resources.js';
 import { isInterrupt, PausedError } from '../lib/pause-control.js';
@@ -1488,12 +1489,17 @@ if (!gotLock) {
 }
 
 app.on('second-instance', () => {
+  // Waiting for a running update install: the files are not complete yet.
+  if (holdingForInstall()) return;
   // Also un-hides a tray-resident instance: double-clicking the .exe while the
   // app sits in the tray should bring the window back, not appear to do nothing.
   showMainWindow();
 });
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  // Opened while an update installer still writes the app's files: wait for it,
+  // then restart on the finished install (main/install-guard.ts).
+  if (await holdForRunningInstall()) return;
   wireStallPower();
   // Every discovery (auto-run, cleanup, Install step) probes the install the
   // operator chose before first — falls back to the search when it is gone.
