@@ -1,9 +1,9 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.265.1",
+  "current": "0.265.2",
   "releases": [
     {
-      "version": "0.265.1",
+      "version": "0.265.2",
       "date": "2026-11-15",
       "sections": [
         {
@@ -17,6 +17,22 @@
             {
               "title": "",
               "text": "Codex: the energy dock can no longer be set above what the power plant supplies; info texts open beside the pips instead of covering them, the facts area is more compact, the screen-edge dock keeps every system on one row and starts level with the ship picture."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.265.1",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Rank page: the header shows your current star map in outline, like the star map page, instead of the generic planet emblem."
             }
           ]
         }
