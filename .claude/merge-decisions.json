@@ -197,6 +197,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›header›tracked file count": [
+      {
+        "ship": "claude/user-security-gap-investigation-747d11",
+        "by": "JerryT2T",
+        "value": "generated file, regenerated with gen-project-map.mjs after the merge (count of the merged tree)",
+        "decided": true,
+        "at": "2026-11-15T23:03:55.783Z",
+        "hunks": [
+          "36ea5c0260bf"
+        ]
+      }
+    ],
     ".claude/project-map.md›header›tracked-count": [
       {
         "ship": "#1096",
