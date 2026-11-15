@@ -23,6 +23,9 @@ import { useViewport } from '../../testing/viewport';
         [backClose]="backClose()"
         (closed)="onClosed($event)"
       >
+        @if (icon()) {
+          <svg popupIcon class="mark" viewBox="0 0 24 24"><path d="M4 12h16" /></svg>
+        }
         <div class="content" [style.height.px]="contentH()">Inhalt</div>
         <ng-container popupActions>
           <button type="button" class="save">Speichern</button>
@@ -45,6 +48,7 @@ class HostComponent {
   readonly size = signal<ScPopupSize | null>(null);
   readonly access = signal<ScPopupAccess>(null);
   readonly contentH = signal(40);
+  readonly icon = signal(false);
   readonly backClose = signal<boolean | null>(null);
   readonly secondBack = signal<boolean | null>(null);
   readonly secondReasons: string[] = [];
@@ -89,7 +93,8 @@ describe('ScPopupComponent', () => {
       expect(!!el.querySelector('.scp-h')).toBe(k.head);
       expect(!!el.querySelector('.scp-x')).toBe(k.close);
       expect(!!el.querySelector('.scp-ev')).toBe(k.eyebrow);
-      expect(el.querySelector('.scp-rail .scp-sym svg')).not.toBeNull();
+      // No generic stand-in symbol: the rail shows only a projected [popupIcon].
+      expect(el.querySelector('.scp-rail .scp-sym svg')).toBeNull();
       if (k.size) expect(el.dataset['size']).toBe(k.size);
       // Exactly one heading, also for kinds without a visible head.
       expect(el.querySelectorAll('h2').length).toBe(1);
@@ -100,9 +105,24 @@ describe('ScPopupComponent', () => {
 
   it('the rail is narrow (36px) on menu and notice, 46px otherwise', async () => {
     for (const [kind, w] of [['menu', 36], ['notice', 36], ['dialog', 46]] as const) {
-      const f = mount((h) => h.kind.set(kind));
+      const f = mount((h) => {
+        h.kind.set(kind);
+        h.icon.set(true);
+      });
       await settle();
       expect(Math.round(frame(f.nativeElement).querySelector<HTMLElement>('.scp-rail')!.getBoundingClientRect().width)).toBe(w);
+      f.destroy();
+      TestBed.resetTestingModule();
+    }
+  });
+
+  it('without a mark or an eyebrow the rail is only a 3px accent edge, never a generic stand-in icon', async () => {
+    for (const kind of ['menu', 'notice'] as const) {
+      const f = mount((h) => h.kind.set(kind));
+      await settle();
+      const rail = frame(f.nativeElement).querySelector<HTMLElement>('.scp-rail')!;
+      expect(Math.round(rail.getBoundingClientRect().width)).toBe(3);
+      expect(rail.querySelector('svg')).toBeNull();
       f.destroy();
       TestBed.resetTestingModule();
     }

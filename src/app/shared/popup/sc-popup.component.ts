@@ -38,15 +38,6 @@ const DEFAULT_SIZE: Record<Exclude<ScPopupKind, 'notice'>, ScPopupSize> = {
   large: 'area',
 };
 
-/** Default rail symbol per kind (24-unit viewBox, stroke style of the app's icon family). */
-const KIND_SYMBOL: Record<ScPopupKind, string> = {
-  menu: 'M4 6h16M4 12h16M4 18h16',
-  panel: 'M4 5h16v14H4zM14 5v14',
-  dialog: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.2a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1 1-1.1 1.7v.4M12 17h.01',
-  large: 'M3 5h18v14H3zM3 9h18',
-  notice: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v5M12 8h.01',
-};
-
 let uid = 0;
 
 /**
@@ -54,11 +45,11 @@ let uid = 0;
  * design d3 "Kommando-Spalte"). The popup fills only its content; head, ✕, footer, width,
  * scroll, scrim, focus and the role edge come from here.
  *
- * Look: a coloured rail on the left (46 px; 36 px for menu + notice) carries the kind's symbol
- * and the vertical eyebrow; title + header tools + ✕ in the head row; only the body scrolls;
+ * Look: a coloured rail on the left (46 px; 36 px for menu + notice) carries the popup's own symbol
+ * and the vertical eyebrow (with neither it narrows to a plain accent edge, never a generic icon); title + header tools + ✕ in the head row; only the body scrolls;
  * footer actions left in reading order (primary first), status text right. The rail colour is
  * the KIND, never the consequence: a delete shows its danger only on its own button
- * (`scAction tone="danger"`). All kinds share `--sc-accent` and differ by symbol; an area may
+ * (`scAction tone="danger"`). All kinds share `--sc-accent`; an area may
  * set `--sc-popup-rail` on the host, but never to hot / collab / danger / warning.
  *
  * Usage:
@@ -118,7 +109,8 @@ let uid = 0;
  *
  * Slots (content projection)
  * - default          the body (the only part that scrolls).
- * - `[popupIcon]`    an `<svg>` replacing the kind's default rail symbol (area symbol).
+ * - `[popupIcon]`    an `<svg>` for the rail: the icon of the trigger that opened the popup, or of the one
+ *                    action it offers. No fitting icon → leave it out; there is no generic default.
  * - `[popupTools]`   header tools before the ✕ (‹ › stepping, a filter toggle); tertiary scActions.
  * - `[popupActions]` footer actions, left, in reading order, at most ONE `tier="primary"`, first.
  * - `[popupStatus]`  footer status text, right (an element, e.g. `<span popupStatus>`).
@@ -181,7 +173,6 @@ let uid = 0;
       <aside class="scp-rail">
         <span class="scp-sym" aria-hidden="true">
           <ng-content select="[popupIcon]" />
-          <svg class="scp-sym-default" viewBox="0 0 24 24"><path [attr.d]="symbol()" /></svg>
         </span>
         @if (showEyebrow()) {
           <span class="scp-ev">{{ eyebrow() }}</span>
@@ -261,7 +252,6 @@ export class ScPopupComponent implements OnInit, OnDestroy {
   readonly takesFocus = computed(() => this.kind() !== 'notice');
   // A menu frame is a labelled group (its items are the host's menuitems); aria-label on a role-less div is invalid.
   readonly frameRole = computed(() => (this.kind() === 'menu' ? 'group' : this.dialogRole()));
-  readonly symbol = computed(() => KIND_SYMBOL[this.kind()]);
   readonly widthTier = computed<ScPopupSize | 'toast'>(() => {
     const k = this.kind();
     if (k === 'notice') return 'toast';
