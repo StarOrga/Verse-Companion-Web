@@ -1,9 +1,9 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.11",
+  "current": "0.270.12",
   "releases": [
     {
-      "version": "0.270.11",
+      "version": "0.270.12",
       "date": "2026-11-15",
       "sections": [
         {
@@ -13,6 +13,22 @@
             {
               "title": "",
               "text": "HQ: retry, undo, crew, sharing and stock buttons use the shared action control — one main step per view, red tone for revoke and remove (#970)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.270.11",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Feedback composers have a microphone button for dictation (Alt+M / ⌥M), shown in its tooltip; spoken text appears live at the cursor."
             }
           ]
         }

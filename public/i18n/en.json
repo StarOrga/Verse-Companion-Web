@@ -5019,7 +5019,15 @@
       "imagesOnly": "Only images can be attached here.",
       "fileTooLarge": "File too large – {{max}} MB per attachment at most.",
       "charCount": "{{used}} of {{max}} characters",
-      "charLimit": "Character limit reached: {{max}} characters per message."
+      "charLimit": "Character limit reached: {{max}} characters per message.",
+      "dictate": "Dictate ({{key}})",
+      "dictateStop": "Stop dictation ({{key}})",
+      "dictateUnsupported": "This browser cannot dictate – Chrome, Edge or Safari can.",
+      "dictateDenied": "No microphone access – please allow it in the browser settings.",
+      "dictateNoMic": "No microphone found.",
+      "dictateNoSpeech": "Nothing heard – please try again.",
+      "dictateNetwork": "Speech recognition unreachable – check your connection.",
+      "dictateFailed": "Dictation did not work – please try again."
     },
     "dashboard": {
       "weekTitle": "This week",
