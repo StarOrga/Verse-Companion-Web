@@ -443,7 +443,7 @@ const KEYBIND_URL_DEBOUNCE_MS = 300;
       text-transform: uppercase; border-radius: 7px; cursor: pointer;
     }
     .dev:hover { color: var(--sc-fg-0); }
-    .dev:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .dev:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .dev.active { background: var(--sc-accent); color: var(--sc-bg-0); }
     .search {
       flex: 1 1 220px; padding: 11px 14px; border-radius: 10px;
@@ -460,7 +460,7 @@ const KEYBIND_URL_DEBOUNCE_MS = 300;
       letter-spacing: 0.04em; text-transform: uppercase;
     }
     .assign-toggle:hover { color: var(--sc-fg-0); border-color: var(--sc-accent-hot); }
-    .assign-toggle:focus-visible { outline: 2px solid var(--sc-accent-hot); outline-offset: 2px; }
+    .assign-toggle:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-hot); }
     .assign-toggle.on { background: var(--sc-accent-hot); border-color: var(--sc-accent-hot); color: var(--sc-bg-0); }
     /* Same wording tag as the shell's admin menu entries (.di-tag). */
 
@@ -483,7 +483,7 @@ const KEYBIND_URL_DEBOUNCE_MS = 300;
     .seg-btn:last-child { border-right: 0; }
     .seg-btn:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-fg-2) 9%, transparent); }
     .seg-btn.on { color: var(--sc-bg-0); background: var(--sc-accent); }
-    .seg-btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .seg-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .lang-note { margin: -8px 0 0; color: var(--sc-fg-2); font-size: max(0.74rem, var(--sc-fs-floor)); }
 
     /* ── admin assignment bar ─────────────────────────────────────────────── */
@@ -657,7 +657,7 @@ const KEYBIND_URL_DEBOUNCE_MS = 300;
     .err { color: var(--sc-danger); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .err .retry:hover { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .empty { text-align: center; padding: 40px 20px; color: var(--sc-fg-1); }
     .empty p { color: var(--sc-fg-2); margin: 6px 0 0; }
 

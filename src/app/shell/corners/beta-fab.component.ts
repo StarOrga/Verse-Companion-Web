@@ -80,7 +80,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
     .staff .fab { color: var(--sc-accent-collab); border-color: color-mix(in srgb, var(--sc-accent-collab) 55%, var(--sc-border)); }
     .fab:hover, .fab[aria-expanded='true'] { background: color-mix(in srgb, var(--sc-accent) 14%, var(--sc-bg-1)); border-color: var(--sc-accent); }
     .staff .fab:hover, .staff .fab[aria-expanded='true'] { background: color-mix(in srgb, var(--sc-accent-collab) 14%, var(--sc-bg-1)); border-color: var(--sc-accent-collab); }
-    .fab:focus-visible, .sw:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .fab:focus-visible, .sw:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .mark { font-family: var(--sc-font-display); font-weight: 700; font-size: 1.1rem; }
     .panel {
       display: flex; flex-direction: column; gap: var(--sc-space-1);

@@ -675,7 +675,7 @@ import { avatarUrlOf } from './avatar-url';
       transition: all 0.18s ease;
     }
     .admin-more-btn:hover { background: rgba(255, 87, 34, 0.1); }
-    .admin-more-btn:focus-visible { outline: 2px solid var(--sc-accent-hot); outline-offset: 1px; }
+    .admin-more-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-hot); }
     .admin-more-btn.active { box-shadow: inset 0 -2px 0 var(--sc-accent-hot); }
     .admin-more-btn .caret { width: 14px; height: 14px; transition: transform 0.16s; }
     .admin-more-btn[aria-expanded='true'] .caret { transform: rotate(180deg); }

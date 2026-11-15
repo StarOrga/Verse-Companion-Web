@@ -1372,7 +1372,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .ho-models a { padding: 2px 6px; border-radius: 6px; color: var(--sc-fg-2); text-decoration: none; white-space: nowrap; }
     .ho-models a:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
     .ho-models a.on { color: var(--sc-fg-0); border-radius: 0; box-shadow: inset 0 -1.5px 0 var(--sc-accent); }
-    .ho-models a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .ho-models a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .ho-models i { color: var(--sc-fg-2); font-style: normal; opacity: 0.6; }
     @media (pointer: coarse) { .ho-models a { min-height: 48px; display: inline-flex; align-items: center; } }
     .side-buy { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
@@ -1539,7 +1539,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .btn.on, .pin.pinned { color: var(--sc-accent);
       border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0));
       background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-    .btn:focus-visible, .pin:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .btn:focus-visible, .pin:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .btn:disabled, .pin:disabled { opacity: 0.38; cursor: not-allowed; }
     .btn.quiet { text-transform: none; letter-spacing: 0; background: transparent; }
 
@@ -1598,7 +1598,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .mchip { font-size: max(10px, var(--sc-fs-floor)); padding: 3px 7px; border-radius: 3px; letter-spacing: 0.12em;
       text-transform: uppercase; background: color-mix(in srgb, var(--sc-bg-0) 72%, transparent);
       border: 1px solid var(--sc-border); color: var(--sc-fg-1); cursor: default; }
-    .mchip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .mchip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     /* Skin / edition picker: sc-codex-variant-picker owns its rules. */
 
@@ -1721,7 +1721,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .err { color: var(--sc-danger); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .err .retry:hover { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .empty { text-align: center; padding: 40px; color: var(--sc-fg-2); }
 
     @media (max-width: 760px) {

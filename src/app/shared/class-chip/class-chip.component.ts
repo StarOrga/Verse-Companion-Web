@@ -54,7 +54,7 @@ import { ScTooltipDirective } from '../tooltip/sc-tooltip.directive';
       font-size: max(0.7rem, var(--sc-fs-floor)); min-height: var(--sc-tap-min);
       transition: color 0.16s, border-color 0.16s; }
     .copy:hover, .copy:focus-visible { color: var(--sc-accent); border-color: color-mix(in srgb, var(--sc-accent) 50%, transparent); }
-    .copy:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .copy:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .ic { width: 12px; height: 12px; flex: none; }
     .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   `],

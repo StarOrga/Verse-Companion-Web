@@ -65,7 +65,7 @@ const UNLOCK_PRIORITY = [
     .count { font-size: max(0.8rem, var(--sc-fs-floor)); color: var(--sc-fg-1); }
     .note { font-size: max(0.8rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     .body:hover b, .body:focus-visible b { text-decoration: underline; }
-    .body:focus-visible, .x:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .body:focus-visible, .x:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .x {
       width: 32px; height: 32px; border-radius: 50%; padding: 0; cursor: pointer; font-size: 16px; line-height: 1;
       background: none; border: 1px solid var(--sc-border); color: var(--sc-fg-2);

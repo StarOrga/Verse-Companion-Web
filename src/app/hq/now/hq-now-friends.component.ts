@@ -41,7 +41,7 @@ import { hqPage } from '../hq-routes';
       :host(:empty) { display: none; }
       .line { margin: 0; display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); font-size: max(0.85rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
       a { color: var(--sc-accent); }
-      a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+      a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
     `,
   ],
 })

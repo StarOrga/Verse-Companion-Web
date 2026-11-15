@@ -188,7 +188,7 @@ export interface VoteSource {
     .vb[data-word='stabil'] b { color: var(--sc-success); }
     .vb[data-word='wackelig'] b, .vb[data-word='instabil'] b { color: var(--sc-warning); }
     .vb:hover:not(:disabled) { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 10%, var(--sc-bg-0)); }
-    .vb:focus-visible, .lnk:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .vb:focus-visible, .lnk:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .vb[aria-pressed='true'] { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 14%, var(--sc-bg-0)); }
     .vb:disabled { cursor: not-allowed; opacity: 0.6; }
     .alt { display: flex; flex-wrap: wrap; gap: 4px 16px; }

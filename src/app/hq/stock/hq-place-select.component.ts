@@ -54,7 +54,7 @@ import { type PlaceGroup, groupPlaces, placeInfo, placeSub } from './hq-stock-pl
       .wrap { position: relative; display: block; }
       .trig { display: inline-flex; align-items: center; gap: 8px; width: 100%; min-height: 30px; padding: 0 12px; border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-0); color: var(--sc-fg); font: inherit; font-size: 0.8rem; cursor: pointer; }
       .trig.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
-      .trig:focus-visible, .srch:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .trig:focus-visible, .srch:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .trig svg { width: 14px; height: 14px; flex: none; fill: none; stroke: var(--sc-accent); stroke-width: 1.8; }
       .tv { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: start; }
       .trig i { color: var(--sc-fg-2); font-style: normal; }

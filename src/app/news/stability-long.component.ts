@@ -213,7 +213,7 @@ const DAY_MS = 86_400_000;
       background: repeating-linear-gradient(135deg, var(--bar) 0 2px, transparent 2px 5px);
       outline: 1px dashed color-mix(in srgb, var(--bar) 70%, transparent);
     }
-    .col:focus-visible { outline: 2px solid var(--sc-accent); }
+    .col:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .tick { position: absolute; left: 50%; bottom: -6px; width: 2px; height: 6px; background: var(--sc-fg-1); transform: translateX(-50%); }
     .chart-axis { display: flex; justify-content: space-between; gap: 8px; font-size: max(0.7rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
 
@@ -226,7 +226,7 @@ const DAY_MS = 86_400_000;
       color: inherit; text-decoration: none; font-size: max(0.8rem, var(--sc-fs-floor));
     }
     .ticket:hover { background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
-    .ticket:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .ticket:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .tk-id { color: var(--sc-accent); font-weight: 700; }
     .tk-votes { color: var(--sc-fg-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
     .tk-text { color: var(--sc-fg-1); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

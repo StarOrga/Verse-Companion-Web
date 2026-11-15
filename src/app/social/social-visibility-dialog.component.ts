@@ -128,7 +128,7 @@ import {
     .switch .knob { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--sc-fg-2); transition: transform 0.15s ease, background 0.15s ease; }
     .switch.on { border-color: var(--sc-accent); background: rgba(0, 212, 255, 0.15); }
     .switch.on .knob { transform: translateX(18px); background: var(--sc-accent); }
-    .switch:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .switch:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .switch:disabled { opacity: 0.6; cursor: default; }
     .sc-btn.micro { padding: 4px 10px; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.04em; }
     @media (prefers-reduced-motion: reduce) { .switch .knob { transition: none; } }

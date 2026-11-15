@@ -39,7 +39,7 @@ import { CalloutSet, CodexLandingCalloutSetService } from './codex-landing-callo
       }
       button:hover { color: var(--sc-fg-0); }
       button.on { color: var(--sc-fg-0); text-decoration-color: var(--sc-accent); }
-      button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 2px; }
+      button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 2px; }
       .sep { color: var(--sc-fg-3, var(--sc-fg-2)); opacity: 0.6; }
       @media (pointer: coarse) {
         .lbl { font-size: 12px; }

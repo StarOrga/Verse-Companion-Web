@@ -70,7 +70,7 @@ export const CLAIM_CHANNELS: readonly ClaimChannel[] = ['pledge', 'ingame', 'bot
      .seg { display: inline-flex; gap: 4px; flex-wrap: wrap; }
      .seg button { padding: 6px 12px; border: 1px solid var(--sc-border); border-radius: 999px; background: var(--sc-bg-0); color: var(--sc-fg-1); font: inherit; cursor: pointer; }
      .seg button[aria-pressed='true'] { border-color: var(--sc-accent); color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
-     .seg button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+     .seg button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
      .opt span { flex: 1; } .sub { margin-inline-start: 28px; } .hint { color: var(--sc-fg-2); font-size: 0.85rem; }`,
   ],
 })

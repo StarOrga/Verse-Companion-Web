@@ -400,7 +400,7 @@ function readShapePref(): 'hex' | 'bars' {
     .compare-head { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
       padding-bottom: 10px; border-bottom: 1px solid var(--sc-border); }
     .compare-label { font-size: max(10.5px, var(--sc-fs-floor)); letter-spacing: 0.08em; text-transform: uppercase; color: var(--sc-fg-2); }
-    .compare-info:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .compare-info:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .small-group { grid-column: 1 / -1; margin: 0; font-size: max(11px, var(--sc-fs-floor)); color: var(--sc-fg-2); text-align: center; }
     .compare-info { display: inline-grid; place-items: center; width: 22px; height: 22px; padding: 0; border-radius: 50%;
       border: 1px solid var(--sc-border); background: none; color: var(--sc-fg-2); font: inherit; font-size: 12px; cursor: help; }
@@ -408,7 +408,7 @@ function readShapePref(): 'hex' | 'bars' {
       border: 1px solid var(--sc-warning); background: none; color: var(--sc-warning); font: inherit; font-size: 12px;
       font-weight: 700; cursor: help; flex: none; }
     .small-group-mark.slot { visibility: hidden; }
-    .small-group-mark:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .small-group-mark:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @media (pointer: coarse) {
       .compare-info, .small-group-mark { width: var(--sc-tap-min); height: var(--sc-tap-min); }
     }
@@ -428,7 +428,7 @@ function readShapePref(): 'hex' | 'bars' {
     .cohort-line.gap { font-style: italic; }
     .tip { margin-left: 4px; cursor: help; color: var(--sc-fg-2); background: none; border: none; padding: 0;
       font: inherit; font-size: max(0.7rem, var(--sc-fs-floor)); }
-    .tip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .tip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .pct-tip { position: absolute; display: none; }
     .tip:focus + .pct-tip, .tip:hover + .pct-tip {
       display: block; position: absolute; z-index: 5; max-width: 260px; padding: 8px 10px;
@@ -574,12 +574,12 @@ function readShapePref(): 'hex' | 'bars' {
     :host(.holo) .holo-rank .band { color: var(--sc-fg-2); }
     /* " · " between the parts: the template's whitespace is stripped, the margin carries the space. */
     :host(.holo) .holo-rank .sep { margin-inline: 0.4em; color: var(--sc-fg-2); }
-    :host(.holo) .holo-rank:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+    :host(.holo) .holo-rank:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
     :host(.holo) .holo-ctrl { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; gap: 4px 8px; min-width: 0;
       padding-bottom: 10px; border-bottom: 1px solid var(--sc-border); }
     :host(.holo) .hc-label { grid-column: 1 / -1; justify-self: start; display: inline-flex; align-items: center; gap: 5px;
       font-size: max(10.5px, var(--sc-fs-floor)); letter-spacing: 0.08em; text-transform: uppercase; color: var(--sc-fg-2); white-space: nowrap; cursor: help; border-radius: 3px; }
-    :host(.holo) .hc-label:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    :host(.holo) .hc-label:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     :host(.holo) .hc-i { display: inline-grid; place-items: center; width: 13px; height: 13px; border-radius: 50%; border: 1px solid currentColor;
       font: italic 600 9px/1 Georgia, serif; letter-spacing: 0; text-transform: none; }
     :host(.holo) .hc-label:hover { color: var(--sc-fg-1); }

@@ -346,7 +346,7 @@ let uidSeq = 0;
       .fact .v { font-family: var(--hs-mono); font-variant-numeric: tabular-nums; font-size: clamp(14px, 0.89vw, 17px); line-height: 1.1; white-space: nowrap; letter-spacing: -0.02em; }
       .fact .v small { color: var(--sc-fg-2); margin-inline-start: 3px; font-size: max(10px, var(--sc-fs-floor)); }
       .fact[tabindex] { cursor: help; border-radius: var(--holo-r-xs); }
-      .fact[tabindex]:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .fact[tabindex]:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       /* Touch: a focusable fact (tooltip in metres) reaches the tap minimum. */
       @media (pointer: coarse) { .fact[tabindex] { min-block-size: var(--sc-tap-min); min-inline-size: var(--sc-tap-min); justify-content: center; } }
       .tip-trigger { font-size: max(9px, var(--sc-fs-floor)); color: var(--sc-fg-2); white-space: nowrap; }
@@ -367,7 +367,7 @@ let uidSeq = 0;
         transition: background var(--holo-t-fast) ease, inline-size var(--holo-t-base) var(--e-out); }
       .hs-toggle:hover { background: color-mix(in srgb, var(--sc-accent) 8%, transparent); }
       .hs-toggle:hover .bar, .hs-toggle .bar.open { background: var(--sc-accent); inline-size: 64px; }
-      .hs-toggle:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+      .hs-toggle:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       /* Touch: the bar keeps its look, the row under it grows to a reachable target. */
       @media (pointer: coarse) { .hs-toggle { block-size: 48px; min-block-size: 48px; } }
       /* The dock: over the page, docked on the row (concept r1-dock-open

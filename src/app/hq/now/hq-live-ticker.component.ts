@@ -120,7 +120,7 @@ const TICK_MS = 30_000;
         font: inherit; font-size: max(0.8rem, var(--sc-fs-floor)); color: var(--sc-fg-1); white-space: nowrap;
       }
       .face:hover .state { text-decoration: underline; text-underline-offset: 3px; }
-      .face:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .face:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .mark { flex: none; box-sizing: border-box; width: 12px; height: 12px; border-radius: 50%; }
       .state { flex: none; font-weight: 600; color: var(--_tone); }
       em { font-style: normal; min-width: 0; overflow: hidden; text-overflow: ellipsis; }

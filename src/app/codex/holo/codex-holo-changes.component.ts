@@ -60,7 +60,7 @@ import { JournalEntry } from './codex-holo-model';
     .lnk { background: none; border: none; padding: 0; color: var(--sc-accent); cursor: pointer; font: inherit;
       font-size: max(11px, var(--f)); min-height: var(--sc-tap-min, 24px); justify-self: start; }
     .lnk:hover { text-decoration: underline; }
-    .lnk:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: var(--holo-r-xs); }
+    .lnk:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: var(--holo-r-xs); }
     .werk { justify-self: start; margin-top: 4px; }
     .journal { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
     .journal li { display: flex; align-items: center; gap: 8px; font-size: max(12px, var(--f)); animation: j-in 260ms var(--holo-e-out) backwards; }

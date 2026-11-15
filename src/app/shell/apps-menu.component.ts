@@ -122,7 +122,7 @@ export interface AppEntry {
     .trigger svg { width: 22px; height: 22px; }
     .trigger:hover, .trigger.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
     .trigger.on { box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-    .trigger:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .trigger:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .pop {
       position: absolute; top: calc(100% + 8px); right: 0; z-index: 60;
       /* 22rem: the chosen two-line copy per app fits at this width (20rem wrapped it to three). */

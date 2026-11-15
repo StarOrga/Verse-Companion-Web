@@ -269,7 +269,7 @@ export function rankWallpaperOptions(st: VerseExplorerState, first: VerseExplore
       .tile { position: relative; display: block; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: var(--sc-bg-0);
         border: 1px solid var(--sc-border); transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
       a.tile:hover { transform: translateY(-2px); border-color: var(--sc-accent); box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--sc-accent) 45%, transparent); }
-      a.tile:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      a.tile:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .tile img { display: block; width: 100%; height: 100%; object-fit: cover; }
       .zoom { position: absolute; right: 10px; top: 10px; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px;
         background: color-mix(in srgb, var(--sc-bg-0) 70%, transparent); color: var(--sc-fg-0); opacity: 0; transition: opacity 0.2s ease; }

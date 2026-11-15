@@ -84,7 +84,7 @@ export function audienceOf(value: string | null): { friendId: string } | { group
       .rows li { display: flex; align-items: center; justify-content: space-between; gap: var(--sc-space-2, 8px); }
       .kind { color: var(--sc-fg-2); }
       a { color: var(--sc-accent); }
-      a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .flash { margin: 0; color: var(--sc-accent); }
       .err { margin: 0; color: var(--sc-danger); }
       @media (pointer: coarse) { .sc-btn { min-height: 48px; } }

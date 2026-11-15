@@ -73,15 +73,15 @@ import type { DeckCrate } from './hq-stock-deck';
       .num { text-align: end; white-space: nowrap; }
       tbody tr { cursor: pointer; }
       tbody tr:hover { background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }
-      tbody tr:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+      tbody tr:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       tbody tr.sel { background: color-mix(in srgb, var(--sc-accent) 18%, transparent); box-shadow: inset 3px 0 0 var(--sc-accent); }
       .amt { width: 7ch; min-height: 30px; padding: 0 6px; border: 1px solid var(--sc-border); border-radius: 6px; background: var(--sc-bg-0); color: var(--sc-fg); font: inherit; text-align: end; }
-      .amt:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .amt:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .scr[data-scrap='unknown'] { color: var(--sc-fg-2); }
       .scr[data-scrap='no'] { color: var(--sc-warning); }
       .rsv { min-height: 30px; padding: 0 10px; border: 1px dashed color-mix(in srgb, var(--sc-accent) 60%, transparent); border-radius: 999px; background: transparent; color: var(--sc-accent); font: inherit; cursor: pointer; }
       .rsv:hover { background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
-      .rsv:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .rsv:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .act { width: 1%; }
       .act svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       @media (pointer: coarse) { .amt, .rsv { min-height: 48px; } }

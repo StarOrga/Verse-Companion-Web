@@ -521,7 +521,7 @@ const SEARCH_DEBOUNCE_MS = 250;
     /* No render anywhere: the ship glyph, small and quiet - never an empty box. */
     .thumb-icon { width: 100%; height: 100%; --sc-icon-max: 44px; opacity: 0.6; }
     .fleet-link { flex: 1; display: flex; flex-direction: column; gap: 8px; color: inherit; text-decoration: none; border-radius: 6px; }
-    .fleet-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 4px; }
+    .fleet-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .fleet-card:has(.fleet-link:focus-visible) { border-color: var(--sc-accent); }
     .card-sub { margin: 0; font-size: max(0.78rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     .fleet-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-width: 0; }
@@ -532,7 +532,7 @@ const SEARCH_DEBOUNCE_MS = 250;
       min-height: var(--sc-tap-min); min-width: 0; display: inline-flex; align-items: center; gap: 4px; }
     .codex-link > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .codex-link:hover { text-decoration: underline; }
-    .codex-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+    .codex-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .card .name { margin: 0; font-size: 0.98rem; font-weight: 600; line-height: 1.25; }
     .rank-sm { font-family: var(--sc-font-display); color: var(--sc-accent); font-size: 0.82rem; }
@@ -610,7 +610,7 @@ const SEARCH_DEBOUNCE_MS = 250;
     .search-err { color: var(--sc-danger); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .err .retry, .search-err .retry { margin-left: auto; min-height: 44px; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .err .retry:hover:not(:disabled), .search-err .retry:hover { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .err .retry:focus-visible, .search-err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible, .search-err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .err .retry:disabled { opacity: 0.5; cursor: default; }
     .hint { color: var(--sc-fg-2); font-size: 0.84rem; margin: 0; }
 

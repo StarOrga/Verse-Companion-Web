@@ -84,7 +84,7 @@ import { NachschubService } from '../nachschub/nachschub.service';
       .earn label { display: flex; flex-direction: column; gap: 4px; }
       .earn label span { color: var(--sc-fg-2); font-size: 0.82rem; }
       .input { min-height: 40px; padding: 0 var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-0); color: var(--sc-fg-0); font: inherit; }
-      .input:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .input:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .err { margin: 0; color: var(--sc-warning); }
       .stops { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
       .stops li { display: flex; align-items: center; gap: var(--sc-space-2, 8px); min-height: 36px; }

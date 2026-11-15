@@ -119,7 +119,7 @@ export function resolveHeroPart(sections: readonly LayoutSection[], pick: HeroPa
       background: var(--sc-bg-1); border: 1px solid color-mix(in srgb, var(--sc-accent) 40%, var(--sc-border));
       box-shadow: 0 12px 32px color-mix(in srgb, var(--sc-bg-0) 70%, transparent); }
     .hpp:focus { outline: none; }
-    .hpp:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .hpp:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .hpp-head { display: flex; align-items: flex-start; gap: 8px; }
     .hpp-id { flex: 1 1 auto; min-width: 0; }
     .hpp-eyebrow { margin: 0; font-size: max(10px, var(--sc-fs-floor)); text-transform: uppercase;

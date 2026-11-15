@@ -124,7 +124,7 @@ export const AKTE_STANDARD_LIVERY = 'standard';
       border: 1px solid var(--sc-border); border-radius: 13px; background: color-mix(in srgb, var(--sc-bg-0) 60%, transparent);
       color: var(--sc-accent); font: inherit; font-size: max(11px, var(--sc-fs-floor)); white-space: nowrap; cursor: pointer; }
     .ak-tg:hover { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
-    .ak-tg:focus-visible, .ak-sw:focus-visible, .ak-rsi:focus-visible, .ak-txt:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .ak-tg:focus-visible, .ak-sw:focus-visible, .ak-rsi:focus-visible, .ak-txt:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .ak-txt { flex: 0 1 auto; min-height: 0; overflow: auto; padding-top: 28px; }
     .ak-txt p { margin: 0; color: var(--sc-fg-0); font-size: max(13.5px, var(--sc-fs-floor)); line-height: 1.55; max-width: var(--sc-measure, 68ch); }
     .ak-txt p.muted { color: var(--sc-fg-2); }

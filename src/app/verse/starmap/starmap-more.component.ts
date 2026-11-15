@@ -119,13 +119,13 @@ import { wallpaperConstellations } from './wallpaper';
       .small { font-size: 0.75rem; }
       .err { color: var(--sc-danger); }
       .link { color: var(--sc-accent); min-height: 36px; display: inline-flex; align-items: center; }
-      .link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .btn { display: inline-flex; align-items: center; min-height: var(--sc-tap-min, 44px); padding: 0 var(--sc-pad-2); border-radius: 8px;
         border: 1px solid var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-fg-0);
         font: inherit; cursor: pointer; text-decoration: none; }
       .btn.ghost { background: transparent; }
       .btn:disabled { opacity: 0.55; cursor: progress; }
-      .btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       ul { list-style: none; margin: 0; padding: 0; }
       .community-fig { width: 120px; }
       .suns { display: flex; flex-wrap: wrap; gap: var(--sc-gap-2); }

@@ -59,7 +59,7 @@ export function badgeCaption(t: TranslateService, b: KartographBadge): { title: 
       .muted { color: var(--sc-fg-2); margin: 0; }
       .btn { display: inline-flex; align-items: center; min-height: var(--sc-tap-min, 44px); padding: 0 var(--sc-pad-2); border-radius: 8px;
         border: 1px solid var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-fg-0); text-decoration: none; }
-      .btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     `,
   ],
 })

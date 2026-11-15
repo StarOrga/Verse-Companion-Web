@@ -210,7 +210,7 @@ export interface SectionRailGo {
         :host(.inline) .stop[aria-current]::before { display: none; }
       }
 
-      .stop:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .stop:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .label { text-shadow: 0 0 6px var(--sc-bg-0), 0 0 2px var(--sc-bg-0); }
       @media (pointer: coarse) { :host(.inline) .stop { width: 44px; height: 44px; } }
       @media (prefers-reduced-motion: reduce) {

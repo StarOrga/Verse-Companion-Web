@@ -54,7 +54,7 @@ import { HqStartTilesComponent } from './hq-start-tiles.component';
       .title { margin: max(6px, 0.6vw) 0 0; font: 500 var(--sc-hero-title-size) / 1.1 var(--sc-font-display); letter-spacing: 0.02em; overflow-wrap: anywhere; }
       .hit { color: inherit; text-decoration: none; }
       .hit:hover { color: var(--sc-accent); }
-      .hit:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+      .hit:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
       .area { width: min(100%, 1120px); margin-top: var(--sc-space-7, 48px); }
       /* Phones: the bottom bar is the way on, there is no cue to clear. */
       @media (max-width: 1023px) {

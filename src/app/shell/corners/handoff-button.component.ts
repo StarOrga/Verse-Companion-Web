@@ -96,7 +96,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
       box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
     }
     .round:hover { border-color: var(--sc-accent); }
-    .round:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .round:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .popup {
       position: absolute; left: 0; bottom: calc(100% + var(--sc-space-2));
       width: min(440px, calc(100vw - 2 * var(--sc-space-4)));
@@ -128,7 +128,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
     .btn { min-height: var(--sc-tap-min); padding: 0 var(--sc-space-3); cursor: pointer; font: inherit;
       color: var(--sc-fg-1); background: none; border: 1px solid var(--sc-border); border-radius: 999px; }
     .btn:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
-    .btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .phones { margin-top: var(--sc-space-3); }
     .sub { margin: 0 0 var(--sc-space-1); color: var(--sc-fg-2); font-size: max(0.72rem, var(--sc-fs-floor)); }
     .phone { display: flex; align-items: center; justify-content: space-between; gap: var(--sc-space-3);

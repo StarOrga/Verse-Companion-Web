@@ -283,7 +283,7 @@ export interface GearSlotRow {
         white-space: nowrap;
       }
       .gear-detail:hover { text-decoration: underline; }
-      .gear-detail:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .gear-detail:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .gear-clear {
         flex: 0 0 auto;
         min-height: max(40px, var(--sc-tap-min));
@@ -300,7 +300,7 @@ export interface GearSlotRow {
       }
       /* Neutral hover: amber (--tint) means "equipped / yours" in this zone, not "remove". */
       .gear-clear:hover, .gear-undo:hover { color: var(--sc-fg-0); border-color: var(--sc-fg-2); }
-      .gear-clear:focus-visible, .gear-undo:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .gear-clear:focus-visible, .gear-undo:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .gear-clear:disabled { cursor: progress; opacity: 0.6; }
 
       .gear-err { margin: 4px 0 0; font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-danger); }

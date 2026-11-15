@@ -146,7 +146,7 @@ export interface ScSegmentOption {
     }
     .seg-btn:last-child { border-right: 0; }
     .seg-btn:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-fg-0) 6%, transparent); }
-    .seg-btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .seg-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .seg-btn.active { background: var(--sc-accent); color: var(--sc-bg-0); font-weight: 600; }
     .seg-btn.active:hover { background: var(--sc-accent); color: var(--sc-bg-0); }
     .seg-btn.disabled, .seg-btn.disabled:hover { color: color-mix(in srgb, var(--sc-fg-2) 45%, transparent); background: transparent; cursor: not-allowed; }

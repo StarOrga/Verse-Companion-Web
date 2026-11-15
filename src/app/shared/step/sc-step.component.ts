@@ -83,7 +83,7 @@ export const STEP_SHAPES: Readonly<Record<StepKind, string>> = {
         background: transparent; color: var(--sc-fg-2); font: inherit; cursor: pointer;
       }
       .undo:hover { color: var(--sc-accent); border-color: var(--sc-accent); }
-      .undo:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .undo:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       @media (pointer: coarse) { .undo { min-height: 48px; padding-inline: 14px; } }
     `,
   ],

@@ -878,7 +878,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
       font-family: var(--sc-font-display); font-size: max(0.58rem, var(--sc-fs-floor)); font-weight: 600;
       line-height: 1; letter-spacing: 0; text-transform: none; }
     .sec-info:hover, .sec-info:focus-visible { color: var(--sc-accent); border-color: var(--sc-accent); }
-    .sec-info:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .sec-info:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @media (pointer: coarse) { .sec-info { width: max(24px, 1.5rem); height: max(24px, 1.5rem); } }
 
     .sec-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }

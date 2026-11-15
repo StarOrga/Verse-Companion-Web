@@ -127,7 +127,7 @@ interface BarRow {
         transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
       }
       .go:hover, .go:focus-visible { border-color: var(--sc-accent); background: rgba(82, 193, 230, 0.1); color: var(--sc-fg-0); }
-      .go:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .go:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       /* The re-scan line: a body-tall track slides its top edge down (transform only). */
       .sweep {
         position: absolute; left: 0; right: 0; top: 0; height: 100%; pointer-events: none; opacity: 0;

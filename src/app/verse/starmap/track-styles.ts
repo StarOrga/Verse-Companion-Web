@@ -29,7 +29,7 @@ export const TRACK_STYLES = `
     translate: 0 calc(var(--i) * var(--i) * var(--k, 0px)); transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease; }
   .tok small { font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sc-fg-2); }
   .tok:not(:disabled):hover, .tok:focus-visible { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); color: var(--sc-fg-0); }
-  .tok:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+  .tok:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
   .tok:disabled { cursor: default; }
   .tok.dim { opacity: 0.45; }
   .curve { position: absolute; left: 0; right: 0; top: calc(100% - var(--rim, 0px) + 8px); width: 100%; overflow: visible; pointer-events: none; }
@@ -40,7 +40,7 @@ export const TRACK_STYLES = `
   .muted { color: var(--sc-fg-2); }
   .err { color: var(--sc-danger); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .retry { min-height: 32px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--sc-accent); background: none; color: var(--sc-fg-0); font: inherit; cursor: pointer; }
-  .retry:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+  .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
   @media (pointer: coarse) { .tok { min-height: 48px; } }
   @media (max-width: 760px) {
     .tok { translate: none; }

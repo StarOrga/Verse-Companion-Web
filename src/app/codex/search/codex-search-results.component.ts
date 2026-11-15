@@ -228,7 +228,7 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
       color: var(--sc-fg-2); font: inherit; text-transform: none; letter-spacing: 0;
     }
     .head-action:hover { color: var(--sc-accent); }
-    .head-action:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .head-action:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     .row {
       position: relative; display: flex; align-items: center; gap: 6px;
@@ -248,7 +248,7 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
       padding: 6px 8px; color: inherit; text-decoration: none; border-radius: inherit;
       min-height: 44px;
     }
-    .hit:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .hit:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .icon { flex: 0 0 auto; display: inline-flex; width: 30px; height: 30px; align-items: center; justify-content: center; color: var(--tone, var(--sc-accent)); }
     .icon:has(sc-ship-blueprint-art) { width: 44px; }
     .body { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
@@ -276,7 +276,7 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
       min-width: 36px; min-height: 36px; margin-right: 4px; border-radius: 6px; cursor: pointer;
       background: transparent; color: var(--sc-fg-2); border: 1px solid transparent; font-family: inherit;
     }
-    .act:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .act:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .act.add {
       padding: 0 10px; border-color: color-mix(in srgb, var(--sc-accent) 60%, transparent); color: var(--sc-accent);
       font-family: var(--sc-font-display); font-size: max(0.64rem, var(--sc-fs-floor)); letter-spacing: 0.05em; text-transform: uppercase;
@@ -306,11 +306,11 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
       padding: 6px 14px; border-radius: 6px; background: transparent; cursor: pointer; font-family: inherit;
       border: 1px solid var(--sc-danger); color: var(--sc-danger);
     }
-    .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .did-you-mean { display: flex; flex-wrap: wrap; gap: 4px 10px; margin: 0; padding: 0 8px 6px; color: var(--sc-fg-2); }
     .dym { color: var(--sc-accent); text-decoration: none; border-radius: 4px; }
     .dym:hover { text-decoration: underline; }
-    .dym:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .dym:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .partial {
       display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0; padding: 4px 8px;
       color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor));
@@ -320,7 +320,7 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
       background: none; border: 0; padding: 2px 4px; border-radius: 4px; cursor: pointer;
       color: var(--sc-accent); font: inherit; text-decoration: underline; text-underline-offset: 2px;
     }
-    .partial-retry:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .partial-retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* Pinned to the bottom of the scroll port: the key legend must not scroll
        away under a long result list. */
     .nav-hint {

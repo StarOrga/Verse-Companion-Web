@@ -169,7 +169,7 @@ let nextDeckPlanId = 0;
       border-radius: 999px; border: 1px solid var(--sc-border); background: var(--sc-bg-1);
       color: var(--sc-fg-1); font: inherit; font-size: max(0.75rem, var(--sc-fs-floor)); cursor: pointer; }
     .tab:hover { border-color: var(--sc-accent); }
-    .tab:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .tab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .tab.on { border-color: var(--sc-accent); color: var(--sc-accent);
       background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
     .tab .n { font-size: 0.85em; color: var(--sc-fg-2); }
@@ -205,7 +205,7 @@ let nextDeckPlanId = 0;
     .chip { min-height: 32px; padding: 2px 10px; border-radius: 6px; border: 1px solid var(--sc-border);
       background: transparent; color: var(--sc-fg-1); font: inherit; font-size: max(0.7rem, var(--sc-fs-floor)); cursor: pointer; }
     .chip:hover, .chip.on { border-color: var(--sc-accent); color: var(--sc-accent); }
-    .chip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @media (pointer: coarse) { .chip { min-height: 48px; } }
 
     .readout { margin: 6px 0 0; min-height: 1.1em; font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-accent); }

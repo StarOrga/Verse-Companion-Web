@@ -77,7 +77,7 @@ import { EinsatzCrew, SLOTS_MAX, SLOT_LABEL_MAX, friendPath } from '../../social
       .slots, .rsvps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sc-space-1, 4px); }
       .slots li { display: flex; gap: var(--sc-space-2, 8px); align-items: center; }
       input { flex: 1; min-width: 0; font: inherit; color: var(--sc-fg); background: var(--sc-bg-0, var(--sc-bg-1)); border: 1px solid var(--sc-border); border-radius: var(--sc-radius); padding: var(--sc-space-2, 8px); min-height: 2.5rem; box-sizing: border-box; }
-      input:focus-visible, a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      input:focus-visible, a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .actions { display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); }
       .rsvps li { display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); }
       a { color: var(--sc-accent); }

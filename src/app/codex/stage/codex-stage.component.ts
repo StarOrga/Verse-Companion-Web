@@ -190,7 +190,7 @@ function centeredFallback(stageW: number, stageH: number, imgW: number, imgH: nu
       }
 
       .stage-hit { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 2px; padding: 0 24px 44px; text-decoration: none; }
-      .stage-hit:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -3px; }
+      .stage-hit:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
 
       .stage-eyebrow {
         display: block;
@@ -241,7 +241,7 @@ function centeredFallback(stageW: number, stageH: number, imgW: number, imgH: nu
       .stage-figure ::ng-deep sc-codex-board-figure { display: block; height: 100%; width: auto; }
       .stage.person .stage-text--link { text-decoration: none; display: flex; flex-direction: column; gap: 2px; }
       .stage.person .stage-text--link:hover .stage-title, .stage.person .stage-text--link:focus-visible .stage-title { color: var(--sc-accent); }
-      .stage.person .stage-text--link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 4px; }
+      .stage.person .stage-text--link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .stage.person .stage-text {
         position: absolute;
         left: 24px;

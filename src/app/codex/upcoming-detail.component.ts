@@ -198,7 +198,7 @@ import { NavOriginService, PageCrumb, originTrail } from '../shared/page-header/
     .load-err .retry { margin-left: auto; min-height: max(36px, var(--sc-tap-min)); padding: 6px 14px; border-radius: 6px; background: transparent;
       border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .load-err .retry:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .load-err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .load-err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .load-err .retry:disabled { opacity: 0.5; cursor: default; }
 
   `],

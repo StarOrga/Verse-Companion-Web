@@ -83,7 +83,7 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
       background: color-mix(in srgb, var(--sc-accent) 18%, rgba(0, 0, 0, 0.62));
     }
     .vote:active:not(:disabled) { transform: scale(0.94); }
-    .vote:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .vote:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* Signed out: still shows the public tally, but says why it does nothing
        (the title/aria-label carries the "sign in to vote" line). */
     .vote:disabled { cursor: not-allowed; opacity: 0.65; }

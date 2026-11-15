@@ -515,7 +515,7 @@ interface FacetOption {
       min-height: max(28px, var(--sc-tap-min));
     }
     .equip-past-back:hover, .equip-past-back:focus-visible { background: color-mix(in srgb, var(--sc-warning) 20%, transparent); }
-    .equip-past-back:focus-visible { outline: 2px solid var(--sc-warning); outline-offset: 2px; }
+    .equip-past-back:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* Carries the "why is this locked" tooltip of a disabled button (a disabled
        button gets no pointer events) without becoming a flex item itself. */
     .tip-wrap { display: contents; }
@@ -537,9 +537,9 @@ interface FacetOption {
     .empty .empty-elsewhere { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 8px; color: var(--sc-fg-1); }
     .try-other { color: var(--sc-accent); text-decoration: none; }
     .try-other:hover, .try-other:focus-visible { text-decoration: underline; }
-    .try-other:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+    .try-other:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
     .equip-btn:hover:not(:disabled) { border-color: var(--sc-accent); color: var(--sc-accent); }
-    .equip-btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .equip-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .equip-btn:disabled { opacity: 0.5; cursor: default; }
     .equip-x { font-size: 0.9em; }
     /* Sticky equip confirmation (see template). Above the page content, below
@@ -573,7 +573,7 @@ interface FacetOption {
       font-size: max(0.7rem, var(--sc-fs-floor));
     }
     .equip-confirm-back:hover, .equip-confirm-back:focus-visible { text-decoration: underline; }
-    .equip-confirm-back:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .equip-confirm-back:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .equip-btn.on {
       border-color: var(--sc-accent); color: var(--sc-accent);
       background: color-mix(in srgb, var(--sc-accent) 16%, transparent);
@@ -589,7 +589,7 @@ interface FacetOption {
       cursor: pointer; transition: all 0.16s;
     }
     .kind:hover { color: var(--sc-fg-0); border-color: var(--sc-accent); }
-    .kind:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .kind:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .kind.active { background: color-mix(in srgb, var(--sc-accent) 18%, transparent); border-color: var(--sc-accent); color: var(--sc-fg-0); }
     .kind-ct { font-size: max(0.68rem, var(--sc-fs-floor)); padding: 0 6px; border-radius: 8px; background: color-mix(in srgb, var(--sc-fg-2) 18%, transparent); color: var(--sc-fg-2); }
     /* Light text on the tint — the dark bg-0 on two stacked accent tints read at ~2.3:1. */
@@ -613,7 +613,7 @@ interface FacetOption {
     }
     /* Clearing a search is neither an error nor destructive — no danger red. */
     .search-clear:hover { color: var(--sc-accent); }
-    .search-clear:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .search-clear:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     .filters-toggle {
       display: inline-flex; align-items: center; justify-content: space-between; gap: 8px;
@@ -623,7 +623,7 @@ interface FacetOption {
       font-size: max(0.74rem, var(--sc-fs-floor)); min-height: max(44px, var(--sc-tap-min));
     }
     .filters-toggle:hover, .filters-toggle[aria-expanded='true'] { border-color: var(--sc-accent); color: var(--sc-accent); }
-    .filters-toggle:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .filters-toggle:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .controls.collapsed .facets { display: none; }
     .facets { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
     .facet { display: flex; flex-direction: column; gap: 4px; }
@@ -657,7 +657,7 @@ interface FacetOption {
       flex: 1; display: flex; flex-direction: column; gap: 8px;
       padding: 14px; border-radius: 8px; color: inherit; text-decoration: none;
     }
-    .card:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .card:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .card .thumb { height: 96px; margin: -4px 0 2px; display: flex; align-items: center; justify-content: center;
       border-radius: 6px; background: radial-gradient(circle at 50% 45%, var(--sc-bg-2), var(--sc-bg-0)); }
     /* The previews are 64px UI renders: a little larger reads as gear, not as a speck. */
@@ -674,7 +674,7 @@ interface FacetOption {
     }
     .pin:hover { color: var(--sc-accent); border-color: var(--sc-border); }
     .pin.pinned { color: var(--sc-accent); }
-    .pin:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .pin:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .badges { display: flex; flex-wrap: wrap; gap: 5px; margin-top: auto; }
     .badge { font-size: max(0.66rem, var(--sc-fs-floor)); padding: 2px 7px; border-radius: 999px; background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); border: 1px solid color-mix(in srgb, var(--sc-accent) 30%, transparent); }
     /* Holds a spelled-out manufacturer ("Klaus & Werner"), so the pill has to
@@ -721,7 +721,7 @@ interface FacetOption {
     .err { color: var(--sc-danger); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .err .retry:hover { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     /* Phones stack the facets one per row — full width, not ragged 160/220 px boxes. */
     @media (max-width: 640px) {

@@ -327,7 +327,7 @@ export type CodexClassicCtx = Pick<
 }
 .pin:hover { color: var(--sc-fg-0); border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0)); }
 .pin.pinned { color: var(--sc-accent); border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0)); background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-.pin:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+.pin:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 .pin:disabled { opacity: 0.38; cursor: not-allowed; }
 .hero { display: grid; grid-template-columns: minmax(200px, 320px) 1fr; gap: 22px; padding: 0; overflow: hidden; }
 .hero-art { margin: 0; display: flex; align-items: center; justify-content: center; min-height: 240px; --sc-img-max-h: 320px; --sc-img-shadow: drop-shadow(0 6px 24px rgba(0,0,0,0.55)); --sc-icon-max: 132px; background: radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--sc-accent) 12%, var(--sc-bg-1)), var(--sc-bg-0)); }
@@ -348,7 +348,7 @@ export type CodexClassicCtx = Pick<
 .hero.missile .hero-body { padding: 16px 18px; }
 .mchips { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .mchip { font-size: max(10px, var(--sc-fs-floor)); padding: 3px 7px; border-radius: 3px; letter-spacing: 0.12em; text-transform: uppercase; background: color-mix(in srgb, var(--sc-bg-0) 72%, transparent); border: 1px solid var(--sc-border); color: var(--sc-fg-1); cursor: default; }
-.mchip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+.mchip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 .facts { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .fact { display: flex; flex-direction: column; gap: 1px; padding: 6px 12px; border-radius: 8px; background: var(--sc-bg-1); border: 1px solid var(--sc-border); }
 .fact.accent { border-color: color-mix(in srgb, var(--sc-accent) 40%, transparent); }

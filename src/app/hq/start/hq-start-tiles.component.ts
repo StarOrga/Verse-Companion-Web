@@ -209,11 +209,11 @@ export function agoText(iso: string, lang: string | undefined, now: number = Dat
       /* The launch hint is fixed to the viewport: its tile has to rise above the rail and the cue. */
       .tile:has(.hint) { z-index: 60; }
       .stretch { position: absolute; inset: 0; z-index: 1; border-radius: 4px; }
-      .stretch:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .stretch:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .own { position: relative; z-index: 2; }
       a.own { color: var(--sc-accent); text-decoration: none; }
       a.own:hover { text-decoration: underline; text-underline-offset: 3px; }
-      a.own:focus-visible, .retry:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+      a.own:focus-visible, .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
       .retry { padding: 0; border: 0; background: none; color: var(--sc-accent); font: inherit; cursor: pointer; }
       .retry:hover { text-decoration: underline; text-underline-offset: 3px; }
       .ico { flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -276,7 +276,7 @@ export function agoText(iso: string, lang: string | undefined, now: number = Dat
       .stat .ico { width: 15px; height: 15px; color: var(--sc-accent); }
       .stat b { font-weight: 500; color: var(--sc-fg-0); }
       .stat:hover { color: var(--sc-accent); }
-      .stat:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+      .stat:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
 
       /* Touch: every own target and the quiet link keep a full tap height. */
       @media (pointer: coarse) {
