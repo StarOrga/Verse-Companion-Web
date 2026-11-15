@@ -78,6 +78,23 @@ describe('CodexCompareTrayComponent', () => {
     expect(el.querySelector('button.toggle')?.textContent).toContain('codex.compare.close');
   });
 
+  it('shows the "differences only" toggle state, not only as aria-pressed', async () => {
+    const { fixture, el } = mount(['ship:a', 'ship:b']);
+    (el.querySelector('button.toggle') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const diff = el.querySelector('button.diff-toggle') as HTMLButtonElement;
+    expect(diff).not.toBeNull();
+    const before = getComputedStyle(diff).backgroundColor;
+    expect(diff.getAttribute('aria-pressed')).toBe('false');
+    diff.click();
+    fixture.detectChanges();
+    expect(diff.getAttribute('aria-pressed')).toBe('true');
+    expect(diff.classList).toContain('on');
+    expect(getComputedStyle(diff).backgroundColor).not.toBe(before);
+  });
+
   it('announces a rejected mixed-kind pin', () => {
     const { fixture, el } = mount(['ship:a']);
     rejected.set('weapon');

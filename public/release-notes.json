@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.268.0",
+  "current": "0.268.1",
   "releases": [
+    {
+      "version": "0.268.1",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Admin telemetry: the attention line uses the singular when exactly one topic needs attention"
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.268.0",
       "date": "2026-11-15",

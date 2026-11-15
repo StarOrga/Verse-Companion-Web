@@ -127,7 +127,7 @@ interface PinnedRef {
             }
           </div>
           <ng-container popupActions>
-            <button scAction type="button" [class.on]="diffOnly()" (click)="toggleDiffOnly()" [attr.aria-pressed]="diffOnly()">
+            <button scAction type="button" class="diff-toggle" [class.on]="diffOnly()" (click)="toggleDiffOnly()" [attr.aria-pressed]="diffOnly()">
               {{ 'codex.compare.diffOnly' | translate }}
             </button>
           </ng-container>
@@ -148,6 +148,8 @@ interface PinnedRef {
       border: 1px solid var(--sc-accent);
       box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 22px color-mix(in srgb, var(--sc-accent) 30%, transparent);
     }
+    /* A toggle with a fixed label (aria-pressed carries the state): the pressed look must be visible too. */
+    .diff-toggle.on { color: var(--sc-accent); border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 16%, transparent); }
     .bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 14px; }
     .tray-label {
       font-family: var(--sc-font-display); font-size: max(0.74rem, var(--sc-fs-floor)); letter-spacing: 0.08em;
