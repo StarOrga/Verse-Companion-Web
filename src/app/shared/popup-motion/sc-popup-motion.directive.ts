@@ -480,18 +480,21 @@ export class ScPopupMotionDirective implements OnInit, OnDestroy {
     for (const el of content) run.push(el.animate(resolve(), opt()));
     for (const el of foot) run.push(el.animate(O.content(), { duration: T, delay: Math.round(T * 0.12), fill: 'both' }));
     this.run = run;
-    rows.forEach((el, i) => this.animateRow(el, i));
+    // One clock reading for the batch: the cascade stays exactly ROW_STEP apart however long
+    // the animate() calls take on a busy machine.
+    const now = performance.now();
+    rows.forEach((el, i) => this.animateRow(el, i, now));
     this.watchRows(panel);
     this.watchSize(panel, f);
     const tail = rows.length ? (POPUP_MOTION_STAGGER_ROWS - 1) * POPUP_MOTION_ROW_STEP_MS : 0;
     this.later(T + tail + 30, () => this.settle());
   }
 
-  private animateRow(el: HTMLElement, i: number): void {
+  private animateRow(el: HTMLElement, i: number, now = performance.now()): void {
     if (this.seenRows.has(el) || i >= POPUP_MOTION_MAX_ROWS) return;
     this.seenRows.add(el);
     const T = this.timing.open;
-    const elapsed = performance.now() - this.startedAt;
+    const elapsed = now - this.startedAt;
     const at = T * 0.6 + Math.min(i, POPUP_MOTION_STAGGER_ROWS - 1) * POPUP_MOTION_ROW_STEP_MS;
     this.setMask(el, ROW_MASK, '250% 100%');
     this.run.push(

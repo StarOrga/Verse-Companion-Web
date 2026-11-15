@@ -157,9 +157,10 @@ describe('ScPopupMotionDirective (Vektor-Aufriss)', () => {
     expect(veil.getAnimations().every((a) => durationOf(a) === 900)).toBe(true);
     const rows = Array.from(veil.querySelectorAll('tbody tr'));
     const delay = (i: number) => Number(rows[i].getAnimations()[0]?.effect?.getTiming().delay);
-    for (let i = 1; i < 6; i++) expect(delay(i) - delay(i - 1)).toBeCloseTo(POPUP_MOTION_ROW_STEP_MS, -1);
-    // Rows past the sixth start with it (delays are offset by the ms already elapsed, hence ±5).
-    expect(Math.abs(delay(10) - delay(5))).toBeLessThanOrEqual(5);
+    // One clock reading for the whole batch: exact steps, even when animate() is slow under load.
+    for (let i = 1; i < 6; i++) expect(delay(i) - delay(i - 1)).toBe(POPUP_MOTION_ROW_STEP_MS);
+    // Rows past the sixth start with it.
+    expect(delay(10)).toBe(delay(5));
     expect(rows[50].getAnimations().length).toBe(0);
     expect(root.classList.contains(POPUP_LARGE_OPEN_CLASS)).toBe(true);
     expect(root.classList.contains('sc-scene-pushin')).toBe(false);

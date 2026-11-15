@@ -182,7 +182,7 @@ import { avatarUrlOf } from './avatar-url';
           <a routerLink="/admin/translations" routerLinkActive="active" class="admin-link admin-inline">
             {{ 'nav.translations' | translate }}
           </a>
-          <!-- Between the phone layout and ~1180px the two admin entries fold
+          <!-- Between the phone layout and 1600px the admin entries fold
                into this one menu, so the header stays a single row (the CSS
                swaps .admin-inline for .admin-more). Red like the entries it
                holds - elevated access - and it says "Admin" in words too. -->
@@ -676,7 +676,7 @@ import { avatarUrlOf } from './avatar-url';
       &:hover { color: var(--sc-accent-hot); background: rgba(255, 87, 34, 0.1); }
       &.active { color: var(--sc-accent-hot); box-shadow: inset 0 -2px 0 var(--sc-accent-hot); }
     }
-    /* The folded admin menu - only between the phone layout and ~1180px. */
+    /* The folded admin menu - only between the phone layout and 1600px. */
     .admin-more { display: none; position: relative; }
     .admin-more-btn {
       display: inline-flex; align-items: center; gap: 4px;
@@ -994,7 +994,10 @@ import { avatarUrlOf } from './avatar-url';
          <1380  tighter gaps, nav padding and wordmark tracking; the flanks
                 stop sharing the leftover evenly (that centring is what broke
                 the wordmark), the nav takes the space between them;
-         <1180  the two admin entries fold into the red "Admin" menu;
+         <1600  the admin entries (three since telemetry and translations)
+                fold into the red "Admin" menu - inline they need ~430px and
+                pushed the header 60px past a 1280px window and the actions
+                onto a second row at 1440px;
          <1000  the wordmark gives way to logo + badge, as on a phone;
          <820   too narrow for one row: the nav takes a row of its own, as on
                 a phone (the header scrolls away here, so the row is cheap). */
@@ -1006,7 +1009,7 @@ import { avatarUrlOf } from './avatar-url';
       .nav > a { padding: 8px 9px; letter-spacing: 0.06em; white-space: nowrap; }
       .actions { flex: 0 0 auto; }
     }
-    @media (min-width: 721px) and (max-width: 1179px) {
+    @media (min-width: 721px) and (max-width: 1599px) {
       .nav > a.admin-inline { display: none; }
       .admin-more { display: block; }
     }
@@ -1114,7 +1117,7 @@ export class ShellComponent implements AfterViewInit {
   private readonly menuMotions = viewChildren(ScPopupMotionDirective);
   private menuHideTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly popouts = inject(HeaderPopoutService);
-  /** The folded admin menu (721-1179px). */
+  /** The folded admin menu (721-1599px). */
   readonly adminMenuOpen = signal(false);
   /** On /admin or /admin/telemetry - the folded menu's button carries the active mark. */
   readonly adminRoute = signal(isAdminNavRoute(this.router.url));
