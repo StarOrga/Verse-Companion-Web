@@ -125,7 +125,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
                 }
 
                 <div class="actions">
-                  <button type="submit" scAction tier="primary" [disabled]="busy() || form.invalid">
+                  <button type="submit" scAction [tier]="previewLocked() ? 'secondary' : 'primary'" [disabled]="busy() || form.invalid">
                     {{ 'auth.signIn' | translate }}
                   </button>
                   <!-- An action (it sends a mail), not a navigation — stays a

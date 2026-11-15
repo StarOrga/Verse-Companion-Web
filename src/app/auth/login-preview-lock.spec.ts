@@ -113,6 +113,24 @@ describe('LoginComponent — signed-out preview lock', () => {
     expect(fixture.nativeElement.querySelectorAll('button.oauth').length).toBe(2);
   });
 
+  it('keeps one primary step: leaving the preview, not the refused sign-in (#970)', () => {
+    viewAs = 'anon';
+    const fixture = setup();
+    fixture.detectChanges();
+    const primaries = fixture.nativeElement.querySelectorAll('.sc-action--primary');
+    expect(primaries.length).toBe(1);
+    expect((primaries[0] as HTMLElement).closest('.preview-locked')).not.toBeNull();
+  });
+
+  it('makes the sign-in submit the primary step outside a preview (#970)', () => {
+    viewAs = null;
+    const fixture = setup();
+    fixture.detectChanges();
+    const primaries = fixture.nativeElement.querySelectorAll('.sc-action--primary');
+    expect(primaries.length).toBe(1);
+    expect((primaries[0] as HTMLElement).getAttribute('type')).toBe('submit');
+  });
+
   it('leavePreview() calls ImpersonationService.exit()', () => {
     viewAs = 'anon';
     const fixture = setup();
