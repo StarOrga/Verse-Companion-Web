@@ -250,7 +250,8 @@ export class ScPopupComponent implements OnInit, OnDestroy {
   readonly hasHead = computed(() => this.kind() === 'panel' || this.kind() === 'dialog' || this.kind() === 'large');
   readonly showEyebrow = computed(() => this.hasHead() && !!this.eyebrow());
   readonly takesFocus = computed(() => this.kind() !== 'notice');
-  readonly frameRole = computed(() => (this.kind() === 'menu' ? null : this.dialogRole()));
+  // A menu frame is a labelled group (its items are the host's menuitems); aria-label on a role-less div is invalid.
+  readonly frameRole = computed(() => (this.kind() === 'menu' ? 'group' : this.dialogRole()));
   readonly symbol = computed(() => KIND_SYMBOL[this.kind()]);
   readonly widthTier = computed<ScPopupSize | 'toast'>(() => {
     const k = this.kind();
@@ -260,6 +261,7 @@ export class ScPopupComponent implements OnInit, OnDestroy {
 
   private readonly zone = inject(NgZone);
   private historyId: string | null = null;
+  private destroyed = false;
 
   constructor() {
     this.layer = inject(ModalInertService).depth + 1;
@@ -267,14 +269,23 @@ export class ScPopupComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (!this.wantsHistoryEntry()) return;
+    if (this.wantsHistoryEntry()) this.pushEntry();
+  }
+
+  private pushEntry(): void {
     this.historyId = pushPopupEntry(() => {
       this.historyId = null;
       this.zone.run(() => this.closed.emit('back'));
+      // A host that keeps the popup open (busy, a confirm pending) ignored the back: the gesture
+      // already used up our entry, so take a new one or the next Back would leave the page.
+      setTimeout(() => {
+        if (!this.destroyed && !this.historyId) this.pushEntry();
+      });
     });
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
     if (this.historyId) releasePopupEntry(this.historyId);
     this.historyId = null;
   }

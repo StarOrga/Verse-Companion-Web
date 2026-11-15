@@ -292,7 +292,27 @@ describe('ScPopupComponent', () => {
       expect(marker()).not.toBeNull();
       history.back();
       await vi.waitFor(() => expect(f.componentInstance.reasons).toEqual(['back']));
+      f.detectChanges();
+      await settle();
       expect(location.href).toBe(url);
+      expect(popupEntryDepth()).toBe(0);
+      f.destroy();
+    });
+
+    it('a host that keeps the popup open on back gets a new entry, so the next Back still closes it', async () => {
+      await idle();
+      const f = mount((h) => h.kind.set('large'));
+      await settle();
+      // The host ignores the first back (busy): no detectChanges, the popup stays.
+      history.back();
+      await vi.waitFor(() => expect(f.componentInstance.reasons).toEqual(['back']));
+      await vi.waitFor(() => expect(popupEntryDepth()).toBe(1));
+      expect(marker()).not.toBeNull();
+      f.componentInstance.reasons.length = 0;
+      history.back();
+      await vi.waitFor(() => expect(f.componentInstance.reasons).toEqual(['back']));
+      f.detectChanges();
+      await settle();
       expect(popupEntryDepth()).toBe(0);
       f.destroy();
     });

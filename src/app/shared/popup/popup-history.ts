@@ -18,8 +18,20 @@ export interface PopupHistoryEntry {
   readonly onBack: () => void;
 }
 
-const stack: PopupHistoryEntry[] = [];
-let ownPops = 0;
+interface Entry extends PopupHistoryEntry {
+  /** The browser entry is really on the history stack (a push waits while a step back is in flight). */
+  pushed: boolean;
+  /** The popup is gone but its entry is still under a live popup's: skipped when it surfaces. */
+  dead: boolean;
+}
+
+/** How long a self-issued step back may stay unanswered (a cancelled traversal) before we stop waiting. */
+const EXPECT_TIMEOUT_MS = 600;
+
+const stack: Entry[] = [];
+/** Steps back this module issued itself and whose popstate has not been seen yet. */
+let expecting = 0;
+let expectTimer: ReturnType<typeof setTimeout> | null = null;
 let listening = false;
 let seq = 0;
 
@@ -27,17 +39,57 @@ function markerOf(state: unknown): string | null {
   return state && typeof state === 'object' && 'scPopup' in state ? String((state as { scPopup: unknown }).scPopup) : null;
 }
 
+function top(): Entry | undefined {
+  return stack[stack.length - 1];
+}
+
+function stepBack(): void {
+  expecting++;
+  if (expectTimer) clearTimeout(expectTimer);
+  // A traversal that never lands (cancelled, or the page left) must not swallow a later real Back.
+  expectTimer = setTimeout(() => {
+    expectTimer = null;
+    expecting = 0;
+    settle();
+  }, EXPECT_TIMEOUT_MS);
+  history.back();
+}
+
+/** Nothing in flight: skip entries of destroyed popups that surfaced, then push the entries that waited. */
+function settle(): void {
+  if (expecting > 0) return;
+  for (let t = top(); t?.dead; t = top()) {
+    stack.pop();
+    if (t.pushed && markerOf(history.state) === t.id) {
+      stepBack();
+      return;
+    }
+  }
+  for (const e of stack) {
+    if (e.pushed) continue;
+    const prev = history.state && typeof history.state === 'object' ? history.state : {};
+    history.pushState({ ...prev, scPopup: e.id }, '', location.href);
+    e.pushed = true;
+  }
+}
+
 function onPopstate(ev: PopStateEvent): void {
-  if (ownPops > 0) {
-    ownPops--;
+  if (expecting > 0) {
+    expecting--;
     ev.stopImmediatePropagation();
+    if (expecting === 0) {
+      if (expectTimer) clearTimeout(expectTimer);
+      expectTimer = null;
+      settle();
+    }
     return;
   }
-  const top = stack[stack.length - 1];
-  if (!top || markerOf(ev.state) === top.id) return;
+  const t = top();
+  if (!t || !t.pushed || markerOf(ev.state) === t.id) return;
   stack.pop();
   ev.stopImmediatePropagation();
-  top.onBack();
+  t.onBack();
+  settle();
 }
 
 function listen(): void {
@@ -50,9 +102,10 @@ function listen(): void {
 export function pushPopupEntry(onBack: () => void): string {
   const id = `p${++seq}-${Date.now().toString(36)}`;
   listen();
-  const prev = history.state && typeof history.state === 'object' ? history.state : {};
-  history.pushState({ ...prev, scPopup: id }, '', location.href);
-  stack.push({ id, onBack });
+  stack.push({ id, onBack, pushed: false, dead: false });
+  // While a step back is in flight (a popup closed in this very tick) the push waits for its popstate:
+  // pushing first would let that traversal land on the entry of the popup that just closed.
+  settle();
   return id;
 }
 
@@ -60,13 +113,22 @@ export function pushPopupEntry(onBack: () => void): string {
 export function releasePopupEntry(id: string): void {
   const at = stack.findIndex((e) => e.id === id);
   if (at < 0) return;
-  stack.splice(at, 1);
-  if (markerOf(history.state) !== id) return;
-  ownPops++;
-  history.back();
+  const entry = stack[at];
+  if (!entry.pushed) {
+    stack.splice(at, 1);
+    return;
+  }
+  const onTop = at === stack.length - 1;
+  if (onTop && expecting === 0) {
+    stack.pop();
+    if (markerOf(history.state) === id) stepBack();
+    return;
+  }
+  // Under a live popup, or a step back is still in flight: the browser entry stays until it surfaces.
+  entry.dead = true;
 }
 
-/** Open popup entries (for tests). */
+/** Open popup entries that belong to a live popup (for tests). */
 export function popupEntryDepth(): number {
-  return stack.length;
+  return stack.filter((e) => !e.dead).length;
 }
