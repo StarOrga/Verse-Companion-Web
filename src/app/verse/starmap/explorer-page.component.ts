@@ -84,13 +84,13 @@ function isComplete(p: VerseExplorerPatch): boolean {
       <h1 class="sr-only">{{ 'starmap.title' | translate }}</h1>
       <section class="card note">
         <p>{{ 'starmap.signedOut' | translate }}</p>
-        <a class="btn" routerLink="/login" [queryParams]="{ redirect: '/verse/explorer' }">{{ 'starmap.signIn' | translate }}</a>
+        <a scAction tier="primary" routerLink="/login" [queryParams]="{ redirect: '/verse/explorer' }">{{ 'starmap.signIn' | translate }}</a>
       </section>
     } @else if (api.explorerState() === 'error') {
       <h1 class="sr-only">{{ 'starmap.title' | translate }}</h1>
       <section class="card note" role="alert">
         <p>{{ (api.explorerError() ?? 'errors.generic') | translate }}</p>
-        <button type="button" class="btn" (click)="reload()">{{ 'errors.retry' | translate }}</button>
+        <button type="button" scAction tier="secondary" (click)="reload()">{{ 'errors.retry' | translate }}</button>
       </section>
     } @else if (!state()) {
       <h1 class="sr-only">{{ 'starmap.title' | translate }}</h1>
@@ -173,10 +173,6 @@ function isComplete(p: VerseExplorerPatch): boolean {
       .card { background: var(--sc-bg-1); border: 1px solid var(--sc-border); border-radius: 12px; padding: var(--sc-pad-3); }
       .note { display: flex; gap: var(--sc-gap-2); align-items: center; flex-wrap: wrap; }
       .note p { margin: 0; }
-      .btn { display: inline-flex; align-items: center; min-height: var(--sc-tap-min, 44px); padding: 0 var(--sc-pad-2); border-radius: 8px;
-        border: 1px solid var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-fg-0);
-        font: inherit; cursor: pointer; text-decoration: none; }
-      .btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
       .page { position: relative; }
       /* The plain "?" right after the title: no frame, just the glyph. */

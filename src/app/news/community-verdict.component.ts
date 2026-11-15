@@ -7,6 +7,7 @@ import {
   BUILD_VOTE_DAILY_CAP, CommunityCorrection, MIN_EFFECTIVE_VOTES, StabilityWord, VOTE_CHANGE_HOURS, VOTE_MIN_ACCOUNT_DAYS, VoteAggregate,
 } from './patch-stability';
 import { CastResult, PatchStabilityVotesService } from './patch-stability-votes.service';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 const WORDS: readonly StabilityWord[] = ['stabil', 'wackelig', 'instabil'];
 
@@ -54,14 +55,14 @@ export interface VoteSource {
 @Component({
   selector: 'sc-community-verdict',
   standalone: true,
-  imports: [TranslatePipe, RouterLink],
+  imports: [TranslatePipe, RouterLink, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="cv" [attr.aria-label]="'stability.vote.title' | translate">
       @if (src().error() && !src().aggregate()) {
         <div class="state" role="alert">
           <p>{{ src().error() ?? 'errors.generic' | translate }}</p>
-          <button type="button" class="sc-btn" (click)="retry()">{{ 'errors.retry' | translate }}</button>
+          <button type="button" scAction tier="secondary" (click)="retry()">{{ 'errors.retry' | translate }}</button>
         </div>
       } @else if (!src().aggregate()) {
         <p class="state muted">{{ 'stability.vote.loading' | translate }}</p>
