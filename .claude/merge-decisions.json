@@ -276,6 +276,16 @@
         "hunks": [
           "c5660787e720"
         ]
+      },
+      {
+        "ship": "feat/verse-rank-followup",
+        "by": "JerryT2T",
+        "value": "\"current\": \"0.265.0\" (regenerated from merged CHANGELOG incl. 0.264.0)",
+        "decided": true,
+        "at": "2026-11-15T01:08:18.190Z",
+        "hunks": [
+          "d28c55f926af"
+        ]
       }
     ],
     "public/release-notes.json›root›current": [
