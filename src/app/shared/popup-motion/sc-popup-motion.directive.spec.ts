@@ -50,6 +50,11 @@ class HostComponent {
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/** Waits for a condition instead of a wall-clock guess: a loaded full-suite run is slow. */
+async function until(ok: () => boolean, ms = 3000): Promise<void> {
+  const end = performance.now() + ms;
+  while (!ok() && performance.now() < end) await sleep(10);
+}
 const frame = () => document.querySelector<HTMLElement>('.pmv-frame');
 const durationOf = (a: Animation) => Number(a.effect?.getTiming().duration);
 
@@ -169,7 +174,7 @@ describe('ScPopupMotionDirective (Vektor-Aufriss)', () => {
     const win = f.nativeElement.querySelector('.win') as HTMLElement;
     expect(frame()?.getBoundingClientRect().height).toBeCloseTo(400, 0);
     win.style.height = '700px';
-    await sleep(60);
+    await until(() => Math.round(frame()?.getBoundingClientRect().height ?? 0) === 700);
     const box = frame()!.getBoundingClientRect();
     expect(box.height).toBeCloseTo(700, 0);
     expect(box.top).toBeCloseTo(win.getBoundingClientRect().top, 0);
@@ -201,7 +206,7 @@ describe('ScPopupMotionDirective (Vektor-Aufriss)', () => {
   it('settles after the open: every effect is gone, the faint resting edge stays', async () => {
     const f = mount();
     const el = f.nativeElement.querySelector('.small') as HTMLElement;
-    await sleep(POPUP_MOTION_TIMING.small.open + 120);
+    await until(() => motionOf(f, '.small').state === 'open');
     expect(el.getAnimations({ subtree: true }).length).toBe(0);
     expect(el.style.getPropertyValue('mask-image')).toBe('');
     expect(frame()).toBeNull();
@@ -211,7 +216,7 @@ describe('ScPopupMotionDirective (Vektor-Aufriss)', () => {
 
   it('C4/P7: exit() plays its own collapse in the close time and resolves once, then', async () => {
     const f = mount();
-    await sleep(POPUP_MOTION_TIMING.small.open + 120);
+    await until(() => motionOf(f, '.small').state === 'open');
     const m = motionOf(f, '.small');
     const el = f.nativeElement.querySelector('.small') as HTMLElement;
     let done = false;
@@ -231,18 +236,21 @@ describe('ScPopupMotionDirective (Vektor-Aufriss)', () => {
 
   it('C8: restart() during a close reverses it from where it stands, no restart from 0', async () => {
     const f = mount();
-    await sleep(POPUP_MOTION_TIMING.small.open + 120);
+    await until(() => motionOf(f, '.small').state === 'open');
     const m = motionOf(f, '.small');
     const el = f.nativeElement.querySelector('.small') as HTMLElement;
     void m.exit();
-    await sleep(80);
+    const closing = el.getAnimations({ subtree: true }).filter((a) => !(a as CSSAnimation).animationName);
+    await Promise.all(closing.map((a) => a.ready));
+    // Pin the close mid-way instead of sleeping: a loaded test machine may not advance it in time.
+    for (const a of closing) a.currentTime = 80;
     const before = el.getAnimations().find((a) => !(a as CSSAnimation).animationName)!;
     const t = Number(before.currentTime);
     m.restart();
     expect(el.classList.contains('pm-out')).toBe(false);
     expect(before.playbackRate).toBe(-1);
     expect(Number(before.currentTime)).toBeGreaterThan(t * 0.5);
-    await sleep(t + 80);
+    await until(() => m.state === 'open');
     expect(m.state).toBe('open');
     expect(el.classList.contains('pmv-rest')).toBe(true);
   });
@@ -267,10 +275,10 @@ describe('ScPopupMotionDirective (Vektor-Aufriss)', () => {
 
   it('animate.leave: the pm-out class alone starts the close', async () => {
     const f = mount();
-    await sleep(POPUP_MOTION_TIMING.small.open + 120);
+    await until(() => motionOf(f, '.small').state === 'open');
     const el = f.nativeElement.querySelector('.small') as HTMLElement;
     el.classList.add('pm-out');
-    await sleep(0);
+    await until(() => motionOf(f, '.small').state === 'closing', 500);
     expect(motionOf(f, '.small').state).toBe('closing');
     expect(frame()).not.toBeNull();
     // The CSS timer Angular's animate.leave waits for lasts the close.
