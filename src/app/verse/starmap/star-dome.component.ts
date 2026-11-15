@@ -5,6 +5,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { map } from 'rxjs';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
+import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import type { VersePoint } from '../data/verse.models';
 import {
   StarSlot,
@@ -45,7 +46,7 @@ export function formatDay(value: string | null, lang: string, withWeekday = fals
 @Component({
   selector: 'sc-star-dome',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent],
+  imports: [RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective],
   template: `
     <div class="fig" [class.celebrate]="celebrate()" [style.--tc]="tCelebrate() + 's'">
       @if (celebrate()) {
