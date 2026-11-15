@@ -98,7 +98,8 @@ export const LOGIN_PLANET_ATTACH_MS = 1800;
     }
     .ls-disc, .ls-gl, .ls-shade, .ls-atm { position: absolute; inset: 0; border-radius: 50%; }
     .ls-disc {
-      background: radial-gradient(circle at 34% 30%, #c9eef9 0%, #7fc6dc 12%, #3f8eaa 28%, #1d5670 44%, #0d2b3c 62%, #04121b 80%);
+      /* microTech's ice, lit from the upper right like the living planet that replaces it. */
+      background: radial-gradient(circle at 68% 28%, #f2f8fb 0%, #c4d9e4 12%, #7f9fb2 30%, #3b5a6d 48%, #13283a 66%, #050d15 82%);
     }
     .ls-gl { width: 100%; height: 100%; opacity: 0; transition: opacity 0.7s ease; }
     .ls-gl.on { opacity: 1; }

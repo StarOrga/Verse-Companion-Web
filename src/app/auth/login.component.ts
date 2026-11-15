@@ -341,7 +341,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
     .lg-hero {
       align-self: end;
       min-width: 0;
-      max-width: 540px;
+      max-width: 540px; /* overlay-size: exception — the landing hero copy, not an overlay */
       padding: 0 var(--sc-page-gutter, 24px) clamp(28px, 7vh, 72px) clamp(24px, 6vw, 96px);
       text-shadow: 0 1px 12px rgba(2, 8, 14, 0.8);
     }
@@ -405,7 +405,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
       background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--sc-accent) 70%, transparent) 50%, transparent);
       opacity: 0.55;
     }
-    .lg-panel-body { width: 100%; max-width: 400px; margin-inline: auto; }
+    .lg-panel-body { width: 100%; max-width: var(--sc-ov-s); margin-inline: auto; }
     .lg-panel h2 {
       margin: 0 0 18px;
       font: 600 1.05rem / 1.2 var(--sc-font-display);
