@@ -137,6 +137,8 @@ export type AddToSetView = 'loading' | 'error' | 'noSet' | 'noFit' | 'pickSet' |
     .ats-trigger:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
     /* Anchored under its trigger; frame, ✕ and width come from sc-popup. */
     .ats-pop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 20; }
+    /* Phone: the popup frame is fixed full-screen; lift the wrapper onto the popup layer (above the shell header). */
+    @media (max-width: 720px) { .ats-pop { z-index: var(--sc-popup-z, 1300); } }
     .ats-head { margin: 0; font-family: var(--sc-font-display); text-transform: uppercase; letter-spacing: 0.08em;
       font-size: max(0.68rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     .ats-text { margin: 0; color: var(--sc-fg-1); font-size: max(0.84rem, var(--sc-fs-floor)); }

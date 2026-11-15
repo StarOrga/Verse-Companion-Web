@@ -3984,7 +3984,6 @@
         "scopesLabel": "Scopes",
         "create": "Create token",
         "creating": "Creating…",
-        "cancel": "Cancel",
         "errorTitle": "Could not create token"
       },
       "scopeDescriptions": {
@@ -7939,7 +7938,7 @@
   "appNotice": {
     "aria": "App notice",
     "eyebrow": "App",
-    "close": "Close",
+    "later": "Later",
     "download": "Download",
     "scc": {
       "line": "Verse Companion App for your desktop",

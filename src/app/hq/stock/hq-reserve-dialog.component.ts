@@ -103,7 +103,7 @@ import type { DeckCrate } from './hq-stock-deck';
             {{ (editing() ? 'hq.bestand.deck.rsv.saveEdit' : 'hq.bestand.deck.reserve') | translate }}
           </button>
           @if (editing()) { <button type="button" scAction tier="secondary" (click)="cancelEdit()">{{ 'hq.bestand.deck.rsv.newOne' | translate }}</button> }
-          <button type="button" scAction tier="secondary" (click)="closed.emit(changed())">{{ 'common.dialog.cancel' | translate }}</button>
+          <button type="button" scAction tier="secondary" (click)="closed.emit(changed())">{{ 'common.dialog.close' | translate }}</button>
         </ng-container>
     </sc-popup>
   `,

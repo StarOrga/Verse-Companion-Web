@@ -97,6 +97,8 @@ export function resolveHeroPart(sections: readonly LayoutSection[], pick: HeroPa
     /* Over the Einordnung column (its positioned parent); grows with its content, scrolls past the column. */
     :host { position: absolute; inset-block-start: 0; inset-inline: 0; z-index: 6; display: block;
       max-height: max(100%, 420px); }
+    /* Phone: the fixed full-screen frame must not stay capped at the wrapper's level (below the shell header). */
+    @media (max-width: 720px) { :host { z-index: var(--sc-popup-z, 1300); } }
     /* The 3D overlay is fullscreen: the popup follows it to the viewport's right edge. */
     :host(.over-full) { position: fixed; inset-block-start: 64px; inset-inline: auto 16px; z-index: 1001;
       max-height: calc(100vh - 80px - var(--sc-float-bottom, 16px));

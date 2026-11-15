@@ -56,6 +56,8 @@ import { PatchSummaryView } from './codex-landing-data.types';
       }
       /* Positioned at its trigger; width and frame come from sc-popup. */
       .pop { position: absolute; right: 0; top: calc(100% + 10px); z-index: 8; }
+      /* Phone: the popup frame is fixed full-screen; lift the wrapper onto the popup layer (above the shell header). */
+      @media (max-width: 720px) { .pop { z-index: var(--sc-popup-z, 1300); } }
       ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
       li { display: flex; gap: 10px; padding: 8px 6px; font-size: 13px; line-height: 1.35; color: var(--sc-fg-0); }
       li b { flex: 0 0 14px; font-weight: 400; text-align: center; color: var(--sc-accent); }

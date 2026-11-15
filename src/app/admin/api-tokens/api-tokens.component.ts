@@ -195,8 +195,8 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
                   [disabled]="creating() || !canSubmit()">
             {{ (creating() ? 'admin.tokens.dialog.creating' : 'admin.tokens.dialog.create') | translate }}
           </button>
-          <button type="button" scAction (click)="closeCreateDialog()" [disabled]="creating()">
-            {{ 'admin.tokens.dialog.cancel' | translate }}
+          <button type="button" scAction tier="secondary" (click)="closeCreateDialog()" [disabled]="creating()">
+            {{ 'common.dialog.cancel' | translate }}
           </button>
         </ng-container>
       </sc-popup>
@@ -211,15 +211,15 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
           <span>{{ 'admin.tokens.reveal.warning' | translate }}</span>
         </div>
 
-        <label class="field">
-          <span class="field-label">{{ 'admin.tokens.reveal.tokenLabel' | translate }}</span>
+        <div class="field" role="group" aria-labelledby="tok-reveal-label">
+          <span class="field-label" id="tok-reveal-label">{{ 'admin.tokens.reveal.tokenLabel' | translate }}</span>
           <div class="reveal-token-row">
             <code class="reveal-token mono">{{ r.plaintext }}</code>
             <button type="button" scAction (click)="copyToClipboard(r.plaintext)">
               {{ (copied() ? 'admin.tokens.reveal.copied' : 'admin.tokens.reveal.copy') | translate }}
             </button>
           </div>
-        </label>
+        </div>
 
         <ng-container popupActions>
           <button type="button" scAction tier="primary" (click)="acknowledgeReveal()">

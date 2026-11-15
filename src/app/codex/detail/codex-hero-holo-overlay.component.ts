@@ -63,6 +63,8 @@ import { logWarn } from '../../core/log';
   styles: [`
     /* Covers its positioned parent (the hero picture + the ownership card). */
     :host { position: absolute; inset: 0; z-index: 5; display: block; }
+    /* Phone: the panel is a fixed full-screen frame; its wrapper must sit on the popup layer, above the shell header. */
+    @media (max-width: 720px) { :host { z-index: var(--sc-popup-z, 1300); } }
     /* Fullscreen: the same panel, filling the viewport (dvh after its vh fallback). */
     :host(.full) { position: fixed; inset: 0; z-index: 1000; height: 100vh; height: 100dvh; }
     sc-popup { display: block; height: 100%; }

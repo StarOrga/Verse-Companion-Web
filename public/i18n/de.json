@@ -3984,7 +3984,6 @@
         "scopesLabel": "Scopes",
         "create": "Token erstellen",
         "creating": "Erstelle…",
-        "cancel": "Abbrechen",
         "errorTitle": "Token konnte nicht erstellt werden"
       },
       "scopeDescriptions": {
@@ -7939,7 +7938,7 @@
   "appNotice": {
     "aria": "App-Hinweis",
     "eyebrow": "App",
-    "close": "Schließen",
+    "later": "Später",
     "download": "Herunterladen",
     "scc": {
       "line": "Verse Companion App für deinen Desktop",

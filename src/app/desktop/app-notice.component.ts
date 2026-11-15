@@ -62,7 +62,7 @@ const STARSCAPE_FALLBACK_URL =
               <span class="acts">
                 <a scAction tier="primary" class="dl" [href]="href()" rel="noopener noreferrer" download>{{ 'appNotice.download' | translate }}</a>
                 <!-- A notice carries no X (r1-close): the snooze lives in the expanded part, next to the download. -->
-                <button type="button" scAction tier="secondary" class="later" (click)="dismiss($event)">{{ 'appNotice.close' | translate }}</button>
+                <button type="button" scAction tier="secondary" class="later" (click)="dismiss($event)">{{ 'appNotice.later' | translate }}</button>
               </span>
             </div>
           </div>

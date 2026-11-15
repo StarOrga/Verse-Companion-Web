@@ -172,6 +172,11 @@ import { BRAND_NAME } from '../core/brand';
     /* Grows up out of the badge. The pinned bubble is <sc-popup kind="panel"> (frame, width, ✕ from the scaffold);
        only the hover peek is a plain tooltip and keeps a light frame of its own. */
     .sf-bubble { position: absolute; left: 0; bottom: calc(100% + var(--sc-space-2)); z-index: 5; }
+    /* Phone: the pinned bubble is a fixed full-screen frame; its wrapper and the stage footer go onto the popup layer. */
+    @media (max-width: 720px) {
+      .sf-bubble.sf-pinned { z-index: var(--sc-popup-z, 1300); }
+      .sf-stage:has(.sf-pinned) { z-index: var(--sc-popup-z, 1300); }
+    }
     .sf-bubble:not(.sf-pinned) {
       width: min(var(--sc-ov-s), calc(100vw - 2 * var(--sc-space-4)));
       padding: var(--sc-space-3) var(--sc-space-4);
