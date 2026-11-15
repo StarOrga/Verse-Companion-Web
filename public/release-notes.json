@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.263.2",
+  "current": "0.263.3",
   "releases": [
+    {
+      "version": "0.263.3",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex: the reset icon of a swapped module now sits in the corner of the favourite/hangar control, left of the info button, and no longer shifts the row when it appears or disappears; the reset icon at the Loadout heading keeps its space too."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.263.2",
       "date": "2026-11-15",
