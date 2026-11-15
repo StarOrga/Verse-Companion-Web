@@ -599,6 +599,16 @@
         "hunks": [
           "f899a31e05a4"
         ]
+      },
+      {
+        "ship": "refactor/hq-scaction",
+        "by": "JerryT2T",
+        "value": "\"current\": \"0.270.9\" (regenerated from CHANGELOG)",
+        "decided": true,
+        "at": "2026-11-15T15:18:49.041Z",
+        "hunks": [
+          "80e2d496f6e7"
+        ]
       }
     ],
     "public/release-notes.json›current›version": [
