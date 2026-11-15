@@ -32,7 +32,7 @@ import { logWarn } from '../../core/log';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.full]': 'full()' },
   template: `
-    <sc-popup kind="panel" size="fill" [bodyFill]="true" [title]="displayName()"
+    <sc-popup kind="panel" size="fill" [bodyFill]="true" [eyebrow]="'codex.title' | translate" [title]="displayName()"
               initialFocus="container"
               (closed)="onClosed($event)">
       <div class="hho-stage">

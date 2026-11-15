@@ -30,7 +30,7 @@ import { HQ_POPUP_CONTENT_STYLES } from './hq-popup-content.styles';
         }
       </div>
       <ng-container popupActions>
-        <button type="button" scAction tier="secondary" tone="danger" (click)="confirmed.emit(back())">
+        <button type="button" scAction tier="primary" tone="danger" (click)="confirmed.emit(back())">
           {{ (mode() === 'remove' ? 'hq.remove.confirmRemove' : 'hq.remove.confirmEmpty') | translate }}
         </button>
         <button type="button" scAction tier="secondary" (click)="cancelled.emit()">{{ 'common.dialog.cancel' | translate }}</button>

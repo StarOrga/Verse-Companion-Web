@@ -469,7 +469,7 @@ export function blueprintCategoriesForGroup(
           {{ 'codex.browse.filterButton' | translate: { count: activeFilterCount() } }}
         </button>
         @if (filtersOpen()) {
-          <sc-popup kind="panel" [modal]="true" [title]="'codex.browse.filtersTitle' | translate"
+          <sc-popup kind="panel" [modal]="true" [eyebrow]="'codex.title' | translate" [title]="'codex.browse.filtersTitle' | translate"
                     (closed)="filtersOpen.set(false)">
             <div class="sheet-body">
               <ng-container [ngTemplateOutlet]="treeTpl" />

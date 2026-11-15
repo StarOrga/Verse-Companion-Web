@@ -99,10 +99,8 @@ const STARSCAPE_FALLBACK_URL =
     .toast.open .more-in { padding-top: 10px; }
     .more-in p { margin: 0; font-size: max(0.82rem, var(--sc-fs-floor)); line-height: 1.4; color: var(--sc-fg-1); }
     .meta { font-size: max(0.78rem, var(--sc-fs-floor)); color: var(--sc-fg-2); font-variant-numeric: tabular-nums; }
-    @keyframes notice-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
     @media (prefers-reduced-motion: reduce) {
       .more { transition: none; }
-      @keyframes notice-fade { from { opacity: 0; } to { opacity: 1; } }
     }
   `],
 })

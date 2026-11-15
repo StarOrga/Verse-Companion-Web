@@ -350,7 +350,6 @@
         "open": "Patch-Zusammenfassung {{patch}} öffnen",
         "unread": "Neue Zusammenfassung",
         "title": "Was {{patch}} verändert",
-        "source": "KI-Zusammenfassung",
         "notes": "Patch-Notes bei CIG",
         "notesOverview": "Alle Patch-Notes bei CIG"
       },

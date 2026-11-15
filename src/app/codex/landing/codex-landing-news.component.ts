@@ -24,7 +24,7 @@ import { PatchSummaryView } from './codex-landing-data.types';
       </button>
       @if (open()) {
         <sc-popup class="pop" kind="panel" [title]="'codex.landing.news.title' | translate: { patch: s.patchVersion }"
-                  [eyebrow]="'codex.landing.news.source' | translate" (closed)="open.set(false)">
+                  [eyebrow]="'codex.title' | translate" (closed)="open.set(false)">
           <ul>
             @for (line of s.lines; track $index) { <li><b aria-hidden="true">›</b><span>{{ line }}</span></li> }
           </ul>
@@ -42,17 +42,17 @@ import { PatchSummaryView } from './codex-landing-data.types';
       :host { position: relative; display: block; }
       .news {
         position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 14px 0 12px;
-        border-radius: 999px; border: 1px solid rgba(82, 193, 230, 0.35); background: rgba(10, 30, 44, 0.72); cursor: pointer;
+        border-radius: 999px; border: 1px solid color-mix(in srgb, var(--sc-accent) 35%, transparent); background: color-mix(in srgb, var(--sc-bg-1) 72%, transparent); cursor: pointer;
         font: 600 max(10px, 0.62rem) var(--sc-font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-1);
       }
       .news svg { width: 15px; height: 15px; color: var(--sc-accent); }
       .news b { font: 400 12px var(--font-monospace, 'Share Tech Mono', monospace); letter-spacing: 0; color: var(--sc-fg-0); }
       .news:hover, .news.on { border-color: var(--sc-accent); color: var(--sc-fg-0); }
-      .news.on { background: rgba(82, 193, 230, 0.14); }
+      .news.on { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
       .news:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
       .dot {
         position: absolute; top: 6px; left: 22px; width: 8px; height: 8px; border-radius: 50%;
-        background: var(--sc-accent); box-shadow: 0 0 0 2px #0b1f2c, 0 0 10px rgba(82, 193, 230, 0.9);
+        background: var(--sc-accent); box-shadow: 0 0 0 2px var(--sc-bg-0), 0 0 10px color-mix(in srgb, var(--sc-accent) 90%, transparent);
       }
       /* Positioned at its trigger; width and frame come from sc-popup. */
       .pop { position: absolute; right: 0; top: calc(100% + 10px); z-index: 8; }

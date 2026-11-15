@@ -434,7 +434,7 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
       background: rgba(251, 191, 36, 0.1);
       border: 1px solid var(--sc-warning);
       border-radius: 6px;
-      margin: 16px 0 0;
+      margin: var(--sc-space-4) 0 0;
       color: var(--sc-warning);
       font-weight: 600;
       font-size: 0.92rem;

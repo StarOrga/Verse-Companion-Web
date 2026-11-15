@@ -350,7 +350,6 @@
         "open": "Open patch summary {{patch}}",
         "unread": "New summary",
         "title": "What {{patch}} changes",
-        "source": "AI summary",
         "notes": "Patch notes at CIG",
         "notesOverview": "All patch notes at CIG"
       },

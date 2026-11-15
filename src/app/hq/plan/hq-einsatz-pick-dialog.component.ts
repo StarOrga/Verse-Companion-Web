@@ -56,14 +56,14 @@ export type EinsatzPick = { kind: 'existing'; id: string } | { kind: 'new' };
       .pick { display: flex; flex-direction: column; gap: 12px; }
       .msg { margin: 0; color: var(--sc-fg-1); overflow-wrap: anywhere; }
       .muted { color: var(--sc-fg-2); }
-      .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+      .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-space-2); }
       .opt {
         inline-size: 100%;
         min-block-size: 44px;
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 8px 12px;
+        gap: var(--sc-space-3);
+        padding: var(--sc-space-2) var(--sc-space-3);
         border: 1px solid var(--sc-border);
         border-radius: var(--sc-radius, 6px);
         background: var(--sc-bg-1);

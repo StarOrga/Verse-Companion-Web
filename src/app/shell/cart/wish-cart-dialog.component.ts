@@ -37,7 +37,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- The scrim does not close the cart (a selection would be lost): the X, Escape or the browser's back do. The cart owns ?cart=1, so no extra history entry. -->
-    <sc-popup kind="large" [scEntry]="'cart'" [title]="'cart.title' | translate" [backClose]="false" (closed)="cart.close()" data-cart>
+    <sc-popup kind="large" [scEntry]="'cart'" [eyebrow]="'hq.title' | translate" [title]="'cart.title' | translate" [backClose]="false" (closed)="cart.close()" data-cart>
       <svg popupIcon viewBox="0 0 24 24">@for (d of wishPath; track $index) { <path [attr.d]="d" /> }</svg>
       <div class="cart-body">
           @if (cart.count() === 0) {

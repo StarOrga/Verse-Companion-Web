@@ -101,8 +101,8 @@ import {
     .hint { display: block; color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor)); margin: 0; }
     .hint.empty { margin-top: 8px; font-style: italic; }
     .flash.error {
-      padding: 10px 14px; border-radius: 4px; font-size: 0.9rem; margin-bottom: 10px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap;
-      background: rgba(248, 113, 113, 0.1); border: 1px solid var(--sc-danger); color: var(--sc-danger);
+      padding: var(--sc-space-3) var(--sc-space-4); border-radius: 4px; font-size: 0.9rem; margin-bottom: var(--sc-space-3); display: flex; gap: var(--sc-space-3); align-items: center; justify-content: space-between; flex-wrap: wrap;
+      background: color-mix(in srgb, var(--sc-danger) 10%, transparent); border: 1px solid var(--sc-danger); color: var(--sc-danger);
     }
     .facets { list-style: none; margin: 8px 0 12px; padding: 0; }
     .facets li { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: var(--sc-space-2, 8px) 0; border-bottom: 1px solid var(--sc-border); }
@@ -114,7 +114,7 @@ import {
       border: 1px solid var(--sc-border); background: var(--sc-bg-2); cursor: pointer;
     }
     .switch .knob { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--sc-fg-2); transition: transform 0.15s ease, background 0.15s ease; }
-    .switch.on { border-color: var(--sc-accent); background: rgba(0, 212, 255, 0.15); }
+    .switch.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 15%, transparent); }
     .switch.on .knob { transform: translateX(18px); background: var(--sc-accent); }
     .switch:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
     .switch:disabled { opacity: 0.6; cursor: default; }

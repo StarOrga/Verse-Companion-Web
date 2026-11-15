@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScPopupComponent } from '../shared/popup/sc-popup.component';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ScSelectComponent, ScSelectOption } from '../shared/sc-select.component';
 import { SupabaseClientProvider } from '../core/supabase.client';
 import { RoleService } from '../auth/role.service';
@@ -36,6 +37,7 @@ import { ScDatePipe } from '../core/locale/sc-date.pipe';
     P4kHistoryComponent,
     AppDownloadPanelComponent,
     ScPopupComponent,
+    ScActionDirective,
     ScSelectComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -100,7 +102,7 @@ import { ScDatePipe } from '../core/locale/sc-date.pipe';
               [ariaLabel]="'desktop.promote.label' | translate"
               (valueChange)="onPromoteTarget($event)"
             />
-            <button class="sc-btn micro" [disabled]="promoting()" (click)="promote(r.version)">
+            <button type="button" scAction tier="secondary" [busy]="promoting()" [disabled]="promoting()" (click)="promote(r.version)">
               {{ 'desktop.promote.action' | translate }}
             </button>
           }
@@ -120,12 +122,12 @@ import { ScDatePipe } from '../core/locale/sc-date.pipe';
   `,
   styles: [`
     /* The full page frame (styles.scss, "PAGE FRAME") — no width of its own. */
-    .uploader { display: flex; flex-direction: column; gap: 14px; }
+    .uploader { display: flex; flex-direction: column; gap: var(--sc-space-4); }
     .u-head h1 { margin: 0; }
     .u-head .hint { color: var(--sc-fg-2); margin: 4px 0 0; }
     .err {
-      padding: 10px 14px;
-      background: rgba(248, 113, 113, 0.1);
+      padding: var(--sc-space-3) var(--sc-space-4);
+      background: color-mix(in srgb, var(--sc-danger) 10%, transparent);
       border: 1px solid var(--sc-danger);
       color: var(--sc-danger);
       border-radius: 4px;
