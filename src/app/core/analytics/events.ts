@@ -1,0 +1,132 @@
+/**
+ * The typed product-event catalogue — the ONE list of what the app may send to
+ * PostHog. `AnalyticsService.track()` accepts only these names, with exactly
+ * these properties; `scripts/check-analytics-events.mjs` (prebuild) keeps the
+ * list honest and `npm run analytics:sync` pushes the descriptions to PostHog.
+ *
+ * Naming: `category:object_action` — present-tense verb from {@link EVENT_VERBS},
+ * snake_case, category = the entry's `area`. Rules, property rules and "how to
+ * add an event": docs/analytics/event-naming.md.
+ *
+ * Properties never carry personal data (no e-mail, no name, no free text, no
+ * ids of other people) — keys, kinds, counts and positions only.
+ *
+ * Erasable TypeScript only and no imports: the guard and the sync script load
+ * this file directly with Node's type stripping.
+ */
+
+/** Product areas — also the `category` prefix of every event name. */
+export const EVENT_AREAS = [
+  'app', 'auth', 'codex', 'hangar', 'hq', 'verse', 'news', 'social', 'search', 'settings', 'feedback', 'desktop', 'admin',
+] as const;
+export type EventArea = (typeof EVENT_AREAS)[number];
+
+/** The fixed present-tense verb list; an event name's last word(s) must be one of these. */
+export const EVENT_VERBS = [
+  'view', 'open', 'close', 'create', 'add', 'remove', 'update', 'change', 'submit', 'send', 'start', 'finish', 'fail',
+  'share', 'search', 'select', 'toggle', 'import', 'export', 'earn', 'request', 'sign_in', 'sign_out', 'show',
+] as const;
+export type EventVerb = (typeof EVENT_VERBS)[number];
+
+/** Phantom type: the property object an event carries (`undefined` = no properties). */
+export interface EventDef<P> {
+  readonly area: EventArea;
+  /** One German line — shown in PostHog as the event definition's description. */
+  readonly desc: string;
+  /** Type-level only; never set at runtime. */
+  readonly __props?: P;
+}
+
+function ev<P = undefined>(area: EventArea, desc: string): EventDef<P> {
+  return { area, desc };
+}
+
+/** Top-level nav items with a β switch (`BetaService`). */
+export type BetaArea = 'verse' | 'codex' | 'shell';
+
+export const EVENTS = {
+  // --- app ---------------------------------------------------------------
+  'app:error_show': ev<{ key: string; scope: string }>('app', 'Ein Fehlerzustand wurde angezeigt (errors.*-Schlüssel und Bereich, nie der Fehlertext).'),
+
+  // --- auth --------------------------------------------------------------
+  'auth:user_sign_in': ev<{ provider: 'email' | 'google' | 'discord' }>('auth', 'Anmeldung erfolgreich (Anbieter).'),
+  'auth:user_sign_out': ev('auth', 'Abmeldung.'),
+  'auth:access_request': ev<{ duplicate: boolean }>('auth', 'Zugang angefragt (duplicate = Adresse war schon bekannt).'),
+
+  // --- codex -------------------------------------------------------------
+  'codex:ship_link_create': ev<{ shipSlug: string }>('codex', 'Ein Codex-Schiff wurde mit einem Hangar-Schiff verknüpft.'),
+  'codex:ship_link_remove': ev<{ shipSlug: string }>('codex', 'Die Verknüpfung eines Codex-Schiffs wurde gelöst.'),
+  'codex:ship_link_update': ev<{ shipSlug: string }>('codex', 'Eine Schiffsverknüpfung wurde zur bevorzugten befördert.'),
+
+  // --- hangar ------------------------------------------------------------
+  'hangar:ship_add': ev<{ ship_class: string; status: string; ship_count: number }>('hangar', 'Ein Schiff wurde dem Hangar hinzugefügt.'),
+  'hangar:ship_remove': ev<{ ship_class: string; status: string; ship_count: number }>('hangar', 'Ein Schiff wurde aus dem Hangar entfernt.'),
+  'hangar:flagship_select': ev<{ ship_class: string }>('hangar', 'Ein Flaggschiff wurde gewählt.'),
+  'hangar:ship_config_update': ev<{ role: string }>('hangar', 'Die Konfiguration eines Hangar-Schiffs wurde gespeichert.'),
+  'hangar:loadout_create': ev<{ role: string }>('hangar', 'Ein Loadout wurde angelegt.'),
+  'hangar:fleet_import': ev<{ ships_imported: number; total_in_file: number; source: 'extension' | 'file' }>('hangar', 'Eine Flotte wurde importiert (Datei oder Erweiterung).'),
+  'hangar:extension_import': ev<{ ships_offered: number }>('hangar', 'Die Browser-Erweiterung hat Schiffe zum Import übergeben.'),
+
+  // --- settings ----------------------------------------------------------
+  'settings:username_update': ev('settings', 'Der Benutzername wurde gespeichert.'),
+  'settings:send_on_enter_toggle': ev<{ on: boolean }>('settings', 'Enter-sendet im Composer wurde umgeschaltet.'),
+  'settings:feedback_fab_toggle': ev<{ on: boolean }>('settings', 'Der Feedback-Knopf wurde ein- oder ausgeblendet.'),
+  'settings:routine_tint_toggle': ev<{ on: boolean }>('settings', 'Die Routine-Färbung wurde umgeschaltet.'),
+  'settings:codex_non_usable_toggle': ev<{ on: boolean }>('settings', 'Nicht nutzbare Codex-Einträge wurden ein- oder ausgeblendet.'),
+  'settings:language_change': ev<{ lang: string }>('settings', 'Die Sprache wurde geändert (Einstellung, auch „auto“).'),
+  'settings:region_change': ev<{ region: string }>('settings', 'Die Region wurde geändert (Einstellung, auch „auto“).'),
+  'settings:beta_toggle': ev<{ area: BetaArea; enabled: boolean }>('settings', 'Der β-Schalter eines Navigationspunkts wurde umgelegt.'),
+
+  // --- verse -------------------------------------------------------------
+  'verse:top_open': ev<{ key: string; kind: string; rank: number; pinned: boolean }>('verse', 'Ein Eintrag der Briefing-Top-Liste wurde geöffnet.'),
+  'verse:door_open': ev<{ door: 'news' | 'patches' | 'gallery' }>('verse', 'Eines der drei Tore (News, Patches, Galerie) wurde geöffnet.'),
+  'verse:star_earn': ev<{ patch_line: string; star_key: string; sun?: boolean }>('verse', 'Ein Explorer-Stern wurde verdient (sun = Kometentreffer).'),
+  'verse:starscape_share': ev<{ image_id: string; channel: 'native' | 'copy' }>('verse', 'Ein Starscape-Bild wurde geteilt.'),
+} as const;
+
+export type EventName = keyof typeof EVENTS;
+
+/** Property object per event; `undefined` for events without properties. */
+export type EventProps = {
+  [K in EventName]: (typeof EVENTS)[K] extends EventDef<infer P> ? P : never;
+};
+
+/** Arguments after the event name: required when the event has properties, absent otherwise. */
+export type TrackArgs<E extends EventName> = undefined extends EventProps[E]
+  ? [props?: undefined]
+  : [props: EventProps[E]];
+
+/**
+ * Old event name → current name, for the PostHog actions that bridge history
+ * (the PostHog project reads this; old events keep their past data under the
+ * old name). Dynamic old names are listed per provider.
+ */
+export const LEGACY_EVENT_NAMES: Readonly<Record<string, EventName>> = {
+  user_signed_in: 'auth:user_sign_in',
+  user_signed_in_with_google: 'auth:user_sign_in',
+  user_signed_in_with_discord: 'auth:user_sign_in',
+  user_signed_out: 'auth:user_sign_out',
+  access_requested: 'auth:access_request',
+  ship_link_set: 'codex:ship_link_create',
+  ship_link_removed: 'codex:ship_link_remove',
+  ship_link_promoted: 'codex:ship_link_update',
+  hangar_ship_added: 'hangar:ship_add',
+  hangar_ship_removed: 'hangar:ship_remove',
+  hangar_flagship_set: 'hangar:flagship_select',
+  hangar_ship_config_saved: 'hangar:ship_config_update',
+  hangar_loadout_created: 'hangar:loadout_create',
+  hangar_fleet_imported: 'hangar:fleet_import',
+  hangar_extension_handover: 'hangar:extension_import',
+  settings_username_saved: 'settings:username_update',
+  settings_send_on_enter_changed: 'settings:send_on_enter_toggle',
+  settings_feedback_fab_changed: 'settings:feedback_fab_toggle',
+  settings_routine_tint_changed: 'settings:routine_tint_toggle',
+  settings_codex_non_usable_changed: 'settings:codex_non_usable_toggle',
+  settings_language_changed: 'settings:language_change',
+  settings_region_changed: 'settings:region_change',
+  beta_toggle: 'settings:beta_toggle',
+  verse_top_open: 'verse:top_open',
+  verse_door_open: 'verse:door_open',
+  verse_star_earned: 'verse:star_earn',
+  starscape_share: 'verse:starscape_share',
+};

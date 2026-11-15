@@ -32,7 +32,7 @@ describe('HangarImportPageComponent', () => {
         provideRouter([]),
         provideTranslateService({ fallbackLang: 'en' }),
         { provide: ExtensionBridgeService, useValue: bridge },
-        { provide: AnalyticsService, useValue: { capture: vi.fn(), flags: () => ({}) } },
+        { provide: AnalyticsService, useValue: { track: vi.fn(), flags: () => ({}) } },
         { provide: LocaleService, useValue: { language: () => 'en', region: () => 'DE' } },
         {
           provide: CodexService,

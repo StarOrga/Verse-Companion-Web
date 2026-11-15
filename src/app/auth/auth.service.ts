@@ -80,8 +80,8 @@ export class AuthService {
     if (this.initialized) return;
     this.initialized = true;
 
-    // Analytics stays anonymous by design (#139): we never identify the user,
-    // so auth state only drives the session signals — no identify()/reset().
+    // Identifying for analytics is AnalyticsIdentityService's job (consent-gated, salted hash + role);
+    // auth state here only drives the session signals.
     // Auth operations always run against the real client — never the anon
     // preview client — so sign-in/out/refresh works even mid-preview.
     this.sb.realClient.auth
@@ -174,7 +174,7 @@ export class AuthService {
 
   async signOut(navigate = true) {
     // Anonymous product event — no-op without statistics consent (#139).
-    this.analytics.capture('user_signed_out');
+    this.analytics.track('auth:user_sign_out');
     await this.sb.realClient.auth.signOut();
     if (navigate) await this.router.navigate(['/login']);
   }

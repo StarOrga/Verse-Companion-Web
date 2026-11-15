@@ -5,28 +5,10 @@ import { filter } from 'rxjs/operators';
 import type { PostHog } from 'posthog-js';
 import { environment } from '../../environments/environment';
 import { ConsentService } from './consent.service';
+import type { EventName, EventProps, TrackArgs } from './analytics/events';
+import { setErrorShownSink } from './describe-error';
 
-/** Top-level nav items with a β switch (`BetaService`). */
-export type BetaArea = 'verse' | 'codex' | 'shell';
-
-/**
- * Typed Verse hub product events and their properties. Properties carry no
- * personal data — keys, kinds and positions only.
- */
-export interface VerseEventProps {
-  /** A briefing top-list entry was opened. */
-  verse_top_open: { key: string; kind: string; rank: number; pinned: boolean };
-  /** One of the three jump gates was opened. */
-  verse_door_open: { door: 'news' | 'patches' | 'gallery' };
-  /** A nav item's β switch was flipped. */
-  beta_toggle: { area: BetaArea; enabled: boolean };
-  /** A Starscape image was shared. */
-  starscape_share: { image_id: string; channel: 'native' | 'copy' };
-  /** An Explorer star was earned (sun = comet hit). */
-  verse_star_earned: { patch_line: string; star_key: string; sun?: boolean };
-}
-
-export type VerseEvent = keyof VerseEventProps;
+export type { BetaArea } from './analytics/events';
 
 /**
  * Anonymous product analytics via PostHog (issue #139).
@@ -45,12 +27,32 @@ export type VerseEvent = keyof VerseEventProps;
  * promise the storage notice makes):
  *  - `persistence: 'localStorage'` — PostHog's default is cookies; we never set one.
  *  - `autocapture: false` — no blanket click/input capture; only explicit events.
- *  - session recording and heatmaps off, `person_profiles: 'never'` — we never
- *    identify a user, so events stay anonymous.
- *  - EU ingest host (admin decision: EU/Germany).
+ *  - `person_profiles: 'identified_only'` — visitors stay anonymous events; only a
+ *    signed-in user with statistics consent is identified, by a salted hash of the
+ *    account id plus its role (`AnalyticsIdentityService`) — never e-mail or name.
+ *  - session replay only for sessions that hit an `$exception` (started from
+ *    `captureException`), every input masked, `[data-ph-mask]` text masked.
+ *  - heatmaps + dead clicks on; the `telemetry-saver` flag pauses replay and
+ *    heatmaps near the free quota — errors and core events are never touched.
+ *  - EU region; the browser talks to `/ingest` on the app's own domain
+ *    (Vercel rewrite / dev proxy) so ad blockers and the CSP stay out of it.
  */
 /** How long a pending flags answer is awaited before the defaults apply. */
 export const FLAGS_TIMEOUT_MS = 2500;
+
+/** PostHog flag that pauses replay and heatmaps (quota saver, admin-controlled). */
+export const TELEMETRY_SAVER_FLAG = 'telemetry-saver';
+
+/** The `<meta name="app-version">` the build stamps (`v0.265.1`), `dev` under `ng serve`. */
+export function readAppRelease(doc: Document | undefined = typeof document !== 'undefined' ? document : undefined): string {
+  return doc?.querySelector('meta[name="app-version"]')?.getAttribute('content')?.trim() || 'dev';
+}
+
+/** Whether PostHog's remote config says this project has no feature flags (so no flags answer will ever come). */
+export function remoteConfigHasNoFlags(result: unknown): boolean {
+  const r = result as { ok?: boolean; config?: { hasFeatureFlags?: boolean } } | null | undefined;
+  return !!r && r.ok !== false && r.config?.hasFeatureFlags === false;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AnalyticsService {
@@ -76,6 +78,13 @@ export class AnalyticsService {
   /** Guards against a second concurrent lazy-load while the first is in flight. */
   private loading = false;
   private routerBound = false;
+  /** The identity to apply once the client is loaded (and re-apply after a consent round trip). */
+  private identity: { distinctId: string; role: string } | null = null;
+  /** True once the client holds an identified person — only then does sign-out need reset(). */
+  private identified = false;
+  /** Replay started for this page session (an $exception happened). */
+  private replayStarted = false;
+  private saver = false;
 
   /** Set by `captureLanding()`, applied by whichever `enable()` call actually
    *  finishes loading the client — see that method for the race this avoids. */
@@ -94,6 +103,8 @@ export class AnalyticsService {
    */
   init(): void {
     if (!this.configured) return;
+    // Central place where an error state reaches the user: `toErrorKey` reports here.
+    setErrorShownSink((scope, key) => this.track('app:error_show', { scope, key }));
     // Explicit injector: init() is called from ngOnInit, outside an injection context.
     effect(
       () => {
@@ -102,21 +113,48 @@ export class AnalyticsService {
       },
       { injector: this.injector },
     );
+    // The quota saver flag: pause replay + heatmaps while it is true.
+    effect(() => this.applySaver(this.featureFlag(TELEMETRY_SAVER_FLAG) === true), { injector: this.injector });
   }
 
   /**
-   * Records a product event. Safe to call unconditionally from feature code:
-   * it is a no-op without a key, without consent, or before the lazy load
-   * finished.
+   * Records a catalogue event (`events.ts`). Safe to call unconditionally from
+   * feature code: it is a no-op without a key, without consent, or before the
+   * lazy load finished. Only catalogue names with their exact properties compile.
    */
-  capture(event: string, properties?: Record<string, unknown>): void {
+  track<E extends EventName>(event: E, ...args: TrackArgs<E>): void {
+    const props = args[0] as EventProps[E] | undefined;
+    this.capture(event, props as Record<string, unknown> | undefined);
+  }
+
+  /** Internal sender (pageviews + `track`); not part of the feature-facing API. */
+  private capture(event: string, properties?: Record<string, unknown>): void {
     if (!this.consent.statisticsAllowed()) return;
     this.client?.capture(event, properties);
   }
 
-  /** Typed Verse hub event; same consent gate as `capture()`. */
-  captureVerse<E extends VerseEvent>(event: E, properties: VerseEventProps[E]): void {
-    this.capture(event, properties as Record<string, unknown>);
+  /**
+   * Identifies the signed-in user — only ever with statistics consent. `distinctId`
+   * is the salted hash from `AnalyticsIdentityService`, never the account id,
+   * e-mail or name; `role` is the only person property.
+   */
+  identify(distinctId: string, role: string): void {
+    if (!this.consent.statisticsAllowed()) return;
+    this.identity = { distinctId, role };
+    this.applyIdentity();
+  }
+
+  private applyIdentity(): void {
+    if (!this.client || !this.identity) return;
+    this.client.identify(this.identity.distinctId, { role: this.identity.role });
+    this.identified = true;
+  }
+
+  /** Back to an anonymous visitor (sign-out, consent revoke). */
+  resetIdentity(): void {
+    this.identity = null;
+    if (this.client && this.identified) this.client.reset();
+    this.identified = false;
   }
 
   /**
@@ -136,6 +174,32 @@ export class AnalyticsService {
   captureException(error: Error, properties?: Record<string, unknown>): void {
     if (!this.consent.statisticsAllowed()) return;
     this.client?.captureException(error, properties);
+    this.startReplayForError();
+  }
+
+  /**
+   * Session replay only for sessions with an error: recording is off at init and
+   * starts here, on the first $exception. Not while the quota saver is on —
+   * errors themselves are always sent, only the replay is paused.
+   */
+  private startReplayForError(): void {
+    if (!this.client || this.replayStarted || this.saver) return;
+    this.replayStarted = true;
+    this.client.startSessionRecording(true);
+  }
+
+  /** E4: the telemetry-saver flag pauses replay and heatmaps; errors and core events never. */
+  private applySaver(on: boolean): void {
+    this.saver = on;
+    const client = this.client;
+    if (!client) return;
+    if (on) {
+      if (this.replayStarted) client.stopSessionRecording();
+      client.set_config({ enable_heatmaps: false, capture_heatmaps: false });
+    } else {
+      client.set_config({ enable_heatmaps: true, capture_heatmaps: true });
+      if (this.replayStarted) client.startSessionRecording(true);
+    }
   }
 
   /**
@@ -186,6 +250,23 @@ export class AnalyticsService {
     this.flagsTimer = setTimeout(() => this.settleFlags(), FLAGS_TIMEOUT_MS);
   }
 
+  /**
+   * A project without feature flags answers its remote config with
+   * hasFeatureFlags: false; posthog-js then never loads flags and never fires
+   * onFeatureFlags. Settle right away instead of waiting out the timeout
+   * (which stays the fallback). A flag created later still works after a reload.
+   */
+  private watchRemoteConfig(posthog: PostHog): void {
+    const settleIfNone = (result: unknown) => {
+      if (remoteConfigHasNoFlags(result)) this.settleFlags();
+    };
+    // Not in the typed on() events, but the client emits it: the answer may come before or after this call.
+    (posthog as unknown as { on(e: string, cb: (r: unknown) => void): void }).on('extensionsRemoteConfig', settleIfNone);
+    const preloaded = (globalThis as { _POSTHOG_REMOTE_CONFIG?: Record<string, { config?: unknown }> })
+      ._POSTHOG_REMOTE_CONFIG?.[environment.posthog.key];
+    if (preloaded?.config) settleIfNone({ ok: true, config: preloaded.config });
+  }
+
   private settleFlags(): void {
     if (this.flagsTimer !== null) clearTimeout(this.flagsTimer);
     this.flagsTimer = null;
@@ -197,6 +278,7 @@ export class AnalyticsService {
     if (this.client) {
       this.client.opt_in_capturing();
       this.applyPendingLandingUtm();
+      this.applyIdentity();
       return;
     }
     // A second concurrent caller (e.g. `captureLanding()` racing `init()`'s own
@@ -209,20 +291,29 @@ export class AnalyticsService {
       const { default: posthog } = await import('posthog-js');
       posthog.init(environment.posthog.key, {
         api_host: environment.posthog.host,
+        ui_host: environment.posthog.uiHost,
         persistence: 'localStorage',
         autocapture: false,
         capture_pageview: false, // routed manually — Angular navigations are not page loads
         capture_pageleave: false,
+        // Replay starts only from captureException (see startReplayForError) — never for a clean session.
         disable_session_recording: true,
+        session_recording: { maskAllInputs: true, maskTextSelector: '[data-ph-mask]' },
         disable_surveys: true,
-        enable_heatmaps: false,
-        person_profiles: 'never',
+        enable_heatmaps: true,
+        capture_dead_clicks: true,
+        capture_performance: { web_vitals: true },
+        person_profiles: 'identified_only',
       });
       this.client = posthog;
       posthog.onFeatureFlags((_flags, variants) => {
         this.flagValues.set({ ...variants });
         this.settleFlags();
       });
+      this.watchRemoteConfig(posthog);
+      posthog.register({ app_version: readAppRelease().replace(/^v/, ''), release: readAppRelease() });
+      this.applyIdentity();
+      this.applySaver(this.saver);
       this.bindRouter();
       this.applyPendingLandingUtm();
     } catch (error) {
@@ -242,8 +333,11 @@ export class AnalyticsService {
     this.flagsTimer = null;
     this.flagsSettled.set(false);
     if (!this.client) return;
+    if (this.replayStarted) this.client.stopSessionRecording();
     this.client.opt_out_capturing();
     this.client.reset();
+    this.identified = false;
+    this.replayStarted = false;
   }
 
   /**
