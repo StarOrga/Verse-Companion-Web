@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.270.5] - 2026-11-15
 
+### Removed
+- The unused xAI (Grok) provider is gone: no more hourly xAI check, no Grok fallback for event summaries, and no xAI entry in the service list.
+
+## [0.270.5] - 2026-11-15
+
 ### Fixed
 - Codex rank: a ship's place and the group median now count each hull once — editions and duplicate records of one hull no longer inflate a comparison group (#968).
 
