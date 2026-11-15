@@ -629,6 +629,21 @@
         "hunks": [
           "01184a991bb2"
         ]
+      },
+      {
+        "ship": "#1141",
+        "by": "Jerry",
+        "value": "0.270.10"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "\"current\": \"0.270.11\" (regenerated; 0.270.10 entry kept below)",
+        "decided": true,
+        "at": "2026-11-15T15:41:45.558Z",
+        "hunks": [
+          "99ce2f9b4e4f"
+        ]
       }
     ],
     "public/release-notes.json›current›version": [
