@@ -184,7 +184,8 @@ describe('NachschubTargetDialogComponent', () => {
   it('blocks "new" and falls back to an existing Nachschub when all 7 slots are in use', () => {
     packages.set(Array.from({ length: 7 }, (_, i) => pkg(`s${i}`, i + 1)));
     const { el } = setup('pickup');
-    expect(radios(el)[0].disabled).toBe(true);
+    // aria-disabled, not disabled: the blocked option keeps its tooltip with the reason (sc-segmented).
+    expect(radios(el)[0].getAttribute('aria-disabled')).toBe('true');
     expect(radios(el)[1].getAttribute('aria-checked')).toBe('true');
   });
 });

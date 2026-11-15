@@ -667,7 +667,7 @@ describe('HqNachschubFlowComponent', () => {
   it('splitting a quantity takes only that part into the Einsätze', async () => {
     const { f, el } = setup();
     click(f, el.querySelector('.grp li sc-tristate button'));
-    const more = [...el.querySelectorAll('.grp li .step')];
+    const more = [...el.querySelectorAll('.grp li .qs-btn')];
     click(f, more[0]); // less
     click(f, el.querySelector('.scp-acts button[tier=primary]'));
     await whenIdle(f);
