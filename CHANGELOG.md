@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.263.2] - 2026-11-15
+
+### Changed
+- Concepts: the area-symbols and holo-table-border concept page has a third round that shows the classic view with every choice made so far, keeps the alternatives collapsed and adds the open points (cooler as thermometer, manned turrets, what goes into the holo table now).
+
 ## [0.263.1] - 2026-11-14
 
 ### Fixed
