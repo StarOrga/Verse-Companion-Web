@@ -166,6 +166,17 @@ export const routes: Routes = [
       import('./desktop/desktop-read-auth.component').then((m) => m.DesktopReadAuthComponent),
   },
   {
+    // A hosted concept page (admin feedback #224) opens full-screen, never
+    // inside the shell (feedback e4428abd): the route only mints the ticket and
+    // replaces itself with the static loader /concept-frame/<id>.html. Outside
+    // the shell, so it carries the blanket gate itself, plus the admin role.
+    path: 'concept/:id',
+    data: { layout: 'cinematic' },
+    canActivate: [...PRIVATE, roleGuard('admin')],
+    loadComponent: () =>
+      import('./admin/concepts/concept-page.component').then((m) => m.ConceptPageComponent),
+  },
+  {
     // The shared shell — gated by default (see PRIVATE / canActivateChild
     // note above). Every child below requires auth + approval unless it
     // moved to the public layout instead.
@@ -447,13 +458,6 @@ export const routes: Routes = [
         canActivate: [roleGuard('admin')],
         loadComponent: () =>
           import('./admin/feedback/admin-feedback.component').then((m) => m.AdminFeedbackComponent),
-      },
-      {
-        path: 'concept/:id',
-        data: { layout: 'tool' },
-        canActivate: [roleGuard('admin')],
-        loadComponent: () =>
-          import('./admin/concepts/concept-page.component').then((m) => m.ConceptPageComponent),
       },
       {
         path: 'settings',

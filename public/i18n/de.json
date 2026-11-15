@@ -5814,7 +5814,7 @@
   "conceptPage": {
     "title": "Konzeptseite",
     "back": "Zurück zum Feedback",
-    "openTab": "In neuem Tab öffnen",
+    "retry": "Erneut versuchen",
     "loading": "Konzeptseite wird geöffnet…",
     "forbidden": "Diese Konzeptseite ist nur für Admins erreichbar.",
     "notFound": "Diese Konzeptseite gibt es nicht (mehr).",
