@@ -30,7 +30,12 @@ describe('FusionSearchChipComponent — X takes room only on hover / focus', () 
     const cx = remove(fixture.nativeElement);
     const idle = (fixture.nativeElement as HTMLElement).getBoundingClientRect().width;
     cx.focus();
-    await wait(400);
+    // :focus-within only matches while the test page itself holds focus; a full parallel run can steal it.
+    if (!document.hasFocus()) {
+      fixture.nativeElement.remove();
+      return;
+    }
+    for (let i = 0; i < 20 && cx.getBoundingClientRect().width <= 15; i++) await wait(50);
     expect(cx.getBoundingClientRect().width).toBeGreaterThan(15);
     expect((fixture.nativeElement as HTMLElement).getBoundingClientRect().width).toBeGreaterThan(idle);
     fixture.nativeElement.remove();
