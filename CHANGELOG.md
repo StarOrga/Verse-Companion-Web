@@ -4,6 +4,12 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.265.2] - 2026-11-15
+
+### Fixed
+- Codex: stacked modules (guns, shields, coolers, drives, missiles and more) keep the "3×" only on values that add up, such as damage, DPS, power and signatures; range, projectile speed, fire rate and timings show once. Modules with different stats are no longer stacked into one row.
+- Codex: the energy dock can no longer be set above what the power plant supplies; info texts open beside the pips instead of covering them, the facts area is more compact, the screen-edge dock keeps every system on one row and starts level with the ship picture.
+
 ## [0.265.1] - 2026-11-15
 
 ### Changed
