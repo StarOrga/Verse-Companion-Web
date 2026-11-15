@@ -1,0 +1,102 @@
+<section id="iter-3" data-iteration="3" data-iteration-template="free" data-final-report data-active>
+  <p class="fr-sentence">Popups öffnen als Vektor-Aufriss: Ein Strich wächst aus dem Funken, rollt den Umriss am echten Rand aus; beim Schließen fällt alles zurück in den Funken.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">✨</span><span><b>Strich und Kreis nie gleich groß</b>: Der Funke ist weg, bevor der Strich voll ist.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">📐</span><span><b>Umriss am echten Rand</b>, auch wenn ein Großfenster seinen Inhalt erst nachlädt.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">⏱</span><span><b>Gestaffelte Dauern</b>: Menü 300, Dialog 500, Großfenster 900 ms; Fokus sitzt sofort.</span></li>
+      </ul>
+      <p class="fr-try-auth">🔑 Noch nicht live: nach dem Ship im Codex „Bauteil tauschen“ öffnen und schließen.</p>
+    </div>
+    <div class="fr-ba" data-label-before="{{final.before}}" data-label-after="{{final.after}}">
+      <figure class="fr-shot"><img src="20261115-0215-popup-animation/shots/open-line.png" alt=""><figcaption>100 ms: Strich wächst, Funke schon klein</figcaption></figure>
+      <figure class="fr-shot"><img src="20261115-0215-popup-animation/shots/open-outline.png" alt=""><figcaption>450 ms: Umriss am Fensterrand, Füllung von oben</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Volle Suite 6937 grün, 1 übersprungen; nach dem letzten Fix die 15 Bewegungs-Specs und Typecheck grün (geschätzt).">
+        <span class="fr-meter-name">🧪 Tests</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">6937 / 6937</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Einzelbilder in 0,1× vom Konto-Menü, Apps-Menü und Swap-Picker: Funke weg bei vollem Strich, Umriss auf 900×716 (geschätzt).">
+        <span class="fr-meter-name">🎞 Pin geprüft</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">3 / 3</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 45%" data-tip="Engine trägt die neuen Popups, aber Bildbetrachter-Zoom, Handy-Vollbild und die übrigen Popups kommen erst über das neue Popup-Gerüst (geschätzt).">
+        <span class="fr-meter-name">🧩 Alle Popups</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">11 / 48</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="4 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ✓ {{final.level_interplay}} · ✓ {{final.level_local}} · ○ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_local}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_prod}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 2 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-rollout"
+          data-issue-title="[FEATURE] Apply the Vektor-Aufriss motion to every popup on sc-popup, plus lightbox zoom and phone fullscreen"
+          data-issue-type="feature"
+          data-issue-body="The scPopupMotion engine (src/app/shared/popup-motion/) now carries the Vektor-Aufriss motion with the kinds small/dialog/large/panel/lightbox/phone and the input scPopupMotionFrom. The parallel Popup-Aufbau branch (claude/modest-napier-9d1e5a) moves all 48 popups onto one sc-popup frame. Once it is on main: attach the right kind per popup (C9), the lightbox holo zoom from the thumbnail (C10) and the phone fullscreen from the trigger rect (C12). Checklist: docs/concepts/20261115-0215-popup-animation/briefs/implement.md."
+          data-issue-module="shared"
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="wartet auf Popup-Gerüst">
+        <span class="oq-label">Alle Popups, Zoom, Handy</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Bildbetrachter-Zoom, Handy-Vollbild und die übrigen Popups fehlen noch.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Alle Popups außer den 11 bisherigen</dd>
+          <dt>{{final.fund_why}}</dt><dd>Die Popup-Aufbau-Session baut diese Dateien gerade um; doppelt anfassen hätte Konflikte gebracht.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-header-overflow"
+          data-issue-title="[BUG] Admin header overflows 1280 px, account and apps menus run off-screen"
+          data-issue-type="bug"
+          data-issue-body="At 1280x800 signed in as the admin test account the page is 1340 px wide (scrollWidth). The admin nav overflows and the account dropdown and apps menu end at x 1340/1291, cutting off the signed-in label. Seen during popup-motion QA; not caused by it, not checked against main."
+          data-issue-module="shell"
+          data-oq-origin="found"
+          data-route-default="issue"
+          data-route-reason="nicht Teil der Animation">
+        <span class="oq-label">Kopfzeile zu breit</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Bei 1280 px ist die Admin-Kopfzeile 1340 px breit, Menüs ragen rechts hinaus.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Shell-Kopfzeile, Admin-Konto</dd>
+          <dt>{{final.fund_why}}</dt><dd>📌 Issue — gehört nicht zur Animation.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Branch <code>claude/popup-popout-animation-concepts-0f27ef</code> · Commits <code>98a4347</code>, <code>e33e81f</code></li>
+      <li><code>sc-popup-motion.directive.ts</code> (Web Animations, Overlay-Rahmen, ResizeObserver), <code>popup-motion.scss</code>, <code>toast-stack.ts</code></li>
+      <li>Horizont, Sterne und Seiten-Zoom des alten Großfensters entfernt; Scrim mit feinem Punktraster</li>
+      <li>API rückwärtskompatibel; neu: Arten <code>dialog</code>, <code>lightbox</code>, <code>phone</code> und <code>scPopupMotionFrom</code></li>
+      <li>QA-Funde behoben: Rahmen maß ein zu kleines Großfenster; Funke wuchs beim Schließen zu früh</li>
+      <li>Tests: 6937 grün, 1 übersprungen · Lint 0 Fehler · Typecheck, Build grün</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-swap" data-crit="mid" data-guide="">Bauteil-Tausch öffnen und schließen</li>
+      <li data-todo-id="t-menu" data-crit="low" data-guide="">Konto- und Apps-Menü öffnen</li>
+    </ul>
+  </section>
+</section>

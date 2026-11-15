@@ -93,6 +93,37 @@
         "d1-toast": "top"
       },
       "response": "Round 2: favourite Hologramm-Projektion kept (spark, light line, collapse to line). Three takes of the materialisation replacing the scanlines (Lichtgitter, Vektor-Aufriss, Interferenz-Welle); rows as soft light edge without flicker; timings 300/500/900 ms; new pages Bildbetrachter (holo zoom from thumbnail) and Handy (fullscreen from the button). No analysis view: every round-1 question answered."
+    },
+    {
+      "iteration": 2,
+      "action": "implement",
+      "favorite": "r2d2",
+      "decisions": [],
+      "annotations": [
+        {
+          "id": "r2-r2d2-phone-a3",
+          "answer": "sehr gut!"
+        }
+      ],
+      "pins": [
+        {
+          "id": "up-mwh69euek1t9",
+          "screen": "r2d2-big",
+          "text": "line too big, bad hand-off; centre circle and line must not coexist at full size"
+        }
+      ],
+      "result": {
+        "commits": [
+          "98a4347e0",
+          "e33e81f00"
+        ],
+        "shortfalls": [
+          "C9 roll-out to all popups",
+          "C10 lightbox zoom",
+          "C12 phone fullscreen"
+        ],
+        "reason": "popup files owned by the parallel Popup-Aufbau branch"
+      }
     }
   ]
 }
