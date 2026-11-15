@@ -272,6 +272,17 @@ class Hull3DExporter:
             cmd += ["-mtl", mtl_rel]
         with stage_timing.timed("convert"):
             r = subprocess.run(cmd, cwd=str(cga_disk.parent), capture_output=True, timeout=600)
+            if mtl_rel and self._bad_material(r, produced):
+                # Converter bug on a material with two texture slots it cannot
+                # name (RSI Salvation, VNCL Blade): the geometry is fine, and
+                # the hull is published without textures anyway, so retry
+                # with a texture-free copy of the paint .mtl (as parts do).
+                from .glb_materials import strip_mtl_textures
+                mtl_disk = cga_disk.parent / mtl_rel
+                mtl_disk.write_bytes(strip_mtl_textures(mtl_disk.read_bytes()))
+                self.log("info", f"  {cga_disk.name}: material texture slots the converter "
+                                 "cannot read — converted with a texture-free copy")
+                r = subprocess.run(cmd, cwd=str(cga_disk.parent), capture_output=True, timeout=600)
         # cgf-converter's exit code is unreliable (non-zero on success in some
         # paths), so the freshly-produced output file is the success signal —
         # robust now that any stale glb was unlinked above. rc is logged only.
@@ -281,6 +292,12 @@ class Hull3DExporter:
                 f"cgf-converter produced no usable glb for {cga_disk.name} "
                 f"(rc={r.returncode}{converter_reason(r)})")
         produced.replace(out_glb)
+
+    @staticmethod
+    def _bad_material(r: subprocess.CompletedProcess, produced: Path) -> bool:
+        if produced.exists() and produced.stat().st_size >= 4096:
+            return False
+        return b"same key has already been added" in (r.stdout or b"")
 
     def _gltf_transform(self, args: List[str]) -> subprocess.CompletedProcess:
         """Run one @gltf-transform/cli command (bundled Node, or npx in dev)."""

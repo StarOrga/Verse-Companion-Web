@@ -200,6 +200,53 @@ def test_a_cached_ship_counts_only_for_the_same_build_and_pipeline(tmp_path):
     assert _cached_catalog(tmp_path, "S") is not None  # no stamp given = format only
 
 
+def _modeled_ship(out: Path, stamp: dict) -> None:
+    (out / "S").mkdir(parents=True)
+    (out / "S" / "skins.json").write_text(json.dumps(
+        {"ship": "S", "format": EXPORT_FORMAT, "stamp": stamp,
+         "skins": [{"id": "standard", "model": "models/S_standard.glb"}]}))
+
+
+def test_a_ship_with_a_model_stays_cached_across_an_aliased_converter(tmp_path):
+    from sc_extract.skin_export_app import _cached_catalog
+    # Built before the stamp carried the converter, or by the older build.
+    _modeled_ship(tmp_path, {"game_build": "100", "pipeline": "p1"})
+    now = {"game_build": "100", "pipeline": "p1", "converter": "new"}
+    assert _cached_catalog(tmp_path, "S", now) is not None
+    assert _cached_catalog(tmp_path, "S", {**now, "pipeline": "p2"}) is None
+
+
+def test_a_ship_without_a_model_is_retried_once_by_another_converter(tmp_path):
+    from sc_extract.skin_export_app import _cached_catalog
+    _cached_ship(tmp_path, {"game_build": "100", "pipeline": "p1"})  # hull failed, no model
+    now = {"game_build": "100", "pipeline": "p1", "converter": "new"}
+    assert _cached_catalog(tmp_path, "S", now) is None
+    # Once the new converter has tried it, the miss is cached like any result.
+    (tmp_path / "S" / "skins.json").unlink()
+    (tmp_path / "S").rmdir()
+    _cached_ship(tmp_path, now)
+    assert _cached_catalog(tmp_path, "S", now) is not None
+
+
+def test_an_aliased_converter_keys_the_pipeline_like_the_build_it_matches(tmp_path, monkeypatch):
+    old, new, other = (tmp_path / n for n in ("old.exe", "new.exe", "other.exe"))
+    old.write_bytes(b"v2.0.0")
+    new.write_bytes(b"v2.0.0-sc.1")
+    other.write_bytes(b"v3")
+    monkeypatch.setattr(build_cache, "CONVERTER_ALIASES",
+                        {build_cache.file_digest(new): build_cache.file_digest(old)})
+    tag = build_cache.pipeline_tag(old, "s", recipe="model3d@2")
+    assert build_cache.pipeline_tag(new, "s", recipe="model3d@2") == tag
+    assert build_cache.pipeline_tag(other, "s", recipe="model3d@2") != tag
+
+
+def test_the_shipped_converter_alias_points_at_upstream_v2():
+    # v2.0.0 as released by Markemp/Cryengine-Converter; the patched build is
+    # pinned in src/lib/cgf-converter.ts (a vitest checks both pins match).
+    assert "75feca2813a6517cad9a8e5df28687860a3b0bab9dcbcfeef65e56850d53b0b7" in \
+        build_cache.CONVERTER_ALIASES.values()
+
+
 def test_an_unstamped_cache_is_rebuilt(tmp_path):
     from sc_extract.skin_export_app import _cached_catalog
     (tmp_path / "S").mkdir()

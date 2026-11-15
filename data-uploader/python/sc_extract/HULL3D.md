@@ -34,7 +34,7 @@ Data.p4k
   ├─ DRAK_Cutlass_Black.cga + .cgam   (whole-ship hull mesh — no socpak assembly!)
   └─ <paint>.mtl                      (the factory paint — only to name the submaterials)
         │
-        ▼  cgf-converter v2.0.0  -glb -objectdir <root> -mtl <paint>
+        ▼  cgf-converter v2.0.0-sc.1  -glb -objectdir <root> -mtl <paint>
    raw glb
         │
         ▼  glb_materials repair  (no-op skin · interior strip · strip_to_geometry)
@@ -184,10 +184,18 @@ ids — see `geometry.py`). **Markemp/Cryengine-Converter v2.0.0** is the first
 release that reads them; v1.7.1 fails silently (empty glb). It is a ~117 MB
 self-contained .NET binary → fetched, never committed.
 
+The uploader runs v2.0.0 **plus two fixes** (`python/tools/cgf-converter/`):
+v2.0.0 wrote an Ivo file's whole index stream once per node and overflowed
+`int.MaxValue` on 25 big hulls (Galaxy, Polaris, Constellations, Hull B …),
+and failed every file whose `.mtl` has a submaterial without `<Textures>`
+(all Vanguards). The build is pinned by sha256 and keyed as v2.0.0 in the
+build cache (`build_cache.CONVERTER_ALIASES`), because its output for every
+mesh v2.0.0 could convert is the same.
+
 ## Setup
 
 ```bash
-python tools/fetch_tools.py          # downloads cgf-converter-2.exe to ./tools/
+python tools/fetch_tools.py          # downloads cgf-converter-2.0.0-sc.1.exe to ./tools/
 # @gltf-transform/cli is BUNDLED with the desktop app and run via Electron's own
 # Node (ELECTRON_RUN_AS_NODE) — no global Node/npx needed at runtime. Plain
 # `npx @gltf-transform/cli` is only the dev fallback when running outside the app.
@@ -198,7 +206,7 @@ python tools/fetch_tools.py          # downloads cgf-converter-2.exe to ./tools/
 ```bash
 python -m sc_extract.cutlass_pilot \
     --p4k "C:\...\StarCitizen\LIVE\Data.p4k" \
-    --out ./out --converter ./tools/cgf-converter-2.exe \
+    --out ./out --converter ./tools/cgf-converter-2.0.0-sc.1.exe \
     [--texture-size 512] [--limit 2]
 ```
 
