@@ -453,6 +453,34 @@
           "d45b14a0c427"
         ]
       }
+    ],
+    ".claude/project-map.md›tree›counts": [
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "regenerated from the merged tree (generated file)",
+        "decided": true,
+        "at": "2026-11-15T05:15:20.861Z",
+        "hunks": [
+          "b09195af4ad1",
+          "8986c179380e",
+          "9aad2de52fa2",
+          "6dea0a6d8a00",
+          "f820f08a9e90"
+        ]
+      }
+    ],
+    "public/release-notes.json›current›value": [
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "regenerated from the merged CHANGELOG (0.268.1 is on main)",
+        "decided": true,
+        "at": "2026-11-15T05:15:20.861Z",
+        "hunks": [
+          "bccf0efc9319"
+        ]
+      }
     ]
   }
 }
