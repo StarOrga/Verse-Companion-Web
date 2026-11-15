@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { UploadJobStore, createJob, nextStage, type JobOrigin, type TextIO, type UploadJobState } from '../src/lib/upload-job.js';
+import { UploadJobStore, createJob, nextStage, sentFor, type JobOrigin, type TextIO, type UploadJobState } from '../src/lib/upload-job.js';
 import { applyReset, changedSubthemes, resumeCompat } from '../src/lib/resume-compat.js';
 import { currentRevisions } from '../src/lib/subthemes.js';
 
@@ -69,6 +69,26 @@ describe('resume after an uploader update', () => {
     const next = applyReset(job, c.stages, NOW);
     expect(nextStage(next)).toBe('silhouettes');
     expect(next.skins.doneShips).toHaveLength(40);
+  });
+
+  it('a silhouette reset re-opens its catalog phase, or the new outlines would be skipped', () => {
+    const base = pausedInModels(older('silhouettes'));
+    const job: UploadJobState = {
+      ...base,
+      catalog: { ...base.catalog, donePhases: ['codex_ships', 'codex_silhouettes'], cursor: null },
+    };
+    const next = applyReset(job, ['silhouettes'], NOW);
+    expect(next.catalog.donePhases).toEqual(['codex_ships']);
+    expect(sentFor(next, 'codex_silhouettes')).toBe(0);
+    expect(sentFor(next, 'codex_ships')).toBe(Number.POSITIVE_INFINITY);
+
+    const midPhase: UploadJobState = {
+      ...base,
+      catalog: { ...base.catalog, cursor: { phase: 'codex_silhouettes', sent: 4000 } },
+    };
+    expect(applyReset(midPhase, ['silhouettes'], NOW).catalog.cursor).toBeNull();
+    // A hull-only reset leaves the catalog cursor alone.
+    expect(applyReset(job, ['skins'], NOW).catalog).toEqual(job.catalog);
   });
 
   it('a changed step that had not run yet only takes the new origin', () => {

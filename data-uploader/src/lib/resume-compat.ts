@@ -31,6 +31,8 @@
 import type { JobOrigin, MacroStage, UploadJobState } from './upload-job.js';
 import { CATALOG_SUBTHEMES, SUBTHEME_KEYS, type SubthemeKey } from './subthemes.js';
 
+const SILHOUETTE_PHASE = 'codex_silhouettes';
+
 export type ResumeCompat =
   | { action: 'keep' }
   | { action: 'reset'; stages: Extract<MacroStage, 'silhouettes' | 'skins'>[]; changed: SubthemeKey[] }
@@ -81,7 +83,16 @@ export function applyReset(
   current: JobOrigin,
 ): UploadJobState {
   const next: UploadJobState = { ...job, origin: current };
-  if (stages.includes('silhouettes')) next.silhouettes = { status: 'pending' };
+  if (stages.includes('silhouettes')) {
+    next.silhouettes = { status: 'pending' };
+    // The silhouette rows ride on the catalog cursor as phase
+    // `codex_silhouettes`: left marked done, the new outlines would be skipped.
+    next.catalog = {
+      ...job.catalog,
+      donePhases: job.catalog.donePhases.filter((p) => p !== SILHOUETTE_PHASE),
+      cursor: job.catalog.cursor?.phase === SILHOUETTE_PHASE ? null : (job.catalog.cursor ?? null),
+    };
+  }
   if (stages.includes('skins')) next.skins = { status: 'pending', doneShips: [] };
   return next;
 }

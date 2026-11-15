@@ -19,9 +19,6 @@
 /** An install that has not finished after this long is not waited for. */
 export const MAX_INSTALL_MS = 15 * 60_000;
 
-/** How long a start waits for a running install before giving up and starting anyway. */
-export const INSTALL_WAIT_MS = 10 * 60_000;
-
 export const INSTALL_POLL_MS = 1_000;
 
 export interface InstallGuardInput {

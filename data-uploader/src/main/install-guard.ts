@@ -11,7 +11,6 @@ import { join } from 'node:path';
 import log from 'electron-log';
 import {
   INSTALL_POLL_MS,
-  INSTALL_WAIT_MS,
   installInProgress,
   isLockError,
 } from '../lib/install-guard.js';
@@ -96,10 +95,19 @@ export async function holdForRunningInstall(): Promise<boolean> {
     /* a missing notification must not block the wait */
   }
   const started = Date.now();
-  while (running() && Date.now() - started < INSTALL_WAIT_MS) {
+  // Bounded by the marker: `running()` turns false once it is MAX_INSTALL_MS old.
+  while (running()) {
     await new Promise((r) => setTimeout(r, INSTALL_POLL_MS));
   }
-  log.info(`[install-guard] installer done after ${Math.round((Date.now() - started) / 1000)} s — restarting`);
+  const secs = Math.round((Date.now() - started) / 1000);
+  if (installerLocked()) {
+    // Still writing after MAX_INSTALL_MS: never start on a half-written install.
+    // The installer's own --force-run starts the app once it is done.
+    log.warn(`[install-guard] installer still running after ${secs} s — leaving the start to it`);
+    app.exit(0);
+    return true;
+  }
+  log.info(`[install-guard] installer done after ${secs} s — restarting`);
   app.relaunch();
   app.exit(0);
   return true;
