@@ -30,7 +30,6 @@ import {
     <sc-popup kind="dialog" [eyebrow]="'social.visibility.eyebrow' | translate" [title]="'social.visibility.title' | translate"
               (closed)="closed.emit()">
       <div class="body">
-      <div class="body">
         @if (social.error(); as key) {
           <div class="flash error" role="alert">{{ key | translate }}</div>
         }

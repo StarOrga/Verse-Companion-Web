@@ -227,9 +227,6 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
       </sc-popup>
     }
   `,
-  styles      </div>
-    }
-  `,
   styles: [`
     :host { display: block; }
     .page { display: flex; flex-direction: column; gap: 20px; }

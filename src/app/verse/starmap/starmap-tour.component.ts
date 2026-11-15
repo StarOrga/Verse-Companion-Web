@@ -51,20 +51,21 @@ interface Box {
           <li>{{ 'starmap.tour.p2' | translate }}</li>
           <li>{{ 'starmap.tour.p3' | translate }}</li>
         </ul>
-        <ng-container popupActions>
-          <button type="button" scAction tier="primary" (click)="go(0)">{{ 'starmap.tour.start' | translate }}</button>
-        </ng-container>
       } @else {
         <p class="text" role="status">{{ 'starmap.tour.step.' + current() + '.text' | translate }}</p>
-        <ng-container popupActions>
+      }
+      <ng-container popupActions>
+        @if (step() < 0) {
+          <button type="button" scAction tier="primary" (click)="go(0)">{{ 'starmap.tour.start' | translate }}</button>
+        } @else {
           @if (step() < steps().length - 1) {
             <button type="button" scAction tier="primary" (click)="go(step() + 1)">{{ 'starmap.tour.next' | translate }}</button>
           } @else {
             <button type="button" scAction tier="primary" (click)="closed.emit()">{{ 'starmap.tour.done' | translate }}</button>
           }
           <button type="button" scAction [disabled]="step() === 0" (click)="go(step() - 1)">{{ 'starmap.tour.back' | translate }}</button>
-        </ng-container>
-      }
+        }
+      </ng-container>
     </sc-popup>
   `,
   styles: [
