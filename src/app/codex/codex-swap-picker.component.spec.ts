@@ -156,7 +156,7 @@ describe('CodexSwapPickerComponent', () => {
 
   it('renders nothing until a hardpoint is targeted', async () => {
     const el = await open(null);
-    expect(el.querySelector('.pick-win')).toBeNull();
+    expect(el.querySelector('.scp-frame')).toBeNull();
   });
 
   it('a list prepared on the slot card press is in the first render, without a loading state', async () => {
@@ -176,7 +176,7 @@ describe('CodexSwapPickerComponent', () => {
       fixture.detectChanges();
       fixture.componentInstance.prepare(TARGET);
       await vi.advanceTimersByTimeAsync(50);
-      expect((fixture.nativeElement as HTMLElement).querySelector('.pick-veil')).toBeNull();
+      expect((fixture.nativeElement as HTMLElement).querySelector('sc-popup')).toBeNull();
       await vi.advanceTimersByTimeAsync(PREPARED_TTL_MS);
       fixture.componentRef.setInput('target', TARGET);
       fixture.detectChanges();
@@ -189,20 +189,20 @@ describe('CodexSwapPickerComponent', () => {
 
   it('opens as a centred dialog over a veil', async () => {
     const el = await open();
-    expect(el.querySelector('.pick-win[role="dialog"]')).toBeTruthy();
-    expect(el.querySelector('.pick-win')?.getAttribute('aria-modal')).toBe('true');
+    expect(el.querySelector('.scp-frame[role="dialog"]')).toBeTruthy();
+    expect(el.querySelector('.scp-frame')?.getAttribute('aria-modal')).toBe('true');
   });
 
   it('closes on its X, never on a click on the veil or the window', async () => {
     const el = await open();
     const spy = vi.fn();
     fixture.componentInstance.closed.subscribe(spy);
-    (el.querySelector('.pick-win') as HTMLElement).click();
-    (el.querySelector('.pick-veil') as HTMLElement).click();
+    (el.querySelector('.scp-frame') as HTMLElement).click();
+    (el.querySelector('.scp-scrim') as HTMLElement).click();
     expect(spy).not.toHaveBeenCalled();
-    (el.querySelector('.pick-close') as HTMLElement).click();
+    (el.querySelector('.scp-x') as HTMLElement).click();
     // The close plays its collapse to a line first (about half the open time), then tells the host.
-    expect(el.querySelector('.pick-veil')?.classList.contains('pm-out')).toBe(true);
+    expect(el.querySelector('sc-popup')?.classList.contains('pm-out')).toBe(true);
     await vi.waitFor(() => expect(spy).toHaveBeenCalled(), { timeout: 3000 });
   });
 
@@ -302,7 +302,7 @@ describe('CodexSwapPickerComponent', () => {
     expect(emitted.className).toBe(FACTORY);
     expect(emitted.target).toBe(TARGET);
     // The pick closes through its collapse to a line, then tells the host.
-    expect(el.querySelector('.pick-veil')?.classList.contains('pm-out')).toBe(true);
+    expect(el.querySelector('sc-popup')?.classList.contains('pm-out')).toBe(true);
     const closed = vi.fn();
     fixture.componentInstance.closed.subscribe(closed);
     await vi.waitFor(() => expect(closed).toHaveBeenCalled(), { timeout: 3000 });
@@ -370,7 +370,7 @@ describe('CodexSwapPickerComponent', () => {
     const el = await open();
     const spy = vi.fn();
     fixture.componentInstance.closed.subscribe(spy);
-    (el.querySelector('.pick-win') as HTMLElement).dispatchEvent(
+    (el.querySelector('.scp-frame') as HTMLElement).dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
     );
     await vi.waitFor(() => expect(spy).toHaveBeenCalled(), { timeout: 3000 });
