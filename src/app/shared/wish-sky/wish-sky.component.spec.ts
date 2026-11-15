@@ -50,7 +50,7 @@ describe('WishEmptyComponent', () => {
     TestBed.configureTestingModule({ providers: [provideTranslateService({})] });
     const fixture = TestBed.createComponent(WishEmptyComponent);
     const search = vi.fn();
-    fixture.componentInstance.search.subscribe(search);
+    fixture.componentInstance.searchWish.subscribe(search);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('sc-wish-sky')).not.toBeNull();
