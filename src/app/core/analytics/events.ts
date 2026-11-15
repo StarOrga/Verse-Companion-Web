@@ -126,6 +126,7 @@ export const EVENTS = {
   'feedback:composer_open': ev<{ surface: string }>('feedback', 'Das Feedback-Fenster wurde geöffnet.'),
   'feedback:item_submit': ev<{ kind: string; length_bucket: 'short' | 'medium' | 'long'; attachments: number }>('feedback', 'Ein Feedback wurde abgeschickt (Art, Längen-Klasse, Anzahl Anhänge; nie der Text).'),
   'feedback:reply_view': ev('feedback', 'Eine Antwort auf das eigene Feedback wurde gelesen.'),
+  'feedback:dictation_start': ev<{ via: 'button' | 'hotkey' }>('feedback', 'Im Feedback-Eingabefeld wurde das Diktieren per Mikrofon gestartet (Knopf oder Tastenkürzel; nie der Text).'),
 
   // --- desktop -----------------------------------------------------------
   'desktop:download_start': ev<{ app: 'uploader' | 'starscape'; surface: string }>('desktop', 'Der Download eines Desktop-Programms wurde angeklickt.'),

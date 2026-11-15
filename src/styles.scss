@@ -566,6 +566,9 @@ html[data-sc-layout] { scroll-padding-top: var(--sc-bar-h); }
      --sc-fab-clear-block, plus the β FAB's lane, and on a phone with the shell bar at the bottom
      it sits above the share button's lane too. */
   --sc-toast-bottom: calc(var(--sc-fab-clear-block) + var(--sc-beta-fab-lane) + var(--sc-view-fab-lane, 0px));
+  /* A toast's right edge: flush with the launcher column (the feedback disc and the β FAB above it), so the
+     stack and the round buttons under it share one edge. */
+  --sc-toast-end: max(var(--sc-fab-inset), env(safe-area-inset-right, 0px));
 }
 @media (max-width: 720px) {
   :root {

@@ -71,7 +71,7 @@ export interface StockStart {
         @if (inv.error() && !inv.loaded()) {
           <div class="state" role="alert">
             <p>{{ inv.error()! | translate }}</p>
-            <button type="button" class="sc-btn" (click)="inv.load()">{{ 'hq.stock.retry' | translate }}</button>
+            <button type="button" scAction tier="secondary" (click)="inv.load()">{{ 'hq.stock.retry' | translate }}</button>
           </div>
         } @else if (mode() === 'browse') {
           <div class="search">
@@ -404,7 +404,7 @@ export interface StockStart {
                 <span>{{ 'hq.stock.capture.location' | translate }}</span>
                 <input name="location" [(ngModel)]="location" maxlength="200" autocomplete="off" [placeholder]="'hq.stock.capture.locationHint' | translate" />
               </label>
-              <button type="submit" class="sc-btn sc-btn-primary" [disabled]="!valid()">{{ 'hq.stock.capture.save' | translate }}</button>
+              <button type="submit" scAction tier="primary" [disabled]="!valid()">{{ 'hq.stock.capture.save' | translate }}</button>
             </div>
             @if (justAdded()) {
               <p class="ok" role="status">{{ 'hq.stock.captured' | translate }}</p>

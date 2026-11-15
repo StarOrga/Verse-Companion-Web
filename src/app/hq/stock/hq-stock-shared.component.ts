@@ -9,6 +9,7 @@ import { SharedWithMeRow } from '../../social/loadout-share.types';
 import { SocialService } from '../../social/social.service';
 import { SharedShipConfig, friendPath } from '../../social/social.types';
 import { hqHangar, hqStockLink } from '../hq-routes';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 
 /**
  * "Von Freunden geteilt" in Bestand (C14, C13): the sets and ship variants friends shared with the
@@ -19,7 +20,7 @@ import { hqHangar, hqStockLink } from '../hq-routes';
 @Component({
   selector: 'sc-hq-stock-shared',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, NgTemplateOutlet, OverlayFrameComponent],
+  imports: [TranslatePipe, RouterLink, NgTemplateOutlet, OverlayFrameComponent, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (count() > 0) {
@@ -28,7 +29,7 @@ import { hqHangar, hqStockLink } from '../hq-routes';
         <h3 id="hq-stock-shared">{{ 'share.sharedWithMe.title' | translate }}</h3>
         <ng-container *ngTemplateOutlet="list" />
       </section>
-      <button type="button" class="sc-btn tile" (click)="open.set(true)">
+      <button type="button" scAction tier="secondary" class="tile" (click)="open.set(true)">
         {{ 'hq.stock.sharedBtn' | translate: { n: count() } }} ›
       </button>
       @if (open()) {
@@ -49,7 +50,7 @@ import { hqHangar, hqStockLink } from '../hq-routes';
             @if (adopted().has(s.share_id)) {
               <a class="done" [routerLink]="setsLink.commands" [queryParams]="setsLink.queryParams" [fragment]="setsLink.fragment">{{ 'hq.friends.stock.adopted' | translate }} ›</a>
             } @else {
-              <button type="button" class="sc-btn tiny" [disabled]="busy()" (click)="adoptSet(s)">{{ 'hq.friends.stock.adopt' | translate }}</button>
+              <button type="button" scAction tier="secondary" [disabled]="busy()" (click)="adoptSet(s)">{{ 'hq.friends.stock.adopt' | translate }}</button>
             }
           </li>
         }
@@ -63,7 +64,7 @@ import { hqHangar, hqStockLink } from '../hq-routes';
             @if (adopted().has(c.share_id)) {
               <a class="done" [routerLink]="hangarLink">{{ 'hq.friends.stock.adopted' | translate }} ›</a>
             } @else {
-              <button type="button" class="sc-btn tiny" [disabled]="busy()" (click)="adoptConfig(c)">{{ 'hq.friends.stock.adopt' | translate }}</button>
+              <button type="button" scAction tier="secondary" [disabled]="busy()" (click)="adoptConfig(c)">{{ 'hq.friends.stock.adopt' | translate }}</button>
             }
           </li>
         }
@@ -78,7 +79,7 @@ import { hqHangar, hqStockLink } from '../hq-routes';
       :host { display: block; }
       .shared { display: grid; gap: var(--sc-space-2, 8px); }
       .tile { display: none; width: 100%; min-height: var(--sc-tap-min, 44px); white-space: normal; }
-      @container (max-width: 520px) { .inline { display: none; } .tile { display: block; } }
+      @container (max-width: 520px) { .inline { display: none; } .tile { display: flex; } }
       h3 { margin: 0; font: 600 1.1rem / 1.2 var(--sc-font-display); }
       .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sc-space-2, 8px); }
       .card { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sc-space-2, 8px); padding: var(--sc-space-3, 12px); background: var(--sc-bg-1); border: 1px solid var(--sc-border); border-radius: var(--sc-radius); }
@@ -87,7 +88,6 @@ import { hqHangar, hqStockLink } from '../hq-routes';
       a { color: var(--sc-accent); }
       a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .err { margin: 0; color: var(--sc-warning); }
-      @media (pointer: coarse) { .sc-btn { min-height: 48px; } }
     `,
   ],
 })
