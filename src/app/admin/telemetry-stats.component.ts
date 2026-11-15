@@ -77,7 +77,7 @@ type StatusKind = 'attention' | 'blind' | 'calm';
         <span class="tick" [class]="'tick lv-' + statusLevel()" aria-hidden="true">{{ statusGlyph() }}</span>
         <span class="status-text">
           @switch (status()) {
-            @case ('attention') { {{ 'telemetry.status.attention' | translate: { n: o.attention } }} }
+            @case ('attention') { {{ (o.attention === 1 ? 'telemetry.status.attentionOne' : 'telemetry.status.attention') | translate: { n: o.attention } }} }
             @case ('blind') { {{ 'telemetry.status.blind' | translate }} }
             @default { {{ 'telemetry.status.calm' | translate }} }
           }
