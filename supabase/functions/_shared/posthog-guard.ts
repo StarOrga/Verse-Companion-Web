@@ -16,7 +16,7 @@ export type Level = 'ok' | 'warn' | 'error' | 'unknown';
 export type Origin = 'human' | 'posthog' | 'service';
 export type QuotaProduct = 'events' | 'exceptions' | 'replay' | 'llm' | 'flags';
 export const QUOTA_PRODUCTS: QuotaProduct[] = ['events', 'exceptions', 'replay', 'llm', 'flags'];
-export const SERVICES = ['claude', 'posthog', 'supabase', 'r2', 'uex', 'rsi', 'xai', 'readme'] as const;
+export const SERVICES = ['claude', 'posthog', 'supabase', 'r2', 'uex', 'rsi', 'readme'] as const;
 export type ServiceName = (typeof SERVICES)[number];
 
 // ---------------------------------------------------------------- auth
@@ -190,7 +190,7 @@ export function serviceLevel(i: { keyMissing?: boolean; consecutiveFailures: num
 
 export interface ProbeResult { ok: boolean; keyMissing?: boolean; skipped?: boolean; note?: string; passiveErrorRate?: number | null }
 
-/** Probe note for a failed HTTP probe. A provider that answers a JSON error body (`{code, error}` like xAI, or
+/** Probe note for a failed HTTP probe. A provider that answers a JSON error body (`{code, error}`, or
  *  `{error: {type, message}}` like Anthropic) gets its reason appended, so the admin sees e.g. "no credits" vs. a
  *  missing endpoint permission instead of a bare "HTTP 403". Anything that looks like an API key is masked, the text
  *  is single-line and capped at 200 characters. Non-JSON bodies (HTML error pages) stay out. */
@@ -204,7 +204,7 @@ export function httpFailureNote(status: number, body: string): string {
   const code = typeof o.code === 'string' ? o.code : typeof nested?.type === 'string' ? nested.type : '';
   const msg = typeof o.error === 'string' ? o.error : typeof nested?.message === 'string' ? nested.message : typeof o.message === 'string' ? o.message : '';
   const detail = [code, msg].filter(Boolean).join(': ')
-    .replace(/\b(?:xai|sk|sbp|phx|ghp)[-_][A-Za-z0-9_-]{6,}/g, '***')
+    .replace(/\b(?:sk|sbp|phx|ghp)[-_][A-Za-z0-9_-]{6,}/g, '***')
     .replace(/\s+/g, ' ').trim();
   if (!detail) return base;
   const full = `${base} (${detail})`;
