@@ -15,6 +15,7 @@ import { CodexListRow, CodexService } from '../codex/codex.service';
 import { AnalyticsService } from '../core/analytics.service';
 import { HangarService } from './hangar.service';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /**
  * Hangar import from a user-provided export file (#136, option 3).
@@ -48,7 +49,7 @@ const MAX_ENTRIES = 200;
 @Component({
   selector: 'sc-hangar-import',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, ScTooltipDirective],
+  imports: [TranslatePipe, RouterLink, ScTooltipDirective, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="import sc-card"
@@ -73,7 +74,7 @@ const MAX_ENTRIES = 200;
 
       @if (entries().length === 0 && !embedded()) {
         <div class="pick">
-          <button type="button" class="sc-btn" (click)="fileInput.click()" [disabled]="parsing()">
+          <button type="button" scAction tier="secondary" (click)="fileInput.click()" [disabled]="parsing()">
             {{ (parsing() ? 'hangar.import.parsing' : 'hangar.import.pickFile') | translate }}
           </button>
           <span class="pick-hint">{{ 'hangar.import.dropHint' | translate }}</span>
@@ -93,7 +94,7 @@ const MAX_ENTRIES = 200;
         <div class="summary-row">
           <span>{{ 'hangar.import.matched' | translate: { matched: matchedCount(), total: entries().length } }}</span>
           @if (!embedded()) {
-            <button type="button" class="link-btn" (click)="reset()">{{ 'hangar.import.chooseOther' | translate }}</button>
+            <button type="button" scAction tier="secondary" (click)="reset()">{{ 'hangar.import.chooseOther' | translate }}</button>
           }
         </div>
         <ul class="rows">
@@ -122,7 +123,7 @@ const MAX_ENTRIES = 200;
           }
         </ul>
         <div class="actions">
-          <button type="button" class="sc-btn sc-btn-primary"
+          <button type="button" scAction tier="primary"
                   [disabled]="selectedCount() === 0 || importing()"
                   (click)="runImport()">
             {{ (importing() ? 'hangar.import.importing' : 'hangar.import.confirm') | translate: { count: selectedCount() } }}
@@ -152,7 +153,6 @@ const MAX_ENTRIES = 200;
     .err { color: var(--sc-danger); font-size: 0.82rem; }
     .summary-row { display: flex; justify-content: space-between; align-items: center; gap: 12px;
       font-size: 0.8rem; color: var(--sc-fg-1); }
-    .link-btn { background: transparent; border: 0; color: var(--sc-accent); cursor: pointer; font-size: max(0.76rem, var(--sc-fs-floor)); }
     .rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px;
       max-height: 320px; overflow-y: auto; }
     .row { display: flex; justify-content: space-between; align-items: center; gap: 10px;
@@ -170,7 +170,6 @@ const MAX_ENTRIES = 200;
     .badge.miss { color: var(--sc-danger); border-color: color-mix(in srgb, var(--sc-danger) 50%, transparent); }
     .badge.muted { font-style: italic; }
     .actions { display: flex; align-items: center; gap: 12px; }
-    .sc-btn-primary { background: var(--sc-accent); color: var(--sc-bg-0); border-color: var(--sc-accent); }
     .done-note { color: var(--sc-success); font-size: 0.8rem; }
   `],
 })

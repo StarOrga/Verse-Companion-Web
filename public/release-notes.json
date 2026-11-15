@@ -1,7 +1,31 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.5",
+  "current": "0.270.6",
   "releases": [
+    {
+      "version": "0.270.6",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader 0.81.1: 3D package re-runs no longer rewrite the 17 MB part index after every package — a fully cached pass is minutes instead of hours."
+            },
+            {
+              "title": "",
+              "text": "Data Uploader: a statement timeout on a catalog batch splits the batch at once instead of resending it unchanged; silhouette batches start smaller."
+            },
+            {
+              "title": "",
+              "text": "Data Uploader log: failed model conversions name the converter's real exception, cached ships are summarised in one line, and a Windows shutdown under a running job is recorded with its resume point."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.270.5",
       "date": "2026-11-15",
