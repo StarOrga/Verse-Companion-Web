@@ -5,6 +5,7 @@ import { isPlainLeftClick } from '../../core/modified-click.util';
 import { hqNachschubPickLink } from '../../hq/hq-routes';
 import { NACHSCHUB_ICON_PATHS } from '../../hq/nachschub/step-icons';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { PATH_ICONS } from '../../shared/item-path/path-icons';
 import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScQtyStepperComponent } from '../../shared/qty-stepper/qty-stepper.component';
 import { SilThumbComponent } from '../../shared/sil-thumb/sil-thumb.component';
@@ -19,8 +20,6 @@ import { MerklisteService } from './merkliste.service';
 /** How many wishlist positions the panel lists before "Ganze Wunschliste". */
 export const WISH_PANEL_SHOWN = 7;
 
-/** The wishlist trigger icon: a heart. */
-const WISH_ICON = ['M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.4a4.2 4.2 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20z'] as const;
 const TRASH = ['M4.5 7h15M10 7V4.5h4V7M6.5 7l1 13h9l1-13M10 11v5.5M14 11v5.5'] as const;
 
 /** One row of the wishlist panel: the position (quantity, removal, Nachschub) and how it is drawn. */
@@ -130,7 +129,8 @@ export class MerklisteComponent {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly panelId = 'sc-merkliste-panel';
-  protected readonly icon = WISH_ICON;
+  /** The trigger icon: the wishes' shooting star, the same glyph as everywhere (`PATH_ICONS.wish`). */
+  protected readonly icon = PATH_ICONS.wish;
   protected readonly trash = TRASH;
   protected readonly nachschub = NACHSCHUB_ICON_PATHS;
   protected readonly open = signal(false);
