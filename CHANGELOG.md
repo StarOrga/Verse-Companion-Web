@@ -4,6 +4,33 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.265.2] - 2026-11-15
+
+### Fixed
+- Codex: stacked modules (guns, shields, coolers, drives, missiles and more) keep the "3×" only on values that add up, such as damage, DPS, power and signatures; range, projectile speed, fire rate and timings show once. Modules with different stats are no longer stacked into one row.
+- Codex: the energy dock can no longer be set above what the power plant supplies; info texts open beside the pips instead of covering them, the facts area is more compact, the screen-edge dock keeps every system on one row and starts level with the ship picture.
+
+## [0.265.1] - 2026-11-15
+
+### Changed
+- Rank page: the header shows your current star map in outline, like the star map page, instead of the generic planet emblem.
+
+## [0.265.0] - 2026-11-15
+
+### Added
+- Rank page: reward ideas with voting from tier 5 (Astrograf, 18 stars); admins can archive ideas. Replaces the old "suggest a top entry" form.
+- Comet: an x.y.z tip that hits earns a sun splinter; three splinters make a small sun in the sun collection. Splinters never count as stars.
+- New rank rewards: Companions (tier 3, older patch constellations faintly in your sky) and Amber tint (tier 4).
+- Verse hub: the star-map planet shows a dot when the rank page has something new.
+
+### Changed
+- Rank tiers now count lit stars (1 · 3 · 7 · 12 · 18 · 26 · 35) instead of completed star maps, so every star moves the bar.
+- Comet: the x.y.z tip comes first when a hotfix target is known; the target is now also detected from Evocati patch notes on Spectrum, before PTU or EPTU exist.
+- Wallpapers: your constellation glows softly with a faint blue veil behind it, and 4K, phone and ultrawide are available from tier 1. The Starscape app draws the same glow and veil.
+
+### Fixed
+- Star map on phones: the comet strip no longer sits under the bottom search bar and feedback launcher.
+
 ## [0.264.0] - 2026-11-15
 
 ### Added

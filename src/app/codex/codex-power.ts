@@ -43,9 +43,10 @@
 //     of a group pins that group at EXACTLY N segments (`levels`). A pin
 //     overrides steps 1–2 for its own group and nothing else: the auto groups
 //     are dealt as if the pin did not exist, so lowering a pin frees exactly
-//     its segments (like a cut) and raising one above the free budget shows up
-//     as `overBudget` — `16 / 14 Seg` in the header, never a silent trim of a
-//     neighbour. A pin below the group's minimum is allowed and flagged
+//     its segments (like a cut). Raising one claims only what is FREE — the
+//     pin stops at the reactor's supply (#351: "Energie kann mehr als möglich
+//     eingestellt werden"), never a silent trim of a neighbour and never
+//     `16 / 14 Seg`. A pin below the group's minimum is allowed and flagged
 //     `belowMinimum` (the pilot asked for it; the dock says what it costs).
 //     Pins are draft state next to the cuts; a preset or reset clears them.
 // F1d COOLER UNITS — the admin's 2026-09-14 reply on 590230e3: "Kühler müssen
@@ -469,10 +470,10 @@ export interface PowerSheet {
   budgetUsed: number;
   /** Σ of every eligible group's minimum — what the ship needs just to run. */
   budgetMinimum: number;
-  /** true when `budgetMinimum > budgetTotal` (the reactor cannot even hold
-   * the minimums) OR when the pilot's pins push `budgetUsed` past the budget
-   * (F1c). Allocations stay where they are so the dock can print the deficit
-   * honestly instead of silently trimming a group (R1). */
+  /** true when `budgetMinimum > budgetTotal` — the reactor cannot even hold
+   * the minimums. Allocations then stay at the floor so the dock prints the
+   * deficit honestly instead of silently trimming a group (R1). A pin can no
+   * longer cause it: pins only claim what is free (F1c, #351). */
   overBudget: boolean;
   groups: PowerGroupRow[];
   facts: PowerFact[];
@@ -619,6 +620,7 @@ export function distributePower(
   budget: number,
   preset: PowerPreset,
   levels: PowerLevels | null = null,
+  cut: ReadonlySet<PowerColumnKey> = new Set(),
 ): Map<PowerColumnKey, number> {
   const out = new Map<PowerColumnKey, number>();
   for (const d of demands) out.set(d.key, Math.min(d.minimum, d.capacity));
@@ -637,10 +639,29 @@ export function distributePower(
   }
   // F1c — the pins go on LAST and touch only their own column: the auto deal
   // above is exactly what the pilot would get without the pin, so a pin
-  // frees or claims precisely its own difference.
+  // frees precisely its own difference. Lowering pins land first (they free
+  // segments), then raising pins claim — but only what is still FREE: the
+  // dock never lets the pilot set more than the reactor supplies (#351,
+  // "Hier nur das was möglich ist"). A cut column holds nothing, so what it
+  // freed is free for a pin; switching it back on trims the raised pins, not
+  // the budget.
+  const pins: { d: GroupDemand; pin: number }[] = [];
   for (const d of demands) {
     const pin = pinnedLevel(levels, d.key);
-    if (pin !== null) out.set(d.key, Math.min(pin, d.capacity));
+    if (pin !== null) pins.push({ d, pin: Math.min(pin, d.capacity) });
+  }
+  for (const { d, pin } of pins) {
+    if (pin <= (out.get(d.key) ?? 0)) out.set(d.key, pin);
+  }
+  if (minimums <= budget) {
+    const used = (): number =>
+      demands.reduce((s, d) => s + (cut.has(d.key) ? 0 : (out.get(d.key) ?? 0)), 0);
+    for (const { d, pin } of pins) {
+      const now = out.get(d.key) ?? 0;
+      if (pin <= now) continue;
+      const free = cut.has(d.key) ? pin - now : Math.max(0, budget - used());
+      out.set(d.key, now + Math.min(pin - now, free));
+    }
   }
   return out;
 }
@@ -773,7 +794,7 @@ export function computePowerSheet(input: PowerSheetInput): PowerSheet {
   const budgetMinimum = demands
     .filter((d) => !(rowMeta.get(d.key)?.cut ?? false))
     .reduce((s, d) => s + d.minimum, 0);
-  const allocation = distributePower(demands, budgetTotal ?? 0, preset, levels);
+  const allocation = distributePower(demands, budgetTotal ?? 0, preset, levels, cutGroups);
 
   const groups: PowerGroupRow[] = [];
   let budgetUsed = 0;
