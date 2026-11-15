@@ -1747,7 +1747,7 @@
         "ir": "Deine Wärmesignatur. Steigt mit der Kühllast und mit allem, was Energie zieht. Wer wenig IR hat, wird später auf Wärme-Sensoren erfasst.",
         "em": "Summe aller aktiven Bauteile. Schilde und Kühler sind die größten Posten — schaltest du eine Gruppe ab, fällt ihr Anteil weg. Was ein Bauteil abstrahlt, steht in den Spieldateien; Energiewaffen tragen dort 0.",
         "crossSection": "Wie groß du auf dem Radar erscheinst. Kommt aus dem Rumpf, nicht aus der Ausrüstung — kein Loadout ändert ihn.",
-        "coolingLoad": "Wie viel der vorhandenen Kühlleistung gerade gebraucht wird. Über 100 % läuft das Schiff heiß und die IR-Signatur schießt hoch."
+        "coolingLoad": "Wie viel der Kühlleistung gerade gebraucht wird — gerechnet wie im Spiel: 100 % ist genau die Leistung der eingeschalteten Kühler, mit der Energie, die sie bekommen. 30 % heißt 70 % Luft, 130 % heißt 30 % zu wenig: Das Schiff läuft heiß und die IR-Signatur schießt hoch. Am sparsamsten knapp unter 100 %."
       },
       "fact": {
         "ir": "IR",
@@ -1772,7 +1772,8 @@
       "preset": {
         "stealth": "Schleichen",
         "auto": "Auto",
-        "reset": "Zurücksetzen"
+        "reset": "Zurücksetzen",
+        "stealthHint": "Niedrigste EM-Signatur: Waffen, Schilde, Quantum, Traktor, Radar und Lebenserhaltung aus, Antrieb auf das Nötigste, Kühler nur so weit, dass die Kühlung unter 100 % bleibt."
       },
       "gap": {
         "noReactorData": "Keine Reaktordaten in diesem Build — das Energiebudget bleibt leer, bis der Extract sie mitbringt.",
@@ -1789,7 +1790,9 @@
         "ir": "Infrarot",
         "em": "Elektromagnetisch",
         "crossSection": "Querschnitt"
-      }
+      },
+      "coolingHeadroom": "{{pct}} % Luft",
+      "coolingDeficit": "{{pct}} % zu wenig"
     },
     "swap": {
       "open": "Bauteil tauschen",
