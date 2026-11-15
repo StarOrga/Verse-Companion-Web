@@ -13,12 +13,12 @@ describe('CodexCompareTrayComponent', () => {
   let clearCompare: Mock;
   let getDetail: Mock;
 
-  function mount(initial: string[]) {
+  function mount(initial: string[], detail: (kind: string, slug: string) => Promise<unknown> = async () => null) {
     keys.set(initial);
     rejected.set(null);
     unpin = vi.fn().mockName('unpin');
     clearCompare = vi.fn().mockName('clearCompare');
-    getDetail = vi.fn().mockName('getDetail').mockResolvedValue(null);
+    getDetail = vi.fn().mockName('getDetail').mockImplementation(detail);
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -46,6 +46,22 @@ describe('CodexCompareTrayComponent', () => {
       '/codex/ship/aegis_avenger',
       '/codex/weapon/klwe_laser',
     ]);
+  });
+
+  it('names the chips from the pinned details while the tray is still collapsed, one read per pin', async () => {
+    const { fixture, el } = mount(['ship:aegs_avenger_titan'], async (kind, slug) => ({
+      kind, classNameSlug: slug, row: { name_localized: 'Avenger Titan' }, payload: {},
+    }));
+    await fixture.whenStable();
+    await new Promise((r) => setTimeout(r));
+    fixture.detectChanges();
+    expect(getDetail).toHaveBeenCalledTimes(1);
+    expect(el.querySelector('.tray.expanded')).toBeNull();
+    expect(el.querySelector('a.chip-link')?.textContent?.trim()).toBe('Avenger Titan');
+    keys.set(['ship:aegs_avenger_titan', 'ship:anvl_arrow']);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(getDetail).toHaveBeenCalledTimes(2);
   });
 
   it('removes a pin via .chip-x and clears all via .clear', () => {

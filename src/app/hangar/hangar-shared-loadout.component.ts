@@ -14,13 +14,14 @@ import { HangarService } from './hangar.service';
 import { PeekedSharedLoadout } from './hangar.types';
 import { SharedLoadoutAdopter, holoSharedLink } from './shared-loadout-adopter.service';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 type LandingState = 'loading' | 'available' | 'unavailable' | 'error';
 
 @Component({
   selector: 'sc-hangar-shared-loadout',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, ScTooltipDirective],
+  imports: [TranslatePipe, RouterLink, ScTooltipDirective, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
@@ -60,12 +61,12 @@ type LandingState = 'loading' | 'available' | 'unavailable' | 'error';
                    Holotable. A real anchor: a signed-out reader passes the
                    login wall and comes back to exactly this view. -->
               @if (holoLink(p); as hl) {
-                <a class="sc-btn holo" [routerLink]="hl.commands" [queryParams]="hl.queryParams">
+                <a scAction tier="secondary" class="holo" [routerLink]="hl.commands" [queryParams]="hl.queryParams">
                   {{ 'hangar.shared.viewOnHolotable' | translate }}
                 </a>
               }
               @if (auth.isAuthenticated()) {
-                <button type="button" class="sc-btn adopt" [disabled]="adopting()" (click)="adopt(p)"
+                <button type="button" scAction tier="primary" class="adopt" [disabled]="adopting()" (click)="adopt(p)"
                         [scTooltip]="'hangar.shared.adoptHint' | translate">
                   {{ (adopting() ? 'hangar.shared.adopting' : 'hangar.shared.adopt') | translate }}
                 </button>
@@ -73,7 +74,7 @@ type LandingState = 'loading' | 'available' | 'unavailable' | 'error';
                   <p class="err" role="alert">{{ 'hangar.shared.adoptError' | translate }}</p>
                 }
               } @else {
-                <a class="sc-btn adopt" [routerLink]="['/login']" [queryParams]="{ redirect: selfUrl() }">{{ 'hangar.shared.loginToAdopt' | translate }}</a>
+                <a scAction tier="primary" class="adopt" [routerLink]="['/login']" [queryParams]="{ redirect: selfUrl() }">{{ 'hangar.shared.loginToAdopt' | translate }}</a>
               }
             </div>
           }
@@ -82,14 +83,14 @@ type LandingState = 'loading' | 'available' | 'unavailable' | 'error';
           <div class="sc-card state" role="alert">
             <p class="state__title">{{ 'hangar.shared.loadError' | translate }}</p>
             <p>{{ loadErrorKey() | translate }}</p>
-            <button type="button" class="sc-btn retry" (click)="load()">{{ 'codex.error.retry' | translate }}</button>
+            <button type="button" scAction tier="secondary" class="retry" (click)="load()">{{ 'codex.error.retry' | translate }}</button>
           </div>
         }
         @case ('unavailable') {
           <div class="sc-card state">
             <p class="state__title">{{ 'hangar.shared.unavailable.title' | translate }}</p>
             <p>{{ 'hangar.shared.unavailable.body' | translate }}</p>
-            <a class="sc-btn" routerLink="/about">{{ 'hangar.shared.aboutCta' | translate }}</a>
+            <a scAction tier="secondary" routerLink="/about">{{ 'hangar.shared.aboutCta' | translate }}</a>
           </div>
         }
       }
@@ -119,8 +120,7 @@ type LandingState = 'loading' | 'available' | 'unavailable' | 'error';
     .state__title { color: var(--sc-fg-0); font-weight: 600; margin: 0 0 6px; }
     .err { margin: 0; flex-basis: 100%; color: var(--sc-danger, #ff5252); font-size: max(0.76rem, var(--sc-fs-floor)); }
     .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-    .sc-btn.adopt, .sc-btn.holo { display: inline-flex; align-items: center; text-decoration: none; min-height: 48px; }
-    .state .sc-btn { align-self: center; margin-top: 14px; }
+    .state .sc-action { align-self: center; margin-top: 14px; }
   `],
 })
 export class HangarSharedLoadoutComponent implements OnInit {

@@ -104,4 +104,24 @@ export function posthogRoot(cards: readonly OverviewCard[]): string {
 }
 
 /** Services the server names by id; anything else renders verbatim. */
-export const KNOWN_SERVICES = ['claude', 'posthog', 'supabase', 'r2', 'uex', 'rsi', 'xai', 'readme'] as const;
+export const KNOWN_SERVICES = ['claude', 'posthog', 'supabase', 'r2', 'uex', 'rsi', 'readme'] as const;
+
+/** A feedback topic a finding already became — what the checked speech bubble links to. */
+export interface LinkedTopic { id: string; seq: number | null }
+
+/**
+ * Match topics to findings: the seeded body opens with the finding's title as its own first line, and that line is
+ * what an admin rarely rewrites. `rows` come newest first, so a title written twice links the newest topic.
+ */
+export function topicsByTitle(
+  rows: readonly { id: string; seq?: number | null; body?: string | null }[],
+  titles: readonly string[],
+): ReadonlyMap<string, LinkedTopic> {
+  const wanted = new Set(titles.map((t) => t.trim()).filter(Boolean));
+  const out = new Map<string, LinkedTopic>();
+  for (const r of rows) {
+    const first = (r.body ?? '').split('\n', 1)[0].trim();
+    if (wanted.has(first) && !out.has(first)) out.set(first, { id: r.id, seq: r.seq ?? null });
+  }
+  return out;
+}

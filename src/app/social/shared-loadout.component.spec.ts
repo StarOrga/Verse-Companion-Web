@@ -76,7 +76,7 @@ describe('SharedLoadoutComponent', () => {
 
   it('the call-to-action links are real anchors to /about (both states)', async () => {
     const found = await mount(TOKEN, view());
-    const a = found.el.querySelector('a.sc-btn') as HTMLAnchorElement;
+    const a = found.el.querySelector('a.sc-action') as HTMLAnchorElement;
     expect(a.tagName).toBe('A');
     expect(a.getAttribute('href')).toBe('/about');
     expect(found.el.querySelectorAll('button').length).toBe(0);
@@ -84,6 +84,6 @@ describe('SharedLoadoutComponent', () => {
 
   it('the not-found state also offers an anchor', async () => {
     const { el } = await mount(TOKEN, null);
-    expect(el.querySelector('a.sc-btn')?.getAttribute('href')).toBe('/about');
+    expect(el.querySelector('a.sc-action')?.getAttribute('href')).toBe('/about');
   });
 });

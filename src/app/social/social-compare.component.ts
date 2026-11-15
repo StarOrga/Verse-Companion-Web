@@ -5,6 +5,7 @@ import { ScSelectComponent, ScSelectOption } from '../shared/sc-select.component
 import { edgeLabel } from './friends.types';
 import { SocialService } from './social.service';
 import { CompareRow, SocialStats, compareRows } from './social.types';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /**
  * Me versus one friend (C07): how each of us uses SCC and what each does.
@@ -18,7 +19,7 @@ import { CompareRow, SocialStats, compareRows } from './social.types';
 @Component({
   selector: 'sc-social-compare',
   standalone: true,
-  imports: [TranslatePipe, ScSelectComponent, NgTemplateOutlet],
+  imports: [ScActionDirective, TranslatePipe, ScSelectComponent, NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="sc-card section" id="social-compare">
@@ -33,7 +34,7 @@ import { CompareRow, SocialStats, compareRows } from './social.types';
         @if (social.loadError(); as key) {
           <div class="load-error" role="alert">
             <span>{{ key | translate }}</span>
-            <button type="button" class="sc-btn micro" (click)="reload()">{{ 'errors.retry' | translate }}</button>
+            <button type="button" scAction tier="secondary" (click)="reload()">{{ 'errors.retry' | translate }}</button>
           </div>
         } @else if (!social.compare()) {
           <p class="empty-inline">{{ 'social.comparePanel.loading' | translate }}</p>
@@ -112,7 +113,6 @@ import { CompareRow, SocialStats, compareRows } from './social.types';
     td.ahead { color: var(--sc-success); }
     td.behind { color: var(--sc-warning); }
     .hidden-val { color: var(--sc-fg-2); font-style: italic; }
-    .sc-btn.micro { padding: 4px 10px; font-size: max(0.7rem, var(--sc-fs-floor)); }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   `],
 })

@@ -92,8 +92,7 @@
   },
   "update": {
     "available": "A new version is available",
-    "reload": "Reload",
-    "dismiss": "Later"
+    "reload": "Reload"
   },
   "auth": {
     "previewLocked": {
@@ -4887,6 +4886,7 @@
       "desktop": "Desktop"
     },
     "toFeedback": "Turn into feedback",
+    "openFeedback": "Open feedback topic",
     "quotaFeedback": "Saving proposal as feedback",
     "upgrade": "Plan in PostHog ↗",
     "boardWaitingOne": "{{n}} board item waits for an answer",
@@ -4915,7 +4915,6 @@
       "r2": "Cloudflare R2",
       "uex": "UEX",
       "rsi": "RSI",
-      "xai": "xAI",
       "readme": "readme.io"
     }
   },

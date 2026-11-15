@@ -220,6 +220,26 @@ function createWindow(): void {
     }
   });
 
+  // Windows is logging off / shutting down under a running job. The process
+  // dies right after this, without `before-quit`, so without this line the log
+  // just stops mid-heartbeat — 2026-11-15 a foreign `shutdown /s` ended a
+  // 5-hour run at 07:04 and nothing said why. The job file already holds the
+  // resume point; this only names it.
+  win.on('session-end', (e) => {
+    const reasons = (e as unknown as { reasons?: string[] }).reasons ?? [];
+    let resume = 'no upload job';
+    try {
+      const v = uploadJob.view();
+      if (v.state) resume = `upload job ${v.state.jobId} ${v.state.status}${v.resumeHint ? `, resumes at ${v.resumeHint}` : ''}`;
+    } catch {
+      /* the line matters more than its detail */
+    }
+    log.warn(
+      `[app] Windows session ending${reasons.length ? ` (${reasons.join(', ')})` : ''} — ` +
+        `${activeJobs.size} sidecar job(s) running; ${resume}`,
+    );
+  });
+
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     // Only hand real web links to the OS browser. A renderer-driven window.open()
     // to file:// or a custom scheme must never reach shell.openExternal — that is

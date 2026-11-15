@@ -4,6 +4,47 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.270.10] - 2026-11-15
+
+### Changed
+- Telemetry: a finding that already has a feedback topic shows a speech bubble with a check mark that opens that topic.
+
+## [0.270.9] - 2026-11-15
+
+### Changed
+- The "new version" notice is now a toast in the bottom-right stack (like undo), stays until you reload.
+- All toasts line up with the round buttons at the bottom right; on phones they share one edge with the compare tray.
+- The compare tray uses the same frame as the toasts and shows real names in its chips.
+
+### Fixed
+- Popups (undo, apps, wishlist) no longer show square corners around their rounded frame.
+- Popup side rails no longer show a generic stand-in icon; only a fitting icon or a thin accent edge.
+
+## [0.270.8] - 2026-11-15
+
+### Removed
+- The unused xAI (Grok) provider is gone: no more hourly xAI check, no Grok fallback for event summaries, and no xAI entry in the service list.
+
+## [0.270.7] - 2026-11-15
+
+### Changed
+- Hangar: every action button uses the shared action control — one main step per view, red tone for delete (#970).
+
+## [0.270.6] - 2026-11-15
+
+### Fixed
+- Data Uploader 0.81.1: 3D package re-runs no longer rewrite the 17 MB part index after every package — a fully cached pass is minutes instead of hours.
+- Data Uploader: a statement timeout on a catalog batch splits the batch at once instead of resending it unchanged; silhouette batches start smaller.
+- Data Uploader log: failed model conversions name the converter's real exception, cached ships are summarised in one line, and a Windows shutdown under a running job is recorded with its resume point.
+
+## [0.270.5] - 2026-11-15
+
+### Fixed
+- Codex rank: a ship's place and the group median now count each hull once — editions and duplicate records of one hull no longer inflate a comparison group (#968).
+
+### Changed
+- Social pages: every action button uses the shared action control (one main step per page, red tone for report and delete) (#970).
+
 ## [0.270.4] - 2026-11-15
 
 ### Fixed

@@ -51,7 +51,7 @@ const UNLOCK_PRIORITY = [
     /* Position only (bottom right, above the launcher); frame, width, rail and symbol come from <sc-popup kind="notice">. */
     .toast {
       position: fixed; z-index: 1450;
-      inset-inline-end: var(--sc-fab-gutter, 16px);
+      inset-inline-end: var(--sc-toast-end, 24px);
       bottom: calc(var(--sc-toast-bottom, var(--sc-fab-clear-block, 80px)) + var(--sc-toast-offset, 0px));
     }
     .body { display: grid; gap: 3px; color: inherit; text-decoration: none; min-width: 0; border-radius: 6px; }
@@ -62,7 +62,9 @@ const UNLOCK_PRIORITY = [
     .body:hover b, .body:focus-visible b { text-decoration: underline; }
     .body:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .drain {
-      display: block; height: 2px; margin-top: 10px; background: var(--sc-accent); transform-origin: left center;
+      /* Along the card's bottom edge, like the undo toast's window. */
+      position: absolute; inset-inline: 0; bottom: 0;
+      display: block; height: 2px; background: var(--sc-accent); transform-origin: left center;
       animation: toast-drain linear forwards;
     }
     .toast.paused .drain { animation-play-state: paused; }
