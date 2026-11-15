@@ -14,6 +14,7 @@ import { FeedbackMotionService } from './feedback-motion.service';
 import { AdminFeedbackComponent } from './admin-feedback.component';
 import { PanelNavigationService } from '../../feedback/panel-navigation.service';
 import { FeedbackMessage, FeedbackRow, FeedbackStatus } from './feedback.types';
+import { POSTHOG_GUARD_PROFILE_ID } from '../../feedback/feedback.types';
 import { provideFakeAttachmentSigner } from '../../feedback/testing/fake-attachment-signer';
 
 /**
@@ -682,6 +683,37 @@ describe('AdminFeedbackComponent — the flight path reads as four steps', () =>
     }
     expect(path.getAttribute('role')).toBe('img');
     expect(path.getAttribute('aria-label')).toContain('adminFeedback.station.pathLabel');
+  });
+
+  it('shows a machine item (origin posthog) from the PostHog-Wächter with the machine glyph, not as unknown', async () => {
+    const { el } = await mount({
+      ...fixtureTables(),
+      admin_feedback: [
+        ...(fixtureTables().admin_feedback as FeedbackRow[]),
+        row('p1', 'open', T('12'), { author_id: null, author: null, origin: 'posthog' }),
+        row('p2', 'open', T('13'), { author_id: null, author: null, origin: 'service' }),
+      ],
+    });
+
+    for (const id of ['p1', 'p2']) {
+      const av = el.querySelector(`#fb-card-${id} .av`)!;
+      expect(av.classList).toContain('bot');
+      expect(av.getAttribute('data-sender')).toBe('guard');
+      expect(av.getAttribute('aria-label')).toBe('adminFeedback.guard.title');
+      expect(av.textContent!.trim()).toBe('');
+      expect(av.querySelector('svg')).not.toBeNull();
+    }
+    // A human row keeps its initials avatar.
+    expect(el.querySelector('#fb-card-o1 .av')!.classList).not.toContain('bot');
+  });
+
+  it('names the guard profile as the sender of a thread reply', async () => {
+    const { cmp: c } = await mount(fixtureTables());
+    expect(c.isMachine('posthog', null)).toBe(true);
+    expect(c.isMachine('human', null)).toBe(false);
+    expect(c.isMachine(null, POSTHOG_GUARD_PROFILE_ID)).toBe(true);
+    expect(c.authorLabel(row('p3', 'open', T('12'), { author_id: null, author: null, origin: 'service' }))).toBe('adminFeedback.guard.name');
+    expect(c.authorLabelFor({ ...msg('m9', 'p3', false, T('12')), author_id: POSTHOG_GUARD_PROFILE_ID, author: null })).toBe('adminFeedback.guard.name');
   });
 
   it('maps each status to the step it is meant to draw', async () => {

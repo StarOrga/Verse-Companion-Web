@@ -278,7 +278,7 @@ export class TelemetryStatsComponent {
 
   titleOf(c: OverviewCard): string {
     if (c.id !== 'ai') return this.translate.instant(`telemetry.card.${c.id}`);
-    const lang = this.translate.currentLang || this.translate.getFallbackLang() || 'de';
+    const lang = this.translate.currentLang() || this.translate.getFallbackLang() || 'de';
     const month = new Intl.DateTimeFormat(lang, { month: 'long' }).format(new Date(this.overview()?.generatedAt ?? Date.now()));
     return this.translate.instant('telemetry.card.ai', { month });
   }
