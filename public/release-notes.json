@@ -1,7 +1,27 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.271.1",
+  "current": "0.271.2",
   "releases": [
+    {
+      "version": "0.271.2",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader 0.81.5: an upload paused before an uploader update now restarts at the extraction when the update changed the metadata extraction, and only the silhouette or 3D step when just those changed — no more mix of old and new data on the server. Unchanged data is still skipped."
+            },
+            {
+              "title": "",
+              "text": "Data Uploader 0.81.5: opening the uploader while its update is still installing waits for the install and restarts by itself instead of failing with \"No module named sc_extract\"."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.271.1",
       "date": "2026-11-15",

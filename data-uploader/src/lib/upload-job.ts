@@ -73,6 +73,17 @@ export interface SkinStage {
   doneShips: string[];
 }
 
+/**
+ * What produced the extract a job uploads: the uploader's version and its
+ * subtheme revisions at the time. A resume by a newer uploader compares them
+ * (`resume-compat.ts`) — an extract made by older metadata logic must not be
+ * finished by newer logic, or the server ends up with a mix of both.
+ */
+export interface JobOrigin {
+  uploaderVersion: string;
+  revisions: Record<string, number>;
+}
+
 export interface UploadJobState {
   v: number;
   jobId: string;
@@ -86,6 +97,8 @@ export interface UploadJobState {
   catalog: CatalogStage;
   silhouettes: SilhouetteStage;
   skins: SkinStage;
+  /** Absent on jobs written before 0.81.5 — see `resume-compat.ts`. */
+  origin?: JobOrigin | null;
   error?: string | null;
 }
 
@@ -103,6 +116,7 @@ export function createJob(
   outDir: string,
   nat: JobNat,
   now: number,
+  origin: JobOrigin | null = null,
 ): UploadJobState {
   return {
     v: SCHEMA_VERSION,
@@ -116,6 +130,7 @@ export function createJob(
     catalog: { status: 'pending', donePhases: [], cursor: null },
     silhouettes: { status: 'pending' },
     skins: { status: 'pending', doneShips: [] },
+    origin,
     error: null,
   };
 }
@@ -366,6 +381,7 @@ export class UploadJobStore {
           status: parsed.skins?.status ?? 'pending',
           doneShips: parsed.skins?.doneShips ?? [],
         },
+        origin: parsed.origin ?? null,
         error: parsed.error ?? null,
       };
     } catch {

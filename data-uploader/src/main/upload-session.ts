@@ -25,7 +25,9 @@ import {
   describeResume,
   resumeSummary,
   rehydrateResult,
+  MANIFEST_FILE,
   type TextIO,
+  type JobOrigin,
   type UploadJobState,
   type JobNat,
   type ResumeSummary,
@@ -38,6 +40,9 @@ import {
   type SkinHookSet,
 } from '../lib/upload-hooks.js';
 import { createPauseControl, type PauseControl, type RunSignal } from '../lib/pause-control.js';
+import { applyReset, resumeCompat } from '../lib/resume-compat.js';
+import { currentRevisions, type SubthemeKey } from '../lib/subthemes.js';
+import { TOOL_VERSION } from '../lib/release-token.js';
 import * as resources from './resources.js';
 
 const JOB_FILE = 'upload-job.json';
@@ -57,6 +62,56 @@ function store(): UploadJobStore {
   };
   _store = new UploadJobStore(io);
   return _store;
+}
+
+/** This uploader as a job origin: what a newly started job is stamped with. */
+function currentOrigin(): JobOrigin {
+  return { uploaderVersion: TOOL_VERSION, revisions: currentRevisions() };
+}
+
+/** The extract's own `tool_version` — the fallback for jobs without an origin. */
+function extractToolVersion(outDir: string): string | null {
+  try {
+    const m = JSON.parse(readFileSync(join(outDir, MANIFEST_FILE), 'utf-8')) as { tool_version?: unknown };
+    return typeof m.tool_version === 'string' ? m.tool_version : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Set when a job was dropped because this uploader extracts differently — for the renderer's notice. */
+let _restarted: { changed: SubthemeKey[]; reason: 'extractor-changed' | 'unknown-origin' } | null = null;
+
+/**
+ * The stored job, reconciled with THIS uploader (`resume-compat.ts`): a job
+ * whose extract was made by other metadata logic is dropped (the next run
+ * extracts again from step 1), one whose silhouette / 3D logic changed gets
+ * those stages reset. Every read that can lead to a resume goes through here.
+ */
+function loadReconciled(): UploadJobState | null {
+  const state = store().load();
+  if (!state || !isResumable(state)) return state;
+  const compat = resumeCompat({
+    job: state,
+    current: currentOrigin(),
+    extractToolVersion: state.origin ? null : extractToolVersion(state.outDir),
+  });
+  if (compat.action === 'keep') return state;
+  if (compat.action === 'restart') {
+    store().clear();
+    _restarted = { changed: compat.changed, reason: compat.reason };
+    log.info(
+      `[upload-job] dropped ${state.jobId} (${describeResume(state)}): ${compat.reason}` +
+        (compat.changed.length ? ` [${compat.changed.join(', ')}]` : '') +
+        ' — the next run extracts again',
+    );
+    return null;
+  }
+  log.info(
+    `[upload-job] ${state.jobId}: [${compat.changed.join(', ')}] changed since the job started` +
+      (compat.stages.length ? ` — restarting [${compat.stages.join(', ')}]` : ''),
+  );
+  return store().save(applyReset(state, compat.stages, currentOrigin()));
 }
 
 /** The live pause control for the current run (created on demand). */
@@ -86,10 +141,12 @@ export interface JobView {
   resumeHint: string | null;
   /** Structured, localization-ready resume picture — the renderer's banner + seed. */
   resumeSummary: ResumeSummary | null;
+  /** An interrupted job this uploader could not finish (other extraction logic) was dropped. */
+  restartedAfterUpdate?: { changed: SubthemeKey[]; reason: 'extractor-changed' | 'unknown-origin' } | null;
 }
 
 export function view(): JobView {
-  const state = store().load();
+  const state = loadReconciled();
   const resumable = isResumable(state);
   return {
     state,
@@ -97,6 +154,7 @@ export function view(): JobView {
     signal: control().state(),
     resumeHint: state && resumable ? describeResume(state) : null,
     resumeSummary: state && resumable ? resumeSummary(state) : null,
+    restartedAfterUpdate: _restarted,
   };
 }
 
@@ -107,13 +165,14 @@ export function view(): JobView {
  */
 export function begin(outDir: string, nat: JobNat): UploadJobState {
   _begun = true;
-  const existing = store().load();
+  const existing = loadReconciled();
   if (existing && existing.outDir === outDir && isResumable(existing)) {
     log.info(`[upload-job] resuming ${existing.jobId} at ${describeResume(existing)}`);
     _control = createPauseControl('running');
-    return store().save({ ...existing, status: 'running', error: null })!;
+    return store().save({ ...existing, origin: existing.origin ?? currentOrigin(), status: 'running', error: null })!;
   }
-  const fresh = createJob(randomUUID(), outDir, nat, Date.now());
+  _restarted = null;
+  const fresh = createJob(randomUUID(), outDir, nat, Date.now(), currentOrigin());
   _control = createPauseControl('running');
   log.info(`[upload-job] new job ${fresh.jobId} for ${outDir}`);
   return store().save(fresh);
@@ -151,7 +210,7 @@ export function pause(): JobView {
  * used to return before doing anything — the "Fortsetzen does nothing" hang.
  */
 export function rehydrate(): RehydrateResult {
-  const res = rehydrateResult(store().load(), {
+  const res = rehydrateResult(loadReconciled(), {
     exists: existsSync,
     readText: (path) => {
       try {
@@ -178,8 +237,16 @@ export function resume(): JobView {
 export function cancel(): JobView {
   control().cancel();
   store().clear();
+  _restarted = null;
   log.info('[upload-job] cancelled + job state cleared');
-  return { state: null, resumable: false, signal: 'cancelled', resumeHint: null, resumeSummary: null };
+  return {
+    state: null,
+    resumable: false,
+    signal: 'cancelled',
+    resumeHint: null,
+    resumeSummary: null,
+    restartedAfterUpdate: null,
+  };
 }
 
 /** Mark the whole run finished and drop the state file. */
