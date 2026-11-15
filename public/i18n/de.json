@@ -96,9 +96,7 @@
   },
   "auth": {
     "previewLocked": {
-      "title": "Du siehst gerade die Vorschau als abgemeldeter Besucher",
-      "body": "Anmelden funktioniert hier nicht — die Vorschau überschreibt weiterhin, was dir die App anzeigt, auch nach erfolgreicher Anmeldung. Beende zuerst die Vorschau.",
-      "exit": "Vorschau beenden und anmelden"
+      "body": "Anmelden funktioniert hier nicht — die Vorschau überschreibt weiterhin, was dir die App anzeigt, auch nach erfolgreicher Anmeldung. Beende zuerst die Vorschau über das Banner oben."
     },
     "tagline": "Dein Terminal zum Verse",
     "email": "E-Mail",
@@ -154,7 +152,13 @@
       },
       "applyCta": "Um Zugang bewerben",
       "applyInline": "Jetzt bewerben",
-      "backToSignIn": "Zurück zur Anmeldung"
+      "backToSignIn": "Zurück zur Anmeldung",
+      "headerNav": "Seitennavigation",
+      "consoleAria": "Anmeldekonsole",
+      "scene": {
+        "approach": "Anflug",
+        "target": "microTech · Stanton"
+      }
     },
     "apply": {
       "title": "Um Zugang bewerben",
