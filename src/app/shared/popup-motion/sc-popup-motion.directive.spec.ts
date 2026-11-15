@@ -238,10 +238,13 @@ describe('ScPopupMotionDirective (Vektor-Aufriss)', () => {
 
   it('C8: exit() during the open runs the open back from its current state', async () => {
     const f = mount((c) => { c.showSmall.set(false); c.showDialog.set(true); });
-    await sleep(200);
+    await f.whenStable();
     const m = motionOf(f, '.dialog');
     const el = f.nativeElement.querySelector('.dialog') as HTMLElement;
     const a = el.getAnimations()[0];
+    await a.ready;
+    // Pin the open mid-way instead of sleeping: a loaded test machine may not advance it in time.
+    for (const x of el.getAnimations({ subtree: true })) x.currentTime = 250;
     const t = Number(a.currentTime);
     expect(t).toBeGreaterThan(100);
     const p = m.exit();
