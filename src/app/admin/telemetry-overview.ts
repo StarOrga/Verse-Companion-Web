@@ -104,4 +104,4 @@ export function posthogRoot(cards: readonly OverviewCard[]): string {
 }
 
 /** Services the server names by id; anything else renders verbatim. */
-export const KNOWN_SERVICES = ['claude', 'posthog', 'supabase', 'r2', 'uex', 'rsi', 'xai', 'readme'] as const;
+export const KNOWN_SERVICES = ['claude', 'posthog', 'supabase', 'r2', 'uex', 'rsi', 'readme'] as const;

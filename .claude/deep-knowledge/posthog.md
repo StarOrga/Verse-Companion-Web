@@ -79,7 +79,7 @@ Feature flags are NOT used for admin/collaborator UI (browser-evaluated, consent
 
 - `posthog-signal` modes: **webhook** (PostHog error-tracking alert → header `x-signal-secret` = `POSTHOG_SIGNAL_SECRET`),
   **trends** (daily 06:30 UTC: LCP p75 +25 %, login funnel −10 pt, new error groups), **quota** (every 6 h).
-  `service-health` probes `claude, posthog, supabase, r2, uex, rsi, xai, readme` hourly (green < 10 % errors and in rhythm,
+  `service-health` probes `claude, posthog, supabase, r2, uex, rsi, readme` hourly (green < 10 % errors and in rhythm,
   yellow 10–50 % or rhythm ×2, red last 3 failed / key missing).
 - Findings land on the admin board as `admin_feedback` rows with `origin` ('posthog' | 'service'), author „PostHog-Wächter“,
   `external_ref` = PostHog issue id / service name (same issue = one item, repeats are thread replies). **Cap 3 new items per

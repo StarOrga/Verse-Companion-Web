@@ -13,7 +13,7 @@ import { buildAiGeneration, captureBatch, redactText, type AiGeneration } from '
 export interface AiCallRow {
   function: string;
   model: string;
-  provider?: 'anthropic' | 'openai' | 'xai';
+  provider?: 'anthropic' | 'openai';
   input_tokens?: number;
   output_tokens?: number;
   cache_read_tokens?: number;
