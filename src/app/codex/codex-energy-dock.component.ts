@@ -50,12 +50,14 @@ import {
   clickPowerPip,
   computePowerSheet,
   coolerUnitCount,
+  coolingMargin,
   isDockPosition,
   isFlightMode,
   migrateLegacyCoolerDraft,
   parsePowerGroups,
   parsePowerLevels,
   resetPowerState,
+  stealthPowerState,
   togglePowerGroup,
 } from './codex-power';
 import {
@@ -335,7 +337,10 @@ let uidSeq = 0;
                 <div class="t" [class.over]="sheet().coolant.percent! > 100">
                   <div class="fill" [style.width.%]="minPct(sheet().coolant.percent)"></div>
                 </div>
-                <span class="v">{{ 'codex.energy.coolingPercent' | translate: { pct: sheet().coolant.percent } }}</span>
+                <span class="v" [class.over]="sheet().coolant.percent! > 100">{{ 'codex.energy.coolingPercent' | translate: { pct: sheet().coolant.percent } }}</span>
+                @if (coolMargin(); as m) {
+                  <span class="margin" [class.over]="m.over">{{ (m.over ? 'codex.energy.coolingDeficit' : 'codex.energy.coolingHeadroom') | translate: { pct: m.pct } }}</span>
+                }
                 <span class="sub">{{ 'codex.energy.coolingValue' | translate: { used: sheet().coolant.used, total: sheet().coolant.total } }}</span>
               } @else {
                 <span class="gapv">{{ coolantGapKey() | translate }}</span>
@@ -361,7 +366,8 @@ let uidSeq = 0;
               </button>
             }
           </div>
-          <button type="button" [class.on]="preset() === 'stealth'" (click)="setPreset('stealth')">
+          <button type="button" [class.on]="preset() === 'stealth'" (click)="setPreset('stealth')"
+            [scTooltip]="'codex.energy.preset.stealthHint' | translate">
             {{ 'codex.energy.preset.stealth' | translate }}
           </button>
           <button type="button" [class.on]="preset() === 'auto'" (click)="setPreset('auto')">
@@ -886,10 +892,19 @@ let uidSeq = 0;
       }
       .md-heat .fill {
         block-size: 100%;
-        background: var(--sc-warn);
+        background: var(--sc-accent);
       }
       .md-heat .t.over .fill {
-        background: var(--sc-danger);
+        background: var(--sc-warning);
+      }
+      /* #352 — over 100 % is a shortfall, not an error: warning, never danger */
+      .md-heat .v.over,
+      .md-heat .margin.over {
+        color: var(--sc-warning);
+      }
+      .md-heat .margin {
+        font-size: max(11px, var(--sc-fs-floor));
+        color: var(--sc-fg-2);
       }
       .md-ok {
         grid-column: 1 / -1;
@@ -1167,6 +1182,8 @@ export class CodexEnergyDockComponent {
 
   protected readonly irFact = computed(() => this.sheet().facts.find((f) => f.key === 'ir'));
   protected readonly emFact = computed(() => this.sheet().facts.find((f) => f.key === 'em'));
+  /** "22 % Luft" / "30 % zu wenig" under the cooling usage (#352). */
+  protected readonly coolMargin = computed(() => coolingMargin(this.sheet().coolant.percent));
   /** WHY the cooling load is empty — no coolers vs. no stated draw. */
   protected readonly coolantGapKey = computed(
     () => this.sheet().facts.find((f) => f.key === 'coolant')?.gapKey ?? 'codex.energy.gap.noCoolingData',
@@ -1502,10 +1519,25 @@ export class CodexEnergyDockComponent {
     this.persistDraft();
   }
 
-  /** A preset is a full re-deal — it clears every pin, the cuts stay. */
+  /** A preset is a full re-deal — it clears every pin. `Schleichen` sets its
+   * own cuts and pins (#352, `stealthPowerState`); leaving it for `Auto`
+   * drops them again, any other cut stays. */
   protected setPreset(preset: PowerPreset): void {
+    const from = this.preset();
     this.preset.set(preset);
-    this.levels.set({});
+    if (preset === 'stealth') {
+      const next = stealthPowerState({
+        occupants: this.occupants(),
+        shipStats: this.shipStats(),
+        schemaVersion: this.schemaVersion(),
+        mode: this.mode(),
+      });
+      this.cutGroups.set(next.cutGroups);
+      this.levels.set(next.levels);
+    } else {
+      if (from === 'stealth') this.cutGroups.set(new Set<PowerColumnKey>());
+      this.levels.set({});
+    }
     this.persistDraft();
   }
 
