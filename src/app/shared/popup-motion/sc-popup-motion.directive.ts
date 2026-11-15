@@ -298,6 +298,32 @@ function remaining(run: readonly Animation[]): number {
 }
 
 /**
+ * The window's visible frame when the host is only a positioning wrapper around an `<sc-popup>`
+ * (a toast, a menu at its trigger): the rounded `.scp-frame` inside it.
+ */
+function innerFrame(panel: HTMLElement): HTMLElement | null {
+  return panel.querySelector<HTMLElement>(':scope > .scp-frame, :scope > .sc-popup > .scp-frame');
+}
+
+/**
+ * The corner radius the outline and the resting edge follow. A wrapper host has no radius of its own,
+ * so its square outline stood around the rounded popup and the corners read as broken: take the radius
+ * of the frame inside it instead.
+ */
+function cornerRadius(panel: HTMLElement): string {
+  const own = getComputedStyle(panel).borderRadius;
+  if (own && parseFloat(own) > 0) return own;
+  const frame = innerFrame(panel);
+  return (frame && getComputedStyle(frame).borderRadius) || own || '0';
+}
+
+/** Gives a square wrapper host the corners of the frame inside it, so the resting edge (an outline) is rounded too. */
+function matchFrameCorners(panel: HTMLElement): void {
+  const r = cornerRadius(panel);
+  if (parseFloat(r) > 0 && !(parseFloat(getComputedStyle(panel).borderRadius) > 0)) panel.style.borderRadius = r;
+}
+
+/**
  * `[scPopupMotion]` - the Vektor-Aufriss popup motion (concept 20261115-0215, round 2 `r2d2`).
  *
  * Open: a spark at the origin, a short light line grows out of it (the spark fades while it does),
@@ -549,7 +575,9 @@ export class ScPopupMotionDirective implements OnInit, OnDestroy {
     this.cancelRun();
     this.frame?.remove();
     this.frame = null;
-    (this.panelEl ?? this.host).classList.add('pmv-rest');
+    const panel = this.panelEl ?? this.host;
+    matchFrameCorners(panel);
+    panel.classList.add('pmv-rest');
     this.phase = 'open';
   }
 
@@ -676,7 +704,7 @@ export class ScPopupMotionDirective implements OnInit, OnDestroy {
     s.top = `${geo.rect.top}px`;
     s.width = `${geo.rect.width}px`;
     s.height = `${geo.rect.height}px`;
-    s.setProperty('--pmv-r', getComputedStyle(panel).borderRadius || '0');
+    s.setProperty('--pmv-r', cornerRadius(panel));
     const box = this.layer(frame, 'pmv-box');
     const glow = this.layer(box, 'pmv-glow');
     const wire = this.layer(box, 'pmv-wire');

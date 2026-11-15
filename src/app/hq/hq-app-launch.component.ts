@@ -108,7 +108,7 @@ const CONNECTED_HINT_MS = 2000;
       /* Bottom right; scToastSlot stacks it above a toast that is already up. Frame, rail and width come from sc-popup. */
       .toast {
         position: fixed; z-index: 1440;
-        inset-inline-end: var(--sc-fab-gutter, 16px);
+        inset-inline-end: var(--sc-toast-end, 24px);
         bottom: calc(var(--sc-toast-bottom, var(--sc-fab-clear-block, 80px)) + var(--sc-toast-offset, 0px));
       }
       .txt { font-size: max(0.88rem, var(--sc-fs-floor)); line-height: 1.4; color: var(--sc-fg-0); }

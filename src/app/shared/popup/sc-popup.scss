@@ -54,7 +54,11 @@
   border-radius: var(--sc-popup-radius, 6px);
   border-width: var(--sc-popup-border-w, 1px);
 }
-.sc-popup .scp-frame[data-kind='notice'] { --scp-w: var(--sc-toast-w); }
+.sc-popup .scp-frame[data-kind='notice'] {
+  --scp-w: var(--sc-toast-w);
+  /* Capped by the toast edge on both sides, so a phone toast lines up with the tray and the launcher column. */
+  inline-size: min(var(--scp-w), calc(100vw - 2 * var(--sc-toast-end, var(--sc-rand, 16px))));
+}
 
 /* r1-role: the top edge carries the role colour; the content stays in the normal colours. */
 .sc-popup .scp-frame[data-access] { border-top: 2px solid var(--scp-access); }
@@ -90,7 +94,7 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.sc-popup .scp-sym:has(> :not(.scp-sym-default)) .scp-sym-default { display: none; }
+.sc-popup .scp-sym:not(:has(> *)) { display: none; }
 .sc-popup .scp-ev {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
@@ -168,7 +172,17 @@
 }
 .sc-popup .scp-frame[data-kind='menu'] .scp-main { padding: 6px; }
 .sc-popup .scp-frame[data-kind='notice'] .scp-main { padding: 12px 14px; }
+/* The notice's mark sits on its first line (a 36 px action row), not in the corner above it. */
+.sc-popup .scp-frame[data-kind='notice'] .scp-rail { padding-top: 21px; }
 .sc-popup .scp-frame:is([data-kind='menu'], [data-kind='notice']) .scp-b { margin-top: 0; }
+
+/* ---- no symbol, no eyebrow: the rail is only the accent edge (no generic stand-in icon) ---- */
+.sc-popup .scp-frame .scp-rail:not(:has(.scp-sym > *, .scp-ev)) {
+  inline-size: 3px;
+  padding: 0;
+  border-inline-end-width: 0;
+  background: var(--sc-popup-rail);
+}
 
 /* ---- phone (the one overlay breakpoint): dialog, panel and large = full screen ---- */
 @media (max-width: 720px) {
