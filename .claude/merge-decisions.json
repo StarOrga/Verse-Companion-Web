@@ -236,6 +236,18 @@
         ]
       }
     ],
+    "public/i18n/de.json›starmap.comet›rule/ruleVersion/modeAria": [
+      {
+        "ship": "claude/focus-borders-starmap-4c0ef0",
+        "by": "JerryT2T",
+        "value": "±1 Tag, ein Ziel, kein Umschalter (Nutzerauftrag 2026-11-15)",
+        "decided": true,
+        "at": "2026-11-15T03:41:15.606Z",
+        "hunks": [
+          "945b49237638"
+        ]
+      }
+    ],
     "public/release-notes.json›current›version": [
       {
         "ship": "fix/kamera-welt-followups",
