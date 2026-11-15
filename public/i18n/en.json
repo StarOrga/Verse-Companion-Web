@@ -8613,8 +8613,10 @@
       "inventarBlueprint": "Blueprint \"{{name}}\" collected",
       "hangarOff": "\"{{name}}\" is out of your hangar",
       "hangarCopy": "You now have {{n}}× \"{{name}}\" in your hangar",
-      "ownWish": "\"{{name}}\" is yours – wish fulfilled",
-      "ownWishLeft": "\"{{name}}\" is yours – {{left}} more among your wishes"
+      "ownWish": "“{{name}}” is here",
+      "ownWishDetail": "Your wish has come true",
+      "ownWishLeft": "“{{name}}” is here",
+      "ownWishLeftDetail": "One wish has come true, {{left}} still to go"
     },
     "err": {
       "failed": "That did not work. Try again.",

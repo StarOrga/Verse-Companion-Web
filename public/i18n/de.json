@@ -8613,8 +8613,10 @@
       "inventarBlueprint": "Blaupause „{{name}}“ gesammelt",
       "hangarOff": "„{{name}}“ ist nicht mehr im Hangar",
       "hangarCopy": "„{{name}}“ ist jetzt {{n}}× im Hangar",
-      "ownWish": "„{{name}}“ ist da – Wunsch erfüllt",
-      "ownWishLeft": "„{{name}}“ ist da – noch {{left}} bei deinen Wünschen"
+      "ownWish": "„{{name}}“ ist da",
+      "ownWishDetail": "Dein Wunsch ist in Erfüllung gegangen",
+      "ownWishLeft": "„{{name}}“ ist da",
+      "ownWishLeftDetail": "Ein Wunsch ist in Erfüllung gegangen, {{left}} bleiben noch"
     },
     "err": {
       "failed": "Das hat nicht geklappt. Versuch es noch einmal.",
