@@ -149,8 +149,6 @@ describe('P4kHistoryComponent — admin actions ask in the app dialog', () => {
     );
     expect(svc.deleteBundle).not.toHaveBeenCalled();
   });
-
-});
 });
 
 describe('P4kHistoryComponent — per patch, leading, delete (B4.5)', () => {
