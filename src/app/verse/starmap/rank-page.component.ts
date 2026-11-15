@@ -14,6 +14,7 @@ import { type ConstellationRenderOptions, WALLPAPER_4K, downloadBlob, renderCons
 import { KartographCrestComponent } from './kartograph-crest.component';
 import { MyConstellationsComponent } from './my-constellations.component';
 import { SeriesStripComponent } from './series-strip.component';
+import { StarmapMiniComponent } from './starmap-mini.component';
 import { StarmapMoreComponent } from './starmap-more.component';
 import {
   RANK_TIER_AT,
@@ -21,8 +22,10 @@ import {
   TIER_REWARDS,
   WALLPAPER_PHONE,
   WALLPAPER_ULTRAWIDE,
+  buildTaskViews,
   defaultPatch,
   hasTierReward,
+  nextTask,
   rankNewsItems,
   rankProgressOf,
   readRankSeen,
@@ -86,10 +89,16 @@ export function rankWallpaperOptions(st: VerseExplorerState, first: VerseExplore
     SeriesStripComponent,
     StarmapMoreComponent,
     MyConstellationsComponent,
+    StarmapMiniComponent,
   ],
   template: `
     <sc-verse-header planet="starmap" [title]="'starmap.rankPage.title' | translate"
-                     [subtitle]="'starmap.rankPage.subtitle' | translate" [trail]="trail" />
+                     [subtitle]="'starmap.rankPage.subtitle' | translate" [trail]="trail">
+      @if (emblem(); as e) {
+        <!-- the current star map in outline, as on the star map page, instead of the generic planet -->
+        <sc-starmap-mini vhEmblem [points]="e.points" [tasks]="e.tasks" [next]="e.next" />
+      }
+    </sc-verse-header>
 
     @if (!signedIn()) {
       <section class="card note">
@@ -342,6 +351,13 @@ export class RankPageComponent {
   readonly first = computed(() => {
     const st = this.state();
     return st ? defaultPatch(st) : null;
+  });
+  /** The header emblem: the current patch's constellation with its lit stars. */
+  readonly emblem = computed(() => {
+    const p = this.first();
+    if (!p) return null;
+    const tasks = buildTaskViews(p);
+    return { points: p.constellation?.points, tasks, next: nextTask(tasks) };
   });
   readonly progress = computed(() => rankProgressOf(this.state()));
   readonly framed = computed(() => hasTierReward(this.progress().tier, 'frame'));
