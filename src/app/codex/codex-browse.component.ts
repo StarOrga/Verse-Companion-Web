@@ -1989,7 +1989,7 @@ export class CodexBrowseComponent implements OnInit {
     effect(() => {
       const n = this.activeFilterCount();
       const kind = this.kind();
-      if (seenFilters !== null && n > seenFilters) untracked(() => this.analytics.track('codex:filter_apply', { kind, filter_count: n }));
+      if (seenFilters !== null && n > seenFilters) untracked(() => this.analytics.track('codex:filter_change', { kind, filter_count: n }));
       seenFilters = n;
     });
     inject(DestroyRef).onDestroy(() => {

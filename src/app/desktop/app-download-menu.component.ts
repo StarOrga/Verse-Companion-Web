@@ -466,7 +466,7 @@ export class AppDownloadMenuComponent {
    * click (Ctrl/Cmd/Shift) opens its tab and leaves the menu open.
    */
   onDownload(ev: MouseEvent): void {
-    this.analytics.track('desktop:download_click', { app: this.product(), surface: 'menu' });
+    this.analytics.track('desktop:download_start', { app: this.product(), surface: 'menu' });
     if (!isPlainLeftClick(ev)) return;
     this.close();
   }

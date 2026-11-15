@@ -233,7 +233,7 @@ export class AppDownloadPanelComponent {
   /** Size + hash never take visible space — they live in the button tooltip. */
   trackDownload(): void {
     const app = this.app();
-    if (app) this.analytics.track('desktop:download_click', { app, surface: 'panel' });
+    if (app) this.analytics.track('desktop:download_start', { app, surface: 'panel' });
   }
 
   tooltip(e: AppDownloadEntry): string {

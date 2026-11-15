@@ -47,7 +47,7 @@ export class SccAppLauncherService {
    * A call while an attempt runs joins it (and its wait).
    */
   launch(waitMs = SCC_LAUNCH_WAIT_MS): Promise<boolean> {
-    if (!this.inflight) this.analytics.track('desktop:app_launch', { app: 'scc' });
+    if (!this.inflight) this.analytics.track('desktop:app_start', { app: 'scc' });
     this.inflight ??= this.attempt(waitMs).finally(() => {
       this.inflight = null;
     });

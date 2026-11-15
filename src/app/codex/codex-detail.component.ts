@@ -2319,7 +2319,7 @@ export class CodexDetailComponent implements OnInit {
       this.draftStore.reset();
     }
     this.holoView.set(next);
-    if (next) this.analytics.track('codex:holotable_open', { kind: this.kind() });
+    if (next) this.analytics.track('codex:holotable_open', { kind: this.kind() ?? 'unknown' });
     try {
       localStorage.setItem(CodexDetailComponent.HOLO_VIEW_STORAGE_KEY, next ? 'holo' : 'classic');
     } catch {

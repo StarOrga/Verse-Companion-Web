@@ -62,7 +62,7 @@ export const EVENTS = {
   'codex:section_view': ev<{ section: 'fps' | 'keybinds' | 'upcoming' | 'upcoming_entry' }>('codex', 'Ein Codex-Abschnitt abseits der Detailseiten wurde geöffnet.'),
   'codex:compare_start': ev<{ kind: string; count: number }>('codex', 'Der Vergleich wurde möglich: das zweite Objekt liegt im Vergleichsfach.'),
   'codex:holotable_open': ev<{ kind: string }>('codex', 'Der Holotisch einer Detailseite wurde bewusst eingeschaltet.'),
-  'codex:filter_apply': ev<{ kind: string; filter_count: number }>('codex', 'Im Codex-Index wurden Filter angewendet (Art, Anzahl aktiver Filter, nie die Werte).'),
+  'codex:filter_change': ev<{ kind: string; filter_count: number }>('codex', 'Im Codex-Index wurden Filter angewendet (Art, Anzahl aktiver Filter, nie die Werte).'),
   'codex:ship_link_create': ev<{ shipSlug: string }>('codex', 'Ein Codex-Schiff wurde mit einem Hangar-Schiff verknüpft.'),
   'codex:ship_link_remove': ev<{ shipSlug: string }>('codex', 'Die Verknüpfung eines Codex-Schiffs wurde gelöst.'),
   'codex:ship_link_update': ev<{ shipSlug: string }>('codex', 'Eine Schiffsverknüpfung wurde zur bevorzugten befördert.'),
@@ -128,8 +128,8 @@ export const EVENTS = {
   'feedback:reply_view': ev('feedback', 'Eine Antwort auf das eigene Feedback wurde gelesen.'),
 
   // --- desktop -----------------------------------------------------------
-  'desktop:download_click': ev<{ app: 'uploader' | 'starscape'; surface: string }>('desktop', 'Der Download eines Desktop-Programms wurde angeklickt.'),
-  'desktop:app_launch': ev<{ app: 'scc' }>('desktop', 'Ein Desktop-Programm wurde per Deep-Link aus dem Web gestartet.'),
+  'desktop:download_start': ev<{ app: 'uploader' | 'starscape'; surface: string }>('desktop', 'Der Download eines Desktop-Programms wurde angeklickt.'),
+  'desktop:app_start': ev<{ app: 'scc' }>('desktop', 'Ein Desktop-Programm wurde per Deep-Link aus dem Web gestartet.'),
   'desktop:apps_view': ev<{ app: 'hub' | 'uploader' | 'starscape' | 'extension' }>('desktop', 'Eine Seite der Programme (Hub, Uploader, Starscape, Erweiterung) wurde geöffnet.'),
 
   // --- admin -------------------------------------------------------------
