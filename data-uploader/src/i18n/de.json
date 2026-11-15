@@ -186,6 +186,8 @@
       "resumed": "Upload wird fortgesetzt…",
       "resumeLost": "Der Upload kann nicht fortgesetzt werden — die extrahierten Daten sind nicht mehr vorhanden.",
       "resumeLostHint": "Bitte den Upload verwerfen und die Extraktion erneut ausführen.",
+      "restartedAfterUpdate": "Ein Update hat die Metadaten-Extraktion geändert ({{list}}) — der unterbrochene Upload startet deshalb neu bei der Extraktion. Unveränderte Daten werden dabei übersprungen.",
+      "restartedUnknownOrigin": "Der unterbrochene Upload stammt von einer älteren Uploader-Version — er startet neu bei der Extraktion, damit keine gemischten Daten hochgeladen werden. Unveränderte Daten werden dabei übersprungen.",
       "discard": "Verwerfen",
       "discardConfirm": {
         "title": "Upload verwerfen?",
@@ -227,6 +229,8 @@
   },
   "update": {
     "available": "Update verfügbar: v{{version}} — wird im Hintergrund geladen…",
+    "installRunningTitle": "Update wird noch installiert",
+    "installRunningBody": "Der Data Uploader startet von selbst, sobald die Installation fertig ist.",
     "progress": "Update wird geladen: {{pct}}%",
     "downloaded": "Update v{{version}} ist geladen und kann installiert werden.",
     "install": "Jetzt installieren",

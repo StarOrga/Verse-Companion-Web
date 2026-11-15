@@ -4,6 +4,12 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.271.2] - 2026-11-15
+
+### Fixed
+- Data Uploader 0.81.5: an upload paused before an uploader update now restarts at the extraction when the update changed the metadata extraction, and only the silhouette or 3D step when just those changed — no more mix of old and new data on the server. Unchanged data is still skipped.
+- Data Uploader 0.81.5: opening the uploader while its update is still installing waits for the install and restarts by itself instead of failing with "No module named sc_extract".
+
 ## [0.271.1] - 2026-11-15
 
 ### Fixed
