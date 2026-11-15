@@ -237,7 +237,7 @@ const UPCOMING = 4;
                     @if (ev.undone) {
                       <span class="muted">{{ 'hq.log.undone' | translate }}</span>
                     } @else if (live.undoable(ev)) {
-                      <button type="button" class="btn" (click)="live.undo(ev.id)">{{ 'hq.log.undo' | translate }}</button>
+                      <button type="button" scAction tier="secondary" (click)="live.undo(ev.id)">{{ 'hq.log.undo' | translate }}</button>
                     }
                   </li>
                 }
@@ -251,7 +251,7 @@ const UPCOMING = 4;
     @if (live.toast(); as t) {
       <div #toast class="toast" role="status">
         <span class="text">{{ label(t).key | translate: label(t).params }}</span>
-        <button type="button" class="btn" (click)="live.undo(t.id)">{{ 'hq.log.undo' | translate }}</button>
+        <button type="button" scAction tier="secondary" (click)="live.undo(t.id)">{{ 'hq.log.undo' | translate }}</button>
       </div>
     }
 
@@ -326,8 +326,6 @@ const UPCOMING = 4;
       li { display: flex; align-items: center; gap: var(--sc-space-3, 12px); padding: 4px 0; border-bottom: 1px solid var(--sc-border); font-size: 0.85rem; }
       li.undone .text { text-decoration: line-through; color: var(--sc-fg-2); }
       .text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-      .btn { min-height: 32px; padding: 0 var(--sc-space-3, 12px); border-radius: var(--sc-radius, 10px); border: 1px solid var(--sc-border); background: transparent; color: var(--sc-fg); cursor: pointer; font: inherit; font-size: 0.8rem; }
-      .btn:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
       .toast {
         position: fixed; z-index: 50; left: 50%; transform: translateX(-50%); bottom: var(--sc-float-bottom, 16px);
         display: flex; align-items: center; gap: var(--sc-space-3, 12px); max-width: min(480px, calc(100vw - 2 * var(--sc-space-3, 12px)));
