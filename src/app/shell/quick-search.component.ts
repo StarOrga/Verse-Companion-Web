@@ -129,7 +129,9 @@ import { SearchOpenService } from './search-open.service';
       display: flex; align-items: center; gap: 10px; padding: 0 14px; border-radius: 8px;
       background: var(--sc-bg-0); border: 1px solid var(--sc-accent);
     }
-    .field:focus-within { box-shadow: 0 0 0 2px color-mix(in srgb, var(--sc-accent) 25%, transparent); }
+    /* Keyboard focus rings the field, not the bare input inside it; a click adds no frame. */
+    .field:has(.qs-input:focus-visible) { box-shadow: var(--sc-tab-ring); }
+    .qs-input:focus-visible { box-shadow: none; }
     .glyph { width: 20px; height: 20px; flex: none; color: var(--sc-accent); }
     .qs-input {
       flex: 1; min-width: 0; padding: 12px 0; background: transparent; border: 0; outline: none;

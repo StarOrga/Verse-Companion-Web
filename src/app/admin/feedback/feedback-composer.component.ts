@@ -535,7 +535,6 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
     .grow > .input:focus {
       outline: none;
       border-color: var(--sc-accent);
-      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.25);
     }
 
     /* The send row: attachment chips on the left (they grow into the gap),

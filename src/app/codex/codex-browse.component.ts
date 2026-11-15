@@ -687,7 +687,7 @@ export function blueprintCategoriesForGroup(
       font: inherit; font-size: max(13px, var(--sc-fs-input, 0px));
     }
     .ls-input::placeholder { color: var(--sc-fg-2); }
-    .ls-input:focus { outline: none; border-color: var(--sc-accent); box-shadow: var(--sc-glow); }
+    .ls-input:focus { outline: none; border-color: var(--sc-accent); }
     .ls-clear {
       position: absolute; right: 4px; width: 28px; height: 28px; border: 0; border-radius: 4px;
       background: transparent; color: var(--sc-fg-2); cursor: pointer; font: inherit; font-size: 12px;

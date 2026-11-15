@@ -450,7 +450,7 @@ const KEYBIND_URL_DEBOUNCE_MS = 300;
       background: var(--sc-bg-0); border: 1px solid var(--sc-border); color: var(--sc-fg-0);
       font-family: inherit; font-size: max(0.95rem, var(--sc-fs-input));
     }
-    .search:focus { outline: none; border-color: var(--sc-accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--sc-accent) 22%, transparent); }
+    .search:focus { outline: none; border-color: var(--sc-accent); }
     /* Admin-only tooling: the elevated-access red, never the viewer accent. */
     .assign-toggle {
       flex: 0 0 auto; padding: 10px 16px; border-radius: 10px; cursor: pointer; min-height: 48px;
