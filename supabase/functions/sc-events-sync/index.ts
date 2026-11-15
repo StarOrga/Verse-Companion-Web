@@ -15,7 +15,7 @@
 //   * Every run is logged in sc_events_scrape_runs (status, counts, changes,
 //     needs_review, error, parser_version) → sc_events_health().
 //   * AI is a fallback only: event-family title but no parseable dates, and only
-//     with ANTHROPIC_API_KEY / OPENAI_API_KEY / GROK_API_KEY set (that order). Accepts confidence >= 0.8 and
+//     with ANTHROPIC_API_KEY / OPENAI_API_KEY set (that order). Accepts confidence >= 0.8 and
 //     validated dates; otherwise the item is logged as needs_review.
 //   * Self-throttled (one run per 5 min) so the public URL cannot be used to
 //     hammer the wiki API. verify_jwt=false: pg_cron calls it with the
@@ -123,18 +123,16 @@ async function askAi(u: Unsure): Promise<AiVerdict | null> {
     }, AI_TIMEOUT_MS);
     return parseVerdict(res.content?.find((c) => c.type === 'text')?.text ?? '');
   }
-  const grok = Deno.env.get('GROK_API_KEY');
-  if (openai || grok) {
-    // xAI's API is OpenAI-compatible; GROK_API_KEY is already set for other functions.
-    const endpoint = openai ? 'https://api.openai.com/v1/chat/completions' : 'https://api.x.ai/v1/chat/completions';
-    const model = Deno.env.get('SC_EVENTS_AI_MODEL') ?? (openai ? 'gpt-4o-mini' : 'grok-3-mini');
-    const provider = openai ? 'openai' : 'xai';
+  if (openai) {
+    const endpoint = 'https://api.openai.com/v1/chat/completions';
+    const model = Deno.env.get('SC_EVENTS_AI_MODEL') ?? 'gpt-4o-mini';
+    const provider = 'openai';
     const started = Date.now();
     let res: { choices?: Array<{ message?: { content?: string } }>; usage?: { prompt_tokens?: number; completion_tokens?: number } };
     try {
       res = await fetchJson(endpoint, {
         method: 'POST',
-        headers: { 'content-type': 'application/json', authorization: `Bearer ${openai ?? grok}` },
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${openai}` },
         body: JSON.stringify({
           model,
           response_format: { type: 'json_object' },
@@ -158,7 +156,7 @@ async function askAi(u: Unsure): Promise<AiVerdict | null> {
 async function resolveUnsure(unsure: Unsure[], knownIds: Set<number>): Promise<{ candidates: Candidate[]; review: Array<Unsure & { ai?: string }> }> {
   const candidates: Candidate[] = [];
   const review: Array<Unsure & { ai?: string }> = [];
-  const hasKey = Boolean(Deno.env.get('ANTHROPIC_API_KEY') || Deno.env.get('OPENAI_API_KEY') || Deno.env.get('GROK_API_KEY'));
+  const hasKey = Boolean(Deno.env.get('ANTHROPIC_API_KEY') || Deno.env.get('OPENAI_API_KEY'));
   let calls = 0;
   for (const u of unsure) {
     if (knownIds.has(u.commLinkId)) continue; // already applied from this post earlier
