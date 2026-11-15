@@ -320,6 +320,16 @@
         "hunks": [
           "d28c55f926af"
         ]
+      },
+      {
+        "ship": "claude/popup-popout-animation-concepts-0f27ef",
+        "by": "Claude",
+        "value": "0.267.0 (this release supersedes 0.266.0)",
+        "decided": true,
+        "at": "2026-11-15T03:56:33.574Z",
+        "hunks": [
+          "001c225b3d56"
+        ]
       }
     ],
     "public/release-notes.json›root›current": [
