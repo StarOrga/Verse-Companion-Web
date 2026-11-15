@@ -56,10 +56,10 @@ const WIDE_RATIO = 1.5;
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (overlay()) {
-      <div class="root overlay" #root (click)="closed.emit()">
+      <!-- No close on a click beside the picture: the lightbox has its own ✕ (CLAUDE.md, popup-aufbau). -->
+      <div class="root overlay" #root>
         <div class="stage" role="dialog" aria-modal="true" scDialog scDialogInitialFocus="container"
-             (scDialogEscape)="closed.emit()" [attr.aria-label]="image().title || ('overlay.gallery.image' | translate)"
-             (click)="$event.stopPropagation()">
+             (scDialogEscape)="closed.emit()" [attr.aria-label]="image().title || ('overlay.gallery.image' | translate)">
           <ng-container *ngTemplateOutlet="inner" />
         </div>
       </div>

@@ -17,7 +17,7 @@ import { fileFinding, throttled, type Db } from '../_shared/guard-board.ts';
 import { pingProject, personalKey } from '../_shared/posthog-api.ts';
 import { captureServerException, withPosthog } from '../_shared/posthog.ts';
 import {
-  SERVICES, buildItemBody, canAutoCloseServiceItem, checkSignalSecret, fromDbHealth, nextHealth, serviceTransition, toDbHealth,
+  SERVICES, buildItemBody, canAutoCloseServiceItem, checkSignalSecret, fromDbHealth, httpFailureNote, nextHealth, serviceTransition, toDbHealth,
   type HealthRow, type ProbeResult, type ServiceName,
 } from '../_shared/posthog-guard.ts';
 
@@ -29,7 +29,9 @@ const EXPECTED_EVERY_SEC = 3600;
 async function http(url: string, init: RequestInit = {}, okIf: (s: number) => boolean = (s) => s >= 200 && s < 300): Promise<ProbeResult> {
   try {
     const res = await fetch(url, { ...init, signal: AbortSignal.timeout(10_000) });
-    return okIf(res.status) ? { ok: true } : { ok: false, note: `HTTP ${res.status}` };
+    if (okIf(res.status)) { await res.body?.cancel(); return { ok: true }; }
+    const body = await res.text().catch(() => '');
+    return { ok: false, note: httpFailureNote(res.status, body.slice(0, 4000)) };
   } catch (e) {
     return { ok: false, note: `nicht erreichbar (${(e as Error).name})` };
   }

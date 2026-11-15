@@ -180,9 +180,9 @@ describe('ShellComponent condensed header', () => {
     expect(fixture.componentInstance.menuOpen()).toBe(true);
   });
 
-  it('between the phone layout and 1180px the inline admin entries give way to the menu', ({ skip }) => {
+  it('between the phone layout and 1600px the inline admin entries give way to the menu', ({ skip }) => {
     setup(true);
-    if (!matchMedia('(min-width: 721px) and (max-width: 1179px)').matches) {
+    if (!matchMedia('(min-width: 721px) and (max-width: 1599px)').matches) {
       skip('the window is outside the folded range');
       return;
     }

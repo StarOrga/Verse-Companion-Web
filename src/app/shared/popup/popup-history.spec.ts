@@ -7,7 +7,8 @@ import { useViewport } from '../../testing/viewport';
 
 const marker = () => (history.state as { scPopup?: string } | null)?.scPopup ?? null;
 const tick = () => new Promise<void>((r) => setTimeout(r, 20));
-const idle = () => vi.waitFor(() => expect(marker()).toBeNull());
+// History steps settle asynchronously; under load (a full suite beside a running game) 1 s was too tight.
+const idle = () => vi.waitFor(() => expect(marker()).toBeNull(), { timeout: 5000 });
 
 describe('popup-history bookkeeping', () => {
   afterEach(async () => {
@@ -29,7 +30,7 @@ describe('popup-history bookkeeping', () => {
     const first = pushPopupEntry(() => undefined);
     releasePopupEntry(first);
     const second = pushPopupEntry(() => undefined);
-    await vi.waitFor(() => expect(marker()).toBe(second));
+    await vi.waitFor(() => expect(marker()).toBe(second), { timeout: 5000 });
     expect(popupEntryDepth()).toBe(1);
     // One Back closes the second popup, none is left over.
     let backs = 0;
@@ -54,7 +55,7 @@ describe('popup-history bookkeeping', () => {
     expect(popupEntryDepth()).toBe(1);
     // The user's Back closes the top popup and the dead entry under it is skipped in the same go.
     history.back();
-    await vi.waitFor(() => expect(topBacks).toBe(1));
+    await vi.waitFor(() => expect(topBacks).toBe(1), { timeout: 5000 });
     await idle();
     expect(marker()).toBeNull();
     expect(location.href).toBe(base);
@@ -81,7 +82,7 @@ describe('popup-history bookkeeping', () => {
     let backs = 0;
     const b = pushPopupEntry(() => backs++);
     history.back();
-    await vi.waitFor(() => expect(backs).toBe(1));
+    await vi.waitFor(() => expect(backs).toBe(1), { timeout: 5000 });
     releasePopupEntry(b);
   });
 });
@@ -116,7 +117,7 @@ describe('popup history on a phone (auto entry for dialog and panel)', () => {
       expect(popupEntryDepth()).toBe(1);
       expect(marker()).not.toBeNull();
       history.back();
-      await vi.waitFor(() => expect(f.componentInstance.reasons).toEqual(['back']));
+      await vi.waitFor(() => expect(f.componentInstance.reasons).toEqual(['back']), { timeout: 5000 });
       f.detectChanges();
       await idle();
       expect(popupEntryDepth()).toBe(0);

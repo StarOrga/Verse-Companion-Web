@@ -6,6 +6,8 @@ import { toErrorKey } from '../../core/describe-error';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { ScQtyStepperComponent } from '../../shared/qty-stepper/qty-stepper.component';
+import { ScSegmentedComponent, type ScSegmentOption } from '../../shared/segmented-control.component';
 import { type Einsatz, HqEinsatzService } from '../data/hq-einsatz.service';
 import { ScSelectComponent, type ScSelectOption } from '../../shared/sc-select.component';
 import { NachschubNamingService } from '../nachschub/nachschub-naming';
@@ -68,7 +70,7 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
 @Component({
   selector: 'sc-hq-nachschub-panel',
   standalone: true,
-  imports: [NgTemplateOutlet, TranslatePipe, FormsModule, ScActionDirective, ScSelectComponent, ScTooltipDirective, HqRouteGraphicComponent, HqEventSectionComponent, HqNachschubGatherComponent],
+  imports: [NgTemplateOutlet, TranslatePipe, FormsModule, ScActionDirective, ScSelectComponent, ScTooltipDirective, ScQtyStepperComponent, ScSegmentedComponent, HqRouteGraphicComponent, HqEventSectionComponent, HqNachschubGatherComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="panel" [attr.aria-label]="nachschub().name">
@@ -168,11 +170,8 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       @if (addOpen()) {
         <form class="ecard addform" ngNoForm (submit)="$event.preventDefault(); saveAdd()" [attr.aria-label]="'hq.einsatz.add.title' | translate">
           <h5 class="af-title">{{ 'hq.einsatz.add.title' | translate }}</h5>
-          <span class="seg" role="group" [attr.aria-label]="'hq.einsatz.add.kindAria' | translate">
-            @for (k of addKinds; track k) {
-              <button type="button" [attr.aria-pressed]="addKind() === k" (click)="addKind.set(k)">{{ 'hq.step.kind.' + k | translate }}</button>
-            }
-          </span>
+          <sc-segmented class="seg compact" variant="chips" [options]="addKindOptions" [value]="addKind()" [ariaLabel]="'hq.einsatz.add.kindAria' | translate"
+                        (valueChange)="addKind.set($any($event))" />
           <label class="af-field">
             <span>{{ ('hq.einsatz.add.what.' + addKind()) | translate }}</span>
             <input #addWhatInput type="text" class="af-input" [maxlength]="einsatzMax" [ngModel]="addWhat()" (ngModelChange)="addWhat.set($event)" name="what"
@@ -186,11 +185,8 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
             </span>
             <span class="af-field af-qty">
               <span>{{ 'hq.einsatz.add.qty' | translate }}</span>
-              <span class="stepper" role="group" [attr.aria-label]="'hq.einsatz.add.qty' | translate">
-                <button type="button" class="step" [disabled]="addQty() <= 1" [attr.aria-label]="'hq.flow.less' | translate" [scTooltip]="'hq.flow.less' | translate" scTooltipTier="label" (click)="addQty.set(addQty() - 1)">−</button>
-                <b class="mono">{{ addQty() }}</b>
-                <button type="button" class="step" [disabled]="addQty() >= 999" [attr.aria-label]="'hq.flow.more' | translate" [scTooltip]="'hq.flow.more' | translate" scTooltipTier="label" (click)="addQty.set(addQty() + 1)">+</button>
-              </span>
+              <sc-qty-stepper class="stepper" [value]="addQty()" [groupLabel]="'hq.einsatz.add.qty' | translate"
+                              [lessLabel]="'hq.flow.less' | translate" [moreLabel]="'hq.flow.more' | translate" (valueChange)="addQty.set($event)" />
             </span>
           </div>
           @if (addError(); as k) { <p class="eerr" role="alert">{{ k | translate }}</p> }
@@ -267,16 +263,8 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       .af-row { display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); align-items: flex-end; }
       .af-where { flex: 1 1 12rem; }
       .af-acts { display: flex; justify-content: flex-end; gap: var(--sc-space-2, 8px); flex-wrap: wrap; }
-      .seg { display: inline-flex; flex-wrap: wrap; align-self: flex-start; padding: 2px; border: 1px solid var(--sc-border); border-radius: 999px; }
-      .seg button { min-height: 28px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: var(--sc-fg-2); font: inherit; font-size: 0.78rem; cursor: pointer; }
-      .seg button[aria-pressed='true'] { color: var(--sc-fg); background: color-mix(in srgb, var(--sc-accent) 22%, transparent); box-shadow: 0 0 0 1px var(--sc-accent); }
-      .seg button:focus-visible, .step:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-      .stepper { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; }
-      .step { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-1); color: var(--sc-fg); font: inherit; cursor: pointer; }
-      .step:hover:not(:disabled) { border-color: var(--sc-accent); }
-      .step:disabled { opacity: 0.4; cursor: default; }
-      .stepper b { min-width: 3ch; text-align: center; }
-      @media (pointer: coarse) { .step { width: 44px; height: 44px; } .seg button { min-height: 44px; } .add-e { min-height: 48px; } }
+      .seg { align-self: flex-start; }
+      @media (pointer: coarse) { .add-e { min-height: 48px; } }
       .n-title { margin: 0; font-weight: 600; }
       .n-hint { margin: 0; color: var(--sc-fg-2); max-width: 52ch; }
       @media (max-width: 1023px) { .body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(220px, 1fr); } }
@@ -457,7 +445,8 @@ export class HqNachschubPanelComponent {
   // ------------------------------------------------------------------------------------------- guided "Einsatz hinzufügen"
 
   private readonly naming = inject(NachschubNamingService);
-  protected readonly addKinds: readonly AddKind[] = ['buy', 'mission', 'mine', 'pickup'];
+  protected readonly addKindOptions: readonly ScSegmentOption[] = (['buy', 'mission', 'mine', 'pickup'] as const satisfies readonly AddKind[])
+    .map((k) => ({ value: k, labelKey: 'hq.step.kind.' + k }));
   protected readonly placeOptions: readonly ScSelectOption[] = pickablePlaces().map((p) => ({ value: p.id, labelKey: '', label: [p.location, p.system].join(' · ') }));
   private readonly places = new Map(pickablePlaces().map((p) => [p.id, p] as const));
   protected readonly addOpen = signal(false);
