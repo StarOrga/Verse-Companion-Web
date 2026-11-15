@@ -144,6 +144,19 @@ describe('ShellComponent condensed header', () => {
     expect(document.activeElement).toBe(button());
   }));
 
+  it('Escape pressed on an entry (the scaffold frame consumes it) closes the menu and returns focus to its button', fakeAsync(() => {
+    setup(true);
+    button().click();
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+    items()[0].focus();
+    items()[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    fixture.detectChanges();
+    expect(el.querySelector('.admin-dropdown')).toBeNull();
+    expect(document.activeElement).toBe(button());
+  }));
+
   it('a plain click on an entry folds it away; a modified click opens a tab and leaves it open', () => {
     setup(true);
     button().click();
