@@ -24,6 +24,7 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { normalizeSheet, type EventSheet } from '../_shared/event-sheet.ts';
 import { callClaude } from '../_shared/ai-ledger.ts';
+import { effectiveForce } from './_force.ts';
 import {
   EXTRACTOR_MAJOR, EXTRACTOR_VERSION, MAX_LLM_CALLS_PER_RUN, SHEET_TOOL_NAME, SHEET_TOOL_SCHEMA,
   actorIdFor, bundleSources, buildPrompt, commLinkIdFromUrl, extractMeta, fillDatesFromCalendar, hashText, mergeSheets,
@@ -142,20 +143,21 @@ Deno.serve(withPosthog('sc-event-sheet', async (req) => {
   const body = (await req.json().catch(() => ({}))) as { eventId?: unknown; force?: unknown; backfill?: unknown };
   const targeted = typeof body.eventId === 'string' && body.eventId.length > 0 ? body.eventId : null;
   const backfill = !targeted && body.backfill === true;
-  const force = body.force === true;
 
-  // Targeted runs and backfill passes: the service-role key or a signed-in admin. The automatic mode needs no caller
-  // trust (throttled + capped).
-  if (targeted || backfill) {
+  // Targeted runs, backfill passes and `force`: the service-role key or a signed-in admin. The automatic mode needs no
+  // caller trust (throttled + capped); an unprivileged caller's `force` is silently ignored, not rejected.
+  let privileged = false;
+  if (targeted || backfill || body.force === true) {
     const auth = req.headers.get('authorization') ?? '';
-    let allowed = auth === `Bearer ${serviceKey}`;
-    if (!allowed && auth) {
+    privileged = auth === `Bearer ${serviceKey}`;
+    if (!privileged && auth) {
       const user = createClient(url, Deno.env.get('SUPABASE_ANON_KEY') ?? '', { global: { headers: { authorization: auth } }, auth: { persistSession: false } });
       const { data } = await user.rpc('is_admin');
-      allowed = data === true;
+      privileged = data === true;
     }
-    if (!allowed) return json({ error: 'forbidden' }, 403);
+    if (!privileged && (targeted || backfill)) return json({ error: 'forbidden' }, 403);
   }
+  const force = effectiveForce(body.force, privileged);
 
   const key = Deno.env.get('ANTHROPIC_API_KEY');
   if (!key) return json({ ok: true, runs: [], status: 'no_key' });

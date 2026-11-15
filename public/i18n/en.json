@@ -136,6 +136,7 @@
     "continueDiscord": "Continue with Discord",
     "inviteOnly": "Access is invite-only. Ask an admin to invite you.",
     "deniedInvite": "This account hasn't been invited yet. The site is invite-only — ask an admin to send you an invitation.",
+    "deniedSignup": "This account is not approved yet. Access is invite-only — request access first, then sign in again.",
     "unavailable": {
       "title": "We couldn't verify your access",
       "body": "Your profile could not be loaded just now — usually a brief hiccup right after signing in. You are still signed in.",
@@ -3895,6 +3896,13 @@
       "copyFailed": "Could not copy the link — copy it manually."
     },
     "people": {
+      "unapproved": "Not approved",
+      "unapprovedTip": "This account signed up on its own, was never approved and has no access to the app.",
+      "approve": "Approve",
+      "approveTitle": "Approve account?",
+      "approveConfirm": "Approve {{email}}? The account gets access to the app as a viewer; assign a higher role afterwards.",
+      "unapprovedOne": "{{n}} account not approved",
+      "unapprovedMany": "{{n}} accounts not approved",
       "title": "People",
       "subtitle": "Accounts and still-open invitations in one list. An invitation drops out of it the moment the address signs in.",
       "invitedPill": "Invited",

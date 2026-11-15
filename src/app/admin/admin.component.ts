@@ -6,7 +6,8 @@ import { SupabaseClientProvider } from '../core/supabase.client';
 import { useAutoRefresh } from '../core/auto-refresh';
 import { Role, RoleService } from '../auth/role.service';
 import { AuthService } from '../auth/auth.service';
-import { isDeleteBlocked, isProtectedAccount, isRoleChangeBlocked } from './admin-protection';
+import { isDeleteBlocked, isProtectedAccount, isRoleChangeBlocked, isUnapprovedAccount } from './admin-protection';
+import { AnalyticsService } from '../core/analytics.service';
 import { PeopleRow, mergePeopleRows } from './people-rows';
 import { ScDatePipe } from '../core/locale/sc-date.pipe';
 import { ScSelectComponent, ScSelectOption } from '../shared/sc-select.component';
@@ -62,6 +63,13 @@ interface AdminUserRow extends SuspensionFields {
    * still parses; `lastSeenAt()` falls back to the sign-in.
    */
   last_seen_at?: string | null;
+  /**
+   * `profiles.is_approved` / `approved_at` — added to the RPC by the sign-up-gate
+   * migration. Optional so a client running against a pre-migration DB still
+   * parses; a missing value counts as approved (`isUnapprovedAccount`).
+   */
+  is_approved?: boolean | null;
+  approved_at?: string | null;
 }
 
 /**
@@ -510,6 +518,17 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
           }
         </div>
 
+        @if (unapprovedCount() > 0) {
+          <p class="unapproved-note">
+            {{ (unapprovedCount() === 1 ? 'admin.people.unapprovedOne' : 'admin.people.unapprovedMany') | translate: { n: unapprovedCount() } }}
+          </p>
+        }
+        @if (approveMsg(); as m) {
+          <div class="invite-msg" [class.error]="m.kind === 'error'" [class.success]="m.kind === 'success'" role="status">
+            {{ m.key | translate: m.params }}
+          </div>
+        }
+
         <div class="sc-card table-scroll">
         <table class="table">
           <thead>
@@ -572,6 +591,11 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                       {{ 'admin.protected' | translate }}
                     </span>
                   }
+                  @if (isUnapproved(u)) {
+                    <span class="role-pill pending" tabindex="0" [scTooltip]="'admin.people.unapprovedTip' | translate">
+                      {{ 'admin.people.unapproved' | translate }}
+                    </span>
+                  }
                   @if (isUserSuspended(u)) {
                     <span class="role-pill suspended" [attr.tabindex]="u.suspension_reason ? 0 : null" [scTooltip]="u.suspension_reason ?? ''" scTooltipTier="label">
                       {{ 'admin.moderation.suspendedPill' | translate }}
@@ -588,7 +612,12 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                 <td class="c-stat" [attr.data-label]="'admin.col.since' | translate">{{ u.created_at | scDate }}</td>
                 <td class="c-stat" [attr.data-label]="'admin.col.lastSeen' | translate">{{ lastSeenAt(u) ? (lastSeenAt(u)! | scDate: 'datetime') : '—' }}</td>
                 <td class="actions">
-                  @if (u.role !== 'collaborator') {
+                  @if (isUnapproved(u)) {
+                    <button scAction tier="secondary" (click)="approveAccount(u)" [disabled]="busy()">
+                      {{ 'admin.people.approve' | translate }}
+                    </button>
+                  }
+                  @if (!isUnapproved(u) && u.role !== 'collaborator') {
                     <span class="tip-wrap" [scTooltip]="roleLockReason(u, 'collaborator')" scTooltipTier="label">
                       <button scAction tier="secondary"
                               (click)="setRole(u.id, 'collaborator')"
@@ -597,7 +626,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                       </button>
                     </span>
                   }
-                  @if (u.role !== 'admin') {
+                  @if (!isUnapproved(u) && u.role !== 'admin') {
                     <span class="tip-wrap" [scTooltip]="roleLockReason(u, 'admin')" scTooltipTier="label">
                       <button scAction tier="secondary"
                               (click)="setRole(u.id, 'admin')"
@@ -606,7 +635,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                       </button>
                     </span>
                   }
-                  @if (u.role !== 'viewer') {
+                  @if (!isUnapproved(u) && u.role !== 'viewer') {
                     <span class="tip-wrap" [scTooltip]="roleLockReason(u, 'viewer')" scTooltipTier="label">
                       <button scAction tier="secondary"
                               (click)="setRole(u.id, 'viewer')"
@@ -825,6 +854,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
     }
     /* The pill is the row's only explanation of what "Eingeladen" means. */
     .invited-row .role-pill.pending { cursor: help; }
+    .unapproved-note { margin: 0 0 8px; color: var(--sc-fg-2); font-size: var(--sc-fs-sm, 0.85rem); }
     .actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
     /* Phone: one card per person instead of a 900px row read by scrolling
@@ -1071,6 +1101,7 @@ export class AdminComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly translate = inject(TranslateService);
   private readonly dialog = inject(ScConfirmService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly users = signal<AdminUserRow[]>([]);
   readonly busy = signal(false);
@@ -1258,6 +1289,8 @@ export class AdminComponent implements OnInit {
   readonly inviteBusy = signal(false);
   /** i18n key (+ params), never raw text. */
   readonly inviteMsg = signal<AdminFlash | null>(null);
+  /** Outcome of "Freischalten" on a people-list row. */
+  readonly approveMsg = signal<AdminFlash | null>(null);
 
   // C7 — share-link copy state (separate toast so it doesn't clash with the
   // register form's own success/error message).
@@ -1765,6 +1798,45 @@ export class AdminComponent implements OnInit {
       await this.auth.signOut();
       return;
     }
+    await this.refresh();
+  }
+
+  isUnapproved(u: AdminUserRow): boolean {
+    return isUnapprovedAccount(u);
+  }
+
+  readonly unapprovedCount = computed(() => this.users().filter((u) => isUnapprovedAccount(u)).length);
+
+  /**
+   * Approves an account that signed up on its own and was never approved — the
+   * same `invite-user` call the register form makes, without a mail.
+   */
+  async approveAccount(u: AdminUserRow): Promise<void> {
+    const ok = await this.dialog.confirm({
+      titleKey: 'admin.people.approveTitle',
+      messageKey: 'admin.people.approveConfirm',
+      params: { email: u.email },
+      confirmKey: 'admin.people.approve',
+    });
+    if (!ok) return;
+    this.busy.set(true);
+    this.approveMsg.set(null);
+    const { data, error } = await this.sb.client.functions.invoke('invite-user', {
+      // Always as viewer: an unapproved row's role column was never a decision
+      // anybody made for an approved account. A higher role is a second, explicit step.
+      body: { email: u.email, role: 'viewer', sendInvite: false },
+    });
+    const payload = (data ?? {}) as RegisterResponse;
+    if (error || payload.error || payload.status !== 'approved_existing') {
+      const code = await readEdgeErrorCode(error, data);
+      logWarn('admin', 'approve account failed', { code, error, payload });
+      this.approveMsg.set({ kind: 'error', key: inviteErrorKey(code) });
+      this.busy.set(false);
+      return;
+    }
+    this.analytics.track('admin:user_accept', { source: 'people_list' });
+    this.approveMsg.set({ kind: 'success', key: 'admin.register.status.approved_existing', params: { email: u.email } });
+    this.busy.set(false);
     await this.refresh();
   }
 

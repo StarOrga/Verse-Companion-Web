@@ -204,6 +204,16 @@
         "value": "3151 tracked files"
       },
       {
+        "ship": "claude/user-security-gap-investigation-747d11",
+        "by": "JerryT2T",
+        "value": "generated file, regenerated with gen-project-map.mjs after the merge (count of the merged tree)",
+        "decided": true,
+        "at": "2026-11-15T23:03:55.783Z",
+        "hunks": [
+          "36ea5c0260bf"
+        ]
+      },
+      {
         "ship": "claude/website-focus-outline-f6427e",
         "by": "JerryT2T",
         "value": "regenerated on the merged tree (generated file, 3155 files)",

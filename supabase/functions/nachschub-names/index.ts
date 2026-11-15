@@ -55,6 +55,8 @@ Deno.serve(withPosthog('nachschub-names', async (req) => {
   });
   const { data: user, error } = await sb.auth.getUser();
   if (error || !user?.user) return json({ error: 'unauthorized' }, 401);
+  const { data: approved, error: apprErr } = await sb.rpc('is_approved');
+  if (apprErr || approved !== true) return json({ error: 'not_approved' }, 403);
 
   let body: unknown;
   try { body = await req.json(); } catch { return json({ error: 'invalid_body' }, 400); }
