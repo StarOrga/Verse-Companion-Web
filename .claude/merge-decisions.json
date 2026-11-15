@@ -522,6 +522,16 @@
         "hunks": [
           "ebf4fcc2e0ce"
         ]
+      },
+      {
+        "ship": "fix/rank-variants-scaction",
+        "by": "JerryT2T",
+        "value": "\"current\": \"0.270.4\" (regenerated from CHANGELOG)",
+        "decided": true,
+        "at": "2026-11-15T13:37:17.340Z",
+        "hunks": [
+          "b19bf63d5cc5"
+        ]
       }
     ],
     "public/release-notes.json›current›version": [
