@@ -4024,7 +4024,7 @@
     },
     "requests": {
       "title": "Einladungsanfragen",
-      "subtitle": "Bewerbungen von der Startseite. Annehmen registriert die E-Mail wie über das Formular unten — plus Einladungsmail: Der Link darin führt direkt auf die Seite, auf der sich die Person ihr eigenes Passwort setzt. Wir vergeben nie ein Passwort.",
+      "subtitle": "Bewerbungen von der Startseite. Annehmen registriert die E-Mail wie über das Einladen-Formular hinter dem + — plus Einladungsmail: Der Link darin führt direkt auf die Seite, auf der sich die Person ihr eigenes Passwort setzt. Wir vergeben nie ein Passwort.",
       "empty": "Keine offenen Anfragen.",
       "accept": "Annehmen",
       "decline": "Ablehnen",
@@ -4427,7 +4427,7 @@
     },
     "historyEyebrow": "Uploader",
     "build": {
-      "title": "Aktueller Build",
+      "title": "Neuestes Bundle",
       "since": "seit {{date}}",
       "quality": "Qualität {{q}}",
       "none": "Noch kein aktives Bundle."

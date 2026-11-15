@@ -4024,7 +4024,7 @@
     },
     "requests": {
       "title": "Access requests",
-      "subtitle": "Applications from the landing page. Accepting registers the email just like the form below — plus an invite mail whose link leads straight to the page where the person picks their own password. We never issue a password.",
+      "subtitle": "Applications from the landing page. Accepting registers the email just like the invite form behind the + — plus an invite mail whose link leads straight to the page where the person picks their own password. We never issue a password.",
       "empty": "No open requests.",
       "accept": "Accept",
       "decline": "Decline",
@@ -4427,7 +4427,7 @@
     },
     "historyEyebrow": "Uploader",
     "build": {
-      "title": "Current build",
+      "title": "Latest bundle",
       "since": "since {{date}}",
       "quality": "Quality {{q}}",
       "none": "No active bundle yet."
