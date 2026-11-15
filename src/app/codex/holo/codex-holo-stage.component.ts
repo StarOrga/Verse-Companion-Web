@@ -1966,7 +1966,8 @@ export class CodexHoloStageComponent {
         this.changeView.set('patch');
         this.patchChooser()?.toggle();
         break;
-      case 'view':
+      case 'view': {
+        const before = this.activeViewId();
         this.akteOpen.set(false);
         this.pickSurface(nextHoloSurface(this.surface(), {
           has3d: this.has3d(),
@@ -1974,7 +1975,10 @@ export class CodexHoloStageComponent {
           side: this.drawingAvailable(),
           front: this.frontAvailable(),
         }));
+        // A hotkey pick is a user choice too: the parent must not override it later (Akte default).
+        if (this.activeViewId() !== before) this.viewChange.emit(this.activeView());
         break;
+      }
     }
   }
 
