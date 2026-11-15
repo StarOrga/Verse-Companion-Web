@@ -60,7 +60,7 @@ interface WishLine {
           <sc-popup kind="panel" [title]="'quick.wish' | translate"
                     [returnFocus]="trigger" [backClose]="false" (closed)="close()">
           @if (cart.count() === 0) {
-            <sc-wish-empty (search)="searchWish()" />
+            <sc-wish-empty (searchWish)="searchWish()" />
           } @else {
           @for (l of lines(); track l.item.key) {
             <div class="qrow">

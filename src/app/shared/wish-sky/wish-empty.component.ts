@@ -9,7 +9,7 @@ const SEARCH = ['M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z', 'M15.5 15.5L20
 /**
  * `<sc-wish-empty>` - the empty state of the wishes, ONE piece for the header popout and the large window: the night
  * sky, the headline "Wünsch dir was", one sentence and the page's one primary action "Wunsch suchen" (search glyph
- * before the label, centred). The action only emits `search`; the host closes itself and opens the search through
+ * before the label, centred). The action only emits `searchWish`; the host closes itself and opens the search through
  * `SearchOpenService`. Nothing else stands in the popup while this shows: no footer, no second primary.
  */
 @Component({
@@ -22,7 +22,7 @@ const SEARCH = ['M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z', 'M15.5 15.5L20
       <sc-wish-sky />
       <p class="we-t">{{ 'cart.empty' | translate }}</p>
       <p class="we-x">{{ 'cart.emptyHint' | translate }}</p>
-      <button type="button" scAction tier="primary" class="we-go" (click)="search.emit()">
+      <button type="button" scAction tier="primary" class="we-go" (click)="searchWish.emit()">
         <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">@for (d of icon; track $index) { <path [attr.d]="d" /> }</svg>
         <span>{{ 'cart.emptyAction' | translate }}</span>
       </button>
@@ -41,5 +41,5 @@ const SEARCH = ['M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z', 'M15.5 15.5L20
 export class WishEmptyComponent {
   protected readonly icon = SEARCH;
   /** The action was pressed: the host closes itself and opens the search. */
-  readonly search = output<void>();
+  readonly searchWish = output<void>();
 }

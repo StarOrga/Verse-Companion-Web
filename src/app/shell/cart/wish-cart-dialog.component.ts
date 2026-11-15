@@ -45,7 +45,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       <svg popupIcon viewBox="0 0 24 24">@for (d of wishPath; track $index) { <path [attr.d]="d" /> }</svg>
       <div class="cart-body">
           @if (cart.count() === 0) {
-            <sc-wish-empty (search)="searchWish()" />
+            <sc-wish-empty (searchWish)="searchWish()" />
           } @else {
             <sc-wish-sky class="strip" variant="strip" />
             <div class="groups">
