@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.265.1] - 2026-11-15
+
+### Changed
+- Rank page: the header shows your current star map in outline, like the star map page, instead of the generic planet emblem.
+
 ## [0.265.0] - 2026-11-15
 
 ### Added
