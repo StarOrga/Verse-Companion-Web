@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScPopoverDismissDirective } from '../../shared/popover/sc-popover-dismiss.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { HoloDiffMarkerComponent } from './holo-diff-marker';
 
 /** A navigation target of the menu (router commands + query params). */
@@ -32,7 +33,7 @@ export interface HangarExemplar {
 @Component({
   selector: 'sc-codex-holo-hangar-menu',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, ScPopoverDismissDirective, HoloDiffMarkerComponent],
+  imports: [TranslatePipe, RouterLink, ScPopoverDismissDirective, HoloDiffMarkerComponent, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="hm" [scPopoverDismiss]="open()" (dismissed)="open.set(false)">
@@ -46,7 +47,8 @@ export interface HangarExemplar {
         <span class="car" aria-hidden="true">▾</span>
       </button>
       @if (open()) {
-        <div class="menu" id="holo-hangar-menu" role="menu" tabindex="-1" [attr.aria-label]="'codex.holo.hangar.menuAria' | translate" (keydown)="onMenuKey($event)">
+        <sc-popup class="menu" kind="menu" [backdrop]="false" [title]="'codex.holo.hangar.menuAria' | translate" (closed)="open.set(false)">
+        <div id="holo-hangar-menu" role="menu" tabindex="-1" [attr.aria-label]="'codex.holo.hangar.menuAria' | translate" (keydown)="onMenuKey($event)">
           <div class="gh" role="presentation">{{ 'codex.holo.hangar.loadouts' | translate }}</div>
           <a role="menuitemradio" class="row" [class.on]="activeId() === null" [attr.aria-checked]="activeId() === null"
              [routerLink]="werkLink().commands" [queryParams]="werkLink().queryParams" (click)="open.set(false)">
@@ -136,6 +138,7 @@ export interface HangarExemplar {
           }
           @if (errorKey(); as err) { <p class="err" role="alert">{{ err | translate }}</p> }
         </div>
+        </sc-popup>
       }
     </div>
   `,
@@ -153,11 +156,9 @@ export interface HangarExemplar {
     .hb .car { color: var(--sc-accent); font-size: 10px; }
     .hb:hover, .hb.open { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); border-color: var(--sc-accent); }
     .hb:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-    .menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; width: 290px; max-width: calc(100vw - 24px);
-      max-height: min(70vh, 560px); max-height: min(70dvh, 560px); overflow: auto; box-sizing: border-box;
-      display: flex; flex-direction: column; gap: 2px; padding: 8px;
-      border: 1px solid color-mix(in srgb, var(--sc-accent) 40%, var(--sc-border)); border-radius: 12px;
-      background: var(--sc-bg-1); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5); }
+    /* Anchored under its button; frame and width (menu tier) come from sc-popup. */
+    .menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; max-width: calc(100vw - 24px); }
+    [role='menu'] { display: flex; flex-direction: column; gap: 2px; max-height: min(70dvh, 560px); overflow: auto; }
     .gh { padding: 4px 10px 2px; font-size: max(9px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); }
     hr { width: 100%; margin: 6px 0; border: 0; border-top: 1px solid var(--sc-border); }
     .row, .add, .go, .act { display: flex; align-items: flex-start; gap: 9px; width: 100%; box-sizing: border-box; min-height: 32px; padding: 7px 10px;

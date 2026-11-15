@@ -21,6 +21,8 @@ import {
   humanizeClassName,
   rowHasDifferences,
 } from './codex-format';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 
 interface PinnedRef {
@@ -39,7 +41,7 @@ interface PinnedRef {
 @Component({
   selector: 'sc-codex-compare-tray',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, ScTooltipDirective, ScPopupMotionDirective],
+  imports: [RouterLink, TranslatePipe, ScTooltipDirective, ScPopupComponent, ScActionDirective, ScPopupMotionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (refs().length > 0) {
@@ -69,52 +71,53 @@ interface PinnedRef {
             {{ 'codex.compare.mixedKind' | translate: { kind: ('codex.kindSingular.' + rk) | translate } }}
           </p>
         }
+      </aside>
 
-        @if (open() && refs().length >= 2) {
-          <div class="panel" scPopupMotion="panel" scPopupMotionRows=".cmp tbody tr" animate.leave="pm-out">
+      @if (open() && refs().length >= 2) {
+        <!-- Outside the aside on purpose: the tray is centred with a transform, which would
+             make a fixed child position against the tray instead of the viewport. -->
+        <sc-popup kind="large" [title]="'codex.compare.tray' | translate: { count: refs().length }"
+                  [eyebrow]="'codex.kindSingular.' + refs()[0].kind | translate"
+                  scPopupMotion="large" scPopupMotionPlate=".scp-frame" scPopupMotionRows=".cmp tbody tr" animate.leave="pm-out"
+                  (closed)="open.set(false)">
+          <div class="panel">
             @if (loading()) {
               <p class="muted">{{ 'codex.results.loading' | translate }}</p>
             } @else {
-              <div class="panel-tools">
-                <button type="button" class="diff-toggle" [class.on]="diffOnly()" (click)="toggleDiffOnly()"
-                        [attr.aria-pressed]="diffOnly()">
-                  {{ (diffOnly() ? 'codex.compare.showAll' : 'codex.compare.diffOnly') | translate }}
-                </button>
-              </div>
               <table class="cmp">
                 <thead>
-                  <tr>
-                    <th class="rowhead">{{ 'codex.compare.property' | translate }}</th>
-                    @for (c of columns(); track c.key) {
-                      <th>
-                        <a [routerLink]="['/codex', c.kind, c.className]" class="col-link">{{ c.name }}</a>
-                        <span class="col-kind">{{ ('codex.kindSingular.' + c.kind) | translate }}</span>
-                      </th>
-                    }
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (g of groupedRows(); track g.group) {
-                    <tr class="grp">
-                      <td [attr.colspan]="columns().length + 1">{{ ('codex.statGroup.' + g.group) | translate }}</td>
-                    </tr>
-                    @for (row of g.rows; track row.id) {
-                      <tr>
-                        <td class="rowhead">{{ row.labelKey ? (row.labelKey | translate) : row.label }}</td>
-                        @for (v of row.values; track $index) {
-                          <td [class.na]="v === null"
-                              [class.best]="row.highlight[$index] === 'best'"
-                              [class.worst]="row.highlight[$index] === 'worst'">
-                            <span class="cell-val">{{ v === null ? '—' : v }}</span>
-                            @if (row.barPct[$index] !== null) {
-                              <span class="delta-bar" aria-hidden="true"><span class="delta-fill" [style.width.%]="row.barPct[$index]"></span></span>
-                            }
-                          </td>
-                        }
-                      </tr>
-                    }
+                <tr>
+                  <th class="rowhead">{{ 'codex.compare.property' | translate }}</th>
+                  @for (c of columns(); track c.key) {
+                    <th>
+                      <a [routerLink]="['/codex', c.kind, c.className]" class="col-link">{{ c.name }}</a>
+                      <span class="col-kind">{{ ('codex.kindSingular.' + c.kind) | translate }}</span>
+                    </th>
                   }
-                </tbody>
+                </tr>
+              </thead>
+              <tbody>
+                @for (g of groupedRows(); track g.group) {
+                  <tr class="grp">
+                    <td [attr.colspan]="columns().length + 1">{{ ('codex.statGroup.' + g.group) | translate }}</td>
+                  </tr>
+                  @for (row of g.rows; track row.id) {
+                    <tr>
+                      <td class="rowhead">{{ row.labelKey ? (row.labelKey | translate) : row.label }}</td>
+                      @for (v of row.values; track $index) {
+                        <td [class.na]="v === null"
+                            [class.best]="row.highlight[$index] === 'best'"
+                            [class.worst]="row.highlight[$index] === 'worst'">
+                          <span class="cell-val">{{ v === null ? '—' : v }}</span>
+                          @if (row.barPct[$index] !== null) {
+                            <span class="delta-bar" aria-hidden="true"><span class="delta-fill" [style.width.%]="row.barPct[$index]"></span></span>
+                          }
+                        </td>
+                      }
+                    </tr>
+                  }
+                }
+              </tbody>
               </table>
               @if (tableRows().length === 0) {
                 <p class="muted">{{ 'codex.compare.noCommon' | translate }}</p>
@@ -123,8 +126,13 @@ interface PinnedRef {
               }
             }
           </div>
-        }
-      </aside>
+          <ng-container popupActions>
+            <button scAction type="button" [class.on]="diffOnly()" (click)="toggleDiffOnly()" [attr.aria-pressed]="diffOnly()">
+              {{ (diffOnly() ? 'codex.compare.showAll' : 'codex.compare.diffOnly') | translate }}
+            </button>
+          </ng-container>
+        </sc-popup>
+      }
     }
   `,
   styles: [`
@@ -160,7 +168,7 @@ interface PinnedRef {
     .clear { margin-left: auto; padding: 5px 12px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-border); color: var(--sc-fg-2); font-family: inherit; font-size: max(0.74rem, var(--sc-fs-floor)); cursor: pointer; }
     .clear:hover { color: var(--sc-accent); border-color: var(--sc-accent); }
 
-    .panel { border-top: 1px solid var(--sc-border); padding: 12px 14px; max-height: min(60vh, 460px); overflow: auto; }
+    .panel { min-width: 0; }
     .muted { color: var(--sc-fg-2); margin: 0; font-size: 0.84rem; }
     .cmp { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
     .cmp th, .cmp td { padding: 6px 10px; text-align: left; border-bottom: 1px solid color-mix(in srgb, var(--sc-border) 60%, transparent); white-space: nowrap; }
@@ -181,16 +189,10 @@ interface PinnedRef {
     .delta-fill { display: block; height: 100%; border-radius: 999px;
       background: color-mix(in srgb, var(--sc-accent) 65%, transparent); }
     td.best .delta-fill { background: #5fd698; }
-    .panel-tools { display: flex; justify-content: flex-end; margin: 0 0 8px; }
-    .diff-toggle { padding: 4px 12px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-border);
-      color: var(--sc-fg-2); font-family: inherit; font-size: max(0.72rem, var(--sc-fs-floor)); cursor: pointer; }
-    .diff-toggle:hover, .diff-toggle.on { color: var(--sc-accent); border-color: var(--sc-accent); }
     .reject { margin: 0; padding: 6px 14px 10px; font-size: max(0.74rem, var(--sc-fs-floor)); color: var(--sc-warning, #ffc14d); }
 
     /* Phone: collapsed, the tray runs from the left edge up to the launcher's
-       lane instead of centring across it. Expanded, it becomes a bottom sheet
-       sized to the dynamic viewport (the URL bar does not eat its last rows);
-       the panel's bottom padding lets the last row scroll above the launcher. */
+       lane instead of centring across it. The expanded comparison is an sc-popup. */
     @media (max-width: 720px) {
       .tray {
         left: 8px; right: var(--sc-fab-clear-inline); transform: none;
@@ -204,16 +206,6 @@ interface PinnedRef {
       .chip { flex: 0 0 auto; padding-block: 0; }
       .chip-link { max-width: 160px; display: inline-flex; align-items: center; }
       .toggle, .clear { padding-inline: 10px; }
-      .tray.expanded {
-        left: 0; right: 0; bottom: 0;
-        border-radius: 12px 12px 0 0; border-bottom-width: 0;
-        padding-bottom: var(--sc-safe-bottom);
-      }
-      .tray.expanded .panel {
-        max-height: calc(100vh - 180px);
-        max-height: calc(100dvh - 180px);
-        padding-bottom: calc(var(--sc-fab-size) + var(--sc-fab-gutter) * 2);
-      }
     }
   `],
 })

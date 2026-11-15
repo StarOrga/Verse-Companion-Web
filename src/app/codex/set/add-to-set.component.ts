@@ -15,7 +15,7 @@ import { AuthService } from '../../auth/auth.service';
 import { HangarService } from '../../hangar/hangar.service';
 import { HangarRoleLoadout } from '../../hangar/hangar.types';
 import { CodexService } from '../codex.service';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { FpsSetPiece, fittingSlots } from './fps-set-fit';
 
 /** What the popover shows — one step of the "add to set" flow at a time. */
@@ -38,7 +38,7 @@ export type AddToSetView = 'loading' | 'error' | 'noSet' | 'noFit' | 'pickSet' |
 @Component({
   selector: 'sc-add-to-set',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, ScDialogDirective],
+  imports: [RouterLink, TranslatePipe, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'sc-add-to-set',
@@ -53,10 +53,8 @@ export type AddToSetView = 'loading' | 'error' | 'noSet' | 'noFit' | 'pickSet' |
       <span aria-hidden="true">+</span> {{ 'fps.addToSet.trigger' | translate }}
     </button>
     @if (open()) {
-      <div class="ats-pop sc-card" role="dialog"
-           [attr.aria-label]="'fps.addToSet.dialogAria' | translate: { item: itemName() }"
-           scDialog [scDialogModal]="false" [scDialogReturnFocus]="trigger"
-           (scDialogEscape)="close()">
+      <sc-popup class="ats-pop" kind="panel" [title]="'fps.addToSet.trigger' | translate" [eyebrow]="itemName()"
+                [returnFocus]="trigger" (closed)="close()">
         @switch (view()) {
           @case ('loading') {
             <p class="ats-text" role="status">{{ 'fps.addToSet.loading' | translate }}</p>
@@ -122,8 +120,7 @@ export type AddToSetView = 'loading' | 'error' | 'noSet' | 'noFit' | 'pickSet' |
         } @else if (conflict()) {
           <p class="ats-text ats-note" role="status">{{ 'fps.equip.changedElsewhere' | translate }}</p>
         }
-        <button type="button" class="ats-close" (click)="close()">{{ 'fps.addToSet.close' | translate }}</button>
-      </div>
+      </sc-popup>
     }
   `,
   styles: [`
@@ -138,16 +135,8 @@ export type AddToSetView = 'loading' | 'error' | 'noSet' | 'noFit' | 'pickSet' |
     }
     .ats-trigger:hover, .ats-trigger[aria-expanded='true'] { border-color: var(--sc-accent); color: var(--sc-accent); }
     .ats-trigger:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-    .ats-pop {
-      position: absolute; top: calc(100% + 6px); left: 0; z-index: 20;
-      display: flex; flex-direction: column; gap: 8px;
-      width: min(300px, calc(100vw - 32px)); box-sizing: border-box;
-      padding: 12px; margin: 0;
-      background: var(--sc-bg-1);
-      border-color: color-mix(in srgb, var(--sc-accent) 45%, var(--sc-border));
-      box-shadow: 0 8px 28px color-mix(in srgb, black 50%, transparent);
-    }
-    .ats-pop:focus { outline: none; }
+    /* Anchored under its trigger; frame, ✕ and width come from sc-popup. */
+    .ats-pop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 20; }
     .ats-head { margin: 0; font-family: var(--sc-font-display); text-transform: uppercase; letter-spacing: 0.08em;
       font-size: max(0.68rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     .ats-text { margin: 0; color: var(--sc-fg-1); font-size: max(0.84rem, var(--sc-fs-floor)); }
@@ -175,12 +164,6 @@ export type AddToSetView = 'loading' | 'error' | 'noSet' | 'noFit' | 'pickSet' |
     }
     .ats-link:hover, .ats-link:focus-visible { text-decoration: underline; }
     .ats-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-    .ats-close {
-      align-self: flex-end; padding: 4px 10px; border-radius: 6px; cursor: pointer;
-      border: 1px solid transparent; background: transparent; color: var(--sc-fg-2);
-      font-family: inherit; font-size: max(0.76rem, var(--sc-fs-floor)); min-height: var(--sc-tap-min);
-    }
-    .ats-close:hover, .ats-close:focus-visible { color: var(--sc-accent); border-color: var(--sc-border); }
     @media (pointer: coarse) {
       .ats-trigger { min-height: max(44px, var(--sc-tap-min)); }
     }

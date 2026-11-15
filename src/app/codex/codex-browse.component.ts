@@ -40,7 +40,7 @@ import {
 import { UpcomingShip, UpcomingShipsService, upcomingRoleLabel } from './upcoming-ships.service';
 import { HoloSilhouette, SilhouetteKind } from './holo-silhouette';
 import { OverlayOriginService } from '../shared/overlay-frame/overlay-origin.service';
-import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import { reloadOnBuildRefresh } from './build-refresh.util';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -185,7 +185,7 @@ export function blueprintCategoriesForGroup(
 @Component({
   selector: 'sc-codex-browse',
   standalone: true,
-  imports: [CompareIconComponent, ItemPathComponent, NgTemplateOutlet, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexCategoryIconComponent, CodexStatusBannerComponent, ScSegmentedComponent, ScSelectComponent, ScTooltipDirective, ScActionDirective, CodexDidYouMeanComponent, PageHeaderComponent, CodexSearchTriggerComponent, ScDialogDirective],
+  imports: [CompareIconComponent, ItemPathComponent, NgTemplateOutlet, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexCategoryIconComponent, CodexStatusBannerComponent, ScSegmentedComponent, ScSelectComponent, ScTooltipDirective, ScActionDirective, CodexDidYouMeanComponent, PageHeaderComponent, CodexSearchTriggerComponent, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="browse" [class.pm-on]="enter()" [class.pm-hold]="!go()">
@@ -462,29 +462,25 @@ export function blueprintCategoriesForGroup(
         </div>
       </div>
 
-      <!-- Phones, legacy shell only: the facets live in a bottom sheet behind one button. With the
+      <!-- Phones, legacy shell only: the facets live in a panel popup (full screen on phones) behind one button. With the
            beta shell the bar's own filter panel carries every facet (d-filter = bar). -->
       @if (!shellOn()) {
         <button type="button" class="filter-fab" (click)="filtersOpen.set(true)" [attr.aria-expanded]="filtersOpen()">
           {{ 'codex.browse.filterButton' | translate: { count: activeFilterCount() } }}
         </button>
         @if (filtersOpen()) {
-          <div class="sheet-backdrop" aria-hidden="true"></div>
-          <div class="sheet" scDialog role="dialog" aria-modal="true"
-               [attr.aria-label]="'codex.browse.filtersAria' | translate"
-               (scDialogEscape)="filtersOpen.set(false)">
-            <div class="sheet-head">
-              <strong>{{ 'codex.browse.filtersTitle' | translate }}</strong>
-              <button type="button" class="sheet-close" (click)="filtersOpen.set(false)"
-                      [attr.aria-label]="'codex.browse.closeFilters' | translate"
-                      [scTooltip]="'codex.browse.closeFilters' | translate" scTooltipTier="label">✕</button>
+          <sc-popup kind="panel" [modal]="true" [title]="'codex.browse.filtersTitle' | translate"
+                    (closed)="filtersOpen.set(false)">
+            <div class="sheet-body">
+              <ng-container [ngTemplateOutlet]="treeTpl" />
+              @if (!isUpcoming()) { <div class="sheet-filters"><ng-container [ngTemplateOutlet]="filtersTpl" /></div> }
             </div>
-            <ng-container [ngTemplateOutlet]="treeTpl" />
-            @if (!isUpcoming()) { <div class="sheet-filters"><ng-container [ngTemplateOutlet]="filtersTpl" /></div> }
-            <button type="button" class="sheet-done" (click)="filtersOpen.set(false)">
-              {{ 'codex.browse.showResults' | translate: { count: listTotal() } }}
-            </button>
-          </div>
+            <ng-container popupActions>
+              <button scAction tier="primary" type="button" (click)="filtersOpen.set(false)">
+                {{ 'codex.browse.showResults' | translate: { count: listTotal() } }}
+              </button>
+            </ng-container>
+          </sc-popup>
         }
       }
 
@@ -808,13 +804,13 @@ export function blueprintCategoriesForGroup(
     .to-plan:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
     .more-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-top: 1px solid var(--sc-border); }
     .showing { font-size: 12px; color: var(--sc-fg-2); }
-    .load-more, .reset-all, .sheet-done {
+    .load-more, .reset-all {
       min-height: max(36px, var(--sc-tap-min, 0px)); padding: 6px 16px; border-radius: 6px; cursor: pointer; font: inherit;
       border: 1px solid var(--sc-accent); background: transparent; color: var(--sc-accent);
     }
-    .load-more:hover, .reset-all:hover, .sheet-done:hover { background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
+    .load-more:hover, .reset-all:hover { background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
     .load-more:disabled { opacity: .6; cursor: default; }
-    .load-more:focus-visible, .reset-all:focus-visible, .sheet-done:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .load-more:focus-visible, .reset-all:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
     .empty { padding: 24px 14px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; color: var(--sc-fg-1); }
     .empty p { margin: 0; }
     .also { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
@@ -831,7 +827,8 @@ export function blueprintCategoriesForGroup(
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font: inherit; }
     .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
 
-    .filter-fab, .sheet, .sheet-backdrop { display: none; }
+    .filter-fab { display: none; }
+    .sheet-body { display: flex; flex-direction: column; gap: 14px; }
     @media (pointer: coarse) {
       .acts .act { opacity: 1; }
       .side-h, .node-ct { font-size: 12px; }
@@ -854,18 +851,6 @@ export function blueprintCategoriesForGroup(
       }
       .filter-fab:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
       .browse { padding-bottom: calc(var(--sc-fab-clear-block) + 24px); }
-      .sheet-backdrop { display: block; position: fixed; inset: 0; z-index: 40; background: color-mix(in srgb, var(--sc-bg-0) 60%, transparent); }
-      .sheet {
-        display: flex; flex-direction: column; gap: 14px; position: fixed; z-index: 41; left: 0; right: 0; bottom: 0;
-        max-height: 85vh; max-height: 85dvh; overflow-y: auto; padding: 16px 16px calc(16px + var(--sc-safe-bottom, 0px));
-        background: var(--sc-bg-1); border-top: 1px solid var(--sc-border); border-radius: 14px 14px 0 0;
-      }
-      .sheet-head { display: flex; align-items: center; justify-content: space-between; }
-      .sheet-close {
-        width: 44px; height: 44px; border-radius: 8px; border: 1px solid var(--sc-border); background: transparent;
-        color: var(--sc-fg-1); cursor: pointer; font: inherit;
-      }
-      .sheet-close:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
       .node { min-height: 44px; }
       .node-tog { width: 44px; min-height: 44px; }
     }

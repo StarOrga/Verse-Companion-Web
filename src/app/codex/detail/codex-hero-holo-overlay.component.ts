@@ -7,8 +7,7 @@ import type { AssetPackageRow } from '../asset-package/asset-package.model';
 import { ShipSkinViewerComponent } from '../ship-skin-viewer.component';
 import type { HardpointPortRef } from '../hardpoint-port-ref';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
-import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { logWarn } from '../../core/log';
 
 /**
@@ -29,25 +28,13 @@ import { logWarn } from '../../core/log';
 @Component({
   selector: 'sc-codex-hero-holo-overlay',
   standalone: true,
-  imports: [TranslatePipe, AssetPackageViewerComponent, ShipSkinViewerComponent, ScActionDirective, ScTooltipDirective, ScDialogDirective],
+  imports: [TranslatePipe, AssetPackageViewerComponent, ShipSkinViewerComponent, ScActionDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.full]': 'full()' },
   template: `
-    <section class="hho sc-card" scDialog [scDialogModal]="false" [attr.role]="full() ? 'dialog' : 'region'"
-             [attr.aria-label]="'codex.detail.holoOverlay.label' | translate: { name: displayName() }"
-             (scDialogEscape)="onEscape()">
-      <div class="hho-bar">
-        <button type="button" scAction tier="secondary" class="hho-full" [attr.aria-pressed]="full()"
-                (click)="toggleFull()">
-          {{ (full() ? 'codex.detail.holoOverlay.exitFullscreen' : 'codex.detail.holoOverlay.fullscreen') | translate }}
-        </button>
-        <button type="button" scAction tier="tertiary" class="hho-close"
-                [attr.aria-label]="'codex.detail.holoOverlay.close' | translate"
-                [scTooltip]="'codex.detail.holoOverlay.close' | translate" scTooltipTier="label"
-                (click)="closed.emit()">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-        </button>
-      </div>
+    <sc-popup kind="panel" [title]="displayName()"
+              initialFocus="container"
+              (closed)="onClosed($event)">
       <div class="hho-stage">
         @defer (on immediate) {
           @if (packageRow(); as row) {
@@ -66,24 +53,24 @@ import { logWarn } from '../../core/log';
           <div class="hho-viewer is-placeholder" aria-hidden="true"></div>
         }
       </div>
-    </section>
+      <ng-container popupActions>
+        <button type="button" scAction tier="secondary" class="hho-full" [attr.aria-pressed]="full()" (click)="toggleFull()">
+          {{ (full() ? 'codex.detail.holoOverlay.exitFullscreen' : 'codex.detail.holoOverlay.fullscreen') | translate }}
+        </button>
+      </ng-container>
+    </sc-popup>
   `,
   styles: [`
     /* Covers its positioned parent (the hero picture + the ownership card). */
     :host { position: absolute; inset: 0; z-index: 5; display: block; }
     /* Fullscreen: the same panel, filling the viewport (dvh after its vh fallback). */
     :host(.full) { position: fixed; inset: 0; z-index: 1000; height: 100vh; height: 100dvh; }
-    .hho { position: relative; width: 100%; height: 100%; box-sizing: border-box; margin: 0;
-      display: flex; flex-direction: column; overflow: hidden; padding: 0;
-      background: var(--sc-bg-1); border: 1px solid color-mix(in srgb, var(--sc-accent) 40%, var(--sc-border));
-      box-shadow: 0 12px 32px color-mix(in srgb, var(--sc-bg-0) 70%, transparent); }
-    :host(.full) .hho { border-radius: 0; border-width: 0; }
-    .hho:focus { outline: none; }
-    .hho:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
-    .hho-bar { position: absolute; top: 8px; inset-inline-end: 8px; z-index: 2;
-      display: flex; align-items: center; gap: 6px; }
-    .hho-close svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-    .hho-stage { position: relative; flex: 1 1 auto; min-height: 0; }
+    sc-popup { display: block; height: 100%; }
+    /* overlay-size: exception - the 3D panel fills its positioned parent (hero picture + ownership card), the host decides its size. */
+    :host ::ng-deep .scp-frame { inline-size: 100%; block-size: 100%; max-block-size: none; }
+    :host(.full) ::ng-deep .scp-frame { border-radius: 0; border-width: 0; }
+    :host ::ng-deep .scp-b { display: flex; flex-direction: column; margin-top: 8px; overflow: hidden; }
+    .hho-stage { position: relative; flex: 1 1 auto; min-height: 200px; }
     .hho-viewer { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
     .hho-viewer.is-placeholder { background: radial-gradient(ellipse at 50% 60%,
       color-mix(in srgb, var(--sc-accent) 12%, transparent), transparent 70%); }
@@ -155,6 +142,12 @@ export class CodexHeroHoloOverlayComponent {
       if (port) chain.push(port);
     }
     this.partPicked.emit({ ...sel, portChain: chain });
+  }
+
+  /** Escape steps back one level (fullscreen → panel → closed); the X and the back gesture close. */
+  onClosed(reason: 'close' | 'escape' | 'back'): void {
+    if (reason === 'escape') this.onEscape();
+    else this.closed.emit();
   }
 
   /** Escape steps back one level: fullscreen → panel, panel → closed. */
