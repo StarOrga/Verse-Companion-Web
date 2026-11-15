@@ -540,6 +540,20 @@
           "6dea0a6d8a00",
           "f820f08a9e90"
         ]
+      },
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "regenerated from the merged tree (generated file)",
+        "decided": true,
+        "at": "2026-11-15T05:27:23.865Z",
+        "hunks": [
+          "9dfd63747e70",
+          "f3997d770056",
+          "7520f3f77ce0",
+          "a66f6dd4a918",
+          "6df19e13b07f"
+        ]
       }
     ],
     "public/release-notes.json›current›value": [
@@ -551,6 +565,43 @@
         "at": "2026-11-15T05:15:20.861Z",
         "hunks": [
           "bccf0efc9319"
+        ]
+      }
+    ],
+    "src/app/codex/codex-browse.component.ts›.sheet-done,.sheet-close›focus-visible": [
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "#1125 focus rule kept for every element that still exists; this rule targets an element the popup scaffold removed or replaced (scAction / .sc-input / sc-popup close carry the focus ring)",
+        "decided": true,
+        "at": "2026-11-15T05:27:23.865Z",
+        "hunks": [
+          "0f57a8ff0d6a",
+          "d5e1687efcee"
+        ]
+      }
+    ],
+    "src/app/codex/detail/codex-hero-holo-overlay.component.ts›.hho›focus-visible": [
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "#1125 focus rule kept for every element that still exists; this rule targets an element the popup scaffold removed or replaced (scAction / .sc-input / sc-popup close carry the focus ring)",
+        "decided": true,
+        "at": "2026-11-15T05:27:23.865Z",
+        "hunks": [
+          "d21f951763d4"
+        ]
+      }
+    ],
+    "src/app/codex/detail/codex-hero-part-popup.component.ts›.hpp›focus-visible": [
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "#1125 focus rule kept for every element that still exists; this rule targets an element the popup scaffold removed or replaced (scAction / .sc-input / sc-popup close carry the focus ring)",
+        "decided": true,
+        "at": "2026-11-15T05:27:23.865Z",
+        "hunks": [
+          "60636bbad8e8"
         ]
       }
     ]
