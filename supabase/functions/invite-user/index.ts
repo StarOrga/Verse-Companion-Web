@@ -98,12 +98,8 @@ Deno.serve(withPosthog('invite-user', async (req: Request): Promise<Response> =>
   } = await userClient.auth.getUser();
   if (authErr || !user) return json({ error: 'unauthorized' }, 401);
 
-  const { data: callerProfile, error: profErr } = await userClient
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (profErr || callerProfile?.role !== 'admin') {
+  const { data: isAdmin, error: adminErr } = await userClient.rpc('is_admin');
+  if (adminErr || isAdmin !== true) {
     return json({ error: 'forbidden' }, 403);
   }
 

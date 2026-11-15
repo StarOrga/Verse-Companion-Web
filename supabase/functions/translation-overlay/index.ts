@@ -1,5 +1,5 @@
 // translation-overlay — serves the published AI-translation overlay of one language.
-//   GET ?lang=de[&build_id=<uuid>]   signed-in user JWT required (401), 404 when not published.
+//   GET ?lang=de[&build_id=<uuid>]   approved user JWT required (401 / 403 not_approved), 404 when not published.
 //   GET ?lang=de&ns=rooms             only the room-label slice (scc_room_*, E14), same auth.
 // The R2 object is streamed; it is never a public Worker path (contract § Data (R2)).
 // verify_jwt = false in config.toml (the gateway cannot verify asymmetric session tokens);
@@ -33,6 +33,13 @@ Deno.serve(withPosthog('translation-overlay', async (req) => {
   });
   const { data: { user } } = await admin.auth.getUser(jwt);
   if (!user) return json({ error: 'unauthorized' }, 401);
+  // An unapproved account holds a valid JWT too: ask the DB as the caller (fail closed).
+  const asCaller = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
+    global: { headers: { authorization: `Bearer ${jwt}` } },
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  const { data: approved, error: apprErr } = await asCaller.rpc('is_approved');
+  if (apprErr || approved !== true) return json({ error: 'not_approved' }, 403);
 
   const url = new URL(req.url);
   const key = overlayObjectKey(
