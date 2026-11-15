@@ -109,6 +109,7 @@ export const EVENTS = {
   'verse:door_open': ev<{ door: 'news' | 'patches' | 'gallery' }>('verse', 'Eines der drei Tore (News, Patches, Galerie) wurde geöffnet.'),
   'verse:star_earn': ev<{ patch_line: string; star_key: string; sun?: boolean }>('verse', 'Ein Explorer-Stern wurde verdient (sun = Kometentreffer).'),
   'verse:starscape_share': ev<{ image_id: string; channel: 'native' | 'copy' }>('verse', 'Ein Starscape-Bild wurde geteilt.'),
+  'verse:gallery_filter_select': ev<{ filter: 'all' | 'newest' | 'top' | 'mine' }>('verse', 'In der Galerie wurde eine Ansicht gewählt (Alle, Neueste, Community Top, Sammlung = mine).'),
   'verse:briefing_view': ev('verse', 'Das Verse-Briefing (Startseite des Verse-Hubs) wurde angezeigt.'),
   'verse:starmap_open': ev<{ page: 'explorer' | 'constellations' }>('verse', 'Die Sternenkarte oder die eigenen Sternbilder wurden geöffnet.'),
   'verse:patch_open': ev<{ line: string }>('verse', 'Eine Patch-Linie im Verse-Hub wurde geöffnet.'),

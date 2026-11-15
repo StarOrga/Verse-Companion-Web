@@ -5500,10 +5500,9 @@
       "all": "All",
       "newest": "Newest",
       "top": "Community top",
-      "mine": "My votes",
-      "mineCount": "My votes · {{n}}",
-      "mineSignedOut": "Sign in to see the wallpapers you voted for",
-      "emptyMine": "You have not voted for a wallpaper yet. Tap the thumbs-up on an image to collect it here."
+      "sammlung": "Collection",
+      "sammlungSignedOut": "Sign in to see your collection",
+      "emptySammlung": "Your collection is still empty. Give an image a thumbs-up and it lands here."
     },
     "lightboxAria": "Wallpaper",
     "source": {
@@ -5555,6 +5554,10 @@
       "cta": "Get it for Windows",
       "note": "Windows only · ~0.3 MB · quit any time from the tray menu",
       "dismiss": "Don't show again"
+    },
+    "stage": {
+      "new": "New",
+      "sammlung": "Collection"
     }
   },
   "userFeedback": {
@@ -7302,7 +7305,6 @@
       }
     },
     "gallery": {
-      "mine": "My star maps",
       "connected": "Starscape connected",
       "share": "Share gallery",
       "heroTitle": "Starscape brings the gallery to your desktop",
