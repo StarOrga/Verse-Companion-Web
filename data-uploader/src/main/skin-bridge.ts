@@ -15,7 +15,7 @@ import { createSidecarLogger } from './bridge-log.js';
 import { createInterface } from 'node:readline';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
-import { createWriteStream, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync } from 'node:fs';
+import { createReadStream, createWriteStream, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { app } from 'electron';
 import log from 'electron-log';
@@ -127,12 +127,33 @@ function removeLegacyConverters(dest: string): void {
 const CGF_HEADER_TIMEOUT_MS = 30_000;
 const CGF_STALL_TIMEOUT_MS = 60_000;
 
-/** Download cgf-converter to userData/tools on first use; no-op if present. */
+/** sha256 of a file, streamed (the converter is ~117 MB). */
+function fileSha256(path: string): Promise<string> {
+  return new Promise((ok, fail) => {
+    const hash = createHash('sha256');
+    createReadStream(path)
+      .on('data', (chunk) => hash.update(chunk))
+      .on('error', fail)
+      .on('end', () => ok(hash.digest('hex')));
+  });
+}
+
+/** The converter file checked against its pin in this app session (hashed once). */
+let verifiedConverter: string | null = null;
+
+/** Download cgf-converter to userData/tools on first use; no-op if present and matching its pin. */
 export async function ensureConverter(onProgress: (pct: number) => void): Promise<string> {
   const dest = converterPath();
   if (existsSync(dest) && statSync(dest).size >= CGF_CONVERTER_MIN_BYTES) {
-    removeLegacyConverters(dest);
-    return dest;
+    // Size alone would accept a truncated or swapped file under this name;
+    // one that does not match the pin is downloaded again.
+    if (verifiedConverter === dest || (await fileSha256(dest)) === CGF_CONVERTER_SHA256) {
+      verifiedConverter = dest;
+      removeLegacyConverters(dest);
+      return dest;
+    }
+    log.warn('[skin-bridge] cgf-converter does not match its pinned sha256 — downloading it again');
+    rmSync(dest, { force: true });
   }
   mkdirSync(resolve(dest, '..'), { recursive: true });
 
@@ -187,6 +208,7 @@ export async function ensureConverter(onProgress: (pct: number) => void): Promis
     throw new Error(`cgf-converter download does not match its pinned sha256 (got ${digest.slice(0, 12)}…) — aborted`);
   }
   renameSync(tmp, dest);
+  verifiedConverter = dest;
   removeLegacyConverters(dest);
   return dest;
 }

@@ -34,10 +34,21 @@ CGF_CONVERTER_DEST = TOOLS / "cgf-converter-2.0.0-sc.1.exe"
 CGF_CONVERTER_MIN_BYTES = 100_000_000  # ~117 MB self-contained .NET binary
 
 
+def _sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        while chunk := f.read(1 << 20):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def _download(url: str, dest: Path, min_bytes: int, sha256: str) -> None:
     if dest.exists() and dest.stat().st_size >= min_bytes:
-        print(f"[skip] {dest.name} already present ({dest.stat().st_size:,} B)")
-        return
+        if _sha256(dest) == sha256:
+            print(f"[skip] {dest.name} already present ({dest.stat().st_size:,} B)")
+            return
+        print(f"[warn] {dest.name} does not match its pinned sha256 — downloading it again")
+        dest.unlink()
     print(f"[get ] {url}\n   -> {dest}")
     tmp = dest.with_suffix(dest.suffix + ".part")
     h = hashlib.sha256()
