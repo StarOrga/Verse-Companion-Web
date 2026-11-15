@@ -154,11 +154,6 @@ export class SwUpdateService {
     return this.document.defaultView;
   }
 
-  /** Hide the prompt without reloading (update stays pending until next load). */
-  dismiss(): void {
-    this.updateReady.set(false);
-  }
-
   /** Activate the downloaded version and hard-reload into it. */
   async applyUpdate(): Promise<void> {
     if (this.applying) {

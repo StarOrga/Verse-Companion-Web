@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, OnInit, untracked } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { TranslateService, TranslatePipe } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from './auth/auth.service';
 import { PresenceService } from './auth/presence.service';
 import { FriendsService } from './social/friends.service';
@@ -17,11 +17,12 @@ import { RouteLoadRecoveryService } from './core/route-load-recovery.service';
 import { SupabaseClientProvider } from './core/supabase.client';
 import { SwUpdateService } from './core/sw-update.service';
 import { ImpersonationBannerComponent } from './shell/impersonation-banner.component';
+import { UpdateToastComponent } from './core/update-toast.component';
 
 @Component({
   selector: 'sc-root',
   standalone: true,
-  imports: [RouterOutlet, TranslatePipe, ConsentBannerComponent, ImpersonationBannerComponent],
+  imports: [RouterOutlet, ConsentBannerComponent, ImpersonationBannerComponent, UpdateToastComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- Mounted here (not inside sc-shell) because a signed-out preview bounces
@@ -39,17 +40,8 @@ import { ImpersonationBannerComponent } from './shell/impersonation-banner.compo
     <!-- First-visit browser-storage notice (#130) — self-hides once decided. -->
     <sc-consent-banner />
 
-    @if (swUpdate.updateReady()) {
-      <div class="sw-update" role="status" aria-live="polite">
-        <span class="sw-update__msg">{{ 'update.available' | translate }}</span>
-        <button type="button" class="sc-btn sc-btn-primary" (click)="swUpdate.applyUpdate()">
-          {{ 'update.reload' | translate }}
-        </button>
-        <button type="button" class="sw-update__dismiss" (click)="swUpdate.dismiss()">
-          {{ 'update.dismiss' | translate }}
-        </button>
-      </div>
-    }
+    <!-- "New version ready": a toast in the bottom-right stack, up until the reader reloads. -->
+    <sc-update-toast />
   `,
   styles: [
     `
@@ -63,46 +55,6 @@ import { ImpersonationBannerComponent } from './shell/impersonation-banner.compo
          component's constructor, which owns the --sc-imp-banner-h var). */
       .routed-content {
         padding-top: var(--sc-imp-banner-h, 0px);
-      }
-
-      .sw-update {
-        position: fixed;
-        left: 50%;
-        bottom: 24px;
-        transform: translateX(-50%);
-        /* Global notice band, same rung as the consent bar (ladder documented
-           in sc-feedback-fab): a bottom-centre toast whose Reload / Dismiss
-           buttons have to stay hittable, and on a narrow viewport it reaches
-           into the feedback launcher's corner (1400). */
-        z-index: 1500;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        max-width: calc(100vw - 32px);
-        padding: 12px 16px;
-        background: linear-gradient(180deg, var(--sc-bg-2), var(--sc-bg-1));
-        border: 1px solid var(--sc-accent);
-        border-radius: 8px;
-        box-shadow: var(--sc-glow);
-      }
-
-      .sw-update__msg {
-        font-family: var(--sc-font-display);
-        font-size: 0.85rem;
-        letter-spacing: 0.04em;
-        color: var(--sc-fg-0);
-      }
-
-      .sw-update__dismiss {
-        background: transparent;
-        border: 0;
-        color: var(--sc-fg-2);
-        font-size: 0.8rem;
-      }
-
-      .sw-update__dismiss:hover {
-        color: var(--sc-fg-0);
-        text-decoration: underline;
       }
     `,
   ],

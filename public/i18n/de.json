@@ -92,8 +92,7 @@
   },
   "update": {
     "available": "Neue Version verfügbar",
-    "reload": "Neu laden",
-    "dismiss": "Später"
+    "reload": "Neu laden"
   },
   "auth": {
     "previewLocked": {
