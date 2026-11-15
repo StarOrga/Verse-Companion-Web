@@ -6,6 +6,7 @@ import en from '../../../../public/i18n/en.json';
 import { ScPopupComponent, type ScPopupAccess, type ScPopupKind, type ScPopupSize } from './sc-popup.component';
 import { ModalInertService } from '../dialog/modal-inert.service';
 import { popupEntryDepth } from './popup-history';
+import { useViewport } from '../../testing/viewport';
 
 @Component({
   standalone: true,
@@ -151,6 +152,28 @@ describe('ScPopupComponent', () => {
     expect(el.getAttribute('aria-modal')).toBe('true');
     expect(document.getElementById(el.getAttribute('aria-labelledby')!)!.textContent!.trim()).toBe('Ziel für Quantanium');
     expect(TestBed.inject(ModalInertService).depth).toBe(1);
+    f.destroy();
+  });
+
+  it('a press on the scrim keeps focus in the frame, so Escape still closes', async () => {
+    const f = mount();
+    await settle();
+    const fr = frame(f.nativeElement);
+    const inFrame = () => fr.contains(document.activeElement);
+    expect(inFrame()).toBe(true);
+    const scrim = f.nativeElement.querySelector('.scp-scrim') as HTMLElement;
+    const down = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
+    scrim.dispatchEvent(down);
+    expect(down.defaultPrevented).toBe(true);
+    scrim.click();
+    expect(inFrame()).toBe(true);
+    // a press inside the frame is left alone (text selection, button focus)
+    const inner = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
+    fr.querySelector('.content')!.dispatchEvent(inner);
+    expect(inner.defaultPrevented).toBe(false);
+    (document.activeElement as HTMLElement).dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    f.detectChanges();
+    expect(f.componentInstance.reasons).toEqual(['escape']);
     f.destroy();
   });
 
@@ -323,3 +346,39 @@ describe('ScPopupComponent', () => {
     });
   });
 });
+
+describe('ScPopupComponent on a phone', () => {
+  useViewport(375, 700);
+
+  it('keeps the footer clear of the feedback launcher and gives checkboxes a 48 px hit area', async () => {
+    TestBed.configureTestingModule({ providers: [provideTranslateService()] });
+    const fixture = TestBed.createComponent(PhoneHostComponent);
+    document.body.appendChild(fixture.nativeElement);
+    fixture.detectChanges();
+    await new Promise<void>((r) => requestAnimationFrame(() => r()));
+    const root = fixture.nativeElement as HTMLElement;
+    const footer = root.querySelector<HTMLElement>('.scp-f')!;
+    const clear = parseFloat(getComputedStyle(footer).paddingInlineEnd);
+    expect(clear).toBeGreaterThanOrEqual(56 + 12);
+    const status = root.querySelector<HTMLElement>('.scp-st')!.getBoundingClientRect();
+    expect(status.right).toBeLessThanOrEqual(window.innerWidth - clear + 1);
+    const box = root.querySelector<HTMLInputElement>('input[type=checkbox]')!.getBoundingClientRect();
+    expect(box.width).toBeGreaterThanOrEqual(48);
+    expect(box.height).toBeGreaterThanOrEqual(48);
+    fixture.destroy();
+    root.remove();
+  });
+});
+
+@Component({
+  standalone: true,
+  imports: [ScPopupComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <sc-popup kind="dialog" title="Wunschliste" eyebrow="Merkliste">
+      <label><input type="checkbox" /> Position</label>
+      <span popupStatus>3 von 5 gewählt</span>
+    </sc-popup>
+  `,
+})
+class PhoneHostComponent {}

@@ -86,8 +86,9 @@ interface WishLine {
             <p class="empty">{{ 'quick.emptyWish' | translate }}</p>
           }
           <ng-container popupActions>
-            <a scAction class="all" [attr.href]="svc.cartHref()" (click)="onCart($event)">{{ (cart.count() === 1 ? 'quick.allWishOne' : 'quick.allWish') | translate: { n: cart.count() } }}</a>
+            <a scAction class="all" [attr.href]="svc.cartHref()" (click)="onCart($event)">{{ 'quick.allWish' | translate }}</a>
           </ng-container>
+          <span popupStatus class="all-count" role="status">{{ (cart.count() === 1 ? 'quick.allWishCountOne' : 'quick.allWishCount') | translate: { n: cart.count() } }}</span>
           </sc-popup>
         </div>
       }

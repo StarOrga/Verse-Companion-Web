@@ -8632,8 +8632,9 @@
     "toNachschub": "In einen Nachschub: {{name}}",
     "wish": "Wunschliste",
     "emptyWish": "Noch nichts auf der Wunschliste.",
-    "allWish": "Ganze Wunschliste · {{n}} Positionen",
-    "allWishOne": "Ganze Wunschliste · 1 Position",
+    "allWish": "Ganze Wunschliste",
+    "allWishCount": "{{n}} Positionen",
+    "allWishCountOne": "1 Position",
     "section": {
       "inventar": "Inventar",
       "hangar": "Hangar",

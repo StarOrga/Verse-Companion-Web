@@ -105,7 +105,7 @@ let uid = 0;
  *
  * Output
  * - `closed` ('close' | 'escape' | 'back'): the ✕, Escape or the back gesture. A scrim click
- *   NEVER closes a modal.
+ *   NEVER closes a modal, and a press on the scrim keeps focus in the frame (Escape stays alive).
  *   The host decides what closing means (remove the `@if`, resolve a promise, play
  *   `[scPopupMotion]`'s exit first).
  *
@@ -136,6 +136,7 @@ let uid = 0;
     '[attr.data-kind]': 'kind()',
     '[class.sc-popup--staged]': 'hasBackdrop()',
     '[attr.data-layer]': 'hasBackdrop() ? layer : null',
+    '(mousedown)': 'onHostMouseDown($event)',
   },
   template: `
     @if (hasBackdrop()) {
@@ -265,6 +266,20 @@ export class ScPopupComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.historyId) releasePopupEntry(this.historyId);
     this.historyId = null;
+  }
+
+  /**
+   * A press on the scrim (or the empty stage; the modal-inert scrim is pointer-transparent, so
+   * the press lands on this host) must not move focus to <body>: the frame's keydown would never
+   * fire again and Escape would go dead. Preventing the default of the mousedown keeps focus where
+   * it was, inside the frame. The click itself still never closes a modal.
+   */
+  onHostMouseDown(ev: MouseEvent): void {
+    const frame = (ev.currentTarget as HTMLElement).querySelector('.scp-frame');
+    if (!this.isModal() || !frame || frame.contains(ev.target as Node)) return;
+    ev.preventDefault();
+    const active = document.activeElement;
+    if (!active || active === document.body) (frame as HTMLElement).focus({ preventScroll: true });
   }
 
   private wantsHistoryEntry(): boolean {

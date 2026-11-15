@@ -66,6 +66,9 @@ describe('MerklisteComponent (wishlist popout)', () => {
     expect(f.el.querySelectorAll('.qrow').length).toBe(7);
     const all = f.el.querySelector<HTMLAnchorElement>('a.all')!;
     expect(all.textContent).toContain('quick.allWish');
+    // The count is footer status text on the right, not part of the action label.
+    expect(all.textContent).not.toContain('quick.allWishCount');
+    expect(f.el.querySelector('.scp-st .all-count')?.textContent).toContain('quick.allWishCount');
     expect(all.getAttribute('href')).toBe('/codex/index?cart=1');
     // A plain click opens the cart in place.
     all.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));

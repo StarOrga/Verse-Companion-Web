@@ -188,4 +188,10 @@
   .sc-popup .scp-frame:is([data-kind='dialog'], [data-kind='panel'], [data-kind='large']) .scp-f {
     padding-inline-end: var(--sc-fab-clear-inline, 0px);
   }
+  /* Checkboxes / radios in a body: the global control paints a fixed 22 px glyph (::before) inside
+     its own box, so a 48 px box raises the hit area and leaves the glyph as it is. */
+  .sc-popup .scp-b :is(input[type='checkbox'], input[type='radio']) {
+    inline-size: 48px;
+    block-size: 48px;
+  }
 }
