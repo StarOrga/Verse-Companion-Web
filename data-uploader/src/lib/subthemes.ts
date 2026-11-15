@@ -211,7 +211,11 @@ export const SUBTHEMES: readonly Subtheme[] = [
     //    Polaris, Perseus, Constellations, Vulture, Hull B …), every Vanguard,
     //    the Salvation and the Blade now build. Cached models are kept (the
     //    build is keyed as v2.0.0); only the ships that had none are built.
-    revision: 7,
+    // 8: a hull whose next simplify rung tears the skin bisects towards it
+    //    instead of staying unsimplified (Polaris, Galaxy, Constellations …).
+    //    Only hulls left over the size budget are built again (FIT_REVISION);
+    //    every hull within it is reused byte-identical.
+    revision: 8,
     phases: [],
     sources: [
       'data-uploader/python/sc_extract/assets3d/',
