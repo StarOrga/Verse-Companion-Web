@@ -17,7 +17,7 @@ import { diagR2, presignDiagLog } from '../_shared/diag-log.ts';
 import { billing, hogql, personalKey, projectId } from '../_shared/posthog-api.ts';
 import { captureServerException, withPosthog } from '../_shared/posthog.ts';
 import { fromDbHealth, parseBilling, quotaStatus, type QuotaRow } from '../_shared/posthog-guard.ts';
-import { aiCard, attentionCount, desktopCard, diagKeyOf, errorsCard, projectUrl, quotaCard, servicesCard, sortCards, usageCard, type Card, type DiagItem, type Mover, type NewIssue } from './_cards.ts';
+import { aiCard, attentionCount, desktopCard, queryReachable, diagKeyOf, errorsCard, projectUrl, quotaCard, servicesCard, sortCards, usageCard, type Card, type DiagItem, type Mover, type NewIssue } from './_cards.ts';
 
 const FN = 'telemetry-overview';
 const CACHE_MS = 5 * 60_000;
@@ -116,11 +116,11 @@ async function build(db: Db, userId: string): Promise<unknown> {
 
   const cards = sortCards([
     quotaCard(quotas, posthogReachable, now),
-    errorsCard(issues, posthogReachable, waiting.count ?? 0, base),
+    errorsCard(issues, queryReachable(posthogReachable, errs), waiting.count ?? 0, base),
     servicesCard(health, base),
-    usageCard(dailyCounts, mv, posthogReachable && daily != null, base),
+    usageCard(dailyCounts, mv, queryReachable(posthogReachable, daily), base),
     aiC,
-    desktopCard(deskRows, posthogReachable && desk != null, base, diag),
+    desktopCard(deskRows, queryReachable(posthogReachable, desk), base, diag),
   ]);
   return { generatedAt: now.toISOString(), lastVisitAt, posthogReachable, attention: attentionCount(cards), cards, quotas };
 }

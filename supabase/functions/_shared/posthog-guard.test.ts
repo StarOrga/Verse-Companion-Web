@@ -5,7 +5,7 @@ import {
   buildItemBody, canAutoCloseServiceItem, checkSignalSecret, constantTimeEqual, decideBoardAction, funnelSignal, intervalToSec,
   lcpSignal, nextHealth, parseBilling, quotaRef, quotaStatus, saverTarget, serviceLevel, serviceTransition, ROUTINE_LINE,
 } from './posthog-guard.ts';
-import { aiCard, attentionCount, errorsCard, feedbackPrefill, quotaCard, servicesCard, sortCards, type Card } from '../telemetry-overview/_cards.ts';
+import { aiCard, attentionCount, errorsCard, queryReachable, feedbackPrefill, quotaCard, servicesCard, sortCards, type Card } from '../telemetry-overview/_cards.ts';
 
 const NOW = new Date('2026-11-15T12:00:00Z');
 
@@ -198,4 +198,13 @@ test('services card lists the worst first; ai card forecasts linearly', () => {
   assert.equal(servicesCard([], 'p').level, 'unknown');
   const a = aiCard({ monthCostUsd: 3, day: 10, daysInMonth: 30, errorRate24h: 0, top: [{ fn: 'f', cost: 2 }], reachable: true }, 'p');
   assert.equal(a.forecast!.display, '$9.00');
+});
+
+test('errors card is unknown, not ok, when only the errors query failed (codex review)', () => {
+  // PostHog answered (billing / usage worked) but the errors HogQL query returned null.
+  const reach = queryReachable(true, null);
+  assert.equal(reach, false);
+  assert.equal(errorsCard([], reach, 0, 'p').level, 'unknown');
+  assert.equal(errorsCard([], queryReachable(true, []), 0, 'p').level, 'ok');
+  assert.equal(queryReachable(false, []), false);
 });

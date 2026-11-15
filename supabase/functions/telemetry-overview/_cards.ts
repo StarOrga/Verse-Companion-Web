@@ -73,6 +73,11 @@ export function quotaCard(quotas: QuotaRow[], reachable: boolean, now: Date): Ca
 }
 
 export interface NewIssue { id: string; name: string; count: number; source: 'web' | 'server' | 'desktop' }
+/** A card that reads one HogQL query is only "reachable" when PostHog answered AND that query returned rows (null = it failed) — else it must show unknown, never a calm "ok". */
+export function queryReachable(posthogReachable: boolean, rows: unknown[] | null | undefined): boolean {
+  return posthogReachable && rows != null;
+}
+
 export function errorsCard(issues: NewIssue[], reachable: boolean, boardWaiting: number, projectUrl: string): Card {
   const links = [{ labelKey: 'errorTracking', url: `${projectUrl}/error_tracking` }];
   if (!reachable) return { id: 'errors', level: 'unknown', kpi: { value: null, display: '–', unitKey: 'newErrors' }, top: [], links, boardWaiting };
