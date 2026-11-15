@@ -2188,3 +2188,20 @@ html.sc-unfocused {
   .sc-action.sc-action--tertiary { width: 48px; height: 48px; }
 }
 /* ===== /ACTION ===== */
+
+/* ===== WISH STAR ===== */
+/* The twinkling star dot on a wish's thumbnail (concept wunschliste-gefuehl, design d3): 4 px, top right, soft glow,
+   twinkling like the night sky of <sc-wish-sky>. Put `sc-wish-dot` on the thumbnail box; it is the one place that
+   marks "this is a wish" on a picture. Reduced motion: lit, static. */
+.sc-wish-dot { position: relative; }
+.sc-wish-dot::after {
+  content: ''; position: absolute; right: 4px; top: 4px; width: 4px; height: 4px; border-radius: 50%; pointer-events: none;
+  background: color-mix(in srgb, white 88%, var(--sc-accent));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--sc-accent) 90%, white);
+  animation: sc-wish-tw 3.2s ease-in-out infinite;
+}
+@keyframes sc-wish-tw { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .sc-wish-dot::after { animation: none; opacity: 0.85; }
+}
+/* ===== /WISH STAR ===== */

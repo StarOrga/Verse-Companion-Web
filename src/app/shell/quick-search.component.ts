@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   HostListener,
   TemplateRef,
   ViewContainerRef,
@@ -19,6 +20,7 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import { CodexSearchEngine } from '../codex/search/codex-search-engine';
 import { CodexSearchResultsComponent } from '../codex/search/codex-search-results.component';
 import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/search/codex-search-hub.service';
+import { SearchOpenService } from './search-open.service';
 
 /**
  * Ctrl+K / "/" and the header's search button.
@@ -176,6 +178,7 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
 export class QuickSearchComponent {
   readonly engine = inject(CodexSearchEngine);
   private readonly hub = inject(CodexSearchHub);
+  private readonly searchOpen = inject(SearchOpenService);
   private readonly analytics = inject(AnalyticsService);
   private readonly overlay = inject(Overlay);
   private readonly viewContainer = inject(ViewContainerRef);
@@ -184,6 +187,12 @@ export class QuickSearchComponent {
   private overlayRef: OverlayRef | null = null;
 
   readonly visible = signal(false);
+
+  constructor() {
+    // The legacy header's search: the wishes' "Wunsch suchen" and the subheader's Ctrl+K reach it through the service.
+    const unregister = this.searchOpen.register(this, () => this.trigger());
+    inject(DestroyRef).onDestroy(unregister);
+  }
   readonly listboxId = 'qs-results-list';
 
   readonly activeDescendant = computed(() => {

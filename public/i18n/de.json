@@ -8618,7 +8618,6 @@
   "quick": {
     "toNachschub": "In einen Nachschub: {{name}}",
     "wish": "Wünsche",
-    "emptyWish": "Wünsch dir was",
     "allWish": "Alle Wünsche",
     "allWishCount": "{{n}} Wünsche",
     "allWishCountOne": "1 Wunsch",
@@ -8648,7 +8647,8 @@
     "summaryOneGroup": "{{n}} Wünsche · 1 Gruppe",
     "close": "Schließen",
     "empty": "Wünsch dir was",
-    "emptyHint": "Leg Gegenstände aus dem Codex oder der Suche hierher.",
+    "emptyHint": "Jede Sternschnuppe ein Wunsch. Such dir deinen ersten aus.",
+    "emptyAction": "Wunsch suchen",
     "group": {
       "weapons": "Waffen",
       "armor": "Rüstung",

@@ -54,6 +54,7 @@ import { RECENT_ROWS_SHOWN, StoredRow, pushRecentRow, readRecentRows } from './s
 import { ItemPathComponent } from '../../shared/item-path/item-path.component';
 import { RowActionResult, SearchRowActionsService } from './search-row-actions.service';
 import { ShellChromeService } from './shell-chrome.service';
+import { SearchOpenService } from '../search-open.service';
 import { SearchContext, SearchPlace, matchPlaces, searchContextOf } from './search-context';
 
 /** Recent searches the empty field offers (A6: the 7 newest). */
@@ -711,6 +712,7 @@ export class FusionSearchComponent {
   private readonly ownership = inject(HqOwnershipService);
   private readonly wishlist = inject(SearchWishlistService);
   private readonly hub = inject(CodexSearchHub);
+  private readonly searchOpen = inject(SearchOpenService);
   protected readonly chrome = inject(ShellChromeService);
   private readonly router = inject(Router);
   private readonly t = inject(TranslateService);
@@ -857,6 +859,7 @@ export class FusionSearchComponent {
     active: this.open.asReadonly(),
   };
   private unregisterHub: (() => void) | null = null;
+  private readonly unregisterOpen = this.searchOpen.register(this, () => this.openSearch());
   private statusTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
@@ -917,6 +920,7 @@ export class FusionSearchComponent {
     this.loadHints();
     inject(DestroyRef).onDestroy(() => {
       this.unregisterHub?.();
+      this.unregisterOpen();
       if (this.statusTimer) clearTimeout(this.statusTimer);
     });
   }
@@ -1211,6 +1215,17 @@ export class FusionSearchComponent {
     else field?.blur();
   }
 
+  /**
+   * Open the search of the page the reader is on, as if they had clicked into it: a page with a field of its own
+   * takes the caret, a landing page's stage field or a Codex page's bar activates, else this subheader field opens.
+   * Ctrl/⌘+K and the wishes' "Wunsch suchen" both come through `SearchOpenService.open()` to here.
+   */
+  private openSearch(): void {
+    if (this.chrome.focusPageSearch()) return;
+    if (this.chrome.stageSearch() === 'stage' && this.hub.activate()) return;
+    this.focus();
+  }
+
   openFromButton(): void {
     this.openPanel();
     setTimeout(() => this.fieldRef()?.nativeElement.focus());
@@ -1287,9 +1302,7 @@ export class FusionSearchComponent {
         this.close();
         return;
       }
-      if (this.chrome.focusPageSearch()) return;
-      if (this.chrome.stageSearch() === 'stage' && this.hub.activate()) return;
-      this.focus();
+      this.searchOpen.open();
       return;
     }
     if (this.open()) {
