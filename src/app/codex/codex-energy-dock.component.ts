@@ -249,7 +249,8 @@ let uidSeq = 0;
                         (isTopOffPip(row, $index + 1) ? 'codex.energy.pip.topOff' : 'codex.energy.pip.level')
                           | translate: { group: (row.labelKey | translate: row.labelParams), n: $index + 1, m: row.capacity }
                       "
-                      [disabled]="!pipsEnabled(row)"
+                      [class.out]="pipOutOfReach(row, $index + 1)"
+                      [disabled]="!pipsEnabled(row) || pipOutOfReach(row, $index + 1)"
                       (click)="clickPip(row, $index + 1)"
                     ></button>
                   } @empty {
@@ -408,6 +409,9 @@ let uidSeq = 0;
         block-size: 0;
       }
       .mini-dock {
+        /* the containing block of the info boxes, which open BESIDE / above
+           the dock instead of over its pips (#351) */
+        position: relative;
         inline-size: fit-content;
         max-inline-size: 100%;
         margin-inline: auto;
@@ -435,9 +439,11 @@ let uidSeq = 0;
       .mini-dock[data-pos='edgeLeft'],
       .mini-dock[data-pos='edgeRight'] {
         position: fixed;
-        inset-block-start: max(var(--sc-chrome-top, 24px), calc(var(--sc-imp-banner-h, 0px) + var(--sc-topbar-h, 0px) + 8px));
+        /* level with the ship picture (#351), never above the chrome */
+        --_edge-top-at: max(var(--sc-chrome-top, 24px), calc(var(--sc-imp-banner-h, 0px) + var(--sc-topbar-h, 0px) + 8px), var(--_edge-top, 0px));
+        inset-block-start: var(--_edge-top-at);
         inline-size: var(--_edge-w, 280px);
-        max-block-size: calc(100dvh - max(var(--sc-chrome-top, 24px), calc(var(--sc-imp-banner-h, 0px) + var(--sc-topbar-h, 0px) + 8px)) - var(--sc-fab-lane, 80px) - 12px);
+        max-block-size: calc(100dvh - var(--_edge-top-at) - var(--sc-fab-lane, 80px) - 12px);
         overflow-y: auto;
         margin: 0;
         border-radius: 12px;
@@ -461,6 +467,29 @@ let uidSeq = 0;
       .mini-dock[data-pos='edgeLeft'] .vr,
       .mini-dock[data-pos='edgeRight'] .vr {
         display: none;
+      }
+      /* Side dock (#351, screenshot 3): every system's pips in ONE row, so the
+         whole strip is always in view — same pip size, tighter spacing. The
+         group button gives up its fixed minimum width to the column. */
+      .mini-dock[data-pos='edgeLeft'] .md-pips,
+      .mini-dock[data-pos='edgeRight'] .md-pips {
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        gap: 1px;
+      }
+      .mini-dock[data-pos='edgeLeft'] .md-col,
+      .mini-dock[data-pos='edgeRight'] .md-col {
+        flex: 0 1 auto;
+        min-inline-size: var(--pip-w);
+      }
+      .mini-dock[data-pos='edgeLeft'] .grp-btn,
+      .mini-dock[data-pos='edgeRight'] .grp-btn {
+        min-inline-size: var(--pip-w);
+        padding: 0;
+      }
+      .mini-dock[data-pos='edgeLeft'] .md-facts,
+      .mini-dock[data-pos='edgeRight'] .md-facts {
+        max-inline-size: none;
       }
       .slot-move {
         display: inline-flex;
@@ -621,6 +650,12 @@ let uidSeq = 0;
       .stack .pip:disabled {
         cursor: default;
       }
+      /* above what the reactor still has free — not settable (#351) */
+      .stack .pip.out {
+        background: transparent;
+        border: 1px dashed color-mix(in srgb, var(--sc-fg-2) 26%, transparent);
+        cursor: not-allowed;
+      }
       .stack .pip.ghost,
       .md-col.absent .stack .pip {
         background: color-mix(in srgb, var(--sc-fg-2) 8%, transparent);
@@ -692,8 +727,13 @@ let uidSeq = 0;
         line-height: 1.2;
         min-block-size: 1.2em;
       }
+      /* The info boxes used to open right above their own icon — straight over
+         the pips the pilot was setting (#351, screenshot 2). They now open
+         OUTSIDE the dock: above its top edge for the docks at the page's foot,
+         beside it for the screen-edge docks. The .tipw only carries the
+         hover/focus trigger; the box is placed against the .mini-dock. */
       .tipw {
-        position: relative;
+        position: static;
       }
       .tipbox {
         display: block;
@@ -702,8 +742,7 @@ let uidSeq = 0;
         transition: opacity 0.12s ease;
         position: absolute;
         inset-block-end: calc(100% + 8px);
-        inset-inline-start: 50%;
-        transform: translateX(-50%);
+        inset-inline-end: 0;
         inline-size: 230px;
         padding: 8px 10px;
         background: var(--sc-bg-2);
@@ -713,14 +752,22 @@ let uidSeq = 0;
         font-size: max(12px, var(--sc-fs-floor));
         z-index: 20;
       }
-      .tipbox::after {
-        content: '';
-        position: absolute;
-        inset-block-start: 100%;
-        inset-inline-start: 50%;
-        transform: translateX(-50%);
-        border: 5px solid transparent;
-        border-block-start-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0));
+      .mini-dock[data-pos='left'] .tipbox {
+        inset-inline: 0 auto;
+      }
+      /* The edge dock scrolls inside itself, so an absolute box would be
+         clipped: it rides fixed, level with the dock's top, in the page-side
+         gap next to it. */
+      .mini-dock[data-pos='edgeLeft'] .tipbox,
+      .mini-dock[data-pos='edgeRight'] .tipbox {
+        position: fixed;
+        inset-block: var(--_edge-top-at) auto;
+      }
+      .mini-dock[data-pos='edgeLeft'] .tipbox {
+        inset-inline: calc(12px + var(--_edge-w, 280px) + 8px) auto;
+      }
+      .mini-dock[data-pos='edgeRight'] .tipbox {
+        inset-inline: auto calc(12px + var(--_edge-w, 280px) + 8px);
       }
       .tipbox b {
         display: block;
@@ -766,11 +813,28 @@ let uidSeq = 0;
       .md-heat {
         cursor: help;
       }
+      /* Kept narrow (#351: "den rechten Bereich noch kleiner machen"): two
+         facts a row, and the cooling and readiness lines wrap inside it
+         instead of stretching the whole dock. */
       .md-facts {
         display: grid;
-        grid-template-columns: repeat(3, auto);
-        gap: 4px 14px;
+        grid-template-columns: repeat(2, max-content);
+        gap: 3px 12px;
         align-content: start;
+        max-inline-size: 300px;
+      }
+      .md-heat .gapv {
+        flex: 1 1 0;
+        min-inline-size: 0;
+        font-size: max(11px, var(--sc-fs-floor));
+        line-height: 1.3;
+      }
+      .md-heat {
+        align-items: flex-start;
+      }
+      .md-heat > .k,
+      .md-heat > .ico {
+        flex: none;
       }
       .md-fact {
         display: flex;
@@ -1160,15 +1224,58 @@ export class CodexEnergyDockComponent {
     const destroyRef = inject(DestroyRef);
     afterNextRender(() => {
       if (typeof window === 'undefined') return;
-      const measure = () => this.measureEdgeRoom();
+      const measure = () => {
+        this.measureEdgeRoom();
+        this.alignEdgeTop();
+      };
+      // The edge dock starts level with the ship picture and only then sticks
+      // under the chrome (#351, screenshot 4). Written straight to the host's
+      // style, once per frame — no change detection per scroll event.
+      let frame = 0;
+      const onScroll = () => {
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          this.alignEdgeTop();
+        });
+      };
       window.addEventListener('resize', measure, { passive: true });
-      destroyRef.onDestroy(() => window.removeEventListener('resize', measure));
+      window.addEventListener('scroll', onScroll, { passive: true });
+      destroyRef.onDestroy(() => {
+        window.removeEventListener('resize', measure);
+        window.removeEventListener('scroll', onScroll);
+        if (frame) cancelAnimationFrame(frame);
+      });
       measure();
     });
     effect(() => {
       this.position();
-      untracked(() => this.measureEdgeRoom());
+      this.effectivePosition();
+      untracked(() => {
+        this.measureEdgeRoom();
+        this.alignEdgeTop();
+      });
     });
+  }
+
+  /**
+   * Where the edge dock's top sits while the page is scrolled to the top: the
+   * picture's top edge (`[data-energy-dock-anchor]`). Scrolled past it, the
+   * CSS `max()` with the chrome offset takes over and the dock sticks.
+   */
+  private alignEdgeTop(): void {
+    const el = this.hostEl.nativeElement as HTMLElement;
+    if (typeof document === 'undefined' || !el?.style) return;
+    const pos = this.effectivePosition();
+    const anchor =
+      pos === 'edgeLeft' || pos === 'edgeRight'
+        ? document.querySelector<HTMLElement>('[data-energy-dock-anchor]')
+        : null;
+    if (!anchor) {
+      el.style.removeProperty('--_edge-top');
+      return;
+    }
+    el.style.setProperty('--_edge-top', `${Math.round(anchor.getBoundingClientRect().top)}px`);
   }
 
   private measureEdgeRoom(): void {
@@ -1350,9 +1457,27 @@ export class CodexEnergyDockComponent {
     return !row.cut && level === row.capacity && row.allocated === row.capacity && row.capacity > 0;
   }
 
+  /**
+   * The highest level this column can be raised to: what it holds now plus
+   * the segments the reactor still has free. Pips above it are out of reach —
+   * the dock never sets more than the ship supplies (#351).
+   */
+  protected reachableLevel(row: PowerGroupRow): number {
+    const s = this.sheet();
+    const free = s.budgetTotal === null ? 0 : Math.max(0, s.budgetTotal - s.budgetUsed);
+    return Math.min(row.capacity, (row.cut ? 0 : row.allocated) + free);
+  }
+
+  /** A pip above {@link reachableLevel}; the full column's own top-off pip stays live. */
+  protected pipOutOfReach(row: PowerGroupRow, level: number): boolean {
+    return level > this.reachableLevel(row) && !this.isTopOffPip(row, level);
+  }
+
   /** Click pip `level` (1 = bottom): pin the group there, or cut it from the top. */
   protected clickPip(row: PowerGroupRow, level: number): void {
     if (!this.pipsEnabled(row)) return;
+    if (this.pipOutOfReach(row, level)) level = this.reachableLevel(row);
+    if (level < 1) return;
     const next = clickPowerPip(this.cutGroups(), this.levels(), row, level);
     this.cutGroups.set(next.cutGroups);
     this.levels.set(next.levels);

@@ -495,7 +495,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
         <!-- The picture and the ownership card are one positioned box, so the
              3D overlay (#334) covers exactly the two of them and nothing else. -->
         <div class="hero-pair">
-        <header class="hero sc-card" [class.bay]="kind() === 'ship'" [class.stage]="kind() === 'ship'" [class.missile]="isMissile()">
+        <header class="hero sc-card" data-energy-dock-anchor [class.bay]="kind() === 'ship'" [class.stage]="kind() === 'ship'" [class.missile]="isMissile()">
           @if (kind() === 'ship') {
             <!-- Extracted to keep this file's component-style budget under the
                  Angular build budget (AUD-062) — same DOM, classes and
