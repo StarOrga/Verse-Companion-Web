@@ -72,11 +72,11 @@ describe('CodexShipActionsComponent', () => {
 
   it('offers the own-link toggle only to a signed-in reader, worded add vs edit', async () => {
     const anon = await setup({ user: null });
-    expect(anon.el.querySelector('button.quiet')).toBeNull();
+    expect(anon.el.querySelector('button.sc-action')).toBeNull();
     TestBed.resetTestingModule();
 
     const signedIn = await setup({ user: { id: 'u1' } });
-    const btn = signedIn.el.querySelector('button.quiet') as HTMLButtonElement;
+    const btn = signedIn.el.querySelector('button.sc-action') as HTMLButtonElement;
     expect(btn.textContent).toContain('codex.shipLink.add');
     btn.click();
     expect(signedIn.store.toggle).toHaveBeenCalledTimes(1);

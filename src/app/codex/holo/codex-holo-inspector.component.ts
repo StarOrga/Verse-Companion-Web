@@ -18,6 +18,7 @@ import { isPlainLeftClick } from '../../core/modified-click.util';
 import type { PortPinBadge } from './codex-holo-patch.component';
 import { PinGroup, StagePin } from './codex-holo-model';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { HoloDiffMarkerComponent } from './holo-diff-marker';
 import { partTypeKey } from './holo-callout-values';
 
@@ -104,7 +105,7 @@ function chipSize(pin: StagePin): number | null {
 @Component({
   selector: 'sc-codex-holo-inspector',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective, RouterLink, ItemPathComponent, HoloDiffMarkerComponent],
+  imports: [TranslatePipe, ScTooltipDirective, ScActionDirective, RouterLink, ItemPathComponent, HoloDiffMarkerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (target(); as it) {
@@ -187,10 +188,10 @@ function chipSize(pin: StagePin): number | null {
               </div>
               <div class="insp-actions">
                 @if (!readOnly()) {
-                  <button type="button" class="btn quiet ico" [scTooltip]="('codex.swap.open' | translate) + ': ' + (mount.name ? itemName(mount.name) : '')" scTooltipTier="label"
+                  <button type="button" scAction tier="tertiary" [scTooltip]="('codex.swap.open' | translate) + ': ' + (mount.name ? itemName(mount.name) : '')" scTooltipTier="label"
                           [attr.aria-label]="('codex.swap.open' | translate) + ': ' + (mount.name ? itemName(mount.name) : '')" (click)="swapRequested.emit(it)">⇄</button>
                 }
-                <button type="button" class="btn quiet ico" [scTooltip]="('codex.inspect.openStats' | translate) + ': ' + (mount.name ? itemName(mount.name) : '')" scTooltipTier="label"
+                <button type="button" scAction tier="tertiary" [scTooltip]="('codex.inspect.openStats' | translate) + ': ' + (mount.name ? itemName(mount.name) : '')" scTooltipTier="label"
                         [attr.aria-label]="('codex.inspect.openStats' | translate) + ': ' + (mount.name ? itemName(mount.name) : '')" (click)="inspected.emit(it)">≡</button>
               </div>
             </div>
@@ -213,11 +214,11 @@ function chipSize(pin: StagePin): number | null {
               }
               <div class="insp-actions">
                 @if ((kid.className || kid.rawTypes.length > 0) && !readOnly()) {
-                  <button type="button" class="btn quiet ico" [scTooltip]="('codex.swap.open' | translate) + ': ' + (kid.name ? itemName(kid.name) : '')" scTooltipTier="label"
+                  <button type="button" scAction tier="tertiary" [scTooltip]="('codex.swap.open' | translate) + ': ' + (kid.name ? itemName(kid.name) : '')" scTooltipTier="label"
                           [attr.aria-label]="('codex.swap.open' | translate) + ': ' + (kid.name ? itemName(kid.name) : '')" (click)="swapRequested.emit(childTarget(it, kid))">⇄</button>
                 }
                 @if (kid.className) {
-                  <button type="button" class="btn quiet ico" [scTooltip]="('codex.inspect.openStats' | translate) + ': ' + (kid.name ? itemName(kid.name) : '')" scTooltipTier="label"
+                  <button type="button" scAction tier="tertiary" [scTooltip]="('codex.inspect.openStats' | translate) + ': ' + (kid.name ? itemName(kid.name) : '')" scTooltipTier="label"
                           [attr.aria-label]="('codex.inspect.openStats' | translate) + ': ' + (kid.name ? itemName(kid.name) : '')" (click)="inspected.emit(childTarget(it, kid))">≡</button>
                 }
               </div>
@@ -324,10 +325,6 @@ function chipSize(pin: StagePin): number | null {
     .lnk { background: none; border: none; padding: 0; color: var(--sc-accent); cursor: pointer; font: inherit;
       font-size: max(11px, var(--f)); min-height: var(--sc-tap-min, 24px); justify-self: start; }
     .lnk:hover { text-decoration: underline; }
-    .btn { min-height: var(--sc-tap-min, 28px); padding: 3px 8px; border-radius: 3px; border: 1px solid var(--hair); background: none;
-      color: var(--sc-fg-1); cursor: pointer; font: inherit; font-size: max(11px, var(--f));
-      transition: border-color 160ms ease, color 160ms ease; }
-    .btn:hover, .btn:focus-visible { border-color: var(--sc-accent); color: var(--sc-accent); }
     .empty { display: grid; place-items: center; text-align: center; gap: 8px; color: var(--sc-fg-2); padding: 40px 10px; font-size: max(12px, var(--f)); }
     .empty b { font-size: max(11px, var(--f)); letter-spacing: 0.14em; color: var(--sc-fg-1); font-weight: 400; }
     .mut { margin: 0; font-size: max(12px, var(--f)); color: var(--sc-fg-2); }
@@ -364,7 +361,6 @@ function chipSize(pin: StagePin): number | null {
     .act span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .insp-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .insp-actions:empty { display: none; }
-    .insp-kid .btn.ico { min-inline-size: var(--sc-tap-min, 32px); min-block-size: var(--sc-tap-min, 32px); padding-inline: 8px; }
     .swap { flex: 1 1 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: max(38px, var(--sc-tap-min, 0px)); border: 1px solid var(--sc-accent); border-radius: 7px;
       background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); cursor: pointer; font: inherit; font-size: max(13px, var(--f)); font-weight: 600; transition: background 160ms ease; }
     .swap:hover { background: color-mix(in srgb, var(--sc-accent) 28%, transparent); }

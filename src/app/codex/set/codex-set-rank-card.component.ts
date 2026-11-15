@@ -4,6 +4,7 @@ import { ResolvedEntity, pickLocalized, toLang } from '../codex.service';
 import { cleanLocaleValue, humanizeClassName } from '../codex-format';
 import { ArmorRatingRow, SET_RANK_PROFILES, SetRankAxis, SetRankProfileId, rankSet } from './set-rating';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 
 /**
  * "Einordnung" for the on-foot set page — mirrors `CodexRankCardComponent`'s
@@ -20,7 +21,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 @Component({
   selector: 'sc-codex-set-rank-card',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective],
+  imports: [TranslatePipe, ScTooltipDirective, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="rank-card sc-card">
@@ -141,7 +142,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
         <!-- A failed read is not "no rating yet": say so and offer the retry. -->
         <div class="rank-failed">
           <p class="gap-note" role="alert">{{ 'codex.setRank.failed' | translate }}</p>
-          <button type="button" class="sc-btn rank-retry" (click)="retry.emit()">{{ 'errors.retry' | translate }}</button>
+          <button type="button" scAction tier="secondary" class="rank-retry" (click)="retry.emit()">{{ 'errors.retry' | translate }}</button>
         </div>
       } @else {
         <p class="gap-note">{{ 'codex.setRank.unavailable' | translate }}</p>

@@ -73,11 +73,11 @@ describe('CodexMissionBarComponent', () => {
 
     fixture.componentRef.setInput('active', 'combat');
     fixture.detectChanges();
-    const resetBtn = fixture.nativeElement.querySelector('.idle-draft .btn') as HTMLButtonElement;
+    const resetBtn = fixture.nativeElement.querySelector('.idle-draft .sc-action') as HTMLButtonElement;
     expect(resetBtn).toBeTruthy();
     expect(resetBtn.disabled).toBe(false);
     expect(resetBtn.getAttribute('title')).toBeNull();
-    const tip = fixture.debugElement.query(By.css('.idle-draft .btn')).injector.get(ScTooltipDirective).scTooltip();
+    const tip = fixture.debugElement.query(By.css('.idle-draft .sc-action')).injector.get(ScTooltipDirective).scTooltip();
     expect(tip).toBe('codex.mission.lensResetTip');
 
     const emitted: string[] = [];

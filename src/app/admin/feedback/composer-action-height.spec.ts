@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideTranslateService } from '@ngx-translate/core';
 import { FeedbackComposerComponent } from './feedback-composer.component';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 
 /**
  * Every shape the send row is built in, in one host so a single layout pass
@@ -10,7 +11,7 @@ import { FeedbackComposerComponent } from './feedback-composer.component';
  */
 @Component({
   standalone: true,
-  imports: [FeedbackComposerComponent],
+  imports: [FeedbackComposerComponent, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="v" id="default">
@@ -21,7 +22,7 @@ import { FeedbackComposerComponent } from './feedback-composer.component';
     </div>
     <div class="v" id="key">
       <sc-feedback-composer [iconSend]="true" [large]="true" [frameless]="true" placeholder="x" sendLabel="y">
-        <button composerAction type="button" class="sc-btn micro">ok</button>
+        <button composerAction type="button" scAction tier="secondary">ok</button>
       </sc-feedback-composer>
     </div>
   `,
@@ -90,9 +91,9 @@ describe('composer send-row height', () => {
   });
 
   it('leaves the attachment lightbox its own tap size', () => {
-    // The strip sits inside the send row, so a rule written as ".foot .sc-btn"
+    // The strip sits inside the send row, so a rule written as ".foot .sc-action"
     // would have pulled the lightbox's 48px controls down into the band.
     const styles = (FeedbackComposerComponent as unknown as { ɵcmp: { styles: string[] } }).ɵcmp.styles;
-    expect(styles.join('\n')).not.toMatch(/\.foot\s*\[[^\]]*]\s*\.sc-btn\s*\{/);
+    expect(styles.join('\n')).not.toMatch(/\.foot\s*\[[^\]]*]\s*\.sc-action\s*\{/);
   });
 });

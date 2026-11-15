@@ -145,7 +145,7 @@ describe('ApiTokensComponent', () => {
 
   it('asks before revoking and revokes after a confirm', async () => {
     const f = await mount();
-    (q(f, 'tbody tr .danger') as HTMLButtonElement).click();
+    (q(f, 'tbody tr .sc-action--danger') as HTMLButtonElement).click();
     await settle(f);
     expect(confirm).toHaveBeenCalledTimes(1);
     expect(vi.mocked(confirm).mock.lastCall![0]).toEqual(
@@ -160,7 +160,7 @@ describe('ApiTokensComponent', () => {
   it('does not revoke when the confirm is declined', async () => {
     const f = await mount();
     confirm.mockResolvedValue(false);
-    (q(f, 'tbody tr .danger') as HTMLButtonElement).click();
+    (q(f, 'tbody tr .sc-action--danger') as HTMLButtonElement).click();
     await settle(f);
     expect(confirm).toHaveBeenCalledTimes(1);
     expect(svc.revoke).not.toHaveBeenCalled();
@@ -170,7 +170,7 @@ describe('ApiTokensComponent', () => {
   it('shows an error flash when the revoke fails', async () => {
     const f = await mount();
     svc.revoke.mockRejectedValue(Object.assign(new Error('revoke_failed'), { status: 500 }));
-    (q(f, 'tbody tr .danger') as HTMLButtonElement).click();
+    (q(f, 'tbody tr .sc-action--danger') as HTMLButtonElement).click();
     await settle(f);
     expect(q(f, '.flash.error')?.textContent).toContain('admin.tokens.revokeError');
     expect(f.componentInstance.revokingId()).toBeNull();

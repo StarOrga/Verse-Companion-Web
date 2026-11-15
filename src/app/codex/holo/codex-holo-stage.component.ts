@@ -85,6 +85,7 @@ import type { CodexBuild } from '../codex.types';
 import type { PowerSheet } from '../codex-power';
 import type { SummaryOccupant } from '../ship-summary-panels';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScSegmentedComponent, ScSegmentOption } from '../../shared/segmented-control.component';
 import { HoloHotkeyAction, HoloSurface, holoHotkeyFor, holoHotkeyLabel, nextHoloSurface } from './codex-holo-hotkeys';
 import { ShipBlueprintService } from '../ship-blueprint/ship-blueprint.service';
@@ -250,6 +251,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   selector: 'sc-codex-holo-stage',
   standalone: true,
   imports: [FeedbackSpotDirective,
+    ScActionDirective,
     ScSegmentedComponent,
     NgTemplateOutlet,
     TranslatePipe,
@@ -679,7 +681,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
         @if (undoToast()) {
           <div class="undo-toast" role="status" animate.enter="toast-enter" animate.leave="toast-leave">
             <span>{{ 'codex.holo.stage.journalChanged' | translate: { label: undoToastLabel() } }}</span>
-            <button type="button" class="btn quiet" (click)="undoToastAction()">{{ 'codex.holo.stage.undo' | translate }}</button>
+            <button type="button" scAction tier="secondary" (click)="undoToastAction()">{{ 'codex.holo.stage.undo' | translate }}</button>
           </div>
         }
         @if (copyToast(); as ct) {
@@ -759,12 +761,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   --holo-cols: var(--holo-lead-w) repeat(4, minmax(0, 1fr)) var(--holo-ctl-w) var(--holo-fab-clear, 0px);
   display: flex; flex-direction: column; gap: 6px;
   }
-  .btn, .mobile-tabs button, .statics .k, .sub, .sh, .details-toggle, .switch { font-family: var(--d); text-transform: uppercase; }
+  .mobile-tabs button, .statics .k, .sub, .sh, .details-toggle, .switch { font-family: var(--d); text-transform: uppercase; }
   .rule { flex: 1; height: 1px; background: var(--l1); }
-  .btn { min-height: var(--sc-tap-min, 32px); padding: 5px 12px; border-radius: 3px; border: 1px solid var(--l2); background: var(--a10);
-  color: var(--sc-fg-0); cursor: pointer; font-size: max(11px, var(--f)); letter-spacing: 0.08em; transition: border-color 160ms ease, color 160ms ease; }
-  .btn.quiet { background: none; border-color: var(--l1); color: var(--sc-fg-1); }
-  .btn:hover, .btn:focus-visible { border-color: var(--sc-accent); color: var(--sc-accent); }
   @keyframes rise { from { opacity: 0; transform: translateY(var(--holo-rise)); } }
   @keyframes fade-in { from { opacity: 0; } }
 

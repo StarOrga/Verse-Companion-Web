@@ -559,15 +559,15 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                pickers stay one click away and the rarer actions sit at its end.
                Wraps on a phone. ── -->
           <div class="stage-actions">
-            <button type="button" class="btn" [class.on]="isPinned()" (click)="togglePin()">
+            <button type="button" scAction tier="secondary" [class.on]="isPinned()" [attr.aria-pressed]="isPinned()" (click)="togglePin()">
               <sc-compare-icon [on]="isPinned()" />
               {{ (isPinned() ? 'codex.compare.pinned' : 'codex.detail.actionCompare') | translate }}
             </button>
-            <button type="button" class="btn" (click)="discardLoadoutDraft()">
+            <button type="button" scAction tier="secondary" (click)="discardLoadoutDraft()">
               {{ 'codex.detail.actionFactoryLoadout' | translate }}
             </button>
             @if (!shareFab()) {
-              <button type="button" class="btn copy" (click)="copyShareLink()">
+              <button type="button" scAction tier="secondary" class="copy" (click)="copyShareLink()">
                 {{ 'codex.detail.actionCopyLink' | translate }}
                 @if (linkCopied()) {
                   <span class="copy-toast" role="status">{{ 'codex.detail.linkCopied' | translate }}</span>
@@ -575,7 +575,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               </button>
             }
             <!-- Navigates, so it is an anchor and never a button (§2). -->
-            <a class="btn on" [routerLink]="['/codex']" [queryParams]="{ kind: 'ship' }">
+            <a scAction tier="secondary" [routerLink]="['/codex']" [queryParams]="{ kind: 'ship' }">
               {{ 'codex.detail.actionSwitchShip' | translate }} <span aria-hidden="true">⇄</span>
             </a>
             @if (editionOptions().length > 1) {
@@ -1515,34 +1515,29 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
        sc-codex-variant-picker (:host(.in-toolrow)); the spacer that pushes the
        rarer actions to the end lives in sc-codex-ship-actions. */
     .stage-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-    /* The one button on this page (concept section 2, part-02:159). Never the
-       hot accent: nothing here is admin-gated. A 3px rectangle with a 10px
-       uppercase label at .12em - the mock's button, not a pill.
-       The hero actions used to keep a compact size of their own right here;
-       they no longer need to, because this rule IS the concept's button at
-       every occurrence, so the four German labels on the half-width hero and
-       the rarer ones at the end of that row are one and the same control. */
-    .btn, .pin { position: relative; display: inline-flex; align-items: center; gap: 5px;
+    /* The stage actions are scAction pills. A pinned compare keeps the accent
+       state; .copy anchors its toast. */
+    .stage-actions .sc-action.on { color: var(--sc-accent);
+      border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0));
+      background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
+    .stage-actions .copy { position: relative; }
+    .pin { position: relative; display: inline-flex; align-items: center; gap: 5px;
       padding: 4px 8px; min-height: 48px;
       border: 1px solid var(--sc-border); border-radius: 3px;
       background: color-mix(in srgb, var(--sc-bg-0) 72%, transparent);
       color: var(--sc-fg-2); font-family: var(--sc-font-display); text-decoration: none;
       font-size: max(10px, var(--sc-fs-floor)); letter-spacing: 0.12em; text-transform: uppercase;
       cursor: pointer; }
-    /* The mock draws this button about 24px tall. A mouse gets exactly that;
-       coarse pointers - and therefore the mobile gate, which emulates one -
-       keep the 48px floor declared above. */
     @media (pointer: fine) {
-      .btn, .pin { min-height: 24px; }
+      .pin { min-height: 24px; }
     }
-    .btn:hover, .pin:hover { color: var(--sc-fg-0);
+    .pin:hover { color: var(--sc-fg-0);
       border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0)); }
-    .btn.on, .pin.pinned { color: var(--sc-accent);
+    .pin.pinned { color: var(--sc-accent);
       border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0));
       background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-    .btn:focus-visible, .pin:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-    .btn:disabled, .pin:disabled { opacity: 0.38; cursor: not-allowed; }
-    .btn.quiet { text-transform: none; letter-spacing: 0; background: transparent; }
+    .pin:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    .pin:disabled { opacity: 0.38; cursor: not-allowed; }
 
     /* The 2D/3D switch (.view-switch) moved to sc-codex-ship-stage — see
        codex-ship-stage.component.ts. */
@@ -1737,7 +1732,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
          card chrome (grid → flex, the wash's height) stays here. */
       .hero.stage { display: flex; flex-direction: column; min-height: 0; padding: 0; gap: 0; }
       .hero.stage::before { inset: 0 0 auto 0; height: 190px; }
-      .stage-actions .btn { flex: 1 1 auto; justify-content: center; }
+      .stage-actions .sc-action { flex: 1 1 auto; justify-content: center; }
     }
     @media (max-width: 400px) {
       .hero-body { padding: 16px; }

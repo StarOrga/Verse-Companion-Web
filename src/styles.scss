@@ -845,14 +845,6 @@ html[data-sc-layout] { scroll-padding-top: var(--sc-bar-h); }
     vertical-align: middle;
   }
 
-  /* The compact `.sc-btn.micro` variant several admin panels define keeps its
-     small type and padding on touch, but never its small hit area. The
-     doubled classes beat encapsulation as with .sc-nest: the component rules
-     that shrink it are 0,3,0 already, so this is 0,4,0. */
-  .sc-btn.sc-btn.micro.micro {
-    min-height: var(--sc-tap-min);
-  }
-
   /* Fields that set no size of their own fall back to the UA's ~13px.
      :where() keeps this at zero specificity, so any component rule still
      wins and brings its own max(..., var(--sc-fs-input)). */
@@ -1303,41 +1295,6 @@ button {
 @media (max-width: 400px) {
   .sc-detail-hero__body { padding: 16px; }
   .sc-detail-hero__body h1 { font-size: 1.4rem; }
-}
-
-.sc-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  background: transparent;
-  color: var(--sc-accent);
-  border: 1px solid var(--sc-accent);
-  border-radius: 4px;
-  font-family: var(--sc-font-display);
-  font-size: 0.85rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  transition: all 0.18s ease;
-
-  &:hover:not(:disabled) {
-    background: var(--sc-accent);
-    color: var(--sc-bg-0);
-    box-shadow: var(--sc-glow);
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  &.sc-btn-primary {
-    background: var(--sc-accent);
-    color: var(--sc-bg-0);
-    &:hover:not(:disabled) {
-      background: var(--accent-strong);
-    }
-  }
 }
 
 .sc-input {

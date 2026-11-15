@@ -1,3 +1,4 @@
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { ScConfirmService } from '../shared/dialog/sc-confirm.service';
@@ -148,7 +149,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
 @Component({
   selector: 'sc-admin',
   standalone: true,
-  imports: [ScDatePipe, ScSelectComponent, TranslatePipe, ScTooltipDirective, SilhouetteCoverageComponent, SearchMissesComponent],
+  imports: [ScDatePipe, ScSelectComponent, TranslatePipe, ScTooltipDirective, SilhouetteCoverageComponent, SearchMissesComponent, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
@@ -214,11 +215,11 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                     (valueChange)="setRequestRole(r.id, asRole($event))"
                     [ariaLabel]="'admin.col.role' | translate"
                     [disabled]="accessBusy()" />
-                  <button type="button" class="sc-btn sc-btn-primary"
+                  <button type="button" scAction tier="secondary"
                           (click)="acceptRequest(r)" [disabled]="accessBusy()">
                     {{ 'admin.requests.accept' | translate }}
                   </button>
-                  <button type="button" class="sc-btn req-decline"
+                  <button type="button" scAction tier="secondary" tone="danger"
                           (click)="declineRequest(r)" [disabled]="accessBusy()">
                     {{ 'admin.requests.decline' | translate }}
                   </button>
@@ -312,31 +313,31 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
 
                   <div class="mod-actions">
                     @if (isUserSuspended(f.user)) {
-                      <button type="button" class="sc-btn micro"
+                      <button type="button" scAction tier="secondary"
                               [disabled]="moderation.busy()" (click)="unsuspend(f.user)">
                         {{ 'admin.moderation.unsuspend' | translate }}
                       </button>
                     } @else {
                       <span class="tip-wrap" [scTooltip]="moderationLockReason(f.user)" scTooltipTier="label">
-                        <button type="button" class="sc-btn micro"
+                        <button type="button" scAction tier="secondary"
                                 [disabled]="moderation.busy() || !canModerate(f.user)"
                                 (click)="openModeration(f.user.id, 'warn')">
                           {{ 'admin.moderation.warn' | translate }}
                         </button>
                       </span>
                       <span class="tip-wrap" [scTooltip]="moderationLockReason(f.user)" scTooltipTier="label">
-                        <button type="button" class="sc-btn micro danger"
+                        <button type="button" scAction tier="secondary" tone="danger"
                                 [disabled]="moderation.busy() || !canModerate(f.user)"
                                 (click)="openModeration(f.user.id, 'suspend')">
                           {{ 'admin.moderation.suspend' | translate }}
                         </button>
                       </span>
                     }
-                    <button type="button" class="sc-btn micro"
+                    <button type="button" scAction tier="secondary"
                             [disabled]="moderation.busy()" (click)="resolveReports(f.user, false)">
                       {{ 'admin.moderation.markReviewed' | translate }}
                     </button>
-                    <button type="button" class="sc-btn micro ghost"
+                    <button type="button" scAction tier="secondary"
                             [disabled]="moderation.busy()" (click)="resolveReports(f.user, true)">
                       {{ 'admin.moderation.dismiss' | translate }}
                     </button>
@@ -376,12 +377,12 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                         <p class="err">{{ key | translate }}</p>
                       }
                       <div class="mod-form-actions">
-                        <button type="button" class="sc-btn micro primary"
+                        <button type="button" scAction tier="secondary"
                                 [disabled]="moderation.busy() || !modReasonValid()"
                                 (click)="submitModeration(f.user)">
                           {{ (modMode() === 'warn' ? 'admin.moderation.confirmWarn' : 'admin.moderation.confirmSuspend') | translate }}
                         </button>
-                        <button type="button" class="sc-btn micro ghost" (click)="cancelModeration()">
+                        <button type="button" scAction tier="secondary" (click)="cancelModeration()">
                           {{ 'admin.moderation.cancel' | translate }}
                         </button>
                       </div>
@@ -426,13 +427,13 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
             {{ 'admin.register.sendInvite' | translate }}
           </label>
           <button type="submit"
-                  class="sc-btn sc-btn-primary"
+                  scAction tier="primary"
                   [disabled]="inviteBusy() || !inviteEmail().includes('@')">
             {{ inviteBusy() ? ('admin.register.sending' | translate) : ('admin.register.send' | translate) }}
           </button>
           <!-- C7: copy action, not a navigation — stays a <button>. -->
           <button type="button"
-                  class="sc-btn share-btn"
+                  scAction tier="secondary" class="share-btn"
                   (click)="copyShareLink()">
             {{ 'admin.share.button' | translate }}
           </button>
@@ -503,7 +504,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
             {{ 'admin.filter.count' | translate: { shown: filteredSortedPeople().length, total: people().length } }}
           </span>
           @if (filtersActive()) {
-            <button type="button" class="sc-btn micro" (click)="clearFilters()">
+            <button type="button" scAction tier="secondary" (click)="clearFilters()">
               {{ 'admin.filter.clear' | translate }}
             </button>
           }
@@ -589,7 +590,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                 <td class="actions">
                   @if (u.role !== 'collaborator') {
                     <span class="tip-wrap" [scTooltip]="roleLockReason(u, 'collaborator')" scTooltipTier="label">
-                      <button class="sc-btn micro"
+                      <button scAction tier="secondary"
                               (click)="setRole(u.id, 'collaborator')"
                               [disabled]="busy() || roleLocked(u, 'collaborator')">
                         {{ 'admin.actions.promoteCollab' | translate }}
@@ -598,7 +599,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                   }
                   @if (u.role !== 'admin') {
                     <span class="tip-wrap" [scTooltip]="roleLockReason(u, 'admin')" scTooltipTier="label">
-                      <button class="sc-btn micro"
+                      <button scAction tier="secondary"
                               (click)="setRole(u.id, 'admin')"
                               [disabled]="busy() || roleLocked(u, 'admin')">
                         {{ 'admin.actions.promoteAdmin' | translate }}
@@ -607,7 +608,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                   }
                   @if (u.role !== 'viewer') {
                     <span class="tip-wrap" [scTooltip]="roleLockReason(u, 'viewer')" scTooltipTier="label">
-                      <button class="sc-btn micro"
+                      <button scAction tier="secondary"
                               (click)="setRole(u.id, 'viewer')"
                               [disabled]="busy() || roleLocked(u, 'viewer')">
                         {{ 'admin.actions.demoteViewer' | translate }}
@@ -620,7 +621,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                        empty once they are closed. Suspending itself stays up
                        there, where the evidence is. -->
                   @if (isUserSuspended(u)) {
-                    <button class="sc-btn micro"
+                    <button scAction tier="secondary"
                             (click)="unsuspend(u)"
                             [disabled]="moderation.busy()"
                             [scTooltip]="u.suspension_reason ?? ''"
@@ -629,7 +630,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                     </button>
                   }
                   <span class="tip-wrap" [scTooltip]="deleteLockReason(u)" scTooltipTier="label">
-                    <button class="sc-btn micro danger"
+                    <button scAction tier="secondary" tone="danger"
                             (click)="deleteUser(u)"
                             [disabled]="busy() || deleteLocked(u)">
                       {{ (u.id === selfId() ? 'admin.actions.leaveSelf' : 'admin.actions.delete') | translate }}
@@ -667,7 +668,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                 <td class="actions">
                   <!-- The old card said it in a subline nobody re-read; here the
                        promise sits on the button that needs it. -->
-                  <button type="button" class="sc-btn micro danger"
+                  <button type="button" scAction tier="secondary" tone="danger"
                           (click)="withdrawInvite(inv)"
                           [scTooltip]="'admin.people.withdrawTitle' | translate"
                           [disabled]="allowlistBusy()">
@@ -928,8 +929,6 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
     .mod-form .hint.small { margin: 0 0 10px; font-size: max(0.72rem, var(--sc-fs-floor)); }
     .mod-form .err { margin-bottom: 10px; font-size: 0.85rem; }
     .mod-form-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .sc-btn.micro.primary { background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-    .sc-btn.micro.ghost { border-color: var(--sc-border); color: var(--sc-fg-1); }
     .mod-flash {
       margin: 12px 0 0;
       padding: 8px 12px;
@@ -940,29 +939,11 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
       font-size: 0.85rem;
     }
 
-    /* 48px, not 44: two overlapping scale(0.994) shell animations shave a
-       hair off every measured box, so a 44px target measures 43. */
-    @media (pointer: coarse) {
-      .mod-actions .sc-btn, .mod-form-actions .sc-btn { min-height: 48px; }
-    }
     @media (max-width: 560px) {
-      .mod-actions .sc-btn, .mod-form-actions .sc-btn { flex: 1 1 100%; }
+      .mod-actions .sc-action, .mod-form-actions .sc-action { flex: 1 1 100%; }
     }
     .muted-zero { color: var(--sc-fg-2); }
 
-    .sc-btn.micro {
-      padding: 4px 10px;
-      font-size: max(0.7rem, var(--sc-fs-floor));
-      letter-spacing: 0.04em;
-    }
-    .sc-btn.micro.danger {
-      color: var(--sc-danger);
-      border-color: var(--sc-danger);
-    }
-    .sc-btn.micro.danger:hover:not(:disabled) {
-      background: var(--sc-danger);
-      color: var(--sc-bg-0);
-    }
 
     .invite-card {
       display: flex;
@@ -1027,8 +1008,6 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
       .req-actions { align-items: stretch; }
       sc-select.role-select { flex: 1 1 100%; width: auto; }
     }
-    .sc-btn.req-decline { color: var(--sc-danger); border-color: var(--sc-danger); }
-    .sc-btn.req-decline:hover:not(:disabled) { background: var(--sc-danger); color: var(--sc-bg-0); }
 
     .invite-head h2 { margin: 0 0 4px; font-size: 1rem; }
     .invite-head .hint { margin: 0; }
