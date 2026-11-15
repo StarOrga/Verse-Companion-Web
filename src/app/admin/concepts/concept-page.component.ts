@@ -1,54 +1,47 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ChangeDetectionStrategy, Component, InjectionToken, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ConceptPageService, ConceptTicketError, ConceptTicketFailure } from './concept-page.service';
 
-type State = 'loading' | 'ready' | ConceptTicketError;
+type State = 'loading' | ConceptTicketError;
 
 /**
- * `/concept/:id` — one hosted concept page, embedded (admin feedback #224).
+ * `/concept/:id` — the entry link of one hosted concept page (admin feedback
+ * #224, full-screen since feedback e4428abd).
  *
- * The admin asked for a link on the website that only admins can open and
- * on which the interactive concept (choices, notes, submit) works exactly
- * like the local `/concept` pages — without the local bridge. The route is
- * `roleGuard('admin')`-gated; on top, the `concept-page` edge function
- * refuses to mint a ticket for anyone but an admin, so a leaked route path
- * alone shows nothing.
+ * The route is `roleGuard('admin')`-gated; on top, the `concept-page` edge
+ * function refuses to mint a ticket for anyone but an admin, so a leaked
+ * route path alone shows nothing.
  *
- * The page itself comes from that function and runs in an iframe: its own
- * document, its own CSP, its own engine. The iframe does NOT point at the
- * function: Supabase serves html from `*.supabase.co` as `text/plain`, so
- * the admin saw the source (#330). It points at the app's static loader
- * `/concept-frame/<id>.html` (public/concept-frame.html) with the ticketed
- * function URL in the fragment; the loader fetches the document as text and
- * writes it into itself. This component only mints the ticket, frames the
- * loader and offers the two navigations (back to the board, open in a new
- * tab). Nothing about the concept's content is rendered here.
+ * The concept is NOT shown inside the app any more. The admin asked for no
+ * intermediate page with a sub-header: a concept link (feedback board,
+ * bookmark, old message) lands straight on the full-screen document, exactly
+ * where the former "open in new tab" link went. So this route sits outside
+ * the shell, mints the ticket and REPLACES its own history entry with the
+ * app's static loader `/concept-frame/<id>.html` (public/concept-frame.html)
+ * carrying the ticketed function URL in the fragment — Back skips this hop.
+ * The loader fetches the document as text and writes it into itself
+ * (Supabase serves html from `*.supabase.co` as `text/plain`, #330). What
+ * stays visible here is only the moment of minting and the failure copies.
  */
 /** `/concept-frame/<id>.html#<encoded function url>` — see public/concept-frame.html. */
 export function conceptFrameUrl(id: string, documentUrl: string): string {
   return `/concept-frame/${encodeURIComponent(id.trim().toLowerCase())}.html#${encodeURIComponent(documentUrl)}`;
 }
 
+/** Leaves the app for the full-screen loader without a history entry (swapped in specs). */
+export const CONCEPT_FRAME_NAVIGATE = new InjectionToken<(url: string) => void>('CONCEPT_FRAME_NAVIGATE', {
+  providedIn: 'root',
+  factory: () => (url: string) => window.location.replace(url),
+});
+
 @Component({
   selector: 'sc-concept-page',
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="concept">
-      <header class="bar">
-        <a class="back" routerLink="/admin/feedback">
-          <span aria-hidden="true">&larr;</span> {{ 'conceptPage.back' | translate }}
-        </a>
-        <h1 class="title">{{ title() || ('conceptPage.title' | translate) }}</h1>
-        @if (rawUrl(); as href) {
-          <a class="open" [href]="href" target="_blank" rel="noopener noreferrer">
-            {{ 'conceptPage.openTab' | translate }} <span aria-hidden="true">&nearr;</span>
-          </a>
-        }
-      </header>
-
+    <main class="concept">
       @switch (state()) {
         @case ('loading') {
           <p class="msg" role="status">{{ 'conceptPage.loading' | translate }}</p>
@@ -61,18 +54,17 @@ export function conceptFrameUrl(id: string, documentUrl: string): string {
         }
         @case ('error') {
           <p class="msg err" role="alert">{{ 'conceptPage.error' | translate }}</p>
-        }
-        @case ('ready') {
-          <iframe
-            class="frame"
-            [src]="safeUrl()"
-            [title]="title() || ('conceptPage.title' | translate)"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"
-            referrerpolicy="no-referrer"
-          ></iframe>
+          <button scAction tier="secondary" type="button" class="retry" (click)="retry()">
+            {{ 'conceptPage.retry' | translate }}
+          </button>
         }
       }
-    </div>
+      @if (state() !== 'loading') {
+        <a class="back" routerLink="/admin/feedback">
+          <span aria-hidden="true">&larr;</span> {{ 'conceptPage.back' | translate }}
+        </a>
+      }
+    </main>
   `,
   styles: [
     `
@@ -80,31 +72,19 @@ export function conceptFrameUrl(id: string, documentUrl: string): string {
       .concept {
         display: flex;
         flex-direction: column;
-        min-height: calc(100dvh - 4rem);
-        width: 100%;
-        max-width: 100%;
-        overflow-x: hidden;
-      }
-      .bar {
-        display: flex;
         align-items: center;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        padding: 0.5rem 1rem;
-        border-bottom: 1px solid var(--sc-border);
-        background: var(--sc-bg-1);
+        justify-content: center;
+        gap: 1rem;
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: 1.5rem 1rem;
+        box-sizing: border-box;
+        background: var(--sc-bg-0);
+        color: var(--sc-fg-1);
       }
-      .title {
-        flex: 1 1 12rem;
-        min-width: 0;
-        margin: 0;
-        font-size: 1rem;
-        font-weight: 600;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .back, .open {
+      .msg { margin: 0; text-align: center; max-width: var(--sc-measure, 60ch); }
+      .msg.err { color: var(--sc-danger); }
+      .back {
         display: inline-flex;
         align-items: center;
         gap: 0.35rem;
@@ -112,60 +92,40 @@ export function conceptFrameUrl(id: string, documentUrl: string): string {
         padding: 0 0.5rem;
         color: var(--sc-accent-hot);
         text-decoration: none;
-        white-space: nowrap;
       }
-      .back:hover, .open:hover { text-decoration: underline; }
-      .msg { padding: 2rem 1rem; text-align: center; color: var(--sc-fg-1); }
-      .msg.err { color: var(--sc-danger); }
-      .frame {
-        flex: 1 1 auto;
-        min-height: 70vh;
-        min-height: 70dvh;
-        width: 100%;
-        max-width: 100%;
-        border: 0;
-        background: transparent;
-      }
+      .back:hover, .back:focus-visible { text-decoration: underline; }
     `,
   ],
 })
 export class ConceptPageComponent {
   private readonly route = inject(ActivatedRoute);
-  private readonly sanitizer = inject(DomSanitizer);
   private readonly tickets = inject(ConceptPageService);
+  private readonly navigate = inject(CONCEPT_FRAME_NAVIGATE);
 
   readonly state = signal<State>('loading');
-  readonly title = signal('');
-  /**
-   * The loader URL for the ticketed document: same-origin static file, the
-   * function URL (with its ticket) only in the fragment, which never reaches
-   * a server.
-   */
-  readonly rawUrl = signal<string | null>(null);
-  readonly safeUrl = computed<SafeResourceUrl | null>(() => {
-    const url = this.rawUrl();
-    return url ? this.sanitizer.bypassSecurityTrustResourceUrl(url) : null;
-  });
+  private id = '';
 
   constructor() {
     this.route.paramMap.subscribe((params) => {
-      void this.load(params.get('id') ?? '');
+      this.id = params.get('id') ?? '';
+      void this.load();
     });
   }
 
-  private async load(id: string): Promise<void> {
+  retry(): void {
+    void this.load();
+  }
+
+  private async load(): Promise<void> {
+    const id = this.id;
     this.state.set('loading');
-    this.rawUrl.set(null);
-    this.title.set('');
     if (!id) {
       this.state.set('notFound');
       return;
     }
     try {
       const ticket = await this.tickets.mintTicket(id);
-      this.title.set(ticket.title);
-      this.rawUrl.set(conceptFrameUrl(id, ticket.url));
-      this.state.set('ready');
+      this.navigate(conceptFrameUrl(id, ticket.url));
     } catch (err) {
       this.state.set(err instanceof ConceptTicketFailure ? err.kind : 'error');
     }
