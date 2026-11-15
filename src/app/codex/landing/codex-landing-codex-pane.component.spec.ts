@@ -160,6 +160,7 @@ describe('Codex landing pane', () => {
       ],
       'armor',
       item('armor', 'I_armor'),
+      600,
     );
     settle();
     expect(rowsShown()).toEqual(['Tool 0', 'Ship 0', 'Ship 1', 'Gun 0']);
@@ -181,11 +182,12 @@ describe('Codex landing pane', () => {
       ],
       'fpsWeapon',
       null,
+      600,
     );
     settle();
     expect(rowsShown()).toEqual(['Gun 0', 'Gun 1', 'Tool 0', 'Ship 2', 'Ship 0', 'Ship 1']);
     const heads = Array.from(host.querySelectorAll<HTMLElement>('.new li.grp-cat .grp-nm')).map((n) => n.textContent!.trim());
-    expect(heads).toEqual(['FPS-Waffen', 'Werkzeuge', 'Raumschiffe']);
+    expect(heads, 'the active block needs no header, its tab names it').toEqual(['Werkzeuge', 'Raumschiffe']);
     const rows = Array.from(host.querySelectorAll<HTMLElement>('.new li:not(.cut):not(.grp)'));
     const fresh = rows.map((li) => !!li.querySelector('.upd.fresh'));
     expect(fresh).toEqual([true, false, true, true, false, false]);

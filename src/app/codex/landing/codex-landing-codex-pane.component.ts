@@ -94,19 +94,18 @@ export type WheelEntry = LandingCodexEntry & { onTable: boolean; category: Landi
 
 /**
  * The current patch's rows grouped by category, `cats` in the given order, each block new
- * before updated (#328). A block gets a header naming its category whenever the list is not
- * just the active category's own: a tab whose category brought nothing must not seem to
- * hold the ships listed under it (feedback #360).
+ * before updated (#328). Every block but the active category's own (its tab already names
+ * it) opens with a header naming its category: a tab whose category brought nothing must
+ * not seem to hold the ships listed under it (feedback #360).
  */
 export function groupByCategory(
   cats: readonly { category: LandingCategory; entries: readonly (LandingCodexEntry & { onTable: boolean })[] }[],
   active: LandingCategory | null,
 ): WheelEntry[] {
-  const headed = cats.length > 1 || (cats.length === 1 && cats[0].category !== active);
   return cats.flatMap((r) => {
     const rows = r.entries.map((e) => ({ ...e, category: r.category }));
     const ordered = [...rows.filter((e) => e.isNew), ...rows.filter((e) => !e.isNew)];
-    if (!headed || !ordered.length) return ordered;
+    if (r.category === active || !ordered.length) return ordered;
     const head: WheelEntry = {
       id: `cat:${r.category}`,
       name: r.category,
