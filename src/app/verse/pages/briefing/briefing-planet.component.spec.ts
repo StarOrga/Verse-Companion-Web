@@ -55,6 +55,10 @@ describe('BriefingPlanetComponent — worker path', () => {
   const planet = (f: ComponentFixture<HostComponent>) =>
     f.debugElement.children.find((d) => d.componentInstance instanceof BriefingPlanetComponent)!.componentInstance as BriefingPlanetComponent;
   const runFrames = (t: number) => frames.splice(0).forEach((cb) => cb(t));
+  // The idle tick is a setTimeout: advance fake time instead of sleeping, so no stray
+  // scroll, resize or focus event of a loaded browser lands in the wait and asks for a frame.
+  const fakeIdle = () => vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  const idle = (ms: number) => vi.advanceTimersByTime(ms);
   const settle = async () => { for (let i = 0; i < 6; i++) await Promise.resolve(); };
   const mount = async () => {
     const f = TestBed.createComponent(HostComponent);
@@ -77,7 +81,10 @@ describe('BriefingPlanetComponent — worker path', () => {
     });
   });
 
-  afterEach(() => forgetPlanetSession());
+  afterEach(() => {
+    vi.useRealTimers();
+    forgetPlanetSession();
+  });
 
   it('hands the canvases to the worker, stands when it is ready, and fires drawn once', async () => {
     const f = await mount();
@@ -90,11 +97,12 @@ describe('BriefingPlanetComponent — worker path', () => {
 
   it('measures at 15 Hz at rest, and every frame while the planet moves on screen', async () => {
     const f = await mount();
+    fakeIdle();
     runFrames(16);
     const a = link!.views[0];
     expect(a.r).toBe(100);
     expect(frames.length, 'at rest a timer sets the pace, not the monitor').toBe(0);
-    await new Promise((r) => setTimeout(r, 90));
+    idle(90);
     expect(frames.length, 'the timer asks for the next frame').toBe(1);
     (f.nativeElement.querySelector('div') as HTMLElement).style.transform = 'translateY(40px)';
     runFrames(200);
@@ -116,10 +124,11 @@ describe('BriefingPlanetComponent — worker path', () => {
 
   it('stands without focus, stays under the page, and carries on with focus', async () => {
     await mount();
+    fakeIdle();
     runFrames(16);
     window.dispatchEvent(new Event('blur'));
     expect(link!.suspended).toBe(1);
-    await new Promise((r) => setTimeout(r, 90));
+    idle(90);
     expect(frames.length, 'no timer left running').toBe(0);
     document.dispatchEvent(new Event('scroll'));
     document.dispatchEvent(new Event('scroll'));
