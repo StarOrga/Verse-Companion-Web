@@ -25,7 +25,7 @@
     } @else if (newsError() && !newsLoading()) {
       <div class="state" role="alert">
         <p>{{ newsError() ?? 'errors.generic' | translate }}</p>
-        <button type="button" class="sc-btn" (click)="retryNews.emit()">{{ 'errors.retry' | translate }}</button>
+        <button type="button" scAction tier="secondary" (click)="retryNews.emit()">{{ 'errors.retry' | translate }}</button>
       </div>
     } @else if (newsLoading()) {
       <div class="feat sk sc-skel-field" aria-hidden="true"></div>

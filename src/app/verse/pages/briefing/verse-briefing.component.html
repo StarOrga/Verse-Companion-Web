@@ -27,7 +27,7 @@
             @if (api.digestState() === 'error' && !api.digest() && !brand()) {
               <h1 class="title2"><span class="tl">{{ 'verse.briefing.headlineError' | translate }}</span></h1>
               <p class="err" role="alert">{{ (api.digestError() ?? 'errors.generic') | translate }}</p>
-              <button type="button" class="sc-btn" (click)="reload()">{{ 'errors.retry' | translate }}</button>
+              <button type="button" scAction tier="secondary" (click)="reload()">{{ 'errors.retry' | translate }}</button>
             } @else if (api.digestState() === 'loading' && !api.digest() && !brand()) {
               <h1 class="title2"><span class="sk sc-skel-field" aria-hidden="true"></span><span class="sc-sr-only">{{ 'verse.briefing.loading' | translate }}</span></h1>
             } @else {

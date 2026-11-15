@@ -22,6 +22,7 @@ import { downloadBlob, renderConstellationPng, renderConstellationWallpaper } fr
 import { wallpaperConstellations } from './wallpaper';
 import { hasTierReward, rankProgressOf } from './starmap.model';
 import { shareImage } from './share-image';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 
 const THUMB = { width: 480, height: 270 } as const;
 
@@ -34,14 +35,14 @@ const THUMB = { width: 480, height: 270 } as const;
 @Component({
   selector: 'sc-my-constellations',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe, ScTooltipDirective],
+  imports: [RouterLink, TranslatePipe, ScTooltipDirective, ScActionDirective],
   template: `
     @if (!signedIn()) {
       <p class="note">{{ 'starmap.signedOut' | translate }}
         <a routerLink="/login" [queryParams]="{ redirect: '/verse/explorer/rank' }">{{ 'starmap.signIn' | translate }}</a></p>
     } @else if (api.explorerState() === 'error') {
       <p class="note" role="alert">{{ (api.explorerError() ?? 'errors.generic') | translate }}
-        <button type="button" class="btn" (click)="reload()">{{ 'errors.retry' | translate }}</button></p>
+        <button type="button" scAction tier="secondary" (click)="reload()">{{ 'errors.retry' | translate }}</button></p>
     } @else if (!api.explorer()) {
       <p class="note" aria-busy="true">{{ 'starmap.loading' | translate }}</p>
     } @else if (earned().length === 0) {
@@ -57,10 +58,10 @@ const THUMB = { width: 480, height: 270 } as const;
               <strong>{{ p.patchLine }}</strong>
               @if (i < 7) { <span class="muted small">{{ 'starmap.gallery.inApp' | translate }}</span> }
               <span class="spacer"></span>
-              <button type="button" class="btn" [disabled]="busy() === p.patchLine" (click)="download(p)">
+              <button type="button" scAction tier="secondary" [busy]="busy() === p.patchLine" (click)="download(p)">
                 {{ 'starmap.gallery.download' | translate }}
               </button>
-              <button type="button" class="btn icon" [attr.aria-label]="'starmap.gallery.share' | translate"
+              <button type="button" scAction tier="tertiary" class="share" [attr.aria-label]="'starmap.gallery.share' | translate"
                       [scTooltip]="'starmap.gallery.share' | translate" scTooltipTier="label" (click)="share(p)">
                 <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                   <circle cx="18" cy="5" r="2.6" /><circle cx="6" cy="12" r="2.6" /><circle cx="18" cy="19" r="2.6" />
@@ -87,12 +88,7 @@ const THUMB = { width: 480, height: 270 } as const;
       .meta { display: flex; gap: var(--sc-gap-2); align-items: center; padding: var(--sc-pad-2); flex-wrap: wrap; }
       .meta strong { font: 600 1rem var(--sc-font-display); }
       .spacer { flex: 1; }
-      .btn { display: inline-flex; align-items: center; justify-content: center; min-height: var(--sc-tap-min, 44px); padding: 0 var(--sc-pad-2);
-        border-radius: 8px; border: 1px solid var(--sc-border); background: var(--sc-bg-2); color: var(--sc-fg-0); font: inherit; cursor: pointer; }
-      .btn.icon { min-width: var(--sc-tap-min, 44px); padding: 0; }
-      .btn:hover { border-color: var(--sc-accent); }
-      .btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-      .btn svg { fill: currentColor; stroke: currentColor; stroke-width: 1.6; }
+      .share svg { fill: currentColor; stroke: currentColor; stroke-width: 1.6; }
     `,
   ],
 })

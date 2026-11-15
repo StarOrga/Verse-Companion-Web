@@ -67,6 +67,7 @@ import { VerseItemLink, verseItemLink } from './verse-item-link';
 import { ShellChromeService } from '../../shell/fusion-bar/shell-chrome.service';
 import { StageSearchDirective } from '../../shell/fusion-bar/stage-search.directive';
 import { StageHeroDirective } from '../../shell/fusion-bar/stage-hero.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 
 export { verseItemLink } from './verse-item-link';
 export type { VerseItemLink } from './verse-item-link';
@@ -239,6 +240,7 @@ export function hurry(a: Animation, ms: number): void {
   selector: 'sc-verse-briefing',
   standalone: true,
   imports: [
+    ScActionDirective,
     StageSearchDirective,
     StageHeroDirective,
     RouterLink, TranslatePipe, ScTooltipDirective, AppNoticeComponent, NewsListComponent, BriefingMoonComponent, BriefingSkyComponent,

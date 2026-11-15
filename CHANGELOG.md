@@ -4,6 +4,14 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.270.18] - 2026-11-15
+
+### Changed
+- Sign-in, password, star map, briefing and news retry buttons use the shared action control — the sign-in form keeps the page's one main step (#970).
+
+### Fixed
+- Main action buttons keep a readable 12 px label on touch screens.
+
 ## [0.270.17] - 2026-11-15
 
 ### Fixed

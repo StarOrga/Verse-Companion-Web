@@ -11,6 +11,7 @@ import { AnalyticsService } from '../core/analytics.service';
 import { ScDatePipe } from '../core/locale/sc-date.pipe';
 import { safeRedirectTarget } from '../core/safe-redirect.util';
 import { AccountStatusService } from '../social/account-status.service';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /** Which panel the landing card currently shows. */
 type Panel = 'signIn' | 'apply' | 'reset';
@@ -18,7 +19,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
 @Component({
   selector: 'sc-login',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, RouterLink, ScDatePipe],
+  imports: [ReactiveFormsModule, TranslatePipe, RouterLink, ScDatePipe, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!--
@@ -49,11 +50,11 @@ type Panel = 'signIn' | 'apply' | 'reset';
             </ul>
 
             @if (panel() === 'signIn') {
-              <button type="button" class="sc-btn sc-btn-primary hero-cta" (click)="showApply()">
+              <button type="button" scAction tier="secondary" class="hero-cta" (click)="showApply()">
                 {{ 'auth.landing.applyCta' | translate }}
               </button>
             } @else {
-              <button type="button" class="sc-btn hero-cta" (click)="showSignIn()">
+              <button type="button" scAction tier="secondary" class="hero-cta" (click)="showSignIn()">
                 {{ 'auth.landing.backToSignIn' | translate }}
               </button>
             }
@@ -102,7 +103,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
                 <div class="notice preview-locked" role="status">
                   <p class="preview-locked__title">{{ 'auth.previewLocked.title' | translate }}</p>
                   <p class="preview-locked__body">{{ 'auth.previewLocked.body' | translate }}</p>
-                  <button type="button" class="sc-btn sc-btn-primary" (click)="leavePreview()">
+                  <button type="button" scAction tier="primary" (click)="leavePreview()">
                     {{ 'auth.previewLocked.exit' | translate }}
                   </button>
                 </div>
@@ -124,7 +125,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
                 }
 
                 <div class="actions">
-                  <button type="submit" class="sc-btn sc-btn-primary" [disabled]="busy() || form.invalid">
+                  <button type="submit" scAction [tier]="previewLocked() ? 'secondary' : 'primary'" [disabled]="busy() || form.invalid">
                     {{ 'auth.signIn' | translate }}
                   </button>
                   <!-- An action (it sends a mail), not a navigation — stays a
@@ -138,10 +139,10 @@ type Panel = 'signIn' | 'apply' | 'reset';
 
               <div class="sep"><span>{{ 'auth.or' | translate }}</span></div>
 
-              <button type="button" class="sc-btn oauth" (click)="signInWithGoogle()" [disabled]="busy()">
+              <button type="button" scAction tier="secondary" class="oauth" (click)="signInWithGoogle()" [disabled]="busy()">
                 {{ 'auth.continueGoogle' | translate }}
               </button>
-              <button type="button" class="sc-btn oauth" (click)="signInWithDiscord()" [disabled]="busy()">
+              <button type="button" scAction tier="secondary" class="oauth" (click)="signInWithDiscord()" [disabled]="busy()">
                 {{ 'auth.continueDiscord' | translate }}
               </button>
 
@@ -156,7 +157,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
 
               @if (resetDone()) {
                 <div class="notice sent" role="status">{{ 'auth.reset.sent' | translate }}</div>
-                <button type="button" class="sc-btn back-btn" (click)="showSignIn()">
+                <button type="button" scAction tier="secondary" class="back-btn" (click)="showSignIn()">
                   {{ 'auth.landing.backToSignIn' | translate }}
                 </button>
               } @else {
@@ -173,7 +174,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
                   }
 
                   <div class="actions">
-                    <button type="submit" class="sc-btn sc-btn-primary"
+                    <button type="submit" scAction tier="primary"
                             [disabled]="resetBusy() || resetForm.invalid">
                       {{ (resetBusy() ? 'auth.reset.sending' : 'auth.reset.send') | translate }}
                     </button>
@@ -188,7 +189,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
 
               @if (applyDone()) {
                 <div class="notice sent" role="status">{{ 'auth.apply.sent' | translate }}</div>
-                <button type="button" class="sc-btn back-btn" (click)="showSignIn()">
+                <button type="button" scAction tier="secondary" class="back-btn" (click)="showSignIn()">
                   {{ 'auth.landing.backToSignIn' | translate }}
                 </button>
               } @else {
@@ -217,7 +218,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
                   }
 
                   <div class="actions">
-                    <button type="submit" class="sc-btn sc-btn-primary"
+                    <button type="submit" scAction tier="primary"
                             [disabled]="applyBusy() || applyForm.invalid">
                       {{ applyBusy() ? ('auth.apply.sending' | translate) : ('auth.apply.send' | translate) }}
                     </button>
@@ -385,7 +386,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
       margin: 0 0 12px;
       color: var(--sc-fg-2);
     }
-    .notice.preview-locked .sc-btn { width: 100%; justify-content: center; }
+    .notice.preview-locked .sc-action { width: 100%; justify-content: center; }
     .back-btn { width: 100%; justify-content: center; }
     .invite-only {
       margin: 18px 0 0;
@@ -451,7 +452,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
       margin-top: 18px;
       flex-wrap: wrap;
     }
-    .actions .sc-btn { flex: 1; justify-content: center; }
+    .actions .sc-action { flex: 1; justify-content: center; }
     /* The link-styled buttons in an action row centre against the primary
        button instead of stretching like one. */
     .actions .linkish {

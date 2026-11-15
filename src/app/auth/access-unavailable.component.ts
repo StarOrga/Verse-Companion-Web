@@ -5,6 +5,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { safeRedirectTarget } from '../core/safe-redirect.util';
 import { AuthService } from './auth.service';
 import { RoleService } from './role.service';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /**
  * The visible end of `approvedGuard`'s fail-closed path.
@@ -34,7 +35,7 @@ import { RoleService } from './role.service';
 @Component({
   selector: 'sc-access-unavailable',
   standalone: true,
-  imports: [AuthStageComponent, TranslatePipe],
+  imports: [AuthStageComponent, TranslatePipe, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <sc-auth-stage>
@@ -46,7 +47,7 @@ import { RoleService } from './role.service';
         <h1>{{ 'auth.unavailable.title' | translate }}</h1>
         <p>{{ 'auth.unavailable.body' | translate }}</p>
         <div class="actions">
-          <button type="button" class="sc-btn sc-btn-primary" [disabled]="busy()" (click)="retry()">
+          <button type="button" scAction tier="primary" [disabled]="busy()" (click)="retry()">
             {{ (busy() ? 'auth.unavailable.retrying' : 'auth.unavailable.retry') | translate }}
           </button>
           <button type="button" class="link" [disabled]="busy()" (click)="signOut()">
