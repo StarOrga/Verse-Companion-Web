@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Concepts: an admin-only concept page for the HQ storage area: its own search over item, location and quantity, three quantity modes (one location, split across locations, nearby locations), a stable tab bar, and point notes by Ctrl/⌘+click that now also work on the mock.
 
+## [0.265.4] - 2026-11-15
+
+### Changed
+- Starscape app: the wallpaper follows your rank like the website — Companions from tier 3 and the Amber tint from tier 4.
+- Rank page: the extras (community star map, sun collection, badge and reward ideas) are tidy cards now; the locked ideas section reads as a calm hint, and the comet tip header wraps cleanly on phones.
+
 ## [0.265.3] - 2026-11-15
 
 ### Fixed
