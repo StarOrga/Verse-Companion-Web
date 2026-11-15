@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.267.0",
+  "current": "0.267.1",
   "releases": [
+    {
+      "version": "0.267.1",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "/verse HQ: the comm mast now towers over the hangar, the hall is lit on both flanks, the departing fighter shows its landing gear, the storage yard is two flat rows of containers instead of a pyramid, the runway lamps under the entrance blink from both outer ends in to the centre and stay within the hangar width, and the hangar carries the number \"1\"."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.267.0",
       "date": "2026-11-15",
