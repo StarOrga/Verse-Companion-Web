@@ -1,0 +1,1170 @@
+<section data-iteration="1" data-iteration-template="decision" data-analysis="full" data-tab-label="Runde 1" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"btw, füge auch in das projektspezifische wissen / extendsiions von claude ein, dass es diese posthog daten gibt und ggf. bei analysen oder umsetzungen miteinbezogen werden könneen! also nicht nur für mich als memory, sondern richtig im git tracked claude infos...","attachments":[]}}</script>
+  <div class="iteration-intro">
+    <h2>PostHog-Audit</h2>
+    <p>Was läuft, was fehlt, und wie PostHog-Signale bei den Admins als Aufgabe mit Lösungsvorschlag ankommen.</p>
+  </div>
+
+  <section id="briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>PostHog läuft live: Events kommen in der EU-Cloud an, nur nach Zustimmung. Server-Fehler, Claude-Aufrufe und eine Dienste-Übersicht für Admins fehlen ganz.</p>
+    <p data-briefing-why>Ausfälle und Fehler fallen heute erst auf, wenn ein Nutzer sie meldet.</p>
+    <div data-briefing-potential data-viz="kpi"
+         data-viz-spec='{"value":"0 von 7","unit":"Claude-Funktionen","label":"mit sichtbarem Verbrauch und Status"}'>0 von 7 Claude-Funktionen</div>
+    <a data-briefing-topic="t-loop" data-share="30">Signal wird Aufgabe</a>
+    <a data-briefing-topic="t-server" data-share="25">Server-Signale</a>
+    <a data-briefing-topic="t-ext" data-share="20">Externe Dienste</a>
+    <a data-briefing-topic="t-fix" data-share="15">Einbindung reparieren</a>
+    <a data-briefing-topic="t-consent" data-share="10">Mehr mit Zustimmung</a>
+    <p data-briefing-duration>≈ 12 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"0 von 7","unit":"Claude-Funktionen","label":"mit Verbrauchs-Sicht"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Signal wird Aufgabe","value":30},{"label":"Server-Signale","value":25},{"label":"Externe Dienste","value":20},{"label":"Einbindung reparieren","value":15},{"label":"Mehr mit Zustimmung","value":10}],"unit":"% Hebel"}'></div>
+        <p>Live geprüft am 15.11.: Schlüssel gesetzt, Zustimmung greift, Events antworten mit 200. Der größte Hebel liegt nicht im Browser, sondern darin, dass Server-Fehler und Claude-Aufrufe nirgends ankommen und niemand daraus Aufgaben macht.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ Thema 1 · Einbindung reparieren ═════════ -->
+  <section id="t-fix" data-topic data-nav-label="Einbindung reparieren">
+    <div data-alevel="2" data-title="Einbindung reparieren">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"4","unit":"Mängel","label":"in einer sonst sauberen Einbindung"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"2,5 s Flag-Wartezeit","value":4},{"label":"Unlesbare Fehler-Stacks","value":4},{"label":"Werbeblocker schlucken Events","value":3},{"label":"Web Vitals doppelt","value":1}],"unit":"Gewicht"}'></div>
+        <p>Zustimmung, Maskierung von Teil-Links und Fehler-Schwärzung sind solide. Vier Stellen kosten Daten oder Zeit.</p>
+      </div>
+    </div>
+
+    <section id="d-flags" data-nav-label="Flag-Wartezeit" data-decision="d-flags" data-decision-mode="yesnoalt"
+             data-label="Flag-Wartezeit" data-rec="yes"
+             data-rec-why="Das Projekt hat keine Flags; PostHog meldet das schon in seiner Konfiguration."
+             data-applies-to="alle Nutzer mit Statistik-Zustimmung" data-finding="f-flags">
+      <p data-applies>Gilt für: alle Nutzer mit Statistik-Zustimmung</p>
+      <p data-situation>Wer Statistik erlaubt, wartet bei jeder β-Entscheidung 2,5 s: das Projekt hat keine Flags, PostHog fragt sie deshalb nie ab, und die Wartezeit läuft jedes Mal voll aus.</p>
+      <h3 data-question>Soll „keine Flags“ sofort als Antwort zählen?</h3>
+      <p data-stakes>Ladezeit der Hangar-Schiffsseite und aller β-Bereiche</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-d-flags" value="yes" checked>
+          <span data-opt-label>Sofort entscheiden, wenn PostHog keine Flags meldet</span>
+          <span data-opt-consequence>Kein Warten mehr; ein später angelegtes Flag wirkt weiter als Kill-Switch.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-d-flags" value="no">
+          <span data-opt-label>Wartezeit lassen</span>
+          <span data-opt-consequence>Zustimmende Nutzer warten weiter bis zu 2,5 s.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-flags" value="alt">
+          <span data-opt-label>Anders</span>
+          <input type="text" name="dm-d-flags-alt" placeholder="Dein Weg" value="">
+        </label>
+      </div>
+      <textarea data-comment="d-flags-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-flags-none" value="">
+      <input type="hidden" name="dm-d-flags-hes" value="{&quot;ms&quot;:28911,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-flags-touched" value="1">
+      <input type="hidden" name="dm-d-flags-issue" value="">
+      <input type="hidden" name="dm-d-flags-epic" value="">
+      <div data-alevel="3" data-title="Flag-Wartezeit">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"2,5 s","unit":"Wartezeit","label":"bei jeder β-Entscheidung"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"heute","value":2.5},"after":{"label":"mit Sofort-Antwort","value":0},"unit":"s"}'></div>
+          <p>Gemessen im Live-Projekt: kein Flags-Aufruf im Netzwerk.</p>
+        </div>
+        <div data-example><pre>// eu-assets.i.posthog.com/array/phc_…/config.js (live, 15.11.)
+"hasFeatureFlags": false,
+
+// posthog-js: Flags werden dann nie geladen
+if (config.hasFeatureFlags !== false) featureFlags.ensureFlagsLoaded()
+
+// analytics.service.ts
+export const FLAGS_TIMEOUT_MS = 2500;   // läuft jedes Mal voll aus</pre></div>
+      </div>
+    </section>
+
+    <section id="d-maps" data-nav-label="Lesbare Fehler" data-decision="d-maps" data-decision-mode="yesnoalt"
+             data-label="Lesbare Fehler" data-rec="yes"
+             data-rec-why="Ohne Source Maps ist jeder gemeldete Fehler eine Zeilennummer in minifiziertem Code."
+             data-applies-to="Fehlerberichte aus dem Browser" data-finding="f-maps">
+      <p data-applies>Gilt für: Fehlerberichte aus dem Browser</p>
+      <p data-situation>Gemeldete Fehler zeigen nur minifizierte Stellen wie main-X7.js:1:48213; welche Datei wirft und in welcher Version, sieht niemand.</p>
+      <h3 data-question>Sollen Source Maps beim Build privat zu PostHog gehen?</h3>
+      <p data-stakes>Ob die KI-Diagnose in Thema 4 überhaupt eine Datei findet</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-d-maps" value="yes" checked>
+          <span data-opt-label>Hochladen und App-Version an jedes Event hängen</span>
+          <span data-opt-consequence>Lesbare Stacks, Fehler pro Release; die Maps bleiben aus dem ausgelieferten Bundle.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-d-maps" value="no">
+          <span data-opt-label>Minifiziert lassen</span>
+          <span data-opt-consequence>Fehler bleiben zählbar, aber kaum zuzuordnen.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-maps" value="alt">
+          <span data-opt-label>Anders</span>
+          <input type="text" name="dm-d-maps-alt" placeholder="Dein Weg" value="">
+        </label>
+      </div>
+      <textarea data-comment="d-maps-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-maps-none" value="">
+      <input type="hidden" name="dm-d-maps-hes" value="{&quot;ms&quot;:15710,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-maps-touched" value="1">
+      <input type="hidden" name="dm-d-maps-issue" value="">
+      <input type="hidden" name="dm-d-maps-epic" value="">
+      <div data-alevel="3" data-title="Lesbare Fehler">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Produktions-Build ohne Source Maps, keine Version an den Events."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"zuordenbare Fehler heute","value":0},"after":{"label":"mit Source Maps","value":100},"unit":"%"}'></div>
+          <p>Nur der Entwicklungs-Build erzeugt Maps.</p>
+        </div>
+        <div data-example><pre>Heute in PostHog:
+  TypeError: Cannot read properties of undefined (reading 'id')
+    at main-X7KQ2.js:1:48213
+
+Mit Source Maps + Version:
+  TypeError: Cannot read properties of undefined (reading 'id')
+    at HangarShipPageComponent.load (src/app/hangar/hangar-ship-page.component.ts:118)
+  release: 0.262.0</pre></div>
+      </div>
+    </section>
+
+    <section id="d-proxy" data-nav-label="Werbeblocker" data-decision="d-proxy" data-decision-mode="yesnoalt"
+             data-label="Werbeblocker" data-rec="yes"
+             data-rec-why="Der Umweg ist in Vercel schon eingerichtet und wird nur nicht benutzt."
+             data-applies-to="alle Events aus dem Browser" data-finding="f-proxy">
+      <p data-applies>Gilt für: alle Events aus dem Browser</p>
+      <p data-situation>Werbeblocker verwerfen Events, die direkt an PostHog gehen; der eigene Umweg über die App-Domain ist in Vercel eingerichtet, wird aber nicht genutzt.</p>
+      <h3 data-question>Sollen Events über die eigene Domain laufen?</h3>
+      <p data-stakes>Wie vollständig Zahlen und Fehlerberichte sind</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-d-proxy" value="yes" checked>
+          <span data-opt-label>Über /ingest der App-Domain senden</span>
+          <span data-opt-consequence>Deutlich weniger verlorene Events; die CSP braucht die PostHog-Hosts nicht mehr.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-d-proxy" value="no">
+          <span data-opt-label>Direkt an PostHog lassen</span>
+          <span data-opt-consequence>Nutzer mit Blocker bleiben unsichtbar, auch wenn sie zugestimmt haben.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-proxy" value="alt">
+          <span data-opt-label>Anders</span>
+          <input type="text" name="dm-d-proxy-alt" placeholder="Dein Weg" value="">
+        </label>
+      </div>
+      <textarea data-comment="d-proxy-note" placeholder="Notiz (optional)">ja genau, außerdem in telemetrie könnten wir keine doppelführung von errors machen bzw. ggf. nur noch top 3 oder so und posthog link! Weil ja alles zu posthog gerouted werden sollte, auch die infos der telemetrie der desktop app</textarea>
+      <input type="hidden" name="dm-d-proxy-none" value="">
+      <input type="hidden" name="dm-d-proxy-hes" value="{&quot;ms&quot;:51719,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-proxy-touched" value="1">
+      <input type="hidden" name="dm-d-proxy-issue" value="">
+      <input type="hidden" name="dm-d-proxy-epic" value="">
+      <div data-alevel="3" data-title="Werbeblocker">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Proxy-Regel vorhanden, api_host zeigt trotzdem direkt auf PostHog."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Browser","value":"App"},{"label":"heute","value":"eu.i.posthog.com (blockbar)"},{"label":"vorgeschlagen","value":"/ingest → PostHog"}]}'></div>
+          <p>Ein Blocker trifft die Fremd-Domain, nicht die eigene.</p>
+        </div>
+        <div data-example><pre>// vercel.json — schon da, ungenutzt
+{ "source": "/ingest/(.*)", "destination": "https://eu.i.posthog.com/$1" }
+
+// environment.prod.ts — heute
+posthog: { host: 'https://eu.i.posthog.com' }
+// vorgeschlagen
+posthog: { host: '/ingest', uiHost: 'https://eu.posthog.com' }</pre></div>
+      </div>
+    </section>
+
+    <section id="d-vitals" data-nav-label="Web Vitals doppelt" data-decision="d-vitals" data-decision-mode="single"
+             data-label="Web Vitals doppelt" data-rec="ph"
+             data-rec-why="PostHogs eigene Messung speist die fertige Web-Analytics-Ansicht; der eigene Dienst wird überflüssig."
+             data-applies-to="Ladezeit-Messung" data-finding="f-vitals">
+      <p data-applies>Gilt für: Ladezeit-Messung</p>
+      <p data-situation>Ladezeiten kommen doppelt an und verfälschen Zählungen: PostHog misst selbst, im Projekt eingeschaltet, und die App schickt zusätzlich ein eigenes Event.</p>
+      <h3 data-question>Welche Messung bleibt?</h3>
+      <p data-stakes>Ein Dienst weniger im Code oder eine Projekt-Einstellung weniger</p>
+      <div data-options>
+        <label data-opt="ph" data-recommended>
+          <input type="radio" name="dm-d-vitals" value="ph" checked>
+          <span data-opt-label>Nur PostHogs eigene Messung</span>
+          <span data-opt-consequence>Fertige Web-Vitals-Ansicht in PostHog; der eigene Mess-Dienst entfällt.</span>
+        </label>
+        <label data-opt="own">
+          <input type="radio" name="dm-d-vitals" value="own">
+          <span data-opt-label>Nur das eigene Event</span>
+          <span data-opt-consequence>Volle Kontrolle über Felder; die Projekt-Einstellung muss aus.</span>
+        </label>
+        <label data-opt="both">
+          <input type="radio" name="dm-d-vitals" value="both">
+          <span data-opt-label>Beide behalten</span>
+          <span data-opt-consequence>Doppelte Events zählen gegen das Freikontingent.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-vitals-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-vitals-none" value="">
+      <input type="hidden" name="dm-d-vitals-hes" value="{&quot;ms&quot;:26178,&quot;revisits&quot;:1,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-vitals-touched" value="1">
+      <input type="hidden" name="dm-d-vitals-issue" value="">
+      <input type="hidden" name="dm-d-vitals-epic" value="">
+      <div data-alevel="3" data-title="Web Vitals doppelt">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"2×","unit":"Ladezeit-Events","label":"pro Seitenaufruf"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"$web_vitals (PostHog)","value":1},{"label":"web_vitals (App)","value":1}],"unit":"Events","hl":"web_vitals (App)"}'></div>
+          <p>Live nachgeladen: web-vitals-with-attribution.js von PostHog.</p>
+        </div>
+        <div data-example><pre>// Remote-Konfiguration des Projekts (live)
+"capturePerformance": { "web_vitals": true, "network_timing": true }
+
+// web-vitals.service.ts (App)
+this.analytics.capture('web_vitals', { ...report });</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ═════════ Thema 2 · Mehr mit Zustimmung ═════════ -->
+  <section id="t-consent" data-topic data-nav-label="Mehr mit Zustimmung">
+    <div data-alevel="2" data-title="Mehr mit Zustimmung">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"30","unit":"Events","label":"handverlesen, alles andere aus"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="donut" data-viz-spec='{"parts":[{"label":"genutzt: Events, Pageviews, Fehler","value":3},{"label":"aus: Personen, Replay, Heatmaps, Dead Clicks, Umfragen","value":5}]}'></div>
+        <p>Wer zugestimmt hat, liefert heute nur anonyme Einzel-Events. Wiederkehr, Fehlerkontext und tote Klicks bleiben unsichtbar.</p>
+      </div>
+    </div>
+
+    <section id="d-identify" data-nav-label="Wiederkehr messen" data-decision="d-identify" data-decision-mode="single"
+             data-label="Wiederkehr messen" data-rec="hashed"
+             data-rec-why="Ein Hash der Konto-ID trennt Personen, ohne dass PostHog weiß, wer sie sind."
+             data-applies-to="angemeldete Nutzer mit Zustimmung" data-finding="f-identify">
+      <p data-applies>Gilt für: angemeldete Nutzer mit Zustimmung</p>
+      <p data-situation>Wer sich anmeldet und morgen wiederkommt, zählt als neuer Besucher; Bindung und Abläufe über mehrere Tage lassen sich nicht messen.</p>
+      <h3 data-question>Wie weit darf PostHog eine Person wiedererkennen?</h3>
+      <p data-stakes>Retention, Funnels, Kohorten und der Text der Datenschutzseite</p>
+      <div data-options>
+        <label data-opt="hashed" data-recommended>
+          <input type="radio" name="dm-d-identify" value="hashed">
+          <span data-opt-label>Pseudonym: gehashte Konto-ID bei Anmeldung</span>
+          <span data-opt-consequence>Wiederkehr und Funnels messbar; kein Name, keine E-Mail in PostHog.</span>
+        </label>
+        <label data-opt="role">
+          <input type="radio" name="dm-d-identify" value="role" checked>
+          <span data-opt-label>Pseudonym plus Rolle (Viewer, Collaborator, Admin)</span>
+          <span data-opt-consequence>Admin-Klicks lassen sich aus den Nutzerzahlen herausrechnen.</span>
+        </label>
+        <label data-opt="anon">
+          <input type="radio" name="dm-d-identify" value="anon">
+          <span data-opt-label>Anonym bleiben</span>
+          <span data-opt-consequence>Wie heute: jede Sitzung steht für sich.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-identify-note" placeholder="Notiz (optional)">ayber bitte im admin panel unter telemetrie sichtbar machen wenn &gt;80% von irgendeinen freikontingent von posthog augebrraucht ist mit call to action! =&gt; Entweder ki generierter feedback vorschlag, also man kann die warnung in ein feedback umwandeln oder cta zu posthog selber dort bezahlte fversion aufzusteigen! Beides wäre ja eine lösung (optimieren der applikation wie viel gesendet wird vs mehr kontingent kaufen)</textarea>
+      <input type="hidden" name="dm-d-identify-none" value="">
+      <input type="hidden" name="dm-d-identify-hes" value="{&quot;ms&quot;:91780,&quot;revisits&quot;:3,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-identify-touched" value="1">
+      <input type="hidden" name="dm-d-identify-issue" value="">
+      <input type="hidden" name="dm-d-identify-epic" value="">
+      <div data-alevel="3" data-title="Wiederkehr messen">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Personen-Profile sind ausgeschaltet, Anmeldung erzeugt nur ein Event."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"Besucher heute (1 Person, 3 Tage)","value":3},"after":{"label":"mit Pseudonym","value":1},"unit":"Personen"}'></div>
+          <p>Ein Admin, der täglich prüft, zählt als drei Besucher.</p>
+        </div>
+        <div data-example><pre>// heute
+posthog.init(key, { person_profiles: 'never', … })
+capture('user_signed_in')
+
+// vorgeschlagen (nur mit Zustimmung)
+posthog.identify(sha256(user.id + salt), { role: 'viewer' })</pre></div>
+      </div>
+    </section>
+
+    <section id="d-replay" data-nav-label="Fehlerkontext" data-decision="d-replay" data-decision-mode="single"
+             data-label="Fehlerkontext" data-rec="onerror"
+             data-rec-why="Aufnahme nur bei Fehlern liefert den Kontext für die Diagnose, ohne alle Sitzungen zu speichern."
+             data-applies-to="Nutzer mit Zustimmung" data-finding="f-replay">
+      <p data-applies>Gilt für: Nutzer mit Zustimmung</p>
+      <p data-situation>Bei einem Fehler sieht niemand, was der Nutzer davor tat; Session Replay ist im PostHog-Projekt an, in der App aber hart abgeschaltet.</p>
+      <h3 data-question>Wann darf eine Sitzung aufgezeichnet werden?</h3>
+      <p data-stakes>Ob die KI-Diagnose den Weg zum Fehler sieht</p>
+      <div data-options>
+        <label data-opt="onerror" data-recommended>
+          <input type="radio" name="dm-d-replay" value="onerror" checked>
+          <span data-opt-label>Nur Sitzungen mit Fehler, alle Eingaben maskiert</span>
+          <span data-opt-consequence>Kontext zu jedem Fehler; Freikontingent (5 000 Aufnahmen/Monat) reicht sicher.</span>
+        </label>
+        <label data-opt="sample">
+          <input type="radio" name="dm-d-replay" value="sample">
+          <span data-opt-label>10 % aller Sitzungen, maskiert</span>
+          <span data-opt-consequence>Zeigt auch Verwirrung ohne Fehler; mehr Daten, mehr Datenschutztext.</span>
+        </label>
+        <label data-opt="off">
+          <input type="radio" name="dm-d-replay" value="off">
+          <span data-opt-label>Keine Aufnahmen</span>
+          <span data-opt-consequence>Wie heute.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-replay-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-replay-none" value="">
+      <input type="hidden" name="dm-d-replay-hes" value="{&quot;ms&quot;:18356,&quot;revisits&quot;:2,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-replay-touched" value="1">
+      <input type="hidden" name="dm-d-replay-issue" value="">
+      <input type="hidden" name="dm-d-replay-epic" value="">
+      <div data-alevel="3" data-title="Fehlerkontext">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Replay serverseitig an, clientseitig abgeschaltet."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Nutzer klickt","value":"unsichtbar"},{"label":"Fehler","value":"$exception"},{"label":"Diagnose","value":"rät"}]}'></div>
+          <p>Die Maskierung aller Eingaben ist im Projekt schon gesetzt.</p>
+        </div>
+        <div data-example><pre>// Projekt-Konfiguration (live)
+"sessionRecording": { "masking": { "maskAllInputs": true }, "eventTriggers": [] }
+
+// App heute
+disable_session_recording: true
+// vorgeschlagen: Trigger "$exception" im Projekt, App gibt Aufnahme frei</pre></div>
+      </div>
+    </section>
+
+    <section id="d-clicks" data-nav-label="Tote Klicks" data-decision="d-clicks" data-decision-mode="multi"
+             data-label="Tote Klicks" data-rec="dead heat"
+             data-rec-why="Dead Clicks und Heatmaps zeigen UI-Fehler, ohne Inhalte zu erfassen."
+             data-applies-to="Nutzer mit Zustimmung" data-finding="f-clicks">
+      <p data-applies>Gilt für: Nutzer mit Zustimmung</p>
+      <p data-situation>Klicks auf Elemente ohne Wirkung bleiben unsichtbar, weil nur handverlesene Events gesendet werden; gerade solche UI-Fehler meldet selten jemand.</p>
+      <h3 data-question>Welche Klick-Signale sollen dazukommen?</h3>
+      <p data-stakes>Neue Hinweise für die Feedback-Routine ohne Nutzer-Meldung</p>
+      <div data-options>
+        <label data-opt="dead" data-recommended>
+          <input type="checkbox" name="dm-d-clicks.dead" checked>
+          <span data-opt-label>Dead Clicks erfassen</span>
+          <span data-opt-consequence>Zeigt Elemente, die wie Links aussehen, aber nichts tun.</span>
+        </label>
+        <label data-opt="heat" data-recommended>
+          <input type="checkbox" name="dm-d-clicks.heat" checked>
+          <span data-opt-label>Heatmaps einschalten</span>
+          <span data-opt-consequence>Sieht, wohin auf Codex- und Hangar-Seiten geklickt wird.</span>
+        </label>
+        <label data-opt="auto">
+          <input type="checkbox" name="dm-d-clicks.auto">
+          <span data-opt-label>Alle Klicks automatisch erfassen</span>
+          <span data-opt-consequence>Rage Clicks inklusive, aber viel Rauschen und mehr Events.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-clicks-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-clicks-none" value="">
+      <input type="hidden" name="dm-d-clicks-hes" value="{&quot;ms&quot;:20754,&quot;revisits&quot;:1,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-clicks-touched" value="1">
+      <input type="hidden" name="dm-d-clicks-issue" value="">
+      <input type="hidden" name="dm-d-clicks-epic" value="">
+      <div data-alevel="3" data-title="Tote Klicks">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Autocapture, Heatmaps und Dead Clicks sind aus."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Dead Clicks","value":0},{"label":"Heatmaps","value":0},{"label":"Autocapture","value":0}],"unit":"Signale/Tag"}'></div>
+          <p>Alle drei sind reine App-Schalter.</p>
+        </div>
+        <div data-example><pre>posthog.init(key, {
+  autocapture: false,
+  enable_heatmaps: false,          // → true
+  capture_dead_clicks: …           // → true
+})</pre></div>
+      </div>
+    </section>
+
+    <section id="d-events" data-nav-label="Fehlende Events" data-decision="d-events" data-decision-mode="multi"
+             data-label="Fehlende Events" data-rec="errshown codex feedback login"
+             data-rec-why="Diese Abläufe sind die Kernwege der App und heute ohne Messpunkt."
+             data-applies-to="Produkt-Events mit Zustimmung" data-finding="f-events">
+      <p data-applies>Gilt für: Produkt-Events mit Zustimmung</p>
+      <p data-situation>Ob Nutzer einen Fehlerzustand sehen, ein Schiff im Codex öffnen oder Feedback absenden, zählt niemand; Hangar und Verse sind dagegen gut vermessen.</p>
+      <h3 data-question>Welche Events sollen dazukommen?</h3>
+      <p data-stakes>Welche Trends der tägliche Abgleich in Thema 4 beobachten kann</p>
+      <div data-options>
+        <label data-opt="errshown" data-recommended>
+          <input type="checkbox" name="dm-d-events.errshown" checked>
+          <span data-opt-label>Fehlerzustand angezeigt (mit Fehler-Schlüssel)</span>
+          <span data-opt-consequence>Zeigt, welche Ladefehler Nutzer wirklich sehen.</span>
+        </label>
+        <label data-opt="codex" data-recommended>
+          <input type="checkbox" name="dm-d-events.codex" checked>
+          <span data-opt-label>Codex: Schiff und Gegenstand geöffnet</span>
+          <span data-opt-consequence>Der meistgenutzte Bereich bekommt Zahlen.</span>
+        </label>
+        <label data-opt="feedback" data-recommended>
+          <input type="checkbox" name="dm-d-events.feedback" checked>
+          <span data-opt-label>Feedback abgesendet (ohne Text)</span>
+          <span data-opt-consequence>Verbindet Fehler-Spitzen mit Meldungen.</span>
+        </label>
+        <label data-opt="login" data-recommended>
+          <input type="checkbox" name="dm-d-events.login" checked>
+          <span data-opt-label>Anmelde-Schritte als Funnel</span>
+          <span data-opt-consequence>Zeigt, wo Neue im Login aussteigen.</span>
+        </label>
+        <label data-opt="search">
+          <input type="checkbox" name="dm-d-events.search" checked>
+          <span data-opt-label>Suche: Treffer ja/nein (ohne Suchtext)</span>
+          <span data-opt-consequence>Doppelt sich teilweise mit „Suche ohne Treffer“ im Admin.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-events-note" placeholder="Notiz (optional)">Keine dopplujngen anostnen aber wirklich breit aufstsellen. Dabei eine eigene auch abgespeicherte im projekt namenskonvention einfügen und in posthog auch bitte als folgeactions mit cdp edge chrome plugin zugriff workflows definieren, welche dann diese realen workflows abbilden etc. 
+Also in posthog bitte reports anlegen die nützlifch sind, dabei bitte 30% einfache reports und 70% die übergreifende flows ziegen usw.! Gerade auch die wo man events gut kennen sollte. Bitte auch entsprechende dashboards (maximal 3) in posthog. Am ende sollte alles was erfasst wird auch über diese drei dashboards zugänglich sein direkt oder indirekt, damit der admin sich in posthog zurec ht findet!</textarea>
+      <input type="hidden" name="dm-d-events-none" value="">
+      <input type="hidden" name="dm-d-events-hes" value="{&quot;ms&quot;:134659,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-events-touched" value="1">
+      <input type="hidden" name="dm-d-events-issue" value="">
+      <input type="hidden" name="dm-d-events-epic" value="">
+      <div data-alevel="3" data-title="Fehlende Events">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"0","unit":"Codex-Events","label":"im größten Bereich"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Hangar","value":8},{"label":"Einstellungen","value":7},{"label":"Verse","value":5},{"label":"Konto","value":3},{"label":"Codex","value":0}],"unit":"Events","hl":"Codex"}'></div>
+          <p>Gezählt im Code: 30 verschiedene Event-Namen.</p>
+        </div>
+        <div data-example><pre>grep capture( src/app  →
+  hangar_ship_added, hangar_fleet_imported, … (8)
+  settings_language_changed, …               (7)
+  verse_top_open, verse_door_open, …         (5)
+  codex_*                                    (0)</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ═════════ Thema 3 · Server-Signale ═════════ -->
+  <section id="t-server" data-topic data-nav-label="Server-Signale">
+    <div data-alevel="2" data-title="Server-Signale">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"0","unit":"Server-Events","label":"bei 35 Funktionen und 16 Cron-Migrationen"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Edge Functions","value":35},{"label":"Claude-Funktionen","value":7},{"label":"Cron-Jobs (Migrationen)","value":16}],"unit":"ohne PostHog"}'></div>
+        <p>PostHog sieht nur den Browser. Alles, was auf dem Server ausfällt, bleibt bis zur Nutzer-Meldung unsichtbar.</p>
+      </div>
+    </div>
+
+    <section id="d-srv" data-nav-label="Was der Server meldet" data-decision="d-srv" data-decision-mode="multi"
+             data-label="Was der Server meldet" data-rec="fn cron ai"
+             data-rec-why="Diese drei fallen heute still aus und betreffen jeden Nutzer."
+             data-applies-to="Supabase Edge Functions und Crons" data-finding="f-srv">
+      <p data-applies>Gilt für: Supabase Edge Functions und Crons</p>
+      <p data-situation>Fällt eine Edge Function oder ein Cron-Job aus, bleibt die Seite leer, und niemand erfährt warum; die Fehler stehen nur in Supabase-Logs, die sieben Tage halten.</p>
+      <h3 data-question>Was soll der Server an PostHog melden?</h3>
+      <p data-stakes>Was Thema 4 und 5 überhaupt sehen können</p>
+      <div data-options>
+        <label data-opt="fn" data-recommended>
+          <input type="checkbox" name="dm-d-srv.fn" checked>
+          <span data-opt-label>Fehler jeder Edge Function als Exception</span>
+          <span data-opt-consequence>Server-Fehler landen im selben Error-Tracking wie Browser-Fehler.</span>
+        </label>
+        <label data-opt="cron" data-recommended>
+          <input type="checkbox" name="dm-d-srv.cron" checked>
+          <span data-opt-label>Jeder Cron-Lauf mit Ergebnis</span>
+          <span data-opt-consequence>Ausbleibende oder rote Läufe werden sichtbar.</span>
+        </label>
+        <label data-opt="ai" data-recommended>
+          <input type="checkbox" name="dm-d-srv.ai" checked>
+          <span data-opt-label>Jeder Claude-Aufruf</span>
+          <span data-opt-consequence>Grundlage für Verbrauch und Status (nächste Frage, Thema 5).</span>
+        </label>
+        <label data-opt="uploader">
+          <input type="checkbox" name="dm-d-srv.uploader" checked>
+          <span data-opt-label>Crashes der Desktop-Apps spiegeln</span>
+          <span data-opt-consequence>Doppelt sich mit der eigenen Uploader-Telemetrie im Admin.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-srv-note" placeholder="Notiz (optional)">wir nehmen sonstige telemitrie raus, wir machen alles nur noch über posthog und ggf. spiegeln von posthog die infos wieder zurück ins admin panel. Single source of trouth!</textarea>
+      <input type="hidden" name="dm-d-srv-none" value="">
+      <input type="hidden" name="dm-d-srv-hes" value="{&quot;ms&quot;:43192,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-srv-touched" value="1">
+      <input type="hidden" name="dm-d-srv-issue" value="">
+      <input type="hidden" name="dm-d-srv-epic" value="">
+      <div data-alevel="3" data-title="Was der Server meldet">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Kein PostHog-Aufruf in supabase/functions."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Funktion wirft","value":"Supabase-Log"},{"label":"7 Tage","value":"gelöscht"},{"label":"Admin","value":"erfährt nichts"}]}'></div>
+          <p>Ein gemeinsamer Helfer in den geteilten Funktionsmodulen deckt alle Funktionen ab.</p>
+        </div>
+        <div data-example><pre>// vorgeschlagen: supabase/functions/_shared/posthog.ts
+await captureServer('$exception', {
+  distinct_id: 'server:patch-teaser',
+  $process_person_profile: false,
+  $exception_list: [...], function: 'patch-teaser', release: '0.262.0'
+})</pre></div>
+      </div>
+    </section>
+
+    <section id="d-llm" data-nav-label="Claude-Aufrufe" data-decision="d-llm" data-decision-mode="single"
+             data-label="Claude-Aufrufe" data-rec="meta"
+             data-rec-why="Metadaten reichen für Kosten und Status; Texte könnten Nutzerinhalte enthalten."
+             data-applies-to="7 Funktionen mit Claude-Aufruf" data-finding="f-llm">
+      <p data-applies>Gilt für: 7 Funktionen mit Claude-Aufruf</p>
+      <p data-situation>Sieben Funktionen rufen Claude auf, aber Verbrauch, Kosten und Fehler pro Funktion zählt nur die Übersetzung; PostHogs LLM-Ansicht bleibt leer.</p>
+      <h3 data-question>Wie viel eines Claude-Aufrufs geht an PostHog?</h3>
+      <p data-stakes>Kosten-Dashboard in PostHog und Datenschutz der Eingaben</p>
+      <div data-options>
+        <label data-opt="meta" data-recommended>
+          <input type="radio" name="dm-d-llm" value="meta" checked>
+          <span data-opt-label>Nur Metadaten: Modell, Tokens, Kosten, Dauer, Fehler</span>
+          <span data-opt-consequence>Kosten pro Funktion und Modell in PostHog, keine Texte.</span>
+        </label>
+        <label data-opt="full">
+          <input type="radio" name="dm-d-llm" value="full">
+          <span data-opt-label>Mit Prompt und Antwort</span>
+          <span data-opt-consequence>Qualität nachprüfbar, aber Nutzertexte (Events, Namen) liegen bei PostHog.</span>
+        </label>
+        <label data-opt="none">
+          <input type="radio" name="dm-d-llm" value="none">
+          <span data-opt-label>Nichts an PostHog, nur eigenes Protokoll</span>
+          <span data-opt-consequence>Verbrauch nur im Admin-Panel (Thema 5), keine PostHog-Auswertung.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-llm-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-llm-none" value="">
+      <input type="hidden" name="dm-d-llm-hes" value="{&quot;ms&quot;:58699,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-llm-touched" value="1">
+      <input type="hidden" name="dm-d-llm-issue" value="">
+      <input type="hidden" name="dm-d-llm-epic" value="">
+      <div data-alevel="3" data-title="Claude-Aufrufe">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"1 von 7","unit":"Funktionen","label":"zählt Kosten"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"translate-orchestrator","value":1},{"label":"patch-teaser","value":0},{"label":"codex-patch-summary","value":0},{"label":"exemplar-ai","value":0},{"label":"nachschub-names","value":0},{"label":"sc-event-sheet","value":0},{"label":"sc-events-sync","value":0}],"unit":"Kostenzählung"}'></div>
+          <p>Sechs Funktionen rufen die API direkt per fetch auf.</p>
+        </div>
+        <div data-example><pre>// PostHog LLM Analytics, manuell per HTTP
+{ "event": "$ai_generation",
+  "properties": { "$ai_provider": "anthropic", "$ai_model": "claude-sonnet-5-5",
+    "$ai_input_tokens": 812, "$ai_output_tokens": 164, "$ai_latency": 2.4,
+    "$ai_total_cost_usd": 0.0049, "function": "patch-teaser", "$ai_is_error": false } }</pre></div>
+      </div>
+    </section>
+
+    <section id="d-legal" data-nav-label="Ohne Einwilligung" data-decision="d-legal" data-decision-mode="verify"
+             data-label="Ohne Einwilligung" data-rec="ok"
+             data-rec-why="Server-Events tragen weder IP noch Nutzer-ID; sie beschreiben die App, nicht Personen."
+             data-applies-to="alle Server-Events" data-finding="f-legal">
+      <p data-applies>Gilt für: alle Server-Events</p>
+      <p data-situation>Die Datenschutzseite verspricht „nur nach Zustimmung“; Server-Events ohne Personenbezug fielen nicht darunter, stünden aber heute nirgends erwähnt.</p>
+      <h3 data-question>Stimmt diese Abgrenzung so?</h3>
+      <p data-context>Aussage: Server-Events tragen Funktion, Dauer, Fehlerart und Version, nie IP, Nutzer-ID oder Inhalte. Sie laufen ohne Einwilligung, die Datenschutzseite nennt sie in einem eigenen Absatz.</p>
+      <p data-stakes>Text der Datenschutzseite und des Zustimmungs-Banners</p>
+      <div data-options>
+        <label data-opt="ok" data-recommended>
+          <input type="radio" name="dm-d-legal" value="ok" checked>
+          <span data-opt-label>Stimmt so</span>
+          <span data-opt-consequence>Server-Events gehen immer, die Datenschutzseite bekommt einen Absatz.</span>
+        </label>
+        <label data-opt="partial">
+          <input type="radio" name="dm-d-legal" value="partial">
+          <span data-opt-label>Teilweise</span>
+          <span data-opt-consequence>Korrektur unten eintragen.</span>
+        </label>
+        <label data-opt="wrong">
+          <input type="radio" name="dm-d-legal" value="wrong">
+          <span data-opt-label>Stimmt nicht</span>
+          <span data-opt-consequence>Server-Events nur, wenn der auslösende Nutzer zugestimmt hat.</span>
+        </label>
+        <input type="text" name="dm-d-legal-fix" placeholder="Korrektur" value="">
+      </div>
+      <textarea data-comment="d-legal-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-legal-none" value="">
+      <input type="hidden" name="dm-d-legal-hes" value="{&quot;ms&quot;:15881,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-legal-touched" value="1">
+      <input type="hidden" name="dm-d-legal-issue" value="">
+      <input type="hidden" name="dm-d-legal-epic" value="">
+      <div data-alevel="3" data-title="Ohne Einwilligung">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Datenschutztext kennt nur Browser-Analytik mit Zustimmung."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"Personenbezug Browser-Event","value":1},"after":{"label":"Personenbezug Server-Event","value":0},"unit":"Merkmale"}'></div>
+          <p>Keine Rechtsberatung, sondern die übliche Abgrenzung technischer Betriebsdaten.</p>
+        </div>
+        <div data-example><pre>Datenschutzseite heute (de.json → legal.privacy…posthog):
+„erfasst anonyme Nutzungsereignisse, Ladezeiten der Seiten und Fehler,
+ und das nur nach deiner Zustimmung.“
+
+Neuer Absatz:
+„Unabhängig davon meldet der Server eigene Fehler und Laufzeiten an PostHog,
+ ohne IP-Adresse, Nutzerkennung oder Inhalte.“</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ═════════ Thema 4 · Signal wird Aufgabe ═════════ -->
+  <section id="t-loop" data-topic data-nav-label="Signal wird Aufgabe">
+    <div data-alevel="2" data-title="Signal wird Aufgabe">
+      <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Kein Weg von einem PostHog-Signal zum Feedback-Board."}'></div></div>
+      <div data-slot="long">
+        <div data-viz="flow" data-viz-spec='{"steps":[{"label":"PostHog","value":"neues Fehler-Issue / Trend"},{"label":"Edge Function","value":"Eintrag mit Link"},{"label":"Routine","value":"Diagnose + Vorschlag"},{"label":"Admin","value":"Freigabe"},{"label":"Routine","value":"baut, liefert aus"}]}'></div>
+        <p>Das Board und die Routine gibt es schon; es fehlt nur der Zulauf. Die Analyse kann auf dem Max-Abo der Routine laufen statt auf API-Guthaben.</p>
+      </div>
+    </div>
+
+    <section id="d-trigger" data-nav-label="Auslöser" data-decision="d-trigger" data-decision-mode="single"
+             data-label="Auslöser" data-rec="both"
+             data-rec-why="Fehler brauchen Sofort-Alarm, Trends (Ladezeit, Funnel) nur einen täglichen Blick."
+             data-applies-to="neue Board-Einträge aus PostHog" data-finding="f-trigger">
+      <p data-applies>Gilt für: neue Board-Einträge aus PostHog</p>
+      <p data-situation>Vom Fehler bis zur Aufgabe vergehen heute Tage, denn das Board erfährt nur davon, wenn ein Admin ihn bemerkt und abtippt.</p>
+      <h3 data-question>Was soll einen Eintrag auslösen?</h3>
+      <p data-stakes>Wie schnell Fehler und wie früh Verschlechterungen ankommen</p>
+      <div data-options>
+        <label data-opt="both" data-recommended>
+          <input type="radio" name="dm-d-trigger" value="both" checked>
+          <span data-opt-label>Alarm bei neuem Fehler plus täglicher Trend-Abgleich</span>
+          <span data-opt-consequence>Fehler in Minuten; Ladezeit- und Funnel-Einbrüche am nächsten Morgen.</span>
+        </label>
+        <label data-opt="webhook">
+          <input type="radio" name="dm-d-trigger" value="webhook">
+          <span data-opt-label>Nur PostHog-Alarm bei neuem oder gehäuftem Fehler</span>
+          <span data-opt-consequence>Einfach, ohne Lesezugriff; Trends bleiben unbeobachtet.</span>
+        </label>
+        <label data-opt="poll">
+          <input type="radio" name="dm-d-trigger" value="poll">
+          <span data-opt-label>Nur täglicher Abgleich per Cron</span>
+          <span data-opt-consequence>Ein Mechanismus für alles; Fehler kommen bis zu 24 h später.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-trigger-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-trigger-none" value="">
+      <input type="hidden" name="dm-d-trigger-hes" value="{&quot;ms&quot;:13000,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-trigger-touched" value="1">
+      <input type="hidden" name="dm-d-trigger-issue" value="">
+      <input type="hidden" name="dm-d-trigger-epic" value="">
+      <div data-alevel="3" data-title="Auslöser">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"PostHog kann bei neuem oder wiedereröffnetem Fehler-Issue einen HTTP-Webhook rufen."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"Fehler bis Aufgabe heute","value":72},"after":{"label":"mit Alarm","value":0.1},"unit":"h"}'></div>
+          <p>Ein Webhook erreicht nur Fehler, Trends braucht eine Abfrage.</p>
+        </div>
+        <div data-example><pre>PostHog → Error tracking → Alerting → „Issue created / reopened“
+  Ziel: HTTP-Webhook
+  POST https://hcnqhvzlavdycidqyaai.supabase.co/functions/v1/posthog-signal
+  Header: x-signal-secret: ••••
+
+Cron 07:00: posthog-signal?mode=trends
+  HogQL: LCP p75 heute vs. 7-Tage-Mittel, Login-Funnel, Top-Fehler</pre></div>
+      </div>
+    </section>
+
+    <section id="d-ai" data-nav-label="Wer analysiert" data-decision="d-ai" data-decision-mode="single"
+             data-label="Wer analysiert" data-rec="routine"
+             data-rec-why="Die Routine läuft auf dem Max-Abo und hat Repo und Code; PostHogs KI ist von außen nicht aufrufbar."
+             data-applies-to="Problem und Lösungsvorschlag im Eintrag" data-finding="f-ai">
+      <p data-applies>Gilt für: Problem und Lösungsvorschlag im Eintrag</p>
+      <p data-situation>PostHogs eigene KI hat keine Schnittstelle, die ein Server aufrufen kann; sie läuft nur in PostHog selbst und über deren MCP-Server.</p>
+      <h3 data-question>Wer schreibt Diagnose und Lösungsvorschlag?</h3>
+      <p data-stakes>API-Kosten pro Eintrag und Qualität des Vorschlags</p>
+      <div data-options>
+        <label data-opt="routine" data-recommended>
+          <input type="radio" name="dm-d-ai" value="routine" checked>
+          <span data-opt-label>Die Feedback-Routine, mit PostHog-MCP</span>
+          <span data-opt-consequence>Kein API-Guthaben; sieht Code und PostHog zugleich, antwortet beim nächsten Lauf.</span>
+        </label>
+        <label data-opt="api">
+          <input type="radio" name="dm-d-ai" value="api">
+          <span data-opt-label>Die Edge Function fragt Claude per API</span>
+          <span data-opt-consequence>Sofort, ≈ 1–5 Cent pro Eintrag; sieht keinen Code, nur das Signal.</span>
+        </label>
+        <label data-opt="none">
+          <input type="radio" name="dm-d-ai" value="none">
+          <span data-opt-label>Keine KI, nur Rohdaten und Link</span>
+          <span data-opt-consequence>Admin denkt selbst; kein Lösungsvorschlag.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-ai-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-ai-none" value="">
+      <input type="hidden" name="dm-d-ai-hes" value="{&quot;ms&quot;:14024,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-ai-touched" value="1">
+      <input type="hidden" name="dm-d-ai-issue" value="">
+      <input type="hidden" name="dm-d-ai-epic" value="">
+      <div data-alevel="3" data-title="Wer analysiert">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"PostHog AI nur im UI und per MCP; kein Server-Endpunkt."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Routine (Max-Abo)","value":0},{"label":"API, je Eintrag","value":3},{"label":"ohne KI","value":0}],"unit":"Cent","hl":"Routine (Max-Abo)"}'></div>
+          <p>Der MCP-Zugang braucht einen PostHog-Schlüssel mit Leserechten.</p>
+        </div>
+        <div data-example><pre>Board-Eintrag (Entwurf)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠ Neuer Fehler: TypeError in Hangar-Schiffsseite
+  37× seit 06:12 · 9 Sitzungen · seit Release 0.262.0
+  → PostHog-Issue: eu.posthog.com/project/…/error_tracking/…
+
+Diagnose (Routine):
+  hangar-ship-page.component.ts:118 liest ship.id, bevor
+  der Flag-Ladevorgang fertig ist.
+Lösungsvorschlag:
+  Guard auf ship() vor dem Zugriff, Spec für leeren Zustand.
+[Umsetzen]  [Verwerfen]</pre></div>
+      </div>
+    </section>
+
+    <section id="d-mode" data-nav-label="Was danach passiert" data-decision="d-mode" data-decision-mode="single"
+             data-label="Was danach passiert" data-rec="diagnose"
+             data-rec-why="Ein Maschinensignal kann falscher Alarm sein; die Routine soll nicht ungefragt Code dafür ausliefern."
+             data-applies-to="Einträge aus PostHog auf dem Admin-Board" data-finding="f-mode">
+      <p data-applies>Gilt für: Einträge aus PostHog auf dem Admin-Board</p>
+      <p data-situation>Ein offener Eintrag wird von der Routine gebaut und bei grünem Gate ausgeliefert; ein Maschinensignal würde so ohne den Blick eines Admins zu Code in Produktion.</p>
+      <h3 data-question>Wie behandelt die Routine einen PostHog-Eintrag?</h3>
+      <p data-stakes>Wie viel ungeprüfter Code aus Alarmen entstehen kann</p>
+      <div data-options>
+        <label data-opt="diagnose" data-recommended>
+          <input type="radio" name="dm-d-mode" value="diagnose" checked>
+          <span data-opt-label>Erst Diagnose, dann Admin-Freigabe</span>
+          <span data-opt-consequence>Routine schreibt Problem, Link und Vorschlag, setzt „wartet auf Antwort“; ein Admin-„Mach“ startet den Bau.</span>
+        </label>
+        <label data-opt="normal">
+          <input type="radio" name="dm-d-mode" value="normal">
+          <span data-opt-label>Wie Admin-Feedback: bauen und ausliefern</span>
+          <span data-opt-consequence>Schnellster Fix; ein Fehlalarm wird ebenso ausgeliefert.</span>
+        </label>
+        <label data-opt="manual">
+          <input type="radio" name="dm-d-mode" value="manual">
+          <span data-opt-label>Nur Eintrag, Routine fasst ihn nicht an</span>
+          <span data-opt-consequence>Kein Vorschlag; der Admin übergibt selbst.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-mode-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-mode-none" value="">
+      <input type="hidden" name="dm-d-mode-hes" value="{&quot;ms&quot;:8397,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-mode-touched" value="1">
+      <input type="hidden" name="dm-d-mode-issue" value="">
+      <input type="hidden" name="dm-d-mode-epic" value="">
+      <div data-alevel="3" data-title="Was danach passiert">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"open = die Routine implementiert und liefert bei Grün aus."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"open","value":"Routine liest"},{"label":"Diagnose","value":"Antwort im Thread"},{"label":"needs_input","value":"Admin entscheidet"},{"label":"open","value":"Routine baut"}]}'></div>
+          <p>Der Status „wartet auf Antwort“ existiert schon auf dem Board.</p>
+        </div>
+        <div data-example><pre>admin_feedback.status
+  'open' | 'in_progress' | 'shipped' | 'rejected' | 'needs_input'
+
+Neu: Herkunft 'posthog' → Routine-Prompt:
+  „Bei Herkunft posthog nur diagnostizieren, Vorschlag posten,
+   needs_input setzen. Bauen erst nach Admin-Antwort.“</pre></div>
+      </div>
+    </section>
+
+    <section id="d-author" data-nav-label="Absender" data-decision="d-author" data-decision-mode="single"
+             data-label="Absender" data-rec="system"
+             data-rec-why="Alle Admins sehen den Eintrag ohnehin; ein eigener Absender macht die Maschinen-Herkunft erkennbar."
+             data-applies-to="Einträge aus PostHog" data-finding="f-author">
+      <p data-applies>Gilt für: Einträge aus PostHog</p>
+      <p data-situation>Ein Eintrag im Namen eines echten Admins täuscht Urheberschaft vor; das Board ist ohnehin für alle Admins gemeinsam.</p>
+      <h3 data-question>Unter wessen Namen erscheint der Eintrag?</h3>
+      <p data-stakes>Ob Admins Maschinen- und Menschen-Einträge auseinanderhalten</p>
+      <div data-options>
+        <label data-opt="system" data-recommended>
+          <input type="radio" name="dm-d-author" value="system" checked>
+          <span data-opt-label>Eigener Absender „PostHog-Wächter“</span>
+          <span data-opt-consequence>Für alle Admins sichtbar, als Maschine erkennbar, filterbar.</span>
+        </label>
+        <label data-opt="owner">
+          <input type="radio" name="dm-d-author" value="owner">
+          <span data-opt-label>Im Namen des Projekt-Owners</span>
+          <span data-opt-consequence>Sieht aus wie normales Feedback; Herkunft nur im Text.</span>
+        </label>
+        <label data-opt="nobody">
+          <input type="radio" name="dm-d-author" value="nobody">
+          <span data-opt-label>Ohne Absender</span>
+          <span data-opt-consequence>Erscheint als „unbekannt“.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-author-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-author-none" value="">
+      <input type="hidden" name="dm-d-author-hes" value="{&quot;ms&quot;:6162,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-author-touched" value="1">
+      <input type="hidden" name="dm-d-author-issue" value="">
+      <input type="hidden" name="dm-d-author-epic" value="">
+      <div data-alevel="3" data-title="Absender">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"author_id darf leer sein; System-Antworten tragen is_system."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"PostHog-Wächter","value":3},{"label":"Owner","value":1},{"label":"ohne","value":1}],"unit":"Erkennbarkeit"}'></div>
+          <p>Ein System-Profil braucht eine kleine Migration.</p>
+        </div>
+        <div data-example><pre>Board-Liste
+  👤 Jerry       Codex-Filter merkt Sortierung nicht       offen
+  🛰 PostHog-Wächter  Neuer Fehler: TypeError Hangar   wartet auf Antwort
+  👤 Mia         Suche findet „Idris-P“ nicht              ausgeliefert</pre></div>
+      </div>
+    </section>
+
+    <section id="d-cap" data-nav-label="Obergrenze" data-decision="d-cap" data-decision-mode="slider"
+             data-label="Obergrenze" data-rec="3" data-unit="Einträge pro Tag"
+             data-rec-why="Drei pro Tag halten das Board lesbar; gleiche Fehler werden ohnehin zusammengefasst."
+             data-applies-to="neue Einträge aus PostHog" data-finding="f-cap"
+             data-stops='[{"at":1,"text":"Nur das Wichtigste; der Rest landet im Tagesbericht."},{"at":3,"text":"Board bleibt lesbar, neue Fehler kommen trotzdem durch."},{"at":6,"text":"Bei einem schlechten Release füllt sich das Board."},{"at":9,"text":"Alarmflut möglich; Routine-Läufe stapeln sich."}]'>
+      <p data-applies>Gilt für: neue Einträge aus PostHog</p>
+      <p data-situation>Ein schlechtes Release kann Dutzende Fehler-Issues auf einmal öffnen und das Board mitsamt Routine fluten.</p>
+      <h3 data-question>Wie viele PostHog-Einträge pro Tag höchstens?</h3>
+      <p data-stakes>Lesbarkeit des Boards und Last der Routine</p>
+      <div data-options>
+        <input type="range" name="dm-d-cap" min="1" max="10" step="1" value="3">
+      </div>
+      <textarea data-comment="d-cap-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-cap-hes" value="{&quot;ms&quot;:6383,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-cap-touched" value="1">
+      <input type="hidden" name="dm-d-cap-issue" value="">
+      <input type="hidden" name="dm-d-cap-epic" value="">
+      <div data-alevel="3" data-title="Obergrenze">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Gleiches PostHog-Issue = ein Eintrag, Wiederholungen als Thread-Antwort."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="spark" data-viz-spec='{"points":[0,0,1,0,14,6,2,0],"label":"neue Fehler-Issues an einem Release-Tag (Beispiel)"}'></div>
+          <p>Überzählige Signale gehen in einen Sammeleintrag.</p>
+        </div>
+        <div data-example><pre>Tag mit Release 0.263.0:
+  14 neue Issues → 3 Einträge (die häufigsten)
+                 + 1 Sammeleintrag „11 weitere neue Fehler“ mit PostHog-Liste</pre></div>
+      </div>
+    </section>
+
+    <section id="d-secret" data-nav-label="Zugangsschlüssel" data-decision="d-secret" data-decision-mode="yesnoalt"
+             data-label="Zugangsschlüssel" data-rec="yes"
+             data-rec-why="Zwei eng begrenzte Schlüssel nur für diesen Weg; kein Nutzer-API-Token nötig."
+             data-applies-to="PostHog-Anbindung des Servers" data-finding="f-secret">
+      <p data-applies>Gilt für: PostHog-Anbindung des Servers</p>
+      <p data-situation>Der tägliche Abgleich braucht Lesezugriff auf PostHog und der Alarm einen Absender-Nachweis; beides fehlt, unter den Supabase-Secrets steht kein PostHog-Schlüssel.</p>
+      <h3 data-question>Sollen zwei eigene Schlüssel nur dafür entstehen?</h3>
+      <p data-context>Vorschlag: ein PostHog-Personal-Key mit nur Lese-Rechten (Abfragen, Error-Tracking) und ein Webhook-Geheimnis, beide als Supabase-Secret.</p>
+      <p data-stakes>Ob Abgleich und MCP-Zugang der Routine funktionieren</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-d-secret" value="yes" checked>
+          <span data-opt-label>Ja, Lese-Key plus Webhook-Geheimnis</span>
+          <span data-opt-consequence>Die Funktion schreibt intern ins Board; kein Token aus der Admin-Token-Liste nötig.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-d-secret" value="no">
+          <span data-opt-label>Nein, nur Webhook ohne Lesezugriff</span>
+          <span data-opt-consequence>Kein Trend-Abgleich, kein MCP für die Routine.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-secret" value="alt">
+          <span data-opt-label>Anders</span>
+          <input type="text" name="dm-d-secret-alt" placeholder="Dein Weg" value="">
+        </label>
+      </div>
+      <textarea data-comment="d-secret-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-secret-none" value="">
+      <input type="hidden" name="dm-d-secret-hes" value="{&quot;ms&quot;:14106,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-secret-touched" value="1">
+      <input type="hidden" name="dm-d-secret-issue" value="">
+      <input type="hidden" name="dm-d-secret-epic" value="">
+      <div data-alevel="3" data-title="Zugangsschlüssel">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"0","unit":"PostHog-Secrets","label":"in Supabase"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Anthropic","value":2},{"label":"Cloudflare","value":4},{"label":"UEX","value":1},{"label":"Grok","value":1},{"label":"PostHog","value":0}],"unit":"Secrets","hl":"PostHog"}'></div>
+          <p>Den Key legst du in PostHog an; ich führe dich dabei.</p>
+        </div>
+        <div data-example><pre>Supabase-Secrets (neu)
+  POSTHOG_PERSONAL_API_KEY   phx_…  Scopes: query:read, error_tracking:read
+  POSTHOG_SIGNAL_SECRET      zufällig, im PostHog-Webhook als Header
+
+Routine (.mcp.json, lokal)
+  posthog → mcp.posthog.com, gleicher Lese-Key</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ═════════ Thema 5 · Externe Dienste ═════════ -->
+  <section id="t-ext" data-topic data-nav-label="Externe Dienste">
+    <div data-alevel="2" data-title="Externe Dienste">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"9","unit":"externe Dienste","label":"ohne Status-Anzeige"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Claude (2 Schlüssel)","value":7},{"label":"RSI und Wiki","value":6},{"label":"Cloudflare R2","value":3},{"label":"PostHog","value":2},{"label":"UEX","value":1},{"label":"Grok / OpenAI","value":1},{"label":"readme.io","value":1}],"unit":"abhängige Funktionen"}'></div>
+        <p>Die Admin-Telemetrie zeigt heute nur Uploader und Desktop-Apps. Ob ein Schlüssel abgelaufen oder ein Dienst rot ist, sieht niemand.</p>
+      </div>
+    </div>
+
+    <section id="d-place" data-nav-label="Wo es steht" data-decision="d-place" data-decision-mode="single"
+             data-label="Wo es steht" data-rec="tab"
+             data-rec-why="Telemetrie ist der Ort, an dem Admins schon nach Betriebsdaten suchen."
+             data-applies-to="Admin-Bereich" data-finding="f-place">
+      <p data-applies>Gilt für: Admin-Bereich</p>
+      <p data-situation>Ausfälle externer Dienste fallen erst auf, wenn eine Seite leer bleibt; es gibt keinen Ort, an dem ein Admin den Zustand aller Anbindungen sieht.</p>
+      <h3 data-question>Wo soll die Dienste-Übersicht stehen?</h3>
+      <p data-stakes>Wie oft Admins sie zu sehen bekommen</p>
+      <div data-options>
+        <label data-opt="tab" data-recommended>
+          <input type="radio" name="dm-d-place" value="tab" checked>
+          <span data-opt-label>Neuer Reiter „Externe Dienste“ unter Telemetrie</span>
+          <span data-opt-consequence>Neben Crashes und Nutzung; Ampel zusätzlich auf der Hub-Kachel.</span>
+        </label>
+        <label data-opt="hub">
+          <input type="radio" name="dm-d-place" value="hub">
+          <span data-opt-label>Eigene Kachel und Seite im Admin-Hub</span>
+          <span data-opt-consequence>Sichtbarer, aber ein weiterer Admin-Bereich.</span>
+        </label>
+        <label data-opt="board">
+          <input type="radio" name="dm-d-place" value="board">
+          <span data-opt-label>Statuszeile über dem Feedback-Board</span>
+          <span data-opt-consequence>Täglich im Blick, aber eng für Verbrauchszahlen.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-place-note" placeholder="Notiz (optional)">Räume wegen dieser intensiven änderunge btte nochmal das amdin telemetrie panel auf und rethink es! Analysiere mit devops agents recherchiert best practices für geleegenheitsadmins und rethink komplett den inhalt der seite und die visualisierung! basierend auf dem neuen vverfahren posthog first! Die seite soll aufmerksam machen, top 3 infos jeweils anzeigen um zu teasern was das tehema dort gerade jeweils ist aber nicht zum reinfujchsen in einzelne fflows oder events etc. sein, da kommt posthog ins spiel</textarea>
+      <input type="hidden" name="dm-d-place-none" value="">
+      <input type="hidden" name="dm-d-place-hes" value="{&quot;ms&quot;:99407,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-place-touched" value="1">
+      <input type="hidden" name="dm-d-place-issue" value="">
+      <input type="hidden" name="dm-d-place-epic" value="">
+      <div data-alevel="3" data-title="Wo es steht">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Telemetrie: nur Uploader, Starscape, App."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Telemetrie","value":1},{"label":"Admin-Hub","value":1},{"label":"Feedback-Board","value":1}],"unit":"Ort"}'></div>
+          <p>Der Reiter nutzt das vorhandene Auto-Refresh der Telemetrie.</p>
+        </div>
+        <div data-example><pre>/admin/telemetry
+  [ Uploader ] [ Starscape ] [ App ] [ Externe Dienste ● ]
+
+Externe Dienste
+  ● Claude API        grün   312 Aufrufe/24 h · 0,84 $ · 0,6 % Fehler   [PostHog ↗]
+  ● PostHog           grün   letzter Server-Event vor 2 min
+  ● UEX               gelb   3 von 12 Abrufen fehlgeschlagen
+  ● Cloudflare R2     grün   Worker antwortet in 80 ms</pre></div>
+      </div>
+    </section>
+
+    <section id="d-svc" data-nav-label="Welche Dienste" data-decision="d-svc" data-decision-mode="multi"
+             data-label="Welche Dienste" data-rec="claude posthog supa r2 uex rsi"
+             data-rec-why="Diese tragen Seiten, die jeder Nutzer sieht."
+             data-applies-to="Dienste-Übersicht" data-finding="f-svc">
+      <p data-applies>Gilt für: Dienste-Übersicht</p>
+      <p data-situation>Neun Anbindungen tragen Inhalte der App; fällt eine aus, zeigt die betroffene Seite einen Fehler, ohne dass ein Admin die Ursache sieht.</p>
+      <h3 data-question>Welche Dienste kommen in die Übersicht?</h3>
+      <p data-stakes>Umfang der Status-Prüfung</p>
+      <div data-options>
+        <label data-opt="claude" data-recommended>
+          <input type="checkbox" name="dm-d-svc.claude" checked>
+          <span data-opt-label>Claude API (beide Schlüssel)</span>
+          <span data-opt-consequence>Patch-Teaser, Events, Übersetzung, Namen.</span>
+        </label>
+        <label data-opt="posthog" data-recommended>
+          <input type="checkbox" name="dm-d-svc.posthog" checked>
+          <span data-opt-label>PostHog</span>
+          <span data-opt-consequence>Annahme der Events und der Signal-Weg aus Thema 4.</span>
+        </label>
+        <label data-opt="supa" data-recommended>
+          <input type="checkbox" name="dm-d-svc.supa" checked>
+          <span data-opt-label>Eigene Edge Functions und Crons</span>
+          <span data-opt-consequence>Letzter Lauf und Fehlerquote je Funktion.</span>
+        </label>
+        <label data-opt="r2" data-recommended>
+          <input type="checkbox" name="dm-d-svc.r2" checked>
+          <span data-opt-label>Cloudflare R2 (3D-Modelle)</span>
+          <span data-opt-consequence>Holotisch und Schiffsansicht.</span>
+        </label>
+        <label data-opt="uex" data-recommended>
+          <input type="checkbox" name="dm-d-svc.uex" checked>
+          <span data-opt-label>UEX (Rohstoffpreise)</span>
+          <span data-opt-consequence>HQ-Nachschub.</span>
+        </label>
+        <label data-opt="rsi" data-recommended>
+          <input type="checkbox" name="dm-d-svc.rsi" checked>
+          <span data-opt-label>RSI, Spectrum, Star-Citizen-Wiki</span>
+          <span data-opt-consequence>News, Roadmap, Patch-Stabilität.</span>
+        </label>
+        <label data-opt="xai">
+          <input type="checkbox" name="dm-d-svc.xai" checked>
+          <span data-opt-label>Grok / OpenAI (Ersatz bei Events)</span>
+          <span data-opt-consequence>Nur Rückfall, selten genutzt.</span>
+        </label>
+        <label data-opt="readme">
+          <input type="checkbox" name="dm-d-svc.readme" checked>
+          <span data-opt-label>readme.io (Doku-Sync)</span>
+          <span data-opt-consequence>Läuft über Git-Sync, kaum Ausfallfolgen.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-svc-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-svc-none" value="">
+      <input type="hidden" name="dm-d-svc-hes" value="{&quot;ms&quot;:10342,&quot;revisits&quot;:1,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-svc-touched" value="1">
+      <input type="hidden" name="dm-d-svc-issue" value="">
+      <input type="hidden" name="dm-d-svc-epic" value="">
+      <div data-alevel="3" data-title="Welche Dienste">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"9","unit":"Anbindungen"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="donut" data-viz-spec='{"parts":[{"label":"tragen sichtbare Seiten","value":6},{"label":"Rückfall oder Hintergrund","value":3}]}'></div>
+          <p>Gezählt aus Supabase-Secrets, CSP und Funktionsaufrufen.</p>
+        </div>
+        <div data-example><pre>Supabase-Secrets: ANTHROPIC_API_KEY, TRANSLATE_ANTHROPIC_API_KEY,
+  GROK_API_KEY, UEX_API_TOKEN, R2_*, CF_ANALYTICS_TOKEN, README_IO_API_KEY
+CSP connect-src: api.star-citizen.wiki, robertsspaceindustries.com,
+  status.robertsspaceindustries.com, eu.i.posthog.com, sc-assets…workers.dev</pre></div>
+      </div>
+    </section>
+
+    <section id="d-usage" data-nav-label="Claude-Verbrauch" data-decision="d-usage" data-decision-mode="single"
+             data-label="Claude-Verbrauch" data-rec="ledger"
+             data-rec-why="Ein eigenes Protokoll ist sofort, pro Funktion und braucht keinen Organisations-Admin-Schlüssel."
+             data-applies-to="Claude-Zeile der Dienste-Übersicht" data-finding="f-usage">
+      <p data-applies>Gilt für: Claude-Zeile der Dienste-Übersicht</p>
+      <p data-situation>Was die Claude-Anbindung kostet und ob sie gerade scheitert, sieht man nur in der Anthropic-Konsole, und dort ohne Zuordnung zur Funktion.</p>
+      <h3 data-question>Woher kommen Verbrauch und Kosten?</h3>
+      <p data-stakes>Genauigkeit der Kosten und ein weiterer Schlüssel mit Organisationsrechten</p>
+      <div data-options>
+        <label data-opt="ledger" data-recommended>
+          <input type="radio" name="dm-d-usage" value="ledger" checked>
+          <span data-opt-label>Eigenes Protokoll pro Aufruf in Supabase</span>
+          <span data-opt-consequence>Live, je Funktion und Modell; Kosten nach Preisliste gerechnet.</span>
+        </label>
+        <label data-opt="admin">
+          <input type="radio" name="dm-d-usage" value="admin">
+          <span data-opt-label>Anthropic Admin-API (Kostenbericht)</span>
+          <span data-opt-consequence>Exakte Rechnung, nur Tageswerte; braucht einen Admin-Schlüssel der Organisation.</span>
+        </label>
+        <label data-opt="both">
+          <input type="radio" name="dm-d-usage" value="both">
+          <span data-opt-label>Protokoll plus täglicher Abgleich mit der Admin-API</span>
+          <span data-opt-consequence>Zeigt Abweichungen; zwei Wege zu pflegen.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-usage-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-usage-none" value="">
+      <input type="hidden" name="dm-d-usage-hes" value="{&quot;ms&quot;:27530,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-usage-touched" value="1">
+      <input type="hidden" name="dm-d-usage-issue" value="">
+      <input type="hidden" name="dm-d-usage-epic" value="">
+      <div data-alevel="3" data-title="Claude-Verbrauch">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Nur die Übersetzung rechnet Kosten aus der usage-Antwort."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"Funktionen mit Kostenzahl heute","value":1},"after":{"label":"mit Protokoll","value":7},"unit":"von 7"}'></div>
+          <p>Die Preisrechnung der Übersetzung lässt sich für alle wiederverwenden.</p>
+        </div>
+        <div data-example><pre>ai_calls (neu)
+  at          function           model              in    out   usd     ok
+  07:02:11    patch-teaser       claude-sonnet-5-5  812   164   0.0049  ✓
+  07:02:14    sc-events-sync     claude-haiku-4-5   2310  402   0.0039  ✓
+  07:05:40    exemplar-ai        claude-sonnet-5-5  —     —     —       ✗ 529 overloaded</pre></div>
+      </div>
+    </section>
+
+    <section id="d-health" data-nav-label="Wie der Status entsteht" data-decision="d-health" data-decision-mode="single"
+             data-label="Wie der Status entsteht" data-rec="both"
+             data-rec-why="Echte Aufrufe zeigen die Fehlerquote, eine Probe zeigt einen toten Schlüssel auch an ruhigen Tagen."
+             data-applies-to="Ampel jedes Dienstes" data-finding="f-health">
+      <p data-applies>Gilt für: Ampel jedes Dienstes</p>
+      <p data-situation>Ein abgelaufener Schlüssel fällt erst beim nächsten echten Aufruf auf; bei selten genutzten Diensten kann das Tage dauern.</p>
+      <h3 data-question>Woraus wird die Ampel berechnet?</h3>
+      <p data-stakes>Ob ein toter Dienst auch ohne Nutzerverkehr rot wird</p>
+      <div data-options>
+        <label data-opt="both" data-recommended>
+          <input type="radio" name="dm-d-health" value="both" checked>
+          <span data-opt-label>Echte Aufrufe plus stündliche Gratis-Probe</span>
+          <span data-opt-consequence>Fehlerquote live, toter Schlüssel nach höchstens 1 h; Proben kosten keine Tokens.</span>
+        </label>
+        <label data-opt="passive">
+          <input type="radio" name="dm-d-health" value="passive">
+          <span data-opt-label>Nur aus echten Aufrufen</span>
+          <span data-opt-consequence>Null Zusatzlast; ruhige Dienste bleiben „unbekannt“.</span>
+        </label>
+        <label data-opt="probe">
+          <input type="radio" name="dm-d-health" value="probe">
+          <span data-opt-label>Nur aktive Probe alle 15 min</span>
+          <span data-opt-consequence>Immer aktuell, aber keine Fehlerquote echter Aufrufe.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-health-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-health-none" value="">
+      <input type="hidden" name="dm-d-health-hes" value="{&quot;ms&quot;:9524,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-health-touched" value="1">
+      <input type="hidden" name="dm-d-health-issue" value="">
+      <input type="hidden" name="dm-d-health-epic" value="">
+      <div data-alevel="3" data-title="Wie der Status entsteht">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Proben wie die Modell-Liste von Anthropic kosten keine Tokens."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"toter Schlüssel erkannt nach (heute)","value":72},"after":{"label":"mit Probe","value":1},"unit":"h"}'></div>
+          <p>Probe-Ergebnisse landen im selben Protokoll wie echte Aufrufe.</p>
+        </div>
+        <div data-example><pre>Stündlicher Cron service-health
+  Anthropic   GET /v1/models               (kostenlos)
+  PostHog     POST /i/v0/e/ health event   (zählt 1 Event)
+  UEX         GET /commodities?limit=1
+  R2 Worker   HEAD /health
+  RSI         GET status.robertsspaceindustries.com/index.json</pre></div>
+      </div>
+    </section>
+
+    <section id="d-thresh" data-nav-label="Ampel-Regeln" data-decision="d-thresh" data-decision-mode="verify"
+             data-label="Ampel-Regeln" data-rec="ok"
+             data-rec-why="Die Schwellen trennen gelegentliche Aussetzer von echten Ausfällen."
+             data-applies-to="Ampel jedes Dienstes" data-finding="f-thresh">
+      <p data-applies>Gilt für: Ampel jedes Dienstes</p>
+      <p data-situation>Ohne feste Regeln wird jeder einzelne Aussetzer rot; Admins lernen dann, die Ampel zu übersehen.</p>
+      <h3 data-question>Passen diese Ampel-Regeln?</h3>
+      <p data-context>Grün: letzter Erfolg im erwarteten Takt, Fehlerquote 24 h unter 10 %. Gelb: Quote 10–50 % oder Takt doppelt überschritten. Rot: letzte 3 Versuche gescheitert oder Schlüssel fehlt.</p>
+      <p data-stakes>Wann aus Rot ein Board-Eintrag wird (nächste Frage)</p>
+      <div data-options>
+        <label data-opt="ok" data-recommended>
+          <input type="radio" name="dm-d-thresh" value="ok" checked>
+          <span data-opt-label>Passt so</span>
+          <span data-opt-consequence>Die Regeln gelten für alle Dienste gleich.</span>
+        </label>
+        <label data-opt="partial">
+          <input type="radio" name="dm-d-thresh" value="partial">
+          <span data-opt-label>Teilweise</span>
+          <span data-opt-consequence>Korrektur unten eintragen.</span>
+        </label>
+        <label data-opt="wrong">
+          <input type="radio" name="dm-d-thresh" value="wrong">
+          <span data-opt-label>Passt nicht</span>
+          <span data-opt-consequence>Eigene Regel im Notizfeld.</span>
+        </label>
+        <input type="text" name="dm-d-thresh-fix" placeholder="Korrektur" value="">
+      </div>
+      <textarea data-comment="d-thresh-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-thresh-none" value="">
+      <input type="hidden" name="dm-d-thresh-hes" value="{&quot;ms&quot;:12646,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-thresh-touched" value="1">
+      <input type="hidden" name="dm-d-thresh-issue" value="">
+      <input type="hidden" name="dm-d-thresh-epic" value="">
+      <div data-alevel="3" data-title="Ampel-Regeln">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Drei Stufen, gleiche Regeln für alle Dienste."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"grün: unter 10 %","value":10},{"label":"gelb: 10–50 %","value":50},{"label":"rot: 3× gescheitert","value":100}],"unit":"% Fehler"}'></div>
+          <p>Der erwartete Takt kommt aus dem Cron-Plan jedes Dienstes.</p>
+        </div>
+        <div data-example><pre>UEX    Takt 1 h · letzter Erfolg vor 25 min · Quote 25 %  → gelb
+Claude Takt —   · letzter Erfolg vor 4 min  · Quote 0,6 % → grün
+R2     Probe 3× Timeout                                   → rot</pre></div>
+      </div>
+    </section>
+
+    <section id="d-escalate" data-nav-label="Rot wird Aufgabe" data-decision="d-escalate" data-decision-mode="yesnoalt"
+             data-label="Rot wird Aufgabe" data-rec="yes"
+             data-rec-why="Derselbe Weg wie in Thema 4, ein Ausfall braucht keinen eigenen Kanal."
+             data-applies-to="Dienste auf Rot" data-finding="f-escalate">
+      <p data-applies>Gilt für: Dienste auf Rot</p>
+      <p data-situation>Eine rote Ampel auf einer Admin-Seite sieht nur, wer die Seite öffnet; nachts oder am Wochenende bleibt ein Ausfall so unbemerkt.</p>
+      <h3 data-question>Soll ein Dienst auf Rot einen Board-Eintrag erzeugen?</h3>
+      <p data-stakes>Ob Ausfälle die Admins von selbst erreichen</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-d-escalate" value="yes" checked>
+          <span data-opt-label>Ja, ein Eintrag pro Ausfall mit Diagnose</span>
+          <span data-opt-consequence>Gleiche Obergrenze und Freigabe wie die PostHog-Einträge; Erholung schließt ihn.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-d-escalate" value="no">
+          <span data-opt-label>Nein, nur die Ampel</span>
+          <span data-opt-consequence>Admins müssen selbst nachsehen.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-escalate" value="alt">
+          <span data-opt-label>Anders</span>
+          <input type="text" name="dm-d-escalate-alt" placeholder="Dein Weg" value="">
+        </label>
+      </div>
+      <textarea data-comment="d-escalate-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-escalate-none" value="">
+      <input type="hidden" name="dm-d-escalate-hes" value="{&quot;ms&quot;:5283,&quot;revisits&quot;:0,&quot;median&quot;:15881}">
+      <input type="hidden" name="dm-d-escalate-touched" value="1">
+      <input type="hidden" name="dm-d-escalate-issue" value="">
+      <input type="hidden" name="dm-d-escalate-epic" value="">
+      <div data-alevel="3" data-title="Rot wird Aufgabe">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Ampel allein meldet sich nicht."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Probe 3× rot","value":"Dienst rot"},{"label":"Board","value":"🛰 Eintrag"},{"label":"Probe grün","value":"Eintrag erledigt"}]}'></div>
+          <p>Erholt sich der Dienst, schließt die Funktion den Eintrag selbst.</p>
+        </div>
+        <div data-example><pre>🛰 PostHog-Wächter · wartet auf Antwort
+  Cloudflare R2 rot seit 03:14 (3 Proben Timeout)
+  Folge: Holotisch lädt keine Modelle
+  Vorschlag: Worker-Logs prüfen, Fallback auf Supabase-Bucket aktivieren</pre></div>
+      </div>
+    </section>
+  </section>
+</section>

@@ -1211,31 +1211,31 @@ export class SettingsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.usernameInput.set(next);
     this.usernameOk.set(true);
     this.usernameSaving.set(false);
-    this.analytics.capture('settings_username_saved');
+    this.analytics.track('settings:username_update');
   }
 
   onSendOnEnterToggle(e: Event) {
     const on = (e.target as HTMLInputElement).checked;
     this.composerPrefs.setSendOnEnter(on);
-    this.analytics.capture('settings_send_on_enter_changed', { on });
+    this.analytics.track('settings:send_on_enter_toggle', { on });
   }
 
   onFeedbackFabToggle(e: Event) {
     const on = (e.target as HTMLInputElement).checked;
     this.feedbackFabPrefs.setShow(on);
-    this.analytics.capture('settings_feedback_fab_changed', { on });
+    this.analytics.track('settings:feedback_fab_toggle', { on });
   }
 
   onRoutineTintToggle(e: Event) {
     const on = (e.target as HTMLInputElement).checked;
     this.routineTintPrefs.setBinary(on);
-    this.analytics.capture('settings_routine_tint_changed', { on });
+    this.analytics.track('settings:routine_tint_toggle', { on });
   }
 
   onShowNonUsableToggle(e: Event) {
     const on = (e.target as HTMLInputElement).checked;
     this.codexPrefs.setShowNonUsable(on);
-    this.analytics.capture('settings_codex_non_usable_changed', { on });
+    this.analytics.track('settings:codex_non_usable_toggle', { on });
   }
 
   onConsentToggle(e: Event) {
@@ -1254,7 +1254,7 @@ export class SettingsComponent implements OnInit, AfterViewInit, OnDestroy {
   onLanguageChange(value: string | null) {
     const setting = value === null || value === 'auto' ? 'auto' : (value as LangId);
     this.locale.setLanguage(setting);
-    this.analytics.capture('settings_language_changed', { lang: setting });
+    this.analytics.track('settings:language_change', { lang: setting });
     // Persist to the profile as the logged-in preference. Fire-and-forget:
     // a failure here (e.g. migration not yet applied) must not block the UI.
     // `null` clears the column, i.e. hands the decision back to detection.
@@ -1269,7 +1269,7 @@ export class SettingsComponent implements OnInit, AfterViewInit, OnDestroy {
   onRegionChange(value: string | null) {
     const setting = value === null || value === 'auto' ? 'auto' : value.toUpperCase();
     this.locale.setRegion(setting);
-    this.analytics.capture('settings_region_changed', { region: setting });
+    this.analytics.track('settings:region_change', { region: setting });
     this.sb.client
       .rpc('set_preferred_region', { region: setting === 'auto' ? null : setting })
       .then(({ error }) => {

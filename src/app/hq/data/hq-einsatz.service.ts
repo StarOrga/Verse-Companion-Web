@@ -1,5 +1,6 @@
 import { DestroyRef, Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import { AuthService } from '../../auth/auth.service';
+import { AnalyticsService } from '../../core/analytics.service';
 import { toErrorKey } from '../../core/describe-error';
 import { logWarn } from '../../core/log';
 import { SupabaseClientProvider } from '../../core/supabase.client';
@@ -128,6 +129,7 @@ interface CacheShape {
 export class HqEinsatzService {
   private readonly sb = inject(SupabaseClientProvider);
   private readonly auth = inject(AuthService);
+  private readonly analytics = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly rows = signal<readonly Einsatz[]>([]);
@@ -201,6 +203,7 @@ export class HqEinsatzService {
       dirty: true,
     };
     this.commit([...this.rows(), e]);
+    this.analytics.track('hq:plan_create', { steps: e.steps.length });
     return e;
   }
 
@@ -234,11 +237,13 @@ export class HqEinsatzService {
 
   setStatus(id: string, status: EinsatzStatus): void {
     this.patch(id, { status });
+    this.analytics.track('hq:plan_update', { change: 'status' });
   }
 
   remove(id: string): void {
     const now = nowIso();
     this.commit(this.rows().map((e) => (e.id === id ? { ...e, deletedAt: now, updatedAt: now, dirty: true } : e)));
+    this.analytics.track('hq:plan_update', { change: 'remove' });
   }
 
   /** The user ticks a step by hand (or unticks it). */
@@ -247,6 +252,7 @@ export class HqEinsatzService {
     const s = e?.steps.find((x) => x.ord === ord);
     if (!e || !s) return;
     this.setStep(id, ord, s.state === 'done' ? 'todo' : 'done', 'user');
+    this.analytics.track('hq:plan_update', { change: 'step' });
   }
 
   /**

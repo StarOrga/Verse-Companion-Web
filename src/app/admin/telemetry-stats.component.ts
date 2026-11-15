@@ -1,717 +1,343 @@
+import { ChangeDetectionStrategy, Component, DestroyRef, Injector, afterNextRender, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { toErrorKey } from '../core/describe-error';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { TranslateService, TranslatePipe } from '@ngx-translate/core';
-import { draftScopes } from '../feedback/feedback-draft.types';
-import { FeedbackComposerSeedService } from '../feedback/feedback-composer-seed.service';
-import { FeedbackFabPrefsService } from '../core/feedback-fab-prefs.service';
-import { buildDiagnosticTopic, diagnosticLogFile, type DiagnosticRow } from './telemetry-diagnostics';
-import { DecimalPipe } from '@angular/common';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ScSegmentedComponent, ScSegmentOption } from '../shared/segmented-control.component';
-import { SupabaseClientProvider } from '../core/supabase.client';
 import { useAutoRefresh } from '../core/auto-refresh';
+import { logWarn } from '../core/log';
 import { ScDatePipe } from '../core/locale/sc-date.pipe';
+import { SupabaseClientProvider } from '../core/supabase.client';
+import { FeedbackFabPrefsService } from '../core/feedback-fab-prefs.service';
+import { FeedbackComposerSeedService } from '../feedback/feedback-composer-seed.service';
+import { draftScopes } from '../feedback/feedback-draft.types';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { PageCrumb } from '../shared/page-header/nav-origin.service';
+import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import {
-  ALL_PRODUCTS,
-  allProductsRow,
-  mergeProductRows,
-  normaliseProductParam,
-  productLabelKey,
-  sharePct,
-  type ProductRow,
-} from './telemetry-products';
+  KNOWN_SERVICES,
+  deltaIsWorse,
+  deltaText,
+  mergeRefresh,
+  posthogRoot,
+  sparkPoints,
+  type FeedbackText,
+  type Overview,
+  type OverviewCard,
+  type OverviewItem,
+} from './telemetry-overview';
 
-interface VersionRow { version: string; crashes: number; usage: number; sessions: number; }
-interface CountRow { name?: string; role?: string; count: number; }
-interface ChannelRow { channel: string; events: number; sessions: number; crashes: number; }
-interface MetricRow { metric: string; count: number; sessions: number; }
-interface RecentCrash {
-  version: string;
-  product?: string;
-  role: string | null;
-  name: string | null;
-  message: string;
-  at: number;
-}
-/** Aborted P4K extraction, broken down by why it stopped. */
-interface AbortReasonRow { reason: string; count: number; }
-interface RecentAbort {
-  version: string;
-  reason: string;
-  phase: string | null;
-  pct: number | null;
-  message: string;
-  at: number;
-}
-interface ExtractAborts { total: number; byReason: AbortReasonRow[]; recent: RecentAbort[]; }
-/** Uploader runs that logged warnings/errors, by how the run ended. */
-interface OutcomeRow { outcome: string; count: number; }
-interface Diagnostics { total: number; byOutcome: OutcomeRow[]; recent: DiagnosticRow[]; }
-interface TelemetryStats {
-  generatedAt: number;
-  windowDays: number;
-  /** Which product the server actually aggregated, or 'all'. */
-  product?: string;
-  /** Per-product roll-up — always the full window, never narrowed by the filter. */
-  products?: ProductRow[];
-  totals: {
-    crashes: number; usage: number; installs: number; sessions: number;
-    extractAborts?: number; diagnostics?: number;
-  };
-  byVersion: VersionRow[];
-  /** Release-ring split. Absent until the starscape-product migration is deployed. */
-  byChannel?: ChannelRow[];
-  /** What the opt-in usage events actually are. Absent on an older backend. */
-  usageByMetric?: MetricRow[];
-  crashesByType: CountRow[];
-  crashesByRole: CountRow[];
-  recentCrashes: RecentCrash[];
-  /** Absent until the telemetry_extract_aborts migration is deployed. */
-  extractAborts?: ExtractAborts;
-  /** Absent until the telemetry_job_diagnostics migration is deployed. */
-  diagnostics?: Diagnostics;
-}
+/** Status strip variants: something to do, a blind spot (PostHog unreachable), or really quiet. */
+type StatusKind = 'attention' | 'blind' | 'calm';
 
-/** Abort reasons the uploader can send — anything else renders verbatim. */
-const KNOWN_ABORT_REASONS = ['cancelled', 'quit', 'error'];
-
-/** Run outcomes the uploader can send — anything else renders verbatim. */
-const KNOWN_OUTCOMES = ['ok', 'failed', 'cancelled', 'quit'];
-/** Job kinds the uploader can send — anything else renders verbatim. */
-const KNOWN_KINDS = ['extract', 'skin'];
-
-/** Release rings we ship a label for; anything else renders verbatim. */
-const KNOWN_CHANNELS = ['stable', 'beta', 'alpha', 'dev'];
-
-/** Time-range options (days); also the i18n key suffixes. */
-const WINDOWS = [7, 30, 90] as const;
-
+/**
+ * Admin › Telemetrie — the Themen-Karten page (concept 20261115-0211-posthog-audit, round 2, design `karten`).
+ *
+ * One read (`telemetry-overview`) feeds six topic cards in the server's urgency order. Each card is a teaser:
+ * level icon + text, one KPI, delta or forecast, the top three findings and a way into PostHog — no lists to wade
+ * through, no second copy of what PostHog already shows. Every top finding can become a feedback topic; the
+ * composer is only pre-filled, the admin sends it.
+ */
 @Component({
   selector: 'sc-telemetry-stats',
   standalone: true,
-  imports: [ScDatePipe, DecimalPipe, TranslatePipe, RouterLink, ScSegmentedComponent],
+  imports: [TranslatePipe, ScDatePipe, ScActionDirective, ScTooltipDirective, PageHeaderComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="page">
-      <header class="head">
-        <div>
-          <h1>{{ 'telemetry.title' | translate }}</h1>
-          <p class="hint">{{ 'telemetry.subtitle' | translate }}</p>
-        </div>
-        <!-- Real anchors: the time range is part of the URL, so an admin can
-             bookmark "last 90 days" and middle-click it into a new tab. The
-             shared control keeps that link mode; see sc-segmented. -->
-        <sc-segmented
-          class="window-seg"
-          [options]="windowOptions"
-          [value]="windowValue()"
-          [ariaLabel]="'telemetry.window.label' | translate" />
-      </header>
-
-      @if (errorMsg()) {
-        <div class="err"><strong>{{ 'telemetry.errorTitle' | translate }}:</strong> {{ errorMsg()! | translate }}</div>
-      }
-
-      @if (busy() && !stats()) {
-        <div class="sc-card empty">{{ 'telemetry.loading' | translate }}</div>
-      } @else if (stats(); as s) {
-        <!-- ── Every product at a glance. One card per product, plus the
-             cross-product card; the selected one is the drill-down below. ── -->
-        <h2 class="section-h">{{ 'telemetry.products.title' | translate }}</h2>
-        <p class="hint">{{ 'telemetry.products.hint' | translate }}</p>
-        <div class="products">
-          @for (p of productCards(); track p.product) {
-            <a
-              class="sc-card product"
-              [class.active]="product() === p.product"
-              [class.silent]="!p.events"
-              [attr.aria-current]="product() === p.product ? 'true' : null"
-              [routerLink]="[]"
-              [queryParams]="{ product: p.product }"
-              queryParamsHandling="merge"
-            >
-              <span class="product-head">
-                <span class="product-name">
-                  @if (productLabel(p.product); as key) {
-                    {{ key | translate }}
-                  } @else {
-                    <span class="mono">{{ p.product }}</span>
-                  }
-                </span>
-                @if (p.crashes) {
-                  <span class="chip warn">{{ p.crashes | number }} {{ 'telemetry.products.crashesShort' | translate }}</span>
-                } @else if (p.events) {
-                  <span class="chip ok">{{ 'telemetry.products.healthy' | translate }}</span>
-                } @else {
-                  <span class="chip">{{ 'telemetry.products.silent' | translate }}</span>
-                }
-              </span>
-              <span class="kpis">
-                <span class="kpi"><b>{{ p.installs | number }}</b><i>{{ 'telemetry.totals.installs' | translate }}</i></span>
-                <span class="kpi"><b>{{ p.sessions | number }}</b><i>{{ 'telemetry.totals.sessions' | translate }}</i></span>
-                <span class="kpi"><b>{{ p.usage | number }}</b><i>{{ 'telemetry.totals.usage' | translate }}</i></span>
-              </span>
-              <!-- Share of all events in the window: the comparison the old
-                   binary switch could never show. -->
-              <span class="share" aria-hidden="true">
-                <span class="share-fill" [style.width.%]="sharePct(p.events, maxProductEvents())"></span>
-              </span>
-              <span class="product-foot hint">
-                @if (p.lastSeen) {
-                  {{ 'telemetry.products.lastSeen' | translate }}: {{ p.lastSeen | scDate: 'datetime' }}
-                } @else {
-                  {{ 'telemetry.products.never' | translate }}
-                }
-              </span>
-            </a>
-          }
-        </div>
-
-        <!-- ── Drill-down: everything below is scoped to the selected product. ── -->
-        <h2 class="section-h">
-          {{ 'telemetry.detail.title' | translate }} ·
-          @if (productLabel(product()); as key) {
-            {{ key | translate }}
-          } @else {
-            <span class="mono">{{ product() }}</span>
-          }
-        </h2>
-
-        <div class="totals">
-          <div class="sc-card stat"><div class="num">{{ s.totals.crashes | number }}</div><div class="lbl">{{ 'telemetry.totals.crashes' | translate }}</div></div>
-          <div class="sc-card stat"><div class="num">{{ s.totals.usage | number }}</div><div class="lbl">{{ 'telemetry.totals.usage' | translate }}</div></div>
-          <div class="sc-card stat"><div class="num">{{ s.totals.installs | number }}</div><div class="lbl">{{ 'telemetry.totals.installs' | translate }}</div></div>
-          <div class="sc-card stat"><div class="num">{{ s.totals.sessions | number }}</div><div class="lbl">{{ 'telemetry.totals.sessions' | translate }}</div></div>
-        </div>
-
-        <div class="cols">
-          <div class="sc-card">
-            <h2>{{ 'telemetry.byVersion' | translate }}</h2>
-            @for (v of s.byVersion; track v.version) {
-              <div class="bar-row">
-                <span class="bar-label mono">{{ v.version }}</span>
-                <span class="bar"><span class="bar-fill" [style.width.%]="sharePct(v.crashes, maxVersionCrashes())"></span></span>
-                <span class="bar-num">{{ v.crashes | number }}</span>
-              </div>
-            } @empty { <p class="hint">{{ 'telemetry.empty' | translate }}</p> }
-
-            @if (channels().length) {
-              <h2 class="sub">{{ 'telemetry.byChannel' | translate }}</h2>
-              <div class="pills">
-                @for (c of channels(); track c.channel) {
-                  <span class="role-pill">
-                    @if (channelLabel(c.channel); as key) {
-                      {{ key | translate }}
-                    } @else {
-                      <span class="mono">{{ c.channel }}</span>
-                    }
-                    · {{ c.sessions | number }}
-                  </span>
-                }
-              </div>
-            }
-
-            @if (usageMetrics().length) {
-              <h2 class="sub">{{ 'telemetry.usageByMetric' | translate }}</h2>
-              @for (m of usageMetrics(); track m.metric) {
-                <div class="bar-row">
-                  <span class="bar-label mono">{{ m.metric }}</span>
-                  <span class="bar"><span class="bar-fill" [style.width.%]="sharePct(m.count, maxUsageMetric())"></span></span>
-                  <span class="bar-num">{{ m.count | number }}</span>
-                </div>
-              }
-            }
-          </div>
-
-          <div class="sc-card">
-            <h2>{{ 'telemetry.crashesByType' | translate }}</h2>
-            @for (c of s.crashesByType; track c.name) {
-              <div class="bar-row">
-                <span class="bar-label mono">{{ c.name }}</span>
-                <span class="bar"><span class="bar-fill warn" [style.width.%]="sharePct(c.count, maxTypeCount())"></span></span>
-                <span class="bar-num">{{ c.count | number }}</span>
-              </div>
-            } @empty { <p class="hint">{{ 'telemetry.empty' | translate }}</p> }
-            <h2 class="sub">{{ 'telemetry.crashesByRole' | translate }}</h2>
-            <div class="pills">
-              @for (r of s.crashesByRole; track r.role) {
-                <span class="role-pill">{{ r.role }} · {{ r.count | number }}</span>
-              } @empty { <span class="hint">{{ 'telemetry.empty' | translate }}</span> }
-            </div>
-          </div>
-        </div>
-
-        @if (aborts(); as a) {
-          <div class="sc-card">
-            <h2>
-              {{ 'telemetry.aborts.title' | translate }}
-              <span class="count-badge">{{ a.total | number }}</span>
-            </h2>
-            <p class="hint">{{ 'telemetry.aborts.hint' | translate }}</p>
-            @if (a.total) {
-              <h2 class="sub">{{ 'telemetry.aborts.byReason' | translate }}</h2>
-              @for (r of a.byReason; track r.reason) {
-                <div class="bar-row">
-                  <span class="bar-label">
-                    @if (reasonLabelKey(r.reason); as key) {
-                      {{ key | translate }}
-                    } @else {
-                      <span class="mono">{{ r.reason }}</span>
-                    }
-                  </span>
-                  <span class="bar"><span class="bar-fill warn" [style.width.%]="sharePct(r.count, maxAbortReason())"></span></span>
-                  <span class="bar-num">{{ r.count | number }}</span>
-                </div>
-              }
-              <h2 class="sub">{{ 'telemetry.aborts.recent' | translate }}</h2>
-              <div class="sc-table-scroll">
-              <table class="table">
-                <thead><tr>
-                  <th>{{ 'telemetry.col.at' | translate }}</th>
-                  <th>{{ 'telemetry.col.version' | translate }}</th>
-                  <th>{{ 'telemetry.aborts.col.reason' | translate }}</th>
-                  <th>{{ 'telemetry.aborts.col.phase' | translate }}</th>
-                  <th>{{ 'telemetry.aborts.col.progress' | translate }}</th>
-                </tr></thead>
-                <tbody>
-                  @for (r of a.recent; track $index) {
-                    <tr>
-                      <td class="mono">{{ r.at | scDate: 'datetime' }}</td>
-                      <td class="mono">{{ r.version }}</td>
-                      <td>
-                        @if (reasonLabelKey(r.reason); as key) {
-                          {{ key | translate }}
-                        } @else {
-                          <span class="mono">{{ r.reason }}</span>
-                        }
-                      </td>
-                      <td class="mono">{{ r.phase ?? '—' }}</td>
-                      <td class="mono">{{ r.pct != null ? (r.pct | number:'1.0-0') + '%' : '—' }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-              </div>
-            } @else {
-              <p class="hint">{{ 'telemetry.empty' | translate }}</p>
-            }
-          </div>
+    <sc-page-header
+      [crumbs]="crumbs"
+      [eyebrow]="'telemetry.eyebrow' | translate"
+      [title]="'telemetry.title' | translate"
+      [subtitle]="'telemetry.subtitle' | translate">
+      <div phAside class="aside">
+        @if (overview(); as o) {
+          <span class="stand">{{ 'telemetry.asOf' | translate }} {{ o.generatedAt | scDate: 'time' }}</span>
         }
+        <a scAction tier="secondary" [href]="postHogUrl()" target="_blank" rel="noopener noreferrer">
+          <span>{{ 'telemetry.openPosthog' | translate }}</span>
+        </a>
+      </div>
+    </sc-page-header>
 
-        <!-- ── Runs that finished with [warn]/[err] lines in their log. Each
-             row unfolds to the transcript and can be filed as a feedback topic
-             with the log attached — the composer opens pre-filled, nothing is
-             sent until the admin presses send. ── -->
-        @if (diagnostics(); as d) {
-          <div class="sc-card">
-            <h2>
-              {{ 'telemetry.diagnostics.title' | translate }}
-              <span class="count-badge">{{ d.total | number }}</span>
+    @if (errorKey(); as key) {
+      <div class="state err" role="alert">
+        <span><strong>{{ 'telemetry.errorTitle' | translate }}:</strong> {{ key | translate }}</span>
+        <button scAction tier="secondary" type="button" [busy]="busy()" (click)="load()">{{ 'telemetry.retry' | translate }}</button>
+      </div>
+    } @else if (!overview()) {
+      <div class="state" role="status">{{ 'telemetry.loading' | translate }}</div>
+    } @else {
+      @let o = overview()!;
+      @if (!o.posthogReachable) {
+        <div class="notice" role="status" data-notice="unreachable">
+          <span class="tick lv-unknown" aria-hidden="true">?</span>
+          <span>{{ 'telemetry.unavailable' | translate }}</span>
+        </div>
+      }
+      <div class="status" [class]="'status st-' + status()" role="status" data-status>
+        <span class="tick" [class]="'tick lv-' + statusLevel()" aria-hidden="true">{{ statusGlyph() }}</span>
+        <span class="status-text">
+          @switch (status()) {
+            @case ('attention') { {{ (o.attention === 1 ? 'telemetry.status.attentionOne' : 'telemetry.status.attention') | translate: { n: o.attention } }} }
+            @case ('blind') { {{ 'telemetry.status.blind' | translate }} }
+            @default { {{ 'telemetry.status.calm' | translate }} }
+          }
+        </span>
+        <span class="since">
+          @if (o.lastVisitAt) {
+            {{ 'telemetry.status.since' | translate: { date: (o.lastVisitAt | scDate: 'datetime') } }}
+          } @else {
+            {{ 'telemetry.status.firstVisit' | translate }}
+          }
+        </span>
+      </div>
+
+      <div class="grid">
+        @for (c of o.cards; track c.id) {
+          <section class="card" [class]="'card lv-card-' + c.level" [attr.data-card]="c.id" [attr.data-level]="c.level" [attr.aria-labelledby]="'tc-' + c.id">
+            <h2 class="top" [id]="'tc-' + c.id">
+              <span class="tick" [class]="'tick lv-' + c.level" aria-hidden="true">{{ glyph(c.level) }}</span>
+              <span class="sc-sr-only">{{ 'telemetry.level.' + c.level | translate }}: </span>
+              {{ titleOf(c) }}
             </h2>
-            <p class="hint">{{ 'telemetry.diagnostics.hint' | translate }}</p>
-            @if (d.total) {
-              <h2 class="sub">{{ 'telemetry.diagnostics.byOutcome' | translate }}</h2>
-              @for (o of d.byOutcome; track o.outcome) {
-                <div class="bar-row">
-                  <span class="bar-label">
-                    @if (outcomeLabelKey(o.outcome); as key) {
-                      {{ key | translate }}
-                    } @else {
-                      <span class="mono">{{ o.outcome }}</span>
-                    }
-                  </span>
-                  <span class="bar"><span class="bar-fill warn" [style.width.%]="sharePct(o.count, maxOutcome())"></span></span>
-                  <span class="bar-num">{{ o.count | number }}</span>
-                </div>
+
+            <div class="kpi">
+              <span class="kpi-val">{{ c.kpi.display }}</span>
+              <small>{{ 'telemetry.unit.' + c.kpi.unitKey | translate }}</small>
+              @if (c.forecast) { <small class="fc">· {{ 'telemetry.forecast' | translate: { value: c.forecast.display } }}</small> }
+              @if (c.delta) {
+                <span class="delta" [class.worse]="isWorse(c)" [class.better]="!isWorse(c)">{{ deltaOf(c) }}</span>
               }
-              <h2 class="sub">{{ 'telemetry.diagnostics.recent' | translate }}</h2>
-              <ul class="diag-list">
-                @for (r of d.recent; track r.id) {
-                  <li class="diag" [class.reported]="reported().has(r.id)">
-                    <details>
-                      <summary class="diag-head">
-                        <span class="diag-when mono">{{ r.at | scDate: 'datetime' }}</span>
-                        <span class="diag-run">
-                          @if (showCrashProduct() && productLabel(r.product); as key) {
-                            {{ key | translate }} ·
-                          }
-                          <span class="mono">{{ r.version }}</span>
-                          ·
-                          @if (kindLabelKey(r.kind); as key) {
-                            {{ key | translate }}
-                          } @else {
-                            <span class="mono">{{ r.kind }}</span>
-                          }
-                          @if (r.gameChannel || r.patchVersion) {
-                            <span class="hint">({{ r.gameChannel ?? '' }} {{ r.patchVersion ?? '' }})</span>
-                          }
-                        </span>
-                        <span class="chip" [class.warn]="r.outcome !== 'ok'">
-                          @if (outcomeLabelKey(r.outcome); as key) {
-                            {{ key | translate }}
-                          } @else {
-                            <span class="mono">{{ r.outcome }}</span>
-                          }
-                        </span>
-                        @if (r.warnings) {
-                          <span class="chip warn">{{ r.warnings | number }} {{ 'telemetry.diagnostics.warningsShort' | translate }}</span>
-                        }
-                        @if (r.errors) {
-                          <span class="chip err">{{ r.errors | number }} {{ 'telemetry.diagnostics.errorsShort' | translate }}</span>
-                        }
-                        @if (reported().has(r.id)) {
-                          <span class="chip ok">{{ 'telemetry.diagnostics.reported' | translate }}</span>
-                        }
-                      </summary>
-                      <div class="diag-body">
-                        <pre class="diag-lines">{{ r.lines || ('telemetry.diagnostics.noLines' | translate) }}</pre>
-                        <div class="diag-actions">
-                          <button type="button" class="sc-btn" (click)="reportDiagnostic(r)">
-                            {{ 'telemetry.diagnostics.report' | translate }}
-                          </button>
-                          <span class="hint">{{ 'telemetry.diagnostics.reportHint' | translate }}</span>
-                        </div>
-                      </div>
-                    </details>
+            </div>
+
+            @if (c.bar; as b) {
+              <div class="bar" role="img" [class]="'bar bar-' + c.level" [attr.aria-label]="'telemetry.barLabel' | translate: { pct: b.pct, month: b.monthPct }">
+                <span [style.width.%]="b.pct"></span><i [style.left.%]="b.monthPct"></i>
+              </div>
+            }
+
+            @if (c.spark?.length) {
+              <svg class="spark" viewBox="0 0 120 26" preserveAspectRatio="none" role="img" [attr.aria-label]="'telemetry.sparkLabel' | translate">
+                <polyline fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" [attr.points]="spark(c)" />
+              </svg>
+            }
+
+            @if (c.top.length) {
+              <ul class="list">
+                @for (it of c.top; track $index) {
+                  <li>
+                    @if (it.badge) { <span class="badge">{{ 'telemetry.badge.' + it.badge | translate }}</span> }
+                    @else if (c.id === 'services' && it.level) { <span class="tick sm" [class]="'tick sm lv-' + it.level" aria-hidden="true">{{ glyph(it.level) }}</span> }
+                    <span class="name">
+                      @if (it.url) {
+                        <a class="item-link" [href]="it.url" target="_blank" rel="noopener noreferrer">{{ itemLabel(c, it) }}<span class="sc-sr-only"> ↗</span></a>
+                      } @else {
+                        {{ itemLabel(c, it) }}
+                      }
+                    </span>
+                    @if (it.value) { <span class="muted val">{{ it.value }}</span> }
+                    @if (it.feedback; as fb) {
+                      <button scAction tier="tertiary" type="button" class="to-fb" [scTooltip]="'telemetry.toFeedback' | translate" scTooltipTier="label"
+                              [attr.aria-label]="'telemetry.toFeedback' | translate" (click)="toFeedback(fb, it.badge)">
+                        <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H9l-4 4V5zM12 8v4M10 10h4" /></svg>
+                      </button>
+                    }
                   </li>
                 }
               </ul>
-            } @else {
-              <p class="hint">{{ 'telemetry.empty' | translate }}</p>
+            } @else if (c.level === 'unknown') {
+              <p class="calm">{{ 'telemetry.cardUnavailable' | translate }}</p>
+            } @else if (c.calmKey) {
+              <p class="calm">{{ 'telemetry.calm.' + c.calmKey | translate }}</p>
             }
-          </div>
-        }
 
-        <div class="sc-card">
-          <h2>{{ 'telemetry.recent' | translate }}</h2>
-          @if (s.recentCrashes.length) {
-            <div class="sc-table-scroll">
-            <table class="table">
-              <thead><tr>
-                <th>{{ 'telemetry.col.at' | translate }}</th>
-                @if (showCrashProduct()) { <th>{{ 'telemetry.product.label' | translate }}</th> }
-                <th>{{ 'telemetry.col.version' | translate }}</th>
-                <th>{{ 'telemetry.col.role' | translate }}</th>
-                <th>{{ 'telemetry.col.name' | translate }}</th>
-                <th>{{ 'telemetry.col.message' | translate }}</th>
-              </tr></thead>
-              <tbody>
-                @for (c of s.recentCrashes; track $index) {
-                  <tr>
-                    <td class="mono">{{ c.at | scDate: 'datetime' }}</td>
-                    @if (showCrashProduct()) {
-                      <td>
-                        @if (productLabel(c.product ?? ''); as key) {
-                          {{ key | translate }}
-                        } @else {
-                          <span class="mono">{{ c.product ?? '—' }}</span>
-                        }
-                      </td>
-                    }
-                    <td class="mono">{{ c.version }}</td>
-                    <td>{{ c.role ?? '—' }}</td>
-                    <td class="mono">{{ c.name ?? '—' }}</td>
-                    <td class="msg">{{ c.message }}</td>
-                  </tr>
+            <div class="cta">
+              @if (c.feedbackCta; as fb) {
+                <button scAction tier="secondary" type="button" class="cta-fb" (click)="toFeedback(fb)">{{ 'telemetry.quotaFeedback' | translate }}</button>
+              }
+              @if (c.upgradeUrl; as up) {
+                <a scAction tier="secondary" [href]="up" target="_blank" rel="noopener noreferrer"><span>{{ 'telemetry.upgrade' | translate }}</span></a>
+              }
+              @for (l of c.links; track l.labelKey) {
+                @if (l.url !== c.upgradeUrl) {
+                  <a scAction tier="secondary" [href]="l.url" target="_blank" rel="noopener noreferrer"><span>{{ 'telemetry.link.' + l.labelKey | translate }}</span></a>
                 }
-              </tbody>
-            </table>
+              }
+              @if (c.boardWaiting) {
+                <span class="badge board">{{ (c.boardWaiting === 1 ? 'telemetry.boardWaitingOne' : 'telemetry.boardWaitingMany') | translate: { n: c.boardWaiting } }}</span>
+              }
             </div>
-          } @else { <p class="hint">{{ 'telemetry.empty' | translate }}</p> }
-        </div>
-
-        <p class="gen hint">{{ 'telemetry.generatedAt' | translate }}: {{ s.generatedAt | scDate: 'datetime' }}</p>
-      }
-    </section>
+          </section>
+        }
+      </div>
+    }
   `,
   styles: [`
-    /* No .page sizing: the page runs the full frame like every other page
-       (styles.scss, "PAGE FRAME"). */
-    .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
-    .hint { color: var(--sc-text-dim, #8b97a8); font-size: 0.85rem; }
-    .err { background: rgba(248,81,73,.12); color: #f85149; padding: 0.6rem 0.9rem; border-radius: 8px; margin-bottom: 1rem; }
-    .empty { text-align: center; color: var(--sc-text-dim, #8b97a8); }
-    .section-h { font-size: 0.95rem; margin: 1.4rem 0 0.25rem; }
-    .section-h:first-of-type { margin-top: 0; }
+    :host { display: block; padding-block: var(--sc-space-4) var(--sc-space-6); }
+    .aside { display: flex; align-items: center; gap: var(--sc-space-3); flex-wrap: wrap; }
+    .stand { color: var(--sc-fg-2); font-size: max(0.82rem, var(--sc-fs-floor)); }
 
-    /* ---- Product overview ---- */
-    .products {
-      display: grid; gap: 0.75rem; margin: 0.75rem 0 1rem;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
-    .product {
-      display: flex; flex-direction: column; gap: 0.5rem;
-      padding: 0.9rem; text-decoration: none; color: inherit;
-      border: 1px solid transparent; min-height: 48px;
-    }
-    .product:hover { border-color: rgba(255,255,255,.18); }
-    .product.active { border-color: var(--sc-accent, #52c1e6); box-shadow: 0 0 0 1px var(--sc-accent, #52c1e6) inset; }
-    .product.silent { opacity: .72; }
-    .product-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
-    .product-name { font-weight: 600; font-size: 0.95rem; overflow-wrap: anywhere; }
-    .chip {
-      background: rgba(255,255,255,.06); color: var(--sc-text-dim, #8b97a8); border-radius: 12px;
-      padding: 2px 9px; font-size: max(0.72rem, var(--sc-fs-floor)); white-space: nowrap;
-    }
-    .chip.warn { background: rgba(210,153,34,.18); color: #d29922; }
-    .chip.ok { background: rgba(63,185,80,.16); color: #3fb950; }
-    .kpis { display: flex; gap: 1rem; flex-wrap: wrap; }
-    .kpi { display: flex; flex-direction: column; }
-    .kpi b { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-    .kpi i {
-      font-style: normal; color: var(--sc-text-dim, #8b97a8);
-      font-size: max(0.7rem, var(--sc-fs-floor)); text-transform: uppercase; letter-spacing: .3px;
-    }
-    .share { display: block; background: rgba(255,255,255,.06); border-radius: 4px; height: 6px; overflow: hidden; }
-    .share-fill { display: block; height: 100%; background: var(--sc-accent, #52c1e6); border-radius: 4px; }
-    .product-foot { font-size: max(0.72rem, var(--sc-fs-floor)); }
+    .tick { width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 0.7rem; font-weight: 700; flex: none; }
+    .tick.sm { width: 16px; height: 16px; font-size: 0.65rem; }
+    .lv-ok { background: color-mix(in srgb, var(--sc-success) 18%, transparent); color: var(--sc-success); }
+    .lv-warn { background: color-mix(in srgb, var(--sc-warning) 20%, transparent); color: var(--sc-warning); }
+    .lv-error { background: color-mix(in srgb, var(--sc-danger) 18%, transparent); color: var(--sc-danger); }
+    .lv-unknown { background: color-mix(in srgb, var(--sc-fg-2) 18%, transparent); color: var(--sc-fg-2); }
 
-    /* ---- Drill-down ---- */
-    .totals { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
-    .stat { text-align: center; padding: 1rem; }
-    .stat .num { font-size: 1.8rem; font-weight: 700; }
-    .stat .lbl { color: var(--sc-text-dim, #8b97a8); font-size: 0.8rem; text-transform: uppercase; letter-spacing: .3px; }
-    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
-    h2 { font-size: 0.95rem; margin: 0 0 0.75rem; } h2.sub { margin-top: 1.2rem; }
-    .bar-row { display: grid; grid-template-columns: 120px 1fr 48px; align-items: center; gap: 0.5rem; margin: 0.3rem 0; }
-    .bar-label { font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .bar { background: rgba(255,255,255,.06); border-radius: 4px; height: 14px; overflow: hidden; }
-    .bar-fill { display: block; height: 100%; background: var(--sc-accent, #52c1e6); border-radius: 4px; }
-    .bar-fill.warn { background: #d29922; }
-    .bar-num { text-align: right; font-size: 0.8rem; font-variant-numeric: tabular-nums; }
-    .count-badge {
-      background: rgba(210,153,34,.18); color: #d29922; border-radius: 12px;
-      padding: 1px 9px; font-size: max(0.78rem, var(--sc-fs-floor)); font-variant-numeric: tabular-nums; margin-left: 0.4rem;
+    .state, .notice, .status {
+      display: flex; align-items: center; gap: var(--sc-space-3); flex-wrap: wrap;
+      margin-top: var(--sc-space-4); padding: var(--sc-space-3) var(--sc-space-4);
+      border-radius: 10px; background: var(--sc-bg-1); border: 1px solid var(--sc-border);
     }
-    .pills { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-    .role-pill { background: rgba(255,255,255,.06); border-radius: 12px; padding: 2px 10px; font-size: max(0.78rem, var(--sc-fs-floor)); }
-    .table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    .table th, .table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.07); vertical-align: top; }
-    .table .msg { color: var(--sc-text-dim, #8b97a8); max-width: 360px; overflow-wrap: anywhere; }
-    .mono { font-family: ui-monospace, monospace; overflow-wrap: anywhere; }
-    .gen { text-align: right; margin-top: 0.5rem; }
+    .state.err { border-color: var(--sc-danger); justify-content: space-between; }
+    .notice { border-color: var(--sc-warning); }
+    .status-text { font-size: 1rem; font-weight: 600; }
+    .since { margin-inline-start: auto; font-size: max(0.82rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
 
-    /* ---- Log diagnostics ---- */
-    .diag-list { list-style: none; margin: 0; padding: 0; }
-    .diag { border-bottom: 1px solid rgba(255,255,255,.07); }
-    .diag:last-child { border-bottom: 0; }
-    .diag-head {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem;
-      padding: 8px 4px; cursor: pointer; font-size: 0.82rem; min-height: 44px;
-    }
-    .diag-head::marker, .diag-head::-webkit-details-marker { color: var(--sc-text-dim, #8b97a8); }
-    .diag-run { flex: 1 1 200px; }
-    .diag.reported .diag-head { opacity: .78; }
-    .chip.err { background: rgba(248,81,73,.16); color: #f85149; }
-    .diag-body { padding: 0 4px 10px; }
-    .diag-lines {
-      margin: 0 0 0.6rem; padding: 0.6rem 0.75rem; max-height: 320px; overflow: auto;
-      background: rgba(0,0,0,.28); border-radius: 8px;
-      font-family: ui-monospace, monospace; font-size: max(0.74rem, var(--sc-fs-floor));
-      white-space: pre-wrap; overflow-wrap: anywhere;
-    }
-    .diag-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.8rem; }
+    .grid { display: grid; gap: var(--sc-space-4); margin-top: var(--sc-space-4); grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 640px) { .grid { grid-template-columns: minmax(0, 1fr); } .since { margin-inline-start: 0; flex-basis: 100%; } }
 
-    @media (max-width: 760px) {
-      .totals { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cols { grid-template-columns: 1fr; }
-      /* The tables scroll inside their wrapper (.sc-table-scroll) from here on
-         instead of squeezing the message column into a ribbon. */
-      .table { min-width: 560px; }
+    .card {
+      display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: var(--sc-space-4);
+      background: var(--sc-bg-1); border: 1px solid var(--sc-border); border-radius: 12px;
     }
-    @media (max-width: 380px) { .totals { grid-template-columns: minmax(0, 1fr); } }
-    @media (max-width: 560px) {
-      .head { flex-direction: column; align-items: stretch; }
-      /* Full width so all three ranges stay a comfortable thumb target. */
-      .window-seg { display: block; }
-      .products { grid-template-columns: 1fr; }
-      .stat .num { font-size: 1.45rem; }
-      .bar-row { grid-template-columns: 90px 1fr 40px; gap: 0.4rem; }
-      .table .msg { max-width: 220px; }
-    }
+    .card.lv-card-warn { border-color: color-mix(in srgb, var(--sc-warning) 55%, transparent); }
+    .card.lv-card-error { border-color: color-mix(in srgb, var(--sc-danger) 50%, transparent); }
+    .top { display: flex; align-items: center; gap: var(--sc-space-2); margin: 0; font-size: 0.82rem; font-weight: 500; color: var(--sc-fg-2); }
+    .kpi { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 6px; line-height: 1.15; }
+    .kpi-val { font-size: 1.75rem; font-weight: 700; color: var(--sc-fg-0, inherit); }
+    .kpi small { font-size: max(0.82rem, var(--sc-fs-floor)); font-weight: 400; color: var(--sc-fg-2); }
+    .delta { font-size: max(0.82rem, var(--sc-fs-floor)); }
+    .delta.better { color: var(--sc-success); }
+    .delta.worse { color: var(--sc-warning); }
+    .spark { height: 26px; width: 100%; color: var(--sc-accent); }
+    .bar { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--sc-fg-2) 25%, transparent); position: relative; margin-block: 4px; }
+    .bar span { position: absolute; inset: 0 auto 0 0; border-radius: 4px; background: var(--sc-success); }
+    .bar-warn span { background: var(--sc-warning); }
+    .bar-error span { background: var(--sc-danger); }
+    .bar-unknown span { background: var(--sc-fg-2); }
+    .bar i { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--sc-fg-1, var(--sc-fg-2)); }
+
+    .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; }
+    .list li { display: flex; gap: var(--sc-space-2); align-items: center; min-width: 0; }
+    .name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .item-link { color: inherit; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--sc-accent) 45%, transparent); text-underline-offset: 3px; }
+    .item-link:hover { color: var(--sc-accent); }
+    .muted { color: var(--sc-fg-2); }
+    .val { white-space: nowrap; }
+    .badge { font-size: max(0.72rem, var(--sc-fs-floor)); padding: 2px 8px; border-radius: 6px; background: color-mix(in srgb, var(--sc-fg-2) 20%, transparent); color: var(--sc-fg-2); white-space: nowrap; }
+    .calm { margin: 0; font-size: 0.85rem; color: var(--sc-fg-2); }
+    .cta { display: flex; gap: var(--sc-space-2); flex-wrap: wrap; align-items: center; margin-top: auto; }
+    .badge.board { white-space: normal; }
   `],
 })
 export class TelemetryStatsComponent {
   private readonly supabase = inject(SupabaseClientProvider);
-  private readonly route = inject(ActivatedRoute);
   private readonly translate = inject(TranslateService);
   private readonly seeds = inject(FeedbackComposerSeedService);
   private readonly fabPrefs = inject(FeedbackFabPrefsService);
   private readonly router = inject(Router);
+  private readonly injector = inject(Injector);
+  private readonly destroyRef = inject(DestroyRef);
 
-  readonly windows = WINDOWS;
-  /**
-   * The time range as segments. Links, not buttons: the range lives in the URL
-   * (see `windowDays`), so each one has to be openable in a new tab.
-   */
-  readonly windowOptions: readonly ScSegmentOption[] = WINDOWS.map((w) => ({
-    value: String(w),
-    labelKey: `telemetry.window.short.${w}`,
-    titleKey: `telemetry.window.${w}`,
-    link: { commands: [], queryParams: { days: w }, queryParamsHandling: 'merge' as const },
-  }));
+  readonly crumbs: PageCrumb[] = [{ labelKey: 'adminHub.title', link: '/admin/hub' }];
 
-  readonly stats = signal<TelemetryStats | null>(null);
+  readonly overview = signal<Overview | null>(null);
   readonly busy = signal(false);
   /** i18n key, never raw text. */
-  readonly errorMsg = signal<string | null>(null);
+  readonly errorKey = signal<string | null>(null);
 
-  /**
-   * Selection lives in the URL, not in component state: the product cards and
-   * the time range are real links, so an admin can middle-click a product into
-   * a new tab and share "starscape, last 90 days" as a plain URL.
-   */
-  private readonly params = toSignal(this.route.queryParamMap, {
-    initialValue: this.route.snapshot.queryParamMap,
+  /** The first answer of this visit — what a later auto-refresh must not overwrite (see mergeRefresh). */
+  private first: Overview | null = null;
+  private seenSent = false;
+  private destroyed = false;
+
+  readonly postHogUrl = computed(() => posthogRoot(this.overview()?.cards ?? []));
+
+  readonly status = computed<StatusKind>(() => {
+    const o = this.overview();
+    if (!o) return 'calm';
+    if (o.attention > 0) return 'attention';
+    return o.posthogReachable ? 'calm' : 'blind';
   });
-
-  readonly windowDays = computed(() => {
-    const raw = Number(this.params().get('days'));
-    return (WINDOWS as readonly number[]).includes(raw) ? raw : 30;
+  readonly statusLevel = computed(() => {
+    const s = this.status();
+    return s === 'attention' ? (this.overview()?.cards.some((c) => c.level === 'error') ? 'error' : 'warn') : s === 'blind' ? 'unknown' : 'ok';
   });
-  /** The active range as the segmented control's string id. */
-  readonly windowValue = computed(() => String(this.windowDays()));
-
-  /** Products the server has actually seen — the accepted filter values. */
-  private readonly reportedProducts = computed(() =>
-    (this.stats()?.products ?? []).map((p) => p.product));
-
-  readonly product = computed(() =>
-    normaliseProductParam(this.params().get('product'), this.reportedProducts()));
-
-  /** Overview cards: every reported product, the silent known ones, then "all". */
-  readonly productCards = computed<ProductRow[]>(() => {
-    const rows = mergeProductRows(this.stats()?.products);
-    return [...rows, allProductsRow(rows)];
-  });
-  readonly maxProductEvents = computed(() =>
-    Math.max(1, ...mergeProductRows(this.stats()?.products).map((p) => p.events)));
-
-  readonly maxVersionCrashes = computed(() =>
-    Math.max(1, ...(this.stats()?.byVersion ?? []).map((v) => v.crashes)));
-  readonly maxTypeCount = computed(() =>
-    Math.max(1, ...(this.stats()?.crashesByType ?? []).map((c) => c.count)));
-
-  /** Absent on a backend without the starscape-product migration → section hidden. */
-  readonly channels = computed<ChannelRow[]>(() => this.stats()?.byChannel ?? []);
-  readonly usageMetrics = computed<MetricRow[]>(() => this.stats()?.usageByMetric ?? []);
-  readonly maxUsageMetric = computed(() =>
-    Math.max(1, ...this.usageMetrics().map((m) => m.count)));
-
-  /** The product column only earns its width in the cross-product view. */
-  readonly showCrashProduct = computed(() => this.product() === ALL_PRODUCTS);
-
-  /**
-   * Aborted extractions — only the Data Uploader reports them, so the card stays
-   * hidden for every other single-product view. Also absent (→ hidden) until the
-   * RPC that returns the block is deployed, so an older backend degrades cleanly.
-   */
-  readonly aborts = computed<ExtractAborts | null>(() => {
-    const s = this.stats();
-    if (!s?.extractAborts) return null;
-    const p = this.product();
-    if (p !== ALL_PRODUCTS && p !== 'data-uploader') return null;
-    return s.extractAborts;
-  });
-  readonly maxAbortReason = computed(() =>
-    Math.max(1, ...(this.aborts()?.byReason ?? []).map((r) => r.count)));
-
-  /**
-   * Log diagnostics — same visibility rule as the aborts: only the uploader
-   * sends them, and the block is absent on a backend without its migration.
-   */
-  readonly diagnostics = computed<Diagnostics | null>(() => {
-    const s = this.stats();
-    if (!s?.diagnostics) return null;
-    const p = this.product();
-    if (p !== ALL_PRODUCTS && p !== 'data-uploader') return null;
-    return s.diagnostics;
-  });
-  readonly maxOutcome = computed(() =>
-    Math.max(1, ...(this.diagnostics()?.byOutcome ?? []).map((o) => o.count)));
-  /**
-   * Rows already handed to the composer in this session — the button stays
-   * (a second topic is legitimate) but the row says it has been filed once.
-   */
-  readonly reported = signal<ReadonlySet<number>>(new Set());
+  readonly statusGlyph = computed(() => this.glyph(this.statusLevel()));
 
   constructor() {
-    // Reload whenever the URL selection changes — including the first render.
-    effect(() => {
-      const days = this.windowDays();
-      const product = this.product();
-      void this.load(days, product);
-    });
-    useAutoRefresh(() => this.load(this.windowDays(), this.product()), {
-      enabled: () => !this.busy(),
-    });
+    this.destroyRef.onDestroy(() => (this.destroyed = true));
+    void this.load();
+    useAutoRefresh(() => this.load(true), { enabled: () => !this.busy() && !this.errorKey() });
   }
 
-  /** i18n key for a known product, or null to render the raw id. */
-  productLabel(product: string): string | null {
-    return productLabelKey(product);
+  glyph(level: string): string {
+    return level === 'ok' ? '✓' : level === 'warn' ? '!' : level === 'error' ? '×' : '?';
   }
 
-  /** i18n key for a known release ring, or null to render the raw value. */
-  channelLabel(channel: string): string | null {
-    return KNOWN_CHANNELS.includes(channel) ? `telemetry.channel.${channel}` : null;
+  titleOf(c: OverviewCard): string {
+    if (c.id !== 'ai') return this.translate.instant(`telemetry.card.${c.id}`);
+    const lang = this.translate.currentLang() || this.translate.getFallbackLang() || 'de';
+    const month = new Intl.DateTimeFormat(lang, { month: 'long' }).format(new Date(this.overview()?.generatedAt ?? Date.now()));
+    return this.translate.instant('telemetry.card.ai', { month });
   }
 
-  /** i18n key for a known abort reason, or null to render the raw value. */
-  reasonLabelKey(reason: string): string | null {
-    return KNOWN_ABORT_REASONS.includes(reason) ? `telemetry.aborts.reason.${reason}` : null;
+  itemLabel(c: OverviewCard, it: OverviewItem): string {
+    if (c.id === 'services' && (KNOWN_SERVICES as readonly string[]).includes(it.label)) return this.translate.instant(`telemetry.service.${it.label}`);
+    return it.label;
   }
 
-  /** i18n key for a known run outcome, or null to render the raw value. */
-  outcomeLabelKey(outcome: string): string | null {
-    return KNOWN_OUTCOMES.includes(outcome) ? `telemetry.diagnostics.outcome.${outcome}` : null;
-  }
-
-  /** i18n key for a known job kind, or null to render the raw value. */
-  kindLabelKey(kind: string): string | null {
-    return KNOWN_KINDS.includes(kind) ? `telemetry.diagnostics.kind.${kind}` : null;
-  }
-
-  sharePct(value: number, max: number): number {
-    return sharePct(value, max);
-  }
+  spark(c: OverviewCard): string { return sparkPoints(c.spark ?? []); }
+  deltaOf(c: OverviewCard): string { return c.delta ? deltaText(c.delta) : ''; }
+  isWorse(c: OverviewCard): boolean { return !!c.delta && deltaIsWorse(c.delta); }
 
   /**
-   * "Als Thema melden": seed the admin new-topic composer with a prompt for
-   * the routine, the area tag, and the transcript as a `.log` attachment, then
-   * open the feedback panel. Nothing is sent here — the composer shows it all,
-   * editable, and the admin presses send (or not).
+   * "In Feedback umwandeln" / "Sparvorschlag als Feedback": plant the server's text in the admin new-topic composer
+   * and open it. Nothing is sent here — the admin reads, edits and presses send.
    */
-  reportDiagnostic(row: DiagnosticRow): void {
-    const body = buildDiagnosticTopic(row, (key, params) => this.translate.instant(key, params));
-    this.seeds.plant(draftScopes.adminNew, {
-      body,
-      area: 'desktop',
-      complex: false,
-      files: [diagnosticLogFile(row)],
-    });
-    // The docked panel is the normal home of the composer. An admin who
-    // switched the launcher off in Settings has no panel to open, so the full
-    // board takes the seed instead — its composer is always mounted.
+  toFeedback(fb: FeedbackText, badge?: string): void {
+    this.seeds.plant(draftScopes.adminNew, { body: fb.body, area: badge === 'desktop' ? 'desktop' : null, complex: false });
+    // An admin who switched the launcher off has no docked panel: the full board's composer takes the seed.
     if (this.fabPrefs.show()) this.seeds.requestOpen();
     else void this.router.navigateByUrl('/admin/feedback');
-    this.reported.update((set) => new Set([...set, row.id]));
   }
 
-  async load(days: number, product: string): Promise<void> {
+  async load(refresh = false): Promise<void> {
     this.busy.set(true);
-    this.errorMsg.set(null);
-    const { data, error } = await this.supabase.client.rpc('get_telemetry_stats', {
-      window_days: days,
-      // 'all' → null: no product restriction server-side.
-      product_filter: product === ALL_PRODUCTS ? null : product,
-    });
-    if (error) {
-      this.errorMsg.set(toErrorKey('telemetry', 'load stats', error, { days, product }));
-      this.stats.set(null);
-    } else {
-      this.stats.set(data as TelemetryStats);
+    if (!refresh) this.errorKey.set(null);
+    try {
+      const { data, error } = await this.supabase.client.functions.invoke('telemetry-overview', { method: 'GET' });
+      if (this.destroyed) return;
+      if (error || !data || !Array.isArray((data as Overview).cards)) {
+        // A failed background refresh keeps the cards on screen; a failed first load or retry shows the error state.
+        if (!refresh || !this.overview()) {
+          this.errorKey.set(toErrorKey('telemetry', 'load overview', error ?? new Error('empty overview')));
+          this.overview.set(null);
+        } else {
+          logWarn('telemetry', 'refresh overview failed', { error });
+        }
+        return;
+      }
+      this.errorKey.set(null);
+      const next = data as Overview;
+      if (!this.first || !refresh) this.first = next;
+      this.overview.set(refresh && this.overview() && this.first ? mergeRefresh(this.first, next) : next);
+      this.markSeen();
+    } finally {
+      this.busy.set(false);
     }
-    this.busy.set(false);
+  }
+
+  /** Stores this visit as "seen" — once, after the cards are on screen, never in the way of the render. */
+  private markSeen(): void {
+    if (this.seenSent) return;
+    this.seenSent = true;
+    afterNextRender(() => {
+      void this.supabase.client.functions
+        .invoke('telemetry-overview', { method: 'POST', body: { seen: true } })
+        .then(({ error }) => { if (error) logWarn('telemetry', 'mark seen failed', { error }); })
+        .catch((e: unknown) => logWarn('telemetry', 'mark seen failed', { error: e }));
+    }, { injector: this.injector });
   }
 }

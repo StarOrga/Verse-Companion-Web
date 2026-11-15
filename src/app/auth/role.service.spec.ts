@@ -85,7 +85,7 @@ function configure(sb: ReturnType<typeof fakeSupabase>) {
       AuthService,
       { provide: SupabaseClientProvider, useValue: sb },
       { provide: Router, useValue: fakeRouter() },
-      { provide: AnalyticsService, useValue: { capture: (): void => {} } },
+      { provide: AnalyticsService, useValue: { track: (): void => {} } },
     ],
   });
 }
@@ -290,7 +290,7 @@ describe('RoleService failure paths (transient read errors)', () => {
         AuthService,
         { provide: SupabaseClientProvider, useValue: sb },
         { provide: Router, useValue: fakeRouter() },
-        { provide: AnalyticsService, useValue: { capture: (): void => {} } },
+        { provide: AnalyticsService, useValue: { track: (): void => {} } },
       ],
     });
   }

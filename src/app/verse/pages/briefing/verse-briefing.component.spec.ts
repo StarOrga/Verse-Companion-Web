@@ -164,7 +164,7 @@ class NewsListStub {}
 
 describe('Verse briefing — component', () => {
   const beta = signal<Record<string, boolean>>({ verse: true, codex: true });
-  const captureVerse = vi.fn().mockName('captureVerse');
+  const track = vi.fn().mockName('track');
   const markSeen = vi.fn().mockName('markSeen').mockResolvedValue({ ok: true, data: undefined });
   const cancels: Mock[] = [];
   const trackShown = vi.fn().mockName('trackShown').mockImplementation(() => {
@@ -185,7 +185,7 @@ describe('Verse briefing — component', () => {
 
   beforeEach(() => {
     sessionStorage.removeItem(INTRO_FLAG);
-    captureVerse.mockClear();
+    track.mockClear();
     trackShown.mockClear();
     loadSeen.mockClear();
     cancels.length = 0;
@@ -197,7 +197,7 @@ describe('Verse briefing — component', () => {
         provideTranslateService({}),
         // A real download settles outside fakeAsync's clock: generate the planet in fake time instead.
         { provide: PLANET_SOURCES, useValue: () => Promise.reject(new Error('specs generate the planet')) },
-        { provide: AnalyticsService, useValue: { captureVerse, flags: () => ({}) } },
+        { provide: AnalyticsService, useValue: { track, flags: () => ({}) } },
         { provide: BriefingGalleryFillService, useValue: { items: signal([]), load: () => Promise.resolve() } },
         { provide: BetaService, useValue: { state: beta, isEnabled: (a: string) => () => beta()[a] } },
         { provide: AuthService, useValue: { isAuthenticated: signal(false), user: signal(null) } },
@@ -290,9 +290,9 @@ describe('Verse briefing — component', () => {
     const el = fixture.nativeElement as HTMLElement;
     middleClick(el.querySelector('a.cta')!);
     expect(markSeen).toHaveBeenCalledWith(['a']);
-    expect(captureVerse).toHaveBeenCalledWith('verse_top_open', { key: 'a', kind: 'patch', rank: 1, pinned: false });
+    expect(track).toHaveBeenCalledWith('verse:top_open', { key: 'a', kind: 'patch', rank: 1, pinned: false });
     middleClick(el.querySelectorAll('nav.moons a.moon')[2]);
-    expect(captureVerse).toHaveBeenCalledWith('verse_door_open', { door: 'gallery' });
+    expect(track).toHaveBeenCalledWith('verse:door_open', { door: 'gallery' });
   });
 
   it('rotates the stories and restarts the "shown" clock per story', () => {
@@ -337,7 +337,7 @@ describe('Verse briefing — component', () => {
     expect(fixture.componentInstance.current()?.item.key).toBe('c');
     expect(el.querySelector('a.cta')?.getAttribute('href')).toBe('https://example.com/c');
     expect(markSeen).not.toHaveBeenCalled();
-    expect(captureVerse).not.toHaveBeenCalledWith('verse_top_open', expect.anything());
+    expect(track).not.toHaveBeenCalledWith('verse:top_open', expect.anything());
     expect(el.querySelectorAll('.story button.sbar')[2].getAttribute('aria-pressed')).toBe('true');
   });
 

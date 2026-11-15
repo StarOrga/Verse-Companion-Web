@@ -88,7 +88,7 @@ export class ShipLinkService {
       const res = await this.invoke({ action: 'set', shipSlug, url });
       if (res) return res;
       this.mergeInto(this.myLinks, shipSlug, url);
-      this.analytics.capture('ship_link_set', { shipSlug });
+      this.analytics.track('codex:ship_link_create', { shipSlug });
       return null;
     } finally {
       this.saving.set(false);
@@ -103,7 +103,7 @@ export class ShipLinkService {
       const res = await this.invoke({ action: 'remove', shipSlug });
       if (res) return res;
       this.mergeInto(this.myLinks, shipSlug, null);
-      this.analytics.capture('ship_link_removed', { shipSlug });
+      this.analytics.track('codex:ship_link_remove', { shipSlug });
       return null;
     } finally {
       this.saving.set(false);
@@ -125,7 +125,7 @@ export class ShipLinkService {
       const res = await this.invoke({ action: 'promote', shipSlug, url });
       if (res) return res;
       this.mergeInto(this.globalLinks, shipSlug, url);
-      this.analytics.capture('ship_link_promoted', { shipSlug });
+      this.analytics.track('codex:ship_link_update', { shipSlug });
       return null;
     } finally {
       this.saving.set(false);

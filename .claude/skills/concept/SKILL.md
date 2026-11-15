@@ -131,6 +131,15 @@ Plugin defaults still apply; only the rules below override or add.
    "nothing in the brief was left out" while listing their own assumptions.
    Upstream candidate: these belong in the plugin's auto-concept defaults.
 
+7. **A concept that adds user-facing behaviour names its analytics.** Every such
+   screen or flow lists the catalogue events it sends (`category:object_action`,
+   entries for `src/app/core/analytics/events.ts`, convention
+   `docs/analytics/event-naming.md`) and the PostHog report that shows whether
+   it is used (a tile of one of the three dashboards in
+   `posthog/dashboards.json`, or a flow in `posthog/flows.json`). The implement
+   brief carries both as checklist lines; a behaviour without an event and a
+   report is not done. Existing numbers first: `.claude/deep-knowledge/posthog.md`.
+
 ## Retired rules (absorbed upstream — do not re-add)
 
 The legacy `devops-concept` extension carried two more rules: "copy the

@@ -267,3 +267,13 @@ below is canonical — external docs cite it.)
     calculation: `deep-knowledge/vercel-rate-limit.md`.
     *Why:* the limit was hit three times (2026-09-05, 2026-11-06 twice); each
     card named the production lag but left the way out to the user as prose.
+
+13. **Analytics catalogue stays green.** A diff that touches
+    `src/app/core/analytics/events.ts` or adds a `track(` call needs
+    `npm run check:analytics-events` green. It is part of `prebuild`, so
+    `npm run build` runs it (own Bash call, rule 7). For a new event the PR body
+    says that `npm run analytics:sync` (and, for a new dashboard tile,
+    `npm run posthog:apply`) is the owner's follow-up — both need the personal
+    API key, `docs/analytics/posthog-setup.md`.
+    *Why:* the catalogue is the only list of what the app may send; a raw
+    `capture('…')` or an unnamed event breaks the PostHog reports silently.

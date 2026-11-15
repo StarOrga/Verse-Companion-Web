@@ -1,3 +1,4 @@
+import { AnalyticsService } from '../core/analytics.service';
 import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -344,6 +345,7 @@ let nextId = 0;
 })
 export class AppDownloadMenuComponent {
   private readonly roles = inject(RoleService);
+  private readonly analytics = inject(AnalyticsService);
   private readonly auth = inject(AuthService);
   private readonly releaseSvc = inject(DesktopReleaseService);
   private readonly conn = inject(DesktopConnectionService);
@@ -464,6 +466,7 @@ export class AppDownloadMenuComponent {
    * click (Ctrl/Cmd/Shift) opens its tab and leaves the menu open.
    */
   onDownload(ev: MouseEvent): void {
+    this.analytics.track('desktop:download_start', { app: this.product(), surface: 'menu' });
     if (!isPlainLeftClick(ev)) return;
     this.close();
   }

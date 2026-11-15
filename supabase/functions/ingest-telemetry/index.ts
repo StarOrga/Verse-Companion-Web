@@ -3,7 +3,7 @@
 // Anonymous crash + opt-in usage telemetry ingest for every desktop client
 // (StarOrga/Star-Citizen-Companion-App#21). Wire contract v1.
 //
-// PRODUCTS — one endpoint, one table, one signature scheme for all of them:
+// PRODUCTS — one endpoint, one PostHog project, one signature scheme for all of them:
 //   scc-app       — the main Verse Companion desktop app
 //   data-uploader — the P4K extraction & upload tool (Electron)
 //   starscape     — the native Windows wallpaper/screensaver tray app (Rust)
@@ -19,19 +19,27 @@
 //   loads by itself — supabase/.env is NOT read by functions serve.
 // Replay guard: |now - timestamp| must be <= 10 min.
 //
-// PRIVACY — no PII is stored. installId/sessionId and the caller IP are stored
-// only as salted SHA-256 hashes; free text is truncated again server-side
-// (the client already redacts). Writes use the service-role key (RLS denies
-// everyone else); reads happen exclusively through the admin-only
-// get_telemetry_stats RPC.
+// FORWARD — since the PostHog single-source switch (concept 20261115-0211-posthog-audit)
+// nothing is stored in our own database: the validated batch goes to PostHog
+// (_shared/posthog.ts captureBatch, mapping in _forward.ts). Crashes become
+// `$exception` (source 'desktop'), usage becomes `desktop:usage_metric`.
+// distinct_id = the salted install hash, `$process_person_profile: false`.
+// A job-diagnostics transcript is uploaded to R2 under diag/<yyyy-mm-dd>/ (30
+// days, _shared/diag-log.ts) and the event carries log_url + log_bytes.
+//
+// PRIVACY — no PII leaves this function. installId/sessionId and the caller IP
+// exist only as salted SHA-256 hashes (the IP hash is only the rate-limit key,
+// it is not forwarded); free text is redacted and truncated again server-side.
 //
 // Responses: 204 accepted · 400 bad payload · 401 bad/old signature ·
 //            429 rate-limited (Retry-After) · 500 server error ·
 //            503 server misconfigured (secrets missing).
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 import { resolveTelemetrySecrets } from './_config.ts';
-import { capDetail } from './_detail.ts';
+import { RateLimiter, clamp, isJobDiagnostics, logTextOf, mapEvent, type StoredLogRef, type WireContext } from './_forward.ts';
+import { captureBatch, withPosthog, type BatchEvent } from '../_shared/posthog.ts';
+import { diagR2, purgeExpiredDiagLogs, uploadDiagLog } from '../_shared/diag-log.ts';
+import type { R2Config } from '../ingest-skins/_r2.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -47,8 +55,8 @@ function json(body: unknown, status = 200): Response {
 }
 
 const REPLAY_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT_PER_IP = 1000; // events / 10 min / ip
-const RATE_WINDOW = "10 minutes";
+const MAX_BODY_BYTES = 1024 * 1024;
+const limiter = new RateLimiter();
 const MAX_BATCH = 200;
 const SECRETS = resolveTelemetrySecrets((k) => Deno.env.get(k));
 if (!SECRETS.ok) {
@@ -84,22 +92,25 @@ const ROLES = new Set(['host', 'daemon', 'overlay', 'desktop', 'renderer']);
 // 'alpha' exists because Starscape ships stable/beta/ALPHA rings. Without it an
 // alpha install would be normalised to 'dev' below and the ring signal lost.
 const CHANNELS = new Set(['stable', 'beta', 'alpha', 'dev']);
-// Every reporting client. Must stay in sync with the telemetry_events.product
-// CHECK constraint — an id accepted here but rejected there fails the INSERT.
+// Every reporting client (the `product` property of the forwarded events).
 const PRODUCTS = new Set(['scc-app', 'data-uploader', 'starscape']);
 
-function clamp(s: unknown, n: number): string | null {
-  if (s == null) return null;
-  return String(s).slice(0, n);
+let lastPurge = 0;
+/** R2 retention (D2): at most once a day per isolate, never blocks the response. */
+function purgeOncePerDay(r2: R2Config): void {
+  if (Date.now() - lastPurge < 24 * 3600_000) return;
+  lastPurge = Date.now();
+  purgeExpiredDiagLogs(r2).catch((e) => console.warn(`[ingest-telemetry] diag purge failed: ${(e as Error).message}`));
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('ingest-telemetry', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
   if (!SECRETS.ok) return json({ error: 'server_misconfigured' }, 503);
 
   // --- read RAW body first (HMAC must cover the exact bytes the client signed) ---
   const rawBody = await req.text();
+  if (rawBody.length > MAX_BODY_BYTES) return json({ error: 'payload_too_large' }, 413);
   const ts = req.headers.get('x-scc-timestamp') ?? '';
   const sig = req.headers.get('x-scc-signature') ?? '';
 
@@ -131,26 +142,14 @@ Deno.serve(async (req: Request): Promise<Response> => {
     return json({ error: 'batch_too_large' }, 400);
   }
 
-  const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-  if (!supabaseUrl || !serviceKey) return json({ error: 'server_misconfigured' }, 500);
-  const admin = createClient(supabaseUrl, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-
   // --- anonymous, salted identifiers ---
   const ipRaw = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
   const ipHash = await sha256Hex(`${SECRETS.hashSalt}:ip:${ipRaw}`);
   const sessionHash = body.sessionId ? await sha256Hex(`${SECRETS.hashSalt}:s:${body.sessionId}`) : null;
   const installHash = body.installId ? await sha256Hex(`${SECRETS.hashSalt}:i:${body.installId}`) : null;
 
-  // --- per-IP rate limit ---
-  const { count } = await admin
-    .from('telemetry_events')
-    .select('id', { count: 'exact', head: true })
-    .eq('ip_hash', ipHash)
-    .gte('received_at', new Date(Date.now() - REPLAY_WINDOW_MS).toISOString());
-  if ((count ?? 0) >= RATE_LIMIT_PER_IP) {
+  // --- per-IP rate limit (per isolate, see _forward.ts) ---
+  if (!limiter.take(ipHash, events.length)) {
     return new Response(JSON.stringify({ error: 'rate_limited' }), {
       status: 429,
       headers: { 'content-type': 'application/json', 'retry-after': '600', ...CORS },
@@ -164,34 +163,39 @@ Deno.serve(async (req: Request): Promise<Response> => {
   // Unknown / absent → null (legacy readers coalesce NULL to 'scc-app').
   const product = PRODUCTS.has(String(body.product)) ? String(body.product) : null;
 
-  const rows = (events as Record<string, unknown>[]).map((ev) => {
-    const isCrash = type === 'crash';
-    return {
-      event_type: type,
-      app_version: appVersion,
-      build_id: clamp(body.buildId, 80),
-      channel,
-      product,
-      os: clamp(body.os, 20),
-      os_release: clamp(body.osRelease, 40),
-      arch: clamp(body.arch, 20),
-      role,
-      error_type: isCrash ? clamp(ev.errorType, 60) : null,
-      error_name: isCrash ? clamp(ev.name, 120) : null,
-      error_message: isCrash ? clamp(ev.message, 500) : null,
-      error_stack: isCrash ? clamp(ev.stack, 8000) : null,
-      metric: !isCrash ? clamp(ev.metric, 80) : null,
-      metric_value: !isCrash && typeof ev.value === 'number' ? ev.value : null,
-      session_hash: sessionHash,
-      install_hash: installHash,
-      ip_hash: ipHash,
-      // AUD-344: at most 4 KiB, larger values become a marker (see _detail.ts).
-      detail: capDetail((isCrash ? ev.extra : ev.detail) ?? null),
-    };
-  });
+  const ctx: WireContext = {
+    type: type as 'crash' | 'usage',
+    appVersion,
+    buildId: clamp(body.buildId, 80),
+    channel,
+    product,
+    os: clamp(body.os, 20),
+    osRelease: clamp(body.osRelease, 40),
+    arch: clamp(body.arch, 20),
+    role,
+    installHash,
+    sessionHash,
+    now: new Date().toISOString(),
+  };
 
-  const { error } = await admin.from('telemetry_events').insert(rows);
-  if (error) return json({ error: 'insert_failed', message: error.message }, 500);
+  // D2: a job-diagnostics transcript goes to R2 (30 days); the event keeps only the reference.
+  const r2 = diagR2();
+  const batch: BatchEvent[] = [];
+  for (const raw of events as Record<string, unknown>[]) {
+    const ev = raw && typeof raw === 'object' ? raw : {};
+    let log: StoredLogRef | null = null;
+    const text = isJobDiagnostics(type, ev) ? logTextOf(ev) : null;
+    if (text && r2) {
+      try {
+        log = await uploadDiagLog(r2, text);
+      } catch (err) {
+        console.warn(`[ingest-telemetry] diag log upload failed: ${(err as Error).message}`);
+      }
+    }
+    batch.push(mapEvent(ctx, ev, log));
+  }
+  await captureBatch(batch);
+  if (r2) purgeOncePerDay(r2);
 
   return new Response(null, { status: 204, headers: CORS });
-});
+}));

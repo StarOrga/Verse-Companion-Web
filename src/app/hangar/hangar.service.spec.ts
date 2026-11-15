@@ -47,11 +47,11 @@ describe('HangarService writes and loads', () => {
     ...over,
   });
 
-  let analytics: { capture: Mock };
+  let analytics: { track: Mock };
 
   function setup(answer?: (call: FakeCall) => FakeResult | Promise<FakeResult>, user: { id: string } | null = { id: 'u1' }) {
     const fake = fakeSupabase({ answer });
-    analytics = { capture: vi.fn().mockName('capture') };
+    analytics = { track: vi.fn().mockName('track') };
     TestBed.configureTestingModule({
       providers: [
         HangarService,
@@ -119,7 +119,7 @@ describe('HangarService writes and loads', () => {
       expect(chainArgs(call, 'update')).toEqual([{ name: 'Renamed' }]);
       expect(chainArgs(call, 'eq')).toEqual(['id', 'cfg-1']);
       expect(updated?.name).toBe('Renamed');
-      expect(analytics.capture).toHaveBeenCalledWith('hangar_ship_config_saved', { role: 'combat' });
+      expect(analytics.track).toHaveBeenCalledWith('hangar:ship_config_update', { role: 'combat' });
     });
 
     it('sends role and loadout when given', async () => {
@@ -133,7 +133,7 @@ describe('HangarService writes and loads', () => {
 
       expect(await svc.updateConfig('cfg-1', { name: 'x' })).toBeNull();
       expect(svc.error()).toBe('errors.forbidden');
-      expect(analytics.capture).not.toHaveBeenCalled();
+      expect(analytics.track).not.toHaveBeenCalled();
     });
   });
 
@@ -169,7 +169,7 @@ describe('HangarService writes and loads', () => {
       ]);
       expect(created?.id).toBe('set-2');
       expect(svc.roleLoadouts().map((l) => l.id)).toEqual(['set-2', 'set-1']);
-      expect(analytics.capture).toHaveBeenCalledWith('hangar_loadout_created', { role: 'fps' });
+      expect(analytics.track).toHaveBeenCalledWith('hangar:loadout_create', { role: 'fps' });
     });
 
     it('returns null, leaves the cache alone and sets an error key on failure', async () => {

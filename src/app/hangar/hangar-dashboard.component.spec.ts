@@ -56,7 +56,7 @@ describe('HangarDashboardComponent role loadouts', () => {
         provideTranslateService({ fallbackLang: 'en' }),
         fake.provider,
         { provide: AuthService, useValue: { user: signal({ id: 'u1' }) } as unknown as AuthService },
-        { provide: AnalyticsService, useValue: { capture: vi.fn().mockName('capture'), flags: () => ({}) } },
+        { provide: AnalyticsService, useValue: { track: vi.fn().mockName('capture'), flags: () => ({}) } },
         {
           provide: CodexService,
           useValue: {

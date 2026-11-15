@@ -36,7 +36,7 @@ describe('HangarShipPageComponent (/hq/hangar/:id)', () => {
             snapshot: { paramMap: convertToParamMap({ id: opts.id }), queryParamMap: convertToParamMap(opts.query ?? {}) },
           },
         },
-        { provide: AnalyticsService, useValue: { ...analytics, captureVerse: () => undefined } },
+        { provide: AnalyticsService, useValue: { ...analytics, track: () => undefined } },
         { provide: AuthService, useValue: { user: signal({ id: 'u' }) } },
         { provide: HangarService, useValue: { ships: signal(opts.ships), loadAll: async () => undefined } },
         { provide: HqOwnershipService, useValue: { ensureLoaded: async () => undefined, configsForShip: () => opts.configs } },

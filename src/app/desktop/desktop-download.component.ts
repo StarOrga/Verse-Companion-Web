@@ -53,6 +53,7 @@ import { ScDatePipe } from '../core/locale/sc-date.pipe';
       }
 
       <sc-app-download-panel
+        app="uploader"
         icon="⬆"
         [title]="'desktop.appTitle'"
         desc="desktop.appDesc"

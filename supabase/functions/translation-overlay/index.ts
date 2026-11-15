@@ -9,6 +9,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 import { BUILD_ID_RE, LANG_RE } from '../ingest-catalog/_locale-shards.ts';
 import { r2FromEnv } from '../ingest-skins/_r2.ts';
 import { overlayObjectKey } from './_key.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -20,7 +21,7 @@ function json(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'content-type': 'application/json' } });
 }
 
-Deno.serve(async (req) => {
+Deno.serve(withPosthog('translation-overlay', async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'GET') return json({ error: 'method_not_allowed' }, 405);
 
@@ -51,4 +52,4 @@ Deno.serve(async (req) => {
     status: 200,
     headers: { ...CORS, 'content-type': 'application/json', 'cache-control': 'private, max-age=300' },
   });
-});
+}));

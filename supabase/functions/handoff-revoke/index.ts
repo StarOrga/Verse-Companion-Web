@@ -18,6 +18,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 import { isRevokeUnavailable, revokeResponse } from './_revoke.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -34,7 +35,7 @@ function json(body: unknown, status = 200): Response {
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('handoff-revoke', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -73,4 +74,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
   }
   const res = revokeResponse(outcome);
   return json(res.body, res.status);
-});
+}));

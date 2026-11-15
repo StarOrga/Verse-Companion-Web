@@ -10,6 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { AnalyticsService } from '../core/analytics.service';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
@@ -175,6 +176,7 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
 export class QuickSearchComponent {
   readonly engine = inject(CodexSearchEngine);
   private readonly hub = inject(CodexSearchHub);
+  private readonly analytics = inject(AnalyticsService);
   private readonly overlay = inject(Overlay);
   private readonly viewContainer = inject(ViewContainerRef);
 
@@ -214,7 +216,9 @@ export class QuickSearchComponent {
 
   /** Ctrl+K, "/" and the header button: the Codex bar on a Codex page, else the overlay. */
   trigger(): void {
-    if (!this.hub.activate()) this.open();
+    const onBar = this.hub.activate();
+    this.analytics.track('search:palette_open', { surface: onBar ? 'codex_bar' : 'palette' });
+    if (!onBar) this.open();
   }
 
   open(): void {

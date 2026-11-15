@@ -33,6 +33,7 @@
 // Design doc: docs/superpowers/specs/2026-08-05-access-control-allowlist-design.md (C5)
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+import { withPosthog } from '../_shared/posthog.ts';
 
 interface RegisterBody {
   email?: string;
@@ -73,7 +74,7 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('invite-user', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -237,4 +238,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
   }
 
   return json({ status: 'invited', ok: true, userId: newUserId, email, role });
-});
+}));

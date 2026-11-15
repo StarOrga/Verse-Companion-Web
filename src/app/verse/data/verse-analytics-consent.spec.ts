@@ -28,17 +28,17 @@ describe('Verse analytics consent gate', () => {
   });
 
   it('sends no Verse event before any consent decision', () => {
-    svc.captureVerse('verse_top_open', { key: 'news:a', kind: 'news', rank: 1, pinned: false });
-    svc.captureVerse('verse_door_open', { door: 'gallery' });
-    svc.captureVerse('beta_toggle', { area: 'verse', enabled: true });
-    svc.captureVerse('starscape_share', { image_id: 'x', channel: 'copy' });
-    svc.captureVerse('verse_star_earned', { patch_line: '4.3', star_key: 'notes' });
+    svc.track('verse:top_open', { key: 'news:a', kind: 'news', rank: 1, pinned: false });
+    svc.track('verse:door_open', { door: 'gallery' });
+    svc.track('settings:beta_toggle', { area: 'verse', enabled: true });
+    svc.track('verse:starscape_share', { image_id: 'x', channel: 'copy' });
+    svc.track('verse:star_earn', { patch_line: '4.3', star_key: 'notes' });
     expect(capture).not.toHaveBeenCalled();
   });
 
   it('sends no Verse event after declining statistics', () => {
     consent.essentialOnly();
-    svc.captureVerse('verse_door_open', { door: 'news' });
+    svc.track('verse:door_open', { door: 'news' });
     expect(capture).not.toHaveBeenCalled();
   });
 
@@ -51,8 +51,8 @@ describe('Verse analytics consent gate', () => {
 
   it('sends the typed event once statistics consent is granted', () => {
     consent.setStatistics(true);
-    svc.captureVerse('verse_door_open', { door: 'patches' });
+    svc.track('verse:door_open', { door: 'patches' });
     expect(capture).toHaveBeenCalledTimes(1);
-    expect(capture).toHaveBeenCalledWith('verse_door_open', { door: 'patches' });
+    expect(capture).toHaveBeenCalledWith('verse:door_open', { door: 'patches' });
   });
 });

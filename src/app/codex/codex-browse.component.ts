@@ -43,6 +43,7 @@ import { OverlayOriginService } from '../shared/overlay-frame/overlay-origin.ser
 import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import { reloadOnBuildRefresh } from './build-refresh.util';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AnalyticsService } from '../core/analytics.service';
 import {
   cleanLocaleValue,
   formatCraftTime,
@@ -1515,6 +1516,7 @@ export class CodexBrowseComponent implements OnInit {
    */
   readonly category = signal<CodexCategory>('ship');
   readonly isUpcoming = computed(() => this.category() === UPCOMING_CATEGORY);
+  private readonly analytics = inject(AnalyticsService);
   readonly kind = signal<CodexKind>('ship');
   readonly searchInput = signal('');
   private readonly searchTerm = signal('');
@@ -1967,6 +1969,14 @@ export class CodexBrowseComponent implements OnInit {
   });
 
   constructor() {
+    // A filter the reader turned on (not one the URL arrived with): one event per rise of the count.
+    let seenFilters: number | null = null;
+    effect(() => {
+      const n = this.activeFilterCount();
+      const kind = this.kind();
+      if (seenFilters !== null && n > seenFilters) untracked(() => this.analytics.track('codex:filter_change', { kind, filter_count: n }));
+      seenFilters = n;
+    });
     inject(DestroyRef).onDestroy(() => {
       if (this.searchTimer) clearTimeout(this.searchTimer);
     });

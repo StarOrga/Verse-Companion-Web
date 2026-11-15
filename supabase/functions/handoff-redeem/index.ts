@@ -48,6 +48,7 @@ import {
   sessionIdOf,
   touch,
 } from './_hash.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -76,7 +77,7 @@ function ipOf(req: Request): string {
   return hops[hops.length - 1] ?? 'unknown';
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('handoff-redeem', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -213,4 +214,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
     expires_at: session.expires_at ?? null,
     target_path: hit.target_path,
   });
-});
+}));

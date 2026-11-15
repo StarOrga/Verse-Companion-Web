@@ -182,9 +182,38 @@ export function describeError(
 
 /**
  * Logs `[scope] <op> failed` with context and returns ONLY the i18n key for
- * the UI. The standard form for every `catch` that sets a UI signal.
+ * the UI. The standard form for every `catch` that sets a UI signal — which makes
+ * it the one place an error state is "shown": it reports `app:error_show`
+ * (scope + `errors.*` key, never the error text) through the registered sink.
  */
 export function toErrorKey(scope: string, op: string, err: unknown, ctx?: Record<string, unknown>): string {
   logWarn(scope, `${op} failed`, { ...ctx, error: err });
-  return describeError(err).key;
+  const key = describeError(err).key;
+  reportErrorShown(scope, key);
+  return key;
+}
+
+type ErrorShownSink = (scope: string, key: string) => void;
+let errorShownSink: ErrorShownSink | null = null;
+/** Per `scope:key` at most this many reports per page session, so a retry loop cannot flood the project. */
+const ERROR_SHOWN_PER_KEY = 3;
+const errorShownCounts = new Map<string, number>();
+
+/** Registered once by `AnalyticsService.init()` — keeps this module free of Angular DI. */
+export function setErrorShownSink(sink: ErrorShownSink | null): void {
+  errorShownSink = sink;
+  errorShownCounts.clear();
+}
+
+function reportErrorShown(scope: string, key: string): void {
+  if (!errorShownSink) return;
+  const id = `${scope}:${key}`;
+  const n = errorShownCounts.get(id) ?? 0;
+  if (n >= ERROR_SHOWN_PER_KEY) return;
+  errorShownCounts.set(id, n + 1);
+  try {
+    errorShownSink(scope, key);
+  } catch {
+    // Reporting must never become the next error.
+  }
 }
