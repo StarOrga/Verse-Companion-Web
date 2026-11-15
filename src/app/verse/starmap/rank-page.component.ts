@@ -254,7 +254,7 @@ export function rankWallpaperOptions(st: VerseExplorerState, first: VerseExplore
       svg.big.empty { overflow: visible; animation: none; }
       svg.big.empty circle, svg.big.empty path { fill: none; stroke: color-mix(in srgb, var(--sc-fg-2) 80%, transparent); stroke-width: 1; stroke-dasharray: 2.5 2.5; }
       .who { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-      .eyebrow { font: 0.7rem var(--sc-font-display); letter-spacing: 0.22em; text-transform: uppercase; color: var(--sc-fg-2); }
+      .eyebrow { font: max(12px, 0.7rem) var(--sc-font-display); letter-spacing: 0.22em; text-transform: uppercase; color: var(--sc-fg-2); }
       .name { margin: 0; font: 600 clamp(1.6rem, 3.4vw, 2.4rem)/1.1 var(--sc-font-display); letter-spacing: 0.04em; color: var(--sc-fg-0); }
       .meaning { margin: 0; color: var(--sc-fg-1); max-width: var(--sc-measure, 62ch); }
       .count { margin: 4px 0 0; font-size: 0.85rem; color: var(--sc-accent); }
@@ -279,13 +279,13 @@ export function rankWallpaperOptions(st: VerseExplorerState, first: VerseExplore
       .tile.none { display: grid; place-items: center; margin: 0; padding: var(--sc-pad-3); text-align: center; color: var(--sc-fg-2); }
       figcaption { display: flex; flex-direction: column; gap: 2px; }
       figcaption b { font: 600 0.95rem var(--sc-font-display); color: var(--sc-fg-0); }
-      figcaption small { font-size: 0.75rem; color: var(--sc-fg-2); }
-      .dl { display: flex; flex-wrap: wrap; gap: var(--sc-gap-2); align-items: center; }
+      figcaption small { font-size: max(12px, 0.75rem); color: var(--sc-fg-2); }
+      .dl { display: flex; flex-wrap: wrap; gap: var(--sc-gap-2); align-items: center; font-size: max(12px, 0.8rem); }
 
       .block { margin-bottom: clamp(28px, 5vw, 48px); }
       .sec { margin: 0 0 14px; font: 400 0.8rem var(--sc-font-display); letter-spacing: 0.22em; text-transform: uppercase; color: var(--sc-fg-2); }
       .lead { margin: -6px 0 14px; color: var(--sc-fg-2); font-size: 0.85rem; max-width: var(--sc-measure, 62ch); }
-      .new { position: absolute; top: 6px; right: 8px; padding: 1px 7px; border-radius: 999px; font: 600 0.62rem var(--sc-font-display); letter-spacing: 0.14em;
+      .new { position: absolute; top: 6px; right: 8px; padding: 1px 7px; border-radius: 999px; font: 600 max(12px, 0.62rem) var(--sc-font-display); letter-spacing: 0.14em;
         text-transform: uppercase; font-style: normal; color: var(--sc-bg-0); background: var(--sc-accent); animation: rk-pop 0.5s ease-out 1s both; }
 
       /* The ladder: seven tiers on one rail, each rising in turn. */
@@ -296,8 +296,8 @@ export function rankWallpaperOptions(st: VerseExplorerState, first: VerseExplore
         background: color-mix(in srgb, var(--sc-fg-2) 25%, transparent); }
       .step.earned + .step::before, .step.earned + .step.current::before { background: var(--sc-accent); }
       .step b { font: 600 0.9rem var(--sc-font-display); color: var(--sc-fg-1); }
-      .step small { font-size: 0.72rem; color: var(--sc-fg-2); }
-      .step .what { font-size: 0.72rem; color: var(--sc-fg-2); line-height: 1.35; }
+      .step small { font-size: max(12px, 0.72rem); color: var(--sc-fg-2); }
+      .step .what { font-size: max(12px, 0.72rem); color: var(--sc-fg-2); line-height: 1.35; }
       .step.current { border-color: color-mix(in srgb, var(--sc-accent) 45%, transparent);
         background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--sc-accent) 14%, transparent), transparent 70%); }
       .step.current b, .step.earned b { color: var(--sc-fg-0); }
@@ -311,7 +311,7 @@ export function rankWallpaperOptions(st: VerseExplorerState, first: VerseExplore
       .rewards b { font: 600 0.9rem var(--sc-font-display); color: var(--sc-fg-0); }
       .rewards li.fresh b { padding-right: 46px; } /* room for the NEU badge */
       .rewards .txt span { font-size: 0.8rem; color: var(--sc-fg-1); }
-      .rewards small { grid-column: 2; font-size: 0.72rem; color: var(--sc-fg-2); }
+      .rewards small { grid-column: 2; font-size: max(12px, 0.72rem); color: var(--sc-fg-2); }
       .rewards li.on small { color: var(--sc-accent); }
       .rewards li:not(.on) b { color: var(--sc-fg-1); }
 

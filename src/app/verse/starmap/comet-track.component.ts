@@ -87,7 +87,7 @@ const RIM_K = 0.32;
       .tok.on { border-color: color-mix(in srgb, var(--sc-warning) 60%, #fff); color: var(--sc-fg-0);
         background: linear-gradient(180deg, color-mix(in srgb, var(--sc-warning) 24%, transparent), color-mix(in srgb, var(--sc-bg-1) 60%, transparent)); }
       .tok:disabled:not(.on) { color: var(--sc-fg-2); }
-      .quiet { order: 10; flex-basis: 100%; margin: -4px 0 0; font-size: 0.72rem; color: var(--sc-fg-2); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+      .quiet { order: 10; flex-basis: 100%; margin: -4px 0 0; font-size: max(12px, 0.72rem); color: var(--sc-fg-2); display: flex; flex-wrap: wrap; gap: 4px 10px; }
       .tok.nav { flex: 0 0 28px; font-size: 1rem; }
       /* Phone: row 1 kind + mode pills + state, row 2 title + info, row 3 the source note. */
       @media (max-width: 560px) {

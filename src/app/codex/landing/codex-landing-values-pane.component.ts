@@ -109,10 +109,10 @@ export const SHEET_ROWS = 7;
       /* Identity: what the hologram's arm leaves out (manufacturer, role/type, size). */
       .id { flex: 0 0 auto; margin: 0; padding-bottom: 10px; border-bottom: 1px solid color-mix(in srgb, var(--sc-accent) 22%, transparent); }
       .maker {
-        margin: 0; font: 600 max(11px, 0.74rem) / 1.25 var(--sc-font-display); letter-spacing: 0.14em; text-transform: uppercase;
+        margin: 0; font: 600 max(12px, 0.74rem) / 1.25 var(--sc-font-display); letter-spacing: 0.14em; text-transform: uppercase;
         color: var(--sc-fg-0); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       }
-      .cls { margin: 4px 0 0; font: 400 max(11px, 0.72rem) / 1.3 var(--sc-font-body); color: var(--sc-fg-2); }
+      .cls { margin: 4px 0 0; font: 400 max(12px, 0.72rem) / 1.3 var(--sc-font-body); color: var(--sc-fg-2); }
       .cls .sep { margin: 0 6px; color: var(--sc-fg-3, var(--sc-fg-2)); }
       .set { display: none; flex: 0 0 auto; margin: 0; }
       /* The values: a plain list, label toward the hologram, value at the outer edge. */
