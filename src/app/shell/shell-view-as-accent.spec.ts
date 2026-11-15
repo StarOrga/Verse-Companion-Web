@@ -161,7 +161,7 @@ describe('ShellComponent - elevated-access marking in the account menu', () => {
 
   it('orders the menu: Social, Einstellungen - divider - Admin, Integrationen - divider - Ansehen als', () => {
     const el = setup({ targets: ['collaborator', 'viewer', 'anon'], active: false, admin: true });
-    const seq = Array.from(el.querySelectorAll<HTMLElement>('.dropdown > a.dropdown-item, .dropdown > button.dropdown-item, .dropdown > hr, .dropdown > .dropdown-sep'))
+    const seq = Array.from(el.querySelectorAll<HTMLElement>('.dropdown .scp-b > a.dropdown-item, .dropdown .scp-b > button.dropdown-item, .dropdown .scp-b > hr, .dropdown .scp-b > .dropdown-sep'))
       .map((n) => (n.tagName === 'HR' ? '|' : n.classList.contains('dropdown-sep') ? '|' : (n.getAttribute('href') ?? n.textContent!.trim())));
     expect(seq).toEqual([
       '/social', '/settings',

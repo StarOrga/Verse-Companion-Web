@@ -290,7 +290,8 @@ export class AppsMenuComponent {
     if (this.open() && !this.host.nativeElement.contains(ev.target as Node)) this.closeMenu();
   }
 
-  /** Escape inside the menu (scDialog in the scaffold): fold away, focus back on the trigger. */
+  /** Escape from anywhere (and from inside the scaffold's frame): fold away, focus back on the trigger. */
+  @HostListener('document:keydown.escape')
   onPopupClosed(): void {
     if (!this.open()) return;
     this.closeMenu();
