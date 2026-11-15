@@ -382,3 +382,64 @@ describe('ScPopupComponent on a phone', () => {
   `,
 })
 class PhoneHostComponent {}
+
+@Component({
+  standalone: true,
+  imports: [ScPopupComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <div class="slot" style="position: relative; width: 300px; height: 260px">
+      <sc-popup kind="panel" size="fill" [bodyFill]="true" [float]="float" title="Fill" style="--sc-popup-body-gap: 7px">
+        <div class="inner">x</div>
+      </sc-popup>
+    </div>
+  `,
+})
+class FillHostComponent {
+  float = false;
+}
+
+describe('ScPopupComponent fill / bodyFill / float', () => {
+  function mountFill(float: boolean) {
+    TestBed.configureTestingModule({ providers: [provideTranslateService()] });
+    const fixture = TestBed.createComponent(FillHostComponent);
+    fixture.componentInstance.float = float;
+    document.body.appendChild(fixture.nativeElement);
+    fixture.detectChanges();
+    return fixture;
+  }
+
+  it('size="fill" sizes the frame by its host and bodyFill makes the body a flex column', () => {
+    const f = mountFill(false);
+    const root = f.nativeElement as HTMLElement;
+    const fr = root.querySelector<HTMLElement>('.scp-frame')!;
+    expect(fr.dataset['size']).toBe('fill');
+    const slot = root.querySelector<HTMLElement>('.slot')!.getBoundingClientRect();
+    expect(Math.round(fr.getBoundingClientRect().width)).toBe(Math.round(slot.width));
+    expect(Math.round(fr.getBoundingClientRect().height)).toBe(Math.round(slot.height));
+    const body = getComputedStyle(root.querySelector('.scp-b')!);
+    expect(body.display).toBe('flex');
+    expect(body.flexDirection).toBe('column');
+    expect(body.rowGap).toBe('7px');
+    f.destroy();
+    root.remove();
+  });
+
+  describe('on a phone', () => {
+    useViewport(375, 700);
+
+    it('a float popup stays a card, a normal panel goes full screen', () => {
+      const f = mountFill(true);
+      const root = f.nativeElement as HTMLElement;
+      expect(getComputedStyle(root.querySelector('.scp-frame')!).position).toBe('relative');
+      f.destroy();
+      root.remove();
+      TestBed.resetTestingModule();
+      const g = mountFill(false);
+      const gr = g.nativeElement as HTMLElement;
+      expect(getComputedStyle(gr.querySelector('.scp-frame')!).position).toBe('fixed');
+      g.destroy();
+      gr.remove();
+    });
+  });
+});

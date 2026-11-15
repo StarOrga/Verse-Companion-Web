@@ -32,7 +32,7 @@ import { logWarn } from '../../core/log';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.full]': 'full()' },
   template: `
-    <sc-popup kind="panel" [title]="displayName()"
+    <sc-popup kind="panel" size="fill" [bodyFill]="true" [title]="displayName()"
               initialFocus="container"
               (closed)="onClosed($event)">
       <div class="hho-stage">
@@ -66,10 +66,8 @@ import { logWarn } from '../../core/log';
     /* Fullscreen: the same panel, filling the viewport (dvh after its vh fallback). */
     :host(.full) { position: fixed; inset: 0; z-index: 1000; height: 100vh; height: 100dvh; }
     sc-popup { display: block; height: 100%; }
-    /* overlay-size: exception - the 3D panel fills its positioned parent (hero picture + ownership card), the host decides its size. */
-    :host ::ng-deep .scp-frame { inline-size: 100%; block-size: 100%; max-block-size: none; }
-    :host(.full) ::ng-deep .scp-frame { border-radius: 0; border-width: 0; }
-    :host ::ng-deep .scp-b { display: flex; flex-direction: column; margin-top: 8px; overflow: hidden; }
+    /* The panel fills its positioned parent (hero picture + ownership card): size="fill"; fullscreen squares it off. */
+    :host(.full) { --sc-popup-radius: 0; --sc-popup-border-w: 0px; }
     .hho-stage { position: relative; flex: 1 1 auto; min-height: 200px; }
     .hho-viewer { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
     .hho-viewer.is-placeholder { background: radial-gradient(ellipse at 50% 60%,

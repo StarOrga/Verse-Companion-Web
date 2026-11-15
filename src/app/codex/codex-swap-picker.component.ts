@@ -214,7 +214,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
   template: `
     @if (target(); as t) {
       <sc-popup kind="large" [title]="'codex.picker.title' | translate: { port: slotLabel(t), size: t.size ?? '' }"
-                [eyebrow]="eyebrow(t)" [initialFocus]="'first'"
+                [eyebrow]="eyebrow(t)" [initialFocus]="'first'" [bodyFill]="true" style="--sc-popup-body-gap: 10px"
                 scPopupMotion="large" scPopupMotionPlate=".scp-frame" scPopupMotionFoot=".scp-f"
                 (closed)="dismiss()">
           <!-- sc-popup: focus in, Tab trap, Escape, focus back to the opener
@@ -492,7 +492,6 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
       border-left: 2px solid color-mix(in srgb, var(--sc-warn) 55%, transparent); padding-left: 8px; }
 
     /* The popup body is the one scroller; the table box inside it keeps its own scroll. */
-    :host ::ng-deep .scp-b { display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
     .pick-titles { flex: 1 1 auto; min-width: 0; }
     .pick-installed { margin: 3px 0 0; font-size: max(0.74rem, var(--sc-fs-floor)); color: var(--sc-fg-1); overflow-wrap: anywhere; }
     .pick-applies { margin: 2px 0 0; font-size: max(0.7rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }

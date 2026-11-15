@@ -42,7 +42,7 @@ interface Box {
       <i class="ring" aria-hidden="true"
          [style.top.px]="b.top" [style.left.px]="b.left" [style.width.px]="b.width" [style.height.px]="b.height"></i>
     }
-    <sc-popup class="card" kind="panel" initialFocus="container" [returnFocus]="returnTo()" (closed)="closed.emit()"
+    <sc-popup class="card" kind="panel" [float]="true" initialFocus="container" [returnFocus]="returnTo()" (closed)="closed.emit()"
               [eyebrow]="step() < 0 ? ('starmap.tour.eyebrow' | translate) : ('starmap.tour.progress' | translate: { n: step() + 1, total: steps().length })"
               [title]="step() < 0 ? ('starmap.tour.title' | translate) : ('starmap.tour.step.' + current() + '.title' | translate)">
       @if (step() < 0) {
@@ -80,10 +80,10 @@ interface Box {
       .points { margin: 0 0 var(--sc-gap-3); padding-left: 1.1rem; display: grid; gap: var(--sc-gap-2); color: var(--sc-fg-1); font-size: 0.9rem; }
       .text { margin: 0 0 var(--sc-gap-3); color: var(--sc-fg-1); font-size: 0.9rem; }
       /* Phone: the scaffold's panel is full screen, which would cover the very element the tour
-         rings. The coach mark stays a card at the bottom (scaffold change request: a coach-mark flag). */
+         rings. The coach mark stays a card at the bottom (the scaffold's float input). */
       @media (max-width: 720px) {
         .card { position: fixed; inset: auto 8px var(--sc-float-bottom, 8px) 8px; }
-        .card ::ng-deep .scp-frame { position: relative; inset: auto; inline-size: 100%; block-size: auto; max-block-size: 70dvh; border: 1px solid var(--sc-border); border-radius: 6px; padding: 0; }
+        .card { --sc-popup-max-h: 70dvh; }
       }
     `,
   ],

@@ -34,7 +34,7 @@
   box-sizing: border-box;
   inline-size: min(var(--scp-w, var(--sc-ov-m)), calc(100vw - 32px));
   max-inline-size: 100%;
-  max-block-size: var(--sc-ov-max-h);
+  max-block-size: var(--sc-popup-max-h, var(--sc-ov-max-h));
   margin: 0;
   border: 1px solid var(--sc-sub-rule, var(--sc-border));
   border-radius: 6px;
@@ -47,6 +47,13 @@
 .sc-popup .scp-frame[data-size='s'] { --scp-w: var(--sc-ov-s); }
 .sc-popup .scp-frame[data-size='m'] { --scp-w: var(--sc-ov-m); }
 .sc-popup .scp-frame[data-size='area'] { inline-size: var(--sc-ov-area); }
+.sc-popup .scp-frame[data-size='fill'] {
+  inline-size: 100%;
+  block-size: 100%;
+  max-block-size: none;
+  border-radius: var(--sc-popup-radius, 6px);
+  border-width: var(--sc-popup-border-w, 1px);
+}
 .sc-popup .scp-frame[data-kind='notice'] { --scp-w: var(--sc-toast-w); }
 
 /* r1-role: the top edge carries the role colour; the content stays in the normal colours. */
@@ -134,6 +141,12 @@
   overscroll-behavior: contain;
   color: var(--sc-fg-1);
 }
+.sc-popup .scp-frame[data-body='fill'] .scp-b {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sc-popup-body-gap, 0);
+  overflow: hidden;
+}
 .sc-popup .scp-f {
   display: flex;
   flex-wrap: wrap;
@@ -159,7 +172,7 @@
 /* ---- phone (the one overlay breakpoint): dialog, panel and large = full screen ---- */
 @media (max-width: 720px) {
   .sc-popup.sc-popup--staged { padding: 0; }
-  .sc-popup .scp-frame:is([data-kind='dialog'], [data-kind='panel'], [data-kind='large']) {
+  .sc-popup .scp-frame:is([data-kind='dialog'], [data-kind='panel'], [data-kind='large']):not([data-float]) {
     position: fixed;
     inset: 0;
     z-index: var(--sc-popup-z, 1300);
@@ -172,12 +185,14 @@
     padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px)
       env(safe-area-inset-left, 0px);
   }
-  .sc-popup .scp-frame[data-access]:is([data-kind='dialog'], [data-kind='panel'], [data-kind='large']) {
+  .sc-popup .scp-frame[data-access]:is([data-kind='dialog'], [data-kind='panel'], [data-kind='large']):not([data-float]) {
     border-top: 2px solid var(--scp-access);
   }
   .sc-popup .scp-frame:is([data-kind='dialog'], [data-kind='panel'], [data-kind='large']) .scp-main {
     padding: 12px 14px calc(12px + var(--sc-safe-bottom, 0px));
   }
+  /* A floating card keeps its width and place on a phone, only capped to the screen. */
+  .sc-popup .scp-frame[data-float] { inline-size: 100%; }
   /* "für Fettfinger": every control of the scaffold at least 48 px. */
   .sc-popup .scp-x,
   .sc-popup .scp-tools > .sc-action--tertiary {

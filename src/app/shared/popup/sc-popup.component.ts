@@ -21,8 +21,8 @@ import { pushPopupEntry, releasePopupEntry } from './popup-history';
 
 /** The five popup kinds (concept 20261115-0216-popup-aufbau, r1-types). */
 export type ScPopupKind = 'menu' | 'panel' | 'dialog' | 'large' | 'notice';
-/** The four overlay width tiers of styles.scss "OVERLAY SIZES". */
-export type ScPopupSize = 'menu' | 's' | 'm' | 'area';
+/** The four overlay width tiers of styles.scss "OVERLAY SIZES", plus `fill` (sized by its host). */
+export type ScPopupSize = 'menu' | 's' | 'm' | 'area' | 'fill';
 /** Who can reach the popup: the top edge takes the role colour (r1-role). */
 export type ScPopupAccess = 'admin' | 'collab' | null;
 /** Why the popup asks to close: its ✕, Escape, or the browser / phone back gesture. */
@@ -86,6 +86,13 @@ let uid = 0;
  * - `size`      override among the four width tokens: menu | s | m | area. Defaults: menu→menu,
  *               panel→s, dialog→m, large→area; a notice takes `--sc-toast-w`. A two-button
  *               question passes `size="s"`.
+ *               `fill`: no width token, the frame fills its host (a 3D panel over a picture, a part
+ *               popup): the host gives the size, `--sc-popup-radius` / `--sc-popup-border-w` on the
+ *               host square it off for a full-screen use.
+ * - `bodyFill`  the body is a flex column that fills the height (gap `--sc-popup-body-gap`) instead of
+ *               scrolling itself: for content that owns its scroller (a table box, a viewer).
+ * - `float`     a coach mark / floating card: stays a card on phones instead of going full screen
+ *               (the host positions it; `--sc-popup-max-h` caps its height).
  * - `access`    'admin' → top edge `--sc-accent-hot`, 'collab' → `--sc-accent-collab`, plus
  *               screen-reader text; no visible role words.
  * - `modal`     override; default true for dialog + large, false otherwise.
@@ -153,6 +160,8 @@ let uid = 0;
         (scDialogEscape)="closed.emit('escape')"
         [attr.data-kind]="kind()"
         [attr.data-size]="widthTier()"
+        [attr.data-body]="bodyFill() ? 'fill' : null"
+        [attr.data-float]="float() ? '' : null"
         [attr.data-access]="access()"
         [attr.role]="frameRole()"
         [attr.aria-modal]="isModal() ? 'true' : null"
@@ -218,6 +227,8 @@ export class ScPopupComponent implements OnInit, OnDestroy {
   readonly eyebrow = input<string>('');
   readonly size = input<ScPopupSize | null>(null);
   readonly access = input<ScPopupAccess>(null);
+  readonly bodyFill = input(false);
+  readonly float = input(false);
   readonly modal = input<boolean | null>(null);
   readonly backdrop = input<boolean | null>(null);
   readonly dialogRole = input<'dialog' | 'alertdialog'>('dialog');
