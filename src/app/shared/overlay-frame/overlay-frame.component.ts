@@ -35,7 +35,7 @@ export interface OverlayNeighbour {
         <ng-container popupTools>
           <ng-container *ngTemplateOutlet="steppers" />
         </ng-container>
-        <div class="content"><ng-content /></div>
+        <div class="content"><ng-container *ngTemplateOutlet="body" /></div>
       </sc-popup>
     } @else {
       <div class="sheet page">
@@ -43,9 +43,11 @@ export interface OverlayNeighbour {
           <h2 class="ttl">{{ heading() }}</h2>
           <span class="nav"><ng-container *ngTemplateOutlet="steppers" /></span>
         </header>
-        <div class="content"><ng-content /></div>
+        <div class="content"><ng-container *ngTemplateOutlet="body" /></div>
       </div>
     }
+    <!-- ONE ng-content (a second one in the other @if branch would leave the first slot empty). -->
+    <ng-template #body><ng-content /></ng-template>
     <ng-template #steppers>
       @if (prev(); as p) {
         <a scAction tier="tertiary" [routerLink]="p.commands" [replaceUrl]="true" [attr.aria-label]="'overlay.prev' | translate"
