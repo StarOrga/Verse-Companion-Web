@@ -95,6 +95,14 @@ const RIM_K = 0.32;
       @media (pointer: coarse) { .mode { min-height: 48px; } }
       .quiet { order: 10; flex-basis: 100%; margin: -4px 0 0; font-size: 0.72rem; color: var(--sc-fg-2); display: flex; flex-wrap: wrap; gap: 4px 10px; }
       .tok.nav { flex: 0 0 28px; font-size: 1rem; }
+      /* Phone: row 1 kind + mode pills + state, row 2 title + info, row 3 the source note. */
+      @media (max-width: 560px) {
+        .head { row-gap: 8px; }
+        .state { order: 1; }
+        .head > b { order: 2; flex: 1 1 calc(100% - 44px); min-width: 0; }
+        .info { order: 3; }
+        .quiet { margin: 0; }
+      }
       @media (pointer: coarse) { .tok.nav { flex-basis: 48px; } }
     `,
   ],

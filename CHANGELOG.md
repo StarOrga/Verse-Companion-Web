@@ -4,6 +4,12 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.265.4] - 2026-11-15
+
+### Changed
+- Starscape app: the wallpaper follows your rank like the website — Companions from tier 3 and the Amber tint from tier 4.
+- Rank page: the extras (community star map, sun collection, badge and reward ideas) are tidy cards now; the locked ideas section reads as a calm hint, and the comet tip header wraps cleanly on phones.
+
 ## [0.265.3] - 2026-11-15
 
 ### Fixed

@@ -13,6 +13,7 @@ import {
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AnalyticsService } from '../../core/analytics.service';
 import { logWarn } from '../../core/log';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { VerseApiService } from '../data/verse-api.service';
 import type { VerseCommunityStars, VerseExplorerPatch, VerseExplorerState } from '../data/verse.models';
 import { ConstellationFigureComponent } from './constellation-figure.component';
@@ -39,23 +40,30 @@ import { wallpaperConstellations } from './wallpaper';
  */
 @Component({
   selector: 'sc-starmap-more',
+  host: { '[attr.data-part]': 'part()' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, ConstellationFigureComponent, RankIdeasComponent],
+  imports: [TranslatePipe, ScActionDirective, ConstellationFigureComponent, RankIdeasComponent],
   template: `
     @let st = state();
     @let p = patch();
     @if (part() === 'logbook') {
-    <section class="block">
-      <h3>{{ 'starmap.community.title' | translate }}</h3>
-      @if (community(); as c) {
-        <sc-constellation-figure class="community-fig" size="small" [points]="p.constellation?.points" [levels]="communityLevelsOf(p, c)" />
-        <p class="muted small">{{ 'starmap.community.count' | translate: { explorers: c.explorers } }}</p>
-      }
-      <p class="muted">{{ (p.unlocks.community ? 'starmap.community.on' : 'starmap.community.off') | translate }}</p>
+    <section class="block card community" aria-labelledby="sm-community">
+      <h3 id="sm-community">{{ 'starmap.community.title' | translate }}</h3>
+      <div class="community-row">
+        @if (community(); as c) {
+          <sc-constellation-figure class="community-fig" size="small" [points]="p.constellation?.points" [levels]="communityLevelsOf(p, c)" />
+        }
+        <div class="community-txt">
+          @if (community(); as c) {
+            <p>{{ 'starmap.community.count' | translate: { explorers: c.explorers } }}</p>
+          }
+          <p class="muted">{{ (p.unlocks.community ? 'starmap.community.on' : 'starmap.community.off') | translate }}</p>
+        </div>
+      </div>
     </section>
 
-    <section class="block">
-      <h3>{{ 'starmap.suns.title' | translate }}</h3>
+    <section class="block card" aria-labelledby="sm-suns">
+      <h3 id="sm-suns">{{ 'starmap.suns.title' | translate }}</h3>
       @if (st.suns.length || splinterSuns().suns > 0 || splinterSuns().rest > 0) {
         <ul class="suns">
           @for (s of st.suns; track s) { <li><span class="sun-dot" aria-hidden="true"></span>{{ s }}</li> }
@@ -75,7 +83,7 @@ import { wallpaperConstellations } from './wallpaper';
     @if (part() === 'series' && (st.rewards.supernova || st.rewards.live || st.rewards.meteor)) {
       <section class="block">
         @if (st.rewards.supernova) {
-          <button type="button" class="btn" [disabled]="exporting()" (click)="exportSupernova()">
+          <button type="button" scAction tier="secondary" [busy]="exporting()" [disabled]="exporting()" (click)="exportSupernova()">
             {{ 'starmap.reward.supernova.download' | translate }}
           </button>
         }
@@ -90,10 +98,10 @@ import { wallpaperConstellations } from './wallpaper';
     }
 
     @if (part() === 'logbook') {
-    <section class="block side">
-      <h3>{{ 'starmap.rankPage.extrasTitle' | translate }}</h3>
+    <section class="block card wide" aria-labelledby="sm-extras">
+      <h3 id="sm-extras">{{ 'starmap.rankPage.extrasTitle' | translate }}</h3>
       @if (badgeOn()) {
-        <button type="button" class="btn ghost" [disabled]="sharing()" (click)="shareBadge()">
+        <button type="button" class="share" scAction tier="secondary" [busy]="sharing()" [disabled]="sharing()" (click)="shareBadge()">
           <svg class="ico" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
             <circle cx="18" cy="5" r="2.6" /><circle cx="6" cy="12" r="2.6" /><circle cx="18" cy="19" r="2.6" />
             <path d="M8.3 10.8 15.7 6.3M8.3 13.2l7.4 4.5" />
@@ -110,9 +118,18 @@ import { wallpaperConstellations } from './wallpaper';
   `,
   styles: [
     `
+      /* Logbook: the rank page's card grid (same surface as the reward cards above). */
       :host { display: flex; flex-direction: column; gap: var(--sc-gap-3); }
-      .block { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+      :host([data-part='series']) { margin-top: 10px; }
+      :host([data-part='logbook']) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+      @media (max-width: 700px) { :host([data-part='logbook']) { grid-template-columns: minmax(0, 1fr); } }
+      .block { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; min-width: 0; }
+      .card { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--sc-border); background: color-mix(in srgb, var(--sc-bg-1) 70%, transparent); }
+      .card p { font-size: 0.85rem; line-height: 1.45; }
+      .wide { grid-column: 1 / -1; }
       h3 { font: 600 0.95rem var(--sc-font-display); margin: 0; color: var(--sc-fg-0); }
+      .community-row { display: flex; gap: var(--sc-gap-1); align-items: center; }
+      .community-txt { display: flex; flex-direction: column; gap: 4px; min-width: 0; color: var(--sc-fg-1); font-weight: 400; }
       h4 { font: 600 0.85rem var(--sc-font-display); margin: var(--sc-gap-2) 0 2px; color: var(--sc-fg-0); }
       p { margin: 0; }
       .muted { color: var(--sc-fg-2); }
@@ -120,14 +137,8 @@ import { wallpaperConstellations } from './wallpaper';
       .err { color: var(--sc-danger); }
       .link { color: var(--sc-accent); min-height: 36px; display: inline-flex; align-items: center; }
       .link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-      .btn { display: inline-flex; align-items: center; min-height: var(--sc-tap-min, 44px); padding: 0 var(--sc-pad-2); border-radius: 8px;
-        border: 1px solid var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-fg-0);
-        font: inherit; cursor: pointer; text-decoration: none; }
-      .btn.ghost { background: transparent; }
-      .btn:disabled { opacity: 0.55; cursor: progress; }
-      .btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
       ul { list-style: none; margin: 0; padding: 0; }
-      .community-fig { width: 120px; }
+      .community-fig { flex: none; width: 96px; }
       .suns { display: flex; flex-wrap: wrap; gap: var(--sc-gap-2); }
       .suns li { display: inline-flex; align-items: center; gap: 4px; }
       .sun-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sc-warning); box-shadow: 0 0 6px var(--sc-warning); }
@@ -135,7 +146,8 @@ import { wallpaperConstellations } from './wallpaper';
       .splinter { color: var(--sc-fg-2); font-size: 0.8rem; }
       .splinter-dot { width: 3px; height: 3px; opacity: 0.6; box-shadow: none; }
       .live { display: block; width: 100%; height: auto; border-radius: 8px; }
-      .ico { fill: currentColor; stroke: currentColor; stroke-width: 1.6; margin-right: 6px; }
+      .ico { fill: currentColor; stroke: currentColor; stroke-width: 1.6; }
+      sc-rank-ideas { width: 100%; margin-top: 6px; padding-top: 14px; border-top: 1px solid var(--sc-border); }
     `,
   ],
 })

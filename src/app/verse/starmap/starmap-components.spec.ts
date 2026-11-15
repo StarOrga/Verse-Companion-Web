@@ -578,11 +578,11 @@ describe('star map components', () => {
     const f = more(stars);
     await f.whenStable();
     f.detectChanges();
-    expect(f.nativeElement.querySelector('.side .btn.ghost')).not.toBeNull();
+    expect(f.nativeElement.querySelector('.wide button.share')).not.toBeNull();
     expect(f.nativeElement.querySelector('.suggest')).toBeNull();
     const none = more({ ...STATE, kartograph: { unlocked: false, rank: 0, stars: 2 } });
     none.detectChanges();
-    expect(none.nativeElement.querySelector('.side .btn.ghost')).toBeNull();
+    expect(none.nativeElement.querySelector('.wide button.share')).toBeNull();
   });
 
   it('the extras area hosts the reward ideas, hidden when the RPC is missing', async () => {
