@@ -49,5 +49,8 @@ dotnet publish cgf-converter/cgf-converter.csproj -c Release -o publish   # .NET
 so publishing one means a new mirror release, a new pin in both places and a
 fresh equivalence check before it may join `CONVERTER_ALIASES`.
 
-The patches are written to be sent upstream; once a release contains them, the
-uploader can go back to the upstream asset.
+Both patches are proposed upstream in
+[Markemp/Cryengine-Converter#267](https://github.com/Markemp/Cryengine-Converter/pull/267)
+(0002 also adds a unit test; the test project is not part of the exe, so the
+pinned binary is unaffected). Once a release contains them, the uploader can go
+back to the upstream asset.

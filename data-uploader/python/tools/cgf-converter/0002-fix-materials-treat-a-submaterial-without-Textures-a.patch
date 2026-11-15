@@ -1,4 +1,4 @@
-From b5442af16e0ed4fb83d69d57a94ed4b9fbd1082a Mon Sep 17 00:00:00 2001
+From fea14c62f555b053171c3cf5ac8edc79a99e4927 Mon Sep 17 00:00:00 2001
 From: JerryT2T <noreply@users.noreply.github.com>
 Date: Sun, 15 Nov 2026 15:05:36 +0100
 Subject: [PATCH 2/2] fix(materials): treat a submaterial without <Textures> as
@@ -9,8 +9,10 @@ is null for a submaterial that has no <Textures> element (AEGS
 Vanguard's vanguard_ext_a.mtl), and the ArgumentNullException failed
 the whole file.
 ---
- .../Renderers/MaterialTextures/MaterialTextureManager.cs     | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ .../MaterialTextureManager.cs                 |  5 +++-
+ .../UnitTests/MaterialTextureManagerTests.cs  | 26 +++++++++++++++++++
+ 2 files changed, 30 insertions(+), 1 deletion(-)
+ create mode 100644 CgfConverterIntegrationTests/UnitTests/MaterialTextureManagerTests.cs
 
 diff --git a/CgfConverter/Renderers/MaterialTextures/MaterialTextureManager.cs b/CgfConverter/Renderers/MaterialTextures/MaterialTextureManager.cs
 index b2de574..bcf001c 100644
@@ -28,3 +30,35 @@ index b2de574..bcf001c 100644
              .Where(
                  x => x.TexType == Texture.TypeEnum.Default
                      && x.File != "nearest_cubemap"
+diff --git a/CgfConverterIntegrationTests/UnitTests/MaterialTextureManagerTests.cs b/CgfConverterIntegrationTests/UnitTests/MaterialTextureManagerTests.cs
+new file mode 100644
+index 0000000..ba4b3bf
+--- /dev/null
++++ b/CgfConverterIntegrationTests/UnitTests/MaterialTextureManagerTests.cs
+@@ -0,0 +1,26 @@
++using CgfConverter;
++using CgfConverter.Models.Materials;
++using CgfConverter.Renderers.MaterialTextures;
++using Microsoft.VisualStudio.TestTools.UnitTesting;
++
++namespace CgfConverterTests.UnitTests;
++
++[TestClass]
++[TestCategory("unit")]
++public class MaterialTextureManagerTests
++{
++    [TestMethod]
++    public void CreateSet_SubmaterialWithoutTextures_ReturnsEmptySet()
++    {
++        // A submaterial without a <Textures> element (Star Citizen's AEGS
++        // Vanguard paint .mtl) deserializes with Textures == null.
++        var manager = new MaterialTextureManager(new Args());
++        var material = new Material { Name = "untextured", Textures = null };
++
++        var set = manager.CreateSet(material);
++
++        Assert.IsNull(set.Diffuse);
++        Assert.IsNull(set.Normal);
++        Assert.IsNull(set.Specular);
++    }
++}
