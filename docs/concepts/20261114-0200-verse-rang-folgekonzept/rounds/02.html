@@ -47,7 +47,7 @@
   <details class="fr-fold" data-open-questions>
     <summary>🔍 2 {{final.funde_fold}}</summary>
     <ul class="fr-funde">
-      <li data-oq-id="oq-phone-comet"
+      <li data-routed="implemented" data-oq-id="oq-phone-comet"
           data-issue-title="[BUG] Star map comet strip sits under the phone search bar"
           data-issue-type="bug"
           data-issue-body="On /verse/explorer at 375x812 the comet track's day strip and the 'offen' state sit under the floating bottom search bar, the beta switch and the feedback launcher. Pre-existing layout, not caused by the rank follow-up. Use --sc-float-bottom / .sc-dock-phone clearances from src/styles.scss."
@@ -61,8 +61,9 @@
           <dt>{{final.fund_where}}</dt><dd>Sternenkarte, Handy</dd>
           <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — kleiner Abstand im Layout.</dd>
         </dl>
+        <p class="oq-done">umgesetzt: Leiste endet auf dem Handy über Suche und Launcher (ebad1a6)</p>
       </li>
-      <li data-oq-id="oq-starscape-sky"
+      <li data-routed="implemented" data-oq-id="oq-starscape-sky"
           data-issue-title="[FEATURE] Mirror the magic wallpaper sky in the Starscape app"
           data-issue-type="feature"
           data-issue-body="The web wallpaper renderer (constellation-render.ts) now draws a soft line glow and a blue veil by default, plus the companions (tier 3) and amber tint (tier 4) rewards. The Starscape desktop app's Rust renderer still draws the previous sky."
@@ -76,6 +77,7 @@
           <dt>{{final.fund_where}}</dt><dd>Starscape (Rust-Renderer)</dd>
           <dt>{{final.fund_why}}</dt><dd>📌 Issue — eigene App, eigener Release.</dd>
         </dl>
+        <p class="oq-done">umgesetzt: Starscape zeichnet Leuchten und Schleier, Tönung vorbereitet (4640aa0)</p>
       </li>
     </ul>
   </details>
@@ -87,6 +89,7 @@
       <li><code>starmap.model.ts</code>, <code>constellation-render.ts</code>, <code>rank-ideas.component.ts</code>, <code>comet-track.component.ts</code></li>
       <li>Tests: 6923 grün, 1 übersprungen · typecheck, lint, build grün</li>
       <li>Ohne Blick übernommen (Empfehlung): Rang-Tempo, Vorschläge, Hub-Punkt, Splitter-Belohnung</li>
+      <li>Nacharbeiten: Handy-Abstand Komet-Leiste, Starscape-Himmel (Rust nur per CI gebaut)</li>
       <li>Hub-Animation bleibt wie gewählt unverändert; neue Belohnungen: Begleiter (3), Bernsteintönung (4)</li>
     </ul>
   </details>
