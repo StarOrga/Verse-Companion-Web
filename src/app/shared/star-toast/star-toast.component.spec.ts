@@ -47,7 +47,8 @@ describe('StarToastComponent', () => {
     stars.next(ev('notes', 3, ['community']));
     f.detectChanges();
     const root = el(f);
-    expect(root.querySelector('[role=status]')?.getAttribute('aria-live')).toBe('polite');
+    expect(root.querySelector('.scp-frame[role=status]')).not.toBeNull();
+    expect(root.querySelector('.scp-b .scp-ev, .scp-main > header')).toBeNull(); // a notice has no head and no X
     expect(root.textContent).toContain('Star lit: Notes read');
     expect(root.textContent).toContain('3 of 7');
     expect(root.textContent).toContain('Community unlocked');
@@ -84,7 +85,7 @@ describe('StarToastComponent', () => {
     tick(2);
     f.detectChanges();
     expect(el(f).textContent).toContain('2 of 7');
-    (el(f).querySelector('.x') as HTMLButtonElement).click();
+    tick(STAR_TOAST_MS);
     f.detectChanges();
     expect(toast()).toBeNull();
   }));

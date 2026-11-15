@@ -99,7 +99,7 @@ describe('AppNoticeComponent', () => {
     expect(el().querySelector('.toast')).toBeNull();
   }));
 
-  it('expands on a click anywhere and snoozes on the x', fakeAsync(() => {
+  it('expands on a click anywhere and snoozes on the later button', fakeAsync(() => {
     fixture = TestBed.createComponent(HostComponent);
     fixture.detectChanges();
     tick(APP_NOTICE_DELAY_MS);
@@ -108,7 +108,7 @@ describe('AppNoticeComponent', () => {
     toast.click();
     fixture.detectChanges();
     expect(toast.classList.contains('open')).toBe(true);
-    el().querySelector<HTMLElement>('.x')!.click();
+    el().querySelector<HTMLElement>('.later')!.click();
     fixture.detectChanges();
     expect(el().querySelector('.toast')).toBeNull();
     expect(new AppNoticeService().isSnoozed('starscape')).toBe(true);
