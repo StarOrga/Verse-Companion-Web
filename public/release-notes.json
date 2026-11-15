@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.270.16",
+  "current": "0.270.17",
   "releases": [
+    {
+      "version": "0.270.17",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader 0.81.2: the 25 ships that never got a 3D model (Galaxy, Polaris, Perseus, Salvation, the Constellations, all Vanguards, Vulture, Hull B, Blade, Guardian MX, San'tok.yāi …) now build one. The uploader runs a fixed geometry converter; every existing model stays exactly as it was, so nothing is rebuilt."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.270.16",
       "date": "2026-11-15",
@@ -12,7 +28,7 @@
           "items": [
             {
               "title": "",
-              "text": "Data Uploader 0.81.2: the 25 ships that never got a 3D model (Galaxy, Polaris, Perseus, Salvation, the Constellations, all Vanguards, Vulture, Hull B, Blade, Guardian MX, San'tok.yāi …) now build one. The uploader runs a fixed geometry converter; every existing model stays exactly as it was, so nothing is rebuilt."
+              "text": "Desktop app: signing in from Verse Companion versions up to 0.109.1 no longer ends on the 404 page — /desktop/connect forwards to /apps/starscape/connect and keeps the sign-in handoff (cb, state)."
             }
           ]
         }

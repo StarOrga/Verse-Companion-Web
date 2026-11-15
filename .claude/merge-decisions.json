@@ -303,6 +303,23 @@
         ]
       }
     ],
+    ".claude/project-map.md›migrations-count›count": [
+      {
+        "ship": "#1148",
+        "by": "Jerry",
+        "value": "migrations 183"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "generated count of the merged tree",
+        "decided": true,
+        "at": "2026-11-15T17:48:29.462Z",
+        "hunks": [
+          "3a473fd5a36a"
+        ]
+      }
+    ],
     ".claude/project-map.md›migrations/›count": [
       {
         "ship": "feat/verse-rank-followup",
@@ -347,6 +364,23 @@
         ]
       }
     ],
+    ".claude/project-map.md›src-counts›count": [
+      {
+        "ship": "#1146",
+        "by": "Jerry",
+        "value": "src 1378 / app 1371"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "generated counts of the merged tree",
+        "decided": true,
+        "at": "2026-11-15T16:02:02.965Z",
+        "hunks": [
+          "c0342f654b62"
+        ]
+      }
+    ],
     ".claude/project-map.md›src›count": [
       {
         "ship": "claude/batch-901bea",
@@ -378,6 +412,23 @@
         "at": "2026-11-15T15:58:54.978Z",
         "hunks": [
           "c0342f654b62"
+        ]
+      }
+    ],
+    ".claude/project-map.md›supabase-count›count": [
+      {
+        "ship": "#1148",
+        "by": "Jerry",
+        "value": "supabase 426"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "generated count of the merged tree",
+        "decided": true,
+        "at": "2026-11-15T17:48:29.462Z",
+        "hunks": [
+          "60ee2da538de"
         ]
       }
     ],
@@ -424,6 +475,38 @@
         "at": "2026-11-15T04:18:13.845Z",
         "hunks": [
           "72caeb6e4c42"
+        ]
+      }
+    ],
+    ".claude/project-map.md›tracked-files›count": [
+      {
+        "ship": "#1148",
+        "by": "Jerry",
+        "value": "3131 tracked files"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "generated count of the merged tree (pre-commit regenerates gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-15T16:02:02.965Z",
+        "hunks": [
+          "54c86e87bf73"
+        ]
+      },
+      {
+        "ship": "#1145",
+        "by": "Jerry",
+        "value": "3133 tracked files"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "generated count of the merged tree",
+        "decided": true,
+        "at": "2026-11-15T17:48:29.462Z",
+        "hunks": [
+          "4dfefe9d74ef"
         ]
       }
     ],
@@ -623,6 +706,66 @@
         ]
       },
       {
+        "ship": "#1140",
+        "by": "Jerry",
+        "value": "0.270.8"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "\"current\": \"0.270.9\" (regenerated from CHANGELOG; 0.270.8 entry kept below)",
+        "decided": true,
+        "at": "2026-11-15T15:19:53.617Z",
+        "hunks": [
+          "8e282c9f1aa6"
+        ]
+      },
+      {
+        "ship": "#1148",
+        "by": "Jerry",
+        "value": "0.270.9"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "\"current\": \"0.270.10\" (regenerated; 0.270.9 entry kept below)",
+        "decided": true,
+        "at": "2026-11-15T15:37:06.247Z",
+        "hunks": [
+          "01184a991bb2"
+        ]
+      },
+      {
+        "ship": "#1141",
+        "by": "Jerry",
+        "value": "0.270.10"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "\"current\": \"0.270.11\" (regenerated; 0.270.10 entry kept below)",
+        "decided": true,
+        "at": "2026-11-15T15:41:45.558Z",
+        "hunks": [
+          "99ce2f9b4e4f"
+        ]
+      },
+      {
+        "ship": "#1142",
+        "by": "Jerry",
+        "value": "0.270.11"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "\"current\": \"0.270.12\" (regenerated; 0.270.11 entry kept below)",
+        "decided": true,
+        "at": "2026-11-15T15:49:04.118Z",
+        "hunks": [
+          "d9905b63158d"
+        ]
+      },
+      {
         "ship": "refactor/hq-scaction",
         "by": "JerryT2T",
         "value": "\"current\": \"0.270.9\" (regenerated from CHANGELOG)",
@@ -660,6 +803,21 @@
         "at": "2026-11-15T15:48:56.873Z",
         "hunks": [
           "8894fffa5668"
+        ]
+      },
+      {
+        "ship": "#1151",
+        "by": "Jerry",
+        "value": "0.270.15"
+      },
+      {
+        "ship": "claude/fix-desktop-connect-redirect",
+        "by": "JerryT2T",
+        "value": "\"current\": \"0.270.16\" (regenerated; 0.270.15 entry kept below)",
+        "decided": true,
+        "at": "2026-11-15T17:25:03.429Z",
+        "hunks": [
+          "1eef0d24323e"
         ]
       }
     ],

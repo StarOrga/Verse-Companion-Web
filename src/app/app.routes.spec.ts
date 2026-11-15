@@ -52,7 +52,7 @@ describe('retired route aliases', () => {
     'news', 'news/patches', 'news/patches/:line', 'hangar',
     'hangar/ship/:id', 'hangar/loadout/:id', 'codex/set/:id', 'codex/blueprint', 'p4k', 'desktop',
     'desktop/auth', 'admin/integrations', 'konzept/:id', 'companion', 'uploader', 'download',
-    'tools/extension', 'hangar/import', 'starscape', 'uploader/auth', 'desktop/connect',
+    'tools/extension', 'hangar/import', 'starscape', 'uploader/auth',
   ];
   for (const path of retired) {
     it(`has no ${path} route`, () => {
@@ -116,6 +116,32 @@ describe('root redirect keeps the query (AUD-144)', () => {
     const router = TestBed.inject(Router);
     await router.navigateByUrl('/?item=abc#x');
     expect(router.url).toBe('/verse?item=abc#x');
+  });
+});
+
+describe('legacy /desktop/connect redirect', () => {
+  it('is a top-level relative redirect outside the gated shell', () => {
+    const r = routes.find((x) => x.path === 'desktop/connect');
+    expect(r?.redirectTo).toBe('apps/starscape/connect');
+    expect(routes.indexOf(r!)).toBeLessThan(routes.indexOf(shellOf()!));
+  });
+
+  it('keeps cb and state when /desktop/connect redirects to /apps/starscape/connect', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([
+          routes.find((x) => x.path === 'desktop/connect')!,
+          { path: 'apps/starscape/connect', children: [] },
+        ]),
+        provideLocationMocks(),
+      ],
+    });
+    const router = TestBed.inject(Router);
+    const cb = 'http://127.0.0.1:61650/scc/callback';
+    await router.navigateByUrl(`/desktop/connect?cb=${encodeURIComponent(cb)}&state=abc123`);
+    const url = router.parseUrl(router.url);
+    expect(url.root.children['primary'].segments.map((s) => s.path)).toEqual(['apps', 'starscape', 'connect']);
+    expect(url.queryParams).toEqual({ cb, state: 'abc123' });
   });
 });
 
