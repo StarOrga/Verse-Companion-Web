@@ -93,3 +93,11 @@ General comment: none. Pins: none. Attachments: none.
 - [ ] C14 Migrate every popup of the mapping onto `sc-popup` per its kind (menus, panels, dialogs, large windows, notices); Sonderformen share scrim + ✕ only. The six separate CSS stacks (`HQ_DIALOG_STYLES`, `sc-overlay-frame`, `.cm-panel`, `.pick-win`, `sc-confirm-dialog`, `.qs-*`) end up on the shared scaffold.
 - [ ] C15 All new strings via ngx-translate (`public/i18n/{de,en}.json`); errors/logging per project rules; no native dialogs/tooltips/selects.
 - [ ] C16 Tests: unit specs for `sc-popup` (kinds, ✕ presence, scrim click does not close a modal, Escape closes, body scroll, stacking) + existing specs of migrated popups stay green; `npm run typecheck`, `npm run lint`, `npm test`, `npm run build` green.
+
+## Back gesture (r1-back, answered by the user in the session on 2026-11-15)
+
+**„Erst Fenster, dann Seite“**: every popup that is fullscreen on the phone (dialog, panel, large) and every large window closes on the back gesture first; the next back leaves the page. Menus and notices are excluded. Popups that already own a URL (wish cart `?cart=1`, overlay-frame child routes) keep their router behaviour.
+
+## Inventory and Wave-2 bundles
+
+File map of all 48 popups: [inventory.md](inventory.md) (scout, read-only). Ownership for Wave 2 follows its four bundles with these changes: `shared/overlay-frame/*` → bundle D (keep its public API, its consumers in A/B stay untouched); `shared/item-path/*` → bundle B (keep its public API); `hq/plan/hq-dialog.styles.ts` → bundle A (wish cart in C drops its import instead of editing it). `shared/dialog/*`, `src/styles.scss` and `public/i18n/*.json` belong to the foundation wave; Wave 2 agents report needed i18n keys instead of editing the JSON files.
