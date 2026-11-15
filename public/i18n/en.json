@@ -1399,7 +1399,6 @@
         "actionGroup": {
           "flight_control": "Flight Control",
           "weapons": "Weapons",
-          "targeting": "Targeting",
           "shields": "Shields",
           "power": "Power",
           "mfd_hud": "MFD / HUD",
@@ -2348,7 +2347,16 @@
         "targeting": "Targeting",
         "slowestMissileNote": "Lock time of the slowest missile.",
         "hintDps": "{{value}} DPS",
-        "hintAlpha": "{{value}} Alpha"
+        "hintAlpha": "{{value}} Alpha",
+        "colMissile": "Missile",
+        "colTracking": "Tracking signal",
+        "colCount": "Count",
+        "colWarhead": "Warhead",
+        "colMissileTotal": "Total damage",
+        "salvoNote": "One salvo of every missile at once — one-off damage, not part of the weapons DPS.",
+        "salvoPartial": "Not every missile has warhead figures; the salvo counts only the known ones.",
+        "noWarheadData": "The current data carries no warhead figures for these missiles yet.",
+        "hintMissiles": "{{value}} missile salvo"
       },
       "defensive": {
         "title": "Defence",
