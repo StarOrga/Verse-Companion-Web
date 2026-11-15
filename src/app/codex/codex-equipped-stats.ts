@@ -83,6 +83,57 @@ export interface EquippedStat {
 }
 
 /**
+ * Stat formats whose value does NOT add up across identical units — a reach,
+ * a speed, a duration, an angle, a ratio, a size class. Two SureGrips do not
+ * reach 300 m (feedback #233), where three Panthers do deal 3× the alpha.
+ */
+const PER_UNIT_FORMATS: ReadonlySet<EquippedStatFormat> = new Set<EquippedStatFormat>([
+  'seconds',
+  'metres',
+  'metresDec',
+  'mps',
+  'gm',
+  'kms',
+  'size',
+  'percent',
+  'degrees',
+]);
+
+/**
+ * Counted stats that are still a property of ONE unit, not an amount the run
+ * pools: three Panthers each fire 600 rpm (they do not fire "3× 600"), a flare
+ * keeps its own signature, a tractor beam pulls its own target.
+ */
+const PER_UNIT_LABELS: ReadonlySet<string> = new Set([
+  'codex.equipped.fireRate',
+  'codex.equipped.cmInfrared',
+  'codex.equipped.cmElectromagnetic',
+  'codex.equipped.cmCrossSection',
+  'codex.equipped.tractorForce',
+  'codex.equipped.radarSensitivity',
+]);
+
+/**
+ * Whether a stat is an AMOUNT that adds up across a stacked run (damage, HP,
+ * output, draw) — only those carry the "3×" reminder on a collapsed row and
+ * are summed into its "Gesamt" figure. Everything else (range, speed, fire
+ * rate, timings) is the same for every unit and reads once, unprefixed
+ * (feedback #351: "Reichweite braucht da nicht 3× 1924 m").
+ */
+export function statAddsUp(stat: Pick<EquippedStat, 'labelKey' | 'format'>): boolean {
+  return !PER_UNIT_FORMATS.has(stat.format) && !PER_UNIT_LABELS.has(stat.labelKey);
+}
+
+/**
+ * Identity of a stat run for stacking: two units only fold into one row when
+ * every curated value matches — "2× 1000 m + 1× 1200 m" are two different
+ * items and must keep their own rows (feedback #351).
+ */
+export function statsFingerprint(stats: readonly EquippedStat[] | null | undefined): string {
+  return (stats ?? []).map((s) => `${s.labelKey}=${s.value}`).join(';');
+}
+
+/**
  * CryEngine writes FLT_MAX (~3.4e38) for "unset/unlimited" — most visibly on
  * quantum-drive jumpRange. Anything at or above this is a sentinel, not data.
  * Mirrors the hangar's threshold so both surfaces agree.
