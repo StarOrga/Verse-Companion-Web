@@ -417,6 +417,42 @@
           "65f4d0fd9795"
         ]
       }
+    ],
+    "docs/concepts/20261115-0216-popup-aufbau.html›page›content": [
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "branch: concept owner session keeps the baked round 1 (the round exactly as the user submitted it) and the round-2 final report; the pre-submission r1-phone -> r1-back edit from #1123 is superseded by the user answer r1-back (Erst Fenster, dann Seite), recorded in briefs/implement.md",
+        "decided": true,
+        "at": "2026-11-15T05:05:26.249Z",
+        "hunks": [
+          "635c41ef7c37"
+        ]
+      }
+    ],
+    "docs/concepts/20261115-0216-popup-aufbau/page.json›lastBuild›value": [
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "branch: concept owner session keeps the baked round 1 (the round exactly as the user submitted it) and the round-2 final report; the pre-submission r1-phone -> r1-back edit from #1123 is superseded by the user answer r1-back (Erst Fenster, dann Seite), recorded in briefs/implement.md",
+        "decided": true,
+        "at": "2026-11-15T05:05:26.249Z",
+        "hunks": [
+          "86bd7b8adf46"
+        ]
+      }
+    ],
+    "docs/concepts/20261115-0216-popup-aufbau/rounds/01.html›round-1›content": [
+      {
+        "ship": "claude/modest-napier-9d1e5a",
+        "by": "Claude",
+        "value": "branch: concept owner session keeps the baked round 1 (the round exactly as the user submitted it) and the round-2 final report; the pre-submission r1-phone -> r1-back edit from #1123 is superseded by the user answer r1-back (Erst Fenster, dann Seite), recorded in briefs/implement.md",
+        "decided": true,
+        "at": "2026-11-15T05:05:26.249Z",
+        "hunks": [
+          "d45b14a0c427"
+        ]
+      }
     ]
   }
 }
