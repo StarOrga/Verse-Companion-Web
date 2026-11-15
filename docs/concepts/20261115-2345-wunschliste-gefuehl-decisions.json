@@ -1,0 +1,33 @@
+{
+  "concept": "20261115-2345-wunschliste-gefuehl",
+  "rounds": [
+    {
+      "iteration": 1,
+      "template": "design",
+      "action": "implement",
+      "submitted_at": "2026-11-15T22:53:59.530Z",
+      "favorite": "d3",
+      "designs": {
+        "d1": "Wunschzettel",
+        "d2": "Geschenk",
+        "d3": "Sternschnuppe"
+      },
+      "comments": {
+        "general": "bitte emit devops agents intensiv umsetzen!",
+        "designs": {},
+        "screens": {},
+        "views": {}
+      },
+      "annotations": [],
+      "userPins": [],
+      "unanswered_questions": [
+        "„Wünsche“ ohne „Liste“: klar genug in Sätzen wie „auf deine Wünsche gesetzt“?",
+        "Der Link öffnet die Suche der Seite … Gemessen wird das als „hq:wishlist_search_open“ … Fehlt dir eine Zahl?",
+        "Der Stern gehört heute den Erkunder-Erfolgen. Darf die Sternschnuppe trotzdem für Wünsche stehen?",
+        "Soll der Nachthimmel auch oben im großen Fenster stehen, oder nur im kleinen, solange es leer ist?",
+        "Beim Hinzufügen fliegt ein Stern ins Symbol. Soll derselbe Stern auch oben ins Symbol in der Kopfzeile fliegen?"
+      ],
+      "defaults_taken": "See briefs/implement.md § Round 1 submission."
+    }
+  ]
+}
