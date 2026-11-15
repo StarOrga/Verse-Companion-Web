@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, computed, effect, inject, signal, untracked } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { AnalyticsService } from '../../core/analytics.service';
 import { isPlainLeftClick } from '../../core/modified-click.util';
 import { hqNachschubPickLink } from '../../hq/hq-routes';
 import { NACHSCHUB_ICON_PATHS } from '../../hq/nachschub/step-icons';
@@ -9,15 +10,17 @@ import { PATH_ICONS } from '../../shared/item-path/path-icons';
 import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScQtyStepperComponent } from '../../shared/qty-stepper/qty-stepper.component';
 import { SilThumbComponent } from '../../shared/sil-thumb/sil-thumb.component';
+import { WishEmptyComponent } from '../../shared/wish-sky/wish-empty.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { ScPopupMotionDirective } from '../../shared/popup-motion/sc-popup-motion.directive';
 import type { CartItem } from '../cart/wish-cart.model';
 import { WishCartService } from '../cart/wish-cart.service';
 import { HeaderPopoutService } from '../header-popout.service';
+import { SearchOpenService } from '../search-open.service';
 import { wishRowOfType, type MerkRow } from './merkliste.model';
 import { MerklisteService } from './merkliste.service';
 
-/** How many wishlist positions the panel lists before "Ganze Wunschliste". */
+/** How many wishes the panel lists before "Alle Wünsche". */
 export const WISH_PANEL_SHOWN = 7;
 
 const TRASH = ['M4.5 7h15M10 7V4.5h4V7M6.5 7l1 13h9l1-13M10 11v5.5M14 11v5.5'] as const;
@@ -39,7 +42,7 @@ interface WishLine {
 @Component({
   selector: 'sc-merkliste',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective, ScPopupMotionDirective, SilThumbComponent, ScQtyStepperComponent],
+  imports: [RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective, ScPopupMotionDirective, SilThumbComponent, ScQtyStepperComponent, WishEmptyComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mk">
@@ -56,10 +59,13 @@ interface WishLine {
                The title is the list's name; the count stands once, in the footer. -->
           <sc-popup kind="panel" [title]="'quick.wish' | translate"
                     [returnFocus]="trigger" [backClose]="false" (closed)="close()">
+          @if (cart.count() === 0) {
+            <sc-wish-empty (search)="searchWish()" />
+          } @else {
           @for (l of lines(); track l.item.key) {
             <div class="qrow">
               <a class="open" [routerLink]="l.row.target!.link" [queryParams]="l.row.target!.queryParams" [fragment]="l.row.target!.fragment ?? undefined" (click)="onOpen($event)">
-                <span class="rimg"><sc-sil-thumb [kind]="l.row.kind ?? l.row.type" [className]="l.row.className ?? l.row.id" /></span>
+                <span class="rimg sc-wish-dot"><sc-sil-thumb [kind]="l.row.kind ?? l.row.type" [className]="l.row.className ?? l.row.id" /></span>
                 <span class="rt"><b>{{ l.row.title }}</b>@if (sub(l.row); as s) { <small>{{ s | translate }}</small> }</span>
               </a>
               <sc-qty-stepper class="step" [value]="l.item.qty" [groupLabel]="'cart.qtyOf' | translate: { name: l.row.title }"
@@ -76,13 +82,17 @@ interface WishLine {
                 <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="trash[0]" /></svg>
               </button>
             </div>
-          } @empty {
-            <p class="empty">{{ 'quick.emptyWish' | translate }}</p>
           }
-          <ng-container popupActions>
-            <a scAction class="all" [attr.href]="svc.cartHref()" (click)="onCart($event)">{{ 'quick.allWish' | translate }}</a>
-          </ng-container>
-          <span popupStatus class="all-count" role="status">{{ (cart.count() === 1 ? 'quick.allWishCountOne' : 'quick.allWishCount') | translate: { n: cart.count() } }}</span>
+          }
+          <!-- While the list is empty the popout has no footer: the empty state's one primary action is the whole offer. -->
+          @if (cart.count() > 0) {
+            <ng-container popupActions>
+              <a scAction class="all" [attr.href]="svc.cartHref()" (click)="onCart($event)">{{ 'quick.allWish' | translate }}</a>
+            </ng-container>
+          }
+          @if (cart.count() > 0) {
+            <span popupStatus class="all-count" role="status">{{ (cart.count() === 1 ? 'quick.allWishCountOne' : 'quick.allWishCount') | translate: { n: cart.count() } }}</span>
+          }
           </sc-popup>
         </div>
       }
@@ -113,7 +123,6 @@ interface WishLine {
       .open:hover .rt b { color: var(--sc-accent); }
       .rt small { font-size: max(0.72rem, var(--sc-fs-floor, 0.75rem)); color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       /* Stepper (not an action): same look as the cart dialog's. */
-      .empty { margin: 8px 4px; color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor, 0.75rem)); }
       /* Touch floor of the gate: 48 px (a 44 px value measures 43), by pointer, not by width, so tablets pass too. */
       @media (pointer: coarse), (max-width: 749px) {
         .trigger { width: 48px; height: 48px; }
@@ -126,6 +135,8 @@ export class MerklisteComponent {
   protected readonly svc = inject(MerklisteService);
   protected readonly cart = inject(WishCartService);
   private readonly popouts = inject(HeaderPopoutService);
+  private readonly analytics = inject(AnalyticsService);
+  private readonly searchOpen = inject(SearchOpenService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly panelId = 'sc-merkliste-panel';
@@ -177,11 +188,23 @@ export class MerklisteComponent {
     this.svc.refresh();
     this.popouts.claim('wishlist');
     this.open.set(true);
+    this.analytics.track('hq:wishlist_open', { surface: 'popout' });
   }
 
   protected close(): void {
     this.open.set(false);
     this.popouts.release('wishlist');
+  }
+
+  /**
+   * "Wunsch suchen" (empty state): the popout folds away first, then the search of the page the reader is on opens as if
+   * they had clicked into it. The focus lands in that field before the popup's focus return looks (it only restores
+   * focus that is on nothing), so it is not pulled back to the trigger.
+   */
+  protected searchWish(): void {
+    this.analytics.track('hq:wish_search_open', { surface: 'popout' });
+    this.close();
+    this.searchOpen.open();
   }
 
   /** A row link folds the panel away on a plain left click only; a modified click opens a tab and stays. */

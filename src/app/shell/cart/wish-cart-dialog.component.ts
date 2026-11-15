@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } 
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { polyHitLink, type PolyHitKind } from '../../codex/codex-poly-search';
+import { AnalyticsService } from '../../core/analytics.service';
 import { isPlainLeftClick } from '../../core/modified-click.util';
 import { hqNachschubPickLink } from '../../hq/hq-routes';
 import { pickedShare, setPicked, toggleGroup, type FlowGroup } from '../../hq/plan/hq-nachschub-flow.util';
@@ -12,10 +13,13 @@ import { ScEntryDirective } from '../../shared/entry-motion/entry-motion';
 import { PATH_ICONS } from '../../shared/item-path/path-icons';
 import { SilThumbComponent } from '../../shared/sil-thumb/sil-thumb.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { WishEmptyComponent } from '../../shared/wish-sky/wish-empty.component';
+import { WishSkyComponent } from '../../shared/wish-sky/wish-sky.component';
 import { NachschubService } from '../../hq/nachschub/nachschub.service';
 import { NACHSCHUB_ICON_PATHS } from '../../hq/nachschub/step-icons';
 import type { Recommendation } from '../../hq/nachschub/recommend';
 import type { CartItem } from './wish-cart.model';
+import { SearchOpenService } from '../search-open.service';
 import { WishCartService } from './wish-cart.service';
 
 const TRASH = ['M4.5 7h15M10 7V4.5h4V7M6.5 7l1 13h9l1-13M10 11v5.5M14 11v5.5'] as const;
@@ -33,7 +37,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
 @Component({
   selector: 'sc-wish-cart',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScEntryDirective, ScTooltipDirective, SilThumbComponent, ScQtyStepperComponent],
+  imports: [RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScEntryDirective, ScTooltipDirective, SilThumbComponent, ScQtyStepperComponent, WishEmptyComponent, WishSkyComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- The scrim does not close the cart (a selection would be lost): the X, Escape or the browser's back do. The cart owns ?cart=1, so no extra history entry. -->
@@ -41,11 +45,9 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       <svg popupIcon viewBox="0 0 24 24">@for (d of wishPath; track $index) { <path [attr.d]="d" /> }</svg>
       <div class="cart-body">
           @if (cart.count() === 0) {
-            <div class="empty">
-              <p class="empty-t">{{ 'cart.empty' | translate }}</p>
-              <p class="empty-h">{{ 'cart.emptyHint' | translate }}</p>
-            </div>
+            <sc-wish-empty (search)="searchWish()" />
           } @else {
+            <sc-wish-sky class="strip" variant="strip" />
             <div class="groups">
               @for (g of cart.groups(); track g.id) {
                 <section class="group ce" [class.bp]="g.type === 'blueprint'" [style.--n]="span(g)" [style.--ce]="$index + 1" [attr.aria-label]="groupTitle(g)">
@@ -71,7 +73,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
                                  [attr.aria-label]="'cart.select' | translate: { name: cart.nameOf(it) }" (change)="onTile(g, r.key, r.qty)" />
                           <!-- A click on the picture or the name ticks the position (the label of its checkbox); the Codex page is the arrow. -->
                           <label class="pickarea" [for]="chkId">
-                            <span class="sil"><sc-sil-thumb [kind]="it.kind" [className]="it.className" /></span>
+                            <span class="sil sc-wish-dot"><sc-sil-thumb [kind]="it.kind" [className]="it.className" /></span>
                             <span class="nm">{{ cart.nameOf(it) }}</span>
                             <small class="sub">{{ ('cart.kind.' + kindKey(it)) | translate }}@if (it.manufacturer) { · {{ it.manufacturer }} }</small>
                           </label>
@@ -129,6 +131,8 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
         </section>
       }
 
+      <!-- While the list is empty the window has no footer: its one primary action is the empty state's "Wunsch suchen". -->
+      @if (cart.count() > 0) {
       <ng-container popupActions>
         <a scAction tier="primary" class="go" [class.off]="picks().size === 0" [attr.aria-disabled]="picks().size === 0 ? 'true' : null" [attr.role]="picks().size === 0 ? 'link' : null"
            [routerLink]="picks().size === 0 ? null : ['/hq']" [fragment]="'planen'" [queryParams]="pickParams()" (click)="onGo($event)">
@@ -137,6 +141,8 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
         </a>
         <button type="button" scAction tier="secondary" [disabled]="picks().size === 0" (click)="picks.set(emptyPicks)"><span>{{ 'cart.clear' | translate }}</span></button>
       </ng-container>
+      }
+      @if (cart.count() > 0) {
       <span popupStatus class="cart-status">
         <span class="cart-sum">{{ summaryKey() | translate: { n: cart.count(), g: cart.groups().length } }}</span>
         <span class="sel-count" role="status"><b>{{ selectedCount() }}</b> {{ 'cart.selected' | translate }}</span>
@@ -144,6 +150,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
           <span class="full-hint" role="status">{{ 'cart.slotsFullHint' | translate }}</span>
         }
       </span>
+      }
     </sc-popup>
   `,
   styles: [
@@ -198,9 +205,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       .sel-count { font-size: 0.85rem; color: var(--sc-fg-1); }
       .sel-count b { color: var(--sc-accent); font-variant-numeric: tabular-nums; }
       .go.off { opacity: 0.45; cursor: default; }
-      .empty { display: grid; place-items: center; gap: 4px; padding: 40px 16px; text-align: center; }
-      .empty-t { margin: 0; font-weight: 600; }
-      .empty-h { margin: 0; color: var(--sc-fg-2); font-size: 0.85rem; }
+      .strip { margin-bottom: 12px; }
       @media (max-width: 900px) {
         .group { flex-basis: 100%; }
         .s-row { grid-template-columns: 1fr; }
@@ -229,6 +234,9 @@ export class WishCartDialogComponent {
   protected readonly openIcon = OPEN;
   protected readonly emptyPicks: ReadonlyMap<string, number> = new Map();
 
+  private readonly analytics = inject(AnalyticsService);
+  private readonly searchOpen = inject(SearchOpenService);
+
   /** The selection: position key -> picked quantity (the whole quantity unless a split was made in Planen). */
   protected readonly picks = signal<ReadonlyMap<string, number>>(this.emptyPicks);
   /** "1 Position · 1 Gruppe", "5 Positionen · 1 Gruppe", else the plural form. */
@@ -239,6 +247,7 @@ export class WishCartDialogComponent {
   protected readonly pickParams = computed(() => hqNachschubPickLink([...this.picks()].map(([key, qty]) => ({ key, qty }))).queryParams ?? {});
 
   constructor() {
+    this.analytics.track('hq:wishlist_open', { surface: 'cart' });
     this.cart.ensureCatalogue();
     void this.ns.ensureLoaded();
     // A removed position drops out of the selection.
@@ -312,6 +321,15 @@ export class WishCartDialogComponent {
   /** The Codex page of a position: a plain click leaves the cart for it, a modified click opens a tab and keeps it. */
   protected onOpen(ev: MouseEvent): void {
     if (isPlainLeftClick(ev)) void this.cart.close();
+  }
+
+  /**
+   * "Wunsch suchen" (empty state): the window closes first (while it stands the page is inert and no field behind it
+   * could take the caret), then the search of the page the reader is on opens as if they had clicked into it.
+   */
+  protected searchWish(): void {
+    this.analytics.track('hq:wish_search_open', { surface: 'cart' });
+    void this.cart.close().then(() => this.searchOpen.openAfterRender());
   }
 
   protected onGo(ev: MouseEvent): void {
