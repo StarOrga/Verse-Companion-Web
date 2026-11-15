@@ -255,20 +255,19 @@ describe('Verse News — harmonised controls', () => {
     beforeEach(() => {
       fixture.componentInstance.openDetail(feed().news[1]);
       fixture.detectChanges();
-      panel = document.querySelector('.nd-panel') as HTMLElement;
+      panel = document.querySelector('sc-popup .scp-frame') as HTMLElement;
       expect(panel, 'overlay panel').not.toBeNull();
     });
 
-    it('closes through a back link in the same idiom as the patch board, not a ✕ disc', () => {
-      const back = panel.querySelector<HTMLElement>('.nd-head .nd-back');
-      expect(back, 'back control').not.toBeNull();
-      expect(back!.textContent).toContain('←');
-      expect(panel.querySelector('.nd-close'), 'old ✕ button').toBeNull();
+    it('closes through the scaffold ✕ — one close control, no own back link', () => {
+      const x = panel.querySelector<HTMLElement>('.scp-x');
+      expect(x, 'close control').not.toBeNull();
+      expect(panel.querySelector('.nd-back'), 'old back link').toBeNull();
 
-      back!.click();
+      x!.click();
       fixture.detectChanges();
       expect(fixture.componentInstance.selected()).toBeNull();
-      expect(document.querySelector('.nd-panel')).toBeNull();
+      expect(document.querySelector('sc-popup .scp-frame')).toBeNull();
     });
 
     it('fits inside the viewport', () => {
@@ -280,19 +279,19 @@ describe('Verse News — harmonised controls', () => {
     });
 
     it('shows the actions without a scroll — that was the whole complaint', () => {
-      const actions = panel.querySelector<HTMLElement>('.nd-actions')!;
+      const actions = panel.querySelector<HTMLElement>('.scp-f')!;
       const r = actions.getBoundingClientRect();
       expect(r.height, 'actions laid out').toBeGreaterThan(0);
       expect(r.bottom).toBeLessThanOrEqual(window.innerHeight + 1);
 
-      const body = panel.querySelector<HTMLElement>('.nd-body')!;
-      expect(body.scrollHeight - body.clientHeight, 'no hidden overflow in the text column').toBeLessThanOrEqual(1);
+      const body = panel.querySelector<HTMLElement>('.scp-b')!;
+      expect(body.scrollHeight - body.clientHeight, 'no hidden overflow in the body').toBeLessThanOrEqual(1);
     });
 
     it('carries the same two controls as the rest of the page', () => {
-      const labels = Array.from(panel.querySelectorAll('.nd-actions .sc-btn'));
+      const labels = Array.from(panel.querySelectorAll('.scp-f .sc-action'));
       expect(labels.length).toBe(3);
-      for (const btn of labels.slice(0, 2)) {
+      for (const btn of labels.slice(1, 3)) {
         expect(btn.querySelector('.ic svg'), btn.textContent!).not.toBeNull();
       }
     });
