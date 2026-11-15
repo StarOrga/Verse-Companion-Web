@@ -4,13 +4,25 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.270.2] - 2026-11-15
+## [0.270.4] - 2026-11-15
 
 ### Fixed
 - Codex rank: a ship's place and the group median now count each hull once — editions and duplicate records of one hull no longer inflate a comparison group (#968).
 
 ### Changed
 - Social pages: every action button uses the shared action control (one main step per page, red tone for report and delete) (#970).
+
+## [0.270.3] - 2026-11-15
+
+### Fixed
+- With admin access the header no longer runs past a 1280 px window or breaks onto two rows at 1440 px: the admin entries fold into the Admin menu below 1600 px.
+- Popup row cascades keep their exact 30 ms rhythm even on a busy machine.
+
+## [0.270.2] - 2026-11-15
+
+### Fixed
+- With admin access the header no longer runs past a 1280 px window or breaks onto two rows at 1440 px: the admin entries fold into the Admin menu below 1600 px.
+- Popup row cascades keep their exact 30 ms rhythm even on a busy machine.
 
 ## [0.270.1] - 2026-11-15
 
