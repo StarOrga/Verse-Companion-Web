@@ -279,7 +279,8 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
     }
     @keyframes ip-fill {
       0%, 52% { fill: transparent; }
-      76% { fill: color-mix(in srgb, currentColor 28%, transparent); }
+      /* var(--sc-accent), not currentColor: a currentColor colour mix in animated fill next to the streak crashed Chromium (Edge) renderers. */
+      76% { fill: color-mix(in srgb, var(--sc-accent) 28%, transparent); }
     }
     @keyframes ip-star-in {
       0% { opacity: 0; transform: translate(120px, -70px) rotate(-30deg); }

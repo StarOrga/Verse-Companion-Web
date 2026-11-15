@@ -262,18 +262,18 @@ describe('ItemPathComponent: the two-node path', () => {
       expect(adding(t).length).toBe(0);
     });
 
-    it('plays from the pill button and from the detail page, where the wish stop carries it', async () => {
-      const pill = setup({ level: 'secondary' });
-      wishing(pill);
-      await pill.click(pill.el.querySelector<HTMLButtonElement>('button.go')!);
-      expect(pill.node('wish')!.hasAttribute('data-adding')).toBe(true);
-      pill.fixture.destroy();
-      TestBed.resetTestingModule();
+    it('plays from the pill button', async () => {
+      const t = setup({ level: 'secondary' });
+      wishing(t);
+      await t.click(t.el.querySelector<HTMLButtonElement>('button.go')!);
+      expect(t.node('wish')!.hasAttribute('data-adding')).toBe(true);
+    });
 
-      const page = setup({ level: 'primary' });
-      wishing(page);
-      await page.click(page.el.querySelector<HTMLButtonElement>('.stop button.sc-action--primary')!);
-      expect(page.el.querySelector('.stop-h')!.hasAttribute('data-adding')).toBe(true);
+    it('plays on the detail page, where the wish stop carries it', async () => {
+      const t = setup({ level: 'primary' });
+      wishing(t);
+      await t.click(t.el.querySelector<HTMLButtonElement>('.stop button.sc-action--primary')!);
+      expect(t.el.querySelector('.stop-h')!.hasAttribute('data-adding')).toBe(true);
     });
   });
 });
