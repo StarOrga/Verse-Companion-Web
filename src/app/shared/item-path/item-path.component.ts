@@ -295,7 +295,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
       min-height: var(--sc-tap-min, 0px); padding: 4px 2px; border: 0; background: none; cursor: pointer; font: inherit; font-size: 0.8125rem;
       color: var(--sc-accent); text-decoration: underline; text-underline-offset: 3px;
     }
-    .txt:focus-visible, .alink:focus-visible, .place:focus-visible, .st button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .txt:focus-visible, .alink:focus-visible, .place:focus-visible, .st button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     /* Frame, ✕, width and the phone full screen come from sc-popup; only content rules stay. */
     .rp.err { color: var(--sc-danger); }
@@ -321,7 +321,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
       flex: 1 1 auto; min-width: 0; min-height: max(36px, var(--sc-tap-min, 0px)); padding: 4px 10px; font: inherit;
       border: 1px solid var(--sc-border); border-radius: 6px; background: var(--sc-bg-0); color: var(--sc-fg-0);
     }
-    .other input:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .other input:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     @media (max-width: 640px) {
       .node.sc-action.sc-action--tertiary { width: max(44px, var(--sc-tap-min, 0px)); height: max(44px, var(--sc-tap-min, 0px)); }

@@ -522,7 +522,7 @@ function scrollBehavior(): ScrollBehavior {
     .fc .img { position: relative; display: block; min-height: 150px; height: 100%; background: linear-gradient(135deg, var(--sc-bg-3), var(--sc-bg-0)); }
     .fc .img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease; }
     a.img[href]:hover img { transform: scale(1.04); }
-    a.img[href]:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    a.img[href]:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .fc .go {
       position: absolute; right: 6px; bottom: 6px; display: inline-flex; align-items: center; justify-content: center;
       width: 20px; height: 20px; border-radius: 4px; font-size: 0.72rem;
@@ -561,7 +561,7 @@ function scrollBehavior(): ScrollBehavior {
       flex: 1 1 auto; min-height: var(--sc-tap-min); padding: 8px 40px 8px 12px; border: 1px solid var(--sc-border); border-radius: 8px;
       background: var(--sc-bg-0); color: var(--sc-fg-0); font: inherit; font-size: max(0.86rem, var(--sc-fs-input));
     }
-    .s-input:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .s-input:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .s-input::-webkit-search-cancel-button { display: none; }
     .s-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); min-width: var(--sc-tap-min); min-height: var(--sc-tap-min); border: 0; background: transparent; color: var(--sc-fg-2); font-size: 1.2rem; cursor: pointer; }
     .coverage { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 8px 0; font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }

@@ -134,7 +134,7 @@ export type AddToSetView = 'loading' | 'error' | 'noSet' | 'noFit' | 'pickSet' |
       min-height: max(32px, var(--sc-tap-min));
     }
     .ats-trigger:hover, .ats-trigger[aria-expanded='true'] { border-color: var(--sc-accent); color: var(--sc-accent); }
-    .ats-trigger:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .ats-trigger:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* Anchored under its trigger; frame, ✕ and width come from sc-popup. */
     .ats-pop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 20; }
     /* Phone: the popup frame is fixed full-screen; lift the wrapper onto the popup layer (above the shell header). */
@@ -155,7 +155,7 @@ export type AddToSetView = 'loading' | 'error' | 'noSet' | 'noFit' | 'pickSet' |
       min-height: var(--sc-tap-min);
     }
     .ats-opt:hover:not(:disabled), .ats-opt:focus-visible { border-color: var(--sc-accent); }
-    .ats-opt:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .ats-opt:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .ats-opt:disabled { opacity: 0.5; cursor: default; }
     .ats-opt-sub { color: var(--sc-fg-2); font-size: max(0.72rem, var(--sc-fs-floor)); }
     .ats-link {
@@ -165,7 +165,7 @@ export type AddToSetView = 'loading' | 'error' | 'noSet' | 'noFit' | 'pickSet' |
       font-size: max(0.72rem, var(--sc-fs-floor));
     }
     .ats-link:hover, .ats-link:focus-visible { text-decoration: underline; }
-    .ats-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .ats-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @media (pointer: coarse) {
       .ats-trigger { min-height: max(44px, var(--sc-tap-min)); }
     }

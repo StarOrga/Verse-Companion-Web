@@ -144,7 +144,7 @@ const COLLAPSE_DELAY_MS = 150;
         text-transform: uppercase;
         color: var(--sc-fg-0);
       }
-      .picker-btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .picker-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .picker-btn b { color: var(--sc-accent); font-size: 13px; }
       .picker-btn__arrow { color: rgba(242, 247, 251, .45); font-size: 8px; }
       .picker.amber .picker-btn { border-color: color-mix(in srgb, var(--amber, #f0c27b) 45%, transparent); }
@@ -187,7 +187,7 @@ const COLLAPSE_DELAY_MS = 150;
       }
       .picker-chain__item.on { color: var(--sc-fg-0); border-bottom-color: var(--amber, #f0c27b); }
       .picker-chain__item:hover { color: var(--sc-fg-0); }
-      .picker-chain__item:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+      .picker-chain__item:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
 
       @media (prefers-reduced-motion: reduce) {
         .picker-chain { transition: none; }

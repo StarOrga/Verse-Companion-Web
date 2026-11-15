@@ -4,6 +4,19 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.269.0] - 2026-11-15
+
+### Changed
+- Focus indication is now a soft glow that only appears when navigating by keyboard — no more hard rings after a mouse click.
+- Star maps never show a default constellation: with nothing discovered yet you see one single star, otherwise only the shape you discovered. The legend is gone; hovering a star explains it.
+- Patch tip: there is only ever one tip — on the next patch CIG has actually announced. Without an announced patch there is no tip. A tip now counts as a hit within ±1 day (was ±2); existing tips were re-evaluated.
+- Codex landing: "Alle …" and "+N neue & aktualisierte" sit together as one group, the hologram beam fans out from a light point, and the data sheet lists up to seven values with a "<Name> ansehen" button.
+- Codex detail pages of items without a 3D model open on the Akte.
+- The label in the search field takes only its text width and widens to show its remove button on hover.
+
+### Fixed
+- Small texts on the rank page, the patch-tip hint and the data sheet now meet the 12 px mobile minimum.
+
 ## [0.268.1] - 2026-11-15
 
 ### Fixed

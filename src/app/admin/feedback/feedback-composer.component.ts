@@ -546,8 +546,8 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
     /* The focus ring belongs on the whole control, not on the 16px box alone —
        the label is the hit area, so it is also what the keyboard lands on. */
     .complex:has(input:focus-visible) {
-      outline: 2px solid var(--sc-accent);
-      outline-offset: 2px;
+      outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+      outline-offset: 0;
       border-radius: 4px;
     }
     .sc-btn.micro { padding: 4px 10px; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.04em; }

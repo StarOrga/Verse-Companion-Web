@@ -42,8 +42,8 @@
   border-radius: 10px;
   container-type: inline-size;
 }
-:is(.sun-l, .const-l, .hq-l):focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 4px; }
-.adm-l:focus-visible { outline: 2px solid var(--sc-accent-hot); outline-offset: 4px; }
+:is(.sun-l, .const-l, .hq-l):focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+.adm-l:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-hot); }
 
 // ── Sun: warm, the one warm tone on the stage ───────────────────────────
 // Concept "Sonne & Planeten" (2026-10-31): a living star instead of a glow

@@ -1,6 +1,7 @@
 import { TranslateService } from '@ngx-translate/core';
 import { formatNumber, humanizeClassName } from '../codex-format';
 import { LandingCategory, LandingValue } from './codex-landing-data.types';
+import { statLabelI18nKey } from '../detail/stat-labels';
 
 /** Callouts at the hologram (round 1 look): at most three, the rest goes to the bars pane. */
 export const MAX_CALLOUTS = 3;
@@ -169,7 +170,15 @@ export function valueLabel(t: Pick<TranslateService, 'instant'>, key: string): s
   const out = t.instant(k);
   if (typeof out === 'string' && out !== k) return out;
   const last = key.split('.').pop() ?? key;
-  return humanizeClassName(last.replace(/([a-z])([A-Z])/g, '$1 $2'));
+  // A non-ship value carries the engine's field name (weaponParams.fireRate): reuse the
+  // detail pages' stat translations before falling back to the humanized English name.
+  const words = last.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase());
+  const statKey = statLabelI18nKey(words);
+  if (statKey) {
+    const stat = t.instant(statKey);
+    if (typeof stat === 'string' && stat !== statKey) return stat;
+  }
+  return humanizeClassName(words);
 }
 
 export function valueText(v: Pick<LandingValue, 'value' | 'unit' | 'text'>): string {

@@ -155,7 +155,7 @@ export interface HangarExemplar {
     .hb .ex { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--sc-fg-0); }
     .hb .car { color: var(--sc-accent); font-size: 10px; }
     .hb:hover, .hb.open { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); border-color: var(--sc-accent); }
-    .hb:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .hb:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* Anchored under its button; frame and width (menu tier) come from sc-popup. */
     .menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; max-width: calc(100vw - 24px);
       /* The scaffold body scrolls; cap the frame here instead of a second scroller inside it. */
@@ -167,7 +167,7 @@ export interface HangarExemplar {
       border: 0; border-radius: 8px; background: none; color: var(--sc-fg-1); font: inherit; font-size: max(12.5px, var(--sc-fs-floor));
       text-align: start; text-decoration: none; cursor: pointer; }
     @media (hover: hover) { .row:hover, .add:hover:not(:disabled), .go:hover, .act:hover { background: color-mix(in srgb, var(--sc-accent) 10%, transparent); color: var(--sc-fg-0); } }
-    .row:focus-visible, .add:focus-visible, .go:focus-visible, .act:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .row:focus-visible, .add:focus-visible, .go:focus-visible, .act:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .row.on { background: color-mix(in srgb, var(--sc-accent) 12%, transparent); color: var(--sc-fg-0); }
     .radio { flex: none; width: 12px; height: 12px; margin-top: 3px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--sc-fg-2); }
     .row.on .radio { border-color: var(--sc-accent); background: radial-gradient(circle, var(--sc-accent) 0 45%, transparent 50%); }

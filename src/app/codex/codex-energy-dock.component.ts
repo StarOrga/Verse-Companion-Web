@@ -650,8 +650,8 @@ let uidSeq = 0;
         cursor: pointer;
       }
       .stack .pip:focus-visible {
-        outline: 2px solid var(--sc-accent);
-        outline-offset: 1px;
+        outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+        outline-offset: 0;
       }
       .stack .pip:disabled {
         cursor: default;

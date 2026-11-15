@@ -1358,7 +1358,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
     .answer-options, .f-chips { display: flex; flex-wrap: wrap; gap: 8px; }
     .f-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-height: 48px; padding: 0 14px; background: var(--sc-bg-2); border: 1px solid var(--sc-border); border-radius: 999px; color: var(--sc-fg-1); font: inherit; font-size: max(0.86rem, var(--sc-fs-floor)); text-align: left; cursor: pointer; }
     .f-chip:hover, .load-more:hover, .new-topic-bar:hover { border-color: var(--sc-accent); color: var(--sc-fg-0); }
-    .f-chip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .f-chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .f-chip.sub { border-style: dashed; }
     /* Selected is a filled pill with a tick — the state has to read without
        colour, the way the old left accent bar did. */

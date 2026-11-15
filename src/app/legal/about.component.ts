@@ -188,7 +188,7 @@ const HIGHLIGHTS = 4;
       background: color-mix(in srgb, var(--sc-accent) 8%, transparent);
     }
     .cta:hover { background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-    .cta:focus-visible, .mini:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .cta:focus-visible, .mini:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .earlier-title { font-size: 0.85rem; color: var(--sc-fg-2); text-transform: uppercase; letter-spacing: 0.1em; }
     .earlier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
     .mini { display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: inherit; padding: 14px 16px; }

@@ -116,7 +116,7 @@ import {
     .switch .knob { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--sc-fg-2); transition: transform 0.15s ease, background 0.15s ease; }
     .switch.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 15%, transparent); }
     .switch.on .knob { transform: translateX(18px); background: var(--sc-accent); }
-    .switch:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .switch:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .switch:disabled { opacity: 0.6; cursor: default; }
     @media (prefers-reduced-motion: reduce) { .switch .knob { transition: none; } }
     @media (pointer: coarse) { .switch { min-height: 48px; width: 56px; border-radius: 24px; } .switch .knob { top: 14px; } }

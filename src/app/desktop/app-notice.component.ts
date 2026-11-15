@@ -89,7 +89,7 @@ const STARSCAPE_FALLBACK_URL =
     .head small { font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.18em; text-transform: uppercase; color: var(--sc-accent); }
     .head b { font-size: 0.92rem; font-weight: 600; color: var(--sc-fg-0); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .toast.open .head b { white-space: normal; }
-    .head:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .head:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .more {
       grid-column: 1 / -1; display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.26s ease;
     }

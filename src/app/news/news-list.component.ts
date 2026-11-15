@@ -438,7 +438,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
     @media (pointer: coarse) {
       .stage-link { display: flex; align-items: center; min-height: max(48px, var(--sc-tap-min)); }
     }
-    .stage-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 4px; border-radius: 4px; }
+    .stage-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
     .stage-deck {
       margin: 0 0 14px; color: var(--sc-fg-1); font-size: 0.9rem; line-height: 1.5;
       display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
@@ -458,7 +458,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       letter-spacing: 0.1em; text-transform: uppercase;
     }
     .cta:hover { background: color-mix(in srgb, var(--sc-accent) 84%, white); }
-    .cta:focus-visible { outline: 2px solid var(--sc-fg-0); outline-offset: 3px; }
+    .cta:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     /* ---------- 2 · Verdict ----------
        Its own surface over the artwork, docked bottom-right. It is the entire
@@ -535,7 +535,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       letter-spacing: 0.08em; color: var(--sc-accent); text-decoration: none;
     }
     .verdict-link:hover { color: color-mix(in srgb, var(--sc-accent) 80%, white); }
-    .verdict-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .verdict-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     /* On a narrow viewport the verdict leaves the artwork and becomes a plain
        band under it — a 320px card over a 375px-wide hero would cover the
@@ -579,7 +579,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
     .chip.on { color: var(--sc-bg-0); background: var(--sc-accent); }
     .chip.saved.on { background: var(--sc-warning); }
     .chip.on .chip-num { background: color-mix(in srgb, var(--sc-bg-0) 24%, transparent); }
-    .chip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
 
     .cards {
       display: grid; gap: var(--news-gap);
@@ -594,7 +594,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
     }
     .card-link { color: inherit; text-decoration: none; }
     .card-link-touch-target { position: absolute; inset: 0; z-index: 5; }
-    .card-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 3px; border-radius: 3px; }
+    .card-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 3px; }
     .card:hover {
       border-color: var(--sc-accent);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4),
@@ -682,7 +682,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       display: inline-block; line-height: 1.6;
     }
-    .act:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+    .act:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
     /* On artwork the two controls need a surface of their own to stay readable. */
     .stage-actions .act {
       color: var(--sc-fg-1);
@@ -699,7 +699,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       letter-spacing: 0.08em; cursor: pointer;
     }
     .more:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
-    .more:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .more:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     /* ---------- Freshness ---------- */
     .freshness {
@@ -744,7 +744,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
     .err { color: var(--sc-danger); padding: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .err .retry:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .err .retry:disabled { opacity: 0.5; cursor: default; }
 
     /* ---------- Detail popup ----------
@@ -814,7 +814,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       display: inline-block; line-height: 1.6;
     }
-    .act:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+    .act:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
     /* On artwork the two controls need a surface of their own to stay readable. */
     .stage-actions .act {
       color: var(--sc-fg-1);
@@ -831,7 +831,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       letter-spacing: 0.08em; cursor: pointer;
     }
     .more:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
-    .more:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .more:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     /* ---------- Freshness ---------- */
     .freshness {
@@ -876,7 +876,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
     .err { color: var(--sc-danger); padding: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .err .retry:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .err .retry:disabled { opacity: 0.5; cursor: default; }
 
     /* ---------- Detail overlay ----------
@@ -919,7 +919,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       font-size: max(0.76rem, var(--sc-fs-floor));
     }
     .nd-back:hover { color: var(--sc-accent); }
-    .nd-back:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 3px; border-radius: 4px; }
+    .nd-back:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
 
     /* The art takes everything the text leaves over — it is the only elastic
        row, so the body can never be squeezed into a scrollbar. */
@@ -933,7 +933,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       transform: translate(-50%, -50%) scale(1.1);
       background: var(--sc-accent); color: var(--sc-bg-0); outline: none;
     }
-    .play-link:focus-visible { outline: 2px solid var(--sc-fg-0); outline-offset: 3px; }
+    .play-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     .nd-body { display: flex; flex-direction: column; gap: var(--sc-gap-2); padding-top: var(--sc-pad-2); }
     .nd-chan {

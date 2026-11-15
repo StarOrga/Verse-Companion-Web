@@ -410,7 +410,7 @@ const RENDER_CHUNK = 24;
       color: inherit; text-decoration: none;
       transition: transform 0.16s ease, box-shadow 0.16s ease;
     }
-    .tile:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .tile:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .tile-wrap:hover { transform: translateY(-2px); }
     .tile-wrap:hover > .tile {
       box-shadow: 0 6px 18px rgba(0,0,0,0.45), 0 0 14px color-mix(in srgb, var(--sc-accent) 25%, transparent); }
@@ -429,7 +429,7 @@ const RENDER_CHUNK = 24;
       background: color-mix(in srgb, var(--sc-bg-0) 70%, transparent); color: var(--sc-fg-0);
     }
     .tile-share:hover, .tile-share:focus-visible { color: var(--sc-accent); border-color: var(--sc-accent); }
-    .tile-share:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .tile-share:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .tile-toast {
       position: fixed; z-index: 30; left: 50%; transform: translateX(-50%);
       bottom: var(--sc-float-bottom, 16px); padding: 8px 14px; border-radius: 999px;

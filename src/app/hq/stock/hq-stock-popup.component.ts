@@ -440,7 +440,7 @@ export interface StockStart {
         font: inherit; color: var(--sc-fg); background: var(--sc-bg-0, var(--sc-bg-1)); border: 1px solid var(--sc-border);
         border-radius: var(--sc-radius); padding: var(--sc-space-2, 8px); min-height: 2.75rem; box-sizing: border-box; width: 100%;
       }
-      input:focus-visible, .chip:focus-visible, .list:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      input:focus-visible, .chip:focus-visible, .list:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .lost { color: var(--sc-warning); }
       .chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc-space-2, 8px); }
       .chip {
@@ -478,7 +478,7 @@ export interface StockStart {
       }
       .step:hover:not(:disabled) { border-color: var(--sc-accent); color: var(--sc-fg-0); }
       .step:disabled { opacity: 0.5; cursor: default; }
-      .step:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .step:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       @media (pointer: coarse) { .step { inline-size: 44px; block-size: 44px; } }
       .desk {
         display: grid; gap: var(--sc-space-2, 8px); padding: var(--sc-space-3, 12px); margin: 0 0 var(--sc-space-2, 8px);
@@ -496,7 +496,7 @@ export interface StockStart {
       .ships { margin-top: var(--sc-space-3, 12px); }
       .ships h3 { padding: var(--sc-space-2, 8px) 0; }
       a { color: var(--sc-accent); }
-      a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .more { padding: var(--sc-space-3, 12px) 0; text-align: center; }
       .find, .capture { display: grid; gap: var(--sc-space-3, 12px); align-content: start; overflow: auto; min-height: 0; }
       .row-f { display: flex; flex-wrap: wrap; gap: var(--sc-space-3, 12px); align-items: end; }

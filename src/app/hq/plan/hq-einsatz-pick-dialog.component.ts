@@ -73,7 +73,7 @@ export type EinsatzPick = { kind: 'existing'; id: string } | { kind: 'new' };
         cursor: pointer;
       }
       .opt:hover { border-color: var(--sc-accent); }
-      .opt:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .opt:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .name { flex: 1; min-inline-size: 0; overflow-wrap: anywhere; }
       .n { color: var(--sc-fg-2); font-size: 0.85rem; flex-shrink: 0; }
     `,

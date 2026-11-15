@@ -477,8 +477,7 @@
       "values": {
         "key": "Kennwerte",
         "more": "Datenblatt",
-        "legend": "Klassenschnitt",
-        "toPage": "Zur {{name}}-Seite"
+        "view": "{{name}} ansehen"
       },
       "set": {
         "label": "Werte",
@@ -7326,15 +7325,15 @@
     "sun": {
       "faded": {
         "aria": "Sonne: verblasst",
-        "tip": "Die Sonne ist verblasst. Setz unten deinen Patch-Tipp auf den Tag, an dem {{patch}} LIVE geht – trifft er auf ±2 Tage, leuchtet die Sonne auf."
+        "tip": "Die Sonne ist verblasst. Setz unten deinen Patch-Tipp auf den Tag, an dem {{patch}} LIVE geht – trifft er auf ±1 Tag, leuchtet die Sonne auf."
       },
       "tipped": {
         "aria": "Sonne: Patch-Tipp gesetzt, wartet auf den LIVE-Tag",
-        "tip": "Dein Patch-Tipp ist gesetzt: Die Sonne glimmt, bis {{patch}} LIVE geht. Trifft er auf ±2 Tage, leuchtet sie auf."
+        "tip": "Dein Patch-Tipp ist gesetzt: Die Sonne glimmt, bis {{patch}} LIVE geht. Trifft er auf ±1 Tag, leuchtet sie auf."
       },
       "hit": {
         "aria": "Sonne: leuchtet",
-        "tip": "Treffer: Dein Patch-Tipp lag höchstens 2 Tage neben dem LIVE-Tag, die Sonne leuchtet."
+        "tip": "Treffer: Dein Patch-Tipp lag höchstens 1 Tag neben dem LIVE-Tag, die Sonne leuchtet."
       }
     },
     "export": {
@@ -7537,9 +7536,9 @@
     "comet": {
       "kind": "Patch-Tipp",
       "ruleAria": "Regeln zum Patch-Tipp",
-      "rule": "Tippe den Tag, an dem {{patch}} LIVE geht – ein Klick auf einen Tag setzt deinen Patch-Tipp, ein Tipp pro Patch. Trifft er auf ±2 Tage, zündet der Komet eine Sonne für deine Sammlung auf der Rangseite. Tipps schließen, sobald {{patch}} LIVE ist oder der LIVE-Termin offiziell angekündigt wurde.",
-      "ruleVersion": "Tippe den Tag, an dem {{patch}} LIVE geht – ein konkreter Patch der Linie, ein Tipp pro Patch. Der Tipp schließt, sobald {{patch}} LIVE ist oder das LIVE-Datum offiziell genannt wurde. Den Patch-Stern gibt es nur mit dem Linien-Tipp.",
-      "modeAria": "Tipp-Ziel",
+      "rule": "Tippe den Tag, an dem {{patch}} LIVE geht – ein Klick auf einen Tag setzt deinen Patch-Tipp, ein Tipp pro Patch. Trifft er auf ±1 Tag, zündet der Komet eine Sonne für deine Sammlung auf der Rangseite. Tipps schließen, sobald {{patch}} LIVE ist oder der LIVE-Termin offiziell angekündigt wurde.",
+      "ruleVersion": "Tippe den Tag, an dem {{patch}} LIVE geht – ein Tipp pro Patch. Der Tipp schließt, sobald {{patch}} LIVE ist oder das LIVE-Datum offiziell genannt wurde. Den Patch-Stern gibt es nur mit dem Linien-Tipp.",
+      "noTip": "Aktuell gibt es keinen Patch-Tipp – CIG hat keinen weiteren Patch angekündigt.",
       "state": {
         "none": "offen",
         "tipped": "gesetzt · wartet auf LIVE",

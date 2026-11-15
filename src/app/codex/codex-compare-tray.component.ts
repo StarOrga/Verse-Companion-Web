@@ -170,7 +170,7 @@ interface PinnedRef {
     .toggle:hover { background: color-mix(in srgb, var(--sc-accent) 26%, transparent); }
     .clear { margin-left: auto; padding: 5px 12px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-border); color: var(--sc-fg-2); font-family: inherit; font-size: max(0.74rem, var(--sc-fs-floor)); cursor: pointer; }
     .clear:hover { color: var(--sc-accent); border-color: var(--sc-accent); }
-    .chip-link:focus-visible, .chip-x:focus-visible, .toggle:focus-visible, .clear:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .chip-link:focus-visible, .chip-x:focus-visible, .toggle:focus-visible, .clear:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     .panel { min-width: 0; }
     .muted { color: var(--sc-fg-2); margin: 0; font-size: 0.84rem; }

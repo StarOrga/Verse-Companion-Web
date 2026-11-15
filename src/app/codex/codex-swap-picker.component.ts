@@ -500,7 +500,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
     .pick-msg.err { color: var(--sc-danger); }
     .pick-retry { align-self: flex-start; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-accent); color: var(--sc-accent); font-family: inherit; font-size: max(0.78rem, var(--sc-fs-floor)); cursor: pointer; }
     .pick-retry:hover { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
-    .pick-retry:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .pick-retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @media (pointer: coarse) { .pick-retry { min-height: 44px; } }
 
     /* Concept .scope-bar (part-01:632-634): ONE centred row - label, chips,
@@ -545,7 +545,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
     .pick-cols-sum { cursor: pointer; padding: 6px 10px; border-radius: 6px; background: var(--sc-bg-0);
       border: 1px solid var(--sc-border); color: var(--sc-fg-1); font-size: max(0.76rem, var(--sc-fs-floor)); list-style: none; }
     .pick-cols-sum { min-block-size: var(--sc-tap-min); }
-    .pick-cols-sum:focus-visible, .pc-reset:focus-visible, .fc button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .pick-cols-sum:focus-visible, .pc-reset:focus-visible, .fc button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .pick-cols-sum::-webkit-details-marker { display: none; }
     .pick-cols-pop { position: absolute; top: calc(100% + 4px); left: 0; z-index: 6;
       /* The host is capped at its containing block (the narrow button, .sc-popup caps it at 100%): give it the menu width, so labels are not cut off. */

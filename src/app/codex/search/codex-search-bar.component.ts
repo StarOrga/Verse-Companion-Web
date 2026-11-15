@@ -167,7 +167,7 @@ let nextId = 0;
     }
     .clear svg { width: 16px; height: 16px; }
     .clear:hover { color: var(--sc-fg-0); background: var(--sc-bg-2); }
-    .clear:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .clear:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .hint {
       flex: none; margin-right: 6px; padding: 1px 6px; border-radius: 4px;
       font-family: var(--sc-font-mono, monospace); font-size: max(0.66rem, var(--sc-fs-floor));

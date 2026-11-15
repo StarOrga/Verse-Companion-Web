@@ -508,8 +508,8 @@ const DELETE_ACCOUNT_ERROR_KEYS: Readonly<Record<string, string>> = {
       outline: none;
     }
     .group:focus-visible {
-      outline: 2px solid var(--sc-accent);
-      outline-offset: 6px;
+      outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+      outline-offset: 0;
       border-radius: 4px;
     }
     .group-title {

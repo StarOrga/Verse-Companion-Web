@@ -143,7 +143,7 @@ import { HighlightSegment, highlightSegments } from './patch-search';
     .pn-source { align-self: flex-start; min-height: var(--sc-tap-min); }
     .pn-link:hover, .pn-source:hover { text-decoration: underline; }
     .pn-link:focus-visible, .pn-source:focus-visible {
-      outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px;
+      outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); outline-offset: 0; border-radius: 4px;
     }
 
     mark {

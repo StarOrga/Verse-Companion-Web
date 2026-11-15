@@ -430,7 +430,7 @@ type Step = 1 | 2;
       .step { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-1); color: var(--sc-fg); font: inherit; cursor: pointer; }
       .step:hover:not(:disabled) { border-color: var(--sc-accent); }
       .step:disabled { opacity: 0.4; cursor: default; }
-      .step:focus-visible, .seg button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .step:focus-visible, .seg button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .share { position: absolute; left: 8px; right: 8px; bottom: 1px; height: 2px; border-radius: 2px; background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
       .share i { display: block; height: 100%; border-radius: inherit; background: var(--sc-accent); }
       .name-field { display: grid; gap: 4px; max-width: 460px; flex: none; }

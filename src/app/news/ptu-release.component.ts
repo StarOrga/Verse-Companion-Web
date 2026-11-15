@@ -119,7 +119,7 @@ interface PtuReleaseView {
     small { font-family: var(--sc-font-body); font-size: max(0.7rem, var(--sc-fs-floor)); font-weight: 400; color: var(--sc-fg-2); overflow-wrap: anywhere; }
     a { color: var(--sc-accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+    a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
     p { margin: 0 0 8px; }
     p:last-child { margin-bottom: 0; }
     @media (max-width: 640px) {

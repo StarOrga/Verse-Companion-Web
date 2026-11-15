@@ -64,7 +64,7 @@ export interface VariantPickerOption {
     .picker > summary::after { content: '▾'; margin-left: auto; color: var(--sc-fg-2); }
     .picker[open] > summary::after { content: '▴'; }
     .picker > summary:hover { border-color: var(--sc-accent); }
-    .picker > summary:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .picker > summary:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .sp-label { font-size: max(0.6rem, var(--sc-fs-floor)); text-transform: uppercase; letter-spacing: 0.08em; color: var(--sc-fg-2); }
     .sp-current { font-size: max(0.82rem, var(--sc-fs-floor)); color: var(--sc-fg-0); }
     .sp-count { font-size: max(0.66rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }

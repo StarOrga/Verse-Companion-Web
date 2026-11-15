@@ -85,7 +85,7 @@ import { HighlightSegment, fuzzyTokens, highlightSegments } from './patch-search
     .gh { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
     .gline { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--sc-fg-0); min-height: var(--sc-tap-min); }
     .gline:hover .gver { color: var(--sc-accent); }
-    .gline:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 3px; border-radius: 6px; }
+    .gline:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 6px; }
     /* Same fixed width as the stack's status word, so the two surfaces line up. */
     .gstatus {
       display: inline-flex; align-items: center; justify-content: center; min-width: 96px;
@@ -108,7 +108,7 @@ import { HighlightSegment, fuzzyTokens, highlightSegments } from './patch-search
       animation: pf-in 0.32s ease-out both;
     }
     a[href].cell:hover { border-color: var(--sc-accent); }
-    a[href].cell:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    a[href].cell:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .hit[data-kind='note'] .cell { background: transparent; border-style: dashed; }
 
     .thumb { position: relative; flex: 0 0 auto; width: 116px; min-height: 76px; border-radius: 5px; overflow: hidden; background: linear-gradient(135deg, var(--sc-bg-3), var(--sc-bg-0)); }

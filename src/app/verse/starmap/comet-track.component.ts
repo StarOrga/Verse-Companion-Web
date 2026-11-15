@@ -30,26 +30,25 @@ const RIM_K = 0.32;
     @let c = cur();
     <div class="head">
       <span class="kind"><span class="comet" [class]="'comet s-' + c.state" aria-hidden="true"></span>{{ 'starmap.comet.kind' | translate }}</span>
-      @if (modes(); as v) {
-        <div class="modes" role="group" [attr.aria-label]="'starmap.comet.modeAria' | translate">
-          <button type="button" class="mode" [class.on]="onVersion()" [attr.aria-pressed]="onVersion()" (click)="versionMode.set(true)">{{ versionName(v.patchVersion) }}</button>
-          <button type="button" class="mode" [class.on]="!onVersion()" [attr.aria-pressed]="!onVersion()" (click)="versionMode.set(false)">{{ lineName() }}</button>
-        </div>
-        @if (onVersion()) {
-          <p class="quiet">
-            @if (v.source) { <span class="src">{{ 'starmap.comet.source.' + v.source | translate }}</span> }
-            <span class="splinter-note">{{ 'starmap.comet.splinterNote' | translate }}</span>
-          </p>
-        }
+      @if (idle()) {
+        <p class="quiet">{{ 'starmap.comet.noTip' | translate }}</p>
+      } @else if (useVersion()) {
+        <p class="quiet">
+          @if (version()?.source; as src) { <span class="src">{{ 'starmap.comet.source.' + src | translate }}</span> }
+          <span class="splinter-note">{{ 'starmap.comet.splinterNote' | translate }}</span>
+        </p>
       }
-      <b>{{ headKey() | translate: { patch: patchName(), date: day(c.tippedDate, true) } }}</b>
-      <button type="button" class="info" [attr.aria-label]="'starmap.comet.ruleAria' | translate"
-              [scTooltip]="(onVersion() ? 'starmap.comet.ruleVersion' : 'starmap.comet.rule') | translate: { patch: patchName() }">i</button>
-      <span class="state" [class.tip]="stateKey() === 'tipped'" [class.missed]="stateKey() === 'missed'">
-        <i class="ring" [class.half]="stateKey() === 'tipped'" [class.done]="c.state === 'hit'" [class.closed]="c.state === 'miss' || stateKey() === 'missed' || (c.state === 'none' && c.locked)"></i>
-        {{ 'starmap.comet.state.' + stateKey() | translate }}
-      </span>
+      @if (!idle()) {
+        <b>{{ headKey() | translate: { patch: patchName(), date: day(c.tippedDate, true) } }}</b>
+        <button type="button" class="info" [attr.aria-label]="'starmap.comet.ruleAria' | translate"
+                [scTooltip]="(useVersion() ? 'starmap.comet.ruleVersion' : 'starmap.comet.rule') | translate: { patch: patchName() }">i</button>
+        <span class="state" [class.tip]="stateKey() === 'tipped'" [class.missed]="stateKey() === 'missed'">
+          <i class="ring" [class.half]="stateKey() === 'tipped'" [class.done]="c.state === 'hit'" [class.closed]="c.state === 'miss' || stateKey() === 'missed' || (c.state === 'none' && c.locked)"></i>
+          {{ 'starmap.comet.state.' + stateKey() | translate }}
+        </span>
+      }
     </div>
+    @if (!idle()) {
     <div class="rail" [style.--k]="rimK + 'px'" [style.--rim]="curve().height + 'px'">
       @if (interactive()) {
         <button type="button" class="tok nav" [disabled]="!canBack()" (click)="shift(-7)"
@@ -73,6 +72,7 @@ const RIM_K = 0.32;
         <path [attr.d]="curve().d" vector-effect="non-scaling-stroke" />
       </svg>
     </div>
+    }
     @if (error()) {
       <div class="foot"><span class="err" role="alert">{{ error()! | translate }}</span></div>
     }
@@ -87,13 +87,7 @@ const RIM_K = 0.32;
       .tok.on { border-color: color-mix(in srgb, var(--sc-warning) 60%, #fff); color: var(--sc-fg-0);
         background: linear-gradient(180deg, color-mix(in srgb, var(--sc-warning) 24%, transparent), color-mix(in srgb, var(--sc-bg-1) 60%, transparent)); }
       .tok:disabled:not(.on) { color: var(--sc-fg-2); }
-      .modes { display: flex; gap: 4px; }
-      .mode { border: 1px solid var(--sc-border, transparent); background: transparent; color: var(--sc-fg-2); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 0.75rem; cursor: pointer; }
-      .mode:hover:not(.on) { color: var(--sc-fg-0); }
-      .mode:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-      .mode.on { color: var(--sc-fg-0); border-color: color-mix(in srgb, var(--sc-accent) 60%, #fff); }
-      @media (pointer: coarse) { .mode { min-height: 48px; } }
-      .quiet { order: 10; flex-basis: 100%; margin: -4px 0 0; font-size: 0.72rem; color: var(--sc-fg-2); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+      .quiet { order: 10; flex-basis: 100%; margin: -4px 0 0; font-size: max(12px, 0.72rem); color: var(--sc-fg-2); display: flex; flex-wrap: wrap; gap: 4px 10px; }
       .tok.nav { flex: 0 0 28px; font-size: 1rem; }
       /* Phone: row 1 kind + mode pills + state, row 2 title + info, row 3 the source note. */
       @media (max-width: 560px) {
@@ -108,24 +102,25 @@ const RIM_K = 0.32;
   ],
 })
 export class CometTrackComponent {
-  /** The patch line the tip is for. */
+  /** The patch line the tip is for (the upcoming line, or the map's own line). */
   readonly patchLine = input.required<string>();
   readonly comet = input.required<VerseComet>();
-  /** The next x.y.z patch of the line, when the server knows one (absent before the version-tip migration). */
-  readonly version = signal<VerseVersionComet | null>(null);
   /**
-   * The reader's choice between the x.y.z patch and the line; null = not chosen yet.
-   * With an open x.y.z target the x.y.z tip is the default, the line tip the second choice.
+   * True on the newest map: the one patch the server has announced (an x.y.z on the
+   * LIVE line, or a new line passed in as `patchLine`/`comet`) is tipped here. With
+   * nothing announced and nothing recorded, the rail says there is no patch tip.
    */
-  readonly versionMode = signal<boolean | null>(null);
-  /** The x.y.z switch only on a map whose line comet is still open - an old, closed map has nothing to tip. */
-  readonly modes = computed(() => (this.comet().locked ? null : this.version()));
-  /** Version mode in effect (the switch can vanish while it is on). */
-  readonly onVersion = computed(() => !!this.modes() && (this.versionMode() ?? true));
-  /** The comet under the rail: the line's or the x.y.z patch's. */
-  readonly cur = computed<VerseComet>(() => (this.onVersion() ? this.version()?.comet : null) ?? this.comet());
+  readonly current = input(false);
+  /** The announced x.y.z patch of the LIVE line, when the server names one (absent before the migration). */
+  readonly version = signal<VerseVersionComet | null>(null);
+  /** The x.y.z comet is the target (the server never names a version and a new line at once). */
+  readonly useVersion = computed(() => this.current() && this.version() !== null);
+  /** Newest map, no announced patch, nothing recorded: no tip is possible right now. */
+  readonly idle = computed(() => this.current() && !this.useVersion() && this.comet().state === 'none' && this.comet().locked);
+  /** The comet under the rail: the x.y.z patch's or the line's. */
+  readonly cur = computed<VerseComet>(() => (this.useVersion() ? this.version()?.comet : null) ?? this.comet());
   /** What a tip is placed on: `4.5` or `4.4.2`. */
-  readonly target = computed(() => (this.onVersion() ? this.version()?.patchVersion : null) ?? this.patchLine());
+  readonly target = computed(() => (this.useVersion() ? this.version()?.patchVersion : null) ?? this.patchLine());
 
   private readonly api = inject(VerseApiService);
   private readonly undo = inject(UndoToastService);
@@ -142,13 +137,13 @@ export class CometTrackComponent {
   /** The tipped day while its undo window is open — nothing sent yet. */
   readonly pending = signal<string | null>(null);
   private readonly start = signal(addDays(this.today, 1));
-  readonly interactive = computed(() => this.cur().state === 'none' && !this.cur().locked);
+  readonly interactive = computed(() => !this.idle() && this.cur().state === 'none' && !this.cur().locked);
   readonly days = computed(() => cometDays(this.start(), COMET_DAYS, this.cur().tippedDate ?? this.pending()));
   readonly canBack = computed(() => this.start() > addDays(this.today, 1));
   readonly curve = computed(() => railCurve(this.interactive() ? COMET_DAYS + 2 : COMET_DAYS, RIM_K, false));
 
   /** The patch under its current name (CIG renames: 4.11 became 5.0), "formerly" appended when renamed. */
-  readonly patchName = computed(() => this.onVersion() ? this.versionName(this.target()) : this.lineName());
+  readonly patchName = computed(() => this.useVersion() ? this.versionName(this.target()) : this.lineName());
 
   /** The line under its current name, "formerly" appended when renamed. */
   lineName(): string {
@@ -221,7 +216,7 @@ export class CometTrackComponent {
   private async send(line: string, ymd: string): Promise<void> {
     this.busy.set(true);
     try {
-      const isVersion = line !== this.patchLine();
+      const isVersion = /^\d+\.\d+\.\d+$/.test(line);
       const r = isVersion ? await this.api.submitVersionPrediction(line, ymd) : await this.api.submitPrediction(line, ymd);
       if (isVersion && r.ok) this.version.set(await this.api.cometVersion());
       if (!r.ok && line === this.target()) this.error.set(r.errorKey);

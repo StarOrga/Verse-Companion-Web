@@ -140,7 +140,7 @@ const STALE_AFTER_MS = 5 * 60 * 1000;
       transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
     }
     .vs-chip:hover { border-color: var(--sc-accent); }
-    .vs-chip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .vs-chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* "Everything is fine" is the state you should be able to IGNORE, so the
        operational chip carries no ring and no glow — only a problem earns the
        eye (admin feedback 4e54ad2c round 3: "grüner punkt ... viel zu
@@ -187,7 +187,7 @@ const STALE_AFTER_MS = 5 * 60 * 1000;
       transition: border-color .18s ease, background .18s ease;
     }
     .app-dl:hover { border-color: var(--sc-accent); background: var(--sc-bg-2); }
-    .app-dl:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .app-dl:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .dl-arrow { color: var(--sc-accent); font-size: 0.95rem; flex: 0 0 auto; }
     .dl-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
     .dl-text strong { font-size: 0.82rem; font-weight: 600; }
@@ -214,7 +214,7 @@ const STALE_AFTER_MS = 5 * 60 * 1000;
       }
       .vs-chip:hover { border-color: transparent; }
       .vs-chip:focus-visible {
-        box-shadow: none; outline: 2px solid var(--sc-accent); outline-offset: -4px;
+        box-shadow: none; outline: 1px solid transparent; box-shadow: var(--sc-focus-ring-inset); outline-offset: 0;
       }
     }
   `],

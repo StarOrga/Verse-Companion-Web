@@ -656,7 +656,7 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
     /* Patched draws a second ring with box-shadow — outline is the focus ring's. */
     .pin.patched i { box-shadow: 0 0 0 2px var(--sc-bg-0), 0 0 0 3px var(--sc-accent), 0 0 12px color-mix(in srgb, var(--pc) 45%, transparent); }
     .pin:focus-visible { outline: none; }
-    .pin:focus-visible i { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .pin:focus-visible i { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .pin-label { font-family: var(--d); text-transform: uppercase; font-size: max(8.5px, var(--f)); letter-spacing: 0.14em; color: var(--sc-fg-1);
       background: color-mix(in srgb, var(--sc-bg-0) 88%, transparent); padding: 2px 6px; border: 1px solid var(--l1); border-radius: 2px;
       white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis;
@@ -712,7 +712,7 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
     .ll:is(.active, .sel, :hover, :focus-visible) { max-width: calc(var(--w) + 180px); z-index: 1; border-color: var(--pc); color: var(--sc-fg-0); }
     .ll.sel { color: var(--pc); }
     .ll.sel i { opacity: 1; }
-    .ll:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .ll:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     /* ── Key + legend under the canvas ── */
     .pin-key { position: relative; z-index: 2; list-style: none; margin: 0; padding: 8px 12px 0; display: flex; flex-wrap: wrap; gap: 4px 6px; }
@@ -720,7 +720,7 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
       background: color-mix(in srgb, var(--sc-bg-0) 70%, transparent); color: var(--sc-fg-1); cursor: pointer; font: inherit;
       font-size: max(9.5px, var(--f)); min-height: var(--sc-tap-min, 24px); max-width: 100%; transition: border-color 160ms ease, color 160ms ease;
       --pc: var(--sc-accent); }
-    .pk:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .pk:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .pk i { width: 10px; height: 10px; border-radius: 50%; border: 1px solid var(--pc); background: var(--pc); font-style: normal;
       flex: none; opacity: 0.8; transition: opacity 160ms ease; }
     .pk span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -743,7 +743,7 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
     .full-close { position: absolute; z-index: 5; top: calc(8px + env(safe-area-inset-top, 0px)); right: calc(8px + env(safe-area-inset-right, 0px));
       width: 48px; height: 48px; display: grid; place-items: center; padding: 0; cursor: pointer; border-radius: 50%; color: var(--sc-fg);
       background: color-mix(in srgb, var(--sc-bg-0) 70%, transparent); border: 1px solid color-mix(in srgb, var(--sc-accent) 40%, transparent); }
-    .full-close:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .full-close:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @media (max-width: 640px) {
       .silhouette-frame, .mode-viewer { min-height: 320px; }
       .silhouette-frame { --pin-inset: 36px; }

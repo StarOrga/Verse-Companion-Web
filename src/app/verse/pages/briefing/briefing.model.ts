@@ -27,12 +27,6 @@ export interface BriefingStatus {
   readonly next: { readonly line: string; readonly unit: NextPatchUnit; readonly n: number; readonly overdue: boolean } | null;
 }
 
-/** `4.10` → `4.11`: the line after a LIVE line when none is in testing yet. */
-export function followingLine(line: string): string | null {
-  const m = /^(\d+)\.(\d+)/.exec(line);
-  return m ? `${m[1]}.${Number(m[2]) + 1}` : null;
-}
-
 /**
  * Same sources and math as the Verse status instrument (patch-note feed first,
  * the digest's patch block as the fallback), shaped for the briefing's
@@ -47,7 +41,7 @@ export function briefingStatus(
   if (live) {
     const liveAt = liveReleaseAt(live);
     const est = computeNextPatch(groups);
-    const nextLine = nextLineInTesting(groups)?.line ?? followingLine(live.line);
+    const nextLine = nextLineInTesting(groups)?.line ?? null; // never LIVE + 1: only a line CIG has put into testing
     const dist = est ? nextPatchDistance(daysUntilNextPatch(est, now)) : null;
     return {
       live: { line: live.line, days: liveAt !== null ? Math.max(0, Math.floor((now - liveAt) / DAY_MS)) : null },

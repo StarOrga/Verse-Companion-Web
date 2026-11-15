@@ -168,7 +168,7 @@ import { BRAND_NAME } from '../core/brand';
       letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.2; max-width: 11ch;
     }
     .sf-badge-btn:hover, .sf-badge-btn:focus-visible { color: var(--sc-fg-1); }
-    .sf-badge-btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 6px; }
+    .sf-badge-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 6px; }
     /* Grows up out of the badge. The pinned bubble is <sc-popup kind="panel"> (frame, width, ✕ from the scaffold);
        only the hover peek is a plain tooltip and keeps a light frame of its own. */
     .sf-bubble { position: absolute; left: 0; bottom: calc(100% + var(--sc-space-2)); z-index: 5; }
@@ -203,7 +203,7 @@ import { BRAND_NAME } from '../core/brand';
       min-height: var(--sc-tap-min); transition: color 0.16s ease;
     }
     .sf-areas a:hover, .sf-areas a[aria-current] { color: var(--sc-accent); }
-    .sf-areas a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 3px; }
+    .sf-areas a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 3px; }
     @media (min-width: 721px) { .sf-badge, .sf-links { flex: 1 1 0; min-width: 0; } }
     .sf-links {
       display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--sc-space-2);
@@ -211,7 +211,7 @@ import { BRAND_NAME } from '../core/brand';
     }
     .sf-links a { color: var(--sc-fg-2); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
     .sf-links a:hover { color: var(--sc-accent); }
-    .sf-links a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 3px; }
+    .sf-links a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 3px; }
     /* Phone (the bar's breakpoint, <= 720): compact, badge row over the links,
        clear of the bottom bar and the feedback launcher. The wordmark folds away
        (the hub's planet-free strip is ~74px at 375px): the emblem stays, and
@@ -300,8 +300,8 @@ import { BRAND_NAME } from '../core/brand';
     }
     .disclaimer-toggle:hover { color: var(--sc-fg-1); }
     .disclaimer-toggle:focus-visible {
-      outline: 1px solid var(--sc-accent);
-      outline-offset: 2px;
+      outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+      outline-offset: 0;
       border-radius: 2px;
     }
     .whatsnew {

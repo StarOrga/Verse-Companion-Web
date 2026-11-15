@@ -4,6 +4,7 @@ import { Params, Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { isPlainLeftClick } from '../../core/modified-click.util';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { comparePatchVersion } from '../codex-format';
 import { CATEGORY_GLYPH } from './codex-landing-holotable.component';
 import { LANDING_CATEGORIES, LandingCategory, LandingCodex, LandingCodexEntry, LandingItem } from './codex-landing-data.types';
@@ -107,7 +108,7 @@ export type WheelEntry = LandingCodexEntry & { onTable: boolean; category: Landi
 @Component({
   selector: 'sc-codex-landing-codex-pane',
   standalone: true,
-  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScTooltipDirective],
+  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScTooltipDirective, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.still]': 'still()', '[class.paused]': 'paused()' },
   template: `
@@ -179,18 +180,21 @@ export type WheelEntry = LandingCodexEntry & { onTable: boolean; category: Landi
       }
       <div class="foot">
         @if (activeRow(); as r) {
-          @if (r.entries.length) {
-            <div class="more-slot">
-              @if (more() > 0) {
-                <a class="more" routerLink="/codex/index" [queryParams]="r.discover ? indexQuery(r.category) : searchQuery(r.category)">
-                  {{ (r.discover ? 'codex.landing.codex.moreDiscover' : 'codex.landing.codex.more') | translate: { count: more() } }} <i aria-hidden="true">↗</i>
-                </a>
-              }
-            </div>
-          }
-          <a class="all" routerLink="/codex/index" [queryParams]="indexQuery(r.category)">
-            {{ 'codex.landing.codex.all' | translate: { category: ('codex.landing.categories.' + r.category | translate) } }} <i aria-hidden="true">↗</i>
-          </a>
+          <!-- One group: "Alle …" is the pane's main step, "+ N neue & aktualisierte" its quieter cut of the same index. -->
+          <div class="cta">
+            <a class="all" scAction tier="secondary" routerLink="/codex/index" [queryParams]="indexQuery(r.category)">
+              {{ 'codex.landing.codex.all' | translate: { category: ('codex.landing.categories.' + r.category | translate) } }} <i aria-hidden="true">↗</i>
+            </a>
+            @if (r.entries.length) {
+              <div class="more-slot">
+                @if (more() > 0) {
+                  <a class="more" routerLink="/codex/index" [queryParams]="r.discover ? indexQuery(r.category) : searchQuery(r.category)">
+                    {{ (r.discover ? 'codex.landing.codex.moreDiscover' : 'codex.landing.codex.more') | translate: { count: more() } }} <i aria-hidden="true">↗</i>
+                  </a>
+                }
+              </div>
+            }
+          </div>
         }
         <a class="keys" routerLink="/codex/keybinds"><span aria-hidden="true">⌨</span> {{ 'codex.landing.rail.keybinds' | translate }}</a>
       </div>

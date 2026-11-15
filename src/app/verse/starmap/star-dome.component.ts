@@ -69,6 +69,7 @@ export function formatDay(value: string | null, lang: string, withWeekday = fals
           <button type="button" class="star" [class]="'star ' + s.state" [style.left.%]="s.x" [style.top.%]="s.y"
                   [style.--d]="(starDelay(s)) + 's'" [attr.aria-pressed]="selected() === s.index"
                   [attr.aria-label]="starAria(s) | translate: { task: (taskTitle(s) | translate), n: s.rank + 1 }"
+                  [scTooltip]="starAria(s) | translate: { task: (taskTitle(s) | translate), n: s.rank + 1 }" scTooltipTier="label"
                   (click)="toggle(s)">
             <span class="ent" [style.--r]="s.rank">
               <svg class="sv" viewBox="-14 -14 28 28" aria-hidden="true" focusable="false">

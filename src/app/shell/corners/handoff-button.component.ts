@@ -97,7 +97,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
       box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
     }
     .round:hover { border-color: var(--sc-accent); }
-    .round:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .round:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* Position only (grows out of the round button); frame, width, head and ✕ come from <sc-popup kind="panel">. */
     .popup { position: absolute; left: 0; bottom: calc(100% + var(--sc-space-2)); transform-origin: bottom left; }
     .steps { list-style: none; margin: 0 0 var(--sc-space-3); padding: 0; display: flex; gap: var(--sc-space-3); }

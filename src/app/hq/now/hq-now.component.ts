@@ -284,7 +284,7 @@ const UPCOMING = 4;
       .menu button { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 36px; padding: 0 10px; border: 0; border-radius: 6px; background: transparent; color: var(--sc-fg); font: inherit; text-align: start; cursor: pointer; }
       .menu button:hover { background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
       .menu button[aria-checked='true'] { color: var(--sc-accent); }
-      .menu button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+      .menu button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       .now { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 420px); gap: var(--sc-space-3, 12px); }
       .panel { min-height: 0; min-width: 0; border: 1px solid var(--sc-border); border-radius: 14px; background: color-mix(in srgb, var(--sc-bg-1) 92%, transparent); }
       .mapcol { display: flex; flex-direction: column; padding: var(--sc-space-2, 8px); }
@@ -304,7 +304,7 @@ const UPCOMING = 4;
       .etab span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 14ch; }
       .etab[aria-pressed='true'] { color: var(--sc-fg); border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 16%, transparent); }
       .etab.fin { text-decoration: line-through; }
-      .etab:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .etab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .anchor { margin-top: auto; padding: var(--sc-space-2, 8px) var(--sc-space-3, 12px); border: 1px solid color-mix(in srgb, var(--sc-accent) 50%, var(--sc-border)); border-left-width: 3px; border-radius: var(--sc-radius, 10px); background: var(--sc-surface-2, var(--sc-bg-0)); }
       .eyebrow { font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-fg-2); }
       .where { margin: 2px 0 0; font: 600 1.1rem / 1.2 var(--sc-font-display); overflow-wrap: anywhere; }

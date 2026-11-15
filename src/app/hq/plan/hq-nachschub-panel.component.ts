@@ -215,7 +215,7 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       .ic svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .name { display: flex; align-items: center; gap: 4px; margin: 0; font: 700 1.1rem var(--sc-font-display, inherit); letter-spacing: 0.02em; min-width: 0; overflow-wrap: anywhere; }
       .rename { min-height: 36px; width: min(28ch, 100%); padding: 0 10px; border: 1px solid var(--sc-accent); border-radius: 8px; background: var(--sc-bg-0); color: var(--sc-fg); font: 700 1.05rem var(--sc-font-display, inherit); }
-      .rename:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .rename:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .pen svg, .acts svg, .good svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .prog { display: inline-flex; align-items: center; gap: 8px; color: var(--sc-fg-2); font-size: 0.82rem; }
       .prog b { color: var(--sc-fg-0); font-family: var(--sc-font-display, inherit); }
@@ -237,10 +237,10 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       .erename { flex: 1; min-width: 0; min-height: 36px; padding: 0 8px; border: 1px solid var(--sc-accent); border-radius: 8px; background: var(--sc-bg-0); color: var(--sc-fg); font: 600 0.9rem var(--sc-font-body, inherit); }
       .erename[aria-invalid='true'] { border-color: var(--sc-warning); }
       .erename:hover { border-color: var(--sc-accent-hover, var(--sc-accent)); }
-      .erename:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .erename:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .epen svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .eerr { margin: 2px 0 0; color: var(--sc-warning); font-size: max(0.78rem, var(--sc-fs-floor, 0.75rem)); }
-      .pick:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+      .pick:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
       .kinds { display: inline-flex; gap: 3px; }
       .kic { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 5px; background: color-mix(in srgb, var(--sc-accent) 12%, transparent); color: var(--sc-accent); }
       .kic svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -255,7 +255,7 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       .add-wrap { width: min(100%, 420px); text-align: start; }
       .add-e { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 12px; border: 1px dashed color-mix(in srgb, var(--sc-accent) 40%, var(--sc-border)); border-radius: 10px; background: transparent; color: var(--sc-fg-1); font: inherit; font-size: 0.85rem; cursor: pointer; width: 100%; }
       .add-e:hover { border-color: var(--sc-accent); color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }
-      .add-e:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .add-e:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .add-e svg { width: 16px; height: 16px; fill: none; stroke: var(--sc-accent); stroke-width: 2; stroke-linecap: round; }
       .addform { display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); border-style: dashed; }
       .af-title { margin: 0; font-size: 0.85rem; font-weight: 600; }
@@ -263,14 +263,14 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       .af-field > span:first-child { color: var(--sc-fg-2); font-size: max(0.78rem, var(--sc-fs-floor, 0.75rem)); }
       .af-input { min-height: 36px; padding: 0 10px; border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-0); color: var(--sc-fg); font: inherit; }
       .af-input:hover { border-color: var(--sc-accent); }
-      .af-input:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .af-input:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .af-row { display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); align-items: flex-end; }
       .af-where { flex: 1 1 12rem; }
       .af-acts { display: flex; justify-content: flex-end; gap: var(--sc-space-2, 8px); flex-wrap: wrap; }
       .seg { display: inline-flex; flex-wrap: wrap; align-self: flex-start; padding: 2px; border: 1px solid var(--sc-border); border-radius: 999px; }
       .seg button { min-height: 28px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: var(--sc-fg-2); font: inherit; font-size: 0.78rem; cursor: pointer; }
       .seg button[aria-pressed='true'] { color: var(--sc-fg); background: color-mix(in srgb, var(--sc-accent) 22%, transparent); box-shadow: 0 0 0 1px var(--sc-accent); }
-      .seg button:focus-visible, .step:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .seg button:focus-visible, .step:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .stepper { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; }
       .step { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-1); color: var(--sc-fg); font: inherit; cursor: pointer; }
       .step:hover:not(:disabled) { border-color: var(--sc-accent); }

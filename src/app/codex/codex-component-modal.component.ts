@@ -204,7 +204,7 @@ export interface ComponentInspectEntry {
     .cm-headline dd { margin: 0; font-size: 0.86rem; color: var(--sc-accent);
       font-variant-numeric: tabular-nums; white-space: nowrap; }
     .derived { color: var(--sc-fg-2); cursor: help; }
-    .cm-headline .hs:focus-visible, .derived:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+    .cm-headline .hs:focus-visible, .derived:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
 
     .cm-block h3 { margin: 0 0 6px; font-size: max(0.66rem, var(--sc-fs-floor)); text-transform: uppercase;
       letter-spacing: 0.07em; color: var(--sc-fg-2); }

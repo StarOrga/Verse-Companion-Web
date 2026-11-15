@@ -89,7 +89,7 @@ export function codexPartUrl(part: CodexPart, search: string): string {
         transform: rotate(45deg); transition: color 0.2s, opacity 0.25s;
       }
       .cx-more-cue:hover .chev, .cx-more-cue:focus-visible .chev { color: var(--sc-accent); }
-      .cx-more-cue:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 6px; }
+      .cx-more-cue:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 6px; }
       @media (max-width: 900px) { .cx-more-cue { display: none; } }
       @media (prefers-reduced-motion: reduce) { .cx-more-cue { transition: none; } }
     `,

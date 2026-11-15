@@ -213,7 +213,7 @@ export interface HoloPerspectiveView {
     .tile-expand { justify-self: start; background: none; border: none; padding: 0; cursor: pointer; font-size: max(8.5px, var(--f)); letter-spacing: 0.14em; color: var(--sc-fg-2); min-height: var(--sc-tap-min, 24px); }
     .tile-expand { transition: color var(--holo-t-fast) ease; }
     .tile-expand:hover, .tile-expand[aria-expanded="true"] { color: var(--sc-accent); }
-    .tile-expand:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: var(--holo-r-xs); }
+    .tile-expand:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: var(--holo-r-xs); }
     /* "Alle Werte" unfolds to its height and folds back (clipped only while
        it moves); without interpolate-size only the fade remains. */
     .tile-full { border-top: 1px solid var(--l1); padding-top: 10px; interpolate-size: allow-keywords;
@@ -237,7 +237,7 @@ export interface HoloPerspectiveView {
     .all-expand { margin-top: auto; align-self: flex-start; background: none; border: none; padding: 0; cursor: pointer; font-family: var(--d); text-transform: uppercase;
       font-size: max(8.5px, var(--f)); letter-spacing: 0.14em; color: var(--sc-fg-2); min-height: var(--sc-tap-min, 24px); transition: color var(--holo-t-fast) ease; }
     .all-expand:hover, .all-expand[aria-expanded="true"] { color: var(--sc-accent); }
-    .all-expand:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: var(--holo-r-xs); }
+    .all-expand:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: var(--holo-r-xs); }
     :host(.row) .ptile { border: 0; border-inline-start: 1px solid var(--sc-border); border-radius: 0; padding: 12px 12px 10px; gap: 8px;
       background: none; box-shadow: inset 0 2px 0 var(--p); }
     :host(.row) .ptile:last-child { border-inline-end: 1px solid var(--sc-border); }

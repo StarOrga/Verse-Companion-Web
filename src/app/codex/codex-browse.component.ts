@@ -636,10 +636,10 @@ export function blueprintCategoriesForGroup(
     .node-tog svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform 120ms ease; }
     .node-tog.open svg { transform: rotate(90deg); }
     .node-tog:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-accent) 8%, transparent); }
-    .node-tog:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .node-tog:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @media (prefers-reduced-motion: reduce) { .node-tog svg { transition: none; } }
     .node:hover { background: color-mix(in srgb, var(--sc-accent) 8%, transparent); }
-    .node:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .node:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .node.on { color: var(--sc-fg-0); }
     .node.current { background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-accent); }
     .node-ct { font-size: 11px; color: var(--sc-fg-2); font-variant-numeric: tabular-nums; }
@@ -647,7 +647,7 @@ export function blueprintCategoriesForGroup(
     .facet.check { flex-direction: row; align-items: center; gap: 8px; font-size: 13px; color: var(--sc-fg-1); cursor: pointer; }
     .facet.check input { accent-color: var(--sc-accent); }
     .reset { align-self: flex-start; background: none; border: 0; padding: 4px 0; color: var(--sc-accent); cursor: pointer; font: inherit; font-size: 13px; text-decoration: underline; }
-    .reset:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .reset:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     .results { display: flex; flex-direction: column; gap: var(--sc-space-3, 12px); min-width: 0; align-self: start; }
     /* The filter bar fills the space beside the title: the list starts right under it. */
@@ -670,7 +670,7 @@ export function blueprintCategoriesForGroup(
     }
     .chip:hover { border-color: var(--sc-accent); color: var(--sc-fg-0); }
     .chip.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-accent); }
-    .chip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .sheet-filters { display: flex; flex-direction: column; gap: var(--sc-space-3, 12px); }
     .list { padding: 0; overflow: hidden; }
     .list-head { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--sc-border); flex-wrap: wrap; }
@@ -693,14 +693,14 @@ export function blueprintCategoriesForGroup(
       background: transparent; color: var(--sc-fg-2); cursor: pointer; font: inherit; font-size: 12px;
     }
     .ls-clear:hover { color: var(--sc-fg-0); }
-    .ls-clear:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .ls-clear:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .count { font-size: 13px; color: var(--sc-fg-1); font-variant-numeric: tabular-nums; }
     .fresh-toggle {
       min-height: var(--sc-tap-min); padding: 0 var(--sc-space-3); border: 1px solid var(--sc-border); border-radius: 999px;
       background: none; color: var(--sc-fg-2); font: inherit; font-size: max(0.78rem, var(--sc-fs-floor)); cursor: pointer;
     }
     .fresh-toggle:hover { color: var(--sc-fg-0); border-color: var(--sc-accent); }
-    .fresh-toggle:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .fresh-toggle:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .fresh-toggle.on { color: var(--sc-accent); border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
     .own.on { color: var(--sc-accent); }
     .own-error { color: var(--sc-danger); }
@@ -721,7 +721,7 @@ export function blueprintCategoriesForGroup(
     .row-link:has(.c-where) { grid-template-columns: 56px minmax(0, 21.25rem) min(15rem, 30%) minmax(max-content, 1fr); }
     .row-link:has(.c-where) > .spec { justify-self: end; }
     .row:hover, .row:focus-within { background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }
-    .row-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .row-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .sil { width: 56px; height: 34px; display: inline-flex; align-items: center; justify-content: center; color: var(--sc-accent); }
     .sil svg { width: 100%; height: 100%; overflow: visible; }
     .sil path {
@@ -755,7 +755,7 @@ export function blueprintCategoriesForGroup(
       color: var(--sc-fg-1); cursor: pointer; font: inherit; text-decoration: none;
     }
     .act:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
-    .act:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .act:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .act.pinned { color: var(--sc-accent); border-color: color-mix(in srgb, var(--sc-accent) 45%, transparent); }
     .act .ico { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .act.shop.pinned { background: color-mix(in srgb, var(--sc-accent) 14%, var(--sc-bg-1)); }
@@ -802,7 +802,7 @@ export function blueprintCategoriesForGroup(
     .buy-note { margin: 0; font-size: 13px; color: var(--sc-fg-2); }
     .buy-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
     .to-plan { font-size: 13px; color: var(--sc-accent); }
-    .to-plan:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .to-plan:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .more-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-top: 1px solid var(--sc-border); }
     .showing { font-size: 12px; color: var(--sc-fg-2); }
     .load-more, .reset-all {
@@ -811,7 +811,7 @@ export function blueprintCategoriesForGroup(
     }
     .load-more:hover, .reset-all:hover { background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
     .load-more:disabled { opacity: .6; cursor: default; }
-    .load-more:focus-visible, .reset-all:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .load-more:focus-visible, .reset-all:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .empty { padding: 24px 14px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; color: var(--sc-fg-1); }
     .empty p { margin: 0; }
     .also { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
@@ -820,13 +820,13 @@ export function blueprintCategoriesForGroup(
       border: 1px dashed var(--sc-border); border-radius: 8px; color: var(--sc-accent); text-decoration: none; font-size: 13px;
     }
     .also-link:hover { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }
-    .also-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .also-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .upcoming-hint { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--sc-fg-1); }
     .soon-badge { padding: 1px 6px; border-radius: 4px; border: 1px solid var(--sc-accent); color: var(--sc-accent); font-size: 11px; }
     .upcoming-link { color: var(--sc-accent); }
     .err { color: var(--sc-danger); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font: inherit; }
-    .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     .filter-fab { display: none; }
     .sheet-body { display: flex; flex-direction: column; gap: 14px; }
@@ -850,7 +850,7 @@ export function blueprintCategoriesForGroup(
         bottom: var(--sc-float-bottom); min-height: 48px; border-radius: 24px;
         border: 1px solid var(--sc-accent); background: var(--sc-bg-1); color: var(--sc-accent); font: inherit; cursor: pointer;
       }
-      .filter-fab:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .filter-fab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .browse { padding-bottom: calc(var(--sc-fab-clear-block) + 24px); }
       .node { min-height: 44px; }
       .node-tog { width: 44px; min-height: 44px; }

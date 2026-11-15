@@ -178,7 +178,7 @@ const WIDE_RATIO = 1.5;
     .edge.r { right: 0; justify-content: flex-end; padding-right: 12px; background: linear-gradient(to left, rgba(0, 0, 0, 0.35), transparent); }
     .chev { font-size: 2.6rem; line-height: 1; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7); }
     .edge:hover .chev, .edge:focus-visible .chev { color: var(--sc-accent); }
-    .edge:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .edge:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     @media (max-width: 720px) {
       .stage { border-radius: 8px; }
       .edge { width: 22%; }

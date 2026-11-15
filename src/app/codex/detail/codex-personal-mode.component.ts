@@ -104,14 +104,14 @@ export const CODEX_MODE_PARAMS: Record<string, null> = {
       color: var(--sc-fg-0); font: inherit; font-size: max(0.78rem, var(--sc-fs-floor)); white-space: nowrap; }
     .isel em { font-style: normal; color: var(--sc-fg-2); }
     .isel:hover, .isel[aria-expanded='true'] { border-color: var(--sc-accent); }
-    .isel:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .isel:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .mode { display: inline-flex; border: 1px solid var(--sc-border); border-radius: 6px; background: var(--sc-bg-1); }
     .seg { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 4px 12px; border: 0;
       background: transparent; color: var(--sc-fg-1); font: inherit; font-size: max(0.78rem, var(--sc-fs-floor));
       text-decoration: none; cursor: pointer; border-radius: 5px; }
     .seg:hover { color: var(--sc-fg-0); }
     .seg.active { background: color-mix(in srgb, var(--sc-accent) 20%, transparent); color: var(--sc-accent); font-weight: 600; }
-    .seg:focus-visible, .item:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .seg:focus-visible, .item:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .mine-wrap { position: relative; display: inline-flex; }
     .caret { font-size: 0.7em; }
     .menu { position: absolute; top: calc(100% + 4px); right: 0; z-index: 20; min-width: 200px; margin: 0; padding: 4px;

@@ -125,7 +125,7 @@ import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, frien
     }
     .chip:hover:not(:disabled) { border-color: var(--sc-accent); }
     .chip.on { border-color: var(--sc-accent); background: rgba(0, 212, 255, 0.12); color: var(--sc-accent); }
-    .chip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .sc-btn.micro { padding: 4px 10px; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.04em; }
     .sc-btn.micro.danger { color: var(--sc-danger); border-color: var(--sc-danger); }
     .sc-btn.micro.danger:hover:not(:disabled) { background: var(--sc-danger); color: var(--sc-bg-0); }

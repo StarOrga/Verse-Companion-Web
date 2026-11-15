@@ -95,7 +95,7 @@ export const LOG_VISIBLE = 3;
       .again svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
       .foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
       .more { min-height: 30px; padding: 0; border: 0; background: none; color: var(--sc-accent); font: inherit; font-size: 0.75rem; cursor: pointer; }
-      .more:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .more:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .none { margin: 0; color: var(--sc-fg-2); font-size: 0.75rem; }
       @media (pointer: coarse) { .more { min-height: 48px; } }
     `,

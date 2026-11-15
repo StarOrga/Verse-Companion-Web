@@ -101,7 +101,7 @@ import type { NachschubTargetIntent, NachschubTargetResult } from './nachschub-t
       .seg button { min-height: 36px; padding: 0 var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 999px; background: var(--sc-bg-0); color: var(--sc-fg-1); font: inherit; cursor: pointer; }
       .seg button.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); }
       .seg button:disabled { opacity: 0.5; cursor: not-allowed; }
-      .seg button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .seg button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .hint { margin: 0; color: var(--sc-fg-2); font-size: 0.82rem; }
       .sc-input[aria-invalid='true'] { border-color: var(--sc-warning); }
       .lines, .stops { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); }

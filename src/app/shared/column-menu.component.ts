@@ -146,7 +146,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
       background: transparent; border: none; color: inherit; font: inherit; cursor: pointer; text-align: inherit; padding: 0; }
     .cm-label:focus-visible, .cm-kebab:focus-visible, .cm-sortbtn:focus-visible, .cm-secondary:focus-visible,
     .cm-clear:focus-visible, .cm-range input:focus-visible {
-      outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .cm-sortbtn:hover, .cm-secondary:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
     .cm-arrow { color: var(--sc-accent); }
     /* LOW-3: unit floor per UI-spec §0 — an explicit max() rather than a

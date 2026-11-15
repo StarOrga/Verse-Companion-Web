@@ -104,7 +104,7 @@ export const HQ_TABS: readonly HqTab[] = [
       }
       .hq-tab:hover { color: var(--sc-fg); }
       .hq-tab.active { color: var(--sc-accent); border-bottom-color: var(--sc-accent); }
-      .hq-tab:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+      .hq-tab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       .supplies-btn { display: inline-flex; align-items: center; gap: var(--sc-space-2, 8px); flex: none; }
       .supplies-count {
         min-width: 1.5em;

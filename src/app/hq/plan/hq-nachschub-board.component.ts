@@ -83,7 +83,7 @@ export interface BoardSlot {
       .slot.done { border-color: color-mix(in srgb, var(--sc-success) 55%, var(--sc-border)); }
       .slot.done small { color: var(--sc-success); }
       .hit { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 8px 9px; border: 0; border-radius: inherit; background: transparent; color: var(--sc-fg); font: inherit; text-align: center; cursor: pointer; }
-      .hit:focus-visible, .archive:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .hit:focus-visible, .archive:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; min-height: 2.5em; font-size: 0.82rem; font-weight: 600; line-height: 1.25; }
       small { font-size: 0.74rem; color: var(--sc-fg-2); }
       .del { position: absolute; top: 4px; right: 4px; opacity: 0; transition: opacity 0.15s; }

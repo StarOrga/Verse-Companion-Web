@@ -29,7 +29,7 @@ import { STARS_PER_PATCH, defaultPatch } from './starmap.model';
       .glyph { display: inline-flex; align-items: center; gap: 4px; min-height: var(--sc-tap-min, 44px); padding: 0 var(--sc-pad-1);
         border-radius: 8px; color: var(--sc-fg-1); text-decoration: none; }
       .glyph:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
-      .glyph:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .glyph:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .fig { width: 26px; }
       .count { font: 600 0.8rem var(--sc-font-display); font-variant-numeric: tabular-nums; }
     `,

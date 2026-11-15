@@ -72,7 +72,7 @@ const LABELLED = ['ship', 'vehicle', 'upcoming', 'weapon', 'component', 'item', 
       .field span { color: var(--sc-fg-2); font-size: max(0.82rem, var(--sc-fs-floor, 0.75rem)); }
       .field input { min-height: 40px; padding: 0 var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-bg-0); color: var(--sc-fg); font: inherit; }
       .field input:hover { border-color: var(--sc-accent); }
-      .field input:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .field input:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .msg { margin: 0; min-height: 1.2em; color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor, 0.75rem)); }
       .msg:empty { min-height: 0; }
       .err { color: var(--sc-warning); }

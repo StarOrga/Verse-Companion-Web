@@ -49,7 +49,7 @@ import { PatchSummaryView } from './codex-landing-data.types';
       .news b { font: 400 12px var(--font-monospace, 'Share Tech Mono', monospace); letter-spacing: 0; color: var(--sc-fg-0); }
       .news:hover, .news.on { border-color: var(--sc-accent); color: var(--sc-fg-0); }
       .news.on { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
-      .news:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .news:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .dot {
         position: absolute; top: 6px; left: 22px; width: 8px; height: 8px; border-radius: 50%;
         background: var(--sc-accent); box-shadow: 0 0 0 2px var(--sc-bg-0), 0 0 10px color-mix(in srgb, var(--sc-accent) 90%, transparent);

@@ -264,7 +264,7 @@ export interface StageHeroChip {
     .view-switch:hover, .view-switch:focus-visible { opacity: 1; }
     .view-switch.on { color: var(--sc-accent); opacity: 0.85;
       border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0)); }
-    .view-switch:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .view-switch:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* "3D", not "30": the digit keeps the display face, the letter is set in
        the body face (Inter) at a heavier weight so its straight stem and flat
        bowl cannot be mistaken for a zero (feedback 140dfb7e).

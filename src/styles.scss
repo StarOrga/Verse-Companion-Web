@@ -262,6 +262,11 @@ html[data-sc-layout] body { font-size: 0.9375rem; }
   --sc-sub-kbd: linear-gradient(180deg, #17384c, #0b2231);
   /* Focus on the satin edge itself: a brighter edge and a soft outer glow (no inner ring). */
   --sc-sub-edge-focus: linear-gradient(160deg, rgba(225, 248, 255, 0.95) 0%, rgba(130, 220, 255, 0.7) 35%, rgba(90, 170, 205, 0.6) 65%, rgba(200, 240, 255, 0.9) 100%);
+  /* Keyboard focus: a thin soft glow that follows the element's own radius (box-shadow,
+     outline stays transparent). :focus-visible only, never after a mouse click. */
+  --sc-focus-ring: 0 0 0 1px rgba(0, 212, 255, 0.45), 0 0 8px rgba(0, 212, 255, 0.25);
+  --sc-focus-ring-inset: inset 0 0 0 1px rgba(0, 212, 255, 0.45), inset 0 0 8px rgba(0, 212, 255, 0.2);
+  --sc-focus-ring-hot: 0 0 0 1px rgba(255, 80, 70, 0.45), 0 0 8px rgba(255, 80, 70, 0.25);
   --sc-sub-focus-glow: 0 0 0 1px rgba(130, 220, 255, 0.35), 0 0 22px rgba(82, 193, 230, 0.3);
   --sc-sub-box: rgba(130, 220, 255, 0.45);
 }
@@ -1058,9 +1063,9 @@ button {
 /* Keyboard focus ring — applies app-wide to every interactive element.
    Uses :focus-visible so it only shows for keyboard/AT users, never on mouse click. */
 :focus-visible {
-  outline: 2px solid var(--sc-accent);
-  outline-offset: 2px;
-  border-radius: 2px;
+  outline: 1px solid transparent; /* forced-colors / Windows high contrast still draws it */
+  outline-offset: 0;
+  box-shadow: var(--sc-focus-ring);
 }
 
 /* A dialog container (ScDialogDirective, tabindex="-1") is no Tab stop; its
@@ -1740,7 +1745,7 @@ button {
 .item-page .it-tab small { font: 500 0.72rem var(--sc-font-body, inherit); color: var(--sc-fg-2); }
 .item-page .it-tab:hover { color: var(--sc-fg-0); }
 .item-page .it-tab.on { color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 14%, transparent); text-shadow: 0 0 8px color-mix(in srgb, var(--sc-accent) 40%, transparent); }
-.item-page .it-tab:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+.item-page .it-tab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
 .item-page .it-pane { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px 12px 12px; }
 .item-page .it-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .item-page .tt-share {
@@ -1748,7 +1753,7 @@ button {
   font: 500 max(8.5px, 0.62rem) var(--sc-font-display, inherit); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-1);
 }
 .item-page .tt-share:hover { color: var(--sc-fg-0); }
-.item-page .tt-share:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+.item-page .tt-share:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 /* Holotisch: the values panel grows with its content — nothing scrolls inside the small box; the stage stays in view beside it. */
 .item-page.flow .it-grid { height: auto; min-height: 440px; align-items: start; }
 .item-page.flow .it-stage { position: sticky; top: calc(var(--sc-header-h, 64px) + 12px); height: calc(100dvh - var(--it-top, 300px)); min-height: 440px; }
@@ -2191,7 +2196,7 @@ html.sc-unfocused {
 .sc-action.sc-action--tertiary:hover:not(:disabled, .is-busy, [aria-disabled='true']) {
   background: color-mix(in srgb, var(--sc-action-t) 14%, transparent);
 }
-.sc-action:focus-visible { outline: 2px solid var(--sc-action-t); outline-offset: 2px; }
+.sc-action:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 .sc-action:disabled,
 .sc-action[aria-disabled='true'] {
   opacity: 0.38;
