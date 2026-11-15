@@ -276,8 +276,8 @@ export const MAIN_NAV_SLOT_PX = 112;
       }
       .brand:focus-visible,
       .slot:focus-visible {
-        outline: 2px solid var(--sc-accent);
-        outline-offset: 2px;
+        outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+        outline-offset: 0;
       }
       /* One indicator that glides under the active slot on a menu switch. */
       .ind {

@@ -136,7 +136,7 @@ import { wallpaperConstellations } from './wallpaper';
       .small { font-size: 0.75rem; }
       .err { color: var(--sc-danger); }
       .link { color: var(--sc-accent); min-height: 36px; display: inline-flex; align-items: center; }
-      .link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       ul { list-style: none; margin: 0; padding: 0; }
       .community-fig { flex: none; width: 96px; }
       .suns { display: flex; flex-wrap: wrap; gap: var(--sc-gap-2); }

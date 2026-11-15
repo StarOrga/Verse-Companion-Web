@@ -59,7 +59,7 @@ export const VIEW_FAB_LANE_VAR = '--sc-view-fab-lane';
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
     .fab:hover { background: color-mix(in srgb, var(--sc-accent) 14%, var(--sc-bg-1)); border-color: var(--sc-accent); }
-    .fab:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .fab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
   `],
 })

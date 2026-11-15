@@ -339,7 +339,7 @@ function chipSize(pin: StagePin): number | null {
     .back { background: none; border: 0; border-radius: 5px; color: var(--sc-accent); cursor: pointer; font: inherit; font-size: max(12.5px, var(--f)); padding: 3px 9px 3px 6px;
       min-height: var(--sc-tap-min, 26px); transition: background 160ms ease; }
     .back:hover { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
-    .back:focus-visible, .lnk:focus-visible, .swap:focus-visible, .act button:focus-visible, .more:focus-visible, .part:focus-visible, .eye:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .back:focus-visible, .lnk:focus-visible, .swap:focus-visible, .act button:focus-visible, .more:focus-visible, .part:focus-visible, .eye:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .pn { display: grid; gap: 1px; min-width: 0; }
     .pn h2 { margin: 0; font-family: var(--sc-font-body); font-size: 19px; font-weight: 600; color: var(--sc-fg-0); overflow-wrap: anywhere; line-height: 1.2; }
     .pn small { font-size: max(12px, var(--f)); color: var(--sc-fg-2); overflow-wrap: anywhere; }

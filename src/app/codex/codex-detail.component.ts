@@ -822,7 +822,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
         <ng-container [ngTemplateOutlet]="infoBlocks" />
         }
         } @else {
-          <sc-codex-holo-stage animate.enter="view-in"
+          <sc-codex-holo-stage animate.enter="view-in" (viewChange)="onStageViewChange()"
             [detail]="detail()!"
             [displayName]="displayName()"
             [manufacturerName]="manufacturerName()"
@@ -1373,7 +1373,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .ho-models a { padding: 2px 6px; border-radius: 6px; color: var(--sc-fg-2); text-decoration: none; white-space: nowrap; }
     .ho-models a:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
     .ho-models a.on { color: var(--sc-fg-0); border-radius: 0; box-shadow: inset 0 -1.5px 0 var(--sc-accent); }
-    .ho-models a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .ho-models a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .ho-models i { color: var(--sc-fg-2); font-style: normal; opacity: 0.6; }
     @media (pointer: coarse) { .ho-models a { min-height: 48px; display: inline-flex; align-items: center; } }
     .side-buy { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
@@ -1540,7 +1540,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .btn.on, .pin.pinned { color: var(--sc-accent);
       border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0));
       background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-    .btn:focus-visible, .pin:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .btn:focus-visible, .pin:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .btn:disabled, .pin:disabled { opacity: 0.38; cursor: not-allowed; }
     .btn.quiet { text-transform: none; letter-spacing: 0; background: transparent; }
 
@@ -1599,7 +1599,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .mchip { font-size: max(10px, var(--sc-fs-floor)); padding: 3px 7px; border-radius: 3px; letter-spacing: 0.12em;
       text-transform: uppercase; background: color-mix(in srgb, var(--sc-bg-0) 72%, transparent);
       border: 1px solid var(--sc-border); color: var(--sc-fg-1); cursor: default; }
-    .mchip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .mchip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     /* Skin / edition picker: sc-codex-variant-picker owns its rules. */
 
@@ -1722,7 +1722,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .err { color: var(--sc-danger); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .err .retry:hover { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .empty { text-align: center; padding: 40px; color: var(--sc-fg-2); }
 
     @media (max-width: 760px) {
@@ -1923,6 +1923,21 @@ export class CodexDetailComponent implements OnInit {
     return cls ? (this.hangar.ships().find((s) => s.shipClassName === cls && s.status === 'owned') ?? null) : null;
   });
   private readonly ownCardRef = viewChild(CodexOwnCardComponent);
+  private readonly holoStage = viewChild(CodexHoloStageComponent);
+  /** The ship whose catalog came back without any 3D model; null = unknown or has one. */
+  private readonly noModelSlug = signal<string | null>(null);
+  /** The reader switched the view on this page, so the no-model default must not override it. */
+  private readonly viewPicked = signal(false);
+  /** A ship without a 3D model opens on the Akte (once per page load, only while the reader has not chosen). */
+  private readonly akteDefault = effect(() => {
+    const slug = this.noModelSlug();
+    const stage = this.holoStage();
+    if (!slug || !stage || this.viewPicked() || this.detail()?.classNameSlug !== slug) return;
+    untracked(() => {
+      stage.akteOpen.set(true);
+      this.noModelSlug.set(null);
+    });
+  });
   private readonly swapPicker = viewChild<CodexSwapPickerComponent>('swapPicker');
   /** The head's "Nicht im Hangar / Inventar": the ownership card comes into view and lights up (C2). */
   revealOwnCard(): void {
@@ -3268,6 +3283,8 @@ export class CodexDetailComponent implements OnInit {
     this.editionOptions.set([]);
     this.modelOptions.set([]);
     this.akteLiveries.set([]);
+    this.noModelSlug.set(null);
+    this.viewPicked.set(false);
     this.rankCohort.set(null);
     this.rankCohortLoading.set(false);
     this.rankCohortFailed.set(false);
@@ -3558,7 +3575,7 @@ export class CodexDetailComponent implements OnInit {
 
   /** The paints of this record for the Akte's Lackierung tiles (ship_skins, C21). Best effort. */
   private async loadShipLiveries(className: string): Promise<void> {
-    const { skins } = await this.shipSkins.listSkins(className);
+    const { skins, error } = await this.shipSkins.listSkins(className);
     if (this.detail()?.classNameSlug !== className) return;
     const tiles: AkteLivery[] = skins.map((s) => ({
       id: s.skinId,
@@ -3568,6 +3585,13 @@ export class CodexDetailComponent implements OnInit {
     // The factory paint leads; it carries the official image.
     tiles.sort((a, b) => Number(b.id === AKTE_STANDARD_LIVERY) - Number(a.id === AKTE_STANDARD_LIVERY));
     this.akteLiveries.set(tiles);
+    // No catalog error and no skin with a model: the 3D view cannot show anything, so the Akte leads.
+    if (!error && !skins.some((s) => !!s.modelPath)) this.noModelSlug.set(className);
+  }
+
+  /** The reader picked a view on the bottom row: from here on the default no longer decides. */
+  onStageViewChange(): void {
+    this.viewPicked.set(true);
   }
 
   /** Reverse lookup: crafting blueprints that consume this entity as an ingredient. */

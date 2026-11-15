@@ -52,7 +52,7 @@ import { PatchSummaryView } from './codex-landing-data.types';
       .news b { font: 400 12px var(--font-monospace, 'Share Tech Mono', monospace); letter-spacing: 0; color: var(--sc-fg-0); }
       .news:hover, .news.on { border-color: var(--sc-accent); color: var(--sc-fg-0); }
       .news.on { background: rgba(82, 193, 230, 0.14); }
-      .news:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .news:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .dot {
         position: absolute; top: 6px; left: 22px; width: 8px; height: 8px; border-radius: 50%;
         background: var(--sc-accent); box-shadow: 0 0 0 2px #0b1f2c, 0 0 10px rgba(82, 193, 230, 0.9);
@@ -73,7 +73,7 @@ import { PatchSummaryView } from './codex-landing-data.types';
       li b { flex: 0 0 14px; font-weight: 400; text-align: center; color: var(--sc-accent); }
       .pop-foot { margin: 0; padding: 10px 4px 0; border-top: 1px solid var(--sc-border); font-size: 11px; }
       .pop-foot a { display: inline-flex; align-items: center; gap: 5px; min-height: 24px; color: var(--sc-accent); text-decoration: none; }
-      .pop-foot a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .pop-foot a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .pop-foot i { font-style: normal; }
       @media (max-width: 720px) {
         .news { min-height: 32px; padding: 0 10px; font-size: 9px; }

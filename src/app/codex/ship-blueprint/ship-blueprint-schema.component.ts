@@ -183,7 +183,7 @@ export interface SchemaCallout {
     .hp .meta { color: var(--sc-fg-2); font-size: max(0.64rem, var(--sc-fs-floor)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .hp:hover, .hp.on { border-color: var(--sc-accent); }
     .hp[aria-pressed='true'] { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, var(--sc-bg-1)); }
-    .hp:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .hp:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
   `],
 })
 export class ShipBlueprintSchemaComponent {

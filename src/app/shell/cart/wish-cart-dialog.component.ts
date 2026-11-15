@@ -199,7 +199,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       .step button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; background: transparent; color: var(--sc-fg-1); cursor: pointer; }
       .step button:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); }
       .step button:disabled { opacity: 0.4; cursor: default; }
-      .step button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+      .step button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       .step svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
       .step b .unit { font-size: 0.68rem; font-weight: 600; color: var(--sc-fg-2); }
       .step b { min-width: 2ch; text-align: center; font-variant-numeric: tabular-nums; font-size: 0.85rem; }
@@ -210,7 +210,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       .chk:checked, .chk:indeterminate { background: var(--sc-accent); border-color: var(--sc-accent); }
       .chk:checked::after { content: ''; width: 5px; height: 10px; border: solid var(--sc-bg-0); border-width: 0 2.4px 2.4px 0; transform: translateY(-1px) rotate(45deg); }
       .chk:indeterminate::after { content: ''; width: 10px; height: 2.4px; background: var(--sc-bg-0); border-radius: 2px; }
-      .chk:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .chk:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .sugs { padding: 10px 14px 12px; border: 1px solid color-mix(in srgb, var(--sc-warning) 35%, transparent); border-radius: 12px; background: linear-gradient(90deg, color-mix(in srgb, var(--sc-warning) 7%, transparent), transparent); }
       .s-head { margin: 0 0 8px; font: 600 0.78rem/1.2 var(--sc-font-display, inherit); letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-warning); }
       .s-head small { font: 500 0.78rem var(--sc-font-body, inherit); letter-spacing: 0; text-transform: none; color: var(--sc-fg-2); margin-left: 6px; }

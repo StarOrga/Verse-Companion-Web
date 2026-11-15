@@ -60,7 +60,7 @@ export const HINT_ROTATE_MS = 6000;
     }
     button.line { cursor: pointer; }
     button.line:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
-    button.line:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    button.line:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @keyframes fsh-in { from { opacity: 0; transform: translateY(3px); } }
     @media (prefers-reduced-motion: reduce) { .line { animation: none; } }
     @media (pointer: coarse) { button.line { min-height: 44px; } }

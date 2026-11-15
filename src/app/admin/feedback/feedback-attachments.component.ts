@@ -386,7 +386,7 @@ export interface AnnotationResult {
       cursor: zoom-in;
     }
     .att-thumb:hover { border-color: var(--sc-accent); }
-    .att-thumb:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .att-thumb:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .att-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     /* Placeholder while the signed URL loads: the empty thumbnail box itself. */
     .att-pending { display: block; width: 100%; height: 100%; background: var(--sc-bg-1); }
@@ -459,7 +459,7 @@ export interface AnnotationResult {
       cursor: pointer;
     }
     .att-remove:hover { background: rgba(0, 0, 0, 0.85); }
-    .att-remove:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .att-remove:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     .lb-backdrop {
       position: fixed; inset: 0; z-index: 1300;

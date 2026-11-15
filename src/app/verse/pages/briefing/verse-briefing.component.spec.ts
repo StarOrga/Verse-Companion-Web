@@ -27,7 +27,6 @@ import {
   VERSE_DOCUMENT_ENTRY,
   briefingStatus,
   explorerLit,
-  followingLine,
   liveStatusKey,
   newestFor,
   nextStatusKey,
@@ -55,12 +54,6 @@ const item = (key: string, rank: number, url: string, kind: VerseDigestItem['kin
 });
 
 describe('Verse briefing — model', () => {
-  it('followingLine bumps the minor line', () => {
-    expect(followingLine('4.10')).toBe('4.11');
-    expect(followingLine('4.9.1')).toBe('4.10');
-    expect(followingLine('x')).toBeNull();
-  });
-
   it('status keys pick the singular and the direction', () => {
     expect(liveStatusKey(null)).toBe('verse.briefing.status.liveNow');
     expect(liveStatusKey(0)).toBe('verse.briefing.status.liveToday');

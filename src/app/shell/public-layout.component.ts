@@ -91,8 +91,8 @@ import { FusionBarComponent } from './fusion-bar/fusion-bar.component';
     }
     .home:hover { color: var(--sc-fg-1); background: rgba(255, 255, 255, 0.04); }
     .home:focus-visible {
-      outline: 1px solid var(--sc-accent);
-      outline-offset: 2px;
+      outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+      outline-offset: 0;
     }
     .home .arrow { font-size: 1.05rem; line-height: 1; }
     .home .logo {

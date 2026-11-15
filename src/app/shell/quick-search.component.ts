@@ -106,7 +106,7 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
       color: var(--sc-fg-2); cursor: pointer; font-family: inherit; font-size: max(0.78rem, var(--sc-fs-floor));
     }
     .trigger:hover { border-color: var(--sc-accent); color: var(--sc-fg-0); }
-    .trigger:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .trigger:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .trigger-icon { width: 18px; height: 18px; flex: 0 0 auto; }
     .trigger kbd {
       font-size: max(0.62rem, var(--sc-fs-floor)); padding: 1px 5px; border-radius: 4px;
@@ -143,7 +143,7 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
     }
     .qs-close svg { width: 18px; height: 18px; }
     .qs-close:hover { color: var(--sc-fg-0); background: var(--sc-bg-2); }
-    .qs-close:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .qs-close:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @media (pointer: coarse) { .qs-close { width: 48px; height: 48px; } }
     /* The results are the scroll port; the field stays put above them. */
     .qs-results { flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; }

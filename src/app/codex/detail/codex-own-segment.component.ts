@@ -52,7 +52,7 @@ export const OWN_ICONS = {
     .own > svg { color: var(--sc-accent); }
     .quiet { border: 0; border-radius: 0 9px 9px 0; background: transparent; color: var(--sc-fg-2); cursor: pointer; }
     .quiet:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-accent) 8%, transparent); }
-    .quiet:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .quiet:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     svg { width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
     .var { margin-inline-start: 0; }
     .shown em { font-style: normal; color: var(--sc-fg-2); }

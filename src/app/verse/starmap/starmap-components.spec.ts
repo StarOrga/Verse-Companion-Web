@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 import { RoleService } from '../../auth/role.service';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { UndoToastService } from '../../shared/undo-toast/undo-toast.service';
+import { CometTrackComponent } from './comet-track.component';
 import { KartographBadgeComponent } from './kartograph-badge.component';
 import { provideTranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../auth/auth.service';
@@ -18,6 +19,7 @@ import { CELEBRATED_KEY, ExplorerPageComponent, wallpaperConstellations } from '
 import { SeriesStripComponent } from './series-strip.component';
 import { MyConstellationsComponent } from './my-constellations.component';
 import { StarmapMoreComponent } from './starmap-more.component';
+import { StarmapMiniComponent } from './starmap-mini.component';
 import { FALLBACK_POINTS, RANK_SEEN_KEY, rankNewsItems } from './starmap.model';
 import { RankPageComponent } from './rank-page.component';
 
@@ -330,69 +332,65 @@ describe('star map components', () => {
     expect(f.nativeElement.querySelector('sc-comet-track .tok.on .comet.fall')).not.toBeNull();
   });
 
-  it("the x.y.z target is offered next to the line and tipped via its own call", async () => {
-    cometVersion.mockResolvedValue({
-      patchVersion: "4.4.2",
-      patchLine: "4.4",
-      liveVersion: "4.4.1",
-      comet: { state: "none", tippedDate: null, locked: false, lockedReason: null, announcedDate: null },
-      splinters: 0,
-      source: "evocati",
-    });
-    explorer.set({ ...STATE, upcoming: { patchLine: "4.5", comet: { ...STATE.patches[0].comet } } });
-    const f = TestBed.createComponent(ExplorerPageComponent);
+  const OPEN = { state: 'none', tippedDate: null, locked: false, lockedReason: null, announcedDate: null } as const;
+  const LIVE_CLOSED = { state: 'none', tippedDate: null, locked: true, lockedReason: 'live', announcedDate: null } as const;
+
+  function track(inputs: { current: boolean; patchLine: string; comet: typeof OPEN | typeof LIVE_CLOSED }) {
+    const f = TestBed.createComponent(CometTrackComponent);
+    f.componentRef.setInput('patchLine', inputs.patchLine);
+    f.componentRef.setInput('comet', inputs.comet);
+    f.componentRef.setInput('current', inputs.current);
     f.detectChanges();
+    return f;
+  }
+
+  it('the announced x.y.z is the one target (no mode switch) and is tipped via its own call', async () => {
+    cometVersion.mockResolvedValue({
+      patchVersion: '4.4.2',
+      patchLine: '4.4',
+      liveVersion: '4.4.1',
+      comet: OPEN,
+      splinters: 0,
+      source: 'evocati',
+    });
+    const f = track({ current: true, patchLine: '4.4', comet: LIVE_CLOSED });
     await vi.waitFor(() => {
       f.detectChanges();
-      expect(f.nativeElement.querySelectorAll("sc-comet-track .mode").length).toBe(2);
+      expect(f.nativeElement.querySelector('.src')?.textContent).toContain('starmap.comet.source.evocati');
     });
-    // x.y.z first and pre-selected, the line is the second choice; source and splinter note stay quiet underneath
-    const modes = [...f.nativeElement.querySelectorAll("sc-comet-track .mode")] as HTMLButtonElement[];
-    expect(modes[0].textContent).toContain("4.4.2");
-    expect(modes[0].getAttribute("aria-pressed")).toBe("true");
-    expect(modes[1].getAttribute("aria-pressed")).toBe("false");
-    expect(f.nativeElement.querySelector("sc-comet-track .src")?.textContent).toContain("starmap.comet.source.evocati");
-    expect(f.nativeElement.querySelector("sc-comet-track .splinter-note")).not.toBeNull();
-    f.detectChanges();
-    (f.nativeElement.querySelector("sc-comet-track .tok:not(.nav):not(:disabled)") as HTMLButtonElement).click();
+    expect(f.nativeElement.querySelector('.mode')).toBeNull();
+    expect(f.nativeElement.querySelector('.splinter-note')).not.toBeNull();
+    (f.nativeElement.querySelector('.tok:not(.nav):not(:disabled)') as HTMLButtonElement).click();
     TestBed.inject(UndoToastService).flush();
-    await vi.waitFor(() => expect(submitVersionPrediction).toHaveBeenCalledWith("4.4.2", expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/)));
+    await vi.waitFor(() => expect(submitVersionPrediction).toHaveBeenCalledWith('4.4.2', expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/)));
     expect(submitPrediction).not.toHaveBeenCalled();
   });
 
-  it("the line tip stays reachable as the second choice and drops the x.y.z notes", async () => {
-    cometVersion.mockResolvedValue({
-      patchVersion: "4.4.2",
-      patchLine: "4.4",
-      liveVersion: "4.4.1",
-      comet: { state: "none", tippedDate: null, locked: false, lockedReason: null, announcedDate: null },
-      splinters: 1,
-      source: null,
-    });
-    explorer.set({ ...STATE, upcoming: { patchLine: "4.5", comet: { ...STATE.patches[0].comet } } });
-    const f = TestBed.createComponent(ExplorerPageComponent);
+  it('an older map ignores the version target', async () => {
+    cometVersion.mockResolvedValue({ patchVersion: '4.4.2', patchLine: '4.4', liveVersion: '4.4.1', comet: OPEN, splinters: 0, source: null });
+    const f = track({ current: false, patchLine: '4.3', comet: LIVE_CLOSED });
+    await vi.waitFor(() => expect(cometVersion).toHaveBeenCalled());
     f.detectChanges();
-    await vi.waitFor(() => {
-      f.detectChanges();
-      expect(f.nativeElement.querySelectorAll("sc-comet-track .mode").length).toBe(2);
-    });
-    expect(f.nativeElement.querySelector("sc-comet-track .src")).toBeNull();
-    (f.nativeElement.querySelectorAll("sc-comet-track .mode")[1] as HTMLButtonElement).click();
-    f.detectChanges();
-    expect(f.nativeElement.querySelectorAll("sc-comet-track .mode")[1].getAttribute("aria-pressed")).toBe("true");
-    expect(f.nativeElement.querySelector("sc-comet-track .splinter-note")).toBeNull();
-    (f.nativeElement.querySelector("sc-comet-track .tok:not(.nav):not(:disabled)") as HTMLButtonElement).click();
-    TestBed.inject(UndoToastService).flush();
-    await vi.waitFor(() => expect(submitPrediction).toHaveBeenCalled());
-    expect(submitVersionPrediction).not.toHaveBeenCalled();
+    expect(f.nativeElement.querySelector('.tok:not(.nav):not(:disabled)')).toBeNull();
+    expect(f.nativeElement.querySelector('.splinter-note')).toBeNull();
   });
 
-  it("without a version target the comet shows no mode switch (migration not applied)", () => {
-    explorer.set({ ...STATE, upcoming: { patchLine: "4.5", comet: { ...STATE.patches[0].comet } } });
-    const f = TestBed.createComponent(ExplorerPageComponent);
+  it('nothing announced on the newest map: a quiet no-tip state and nothing to submit', async () => {
+    const f = track({ current: true, patchLine: '4.4', comet: LIVE_CLOSED });
+    await vi.waitFor(() => expect(cometVersion).toHaveBeenCalled());
     f.detectChanges();
-    expect(f.nativeElement.querySelector("sc-comet-track .mode")).toBeNull();
-    expect(f.nativeElement.querySelector("sc-comet-track .tok")).not.toBeNull();
+    expect(f.nativeElement.querySelector('.quiet')?.textContent).toContain('starmap.comet.noTip');
+    expect(f.nativeElement.querySelector('.tok')).toBeNull();
+  });
+
+  it('an announced new line is tipped through the line call', async () => {
+    const f = track({ current: true, patchLine: '4.5', comet: OPEN });
+    await vi.waitFor(() => expect(cometVersion).toHaveBeenCalled());
+    f.detectChanges();
+    (f.nativeElement.querySelector('.tok:not(.nav):not(:disabled)') as HTMLButtonElement).click();
+    TestBed.inject(UndoToastService).flush();
+    await vi.waitFor(() => expect(submitPrediction).toHaveBeenCalledWith('4.5', expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/)));
+    expect(submitVersionPrediction).not.toHaveBeenCalled();
   });
 
   it('a tip whose day passed while the patch is not LIVE reads missed, under the renamed patch', () => {
@@ -426,13 +424,22 @@ describe('star map components', () => {
     }
   });
 
-  it('the header shows the real map in small, no globe: same 7 stars and 7 edges as the big map', () => {
+  it('the header shows only the discovered map in small, no globe: the lit stars, never open ones', () => {
     const f = TestBed.createComponent(ExplorerPageComponent);
     f.detectChanges();
     const mini = f.nativeElement.querySelector('sc-verse-header sc-starmap-mini') as HTMLElement;
     expect(mini).not.toBeNull();
-    expect(mini.querySelectorAll('.core').length).toBe(7);
-    expect(mini.querySelectorAll('.ln').length).toBe(7);
+    expect(mini.querySelectorAll('.core').length).toBe(2);
+    expect(mini.querySelectorAll('.ln:not(.on)').length).toBe(0);
+  });
+
+  it('the header emblem is exactly one single star while nothing is discovered, never a default shape', () => {
+    const f = TestBed.createComponent(StarmapMiniComponent);
+    f.componentRef.setInput('points', null);
+    f.detectChanges();
+    expect(f.nativeElement.querySelectorAll('.core').length).toBe(1);
+    expect(f.nativeElement.querySelectorAll('.ln').length).toBe(0);
+    expect(f.nativeElement.querySelector('.done')).toBeNull();
   });
 
   it('the guess rail submits on click and hides when unavailable', async () => {

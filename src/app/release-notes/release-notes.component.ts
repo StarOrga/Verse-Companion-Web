@@ -129,7 +129,7 @@ type KnownCategory = (typeof KNOWN_CATEGORIES)[number];
       background: rgba(0, 212, 255, 0.06);
     }
     .load-more:hover { background: rgba(0, 212, 255, 0.14); }
-    .load-more:focus-visible, .expander:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .load-more:focus-visible, .expander:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @media (pointer: coarse) {
       .load-more, .expander { min-height: 48px; min-width: 48px; }
     }

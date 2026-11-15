@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import type { VersePoint } from '../data/verse.models';
-import { FALLBACK_POINTS, lightRank, litIndices } from './starmap.model';
+import { lightRank, litIndices } from './starmap.model';
 
 /**
  * One constellation as SVG: outline, 7 stars (lit in SYMMETRIC order — the CSS
@@ -13,7 +13,7 @@ import { FALLBACK_POINTS, lightRank, litIndices } from './starmap.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <svg viewBox="-8 -14 122 122" [class.small]="size() === 'small'" aria-hidden="true" focusable="false">
-      <polygon class="outline" [class.on]="lit().size > 0" [attr.points]="outline()" />
+      @if (stars().length > 1) { <polygon class="outline" [class.on]="lit().size > 0" [attr.points]="outline()" /> }
       @for (s of stars(); track s.i) {
         <g class="star" [class.lit]="s.lit" [style.--rank]="s.rank" [style.opacity]="s.level" [attr.transform]="'translate(' + s.x + ' ' + s.y + ')'">
           <circle class="halo" r="7" />
@@ -70,33 +70,42 @@ export class ConstellationFigureComponent {
    */
   readonly levels = input<readonly number[] | null>(null);
 
-  private readonly pts = computed(() => {
+  /** The patch's real points, or none (never a made-up default shape). */
+  private readonly pts = computed<readonly VersePoint[]>(() => {
     const p = this.points();
-    return p && p.length === 7 ? p : FALLBACK_POINTS;
+    return p && p.length === 7 ? p : [];
   });
   readonly lit = computed(() => {
+    const pts = this.pts();
     const levels = this.levels();
-    if (!levels) return litIndices(this.pts(), this.starCount());
-    const rank = lightRank(this.pts());
-    return new Set(this.pts().map((_, i) => i).filter((i) => (levels[rank[i]] ?? 0) > 0));
+    if (!levels) return litIndices(pts, this.starCount());
+    const rank = lightRank(pts);
+    return new Set(pts.map((_, i) => i).filter((i) => (levels[rank[i]] ?? 0) > 0));
   });
+  /**
+   * Only the discovered shape: the lit stars. With nothing lit (or no
+   * constellation yet) exactly ONE dormant star in the middle.
+   */
   readonly stars = computed(() => {
-    const rank = lightRank(this.pts());
+    const pts = this.pts();
     const lit = this.lit();
     const levels = this.levels();
-    return this.pts().map((p, i) => ({
-      i,
-      x: p[0] * 100,
-      y: p[1] * 100,
-      lit: lit.has(i),
-      rank: rank[i],
-      level: levels && lit.has(i) ? 0.35 + 0.65 * (levels[rank[i]] ?? 0) : null,
-    }));
+    if (!pts.length || lit.size === 0) return [{ i: 0, x: 50, y: 50, lit: false, rank: 0, level: null as number | null }];
+    const rank = lightRank(pts);
+    return pts
+      .map((p, i) => ({
+        i,
+        x: p[0] * 100,
+        y: p[1] * 100,
+        lit: lit.has(i),
+        rank: rank[i],
+        level: levels && lit.has(i) ? 0.35 + 0.65 * (levels[rank[i]] ?? 0) : (null as number | null),
+      }))
+      .filter((s) => s.lit);
   });
   readonly outline = computed(() => this.stars().map((s) => `${s.x},${s.y}`).join(' '));
   readonly markAt = computed<[number, number]>(() => {
-    const lit = [...this.lit()];
-    const s = this.stars()[lit.length ? Math.min(...lit) : 0];
+    const s = this.stars()[0];
     return [s.x, s.y];
   });
 }

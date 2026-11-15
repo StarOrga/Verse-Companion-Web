@@ -321,7 +321,7 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
       display: grid; grid-template-columns: auto minmax(84px, auto) 1fr auto;
       align-items: center; gap: 14px; padding: 12px 14px; cursor: pointer;
     }
-    .patch-main:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; border-radius: 8px; }
+    .patch-main:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); border-radius: 8px; }
     .chev { color: var(--sc-accent); font-size: 0.9rem; width: 16px; text-align: center; }
     .patch-ver { font-size: 1.05rem; color: var(--sc-fg-0); display: flex; align-items: center; gap: 8px; }
     .patch-mid { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }

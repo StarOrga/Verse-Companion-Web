@@ -154,7 +154,7 @@ import { hqHangar, hqLocker, hqSet } from './hq-routes';
       }
       .archive-line__link.stage-cta--ghost { background: transparent; border-color: var(--sc-border); }
       .archive-line.amber .archive-line__link.stage-cta { border-color: var(--amber, #f0c27b); background: color-mix(in srgb, var(--amber, #f0c27b) 14%, transparent); }
-      .archive-line__link.stage-cta:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .archive-line__link.stage-cta:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       @media (pointer: coarse) { .archive-line__link.stage-cta { min-height: 48px; align-items: center; } }
       @media (max-width: 520px) {
         .stage-split { grid-template-columns: 1fr; grid-template-rows: 300px 300px; height: auto; }

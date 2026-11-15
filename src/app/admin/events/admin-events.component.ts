@@ -154,7 +154,7 @@ export function rejectField(sheet: EventSheet, key: EventSheetFieldKey): EventSh
       .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: calc(100dvh - 18rem); overflow: auto; }
       .row { width: 100%; text-align: start; display: flex; flex-direction: column; gap: 2px; padding: var(--sc-space-2, 8px) var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-bg-1); color: var(--sc-fg); font: inherit; cursor: pointer; }
       .row[aria-pressed='true'] { border-color: var(--sc-accent-hot); background: color-mix(in srgb, var(--sc-accent-hot) 10%, var(--sc-bg-1)); }
-      .row:focus-visible { outline: 2px solid var(--sc-accent-hot); outline-offset: 2px; }
+      .row:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-hot); }
       .badge { align-self: flex-start; padding: 1px 8px; border-radius: 999px; background: color-mix(in srgb, var(--sc-warning) 20%, transparent); color: var(--sc-warning); font-size: 0.74rem; }
       .badge.mute, .mute { color: var(--sc-fg-2); background: none; }
       .dh { display: flex; align-items: center; gap: var(--sc-space-3, 12px); }

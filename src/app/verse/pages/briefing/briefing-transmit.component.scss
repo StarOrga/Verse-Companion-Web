@@ -136,7 +136,7 @@
 :host(.away) .holo { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
 // Landed in the hub heads: the heads' own planet and word take over.
 :host(.docked) .pl { visibility: hidden; }
-.pl:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 4px; }
+.pl:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 // Charging: the sender's atmosphere brightens (a glow, no rings).
 .pl.send { box-shadow: 0 0 calc(var(--s) * 0.32) rgba(150, 225, 255, 0.6); transition: scale 0.25s, box-shadow 0.84s ease-in; }
 // The name shows only on hover / focus, rising under the planet like the sun's label (briefing-beacons .lab) -
@@ -251,7 +251,7 @@
 }
 // Nothing to click before the panel stands.
 :host([data-phase='charge']) .holo { pointer-events: none; }
-.holo:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 4px; }
+.holo:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 // The dark glass; it appears exactly behind the scan line.
 .holo-glass {
   position: absolute;

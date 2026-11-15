@@ -91,7 +91,7 @@ const THUMB = { width: 480, height: 270 } as const;
         border-radius: 8px; border: 1px solid var(--sc-border); background: var(--sc-bg-2); color: var(--sc-fg-0); font: inherit; cursor: pointer; }
       .btn.icon { min-width: var(--sc-tap-min, 44px); padding: 0; }
       .btn:hover { border-color: var(--sc-accent); }
-      .btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .btn svg { fill: currentColor; stroke: currentColor; stroke-width: 1.6; }
     `,
   ],

@@ -95,7 +95,7 @@ const STARSCAPE_FALLBACK_URL =
     .head small { font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.18em; text-transform: uppercase; color: var(--sc-accent); }
     .head b { font-size: 0.92rem; font-weight: 600; color: var(--sc-fg-0); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .toast.open .head b { white-space: normal; }
-    .head:focus-visible, .x:focus-visible, .dl:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .head:focus-visible, .x:focus-visible, .dl:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .x {
       width: 32px; height: 32px; border-radius: 50%; padding: 0; cursor: pointer; font-size: 16px; line-height: 1;
       background: none; border: 1px solid var(--sc-border); color: var(--sc-fg-2);

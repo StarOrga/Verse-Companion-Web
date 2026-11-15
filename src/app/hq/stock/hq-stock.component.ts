@@ -527,7 +527,7 @@ type Cell = { kind: 'add' } | { kind: 'ship'; ship: HangarShip } | { kind: 'bp';
       .tab:hover { color: var(--sc-fg); }
       .tab[aria-current='page'] { color: var(--sc-fg); background: color-mix(in srgb, var(--sc-accent) 20%, transparent); box-shadow: 0 0 0 1px var(--sc-accent); }
       .tab[aria-current='page'] svg { color: var(--sc-accent); }
-      .tab:focus-visible, .chip:focus-visible, .tog:focus-visible, .bay:focus-visible, .mode button:focus-visible, .tile:focus-visible, .set:focus-visible, .pad:focus-visible, .lock:focus-visible, .band:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .tab:focus-visible, .chip:focus-visible, .tog:focus-visible, .bay:focus-visible, .mode button:focus-visible, .tile:focus-visible, .set:focus-visible, .pad:focus-visible, .lock:focus-visible, .band:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .head-r { margin-left: auto; display: inline-flex; flex-wrap: wrap; justify-content: flex-end; max-width: 100%; align-items: center; gap: var(--sc-space-2, 8px); }
       .mode { display: inline-flex; padding: 3px; border: 1px solid var(--sc-border); border-radius: 10px; }
       .mode button { min-height: 28px; padding: 0 10px; border: 0; border-radius: 7px; background: none; color: var(--sc-fg-2); font: inherit; font-size: 0.8rem; cursor: pointer; }
@@ -538,7 +538,7 @@ type Cell = { kind: 'add' } | { kind: 'ship'; ship: HangarShip } | { kind: 'bp';
       .menu a, .menu button { display: flex; align-items: center; width: 100%; min-height: 36px; padding: 0 10px; border: 0; border-radius: 6px; background: transparent; color: var(--sc-fg); font: inherit; text-align: start; text-decoration: none; cursor: pointer; box-sizing: border-box; }
       .menu a:hover, .menu button:hover { background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
       .menu .danger { color: var(--sc-danger); }
-      .menu a:focus-visible, .menu button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+      .menu a:focus-visible, .menu button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       .err { margin: 0; color: var(--sc-warning); }
       .state { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sc-space-2, 8px); }
       .state p { margin: 0; }
@@ -640,7 +640,7 @@ type Cell = { kind: 'add' } | { kind: 'ship'; ship: HangarShip } | { kind: 'bp';
       .tile .nm.tile-link { color: inherit; text-decoration: none; }
       .tile-link::after { content: ''; position: absolute; inset: 0; border-radius: 12px; }
       .tile-link:focus-visible { outline: none; }
-      .tile-link:focus-visible::after { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+      .tile-link:focus-visible::after { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       .tile:has(.tile-link):hover { border-color: var(--sc-accent); transform: translateY(-1px); }
       .tile .qty { position: absolute; top: 8px; right: 12px; font: 700 1rem var(--sc-font-display, inherit); color: var(--sc-accent); pointer-events: none; }
       .tile .where { color: var(--sc-fg-2); font-size: 0.74rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }

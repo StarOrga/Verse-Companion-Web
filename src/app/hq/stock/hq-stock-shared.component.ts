@@ -85,7 +85,7 @@ import { hqHangar, hqStockLink } from '../hq-routes';
       .what { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
       .meta { color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor)); }
       a { color: var(--sc-accent); }
-      a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .err { margin: 0; color: var(--sc-warning); }
       @media (pointer: coarse) { .sc-btn { min-height: 48px; } }
     `,

@@ -34,7 +34,7 @@ import { normalizeSearch } from './codex-search';
     .did-you-mean { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; margin: 10px 0 0; color: var(--sc-fg-2); }
     .suggestion { color: var(--sc-accent); text-decoration: none; border-radius: 4px; }
     .suggestion:hover { text-decoration: underline; }
-    .suggestion:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; text-decoration: underline; }
+    .suggestion:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); text-decoration: underline; }
     .sep { color: var(--sc-fg-2); }
     @media (pointer: coarse) {
       .suggestion { display: inline-flex; align-items: center; min-height: max(48px, var(--sc-tap-min)); padding: 0 4px; }

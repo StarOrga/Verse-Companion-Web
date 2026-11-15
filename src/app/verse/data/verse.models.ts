@@ -129,7 +129,7 @@ export interface VerseConstellation {
   readonly points: readonly VersePoint[];
 }
 
-/** none = no tip · tipped = waiting for LIVE · hit = within +-2 days (sun lit) · miss = LIVE, outside. */
+/** none = no tip · tipped = waiting for LIVE · hit = within +-1 day (sun lit) · miss = LIVE, outside. */
 export type VerseCometStateKey = 'none' | 'tipped' | 'hit' | 'miss';
 
 /** Why the LIVE date can no longer be tipped. */
@@ -252,7 +252,7 @@ export interface VerseExplorerState {
   /** Null when no patch is in testing. */
   readonly upcoming: VerseUpcomingPatch | null;
   readonly totalStars: number;
-  /** Patch lines with a sun (comet hit within +-2 days). */
+  /** Patch lines with a sun (comet hit within +-1 day). */
   readonly suns: readonly string[];
   /** Sun splinters (3 = one small sun); 0 on a server without the migration. Never counts as a star. */
   readonly sunSplinters: number;

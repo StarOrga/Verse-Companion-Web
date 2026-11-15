@@ -77,7 +77,7 @@ export const PAGE_BAR_SLACK_PX = 12;
       }
       .tab svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .tab[aria-current='page'] { color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
-      .tab:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+      .tab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       /* Beta shell on a phone: the docked fusion bar stands at the bottom edge too (and under this
          bar's left end it showed through, seen in a real phone viewport), so this bar sits on top of it. */
       @media (max-width: 720px) {

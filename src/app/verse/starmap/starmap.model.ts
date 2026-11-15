@@ -53,8 +53,15 @@ export function lightRank(points: readonly VersePoint[]): number[] {
 }
 
 /**
- * Fallback shape when a patch has no uploaded constellation yet: a calm,
- * mirror-symmetric "arrow" (nose, two wing pairs, tail pair) in 0..1.
+ * What an emblem/image draws while no constellation of the patch is known: ONE
+ * single star in the middle (0..1), never a made-up shape.
+ */
+export const SINGLE_STAR: readonly VersePoint[] = [[0.5, 0.5]];
+
+/**
+ * Task-slot layout of the dome when a patch has no uploaded constellation yet
+ * (the 7 tasks need 7 places): a calm, mirror-symmetric "arrow" in 0..1.
+ * Never used for emblems or images, see {@link SINGLE_STAR}.
  */
 export const FALLBACK_POINTS: readonly VersePoint[] = [
   [0.5, 0.08],
@@ -510,7 +517,7 @@ export function todayYmd(now: Date = new Date()): string {
   return localYmd(now);
 }
 
-/** One day token of the comet rail; `win` = within ±2 days of the tip. */
+/** One day token of the comet rail; `win` = within ±1 day of the tip. */
 export interface CometDay {
   readonly ymd: string;
   readonly win: boolean;
@@ -522,7 +529,7 @@ export function cometDays(start: string, count: number, tipped: string | null): 
   return Array.from({ length: count }, (_, i) => {
     const ymd = addDays(start, i);
     const diff = Math.abs(Date.parse(`${ymd}T00:00:00Z`) - tipDay) / 86_400_000;
-    return { ymd, win: !Number.isNaN(diff) && diff <= 2, on: ymd === tipped };
+    return { ymd, win: !Number.isNaN(diff) && diff <= 1, on: ymd === tipped };
   });
 }
 

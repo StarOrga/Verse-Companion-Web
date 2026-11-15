@@ -883,8 +883,8 @@ $dock-ease: cubic-bezier(0.55, 0, 0.2, 1);
   box-shadow: inset 0 0 0 3px #061724;
 }
 .fopt input:focus-visible {
-  outline: 2px solid var(--sc-accent);
-  outline-offset: 2px;
+  outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+  outline-offset: 0;
 }
 .fopt span {
   overflow: hidden;
@@ -971,8 +971,8 @@ $dock-ease: cubic-bezier(0.55, 0, 0.2, 1);
 .trail a:focus-visible,
 .brand:focus-visible,
 .home-link:focus-visible {
-  outline: 2px solid var(--sc-accent);
-  outline-offset: 2px;
+  outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+  outline-offset: 0;
 }
 
 

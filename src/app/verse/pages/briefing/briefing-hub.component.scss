@@ -45,7 +45,7 @@
 }
 .colh:hover, .colh:focus-visible { opacity: 1; }
 .colh:hover .chev, .colh:focus-visible .chev { color: var(--sc-accent); }
-.colh:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+.colh:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 .mini {
   @include w.body;
   @include w.by-door;
@@ -65,7 +65,7 @@
 .feat { position: relative; display: block; height: var(--feat); border-radius: 6px; overflow: hidden; color: inherit; text-decoration: none; }
 .feat-img, .acc-img, .shot img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .blank { background: linear-gradient(160deg, #0e1a2a, #24405c 55%, #0b1622); }
-.feat:focus-visible, .acc-a:focus-visible, .ch:focus-visible, .shot:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+.feat:focus-visible, .acc-a:focus-visible, .ch:focus-visible, .shot:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 .state { margin: 0; display: grid; place-content: center; gap: var(--sc-space-3, 12px); text-align: center; color: var(--sc-fg-1); }
 .state p { margin: 0; }
 .sk { border-radius: 6px; }

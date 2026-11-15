@@ -157,13 +157,13 @@ const FLASH_MS = 1400;
     .oc-link { display: inline-flex; align-items: center; gap: 5px; min-height: var(--sc-tap-min, 32px); color: var(--sc-accent);
       font-size: max(0.8rem, var(--sc-fs-floor)); text-decoration: none; }
     .oc-link:hover { text-decoration: underline; }
-    .oc-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+    .oc-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
     .oc-step { display: inline-flex; align-items: center; gap: 6px; }
     .oc-step b { min-width: 1.4em; text-align: center; color: var(--sc-fg-0); font-size: max(0.95rem, var(--sc-fs-floor)); }
     .st { display: inline-grid; place-items: center; width: 28px; height: 28px; padding: 0; border-radius: 50%; cursor: pointer;
       border: 1px solid var(--sc-border); background: var(--sc-bg-1); color: var(--sc-fg-1); font: inherit; line-height: 1; }
     .st:hover:not(:disabled) { border-color: var(--sc-accent); color: var(--sc-fg-0); }
-    .st:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .st:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .st:disabled { opacity: 0.5; cursor: default; }
     .oc-err { margin: 0; color: var(--sc-danger); font-size: max(0.76rem, var(--sc-fs-floor)); }
     .mono { font-family: var(--sc-font-mono, monospace); }

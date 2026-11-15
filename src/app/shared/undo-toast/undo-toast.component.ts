@@ -49,7 +49,7 @@ import { UndoToastService } from './undo-toast.service';
       transition: background 0.15s, color 0.15s;
     }
     .undo:hover { background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-fg-0); }
-    .undo:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .undo:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @media (pointer: coarse) { .undo { height: 48px; } }
     .drain {
       position: absolute; inset: auto 0 0 0; height: 2px; background: var(--sc-accent); transform-origin: left center;

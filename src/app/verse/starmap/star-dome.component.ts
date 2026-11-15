@@ -69,6 +69,7 @@ export function formatDay(value: string | null, lang: string, withWeekday = fals
           <button type="button" class="star" [class]="'star ' + s.state" [style.left.%]="s.x" [style.top.%]="s.y"
                   [style.--d]="(starDelay(s)) + 's'" [attr.aria-pressed]="selected() === s.index"
                   [attr.aria-label]="starAria(s) | translate: { task: (taskTitle(s) | translate), n: s.rank + 1 }"
+                  [scTooltip]="starAria(s) | translate: { task: (taskTitle(s) | translate), n: s.rank + 1 }" scTooltipTier="label"
                   (click)="toggle(s)">
             <span class="ent" [style.--r]="s.rank">
               <svg class="sv" viewBox="-14 -14 28 28" aria-hidden="true" focusable="false">
@@ -180,7 +181,7 @@ export function formatDay(value: string | null, lang: string, withWeekday = fals
       .x:hover, .x:focus-visible { color: var(--sc-fg-0); border-color: var(--sc-accent); outline: none; }
       .go { display: inline-flex; align-items: center; min-height: 36px; padding: 0 var(--sc-pad-2); border-radius: 4px; background: var(--sc-accent);
         color: var(--sc-bg-0); font: 0.75rem var(--sc-font-display); letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; }
-      .go:focus-visible { outline: 2px solid var(--sc-fg-0); outline-offset: 2px; }
+      .go:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       /* Completion celebration (once per patch line, on the visit after the last star): a bloom from the
          figure's heart, the outline flares, the stars pulse one after another, a few sparks drift out. */
       .bloom { position: absolute; z-index: 1; left: 50%; top: 50%; width: 70%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%;

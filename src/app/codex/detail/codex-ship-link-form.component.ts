@@ -98,7 +98,7 @@ import { ShipLinkFormStore } from './ship-link-form.store';
     }
     .btn:hover { color: var(--sc-fg-0);
       border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0)); }
-    .btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .btn:disabled { opacity: 0.38; cursor: not-allowed; }
     .btn.quiet { text-transform: none; letter-spacing: 0; background: transparent; }
   `],

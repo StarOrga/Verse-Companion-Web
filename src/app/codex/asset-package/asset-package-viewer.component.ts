@@ -376,7 +376,7 @@ const WHEEL_LINE_PX = 33;
         color: var(--sc-accent); font: inherit; font-size: 1rem; line-height: 1; cursor: pointer;
       }
       .step:hover { border-color: var(--sc-accent); }
-      .clabel .nm:focus-visible, .step:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .clabel .nm:focus-visible, .step:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       @media (pointer: coarse) { .step { width: 3rem; height: 3rem; } }
       .bar {
         position: absolute; left: var(--sc-pad-2); right: var(--sc-pad-2); bottom: var(--sc-pad-2);
@@ -389,7 +389,7 @@ const WHEEL_LINE_PX = 33;
         color: var(--sc-fg-2); font: inherit; font-size: 0.8125rem; cursor: pointer;
       }
       .chip[aria-pressed='true'], .chip[aria-expanded='true'] { border-color: var(--sc-accent); color: var(--sc-accent); }
-      .chip:focus-visible, .eye:focus-visible, .name:focus-visible, .free:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .chip:focus-visible, .eye:focus-visible, .name:focus-visible, .free:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .plist {
         position: absolute; top: var(--sc-pad-2); right: var(--sc-pad-2); bottom: 3.5rem;
         width: min(20rem, calc(100% - 2 * var(--sc-pad-2))); overflow: auto; margin: 0; padding: var(--sc-pad-1);

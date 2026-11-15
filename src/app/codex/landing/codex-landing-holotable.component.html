@@ -1,6 +1,6 @@
 <div class="air">
   <span class="halo" aria-hidden="true"></span>
-  <span class="beam" aria-hidden="true"><i class="rays"></i><i class="motes"></i><i class="core"></i></span>
+  <span class="beam" aria-hidden="true"><i class="rays"></i><i class="lines"></i><i class="motes"></i><i class="core"></i></span>
 
   @if (item(); as it) {
     @for (k of [key()]; track k) {
@@ -76,9 +76,6 @@
               <span>{{ eyebrowKey(it) | translate }}</span>
               <span class="k-sep" aria-hidden="true">·</span>
               <span>{{ label(it.category) | translate }}</span>
-              @if (it.eyebrow.manufacturer) {
-                <span class="sc-sr-only">·</span><span class="k-maker">{{ it.eyebrow.manufacturer }}</span>
-              }
             </p>
             <p class="k-name"><span class="k-type">{{ it.name }}</span></p>
           </div>

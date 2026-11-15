@@ -79,7 +79,7 @@ export function missingParts(
       .note { color: var(--sc-fg-2); font-size: max(0.85rem, var(--sc-fs-floor)); }
       .plan { display: inline-flex; align-items: center; min-height: var(--sc-tap-min, 44px); color: var(--sc-accent); text-decoration: none; }
       .plan:hover { text-decoration: underline; }
-      .plan:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+      .plan:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
     `,
   ],
 })

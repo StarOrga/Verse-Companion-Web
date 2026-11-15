@@ -57,7 +57,7 @@ export function qualityTone(q: number | null): 'unknown' | 'low' | 'mid' | 'high
         background: linear-gradient(180deg, color-mix(in srgb, var(--sc-accent) 14%, transparent), color-mix(in srgb, var(--sc-bg-0) 95%, transparent)), repeating-linear-gradient(90deg, transparent 0 18px, color-mix(in srgb, var(--sc-accent) 5%, transparent) 18px 19px); transition: border-color .15s, box-shadow .15s; }
       .crate.box { justify-content: flex-start; padding: 8px 10px; border-color: var(--sc-border); border-radius: 8px; background: var(--sc-bg-1); }
       .crate:hover { border-color: var(--sc-accent); }
-      .crate:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .crate:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .crate.sel { border-color: var(--sc-accent); box-shadow: 0 0 0 2px var(--sc-accent), 0 0 18px color-mix(in srgb, var(--sc-accent) 45%, transparent); background: color-mix(in srgb, var(--sc-accent) 22%, var(--sc-bg-1)); }
       .crate { --qc: var(--sc-fg-2); }
       .crate[data-tone='unknown'] { --qc: var(--sc-border); }

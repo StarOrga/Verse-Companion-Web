@@ -815,7 +815,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   color: var(--sc-fg-2); font: inherit; font-size: max(12px, var(--f)); white-space: nowrap; transition: color 180ms ease; }
   .ptab svg { width: 1.15em; height: 1.15em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .ptab:hover, .ptab.on { color: var(--sc-fg-0); }
-  .ptab:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+  .ptab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
   .tcount { font-family: var(--m); font-size: max(10px, var(--f)); color: var(--sc-accent); }
   .ptab.on .tcount { color: var(--sc-fg-0); }
   .pbody { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding: 12px 16px; animation: rise var(--rise-dur, 300ms) var(--e-out) var(--rise-delay, 60ms) backwards;
@@ -877,7 +877,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .pdetails { flex: none; display: block; width: 100%; min-height: max(30px, var(--sc-tap-min, 0px)); background: none; border: 0; border-block-start: 1px solid var(--hair); color: var(--sc-fg-2); cursor: pointer;
   font: inherit; font-size: max(11px, var(--f)); transition: color 160ms ease; }
   .pdetails:hover { color: var(--sc-accent); }
-  .pdetails:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+  .pdetails:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
 
   /* ── Tab Einordnung ── */
   .rankbody { display: grid; gap: 10px; min-width: 0; }
@@ -939,7 +939,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .vw-thumb.on .vw-l { color: var(--sc-fg-0); }
   .vw-thumb.dis { opacity: 0.42; cursor: not-allowed; }
   .vw-thumb:focus-visible { outline: none; }
-  .vw-thumb:focus-visible .vw-ic { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+  .vw-thumb:focus-visible .vw-ic { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
   /* Views | filters: a full-height rule; the filters read as their own kind (chips with a check). */
   .vw-sep { flex: none; width: 2px; align-self: stretch; margin: 2px 6px; border-radius: 1px; background: color-mix(in srgb, var(--sc-accent) 55%, transparent); }
   .vf { flex: 0 1 auto; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
@@ -953,7 +953,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .vf-chip.all.on { border-style: solid; }
   .vf-chip:hover:not([aria-disabled="true"]) { color: var(--sc-fg-0); border-color: var(--l2); }
   .vf-chip[aria-disabled="true"] { opacity: 0.4; cursor: not-allowed; }
-  .vf-chip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+  .vf-chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
   @media (pointer: coarse) { .vf-chip { height: var(--sc-tap-min, 44px); } }
   /* D5: the rooms take the filters' slot and the rest of the row; overflow scrolls sideways, the row stays one line. */
   .vr { flex: 1 1 auto; }
@@ -1013,7 +1013,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .switch .track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 8px; height: 8px; border-radius: 50%; background: var(--sc-fg-2); transition: transform 200ms var(--e-out), background 160ms ease; }
   .switch input:checked + .track { background: color-mix(in srgb, var(--sc-accent) 30%, var(--sc-bg-0)); border-color: var(--sc-accent); }
   .switch input:checked + .track::after { transform: translateX(14px); background: var(--sc-accent); }
-  .switch input:focus-visible + .track { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+  .switch input:focus-visible + .track { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
   /* The toast rides above the strip, whatever height the strip has. */
   .toasts { position: fixed; bottom: calc(var(--holo-strip-h, 64px) + 16px + var(--holo-strip-lift, 0px)); left: 50%; translate: -50% 0; z-index: 20;
   display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
@@ -1966,7 +1966,8 @@ export class CodexHoloStageComponent {
         this.changeView.set('patch');
         this.patchChooser()?.toggle();
         break;
-      case 'view':
+      case 'view': {
+        const before = this.activeViewId();
         this.akteOpen.set(false);
         this.pickSurface(nextHoloSurface(this.surface(), {
           has3d: this.has3d(),
@@ -1974,7 +1975,10 @@ export class CodexHoloStageComponent {
           side: this.drawingAvailable(),
           front: this.frontAvailable(),
         }));
+        // A hotkey pick is a user choice too: the parent must not override it later (Akte default).
+        if (this.activeViewId() !== before) this.viewChange.emit(this.activeView());
         break;
+      }
     }
   }
 

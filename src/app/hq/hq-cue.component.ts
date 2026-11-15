@@ -53,7 +53,7 @@ import { HqPageId } from './hq-routes';
         transform: rotate(45deg);
       }
       .more-cue:hover .chev, .more-cue:focus-visible .chev { color: var(--sc-accent); }
-      .more-cue:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 6px; }
+      .more-cue:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 6px; }
       @media (pointer: coarse) { .more-cue { min-height: 48px; } }
     `,
   ],

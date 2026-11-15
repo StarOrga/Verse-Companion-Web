@@ -288,9 +288,11 @@ describe('CodexLandingComponent', () => {
     expect(calls[0].querySelector('a')).toBeNull();
     expect(calls[0].querySelector('.c-cmp.worse'), 'worse than its class').not.toBeNull();
     expect(piece().querySelectorAll('.leaders path').length).toBe(1);
-    const bars = el.querySelectorAll('sc-codex-landing-values-pane .row:not(.callout)');
-    expect(bars.length).toBe(1);
-    expect(bars[0].querySelector('.bar u'), 'class mean tick').not.toBeNull();
+    // The data sheet lists every value (its own first, then the callout ones) as plain rows, no bars.
+    const rows = el.querySelectorAll('sc-codex-landing-values-pane .row');
+    expect(rows.length).toBe(2);
+    expect(rows[0].classList.contains('callout')).toBe(false);
+    expect(el.querySelector('sc-codex-landing-values-pane .bar')).toBeNull();
     flush();
   }));
 

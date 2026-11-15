@@ -255,7 +255,7 @@
   pointer-events: none;
 }
 .map:hover::before, .map:focus-visible::before { opacity: 1; transform: none; }
-.map:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+.map:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
 // Square like the sky's viewBox, and the sky fills it, so the anchor's box
 // (halo, focus ring) is exactly where the stars are.
 .fig {
@@ -330,7 +330,7 @@
   animation: soft-up calc(0.4s * var(--k)) cubic-bezier(0.2, 0.7, 0.2, 1) calc(1.2s * var(--k)) both;
 }
 .cta:hover { background: var(--sc-fg-0); color: var(--sc-bg-0); text-decoration: none; }
-.cta:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 3px; }
+.cta:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 // Where the CTA leads, small and muted right under it.
 .where {
   margin: 0;
@@ -399,7 +399,7 @@
   transition: color 0.16s, border-color 0.16s;
 }
 .pause:hover { color: var(--sc-fg-0); border-color: color-mix(in srgb, var(--sc-fg-0) 55%, transparent); }
-.pause:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+.pause:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 .pause svg { width: 14px; height: 14px; fill: currentColor; }
 .stage.paused .pause { color: var(--sc-accent); border-color: color-mix(in srgb, var(--sc-accent) 60%, transparent); }
 

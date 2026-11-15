@@ -71,7 +71,7 @@ const RING_C = 2 * Math.PI * RING_R;
       }
       :host([data-variant='checkbox']) .tri { border-radius: 6px; }
       .tri:disabled { cursor: default; opacity: 0.5; }
-      .tri:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .tri:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .tri:hover:not(:disabled) { color: var(--sc-fg); }
       svg { width: 100%; height: 100%; overflow: visible; }
       .track, .box { fill: none; stroke: currentColor; stroke-width: 1.6; opacity: 0.55; }

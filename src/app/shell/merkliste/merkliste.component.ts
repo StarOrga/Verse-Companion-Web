@@ -101,7 +101,7 @@ interface WishLine {
       .trigger svg { width: 24px; height: 24px; }
       .trigger:hover, .trigger.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
       .trigger.on { box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-      .trigger:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .trigger:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       /*
        * 27rem (432 px): a row is thumb 52 + gap 8 + name + stepper 84 + two 32 px icons + gaps 12, inside 14 px panel
        * padding and 4 px row padding on each side. That leaves ~190 px for the name: "Aegis Avenger Warlock" (21 characters
@@ -115,7 +115,7 @@ interface WishLine {
       .qrow { display: grid; grid-template-columns: minmax(0, 1fr) auto 32px 32px; align-items: center; gap: 4px; min-height: 50px; padding: 2px 4px; border: 1px solid transparent; border-radius: 8px; }
       .qrow:hover, .qrow:focus-within { background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }
       .open { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: 8px; min-width: 0; min-height: 44px; border-radius: 8px; color: var(--sc-fg-0); text-decoration: none; }
-      .open:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .open:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .rimg { display: block; height: 36px; padding: 3px; border-radius: 7px; color: var(--sc-fg-1); background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }
       .rt { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
       .rt b { font-size: 0.85rem; font-weight: 600; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
@@ -126,12 +126,12 @@ interface WishLine {
       .step button { display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; background: transparent; color: var(--sc-fg-1); cursor: pointer; }
       .step button:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); }
       .step button:disabled { opacity: 0.4; cursor: default; }
-      .step button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+      .step button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       .step svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
       .step b { min-width: 2ch; text-align: center; font-variant-numeric: tabular-nums; font-size: 0.85rem; font-weight: 600; color: var(--sc-fg-0); }
       .all { display: inline-flex; align-items: center; min-height: 36px; margin-top: 4px; padding: 0 4px; border: 0; background: none; font: inherit; font-size: 0.85rem; color: var(--sc-accent); text-decoration: none; cursor: pointer; }
       .all:hover { text-decoration: underline; }
-      .all:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+      .all:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
       .empty { margin: 8px 4px; color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor, 0.75rem)); }
       /* Phone: a sheet above the feedback launcher's lane, never cut by the mobile URL bar. */
       @media (max-width: 749px) {

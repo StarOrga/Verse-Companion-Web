@@ -340,7 +340,7 @@ export interface SetStageLine {
         border-color: var(--sc-accent);
         background: color-mix(in srgb, var(--sc-accent) 10%, var(--sc-bg-0));
       }
-      .tile:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .tile:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .ic { flex: none; width: 28px; height: 28px; display: inline-flex; --sc-icon-max: 20px; }
       .ic sc-codex-icon { width: 100%; height: 100%; }
       .tile.open .ic { opacity: 0.6; }
@@ -393,7 +393,7 @@ export interface SetStageLine {
       .clear svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
       /* Neutral hover: amber means "equipped", red is for errors — clearing is undoable. */
       .clear:hover { color: var(--sc-fg-0); border-color: var(--sc-fg-2); }
-      .clear:focus-visible, .undo:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .clear:focus-visible, .undo:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .clear:disabled, .undo:disabled { cursor: progress; opacity: 0.6; }
       .note {
         margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;

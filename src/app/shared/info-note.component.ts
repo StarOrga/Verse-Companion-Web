@@ -47,7 +47,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, inject, input, signal }
       font-weight: 600; line-height: 1;
     }
     .dot:hover, .dot[aria-expanded='true'] { color: var(--sc-accent); border-color: var(--sc-accent); }
-    .dot:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .dot:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* Default: up and to the right of the dot. */
     .pop {
       position: absolute; bottom: calc(100% + 8px); left: 0; right: auto; top: auto;

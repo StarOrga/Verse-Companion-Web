@@ -62,7 +62,7 @@ export interface StripMission {
         background: color-mix(in srgb, var(--sc-bg-0) 70%, transparent); color: var(--sc-fg-0); font: inherit; text-align: start; cursor: pointer;
         transition: border-color 160ms ease, background 160ms ease; max-inline-size: 100%; }
       .einsatz:hover, .einsatz[aria-expanded='true'] { border-color: var(--sc-accent); background: color-mix(in srgb, var(--holo-e, var(--sc-accent)) 12%, var(--sc-bg-0)); }
-      .einsatz:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .einsatz:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .lab { grid-column: 1 / -1; font-family: var(--sc-font-display); font-size: max(9.5px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); }
       .val { display: inline-flex; align-items: center; gap: 6px; font-family: var(--sc-font-display); font-size: max(14px, var(--sc-fs-floor)); font-weight: 600; letter-spacing: 0.04em;
         color: var(--holo-e, var(--sc-fg-0)); white-space: nowrap; transition: color var(--holo-t-base, 200ms) ease; }
@@ -80,7 +80,7 @@ export interface StripMission {
       .mp:hover:not(.dis) { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-accent) 8%, transparent); }
       .mp.on { color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
       .mp.dis { opacity: 0.4; cursor: not-allowed; }
-      .mp:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+      .mp:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       @media (max-width: 640px) {
         .mission-pop { inset-inline-start: 0; translate: none; }
       }

@@ -91,7 +91,7 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
       font-family: inherit; text-align: left; cursor: pointer;
     }
     .main:hover { background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
-    .main:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -3px; }
+    .main:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .caret {
       flex: 0 0 auto; width: 12px; text-align: center; line-height: 1.4;
       color: var(--sc-accent); transition: transform .16s ease;
@@ -110,7 +110,7 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
       color: var(--sc-fg-2); text-decoration: none; font-size: 0.9rem;
     }
     .rsi:hover { color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
-    .rsi:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -3px; }
+    .rsi:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
 
     .tag {
       display: inline-flex; align-items: center;

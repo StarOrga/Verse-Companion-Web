@@ -93,7 +93,7 @@ const CONNECTED_HINT_MS = 2000;
         font: 500 max(0.84rem, var(--sc-fs-floor)) / 1 var(--sc-font-body);
       }
       .pill:hover { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
-      .pill:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .pill:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       /* Inside the HQ status chip (sc-hq-live-ticker): the same pill, one size down, so it fits the 32px chip. */
       .pill.chip { min-height: 24px; padding: 0 10px; font-size: max(0.76rem, var(--sc-fs-floor)); }
       @media (pointer: coarse) { .pill, .pill.chip { min-height: 48px; } }
@@ -132,7 +132,7 @@ const CONNECTED_HINT_MS = 2000;
         background: none; border: 1px solid var(--sc-border); color: var(--sc-fg-2);
       }
       .x:hover { color: var(--sc-fg-0); border-color: var(--sc-accent); }
-      .act:focus-visible, .x:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .act:focus-visible, .x:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       @keyframes hq-app-spin { to { transform: rotate(360deg); } }
       @media (prefers-reduced-motion: reduce) { .spin { animation-duration: 3s; } }
     `,

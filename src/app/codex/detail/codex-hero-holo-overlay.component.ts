@@ -79,7 +79,7 @@ import { logWarn } from '../../core/log';
       box-shadow: 0 12px 32px color-mix(in srgb, var(--sc-bg-0) 70%, transparent); }
     :host(.full) .hho { border-radius: 0; border-width: 0; }
     .hho:focus { outline: none; }
-    .hho:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .hho:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .hho-bar { position: absolute; top: 8px; inset-inline-end: 8px; z-index: 2;
       display: flex; align-items: center; gap: 6px; }
     .hho-close svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }

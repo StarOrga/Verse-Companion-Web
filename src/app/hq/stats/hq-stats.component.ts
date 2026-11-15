@@ -182,7 +182,7 @@ export interface HqTile {
         color: var(--sc-fg);
       }
       .tile:hover { border-color: var(--sc-accent); }
-      .tile:focus-visible, .sc-btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .tile:focus-visible, .sc-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .t-name { color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor)); text-transform: uppercase; letter-spacing: 0.04em; }
       .t-value { font: 600 1.7rem / 1.1 var(--sc-font-display); font-variant-numeric: tabular-nums; }
       .t-sub { color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor)); min-height: 1.2em; }

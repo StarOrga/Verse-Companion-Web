@@ -104,7 +104,7 @@ export const IDEA_MIN = 3;
       .compose label { font-size: 0.8rem; color: var(--sc-fg-2); }
       .compose textarea { font: inherit; color: var(--sc-fg-0); background: var(--sc-bg-0); border: 1px solid var(--sc-border);
         border-radius: 8px; padding: var(--sc-pad-1); min-height: var(--sc-tap-min, 44px); resize: vertical; }
-      .compose textarea:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .compose textarea:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .compose textarea[aria-invalid='true'] { border-color: var(--sc-warning); }
       .row { display: flex; align-items: center; gap: var(--sc-gap-2); }
       .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }

@@ -171,7 +171,7 @@ export function cometStrip(median: string | null, mine: string | null): CometStr
     .ngh .mine { color: var(--sc-fg-0); }
     .tip { margin-left: auto; color: var(--sc-accent); font-size: max(0.82rem, var(--sc-fs-floor)); font-weight: 600; text-decoration: none; white-space: nowrap; }
     .tip:hover { text-decoration: underline; }
-    .tip:focus-visible, .check:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 6px; }
+    .tip:focus-visible, .check:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 6px; }
     .checks { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
     .check {
       display: flex; align-items: center; gap: 10px; width: 100%; min-height: var(--sc-tap-min);
