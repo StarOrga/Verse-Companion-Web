@@ -8789,6 +8789,9 @@
     "loading": "Loading …",
     "empty": "No events.",
     "reextract": "Re-evaluate",
+    "backfill": "Evaluate missing",
+    "backfillProgress": "{{n}} data sheets written …",
+    "backfillDone": "Done: {{n}} data sheets written.",
     "col": {
       "field": "Field",
       "value": "Value",

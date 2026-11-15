@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.271.0",
+  "current": "0.271.1",
   "releases": [
+    {
+      "version": "0.271.1",
+      "date": "2026-11-15",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Admin event datasheets: the crawl + AI pipeline now reads every event that has no current sheet (past editions and announced 2957 events, not only the running ones), finds each event by its own comm-link, a year-aware comm-link title search and the wiki page regardless of case, and \"Fehlende auswerten\" on /admin/events backfills them all at once. Estimated values of unannounced editions wait for admin approval."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.271.0",
       "date": "2026-11-15",

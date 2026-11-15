@@ -8789,6 +8789,9 @@
     "loading": "Lädt …",
     "empty": "Keine Events.",
     "reextract": "Neu auswerten",
+    "backfill": "Fehlende auswerten",
+    "backfillProgress": "{{n}} Datenblätter geschrieben …",
+    "backfillDone": "Fertig: {{n}} Datenblätter geschrieben.",
     "col": {
       "field": "Feld",
       "value": "Wert",
