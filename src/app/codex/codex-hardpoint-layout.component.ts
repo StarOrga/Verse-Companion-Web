@@ -478,6 +478,11 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                               }
                               @if (row.slot.grade) { <span class="tag">{{ row.slot.grade }}</span> }
                               @if (row.slot.statChip) { <span class="tag accent">{{ row.slot.statChip }}</span> }
+                              @if (row.slot.draftState; as ds) {
+                                <span class="tag draft" [class.pending]="ds === 'pending'" [class.unresolved]="ds === 'unresolved'">
+                                  {{ ('codex.loadout.draftState.' + ds) | translate }}
+                                </span>
+                              }
                             </span>
                           </span>
                         </span>
@@ -582,10 +587,16 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                   <!-- Draft write-path (PR B): a row edited away from stock
                        carries a chip naming its state, plus a revert action. -->
                   @if (row.slot.draftState; as ds) {
-                    <span class="tag draft" [class.pending]="ds === 'pending'" [class.unresolved]="ds === 'unresolved'">
-                      {{ ('codex.loadout.draftState.' + ds) | translate }}
-                    </span>
-                    @if (row.slot.draftPaths?.length) {
+                    <!-- A row with an occupant names its state inside its own
+                         card and carries its reset icon in the tool cell below,
+                         so neither moves the row's tools (#345 follow-up); only
+                         an emptied row keeps both out here. -->
+                    @if (!row.slot.className) {
+                      <span class="tag draft" [class.pending]="ds === 'pending'" [class.unresolved]="ds === 'unresolved'">
+                        {{ ('codex.loadout.draftState.' + ds) | translate }}
+                      </span>
+                    }
+                    @if (row.slot.draftPaths?.length && !row.slot.className) {
                       <button type="button" scAction tier="tertiary" class="slot-revert" (click)="revertRow(row)"
                               [attr.aria-label]="'codex.loadout.revert' | translate"
                               [scTooltip]="'codex.loadout.revert' | translate" scTooltipTier="label">
@@ -600,9 +611,22 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                        so — a thruster is as worth reading as a gun. The swap
                        action stays on the rows that actually have a choice. -->
                   @if (row.slot.className) {
-                    @if (row.slot.kind) {
-                      <sc-item-path [kind]="row.slot.kind" [className]="row.slot.className" [name]="row.slot.name" />
-                    }
+                    <!-- #345 follow-up (admin screenshot): the reset icon sits
+                         at the top right of the favourite/hangar cell, just
+                         left of the info button, laid OVER the cell rather
+                         than beside it, so a swap never pushes the tools. -->
+                    <span class="tools" [class.bare]="!row.slot.kind">
+                      @if (row.slot.kind) {
+                        <sc-item-path [kind]="row.slot.kind" [className]="row.slot.className" [name]="row.slot.name" />
+                      }
+                      @if (row.slot.draftState && row.slot.draftPaths?.length) {
+                        <button type="button" scAction tier="tertiary" class="slot-revert" (click)="revertRow(row)"
+                                [attr.aria-label]="'codex.loadout.revert' | translate"
+                                [scTooltip]="'codex.loadout.revert' | translate" scTooltipTier="label">
+                          <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.35-5.65M4 4v4.5h4.5" /></svg>
+                        </button>
+                      }
+                    </span>
                     <button type="button" class="slot-swap" (click)="inspectRow(row)"
                             [attr.aria-label]="'codex.inspect.openStats' | translate"
                             [scTooltip]="'codex.inspect.openStats' | translate" scTooltipTier="label">ⓘ</button>
@@ -701,9 +725,19 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                                  before (feedback dbdb2ffe: *"von den Waffen
                                  fehlt es komplett"*) — the mount's ⓘ describes
                                  the mount, which is not the thing that shoots. -->
-                            @if (kid.kind) {
-                              <sc-item-path [kind]="kid.kind" [className]="kid.className" [name]="kid.name" />
-                            }
+                            <span class="tools" [class.bare]="!kid.kind">
+                              @if (kid.kind) {
+                                <sc-item-path [kind]="kid.kind" [className]="kid.className" [name]="kid.name" />
+                              }
+                              <!-- #345: a swapped sub-slot (the gun in a gimbal) resets on its own, too. -->
+                              @if (kid.draftState && kid.draftPaths?.length) {
+                                <button type="button" scAction tier="tertiary" class="slot-revert kid-revert" (click)="revertChild(kid)"
+                                        [attr.aria-label]="'codex.loadout.revert' | translate"
+                                        [scTooltip]="'codex.loadout.revert' | translate" scTooltipTier="label">
+                                  <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.35-5.65M4 4v4.5h4.5" /></svg>
+                                </button>
+                              }
+                            </span>
                             <button type="button" class="slot-swap kid-swap" (click)="inspectChild(row, kid)"
                                     [attr.aria-label]="'codex.inspect.openStats' | translate"
                                     [scTooltip]="'codex.inspect.openStats' | translate" scTooltipTier="label">ⓘ</button>
@@ -737,14 +771,6 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                               </span>
                               <span class="slot-port">{{ kid.port }}</span>
                             </span>
-                          }
-                          <!-- #345: a swapped sub-slot (the gun in a gimbal) resets on its own, too. -->
-                          @if (kid.draftState && kid.draftPaths?.length) {
-                            <button type="button" scAction tier="tertiary" class="slot-revert kid-revert" (click)="revertChild(kid)"
-                                    [attr.aria-label]="'codex.loadout.revert' | translate"
-                                    [scTooltip]="'codex.loadout.revert' | translate" scTooltipTier="label">
-                              <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.35-5.65M4 4v4.5h4.5" /></svg>
-                            </button>
                           }
                           </div>
                         </li>
@@ -935,9 +961,28 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     .tag.draft.unresolved { color: var(--sc-danger, #ff5252);
       border-color: color-mix(in srgb, var(--sc-danger, #ff5252) 45%, transparent);
       background: color-mix(in srgb, var(--sc-danger, #ff5252) 10%, transparent); }
-    /* #345: scAction tertiary, sized down to the row's other 26px icons (ⓘ, ⇄). */
+    /* #345: scAction tertiary. An emptied row keeps it in the flow beside its
+       draft chip; every occupied row carries it in the .tools cell. */
     .slot-revert { flex: 0 0 auto; align-self: center; width: 26px; height: 26px; }
     @media (pointer: coarse) { .slot-revert { width: 48px; height: 48px; } }
+    /* The favourite/hangar cell. The reset icon is laid over its top right
+       corner (the spot the admin marked, left of the info button) instead of
+       taking a column of its own, so a swap and its reset never move the
+       info/swap tools or the card's width. The rail's nodes are round and
+       centred, so that corner is free. */
+    .tools { flex: 0 0 auto; position: relative; display: inline-flex; align-items: center; }
+    .tools:empty { display: none; }
+    .tools > .slot-revert { position: absolute; top: 0; right: 0; z-index: 1;
+      width: 22px; height: 22px; background: var(--sc-bg-0); }
+    .tools > .slot-revert .sc-action-icon { width: 14px; height: 14px; }
+    /* No rail to sit on (an item without a wish/hangar path): plain flow. */
+    .tools.bare > .slot-revert { position: static; width: 26px; height: 26px; }
+    /* Touch: a 48px target cannot hide in a corner; it stacks above the rail,
+       so the row may grow in height but never shifts sideways. */
+    @media (pointer: coarse) {
+      .tools { flex-direction: column; justify-content: center; align-items: flex-end; gap: 2px; }
+      .tools > .slot-revert, .tools.bare > .slot-revert { position: static; width: 48px; height: 48px; }
+    }
 
     /* .m-slot (part-02.html:204), RAISED off the card — the row sits ON the
        module, so it is the lighter of the two surfaces. Its corner is the
