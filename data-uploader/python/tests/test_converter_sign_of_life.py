@@ -1,0 +1,91 @@
+"""Every converter / optimizer call logs one line naming its file BEFORE it runs.
+
+The host's stall watchdog (`main/index.ts`, `JobStall`) resets on every sidecar
+event. cgf-converter may take up to 600 s and gltf-transform up to 900 s per
+call, so a slow part used to stay silent for minutes; with the line first, a
+slow part resets the watchdog and a real hang names the part it hung on.
+
+Run via: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest data-uploader/python/tests/
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+from types import SimpleNamespace
+
+from sc_extract import hull3d as hull3d_mod
+from sc_extract.assets3d import parts as parts_mod
+from sc_extract.assets3d.parts import PartStore
+from sc_extract.glb_materials import write_glb
+from sc_extract.hull3d import Hull3DExporter, HullExportConfig, _describe_gltf_args
+
+MESH = "Data/Objects/Ships/AEGS/part.cgf"
+FILES = {MESH: b"mesh"}
+
+
+class _P4K:
+    def infolist(self):
+        return []
+
+
+def test_a_part_conversion_logs_its_path_before_the_converter_runs(tmp_path, monkeypatch):
+    logs = []
+
+    def fake_converter(cmd, cwd=None, **kwargs):
+        # The line is out before the (possibly long) converter call starts.
+        assert logs == [("info", f"  convert {MESH}")]
+        write_glb((Path(cwd) / cmd[1]).with_suffix(".glb"),
+                  {"asset": {"version": "2.0", "generator": "x" * 256}}, b"")
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(parts_mod.subprocess, "run", fake_converter)
+    store = PartStore(tmp_path / "store", FILES.__getitem__, FILES.__contains__,
+                      tmp_path / "cgf-converter.exe", lambda *a, **k: None, tmp_path / "work",
+                      on_log=lambda lvl, m: logs.append((lvl, m)))
+    store.convert_raw(MESH, None, tmp_path / "work" / "part_x")
+    assert logs[0] == ("info", f"  convert {MESH}")
+
+
+def test_a_hull_conversion_logs_its_mesh_before_the_converter_runs(tmp_path, monkeypatch):
+    logs = []
+    cfg = HullExportConfig(cgf_converter=tmp_path / "cgf-converter.exe",
+                           out_dir=tmp_path / "out", work_dir=tmp_path / "work",
+                           on_log=lambda lvl, m: logs.append((lvl, m)))
+    exp = Hull3DExporter(_P4K(), cfg)
+    cga = tmp_path / "work" / "Data" / "hull.cga"
+    cga.parent.mkdir(parents=True)
+    cga.write_bytes(b"mesh")
+
+    def fake_converter(cmd, cwd=None, **kwargs):
+        assert logs == [("info", "  convert hull.cga")]
+        (Path(cwd) / cmd[1]).with_suffix(".glb").write_bytes(b"g" * 5000)
+        return SimpleNamespace(returncode=0, stdout=b"")
+
+    monkeypatch.setattr(hull3d_mod.subprocess, "run", fake_converter)
+    exp._cgf_to_glb(cga, tmp_path / "work" / "Data", None, tmp_path / "raw.glb")
+    assert logs == [("info", "  convert hull.cga")]
+
+
+def test_an_optimizer_call_logs_its_command_and_input_first(tmp_path, monkeypatch):
+    logs = []
+    cfg = HullExportConfig(cgf_converter=tmp_path / "cgf-converter.exe",
+                           out_dir=tmp_path / "out", work_dir=tmp_path / "work",
+                           on_log=lambda lvl, m: logs.append((lvl, m)))
+    exp = Hull3DExporter(_P4K(), cfg)
+    monkeypatch.setenv("SC_GLTF_TRANSFORM_ARGV", '["node", "cli.js"]')
+    monkeypatch.setenv("SC_GLTF_WORKER", "0")
+    exp._worker_failed = True  # one Node per call — no long-lived worker in a test
+
+    def fake_run(cmd, **kwargs):
+        assert logs == [("info", "  gltf-transform simplify in.glb")]
+        return SimpleNamespace(returncode=0, stderr="")
+
+    monkeypatch.setattr(hull3d_mod.subprocess, "run", fake_run)
+    exp._gltf_transform(["simplify", str(tmp_path / "in.glb"), str(tmp_path / "out.glb")])
+    assert logs == [("info", "  gltf-transform simplify in.glb")]
+
+
+def test_describe_gltf_args_names_the_command_and_the_input_file():
+    assert _describe_gltf_args(["weld", "C:/w/a/b.glb", "C:/w/a/c.glb"]) == "weld b.glb"
+    assert _describe_gltf_args(["inspect"]) == "inspect"
+    assert _describe_gltf_args([]) == "?"
