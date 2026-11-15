@@ -547,7 +547,9 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
     .pick-cols-sum { min-block-size: var(--sc-tap-min); }
     .pick-cols-sum:focus-visible, .pc-reset:focus-visible, .fc button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
     .pick-cols-sum::-webkit-details-marker { display: none; }
-    .pick-cols-pop { position: absolute; top: calc(100% + 4px); right: 0; z-index: 6; }
+    .pick-cols-pop { position: absolute; top: calc(100% + 4px); left: 0; z-index: 6;
+      /* The host is capped at its containing block (the narrow button): give it the menu width, so labels are not cut off. */
+      inline-size: min(var(--sc-ov-menu), calc(100vw - 2 * var(--sc-space-4))); }
     .pc-body { display: flex; flex-direction: column; gap: 3px; max-height: min(320px, 45dvh); overflow-y: auto; }
     .pc-row { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
     .pc-row.off { color: var(--sc-fg-2); cursor: not-allowed; }
