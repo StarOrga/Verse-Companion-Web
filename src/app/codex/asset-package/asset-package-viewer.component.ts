@@ -18,6 +18,7 @@ import { LocationStrategy } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { CodexHoloCalloutComponent } from '../holo/codex-holo-callout.component';
 import { toErrorKey } from '../../core/describe-error';
 import { logWarn } from '../../core/log';
@@ -135,7 +136,7 @@ const WHEEL_LINE_PX = 33;
   selector: 'sc-asset-package-viewer',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe, ScTooltipDirective, CodexHoloCalloutComponent],
+  imports: [RouterLink, TranslatePipe, ScTooltipDirective, ScActionDirective, CodexHoloCalloutComponent],
   host: { '[style.--holo-mfr-rgb]': 'mfrRgb()' },
   template: `
     <div class="pkg" [class.ready]="status() === 'ready'">
@@ -146,7 +147,7 @@ const WHEEL_LINE_PX = 33;
       } @else if (status() === 'error') {
         <div class="state err" role="alert">
           <p>{{ errorKey() | translate }}</p>
-          <button type="button" class="sc-btn" (click)="retry()">{{ 'codex.assetPackage.retry' | translate }}</button>
+          <button type="button" scAction tier="secondary" (click)="retry()">{{ 'codex.assetPackage.retry' | translate }}</button>
         </div>
       }
 

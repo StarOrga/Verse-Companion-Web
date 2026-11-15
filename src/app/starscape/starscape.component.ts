@@ -1,3 +1,4 @@
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -108,7 +109,7 @@ const RENDER_CHUNK = 24;
 @Component({
   selector: 'sc-starscape',
   standalone: true,
-  imports: [NeuroFieldDirective, RouterLink,
+  imports: [ScActionDirective, NeuroFieldDirective, RouterLink,
     TranslatePipe,
     ImgReadyDirective,
     AppDownloadMenuComponent,
@@ -179,7 +180,7 @@ const RENDER_CHUNK = 24;
           @if (!svc.timedOut()) {
             <p class="err-detail">{{ err | translate }}</p>
           }
-          <button type="button" class="sc-btn" [disabled]="svc.loading()" (click)="reload()">
+          <button type="button" scAction tier="secondary" [disabled]="svc.loading()" (click)="reload()">
             {{ 'starscape.retry' | translate }}
           </button>
         </div>
@@ -210,7 +211,7 @@ const RENDER_CHUNK = 24;
       @if (imagesStalled()) {
         <div class="sc-card stalled" role="status">
           <p>{{ 'starscape.imagesStalled' | translate }}</p>
-          <button type="button" class="sc-btn" (click)="retryImages()">
+          <button type="button" scAction tier="secondary" (click)="retryImages()">
             {{ 'starscape.retryImages' | translate }}
           </button>
         </div>
@@ -338,7 +339,7 @@ const RENDER_CHUNK = 24;
            keyboard / reduced-data users. -->
       @if (svc.hasMore()) {
         <div #sentinel class="sentinel" aria-hidden="true"></div>
-        <button type="button" class="sc-btn more" [disabled]="svc.loading()" (click)="svc.load()">
+        <button type="button" scAction tier="secondary" class="more" [busy]="svc.loading()" [disabled]="svc.loading()" (click)="svc.load()">
           {{ (svc.loading() ? 'starscape.loading' : 'starscape.loadMore') | translate }}
         </button>
       }
@@ -364,7 +365,7 @@ const RENDER_CHUNK = 24;
       <sc-lightbox [image]="lightboxImage(w)" (closed)="close()">
         <!-- A phone views images here, so the vote and the share stay reachable. -->
         <sc-vote-button [imageId]="w.imageId" />
-        <button type="button" class="sc-btn lb-share" (click)="share(w)">{{ 'starscape.share.label' | translate }}</button>
+        <button type="button" scAction tier="secondary" class="lb-share" (click)="share(w)">{{ 'starscape.share.label' | translate }}</button>
         @if (shareHint(); as hint) {
           <p class="lb-hint" role="status" aria-live="polite">{{ hint | translate }}</p>
         }
@@ -564,9 +565,7 @@ const RENDER_CHUNK = 24;
        reveal/press animations scale interactive elements by 0.994, which measures
        a 44px control as 43px. */
     @media (pointer: coarse) {
-      .more { min-height: 48px; }
       .tf-retry { min-height: 48px; }
-      .err .sc-btn, .stalled .sc-btn { min-height: 48px; }
       /* No blur-up on touch hardware. A 12px blur over a full-width phone tile
          is a GPU-composited layer per tile, and while it is up the picture IS a
          grey-blue smear — on a mid-range phone decoding a whole column at once
@@ -575,7 +574,6 @@ const RENDER_CHUNK = 24;
          cannot leave a half-composited layer behind. */
       .tile-img { filter: none; transform: none; transition: opacity 0.3s ease; }
       .tile-img.ready { filter: none; transform: none; }
-      .lb-share { min-height: 48px; }
       /* No hover on touch — the lift and the zoom-in cursor are mouse idioms. */
       .tile { cursor: pointer; }
       .tile-wrap:hover { transform: none; }

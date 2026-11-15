@@ -1,3 +1,4 @@
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -52,7 +53,7 @@ const REFRESH_MS = 5 * 60_000;
 @Component({
   selector: 'sc-silhouette-coverage',
   standalone: true,
-  imports: [DecimalPipe, RouterLink, TranslatePipe, ScTooltipDirective],
+  imports: [DecimalPipe, RouterLink, TranslatePipe, ScTooltipDirective, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="sc-card cov-card">
@@ -70,7 +71,7 @@ const REFRESH_MS = 5 * 60_000;
       @if (errorKey(); as key) {
         <div class="err" role="alert">
           <span><strong>{{ 'admin.errorTitle' | translate }}:</strong> {{ key | translate }}</span>
-          <button type="button" class="sc-btn" (click)="load()" [disabled]="loading()">
+          <button type="button" scAction tier="secondary" (click)="load()" [disabled]="loading()">
             {{ 'admin.silhouettes.retry' | translate }}
           </button>
         </div>

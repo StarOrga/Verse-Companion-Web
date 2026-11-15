@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 
 /** The read-only banner while a shared link's loadout is on the table (#646). */
 export interface HoloSharedBanner {
@@ -19,7 +20,7 @@ export interface HoloSharedBanner {
 @Component({
   selector: 'sc-codex-holo-shared-banner',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @let sb = banner();
@@ -30,20 +31,20 @@ export interface HoloSharedBanner {
         @case ('loading') { <span class="sb-text">{{ 'codex.holo.shared.loading' | translate }}</span> }
         @case ('ready') {
           <span class="sb-text">{{ 'codex.holo.shared.banner' | translate: { owner: sb.ownerName ?? '—', name: sb.configName } }}</span>
-          <button type="button" class="btn sb-adopt" [disabled]="adopting()" [attr.aria-busy]="adopting()" (click)="adopt.emit()">
+          <button type="button" scAction tier="primary" class="sb-adopt" [busy]="adopting()" [disabled]="adopting()" (click)="adopt.emit()">
             {{ (adopting() ? 'hangar.shared.adopting' : 'codex.holo.shared.adopt') | translate }}
           </button>
         }
         @case ('unavailable') { <span class="sb-text">{{ 'codex.holo.shared.unavailable' | translate }}</span> }
         @case ('error') {
           <span class="sb-text">{{ 'codex.holo.shared.loadError' | translate }} {{ (sb.errorKey ?? 'errors.generic') | translate }}</span>
-          <button type="button" class="btn sb-retry" (click)="retry.emit()">{{ 'codex.error.retry' | translate }}</button>
+          <button type="button" scAction tier="primary" class="sb-retry" (click)="retry.emit()">{{ 'codex.error.retry' | translate }}</button>
         }
       }
       @if (sb.status === 'ready' && sb.errorKey) {
         <span class="sb-err" role="alert">{{ sb.errorKey | translate }}</span>
       }
-      <button type="button" class="btn quiet sb-exit" (click)="exit.emit()">{{ 'codex.holo.shared.exit' | translate }}</button>
+      <button type="button" scAction tier="secondary" class="sb-exit" (click)="exit.emit()">{{ 'codex.holo.shared.exit' | translate }}</button>
     </div>
   `,
   styles: [`
@@ -55,13 +56,6 @@ export interface HoloSharedBanner {
     .sb-glyph { color: var(--sc-accent); }
     .sb-text { flex: 1 1 240px; min-width: 0; }
     .sb-err { flex-basis: 100%; color: var(--sc-danger); }
-    .btn { min-height: max(32px, var(--sc-tap-min, 0px)); padding: 5px 12px; border-radius: 3px; cursor: pointer; font-family: var(--sc-font-display);
-      text-transform: uppercase; font-size: max(11px, var(--sc-fs-floor)); letter-spacing: 0.08em; color: var(--sc-fg-0);
-      border: 1px solid color-mix(in srgb, var(--sc-accent) 30%, transparent); background: color-mix(in srgb, var(--sc-accent) 10%, transparent);
-      transition: border-color 160ms ease, color 160ms ease; }
-    .btn.quiet { background: none; border-color: var(--sc-border); color: var(--sc-fg-1); }
-    .btn:hover, .btn:focus-visible { border-color: var(--sc-accent); color: var(--sc-accent); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
   `],
 })
 export class CodexHoloSharedBannerComponent {

@@ -76,7 +76,7 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
           <div class="head-actions">
             <button
               #newTokenBtn
-              class="sc-btn sc-btn-primary"
+              scAction tier="primary"
               (click)="openCreateDialog()"
               [disabled]="busy() || dialogOpen() || revealedToken() !== null">
               {{ 'admin.tokens.newToken' | translate }}
@@ -132,7 +132,7 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
                 <td>
                   <div class="actions">
                   <button
-                    class="sc-btn micro danger"
+                    scAction tier="secondary" tone="danger"
                     (click)="revoke(t)"
                     [disabled]="busy() || revokingId() === t.id">
                     {{ (revokingId() === t.id ? 'admin.tokens.revoking' : 'admin.tokens.revoke') | translate }}
@@ -299,16 +299,6 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
     }
     .docs-link:hover { text-decoration: underline; }
 
-    .sc-btn-primary {
-      background: var(--sc-accent);
-      color: var(--sc-bg-0);
-      border-color: var(--sc-accent);
-    }
-    .sc-btn-primary:hover:not(:disabled) {
-      background: transparent;
-      color: var(--sc-accent);
-    }
-
     .flash {
       padding: 10px 14px;
       border-radius: 4px;
@@ -370,15 +360,6 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
     }
 
     .actions { display: flex; gap: 6px; flex-wrap: wrap; }
-    .sc-btn.micro { padding: 4px 10px; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.04em; }
-    .sc-btn.micro.danger {
-      color: var(--sc-danger);
-      border-color: var(--sc-danger);
-    }
-    .sc-btn.micro.danger:hover:not(:disabled) {
-      background: var(--sc-danger);
-      color: var(--sc-bg-0);
-    }
 
     /* Dialog frame, head, ✕, footer and width come from <sc-popup kind="dialog">. */
     .field {
@@ -470,7 +451,7 @@ const README_IO_URL = 'https://star-citizen-companion.readme.io';
 
     @media (max-width: 640px) {
       .head { flex-direction: column; align-items: stretch; }
-      .head-actions .sc-btn { flex: 1; justify-content: center; }
+      .head-actions .sc-action { flex: 1; justify-content: center; }
       /* Checkbox in its own column, code and description stacked beside it:
          one row per scope instead of three. */
       .scope-row { grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; row-gap: 0; padding: 4px 0; }

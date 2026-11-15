@@ -4,6 +4,19 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.271.1] - 2026-11-15
+
+### Fixed
+- Admin event datasheets: the crawl + AI pipeline now reads every event that has no current sheet (past editions and announced 2957 events, not only the running ones), finds each event by its own comm-link, a year-aware comm-link title search and the wiki page regardless of case, and "Fehlende auswerten" on /admin/events backfills them all at once. Estimated values of unannounced editions wait for admin approval.
+
+## [0.271.0] - 2026-11-15
+
+### Changed
+- Every remaining action button in Admin, Codex, settings, Starscape, the consent banner, the phone hand-off, the feedback panel, the P4K history, the extension install page and About now uses the one action control (scAction). Each view shows at most one primary step, and destructive actions use the danger tone (#970).
+
+### Added
+- Prebuild guard `check-legacy-actions` fails the build on a new legacy `.sc-btn` / `.btn` / `.link-btn` button (#970).
+
 ## [0.270.21] - 2026-11-15
 
 ### Fixed

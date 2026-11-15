@@ -1,4 +1,5 @@
 import { logWarn } from '../core/log';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { onScrollTick } from '../core/scroll-tick';
 import {
   AfterViewInit,
@@ -91,7 +92,7 @@ const DELETE_ACCOUNT_ERROR_KEYS: Readonly<Record<string, string>> = {
 @Component({
   selector: 'sc-settings',
   standalone: true,
-  imports: [PasswordFormComponent, RouterLink, ScDatePipe, TranslatePipe, ScTooltipDirective, ScSelectComponent, SectionRailComponent],
+  imports: [ScActionDirective, PasswordFormComponent, RouterLink, ScDatePipe, TranslatePipe, ScTooltipDirective, ScSelectComponent, SectionRailComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page" [class.pm-on]="shellOn()">
@@ -197,7 +198,9 @@ const DELETE_ACCOUNT_ERROR_KEYS: Readonly<Record<string, string>> = {
                     spellcheck="false" />
                   <button
                     type="submit"
-                    class="sc-btn sc-btn-primary"
+                    scAction
+                    tier="secondary"
+                    [busy]="usernameSaving()"
                     [disabled]="usernameSaving() || !usernameDirty()">
                     {{ (usernameSaving() ? 'settings.username.saving' : 'settings.username.save') | translate }}
                   </button>
@@ -456,14 +459,18 @@ const DELETE_ACCOUNT_ERROR_KEYS: Readonly<Record<string, string>> = {
                   }
                   <button
                     type="button"
-                    class="sc-btn danger-btn"
+                    scAction
+                    tier="secondary"
+                    tone="danger"
+                    class="danger-btn"
+                    [busy]="deleting()"
                     [disabled]="deleting()"
                     (click)="deleteAccount()">
                     {{ (deleting() ? 'settings.danger.deleting' : 'settings.danger.deleteBtn') | translate }}
                   </button>
                 } @else {
                   <p class="hint">{{ 'settings.danger.viaAdmin' | translate }}</p>
-                  <a class="sc-btn" routerLink="/legal/imprint">{{ 'settings.danger.imprintLink' | translate }}</a>
+                  <a scAction tier="secondary" routerLink="/legal/imprint">{{ 'settings.danger.imprintLink' | translate }}</a>
                 }
               </div>
             </div>
@@ -724,15 +731,6 @@ const DELETE_ACCOUNT_ERROR_KEYS: Readonly<Record<string, string>> = {
       width: 100%;
       min-width: 0;
     }
-    .sc-btn-primary {
-      background: var(--sc-accent);
-      color: var(--sc-bg-0);
-      border-color: var(--sc-accent);
-    }
-    .sc-btn-primary:hover:not(:disabled) {
-      background: transparent;
-      color: var(--sc-accent);
-    }
 
     .flash {
       margin-top: 12px;
@@ -756,14 +754,6 @@ const DELETE_ACCOUNT_ERROR_KEYS: Readonly<Record<string, string>> = {
       box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.15);
     }
     .danger-zone h3 { color: var(--sc-danger); }
-    .danger-btn {
-      color: var(--sc-danger);
-      border-color: var(--sc-danger);
-    }
-    .danger-btn:hover:not(:disabled) {
-      background: var(--sc-danger);
-      color: var(--sc-bg-0);
-    }
 
     /* A fragment jump has to clear the pinned compact strip too, or it parks the heading underneath the very control that
        sent you there. 88px covers the strip at its tallest (48px touch chip + padding + rule). */
@@ -810,7 +800,7 @@ const DELETE_ACCOUNT_ERROR_KEYS: Readonly<Record<string, string>> = {
       .value { text-align: left; }
       .value.pills { justify-content: flex-start; }
       .text-input { min-width: 0; flex: 1 1 100%; }
-      .field-row .sc-btn { flex: 1 1 100%; justify-content: center; }
+      .field-row .sc-action { flex: 1 1 100%; justify-content: center; }
       .danger-btn { width: 100%; justify-content: center; }
       /* The id would otherwise squeeze the copy button off the card edge. */
       .id-line { flex-wrap: wrap; }

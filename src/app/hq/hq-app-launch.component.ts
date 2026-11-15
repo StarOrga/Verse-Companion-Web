@@ -45,9 +45,8 @@ const CONNECTED_HINT_MS = 2000;
     @if (canInstall()) {
       <a
         class="go"
-        [class.sc-btn]="look() === 'primary'"
-        [class.sc-btn-primary]="look() === 'primary'"
-        [class.pill]="look() === 'pill' || look() === 'chip'"
+        scAction
+        [tier]="look() === 'primary' ? 'primary' : 'secondary'"
         [class.chip]="look() === 'chip'"
         [href]="url"
         [scTooltip]="tip() ? (tip() | translate) : null"
@@ -93,18 +92,9 @@ const CONNECTED_HINT_MS = 2000;
       @media (max-width: 749px) { :host { display: none; } }
       /* Only Angular's comment anchors left (cannot install): take no room. */
       :host:empty { display: none; }
-      .go { display: inline-flex; align-items: center; min-height: var(--sc-tap-min, 44px); text-decoration: none; }
-      .pill {
-        min-height: 36px; padding: 0 14px;
-        border: 1px solid color-mix(in srgb, var(--sc-accent) 55%, transparent); border-radius: 999px;
-        background: color-mix(in srgb, var(--sc-bg-1) 75%, transparent); color: var(--sc-accent);
-        font: 500 max(0.84rem, var(--sc-fs-floor)) / 1 var(--sc-font-body);
-      }
-      .pill:hover { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
-      .pill:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-      /* Inside the HQ status chip (sc-hq-live-ticker): the same pill, one size down, so it fits the 32px chip. */
-      .pill.chip { min-height: 24px; padding: 0 10px; font-size: max(0.76rem, var(--sc-fs-floor)); }
-      @media (pointer: coarse) { .pill, .pill.chip { min-height: 48px; } }
+      /* Inside the HQ status chip (sc-hq-live-ticker): the secondary pill one size down, so it fits the 32px chip. */
+      .sc-action.chip { min-height: 24px; padding: 0 10px; font-size: max(0.76rem, var(--sc-fs-floor)); }
+      @media (pointer: coarse) { .sc-action.chip { min-height: 48px; } }
       /* Bottom right; scToastSlot stacks it above a toast that is already up. Frame, rail and width come from sc-popup. */
       .toast {
         position: fixed; z-index: 1440;
