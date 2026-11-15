@@ -4,6 +4,7 @@ import {
   ElementRef,
   OnDestroy,
   OnInit,
+  AfterViewInit,
   computed,
   effect,
   inject,
@@ -15,7 +16,7 @@ import { onScrollTick } from '../core/scroll-tick';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
-import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import { LocaleService } from '../core/locale/locale.service';
 import { isPlainLeftClick } from '../core/modified-click.util';
 import { OverlayOriginService } from '../shared/overlay-frame/overlay-origin.service';
@@ -125,19 +126,17 @@ function scrollBehavior(): ScrollBehavior {
   standalone: true,
   imports: [
     TranslatePipe, RouterLink, PatchCycleComponent, PatchEntryRowComponent,
-    PatchNoteDetailComponent, StabilityChipComponent, StabilityLongComponent, BuildVerdictComponent, ScDialogDirective,
+    PatchNoteDetailComponent, StabilityChipComponent, StabilityLongComponent, BuildVerdictComponent, ScPopupComponent,
     ScTooltipDirective, ShareButtonComponent, SectionRailComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="scrim">
-      <div class="panel" role="dialog" aria-modal="true" scDialog (scDialogEscape)="onEscape()" [attr.aria-label]="title()" #panel>
+    <sc-popup kind="large" [title]="title()" [eyebrow]="'news.patch.dossier.eyebrow' | translate" [backClose]="false" (closed)="onEscape()">
+      <div class="panel">
         @if (card(); as c) {
           <header class="hero" [attr.data-status]="c.status">
-            <a class="close" [routerLink]="['/verse/patches']" [queryParams]="closeParams()" (click)="onClose($event)" [attr.aria-label]="'news.patch.dossier.close' | translate" [scTooltip]="'news.patch.dossier.close' | translate">✕</a>
             <div class="hero-row">
               <span class="status" [attr.data-status]="c.status">{{ ('news.patch.status.' + c.status) | translate }}</span>
-              <h2>{{ title() }}</h2>
               <!-- Same corner, same picture as on the board card the reader
                    just came from (owner, 2026-09-05). -->
               @if (chip(); as ch) {
@@ -415,42 +414,25 @@ function scrollBehavior(): ScrollBehavior {
           </div>
         } @else {
           <header class="hero">
-            <a class="close" routerLink="/verse/patches" [attr.aria-label]="'news.patch.dossier.close' | translate" [scTooltip]="'news.patch.dossier.close' | translate">✕</a>
-            <h2>{{ 'news.patch.line' | translate:{ version: line() } }}</h2>
             <p class="state">{{ 'news.patch.dossier.unknown' | translate:{ line: line() } }}</p>
           </header>
         }
       </div>
-    </div>
+    </sc-popup>
     <sc-share-button [shareTitle]="title()" />
   `,
   styles: [`
     :host { display: block; }
-    .scrim {
-      position: fixed; inset: 0; z-index: 60; display: flex; justify-content: center; align-items: flex-start;
-      padding: 24px 16px; background: color-mix(in srgb, var(--sc-bg-0) 78%, transparent);
-      -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); overflow: hidden;
-    }
-    .panel {
-      width: min(100%, var(--sc-ov-area)); max-height: var(--sc-ov-max-h); overflow-y: auto; overscroll-behavior: contain;
-      border: 1px solid var(--sc-border); border-radius: 12px; background: var(--sc-bg-0);
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5); scrollbar-width: thin;
-    }
+    /* Frame, head, ✕, scrim and width come from <sc-popup kind="large">; the
+       scaffold's body (.scp-b) is the scroller. */
     .hero {
-      position: sticky; top: 0; z-index: 2; padding: 16px 20px 12px;
+      position: sticky; top: 0; z-index: 2; padding: 12px 20px 12px;
       background: linear-gradient(160deg, var(--sc-bg-3) 0%, var(--sc-bg-1) 60%); border-bottom: 1px solid var(--sc-border);
     }
     .hero[data-status='live'] { background: linear-gradient(160deg, color-mix(in srgb, var(--sc-success) 16%, var(--sc-bg-1)), var(--sc-bg-1) 60%); }
     .hero[data-status='next'], .hero[data-status='ptu'], .hero[data-status='evocati'] { background: linear-gradient(160deg, color-mix(in srgb, var(--sc-accent) 16%, var(--sc-bg-1)), var(--sc-bg-1) 60%); }
-    .hero-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding-right: 44px; }
+    .hero-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
     .stab { margin-left: auto; }
-    .hero h2 { margin: 0; font-size: 1.6rem; line-height: 1; }
-    .close {
-      position: absolute; right: 8px; top: 8px; display: inline-flex; align-items: center; justify-content: center;
-      min-width: var(--sc-tap-min); min-height: var(--sc-tap-min); color: var(--sc-fg-2); text-decoration: none; font-size: 1rem;
-    }
-    .close:hover { color: var(--sc-fg-0); }
-    .close:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -3px; border-radius: 6px; }
     .status {
       display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 6px; font-family: var(--sc-font-display);
       font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; white-space: nowrap;
@@ -597,10 +579,7 @@ function scrollBehavior(): ScrollBehavior {
     .wave time { color: var(--sc-fg-2); font-size: max(0.7rem, var(--sc-fs-floor)); }
 
     @media (max-width: 720px) {
-      .scrim { padding: 0; align-items: flex-end; }
-      .panel { max-height: 100vh; height: 100vh; max-height: 100dvh; height: 100dvh; border-radius: 0; border: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
-      .hero { padding: 14px 14px 10px; }
-      .hero h2 { font-size: 1.3rem; }
+      .hero { padding: 10px 14px 10px; }
       .body { grid-template-columns: minmax(0, 1fr); }
       /* Phone: the rail becomes the pinned pill row (the shared rail does it itself). */
       .toc { position: sticky; top: 84px; z-index: 2; padding: 0; border-right: 0; }
@@ -612,7 +591,7 @@ function scrollBehavior(): ScrollBehavior {
     }
   `],
 })
-export class PatchDossierComponent implements OnInit, OnDestroy {
+export class PatchDossierComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly svc = inject(NewsService);
   readonly roadmap = inject(RoadmapService);
   private readonly t = inject(TranslateService);
@@ -894,7 +873,10 @@ export class PatchDossierComponent implements OnInit, OnDestroy {
       this.previousOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
     }
-    const panel = this.host.nativeElement.querySelector<HTMLElement>('.panel');
+  }
+
+  ngAfterViewInit(): void {
+    const panel = this.host.nativeElement.querySelector<HTMLElement>('.scp-b');
     if (panel) {
       this.scrollListener = onScrollTick(() => this.syncActive(panel), { target: panel });
     }

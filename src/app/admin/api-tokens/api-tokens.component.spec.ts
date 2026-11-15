@@ -97,12 +97,12 @@ describe('ApiTokensComponent', () => {
 
     (q(f, '.head-actions button') as HTMLButtonElement).click();
     await settle(f);
-    const name = q(f, '.dialog input[type="text"]') as HTMLInputElement;
+    const name = q(f, 'sc-popup input[type="text"]') as HTMLInputElement;
     name.value = '  Bot  ';
     name.dispatchEvent(new Event('input'));
-    (q(f, '.dialog input[type="checkbox"]') as HTMLInputElement).click();
+    (q(f, 'sc-popup input[type="checkbox"]') as HTMLInputElement).click();
     await settle(f);
-    (q(f, '.dialog form') as HTMLFormElement).dispatchEvent(new Event('submit', { cancelable: true }));
+    (q(f, 'sc-popup form') as HTMLFormElement).dispatchEvent(new Event('submit', { cancelable: true }));
     await settle(f);
 
     expect(svc.create).toHaveBeenCalledTimes(1);
@@ -111,7 +111,7 @@ describe('ApiTokensComponent', () => {
     expect(qa(f, 'tbody tr').length).toBe(2);
     expect((f.nativeElement as HTMLElement).textContent!.split('scc_secret_plaintext').length - 1).toBe(1);
 
-    (q(f, '.reveal-dialog .sc-btn-primary') as HTMLButtonElement).click();
+    (q(f, 'sc-popup .scp-f .sc-action--primary') as HTMLButtonElement).click();
     await settle(f);
     expect(q(f, '.reveal-token')).toBeNull();
     expect((f.nativeElement as HTMLElement).textContent).not.toContain('scc_secret_plaintext');
@@ -122,14 +122,14 @@ describe('ApiTokensComponent', () => {
     svc.create.mockRejectedValue(Object.assign(new Error('forbidden'), { status: 403, code: 'forbidden' }));
     (q(f, '.head-actions button') as HTMLButtonElement).click();
     await settle(f);
-    const name = q(f, '.dialog input[type="text"]') as HTMLInputElement;
+    const name = q(f, 'sc-popup input[type="text"]') as HTMLInputElement;
     name.value = 'Bot';
     name.dispatchEvent(new Event('input'));
-    (q(f, '.dialog input[type="checkbox"]') as HTMLInputElement).click();
+    (q(f, 'sc-popup input[type="checkbox"]') as HTMLInputElement).click();
     await settle(f);
-    (q(f, '.dialog form') as HTMLFormElement).dispatchEvent(new Event('submit', { cancelable: true }));
+    (q(f, 'sc-popup form') as HTMLFormElement).dispatchEvent(new Event('submit', { cancelable: true }));
     await settle(f);
-    expect(q(f, '.dialog .err')?.textContent).toContain('errors.forbidden');
+    expect(q(f, 'sc-popup .err')?.textContent).toContain('errors.forbidden');
     expect(q(f, '.reveal-token')).toBeNull();
   });
 
@@ -137,7 +137,7 @@ describe('ApiTokensComponent', () => {
     const f = await mount([]);
     (q(f, '.head-actions button') as HTMLButtonElement).click();
     await settle(f);
-    const submit = q(f, '.dialog button[type="submit"]') as HTMLButtonElement;
+    const submit = q(f, 'sc-popup button[type="submit"]') as HTMLButtonElement;
     expect(submit.disabled).toBe(true);
     await f.componentInstance.onCreateSubmit(new Event('submit', { cancelable: true }));
     expect(svc.create).not.toHaveBeenCalled();

@@ -270,19 +270,19 @@ describe('star map components', () => {
     const el = f.nativeElement as HTMLElement;
     (el.querySelector('button.star.next') as HTMLButtonElement).click();
     f.detectChanges();
-    expect(el.querySelector('.card[role=dialog]')?.textContent).toContain('starmap.card.here');
+    expect(el.querySelector('.card .scp-frame[role=dialog]')?.textContent).toContain('starmap.card.here');
     expect(el.querySelector('button.star.next')?.getAttribute('aria-pressed')).toBe('true');
     const hrefs: (string | null)[] = [];
     for (const star of [...el.querySelectorAll('button.star.open')] as HTMLButtonElement[]) {
       star.click();
       f.detectChanges();
-      hrefs.push(el.querySelector('.card a.go')?.getAttribute('href') ?? null);
+      hrefs.push(el.querySelector('.card .scp-f a')?.getAttribute('href') ?? null);
     }
     expect(hrefs).toContain('/codex/fps');
     (el.querySelector('button.star.done') as HTMLButtonElement).click();
     f.detectChanges();
-    expect(el.querySelector('.card[role=dialog]')?.textContent).toContain('starmap.card.doneOn');
-    expect(el.querySelector('.card a.go')).toBeNull();
+    expect(el.querySelector('.card .scp-frame[role=dialog]')?.textContent).toContain('starmap.card.doneOn');
+    expect(el.querySelector('.card .scp-f a')).toBeNull();
   });
 
   it('no sun on the star map (the Verse hub carries it)', () => {

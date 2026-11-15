@@ -14,6 +14,7 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScDialogDirective } from '../dialog/sc-dialog.directive';
 import { OverlayNeighbour } from '../overlay-frame/overlay-frame.component';
+import { ScActionDirective } from '../action/sc-action.directive';
 import { ScTooltipDirective } from '../tooltip/sc-tooltip.directive';
 
 /** What the lightbox shows - the same shape for the routed item and the starscape wall. */
@@ -51,7 +52,7 @@ const WIDE_RATIO = 1.5;
 @Component({
   selector: 'sc-lightbox',
   standalone: true,
-  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScDialogDirective, ScTooltipDirective],
+  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScDialogDirective, ScActionDirective, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (overlay()) {
@@ -97,8 +98,10 @@ const WIDE_RATIO = 1.5;
           </button>
         }
         @if (overlay()) {
-          <button type="button" class="ib" (click)="closed.emit()" [attr.aria-label]="'overlay.close' | translate"
-                  [scTooltip]="'overlay.close' | translate" scTooltipTier="label">✕</button>
+          <button type="button" scAction tier="tertiary" class="lb-x" (click)="closed.emit()" [attr.aria-label]="'overlay.close' | translate"
+                  [scTooltip]="'overlay.close' | translate" scTooltipTier="label">
+            <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+          </button>
         }
       </div>
 
@@ -116,8 +119,9 @@ const WIDE_RATIO = 1.5;
     .root.overlay {
       position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; cursor: zoom-out;
       padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
-      background: rgba(0, 0, 0, 0.85); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+      background: var(--sc-scrim); /* Sonderform: scrim + ✕ are the popup scaffold's */
     }
+    .lb-x { color: var(--sc-fg-0); background: rgba(0, 0, 0, 0.55); }
     .stage {
       position: relative; overflow: hidden; cursor: default; isolation: isolate;
       /* overlay-size: exception — the image drives the size (16:9 stage, centred) */

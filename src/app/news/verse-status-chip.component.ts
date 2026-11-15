@@ -10,7 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import { DesktopCapabilityService } from '../core/desktop-capability.service';
 import { isPlainLeftClick } from '../core/modified-click.util';
 import { NewsService, StatusLevel, effectivePlayability } from './news.service';
@@ -53,7 +53,7 @@ const STALE_AFTER_MS = 5 * 60 * 1000;
 @Component({
   selector: 'sc-verse-status-chip',
   standalone: true,
-  imports: [TranslatePipe, ScDialogDirective],
+  imports: [TranslatePipe, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (status(); as st) {
@@ -73,10 +73,10 @@ const STALE_AFTER_MS = 5 * 60 * 1000;
         </button>
 
         @if (open()) {
-          <div class="vs-panel" role="dialog" [id]="panelId"
-               scDialog [scDialogModal]="false" scDialogInitialFocus="container" (scDialogEscape)="open.set(false)"
-               [attr.aria-label]="'news.status.services' | translate">
-            <h3>{{ 'news.status.services' | translate }}</h3>
+          <sc-popup class="vs-panel" kind="panel" [id]="panelId" initialFocus="container"
+                    [eyebrow]="'news.status.title' | translate"
+                    [title]="'news.status.services' | translate" (closed)="open.set(false)">
+            <div class="vs-body">
             @if (st.components.length > 0) {
               <ul class="svc-list">
                 @for (c of st.components; track c.name) {
@@ -119,7 +119,8 @@ const STALE_AFTER_MS = 5 * 60 * 1000;
                 </span>
               </a>
             }
-          </div>
+            </div>
+          </sc-popup>
         }
       </div>
     }
@@ -160,19 +161,10 @@ const STALE_AFTER_MS = 5 * 60 * 1000;
     .dot.status-maintenance { background: var(--sc-accent); }
     .dot.status-unknown { background: var(--sc-fg-2); }
 
-    .vs-panel {
-      position: absolute; top: calc(100% + 8px); right: 0;
-      z-index: 30; width: max-content; max-width: min(360px, calc(100vw - 24px));
-      display: flex; flex-direction: column; gap: 8px;
-      padding: 12px 14px;
-      background: linear-gradient(180deg, var(--sc-bg-2), var(--sc-bg-1));
-      border: 1px solid var(--sc-border); border-radius: 8px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), var(--sc-glow);
-    }
-    .vs-panel h3 {
-      margin: 0; font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
-      text-transform: uppercase; letter-spacing: 0.08em;
-    }
+    /* Frame, head, ✕ and width come from <sc-popup kind="panel">; only its place
+       under the chip is set here. */
+    .vs-panel { position: absolute; top: calc(100% + 8px); right: 0; z-index: 30; }
+    .vs-body { display: flex; flex-direction: column; gap: 8px; }
     .svc-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 5px; }
     .svc-list li {
       display: flex; align-items: center; gap: 8px; font-size: 0.82rem;

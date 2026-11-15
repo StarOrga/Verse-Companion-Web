@@ -56,7 +56,7 @@ describe('LightboxComponent', () => {
   it('emits closed from the close button', () => {
     let closed = 0;
     fixture.componentInstance.closed.subscribe(() => closed++);
-    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('button.ib:last-of-type')?.click();
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('button.lb-x')?.click();
     expect(closed).toBe(1);
   });
 });
