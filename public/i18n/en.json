@@ -7020,7 +7020,8 @@
         "cargo-ship": "Cargo ship",
         "mining-ship": "Mining ship",
         "medical-ship": "Medical ship",
-        "any-ship": "Any ship"
+        "any-ship": "Any ship",
+        "none": "None"
       },
       "progress": {
         "title": "Progress",
