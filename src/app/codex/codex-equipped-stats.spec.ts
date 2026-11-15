@@ -22,6 +22,8 @@ import {
   tractorBeamStats,
   weaponStatsUnavailable,
   type EquippedStat,
+  statAddsUp,
+  statsFingerprint,
 } from './codex-equipped-stats';
 import { hasTractorBeamParams, isTractorBeamWeapon } from './codex.types';
 
@@ -1103,6 +1105,35 @@ describe('codex-equipped-stats', () => {
         },
       };
       expect(valueOf(nav, 'codex.equipped.powerDraw')).toBe(5);
+    });
+  });
+
+  // Feedback #351: a stacked "3×" row repeats only what pools across units.
+  describe('statAddsUp', () => {
+    it('keeps the reminder on amounts — damage, DPS, shield HP, power output', () => {
+      expect(statAddsUp({ labelKey: 'codex.equipped.alphaDamage', format: 'dec' })).toBe(true);
+      expect(statAddsUp({ labelKey: 'codex.equipped.dps', format: 'dec' })).toBe(true);
+      expect(statAddsUp({ labelKey: 'codex.equipped.shieldHp', format: 'int' })).toBe(true);
+      expect(statAddsUp({ labelKey: 'codex.missile.stat.damage', format: 'int' })).toBe(true);
+    });
+
+    it('drops it on values every unit shares — range, speed, fire rate, timings', () => {
+      expect(statAddsUp({ labelKey: 'codex.equipped.range', format: 'metres' })).toBe(false);
+      expect(statAddsUp({ labelKey: 'codex.equipped.projectileSpeed', format: 'mps' })).toBe(false);
+      expect(statAddsUp({ labelKey: 'codex.equipped.fireRate', format: 'int' })).toBe(false);
+      expect(statAddsUp({ labelKey: 'codex.equipped.spoolTime', format: 'seconds' })).toBe(false);
+      expect(statAddsUp({ labelKey: 'codex.equipped.jumpRange', format: 'gm' })).toBe(false);
+      expect(statAddsUp({ labelKey: 'codex.equipped.cmInfrared', format: 'int' })).toBe(false);
+    });
+  });
+
+  describe('statsFingerprint', () => {
+    it('differs as soon as one value differs, so such units never stack', () => {
+      const a = [{ labelKey: 'codex.equipped.range', value: 1000, format: 'metres' as const }];
+      const b = [{ labelKey: 'codex.equipped.range', value: 1200, format: 'metres' as const }];
+      expect(statsFingerprint(a)).not.toBe(statsFingerprint(b));
+      expect(statsFingerprint(a)).toBe(statsFingerprint([{ ...a[0] }]));
+      expect(statsFingerprint(undefined)).toBe('');
     });
   });
 });

@@ -129,6 +129,7 @@ import {
   ammoClassNamesFor,
   damageChannelsOf,
   equippedStats,
+  statsFingerprint,
   equippedStatsNoteKey,
   equippedTypeLabel,
   isWeaponMountPort,
@@ -5029,7 +5030,14 @@ export class CodexDetailComponent implements OnInit {
             ? 'passive'
             : 'active'
           : '';
-      const groupKey = `${classNamePositionFamily(l.className) || ' '}|${l.size ?? ''}|${l.grade ?? ''}|${variantKey}|${stockRole}`;
+      // Same class family is not enough: per-side classes can carry different
+      // numbers, and "2× 1000 m + 1× 1200 m" are two items that must keep
+      // their own rows (#351). The STOCK stats (own + carried) join the key.
+      const stockStats = [
+        statsFingerprint(l.className ? equippedStats(item) : []),
+        ...stockKids.map((c) => statsFingerprint(c.stats)),
+      ].join('/');
+      const groupKey = `${classNamePositionFamily(l.className) || ' '}|${l.size ?? ''}|${l.grade ?? ''}|${variantKey}|${stockRole}|${stockStats}`;
 
       const draftEntry = configurable ? this.draft().get(l.port) : undefined;
       const overlay = this.draftOverlayFor(l.port, draftEntry, item);
