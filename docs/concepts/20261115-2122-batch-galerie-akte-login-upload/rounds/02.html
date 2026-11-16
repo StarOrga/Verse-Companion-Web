@@ -67,13 +67,9 @@
           data-issue-body="Found while investigating the 1292 'gladius' search misses: codex-search-engine.spec.ts ran with the real Supabase client and wrote search_log_miss to the cloud project on every test run (fixed in this batch). codex-search-bar.component.spec.ts and shell/quick-search.component.spec.ts still run without a fake Supabase client and can write search_log_open (popularity ranking) to the cloud database. Provide fakeSupabase in both and add a guard that fails a spec when it reaches the real client."
           data-oq-origin="found"
           data-route-default="now"
-          data-route-reason="klein">
+          data-route-reason="klein" data-routed>
         <span class="oq-label">Specs schreiben in Cloud-DB</span>
-        <dl class="fr-fkv">
-          <dt>{{final.fund_what}}</dt><dd>Zwei Such-Specs können beim Testlauf echte Öffnen-Zählungen in die Cloud schreiben.</dd>
-          <dt>{{final.fund_where}}</dt><dd>Codex-Suchleiste, Schnellsuche</dd>
-          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — klein und verfälscht sonst das Ranking.</dd>
-        </dl>
+        <span class="oq-done">✓ umgesetzt — Fake-Client in drei Specs, Schreibschutz in <code>src/app/testing/vitest-setup.ts</code> (<code>d8cf19530</code>)</span>
       </li>
     </ul>
   </details>
@@ -85,7 +81,7 @@
       <li><code>codex-holo-akte.component.ts</code>, <code>login.component.ts</code>, <code>p4k-history.component.ts</code></li>
       <li>Tests: 7079 grün, 1 übersprungen · typecheck, lint, build, test:gate grün · Abnahme 28 met / 5 partial</li>
       <li>Migration <code>20261115213000_drop_search_misses.sql</code> geht erst mit db:push live</li>
-      <li>Nicht gebaut: <code>search_opens</code>/<code>search_popularity</code> bleiben, sie ranken die Treffer</li>
+      <li>Nachtrag: Spec-Schreibschutz <code>d8cf19530</code>; Wikelo nicht gebaut, keine Datenquelle</li>
     </ul>
   </details>
   </div>
