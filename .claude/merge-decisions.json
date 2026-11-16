@@ -401,6 +401,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›src and app›count": [
+      {
+        "ship": "PR #1163",
+        "by": "JerryT2T",
+        "value": "src/ (1389), app/ (1382) (generated on this branch's final tree)",
+        "decided": true,
+        "at": "2026-11-16T21:15:35.823Z",
+        "hunks": [
+          "02827798ba7c"
+        ]
+      }
+    ],
     ".claude/project-map.md›src-counts›count": [
       {
         "ship": "#1146",
@@ -512,6 +524,18 @@
         "at": "2026-11-15T04:18:13.845Z",
         "hunks": [
           "72caeb6e4c42"
+        ]
+      }
+    ],
+    ".claude/project-map.md›tracked files›count": [
+      {
+        "ship": "PR #1163",
+        "by": "JerryT2T",
+        "value": "3179 tracked files (generated on this branch's final tree)",
+        "decided": true,
+        "at": "2026-11-16T21:15:35.823Z",
+        "hunks": [
+          "0de295251c78"
         ]
       }
     ],
