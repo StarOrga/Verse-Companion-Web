@@ -55,5 +55,22 @@
         "Syllable hyphenation of names in the popout"
       ]
     }
-  ]
+  ],
+  "finalize": {
+    "submitted_at": "2026-11-16T20:03:45.763Z",
+    "submission_id": "sub-mwjoy5sw-36m9hqnc",
+    "ship": true,
+    "disposition": "discard (built page only; source stays tracked, project concept rule 5)",
+    "implement": [
+      {
+        "id": "oq-path-stations",
+        "result": "not built",
+        "reason": "Contradicts the accepted spec nachschub-hq-ui-spec.md (two nodes only, no Nachschub node outside HQ; three status nodes rejected); own stops exclude each other per item. Needs its own concept."
+      }
+    ],
+    "tests": [
+      "t-fulfilled: self",
+      "t-feel: self"
+    ]
+  }
 }

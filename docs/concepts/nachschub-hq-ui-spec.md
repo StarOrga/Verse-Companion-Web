@@ -26,6 +26,15 @@ The next concept or implementation for wishlist, Nachschub, Inventar, Hangar, Sa
 - **Header quick access ("Schnellzugriff"):** icon only in the header, the word appears only in the opened panel. Count = wishlist positions. Sections: Zuletzt geöffnet 3 (expand to 7), Wunschliste 3 + "Ganze Wunschliste", and a context Bestand section (Hangar / Inventar / Sammlung) filtered by page type; everything filtered by page type. No Nachschub. Pages without a type (HQ start, Verse, Social) show no Bestand section. On news pages the context section is Sammlung (collected news).
 - **Migration:** existing open Nachschub lines become one package "Bisheriger Nachschub"; news bookmarks in localStorage are copied into the account's Sammlung on the next visit.
 
+### Wishes (concept , design "Sternschnuppe")
+- **Name:** "Wünsche" / "Wishes" everywhere. No "Wunschliste", no "Positionen gemerkt"; counts read "N Wünsche" / "1 Wunsch", "Alle Wünsche" opens the large window. The search keyword  stays as an alias.
+- **One icon:** the shooting star () in the header, the path control, search rows and the large window. News "gemerkt" keeps the bookmark (); the Explorer achievement keeps its ★.
+- **Empty state:**  with the night sky , "Wünsch dir was" and the primary "Wunsch suchen", which opens the search of the page the reader is on through  (the same thing Ctrl+K does) with the caret in the field. No footer while empty. The large window shows the sky as a strip above the groups.
+- **Moments:** the wish node plays one add moment per own add (1.7 s); owning a wished item shows the two-line fulfilled toast. Reduced motion: no animation, the picture stays complete.
+- **Light popouts:** a non-modal panel at its trigger shows the accent edge only, no rail icon and no vertical eyebrow (apps menu, wishes, HQ chips).
+- **Analytics:** ,  ; PostHog flow .
+- **Path control stays at two nodes.** The concept's Codex mock drew a five-station strip; that was a drawing, not a decision. A close-out request to build five stations was not built, because it contradicts "two nodes only" and "No Nachschub node outside HQ" above and Inventar / Hangar / Sammlung exclude each other per item. Changing the path needs its own concept.
+
 ## Rejected
 - Nachschub as its own sixth HQ page or as a Bestand tab.
 - Three status nodes everywhere in the Codex; a Nachschub pill on Codex detail pages.
