@@ -198,13 +198,13 @@ export class MerklisteComponent {
 
   /**
    * "Wunsch suchen" (empty state): the popout folds away first, then the search of the page the reader is on opens as if
-   * they had clicked into it. The focus lands in that field before the popup's focus return looks (it only restores
-   * focus that is on nothing), so it is not pulled back to the trigger.
+   * they had clicked into it. After the next render, never in the same tick: on a phone the popout is a sheet that
+   * holds the page inert while it stands, and a field behind it cannot take the caret until the sheet is gone.
    */
   protected searchWish(): void {
     this.analytics.track('hq:wish_search_open', { surface: 'popout' });
     this.close();
-    this.searchOpen.open();
+    this.searchOpen.openAfterRender();
   }
 
   /** A row link folds the panel away on a plain left click only; a modified click opens a tab and stays. */

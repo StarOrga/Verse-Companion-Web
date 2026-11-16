@@ -181,6 +181,8 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       .sil { display: block; height: 96px; margin-bottom: 4px; padding: 10px 8px; border-radius: 8px; color: var(--sc-fg-1);
         background: radial-gradient(ellipse at 50% 80%, color-mix(in srgb, var(--sc-accent) 14%, transparent), transparent 70%), color-mix(in srgb, var(--sc-accent) 4%, transparent); }
       .pickarea:hover .sil { background-color: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
+      /* The wish star sits bottom right on a tile: the top right corner belongs to the open arrow. */
+      .sil.sc-wish-dot::after { top: auto; right: 6px; bottom: 6px; }
       .nm { font-size: 0.82rem; font-weight: 600; color: var(--sc-fg-0); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .sub { font-size: max(0.72rem, var(--sc-fs-floor, 0.75rem)); color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .foot { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; gap: 4px; }

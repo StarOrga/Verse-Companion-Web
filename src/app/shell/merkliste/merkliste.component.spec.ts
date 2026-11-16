@@ -29,7 +29,7 @@ function mount(items: CartItem[]) {
   };
   const svc = { refresh: vi.fn().mockName('refresh'), cartHref: signal('/codex/index?cart=1') };
   const track = vi.fn().mockName('track');
-  const searchOpen = { open: vi.fn().mockName('open') };
+  const searchOpen = { open: vi.fn().mockName('open'), openAfterRender: vi.fn().mockName('openAfterRender') };
   TestBed.configureTestingModule({
     providers: [
       provideRouter([]),
@@ -143,7 +143,9 @@ describe('MerklisteComponent (wishlist popout)', () => {
     f.el.querySelector<HTMLButtonElement>('button.we-go')!.click();
     f.fixture.detectChanges();
     expect(f.track).toHaveBeenCalledWith('hq:wish_search_open', { surface: 'popout' });
-    expect(f.searchOpen.open).toHaveBeenCalledTimes(1);
+    // After the next render, never in the same tick: as a phone sheet the popout holds the page inert while it stands.
+    expect(f.searchOpen.openAfterRender).toHaveBeenCalledTimes(1);
+    expect(f.searchOpen.open).not.toHaveBeenCalled();
     expect(f.popouts.active()).toBeNull();
     // The popup closes before the search opens (the popup's focus return must not win over the field).
     const closedAt = f.fixture.componentInstance as unknown as { open: () => boolean };
