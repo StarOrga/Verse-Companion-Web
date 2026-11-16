@@ -4,6 +4,21 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.272.0] - 2026-11-16
+
+### Added
+- An empty wish list now shows a night sky and "Wunsch suchen": it opens the search of the page you are on, with the cursor already in the field.
+- Adding a wish plays a short shooting-star moment on its symbol. When a wished item arrives in your Hangar or Inventar, the note reads "… ist da — Dein Wunsch ist in Erfüllung gegangen".
+
+### Changed
+- The wishlist is now called "Wünsche" (Wishes) and has one symbol everywhere, a shooting star: in the header, on every item, in the search and in the large window. Saved news keep the bookmark.
+- Small popouts that open at their button (apps, wishes, the HQ app chips) show only the coloured edge; the side rail with icon and vertical title is gone there. The HQ chip now reads "Jetzt starten".
+
+### Fixed
+- The account menu no longer scrolls sideways.
+- The "Mit der App" card in the HQ keeps its full width instead of shrinking to its chip.
+- On tablets and phones the "Gefechtsbereit" line of a ship's energy panel is large enough to press and hold for its explanation.
+
 ## [0.271.5] - 2026-11-16
 
 ### Fixed
