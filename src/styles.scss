@@ -267,6 +267,9 @@ html[data-sc-layout] body { font-size: 0.9375rem; }
   --sc-focus-ring: 0 0 0 1px rgba(0, 212, 255, 0.45), 0 0 8px rgba(0, 212, 255, 0.25);
   --sc-focus-ring-inset: inset 0 0 0 1px rgba(0, 212, 255, 0.45), inset 0 0 8px rgba(0, 212, 255, 0.2);
   --sc-focus-ring-hot: 0 0 0 1px rgba(255, 80, 70, 0.45), 0 0 8px rgba(255, 80, 70, 0.25);
+  /* The same ring for the wrapper of a text field (a round search field around a bare
+     input): empty until Tab moves focus, see "Keyboard focus ring" below. */
+  --sc-tab-ring: 0 0 0 0 transparent;
   --sc-sub-focus-glow: 0 0 0 1px rgba(130, 220, 255, 0.35), 0 0 22px rgba(82, 193, 230, 0.3);
   --sc-sub-box: rgba(130, 220, 255, 0.45);
 }
@@ -1063,6 +1066,25 @@ button {
   box-shadow: var(--sc-focus-ring);
 }
 
+/* A text field matches :focus-visible after a click as well (the browser rings whatever can
+   be typed into), so the rule above would frame every clicked field. Until focus is moved with
+   Tab (`data-sc-tabbing`, core/focus-modality.ts) the ring tokens are blank on a focused text
+   field: a clicked field shows focus by recolouring the border it already has, never by a
+   second frame. Any `box-shadow: var(--sc-focus-ring…)` on a field follows without a rule of
+   its own; a field's focus rule therefore never hard-codes a ring. */
+:root:not([data-sc-tabbing]) :is(
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='button'], [type='submit'], [type='reset'], [type='file'], [type='color'], [type='image']),
+  textarea,
+  [contenteditable]:not([contenteditable='false'])
+):focus {
+  --sc-focus-ring: 0 0 0 0 transparent;
+  --sc-focus-ring-inset: 0 0 0 0 transparent;
+  --sc-focus-ring-hot: 0 0 0 0 transparent;
+}
+/* Where the wrapper is the visible field, the wrapper takes the ring: the bare input drops
+   its own and the wrapper adds `var(--sc-tab-ring)` on `:has(input:focus-visible)`. */
+:root[data-sc-tabbing] { --sc-tab-ring: var(--sc-focus-ring); }
+
 /* A dialog container (ScDialogDirective, tabindex="-1") is no Tab stop; its
    focus is only the starting point for screen readers and the next Tab, so
    no ring around the whole lightbox, panel or popover. Controls inside keep
@@ -1309,7 +1331,6 @@ button {
   &:focus {
     outline: none;
     border-color: var(--sc-accent);
-    box-shadow: var(--sc-glow);
   }
 }
 

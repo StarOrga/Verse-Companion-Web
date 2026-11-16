@@ -84,6 +84,7 @@ interface JobViewLike {
   resumeHint: string | null;
   resumeSummary: ResumeSummaryLike | null;
   state: { status: string; silhouettes?: { status: string } } | null;
+  restartedAfterUpdate?: { changed: SubthemeKey[]; reason: 'extractor-changed' | 'unknown-origin' } | null;
 }
 
 /** Mirror of `main/catalog-bridge.ts:CatalogUploadResult` (see the note above). */
@@ -1970,6 +1971,20 @@ async function refreshJobView(): Promise<void> {
   }
   state.uploadPaused = state.resumableJob?.state?.status === 'paused';
   paintJobNotice();
+  noteRestartAfterUpdate(state.resumableJob?.restartedAfterUpdate ?? null);
+}
+
+/** Said once: an interrupted job was dropped because this uploader extracts differently. */
+let restartNoted = false;
+function noteRestartAfterUpdate(r: JobViewLike['restartedAfterUpdate']): void {
+  if (!r || restartNoted) return;
+  restartNoted = true;
+  const msg =
+    r.reason === 'extractor-changed' && r.changed.length
+      ? t('upload.job.restartedAfterUpdate', { list: r.changed.map(subthemeName).join(', ') })
+      : t('upload.job.restartedUnknownOrigin');
+  drawerAppendLog(msg, 'warn');
+  setStatus(msg);
 }
 
 // Turn the structured resume summary into a human, localized banner — e.g.

@@ -5,6 +5,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from './auth.service';
+import { consumeAuthReturnError, type AuthReturnError } from './auth-return-error';
 import { AccessRequestService } from './access-request.service';
 import { ImpersonationService } from './impersonation.service';
 import { AnalyticsService } from '../core/analytics.service';
@@ -84,6 +85,15 @@ type Panel = 'signIn' | 'apply' | 'reset';
 
               @if (denied()) {
                 <div class="notice denied" role="alert">{{ 'auth.deniedInvite' | translate }}</div>
+              }
+
+              @if (returnError() === 'signup_not_allowed') {
+                <div class="notice denied" role="alert">
+                  <p>{{ 'auth.deniedSignup' | translate }}</p>
+                  <button type="button" scAction tier="secondary" (click)="showApply()">
+                    {{ 'auth.landing.applyCta' | translate }}
+                  </button>
+                </div>
               }
 
               <!--
@@ -617,7 +627,15 @@ export class LoginComponent {
 
   readonly busy = signal(false);
   /** i18n key, never raw text. */
-  readonly errorMsg = signal<string | null>(null);
+  /**
+   * What the OAuth return carried (snapshotted in main.ts before supabase-js
+   * cleans the URL). Consumed once, so a reload shows nothing. Only the
+   * classification is used — the raw error_description is never rendered.
+   */
+  readonly returnError = signal<AuthReturnError>(consumeAuthReturnError());
+  readonly errorMsg = signal<string | null>(
+    this.returnError() === 'other' ? authErrorKey(null, 'oauth return') : null,
+  );
   /** Set when the approvedGuard bounced an un-invited account back here. */
   readonly denied = signal(this.route.snapshot.queryParamMap.get('denied') === 'invite');
 
@@ -680,6 +698,27 @@ export class LoginComponent {
   readonly resetForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
   });
+
+  constructor() {
+    if (this.returnError() !== null) this.stripErrorParams();
+  }
+
+  /** Drop `error*` params from query and hash, keep the rest of the URL. */
+  private stripErrorParams(): void {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    const clean = (raw: string): string => {
+      const p = new URLSearchParams(raw);
+      for (const k of ['error', 'error_code', 'error_description']) p.delete(k);
+      return p.toString();
+    };
+    const search = clean(url.search.replace(/^\?/, ''));
+    // A plain anchor ("#section") is no parameter list: leave it as it is.
+    const rawHash = url.hash.replace(/^#/, '');
+    const hash = /(^|&)error(_code|_description)?=/.test(rawHash) ? clean(rawHash) : rawHash;
+    const next = url.pathname + (search ? `?${search}` : '') + (hash ? `#${hash}` : '');
+    if (next !== url.pathname + url.search + url.hash) window.history.replaceState(window.history.state, '', next);
+  }
 
   showApply(): void {
     this.switched.set(true);

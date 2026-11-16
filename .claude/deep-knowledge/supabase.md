@@ -39,6 +39,7 @@ Cloud project: **`hcnqhvzlavdycidqyaai`** (region `eu-central-1`, free tier, org
 | `20260928231143_delete_paths_and_log_retention.sql` | Delete paths + retention (plan D02). AUD-005: `hangar_ship_configs_share_guard` / `hangar_share_links_revoke_guard` allow the one-way null the FK actions `on delete set null` write (`source_config_id` → the follower copy forks: `follows_owner = false`, `forked_at` set; `owner_user_id` → null), so shared/adopted configs, their ships and sharing accounts are deletable again; every other guard rule unchanged. AUD-108: `p4k_bundles.disabled_by` re-added `on delete set null` (`p4k_bundles_disabled_by_fkey`). AUD-113: `codex_builds.finalized_at` (backfilled once), set by `set_current_codex_build`; `prune_codex_builds` counts finalized builds only and sweeps never-finalized, non-current ones after 7 days. AUD-319/344: pg_cron `api-request-log-purge` (1 day, 04:15) and `telemetry-events-retention` (120 days, 04:25), index `api_request_log_ts_idx`. AUD-321: indexes on `hangar_share_links.source_config_id`, `hangar_ship_configs.source_config_id` / `owner_user_id`, `p4k_bundles.disabled_by` |
 | `20260802080000_protected_admins.sql` | Founder-admin protection — `protected_admins`, the `profiles_protected_admin_guard` + `profiles_role_write_guard` triggers, `protect_admin()`/`unprotect_admin()` (service_role only), the `protected_admin_removal_requests` seam. See **Protected admin accounts** below |
 | `20260805120000_email_allowlist.sql` | `allowed_emails` (admin-managed sign-in allowlist), extends `handle_new_user()` with the allowlist branch, admin RPCs `list_allowed_emails()`/`remove_allowed_email()`, service-role helper `email_to_user_id()`, and the `is_approved()` RESTRICTIVE RLS gate on self-scoped hangar/loadout/link/draft tables. See **Email allowlist & access control** below |
+| `20261115233000_signup_gate_unapproved_lockdown.sql` | Security audit 2026-11-15. `hook_before_user_created(jsonb)` (the Auth sign-up gate), `handle_new_user()` (bootstrap only while no admin exists, allowlist match in lower case), `current_user_role()` clamped to `viewer` for unapproved/suspended accounts, the `*_approved_gate` policy on 17 more self-scoped tables, trigger `require_approved_writer()` on the six tables the SECURITY DEFINER game RPCs write, `profiles_unapproved_identity_freeze`, `list_users_for_admin()` + `is_approved` / `approved_at`. See **Sign-up gate & unapproved accounts** below. pgTAP: `signup_gate_unapproved_lockdown.test.sql` |
 | `20260901182500_starscape_wallpaper_votes.sql` | Starscape thumbs-up: `wallpaper_votes` (PK `(image_id, user_id)` = one vote per user per image; self-read only, so nobody can see who voted), the two SECURITY DEFINER read paths `starscape_vote_state(text[])` (counts + "did I", no user_id) and `starscape_top_wallpapers(int)` (global ranking, `votes desc, published_at desc` — the newest wallpapers fill the slots nobody has voted for yet), plus `profiles.starscape_top_only` + `set_starscape_top_only()` for the per-user "Top 7 only" toggle the Starscape desktop app will share |
 | `20260903170000_verse_wallpapers_variant_groups.sql` | Starscape variant groups (feedback fcd956cf) — additive only: `verse_wallpapers.width`/`height` (largest known artwork size), `thumb` (crop-tolerant signature, `v1:<w>x<h>:<base64 rgb>`, written by `variant-signature.ts`), `variant_group` + `variant_role` (`single`\|`primary`\|`ratio`\|`duplicate`, CHECK-constrained, default `single` so an ungrouped row is fully visible), plus a partial index on the visible roles and one on the group key. RSI publishes one artwork in several CROPS under separate media ids, which `phash` cannot see (a crop moves every cell of a global hash — the live duplicate pairs measured 78–115 bits apart while the gate is 48). Look-alikes are **grouped, never deleted**: consumers list `single`+`primary`, `ratio` rows stay available for a client picking the shape closest to its screen, `duplicate` rows are same-shape lower-res copies. No policy or grant change — the table-level `select` grant already covers new columns |
 | `20260903220000_social_graph_reports.sql` | The social graph, phase 1 of admin feedback cf0ddf7d: `friend_requests`, `friendships` (stored once as the ordered pair `user_low < user_high`), `user_blocks`, `user_reports`. **No table has a write policy** — `send_friend_request()` / `respond_friend_request()` / `withdraw_friend_request()` / `remove_friend()` / `block_user()` / `unblock_user()` / `report_user()` are the only write paths, all SECURITY DEFINER and all pinning the actor to `auth.uid()`. Reads go through `list_my_friend_edges()` (one round trip, four `kind`s) because `profiles` is self-read only; `find_user_by_username()` is EXACT-match on purpose (a prefix search would be a user-enumeration endpoint). `list_users_for_admin()` gains `report_count`; `list_reports_for_admin()` is the admin's read-only report feed. Account suspension and loadout sharing are deliberately **not** here — phase 2 |
@@ -166,6 +167,69 @@ optionally still send a Supabase invite mail.
   them to) — the admin UI says so explicitly (`admin.requests.acceptedNoMail`).
   The GoTrue invite/recovery **mail templates** are dashboard config, not repo
   config; they are the one piece of this flow not versioned here.
+
+## Sign-up gate & unapproved accounts
+
+Audit 2026-11-15, after a stranger's Google sign-in on 2026-11-12 showed up in
+the admin list looking like a member (it never was: `is_approved = false`, no
+data). Three layers now, outermost first:
+
+1. **No account without an allowlist row.** Supabase Auth calls
+   `public.hook_before_user_created(event jsonb)` before it creates an account
+   (OAuth, e-mail sign-up, invite alike). It allows only an address on
+   `allowed_emails` (compared in lower case) that also arrives through a path
+   proving the mailbox — Google unless it reports `email_verified = false`,
+   any other OAuth provider only with `email_verified = true`, an e-mail
+   (password / invite) account only within 2 minutes of
+   `allowed_emails.invite_started_at`, which `invite-user` stamps right before
+   `inviteUserByEmail` and clears right after — or the bootstrap founder of a database without an
+   admin. Without the path rule anybody who knew an allowlisted, not-yet-joined
+   address could `POST /auth/v1/signup` with their own password and be approved
+   at its role once the real owner clicked the confirmation mail. Otherwise it answers
+   `{ error: { http_code: 403, message: 'signup_not_allowed' } }`. EXECUTE is
+   for `supabase_auth_admin` only — callable by a client it would be an "is
+   this address invited?" oracle. **The hook is switched on in the project's
+   auth config, not by the migration**: `hook_before_user_created_enabled` +
+   `hook_before_user_created_uri = pg-functions://postgres/public/hook_before_user_created`
+   (dashboard → Auth → Hooks, or `PATCH /v1/projects/<ref>/config/auth` with the
+   CLI token; `config.toml` carries the same block for the local stack). If it
+   is ever disabled, layers 2 and 3 are the gate again.
+   The web client recognises the rejection by the marker in
+   `error_description` (`src/app/auth/auth-return-error.ts`, snapshotted in
+   `main.ts`) and explains it on the login page; the text is never rendered.
+   `invite-user` writes the allowlist row before it invites, so invitations
+   pass. `delete-user` removes the row with the account — otherwise a deleted
+   person could sign up again and be approved at the old role.
+2. **An unapproved account is nobody.** `current_user_role()` answers `viewer`
+   unless the caller is approved and not suspended, so `is_admin()` /
+   `is_collaborator()` and everything built on them include approval. Edge
+   functions ask `rpc('is_admin')` / `rpc('is_approved')` with the caller's
+   client — never `profiles.role` alone, and never `auth.getUser()` alone for
+   anything that costs money or returns private data.
+3. **Every own-row table carries `<table>_approved_gate`** (RESTRICTIVE,
+   `is_approved()`); tables written by SECURITY DEFINER RPCs carry the
+   `<table>_approved_writer` trigger instead, because RLS does not reach those
+   writes. **A new self-scoped table gets the policy in its first migration, a
+   new RPC-written table the trigger.** Public-read tables get neither: an
+   unapproved session may read what an anonymous visitor may read.
+
+The admin people list marks an account whose `is_approved` is false ("Nicht
+freigeschaltet") and approves it through `invite-user` (`approved_existing`);
+`set_user_role()` alone never approved anybody.
+
+**Redirect URLs are part of this.** Production's allow list is exactly the
+production host plus `localhost:4200` / `127.0.0.1:4200`. A redirect URL is
+where Supabase delivers the sign-in code, so a host we do not control
+(a `*.vercel.app` wildcard, a retired project name anyone can re-register) is
+an account-takeover path through a crafted sign-in link. Until 2026-11-15 the
+list held both. Preview deployments therefore return an OAuth sign-in to the
+production site.
+
+Not verified live (it would need a fresh Google account or a real invite
+mail): that the hook's event carries `app_metadata.provider` and
+`user_metadata.email_verified` exactly as the Supabase docs sample shows. If a
+legitimate, allowlisted person is refused with `signup_not_allowed`, look
+there first; an invite mail is the way in meanwhile.
 
 ## Protected admin accounts (`protected_admins`)
 
@@ -299,7 +363,7 @@ this project on 2026-09-13, and a non-interactive scheduled-task session cannot 
 
 ## What MCP does NOT give us
 
-- **Auth provider config** (toggling Google, SMTP, email confirmation). Dashboard-only: <https://supabase.com/dashboard/project/hcnqhvzlavdycidqyaai/auth/providers>.
+- **Auth provider config** (toggling Google, SMTP, email confirmation, redirect URLs, auth hooks). Dashboard: <https://supabase.com/dashboard/project/hcnqhvzlavdycidqyaai/auth/providers>, or the Management API with the CLI token (`GET` / `PATCH https://api.supabase.com/v1/projects/hcnqhvzlavdycidqyaai/config/auth`; read it before you change it, and never print the secret fields).
 - **Setting edge-function secrets.** Dashboard or `npx supabase secrets set KEY=value --project-ref hcnqhvzlavdycidqyaai`.
   `ingest-telemetry` REQUIRES `TELEMETRY_HMAC_KEY` and `TELEMETRY_HASH_SALT` — without them it answers every request `503 server_misconfigured` (no dev fallback since plan D01, AUD-114; only a local stack opts in with `TELEMETRY_DEV=1` in `supabase/functions/.env`). The uploader's tag build bakes the matching GitHub secret `SC_TELEMETRY_HMAC_KEY` and fails without it.
 

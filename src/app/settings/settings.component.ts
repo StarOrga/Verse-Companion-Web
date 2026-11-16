@@ -703,7 +703,6 @@ const DELETE_ACCOUNT_ERROR_KEYS: Readonly<Record<string, string>> = {
     .text-input:focus {
       outline: none;
       border-color: var(--sc-accent);
-      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.25);
     }
 
     .locale-grid {

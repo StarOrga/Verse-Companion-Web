@@ -149,7 +149,7 @@
   border-radius: 999px;
   background: var(--sc-well);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sc-accent) 25%, transparent),
-    0 0 18px color-mix(in srgb, var(--sc-accent) 12%, transparent);
+    0 0 18px color-mix(in srgb, var(--sc-accent) 12%, transparent), var(--_kb);
 }
 :host([data-mode='stage']) .cap::after {
   @include breath;
@@ -162,7 +162,7 @@
   display: none;
 }
 :host([data-mode='stage']) .cap:has(.input:focus) {
-  box-shadow: var(--_rim-hi);
+  box-shadow: var(--_rim-hi), var(--_kb);
 }
 // One light trace around the frame: on docking and on the stage entrance, then gone.
 .trace {
@@ -582,6 +582,8 @@ $dock-ease: cubic-bezier(0.55, 0, 0.2, 1);
   // What the breath lays over the resting rim to reach that state (25 % + 27 % = 45 %, 12 % + 11 % = 22 %).
   --_rim-breath: inset 0 0 0 1px color-mix(in srgb, var(--sc-accent) 27%, transparent),
     0 0 26px color-mix(in srgb, var(--sc-accent) 11%, transparent);
+  // The keyboard ring of the round field: nothing, until Tab lands in its input (below).
+  --_kb: 0 0 0 0 transparent;
 }
 :host(:not([data-mode='stage'])) ::ng-deep .search:not(.bottom) .field,
 :host(:not([data-mode='stage'])) ::ng-deep .search.bottom.open .field {
@@ -589,18 +591,27 @@ $dock-ease: cubic-bezier(0.55, 0, 0.2, 1);
   border-radius: 999px;
   background: var(--sc-well);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sc-accent) 25%, transparent),
-    0 0 18px color-mix(in srgb, var(--sc-accent) 12%, transparent);
+    0 0 18px color-mix(in srgb, var(--sc-accent) 12%, transparent), var(--_kb);
   position: relative;
 }
 :host(:not([data-mode='stage'])) ::ng-deep .search.bottom.open .field::after {
   @include breath;
 }
 :host(:not([data-mode='stage'])) ::ng-deep .search .field.focused {
-  box-shadow: var(--_rim-hi);
+  box-shadow: var(--_rim-hi), var(--_kb);
 }
 :host(:not([data-mode='stage'])) ::ng-deep .search .field.focused::after {
   animation: none;
   opacity: 0;
+}
+// Keyboard focus rings the round field itself, never the bare input inside it
+// (`--sc-tab-ring` is empty until Tab moves focus, so a click adds no frame).
+:host ::ng-deep .search .input:focus-visible {
+  box-shadow: none;
+}
+:host([data-mode='stage']) .cap:has(.input:focus-visible),
+:host(:not([data-mode='stage'])) ::ng-deep .search .field:has(.input:focus-visible) {
+  --_kb: var(--sc-tab-ring);
 }
 @keyframes fb-breathe {
   50% {
