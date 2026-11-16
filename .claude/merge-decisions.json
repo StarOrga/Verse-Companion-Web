@@ -988,6 +988,16 @@
         "hunks": [
           "6282ff402f2b"
         ]
+      },
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "0.272.0 (regenerated from CHANGELOG by the bump)",
+        "decided": true,
+        "at": "2026-11-16T21:11:45.546Z",
+        "hunks": [
+          "267aeeeb5081"
+        ]
       }
     ],
     "public/release-notes.json›root›current": [
