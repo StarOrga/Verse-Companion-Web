@@ -319,7 +319,7 @@ type Panel = 'signIn' | 'apply' | 'reset';
       padding: var(--sc-space-4, 16px) var(--sc-page-gutter, 24px);
       background: linear-gradient(180deg, color-mix(in srgb, var(--sc-bg-0) 60%, transparent), transparent);
     }
-    .lg-brand { display: inline-flex; align-items: center; gap: 12px; min-width: 0; }
+    .lg-brand { display: inline-flex; align-items: center; gap: 12px; min-width: 0; --sc-brand-channel-fs: max(12px, var(--sc-fs-floor)); }
     .lg-nav { display: flex; gap: var(--sc-space-1, 4px); }
     .lg-nav a {
       display: inline-flex;

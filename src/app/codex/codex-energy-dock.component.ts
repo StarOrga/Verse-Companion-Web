@@ -929,6 +929,10 @@ let uidSeq = 0;
         justify-self: start;
         cursor: help;
       }
+      /* Focusable for its tooltip, so on touch it needs a full tap target. */
+      @media (pointer: coarse) {
+        .md-ok { min-height: max(48px, var(--sc-tap-min, 0px)); }
+      }
       .md-heat {
         flex-wrap: wrap;
         row-gap: 2px;
