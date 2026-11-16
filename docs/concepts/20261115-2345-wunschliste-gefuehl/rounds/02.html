@@ -1,0 +1,86 @@
+<section data-iteration="2" data-iteration-template="free" data-final-report>
+  <p class="fr-sentence">Aus der Wunschliste wurden die „Wünsche“: eine Sternschnuppe als Symbol, ein Nachthimmel statt „0 Positionen gemerkt“ und ein Knopf, der die Suche der Seite öffnet.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🌠</span><span><b>Ein Symbol, ein Name</b>: Sternschnuppe und „Wünsche“ überall.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🔎</span><span><b>„Wunsch suchen“</b> öffnet die Suche der Seite, mit Cursor im Feld.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">✨</span><span>Hinzufügen und Erfüllen haben <b>einen eigenen Moment</b>.</span></li>
+      </ul>
+      <p class="fr-try-auth">🔑 Noch nicht live: erst nach dem Shippen mit deinem Konto unter Codex, Stern oben rechts</p>
+    </div>
+    <div class="fr-ba" data-label-before="{{final.before}}" data-label-after="{{final.after}}">
+      <figure class="fr-shot"><img src="20261115-2345-wunschliste-gefuehl/shots/before.png" alt="Leere Wunschliste mit Herz, senkrechtem Titel und dem Text 0 Positionen gemerkt"><figcaption>Herz, Leiste, „0 Positionen gemerkt“</figcaption></figure>
+      <figure class="fr-shot"><img src="20261115-2345-wunschliste-gefuehl/shots/after.png" alt="Leere Wünsche mit Nachthimmel, Wünsch dir was und dem Knopf Wunsch suchen"><figcaption>Sternschnuppe, Nachthimmel, „Wunsch suchen“</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="7077 Tests grün, dazu Typen, Lint und Build; Anforderung: keine roten Tests (geschätzt).">
+        <span class="fr-meter-name">🧱 Stabilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">7077 ✓</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Die Suche bekommt den Cursor auf 6 von 6 geprüften Seiten (Rechner und Handy); bei reduzierter Bewegung läuft keine Animation; Anforderung: alle (geschätzt).">
+        <span class="fr-meter-name">♿ Barrierefreiheit</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">6 / 6</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Symbol und Name der Wünsche kommen jetzt aus einer Stelle statt aus zwei; Anforderung: eine Quelle (geschätzt).">
+        <span class="fr-meter-name">🛠 Wartbarkeit</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">2 → 1</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="5 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ✓ {{final.level_interplay}} · ✓ {{final.level_local}} · ✓ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_prod}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_live}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 1 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-path-stations"
+          data-issue-title="[DESIGN] Decide whether the item path shows all five stations"
+          data-issue-type="design"
+          data-issue-body="Concept 20261115-2345-wunschliste-gefuehl (design d3, screen 'Im Codex') drew the path with five stations: Wünsche, Nachschub, Inventar, Hangar, Sammlungen. The real control (src/app/shared/item-path/item-path.component.ts) shows two: the wish node and the one own node that fits the item's kind (pathSteps in src/app/hq/data/item-path.service.ts). Only the wish node was redrawn (shooting star, label 'Wünsche', add moment). Showing five stations would change what the control means for every item kind and needs its own concept."
+          data-issue-module="codex"
+          data-oq-origin="shortfall"
+          data-route-default="ignore"
+          data-route-reason="bewusst">
+        <span class="oq-label">Pfad mit zwei Stationen</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Nicht umgesetzt, weil der echte Pfad je Gegenstand nur zwei Stationen kennt; der Entwurf zeigte fünf.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Codex · Pfad am Gegenstand</dd>
+          <dt>{{final.fund_why}}</dt><dd>✕ Weglassen — der Pfad funktioniert so, fünf Stationen wären ein eigener Umbau.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Branch <code>claude/wishlist-icons-ux-6565a1</code> · Bereiche: shell, shared/item-path, shared/wish-sky, shared/popup, hq, i18n, posthog</li>
+      <li><code>src/app/shared/wish-sky/</code>, <code>src/app/shell/search-open.service.ts</code>, <code>src/app/shared/item-path/path-icons.ts</code></li>
+      <li>Tests: 591 Dateien, 7077 grün, 1 übersprungen · typecheck, lint, test:gate, build grün</li>
+      <li>Parität (<code>parity.md</code>): 1–10, 13, 14 met, belegt in <code>shots/</code> und der unabhängigen Prüfung; 9 mit zwei statt fünf Stationen (Fund); 11 und 12 partial, nur per Spec und Code</li>
+      <li>Ohne Antwort übernommen: „Wünsche“ ohne „Liste“, zwei Messpunkte (öffnen, Suche öffnen), Stern trotz Erkunder-Erfolgen, Himmel auch im großen Fenster, kein Flug in die Kopfzeile · Nachgebessert: Fokus am Handy, Sternpunkt, Silbentrennung</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-fulfilled" data-crit="mid" data-guide="">Gewünschtes Schiff besitzen: Hinweis ansehen</li>
+      <li data-todo-id="t-feel" data-crit="mid" data-guide="">Fühlt sich der Nachthimmel wie Wünschen an?</li>
+    </ul>
+  </section>
+</section>

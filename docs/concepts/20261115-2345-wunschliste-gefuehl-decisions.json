@@ -27,7 +27,33 @@
         "Soll der Nachthimmel auch oben im großen Fenster stehen, oder nur im kleinen, solange es leer ist?",
         "Beim Hinzufügen fliegt ein Stern ins Symbol. Soll derselbe Stern auch oben ins Symbol in der Kopfzeile fliegen?"
       ],
-      "defaults_taken": "See briefs/implement.md § Round 1 submission."
+      "defaults_taken": "See briefs/implement.md § Round 1 submission.",
+      "outcome": "implemented"
+    },
+    {
+      "iteration": 2,
+      "template": "free",
+      "final_report": true,
+      "written_at": "2026-11-16T00:05:02.928Z",
+      "built": "design d3 Sternschnuppe, checklist 1-16",
+      "defaults_taken": [
+        "Name: Wuensche without Liste",
+        "Analytics: hq:wishlist_open and hq:wish_search_open",
+        "Shooting star stands for wishes although the star belongs to explorer achievements",
+        "Sky strip also in the large window",
+        "No star flight into the header icon"
+      ],
+      "deviations": [
+        "Item path keeps two stations (mock drew five)"
+      ],
+      "not_verified_in_browser": [
+        "Fulfilled toast (spec only)"
+      ],
+      "fixes_after_independent_check": [
+        "Phone: search takes the caret after the sheet is gone",
+        "Tile star dot clear of the open arrow",
+        "Syllable hyphenation of names in the popout"
+      ]
     }
   ]
 }

@@ -119,7 +119,7 @@ interface WishLine {
       .open:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .rimg { display: block; height: 36px; padding: 3px; border-radius: 7px; color: var(--sc-fg-1); background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }
       .rt { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
-      .rt b { font-size: 0.85rem; font-weight: 600; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+      .rt b { font-size: 0.85rem; font-weight: 600; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; hyphens: auto; }
       .open:hover .rt b { color: var(--sc-accent); }
       .rt small { font-size: max(0.72rem, var(--sc-fs-floor, 0.75rem)); color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       /* Stepper (not an action): same look as the cart dialog's. */
