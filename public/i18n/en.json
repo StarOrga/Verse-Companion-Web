@@ -96,9 +96,7 @@
   },
   "auth": {
     "previewLocked": {
-      "title": "You are previewing as a signed-out visitor",
-      "body": "Signing in will not work here — the preview overrides what the app shows you, even after a successful sign-in. Leave the preview first.",
-      "exit": "Leave preview and sign in"
+      "body": "Signing in will not work here — the preview overrides what the app shows you, even after a successful sign-in. Leave the preview in the banner at the top first."
     },
     "tagline": "Your terminal to the verse",
     "email": "Email",
@@ -155,7 +153,13 @@
       },
       "applyCta": "Apply for access",
       "applyInline": "Apply now",
-      "backToSignIn": "Back to sign-in"
+      "backToSignIn": "Back to sign-in",
+      "headerNav": "Site navigation",
+      "consoleAria": "Sign-in console",
+      "scene": {
+        "approach": "Approach",
+        "target": "microTech · Stanton"
+      }
     },
     "apply": {
       "title": "Apply for access",
@@ -1187,7 +1191,40 @@
         "liveries": "Livery",
         "standard": "Standard",
         "maker": "Manufacturer",
-        "modelsAria": "Model"
+        "modelsAria": "Model",
+        "tabsAria": "View of the file",
+        "tabSheet": "Data sheet",
+        "tabText": "Description",
+        "tabBuy": "Buy",
+        "buy": {
+          "loading": "Loading prices …",
+          "error": "The prices could not be loaded.",
+          "retry": "Try again",
+          "empty": "No place to buy this ship is known.",
+          "shops": "Buy in game",
+          "nearest": "Nearest to {{place}}",
+          "cheapest": "Cheapest first",
+          "grouped": "By system and place",
+          "showAll": "All {{n}} places",
+          "showLess": "Fewer",
+          "searchLabel": "Search places to buy",
+          "searchPlaceholder": "Search a place or shop …",
+          "noMatch": "No place matches “{{q}}”.",
+          "aUEC": "aUEC",
+          "wish": "Add to wishlist",
+          "wished": "On the wishlist",
+          "wishedFrom": "Source: {{source}}",
+          "undo": "Undo",
+          "wishError": "The entry could not be added.",
+          "signIn": "Sign in to save this.",
+          "wikelo": "Trade at Wikelo",
+          "wikeloRow": "Wikelo trade",
+          "wikeloPlace": "Wikelo Emporium · Kinga Station",
+          "wikeloNoData": "The required parts are not in the Codex data yet.",
+          "wikeloHave": "{{have}} of {{need}} in stock",
+          "wikeloSource": "Wikelo trade",
+          "attribution": "Prices: UEX Corp · Wikelo: Codex trade data"
+        }
       },
       "hangar": {
         "menuAria": "Hangar and loadout",
@@ -3633,7 +3670,10 @@
     "actions": {
       "disable": "Disable",
       "reenable": "Re-enable",
-      "delete": "Delete"
+      "delete": "Delete",
+      "disablePatch": "Disable patch",
+      "reenablePatch": "Re-enable patch",
+      "lead": "Use as leading"
     },
     "diff": {
       "title": "Diff details (vs. previous build)",
@@ -3651,11 +3691,20 @@
       "delete": "Permanently delete bundle \"{{name}}\"?\n\nThis cannot be undone.",
       "disableTitle": "Disable bundle “{{name}}”?",
       "reasonLabel": "Reason (optional)",
-      "deleteTitle": "Delete bundle?"
+      "deleteTitle": "Delete bundle?",
+      "disablePatchTitle": "Disable patch {{name}} ({{count}} active uploads)?",
+      "reenablePatch": "Re-enable patch {{name}}? Per channel its newest upload leads again.",
+      "leadTitle": "Use “{{name}}” as leading?",
+      "leadMessage": "The other active uploads of the same patch and channel are disabled (with a note) and stay in the history."
     },
     "superseded": {
       "badge": "Superseded",
       "title": "Superseded by a newer upload"
+    },
+    "leading": {
+      "badge": "Leading",
+      "tip": "The Codex uses this bundle for its patch and channel.",
+      "reason": "Stepped back: {{name}} was chosen as leading."
     }
   },
   "profile": {
@@ -3888,7 +3937,8 @@
         "role_assign_failed": "Invited, but the role could not be assigned.",
         "existing_account_not_updated": "The email is on the allowlist, but the existing account was not changed — most likely a protected admin.",
         "user_exists": "This email is already registered. The allowlist was updated anyway."
-      }
+      },
+      "open": "Invite someone"
     },
     "share": {
       "button": "Copy share link",
@@ -4019,7 +4069,7 @@
     },
     "requests": {
       "title": "Access requests",
-      "subtitle": "Applications from the landing page. Accepting registers the email just like the form below — plus an invite mail whose link leads straight to the page where the person picks their own password. We never issue a password.",
+      "subtitle": "Applications from the landing page. Accepting registers the email just like the invite form behind the + — plus an invite mail whose link leads straight to the page where the person picks their own password. We never issue a password.",
       "empty": "No open requests.",
       "accept": "Accept",
       "decline": "Decline",
@@ -4393,15 +4443,6 @@
         "saveEdit": "Save text",
         "resolved": "Alert resolved."
       }
-    },
-    "searchMisses": {
-      "title": "Often without hits",
-      "subtitle": "Searches without a single hit, counted anonymously (text and count only).",
-      "query": "Search",
-      "hits": "Count",
-      "last": "Last",
-      "empty": "No search without hits yet.",
-      "retry": "Reload"
     }
   },
   "desktop": {
@@ -4429,7 +4470,21 @@
       "fullPage": "Full Data Upload page",
       "note": "Windows only · signs in with your Verse Companion account · uploads data, never code."
     },
-    "historyEyebrow": "Uploader"
+    "historyEyebrow": "Uploader",
+    "build": {
+      "title": "Latest bundle",
+      "since": "since {{date}}",
+      "quality": "Quality {{q}}",
+      "none": "No active bundle yet."
+    },
+    "steps": {
+      "title": "Setup",
+      "done": "Set up — you have uploaded before.",
+      "doneSr": "done",
+      "s1": "Download and start the uploader",
+      "s2": "Sign in with your Verse Companion account",
+      "s3": "Choose your Star Citizen folder — the uploader reads Data.p4k and uploads the bundles"
+    }
   },
   "download": {
     "title": "Download",
@@ -5475,10 +5530,9 @@
       "all": "All",
       "newest": "Newest",
       "top": "Community top",
-      "mine": "My votes",
-      "mineCount": "My votes · {{n}}",
-      "mineSignedOut": "Sign in to see the wallpapers you voted for",
-      "emptyMine": "You have not voted for a wallpaper yet. Tap the thumbs-up on an image to collect it here."
+      "sammlung": "Collection",
+      "sammlungSignedOut": "Sign in to see your collection",
+      "emptySammlung": "Your collection is still empty. Give an image a thumbs-up and it lands here."
     },
     "lightboxAria": "Wallpaper",
     "source": {
@@ -5530,6 +5584,10 @@
       "cta": "Get it for Windows",
       "note": "Windows only · ~0.3 MB · quit any time from the tray menu",
       "dismiss": "Don't show again"
+    },
+    "stage": {
+      "new": "New",
+      "sammlung": "Collection"
     }
   },
   "userFeedback": {
@@ -7278,7 +7336,6 @@
       }
     },
     "gallery": {
-      "mine": "My star maps",
       "connected": "Starscape connected",
       "share": "Share gallery",
       "heroTitle": "Starscape brings the gallery to your desktop",

@@ -1,5 +1,5 @@
 import { ScActionDirective } from '../shared/action/sc-action.directive';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -44,7 +44,7 @@ export interface SilhouetteCoverage {
 const REFRESH_MS = 5 * 60_000;
 
 /**
- * Admin tile (#647): how many hulls of the current LIVE build have a Holotable
+ * Admin tile (#647, since 2026-11-15 on the Data Upload page, B4.2): how many hulls of the current LIVE build have a Holotable
  * silhouette, how many of those carry hardpoint anchors, and which hulls have
  * none — each linked to its Codex page. The RPC is admin-only; RSI art vs the
  * glyph is decided in the browser, so "without" is split only by what the
@@ -56,9 +56,14 @@ const REFRESH_MS = 5 * 60_000;
   imports: [DecimalPipe, RouterLink, TranslatePipe, ScTooltipDirective, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="sc-card cov-card">
+    <div class="sc-card cov-card" [class.hot]="access() === 'admin'">
       <div class="cov-head">
-        <h2>{{ 'admin.silhouettes.title' | translate }}</h2>
+        <h2>
+          {{ 'admin.silhouettes.title' | translate }}
+          @if (access() === 'admin') {
+            <span class="sc-sr-only">({{ 'common.popup.access.admin' | translate }})</span>
+          }
+        </h2>
         @if (data(); as d) {
           <p class="hint">
             {{ 'admin.silhouettes.build' | translate: { channel: d.build.channel, patch: d.build.patch_version, build: d.build.build_number } }}
@@ -136,6 +141,10 @@ const REFRESH_MS = 5 * 60_000;
     </div>
   `,
   styles: [`
+    /* Sized by its slot (a strip tile on the Data Upload page), not the viewport. */
+    :host { display: block; container-type: inline-size; }
+    /* Admin-only surface on a page collaborators see too: the red edge carries it (no visible words). */
+    .cov-card.hot { border-left: 3px solid var(--sc-accent-hot); }
     .cov-head h2 { margin: 0 0 4px; font-size: 1rem; }
     .hint { color: var(--sc-fg-2); margin: 0 0 12px; }
     .err {
@@ -177,7 +186,7 @@ const REFRESH_MS = 5 * 60_000;
     }
     .reason.unknown { color: var(--sc-warning); border-color: color-mix(in srgb, var(--sc-warning) 45%, transparent); }
     .missing a:hover, .missing a:focus-visible { color: var(--sc-accent); }
-    @media (max-width: 640px) {
+    @container (max-width: 520px) {
       .nums { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   `],
@@ -185,6 +194,9 @@ const REFRESH_MS = 5 * 60_000;
 export class SilhouetteCoverageComponent implements OnInit {
   private readonly sb = inject(SupabaseClientProvider);
   private readonly translate = inject(TranslateService);
+
+  /** `admin`: shown on a page collaborators also see — the card takes the admin red edge. */
+  readonly access = input<'admin' | null>(null);
 
   readonly data = signal<SilhouetteCoverage | null>(null);
   readonly loading = signal(false);

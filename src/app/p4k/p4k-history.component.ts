@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { DecimalPipe } from '@angular/common';
-import { TranslatePipe } from '@ngx-translate/core';
-import { BundleDiffSummary, ChannelTag, P4kBundleRow, P4kService } from './p4k.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { BundleDiffSummary, BundleStateChange, ChannelTag, P4kBundleRow, P4kService } from './p4k.service';
 import { RoleService } from '../auth/role.service';
 import { useAutoRefresh } from '../core/auto-refresh';
 import { ScDatePipe } from '../core/locale/sc-date.pipe';
@@ -31,7 +31,7 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
         <div class="sec-head">
           <span class="t">{{ 'desktop.bundleHistory' | translate }}</span>
           @if (roles.isAdmin()) {
-            <button type="button" class="icon-toggle"
+            <button type="button" class="icon-toggle hot"
                     [class.active]="svc.includeDisabled()"
                     (click)="svc.toggleDisabled()"
                     [attr.aria-pressed]="svc.includeDisabled()"
@@ -42,7 +42,9 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
                 <circle cx="12" cy="12" r="3" />
+                @if (!svc.includeDisabled()) { <path d="M4 4l16 16" /> }
               </svg>
+              <span class="sc-sr-only">({{ 'common.popup.access.admin' | translate }})</span>
             </button>
           }
         </div>
@@ -62,13 +64,13 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
           </div>
         } @else {
           <!-- One card per patch version; expand to reveal its individual uploads. -->
-          <div class="hist-list">
-            @for (g of patchGroups(); track g.patch_version) {
-              <div class="patch" [class.superseded]="g.allSuperseded">
-                <div class="patch-main" role="button" tabindex="0"
+          <div class="hist-list" [class.timeline]="timeline()">
+            @for (g of patchGroups(); track g.patch_version; let first = $first) {
+              <div class="patch" [class.superseded]="g.allSuperseded" [class.now]="first && !g.allSuperseded"
+                   [class.all-off]="patchState(g) === 'off'">
+                <div class="patch-head">
+                <button type="button" class="patch-main"
                      (click)="toggleGroup(g.patch_version)"
-                     (keydown.enter)="toggleGroup(g.patch_version)"
-                     (keydown.space)="toggleGroup(g.patch_version); $event.preventDefault()"
                      [attr.aria-expanded]="isGroupExpanded(g.patch_version)">
                   <span class="chev">{{ isGroupExpanded(g.patch_version) ? '▾' : '▸' }}</span>
                   <span class="patch-ver mono">
@@ -97,6 +99,21 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
                     </span>
                   </div>
                   <span class="patch-when">{{ g.latest_at | scDate: 'datetime' }}</span>
+                </button>
+                @if (roles.isAdmin() && patchState(g) !== 'history') {
+                  <!-- Deactivate per PATCH, not per uploaded bundle (P14). -->
+                  <div class="acts patch-acts">
+                    @if (patchState(g) === 'off') {
+                      <button type="button" scAction tier="secondary" (click)="reenablePatch(g)" [disabled]="svc.busy()">
+                        {{ 'p4k.actions.reenablePatch' | translate }}
+                      </button>
+                    } @else {
+                      <button type="button" scAction tier="secondary" tone="danger" (click)="disablePatch(g)" [disabled]="svc.busy()">
+                        {{ 'p4k.actions.disablePatch' | translate }}
+                      </button>
+                    }
+                  </div>
+                }
                 </div>
 
                 @if (isGroupExpanded(g.patch_version)) {
@@ -109,6 +126,9 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
                           <span class="ch-pill" [class]="b.channel">{{ b.channel.toUpperCase() }}</span>
                           @if (isSuperseded(b)) {
                             <span class="badge" [attr.tabindex]="b.disabled_reason ? 0 : null" [scTooltip]="b.disabled_reason ?? ''" scTooltipTier="label">{{ 'p4k.superseded.badge' | translate }}</span>
+                          }
+                          @if (leading().has(b.id)) {
+                            <span class="badge lead" tabindex="0" [scTooltip]="'p4k.leading.tip' | translate" scTooltipTier="label">{{ 'p4k.leading.badge' | translate }}</span>
                           }
                           <span class="up-b mono">{{ b.build_number || '—' }}</span>
                           <div class="qbar">
@@ -152,15 +172,14 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
                           @if (roles.isAdmin()) {
                             <div class="acts">
                               @if (isSuperseded(b)) {
-                                <!-- superseded = history; re-enabling would create a second
+                                <!-- superseded = history; making it lead would create a second
                                      active bundle for the same key, so only allow delete -->
-                              } @else if (b.disabled) {
-                                <button type="button" scAction tier="secondary" (click)="reenable(b)" [disabled]="svc.busy()">
-                                  {{ 'p4k.actions.reenable' | translate }}
-                                </button>
-                              } @else {
-                                <button type="button" scAction tier="secondary" tone="danger" (click)="disable(b)" [disabled]="svc.busy()">
-                                  {{ 'p4k.actions.disable' | translate }}
+                              } @else if (!leading().has(b.id)) {
+                                <!-- Choose which upload of the patch is used (P14): this one
+                                     becomes active, the other active uploads of the same
+                                     patch + channel step back (deactivated, reason noted). -->
+                                <button type="button" scAction tier="secondary" (click)="makeLeading(b)" [disabled]="svc.busy()">
+                                  {{ 'p4k.actions.lead' | translate }}
                                 </button>
                               }
                               <button type="button" scAction tier="secondary" tone="danger" (click)="remove(b)" [disabled]="svc.busy()">
@@ -251,6 +270,10 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
       color: var(--sc-accent); border-color: var(--sc-accent);
       background: rgba(var(--accent-primary-rgb), 0.12);
     }
+    /* Admin-only control: the admin red carries it (no visible words). */
+    .icon-toggle.hot { border-color: color-mix(in srgb, var(--sc-accent-hot) 45%, var(--sc-border)); }
+    .icon-toggle.hot:hover, .icon-toggle.hot.active { color: var(--sc-accent-hot); border-color: var(--sc-accent-hot); }
+    .icon-toggle.hot.active { background: color-mix(in srgb, var(--sc-accent-hot) 12%, transparent); }
 
     .err {
       margin: 14px 20px 0;
@@ -318,9 +341,33 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
     }
     .patch:hover { border-color: color-mix(in srgb, var(--sc-accent) 40%, var(--sc-border)); }
     .patch.superseded { opacity: 0.72; }
+    .patch.all-off { opacity: 0.6; }
+    .patch-head { display: flex; align-items: center; gap: 10px; }
+    .patch-acts { padding-right: 12px; flex: none; }
     .patch-main {
+      flex: 1 1 auto; min-width: 0;
       display: grid; grid-template-columns: auto minmax(84px, auto) 1fr auto;
       align-items: center; gap: 14px; padding: 12px 14px; cursor: pointer;
+      background: transparent; border: 0; color: inherit; font: inherit; text-align: left;
+    }
+
+    /* Timeline (Data Upload page, spec d4-zeit): one spine, a node per patch, the newest lit. */
+    .hist-list.timeline { position: relative; padding-left: 46px; }
+    .hist-list.timeline::before {
+      content: ""; position: absolute; left: 30px; top: 22px; bottom: 16px; width: 2px;
+      background: linear-gradient(180deg, var(--sc-accent-collab), color-mix(in srgb, var(--sc-accent-collab) 10%, transparent));
+    }
+    .timeline .patch { position: relative; overflow: visible; }
+    .timeline .patch::before {
+      content: ""; position: absolute; left: -21px; top: 18px; width: 10px; height: 10px; border-radius: 50%;
+      background: var(--sc-bg-0); border: 2px solid var(--sc-accent-collab);
+    }
+    .timeline .patch.now::before { background: var(--sc-accent-collab); box-shadow: 0 0 10px var(--sc-accent-collab); }
+    .timeline .patch > .uploads { border-radius: 0 0 10px 10px; }
+    .badge.lead {
+      color: var(--sc-accent-collab);
+      border-color: color-mix(in srgb, var(--sc-accent-collab) 55%, transparent);
+      background: color-mix(in srgb, var(--sc-accent-collab) 12%, transparent);
     }
     .patch-main:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); border-radius: 8px; }
     .chev { color: var(--sc-accent); font-size: 0.9rem; width: 16px; text-align: center; }
@@ -391,6 +438,11 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
     .disabled-note.superseded-note { background: rgba(0, 212, 255, 0.08); border-left-color: var(--sc-accent); }
 
     @media (max-width: 640px) {
+      .patch-head { flex-wrap: wrap; }
+      .patch-acts { padding: 0 12px 10px 40px; }
+      .hist-list.timeline { padding-left: 34px; }
+      .hist-list.timeline::before { left: 18px; }
+      .timeline .patch::before { left: -21px; }
       .patch-main { grid-template-columns: auto 1fr auto; gap: 10px; }
       .patch-mid { order: 3; grid-column: 1 / -1; }
       .up-right { justify-content: flex-start; }
@@ -406,6 +458,9 @@ export class P4kHistoryComponent implements OnInit {
    *  is dropped and the standalone card wrapper is skipped — the host panel
    *  supplies the surrounding card and section rhythm. */
   readonly embedded = input(false);
+  /** Data Upload page (B4.1): the history is the page's spine — a timeline whose newest patch starts open. */
+  readonly timeline = input(false);
+  private readonly translate = inject(TranslateService);
 
   constructor() {
     useAutoRefresh(() => this.refresh(), { enabled: () => !this.svc.busy() });
@@ -418,6 +473,9 @@ export class P4kHistoryComponent implements OnInit {
 
   /** Uploads grouped by patch version — the history's top-level cards. */
   readonly patchGroups = computed<PatchGroup[]>(() => groupBundlesByPatch(this.bundles()));
+
+  /** The upload each (patch, channel) uses: its newest active one (P14 "leading"). */
+  readonly leading = computed<ReadonlySet<string>>(() => leadingBundleIds(this.bundles()));
 
   ngOnInit() {
     this.refresh();
@@ -444,8 +502,59 @@ export class P4kHistoryComponent implements OnInit {
     this._expanded.set(next);
   }
 
+  /** On the timeline the newest patch starts open; a click flips it like any other. */
   isGroupExpanded(patch: string): boolean {
-    return this._groupExpanded().has(patch);
+    const toggled = this._groupExpanded().has(patch);
+    const openByDefault = this.timeline() && this.patchGroups()[0]?.patch_version === patch;
+    return openByDefault ? !toggled : toggled;
+  }
+
+  /** `on`: something of the patch is in use · `off`: deactivated by hand · `history`: only superseded uploads. */
+  patchState(g: PatchGroup): 'on' | 'off' | 'history' {
+    return patchStateOf(g);
+  }
+
+  /** Deactivate a whole patch (P14: per patch, not per uploaded bundle) — one reason for all its active uploads. */
+  async disablePatch(g: PatchGroup): Promise<void> {
+    const targets = g.uploads.filter((u) => !u.disabled);
+    if (targets.length === 0) return;
+    const reason = await this.dialog.prompt({
+      titleKey: 'p4k.prompts.disablePatchTitle',
+      params: { name: g.patch_version, count: targets.length },
+      inputLabelKey: 'p4k.prompts.reasonLabel',
+      confirmKey: 'p4k.actions.disablePatch',
+      tone: 'danger',
+    });
+    if (reason === null) return;
+    const why = reason.trim() || null;
+    await this.svc.applyStates(targets.map((u) => ({ id: u.id, disabled: true, reason: why })));
+  }
+
+  /** Re-activate a deactivated patch: per channel its newest hand-deactivated upload leads again. */
+  async reenablePatch(g: PatchGroup): Promise<void> {
+    const targets = reenableTargets(g);
+    if (targets.length === 0) return;
+    const ok = await this.dialog.confirm({
+      titleKey: 'p4k.prompts.reenablePatch',
+      params: { name: g.patch_version },
+      confirmKey: 'p4k.actions.reenablePatch',
+    });
+    if (!ok) return;
+    await this.svc.applyStates(targets.map((u) => ({ id: u.id, disabled: false, reason: null })));
+  }
+
+  /** Make this upload the one its patch + channel uses; the other active ones step back (P14). */
+  async makeLeading(b: P4kBundleRow): Promise<void> {
+    const name = `${b.channel.toUpperCase()} ${b.patch_version} ${b.build_number}`;
+    const ok = await this.dialog.confirm({
+      titleKey: 'p4k.prompts.leadTitle',
+      messageKey: 'p4k.prompts.leadMessage',
+      params: { name },
+      confirmKey: 'p4k.actions.lead',
+    });
+    if (!ok) return;
+    const reason = this.translate.instant('p4k.leading.reason', { name }) as string;
+    await this.svc.applyStates(leadingChanges(this.bundles(), b, reason));
   }
 
   toggleGroup(patch: string): void {
@@ -453,30 +562,6 @@ export class P4kHistoryComponent implements OnInit {
     if (next.has(patch)) next.delete(patch);
     else next.add(patch);
     this._groupExpanded.set(next);
-  }
-
-  async disable(b: P4kBundleRow): Promise<void> {
-    const name = `${b.channel.toUpperCase()} ${b.patch_version} ${b.build_number}`;
-    const reason = await this.dialog.prompt({
-      titleKey: 'p4k.prompts.disableTitle',
-      params: { name },
-      inputLabelKey: 'p4k.prompts.reasonLabel',
-      confirmKey: 'p4k.actions.disable',
-      tone: 'danger',
-    });
-    if (reason === null) return; // cancelled
-    await this.svc.setDisabled(b.id, true, reason.trim() || null);
-  }
-
-  async reenable(b: P4kBundleRow): Promise<void> {
-    const name = `${b.channel.toUpperCase()} ${b.patch_version}`;
-    const ok = await this.dialog.confirm({
-      titleKey: 'p4k.prompts.reenable',
-      params: { name },
-      confirmKey: 'p4k.actions.reenable',
-    });
-    if (!ok) return;
-    await this.svc.setDisabled(b.id, false, null);
   }
 
   async remove(b: P4kBundleRow): Promise<void> {
@@ -519,6 +604,49 @@ export class P4kHistoryComponent implements OnInit {
       .map(([key, v]) => ({ key, prev: v.prev, new: v.new, delta: v.delta }))
       .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
   }
+}
+
+/** Newest active upload per (patch, channel) — the bundle the codex uses for it. */
+export function leadingBundleIds(bundles: readonly P4kBundleRow[]): Set<string> {
+  const best = new Map<string, P4kBundleRow>();
+  for (const b of bundles) {
+    if (b.disabled) continue;
+    const key = `${b.patch_version}|${b.channel}`;
+    const cur = best.get(key);
+    if (!cur || b.created_at > cur.created_at) best.set(key, b);
+  }
+  return new Set([...best.values()].map((b) => b.id));
+}
+
+/** The state changes that make `lead` the active upload of its patch + channel. */
+export function leadingChanges(bundles: readonly P4kBundleRow[], lead: P4kBundleRow, reason: string): BundleStateChange[] {
+  const changes: BundleStateChange[] = [];
+  if (lead.disabled && lead.superseded_at === null) changes.push({ id: lead.id, disabled: false, reason: null });
+  for (const b of bundles) {
+    if (b.id === lead.id || b.disabled) continue;
+    if (b.patch_version === lead.patch_version && b.channel === lead.channel) {
+      changes.push({ id: b.id, disabled: true, reason });
+    }
+  }
+  return changes;
+}
+
+export function patchStateOf(g: PatchGroup): 'on' | 'off' | 'history' {
+  if (g.uploads.some((u) => !u.disabled)) return 'on';
+  if (g.uploads.some((u) => u.disabled && u.superseded_at === null)) return 'off';
+  return 'history';
+}
+
+/** Per channel the newest hand-deactivated (not superseded) upload of a patch. */
+export function reenableTargets(g: PatchGroup): P4kBundleRow[] {
+  const seen = new Set<ChannelTag>();
+  const out: P4kBundleRow[] = [];
+  for (const u of g.uploads) {
+    if (!u.disabled || u.superseded_at !== null || seen.has(u.channel)) continue;
+    seen.add(u.channel);
+    out.push(u);
+  }
+  return out;
 }
 
 export interface ChannelSummary {

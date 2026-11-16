@@ -183,6 +183,35 @@ export class WishlistStore {
     }
   }
 
+  /**
+   * Set the note of an existing wish (the Akte's Kaufen tab keeps "where to buy" there). A missing wish is created
+   * with the note. True when the list shows the note afterwards.
+   */
+  async setNotes(entry: WishEntry, notes: string | null): Promise<boolean> {
+    if (!this.auth.user()) return false;
+    const hit = this.find(entry.kind, entry.className, entry.name, entry.forClassName);
+    if (!hit) return this.add({ ...entry, notes });
+    const next = notes?.trim().slice(0, 500) || null;
+    if (hit.notes === next) return true;
+    try {
+      const { error } = await this.sb.client
+        .from('search_wishlist' as never)
+        .update({ notes: next } as never)
+        .eq('entity_kind', hit.kind)
+        .eq('class_name', hit.className)
+        .eq('for_class_name', hit.forClassName);
+      if (error) {
+        logWarn('wishlist', 'setNotes failed', error);
+        return false;
+      }
+      this.rows.update((rs) => rs.map((r) => (r === hit ? { ...r, notes: next } : r)));
+      return true;
+    } catch (err) {
+      logWarn('wishlist', 'setNotes failed', err);
+      return false;
+    }
+  }
+
   /** Count an entry up by `qty` (default 1) - how returned Nachschub lines land on the wishlist. */
   addQty(entry: WishEntry, qty = entry.qty ?? 1): Promise<boolean> {
     return this.setQty(entry, this.qtyOf(entry.kind, entry.className, entry.name, entry.forClassName) + Math.max(1, Math.round(qty)));

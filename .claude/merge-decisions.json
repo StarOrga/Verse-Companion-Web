@@ -1,6 +1,18 @@
 {
   "version": 1,
   "aspects": {
+    ".claude/project-map.md›auth›file count": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-16T21:00:36.879Z",
+        "hunks": [
+          "156edbb1bc03"
+        ]
+      }
+    ],
     ".claude/project-map.md›concepts/›file-count": [
       {
         "ship": "claude/popup-popout-animation-concepts-0f27ef",
@@ -172,6 +184,18 @@
         "at": "2026-11-15T04:52:34.188Z",
         "hunks": [
           "3a7ebd466094"
+        ]
+      }
+    ],
+    ".claude/project-map.md›header›file count": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "regenerated for the merged tree (gen-project-map: up-to-date)",
+        "decided": true,
+        "at": "2026-11-16T21:00:36.879Z",
+        "hunks": [
+          "0de295251c78"
         ]
       }
     ],
@@ -401,6 +425,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›migrations›file count": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-16T21:00:36.879Z",
+        "hunks": [
+          "2b2be5841d5e"
+        ]
+      }
+    ],
     ".claude/project-map.md›src-counts›count": [
       {
         "ship": "#1146",
@@ -437,6 +473,18 @@
         "at": "2026-11-15T04:18:13.845Z",
         "hunks": [
           "97ff2866726a"
+        ]
+      }
+    ],
+    ".claude/project-map.md›src›file count": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-16T21:00:36.879Z",
+        "hunks": [
+          "02827798ba7c"
         ]
       }
     ],
@@ -512,6 +560,18 @@
         "at": "2026-11-15T04:18:13.845Z",
         "hunks": [
           "72caeb6e4c42"
+        ]
+      }
+    ],
+    ".claude/project-map.md›supabase›file count": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-16T21:00:36.879Z",
+        "hunks": [
+          "8b3dd9ff3e06"
         ]
       }
     ],
@@ -928,6 +988,16 @@
         "hunks": [
           "6282ff402f2b"
         ]
+      },
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "0.272.0 (regenerated from CHANGELOG by the bump)",
+        "decided": true,
+        "at": "2026-11-16T21:11:45.546Z",
+        "hunks": [
+          "267aeeeb5081"
+        ]
       }
     ],
     "public/release-notes.json›root›current": [
@@ -939,6 +1009,66 @@
         "at": "2026-11-11T23:19:52.365Z",
         "hunks": [
           "65f4d0fd9795"
+        ]
+      }
+    ],
+    "src/app/admin/admin.component.ts›.share-btn›tier": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "scAction tertiary icon in the access panel (concept pin)",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "1745de3527d1"
+        ]
+      }
+    ],
+    "src/app/admin/admin.component.ts›AdminComponent›imports": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "ScActionDirective kept; SilhouetteCoverage + SearchMisses moved/removed by B4",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "e0b2495d4ad3"
+        ]
+      }
+    ],
+    "src/app/admin/search-misses.component.ts›file›existence": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "removed (misses in PostHog)",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "c770939b19db"
+        ]
+      }
+    ],
+    "src/app/admin/search-misses.component.ts›imports›ScActionDirective": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "removed with the component",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "dace207a8c09"
+        ]
+      }
+    ],
+    "src/app/admin/search-misses.component.ts›retry-button›scAction": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "removed with the component",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "9cd9f66a86dc"
         ]
       }
     ],
@@ -976,6 +1106,30 @@
         "at": "2026-11-15T05:27:23.865Z",
         "hunks": [
           "60636bbad8e8"
+        ]
+      }
+    ],
+    "src/app/p4k/p4k-history.component.ts›disable button›scope": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "scAction secondary danger disablePatch per patch (concept pin)",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "a4213917d7e0"
+        ]
+      }
+    ],
+    "src/app/p4k/p4k-history.component.ts›reenable button›scope": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "scAction secondary reenablePatch per patch (concept pin)",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "1153619b7ecb"
         ]
       }
     ]

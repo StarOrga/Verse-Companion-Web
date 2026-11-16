@@ -34,6 +34,13 @@ export interface P4kBundleRow {
   superseded_at: string | null;
 }
 
+/** One bundle's new state, for a patch-wide or leading change (B4.5). */
+export interface BundleStateChange {
+  id: string;
+  disabled: boolean;
+  reason: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class P4kService {
   private readonly sb = inject(SupabaseClientProvider);
@@ -76,6 +83,30 @@ export class P4kService {
     } else {
       await this.listBundles();
     }
+    this.busy.set(false);
+  }
+
+  /**
+   * Apply several state changes (deactivate a patch, choose the leading upload)
+   * through the same `set_bundle_disabled` RPC, in order, then reload once.
+   * Stops at the first failure so the list never shows a half-guessed state.
+   */
+  async applyStates(changes: readonly BundleStateChange[]): Promise<void> {
+    if (changes.length === 0) return;
+    this.busy.set(true);
+    this.errorMsg.set(null);
+    for (const c of changes) {
+      const { error } = await this.sb.client.rpc('set_bundle_disabled', {
+        bundle_id: c.id,
+        new_disabled: c.disabled,
+        reason: c.reason,
+      });
+      if (error) {
+        this.errorMsg.set(toErrorKey('p4k', 'set disabled', error, { bundleId: c.id }));
+        break;
+      }
+    }
+    await this.listBundles();
     this.busy.set(false);
   }
 

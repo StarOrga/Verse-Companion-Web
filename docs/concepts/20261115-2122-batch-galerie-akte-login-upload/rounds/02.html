@@ -1,0 +1,101 @@
+<section data-iteration="2" data-iteration-template="free" data-final-report>
+  <p class="fr-sentence">Galerie, Holotisch-Akte, Login und Data Upload sind nach deinen Entscheidungen umgebaut, und die Fehlsuchen laufen jetzt über PostHog.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🌌</span><span><b>Login als Brücke</b> über microTech, mit Intro und echtem Footer.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🛒</span><span>Die Akte hat jetzt <b>Datenblatt, Beschreibung und Kaufen</b> in fester Größe.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🗂</span><span>Die <b>Bundle-Historie als Zeitleiste</b> steht direkt auf dem Data Upload.</span></li>
+      </ul>
+      <p class="fr-try-auth">🔑 Lokal mit <code>npm start</code> auf 127.0.0.1:4200, Testkonto laut <code>.claude/deep-knowledge/test-account.md</code></p>
+    </div>
+    <div class="fr-ba" data-label-before="{{final.before}}" data-label-after="{{final.after}}">
+      <figure class="fr-shot"><img src="20261115-2122-batch-galerie-akte-login-upload/shots/before.png" alt=""><figcaption>Login bisher, mit Vorschau-Box</figcaption></figure>
+      <figure class="fr-shot"><img src="20261115-2122-batch-galerie-akte-login-upload/shots/after.png" alt=""><figcaption>Login als Brücke</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Voller Testlauf auf dem zusammengeführten Stand ohne Fehler; Anforderung: alle grün (geschätzt).">
+        <span class="fr-meter-name">🧱 Stabilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">7079 / 7079</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 85%" data-tip="28 von 33 Punkten in der Abnahme voll erfüllt, 5 teilweise (Wikelo-Daten fehlen, einige Zustände nur per Test belegt) (geschätzt).">
+        <span class="fr-meter-name">🎯 Umfang</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">28 / 33</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 70%" data-tip="Reduzierte Bewegung ist für Galerie und Login im Code abgedeckt, aber nicht im Browser durchgespielt (geschätzt).">
+        <span class="fr-meter-name">♿ Barrierefreiheit</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">Code ✓</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="5 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ✓ {{final.level_interplay}} · ✓ {{final.level_local}} · ✓ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_prod}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_live}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 2 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-wikelo"
+          data-issue-title="[FEATURE] Feed Wikelo trade data into the holo dossier buy tab"
+          data-issue-type="feature"
+          data-issue-body="Approved in the batch concept (B2.5/B2.9): the Kaufen tab should show Wikelo trades with the required parts and how many the user already holds. The UI is built (codex-holo-buy-tab, wikeloNeeds input, stock count from HqInventoryService), but the Codex holds no Wikelo trade data, so codex-detail.component.ts never binds wikeloNeeds and the row only appears for records whose name contains 'wikelo'. Needs a data source for Wikelo trades (extractor or curated table)."
+          data-oq-origin="shortfall"
+          data-route-default="issue"
+          data-route-reason="braucht-Daten">
+        <span class="oq-label">Wikelo-Tauschdaten fehlen</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Die Wikelo-Zeile zeigt noch keine Teile und keinen Bestand, weil der Codex keine Tauschdaten hat.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Holotisch-Akte, Tab Kaufen</dd>
+          <dt>{{final.fund_why}}</dt><dd>📌 Issue — braucht zuerst eine Datenquelle.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-spec-cloud"
+          data-issue-title="[BUG] Stop search specs from writing to the cloud database"
+          data-issue-type="bug"
+          data-issue-body="Found while investigating the 1292 'gladius' search misses: codex-search-engine.spec.ts ran with the real Supabase client and wrote search_log_miss to the cloud project on every test run (fixed in this batch). codex-search-bar.component.spec.ts and shell/quick-search.component.spec.ts still run without a fake Supabase client and can write search_log_open (popularity ranking) to the cloud database. Provide fakeSupabase in both and add a guard that fails a spec when it reaches the real client."
+          data-oq-origin="found"
+          data-route-default="now"
+          data-route-reason="klein" data-routed>
+        <span class="oq-label">Specs schreiben in Cloud-DB</span>
+        <span class="oq-done">✓ umgesetzt — Fake-Client in drei Specs, Schreibschutz in <code>src/app/testing/vitest-setup.ts</code> (<code>d8cf19530</code>)</span>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Branch <code>claude/batch-b25f1b</code> · Merge <code>f576efe21</code> · Bereiche: starscape, codex/holo, auth, admin, desktop, p4k</li>
+      <li><code>codex-holo-akte.component.ts</code>, <code>login.component.ts</code>, <code>p4k-history.component.ts</code></li>
+      <li>Tests: 7079 grün, 1 übersprungen · typecheck, lint, build, test:gate grün · Abnahme 28 met / 5 partial</li>
+      <li>Migration <code>20261115213000_drop_search_misses.sql</code> geht erst mit db:push live</li>
+      <li>Nachtrag: Spec-Schreibschutz <code>d8cf19530</code>; Wikelo nicht gebaut, keine Datenquelle</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-edge" data-crit="mid" data-guide="">Vollbild: rechten Rand in Edge anklicken</li>
+      <li data-todo-id="t-login" data-crit="low" data-guide="">Login-Intro einmal live ansehen</li>
+      <li data-todo-id="t-uploader" data-crit="low" data-guide="">Data Upload nach einem Upload prüfen</li>
+    </ul>
+  </section>
+  <section data-handoffs hidden aria-label="{{final.group_handoffs}}">
+    <ul>
+      <li data-todo-id="h-migration" data-crit="high" data-guide="">Migration nach dem Merge per db:push einspielen</li>
+    </ul>
+  </section>
+</section>

@@ -62,6 +62,8 @@ export const EVENTS = {
   'codex:section_view': ev<{ section: 'fps' | 'keybinds' | 'upcoming' | 'upcoming_entry' }>('codex', 'Ein Codex-Abschnitt abseits der Detailseiten wurde geöffnet.'),
   'codex:compare_start': ev<{ kind: string; count: number }>('codex', 'Der Vergleich wurde möglich: das zweite Objekt liegt im Vergleichsfach.'),
   'codex:holotable_open': ev<{ kind: string }>('codex', 'Der Holotisch einer Detailseite wurde bewusst eingeschaltet.'),
+  'codex:buy_open': ev<{ kind: string; tab_remembered: boolean }>('codex', 'Der Reiter Kaufen der Holotisch-Akte wurde geöffnet (Art; ob er die gemerkte Wahl war).'),
+  'codex:wish_add': ev<{ kind: string; source: 'shop' | 'wikelo' }>('codex', 'Ein Eintrag wurde aus dem Reiter Kaufen auf die Wunschliste gesetzt (Quelle: Laden oder Wikelo-Tausch).'),
   'codex:filter_change': ev<{ kind: string; filter_count: number }>('codex', 'Im Codex-Index wurden Filter angewendet (Art, Anzahl aktiver Filter, nie die Werte).'),
   'codex:ship_link_create': ev<{ shipSlug: string }>('codex', 'Ein Codex-Schiff wurde mit einem Hangar-Schiff verknüpft.'),
   'codex:ship_link_remove': ev<{ shipSlug: string }>('codex', 'Die Verknüpfung eines Codex-Schiffs wurde gelöst.'),
@@ -90,7 +92,7 @@ export const EVENTS = {
   // --- search ------------------------------------------------------------
   'search:palette_open': ev<{ surface: 'palette' | 'codex_bar' }>('search', 'Die Suche wurde geöffnet (Palette oder Codex-Leiste).'),
   'search:result_open': ev<{ area: string; rank: number; new_tab: boolean }>('search', 'Ein Suchtreffer wurde geöffnet (Bereich, Rang in der Liste; nie der Suchtext).'),
-  'search:miss_show': ev<{ area: string }>('search', 'Eine Suche blieb ohne Treffer (Bereich; nie der Suchtext).'),
+  'search:miss_show': ev<{ area: string; term: string }>('search', 'Eine Suche blieb ohne Treffer: Bereich und Suchtext (getrimmt, klein, max. 80 Zeichen; einmal je Begriff und Sitzung) — die einzige Stelle, an der ein Suchtext gesendet wird.'),
 
   // --- settings ----------------------------------------------------------
   'settings:username_update': ev('settings', 'Der Benutzername wurde gespeichert.'),
@@ -107,6 +109,7 @@ export const EVENTS = {
   'verse:door_open': ev<{ door: 'news' | 'patches' | 'gallery' }>('verse', 'Eines der drei Tore (News, Patches, Galerie) wurde geöffnet.'),
   'verse:star_earn': ev<{ patch_line: string; star_key: string; sun?: boolean }>('verse', 'Ein Explorer-Stern wurde verdient (sun = Kometentreffer).'),
   'verse:starscape_share': ev<{ image_id: string; channel: 'native' | 'copy' }>('verse', 'Ein Starscape-Bild wurde geteilt.'),
+  'verse:gallery_filter_select': ev<{ filter: 'all' | 'newest' | 'top' | 'mine' }>('verse', 'In der Galerie wurde eine Ansicht gewählt (Alle, Neueste, Community Top, Sammlung = mine).'),
   'verse:briefing_view': ev('verse', 'Das Verse-Briefing (Startseite des Verse-Hubs) wurde angezeigt.'),
   'verse:starmap_open': ev<{ page: 'explorer' | 'constellations' }>('verse', 'Die Sternenkarte oder die eigenen Sternbilder wurden geöffnet.'),
   'verse:patch_open': ev<{ line: string }>('verse', 'Eine Patch-Linie im Verse-Hub wurde geöffnet.'),

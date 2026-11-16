@@ -6,6 +6,7 @@ import {
   HostListener,
   inject,
   input,
+  OnDestroy,
   output,
   signal,
   viewChild,
@@ -132,7 +133,8 @@ const WIDE_RATIO = 1.5;
     .stage:focus { outline: none; }
     .root.page .stage { width: 100%; }
     .root:fullscreen { display: grid; place-items: center; background: #000; padding: 0; }
-    .root:fullscreen .stage { width: 100vw; height: 100vh; height: 100dvh; aspect-ratio: auto; border: 0; border-radius: 0; }
+    /* 100%, not 100vw: vw counts the document scrollbar gutter, which is not part of the fullscreen box. */
+    .root:fullscreen .stage { width: 100%; height: 100%; aspect-ratio: auto; border: 0; border-radius: 0; }
     .root:fullscreen.overlay { cursor: default; }
 
     .mirror {
@@ -186,7 +188,7 @@ const WIDE_RATIO = 1.5;
     }
   `],
 })
-export class LightboxComponent {
+export class LightboxComponent implements OnDestroy {
   private readonly router = inject(Router);
 
   readonly image = input.required<LightboxImage>();
@@ -200,6 +202,7 @@ export class LightboxComponent {
   protected readonly fullscreen = signal(false);
   protected readonly canFullscreen = typeof document !== 'undefined' && !!document.fullscreenEnabled;
   private readonly root = viewChild<ElementRef<HTMLElement>>('root');
+  private gutterReleased = false;
 
 
   protected onLoad(ev: Event): void {
@@ -217,7 +220,35 @@ export class LightboxComponent {
   @HostListener('document:fullscreenchange')
   protected onFullscreenChange(): void {
     if (typeof document === 'undefined') return;
-    this.fullscreen.set(document.fullscreenElement === this.root()?.nativeElement);
+    const on = document.fullscreenElement === this.root()?.nativeElement;
+    this.fullscreen.set(on);
+    this.releaseGutter(on);
+  }
+
+  /**
+   * The outermost right pixel column in full screen (batch note #2: „ganz rechts an den Außenrand …
+   * dann kann man nicht klicken“). The document reserves its scrollbar space for good
+   * (`html { scrollbar-gutter: stable }`, styles.scss), and that gutter stays reserved while an
+   * element is in full screen: the fullscreen box ends a gutter short of the screen edge, and a
+   * click there lands on the document's scrollbar strip, not on the "next" edge. The left edge has
+   * no gutter, which is why it always worked. While the picture is in full screen the document has
+   * nothing to scroll anyway, so its gutter and overflow are released and restored on the way out.
+   */
+  private releaseGutter(on: boolean): void {
+    const html = document.documentElement;
+    if (on && !this.gutterReleased) {
+      this.gutterReleased = true;
+      html.style.setProperty('scrollbar-gutter', 'auto');
+      html.style.setProperty('overflow', 'hidden');
+    } else if (!on && this.gutterReleased) {
+      this.gutterReleased = false;
+      html.style.removeProperty('scrollbar-gutter');
+      html.style.removeProperty('overflow');
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (typeof document !== 'undefined') this.releaseGutter(false);
   }
 
   /** ←/→ walk the neighbours (replacing the history entry), also in full screen. */

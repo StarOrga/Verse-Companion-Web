@@ -34,6 +34,13 @@ build on it).
   user, search terms, tokens or URLs with query strings. Keys, kinds, counts,
   positions and ids of public game data only. `track()` sends nothing without
   statistics consent.
+- **One deliberate exception: `search:miss_show`** carries the text of a search
+  that found nothing (`term`: trimmed, lower-cased, at most 80 characters, once
+  per term and session). The owner moved the former admin card "Häufig ohne
+  Treffer" to PostHog (concept 2026-11-15, B4.8) so the dashboard shows exactly
+  which terms fail (tile "Suchen ohne Treffer" on "Wird es genutzt?"). Searches
+  that found something never send their text (`search:result_open` stays area
+  + rank).
 - Super properties added by the service on every event: `app_version`, `release`,
   the UTM trio of the landing page, and — for signed-in users with consent — the
   person property `role` (viewer / collaborator / admin).
