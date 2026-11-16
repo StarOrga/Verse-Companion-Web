@@ -942,6 +942,66 @@
         ]
       }
     ],
+    "src/app/admin/admin.component.ts›.share-btn›tier": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "scAction tertiary icon in the access panel (concept pin)",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "1745de3527d1"
+        ]
+      }
+    ],
+    "src/app/admin/admin.component.ts›AdminComponent›imports": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "ScActionDirective kept; SilhouetteCoverage + SearchMisses moved/removed by B4",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "e0b2495d4ad3"
+        ]
+      }
+    ],
+    "src/app/admin/search-misses.component.ts›file›existence": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "removed (misses in PostHog)",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "c770939b19db"
+        ]
+      }
+    ],
+    "src/app/admin/search-misses.component.ts›imports›ScActionDirective": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "removed with the component",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "dace207a8c09"
+        ]
+      }
+    ],
+    "src/app/admin/search-misses.component.ts›retry-button›scAction": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "removed with the component",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "9cd9f66a86dc"
+        ]
+      }
+    ],
     "src/app/codex/codex-browse.component.ts›.sheet-done,.sheet-close›focus-visible": [
       {
         "ship": "claude/modest-napier-9d1e5a",
@@ -976,6 +1036,30 @@
         "at": "2026-11-15T05:27:23.865Z",
         "hunks": [
           "60636bbad8e8"
+        ]
+      }
+    ],
+    "src/app/p4k/p4k-history.component.ts›disable button›scope": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "scAction secondary danger disablePatch per patch (concept pin)",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "a4213917d7e0"
+        ]
+      }
+    ],
+    "src/app/p4k/p4k-history.component.ts›reenable button›scope": [
+      {
+        "ship": "claude/batch-b25f1b",
+        "by": "JerryT2T",
+        "value": "scAction secondary reenablePatch per patch (concept pin)",
+        "decided": true,
+        "at": "2026-11-16T20:46:33.906Z",
+        "hunks": [
+          "1153619b7ecb"
         ]
       }
     ]
