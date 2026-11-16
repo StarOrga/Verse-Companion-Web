@@ -13,6 +13,7 @@ import { scopeForKind } from '../codex-poly-search';
 import { provideNoShipBlueprints } from '../ship-blueprint/ship-blueprint.testing';
 import { CodexSearchBarComponent } from './codex-search-bar.component';
 import { CodexSearchHub } from './codex-search-hub.service';
+import { fakeSupabase } from '../../testing/fake-supabase';
 
 describe('CodexSearchBarComponent', () => {
   let fixture: ComponentFixture<CodexSearchBarComponent>;
@@ -32,6 +33,8 @@ describe('CodexSearchBarComponent', () => {
     TestBed.configureTestingModule({
       imports: [CodexSearchBarComponent],
       providers: [
+        // Never the real client: opening a result would log search_log_open to the cloud project.
+        fakeSupabase().provider,
         { provide: ItemPathService, useValue: fakeItemPath() },
         provideNoShipBlueprints(),
         provideRouter([{ path: '**', children: [] }]),
