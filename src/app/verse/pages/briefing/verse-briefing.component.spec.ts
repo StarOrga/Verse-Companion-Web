@@ -22,6 +22,7 @@ import { ShellChromeService } from '../../../shell/fusion-bar/shell-chrome.servi
 import { By } from '@angular/platform-browser';
 import { BriefingPlanetComponent } from './briefing-planet.component';
 import { VERSE_STAGED_BUILD } from './staged-build';
+import { fakeSupabase } from '../../../testing/fake-supabase';
 import {
   INTRO_FLAG,
   VERSE_DOCUMENT_ENTRY,
@@ -184,6 +185,8 @@ describe('Verse briefing — component', () => {
     cancels.length = 0;
     TestBed.configureTestingModule({
       providers: [
+        // Never the real client: the patch-stability panel would call patch_stability_vote_state on the cloud project.
+        fakeSupabase().provider,
         { provide: VERSE_STAGED_BUILD, useValue: false },
         { provide: VERSE_DOCUMENT_ENTRY, useValue: () => ({ bare: true, revisit: false }) },
         provideRouter([]),

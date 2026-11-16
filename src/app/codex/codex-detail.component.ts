@@ -943,7 +943,10 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               [liveries]="akteLiveries()"
               [editions]="akteEditions()"
               [currentSlug]="detail()!.classNameSlug"
-              [rsiHref]="shipLinkForm.pledgeLink() ?? rsiShipsUrl">
+              [rsiHref]="shipLinkForm.pledgeLink() ?? rsiShipsUrl"
+              [buyOptions]="buyOptions()" [buyLoading]="buyLoading()" [buyError]="buyError()"
+              [itemName]="displayName()" [wikelo]="isWikeloRecord()"
+              (buyRetry)="retryWhereToBuy()">
               <button type="button" class="pin ak-pin" [class.pinned]="isPinned()" [attr.aria-pressed]="isPinned()" (click)="togglePin()">
                 <sc-compare-icon [on]="isPinned()" /> {{ (isPinned() ? 'codex.compare.pinned' : 'codex.compare.pin') | translate }}
               </button>
@@ -2447,6 +2450,16 @@ export class CodexDetailComponent implements OnInit {
   readonly akteEditions = computed<AkteEdition[]>(() =>
     this.editionOptions().map((o) => ({ classNameSlug: o.classNameSlug, label: o.editionName ?? this.displayName() })),
   );
+  /**
+   * The record is a Wikelo trade item (its name or class carries the marker the edition folding knows). The Codex
+   * holds no trade data (parts, quantities) yet, so the Akte's Wikelo row shows without a parts list.
+   */
+  readonly isWikeloRecord = computed(() => /wikelo/i.test(`${this.displayName()} ${this.detail()?.classNameSlug ?? ''}`));
+  /** The Kaufen tab's "Erneut versuchen": the shop lookup again. */
+  retryWhereToBuy(): void {
+    const d = this.detail();
+    if (d) void this.loadWhereToBuy(d);
+  }
   /** The Akte's facts: maker plus a few hull lines that have a value. */
   readonly akteFacts = computed<AkteFact[]>(() => {
     const out: AkteFact[] = [];

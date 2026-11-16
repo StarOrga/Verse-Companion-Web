@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { preferenceStorage } from '../../core/consent.service';
 import { SupabaseClientProvider } from '../../core/supabase.client';
 import { logWarn } from '../../core/log';
+import { AnalyticsService } from '../../core/analytics.service';
 import {
   NO_SIGNALS,
   OpenedRef,
@@ -17,18 +18,23 @@ import {
 /** How long a zero-hit search must stand still before it is counted (typing in progress). */
 export const MISS_DEBOUNCE_MS = 1500;
 const POPULARITY_LIMIT = 500;
+/** The longest search text a zero-hit event carries (PostHog, B4.8). */
+export const MISS_TERM_MAX = 80;
 
 /**
  * Client side of the search signals and counters (C9, C10):
  *  - recently opened (local) and what others open often (`search_popularity`,
  *    read once per session, silently absent when the RPC is not deployed),
- *  - `search_log_open` on every open and `search_log_miss` for a committed
- *    search without a hit (debounced, once per term and session). Both are
- *    anonymous counters (text/class + count) and never throw.
+ *  - `search_log_open` on every open (anonymous class + count),
+ *  - a committed search without a hit goes to PostHog as `search:miss_show`
+ *    with the area and the normalised text (debounced, once per term and
+ *    session; consent-gated like every web event). The former DB counter
+ *    `search_log_miss` and its admin card are gone (B4.8). Never throws.
  */
 @Injectable({ providedIn: 'root' })
 export class SearchSignalsService {
   private readonly sb = inject(SupabaseClientProvider);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly recentOpened = signal<OpenedRef[]>(readRecentOpened(storage()));
   private readonly popularity = signal<ReadonlyMap<string, number>>(new Map());
@@ -77,21 +83,19 @@ export class SearchSignalsService {
     })();
   }
 
-  /** A committed search found nothing anywhere: count the term (anonymous), once per term. */
-  logMiss(term: string): void {
-    const key = missKey(term);
+  /** A committed search found nothing anywhere: report the term to PostHog, once per term and session. */
+  logMiss(term: string, area = 'all'): void {
+    const key = missKey(term).slice(0, MISS_TERM_MAX).trim();
     if (key.length < 2 || this.missed.has(key)) return;
     if (this.missTimer) clearTimeout(this.missTimer);
     this.missTimer = setTimeout(() => {
       this.missTimer = null;
       this.missed.add(key);
-      void (async () => {
-        try {
-          await this.sb.client.rpc('search_log_miss', { p_query: key });
-        } catch (err) {
-          logWarn('search', 'log miss failed', err);
-        }
-      })();
+      try {
+        this.analytics.track('search:miss_show', { area, term: key });
+      } catch (err) {
+        logWarn('search', 'log miss failed', err);
+      }
     }, MISS_DEBOUNCE_MS);
   }
 

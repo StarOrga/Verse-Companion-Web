@@ -929,6 +929,10 @@ let uidSeq = 0;
         justify-self: start;
         cursor: help;
       }
+      /* Focusable for its tooltip, so on touch it needs a full tap target. */
+      @media (pointer: coarse) {
+        .md-ok { min-height: max(48px, var(--sc-tap-min, 0px)); }
+      }
       .md-heat {
         flex-wrap: wrap;
         row-gap: 2px;
@@ -970,11 +974,6 @@ let uidSeq = 0;
           --pip-h: 16px;
           --pip-gap: 3px;
           --pip-w: 30px;
-        }
-        /* The verdict line is held to read its reason (long-press tooltip): a thumb-sized target, not an 18px text row. */
-        .md-ok {
-          min-block-size: 48px;
-          min-inline-size: 48px;
         }
       }
       .md-foot {

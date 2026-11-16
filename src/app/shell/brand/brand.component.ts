@@ -72,7 +72,8 @@ export class BrandLogoComponent {}
       }
       .channel {
         flex: none;
-        font-size: 9px;
+        /* A host may raise it to the readable floor (the login header, which the mobile gate audits on phones). */
+        font-size: var(--sc-brand-channel-fs, 9px);
         letter-spacing: 0.42em;
         color: var(--sc-accent);
       }

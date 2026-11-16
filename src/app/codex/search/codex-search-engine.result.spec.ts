@@ -133,7 +133,7 @@ describe('CodexSearchEngine result (concept 2026-11-02)', () => {
     tick(SEARCH_DEBOUNCE_MS);
     tick();
     expect(signals.logMiss).toHaveBeenCalledTimes(1);
-    expect(signals.logMiss).toHaveBeenCalledWith('zzzz');
+    expect(signals.logMiss).toHaveBeenCalledWith('zzzz', 'all');
     tick(2000);
   }));
 

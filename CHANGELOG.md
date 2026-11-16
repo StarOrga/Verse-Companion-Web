@@ -4,7 +4,7 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.272.0] - 2026-11-16
+## [0.273.0] - 2026-11-16
 
 ### Added
 - An empty wish list now shows a night sky and "Wunsch suchen": it opens the search of the page you are on, with the cursor already in the field.
@@ -17,7 +17,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - The account menu no longer scrolls sideways.
 - The "Mit der App" card in the HQ keeps its full width instead of shrinking to its chip.
-- On tablets and phones the "Gefechtsbereit" line of a ship's energy panel is large enough to press and hold for its explanation.
+
+## [0.272.0] - 2026-11-16
+
+### Added
+- Gallery: filter segment with an animated, three-phase staged load; "Sammlung" replaces "Meine Votes".
+- Holo dossier: tabs Datenblatt / Beschreibung / Kaufen with a fixed panel size; the Kaufen tab lists the nearest shops to the HQ, a fuzzy mini search and wishlist entries with their source. The last tab is remembered across ships.
+- Data Upload: bundle history as an inline timeline (disable per patch, delete per bundle, choose the leading bundle) and the holotable silhouettes moved here from the admin users page.
+- Admin users page: requests and invites in one access panel, people panel with search.
+- Login redesigned as the "Brücke" with an intro scene, Discord/Google logos and the real header and footer.
+
+### Changed
+- Search misses are tracked in PostHog (`search:miss_show`) instead of the admin card "Häufig ohne Treffer"; the `search_misses` table is dropped.
+- Star-map glyph removed from the Galerie, Patches and News headers.
+
+### Fixed
+- Lightbox: the right-most pixel column of the screen is clickable again.
+- Unit tests can no longer write to the cloud database (guard in the Vitest setup); the 1292 "gladius" misses came from a spec.
+- Login brand channel readable on phones; energy verdict pill has a full touch target.
 
 ## [0.271.5] - 2026-11-16
 

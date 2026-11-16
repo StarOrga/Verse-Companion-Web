@@ -8,6 +8,7 @@ import { AnalyticsService } from '../core/analytics.service';
 import { AuthService } from './auth.service';
 import { LoginComponent } from './login.component';
 import { SupabaseClientProvider } from '../core/supabase.client';
+import { VerseBodiesService } from '../verse/pages/briefing/bodies/body.directive';
 
 /**
  * The signed-out landing page (feedback 56f328ea): an uninvited visitor has to
@@ -31,6 +32,7 @@ describe('LoginComponent — landing + apply', () => {
         { provide: AuthService, useValue: { ready: () => false, realUser: () => null, signInWithPassword: () => Promise.resolve({ error: null }), signInWithGoogle: () => Promise.resolve({ error: null }) } },
         { provide: AnalyticsService, useValue: { track: () => {} } },
         { provide: SupabaseClientProvider, useValue: { client: {} } },
+        { provide: VerseBodiesService, useValue: { attach: () => () => undefined } },
       ],
     });
     const fixture = TestBed.createComponent(LoginComponent);

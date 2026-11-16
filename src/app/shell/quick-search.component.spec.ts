@@ -10,6 +10,7 @@ import { HangarService } from '../hangar/hangar.service';
 import { CodexSearchHub, isTypeToSearchKey } from '../codex/search/codex-search-hub.service';
 import { QuickSearchComponent } from './quick-search.component';
 import { SearchOpenService } from './search-open.service';
+import { fakeSupabase } from '../testing/fake-supabase';
 
 describe('QuickSearchComponent', () => {
   let searchAll: Mock;
@@ -19,6 +20,8 @@ describe('QuickSearchComponent', () => {
     TestBed.configureTestingModule({
       imports: [QuickSearchComponent],
       providers: [
+        // Never the real client: opening a result would log search_log_open to the cloud project.
+        fakeSupabase().provider,
         provideRouter([]),
         provideTranslateService({ fallbackLang: 'en' }),
         { provide: CodexService, useValue: { searchAll, suggestNames: () => Promise.resolve([]), isPinned: () => false } },

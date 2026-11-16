@@ -96,9 +96,7 @@
   },
   "auth": {
     "previewLocked": {
-      "title": "Du siehst gerade die Vorschau als abgemeldeter Besucher",
-      "body": "Anmelden funktioniert hier nicht — die Vorschau überschreibt weiterhin, was dir die App anzeigt, auch nach erfolgreicher Anmeldung. Beende zuerst die Vorschau.",
-      "exit": "Vorschau beenden und anmelden"
+      "body": "Anmelden funktioniert hier nicht — die Vorschau überschreibt weiterhin, was dir die App anzeigt, auch nach erfolgreicher Anmeldung. Beende zuerst die Vorschau über das Banner oben."
     },
     "tagline": "Dein Terminal zum Verse",
     "email": "E-Mail",
@@ -155,7 +153,13 @@
       },
       "applyCta": "Um Zugang bewerben",
       "applyInline": "Jetzt bewerben",
-      "backToSignIn": "Zurück zur Anmeldung"
+      "backToSignIn": "Zurück zur Anmeldung",
+      "headerNav": "Seitennavigation",
+      "consoleAria": "Anmeldekonsole",
+      "scene": {
+        "approach": "Anflug",
+        "target": "microTech · Stanton"
+      }
     },
     "apply": {
       "title": "Um Zugang bewerben",
@@ -1187,7 +1191,40 @@
         "liveries": "Lackierung",
         "standard": "Standard",
         "maker": "Hersteller",
-        "modelsAria": "Modell"
+        "modelsAria": "Modell",
+        "tabsAria": "Ansicht der Akte",
+        "tabSheet": "Datenblatt",
+        "tabText": "Beschreibung",
+        "tabBuy": "Kaufen",
+        "buy": {
+          "loading": "Preise werden geladen …",
+          "error": "Die Preise konnten nicht geladen werden.",
+          "retry": "Erneut versuchen",
+          "empty": "Für dieses Schiff ist kein Kaufort bekannt.",
+          "shops": "Im Spiel kaufen",
+          "nearest": "Am nächsten zu {{place}}",
+          "cheapest": "Günstigste zuerst",
+          "grouped": "Nach System und Ort",
+          "showAll": "Alle {{n}} Orte",
+          "showLess": "Weniger",
+          "searchLabel": "Kaufort suchen",
+          "searchPlaceholder": "Ort oder Laden suchen …",
+          "noMatch": "Kein Ort passt zu „{{q}}“.",
+          "aUEC": "aUEC",
+          "wish": "Auf die Wunschliste",
+          "wished": "Auf der Wunschliste",
+          "wishedFrom": "Quelle: {{source}}",
+          "undo": "Rückgängig",
+          "wishError": "Der Eintrag konnte nicht gesetzt werden.",
+          "signIn": "Zum Merken bitte anmelden.",
+          "wikelo": "Tausch bei Wikelo",
+          "wikeloRow": "Wikelo-Tausch",
+          "wikeloPlace": "Wikelo Emporium · Kinga Station",
+          "wikeloNoData": "Die benötigten Teile liegen noch nicht in den Codex-Daten.",
+          "wikeloHave": "{{have}} von {{need}} im Bestand",
+          "wikeloSource": "Wikelo-Tausch",
+          "attribution": "Preise: UEX Corp · Wikelo: Codex-Tauschdaten"
+        }
       },
       "hangar": {
         "menuAria": "Hangar und Ausstattung",
@@ -3633,7 +3670,10 @@
     "actions": {
       "disable": "Deaktivieren",
       "reenable": "Reaktivieren",
-      "delete": "Löschen"
+      "delete": "Löschen",
+      "disablePatch": "Patch deaktivieren",
+      "reenablePatch": "Patch reaktivieren",
+      "lead": "Als führend nutzen"
     },
     "diff": {
       "title": "Diff-Details (vs. vorheriger Build)",
@@ -3651,11 +3691,20 @@
       "delete": "Bundle \"{{name}}\" endgültig löschen?\n\nDies kann nicht rückgängig gemacht werden.",
       "disableTitle": "Bundle „{{name}}“ deaktivieren?",
       "reasonLabel": "Grund (optional)",
-      "deleteTitle": "Bundle löschen?"
+      "deleteTitle": "Bundle löschen?",
+      "disablePatchTitle": "Patch {{name}} deaktivieren ({{count}} aktive Uploads)?",
+      "reenablePatch": "Patch {{name}} wieder aktivieren? Je Kanal führt wieder sein neuester Upload.",
+      "leadTitle": "„{{name}}“ als führend nutzen?",
+      "leadMessage": "Die anderen aktiven Uploads desselben Patches und Kanals werden deaktiviert (mit Vermerk) und bleiben in der Historie."
     },
     "superseded": {
       "badge": "Ersetzt",
       "title": "Ersetzt durch neueren Upload"
+    },
+    "leading": {
+      "badge": "Führend",
+      "tip": "Dieses Bundle nutzt der Codex für Patch und Kanal.",
+      "reason": "Zurückgestellt: {{name}} wurde als führend gewählt."
     }
   },
   "profile": {
@@ -3888,7 +3937,8 @@
         "role_assign_failed": "Eingeladen, aber die Rolle konnte nicht gesetzt werden.",
         "existing_account_not_updated": "Die E-Mail steht in der Allowlist, aber der bestehende Account wurde nicht geändert — vermutlich ein geschützter Admin.",
         "user_exists": "Diese E-Mail ist bereits registriert. Die Allowlist wurde trotzdem aktualisiert."
-      }
+      },
+      "open": "Person einladen"
     },
     "share": {
       "button": "Share-Link kopieren",
@@ -4019,7 +4069,7 @@
     },
     "requests": {
       "title": "Einladungsanfragen",
-      "subtitle": "Bewerbungen von der Startseite. Annehmen registriert die E-Mail wie über das Formular unten — plus Einladungsmail: Der Link darin führt direkt auf die Seite, auf der sich die Person ihr eigenes Passwort setzt. Wir vergeben nie ein Passwort.",
+      "subtitle": "Bewerbungen von der Startseite. Annehmen registriert die E-Mail wie über das Einladen-Formular hinter dem + — plus Einladungsmail: Der Link darin führt direkt auf die Seite, auf der sich die Person ihr eigenes Passwort setzt. Wir vergeben nie ein Passwort.",
       "empty": "Keine offenen Anfragen.",
       "accept": "Annehmen",
       "decline": "Ablehnen",
@@ -4393,15 +4443,6 @@
         "saveEdit": "Text speichern",
         "resolved": "Hinweis erledigt."
       }
-    },
-    "searchMisses": {
-      "title": "Häufig ohne Treffer",
-      "subtitle": "Suchen ohne einen einzigen Treffer, anonym gezählt (nur Text und Anzahl).",
-      "query": "Suche",
-      "hits": "Anzahl",
-      "last": "Zuletzt",
-      "empty": "Noch keine Suche ohne Treffer.",
-      "retry": "Erneut laden"
     }
   },
   "desktop": {
@@ -4429,7 +4470,21 @@
       "fullPage": "Volle Data-Upload-Seite",
       "note": "Nur Windows · Anmeldung mit deinem Verse-Companion-Konto · lädt Daten hoch, keinen Code."
     },
-    "historyEyebrow": "Uploader"
+    "historyEyebrow": "Uploader",
+    "build": {
+      "title": "Neuestes Bundle",
+      "since": "seit {{date}}",
+      "quality": "Qualität {{q}}",
+      "none": "Noch kein aktives Bundle."
+    },
+    "steps": {
+      "title": "Einrichtung",
+      "done": "Eingerichtet — du hast schon hochgeladen.",
+      "doneSr": "erledigt",
+      "s1": "Uploader herunterladen und starten",
+      "s2": "Mit deinem Verse-Companion-Konto anmelden",
+      "s3": "Star-Citizen-Ordner wählen — der Uploader liest Data.p4k und lädt die Bundles hoch"
+    }
   },
   "download": {
     "title": "Download",
@@ -5475,10 +5530,9 @@
       "all": "Alle",
       "newest": "Neueste",
       "top": "Community Top",
-      "mine": "Meine Votes",
-      "mineCount": "Meine Votes · {{n}}",
-      "mineSignedOut": "Melde dich an, um deine bewerteten Wallpaper zu sehen",
-      "emptyMine": "Du hast noch kein Wallpaper bewertet. Tippe auf den Daumen bei einem Bild, dann landet es hier."
+      "sammlung": "Sammlung",
+      "sammlungSignedOut": "Melde dich an, um deine Sammlung zu sehen",
+      "emptySammlung": "Deine Sammlung ist noch leer. Gib einem Bild den Daumen hoch, dann landet es hier."
     },
     "lightboxAria": "Hintergrundbild",
     "source": {
@@ -5530,6 +5584,10 @@
       "cta": "Für Windows holen",
       "note": "Nur Windows · ~0,3 MB · jederzeit über das Tray-Menü beendet",
       "dismiss": "Nicht mehr anzeigen"
+    },
+    "stage": {
+      "new": "Neu",
+      "sammlung": "Sammlung"
     }
   },
   "userFeedback": {
@@ -7279,7 +7337,6 @@
       }
     },
     "gallery": {
-      "mine": "Meine Sternkarten",
       "connected": "Starscape verbunden",
       "share": "Galerie teilen",
       "heroTitle": "Starscape holt die Galerie auf deinen Desktop",

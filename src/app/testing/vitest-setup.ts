@@ -52,8 +52,42 @@ if (!host[GUARD]) {
   window.addEventListener('auxclick', watch, true);
 }
 
+// 3. No spec may write to the cloud database. A spec that lets the real
+//    Supabase client run (no `fakeSupabase().provider`) sends its RPCs and
+//    inserts to the live project: codex-search-engine.spec.ts logged
+//    search_log_miss('gladius') on every run — 1292 fake "misses" by
+//    2026-11-15. Every non-GET request to the project host is refused here and
+//    fails the spec that sent it; reads stay untouched.
+const SUPABASE_HOST = 'supabase.co';
+const cloudWrites: string[] = [];
+const FETCH_GUARD = Symbol.for('verse-companion/cloud-write-guard');
+const fetchHost = globalThis as typeof globalThis & { [FETCH_GUARD]?: true };
+if (!fetchHost[FETCH_GUARD]) {
+  fetchHost[FETCH_GUARD] = true;
+  const realFetch = window.fetch.bind(window);
+  window.fetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+    const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
+    if (url.includes(SUPABASE_HOST) && method !== 'GET' && method !== 'HEAD') {
+      cloudWrites.push(`${method} ${url}`);
+      return Promise.resolve(new Response('{"message":"blocked by vitest-setup"}', { status: 503 }));
+    }
+    return realFetch(input, init);
+  };
+}
+
 beforeEach(() => {
   linkClicks.length = 0;
+  cloudWrites.length = 0;
+});
+
+afterEach(() => {
+  const writes = cloudWrites.splice(0);
+  if (writes.length === 0) return;
+  throw new Error(
+    `This spec sent a write or an RPC to the cloud database (${writes.join(', ')}). ` +
+      'Provide fakeSupabase().provider (src/app/testing/fake-supabase.ts) instead of the real client.',
+  );
 });
 
 afterEach(() => {
