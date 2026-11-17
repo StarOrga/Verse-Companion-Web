@@ -44,8 +44,8 @@ export interface HoloPerspectiveView {
  * Purely presentational — the stage resolves every string.
  *
  * `layout="row"` (concept holotisch-unten r1, d2): one row on the strip's own
- * columns — a lead cell as wide as the strip's Einsatz, then the four areas
- * over the strip's four areas. The stage puts one row at the page's end, where
+ * columns — the four areas edge on edge over the strip's four areas, the
+ * "Alle Werte aller vier" switch on a slim right-aligned line above them. The stage puts one row at the page's end, where
  * it docks onto the sticky strip, and one inside the strip's dock (the arrow
  * opens it anywhere). On a phone the four areas swipe sideways, one at a time.
  */
@@ -57,15 +57,7 @@ export interface HoloPerspectiveView {
   host: { '[class.row]': "layout() === 'row'", '[class.docked]': 'docked()' },
   template: `
     @if (layout() === 'row') {
-      <div class="lead">
-        <span class="lt">{{ 'codex.holo.stage.perspectives' | translate }}</span>
-        <p class="lsay">
-          @if (cohortSize(); as n) {
-            {{ 'codex.holo.persp.lead' | translate: { mission: (missionLabelKey() | translate), n: n } }}
-          } @else {
-            {{ 'codex.holo.persp.leadNoCohort' | translate: { mission: (missionLabelKey() | translate) } }}
-          }
-        </p>
+      <div class="all-line">
         <button type="button" class="all-expand" (click)="toggleAll()" [attr.aria-expanded]="allOpen()">
           {{ (allOpen() ? 'codex.holo.persp.allHide' : 'codex.holo.persp.allShow') | translate }}
         </button>
@@ -224,17 +216,16 @@ export interface HoloPerspectiveView {
     @media (max-width: 640px) { .big .num { font-size: 22px; } }
 
     /* ── Row on the strip's columns (layout="row") ── */
-    :host(.row) { display: grid; grid-template-columns: var(--holo-cols, 200px repeat(4, minmax(0, 1fr)) 44px); gap: 0; align-items: stretch;
+    :host(.row) { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; align-items: stretch;
       border: 1px solid color-mix(in srgb, var(--holo-e, var(--sc-accent)) 28%, transparent); border-radius: 16px;
       background: linear-gradient(180deg, color-mix(in srgb, var(--sc-accent) 7%, var(--sc-bg-0)), color-mix(in srgb, var(--sc-accent) 3%, var(--sc-bg-0))); overflow: hidden; }
     /* Docked onto the strip below: one piece with it. */
     :host(.row.docked) { border-block-end: 0; border-radius: 16px 16px 0 0; }
     /* Inside the strip's dock: the dock is the frame. */
     :host(.row.in-dock) { border: 0; border-radius: 0; background: none; overflow: visible; }
-    .lead { display: flex; flex-direction: column; gap: 6px; padding: 12px 12px 10px; min-width: 0; }
-    .lead .lt { font-family: var(--d); text-transform: uppercase; font-size: max(9.5px, var(--f)); letter-spacing: 0.14em; color: var(--sc-accent); }
-    .lsay { margin: 0; font-size: max(11.5px, var(--f)); line-height: 1.4; color: var(--sc-fg-1); }
-    .all-expand { margin-top: auto; align-self: flex-start; background: none; border: none; padding: 0; cursor: pointer; font-family: var(--d); text-transform: uppercase;
+    /* The switch has a slim line of its own above the tiles, right-aligned: the four columns stay where the strip's four groups are. */
+    .all-line { grid-column: 1 / -1; display: flex; justify-content: flex-end; padding: 0 12px; }
+    .all-expand { background: none; border: none; padding: 0; cursor: pointer; font-family: var(--d); text-transform: uppercase;
       font-size: max(8.5px, var(--f)); letter-spacing: 0.14em; color: var(--sc-fg-2); min-height: var(--sc-tap-min, 24px); transition: color var(--holo-t-fast) ease; }
     .all-expand:hover, .all-expand[aria-expanded="true"] { color: var(--sc-accent); }
     .all-expand:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: var(--holo-r-xs); }
@@ -249,8 +240,7 @@ export interface HoloPerspectiveView {
     :host(.row) .subs { grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); }
     @media (max-width: 1000px) {
       :host(.row) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      :host(.row) .lead { grid-column: 1 / -1; }
-      :host(.row) .ptile:nth-child(odd) { border-inline-end: 0; }
+      :host(.row) .ptile:nth-of-type(odd) { border-inline-end: 0; }
     }
     /* Phone (concept r1-dock-phone "swipe"): the four areas side by side,
        one large at a time, swiped sideways with a snap. */
@@ -258,7 +248,7 @@ export interface HoloPerspectiveView {
       :host(.row) { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 86%; overflow-x: auto; overscroll-behavior-x: contain;
         scroll-snap-type: x mandatory; scrollbar-width: none; }
       :host(.row)::-webkit-scrollbar { display: none; }
-      :host(.row) .lead { display: none; }
+      :host(.row) .all-line { display: none; }
       :host(.row) .ptile { scroll-snap-align: start; border-inline-end: 0; }
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

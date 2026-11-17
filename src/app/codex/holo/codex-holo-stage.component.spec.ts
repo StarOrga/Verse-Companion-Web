@@ -829,12 +829,10 @@ describe('CodexHoloStageComponent lower part (concept holotisch-unten r1, d2)', 
     expect(persp.classList).toContain('row');
   });
 
-  it('the side column sits in the first (Einsatz) column and holds no chip filter row (C6/C8)', async () => {
+  it('has no side column below the first screen (sources live in the Akte) and holds no chip filter row (C6/C8)', async () => {
     const f = await setup({ primaryModuleSections: sections });
     const el: HTMLElement = f.nativeElement;
-    const side = el.querySelector<HTMLElement>('.holo-below .below-side')!;
-    expect(side).toBeTruthy();
-    expect(getComputedStyle(side).gridColumnStart).toBe('1');
+    expect(el.querySelector('.holo-below .below-side')).toBeNull();
     expect(el.querySelector('.holo-below .chip, .holo-below [role="toolbar"]')).toBeNull();
   });
 

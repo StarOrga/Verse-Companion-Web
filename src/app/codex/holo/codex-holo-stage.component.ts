@@ -601,12 +601,10 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
         </div>
       </div>
 
-      <!-- ── Below (concept holotisch-unten r1, d2): on the strip's own
-           columns — a side column as wide as the Einsatz (Beschreibung, Wo zu
-           kaufen, Varianten; projected [htSide]) and the parts in four columns
-           over the strip's four areas, then the details. ─────────────── -->
+      <!-- ── Below: the parts in four columns over the strip's four areas
+           (no side column since the Akte carries description, sources and
+           variants), then the details. ─────────────── -->
       <div class="holo-below mobile-data">
-        <aside class="below-side"><ng-content select="[htSide]" /></aside>
         <div class="below-head sh" [scFeedbackSpot]="'codex.detail.columnLoadout'">
           <span class="t">{{ 'codex.holo.below.parts' | translate }}</span>
           <span class="n">{{ 'codex.holo.below.partsCount' | translate: { n: pins().length } }}</span>
@@ -754,11 +752,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   --panel-w: clamp(320px, 22.2vw, 360px);
   /* The fixed right card and the Akte card share one height (concept holotisch-feinschliff C14/C20). */
   --holo-card-h: min(100%, 540px);
-  /* The strip's columns, shared by everything below the first screen (concept
-     r1 d2): a narrow lead column (Einsatz on the strip; Beschreibung + Wo zu
-     kaufen above it), the four areas evenly, the strip's arrow. */
-  --holo-lead-w: clamp(150px, 15%, 230px); --holo-ctl-w: max(44px, var(--sc-tap-min, 0px));
-  --holo-cols: var(--holo-lead-w) repeat(4, minmax(0, 1fr)) var(--holo-ctl-w) var(--holo-fab-clear, 0px);
+  /* The strip's columns, shared by everything below the first screen: the four areas evenly, edge on edge with the strip's four groups. */
+  --holo-cols: repeat(4, minmax(0, 1fr));
   display: flex; flex-direction: column; gap: 6px;
   }
   .mobile-tabs button, .statics .k, .sub, .sh, .details-toggle, .switch { font-family: var(--d); text-transform: uppercase; }
@@ -970,9 +965,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
 
   /* ── Below: side column | four area columns (the strip's columns) ── */
   .holo-below { display: grid; grid-template-columns: var(--holo-cols); column-gap: 0; row-gap: 8px; align-items: start; margin-top: 10px; }
-  .below-side { grid-column: 1; grid-row: 1 / span 3; position: sticky; top: 84px; display: flex; flex-direction: column; gap: 10px; min-width: 0; padding-inline-end: 12px; }
-  .below-side:empty { display: none; }
-  .below-head { grid-column: 2 / 6; grid-row: 1; margin-bottom: 0; }
+  .below-head { grid-column: 1 / 5; grid-row: 1; margin-bottom: 0; }
   .below-head .n { font-family: var(--m); letter-spacing: 0; text-transform: none; color: var(--sc-fg-2); }
   .below-area { grid-row: 2; min-width: 0; padding: 4px 10px 8px; border-inline-start: 1px solid var(--l1); box-shadow: inset 0 2px 0 var(--p); }
   .below-area[data-p="offensive"] { --p: var(--holo-p-offensive); }
@@ -981,7 +974,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .below-area[data-p="signature"] { --p: var(--holo-p-signature); border-inline-end: 1px solid var(--l1); }
   .area-h { margin: 6px 0 4px; font-family: var(--d); font-weight: 400; text-transform: uppercase; font-size: max(9.5px, var(--f)); letter-spacing: 0.14em; color: var(--p, var(--sc-accent)); }
   .area-empty { margin: 4px 0; font-size: max(11.5px, var(--f)); color: var(--sc-fg-2); }
-  .holo-below .holo-details { grid-column: 2 / 6; grid-row: 3; min-width: 0; }
+  .holo-below .holo-details { grid-column: 1 / 5; grid-row: 3; min-width: 0; }
   /* At the page's end the perspectives sit right on the strip. */
   .below-persp { margin-top: 14px; margin-bottom: 0; }
   /* The stage is a flex column with gap: 6px; the panel cancels it toward the strip so the two meet without a seam (feedback #4). */
@@ -1037,7 +1030,6 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .below-head, .holo-below .holo-details { grid-column: 1 / -1; grid-row: auto; }
   .below-area { grid-row: auto; }
   .below-area[data-p="defensive"], .below-area[data-p="signature"] { border-inline-end: 1px solid var(--l1); }
-  .below-side { grid-column: 1 / -1; grid-row: auto; order: 5; position: static; padding-inline-end: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); align-items: start; }
   .holo-below .holo-details { order: 6; }
   }
   @media (max-width: 640px) {

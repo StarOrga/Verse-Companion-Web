@@ -1053,8 +1053,6 @@
         "areaEmpty": "Keine Bauteile in diesem Bereich."
       },
       "persp": {
-        "lead": "Bewertet als {{mission}}, verglichen mit {{n}} Schiffen.",
-        "leadNoCohort": "Bewertet als {{mission}}.",
         "allShow": "Alle Werte aller vier ▾",
         "allHide": "Alle Werte zuklappen ▴"
       },
@@ -1184,8 +1182,8 @@
         "diffLegend": "weicht vom Werk ab"
       },
       "akte": {
-        "imageOnly": "Nur Bild",
-        "showText": "Text zeigen",
+        "imageOnly": "Akte einklappen",
+        "showText": "Akte ausklappen",
         "descriptionAria": "Beschreibung",
         "noDescription": "Für dieses Schiff liegt keine Beschreibung vor.",
         "liveries": "Lackierung",

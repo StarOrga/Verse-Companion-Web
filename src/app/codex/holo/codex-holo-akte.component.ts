@@ -90,7 +90,12 @@ export const AKTE_TAB_PREF_KEY = 'sc.codex.holo.akteTab';
                 [scTooltip]="(textOpen() ? 'codex.holo.akte.imageOnly' : 'codex.holo.akte.showText') | translate" scTooltipTier="label"
                 [attr.aria-label]="(textOpen() ? 'codex.holo.akte.imageOnly' : 'codex.holo.akte.showText') | translate"
                 (click)="textOpen.set(!textOpen())">
-          <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 16l5-5 4 4 3-3 6 6" /></svg>
+          <!-- Minimise: two arrows pointing inward; collapsed, the counterpart (two arrows outward). -->
+          @if (textOpen()) {
+            <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l6 6M10 5v5H5M20 4l-6 6M14 5v5h5M4 20l6-6M10 19v-5H5M20 20l-6-6M14 19v-5h5" /></svg>
+          } @else {
+            <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 10L4 4M4 9V4h5M14 10l6-6M15 4h5v5M10 14l-6 6M4 15v5h5M14 14l6 6M15 20h5v-5" /></svg>
+          }
         </button>
       </div>
       @if (textOpen()) {
@@ -165,6 +170,12 @@ export const AKTE_TAB_PREF_KEY = 'sc.codex.holo.akteTab';
     /* "Nur Bild": the card shrinks to its head, the image is free. */
     .ak-card.shut { width: auto; height: auto; padding: 6px; border-radius: 22px; }
     .ak-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: 0 0 auto; }
+    /* The minimise control: no frame, no glow, quieter than the tabs beside it. */
+    .ak-card .ak-tg.sc-action { width: 24px; height: 24px; border: 0; background: none; box-shadow: none; color: var(--sc-fg-2); opacity: 0.8; }
+    .ak-card .ak-tg.sc-action .sc-action-icon { width: 13px; height: 13px; stroke-width: 1.6; }
+    .ak-card .ak-tg.sc-action:hover { opacity: 1; color: var(--sc-fg-0); background: none; }
+    .ak-card .ak-tg.sc-action:focus-visible { box-shadow: var(--sc-focus-ring); opacity: 1; }
+    @media (pointer: coarse) { .ak-card .ak-tg.sc-action { width: 44px; height: 44px; } }
     .ak-tabs { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--sc-border); border-radius: 16px; background: color-mix(in srgb, var(--sc-bg-0) 60%, transparent); min-width: 0; }
     .ak-tab { min-height: 28px; padding: 0 11px; border: 0; border-radius: 14px; background: none; color: var(--sc-fg-1); font: inherit; font-size: max(12px, var(--sc-fs-floor)); white-space: nowrap; cursor: pointer; }
     .ak-tab:hover { color: var(--sc-fg-0); }
@@ -227,6 +238,8 @@ export class CodexHoloAkteComponent {
   readonly wikelo = input(false);
   readonly wikeloNeeds = input<readonly WikeloNeed[]>([]);
   readonly buyRetry = output<void>();
+  /** The search's "Bezugsquelle" link asked for the sources: open the buy tab (not remembered as the pick). */
+  readonly openBuy = input(false);
 
   private readonly analytics = inject(AnalyticsService);
   protected readonly tabs: readonly { id: AkteTab; key: string }[] = [
@@ -259,6 +272,11 @@ export class CodexHoloAkteComponent {
 
   constructor() {
     if (this.tab() === 'buy') this.analytics.track('codex:buy_open', { kind: 'ship', tab_remembered: true });
+    effect(() => {
+      if (!this.openBuy()) return;
+      this.tab.set('buy');
+      this.textOpen.set(true);
+    });
     // A new record starts on its factory paint and its first image.
     effect(() => {
       this.currentSlug();

@@ -1053,8 +1053,6 @@
         "areaEmpty": "No components in this area."
       },
       "persp": {
-        "lead": "Rated as {{mission}}, compared with {{n}} ships.",
-        "leadNoCohort": "Rated as {{mission}}.",
         "allShow": "All values of all four ▾",
         "allHide": "Collapse all values ▴"
       },
@@ -1184,8 +1182,8 @@
         "diffLegend": "differs from stock"
       },
       "akte": {
-        "imageOnly": "Image only",
-        "showText": "Show text",
+        "imageOnly": "Collapse the file",
+        "showText": "Expand the file",
         "descriptionAria": "Description",
         "noDescription": "There is no description for this ship.",
         "liveries": "Livery",
