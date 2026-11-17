@@ -54,6 +54,17 @@
   --sc-idle: #3d5a6c;
   --sc-idle-bg: #0a1c26;
   --sc-offense: #e8864a;
+  /* Interior element groups of the holotable (concept 20261117-1810): one hue per
+     filter chip — cargo amber, ways cyan, medical green, weapons the offense orange. */
+  --sc-int-cargo: #f2c46b;
+  --sc-int-ways: #52c1e6;
+  --sc-int-med: #5fd39a;
+  --sc-int-weapons: var(--sc-offense);
+  --sc-int-lockers: #b7a3e8;
+  --sc-int-fire: #ff6b5b;
+  --sc-int-tech: #d9b45f;
+  --sc-int-living: #9fb3c8;
+  --sc-int-doors: #8fc0d8;
   --sc-danger: var(--accent-danger-light);
   --sc-border: var(--border-subtle);
   --sc-glow: var(--shadow-glow);

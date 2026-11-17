@@ -28,7 +28,9 @@ import { HoloSilhouette } from '../holo-silhouette';
 import { ShipHardpointMapComponent } from '../ship-hardpoint-map.component';
 import { ShipBlueprintSchemaComponent, type SchemaCallout } from '../ship-blueprint/ship-blueprint-schema.component';
 import { ShipDeckPlanComponent } from '../ship-deck-plan.component';
-import type { Lang, ShipDeck } from '../codex.types';
+import type { Lang, ShipDeck, ShipInterior, ShipInteriorGroup } from '../codex.types';
+import type { InteriorPick } from './holo-interior';
+import { ShipInterior3dComponent } from './ship-interior-3d.component';
 import { ShipBlueprintService } from '../ship-blueprint/ship-blueprint.service';
 import {
   type BlueprintViewName,
@@ -64,6 +66,21 @@ export interface HoloDeckView {
   key: string;
   /** D5: the room picked in the bottom row (its key); null/absent = none. */
   room?: string | null;
+  /** The interior drawn over the rooms (concept 20261117-1810 B3); absent on builds without one. */
+  interior?: ShipInterior | null;
+  groups?: ReadonlySet<ShipInteriorGroup>;
+  pick?: InteriorPick | null;
+}
+
+/** "3D mit Hülle" (concept 20261117-1810 B2): the interior in the hull's ghost, one deck in focus or all equal. */
+export interface HoloInterior3dView {
+  decks: readonly ShipDeck[];
+  interior: ShipInterior | null;
+  /** The focused deck; null = all decks equal. */
+  focus: string | null;
+  focusLabel: string;
+  groups: ReadonlySet<ShipInteriorGroup>;
+  pick: InteriorPick | null;
 }
 
 /**
@@ -189,7 +206,7 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
 @Component({
   selector: 'sc-codex-holo-table',
   standalone: true,
-  imports: [TranslatePipe, ShipHardpointMapComponent, ShipBlueprintSchemaComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, AssetPackageViewerComponent, FallbackImageComponent, ScTooltipDirective, CodexHoloCalloutComponent, HoloDiffMarkerComponent],
+  imports: [TranslatePipe, ShipHardpointMapComponent, ShipBlueprintSchemaComponent, ShipDeckPlanComponent, ShipInterior3dComponent, ShipSkinViewerComponent, AssetPackageViewerComponent, FallbackImageComponent, ScTooltipDirective, CodexHoloCalloutComponent, HoloDiffMarkerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[class.ph-wait]': "phase() === 'wait'",
@@ -216,7 +233,18 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
       @if (heroSrc(); as src) {
         <img class="hero-art" [src]="src" alt="" aria-hidden="true" />
       }
-      @if (viewMode() === '3d') {
+      @if (viewMode() === '3d' && interior3d(); as iv) {
+        <!-- "3D mit Hülle" (concept 20261117-1810 r2d1): a deck picked in the filter row turns the
+             3D view inward — the hull as a ghost, the deck solid. Its own chunk, like the hull viewer. -->
+        @defer (on immediate) {
+          <sc-ship-interior-3d class="mode-viewer interior-3d" animate.leave="surface-leave"
+            [decks]="iv.decks" [interior]="iv.interior" [silhouette]="silhouette()" [focus]="iv.focus" [focusLabel]="iv.focusLabel"
+            [groups]="iv.groups" [pick]="iv.pick" [still]="still()"
+            (pickChange)="interiorPick.emit($event)" (deckSelect)="interiorDeck.emit($event)" />
+        } @placeholder {
+          <div class="mode-viewer is-placeholder" aria-hidden="true"></div>
+        }
+      } @else if (viewMode() === '3d') {
         <!-- @defer: the viewer chunk loads only in 3D mode (AUD-048). Until the hull is drawn the
              layer stays transparent over the table, which keeps its hull: no "loading" frame between
              the schema and the 3D hologram (D11). -->
@@ -259,8 +287,9 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
              rooms replace the hull; no part markers or callouts inside a deck. -->
         <sc-ship-deck-plan class="mode-viewer deck-sheet" animate.leave="surface-leave"
           [decks]="dp.decks" [lang]="dp.lang" [deckKey]="dp.key" [bare]="true"
-          [room]="dp.room ?? null" (roomChange)="deckRoomChange.emit($event)" />
-      } @else if (showCanvas() && (viewMode() !== '3d' || !viewerDrawn())) {
+          [room]="dp.room ?? null" (roomChange)="deckRoomChange.emit($event)"
+          [interior]="dp.interior ?? null" [groups]="dp.groups ?? emptyGroups" [pick]="dp.pick ?? null" (pickChange)="interiorPick.emit($event)" />
+      } @else if (showCanvas() && (viewMode() !== '3d' || (!viewerDrawn() && !interior3d()))) {
         <div class="shipwrap" animate.leave="surface-leave" [class.no-geometry]="!silhouette()" [class.dense]="keyMode()"
              [class.leader]="!!leader()" [style.width.px]="leader()?.hull?.w ?? null"
              [class.empty]="pins().length === 0" [class.has-orbit]="!!orbit()">
@@ -498,6 +527,7 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
     .viewer-hold > .mode-viewer { transition: opacity var(--holo-t-base) var(--holo-e-out); }
     .viewer-hold.held > .mode-viewer { opacity: 0; pointer-events: none; }
     .mode-viewer { position: absolute; inset: 0; z-index: 1; animation: fade-in var(--holo-t-base) var(--holo-e-out) backwards; }
+    .interior-3d { display: flex; flex-direction: column; }
     .mode-viewer.is-placeholder { animation: none; }
     /* While the viewer chunk / the hull's asset row resolves, the projector already
        runs: a pulsing lock ring and a scan line rising through the air, so the stage
@@ -890,6 +920,13 @@ export class CodexHoloTableComponent {
   readonly deckPlan = input<HoloDeckView | null>(null);
   /** D5: a room picked (or let go) on the deck plan — the bottom row's room chips follow it. */
   readonly deckRoomChange = output<string | null>();
+  /** The interior in 3D (a deck picked in the filter row while the view is 3D); null = the hull model. */
+  readonly interior3d = input<HoloInterior3dView | null>(null);
+  /** An interior element picked on the plan or in 3D. */
+  readonly interiorPick = output<InteriorPick>();
+  /** A faint deck clicked in 3D: focus it. */
+  readonly interiorDeck = output<string>();
+  readonly emptyGroups: ReadonlySet<ShipInteriorGroup> = new Set();
   readonly shipClassName = input('');
   readonly hardpointPortRefs = input<readonly HardpointPortRef[]>([]);
   readonly hardpointFrame = input<HardpointFrame | null>(null);

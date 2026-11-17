@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, input, model, signal , inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, model, output, signal , inject } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
-import type { Lang, ShipDeck } from './codex.types';
+import type { Lang, ShipDeck, ShipInterior, ShipInteriorGroup } from './codex.types';
+import { GLYPH_PATHS, GROUP_OF_CAT, InteriorPick, glyphOf } from './holo/holo-interior';
 import { buildDeckPlans, DeckPlan, DeckPlanRoom } from './deck-plan';
 import { RoomLabelTranslations } from './room-label-translations';
 
@@ -108,6 +109,35 @@ let nextDeckPlanId = 0;
                         dominant-baseline="middle" [attr.font-size]="labelSize()">{{ r.label }}</text>
                 }
               }
+              <!-- The interior on the Holotable (concept 20261117-1810 B3): cargo grids with their
+                   SCU, doors as small dots, the elements of the groups that are on. -->
+              @if (overlay(); as ov) {
+                <g class="ov">
+                  @for (g of ov.grids; track g.index) {
+                    <g class="ov-grid" [class.off]="!g.on" [class.sel]="g.sel" (click)="pickChange.emit({ kind: 'grid', index: g.index })">
+                      <rect [attr.x]="g.x" [attr.y]="g.y" [attr.width]="g.w" [attr.height]="g.h" />
+                      @if (g.on) {
+                        <text [attr.x]="g.x + g.w / 2" [attr.y]="g.y + g.h / 2" text-anchor="middle" dominant-baseline="middle"
+                              [attr.font-size]="ov.r * 1.3">{{ g.scu }}</text>
+                      }
+                    </g>
+                  }
+                  @for (i of ov.icons; track i.index) {
+                    @if (i.door) {
+                      <circle class="ov-door" [attr.cx]="i.x" [attr.cy]="i.y" [attr.r]="ov.r * 0.32" (click)="pickChange.emit({ kind: 'poi', index: i.index })" />
+                    } @else {
+                      <g class="ov-ic" [attr.data-g]="i.group" [attr.transform]="'translate(' + (i.x - ov.r) + ' ' + (i.y - ov.r) + ') scale(' + (ov.r / 12) + ')'"
+                         (click)="pickChange.emit({ kind: 'poi', index: i.index })">
+                        <circle cx="12" cy="12" r="10.5" class="ic-bg" />
+                        <path [attr.d]="glyph[i.glyph].d" [class.fill]="glyph[i.glyph].fill" />
+                      </g>
+                    }
+                  }
+                  @if (ov.picked; as p) {
+                    <circle class="ov-pick" [attr.cx]="p.x" [attr.cy]="p.y" [attr.r]="ov.r * 1.7" />
+                  }
+                </g>
+              }
               <!-- The selected room, unmistakable (B13): a room without a footprint gets a ring,
                    every selected room its name on the plan. -->
               @for (r of activeRooms(); track r.key) {
@@ -187,8 +217,33 @@ let nextDeckPlanId = 0;
       vector-effect: non-scaling-stroke; }
     .room path.mesh { stroke: none; }
     .room circle { fill: var(--sc-fg-2); }
-    .lbl { fill: var(--sc-fg-1); pointer-events: none; paint-order: stroke; stroke: var(--sc-bg-0); stroke-width: 3px; stroke-linejoin: round; }
-    .lbl.on { fill: var(--sc-accent); font-weight: 600; }
+    .lbl { fill: var(--sc-fg-1); pointer-events: none; paint-order: stroke; stroke: color-mix(in srgb, var(--sc-bg-0) 70%, transparent);
+      stroke-width: 2px; stroke-linejoin: round; }
+    /* The picked room's name: bright text with a soft glow, no dark halo around it (concept 20261117-1810 B4). */
+    .lbl.on { fill: var(--sc-fg-0); font-weight: 700; stroke: none; filter: drop-shadow(0 0 2px color-mix(in srgb, var(--sc-accent) 80%, transparent)); }
+    /* A clicked room never shows the browser's own focus frame; keyboard focus keeps the app's ring on the footprint. */
+    .room { outline: none; }
+    .room:focus-visible path { stroke: var(--sc-accent); stroke-width: 2px; filter: drop-shadow(0 0 4px color-mix(in srgb, var(--sc-accent) 60%, transparent)); }
+    .ov-grid { cursor: pointer; }
+    .ov-grid rect { fill: color-mix(in srgb, var(--sc-int-cargo) 42%, transparent); stroke: var(--sc-int-cargo); stroke-width: 1.6px;
+      vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 3px color-mix(in srgb, var(--sc-int-cargo) 60%, transparent)); }
+    .ov-grid.off rect { fill: color-mix(in srgb, var(--sc-int-cargo) 14%, transparent); stroke-opacity: 0.4; filter: none; }
+    .ov-grid.sel rect { stroke: var(--sc-fg-0); stroke-width: 2.4px; }
+    .ov-grid text { fill: color-mix(in srgb, var(--sc-int-cargo) 40%, white); font-weight: 700; pointer-events: none; }
+    .ov-door { fill: var(--sc-int-doors); opacity: 0.9; cursor: pointer; }
+    .ov-ic { cursor: pointer; }
+    .ov-ic .ic-bg { fill: var(--sc-bg-0); stroke: currentColor; stroke-width: 1.6px; }
+    .ov-ic path { fill: none; stroke: currentColor; stroke-width: 1.7px; }
+    .ov-ic path.fill { fill: currentColor; stroke: none; }
+    .ov-ic[data-g='ways'] { color: var(--sc-int-ways); }
+    .ov-ic[data-g='med'] { color: var(--sc-int-med); }
+    .ov-ic[data-g='weapons'] { color: var(--sc-int-weapons); }
+    .ov-ic[data-g='lockers'] { color: var(--sc-int-lockers); }
+    .ov-ic[data-g='fire'] { color: var(--sc-int-fire); }
+    .ov-ic[data-g='tech'] { color: var(--sc-int-tech); }
+    .ov-ic[data-g='living'] { color: var(--sc-int-living); }
+    .ov-pick { fill: none; stroke: var(--sc-fg-0); stroke-width: 2px; vector-effect: non-scaling-stroke; pointer-events: none;
+      filter: drop-shadow(0 0 4px var(--sc-accent)); }
     .ring { fill: color-mix(in srgb, var(--sc-accent) 18%, transparent); stroke: var(--sc-accent); stroke-width: 2px; vector-effect: non-scaling-stroke; pointer-events: none; }
     .room:hover path { fill: color-mix(in srgb, var(--sc-accent) 30%, transparent); stroke: var(--sc-accent); }
     .room.on path { fill: color-mix(in srgb, var(--sc-accent) 45%, transparent); stroke: var(--sc-accent); stroke-width: 2px;
@@ -222,6 +277,14 @@ export class ShipDeckPlanComponent {
   readonly deckKey = input<string | null>(null);
   /** No card, header, switcher or room chips: the plan alone, for the Holotable surface. */
   readonly bare = input(false);
+  /** The ship's interior (concept 20261117-1810): grids, doors and elements drawn over the rooms. */
+  readonly interior = input<ShipInterior | null>(null);
+  /** The element groups that are on; grids show dimmed while cargo is off. */
+  readonly groups = input<ReadonlySet<ShipInteriorGroup>>(new Set());
+  /** The element picked in the panel or on the plan. */
+  readonly pick = input<InteriorPick | null>(null);
+  readonly pickChange = output<InteriorPick>();
+  readonly glyph = GLYPH_PATHS;
 
   private readonly roomLabels = inject(RoomLabelTranslations);
   readonly plans = computed(() => buildDeckPlans(this.decks(), this.lang(), this.roomLabels.labels(this.lang())));
@@ -286,6 +349,31 @@ export class ShipDeckPlanComponent {
     const w = w0 + 2 * pad, h = h0 + 2 * pad;
     const r2 = (n: number) => Math.round(n * 100) / 100;
     return { viewBox: `${r2(minX - pad)} ${r2(minY - pad)} ${r2(w)} ${r2(h)}`, w, h };
+  });
+
+  /** The interior of the deck on the plan, in viewBox space; null without an interior. */
+  readonly overlay = computed(() => {
+    const interior = this.interior();
+    const set = this.plans();
+    const deck = this.deck();
+    if (!interior || !set || !deck) return null;
+    const groups = this.groups();
+    const pick = this.pick();
+    const at = (x: number, y: number) => ({ x: Math.round((x + set.ox) * 100) / 100, y: Math.round((set.oy - y) * 100) / 100 });
+    const grids = interior.cargoGrids.flatMap((g, index) => {
+      if (g.deck !== deck.key) return [];
+      const [w, l] = g.dims;
+      const tl = at(g.pos[0] - w / 2, g.pos[1] + l / 2);
+      return [{ index, x: tl.x, y: tl.y, w, h: l, scu: g.scu, on: groups.has('cargo'), sel: pick?.kind === 'grid' && pick.index === index }];
+    });
+    const icons = interior.pois.flatMap((p, index) => {
+      const group = GROUP_OF_CAT[p.cat];
+      if (p.deck !== deck.key || !groups.has(group)) return [];
+      return [{ index, group, glyph: glyphOf(p.cat), door: p.cat === 'door', ...at(p.pos[0], p.pos[1]) }];
+    });
+    const el = pick ? (pick.kind === 'grid' ? interior.cargoGrids[pick.index] : interior.pois[pick.index]) : null;
+    const picked = el && el.deck === deck.key ? at(el.pos[0], el.pos[1]) : null;
+    return { grids, icons, picked, r: this.fontSize() * 0.75 };
   });
 
   /** Inline room labels run smaller than the nose mark. */
