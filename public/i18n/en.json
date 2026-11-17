@@ -4250,7 +4250,8 @@
         "plan_missing": "The translation plan is missing.",
         "results_missing": "The results are missing.",
         "r2_not_configured": "Storage (R2) is not configured.",
-        "internal": "Internal error in the translation pipeline."
+        "internal": "Internal error in the translation pipeline.",
+        "worker_limit": "The job exceeded the worker's CPU or memory limit several times in a row and was stopped."
       },
       "glossary": {
         "title": "Glossary",

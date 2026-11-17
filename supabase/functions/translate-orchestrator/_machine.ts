@@ -21,8 +21,10 @@ import { addJudgeCandidates, resumeLearning, runLearning } from './_learn.ts';
 import type { LearnDb } from './_learn_db.ts';
 import { loadTm, makeOverlay, overlayKey, putLatestOverlay, readLocaleTable, saveTm, workKey } from './_io.ts';
 import type { OverlayMeta } from './_io.ts';
-import { detectOverrideAlerts } from './_alerts.ts';
-import type { AdminTerm, AlertRow } from './_alerts.ts';
+import type { AlertRow } from './_alerts.ts';
+import { runVerdict, WORKER_LIMIT_KEY } from './_attempts.ts';
+import { mergeParts, openReaders, scanPartKey, scanSlice, SCAN_SHARDS, shotsPartKey, SHOT_CHUNKS } from './_scan.ts';
+import type { ScanContext, ScanPart } from './_scan.ts';
 import type { Store } from './_io.ts';
 import { mask, unmask } from './_mask.ts';
 import {
@@ -66,7 +68,23 @@ export interface Stats {
   qa?: { ok: number; failed: number; reasons: Record<string, number>; dropped?: number };
   judge?: { n: number; mean: number } | null;
   ledgered?: string[];
+  /** Sliced estimating: where the job is (see stepEstimating). */
+  est?: EstState;
+  /** Heavy step in flight since (ISO); still set after RUN_STALE_MS = that run was killed (_attempts.ts). */
+  run_at?: string;
+  /** Killed runs in a row without progress. */
+  dead?: number;
   [k: string]: unknown;
+}
+
+export interface EstState {
+  phase: 'scan' | 'finalize' | 'shots' | 'complete';
+  /** scan: next English shard index; shots: next chunk index. */
+  cursor: number;
+  /** scan: shard count; shots: chunk count. */
+  total: number;
+  /** Scan shard count (kept after `total` turns into the chunk count) so the part files can be cleaned up. */
+  scans: number;
 }
 
 export interface Job {
@@ -138,6 +156,8 @@ export interface Deps {
   /** null = secret TRANSLATE_ANTHROPIC_API_KEY absent. */
   llm: Llm | null;
   now(): Date;
+  /** Monotonic ms for the slice budget (default `performance.now`); fakes may pin it. */
+  perfNow?(): number;
   log(msg: string, data?: Record<string, unknown>): void;
   /** Learning step adapter (`makeLearnDb`); absent = no learning, no cards (tests, older wiring). */
   learn?: LearnDb;
@@ -177,15 +197,6 @@ export interface PlanResult {
   plan: Plan;
   estimate: Estimate;
   stringCount: number;
-  /** Tables already read for the plan, reused by the B4 alert check (not persisted). */
-  inputs?: {
-    en: Record<string, string>;
-    baseEn: Record<string, string> | null;
-    cig: Record<string, string>;
-    cigFolder: string;
-    tm: Record<string, TmEntry>;
-    glossary: AdminTerm[];
-  };
 }
 
 export async function computePlan(
@@ -267,7 +278,6 @@ export async function computePlan(
   };
   return {
     plan, estimate, stringCount: diff.todo.reduce((a, u) => a + u.keys.length, 0),
-    inputs: { en, baseEn, cig, cigFolder: language.cig_folder || job.lang, tm, glossary: dbGlossary },
   };
 }
 
@@ -422,48 +432,169 @@ function glossaryFor(plan: Plan, db: GlossaryRow[]): GlossaryRow[] {
 
 // ── steps ────────────────────────────────────────────────────────────────────
 
-/**
- * B4: a delta whose English or CIG value changed under an admin correction raises an admin alert
- * with the diff. Never fails the job — an alert is advice, the translation goes on.
- */
-async function checkOverrideAlerts(deps: Deps, job: Job, r: PlanResult): Promise<void> {
-  if (!deps.alerts || job.mode !== 'delta' || !job.base_build_id || !r.inputs?.baseEn) return;
-  try {
-    const { en, baseEn, cig, cigFolder, tm, glossary } = r.inputs;
-    const baseCig = await readLocaleTable(deps.store, job.base_build_id, cigFolder);
-    const rows = await detectOverrideAlerts({ baseEn, en, baseCig, cig, tm, adminGlossary: glossary });
-    if (rows.length) await deps.alerts(job.lang, job.build_id, rows);
-  } catch (e) {
-    deps.log('translate override alerts failed', { lang: job.lang, error: String((e as Error)?.message ?? e) });
-  }
+// ── estimating (sliced) ───────────────────────────────────────────────────────
+//
+// `computePlan` does the whole diff in one request and needs far more CPU and memory than an edge
+// request has (546 on every tick, 2026-11). The tick therefore runs the same work in slices, each a
+// compare-and-set that persists its progress in `stats.est` and its output in R2:
+//
+//   scan      SCAN_SHARDS English shards per slice -> `scan-<cursor>.json` (diff, pairs, labels, alerts)
+//   finalize  merge the parts, glossary + system prompt + chunks -> `plan0`, `chunks`, `pairs`
+//   shots     SHOT_CHUNKS chunks per slice get their few-shot pairs -> `shots-<from>.json`
+//   complete  assemble the plan, estimate, caps / holds (unchanged logic) -> queued | awaiting_approval | ...
+//
+// A tick keeps slicing until ESTIMATE_BUDGET_MS of wall time is used (wall >= CPU, so conservative).
+
+/** Wall-clock budget of the slice loop of one tick. A slice always runs at least once. */
+export const ESTIMATE_BUDGET_MS = 900;
+
+const planPartKey = (jobId: string, name: string) => workKey(jobId, name);
+
+async function estimateCtx(deps: Deps, job: Job): Promise<{ ctx: ScanContext; dbGlossary: GlossaryRow[]; cigFolder: string }> {
+  const language = await deps.db.getLanguage(job.lang);
+  if (!language) throw new TranslateError('translate.lang_unknown');
+  const dbGlossary = await deps.db.listGlossary(job.lang);
+  const cigFolder = language.cig_folder || job.lang;
+  return {
+    dbGlossary,
+    cigFolder,
+    ctx: {
+      store: deps.store, buildId: job.build_id, lang: job.lang, mode: job.mode, baseBuildId: job.base_build_id, cigFolder,
+      forceTerms: dbGlossary.filter((g) => g.needs_retranslate).map((g) => g.source_term),
+      adminGlossary: dbGlossary,
+    },
+  };
 }
 
-async function stepEstimating(deps: Deps, job: Job): Promise<void> {
+/** One slice of the estimate. Returns the job after its CAS, or null when it lost the race. */
+async function estimateSlice(deps: Deps, job: Job): Promise<Job | null> {
+  const est = job.stats?.est;
+  const phase = est?.phase ?? 'scan';
+  const progress = { dead: undefined as number | undefined };
+
+  if (phase === 'scan') {
+    const { ctx } = await estimateCtx(deps, job);
+    const readers = await openReaders(ctx);
+    if (!readers.en.index || !readers.en.index.count) throw new TranslateError('translate.english_missing');
+    if (job.mode === 'delta') {
+      if (!job.base_build_id) throw new TranslateError('translate.no_base_build');
+      if (!readers.base?.index || !readers.base.index.count) throw new TranslateError('translate.base_build_missing');
+    }
+    const total = readers.en.names().length;
+    const cursor = est && est.total === total ? est.cursor : 0;
+    const part = await scanSlice(ctx, readers, cursor);
+    await deps.store.putJson(scanPartKey(job.id, cursor), part);
+    if (part.alerts.length && deps.alerts) {
+      // B4: advice for the admin, never a reason to fail the job (idempotent per key).
+      try {
+        await deps.alerts(job.lang, job.build_id, part.alerts);
+      } catch (e) {
+        deps.log('translate override alerts failed', { lang: job.lang, error: String((e as Error)?.message ?? e) });
+      }
+    }
+    const next = cursor + SCAN_SHARDS;
+    const state: EstState = { phase: next >= total ? 'finalize' : 'scan', cursor: next, total, scans: total };
+    return await deps.db.cas(job, { stats: addStats(job, { est: state, ...progress }) });
+  }
+
+  if (phase === 'finalize') {
+    const { dbGlossary } = await estimateCtx(deps, job);
+    const parts: ScanPart[] = [];
+    for (let c = 0; c < est!.total; c += SCAN_SHARDS) {
+      const p = await deps.store.getJson(scanPartKey(job.id, c)) as ScanPart | null;
+      if (!p) {
+        // A part vanished (cleanup raced a retry): scan again from the start.
+        return await deps.db.cas(job, { stats: addStats(job, { est: { phase: 'scan', cursor: 0, total: est!.total, scans: est!.total }, ...progress }) });
+      }
+      parts.push(p);
+    }
+    const merged = mergeParts(parts);
+    const forced = dbGlossary.filter((g) => g.needs_retranslate);
+    const derived = deriveCigLabels(merged.labelEn, merged.labelCig);
+    const glossary = mergeGlossary(dbGlossary, derived);
+    const notes = await loadNotes(deps.store, job.lang);
+    const style = deps.learn ? await deps.learn.getStyle(job.lang).catch(() => null) : null;
+    const system = buildSystem(job.lang, glossary, { style, notes });
+    const keysByHash: Record<string, string[]> = {};
+    const items: ChunkItem[] = merged.todo.map((u) => {
+      keysByHash[u.h] = u.keys;
+      return toChunkItem(u);
+    });
+    const settings = await deps.db.getSettings();
+    const chunks = buildChunks(items, (it) => keysByHash[it.h], {
+      lang: job.lang, loreModel: settings.lore_model || undefined, restModel: settings.rest_model || undefined,
+    });
+    const keyNotes: Record<string, string> = {};
+    for (const ks of Object.values(keysByHash)) for (const k of ks) if (notes.byKey[k]) keyNotes[k] = notes.byKey[k];
+    const plan0 = {
+      v: 1, build_id: job.build_id, lang: job.lang, mode: job.mode, system, keysByHash, reused: merged.reused,
+      forceIds: forced.map((g) => g.id!).filter(Boolean), counts: merged.counts, newGlossary: newRows(dbGlossary, derived), keyNotes,
+      stringCount: merged.todo.reduce((a, u) => a + u.keys.length, 0),
+    };
+    await deps.store.putJson(planPartKey(job.id, 'plan0'), plan0);
+    await deps.store.putJson(planPartKey(job.id, 'chunks'), chunks);
+    await deps.store.putJson(planPartKey(job.id, 'pairs'), merged.pairs);
+    const state: EstState = { phase: chunks.length ? 'shots' : 'complete', cursor: 0, total: chunks.length, scans: est!.total };
+    return await deps.db.cas(job, { stats: addStats(job, { est: state, ...progress }) });
+  }
+
+  if (phase === 'shots') {
+    const chunks = (await deps.store.getJson(planPartKey(job.id, 'chunks'))) as Chunk[] | null;
+    const pairs = (await deps.store.getJson(planPartKey(job.id, 'pairs'))) as CigPair[] | null;
+    if (!chunks || !pairs) throw new TranslateError('translate.plan_missing');
+    const index = buildFewShotIndex(pairs);
+    const out: Record<string, CigPair[]> = {};
+    for (const c of chunks.slice(est!.cursor, est!.cursor + SHOT_CHUNKS)) out[c.id] = pickSimilar(index, c.items, 8);
+    await deps.store.putJson(shotsPartKey(job.id, est!.cursor), out);
+    const next = est!.cursor + SHOT_CHUNKS;
+    const state: EstState = { phase: next >= est!.total ? 'complete' : 'shots', cursor: next, total: est!.total, scans: est!.scans };
+    return await deps.db.cas(job, { stats: addStats(job, { est: state, ...progress }) });
+  }
+
+  return await completeEstimate(deps, job, est!);
+}
+
+/** Assembles the plan and applies the estimate / caps. The spending logic is the unsliced one, unchanged. */
+async function completeEstimate(deps: Deps, job: Job, est: EstState): Promise<Job | null> {
   const { db, store } = deps;
   const settings = await db.getSettings();
-  let r: PlanResult;
-  try {
-    r = await computePlan(deps, job, settings);
-  } catch (e) {
-    if (e instanceof TranslateError && (e.key === 'translate.no_base_build' || e.key === 'translate.base_build_missing')) {
-      await db.cas(job, { status: 'skipped', error: e.key });
-      return;
-    }
-    throw e;
+  const plan0 = (await store.getJson(planPartKey(job.id, 'plan0'))) as (Omit<Plan, 'chunks' | 'fewShot'> & { stringCount: number }) | null;
+  const chunks = (await store.getJson(planPartKey(job.id, 'chunks'))) as Chunk[] | null;
+  if (!plan0 || !chunks) throw new TranslateError('translate.plan_missing');
+  const fewShot: Record<string, CigPair[]> = {};
+  for (let from = 0; from < chunks.length; from += SHOT_CHUNKS) {
+    const part = (await store.getJson(shotsPartKey(job.id, from))) as Record<string, CigPair[]> | null;
+    if (!part) throw new TranslateError('translate.plan_missing');
+    Object.assign(fewShot, part);
   }
-  const { plan, estimate, stringCount } = r;
-  await checkOverrideAlerts(deps, job, r);
-  const stats = addStats(job, { counts: plan.counts, estimate, phase: undefined, hold: undefined });
+  const { stringCount, ...rest } = plan0;
+  const plan: Plan = { ...rest, chunks, fewShot };
+  const estimate = estimateJob(
+    job.lang,
+    chunks.map((c) => ({ model: c.model, inputChars: c.inputChars, enChars: c.enChars, strings: c.items.length })),
+    estimateTokens(plan.system.length),
+  );
+  // The few-shot pairs ride in the (uncached) user message.
+  estimate.usd += (chunks.reduce((a, c) => a + (fewShot[c.id]?.length ?? 0), 0) * 60 * 0.9 * 3) / 1e6;
+
+  const stats = addStats(job, { counts: plan.counts, estimate, phase: undefined, hold: undefined, est: undefined, run_at: undefined, dead: undefined });
   const base = { string_count: stringCount, estimate_usd: round4(estimate.usd) };
+  const cleanup = async () => {
+    for (let c = 0; c < est.scans || c === 0; c += SCAN_SHARDS) await store.deleteKey(scanPartKey(job.id, c)).catch(() => {});
+    for (const n of ['plan0', 'chunks', 'pairs']) await store.deleteKey(planPartKey(job.id, n)).catch(() => {});
+    for (let from = 0; from < chunks.length; from += SHOT_CHUNKS) await store.deleteKey(shotsPartKey(job.id, from)).catch(() => {});
+  };
 
   if (!plan.chunks.length) {
     if (Object.keys(plan.reused).length) {
       await store.putJson(workKey(job.id, 'plan'), plan);
-      await db.cas(job, { ...base, status: 'publishing', stats });
-    } else {
-      await db.cas(job, { ...base, status: 'skipped', error: 'translate.nothing_to_do', stats });
+      const next = await db.cas(job, { ...base, status: 'publishing', stats });
+      if (next) await cleanup();
+      return next;
     }
-    return;
+    const next = await db.cas(job, { ...base, status: 'skipped', error: 'translate.nothing_to_do', stats });
+    if (next) await cleanup();
+    return next;
   }
   await store.putJson(workKey(job.id, 'plan'), plan);
   if (plan.newGlossary.length) await db.insertGlossary(job.lang, plan.newGlossary);
@@ -478,7 +609,27 @@ async function stepEstimating(deps: Deps, job: Job): Promise<void> {
       if (committed + estimate.usd > settings.monthly_cap_usd) hold = 'monthly_cap';
     }
   }
-  await db.cas(job, { ...base, status: hold ? 'awaiting_approval' : 'queued', stats: addStats({ ...job, stats }, { hold }) });
+  const next = await db.cas(job, { ...base, status: hold ? 'awaiting_approval' : 'queued', stats: addStats({ ...job, stats }, { hold }) });
+  if (next) await cleanup();
+  return next;
+}
+
+async function stepEstimating(deps: Deps, job: Job): Promise<void> {
+  const perf = deps.perfNow ?? (() => performance.now());
+  const t0 = perf();
+  let cur: Job | null = job;
+  try {
+    while (cur && cur.status === 'estimating') {
+      cur = await estimateSlice(deps, cur);
+      if (perf() - t0 > ESTIMATE_BUDGET_MS) break;
+    }
+  } catch (e) {
+    if (e instanceof TranslateError && (e.key === 'translate.no_base_build' || e.key === 'translate.base_build_missing')) {
+      await deps.db.cas((await deps.db.getJob(job.id)) ?? job, { status: 'skipped', error: e.key });
+      return;
+    }
+    throw e;
+  }
 }
 
 async function stepQueued(deps: Deps, job: Job): Promise<void> {
@@ -722,29 +873,60 @@ async function cancelBatches(deps: Deps, job: Job): Promise<void> {
   for (const b of job.batch_ids) await deps.llm.cancel(b.id).catch(() => {});
 }
 
+/**
+ * Steps that read whole tables / plans and can outlive an edge request. They carry the dead-run
+ * marker (`stats.run_at`, _attempts.ts) and at most one of them runs per tick. `validating` is not
+ * marked on purpose: its crash recovery (judge_submitting) reads `updated_at`, which a marker would refresh.
+ */
+const HEAVY: Status[] = ['estimating', 'publishing'];
+const isHeavy = (s: Status) => HEAVY.includes(s);
+
 export async function advance(deps: Deps, job: Job): Promise<Status> {
+  let cur = job;
+  const marked = isHeavy(job.status);
+  if (marked) {
+    // A stamp left by a run that never ended means the runtime killed it (546): count it, and after
+    // MAX_DEAD_ATTEMPTS in a row fail the job instead of repeating the same death every tick.
+    const v = runVerdict(job.stats, deps.now().getTime());
+    if (v.kind === 'busy') return job.status;
+    if (v.kind === 'fail') {
+      deps.log('translate job killed repeatedly', { job: job.id, status: job.status, dead: v.dead });
+      await fail(deps, job, WORKER_LIMIT_KEY);
+      return (await deps.db.getJob(job.id))?.status ?? job.status;
+    }
+    const stamped = await deps.db.cas(job, { stats: addStats(job, { run_at: deps.now().toISOString(), dead: v.dead || undefined }) });
+    if (!stamped) return job.status;
+    cur = stamped;
+  }
   try {
-    switch (job.status) {
-      case 'estimating': await stepEstimating(deps, job); break;
-      case 'queued': await stepQueued(deps, job); break;
-      case 'submitted': await stepSubmitted(deps, job); break;
-      case 'validating': await stepValidating(deps, job); break;
-      case 'post_editing': await stepPostEditing(deps, job); break;
-      case 'publishing': await stepPublishing(deps, job); break;
+    switch (cur.status) {
+      case 'estimating': await stepEstimating(deps, cur); break;
+      case 'queued': await stepQueued(deps, cur); break;
+      case 'submitted': await stepSubmitted(deps, cur); break;
+      case 'validating': await stepValidating(deps, cur); break;
+      case 'post_editing': await stepPostEditing(deps, cur); break;
+      case 'publishing': await stepPublishing(deps, cur); break;
     }
   } catch (e) {
-    if (e instanceof LostRace) return job.status;
+    if (e instanceof LostRace) return cur.status;
     if (e instanceof TranslateError) {
-      await fail(deps, job, e.key);
+      await fail(deps, (await deps.db.getJob(job.id)) ?? cur, e.key);
     } else {
-      const fresh = (await deps.db.getJob(job.id)) ?? job;
+      const fresh = (await deps.db.getJob(job.id)) ?? cur;
       const attempts = (fresh.stats?.attempts ?? 0) + 1;
       deps.log('translate step error', { job: job.id, status: fresh.status, error: String((e as Error)?.message ?? e) });
       if (attempts >= MAX_ATTEMPTS) await fail(deps, fresh, 'translate.internal');
       else await deps.db.cas(fresh, { stats: addStats(fresh, { attempts }) });
     }
   }
-  return (await deps.db.getJob(job.id))?.status ?? job.status;
+  const after = (await deps.db.getJob(job.id)) ?? cur;
+  if (marked && after.status === job.status && after.stats?.run_at) {
+    // The run ended: clear the stamp. Any CAS since the stamp is progress, so the dead count restarts.
+    const progressed = after.updated_at !== cur.updated_at;
+    await deps.db.cas(after, { stats: addStats(after, { run_at: undefined, dead: progressed ? undefined : after.stats.dead }) });
+    return (await deps.db.getJob(job.id))?.status ?? after.status;
+  }
+  return after.status;
 }
 
 export interface TickSummary {
@@ -758,10 +940,15 @@ export async function tick(deps: Deps, budgetMs = 110_000): Promise<TickSummary[
   const settings = await deps.db.getSettings();
   const started = deps.now().getTime();
   const out: TickSummary[] = [];
+  let heavyDone = false;
   for (const job of await deps.db.listOpenJobs()) {
     if (deps.now().getTime() - started > budgetMs) break;
     if (!settings.enabled && (job.status === 'estimating' || job.status === 'queued')) continue;
-    out.push({ id: job.id, lang: job.lang, from: job.status, to: await advance(deps, job) });
+    // One heavy job per tick: two of them in one request would add up to the limit.
+    if (isHeavy(job.status) && heavyDone) continue;
+    const to = await advance(deps, job);
+    if (isHeavy(job.status) && !['failed', 'skipped', 'cancelled'].includes(to)) heavyDone = true;
+    out.push({ id: job.id, lang: job.lang, from: job.status, to });
   }
   // Learning batches started on an earlier tick (arbiter, Haiku, align, web) are read here.
   if (deps.learn && deps.now().getTime() - started <= budgetMs) {

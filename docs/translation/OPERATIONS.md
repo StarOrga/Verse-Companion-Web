@@ -50,10 +50,27 @@ shards missing) ends the job `skipped` (`translate.no_base_build` / `translate.b
 
 `translate.no_api_key` · `translate.english_missing` · `translate.lang_unknown` ·
 `translate.plan_missing` · `translate.results_missing` · `translate.internal` (5 failed attempts of
-one step) · `translate.nothing_to_do` (skipped).
+one step) · `translate.nothing_to_do` (skipped) ·
+`translate.worker_limit` (the worker was killed by the runtime's CPU / memory limit 3 times in a row).
 A transient error (network, R2) only bumps `stats.attempts`; the next tick retries the same step.
 A crash between the claim and the batch creation is retried after 15 minutes; in the worst case it
 leaves one orphan batch (visible in the Console) that is paid but unused.
+
+## Estimating runs in slices (why a tick cannot die on it)
+
+A string table is ~90k keys per build and language, so the whole diff does not fit one edge request
+(about 2 s CPU, 256 MB). `estimating` therefore advances in slices that persist their progress in
+`stats.est` (`phase`: `scan` -> `finalize` -> `shots` -> `complete`, `cursor`, `total`) and their output
+in `translation-work/<job>/` (R2): `scan` reads `SCAN_SHARDS` (8) English shards per slice and looks the same keys up in the
+base / CIG tables through the shard layout; `shots` picks the few-shot pairs of 15 chunks per slice. A tick
+keeps slicing for ~0.9 s of wall time, at most **one** estimating / publishing job per tick. Tunables:
+`SCAN_SHARDS`, `SHOT_CHUNKS` (`_scan.ts`), `ESTIMATE_BUDGET_MS` (`_machine.ts`).
+
+A worker the runtime kills (546) never reaches a catch block. Before an estimating / publishing step the
+driver stamps `stats.run_at`; a clean end clears it. A stamp older than 5 minutes is a dead run and bumps
+`stats.dead` (it restarts at 0 whenever a slice commits). The third dead run in a row without progress
+ends the job `failed` / `translate.worker_limit` instead of repeating it every 10 minutes. The stamp is
+also the concurrency guard: a young stamp makes another tick leave the job alone.
 
 ## Rough cost (batch prices: Sonnet 5.5 $2/$10, Opus 5.5 $4/$20 per MTok)
 
