@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject } from '@angular/core';
 import { AuthService } from '../../auth/auth.service';
 import { toErrorKey } from '../../core/describe-error';
 import { SupabaseClientProvider } from '../../core/supabase.client';
@@ -7,6 +7,7 @@ import { HangarService } from '../../hangar/hangar.service';
 import { HangarShipOrigin } from '../../hangar/hangar.types';
 import { HqInventoryService } from '../data/hq-inventory.service';
 import { WishlistStore, upcomingClassName } from '../data/wishlist.store';
+import { HqSuppliesService } from '../hq-supplies.service';
 import { followAnnounced, ingameSources, nextShipCopies } from './nachschub.model';
 
 /**
@@ -30,6 +31,7 @@ export class NachschubEdgeService {
   private readonly hangar = inject(HangarService);
   private readonly wish = inject(WishlistStore);
   private readonly searchWish = inject(SearchWishlistService);
+  private readonly injector = inject(Injector);
 
   /** i18n key of the last failure, else null. */
   lastError: string | null = null;
@@ -98,6 +100,11 @@ export class NachschubEdgeService {
       if (!ship) continue;
       if (qty > 1) await this.hangar.updateShip(ship.id, { qty });
       await this.wish.remove('upcoming', row.className, row.name);
+      // The wish changed its key (upcoming:<folded> -> ship:<Class>): its assignments follow it (M2), or they would be
+      // lines of a wish that no longer exists.
+      const supplies = this.injector.get(HqSuppliesService);
+      const lines = supplies.items().filter((l) => l.source === 'wish' && l.entityKind === 'upcoming' && (l.className ?? '').toLowerCase() === row.className.toLowerCase());
+      if (lines.length) supplies.retarget(lines.map((l) => l.id), 'ship', h.shipClassName);
       done.push(h.shipClassName);
     }
     return done;

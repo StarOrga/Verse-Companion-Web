@@ -7,7 +7,7 @@ import { HangarService } from '../../hangar/hangar.service';
 import { HqOwnershipService } from '../hq-ownership.service';
 import { HqLiveService } from '../now/hq-live.service';
 import { isGameLive, readLocation } from '../now/hq-live.util';
-import { HqSuppliesService, SupplyUnit, lineAmount, roundAmount } from '../hq-supplies.service';
+import { HqSuppliesService, SupplyItem, SupplyUnit, lineAmount, roundAmount } from '../hq-supplies.service';
 import { NachschubEdgeService } from '../nachschub/nachschub-edge.service';
 import { stockMatches } from '../nachschub/nachschub-stock';
 import type { RemovalPlan } from '../nachschub/nachschub.model';
@@ -413,9 +413,12 @@ export class ItemPathService {
       else this.supplies.setQty(line.id, line.qty - n);
     }
     if (tracked) void nachschub?.reconcile();
-    // A wish line is the wish's assignment (A1/A8): the arrival answers the wish in full and the line closes as
-    // reached. Any other line (Bestand, manual) answers what it asked for; only the rest answers the item's own wish.
-    const toWish = line && !isWishLine(line) ? Math.max(0, n - lineAmount(line)) : n;
+    // What the open lines of active Nachschuebe ask for answers them first - whichever line the stock rise closes, a
+    // wish line then lowers its wish once by the whole line (NachschubService.fulfilWishLines, H2). A loose line
+    // answers its own part here. Only the rest answers the item's own wish directly, so nothing is counted twice.
+    const trackedNeed = this.trackedLines(className).reduce((s, l) => s + lineAmount(l), 0);
+    const looseNeed = line && !tracked ? lineAmount(line) : 0;
+    const toWish = Math.max(0, n - trackedNeed - looseNeed);
     // SCU stock answers a material wish; an item wished as such keeps its own kind.
     const wishKind = scu && !this.wishlist.has(kind, className, name) ? 'material' : kind;
     const wish = toWish > 1e-9 ? await this.fulfilOwnWish(wishKind, className, name, scu ? Math.ceil(toWish - 1e-9) : toWish) : null;
@@ -434,10 +437,31 @@ export class ItemPathService {
           }
         }
         const back = wish ? await wish.restore() : true;
+        // A wish line that was met and is open again gives its pieces back to the wish (NachschubService.reconcile).
+        if (tracked) void nachschub?.reconcile();
         if (!reopened) return fail('itemPath.err.failed');
         return removed && back ? { ok: true, key: 'itemPath.done.undone', params: { name } } : fail('itemPath.err.failed');
       },
     };
+  }
+
+  /** Open lines of a class that sit in an active Nachschub (they close by the stock rise, not here). */
+  private trackedLines(className: string): SupplyItem[] {
+    const open = this.supplies.openLinesFor(className).filter((l) => !!l.packageId);
+    if (!open.length) return [];
+    const active = new Set(this.injector.get(NachschubService).active().map((p) => p.id));
+    return open.filter((l) => active.has(l.packageId ?? ''));
+  }
+
+  /** A tracked wish line answers the arrival: the Nachschub reconcile closes it and lowers the wish once. No wish change here. */
+  private lineAnswers(): null {
+    void this.injector.get(NachschubService).reconcile();
+    return null;
+  }
+
+  /** An open wish line of this ship in an active Nachschub: then the line answers a new copy, not the wish directly. */
+  private shipWishTracked(className: string): boolean {
+    return this.trackedLines(className).some((l) => isWishLine(l));
   }
 
   /** The stepper of the Inventar popover: stock at one place moves, a Nachschub line stays as it is. */
@@ -502,7 +526,7 @@ export class ItemPathService {
         const before = had.qty ?? 1;
         const copies = await this.injector.get(NachschubEdgeService).addShipCopy(className);
         if (!copies) return fail('itemPath.err.failed');
-        const wish = await this.fulfilOwnWish('ship', className, name, 1);
+        const wish = this.shipWishTracked(className) ? this.lineAnswers() : await this.fulfilOwnWish('ship', className, name, 1);
         return {
           ok: true,
           ...(wish ? this.wishDone(label, wish) : { key: 'itemPath.done.hangarCopy', params: { name: label, n: copies } }),
@@ -516,7 +540,7 @@ export class ItemPathService {
       const added = await this.hangar.addShip(className, 'owned');
       if (!added) return fail('itemPath.err.failed');
       // A wish kept from an earlier copy (removed from the Hangar since) is answered by this one.
-      const wish = await this.fulfilOwnWish('ship', className, name, 1);
+      const wish = this.shipWishTracked(className) ? this.lineAnswers() : await this.fulfilOwnWish('ship', className, name, 1);
       return {
         ok: true,
         ...(wish ? this.wishDone(label, wish) : { key: 'itemPath.done.hangar', params: { name: label } }),
@@ -534,7 +558,11 @@ export class ItemPathService {
   /** A ship wished `wished` times is bought once: the row owns one copy, the rest stays on the wishlist. */
   private async buyWishedShip(id: string, wished: number, className: string, label: string): Promise<PathResult> {
     if (!(await this.hangar.updateShip(id, { status: 'owned', qty: 1 }))) return fail('itemPath.err.failed');
-    const left = wished - 1;
+    // With a wish line of the ship in an Operation the line answers the copy (and lowers the wish once when it is
+    // met): the wish keeps its full quantity, now as the owned ship's wish.
+    const tracked = this.shipWishTracked(className);
+    if (tracked) this.lineAnswers();
+    const left = wished - (tracked ? 0 : 1);
     if (left > 0 && !(await this.wishlist.setQty('ship', className, label, left))) {
       // The move is one step for the reader: a wish that cannot stay keeps the purchase out too.
       await this.hangar.updateShip(id, { status: 'wishlist', qty: wished });

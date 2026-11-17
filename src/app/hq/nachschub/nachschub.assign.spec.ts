@@ -30,7 +30,9 @@ interface Ln {
   source: string;
   gather: null;
   stepKind: string | null;
+  minQuality: number | null;
   updatedAt: string;
+  createdAt: string;
   deletedAt: string | null;
 }
 
@@ -40,29 +42,50 @@ const tick = (): string => `2026-11-17T10:${String(Math.floor(clock / 60)).padSt
 class FakeSupplies {
   readonly rows = signal<Ln[]>([]);
   readonly items = computed(() => this.rows().filter((r) => !r.deletedAt));
+  /** The server's copy of each line's source (the compare-and-set runs against it). */
+  readonly server = new Map<string, string>();
+  /** The compare-and-set fails (offline). */
+  casFails = false;
+  casCalls = 0;
   private n = 0;
   addLine(name: string, qty: number, meta: { entityKind?: string; className?: string; forClassName?: string | null; packageId?: string | null; source?: string } = {}) {
     const pkg = meta.packageId ?? null;
-    const same = this.items().find((i) => !i.done && i.name.toLowerCase() === name.toLowerCase() && i.packageId === pkg && (i.forClassName ?? '') === (meta.forClassName ?? ''));
+    // Same predicate as HqSuppliesService.addLine, including the wish / non-wish split (H1).
+    const same = this.items().find(
+      (i) => !i.done && i.name.toLowerCase() === name.toLowerCase() && i.packageId === pkg && (i.forClassName ?? '') === (meta.forClassName ?? '') && (i.source === 'wish') === (meta.source === 'wish'),
+    );
     if (same) {
       this.patch(same.id, { qty: same.qty + qty });
       return { id: same.id, prevQty: same.qty, prevAmount: null };
     }
     const id = `L${++this.n}`;
+    const at = tick();
     this.rows.update((rs) => [
       ...rs,
       {
-        id, name, qty, amount: null, unit: null, done: false, entityKind: meta.entityKind ?? null, className: meta.className ?? null,
-        forClassName: meta.forClassName ?? null, packageId: pkg, source: meta.source ?? 'manual', gather: null, stepKind: null, updatedAt: tick(), deletedAt: null,
+        id, name, qty, amount: null, unit: null, done: false, entityKind: meta.entityKind ?? null, className: meta.className ?? null, minQuality: null,
+        forClassName: meta.forClassName ?? null, packageId: pkg, source: meta.source ?? 'manual', gather: null, stepKind: null, updatedAt: at, createdAt: at, deletedAt: null,
       },
     ]);
+    this.server.set(id, meta.source ?? 'manual');
     return { id, prevQty: 0, prevAmount: null };
   }
   /** A line as it was written before this change (or by any other path). */
   put(l: Partial<Ln> & Pick<Ln, 'name' | 'qty' | 'className' | 'packageId'>): string {
     const id = `L${++this.n}`;
-    this.rows.update((rs) => [...rs, { id, amount: null, unit: null, done: false, entityKind: 'item', forClassName: null, source: 'search', gather: null, stepKind: null, updatedAt: tick(), deletedAt: null, ...l }]);
+    const at = tick();
+    const row: Ln = { id, amount: null, unit: null, done: false, entityKind: 'item', forClassName: null, source: 'search', gather: null, stepKind: null, minQuality: null, updatedAt: at, createdAt: at, deletedAt: null, ...l };
+    this.rows.update((rs) => [...rs, row]);
+    this.server.set(id, row.source);
     return id;
+  }
+  async casSource(ids: readonly string[], from: string, to: string): Promise<string[] | null> {
+    this.casCalls++;
+    if (this.casFails) return null;
+    const won = ids.filter((id) => this.server.get(id) === from);
+    for (const id of won) this.server.set(id, to);
+    this.rows.update((rs) => rs.map((r) => (ids.includes(r.id) && this.server.has(r.id) ? { ...r, source: this.server.get(r.id) as string } : r)));
+    return won;
   }
   private patch(id: string, p: Partial<Ln>) {
     this.rows.update((rs) => rs.map((r) => (r.id === id ? { ...r, ...p, updatedAt: tick() } : r)));
@@ -107,7 +130,15 @@ interface WishRow {
 class FakeWish {
   readonly rows = signal<WishRow[]>([]);
   readonly loaded = signal(true);
+  failOn = new Set<string>();
+  reloads = 0;
+  reloadFails = false;
+  async reload(): Promise<boolean> {
+    this.reloads++;
+    return !this.reloadFails;
+  }
   async setQty(e: { kind: string; className: string; name?: string | null; forClassName?: string | null }, qty: number): Promise<boolean> {
+    if (this.failOn.has(e.className)) return false;
     const f = e.forClassName ?? '';
     const hit = this.rows().find((r) => r.kind === e.kind && r.className === e.className && r.forClassName === f);
     if (qty <= 0) this.rows.update((rs) => rs.filter((r) => r !== hit));
@@ -139,6 +170,7 @@ describe('NachschubService: wishes assigned to an Operation', () => {
   let einsaetze: ReturnType<typeof signal<{ id: string; packageId: string; status: string }[]>>;
   let stock: ReturnType<typeof signal<{ class_name: string | null; qty: number }[]>>;
   let tracked: [string, unknown][];
+  let failDrop: boolean;
   let svc: NachschubService;
 
   const idOf = (call: FakeCall): unknown =>
@@ -154,6 +186,7 @@ describe('NachschubService: wishes assigned to an Operation', () => {
     }
     const update = chainArgs(call, 'update');
     if (update) {
+      if (failDrop && (update[0] as Partial<ServerPkg>).deleted_at) return { error: { code: '500', message: 'boom' } };
       const hit = server.find((s) => s.id === idOf(call));
       if (hit) Object.assign(hit, update[0]);
       return { data: hit ? [{ id: hit.id }] : [] };
@@ -165,6 +198,7 @@ describe('NachschubService: wishes assigned to an Operation', () => {
     TestBed.resetTestingModule();
     server = [];
     tracked = [];
+    failDrop = false;
     supplies = new FakeSupplies();
     wish = new FakeWish();
     einsaetze = signal([]);
@@ -357,35 +391,179 @@ describe('NachschubService: wishes assigned to an Operation', () => {
     stock.set([{ class_name: 'medpen', qty: 2 }]);
     await svc.reconcile();
     const lines = svc.linesOf(id);
-    expect(lines.find((l) => l.className === 'medpen')?.done).toBe(true);
+    const medLine = lines.find((l) => l.className === 'medpen');
+    expect(medLine?.done).toBe(true);
+    expect(medLine?.source).toBe('wish_met');
     expect(lines.length).toBe(2);
     expect(svc.evaluation(id)?.progress).toEqual({ done: 1, total: 2 });
+    // H2: the reached pieces are no longer wished - the wish shrank by the whole line, nothing turned free.
+    expect(wish.qty('medpen')).toBe(0);
+    expect(alloc()).toEqual(expect.objectContaining({ wished: 0, assigned: 0, free: 0 }));
+  });
+
+  it('H2: a met line lowers its wish exactly once; reopening it gives the pieces back once', async () => {
+    wishFor('medpen', 5);
+    wishFor('rattler', 1);
+    await svc.assignWish(medpen, 3, 'new', { name: 'Op' });
+    // A second line keeps the Operation active (a finished one archives itself).
+    await svc.assignWish({ kind: 'item', className: 'rattler', forClassName: null }, 1, pkgNamed('Op')?.id ?? '');
+    const line = alloc().assignments[0].lineIds[0];
+    await svc.reconcile();
+    stock.set([{ class_name: 'medpen', qty: 1 }]);
+    await svc.reconcile();
+    // A partial arrival answers the line, not the wish: still 5 wished, 3 assigned, 2 free.
+    expect(alloc()).toEqual(expect.objectContaining({ wished: 5, assigned: 3, free: 2 }));
+    supplies.setDone(line, true); // ticked by hand (or by a whole live purchase)
+    await svc.reconcile();
+    await svc.reconcile();
+    expect(wish.qty('medpen')).toBe(2);
+    expect(alloc()).toEqual(expect.objectContaining({ wished: 2, assigned: 0, free: 2 }));
+    supplies.setDone(line, false);
+    await svc.reconcile();
+    await svc.reconcile();
+    expect(wish.qty('medpen')).toBe(5);
+    expect(alloc().assigned).toBe(3);
+  });
+
+  it('H1: a wish never merges into a Bestand line of the same item, and a Bestand line never into a wish line', async () => {
+    wishFor('medpen', 3);
+    await svc.assignWish(medpen, 1, 'new', { name: 'Op' });
+    const id = pkgNamed('Op')?.id ?? '';
+    await svc.addToNachschub(id, [{ name: 'medpen', className: 'medpen', amount: 4, unit: 'pcs' }]);
+    expect(alloc()).toEqual(expect.objectContaining({ assigned: 1, free: 2 }));
+    await svc.assignWish(medpen, 2, id);
+    const lines = svc.linesOf(id).map((l) => [l.source, l.qty]);
+    expect(lines).toEqual([['wish', 3], ['search', 4]]);
+    expect(alloc()).toEqual(expect.objectContaining({ assigned: 3, free: 0 }));
+  });
+
+  it('M1: when a dissolve fails the lines of that Operation are lowered as well, never above the wish', async () => {
+    wishFor('medpen', 2);
+    await svc.assignWish(medpen, 2, 'new', { name: 'Solo' });
+    failDrop = true;
+    const r = await svc.applyWishRemoval(medpen, 2);
+    expect(r).toEqual(expect.objectContaining({ ok: true, warn: { key: 'hq.nachschub.dissolveFailed' } }));
+    expect(pkgNamed('Solo')).toBeDefined();
+    expect(wish.qty('medpen')).toBe(0);
     expect(alloc().assigned).toBe(0);
   });
 
-  it('A11: old wish lines are counted back onto the wishlist once and relabelled; events, closed and pick-up lines stay', async () => {
-    server = [
-      { id: 'N1', name: 'Normal', status: 'active', slot: 1, snapshot: {}, archived_at: null, deleted_at: null, created_at: tick() },
-      { id: 'E1', name: 'Event', status: 'active', slot: 2, snapshot: {}, type: 'event', archived_at: null, deleted_at: null, created_at: tick() },
-    ];
-    await svc.reload();
-    wishFor('medpen', 1);
-    const old = supplies.put({ name: 'Medpen', qty: 3, className: 'medpen', packageId: 'N1' });
-    const closed = supplies.put({ name: 'Rattler', qty: 2, className: 'rattler', packageId: 'N1', done: true });
-    const pickup = supplies.put({ name: 'Gallant', qty: 2, className: 'gallant', packageId: 'N1', stepKind: 'pickup' });
-    const event = supplies.put({ name: 'Arrow', qty: 1, className: 'arrow', packageId: 'E1' });
+  it('M3: an event Nachschub keeps the old rule - its picks leave the wishlist and it never holds a wish', async () => {
+    wishFor('medpen', 3);
+    const r = await svc.createFromWishlist({ picks: [{ key: 'item:medpen', qty: 2 }], name: 'Ev', event: { type: 'event', eventId: 'ev1', name: 'Ev', rewards: [] } });
+    expect(r.ok).toBe(true);
+    expect(wish.qty('medpen')).toBe(1);
+    expect(svc.linesOf(r.id!).map((l) => l.source)).toEqual(['search']);
+    expect(alloc()).toEqual(expect.objectContaining({ wished: 1, assigned: 0, free: 1 }));
+    expect(svc.planWishRemoval(medpen, 1).parts).toEqual([]);
+    await svc.applyWishRemoval(medpen, 1);
+    expect(pkgNamed('Ev')).toBeDefined();
+    await r.undo?.();
+    expect(wish.qty('medpen')).toBe(2); // 0 after the removal, the undo puts back the 2 the event took
+  });
 
-    expect(await svc.reconcileLegacyWishLines()).toBe(1);
-    expect(wish.qty('medpen')).toBe(4);
-    expect(supplies.line(old)?.source).toBe('wish');
-    expect(alloc()).toEqual(expect.objectContaining({ wished: 4, assigned: 3, free: 1 }));
-    expect([closed, pickup, event].map((l) => supplies.line(l)?.source)).toEqual(['search', 'search', 'search']);
-    expect(wish.qty('rattler') + wish.qty('gallant') + wish.qty('arrow')).toBe(0);
+  it('M4: "most recently assigned" follows the creation of the lines, not later edits', async () => {
+    wishFor('medpen', 4);
+    await svc.assignWish(medpen, 2, 'new', { name: 'Old' });
+    await svc.assignWish(medpen, 2, 'new', { name: 'New' });
+    const oldLine = svc.linesOf(pkgNamed('Old')?.id ?? '')[0].id;
+    supplies.setLine(oldLine, 2); // an edit (or a sync) touches the older line later
+    expect(svc.planWishRemoval(medpen, 1).parts.map((p) => [p.packageName, p.qty])).toEqual([['New', 1], ['Old', 0]]);
+  });
 
-    // Idempotent: a later pass (another session, another device after the relabel synced) finds nothing left.
-    (svc as unknown as { legacyReconciled: boolean }).legacyReconciled = false;
-    expect(await svc.reconcileLegacyWishLines()).toBe(0);
-    expect(wish.qty('medpen')).toBe(4);
+  it('M2: wish lines above a wish lowered elsewhere are trimmed (newest first) after a fresh read; a stale read trims nothing', async () => {
+    wishFor('medpen', 4);
+    await svc.assignWish(medpen, 2, 'new', { name: 'Old' });
+    await svc.assignWish(medpen, 2, 'new', { name: 'New' });
+    await wish.setQty({ kind: 'item', className: 'medpen' }, 1); // the cart lowered it without the dialog
+    wish.reloadFails = true;
+    await svc.reconcile();
+    expect(alloc().assignments.map((a) => a.qty)).toEqual([2, 2]);
+    wish.reloadFails = false;
+    await svc.reconcile();
+    expect(alloc().assignments.map((a) => [a.packageName, a.qty])).toEqual([['Old', 1]]);
+    await wish.setQty({ kind: 'item', className: 'medpen' }, 0); // the wish is gone: its lines go too
+    await svc.reconcile();
+    expect(alloc().assigned).toBe(0);
+    expect(svc.linesOf(pkgNamed('Old')?.id ?? '').length).toBe(0);
+  });
+
+  describe('A11 legacy lines (H3)', () => {
+    const wishKind = (kind: string, className: string, qty: number, forClassName = '') =>
+      wish.rows.update((rs) => [...rs, { kind, className, name: className, qty, forClassName }]);
+    const material = { kind: 'material', className: 'iron', forClassName: null };
+
+    beforeEach(async () => {
+      server = [
+        { id: 'N1', name: 'Normal', status: 'active', slot: 1, snapshot: {}, archived_at: null, deleted_at: null, created_at: tick() },
+        { id: 'E1', name: 'Event', status: 'active', slot: 2, snapshot: {}, type: 'event', archived_at: null, deleted_at: null, created_at: tick() },
+      ];
+      await svc.reload();
+    });
+
+    it('only certain old wish lines are counted back; plain item / ship lines, SCU, quality, stops, events and closed lines stay', async () => {
+      wishKind('material', 'iron', 1);
+      const old = supplies.put({ name: 'Iron', qty: 3, className: 'iron', entityKind: 'material', packageId: 'N1' });
+      const forBp = supplies.put({ name: 'Bolt', qty: 2, className: 'bolt', packageId: 'N1', forClassName: 'bp_gun' });
+      const others = [
+        supplies.put({ name: 'Medpen', qty: 3, className: 'medpen', packageId: 'N1' }), // a Bestand line without a place looks like this
+        supplies.put({ name: 'Polaris', qty: 1, className: 'polaris', entityKind: 'ship', packageId: 'N1' }), // a reward that stayed in a normal one
+        supplies.put({ name: 'Ore', qty: 1, className: 'ore', entityKind: 'material', packageId: 'N1', amount: 0.5 }),
+        supplies.put({ name: 'Steel', qty: 1, className: 'steel', entityKind: 'material', packageId: 'N1', minQuality: 700 }),
+        supplies.put({ name: 'Gold', qty: 2, className: 'gold', entityKind: 'material', packageId: 'N1', stepKind: 'pickup' }),
+        supplies.put({ name: 'Rattler', qty: 2, className: 'rattler', entityKind: 'material', packageId: 'N1', done: true }),
+        supplies.put({ name: 'Arrow', qty: 1, className: 'arrow', entityKind: 'material', packageId: 'E1' }),
+      ];
+      expect(await svc.reconcileLegacyWishLines()).toBe(2);
+      expect(wish.qty('iron')).toBe(4);
+      expect(wish.rows().find((r) => r.className === 'bolt')).toEqual(expect.objectContaining({ kind: 'item', qty: 2, forClassName: 'bp_gun' }));
+      expect([old, forBp].map((l) => supplies.line(l)?.source)).toEqual(['wish', 'wish']);
+      expect(others.map((l) => supplies.line(l)?.source)).toEqual(others.map(() => 'search'));
+      expect(['medpen', 'polaris', 'ore', 'steel', 'gold', 'rattler', 'arrow'].map((c) => wish.qty(c))).toEqual([0, 0, 0, 0, 0, 0, 0]);
+      expect(svc.allocationOf(material)).toEqual(expect.objectContaining({ wished: 4, assigned: 3, free: 1 }));
+    });
+
+    it('runs once: a second pass, and a device whose line another device already relabelled, add nothing', async () => {
+      wishKind('material', 'iron', 1);
+      const a = supplies.put({ name: 'Iron', qty: 3, className: 'iron', entityKind: 'material', packageId: 'N1' });
+      expect(await svc.reconcileLegacyWishLines()).toBe(1);
+      (svc as unknown as { legacyReconciled: boolean }).legacyReconciled = false;
+      expect(await svc.reconcileLegacyWishLines()).toBe(0);
+      expect(wish.qty('iron')).toBe(4);
+
+      // Another device won the server row first: this one still holds a stale 'search' copy.
+      const b = supplies.put({ name: 'Copper', qty: 2, className: 'copper', entityKind: 'material', packageId: 'N1' });
+      supplies.server.set(b, 'wish');
+      (svc as unknown as { legacyReconciled: boolean }).legacyReconciled = false;
+      expect(await svc.reconcileLegacyWishLines()).toBe(0);
+      expect(wish.qty('copper')).toBe(0);
+      expect(supplies.line(b)?.source).toBe('wish'); // the local copy adopts the server's label
+      expect(supplies.line(a)?.source).toBe('wish');
+    });
+
+    it('a failed wishlist write puts the label back, so the retry adds the pieces exactly once; offline changes nothing', async () => {
+      wishKind('material', 'iron', 1);
+      const a = supplies.put({ name: 'Iron', qty: 3, className: 'iron', entityKind: 'material', packageId: 'N1' });
+      supplies.casFails = true;
+      expect(await svc.reconcileLegacyWishLines()).toBe(0);
+      supplies.casFails = false;
+      wish.failOn.add('iron');
+      expect(await svc.reconcileLegacyWishLines()).toBe(0);
+      expect(supplies.line(a)?.source).toBe('search');
+      expect(wish.qty('iron')).toBe(1);
+      wish.failOn.clear();
+      expect(await svc.reconcileLegacyWishLines()).toBe(1);
+      expect(wish.qty('iron')).toBe(4);
+    });
+
+    it('the 999 cap: what does not fit on the wish is taken off the lines, never assigned beyond the wish', async () => {
+      wishKind('material', 'iron', 997);
+      const a = supplies.put({ name: 'Iron', qty: 5, className: 'iron', entityKind: 'material', packageId: 'N1' });
+      expect(await svc.reconcileLegacyWishLines()).toBe(1);
+      expect(wish.qty('iron')).toBe(999);
+      expect(supplies.line(a)?.qty).toBe(2);
+      expect(svc.allocationOf(material)).toEqual(expect.objectContaining({ wished: 999, assigned: 2 }));
+    });
   });
 
   it('the picker lists active normal Operationen newest first with progress and the slots', async () => {

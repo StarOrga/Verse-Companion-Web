@@ -102,6 +102,7 @@ interface AddedPick {
 
 const asPicks = (lines: readonly AddedLine[]): Pick<AddedPick, 'line'>[] => lines.map((line) => ({ line }));
 const capWarn = (lost: number): NachschubResult['warn'] => (lost > 0 ? { key: 'hq.nachschub.wishCapped', params: { count: lost } } : undefined);
+const NO_SHIFT: ShiftResult = { ok: true, lost: 0, applied: [] };
 const inverse = (applied: readonly Shift[]): Shift[] => [...applied].reverse().map((a) => ({ p: a.p, delta: -a.delta }));
 
 /**
@@ -301,7 +302,9 @@ export class NachschubService {
     await this.reload(); // another tab may have taken a slot or freed one
     const slot = freeSlot(this.packages());
     if (slot === null) return fail('hq.nachschub.slotsFull');
-    // A1: only FREE pieces can be assigned; the wish keeps its quantity, the line is the assignment.
+    // A1: only FREE pieces can be assigned; the wish keeps its quantity, the line is the assignment. An event
+    // Nachschub keeps the old rule (M3): its picks leave the wishlist and its lines are no assignments.
+    const moveOff = !!opts.event;
     const { taken } = takeFromWishlist(this.freeWishPositions(), opts.picks);
     if (!taken.length && !opts.event) return fail('hq.nachschub.nothingPicked');
     const stock = await this.ensureStock();
@@ -314,7 +317,7 @@ export class NachschubService {
     const snapshot: Record<string, number> = {};
     let skipped = 0;
     for (const p of taken) {
-      const added = this.addPick(p, id, label(p));
+      const added = this.addPick(p, id, label(p), moveOff ? 'search' : 'wish');
       if (!added) {
         skipped++;
         continue;
@@ -339,6 +342,12 @@ export class NachschubService {
       this.undoPicks([...lines, ...asPicks(rewardLines)]);
       return fail(this.error() ?? 'errors.generic');
     }
+    const took = moveOff ? await this.shiftWishes(lines.map((x) => ({ p: x.p, delta: -x.p.qty }))) : NO_SHIFT;
+    if (!took.ok) {
+      this.undoPicks([...lines, ...asPicks(rewardLines)]);
+      await this.drop(id, uid);
+      return fail('hq.nachschub.wishlistFailed');
+    }
     return {
       ok: true,
       key: 'hq.nachschub.done.created',
@@ -348,7 +357,8 @@ export class NachschubService {
       undo: async () => {
         if (!(await this.drop(id, uid))) return fail(this.error() ?? 'errors.generic');
         this.supplies.removeMany(lineIds);
-        return UNDONE;
+        const back = await this.shiftWishes(inverse(took.applied));
+        return back.ok ? { ...UNDONE, warn: capWarn(back.lost) } : fail('hq.nachschub.wishlistFailed');
       },
     };
   }
@@ -362,6 +372,8 @@ export class NachschubService {
     const uid = this.auth.user()?.id;
     const n = this.packages().find((p) => p.id === id && p.status === 'active');
     if (!uid || !n) return fail('errors.generic');
+    // M3: into an event / sightseeing Nachschub (or one bound to an event in this edit) picks leave the wishlist as before.
+    const moveOff = (n.type ?? 'normal') !== 'normal' || eventRewards.length > 0;
     const { taken } = takeFromWishlist(this.freeWishPositions(), picks);
     if (!taken.length && !eventRewards.length) return fail('hq.nachschub.nothingPicked');
     const stock = await this.ensureStock();
@@ -371,7 +383,7 @@ export class NachschubService {
     let skipped = 0;
     let newBaselines = false;
     for (const p of taken) {
-      const added = this.addPick(p, id, label(p));
+      const added = this.addPick(p, id, label(p), moveOff ? 'search' : 'wish');
       if (!added) {
         skipped++;
         continue;
@@ -388,9 +400,15 @@ export class NachschubService {
     if (rewardLines.length && stock) newBaselines = true;
     const all = [...lines, ...asPicks(rewardLines)];
     if (taken.length && !lines.length && !rewardLines.length) return fail('hq.nachschub.linesFull');
+    const took = moveOff ? await this.shiftWishes(lines.map((x) => ({ p: x.p, delta: -x.p.qty }))) : NO_SHIFT;
+    if (!took.ok) {
+      this.undoPicks(all);
+      return fail('hq.nachschub.wishlistFailed');
+    }
     if (newBaselines) {
       if ((await this.patch(id, uid, { snapshot })) !== 'ok') {
         this.undoPicks(all);
+        await this.shiftWishes(inverse(took.applied));
         return fail(this.error() ?? 'errors.generic');
       }
       this.packages.update((ps) => ps.map((p) => (p.id === id ? { ...p, snapshot } : p)));
@@ -401,8 +419,10 @@ export class NachschubService {
       id,
       warn: skipped > 0 ? { key: 'hq.nachschub.partial', params: { count: skipped } } : undefined,
       undo: async () => {
+        const back = await this.shiftWishes(inverse(took.applied));
+        if (!back.ok) return fail('hq.nachschub.wishlistFailed');
         this.undoPicks(all);
-        return UNDONE;
+        return { ...UNDONE, warn: capWarn(back.lost) };
       },
     };
   }
@@ -739,6 +759,8 @@ export class NachschubService {
         if (!(await this.ensureStock())) return;
         await this.reconcileLegacyWishLines();
         await this.reconcileOnce(uid);
+        await this.fulfilWishLines();
+        await this.trimOverAssigned(true);
       } while (this.reconcileAgain);
     } finally {
       this.reconciling = false;
@@ -777,14 +799,19 @@ export class NachschubService {
 
   // ------------------------------------------------------------------- wishes assigned to an Operation (A1-A11)
 
-  /** Open wish lines of every active Nachschub with the pieces still to come (line quantity minus what arrived). */
+  /**
+   * Wish lines of every active NORMAL Nachschub (event / sightseeing / verkauf lines are never assignments, M3) with
+   * their full quantity: a line counts as assigned until it is met; then {@link fulfilWishLines} lowers the wish by
+   * the whole line once and the line leaves this list (source 'wish_met'). `assignedAt` is the line's creation time
+   * (stable, M4).
+   */
   readonly assignedLines = computed<readonly AssignedLine[]>(() => {
     const out: AssignedLine[] = [];
     for (const n of this.active()) {
+      if ((n.type ?? 'normal') !== 'normal') continue;
       for (const l of this.linesOf(n.id)) {
-        if (!isWishLine(l)) continue;
-        const qty = this.piecesLeft(l);
-        if (qty > 0) out.push({ lineId: l.id, packageId: n.id, key: lineKey(l), qty, assignedAt: l.updatedAt });
+        if (!isWishLine(l) || l.qty <= 0) continue;
+        out.push({ lineId: l.id, packageId: n.id, key: lineKey(l), qty: l.qty, assignedAt: l.createdAt ?? l.updatedAt });
       }
     }
     return out;
@@ -910,12 +937,18 @@ export class NachschubService {
     const dissolve = dissolvedBy(plan, opts.dissolve);
     const key = positionKey(ref);
     const changed: LineChange[] = [];
-    for (const part of plan.parts) {
-      if (part.qty <= 0 || dissolve.includes(part.packageId)) continue;
-      const lines = this.assignedLines().filter((l) => l.key === key && l.packageId === part.packageId).sort((a, b) => b.assignedAt.localeCompare(a.assignedAt));
+    const lowerPart = (part: { packageId: string; qty: number }): void => {
+      const lines = this.openAssigned(key).filter((l) => l.packageId === part.packageId);
       changed.push(...this.lowerLines(lines.map((l) => ({ id: l.lineId, qty: l.qty })), part.qty));
+    };
+    for (const part of plan.parts) {
+      if (part.qty > 0 && !dissolve.includes(part.packageId)) lowerPart(part);
     }
     const gone = await this.dissolveAll(dissolve, uid);
+    // M1: a Nachschub that could not be dissolved keeps its lines - lower them, or assigned would exceed the wish.
+    for (const part of plan.parts) {
+      if (part.qty > 0 && gone.failedIds.includes(part.packageId)) lowerPart(part);
+    }
     const pieces = plan.remove - plan.free;
     if (pieces > 0 && opts.surface) trackPathGroupRelease(this.injector.get(AnalyticsService), opts.surface, pieces, gone.done.length > 0);
     return {
@@ -927,6 +960,8 @@ export class NachschubService {
         if (!(await this.undoDissolve(gone.done, uid))) return fail(this.error() ?? 'errors.generic');
         this.revertLineChanges(changed);
         const back = await this.shiftWishes(inverse(took.applied));
+        // The wish may have changed meanwhile: the restored lines never stay above it.
+        await this.trimOverAssigned(false, key);
         return back.ok ? UNDONE : fail('hq.nachschub.wishlistFailed');
       },
     };
@@ -939,7 +974,7 @@ export class NachschubService {
    */
   releaseInfo(lineId: string): ReleaseInfo | null {
     const l = this.supplies.items().find((x) => x.id === lineId);
-    const n = l?.packageId ? this.active().find((p) => p.id === l.packageId) : undefined;
+    const n = l?.packageId ? this.active().find((p) => p.id === l.packageId && (p.type ?? 'normal') === 'normal') : undefined;
     if (!l || !n || !isWishLine(l)) return null;
     const pieces = this.piecesLeft(l);
     if (pieces <= 0) return null;
@@ -979,6 +1014,7 @@ export class NachschubService {
         if (!(await this.undoDissolve(gone.done, uid))) return fail(this.error() ?? 'errors.generic');
         this.supplies.restore(lineId);
         const back = await this.shiftWishes(inverse(took.applied));
+        await this.trimOverAssigned(false, lineKey(l));
         return back.ok ? UNDONE : fail('hq.nachschub.wishlistFailed');
       },
     };
@@ -987,34 +1023,123 @@ export class NachschubService {
   private legacyReconciled = false;
 
   /**
-   * A11, one time: wish lines made before wishes stayed wishes had their quantity moved OFF the wishlist. Open
-   * `search` lines without pick-up stops in active NORMAL Nachschuebe are such lines: their pieces still to come are
-   * counted back onto the wishlist, then the lines are relabelled `wish`. The relabel syncs, so the pass is idempotent
-   * across reloads and devices (a second pass finds no `search` line left). Closed lines and event / sightseeing /
-   * verkauf lines stay untouched. Runs from {@link reconcile} once stock, supplies and wishlist are loaded. Known
-   * limit: a Bestand line planned without any place looks exactly like an old wish line and is counted as one.
-   * Returns the number of lines relabelled.
+   * A11, one time: wish lines made before wishes stayed wishes had their quantity moved OFF the wishlist. Only lines
+   * that are CERTAINLY old wish lines are counted back (H3 - a phantom wish is worse than an old line left plain):
+   * open `search` lines in active NORMAL Nachschuebe without stops, step, SCU amount or minimum quality, whose kind is
+   * neither `item` nor `ship` or that carry a blueprint (`forClassName`). Bestand lines are always plain `item` lines
+   * and reward lines `item` / `ship`, so a plain item or ship line stays as it is (it simply is no assignment).
+   * Exactly once per line, also with two devices or a retry: per wish the lines are first relabelled ON THE SERVER
+   * with a compare-and-set (`search` -> `wish`, {@link HqSuppliesService.casSource}); only the lines this call won
+   * count, with ONE wishlist write; when that write fails the label goes back so a later pass retries. Pieces the
+   * 999 cap cuts off are taken off the lines too (never assigned beyond the wish). Returns the lines relabelled.
    */
   async reconcileLegacyWishLines(): Promise<number> {
     if (this.legacyReconciled || !this.loaded() || !this.storesReady()) return 0;
-    this.legacyReconciled = true;
-    const legacy: SupplyItem[] = [];
+    const groups = new Map<string, SupplyItem[]>();
     for (const n of this.active()) {
       if ((n.type ?? 'normal') !== 'normal') continue;
       for (const l of this.linesOf(n.id)) {
-        if (l.source === 'search' && !l.done && l.className && !l.gather?.length && !l.stepKind && this.piecesLeft(l) > 0) legacy.push(l);
+        if (!isLegacyWishLine(l)) continue;
+        const k = lineKey(l);
+        groups.set(k, [...(groups.get(k) ?? []), l]);
       }
     }
-    if (!legacy.length) return 0;
-    const back = await this.shiftWishes(
-      legacy.map((l) => ({ p: { kind: l.entityKind ?? 'item', className: l.className ?? '', name: l.name, qty: 0, forClassName: l.forClassName }, delta: this.piecesLeft(l) })),
-    );
-    if (!back.ok) {
-      this.legacyReconciled = false; // nothing changed (shiftWishes rolled back); try again on the next pass
-      return 0;
+    let count = 0;
+    for (const lines of groups.values()) {
+      const won = await this.supplies.casSource(lines.map((l) => l.id), 'search', 'wish');
+      if (won === null) return count; // offline / failed: nothing changed for this wish, the next pass retries
+      if (!won.length) continue; // another device or an earlier pass got there first
+      const mine = lines.filter((l) => won.includes(l.id)).sort((a, b) => (b.createdAt ?? b.updatedAt).localeCompare(a.createdAt ?? a.updatedAt));
+      const l0 = mine[0];
+      const p: WishPosition = { kind: l0.entityKind ?? 'item', className: l0.className ?? '', name: l0.name, qty: 0, forClassName: l0.forClassName };
+      const qty = mine.reduce((n, l) => n + l.qty, 0);
+      const have = this.wishQtyOf(p);
+      const add = Math.min(qty, Math.max(0, WISH_QTY_MAX - have));
+      if (add > 0 && !(await this.setWishQty(p, have + add))) {
+        await this.supplies.casSource(won, 'wish', 'search');
+        return count;
+      }
+      if (add < qty) this.lowerLines(mine.map((l) => ({ id: l.id, qty: l.qty })), qty - add);
+      count += won.length;
     }
-    this.supplies.setSource(legacy.map((l) => l.id), 'wish');
-    return legacy.length;
+    this.legacyReconciled = true;
+    return count;
+  }
+
+  /**
+   * A8 / H2, every pass: a wish line that was reached (ticked by hand, by the stock rise or by a whole live purchase)
+   * lowers its wish by the whole line, exactly once: the line is moved `wish` -> `wish_met` with a compare-and-set
+   * on the server first, and only the lines this call won move the wish (ONE write per wish; the label goes back when
+   * it fails). A `wish_met` line that is open again (undo, unticked) gives the pieces back the same way. The line
+   * stays in its Operation, ticked as reached. Arrivals in between never touch the wish: the line answers them.
+   */
+  private async fulfilWishLines(): Promise<void> {
+    if (!this.storesReady()) return;
+    const met = new Map<string, SupplyItem[]>();
+    const reopened = new Map<string, SupplyItem[]>();
+    for (const n of this.packages()) {
+      if ((n.type ?? 'normal') !== 'normal') continue;
+      for (const l of this.linesOf(n.id)) {
+        if (!l.className) continue;
+        const into = l.source === 'wish' && l.done ? met : l.source === 'wish_met' && !l.done ? reopened : null;
+        if (into) into.set(lineKey(l), [...(into.get(lineKey(l)) ?? []), l]);
+      }
+    }
+    const move = async (groups: Map<string, SupplyItem[]>, from: 'wish' | 'wish_met', to: 'wish' | 'wish_met', sign: 1 | -1): Promise<void> => {
+      for (const lines of groups.values()) {
+        const won = await this.supplies.casSource(lines.map((l) => l.id), from, to);
+        if (!won?.length) continue;
+        const mine = lines.filter((l) => won.includes(l.id));
+        const l0 = mine[0];
+        const p: WishPosition = { kind: l0.entityKind ?? 'item', className: l0.className ?? '', name: l0.name, qty: 0, forClassName: l0.forClassName };
+        const have = this.wishQtyOf(p);
+        const next = Math.min(WISH_QTY_MAX, Math.max(0, have + sign * mine.reduce((n, l) => n + l.qty, 0)));
+        if (next !== have && !(await this.setWishQty(p, next))) await this.supplies.casSource(won, to, from);
+      }
+    };
+    await move(met, 'wish', 'wish_met', -1);
+    await move(reopened, 'wish_met', 'wish', 1);
+  }
+
+  /**
+   * Safety net of A3 (M2): wishlist writes that bypass the removal flow (cart, list page, undo of other actions, a
+   * deleted wish) can leave more pieces assigned than wished. Per wish the open lines are lowered to the wish, the most
+   * recently assigned first; a line of a wish that is gone is removed (it was an assignment of nothing). With `fresh`
+   * the wishlist is read again first and nothing is trimmed when that fails, so a stale list in a tab left open never
+   * costs lines. Ship wishes are left out of the reconcile pass (their Hangar half is not re-read); `onlyKey` limits
+   * the pass to one wish (the undo of a removal re-checks its own wish with the list it just wrote).
+   */
+  private async trimOverAssigned(fresh: boolean, onlyKey?: string): Promise<void> {
+    if (!this.storesReady()) return;
+    if (fresh) {
+      const reload = (this.wish as Partial<WishlistStore>).reload;
+      if (!reload || !(await reload.call(this.wish))) return;
+    }
+    const byKey = new Map<string, { kind: string; lines: AssignedLine[] }>();
+    for (const l of this.openAssignedAll()) {
+      if (onlyKey !== undefined && l.key !== onlyKey) continue;
+      const kind = l.key.slice(0, l.key.indexOf(':'));
+      if (fresh && (kind === 'ship' || kind === 'upcoming')) continue;
+      byKey.set(l.key, { kind, lines: [...(byKey.get(l.key)?.lines ?? []), l] });
+    }
+    for (const [key, g] of byKey) {
+      const wished = this.wishPositions().find((w) => positionKey(w) === key)?.qty ?? 0;
+      const assigned = this.assignedLines().filter((l) => l.key === key).reduce((n, l) => n + l.qty, 0);
+      if (assigned <= wished) continue;
+      this.lowerLines(g.lines.map((l) => ({ id: l.lineId, qty: l.qty })), assigned - wished);
+    }
+  }
+
+  /** Open (not yet reached) wish lines of one wish, most recently assigned first - what a removal or release can take. */
+  private openAssigned(key: string): AssignedLine[] {
+    return this.openAssignedAll().filter((l) => l.key === key);
+  }
+
+  private openAssignedAll(): AssignedLine[] {
+    const done = new Set(this.supplies.items().filter((i) => i.done).map((i) => i.id));
+    return this.assignedLines()
+      .filter((l) => !done.has(l.lineId))
+      .sort((a, b) => b.assignedAt.localeCompare(a.assignedAt));
   }
 
   /** Supplies pulled and wishlist loaded (fakes in specs that lack the flags count as ready). */
@@ -1024,18 +1149,17 @@ export class NachschubService {
     return (!sr || sr()) && (!wl || wl());
   }
 
-  /** Pieces of an open line still to come (its quantity minus the rise its evaluation counted); 0 for a closed line. */
+  /** Pieces an open line stands for (its quantity); 0 for a line that is ticked or closed by the stock rise. */
   private piecesLeft(l: SupplyItem): number {
     if (l.done) return 0;
     const st = l.packageId ? this.evaluation(l.packageId)?.statuses.get(l.id) : undefined;
-    if (st?.closed) return 0;
-    return Math.max(0, Math.round(l.qty - (st?.rise ?? 0)));
+    return st?.closed ? 0 : Math.max(0, Math.round(l.qty));
   }
 
-  /** The Nachschuebe holding a wish, for the removal planner. */
+  /** The NORMAL Nachschuebe holding open pieces of a wish, for the removal planner (never an event one, M3). */
   private holdersOf(ref: WishRef): RemovalHolder[] {
     const key = positionKey(ref);
-    const lines = this.assignedLines().filter((l) => l.key === key);
+    const lines = this.openAssigned(key);
     return sharesByPackage(lines).map((s) => {
       const mine = new Set(s.lineIds);
       const otherOpen = this.linesOf(s.packageId).reduce((n, l) => (mine.has(l.id) ? n : n + this.piecesLeft(l)), 0);
@@ -1073,21 +1197,22 @@ export class NachschubService {
   }
 
   /** Dissolve Nachschuebe with every line (tombstones). `failed` = at least one delete did not go through. */
-  private async dissolveAll(ids: readonly string[], uid: string): Promise<{ done: Dissolved[]; failed: boolean }> {
+  private async dissolveAll(ids: readonly string[], uid: string): Promise<{ done: Dissolved[]; failed: boolean; failedIds: string[] }> {
     const done: Dissolved[] = [];
-    let failed = false;
+    const failedIds: string[] = [];
     for (const id of ids) {
-      const n = this.packages().find((p) => p.id === id);
+      // Only a normal Nachschub is ever dissolved by a wish (M3).
+      const n = this.packages().find((p) => p.id === id && (p.type ?? 'normal') === 'normal');
       if (!n) continue;
       const lineIds = this.linesOf(id).map((l) => l.id);
       if (!(await this.drop(id, uid))) {
-        failed = true;
+        failedIds.push(id);
         continue;
       }
       this.supplies.removeMany(lineIds);
       done.push({ n, lineIds });
     }
-    return { done, failed };
+    return { done, failed: failedIds.length > 0, failedIds };
   }
 
   /** Undo of {@link dissolveAll}: the Nachschub comes back with its name (its slot if still free) and its lines. */
@@ -1102,14 +1227,14 @@ export class NachschubService {
   // ------------------------------------------------------------------------------------------------ internals
 
   /** Put one wishlist position onto a line of the Nachschub `packageId`. */
-  private addPick(p: WishPosition, packageId: string, label: string): AddedPick | null {
+  private addPick(p: WishPosition, packageId: string, label: string, source: 'wish' | 'search'): AddedPick | null {
     const line = this.supplies.addLine(label, p.qty, {
       entityKind: p.kind,
       className: p.className,
       forClassName: p.forClassName ?? null,
       packageId,
-      // The line IS the assignment of the wish (A1); 'wish' tells it from Bestand and reward lines.
-      source: 'wish',
+      // 'wish': the line IS the assignment of the wish (A1). 'search': an event Nachschub's pick, moved off the list (M3).
+      source,
     });
     return line ? { p, line } : null;
   }
@@ -1421,6 +1546,17 @@ interface Dissolved {
 /** A line that is the assignment of a wish (A1): source 'wish' with a class. */
 export function isWishLine(l: Pick<SupplyItem, 'source' | 'className'>): boolean {
   return l.source === 'wish' && !!l.className;
+}
+
+/**
+ * A line written by the old "move off the wishlist" contract that is CERTAINLY a wish line (H3): open, from the
+ * search, no stops / step / SCU amount / minimum quality, and a kind no Bestand or reward line has (anything but
+ * `item` and `ship`) or a blueprint group (`forClassName`).
+ */
+export function isLegacyWishLine(l: SupplyItem): boolean {
+  if (l.source !== 'search' || l.done || !l.className || !l.entityKind) return false;
+  if (l.gather?.length || l.stepKind || l.amount !== null || l.minQuality) return false;
+  return (l.entityKind !== 'item' && l.entityKind !== 'ship') || !!l.forClassName;
 }
 
 /** {@link positionKey} of the wish a line answers. */

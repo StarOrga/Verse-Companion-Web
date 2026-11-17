@@ -402,19 +402,29 @@ describe('ItemPathService', () => {
       expect(l.done).toBe(false);
     });
 
-    it('A8: an arrival on a wish line answers the wish in full; the line is left to close as reached', async () => {
+    it('A8/H2: an arrival on a wish line is answered by the line (the reconcile lowers the wish once); only the excess lowers it here', async () => {
       const { svc, lines, active, wishlist, nachschub } = setup();
       active.set([{ id: 'n1' }]);
-      const l = { ...packageLine(lines, 5) };
-      lines[lines.length - 1] = Object.assign(lines[lines.length - 1], { source: 'wish' });
-      await wishlist.setQty('item', 'medpen', 'Medpen', 5);
+      Object.assign(packageLine(lines, 5), { source: 'wish' });
+      await wishlist.setQty('item', 'medpen', 'Medpen', 7);
       const res = await svc.moveToInventar('item', 'medpen', 'Medpen', 'Lorville', 5);
-      expect(res).toEqual(expect.objectContaining({ ok: true, key: 'itemPath.done.ownWish' }));
-      expect(wishlist.qtyOf('item', 'medpen', 'Medpen')).toBe(0);
-      expect(lines[lines.length - 1].done).toBe(l.done);
+      expect(res).toEqual(expect.objectContaining({ ok: true, key: 'itemPath.done.inventar' }));
+      expect(wishlist.qtyOf('item', 'medpen', 'Medpen')).toBe(7);
+      expect(lines[lines.length - 1].done).toBe(false);
       expect(nachschub.reconcile).toHaveBeenCalled();
-      await res.undo!();
+      // Two more than every tracked line asks for answer the own wish directly.
+      await svc.moveToInventar('item', 'medpen', 'Medpen', 'Lorville', 7);
       expect(wishlist.qtyOf('item', 'medpen', 'Medpen')).toBe(5);
+    });
+
+    it('the wish lowering does not depend on which open line is picked: every tracked line answers first', async () => {
+      const { svc, lines, active, wishlist } = setup();
+      active.set([{ id: 'n1' }]);
+      lines.push({ id: 'b1', name: 'Medpen', qty: 2, done: false, className: 'medpen', amount: null, unit: null, packageId: 'n1', source: 'search' });
+      Object.assign(packageLine(lines, 3), { source: 'wish' });
+      await wishlist.setQty('item', 'medpen', 'Medpen', 4);
+      await svc.moveToInventar('item', 'medpen', 'Medpen', 'Lorville', 6);
+      expect(wishlist.qtyOf('item', 'medpen', 'Medpen')).toBe(3);
     });
 
     it('A2/A3: the state counts assigned and free pieces; a plain counter never cuts into assigned ones', async () => {

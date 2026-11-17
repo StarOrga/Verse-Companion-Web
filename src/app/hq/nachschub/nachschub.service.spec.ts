@@ -39,7 +39,10 @@ class FakeSupplies {
   addLine(name: string, qty: number, meta: { entityKind?: string; className?: string; forClassName?: string | null; packageId?: string | null; source?: string } = {}) {
     if (this.items().length >= this.max) return null;
     const pkg = meta.packageId ?? null;
-    const same = this.items().find((i) => !i.done && i.name.toLowerCase() === name.toLowerCase() && i.packageId === pkg && (i.forClassName ?? '') === (meta.forClassName ?? ''));
+    // Same predicate as HqSuppliesService.addLine, including the wish / non-wish split (H1).
+    const same = this.items().find(
+      (i) => !i.done && i.name.toLowerCase() === name.toLowerCase() && i.packageId === pkg && (i.forClassName ?? '') === (meta.forClassName ?? '') && (i.source === 'wish') === (meta.source === 'wish'),
+    );
     if (same) {
       this.rows.update((rs) => rs.map((r) => (r.id === same.id ? { ...r, qty: r.qty + qty } : r)));
       return { id: same.id, prevQty: same.qty, prevAmount: null };
@@ -62,6 +65,12 @@ class FakeSupplies {
   }
   remove(id: string) {
     this.removeMany([id]);
+  }
+  /** In memory the rows are the server: a compare-and-set on their source. */
+  async casSource(ids: readonly string[], from: string, to: string): Promise<string[]> {
+    const won = this.items().filter((i) => ids.includes(i.id) && i.source === from).map((i) => i.id);
+    this.rows.update((rs) => rs.map((r) => (won.includes(r.id) ? { ...r, source: to } : r)));
+    return won;
   }
   restore(id: string) {
     this.rows.update((rs) => rs.map((r) => (r.id === id ? { ...r, deletedAt: null } : r)));
@@ -422,12 +431,12 @@ describe('NachschubService', () => {
       const lineId = supplies.linesOfPackage(made.id!)[0].id;
       expect(svc.packages()[0].snapshot[lineId]).toBe(5);
 
-      // One medpen arrived (the line has 1 still to come); 3 more are wished: 5 wished - 1 assigned = 4 free.
+      // One medpen arrived: the line still counts whole until it is met (H2), so 5 wished - 2 assigned = 3 free.
       inventory.items.set([{ class_name: 'medpen', qty: 6 }]);
       wish.rows.update((rs) => rs.map((x) => (x.className === 'medpen' ? { ...x, qty: 5 } : x)));
       const r = await svc.addFromWishlist(made.id!, [{ key: 'item:medpen' }]);
       expect(r.ok).toBe(true);
-      expect(supplies.linesOfPackage(made.id!)[0].qty).toBe(6);
+      expect(supplies.linesOfPackage(made.id!)[0].qty).toBe(5);
       expect(svc.packages()[0].snapshot[lineId]).toBe(5);
 
       const u = await r.undo!();

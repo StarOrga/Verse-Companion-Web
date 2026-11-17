@@ -261,7 +261,26 @@ describe('HqSuppliesService', () => {
     expect(s.items().map((i) => i.id).sort()).toEqual(['a', 'b']);
   });
 
+  it('H1: a wish line and a Bestand / manual line of the same item in one Nachschub never merge, either way round', () => {
+    const s = make();
+    const wishLine = s.addLine('Medpen', 2, { className: 'medpen', packageId: 'P', source: 'wish' });
+    const bestand = s.addLine('Medpen', 3, { className: 'medpen', packageId: 'P', source: 'search' });
+    expect(bestand?.id).not.toBe(wishLine?.id);
+    expect(s.addLine('Medpen', 1, { className: 'medpen', packageId: 'P', source: 'wish' })?.id).toBe(wishLine?.id);
+    expect(s.items().map((i) => [i.source, i.qty])).toEqual([['wish', 3], ['search', 3]]);
+    expect(s.items().every((i) => !!i.createdAt)).toBe(true);
+  });
+
   describe('live agent API', () => {
+    it('H2: a purchase smaller than a wish line leaves it to the stock rise; a whole one ticks it', () => {
+      const s = make();
+      s.addLine('Repeater', 3, { className: 'REP_S3', packageId: 'P', source: 'wish' });
+      expect(s.tickByClassName('rep_s3', 1)).toBeNull();
+      expect(s.items()[0].qty).toBe(3);
+      expect(s.tickByClassName('rep_s3', 3)).toBe(s.items()[0].id);
+      expect(s.items()[0].done).toBe(true);
+    });
+
     it('tickByClassName covers a line, reduces a bigger one, and untick reverts exactly that', () => {
       const s = make();
       s.add('Repeater', 3, { className: 'REP_S3' });

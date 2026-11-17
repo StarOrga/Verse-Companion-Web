@@ -61,6 +61,8 @@ export interface SupplyItem {
   readonly minQuality?: number | null;
   /** Client edit time (ISO) - the LWW key. */
   readonly updatedAt: string;
+  /** When the line was made (ISO; the server's `created_at` once pulled). Stable: ticks and edits never move it. */
+  readonly createdAt?: string;
   /** Tombstone (ISO) while a deletion is on its way to the server; never listed in `items`. */
   readonly deletedAt: string | null;
   /** Not yet accepted by the server. */
@@ -227,7 +229,9 @@ export class HqSuppliesService {
         i.name.toLowerCase() === clean.toLowerCase() &&
         (i.forClassName ?? '').toLowerCase() === (forClassName ?? '').toLowerCase() &&
         i.packageId === packageId &&
-        (i.amount !== null) === (amount !== null),
+        (i.amount !== null) === (amount !== null) &&
+        // A wish's assignment (source 'wish') never merges with a Bestand / manual line of the same item, either way.
+        (i.source === 'wish') === (meta.source === 'wish'),
     );
     if (same) {
       this.patch(same.id, {
@@ -259,6 +263,7 @@ export class HqSuppliesService {
         gather,
         minQuality,
         updatedAt: nowIso(),
+        createdAt: nowIso(),
         deletedAt: null,
         dirty: true,
       };
@@ -349,14 +354,59 @@ export class HqSuppliesService {
     return this.items().filter((i) => i.packageId === packageId);
   }
 
-  /**
-   * Re-label where lines came from. Only the one-time reconcile of wish lines uses it (`search` -> `wish`, concept
-   * 20261117-1110-pfad-stationen A11): the label is what makes that reconcile idempotent across devices.
-   */
+  /** Re-label where lines came from (local, pushed like any edit). */
   setSource(ids: readonly string[], source: SupplySource): void {
     const set = new Set(ids);
     const now = nowIso();
     this.commit(this.rows().map((i) => (set.has(i.id) && !i.deletedAt && i.source !== source ? { ...i, source, updatedAt: now, dirty: true } : i)));
+  }
+
+  /**
+   * Compare-and-set of the source ON THE SERVER: lines among `ids` whose server row still has source `from` get `to`,
+   * in one conditional update. Returns the ids THIS call changed (another device or an earlier pass that got there
+   * first changes nothing here), or null when the write failed / nobody is signed in. Afterwards the local copies
+   * take the server's source of every id, so a later push cannot carry the old label back. This is the exactly-once
+   * marker of the wish transitions (concept 20261117-1110-pfad-stationen A8 / A11): only the caller that won a line
+   * moves its wish.
+   */
+  async casSource(ids: readonly string[], from: SupplySource, to: SupplySource): Promise<string[] | null> {
+    const uid = this.uid;
+    if (!uid || !ids.length) return uid ? [] : null;
+    try {
+      const now = nowIso();
+      const { data, error } = await this.sb.client
+        .from('hq_supplies' as never)
+        .update({ source: to, updated_at: now } as never)
+        .eq('user_id', uid)
+        .in('id', [...ids])
+        .eq('source', from)
+        .is('deleted_at', null)
+        .select('id');
+      if (error) throw error;
+      const won = ((data ?? []) as { id: string }[]).map((r) => r.id);
+      const read = await this.sb.client.from('hq_supplies' as never).select('id, source, updated_at').eq('user_id', uid).in('id', [...ids]);
+      const server = new Map(((read.data ?? []) as { id: string; source: SupplySource; updated_at: string }[]).map((r) => [r.id, r] as const));
+      for (const id of won) if (!server.has(id)) server.set(id, { id, source: to, updated_at: now });
+      // Adopt the server's label. A clean row takes the server's edit time; a row with a pending local edit gets a
+      // fresh one, so its push wins the LWW check and carries the adopted label instead of the old one.
+      const later = nowIso();
+      this.commit(this.rows().map((i) => {
+        const s = server.get(i.id);
+        if (!s || s.source === i.source) return i;
+        return { ...i, source: s.source, updatedAt: i.dirty ? later : s.updated_at };
+      }));
+      return won;
+    } catch (err) {
+      logWarn('hq', 'supplies source cas failed', err);
+      return null;
+    }
+  }
+
+  /** Point lines at another item (an announced ship's wish became a real ship's: kind and class change, M2). */
+  retarget(ids: readonly string[], entityKind: string, className: string): void {
+    const set = new Set(ids);
+    const now = nowIso();
+    this.commit(this.rows().map((i) => (set.has(i.id) && !i.deletedAt ? { ...i, entityKind, className, updatedAt: now, dirty: true } : i)));
   }
 
   /** Move lines into a Nachschub (or out of it with null). */
@@ -403,7 +453,12 @@ export class HqSuppliesService {
     if (!key) return null;
     const n = clampQty(qty);
     const hits = this.items().filter(
-      (i) => !i.done && ((i.className ?? '').toLowerCase() === key || (!i.className && i.name.toLowerCase() === key)),
+      (i) =>
+        !i.done &&
+        ((i.className ?? '').toLowerCase() === key || (!i.className && i.name.toLowerCase() === key)) &&
+        // A wish's assignment is only ever closed whole (the wish then shrinks once by the whole line, H2); a purchase
+        // smaller than it leaves it to the stock rise.
+        (i.source !== 'wish' || n >= i.qty),
     );
     const hit = hits.find((i) => i.wanted) ?? hits[0];
     if (!hit) return null;
@@ -680,6 +735,7 @@ function fromRow(r: HqSupplyRow): SupplyItem {
     gather: parseGather(r.gather),
     minQuality: parseMinQuality(r.min_quality),
     updatedAt: r.updated_at,
+    ...(r.created_at ? { createdAt: r.created_at } : {}),
     deletedAt: r.deleted_at,
     dirty: false,
   };
@@ -726,7 +782,7 @@ function sanitize(r: unknown, keepSync: boolean): SupplyItem | null {
   const setKind = o['setKind'] === 'ship' || o['setKind'] === 'fps' ? o['setKind'] : null;
   const setId = str('setId');
   const stepKind = typeof o['stepKind'] === 'string' && STEP_KINDS_SET.has(o['stepKind']) ? (o['stepKind'] as StepKind) : null;
-  const source = o['source'] === 'set' || o['source'] === 'search' || o['source'] === 'live' || o['source'] === 'wish' ? o['source'] : 'manual';
+  const source = o['source'] === 'set' || o['source'] === 'search' || o['source'] === 'live' || o['source'] === 'wish' || o['source'] === 'wish_met' ? o['source'] : 'manual';
   return {
     id: o['id'],
     name: o['name'].slice(0, SUPPLY_NAME_MAX),
@@ -745,6 +801,7 @@ function sanitize(r: unknown, keepSync: boolean): SupplyItem | null {
     gather: parseGather(o['gather']),
     minQuality: parseMinQuality(o['minQuality']),
     updatedAt: str('updatedAt') ?? nowIso(),
+    ...(str('createdAt') ? { createdAt: str('createdAt') as string } : {}),
     deletedAt: keepSync ? str('deletedAt') : null,
     dirty: keepSync ? o['dirty'] === true : false,
   };

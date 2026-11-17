@@ -123,6 +123,25 @@ export class WishlistStore {
     return this.inFlight;
   }
 
+  /**
+   * Read the wishlist again from the server (another device may have changed it). False when that failed; the rows
+   * stay as they were. The wish-line safety net (NachschubService.reconcile) trims lines only after a fresh read.
+   */
+  async reload(): Promise<boolean> {
+    const uid = this.auth.user()?.id ?? null;
+    if (!uid || this.loadedFor !== uid) return false;
+    try {
+      const { data, error } = await this.sb.client.from('search_wishlist' as never).select('*');
+      if (error || this.loadedFor !== uid) return false;
+      this.rows.set(((data ?? []) as Record<string, unknown>[]).map(mapWishRow));
+      this.loaded.set(true);
+      return true;
+    } catch (err) {
+      logWarn('wishlist', 'reload failed', err);
+      return false;
+    }
+  }
+
   /** Insert a wish. True when it is on the list afterwards (a duplicate counts). */
   async add(entry: WishEntry): Promise<boolean> {
     if (!this.auth.user()) return false;
