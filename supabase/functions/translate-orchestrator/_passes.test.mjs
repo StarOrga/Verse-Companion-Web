@@ -20,6 +20,7 @@ import { SCAN_SHARDS } from './_scan.ts';
 import { seedEntries } from './_seed.ts';
 import { startImport, syncSources } from './_sources.ts';
 import { styleStats } from './_style.ts';
+import { chunkedBody } from './_testkit.mjs';
 
 const BUILD = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const T0 = Date.parse('2026-11-17T12:00:00Z');
@@ -37,7 +38,7 @@ function putTable(files, lang, entries) {
   return index;
 }
 
-function world({ en, cig = {}, glossary = [], names = [], settings = {}, sources = [], pack = '' } = {}) {
+function world({ en, cig = {}, glossary = [], names = [], settings = {}, sources = [], pack = '', pieceChars, chunkBytes } = {}) {
   const files = new Map();
   const enIndex = putTable(files, 'en', en);
   if (Object.keys(cig).length) putTable(files, 'de', cig);
@@ -112,10 +113,14 @@ function world({ en, cig = {}, glossary = [], names = [], settings = {}, sources
     async list(lang) { return [...sourceRows.values()].filter((r) => !lang || r.lang === lang).map((r) => ({ ...r })); },
     async liveBuild() { return BUILD; },
     async update(id, patch) { Object.assign(sourceRows.get(id), patch); },
+    pieceChars,
     async fetchFn(_url, init) {
       if (init?.method === 'HEAD') return new Response(null, { headers: { etag: net.etag } });
       net.gets++;
-      return new Response(new TextEncoder().encode(net.pack), { headers: { etag: net.etag } });
+      const bytes = new TextEncoder().encode(net.pack);
+      if (!chunkBytes) return new Response(bytes, { headers: { etag: net.etag } });
+      // The network hands a body out in chunks that end anywhere, also inside a character.
+      return new Response(chunkedBody(bytes, chunkBytes), { headers: { etag: net.etag } });
     },
   };
   const passes = memPasses(now);
@@ -468,6 +473,96 @@ describe('seed import in slices', () => {
     assert.equal(second.state.counts.imported, 0);
     assert.equal(second.state.counts.unchanged, want.counts.imported);
     assert.deepEqual(await loadTm(w.deps.store, 'de'), first);
+  });
+
+  it('a pack is stored and split piece by piece: no work file holds it, and the TM is the one-pass TM', async () => {
+    const t = await seedTable();
+    // A line the file repeats far below (another piece): the later one wins, as in one pass over the file.
+    const pack = t.pack.replace('\r\n', '\r\ndlg_open_a=Falsch\r\nitem_line_05996=Frühere Fassung für %s\r\n');
+    const w = world({ en: t.en, cig: t.cig, sources: [{ id: 'rjcncpt' }], pack, pieceChars: 3000, chunkBytes: 1001 });
+    w.deps.learn = undefined;
+    await startImport(w.deps, 'rjcncpt');
+    let splits = 0;
+    for (let i = 0; i < 3000 && passOf(w, 'seed').status === 'open'; i++) {
+      const before = structuredClone(passOf(w, 'seed'));
+      await tickAll(w.deps, ONE);
+      if (before.phase === 'split') splits++;
+      // The same slice once more, as a request does that was killed after its writes: it loses the
+      // compare-and-set, and what it wrote again must be what was there.
+      if (before.phase === 'fetch' || before.phase === 'split' || before.phase === 'scan') {
+        assert.equal(await PASS_STEPS.seed(w.deps, before), null);
+      }
+    }
+    const pass = passOf(w, 'seed');
+    assert.equal(pass.status, 'done', pass.error);
+    assert.ok(pass.state.pieces > 40 && splits === pass.state.pieces, `pieces ${pass.state.pieces}, split slices ${splits}`);
+    assert.ok(w.io.maxBytes < 200_000, `a work file of ${w.io.maxBytes} bytes: the pack (${pack.length} chars) must not be in one`);
+    const want = await seedEntries({ en: t.en, cig: t.cig, pack: packOf(t), sourceId: 'rjcncpt', lic: 'CC-BY-NC-SA-4.0', at: pass.state.at, tm: {} });
+    assert.deepEqual(await loadTm(w.deps.store, 'de'), want.updates);
+    assert.deepEqual(pass.state.counts, want.counts);
+    assert.equal((await loadTm(w.deps.store, 'de'))[await sha256Hex('Open')].t, 'Öffnen');
+    // Two keys stand twice in the file.
+    assert.equal(pass.state.packKeys, t.packMap.size + 2);
+    assert.equal(w.sourceRows.get('rjcncpt').coverage.pack_keys, t.packMap.size + 2);
+    assert.deepEqual([...w.files.keys()].filter((k) => k.includes(`seed-${pass.id}`)), []);
+  });
+
+  it('a part of the pack that is gone starts the import over, and nothing of the first download is used', async () => {
+    const t = await seedTable();
+    const w = world({ en: t.en, cig: t.cig, sources: [{ id: 'rjcncpt' }], pack: t.pack, pieceChars: 3000, chunkBytes: 4096 });
+    w.deps.learn = undefined;
+    await startImport(w.deps, 'rjcncpt');
+    await drain(w, () => passOf(w, 'seed').phase === 'scan' && passOf(w, 'seed').pos > 0);
+    const first = structuredClone(passOf(w, 'seed'));
+    // Upstream changed meanwhile: a short pack with other texts and without most groups.
+    const small = new Map([...packOf(t)].filter(([k]) => k.startsWith('ui_line_')).map(([k, v]) => [k, v.startsWith('Satz') ? `Neu: ${v}` : v]));
+    w.net.pack = '\ufeffFrontend_PU_Version=Pack 2\r\n' + [...small].map(([k, v]) => `${k}=${v}`).join('\r\n');
+    // A part of a group the scan has not reached yet is lost.
+    const prefix = `translation-work/seed-${first.id}/`;
+    const reached = new Set(Object.keys(w.enIndex.groups).slice(0, 1));
+    const lost = [...w.files.keys()].filter((k) => k.startsWith(`${prefix}pack-`)).filter((k) => ![...reached].some((g) => k.endsWith(`-${g}.json`))).at(-1);
+    assert.ok(lost, 'a part file to lose');
+    w.files.delete(lost);
+    await drain(w, () => passOf(w, 'seed').status !== 'open');
+    const pass = passOf(w, 'seed');
+    assert.equal(pass.status, 'done', pass.error);
+    assert.equal(w.net.gets, 2, 'the pack is downloaded again');
+    assert.ok(pass.state.walk > first.state.walk);
+    assert.ok(pass.state.pieces < first.state.pieces);
+    const want = await seedEntries({ en: t.en, cig: t.cig, pack: small, sourceId: 'rjcncpt', lic: 'CC-BY-NC-SA-4.0', at: pass.state.at, tm: {} });
+    assert.deepEqual(await loadTm(w.deps.store, 'de'), want.updates);
+    assert.deepEqual(pass.state.counts, want.counts);
+    assert.ok(want.counts.imported > 300 && want.counts.missing > 4000);
+  });
+
+  it('a pass whose pack was stored by the older layout fetches it again instead of importing nothing', async () => {
+    const t = await seedTable();
+    const w = world({ en: t.en, cig: t.cig, sources: [{ id: 'rjcncpt' }], pack: t.pack });
+    w.deps.learn = undefined;
+    await startImport(w.deps, 'rjcncpt');
+    await drain(w, () => passOf(w, 'seed').phase === 'split');
+    // As the code before the pieces left it: one `raw` file, no count of pieces, a list of groups.
+    const row = w.passes.rows.get(passOf(w, 'seed').id);
+    const { pieces: _p, parts: _q, ...old } = row.state;
+    row.state = { ...old, groups: ['ui'] };
+    await drain(w, () => passOf(w, 'seed').status !== 'open');
+    const pass = passOf(w, 'seed');
+    assert.equal(pass.status, 'done', pass.error);
+    assert.equal(w.net.gets, 2);
+    const want = await seedEntries({ en: t.en, cig: t.cig, pack: packOf(t), sourceId: 'rjcncpt', lic: 'CC-BY-NC-SA-4.0', at: pass.state.at, tm: {} });
+    assert.deepEqual(pass.state.counts, want.counts);
+
+    // The same in the scan: no list of parts starts the import over.
+    const again = await startImport(w.deps, 'rjcncpt');
+    await drain(w, () => w.passes.rows.get(again.pass_id).phase === 'scan');
+    const row2 = w.passes.rows.get(again.pass_id);
+    const { parts: _r, ...old2 } = row2.state;
+    row2.state = old2;
+    await drain(w, () => w.passes.rows.get(again.pass_id).status !== 'open');
+    const second = w.passes.rows.get(again.pass_id);
+    assert.equal(second.status, 'done', second.error);
+    assert.equal(second.state.counts.unchanged, want.counts.imported);
+    assert.equal(second.state.walk, 2);
   });
 
   it('use_cig_table = false ignores the CIG table of the folder (another language lives there)', async () => {
