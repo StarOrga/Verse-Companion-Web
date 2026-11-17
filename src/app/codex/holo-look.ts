@@ -59,7 +59,9 @@ export interface BodyLook {
   readonly glow: number;
 }
 export const HOLO_BODY_IDLE: BodyLook = { line: HOLO_PART_LINE, lineAlpha: 1, fill: HOLO_PART_FILL, fillAlpha: 0.36, glow: 0.55 };
-export const HOLO_BODY_DIM: BodyLook = { line: HOLO_DIM_PART, lineAlpha: 0.42, fill: HOLO_DIM_PART, fillAlpha: 0.05, glow: 0 };
+// The mock's .42 is per outline; a 3D part has dozens of crease lines that add up in
+// coverage, so .42 per line still read at full brightness on the Valkyrie. .2 lands on "a third".
+export const HOLO_BODY_DIM: BodyLook = { line: HOLO_DIM_PART, lineAlpha: 0.2, fill: HOLO_DIM_PART, fillAlpha: 0.05, glow: 0 };
 export const HOLO_BODY_HOVER: BodyLook = { line: [255, 255, 255], lineAlpha: 1, fill: HOLO_HOVER_FILL, fillAlpha: 0.36, glow: 0.7 };
 export const HOLO_BODY_SELECT: BodyLook = { line: HOLO_SELECT, lineAlpha: 1, fill: HOLO_SELECT, fillAlpha: 0.64, glow: 0.9 };
 /** A part of another Einsatz: between idle and dimmed. */
@@ -73,7 +75,7 @@ export const HOLO_GHOST: Readonly<Record<'part' | 'quiet' | 'hover' | 'select', 
   part: 0.5,
   quiet: 0.4,
   hover: 0.7,
-  select: 0.85,
+  select: 1,
 };
 
 export function mixBody(a: BodyLook, b: BodyLook, t: number): BodyLook {

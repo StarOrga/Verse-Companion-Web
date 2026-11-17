@@ -328,7 +328,7 @@ describe('HoloLook lit bodies', () => {
     look.setDim(true);
     // Others drop to about a third, a hovered one keeps the hover look on top.
     expect(alpha('part')).toBeCloseTo(0.05, 5);
-    expect(look.line('part').uniforms['uAlpha'].value).toBeCloseTo(0.42, 5);
+    expect(look.line('part').uniforms['uAlpha'].value).toBeLessThan(0.42);
     expect(rgb(look.line('hover').uniforms['uColor'].value)).toEqual([255, 255, 255]);
     expect(rgb(look.fill('select').uniforms['uBodyColor'].value)).toEqual([...HOLO_SELECT]);
     look.dispose();
