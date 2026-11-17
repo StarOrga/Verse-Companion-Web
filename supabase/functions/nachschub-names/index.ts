@@ -5,9 +5,9 @@
 //
 // Graceful: every failure is a 200 with a status and no name; the client then uses its rule-based fallback, so the
 // feature never depends on this function. The key lives only here (ANTHROPIC_API_KEY secret); model override via
-// NACHSCHUB_NAMES_MODEL. verify_jwt is OFF (supabase/config.toml): with the platform gate on, every call of a
-// signed-in web session was answered 401 before the handler ran. The handler requires a real, approved user
-// (getUser with the bearer token + is_approved), not the bare publishable key. Output is never labelled as AI.
+// NACHSCHUB_NAMES_MODEL. verify_jwt stays ON (default) - the platform rejects calls without a session; the handler
+// additionally requires a real, approved user (getUser with the bearer token + is_approved), not the bare publishable
+// key. Output is never labelled as AI.
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
@@ -49,8 +49,9 @@ Deno.serve(withPosthog('nachschub-names', async (req) => {
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
   // A real signed-in user, not just the anon/publishable key.
-  // The token is handed to getUser() explicitly: the client has no stored session, and reading it back from a
-  // custom header depends on the header's spelling in the supabase-js version in use.
+  // The token is handed to getUser() explicitly. Until 2026-11-17 the handler relied on a lower-case `authorization`
+  // entry in the client's global headers and getUser() without a token; that answered every web session with
+  // 401 "unauthorized" (17 of 17 calls that day), so the name always fell back to the rule-based one.
   const jwt = bearerToken(req.headers.get('authorization'));
   if (!jwt) return json({ error: 'unauthorized' }, 401);
   const sb = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
