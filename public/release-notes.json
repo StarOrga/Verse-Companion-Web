@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.273.5",
+  "current": "0.273.6",
   "releases": [
+    {
+      "version": "0.273.6",
+      "date": "2026-11-17",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Server errors reach error tracking as one issue per function, status and error code (desktop crashes per product and error type) instead of one catch-all issue for every error."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.273.5",
       "date": "2026-11-17",
