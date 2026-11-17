@@ -1,7 +1,37 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.273.1",
+  "current": "0.273.2",
   "releases": [
+    {
+      "version": "0.273.2",
+      "date": "2026-11-17",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Translation jobs no longer hang in the estimate: the orchestrator works through the string tables in slices instead of loading everything into one request, which the edge runtime killed on every tick."
+            },
+            {
+              "title": "",
+              "text": "A translation job whose worker is killed three times in a row now fails with a clear message instead of retrying forever."
+            }
+          ]
+        },
+        {
+          "category": "Removed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The unused verify-release-token edge function."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.273.1",
       "date": "2026-11-17",

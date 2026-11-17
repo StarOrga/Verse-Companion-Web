@@ -74,6 +74,10 @@ export interface Stats {
   run_at?: string;
   /** Killed runs in a row without progress. */
   dead?: number;
+  /** A batch create in flight: written before the provider call, cleared with the saved ref (see submitGroups). */
+  submit?: { kind: BatchRef['kind']; g: number; at: string };
+  /** Batch groups created again after a run died with its intent open: each may exist twice at the provider. */
+  resubmits?: number;
   [k: string]: unknown;
 }
 
@@ -336,9 +340,24 @@ function requireLlm(deps: Deps): Llm {
   return deps.llm;
 }
 
-/** Creates the batches that do not exist yet (resumable: refs are saved after each one). */
+/**
+ * Creates the batches that do not exist yet (resumable: refs are saved after each one) and ends in
+ * `donePhase`, the phase the caller waits in.
+ *
+ * The provider has no idempotency key or metadata for a batch, so a create cannot be made repeatable.
+ * What keeps a batch from being created twice:
+ * - Every create is preceded by a compare-and-set that records the intent (`stats.submit`). Of two
+ *   runs that resume the same stale job only one wins it; the other stops before it creates anything.
+ *   The write also refreshes `updated_at`, so a third run waits out the stale window again.
+ * - The last write sets `donePhase` itself. A kill can no longer leave a job between "all batches
+ *   created" and the phase that reads them.
+ * What remains: a kill between the provider's answer and the write of the ref (one DB round trip),
+ * or a create whose answer never arrived. The next run finds the intent without a ref, creates that
+ * group again and counts it in `stats.resubmits` - the first batch, if it exists, is paid for and
+ * never read.
+ */
 async function submitGroups(
-  deps: Deps, job: Job, kind: BatchRef['kind'], reqs: { custom_id: string; params: BatchParams }[],
+  deps: Deps, job: Job, kind: BatchRef['kind'], reqs: { custom_id: string; params: BatchParams }[], donePhase = 'running',
 ): Promise<Job> {
   const llm = requireLlm(deps);
   const groups: typeof reqs[] = [];
@@ -346,10 +365,30 @@ async function submitGroups(
   let cur = job;
   const have = cur.batch_ids.filter((b) => b.kind === kind).length;
   for (let g = have; g < groups.length; g++) {
-    const { id } = await llm.createBatch(groups[g]);
-    cur = await must(await deps.db.cas(cur, { batch_ids: [...cur.batch_ids, { id, kind }] }));
+    const left = cur.stats?.submit;
+    const again = !!left && left.kind === kind && left.g === g;
+    if (again) deps.log('translate batch may exist twice', { job: cur.id, kind, group: g, since: left!.at });
+    cur = await must(await deps.db.cas(cur, {
+      stats: addStats(cur, {
+        submit: { kind, g, at: deps.now().toISOString() },
+        resubmits: again ? (cur.stats?.resubmits ?? 0) + 1 : cur.stats?.resubmits,
+      }),
+    }));
+    let id: string;
+    try {
+      ({ id } = await llm.createBatch(groups[g]));
+    } catch (e) {
+      // An HTTP status means the provider answered and refused: nothing was created, so the retry is
+      // not a possible duplicate. Without one (timeout, dropped connection) the create may have gone
+      // through, and the intent stays so the retry is counted.
+      if (typeof (e as { status?: unknown })?.status === 'number') {
+        await deps.db.cas(cur, { stats: addStats(cur, { submit: undefined }) });
+      }
+      throw e;
+    }
+    cur = await must(await deps.db.cas(cur, { batch_ids: [...cur.batch_ids, { id, kind }], stats: addStats(cur, { submit: undefined }) }));
   }
-  return await must(await deps.db.cas(cur, { stats: addStats(cur, { phase: 'running' }) }));
+  return await must(await deps.db.cas(cur, { stats: addStats(cur, { phase: donePhase, submit: undefined }) }));
 }
 
 async function allEnded(deps: Deps, job: Job, kind: BatchRef['kind']): Promise<boolean> {
@@ -682,7 +721,9 @@ async function stepValidating(deps: Deps, job: Job): Promise<void> {
   const { db, store } = deps;
   const plan = await readPlan(deps, job);
   const dbGlossary = await db.listGlossary(job.lang);
-  const phase = job.stats?.phase ?? 'results';
+  // `running` here is a judge batch whose phase write was lost (submitGroups ended in `running` for
+  // every kind until 2026-11-17, with `judge` as a second write): its batches exist, so read them.
+  const phase = job.stats?.phase === 'running' ? 'judge' : (job.stats?.phase ?? 'results');
 
   if (phase === 'results') {
     const { res, usd } = await collect(deps, job, 'main', plan.chunks, glossaryFor(plan, dbGlossary), {});
@@ -730,8 +771,7 @@ async function submitJudge(deps: Deps, job: Job, plan: Plan, res: ResMap, sample
   });
   const reqs = [{ custom_id: 'j0', params: judgeParams(job.lang, JUDGE_MODEL, samples) }];
   const claimed = job.stats?.phase === 'judge_submitting' ? job : await must(await deps.db.cas(job, { stats: addStats(job, { phase: 'judge_submitting' }) }));
-  const out = await submitGroups(deps, claimed, 'judge', reqs);
-  await deps.db.cas(out, { stats: addStats(out, { phase: 'judge' }) });
+  await submitGroups(deps, claimed, 'judge', reqs, 'judge');
 }
 
 async function readJudge(deps: Deps, job: Job, plan: Plan, res: ResMap, sample: string[]) {
