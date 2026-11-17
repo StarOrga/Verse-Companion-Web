@@ -2,7 +2,8 @@ import type { Mock, MockedObject } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { AnalyticsService } from './analytics.service';
-import { AppErrorHandler, redactErrorText } from './app-error-handler';
+import { AppErrorHandler, isDeferLoadError, redactErrorText } from './app-error-handler';
+import { RouteLoadRecoveryService } from './route-load-recovery.service';
 import { ConsentService } from './consent.service';
 
 describe('AppErrorHandler', () => {
@@ -69,6 +70,67 @@ describe('AppErrorHandler', () => {
       throw new Error('posthog exploded');
     });
     expect(() => handler.handleError(new Error('probe'))).not.toThrow();
+  });
+});
+
+describe('AppErrorHandler — failed @defer chunks (#367)', () => {
+  let handler: AppErrorHandler;
+  let consent: ConsentService;
+  let recover: Mock;
+  let fakeClient: MockedObject<{ captureException: (e: Error, p?: unknown) => void }>;
+
+  /** Angular's production NG0750: only the code, no cause in the message. */
+  const ng0750 = (): Error => Object.assign(new Error('NG0750'), { code: -750 });
+
+  beforeEach(() => {
+    localStorage.clear();
+    vi.spyOn(console, 'error').mockReturnValue(undefined as never);
+    recover = vi.fn().mockReturnValue('reloading');
+    TestBed.configureTestingModule({
+      providers: [
+        AppErrorHandler,
+        AnalyticsService,
+        ConsentService,
+        provideRouter([]),
+        { provide: RouteLoadRecoveryService, useValue: { recoverFromStaleChunk: recover } },
+      ],
+    });
+    handler = TestBed.inject(AppErrorHandler);
+    consent = TestBed.inject(ConsentService);
+    fakeClient = { captureException: vi.fn() };
+    (TestBed.inject(AnalyticsService) as unknown as { client: unknown }).client = fakeClient;
+  });
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+    localStorage.clear();
+  });
+
+  it('recognises NG0750 by code and by its dev message, nothing else', () => {
+    expect(isDeferLoadError(ng0750())).toBe(true);
+    expect(
+      isDeferLoadError(
+        new Error('Loading dependencies for `@defer` block failed … Failed to fetch dynamically imported module: /chunk-A.js'),
+      ),
+    ).toBe(true);
+    expect(isDeferLoadError(new Error('Failed to fetch dynamically imported module: /chunk-A.js'))).toBe(false);
+    expect(isDeferLoadError(new Error('probe'))).toBe(false);
+    expect(isDeferLoadError(null)).toBe(false);
+  });
+
+  it('triggers the stale-chunk recovery with the shell notice and reports it as handled', () => {
+    consent.acceptAll();
+    handler.handleError(ng0750());
+    expect(recover).toHaveBeenCalledTimes(1);
+    expect(recover).toHaveBeenCalledWith({ notice: true });
+    const [, props] = vi.mocked(fakeClient.captureException).mock.lastCall!;
+    expect((props as Record<string, unknown>)['handled']).toBe(true);
+  });
+
+  it('never triggers the recovery for any other error', () => {
+    handler.handleError(new Error('probe'));
+    handler.handleError(new Error('Failed to fetch dynamically imported module: /chunk-A.js'));
+    expect(recover).not.toHaveBeenCalled();
   });
 });
 

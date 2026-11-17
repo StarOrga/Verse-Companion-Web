@@ -72,6 +72,11 @@
         "admin": "Visible to admins only",
         "collab": "Visible to admins and collaborators only"
       }
+    },
+    "deferError": {
+      "message": "The 3D view could not be loaded.",
+      "deckPlan": "The deck plan could not be loaded.",
+      "reload": "Reload"
     }
   },
   "date": {
