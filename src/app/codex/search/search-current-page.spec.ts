@@ -68,8 +68,8 @@ describe('current page: identity', () => {
     expect(isCurrentTarget(v1.target, onC2)).toBe(true);
     expect(isCurrentVariant(v1, onC2)).toBe(false);
     expect(isCurrentVariant(v2, onC2)).toBe(true);
-    // No `v` in the URL: the page shows the active variant.
-    expect(isCurrentVariant(v1, ON_GLADIUS)).toBe(true);
+    // No `v` in the URL: the Codex page shows the stock ship (the row itself), no variant is open.
+    expect(isCurrentVariant(v1, ON_GLADIUS)).toBe(false);
     expect(isCurrentVariant(v2, ON_GLADIUS)).toBe(false);
   });
 });

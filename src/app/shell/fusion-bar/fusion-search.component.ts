@@ -351,7 +351,7 @@ const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
                                      [scTooltip]="'search.row.variantCurrent' | translate" scTooltipTier="label"
                                      (click)="onVariantClick($event, r, v)">{{ v.label || (v.labelKey ?? '' | translate) }}</a>
                                 } @else {
-                                  <a class="vl" [routerLink]="v.target.link" [queryParams]="v.target.queryParams"
+                                  <a class="vl" [class.match]="v.emphasis" [routerLink]="v.target.link" [queryParams]="v.target.queryParams"
                                      (click)="onVariantClick($event, r, v)">{{ v.label || (v.labelKey ?? '' | translate) }}</a>
                                 }
                               }
@@ -670,6 +670,7 @@ const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
     .vl:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .vl.here { color: var(--sc-fg-1); text-decoration: none; font-weight: 600; cursor: default; }
     .vl.more { text-decoration: none; }
+    .vl.match { font-weight: 700; color: var(--sc-fg-0); text-decoration-color: currentColor; }
     .vl { overflow-wrap: anywhere; }
     /* Touch: every mini link a finger-sized target; the list wraps under the row, never past it. */
     @media (pointer: coarse) { .vl { display: inline-flex; align-items: center; min-height: 48px; padding: 0 4px; } }

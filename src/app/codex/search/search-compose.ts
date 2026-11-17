@@ -38,6 +38,7 @@ import { recordScore, searchScore } from '../codex-search';
 import { CtaRow, resolveCta, resolveIcons } from './search-cta';
 import type { SearchFit } from './search-compat';
 import { OwnSearchResult, ownMoreTarget } from './search-own';
+import { otherMemberMatched } from './search-families';
 import { withOptionCounts } from './search-query-parse';
 import {
   NO_SIGNALS,
@@ -87,8 +88,13 @@ export interface ComposeInput {
   facets?: { size: Record<string, number>; grade: Record<string, number> } | null;
   /** The page the reader stands on: its row is hidden (weak match) or greyed (near-exact), never offered as a way there. */
   here?: PageLocation | null;
-  /** The reader's own variants per ship class: a catalog ship row and its own rows become ONE row (C11). */
+  /**
+   * The mini links of a ship row per class — the family's other models, then the reader's own
+   * variants: a catalog ship row and its own rows become ONE row (C11).
+   */
   ownVariants?: ShipVariantsOf;
+  /** The family base (lower case) of a ship class; own rows of any model fold into the family row. */
+  shipBaseOf?: (classNameSlug: string) => string;
 }
 
 /** The chip a hit fails, or null when it is inside every chip. */
@@ -291,7 +297,7 @@ export function composeSearchResult(input: ComposeInput): SearchResult {
 
   // ── one row per ship page (C11): the own rows of a listed hull fold into its catalog row ──
   if (input.ownVariants) {
-    const folded = foldShipRows(groups, outside, input.ownVariants);
+    const folded = foldShipRows(groups, outside, input.ownVariants, input.shipBaseOf);
     groups.splice(0, groups.length, ...folded.groups);
     outside = folded.outside;
     groups.forEach((g, i) => {
@@ -360,10 +366,6 @@ function withVariantState(row: SearchResultRow, here: PageLocation): SearchResul
   return { ...row, variants: markVariants(row.variants, here) };
 }
 
-const slugOf = (r: SearchResultRow): string | null =>
-  r.type === 'hit' ? (r.hit.kind === 'ship' ? r.hit.classNameSlug.toLowerCase() : null)
-    : r.type === 'own' && (r.ownKind === 'ship' || r.ownKind === 'config') ? (r.classNameSlug?.toLowerCase() ?? null)
-      : null;
 
 /**
  * One row per ship page (C11, the reader's words: "ein eintrag mit mini textlinks zu varianten").
@@ -378,7 +380,12 @@ export function foldShipRows(
   groups: readonly SearchResultGroup[],
   outside: SearchResultGroup | null,
   variantsOf: ShipVariantsOf,
+  baseOf: (classNameSlug: string) => string = (c) => c.toLowerCase(),
 ): { groups: SearchResultGroup[]; outside: SearchResultGroup | null } {
+  const slugOf = (r: SearchResultRow): string | null =>
+    r.type === 'hit' ? (r.hit.kind === 'ship' ? baseOf(r.hit.classNameSlug) : null)
+      : r.type === 'own' && (r.ownKind === 'ship' || r.ownKind === 'config') && r.classNameSlug ? baseOf(r.classNameSlug)
+        : null;
   type At = { g: number; r: number };
   const hitAt = new Map<string, At>();
   groups.forEach((g, gi) =>
@@ -404,7 +411,7 @@ export function foldShipRows(
   }
   const withVariants = (r: SearchResultRow): SearchResultRow => {
     const k = r.type === 'hit' ? slugOf(r) : null;
-    const vs = k && r.type === 'hit' ? variantsOf(k) : undefined;
+    const vs = k && r.type === 'hit' ? variantsOf(r.hit.classNameSlug) : undefined;
     return vs?.length && r.type === 'hit' ? { ...r, variants: [...vs] } : r;
   };
   const out: SearchResultGroup[] = [];
@@ -453,7 +460,7 @@ export function applyCurrentRows(
     for (const raw of g.rows) {
       const row = withVariantState(raw, here);
       if (!isCurrentTarget(row.target, here)) rows.push(row);
-      else if (isNearExactRow(term, row)) rows.push(asCurrent(row));
+      else if (isNearExactRow(term, row) || otherMemberMatched(row.type === 'hit' ? row.variants : undefined)) rows.push(asCurrent(row));
       else hidden.push({ at, group: g, row });
     }
     return rows.length === g.rows.length && rows.every((r, i) => r === g.rows[i])

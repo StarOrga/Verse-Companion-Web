@@ -8159,7 +8159,7 @@
     },
     "row": {
       "current": "Du bist hier",
-      "variants": "Meine Varianten",
+      "variants": "Varianten",
       "variantMine": "Mein Schiff",
       "variantsMore": "+{{n}}",
       "variantsMoreAria": "{{n}} weitere Varianten auf der Schiffsseite",

@@ -99,10 +99,13 @@ describe('CodexSearchBarComponent', () => {
     fixture.detectChanges();
 
     const options = Array.from(host.querySelectorAll<HTMLAnchorElement>('[role="option"]'));
-    expect(options.length).toBe(3);
+    // Gladius and Valiant are one ship family: ONE row to Standard, Valiant as a mini link (C11).
+    expect(options.length).toBe(2);
     expect(options.every((a) => a.tagName === 'A' && !!a.getAttribute('href'))).toBe(true);
     expect(options[0].getAttribute('href')).toBe('/codex/ship/AEGS_Gladius');
-    expect(options[2].getAttribute('href')).toBe('/codex/index?kind=ship&q=gladius');
+    expect(options[1].getAttribute('href')).toBe('/codex/index?kind=ship&q=gladius');
+    const links = Array.from(host.querySelectorAll<HTMLAnchorElement>('.variants a.vl'));
+    expect(links.map((a) => [a.textContent?.trim(), a.getAttribute('href')])).toEqual([['Valiant', '/codex/ship/AEGS_Gladius_Valiant']]);
     expect(host.querySelector('.group-head .count')?.textContent?.trim()).toBe('14');
   }));
 
@@ -117,11 +120,13 @@ describe('CodexSearchBarComponent', () => {
     keydown('ArrowDown');
     fixture.detectChanges();
     const id = input().getAttribute('aria-activedescendant')!;
-    expect(host.querySelector(`#${id}`)?.getAttribute('href')).toBe('/codex/ship/AEGS_Gladius_Valiant');
+    expect(host.querySelector(`#${id}`)?.getAttribute('href')).toBe('/codex/index?kind=ship&q=gladius');
+    keydown('ArrowUp');
+    fixture.detectChanges();
 
     keydown('Enter');
     fixture.detectChanges();
-    expect(nav).toHaveBeenCalledWith(['/codex', 'ship', 'AEGS_Gladius_Valiant'], { queryParams: undefined });
+    expect(nav).toHaveBeenCalledWith(['/codex', 'ship', 'AEGS_Gladius'], { queryParams: undefined });
     expect(host.classList).not.toContain('active');
     tick(1000);
   }));

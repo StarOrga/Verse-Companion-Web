@@ -21,6 +21,9 @@ import { composeSearchResult } from './search-compose';
 import { FitItemPort, FitLoadoutEntry, FitPort, buildFitPorts, fitVerdict } from './search-compat';
 import { AliasReading, aliasReadings, setAliasLanguage } from './search-aliases';
 import { OwnSources, ownVariantsByClass, searchOwn } from './search-own';
+import { FamilyFold, ShipFamilyOf, familyFromRows, foldShipFamilies } from './search-families';
+import { editionQueryPrefix } from '../codex-edition-group';
+import type { CodexListRow } from '../codex.service';
 import { OwnSetEntry, ownSetGroups, ownSetOf } from './search-own-sets';
 import { WishNamesService } from './wish-names.service';
 import { parseQuery, switchChip } from './search-query-parse';
@@ -158,23 +161,82 @@ export class CodexSearchEngine {
    */
   readonly here = signal<PageLocation>(pageLocationOf(this.router.url));
   /** The catalog groups the Codex bar and Ctrl+K draw: the current-page rule applied. */
-  readonly listGroups = computed(() => applyCurrentPage(this.groups(), this.searchText(), this.here()));
+  readonly listGroups = computed(() =>
+    applyCurrentPage(this.listFold().groups, this.searchText(), this.here(), this.shipLinks(this.listFold())),
+  );
   readonly options = computed<SearchOption[]>(() =>
     this.input().trim()
-      ? resultOptions(this.listGroups().groups, this.listGroups().current, this.variantsOf(), this.here())
+      ? resultOptions(this.listGroups().groups, this.listGroups().current, this.shipLinks(this.listFold()), this.here())
       : suggestionOptions(this.recent(), this.fresh(), this.here()),
   );
   /**
    * The reader's own variants per ship class: the one catalog row of a ship carries them as mini
    * links on every surface (C11 / C12). Signed out: none.
    */
-  private readonly ownVariantMap = computed(() =>
-    this.signedIn() ? ownVariantsByClass(this.ownSources(), this.shellBeta()) : new Map<string, SearchVariantLink[]>(),
-  );
-  private readonly variantsOf = computed(() => {
-    const map = this.ownVariantMap();
-    return (cls: string): SearchVariantLink[] | undefined => map.get(cls.toLowerCase());
+  private readonly ownVariantMap = computed(() => {
+    if (!this.hasTerm()) return new Map<string, SearchVariantLink[]>();
+    try {
+      return this.signedIn() ? ownVariantsByClass(this.ownSources(), this.shellBeta()) : new Map<string, SearchVariantLink[]>();
+    } catch {
+      return new Map<string, SearchVariantLink[]>(); // the own data is a courtesy; a host without it gets none
+    }
   });
+  /** Sibling records per edition prefix (lower case), read like the ship page reads its model row. */
+  private readonly familyRows = signal<ReadonlyMap<string, readonly CodexListRow[]>>(new Map());
+  private readonly familyRequested = new Set<string>();
+  /**
+   * The ship family of a class: the page's own model row (`resolveModelVariants` over
+   * `listEditionSiblings`). Until the siblings are read, the ship hits themselves stand in.
+   */
+  private readonly familyOf = computed<ShipFamilyOf>(() => {
+    const rows = this.familyRows();
+    const ships = [...this.hits(), ...(this.baseResult()?.hits ?? [])].filter((h) => h.kind === 'ship');
+    const memo = new Map<string, ReturnType<ShipFamilyOf>>();
+    return (cls) => {
+      const k = cls.toLowerCase();
+      if (memo.has(k)) return memo.get(k)!;
+      const prefix = editionQueryPrefix(cls).toLowerCase();
+      const pool = rows.get(prefix) ?? ships.filter((h) => h.classNameSlug.toLowerCase().startsWith(prefix));
+      const fam = familyFromRows(pool, cls);
+      memo.set(k, fam);
+      return fam;
+    };
+  });
+  /** One row per ship family (C11): the Codex bar / Ctrl+K groups and the fusion bar's. */
+  private readonly listFold = computed(() => foldShipFamilies(this.groups(), this.familyOf()));
+  private readonly composeFold = computed(() => foldShipFamilies(this.mergedGroups(), this.familyOf()));
+  /** The mini links of a ship row: the family's other models, then the reader's own variants of any of them. */
+  private shipLinks(fold: FamilyFold): (cls: string) => SearchVariantLink[] | undefined {
+    const own = this.ownVariantMap();
+    return (cls) => {
+      const key = fold.baseOf.get(cls.toLowerCase()) ?? cls.toLowerCase();
+      const all = [...(fold.links.get(key) ?? []), ...(fold.members.get(key) ?? [key]).flatMap((m) => own.get(m) ?? [])];
+      return all.length ? all : undefined;
+    };
+  }
+
+  /** Read the sibling records of the listed ships' families once per prefix (a handful per search). */
+  private requestFamilies(hits: readonly PolySearchHit[]): void {
+    const svc = this.codex as Partial<Pick<CodexService, 'listEditionSiblings'>>;
+    if (typeof svc.listEditionSiblings !== 'function') return;
+    const byPrefix = new Map<string, string>();
+    for (const h of hits) {
+      const p = h.kind === 'ship' ? editionQueryPrefix(h.classNameSlug).toLowerCase() : null;
+      if (p && !this.familyRequested.has(p) && !byPrefix.has(p)) byPrefix.set(p, h.classNameSlug);
+    }
+    const prefixes = [...byPrefix].map(([p, c]) => ({ c, p })).slice(0, 6);
+    for (const { c, p } of prefixes) {
+      this.familyRequested.add(p);
+      void svc
+        .listEditionSiblings('ship', c)
+        .then((rows) => {
+          const next = new Map(this.familyRows());
+          next.set(p, rows);
+          this.familyRows.set(next);
+        })
+        .catch(() => this.familyRequested.delete(p)); // the hits stand in; a later search retries
+    }
+  }
   readonly activeOption = computed<SearchOption | null>(() => this.options()[this.activeIndex()] ?? null);
 
   // -- context, chips and the composed result (concept 2026-11-02) ---------------
@@ -247,9 +309,10 @@ export class CodexSearchEngine {
       : null;
     const compat = chips.find((c) => c.filter.compatWith)?.filter.compatWith;
     const ports = compat?.kind === 'ship' && this.compatPorts()?.key === compat.className ? this.compatPorts()!.ports : null;
+    const fold = this.composeFold();
     return composeSearchResult({
       term: text,
-      groups: this.mergedGroups(),
+      groups: fold.groups,
       context: ctx,
       chips,
       own,
@@ -271,7 +334,8 @@ export class CodexSearchEngine {
       facets: this.facets(),
       ownSet: ownSetOf(chips) !== null,
       here: this.here(),
-      ownVariants: this.variantsOf(),
+      ownVariants: this.shipLinks(fold),
+      shipBaseOf: (cls) => fold.baseOf.get(cls.toLowerCase()) ?? cls.toLowerCase(),
     });
   });
 
@@ -443,7 +507,8 @@ export class CodexSearchEngine {
     }
     this.remember();
     this.navOrigin.noteSearchArrival(this.term(), variant.target.link);
-    if (shipClassName) this.trySignals()?.recordOpen('ship', shipClassName);
+    const opened = variant.kind === 'edition' ? variant.target.link[variant.target.link.length - 1] : shipClassName;
+    if (opened) this.trySignals()?.recordOpen('ship', opened);
     this.trackOpen('ship', null, newTab, { variant: true });
   }
 
@@ -601,6 +666,7 @@ export class CodexSearchEngine {
       const { hits, totals, distinct, read, failed, failure, facets } = await (hasAttrs ? this.codex.searchAll(term, this.perGroup(), attrs) : this.codex.searchAll(term, this.perGroup()));
       if (seq !== this.seq) return; // a newer search superseded this one
       this.hits.set(hits);
+      this.requestFamilies(hits);
       this.totals.set(totals);
       this.counts.set({ distinct, read });
       this.baseResult.set(null);

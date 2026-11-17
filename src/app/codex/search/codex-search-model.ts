@@ -282,6 +282,15 @@ export interface SearchVariantLink {
   label: string;
   /** i18n key shown when `label` is empty. */
   labelKey?: string;
+  /**
+   * `edition`: another model of the ship family (Valiant, Pirate …) — its own ship page;
+   * absent / `own`: one of the reader's saved variants (`?v=`, `?mine`).
+   */
+  kind?: 'edition' | 'own';
+  /** Edition link: the term matched this model. */
+  matched?: true;
+  /** Edition link: the term named this model rather than the family — shown emphasised, listed first. */
+  emphasis?: true;
   target: SearchTarget;
   /** The ship's active variant: what the row itself opens and what the page shows without a `v`. */
   active: boolean;
@@ -295,9 +304,11 @@ export interface SearchVariantLink {
  * ship (codex mode, codex-detail `applyLoadoutSource`) — that is the row's own state, no variant
  * is open — while an HQ ship page shows the active variant.
  */
-export function isCurrentVariant(variant: Pick<SearchVariantLink, 'target' | 'active'>, here: PageLocation | null): boolean {
+export function isCurrentVariant(variant: Pick<SearchVariantLink, 'target' | 'active' | 'kind'>, here: PageLocation | null): boolean {
   if (!here || !isCurrentTarget(variant.target, here)) return false;
   const open = here.query['v'] ?? null;
+  // Another model's page: open unless the reader looks at one of their own variants of it.
+  if (variant.kind === 'edition') return !open && !('mine' in here.query);
   const own = variant.target.queryParams?.['v'] ?? null;
   if (open) return open === own;
   if (!own) return 'mine' in here.query && 'mine' in (variant.target.queryParams ?? {});
@@ -316,7 +327,7 @@ export function markVariants(variants: readonly SearchVariantLink[], here: PageL
 export type ShipVariantsOf = (shipClassName: string) => readonly SearchVariantLink[] | undefined;
 
 /** Variant mini links shown on one row before "+n". */
-export const VARIANT_LINKS_SHOWN = 3;
+export const VARIANT_LINKS_SHOWN = 4;
 
 /** Identity of a hit in the current-page rule. */
 export function hitKey(hit: Pick<PolySearchHit, 'kind' | 'classNameSlug'>): string {
@@ -338,6 +349,7 @@ export function applyCurrentPage(
   groups: readonly CodexSearchGroup[],
   term: string,
   here: PageLocation | null,
+  linksOf?: ShipVariantsOf,
 ): { groups: CodexSearchGroup[]; current: ReadonlySet<string> } {
   if (!here) return { groups: [...groups], current: NO_KEYS };
   const current = new Set<string>();
@@ -346,7 +358,9 @@ export function applyCurrentPage(
   for (const g of groups) {
     const hits = g.hits.filter((hit) => {
       if (!isCurrentTarget(hitTarget(hit), here)) return true;
-      if (isNearExactHit(term, hit)) {
+      // A family row stays (greyed) when the term named the page OR another model of the family.
+      const other = hit.kind === 'ship' && !!linksOf?.(hit.classNameSlug)?.some((v) => v.kind === 'edition' && v.matched);
+      if (isNearExactHit(term, hit) || other) {
         current.add(hitKey(hit));
         return true;
       }

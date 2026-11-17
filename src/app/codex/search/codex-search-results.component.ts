@@ -183,7 +183,7 @@ import { SearchOption, SearchVariantLink, VARIANT_LINKS_SHOWN, hitManufacturer, 
                      [scTooltip]="'search.row.variantCurrent' | translate" scTooltipTier="label"
                      (click)="onVariantClick($event, o, v)">{{ v.label || (v.labelKey ?? '' | translate) }}</a>
                 } @else {
-                  <a class="vl" [routerLink]="v.target.link" [queryParams]="v.target.queryParams"
+                  <a class="vl" [class.match]="v.emphasis" [routerLink]="v.target.link" [queryParams]="v.target.queryParams"
                      (click)="onVariantClick($event, o, v)">{{ v.label || (v.labelKey ?? '' | translate) }}</a>
                 }
               }
@@ -409,6 +409,7 @@ import { SearchOption, SearchVariantLink, VARIANT_LINKS_SHOWN, hitManufacturer, 
     .vl:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .vl.here { color: var(--sc-fg-1); text-decoration: none; font-weight: 600; cursor: default; }
     .vl.more { text-decoration: none; }
+    .vl.match { font-weight: 700; color: var(--sc-fg-0); text-decoration-color: currentColor; }
     @media (pointer: coarse) { .vl { display: inline-flex; align-items: center; min-height: 48px; padding: 0 4px; } }
     @media (max-width: 599.98px) { .variants { padding-left: 8px; } }
     .here {
