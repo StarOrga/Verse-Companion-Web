@@ -979,6 +979,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .below-persp { margin-top: 14px; margin-bottom: 0; }
   /* The stage is a flex column with gap: 6px; the panel cancels it toward the strip so the two meet without a seam (feedback #4). */
   @media (min-width: 901px) { .below-persp { margin-bottom: -6px; } }
+  /* The strip ends before the launcher lane (it measures --holo-fab-clear): what stands on its columns ends there too, or the four columns drift apart. */
+  @media (min-width: 641px) { .holo-below, .below-persp { margin-inline-end: var(--holo-fab-clear, 0px); } }
   .holo-stage.first:is(.ph-wait, .ph-hero) .holo-below { opacity: 0; }
   .first.ph-reveal .holo-below { animation: rise 600ms var(--e-out) 440ms backwards; }
   .holo-below { transition: opacity var(--holo-t-fast) var(--e-io); }
@@ -1739,6 +1741,11 @@ export class CodexHoloStageComponent {
     effect(() => {
       if (this.openDetails()) {
         untracked(() => {
+          // The sources live in the Akte: the jump has to bring that view up, or it scrolls to a hidden target.
+          if (!this.akteOpen()) {
+            this.akteOpen.set(true);
+            this.viewChange.emit('akte');
+          }
           if (typeof requestAnimationFrame !== 'function') return;
           requestAnimationFrame(() => {
             const host: HTMLElement = this.host.nativeElement;
