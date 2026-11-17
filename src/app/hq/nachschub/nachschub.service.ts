@@ -1802,8 +1802,11 @@ export function isLegacyWishLine(l: SupplyItem): boolean {
   return (l.entityKind !== 'item' && l.entityKind !== 'ship') || !!l.forClassName;
 }
 
-/** First day the `wish` source existed: older plain lines may be wishes the old contract moved off the wishlist. */
-export const PLAIN_LINE_CUTOFF = '2026-11-17T00:00:00Z';
+/**
+ * End of the day the `wish` source went live (released 2026-11-17 in the evening): plain lines made up to then may be
+ * wishes the old contract moved off the wishlist - the client in production wrote them that way until the release.
+ */
+export const PLAIN_LINE_CUTOFF = '2026-11-18T00:00:00Z';
 
 /**
  * The complement of {@link isLegacyWishLine} (H4): an open, plain `search` item / ship line made before the cut-off.
