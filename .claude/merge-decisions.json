@@ -268,6 +268,16 @@
         "hunks": [
           "36ea5c0260bf"
         ]
+      },
+      {
+        "ship": "claude/user-security-gap-investigation-747d11",
+        "by": "JerryT2T",
+        "value": "generated file, regenerated with gen-project-map.mjs (count of this tree)",
+        "decided": true,
+        "at": "2026-11-17T11:32:30.936Z",
+        "hunks": [
+          "cd496d198d70"
+        ]
       }
     ],
     ".claude/project-map.md›header›tracked-count": [
@@ -573,6 +583,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›supabase/migrations›file count": [
+      {
+        "ship": "claude/user-security-gap-investigation-747d11",
+        "by": "JerryT2T",
+        "value": "generated file, regenerated with gen-project-map.mjs (count of this tree)",
+        "decided": true,
+        "at": "2026-11-17T11:32:30.936Z",
+        "hunks": [
+          "878e43513ef1"
+        ]
+      }
+    ],
     ".claude/project-map.md›supabase/›count": [
       {
         "ship": "feat/verse-rank-followup",
@@ -616,6 +638,16 @@
         "at": "2026-11-16T21:00:36.879Z",
         "hunks": [
           "8b3dd9ff3e06"
+        ]
+      },
+      {
+        "ship": "claude/user-security-gap-investigation-747d11",
+        "by": "JerryT2T",
+        "value": "generated file, regenerated with gen-project-map.mjs (count of this tree)",
+        "decided": true,
+        "at": "2026-11-17T11:32:30.936Z",
+        "hunks": [
+          "49d4ba974ff0"
         ]
       }
     ],
