@@ -1,4 +1,5 @@
 import { ShipArrivalComponent } from './ship-arrival/ship-arrival.component';
+import { PATH_ICONS } from '../shared/item-path/path-icons';
 import { SilThumbsService } from '../shared/sil-thumb/sil-thumbs.service';
 import { SILHOUETTE_HOLD_MS, arrivalThumbOf } from './ship-arrival/arrival-thumb';
 import { StarTriggerService } from '../verse/starmap/star-trigger.service';
@@ -71,7 +72,6 @@ import { InfoNoteComponent } from '../shared/info-note.component';
 import { ShareButtonComponent } from '../shared/share-button/share-button.component';
 import { ScEntryDirective } from '../shared/entry-motion/entry-motion';
 import { NachschubService } from '../hq/nachschub/nachschub.service';
-import { NACHSCHUB_ICON_PATHS } from '../hq/nachschub/step-icons';
 import { CodexItemStageComponent } from './detail/codex-item-stage.component';
 import { DisplayStatGroup, toDisplayStatGroups } from './detail/stat-labels';
 import { CodexShipStageComponent } from './detail/codex-ship-stage.component';
@@ -1842,7 +1842,8 @@ export class CodexDetailComponent implements OnInit {
   private get nachschub(): NachschubService {
     return (this.nachschubSvc ??= this.lazyInjector.get(NachschubService));
   }
-  protected readonly nachschubIcon = NACHSCHUB_ICON_PATHS;
+  /** The Route glyph of an Operation (B9), from the item path's icon family. */
+  protected readonly nachschubIcon = PATH_ICONS.nachschub;
   /** Every kind but ships (which keep their own stage) gets the stage layout; a missile too, with its own values and rank. */
   /** The frozen Klassisch view reads the page through this (see CodexClassicCtx for what it may touch). */
   protected readonly classicCtx: CodexClassicCtx = this;

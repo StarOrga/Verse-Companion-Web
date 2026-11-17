@@ -38,7 +38,7 @@ const NAME_MARK = '\u0001';
             <span class="msg">
               @let line = p.messageKey | translate: boldParams(p.messageParams);
               @for (seg of segments(line); track $index) {
-                @if (seg.bold) { <b>{{ seg.text }}</b> } @else { {{ seg.text }} }
+                @if (seg.bold) {<b>{{ seg.text }}</b>} @else {<span>{{ seg.text }}</span>}
               }
               @if (p.detailKey; as detail) {
                 <span class="msg-detail">{{ detail | translate: p.detailParams }}</span>

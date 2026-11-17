@@ -1,7 +1,27 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.273.3",
+  "current": "0.273.4",
   "releases": [
+    {
+      "version": "0.273.4",
+      "date": "2026-11-17",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "A finished translation is published right away instead of waiting until the other languages of the same upload have been estimated."
+            },
+            {
+              "title": "",
+              "text": "Publishing a translation no longer ends in a killed worker: the learning pass, which does not fit one request yet, is recorded as due instead of being run with the publish."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.273.3",
       "date": "2026-11-17",

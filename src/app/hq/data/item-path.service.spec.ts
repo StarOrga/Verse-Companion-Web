@@ -19,7 +19,7 @@ interface Ship { id: string; shipClassName: string; status: 'owned' | 'wishlist'
  * The REAL SearchWishlistService (so a ship's two wish homes are the production rule) over a fake store and hangar;
  * Nachschub lines, stock and the second-copy rule are fakes.
  */
-function setup(opts: { user?: boolean; live?: Record<string, unknown> | null; storeFails?: boolean } = {}) {
+function setup(opts: { user?: boolean; live?: Record<string, unknown> | null; storeFails?: boolean; nachschubLoaded?: boolean } = {}) {
   const rows = signal<WishRow[]>([]);
   const row = (e: WishEntry, qty: number): WishRow => ({
     kind: e.kind, className: e.className, name: e.name ?? null, manufacturer: null, rsiUrl: null, notes: null, qty, forClassName: '', createdAt: '',
@@ -103,8 +103,11 @@ function setup(opts: { user?: boolean; live?: Record<string, unknown> | null; st
     },
   };
   const active = signal<{ id: string }[]>([]);
+  const nsLoaded = signal(opts.nachschubLoaded ?? true);
   const nachschub = {
     active,
+    loaded: nsLoaded,
+    ensureLoaded: vi.fn().mockName('ensureLoaded').mockImplementation(async () => nsLoaded.set(true)),
     reconcile: vi.fn().mockName('reconcile').mockResolvedValue(undefined),
     allocationOf: vi.fn().mockName('allocationOf').mockReturnValue({ key: '', wished: 0, assigned: 0, free: 0, assignments: [] }),
     reactivate: vi.fn().mockName('reactivate').mockImplementation(async (id: string) => (active.update((a) => [...a, { id }]), { ok: true })),
@@ -425,6 +428,34 @@ describe('ItemPathService', () => {
       await wishlist.setQty('item', 'medpen', 'Medpen', 4);
       await svc.moveToInventar('item', 'medpen', 'Medpen', 'Lorville', 6);
       expect(wishlist.qtyOf('item', 'medpen', 'Medpen')).toBe(3);
+    });
+
+    it('B8/B4: a session that never opened the HQ loads the Operationen on the first read of a wished item; free stays 0 until then', async () => {
+      const { svc, lines, active, wishlist, nachschub } = setup({ nachschubLoaded: false });
+      active.set([{ id: 'n1' }]);
+      Object.assign(packageLine(lines, 2), { source: 'wish' });
+      await wishlist.setQty('item', 'medpen', 'Medpen', 3);
+      nachschub.allocationOf.mockReturnValue({ key: 'item:medpen', wished: 3, assigned: 2, free: 1, assignments: [] });
+      const before = svc.read('item', 'medpen', 'Medpen');
+      expect(before).toEqual(expect.objectContaining({ assigned: 0, free: 0, assignmentsKnown: false }));
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(nachschub.ensureLoaded).toHaveBeenCalledTimes(1);
+      svc.read('item', 'medpen', 'Medpen'); // no second load while one is done / running
+      expect(svc.read('item', 'medpen', 'Medpen')).toEqual(expect.objectContaining({ assigned: 2, free: 1, assignmentsKnown: true }));
+      expect(nachschub.ensureLoaded).toHaveBeenCalledTimes(1);
+    });
+
+    it('B8: no load for a signed-out reader or an item that is not wished', async () => {
+      const out = setup({ nachschubLoaded: false, user: false });
+      out.svc.read('item', 'medpen', 'Medpen');
+      await Promise.resolve();
+      expect(out.nachschub.ensureLoaded).not.toHaveBeenCalled();
+      TestBed.resetTestingModule();
+      const empty = setup({ nachschubLoaded: false });
+      expect(empty.svc.read('item', 'medpen', 'Medpen').assignmentsKnown).toBe(true);
+      await Promise.resolve();
+      expect(empty.nachschub.ensureLoaded).not.toHaveBeenCalled();
     });
 
     it('A2/A3: the state counts assigned and free pieces; a plain counter never cuts into assigned ones', async () => {

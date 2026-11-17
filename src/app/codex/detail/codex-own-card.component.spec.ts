@@ -8,6 +8,8 @@ import type { HangarShip } from '../../hangar/hangar.types';
 import { ItemPathService } from '../../hq/data/item-path.service';
 import { HqItemMarksService, type HqItemMark } from '../../hq/data/hq-item-marks.service';
 import { HqOwnershipService } from '../../hq/hq-ownership.service';
+import { NachschubService } from '../../hq/nachschub/nachschub.service';
+import { WishRemovalFlowService } from '../../hq/nachschub/wish-removal-flow.service';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { fakeItemPath, type FakeItemPath } from '../../shared/item-path/item-path.testing';
 import { CodexOwnCardComponent } from './codex-own-card.component';
@@ -19,10 +21,17 @@ describe('Codex ownership card + head segment (concept codex-kopf-besitz C2/C5/C
   let path: FakeItemPath;
   let confirm: Mock;
   let prompt: Mock;
+  /** The removal flow runs for real; only the Nachschub store behind it is a stand-in (C6). */
+  let nach: { needsConfirm: boolean; planWishRemoval: Mock; applyWishRemoval: Mock };
   let marks: { list: ReturnType<typeof signal<HqItemMark[]>>; setNote: Mock; setPinned: Mock };
 
   function setup<T>(type: Type<T>, inputs: Record<string, unknown>): ComponentFixture<T> {
     path = fakeItemPath();
+    nach = {
+      needsConfirm: false,
+      planWishRemoval: vi.fn().mockName('planWishRemoval').mockImplementation(() => ({ needsConfirm: nach.needsConfirm })),
+      applyWishRemoval: vi.fn().mockName('applyWishRemoval').mockResolvedValue({ ok: true, key: 'wishRemoval.done', undo: async () => ({ ok: true, key: 'itemPath.done.undone' }) }),
+    };
     confirm = vi.fn().mockName('confirm').mockResolvedValue(true);
     prompt = vi.fn().mockName('prompt').mockResolvedValue(null);
     const list = signal<HqItemMark[]>([]);
@@ -47,6 +56,7 @@ describe('Codex ownership card + head segment (concept codex-kopf-besitz C2/C5/C
         },
         { provide: HangarService, useValue: { error: signal(null), ships: signal([SHIP]), updateShip: vi.fn(), pinShip: vi.fn(), removeShip: vi.fn() } },
         { provide: HqOwnershipService, useValue: { configsForShip: () => [], invalidate: () => undefined } },
+        { provide: NachschubService, useValue: nach },
       ],
     });
     const fixture = TestBed.createComponent(type);
@@ -84,6 +94,37 @@ describe('Codex ownership card + head segment (concept codex-kopf-besitz C2/C5/C
       el.querySelectorAll<HTMLButtonElement>('.oc-step .st')[1].click();
       await flush();
       expect(path.setWishQty).toHaveBeenCalledWith('ship', 'AEGS_Avenger_Stalker', 'Avenger Stalker', 3);
+    });
+
+    it('less with free pieces lowers silently through the removal flow, no dialog (C6, A4)', async () => {
+      const f = setup(CodexOwnCardComponent, { kind: 'weapon', className: 'gun', name: 'Karna' });
+      path.current.set({ wished: true, wishQty: 3, free: 3 });
+      f.detectChanges();
+      const ask = vi.spyOn(TestBed.inject(WishRemovalFlowService) as unknown as { ask: () => Promise<unknown> }, 'ask');
+      (f.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('.oc-step .st')[0].click();
+      await flush();
+      expect(ask).not.toHaveBeenCalled();
+      expect(nach.applyWishRemoval).toHaveBeenCalledWith({ kind: 'weapon', className: 'gun', forClassName: null, name: 'Karna' }, 1, { surface: 'codex' });
+      expect(path.setWishQty).not.toHaveBeenCalled();
+      expect(text(f)).not.toContain('itemPath.err.wishAssigned');
+    });
+
+    it('less into assigned pieces opens the dialog and writes nothing before it is confirmed (C6, A5)', async () => {
+      const f = setup(CodexOwnCardComponent, { kind: 'weapon', className: 'gun', name: 'Karna' });
+      path.current.set({ wished: true, wishQty: 2, assigned: 2, free: 0 });
+      nach.needsConfirm = true;
+      f.detectChanges();
+      let answer: (v: unknown) => void = () => undefined;
+      const ask = vi.spyOn(TestBed.inject(WishRemovalFlowService) as unknown as { ask: () => Promise<unknown> }, 'ask').mockImplementation(() => new Promise((r) => (answer = r)));
+      (f.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('.oc-step .st')[0].click();
+      await flush();
+      expect(ask).toHaveBeenCalledTimes(1);
+      expect(nach.applyWishRemoval).not.toHaveBeenCalled();
+      answer({ qty: 1, dissolve: [] });
+      await flush();
+      expect(nach.applyWishRemoval).toHaveBeenCalledWith({ kind: 'weapon', className: 'gun', forClassName: null, name: 'Karna' }, 1, { surface: 'codex', dissolve: [] });
+      expect(path.setWishQty).not.toHaveBeenCalled();
+      expect(text(f)).not.toContain('itemPath.err.wishAssigned');
     });
 
     it('ship owned: "Dein Exemplar" with the name, the own-ship actions, Nachschub hint, Im HQ zeigen and no variant select', () => {

@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PATH_ICONS } from '../../shared/item-path/path-icons';
@@ -6,7 +7,7 @@ import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScQtyStepperComponent } from '../../shared/qty-stepper/qty-stepper.component';
 import type { RemovalPart, RemovalPlan } from './nachschub.model';
 import { NachschubService, type WishRef } from './nachschub.service';
-import { barSegments, hangingIds } from './wish-removal-bar';
+import { barSegments, hangChain, hangingIds } from './wish-removal-bar';
 
 /** What the user chose in the removal dialog; null (the `closed` value) = cancelled. */
 export interface WishRemovalChoice {
@@ -28,7 +29,7 @@ export interface WishRemovalChoice {
 @Component({
   selector: 'sc-wish-removal-dialog',
   standalone: true,
-  imports: [TranslatePipe, ScPopupComponent, ScActionDirective, ScQtyStepperComponent],
+  imports: [NgTemplateOutlet, TranslatePipe, ScPopupComponent, ScActionDirective, ScQtyStepperComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form class="wr" (submit)="submit($event)">
@@ -44,16 +45,25 @@ export interface WishRemovalChoice {
 
           <div class="wr-what">
             <span class="wr-cap" [id]="capId">{{ (qty() === 1 ? 'wishRemoval.captionOne' : 'wishRemoval.caption') | translate: { n: qty() } }}</span>
-            <ul #bar class="wr-bar" [class.has-out]="hanging().size > 0" role="list" [attr.aria-labelledby]="capId">
+            <ul #bar class="wr-bar" role="list" [attr.aria-labelledby]="capId">
               @for (s of segments(); track s.id) {
                 <li class="wr-sg" [class.out]="hanging().has(s.id)" [class.op]="s.kind === 'op'" [style.--w]="s.qty">
                   @if (s.kind === 'op') {
                     <svg class="wr-i" viewBox="0 0 24 24" aria-hidden="true">@for (d of route; track $index) { <path [attr.d]="d" /> }</svg>
                   }
-                  <span class="wr-sl">{{ labelOf(s.id) }}</span>
+                  <span class="wr-sl" [class.sc-sr-only]="hanging().has(s.id)">{{ labelOf(s.id) }}</span>
                 </li>
               }
             </ul>
+            <!-- Labels that do not fit hang here: nested, so each has its own line and its own tick, and none runs into another. -->
+            @if (chain().length) {
+              <div class="wr-hangs" aria-hidden="true"><ng-container *ngTemplateOutlet="hang; context: { i: 0 }" /></div>
+            }
+            <ng-template #hang let-i="i">
+              @if (chain()[i]; as h) {
+                <div class="wr-hg" [style.margin-inline-start.px]="h.margin">@if (i + 1 < chain().length) {<ng-container *ngTemplateOutlet="hang; context: { i: i + 1 }" />}<span class="wr-hl">{{ labelOf(h.id) }}</span></div>
+              }
+            </ng-template>
           </div>
 
           @if (rows().length > 1) {
@@ -88,8 +98,8 @@ export interface WishRemovalChoice {
               <span>{{ (staying().length > 1 ? 'wishRemoval.alsoDissolveNamed' : 'wishRemoval.alsoDissolve') | translate: { name: p.packageName } }}</span>
             </label>
           }
-          @if (keeps() > 0) {
-            <span class="wr-mut">{{ (keeps() > 1 ? 'wishRemoval.keepsMany' : 'wishRemoval.keeps') | translate }}</span>
+          @for (p of keeping(); track p.packageId) {
+            <span class="wr-mut">{{ 'wishRemoval.keeps' | translate: { name: p.packageName } }}</span>
           }
         </div>
         <ng-container popupActions>
@@ -113,15 +123,16 @@ export interface WishRemovalChoice {
     .wr-i { flex: none; inline-size: 14px; block-size: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; color: var(--sc-accent); }
     /* One bar, one style: every segment has the same background and border; the Route icon and the text mark an Operation. */
     .wr-bar { display: flex; gap: 3px; min-width: 0; margin: 0; padding: 0; list-style: none; }
-    .wr-bar.has-out { margin-block-end: 28px; }
     .wr-sg { position: relative; flex: var(--w) 1 0; min-inline-size: 56px; display: flex; align-items: center; gap: 6px; block-size: 30px; padding: 0 10px;
       border: 1px solid var(--sc-border); border-radius: 6px; background: color-mix(in srgb, var(--sc-accent) 8%, transparent);
       color: var(--sc-fg-1); font-size: 0.75rem; font-weight: 500; white-space: nowrap; overflow: hidden; }
     .wr-sl { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
     /* A label that does not fit hangs under its segment on a tick. */
-    .wr-sg.out { overflow: visible; justify-content: center; }
-    .wr-sg.out > .wr-sl { position: absolute; inset-block-start: calc(100% + 8px); inset-inline-end: 0; overflow: visible; color: var(--sc-fg-1); }
-    .wr-sg.out::after { content: ''; position: absolute; inset-block-start: 100%; inset-inline-start: 50%; inline-size: 1px; block-size: 7px; background: var(--sc-accent); }
+    .wr-sg.out { justify-content: center; }
+    .wr-hangs { margin-block-start: 4px; min-inline-size: 0; }
+    /* The nested element's left border is the tick; the label sits at its foot, wraps, is never cut. */
+    .wr-hg { border-inline-start: 1px solid var(--sc-accent); padding-inline-start: 8px; padding-block-end: 6px; min-inline-size: 0; }
+    .wr-hl { display: block; color: var(--sc-fg-1); font-size: 0.75rem; overflow-wrap: anywhere; }
     .wr-rows { display: flex; flex-direction: column; gap: 6px; }
     .wr-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding: 6px 10px; border: 1px solid var(--sc-border); border-radius: 8px; }
     .wr-rn { flex: 1 1 8rem; min-inline-size: 0; display: flex; flex-direction: column; overflow-wrap: anywhere; }
@@ -197,7 +208,8 @@ export class WishRemovalDialogComponent implements AfterViewInit {
   private readonly emptied = computed(() => this.effective().parts.filter((p) => p.qty > 0 && p.lastWish));
   protected readonly dissolving = computed(() => this.emptied().filter((p) => p.dissolves));
   protected readonly staying = computed(() => this.emptied().filter((p) => !p.dissolves));
-  protected readonly keeps = computed(() => this.effective().parts.filter((p) => p.qty > 0 && !p.lastWish).length);
+  protected readonly keeping = computed(() => this.effective().parts.filter((p) => p.qty > 0 && !p.lastWish));
+  protected readonly chain = computed(() => hangChain(this.segments(), this.hanging(), this.barPx()));
   protected readonly dissolveAny = computed(() => this.dissolving().length > 0 || this.dissolveChosen().length > 0);
   protected readonly danger = computed(() => this.dissolving().length > 0);
 

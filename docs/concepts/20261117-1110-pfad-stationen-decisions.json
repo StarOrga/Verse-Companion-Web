@@ -75,11 +75,36 @@
         }
       ],
       "annotations": [
-        { "id": "r2-wunsch-schiff-a1", "design": "wunsch", "screen": "wunsch-schiff", "answer": "finde ich gut hier!" },
-        { "id": "r2-wunsch-offen-a1", "design": "wunsch", "screen": "wunsch-offen", "answer": "sehr gut" },
-        { "id": "r2-wunsch-zuordnen-a1", "design": "wunsch", "screen": "wunsch-zuordnen", "answer": "sehr gut, immer das maximale vorgeschlagne" },
-        { "id": "r2-wunsch-zuordnen-a2", "design": "wunsch", "screen": "wunsch-zuordnen", "answer": "Das macht Sinn!" },
-        { "id": "r2-wunsch-liste-a1", "design": "wunsch", "screen": "wunsch-liste", "answer": "gestrichelt ist zu viel, aber das projekt icon ist supoer" }
+        {
+          "id": "r2-wunsch-schiff-a1",
+          "design": "wunsch",
+          "screen": "wunsch-schiff",
+          "answer": "finde ich gut hier!"
+        },
+        {
+          "id": "r2-wunsch-offen-a1",
+          "design": "wunsch",
+          "screen": "wunsch-offen",
+          "answer": "sehr gut"
+        },
+        {
+          "id": "r2-wunsch-zuordnen-a1",
+          "design": "wunsch",
+          "screen": "wunsch-zuordnen",
+          "answer": "sehr gut, immer das maximale vorgeschlagne"
+        },
+        {
+          "id": "r2-wunsch-zuordnen-a2",
+          "design": "wunsch",
+          "screen": "wunsch-zuordnen",
+          "answer": "Das macht Sinn!"
+        },
+        {
+          "id": "r2-wunsch-liste-a1",
+          "design": "wunsch",
+          "screen": "wunsch-liste",
+          "answer": "gestrichelt ist zu viel, aber das projekt icon ist supoer"
+        }
       ],
       "reading": "Direction 'Am Wunsch' is set; every recommendation was taken. Two points stay open and were flagged by the hesitation signal: the name (Projekt reads as not thematic and as months of work) and the removal of an assigned wish (ask how many, release them from the group too, warn when the group is dissolved by it). Rows: no dashed ring, the badge alone marks the assignment.",
       "generated_at": "2026-11-17T11:40:52Z",
@@ -138,20 +163,80 @@
         "r3-d-hq": "no (deviates from the recommendation: releasing in the HQ asks)"
       },
       "annotations": [
-        { "id": "r3-pfad-liste-a1", "design": "pfad", "screen": "pfad-liste", "answer": "ja" },
-        { "id": "r3-entfernen-frei-a1", "design": "entfernen", "screen": "entfernen-frei", "answer": "der ist noch nicht so suppper hübsch... gern polishen! Muss mehr eye catching sein" },
-        { "id": "r3-entfernen-dialog-a1", "design": "entfernen", "screen": "entfernen-dialog", "answer": "jain, die balken waren mir nicht zugeordnet genugg zur legende, sprich was die balken zu tun haben dort war erst auf dem driitten blick kalr" },
-        { "id": "r3-entfernen-mehrere-a1", "design": "entfernen", "screen": "entfernen-mehrere", "answer": "sehr gut!" },
-        { "id": "r3-entfernen-letzter-a1", "design": "entfernen", "screen": "entfernen-letzter", "answer": "sehr gut!" },
-        { "id": "r3-entfernen-aufgeloest-a1", "design": "entfernen", "screen": "entfernen-aufgeloest", "answer": "Sehr gut!" }
+        {
+          "id": "r3-pfad-liste-a1",
+          "design": "pfad",
+          "screen": "pfad-liste",
+          "answer": "ja"
+        },
+        {
+          "id": "r3-entfernen-frei-a1",
+          "design": "entfernen",
+          "screen": "entfernen-frei",
+          "answer": "der ist noch nicht so suppper hübsch... gern polishen! Muss mehr eye catching sein"
+        },
+        {
+          "id": "r3-entfernen-dialog-a1",
+          "design": "entfernen",
+          "screen": "entfernen-dialog",
+          "answer": "jain, die balken waren mir nicht zugeordnet genugg zur legende, sprich was die balken zu tun haben dort war erst auf dem driitten blick kalr"
+        },
+        {
+          "id": "r3-entfernen-mehrere-a1",
+          "design": "entfernen",
+          "screen": "entfernen-mehrere",
+          "answer": "sehr gut!"
+        },
+        {
+          "id": "r3-entfernen-letzter-a1",
+          "design": "entfernen",
+          "screen": "entfernen-letzter",
+          "answer": "sehr gut!"
+        },
+        {
+          "id": "r3-entfernen-aufgeloest-a1",
+          "design": "entfernen",
+          "screen": "entfernen-aufgeloest",
+          "answer": "Sehr gut!"
+        }
       ],
       "user_pins": [
-        { "id": "up-mwknv49q9yz4", "screen": "pfad-offen", "target": "Keiner Operation zugeordnet · Zuordnen", "text": "wenn keiner operation zugeordnet, reicht einfach der zuronden button ohne die ganze leiste, analog zu ins inventar!" },
-        { "id": "up-mwknvhorsj2w", "screen": "pfad-offen", "target": "Ins Inventar", "text": "Wenn es im inventar ist, sieht man darunter auch so eine leiste, die z. B. anzeigt wo? Ich würde gern die beiden kästen ähnlich halten !" },
-        { "id": "up-mwknxddbg0ea", "screen": "pfad-zuordnen", "target": "Einer Operation zuordnen", "text": "finde ich super, aber irgendwie nicht zugeordnet zu dem zurodnen button!? Das sollte sich ja visuell daran anschließen" },
-        { "id": "up-mwknxx4s1r5z", "screen": "pfad-zuordnen", "target": "Flotte ausbauen 2/5", "text": "Ich denke es wäre gut, dass danach anzuordnen welcher als letztes erstellt wurde oben und neue operation unten belassen" },
-        { "id": "up-mwknyuuim75d", "screen": "pfad-zuordnen", "target": "3 von 7 Plätzen belegt · Einsätze planst du im HQ", "text": "hq als link!? zur planen sektion!?" },
-        { "id": "up-mwko3wxxjgj1", "screen": "entfernen-letzter", "target": "1 aus Operation „Flotte ausbauen“", "text": "aber dann hier ohne balken? Naja, das balken thema eh nochmal überarbeiten" }
+        {
+          "id": "up-mwknv49q9yz4",
+          "screen": "pfad-offen",
+          "target": "Keiner Operation zugeordnet · Zuordnen",
+          "text": "wenn keiner operation zugeordnet, reicht einfach der zuronden button ohne die ganze leiste, analog zu ins inventar!"
+        },
+        {
+          "id": "up-mwknvhorsj2w",
+          "screen": "pfad-offen",
+          "target": "Ins Inventar",
+          "text": "Wenn es im inventar ist, sieht man darunter auch so eine leiste, die z. B. anzeigt wo? Ich würde gern die beiden kästen ähnlich halten !"
+        },
+        {
+          "id": "up-mwknxddbg0ea",
+          "screen": "pfad-zuordnen",
+          "target": "Einer Operation zuordnen",
+          "text": "finde ich super, aber irgendwie nicht zugeordnet zu dem zurodnen button!? Das sollte sich ja visuell daran anschließen"
+        },
+        {
+          "id": "up-mwknxx4s1r5z",
+          "screen": "pfad-zuordnen",
+          "target": "Flotte ausbauen 2/5",
+          "text": "Ich denke es wäre gut, dass danach anzuordnen welcher als letztes erstellt wurde oben und neue operation unten belassen"
+        },
+        {
+          "id": "up-mwknyuuim75d",
+          "screen": "pfad-zuordnen",
+          "target": "3 von 7 Plätzen belegt · Einsätze planst du im HQ",
+          "text": "hq als link!? zur planen sektion!?"
+        },
+        {
+          "id": "up-mwko3wxxjgj1",
+          "screen": "entfernen-letzter",
+          "target": "1 aus Operation „Flotte ausbauen“",
+          "text": "aber dann hier ohne balken? Naja, das balken thema eh nochmal überarbeiten"
+        }
       ],
       "reading": "The rules are settled as recommended, except releasing in the HQ, which shall ask. The name question was not looked at; the owner already writes 'Operation' in their own notes. What remains is polish: both stations built alike (button only when empty, a status strip when filled, the ownership strip showing the place), the picker hanging on its button with the newest Operation on top and a link to HQ Planen, a split bar that labels itself and appears in every dialog, a louder toast.",
       "generated_at": "2026-11-17T12:18:46Z",
@@ -191,7 +276,7 @@
     {
       "iteration": 4,
       "template": "design",
-      "status": "open",
+      "status": "submitted",
       "generated_at": "2026-11-17T12:48:54Z",
       "design_set": "topics",
       "designs": [
@@ -219,7 +304,51 @@
         "rows and cards: solid ring, badge only"
       ],
       "changes_from_round_3": "both stations built alike (button only when empty, status strip when filled; the ownership strip shows quantity and place); the picker hangs on its button, newest Operation first, 'im HQ' links to /hq#planen; one self-labelled split bar in all four dialogs, no legend; a louder toast with accent edge, undo pill and time line; new screen entfernen-hq with a short confirmation",
-      "brief": "docs/concepts/20261117-1110-pfad-stationen/briefs/04.md"
+      "brief": "docs/concepts/20261117-1110-pfad-stationen/briefs/04.md",
+      "action": "implement",
+      "submitted_at": "2026-11-17",
+      "answers": {
+        "r4-d-name4": "yes (the word Operation)",
+        "r4-d-hqfrage": "immer (releasing in the HQ always asks)"
+      },
+      "pins": [
+        "pfad-beides: one line; nearest place plus a hint for further places",
+        "entfernen-frei: much better; this toast for ALL undo toasts",
+        "entfernen-dialog: all bar segments one style",
+        "entfernen-hq: third, red button to also delete from the wishlist",
+        "own pin: 1 von 4 Einsaetzen stands after the progress marks"
+      ],
+      "implement": {
+        "brief": "docs/concepts/20261117-1110-pfad-stationen/briefs/implement.md",
+        "lines": 39,
+        "check": {
+          "met": 26,
+          "partial": 8,
+          "not_reached_in_app": 5
+        },
+        "result": "built on claude/wishlist-icons-ux-6565a1; build and full test run green; fix round after the independent check running",
+        "needs_decision": "where the two stations live on item and ship pages (round 5): the two-station control is rendered only on blueprint and upcoming pages reached from the HQ or a set; item and ship pages use sc-codex-own-card"
+      }
+    },
+    {
+      "iteration": 5,
+      "template": "design",
+      "status": "open",
+      "generated_at": "2026-11-17T15:08:00Z",
+      "reason": "needs-decision from the implement run",
+      "designs": [
+        "karte (the existing card gains the strips)",
+        "kaesten (the two stations replace the card)"
+      ],
+      "analysis_view": {
+        "id": "r5-wo",
+        "decisions": [
+          "r5-d-bauplan",
+          "r5-d-einfach",
+          "r5-d-holo"
+        ]
+      },
+      "brief": "docs/concepts/20261117-1110-pfad-stationen/briefs/05.md"
     }
   ]
 }

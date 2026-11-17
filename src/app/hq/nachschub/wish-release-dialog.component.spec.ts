@@ -32,7 +32,7 @@ describe('release confirmation in the HQ (C7)', () => {
     expect(q('.scp-title')?.textContent).toContain('Karna Rifle aus der Operation lösen?');
     expect(q('.wr-text')?.textContent).toContain('Die 3 Stücke bleiben auf deiner Wunschliste und werden wieder frei.');
     const names = Array.from(document.querySelectorAll('sc-wish-release-dialog button.sc-action')).map((b) => b.textContent!.trim()).filter((t) => t && !t.includes('Schließen'));
-    expect(names).toEqual(expect.arrayContaining(['Lösen', 'Abbrechen', 'Auch von der Wunschliste löschen']));
+    expect(names).toEqual(['Abbrechen', 'Lösen', 'Auch von der Wunschliste löschen']);
     expect(q('button.delete')!.classList).toContain('sc-action--danger');
     expect(q('button.release')!.classList).toContain('sc-action--primary');
     q<HTMLButtonElement>('button.release')!.click();

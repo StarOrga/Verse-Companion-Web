@@ -24,7 +24,7 @@ export interface WishReleaseChoice {
   imports: [TranslatePipe, ScPopupComponent, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <sc-popup kind="dialog" size="s" [sheet]="true" dialogRole="alertdialog" [backdrop]="false"
+    <sc-popup kind="dialog" size="m" [sheet]="true" dialogRole="alertdialog" [backdrop]="false"
               [title]="'wishRemoval.release.title' | translate: { name: name() }" (closed)="closed.emit(null)">
       <div class="wr-body">
         <p class="wr-text">{{ (info().pieces === 1 ? 'wishRemoval.release.textOne' : 'wishRemoval.release.text') | translate: { n: info().pieces } }}</p>
@@ -47,15 +47,23 @@ export interface WishReleaseChoice {
           }
         }
       </div>
-      <ng-container popupActions>
-        <button scAction tier="primary" type="button" class="release" (click)="answer('release')">{{ 'wishRemoval.release.confirm' | translate }}</button>
+      <span popupActions class="wr-acts">
         <button scAction tier="secondary" type="button" class="cancel" (click)="closed.emit(null)">{{ 'common.dialog.cancel' | translate }}</button>
+        <button scAction tier="primary" type="button" class="release" (click)="answer('release')">{{ 'wishRemoval.release.confirm' | translate }}</button>
         <button scAction tier="secondary" tone="danger" type="button" class="delete" (click)="answer('delete')">{{ 'wishRemoval.release.deleteToo' | translate }}</button>
-      </ng-container>
+      </span>
     </sc-popup>
   `,
   styles: [`
     :host { display: block; }
+    /* The mock's order on one row: Abbrechen, Lösen, the red one. On a phone they stack: Lösen first, Abbrechen, the red one clearly apart. */
+    .wr-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    @media (max-width: 720px) {
+      .wr-acts { flex-direction: column; align-items: stretch; inline-size: 100%; }
+      .wr-acts .release { order: 1; }
+      .wr-acts .cancel { order: 2; }
+      .wr-acts .delete { order: 3; margin-block-start: 12px; }
+    }
     .wr-body { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
     .wr-text { margin: 0; color: var(--sc-fg-1); overflow-wrap: anywhere; }
     .wr-i { flex: none; inline-size: 14px; block-size: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; color: var(--sc-accent); margin-block-start: 2px; }

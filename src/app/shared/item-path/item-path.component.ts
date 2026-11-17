@@ -195,7 +195,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
                   <a class="strip asg" data-strip="operation" [routerLink]="hqRoot" fragment="planen"
                      (click)="onOperationLink($event, a.packageId)" (auxclick)="onOperationLink($event, a.packageId)">
                     <svg class="strip-i" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.nachschub; track $index) { <path [attr.d]="d" /> }</svg>
-                    <span class="asg-name">{{ (a.qty >= state().wishQty && state().wishQty === 1 ? 'pathCtl.assign.lineWhole' : 'pathCtl.assign.line') | translate: { n: a.qty, name: a.packageName } }}</span>
+                    <span class="asg-name">{{ 'pathCtl.assign.line' | translate: { n: a.qty, name: a.packageName } }}</span>
                     @if (a.einsaetzeTotal > 0) {
                       <span class="seg" aria-hidden="true">@for (m of marks(a.einsaetzeDone, a.einsaetzeTotal); track $index) { <i [class.on]="m"></i> }</span>
                       <span class="mut">{{ 'pathCtl.assign.progress' | translate: { done: a.einsaetzeDone, total: a.einsaetzeTotal } }}</span>

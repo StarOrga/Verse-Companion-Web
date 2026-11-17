@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, effect, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Injector, computed, effect, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import type { HangarShip } from '../../hangar/hangar.types';
@@ -9,11 +9,11 @@ import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { UndoToastService } from '../../shared/undo-toast/undo-toast.service';
+import { WishRemovalFlowService } from '../../hq/nachschub/wish-removal-flow.service';
 import { CodexOwnShipActionsComponent } from '../holo/codex-own-ship-actions.component';
 import { PATH_ICONS } from '../../shared/item-path/path-icons';
 import { OWN_ICONS } from './codex-own-segment.component';
 
-const CRATE_ICON = 'M4 7h16v13H4zM4 7l2-3h12l2 3M9 11h6';
 const FLASH_MS = 1400;
 
 /**
@@ -45,7 +45,7 @@ const FLASH_MS = 1400;
         @if (nachschubName(); as n) {
           <div class="oc-row">
             <span class="oc-hq">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="crateIcon" /></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true">@for (d of operationIcon; track $index) { <path [attr.d]="d" /> }</svg>
               {{ 'codex.ownCard.inNachschub' | translate: { name: n } }}
             </span>
           </div>
@@ -178,6 +178,8 @@ const FLASH_MS = 1400;
 })
 export class CodexOwnCardComponent {
   private readonly path = inject(ItemPathService);
+  /** Resolved on use: the flow pulls in the Nachschub store and the dialogs. */
+  private readonly injector = inject(Injector);
   private readonly toast = inject(UndoToastService);
   private readonly confirmDialog = inject(ScConfirmService);
   private readonly marks = inject(HqItemMarksService);
@@ -195,7 +197,8 @@ export class CodexOwnCardComponent {
 
   protected readonly icons = OWN_ICONS;
   protected readonly wishIcon = PATH_ICONS.wish;
-  protected readonly crateIcon = CRATE_ICON;
+  /** An Operation is marked with the Route glyph everywhere (B9). */
+  protected readonly operationIcon = PATH_ICONS.nachschub;
   protected readonly cartParams = cartLinkParams;
   protected readonly state = computed(() => this.path.state(this.kind(), this.className(), this.name())());
   protected readonly isShip = computed(() => this.kind() === 'ship' || this.kind() === 'upcoming');
@@ -256,7 +259,30 @@ export class CodexOwnCardComponent {
   }
 
   stepWish(delta: number): Promise<void> {
+    if (delta < 0) return this.lowerWish(-delta);
     return this.run(() => this.path.setWishQty(this.kind(), this.className(), this.name(), this.state().wishQty + delta));
+  }
+
+  /**
+   * C6: lowering the wish runs through the ONE removal flow, like the path control: free pieces go without a question
+   * (A4), a cut into assigned pieces opens the dialog and writes nothing before it is confirmed (A5). Cancelled = null.
+   */
+  private async lowerWish(n: number): Promise<void> {
+    if (this.busy()) return;
+    this.busy.set(true);
+    this.errorKey.set(null);
+    try {
+      const flow = this.injector.get(WishRemovalFlowService);
+      const res = await flow.lower({ kind: this.kind(), className: this.className(), forClassName: null, name: this.label() }, n, 'codex');
+      if (!res) return;
+      if (!res.ok) {
+        this.errorKey.set(res.key);
+        return;
+      }
+      flow.announce(res, (key) => this.errorKey.set(key));
+    } finally {
+      this.busy.set(false);
+    }
   }
 
   /** Ships go into the Hangar; items into the Inventar at the current place (live location or "Bei mir"). */

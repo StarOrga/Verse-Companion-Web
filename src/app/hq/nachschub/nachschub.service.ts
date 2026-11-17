@@ -898,6 +898,9 @@ export class NachschubService {
    * as `hq:path_group_assign`.
    */
   async assignWish(ref: WishRef, qty: number, target: string | 'new', opts: { name?: string; surface?: PathGroupSurface } = {}): Promise<NachschubResult> {
+    // Outside the HQ the list may not be loaded yet: free pieces are counted only against every Operation (A3).
+    await this.ensureLoaded();
+    if (!this.loaded()) return fail(this.error() ?? 'errors.generic');
     if (this.allocationOf(ref).free <= 0) return fail('hq.nachschub.nothingFree');
     const picks = [{ key: positionKey(ref), qty: Math.max(1, Math.round(qty)) }];
     const r = target === 'new' ? await this.createFromWishlist({ picks, name: opts.name }) : await this.addFromWishlist(target, picks);

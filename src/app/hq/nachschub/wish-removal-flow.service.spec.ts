@@ -133,6 +133,29 @@ describe('WishRemovalFlowService', () => {
     expect(applyWishRemoval).toHaveBeenCalledOnce();
   });
 
+  it('two labels that do not fit hang on their own lines and never run into each other', async () => {
+    const { flow } = setup(3, [
+      holder('a', 'Omnisky-III-Kanone', 1, '2026-11-03'),
+      holder('b', 'AMRS Laser Cannon S1', 1, '2026-11-01'),
+    ]);
+    const p = flow.lower(REF, 3, 'wishlist');
+    await settle();
+    await settle();
+    const labels = qa('.wr-hl');
+    expect(labels.length).toBe(2);
+    const [r1, r2] = labels.map((l) => l.getBoundingClientRect());
+    expect(r1.bottom <= r2.top + 0.5 || r2.bottom <= r1.top + 0.5).toBe(true);
+    expect(qa('.wr-hg').length).toBe(2);
+    // every segment keeps the one style
+    const segs = qa('.wr-sg').map((e) => getComputedStyle(e).backgroundColor);
+    expect(new Set(segs).size).toBe(1);
+    // the hanging labels are still there for assistive tech inside their segments
+    expect(qa('.wr-sg .sc-sr-only').length).toBe(2);
+    expect(qa('.wr-mut').map((e) => e.textContent!.trim())).toEqual(['„Omnisky-III-Kanone“ behält andere Wünsche.', '„AMRS Laser Cannon S1“ behält andere Wünsche.']);
+    q<HTMLButtonElement>('button.cancel')!.click();
+    await p;
+  });
+
   it('announce puts the undo of a result on the toast, with a second line when an Operation went along', () => {
     const { flow } = setup(1, []);
     const toast = TestBed.inject(UndoToastService);
@@ -163,5 +186,30 @@ describe('removal dialog on a phone (C8)', () => {
     expect(r.height).toBeLessThan(window.innerHeight - 24);
     expect(getComputedStyle(frame).borderTopLeftRadius).toBe('16px');
     q<HTMLButtonElement>('button.cancel')!.click();
+  });
+});
+
+describe('removal dialog bar at 390 px', () => {
+  useViewport(390, 780);
+  afterEach(() => TestBed.inject(OverlayContainer).ngOnDestroy());
+
+  it('three long labels hang without colliding or being cut', async () => {
+    const { flow } = setup(4, [
+      holder('a', 'Omnisky-III-Kanone', 1, '2026-11-03'),
+      holder('b', 'AMRS Laser Cannon S1 mit langem Namen', 1, '2026-11-02'),
+      holder('c', 'Bodentrupp ausrüsten', 1, '2026-11-01'),
+    ]);
+    const p = flow.lower(REF, 4, 'wishlist');
+    await settle();
+    await settle();
+    const rects = qa('.wr-hl').map((l) => l.getBoundingClientRect());
+    expect(rects.length).toBeGreaterThanOrEqual(2);
+    for (let i = 0; i < rects.length; i++) {
+      expect(rects[i].right).toBeLessThanOrEqual(window.innerWidth);
+      for (let j = i + 1; j < rects.length; j++) expect(rects[i].bottom <= rects[j].top + 0.5 || rects[j].bottom <= rects[i].top + 0.5).toBe(true);
+    }
+    expect(qa('.wr-hl').every((l) => getComputedStyle(l).textOverflow !== 'ellipsis')).toBe(true);
+    q<HTMLButtonElement>('button.cancel')!.click();
+    await p;
   });
 });

@@ -40,3 +40,32 @@ export function hangingIds(segments: readonly BarSegment[], labels: ReadonlyMap<
   }
   return out;
 }
+
+/** One hanging label: where its tick stands (px from the bar's left edge) and how far to indent it from the tick before it. */
+export interface HangItem {
+  readonly id: string;
+  readonly x: number;
+  readonly margin: number;
+}
+
+/**
+ * The hanging labels as a chain, leftmost first. Each level is nested in the one before it: the nested element's left
+ * border is the tick, so a tick runs down from the bar past the shallower labels (which start to its right) to its
+ * own line, and no label can run into another - every label has its own line and wraps instead of being cut. A tick
+ * near the right end is pulled left so its label keeps at least `minLabelPx` to wrap in.
+ */
+export function hangChain(segments: readonly BarSegment[], hanging: ReadonlySet<string>, barPx: number, gapPx = 3, minPx = 56, minLabelPx = 140): readonly HangItem[] {
+  if (barPx <= 0 || hanging.size === 0) return [];
+  const total = segments.reduce((n, s) => n + s.qty, 0);
+  const room = barPx - gapPx * (segments.length - 1);
+  let left = 0;
+  const xs: { id: string; x: number }[] = [];
+  for (const s of segments) {
+    const width = Math.max(minPx, (s.qty / total) * room);
+    if (hanging.has(s.id)) xs.push({ id: s.id, x: Math.max(0, Math.min(left + width / 2, barPx - minLabelPx)) });
+    left += width + gapPx;
+  }
+  xs.sort((a, b) => a.x - b.x);
+  // 9 px = the 1 px tick plus the 8 px between tick and text.
+  return xs.map((h, i) => ({ id: h.id, x: h.x, margin: i === 0 ? h.x : Math.max(0, h.x - (xs[i - 1].x + 9)) }));
+}

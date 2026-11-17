@@ -92,6 +92,11 @@ export interface ItemPathState {
   steps: readonly PathStep[];
   /** 'notYetInGame' for announced ships (only the wish step exists). */
   hint: 'notYetInGame' | null;
+  /**
+   * False while the data behind `assigned` / `free` / `assignments` is still loading for a wished item (outside the
+   * HQ it loads on the first read). `free` is 0 until then; absent = known (test states).
+   */
+  assignmentsKnown?: boolean;
   signedIn: boolean;
 }
 
@@ -228,6 +233,32 @@ export class ItemPathService {
     return this.livePlace() ?? PLACE_WITH_ME;
   }
 
+  private assignLoad: Promise<void> | null = null;
+
+  /**
+   * Supply lines pulled and the Nachschub list loaded (reactive). Starts the Nachschub load once when it is missing -
+   * from a microtask, so no signal is written while a computed runs; a failed load is logged and the next read
+   * retries. No timer, nothing in the zone that keeps running.
+   */
+  private assignmentsLoaded(): boolean {
+    const ns = this.injector.get(NachschubService);
+    const supplies = this.supplies as Partial<HqSuppliesService>;
+    const linesReady = supplies.ready ? supplies.ready() : true;
+    if (ns.loaded()) return linesReady;
+    if (!this.assignLoad) {
+      this.assignLoad = Promise.resolve()
+        .then(() => untracked(() => ns.ensureLoaded()))
+        .then(() => {
+          if (!untracked(() => ns.loaded())) this.assignLoad = null;
+        })
+        .catch((err: unknown) => {
+          logWarn('itemPath', 'assignments load failed', err);
+          this.assignLoad = null;
+        });
+    }
+    return false;
+  }
+
   /** The live location name while the game runs and the app knows it, else null. */
   livePlace(): string | null {
     const state = this.live.state();
@@ -275,8 +306,13 @@ export class ItemPathService {
     }
     if (!places.length) places = NO_PLACES as PathPlace[];
     const wishQty = this.wishlist.qtyOf(kind, className, name);
-    // Only an item with an open wish line can have assigned pieces; the Nachschub service is asked only then.
-    const alloc = wishLines && wishQty > 0 ? this.injector.get(NachschubService).allocationOf({ kind, className, forClassName: null }) : null;
+    // The assignment needs the supply lines (HqSuppliesService pulls them by itself for a signed-in user) AND the
+    // Nachschub list, which only the HQ loaded so far: a wished item read anywhere (search row, card, detail) asks
+    // for it once (B8/B4). Until both are there `assignmentsKnown` is false and `free` is 0, so no surface offers
+    // assigned pieces as free (A3).
+    const signedIn = !!this.auth.user();
+    const known = wishQty > 0 && signedIn ? this.assignmentsLoaded() : true;
+    const alloc = known && wishLines && wishQty > 0 ? this.injector.get(NachschubService).allocationOf({ kind, className, forClassName: null }) : null;
     const assigned = Math.min(wishQty, alloc?.assigned ?? 0);
     return {
       kind,
@@ -286,8 +322,9 @@ export class ItemPathService {
       nachschubQty,
       nachschubUnit,
       assigned,
-      free: Math.max(0, wishQty - assigned),
+      free: known ? Math.max(0, wishQty - assigned) : 0,
       assignments: alloc?.assignments ?? NO_ASSIGNMENTS,
+      assignmentsKnown: known,
       inventarQty: places.reduce((n, p) => n + p.qty, 0),
       places,
       nearestPlace: places.length ? nearestPlaceOf(places, this.livePlace()) : null,
