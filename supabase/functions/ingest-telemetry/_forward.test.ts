@@ -27,6 +27,12 @@ test('crash becomes a person-less $exception with desktop source and the install
   assert.equal(list[0].stacktrace.raw, 'at x (file.js:1)');
 });
 
+test('crash fingerprint is per product and error type, sanitised', () => {
+  assert.equal(mapEvent(ctx(), { errorType: 'uncaught', name: 'Error' }).properties.$exception_fingerprint, 'desktop:starscape:uncaught');
+  assert.equal(mapEvent(ctx({ product: null }), { errorType: 'render crash/gpu' }).properties.$exception_fingerprint, 'desktop:scc-app:render_crash_gpu');
+  assert.equal(mapEvent(ctx(), { name: 'Error' }).properties.$exception_fingerprint, 'desktop:starscape:none');
+});
+
 test('distinct id falls back to session hash, then a per-product bucket', () => {
   assert.equal(mapEvent(ctx({ installHash: null }), {}).distinct_id, 'sess-hash');
   assert.equal(mapEvent(ctx({ installHash: null, sessionHash: null }), {}).distinct_id, 'desktop:starscape');

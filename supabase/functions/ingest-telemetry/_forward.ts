@@ -13,7 +13,7 @@
 // throughout: no person is ever created from desktop telemetry.
 
 import type { BatchEvent } from '../_shared/posthog.ts';
-import { redactText } from '../_shared/posthog.ts';
+import { fingerprintPart, redactText } from '../_shared/posthog.ts';
 import { capDetail } from './_detail.ts';
 
 export const EXTRACT_ABORTED = 'extract-aborted';
@@ -136,6 +136,8 @@ export function mapEvent(ctx: WireContext, ev: Record<string, unknown>, log?: St
       $exception_type: entry.type,
       $exception_message: value,
       $exception_level: 'fatal',
+      // one PostHog issue per product and error type, never one catch-all for every `Error`
+      $exception_fingerprint: `desktop:${fingerprintPart(base.product)}:${fingerprintPart(errorType)}`,
       error_type: errorType,
       detail,
     },

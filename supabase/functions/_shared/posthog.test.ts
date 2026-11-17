@@ -1,7 +1,7 @@
 // node --test supabase/functions/_shared/posthog.test.ts
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CRON_RUN_EVENT, buildAiGeneration, buildCapture, buildCronRun, buildException, redactText, serverDistinctId, withPosthog } from './posthog.ts';
+import { CRON_RUN_EVENT, buildAiGeneration, buildCapture, buildCronRun, buildException, buildHttpException, fingerprintPart, readErrorCode, redactText, serverDistinctId, withPosthog } from './posthog.ts';
 import { PRICES } from '../translate-orchestrator/_cost.ts';
 import { LIST_PRICES, costUsd, priceFor } from './ai-pricing.ts';
 
@@ -66,6 +66,65 @@ test('withPosthog passes responses through and rethrows', async () => {
     await assert.rejects(() => bad(new Request('http://x.test')), /x/);
     const five = withPosthog('t', () => Promise.resolve(new Response('no', { status: 503 })));
     assert.equal((await five(new Request('http://x.test'))).status, 503);
+    await new Promise((r) => setTimeout(r, 10)); // the 5xx report goes out in the background
+  } finally {
+    globalThis.fetch = real;
+  }
+});
+
+test('exception fingerprint defaults to function and type, a caller may set its own', () => {
+  assert.equal(buildException('api', new TypeError('x')).properties.$exception_fingerprint, 'server:api:TypeError');
+  assert.equal(buildException('api', 'x', { fingerprint: 'custom:1' }).properties.$exception_fingerprint, 'custom:1');
+  assert.ok(!('fingerprint' in buildException('api', 'x', { fingerprint: 'custom:1' }).properties));
+  assert.equal(fingerprintPart('a b/c:d'), 'a_b_c_d');
+  assert.equal(fingerprintPart(''), 'none');
+  assert.equal(fingerprintPart('x'.repeat(100)).length, 64);
+});
+
+test('readErrorCode takes only the string error field, redacted and capped', async () => {
+  const json = (body: unknown) => new Response(JSON.stringify(body), { status: 500, headers: { 'content-type': 'application/json' } });
+  assert.equal(await readErrorCode(json({ error: 'sign_failed', detail: 'secret stuff' })), 'sign_failed');
+  assert.equal(await readErrorCode(json({ error: 42 })), null);
+  assert.equal(await readErrorCode(json([1, 2])), null);
+  assert.equal(await readErrorCode(json({ error: 'mail a@b.example now' })), 'mail *** now');
+  assert.equal((await readErrorCode(json({ error: 'y'.repeat(200) })))?.length, 64);
+  assert.equal(await readErrorCode(new Response('{broken', { status: 500, headers: { 'content-type': 'application/json' } })), null);
+  assert.equal(await readErrorCode(new Response('plain', { status: 500 })), null);
+});
+
+test('5xx becomes an HttpError fingerprinted by function, status and code', () => {
+  const e = buildHttpException('ingest-skins', 500, 'commit_failed', 'POST');
+  const list = e.properties.$exception_list as { type: string; value: string; stacktrace?: unknown }[];
+  assert.equal(list[0].type, 'HttpError');
+  assert.equal(list[0].value, 'ingest-skins: HTTP 500 commit_failed');
+  assert.equal(list[0].stacktrace, undefined);
+  assert.equal(e.properties.$exception_fingerprint, 'server:ingest-skins:500:commit_failed');
+  assert.equal(e.properties.error_code, 'commit_failed');
+  assert.equal(e.properties.http_status, 500);
+  const none = buildHttpException('uex-proxy', 504, null, 'GET');
+  assert.equal((none.properties.$exception_list as { value: string }[])[0].value, 'uex-proxy: HTTP 504');
+  assert.equal(none.properties.$exception_fingerprint, 'server:uex-proxy:504:none');
+});
+
+test('withPosthog sends the 5xx code without touching the response body', async () => {
+  const real = globalThis.fetch;
+  const sent: { batch: { properties: Record<string, unknown> }[] }[] = [];
+  let done!: () => void;
+  const arrived = new Promise<void>((r) => { done = r; });
+  globalThis.fetch = ((_u: string, init: RequestInit) => {
+    sent.push(JSON.parse(String(init.body)));
+    done();
+    return Promise.resolve(new Response(null, { status: 200 }));
+  }) as typeof fetch;
+  try {
+    const h = withPosthog('ingest-skins', () => new Response(JSON.stringify({ error: 'prune_failed' }), {
+      status: 503, headers: { 'content-type': 'application/json' },
+    }));
+    const res = await h(new Request('http://x.test', { method: 'POST' }));
+    assert.equal(res.status, 503);
+    assert.deepEqual(await res.json(), { error: 'prune_failed' });
+    await arrived;
+    assert.equal(sent[0].batch[0].properties.$exception_fingerprint, 'server:ingest-skins:503:prune_failed');
   } finally {
     globalThis.fetch = real;
   }
