@@ -637,6 +637,8 @@
         "allUpcoming": "All {{n}} in Upcoming Ships",
         "folded": "{{n}} variants folded in",
         "foldedAtLeast": "at least {{n}} variants folded in",
+        "foldedOne": "1 variant folded in",
+        "foldedAtLeastOne": "at least 1 variant folded in",
         "grade": "Grade {{grade}}",
         "livery": "Livery",
         "upcomingBadge": "Not in the game yet",

@@ -637,6 +637,8 @@
         "allUpcoming": "Alle {{n}} bei „Kommende Schiffe“",
         "folded": "{{n}} Varianten zusammengefasst",
         "foldedAtLeast": "mind. {{n}} Varianten zusammengefasst",
+        "foldedOne": "1 Variante zusammengefasst",
+        "foldedAtLeastOne": "mind. 1 Variante zusammengefasst",
         "grade": "Klasse {{grade}}",
         "livery": "Lackierung",
         "upcomingBadge": "Noch nicht im Spiel",

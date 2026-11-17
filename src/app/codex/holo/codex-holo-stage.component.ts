@@ -908,6 +908,10 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   /* The Akte (slot [holoAkte]) lies over the table; the table keeps its size under it (no canvas re-layout). */
   .holo-akte { position: absolute; inset: 0; z-index: 4; display: none; min-width: 0; min-height: 0; }
   .holo-akte.on { display: flex; flex-direction: column; }
+  /* A filled head row (classic shell: the hangar dock) stays above the Akte instead of on its tabs. */
+  .table-head:not(:empty) ~ .holo-akte { inset-block-start: 40px; }
+  /* The source jump (#bezugsquelle) targets the projected Akte: it lands clear of the top bar (the classic shell sets no scroll padding) with room for that head row. */
+  .holo-akte ::ng-deep [holoAkte] { scroll-margin-top: 96px; }
   .under-akte { visibility: hidden; }
 
   /* ── The bottom row (r4 d1, C6): views = one choice as thumbnails, filters = multi-select chips ── */
