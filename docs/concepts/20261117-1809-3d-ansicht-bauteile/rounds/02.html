@@ -1,0 +1,88 @@
+<section data-iteration="2" data-iteration-template="free" data-final-report>
+  <p class="fr-sentence">Im 3D-Modell leuchten Bauteile jetzt als eigene Körper, die Auswahl ist grün und klar, und ein Klick führt wieder zurück.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">💡</span><span><b>Gleich hell</b> aus jedem Winkel, auch ohne Klick.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🟢</span><span>Gewähltes Bauteil <b>grün mit Namensschild</b>, der Rest dunkler.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">↩️</span><span><b>Abwählen</b> per zweitem Klick, Klick ins Leere oder Escape.</span></li>
+      </ul>
+      <a class="fr-try" href="http://127.0.0.1:4200/codex/ship/ANVL_Valkyrie" target="_blank" rel="noopener noreferrer">▶ {{final.try_it}}</a>
+      <p class="fr-try-auth">🔑 Lokaler Stand dieses Branches; anmelden wie gewohnt mit deinem Konto.</p>
+    </div>
+    <div class="fr-ba" data-label-before="{{final.before}}" data-label-after="{{final.after}}">
+      <figure class="fr-shot"><img src="20261117-1809-3d-ansicht-bauteile/shots/before.jpg" alt=""><figcaption>Auswahl überstrahlt das ganze Schiff</figcaption></figure>
+      <figure class="fr-shot"><img src="20261117-1809-3d-ansicht-bauteile/shots/w2-select-large.png" alt=""><figcaption>Auswahl grün, Rumpf ruhig</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Alle 7153 automatischen Tests laufen durch, dazu Typprüfung, Lint und Build; Anforderung: kein roter Test (geschätzt).">
+        <span class="fr-meter-name">🧱 Stabilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">7153 grün</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Ohne Maus bedienbar: Tab erreicht jedes Bauteil, Enter und Leertaste wählen und wählen ab, Escape hebt auf; Anforderung: alle vier Wege (geschätzt).">
+        <span class="fr-meter-name">♿ Barrierefreiheit</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">4 / 4 Wege</b>
+      </div>
+      <div class="fr-meter" data-grade="open" style="--fr-fill: 0%" data-tip="Nicht gemessen: Wie flüssig das Modell mit Umriss und Durchschein-Bauteilen auf einer echten Grafikkarte dreht. Geprüft wurde nur im Testbrowser ohne Grafikkarte; Anforderung: flüssig wie vorher (geschätzt).">
+        <span class="fr-meter-name">⚡ Performance</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">nicht gemessen</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="5 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ✓ {{final.level_interplay}} · ✓ {{final.level_local}} · ✓ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_prod}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_live}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 1 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-phone-centre"
+          data-issue-title="[BUG] Centre the 3D model in the holo stage on phone portrait"
+          data-issue-type="bug"
+          data-issue-body="On a 390x844 portrait viewport the holo stage of /codex/ship/ANVL_Valkyrie draws the model and its grid rings left of the viewport centre (rings centred near x=150 of 390, the hull starts at x=22). Seen in docs/concepts/20261117-1809-3d-ansicht-bauteile/shots/w3-phone-portrait-select.png and w2-phone-portrait.jpg. Not caused by the part-selection change (framing code untouched); found while checking it. Expected: model and rings centred in the visible stage. Look at the stage width / canvas offset in codex-holo-stage on narrow viewports; check landscape overlay stays centred (it is today)."
+          data-issue-module="codex"
+          data-oq-origin="found"
+          data-route-default="now"
+          data-route-reason="im Repo">
+        <span class="oq-label">Schiff am Telefon schief</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Hochkant sitzt das Modell links der Bildmitte, das Heck klebt am Rand.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Holotisch der Schiffsseite, Telefon hochkant</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — liegt im selben Bereich und fällt beim Ausprobieren am Telefon sofort auf.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Branch <code>claude/3d-view-component-visibility-27ac32</code> · Bereiche: codex (3D-Viewer), analytics</li>
+      <li><code>src/app/codex/holo-look.ts</code>, <code>asset-package-scene.ts</code>, <code>asset-package-viewer.component.ts</code></li>
+      <li>Tests: 7153 grün, 1 übersprungen · typecheck, lint (0 Fehler), test:gate 167, build grün</li>
+      <li>Checkliste C1–C22: alle erfüllt, Belege je Zeile in <code>parity.md</code>; unabhängig geprüft (Bilder <code>shots/w3-*</code>)</li>
+      <li>Auslegungen: Zurück-Link heißt „Alle Bauteile“ und führt zur Liste; „horizontal“ = Telefon quer. Abgedunkelte Werte stärker als im Entwurf.</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-gpu" data-crit="high" data-guide="">Am PC drehen: flüssig, Puls beim Auswählen?</li>
+      <li data-todo-id="t-small" data-crit="mid" data-guide="">Schild wählen: findest du ihn sofort?</li>
+      <li data-todo-id="t-phone" data-crit="mid" data-guide="">Am Telefon tippen, hochkant und quer</li>
+    </ul>
+  </section>
+</section>

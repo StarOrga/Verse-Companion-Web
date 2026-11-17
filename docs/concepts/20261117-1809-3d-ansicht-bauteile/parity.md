@@ -73,3 +73,34 @@ Variants d2 "Röntgen-Fokus" (dots, focus brackets, hull turning into a contour)
 ## Acceptance table (return this, one row per line you own)
 
 `C# → done / partial / not done → evidence (file:line, spec name, screenshot path)`. A line without evidence counts as not done.
+
+## Parity result (2026-11-17, independent check by a QA agent that built nothing)
+
+Evidence lives in `shots/` (`w1-*`, `w1b-*` rendering, `w2-*` interaction, `w3-*` independent check). Real pointer, touch and keyboard events in headless Edge (software renderer, so reduced motion unless forced).
+
+| # | Status | Evidence |
+|---|---|---|
+| C1 | met | hull stays opaque on hover and select; mean luminance idle 30.9, hover 31.0; `w3-hover-large.png`, `w3-select-large.png` |
+| C2 | met | idle mean canvas luminance 3/4 30.9, top 33.3, underside 33.2 (background 20.3); `w3-idle-34.png`, `w3-idle-top.jpg`, `w3-idle-below.jpg` |
+| C3 | met | lit bodies, no dots, parts show through the hull; `w3-idle-34.png` |
+| C4 | met | cursor pointer over a part, 24 / 48 px slop, a drag never picks; check log, viewer specs |
+| C5 | met | white part plus name tag, 6 px gap to the part, hull unchanged; `w3-hover-shield-x3.jpg` |
+| C6 | met | fixed green `rgb(125,255,156)` on Anvil and Drake, outline, one pulse (motion forced for the shot), no halo; `w3-select-pulse.png`, `w3-drake-select.png` |
+| C7 | met, values differ from the mock | others are quiet outlines (line alpha .08, not .42), hull loses 42 % luminance (not `.30` per line): the mock's values did not show on a real wireframe; `w3-select-hover-other.jpg`, `w1b-select-large-34.png` |
+| C8 | met | second click deselects; check log, viewer spec |
+| C9 | met | empty click beside the model and on the hull deselects, a drag does not; dblclick off a part re-frames, on a part toggles once; check log, viewer specs |
+| C10 | met | Escape deselects; check log |
+| C11 | met (orchestrator's reading) | back control "‹ Alle Bauteile" clears the selection and lands on the parts list; `w3-panel-back.png` |
+| C12 | met | no ✕ on the tag; shots, viewer spec |
+| C13 | met | hero turntable: drifts 2.42→1.69 with the pointer away, holds 1.61→1.61 over the model and during a selection, resumes; check log |
+| C14 | met (emulated touch) | first tap selects, tap on another switches, tap on empty deselects; check log |
+| C15 | met (emulated, orchestrator's reading) | portrait 390×844 and landscape 844×390; `w3-phone-portrait-select.png`, `w3-phone-landscape-select.png` |
+| C16 | met | `/codex/ship/ANVL_Valkyrie?view=classic` + 3D switch: hover without see-through, click opens the popup; `w3-hero-hover.jpg`, `w3-hero-click.jpg` |
+| C17 | met | `/codex` landing: stable base look, no tags, no selection; `w3-landing-ship-a.png`, `w3-landing-ship-hover.png` |
+| C18 | met | Tab reaches a part, Enter/Space toggle, Escape clears, ring only under Tab; `w3-keyboard-focus.jpg`, `w3-keyboard-enter.jpg` |
+| C19 | met by spec | "pulses once per select, never … with reduced motion"; not observed in a browser with reduced motion as a user setting |
+| C20 | met | events in `events.ts`, sent from the stage (stage spec), tile in `posthog/dashboards.json` (usage dashboard, there is no separate Codex dashboard); not read back from PostHog |
+| C21 | met | full suite 7153 passed, 1 skipped |
+| C22 | met | `docs/concepts/codex-holotisch-ui-spec.md`, section "Decided and built: recognisable parts in the 3D view" |
+
+Not verified by anyone: a real GPU (frame rate with outline and ghost pass, the tween), a real touch device.

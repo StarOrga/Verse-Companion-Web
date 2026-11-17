@@ -23,6 +23,17 @@
       { "design": "d1", "screen": "r1-d1-s1 (Schiffsseite)", "target": "swatch \"Grün\"", "text": "grün entspricht auch dem r wechsel in sc, also nehmen wir grün" },
       { "design": "d1", "screen": "r1-d1-s2 (Telefon)", "target": "stage", "text": "gut und auch horizontal machen können" }
     ],
-    "not_chosen": ["d2 Röntgen-Fokus", "d3 Etiketten", "visible close cross at the selection", "panel returns to the origin tab", "2D schema views"]
+    "not_chosen": ["d2 Röntgen-Fokus", "d3 Etiketten", "visible close cross at the selection", "panel returns to the origin tab", "2D schema views"],
+    "implemented": {
+      "date": "2026-11-17",
+      "branch": "claude/3d-view-component-visibility-27ac32",
+      "checklist": "C1–C22 met, evidence per line in 20261117-1809-3d-ansicht-bauteile/parity.md (independent check, shots/w3-*)",
+      "readings": [
+        "The panel's back control keeps the truthful label \"Alle Bauteile\", clears the selection and lands on the parts list (owner chose both \"Übersicht statt Alle Bauteile\" and \"Die Liste aller Bauteile, wie heute\").",
+        "\"gut und auch horizontal machen können\" read as: select, switch and deselect also work in phone landscape."
+      ],
+      "deviations_from_mock": "Dimmed part lines .08 instead of .42 and a 42 % hull luminance drop instead of .30 per line: the mock's values did not show on a real wireframe.",
+      "not_verified": ["real GPU (frame rate, tween, pulse)", "real touch device"]
+    }
   }
 ]
