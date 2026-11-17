@@ -81,12 +81,7 @@ export interface AppEntry {
         @if (open()) {
           <div class="pop" [id]="panelId" scPopupMotion scPopupMotionItems=".entry" scPopupMotionOrigin="tr" animate.leave="pm-out">
           <sc-popup kind="menu" [backdrop]="false" [title]="'appsMenu.aria' | translate" (closed)="onPopupClosed()">
-            <!-- The rail carries the trigger's grid: the same mark that opened the menu. -->
-            <svg popupIcon class="grid-mark" viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="6" cy="6" r="1.6" /><circle cx="12" cy="6" r="1.6" /><circle cx="18" cy="6" r="1.6" />
-              <circle cx="6" cy="12" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="18" cy="12" r="1.6" />
-              <circle cx="6" cy="18" r="1.6" /><circle cx="12" cy="18" r="1.6" /><circle cx="18" cy="18" r="1.6" />
-            </svg>
+            <!-- No rail icon: at its trigger the menu carries only the accent edge, like the account menu. -->
             <div class="pbody">
             @for (app of apps(); track app.id) {
               @if (app.href) {
@@ -137,8 +132,6 @@ export interface AppEntry {
     /* Only the position at the trigger; frame, width, rail and edge come from <sc-popup kind="menu">. */
     .pop { position: absolute; top: calc(100% + 8px); right: 0; z-index: 60; }
     .pop sc-popup { display: block; }
-    /* The grid is dots, not strokes: filled, unlike the rail's line icons. */
-    .pop .grid-mark { fill: currentColor; stroke: none; }
     .pbody { display: flex; flex-direction: column; gap: 2px; }
     .entry {
       display: flex; gap: 12px; align-items: flex-start; padding: 10px; border-radius: 8px;

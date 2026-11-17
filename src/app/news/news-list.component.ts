@@ -1408,12 +1408,12 @@ export class NewsListComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * The saved glyph: the bookmark of the path family (`PATH_ICONS.wish`), filled when
-   * saved, outlined when not. News says no word for it ("Merken" is the wishlist's
-   * business, not the news'), so the glyph and its tooltip carry the whole control.
+   * The saved glyph: the bookmark (`PATH_ICONS.saved`), filled when saved, outlined when
+   * not. News says no word for it ("Merken" is the wishes' business, not the news'), so
+   * the glyph and its tooltip carry the whole control.
    */
   favIcon(on: boolean): SafeHtml {
-    const d = PATH_ICONS.wish[0];
+    const d = PATH_ICONS.saved[0];
     return this.safeSvg(
       `<svg viewBox="0 0 24 24" fill="${on ? 'currentColor' : 'none'}" fill-opacity="${on ? '0.28' : '0'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`,
     );

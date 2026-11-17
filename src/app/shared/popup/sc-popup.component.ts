@@ -47,6 +47,9 @@ let uid = 0;
  *
  * Look: a coloured rail on the left (46 px; 36 px for menu + notice) carries the popup's own symbol
  * and the vertical eyebrow (with neither it narrows to a plain accent edge, never a generic icon); title + header tools + ✕ in the head row; only the body scrolls;
+ * A LIGHT popout (a non-modal panel at its trigger: wishlist, app status, missions, a coach mark) never
+ * shows the rail's symbol or vertical eyebrow, only the 3 px accent edge, like a menu; an eyebrow that
+ * says something (an item's name, a step count) stands as a small line above its title instead.
  * footer actions left in reading order (primary first), status text right. The rail colour is
  * the KIND, never the consequence: a delete shows its danger only on its own button
  * (`scAction tone="danger"`). All kinds share `--sc-accent`; an area may
@@ -73,7 +76,8 @@ let uid = 0;
  *                 notice no head, no ✕, no eyebrow, narrow rail, never takes focus.
  * - `title`     the popup's one heading (already translated). Menus/notices: screen-reader only.
  * - `eyebrow`   area or subject ("Nachschub", "Waffe · S3 · Nase"), vertical in the rail.
- *               Not shown on menus and notices.
+ *               Not shown on menus and notices. On a light popout (non-modal panel) it is a small
+ *               line above the title: pass it only when it says more than the area's name.
  * - `size`      override among the four width tokens: menu | s | m | area. Defaults: menu→menu,
  *               panel→s, dialog→m, large→area; a notice takes `--sc-toast-w`. A two-button
  *               question passes `size="s"`.
@@ -154,6 +158,7 @@ let uid = 0;
         [attr.data-size]="widthTier()"
         [attr.data-body]="bodyFill() ? 'fill' : null"
         [attr.data-float]="float() ? '' : null"
+        [attr.data-light]="light() ? '' : null"
         [attr.data-access]="access()"
         [attr.role]="frameRole()"
         [attr.aria-modal]="trapped() ? 'true' : null"
@@ -174,7 +179,7 @@ let uid = 0;
         <span class="scp-sym" aria-hidden="true">
           <ng-content select="[popupIcon]" />
         </span>
-        @if (showEyebrow()) {
+        @if (showEyebrow() && !light()) {
           <span class="scp-ev">{{ eyebrow() }}</span>
         }
       </aside>
@@ -184,7 +189,12 @@ let uid = 0;
         }
         @if (hasHead()) {
           <header class="scp-h">
-            <h2 class="scp-title" [id]="titleId">{{ title() }}</h2>
+            <div class="scp-hd">
+              @if (showEyebrow() && light()) {
+                <span class="scp-ev-in">{{ eyebrow() }}</span>
+              }
+              <h2 class="scp-title" [id]="titleId">{{ title() }}</h2>
+            </div>
             <span class="scp-tools"><ng-content select="[popupTools]" /></span>
             <button
               scAction
@@ -249,6 +259,8 @@ export class ScPopupComponent implements OnInit, OnDestroy {
   readonly hasBackdrop = computed(() => this.backdrop() ?? this.isModal());
   readonly hasHead = computed(() => this.kind() === 'panel' || this.kind() === 'dialog' || this.kind() === 'large');
   readonly showEyebrow = computed(() => this.hasHead() && !!this.eyebrow());
+  /** A light popout: a non-modal panel at its trigger. Accent edge only, no rail symbol, no vertical eyebrow. */
+  readonly light = computed(() => this.kind() === 'panel' && !this.isModal() && this.widthTier() !== 'fill');
   readonly takesFocus = computed(() => this.kind() !== 'notice');
   // A menu frame is a labelled group (its items are the host's menuitems); aria-label on a role-less div is invalid.
   readonly frameRole = computed(() => (this.kind() === 'menu' ? 'group' : this.dialogRole()));

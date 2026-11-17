@@ -53,7 +53,7 @@ const CONNECTED_HINT_MS = 2000;
         rel="noopener noreferrer"
         [attr.aria-busy]="status() === 'starting'"
         (click)="onClick($event)"
-      >{{ (mode() === 'download' ? 'hq.app.downloadCta' : 'hq.app.launch') | translate }}</a>
+      >{{ label() | translate }}</a>
       <!-- The notice frame is the one live region (role="status" from the scaffold); a second one around it would announce twice. -->
       <div class="live">
         @if (status() !== 'idle') {
@@ -119,6 +119,11 @@ export class HqAppLaunchComponent {
   protected readonly tip = computed(() => {
     if (!this.tipped()) return '';
     return this.mode() === 'download' ? 'hq.app.tipDownload' : 'hq.app.tipLaunch';
+  });
+  /** Beside the status chip "App aus" already names the app: there the action reads "Jetzt starten". */
+  protected readonly label = computed(() => {
+    if (this.mode() === 'download') return 'hq.app.downloadCta';
+    return this.look() === 'chip' ? 'hq.app.launchNow' : 'hq.app.launch';
   });
   /** Success states have nothing left to click: no close button, they leave by themselves. */
   protected readonly done = computed(() => this.status() === 'started' || this.status() === 'downloadStarted');

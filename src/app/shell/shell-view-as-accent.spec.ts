@@ -170,6 +170,14 @@ describe('ShellComponent - elevated-access marking in the account menu', () => {
     ]);
   });
 
+  it('never scrolls sideways: the divider stays inside the menu width', () => {
+    const el = setup({ targets: ['collaborator', 'viewer', 'anon'], active: false, admin: true });
+    const body = el.querySelector<HTMLElement>('.dropdown .scp-b')!;
+    expect(el.querySelector('.dropdown hr.menu-sep')).not.toBeNull();
+    // A divider of width: 100% plus side margins once overflowed the body by 4px: a horizontal scrollbar.
+    expect(body.scrollWidth).toBeLessThanOrEqual(body.clientWidth);
+  });
+
   it('shows no elevated surface at all for a plain viewer', () => {
     const el = setup({ targets: [], active: false, admin: false });
 

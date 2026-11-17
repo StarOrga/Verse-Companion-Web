@@ -1,5 +1,5 @@
 {
-  "$comment": "The seven cross-area flows, in priority order. Steps use catalogue event names only (src/app/core/analytics/events.ts) plus the server/desktop events named in the brief. core-D builds funnels, paths and retention from this file.",
+  "$comment": "The eight cross-area flows, in priority order. Steps use catalogue event names only (src/app/core/analytics/events.ts) plus the server/desktop events named in the brief. core-D builds funnels, paths and retention from this file.",
   "flows": [
     {
       "id": "onboard",
@@ -80,6 +80,17 @@
       ],
       "conversionWindowDays": 7,
       "breakdown": "door"
+    },
+    {
+      "id": "wish",
+      "name": "Wunsch: öffnen, suchen, hinzufügen",
+      "steps": [
+        { "event": "hq:wishlist_open" },
+        { "event": "hq:wish_search_open" },
+        { "event": "hq:wish_add" }
+      ],
+      "conversionWindowDays": 1,
+      "breakdown": "surface"
     }
   ]
 }

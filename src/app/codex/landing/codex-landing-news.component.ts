@@ -24,7 +24,7 @@ import { PatchSummaryView } from './codex-landing-data.types';
       </button>
       @if (open()) {
         <sc-popup class="pop" kind="panel" [title]="'codex.landing.news.title' | translate: { patch: s.patchVersion }"
-                  [eyebrow]="'codex.title' | translate" (closed)="open.set(false)">
+                  (closed)="open.set(false)">
           <ul>
             @for (line of s.lines; track $index) { <li><b aria-hidden="true">›</b><span>{{ line }}</span></li> }
           </ul>

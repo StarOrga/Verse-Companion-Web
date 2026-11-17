@@ -10,9 +10,9 @@ import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { UndoToastService } from '../../shared/undo-toast/undo-toast.service';
 import { CodexOwnShipActionsComponent } from '../holo/codex-own-ship-actions.component';
+import { PATH_ICONS } from '../../shared/item-path/path-icons';
 import { OWN_ICONS } from './codex-own-segment.component';
 
-const WISH_ICON = 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z';
 const CRATE_ICON = 'M4 7h16v13H4zM4 7l2-3h12l2 3M9 11h6';
 const FLASH_MS = 1400;
 
@@ -89,7 +89,7 @@ const FLASH_MS = 1400;
         @if (!sammlung()) {
           <span class="oc-grow"></span>
           <button type="button" scAction tier="secondary" class="oc-again" [busy]="busy()" (click)="wishAgain()">
-            <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="wishIcon" /></svg>
+            <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">@for (d of wishIcon; track $index) { <path [attr.d]="d" /> }</svg>
             <span>{{ 'codex.ownCard.wishAgain' | translate }}</span>
           </button>
         }
@@ -118,7 +118,7 @@ const FLASH_MS = 1400;
             </a>
           } @else {
             <button type="button" scAction tier="secondary" class="oc-wish" [busy]="busy()" (click)="wish()">
-              <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="wishIcon" /></svg>
+              <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">@for (d of wishIcon; track $index) { <path [attr.d]="d" /> }</svg>
               <span>{{ 'codex.ownCard.toWishlist' | translate }}</span>
             </button>
           }
@@ -194,7 +194,7 @@ export class CodexOwnCardComponent {
   readonly nachschubName = input<string | null>(null);
 
   protected readonly icons = OWN_ICONS;
-  protected readonly wishIcon = WISH_ICON;
+  protected readonly wishIcon = PATH_ICONS.wish;
   protected readonly crateIcon = CRATE_ICON;
   protected readonly cartParams = cartLinkParams;
   protected readonly state = computed(() => this.path.state(this.kind(), this.className(), this.name())());

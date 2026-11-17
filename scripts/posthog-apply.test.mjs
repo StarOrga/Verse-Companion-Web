@@ -59,18 +59,18 @@ test('every catalogue area is reachable: an area breakdown table or a tile on on
   for (const a of catalogueAreas) assert.ok(EVENT_AREAS.includes(a));
 });
 
-test('the seven flows are referenced by id, in the agreed order', () => {
+test('the eight flows are referenced by id, in the agreed order', () => {
   const ids = dash.dashboards.flatMap((d) => d.tiles).filter((t) => t.flow).map((t) => t.flow);
-  assert.deepEqual(ids, ['onboard', 'codex', 'error', 'hangar', 'feedback', 'desktop', 'verse']);
+  assert.deepEqual(ids, ['onboard', 'codex', 'error', 'hangar', 'feedback', 'desktop', 'verse', 'wish']);
 });
 
 test('a missing flows file only skips the flow tiles', () => {
   const without = resolvedTiles({ ...spec, flows: null });
   const withFlows = resolvedTiles({
     ...spec,
-    flows: { flows: ['onboard', 'codex', 'error', 'hangar', 'feedback', 'desktop', 'verse'].map((id) => ({ id, steps: ['$pageview', '$exception'] })) },
+    flows: { flows: ['onboard', 'codex', 'error', 'hangar', 'feedback', 'desktop', 'verse', 'wish'].map((id) => ({ id, steps: ['$pageview', '$exception'] })) },
   });
-  assert.equal(withFlows.length - without.length, 7);
+  assert.equal(withFlows.length - without.length, 8);
 });
 
 test('the plan is idempotent by name: known names PATCH, new ones POST', () => {

@@ -42,6 +42,9 @@ import { ScTooltipDirective } from '../tooltip/sc-tooltip.directive';
 import { UndoToastService } from '../undo-toast/undo-toast.service';
 import { PATH_ICONS } from './path-icons';
 
+/** Length of the add moment: the streak is visible for about 1.1 s, the node peaks as it arrives, then it settles (1.7 s). */
+const ADD_MOMENT_MS = 1700;
+
 export type ItemPathLevel = 'tertiary' | 'secondary' | 'primary';
 type PopMode = 'place' | 'error';
 
@@ -93,7 +96,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
   template: `
     <ng-template #rail>
       <span class="rail">
-        <button scAction tier="tertiary" type="button" class="node" data-step="wish" [class.on]="state().wished" [class.cur]="state().wished && !ownOn()"
+        <button scAction tier="tertiary" type="button" class="node" data-step="wish" [class.on]="state().wished" [class.cur]="state().wished && !ownOn()" [class.is-adding]="adding()" [attr.data-adding]="adding() ? '' : null"
                 [busy]="busy() === 'wish'" [scTooltip]="wishLabel()" scTooltipTier="label" [attr.aria-label]="ariaName(wishLabel())"
                 (click)="onWish($event)">
           <svg class="sc-action-icon" [class.is-filled]="state().wished" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.wish; track $index) { <path [attr.d]="d" /> }</svg>
@@ -144,7 +147,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
         <div class="primary">
           <ol class="path" [class.single]="!own()">
             <li class="stop" [class.on]="state().wished">
-              <span class="stop-h">
+              <span class="stop-h" [class.is-adding]="adding()" [attr.data-adding]="adding() ? '' : null">
                 <svg class="sc-action-icon" [class.is-filled]="state().wished" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.wish; track $index) { <path [attr.d]="d" /> }</svg>
                 <b>{{ 'pathCtl.node.wish' | translate }}</b>
               </span>
@@ -203,7 +206,6 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
       } @else {
         <sc-popup class="rp" kind="panel" [title]="'pathCtl.whereTitle' | translate" [eyebrow]="name() ?? ''"
                   [returnFocus]="anchor()" (closed)="closePop()">
-          <svg popupIcon class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.inventar; track $index) { <path [attr.d]="d" /> }</svg>
           <div class="places">
             @for (p of placeOptions(); track p; let first = $first) {
               <button type="button" class="place" [class.on]="first" (click)="choosePlace(p)">{{ placeText(p) }}</button>
@@ -249,6 +251,46 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
     .n {
       position: absolute; right: -2px; top: -3px; min-width: 15px; height: 15px; padding: 0 3px; border-radius: 8px;
       background: var(--sc-accent); color: var(--sc-bg-0); font: 600 10px/15px var(--sc-font-body); font-style: normal; text-align: center;
+    }
+    /*
+     * The add moment (concept wunschliste-gefuehl, d3 "Sternschnuppe"): a streak flies into the wish node from the top right
+     * (wl-star-in), the node pulses (wl-add) and its icon fills (wl-fill). One shot of 1.7 s per add: the mock's 5 s loop
+     * shows the streak for 24-47 % (about 1.1 s) and peaks the node right as it arrives; the rest state afterwards is the
+     * normal wished look, so every keyframe ends on the element's own style.
+     */
+    .node.sc-action.is-adding { animation: ip-add 1.7s ease-in-out; }
+    .node.is-adding svg { animation: ip-fill 1.7s ease-in-out; }
+    .node.is-adding::before, .stop-h.is-adding::before {
+      content: ""; position: absolute; top: 50%; width: 46px; height: 2px; border-radius: 2px; pointer-events: none; opacity: 0;
+      background: linear-gradient(90deg, #fff, color-mix(in srgb, var(--sc-accent) 60%, transparent) 35%, transparent);
+      animation: ip-star-in 1.7s ease-in;
+    }
+    .node.is-adding::before { right: 50%; }
+    .stop-h.is-adding { position: relative; }
+    .stop-h.is-adding::before { right: calc(100% - 9px); }
+    .stop-h.is-adding svg { animation: ip-icon 1.7s ease-in-out, ip-fill 1.7s ease-in-out; }
+    @keyframes ip-add {
+      0%, 47% { border-color: var(--sc-border); color: var(--sc-fg-2); box-shadow: 0 0 0 0 transparent; transform: none; }
+      70% { border-color: var(--sc-accent); color: var(--sc-accent); box-shadow: 0 0 0 8px color-mix(in srgb, var(--sc-accent) 22%, transparent); transform: scale(1.14); }
+    }
+    @keyframes ip-icon {
+      0%, 47% { color: var(--sc-fg-1); transform: none; }
+      70% { color: var(--sc-accent); transform: scale(1.14); }
+    }
+    @keyframes ip-fill {
+      0%, 52% { fill: transparent; }
+      /* var(--sc-accent), not currentColor: a currentColor colour mix in animated fill next to the streak crashed Chromium (Edge) renderers. */
+      76% { fill: color-mix(in srgb, var(--sc-accent) 28%, transparent); }
+    }
+    @keyframes ip-star-in {
+      0% { opacity: 0; transform: translate(120px, -70px) rotate(-30deg); }
+      18% { opacity: 1; }
+      59% { opacity: 1; transform: translate(22px, -12px) rotate(-30deg); }
+      68%, 100% { opacity: 0; transform: translate(22px, -12px) rotate(-30deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .node.sc-action.is-adding, .node.is-adding svg, .stop-h.is-adding svg { animation: none; }
+      .node.is-adding::before, .stop-h.is-adding::before { display: none; }
     }
     .link { display: block; width: 9px; height: 2px; background: var(--sc-border); }
     .link.on { background: var(--sc-accent); }
@@ -367,6 +409,8 @@ export class ItemPathComponent implements OnDestroy {
   readonly errorTone = signal<PathTone>('error');
   readonly anchor = signal<HTMLElement | null>(null);
   readonly otherOpen = signal(false);
+  /** The add moment plays while this is on (one shot per add by the user, see {@link playAdd}). */
+  readonly adding = signal(false);
 
   /** The second node's step (Inventar / Hangar), null for an announced ship. */
   readonly own = computed(() => ownStepOf(this.state()));
@@ -397,6 +441,7 @@ export class ItemPathComponent implements OnDestroy {
   private ref: OverlayRef | null = null;
   private errorTimer: ReturnType<typeof setTimeout> | null = null;
   private destroyed = false;
+  private addTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly onScroll = (ev: Event): void => {
     if (this.ref && !this.ref.overlayElement.contains(ev.target as Node)) this.closePop();
   };
@@ -407,6 +452,7 @@ export class ItemPathComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.destroyed = true;
+    if (this.addTimer) clearTimeout(this.addTimer);
     this.closePop();
   }
 
@@ -478,14 +524,32 @@ export class ItemPathComponent implements OnDestroy {
     void this.injector.get(WishCartService).open();
   }
 
+  /**
+   * The add moment: only after the reader's own action took the item from "not wished" to "wished" - never on the first
+   * render of a wished item, never on a quantity change or a removal. It ends after its 1.7 s (the node then simply
+   * shows the wished look, which is also all that is left under reduced motion).
+   */
+  private playAdd(wasWished: boolean, res: PathResult): void {
+    if (this.destroyed || wasWished || !res.ok) return;
+    if (this.addTimer) clearTimeout(this.addTimer);
+    this.adding.set(true);
+    this.addTimer = setTimeout(() => {
+      this.addTimer = null;
+      this.adding.set(false);
+    }, ADD_MOMENT_MS);
+  }
+
   private async fill(step: PathStep, at: HTMLElement): Promise<void> {
     if (step === 'inventar' && this.kind() !== 'blueprint') {
       this.togglePlace(at);
       return;
     }
     this.busy.set(step);
+    const wasWished = this.state().wished;
     try {
-      this.report(await this.write(step), at);
+      const res = await this.write(step);
+      if (step === 'wish') this.playAdd(wasWished, res);
+      this.report(res, at);
     } finally {
       this.busy.set(null);
     }
@@ -504,7 +568,10 @@ export class ItemPathComponent implements OnDestroy {
 
   async stepWish(delta: number): Promise<void> {
     const at = this.host.querySelector<HTMLElement>('.st') ?? this.host;
-    this.report(await this.path.setWishQty(this.kind(), this.className(), this.name(), this.state().wishQty + delta), at);
+    const wasWished = this.state().wished;
+    const res = await this.path.setWishQty(this.kind(), this.className(), this.name(), this.state().wishQty + delta);
+    this.playAdd(wasWished, res);
+    this.report(res, at);
   }
 
   async stepPlace(place: string, delta: number): Promise<void> {

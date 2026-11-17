@@ -9,6 +9,7 @@ import { CodexBuildDiffService } from '../codex/codex-build-diff.service';
 import { HangarService } from '../hangar/hangar.service';
 import { CodexSearchHub, isTypeToSearchKey } from '../codex/search/codex-search-hub.service';
 import { QuickSearchComponent } from './quick-search.component';
+import { SearchOpenService } from './search-open.service';
 import { fakeSupabase } from '../testing/fake-supabase';
 
 describe('QuickSearchComponent', () => {
@@ -71,6 +72,20 @@ describe('QuickSearchComponent', () => {
       expect(bar.activate).toHaveBeenCalledTimes(3);
       expect(fixture.componentInstance.visible()).toBe(false);
       expect(document.querySelector('.cdk-overlay-container .qs-input')).toBeNull();
+      unregister();
+    });
+
+    it('SearchOpenService (the wish action): no bar, the palette opens; a bar on the page is activated instead', () => {
+      const fixture = create();
+      expect(TestBed.inject(SearchOpenService).open()).toBe(true);
+      fixture.detectChanges();
+      expect(fixture.componentInstance.visible()).toBe(true);
+      fixture.componentInstance.close();
+      const bar = { activate: vi.fn().mockName('activate') };
+      const unregister = TestBed.inject(CodexSearchHub).register(bar);
+      TestBed.inject(SearchOpenService).open();
+      expect(bar.activate).toHaveBeenCalledTimes(1);
+      expect(fixture.componentInstance.visible()).toBe(false);
       unregister();
     });
 

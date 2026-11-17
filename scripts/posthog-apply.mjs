@@ -4,7 +4,7 @@
 //
 // Creates / updates, idempotently by name, everything an admin browses in
 // PostHog: the three dashboards and their insights (posthog/dashboards.json),
-// the funnels of the seven flows (posthog/flows.json), the workflow actions
+// the funnels of the eight flows (posthog/flows.json), the workflow actions
 // (posthog/actions.json), the legacy-name bridge actions (LEGACY_EVENT_NAMES
 // in events.ts) and the `telemetry-saver` feature flag (inactive).
 //

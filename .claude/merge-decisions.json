@@ -103,6 +103,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›docs/concepts›count": [
+      {
+        "ship": "PR #1163",
+        "by": "JerryT2T",
+        "value": "count from the map regenerated on the merged tree",
+        "decided": true,
+        "at": "2026-11-17T00:17:56.554Z",
+        "hunks": [
+          "1225ec8aa64c"
+        ]
+      }
+    ],
     ".claude/project-map.md›docs/›file-count": [
       {
         "ship": "claude/popup-popout-animation-concepts-0f27ef",
@@ -124,6 +136,16 @@
         "at": "2026-11-15T04:18:13.845Z",
         "hunks": [
           "10a659b382df"
+        ]
+      },
+      {
+        "ship": "PR #1163",
+        "by": "JerryT2T",
+        "value": "docs/ (779) (map regenerated on the merged tree)",
+        "decided": true,
+        "at": "2026-11-17T00:17:56.554Z",
+        "hunks": [
+          "f1b092cd8858"
         ]
       }
     ],
@@ -437,6 +459,28 @@
         ]
       }
     ],
+    ".claude/project-map.md›src and app›count": [
+      {
+        "ship": "PR #1163",
+        "by": "JerryT2T",
+        "value": "src/ (1389), app/ (1382) (generated on this branch's final tree)",
+        "decided": true,
+        "at": "2026-11-16T21:15:35.823Z",
+        "hunks": [
+          "02827798ba7c"
+        ]
+      },
+      {
+        "ship": "PR #1163",
+        "by": "JerryT2T",
+        "value": "src/ (1399) (map regenerated on the merged tree)",
+        "decided": true,
+        "at": "2026-11-17T00:17:56.554Z",
+        "hunks": [
+          "4b518700e10a"
+        ]
+      }
+    ],
     ".claude/project-map.md›src-counts›count": [
       {
         "ship": "#1146",
@@ -572,6 +616,28 @@
         "at": "2026-11-16T21:00:36.879Z",
         "hunks": [
           "8b3dd9ff3e06"
+        ]
+      }
+    ],
+    ".claude/project-map.md›tracked files›count": [
+      {
+        "ship": "PR #1163",
+        "by": "JerryT2T",
+        "value": "3179 tracked files (generated on this branch's final tree)",
+        "decided": true,
+        "at": "2026-11-16T21:15:35.823Z",
+        "hunks": [
+          "0de295251c78"
+        ]
+      },
+      {
+        "ship": "PR #1163",
+        "by": "JerryT2T",
+        "value": "3205 tracked files (map regenerated on the merged tree)",
+        "decided": true,
+        "at": "2026-11-17T00:17:56.554Z",
+        "hunks": [
+          "a3afcb1fb860"
         ]
       }
     ],
@@ -997,6 +1063,16 @@
         "at": "2026-11-16T21:11:45.546Z",
         "hunks": [
           "267aeeeb5081"
+        ]
+      },
+      {
+        "ship": "PR #1163",
+        "by": "JerryT2T",
+        "value": "\"current\": \"0.273.0\" (this release follows 0.272.0)",
+        "decided": true,
+        "at": "2026-11-17T00:17:56.554Z",
+        "hunks": [
+          "a86b9f32e335"
         ]
       }
     ],

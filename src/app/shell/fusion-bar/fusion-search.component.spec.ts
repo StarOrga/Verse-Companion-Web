@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ShellChromeService } from './shell-chrome.service';
+import { SearchOpenService } from '../search-open.service';
 import { fakeEngine, fxGroup, setupFusionSearch } from './fusion-search.testing';
 
 /** op-hybrid open behaviour (concept 2026-11-01, round 2). */
@@ -42,6 +43,24 @@ describe('FusionSearchComponent op-hybrid', () => {
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
     fixture.detectChanges();
     expect(cmp.open(), 'Ctrl+K').toBe(true);
+  });
+
+  it('SearchOpenService.open() is Ctrl+K: the caret goes into the field and the panel opens; a page with its own search field takes it instead', async () => {
+    const { fixture, el, field, cmp } = setup();
+    document.body.appendChild(el);
+    expect(TestBed.inject(SearchOpenService).open()).toBe(true);
+    fixture.detectChanges();
+    expect(cmp.open()).toBe(true);
+    await vi.waitFor(() => expect(document.activeElement).toBe(field));
+    cmp.close();
+    fixture.detectChanges();
+    const own = vi.fn().mockName('own').mockReturnValue(true);
+    const off = TestBed.inject(ShellChromeService).registerSearchFocus({}, own);
+    TestBed.inject(SearchOpenService).open();
+    expect(own).toHaveBeenCalledTimes(1);
+    expect(cmp.open()).toBe(false);
+    off();
+    el.remove();
   });
 
   it('without a page search the first typed character opens the panel with results', () => {

@@ -1,7 +1,55 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.272.0",
+  "current": "0.273.0",
   "releases": [
+    {
+      "version": "0.273.0",
+      "date": "2026-11-17",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "An empty wish list now shows a night sky and \"Wunsch suchen\": it opens the search of the page you are on, with the cursor already in the field."
+            },
+            {
+              "title": "",
+              "text": "Adding a wish plays a short shooting-star moment on its symbol. When a wished item arrives in your Hangar or Inventar, the note reads \"… ist da — Dein Wunsch ist in Erfüllung gegangen\"."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The wishlist is now called \"Wünsche\" (Wishes) and has one symbol everywhere, a shooting star: in the header, on every item, in the search and in the large window. Saved news keep the bookmark."
+            },
+            {
+              "title": "",
+              "text": "Small popouts that open at their button (apps, wishes, the HQ app chips) show only the coloured edge; the side rail with icon and vertical title is gone there. The HQ chip now reads \"Jetzt starten\"."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The account menu no longer scrolls sideways."
+            },
+            {
+              "title": "",
+              "text": "The \"Mit der App\" card in the HQ keeps its full width instead of shrinking to its chip."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.272.0",
       "date": "2026-11-16",

@@ -210,4 +210,70 @@ describe('ItemPathComponent: the two-node path', () => {
       expect(t.path.addWish).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('the add moment (streak, pulse, fill - once per add)', () => {
+    const adding = (t: ReturnType<typeof setup>) => t.el.querySelectorAll('[data-adding]');
+
+    /** The write also moves the state, as the real service does. */
+    function wishing(t: ReturnType<typeof setup>): void {
+      t.path.addWish.mockImplementation(async () => {
+        t.path.current.set({ wished: true, wishQty: 1 });
+        return { ok: true, key: 'itemPath.done.wishOn', undo: async () => ({ ok: true, key: 'itemPath.done.undone' }) };
+      });
+    }
+
+    it('plays on the wish node when the reader adds, then ends (one shot) and the node keeps its wished look', async () => {
+      const t = setup();
+      wishing(t);
+      expect(adding(t).length).toBe(0);
+      await t.click(t.node('wish')!);
+      expect(adding(t).length).toBe(1);
+      expect(t.node('wish')!.hasAttribute('data-adding')).toBe(true);
+      expect(t.node('wish')!.classList).toContain('is-adding');
+      await new Promise((r) => setTimeout(r, 1800));
+      t.fixture.detectChanges();
+      expect(adding(t).length).toBe(0);
+      expect(t.node('wish')!.classList).toContain('on');
+    });
+
+    it('does not play on the first render of an item that is already wished', () => {
+      const t = setup({ state: { wished: true, wishQty: 2 } });
+      expect(adding(t).length).toBe(0);
+      expect(t.node('wish')!.classList).toContain('on');
+    });
+
+    it('does not play for a quantity change or a removal', async () => {
+      const t = setup({ level: 'primary', state: { wished: true, wishQty: 2 } });
+      const [less, more] = Array.from(t.el.querySelectorAll<HTMLButtonElement>('.stop .st button'));
+      await t.click(more);
+      expect(adding(t).length).toBe(0);
+      t.path.setWishQty.mockImplementationOnce(async () => {
+        t.path.current.set({ wished: false, wishQty: 0 });
+        return { ok: true, key: 'itemPath.done.wishOff' };
+      });
+      await t.click(less);
+      expect(adding(t).length).toBe(0);
+    });
+
+    it('does not play when the add fails', async () => {
+      const t = setup();
+      t.path.addWish.mockResolvedValueOnce({ ok: false, key: 'itemPath.err.failed' });
+      await t.click(t.node('wish')!);
+      expect(adding(t).length).toBe(0);
+    });
+
+    it('plays from the pill button', async () => {
+      const t = setup({ level: 'secondary' });
+      wishing(t);
+      await t.click(t.el.querySelector<HTMLButtonElement>('button.go')!);
+      expect(t.node('wish')!.hasAttribute('data-adding')).toBe(true);
+    });
+
+    it('plays on the detail page, where the wish stop carries it', async () => {
+      const t = setup({ level: 'primary' });
+      wishing(t);
+      await t.click(t.el.querySelector<HTMLButtonElement>('.stop button.sc-action--primary')!);
+      expect(t.el.querySelector('.stop-h')!.hasAttribute('data-adding')).toBe(true);
+    });
+  });
 });
