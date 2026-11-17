@@ -122,6 +122,11 @@ export async function advance(deps: Deps, job: Job): Promise<Status> {
   }
   let ok = false;
   try {
+    // Batches were sent for a plan this code cannot read (an older layout, or the plan is gone): say so.
+    // Going on would read no result, book nothing and publish the job as if it had worked.
+    if ((cur.status === 'submitted' || cur.status === 'validating' || cur.status === 'post_editing') && !cur.stats?.plan?.parts) {
+      throw new TranslateError('translate.plan_missing');
+    }
     switch (cur.status) {
       case 'estimating': await stepEstimating(deps, cur); break;
       case 'queued': await stepQueued(deps, cur); break;

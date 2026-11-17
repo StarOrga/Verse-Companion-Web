@@ -742,6 +742,15 @@ describe('jobs that began under an older layout', () => {
     assert.deepEqual([job.stats.counts.todo, job.string_count], [3, 3]);
   });
 
+  it('a job whose batches were sent for a plan this code cannot read fails with a key instead of publishing nothing', async () => {
+    const w = world();
+    const j = await newJob(w);
+    const cur = w.jobs.get(j.id);
+    w.jobs.set(j.id, { ...cur, status: 'validating', batch_ids: [{ id: 'old1', kind: 'main' }], stats: { phase: 'running' } });
+    await tick(w.deps);
+    assert.deepEqual([w.jobs.get(j.id).status, w.jobs.get(j.id).error], ['failed', 'translate.plan_missing']);
+  });
+
   it('a queued job without a plan of this layout is estimated again, nothing is sent blind', async () => {
     const w = world();
     const j = await newJob(w);
