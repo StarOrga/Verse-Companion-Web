@@ -781,6 +781,23 @@
         ]
       }
     ],
+    "docs/analytics/event-naming.md›search:result_open›properties": [
+      {
+        "ship": "#1124",
+        "by": "Jerry",
+        "value": "area + rank"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "area, rank, new_tab, current, variant",
+        "decided": true,
+        "at": "2026-11-17T19:31:21.386Z",
+        "hunks": [
+          "8e75d40f8989"
+        ]
+      }
+    ],
     "docs/concepts/20261115-0216-popup-aufbau.html›page›content": [
       {
         "ship": "claude/modest-napier-9d1e5a",
