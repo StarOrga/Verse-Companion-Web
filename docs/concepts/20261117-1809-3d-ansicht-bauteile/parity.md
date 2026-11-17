@@ -1,6 +1,6 @@
 # Parity checklist — 3D view: recognisable parts
 
-Same checklist as [briefs/implement.md](briefs/implement.md); every line comes from round 1 (, design d1). Status and evidence are filled in by the parity check.
+Same checklist as [briefs/implement.md](briefs/implement.md); every line comes from round 1 (`rounds/01.html`, design d1). Status and evidence are filled in by the parity check.
 
 Decisions: [`../../20261117-1809-3d-ansicht-bauteile-decisions.json`](../../20261117-1809-3d-ansicht-bauteile-decisions.json)
 Binding visual spec: [`../rounds/01.html`](../rounds/01.html) — design `d1`, CSS block that starts with
