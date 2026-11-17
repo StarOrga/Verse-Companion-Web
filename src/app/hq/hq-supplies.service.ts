@@ -335,18 +335,20 @@ export class HqSuppliesService {
    * Brings back a removed line (undo of {@link remove}); a newer edit clears the tombstone. A tombstone the sync
    * already dropped (clean + pushed, ~500 ms after the removal) is re-inserted from the snapshot taken at removal,
    * as a dirty row with the same id, so it pushes again and the server tombstone is overwritten.
+   * False when the line is gone for good (no row, no snapshot): a caller that undoes a removal must not report success.
    */
-  restore(id: string): void {
+  restore(id: string): boolean {
     const i = this.rows().find((x) => x.id === id);
     if (i) {
       if (i.deletedAt) this.patch(id, { deletedAt: null });
       this.removedSnapshots.delete(id);
-      return;
+      return true;
     }
     const snap = this.removedSnapshots.get(id);
-    if (!snap) return;
+    if (!snap) return false;
     this.removedSnapshots.delete(id);
     this.commit([...this.rows(), { ...snap, deletedAt: null, updatedAt: nowIso(), dirty: true }]);
+    return true;
   }
 
   /** Lines of one Nachschub (open and closed). */
@@ -367,23 +369,22 @@ export class HqSuppliesService {
    * first changes nothing here), or null when the write failed / nobody is signed in. Afterwards the local copies
    * take the server's source of every id, so a later push cannot carry the old label back. This is the exactly-once
    * marker of the wish transitions (concept 20261117-1110-pfad-stationen A8 / A11): only the caller that won a line
-   * moves its wish.
+   * moves its wish. The write is the server function `hq_supplies_cas_source` (migration 20261117160000): besides the
+   * conditional update it marks the transaction, which is what lets a met line be reopened here and nowhere else.
    */
   async casSource(ids: readonly string[], from: SupplySource, to: SupplySource): Promise<string[] | null> {
     const uid = this.uid;
     if (!uid || !ids.length) return uid ? [] : null;
     try {
       const now = nowIso();
-      const { data, error } = await this.sb.client
-        .from('hq_supplies' as never)
-        .update({ source: to, updated_at: now } as never)
-        .eq('user_id', uid)
-        .in('id', [...ids])
-        .eq('source', from)
-        .is('deleted_at', null)
-        .select('id');
+      // The server function marks its transaction as the deliberate move: the guard trigger on hq_supplies lets
+      // `wish_met` -> `wish` through only there, never for a stale full-row upsert of a device that missed the met state.
+      const { data, error } = await this.sb.client.rpc(
+        'hq_supplies_cas_source' as never,
+        { p_ids: [...ids], p_from: from, p_to: to, p_at: now } as never,
+      );
       if (error) throw error;
-      const won = ((data ?? []) as { id: string }[]).map((r) => r.id);
+      const won = ((data ?? []) as { won_id: string }[]).map((r) => r.won_id);
       const read = await this.sb.client.from('hq_supplies' as never).select('id, source, updated_at').eq('user_id', uid).in('id', [...ids]);
       const server = new Map(((read.data ?? []) as { id: string; source: SupplySource; updated_at: string }[]).map((r) => [r.id, r] as const));
       for (const id of won) if (!server.has(id)) server.set(id, { id, source: to, updated_at: now });

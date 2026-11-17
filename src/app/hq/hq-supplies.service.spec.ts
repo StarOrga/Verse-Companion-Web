@@ -33,7 +33,24 @@ describe('HqSuppliesService', () => {
   let rejectIds: Set<string>;
   const flush = () => new Promise<void>((r) => setTimeout(r, 0));
 
+  /** The server's met guard (trigger hq_supplies_c_met_guard): an unmarked write never turns wish_met back into wish. */
+  let metGuard = true;
+  /** Parameters of the casSource calls that reached the server function. */
+  let casCalls: { p_ids: string[]; p_from: string; p_to: string }[];
+
   const answer = (call: FakeCall): FakeResult => {
+    if (call.op === 'rpc' && call.target === 'hq_supplies_cas_source') {
+      if (failPush) return { error: { message: 'offline', status: 0 } };
+      const p = call.args as { p_ids: string[]; p_from: HqSupplyRow['source']; p_to: HqSupplyRow['source']; p_at: string };
+      casCalls.push(p);
+      const won: { won_id: string }[] = [];
+      for (const row of server) {
+        if (!p.p_ids.includes(row.id) || row.source !== p.p_from || row.deleted_at) continue;
+        Object.assign(row, { source: p.p_to, updated_at: p.p_at, synced_at: new Date().toISOString() });
+        won.push({ won_id: row.id });
+      }
+      return { data: won };
+    }
     if (call.target !== 'hq_supplies') return { data: null };
     const upsert = chainArgs(call, 'upsert');
     if (upsert) {
@@ -43,6 +60,10 @@ describe('HqSuppliesService', () => {
         if (rejectIds.has(r.id!)) continue;
         const i = server.findIndex((s) => s.id === r.id);
         const row = { ...(i >= 0 ? server[i] : serverRow(r.id!)), ...r, synced_at: new Date().toISOString() } as HqSupplyRow;
+        if (metGuard && i >= 0 && server[i].source === 'wish_met' && row.source === 'wish') {
+          row.source = server[i].source;
+          row.done = server[i].done;
+        }
         if (i >= 0) server[i] = row;
         else server.push(row);
         accepted.push({ id: r.id! });
@@ -87,6 +108,8 @@ describe('HqSuppliesService', () => {
     server = [];
     failPush = false;
     rejectIds = new Set();
+    metGuard = true;
+    casCalls = [];
     clearStorage();
   });
   afterEach(clearStorage);
@@ -238,6 +261,56 @@ describe('HqSuppliesService', () => {
     expect(a.name).toBe('Server wins');
     expect(a.qty).toBe(1);
     expect(a.dirty).toBe(false);
+  });
+
+  describe('H2: a met wish line stays met (server guard + compare-and-set function)', () => {
+    it('casSource calls the server function, returns the ids it won and adopts the server source', async () => {
+      server = [serverRow('m', { source: 'wish', done: true }), serverRow('n', { source: 'search' })];
+      const s = make();
+      await s.sync();
+      const won = await s.casSource(['m', 'n'], 'wish', 'wish_met');
+      expect(won).toEqual(['m']);
+      expect(casCalls).toEqual([expect.objectContaining({ p_ids: ['m', 'n'], p_from: 'wish', p_to: 'wish_met' })]);
+      expect(s.items().find((i) => i.id === 'm')?.source).toBe('wish_met');
+      expect(s.items().find((i) => i.id === 'n')?.source).toBe('search');
+      // the deliberate way back works, once: the second caller wins nothing
+      expect(await s.casSource(['m'], 'wish_met', 'wish')).toEqual(['m']);
+      expect(await s.casSource(['m'], 'wish_met', 'wish')).toEqual([]);
+      expect(s.items().find((i) => i.id === 'm')?.source).toBe('wish');
+    });
+
+    it('casSource reports null when the function call fails (offline), nothing adopted', async () => {
+      server = [serverRow('m', { source: 'wish' })];
+      const s = make();
+      await s.sync();
+      failPush = true;
+      expect(await s.casSource(['m'], 'wish', 'wish_met')).toBeNull();
+      expect(s.items().find((i) => i.id === 'm')?.source).toBe('wish');
+    });
+
+    it('a device that missed the met state pushes its stale wish and converges to the server row on the next pull', async () => {
+      server = [serverRow('m', { source: 'wish', qty: 2, entity_kind: 'item', class_name: 'medpen' })];
+      const s = make();
+      await s.sync();
+      // another device met the line: server row is wish_met and ticked, this device does not know yet
+      Object.assign(server[0], { source: 'wish_met', done: true, updated_at: '2026-11-17T09:00:00.000Z', synced_at: new Date().toISOString() });
+      s.setQty('m', 3); // an offline edit on the stale copy: newer, full row, source still 'wish'
+      expect(s.items()[0]).toEqual(expect.objectContaining({ source: 'wish', done: false, dirty: true }));
+      await s.sync();
+      expect(server[0]).toEqual(expect.objectContaining({ source: 'wish_met', done: true, qty: 3 })); // newer qty applied, met state kept
+      expect(s.items()[0]).toEqual(expect.objectContaining({ source: 'wish_met', done: true, qty: 3, dirty: false }));
+    });
+
+    it('without the guard the same push would reopen the line (the failure the guard prevents)', async () => {
+      metGuard = false;
+      server = [serverRow('m', { source: 'wish', entity_kind: 'item', class_name: 'medpen' })];
+      const s = make();
+      await s.sync();
+      Object.assign(server[0], { source: 'wish_met', done: true, updated_at: '2026-11-17T09:00:00.000Z', synced_at: new Date().toISOString() });
+      s.setQty('m', 3);
+      await s.sync();
+      expect(server[0].source).toBe('wish');
+    });
   });
 
   it('is not ready before the first pull and ready after', async () => {
