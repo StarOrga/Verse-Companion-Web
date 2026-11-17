@@ -239,20 +239,25 @@ export async function estimateSlice(deps: Deps, job: Job): Promise<Job> {
     const next = cursor + SCAN_SHARDS;
     const blank = (cursor === 0 ? 0 : e.blank ?? 0) + r.blank;
     return slice(deps, job, est(job, next >= total
-      ? { phase: 'diff', cursor: 0, total, blank }
+      ? { phase: 'diff', cursor: 0, total, blank, ix: { groups: readers.en.index.groups, misc: readers.en.index.misc, count: readers.en.index.count } }
       : { phase: 'rows', cursor: next, total, mark, blank }, cursor === 0 ? { counts: undefined } : {}));
   }
 
   if (e.phase === 'diff') {
-    const { dbGlossary, cig } = await context(deps, job);
-    const rows = await loadRows(store, workPrefix(job.id), e.cursor, e.total);
-    if (!rows) return slice(deps, job, est(job, { phase: 'rows', cursor: 0, total: 0 }));
-    const readers = await openRowReaders(store, job.build_id, cig);
-    if (!readers.en.index) throw new TranslateError('translate.english_missing');
-    const segs = segmentsOf(readers.en.index);
-    const sampling = poolSampling(readers.en.index);
+    const rows = e.ix ? await loadRows(store, workPrefix(job.id), e.cursor, e.total) : null;
+    if (!rows || !e.ix) return slice(deps, job, est(job, { phase: 'rows', cursor: 0, total: 0 }));
+    // From the layout the rows were walked with, not from the table as it is now (EstState.ix).
+    const segs = segmentsOf(e.ix);
+    const sampling = poolSampling(e.ix);
     const { tm, nonEmpty } = await loadTmDigit(store, job.lang, e.cursor);
-    const forceTerms = dbGlossary.filter((g) => g.needs_retranslate).map((g) => g.source_term);
+    // The flagged terms as they stand when the diff begins. A term flagged while the digits are walked
+    // would force some digits and not others; it waits for the next job.
+    let force = e.force;
+    if (e.cursor === 0 || !force) {
+      const flagged = (await deps.db.listGlossary(job.lang)).filter((g) => g.needs_retranslate);
+      force = { ids: flagged.map((g) => g.id!).filter(Boolean), terms: flagged.map((g) => g.source_term) };
+    }
+    const forceTerms = force.terms;
     const diff = await diffRows(rows, tm, { mode: job.mode, forceTerms });
 
     // The texts to translate, with the segment of their smallest key.
@@ -302,7 +307,7 @@ export async function estimateSlice(deps: Deps, job: Job): Promise<Job> {
       seg[s] = (seg[s] ?? 0) + list.length;
       sd[s] = (sd[s] ?? '') + HEX[e.cursor];
     }
-    const state: EstState = { ...e, seg, sd, strings: (e.cursor === 0 ? 0 : e.strings ?? 0) + strings };
+    const state: EstState = { ...e, seg, sd, force, strings: (e.cursor === 0 ? 0 : e.strings ?? 0) + strings };
     if (e.cursor + 1 < DIGITS) return slice(deps, job, est(job, { ...state, cursor: e.cursor + 1 }, { counts }));
     // Blank English has no row: the rows walk counted it.
     counts.keys += e.blank ?? 0;
@@ -316,20 +321,21 @@ export async function estimateSlice(deps: Deps, job: Job): Promise<Job> {
     const labelCig: Record<string, string> = {};
     for (let d = 0; d < DIGITS; d++) {
       const part = (await store.getJson(work(job.id, `lab-${HEX[d]}`))) as [string, string, string][] | null;
-      if (!part) return slice(deps, job, est(job, { phase: 'diff', cursor: 0, total: e.total, blank: e.blank }));
+      if (!part) return slice(deps, job, est(job, { phase: 'diff', cursor: 0, total: e.total, blank: e.blank, ix: e.ix }));
       for (const [k, en, t] of part) {
         labelEn[k] = en;
         labelCig[k] = t;
       }
     }
-    const forced = dbGlossary.filter((g) => g.needs_retranslate);
+    const flagged = dbGlossary.filter((g) => g.needs_retranslate);
+    const force = e.force ?? { ids: flagged.map((g) => g.id!).filter(Boolean), terms: flagged.map((g) => g.source_term) };
     const derived = deriveCigLabels(labelEn, labelCig);
     const notes = await loadNotes(store, job.lang);
     const style = deps.learn ? await deps.learn.getStyle(job.lang).catch(() => null) : null;
     const system = buildSystem(job.lang, mergeGlossary(dbGlossary, derived), { style, notes });
     const head: PlanHead = {
       v: 2, build_id: job.build_id, lang: job.lang, mode: job.mode, system,
-      forceIds: forced.map((g) => g.id!).filter(Boolean), forceTerms: forced.map((g) => g.source_term),
+      forceIds: force.ids, forceTerms: force.terms,
       newGlossary: newRows(dbGlossary, derived),
     };
     await store.putJson(planKey(job.id), head);
@@ -337,10 +343,8 @@ export async function estimateSlice(deps: Deps, job: Job): Promise<Job> {
   }
 
   if (e.phase === 'chunk') {
-    const { cig } = await context(deps, job);
-    const readers = await openRowReaders(store, job.build_id, cig);
-    if (!readers.en.index) throw new TranslateError('translate.english_missing');
-    const count = segmentsOf(readers.en.index).count;
+    if (!e.ix) return slice(deps, job, est(job, { phase: 'rows', cursor: 0, total: 0 }));
+    const count = segmentsOf(e.ix).count;
     const seg = e.seg ?? {};
     // This slice: segments from the cursor on until SEG_ITEMS texts are together (always at least one).
     let from = e.cursor;
@@ -458,7 +462,9 @@ async function complete(deps: Deps, job: Job, e: EstState): Promise<Job> {
   const estimate = estimateFromTotals(e.cost ?? {}, estimateTokens(head.system.length));
   // The few-shot pairs ride in the (uncached) user message.
   estimate.usd += ((e.shots ?? 0) * 60 * 0.9 * 3) / 1e6;
-  if (head.newGlossary.length) await db.insertGlossary(job.lang, head.newGlossary);
+  // Against the glossary as it is now: another job of the language may have added some of them since `prep`.
+  const fresh = head.newGlossary.length ? newRows(await db.listGlossary(job.lang), head.newGlossary) : [];
+  if (fresh.length) await db.insertGlossary(job.lang, fresh);
 
   let hold: string | undefined;
   if (job.mode === 'full') hold = 'full';

@@ -81,10 +81,18 @@ export async function stepPublishing(deps: Deps, job: Job): Promise<void> {
 
   if (phase === 'tm') {
     const updates: Record<string, TmEntry> = {};
+    const { tm: cur } = await loadTmDigit(store, job.lang, pos);
+    const began = Date.parse(job.created_at);
     for (let g = 0; g < groups; g++) {
       const list = (await store.getJson(tmuKey(job.id, pos, g))) as TmUpdate[] | null;
       if (!list) throw new TranslateError('translate.results_missing');
-      for (const [h, t, m] of list) updates[h] = { t, o: 'ai', m, at: pub.at };
+      for (const [h, t, m] of list) {
+        // A job runs for hours to days (batches, an approval). What a person or an import wrote for a
+        // text meanwhile stands: an admin correction always, a community entry that is newer than the job.
+        const have = Object.hasOwn(cur, h) ? cur[h] : undefined;
+        if (have && have.o !== 'ai' && (have.o === 'admin' || Date.parse(have.at ?? '') > began)) continue;
+        updates[h] = { t, o: 'ai', m, at: pub.at };
+      }
     }
     if (Object.keys(updates).length) await saveTm(store, job.lang, updates);
     await slice(deps, job, pos + 1 < DIGITS ? { pos: pos + 1 } : { phase: 'rows', pos: 0 });
@@ -144,7 +152,11 @@ export async function stepPublishing(deps: Deps, job: Job): Promise<void> {
     }
     const at = deps.now().toISOString();
     const overlay = assembleOverlay(job.lang, job.build_id, parts, at, sourceRows);
-    await writeOverlayText(store, job.lang, job.build_id, overlay, !(await db.hasNewerPublished(job)));
+    // `latest` is the overlay of the current LIVE build, the rule of the overlay pass: the job of a PTU
+    // build, or of a build that is no longer the live one, must not put its table in front of everyone.
+    // Without the sources adapter: the newest build that has a published job.
+    const live = deps.sources ? await deps.sources.liveBuild().catch(() => null) : null;
+    await writeOverlayText(store, job.lang, job.build_id, overlay, live ? live === job.build_id : !(await db.hasNewerPublished(job)));
 
     const counts: AiTermCounts[] = [];
     for (let g = 0; g < groups; g++) counts.push(((await store.getJson(aitKey(job.id, g))) ?? {}) as AiTermCounts);
@@ -154,7 +166,7 @@ export async function stepPublishing(deps: Deps, job: Job): Promise<void> {
 
     // C0: learning from what was just published is asked for, never run in this request. The token
     // makes a repeat of this slice find the pass it opened.
-    await requestLearning(deps, job.lang, 'publish', `job:${job.id}`).catch((e) =>
+    await requestLearning(deps, job.lang, 'publish', `job:${job.id}:${job.stats?.run ?? 0}`).catch((e) =>
       deps.log('translate learning request failed', { lang: job.lang, error: String((e as Error)?.message ?? e) })
     );
     await slice(deps, job, {

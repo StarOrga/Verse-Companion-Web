@@ -46,6 +46,7 @@ const KNOWN_JOB_ERRORS = new Set([
   'translate.plan_missing', 'translate.results_missing', 'translate.r2_not_configured',
   'translate.internal', 'translate.worker_limit', 'translate.no_live_build', 'translate.source_not_permitted',
   'translate.source_unknown', 'translate.nothing_to_do', 'translate.phase_unknown', 'translate.job_cleanup_pending',
+  'translate.resubmit_limit',
 ]);
 
 const HASH_DIGITS = 16;

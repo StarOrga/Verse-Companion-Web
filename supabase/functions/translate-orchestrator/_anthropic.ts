@@ -6,6 +6,11 @@ import type { BatchResult, Llm } from './_job.ts';
 import { recordAiCalls, type AiCallRow } from '../_shared/ai-ledger.ts';
 import { usageCostUsd } from './_cost.ts';
 
+// A request must end well inside the life of an edge request (150 s) and of the heavy-work lock, or a
+// second request slices beside one that still hangs in a fetch.
+const CREATE_TIMEOUT_MS = 90_000;
+const ASK_TIMEOUT_MS = 20_000;
+
 /** Batch results already booked by this isolate, so a re-read of the same batch does not book twice. */
 const booked = new Set<string>();
 
@@ -14,11 +19,13 @@ export function makeLlm(apiKey: string): Llm {
   const client: any = new Anthropic({ apiKey });
   return {
     async createBatch(requests) {
-      const b = await client.messages.batches.create({ requests });
+      // No retry by the SDK: a create it sends again after a lost answer is a second paid batch that
+      // nobody knows of. The caller counts what may exist twice (_job_run.ts: createBatch).
+      const b = await client.messages.batches.create({ requests }, { maxRetries: 0, timeout: CREATE_TIMEOUT_MS });
       return { id: b.id as string };
     },
     async isEnded(id) {
-      const b = await client.messages.batches.retrieve(id);
+      const b = await client.messages.batches.retrieve(id, { timeout: ASK_TIMEOUT_MS });
       return b.processing_status === 'ended';
     },
     async *results(id): AsyncGenerator<BatchResult> {

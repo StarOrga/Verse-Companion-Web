@@ -2,6 +2,7 @@
 // Runs with the service-role client; RLS is bypassed, auth happens in index.ts.
 
 import type { Pass, PassDb, PassRequest } from './_pass.ts';
+import { TOKEN_WINDOW_MS } from './_pass.ts';
 import { learnStep } from './_learn_pass.ts';
 import { overlayStep } from './_overlay.ts';
 import type { PassKind, PassStep } from './_pass.ts';
@@ -44,6 +45,16 @@ export function makePassDb(sb: Client, now: () => Date): PassDb {
       return (data as Pass | null) ?? null;
     },
     async open(req) {
+      if (req.token) {
+        // The asker asks a second time (its slice was killed after the first): the pass it ordered stands,
+        // also when it has ended meanwhile.
+        const since = new Date(now().getTime() - TOKEN_WINDOW_MS).toISOString();
+        const asked = sb.from(T).select('*').eq('kind', req.kind).eq('lang', req.lang).eq('token', req.token).gte('created_at', since);
+        const mine = await (req.source_id ? asked.eq('source_id', req.source_id) : asked.is('source_id', null))
+          .order('created_at', { ascending: false }).limit(1).maybeSingle();
+        if (mine.error) fail(mine.error);
+        if (mine.data) return mine.data as Pass;
+      }
       for (let attempt = 0; attempt < 2; attempt++) {
         const ins = await insert(req);
         if (!ins.error && ins.data) return ins.data as Pass;

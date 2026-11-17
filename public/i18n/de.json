@@ -4261,7 +4261,8 @@
         "source_unknown": "Die Quelle gibt es nicht (mehr).",
         "nothing_to_do": "Es gab nichts zu übersetzen.",
         "phase_unknown": "Der Auftrag steht in einem unbekannten Schritt.",
-        "job_cleanup_pending": "Der vorige Auftrag wird noch aufgeräumt. Bitte in einer Minute erneut versuchen."
+        "job_cleanup_pending": "Der vorige Auftrag wird noch aufgeräumt. Bitte in einer Minute erneut versuchen.",
+        "resubmit_limit": "Das Anlegen eines Batches ist mehrfach ohne Antwort geblieben. Der Auftrag wurde gestoppt, damit kein Batch doppelt bezahlt wird. Bitte in der Anthropic-Konsole nach verwaisten Batches sehen."
       },
       "glossary": {
         "title": "Glossar",

@@ -17,7 +17,7 @@
 import { runVerdict, WORKER_LIMIT_KEY } from './_attempts.ts';
 import { TranslateError } from './_errors.ts';
 import { sweepPrefix } from './_io.ts';
-import { addStats, jobPrefix, LostRace, MAX_ATTEMPTS, OPEN_STATUSES, TERMINAL_STATUSES } from './_job.ts';
+import { addStats, groupsOf, jobPrefix, LostRace, MAX_ATTEMPTS, monthOf, OPEN_STATUSES, round4, TERMINAL_STATUSES } from './_job.ts';
 import type { Deps, Job, Status } from './_job.ts';
 import { estimateSlice } from './_job_estimate.ts';
 import { stepPublishing } from './_job_publish.ts';
@@ -54,9 +54,34 @@ export function isHeavy(job: Pick<Job, 'status' | 'stats'>): boolean {
   }
 }
 
+/**
+ * A job that ends early may leave batches that ran and were never read. Their spend is not known, so
+ * their share of the estimate goes into the ledger: a month may be over-counted, never under-counted.
+ * `job` is the job as it stood before it ended.
+ */
+async function bookUnread(deps: Deps, job: Job): Promise<void> {
+  const main = job.batch_ids.filter((b) => b.kind === 'main').length;
+  const groups = groupsOf(job.stats?.plan?.parts ?? 0) || main;
+  if (!main || !groups) return;
+  const read = job.status === 'submitted'
+    ? 0
+    : job.status === 'validating' && (job.stats?.phase ?? 'results') === 'results' ? Math.min(main, job.stats?.pos ?? 0) : main;
+  const usd = round4((job.estimate_usd ?? 0) * ((main - read) / groups));
+  if (usd <= 0) return;
+  const run = job.stats?.run;
+  try {
+    await deps.db.addLedger(job.id, monthOf(deps.now()), usd, run ? `unread#${run}` : 'unread');
+  } catch (e) {
+    deps.log('translate unread spend not booked', { job: job.id, usd, error: String((e as Error)?.message ?? e) });
+  }
+}
+
+/** Ends a job as failed. The status goes first: batches are only cancelled for a job that really ended here. */
 export async function fail(deps: Deps, job: Job, key: string): Promise<void> {
-  await cancelBatches(deps, job);
-  await deps.db.cas(job, { status: 'failed', error: key, stats: addStats(job, { sweep: true, run_at: undefined }) });
+  const ended = await deps.db.cas(job, { status: 'failed', error: key, stats: addStats(job, { sweep: true, run_at: undefined, submit: undefined }) });
+  if (!ended) return;
+  await cancelBatches(deps, ended);
+  await bookUnread(deps, job);
 }
 
 async function cancelBatches(deps: Deps, job: Job): Promise<void> {
@@ -95,6 +120,7 @@ export async function advance(deps: Deps, job: Job): Promise<Status> {
     if (!stamped) return job.status;
     cur = stamped;
   }
+  let ok = false;
   try {
     switch (cur.status) {
       case 'estimating': await stepEstimating(deps, cur); break;
@@ -104,6 +130,7 @@ export async function advance(deps: Deps, job: Job): Promise<Status> {
       case 'post_editing': await stepPostEditing(deps, cur); break;
       case 'publishing': await stepPublishing(deps, cur); break;
     }
+    ok = true;
   } catch (e) {
     if (e instanceof LostRace) return (await deps.db.getJob(job.id))?.status ?? cur.status;
     if (e instanceof TranslateError) {
@@ -120,6 +147,10 @@ export async function advance(deps: Deps, job: Job): Promise<Status> {
   if (marked && after.stats?.run_at && OPEN_STATUSES.includes(after.status)) {
     // The step ended without a slice of its own (it had nothing to do yet): give the stamp back.
     await deps.db.cas(after, { stats: addStats(after, { run_at: undefined }) });
+  } else if (ok && !marked && after.stats?.attempts && OPEN_STATUSES.includes(after.status)) {
+    // A wait that was asked without an error: the errors before it are not "in a row" any more. A job
+    // waits up to a day on a batch, and five network errors over that day must not end it.
+    await deps.db.cas(after, { stats: addStats(after, { attempts: undefined }) });
   }
   return after.status;
 }
@@ -327,9 +358,13 @@ export async function cancel(deps: Deps, jobId: string): Promise<Job> {
   const job = await deps.db.getJob(jobId);
   if (!job) throw new TranslateError('translate.job_not_found');
   if (job.status !== 'awaiting_approval' && !OPEN_STATUSES.includes(job.status)) throw new TranslateError('translate.not_cancellable');
-  await cancelBatches(deps, job);
-  const next = await deps.db.cas(job, { status: 'cancelled', stats: addStats(job, { sweep: true, run_at: undefined }) });
+  // The status goes first. Cancelling the batches before it left a job that lost this race running
+  // with dead batches, and their texts were then sent again as post-edits. A create that is in flight
+  // right now loses its own compare-and-set and stops the batch it made (_job_run.ts: createBatch).
+  const next = await deps.db.cas(job, { status: 'cancelled', stats: addStats(job, { sweep: true, run_at: undefined, submit: undefined }) });
   if (!next) throw new TranslateError('translate.conflict');
+  await cancelBatches(deps, next);
+  await bookUnread(deps, job);
   return next;
 }
 
@@ -348,10 +383,11 @@ export async function startFull(deps: Deps, build_id: string, lang: string): Pro
   if (!TERMINAL_STATUSES.includes(have.status)) return have;
   // Its work files are still being deleted: a new run would lose its own files to that.
   if (have.stats?.sweep) throw new TranslateError('translate.job_cleanup_pending');
-  // `spent_usd` stays: it is what the ledger holds for this job, over all its runs.
+  // `spent_usd` starts again with the run: the reserve of an open job is its estimate minus what it has
+  // spent, and the spend of an earlier run would shrink it. The ledger keeps every run.
   const again = await deps.db.cas(have, {
-    status: 'estimating', stats: { run: (have.stats?.run ?? 0) + 1 }, batch_ids: [], error: null, estimate_usd: null, string_count: null,
-    approved_by: null,
+    status: 'estimating', stats: { run: (have.stats?.run ?? 0) + 1 }, batch_ids: [], error: null, spent_usd: 0, estimate_usd: null,
+    string_count: null, approved_by: null,
   });
   if (!again) throw new TranslateError('translate.conflict');
   return again;

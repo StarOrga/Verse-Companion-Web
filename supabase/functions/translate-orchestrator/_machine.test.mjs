@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { advance, approve, cancel, isHeavy, startFull, tick, tickAll } from './_machine.ts';
 import { buildShards, indexKey, shardKey } from '../ingest-catalog/_locale-shards.ts';
-import { overlayKey, roomOverlayKey, tmIndexKey } from './_io.ts';
+import { loadTm, overlayKey, roomOverlayKey, saveTm, tmIndexKey } from './_io.ts';
 import { sha256Hex } from './_diff.ts';
 import { memPasses } from './_pass.ts';
 
@@ -332,8 +332,10 @@ describe('caps and approval', () => {
     await until(w, () => w.jobs.get(job.id).status === 'published' && !w.jobs.get(job.id).stats.sweep);
     const done = w.jobs.get(job.id);
     assert.deepEqual(w.ledger.map((r) => r.ref).sort(), ['judge', 'judge#1', 'main:0', 'main:0#1']);
-    assert.ok(Math.abs(done.spent_usd - w.ledger.reduce((a, r) => a + r.usd, 0)) < 1e-6, 'the job row holds what the ledger holds');
-    assert.ok(done.spent_usd > firstSpend);
+    // The job row counts the run (its reserve is the estimate minus this), the ledger keeps both runs.
+    const second = w.ledger.filter((r) => r.ref.endsWith('#1')).reduce((a, r) => a + r.usd, 0);
+    assert.ok(Math.abs(done.spent_usd - second) < 1e-6 && second > 0);
+    assert.ok(Math.abs(w.ledger.reduce((a, r) => a + r.usd, 0) - (firstSpend + second)) < 1e-6);
   });
 });
 
@@ -535,5 +537,195 @@ describe('idempotency', () => {
     assert.deepEqual(w.ledger.map((r) => r.ref).sort(), ['judge', 'main:0', 'postedit:0']);
     const overlay = w.files.get(overlayKey('de', NEW));
     assert.deepEqual(Object.keys(overlay.entries).sort(), ['pu_m_1', 'ui_a_1', 'ui_a_2']);
+  });
+});
+
+describe('ending a job that has batches', () => {
+  it('a cancel that arrives while a batch is being created stops that batch', async () => {
+    const w = world();
+    const j = await newJob(w);
+    const stopped = [];
+    w.llm.cancel = async (id) => { stopped.push(id); };
+    const create = w.llm.createBatch;
+    // The admin cancels between the provider's answer and the write of the batch id.
+    w.llm.createBatch = async (reqs) => {
+      const out = await create(reqs);
+      await cancel(w.deps, j.id);
+      return out;
+    };
+    await until(w, () => w.jobs.get(j.id).status === 'cancelled');
+    const job = w.jobs.get(j.id);
+    assert.deepEqual([job.batch_ids, job.stats.submit], [[], undefined]);
+    assert.deepEqual(stopped, ['b0'], 'the batch nobody will read is cancelled at the provider');
+    for (let i = 0; i < 3; i++) await tick(w.deps);
+    assert.equal(w.llm.batches.length, 1);
+  });
+
+  it('a cancel that loses its race leaves the batches alone', async () => {
+    const w = world();
+    const j = await newJob(w);
+    await until(w, () => w.jobs.get(j.id).stats?.phase === 'running');
+    const stopped = [];
+    w.llm.cancel = async (id) => { stopped.push(id); };
+    const cas = w.deps.db.cas;
+    w.deps.db.cas = async (job, patch) => (patch.status === 'cancelled' ? null : cas(job, patch));
+    await assert.rejects(cancel(w.deps, j.id), { key: 'translate.conflict' });
+    w.deps.db.cas = cas;
+    assert.deepEqual(stopped, []);
+    await run(w, TERMINAL);
+    assert.equal(w.jobs.get(j.id).status, 'published');
+    assert.equal(w.llm.batches.filter((b) => b.requests[0].custom_id.startsWith('p')).length, 0, 'nothing was sent again as a post-edit');
+  });
+
+  it('the share of the estimate that was sent and never read goes into the ledger', async () => {
+    const w = world();
+    const j = await newJob(w);
+    await until(w, () => w.jobs.get(j.id).stats?.phase === 'running');
+    const estimate = w.jobs.get(j.id).estimate_usd;
+    await cancel(w.deps, j.id);
+    assert.deepEqual(w.ledger.map((r) => [r.ref, r.usd]), [['unread', estimate]]);
+
+    // Nothing was sent: nothing is booked.
+    const w2 = world({ settings: { upload_cap_usd: 0 } });
+    const k = await newJob(w2);
+    await run(w2, TERMINAL);
+    await cancel(w2.deps, k.id);
+    assert.deepEqual(w2.ledger, []);
+
+    // Everything was read: the ledger already holds the real spend.
+    const w3 = world();
+    const l = await newJob(w3);
+    await until(w3, () => w3.jobs.get(l.id).status === 'publishing');
+    const refs = w3.ledger.map((r) => r.ref).sort();
+    await cancel(w3.deps, l.id);
+    assert.deepEqual(w3.ledger.map((r) => r.ref).sort(), refs);
+  });
+});
+
+describe('creating a batch', () => {
+  it('a server error may have created the batch: the intent stays and the retry is counted', async () => {
+    const w = world();
+    const j = await newJob(w);
+    await until(w, () => w.jobs.get(j.id).stats?.phase === 'running');
+    const create = w.llm.createBatch;
+    w.llm.createBatch = async () => { throw Object.assign(new Error('overloaded'), { status: 529 }); };
+    await tick(w.deps);
+    w.llm.createBatch = create;
+    const cur = w.jobs.get(j.id);
+    assert.equal(cur.stats.phase, 'judge_submitting');
+    assert.deepEqual(Object.keys(cur.stats.submit).sort(), ['at', 'g', 'kind']);
+    cur.updated_at = new Date(0).toISOString();
+    const base = Date.now() + 3_600_000;
+    w.deps.now = () => new Date(base);
+    await tick(w.deps);
+    assert.equal(w.jobs.get(j.id).stats.resubmits, 1);
+  });
+
+  it('a job that keeps losing its creates stops instead of paying for one batch after another', async () => {
+    const w = world();
+    const j = await newJob(w);
+    await tick(w.deps); // queued
+    const queued = await w.db.getJob(j.id);
+    await w.db.cas(queued, { status: 'submitted', stats: { ...queued.stats, phase: 'submitting', resubmits: 3, submit: { kind: 'main', g: 0, at: 'x' } } });
+    w.jobs.get(j.id).updated_at = new Date(0).toISOString();
+    const base = Date.now() + 3_600_000;
+    w.deps.now = () => new Date(base);
+    await tick(w.deps);
+    const after = w.jobs.get(j.id);
+    assert.deepEqual([after.status, after.error, w.llm.batches.length], ['failed', 'translate.resubmit_limit', 0]);
+  });
+
+  it('errors while a batch is awaited only count in a row: a day of waiting survives more than five of them', async () => {
+    const w = world();
+    const j = await newJob(w);
+    await until(w, () => w.jobs.get(j.id).stats?.phase === 'running');
+    let mode = 'throw';
+    w.llm.isEnded = async () => {
+      if (mode === 'throw') throw new Error('network');
+      return mode === 'ended';
+    };
+    for (let round = 0; round < 3; round++) {
+      mode = 'throw';
+      for (let i = 0; i < 4; i++) await tick(w.deps);
+      assert.equal(w.jobs.get(j.id).stats.attempts, 4);
+      mode = 'running';
+      await tick(w.deps);
+      assert.equal(w.jobs.get(j.id).stats.attempts, undefined, 'a wait that was asked without an error starts the count again');
+    }
+    assert.equal(w.jobs.get(j.id).status, 'submitted');
+    mode = 'ended';
+    await run(w, TERMINAL);
+    assert.equal(w.jobs.get(j.id).status, 'published');
+  });
+
+  it('a result no request of the plan stands for is still paid for', async () => {
+    const spend = async (ghost) => {
+      const w = world();
+      const j = await newJob(w);
+      const results = w.llm.results.bind(w.llm);
+      w.llm.results = async function* (id) {
+        if (ghost) yield { custom_id: 'ghost', type: 'succeeded', text: '{}', stop_reason: 'end_turn', usage: { input_tokens: 1_000_000, output_tokens: 0 }, model: 'claude-sonnet-5-5' };
+        yield* results(id);
+      };
+      await run(w, TERMINAL);
+      assert.equal(w.jobs.get(j.id).status, 'published');
+      return w.jobs.get(j.id).spent_usd;
+    };
+    const [plain, withGhost] = [await spend(false), await spend(true)];
+    assert.ok(withGhost > plain + 0.5, `${withGhost} vs ${plain}`);
+  });
+});
+
+describe('publishing beside other writers', () => {
+  it('latest.json is the overlay of the live build: the job of another build writes only its own file', async () => {
+    const forLive = async (live) => {
+      const w = world();
+      w.deps.sources = { liveBuild: async () => live, list: async () => [] };
+      const j = await newJob(w);
+      await run(w, TERMINAL);
+      assert.equal(w.jobs.get(j.id).status, 'published', w.jobs.get(j.id).error);
+      return [w.files.has(overlayKey('de', NEW)), w.files.has(overlayKey('de', 'latest'))];
+    };
+    assert.deepEqual(await forLive(NEW), [true, true]);
+    assert.deepEqual(await forLive(OLD), [true, false]);
+  });
+
+  it('what an admin or an import wrote for a text while the job ran is not overwritten', async () => {
+    const w = world();
+    const j = await newJob(w, { created_at: '2026-06-01T00:00:00.000Z' });
+    await until(w, () => w.jobs.get(j.id).status === 'validating');
+    const [open, close, kill] = await Promise.all(['Open the door', 'Close the door', 'Kill ~mission(Target) at <EM1>Port</EM1>'].map((e) => sha256Hex(e)));
+    await saveTm(w.deps.store, 'de', {
+      [open]: { t: 'Tür auf', o: 'admin' },
+      [close]: { t: 'Tür zu (Pack)', o: 'community', src: 'pack', at: '2026-06-02T00:00:00.000Z' },
+      // Older than the job: it was there when the job decided to translate the text again.
+      [kill]: { t: 'Alt', o: 'community', src: 'pack', at: '2026-05-01T00:00:00.000Z' },
+    });
+    await run(w, TERMINAL);
+    assert.equal(w.jobs.get(j.id).status, 'published', w.jobs.get(j.id).error);
+    const tm = await loadTm(w.deps.store, 'de');
+    assert.deepEqual([tm[open].o, tm[open].t, tm[close].o, tm[close].t, tm[kill].o], ['admin', 'Tür auf', 'community', 'Tür zu (Pack)', 'ai']);
+    const overlay = w.files.get(overlayKey('de', NEW));
+    assert.deepEqual([overlay.entries.ui_a_1.t, overlay.entries.ui_a_2.t], ['Tür auf', 'Tür zu (Pack)']);
+  });
+
+  it('an admin entry is never sent for retranslation because its text uses a flagged term', async () => {
+    const w = world({ en: { ui_a_1: 'Open the door', ui_a_2: 'Close the door', ui_old: 'Unchanged text' }, baseEn: { ui_a_1: 'Open the door', ui_a_2: 'Close the door', ui_old: 'Unchanged text' } });
+    w.db.glossary.push({ id: 'g1', source_term: 'door', target_term: 'Tür', category: 'term', origin: 'admin', needs_retranslate: true });
+    await saveTm(w.deps.store, 'de', {
+      [await sha256Hex('Open the door')]: { t: 'Tür öffnen', o: 'admin' },
+      [await sha256Hex('Close the door')]: { t: 'Tor zu', o: 'ai', at: '2026-01-01T00:00:00.000Z' },
+    });
+    const j = await newJob(w);
+    await run(w, TERMINAL);
+    const job = w.jobs.get(j.id);
+    assert.equal(job.status, 'published', job.error);
+    assert.equal(job.stats.counts.forced, 1);
+    // The strings of the main batch (the admin's line may still ride along as a reference pair).
+    const asked = w.llm.batches[0].requests.flatMap((r) => {
+      const msg = r.params.messages[0].content;
+      return JSON.parse(msg.slice(msg.indexOf('{"g"'))).g.flatMap((x) => x.s.map((s) => s[1]));
+    });
+    assert.deepEqual(asked, ['Close the door']);
   });
 });

@@ -74,13 +74,23 @@ export function makeDb(sb: Client, now: () => Date): Db {
         sb.from('translation_glossary').select('*').eq('lang', lang).order('id').range(from, to));
     },
     async insertGlossary(lang, rows) {
-      for (let i = 0; i < rows.length; i += 500) {
-        const part = rows.slice(i, i + 500).map((r) => ({
-          lang, source_term: r.source_term, target_term: r.target_term, category: r.category, origin: r.origin,
-        }));
+      type Row = { lang: string; source_term: string; target_term: string; category: string; origin: string };
+      // 23505: another job inserted one of the terms first - never overwrite it. One duplicate fails the
+      // whole statement, so the part is halved until the duplicate stands alone and the rest goes in.
+      const put = async (part: Row[]): Promise<void> => {
+        if (!part.length) return;
         const { error } = await sb.from('translation_glossary').insert(part);
-        // 23505: a concurrent job inserted the same term first — never overwrite.
-        if (error && error.code !== '23505') fail(error);
+        if (!error) return;
+        if (error.code !== '23505') fail(error);
+        if (part.length === 1) return;
+        const mid = part.length >> 1;
+        await put(part.slice(0, mid));
+        await put(part.slice(mid));
+      };
+      for (let i = 0; i < rows.length; i += 500) {
+        await put(rows.slice(i, i + 500).map((r) => ({
+          lang, source_term: r.source_term, target_term: r.target_term, category: r.category, origin: r.origin,
+        })));
       }
     },
     async resetRetranslate(ids) {

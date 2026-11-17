@@ -497,6 +497,44 @@ describe('a table published again while a walk is under way', () => {
   });
 });
 
+describe('the plan is cut from the table the rows were walked with', () => {
+  it('a table published again between the diff and the chunking loses no text', async () => {
+    const { en, cig, base } = bigTables(20000);
+    const w = world({ tables: { en, cig, base } });
+    const job = await w.newJob();
+    await until(w, () => w.jobs.get(job.id).stats.est?.phase === 'chunk');
+    const whole = await diffStrings({ en, cig, tm: {}, mode: 'delta', baseEn: base });
+    // The new publication has one small group: its segments are numbered differently.
+    putTable(w.ts, NEW, 'en', { ui_a: 'Only this one is left' }, 'gen002');
+    await until(w, () => w.jobs.get(job.id).status !== 'estimating');
+    const done = w.jobs.get(job.id);
+    assert.equal(done.status, 'queued', done.error);
+    const items = (await planOf(w, done)).flatMap((c) => c.items);
+    assert.equal(items.length, whole.todo.length);
+    assert.deepEqual(items.map((it) => it.h).sort(), whole.todo.map((u) => u.h).sort());
+    assert.equal(done.string_count, whole.todo.reduce((a, u) => a + u.keys.length, 0));
+  });
+
+  it('a term flagged while the digits are walked waits for the next job: no digit is forced alone', async () => {
+    const en = {};
+    for (let i = 0; i < 400; i++) en[`ui_k${String(i).padStart(3, '0')}`] = `Open the Hull number ${i} of the ship`;
+    const tm = {};
+    for (const e of Object.values(en)) tm[await sha256Hex(e)] = { t: `ALT ${e}`, o: 'ai', at: '2026-01-01T00:00:00.000Z' };
+    const glossary = [{ id: 'g1', source_term: 'Hull', target_term: 'Rumpf', category: 'term', origin: 'admin', needs_retranslate: false }];
+    const w = world({ tables: { en, cig: {}, base: { ...en } }, tm, glossary });
+    const job = await w.newJob();
+    await until(w, () => w.jobs.get(job.id).stats.est?.phase === 'diff' && w.jobs.get(job.id).stats.est.cursor === 8);
+    w.db.glossary[0].needs_retranslate = true;
+    await until(w, () => !isHeavy(w.jobs.get(job.id)));
+    const done = w.jobs.get(job.id);
+    assert.deepEqual([done.stats.counts.forced, done.stats.counts.todo, done.stats.counts.tm], [0, 0, 400], JSON.stringify(done.stats.counts));
+    // Nothing was translated, so every text keeps its place in the overlay with the wording it has.
+    assert.equal(done.status, 'published', done.error);
+    assert.equal(Object.keys(w.ts.json(overlayKey('de', NEW)).entries).length, 400);
+    assert.equal(w.db.glossary[0].needs_retranslate, true);
+  });
+});
+
 describe('the fast lane', () => {
   it('starts a queued job and creates its batch, but asks no batch that is under way', async () => {
     const w = world({ tables: { en: { ui_a: 'One', ui_b: 'Two', ui_old: 'Old' }, cig: {}, base: { ui_old: 'Old' } } });

@@ -101,7 +101,8 @@ export async function diffStrings(input: DiffInput): Promise<DiffResult> {
       continue;
     }
     const lower = force.length ? en.toLowerCase() : '';
-    const forced = !!hit && force.some((t) => lower.includes(t));
+    // An admin's own wording is never sent for retranslation: the admin who flags a term edits those.
+    const forced = !!hit && hit.o !== 'admin' && force.some((t) => lower.includes(t));
     if (hit && !forced) {
       counts.tm++;
       reused[key] = { h, t: hit.t };

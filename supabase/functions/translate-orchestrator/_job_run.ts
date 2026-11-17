@@ -32,8 +32,8 @@ import { usageCostUsd } from './_cost.ts';
 import { TranslateError } from './_errors.ts';
 import { extractJudgeTerms, mergeGlossary } from './_glossary.ts';
 import {
-  addStats, groupsOf, jobKey, JUDGE_CAP, JUDGE_MODEL, JUDGE_THRESHOLD, monthOf, must, partsOfGroup, requireLlm, round4, slice,
-  STALE_SUBMIT_MS,
+  addStats, groupsOf, jobKey, JUDGE_CAP, JUDGE_MODEL, JUDGE_THRESHOLD, LostRace, MAX_RESUBMITS, monthOf, must, partsOfGroup, requireLlm,
+  round4, slice, STALE_SUBMIT_MS,
 } from './_job.ts';
 import type { BatchRef, Deps, Job, QaStats, Stats } from './_job.ts';
 import { readPlan, readPlanPart } from './_job_estimate.ts';
@@ -122,7 +122,10 @@ async function createBatch(
   const v = intentVerdict(job, deps.now().getTime());
   if (v === 'wait') return null;
   const again = v === 'stale';
-  if (again) deps.log('translate batch may exist twice', { job: job.id, kind, group: g, since: job.stats!.submit!.at });
+  if (again) {
+    deps.log('translate batch may exist twice', { job: job.id, kind, group: g, since: job.stats!.submit!.at });
+    if ((job.stats?.resubmits ?? 0) >= MAX_RESUBMITS) throw new TranslateError('translate.resubmit_limit');
+  }
   const cur = must(await deps.db.cas(job, {
     stats: addStats(job, {
       submit: { kind, g, at: deps.now().toISOString() },
@@ -134,15 +137,23 @@ async function createBatch(
   try {
     ({ id } = await llm.createBatch(reqs));
   } catch (e) {
-    // An HTTP status means the provider answered and refused: nothing was created, so the retry is
-    // not a possible duplicate. Without one (timeout, dropped connection) the create may have gone
+    // A 4xx means the provider answered and refused: nothing was created, so the retry is not a
+    // possible duplicate. Anything else (timeout, dropped connection, 5xx, 529) may have gone
     // through, and the intent stays so the retry is counted.
-    if (typeof (e as { status?: unknown })?.status === 'number') {
+    const status = (e as { status?: unknown })?.status;
+    if (typeof status === 'number' && status >= 400 && status < 500) {
       await deps.db.cas(cur, { stats: addStats(cur, { submit: undefined }) });
     }
     throw e;
   }
-  return await slice(deps, cur, { ...done, submit: undefined }, { batch_ids: [...cur.batch_ids, { id, kind }] });
+  try {
+    return await slice(deps, cur, { ...done, submit: undefined }, { batch_ids: [...cur.batch_ids, { id, kind }] });
+  } catch (e) {
+    // The job was ended while the provider answered (cancelled by an admin, failed): nobody will read
+    // this batch and no cancel knows its id, so it is stopped here.
+    if (e instanceof LostRace) await llm.cancel(id).catch(() => {});
+    throw e;
+  }
 }
 
 async function allEnded(deps: Deps, job: Job, kind: BatchRef['kind']): Promise<boolean> {
@@ -174,10 +185,11 @@ async function collect(deps: Deps, batchId: string, chunks: Chunk[], glossary: Q
   const seen = new Set<string>();
   for await (const r of llm.results(batchId)) {
     const c = byId.get(r.custom_id);
+    // Paid is paid: a result no request of the plan stands for still counts.
+    if (r.usage && (r.model ?? c?.model)) usd += usageCostUsd((r.model ?? c?.model)!, r.usage);
     if (!c) continue;
     seen.add(c.id);
     const model = r.model ?? c.model;
-    if (r.usage) usd += usageCostUsd(model, r.usage);
     if (r.type !== 'succeeded') {
       failAll(c, `request:${r.type}`, model);
       continue;

@@ -40,6 +40,13 @@ export interface EstState {
   total: number;
   /** rows: the publication of the tables the walk reads (`tableMark`). */
   mark?: string;
+  /**
+   * The layout of the English table the rows were walked with. Segments and reference pools are cut
+   * from it, so the numbering holds for the whole estimate, also when the table is published again.
+   */
+  ix?: { groups: Record<string, number>; misc: number; count: number };
+  /** The glossary rows flagged for retranslation when the diff began: every digit and the plan use these. */
+  force?: { ids: string[]; terms: string[] };
   /** Keys with blank English (counted by the rows walk, which writes no row for them). */
   blank?: number;
   /** Todo items per segment (`_job_estimate.ts: segmentsOf`), and the hash digits that hold some of them. */
@@ -214,6 +221,12 @@ export function addStats(job: Job, patch: Partial<Stats>): Stats {
 
 /** A compare-and-set this request lost: the job belongs to another request now. */
 export class LostRace extends Error {}
+
+/**
+ * Batches a job may create again after an intent went stale. Each one may be a paid duplicate, so a
+ * job that keeps losing its creates stops and waits for a person instead of going on forever.
+ */
+export const MAX_RESUBMITS = 3;
 
 export function must(job: Job | null): Job {
   if (!job) throw new LostRace();

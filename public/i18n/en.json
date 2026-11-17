@@ -4261,7 +4261,8 @@
         "source_unknown": "The source does not exist (any more).",
         "nothing_to_do": "There was nothing to translate.",
         "phase_unknown": "The job is in an unknown step.",
-        "job_cleanup_pending": "The previous job is still being cleaned up. Please try again in a minute."
+        "job_cleanup_pending": "The previous job is still being cleaned up. Please try again in a minute.",
+        "resubmit_limit": "Creating a batch went unanswered several times. The job was stopped so that no batch is paid for twice. Please check the Anthropic Console for orphaned batches."
       },
       "glossary": {
         "title": "Glossary",

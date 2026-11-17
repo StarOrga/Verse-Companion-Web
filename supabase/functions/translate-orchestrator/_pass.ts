@@ -176,6 +176,12 @@ export async function advancePass(deps: Deps, pass: Pass, steps: Record<PassKind
 export { MAX_DEAD_ATTEMPTS };
 
 /** In-memory PassDb: the unit tests, and callers that run a pass to its end in one process. */
+/**
+ * An asker that repeats itself (its slice was killed after it asked) finds the pass it ordered for
+ * this long, also when that pass has ended meanwhile: a killed slice is run again after five minutes.
+ */
+export const TOKEN_WINDOW_MS = 24 * 3600_000;
+
 export function memPasses(now: () => Date = () => new Date()): PassDb & { rows: Map<string, Pass> } {
   const rows = new Map<string, Pass>();
   let seq = 0;
@@ -197,9 +203,15 @@ export function memPasses(now: () => Date = () => new Date()): PassDb & { rows: 
       return structuredClone(next);
     },
     async open(req) {
+      if (req.token) {
+        const at = now().getTime();
+        const mine = [...rows.values()].find((p) =>
+          p.kind === req.kind && p.lang === req.lang && (p.source_id ?? '') === (req.source_id ?? '') && p.token === req.token &&
+          at - Date.parse(p.created_at) < TOKEN_WINDOW_MS);
+        if (mine) return structuredClone(mine);
+      }
       const have = [...rows.values()].find((p) => same(p, req));
       if (have) {
-        if (req.token && have.token === req.token) return structuredClone(have);
         have.again = true;
         have.next_state = structuredClone(req.state ?? {});
         return structuredClone(have);

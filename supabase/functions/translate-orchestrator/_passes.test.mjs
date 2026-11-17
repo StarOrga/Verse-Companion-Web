@@ -568,6 +568,13 @@ describe('pass driver', () => {
     const a = await w2.passes.open({ kind: 'learn', lang: 'de', reason: 'seed', token: 'seed:7' });
     const b = await w2.passes.open({ kind: 'learn', lang: 'de', reason: 'seed', token: 'seed:7' });
     assert.deepEqual([b.id, b.again], [a.id, false]);
+    // The asker repeats itself minutes later, when the pass it ordered has already ended: still no second one.
+    await w2.passes.cas(await w2.passes.get(a.id), { status: 'done', phase: 'done' });
+    const c = await w2.passes.open({ kind: 'learn', lang: 'de', reason: 'seed', token: 'seed:7' });
+    assert.deepEqual([c.id, c.status, w2.passes.rows.size], [a.id, 'done', 1]);
+    // Another asker gets its own pass.
+    const d = await w2.passes.open({ kind: 'learn', lang: 'de', reason: 'publish', token: 'job:9:0' });
+    assert.deepEqual([d.id === a.id, d.status, w2.passes.rows.size], [false, 'open', 2]);
   });
 
   it('a young stamp means another request is running: nothing is done', async () => {

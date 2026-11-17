@@ -84,9 +84,12 @@ language with a community pack cannot do): the estimate is the first step of the
 
 `translate.no_api_key` · `translate.english_missing` · `translate.lang_unknown` ·
 `translate.plan_missing` · `translate.results_missing` · `translate.phase_unknown` ·
+`translate.resubmit_limit` (a batch create went unanswered 3 times; see "Submitting a batch at most once") ·
 `translate.internal` (5 failed attempts of one step) · `translate.nothing_to_do` (skipped) ·
 `translate.worker_limit` (the worker was killed by the runtime's CPU / memory limit 3 times in a row).
-A transient error (network, R2) only bumps `stats.attempts`; the next tick retries the same step.
+A transient error (network, R2) only bumps `stats.attempts`; the next tick retries the same step. The
+count is of errors in a row: a slice that commits and a wait that is asked without an error both start
+it again, so a job that waits a day for a batch does not end on five network errors spread over it.
 
 A job that ends (published, failed, skipped, cancelled) carries `stats.sweep` until a later tick has
 deleted `translation-work/<job>/`, 150 objects per slice.
@@ -101,8 +104,10 @@ goes through `createBatch` (`_job_run.ts`):
 
 - Before the create it writes the intent `stats.submit` (`kind`, group, time) as a compare-and-set.
   Of two requests that reach the same group only one wins that write; the other stops before it
-  creates anything. A create the provider refuses (an HTTP status came back) clears the intent again;
-  one whose answer never arrived keeps it.
+  creates anything. A create the provider refuses (a 4xx came back) clears the intent again; one
+  whose answer never arrived, or that ended in a 5xx / 529, keeps it - the batch may exist.
+- The SDK does not retry a create (`maxRetries: 0`, 90 s timeout in `_anthropic.ts`): a create it
+  sent again by itself would be a second paid batch nobody knows of.
 - A request that finds an intent it did not write leaves the job alone until the intent is older than
   15 minutes (`STALE_SUBMIT_MS`): the request that wrote it may still be waiting for the answer.
 - The batch id is written in the compare-and-set that moves the position to the next group.
@@ -111,7 +116,14 @@ What remains is a kill between the provider's answer and the write of the batch 
 trip), or a create whose answer was lost. The next request then finds the stale intent, creates that
 group again, logs `translate batch may exist twice` and counts it in `stats.resubmits`; the first batch
 is an orphan (visible in the Console) that is paid and never read. `resubmits > 0` on a job is the cue
-to look. The learning step's batches (`_learn_batch.ts`, ids in R2 work keys) have their own intent.
+to look, and after `MAX_RESUBMITS` (3) the job fails with `translate.resubmit_limit` instead of creating
+another one. The learning step's batches (`_learn_batch.ts`, ids in R2 work keys) have their own intent.
+
+**Ending a job that has batches.** `cancel` and a failure set the status first and cancel the batches
+after it, so a job that lost that race keeps its batches. A create that is in flight at that moment
+loses its own compare-and-set and cancels the batch it just made. The share of the estimate that was
+sent and never read is booked under the ledger ref `unread`: the real spend of those batches is not
+known, and the monthly ledger may over-count but never under-count.
 
 Spend is booked once per batch: `translation_ledger.ref` is `main:<group>`, `judge` or
 `postedit:<group>` (with `#<run>` on a restarted job), unique per job, so a slice that is repeated after
@@ -152,6 +164,19 @@ smallest key and `chunk` cuts one segment at a time.
 A job that has nothing to translate but whose TM can fill keys of the build (after a community import)
 goes from `estimating` straight to `publishing` and writes the overlay of that build.
 
+**Publishing beside other writers.** A job runs for hours to days (batches, an approval). When its
+results reach the TM (`tm`), an entry an admin wrote for the same text stands, and so does a community
+entry that is newer than the job; admin entries are also never picked for retranslation by a flagged
+glossary term. The flagged terms are read once, when the diff begins (`stats.est.force`): a term flagged
+while a job estimates waits for the next job. `latest.json` is written only by the job of the current
+LIVE build - a PTU build's job writes `<build>.json` alone.
+
+Known limits (decided, not bugs): the caps are checked against the estimate when a job is queued, not
+against the running spend (the judge sample and the post-edit add a few percent); a text that was
+picked for retranslation and whose rewrite failed QA is left out of that job's overlay, keeps its old
+TM entry and comes back with the next overlay rebuild; two jobs of one language that run at the same
+time (PTU and LIVE) both translate a text that is new to both.
+
 **Budgets.** `_scale.test.mjs` runs every walk on a table of production size against a store that keeps
 JSON text like the bucket, and fails when one slice reads or writes more than 6 MB. Measured there
 (2026-11-17, 91 900 keys, a pack of 87 000 lines, 64 000 TM entries): the largest slices are the import's
@@ -184,7 +209,8 @@ books or creates is guarded (ledger ref, batch intent).
 `index.json`; the shards of the old one go away). A walk notes generation and shard count of every table
 it reads with its first `rows` slice (`tableMark`, in `stats.est.mark` / `stats.pub.mark` / the pass
 state) and starts over when a later slice finds another one. The digit phases only read the row files
-the walk wrote, so what they join is always one publication.
+the walk wrote, so what they join is always one publication; the estimate also keeps the layout of the
+table it walked (`stats.est.ix`) and cuts its segments from that, not from the table as it is later.
 
 **CIG's own translation.** The uploader publishes CIG's table of a language under the language code
 (`codex-locale/<build>/de/`), not under the game folder name (`german_(germany)`). Until 0.274.0 the
