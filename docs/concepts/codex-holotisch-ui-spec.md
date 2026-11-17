@@ -98,8 +98,23 @@ Source: `20261107-0250-holotisch-unten-hangar/briefs/implement.md` (verbatim not
 - Groups under 8 ships stay pickable with "nur N Schiffe". Default = narrowest group; a picked group is remembered **per ship for 12 h** (classic view keeps its account-wide choice).
 - Shell beta: no hangar button anywhere (classic page loses only that row). Own ship in the Holotable: rename, note, pin, remove (remove confirms) — holotable variant only.
 
+## Decided and built: interior (concept 20261117-1810, 2026-11-17)
+
+Source: `20261117-1810-holotisch-innenleben/briefs/implement.md` (verbatim notes, checklist A1–A10, B1–B12), round 2 design r2d1 "3D mit Hülle" ("sehr gut so machen!"). Beta holotable only.
+
+- **One view row**, no Außen/Innen split: "Ansicht" (Akte · 3D · Einfach · Oben · Seite · Front) plus "Deck · Filter" at the bottom (Alle · Hülle, Alle Decks, each deck with its SCU). This replaces the 11-07 deck chips in Einfach and the Innen group.
+- **3D mit Hülle:** a faint ghost hull from the silhouette, the picked deck solid, the others faint; cargo grids as boxes with SCU, lifts as lines with stops, ladders as their own lines; drag turns, wheel zooms. SVG projection, no WebGL. "Alle" keeps the hull model with its part hotspots; "Alle Decks" is its own chip (3D only).
+- **Room click:** no black frame; Bauteile shows deck, floor, height, SCU, "Versorgt von" relay and what stands in the room.
+- **Bauteile:** interior overview by type (escape pods to lifts, doors by kind incl. brig cells, weapon racks, lockers …), a click opens the element on its deck; one mini search (magnifier) over outside parts, inside element types and rooms.
+- **Role presets** in 5 groups with a start deck (Kampf → Waffen, Türen, Wege, Medizin; Fracht → Fracht, Wege, Türen; Medizin; Industrie/Bergung; Sonstige). **Nothing is remembered** (r2-remember "none"): every hull opens on its preset.
+- **Data gaps are shown**, never hidden ("96 von 224 SCU verortet" on the Starlancer MAX).
+- Events: `codex:deck_select`, `codex:interior_filter_toggle`, `codex:interior_element_select`, `codex:parts_search` (never the search text); PostHog tiles "Holotisch innen …" in `posthog/dashboards.json`.
+- Rejected in round 1: design d2 "3D-Schnitt" layout ("das geht gar nicht!").
+
 ## Rejected, do not re-propose without saying so
 
+- A separate Außen/Innen switch on the holotable; decks are a filter (20261117-1810 r1).
+- Remembering the interior filter per user, role or ship (20261117-1810 r2-remember).
 - Compare button on the ship page ("eher auf der Landing ... Richtung Simulation"). (S hv-s2)
 - "Schiff wechseln" and a share button in the toolbar. (S hv3-s2)
 - Global density setting; density lives inside the boxes. (S hv5-s3)
