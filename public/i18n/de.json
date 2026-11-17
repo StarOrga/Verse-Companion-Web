@@ -1005,7 +1005,7 @@
         "partSize": "Größe",
         "partGrade": "Klasse",
         "iconWishlist": "Wünsche",
-        "iconSupply": "Nachschub",
+        "iconSupply": "Operation",
         "iconStock": "Inventar",
         "previewTitle": "Vorschau der Detailseite",
         "previewMaker": "Hersteller",
@@ -2516,9 +2516,9 @@
         "lensLimits": "begrenzt das Set in diesem Einsatz"
       },
       "supplies": {
-        "add": "Fehlendes in Nachschub ({{n}})",
-        "none": "Alles da oder schon im Nachschub.",
-        "added": "{{n}} Teile im Nachschub.",
+        "add": "Fehlendes in Operation ({{n}})",
+        "none": "Alles da oder schon in einer Operation.",
+        "added": "{{n}} Teile in der Operation.",
         "toPlan": "Zum Planen"
       },
       "notFoundPage": {
@@ -2952,7 +2952,7 @@
       "removeTitle": "Aus dem Inventar entfernen?",
       "removeBody": "{{n}}× {{name}} verlässt jeden Ort in deinem Inventar.",
       "removeConfirm": "Entfernen",
-      "inNachschub": "Im Nachschub „{{name}}“",
+      "inNachschub": "In der Operation „{{name}}“",
       "showInHq": "Im HQ zeigen",
       "noteTitle": "Notiz zu diesem Gegenstand",
       "wishAgain": "Noch eins wünschen"
@@ -5934,28 +5934,28 @@
       "fit": "Karte einpassen",
       "legend": "Legende",
       "legendAria": "Aktionen ein- und ausblenden",
-      "shared": "{{place}} dient auch dem Nachschub „{{name}}“",
+      "shared": "{{place}} dient auch der Operation „{{name}}“",
       "open": "Ort offen"
     },
     "slots": {
-      "aria": "Nachschub-Slots",
+      "aria": "Operations-Slots",
       "finished": "fertig",
       "einsaetze": "{{n}} Einsätze",
       "einsatzOne": "1 Einsatz",
       "delete": "„{{name}}“ löschen",
-      "newAria": "Neuer Nachschub in Slot {{n}}",
+      "newAria": "Neue Operation in Slot {{n}}",
       "free": "Slot {{n}}",
       "archive": "Archiv",
-      "archiveAria": "Archiv, {{n}} Nachschübe",
-      "introTitle": "Noch kein Nachschub",
-      "introText": "Tippe auf ein Plus und nimm Dinge von deinen Wünschen mit. Aus ihnen wird ein Nachschub mit Einsätzen, die du in Jetzt Schritt für Schritt abarbeitest.",
-      "newAriaEvent": "Neuer Nachschub in Slot {{n}} – Event verfügbar"
+      "archiveAria": "Archiv, {{n}} Operationen",
+      "introTitle": "Noch keine Operation",
+      "introText": "Tippe auf ein Plus und lege eine Operation an: eine Gruppe von Einsätzen mit einem Ziel. Deine Wünsche weist du ihr zu, sie bleiben Wünsche. Die Einsätze arbeitest du in Jetzt Schritt für Schritt ab.",
+      "newAriaEvent": "Neue Operation in Slot {{n}} – Event verfügbar"
     },
     "remove": {
       "titleRemove": "„{{name}}“ löschen?",
       "titleEmpty": "„{{name}}“ leeren?",
-      "msgRemove": "Der Nachschub verschwindet. Offene Positionen: {{n}}.",
-      "msgEmpty": "Der Nachschub bleibt, seine offenen Positionen verlassen ihn. Offene Positionen: {{n}}.",
+      "msgRemove": "Die Operation verschwindet. Offene Positionen: {{n}}.",
+      "msgEmpty": "Die Operation bleibt, seine offenen Positionen verlassen ihn. Offene Positionen: {{n}}.",
       "back": "Offene Positionen zurück zu den Wünschen",
       "backOn": "Sie werden bei deinen Wünschen hochgezählt.",
       "backOff": "Sie werden ganz verworfen.",
@@ -5963,14 +5963,14 @@
       "confirmEmpty": "Leeren"
     },
     "archive": {
-      "slotFree": "Ein Platz ist frei, du kannst einen Nachschub zurückholen.",
-      "empty": "Noch nichts im Archiv. Ein fertiger Nachschub rutscht von selbst hierher und macht seinen Platz frei.",
+      "slotFree": "Ein Platz ist frei, du kannst eine Operation zurückholen.",
+      "empty": "Noch nichts im Archiv. Eine fertige Operation rutscht von selbst hierher und macht seinen Platz frei.",
       "reactivate": "Wieder aktivieren",
       "close": "Schließen"
     },
     "flow": {
-      "titleNew": "Neuer Nachschub",
-      "titleEdit": "Nachschub bearbeiten",
+      "titleNew": "Neue Operation",
+      "titleEdit": "Operation bearbeiten",
       "slotOf": "Slot {{n}} von {{max}}",
       "stepsAria": "Schritte",
       "step": {
@@ -5990,10 +5990,10 @@
       "qtyOf": "Menge von {{name}}",
       "less": "Weniger mitnehmen",
       "more": "Mehr mitnehmen",
-      "nameLabel": "Name des Nachschubs",
-      "alreadyIn": "Schon im Nachschub",
+      "nameLabel": "Name der Operation",
+      "alreadyIn": "Schon in der Operation",
       "forBp": "für {{name}}",
-      "removeLine": "„{{name}}“ aus dem Nachschub nehmen",
+      "removeLine": "„{{name}}“ aus der Operation nehmen",
       "einsaetze": "Einsätze",
       "einsatzCount": "{{n}} Einsätze · {{s}} Schritte",
       "noNewLines": "Keine neuen Positionen, deshalb keine neuen Einsätze.",
@@ -6022,7 +6022,7 @@
       "haveEinsaetze": "Schon geplant",
       "back": "Zurück",
       "next": "Weiter",
-      "create": "Nachschub anlegen",
+      "create": "Operation anlegen",
       "saveEdit": "Speichern",
       "close": "Schließen",
       "namePlaceholder": "Leer lassen, dann wird einer vorgeschlagen",
@@ -6052,11 +6052,11 @@
       }
     },
     "panel": {
-      "renameAria": "Neuer Name des Nachschubs",
+      "renameAria": "Neuer Name der Operation",
       "rename": "Namen ändern",
       "positions": "Positionen",
       "edit": "Bearbeiten",
-      "noEinsaetze": "Dieser Nachschub hat noch keine Einsätze.",
+      "noEinsaetze": "Diese Operation hat noch keine Einsätze.",
       "noEinsaetzeHint": "Aus den Positionen entstehen Einsätze: kaufen, abbauen, Missionen, am Ende das Craften.",
       "proposeEinsaetze": "Einsätze vorschlagen",
       "einsaetze": "Einsätze",
@@ -6067,19 +6067,19 @@
       "places": "{{n}} Orte"
     },
     "run": {
-      "aria": "Nachschub, den Jetzt bedient",
+      "aria": "Operation, die Jetzt bedient",
       "for": "für",
       "stepOf": "Schritt {{n}} von {{total}}",
-      "switch": "Nachschub wechseln",
-      "emptyTitle": "Kein Nachschub in Arbeit",
+      "switch": "Operation wechseln",
+      "emptyTitle": "Keine Operation in Arbeit",
       "toPlanen": "Zu Planen",
       "finish": "Schritt erledigt",
       "sharedStop": "Dieser Ort dient auch „{{name}}“.",
       "doneKicker": "Alles abgehakt",
       "allDone": "Alle Schritte dieses Einsatzes sind erledigt.",
-      "allDoneHint": "Wähle einen anderen Einsatz des Nachschubs oder wechsle den Nachschub.",
-      "einsaetze": "Einsätze dieses Nachschubs",
-      "archived": "Abgeschlossen: Dieser Nachschub liegt im Archiv, seine Einsätze laufen hier weiter. Unter Planen › Archiv kannst du ihn wieder aktivieren."
+      "allDoneHint": "Wähle einen anderen Einsatz der Operation oder wechsle die Operation.",
+      "einsaetze": "Einsätze dieser Operation",
+      "archived": "Abgeschlossen: Diese Operation liegt im Archiv, ihre Einsätze laufen hier weiter. Unter Planen › Archiv kannst du sie wieder aktivieren."
     },
     "ticker": {
       "none": "noch kein Ereignis",
@@ -6131,7 +6131,7 @@
       "prev": "Vorherige Seite",
       "next": "Nächste Seite",
       "hintWish": "bei deinen Wünschen: {{n}}",
-      "hintNachschub": "im Nachschub „{{name}}“",
+      "hintNachschub": "in der Operation „{{name}}“",
       "bpPick": {
         "hint": "Aus dem Codex wählen, damit Material und Codex-Seite passen.",
         "label": "Blaupause suchen",
@@ -6324,7 +6324,7 @@
       }
     },
     "nachschub": {
-      "slotsFull": "Alle 7 Nachschub-Plätze sind belegt. Schließe einen Nachschub ab oder lösche einen, dann ist ein Platz frei.",
+      "slotsFull": "Alle 7 Operations-Plätze sind belegt. Schließe eine Operation ab oder lösche eine, dann ist ein Platz frei.",
       "nothingPicked": "Wähle mindestens einen Gegenstand aus deinen Wünschen.",
       "sellGoalInvalid": "Gib ein Ziel von mindestens 1 aUEC ein.",
       "target": {
@@ -6337,12 +6337,12 @@
         },
         "lead": "{{n}} Gegenstand/Gegenstände aus deinem Lager",
         "where": "Wohin",
-        "new": "Neuer Nachschub",
-        "newSell": "Neuer Nachschub: Geld verdienen",
+        "new": "Neue Operation",
+        "newSell": "Neue Operation: Geld verdienen",
         "append": "An „{{name}}“ anhängen",
         "goal": "Ziel in aUEC",
         "goalPlaceholder": "z. B. 1.500.000",
-        "create": "Nachschub anlegen",
+        "create": "Operation anlegen",
         "add": "Hinzufügen",
         "sellName": "Geld verdienen",
         "scu": "SCU",
@@ -6354,7 +6354,7 @@
         "einsatzMany": "Abholen"
       },
       "sellForm": {
-        "kindAria": "Wofür ist der Nachschub?",
+        "kindAria": "Wofür ist die Operation?",
         "wish": "Aus deinen Wünschen",
         "sell": "Geld verdienen",
         "goal": "Ziel in aUEC",
@@ -6390,12 +6390,12 @@
       "done": {
         "created": "„{{name}}“ ist angelegt.",
         "undone": "Rückgängig gemacht.",
-        "reactivated": "Nachschub ist wieder aktiv.",
-        "emptied": "Nachschub geleert.",
-        "removed": "Nachschub gelöscht.",
-        "added": "Zum Nachschub hinzugefügt.",
+        "reactivated": "Operation ist wieder aktiv.",
+        "emptied": "Operation geleert.",
+        "removed": "Operation gelöscht.",
+        "added": "Zur Operation hinzugefügt.",
         "lineRemoved": "Position entfernt.",
-        "edited": "Nachschub gespeichert.",
+        "edited": "Operation gespeichert.",
         "wishRemoved": "{{count}} × {{name}} von der Wunschliste entfernt.",
         "released": "{{name}} aus der Operation gelöst."
       },
@@ -6422,12 +6422,12 @@
           "buy": "Kaufen"
         }
       },
-      "linesFull": "Deine Nachschub-Liste ist voll (100 Positionen). Entferne erst Positionen, dann können deine Wünsche einziehen.",
-      "partial": "{{count}} Positionen sind geblieben: Deine Nachschub-Liste ist voll.",
+      "linesFull": "Deine Operation ist voll (100 Positionen). Entferne erst Positionen, dann kannst du weitere zuweisen.",
+      "partial": "{{count}} Positionen sind geblieben: Deine Operation ist voll.",
       "wishlistFailed": "Deine Wünsche konnten nicht geändert werden. Es wurde nichts verschoben.",
       "wishCapped": "{{count}} Stück passen nicht mehr in deine Wünsche (höchstens 999 je Eintrag) und gehen verloren.",
-      "gone": "Dieser Nachschub existiert nicht mehr (auf einem anderen Gerät gelöscht). Die Ansicht wird aktualisiert.",
-      "capReached": "Du hast das Limit an gespeicherten Nachschüben erreicht. Lösche alte aus dem Archiv, dann klappt es wieder.",
+      "gone": "Diese Operation existiert nicht mehr (auf einem anderen Gerät gelöscht). Die Ansicht wird aktualisiert.",
+      "capReached": "Du hast das Limit an gespeicherten Operationen erreicht. Lösche alte aus dem Archiv, dann klappt es wieder.",
       "nothingFree": "Alle Stücke dieses Wunschs sind schon einer Operation zugeordnet.",
       "splitInvalid": "Die Aufteilung auf die Operationen geht nicht auf.",
       "dissolveFailed": "Eine Operation konnte nicht aufgelöst werden und bleibt bestehen."
@@ -6442,7 +6442,7 @@
       "ops": "Einsätze"
     },
     "supplies": {
-      "button": "Nachschub",
+      "button": "Operationen",
       "add": {
         "search": "Gegenstand suchen"
       },
@@ -6453,20 +6453,20 @@
       "remove": "{{name}} entfernen",
       "sum": "{{open}} offen ({{units}} Stk.) · {{done}} besorgt",
       "clearDone": "Abgehakte entfernen",
-      "buttonAria": "Nachschub öffnen ({{count}} Einträge)",
-      "title": "Nachschub",
-      "close": "Nachschub schließen",
-      "empty": "Noch nichts auf der Nachschub-Liste.",
-      "emptyHint": "Such einen Gegenstand und leg ihn in den Nachschub: dann siehst du unter Planen, wo es ihn gibt und wie du hinkommst.",
+      "buttonAria": "Operationen öffnen ({{count}} Einträge)",
+      "title": "Operationen",
+      "close": "Operationen schließen",
+      "empty": "Noch nichts in deinen Operationen.",
+      "emptyHint": "Such einen Gegenstand und weise ihn einer Operation zu: dann siehst du unter Planen, wo es ihn gibt und wie du hinkommst.",
       "tabsAria": "Listen",
       "tabs": {
         "wish": "Wünsche",
-        "nachschub": "Nachschub"
+        "nachschub": "Operationen"
       },
       "wish": {
         "empty": "Wünsch dir was",
-        "emptyHint": "Such einen Gegenstand oder ein Schiff und wünsch es dir. Von hier wandert es mit einem Klick in den Nachschub.",
-        "toNachschub": "In den Nachschub",
+        "emptyHint": "Such einen Gegenstand oder ein Schiff und wünsch es dir. Von hier weist du es mit einem Klick einer Operation zu.",
+        "toNachschub": "Einer Operation zuweisen",
         "remove": "{{name}} aus deinen Wünschen nehmen",
         "notYet": "noch nicht im Spiel"
       },
@@ -6491,9 +6491,9 @@
       "noVariant": "Werksausstattung",
       "activeSet": "Aktives Set",
       "nextOps": "Nächste Einsätze",
-      "suppliesPreview": "Nachschub",
+      "suppliesPreview": "Operationen",
       "opsOpen": "Einsätze öffnen",
-      "suppliesOpen": "Nachschub öffnen",
+      "suppliesOpen": "Operationen öffnen",
       "opsEmpty": "Noch keine Einsätze geplant.",
       "suppliesEmpty": "Nichts zu besorgen.",
       "noShip": "Noch kein Schiff im Hangar.",
@@ -6574,9 +6574,9 @@
       },
       "planen": {
         "empty": "Noch nichts geplant",
-        "emptyHint": "Aus dem Nachschub wird ein Einsatz.",
+        "emptyHint": "Aus einer Operation wird ein Einsatz.",
         "count": "{{n}} offen",
-        "needs": "{{n}} im Nachschub",
+        "needs": "{{n}} in Operationen",
         "open": "Planen öffnen"
       },
       "stats": {
@@ -7063,12 +7063,12 @@
       "pick": {
         "title": "Events",
         "hint": "Laufende Events, die du noch nicht erledigt hast – wähle die Belohnungen, die du holen willst.",
-        "sightseeing": "Keine Belohnung – als Sightseeing-Nachschub."
+        "sightseeing": "Keine Belohnung – als Sightseeing-Operation."
       },
       "draft": {
         "area": "Gebiet des Events statt eines festen Ortes"
       },
-      "severalHint": "Mehrere Events in einem Nachschub sind möglich, aber nicht empfohlen.",
+      "severalHint": "Mehrere Events in einer Operation sind möglich, aber nicht empfohlen.",
       "doneTag": "Erledigt",
       "abort": "Abbrechen",
       "complete": "Event erledigt",
@@ -7131,8 +7131,8 @@
         "confirm": "Abholen"
       },
       "offer": {
-        "area": "Du bist im Gebiet von {{event}}. Zu diesem Nachschub wechseln?",
-        "ac": "Arena Commander läuft – passt zu {{event}}. Zu diesem Nachschub wechseln?",
+        "area": "Du bist im Gebiet von {{event}}. Zu dieser Operation wechseln?",
+        "ac": "Arena Commander läuft – passt zu {{event}}. Zu dieser Operation wechseln?",
         "switch": "Wechseln",
         "notNow": "Nicht jetzt"
       },
@@ -7158,7 +7158,7 @@
         "start": "Mit der App siehst du hier live, wo du bist, was du fliegst und was als Nächstes kommt.",
         "inventar": "Die App liest dein Inventar und deine Schiffe aus dem Spiel. Du tippst nichts ab.",
         "jetzt": "Die App meldet, wo du gerade bist, und hakt Schritte von selbst ab:",
-        "planen": "Die App erkennt, wann ein Nachschub-Posten ankommt, und schließt ihn.",
+        "planen": "Die App erkennt, wann ein Posten deiner Operation ankommt, und schließt ihn.",
         "statistik": "Die App zählt beim Spielen mit: Spielzeit, Sessions, Missionen und Verluste. Ohne sie bleibt diese Seite leer.",
         "jetztList": {
           "e1": "Dein Standort und dein Schiff, z. B. „Stanton › New Babbage“.",
@@ -7369,8 +7369,8 @@
       "hqEventOne": "{{name}} läuft · noch 1 Tag",
       "hqEventToday": "{{name}} läuft · endet heute",
       "hqEventOpen": "{{name}} läuft",
-      "hqSupplies": "{{n}} offene Nachschübe",
-      "hqSuppliesOne": "1 offener Nachschub",
+      "hqSupplies": "{{n}} offene Operationen",
+      "hqSuppliesOne": "1 offene Operation",
       "hqCalm": "Alles ruhig im HQ",
       "admin": "Admin-Station",
       "adminValue": "Direkt ins Admin-Hub",
@@ -8140,7 +8140,7 @@
     },
     "signIn": {
       "title": "Anmelden?",
-      "message": "Wünsche, Inventar und Nachschub gehören zu deinem Konto. Melde dich an, um das zu speichern.",
+      "message": "Wünsche, Inventar und Operationen gehören zu deinem Konto. Melde dich an, um das zu speichern.",
       "confirm": "Zur Anmeldung"
     },
     "done": {
@@ -8301,7 +8301,7 @@
         "t": "Eigene Treffer stehen immer ganz oben"
       },
       {
-        "t": "Mit „fehlt mir“ vor dem Begriff suchst du nur in deinem Nachschub"
+        "t": "Mit „fehlt mir“ vor dem Begriff suchst du nur in deinen Operationen"
       },
       {
         "t": "Die Suche merkt sich, wo du sie öffnest"
@@ -8691,7 +8691,7 @@
     }
   },
   "quick": {
-    "toNachschub": "In einen Nachschub: {{name}}",
+    "toNachschub": "In eine Operation: {{name}}",
     "wish": "Wünsche",
     "allWish": "Alle Wünsche",
     "allWishCount": "{{n}} Wünsche",
@@ -8745,7 +8745,7 @@
     "removedGroup": "{{name}} entfernt ({{n}} Wünsche)",
     "selected": "gewählt",
     "clear": "Alle abwählen",
-    "toNachschub": "In einen Nachschub",
+    "toNachschub": "In eine Operation",
     "kind": {
       "ship": "Schiff",
       "vehicle": "Fahrzeug",
