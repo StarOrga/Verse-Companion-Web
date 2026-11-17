@@ -181,12 +181,26 @@ time (PTU and LIVE) both translate a text that is new to both.
 JSON text like the bucket, and fails when one slice reads or writes more than 6 MB. Measured there
 (2026-11-17, 91 900 keys, a pack of 87 000 lines, 64 000 TM entries): the largest slices are the import's
 `scan` (4.3 MB read: 8 shards plus the pack parts of their key groups), the digit joins (2.4 MB) and a
-`rows` slice (1.5 MB read, 1.4 MB written); 100-300 ms of CPU each on a desktop CPU. Three slices are
-outside that budget on purpose and do nothing else: the import's `fetch` and `split` hold one pack
-(~12 MB of text), and `assemble` concatenates ~14 MB of JSON text and writes it twice (`<build>.json`,
-`latest.json`) without parsing it into objects. Counts on that table: an import 42 slices, an overlay
-37, a learning pass 40, a delta job about 95, the whole gap of a language (64 000 texts in 28 batch
-groups) about 390.
+`rows` slice (1.5 MB read, 1.4 MB written); 100-300 ms of CPU each on a desktop CPU. Two slices are
+outside that budget on purpose and do nothing else: the import's `fetch` writes a whole pack (~12 MB of
+text), but in pieces of about 1 MB as the bytes arrive, and `assemble` concatenates ~14 MB of JSON text
+and writes it twice (`<build>.json`, `latest.json`) without parsing it into objects. Counts on that
+table: an import 53 slices, an overlay 37, a learning pass 40, a delta job about 95, the whole gap of a
+language (64 000 texts in 28 batch groups) about 390.
+
+**Memory is not bytes moved.** A worker has 256 MB for heap and buffers together, and the byte budget
+above does not see what a download costs: the runtime reads a response body into a buffer of 64 KB per
+read and hands out a view of the part that was filled, so a list of chunks holds 64 KB for every few KB
+that came in. The first live import (2026-11-17) kept the chunks of an 11.8 MB pack to join them and
+was killed with 203 MB of buffers (`reason: Memory` in the `Shutdown` log line, which carries
+`memory_used.heap` / `.external` / `.total`). Since then a pack is never held: `openSource` hands out
+the bytes chunk by chunk, each chunk is decoded and used before the next one is asked for
+(`iniDecoder`, `lineCutter`), a piece of whole lines is stored as soon as it is full, and `split` parses
+one piece per slice into files of its own (`pack-<piece>-<group>`), reading none - so the order of the
+lines in a pack does not change what a slice moves. Only a `zip-entry` source is held whole, to inflate
+its one entry (no licensed source is one today); its zip must stay well under 100 MB. A test body that
+wipes the buffer of a chunk when the next one is asked for (`chunkedBody` in `_testkit.mjs`) fails any
+reader that keeps chunks.
 
 Hashing is synchronous (`_sha256.ts`): `crypto.subtle.digest` per string was most of the CPU of a
 slice (200-750 ms for the ~5 000 strings of 8 shards, against under 40 ms).
@@ -300,7 +314,7 @@ walks are the two of "A job runs in slices": `rows` by key, then one hash digit 
 
 | Kind | Asked for by | Phases | Slices on a table of 150 shards |
 |---|---|---|---|
-| `seed` | `import_seed`, `sync_sources` | `start` · `fetch` (download, store the text) · `split` (one part per key group) · `scan` (8 shards: votes per English text, bucketed by first hash digit) · `apply` (one digit: decide - kept in `dec-<digit>` so a repeated slice decides nothing twice - and write its 16 TM shards) · `arbitrate` (one digit: its conflicts to the arbiter) · `finish` (coverage) · `follow` (asks for `overlay`, then `learn`, each with a token) · `cleanup` | about 42 |
+| `seed` | `import_seed`, `sync_sources` | `start` · `fetch` (download; the text is stored in pieces of whole lines as it arrives) · `split` (one piece per slice: its lines by key group) · `scan` (8 shards: votes per English text, bucketed by first hash digit) · `apply` (one digit: decide - kept in `dec-<digit>` so a repeated slice decides nothing twice - and write its 16 TM shards) · `arbitrate` (one digit: its conflicts to the arbiter) · `finish` (coverage) · `follow` (asks for `overlay`, then `learn`, each with a token) · `cleanup` | about 53 |
 | `overlay` | a finished import | `start` · `rows` (8 shards) · `join` (one digit: the entries the TM can fill, as a piece of JSON text) · `assemble` (join the 16 pieces, write `<build>.json`, `latest.json`, `rooms.json`) · `cleanup` | about 37 |
 | `learn` | a publish, a finished import, `op: learn` | `start` (answered cards, codex names) · `rows` (8 shards) · `mine` (one digit: term votes, style counts, name counts) · `plan` (style, promotions, contested terms) · `insert` (500 glossary rows) · `detect` (one digit, only when the plan asks: example lines, lines missing a CIG term) · `submit` (Haiku, align, then web research + arbiter) · `cleanup` | about 40 |
 
@@ -329,8 +343,9 @@ walks are the two of "A job runs in slices": `rows` by key, then one hash digit 
   progress. SQL: `select kind, lang, source_id, status, phase, pos, total, dead, attempts, error, updated_at
   from translation_passes order by created_at desc`. A failed pass is started again with the same op.
 - **Size of a slice.** `SCAN_SHARDS` (8 English shards, about 4 800 keys) for a `rows` or `scan` slice, one
-  hash digit for the rest; budgets and how to measure are in "A job runs in slices". The seed `fetch` and
-  `split` slices hold one pack (~12 MB); `assemble` holds one overlay as text (~10-14 MB).
+  hash digit for the rest; budgets and how to measure are in "A job runs in slices". The seed `fetch`
+  slice stores a pack in pieces of ~1 MB (`PIECE_CHARS`) and holds one of them; `assemble` holds one
+  overlay as text (~10-14 MB).
 - Daily cron `translate-orchestrator-housekeeping` (04:23 UTC) deletes finished passes older than 30 days
   and the run details of the fast-lane job older than a day.
 

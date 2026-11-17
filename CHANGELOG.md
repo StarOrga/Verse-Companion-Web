@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.274.1] - 2026-11-17
+
+### Fixed
+- The import of a community language pack no longer runs out of memory: the pack is downloaded, stored and split in pieces instead of being held whole.
+
 ## [0.274.0] - 2026-11-17
 
 ### Added

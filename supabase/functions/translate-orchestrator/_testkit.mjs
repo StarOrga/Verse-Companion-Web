@@ -182,6 +182,28 @@ export function fakeLearn({ build = NEW, glossary = [], names = [], settings = {
 }
 
 /** The community sources of a language and the host their pack comes from. */
+/**
+ * A response body as the platform hands it out: every chunk is a view of a buffer of 64 KB, and the
+ * buffer of a chunk is wiped when the chunk after it is asked for. A reader that keeps chunks to join
+ * them later (and so keeps 64 KB alive for every few KB that came in - the first live import died of
+ * that) reads zeros here.
+ */
+export function chunkedBody(bytes, chunkBytes) {
+  let o = 0;
+  let last = null;
+  return new ReadableStream({
+    pull(c) {
+      if (last) last.fill(0);
+      if (o >= bytes.length) { c.close(); return; }
+      const n = Math.min(chunkBytes, bytes.length - o);
+      last = new Uint8Array(64 * 1024);
+      last.set(bytes.subarray(o, o + n));
+      o += n;
+      c.enqueue(last.subarray(0, n));
+    },
+  }, { highWaterMark: 0 });
+}
+
 export function fakeSources({ build = NEW, sources = [], pack = '' } = {}) {
   const rows = new Map(sources.map((s) => [s.id, {
     lang: 'de', name: s.id, raw_url: `https://packs.example.test/${s.id}/global.ini`, resolver: null, repo_url: null,
@@ -198,7 +220,7 @@ export function fakeSources({ build = NEW, sources = [], pack = '' } = {}) {
     async fetchFn(_url, init) {
       if (init?.method === 'HEAD') return new Response(null, { headers: { etag: net.etag } });
       net.gets++;
-      return new Response(new TextEncoder().encode(net.pack), { headers: { etag: net.etag } });
+      return new Response(chunkedBody(new TextEncoder().encode(net.pack), 16 * 1024), { headers: { etag: net.etag } });
     },
   };
 }
