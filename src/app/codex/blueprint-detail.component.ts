@@ -42,6 +42,7 @@ import { NavOriginService, PageCrumb, originTrail } from '../shared/page-header/
 import { ItemPathComponent } from '../shared/item-path/item-path.component';
 import { noteOpenedPage } from '../shell/merkliste/merkliste-opened';
 import { pathLevelFor } from './path-level.util';
+import { ItemPathService } from '../hq/data/item-path.service';
 import { blueprintMissions } from './blueprint-missions';
 import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { UndoToastService } from '../shared/undo-toast/undo-toast.service';
@@ -314,8 +315,12 @@ export class BlueprintDetailComponent implements OnInit {
       labelKey: 'codex.kinds.blueprint', link: '/codex/index', queryParams: { kind: 'blueprint' },
     });
   });
-  /** The full path form when the reader came from Planen or a set, the pill otherwise (D2). */
-  protected readonly pathLevel = computed(() => (this.detail() ? pathLevelFor(this.navOrigin) : 'secondary'));
+  private readonly itemPath = inject(ItemPathService);
+  /** Signed in: always the two stations (R5 r5-d-bauplan); signed out the full form only from Planen or a set (D2). */
+  protected readonly pathLevel = computed(() => {
+    const d = this.detail();
+    return d ? pathLevelFor(this.navOrigin, this.itemPath.state('blueprint', d.classNameSlug, null)().signedIn) : 'secondary';
+  });
   readonly svc = inject(CodexService);
   private readonly route = inject(ActivatedRoute);
   private readonly translate = inject(TranslateService);

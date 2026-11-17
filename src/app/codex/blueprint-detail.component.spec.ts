@@ -103,8 +103,22 @@ describe('BlueprintDetailComponent — path (A9)', () => {
     const paths = el.querySelectorAll('sc-item-path');
     expect(paths.length).toBe(1);
     expect(Array.from(paths[0].querySelectorAll('.node')).map((n) => n.getAttribute('data-step'))).toEqual(['wish', 'inventar']);
-    // Not from Planen or a set: the pill, with the next step as its button.
-    expect(paths[0].querySelector('.pill .go')).not.toBeNull();
+  });
+
+  it('signed in: always the two stations (primary), whatever page the reader came from (R5 r5-d-bauplan)', async () => {
+    const fixture = await setup(blueprint([ingredient(0, 'Agricium', 0.36)]));
+    const path = (fixture.nativeElement as HTMLElement).querySelector('sc-item-path')!;
+    expect(path.classList).toContain('ip-primary');
+    expect(Array.from(path.querySelectorAll('[data-station]')).map((s) => s.getAttribute('data-station'))).toEqual(['wish', 'own']);
+    expect(path.querySelector('.pill')).toBeNull();
+  });
+
+  it('signed out and not from Planen or a set: the pill, as before (D2)', async () => {
+    TestBed.overrideProvider(ItemPathService, { useValue: fakeItemPath({ signedIn: false }) });
+    const fixture = await setup(blueprint([ingredient(0, 'Agricium', 0.36)]));
+    const path = (fixture.nativeElement as HTMLElement).querySelector('sc-item-path')!;
+    expect(path.classList).not.toContain('ip-primary');
+    expect(path.querySelector('.pill .go')).not.toBeNull();
   });
 });
 

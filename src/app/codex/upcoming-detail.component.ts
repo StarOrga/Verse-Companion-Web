@@ -16,6 +16,7 @@ import { BetaService } from '../core/beta.service';
 import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ItemPathComponent } from '../shared/item-path/item-path.component';
 import { pathLevelFor } from './path-level.util';
+import { ItemPathService } from '../hq/data/item-path.service';
 import { OverlayFrameComponent } from '../shared/overlay-frame/overlay-frame.component';
 import { OverlayOriginService } from '../shared/overlay-frame/overlay-origin.service';
 import {
@@ -220,7 +221,12 @@ export class UpcomingDetailComponent implements OnInit {
   roleLabel(value: string | null): string {
     return upcomingRoleLabel(value, (k) => this.translate.instant(k));
   }
-  protected readonly pathLevel = computed(() => pathLevelFor(this.navOrigin));
+  private readonly itemPath = inject(ItemPathService);
+  /** Signed in: always the two stations (R5 r5-d-bauplan); signed out the full form only from Planen or a set (D2). */
+  protected readonly pathLevel = computed(() => {
+    const s = this.ship();
+    return pathLevelFor(this.navOrigin, !!s && this.itemPath.state('upcoming', s.id, null)().signedIn);
+  });
 
   readonly loading = signal(true);
   readonly retrying = signal(false);

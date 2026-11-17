@@ -48,6 +48,8 @@ import { PATH_ICONS } from './path-icons';
 
 /** Length of the add moment: the streak is visible for about 1.1 s, the node peaks as it arrives, then it settles (1.7 s). */
 const ADD_MOMENT_MS = 1700;
+/** How long the ownership station stays lit after the head strip's jump. */
+const REVEAL_FLASH_MS = 1400;
 
 /**
  * The wish station shows one strip per Operation holding the item, newest first, up to this many; the rest is one
@@ -112,7 +114,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
   standalone: true,
   imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective, ItemPathAssignComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '[class.ip-primary]': "level() === 'primary'" },
+  host: { '[class.ip-primary]': "level() === 'primary'", '[class.ip-stacked]': "layout() === 'stacked'" },
   template: `
     <ng-template #rail>
       <span class="rail">
@@ -230,7 +232,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
               }
             </li>
             @if (own(); as o) {
-              <li class="stop" data-station="own" [class.on]="ownOn()">
+              <li #ownStop class="stop" data-station="own" tabindex="-1" [class.on]="ownOn()" [class.flash]="flashing()">
                 <div class="head">
                   <span class="stop-h">
                     <svg class="sc-action-icon" [class.is-filled]="ownOn()" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons[word()!]; track $index) { <path [attr.d]="d" /> }</svg>
@@ -242,6 +244,10 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
                       <b>{{ ownQty() }}</b>
                       <button type="button" [attr.aria-label]="'pathCtl.more' | translate" (click)="stepPlace(at, 1)">+</button>
                     </span>
+                  }
+                  @if (ownOn()) {
+                    <!-- R5 (G2): the host's own actions on the owned piece (note, pin, remove / rename) as icon buttons. -->
+                    <span class="tools end"><ng-content select="[ipOwnTools]" /></span>
                   }
                 </div>
                 @if (ownOn()) {
@@ -256,6 +262,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
                           <span class="mut more-places">{{ (state().morePlaces === 1 ? 'pathCtl.own.morePlacesOne' : 'pathCtl.own.morePlaces') | translate: { n: state().morePlaces } }}</span>
                         }
                       }
+                      @if (ownName(); as nm) { <span class="mut place-1 own-name">· „{{ nm }}“</span> }
                     </span>
                     <a class="alink end" [routerLink]="ownLink().commands" [fragment]="ownLink().fragment" [queryParams]="ownLink().queryParams" (click)="onLink($event)">{{ 'pathCtl.view.' + word() | translate }}</a>
                   </span>
@@ -267,6 +274,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
                     <span>{{ 'pathCtl.go.' + word() | translate }}</span>
                   </button>
                 }
+                <ng-content select="[ipOwnExtra]" />
               </li>
             }
           </ol>
@@ -310,7 +318,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
   `,
   styles: [`
     :host { display: inline-flex; align-items: center; flex: none; }
-    :host(.ip-primary) { display: block; }
+    :host(.ip-primary) { display: block; container: ip-path / inline-size; }
 
     .rail { display: inline-flex; align-items: center; }
     .node.sc-action.sc-action--tertiary {
@@ -493,6 +501,20 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
     }
     .other input:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
+    /* R5 (G1): one station under the other in a narrow host (item panel, menus) - by the host's width, not the page's. */
+    :host(.ip-stacked) .path { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    :host(.ip-stacked) .stop + .stop::before { left: 28px; top: -11px; width: 2px; height: 10px; }
+    :host(.ip-stacked) .own { flex-wrap: wrap; }
+    @container ip-path (max-width: 520px) {
+      .path { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+      .stop + .stop::before { left: 28px; top: -11px; width: 2px; height: 10px; }
+      .own { flex-wrap: wrap; }
+    }
+    .tools { display: inline-flex; align-items: center; gap: 2px; }
+    .tools:empty { display: none; }
+    .stop[data-station="own"] { outline: none; transition: box-shadow 0.3s ease, border-color 0.3s ease; }
+    .stop.flash { border-color: var(--sc-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-accent) 35%, transparent); }
+    @media (prefers-reduced-motion: reduce) { .stop[data-station="own"] { transition: none; } }
     @media (max-width: 640px) {
       .node.sc-action.sc-action--tertiary { width: max(44px, var(--sc-tap-min, 0px)); height: max(44px, var(--sc-tap-min, 0px)); }
       .link { width: 6px; }
@@ -515,6 +537,15 @@ export class ItemPathComponent implements OnDestroy {
   readonly nextStep = input<PathStep | null>(null);
   /** A plain click on a link is leaving: a floating host can close itself. */
   readonly leave = output<void>();
+  /**
+   * Primary level: `auto` puts the two stations side by side and stacks them when the host is narrow (a container
+   * query on the host's own width); `stacked` always puts one under the other (narrow panels, menus).
+   */
+  readonly layout = input<'auto' | 'stacked'>('auto');
+  /** The page is the reader's own copy (HQ-hosted ship page): the ownership station reads filled whatever the store says. */
+  readonly forceOwned = input(false);
+  /** A ship's own name, shown in the ownership strip ("Im Hangar · „Name“"). */
+  readonly ownName = input<string | null>(null);
 
   private readonly path = inject(ItemPathService);
   /** Resolved on click only: building the cart (wishlist store, Supabase client) is not the price of drawing a path control. */
@@ -525,6 +556,10 @@ export class ItemPathComponent implements OnDestroy {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly popTpl = viewChild.required<TemplateRef<unknown>>('pop');
   private readonly placeInput = viewChild<ElementRef<HTMLInputElement>>('placeInput');
+  private readonly ownStop = viewChild<ElementRef<HTMLElement>>('ownStop');
+  /** The ownership station lights up after {@link reveal}. */
+  readonly flashing = signal(false);
+  private flashTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly icons = PATH_ICONS;
   private readonly translate = inject(TranslateService);
@@ -550,7 +585,7 @@ export class ItemPathComponent implements OnDestroy {
   readonly word = computed<OwnWord | null>(() => ownWordOf(this.kind()));
   readonly ownOn = computed(() => {
     const o = this.own();
-    return !!o && isFilled(this.state(), o);
+    return !!o && (this.forceOwned() || isFilled(this.state(), o));
   });
   readonly ownQty = computed(() => (this.own() === 'hangar' ? Math.max(1, this.state().hangarQty) : this.state().inventarQty));
   readonly ownLink = computed<HqPageLink>(() => {
@@ -621,7 +656,22 @@ export class ItemPathComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.destroyed = true;
     if (this.addTimer) clearTimeout(this.addTimer);
+    if (this.flashTimer) clearTimeout(this.flashTimer);
     this.closePop();
+  }
+
+  /**
+   * The jump from the head strip's segment ("Nicht im Inventar"): the ownership station (or the whole control when
+   * there is none) comes into view, takes focus and lights up briefly.
+   */
+  reveal(): void {
+    const target = this.ownStop()?.nativeElement ?? this.host;
+    const still = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView?.({ block: 'center', behavior: still ? 'auto' : 'smooth' });
+    target.focus?.({ preventScroll: true });
+    this.flashing.set(true);
+    if (this.flashTimer) clearTimeout(this.flashTimer);
+    this.flashTimer = setTimeout(() => this.flashing.set(false), REVEAL_FLASH_MS);
   }
 
   private get label(): string {
