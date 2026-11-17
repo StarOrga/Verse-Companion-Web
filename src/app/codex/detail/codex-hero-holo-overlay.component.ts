@@ -9,6 +9,7 @@ import type { HardpointPortRef } from '../hardpoint-port-ref';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { logWarn } from '../../core/log';
+import { DeferErrorComponent } from '../../shared/defer-error/defer-error.component';
 
 /**
  * The classic ship page's 3D view (#334): a panel laid over the hero picture
@@ -28,7 +29,7 @@ import { logWarn } from '../../core/log';
 @Component({
   selector: 'sc-codex-hero-holo-overlay',
   standalone: true,
-  imports: [TranslatePipe, AssetPackageViewerComponent, ShipSkinViewerComponent, ScActionDirective, ScPopupComponent],
+  imports: [DeferErrorComponent, TranslatePipe, AssetPackageViewerComponent, ShipSkinViewerComponent, ScActionDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.full]': 'full()' },
   template: `
@@ -51,6 +52,8 @@ import { logWarn } from '../../core/log';
           }
         } @placeholder {
           <div class="hho-viewer is-placeholder" aria-hidden="true"></div>
+        } @error {
+          <sc-defer-error class="hho-viewer" source="codex.heroHoloOverlay" />
         }
       </div>
       <ng-container popupActions>

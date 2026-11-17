@@ -259,7 +259,13 @@ a.tl:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shad
 .more-cue:hover .chev, .more-cue:focus-visible .chev { color: var(--sc-accent); }
 .more-cue:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 6px; }
 
-.hub { scroll-margin-top: calc(var(--sc-bar-h, 56px) + 16px); }
+// No scroll-margin of its own: the root already keeps --sc-bar-h clear (scroll-padding-top), and the hub is
+// a snap area (wireSnap, briefing-dock.ts) whose snap position is hubTop - padding - margin. The old extra
+// bar-h + 16 px of margin put that position 80 px above the hub, so on a height-limited window (hub + footer
+// fill one viewport, ~950 px or 1280x800) the document end lay 20-60 px beyond the last resting place: the
+// glide to page 2 was snapped back there, the footer hung under the window edge and the page scrolled on.
+// With margin 0 the position lies at or past the end and the browser clamps it to scrollHeight - innerHeight.
+.hub { scroll-margin-top: 0; }
 
 // Readability: every text block sits on a soft dark pool, so city lights and
 // stars step back behind it (concept 2026-10-29, round 1).

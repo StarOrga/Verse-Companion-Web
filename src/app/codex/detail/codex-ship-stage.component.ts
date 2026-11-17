@@ -7,6 +7,7 @@ import type { HardpointPortRef } from '../hardpoint-port-ref';
 import { FallbackImageComponent } from '../fallback-image.component';
 import { CodexCategoryIconComponent } from '../codex-category-icon.component';
 import type { StageCountChip } from './codex-detail.types';
+import { DeferErrorComponent } from '../../shared/defer-error/defer-error.component';
 
 /** One hero chip on the ship stage — a career/role/crew/cargo/mass fact or a
  * disclosed gap. Mirrors the shape `codex-detail.component.ts` computes. */
@@ -37,6 +38,7 @@ export interface StageHeroChip {
   selector: 'sc-codex-ship-stage',
   standalone: true,
   imports: [
+    DeferErrorComponent,
     TranslatePipe,
     ScTooltipDirective,
     ShipSkinViewerComponent,
@@ -69,6 +71,15 @@ export interface StageHeroChip {
               <span class="art-note">{{ 'codex.detail.noArtwork' | translate }}</span>
             </span>
           </sc-fallback-image>
+        } @error {
+          <!-- The chunk did not load (#367): the 2D art stays, the hint sits over its foot. -->
+          <sc-fallback-image [candidates]="heroArt()" [alt]="displayName()" [eager]="true">
+            <span class="art-fallback">
+              <sc-codex-icon class="hero-icon" [kind]="kind()" [sub]="heroSub()" />
+              <span class="art-note">{{ 'codex.detail.noArtwork' | translate }}</span>
+            </span>
+          </sc-fallback-image>
+          <sc-defer-error class="stage-defer-error" source="codex.shipStage" />
         }
       } @else {
         <sc-fallback-image [candidates]="heroArt()" [alt]="displayName()" [eager]="true">
@@ -192,6 +203,13 @@ export interface StageHeroChip {
       --sc-icon-max: 132px; }
     /* The live model is the one piece of stage art you may grab. */
     .stage-art.live { pointer-events: auto; }
+    /* #367: the viewer chunk did not load — the hint floats centred over the 2D art. */
+    .stage-defer-error {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      max-width: calc(100% - 2 * var(--sc-space-4));
+      background: color-mix(in srgb, var(--sc-bg-1) 88%, transparent);
+      border: 1px solid var(--sc-border); border-radius: 8px;
+    }
     .stage-art sc-ship-skin-viewer { display: block; width: 100%; height: 100%; }
     /* The bottom-wash gradient (.hero.stage::before) stays with the parent
        header — it is a pseudo-element of the card, not of this content. */

@@ -28,6 +28,7 @@ import {
 } from './scene.model';
 import { SceneCameraService } from './scene-camera.service';
 import { SPARKLE_COUNT, StarSparkle } from './star-sparkle';
+import { DeferErrorComponent } from '../../shared/defer-error/defer-error.component';
 
 /** How long the scene's ignite from black runs on a full entrance (sky 0–0.9 s, world 0.2–1.6 s, mock d5-pb-main-fadein). */
 const IGNITE_MS = 1700;
@@ -51,7 +52,7 @@ export const SCENE_HTML_ATTR = 'data-sc-scene';
   selector: 'sc-shell-scene',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BriefingPlanetComponent, BriefingStationComponent, BriefingHqBaseComponent, BriefingSkyComponent, SceneBodiesComponent],
+  imports: [DeferErrorComponent, BriefingPlanetComponent, BriefingStationComponent, BriefingHqBaseComponent, BriefingSkyComponent, SceneBodiesComponent],
   templateUrl: './shell-scene.component.html',
   styleUrl: './shell-scene.component.scss',
   // Global on purpose: it has to clear body's background (see the stylesheet); every rule is scoped by the host class.

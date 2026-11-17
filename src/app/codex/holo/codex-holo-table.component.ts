@@ -56,6 +56,7 @@ import { FallbackImageComponent } from '../fallback-image.component';
 import type { PortPinBadge } from './codex-holo-patch.component';
 import { HoloPhase, PinRing, StagePin, spreadStackedPins } from './codex-holo-model';
 import { LeaderLayout, layoutLeaderLabels } from './codex-holo-leader';
+import { DeferErrorComponent } from '../../shared/defer-error/defer-error.component';
 
 /** One deck of the ship on the table surface (Schema "Einfach", concept r1-decks). */
 export interface HoloDeckView {
@@ -189,7 +190,7 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
 @Component({
   selector: 'sc-codex-holo-table',
   standalone: true,
-  imports: [TranslatePipe, ShipHardpointMapComponent, ShipBlueprintSchemaComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, AssetPackageViewerComponent, FallbackImageComponent, ScTooltipDirective, CodexHoloCalloutComponent, HoloDiffMarkerComponent],
+  imports: [DeferErrorComponent, TranslatePipe, ShipHardpointMapComponent, ShipBlueprintSchemaComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, AssetPackageViewerComponent, FallbackImageComponent, ScTooltipDirective, CodexHoloCalloutComponent, HoloDiffMarkerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[class.ph-wait]': "phase() === 'wait'",
@@ -239,6 +240,8 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
           }
         } @placeholder {
           <div class="mode-viewer is-placeholder" aria-hidden="true"></div>
+        } @error {
+          <sc-defer-error class="mode-viewer" source="codex.holoTable" (failed)="markDrawn()" />
         }
         </div>
       }

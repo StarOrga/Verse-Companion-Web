@@ -4,6 +4,39 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.277.3] - 2026-11-17
+
+### Fixed
+- 3D views and the start-page planet: when a part of the page cannot be loaded (usually an old tab after an update), the page shows a hint with "Neu laden" instead of staying empty, and an untouched page reloads itself once to pick up the new version.
+
+## [0.277.2] - 2026-11-17
+
+### Fixed
+- Data Uploader 0.82.1: a stalled job is reported under one stable message per job and stage, so a late timer no longer opens a new error report each time.
+
+## [0.277.1] - 2026-11-17
+
+### Fixed
+- 3D model upload: a short storage hiccup while a ship's hull is checked or tidied up is answered as "try again" instead of a server error, and Data Uploader 0.82.1 retries it with a back-off, so the ship no longer goes missing after the run.
+
+## [0.277.0] - 2026-11-17
+
+### Added
+- Search: one row per ship. A ship's editions (Standard, Valiant, Pirate …) and your own variants are mini links of that row instead of rows of their own; the row itself opens the standard edition.
+- Search: the page you are on no longer shows up in the suggestions. For a near-exact term it stays as a greyed "Du bist hier" row that only closes the search.
+- Star map: the ship to recognise is picked automatically for every patch (a new ship of the patch, else the newest one from the last patch that had any) and repairs itself when its record changes.
+
+### Changed
+- Ship page: the Akte's collapse control is a quiet pair of arrows; "Wo zu kaufen" lives only in the Akte's buy tab; the four perspectives line up with the four groups of the lower strip.
+- Data Uploader 0.82.0: the game version is x.y.z plus build, read from the installation. A start only continues what is still open and says which parts.
+
+### Fixed
+- Data Uploader: it no longer reports "4.10.0" for every 4.10.x build and no longer restarts a full upload on every start while only the 3D models were open.
+- Star map 4.10: the guess shows seven ships again instead of empty placeholders.
+- Verse start: the page no longer scrolls a little further behind its second page, and the footer sits on the line of the round buttons.
+- Fleet patch overview, mission search and the maker filter no longer time out on the server.
+- Ship page: the jump to the sources opens the Akte's buy tab; in the classic header the hangar button no longer covers the Akte's tabs; Akte tiles without a picture show a neutral ring instead of a made-up ship outline.
+
 ## [0.276.0] - 2026-11-17
 
 ### Added

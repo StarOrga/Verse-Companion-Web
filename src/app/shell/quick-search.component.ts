@@ -281,7 +281,7 @@ export class QuickSearchComponent {
     const opt = this.engine.enterOption();
     if (!opt) return;
     const result = this.engine.open(opt, action === 'open-new-tab');
-    if (result === 'navigated') this.close();
+    if (result === 'navigated' || result === 'here') this.close();
     else if (result === 'searched') this.focusField();
   }
 

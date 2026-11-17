@@ -112,11 +112,27 @@ export class RouteLoadRecoveryService {
    */
   private static readonly RECOVERED_KEY = 'sc.nav.recoveredUrl';
 
+  /**
+   * sessionStorage key set once a failed `@defer` chunk spent its reload
+   * (#367). Unlike the route marker it is never cleared within the session:
+   * the reloaded document renders the same block again, and a marker that a
+   * successful navigation rearmed would turn a chunk that stays broken into a
+   * reload loop.
+   */
+  private static readonly DEFER_RECOVERED_KEY = 'sc.defer.recovered';
+
   /** Max time spent adopting a newer worker before reloading anyway. */
   private static readonly ADOPT_TIMEOUT_MS = 4000;
 
   private initialized = false;
   private inFlight = false;
+  /**
+   * True once the reader pressed a key or a pointer in this document. A failed
+   * `@defer` chunk reloads the page only before that — mid-work (a loadout
+   * being edited in the codex) a reload would throw the work away, so the
+   * failing block shows its hint with a reload action instead.
+   */
+  private interacted = false;
 
   /**
    * Subscribe to the router. Idempotent; called from `AppComponent.ngOnInit`
@@ -126,6 +142,15 @@ export class RouteLoadRecoveryService {
   init(): void {
     if (this.initialized) return;
     this.initialized = true;
+    const markInteracted = (): void => {
+      this.interacted = true;
+    };
+    // Guarded: test doubles of DOCUMENT carry no event API.
+    if (typeof this.document.addEventListener === 'function') {
+      for (const type of ['pointerdown', 'keydown'] as const) {
+        this.document.addEventListener(type, markInteracted, { capture: true, passive: true, once: true });
+      }
+    }
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationError) {
         void this.onNavigationError(event);
@@ -143,6 +168,54 @@ export class RouteLoadRecoveryService {
   /** The notice's action: the manual version of the recovery that did not stick. */
   reload(): void {
     this.document.location.reload();
+  }
+
+  /**
+   * A lazily loaded `@defer` chunk failed (#367) — the same stale-document
+   * cause as a dead route chunk, but Angular hands it to the block's `@error`
+   * branch (or the ErrorHandler), never to the router.
+   *
+   * Reloads the current URL ONCE per session, after adopting a newer
+   * service-worker version, and only while the reader has not interacted
+   * with this document yet. Returns `'reloading'` when that reload is under
+   * way and `'hint'` when the caller has to show its own notice instead
+   * (one-shot spent, or the reader is mid-work). With `notice: true` the
+   * shell's load-failed notice is raised for the hint case — for a failure
+   * that has no `@error` branch to show anything.
+   */
+  recoverFromStaleChunk(options: { notice?: boolean } = {}): 'reloading' | 'hint' {
+    if (this.inFlight) return 'reloading';
+    if (this.interacted || this.deferRecovered()) {
+      if (options.notice) this.loadFailed.set(true);
+      return 'hint';
+    }
+    this.inFlight = true;
+    this.recovering.set(true);
+    this.writeSession(RouteLoadRecoveryService.DEFER_RECOVERED_KEY, '1');
+    void this.adoptNewestVersion().then(() => this.document.location.reload());
+    return 'reloading';
+  }
+
+  private deferRecovered(): boolean {
+    try {
+      return (
+        this.document.defaultView?.sessionStorage.getItem(
+          RouteLoadRecoveryService.DEFER_RECOVERED_KEY,
+        ) != null
+      );
+    } catch {
+      // Unreadable storage: treat as spent — without a marker that survives the
+      // reload, a second reload could not be stopped.
+      return true;
+    }
+  }
+
+  private writeSession(key: string, value: string): void {
+    try {
+      this.document.defaultView?.sessionStorage.setItem(key, value);
+    } catch {
+      // Ignore — see recoveredUrl().
+    }
   }
 
   private async onNavigationError(event: NavigationError): Promise<void> {
