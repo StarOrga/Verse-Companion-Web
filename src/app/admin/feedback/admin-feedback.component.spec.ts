@@ -13,6 +13,7 @@ import { CelebrationService } from './celebration.service';
 import { FeedbackMotionService } from './feedback-motion.service';
 import { AdminFeedbackComponent } from './admin-feedback.component';
 import { PanelNavigationService } from '../../feedback/panel-navigation.service';
+import { FeedbackComposerSeedService } from '../../feedback/feedback-composer-seed.service';
 import { FeedbackMessage, FeedbackRow, FeedbackStatus } from './feedback.types';
 import { POSTHOG_GUARD_PROFILE_ID } from '../../feedback/feedback.types';
 import { provideFakeAttachmentSigner } from '../../feedback/testing/fake-attachment-signer';
@@ -1383,5 +1384,69 @@ describe('AdminFeedbackComponent — new topic focuses the field (admin feedback
     } finally {
       el.remove();
     }
+  });
+});
+
+/**
+ * Admin feedback #358: "Wenn im feedback panel noch ein issue offen ist man
+ * aber auf issue erstellen klickt, dann sollte das issue zugehen und in der
+ * Übersicht ja das neue issue text anzeigen". A request from outside the board
+ * replaces whatever sheet the panel shows: a seed closes the open topic and
+ * unfolds the composer, a topic request switches to that topic.
+ */
+describe('AdminFeedbackComponent — a request from outside replaces the open topic', () => {
+  async function flush(fixture: { detectChanges(): void; whenStable(): Promise<unknown> }) {
+    TestBed.tick();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+  }
+
+  it('closes the open topic and shows the composer when a page seeds a new topic', async () => {
+    const { fixture, cmp, el } = await mount(fixtureTables());
+    const seeds = TestBed.inject(FeedbackComposerSeedService);
+    cmp.openTopic('r1');
+    cmp.toggleMore('r1');
+    fixture.detectChanges();
+    expect(cmp.openRow()?.id).toBe('r1');
+
+    seeds.plant(cmp.draftScope, { body: 'Telemetry finding' });
+    seeds.requestOpen();
+    await flush(fixture);
+
+    expect(cmp.openRow(), 'the open topic closed').toBeNull();
+    expect(cmp.overlayOpen()).toBe(false);
+    expect(cmp.composerOpen(), 'the composer unfolded').toBe(true);
+    expect(el.querySelector('.sheet.topic')).toBeNull();
+    expect(el.querySelector('.compose-sheet sc-feedback-composer')).not.toBeNull();
+  });
+
+  it('closes the filters sheet too when a page seeds a new topic', async () => {
+    const { fixture, cmp } = await mount(fixtureTables());
+    const seeds = TestBed.inject(FeedbackComposerSeedService);
+    cmp.openFilters();
+    fixture.detectChanges();
+
+    seeds.plant(cmp.draftScope, { body: 'Telemetry finding' });
+    seeds.requestOpen();
+    await flush(fixture);
+
+    expect(cmp.filtersOpen()).toBe(false);
+    expect(cmp.composerOpen()).toBe(true);
+  });
+
+  it('switches to the requested topic while another one is open, and folds the composer', async () => {
+    const { fixture, cmp } = await mount(fixtureTables());
+    const seeds = TestBed.inject(FeedbackComposerSeedService);
+    cmp.openComposer();
+    cmp.openTopic('r1');
+    fixture.detectChanges();
+
+    seeds.requestTopic('q1');
+    await flush(fixture);
+
+    expect(cmp.openRow()?.id).toBe('q1');
+    expect(cmp.composerOpen()).toBe(false);
+    expect(seeds.pendingTopic()).toBeNull();
   });
 });

@@ -1934,9 +1934,29 @@ export class AdminFeedbackComponent implements OnInit {
     if (!id || !this.messages().some((m) => m.id === id)) return;
     untracked(() => {
       this.wantedTopic.set(null);
+      // Another topic, the filters or a decline form may still be open — the
+      // requested topic replaces whatever the panel showed (#358).
+      this.dismissSheets();
+      this.composerOpen.set(false);
       this.openTopic(id);
     });
   });
+
+  /**
+   * Close every sheet over the stream at once — the opened topic, the decline
+   * form, the filters, a ⋯ menu — for a request from outside the board. The
+   * keyboard does not travel back through each sheet's opener: the request
+   * decides what comes on screen next.
+   */
+  dismissSheets(): void {
+    this.openId.set(null);
+    this._moreOpen.set(new Set());
+    this.declineFormFor.set(null);
+    this.declineNote.set('');
+    this.declineReason.set(null);
+    this.filtersOpen.set(false);
+    this._returnFocus.length = 0;
+  }
 
   openTopic(id: string): void {
     this.openId.set(id);
@@ -2466,7 +2486,12 @@ export class AdminFeedbackComponent implements OnInit {
     const n = this.seeds.openRequests();
     if (n === this.seenOpenRequests) return;
     this.seenOpenRequests = n;
-    if (untracked(() => this.embedded() || this.phone())) this.composerOpen.set(true);
+    untracked(() => {
+      // An open topic (or filters / decline form) would hide the seeded draft
+      // behind its sheet — the new topic is what the request is about (#358).
+      this.dismissSheets();
+      if (this.embedded() || this.phone()) this.composerOpen.set(true);
+    });
   });
   closeComposer(): void { this.composerOpen.set(false); }
 
