@@ -1,0 +1,117 @@
+<section data-iteration="2" data-iteration-template="free" data-final-report>
+  <p class="fr-sentence">Alle neun Notizen sind gebaut: Schiffsseite aufgeräumt, Suche mit einer Zeile pro Schiff, Uploader mit echter Version, Sternenkarte wählt selbst, Verse-Footer sitzt.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🔎</span><span><b>Eine Zeile pro Schiff</b> mit Links zu den Varianten; die offene Seite ist grau.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">📦</span><span>Der Uploader liest <b>4.10.3 plus Build</b> und lädt nur noch, was offen ist.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🌌</span><span>Die Sternenkarte <b>wählt ihr Schiff selbst</b>, bei jedem neuen Patch.</span></li>
+      </ul>
+      <p class="fr-try-auth">🔑 Noch nicht live: erst nach dem Shippen zu sehen, die Datenbank ist unverändert</p>
+    </div>
+    <div class="fr-ba" data-label-before="{{final.before}}" data-label-after="{{final.after}}">
+      <figure class="fr-shot"><img src="20261117-1609-batch-akte-suche-uploader-sternenkarte/shots/2026-11-17T14-39-25-706Z-1.webp" alt="Verse-Start mit einem Footer, der unter der Linie der runden Knöpfe liegt und unten abgeschnitten ist"><figcaption>Footer unter der Linie, Seite scrollt weiter</figcaption></figure>
+      <figure class="fr-shot"><img src="20261117-1609-batch-akte-suche-uploader-sternenkarte/shots/qa/C23-verse-page2-1920x950.png" alt="Verse-Start mit dem Footer auf einer Linie mit den runden Knöpfen unten links und rechts"><figcaption>Footer auf der Linie, 0 px Rest</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="7180 Tests der Seite, 659 des Uploaders und 646 der Server-Funktionen grün, dazu Typen, Lint und Build; Anforderung: keine roten Tests (geschätzt).">
+        <span class="fr-meter-name">🧱 Stabilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">7180 ✓</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Beide Datenbank-Änderungen liefen als Trockenlauf gegen die echte Datenbank und wurden zurückgerollt: 7 von 7 Uploader-Einträgen zählen weiter, 2 von 2 abgegebenen Tipps bleiben gültig; Anforderung: kein Verlust (geschätzt).">
+        <span class="fr-meter-name">🗄 Datenintegrität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">9 / 9</b>
+      </div>
+      <div class="fr-meter" data-grade="open" style="--fr-fill: 0%" data-tip="Wie viel Rechenzeit der Uploader jetzt spart, ist nicht gemessen: die App selbst wurde nicht gestartet, geprüft sind Code und Tests; Anforderung: kein unnötiger Voll-Lauf (geschätzt).">
+        <span class="fr-meter-name">⚡ Performance</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">nicht gemessen</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="5 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ✓ {{final.level_interplay}} · ✓ {{final.level_local}} · ✓ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_prod}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_live}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 3 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-uploader-reread"
+          data-issue-title="[FEATURE] Uploader: build open 3D models without re-reading the whole game archive"
+          data-issue-type="feature"
+          data-issue-body="Concept 20261117-1609-batch-akte-suche-uploader-sternenkarte, decision d-resume ('Nur die 3D-Modelle fortsetzen': no p4k re-read, no second metadata upload). Built: when only hulls and/or silhouettes are open, nothing else is uploaded and no new codex_builds row is created (data-uploader/src/lib/auto-run.ts planContinuation, src/renderer/main.ts runContinuation). Not built: when this build's extract is no longer on disk, the extractor still reads the P4K again locally (DataCore read, roughly the old 'Metadaten' step), because the hull and silhouette builds need the extract's manifests (skins/_build_manifest.json, silhouettes/_build_manifest.json) and the server holds neither. A lighter extractor mode that writes only those manifests would close it. The extract is now deleted only when everything open has landed, so the case is rare."
+          data-issue-module="data-uploader"
+          data-oq-origin="shortfall"
+          data-route-default="ignore"
+          data-route-reason="selten">
+        <span class="oq-label">Spieldateien neu gelesen</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Nicht umgesetzt, weil der 3D-Bau Listen aus dem Zwischenstand braucht: fehlt der auf der Platte, liest der Uploader die Spieldateien lokal neu. Hochgeladen wird trotzdem nur Offenes.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Data Uploader · Start mit offenen 3D-Modellen</dd>
+          <dt>{{final.fund_why}}</dt><dd>✕ Weglassen — der Zwischenstand bleibt jetzt liegen, bis alles Offene gelandet ist; der Fall ist selten.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-rpc-timeouts"
+          data-issue-title="[BUG] Several codex and HQ RPCs hit the statement timeout on production"
+          data-issue-type="bug"
+          data-issue-body="Seen on 2026-11-17 while checking an unrelated batch against the cloud database (project hcnqhvzlavdycidqyaai). API logs 12:00-17:40 UTC, HTTP 500 from PostgREST: /rest/v1/rpc/hq_fleet_patch 14x (first 14:53), codex_swap_candidates 4x, codex_added_class_names 3x, codex_facet_values 2x, search_missions 2x; Postgres log shows 'canceling statement due to statement timeout' at the same times (clustered 17:02-17:16 UTC under parallel page loads). Effect in the app: 'Neu in diesem Patch' in the search stays empty, the mission search fails silently. Role timeouts are anon 3 s / authenticated 8 s. Start with hq_fleet_patch (most frequent, also outside the cluster): measure as the real role in a rolled-back transaction, check for payload TOAST reads and missing indexes."
+          data-issue-module="supabase"
+          data-oq-origin="found"
+          data-route-default="issue"
+          data-route-reason="riskant">
+        <span class="oq-label">Server-Abfragen laufen ab</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Auf dem Live-Server liefen heute mehrere Abfragen in die Zeitgrenze, am häufigsten die Patch-Übersicht der Flotte (14-mal). In der Suche bleibt dann „Neu in diesem Patch“ leer.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Live-Datenbank · Flotte, Codex, Missionssuche</dd>
+          <dt>{{final.fund_why}}</dt><dd>📌 Issue — braucht Messungen an der Live-Datenbank, bevor jemand etwas ändert.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-akte-glyph"
+          data-issue-title="[BUG] Akte tiles without an image draw a hard-coded ship glyph"
+          data-issue-type="bug"
+          data-issue-body="src/app/codex/holo/codex-holo-akte.component.ts draws a fixed, generic ship glyph in livery and edition tiles that have no image (template around the tiles, CSS for the glyph). The project rule is 'never a guessed shape' (see the comment at src/app/codex/codex.service.ts near the silhouette fallback): a tile without an image should show the game icon of that hull or a neutral placeholder, not a shape that looks like some other ship. Found while replacing the Akte's image toggle; not part of that scope."
+          data-issue-module="codex"
+          data-oq-origin="found"
+          data-route-default="now"
+          data-route-reason="klein">
+        <span class="oq-label">Erfundene Schiffsform</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Kacheln ohne Bild zeigen in der Akte ein fest eingebautes Schiffs-Symbol, obwohl die Regel „nie eine geratene Form“ gilt.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Schiffsseite · Akte · Lackierungen</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — kleine Änderung an einer Stelle, im selben Bauteil.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Branch <code>claude/batch-82d91f</code> · Bereiche: codex/holo, codex/search, shell, verse, data-uploader, supabase, i18n, posthog</li>
+      <li><code>src/app/codex/search/search-families.ts</code>, <code>data-uploader/src/lib/auto-run.ts</code>, <code>supabase/migrations/20261117164700_verse_constellation_auto_pick.sql</code></li>
+      <li>Tests: Web 7180 grün, Uploader 659, Functions 646, Gate 167 · typecheck, lint, build, Subtheme-Guard grün · zwei unabhängige Prüfungen: <code>checks/implement-qa.md</code>, <code>checks/implement-qa-2.md</code></li>
+      <li>Reihenfolge beim Shippen: beide Migrationen, <code>notify pgrst, 'reload schema'</code> und <code>ingest-catalog</code> vor dem nächsten Uploader-Release (Ledger-Abgleich über Kanal und Build)</li>
+      <li>Ursachen: Footer = <code>scroll-margin-top</code> 80 px am Hub zusätzlich zum Seitenabstand · 4.10.0 = erster Treffer im Manifest war der Branch-Name; 4.10.3 steht im Launcher-Log beim Build 13165946 · Sternenkarte = gespeicherte Klasse wurde zur Variante</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-uploader" data-crit="high" data-guide="">Uploader starten: 4.10.3, kein neuer Lauf?</li>
+      <li data-todo-id="t-phone" data-crit="mid" data-guide="">Suche am Handy: Varianten-Links antippen</li>
+      <li data-todo-id="t-starmap" data-crit="mid" data-guide="">Sternenkarte 4.10: sieben Schiffe zum Raten da?</li>
+    </ul>
+  </section>
+</section>
