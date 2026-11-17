@@ -14,6 +14,7 @@ import {
   hitTitle,
   indexTarget,
   isLivery,
+  pageLocationOf,
   pushRecentSearch,
   readRecentSearches,
   targetUrl,
@@ -342,5 +343,36 @@ describe('CodexSearchEngine', () => {
     expect(types[0]).toBe('recent');
     expect(types).toContain('fresh');
     expect(types.filter((t) => t === 'category').length).toBeGreaterThan(3);
+  }));
+
+  it('Enter on the greyed current row only closes: no navigation, no recent search, counted as current', fakeAsync(() => {
+    const nav = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    engine.here.set(pageLocationOf('/codex/ship/AEGS_Gladius?view=holo'));
+    searchAll.mockResolvedValue({
+      hits: [hit('ship', 'AEGS_Gladius', { nameLocalized: 'Aegis Gladius' }), hit('ship', 'AEGS_Gladius_Valiant', { nameLocalized: 'Aegis Gladius Valiant' })],
+      totals: { ship: 2 },
+    });
+    engine.searchFor('gladius');
+    tick();
+
+    const first = engine.enterOption()!;
+    expect(first).toEqual(expect.objectContaining({ type: 'hit', current: true }));
+    expect(engine.open(first)).toBe('here');
+    expect(nav).not.toHaveBeenCalled();
+    expect(engine.recent()).toEqual([]);
+    expect(track).toHaveBeenCalledWith('search:result_open', expect.objectContaining({ current: true, variant: false, new_tab: false }));
+
+    // A weak term hides the page the reader is on; the variant stays.
+    engine.searchFor('gla');
+    tick();
+    expect(engine.options().filter((o) => o.type === 'hit').map((o) => (o.type === 'hit' ? o.hit.classNameSlug : ''))).toEqual(['AEGS_Gladius_Valiant']);
+  }));
+
+  it('a navigation moves the location the rule reads', fakeAsync(() => {
+    const router = TestBed.inject(Router);
+    router.resetConfig([{ path: '**', children: [] }]);
+    void router.navigateByUrl('/codex/ship/AEGS_Gladius');
+    tick();
+    expect(engine.here().path).toBe('/codex/ship/aegs_gladius');
   }));
 });
