@@ -84,6 +84,16 @@ function safeJson(v: unknown): string {
   try { return JSON.stringify(v) ?? String(v); } catch { return String(v); }
 }
 
+/** One fingerprint component: word chars, dot and dash only, capped. */
+export function fingerprintPart(v: unknown, max = 64): string {
+  const t = String(v ?? '').trim().replace(/[^\w.-]+/g, '_').slice(0, max);
+  return t || 'none';
+}
+
+/**
+ * `extra.fingerprint` sets `$exception_fingerprint`; without one it is `server:<fn>:<type>`,
+ * so the same error type of two functions never shares one PostHog issue.
+ */
 export function buildException(fn: string, err: unknown, extra: Record<string, unknown> = {}): BatchEvent {
   const isErr = err instanceof Error;
   const type = redactText(isErr ? err.name : typeof err === 'string' ? 'Error' : 'NonError', 80);
@@ -95,9 +105,13 @@ export function buildException(fn: string, err: unknown, extra: Record<string, u
     mechanism: { handled: Boolean(extra.handled ?? true), synthetic: false },
   };
   if (stack) entry.stacktrace = { type: 'raw', frames: [], raw: stack };
-  const { handled: _h, ...rest } = extra;
+  const { handled: _h, fingerprint, ...rest } = extra;
+  const fp = typeof fingerprint === 'string' && fingerprint
+    ? redactText(fingerprint, 200)
+    : `server:${fingerprintPart(fn)}:${fingerprintPart(type)}`;
   return buildCapture('$exception', {
     ...rest,
+    $exception_fingerprint: fp,
     $exception_list: [entry],
     $exception_type: type,
     $exception_message: value,
@@ -181,6 +195,35 @@ function keepAlive(p: Promise<unknown>): void {
   if (rt?.waitUntil) rt.waitUntil(p);
 }
 
+const MAX_ERROR_CODE = 64;
+
+/** The `error` field of a JSON error body (string only), redacted and capped; null on anything else. */
+export async function readErrorCode(res: Response): Promise<string | null> {
+  try {
+    if (!/json/i.test(res.headers.get('content-type') ?? '')) return null;
+    const body = await res.clone().json();
+    const code = body && typeof body === 'object' ? (body as Record<string, unknown>).error : null;
+    if (typeof code !== 'string' || !code.trim()) return null;
+    return redactText(code.trim().slice(0, MAX_ERROR_CODE), MAX_ERROR_CODE) || null;
+  } catch {
+    return null;
+  }
+}
+
+/** A 5xx response as `HttpError`: one PostHog issue per function, status and error code. */
+export function buildHttpException(fn: string, status: number, code: string | null, method: string): BatchEvent {
+  const err = new Error(`${fn}: HTTP ${status}${code ? ` ${code}` : ''}`);
+  err.name = 'HttpError';
+  err.stack = undefined;
+  return buildException(fn, err, {
+    handled: true,
+    http_status: status,
+    http_method: method,
+    error_code: code,
+    fingerprint: `server:${fingerprintPart(fn)}:${status}:${code ? fingerprintPart(code) : 'none'}`,
+  });
+}
+
 export const CRON_RUN_EVENT = 'server:cron_run_finish';
 
 /** The cron-run outcome event: a 5xx or a throw is a failure, everything else (incl. 429 throttle) is a healthy run. */
@@ -192,7 +235,8 @@ export function buildCronRun(fn: string, status: number | null, durationMs: numb
 }
 
 /**
- * Reports thrown errors and 5xx responses as `$exception`; the outcome reaches the caller unchanged.
+ * Reports thrown errors and 5xx responses as `$exception` (a 5xx as `HttpError`, fingerprinted by
+ * function, status and the body's `error` code); the outcome reaches the caller unchanged.
  * `opts.cron` (pg_cron driven functions) additionally reports every run's outcome as `server:cron_run_finish`.
  */
 export function withPosthog(
@@ -213,12 +257,22 @@ export function withPosthog(
       await p;
       throw e;
     }
-    const events: BatchEvent[] = [];
-    if (res.status >= 500) {
-      events.push(buildException(fn, new Error(`HTTP ${res.status}`), { handled: true, http_status: res.status, http_method: req.method }));
+    const status = res.status;
+    const cronRun = opts.cron ? buildCronRun(fn, status, Date.now() - started) : null;
+    if (status >= 500) {
+      // The body is read from a clone in the background: the response leaves unchanged and undelayed.
+      const p = readErrorCode(res)
+        .catch(() => null)
+        .then((code) => {
+          const events = [buildHttpException(fn, status, code, req.method)];
+          if (cronRun) events.push(cronRun);
+          return captureBatch(events);
+        })
+        .catch(() => undefined);
+      keepAlive(p);
+    } else if (cronRun) {
+      keepAlive(captureBatch([cronRun]));
     }
-    if (opts.cron) events.push(buildCronRun(fn, res.status, Date.now() - started));
-    if (events.length) keepAlive(captureBatch(events));
     return res;
   };
 }
