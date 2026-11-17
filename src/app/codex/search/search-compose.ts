@@ -386,7 +386,7 @@ export function foldShipRows(
     r.type === 'hit' ? (r.hit.kind === 'ship' ? baseOf(r.hit.classNameSlug) : null)
       : r.type === 'own' && (r.ownKind === 'ship' || r.ownKind === 'config') && r.classNameSlug ? baseOf(r.classNameSlug)
         : null;
-  type At = { g: number; r: number };
+  interface At { g: number; r: number }
   const hitAt = new Map<string, At>();
   groups.forEach((g, gi) =>
     g.rows.forEach((r, ri) => {

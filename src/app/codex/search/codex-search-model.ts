@@ -318,7 +318,8 @@ export function isCurrentVariant(variant: Pick<SearchVariantLink, 'target' | 'ac
 /** The variant links with the one open on the page marked (`current`), every other one a plain link. */
 export function markVariants(variants: readonly SearchVariantLink[], here: PageLocation | null | undefined): SearchVariantLink[] {
   return variants.map((v) => {
-    const { current: _drop, ...rest } = v;
+    const rest: SearchVariantLink = { ...v };
+    delete rest.current;
     return isCurrentVariant(rest, here ?? null) ? { ...rest, current: true as const } : rest;
   });
 }
