@@ -279,12 +279,13 @@ Deno.serve(withPosthog('concept-page', async (req: Request): Promise<Response> =
     } = await admin.auth.getUser(jwt);
     if (authErr || !user) return json({ error: 'unauthorized' }, 401);
 
-    const { data: profile } = await admin
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-    if (profile?.role !== 'admin') return json({ error: 'forbidden' }, 403);
+    // is_admin() (approved, not suspended) on the caller's own client; the service client has no auth.uid().
+    const caller = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
+      global: { headers: { Authorization: `Bearer ${jwt}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: isAdmin } = await caller.rpc('is_admin');
+    if (isAdmin !== true) return json({ error: 'forbidden' }, 403);
 
     const body = (await readJson(req)) as { id?: unknown } | undefined;
     const id = typeof body?.id === 'string' ? body.id.trim().toLowerCase() : '';

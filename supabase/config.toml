@@ -193,7 +193,7 @@ verify_jwt = false
 # by ReadMe Git Sync from docs/readme-io/pages/ (see GIT-SYNC-SETUP.md). The
 # function reports whether the API is still closed and what the repo expects to
 # be live, using README_IO_API_KEY. The handler additionally requires
-# profiles.role = 'admin'.
+# is_admin() (approved, not suspended) or the exact service key (constant-time compare, no unverified role claim).
 verify_jwt = true
 
 [functions.ship-link]
@@ -223,7 +223,7 @@ policy = "oneshot"
 # JWT verification OFF: pg_cron (sc-events-sync job, 20261016120000_sc_events.sql)
 # calls it with the publishable key, like patch-stability-sample. The function
 # only reads public Comm-Links and writes through a service_role-only RPC; it
-# self-throttles to one run per 5 min, so the public URL cannot be abused to
+# self-throttles to one run per hour (atomic claim_run), so the public URL cannot be abused to
 # hammer the upstream API.
 verify_jwt = false
 
@@ -239,7 +239,8 @@ verify_jwt = false
 [functions.translate-orchestrator]
 # JWT verification OFF — the function does its own auth (index.ts): service-role key for
 # every op, the project's anon key for `tick` only (pg_cron has no vault for the service
-# key), or an admin user JWT (profiles.role = 'admin') for approve/cancel/estimate/start_full.
+# key), or an admin user JWT (rpc is_admin) for approve/cancel/estimate/start_full. `sync_sources` with the
+# public key is throttled to one run per 6 h (atomic claim_run).
 # The gateway cannot verify the asymmetric session tokens, and `supabase functions deploy`
 # defaults verify_jwt to TRUE when a function has no block. Don't revert.
 verify_jwt = false
@@ -250,12 +251,15 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.patch-teaser]
-# Service-role only (own Bearer check in index.ts), so the platform JWT gate stays off.
+# JWT verification OFF: pg_cron (patch-teaser-sweep) calls it with the publishable key, so `{ sweep: true }` is open to
+# any caller by design - it only fills MISSING patch_teasers rows, cannot pick a version or force, and is bounded by
+# atomic claim_run claims (one Spectrum lookup per 5 min, one model call per version per 6 h). A targeted
+# `{ version, slug }` call needs the service-role key (own Bearer check in index.ts).
 verify_jwt = false
 
 [functions.sc-event-sheet]
 # JWT verification OFF: pg_cron (sc-event-sheet job, 20261108190200_sc_event_sheet_cron.sql) calls it with the
-# publishable key, like sc-events-sync. The automatic mode is throttled (one run per 10 min) and capped (3 LLM calls);
+# publishable key, like sc-events-sync. The automatic mode is throttled (one run per 10 min, atomic claim_run) and capped (3 LLM calls);
 # a targeted re-extract ({eventId}) checks the caller itself (service-role key or signed-in admin). The sheet is only
 # written through the service_role/admin RPC sc_event_sheet_apply.
 verify_jwt = false

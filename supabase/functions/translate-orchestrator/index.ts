@@ -17,8 +17,11 @@
 //                               settings.enabled and a job is queued/approved. Concurrent ticks
 //                               are harmless: every transition is a compare-and-set.
 //   * the anon/publishable key -> also `sync_sources` (daily cron): it only re-imports enabled
-//                               licensed|permitted sources whose upstream changed.
-//   * a user JWT whose profiles.role = 'admin' -> every op
+//                               licensed|permitted sources whose upstream changed, and a public-key
+//                               caller is throttled to one run per 6 h (atomic claim_run) because it
+//                               makes outbound GitHub calls with the server token.
+//   * a signed-in user for whom public.is_admin() is true (approved, not suspended; asked with the
+//     CALLER's client, the rpc reads auth.uid()) -> every op
 // The Anthropic key is TRANSLATE_ANTHROPIC_API_KEY only; absent -> jobs fail with
 // `translate.no_api_key`. It is never the sc-events-sync key.
 
@@ -36,6 +39,8 @@ import { buildOverlayMeta } from './_io.ts';
 import { writeAlerts } from './_alerts.ts';
 import { makeLearnDb } from './_learn_db.ts';
 import { withPosthog } from '../_shared/posthog.ts';
+import { classifyToken } from './_auth.ts';
+import { claimRun } from '../_shared/claim-run.ts';
 
 function logWarn(msg: string, data?: Record<string, unknown>): void {
   console.warn(`translate-orchestrator: ${msg}`, data ? JSON.stringify(data) : '');
@@ -44,6 +49,8 @@ function logError(msg: string, data?: Record<string, unknown>): void {
   console.error(`translate-orchestrator: ${msg}`, data ? JSON.stringify(data) : '');
 }
 
+// sync_sources by a public-key caller (the daily cron): at most one run per 6 h, claimed atomically (claim_run).
+const SYNC_SOURCES_PUBLIC_MIN_MS = 6 * 3600_000;
 const SOURCE_ID_RE = /^[a-z0-9][a-z0-9_-]{0,63}$/;
 
 const CORS = {
@@ -83,16 +90,20 @@ Deno.serve(withPosthog('translate-orchestrator', async (req) => {
   const token = bearer(req) || (req.headers.get('apikey') ?? '');
   let actor: string | null = null; // admin user id; null for service role
   let allowed = false;
-  if (token && serviceKey && token === serviceKey) allowed = true;
+  const kind = classifyToken(token, op, serviceKey, anonKey);
+  const publicKeyCaller = kind === 'public'; // the public key only (no service key, no admin session)
+  if (kind === 'service') allowed = true;
   // tick is the pg_cron entry point. The cron job sends the public sb_publishable_* key, which
   // the runtime's SUPABASE_ANON_KEY may not equal (it can still hold the legacy JWT). Both are
   // public, and tick only advances jobs already inside the caps, so either one is enough.
-  else if ((op === 'tick' || op === 'sync_sources') && token && ((anonKey && token === anonKey) || token.startsWith('sb_publishable_'))) allowed = true;
+  else if (kind === 'public') allowed = true;
   else if (token) {
     const { data: { user } } = await admin.auth.getUser(token);
     if (user) {
-      const { data: p } = await admin.from('profiles').select('role').eq('id', user.id).maybeSingle();
-      if ((p as { role?: string } | null)?.role === 'admin') {
+      // is_admin() ignores a stale profiles.role of a suspended or unapproved account; it needs the caller's own client.
+      const caller = createClient(supabaseUrl, anonKey, { global: { headers: { authorization: `Bearer ${token}` } }, auth: { autoRefreshToken: false, persistSession: false } });
+      const { data: isAdmin } = await caller.rpc('is_admin');
+      if (isAdmin === true) {
         allowed = true;
         actor = user.id;
       } else return json({ error: 'forbidden' }, 403);
@@ -161,6 +172,9 @@ Deno.serve(withPosthog('translate-orchestrator', async (req) => {
         return json({ ok: true, ...(await importSeed(deps, admin, sourceId, { ghToken: Deno.env.get('GITHUB_TOKEN') ?? undefined })) });
       }
       case 'sync_sources': {
+        if (publicKeyCaller && !(await claimRun(admin, 'translate-orchestrator:sync_sources', SYNC_SOURCES_PUBLIC_MIN_MS))) {
+          return json({ ok: true, throttled: true, checked: 0, changed: 0, errors: [] });
+        }
         const work = syncSources(deps, admin, { ghToken: Deno.env.get('GITHUB_TOKEN') ?? undefined });
         (globalThis as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime?.waitUntil?.(work.catch(() => {}));
         return json({ ok: true, ...(await work) });
