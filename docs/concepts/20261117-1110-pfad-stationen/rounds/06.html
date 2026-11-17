@@ -1,0 +1,153 @@
+<section id="iter-6" data-iteration="6" data-iteration-template="free" data-final-report>
+  <p class="fr-sentence">Wünsche lassen sich jetzt überall im Codex einer Operation zuordnen; Seiten und Holotisch zeigen dafür dieselben zwei Kästen.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">✦</span><span><b>Ein Wunsch bleibt ein Wunsch</b>, auch wenn er einer Operation zugeordnet ist.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">▣</span><span><b>Dieselben zwei Kästen</b> auf jeder Codex-Seite und im Holotisch-Menü.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">↩</span><span><b>Entfernen fragt nur bei Zugeordnetem</b>; ein Rückgängig holt alles zurück.</span></li>
+      </ul>
+      <p class="fr-try-auth">🔑 Noch nicht ausgeliefert: lokal mit <code>npm start</code> auf 127.0.0.1:4200, Beta einschalten</p>
+    </div>
+    <div class="fr-ba" data-label-before="{{final.before}}" data-label-after="{{final.after}}">
+      <figure class="fr-shot"><img src="20261117-1110-pfad-stationen/shots/before.png" alt=""><figcaption>Hangar-Menü mit drei Gruppen, ohne Operation</figcaption></figure>
+      <figure class="fr-shot"><img src="20261117-1110-pfad-stationen/shots/after.png" alt=""><figcaption>Wunsch-Kasten mit Operationen und „Zuordnen“, Hangar-Kasten</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 88%" data-tip="Zwei Gegenprüfungen und drei Prüfungen in der App fanden acht ernste Lücken im Daten-Umbau; sieben sind geschlossen, offen bleibt ein zweites Gerät ohne Netz. Anforderung: keine offene Lücke (geschätzt).">
+        <span class="fr-meter-name">🧮 Datenintegrität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">7 / 8</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Alle Tests bestanden, der Build ist grün. Anforderung: kein roter Test (geschätzt).">
+        <span class="fr-meter-name">🧱 Stabilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">7240 Tests</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Alle neuen Flächen bei 390 × 844 geprüft, die alte Oberfläche ohne Beta läuft weiter. Anforderung: beides ohne Bruch (geschätzt).">
+        <span class="fr-meter-name">📱 Kompatibilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">2 / 2</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="5 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ✓ {{final.level_interplay}} · ✓ {{final.level_local}} · ✓ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_prod}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_live}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 5 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-altdaten"
+          data-issue-title="[FEATURE] Count plain item and ship lines of old Operationen back onto the wishlist"
+          data-issue-type="feature"
+          data-issue-body="Concept 20261117-1110-pfad-stationen, checklist line A11 (existing data): before this change, putting a wish into a Nachschub moved the quantity off the wishlist. The one-time client reconcile (reconcileLegacyWishLines / isLegacyWishLine in src/app/hq/nachschub/nachschub.service.ts) counts back only lines that provably came from a wish (kind neither item nor ship, or carrying forClassName; no stops, step, SCU or minQuality). Plain item and ship lines of Operationen that existed before the change are deliberately left alone, because they cannot be told apart from Bestand lines planned without a place, and counting them back would create wishes the owner never made (redteam finding H3). Result: such old lines are not shown as 'gewünscht und zugeordnet'. A safe rule needs a discriminator the data does not have today (e.g. a server-side marker written at assignment time, or asking the owner once per old Operation). Decide the rule first, then build it with a dry run against production data."
+          data-issue-module="hq"
+          data-oq-origin="shortfall"
+          data-route-default="issue"
+          data-route-reason="riskant">
+        <span class="oq-label">Alte Zeilen nur teils zurück</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Nur teilweise umgesetzt, weil sich einfache Gegenstände und Schiffe in alten Operationen nicht sicher von Bestandszeilen unterscheiden lassen. Sie bleiben, wie sie sind.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Operationen, die es schon vor diesem Umbau gab</dd>
+          <dt>{{final.fund_why}}</dt><dd>📌 Issue — riskant: Ein falscher Griff erzeugt Wünsche, die du nie hattest.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-undo"
+          data-issue-title="[BUG] Undo of a wish removal restores absolute values and drops a ship wish's name and notes"
+          data-issue-type="bug"
+          data-issue-body="Concept 20261117-1110-pfad-stationen, checklist line A10 (one undo restores everything). Two gaps remain in the undo of applyWishRemoval / release (src/app/hq/nachschub/nachschub.service.ts) and of the ship wish path (src/app/hq/data/item-path.service.ts, src/app/hq/data/wishlist.store.ts): (1) undo writes back the absolute line and wish values captured before the removal, so a change made in between (another tab or device, a fulfilment) is overwritten instead of merged; restore by delta or refuse when the row changed since. (2) A ship wish lowered to 0 is deleted; undo re-creates it without its custom name and notes; capture and restore the full row. Add specs for both."
+          data-issue-module="hq"
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="klein">
+        <span class="oq-label">Rückgängig mit zwei Lücken</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Nicht ganz umgesetzt: Rückgängig überschreibt eine Änderung, die inzwischen auf einem anderen Gerät passiert ist, und ein auf 0 gesetzter Schiffswunsch kommt ohne Namen und Notiz zurück.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Rückgängig nach dem Entfernen oder Lösen</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — klein und im selben Code.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-offline"
+          data-issue-title="[BUG] An offline second device can reopen a fulfilled wish line"
+          data-issue-type="bug"
+          data-issue-body="Concept 20261117-1110-pfad-stationen, checklist line A8 (a fulfilled wish stays in its Operation as reached). A met wish line switches its source from 'wish' to 'wish_met' through a conditional update (casSource in src/app/hq/hq-supplies.service.ts) and lowers the wish once. A second device that edited the same line while offline still holds source 'wish' and pushes it on reconnect; last write wins, the line reads as open again and the next fulfilment would lower the wish a second time (redteam round 2, left open). The client cannot prevent this. Fix on the server: a trigger on public.hq_supplies that refuses the transition wish_met -> wish (or keeps the greater state), shipped as a migration with a begin/rollback dry run."
+          data-issue-module="hq"
+          data-oq-origin="shortfall"
+          data-route-default="issue"
+          data-route-reason="riskant">
+        <span class="oq-label">Zweites Gerät ohne Netz</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Nicht abgesichert, weil es nur in der Datenbank zu lösen ist: Ein zweites Gerät, das ohne Netz dieselbe Zeile bearbeitet hat, kann einen erfüllten Wunsch wieder öffnen.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Abgleich zwischen zwei Geräten</dd>
+          <dt>{{final.fund_why}}</dt><dd>📌 Issue — riskant: braucht eine Regel in der Live-Datenbank.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-archiv"
+          data-issue-title="[FEATURE] Delete an archived Operation from the Archiv"
+          data-issue-type="feature"
+          data-issue-body="Found during the independent check of concept 20261117-1110-pfad-stationen: the Archiv in HQ Planen offers only 'Wieder aktivieren' per archived Operation. To delete one, the user has to reactivate it (which needs a free slot of the 7) and delete it from the active list. Add a delete control to the archive rows (scAction tertiary, tone danger, ScConfirmService with the same wording and wish rule as the active delete: wishes stay on the wishlist unless the box says otherwise). Files: the Archiv component under src/app/hq/plan/ and NachschubService.remove."
+          data-issue-module="hq"
+          data-oq-origin="found"
+          data-route-default="now"
+          data-route-reason="klein">
+        <span class="oq-label">Archiv ohne Löschen</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Eine archivierte Operation lässt sich nicht löschen, nur wieder aktivieren und dann löschen.</dd>
+          <dt>{{final.fund_where}}</dt><dd>HQ, Planen, Archiv</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — klein, ein Knopf mit Nachfrage.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-names"
+          data-issue-title="[BUG] Edge function nachschub-names answers 401 when the HQ wizard opens"
+          data-issue-type="bug"
+          data-issue-body="Found during the independent check of concept 20261117-1110-pfad-stationen (test account, local dev server against the cloud project): every time the HQ wizard or the 'In eine Operation' flow opened, the browser console showed POST https://<project>.supabase.co/functions/v1/nachschub-names -> 401. The name proposal still worked (it falls back to the item name), so the user sees nothing. Not caused by this concept's diff as far as checked; not compared against main. Check verify_jwt and the Authorization header the client sends (supabase/functions/nachschub-names, the caller in src/app/hq/nachschub/), and whether the function is deployed with the expected secret."
+          data-issue-module="hq"
+          data-oq-origin="found"
+          data-route-default="issue"
+          data-route-reason="unklar">
+        <span class="oq-label">Namensdienst meldet 401</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Der Dienst, der Namen für neue Operationen vorschlägt, lehnt die Anfrage ab. Die App fällt still auf den Namen des Gegenstands zurück.</dd>
+          <dt>{{final.fund_where}}</dt><dd>HQ, neue Operation anlegen</dd>
+          <dt>{{final.fund_why}}</dt><dd>📌 Issue — Ursache unklar, erst untersuchen.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Commit <code>bc97a1a8f</code> · Bereiche: hq/nachschub, hq/data, shared/item-path, codex, i18n, eine Migration</li>
+      <li><code>src/app/hq/nachschub/nachschub.service.ts</code>, <code>src/app/shared/item-path/item-path.component.ts</code>, <code>src/app/codex/holo/codex-holo-hangar-menu.component.ts</code></li>
+      <li>Tests: 7240 grün, 1 übersprungen; Build grün; zwei Gegenprüfungen, drei Prüfungen in der echten App (Desktop, Handy, Beta an und aus)</li>
+      <li>Parität, 49 Punkte: 43 erfüllt mit Bild oder Messung; A2, A7, B4, B7, C3 nur durch Tests belegt (Operation mit Einsätzen fehlt im Testkonto); A11 teilweise (Fund)</li>
+      <li>Migration <code>20261117120000_hq_supplies_source_wish.sql</code>: Prüfregel live schon erweitert, Eintrag im Ledger folgt beim Ausliefern; main zuletzt eingeholt bei <code>91b4051fe</code></li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-einsaetze" data-crit="mid" data-guide="">Operation mit Einsätzen: Marken ansehen</li>
+      <li data-todo-id="t-holo-eigen" data-crit="mid" data-guide="">Holotisch-Menü mit eigenem Schiff ansehen</li>
+      <li data-todo-id="t-handy" data-crit="mid" data-guide="">Zuordnen einmal am Handy durchspielen</li>
+    </ul>
+  </section>
+  <section data-handoffs hidden aria-label="{{final.group_handoffs}}">
+    <ul>
+      <li data-todo-id="h-posthog" data-crit="mid" data-guide="">PostHog: zwei Befehle für den Trichter</li>
+      <li data-todo-id="h-reload" data-crit="mid" data-guide="">Nach dem Update die App einmal neu laden</li>
+    </ul>
+  </section>
+</section>

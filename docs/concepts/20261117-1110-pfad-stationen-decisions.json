@@ -365,6 +365,31 @@
         "brief": "docs/concepts/20261117-1110-pfad-stationen/briefs/implement-r5.md",
         "lines": 10
       }
+    },
+    {
+      "iteration": 6,
+      "template": "free",
+      "status": "pending",
+      "generated_at": "2026-11-17T17:55:15Z",
+      "kind": "final-report",
+      "reason": "implement of rounds 1-5 finished and independently checked",
+      "funde": [
+        "oq-altdaten",
+        "oq-undo",
+        "oq-offline",
+        "oq-archiv",
+        "oq-names"
+      ],
+      "tests": [
+        "t-einsaetze",
+        "t-holo-eigen",
+        "t-handy"
+      ],
+      "handoffs": [
+        "h-posthog",
+        "h-reload"
+      ],
+      "checks": "docs/concepts/20261117-1110-pfad-stationen/checks/05.md"
     }
   ]
 }
