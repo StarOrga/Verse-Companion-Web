@@ -6395,7 +6395,9 @@
         "removed": "Nachschub gelöscht.",
         "added": "Zum Nachschub hinzugefügt.",
         "lineRemoved": "Position entfernt.",
-        "edited": "Nachschub gespeichert."
+        "edited": "Nachschub gespeichert.",
+        "wishRemoved": "{{count}} × {{name}} von der Wunschliste entfernt.",
+        "released": "{{name}} aus der Operation gelöst."
       },
       "rec": {
         "reason": {
@@ -6425,7 +6427,10 @@
       "wishlistFailed": "Deine Wünsche konnten nicht geändert werden. Es wurde nichts verschoben.",
       "wishCapped": "{{count}} Stück passen nicht mehr in deine Wünsche (höchstens 999 je Eintrag) und gehen verloren.",
       "gone": "Dieser Nachschub existiert nicht mehr (auf einem anderen Gerät gelöscht). Die Ansicht wird aktualisiert.",
-      "capReached": "Du hast das Limit an gespeicherten Nachschüben erreicht. Lösche alte aus dem Archiv, dann klappt es wieder."
+      "capReached": "Du hast das Limit an gespeicherten Nachschüben erreicht. Lösche alte aus dem Archiv, dann klappt es wieder.",
+      "nothingFree": "Alle Stücke dieses Wunschs sind schon einer Operation zugeordnet.",
+      "splitInvalid": "Die Aufteilung auf die Operationen geht nicht auf.",
+      "dissolveFailed": "Eine Operation konnte nicht aufgelöst werden und bleibt bestehen."
     },
     "title": "HQ",
     "eyebrow": "Persönlicher Bereich",
@@ -8678,7 +8683,8 @@
     },
     "err": {
       "failed": "Das hat nicht geklappt. Versuch es noch einmal.",
-      "unavailable": "Diesen Schritt gibt es hier nicht."
+      "unavailable": "Diesen Schritt gibt es hier nicht.",
+      "wishAssigned": "Diese Stücke sind einer Operation zugeordnet. Entferne sie über den Dialog."
     },
     "hint": {
       "notYetInGame": "noch nicht im Spiel"

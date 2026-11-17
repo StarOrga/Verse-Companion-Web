@@ -529,7 +529,7 @@ export class HqNachschubFlowComponent {
   /** Lines removed from the Nachschub while editing (their rows leave the list at once, the write already happened). */
   private readonly removed = signal<ReadonlySet<string>>(new Set());
 
-  private readonly wish = computed(() => this.svc.wishPositions());
+  private readonly wish = computed(() => this.svc.freeWishPositions());
   protected readonly groups = computed(() => groupWish(this.wish()));
   protected readonly pieces = computed(() => pickedPieces(this.picks()));
   protected readonly allPicked = computed(() => this.groups().length > 0 && this.groups().every((g) => pickedShare(g.rows, this.picks()) === 1));

@@ -6395,7 +6395,9 @@
         "removed": "Nachschub deleted.",
         "added": "Added to the Nachschub.",
         "lineRemoved": "Position removed.",
-        "edited": "Nachschub saved."
+        "edited": "Nachschub saved.",
+        "wishRemoved": "Removed {{count}} × {{name}} from the wishlist.",
+        "released": "Released {{name}} from the Operation."
       },
       "rec": {
         "reason": {
@@ -6425,7 +6427,10 @@
       "wishlistFailed": "Your wishes could not be changed. Nothing was moved.",
       "wishCapped": "{{count}} units no longer fit among your wishes (999 per entry at most) and are lost.",
       "gone": "This Nachschub no longer exists (deleted on another device). The view is refreshing.",
-      "capReached": "You reached the limit of stored Nachschübe. Delete old ones from the archive and it works again."
+      "capReached": "You reached the limit of stored Nachschübe. Delete old ones from the archive and it works again.",
+      "nothingFree": "Every piece of this wish is already assigned to an Operation.",
+      "splitInvalid": "The split across the Operations does not add up.",
+      "dissolveFailed": "An Operation could not be dissolved and stays."
     },
     "title": "HQ",
     "eyebrow": "Personal area",
@@ -8678,7 +8683,8 @@
     },
     "err": {
       "failed": "That did not work. Try again.",
-      "unavailable": "This step does not exist here."
+      "unavailable": "This step does not exist here.",
+      "wishAssigned": "These pieces are assigned to an Operation. Remove them through the dialog."
     },
     "hint": {
       "notYetInGame": "not in the game yet"
