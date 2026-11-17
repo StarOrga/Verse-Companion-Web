@@ -476,7 +476,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
     .own-what .q { flex: none; color: var(--sc-fg-0); font-weight: 600; }
     .own-what .place-1 { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
     .own-what .more-places { flex: none; }
-    .own .alink { flex: none; min-height: 0; }
+    .own .alink { flex: none; }
     /* The anchor of the picker (B6): the button, and on phones the picker in the flow right under it. */
     .anc { position: relative; display: flex; flex-direction: column; align-items: flex-start; max-width: 100%; }
     .anc > .sc-action { max-width: 100%; white-space: normal; text-align: left; }
