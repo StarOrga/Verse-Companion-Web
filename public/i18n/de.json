@@ -1262,6 +1262,7 @@
       "partType": {
         "gatling": "Gatling",
         "remoteTurret": "Fernturm",
+        "mannedTurret": "Bemannter Turm",
         "scattergun": "Schrotkanone",
         "massDriver": "Massetreiber",
         "railgun": "Railgun",
@@ -1704,6 +1705,7 @@
       "stageLaunchers": "{{n}} Werfer",
       "stageMissileRacks": "Raketenwerfer",
       "stageRemoteTurret": "Ferngesteuerter Turm",
+      "stageMannedTurret": "Bemannter Turm",
       "stageTractorBeam": "Traktorstrahl",
       "stageTractorBeams": "Traktorstrahlen",
       "linkCopied": "Link kopiert",
@@ -2198,6 +2200,7 @@
     "moduleSection": {
       "weapons": "Bewaffnung",
       "remoteTurrets": "Ferngesteuerte Türme",
+      "mannedTurrets": "Bemannte Türme",
       "missiles": "Raketen",
       "pod": "Pods",
       "shields": "Schild-Generatoren",
@@ -4210,6 +4213,17 @@
         "cancelTitle": "Auftrag für {{lang}} abbrechen?",
         "cancelText": "Der Auftrag wird beendet; bereits angefallene Kosten bleiben.",
         "progress": "{{pct}} %",
+        "hold": {
+          "full": "Ein Voll-Lauf startet erst nach deiner Freigabe.",
+          "upload_cap": "Die Schätzung liegt über dem Limit pro Upload.",
+          "monthly_cap": "Mit diesem Auftrag wäre das Monatslimit überschritten.",
+          "overrun": "Die erste Batch-Gruppe hat {{pct}} % mehr gekostet als geschätzt. Die Schätzung ist angepasst, der Rest startet erst nach deiner Freigabe."
+        },
+        "capped": {
+          "job_budget": "Budget des Auftrags erreicht: {{texts}} Texte bekamen keinen zweiten Versuch und bleiben unübersetzt.",
+          "monthly_cap": "Monatslimit erreicht: {{texts}} Texte bekamen keinen zweiten Versuch und bleiben unübersetzt.",
+          "judge": "Budget erreicht: Die Judge-Stichprobe wurde ausgelassen."
+        },
         "cols": {
           "build": "Build",
           "lang": "Sprache",

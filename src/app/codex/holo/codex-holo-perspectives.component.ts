@@ -9,6 +9,7 @@ import {
 import { DefensivePanel, OffensivePanel } from '../codex-loadout-stats';
 import { Perspective } from '../codex-build-compare';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { AreaSymbolComponent } from '../../shared/area-symbol/area-symbol.component';
 
 /** A patch-Δ ghost beside a number: the other build's value and its tone. */
 export interface HoloGhost {
@@ -52,7 +53,7 @@ export interface HoloPerspectiveView {
 @Component({
   selector: 'sc-codex-holo-perspectives',
   standalone: true,
-  imports: [TranslatePipe, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, ScTooltipDirective],
+  imports: [TranslatePipe, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, ScTooltipDirective, AreaSymbolComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.row]': "layout() === 'row'", '[class.docked]': 'docked()' },
   template: `
@@ -80,7 +81,7 @@ export interface HoloPerspectiveView {
     @for (tile of tiles(); track tile.id) {
       <article class="ptile" [attr.data-p]="tile.id" [class.pulse]="pulse() === tile.id">
         <div class="pt-head">
-          <span class="t">{{ tile.titleKey | translate }}</span>
+          <span class="t"><sc-area-symbol class="area-sym" [area]="tile.id" />{{ tile.titleKey | translate }}</span>
           @if (tile.pct != null) { <span class="pp">P{{ tile.pct }}</span> }
           <span class="prof">{{ missionLabelKey() | translate }}</span>
         </div>
@@ -174,6 +175,8 @@ export interface HoloPerspectiveView {
     .ptile.pulse::after { animation: holo-pulse 900ms var(--holo-e-out); }
     @keyframes holo-pulse { 0% { opacity: 1; transform: scale(0.985); } 100% { opacity: 0; transform: scale(1); } }
     .pt-head { display: flex; align-items: baseline; gap: 10px; font-size: max(9.5px, var(--f)); letter-spacing: 0.14em; color: var(--sc-fg-0); }
+    .pt-head .t { display: inline-flex; align-items: center; gap: 6px; }
+    .pt-head .area-sym { color: var(--p); font-size: max(13px, var(--f)); }
     .pt-head .pp { font-family: var(--m); letter-spacing: 0; color: var(--p); font-size: max(10px, var(--f)); }
     .pt-head .prof { font-size: max(8.5px, var(--f)); color: var(--sc-fg-2); }
     .pt-main { display: grid; grid-template-columns: 1fr 84px; gap: 12px; align-items: center; }

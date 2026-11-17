@@ -406,12 +406,24 @@ html[data-sc-layout] { scroll-padding-top: var(--sc-bar-h); }
   --holo-rise: 6px;
   --holo-r-xs: 2px;
   --holo-r: 4px;
-  /* Perspective hues (tiles, strip). Movement is violet, not green: green
-     already means "better" in the deltas inside the same tile. */
-  --holo-p-offensive: var(--sc-accent);
-  --holo-p-defensive: var(--cat-game);
-  --holo-p-movement: var(--cat-ai);
-  --holo-p-signature: var(--accent-gold);
+  /* Perspective hues (tiles, strip): the four loadout AREAS, one colour
+     each in the Holotable and the classic loadout view (feedback #330, concept
+     2026-11-10-bereichs-symbole-umrandung). Offensive is its own holo red,
+     never --sc-accent-hot (admin) nor --sc-danger (errors). Movement is
+     violet, not green: green already means "better" in the deltas inside the
+     same tile. --sc-area-ice is the snowflake's fixed second colour on the
+     cooler symbol. --sc-area-line is how strong an area's line on top of a
+     block is drawn. */
+  --sc-area-offensive: #e5484d;
+  --sc-area-defensive: #5b8def;
+  --sc-area-movement: var(--cat-ai);
+  --sc-area-signature: #7cd4ef;
+  --sc-area-ice: #a9dcf5;
+  --sc-area-line: 60%;
+  --holo-p-offensive: var(--sc-area-offensive);
+  --holo-p-defensive: var(--sc-area-defensive);
+  --holo-p-movement: var(--sc-area-movement);
+  --holo-p-signature: var(--sc-area-signature);
   /* The Einsatz signal on the Holotable (glow, strip, dots, hexagon): quiet hues, always with a
      symbol beside them. The default stays the accent. Never red, never the warning colour. */
   --sc-mission-all: var(--sc-accent);

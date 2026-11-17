@@ -50,8 +50,8 @@ export interface MissionDef {
 // The prototype's four loadout groups, expanded to this app's finer-grained
 // `ShipModuleSection` taxonomy (04-rules-v2 §7.1: weapons/missiles/shields/power).
 const GROUP_SECTIONS: Readonly<Record<string, readonly ShipModuleSection[]>> = {
-  weapons: ['weapons', 'remoteTurrets'],
-  offense: ['weapons', 'remoteTurrets'],
+  weapons: ['weapons', 'remoteTurrets', 'mannedTurrets'],
+  offense: ['weapons', 'remoteTurrets', 'mannedTurrets'],
   missiles: ['missiles'],
   shields: ['shields'],
   power: ['powerPlants', 'quantum', 'coolers', 'radar', 'lifeSupport', 'pod'],
