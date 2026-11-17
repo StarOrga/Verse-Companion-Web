@@ -98,8 +98,23 @@ Source: `20261107-0250-holotisch-unten-hangar/briefs/implement.md` (verbatim not
 - Groups under 8 ships stay pickable with "nur N Schiffe". Default = narrowest group; a picked group is remembered **per ship for 12 h** (classic view keeps its account-wide choice).
 - Shell beta: no hangar button anywhere (classic page loses only that row). Own ship in the Holotable: rename, note, pin, remove (remove confirms) — holotable variant only.
 
+## Decided and built: recognisable parts in the 3D view (concept 20261117-1809, 2026-11-17)
+
+Source: `20261117-1809-3d-ansicht-bauteile/briefs/implement.md` (verbatim notes, checklist C1–C22), favourite design d1 "Leuchtkörper". Applies to the Codex-ship holotable, the 3D preview of the classic detail pages (hero overlay), and, base look only, the Codex landing holotable; not to the 2D views.
+
+- **Stable brightness:** no see-through on hover or selection anywhere, the hull always hides its back and inner lines (the user's own interior layer stays); hull edge lines no longer add up, so a dense underside reads like a sparse top. (C1, C2, C17)
+- **Parts are lit bodies, no dots:** every clickable part is its own glowing body above the hull, parts inside the hull stay visible through it, quieter. The 12 px DOM rings are gone; invisible keyboard targets remain (Tab reaches every part, focus gives the hover look, Enter/Space select and toggle, Escape deselects, focus ring only under Tab). (C3, C18)
+- **The part takes the pointer itself** (`PackageScene.pick`): a ray hit on the part, else its projected centre within an invisible 24 px (mouse) / 48 px (touch, pen) area; `cursor: pointer` over a part; a press that travels 4 px or more is a rotate and never selects or deselects. (C4)
+- **Hover** lights the part (white line, brighter fill, 150 ms) and shows its **name tag** at the part, beside or above it, never on it, kept inside the stage and following the turn. Nothing else changes. (C5)
+- **Selection is green** for every ship (`--sc-holo-select` `#7dff9c`, not the maker accent, not user-selectable): green fill, 2 px green outline readable through the hull, one 750 ms pulse; its name tag stays and turns green with dark text (`--sc-holo-select-ink`). The other parts drop to about a third and the hull lines to `.30`; they stay clickable and hoverable. Only the hovered and the selected part carry a tag. (C6, C7)
+- **Ways out:** a second click on the selected part, a click into empty space (beside the model or on the hull), Escape, and the panel's back control "Alle Bauteile", which clears the selection and lands on the list of all parts (never on Einordnung). A double click re-frames only off a part; on a part it toggles once. No visible ✕ at the selection. (C8–C12)
+- **Turntable** (hero preview) holds while the pointer is over the model and while a part is selected, then runs on. Touch: the first tap selects and opens the details at once; select, switch and deselect work in portrait and in the landscape overlay. Reduced motion: no pulse, instant states. (C13–C15, C19)
+- **Classic detail pages** keep their click behaviour (popup / navigation), with the same idle / hover / selected look. (C16)
+- Analytics: `codex:part_select { source: model | list | keyboard }`, `codex:part_deselect { via: empty | again | panel | escape }`; tile "Bauteil-Auswahl je Holotisch-Besuch" in the Nutzung dashboard. (C20)
+
 ## Rejected, do not re-propose without saying so
 
+- In the 3D view (concept 20261117-1809): dots or rings over the parts; permanent name labels on every part (d3 "Etiketten"); a focus frame / brackets and a hull turning into a contour (d2 "Röntgen-Fokus"); a visible ✕ at the selection ("kein sichtbares x an der auswhal bitte"); see-through of the hull on hover or selection; a colour picker for the selection colour ("nicht auswählbar machen, wir machen grün"); the same selection states in the 2D schema views.
 - Compare button on the ship page ("eher auf der Landing ... Richtung Simulation"). (S hv-s2)
 - "Schiff wechseln" and a share button in the toolbar. (S hv3-s2)
 - Global density setting; density lives inside the boxes. (S hv5-s3)

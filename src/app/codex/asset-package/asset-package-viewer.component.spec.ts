@@ -1,5 +1,5 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { Router, provideRouter } from '@angular/router';
+import { provideRouter } from '@angular/router';
 import { TranslateService, provideTranslateService } from '@ngx-translate/core';
 import { AssetPackageViewerComponent, HOVER_GRACE_MS } from './asset-package-viewer.component';
 import { AssetPackageService } from './asset-package.service';
@@ -271,7 +271,7 @@ describe('AssetPackageViewerComponent (state logic, no WebGL)', () => {
 
     /** A scene stand-in: `pick` answers what lies under the pointer, the rest is a no-op. */
     function fakeScene(c: AssetPackageViewerComponent, hit: { id: string | null }) {
-      const pick = vi.fn((_x: number, _y: number, _slop: number, _cands: ReadonlySet<string>) => hit.id);
+      const pick = vi.fn<(x: number, y: number, slop: number, cands: ReadonlySet<string>) => string | null>(() => hit.id);
       const frame = vi.fn();
       const noop = () => undefined;
       c['scene'] = {
