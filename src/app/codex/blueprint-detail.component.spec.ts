@@ -97,12 +97,12 @@ function quantities(fixture: ComponentFixture<BlueprintDetailComponent>, rowSele
 }
 
 describe('BlueprintDetailComponent — path (A9)', () => {
-  it('carries the path control with its two stops: wish, Inventar', async () => {
+  it('carries one path control with its two stops: wish, Sammlung', async () => {
     const fixture = await setup(blueprint([ingredient(0, 'Agricium', 0.36)]));
     const el: HTMLElement = fixture.nativeElement;
     const paths = el.querySelectorAll('sc-item-path');
     expect(paths.length).toBe(1);
-    expect(Array.from(paths[0].querySelectorAll('.node')).map((n) => n.getAttribute('data-step'))).toEqual(['wish', 'inventar']);
+    expect(paths[0].querySelector('[data-station="own"]')?.textContent).toContain('pathCtl.node.sammlung');
   });
 
   it('signed in: always the two stations (primary), whatever page the reader came from (R5 r5-d-bauplan)', async () => {

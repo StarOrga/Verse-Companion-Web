@@ -50,6 +50,17 @@ Replaces the lines marked "REPLACED" above and the old "moves off the wishlist" 
   - a fulfilled wish (item now owned) stays as "reached";
   - releasing a piece from an Operation in the HQ always asks first.
 
+### Where the two stations live (concept `20261117-1110-pfad-stationen`, round 5, design "Zwei Kästen")
+Replaces the ownership card (`sc-codex-own-card`, "Haben?" / "Dein Bestand" / "Dein Exemplar", concept codex-kopf-besitz C5/C7), which is gone.
+- **Item pages, Holotisch view:** the two stations of `sc-item-path` (level primary) at the top of the side panel (`aside.it-panel > .it-path`), one under the other (`layout="stacked"`).
+- **Item pages, Klassisch view:** the same control under the page head (owner decision `r5-d-einfach`), side by side.
+- **Ship pages, Klassisch view:** under the picture (`.hero-own`), side by side with the connector, stacked when the host is narrow (a container query on the control's own width, no page breakpoint).
+- **Blueprint and preview pages:** the full two-station form whenever the reader is signed in (`pathLevelFor`, owner decision `r5-d-bauplan` "Immer, wenn du angemeldet bist"); signed out the pill, or the full form when coming from Planen or a set (D2).
+- **Nothing of the card is lost:** the ownership station's head carries the icon buttons (items: note, pin, remove with the danger confirm; Sammlung: remove un-collects; ships: rename, note, pin, remove via `sc-codex-own-ship-actions`); an item's note text, the Operation a ship sits in and a failed write sit under the strip; a ship's own name stands in the strip ("Im Hangar · „Name“"); the strip's link ("Im Inventar / Im Hangar ansehen") replaces "Im HQ zeigen"; signed out the hint and the sign-in link; the HQ-hosted copy reads owned (`forceOwned`); the head strip's "Nicht im Inventar / Hangar" jumps to the ownership station and lights it up.
+- The host is `sc-codex-own-stations` (`src/app/codex/detail/`); everything codex-specific goes in through the control's slots `[ipOwnTools]` (station head) and `[ipOwnExtra]` (under the strip), so `sc-item-path` knows nothing about hangar internals.
+- **Holotisch, ships:** the hangar menu in the head (`sc-codex-holo-hangar-menu`) is rebuilt as the same two stations (round 5, G5).
+- The pages render one template in both shells, so the stations show in the beta shell and the non-beta shell alike.
+
 ## Rejected
 - Nachschub as its own sixth HQ page or as a Bestand tab.
 - ~~Three status nodes everywhere in the Codex; a Nachschub pill on Codex detail pages.~~ **Replaced by concept `20261117-1110-pfad-stationen`:** the Codex path control shows two stations (wish, ownership); the assignment to an Operation lives inside the wish station, and rows show the badge only. History kept.
@@ -94,7 +105,7 @@ Replaces the lines marked "REPLACED" above and the old "moves off the wishlist" 
 ## Implementation: wave 3 (shell, search, Codex detail)
 - **Schnellzugriff** (`shell/merkliste/`): crate icon "frame" without a count, the word only in the open panel. Zuletzt geöffnet = 3 image tiles, 7 after "Mehr anzeigen" (`RECENT_ROWS_MAX` 12 is the store cap). Wunschliste = the last 3 added (page type, else overall). The context section (Inventar / Hangar / Sammlung) is strictly type-filtered, shows the last 3 added and a "Gesamtes ..." link carrying the filter (`hqStockLink`); pages without a type show no Bestand section.
 - **Warenkorb** (`shell/cart/`): own URL (`?cart=1`, `hqCartLink`), `[scDialog]`. Groups follow `cartGroups()` (weapons first, blueprints last), the group checkbox selects the group, silhouettes via `sc-sil-thumb` (contain), red trash with an undo toast (also for groups, no question), "Passt dazu" 3 of 7 (`WishCartService.suggestions`, catalogue adapter `hq/nachschub/rec-catalogue.ts`, FPS armor and weapons only), one primary "In einen Nachschub" -> `/hq#planen?pick=<key>~<qty>|...`.
-- **Path control** (`shared/item-path/`): two nodes, Wunschliste -> Inventar / Hangar / Sammlung by kind. Empty wish = +1, filled wish opens the cart, the own node deep-links to HQ Bestand.
+- **Path control** (`shared/item-path/`; where its primary form lives on detail pages: see "Where the two stations live" above): two nodes, Wunschliste -> Inventar / Hangar / Sammlung by kind. Empty wish = +1, filled wish opens the cart, the own node deep-links to HQ Bestand.
 - **Codex detail** (`codex/detail/codex-item-stage.component.ts`, `codex-detail.component.ts`, global `ITEM PAGE` block in `styles.scss`): items, weapons, armor and components use the holotable layout (stage left with Silhouette | 3D-Modell switch, tabbed panel right: Werte / Herstellung / Kaufen & Info). Compare lives only in the full-site search overview. Opened from the HQ the page quietly names the Nachschub that holds the item. Blueprint page: "Material xN auf die Wunschliste".
 - **Entry motion** (`shared/entry-motion/`): `[scEntry]` + global `CINEMATIC ENTRY` block; cinematic on the first open of a page, quick afterwards, none under `prefers-reduced-motion`.
 - **Galerie / News**: both show `sc-sammlung-strip`; the gallery source filter is an `<sc-select>`; `NewsService.toggleFavorite` writes to `SammlungService`.
