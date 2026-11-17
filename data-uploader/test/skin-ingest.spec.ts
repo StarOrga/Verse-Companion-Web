@@ -160,6 +160,75 @@ describe('uploadSkins', () => {
     expect(await exists(join(dir, '.uploaded'))).toBe(false);
   });
 
+  it('retries a commit the function refused as transient (R2 hiccup) and ships the ship', async () => {
+    // #365: an R2 failure while checking or pruning used to be a 500 and the
+    // ship stayed missing for the whole run.
+    let commits = 0;
+    fetchMock.mockImplementation(async (url: string | URL, init?: { body?: unknown }) => {
+      const href = String(url);
+      if (href.includes('ingest-skins')) {
+        const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+        if (body['action'] === 'commit' && ++commits < 3) {
+          return { ok: false, status: 503, json: async () => ({ error: 'commit_failed', transient: true }) };
+        }
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            uploads: [{ path: 'SHIP_A/standard.glb', token: 't', signedUrl: 'http://x/upload' }],
+            count: 1,
+          }),
+        };
+      }
+      return { ok: true, json: async () => ({}) };
+    });
+    const dir = await makeShip('SHIP_A', [{ id: 'standard', name: 'Standard', model: 'models/standard.glb' }]);
+    const sleeps: number[] = [];
+
+    const res = await uploadSkins('jwt', [{ shipId: 'SHIP_A', dir }], () => {}, {
+      sleep: async (ms) => {
+        sleeps.push(ms);
+      },
+    });
+
+    expect(commits).toBe(3);
+    expect(sleeps).toEqual([500, 1000]);
+    expect(res[0]).toMatchObject({ ok: true, ship_id: 'SHIP_A', committed: 1 });
+    expect(await exists(join(dir, '.uploaded'))).toBe(true);
+  });
+
+  it('gives up after the retries and reports the transient code, and never retries a plain 500', async () => {
+    let calls = 0;
+    fetchMock.mockImplementation(async (url: string | URL, init?: { body?: unknown }) => {
+      if (!String(url).includes('ingest-skins')) return { ok: true, json: async () => ({}) };
+      const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      calls++;
+      if (body['ship_id'] === 'SHIP_A') {
+        return { ok: false, status: 503, json: async () => ({ error: 'sign_failed', transient: true }) };
+      }
+      return { ok: false, status: 500, json: async () => ({ error: 'sign_failed' }) };
+    });
+    const a = await makeShip('SHIP_A', [{ id: 'standard', name: 'Standard', model: 'models/standard.glb' }]);
+    const b = await makeShip('SHIP_B', [{ id: 'standard', name: 'Standard', model: 'models/standard.glb' }]);
+
+    const res = await uploadSkins(
+      'jwt',
+      [
+        { shipId: 'SHIP_A', dir: a },
+        { shipId: 'SHIP_B', dir: b },
+      ],
+      () => {},
+      { sleep: async () => {} },
+    );
+
+    // SHIP_A: 1 try + 3 retries; SHIP_B: the plain 500 once.
+    expect(calls).toBe(5);
+    expect(res.map((r) => [r.ship_id, r.ok, r.error])).toEqual([
+      ['SHIP_A', false, 'sign_failed'],
+      ['SHIP_B', false, 'sign_failed'],
+    ]);
+  });
+
   it('stops at the first ship when the R2 cost gate is closed, with one log line', async () => {
     fetchMock.mockResolvedValue({ ok: false, status: 503, json: async () => ({ error: 'r2_usage_unknown' }) });
     const a = await makeShip('SHIP_A', [{ id: 'standard', name: 'Standard', model: 'models/standard.glb' }]);
