@@ -286,6 +286,24 @@ describe('TranslationSourcesComponent', () => {
     }
   });
 
+  it('a tab destroyed while a read is under way sets no new timer', async () => {
+    passRows = [pass('p1', { status: 'open', phase: 'apply', pos: 4 })];
+    const { fake } = setup(answer);
+    vi.useFakeTimers();
+    try {
+      const fixture = TestBed.createComponent(TranslationSourcesComponent);
+      fixture.detectChanges();
+      // The first read has been sent and not answered yet.
+      const reads = () => fake.calls.filter((c) => c.target === 'translation_passes').length;
+      expect(reads()).toBe(1);
+      fixture.destroy();
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(reads()).toBe(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('starts a learning pass and says that it runs in the background', async () => {
     setup(answer);
     const fixture = TestBed.createComponent(TranslationSourcesComponent);

@@ -181,9 +181,15 @@ export class TranslationSourcesComponent implements OnInit {
   readonly progress = passProgress;
   readonly errorKey = (code: string | null) => jobErrorKey(code) ?? 'admin.translations.jobErrors.unknown';
   private timer: ReturnType<typeof setTimeout> | null = null;
+  /** Number of the newest read; an answer to an older one, or one that arrives after the destroy, sets no timer. */
+  private readSeq = 0;
+  private destroyed = false;
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => this.stopPolling());
+    inject(DestroyRef).onDestroy(() => {
+      this.destroyed = true;
+      this.stopPolling();
+    });
   }
 
   busy(): boolean {
@@ -211,8 +217,10 @@ export class TranslationSourcesComponent implements OnInit {
   async loadPasses(): Promise<void> {
     this.stopPolling();
     const wasOpen = new Set(this.passes().filter((p) => p.status === 'open' && p.kind === 'seed').map((p) => p.id));
+    const seq = ++this.readSeq;
     try {
       const rows = await this.svc.listPasses();
+      if (this.destroyed || seq !== this.readSeq) return;
       this.passes.set(rows);
       this.passError.set(null);
       if (rows.some((p) => wasOpen.has(p.id) && p.status !== 'open')) void this.load();
@@ -223,6 +231,7 @@ export class TranslationSourcesComponent implements OnInit {
         });
       }
     } catch (e) {
+      if (this.destroyed || seq !== this.readSeq) return;
       this.passError.set(toErrorKey('admin-translations', 'passes-load', e));
     }
   }
