@@ -8109,6 +8109,11 @@
       "setsOne": "in 1 Set"
     },
     "row": {
+      "current": "Du bist hier",
+      "variants": "Varianten",
+      "variantsMore": "+{{n}}",
+      "variantsMoreAria": "{{n}} weitere Varianten im Hangar",
+      "variantCurrent": "Diese Variante ist gerade offen",
       "patch": "Patch {{line}}",
       "patchMeta": "Patch-Notiz · {{version}}",
       "galleryMeta": "Galerie",

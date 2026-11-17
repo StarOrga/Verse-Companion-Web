@@ -2,7 +2,7 @@ import { BetaService } from '../../core/beta.service';
 import { AnalyticsService } from '../../core/analytics.service';
 import { DestroyRef, Injectable, Injector, computed, inject, signal } from '@angular/core';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { NavOriginService } from '../../shared/page-header/nav-origin.service';
 import { TranslateService } from '@ngx-translate/core';
 import { toErrorKey } from '../../core/describe-error';
@@ -25,6 +25,7 @@ import { OwnSetEntry, ownSetGroups, ownSetOf } from './search-own-sets';
 import { WishNamesService } from './wish-names.service';
 import { parseQuery, switchChip } from './search-query-parse';
 import { RowOwnership, SearchChip, SearchResult, SearchResultRow } from './search-result-model';
+import type { SearchVariantLink } from './codex-search-model';
 import { SearchSignalsService } from './search-signals.service';
 import {
   GalleryMatch, GalleryRpcRow, MissionMatch, MissionRpcRow, SourceResult, mapGalleryRows, mapMissionRows, searchPatches,
@@ -37,7 +38,11 @@ import { Lang, LoadoutEntry } from '../codex.types';
 import { stockLoadoutClassNames } from '../stock-loadout';
 import {
   CodexSearchGroup,
+  FRESH_SHIPS_SHOWN,
   GroupCounts,
+  PageLocation,
+  applyCurrentPage,
+  pageLocationOf,
   SearchOption,
   SearchTarget,
   clearRecentSearches,
@@ -50,8 +55,8 @@ import {
 } from './codex-search-model';
 
 export const SEARCH_DEBOUNCE_MS = 220;
-/** How many of the patch's new ships an empty field offers. */
-const FRESH_SHIPS_SHOWN = 4;
+/** New ships kept beyond the shown four: the current page drops out, the next one backfills. */
+const FRESH_SHIPS_KEPT = FRESH_SHIPS_SHOWN + 4;
 
 /** Aliases / chips named in the "gelesen als" line at most. */
 const READINGS_SHOWN = 3;
@@ -64,6 +69,9 @@ export interface SearchReadings {
 
 /** What a key press in the search field asks the host to do. */
 export type SearchKeyAction = 'open' | 'open-new-tab' | 'escape' | null;
+
+/** What opening an option did. 'here': the option is the page the reader is on — the host only closes. */
+export type SearchOpenResult = 'navigated' | 'searched' | 'new-tab' | 'here';
 
 /**
  * The ONE Codex search: debounced term → `CodexService.searchAll` (every kind
@@ -144,8 +152,17 @@ export class CodexSearchEngine {
     }
     return out;
   });
+  /**
+   * Where the reader stands (router path + query), for the current-page rule:
+   * its row is hidden for a weak match, greyed for a near-exact one (note 4).
+   */
+  readonly here = signal<PageLocation>(pageLocationOf(this.router.url));
+  /** The catalog groups the Codex bar and Ctrl+K draw: the current-page rule applied. */
+  readonly listGroups = computed(() => applyCurrentPage(this.groups(), this.searchText(), this.here()));
   readonly options = computed<SearchOption[]>(() =>
-    this.input().trim() ? resultOptions(this.groups()) : suggestionOptions(this.recent(), this.fresh()),
+    this.input().trim()
+      ? resultOptions(this.listGroups().groups, this.listGroups().current)
+      : suggestionOptions(this.recent(), this.fresh(), this.here()),
   );
   readonly activeOption = computed<SearchOption | null>(() => this.options()[this.activeIndex()] ?? null);
 
@@ -242,6 +259,7 @@ export class CodexSearchEngine {
       didYouMean: this.didYouMean(),
       facets: this.facets(),
       ownSet: ownSetOf(chips) !== null,
+      here: this.here(),
     });
   });
 
@@ -251,6 +269,10 @@ export class CodexSearchEngine {
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.cancelTimer());
+    const sub = this.router.events.subscribe((e) => {
+      if (e instanceof NavigationEnd) this.here.set(pageLocationOf(e.urlAfterRedirects));
+    });
+    inject(DestroyRef).onDestroy(() => sub.unsubscribe());
   }
 
   lang(): Lang {
@@ -361,10 +383,15 @@ export class CodexSearchEngine {
 
   /** A result row was opened: remember it (recent searches, recent opens) and count the open. */
   noteOpened(row: SearchResultRow): void {
+    // The greyed current row leads nowhere: counted, nothing remembered (no recent, no origin).
+    if (row.current) {
+      this.trackOpen(row.type === 'hit' ? row.hit.kind : row.type, null, false, { current: true });
+      return;
+    }
     this.remember();
     if (row.type === 'hit') {
       this.trySignals()?.recordOpen(row.hit.kind, row.hit.classNameSlug);
-      this.trackOpen(row.hit.kind, null, false);
+      this.trackOpen(row.hit.kind, null, false, {});
       this.navOrigin.noteSearchArrival(this.term(), row.target.link);
     }
   }
@@ -381,18 +408,42 @@ export class CodexSearchEngine {
    */
   opening(opt: SearchOption, newTabFlag = false): void {
     if (opt.type !== 'hit' && opt.type !== 'more') return;
+    if (opt.type === 'hit' && opt.current && !newTabFlag) {
+      this.trackOpen(opt.hit.kind, opt.id, false, { current: true });
+      return;
+    }
     this.remember();
     if (opt.type === 'hit') {
       this.navOrigin.noteSearchArrival(this.term(), opt.target.link);
       this.trySignals()?.recordOpen(opt.hit.kind, opt.hit.classNameSlug);
-      this.trackOpen(opt.hit.kind, opt.id, newTabFlag);
+      this.trackOpen(opt.hit.kind, opt.id, newTabFlag, {});
     }
   }
 
-  /** One `search:result_open`: the area is the hit's kind, the rank its place in the list; never the term. */
-  private trackOpen(area: string, optionId: string | null, newTab: boolean): void {
+  /**
+   * A variant mini link of an own ship row was opened. The open variant of the current page
+   * leads nowhere (counted only); any other one is remembered like its row.
+   */
+  noteVariantOpened(row: SearchResultRow, variant: SearchVariantLink, newTab = false): void {
+    if (variant.current && !newTab) {
+      this.trackOpen('own', null, false, { current: true, variant: true });
+      return;
+    }
+    this.remember();
+    this.navOrigin.noteSearchArrival(this.term(), variant.target.link);
+    if (row.type === 'own' && row.classNameSlug) this.trySignals()?.recordOpen('ship', row.classNameSlug);
+    this.trackOpen('own', null, newTab, { variant: true });
+  }
+
+  /**
+   * One `search:result_open`: the area is the hit's kind, the rank its place in the list; never the term.
+   * `current`: the greyed "Du bist hier" row was chosen; `variant`: a variant mini link was.
+   */
+  private trackOpen(area: string, optionId: string | null, newTab: boolean, how: { current?: boolean; variant?: boolean }): void {
     const index = optionId ? this.options().findIndex((o) => o.id === optionId) : -1;
-    this.injector.get(AnalyticsService).track('search:result_open', { area, rank: index + 1, new_tab: newTab });
+    this.injector.get(AnalyticsService).track('search:result_open', {
+      area, rank: index + 1, new_tab: newTab, current: !!how.current, variant: !!how.variant,
+    });
   }
 
   forgetRecent(): void {
@@ -407,7 +458,7 @@ export class CodexSearchEngine {
     void this.injector
       .get(CodexBuildDiffService)
       .addedShipsMemo()
-      .then((rows) => this.fresh.set(rows.slice(0, FRESH_SHIPS_SHOWN).map((r) => toPolyHit('ship', r))))
+      .then((rows) => this.fresh.set(rows.slice(0, FRESH_SHIPS_KEPT).map((r) => toPolyHit('ship', r))))
       .catch(() => this.fresh.set([]));
   }
 
@@ -460,10 +511,15 @@ export class CodexSearchEngine {
 
   /**
    * Open an option the way its anchor would. A recent search runs in place
-   * ('searched'); everything else navigates ('navigated') or, with
+   * ('searched'), the greyed current page only closes ('here'); everything else navigates ('navigated') or, with
    * `newTab`, opens a new tab and leaves the search as it is ('new-tab').
    */
-  open(opt: SearchOption, newTab = false): 'navigated' | 'searched' | 'new-tab' {
+  open(opt: SearchOption, newTab = false): SearchOpenResult {
+    // The page the reader is on: Enter only closes — URL, query and fragment stay as they are.
+    if (opt.type === 'hit' && opt.current && !newTab) {
+      this.opening(opt);
+      return 'here';
+    }
     if (opt.type === 'recent' && !newTab) {
       this.searchFor(opt.term);
       return 'searched';
