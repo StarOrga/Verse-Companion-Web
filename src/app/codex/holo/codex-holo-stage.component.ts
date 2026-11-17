@@ -2190,7 +2190,7 @@ export class CodexHoloStageComponent {
         const before = this.activeViewId();
         this.akteOpen.set(false);
         this.pickSurface(nextHoloSurface(this.surface(), {
-          has3d: this.has3d(),
+          has3d: this.can3d(),
           top: this.schemaAvailable(),
           side: this.drawingAvailable(),
           front: this.frontAvailable(),
