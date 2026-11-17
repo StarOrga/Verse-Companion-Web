@@ -73,6 +73,7 @@ import {
 } from '../codex-power';
 import type { SummaryOccupant } from '../ship-summary-panels';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { AreaSymbolComponent } from '../../shared/area-symbol/area-symbol.component';
 import { CountUp } from './count-up';
 
 const GROUP_ICON: Readonly<Record<PowerGroup, string>> = {
@@ -110,7 +111,7 @@ let uidSeq = 0;
 @Component({
   selector: 'sc-codex-holo-strip',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective],
+  imports: [TranslatePipe, ScTooltipDirective, AreaSymbolComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="holo-strip" [class.open]="expanded()">
@@ -224,7 +225,7 @@ let uidSeq = 0;
       <div class="hs-row">
         @for (tile of perspectiveTiles(); track tile.perspective) {
           <div class="seg tile" [attr.data-p]="tile.perspective">
-            <span class="lab"><span class="lt">{{ tile.labelKey | translate }}</span></span>
+            <span class="lab"><sc-area-symbol class="area-sym" [area]="tile.perspective" /><span class="lt">{{ tile.labelKey | translate }}</span></span>
             <div class="tile-vals">
               @for (c of tile.cells; track c.key) {
                 <span class="tv" [class.flash]="flashKeys().has(c.key)">
@@ -246,7 +247,7 @@ let uidSeq = 0;
         }
 
         <div class="seg tile sig" data-p="signature">
-          <span class="lab"><span class="lt">{{ 'codex.holo.strip.signature' | translate }}</span></span>
+          <span class="lab"><sc-area-symbol class="area-sym" area="signature" /><span class="lt">{{ 'codex.holo.strip.signature' | translate }}</span></span>
           <div class="tile-vals">
           <span class="fact" tabindex="0" [scTooltip]="fmtM($safeNavigationMigration(irFact()?.value)) + '\u00a0m'" scTooltipTier="label">
             <span class="tip-trigger">{{ 'codex.energy.fact.ir' | translate }}</span>
@@ -330,6 +331,12 @@ let uidSeq = 0;
       .seg { display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 6px clamp(7px, 0.6vw, 11px); min-width: 0; flex: 1 1 auto; }
       .seg .lab { display: inline-flex; align-items: baseline; gap: 8px; font-family: var(--sc-font-display); font-size: max(9px, var(--sc-fs-floor));
         letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-accent); white-space: nowrap; }
+      /* Each area's symbol in its colour (#330); the label beside it stays the accent. */
+      .seg[data-p="offensive"] { --p: var(--p-offensive); }
+      .seg[data-p="defensive"] { --p: var(--p-defensive); }
+      .seg[data-p="movement"] { --p: var(--p-movement); }
+      .seg[data-p="signature"] { --p: var(--p-signature); }
+      .seg .lab .area-sym { align-self: center; color: var(--p, var(--sc-accent)); font-size: max(13px, var(--sc-fs-floor)); }
       .tile-vals { display: flex; justify-content: space-between; gap: clamp(6px, 0.5vw, 9px); flex-wrap: nowrap; }
       .tv { display: flex; flex-direction: column; gap: 1px; }
       .tv .k { font-size: max(9px, var(--sc-fs-floor)); color: var(--sc-fg-2); white-space: nowrap; }

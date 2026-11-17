@@ -4,7 +4,7 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.276.0] - 2026-11-17
+## [0.277.0] - 2026-11-17
 
 ### Added
 - Search: one row per ship. A ship's editions (Standard, Valiant, Pirate …) and your own variants are mini links of that row instead of rows of their own; the row itself opens the standard edition.
@@ -21,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Verse start: the page no longer scrolls a little further behind its second page, and the footer sits on the line of the round buttons.
 - Fleet patch overview, mission search and the maker filter no longer time out on the server.
 - Ship page: the jump to the sources opens the Akte's buy tab; in the classic header the hangar button no longer covers the Akte's tabs; Akte tiles without a picture show a neutral ring instead of a made-up ship outline.
+
+## [0.276.0] - 2026-11-17
+
+### Added
+- Codex ship pages: every loadout area has its own symbol and a top line in its area colour (offensive red, defensive blue, movement violet, signature & cooling ice cyan), in the classic view and the holo table alike; manned turrets get their own block and countermeasures a new flare symbol.
 
 ## [0.275.0] - 2026-11-17
 
