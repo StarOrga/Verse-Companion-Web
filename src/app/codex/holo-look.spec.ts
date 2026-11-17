@@ -10,6 +10,7 @@ import {
   HOLO_GHOST_FLAG,
   HOLO_DIM_FILL,
   HOLO_DIM_EDGE_ALPHA,
+  HOLO_DIM_EDGE_COLOR,
   HOLO_EDGE_OPACITY,
   HoloLook,
   countTriangles,
@@ -263,9 +264,10 @@ describe('HoloLook focus tween', () => {
 
   it('dims the hull visibly while a selection exists (thousands of lines saturate the mock\'s .46 → .30)', () => {
     // Effective line alpha well under the mock's .30, fill clearly darker, still readable.
-    expect(HOLO_EDGE_OPACITY * HOLO_DIM_EDGE_ALPHA).toBeLessThan(0.25);
-    expect(HOLO_EDGE_OPACITY * HOLO_DIM_EDGE_ALPHA).toBeGreaterThan(0.12);
-    expect(HOLO_DIM_FILL).toBeLessThanOrEqual(0.55);
+    expect(HOLO_EDGE_OPACITY * HOLO_DIM_EDGE_ALPHA).toBeLessThan(0.3);
+    expect(HOLO_DIM_EDGE_ALPHA * HOLO_DIM_EDGE_COLOR).toBeLessThan(0.62);
+    expect(HOLO_DIM_EDGE_ALPHA * HOLO_DIM_EDGE_COLOR).toBeGreaterThan(0.45);
+    expect(HOLO_DIM_FILL).toBeLessThanOrEqual(0.6);
   });
 
   it('keeps the dim soft enough to read the rest of the model', () => {

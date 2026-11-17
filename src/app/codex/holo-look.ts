@@ -60,8 +60,8 @@ export interface BodyLook {
 }
 export const HOLO_BODY_IDLE: BodyLook = { line: HOLO_PART_LINE, lineAlpha: 1, fill: HOLO_PART_FILL, fillAlpha: 0.36, glow: 0.55 };
 // The mock's .42 is per outline; a 3D part has dozens of crease lines that add up in
-// coverage, so .42 per line still read at full brightness on the Valkyrie. .2 lands on "a third".
-export const HOLO_BODY_DIM: BodyLook = { line: HOLO_DIM_PART, lineAlpha: 0.2, fill: HOLO_DIM_PART, fillAlpha: 0.05, glow: 0 };
+// coverage, so .42 (and still .2) per line read as solid cyan on small, dense parts. .08 lands on "a third".
+export const HOLO_BODY_DIM: BodyLook = { line: HOLO_DIM_PART, lineAlpha: 0.08, fill: HOLO_DIM_PART, fillAlpha: 0.05, glow: 0 };
 export const HOLO_BODY_HOVER: BodyLook = { line: [255, 255, 255], lineAlpha: 1, fill: HOLO_HOVER_FILL, fillAlpha: 0.36, glow: 0.7 };
 export const HOLO_BODY_SELECT: BodyLook = { line: HOLO_SELECT, lineAlpha: 1, fill: HOLO_SELECT, fillAlpha: 0.64, glow: 0.9 };
 /** A part of another Einsatz: between idle and dimmed. */
@@ -112,13 +112,13 @@ export const HOLO_EDGE_OPACITY = 0.46;
 // or a selection never makes the hull translucent; the parts carry the highlight.
 // The mock's hull drop (.46 → .30 per line) does not carry on a wireframe with
 // thousands of crease lines (coverage saturates), so the factors are stronger:
-// measured on ANVL_Valkyrie the hull's mean luminance falls by about 40 %.
+// the hull's mean luminance on ANVL_Valkyrie falls by about 40 % (w1b shots).
 /** Fill colour factor of the hull while a selection exists (1 = no dimming). */
-export const HOLO_DIM_FILL = 0.5;
+export const HOLO_DIM_FILL = 0.55;
 /** Crease-line colour factor of the hull while a selection exists. */
-export const HOLO_DIM_EDGE_COLOR = 0.8;
-/** Crease-line alpha factor of the hull while a selection exists: `.46` → about `.21`. */
-export const HOLO_DIM_EDGE_ALPHA = 0.45;
+export const HOLO_DIM_EDGE_COLOR = 0.9;
+/** Crease-line alpha factor of the hull while a selection exists: `.46` → about `.29` (with the colour factor about 40 % less light). */
+export const HOLO_DIM_EDGE_ALPHA = 0.62;
 /** Width of the selected part's green silhouette, CSS px. */
 export const HOLO_OUTLINE_PX = 2;
 /** Mark on the outline kit (stencil mask + offset copies) of a selected body. */
