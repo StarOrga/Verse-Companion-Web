@@ -217,6 +217,18 @@ The admin people list marks an account whose `is_approved` is false ("Nicht
 freigeschaltet") and approves it through `invite-user` (`approved_existing`);
 `set_user_role()` alone never approved anybody.
 
+**Why six such accounts sat unseen from 2026-06 to 2026-11.** The approval
+queue (`pending_access_requests()`) lists only `access_requests` rows — a form
+somebody chooses to submit, and it exists only since `20260816120000`. A direct
+Google sign-in created `auth.users` plus an unapproved profile and no request
+row, so the queue stayed empty; `list_users_for_admin()` did not return
+`is_approved`, so the people list showed the accounts as ordinary viewers; and
+nothing told an admin. **Rule:** whatever needs an admin's attention is read
+from the state itself (`profiles.is_approved`, `suspended_at`), never only from
+a parallel record the other side may or may not file. An admin-facing list of
+people always returns and shows the access state, and a new access state gets
+its marker in that list in the same change that introduces it.
+
 **Redirect URLs are part of this.** Production's allow list is exactly the
 production host plus `localhost:4200` / `127.0.0.1:4200`. A redirect URL is
 where Supabase delivers the sign-in code, so a host we do not control
