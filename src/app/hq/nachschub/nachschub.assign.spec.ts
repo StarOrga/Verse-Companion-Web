@@ -792,6 +792,131 @@ describe('NachschubService: wishes assigned to an Operation', () => {
     });
   });
 
+  describe('H3: delete an archived Operation', () => {
+    const archived = (id: string, name: string): ServerPkg => ({ id, name, status: 'archived', slot: null, snapshot: {}, archived_at: tick(), deleted_at: null, created_at: tick() });
+
+    it('removes it with its history lines, moves no wish and no slot; the undo brings it back ARCHIVED', async () => {
+      server = [archived('H3A', 'Old'), { id: 'H3N', name: 'Live', status: 'active', slot: 1, snapshot: {}, archived_at: null, deleted_at: null, created_at: tick() }];
+      await svc.reload();
+      wishFor('medpen', 3);
+      const met = supplies.put({ name: 'Medpen', qty: 2, className: 'medpen', packageId: 'H3A', source: 'wish_met', done: true });
+      const slotsBefore = svc.packages().filter((p) => p.status === 'active').map((p) => p.slot);
+      const r = await svc.removeArchived('H3A');
+      expect(r.ok).toBe(true);
+      expect(pkgNamed('Old')).toBeUndefined();
+      expect(svc.archived()).toEqual([]);
+      expect(supplies.items().some((l) => l.id === met)).toBe(false);
+      expect(wish.qty('medpen')).toBe(3);
+      expect(svc.packages().filter((p) => p.status === 'active').map((p) => p.slot)).toEqual(slotsBefore);
+      expect((await r.undo?.())?.ok).toBe(true);
+      expect(pkgNamed('Old')?.status).toBe('archived');
+      expect(pkgNamed('Old')?.slot).toBeNull();
+      expect(supplies.line(met)?.source).toBe('wish_met');
+      expect(wish.qty('medpen')).toBe(3);
+    });
+
+    it('refuses an active Operation', async () => {
+      server = [{ id: 'H3N', name: 'Live', status: 'active', slot: 1, snapshot: {}, archived_at: null, deleted_at: null, created_at: tick() }];
+      await svc.reload();
+      expect((await svc.removeArchived('H3N')).ok).toBe(false);
+      expect(pkgNamed('Live')).toBeDefined();
+    });
+  });
+
+  describe('H4: plain item / ship lines of old Operationen', () => {
+    const OLD = '2026-11-10T10:00:00.000Z';
+    const wishKind = (kind: string, className: string, qty: number) => wish.rows.update((rs) => [...rs, { kind, className, name: className, qty, forClassName: '' }]);
+    const line = (name: string, className: string, qty: number, extra: Partial<Ln> = {}) => supplies.put({ name, qty, className, packageId: 'P1', createdAt: OLD, ...extra });
+
+    beforeEach(async () => {
+      server = [
+        { id: 'P1', name: 'Plain', status: 'active', slot: 1, snapshot: {}, archived_at: null, deleted_at: null, created_at: tick() },
+        { id: 'E1', name: 'Event', status: 'active', slot: 2, snapshot: {}, type: 'event', archived_at: null, deleted_at: null, created_at: tick() },
+      ];
+      await svc.reload();
+    });
+
+    it('candidates: open plain item / ship search lines made before the cut-off; every other shape is excluded', async () => {
+      const a = line('Medpen', 'medpen', 3);
+      const b = line('Polaris', 'polaris', 1, { entityKind: 'ship' });
+      const out = [
+        line('New', 'newer', 1, { createdAt: '2026-11-17T09:00:00.000Z' }),
+        line('Blueprint', 'bolt', 1, { forClassName: 'bp_gun' }),
+        line('Gather', 'gold', 1, { gather: [{ place: 'X', qty: 1 }] as never }),
+        line('Step', 'step', 1, { stepKind: 'pickup' }),
+        line('Scu', 'ore', 1, { amount: 0.5 }),
+        line('Quality', 'steel', 1, { minQuality: 700 }),
+        line('Done', 'done', 1, { done: true }),
+        line('Wish', 'wished', 1, { source: 'wish' }),
+        line('Manual', 'manual', 1, { source: 'manual' }),
+        line('Material', 'iron', 1, { entityKind: 'material' }),
+        supplies.put({ name: 'Arrow', qty: 1, className: 'arrow', packageId: 'E1', createdAt: OLD }),
+      ];
+      expect(svc.plainSearchLinesOf('P1').map((l) => l.id).sort()).toEqual([a, b].sort());
+      expect(svc.plainSearchLinesOf('E1')).toEqual([]);
+      expect(out.length).toBe(11);
+    });
+
+    it('"Als Wünsche führen": only CAS-won lines count, ONE wishlist write per wish; the undo lowers by exactly that and relabels back', async () => {
+      wishKind('item', 'medpen', 1);
+      const a = line('Medpen', 'medpen', 3);
+      const b = line('Medpen', 'medpen', 2, { entityKind: 'item' });
+      supplies.server.set(b, 'wish'); // another device already answered this one
+      const r = await svc.adoptPlainLines('P1');
+      expect(r.ok).toBe(true);
+      expect(r.params).toEqual({ count: 1 });
+      expect(supplies.line(a)?.source).toBe('wish');
+      expect(wish.qty('medpen')).toBe(4);
+      expect(svc.plainSearchLinesOf('P1')).toEqual([]);
+      expect((await r.undo?.())?.ok).toBe(true);
+      expect(supplies.line(a)?.source).toBe('search');
+      expect(wish.qty('medpen')).toBe(1);
+      expect(svc.plainSearchLinesOf('P1').map((l) => l.id)).toEqual([a]);
+    });
+
+    it('a failed wishlist write puts the label back and shows an error; offline changes nothing', async () => {
+      wishKind('item', 'medpen', 1);
+      const a = line('Medpen', 'medpen', 3);
+      supplies.casFails = true;
+      expect((await svc.adoptPlainLines('P1')).ok).toBe(false);
+      supplies.casFails = false;
+      wish.failOn.add('medpen');
+      const r = await svc.adoptPlainLines('P1');
+      expect(r.ok).toBe(false);
+      expect(r.key).toBe('hq.nachschub.wishlistFailed');
+      expect(supplies.line(a)?.source).toBe('search');
+      expect(wish.qty('medpen')).toBe(1);
+    });
+
+    it('the 999 cap: the cut-off pieces are taken off the lines and come back with the undo', async () => {
+      wishKind('item', 'medpen', 997);
+      const a = line('Medpen', 'medpen', 5);
+      const r = await svc.adoptPlainLines('P1');
+      expect(wish.qty('medpen')).toBe(999);
+      expect(supplies.line(a)?.qty).toBe(2);
+      await r.undo?.();
+      expect(wish.qty('medpen')).toBe(997);
+      expect(supplies.line(a)?.qty).toBe(5);
+    });
+
+    it('"So lassen": the lines become manual (hint gone, survives a reload), no wish moves; failure keeps the hint; the undo gives them back', async () => {
+      wishKind('item', 'medpen', 1);
+      const a = line('Medpen', 'medpen', 3);
+      supplies.casFails = true;
+      expect((await svc.keepPlainLines('P1')).ok).toBe(false);
+      expect(svc.plainSearchLinesOf('P1').length).toBe(1);
+      supplies.casFails = false;
+      const r = await svc.keepPlainLines('P1');
+      expect(r.ok).toBe(true);
+      expect(supplies.line(a)?.source).toBe('manual');
+      expect(supplies.server.get(a)).toBe('manual');
+      expect(svc.plainSearchLinesOf('P1')).toEqual([]);
+      expect(wish.qty('medpen')).toBe(1);
+      await r.undo?.();
+      expect(supplies.line(a)?.source).toBe('search');
+    });
+  });
+
   describe('H1: the undo of a removal gives back what it took, by delta', () => {
     it('a change made in between (another tab: the line and the wish went up) survives the undo', async () => {
       wishFor('medpen', 5);
