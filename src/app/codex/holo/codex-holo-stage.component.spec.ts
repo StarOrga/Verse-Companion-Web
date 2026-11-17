@@ -10,7 +10,6 @@ import { ShipCapabilities } from '../codex-mission';
 import type { LayoutSection, LayoutSlot } from '../codex-hardpoint-layout.component';
 import type { KpiStripCell } from '../codex-kpi-sets';
 import type { HardpointFrame } from '../hardpoint-map';
-import { AnalyticsService } from '../../core/analytics.service';
 import { vi } from 'vitest';
 
 const CAPS: ShipCapabilities = { hasCargo: false, hasQuantum: true, hasMining: false, hasSalvage: false };
