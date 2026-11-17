@@ -8,6 +8,19 @@ import { estimateJob, maxTokensFor, usageCostUsd } from './_cost.ts';
 import { qaCheck } from './_qa.ts';
 import { buildSystem, requestParams, userMessage, pickSimilar, buildFewShotIndex } from './_prompt.ts';
 import { deriveAiTerms, deriveCigLabels } from './_glossary.ts';
+import { sha256HexSync } from './_sha256.ts';
+
+describe('_sha256', () => {
+  const subtle = async (s) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map((b) => b.toString(16).padStart(2, '0')).join('');
+  it('is the digest crypto.subtle gives: every length around the block borders, any script', async () => {
+    assert.equal(sha256HexSync('abc'), 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
+    assert.equal(sha256HexSync(''), 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855');
+    const texts = ['Zeile\r\nmit ~mission(Target|Name) und „Anführung“', '\ud800 lone surrogate', 'x'.repeat(200_000)];
+    for (let len = 0; len < 200; len++) texts.push('a'.repeat(len), 'ä€😀日本'.repeat(len), String.fromCharCode(...Array.from({ length: len }, (_, i) => (i * 7919 + len) % 0x7ff)));
+    for (const s of texts) assert.equal(sha256HexSync(s), await subtle(s), `length ${s.length}`);
+    assert.equal(await sha256Hex('Close'), sha256HexSync('Close'));
+  });
+});
 
 describe('_mask', () => {
   it('masks and restores every token kind', () => {

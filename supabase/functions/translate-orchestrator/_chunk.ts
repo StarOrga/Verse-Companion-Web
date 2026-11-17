@@ -73,6 +73,10 @@ export interface ChunkOptions {
   maxItems?: number;
   maxInputTokens?: number;
   idPrefix?: string;
+  /** Number of the first chunk (a plan is chunked segment by segment, its request ids run through). */
+  idStart?: number;
+  /** The model of an item, when it is known already (a post-edit keeps the model of its first attempt). */
+  modelOf?: (it: ChunkItem) => string | undefined;
 }
 
 export function toChunkItem(u: UniqueText): ChunkItem {
@@ -87,8 +91,9 @@ export function buildChunks(items: ChunkItem[], keysOf: (it: ChunkItem) => strin
   const maxItems = opts.maxItems ?? 100;
   const maxChars = Math.floor((opts.maxInputTokens ?? 30_000) / INPUT_TOK_PER_CHAR);
   const prefix = opts.idPrefix ?? 'c';
+  const idStart = opts.idStart ?? 0;
 
-  const routed = items.map((it) => ({ it, model: keysOf(it).some(isLoreKey) ? loreModel : restModel }));
+  const routed = items.map((it) => ({ it, model: opts.modelOf?.(it) ?? (keysOf(it).some(isLoreKey) ? loreModel : restModel) }));
   routed.sort((a, b) =>
     a.model === b.model ? (a.it.key < b.it.key ? -1 : a.it.key > b.it.key ? 1 : 0) : a.model < b.model ? -1 : 1
   );
@@ -101,7 +106,7 @@ export function buildChunks(items: ChunkItem[], keysOf: (it: ChunkItem) => strin
   const flush = () => {
     if (!cur.length) return;
     chunks.push({
-      id: `${prefix}${chunks.length}`,
+      id: `${prefix}${idStart + chunks.length}`,
       model,
       items: cur,
       inputChars: chars,

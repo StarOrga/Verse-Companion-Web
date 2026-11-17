@@ -39,33 +39,81 @@ export function containsStem(text: string, target: string): boolean {
   return text.toLowerCase().includes(stem);
 }
 
-/** Only entries an admin/CIG put in, or do-not-translate names, are enforced; AI entries are advice. */
-export function glossaryFailures(en: string, out: string, glossary: QaGlossaryRow[]): string[] {
-  const failed: string[] = [];
-  for (const g of glossary) {
-    if (!g.source_term || !g.target_term) continue;
+const TOKEN_RE = /[\p{L}\p{N}]+/gu;
+
+/**
+ * A glossary prepared for many strings. Checking a string against every row costs a regular
+ * expression per row and string - 3 000 strings against 2 000 rows are six million of them, more
+ * than a request has. The index finds the few rows a string can touch: labels by the whole string,
+ * terms by their first word (a term that matches as a whole has its first word as a whole word of
+ * the text).
+ */
+export interface QaIndex {
+  /** Enforced rows in glossary order, with the position they had. */
+  labels: Map<string, { at: number; g: QaGlossaryRow }[]>;
+  byToken: Map<string, { at: number; g: QaGlossaryRow; re: RegExp }[]>;
+  /** Terms without a letter or digit: checked for every string. */
+  loose: { at: number; g: QaGlossaryRow; re: RegExp }[];
+}
+
+const termRe = (term: string) => new RegExp(`(?<![\\p{L}\\p{N}])${escapeRe(term)}(?![\\p{L}\\p{N}])`, 'iu');
+
+export function qaIndex(glossary: QaGlossaryRow[]): QaIndex {
+  const idx: QaIndex = { labels: new Map(), byToken: new Map(), loose: [] };
+  glossary.forEach((g, at) => {
+    if (!g.source_term || !g.target_term) return;
+    // Only entries an admin/CIG put in, or do-not-translate names, are enforced; AI entries are advice.
     const enforced = g.locked || g.origin === 'admin' || g.origin === 'cig' || g.category === 'dnt';
-    if (!enforced) continue;
+    if (!enforced) return;
     if (g.category === 'label') {
-      // Labels are whole-string pairs ("Item Type:" → "Gegenstand:").
-      if (en.trim().toLowerCase() === g.source_term.trim().toLowerCase() &&
-          out.trim().toLowerCase() !== g.target_term.trim().toLowerCase()) {
-        failed.push(`glossary:${g.source_term}`);
-      }
-      continue;
+      const k = g.source_term.trim().toLowerCase();
+      const list = idx.labels.get(k);
+      if (list) list.push({ at, g });
+      else idx.labels.set(k, [{ at, g }]);
+      return;
     }
-    if (!containsTerm(en, g.source_term)) continue;
-    const ok = g.category === 'dnt' ? out.toLowerCase().includes(g.target_term.toLowerCase()) : containsStem(out, g.target_term);
-    if (!ok) failed.push(`glossary:${g.source_term}`);
+    const row = { at, g, re: termRe(g.source_term) };
+    const tok = g.source_term.toLowerCase().match(TOKEN_RE)?.[0];
+    if (!tok) {
+      idx.loose.push(row);
+      return;
+    }
+    const list = idx.byToken.get(tok);
+    if (list) list.push(row);
+    else idx.byToken.set(tok, [row]);
+  });
+  return idx;
+}
+
+/** Only entries an admin/CIG put in, or do-not-translate names, are enforced; AI entries are advice. */
+export function glossaryFailures(en: string, out: string, glossary: QaGlossaryRow[] | QaIndex): string[] {
+  const idx = Array.isArray(glossary) ? qaIndex(glossary) : glossary;
+  const hits: { at: number; code: string }[] = [];
+  // Labels are whole-string pairs ("Item Type:" → "Gegenstand:").
+  for (const { at, g } of idx.labels.get(en.trim().toLowerCase()) ?? []) {
+    if (out.trim().toLowerCase() !== g.target_term.trim().toLowerCase()) hits.push({ at, code: `glossary:${g.source_term}` });
   }
-  return failed;
+  const cands: QaIndex['loose'] = [...idx.loose];
+  if (idx.byToken.size) {
+    for (const tok of new Set(en.toLowerCase().match(TOKEN_RE) ?? [])) {
+      const list = idx.byToken.get(tok);
+      if (list) for (const r of list) cands.push(r);
+    }
+  }
+  for (const { at, g, re } of cands) {
+    if (!re.test(en)) continue;
+    const ok = g.category === 'dnt' ? out.toLowerCase().includes(g.target_term.toLowerCase()) : containsStem(out, g.target_term);
+    if (!ok) hits.push({ at, code: `glossary:${g.source_term}` });
+  }
+  // Glossary order, as a walk over the rows would report them.
+  return hits.sort((a, b) => a.at - b.at).map((h) => h.code);
 }
 
 /**
  * Checks a model output (still masked) against its source. `toks` are the source's
- * original tokens; `en` is the unmasked English.
+ * original tokens; `en` is the unmasked English. Pass a `qaIndex` when many strings are checked.
  */
-export function qaCheck(en: string, outMasked: string, toks: string[], glossary: QaGlossaryRow[] = []): QaResult {
+export function qaCheck(en: string, outMasked: string, toks: string[], glossary: QaGlossaryRow[] | QaIndex = []): QaResult {
   const reasons: string[] = [];
   const text = unmask(outMasked, toks);
   if (!outMasked.trim()) reasons.push('empty');
