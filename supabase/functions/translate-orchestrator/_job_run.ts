@@ -253,6 +253,12 @@ export const judgeCount = (ok: number) => (ok ? Math.min(JUDGE_CAP, Math.max(Mat
 export async function stepQueued(deps: Deps, job: Job): Promise<void> {
   const settings = await deps.db.getSettings();
   if (!settings.enabled) return;
+  if (!job.stats?.plan?.chunks) {
+    // Planned under an older layout of the plan, or without one: nothing was sent yet, so the job is
+    // estimated again instead of submitting requests it cannot read.
+    await deps.db.cas(job, { status: 'estimating', stats: addStats(job, { est: undefined, plan: undefined, hold: undefined }) });
+    return;
+  }
   requireLlm(deps);
   if (!job.approved_by && job.mode !== 'full') {
     const committed = await deps.db.monthCommitted(monthOf(deps.now()), job.id);

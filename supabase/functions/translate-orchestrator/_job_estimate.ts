@@ -193,10 +193,15 @@ const emptyCounts = (): DiffCounts => ({ keys: 0, cig: 0, blank: 0, tm: 0, force
 
 const est = (_job: Job, e: EstState, more: Partial<Stats> = {}): Partial<Stats> => ({ est: e, ...more });
 
+const PHASES: string[] = ['adm', 'rows', 'diff', 'prep', 'chunk', 'shots', 'clean', 'complete'] satisfies EstState['phase'][];
+
 /** One slice of the estimate. Returns the job after its compare-and-set (LostRace when it lost). */
 export async function estimateSlice(deps: Deps, job: Job): Promise<Job> {
   const { store } = deps;
-  const e: EstState = job.stats?.est ?? { phase: job.mode === 'delta' && deps.alerts ? 'adm' : 'rows', cursor: 0, total: 0 };
+  // A position this code does not know (a job that began under an older layout of the estimate) is
+  // no position: the estimate begins again. It costs nothing, and going on would guess.
+  const known = job.stats?.est && PHASES.includes(job.stats.est.phase) ? job.stats.est : undefined;
+  const e: EstState = known ?? { phase: job.mode === 'delta' && deps.alerts ? 'adm' : 'rows', cursor: 0, total: 0 };
 
   if (e.phase === 'adm') {
     const have = await loadTmAdmin(store, job.lang);

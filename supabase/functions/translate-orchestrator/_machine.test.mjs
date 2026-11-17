@@ -729,3 +729,29 @@ describe('publishing beside other writers', () => {
     assert.deepEqual(asked, ['Close the door']);
   });
 });
+
+describe('jobs that began under an older layout', () => {
+  it('an estimate at a position this code does not know begins again and ends with the right plan', async () => {
+    const w = world();
+    const j = await newJob(w);
+    const cur = w.jobs.get(j.id);
+    w.jobs.set(j.id, { ...cur, stats: { est: { phase: 'scan', cursor: 8, total: 20 } } });
+    await run(w, TERMINAL);
+    const job = w.jobs.get(j.id);
+    assert.equal(job.status, 'published', job.error);
+    assert.deepEqual([job.stats.counts.todo, job.string_count], [3, 3]);
+  });
+
+  it('a queued job without a plan of this layout is estimated again, nothing is sent blind', async () => {
+    const w = world();
+    const j = await newJob(w);
+    const cur = w.jobs.get(j.id);
+    w.jobs.set(j.id, { ...cur, status: 'queued', estimate_usd: 1, string_count: 3, stats: { counts: { todo: 3 } } });
+    await tickAll(w.deps, { fast: true, sliceBudgetMs: 0 });
+    assert.equal(w.llm.batches.length, 0);
+    assert.equal(w.jobs.get(j.id).status, 'estimating');
+    await run(w, TERMINAL);
+    assert.equal(w.jobs.get(j.id).status, 'published', w.jobs.get(j.id).error);
+    assert.equal(w.llm.batches.filter((b) => b.requests[0].custom_id.startsWith('c')).length, 1);
+  });
+});
