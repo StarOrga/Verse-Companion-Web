@@ -1145,7 +1145,9 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .holo-topbar { grid-template-columns: auto minmax(0, 1fr); }
   .ht-left { grid-column: 1 / -1; }
   .ht-centre { justify-self: start; }
-  .ht-right { justify-content: flex-end; }
+  /* Its own row: beside the Einsatz box the hangar button (48 px tall, no shrink on touch)
+     ran 53–61 px past a 375 px phone and the page scrolled sideways. */
+  .ht-right { grid-column: 1 / -1; justify-content: flex-end; }
   .holo-body { gap: 10px; }
   .table-head { flex-wrap: wrap; gap: 6px; padding: 0; }
   .holo-below { grid-template-columns: 1fr; }
