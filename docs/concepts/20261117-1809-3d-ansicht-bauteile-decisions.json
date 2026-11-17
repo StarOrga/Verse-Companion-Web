@@ -1,0 +1,28 @@
+[
+  {
+    "iteration": 1,
+    "template": "design",
+    "action": "implement",
+    "submitted_at": "2026-11-17",
+    "favorite": "d1 (Leuchtkörper)",
+    "decisions": {
+      "r1-diag": { "label": "Diagnose Helligkeit", "value": "ok", "meaning": "Diagnosis confirmed: the see-through mode goes, the hull always occludes its own back side." },
+      "r1-scope": { "label": "Geltung", "value": ["stage", "hero", "landing"], "meaning": "Holo stage and hero preview get base look + states; the Codex landing holotable gets the base look only. 2D schema views are out." },
+      "r1-target": { "label": "Klickziel", "value": "yes", "meaning": "The part itself takes hover and click, with an invisible minimum hit area." },
+      "r1-touch": { "label": "Erster Tipp", "value": "select", "meaning": "The first tap selects at once." },
+      "r1-deselect": { "label": "Rückwege", "value": ["empty", "panel", "esc", "again"], "deviates": true, "note": "kein sichtbares x an der auswhal bitte", "meaning": "Click on empty space, the panel's back control, Escape and a second click on the selected part clear the selection. No visible close cross at the selection." },
+      "r1-after": { "label": "Panel nach Abwahl", "value": "list", "deviates": true, "meaning": "After deselecting, the side panel shows the list of all parts, as today." },
+      "r1-spin": { "label": "Drehung", "value": "hover", "meaning": "The turntable holds while the pointer is over the model and while a part is selected." }
+    },
+    "annotations": [
+      { "id": "r1-d1-s1-a1", "question": "Eisweiß ist als Auswahlton vorbelegt. […] Welcher trägt für dich, auch dein Grün?", "answer": "nicht auswählbar machen, wir machen grün" },
+      { "id": "r1-d1-s1-a2", "question": "Bei einer Auswahl sinken die anderen Bauteile auf etwa ein Drittel. Sind sie zum Wechseln noch gut genug zu sehen?", "answer": "ja gut" }
+    ],
+    "userPins": [
+      { "design": "d1", "screen": "r1-d1-s1 (Schiffsseite)", "target": "selected part", "text": "wen man nochmal draufklickt, sollte es wieder entsdelektieren!" },
+      { "design": "d1", "screen": "r1-d1-s1 (Schiffsseite)", "target": "swatch \"Grün\"", "text": "grün entspricht auch dem r wechsel in sc, also nehmen wir grün" },
+      { "design": "d1", "screen": "r1-d1-s2 (Telefon)", "target": "stage", "text": "gut und auch horizontal machen können" }
+    ],
+    "not_chosen": ["d2 Röntgen-Fokus", "d3 Etiketten", "visible close cross at the selection", "panel returns to the origin tab", "2D schema views"]
+  }
+]
