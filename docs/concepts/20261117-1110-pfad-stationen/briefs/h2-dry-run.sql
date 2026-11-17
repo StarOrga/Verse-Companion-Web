@@ -76,6 +76,9 @@ create trigger hq_supplies_c_met_guard
   before update on public.hq_supplies
   for each row execute function public.hq_supplies_keep_met();
 
+-- PostgREST learns the new function right away (a new rpc answers PGRST202 until its schema cache reloads).
+notify pgrst, 'reload schema';
+
 -- ===========================================================================
 -- setup (as the owner role): five throwaway rows for an existing user
 -- ===========================================================================

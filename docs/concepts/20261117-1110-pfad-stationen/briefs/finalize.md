@@ -21,7 +21,7 @@ Orchestrator's findings (verify the one assumption each rests on, then build):
 - `wish_met -> wish` is ALSO the legitimate way back: a met line that is unticked or restored by an undo is moved
   back by `casSource(ids, 'wish_met', 'wish')` and the wish is raised once (see the comment of the fulfil pass in
   `nachschub.service.ts`, "A `wish_met` line that is open again ... gives the pieces back the same way", and the
-  migration `20261117120000_hq_supplies_source_wish.sql`). A trigger that refuses the transition outright breaks
+  migration `20261117155000_hq_supplies_source_wish.sql`). A trigger that refuses the transition outright breaks
   that. The server must tell the deliberate compare-and-set apart from a stale full-row upsert.
 - Direction (free to improve, not to weaken): a small SQL function for the compare-and-set that marks its own
   transaction (`set_config(..., true)`), called by `casSource` through `rpc`; a `before update` trigger on
