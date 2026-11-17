@@ -231,6 +231,28 @@ mail): that the hook's event carries `app_metadata.provider` and
 legitimate, allowlisted person is refused with `signup_not_allowed`, look
 there first; an invite mail is the way in meanwhile.
 
+## Atomic run claims for public cron endpoints (`claim_run`)
+
+Audit 2026-11-16. Edge functions with `verify_jwt = false` that pg_cron calls with the publishable key are open to
+anyone, and a read-then-insert throttle lets N parallel POSTs all pass. `public.claim_run(p_name text, p_min_interval
+interval) returns boolean` (migration `20261116100000_claim_run.sql`, pgTAP `claim_run.test.sql`) is ONE
+`insert ... on conflict (mode) do update ... where last_run_at <= now - interval returning true` on the existing
+`guard_runs` table: the first caller gets `true`, a concurrent one waits on the row lock, re-checks the committed row and
+gets `false`. SECURITY DEFINER, `search_path = ''`, EXECUTE for `service_role` only. A claim expires by time alone, so a
+crashed run blocks at most one interval. TS wrapper: `_shared/claim-run.ts` (`claimRun(db, name, minMs)`), **fails
+closed** (rpc missing or erroring = nobody runs), so push the migration before deploying the functions.
+
+| Function | Claim name | Interval |
+|---|---|---|
+| `sc-events-sync` | `sc-events-sync` | 5 min |
+| `sc-event-sheet` (automatic mode only; targeted/backfill are privileged) | `sc-event-sheet:auto` | 10 min |
+| `patch-teaser` sweep | `patch-teaser:sweep` (one Spectrum lookup), `patch-teaser:<version>` (one model call per version) | 5 min / 6 h |
+| `translate-orchestrator` `sync_sources` by the public key (service key and admins bypass) | `translate-orchestrator:sync_sources` | 6 h |
+
+Role checks in edge functions use `rpc('is_admin')` / `rpc('is_collaborator')` on the CALLER's client (they read
+`auth.uid()` and honour `is_approved` / `suspended_at`), never `profiles.role`. Secrets compare with
+`_shared/safe-equal.ts` (constant time); an unverified `role` claim in a JWT is never a credential.
+
 ## Protected admin accounts (`protected_admins`)
 
 Threat model (admin_feedback #83): a **compromised admin account** must not be able to

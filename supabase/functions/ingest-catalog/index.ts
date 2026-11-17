@@ -117,6 +117,7 @@ import { CLEAR_OP_TABLES, isLegacyNatkeyConflict, isRebuildUnavailable, prepareR
 import type { RebuildPlan } from './_rebuild.ts';
 import { copyBuildLocales } from './_locale-copy.ts';
 import { withPosthog } from '../_shared/posthog.ts';
+import { safeEqual } from '../_shared/safe-equal.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -481,7 +482,7 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
   const releaseToken = req.headers.get('x-sc-release-token');
 
   let authed = false;
-  if (authHeader && authHeader === `Bearer ${serviceKey}`) {
+  if (authHeader && serviceKey && safeEqual(authHeader, `Bearer ${serviceKey}`)) {
     authed = true;
   } else if (seedToken) {
     const { data: tok } = await admin
@@ -504,10 +505,9 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
     });
     const { data: { user } } = await userClient.auth.getUser();
     if (!user) return json({ error: 'unauthorized' }, 401);
-    const { data: profile } = await userClient
-      .from('profiles').select('role').eq('id', user.id).maybeSingle();
-    const role = (profile as { role?: string } | null)?.role ?? '';
-    if (!['admin', 'collaborator'].includes(role)) return json({ error: 'forbidden' }, 403);
+    // is_collaborator(): approved + not suspended; asked with the caller's own client (reads auth.uid()).
+    const { data: isCollaborator } = await userClient.rpc('is_collaborator');
+    if (isCollaborator !== true) return json({ error: 'forbidden' }, 403);
     if (!releaseToken) return json({ error: 'missing_release_token' }, 400);
     // is_current was dropped by the desktop-channels migration; a known,
     // non-revoked token is valid (mirrors desktop-latest / ingest-bundle).
