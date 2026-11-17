@@ -4,6 +4,19 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.278.0] - 2026-11-17
+
+### Changed
+- 3D view of a ship: the picture keeps the same brightness from every angle and no longer turns see-through when a part is hovered or selected.
+- 3D view: clickable parts glow as their own bodies, also through the hull, and take hover and click themselves; the small rings are gone.
+- 3D view: a selected part is green with an outline, a short pulse and a name tag, while the hull and the other parts dim. The other parts stay clickable.
+
+### Added
+- 3D view: leave a selection with a second click on the part, a click into empty space, Escape or "Alle Bauteile" in the side panel. Works with the keyboard and on a phone in portrait and landscape.
+
+### Fixed
+- 3D view: a selected part no longer hides under a coloured halo, and the ship no longer flares up when something is selected.
+
 ## [0.277.3] - 2026-11-17
 
 ### Fixed

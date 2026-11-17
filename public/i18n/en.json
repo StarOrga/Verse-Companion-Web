@@ -1007,7 +1007,7 @@
           "changes": "Changes"
         },
         "backToParts": "All parts",
-        "backHint": "Back to the list (Esc)",
+        "backHint": "Clears the selection in the model (Esc)",
         "partsTotal": "{{n}} parts",
         "partSize": "Size",
         "partGrade": "Grade",
@@ -2701,7 +2701,6 @@
         "open": "Open {{name}} in the Codex",
         "prev": "Previous slot",
         "next": "Next slot",
-        "close": "Clear selection",
         "emptySlot": "Free slot"
       },
       "allParts": "All parts",
