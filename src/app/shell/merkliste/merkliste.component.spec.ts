@@ -26,6 +26,7 @@ function mount(items: CartItem[]) {
     open: vi.fn().mockName('open').mockResolvedValue(true),
     setQty: vi.fn().mockName('setQty').mockResolvedValue(true),
     remove: vi.fn().mockName('remove'),
+    flashed: signal<string | null>(null),
   };
   const svc = { refresh: vi.fn().mockName('refresh'), cartHref: signal('/codex/index?cart=1') };
   const track = vi.fn().mockName('track');
