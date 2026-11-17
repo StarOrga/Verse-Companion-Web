@@ -86,7 +86,7 @@ export const EVENTS = {
   'hq:plan_create': ev<{ steps: number }>('hq', 'Ein Einsatz wurde geplant (Anzahl Schritte).'),
   'hq:plan_update': ev<{ change: 'status' | 'step' | 'remove' }>('hq', 'Ein Einsatz wurde geändert (Status, Schritt oder entfernt).'),
   'hq:inventory_add': ev<{ unit: 'pcs' | 'scu' }>('hq', 'Ein Bestand wurde ins Inventar gebucht.'),
-  'hq:supply_add': ev<{ qty: number }>('hq', 'Ein Nachschub-Posten wurde angelegt.'),
+  'hq:supply_add': ev<{ qty: number }>('hq', 'Ein Posten einer Operation wurde angelegt.'),
   'hq:wish_add': ev<{ kind: string }>('hq', 'Ein Eintrag wurde zu den Wünschen gelegt.'),
   'hq:wishlist_open': ev<{ surface: 'popout' | 'cart' }>('hq', 'Die Wünsche wurden geöffnet (Popout in der Kopfzeile oder großes Fenster).'),
   'hq:wish_search_open': ev<{ surface: 'popout' | 'cart' }>('hq', 'Aus den leeren Wünschen heraus wurde die Suche geöffnet.'),
