@@ -4,7 +4,7 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.273.0] - 2026-11-16
+## [0.273.0] - 2026-11-17
 
 ### Added
 - An empty wish list now shows a night sky and "Wunsch suchen": it opens the search of the page you are on, with the cursor already in the field.
