@@ -8112,7 +8112,7 @@
       "current": "You are here",
       "variants": "Variants",
       "variantsMore": "+{{n}}",
-      "variantsMoreAria": "{{n}} more variants in the hangar",
+      "variantsMoreAria": "{{n}} more variants on the ship page",
       "variantCurrent": "This variant is open right now",
       "patch": "Patch {{line}}",
       "patchMeta": "Patch note · {{version}}",
