@@ -583,7 +583,8 @@ describe('ending a job that has batches', () => {
     await until(w, () => w.jobs.get(j.id).stats?.phase === 'running');
     const estimate = w.jobs.get(j.id).estimate_usd;
     await cancel(w.deps, j.id);
-    assert.deepEqual(w.ledger.map((r) => [r.ref, r.usd]), [['unread', estimate]]);
+    // Under the ref the read of that batch would have used: a bill that is there already is not doubled.
+    assert.deepEqual(w.ledger.map((r) => [r.ref, r.usd]), [['main:0', estimate]]);
 
     // Nothing was sent: nothing is booked.
     const w2 = world({ settings: { upload_cap_usd: 0 } });

@@ -86,7 +86,7 @@
     <summary>🛠 {{final.dev_fold}}</summary>
     <ul class="fr-dev">
       <li>Branch <code>claude/batch-82d91f</code> · Bereiche: codex/holo, codex/search, shell, verse, data-uploader, supabase, i18n, posthog</li>
-      <li><code>src/app/codex/search/search-families.ts</code>, <code>data-uploader/src/lib/auto-run.ts</code>, <code>supabase/migrations/20261117164700_verse_constellation_auto_pick.sql</code></li>
+      <li><code>src/app/codex/search/search-families.ts</code>, <code>data-uploader/src/lib/auto-run.ts</code>, <code>supabase/migrations/20261117204000_verse_constellation_auto_pick.sql</code></li>
       <li>Tests: Web 7180 grün, Uploader 659, Functions 646, Gate 167 · typecheck, lint, build, Subtheme-Guard grün · zwei unabhängige Prüfungen: <code>checks/implement-qa.md</code>, <code>checks/implement-qa-2.md</code></li>
       <li>Im Abschluss gebaut: <code>supabase/migrations/20261117203000_rpc_statement_timeouts.sql</code> (Flotten-Patch 4,6 s → unter 1 s, Missionssuche 10 s → 0,6 s, Hersteller-Filter 4,6 s → 0,3 s; gleiche Ergebnisse) · neutraler Ring in <code>codex-holo-akte.component.ts</code></li>
       <li>Reihenfolge beim Shippen: beide Migrationen, <code>notify pgrst, 'reload schema'</code> und <code>ingest-catalog</code> vor dem nächsten Uploader-Release (Ledger-Abgleich über Kanal und Build) · Ursachen: Footer = <code>scroll-margin-top</code> 80 px am Hub zusätzlich zum Seitenabstand · 4.10.0 = erster Treffer im Manifest war der Branch-Name; 4.10.3 steht im Launcher-Log beim Build 13165946 · Sternenkarte = gespeicherte Klasse wurde zur Variante</li>

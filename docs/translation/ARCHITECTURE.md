@@ -28,7 +28,11 @@ Decided in the concept `docs/concepts/2026-10-29-ki-spieluebersetzung.html`
 - **Budget.** `upload_cap_usd` (default **20**) per upload, summed over all its
   languages; `monthly_cap_usd` (default **190**, the Max-20x monthly API credit minus a
   reserve) as a hard ledger per calendar month. An estimate above either cap parks the
-  job as `awaiting_approval`; an admin approves or cancels it. Translation runs on its
+  job as `awaiting_approval`; an admin approves or cancels it. While a job runs, its real
+  spend is held against its budget (estimate plus a quarter) and the month's ledger: a
+  large job reads its first batch group before it sends the rest and waits again when
+  that group cost more than estimated, and the judge sample and second attempts are
+  left out once the money is spent (OPERATIONS.md, "What a job may spend"). Translation runs on its
   own secret `TRANSLATE_ANTHROPIC_API_KEY` (own Console workspace with a spend limit,
   auto-reload off), never the key `sc-events-sync` uses.
 - **Models (tiered).** Lore / missions / dialogue keys (prefix regex

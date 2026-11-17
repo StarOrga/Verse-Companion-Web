@@ -1,5 +1,5 @@
 -- ============================================================
--- 20261117164700_verse_constellation_auto_pick.sql
+-- 20261117204000_verse_constellation_auto_pick.sql
 -- The star map's ship is chosen by a server-side rule, and a choice that stops
 -- being eligible heals itself (concept batch 2026-11-17, B4, C20-C22).
 --

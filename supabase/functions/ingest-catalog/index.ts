@@ -790,7 +790,7 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
         return msg.includes('could not find the table') || msg.includes('does not exist') ||
           code === 'PGRST205' || code === '42P01';
       };
-      // Server-side rule (migration 20261117164700): keep every hull's stars, then
+      // Server-side rule (migration 20261117204000): keep every hull's stars, then
       // verse_constellation_lock heals stored lines and locks this line's first
       // pick (new ships of the patch line, else the newest of the last line that
       // had some; never a variant / display / mission copy). Old uploaders send

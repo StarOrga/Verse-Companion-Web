@@ -168,7 +168,7 @@ describe('candidateRowChunks', () => {
 });
 
 describe('isMissingServerRule', () => {
-  it('recognises a database without the 20261117164700 migration', () => {
+  it('recognises a database without the 20261117204000 migration', () => {
     assert.equal(isMissingServerRule({ code: 'PGRST202', message: 'Could not find the function public.verse_constellation_lock' }), true);
     assert.equal(isMissingServerRule({ code: 'PGRST205', message: 'Could not find the table' }), true);
     assert.equal(isMissingServerRule({ code: '42P01', message: 'relation does not exist' }), true);

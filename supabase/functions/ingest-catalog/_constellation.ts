@@ -1,6 +1,6 @@
 // Verse-hub constellation: pure helpers for the `constellation` op.
 //
-// Since 20261117164700 the CHOICE lives in SQL (verse_constellation_lock /
+// Since 20261117204000 the CHOICE lives in SQL (verse_constellation_lock /
 // verse_constellation_pick): index.ts stores every candidate in
 // verse_constellation_candidates and calls the RPC, which also heals stored
 // lines whose class stopped being eligible. pickNewest below is only the

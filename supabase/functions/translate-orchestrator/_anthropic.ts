@@ -28,15 +28,18 @@ export function makeLlm(apiKey: string): Llm {
       const b = await client.messages.batches.retrieve(id, { timeout: ASK_TIMEOUT_MS });
       return b.processing_status === 'ended';
     },
-    async *results(id): AsyncGenerator<BatchResult> {
+    async *results(id, opts): AsyncGenerator<BatchResult> {
       // Results arrive in any order: the caller keys on custom_id.
       // One ledger row per result (Batch rate, usageCostUsd), written in one go once the stream ends.
+      // A read that only looks at the bill (`record: false`) logs nothing: the batch is read again
+      // later, usually by another worker, and would be in the call log twice.
+      const record = opts?.record !== false;
       const rows: AiCallRow[] = [];
       try {
         for await (const row of await client.messages.batches.results(id)) {
           const r = row.result;
-          const fresh = !booked.has(id + ':' + row.custom_id);
-          booked.add(id + ':' + row.custom_id);
+          const fresh = record && !booked.has(id + ':' + row.custom_id);
+          if (record) booked.add(id + ':' + row.custom_id);
           if (r.type !== 'succeeded') {
             if (fresh) rows.push({ function: 'translate-orchestrator', model: 'unknown', latency_ms: 0, ok: false, error: r.type });
             yield { custom_id: row.custom_id, type: r.type };
