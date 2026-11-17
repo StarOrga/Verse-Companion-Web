@@ -461,6 +461,23 @@ describe('star map components', () => {
     expect(f.nativeElement.querySelector('sc-guess-track')).toBeNull();
   });
 
+  it('the guess rail explains an empty options load instead of seven ghost tokens', async () => {
+    const open = { state: 'open', guessedClass: null, answerClass: null, answerName: null } as const;
+    (TestBed.inject(VerseApiService).guessOptions as Mock).mockResolvedValueOnce({
+      ok: true,
+      data: { patchLine: '4.4', ...open, state: 'unavailable', options: [] },
+    });
+    explorer.set({ ...STATE, patches: [patch('4.4', 2, { guess: open }), ...STATE.patches.slice(1)] });
+    const f = TestBed.createComponent(ExplorerPageComponent);
+    f.detectChanges();
+    await f.whenStable();
+    f.detectChanges();
+    const track = f.nativeElement.querySelector('sc-guess-track') as HTMLElement;
+    expect(track.querySelectorAll('.tok.ship').length).toBe(0);
+    expect(track.querySelector('.none')?.textContent).toContain('starmap.guess.foot.unavailable');
+    expect(track.querySelector('.head b')?.textContent).toContain('starmap.guess.head.unavailable');
+  });
+
   it('undo after a guess reverts the pick and never sends it', async () => {
     const open = { state: 'open', guessedClass: null, answerClass: null, answerName: null } as const;
     explorer.set({ ...STATE, patches: [patch('4.4', 2, { guess: open }), ...STATE.patches.slice(1)] });

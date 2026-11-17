@@ -23,10 +23,22 @@ import {
   polyMatchScore,
 } from '../codex-poly-search';
 import { kindRank, type SearchContext } from '../../shell/fusion-bar/search-context';
-import { CodexSearchGroup, SearchTarget, hitTarget, indexTarget } from './codex-search-model';
+import {
+  CodexSearchGroup,
+  PageLocation,
+  SearchTarget,
+  hitTarget,
+  indexTarget,
+  ShipVariantsOf,
+  isCurrentTarget,
+  isNearExactHit,
+  markVariants,
+} from './codex-search-model';
+import { recordScore, searchScore } from '../codex-search';
 import { CtaRow, resolveCta, resolveIcons } from './search-cta';
 import type { SearchFit } from './search-compat';
 import { OwnSearchResult, ownMoreTarget } from './search-own';
+import { otherMemberMatched } from './search-families';
 import { withOptionCounts } from './search-query-parse';
 import {
   NO_SIGNALS,
@@ -74,6 +86,15 @@ export interface ComposeInput {
   ownSet?: boolean;
   /** Value → count over the rows read WITHOUT size/grade chips; fills the chip menus. */
   facets?: { size: Record<string, number>; grade: Record<string, number> } | null;
+  /** The page the reader stands on: its row is hidden (weak match) or greyed (near-exact), never offered as a way there. */
+  here?: PageLocation | null;
+  /**
+   * The mini links of a ship row per class — the family's other models, then the reader's own
+   * variants: a catalog ship row and its own rows become ONE row (C11).
+   */
+  ownVariants?: ShipVariantsOf;
+  /** The family base (lower case) of a ship class; own rows of any model fold into the family row. */
+  shipBaseOf?: (classNameSlug: string) => string;
 }
 
 /** The chip a hit fails, or null when it is inside every chip. */
@@ -274,6 +295,26 @@ export function composeSearchResult(input: ComposeInput): SearchResult {
     };
   }
 
+  // ── one row per ship page (C11): the own rows of a listed hull fold into its catalog row ──
+  if (input.ownVariants) {
+    const folded = foldShipRows(groups, outside, input.ownVariants, input.shipBaseOf);
+    groups.splice(0, groups.length, ...folded.groups);
+    outside = folded.outside;
+    groups.forEach((g, i) => {
+      g.reason = groupReason(g, i, ctx);
+    });
+  }
+
+  // ── the current page (note 4): hidden or greyed, never an empty panel ─────
+  if (input.here) {
+    const ruled = applyCurrentRows(groups, outside, term, input.here);
+    groups.splice(0, groups.length, ...ruled.groups);
+    outside = ruled.outside;
+    groups.forEach((g, i) => {
+      g.reason = groupReason(g, i, ctx);
+    });
+  }
+
   // ── chip menus: counts per value ──────────────────────────────────────────
   const kindTotals: Record<string, number> = {};
   for (const g of input.groups) kindTotals[g.kind] = g.total;
@@ -294,6 +335,149 @@ export function composeSearchResult(input: ComposeInput): SearchResult {
     empty: groups.length === 0 && !outside,
     filteredOut,
   };
+}
+
+// ── "Du bist hier" (concept 2026-11-17, note 4) ─────────────────────────────
+
+/** The term names the row nearly exactly — a hit by its score 4, every other row by its title. */
+export function isNearExactRow(term: string, row: SearchResultRow): boolean {
+  if (!term.trim()) return false;
+  switch (row.type) {
+    case 'hit':
+      return isNearExactHit(term, row.hit);
+    case 'own': {
+      const rest = row.title.includes(' ') ? row.title.slice(row.title.indexOf(' ') + 1) : null;
+      return recordScore(term, [row.title, row.ownName, rest], [row.classNameSlug]) === 4;
+    }
+    default:
+      return searchScore(term, row.title) === 4;
+  }
+}
+
+/** The greyed "Du bist hier" row: name and hint only — no CTA, no icons, no fit badge. */
+function asCurrent(row: SearchResultRow): SearchResultRow {
+  const base = { ...row, current: true as const, cta: null, icons: { ...NO_ICONS } };
+  return base.type === 'hit' ? { ...base, fit: null } : base;
+}
+
+/** Mark the variant mini link that is open on the page. */
+function withVariantState(row: SearchResultRow, here: PageLocation): SearchResultRow {
+  if ((row.type !== 'hit' && row.type !== 'own') || !row.variants?.length) return row;
+  return { ...row, variants: markVariants(row.variants, here) };
+}
+
+
+/**
+ * One row per ship page (C11, the reader's words: "ein eintrag mit mini textlinks zu varianten").
+ * A catalog ship row (`/codex/ship/<class>`, the stock ship) and every own ship / own variant row
+ * of the same class become ONE row: the catalog row, carrying the reader's variants of that class
+ * as mini links, at the better reading position of its parts (the own row's slot when the own
+ * group stands first). A hull with a page of its own (Gladius Valiant, Pirate) has another class,
+ * so it stays its own row; items and liveries are no ship rows. An own row whose hull is not
+ * listed stays an own row. Group totals stay the sources' sums.
+ */
+export function foldShipRows(
+  groups: readonly SearchResultGroup[],
+  outside: SearchResultGroup | null,
+  variantsOf: ShipVariantsOf,
+  baseOf: (classNameSlug: string) => string = (c) => c.toLowerCase(),
+): { groups: SearchResultGroup[]; outside: SearchResultGroup | null } {
+  const slugOf = (r: SearchResultRow): string | null =>
+    r.type === 'hit' ? (r.hit.kind === 'ship' ? baseOf(r.hit.classNameSlug) : null)
+      : r.type === 'own' && (r.ownKind === 'ship' || r.ownKind === 'config') && r.classNameSlug ? baseOf(r.classNameSlug)
+        : null;
+  interface At { g: number; r: number }
+  const hitAt = new Map<string, At>();
+  groups.forEach((g, gi) =>
+    g.rows.forEach((r, ri) => {
+      const k = r.type === 'hit' ? slugOf(r) : null;
+      if (k && !hitAt.has(k)) hitAt.set(k, { g: gi, r: ri });
+    }),
+  );
+  const ownAt = new Map<string, At>();
+  const drop = new Set<SearchResultRow>();
+  groups.forEach((g, gi) =>
+    g.rows.forEach((r, ri) => {
+      const k = r.type === 'own' ? slugOf(r) : null;
+      if (!k || !hitAt.has(k)) return;
+      drop.add(r);
+      if (!ownAt.has(k)) ownAt.set(k, { g: gi, r: ri });
+    }),
+  );
+  const moved = new Map<string, At>();
+  for (const [k, o] of ownAt) {
+    const h = hitAt.get(k)!;
+    if (o.g < h.g || (o.g === h.g && o.r < h.r)) moved.set(k, o);
+  }
+  const withVariants = (r: SearchResultRow): SearchResultRow => {
+    const k = r.type === 'hit' ? slugOf(r) : null;
+    const vs = k && r.type === 'hit' ? variantsOf(r.hit.classNameSlug) : undefined;
+    return vs?.length && r.type === 'hit' ? { ...r, variants: [...vs] } : r;
+  };
+  const out: SearchResultGroup[] = [];
+  groups.forEach((g, gi) => {
+    const rows: SearchResultRow[] = [];
+    g.rows.forEach((r, ri) => {
+      const k = slugOf(r);
+      if (drop.has(r)) {
+        const m = k ? moved.get(k) : undefined;
+        if (k && m && m.g === gi && m.r === ri) {
+          const h = hitAt.get(k)!;
+          rows.push(withVariants(groups[h.g].rows[h.r]));
+        }
+        return;
+      }
+      if (r.type === 'hit' && k) {
+        const at = hitAt.get(k)!;
+        if (at.g === gi && at.r === ri && moved.has(k)) return;
+      }
+      rows.push(withVariants(r));
+    });
+    if (!rows.length) return;
+    const same = rows.length === g.rows.length && rows.every((r, i) => r === g.rows[i]);
+    out.push(same ? g : { ...g, rows, expandable: Math.max(0, rows.length - SEARCH_ROWS_SHOWN) });
+  });
+  const outs = outside ? { ...outside, rows: outside.rows.map(withVariants) } : null;
+  return { groups: out, outside: outs };
+}
+
+/**
+ * The current-page rule over composed groups (fusion bar): a row on the page
+ * the reader stands on is hidden for a weak match and kept at its rank, greyed,
+ * for a near-exact one. When nothing would remain, the first hidden row comes
+ * back greyed — never an empty panel. Totals and counts stay the source's.
+ */
+export function applyCurrentRows(
+  groups: SearchResultGroup[],
+  outside: SearchResultGroup | null,
+  term: string,
+  here: PageLocation | null | undefined,
+): { groups: SearchResultGroup[]; outside: SearchResultGroup | null } {
+  if (!here) return { groups, outside };
+  const hidden: { at: number; group: SearchResultGroup; row: SearchResultRow }[] = [];
+  const pass = (g: SearchResultGroup, at: number): SearchResultGroup => {
+    const rows: SearchResultRow[] = [];
+    for (const raw of g.rows) {
+      const row = withVariantState(raw, here);
+      if (!isCurrentTarget(row.target, here)) rows.push(row);
+      else if (isNearExactRow(term, row) || otherMemberMatched(row.type === 'hit' ? row.variants : undefined)) rows.push(asCurrent(row));
+      else hidden.push({ at, group: g, row });
+    }
+    return rows.length === g.rows.length && rows.every((r, i) => r === g.rows[i])
+      ? g
+      : { ...g, rows, expandable: Math.max(0, rows.length - SEARCH_ROWS_SHOWN) };
+  };
+  const passed = groups.map(pass);
+  let out = passed.filter((g) => g.rows.length);
+  let outs = outside ? pass(outside, -1) : null;
+  if (outs && !outs.rows.length) outs = null;
+  const first = hidden[0];
+  if (first && !out.length && !outs) {
+    const back = { ...first.group, rows: [asCurrent(first.row)], expandable: 0 };
+    if (first.at === -1) outs = back;
+    else out = [back];
+  }
+  return { groups: out, outside: outs };
 }
 
 function indexMoreTarget(kind: PolyHitKind, term: string, chips: readonly SearchChip[]): SearchTarget {

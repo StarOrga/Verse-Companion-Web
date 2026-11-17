@@ -447,15 +447,17 @@
     "minimizeHint": "The X hides the window to the tray instead of quitting."
   },
   "autorun": {
-    "starting": "New version detected ({{channel}}: {{local}} vs {{server}}) — starting automatically.",
+    "starting": "Game build changed ({{channel}}: {{local}} vs {{server}} on the server) — checking and uploading what is open.",
     "resumeFirst": "Found an interrupted upload — skipped the automatic run.",
     "resuming": "Found an interrupted upload — resuming it automatically.",
     "banner": {
       "aria": "New game patch",
       "text": "New game patch {{patch}} — upload starts automatically in",
       "now": "Upload now",
-      "cancel": "Cancel"
-    }
+      "cancel": "Cancel",
+      "partsText": "{{patch}} is on the server — still open: {{parts}}. Continuing automatically in"
+    },
+    "continuingParts": "{{channel}} {{version}} is on the server — still open: {{parts}}. Continuing automatically."
   },
   "subthemes": {
     "allCurrent": "The server already holds this build in full — nothing changed, extraction and upload are skipped. \"Force everything\" runs anyway.",
@@ -470,7 +472,16 @@
       "codex_extra": "Other metadata",
       "silhouettes": "Silhouettes",
       "hulls": "3D hulls"
-    }
+    },
+    "contModelsReuse": "Only the 3D models are open — continuing them from the extract on disk. Nothing is uploaded again.",
+    "contModelsLocal": "Only the 3D models are open. The game files are read locally to produce the ship list for the model build — catalogue, bundle and metadata are not uploaded again.",
+    "contSilReuse": "Only the silhouettes are open — continuing them from the extract on disk. Nothing but the silhouettes is uploaded.",
+    "contSilLocal": "Only the silhouettes are open. The game files are read locally to build them — catalogue, bundle and metadata are not uploaded again.",
+    "contBothReuse": "Silhouettes and 3D models are open — continuing them from the extract on disk. Catalogue, bundle and metadata are not uploaded again.",
+    "contBothLocal": "Silhouettes and 3D models are open. The game files are read locally to build them — catalogue, bundle and metadata are not uploaded again.",
+    "contDone": "Everything that was open for this build is on the server.",
+    "contOpen": "Not everything is uploaded yet — the extract stays on disk, the next start continues.",
+    "noLiveBuild": "The server has no published codex for this build yet — the silhouettes are not uploaded."
   },
   "res": {
     "title": "Performance",

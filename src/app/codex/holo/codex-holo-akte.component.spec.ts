@@ -57,6 +57,27 @@ describe('CodexHoloAkteComponent tabs', () => {
     expect(tabs(g)[2].getAttribute('aria-selected')).toBe('true');
   });
 
+  it('a tile without a picture shows a neutral ring, never a drawn hull', () => {
+    const f = setup();
+    f.componentRef.setInput('liveries', [
+      { id: 'std', label: 'Standard', imageUrl: null },
+      { id: 'frost', label: 'Frostbite', imageUrl: null },
+    ]);
+    f.componentRef.setInput('editions', [
+      { classNameSlug: 'aegs_gladius', label: 'Standard' },
+      { classNameSlug: 'aegs_gladius_valiant', label: 'Valiant' },
+    ]);
+    f.detectChanges();
+    const marks = Array.from(f.nativeElement.querySelectorAll('.ak-sw .t i')) as HTMLElement[];
+    expect(marks.length).toBe(3);
+    for (const m of marks) {
+      const cs = getComputedStyle(m);
+      expect(cs.clipPath).toBe('none');
+      expect(cs.borderTopStyle).toBe('dashed');
+      expect(cs.borderTopLeftRadius).toBe('50%');
+    }
+  });
+
   it('keeps the card one fixed size on every tab, with "Nur Bild" in the head', () => {
     const f = setup();
     (f.nativeElement as HTMLElement).style.cssText = 'display:block;height:700px;width:900px';

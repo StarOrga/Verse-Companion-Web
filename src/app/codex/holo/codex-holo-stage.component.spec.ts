@@ -348,6 +348,20 @@ describe('CodexHoloStageComponent — wave 5 fixes', () => {
     expect(seen).toEqual(['akte', 'simple']);
   });
 
+  it('the source jump (#bezugsquelle) brings the Akte up: the sources live there, not on the table', async () => {
+    const fixture = await setup({ detail: detailWithPorts(['hardpoint_gun_left']) });
+    const c = fixture.componentInstance;
+    const el: HTMLElement = fixture.nativeElement;
+    const seen: string[] = [];
+    c.viewChange.subscribe((v) => seen.push(v));
+    expect(el.querySelector('.holo-akte.on'), 'the table is the default view').toBeNull();
+    fixture.componentRef.setInput('openDetails', true);
+    fixture.detectChanges();
+    expect(c.activeView()).toBe('akte');
+    expect(el.querySelector('.holo-akte.on')).toBeTruthy();
+    expect(seen).toEqual(['akte']);
+  });
+
   it('the toolbar has no Teilen any more and Escape closes the inspector (C9)', async () => {
     const fixture = await setup({ detail: detailWithPorts(['hardpoint_gun_left']) });
     const c = fixture.componentInstance;
@@ -860,12 +874,10 @@ describe('CodexHoloStageComponent lower part (concept holotisch-unten r1, d2)', 
     expect(persp.classList).toContain('row');
   });
 
-  it('the side column sits in the first (Einsatz) column and holds no chip filter row (C6/C8)', async () => {
+  it('has no side column below the first screen (sources live in the Akte) and holds no chip filter row (C6/C8)', async () => {
     const f = await setup({ primaryModuleSections: sections });
     const el: HTMLElement = f.nativeElement;
-    const side = el.querySelector<HTMLElement>('.holo-below .below-side')!;
-    expect(side).toBeTruthy();
-    expect(getComputedStyle(side).gridColumnStart).toBe('1');
+    expect(el.querySelector('.holo-below .below-side')).toBeNull();
     expect(el.querySelector('.holo-below .chip, .holo-below [role="toolbar"]')).toBeNull();
   });
 

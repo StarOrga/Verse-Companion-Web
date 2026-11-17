@@ -3,7 +3,7 @@ import './dev-user-data.js';
 import { app, BrowserWindow, Menu, ipcMain, dialog, shell, clipboard, powerMonitor } from 'electron';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { existsSync } from 'node:fs';
+import { existsSync, promises as fsp } from 'node:fs';
 import { exec } from 'node:child_process';
 import log from 'electron-log';
 import { initLogging, logFromRenderer } from './logging.js';
@@ -82,9 +82,9 @@ import * as resources from './resources.js';
 import { isInterrupt, PausedError } from '../lib/pause-control.js';
 import { ProgressHub } from '../lib/progress-hub.js';
 import { initTray, updateTray, destroyTray, notifyHidden, hasTray, type TrayMenuLabels } from './tray.js';
-import { decideAutoRun, describeDecision, pickSubthemeCandidates, type AutoRunDecision } from '../lib/auto-run.js';
+import { applyLedger, decideAutoRun, describeDecision, formatIdentity, pickSubthemeCandidates, type AutoRunDecision, type LedgerVerdict } from '../lib/auto-run.js';
 import { planSubthemes, type SubthemeKey, type SubthemePlan } from '../lib/subthemes.js';
-import { fetchLedger, recordLedger, type LedgerKey } from '../lib/subtheme-ledger.js';
+import { fetchLedger, fetchLiveBuildId, recordLedger, type LedgerKey } from '../lib/subtheme-ledger.js';
 
 // Configure logging + install uncaughtException/unhandledRejection handlers
 // before any window or IPC work, so a startup failure lands in main.log and
@@ -516,27 +516,82 @@ ipcMain.handle('sc:autorun:decide', async (_e, signedIn: boolean): Promise<AutoR
     channels,
     snapshot: getCachedSnapshot(),
   });
-  log.info(`[autorun] ${describeDecision(decision)}`);
-  if (decision.reason !== 'already-uploaded') return decision;
+  for (const c of channels) {
+    log.info(
+      `[autorun] ${c.channel} install: ${formatIdentity(c.version, c.buildNumber)} (from ${c.versionSource ?? 'unknown'})`,
+    );
+  }
+  log.info(`[autorun] identity check: ${describeDecision(decision)}`);
+  if (!decision.run && decision.reason !== 'already-uploaded') return decision;
 
-  // Same patch as the server — but this uploader may do a subtheme differently
-  // now (revision bumped), or the server may hold another build of that patch.
-  // Only a ledger that was actually read (`reason: 'ledger'`) may start a run:
-  // an unknown build or an unreadable ledger would otherwise restart the whole
-  // pipeline on every launch.
+  // The identity says "differs" or "same" — the ledger says which PARTS of
+  // this exact build the server holds at this uploader's revisions. Only a
+  // ledger that was actually read (`reason: 'ledger'`) may start or stop a run
+  // (lib/auto-run.ts `applyLedger`).
   const { token } = await ensureAccessToken();
   if (!token) return decision;
+  const verdicts: LedgerVerdict[] = [];
   for (const channel of pickSubthemeCandidates(channels)) {
-    const key = { channel: channel.channel, patchVersion: channel.version ?? '', buildNumber: channel.buildNumber ?? '' };
+    const key = ledgerKeyOf(channel);
     const ledger = await fetchLedger({ apiBase: API_BASE, anonKey: SUPABASE_ANON_KEY, accessToken: token }, key);
-    const plan = planSubthemes({ buildNumber: key.buildNumber, ledger, force: false });
-    if (plan.reason === 'ledger' && plan.pending.length > 0) {
-      log.info(`[autorun] ${channel.channel}: subthemes pending [${plan.pending.join(', ')}] — starting`);
-      return { run: true, channel, localVersion: channel.version ?? undefined, serverVersion: channel.version };
-    }
+    verdicts.push({ channel, plan: planSubthemes({ buildNumber: key.buildNumber, ledger, force: false }) });
   }
-  return decision;
+  const final = applyLedger(decision, verdicts);
+  log.info(`[autorun] ${describeDecision(final)}`);
+  return final;
 });
+
+/** The ledger key of an install — the same identity the header and the run use. */
+function ledgerKeyOf(channel: { channel: string; version?: string | null; buildNumber?: string | null }): LedgerKey {
+  return { channel: channel.channel, patchVersion: channel.version ?? '', buildNumber: channel.buildNumber ?? '' };
+}
+
+/**
+ * A finished extract of this exact build still on disk — what a models-only
+ * run continues from (`skins/_build_manifest.json` drives the hull build).
+ * Matched on channel + build number from the extract's own manifest.json, so a
+ * folder named after an older label (`LIVE-4.10.0`) still counts. Null = none;
+ * the run then extracts as before.
+ */
+ipcMain.handle(
+  'sc:extract:reuse',
+  async (_e, req: { installPath: string; channel: string; buildNumber: string; patchVersion: string }) => {
+    const root = join(String(req.installPath ?? ''), '.sc-companion-extracts');
+    let names: string[] = [];
+    try {
+      names = await fsp.readdir(root);
+    } catch {
+      return null;
+    }
+    for (const name of names) {
+      const dir = join(root, name);
+      try {
+        const manifestPath = join(dir, 'manifest.json');
+        const m = JSON.parse(await fsp.readFile(manifestPath, 'utf-8')) as Record<string, unknown>;
+        if (String(m.channel ?? '').toUpperCase() !== String(req.channel).toUpperCase()) continue;
+        if (String(m.build_number ?? '').trim() !== String(req.buildNumber).trim()) continue;
+        await fsp.access(join(dir, 'skins', '_build_manifest.json'));
+        log.info(`[autorun] models-only: reusing extract ${dir} (labelled ${String(m.patch_version)})`);
+        return {
+          channel: String(m.channel),
+          // The identity of the install, not the folder's old label.
+          patch_version: String(req.patchVersion || m.patch_version),
+          build_number: String(m.build_number),
+          schema_version: Number(m.schema_version ?? 0),
+          quality_score: Number(m.quality_score ?? 0),
+          entity_counts: (m.entity_counts ?? {}) as Record<string, number>,
+          manifest_path: manifestPath,
+          output_dir: dir,
+          tool_version: String(m.tool_version ?? ''),
+        };
+      } catch {
+        /* not a usable extract */
+      }
+    }
+    log.info(`[autorun] models-only: no extract of ${req.channel} build ${req.buildNumber} on disk`);
+    return null;
+  },
+);
 
 /**
  * Which subthemes this run can leave out: the server's ledger for the same
@@ -1414,7 +1469,7 @@ ipcMain.handle(
 // wiring as the catalog — its rows are phase `codex_silhouettes` of that cursor.
 ipcMain.handle(
   'sc:catalog:silhouettes',
-  async (event, accessToken: string, outDir: string): Promise<CatalogUploadResult> => {
+  async (event, accessToken: string, outDir: string, buildId?: string | null): Promise<CatalogUploadResult> => {
     try {
       const result = await uploadCatalog(
         () => freshToken(accessToken),
@@ -1423,7 +1478,13 @@ ipcMain.handle(
           hub.update('upload', p.phase, p.total > 0 ? (p.current / p.total) * 100 : null);
           safeSend(event.sender, 'sc:catalog:event', p);
         },
-        { ...uploadJob.hooksForCatalog(), mode: 'silhouettes' },
+        {
+          ...uploadJob.hooksForCatalog(),
+          mode: 'silhouettes',
+          // A silhouettes-only continuation has no catalogue run of its own: the
+          // published row the server already holds is the target.
+          ...(typeof buildId === 'string' && buildId ? { buildId } : {}),
+        },
       );
       if (result.ok) uploadJob.update((s) => ({ ...s, silhouettes: { status: 'done' } }));
       return result;
@@ -1436,6 +1497,13 @@ ipcMain.handle(
     }
   },
 );
+
+/** The published codex build of this identity (silhouettes-only continuation); null = none. */
+ipcMain.handle('sc:catalog:currentBuild', async (_e, key: LedgerKey): Promise<string | null> => {
+  const { token } = await ensureAccessToken();
+  if (!token) return null;
+  return fetchLiveBuildId({ apiBase: API_BASE, anonKey: SUPABASE_ANON_KEY, accessToken: token }, key);
+});
 
 /** The Silhouetten step had nothing to send (skipped by the ledger, or no build) — record it as passed. */
 ipcMain.handle('sc:catalog:silhouettesSkipped', () => {

@@ -2,7 +2,7 @@ import { BetaService } from '../../core/beta.service';
 import { AnalyticsService } from '../../core/analytics.service';
 import { DestroyRef, Injectable, Injector, computed, inject, signal } from '@angular/core';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { NavOriginService } from '../../shared/page-header/nav-origin.service';
 import { TranslateService } from '@ngx-translate/core';
 import { toErrorKey } from '../../core/describe-error';
@@ -20,11 +20,15 @@ import { SearchContext, neutralContext } from '../../shell/fusion-bar/search-con
 import { composeSearchResult } from './search-compose';
 import { FitItemPort, FitLoadoutEntry, FitPort, buildFitPorts, fitVerdict } from './search-compat';
 import { AliasReading, aliasReadings, setAliasLanguage } from './search-aliases';
-import { OwnSources, searchOwn } from './search-own';
+import { OwnSources, ownVariantsByClass, searchOwn } from './search-own';
+import { FamilyFold, ShipFamilyOf, familyFromRows, foldShipFamilies } from './search-families';
+import { editionQueryPrefix } from '../codex-edition-group';
+import type { CodexListRow } from '../codex.service';
 import { OwnSetEntry, ownSetGroups, ownSetOf } from './search-own-sets';
 import { WishNamesService } from './wish-names.service';
 import { parseQuery, switchChip } from './search-query-parse';
 import { RowOwnership, SearchChip, SearchResult, SearchResultRow } from './search-result-model';
+import type { SearchVariantLink } from './codex-search-model';
 import { SearchSignalsService } from './search-signals.service';
 import {
   GalleryMatch, GalleryRpcRow, MissionMatch, MissionRpcRow, SourceResult, mapGalleryRows, mapMissionRows, searchPatches,
@@ -37,7 +41,11 @@ import { Lang, LoadoutEntry } from '../codex.types';
 import { stockLoadoutClassNames } from '../stock-loadout';
 import {
   CodexSearchGroup,
+  FRESH_SHIPS_SHOWN,
   GroupCounts,
+  PageLocation,
+  applyCurrentPage,
+  pageLocationOf,
   SearchOption,
   SearchTarget,
   clearRecentSearches,
@@ -50,8 +58,8 @@ import {
 } from './codex-search-model';
 
 export const SEARCH_DEBOUNCE_MS = 220;
-/** How many of the patch's new ships an empty field offers. */
-const FRESH_SHIPS_SHOWN = 4;
+/** New ships kept beyond the shown four: the current page drops out, the next one backfills. */
+const FRESH_SHIPS_KEPT = FRESH_SHIPS_SHOWN + 4;
 
 /** Aliases / chips named in the "gelesen als" line at most. */
 const READINGS_SHOWN = 3;
@@ -64,6 +72,9 @@ export interface SearchReadings {
 
 /** What a key press in the search field asks the host to do. */
 export type SearchKeyAction = 'open' | 'open-new-tab' | 'escape' | null;
+
+/** What opening an option did. 'here': the option is the page the reader is on — the host only closes. */
+export type SearchOpenResult = 'navigated' | 'searched' | 'new-tab' | 'here';
 
 /**
  * The ONE Codex search: debounced term → `CodexService.searchAll` (every kind
@@ -144,9 +155,88 @@ export class CodexSearchEngine {
     }
     return out;
   });
-  readonly options = computed<SearchOption[]>(() =>
-    this.input().trim() ? resultOptions(this.groups()) : suggestionOptions(this.recent(), this.fresh()),
+  /**
+   * Where the reader stands (router path + query), for the current-page rule:
+   * its row is hidden for a weak match, greyed for a near-exact one (note 4).
+   */
+  readonly here = signal<PageLocation>(pageLocationOf(this.router.url));
+  /** The catalog groups the Codex bar and Ctrl+K draw: the current-page rule applied. */
+  readonly listGroups = computed(() =>
+    applyCurrentPage(this.listFold().groups, this.searchText(), this.here(), this.shipLinks(this.listFold())),
   );
+  readonly options = computed<SearchOption[]>(() =>
+    this.input().trim()
+      ? resultOptions(this.listGroups().groups, this.listGroups().current, this.shipLinks(this.listFold()), this.here())
+      : suggestionOptions(this.recent(), this.fresh(), this.here()),
+  );
+  /**
+   * The reader's own variants per ship class: the one catalog row of a ship carries them as mini
+   * links on every surface (C11 / C12). Signed out: none.
+   */
+  private readonly ownVariantMap = computed(() => {
+    if (!this.hasTerm()) return new Map<string, SearchVariantLink[]>();
+    try {
+      return this.signedIn() ? ownVariantsByClass(this.ownSources(), this.shellBeta()) : new Map<string, SearchVariantLink[]>();
+    } catch {
+      return new Map<string, SearchVariantLink[]>(); // the own data is a courtesy; a host without it gets none
+    }
+  });
+  /** Sibling records per edition prefix (lower case), read like the ship page reads its model row. */
+  private readonly familyRows = signal<ReadonlyMap<string, readonly CodexListRow[]>>(new Map());
+  private readonly familyRequested = new Set<string>();
+  /**
+   * The ship family of a class: the page's own model row (`resolveModelVariants` over
+   * `listEditionSiblings`). Until the siblings are read, the ship hits themselves stand in.
+   */
+  private readonly familyOf = computed<ShipFamilyOf>(() => {
+    const rows = this.familyRows();
+    const ships = [...this.hits(), ...(this.baseResult()?.hits ?? [])].filter((h) => h.kind === 'ship');
+    const memo = new Map<string, ReturnType<ShipFamilyOf>>();
+    return (cls) => {
+      const k = cls.toLowerCase();
+      if (memo.has(k)) return memo.get(k)!;
+      const prefix = editionQueryPrefix(cls).toLowerCase();
+      const pool = rows.get(prefix) ?? ships.filter((h) => h.classNameSlug.toLowerCase().startsWith(prefix));
+      const fam = familyFromRows(pool, cls);
+      memo.set(k, fam);
+      return fam;
+    };
+  });
+  /** One row per ship family (C11): the Codex bar / Ctrl+K groups and the fusion bar's. */
+  private readonly listFold = computed(() => foldShipFamilies(this.groups(), this.familyOf()));
+  private readonly composeFold = computed(() => foldShipFamilies(this.mergedGroups(), this.familyOf()));
+  /** The mini links of a ship row: the family's other models, then the reader's own variants of any of them. */
+  private shipLinks(fold: FamilyFold): (cls: string) => SearchVariantLink[] | undefined {
+    const own = this.ownVariantMap();
+    return (cls) => {
+      const key = fold.baseOf.get(cls.toLowerCase()) ?? cls.toLowerCase();
+      const all = [...(fold.links.get(key) ?? []), ...(fold.members.get(key) ?? [key]).flatMap((m) => own.get(m) ?? [])];
+      return all.length ? all : undefined;
+    };
+  }
+
+  /** Read the sibling records of the listed ships' families once per prefix (a handful per search). */
+  private requestFamilies(hits: readonly PolySearchHit[]): void {
+    const svc = this.codex as Partial<Pick<CodexService, 'listEditionSiblings'>>;
+    if (typeof svc.listEditionSiblings !== 'function') return;
+    const byPrefix = new Map<string, string>();
+    for (const h of hits) {
+      const p = h.kind === 'ship' ? editionQueryPrefix(h.classNameSlug).toLowerCase() : null;
+      if (p && !this.familyRequested.has(p) && !byPrefix.has(p)) byPrefix.set(p, h.classNameSlug);
+    }
+    const prefixes = [...byPrefix].map(([p, c]) => ({ c, p })).slice(0, 6);
+    for (const { c, p } of prefixes) {
+      this.familyRequested.add(p);
+      void svc
+        .listEditionSiblings('ship', c)
+        .then((rows) => {
+          const next = new Map(this.familyRows());
+          next.set(p, rows);
+          this.familyRows.set(next);
+        })
+        .catch(() => this.familyRequested.delete(p)); // the hits stand in; a later search retries
+    }
+  }
   readonly activeOption = computed<SearchOption | null>(() => this.options()[this.activeIndex()] ?? null);
 
   // -- context, chips and the composed result (concept 2026-11-02) ---------------
@@ -219,9 +309,10 @@ export class CodexSearchEngine {
       : null;
     const compat = chips.find((c) => c.filter.compatWith)?.filter.compatWith;
     const ports = compat?.kind === 'ship' && this.compatPorts()?.key === compat.className ? this.compatPorts()!.ports : null;
+    const fold = this.composeFold();
     return composeSearchResult({
       term: text,
-      groups: this.mergedGroups(),
+      groups: fold.groups,
       context: ctx,
       chips,
       own,
@@ -242,6 +333,9 @@ export class CodexSearchEngine {
       didYouMean: this.didYouMean(),
       facets: this.facets(),
       ownSet: ownSetOf(chips) !== null,
+      here: this.here(),
+      ownVariants: this.shipLinks(fold),
+      shipBaseOf: (cls) => fold.baseOf.get(cls.toLowerCase()) ?? cls.toLowerCase(),
     });
   });
 
@@ -251,6 +345,10 @@ export class CodexSearchEngine {
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.cancelTimer());
+    const sub = this.router.events.subscribe((e) => {
+      if (e instanceof NavigationEnd) this.here.set(pageLocationOf(e.urlAfterRedirects));
+    });
+    inject(DestroyRef).onDestroy(() => sub.unsubscribe());
   }
 
   lang(): Lang {
@@ -361,10 +459,15 @@ export class CodexSearchEngine {
 
   /** A result row was opened: remember it (recent searches, recent opens) and count the open. */
   noteOpened(row: SearchResultRow): void {
+    // The greyed current row leads nowhere: counted, nothing remembered (no recent, no origin).
+    if (row.current) {
+      this.trackOpen(row.type === 'hit' ? row.hit.kind : row.type, null, false, { current: true });
+      return;
+    }
     this.remember();
     if (row.type === 'hit') {
       this.trySignals()?.recordOpen(row.hit.kind, row.hit.classNameSlug);
-      this.trackOpen(row.hit.kind, null, false);
+      this.trackOpen(row.hit.kind, null, false, {});
       this.navOrigin.noteSearchArrival(this.term(), row.target.link);
     }
   }
@@ -381,18 +484,43 @@ export class CodexSearchEngine {
    */
   opening(opt: SearchOption, newTabFlag = false): void {
     if (opt.type !== 'hit' && opt.type !== 'more') return;
+    if (opt.type === 'hit' && opt.current && !newTabFlag) {
+      this.trackOpen(opt.hit.kind, opt.id, false, { current: true });
+      return;
+    }
     this.remember();
     if (opt.type === 'hit') {
       this.navOrigin.noteSearchArrival(this.term(), opt.target.link);
       this.trySignals()?.recordOpen(opt.hit.kind, opt.hit.classNameSlug);
-      this.trackOpen(opt.hit.kind, opt.id, newTabFlag);
+      this.trackOpen(opt.hit.kind, opt.id, newTabFlag, {});
     }
   }
 
-  /** One `search:result_open`: the area is the hit's kind, the rank its place in the list; never the term. */
-  private trackOpen(area: string, optionId: string | null, newTab: boolean): void {
+  /**
+   * A variant mini link of an own ship row was opened. The open variant of the current page
+   * leads nowhere (counted only); any other one is remembered like its row.
+   */
+  noteVariantOpened(shipClassName: string | null, variant: SearchVariantLink, newTab = false): void {
+    if (variant.current && !newTab) {
+      this.trackOpen('ship', null, false, { current: true, variant: true });
+      return;
+    }
+    this.remember();
+    this.navOrigin.noteSearchArrival(this.term(), variant.target.link);
+    const opened = variant.kind === 'edition' ? variant.target.link[variant.target.link.length - 1] : shipClassName;
+    if (opened) this.trySignals()?.recordOpen('ship', opened);
+    this.trackOpen('ship', null, newTab, { variant: true });
+  }
+
+  /**
+   * One `search:result_open`: the area is the hit's kind, the rank its place in the list; never the term.
+   * `current`: the greyed "Du bist hier" row was chosen; `variant`: a variant mini link was.
+   */
+  private trackOpen(area: string, optionId: string | null, newTab: boolean, how: { current?: boolean; variant?: boolean }): void {
     const index = optionId ? this.options().findIndex((o) => o.id === optionId) : -1;
-    this.injector.get(AnalyticsService).track('search:result_open', { area, rank: index + 1, new_tab: newTab });
+    this.injector.get(AnalyticsService).track('search:result_open', {
+      area, rank: index + 1, new_tab: newTab, current: !!how.current, variant: !!how.variant,
+    });
   }
 
   forgetRecent(): void {
@@ -407,7 +535,7 @@ export class CodexSearchEngine {
     void this.injector
       .get(CodexBuildDiffService)
       .addedShipsMemo()
-      .then((rows) => this.fresh.set(rows.slice(0, FRESH_SHIPS_SHOWN).map((r) => toPolyHit('ship', r))))
+      .then((rows) => this.fresh.set(rows.slice(0, FRESH_SHIPS_KEPT).map((r) => toPolyHit('ship', r))))
       .catch(() => this.fresh.set([]));
   }
 
@@ -460,10 +588,15 @@ export class CodexSearchEngine {
 
   /**
    * Open an option the way its anchor would. A recent search runs in place
-   * ('searched'); everything else navigates ('navigated') or, with
+   * ('searched'), the greyed current page only closes ('here'); everything else navigates ('navigated') or, with
    * `newTab`, opens a new tab and leaves the search as it is ('new-tab').
    */
-  open(opt: SearchOption, newTab = false): 'navigated' | 'searched' | 'new-tab' {
+  open(opt: SearchOption, newTab = false): SearchOpenResult {
+    // The page the reader is on: Enter only closes — URL, query and fragment stay as they are.
+    if (opt.type === 'hit' && opt.current && !newTab) {
+      this.opening(opt);
+      return 'here';
+    }
     if (opt.type === 'recent' && !newTab) {
       this.searchFor(opt.term);
       return 'searched';
@@ -533,6 +666,7 @@ export class CodexSearchEngine {
       const { hits, totals, distinct, read, failed, failure, facets } = await (hasAttrs ? this.codex.searchAll(term, this.perGroup(), attrs) : this.codex.searchAll(term, this.perGroup()));
       if (seq !== this.seq) return; // a newer search superseded this one
       this.hits.set(hits);
+      this.requestFamilies(hits);
       this.totals.set(totals);
       this.counts.set({ distinct, read });
       this.baseResult.set(null);
