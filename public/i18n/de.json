@@ -8848,7 +8848,31 @@
     "whereTitle": "Wo liegt es?",
     "otherPlace": "Anderer Ort …",
     "otherPlaceholder": "Ort eingeben",
-    "store": "Ablegen"
+    "store": "Ablegen",
+    "wishAssigned": "{{n}} davon einer Operation zugeordnet",
+    "assign": {
+      "go": "Zuordnen",
+      "title": "Einer Operation zuordnen",
+      "howMany": "Wie viele?",
+      "ofWished": "von {{n}} gewünschten",
+      "ofFree": "von {{n}} freien",
+      "newest": "zuletzt erstellt",
+      "new": "Neue Operation",
+      "newHint": "Name wird vorgeschlagen",
+      "slots": "{{used}} von {{max}} Plätzen belegt",
+      "planHint": "Einsätze planst du",
+      "inHq": "im HQ",
+      "progress": "{{done}} von {{total}} Einsätzen",
+      "noEinsatz": "Noch kein Einsatz geplant",
+      "line": "{{n}} in Operation „{{name}}“",
+      "lineWhole": "Operation „{{name}}“",
+      "moreOne": "+1 weitere Operation",
+      "more": "+{{n}} weitere Operationen"
+    },
+    "own": {
+      "morePlacesOne": "+1 weiterer Ort",
+      "morePlaces": "+{{n}} weitere Orte"
+    }
   },
   "itemStage": {
     "aria": "Bühne: {{name}}",

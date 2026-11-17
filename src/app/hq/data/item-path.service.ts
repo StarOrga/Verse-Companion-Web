@@ -349,6 +349,11 @@ export class ItemPathService {
     return this.injector.get(NachschubService).assignTargets();
   }
 
+  /** The picker opens on a Codex page where the Operationen may not be loaded yet: load them once (no-op after). */
+  loadAssignTargets(): Promise<void> {
+    return this.injector.get(NachschubService).ensureLoaded();
+  }
+
   /** Name proposal for a new Operation made for `qty` pieces of this item. */
   proposeOperationName(name: string, qty: number): Promise<string> {
     return this.injector.get(NachschubService).proposeName(name, qty);

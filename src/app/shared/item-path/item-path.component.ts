@@ -33,20 +33,33 @@ import {
   type PathStep,
   type PathTone,
 } from '../../hq/data/item-path.service';
-import { hangarRedirectLink, hqStockLink, type HqPageLink } from '../../hq/hq-routes';
+import { HQ_ROOT, hangarRedirectLink, hqStockLink, type HqPageLink } from '../../hq/hq-routes';
+import { NachschubFocusService } from '../../hq/nachschub/nachschub-focus.service';
+import type { AssignTargets } from '../../hq/nachschub/nachschub.service';
+import { WishRemovalFlowService } from '../../hq/nachschub/wish-removal-flow.service';
 import { placeLabel } from '../../hq/now/hq-live.util';
 import { WishCartService } from '../../shell/cart/wish-cart.service';
 import { ScActionDirective } from '../action/sc-action.directive';
-import { ScPopupComponent } from '../popup/sc-popup.component';
+import { SC_POPUP_PHONE_QUERY, ScPopupComponent } from '../popup/sc-popup.component';
 import { ScTooltipDirective } from '../tooltip/sc-tooltip.directive';
 import { UndoToastService } from '../undo-toast/undo-toast.service';
+import { ItemPathAssignComponent, progressMarks, type AssignCaret, type AssignPick } from './item-path-assign.component';
 import { PATH_ICONS } from './path-icons';
 
 /** Length of the add moment: the streak is visible for about 1.1 s, the node peaks as it arrives, then it settles (1.7 s). */
 const ADD_MOMENT_MS = 1700;
 
+/**
+ * The wish station shows one strip per Operation holding the item, newest first, up to this many; the rest is one
+ * "+N weitere Operationen" link to Planen (B4: several Operationen without growing the station without limit).
+ */
+const MAX_ASSIGNMENT_LINES = 2;
+
+/** The place pin of the ownership strip (mock rounds/04.html `pfad-beides`). */
+const PIN_ICON: readonly string[] = ['M12 21s-6-5.4-6-10a6 6 0 0 1 12 0c0 4.6-6 10-6 10z', 'M12 8.5a2 2 0 1 0 0 4a2 2 0 1 0 0-4z'];
+
 export type ItemPathLevel = 'tertiary' | 'secondary' | 'primary';
-type PopMode = 'place' | 'error';
+type PopMode = 'place' | 'error' | 'assign';
 
 /** A stop has something in it: the wish node when the item is wished, the second node when it is owned / collected. */
 export function isFilled(s: ItemPathState, step: PathStep): boolean {
@@ -86,11 +99,18 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
  * the Hangar, with the count on it. Levels: `tertiary` the two nodes with count bullets (search rows, cards); `secondary`
  * the pill - the nodes plus the next step as a button; `primary` the detail page: both stops in words, a stepper on the
  * wish and on the Inventar count. `(leave)` fires when a plain click leaves the page, so a floating host can close itself.
+ *
+ * Operationen (concept 20261117-1110-pfad-stationen): still two stations - the assignment lives inside the wish
+ * station. Detail page: head -> a strip per Operation holding the item (link to Planen, progress marks, then
+ * "k von n Einsätzen") -> "Zuordnen" while free pieces are left, with the picker hanging on it
+ * (`sc-item-path-assign`). The ownership station mirrors it: head with counter -> one-line strip "N× im Inventar ·
+ * <nearest place> +k weitere Orte" -> or only its button. Rows and cards never assign; an assigned wish node carries
+ * the small Route badge. Lowering the wish always runs through WishRemovalFlowService (C6).
  */
 @Component({
   selector: 'sc-item-path',
   standalone: true,
-  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective],
+  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective, ItemPathAssignComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.ip-primary]': "level() === 'primary'" },
   template: `
@@ -101,6 +121,10 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
                 (click)="onWish($event)">
           <svg class="sc-action-icon" [class.is-filled]="state().wished" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.wish; track $index) { <path [attr.d]="d" /> }</svg>
           @if (state().wishQty > 0) { <i class="n">{{ countText(state().wishQty) }}</i> }
+          <!-- B8: rows do not assign; the small Route badge only says the wish belongs to an Operation. -->
+          @if (state().assigned > 0) {
+            <i class="op-badge" data-badge="operation" aria-hidden="true"><svg viewBox="0 0 24 24">@for (d of icons.nachschub; track $index) { <path [attr.d]="d" /> }</svg></i>
+          }
         </button>
         @if (own(); as o) {
           <i class="link" [class.on]="state().wished || ownOn()"></i>
@@ -146,20 +170,59 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
       @case ('primary') {
         <div class="primary">
           <ol class="path" [class.single]="!own()">
-            <li class="stop" [class.on]="state().wished">
-              <span class="stop-h" [class.is-adding]="adding()" [attr.data-adding]="adding() ? '' : null">
-                <svg class="sc-action-icon" [class.is-filled]="state().wished" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.wish; track $index) { <path [attr.d]="d" /> }</svg>
-                <b>{{ 'pathCtl.node.wish' | translate }}</b>
-              </span>
-              @if (state().wished) {
-                <span class="st" role="group" [attr.aria-label]="'pathCtl.wishQty' | translate">
-                  <button type="button" [attr.aria-label]="'pathCtl.less' | translate" (click)="stepWish(-1)">−</button>
-                  <b>{{ state().wishQty }}</b>
-                  <button type="button" [attr.aria-label]="'pathCtl.more' | translate" [disabled]="state().wishQty >= 999" (click)="stepWish(1)">+</button>
+            <!--
+              Two stations built alike (B1, B2): head (icon, word, counter) -> a strip only when there is something to say
+              -> otherwise only the action button. The assignment to an Operation lives inside the wish station.
+            -->
+            <li class="stop" data-station="wish" [class.on]="state().wished">
+              <div class="head">
+                <span class="stop-h" [class.is-adding]="adding()" [attr.data-adding]="adding() ? '' : null">
+                  <svg class="sc-action-icon" [class.is-filled]="state().wished" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.wish; track $index) { <path [attr.d]="d" /> }</svg>
+                  <b>{{ 'pathCtl.node.wish' | translate }}</b>
                 </span>
-                <button type="button" class="txt" (click)="openCart($event)">{{ 'pathCtl.openCart' | translate }}</button>
+                @if (state().wished) {
+                  <span class="st" role="group" [attr.aria-label]="'pathCtl.wishQty' | translate">
+                    <button type="button" [attr.aria-label]="'pathCtl.less' | translate" [disabled]="lowering()" (click)="stepWish(-1)">−</button>
+                    <b>{{ state().wishQty }}</b>
+                    <button type="button" [attr.aria-label]="'pathCtl.more' | translate" [disabled]="state().wishQty >= 999" (click)="stepWish(1)">+</button>
+                  </span>
+                  <button type="button" class="txt end" (click)="openCart($event)">{{ 'pathCtl.openCart' | translate }}</button>
+                }
+              </div>
+              @if (state().wished) {
+                @for (a of shownAssignments(); track a.packageId) {
+                  <!-- B4: a real link into the HQ to that Operation; marks before the text "1 von 4 Einsätzen". -->
+                  <a class="strip asg" data-strip="operation" [routerLink]="hqRoot" fragment="planen"
+                     (click)="onOperationLink($event, a.packageId)" (auxclick)="onOperationLink($event, a.packageId)">
+                    <svg class="strip-i" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.nachschub; track $index) { <path [attr.d]="d" /> }</svg>
+                    <span class="asg-name">{{ (a.qty >= state().wishQty && state().wishQty === 1 ? 'pathCtl.assign.lineWhole' : 'pathCtl.assign.line') | translate: { n: a.qty, name: a.packageName } }}</span>
+                    @if (a.einsaetzeTotal > 0) {
+                      <span class="seg" aria-hidden="true">@for (m of marks(a.einsaetzeDone, a.einsaetzeTotal); track $index) { <i [class.on]="m"></i> }</span>
+                      <span class="mut">{{ 'pathCtl.assign.progress' | translate: { done: a.einsaetzeDone, total: a.einsaetzeTotal } }}</span>
+                    } @else {
+                      <span class="mut">{{ 'pathCtl.assign.noEinsatz' | translate }}</span>
+                    }
+                  </a>
+                }
+                @if (moreAssignments() > 0) {
+                  <a class="strip-more" [routerLink]="hqRoot" fragment="planen" (click)="onLink($event)">
+                    {{ (moreAssignments() === 1 ? 'pathCtl.assign.moreOne' : 'pathCtl.assign.more') | translate: { n: moreAssignments() } }}
+                  </a>
+                }
+                @if (canAssign()) {
+                  <!-- B3/B6: same tier, size and place as "Ins Inventar"; the picker hangs on it. -->
+                  <div class="anc">
+                    <button #assignBtn scAction tier="secondary" type="button" class="assign" [class.is-open]="mode() === 'assign'" [busy]="assigning()"
+                            aria-haspopup="dialog" [attr.aria-expanded]="mode() === 'assign'" (click)="toggleAssign($event)">
+                      <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.nachschub; track $index) { <path [attr.d]="d" /> }</svg>
+                      <span>{{ 'pathCtl.assign.go' | translate }}</span>
+                    </button>
+                    @if (mode() === 'assign' && pickInline()) {
+                      <ng-container [ngTemplateOutlet]="assignTpl" [ngTemplateOutletContext]="{ inline: true }" />
+                    }
+                  </div>
+                }
               } @else {
-                <p>{{ 'pathCtl.wishOff' | translate }}</p>
                 <button scAction tier="primary" type="button" [busy]="busy() === 'wish'" (click)="onGo($event, 'wish')">
                   <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.wish; track $index) { <path [attr.d]="d" /> }</svg>
                   <span>{{ 'pathCtl.go.wish' | translate }}</span>
@@ -167,25 +230,39 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
               }
             </li>
             @if (own(); as o) {
-              <li class="stop" [class.on]="ownOn()">
-                <span class="stop-h">
-                  <svg class="sc-action-icon" [class.is-filled]="ownOn()" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons[word()!]; track $index) { <path [attr.d]="d" /> }</svg>
-                  <b>{{ 'pathCtl.node.' + word() | translate }}</b>
-                </span>
-                @if (ownOn()) {
-                  @if (o === 'inventar' && kind() !== 'blueprint' && state().places.length) {
+              <li class="stop" data-station="own" [class.on]="ownOn()">
+                <div class="head">
+                  <span class="stop-h">
+                    <svg class="sc-action-icon" [class.is-filled]="ownOn()" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons[word()!]; track $index) { <path [attr.d]="d" /> }</svg>
+                    <b>{{ 'pathCtl.node.' + word() | translate }}</b>
+                  </span>
+                  @if (ownOn() && o === 'inventar' && kind() !== 'blueprint' && stepPlaceName(); as at) {
                     <span class="st" role="group" [attr.aria-label]="'pathCtl.ownQty.' + word() | translate">
-                      <button type="button" [attr.aria-label]="'pathCtl.less' | translate" (click)="stepPlace(state().places[0].location, -1)">−</button>
+                      <button type="button" [attr.aria-label]="'pathCtl.less' | translate" (click)="stepPlace(at, -1)">−</button>
                       <b>{{ ownQty() }}</b>
-                      <button type="button" [attr.aria-label]="'pathCtl.more' | translate" (click)="stepPlace(state().places[0].location, 1)">+</button>
+                      <button type="button" [attr.aria-label]="'pathCtl.more' | translate" (click)="stepPlace(at, 1)">+</button>
                     </span>
-                  } @else {
-                    <p>{{ ('pathCtl.ownOn.' + word()) | translate: { n: ownQty() } }}</p>
                   }
-                  <a class="alink" [routerLink]="ownLink().commands" [fragment]="ownLink().fragment" [queryParams]="ownLink().queryParams" (click)="onLink($event)">{{ 'pathCtl.view.' + word() | translate }}</a>
+                </div>
+                @if (ownOn()) {
+                  <!-- B5: ONE line - the quantity, the one nearest place, a hint for more; the rest behind the link. -->
+                  <span class="strip own" data-strip="own">
+                    <svg class="strip-i" viewBox="0 0 24 24" aria-hidden="true">@for (d of ownStripIcon(); track $index) { <path [attr.d]="d" /> }</svg>
+                    <span class="own-what">
+                      <b class="q">{{ ('pathCtl.ownOn.' + word()) | translate: { n: ownQty() } }}</b>
+                      @if (o === 'inventar' && kind() !== 'blueprint' && state().nearestPlace; as where) {
+                        <span class="mut place-1">· {{ placeText(where) }}</span>
+                        @if (state().morePlaces > 0) {
+                          <span class="mut more-places">{{ (state().morePlaces === 1 ? 'pathCtl.own.morePlacesOne' : 'pathCtl.own.morePlaces') | translate: { n: state().morePlaces } }}</span>
+                        }
+                      }
+                    </span>
+                    <a class="alink end" [routerLink]="ownLink().commands" [fragment]="ownLink().fragment" [queryParams]="ownLink().queryParams" (click)="onLink($event)">{{ 'pathCtl.view.' + word() | translate }}</a>
+                  </span>
                 } @else {
-                  <p>{{ ('pathCtl.ownOff.' + word()) | translate }}</p>
-                  <button scAction tier="secondary" type="button" [busy]="busy() === o" (click)="onGo($event, o)">
+                  <button scAction tier="secondary" type="button" [class.is-open]="mode() === 'place'" [busy]="busy() === o"
+                          [attr.aria-haspopup]="o === 'inventar' && kind() !== 'blueprint' ? 'dialog' : null"
+                          [attr.aria-expanded]="o === 'inventar' && kind() !== 'blueprint' ? mode() === 'place' : null" (click)="onGo($event, o)">
                     <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons[word()!]; track $index) { <path [attr.d]="d" /> }</svg>
                     <span>{{ 'pathCtl.go.' + word() | translate }}</span>
                   </button>
@@ -198,8 +275,16 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
       }
     }
 
+    <ng-template #assignTpl let-inline="inline">
+      <sc-item-path-assign [name]="name() ?? ''" [free]="state().free" [assigned]="state().assigned" [targets]="targets()" [busy]="assigning()"
+                           [inline]="!!inline" [caret]="caret()" [returnFocus]="anchor()"
+                           (assign)="onAssign($event)" (closed)="closePop()" (leave)="onLink($event)" />
+    </ng-template>
+
     <ng-template #pop>
-      @if (mode() === 'error') {
+      @if (mode() === 'assign') {
+        <ng-container [ngTemplateOutlet]="assignTpl" [ngTemplateOutletContext]="{ inline: false }" />
+      } @else if (mode() === 'error') {
         <!-- A refusal (tone info) reads neutral and politely; only a real failure is an alert in the danger tone. -->
         <sc-popup class="rp" [class.err]="errorTone() === 'error'" [attr.role]="errorTone() === 'error' ? 'alert' : 'status'"
                   kind="notice" [title]="'pathCtl.whereTitle' | translate">{{ errorKey() | translate }}</sc-popup>
@@ -358,6 +443,49 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
     }
     .place:hover { color: var(--sc-accent); border-color: var(--sc-accent); }
     .place.on { border-color: var(--sc-accent); color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
+    /* B8: the Route badge on an assigned wish node (rows, cards); the ring stays solid. */
+    .op-badge {
+      position: absolute; right: -5px; bottom: -5px; display: grid; place-items: center; width: 15px; height: 15px; border-radius: 50%;
+      border: 1px solid var(--sc-accent); background: var(--sc-bg-0); color: var(--sc-accent); font-style: normal; pointer-events: none;
+    }
+    .node.sc-action .op-badge svg { width: 10px; height: 10px; display: block; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* The station head (B2): icon + word, the counter, the cart link at the end. */
+    .head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; width: 100%; min-height: 30px; }
+    .end { margin-left: auto; }
+    .mut { color: var(--sc-fg-2); font-size: 0.75rem; }
+    /* The status strip, the same construction in both stations (B2, B4, B5). */
+    .strip {
+      display: flex; align-items: center; gap: 6px 10px; width: 100%; min-height: max(36px, var(--sc-tap-min, 0px)); padding: 6px 10px;
+      border-left: 2px solid var(--sc-accent); border-radius: 0 8px 8px 0; background: color-mix(in srgb, var(--sc-accent) 8%, transparent);
+      color: var(--sc-fg-1); font-size: 0.8125rem;
+    }
+    .strip-i { width: 16px; height: 16px; flex: none; fill: none; stroke: var(--sc-accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .asg { flex-wrap: wrap; text-decoration: none; }
+    .asg:hover { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
+    .asg:hover .asg-name { text-decoration: underline; text-underline-offset: 3px; }
+    .asg-name { min-width: 0; color: var(--sc-accent); overflow-wrap: anywhere; }
+    .seg { display: inline-flex; align-items: center; gap: 3px; flex: none; }
+    .seg i { display: block; width: 16px; height: 5px; border-radius: 3px; background: color-mix(in srgb, var(--sc-accent) 20%, transparent); }
+    .seg i.on { background: var(--sc-accent); }
+    .strip-more { color: var(--sc-fg-2); font-size: 0.75rem; text-decoration: underline; text-underline-offset: 3px; min-height: var(--sc-tap-min, 0px); display: inline-flex; align-items: center; }
+    .strip-more:hover { color: var(--sc-accent); }
+    /* One line, always (B5): the place gives way before the link does. */
+    .own { flex-wrap: nowrap; white-space: nowrap; }
+    .own-what { display: inline-flex; align-items: baseline; gap: 6px; flex: 1 1 auto; min-width: 0; overflow: hidden; }
+    .own-what .q { flex: none; color: var(--sc-fg-0); font-weight: 600; }
+    .own-what .place-1 { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .own-what .more-places { flex: none; }
+    .own .alink { flex: none; min-height: 0; }
+    /* The anchor of the picker (B6): the button, and on phones the picker in the flow right under it. */
+    .anc { position: relative; display: flex; flex-direction: column; align-items: flex-start; max-width: 100%; }
+    .anc > .sc-action { max-width: 100%; white-space: normal; text-align: left; }
+    /* The open state of a station button while its popup hangs on it ("Ins Inventar" / "Zuordnen"). */
+    .stop .sc-action.sc-action--secondary.is-open {
+      border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0);
+    }
+    .asg:focus-visible, .strip-more:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+
     .other { display: flex; align-items: center; gap: 8px; }
     .other input {
       flex: 1 1 auto; min-width: 0; min-height: max(36px, var(--sc-tap-min, 0px)); padding: 4px 10px; font: inherit;
@@ -371,6 +499,10 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
       .path { grid-template-columns: minmax(0, 1fr); }
       .stop + .stop::before { display: none; }
       .pill { flex-wrap: wrap; border-radius: 18px; }
+    }
+    @media (max-width: 720px) {
+      /* B10: the picker sits in the flow under its button, as wide as the station. */
+      .anc { width: 100%; }
     }
   `],
 })
@@ -433,6 +565,34 @@ export class ItemPathComponent implements OnDestroy {
     return wanted && s.steps.includes(wanted) ? wanted : nextStepOf(s);
   });
 
+  readonly hqRoot = [HQ_ROOT];
+  /** A write of the picker is under way. */
+  readonly assigning = signal(false);
+  /** A lowering of the wish runs through the removal flow (its dialog may be open). */
+  readonly lowering = signal(false);
+  /** The picker sits in the flow under its button (phones, B10) instead of in the overlay. */
+  readonly pickInline = signal(false);
+  readonly caret = signal<AssignCaret>('top');
+
+  /** The picker's rows; read only while it is open (the Nachschub store is resolved on demand). */
+  readonly targets = computed(() => (this.mode() === 'assign' ? this.path.assignTargets() : NO_TARGETS));
+  /** "Zuordnen" is offered while free pieces are left (B3); an announced ship cannot be obtained yet. */
+  readonly canAssign = computed(() => {
+    const s = this.state();
+    return s.signedIn && s.wished && s.free > 0 && s.hint === null;
+  });
+  readonly shownAssignments = computed(() => {
+    const a = this.state().assignments;
+    return a.length > MAX_ASSIGNMENT_LINES ? a.slice(0, MAX_ASSIGNMENT_LINES) : a;
+  });
+  readonly moreAssignments = computed(() => Math.max(0, this.state().assignments.length - MAX_ASSIGNMENT_LINES));
+  /** The Inventar counter steps at the place the strip names (B5), so both speak of the same place. */
+  readonly stepPlaceName = computed(() => this.state().nearestPlace ?? this.state().places[0]?.location ?? null);
+  readonly ownStripIcon = computed<readonly string[]>(() => {
+    const w = this.word();
+    return w === 'inventar' ? PIN_ICON : this.icons[w ?? 'inventar'];
+  });
+
   readonly placeOptions = computed(() => {
     const first = this.path.currentPlaceDefault();
     return [first, ...this.path.knownPlaces().filter((p) => p !== first)].slice(0, 5);
@@ -471,7 +631,13 @@ export class ItemPathComponent implements OnDestroy {
   /** Tooltip and name of the wish node: add, or "n on the wishlist - open". */
   wishLabel(): string {
     const s = this.state();
-    return this.translate.instant(s.wished ? 'pathCtl.tip.wishOn' : 'pathCtl.tip.wishOff', { qty: s.wishQty });
+    const base = this.translate.instant(s.wished ? 'pathCtl.tip.wishOn' : 'pathCtl.tip.wishOff', { qty: s.wishQty });
+    // B8: the badge is decoration; its meaning reaches the tooltip and the accessible name.
+    return s.assigned > 0 ? `${base} · ${this.translate.instant('pathCtl.wishAssigned', { n: s.assigned })}` : base;
+  }
+
+  marks(done: number, total: number): boolean[] {
+    return progressMarks(done, total);
   }
 
   ownLabel(): string {
@@ -568,10 +734,80 @@ export class ItemPathComponent implements OnDestroy {
 
   async stepWish(delta: number): Promise<void> {
     const at = this.host.querySelector<HTMLElement>('.st') ?? this.host;
+    if (delta < 0) {
+      await this.lowerWish(-delta, at);
+      return;
+    }
     const wasWished = this.state().wished;
     const res = await this.path.setWishQty(this.kind(), this.className(), this.name(), this.state().wishQty + delta);
     this.playAdd(wasWished, res);
     this.report(res, at);
+  }
+
+  /**
+   * C6: lowering or removing the wish goes through the ONE removal flow - free pieces go without a question (A4), a
+   * cut into assigned pieces asks first (A5). Cancelled = null, nothing changed. The result's undo goes on the toast.
+   */
+  private async lowerWish(n: number, at: HTMLElement): Promise<void> {
+    if (this.lowering()) return;
+    this.lowering.set(true);
+    try {
+      const flow = this.injector.get(WishRemovalFlowService);
+      const res = await flow.lower({ kind: this.kind(), className: this.className(), forClassName: null, name: this.label }, n, 'codex');
+      if (!res) return;
+      if (!res.ok) {
+        this.showError(res.key, at);
+        return;
+      }
+      flow.announce(res, (key) => this.showError(key, at));
+    } finally {
+      this.lowering.set(false);
+    }
+  }
+
+  // ── assigning the wish to an Operation (B6, B7) ─────────────────────────────
+
+  /** "Zuordnen": the picker opens under the button (overlay), on phones in the flow right under it; again = closes. */
+  toggleAssign(ev: Event): void {
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (this.mode() === 'assign') {
+      this.closePop();
+      return;
+    }
+    const at = ev.currentTarget as HTMLElement;
+    this.closePop();
+    void this.path.loadAssignTargets();
+    if (isPhone()) {
+      this.anchor.set(at);
+      this.pickInline.set(true);
+      this.mode.set('assign');
+      return;
+    }
+    this.openPop('assign', at);
+  }
+
+  async onAssign(pick: AssignPick): Promise<void> {
+    if (this.assigning()) return;
+    const at = this.anchor();
+    this.assigning.set(true);
+    try {
+      const res = await this.path.assignWish(this.kind(), this.className(), pick.qty, pick.target, { name: this.label, surface: 'codex' });
+      if (res.ok) this.closePop();
+      this.report(res, at?.isConnected ? at : this.host.querySelector<HTMLElement>('.st'));
+    } finally {
+      this.assigning.set(false);
+    }
+  }
+
+  /**
+   * The strip leads to Planen with that Operation in focus. The focus is stored before the browser follows the link,
+   * so a new tab (middle / modified click) opens on the same Operation; only a plain click closes a floating host.
+   */
+  onOperationLink(ev: MouseEvent, packageId: string): void {
+    if (ev.type === 'auxclick' && ev.button !== 1) return;
+    this.injector.get(NachschubFocusService).select(packageId);
+    if (ev.type === 'click') this.onLink(ev);
   }
 
   async stepPlace(place: string, delta: number): Promise<void> {
@@ -658,12 +894,21 @@ export class ItemPathComponent implements OnDestroy {
     this.mode.set(mode);
     this.anchor.set(at);
     this.otherOpen.set(false);
-    const ref = this.overlay.create({
-      disposeOnNavigation: true,
-      scrollStrategy: this.overlay.scrollStrategies.reposition(),
-      // Phones: above the launcher lane (--sc-fab-clear-block), never under the feedback button.
-      positionStrategy: phone
-        ? this.overlay.position().global().centerHorizontally().bottom('var(--sc-fab-clear-block)')
+    this.caret.set('top');
+    // The picker hangs on "Zuordnen" (B6): start-aligned under it, caret at its left; with no room below it opens
+    // above with the caret at the bottom. No push: pushing would slide it over its own button.
+    const connected =
+      mode === 'assign'
+        ? this.overlay
+            .position()
+            .flexibleConnectedTo(at)
+            .withPositions([
+              { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 8 },
+              { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom', offsetY: -8 },
+            ])
+            .withPush(false)
+            .withViewportMargin(8)
+            .withFlexibleDimensions(false)
         : this.overlay
             .position()
             .flexibleConnectedTo(at)
@@ -675,7 +920,13 @@ export class ItemPathComponent implements OnDestroy {
             ])
             .withPush(true)
             .withViewportMargin(8)
-            .withFlexibleDimensions(false),
+            .withFlexibleDimensions(false);
+    if (mode === 'assign') connected.positionChanges.subscribe((c) => this.caret.set(c.connectionPair.originY === 'top' ? 'bottom' : 'top'));
+    const ref = this.overlay.create({
+      disposeOnNavigation: true,
+      scrollStrategy: this.overlay.scrollStrategies.reposition(),
+      // Phones: above the launcher lane (--sc-fab-clear-block), never under the feedback button.
+      positionStrategy: phone && mode !== 'assign' ? this.overlay.position().global().centerHorizontally().bottom('var(--sc-fab-clear-block)') : connected,
     });
     ref.attach(new TemplatePortal(this.popTpl(), this.vcr));
     ref.outsidePointerEvents().subscribe((ev) => {
@@ -700,5 +951,13 @@ export class ItemPathComponent implements OnDestroy {
     if (typeof window !== 'undefined') window.removeEventListener('scroll', this.onScroll, true);
     ref?.dispose();
     this.mode.set(null);
+    this.pickInline.set(false);
   }
+}
+
+const NO_TARGETS: AssignTargets = { operations: [], slotsUsed: 0, slotsMax: 7, canCreate: true, blockKey: null };
+
+/** The overlay breakpoint of sc-popup: below it the picker goes into the flow instead of an overlay (B10). */
+function isPhone(): boolean {
+  return typeof window !== 'undefined' && window.matchMedia(SC_POPUP_PHONE_QUERY).matches;
 }

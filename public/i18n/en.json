@@ -8848,7 +8848,31 @@
     "whereTitle": "Where is it?",
     "otherPlace": "Other place …",
     "otherPlaceholder": "Enter a place",
-    "store": "Put down"
+    "store": "Put down",
+    "wishAssigned": "{{n}} of them assigned to an Operation",
+    "assign": {
+      "go": "Assign",
+      "title": "Assign to an Operation",
+      "howMany": "How many?",
+      "ofWished": "of {{n}} wished",
+      "ofFree": "of {{n}} free",
+      "newest": "created last",
+      "new": "New Operation",
+      "newHint": "A name is proposed",
+      "slots": "{{used}} of {{max}} slots in use",
+      "planHint": "You plan Einsätze",
+      "inHq": "in the HQ",
+      "progress": "{{done}} of {{total}} Einsätze",
+      "noEinsatz": "No Einsatz planned yet",
+      "line": "{{n}} in Operation “{{name}}”",
+      "lineWhole": "Operation “{{name}}”",
+      "moreOne": "+1 more Operation",
+      "more": "+{{n}} more Operations"
+    },
+    "own": {
+      "morePlacesOne": "+1 more place",
+      "morePlaces": "+{{n}} more places"
+    }
   },
   "itemStage": {
     "aria": "Stage: {{name}}",
