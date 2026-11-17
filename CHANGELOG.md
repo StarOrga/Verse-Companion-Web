@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.278.1] - 2026-11-18
+
+### Fixed
+- Admin concept pages: Ctrl/⌘ + click (or a long press) sets a note on any element of a mock, not only on paragraphs and list rows, also on pages published earlier. A concept tab left open overnight picks up a new ticket by itself and keeps following new rounds.
+
 ## [0.278.0] - 2026-11-17
 
 ### Changed
