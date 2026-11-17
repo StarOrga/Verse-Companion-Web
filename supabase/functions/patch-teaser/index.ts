@@ -23,6 +23,7 @@ import { RETRY_COOLDOWN_MS, liveVersionOfSlug, pickSweepTargets, wantedVersions 
 import { callClaude } from '../_shared/ai-ledger.ts';
 import { withPosthog } from '../_shared/posthog.ts';
 import { claimRun } from '../_shared/claim-run.ts';
+import { safeEqual } from '../_shared/safe-equal.ts';
 
 const MODEL = Deno.env.get('PATCH_TEASER_MODEL') ?? 'claude-sonnet-5-5';
 const SPECTRUM_LIST_URL = 'https://robertsspaceindustries.com/api/spectrum/forum/channel/threads';
@@ -124,7 +125,7 @@ Deno.serve(withPosthog('patch-teaser', async (req) => {
   // Sweep: open to any caller, missing rows only (see header). Nothing in the body steers it.
   if (body.sweep === true) return await sweep(admin, serviceKey);
 
-  if (!serviceKey || req.headers.get('authorization') !== `Bearer ${serviceKey}`) return json({ error: 'forbidden' }, 403);
+  if (!serviceKey || !safeEqual(req.headers.get('authorization') ?? '', `Bearer ${serviceKey}`)) return json({ error: 'forbidden' }, 403);
   const version = String(body.version ?? '');
   const slug = String(body.slug ?? '').toLowerCase();
   if (!VERSION_RE.test(version) || !/^[a-z0-9-]{1,160}$/.test(slug)) return json({ error: 'invalid_body' }, 400);

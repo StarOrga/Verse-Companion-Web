@@ -252,11 +252,14 @@ interval) returns boolean` (migration `20261116100000_claim_run.sql`, pgTAP `cla
 `guard_runs` table: the first caller gets `true`, a concurrent one waits on the row lock, re-checks the committed row and
 gets `false`. SECURITY DEFINER, `search_path = ''`, EXECUTE for `service_role` only. A claim expires by time alone, so a
 crashed run blocks at most one interval. TS wrapper: `_shared/claim-run.ts` (`claimRun(db, name, minMs)`), **fails
-closed** (rpc missing or erroring = nobody runs), so push the migration before deploying the functions.
+closed** (rpc missing or erroring = nobody runs), so push the migration before deploying the functions — CI deploys
+them on the merge, so a claim migration goes out BEFORE the merge. A throttled cron call answers 429 / `throttled`,
+which monitoring counts as healthy: a missing rpc shows only as data that stops updating. An operator retry inside a
+claim goes through the privileged path (service key / admin), not by deleting `patch_teaser_tries`.
 
 | Function | Claim name | Interval |
 |---|---|---|
-| `sc-events-sync` | `sc-events-sync` | 5 min |
+| `sc-events-sync` | `sc-events-sync` | 1 h (unsure items are re-asked on every run, so the interval bounds the forced AI spend) |
 | `sc-event-sheet` (automatic mode only; targeted/backfill are privileged) | `sc-event-sheet:auto` | 10 min |
 | `patch-teaser` sweep | `patch-teaser:sweep` (one Spectrum lookup), `patch-teaser:<version>` (one model call per version) | 5 min / 6 h |
 | `translate-orchestrator` `sync_sources` by the public key (service key and admins bypass) | `translate-orchestrator:sync_sources` | 6 h |

@@ -17,7 +17,7 @@
 //   * AI is a fallback only: event-family title but no parseable dates, and only
 //     with ANTHROPIC_API_KEY / OPENAI_API_KEY set (that order). Accepts confidence >= 0.8 and
 //     validated dates; otherwise the item is logged as needs_review.
-//   * Self-throttled (one run per 5 min, atomic claim_run) so the public URL cannot be used to
+//   * Self-throttled (one run per hour, atomic claim_run; pg_cron calls it every 6 h) so the public URL cannot be used to
 //     hammer the wiki API. verify_jwt=false: pg_cron calls it with the
 //     publishable key, like patch-stability-sample.
 
@@ -37,7 +37,9 @@ const PAGES = 3; // 3 x 100 newest Comm-Links ≈ 4–6 months of posts
 const FETCH_TIMEOUT_MS = 15_000;
 const AI_TIMEOUT_MS = 25_000;
 const AI_MAX_CALLS = 5;
-const THROTTLE_MS = 5 * 60_000;
+// One run per hour: unsure items go back to the AI on every run (up to AI_MAX_CALLS), so the interval is what bounds
+// the spend an anonymous caller can force. The cron (every 6 h) is far inside it.
+const THROTTLE_MS = 60 * 60_000;
 const USER_AGENT = 'VerseCompanion/1.0 (+sc-events-sync)';
 
 const json = (body: unknown, status = 200) =>
@@ -193,7 +195,7 @@ Deno.serve(withPosthog('sc-events-sync', async (req) => {
   await db.from('sc_events_scrape_runs').update({ status: 'failed', finished_at: new Date().toISOString(), error: 'run did not finish (worker killed or timed out)' })
     .eq('status', 'running').lt('started_at', new Date(Date.now() - 30 * 60_000).toISOString());
   // Atomic claim (claim_run, one statement): N parallel POSTs cannot all pass a read-then-insert check any more.
-  if (!(await claimRun(db, 'sc-events-sync', THROTTLE_MS))) return json({ skipped: 'throttled: a run started less than 5 minutes ago' }, 429);
+  if (!(await claimRun(db, 'sc-events-sync', THROTTLE_MS))) return json({ skipped: 'throttled: a run started less than an hour ago' }, 429);
 
   const { data: run, error: runErr } = await db.from('sc_events_scrape_runs')
     .insert({ source: 'star-citizen-wiki:comm-links', status: 'running', parser_version: PARSER_VERSION }).select('id').single();

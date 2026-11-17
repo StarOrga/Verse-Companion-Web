@@ -223,7 +223,7 @@ policy = "oneshot"
 # JWT verification OFF: pg_cron (sc-events-sync job, 20261016120000_sc_events.sql)
 # calls it with the publishable key, like patch-stability-sample. The function
 # only reads public Comm-Links and writes through a service_role-only RPC; it
-# self-throttles to one run per 5 min (atomic claim_run), so the public URL cannot be abused to
+# self-throttles to one run per hour (atomic claim_run), so the public URL cannot be abused to
 # hammer the upstream API.
 verify_jwt = false
 

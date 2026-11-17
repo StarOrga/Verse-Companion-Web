@@ -36,6 +36,7 @@ import {
 } from './_extract.ts';
 import { withPosthog } from '../_shared/posthog.ts';
 import { claimRun } from '../_shared/claim-run.ts';
+import { safeEqual } from '../_shared/safe-equal.ts';
 
 const MODEL = Deno.env.get('SC_EVENT_SHEET_MODEL') ?? 'claude-sonnet-5-5';
 const COMM_LINK_API = 'https://api.star-citizen.wiki/api/comm-links';
@@ -210,7 +211,7 @@ Deno.serve(withPosthog('sc-event-sheet', async (req) => {
   let privileged = false;
   if (targeted || backfill || body.force === true) {
     const auth = req.headers.get('authorization') ?? '';
-    privileged = auth === `Bearer ${serviceKey}`;
+    privileged = !!serviceKey && safeEqual(auth, `Bearer ${serviceKey}`); // an unset key never matches "Bearer "
     if (!privileged && auth) {
       const user = createClient(url, Deno.env.get('SUPABASE_ANON_KEY') ?? '', { global: { headers: { authorization: auth } }, auth: { persistSession: false } });
       const { data } = await user.rpc('is_admin');
