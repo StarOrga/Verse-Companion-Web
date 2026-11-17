@@ -333,7 +333,7 @@
     {
       "iteration": 5,
       "template": "design",
-      "status": "open",
+      "status": "submitted",
       "generated_at": "2026-11-17T15:08:00Z",
       "reason": "needs-decision from the implement run",
       "designs": [
@@ -348,7 +348,23 @@
           "r5-d-holo"
         ]
       },
-      "brief": "docs/concepts/20261117-1110-pfad-stationen/briefs/05.md"
+      "brief": "docs/concepts/20261117-1110-pfad-stationen/briefs/05.md",
+      "action": "implement",
+      "submitted_at": "2026-11-17",
+      "favourite": "kaesten",
+      "answers": {
+        "r5-d-bauplan": "immer (always when signed in; recommendation was gewuenscht)",
+        "r5-d-einfach": "ja (the classic item view gets the control)",
+        "r5-d-holo": "menue (recommendation left standing)"
+      },
+      "note": "im holotisch in beta haben wir auß0erdem eine andere visualisierung, rethink die ggf. inkl. der neuen karten logik dort für den wiederkennugnswert - oder wenn der nicht benötigt, weil einzige stelle (abgesehne von klaassicsher beta nanischt), dann gern nochmal die darstellung generell r ethinken und mergen damit . Btw. du brauchst nur beta versionen anzugleichen!",
+      "attachments": [
+        ".claude/concepts/20261117-1110-pfad-stationen/attachments/cb8e8d66f274ff725741a2e5358b1e03dbb78dbf5e4fecc8f4290a2db4e04343.png"
+      ],
+      "implement": {
+        "brief": "docs/concepts/20261117-1110-pfad-stationen/briefs/implement-r5.md",
+        "lines": 10
+      }
     }
   ]
 }
