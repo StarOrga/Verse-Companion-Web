@@ -48,8 +48,11 @@
 //   403 forbidden | unknown_release_token | release_token_revoked
 //   426 uploader_outdated
 //   500 server_misconfigured | sign_failed | commit_failed | prune_failed
+//       (a database refusal, or Supabase Storage)
 //   503 r2_usage_unknown (R2 mode only: usage could not be read — fail closed;
 //       a reading up to 24 h old (same month) bridges an Analytics outage)
+//   503 sign_failed | commit_failed | prune_failed with `transient: true` +
+//       Retry-After (R2 mode only: R2 refused or timed out; retry the call)
 //   507 storage_quota_exceeded | r2_free_tier_guard (R2 mode only)
 //
 // STORAGE BACKEND (storage plan 2026-09-24): with the R2_* secrets set (see
@@ -101,6 +104,7 @@ import {
   parseBlueprintObjects,
 } from './_blueprints.ts';
 import { withPosthog } from '../_shared/posthog.ts';
+import { DbError, r2Failure } from './_r2-failure.ts';
 
 const BUCKET = 'ship-skins';
 const SAFE_ID = /^[A-Za-z0-9_-]+$/;
@@ -181,7 +185,7 @@ async function r2Gate(r2: R2): Promise<Response | null> {
     // A cached reading only counts with 10 % headroom under the quota (Codex review).
     used = await bucketBytes(r2, Date.now(), r2.quotaBytes * BUCKET_CACHE_HEADROOM);
   } catch (e) {
-    return r2SignFailed(e);
+    return r2Failed('sign_failed', e);
   }
   if (used >= r2.quotaBytes) {
     return json({ error: 'storage_quota_exceeded', message: `R2 holds ${used} of ${r2.quotaBytes} bytes` }, 507);
@@ -205,15 +209,13 @@ async function mapLimit<T, R>(items: T[], n: number, fn: (x: T) => Promise<R>): 
 }
 
 /**
- * R2 refused/timed out while signing (list, quota read). The request itself is
- * fine, so reply 503 + Retry-After (still code `sign_failed`, which the
- * uploader already retries with backoff) instead of a bare 500.
+ * R2 refused/timed out (list, get, delete, presign, quota read) — the request
+ * itself is fine, so reply 503 + Retry-After + `transient: true` under the
+ * same code, which the uploader retries with backoff. A `DbError` thrown
+ * inside the same block stays a 500 (#365).
  */
-function r2SignFailed(e: unknown, path?: string): Response {
-  return new Response(
-    JSON.stringify({ error: 'sign_failed', transient: true, message: (e as Error).message, ...(path ? { path } : {}) }),
-    { status: 503, headers: { 'content-type': 'application/json', 'retry-after': '2', ...CORS } },
-  );
+function r2Failed(code: string, e: unknown, path?: string): Response {
+  return r2Failure(code, e, CORS, path);
 }
 
 /** Stored size of one object below `ship-skins/`, or null when it is not there. */
@@ -296,7 +298,7 @@ async function handlePackage(
       });
       return json({ ok: true, uploads });
     } catch (e) {
-      return r2SignFailed(e);
+      return r2Failed('sign_failed', e);
     }
   }
 
@@ -334,7 +336,7 @@ async function handlePackage(
       );
     }
   } catch (e) {
-    return json({ error: 'commit_failed', message: (e as Error).message }, 500);
+    return r2Failed('commit_failed', e);
   }
 
   const { error } = await adminClient.from('asset_packages').upsert(
@@ -396,7 +398,7 @@ async function handleBlueprint(
       });
       return json({ ok: true, uploads });
     } catch (e) {
-      return r2SignFailed(e);
+      return r2Failed('sign_failed', e);
     }
   }
 
@@ -413,7 +415,7 @@ async function handleBlueprint(
       .from('ship_skins')
       .select('ship_id', { count: 'exact', head: true })
       .or(`blueprint_path.eq."${path}",blueprint_icon_path.eq."${path}"`);
-    if (error) throw new Error(error.message);
+    if (error) throw new DbError(error.message);
     return count !== 0;
   };
   try {
@@ -430,7 +432,7 @@ async function handleBlueprint(
       }
     }
   } catch (e) {
-    return json({ error: 'commit_failed', message: (e as Error).message }, 500);
+    return r2Failed('commit_failed', e);
   }
 
   const { data: before, error: beforeErr } = await adminClient
@@ -584,7 +586,7 @@ Deno.serve(withPosthog('ingest-skins', async (req: Request): Promise<Response> =
           }
           uploads.push({ path, token: '', signedUrl: await presignPut(r2, SKINS_PREFIX + path) });
         } catch (e) {
-          return r2SignFailed(e, path);
+          return r2Failed('sign_failed', e, path);
         }
         continue;
       }
@@ -644,7 +646,7 @@ Deno.serve(withPosthog('ingest-skins', async (req: Request): Promise<Response> =
               .from('ship_skins')
               .select('ship_id', { count: 'exact', head: true })
               .eq('model_path', p);
-            if (refErr) throw new Error(refErr.message);
+            if (refErr) throw new DbError(refErr.message);
             if (needsVerification(p, count)) {
               verdict = await checkHull(p, obj.size, () => getObject(r2, key, MAX_HULL_BYTES));
               // Unreferenced, so no other ship can be using these wrong bytes.
@@ -652,7 +654,7 @@ Deno.serve(withPosthog('ingest-skins', async (req: Request): Promise<Response> =
             }
           }
         } catch (e) {
-          return json({ error: 'commit_failed', message: (e as Error).message }, 500);
+          return r2Failed('commit_failed', e);
         }
         if (verdict !== 'ok') return json({ error: `hull_${verdict}`, message: p }, 409);
       }
@@ -699,13 +701,13 @@ Deno.serve(withPosthog('ingest-skins', async (req: Request): Promise<Response> =
             .from('ship_skins')
             .select('ship_id', { count: 'exact', head: true })
             .eq('model_path', p);
-          if (refErr) throw new Error(refErr.message);
+          if (refErr) throw new DbError(refErr.message);
           if (count !== 0) continue; // still shared (or unknown) — keep it
           await deleteObject(r2, SKINS_PREFIX + p);
           prunedR2++;
         }
       } catch (e) {
-        return json({ error: 'prune_failed', message: (e as Error).message }, 500);
+        return r2Failed('prune_failed', e);
       }
       // Everything this ship still needs is in R2 now; the Supabase copy goes.
       keepPaths.clear();
