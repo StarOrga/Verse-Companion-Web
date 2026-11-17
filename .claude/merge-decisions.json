@@ -54,6 +54,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›counts›generated": [
+      {
+        "ship": "claude/holotisch-decks-display-5750f7",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree",
+        "decided": true,
+        "at": "2026-11-17T23:08:09.663Z",
+        "hunks": [
+          "72d685fc6281"
+        ]
+      }
+    ],
     ".claude/project-map.md›data-uploader/python/tests›count": [
       {
         "ship": "claude/ship-data-extraction-validation-8d0c76",
