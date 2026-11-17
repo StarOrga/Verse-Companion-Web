@@ -5,7 +5,7 @@
 // Types only (plus one constant) — no framework, no runtime imports.
 
 import type { PolyHitKind, PolySearchHit } from '../codex-poly-search';
-import type { SearchTarget } from './codex-search-model';
+import type { SearchTarget, SearchVariantLink } from './codex-search-model';
 import type { SearchFit } from './search-compat';
 
 /** A result group id: a catalog kind, or one of the extra sources. */
@@ -121,6 +121,12 @@ interface RowBase {
   target: SearchTarget;
   cta: SearchCta | null;
   icons: SearchRowIcons;
+  /**
+   * The row opens the page the reader is on (note 4): greyed, "Du bist hier",
+   * aria-current="page", no CTA, no icons, no fit badge; Enter / a plain
+   * click only closes the search.
+   */
+  current?: true;
 }
 
 export type SearchResultRow =
@@ -147,6 +153,11 @@ export type SearchResultRow =
       classNameSlug: string | null;
       /** Inventory quantity, when meaningful. */
       qty: number | null;
+      /**
+       * A ship's saved variants ("Meine …", `?v=`) as mini text links: one row per
+       * ship, the row itself opens the active (default) variant. Only with two or more.
+       */
+      variants?: SearchVariantLink[];
     })
   | (RowBase & { type: 'patch'; line: string; title: string; version: string; publishedAt: string })
   | (RowBase & {

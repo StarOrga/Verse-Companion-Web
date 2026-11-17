@@ -17,6 +17,7 @@ import {
   isUpcomingHit,
   polyHitLink,
   polyHitQueryParams,
+  polyMatchScore,
 } from '../codex-poly-search';
 import { normalizeSearch } from '../codex-search';
 
@@ -56,7 +57,7 @@ export interface CodexSearchGroup {
  * they share one shape.
  */
 export type SearchOption =
-  | { type: 'hit'; id: string; hit: PolySearchHit; target: SearchTarget }
+  | { type: 'hit'; id: string; hit: PolySearchHit; target: SearchTarget; current?: true }
   | { type: 'more'; id: string; kind: PolyHitKind; total: number; target: SearchTarget }
   | { type: 'recent'; id: string; term: string; target: SearchTarget }
   | { type: 'category'; id: string; labelKey: string; target: SearchTarget }
@@ -157,29 +158,180 @@ export function groupHits(
   return groups;
 }
 
-/** The listbox options of a grouped result, in reading order. */
-export function resultOptions(groups: readonly CodexSearchGroup[]): SearchOption[] {
+/**
+ * The listbox options of a grouped result, in reading order. Run the groups
+ * through {@link applyCurrentPage} first: its `current` keys mark the
+ * "Du bist hier" row.
+ */
+export function resultOptions(groups: readonly CodexSearchGroup[], current: ReadonlySet<string> = NO_KEYS): SearchOption[] {
   const out: SearchOption[] = [];
   for (const g of groups) {
     g.hits.forEach((hit, i) =>
-      out.push({ type: 'hit', id: `${g.kind}-${i}`, hit, target: hitTarget(hit) }),
+      out.push({
+        type: 'hit', id: `${g.kind}-${i}`, hit, target: hitTarget(hit),
+        ...(current.has(hitKey(hit)) ? { current: true as const } : {}),
+      }),
     );
     if (g.more) out.push({ type: 'more', id: `${g.kind}-more`, kind: g.kind, total: g.total, target: g.more });
   }
   return out;
 }
 
-/** The listbox options of an empty field: recent searches, new ships, categories. */
-export function suggestionOptions(recent: readonly string[], fresh: readonly PolySearchHit[]): SearchOption[] {
+/** How many of the patch's new ships an empty field offers. */
+export const FRESH_SHIPS_SHOWN = 4;
+
+/**
+ * The listbox options of an empty field: recent searches, new ships, categories.
+ * The page the reader stands on is never offered (it would lead nowhere); the
+ * new ships backfill from the rest of `fresh`, so the list keeps its length.
+ */
+export function suggestionOptions(
+  recent: readonly string[],
+  fresh: readonly PolySearchHit[],
+  here: PageLocation | null = null,
+): SearchOption[] {
   const out: SearchOption[] = [];
   recent.forEach((term, i) =>
     out.push({ type: 'recent', id: `recent-${i}`, term, target: { link: ['/codex'], queryParams: { q: term } } }),
   );
-  fresh.forEach((hit, i) => out.push({ type: 'fresh', id: `fresh-${i}`, hit, target: hitTarget(hit) }));
-  SEARCH_CATEGORY_SHORTCUTS.forEach((c, i) =>
-    out.push({ type: 'category', id: `cat-${i}`, labelKey: c.labelKey, target: c.target }),
-  );
+  fresh
+    .filter((hit) => !isCurrentTarget(hitTarget(hit), here))
+    .slice(0, FRESH_SHIPS_SHOWN)
+    .forEach((hit, i) => out.push({ type: 'fresh', id: `fresh-${i}`, hit, target: hitTarget(hit) }));
+  SEARCH_CATEGORY_SHORTCUTS.forEach((c, i) => {
+    if (!isCurrentTarget(c.target, here)) out.push({ type: 'category', id: `cat-${i}`, labelKey: c.labelKey, target: c.target });
+  });
   return out;
+}
+
+// -- "Du bist hier" (concept 2026-11-17, note 4) ----------------------------------
+// A search started on a detail page does not offer that page again: a weak
+// match is hidden, a near-exact one stays at its rank, greyed, and only closes
+// the search. Pure, so the fusion bar, the Codex bar and Ctrl+K share it.
+
+/** Where the reader stands: the router path (decoded, lower case, no trailing slash) and its query. */
+export interface PageLocation {
+  path: string;
+  query: Readonly<Record<string, string>>;
+}
+
+/**
+ * Query params that only pick a VIEW of one page, never another page: the
+ * personal variant (`v`), holo/classic, a loadout, a shared link, "mine" mode.
+ * A ship row is the current page on any of them; its variant links say which
+ * variant is open.
+ */
+export const VIEW_ONLY_PARAMS: ReadonlySet<string> = new Set(['v', 'view', 'loadout', 'shared', 'mine']);
+
+const NO_KEYS: ReadonlySet<string> = new Set();
+
+function normPath(p: string): string {
+  let d = p;
+  try {
+    d = decodeURIComponent(p);
+  } catch {
+    /* a malformed escape compares as written */
+  }
+  d = ('/' + d.split(';')[0]).replace(/\/{2,}/g, '/').toLowerCase();
+  return d.length > 1 ? d.replace(/\/+$/, '') : d;
+}
+
+/** A router URL (`/codex/ship/AEGS_Gladius?view=holo#akte`) as a page location. The fragment never matters. */
+export function pageLocationOf(url: string): PageLocation {
+  const noHash = (url ?? '').split('#')[0];
+  const qi = noHash.indexOf('?');
+  const query: Record<string, string> = {};
+  if (qi !== -1) {
+    new URLSearchParams(noHash.slice(qi + 1)).forEach((v, k) => {
+      if (!(k in query)) query[k] = v;
+    });
+  }
+  return { path: normPath(qi === -1 ? noHash : noHash.slice(0, qi)), query };
+}
+
+/**
+ * True when `t` opens the page the reader is on: the same path, and every
+ * query param of the target that names a page (not a view) equal to the URL's.
+ */
+export function isCurrentTarget(t: SearchTarget, here: PageLocation | null): boolean {
+  if (!here) return false;
+  if (normPath(t.link.join('/')) !== here.path) return false;
+  for (const [k, v] of Object.entries(t.queryParams ?? {})) {
+    if (VIEW_ONLY_PARAMS.has(k)) continue;
+    if ((here.query[k] ?? null) !== v) return false;
+  }
+  return true;
+}
+
+/** A variant mini link (`?v=<config>`) on its ship's row. */
+export interface SearchVariantLink {
+  /** The saved configuration's id — the `v` of the link. */
+  id: string;
+  label: string;
+  target: SearchTarget;
+  /** The ship's active variant: what the row itself opens and what the page shows without a `v`. */
+  active: boolean;
+  /** This variant is open on the page the reader is on: marked, not a navigation. */
+  current?: true;
+}
+
+/** True when the variant link is the variant open right now. Without a `v` in the URL the active one is. */
+export function isCurrentVariant(variant: Pick<SearchVariantLink, 'target' | 'active'>, here: PageLocation | null): boolean {
+  if (!here || !isCurrentTarget(variant.target, here)) return false;
+  const open = here.query['v'] ?? null;
+  return open ? open === (variant.target.queryParams?.['v'] ?? null) : variant.active;
+}
+
+/** Variant mini links shown on one row before "+n". */
+export const VARIANT_LINKS_SHOWN = 3;
+
+/** Identity of a hit in the current-page rule. */
+export function hitKey(hit: Pick<PolySearchHit, 'kind' | 'classNameSlug'>): string {
+  return `${hit.kind}|${hit.classNameSlug.toLowerCase()}`;
+}
+
+/** The term names the hit nearly exactly: name, name without maker or class name equals it (score 4). */
+export function isNearExactHit(term: string, hit: PolySearchHit): boolean {
+  return !!term.trim() && polyMatchScore(term, hit) === 4;
+}
+
+/**
+ * The current-page rule for the grouped hits of the Codex bar and Ctrl+K: a
+ * weak match on the current page is dropped, a near-exact one stays and is
+ * returned in `current`. When nothing else would remain, the current page
+ * shows greyed instead of an empty panel. Group totals stay the index's.
+ */
+export function applyCurrentPage(
+  groups: readonly CodexSearchGroup[],
+  term: string,
+  here: PageLocation | null,
+): { groups: CodexSearchGroup[]; current: ReadonlySet<string> } {
+  if (!here) return { groups: [...groups], current: NO_KEYS };
+  const current = new Set<string>();
+  const hidden: { kind: PolyHitKind; hit: PolySearchHit }[] = [];
+  const out: CodexSearchGroup[] = [];
+  for (const g of groups) {
+    const hits = g.hits.filter((hit) => {
+      if (!isCurrentTarget(hitTarget(hit), here)) return true;
+      if (isNearExactHit(term, hit)) {
+        current.add(hitKey(hit));
+        return true;
+      }
+      hidden.push({ kind: g.kind, hit });
+      return false;
+    });
+    if (hits.length || g.more) out.push(hits.length === g.hits.length ? g : { ...g, hits });
+  }
+  const first = hidden[0];
+  if (first && !out.some((g) => g.hits.length)) {
+    current.add(hitKey(first.hit));
+    const at = out.findIndex((x) => x.kind === first.kind);
+    const src = at === -1 ? groups.find((x) => x.kind === first.kind)! : out[at];
+    const back = { ...src, hits: [first.hit] };
+    if (at === -1) out.unshift(back);
+    else out[at] = back;
+  }
+  return { groups: out, current };
 }
 
 /** A target as a URL string — for Ctrl+Enter (new tab) and plain hrefs. */
