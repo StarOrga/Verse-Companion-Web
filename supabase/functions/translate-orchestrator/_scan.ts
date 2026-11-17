@@ -20,8 +20,13 @@ import { inPool, tmIndexKey, tmShardKey } from './_io.ts';
 import type { Store } from './_io.ts';
 import type { CigPair } from './_prompt.ts';
 
-/** English shards per slice (~1 000 keys each). Tunable: lower it if a slice still hits the CPU limit. */
-export const SCAN_SHARDS = 16;
+/**
+ * English shards per slice (~1 000 keys each). Unmeasured when it shipped (2026-11-17), so it starts on the careful
+ * side: a slice that dies costs a dead run, one that is small only costs ticks. Raise it once the function log shows
+ * a scan slice well inside the limits; lower it if a slice still hits the CPU limit. A change mid-job is safe: finalize
+ * finds a part missing and rescans.
+ */
+export const SCAN_SHARDS = 8;
 /** Chunks per few-shot slice (`pickSimilar` scores a pool of up to 2 500 pairs per chunk). */
 export const SHOT_CHUNKS = 15;
 

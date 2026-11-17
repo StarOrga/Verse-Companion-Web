@@ -7,7 +7,7 @@ import { advance, tick } from './_machine.ts';
 import { buildShards, indexKey, shardKey } from '../ingest-catalog/_locale-shards.ts';
 import { diffStrings, isCigValid, sha256Hex } from './_diff.ts';
 import { MAX_DEAD_ATTEMPTS, RUN_STALE_MS, runVerdict, WORKER_LIMIT_KEY } from './_attempts.ts';
-import { mergeParts, openReaders, scanSlice } from './_scan.ts';
+import { mergeParts, openReaders, scanSlice, SCAN_SHARDS } from './_scan.ts';
 import { tmIndexKey, tmShardKey } from './_io.ts';
 
 const NEW = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
@@ -157,7 +157,7 @@ describe('sliced estimating in the machine', () => {
       assert.ok(ticks < 40, `did not converge: ${cursors}`);
     }
     assert.ok(ticks > 3, `expected several ticks, got ${ticks}: ${cursors}`);
-    assert.ok(cursors[0].startsWith('scan:16'), cursors[0]);
+    assert.ok(cursors[0].startsWith(`scan:${SCAN_SHARDS}`), cursors[0]);
     const done = w.jobs.get(job.id);
     assert.equal(done.status, 'queued');
     assert.ok(done.estimate_usd > 0 && done.string_count > 0);
@@ -200,7 +200,7 @@ describe('dead runs', () => {
     const st = w.jobs.get(job.id).stats;
     assert.equal(st.run_at, undefined);
     assert.equal(st.dead, undefined, 'a slice committed, so the dead count restarted');
-    assert.equal(st.est.cursor, 16);
+    assert.equal(st.est.cursor, SCAN_SHARDS);
   });
 
   it('MAX_DEAD_ATTEMPTS dead runs in a row fail the job with a translated key, no work done', async () => {

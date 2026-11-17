@@ -61,7 +61,7 @@ leaves one orphan batch (visible in the Console) that is paid but unused.
 A string table is ~90k keys per build and language, so the whole diff does not fit one edge request
 (about 2 s CPU, 256 MB). `estimating` therefore advances in slices that persist their progress in
 `stats.est` (`phase`: `scan` -> `finalize` -> `shots` -> `complete`, `cursor`, `total`) and their output
-in `translation-work/<job>/` (R2): `scan` reads 16 English shards per slice and looks the same keys up in the
+in `translation-work/<job>/` (R2): `scan` reads `SCAN_SHARDS` (8) English shards per slice and looks the same keys up in the
 base / CIG tables through the shard layout; `shots` picks the few-shot pairs of 15 chunks per slice. A tick
 keeps slicing for ~0.9 s of wall time, at most **one** estimating / publishing job per tick. Tunables:
 `SCAN_SHARDS`, `SHOT_CHUNKS` (`_scan.ts`), `ESTIMATE_BUDGET_MS` (`_machine.ts`).
