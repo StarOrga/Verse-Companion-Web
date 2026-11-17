@@ -278,12 +278,12 @@ describe('idempotency', () => {
 
   // Brings a job to `validating` with its main batch ended and the judge batch not created yet
   // (the run that should have created it was killed), stale enough for a resume.
-  async function staleJudgeSubmission(w) {
+  async function staleJudgeSubmission(w, failure = new Error('connection lost')) {
     const j = await newJob(w);
     for (let i = 0; i < 10 && w.jobs.get(j.id).status !== 'validating'; i++) await tick(w.deps);
     assert.equal(w.jobs.get(j.id).status, 'validating');
     const create = w.llm.createBatch;
-    w.llm.createBatch = async () => { throw new Error('killed'); };
+    w.llm.createBatch = async () => { throw failure; };
     await tick(w.deps); // results collected, judge claim written, create dies
     w.llm.createBatch = create;
     const cur = w.jobs.get(j.id);
@@ -351,13 +351,23 @@ describe('idempotency', () => {
     assert.equal(after.stats.submit, undefined);
   });
 
-  it('a create that fails leaves no intent behind, so the retry is not counted as a duplicate', async () => {
+  it('a create the provider refuses leaves no intent behind, so the retry is not counted as a duplicate', async () => {
     const w = world();
-    const id = await staleJudgeSubmission(w);
+    const id = await staleJudgeSubmission(w, Object.assign(new Error('rate limited'), { status: 429 }));
     assert.equal(w.jobs.get(id).stats.submit, undefined);
     await tick(w.deps);
     assert.equal(judgeBatches(w).length, 1);
     assert.equal(w.jobs.get(id).stats.resubmits, undefined);
+  });
+
+  it('a create whose answer never arrived keeps its intent, so the retry is counted', async () => {
+    const w = world();
+    const id = await staleJudgeSubmission(w); // no HTTP status: the batch may exist
+    assert.deepEqual(Object.keys(w.jobs.get(id).stats.submit).sort(), ['at', 'g', 'kind']);
+    await tick(w.deps);
+    assert.equal(judgeBatches(w).length, 1);
+    assert.equal(w.jobs.get(id).stats.resubmits, 1);
+    assert.equal(w.jobs.get(id).stats.submit, undefined);
   });
 
   it('dry-run estimate writes nothing', async () => {

@@ -351,9 +351,10 @@ function requireLlm(deps: Deps): Llm {
  *   The write also refreshes `updated_at`, so a third run waits out the stale window again.
  * - The last write sets `donePhase` itself. A kill can no longer leave a job between "all batches
  *   created" and the phase that reads them.
- * What remains: a kill between the provider's answer and the write of the ref (one DB round trip).
- * The next run finds the intent without a ref, creates that group again and counts it in
- * `stats.resubmits` - the first batch is then paid for and never read.
+ * What remains: a kill between the provider's answer and the write of the ref (one DB round trip),
+ * or a create whose answer never arrived. The next run finds the intent without a ref, creates that
+ * group again and counts it in `stats.resubmits` - the first batch, if it exists, is paid for and
+ * never read.
  */
 async function submitGroups(
   deps: Deps, job: Job, kind: BatchRef['kind'], reqs: { custom_id: string; params: BatchParams }[], donePhase = 'running',
@@ -377,8 +378,12 @@ async function submitGroups(
     try {
       ({ id } = await llm.createBatch(groups[g]));
     } catch (e) {
-      // The provider refused: nothing was created, so the retry is not a possible duplicate.
-      await deps.db.cas(cur, { stats: addStats(cur, { submit: undefined }) });
+      // An HTTP status means the provider answered and refused: nothing was created, so the retry is
+      // not a possible duplicate. Without one (timeout, dropped connection) the create may have gone
+      // through, and the intent stays so the retry is counted.
+      if (typeof (e as { status?: unknown })?.status === 'number') {
+        await deps.db.cas(cur, { stats: addStats(cur, { submit: undefined }) });
+      }
       throw e;
     }
     cur = await must(await deps.db.cas(cur, { batch_ids: [...cur.batch_ids, { id, kind }], stats: addStats(cur, { submit: undefined }) }));

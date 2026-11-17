@@ -61,14 +61,15 @@ be made repeatable. All three submissions (main, judge, post-edit) go through `s
 
 - Before each create it writes the intent `stats.submit` (`kind`, group, time) as a compare-and-set.
   Of two runs that resume the same stale job only one wins that write; the other stops before it
-  creates anything. A create the provider refuses clears the intent again.
+  creates anything. A create the provider refuses (an HTTP status came back) clears the intent again;
+  one whose answer never arrived keeps it.
 - Its last write sets the phase the step waits in (`running`, or `judge` for the judge batch) in the
   same compare-and-set that ends the submission. A `validating` job still found in `running` (a
   judge batch from before this change whose second write was lost) is read as `judge`.
 - A submission that never finished (phase `submitting` / `judge_submitting`) is resumed after 15 minutes.
 
 What remains is a kill between the provider's answer and the write of the batch ref (one DB round
-trip). The resume then finds the intent without a ref, creates that group again, logs
+trip), or a create whose answer was lost. The resume then finds the intent without a ref, creates that group again, logs
 `translate batch may exist twice` and counts it in `stats.resubmits`; the first batch is an orphan
 (visible in the Console) that is paid and never read. `resubmits > 0` on a job is the cue to look.
 The learning step's batches (`_learn_batch.ts`, ids in R2 work keys) do not use this guard.
