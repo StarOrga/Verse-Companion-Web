@@ -8715,6 +8715,36 @@
       "news": "News"
     }
   },
+  "wishRemoval": {
+    "title": "{{name}} entfernen",
+    "howMany": "Wie viele entfernen?",
+    "caption": "Diese {{n}} Stücke gehen:",
+    "captionOne": "Dieses Stück geht:",
+    "barLabel": "Wohin die Stücke gehen",
+    "free": "{{n}} frei",
+    "fromOp": "{{n}} aus „{{name}}“",
+    "latest": "zuletzt zugeordnet",
+    "of": "von {{n}}",
+    "rowLabel": "Stücke aus „{{name}}“",
+    "sum": "{{done}} von {{total}} verteilt",
+    "keeps": "Die Operation behält andere Wünsche.",
+    "keepsMany": "Die Operationen behalten andere Wünsche.",
+    "lastStays": "„{{name}}“ hat danach keinen Wunsch mehr. Die {{n}} Einsätze bleiben.",
+    "lastStaysOne": "„{{name}}“ hat danach keinen Wunsch mehr. Der Einsatz bleibt.",
+    "dissolves": "„{{name}}“ hat keinen Einsatz und wird mit aufgelöst.",
+    "alsoDissolve": "Operation auch auflösen",
+    "alsoDissolveNamed": "Operation „{{name}}“ auch auflösen",
+    "confirm": "{{n}} entfernen",
+    "confirmDissolve": "Entfernen und auflösen",
+    "toastDissolved": "Die Operation wurde mit aufgelöst.",
+    "release": {
+      "title": "{{name}} aus der Operation lösen?",
+      "text": "Die {{n}} Stücke bleiben auf deiner Wunschliste und werden wieder frei.",
+      "textOne": "Das Stück bleibt auf deiner Wunschliste und wird wieder frei.",
+      "confirm": "Lösen",
+      "deleteToo": "Auch von der Wunschliste löschen"
+    }
+  },
   "cart": {
     "title": "Wünsche",
     "summary": "{{n}} Wünsche · {{g}} Gruppen",
@@ -8763,8 +8793,8 @@
       "add": "zu den Wünschen",
       "dismiss": "{{name}} nicht vorschlagen"
     },
-    "slotsFullHint": "Alle 7 Nachschub-Plätze sind belegt. Die Auswahl kommt in einen bestehenden Nachschub.",
-    "toExisting": "In einen bestehenden Nachschub",
+    "slotsFullHint": "Alle 7 Operations-Plätze sind belegt. Die Auswahl kommt in eine bestehende Operation.",
+    "toExisting": "In eine bestehende Operation",
     "open": "„{{name}}“ im Codex öffnen"
   },
   "pathCtl": {
@@ -8830,7 +8860,7 @@
     "noSilhouette": "keine Silhouette",
     "noSilhouetteReason": "Zu diesem Gegenstand liegt in diesem Build keine Silhouette vor, das Vorschaubild steht stellvertretend.",
     "no3dReason": "Zu diesem Gegenstand liegt in diesem Build kein 3D-Modell vor.",
-    "inNachschub": "Steckt im Nachschub „{{name}}“",
+    "inNachschub": "Steckt in der Operation „{{name}}“",
     "panelAria": "Werte und Informationen",
     "tabsAria": "Bereiche",
     "tab": {
