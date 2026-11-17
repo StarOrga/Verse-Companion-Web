@@ -346,10 +346,10 @@ function withVariantState(row: SearchResultRow, here: PageLocation): SearchResul
   if (row.type !== 'own' || !row.variants?.length) return row;
   return {
     ...row,
-    variants: row.variants.map((v) => {
-      const { current: _drop, ...rest } = v;
-      return isCurrentVariant(v, here) ? { ...rest, current: true as const } : rest;
-    }),
+    variants: row.variants.map((v) => ({
+      id: v.id, label: v.label, target: v.target, active: v.active,
+      ...(isCurrentVariant(v, here) ? { current: true as const } : {}),
+    })),
   };
 }
 
