@@ -4,6 +4,15 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.273.2] - 2026-11-17
+
+### Fixed
+- Translation jobs no longer hang in the estimate: the orchestrator works through the string tables in slices instead of loading everything into one request, which the edge runtime killed on every tick.
+- A translation job whose worker is killed three times in a row now fails with a clear message instead of retrying forever.
+
+### Removed
+- The unused `verify-release-token` edge function.
+
 ## [0.273.1] - 2026-11-17
 
 ### Security
