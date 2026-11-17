@@ -642,6 +642,8 @@
         "allUpcoming": "Alle {{n}} bei „Kommende Schiffe“",
         "folded": "{{n}} Varianten zusammengefasst",
         "foldedAtLeast": "mind. {{n}} Varianten zusammengefasst",
+        "foldedOne": "1 Variante zusammengefasst",
+        "foldedAtLeastOne": "mind. 1 Variante zusammengefasst",
         "grade": "Klasse {{grade}}",
         "livery": "Lackierung",
         "upcomingBadge": "Noch nicht im Spiel",
@@ -1058,8 +1060,6 @@
         "areaEmpty": "Keine Bauteile in diesem Bereich."
       },
       "persp": {
-        "lead": "Bewertet als {{mission}}, verglichen mit {{n}} Schiffen.",
-        "leadNoCohort": "Bewertet als {{mission}}.",
         "allShow": "Alle Werte aller vier ▾",
         "allHide": "Alle Werte zuklappen ▴"
       },
@@ -1189,8 +1189,8 @@
         "diffLegend": "weicht vom Werk ab"
       },
       "akte": {
-        "imageOnly": "Nur Bild",
-        "showText": "Text zeigen",
+        "imageOnly": "Akte einklappen",
+        "showText": "Akte ausklappen",
         "descriptionAria": "Beschreibung",
         "noDescription": "Für dieses Schiff liegt keine Beschreibung vor.",
         "liveries": "Lackierung",
@@ -7731,7 +7731,7 @@
       "foot": {
         "open": "Richtig erkannt, erscheint der Name in der Sternkarte und der Kreis bekommt ein Häkchen.",
         "wrong": "Diesmal kein Stern – die Auflösung bleibt in der Sternkarte stehen.",
-        "unavailable": "Sobald die Spielwerte geladen sind, kannst du hier tippen."
+        "unavailable": "Für diese Sternkarte steht gerade kein Schiff zum Erkennen fest. Es wird automatisch gewählt, sobald der Codex die Spielwerte des Patches hat – dann kannst du hier tippen."
       },
       "undoToast": "Tipp abgegeben: {{name}}"
     },
@@ -8179,6 +8179,12 @@
       "setsOne": "in 1 Set"
     },
     "row": {
+      "current": "Du bist hier",
+      "variants": "Varianten",
+      "variantMine": "Mein Schiff",
+      "variantsMore": "+{{n}}",
+      "variantsMoreAria": "{{n}} weitere Varianten auf der Schiffsseite",
+      "variantCurrent": "Diese Variante ist gerade offen",
       "patch": "Patch {{line}}",
       "patchMeta": "Patch-Notiz · {{version}}",
       "galleryMeta": "Galerie",

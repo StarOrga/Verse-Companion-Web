@@ -21,6 +21,8 @@ import { isSettingsDialogOpen } from './settings-dialog.js';
 export interface PatchCountdownCtx {
   channel: string;
   version: string;
+  /** Same build, only parts open: names them instead of "new game patch". */
+  parts?: string | null;
   /** The operator left the Install step or started a run. */
   isBusy: () => boolean;
   /** Start the run exactly like the unattended auto-run would. */
@@ -68,7 +70,8 @@ export function repaintPatchCountdown(): void {
   if (!el || !active) return;
   el.setAttribute('aria-label', t('autorun.banner.aria'));
   el.innerHTML = `
-    <span class="patch-banner-text" aria-live="polite">${t('autorun.banner.text', {
+    <span class="patch-banner-text" aria-live="polite">${t(active.parts ? 'autorun.banner.partsText' : 'autorun.banner.text', {
+      parts: escapeHtml(active.parts ?? ''),
       patch: `<span class="patch-banner-pill">${escapeHtml(active.channel)} ${escapeHtml(active.version)}</span>`,
     })}</span>
     <span class="patch-banner-count" id="patch-banner-count"></span>

@@ -15,6 +15,7 @@
 
 import type { ChannelTag, DiscoveredChannel } from './discovery.js';
 import type { CatalogSnapshot } from './sync.js';
+import type { SubthemeKey, SubthemePlan } from './subthemes.js';
 
 export type SkipReason =
   | 'no-session'
@@ -25,12 +26,21 @@ export type SkipReason =
 
 export interface AutoRunDecision {
   run: boolean;
+  /**
+   * Why a run starts: `identity` = the local x.y.z or build differs from the
+   * server's; `parts` = same identity, but the ledger names parts still open.
+   */
+  kind?: 'identity' | 'parts';
   /** The channel to process — only set when `run` is true. */
   channel?: DiscoveredChannel;
-  /** Local version that differs from the server's. */
+  /** Local x.y.z of the install. */
   localVersion?: string;
+  localBuild?: string | null;
   /** What the server currently holds for that channel (null = nothing yet). */
   serverVersion?: string | null;
+  serverBuild?: string | null;
+  /** The subthemes the run has to do — absent = all (ledger unknown). */
+  pending?: SubthemeKey[];
   reason?: SkipReason;
 }
 
@@ -44,10 +54,15 @@ export interface AutoRunInputs {
 const CHANNEL_PRIORITY: readonly ChannelTag[] = ['LIVE', 'PTU', 'EPTU', 'TECH-PREVIEW'];
 
 /** The server tags channels lowercase (`live`); discovery uses uppercase. */
-function serverVersionFor(snapshot: CatalogSnapshot, channel: ChannelTag): string | null {
+function serverIdentityFor(
+  snapshot: CatalogSnapshot,
+  channel: ChannelTag,
+): { version: string; build: string | null } | null {
   const tag = channel.toLowerCase();
   const hit = snapshot.channels.find((c) => c.channel.toLowerCase() === tag);
-  return hit ? hit.patchVersion : null;
+  if (!hit) return null;
+  const build = String(hit.buildNumber ?? '').trim();
+  return { version: hit.patchVersion, build: build || null };
 }
 
 export function decideAutoRun(input: AutoRunInputs): AutoRunDecision {
@@ -71,18 +86,122 @@ export function decideAutoRun(input: AutoRunInputs): AutoRunDecision {
       sawUnknown = true;
       continue;
     }
-    const serverVersion = serverVersionFor(input.snapshot, channel.channel);
-    if (serverVersion !== channel.version) {
+    const server = serverIdentityFor(input.snapshot, channel.channel);
+    // Identity = x.y.z + build: any of the four values differing is worth a
+    // check (the ledger then decides which parts actually need work).
+    const localBuild = (channel.buildNumber ?? '').trim();
+    const buildDiffers = Boolean(localBuild) && Boolean(server?.build) && server!.build !== localBuild;
+    if (server?.version !== channel.version || buildDiffers) {
       return {
         run: true,
+        kind: 'identity',
         channel,
         localVersion: channel.version,
-        serverVersion,
+        localBuild: localBuild || null,
+        serverVersion: server?.version ?? null,
+        serverBuild: server?.build ?? null,
       };
     }
   }
 
   return { run: false, reason: sawUnknown ? 'unknown-local-version' : 'already-uploaded' };
+}
+
+/** "4.10.3 (13165946)" — the identity as the log and the status line show it. */
+export function formatIdentity(version: string | null | undefined, build?: string | null): string {
+  const v = version || '?';
+  return build ? `${v} (${build})` : v;
+}
+
+/** One channel's ledger answer, as `sc:autorun:decide` gathered it. */
+export interface LedgerVerdict {
+  channel: DiscoveredChannel;
+  /** null = ledger not readable / no session — proves nothing either way. */
+  plan: SubthemePlan | null;
+}
+
+/**
+ * Combine the identity comparison with the subtheme ledger — the one place
+ * that turns "something differs" into "these parts need work":
+ *
+ * - identity differs, ledger read and nothing pending → no run: the server
+ *   already holds every part of this exact build (only a label differed);
+ * - identity differs, ledger names pending parts → run those (`kind: 'identity'`);
+ * - identity differs, ledger unreadable → run (conservative: all parts);
+ * - identity equal, ledger names pending parts (missing content, or a subtheme
+ *   revision bumped) → run exactly those (`kind: 'parts'`);
+ * - otherwise → the decision as it was.
+ *
+ * Only a ledger actually read (`reason: 'ledger'`) may start or stop a run.
+ */
+export function applyLedger(base: AutoRunDecision, verdicts: readonly LedgerVerdict[]): AutoRunDecision {
+  const planOf = (c: DiscoveredChannel): SubthemePlan | null =>
+    verdicts.find((v) => v.channel.installPath === c.installPath && v.channel.channel === c.channel)?.plan ?? null;
+  if (base.run && base.channel) {
+    const plan = planOf(base.channel);
+    if (plan?.reason !== 'ledger') return base;
+    if (plan.pending.length === 0) return { run: false, reason: 'already-uploaded' };
+    return { ...base, pending: [...plan.pending] };
+  }
+  if (base.reason !== 'already-uploaded') return base;
+  for (const v of verdicts) {
+    if (v.plan?.reason === 'ledger' && v.plan.pending.length > 0) {
+      return {
+        run: true,
+        kind: 'parts',
+        channel: v.channel,
+        localVersion: v.channel.version ?? undefined,
+        localBuild: v.channel.buildNumber ?? null,
+        pending: [...v.plan.pending],
+      };
+    }
+  }
+  return base;
+}
+
+/**
+ * Only the 3D hulls are open: the catalogue, its bundle, the metadata and the
+ * silhouettes are all on the server for this build — the run continues the
+ * models alone, without reading the P4K for the catalogue again.
+ */
+export function isModelsOnly(pending: readonly SubthemeKey[] | undefined | null): boolean {
+  return Boolean(pending && pending.length > 0 && pending.every((k) => k === 'hulls'));
+}
+
+/**
+ * A run that continues only parts the server cannot hold without a local
+ * build: the silhouettes and/or the 3D hulls. Everything else (the catalogue,
+ * its bundle, the metadata) is on the server for this identity.
+ *
+ * What these two builds need as input is the extract's own manifests
+ * (`skins/_build_manifest.json`, `silhouettes/_build_manifest.json`: the
+ * ship/entity list with geometry and material references) plus the install's
+ * Data.p4k. The server holds neither, so when no extract of this build is left
+ * on disk the extractor runs again LOCALLY to re-create them — and nothing of
+ * it is uploaded: no bundle, no metadata/catalogue, no new `codex_builds` row.
+ * `steps` is the whole list of network-facing work; it never names the bundle
+ * or the metadata.
+ */
+export interface ContinuationPlan {
+  /** `reuse`: this build's extract is still on disk. `local`: re-create it from the P4K, upload nothing from it. */
+  extract: 'reuse' | 'local';
+  /** The only steps that run, in order. */
+  steps: ('silhouettes' | 'hulls')[];
+}
+
+export function isLocalOnly(pending: readonly SubthemeKey[] | undefined | null): boolean {
+  return Boolean(pending && pending.length > 0 && pending.every((k) => k === 'hulls' || k === 'silhouettes'));
+}
+
+export function planContinuation(
+  pending: readonly SubthemeKey[] | undefined | null,
+  extractOnDisk: boolean,
+): ContinuationPlan | null {
+  if (!isLocalOnly(pending)) return null;
+  const steps: ContinuationPlan['steps'] = [];
+  if (pending!.includes('silhouettes')) steps.push('silhouettes');
+  if (pending!.includes('hulls')) steps.push('hulls');
+  return { extract: extractOnDisk ? 'reuse' : 'local', steps };
 }
 
 /**
@@ -100,7 +219,11 @@ export function pickSubthemeCandidates(channels: readonly DiscoveredChannel[]): 
 /** One-line log/UI summary of a decision. */
 export function describeDecision(d: AutoRunDecision): string {
   if (d.run && d.channel) {
-    return `${d.channel.channel}: local ${d.localVersion} vs server ${d.serverVersion ?? 'none'} — starting`;
+    const local = formatIdentity(d.localVersion, d.localBuild);
+    const parts = d.pending ? ` parts [${d.pending.join(', ')}]` : ' parts [all]';
+    if (d.kind === 'parts') return `${d.channel.channel} ${local}: same build on the server,${parts} open — starting`;
+    const server = d.serverVersion ? formatIdentity(d.serverVersion, d.serverBuild) : 'none';
+    return `${d.channel.channel}: local ${local} vs server ${server}${parts} — starting`;
   }
   return `no auto-run (${d.reason})`;
 }

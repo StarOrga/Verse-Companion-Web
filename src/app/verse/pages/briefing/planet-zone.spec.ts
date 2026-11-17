@@ -256,6 +256,9 @@ describe('Verse hub — Funkfeuer 2 stage (beta shell)', () => {
       fixture.detectChanges();
     }
     expect(el.querySelector('sc-briefing-hub')?.getAttribute('data-cols')).toBe('3');
+    // Page 2 must be the end of the document: the hub is a snap area, and a scroll-margin of its own would put
+    // its snap position before the end (rest scroll, footer under the window edge). Only the root's scroll-padding offsets it.
+    expect(getComputedStyle(el.querySelector('sc-briefing-hub') as Element).scrollMarginTop).toBe('0px');
     fixture.destroy();
   });
 

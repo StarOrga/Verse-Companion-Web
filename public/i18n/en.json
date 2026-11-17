@@ -642,6 +642,8 @@
         "allUpcoming": "All {{n}} in Upcoming Ships",
         "folded": "{{n}} variants folded in",
         "foldedAtLeast": "at least {{n}} variants folded in",
+        "foldedOne": "1 variant folded in",
+        "foldedAtLeastOne": "at least 1 variant folded in",
         "grade": "Grade {{grade}}",
         "livery": "Livery",
         "upcomingBadge": "Not in the game yet",
@@ -1058,8 +1060,6 @@
         "areaEmpty": "No components in this area."
       },
       "persp": {
-        "lead": "Rated as {{mission}}, compared with {{n}} ships.",
-        "leadNoCohort": "Rated as {{mission}}.",
         "allShow": "All values of all four ▾",
         "allHide": "Collapse all values ▴"
       },
@@ -1189,8 +1189,8 @@
         "diffLegend": "differs from stock"
       },
       "akte": {
-        "imageOnly": "Image only",
-        "showText": "Show text",
+        "imageOnly": "Collapse the file",
+        "showText": "Expand the file",
         "descriptionAria": "Description",
         "noDescription": "There is no description for this ship.",
         "liveries": "Livery",
@@ -7731,7 +7731,7 @@
       "foot": {
         "open": "Guess right and the name appears in the star map and the circle gets a check mark.",
         "wrong": "No star this time – the answer stays in the star map.",
-        "unavailable": "Once the game data has loaded you can guess here."
+        "unavailable": "No ship to recognise is set for this star map right now. It is picked automatically once the codex has the patch's game data – then you can guess here."
       },
       "undoToast": "Guess placed: {{name}}"
     },
@@ -8179,6 +8179,12 @@
       "setsOne": "in 1 set"
     },
     "row": {
+      "current": "You are here",
+      "variants": "Variants",
+      "variantMine": "My ship",
+      "variantsMore": "+{{n}}",
+      "variantsMoreAria": "{{n}} more variants on the ship page",
+      "variantCurrent": "This variant is open right now",
       "patch": "Patch {{line}}",
       "patchMeta": "Patch note · {{version}}",
       "galleryMeta": "Gallery",

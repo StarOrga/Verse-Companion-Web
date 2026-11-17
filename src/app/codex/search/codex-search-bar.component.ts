@@ -402,7 +402,7 @@ export class CodexSearchBarComponent {
     const opt = this.engine.enterOption();
     if (!opt) return;
     const result = this.engine.open(opt, action === 'open-new-tab');
-    if (result === 'navigated') this.collapse(true);
+    if (result === 'navigated' || result === 'here') this.collapse(true);
   }
 
   /** Focus left the bar: collapse when it went elsewhere on the page, or the field is empty. */

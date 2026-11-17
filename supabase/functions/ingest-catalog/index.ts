@@ -106,6 +106,8 @@ import {
   patchLineOf,
   pickNewest,
   sanitizeCandidates,
+  candidateRowChunks,
+  isMissingServerRule,
 } from './_constellation.ts';
 import { nullUndefinedPlaceholders } from './_placeholders.ts';
 import { isCarryUnavailable, isRpcMissing, parseCarry, parsePrune } from './_carry.ts';
@@ -788,6 +790,28 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
         return msg.includes('could not find the table') || msg.includes('does not exist') ||
           code === 'PGRST205' || code === '42P01';
       };
+      // Server-side rule (migration 20261117204000): keep every hull's stars, then
+      // verse_constellation_lock heals stored lines and locks this line's first
+      // pick (new ships of the patch line, else the newest of the last line that
+      // had some; never a variant / display / mission copy). Old uploaders send
+      // the same body, so nothing depends on a new client. A database without the
+      // migration falls through to the in-function pick below.
+      try {
+        for (const rows of candidateRowChunks(buildId, candidates)) {
+          const { error } = await admin.from('verse_constellation_candidates')
+            .upsert(rows, { onConflict: 'build_id,class_name' });
+          if (error) throw error;
+        }
+        const { data, error } = await admin.rpc('verse_constellation_lock', {
+          p_patch_line: patchLine,
+          p_build_id: buildId,
+        });
+        if (error) throw error;
+        return json((data as Record<string, unknown> | null) ?? { ok: true, skipped: 'no_candidates' });
+      } catch (e) {
+        if (!isMissingServerRule(e)) throw e;
+      }
+
       const store: ConstellationStore = {
         async find(line) {
           const { data, error } = await admin.from('verse_constellations')
