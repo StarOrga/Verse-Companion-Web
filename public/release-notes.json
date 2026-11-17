@@ -1,7 +1,31 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.273.0",
+  "current": "0.273.1",
   "releases": [
+    {
+      "version": "0.273.1",
+      "date": "2026-11-17",
+      "sections": [
+        {
+          "category": "Security",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Public cron endpoints (event sync, event sheets, patch teaser, translation source sync) take an atomic run claim, so parallel anonymous calls can no longer start several paid runs at once. The event sync runs at most once per hour."
+            },
+            {
+              "title": "",
+              "text": "Uploader ingest, ship links, concept pages, API tokens and the translation admin functions check the role through is_admin / is_collaborator: a suspended or unapproved account no longer passes."
+            },
+            {
+              "title": "",
+              "text": "readme-sync accepts only the real service key, not a token that merely claims the service role; service-key comparisons run in constant time."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.273.0",
       "date": "2026-11-17",

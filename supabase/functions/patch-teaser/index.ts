@@ -9,7 +9,8 @@
 // 190048 and generates ONLY for versions with no patch_teasers row. Safe to call
 // openly: it cannot force or pick a version, spends at most SWEEP_MAX model
 // calls per call, and a version attempted within RETRY_COOLDOWN_MS (success or
-// not) is skipped (patch_teaser_tries), so repeated calls cost nothing.
+// not) is skipped, so repeated calls cost nothing. The skip is an atomic claim_run per
+// version (concurrent sweeps cannot both call the model); patch_teaser_tries is the read filter.
 // Source text: the outline rsi-roadmap parses and caches ("?notes=<slug>").
 // Result: public.patch_teasers, read by the Verse hero; without a row the hero
 // shows "Neues in <version>". Graceful: every failure leaves the table untouched.
@@ -21,9 +22,12 @@ import { VERSION_RE, buildPrompt, parseTeaser, type OutlineNode } from './_tease
 import { RETRY_COOLDOWN_MS, liveVersionOfSlug, pickSweepTargets, wantedVersions } from './_sweep.ts';
 import { callClaude } from '../_shared/ai-ledger.ts';
 import { withPosthog } from '../_shared/posthog.ts';
+import { claimRun } from '../_shared/claim-run.ts';
+import { safeEqual } from '../_shared/safe-equal.ts';
 
 const MODEL = Deno.env.get('PATCH_TEASER_MODEL') ?? 'claude-sonnet-5-5';
 const SPECTRUM_LIST_URL = 'https://robertsspaceindustries.com/api/spectrum/forum/channel/threads';
+const SWEEP_CLAIM_MS = 5 * 60_000;
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
@@ -83,6 +87,8 @@ async function sweep(admin: Admin, serviceKey: string): Promise<Response> {
     // Nothing missing: no Spectrum call, no model call.
     if (wanted.every((v) => haveSet.has(v))) return json({ ok: true, results: [] });
 
+    // One Spectrum lookup per 5 min however many callers arrive (the sweep is open to the publishable key).
+    if (!(await claimRun(admin, 'patch-teaser:sweep', SWEEP_CLAIM_MS))) return json({ ok: true, results: [], status: 'throttled' });
     const list = await fetch(SPECTRUM_LIST_URL, {
       method: 'POST',
       headers: { 'content-type': 'application/json', accept: 'application/json', 'x-tavern-id': '1', 'user-agent': 'VerseCompanion/0.6 (+patch-teaser)' },
@@ -96,7 +102,9 @@ async function sweep(admin: Admin, serviceKey: string): Promise<Response> {
     const targets = pickSweepTargets({ wanted, threads, have: haveSet, recentlyTried: new Set(col(tries).map(String)), knownSlugs: liveVersion ? { [liveVersion]: liveSlug } : {} });
     const results: Array<{ version: string; status: string }> = [];
     for (const t of targets) {
-      // Recorded BEFORE the call: a crash or timeout still cools the version down.
+      // Atomic claim BEFORE the call (claim_run): of N concurrent sweeps exactly one gets the version, and a crash or
+      // timeout still cools it down for RETRY_COOLDOWN_MS. The tries row below stays for the read-side filter.
+      if (!(await claimRun(admin, `patch-teaser:${t.version}`, RETRY_COOLDOWN_MS))) continue;
       await admin.from('patch_teaser_tries').upsert({ version: t.version, tried_at: new Date().toISOString() });
       results.push({ version: t.version, status: await generate(admin, t.version, t.slug, key, serviceKey) });
     }
@@ -117,7 +125,7 @@ Deno.serve(withPosthog('patch-teaser', async (req) => {
   // Sweep: open to any caller, missing rows only (see header). Nothing in the body steers it.
   if (body.sweep === true) return await sweep(admin, serviceKey);
 
-  if (!serviceKey || req.headers.get('authorization') !== `Bearer ${serviceKey}`) return json({ error: 'forbidden' }, 403);
+  if (!serviceKey || !safeEqual(req.headers.get('authorization') ?? '', `Bearer ${serviceKey}`)) return json({ error: 'forbidden' }, 403);
   const version = String(body.version ?? '');
   const slug = String(body.slug ?? '').toLowerCase();
   if (!VERSION_RE.test(version) || !/^[a-z0-9-]{1,160}$/.test(slug)) return json({ error: 'invalid_body' }, 400);

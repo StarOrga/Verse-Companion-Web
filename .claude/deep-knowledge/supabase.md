@@ -217,6 +217,18 @@ The admin people list marks an account whose `is_approved` is false ("Nicht
 freigeschaltet") and approves it through `invite-user` (`approved_existing`);
 `set_user_role()` alone never approved anybody.
 
+**Why six such accounts sat unseen from 2026-06 to 2026-11.** The approval
+queue (`pending_access_requests()`) lists only `access_requests` rows — a form
+somebody chooses to submit, and it exists only since `20260816120000`. A direct
+Google sign-in created `auth.users` plus an unapproved profile and no request
+row, so the queue stayed empty; `list_users_for_admin()` did not return
+`is_approved`, so the people list showed the accounts as ordinary viewers; and
+nothing told an admin. **Rule:** whatever needs an admin's attention is read
+from the state itself (`profiles.is_approved`, `suspended_at`), never only from
+a parallel record the other side may or may not file. An admin-facing list of
+people always returns and shows the access state, and a new access state gets
+its marker in that list in the same change that introduces it.
+
 **Redirect URLs are part of this.** Production's allow list is exactly the
 production host plus `localhost:4200` / `127.0.0.1:4200`. A redirect URL is
 where Supabase delivers the sign-in code, so a host we do not control
@@ -230,6 +242,31 @@ mail): that the hook's event carries `app_metadata.provider` and
 `user_metadata.email_verified` exactly as the Supabase docs sample shows. If a
 legitimate, allowlisted person is refused with `signup_not_allowed`, look
 there first; an invite mail is the way in meanwhile.
+
+## Atomic run claims for public cron endpoints (`claim_run`)
+
+Audit 2026-11-16. Edge functions with `verify_jwt = false` that pg_cron calls with the publishable key are open to
+anyone, and a read-then-insert throttle lets N parallel POSTs all pass. `public.claim_run(p_name text, p_min_interval
+interval) returns boolean` (migration `20261116100000_claim_run.sql`, pgTAP `claim_run.test.sql`) is ONE
+`insert ... on conflict (mode) do update ... where last_run_at <= now - interval returning true` on the existing
+`guard_runs` table: the first caller gets `true`, a concurrent one waits on the row lock, re-checks the committed row and
+gets `false`. SECURITY DEFINER, `search_path = ''`, EXECUTE for `service_role` only. A claim expires by time alone, so a
+crashed run blocks at most one interval. TS wrapper: `_shared/claim-run.ts` (`claimRun(db, name, minMs)`), **fails
+closed** (rpc missing or erroring = nobody runs), so push the migration before deploying the functions — CI deploys
+them on the merge, so a claim migration goes out BEFORE the merge. A throttled cron call answers 429 / `throttled`,
+which monitoring counts as healthy: a missing rpc shows only as data that stops updating. An operator retry inside a
+claim goes through the privileged path (service key / admin), not by deleting `patch_teaser_tries`.
+
+| Function | Claim name | Interval |
+|---|---|---|
+| `sc-events-sync` | `sc-events-sync` | 1 h (unsure items are re-asked on every run, so the interval bounds the forced AI spend) |
+| `sc-event-sheet` (automatic mode only; targeted/backfill are privileged) | `sc-event-sheet:auto` | 10 min |
+| `patch-teaser` sweep | `patch-teaser:sweep` (one Spectrum lookup), `patch-teaser:<version>` (one model call per version) | 5 min / 6 h |
+| `translate-orchestrator` `sync_sources` by the public key (service key and admins bypass) | `translate-orchestrator:sync_sources` | 6 h |
+
+Role checks in edge functions use `rpc('is_admin')` / `rpc('is_collaborator')` on the CALLER's client (they read
+`auth.uid()` and honour `is_approved` / `suspended_at`), never `profiles.role`. Secrets compare with
+`_shared/safe-equal.ts` (constant time); an unverified `role` claim in a JWT is never a credential.
 
 ## Protected admin accounts (`protected_admins`)
 

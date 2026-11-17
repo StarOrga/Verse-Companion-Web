@@ -490,12 +490,10 @@ Deno.serve(withPosthog('ingest-skins', async (req: Request): Promise<Response> =
     error: authErr,
   } = await userClient.auth.getUser();
   if (authErr || !user) return json({ error: 'unauthorized' }, 401);
-  const { data: profile } = await userClient
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!profile || !['admin', 'collaborator'].includes((profile as { role?: string }).role ?? '')) {
+  // is_collaborator() (admin or collaborator, approved, not suspended) - profiles.role alone ignores suspended_at /
+  // is_approved. The rpc reads auth.uid(), so it must run on the CALLER's client.
+  const { data: isCollaborator } = await userClient.rpc('is_collaborator');
+  if (isCollaborator !== true) {
     return json({ error: 'forbidden' }, 403);
   }
 

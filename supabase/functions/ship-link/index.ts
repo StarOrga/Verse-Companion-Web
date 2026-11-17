@@ -180,12 +180,9 @@ Deno.serve(withPosthog('ship-link', async (req: Request): Promise<Response> => {
   // Making a link visible to everyone is an explicit, deliberate admin act. The
   // admin supplies the URL they are publishing; this function never lifts a
   // link out of another user's private row, so promotion leaks nothing.
-  const { data: profile } = await userClient
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (profile?.role !== 'admin') return json({ error: 'forbidden' }, 403);
+  // is_admin(): approved, not suspended; the caller's own client carries auth.uid().
+  const { data: isAdmin } = await userClient.rpc('is_admin');
+  if (isAdmin !== true) return json({ error: 'forbidden' }, 403);
 
   if (action === 'promote') {
     const url = normalizeRsiPledgeShipUrl(body.url);

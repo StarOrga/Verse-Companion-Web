@@ -35,6 +35,8 @@ import {
   type EventInfo, type LinkInfo, type RunState, type SourceItem, type SpectrumPost, CORS, preflight,
 } from './_extract.ts';
 import { withPosthog } from '../_shared/posthog.ts';
+import { claimRun } from '../_shared/claim-run.ts';
+import { safeEqual } from '../_shared/safe-equal.ts';
 
 const MODEL = Deno.env.get('SC_EVENT_SHEET_MODEL') ?? 'claude-sonnet-5-5';
 const COMM_LINK_API = 'https://api.star-citizen.wiki/api/comm-links';
@@ -209,7 +211,7 @@ Deno.serve(withPosthog('sc-event-sheet', async (req) => {
   let privileged = false;
   if (targeted || backfill || body.force === true) {
     const auth = req.headers.get('authorization') ?? '';
-    privileged = auth === `Bearer ${serviceKey}`;
+    privileged = !!serviceKey && safeEqual(auth, `Bearer ${serviceKey}`); // an unset key never matches "Bearer "
     if (!privileged && auth) {
       const user = createClient(url, Deno.env.get('SUPABASE_ANON_KEY') ?? '', { global: { headers: { authorization: auth } }, auth: { persistSession: false } });
       const { data } = await user.rpc('is_admin');
@@ -234,6 +236,10 @@ Deno.serve(withPosthog('sc-event-sheet', async (req) => {
   }
   const newest = (hist ?? [])[0]?.created_at as string | undefined;
   if (!targeted && !backfill && newest && Date.now() - Date.parse(newest) < GLOBAL_THROTTLE_MS) {
+    return json({ ok: true, runs: [], status: 'throttled' }, 429);
+  }
+  // The history row above only exists once a run FINISHED; the claim closes the window between start and first write.
+  if (!targeted && !backfill && !(await claimRun(db, 'sc-event-sheet:auto', GLOBAL_THROTTLE_MS))) {
     return json({ ok: true, runs: [], status: 'throttled' }, 429);
   }
 
