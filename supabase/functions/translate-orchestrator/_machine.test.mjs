@@ -246,6 +246,28 @@ describe('caps and approval', () => {
   });
 });
 
+describe('one heavy job per tick', () => {
+  it('a job ready to publish goes before an estimate, whatever the list order', async () => {
+    const w = world();
+    const pub = await newJob(w);
+    for (let i = 0; i < 20 && w.jobs.get(pub.id).status !== 'publishing'; i++) await tick(w.deps);
+    assert.equal(w.jobs.get(pub.id).status, 'publishing');
+    const est = await newJob(w, { lang: 'it' });
+    // Same created_at in production means any order: put the estimate first.
+    const row = w.jobs.get(pub.id);
+    w.jobs.delete(pub.id);
+    w.jobs.set(pub.id, row);
+    assert.deepEqual([...w.jobs.keys()], [est.id, pub.id]);
+
+    const out = await tick(w.deps);
+    assert.equal(w.jobs.get(pub.id).status, 'published', w.jobs.get(pub.id).error);
+    assert.deepEqual(out.map((o) => o.id), [pub.id]);
+    assert.equal(w.jobs.get(est.id).stats.est, undefined); // the estimate waited one tick
+    const next = await tick(w.deps);
+    assert.deepEqual(next.map((o) => o.id), [est.id]); // and runs on the next one
+  });
+});
+
 describe('idempotency', () => {
   it('a racing second advance with a stale row creates no second batch', async () => {
     const w = world();

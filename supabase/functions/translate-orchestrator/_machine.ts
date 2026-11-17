@@ -981,7 +981,12 @@ export async function tick(deps: Deps, budgetMs = 110_000): Promise<TickSummary[
   const started = deps.now().getTime();
   const out: TickSummary[] = [];
   let heavyDone = false;
-  for (const job of await deps.db.listOpenJobs()) {
+  // The jobs of one upload share their created_at, so the list order is arbitrary. With one heavy job
+  // per tick a publish goes first: it is the last step of work already paid for, and behind the
+  // estimates of the other languages it would wait for hours (seen 2026-11-17). The sort is stable.
+  const jobs = await deps.db.listOpenJobs();
+  jobs.sort((a, b) => Number(b.status === 'publishing') - Number(a.status === 'publishing'));
+  for (const job of jobs) {
     if (deps.now().getTime() - started > budgetMs) break;
     if (!settings.enabled && (job.status === 'estimating' || job.status === 'queued')) continue;
     // One heavy job per tick: two of them in one request would add up to the limit.
