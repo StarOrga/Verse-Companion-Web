@@ -184,8 +184,9 @@ export function deckFloors(decks: readonly ShipDeck[]): Map<string, number> {
 }
 
 export function buildScene3d(input: Scene3dInput): Scene3d | null {
-  const decks = input.decks.filter((d) => (d.rooms ?? []).length > 0 && !d.fallback);
-  const list = decks.length > 0 ? decks : input.decks.filter((d) => (d.rooms ?? []).length > 0);
+  // Every deck with rooms, the fallback ("Rest") deck included: the deck filter offers it, so
+  // picking it in 3D must draw its floor and its elements.
+  const list = input.decks.filter((d) => (d.rooms ?? []).length > 0);
   if (list.length === 0) return null;
   const cam = new OrthoCam(input.yaw, input.pitch);
   const floors = deckFloors(list);

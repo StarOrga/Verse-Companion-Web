@@ -188,6 +188,11 @@ describe('holo-interior', () => {
       { key: 'Starlancer_Deck_1', name: null, order: 0, rooms: [{ key: 'Room_Hold', name: null, pos: [0, -18, -5], floorZ: -5, height: 4, shapes: [[[-6, -24], [6, -24], [6, -12], [-6, -12]]] }] },
       { key: 'Starlancer_Deck_2', name: null, order: 1, rooms: [{ key: 'Room_Crew', name: null, pos: [0, 0, 0.7], floorZ: 0.7, height: 2.6, shapes: [[[-4, -6], [4, -6], [4, 6], [-4, 6]]] }] },
     ];
+    it('a fallback ("Rest") deck the filter offers is drawn too, so picking it shows its floor', () => {
+      const rest = { key: 'unassigned', name: null, order: 2, fallback: true, rooms: [{ key: 'Room_Odd', name: null, pos: [0, 10, 3], floorZ: 3, height: 2.5, shapes: [[[-2, 8], [2, 8], [2, 12], [-2, 12]]] }] };
+      const s = buildScene3d({ decks: [...decks, rest], interior: starlancer, silhouette: null, focus: 'unassigned', groups: new Set(), pick: null, yaw: 35, pitch: 32, zoom: 1 })!;
+      expect(s.decks.map((d) => d.state)).toEqual(['ghost', 'ghost', 'on']);
+    });
     it('floors come from the rooms when the deck carries none', () => {
       expect(deckFloors(decks).get('Starlancer_Deck_1')).toBe(-5);
     });
