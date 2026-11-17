@@ -33,8 +33,30 @@ export interface Usage {
   server_tool_use?: { web_search_requests?: number };
 }
 
+/**
+ * The entry of the price table a model id belongs to: the id itself, or the alias a dated snapshot id
+ * begins with (`claude-sonnet-5-5-20261001`). null = the table does not know it.
+ */
+export function knownModel(model: string | null | undefined): ModelId | null {
+  if (!model) return null;
+  if (Object.hasOwn(PRICES, model)) return model as ModelId;
+  const hit = (Object.keys(PRICES) as ModelId[]).filter((id) => model.startsWith(`${id}-`)).sort((a, b) => b.length - a.length)[0];
+  return hit ?? null;
+}
+
+/** An id the table does not know is priced as the most expensive model: a bill may be over-counted, never under-counted. */
 export function priceOf(model: string): { in: number; out: number } {
-  return PRICES[model as ModelId] ?? PRICES['claude-opus-5-5'];
+  return PRICES[knownModel(model) ?? 'claude-opus-5-5'];
+}
+
+/**
+ * The model a result is priced as: what the provider says ran it when the price table knows that id,
+ * else what the request asked for. (An answer that names a snapshot the table has never heard of must
+ * not turn a Sonnet request into an Opus bill: budgets and the probe are decided on these figures.)
+ */
+export function billedModel(answered: string | null | undefined, asked: string | null | undefined): string | undefined {
+  if (knownModel(answered)) return answered!;
+  return asked ?? answered ?? undefined;
 }
 
 export function estimateTokens(chars: number): number {
@@ -72,6 +94,9 @@ export function usageCostUsd(model: string, u: Usage): number {
   return (inTok * p.in + read * p.in * CACHE_READ_FACTOR + write * p.in * CACHE_WRITE_1H_FACTOR + out * p.out) / 1e6 +
     searches * WEB_SEARCH_USD;
 }
+
+/** Few-shot pairs ride in the (uncached) user message: about 60 characters each. */
+export const shotsUsd = (pairs: number) => (pairs * 60 * INPUT_TOK_PER_CHAR * 3) / 1e6;
 
 export interface Estimate {
   usd: number;
