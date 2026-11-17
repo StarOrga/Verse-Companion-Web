@@ -1,7 +1,27 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.273.2",
+  "current": "0.273.3",
   "releases": [
+    {
+      "version": "0.273.3",
+      "date": "2026-11-17",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "A translation job can no longer submit the same batch twice when two runs resume it at the same moment."
+            },
+            {
+              "title": "",
+              "text": "A translation job no longer gets stuck in validation when the worker is killed right after the quality-check batch was created."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.273.2",
       "date": "2026-11-17",

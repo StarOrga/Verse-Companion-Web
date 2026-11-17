@@ -17,7 +17,8 @@ import { diffStrings, sha256Hex } from './_diff.ts';
 import type { DiffCounts, TmEntry } from './_diff.ts';
 import { deriveAiTerms, deriveCigLabels, extractJudgeTerms, mergeGlossary, newRows } from './_glossary.ts';
 import { loadNotes } from './_cards.ts';
-import { addJudgeCandidates, resumeLearning, runLearning } from './_learn.ts';
+import { addJudgeCandidates, resumeLearning } from './_learn.ts';
+import { learnDueKey } from './_learn_batch.ts';
 import type { LearnDb } from './_learn_db.ts';
 import { loadTm, makeOverlay, overlayKey, putLatestOverlay, readLocaleTable, saveTm, workKey } from './_io.ts';
 import type { OverlayMeta } from './_io.ts';
@@ -889,13 +890,20 @@ async function stepPublishing(deps: Deps, job: Job): Promise<void> {
   if (ai.length) await db.insertGlossary(job.lang, ai);
   if (plan.forceIds.length) await db.resetRetranslate(plan.forceIds);
 
-  const cur = await db.cas(job, { status: 'published', stats: addStats(job, { phase: undefined, published_at: at, overlay_count: overlay.count }) });
+  const cur = await db.cas(job, {
+    status: 'published',
+    stats: addStats(job, { phase: undefined, published_at: at, overlay_count: overlay.count, run_at: undefined, dead: undefined }),
+  });
   if (cur) {
     for (const n of ['plan', 'main-results', 'postedit-plan']) await store.deleteKey(workKey(job.id, n)).catch(() => {});
-    // C0: learn from what was just published. Never fails the (already published) job.
+    // C0: learning from what was just published is only recorded as due, never run in this request.
+    // The pass reads the whole string table and the whole TM. Inside the publish tick it took the
+    // worker over the CPU limit every time (546 right after the job was published, 2026-11-17): the
+    // other jobs of the tick lost their turn and the pass itself never finished once in production.
+    // `op: learn` starts it by hand; a tick may pick the marker up once the pass runs in slices.
     if (deps.learn) {
-      await runLearning(deps, job.lang, 'publish').catch((e) =>
-        deps.log('translate learning failed', { lang: job.lang, error: String((e as Error)?.message ?? e) })
+      await store.putJson(learnDueKey(job.lang), { trigger: 'publish', at, build_id: job.build_id }).catch((e) =>
+        deps.log('translate learning marker failed', { lang: job.lang, error: String((e as Error)?.message ?? e) })
       );
     }
   }
@@ -981,7 +989,12 @@ export async function tick(deps: Deps, budgetMs = 110_000): Promise<TickSummary[
   const started = deps.now().getTime();
   const out: TickSummary[] = [];
   let heavyDone = false;
-  for (const job of await deps.db.listOpenJobs()) {
+  // The jobs of one upload share their created_at, so the list order is arbitrary. With one heavy job
+  // per tick a publish goes first: it is the last step of work already paid for, and behind the
+  // estimates of the other languages it would wait for hours (seen 2026-11-17). The sort is stable.
+  const jobs = await deps.db.listOpenJobs();
+  jobs.sort((a, b) => Number(b.status === 'publishing') - Number(a.status === 'publishing'));
+  for (const job of jobs) {
     if (deps.now().getTime() - started > budgetMs) break;
     if (!settings.enabled && (job.status === 'estimating' || job.status === 'queued')) continue;
     // One heavy job per tick: two of them in one request would add up to the limit.
