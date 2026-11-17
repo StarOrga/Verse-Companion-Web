@@ -48,7 +48,40 @@
     {
       "iteration": 2,
       "template": "design",
-      "status": "open",
+      "action": "iterate",
+      "submission_id": "sub-mwkn46ww-b80acsbu",
+      "favorite": "wunsch",
+      "general": "",
+      "decided": {
+        "d-name": "projekt (kept, but flagged: wants more proposals)",
+        "d-icon": "route",
+        "d-wort": "yes (the word Nachschub disappears)",
+        "d-menge": "bleibt (a wish stays a wish)",
+        "d-zaehler": "yes",
+        "d-entfernen": "fragen (kept, flagged: think the removal through)",
+        "d-weg": "auswahl",
+        "d-wieviel": "alle",
+        "d-neu": "yes",
+        "d-zeilen": "nur-detail"
+      },
+      "notes": [
+        {
+          "id": "d-name-note",
+          "answer": "Projekt finde ich gut, aber wenig thematisch und klingt nach monaten des beschäftigens hmmm\n\nWeitere vorhscläge?"
+        },
+        {
+          "id": "d-entfernen-note",
+          "answer": "Genau, aber man muss sich entscheiden, wenn man so viele von der wunschliste von dem gegenstand entfernt, dass nur noch die übrig bleiben die zugeordnet sind, dann solld er nutzer gefragt werden, ob und wie viele entfernt werden sollen, und das diese aus dem projekt auch entefrfertn werden - ggf. inkl. hinweis, dass dadurch dasg esamte projekt aufgelöst ist, falls das so ist und das das einzige drin war. Denke das ochmla tief durhc"
+        }
+      ],
+      "annotations": [
+        { "id": "r2-wunsch-schiff-a1", "design": "wunsch", "screen": "wunsch-schiff", "answer": "finde ich gut hier!" },
+        { "id": "r2-wunsch-offen-a1", "design": "wunsch", "screen": "wunsch-offen", "answer": "sehr gut" },
+        { "id": "r2-wunsch-zuordnen-a1", "design": "wunsch", "screen": "wunsch-zuordnen", "answer": "sehr gut, immer das maximale vorgeschlagne" },
+        { "id": "r2-wunsch-zuordnen-a2", "design": "wunsch", "screen": "wunsch-zuordnen", "answer": "Das macht Sinn!" },
+        { "id": "r2-wunsch-liste-a1", "design": "wunsch", "screen": "wunsch-liste", "answer": "gestrichelt ist zu viel, aber das projekt icon ist supoer" }
+      ],
+      "reading": "Direction 'Am Wunsch' is set; every recommendation was taken. Two points stay open and were flagged by the hesitation signal: the name (Projekt reads as not thematic and as months of work) and the removal of an assigned wish (ask how many, release them from the group too, warn when the group is dissolved by it). Rows: no dashed ring, the badge alone marks the assignment.",
       "generated_at": "2026-11-17T11:40:52Z",
       "designs": [
         "wunsch Am Wunsch",
@@ -87,6 +120,44 @@
         "design": "devops:designer: assignment inside the wish station; name Operation; glyph Route"
       },
       "brief": "docs/concepts/20261117-1110-pfad-stationen/briefs/02.md"
+    },
+    {
+      "iteration": 3,
+      "template": "design",
+      "status": "open",
+      "generated_at": "2026-11-17T12:18:46Z",
+      "design_set": "topics",
+      "designs": [
+        "pfad Der Pfad (schiff, offen, zuordnen, liste)",
+        "entfernen Entfernen (frei, dialog, mehrere, letzter, aufgeloest)"
+      ],
+      "analysis_view": {
+        "id": "r3-regeln3",
+        "topics": [
+          "r3-t-name",
+          "r3-t-entfernen"
+        ],
+        "decisions": [
+          "r3-d-name3",
+          "r3-d-frei",
+          "r3-d-dialog",
+          "r3-d-mehrere",
+          "r3-d-leer",
+          "r3-d-erfuellt",
+          "r3-d-hq"
+        ]
+      },
+      "working_title": "Operation",
+      "settled": [
+        "model: the assignment is a line inside the wish station (design Am Wunsch)",
+        "symbol Route; the word Nachschub disappears from visible texts",
+        "a wish stays a wish and keeps counting",
+        "picker from the Codex, whole wished quantity preselected, new group by name only",
+        "rows and cards show the badge only (solid ring), they do not assign"
+      ],
+      "proposed_rules": "free pieces first without a question; a dialog with a quantity stepper as soon as a removal cuts into assigned pieces; several groups: most recently assigned gives first, adjustable; a group losing its last wish stays when it has Einsaetze (checkbox to dissolve), otherwise it is dissolved along (danger tone); one undo restores everything; unassigning in the HQ asks nothing; a fulfilled wish stays ticked in the group",
+      "analytics": "hq:path_group_assign { surface, created }, hq:path_group_release { surface, pieces, dissolved }",
+      "brief": "docs/concepts/20261117-1110-pfad-stationen/briefs/03.md"
     }
   ]
 }
