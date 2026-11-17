@@ -112,13 +112,16 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // floor height ("Level N" / "Ebene N"); stairs, ladders and lifts sit on
     // every level they join and name them in `rooms[].connects`.
     // 16: mission-objective props (EAObjective*, e.g. the Satellite) are no ships.
-    revision: 16,
+    // 17: concept 20261117-1810 — payload.interior (elements, doors, cargo grids, lifts, cargo
+    // gaps), decks merged by lift stops, rooms carry `poweredBy`, catch-all rooms land on their deck.
+    revision: 17,
     phases: ['codex_ships'],
     sources: [
       ...CATALOG_SHARED,
       'data-uploader/python/sc_extract/geometry.py',
       'data-uploader/python/sc_extract/ship_decks.py',
       'data-uploader/python/sc_extract/ship_discovery.py',
+      'data-uploader/python/sc_extract/ship_interior.py',
       'data-uploader/python/sc_extract/ship_rooms.py',
       'data-uploader/python/sc_extract/thresholds.py',
     ],
