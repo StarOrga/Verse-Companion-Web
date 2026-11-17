@@ -106,6 +106,7 @@ function collectRank(): void {
 const ALL_SECTIONS: readonly ShipModuleSection[] = [
   'weapons',
   'remoteTurrets',
+  'mannedTurrets',
   'missiles',
   'countermeasures',
   'pod',

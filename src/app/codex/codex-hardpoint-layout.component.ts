@@ -46,6 +46,7 @@ import { trackingSignalOf } from './codex-missile';
 import { displayItemName, formatNumber } from './codex-format';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import { ScActionDirective } from '../shared/action/sc-action.directive';
+import { AreaSymbolComponent } from '../shared/area-symbol/area-symbol.component';
 import { FeedbackSpotDirective } from '../feedback/feedback-spot.directive';
 import { CodexSwapCandidatesService, swapPreloadQueries } from './codex-swap-candidates.service';
 
@@ -298,7 +299,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
 @Component({
   selector: 'sc-codex-hardpoint-layout',
   standalone: true,
-  imports: [ItemPathComponent, FeedbackSpotDirective, TranslatePipe, NgTemplateOutlet, ScTooltipDirective, ScActionDirective],
+  imports: [ItemPathComponent, FeedbackSpotDirective, TranslatePipe, NgTemplateOutlet, ScTooltipDirective, ScActionDirective, AreaSymbolComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.calm]': 'calm()' },
   template: `
@@ -314,7 +315,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                    [scFeedbackSpot]="'codex.detail.columnLoadout'" [scFeedbackSpotSub]="grp.labelKey"
                    [open]="grp.open" (toggle)="onGroupToggle(grp.group, $event)">
             <summary class="sec-head">
-              <span class="sec-glyph" aria-hidden="true">◈</span>
+              <sc-area-symbol class="sec-glyph" [area]="grp.group" />
               {{ grp.labelKey | translate }}
               <span class="sec-ct">{{ (grp.count === 1 ? 'codex.module.censusSlot' : 'codex.module.censusSlots') | translate: { slots: grp.count } }}</span>
               <span class="caret" [class.open]="grp.open">
@@ -368,7 +369,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
 
     <!-- One block heading, used at both nesting levels. -->
     <ng-template #secSummary let-sec>
-            <span class="sec-glyph" aria-hidden="true">◈</span>
+            <sc-area-symbol class="sec-glyph" [area]="sec.section" />
             {{ ('codex.moduleSection.' + sec.section) | translate }}
             <span class="sec-ct">{{ censusKey(sec) | translate: censusParams(sec) }}</span>
             <!-- What this block can and cannot tell you sits behind an info
@@ -791,6 +792,21 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
        mock literals off this page. */
     .mod-sec { border-radius: 4px; background: linear-gradient(180deg, var(--sc-bg-2), var(--sc-bg-1));
       border: 1px solid var(--sc-border); padding: 10px 12px; }
+    /* Area colours (feedback #330, concept 2026-11-10-bereichs-symbole-umrandung):
+       every block carries its Holotable area — Offensive, Verteidigung,
+       Bewegung, Signatur & Kühlung — as a 2px line on top at --sc-area-line
+       strength and in its heading. The line is an inset shadow, so it follows
+       the 4px corners instead of squaring them off. "Antrieb & Systeme" stays
+       neutral outside; its sub-blocks carry their own area. */
+    .mod-sec, .mod-sub { --p: var(--sc-accent); --pb: color-mix(in srgb, var(--p) var(--sc-area-line), transparent);
+      box-shadow: inset 0 2px 0 var(--pb); }
+    [data-sec="weapons"], [data-sec="remoteTurrets"], [data-sec="mannedTurrets"], [data-sec="missiles"], [data-sec="pod"] { --p: var(--sc-area-offensive); }
+    [data-sec="shields"], [data-sec="countermeasures"], [data-sec="structure"] { --p: var(--sc-area-defensive); }
+    [data-sec="powerPlants"], [data-sec="quantum"] { --p: var(--sc-area-movement); }
+    [data-sec="coolers"], [data-sec="radar"], [data-sec="lifeSupport"] { --p: var(--sc-area-signature); }
+    .mod-sec.merged { --pb: var(--sc-border); }
+    .mod-sec.merged > .sec-head { color: var(--sc-fg-1); }
+    .mod-sec.fixed { --pb: color-mix(in srgb, var(--p) 30%, transparent); }
     /* "Antrieb & Systeme": the merged block and its nested sections. */
     .sub-stack { display: flex; flex-direction: column; gap: 8px; }
     .mod-sub { border-radius: 4px; background: var(--sc-bg-2); border: 1px solid var(--sc-border);
@@ -811,7 +827,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
        label. The px value is the mock's rem rendered at ITS 13px root; the
        max() keeps the coarse-pointer readability floor from styles.scss. */
     .sec-head { margin: 0 0 8px; font-size: max(10.5px, var(--sc-fs-floor)); text-transform: uppercase; letter-spacing: 0.14em;
-      font-weight: 600; color: var(--sc-accent); display: flex; align-items: center; flex-wrap: wrap; gap: 6px; min-width: 0;
+      font-weight: 600; color: var(--p, var(--sc-accent)); display: flex; align-items: center; flex-wrap: wrap; gap: 6px; min-width: 0;
       cursor: pointer; list-style: none; }
     .sec-head::-webkit-details-marker { display: none; }
     /* An OPEN block draws a hairline under its heading (part-01.html:675) —
@@ -821,7 +837,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
       border-bottom: 1px solid var(--sc-border); }
     .mod-sub[open] > .sub-head { margin-inline: -10px; padding: 0 10px 8px;
       border-bottom: 1px solid var(--sc-border); }
-    .sec-glyph { color: var(--sc-accent); font-size: 0.8rem; }
+    .sec-glyph { font-size: max(14px, var(--sc-fs-floor)); }
     /* The heading's 600 belongs to the heading TEXT; the mock keeps every
        child of .m-h2 at the body weight (part-02.html:142-144). */
     .caret { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-weight: 400;
@@ -1069,13 +1085,14 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
        the hovered/located row lights up. Every control stays (split, caret,
        ⓘ, ⇄, revert); the per-row stats fold behind the group's "Detail ▾". ── */
     :host(.calm) .layout { gap: 8px; }
-    :host(.calm) .mod-sec, :host(.calm) .mod-sub { background: transparent; border: 0; border-radius: 0; padding: 0 0 6px; }
+    :host(.calm) .mod-sec, :host(.calm) .mod-sub { background: transparent; border: 0; border-radius: 0; padding: 0 0 6px; box-shadow: none; }
     :host(.calm) .mod-sec.fixed { opacity: 1; }
     :host(.calm) .sub-stack { gap: 4px; }
     :host(.calm) .sec-head { margin: 0 0 4px; padding: 6px 0; font-family: var(--sc-font-display); font-weight: 400;
       font-size: max(9px, var(--sc-fs-floor)); letter-spacing: 0.16em; color: var(--sc-fg-1); gap: 10px; }
     :host(.calm) .sec-head::after { content: ''; order: 1; flex: 1 1 24px; height: 1px; background: var(--sc-border); }
-    :host(.calm) .sec-head > .sec-glyph { display: none; }
+    /* The Holotable column already names the area; each part keeps its symbol in the area colour (#330). */
+    :host(.calm) .sec-head > .sec-glyph { color: var(--p); font-size: max(13px, var(--sc-fs-floor)); }
     :host(.calm) .sec-head > .sec-ct, :host(.calm) .sec-head > .sec-info, :host(.calm) .sec-head > .sec-tag, :host(.calm) .sec-head > .sec-btn, :host(.calm) .sec-head > .caret { order: 2; }
     :host(.calm) .sec-head > .fold-preview { order: 3; font-family: var(--sc-font-body); letter-spacing: 0; }
     /* The caret beside the heading already says "aufklappen". */

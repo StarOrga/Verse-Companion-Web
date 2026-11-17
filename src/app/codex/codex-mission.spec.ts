@@ -29,7 +29,7 @@ describe('codex-mission', () => {
 
   it('maps combat to the loadout-order group and empty fold set', () => {
     const combat = missionById('combat');
-    expect(combat.order).toEqual(['weapons', 'remoteTurrets', 'missiles', 'shields', 'powerPlants', 'quantum', 'coolers', 'radar', 'lifeSupport', 'pod']);
+    expect(combat.order).toEqual(['weapons', 'remoteTurrets', 'mannedTurrets', 'missiles', 'shields', 'powerPlants', 'quantum', 'coolers', 'radar', 'lifeSupport', 'pod']);
     expect(foldedSectionsFor(combat).size).toBe(0);
   });
 
@@ -38,6 +38,7 @@ describe('codex-mission', () => {
       const folded = foldedSectionsFor(missionById(id));
       expect(folded.has('weapons')).toBe(true);
       expect(folded.has('remoteTurrets')).toBe(true);
+      expect(folded.has('mannedTurrets')).toBe(true);
       expect(folded.has('missiles')).toBe(true);
     }
   });

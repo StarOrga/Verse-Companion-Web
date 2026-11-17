@@ -413,6 +413,10 @@ export function buildStageCounts(
       }
       continue;
     }
+    if (group === 'mannedTurrets' && slots === 1) {
+      out.push({ group, count: slots, labelKey: 'codex.detail.stageMannedTurret', detailKey: null, detailCount: 0 });
+      continue;
+    }
     out.push({ group, count: slots, labelKey, detailKey: null, detailCount: 0 });
   }
   return out;

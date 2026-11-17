@@ -1262,6 +1262,7 @@
       "partType": {
         "gatling": "Gatling",
         "remoteTurret": "Fernturm",
+        "mannedTurret": "Bemannter Turm",
         "scattergun": "Schrotkanone",
         "massDriver": "Massetreiber",
         "railgun": "Railgun",
@@ -1704,6 +1705,7 @@
       "stageLaunchers": "{{n}} Werfer",
       "stageMissileRacks": "Raketenwerfer",
       "stageRemoteTurret": "Ferngesteuerter Turm",
+      "stageMannedTurret": "Bemannter Turm",
       "stageTractorBeam": "Traktorstrahl",
       "stageTractorBeams": "Traktorstrahlen",
       "linkCopied": "Link kopiert",
@@ -2198,6 +2200,7 @@
     "moduleSection": {
       "weapons": "Bewaffnung",
       "remoteTurrets": "Ferngesteuerte Türme",
+      "mannedTurrets": "Bemannte Türme",
       "missiles": "Raketen",
       "pod": "Pods",
       "shields": "Schild-Generatoren",
