@@ -209,10 +209,10 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
                     {{ (moreAssignments() === 1 ? 'pathCtl.assign.moreOne' : 'pathCtl.assign.more') | translate: { n: moreAssignments() } }}
                   </a>
                 }
-                @if (canAssign()) {
+                @if (canAssign() || assignPending()) {
                   <!-- B3/B6: same tier, size and place as "Ins Inventar"; the picker hangs on it. -->
                   <div class="anc">
-                    <button #assignBtn scAction tier="secondary" type="button" class="assign" [class.is-open]="mode() === 'assign'" [busy]="assigning()"
+                    <button #assignBtn scAction tier="secondary" type="button" class="assign" [class.is-open]="mode() === 'assign'" [busy]="assigning() || assignPending()"
                             aria-haspopup="dialog" [attr.aria-expanded]="mode() === 'assign'" (click)="toggleAssign($event)">
                       <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">@for (d of icons.nachschub; track $index) { <path [attr.d]="d" /> }</svg>
                       <span>{{ 'pathCtl.assign.go' | translate }}</span>
@@ -581,6 +581,14 @@ export class ItemPathComponent implements OnDestroy {
     const s = this.state();
     return s.signedIn && s.wished && s.free > 0 && s.hint === null;
   });
+  /**
+   * The Operationen of a wished item are still loading (`assignmentsKnown === false`, `free` reads 0 until then):
+   * "Zuordnen" shows busy instead of vanishing as if nothing were free, and it opens no empty picker.
+   */
+  readonly assignPending = computed(() => {
+    const s = this.state();
+    return s.signedIn && s.wished && s.hint === null && s.assignmentsKnown === false;
+  });
   readonly shownAssignments = computed(() => {
     const a = this.state().assignments;
     return a.length > MAX_ASSIGNMENT_LINES ? a.slice(0, MAX_ASSIGNMENT_LINES) : a;
@@ -775,6 +783,7 @@ export class ItemPathComponent implements OnDestroy {
       this.closePop();
       return;
     }
+    if (this.assignPending()) return;
     const at = ev.currentTarget as HTMLElement;
     this.closePop();
     void this.path.loadAssignTargets();

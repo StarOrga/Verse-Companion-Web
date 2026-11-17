@@ -360,6 +360,21 @@ describe('ItemPathComponent: the two-node path', () => {
       expect(wishStation(t).querySelector('button.assign')).not.toBeNull();
     });
 
+    it('while the Operationen load, "Zuordnen" shows busy and opens no picker; the strips appear once known', async () => {
+      const t = setup({ level: 'primary', state: { wished: true, wishQty: 3, free: 0, assignmentsKnown: false } });
+      const btn = wishStation(t).querySelector<HTMLButtonElement>('button.assign')!;
+      expect(btn).not.toBeNull();
+      expect(btn.classList).toContain('is-busy');
+      expect(wishStation(t).querySelector('.strip')).toBeNull();
+      btn.click();
+      await t.settle();
+      expect(picker()).toBeNull();
+      t.path.current.set({ wished: true, wishQty: 3, assigned: 2, free: 1, assignmentsKnown: true, assignments: [asg({ qty: 2 })] });
+      t.fixture.detectChanges();
+      expect(wishStation(t).querySelectorAll('a.strip.asg').length).toBe(1);
+      expect(wishStation(t).querySelector('button.assign')!.classList).not.toContain('is-busy');
+    });
+
     it('everything assigned: the strip, no "Zuordnen"', () => {
       const t = setup({ level: 'primary', state: { wished: true, wishQty: 3, assigned: 3, free: 0, assignments: [asg()] } });
       expect(wishStation(t).querySelector('button.assign')).toBeNull();
