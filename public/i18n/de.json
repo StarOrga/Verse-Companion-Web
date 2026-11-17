@@ -8110,7 +8110,8 @@
     },
     "row": {
       "current": "Du bist hier",
-      "variants": "Varianten",
+      "variants": "Meine Varianten",
+      "variantMine": "Mein Schiff",
       "variantsMore": "+{{n}}",
       "variantsMoreAria": "{{n}} weitere Varianten auf der Schiffsseite",
       "variantCurrent": "Diese Variante ist gerade offen",

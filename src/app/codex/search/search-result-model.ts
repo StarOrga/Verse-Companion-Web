@@ -140,6 +140,13 @@ export type SearchResultRow =
       fit: SearchFit | null;
       /** Ranking signals behind the row's place among equals. */
       signal: { recent: boolean; owned: boolean; popular: boolean };
+      /**
+       * One row per ship page (C11): the reader's own variants of the ship as mini text links
+       * ("Meine …", `?v=`). On a catalog ship row the row itself opens the plain ship page (stock),
+       * the links the own variants; on an own row without a catalog partner it opens the active
+       * variant and lists the variants only with two or more.
+       */
+      variants?: SearchVariantLink[];
     })
   | (RowBase & {
       type: 'own';
@@ -153,10 +160,7 @@ export type SearchResultRow =
       classNameSlug: string | null;
       /** Inventory quantity, when meaningful. */
       qty: number | null;
-      /**
-       * A ship's saved variants ("Meine …", `?v=`) as mini text links: one row per
-       * ship, the row itself opens the active (default) variant. Only with two or more.
-       */
+      /** See the hit row: a ship's own variants as mini links. */
       variants?: SearchVariantLink[];
     })
   | (RowBase & { type: 'patch'; line: string; title: string; version: string; publishedAt: string })

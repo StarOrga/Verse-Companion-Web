@@ -8110,7 +8110,8 @@
     },
     "row": {
       "current": "You are here",
-      "variants": "Variants",
+      "variants": "My variants",
+      "variantMine": "My ship",
       "variantsMore": "+{{n}}",
       "variantsMoreAria": "{{n}} more variants on the ship page",
       "variantCurrent": "This variant is open right now",

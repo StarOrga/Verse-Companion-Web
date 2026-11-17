@@ -12,7 +12,7 @@ import { ShipBlueprintIconComponent } from '../ship-blueprint/ship-blueprint-ico
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { PolySearchHit, isUpcomingHit, polyHitIconKind } from '../codex-poly-search';
 import { CodexSearchEngine } from './codex-search-engine';
-import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './codex-search-model';
+import { SearchOption, SearchVariantLink, VARIANT_LINKS_SHOWN, hitManufacturer, hitTitle, isLivery, pinKindOf } from './codex-search-model';
 
 /**
  * The results of the ONE Codex search, rendered the same way under Ctrl+K,
@@ -156,7 +156,9 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
     <ng-template #row let-o>
       @if (o.type === 'hit' || o.type === 'fresh') {
         @let here = isCurrent(o);
-        <div class="row" role="presentation" [class.active]="isActive(o)" [class.upcoming]="isUpcoming(o.hit)" [class.current]="here">
+        @let vs = variantsOf(o);
+        <div class="row" role="presentation" [class.active]="isActive(o)" [class.upcoming]="isUpcoming(o.hit)" [class.current]="here"
+             [class.has-variants]="vs.length > 0">
           @if (here) {
             <!-- The page the reader is on (note 4): a plain href, not a routerLink — RouterLink navigates
                  whatever the click handler does; a plain click only closes, a modified one opens a tab. -->
@@ -170,6 +172,28 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
                (click)="onClick($event, o)" (mouseenter)="hover(o)">
               <ng-container *ngTemplateOutlet="hitBody; context: { $implicit: o, here: false }" />
             </a>
+          }
+          @if (vs.length) {
+            <!-- One row per ship page (C11): the row opens the stock ship, these the reader's own variants. -->
+            <span class="variants">
+              <span class="vl-label">{{ 'search.row.variants' | translate }}</span>
+              @for (v of vs.slice(0, variantCap); track v.id) {
+                @if (v.current) {
+                  <a class="vl here" aria-current="page" [attr.href]="engine().href(v.target)"
+                     [scTooltip]="'search.row.variantCurrent' | translate" scTooltipTier="label"
+                     (click)="onVariantClick($event, o, v)">{{ v.label || (v.labelKey ?? '' | translate) }}</a>
+                } @else {
+                  <a class="vl" [routerLink]="v.target.link" [queryParams]="v.target.queryParams"
+                     (click)="onVariantClick($event, o, v)">{{ v.label || (v.labelKey ?? '' | translate) }}</a>
+                }
+              }
+              @if (vs.length > variantCap) {
+                <a class="vl more" [routerLink]="o.target.link" [queryParams]="o.target.queryParams"
+                   [attr.aria-label]="'search.row.variantsMoreAria' | translate: { n: vs.length - variantCap }"
+                   [scTooltip]="'search.row.variantsMoreAria' | translate: { n: vs.length - variantCap }" scTooltipTier="label"
+                   (click)="onVariantMoreClick($event)">{{ 'search.row.variantsMore' | translate: { n: vs.length - variantCap } }}</a>
+              }
+            </span>
           }
           @if (!here && hasPath(o.hit)) {
             <sc-item-path [kind]="o.hit.kind" [className]="o.hit.classNameSlug" [name]="title(o.hit)" />
@@ -367,6 +391,26 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
       border-color: color-mix(in srgb, var(--sc-fg-2) 45%, transparent);
       background: color-mix(in srgb, var(--sc-fg-2) 8%, transparent);
     }
+    /* One row per ship page (C11): the own variants as mini text links under the name; they wrap,
+       never overflow the row; on touch each link grows to a finger-sized target. */
+    .row.has-variants { flex-wrap: wrap; }
+    .row.has-variants .hit { flex-basis: 60%; }
+    .variants {
+      order: 3; flex: 1 0 100%; min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline;
+      gap: 0 var(--sc-space-2); padding: 0 8px 4px calc(44px + 18px);
+      font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
+    }
+    .vl {
+      color: color-mix(in oklab, var(--sc-accent) 80%, var(--sc-fg-0)); text-decoration: underline;
+      text-decoration-color: color-mix(in srgb, var(--sc-accent) 35%, transparent); text-underline-offset: 2px;
+      border-radius: 4px; padding: 2px 0; overflow-wrap: anywhere;
+    }
+    .vl:hover { text-decoration-color: currentColor; }
+    .vl:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    .vl.here { color: var(--sc-fg-1); text-decoration: none; font-weight: 600; cursor: default; }
+    .vl.more { text-decoration: none; }
+    @media (pointer: coarse) { .vl { display: inline-flex; align-items: center; min-height: 48px; padding: 0 4px; } }
+    @media (max-width: 599.98px) { .variants { padding-left: 8px; } }
     .here {
       font-family: var(--sc-font-display); text-transform: uppercase; letter-spacing: 0.04em; color: var(--sc-fg-1);
     }
@@ -429,6 +473,38 @@ export class CodexSearchResultsComponent {
   /** The greyed "Du bist hier" row (note 4). */
   isCurrent(o: SearchOption): boolean {
     return o.type === 'hit' && !!o.current;
+  }
+
+  /** Variant mini links shown before "+n". */
+  readonly variantCap = VARIANT_LINKS_SHOWN;
+
+  /** A ship hit's own variants (one row per ship page, C11); empty for every other option. */
+  variantsOf(o: SearchOption): SearchVariantLink[] {
+    return o.type === 'hit' ? (o.variants ?? []) : [];
+  }
+
+  /**
+   * A variant mini link: the open one only closes the search (a plain href); any other one navigates
+   * through its routerLink and is remembered like its row. Modified clicks stay the browser's.
+   */
+  onVariantClick(ev: MouseEvent, o: SearchOption, v: SearchVariantLink): void {
+    ev.stopPropagation();
+    const plain = isPlainLeftClick(ev);
+    const cls = o.type === 'hit' ? o.hit.classNameSlug : null;
+    if (v.current && plain) {
+      ev.preventDefault();
+      this.engine().noteVariantOpened(cls, v);
+      this.navigated.emit();
+      return;
+    }
+    this.engine().noteVariantOpened(cls, v, !plain);
+    if (plain) this.navigated.emit();
+  }
+
+  /** "+n": the ship's page, where every variant can be picked. */
+  onVariantMoreClick(ev: MouseEvent): void {
+    ev.stopPropagation();
+    if (isPlainLeftClick(ev)) this.navigated.emit();
   }
 
   isActive(o: SearchOption): boolean {

@@ -349,10 +349,10 @@ const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
                                 @if (v.current) {
                                   <a class="vl here" aria-current="page" [attr.href]="href(v.target)"
                                      [scTooltip]="'search.row.variantCurrent' | translate" scTooltipTier="label"
-                                     (click)="onVariantClick($event, r, v)">{{ v.label }}</a>
+                                     (click)="onVariantClick($event, r, v)">{{ v.label || (v.labelKey ?? '' | translate) }}</a>
                                 } @else {
                                   <a class="vl" [routerLink]="v.target.link" [queryParams]="v.target.queryParams"
-                                     (click)="onVariantClick($event, r, v)">{{ v.label }}</a>
+                                     (click)="onVariantClick($event, r, v)">{{ v.label || (v.labelKey ?? '' | translate) }}</a>
                                 }
                               }
                               @if (vs.length > variantCap) {
@@ -670,7 +670,10 @@ const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
     .vl:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .vl.here { color: var(--sc-fg-1); text-decoration: none; font-weight: 600; cursor: default; }
     .vl.more { text-decoration: none; }
-    @media (pointer: coarse) { .vl { padding: 6px 2px; } }
+    .vl { overflow-wrap: anywhere; }
+    /* Touch: every mini link a finger-sized target; the list wraps under the row, never past it. */
+    @media (pointer: coarse) { .vl { display: inline-flex; align-items: center; min-height: 48px; padding: 0 4px; } }
+    @media (max-width: 599.98px) { .variants { padding-left: 8px; } }
     .rt { position: relative; z-index: 1; flex: none; display: inline-flex; align-items: center; gap: 4px; padding-right: 4px; }
     /* ONE quiet CTA: outlined, the same for every row, filled only on the focused row (B6). */
     .cta {
@@ -1602,7 +1605,7 @@ export class FusionSearchComponent {
 
   /** A ship row's saved variants (one row per ship, d-variant); empty for every other row. */
   variantsOf(r: ViewRow): SearchVariantLink[] {
-    return r.type === 'own' ? (r.variants ?? []) : [];
+    return r.type === 'hit' || r.type === 'own' ? (r.variants ?? []) : [];
   }
 
   /** "+n": the ship's page, where every variant can be picked. */
@@ -1618,13 +1621,14 @@ export class FusionSearchComponent {
     ev.stopPropagation();
     if (r.type === 'place') return;
     const plain = isPlainLeftClick(ev);
+    const cls = r.type === 'hit' ? r.hit.classNameSlug : r.type === 'own' ? r.classNameSlug : null;
     if (v.current && plain) {
       ev.preventDefault();
-      this.engine.noteVariantOpened(r, v);
+      this.engine.noteVariantOpened(cls, v);
       this.close();
       return;
     }
-    this.engine.noteVariantOpened(r, v, !plain);
+    this.engine.noteVariantOpened(cls, v, !plain);
     const row = r.current ? { ...r, current: undefined } : r;
     this.recentRows.set(pushRecentRow(preferenceStorage(), this.recentRows(), row));
     if (plain) this.close();

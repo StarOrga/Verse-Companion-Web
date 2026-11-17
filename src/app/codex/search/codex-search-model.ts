@@ -57,7 +57,11 @@ export interface CodexSearchGroup {
  * they share one shape.
  */
 export type SearchOption =
-  | { type: 'hit'; id: string; hit: PolySearchHit; target: SearchTarget; current?: true }
+  | {
+      type: 'hit'; id: string; hit: PolySearchHit; target: SearchTarget; current?: true;
+      /** A ship the reader owns: its own variants as mini links — one row per ship page (C11). */
+      variants?: SearchVariantLink[];
+    }
   | { type: 'more'; id: string; kind: PolyHitKind; total: number; target: SearchTarget }
   | { type: 'recent'; id: string; term: string; target: SearchTarget }
   | { type: 'category'; id: string; labelKey: string; target: SearchTarget }
@@ -163,15 +167,22 @@ export function groupHits(
  * through {@link applyCurrentPage} first: its `current` keys mark the
  * "Du bist hier" row.
  */
-export function resultOptions(groups: readonly CodexSearchGroup[], current: ReadonlySet<string> = NO_KEYS): SearchOption[] {
+export function resultOptions(
+  groups: readonly CodexSearchGroup[],
+  current: ReadonlySet<string> = NO_KEYS,
+  variantsOf?: ShipVariantsOf,
+  here: PageLocation | null = null,
+): SearchOption[] {
   const out: SearchOption[] = [];
   for (const g of groups) {
-    g.hits.forEach((hit, i) =>
+    g.hits.forEach((hit, i) => {
+      const vs = hit.kind === 'ship' ? variantsOf?.(hit.classNameSlug) : undefined;
       out.push({
         type: 'hit', id: `${g.kind}-${i}`, hit, target: hitTarget(hit),
         ...(current.has(hitKey(hit)) ? { current: true as const } : {}),
-      }),
-    );
+        ...(vs?.length ? { variants: markVariants(vs, here) } : {}),
+      });
+    });
     if (g.more) out.push({ type: 'more', id: `${g.kind}-more`, kind: g.kind, total: g.total, target: g.more });
   }
   return out;
@@ -263,11 +274,14 @@ export function isCurrentTarget(t: SearchTarget, here: PageLocation | null): boo
   return true;
 }
 
-/** A variant mini link (`?v=<config>`) on its ship's row. */
+/** A variant mini link (`?v=<config>`, or `?mine` for an own ship without a saved variant) on its ship's row. */
 export interface SearchVariantLink {
-  /** The saved configuration's id — the `v` of the link. */
+  /** The saved configuration's id — the `v` of the link (`mine-<hangar id>` for the `?mine` link). */
   id: string;
+  /** The variant's name; empty for the `?mine` link of a ship without a custom name (then `labelKey`). */
   label: string;
+  /** i18n key shown when `label` is empty. */
+  labelKey?: string;
   target: SearchTarget;
   /** The ship's active variant: what the row itself opens and what the page shows without a `v`. */
   active: boolean;
@@ -275,12 +289,31 @@ export interface SearchVariantLink {
   current?: true;
 }
 
-/** True when the variant link is the variant open right now. Without a `v` in the URL the active one is. */
+/**
+ * True when the variant link is the variant open right now. A `v` in the URL names it; `?mine`
+ * names the own ship without a saved variant. Without either, a Codex ship page shows the stock
+ * ship (codex mode, codex-detail `applyLoadoutSource`) — that is the row's own state, no variant
+ * is open — while an HQ ship page shows the active variant.
+ */
 export function isCurrentVariant(variant: Pick<SearchVariantLink, 'target' | 'active'>, here: PageLocation | null): boolean {
   if (!here || !isCurrentTarget(variant.target, here)) return false;
   const open = here.query['v'] ?? null;
-  return open ? open === (variant.target.queryParams?.['v'] ?? null) : variant.active;
+  const own = variant.target.queryParams?.['v'] ?? null;
+  if (open) return open === own;
+  if (!own) return 'mine' in here.query && 'mine' in (variant.target.queryParams ?? {});
+  return variant.active && !here.path.startsWith('/codex/');
 }
+
+/** The variant links with the one open on the page marked (`current`), every other one a plain link. */
+export function markVariants(variants: readonly SearchVariantLink[], here: PageLocation | null | undefined): SearchVariantLink[] {
+  return variants.map((v) => {
+    const { current: _drop, ...rest } = v;
+    return isCurrentVariant(rest, here ?? null) ? { ...rest, current: true as const } : rest;
+  });
+}
+
+/** The reader's own variants of a ship class (any case), every hangar ship of that class; empty = none owned. */
+export type ShipVariantsOf = (shipClassName: string) => readonly SearchVariantLink[] | undefined;
 
 /** Variant mini links shown on one row before "+n". */
 export const VARIANT_LINKS_SHOWN = 3;

@@ -49,6 +49,35 @@ export interface OwnSearchResult {
 
 const KIND_ORDER: Record<OwnRowType, number> = { ship: 0, config: 1, set: 2, item: 3 };
 
+/**
+ * The reader's own variants per ship class (lower case): every saved variant of every owned hangar
+ * ship of that class, the active one first; a ship without a saved variant gives its `?mine` link.
+ * What the catalog row of that ship carries as mini links when the own row folds into it (C11).
+ */
+export function ownVariantsByClass(src: Pick<OwnSources, 'ships' | 'configs'>, hq = false): Map<string, SearchVariantLink[]> {
+  const out = new Map<string, SearchVariantLink[]>();
+  for (const s of src.ships) {
+    if (s.status !== 'owned' || !s.shipClassName) continue;
+    const key = s.shipClassName.toLowerCase();
+    const list = out.get(key) ?? [];
+    const cfgs = src.configs
+      .filter((c) => c.hangarShipId === s.id)
+      .map((c, i) => ({ c, i }))
+      .sort((a, b) => Number(b.c.isActive) - Number(a.c.isActive) || a.i - b.i);
+    if (cfgs.length) {
+      for (const { c } of cfgs) {
+        const l = ownVariantLink(s, c.id, hq);
+        list.push({ id: c.id, label: c.name, target: { link: l.commands, queryParams: l.queryParams }, active: c.isActive });
+      }
+    } else {
+      const t = ownTarget(s, [], hq);
+      list.push({ id: `mine-${s.id}`, label: s.customName?.trim() || '', labelKey: 'search.row.variantMine', target: t, active: true });
+    }
+    out.set(key, list);
+  }
+  return out;
+}
+
 /** Where "Alle N im HQ öffnen" leads for a set of own rows. */
 export function ownMoreTarget(rows: readonly OwnMatch[], term: string): SearchTarget {
   const q = term.trim();

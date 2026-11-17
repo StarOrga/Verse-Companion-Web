@@ -20,7 +20,7 @@ import { SearchContext, neutralContext } from '../../shell/fusion-bar/search-con
 import { composeSearchResult } from './search-compose';
 import { FitItemPort, FitLoadoutEntry, FitPort, buildFitPorts, fitVerdict } from './search-compat';
 import { AliasReading, aliasReadings, setAliasLanguage } from './search-aliases';
-import { OwnSources, searchOwn } from './search-own';
+import { OwnSources, ownVariantsByClass, searchOwn } from './search-own';
 import { OwnSetEntry, ownSetGroups, ownSetOf } from './search-own-sets';
 import { WishNamesService } from './wish-names.service';
 import { parseQuery, switchChip } from './search-query-parse';
@@ -161,9 +161,20 @@ export class CodexSearchEngine {
   readonly listGroups = computed(() => applyCurrentPage(this.groups(), this.searchText(), this.here()));
   readonly options = computed<SearchOption[]>(() =>
     this.input().trim()
-      ? resultOptions(this.listGroups().groups, this.listGroups().current)
+      ? resultOptions(this.listGroups().groups, this.listGroups().current, this.variantsOf(), this.here())
       : suggestionOptions(this.recent(), this.fresh(), this.here()),
   );
+  /**
+   * The reader's own variants per ship class: the one catalog row of a ship carries them as mini
+   * links on every surface (C11 / C12). Signed out: none.
+   */
+  private readonly ownVariantMap = computed(() =>
+    this.signedIn() ? ownVariantsByClass(this.ownSources(), this.shellBeta()) : new Map<string, SearchVariantLink[]>(),
+  );
+  private readonly variantsOf = computed(() => {
+    const map = this.ownVariantMap();
+    return (cls: string): SearchVariantLink[] | undefined => map.get(cls.toLowerCase());
+  });
   readonly activeOption = computed<SearchOption | null>(() => this.options()[this.activeIndex()] ?? null);
 
   // -- context, chips and the composed result (concept 2026-11-02) ---------------
@@ -260,6 +271,7 @@ export class CodexSearchEngine {
       facets: this.facets(),
       ownSet: ownSetOf(chips) !== null,
       here: this.here(),
+      ownVariants: this.variantsOf(),
     });
   });
 
@@ -424,15 +436,15 @@ export class CodexSearchEngine {
    * A variant mini link of an own ship row was opened. The open variant of the current page
    * leads nowhere (counted only); any other one is remembered like its row.
    */
-  noteVariantOpened(row: SearchResultRow, variant: SearchVariantLink, newTab = false): void {
+  noteVariantOpened(shipClassName: string | null, variant: SearchVariantLink, newTab = false): void {
     if (variant.current && !newTab) {
-      this.trackOpen('own', null, false, { current: true, variant: true });
+      this.trackOpen('ship', null, false, { current: true, variant: true });
       return;
     }
     this.remember();
     this.navOrigin.noteSearchArrival(this.term(), variant.target.link);
-    if (row.type === 'own' && row.classNameSlug) this.trySignals()?.recordOpen('ship', row.classNameSlug);
-    this.trackOpen('own', null, newTab, { variant: true });
+    if (shipClassName) this.trySignals()?.recordOpen('ship', shipClassName);
+    this.trackOpen('ship', null, newTab, { variant: true });
   }
 
   /**
