@@ -280,7 +280,7 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       .af-acts { display: flex; justify-content: flex-end; gap: var(--sc-space-2, 8px); flex-wrap: wrap; }
       .seg { align-self: flex-start; }
       @media (pointer: coarse) { .add-e { min-height: 48px; } }
-      .plain { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc-space-2, 8px) var(--sc-space-3, 12px); padding: var(--sc-space-2, 8px) var(--sc-space-3, 12px); border: 1px dashed var(--sc-border); border-radius: 10px; background: var(--sc-bg-0); }
+      .plain { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc-space-2, 8px) var(--sc-space-3, 12px); padding: var(--sc-space-2, 8px) var(--sc-space-3, 12px); border: 1px dashed var(--sc-border); border-radius: 10px; background: var(--sc-bg-0); margin-bottom: var(--sc-space-3, 12px); }
       .plain-ic svg { width: 20px; height: 20px; fill: none; stroke: var(--sc-accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; display: block; }
       .plain-txt { margin: 0; flex: 1 1 18rem; min-width: 0; color: var(--sc-fg-2); font-size: 0.85rem; overflow-wrap: anywhere; }
       .plain-txt b { color: var(--sc-fg); font-weight: 600; }

@@ -6091,8 +6091,8 @@
     },
     "panel": {
       "plain": {
-        "one": "1 Zeile ist noch kein Wunsch.",
-        "other": "{{count}} Zeilen sind noch keine Wünsche.",
+        "one": "1 Position ist noch kein Wunsch.",
+        "other": "{{count}} Positionen sind noch keine Wünsche.",
         "ask": "Vor dem Umbau angelegt. Sollen sie als Wünsche auf deiner Wunschliste stehen?",
         "adopt": "Als Wünsche führen",
         "keep": "So lassen"
