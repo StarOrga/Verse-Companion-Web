@@ -154,7 +154,6 @@ export class GuessTrackComponent {
       this.answer.set(null);
       this.error.set(null);
       this.loaded.set(false);
-      this.options.set([]);
       if (state !== 'unavailable') void this.load();
     });
     // A pick stays marked through state refreshes of the same patch (its offer
