@@ -2,6 +2,7 @@ import { computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AuthService } from '../../auth/auth.service';
 import { AnalyticsService } from '../../core/analytics.service';
+import { SearchWishlistService } from '../../codex/search/search-wishlist.service';
 import { HangarService } from '../../hangar/hangar.service';
 import { FakeCall, FakeResult, chainArgs, fakeSupabase } from '../../testing/fake-supabase';
 import { HqEinsatzService } from '../data/hq-einsatz.service';
@@ -111,8 +112,14 @@ class FakeSupplies {
   remove(id: string) {
     this.removeMany([id]);
   }
-  restore(id: string) {
+  restore(id: string): boolean {
+    if (!this.rows().some((r) => r.id === id)) return false;
     this.rows.update((rs) => rs.map((r) => (r.id === id ? { ...r, deletedAt: null } : r)));
+    return true;
+  }
+  /** Another tab or device edited the line (a change the removal under test knows nothing about). */
+  edit(id: string, p: Partial<Ln>) {
+    this.patch(id, p);
   }
   setLine(id: string, qty: number) {
     this.patch(id, { qty });
@@ -134,6 +141,17 @@ interface WishRow {
   name: string | null;
   qty: number;
   forClassName: string;
+}
+
+interface FakeShip {
+  id: string;
+  shipClassName: string;
+  status: 'owned' | 'wishlist';
+  qty: number;
+  customName: string | null;
+  notes: string | null;
+  selectedSkinId: string | null;
+  origin: null;
 }
 
 class FakeWish {
@@ -180,6 +198,7 @@ describe('NachschubService: wishes assigned to an Operation', () => {
   let stock: ReturnType<typeof signal<{ class_name: string | null; qty: number }[]>>;
   let tracked: [string, unknown][];
   let failDrop: boolean;
+  let ships: ReturnType<typeof signal<FakeShip[]>>;
   let gateNextRead: Promise<void> | null = null;
   let svc: NachschubService;
 
@@ -235,6 +254,7 @@ describe('NachschubService: wishes assigned to an Operation', () => {
     failDrop = false;
     supplies = new FakeSupplies();
     wish = new FakeWish();
+    ships = signal<FakeShip[]>([]);
     einsaetze = signal([]);
     stock = signal([]);
     const fake = fakeSupabase({ answer });
@@ -245,7 +265,28 @@ describe('NachschubService: wishes assigned to an Operation', () => {
         { provide: HqSuppliesService, useValue: supplies },
         { provide: WishlistStore, useValue: wish },
         { provide: HqInventoryService, useValue: { items: stock, loaded: signal(true), error: signal(null), load: () => Promise.resolve() } },
-        { provide: HangarService, useValue: { ships: signal([]), error: signal(null), loadAll: () => Promise.resolve(), shipByClassName: () => undefined } },
+        {
+          provide: HangarService,
+          useValue: {
+            ships,
+            error: signal(null),
+            loadAll: () => Promise.resolve(),
+            shipByClassName: (c: string) => ships().find((s) => s.shipClassName === c) ?? null,
+            updateShip: async (id: string, p: Partial<FakeShip>) => (ships.update((l) => l.map((s) => (s.id === id ? { ...s, ...p } : s))), true),
+          },
+        },
+        {
+          // A ship wish lives in its hangar row; taking it to 0 deletes the row, a wish above 0 (re)creates it blank.
+          provide: SearchWishlistService,
+          useValue: {
+            setQty: async (_k: string, c: string, _n: string | null | undefined, qty: number) => {
+              if (qty <= 0) ships.update((l) => l.filter((s) => s.shipClassName !== c));
+              else if (ships().some((s) => s.shipClassName === c)) ships.update((l) => l.map((s) => (s.shipClassName === c ? { ...s, qty } : s)));
+              else ships.update((l) => [...l, { id: `sh-${c}`, shipClassName: c, status: 'wishlist', qty, customName: null, notes: null, selectedSkinId: null, origin: null }]);
+              return true;
+            },
+          },
+        },
         { provide: NachschubNamingService, useValue: { nachschubName: () => Promise.resolve('Auto') } },
         { provide: HqEinsatzService, useValue: { ofPackage: (id: string) => einsaetze().filter((e) => e.packageId === id), setKnownPackages: () => undefined } },
         { provide: AnalyticsService, useValue: { track: (e: string, p: unknown) => tracked.push([e, p]) } },
@@ -748,6 +789,57 @@ describe('NachschubService: wishes assigned to an Operation', () => {
       expect(wish.qty('iron')).toBe(999);
       expect(supplies.line(a)?.qty).toBe(2);
       expect(svc.allocationOf(material)).toEqual(expect.objectContaining({ wished: 999, assigned: 2 }));
+    });
+  });
+
+  describe('H1: the undo of a removal gives back what it took, by delta', () => {
+    it('a change made in between (another tab: the line and the wish went up) survives the undo', async () => {
+      wishFor('medpen', 5);
+      await svc.assignWish(medpen, 4, 'new', { name: 'A' });
+      const lineId = alloc().assignments[0].lineIds[0];
+      const r = await svc.applyWishRemoval(medpen, 2); // 1 free piece + 1 piece out of the line (4 -> 3)
+      expect(supplies.line(lineId)?.qty).toBe(3);
+      expect(wish.qty('medpen')).toBe(3);
+      supplies.edit(lineId, { qty: 5 }); // another device raised the line by 2 ...
+      wish.rows.update((rs) => rs.map((w) => ({ ...w, qty: 8 }))); // ... and the wish by 5
+      const back = await r.undo?.();
+      expect(back?.ok).toBe(true);
+      expect(supplies.line(lineId)?.qty).toBe(6); // 5 + the 1 this removal took, never the old absolute 4
+      expect(wish.qty('medpen')).toBe(10); // 8 + the 2 this removal took
+    });
+
+    it('a line met in between is refused (translated error), the wish still comes back, nothing stale is written', async () => {
+      wishFor('medpen', 4);
+      await svc.assignWish(medpen, 4, 'new', { name: 'A' });
+      const lineId = alloc().assignments[0].lineIds[0];
+      const r = await svc.applyWishRemoval(medpen, 1);
+      expect(supplies.line(lineId)?.qty).toBe(3);
+      supplies.edit(lineId, { done: true, source: 'wish_met' });
+      const back = await r.undo?.();
+      expect(back).toEqual({ ok: false, key: 'errors.generic' });
+      expect(supplies.line(lineId)?.qty).toBe(3);
+      expect(wish.qty('medpen')).toBe(4);
+    });
+
+    it('a line that is gone for good is refused, never re-created from a guess', async () => {
+      wishFor('medpen', 2);
+      await svc.assignWish(medpen, 2, 'new', { name: 'A' });
+      const lineId = alloc().assignments[0].lineIds[0];
+      const r = await svc.release(lineId, { surface: 'hq' });
+      supplies.rows.update((rs) => rs.filter((x) => x.id !== lineId)); // purged elsewhere
+      const back = await r.undo?.();
+      expect(back?.ok).toBe(false);
+    });
+
+    it('a ship wish taken to 0 comes back with its custom name and notes', async () => {
+      ships.set([{ id: 'sh-1', shipClassName: 'cutlass', status: 'wishlist', qty: 1, customName: 'Black Mamba', notes: 'next pledge', selectedSkinId: null, origin: null }]);
+      const cutlass = { kind: 'ship', className: 'cutlass', forClassName: null, name: 'Cutlass' };
+      const r = await svc.applyWishRemoval(cutlass, 1);
+      expect(r.ok).toBe(true);
+      expect(ships()).toEqual([]);
+      const back = await r.undo?.();
+      expect(back?.ok).toBe(true);
+      expect(ships()).toEqual([expect.objectContaining({ shipClassName: 'cutlass', status: 'wishlist', qty: 1, customName: 'Black Mamba', notes: 'next pledge' })]);
     });
   });
 

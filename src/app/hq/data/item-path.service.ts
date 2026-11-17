@@ -15,6 +15,7 @@ import { AssignTargets, NachschubService, WishAssignment, isWishLine } from '../
 import type { PathGroupSurface } from '../nachschub/path-group-analytics';
 import { parseStockRef } from '../stock/hq-stock-ref';
 import { HqInventoryService } from './hq-inventory.service';
+import { restoreShipWish, snapshotShipWish } from './ship-wish-snapshot';
 
 /*
  * ItemPathService - THE contract of the way an item takes outside the HQ (concept nachschub-hq r4-d1-s8): two stops,
@@ -371,12 +372,22 @@ export class ItemPathService {
   async removeWish(kind: string, className: string, name?: string | null): Promise<PathResult> {
     if (!this.auth.user()) return fail('itemPath.err.failed');
     if (this.read(kind, className, name).assigned > 0) return refuse('itemPath.err.wishAssigned');
+    // A ship wish is a hangar row: its custom name and notes go with it and must come back with the undo.
+    const shipRow = kind === 'ship' ? snapshotShipWish(this.hangar, className) : null;
     try {
       if (!(await this.wishlist.remove(kind, className, name))) return fail('itemPath.err.failed');
     } catch (err) {
       return fail(toErrorKey('itemPath', 'removeWish', err));
     }
-    return { ok: true, key: 'itemPath.done.wishOff', params: { name: name ?? className }, undo: () => this.addWish(kind, className, name) };
+    return {
+      ok: true,
+      key: 'itemPath.done.wishOff',
+      params: { name: name ?? className },
+      undo: async () => {
+        const r = await this.addWish(kind, className, name);
+        return r.ok && !(await restoreShipWish(this.hangar, className, shipRow)) ? fail('itemPath.err.failed') : r;
+      },
+    };
   }
 
   // ── assigning the wish to an Operation (concept 20261117-1110-pfad-stationen)

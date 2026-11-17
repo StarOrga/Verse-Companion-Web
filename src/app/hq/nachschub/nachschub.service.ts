@@ -12,6 +12,7 @@ import { newClientId } from '../data/hq-supplies-sync';
 import { HqEinsatzService } from '../data/hq-einsatz.service';
 import { HqInventoryService } from '../data/hq-inventory.service';
 import { WishlistStore } from '../data/wishlist.store';
+import { restoreShipWish, snapshotShipWish } from '../data/ship-wish-snapshot';
 import { AddedLine, HqSuppliesService, SupplyItem } from '../hq-supplies.service';
 import { NachschubNamingService } from './nachschub-naming';
 import { PathGroupSurface, trackPathGroupAssign, trackPathGroupRelease } from './path-group-analytics';
@@ -1015,6 +1016,8 @@ export class NachschubService {
     if (plan.remove <= 0) return fail('hq.nachschub.nothingPicked');
     const label = ref.name?.trim() || humanizeClassName(ref.className);
     const p: WishPosition = { kind: ref.kind, className: ref.className, name: ref.name ?? null, qty: plan.remove, forClassName: ref.forClassName ?? null };
+    // A ship wish taken to 0 loses its hangar row: keep the row's own data for the undo.
+    const shipRow = p.kind === 'ship' && this.wishQtyOf(p) - plan.remove <= 0 ? snapshotShipWish(this.hangar, p.className) : null;
     const took = await this.shiftWishes([{ p, delta: -plan.remove }]);
     if (!took.ok) return fail('hq.nachschub.wishlistFailed');
 
@@ -1042,11 +1045,14 @@ export class NachschubService {
       warn: gone.failed ? { key: 'hq.nachschub.dissolveFailed' } : undefined,
       undo: async () => {
         if (!(await this.undoDissolve(gone.done, uid))) return fail(this.error() ?? 'errors.generic');
-        this.revertLineChanges(changed);
+        // Lines and wish are given back by delta (what THIS removal took); a line that changed or is gone is refused.
+        const linesBack = this.revertLineChanges(changed);
         const back = await this.shiftWishes(inverse(took.applied));
+        const shipBack = back.ok && (await restoreShipWish(this.hangar, p.className, shipRow));
         // The wish may have changed meanwhile: the restored lines never stay above it.
         await this.trimOverAssigned(false, key);
-        return back.ok ? UNDONE : fail('hq.nachschub.wishlistFailed');
+        if (!back.ok) return fail('hq.nachschub.wishlistFailed');
+        return linesBack && shipBack ? UNDONE : fail('errors.generic');
       },
     };
   }
@@ -1084,6 +1090,7 @@ export class NachschubService {
     const l = this.supplies.items().find((x) => x.id === lineId);
     if (!uid || !info || !l) return fail('errors.generic');
     const p: WishPosition = { kind: l.entityKind ?? 'item', className: l.className ?? '', name: l.name, qty: info.pieces, forClassName: l.forClassName };
+    const shipRow = opts.alsoRemoveWish && p.kind === 'ship' && this.wishQtyOf(p) - info.pieces <= 0 ? snapshotShipWish(this.hangar, p.className) : null;
     const took = opts.alsoRemoveWish ? await this.shiftWishes([{ p, delta: -info.pieces }]) : { ok: true, lost: 0, applied: [] };
     if (!took.ok) return fail('hq.nachschub.wishlistFailed');
     const dissolve = info.emptiesPackage && ((autoDissolve && info.dissolvesAlong) || !!opts.dissolve) ? [info.packageId] : [];
@@ -1098,10 +1105,13 @@ export class NachschubService {
       warn: gone.failed ? { key: 'hq.nachschub.dissolveFailed' } : undefined,
       undo: async () => {
         if (!(await this.undoDissolve(gone.done, uid))) return fail(this.error() ?? 'errors.generic');
-        this.supplies.restore(lineId);
+        // The line comes back as it was removed; a line that no longer exists at all is refused, never guessed.
+        const lineBack = this.supplies.restore(lineId) !== false;
         const back = await this.shiftWishes(inverse(took.applied));
+        const shipBack = back.ok && (await restoreShipWish(this.hangar, p.className, shipRow));
         await this.trimOverAssigned(false, lineKey(l));
-        return back.ok ? UNDONE : fail('hq.nachschub.wishlistFailed');
+        if (!back.ok) return fail('hq.nachschub.wishlistFailed');
+        return lineBack && shipBack ? UNDONE : fail('errors.generic');
       },
     };
   }
@@ -1284,18 +1294,35 @@ export class NachschubService {
       if (!l) continue;
       const taken = (lines.find((x) => x.id === id)?.qty ?? 0) - left;
       const next = l.qty - taken;
-      out.push({ id, qty: l.qty, amount: l.amount, removed: next <= 0 });
+      // What this change TOOK (not the line as it was): the undo gives exactly that back onto whatever the line is by then.
+      out.push({ id, qty: next <= 0 ? l.qty : taken, removed: next <= 0 });
       if (next <= 0) this.supplies.removeMany([id]);
       else this.supplies.setLine(id, next, l.amount);
     }
     return out;
   }
 
-  private revertLineChanges(changed: readonly LineChange[]): void {
+  /**
+   * Undo of {@link lowerLines} by delta: every line gets back the pieces this change took, added onto what it holds now,
+   * so an edit made meanwhile (another tab or device) survives. A removed line whose tombstone is still there comes back
+   * as it was; one another device re-created gets the pieces added. A line that is gone, ticked or already met is
+   * refused (false) - writing a value from before would be stale.
+   */
+  private revertLineChanges(changed: readonly LineChange[]): boolean {
+    let ok = true;
     for (const c of [...changed].reverse()) {
-      if (c.removed) this.supplies.restore(c.id);
-      else this.supplies.setLine(c.id, c.qty, c.amount);
+      const now = this.supplies.items().find((x) => x.id === c.id);
+      if (!now) {
+        if (!c.removed || this.supplies.restore(c.id) === false) ok = false;
+        continue;
+      }
+      if (now.done || now.source === 'wish_met') {
+        ok = false;
+        continue;
+      }
+      this.supplies.setLine(c.id, now.qty + c.qty, now.amount);
     }
+    return ok;
   }
 
   /** Dissolve Nachschuebe with every line (tombstones). `failed` = at least one delete did not go through. */
@@ -1321,7 +1348,7 @@ export class NachschubService {
   private async undoDissolve(done: readonly Dissolved[], uid: string): Promise<boolean> {
     for (const d of [...done].reverse()) {
       if (!(await this.restorePackage(d.n, uid))) return false;
-      for (const l of d.lineIds) this.supplies.restore(l);
+      for (const l of d.lineIds) if (this.supplies.restore(l) === false) return false;
     }
     return true;
   }
@@ -1644,10 +1671,10 @@ export interface ReleaseInfo {
   readonly dissolvesAlong: boolean;
 }
 
+/** What one lowering took from a line: `qty` pieces (the whole line when `removed`), the undo adds them back. */
 interface LineChange {
   readonly id: string;
   readonly qty: number;
-  readonly amount: number | null;
   readonly removed: boolean;
 }
 

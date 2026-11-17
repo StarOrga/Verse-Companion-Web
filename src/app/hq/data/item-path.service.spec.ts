@@ -13,7 +13,7 @@ import { WishlistStore, wishKey, type WishEntry, type WishRow } from './wishlist
 
 interface Line { id: string; name: string; qty: number; done: boolean; className: string; amount: number | null; unit: null; packageId?: string | null; source?: string }
 interface Stock { location: string; name: string; class_name: string | null; qty: number; unit: 'pcs' }
-interface Ship { id: string; shipClassName: string; status: 'owned' | 'wishlist'; qty: number }
+interface Ship { id: string; shipClassName: string; status: 'owned' | 'wishlist'; qty: number; customName?: string | null; notes?: string | null }
 
 /**
  * The REAL SearchWishlistService (so a ship's two wish homes are the production rule) over a fake store and hangar;
@@ -505,6 +505,30 @@ describe('ItemPathService', () => {
       expect(svc.livePlace()).toBe('Lorville');
       expect(st.nearestPlace).toBe('Lorville');
       expect(st.morePlaces).toBe(1);
+    });
+  });
+
+  describe('undo of a ship wish taken off (H1)', () => {
+    it('brings the hangar row back with its custom name and notes', async () => {
+      const { svc, ships, ship } = setup();
+      await svc.addWish('ship', 'cutlass', 'Cutlass');
+      ships.update((x) => x.map((r) => ({ ...r, customName: 'Black Mamba', notes: 'buy with the next pledge' })));
+      const off = await svc.removeWish('ship', 'cutlass', 'Cutlass');
+      expect(off.ok).toBe(true);
+      expect(ship('cutlass')).toBeNull();
+      expect((await off.undo?.())?.ok).toBe(true);
+      expect(ship('cutlass')).toEqual(expect.objectContaining({ status: 'wishlist', customName: 'Black Mamba', notes: 'buy with the next pledge' }));
+    });
+
+    it('keeps what was typed into the re-created row meanwhile', async () => {
+      const { svc, ships, ship } = setup();
+      await svc.addWish('ship', 'cutlass', 'Cutlass');
+      ships.update((x) => x.map((r) => ({ ...r, customName: 'Old', notes: 'old notes' })));
+      const off = await svc.removeWish('ship', 'cutlass', 'Cutlass');
+      // another device wished it again and named it before the undo
+      ships.set([{ id: 's-new', shipClassName: 'cutlass', status: 'wishlist', qty: 1, customName: 'Fresh', notes: null }]);
+      await off.undo?.();
+      expect(ship('cutlass')).toEqual(expect.objectContaining({ customName: 'Fresh', notes: 'old notes' }));
     });
   });
 });
