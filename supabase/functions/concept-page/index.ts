@@ -34,6 +34,8 @@
 //   GET  /:id/draft?t=           { found, recovered }
 //   POST /:id/draft?t=           merge the page's text fields into the mirror
 //   POST /:id/attachments?t=     501 { reason: 'unsupported' } (v1)
+//   POST /:id/bye?t=             { ok: true } — the engine's unload beacon, no-op
+//   GET|POST /:id/closed-ack?t=  { ack: false } / { ok: true } — no-op
 //   OPTIONS                      CORS preflight
 //
 // Security model — read before changing anything here
@@ -70,6 +72,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 import { buildShim } from './shim.ts';
+import { upgradeEngine } from './upgrade.ts';
 import { buildEchoBody, isReplayOf, type ConceptSubmission } from './echo.ts';
 import { withPosthog } from '../_shared/posthog.ts';
 
@@ -336,7 +339,8 @@ Deno.serve(withPosthog('concept-page', async (req: Request): Promise<Response> =
     // origin, because the platform serves this response as text/plain (#330).
     const base = `${supabaseUrl.replace(/\/+$/, '')}/functions/v1/concept-page/${id}`;
     const shim = buildShim({ base, ticket: url.searchParams.get('t') ?? '' });
-    return htmlResponse(injectShim(row.html, shim));
+    // upgradeEngine: pages from an older donor get the #369 mock-part pins too.
+    return htmlResponse(injectShim(upgradeEngine(row.html), shim));
   }
 
   if (sub === 'heartbeat') {
@@ -473,6 +477,16 @@ Deno.serve(withPosthog('concept-page', async (req: Request): Promise<Response> =
       if (error) return json({ error: 'db_error', message: error.message }, 500);
       return json({ ok: true });
     }
+    return json({ error: 'method_not_allowed' }, 405);
+  }
+
+  if (sub === 'bye' || sub === 'closed-ack') {
+    // The engine's unload beacon (`/bye`) and its close-out acknowledgement
+    // (`/closed-ack`). The local bridge tracks open tabs and the close-out
+    // phase with them; a hosted page has neither, so both are no-ops that
+    // answer 200 instead of a 404 in the console.
+    if (req.method === 'GET') return json({ ack: false });
+    if (req.method === 'POST') return json({ ok: true });
     return json({ error: 'method_not_allowed' }, 405);
   }
 

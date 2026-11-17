@@ -36,14 +36,16 @@ interface FetchCall {
 }
 
 /** Runs the loader at `href` (path + hash); resolves after the fetch chain settled. */
-async function run(href: string, body = '<html><body>ok</body></html>', resUrl?: string) {
+async function run(href: string, body = '<html><body>ok</body></html>', resUrl?: string, status = 200, session: Record<string, string> = {}) {
+  const replaced: string[] = [];
   const loc = new URL(href);
   const fetched: FetchCall[] = [];
   const written: string[] = [];
   const msg = { textContent: '', attrs: {} as Record<string, string>, setAttribute(k: string, v: string) { this.attrs[k] = v; } };
   const ctx = vm.createContext({
     navigator: { language: 'en' },
-    location: { pathname: loc.pathname, hash: loc.hash, hostname: loc.hostname, origin: loc.origin },
+    location: { pathname: loc.pathname, hash: loc.hash, hostname: loc.hostname, origin: loc.origin, replace: (u: string) => replaced.push(u) },
+    sessionStorage: { getItem: (k: string) => session[k] ?? null, setItem: (k: string, v: string) => { session[k] = v; } },
     document: {
       getElementById: () => msg,
       open: () => undefined,
@@ -53,13 +55,13 @@ async function run(href: string, body = '<html><body>ok</body></html>', resUrl?:
     URL,
     fetch: (url: string, init: Record<string, unknown>) => {
       fetched.push({ url, init });
-      return Promise.resolve({ redirected: false, url: resUrl ?? url, text: () => Promise.resolve(body) });
+      return Promise.resolve({ redirected: false, status, url: resUrl ?? url, text: () => Promise.resolve(body) });
     },
   });
   vm.runInContext(SCRIPT, ctx);
   await new Promise((r) => setTimeout(r, 0));
   await new Promise((r) => setTimeout(r, 0));
-  return { fetched, written, msg };
+  return { fetched, written, msg, replaced, session };
 }
 
 const frame = (src: string, host = APP, id = ID) => `${host}/concept-frame/${id}.html#${encodeURIComponent(src)}`;
@@ -152,4 +154,14 @@ test('vercel.json pins the loader CSP to our project and the app frames only its
   assert.ok(app, 'the app rule excludes the loader path');
   assert.ok(!directive(app, 'frame-src').some((s) => s.includes('supabase.co')), 'the app frames no Supabase origin');
   assert.ok(directive(app, 'frame-src').includes("'self'"));
+});
+
+test('an expired ticket (401) goes back through /concept/<id> to mint a fresh one, once a minute (#369)', SKIP, async () => {
+  const env = await run(frame(GOOD), '<html><body>abgelaufen</body></html>', undefined, 401);
+  assert.deepEqual(env.replaced, [`/concept/${ID}`]);
+  assert.deepEqual(env.written, []);
+  // A second 401 within the minute shows the expired page instead of looping.
+  const again = await run(frame(GOOD), '<html><body>abgelaufen</body></html>', undefined, 401, env.session);
+  assert.deepEqual(again.replaced, []);
+  assert.deepEqual(again.written, ['<html><body>abgelaufen</body></html>']);
 });
