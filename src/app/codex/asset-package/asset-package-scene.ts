@@ -820,6 +820,32 @@ export class PackageScene {
   }
 
   /**
+   * Screen rectangle of one placed part (its world box's projected corners), CSS px;
+   * null for an unknown, hidden or behind-the-camera part. The name tag sits beside it.
+   */
+  partRect(id: string): Rect | null {
+    const node = this.placed.get(id);
+    if (!node?.visible) return null;
+    node.updateWorldMatrix(true, true);
+    const box = this.partBox.setFromObject(node);
+    if (box.isEmpty()) return null;
+    const w = this.canvas.clientWidth;
+    const h = this.canvas.clientHeight;
+    const pts = [];
+    for (const x of [box.min.x, box.max.x]) {
+      for (const y of [box.min.y, box.max.y]) {
+        for (const z of [box.min.z, box.max.z]) {
+          this.tmp.set(x, y, z).project(this.camera);
+          if (this.tmp.z >= 1) continue;
+          pts.push({ x: ((this.tmp.x + 1) / 2) * w, y: ((1 - this.tmp.y) / 2) * h });
+        }
+      }
+    }
+    return pts.length ? rectOf(pts) : null;
+  }
+  private readonly partBox = new THREE.Box3();
+
+  /**
    * Idle turntable. OrbitControls' autoRotate orbits the CAMERA, so a positive
    * speed (camera clockwise) reads as the model turning counter-clockwise.
    */

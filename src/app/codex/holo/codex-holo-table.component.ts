@@ -42,7 +42,7 @@ import {
 import type { AssetPackageManifest } from '../asset-package/asset-package.model';
 import { HardpointFrame, HardpointMarker } from '../hardpoint-map';
 import { ShipSkinViewerComponent } from '../ship-skin-viewer.component';
-import { AssetPackageViewerComponent, type CalloutValue, type PlacementSelection } from '../asset-package/asset-package-viewer.component';
+import { AssetPackageViewerComponent, type CalloutValue, type PlacementSelection, type SelectionIntent } from '../asset-package/asset-package-viewer.component';
 import type { HotspotScope } from '../asset-package/asset-package.model';
 import { calloutGutter, calloutSize } from '../asset-package/holo-overlay';
 import { AssetPackageService } from '../asset-package/asset-package.service';
@@ -228,7 +228,7 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
               [relevantPorts]="relevantPorts()" [calloutValues]="calloutModel()?.values ?? calloutValues()" [calloutTitle]="calloutModel()?.title ?? calloutTitle()"
               [calloutType]="calloutModel()?.type ?? null" [calloutDiff]="calloutModel()?.diff ?? false" [groupFilter]="viewerGroups()" [(hotspotScope)]="hotspotScope"
               [activePorts]="activePorts()" (hovered)="hovered.emit($event)" (locatable)="locatable.emit($event)"
-              (selectionChange)="partSelected.emit($event)" (swapRequested)="partSwap.emit($event)" />
+              (selectionIntent)="partIntent.emit($event)" (selectionChange)="partSelected.emit($event)" (swapRequested)="partSwap.emit($event)" />
           } @else if (packageRow() === null) {
             <!-- Legacy path (hulls uploaded before asset packages): model-viewer + browser-side port/node join. -->
             <sc-ship-skin-viewer class="mode-viewer" animate.leave="surface-leave" (drawn)="markDrawn()" [shipId]="shipClassName()" [embedded]="true" [holo]="true" [still]="still()"
@@ -772,6 +772,8 @@ export class CodexHoloTableComponent {
   /** Which dots the model shows; the "all parts" chip writes it. */
   readonly hotspotScope = model<HotspotScope>('swappable');
   readonly partSelected = output<PlacementSelection | null>();
+  /** What started or ended a selection on the model (analytics). */
+  readonly partIntent = output<SelectionIntent>();
   readonly partSwap = output<PlacementSelection>();
   /**
    * The swap icon of a callout that is not the 3D viewer's (Einfach, Oben, Seite, Front):

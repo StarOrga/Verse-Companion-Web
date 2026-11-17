@@ -396,6 +396,8 @@ html[data-sc-layout] { scroll-padding-top: var(--sc-bar-h); }
   /* The one selection colour of the holotable, every ship (concept 20261117-1809 "Grün").
      Same value as HOLO_SELECT in src/app/codex/holo-look.ts. */
   --sc-holo-select: #7dff9c;
+  /* Text on the green: the selected part's name tag. */
+  --sc-holo-select-ink: #04202e;
   --holo-t-fast: 160ms;
   --holo-t-base: 280ms;
   --holo-t-slow: 900ms;

@@ -1000,7 +1000,7 @@
           "changes": "Änderungen"
         },
         "backToParts": "Alle Bauteile",
-        "backHint": "Zurück zur Liste (Esc)",
+        "backHint": "Hebt die Auswahl im Modell auf (Esc)",
         "partsTotal": "{{n}} Bauteile",
         "partSize": "Größe",
         "partGrade": "Klasse",

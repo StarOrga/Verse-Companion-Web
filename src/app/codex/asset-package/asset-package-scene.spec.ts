@@ -217,6 +217,21 @@ describe('PackageScene highlight and pick', () => {
     expect(scene.pick(p.x + 10, p.y, 24, all)).toBe('slot');
     expect(scene.pick(p.x + 40, p.y, 24, all)).toBeNull();
   });
+
+  it('gives a placed part its screen rectangle around its anchor, none when hidden', () => {
+    const a = part('a', [0, 0, 0]);
+    internals.camera.position.set(0, 0, 10);
+    internals.camera.lookAt(0, 0, 0);
+    internals.camera.updateMatrixWorld();
+    const r = scene.partRect('a')!;
+    expect(r.left).toBeLessThan(400);
+    expect(r.right).toBeGreaterThan(400);
+    expect(r.top).toBeLessThan(300);
+    expect(r.bottom).toBeGreaterThan(300);
+    expect(scene.partRect('nope')).toBeNull();
+    a.visible = false;
+    expect(scene.partRect('a')).toBeNull();
+  });
 });
 
 interface HighlightInternals {

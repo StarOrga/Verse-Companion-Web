@@ -1000,7 +1000,7 @@
           "changes": "Changes"
         },
         "backToParts": "All parts",
-        "backHint": "Back to the list (Esc)",
+        "backHint": "Clears the selection in the model (Esc)",
         "partsTotal": "{{n}} parts",
         "partSize": "Size",
         "partGrade": "Grade",

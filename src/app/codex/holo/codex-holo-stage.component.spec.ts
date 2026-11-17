@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed, fakeAsync, flush, flushMicrotasks, tick } fr
 import { provideRouter } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { CodexHoloStageComponent, HOLO_TONES, resetHoloArrivalSession } from './codex-holo-stage.component';
+import { AnalyticsService } from '../../core/analytics.service';
 import { CodexDetail } from '../codex.service';
 import { HoloSilhouette } from '../holo-silhouette';
 import { ShipCapabilities } from '../codex-mission';
@@ -625,6 +626,36 @@ describe('CodexHoloStageComponent one panel (concept glas3)', () => {
     c.onPartSelected(null);
     expect(c.inspectedPort()).toBeNull();
     expect(c.viewerSelectedPort()).toBeNull();
+  });
+
+  it('the panel back control deselects and lands on the list of all parts; every select and deselect is one catalogue event', async () => {
+    const f = await setup({ primaryModuleSections: sections });
+    const c = f.componentInstance;
+    const track = vi.spyOn(TestBed.inject(AnalyticsService), 'track');
+    c.onPartIntent({ kind: 'select', source: 'model' });
+    c.onPartSelected({ id: 'x', portName: 'hp_shield', itemClass: 'S', swappable: true });
+    c.onInspectorBack();
+    expect(c.inspectedPort()).toBeNull();
+    expect(c.viewerSelectedPort()).toBeNull();
+    // No jump to Einordnung: the panel stays on the parts list.
+    expect(c.panelTab()).toBe('parts');
+    // A back with nothing selected sends nothing.
+    c.onInspectorBack();
+    c.onListInspect('hp_gun');
+    c.onPartIntent({ kind: 'deselect', via: 'empty' });
+    c.onPartIntent({ kind: 'deselect', via: 'again' });
+    c.onPartIntent({ kind: 'select', source: 'keyboard' });
+    expect(track.mock.calls).toEqual([
+      ['codex:part_select', { source: 'model' }],
+      ['codex:part_deselect', { via: 'panel' }],
+      ['codex:part_select', { source: 'list' }],
+      ['codex:part_deselect', { via: 'empty' }],
+      ['codex:part_deselect', { via: 'again' }],
+      ['codex:part_select', { source: 'keyboard' }],
+    ]);
+    f.detectChanges();
+    const back = (f.nativeElement as HTMLElement).querySelector('.inspector-close');
+    if (back) expect(back.textContent).toContain('codex.holo.stage.backToParts');
   });
 
   it('a part with no loadout slot is named from the package, with nothing to swap', async () => {
