@@ -42,6 +42,9 @@ DECK_STACK_GAP_M = 3.2         # a level this close under a deck is its landing 
 # entity class (socpak) -> category
 ENT_CATS: List[Tuple[str, str]] = [
     ("lift", r"^Transit(Destination|Gateway)$"),
+    # One per stop of a lift cabin's path (the Reclaimer's elevator has six, no Transit
+    # entities); used only when a ship has no Transit entities, see `lift_stops`.
+    ("liftFloor", r"^Elevator_Floor$"),
     ("ladder", r"^Ladder$|^Ladder_"),
     ("door", r"^Door_(?!.*toilet)|^ElevatorDoor"),
     ("weaponRack", r"Weapon_Rack"),
@@ -205,6 +208,17 @@ def locate_grids(loadout: Sequence[Dict[str, Any]], port_names: Iterable[str],
 
 
 # ── lifts ────────────────────────────────────────────────────────────────────
+def lift_stops(entities: Sequence[Dict[str, Any]]) -> List[Tuple[float, float, float, int]]:
+    """The lift stops `(x, y, z, rank)` of a ship for `cluster_lifts`: its Transit entities
+    (destination rank 0, gateway 1); a ship without any (Reclaimer) falls back to its
+    `Elevator_Floor` entities, one per cabin stop. Never both, so no stop counts twice."""
+    transit = [(*e["pos"][:3], 1 if re.search(r"gateway", e.get("cls") or "", re.I) else 0)
+               for e in entities if e["cat"] == "lift"]
+    if transit:
+        return transit
+    return [(*e["pos"][:3], 0) for e in entities if e["cat"] == "liftFloor"]
+
+
 def cluster_lifts(stops: Iterable[Sequence[float]], tol: float = LIFT_CLUSTER_M) -> List[Dict[str, Any]]:
     """Clusters lift stops `(x, y, z[, rank])` into shafts: x/y within `tol` metres of the shaft.
     Stops of one shaft within `LIFT_STOP_MIN_GAP_M` in height are one stop (the game places a
@@ -499,8 +513,7 @@ def assemble(*, decks: List[Dict[str, Any]], floors: List[Tuple[float, str]],
         return room_at(decks, deck_of(d["pos"]), d["pos"])
 
     attach_panels(doors, panels, room_of=door_room)
-    shafts = cluster_lifts([(*e["pos"][:3], 1 if re.search(r"gateway", e.get("cls") or "", re.I) else 0)
-                            for e in entities if e["cat"] == "lift"])
+    shafts = cluster_lifts(lift_stops(entities))
     seen_climb: List[Tuple[str, Sequence[float]]] = []
     pois: List[Dict[str, Any]] = []
     for e in entities + loadout_pois:

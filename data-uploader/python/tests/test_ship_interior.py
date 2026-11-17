@@ -122,6 +122,19 @@ def test_destination_and_gateway_of_one_stop_are_one_stop_and_the_destination_he
     assert len(shafts) == 1 and shafts[0]["stops"] == [-4.44, 0.69]
 
 
+def test_a_ship_without_transit_entities_takes_its_lift_stops_from_the_elevator_floors() -> None:
+    # AEGS_Reclaimer LIVE 4.10.2: no TransitDestination / -Gateway, six Elevator_Floor at x 0, y -43.
+    floors = [{"cat": "liftFloor", "cls": "Elevator_Floor", "pos": [0.0, -43.0, z]}
+              for z in (-25.5, -12.24, -4.62, 0.26, 3.25, 8.63)]
+    shafts = si.cluster_lifts(si.lift_stops(floors))
+    assert len(shafts) == 1 and shafts[0]["at"] == [0.0, -43.0]
+    assert shafts[0]["stops"] == [-25.5, -12.24, -4.62, 0.26, 3.25, 8.63]
+    # With Transit entities the floors are ignored, so no stop counts twice.
+    transit = [{"cat": "lift", "cls": "TransitDestination", "pos": [0.0, -43.0, -4.0]}]
+    assert si.lift_stops(transit + floors) == [(0.0, -43.0, -4.0, 0)]
+    assert si.cat_of(si.ENT_CATS, "Elevator_Floor") == "liftFloor"
+
+
 def test_two_lifts_ten_metres_apart_are_two_shafts() -> None:
     assert len(si.cluster_lifts([(-5.0, -11.0, -4.4, 0), (5.0, -11.0, -4.4, 0)])) == 2
 
