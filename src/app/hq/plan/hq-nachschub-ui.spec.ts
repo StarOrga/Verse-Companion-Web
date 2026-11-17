@@ -377,6 +377,7 @@ describe('HqNachschubFlowComponent', () => {
     });
     const fake = {
       wishPositions: () => live(),
+      freeWishPositions: () => live(),
       packages: signal<Nachschub[]>([]),
       linesOf: () => [],
       createFromWishlist: created,
@@ -406,6 +407,7 @@ describe('HqNachschubFlowComponent', () => {
     TestBed.resetTestingModule();
     const fake = {
       wishPositions: () => [] as WishPosition[],
+      freeWishPositions: () => [] as WishPosition[],
       packages: signal<Nachschub[]>([opts.plain ? nach('n1', 'Bestehend', 1) : { ...nach('n1', 'Bestehend', 1), type: 'event', eventId: 'ev0' }]),
       error: signal<string | null>(null),
       update: vi.fn().mockName('update').mockResolvedValue(true),
@@ -700,6 +702,7 @@ describe('HqNachschubFlowComponent', () => {
       TestBed.resetTestingModule();
       const fake = {
         wishPositions: () => [],
+        freeWishPositions: () => [],
         packages: signal<Nachschub[]>([nach('p1', 'Gallant-Ausrüstung', 1)]),
         linesOf: () => lines,
         rename: vi.fn().mockName('rename').mockResolvedValue(true),

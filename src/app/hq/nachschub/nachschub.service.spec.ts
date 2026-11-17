@@ -24,6 +24,8 @@ interface Ln {
   className: string | null;
   forClassName: string | null;
   packageId: string | null;
+  source: string;
+  updatedAt: string;
   deletedAt: string | null;
 }
 
@@ -34,7 +36,7 @@ class FakeSupplies {
   max = 100;
   private n = 0;
 
-  addLine(name: string, qty: number, meta: { entityKind?: string; className?: string; forClassName?: string | null; packageId?: string | null } = {}) {
+  addLine(name: string, qty: number, meta: { entityKind?: string; className?: string; forClassName?: string | null; packageId?: string | null; source?: string } = {}) {
     if (this.items().length >= this.max) return null;
     const pkg = meta.packageId ?? null;
     const same = this.items().find((i) => !i.done && i.name.toLowerCase() === name.toLowerCase() && i.packageId === pkg && (i.forClassName ?? '') === (meta.forClassName ?? ''));
@@ -45,7 +47,10 @@ class FakeSupplies {
     const id = `L${++this.n}`;
     this.rows.update((rs) => [
       ...rs,
-      { id, name, qty, amount: null, unit: null, done: false, entityKind: meta.entityKind ?? null, className: meta.className ?? null, forClassName: meta.forClassName ?? null, packageId: pkg, deletedAt: null },
+      {
+        id, name, qty, amount: null, unit: null, done: false, entityKind: meta.entityKind ?? null, className: meta.className ?? null, forClassName: meta.forClassName ?? null,
+        packageId: pkg, source: meta.source ?? 'manual', updatedAt: `2026-11-07T10:00:${String(this.n).padStart(2, '0')}Z`, deletedAt: null,
+      },
     ]);
     return { id, prevQty: 0, prevAmount: null };
   }
@@ -205,16 +210,18 @@ describe('NachschubService', () => {
   const create = (picks: { key: string; qty?: number }[], name = 'N') => svc.createFromWishlist({ picks, name });
 
   describe('createFromWishlist', () => {
-    it('H3: a pick without a line stays on the wishlist and the result says so', async () => {
+    it('H3 / A1: a pick without a line is not assigned and the result says so; every wish keeps its quantity', async () => {
       addWish('medpen', 2);
       addWish('rattler', 1);
       supplies.max = 1;
       const r = await create([{ key: 'item:medpen' }, { key: 'item:rattler' }]);
       expect(r.ok).toBe(true);
       expect(r.warn).toEqual({ key: 'hq.nachschub.partial', params: { count: 1 } });
-      expect(wish.qty('medpen')).toBe(0);
+      expect(wish.qty('medpen')).toBe(2);
       expect(wish.qty('rattler')).toBe(1);
       expect(supplies.items().length).toBe(1);
+      expect(supplies.items()[0].source).toBe('wish');
+      expect(svc.allocationOf({ kind: 'item', className: 'medpen' })).toEqual(expect.objectContaining({ wished: 2, assigned: 2, free: 0 }));
     });
 
     it('H3: with no line at all nothing is saved and the wishlist stays', async () => {
@@ -228,17 +235,26 @@ describe('NachschubService', () => {
       expect(wish.qty('medpen')).toBe(2);
     });
 
-    it('AUD-10: a failing wishlist write rolls everything back and reports it', async () => {
+    it('A1: creating never writes the wishlist, so a wishlist that cannot be written does not block it', async () => {
       addWish('medpen', 2);
       addWish('rattler', 1);
       wish.failOn.add('rattler');
       const r = await create([{ key: 'item:medpen' }, { key: 'item:rattler' }]);
-      expect(r).toEqual({ ok: false, key: 'hq.nachschub.wishlistFailed' });
+      expect(r.ok).toBe(true);
       expect(wish.qty('medpen')).toBe(2);
       expect(wish.qty('rattler')).toBe(1);
-      expect(supplies.items().length).toBe(0);
-      expect(svc.packages().length).toBe(0);
-      expect(server[0].deleted_at).not.toBeNull();
+      expect(supplies.items().length).toBe(2);
+      expect(server[0].deleted_at).toBeNull();
+    });
+
+    it('A3: only the free pieces are taken; a fully assigned wish is no pick any more', async () => {
+      addWish('medpen', 3);
+      await create([{ key: 'item:medpen', qty: 2 }], 'A');
+      const r = await create([{ key: 'item:medpen', qty: 5 }], 'B');
+      expect(r.ok).toBe(true);
+      expect(supplies.linesOfPackage(r.id!)[0].qty).toBe(1);
+      expect(await create([{ key: 'item:medpen' }], 'C')).toEqual({ ok: false, key: 'hq.nachschub.nothingPicked' });
+      expect(wish.qty('medpen')).toBe(3);
     });
 
     it('M6: reads the slots fresh, so a slot taken in another tab is not offered', async () => {
@@ -315,23 +331,35 @@ describe('NachschubService', () => {
   });
 
   describe('emptying and deleting', () => {
-    it('M3: undo of "Leeren" puts back only its own change', async () => {
+    it('A1: "Leeren" with backToWishlist leaves the wish as it is - it never left the wishlist', async () => {
       addWish('medpen', 3);
       const made = await create([{ key: 'item:medpen' }]);
       const r = await svc.empty(made.id!, true);
       expect(wish.qty('medpen')).toBe(3);
+      expect(supplies.linesOfPackage(made.id!).length).toBe(0);
+      await r.undo!();
+      expect(supplies.linesOfPackage(made.id!).length).toBe(1);
+      expect(wish.qty('medpen')).toBe(3);
+    });
+
+    it('M3: undo of "Leeren" without backToWishlist puts back only its own change', async () => {
+      addWish('medpen', 3);
+      const made = await create([{ key: 'item:medpen' }]);
+      const r = await svc.empty(made.id!, false);
+      expect(wish.qty('medpen')).toBe(0);
       addWish('rattler', 2); // a wish added during the toast window
-      wish.rows.update((rs) => rs.map((x) => (x.className === 'medpen' ? { ...x, qty: 4 } : x))); // and one more medpen
+      addWish('medpen', 1); // and a medpen wished again
       const u = await r.undo!();
       expect(u.ok).toBe(true);
       expect(wish.qty('rattler')).toBe(2);
-      expect(wish.qty('medpen')).toBe(1);
+      expect(wish.qty('medpen')).toBe(4);
       expect(supplies.linesOfPackage(made.id!).length).toBe(1);
     });
 
-    it('L1: merging back above 999 says how much was lost, and the undo restores the exact quantity', async () => {
-      addWish('medpen', 600);
-      const made = await create([{ key: 'item:medpen' }]);
+    it('L1: a Bestand line merging back above 999 says how much was lost, and the undo restores the exact quantity', async () => {
+      addWish('rattler', 1);
+      const made = await create([{ key: 'item:rattler' }]);
+      await svc.addToNachschub(made.id!, [{ name: 'medpen', className: 'medpen', amount: 600, unit: 'pcs' }]);
       addWish('medpen', 600);
       const r = await svc.empty(made.id!, true);
       expect(wish.qty('medpen')).toBe(999);
@@ -344,7 +372,7 @@ describe('NachschubService', () => {
       addWish('medpen', 3);
       const made = await create([{ key: 'item:medpen' }]);
       wish.failOn.add('medpen');
-      const r = await svc.empty(made.id!, true);
+      const r = await svc.empty(made.id!, false);
       expect(r).toEqual({ ok: false, key: 'hq.nachschub.wishlistFailed' });
       expect(supplies.linesOfPackage(made.id!).length).toBe(1);
     });
@@ -353,10 +381,11 @@ describe('NachschubService', () => {
       addWish('medpen', 3);
       const made = await create([{ key: 'item:medpen' }]);
       failDrop = true;
-      const r = await svc.remove(made.id!, true);
+      const r = await svc.remove(made.id!, false);
       expect(r.ok).toBe(false);
       expect(supplies.linesOfPackage(made.id!).length).toBe(1);
-      expect(wish.qty('medpen')).toBe(0);
+      // The wish pieces it would have taken along are back (A1: they were on the wishlist all along).
+      expect(wish.qty('medpen')).toBe(3);
       expect(svc.packages().some((p) => p.id === made.id)).toBe(true);
     });
 
@@ -393,11 +422,12 @@ describe('NachschubService', () => {
       const lineId = supplies.linesOfPackage(made.id!)[0].id;
       expect(svc.packages()[0].snapshot[lineId]).toBe(5);
 
-      inventory.items.set([{ class_name: 'medpen', qty: 7 }]);
-      addWish('medpen', 3);
+      // One medpen arrived (the line has 1 still to come); 3 more are wished: 5 wished - 1 assigned = 4 free.
+      inventory.items.set([{ class_name: 'medpen', qty: 6 }]);
+      wish.rows.update((rs) => rs.map((x) => (x.className === 'medpen' ? { ...x, qty: 5 } : x)));
       const r = await svc.addFromWishlist(made.id!, [{ key: 'item:medpen' }]);
       expect(r.ok).toBe(true);
-      expect(supplies.linesOfPackage(made.id!)[0].qty).toBe(5);
+      expect(supplies.linesOfPackage(made.id!)[0].qty).toBe(6);
       expect(svc.packages()[0].snapshot[lineId]).toBe(5);
 
       const u = await r.undo!();
@@ -405,7 +435,7 @@ describe('NachschubService', () => {
       const lines = supplies.linesOfPackage(made.id!);
       expect(lines.length).toBe(1);
       expect(lines[0].qty).toBe(2);
-      expect(wish.qty('medpen')).toBe(3);
+      expect(wish.qty('medpen')).toBe(5);
     });
 
     it('a new line gets a baseline of its own and the undo removes only that line', async () => {

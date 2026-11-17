@@ -8,10 +8,10 @@ import { NachschubEdgeService } from '../nachschub/nachschub-edge.service';
 import { NachschubService } from '../nachschub/nachschub.service';
 import { HqLiveService } from '../now/hq-live.service';
 import { HqInventoryService } from './hq-inventory.service';
-import { ItemPathService, PLACE_WITH_ME, isPathError, stepsOf } from './item-path.service';
+import { ItemPathService, PLACE_WITH_ME, isPathError, nearestPlaceOf, orderPlaces, stepsOf } from './item-path.service';
 import { WishlistStore, wishKey, type WishEntry, type WishRow } from './wishlist.store';
 
-interface Line { id: string; name: string; qty: number; done: boolean; className: string; amount: number | null; unit: null; packageId?: string | null }
+interface Line { id: string; name: string; qty: number; done: boolean; className: string; amount: number | null; unit: null; packageId?: string | null; source?: string }
 interface Stock { location: string; name: string; class_name: string | null; qty: number; unit: 'pcs' }
 interface Ship { id: string; shipClassName: string; status: 'owned' | 'wishlist'; qty: number }
 
@@ -106,6 +106,7 @@ function setup(opts: { user?: boolean; live?: Record<string, unknown> | null; st
   const nachschub = {
     active,
     reconcile: vi.fn().mockName('reconcile').mockResolvedValue(undefined),
+    allocationOf: vi.fn().mockName('allocationOf').mockReturnValue({ key: '', wished: 0, assigned: 0, free: 0, assignments: [] }),
     reactivate: vi.fn().mockName('reactivate').mockImplementation(async (id: string) => (active.update((a) => [...a, { id }]), { ok: true })),
   };
   TestBed.configureTestingModule({
@@ -401,11 +402,68 @@ describe('ItemPathService', () => {
       expect(l.done).toBe(false);
     });
 
+    it('A8: an arrival on a wish line answers the wish in full; the line is left to close as reached', async () => {
+      const { svc, lines, active, wishlist, nachschub } = setup();
+      active.set([{ id: 'n1' }]);
+      const l = { ...packageLine(lines, 5) };
+      lines[lines.length - 1] = Object.assign(lines[lines.length - 1], { source: 'wish' });
+      await wishlist.setQty('item', 'medpen', 'Medpen', 5);
+      const res = await svc.moveToInventar('item', 'medpen', 'Medpen', 'Lorville', 5);
+      expect(res).toEqual(expect.objectContaining({ ok: true, key: 'itemPath.done.ownWish' }));
+      expect(wishlist.qtyOf('item', 'medpen', 'Medpen')).toBe(0);
+      expect(lines[lines.length - 1].done).toBe(l.done);
+      expect(nachschub.reconcile).toHaveBeenCalled();
+      await res.undo!();
+      expect(wishlist.qtyOf('item', 'medpen', 'Medpen')).toBe(5);
+    });
+
+    it('A2/A3: the state counts assigned and free pieces; a plain counter never cuts into assigned ones', async () => {
+      const { svc, lines, active, wishlist, nachschub } = setup();
+      active.set([{ id: 'n1' }]);
+      Object.assign(packageLine(lines, 3), { source: 'wish' });
+      await wishlist.setQty('item', 'medpen', 'Medpen', 5);
+      const assignments = [{ packageId: 'n1', packageName: 'Bodentrupp', qty: 3, assignedAt: '', createdAt: '', einsaetzeDone: 1, einsaetzeTotal: 4, lineIds: ['p1'] }];
+      nachschub.allocationOf.mockReturnValue({ key: 'item:medpen', wished: 5, assigned: 3, free: 2, assignments });
+      const st = svc.read('item', 'medpen', 'Medpen');
+      expect(st).toEqual(expect.objectContaining({ wishQty: 5, assigned: 3, free: 2, assignments }));
+      expect((await svc.setWishQty('item', 'medpen', 'Medpen', 4)).ok).toBe(true);
+      const cut = await svc.setWishQty('item', 'medpen', 'Medpen', 2);
+      expect(cut).toEqual({ ok: false, key: 'itemPath.err.wishAssigned', tone: 'info' });
+      expect(await svc.removeWish('item', 'medpen', 'Medpen')).toEqual({ ok: false, key: 'itemPath.err.wishAssigned', tone: 'info' });
+      expect(wishlist.qtyOf('item', 'medpen', 'Medpen')).toBe(4);
+    });
+
     it('a line of an archived Nachschub is a loose line: it shrinks as before', async () => {
       const { svc, lines } = setup();
       const l = packageLine(lines, 10);
       await svc.moveToInventar('item', 'medpen', 'Medpen', 'Lorville', 6);
       expect(l.qty).toBe(4);
+    });
+  });
+
+  describe('B5: the one place of the ownership strip', () => {
+    const places = [
+      { location: 'Area18', qty: 1 },
+      { location: PLACE_WITH_ME, qty: 1 },
+      { location: 'Lorville', qty: 4 },
+      { location: 'Orison', qty: 4 },
+    ];
+
+    it('the live place first, then "Bei mir", then the most pieces, then by name', () => {
+      expect(orderPlaces(places, 'area18').map((p) => p.location)).toEqual(['Area18', PLACE_WITH_ME, 'Lorville', 'Orison']);
+      expect(orderPlaces(places, null).map((p) => p.location)).toEqual([PLACE_WITH_ME, 'Lorville', 'Orison', 'Area18']);
+      expect(nearestPlaceOf(places.slice(2), 'Microtech')).toBe('Lorville');
+      expect(nearestPlaceOf([], null)).toBeNull();
+    });
+
+    it('the state names the place while the game runs at it and counts the others', async () => {
+      const { svc } = setup({ live: { presence: { gameRunning: true, at: new Date().toISOString() }, location: { name: 'Lorville' } } });
+      await svc.moveToInventar('item', 'medpen', 'Medpen', 'Area18', 3);
+      await svc.moveToInventar('item', 'medpen', 'Medpen', 'Lorville', 1);
+      const st = svc.read('item', 'medpen', 'Medpen');
+      expect(svc.livePlace()).toBe('Lorville');
+      expect(st.nearestPlace).toBe('Lorville');
+      expect(st.morePlaces).toBe(1);
     });
   });
 });
