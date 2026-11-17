@@ -43,6 +43,8 @@ export interface SourceDb {
   update(id: string, patch: { coverage: Record<string, unknown>; last_synced_at: string; last_seen_commit: string | null }): Promise<void>;
   fetchFn?: FetchFn;
   ghToken?: string;
+  /** Characters per stored piece of a pack; tests cut small pieces, production uses PIECE_CHARS. */
+  pieceChars?: number;
 }
 
 function fail(e: { message?: string } | null): never {

@@ -20,11 +20,13 @@ const MB = 1024 * 1024;
 const READ_MAX = 6 * MB;
 const WRITE_MAX = 6 * MB;
 /**
- * The two slices that hold a whole community pack (~12 MB of text): the download and its split by
- * key group. They do nothing else, and a pack does not grow with the translation memory.
+ * The download of a community pack (~12 MB of text) writes all of it in one slice, but piece by
+ * piece as the bytes arrive: the sum is the pack, the largest object is one piece. (The first live
+ * import died at the 256 MB of a worker with the pack in one object and its chunks in a list.)
  */
-const PACK_SLICES = new Set(['seed/fetch', 'seed/split']);
+const PACK_SLICES = new Set(['seed/fetch']);
 const PACK_MAX = 40 * MB;
+const PIECE_MAX = 4 * MB;
 /**
  * The slice that joins the sixteen pieces of an overlay into its file and writes it under the build
  * and as `latest`: ~14 MB of text that is concatenated, never parsed into objects or serialized.
@@ -139,6 +141,7 @@ function assertBudget({ worst }) {
     const [r, wr] = PACK_SLICES.has(tag) ? [PACK_MAX, PACK_MAX] : TEXT_SLICES.has(tag) ? [TEXT_MAX, TEXT_MAX] : [READ_MAX, WRITE_MAX];
     assert.ok(x.read <= r, `${tag} read ${mb(x.read)} MB in one slice (budget ${mb(r)})`);
     assert.ok(x.written <= wr, `${tag} wrote ${mb(x.written)} MB in one slice (budget ${mb(wr)})`);
+    if (PACK_SLICES.has(tag)) assert.ok(x.biggest <= PIECE_MAX, `${tag} moved an object of ${mb(x.biggest)} MB (budget ${mb(PIECE_MAX)})`);
   }
 }
 
