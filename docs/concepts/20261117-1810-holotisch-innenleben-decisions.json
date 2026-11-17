@@ -1,0 +1,109 @@
+{
+  "concept": "20261117-1810-holotisch-innenleben",
+  "rounds": [
+    {
+      "iteration": 1,
+      "template": "design",
+      "action": "iterate",
+      "submitted_at": null,
+      "designs": {
+        "d1": "Deckplan 2D",
+        "d2": "3D-Schnitt",
+        "d3": "Bauteile & Suche"
+      },
+      "comments": {
+        "general": {
+          "text": "auf der genannten vergleichswebsite war noch so cool drumherum in 3D das schiffe ganz leicht gezeichnet und man wusste wo das deck gerade amm schiff ist und konnte es auch drehen. Ich sehe das so wie außen, dort gibt es die 3d und die einfache ansicht.\ndafür jeweeils noch eine fitler mit dem ausgewählten deck! \nDann können wir uns außen und innen sparen, es gibt nurr noch 3d einfach und die seitenansichten und zusätzlich decks als filterauswahl unten! \nNebst den komponenten die angezeigt werden sollten (standardmäßig nach typ ausgewählt, e.g. frachter sollen cargo decks vorausgewählt habnen, medic schiffe, medic sachen und kampfschiffe eher kampf sachen).",
+          "attachments": []
+        },
+        "designs": {
+          "d1": "das ist super!",
+          "d2": "das geht gar nicht!",
+          "d3": "das finde ich auch nicht schlecht!"
+        }
+      },
+      "decisions": [
+        {
+          "id": "r1-decks",
+          "label": "Decks ohne Spieldaten",
+          "mode": "single",
+          "value": "lifts",
+          "rec": "lifts",
+          "deviates": false,
+          "note": "und leitern!"
+        },
+        {
+          "id": "r1-scope",
+          "label": "Innen-Elemente im Extrakt",
+          "mode": "multi",
+          "value": [
+            "cargo",
+            "wege",
+            "med",
+            "gear",
+            "fire",
+            "tech",
+            "home",
+            "doors"
+          ],
+          "rec": "cargo wege med gear fire tech home",
+          "deviates": true,
+          "note": "auch türen sind wichtig für das gameplay!"
+        },
+        {
+          "id": "r1-3d",
+          "label": "Quelle der 3D-Innenansicht",
+          "mode": "single",
+          "value": "extrude",
+          "rec": "extrude",
+          "deviates": false,
+          "note": ""
+        },
+        {
+          "id": "r1-coverage",
+          "label": "Schiffe mit Innenleben",
+          "mode": "single",
+          "value": "all",
+          "rec": "all",
+          "deviates": false,
+          "note": ""
+        },
+        {
+          "id": "r1-relay",
+          "label": "Relais-Verkabelung prüfen",
+          "mode": "yesnoalt",
+          "value": {
+            "answer": "yes",
+            "alt": ""
+          },
+          "rec": "yes",
+          "deviates": false,
+          "note": ""
+        },
+        {
+          "id": "r1-gaps",
+          "label": "Umgang mit Datenlücken",
+          "mode": "single",
+          "value": "show",
+          "rec": "show",
+          "deviates": false,
+          "note": ""
+        },
+        {
+          "id": "r1-events",
+          "label": "Analytics-Events Innenleben",
+          "mode": "yesnoalt",
+          "value": {
+            "answer": "yes",
+            "alt": ""
+          },
+          "rec": "yes",
+          "deviates": false,
+          "note": ""
+        }
+      ],
+      "annotations": [],
+      "outcome": "iterated → round 2 (3D mit Hülle, Einfach + Deckfilter, Bauteile & Suche)"
+    }
+  ]
+}
