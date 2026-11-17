@@ -10,6 +10,8 @@ import type { BatchResult, Deps } from './_machine.ts';
 import type { BatchParams } from './_prompt.ts';
 
 export const learnKey = (lang: string, name: string) => `translation-work/learn-${lang}/${name}.json`;
+/** Written by a publish: a learning pass is due for this language (`{ trigger, at, build_id }`). Nothing reads it yet. */
+export const learnDueKey = (lang: string) => learnKey(lang, 'due');
 /** Month totals of web-research RESERVATIONS (kind web_reserved) so two languages in one tick cannot both pass the cap. Real spend is in the ledger. */
 export const spendKey = (month: string) => `translation-work/learn-spend/${month}.json`;
 
