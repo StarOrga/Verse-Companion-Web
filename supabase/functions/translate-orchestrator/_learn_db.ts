@@ -6,6 +6,7 @@
 // (migration 20261108180000). `monthCommitted` sums every row, so the monthly cap sees all kinds;
 // the web-research cap sums kind='web' of the month.
 
+import { selectAll } from './_page.ts';
 import type { GlossaryRow } from './_prompt.ts';
 import type { LearnedStyle } from './_style.ts';
 
@@ -79,8 +80,8 @@ export interface LearnDb {
   listAnsweredUnapplied(lang: string, limit: number): Promise<CardRow[]>;
   listOpenCards(lang: string, kinds: CardRow['kind'][], limit: number): Promise<CardRow[]>;
   updateCardContext(id: string, context: Record<string, unknown>): Promise<void>;
-  /** Books learning spend as a job-less ledger row (see header). */
-  addLearnLedger(month: string, usd: number, kind: string, lang: string): Promise<void>;
+  /** Books learning spend as a job-less ledger row (see header). With `ref` (the batch id) a second booking of the same batch is ignored. */
+  addLearnLedger(month: string, usd: number, kind: string, lang: string, ref?: string): Promise<void>;
   /** Ledger sum of one kind in a month (web-research cap). */
   monthKindSpent(month: string, kind: string): Promise<number>;
   /** Ledger sum of the month (all spend, the monthly cap's basis). */
@@ -120,9 +121,13 @@ export function makeLearnDb(sb: Client, now: () => Date = () => new Date()): Lea
     async codexNames(buildId) {
       const out = new Set<string>();
       for (const [table, col] of [['codex_manufacturers', 'name_localized'], ['codex_ships', 'name_localized'], ['codex_locations', 'name']]) {
-        const { data, error } = await sb.from(table).select(col).eq('build_id', buildId).limit(10000);
-        if (error) continue; // a missing table degrades to fewer names
-        for (const r of (data ?? []) as Record<string, string | null>[]) {
+        let data: Record<string, string | null>[];
+        try {
+          data = await selectAll((from, to) => sb.from(table).select(col).eq('build_id', buildId).order(col).range(from, to));
+        } catch {
+          continue; // a missing table degrades to fewer names
+        }
+        for (const r of data) {
           const n = (r[col] ?? '').trim();
           if (n) out.add(n);
         }
@@ -140,19 +145,30 @@ export function makeLearnDb(sb: Client, now: () => Date = () => new Date()): Lea
       if (error) fail(error);
     },
     async listGlossary(lang) {
-      const { data, error } = await sb.from('translation_glossary').select('*').eq('lang', lang).limit(20000);
-      if (error) fail(error);
-      return (data ?? []) as LearnGlossaryRow[];
+      return await selectAll<LearnGlossaryRow>((from, to) =>
+        sb.from('translation_glossary').select('*').eq('lang', lang).order('id').range(from, to));
     },
     async insertGlossary(lang, rows) {
+      const shape = (r: LearnGlossaryRow) => ({
+        lang, source_term: r.source_term, target_term: r.target_term, category: r.category, origin: r.origin,
+        evidence: r.evidence ?? 0,
+      });
       let n = 0;
-      for (const r of rows) {
-        const { error } = await sb.from('translation_glossary').insert({
-          lang, source_term: r.source_term, target_term: r.target_term, category: r.category, origin: r.origin,
-          evidence: r.evidence ?? 0,
-        });
-        if (error && error.code !== '23505') fail(error);
-        if (!error) n++;
+      // A first learning pass promotes hundreds of terms: one statement per 100 rows. A group that
+      // holds a term the table already has fails as a whole (23505) and is repeated row by row.
+      for (let i = 0; i < rows.length; i += 100) {
+        const group = rows.slice(i, i + 100);
+        const bulk = await sb.from('translation_glossary').insert(group.map(shape));
+        if (!bulk.error) {
+          n += group.length;
+          continue;
+        }
+        if (bulk.error.code !== '23505') fail(bulk.error);
+        for (const r of group) {
+          const { error } = await sb.from('translation_glossary').insert(shape(r));
+          if (error && error.code !== '23505') fail(error);
+          if (!error) n++;
+        }
       }
       return n;
     },
@@ -197,20 +213,22 @@ export function makeLearnDb(sb: Client, now: () => Date = () => new Date()): Lea
       const { error } = await sb.from('translation_cards').update({ context }).eq('id', id);
       if (error) fail(error);
     },
-    async addLearnLedger(month, usd, kind, lang) {
+    async addLearnLedger(month, usd, kind, lang, ref) {
       if (!(usd > 0)) return;
-      const { error } = await sb.from('translation_ledger').insert({ job_id: null, month, usd, kind, lang });
-      if (error) fail(error);
+      const { error } = await sb.from('translation_ledger').insert({ job_id: null, month, usd, kind, lang, ref: ref ?? null });
+      // 23505 on (job, ref): this batch is booked already.
+      if (error && !(ref && error.code === '23505')) fail(error);
     },
     async monthKindSpent(month, kind) {
-      const { data, error } = await sb.from('translation_ledger').select('usd').eq('month', month).eq('kind', kind);
-      if (error) fail(error);
-      return ((data ?? []) as { usd: number }[]).reduce((a, r) => a + Number(r.usd), 0);
+      // The caps are read from these sums: a list cut at the API's row cap would let the pipeline overspend.
+      const rows = await selectAll<{ usd: number }>((from, to) =>
+        sb.from('translation_ledger').select('usd').eq('month', month).eq('kind', kind).order('id').range(from, to));
+      return rows.reduce((a, r) => a + Number(r.usd), 0);
     },
     async monthSpent(month) {
-      const { data, error } = await sb.from('translation_ledger').select('usd').eq('month', month);
-      if (error) fail(error);
-      return ((data ?? []) as { usd: number }[]).reduce((a, r) => a + Number(r.usd), 0);
+      const rows = await selectAll<{ usd: number }>((from, to) =>
+        sb.from('translation_ledger').select('usd').eq('month', month).order('id').range(from, to));
+      return rows.reduce((a, r) => a + Number(r.usd), 0);
     },
     async listApprovedLangs() {
       const { data, error } = await sb.from('translation_languages').select('lang').eq('approved', true);

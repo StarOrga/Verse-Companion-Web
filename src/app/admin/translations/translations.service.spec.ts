@@ -63,9 +63,10 @@ describe('TranslationsService', () => {
     expect(calls[0].target).toBe('translate-orchestrator');
   });
 
-  it('reads the full-run estimate', async () => {
-    const svc = setup(() => ({ data: { ok: true, estimate: { string_count: 900, estimate_usd: 41.2 } } }));
-    expect(await svc.estimateFull('b1', 'de')).toEqual({ string_count: 900, estimate_usd: 41.2 });
-    expect((calls[0].args as { body: unknown }).body).toEqual({ op: 'estimate', build_id: 'b1', lang: 'de', mode: 'full' });
+  it('orders a full run with one call (the estimate is the job\'s own first step)', async () => {
+    const svc = setup(() => ({ data: { ok: true, job: { id: 'j9', status: 'estimating' } } }));
+    await svc.startFull('b1', 'de');
+    expect(calls.length).toBe(1);
+    expect((calls[0].args as { body: unknown }).body).toEqual({ op: 'start_full', build_id: 'b1', lang: 'de' });
   });
 });
