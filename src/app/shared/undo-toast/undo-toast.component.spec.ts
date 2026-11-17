@@ -109,4 +109,16 @@ describe('UndoToastComponent', () => {
     expect(f.nativeElement.querySelector('.msg b')).toBeNull();
     svc.undo();
   });
+
+  it('no stray space appears inside the quotation marks around a bold name', () => {
+    const svc = TestBed.inject(UndoToastService);
+    const t = TestBed.inject(TranslateService);
+    t.setTranslation('de', { made: '„{{name}}“ ist angelegt.' });
+    t.use('de');
+    const f = TestBed.createComponent(UndoToastComponent);
+    svc.offer({ messageKey: 'made', messageParams: { name: 'Flotte ausbauen' }, commit: () => undefined, onUndo: () => undefined });
+    f.detectChanges();
+    expect((f.nativeElement.querySelector('.msg') as HTMLElement).textContent!.trim()).toBe('„Flotte ausbauen“ ist angelegt.');
+    svc.undo();
+  });
 });
