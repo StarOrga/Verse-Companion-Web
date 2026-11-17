@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -32,7 +33,16 @@ import {
   isEditableTarget,
   isTypeToSearchKey,
 } from '../../codex/search/codex-search-hub.service';
-import { SearchTarget, hitManufacturer, hitTitle, targetUrl } from '../../codex/search/codex-search-model';
+import {
+  SearchTarget,
+  SearchVariantLink,
+  VARIANT_LINKS_SHOWN,
+  hitManufacturer,
+  hitTitle,
+  isCurrentTarget,
+  targetUrl,
+} from '../../codex/search/codex-search-model';
+import { searchScore } from '../../codex/codex-search';
 import { resolveCta, resolveIcons } from '../../codex/search/search-cta';
 import {
   SEARCH_ROWS_SHOWN,
@@ -72,6 +82,8 @@ interface PlaceRow {
   target: SearchTarget;
   cta: null;
   icons: SearchRowIcons;
+  /** The app page the reader is on, named exactly: greyed, only closes (note 4). */
+  current?: true;
 }
 
 export type ViewRow = SearchResultRow | PlaceRow;
@@ -132,7 +144,7 @@ const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
 @Component({
   selector: 'sc-fusion-search',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, ScTooltipDirective, FusionSearchChipComponent, FusionSearchHintComponent, ItemPathComponent],
+  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScTooltipDirective, FusionSearchChipComponent, FusionSearchHintComponent, ItemPathComponent],
   providers: [CodexSearchEngine],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
@@ -312,46 +324,47 @@ const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
                     @case ('row') {
                       @let r = o.row;
                       @let nm = rowName(r);
-                      <div class="row" role="presentation" [class.active]="isActive(o)" [class.soon]="isSoon(r)">
-                        <a class="hit" role="option" tabindex="-1" [id]="optId(o)" [attr.aria-selected]="isActive(o)"
-                           [routerLink]="r.target.link" [queryParams]="r.target.queryParams" [fragment]="r.target.fragment ?? undefined"
-                           (click)="onRowClick($event, o)" (mouseenter)="hover(o)">
-                          <span class="ico" aria-hidden="true">
-                            @if (silhouetteOf(r); as sil) {
-                              <svg class="sil" [attr.viewBox]="sil.viewBox" preserveAspectRatio="xMidYMid meet"><path [attr.d]="sil.path" vector-effect="non-scaling-stroke" /></svg>
-                            } @else {
-                              <svg viewBox="0 0 24 24">@for (d of kindIcon(r); track $index) { <path [attr.d]="d" /> }</svg>
-                            }
-                          </span>
-                          <span class="body">
-                            <span class="name">
-                              <span class="nm">{{ nm.title }}@if (nm.own) { <span class="ownname"> · „{{ nm.own }}“</span> }</span>
-                              @if (newIn(r); as v) {
-                                <span class="new" tabindex="0" role="img" [attr.aria-label]="'search.newInPatch' | translate: { version: v }"
-                                      [scTooltip]="'search.newInPatch' | translate: { version: v }" scTooltipTier="label">
-                                  <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="actionIcons.fresh[0]" /></svg>
-                                </span>
-                              }
-                            </span>
-                            <span class="meta">
-                              @for (m of metaOf(r); track $index) {
-                                @if (m.key || m.text) {
-                                  <span [class.mine]="m.mine">{{ m.key ? (m.key | translate: m.params) : m.text }}</span>
+                      <div class="row" role="presentation" [class.active]="isActive(o)" [class.soon]="isSoon(r)"
+                           [class.current]="r.current" [class.has-variants]="!!variantsOf(r).length">
+                        @if (r.current) {
+                          <!-- The page the reader is on (note 4): a plain href, not a routerLink (RouterLink navigates
+                               whatever the handler does); a plain click / Enter only closes, a modified click opens a tab. -->
+                          <a class="hit" role="option" tabindex="-1" [id]="optId(o)" [attr.aria-selected]="isActive(o)" aria-current="page"
+                             [attr.href]="href(r.target)" (click)="onRowClick($event, o)" (mouseenter)="hover(o)">
+                            <ng-container *ngTemplateOutlet="rowBody; context: { $implicit: r }" />
+                          </a>
+                        } @else {
+                          <a class="hit" role="option" tabindex="-1" [id]="optId(o)" [attr.aria-selected]="isActive(o)"
+                             [routerLink]="r.target.link" [queryParams]="r.target.queryParams" [fragment]="r.target.fragment ?? undefined"
+                             (click)="onRowClick($event, o)" (mouseenter)="hover(o)">
+                            <ng-container *ngTemplateOutlet="rowBody; context: { $implicit: r }" />
+                          </a>
+                        }
+                        @if (variantsOf(r); as vs) {
+                          @if (vs.length) {
+                            <!-- One row per ship (d-variant): the row opens the default variant, these open the others. -->
+                            <span class="variants">
+                              <span class="vl-label">{{ 'search.row.variants' | translate }}</span>
+                              @for (v of vs.slice(0, variantCap); track v.id) {
+                                @if (v.current) {
+                                  <a class="vl here" aria-current="page" [attr.href]="href(v.target)"
+                                     [scTooltip]="'search.row.variantCurrent' | translate" scTooltipTier="label"
+                                     (click)="onVariantClick($event, r, v)">{{ v.label }}</a>
+                                } @else {
+                                  <a class="vl" [routerLink]="v.target.link" [queryParams]="v.target.queryParams"
+                                     (click)="onVariantClick($event, r, v)">{{ v.label }}</a>
                                 }
                               }
-                              @if (fitOf(r); as fit) {
-                                <span class="fit" [class.ok]="fit.verdict === 'fits'" [class.no]="fit.verdict === 'noFit'" [class.unk]="fit.verdict === 'unknown'">
-                                  @switch (fit.verdict) {
-                                    @case ('fits') { ✓ {{ 'search.fit.fits' | translate: { name: compatName() } }} }
-                                    @case ('noFit') { ⚠ {{ 'search.fit.noFit' | translate }}@if (fit.reasonKey) { · {{ fit.reasonKey | translate: fit.reasonParams }} } }
-                                    @default { ? {{ (fit.reasonKey ?? 'search.fit.unknown') | translate }} }
-                                  }
-                                </span>
+                              @if (vs.length > variantCap) {
+                                <a class="vl more" [routerLink]="variantsMoreTarget(r).link" [queryParams]="variantsMoreTarget(r).queryParams"
+                                   [attr.aria-label]="'search.row.variantsMoreAria' | translate: { n: vs.length - variantCap }"
+                                   [scTooltip]="'search.row.variantsMoreAria' | translate: { n: vs.length - variantCap }" scTooltipTier="label"
+                                   (click)="onMoreClick($event)">{{ 'search.row.variantsMore' | translate: { n: vs.length - variantCap } }}</a>
                               }
                             </span>
-                          </span>
-                        </a>
-                        @if (r.cta || hasIcons(r)) {
+                          }
+                        }
+                        @if (!r.current && (r.cta || hasIcons(r))) {
                           <span class="rt">
                             @if (r.cta; as c) {
                               @if (c.type === 'link' && c.target) {
@@ -421,6 +434,48 @@ const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
         </p>
       </div>
     }
+
+    <ng-template #rowBody let-r>
+      @let nm = rowName(r);
+      <span class="ico" aria-hidden="true">
+        @if (silhouetteOf(r); as sil) {
+          <svg class="sil" [attr.viewBox]="sil.viewBox" preserveAspectRatio="xMidYMid meet"><path [attr.d]="sil.path" vector-effect="non-scaling-stroke" /></svg>
+        } @else {
+          <svg viewBox="0 0 24 24">@for (d of kindIcon(r); track $index) { <path [attr.d]="d" /> }</svg>
+        }
+      </span>
+      <span class="body">
+        <span class="name">
+          <span class="nm">{{ nm.title }}@if (nm.own) { <span class="ownname"> · „{{ nm.own }}“</span> }</span>
+          @if (!r.current && newIn(r); as v) {
+            <span class="new" tabindex="0" role="img" [attr.aria-label]="'search.newInPatch' | translate: { version: v }"
+                  [scTooltip]="'search.newInPatch' | translate: { version: v }" scTooltipTier="label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="actionIcons.fresh[0]" /></svg>
+            </span>
+          }
+        </span>
+        <span class="meta">
+          @if (r.current) {
+            <span class="here">{{ 'search.row.current' | translate }}</span>
+          } @else {
+          @for (m of metaOf(r); track $index) {
+            @if (m.key || m.text) {
+              <span [class.mine]="m.mine">{{ m.key ? (m.key | translate: m.params) : m.text }}</span>
+            }
+          }
+          @if (fitOf(r); as fit) {
+            <span class="fit" [class.ok]="fit.verdict === 'fits'" [class.no]="fit.verdict === 'noFit'" [class.unk]="fit.verdict === 'unknown'">
+              @switch (fit.verdict) {
+                @case ('fits') { ✓ {{ 'search.fit.fits' | translate: { name: compatName() } }} }
+                @case ('noFit') { ⚠ {{ 'search.fit.noFit' | translate }}@if (fit.reasonKey) { · {{ fit.reasonKey | translate: fit.reasonParams }} } }
+                @default { ? {{ (fit.reasonKey ?? 'search.fit.unknown') | translate }} }
+              }
+            </span>
+          }
+          }
+        </span>
+      </span>
+    </ng-template>
   `,
   styles: [`
     :host { position: relative; display: flex; min-width: 0; flex: 1 1 auto; }
@@ -592,6 +647,30 @@ const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
     .fit.no { background: color-mix(in srgb, var(--sc-warning) 14%, transparent); color: var(--sc-warning); }
     .fit.unk { background: color-mix(in srgb, var(--sc-fg-0) 5%, transparent); color: var(--sc-fg-2); }
     .row.soon .ico { opacity: 0.75; }
+    /* The page the reader is on (note 4): greyed, still an arrow stop; it only closes the search. */
+    .row.current::before { background: color-mix(in srgb, var(--sc-fg-2) 10%, transparent); }
+    .row.current .hit { cursor: default; }
+    .row.current .ico, .row.current .nm { opacity: 0.6; }
+    .row.current .nm { color: var(--sc-fg-1); }
+    .here { font-family: var(--sc-font-display); text-transform: uppercase; letter-spacing: 0.04em; color: var(--sc-fg-1); }
+    /* One row per ship (d-variant): its saved variants as mini text links under the name. */
+    .row.has-variants { flex-wrap: wrap; }
+    .row.has-variants .hit { flex-basis: 60%; }
+    .variants {
+      position: relative; z-index: 1; order: 3; flex: 1 0 100%; display: flex; flex-wrap: wrap; align-items: baseline;
+      gap: 0 var(--sc-space-2); padding: 0 8px 4px calc(40px + var(--sc-space-3) + 8px);
+      font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
+    }
+    .vl {
+      color: color-mix(in oklab, var(--sc-accent) 80%, var(--sc-fg-0)); text-decoration: underline;
+      text-decoration-color: color-mix(in srgb, var(--sc-accent) 35%, transparent); text-underline-offset: 2px;
+      border-radius: 4px; padding: 2px 0;
+    }
+    .vl:hover { text-decoration-color: currentColor; }
+    .vl:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    .vl.here { color: var(--sc-fg-1); text-decoration: none; font-weight: 600; cursor: default; }
+    .vl.more { text-decoration: none; }
+    @media (pointer: coarse) { .vl { padding: 6px 2px; } }
     .rt { position: relative; z-index: 1; flex: none; display: inline-flex; align-items: center; gap: 4px; padding-right: 4px; }
     /* ONE quiet CTA: outlined, the same for every row, filled only on the focused row (B6). */
     .cta {
@@ -782,9 +861,20 @@ export class FusionSearchComponent {
   /** "gemerkt" / "fehlt mir" / "lager": the reader's own set only, so no app pages beside it. */
   private readonly ownSetOnly = computed(() => this.chips().some((c) => c.filter.wished || c.filter.needed || c.filter.ownOnly));
 
-  private readonly places = computed(() =>
-    this.hasText() && !this.ownSetOnly() ? matchPlaces(this.engine.input(), this.context(), (p) => this.t.instant(p.labelKey)).slice(0, PLACES_SHOWN) : [],
-  );
+  private readonly places = computed<{ place: SearchPlace; current: boolean }[]>(() => {
+    if (!this.hasText() || this.ownSetOnly()) return [];
+    const term = this.engine.input();
+    const here = this.engine.here();
+    const label = (p: SearchPlace): string => this.t.instant(p.labelKey);
+    const out: { place: SearchPlace; current: boolean }[] = [];
+    for (const p of matchPlaces(term, this.context(), label)) {
+      const current = isCurrentTarget({ link: p.link, queryParams: p.queryParams }, here);
+      // The page the reader is on: hidden for a weak match, greyed when the term names it.
+      if (current && searchScore(term, label(p)) !== 4) continue;
+      out.push({ place: p, current });
+    }
+    return out.slice(0, PLACES_SHOWN);
+  });
 
   /** The groups as drawn: own first, the outside group after the catalog, patches / gallery / pages last. */
   readonly allGroups = computed<ViewGroup[]>(() => {
@@ -803,9 +893,12 @@ export class FusionSearchComponent {
     if (places.length) {
       out.push({
         id: 'places', labelKey: 'fusionBar.search.places', labelParams: null, count: null, reason: null, own: false, outside: false,
-        options: places.map((p) => ({
+        options: places.map(({ place: p, current }) => ({
           type: 'row' as const, id: `places-${p.id}`, group: 'places',
-          row: { type: 'place', id: `place-${p.id}`, place: p, target: { link: p.link, queryParams: p.queryParams }, cta: null, icons: NO_ICONS },
+          row: {
+            type: 'place' as const, id: `place-${p.id}`, place: p, target: { link: p.link, queryParams: p.queryParams }, cta: null, icons: NO_ICONS,
+            ...(current ? { current: true as const } : {}),
+          },
         })),
         expandable: 0, expanded: false, more: null,
       });
@@ -1007,7 +1100,8 @@ export class FusionSearchComponent {
         expandable: 0, expanded: false, more: null,
       });
     }
-    const opened = this.recentRows().slice(0, RECENT_ROWS_SHOWN);
+    const here = this.engine.here();
+    const opened = this.recentRows().filter((r) => !isCurrentTarget(r.target, here)).slice(0, RECENT_ROWS_SHOWN);
     if (opened.length) {
       const ctx = this.context();
       out.push({
@@ -1442,6 +1536,12 @@ export class FusionSearchComponent {
       this.engine.searchFor(opt.term);
       return;
     }
+    // The page the reader is on: Enter only closes — URL, query and fragment stay, nothing is remembered.
+    if (opt.type === 'row' && opt.row.current && !newTab) {
+      if (opt.row.type !== 'place') this.engine.noteOpened(opt.row);
+      this.close();
+      return;
+    }
     this.noteOpening(opt);
     const target = opt.type === 'row' ? opt.row.target : opt.target;
     if (newTab) {
@@ -1459,8 +1559,10 @@ export class FusionSearchComponent {
         this.engine.remember();
         return;
       }
-      this.engine.noteOpened(r);
-      if (r.type === 'hit' || r.type === 'own') this.recentRows.set(pushRecentRow(preferenceStorage(), this.recentRows(), r));
+      // A modified click on the greyed row opens a tab like any row: counted and remembered as an open.
+      const row = r.current ? { ...r, current: undefined } : r;
+      this.engine.noteOpened(row);
+      if (row.type === 'hit' || row.type === 'own') this.recentRows.set(pushRecentRow(preferenceStorage(), this.recentRows(), row));
     } else if (opt.type === 'more') this.engine.remember();
   }
 
@@ -1484,8 +1586,48 @@ export class FusionSearchComponent {
 
   /** Plain left click navigates through the anchor and closes; modified clicks stay the browser's. */
   onRowClick(ev: MouseEvent, o: FusionOption): void {
+    if (o.type === 'row' && o.row.current && isPlainLeftClick(ev)) {
+      // The page the reader is on: only close (the anchor is a plain href, so nothing else navigates).
+      ev.preventDefault();
+      if (o.row.type !== 'place') this.engine.noteOpened(o.row);
+      this.close();
+      return;
+    }
     this.noteOpening(o);
     if (isPlainLeftClick(ev)) this.close();
+  }
+
+  /** Variant mini links shown before "+n". */
+  readonly variantCap = VARIANT_LINKS_SHOWN;
+
+  /** A ship row's saved variants (one row per ship, d-variant); empty for every other row. */
+  variantsOf(r: ViewRow): SearchVariantLink[] {
+    return r.type === 'own' ? (r.variants ?? []) : [];
+  }
+
+  /** "+n": the ship's page, where every variant can be picked. */
+  variantsMoreTarget(r: ViewRow): SearchTarget {
+    return r.target;
+  }
+
+  /**
+   * A variant mini link. The variant open on this page only closes the search (a plain href);
+   * any other one navigates through its routerLink and is remembered like its ship row.
+   */
+  onVariantClick(ev: MouseEvent, r: ViewRow, v: SearchVariantLink): void {
+    ev.stopPropagation();
+    if (r.type === 'place') return;
+    const plain = isPlainLeftClick(ev);
+    if (v.current && plain) {
+      ev.preventDefault();
+      this.engine.noteVariantOpened(r, v);
+      this.close();
+      return;
+    }
+    this.engine.noteVariantOpened(r, v, !plain);
+    const row = r.current ? { ...r, current: undefined } : r;
+    this.recentRows.set(pushRecentRow(preferenceStorage(), this.recentRows(), row));
+    if (plain) this.close();
   }
 
   /**
