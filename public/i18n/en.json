@@ -4251,7 +4251,10 @@
         "results_missing": "The results are missing.",
         "r2_not_configured": "Storage (R2) is not configured.",
         "internal": "Internal error in the translation pipeline.",
-        "worker_limit": "The job exceeded the worker's CPU or memory limit several times in a row and was stopped."
+        "worker_limit": "The job exceeded the worker's CPU or memory limit several times in a row and was stopped.",
+        "no_live_build": "There is no current LIVE build.",
+        "source_not_permitted": "The licence of this source is not settled.",
+        "source_unknown": "The source does not exist (any more)."
       },
       "glossary": {
         "title": "Glossary",
@@ -4346,18 +4349,17 @@
         "intro": "Community packs the translation starts from. Import only once the licence is clear.",
         "syncAll": "Sync now",
         "syncTitle": "Sync all sources?",
-        "syncText": "Checks every active source for changes and re-imports changed ones.",
+        "syncText": "Checks every active source for changes and starts a background import for the changed ones.",
         "import": "Import seed",
         "importTitle": "Import the seed of {{name}}?",
-        "importText": "The {{lang}} pack is checked and taken into the translation base. CIG lines stay untouched.",
+        "importText": "The {{lang}} pack is checked in the background and taken into the translation base. CIG lines stay untouched.",
         "importLocked": "Only possible once the licence is clear (licensed or permitted).",
-        "importResult": "Import result",
-        "imported": "{{name}}: {{count}} lines imported.",
-        "synced": "Synced: {{checked}} checked, {{changed}} changed, {{errors}} errors.",
+        "importStarted": "{{name}}: import started. It runs in the background; see \"Background runs\" for its progress.",
+        "synced": "Synced: {{checked}} checked, {{changed}} imports started, {{errors}} errors.",
         "learn": "Learn",
         "learnTitle": "Start the learning step for {{lang}}?",
         "learnText": "Derives terms, style and cards for {{lang}} from the existing data. May cost money.",
-        "learnResult": "Learning step result",
+        "learnStarted": "Learning step for {{lang}} started. It runs in the background; see \"Background runs\" for its progress.",
         "draft": "Create request draft",
         "drafted": "Draft for {{name}} created – see Requests.",
         "empty": "No sources registered.",
@@ -4381,6 +4383,45 @@
           "awaiting_permission": "Awaiting permission",
           "permitted": "Permitted",
           "refused": "Refused"
+        }
+      },
+      "passes": {
+        "title": "Background runs",
+        "intro": "Import, overlay build and learning run in the background, one step at a time. A step that was cut off is repeated.",
+        "empty": "No runs in the last 7 days.",
+        "cols": {
+          "kind": "Kind",
+          "lang": "Language",
+          "source": "Source",
+          "state": "State",
+          "updated": "Last update"
+        },
+        "kinds": {
+          "seed": "Import",
+          "overlay": "Overlay build",
+          "learn": "Learning"
+        },
+        "status": {
+          "open": "running",
+          "done": "done",
+          "failed": "failed"
+        },
+        "phases": {
+          "start": "Preparing",
+          "fetch": "Loading the pack",
+          "split": "Splitting the pack",
+          "scan": "Walking the texts",
+          "apply": "Writing translations",
+          "arbitrate": "Checking conflicts",
+          "finish": "Finishing",
+          "cleanup": "Cleaning up",
+          "mine": "Collecting terms",
+          "plan": "Evaluating",
+          "insert": "Extending the glossary",
+          "detect": "Finding examples",
+          "submit": "Submitting requests",
+          "assemble": "Writing the overlay",
+          "done": "done"
         }
       },
       "outreach": {

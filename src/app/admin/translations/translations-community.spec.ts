@@ -9,7 +9,7 @@ import { TranslationCardsComponent } from './translation-cards.component';
 import { TranslationOutreachComponent } from './translation-outreach.component';
 import { TranslationSourcesComponent } from './translation-sources.component';
 import { TranslationsService } from './translations.service';
-import { canImportSource, contextLines, goalPercent } from './translations.logic';
+import { canImportSource, contextLines, goalPercent, passProgress } from './translations.logic';
 
 type Answer = (c: FakeCall) => FakeResult | Promise<FakeResult>;
 
@@ -56,6 +56,15 @@ async function settle(fixture: { whenStable(): Promise<unknown>; detectChanges()
 
 const q = <T extends Element>(el: HTMLElement, sel: string) => el.querySelector<T>(sel);
 describe('logic helpers of the community tabs', () => {
+  it('reports the progress of a pass only in phases that count', () => {
+    expect(passProgress({ status: 'open', phase: 'scan', pos: 8, total: 24 })).toBe(33);
+    expect(passProgress({ status: 'open', phase: 'apply', pos: 4, total: 24 })).toBe(25);
+    expect(passProgress({ status: 'open', phase: 'fetch', pos: 0, total: 24 })).toBeNull();
+    expect(passProgress({ status: 'open', phase: 'mine', pos: 0, total: 0 })).toBeNull();
+    expect(passProgress({ status: 'done', phase: 'scan', pos: 8, total: 24 })).toBeNull();
+    expect(passProgress({ status: 'open', phase: 'detect', pos: 40, total: 24 })).toBe(100);
+  });
+
   it('allows import only for licensed and permitted sources', () => {
     expect(canImportSource('licensed')).toBe(true);
     expect(canImportSource('permitted')).toBe(true);
@@ -180,15 +189,25 @@ describe('TranslationSourcesComponent', () => {
     last_synced_at: null,
     coverage: { text_pct: 94.3 },
   });
+  const pass = (id: string, extra: Record<string, unknown> = {}) => ({
+    id, kind: 'seed', lang: 'de', source_id: 'rjcncpt', reason: 'seed', status: 'done', phase: 'done', pos: 0, total: 24, error: null,
+    created_at: '2026-11-17T10:00:00Z', updated_at: '2026-11-17T10:20:00Z', ...extra,
+  });
+  let passRows: ReturnType<typeof pass>[] = [];
   const answer: Answer = (c) => {
     if (c.target === 'translation_sources') return { data: [src('rjcncpt', 'licensed'), src('thord82', 'awaiting_permission')] };
+    if (c.target === 'translation_passes') return { data: passRows };
     if (c.op === 'invoke') {
       const op = (c.args as { body: { op: string } }).body.op;
-      if (op === 'import_seed') return { data: { source_id: 'rjcncpt', lang: 'de', imported: 7, skipped_cig: 1, skipped_same: 0, rejected_qa: 0, conflicts: 0, coverage: {} } };
-      return { data: { ok: true, checked: 2, changed: 1, errors: 0 } };
+      if (op === 'import_seed') return { data: { ok: true, source_id: 'rjcncpt', lang: 'de', queued: true, pass_id: 'p1' } };
+      if (op === 'learn') return { data: { ok: true, lang: 'de', queued: true, pass_id: 'p2' } };
+      return { data: { ok: true, checked: 2, changed: 1, errors: [{ source_id: 'x', error: 'translate.source_fetch_404' }] } };
     }
     return { data: null };
   };
+  beforeEach(() => {
+    passRows = [];
+  });
 
   it('disables import for sources awaiting permission and imports licensed ones via the orchestrator', async () => {
     const { fake, confirm } = setup(answer);
@@ -210,7 +229,71 @@ describe('TranslationSourcesComponent', () => {
     const inv = fake.calls.find((c) => c.op === 'invoke')!;
     expect(inv.target).toBe('translate-orchestrator');
     expect((inv.args as { body: unknown }).body).toEqual({ op: 'import_seed', source_id: 'rjcncpt' });
-    expect(cmp.summary()?.entries.find((e) => e.k === 'imported')?.v).toBe('7');
+    // The import only starts: the flash says so and no row count is claimed.
+    expect(cmp.flash()).toEqual({ key: 'admin.translations.sources.importStarted', params: { name: 'rjcncpt' }, err: false });
+  });
+
+  it('shows running and failed background passes and stops reading them when none runs any more', async () => {
+    passRows = [
+      pass('p1', { status: 'open', phase: 'scan', pos: 8, total: 24 }),
+      pass('p2', { kind: 'learn', source_id: null, status: 'failed', phase: 'mine', error: 'translate.worker_limit' }),
+      pass('p3', { kind: 'overlay', source_id: null }),
+    ];
+    const { fake } = setup(answer);
+    vi.useFakeTimers();
+    try {
+      const fixture = TestBed.createComponent(TranslationSourcesComponent);
+      fixture.detectChanges();
+      await vi.advanceTimersByTimeAsync(0);
+      fixture.detectChanges();
+      const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[data-test=passes] tbody tr'));
+      expect(rows.length).toBe(3);
+      expect(rows[0].querySelector('.pill')?.classList.contains('warn')).toBe(true);
+      expect(rows[0].textContent).toContain('33 %');
+      expect(rows[1].querySelector('.pill')?.classList.contains('bad')).toBe(true);
+      expect(rows[1].textContent).toContain('admin.translations.jobErrors.worker_limit');
+      expect(rows[2].querySelector('.pill')?.classList.contains('ok')).toBe(true);
+
+      // The import ends: the next read picks it up, reloads the sources (coverage, last sync) and polling stops.
+      const reads = (target: string) => fake.calls.filter((c) => c.target === target).length;
+      passRows = [pass('p1'), passRows[1], passRows[2]];
+      const sourcesBefore = reads('translation_sources');
+      await vi.advanceTimersByTimeAsync(5000);
+      expect(reads('translation_sources')).toBe(sourcesBefore + 1);
+      const passesAfter = reads('translation_passes');
+      await vi.advanceTimersByTimeAsync(20_000);
+      expect(reads('translation_passes')).toBe(passesAfter);
+      fixture.destroy();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('a destroyed tab stops reading the passes', async () => {
+    passRows = [pass('p1', { status: 'open', phase: 'apply', pos: 4 })];
+    const { fake } = setup(answer);
+    vi.useFakeTimers();
+    try {
+      const fixture = TestBed.createComponent(TranslationSourcesComponent);
+      fixture.detectChanges();
+      await vi.advanceTimersByTimeAsync(0);
+      const before = fake.calls.filter((c) => c.target === 'translation_passes').length;
+      fixture.destroy();
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(fake.calls.filter((c) => c.target === 'translation_passes').length).toBe(before);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('starts a learning pass and says that it runs in the background', async () => {
+    setup(answer);
+    const fixture = TestBed.createComponent(TranslationSourcesComponent);
+    fixture.detectChanges();
+    await settle(fixture);
+    const cmp = fixture.componentInstance;
+    await cmp.learn(cmp.sources()[0]);
+    expect(cmp.flash()).toEqual({ key: 'admin.translations.sources.learnStarted', params: { lang: 'de' }, err: false });
   });
 
   it('syncs all sources after confirmation', async () => {
@@ -221,7 +304,8 @@ describe('TranslationSourcesComponent', () => {
     await fixture.componentInstance.sync();
     const inv = fake.calls.find((c) => c.op === 'invoke')!;
     expect((inv.args as { body: unknown }).body).toEqual({ op: 'sync_sources' });
-    expect(fixture.componentInstance.flash()?.params).toEqual({ checked: 2, changed: 1, errors: 0 });
+    // The function answers with the list of failed sources; the text counts them.
+    expect(fixture.componentInstance.flash()?.params).toEqual({ checked: 2, changed: 1, errors: 1 });
   });
 });
 

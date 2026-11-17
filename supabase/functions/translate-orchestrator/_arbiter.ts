@@ -289,7 +289,13 @@ export async function arbitrate(deps: Deps, lang: string, conflicts: Conflict[])
     }
   }
 
-  // 3. submit the next batch
+  // What steps 1 and 2 decided is written before anything else can fail. A request that dies after this
+  // point repeats the same decisions (idempotent); one that died before lost nothing, the batch is still there.
+  if (Object.keys(writes).length) await saveTm(d.store, lang, writes);
+  if (cards.length) sum.cards = await createCards(d.learn, cards);
+  await d.store.putJson(reviseKey(lang), revise);
+
+  // 3. submit the next batch; its id is saved at once, so only a kill inside that one write can orphan it.
   if (!state.batch && state.queue.length) {
     const take = state.queue.slice(0, BATCH_CONFLICTS);
     const est = estimatePairUsd(take, settings.arbiter_model);
@@ -303,10 +309,6 @@ export async function arbitrate(deps: Deps, lang: string, conflicts: Conflict[])
       sum.submitted = take.length;
     }
   }
-
-  if (Object.keys(writes).length) await saveTm(d.store, lang, writes);
-  if (cards.length) sum.cards = await createCards(d.learn, cards);
-  await d.store.putJson(reviseKey(lang), revise);
   await d.store.putJson(arbiterKey(lang), state);
   return sum;
 }

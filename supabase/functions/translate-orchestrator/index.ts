@@ -1,13 +1,14 @@
 // translate-orchestrator — game-string translation job state machine.
 // Contract: docs/translation/ARCHITECTURE.md. Operations: docs/translation/OPERATIONS.md.
 //
-//   POST { op: 'tick' }                              advance every open job one step
+//   POST { op: 'tick', fast? }                       poll every waiting job, run one heavy slice (job or pass)
 //   POST { op: 'approve' | 'cancel', job_id }        admin
 //   POST { op: 'estimate', build_id, lang, mode? }   admin dry run, no writes
 //   POST { op: 'start_full', build_id, lang }        admin, always parks in awaiting_approval
-//   POST { op: 'import_seed', source_id }            admin, community pack -> TM (licensed|permitted only)
-//   POST { op: 'sync_sources' }                      daily pg_cron (publishable key) or admin
-//   POST { op: 'learn', lang }                       admin, learning backfill (hook)
+//   POST { op: 'import_seed', source_id }            admin, starts the import pass of a community pack (licensed|permitted only)
+//   POST { op: 'sync_sources' }                      daily pg_cron (publishable key) or admin: starts a pass per changed source
+//   POST { op: 'learn', lang }                       admin, starts a learning pass
+// import_seed / sync_sources / learn only start a pass (translation_passes); later ticks run it in slices.
 //   POST { op: 'draft_outreach', source_id }         admin, maintainer message DRAFT (never sent)
 //
 // AUTH (verify_jwt = false in config.toml; checked here):
@@ -30,11 +31,12 @@ import { deleteObject, getObject, putObject, r2FromEnv } from '../ingest-skins/_
 import { BUILD_ID_RE, LANG_RE } from '../ingest-catalog/_locale-shards.ts';
 import { makeLlm } from './_anthropic.ts';
 import { makeDb } from './_db.ts';
-import { approve, cancel, dryRun, startFull, tick, TranslateError } from './_machine.ts';
+import { approve, cancel, dryRun, startFull, tickAll, TranslateError } from './_machine.ts';
 import type { Deps } from './_machine.ts';
 import type { Store } from './_io.ts';
-import { learningHooks } from './_hooks.ts';
-import { draftOutreach, importSeed, listSources, syncSources } from './_sources.ts';
+import { requestLearning } from './_learn_pass.ts';
+import { makePassDb, PASS_STEPS } from './_pass_db.ts';
+import { draftOutreach, listSources, makeSourceDb, startImport, syncSources } from './_sources.ts';
 import { buildOverlayMeta } from './_io.ts';
 import { writeAlerts } from './_alerts.ts';
 import { makeLearnDb } from './_learn_db.ts';
@@ -52,6 +54,10 @@ function logError(msg: string, data?: Record<string, unknown>): void {
 // sync_sources by a public-key caller (the daily cron): at most one run per 6 h, claimed atomically (claim_run).
 const SYNC_SOURCES_PUBLIC_MIN_MS = 6 * 3600_000;
 const SOURCE_ID_RE = /^[a-z0-9][a-z0-9_-]{0,63}$/;
+// The heavy-work lock (claim_run / release_run). It is given back after every slice; the interval only frees it
+// after a request that was killed, so it is as long as the platform lets a request live.
+const HEAVY_LOCK = 'translate-orchestrator:heavy';
+const HEAVY_LOCK_MS = 150_000;
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -123,6 +129,7 @@ Deno.serve(withPosthog('translate-orchestrator', async (req) => {
       }
     },
     putJson: (key, value) => putObject(r2, key, JSON.stringify(value), 'application/json'),
+    putText: (key, text) => putObject(r2, key, text, 'application/json'),
     deleteKey: (key) => deleteObject(r2, key),
   };
   const apiKey = (Deno.env.get('TRANSLATE_ANTHROPIC_API_KEY') ?? '').trim();
@@ -137,15 +144,25 @@ Deno.serve(withPosthog('translate-orchestrator', async (req) => {
     alerts: async (lang, buildId, rows) => {
       await writeAlerts(admin, lang, buildId, rows);
     },
+    passes: makePassDb(admin, () => new Date()),
+    passSteps: PASS_STEPS,
+    sources: makeSourceDb(admin, { ghToken: Deno.env.get('GITHUB_TOKEN') ?? undefined }),
+    lock: {
+      claim: () => claimRun(admin, HEAVY_LOCK, HEAVY_LOCK_MS),
+      release: async () => {
+        const { error } = await admin.rpc('release_run', { p_name: HEAVY_LOCK });
+        if (error) logWarn('release_run failed', { error: error.message });
+      },
+    },
   };
 
   try {
     switch (op) {
       case 'tick': {
-        const work = tick(deps);
+        const work = tickAll(deps, { fast: body.fast === true });
         // A tick can outlast the response; the platform keeps the isolate alive for it.
         (globalThis as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime?.waitUntil?.(work.catch(() => {}));
-        return json({ ok: true, jobs: await work });
+        return json({ ok: true, ...(await work) });
       }
       case 'approve':
         if (!body.job_id) return json({ error: 'job_id_required' }, 400);
@@ -169,20 +186,19 @@ Deno.serve(withPosthog('translate-orchestrator', async (req) => {
       case 'import_seed': {
         const sourceId = String(body.source_id ?? '');
         if (!SOURCE_ID_RE.test(sourceId)) return json({ error: 'bad_params' }, 400);
-        return json({ ok: true, ...(await importSeed(deps, admin, sourceId, { ghToken: Deno.env.get('GITHUB_TOKEN') ?? undefined })) });
+        return json({ ok: true, ...(await startImport(deps, sourceId)) });
       }
       case 'sync_sources': {
         if (publicKeyCaller && !(await claimRun(admin, 'translate-orchestrator:sync_sources', SYNC_SOURCES_PUBLIC_MIN_MS))) {
           return json({ ok: true, throttled: true, checked: 0, changed: 0, errors: [] });
         }
-        const work = syncSources(deps, admin, { ghToken: Deno.env.get('GITHUB_TOKEN') ?? undefined });
-        (globalThis as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime?.waitUntil?.(work.catch(() => {}));
-        return json({ ok: true, ...(await work) });
+        return json({ ok: true, ...(await syncSources(deps)) });
       }
       case 'learn': {
         const lang = String(body.lang ?? '');
         if (!LANG_RE.test(lang)) return json({ error: 'bad_params' }, 400);
-        return json({ ok: true, lang, result: await learningHooks.runLearning(deps, lang, 'backfill') });
+        const pass = await requestLearning(deps, lang, 'backfill');
+        return json({ ok: true, lang, queued: !!pass, pass_id: pass?.id ?? null });
       }
       case 'draft_outreach': {
         const sourceId = String(body.source_id ?? '');

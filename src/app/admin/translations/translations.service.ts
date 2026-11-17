@@ -123,21 +123,35 @@ export interface TranslationSource {
   coverage: Record<string, unknown> | null;
 }
 
-export interface ImportSeedResult {
-  source_id: string;
+/** `import_seed` and `learn` only start a background pass; its result lands on the source row / in the glossary. */
+export interface PassStarted {
   lang: string;
-  imported: number;
-  skipped_cig: number;
-  skipped_same: number;
-  rejected_qa: number;
-  conflicts: number;
-  coverage: unknown;
+  queued: boolean;
+  pass_id: string | null;
+  source_id?: string;
+}
+
+/** A background pass of the pipeline (table `translation_passes`): it runs in slices, `pos` of `total` in countable phases. */
+export interface TranslationPass {
+  id: string;
+  kind: 'learn' | 'seed' | 'overlay';
+  lang: string;
+  source_id: string | null;
+  reason: string;
+  status: 'open' | 'done' | 'failed';
+  phase: string;
+  pos: number;
+  total: number;
+  error: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface SyncSourcesResult {
   checked: number;
+  /** Sources whose upstream changed: an import pass was started for each. */
   changed: number;
-  errors: number;
+  errors: { source_id: string; error: string }[] | number;
 }
 
 export interface OutreachDraft {
@@ -403,7 +417,20 @@ export class TranslationsService {
   }
 
   importSeed(sourceId: string) {
-    return this.orchestrator<ImportSeedResult>({ op: 'import_seed', source_id: sourceId });
+    return this.orchestrator<PassStarted>({ op: 'import_seed', source_id: sourceId });
+  }
+
+  /** Running passes plus those that ended in the last `days` days, newest first. */
+  listPasses(days = 7, now: Date = new Date()): Promise<TranslationPass[]> {
+    const since = new Date(now.getTime() - days * 86_400_000).toISOString();
+    return this.rows(
+      this.sb.client
+        .from('translation_passes')
+        .select('id,kind,lang,source_id,reason,status,phase,pos,total,error,created_at,updated_at')
+        .or(`status.eq.open,updated_at.gte.${since}`)
+        .order('created_at', { ascending: false })
+        .limit(30),
+    );
   }
 
   syncSources() {
@@ -415,7 +442,7 @@ export class TranslationsService {
   }
 
   learn(lang: string) {
-    return this.orchestrator<Record<string, unknown>>({ op: 'learn', lang });
+    return this.orchestrator<PassStarted>({ op: 'learn', lang });
   }
 
   listOutreach(): Promise<OutreachDraft[]> {

@@ -111,7 +111,7 @@ export async function openReaders(ctx: ScanContext): Promise<ScanReaders> {
 }
 
 /** The TM shards that hold any of `hashes`; entries are only returned for those shards. */
-async function loadTmFor(store: Store, lang: string, hashes: Iterable<string>): Promise<{ tm: Record<string, TmEntry>; nonEmpty: boolean }> {
+export async function loadTmFor(store: Store, lang: string, hashes: Iterable<string>): Promise<{ tm: Record<string, TmEntry>; nonEmpty: boolean }> {
   const index = await store.getJson(tmIndexKey(lang)) as { shards?: string[] } | null;
   const known = new Set(index?.shards ?? []);
   const want = new Set<string>();

@@ -18,7 +18,10 @@ import type { DiffCounts, TmEntry } from './_diff.ts';
 import { deriveAiTerms, deriveCigLabels, extractJudgeTerms, mergeGlossary, newRows } from './_glossary.ts';
 import { loadNotes } from './_cards.ts';
 import { addJudgeCandidates, resumeLearning } from './_learn.ts';
-import { learnDueKey } from './_learn_batch.ts';
+import { requestLearning } from './_learn_pass.ts';
+import { advancePass } from './_pass.ts';
+import type { PassDb, PassKind, PassOutcome, PassStep } from './_pass.ts';
+import type { SourceDb } from './_sources.ts';
 import type { LearnDb } from './_learn_db.ts';
 import { loadTm, makeOverlay, overlayKey, putLatestOverlay, readLocaleTable, saveTm, workKey } from './_io.ts';
 import type { OverlayMeta } from './_io.ts';
@@ -40,14 +43,9 @@ import {
 import type { BatchParams, CigPair, GlossaryRow } from './_prompt.ts';
 import { qaCheck } from './_qa.ts';
 import { isCigValid } from './_diff.ts';
+import { TranslateError } from './_errors.ts';
 
-export class TranslateError extends Error {
-  key: string;
-  constructor(key: string) {
-    super(key);
-    this.key = key;
-  }
-}
+export { TranslateError };
 
 export type Status =
   | 'estimating' | 'awaiting_approval' | 'queued' | 'submitted' | 'validating' | 'post_editing'
@@ -170,6 +168,18 @@ export interface Deps {
   overlayMeta?: (lang: string, entries: Record<string, { h: string; t: string }>, tm: Record<string, TmEntry>) => Promise<OverlayMeta>;
   /** Writes override alerts (B4, service-role client in index.ts); absent = no alerts. */
   alerts?: (lang: string, buildId: string, rows: AlertRow[]) => Promise<void>;
+  /** Background passes (learn, seed import, overlay rebuild); absent = none are started or run. */
+  passes?: PassDb;
+  /** The step of each pass kind (index.ts: PASS_STEPS). Kept out of this file so it stays free of the pass modules. */
+  passSteps?: Record<PassKind, PassStep>;
+  /** Community sources and their upstream (seed passes, overlay credits); absent = no imports. */
+  sources?: SourceDb;
+  /**
+   * Lock around heavy work. Two requests that run slices at the same time would add their CPU up in
+   * one isolate and could rewrite the same TM shard; with the lock the second one does nothing.
+   * It expires by time, so a killed request frees it. Absent (tests) = no lock.
+   */
+  lock?: { claim(): Promise<boolean>; release(): Promise<void> };
 }
 
 export const BATCH_MAX_REQUESTS = 400;
@@ -896,16 +906,12 @@ async function stepPublishing(deps: Deps, job: Job): Promise<void> {
   });
   if (cur) {
     for (const n of ['plan', 'main-results', 'postedit-plan']) await store.deleteKey(workKey(job.id, n)).catch(() => {});
-    // C0: learning from what was just published is only recorded as due, never run in this request.
-    // The pass reads the whole string table and the whole TM. Inside the publish tick it took the
-    // worker over the CPU limit every time (546 right after the job was published, 2026-11-17): the
-    // other jobs of the tick lost their turn and the pass itself never finished once in production.
-    // `op: learn` starts it by hand; a tick may pick the marker up once the pass runs in slices.
-    if (deps.learn) {
-      await store.putJson(learnDueKey(job.lang), { trigger: 'publish', at, build_id: job.build_id }).catch((e) =>
-        deps.log('translate learning marker failed', { lang: job.lang, error: String((e as Error)?.message ?? e) })
-      );
-    }
+    // C0: learning from what was just published is asked for, never run in this request. Inside the
+    // publish tick the unsliced run took the worker over the CPU limit every time (546 right after the
+    // job was published, 2026-11-17). It is a pass now: later ticks run it slice by slice.
+    await requestLearning(deps, job.lang, 'publish').catch((e) =>
+      deps.log('translate learning request failed', { lang: job.lang, error: String((e as Error)?.message ?? e) })
+    );
   }
 }
 
@@ -984,37 +990,98 @@ export interface TickSummary {
   to: Status;
 }
 
-export async function tick(deps: Deps, budgetMs = 110_000): Promise<TickSummary[]> {
+export interface TickOptions {
+  budgetMs?: number;
+  /** Fast-lane call (every 10 s while work is pending): only the steps that run in slices, no polling of batches. */
+  fast?: boolean;
+}
+
+export interface TickResult {
+  jobs: TickSummary[];
+  passes: PassOutcome[];
+  /** Languages whose finished learning batches were applied in this tick. */
+  learned: string[];
+  /** false = another request holds the heavy-work lock, so this one ran no slice. */
+  heavy: boolean;
+}
+
+/**
+ * One tick: every job that only waits is polled, then ONE heavy step runs - a slice of a job
+ * (estimating / publishing), else a slice of a background pass, else the learning batches that have
+ * ended. One per request because the CPU limit is per isolate and a slice is sized to it; behind the
+ * lock because a second request would run its slice in the same seconds.
+ */
+export async function tickAll(deps: Deps, opts: TickOptions = {}): Promise<TickResult> {
+  const budgetMs = opts.budgetMs ?? 110_000;
   const settings = await deps.db.getSettings();
   const started = deps.now().getTime();
-  const out: TickSummary[] = [];
-  let heavyDone = false;
-  // The jobs of one upload share their created_at, so the list order is arbitrary. With one heavy job
-  // per tick a publish goes first: it is the last step of work already paid for, and behind the
-  // estimates of the other languages it would wait for hours (seen 2026-11-17). The sort is stable.
+  const left = () => deps.now().getTime() - started <= budgetMs;
+  const res: TickResult = { jobs: [], passes: [], learned: [], heavy: true };
+  // The jobs of one upload share their created_at, so the list order is arbitrary. A publish goes
+  // first: it is the last step of work already paid for, and behind the estimates of the other
+  // languages it would wait for hours (seen 2026-11-17). The sort is stable.
   const jobs = await deps.db.listOpenJobs();
   jobs.sort((a, b) => Number(b.status === 'publishing') - Number(a.status === 'publishing'));
+  const heavyJobs: Job[] = [];
   for (const job of jobs) {
-    if (deps.now().getTime() - started > budgetMs) break;
+    if (!left()) break;
     if (!settings.enabled && (job.status === 'estimating' || job.status === 'queued')) continue;
-    // One heavy job per tick: two of them in one request would add up to the limit.
-    if (isHeavy(job.status) && heavyDone) continue;
-    const to = await advance(deps, job);
-    if (isHeavy(job.status) && !['failed', 'skipped', 'cancelled'].includes(to)) heavyDone = true;
-    out.push({ id: job.id, lang: job.lang, from: job.status, to });
-  }
-  // Learning batches started on an earlier tick (arbiter, Haiku, align, web) are read here.
-  if (deps.learn && deps.now().getTime() - started <= budgetMs) {
-    try {
-      for (const lang of await deps.learn.listApprovedLangs()) {
-        if (deps.now().getTime() - started > budgetMs) break;
-        await resumeLearning(deps, lang);
-      }
-    } catch (e) {
-      deps.log('translate learning resume failed', { error: String((e as Error)?.message ?? e) });
+    if (isHeavy(job.status)) {
+      // A young stamp is a slice in flight, or one whose request was just killed: either way this job
+      // cannot run now, and it must not hold the slot while other work waits.
+      if (runVerdict(job.stats, deps.now().getTime()).kind !== 'busy') heavyJobs.push(job);
+      continue;
     }
+    if (opts.fast) continue;
+    const to = await advance(deps, job);
+    res.jobs.push({ id: job.id, lang: job.lang, from: job.status, to });
   }
-  return out;
+
+  const passes = deps.passes && deps.passSteps ? await deps.passes.listOpen() : [];
+  const resume = !opts.fast && !!deps.learn;
+  if (!heavyJobs.length && !passes.length && !resume) return res;
+  if (deps.lock && !(await deps.lock.claim())) return { ...res, heavy: false };
+  try {
+    let taken = false;
+    for (const job of heavyJobs) {
+      if (taken || !left()) break;
+      const to = await advance(deps, job);
+      res.jobs.push({ id: job.id, lang: job.lang, from: job.status, to });
+      // A job that ended without doing work (failed, skipped) leaves the slot to the next one.
+      if (!['failed', 'skipped', 'cancelled'].includes(to)) taken = true;
+    }
+    for (const pass of passes) {
+      if (taken || !left()) break;
+      try {
+        const o = await advancePass(deps, pass, deps.passSteps!);
+        res.passes.push(o);
+        if (o.ran) taken = true;
+      } catch (e) {
+        deps.log('translate pass failed', { pass: pass.id, kind: pass.kind, error: String((e as Error)?.message ?? e) });
+      }
+    }
+    // Learning batches started earlier (arbiter, Haiku, align, web): one language's results per tick.
+    if (!taken && resume && left()) {
+      try {
+        for (const lang of await deps.learn!.listApprovedLangs()) {
+          if (!left()) break;
+          if ((await resumeLearning(deps, lang)).applied) {
+            res.learned.push(lang);
+            break;
+          }
+        }
+      } catch (e) {
+        deps.log('translate learning resume failed', { error: String((e as Error)?.message ?? e) });
+      }
+    }
+  } finally {
+    await deps.lock?.release().catch(() => {});
+  }
+  return res;
+}
+
+export async function tick(deps: Deps, budgetMs = 110_000): Promise<TickSummary[]> {
+  return (await tickAll(deps, { budgetMs })).jobs;
 }
 
 export async function approve(deps: Deps, jobId: string, userId: string | null): Promise<Job> {

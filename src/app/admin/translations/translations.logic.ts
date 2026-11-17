@@ -44,7 +44,8 @@ const KNOWN_JOB_ERRORS = new Set([
   'translate.job_not_found', 'translate.lang_unknown', 'translate.no_api_key',
   'translate.no_base_build', 'translate.not_awaiting_approval', 'translate.not_cancellable',
   'translate.plan_missing', 'translate.results_missing', 'translate.r2_not_configured',
-  'translate.internal', 'translate.worker_limit',
+  'translate.internal', 'translate.worker_limit', 'translate.no_live_build', 'translate.source_not_permitted',
+  'translate.source_unknown',
 ]);
 
 /** i18n key for a job's / orchestrator's error code; unknown codes get a generic sentence, never raw text. */
@@ -147,10 +148,17 @@ export function contextLines(v: unknown): string[] {
 }
 
 /** Flat `label: value` pairs of an orchestrator summary object (nested objects as JSON). */
-export function summaryEntries(o: Record<string, unknown> | null | undefined): { k: string; v: string }[] {
-  return Object.entries(o ?? {})
-    .filter(([k]) => k !== 'ok')
-    .map(([k, v]) => ({ k, v: typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v) }));
+/** Phases of a background pass that walk the string table: `pos` of `total` shards. */
+const WALK_PHASES = new Set(['scan', 'mine', 'detect']);
+/** The import writes the translation memory in 16 steps (one per first hash digit). */
+const APPLY_STEPS = 16;
+
+/** Progress of a running pass in percent; null in phases that have nothing to count. */
+export function passProgress(p: { status: string; phase: string; pos: number; total: number }): number | null {
+  if (p.status !== 'open') return null;
+  const total = WALK_PHASES.has(p.phase) ? p.total : p.phase === 'apply' ? APPLY_STEPS : 0;
+  if (!(total > 0)) return null;
+  return Math.max(0, Math.min(100, Math.round((p.pos / total) * 100)));
 }
 
 /** Postgres insufficient-privilege (RPC rights check, e.g. approval by a non-protected admin). */

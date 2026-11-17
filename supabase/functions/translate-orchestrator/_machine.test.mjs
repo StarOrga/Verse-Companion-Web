@@ -6,6 +6,7 @@ import { advance, approve, cancel, startFull, tick, dryRun } from './_machine.ts
 import { buildShards, indexKey, shardKey } from '../ingest-catalog/_locale-shards.ts';
 import { overlayKey, roomOverlayKey, tmIndexKey } from './_io.ts';
 import { sha256Hex } from './_diff.ts';
+import { memPasses } from './_pass.ts';
 
 const NEW = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const OLD = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
@@ -247,8 +248,9 @@ describe('caps and approval', () => {
 });
 
 describe('publishing', () => {
-  it('records that learning is due and runs no learning pass in the publish request', async () => {
+  it('asks for a learning pass and runs none of it in the publish request', async () => {
     const w = world();
+    w.deps.passes = memPasses();
     const calls = [];
     // A learning adapter that only knows what a tick and the estimate may ask; anything else is a learning pass.
     w.deps.learn = new Proxy({ listApprovedLangs: async () => [], getStyle: async () => null }, {
@@ -262,10 +264,9 @@ describe('publishing', () => {
     const job = w.jobs.get(j.id);
     assert.equal(job.status, 'published', job.error);
     assert.deepEqual([...new Set(calls)].sort(), ['getStyle', 'listApprovedLangs']);
-    const due = w.files.get('translation-work/learn-de/due.json');
-    assert.equal(due.trigger, 'publish');
-    assert.equal(due.build_id, NEW);
-    assert.equal(due.at, job.stats.published_at);
+    // No step map was handed in, so the pass can only have been opened, never run.
+    const passes = [...w.deps.passes.rows.values()];
+    assert.deepEqual(passes.map((p) => [p.kind, p.lang, p.reason, p.status, p.phase]), [['learn', 'de', 'publish', 'open', 'start']]);
     assert.equal(job.stats.run_at, undefined);
   });
 });

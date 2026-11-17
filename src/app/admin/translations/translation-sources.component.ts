@@ -1,17 +1,21 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, NgZone, OnInit, inject, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { toErrorKey } from '../../core/describe-error';
 import { ScDatePipe } from '../../core/locale/sc-date.pipe';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
-import { TranslationSource, TranslationsService } from './translations.service';
-import { canImportSource, coverageText, jobErrorKey, summaryEntries } from './translations.logic';
+import { TranslationPass, TranslationSource, TranslationsService } from './translations.service';
+import { canImportSource, coverageText, jobErrorKey, passProgress } from './translations.logic';
 import { TRANSLATIONS_TAB_STYLES } from './translations-shared.styles';
+
+/** How often the list of background passes is read again while one is running. */
+const PASS_POLL_MS = 5000;
 
 /**
  * Quellen tab: community packs with licence, status, coverage and last sync.
- * Import / sync / learn / outreach-draft all run as orchestrator ops; import
+ * Import / sync / learn only start a background pass in the orchestrator (it runs
+ * in slices); the passes block below the table shows where each one stands. Import
  * is only enabled once the licence is clear (licensed / permitted).
  */
 @Component({
@@ -97,16 +101,56 @@ import { TRANSLATIONS_TAB_STYLES } from './translations-shared.styles';
       <p class="flash" [class.err]="f.err" role="status">{{ f.key | translate: f.params }}</p>
     }
 
-    @if (summary(); as sm) {
-      <section class="sc-card block" data-test="summary">
-        <h3>{{ sm.title | translate }}</h3>
-        <dl class="summary">
-          @for (e of sm.entries; track e.k) {
-            <dt>{{ e.k }}</dt><dd>{{ e.v }}</dd>
-          }
-        </dl>
-      </section>
-    }
+    <section class="sc-card block" data-test="passes">
+      <div class="block-head">
+        <h2>{{ 'admin.translations.passes.title' | translate }}</h2>
+      </div>
+      <p class="hint">{{ 'admin.translations.passes.intro' | translate }}</p>
+      @if (passError()) {
+        <div class="state error" role="alert">
+          <p>{{ passError()! | translate }}</p>
+          <button scAction type="button" (click)="loadPasses()">{{ 'admin.translations.retry' | translate }}</button>
+        </div>
+      } @else if (passes().length === 0) {
+        <p class="hint" data-test="passes-empty">{{ 'admin.translations.passes.empty' | translate }}</p>
+      } @else {
+        <div class="sc-table-scroll">
+          <table class="src">
+            <thead>
+              <tr>
+                <th>{{ 'admin.translations.passes.cols.kind' | translate }}</th>
+                <th>{{ 'admin.translations.passes.cols.lang' | translate }}</th>
+                <th>{{ 'admin.translations.passes.cols.source' | translate }}</th>
+                <th>{{ 'admin.translations.passes.cols.state' | translate }}</th>
+                <th>{{ 'admin.translations.passes.cols.updated' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of passes(); track p.id) {
+                <tr>
+                  <td>{{ 'admin.translations.passes.kinds.' + p.kind | translate }}</td>
+                  <td>{{ p.lang }}</td>
+                  <td>{{ p.source_id ?? '—' }}</td>
+                  <td>
+                    <span class="pill" [class.ok]="p.status === 'done'" [class.warn]="p.status === 'open'" [class.bad]="p.status === 'failed'">
+                      {{ 'admin.translations.passes.status.' + p.status | translate }}
+                    </span>
+                    @if (p.status === 'open') {
+                      <span class="hint">
+                        {{ 'admin.translations.passes.phases.' + p.phase | translate }}@if (progress(p) !== null) { · {{ progress(p) }} % }
+                      </span>
+                    } @else if (p.status === 'failed') {
+                      <span class="hint">{{ errorKey(p.error) | translate }}</span>
+                    }
+                  </td>
+                  <td>{{ p.updated_at | scDate: 'datetime' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
   `,
   styles: [
     TRANSLATIONS_TAB_STYLES,
@@ -115,28 +159,40 @@ import { TRANSLATIONS_TAB_STYLES } from './translations-shared.styles';
       .src th, .src td { text-align: start; padding: var(--sc-space-2) var(--sc-space-3); border-bottom: 1px solid var(--sc-border); vertical-align: middle; }
       .src .num { text-align: end; font-variant-numeric: tabular-nums; }
       .src .actions { display: flex; gap: var(--sc-space-2); flex-wrap: wrap; }
+      .src .pill + .hint { margin-inline-start: var(--sc-space-2); }
     `,
   ],
 })
 export class TranslationSourcesComponent implements OnInit {
   private readonly svc = inject(TranslationsService);
   private readonly confirmSvc = inject(ScConfirmService);
+  private readonly zone = inject(NgZone);
 
   readonly sources = signal<TranslationSource[]>([]);
+  readonly passes = signal<TranslationPass[]>([]);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly passError = signal<string | null>(null);
   readonly busyKey = signal<string | null>(null);
   readonly flash = signal<{ key: string; params?: Record<string, unknown>; err: boolean } | null>(null);
-  readonly summary = signal<{ title: string; entries: { k: string; v: string }[] } | null>(null);
 
   readonly canImport = canImportSource;
   readonly coverage = (s: TranslationSource) => coverageText(s.coverage);
+  readonly progress = passProgress;
+  readonly errorKey = (code: string | null) => jobErrorKey(code) ?? 'admin.translations.jobErrors.unknown';
+  private timer: ReturnType<typeof setTimeout> | null = null;
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.stopPolling());
+  }
+
   busy(): boolean {
     return this.busyKey() !== null;
   }
 
   ngOnInit(): void {
     void this.load();
+    void this.loadPasses();
   }
 
   async load(): Promise<void> {
@@ -151,10 +207,34 @@ export class TranslationSourcesComponent implements OnInit {
     }
   }
 
+  /** Reads the passes; while one runs it is read again every few seconds, and a finished import refreshes the sources. */
+  async loadPasses(): Promise<void> {
+    this.stopPolling();
+    const wasOpen = new Set(this.passes().filter((p) => p.status === 'open' && p.kind === 'seed').map((p) => p.id));
+    try {
+      const rows = await this.svc.listPasses();
+      this.passes.set(rows);
+      this.passError.set(null);
+      if (rows.some((p) => wasOpen.has(p.id) && p.status !== 'open')) void this.load();
+      // Outside the zone: a timer inside it would keep the app from ever becoming stable.
+      if (rows.some((p) => p.status === 'open')) {
+        this.zone.runOutsideAngular(() => {
+          this.timer = setTimeout(() => this.zone.run(() => void this.loadPasses()), PASS_POLL_MS);
+        });
+      }
+    } catch (e) {
+      this.passError.set(toErrorKey('admin-translations', 'passes-load', e));
+    }
+  }
+
+  private stopPolling(): void {
+    if (this.timer !== null) clearTimeout(this.timer);
+    this.timer = null;
+  }
+
   private async run<T>(busyKey: string, op: string, fn: () => Promise<T>, done: (r: T) => void): Promise<void> {
     this.busyKey.set(busyKey);
     this.flash.set(null);
-    this.summary.set(null);
     try {
       done(await fn());
     } catch (e) {
@@ -179,10 +259,9 @@ export class TranslationSourcesComponent implements OnInit {
       'import:' + s.id,
       'import-seed',
       () => this.svc.importSeed(s.id),
-      (r) => {
-        this.flash.set({ key: 'admin.translations.sources.imported', params: { name: s.name, count: r.imported }, err: false });
-        this.summary.set({ title: 'admin.translations.sources.importResult', entries: summaryEntries(r as unknown as Record<string, unknown>) });
-        void this.load();
+      () => {
+        this.flash.set({ key: 'admin.translations.sources.importStarted', params: { name: s.name }, err: false });
+        void this.loadPasses();
       },
     );
   }
@@ -199,8 +278,9 @@ export class TranslationSourcesComponent implements OnInit {
       'sync-sources',
       () => this.svc.syncSources(),
       (r) => {
-        this.flash.set({ key: 'admin.translations.sources.synced', params: { checked: r.checked, changed: r.changed, errors: r.errors }, err: false });
-        void this.load();
+        const errors = Array.isArray(r.errors) ? r.errors.length : Number(r.errors) || 0;
+        this.flash.set({ key: 'admin.translations.sources.synced', params: { checked: r.checked, changed: r.changed, errors }, err: false });
+        void this.loadPasses();
       },
     );
   }
@@ -217,7 +297,10 @@ export class TranslationSourcesComponent implements OnInit {
       'learn:' + s.id,
       'learn',
       () => this.svc.learn(s.lang),
-      (r) => this.summary.set({ title: 'admin.translations.sources.learnResult', entries: summaryEntries(r) }),
+      () => {
+        this.flash.set({ key: 'admin.translations.sources.learnStarted', params: { lang: s.lang }, err: false });
+        void this.loadPasses();
+      },
     );
   }
 

@@ -9,6 +9,8 @@ export interface Store {
   getJson(key: string): Promise<unknown | null>;
   putJson(key: string, value: unknown): Promise<void>;
   deleteKey(key: string): Promise<void>;
+  /** Writes JSON text as it is (an overlay of ~10 MB is serialized once and stored under two keys). */
+  putText?(key: string, text: string): Promise<void>;
 }
 
 const READ_CONCURRENCY = 12;
@@ -137,6 +139,19 @@ export async function putLatestOverlay(store: Pick<Store, 'putJson'>, overlay: O
   await store.putJson(roomOverlayKey(overlay.lang), roomOverlay(overlay));
 }
 
+/**
+ * Writes an overlay under its build key and, when it is the newest one of its language, as `latest.json`
+ * with the room-label slice. The overlay is serialized once.
+ */
+export async function writeOverlay(store: Store, overlay: Overlay, latest: boolean): Promise<void> {
+  const text = JSON.stringify(overlay);
+  const put = (key: string) => (store.putText ? store.putText(key, text) : store.putJson(key, overlay));
+  await put(overlayKey(overlay.lang, overlay.build_id));
+  if (!latest) return;
+  await put(overlayKey(overlay.lang, 'latest'));
+  await store.putJson(roomOverlayKey(overlay.lang), roomOverlay(overlay));
+}
+
 /** Overlay v1 + the additive source/attribution fields; `meta` is optional (older callers). */
 export function makeOverlay(
   lang: string,
@@ -205,6 +220,15 @@ export function buildOverlayMeta(
   tm: Record<string, { o: string; src?: string }>,
   sourceRows: SourceMetaRow[],
 ): Required<OverlayMeta> {
+  const { used, ai } = overlayUsage(entries, tm);
+  return overlayMetaOf(lang, used, ai, sourceRows);
+}
+
+/** Which community sources the entries come from, and whether any is the AI's. Adds up across slices. */
+export function overlayUsage(
+  entries: Record<string, { h: string; t: string }>,
+  tm: Record<string, { o: string; src?: string }>,
+): { used: Set<string>; ai: boolean } {
   const used = new Set<string>();
   let ai = false;
   for (const e of Object.values(entries)) {
@@ -213,6 +237,11 @@ export function buildOverlayMeta(
     if (hit.o === 'community' && hit.src) used.add(hit.src);
     else if (hit.o === 'ai') ai = true;
   }
+  return { used, ai };
+}
+
+/** `buildOverlayMeta` from the usage alone (what a sliced build has after merging its parts). */
+export function overlayMetaOf(lang: string, used: Set<string>, ai: boolean, sourceRows: SourceMetaRow[]): Required<OverlayMeta> {
   const rows = sourceRows.filter((r) => r.lang === lang);
   const contributing = rows.filter((r) => used.has(r.id)).sort((a, b) => a.id.localeCompare(b.id));
   const nc = contributing.some((r) => r.license_kind === 'nc_sa');

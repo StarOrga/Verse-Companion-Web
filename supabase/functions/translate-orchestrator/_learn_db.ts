@@ -79,8 +79,8 @@ export interface LearnDb {
   listAnsweredUnapplied(lang: string, limit: number): Promise<CardRow[]>;
   listOpenCards(lang: string, kinds: CardRow['kind'][], limit: number): Promise<CardRow[]>;
   updateCardContext(id: string, context: Record<string, unknown>): Promise<void>;
-  /** Books learning spend as a job-less ledger row (see header). */
-  addLearnLedger(month: string, usd: number, kind: string, lang: string): Promise<void>;
+  /** Books learning spend as a job-less ledger row (see header). With `ref` (the batch id) a second booking of the same batch is ignored. */
+  addLearnLedger(month: string, usd: number, kind: string, lang: string, ref?: string): Promise<void>;
   /** Ledger sum of one kind in a month (web-research cap). */
   monthKindSpent(month: string, kind: string): Promise<number>;
   /** Ledger sum of the month (all spend, the monthly cap's basis). */
@@ -145,14 +145,26 @@ export function makeLearnDb(sb: Client, now: () => Date = () => new Date()): Lea
       return (data ?? []) as LearnGlossaryRow[];
     },
     async insertGlossary(lang, rows) {
+      const shape = (r: LearnGlossaryRow) => ({
+        lang, source_term: r.source_term, target_term: r.target_term, category: r.category, origin: r.origin,
+        evidence: r.evidence ?? 0,
+      });
       let n = 0;
-      for (const r of rows) {
-        const { error } = await sb.from('translation_glossary').insert({
-          lang, source_term: r.source_term, target_term: r.target_term, category: r.category, origin: r.origin,
-          evidence: r.evidence ?? 0,
-        });
-        if (error && error.code !== '23505') fail(error);
-        if (!error) n++;
+      // A first learning pass promotes hundreds of terms: one statement per 100 rows. A group that
+      // holds a term the table already has fails as a whole (23505) and is repeated row by row.
+      for (let i = 0; i < rows.length; i += 100) {
+        const group = rows.slice(i, i + 100);
+        const bulk = await sb.from('translation_glossary').insert(group.map(shape));
+        if (!bulk.error) {
+          n += group.length;
+          continue;
+        }
+        if (bulk.error.code !== '23505') fail(bulk.error);
+        for (const r of group) {
+          const { error } = await sb.from('translation_glossary').insert(shape(r));
+          if (error && error.code !== '23505') fail(error);
+          if (!error) n++;
+        }
       }
       return n;
     },
@@ -197,10 +209,11 @@ export function makeLearnDb(sb: Client, now: () => Date = () => new Date()): Lea
       const { error } = await sb.from('translation_cards').update({ context }).eq('id', id);
       if (error) fail(error);
     },
-    async addLearnLedger(month, usd, kind, lang) {
+    async addLearnLedger(month, usd, kind, lang, ref) {
       if (!(usd > 0)) return;
-      const { error } = await sb.from('translation_ledger').insert({ job_id: null, month, usd, kind, lang });
-      if (error) fail(error);
+      const { error } = await sb.from('translation_ledger').insert({ job_id: null, month, usd, kind, lang, ref: ref ?? null });
+      // 23505 on (job, ref): this batch is booked already.
+      if (error && !(ref && error.code === '23505')) fail(error);
     },
     async monthKindSpent(month, kind) {
       const { data, error } = await sb.from('translation_ledger').select('usd').eq('month', month).eq('kind', kind);

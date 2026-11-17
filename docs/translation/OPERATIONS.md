@@ -26,9 +26,25 @@ curl -X POST "$SUPABASE_URL/functions/v1/translate-orchestrator" \
   -d '{"op":"tick"}'
 ```
 
-The response lists every open job with `from` and `to` status. One tick moves each job at most one
-step; a batch usually takes minutes to hours, so expect many ticks per job. Nothing is spent unless
-`translation_settings.enabled` is true.
+The response lists every job it touched with `from` and `to` status (`jobs`), the background passes it
+ran a slice of (`passes`), the languages whose finished learning batches it applied (`learned`) and
+`heavy: false` when another request held the heavy-work lock. A batch usually takes minutes to hours, so
+expect many ticks per job. Nothing is spent unless `translation_settings.enabled` is true.
+
+**What one tick does.** Every job that only waits for a batch is polled. Then ONE heavy step runs: a
+slice of a job (`estimating` / `publishing`), else a slice of a background pass, else the learning
+batches that have ended, for one language. One, because the CPU limit (about 2 s) is per isolate and a
+slice is sized to it; and behind a lock (`claim_run('translate-orchestrator:heavy')`, given back with
+`release_run` after the slice, expiring after 150 s when a request was killed), because a second request
+in the same seconds would add its CPU to the same isolate and could rewrite the same TM shard.
+
+**Fast lane.** A sliced step needs many requests (an estimate about 25, a learning pass about 45, an
+import about 45). Cron `translate-orchestrator-fast` (migration `20261117150000`) asks every 10 seconds
+and posts `{"op":"tick","fast":true}` only while `translation_work_pending()` is true: a job is
+`estimating` or `publishing`, or a pass is open. A fast tick skips the polling and runs just the heavy
+step. The 10-minute tick stays the heartbeat for everything that waits. Roll back with
+`select cron.unschedule('translate-orchestrator-fast')`; the pipeline then still works, one slice per
+10 minutes.
 
 ## Approve, cancel, estimate
 
@@ -129,17 +145,23 @@ orchestrator deploy.
 All with an admin JWT or the service role (`sync_sources` also with the publishable key, for pg_cron):
 
 ```
-{"op":"import_seed","source_id":"rjcncpt"}   # pack -> TM (community), coverage, learning, republish latest overlay
-{"op":"sync_sources"}                        # every enabled licensed|permitted source: upstream changed? re-import
-{"op":"learn","lang":"de"}                   # learning backfill (hook; no-op until the learning module is wired)
+{"op":"import_seed","source_id":"rjcncpt"}   # starts the import pass: pack -> TM (community), coverage, overlay, learning
+{"op":"sync_sources"}                        # every enabled licensed|permitted source: upstream changed? start its import pass
+{"op":"learn","lang":"de"}                   # starts a learning pass
 {"op":"draft_outreach","source_id":"thord82"}# maintainer message draft (status draft; never sent by code)
 ```
 
+- All three only start a background pass and answer at once (`{queued: true, pass_id}`; `sync_sources`:
+  `{checked, changed, errors}` with `changed` = passes started). The work runs in slices on later ticks, see
+  "Background passes" below. Until 0.274.0 they did everything in the one request and never finished:
+  `sync_sources` answered 546 every night and no source had ever been imported.
 - `import_seed` answers `409 translate.source_not_permitted` unless the source is `licensed` or `permitted`
-  and enabled (fr / zh-Hans / es until a permission is recorded), `409 translate.no_live_build` /
-  `translate.english_missing` without a published LIVE English table, `502 translate.source_*` when the
-  upstream fetch fails (`source_fetch_<http status>`, `source_too_large`, `source_asset_missing`,
-  `source_entry_missing`). Re-running it with an unchanged pack changes nothing.
+  and enabled (fr / zh-Hans / es until a permission is recorded). What the pass itself runs into ends up in
+  `translation_passes.error`: `translate.no_live_build` / `translate.english_missing` without a published
+  LIVE English table, `translate.source_not_permitted` when the permission went away meanwhile; an upstream
+  fetch problem (`translate.source_fetch_<http status>`, `source_too_large`, `source_asset_missing`,
+  `source_entry_missing`) is retried five times and then fails the pass. Re-running an import with an
+  unchanged pack changes nothing.
 - Cron `translate-orchestrator-sync-sources` runs `sync_sources` daily at 04:17 UTC
   (migration `20261108170000`); roll back with `select cron.unschedule('translate-orchestrator-sync-sources')`.
   The marker per source is stored in `translation_sources.last_seen_commit`; an optional
@@ -163,29 +185,61 @@ All with an admin JWT or the service role (`sync_sources` also with the publisha
 | German with seed: the remaining AI gap (about 6 % uncovered text + ~2 400 placeholder rejects) | about 2–5 USD per language instead of about 40 USD |
 | Arbiter pairwise comparison (Haiku class, batch, both orders) | cents per few thousand conflicts |
 
+## Background passes (`translation_passes`)
+
+Three kinds of work read the whole string table (~90k keys) and the whole translation memory. In one edge
+request that is several seconds of CPU; the runtime allows about two. They run as passes: one bounded slice
+per request, the position in `translation_passes` (compare-and-set on `updated_at`, like a job), what a
+slice found in R2 work files. A killed request loses one slice.
+
+| Kind | Asked for by | Phases | Slices on today's table (154 English shards) |
+|---|---|---|---|
+| `seed` | `import_seed`, `sync_sources` | `start` · `fetch` (download, store the text) · `split` (one part per key group) · `scan` (8 shards: votes per English text, bucketed by first hash digit) · `apply` (one digit: decide, write its 16 TM shards) · `arbitrate` · `finish` (coverage, asks for `overlay` + `learn`) · `cleanup` | about 45 |
+| `overlay` | a finished import | `start` · `scan` (8 shards: the entries the TM can fill) · `assemble` (merge, write `<build>.json`, `latest.json`, `rooms.json`) | about 22 |
+| `learn` | a publish, a finished import, `op: learn` | `start` (answered cards, codex names) · `mine` (8 shards: term votes, style counts, name counts) · `plan` (style, promotions, contested terms) · `insert` (500 glossary rows) · `detect` (8 shards, only when the plan asks: example lines, lines missing a CIG term) · `submit` (Haiku, align, then web research + arbiter) | about 45 |
+
+- **Same result as one run.** Everything a slice computes merges: votes and counts add up, the smallest key
+  decides a spelling, a text is decided once with every vote in hand. `_passes.test.mjs` compares the passes
+  with one run over the whole table (style, glossary rows, the Haiku and align requests, the TM, the overlay).
+- **One open pass per kind, language and source.** A second request while one runs sets `again`; one more pass
+  follows the running one. A request is never lost and never runs twice at once.
+- **A pass always ends.** A slice that throws is retried; after 5 errors in a row the pass is `failed` with
+  `translate.internal`, a translated verdict (`translate.source_not_permitted`, `translate.no_live_build`, …)
+  fails it at once. A slice whose request was killed leaves `run_at` behind; after `RUN_STALE_MS` (5 min) the
+  next tick counts it, and three kills in a row without progress fail the pass with `translate.worker_limit`.
+- **Batches.** Before a learning batch is created the pass records the intent (`state.intent`); the batch id
+  is saved right after the provider answered. A request killed in between leaves a paid batch nobody reads:
+  the next run creates it again, logs `translate learning batch may exist twice` and counts it in
+  `state.resubmits`. Spend is booked with the batch id as `translation_ledger.ref`, so reading a batch twice
+  books it once.
+- **Where to look.** Admin → Übersetzungen → Quellen lists the passes of the last 7 days with phase and
+  progress. SQL: `select kind, lang, source_id, status, phase, pos, total, dead, attempts, error, updated_at
+  from translation_passes order by created_at desc`. A failed pass is started again with the same op.
+- **Size of a slice.** `SCAN_SHARDS` (8 English shards, about 4 800 keys) for every walk, as for the estimate;
+  see "Estimating runs in slices" for how to measure. The seed `fetch` slice holds one pack (~12 MB) in
+  memory; `assemble` holds one overlay (~10 MB for a language with a pack).
+- Daily cron `translate-orchestrator-housekeeping` (04:23 UTC) deletes finished passes older than 30 days
+  and the run details of the fast-lane job older than a day.
+
 ## Learning step: work keys and spend
 
 The learning step (`_learn.ts`, `_arbiter.ts`, `_revise.ts`, `_cards.ts`) runs after every seed import
 or sync and on `op: learn`. Its LLM parts (Haiku pre-decision, pairwise arbiter, B1 term alignment, web
 research) are Message Batches resumed by later ticks.
 
-**It does not fit an edge request yet.** The pass (`runLearning`) reads the whole English table, the CIG
-table and the whole TM and hashes or mines every line, the same shape the estimate had before it was
-sliced. Run inside the publish tick it took the worker over the 2 s CPU limit right after the job was
-published (2026-11-17, pt-BR: published at 14:05:10 UTC, worker killed at 14:05:30 with `CPUTime`), and
-no pass has finished in production so far: no language has a learned `style.at`, there are no cards, no
-`mined` glossary rows and no learning ledger rows. Since 0.273.4 a publish therefore only writes
-`translation-work/learn-<lang>/due.json` (`trigger`, `at`, `build_id`) and runs nothing; `op: learn` and
-the seed / sync hooks still call the unsliced pass and will hit the same limit on a table of this size.
-Slicing the pass (scan parts that merge, as in `_scan.ts`) is the open work; it also switches on the
-learning spend below for the first time.
+**It runs as a background pass** (`_learn_pass.ts`, see "Background passes" below): a publish, a finished
+import and `op: learn` only ask for one. Until 0.274.0 the pass ran in one request, read the whole English
+table, the CIG table and the whole TM, and searched every line for every contested term. Inside the publish
+tick it took the worker over the 2 s CPU limit right after the job was published (2026-11-17, pt-BR:
+published at 14:05:10 UTC, worker killed at 14:05:30 with `CPUTime`), and it never finished once in
+production: no language had a learned style, a card, a `mined` glossary row or a learning ledger row.
 
-Progress lives in R2:
+What a pass leaves between its slices is in `translation-work/learn-<lang>/p-<pass id>/` and deleted when it
+ends. What outlives a pass lives in R2:
 
 | Key | Content |
 |---|---|
-| `translation-work/learn-<lang>/state.json` | phase of the running learning pass |
-| `translation-work/learn-<lang>/due.json` | written by a publish: a learning pass is due (nothing reads it yet) |
+| `translation-work/learn-<lang>/state.json` | the learning batches in flight (Haiku, align, web), what the last pass was, the pairs Haiku already judged for this build |
 | `translation-work/learn-<lang>/arbiter.json` | open pairwise comparisons (both orders) |
 | `translation-work/learn-<lang>/revise.json` | per-release change counter (hysteresis budget) |
 | `translation-work/learn-<lang>/notes.json` | admin card notes fed into prompts |
