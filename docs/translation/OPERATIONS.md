@@ -45,7 +45,7 @@ that holds that token, so a request that outlived its claim cannot free the next
 request's claim expires after 150 s. A lock call that fails makes the tick run no slice.
 
 **Fast lane.** A sliced step needs many requests (the table below). Cron `translate-orchestrator-fast`
-(migration `20261117150000`) asks every 10 seconds and posts `{"op":"tick","fast":true}` only while
+(migration `20261117150000`; the gate as of `20261117200000`) asks every 10 seconds and posts `{"op":"tick","fast":true}` only while
 `translation_work_pending()` is true: a job has a slice to run (the same rule as `isHeavy()` in
 `_machine.ts` - keep the two in step) or is `queued`, an ended job still has work files, or a pass is
 open. A fast tick skips the asking of batches and the learning results: it starts queued jobs and runs
@@ -122,12 +122,70 @@ another one. The learning step's batches (`_learn_batch.ts`, ids in R2 work keys
 **Ending a job that has batches.** `cancel` and a failure set the status first and cancel the batches
 after it, so a job that lost that race keeps its batches. A create that is in flight at that moment
 loses its own compare-and-set and cancels the batch it just made. The share of the estimate that was
-sent and never read is booked under the ledger ref `unread`: the real spend of those batches is not
-known, and the monthly ledger may over-count but never under-count.
+sent and never read is booked in the ledger (under the ref of each batch, see "What a job may
+spend"): the real spend of those batches is not known, and the monthly ledger may over-count but
+never under-count.
 
 Spend is booked once per batch: `translation_ledger.ref` is `main:<group>`, `judge` or
 `postedit:<group>` (with `#<run>` on a restarted job), unique per job, so a slice that is repeated after
 a kill does not book twice.
+
+## What a job may spend
+
+Caps and approvals are given for an estimate; what a job really costs is known batch by batch. The
+real figures are asked again wherever a decision is still open (`_job_run.ts`, tests in
+`_spend.test.mjs`):
+
+- **Budget of a job** (`budgetOf`): its estimate plus a quarter, at least 5 cents. The estimate covers
+  the first attempt of every text; the judge sample and the second attempts come out of the margin,
+  and so does a first attempt that costs more than estimated.
+- **Probe** (jobs of several batch groups, i.e. more than ~3 000 texts). The first group is sent alone
+  (`submitted` / `probe`, a wait) and its bill is read when it has ended (`probe_read`, a slice of its
+  own): the bill against the estimate of the requests that were billed is the ratio the rest of the job
+  is expected to follow (`stats.probe`: `est`, `usd`, `ratio`). A request that expired or failed costs
+  nothing and is left out of both sides, so it cannot hide what the others cost. Up to 10 % above the
+  estimate (`PROBE_SHARE`) the other groups are sent - less than the margin, because what is left of it
+  is for the judge and the second attempts. Beyond that the job goes back to `awaiting_approval` with
+  `stats.hold = 'overrun'`, `estimate_usd` corrected to the projected figure (its budget follows) and
+  the approval it had removed: one group is paid, not all of them. Approved again it goes on with the
+  second group; cancelled, the paid group is booked already (ledger `main:0` and `spent_usd`, both by
+  the probe - the later read of the group adds only what the probe did not see) and nothing else is.
+  A first batch that billed nothing at all (expired, failed as a whole) says nothing: the job goes on.
+  The price of the probe is one more wait for a batch on a large job. A job of one group has nothing
+  to probe - its first attempts are one batch, paid when it is sent. The ratio is one figure for the
+  job: a first group with another share of lore texts (Opus) than the rest projects a little off, and
+  the budget is what bounds that.
+- **The price of an answer** is the price of the model that ran it (`billedModel`, `_cost.ts`): the id
+  the provider names when the price table knows it - also as the alias a dated snapshot id begins
+  with -, else the model the request asked for. An id nobody knows is never priced as "the most
+  expensive model" where a decision hangs on the figure; only the call log falls back to that.
+- **Paid steps beyond the first attempts.** Before the judge batch and before every post-edit batch the
+  job asks `spendStop`: what it was billed (`spent_usd`) plus the estimate of what it has sent and not
+  read (`stats.peSent`) plus the estimate of the next batch against its budget (a batch whose create
+  was answered by nobody may exist twice and is counted twice); and, for a job no
+  person approved, the month's ledger plus the reserves of the other open jobs against
+  `monthly_cap_usd`. A step that is refused is left out with everything after it: the job publishes
+  what passed, the texts without a second attempt stay untranslated (their QA counts them as
+  `dropped`, the next job of the language takes them), post-edit batches that were sent before are
+  still read, and `stats.capped` records it (`reason`: `job_budget` or `monthly_cap`, `limit`, `spent`,
+  `judge` = the sample was left out, `texts` = texts without a second attempt). The admin job list
+  shows a sentence for it, as it does for every reason a job waits for approval.
+- **A person's approval** lifts the month's cap for that job (as before) - by its estimate, and the
+  job's own budget bounds by how much more.
+- **Reserve.** While a job is open, the month counts it with what it may still spend
+  (`reserveOf`: budget minus `spent_usd`), not with the unspent rest of its estimate.
+
+What this does not bound: the first attempts of a job of ONE group, and the first group of a larger
+job, are a batch that is paid when it is sent. `max_tokens` of a request is 2.5 times its estimated
+output (at least 2 048), which is the ceiling of what such a batch can cost; in the four delta jobs of
+2026-11-11 the bill was 0.78 to 1.05 times the estimate. The output estimate uses one measured ratio
+(German, `OUTPUT_TOK_PER_CHAR` in `_cost.ts`) for every language until others are measured - the
+probe is what catches a language whose tokens run longer.
+
+A job that ends early books the estimate of every batch that was sent and not read: first attempts
+and the judge batch (`stats.judgeSent`) under the ref their read would have used (`main:<g>`, `judge` -
+so a batch whose bill a killed slice had booked already is not booked twice), second attempts
+(`stats.peSent`) under `unread`.
 
 ## A job runs in slices (why a tick cannot die on it)
 
@@ -151,7 +209,7 @@ sixteenth of each. All keys with the same English text meet in one digit, so a t
 |---|---|
 | `estimating` | `adm` (delta: the admin entries of the TM, one digit per slice, once per language) · `rows` (8 shards; override alerts) · `diff` (one digit: counts, the texts to translate routed to the segment of their key, reference pairs, CIG label pairs) · `prep` (glossary, system prompt → `plan.json`) · `chunk` (one key segment, or several small ones: the requests → `plan-<n>.json`, 15 each) · `shots` (one plan part, at most 2 pools of reference pairs) · `clean` · `complete` (cost, caps, holds) |
 | `queued` | → `submitted` |
-| `submitted` | `submitting` (one batch per slice) · `running` (wait) |
+| `submitted` | `submitting` (one batch per slice) · `probe` (wait, jobs of several groups: has the first batch ended?) · `probe_read` (its bill is read before the others are sent, see "What a job may spend") · `running` (wait) |
 | `validating` | `results` (one group: read its batch, QA) · `judge_plan` · `judge_submitting` · `judge` (wait) · `judge_read` · `pe_plan` (one group: judge verdicts, the post-edit requests) |
 | `post_editing` | `submitting` (one batch per slice) · `running` (wait) · `results` (one group) |
 | `publishing` | `route` (one group: accepted results by hash digit) · `tm` (one digit into its 16 TM shards) · `rows` (8 shards) · `join` (one digit: overlay entries) · `assemble` (the 16 pieces become the overlay file as text, glossary rows, a learning pass is asked for) |
@@ -171,8 +229,8 @@ glossary term. The flagged terms are read once, when the diff begins (`stats.est
 while a job estimates waits for the next job. `latest.json` is written only by the job of the current
 LIVE build - a PTU build's job writes `<build>.json` alone.
 
-Known limits (decided, not bugs): the caps are checked against the estimate when a job is queued, not
-against the running spend (the judge sample and the post-edit add a few percent); a text that was
+Known limits (decided, not bugs): a job of one batch group pays for its first attempts before any
+real figure exists ("What a job may spend"); a text that was
 picked for retranslation and whose rewrite failed QA is left out of that job's overlay, keeps its old
 TM entry and comes back with the next overlay rebuild; two jobs of one language that run at the same
 time (PTU and LIVE) both translate a text that is new to both.

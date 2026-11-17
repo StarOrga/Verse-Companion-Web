@@ -4214,6 +4214,17 @@
         "cancelTitle": "Cancel the job for {{lang}}?",
         "cancelText": "The job is stopped; costs already incurred stay.",
         "progress": "{{pct}} %",
+        "hold": {
+          "full": "A full run only starts after your approval.",
+          "upload_cap": "The estimate is above the limit per upload.",
+          "monthly_cap": "This job would take the month above its limit.",
+          "overrun": "The first batch group cost {{pct}} % more than estimated. The estimate is corrected, the rest only starts after your approval."
+        },
+        "capped": {
+          "job_budget": "Job budget reached: {{texts}} texts got no second attempt and stay untranslated.",
+          "monthly_cap": "Monthly limit reached: {{texts}} texts got no second attempt and stay untranslated.",
+          "judge": "Budget reached: the judge sample was left out."
+        },
         "cols": {
           "build": "Build",
           "lang": "Language",
