@@ -180,6 +180,12 @@ it forever. The stamp is also the concurrency guard: a young stamp makes another
 alone. Every slice can be repeated: it writes its files first and moves the position last, and what it
 books or creates is guarded (ledger ref, batch intent).
 
+**A table published again.** The table of a build can be published again (a new generation in its
+`index.json`; the shards of the old one go away). A walk notes generation and shard count of every table
+it reads with its first `rows` slice (`tableMark`, in `stats.est.mark` / `stats.pub.mark` / the pass
+state) and starts over when a later slice finds another one. The digit phases only read the row files
+the walk wrote, so what they join is always one publication.
+
 **CIG's own translation.** The uploader publishes CIG's table of a language under the language code
 (`codex-locale/<build>/de/`), not under the game folder name (`german_(germany)`). Until 0.274.0 the
 pipeline read the folder name, found nothing and treated every key as untranslated: CIG's ~23 000

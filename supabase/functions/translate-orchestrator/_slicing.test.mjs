@@ -484,15 +484,16 @@ describe('a table published again while a walk is under way', () => {
     await until(w, () => w.jobs.get(job.id).status === 'publishing' && w.jobs.get(job.id).stats.phase === 'join');
     const mark = w.jobs.get(job.id).stats.pub.mark;
     assert.match(mark, /^gen001:\d+\|/);
-    // The rows of the walk are there; a walk that begins again after a re-publish notes the new mark.
-    putTable(w.ts, NEW, 'en', en, 'gen002');
+    // The table is published again without ui_b while the rows walk is under way (its first slice
+    // is done): the walk begins again, and the overlay holds no key the table no longer has.
+    putTable(w.ts, NEW, 'en', { ui_a: en.ui_a, ui_old: en.ui_old }, 'gen002');
     const cur = w.jobs.get(job.id);
     w.jobs.set(job.id, { ...cur, stats: { ...cur.stats, phase: 'rows', pos: SCAN_SHARDS } });
     await tickAll(w.deps, ONE);
     assert.match(w.jobs.get(job.id).stats.pub.mark, /^gen002:/);
     await until(w, () => ['published', 'failed'].includes(w.jobs.get(job.id).status));
     assert.equal(w.jobs.get(job.id).status, 'published', w.jobs.get(job.id).error);
-    assert.deepEqual(Object.keys(w.ts.json(overlayKey('de', NEW)).entries).sort(), ['ui_a', 'ui_b']);
+    assert.deepEqual(Object.keys(w.ts.json(overlayKey('de', NEW)).entries).sort(), ['ui_a']);
   });
 });
 
