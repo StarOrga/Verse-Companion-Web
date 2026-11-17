@@ -1,7 +1,7 @@
 // node --test supabase/functions/translate-orchestrator/_community.test.mjs
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { decodeIni, normalizeKey, parseIni, parsePack, parseRawGithub, parseResolver } from './_pack.ts';
+import { decodeIni, iniDecoder, lineCutter, normalizeKey, parseIni, parsePack, parseRawGithub, parseResolver, resolveSource } from './_pack.ts';
 import { isPackNoise, placeholdersMatch, seedEntries } from './_seed.ts';
 import { detectOverrideAlerts, writeAlerts } from './_alerts.ts';
 import { buildOutreachDraft, messageLang, outreachKind } from './_outreach.ts';
@@ -9,6 +9,7 @@ import { attributionLine, buildOverlayMeta, makeOverlay } from './_io.ts';
 import { diffStrings, sha256Hex } from './_diff.ts';
 import { requestLearning } from './_learn_pass.ts';
 import { arbitrate } from './_arbiter.ts';
+import { chunkedBody } from './_testkit.mjs';
 
 const enc = (s) => new TextEncoder().encode(s);
 const sha = sha256Hex;
@@ -30,6 +31,83 @@ describe('_pack', () => {
     assert.equal(decodeIni(nobom), 'A=b\n');
     const be = Buffer.from('﻿A=ö\n', 'utf16le').swap16();
     assert.equal(decodeIni(new Uint8Array(be)), 'A=ö\n');
+  });
+  it('bytes that arrive in chunks decode to what the whole file decodes to, wherever a chunk ends', () => {
+    const text = 'Frontend_PU_Version=Päck\r\nA=ä – „Zitat“ 日本語\r\nB=😀 ende\r\nC=x';
+    const u16 = Buffer.from('\ufeff' + text, 'utf16le');
+    const files = {
+      'utf-8': enc(text),
+      'utf-8 with BOM': new Uint8Array([0xef, 0xbb, 0xbf, ...enc(text)]),
+      'utf-16 le with BOM': new Uint8Array(u16),
+      'utf-16 be with BOM': new Uint8Array(Buffer.from(u16).swap16()),
+      'utf-16 le without BOM': new Uint8Array(Buffer.from('A=b\r\nC=d ä\r\n', 'utf16le')),
+      'one byte': enc('A'),
+      'three bytes': enc('A=b'),
+      empty: new Uint8Array(0),
+    };
+    for (const [name, bytes] of Object.entries(files)) {
+      for (const size of [1, 2, 3, 5, 7, 64, 100_000]) {
+        const dec = iniDecoder();
+        let got = '';
+        for (let o = 0; o < bytes.length; o += size) got += dec.push(bytes.subarray(o, o + size));
+        got += dec.end();
+        assert.equal(got, decodeIni(bytes), `${name} in chunks of ${size}`);
+      }
+    }
+  });
+  it('a text is cut into pieces of whole lines; together they are the text and parse to the same pack', () => {
+    const lines = ['\ufeffFrontend_PU_Version=Pack'];
+    for (let i = 0; i < 400; i++) lines.push(`Key_${i}${i % 9 === 0 ? ',P' : ''}=Wert ${i} ${'x'.repeat(i % 37)}`);
+    lines.push('Key_3=zweite Fassung', `Long_Line=${'y'.repeat(900)}`, 'Key_last=ohne Zeilenende');
+    for (const eol of ['\r\n', '\n']) {
+      const text = lines.join(eol);
+      for (const [size, feed] of [[200, 1], [200, 17], [200, 5000], [64, 3], [1_000_000, 50]]) {
+        const cut = lineCutter(size);
+        const pieces = [];
+        for (let o = 0; o < text.length; o += feed) pieces.push(...cut.push(text.slice(o, o + feed)));
+        const rest = cut.end();
+        if (rest !== null) pieces.push(rest);
+        assert.equal(pieces.join(''), text);
+        assert.equal(cut.end(), null, 'nothing is handed out twice');
+        for (const p of pieces.slice(0, -1)) assert.ok(p.endsWith('\n'), 'a piece ends on a line break');
+        // Only a line that is longer than a piece makes a piece longer than asked for.
+        for (const p of pieces.slice(0, -1)) assert.ok(p.length <= size || p.indexOf('\n') === p.length - 1, `piece of ${p.length} chars for size ${size}`);
+        if (size === 200) assert.ok(pieces.length > 20, `expected many pieces, got ${pieces.length}`);
+        // Piece by piece in the order of the file: the same map as one parse, a later line wins.
+        const whole = parseIni(text);
+        const map = new Map();
+        let header = null;
+        for (const p of pieces) {
+          const part = parseIni(p);
+          header ??= part.header;
+          for (const [k, v] of part.map) map.set(k, v);
+        }
+        assert.deepEqual([...map].sort(), [...whole.map].sort());
+        assert.equal(map.get('key_3'), 'zweite Fassung');
+        assert.equal(header, 'Pack');
+      }
+    }
+  });
+  it('a download keeps no chunk: the bytes of a body in small chunks come out whole, and the cap holds', async () => {
+    const bytes = enc('A=1\r\n'.repeat(50_000));
+    const src = { id: 's', raw_url: 'https://packs.example.test/global.ini', resolver: null };
+    const r = await resolveSource(src, async () => new Response(chunkedBody(bytes, 777), { headers: { etag: 'e1' } }));
+    assert.deepEqual([r.bytes.length, r.token], [bytes.length, 'e1']);
+    assert.ok(Buffer.from(r.bytes).equals(Buffer.from(bytes)));
+    // The fixture bites: a reader that keeps the chunks and joins them afterwards reads wiped buffers.
+    const kept = [];
+    for await (const chunk of chunkedBody(bytes, 777)) kept.push(chunk);
+    assert.ok(!Buffer.concat(kept).equals(Buffer.from(bytes)));
+    // A zip is read into one buffer that grows; the same holds for it.
+    const zipSrc = { id: 'z', raw_url: 'https://packs.example.test/data.zip', resolver: 'zip-entry:global.ini' };
+    const z = await resolveSource(zipSrc, async () => new Response(chunkedBody(bytes, 5000)), undefined, (zip) => ({ 'global.ini': zip.slice() }));
+    assert.ok(Buffer.from(z.bytes).equals(Buffer.from(bytes)));
+    // The cap counts what arrives, not what a header promises.
+    const big = new ReadableStream({
+      pull(c) { c.enqueue(new Uint8Array(4 * 1024 * 1024)); },
+    });
+    await assert.rejects(resolveSource(src, async () => new Response(big)), /translate\.source_too_large/);
+    await assert.rejects(resolveSource(src, async () => new Response('gone', { status: 404 })), /translate\.source_fetch_404/);
   });
   it('keeps the first header, last duplicate wins, plain text without trailing newline', () => {
     const p = parseIni('Frontend_PU_Version=one\nFrontend_PU_Version=two\nk=1\nK=2');
