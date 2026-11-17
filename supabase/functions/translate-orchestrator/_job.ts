@@ -102,6 +102,8 @@ export interface Stats {
    * estimated at, what it cost, and the ratio the rest of the job is expected to follow.
    */
   probe?: { est: number; usd: number; ratio: number };
+  /** Estimated spend of the judge batch that was sent (booked when the job ends before it is read). */
+  judgeSent?: number;
   /** Estimated spend of the post-edit batches sent so far (their real spend is read after all are sent). */
   peSent?: number;
   /**
@@ -181,7 +183,8 @@ export interface BatchResult {
 export interface Llm {
   createBatch(requests: { custom_id: string; params: BatchParams }[]): Promise<{ id: string }>;
   isEnded(id: string): Promise<boolean>;
-  results(id: string): AsyncIterable<BatchResult>;
+  /** `record: false` = a read that only looks at the bill (the probe): the call log is left to the read that uses the results. */
+  results(id: string, opts?: { record?: boolean }): AsyncIterable<BatchResult>;
   cancel(id: string): Promise<void>;
 }
 
@@ -233,6 +236,12 @@ export const round4 = (n: number) => Math.round(n * 1e6) / 1e6; // micro-dollars
  */
 export const OVERRUN_SHARE = 0.25;
 export const OVERRUN_MIN_USD = 0.05;
+/**
+ * How far above its estimate the first batch group of a large job may be billed before a person is
+ * asked again. Less than the margin: what is left of it is for the judge and the second attempts, and
+ * a job that used it all up on first attempts would leave those out without anyone having decided so.
+ */
+export const PROBE_SHARE = 0.1;
 
 /** The most a job may spend: its estimate (what was approved, by the caps or by a person) and the margin. */
 export function budgetOf(job: Pick<Job, 'estimate_usd'>): number {

@@ -120,18 +120,27 @@ export function fakeDb({ settings = {}, glossary = [] } = {}) {
 /**
  * A batch provider. A main request is answered with `DE: <text>` per string; `bad(text, request)` makes
  * an answer fail QA (it drops the placeholders) on the first attempt. The judge gives 9, or `judge(sample)`.
+ * `model(request)` is the model id the answer names (default: the one asked for); `lost(request)` makes a
+ * request expire (no answer, no bill). `reads` lists every read of a batch and whether it was logged.
  */
-export function fakeLlm({ bad = () => false, judge = () => 9, usage = () => undefined, ended = () => true } = {}) {
+export function fakeLlm({ bad = () => false, judge = () => 9, usage = () => undefined, ended = () => true, model = (r) => r.params.model, lost = () => false } = {}) {
   const batches = [];
+  const reads = [];
   const llm = {
     batches,
+    reads,
     async createBatch(requests) { batches.push({ id: `b${batches.length}`, requests }); return { id: `b${batches.length - 1}` }; },
     async isEnded(id) { return ended(id); },
     async cancel() {},
-    async *results(id) {
+    async *results(id, opts) {
+      reads.push({ id, record: opts?.record !== false });
       const b = batches.find((x) => x.id === id);
       for (const r of [...b.requests].reverse()) { // arbitrary order on purpose
         const msg = r.params.messages[0].content;
+        if (r.custom_id !== 'j0' && lost(r)) {
+          yield { custom_id: r.custom_id, type: 'expired' };
+          continue;
+        }
         if (r.custom_id === 'j0') {
           const sample = JSON.parse(msg);
           yield { custom_id: 'j0', type: 'succeeded', text: JSON.stringify({ r: sample.map((s) => ({ score: judge(s), back: 'x', terms: [] })) }), stop_reason: 'end_turn', usage: usage(r, 'judge') ?? { input_tokens: 100, output_tokens: 100 }, model: 'claude-opus-5-5' };
@@ -141,7 +150,7 @@ export function fakeLlm({ bad = () => false, judge = () => 9, usage = () => unde
         const flat = g.flatMap((x) => x.s);
         const isPost = r.custom_id.startsWith('p');
         const t = flat.map((s) => (!isPost && bad(s[1], r) ? 'DE: \n broken' : `DE: ${s[1]}`));
-        yield { custom_id: r.custom_id, type: 'succeeded', text: JSON.stringify({ t }), stop_reason: 'end_turn', usage: usage(r, isPost ? 'post' : 'main') ?? { input_tokens: 1000, output_tokens: 500, cache_read_input_tokens: 2000 }, model: r.params.model };
+        yield { custom_id: r.custom_id, type: 'succeeded', text: JSON.stringify({ t }), stop_reason: 'end_turn', usage: usage(r, isPost ? 'post' : 'main') ?? { input_tokens: 1000, output_tokens: 500, cache_read_input_tokens: 2000 }, model: model(r) };
       }
     },
   };

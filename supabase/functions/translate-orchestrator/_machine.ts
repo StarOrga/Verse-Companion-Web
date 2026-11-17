@@ -44,7 +44,7 @@ export function isHeavy(job: Pick<Job, 'status' | 'stats'>): boolean {
     case 'publishing':
       return true;
     case 'submitted':
-      return phase === 'submitting';
+      return phase === 'submitting' || phase === 'probe_read';
     case 'validating':
       return (phase ?? 'results') !== 'judge';
     case 'post_editing':
@@ -73,7 +73,10 @@ async function bookUnread(deps: Deps, job: Job): Promise<void> {
   const pe = job.stats?.pe?.length ?? 0;
   const left = (job.stats?.phase ?? 'submitting') === 'results' ? (pe ? Math.max(0, pe - (job.stats?.pos ?? 0)) / pe : 0) : 1;
   const edits = job.status === 'post_editing' ? (job.stats?.peSent ?? 0) * left : 0;
-  const usd = round4((job.estimate_usd ?? 0) * ((main - read) / groups) + edits);
+  // The judge batch, sent and not read.
+  const vPhase = job.stats?.phase;
+  const judge = job.status === 'validating' && (vPhase === 'judge' || vPhase === 'judge_read') ? job.stats?.judgeSent ?? 0 : 0;
+  const usd = round4((job.estimate_usd ?? 0) * ((main - read) / groups) + edits + judge);
   if (usd <= 0) return;
   const run = job.stats?.run;
   try {

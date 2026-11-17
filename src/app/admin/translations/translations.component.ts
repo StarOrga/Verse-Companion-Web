@@ -18,7 +18,7 @@ import {
   TranslationSettings,
   TranslationsService,
 } from './translations.service';
-import { canApprove, canCancel, jobErrorKey, jobNote, jobProgress, judgeScore, spendPercent } from './translations.logic';
+import { canApprove, canCancel, jobErrorKey, jobNotes, jobProgress, judgeScore, spendPercent } from './translations.logic';
 
 type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary';
 
@@ -176,7 +176,7 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
                       @if (progress(j); as p) {
                         <div class="progress-line">{{ 'admin.translations.jobs.progress' | translate: { pct: p.pct } }}</div>
                       }
-                      @if (note(j); as n) {
+                      @for (n of notes(j); track n.key) {
                         <div class="progress-line">{{ n.key | translate: n.params }}</div>
                       }
                       @if (errorKey(j); as ek) {
@@ -284,7 +284,7 @@ export class AdminTranslationsComponent implements OnInit {
   readonly canApprove = canApprove;
   readonly canCancel = canCancel;
   readonly errorKey = (j: TranslationJob) => jobErrorKey(j.error);
-  readonly note = (j: TranslationJob) => jobNote(j.status, j.stats);
+  readonly notes = (j: TranslationJob) => jobNotes(j.status, j.stats);
   /** Wrapped in an object so that 0 % still renders. */
   readonly progress = (j: TranslationJob) => {
     const pct = jobProgress(j.status, j.stats);
