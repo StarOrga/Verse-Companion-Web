@@ -276,6 +276,100 @@ describe('idempotency', () => {
     assert.equal(w.llm.batches.length, 1);
   });
 
+  // Brings a job to `validating` with its main batch ended and the judge batch not created yet
+  // (the run that should have created it was killed), stale enough for a resume.
+  async function staleJudgeSubmission(w, failure = new Error('connection lost')) {
+    const j = await newJob(w);
+    for (let i = 0; i < 10 && w.jobs.get(j.id).status !== 'validating'; i++) await tick(w.deps);
+    assert.equal(w.jobs.get(j.id).status, 'validating');
+    const create = w.llm.createBatch;
+    w.llm.createBatch = async () => { throw failure; };
+    await tick(w.deps); // results collected, judge claim written, create dies
+    w.llm.createBatch = create;
+    const cur = w.jobs.get(j.id);
+    assert.equal(cur.stats.phase, 'judge_submitting');
+    cur.updated_at = new Date(0).toISOString();
+    const base = Date.now() + 3_600_000;
+    w.deps.now = () => new Date(base);
+    return j.id;
+  }
+  const judgeBatches = (w) => w.llm.batches.filter((b) => b.requests.some((r) => r.custom_id === 'j0'));
+
+  it('two runs resuming the same stale judge submission create one judge batch', async () => {
+    const w = world();
+    const id = await staleJudgeSubmission(w);
+    const snap = await w.db.getJob(id);
+    await Promise.all([advance(w.deps, snap), advance(w.deps, { ...snap })]);
+    assert.equal(judgeBatches(w).length, 1);
+    const after = w.jobs.get(id);
+    assert.equal(after.stats.phase, 'judge');
+    assert.equal(after.batch_ids.filter((b) => b.kind === 'judge').length, 1);
+    assert.equal(after.stats.submit, undefined);
+  });
+
+  it('two runs resuming the same stale main submission create one main batch', async () => {
+    const w = world();
+    const j = await newJob(w);
+    await tick(w.deps); // queued
+    const queued = await w.db.getJob(j.id);
+    await w.db.cas(queued, { status: 'submitted', stats: { ...queued.stats, phase: 'submitting' } });
+    w.jobs.get(j.id).updated_at = new Date(0).toISOString();
+    const base = Date.now() + 3_600_000;
+    w.deps.now = () => new Date(base);
+    const snap = await w.db.getJob(j.id);
+    await Promise.all([advance(w.deps, snap), advance(w.deps, { ...snap })]);
+    assert.equal(w.llm.batches.length, 1);
+    assert.equal(w.jobs.get(j.id).stats.phase, 'running');
+  });
+
+  it('a judge submission whose phase write was lost (legacy `running`) still finishes', async () => {
+    const w = world();
+    const j = await newJob(w);
+    for (let i = 0; i < 10 && w.jobs.get(j.id).stats?.phase !== 'judge'; i++) await tick(w.deps);
+    const cur = w.jobs.get(j.id);
+    assert.equal(cur.status, 'validating');
+    cur.stats = { ...cur.stats, phase: 'running' };
+    await run(w, TERMINAL);
+    assert.equal(w.jobs.get(j.id).status, 'published', w.jobs.get(j.id).error);
+    assert.equal(judgeBatches(w).length, 1);
+  });
+
+  it('a run killed after its create is resumed once and counted as a possible duplicate', async () => {
+    const w = world();
+    const j = await newJob(w);
+    await tick(w.deps); // queued
+    const queued = await w.db.getJob(j.id);
+    // The killed run recorded its intent for group 0 and never saved a batch ref.
+    await w.db.cas(queued, { status: 'submitted', stats: { ...queued.stats, phase: 'submitting', submit: { kind: 'main', g: 0, at: 'x' } } });
+    w.jobs.get(j.id).updated_at = new Date(0).toISOString();
+    const base = Date.now() + 3_600_000;
+    w.deps.now = () => new Date(base);
+    await tick(w.deps);
+    const after = w.jobs.get(j.id);
+    assert.equal(w.llm.batches.length, 1);
+    assert.equal(after.stats.resubmits, 1);
+    assert.equal(after.stats.submit, undefined);
+  });
+
+  it('a create the provider refuses leaves no intent behind, so the retry is not counted as a duplicate', async () => {
+    const w = world();
+    const id = await staleJudgeSubmission(w, Object.assign(new Error('rate limited'), { status: 429 }));
+    assert.equal(w.jobs.get(id).stats.submit, undefined);
+    await tick(w.deps);
+    assert.equal(judgeBatches(w).length, 1);
+    assert.equal(w.jobs.get(id).stats.resubmits, undefined);
+  });
+
+  it('a create whose answer never arrived keeps its intent, so the retry is counted', async () => {
+    const w = world();
+    const id = await staleJudgeSubmission(w); // no HTTP status: the batch may exist
+    assert.deepEqual(Object.keys(w.jobs.get(id).stats.submit).sort(), ['at', 'g', 'kind']);
+    await tick(w.deps);
+    assert.equal(judgeBatches(w).length, 1);
+    assert.equal(w.jobs.get(id).stats.resubmits, 1);
+    assert.equal(w.jobs.get(id).stats.submit, undefined);
+  });
+
   it('dry-run estimate writes nothing', async () => {
     const w = world();
     const before = w.files.size;
