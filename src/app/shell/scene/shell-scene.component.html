@@ -11,6 +11,9 @@
       <div class="live-planet"><sc-briefing-planet [anchor]="planetEl" [paused]="planetParked()" (drawn)="onPlanet('drawn')" (unavailable)="onPlanet('failed')" /></div>
       <!-- The hub's living planets in the scene's pieces (D8), and the body engine kept warm (D12). -->
       <sc-scene-bodies [canvases]="{ news: newsGl, patches: patchesGl, gallery: galleryGl }" (warmed)="warming.set(false)" />
+    } @error {
+      <!-- The chunk did not load (#367): the CSS planet stays, exactly as without WebGL. -->
+      <sc-defer-error quiet source="shell.scene" (failed)="onPlanet('failed'); warming.set(false)" />
     }
     <!-- The one world (rounds/05 .d5-world): every page is a camera pose on it. -->
     <div class="tilt near">

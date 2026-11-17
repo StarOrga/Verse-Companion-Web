@@ -13,7 +13,7 @@ import { API_BASE, RELEASE_TOKEN, TOOL_VERSION } from '../lib/release-token.js';
 import { isInterrupt, type PauseControl } from '../lib/pause-control.js';
 import { fetchWithTimeout, isTimeout, putTimeoutMs } from '../lib/fetch-timeout.js';
 import { isSkinGateCode, type SkinGateCode } from '../lib/skin-upload-summary.js';
-import { isShipFolder, mapLimit } from '../lib/asset-package.js';
+import { isShipFolder, mapLimit, withRetry } from '../lib/asset-package.js';
 import { exportRootOf, uploadPackage, type PackageUploadResult } from './asset-package-ingest.js';
 import { uploadBlueprint, type BlueprintUploadResult } from './blueprint-ingest.js';
 
@@ -91,6 +91,8 @@ export interface SkinUploadHooks {
    * ship / asset rather than only by the next run.
    */
   pace?: () => Promise<void>;
+  /** Backoff sleep between retries of a transient sign/commit refusal (tests inject a no-op). */
+  sleep?: (ms: number) => Promise<void>;
   /** Ship ids a prior run already committed — skipped without touching disk. */
   doneShips?: string[];
   /** Fired when a ship is fully committed, so a kill can't lose the progress. */
@@ -142,7 +144,7 @@ const INGEST_TIMEOUT_MS = 60_000;
 async function callIngest(
   getToken: () => string | Promise<string>,
   body: unknown,
-): Promise<{ ok: boolean; json: Record<string, unknown>; error?: string }> {
+): Promise<IngestReply> {
   const accessToken = await getToken();
   const res = await fetchWithTimeout(fnUrl('ingest-skins'), {
     method: 'POST',
@@ -162,9 +164,53 @@ async function callIngest(
   })) as Record<string, unknown>;
   return {
     ok: res.ok,
+    status: res.status,
     json,
     error: res.ok ? undefined : ((json['error'] as string) ?? `HTTP ${res.status}`),
   };
+}
+
+interface IngestReply {
+  ok: boolean;
+  status?: number;
+  json: Record<string, unknown>;
+  error?: string;
+}
+
+/** A 503 the function marked `transient` (R2 refused or timed out) — worth another try. */
+class TransientReply extends Error {
+  constructor(public readonly reply: IngestReply) {
+    super(reply.error ?? 'transient ingest-skins failure');
+  }
+}
+
+/** True for a 503 with `transient: true`; a gate 503 (r2_usage_unknown) carries no flag and stays final. */
+export function isTransientReply(r: IngestReply): boolean {
+  return !r.ok && r.status === 503 && r.json['transient'] === true;
+}
+
+/**
+ * One sign/commit call, retried with backoff while the function answers a
+ * transient 503 (#365: an R2 hiccup while checking or pruning used to fail the
+ * ship for the whole run). Every call is idempotent: sign hands out fresh URLs,
+ * commit upserts and prunes. After the last retry the 503 reply is returned.
+ */
+async function callIngestRetrying(
+  getToken: () => string | Promise<string>,
+  body: unknown,
+  sleep?: (ms: number) => Promise<void>,
+): Promise<IngestReply> {
+  return withRetry(
+    async () => {
+      const r = await callIngest(getToken, body);
+      if (isTransientReply(r)) throw new TransientReply(r);
+      return r;
+    },
+    { retryable: (e) => e instanceof TransientReply, ...(sleep ? { sleep } : {}) },
+  ).catch((e: unknown) => {
+    if (e instanceof TransientReply) return e.reply;
+    throw e;
+  });
 }
 
 async function putSigned(u: SignedUpload | undefined, file: string, contentType: string): Promise<void> {
@@ -298,7 +344,7 @@ export async function uploadSkins(
         }
         if (s.icon) objects.push({ skin_id: s.id, ext: 'webp' });
       }
-      const signed = await callIngest(getToken, { action: 'sign', ship_id: cat.ship, objects });
+      const signed = await callIngestRetrying(getToken, { action: 'sign', ship_id: cat.ship, objects }, hooks.sleep);
       if (!signed.ok && isSkinGateCode(signed.error)) {
         const code = signed.error;
         onLog(
@@ -352,7 +398,7 @@ export async function uploadSkins(
         model_bytes: s.model_mb ? Math.round(s.model_mb * 1e6) : null,
         ...(s.model && shas.has(s.id) ? { model_sha256: shas.get(s.id) } : {}),
       }));
-      const committed = await callIngest(getToken, { action: 'commit', ship_id: cat.ship, skins });
+      const committed = await callIngestRetrying(getToken, { action: 'commit', ship_id: cat.ship, skins }, hooks.sleep);
       if (!committed.ok) {
         onLog(`${shipId}: commit failed after ${n} object(s) — ${committed.error}`, 'error');
         out.push({ ok: false, ship_id: shipId, uploaded: n, error: committed.error });

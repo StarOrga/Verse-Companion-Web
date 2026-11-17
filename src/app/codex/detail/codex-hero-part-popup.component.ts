@@ -10,6 +10,7 @@ import { partFocusOf, type PartFocus } from '../holo/codex-holo-inspector.compon
 import { ItemPathComponent } from '../../shared/item-path/item-path.component';
 import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { logWarn } from '../../core/log';
+import { DeferErrorComponent } from '../../shared/defer-error/defer-error.component';
 
 /** A hotspot picked in the classic 3D overlay, with the port names up its mount chain (nearest first). */
 export interface HeroPartPick extends PlacementSelection {
@@ -54,7 +55,7 @@ export function resolveHeroPart(sections: readonly LayoutSection[], pick: HeroPa
 @Component({
   selector: 'sc-codex-hero-part-popup',
   standalone: true,
-  imports: [TranslatePipe, AssetPackageViewerComponent, ItemPathComponent, ScPopupComponent],
+  imports: [DeferErrorComponent, TranslatePipe, AssetPackageViewerComponent, ItemPathComponent, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.over-full]': 'overFull()' },
   template: `
@@ -73,6 +74,8 @@ export function resolveHeroPart(sections: readonly LayoutSection[], pick: HeroPa
             }
           } @placeholder {
             <div class="hpp-viewer is-placeholder" aria-hidden="true"></div>
+          } @error {
+            <sc-defer-error class="hpp-viewer" source="codex.heroPartPopup" />
           }
         </div>
       }
