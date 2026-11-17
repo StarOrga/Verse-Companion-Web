@@ -748,6 +748,31 @@ export class NachschubService {
     };
   }
 
+  /**
+   * H3: delete an ARCHIVED Operation from the Archiv. It holds history only, so no wish moves and no slot is taken or
+   * freed (an archived one has none). Undo brings it back archived, with its lines.
+   */
+  async removeArchived(id: string): Promise<NachschubResult> {
+    const uid = this.auth.user()?.id;
+    const n = this.packages().find((p) => p.id === id);
+    if (!uid || !n || n.status !== 'archived') return fail('errors.generic');
+    await this.fulfilWishLines(); // a met wish line lowers its wish before it goes
+    if (!(await this.drop(id, uid))) return fail(this.error() ?? 'errors.generic');
+    const all = this.linesOf(id).map((l) => l.id);
+    this.supplies.removeMany(all);
+    return {
+      ok: true,
+      key: 'hq.nachschub.done.removed',
+      id,
+      undo: async () => {
+        const back = await this.restorePackage(n, uid);
+        if (!back) return fail(this.error() ?? 'errors.generic');
+        for (const l of all) this.supplies.restore(l);
+        return UNDONE;
+      },
+    };
+  }
+
   /** Persist a changed Nachschub (the event services use this). */
   async update(next: Nachschub): Promise<boolean> {
     const uid = this.auth.user()?.id;
@@ -1140,10 +1165,24 @@ export class NachschubService {
         groups.set(k, [...(groups.get(k) ?? []), l]);
       }
     }
+    const lifted = await this.liftSearchLines(groups);
+    if (lifted.stopped) return lifted.count;
+    this.legacyReconciled = true;
+    return lifted.count;
+  }
+
+  /**
+   * The shared mechanics of "these `search` lines are wishes": per wish position the lines are relabelled ON THE SERVER
+   * first (`search` -> `wish`, compare-and-set); only the lines this call won count, with ONE wishlist write that raises
+   * the wish by what was won (999 cap; pieces the cap cuts off are taken off the lines); when that write fails the label
+   * goes back. `stopped` = offline / a failed step: the groups after it were not touched.
+   */
+  private async liftSearchLines(groups: ReadonlyMap<string, SupplyItem[]>): Promise<{ count: number; stopped: boolean; lifted: readonly LiftedGroup[] }> {
     let count = 0;
+    const lifted: LiftedGroup[] = [];
     for (const lines of groups.values()) {
       const won = await this.supplies.casSource(lines.map((l) => l.id), 'search', 'wish');
-      if (won === null) return count; // offline / failed: nothing changed for this wish, the next pass retries
+      if (won === null) return { count, stopped: true, lifted }; // offline / failed: nothing changed for this wish, the next pass retries
       if (!won.length) continue; // another device or an earlier pass got there first
       const mine = lines.filter((l) => won.includes(l.id)).sort((a, b) => (b.createdAt ?? b.updatedAt).localeCompare(a.createdAt ?? a.updatedAt));
       const l0 = mine[0];
@@ -1153,13 +1192,77 @@ export class NachschubService {
       const add = Math.min(qty, Math.max(0, WISH_QTY_MAX - have));
       if (add > 0 && !(await this.setWishQty(p, have + add))) {
         await this.supplies.casSource(won, 'wish', 'search');
-        return count;
+        return { count, stopped: true, lifted };
       }
-      if (add < qty) this.lowerLines(mine.map((l) => ({ id: l.id, qty: l.qty })), qty - add);
+      const lowered = add < qty ? this.lowerLines(mine.map((l) => ({ id: l.id, qty: l.qty })), qty - add) : [];
+      lifted.push({ won, p, added: add, lowered });
       count += won.length;
     }
-    this.legacyReconciled = true;
-    return count;
+    return { count, stopped: false, lifted };
+  }
+
+  /**
+   * H4: the open plain item / ship lines of an ACTIVE normal Operation that cannot be told from Bestand lines
+   * ({@link isPlainSearchLine}); the page asks the owner once per Operation what they are.
+   */
+  plainSearchLinesOf(id: string): SupplyItem[] {
+    const n = this.packages().find((p) => p.id === id);
+    if (!n || n.status !== 'active' || (n.type ?? 'normal') !== 'normal') return [];
+    return this.linesOf(id).filter(isPlainSearchLine);
+  }
+
+  /**
+   * H4 "Als Wünsche führen": the plain lines of Operation `id` become wishes ({@link liftSearchLines}). The undo puts
+   * the lines back to `search` first; the wish is lowered only by what the lines that came back held, so a line met
+   * meanwhile does not take its pieces off twice.
+   */
+  async adoptPlainLines(id: string): Promise<NachschubResult> {
+    if (!this.storesReady()) return fail('errors.generic');
+    const lines = this.plainSearchLinesOf(id);
+    if (!lines.length) return fail('errors.generic');
+    const groups = new Map<string, SupplyItem[]>();
+    for (const l of lines) groups.set(lineKey(l), [...(groups.get(lineKey(l)) ?? []), l]);
+    const r = await this.liftSearchLines(groups);
+    if (r.stopped) return fail('hq.nachschub.wishlistFailed');
+    if (!r.count) return fail('hq.nachschub.plainGone');
+    return {
+      ok: true,
+      key: 'hq.nachschub.done.plainAdopted',
+      id,
+      params: { count: r.count },
+      undo: async () => {
+        let ok = true;
+        for (const g of [...r.lifted].reverse()) {
+          const back = await this.supplies.casSource(g.won as string[], 'wish', 'search');
+          if (back === null) {
+            ok = false;
+            continue;
+          }
+          const held = back.length === g.won.length ? g.added : Math.min(g.added, this.supplies.items().filter((l) => back.includes(l.id)).reduce((n, l) => n + l.qty, 0));
+          if (held > 0 && !(await this.shiftWishes([{ p: g.p, delta: -held }])).ok) ok = false;
+          if (!this.revertLineChanges(g.lowered)) ok = false;
+        }
+        return ok ? UNDONE : fail('hq.nachschub.wishlistFailed');
+      },
+    };
+  }
+
+  /**
+   * H4 "So lassen": the plain lines stay as they are and the question never returns for them: `search` -> `manual`
+   * on the server (nothing else reads `search` on an item / ship line; `manual` merges and renders the same).
+   */
+  async keepPlainLines(id: string): Promise<NachschubResult> {
+    const ids = this.plainSearchLinesOf(id).map((l) => l.id);
+    if (!ids.length) return fail('errors.generic');
+    const won = await this.supplies.casSource(ids, 'search', 'manual');
+    if (won === null) return fail('errors.generic');
+    return {
+      ok: true,
+      key: 'hq.nachschub.done.plainKept',
+      id,
+      params: { count: won.length },
+      undo: async () => ((await this.supplies.casSource(won, 'manual', 'search')) === null ? fail('errors.generic') : UNDONE),
+    };
   }
 
   /**
@@ -1697,6 +1800,29 @@ export function isLegacyWishLine(l: SupplyItem): boolean {
   if (l.source !== 'search' || l.done || !l.className || !l.entityKind) return false;
   if (l.gather?.length || l.stepKind || l.amount !== null || l.minQuality) return false;
   return (l.entityKind !== 'item' && l.entityKind !== 'ship') || !!l.forClassName;
+}
+
+/** First day the `wish` source existed: older plain lines may be wishes the old contract moved off the wishlist. */
+export const PLAIN_LINE_CUTOFF = '2026-11-17T00:00:00Z';
+
+/**
+ * The complement of {@link isLegacyWishLine} (H4): an open, plain `search` item / ship line made before the cut-off.
+ * It may be an old wish assignment or a Bestand line planned without a place - only the owner knows. Lines made since
+ * are excluded because the Bestand / HQ-search flows still write plain `search` lines that are no wishes.
+ */
+export function isPlainSearchLine(l: SupplyItem): boolean {
+  if (l.source !== 'search' || l.done || !l.className || !l.entityKind || l.forClassName) return false;
+  if (l.entityKind !== 'item' && l.entityKind !== 'ship') return false;
+  if (l.gather?.length || l.stepKind || l.amount !== null || l.minQuality) return false;
+  const made = Date.parse(l.createdAt ?? l.updatedAt);
+  return Number.isFinite(made) && made < Date.parse(PLAIN_LINE_CUTOFF);
+}
+
+interface LiftedGroup {
+  readonly won: readonly string[];
+  readonly p: WishPosition;
+  readonly added: number;
+  readonly lowered: readonly LineChange[];
 }
 
 /** {@link positionKey} of the wish a line answers. */

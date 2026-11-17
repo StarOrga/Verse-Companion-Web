@@ -12,6 +12,7 @@ import { NachschubService, type NachschubResult } from '../nachschub/nachschub.s
 import { isEventNachschub } from '../events/event-nachschub';
 import { EventHqService } from '../events/event-hq.service';
 import { HqNachschubBoardComponent } from './hq-nachschub-board.component';
+import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { HqNachschubArchiveDialogComponent, HqNachschubRemoveDialogComponent } from './hq-nachschub-dialogs.component';
 import { HqNachschubFlowComponent } from './hq-nachschub-flow.component';
 import { HqNachschubPanelComponent } from './hq-nachschub-panel.component';
@@ -63,7 +64,8 @@ import { HqNachschubPanelComponent } from './hq-nachschub-panel.component';
         <sc-hq-nachschub-panel
           [nachschub]="sel"
           (edit)="flow.set({ mode: 'edit', id: sel.id, step: $event })"
-          (remove)="askRemove(sel.id, 'remove')" />
+          (remove)="askRemove(sel.id, 'remove')"
+          (answered)="announce($event)" />
       } @else if (ns.loaded() || !ns.error()) {
         <section class="intro">
           <p class="intro-title">{{ 'hq.slots.introTitle' | translate }}</p>
@@ -79,7 +81,7 @@ import { HqNachschubPanelComponent } from './hq-nachschub-panel.component';
       <sc-hq-nachschub-remove-dialog [name]="nameOf(r.id)" [mode]="r.kind" [open]="openCountOf(r.id)" (cancelled)="removing.set(null)" (confirmed)="doRemove($event)" />
     }
     @if (archiveOpen()) {
-      <sc-hq-nachschub-archive-dialog (closed)="archiveOpen.set(false)" (reactivate)="reactivate($event)" />
+      <sc-hq-nachschub-archive-dialog (closed)="archiveOpen.set(false)" (reactivate)="reactivate($event)" (removeArchived)="removeArchived($event)" />
     }
     @if (notice(); as n) {
       <div class="notice" role="status">
@@ -117,6 +119,7 @@ export class HqPlanComponent {
   protected readonly flow = signal<{ mode: 'new' | 'edit'; id: string | null; step: 1 | 2 } | null>(null);
   protected readonly removing = signal<{ id: string; kind: 'remove' | 'empty' } | null>(null);
   protected readonly archiveOpen = signal(false);
+  private readonly confirm = inject(ScConfirmService);
   protected readonly notice = signal<{ key: string; params?: Record<string, string | number>; warn?: NachschubResult['warn']; undo?: () => Promise<NachschubResult> } | null>(null);
   private noticeTimer: ReturnType<typeof setTimeout> | undefined;
   private readonly listRoute = inject(ActivatedRoute);
@@ -264,6 +267,19 @@ export class HqPlanComponent {
     this.announce(res);
   }
 
+  /** Delete an archived Operation for good: asked like the active delete, but it holds history only (no wish moves). */
+  protected async removeArchived(id: string): Promise<void> {
+    const ok = await this.confirm.confirm({
+      titleKey: 'hq.archive.removeTitle',
+      messageKey: 'hq.archive.removeMsg',
+      params: { name: this.nameOf(id) },
+      confirmKey: 'hq.archive.removeConfirm',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    this.announce(await this.ns.removeArchived(id));
+  }
+
   protected onFlowDone(res: NachschubResult): void {
     this.flow.set(null);
     this.dropPickParam();
@@ -272,7 +288,7 @@ export class HqPlanComponent {
   }
 
   /** A result with its undo as a notice at the bottom (8 s). */
-  private announce(res: NachschubResult): void {
+  protected announce(res: NachschubResult): void {
     clearTimeout(this.noticeTimer);
     this.notice.set({ key: res.key, params: res.params, warn: res.warn, undo: res.undo });
     this.noticeTimer = setTimeout(() => this.notice.set(null), NOTICE_MS);

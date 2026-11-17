@@ -5988,6 +5988,11 @@
       "slotFree": "Ein Platz ist frei, du kannst eine Operation zurückholen.",
       "empty": "Noch nichts im Archiv. Eine fertige Operation rutscht von selbst hierher und macht seinen Platz frei.",
       "reactivate": "Wieder aktivieren",
+      "remove": "Löschen",
+      "removeAria": "Operation „{{name}}“ endgültig löschen",
+      "removeTitle": "„{{name}}“ löschen?",
+      "removeMsg": "Die Operation liegt im Archiv und enthält nur Erledigtes. Sie wird endgültig gelöscht und lässt sich nicht zurückholen. Deine Wunschliste und die sieben Plätze bleiben, wie sie sind.",
+      "removeConfirm": "Endgültig löschen",
       "close": "Schließen"
     },
     "flow": {
@@ -6074,6 +6079,13 @@
       }
     },
     "panel": {
+      "plain": {
+        "one": "1 Zeile ist noch kein Wunsch.",
+        "other": "{{count}} Zeilen sind noch keine Wünsche.",
+        "ask": "Vor dem Umbau angelegt. Sollen sie als Wünsche auf deiner Wunschliste stehen?",
+        "adopt": "Als Wünsche führen",
+        "keep": "So lassen"
+      },
       "renameAria": "Neuer Name der Operation",
       "rename": "Namen ändern",
       "positions": "Positionen",
@@ -6413,6 +6425,8 @@
         "created": "„{{name}}“ ist angelegt.",
         "undone": "Rückgängig gemacht.",
         "reactivated": "Operation ist wieder aktiv.",
+        "plainAdopted": "{{count}} Positionen stehen jetzt als Wünsche auf deiner Wunschliste.",
+        "plainKept": "{{count}} Positionen bleiben, wie sie sind.",
         "emptied": "Operation geleert.",
         "removed": "Operation gelöscht.",
         "added": "Zur Operation hinzugefügt.",
@@ -6447,6 +6461,7 @@
       "linesFull": "Deine Operation ist voll (100 Positionen). Entferne erst Positionen, dann kannst du weitere zuweisen.",
       "partial": "{{count}} Positionen sind geblieben: Deine Operation ist voll.",
       "wishlistFailed": "Deine Wünsche konnten nicht geändert werden. Es wurde nichts verschoben.",
+      "plainGone": "Diese Positionen wurden schon auf einem anderen Gerät beantwortet. Die Ansicht wird aktualisiert.",
       "wishCapped": "{{count}} Stück passen nicht mehr in deine Wünsche (höchstens 999 je Eintrag) und gehen verloren.",
       "gone": "Diese Operation existiert nicht mehr (auf einem anderen Gerät gelöscht). Die Ansicht wird aktualisiert.",
       "capReached": "Du hast das Limit an gespeicherten Operationen erreicht. Lösche alte aus dem Archiv, dann klappt es wieder.",

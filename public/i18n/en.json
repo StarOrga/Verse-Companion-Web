@@ -5988,6 +5988,11 @@
       "slotFree": "A slot is free, you can bring an Operation back.",
       "empty": "Nothing in the archive yet. A finished Operation moves here by itself and frees its slot.",
       "reactivate": "Reactivate",
+      "remove": "Delete",
+      "removeAria": "Delete Operation \"{{name}}\" for good",
+      "removeTitle": "Delete \"{{name}}\"?",
+      "removeMsg": "This Operation is in the archive and holds only finished work. It is deleted for good and cannot be brought back. Your wishlist and the seven slots stay as they are.",
+      "removeConfirm": "Delete for good",
       "close": "Close"
     },
     "flow": {
@@ -6074,6 +6079,13 @@
       }
     },
     "panel": {
+      "plain": {
+        "one": "1 line is not a wish yet.",
+        "other": "{{count}} lines are not wishes yet.",
+        "ask": "Created before the rebuild. Should they stand as wishes on your wishlist?",
+        "adopt": "Keep as wishes",
+        "keep": "Leave as is"
+      },
       "renameAria": "New name of the Operation",
       "rename": "Change name",
       "positions": "positions",
@@ -6413,6 +6425,8 @@
         "created": "\"{{name}}\" is created.",
         "undone": "Undone.",
         "reactivated": "Operation is active again.",
+        "plainAdopted": "{{count}} lines are now wishes on your wishlist.",
+        "plainKept": "{{count}} lines stay as they are.",
         "emptied": "Operation emptied.",
         "removed": "Operation deleted.",
         "added": "Added to the Operation.",
@@ -6447,6 +6461,7 @@
       "linesFull": "Your Operation is full (100 positions). Remove some positions first, then you can assign more.",
       "partial": "{{count}} positions stayed behind: your Operation is full.",
       "wishlistFailed": "Your wishes could not be changed. Nothing was moved.",
+      "plainGone": "These lines were already answered on another device. The view is refreshing.",
       "wishCapped": "{{count}} units no longer fit among your wishes (999 per entry at most) and are lost.",
       "gone": "This Operation no longer exists (deleted on another device). The view is refreshing.",
       "capReached": "You reached the limit of stored Operations. Delete old ones from the archive and it works again.",
