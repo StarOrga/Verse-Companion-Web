@@ -10,6 +10,7 @@ import { DesktopConnectionService } from '../desktop/desktop-connection.service'
 import { HangarService } from '../hangar/hangar.service';
 import { ShellChromeService } from '../shell/fusion-bar/shell-chrome.service';
 import { SceneCameraService } from '../shell/scene/scene-camera.service';
+import { fakeSupabase } from '../testing/fake-supabase';
 import { HqLandingComponent } from './hq-landing.component';
 import { HqOverviewComponent } from './hq-overview.component';
 import { HqPagesComponent } from './hq-pages.component';
@@ -26,9 +27,14 @@ function baseProviders(shell: boolean) {
     provideRouter([]),
     provideLocationMocks(),
     provideTranslateService({ fallbackLang: 'en' }),
+    // The follow pages reach services that ask the database for shared loadouts and ship configs.
+    fakeSupabase().provider,
     { provide: BetaService, useValue: { isEnabled: () => signal(shell) } },
     { provide: AuthService, useValue: { user: signal(null) } },
-    { provide: HangarService, useValue: { ships: signal([]), roleLoadouts: signal([]), loadAll: () => Promise.resolve() } },
+    {
+      provide: HangarService,
+      useValue: { ships: signal([]), roleLoadouts: signal([]), loading: signal(false), error: signal(null), loadAll: () => Promise.resolve() },
+    },
     { provide: DesktopConnectionService, useValue: { connections: signal([]), refresh: () => Promise.resolve(), stateFor: () => 'never' } },
   ];
 }
