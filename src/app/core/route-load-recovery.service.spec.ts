@@ -186,4 +186,72 @@ describe('RouteLoadRecoveryService', () => {
     expect(assign).toHaveBeenCalledWith('/friends');
     expect(service.loadFailed()).toBe(false);
   });
+  describe('recoverFromStaleChunk (#367, failed @defer chunks)', () => {
+    it('reloads the current page exactly once per session', async () => {
+      const service = setup();
+      expect(service.recoverFromStaleChunk()).toBe('reloading');
+      await flush();
+      expect(reload).toHaveBeenCalledTimes(1);
+      expect(assign).not.toHaveBeenCalled();
+      expect(sessionStore.get('sc.defer.recovered')).toBe('1');
+
+      // The reloaded document (fresh service, marker kept) fails again: no loop.
+      const store = sessionStore;
+      TestBed.resetTestingModule();
+      const second = setup();
+      store.forEach((v, k) => sessionStore.set(k, v));
+      expect(second.recoverFromStaleChunk()).toBe('hint');
+      await flush();
+      expect(reload).not.toHaveBeenCalled();
+    });
+
+    it('a successful navigation does not rearm it', async () => {
+      const service = setup();
+      service.recoverFromStaleChunk();
+      await flush();
+      events.next(new NavigationEnd(2, '/codex', '/codex'));
+      // Unlike the route marker, a completed navigation leaves it spent.
+      expect(service.recoverFromStaleChunk()).toBe('hint');
+      await flush();
+      expect(reload).toHaveBeenCalledTimes(1);
+    });
+
+    it('never reloads once the reader interacted — mid-work it only hints', async () => {
+      events = new Subject<unknown>();
+      reload = vi.fn();
+      assign = vi.fn();
+      sessionStore = new Map<string, string>();
+      const listeners: Record<string, () => void> = {};
+      TestBed.configureTestingModule({
+        providers: [
+          RouteLoadRecoveryService,
+          { provide: Router, useValue: { events } },
+          {
+            provide: DOCUMENT,
+            useValue: {
+              location: { assign, reload },
+              defaultView: {
+                sessionStorage: {
+                  getItem: (k: string) => sessionStore.get(k) ?? null,
+                  setItem: (k: string, v: string) => void sessionStore.set(k, v),
+                  removeItem: (k: string) => void sessionStore.delete(k),
+                },
+              },
+              addEventListener: (type: string, fn: () => void) => (listeners[type] = fn),
+            },
+          },
+        ],
+      });
+      const service = TestBed.inject(RouteLoadRecoveryService);
+      service.init();
+      listeners['pointerdown']();
+
+      expect(service.recoverFromStaleChunk()).toBe('hint');
+      await flush();
+      expect(reload).not.toHaveBeenCalled();
+      expect(service.loadFailed()).toBe(false);
+      expect(service.recoverFromStaleChunk({ notice: true })).toBe('hint');
+      expect(service.loadFailed()).toBe(true);
+    });
+  });
 });

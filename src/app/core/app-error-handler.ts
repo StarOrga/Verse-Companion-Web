@@ -87,7 +87,7 @@ export function isDeferLoadError(error: unknown): boolean {
   if (code === -750 || code === 750) return true;
   const raw = (error as { message?: unknown }).message;
   if (typeof raw !== 'string') return false;
-  return /^NG0750/.test(raw) || (raw.includes('@defer') && isRouteChunkError(error));
+  return /^NG0750(?!d)/.test(raw) || (raw.includes('@defer') && isRouteChunkError(error));
 }
 
 const BEARER_PATH = /(\/shared\/loadout\/|\/hangar\/shared\/)[^/\s'")?#]+/g;
