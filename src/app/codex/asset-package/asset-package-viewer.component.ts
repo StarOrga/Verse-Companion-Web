@@ -4,6 +4,7 @@ import {
   DestroyRef,
   ElementRef,
   NgZone,
+  afterNextRender,
   computed,
   effect,
   inject,
@@ -167,8 +168,7 @@ const WHEEL_LINE_PX = 33;
       <!-- The parts take the pointer on the canvas itself (scene.pick): hover, click, a second click and a click
            into empty space; a drag rotates. A double click re-frames, but only off a part. -->
       <canvas #canvas class="stage" aria-hidden="true" [style.cursor]="overPart() ? 'pointer' : null"
-              (pointerdown)="onPointerDown($event)" (pointermove)="onPointerMove($event)"
-              (pointerleave)="onPointerLeave()" (click)="onCanvasClick($event)" (auxclick)="onCanvasClick($event)"
+              (click)="onCanvasClick($event)" (auxclick)="onCanvasClick($event)"
               (dblclick)="onCanvasDblClick($event)"></canvas>
 
       @if (status() === 'loading') {
@@ -740,6 +740,24 @@ export class AssetPackageViewerComponent {
     this.zone.runOutsideAngular(() =>
       this.host.nativeElement.addEventListener('wheel', this.onWheel, { capture: true, passive: false }),
     );
+    // Pointer travel and hover run outside Angular (a move must not check the whole page);
+    // only a signal that changes reaches the view. Clicks stay template listeners.
+    afterNextRender(() => {
+      const el = this.canvas().nativeElement;
+      const down = (ev: PointerEvent) => this.onPointerDown(ev);
+      const move = (ev: PointerEvent) => this.onPointerMove(ev);
+      const leave = () => this.onPointerLeave();
+      this.zone.runOutsideAngular(() => {
+        el.addEventListener('pointerdown', down);
+        el.addEventListener('pointermove', move);
+        el.addEventListener('pointerleave', leave);
+      });
+      destroyRef.onDestroy(() => {
+        el.removeEventListener('pointerdown', down);
+        el.removeEventListener('pointermove', move);
+        el.removeEventListener('pointerleave', leave);
+      });
+    });
     if (typeof IntersectionObserver === 'function') {
       this.visObs = new IntersectionObserver((entries) => {
         const last = entries[entries.length - 1];
