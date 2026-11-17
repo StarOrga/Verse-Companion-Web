@@ -75,7 +75,8 @@ const EDGE = 8;
       </button>
       @if (open()) {
         <sc-popup #panel id="holo-hangar-menu" class="menu" kind="panel" size="s" [float]="true" [backdrop]="false" [backClose]="false"
-                  [title]="shipName()" [returnFocus]="trigger" (closed)="close()" (keydown)="onPanelKey($event)">
+                  [title]="shipName()" [returnFocus]="trigger" (closed)="close()" (keydown)="onPanelKey($event)"
+                  (click)="onPanelClick($event)" (focusout)="onPanelFocusOut()">
           <section class="grp" [attr.aria-label]="'codex.holo.hangar.loadouts' | translate">
             <div class="gh" aria-hidden="true">{{ 'codex.holo.hangar.loadouts' | translate }}</div>
             <a class="row" [class.on]="activeId() === null" [attr.aria-current]="activeId() === null ? 'true' : null"
@@ -209,10 +210,13 @@ const EDGE = 8;
      * button allows, the body scrolls. On a phone it also ends above the feedback launcher (--sc-fab-clear-block).
      */
     .menu { position: absolute; top: calc(100% + 6px); left: var(--hm-left, auto); z-index: 30;
-      inline-size: var(--hm-w, min(28rem, calc(100vw - 16px)));
-      --sc-popup-max-h: min(85dvh, calc(100dvh - var(--hm-top, 120px) - 8px)); }
+      inline-size: var(--hm-w, min(28rem, calc(100vw - 16px))); max-inline-size: none;
+      --sc-popup-max-h: min(600px, calc(100dvh - var(--hm-top, 120px) - 16px)); }
     .menu ::ng-deep .scp-frame { inline-size: 100%; }
-    @media (max-width: 720px) { .menu { --sc-popup-max-h: calc(100dvh - var(--hm-top, 120px) - var(--sc-fab-clear-block)); } }
+    /* Phones: the right edge stays out of the launcher lane (place()), the bottom above the floating buttons and docks. */
+    @media (max-width: 720px) {
+      .menu { --sc-popup-max-h: calc(100dvh - var(--hm-top, 120px) - var(--sc-toast-bottom, var(--sc-fab-clear-block))); }
+    }
     .grp { display: flex; flex-direction: column; gap: 2px; margin-block-end: 12px; }
     .gh { padding: 0 10px 2px; font-size: max(9px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); }
     .row { display: flex; align-items: flex-start; gap: 9px; width: 100%; box-sizing: border-box; min-height: 32px; padding: 7px 10px;
@@ -321,7 +325,9 @@ export class CodexHoloHangarMenuComponent {
     const r = btn.getBoundingClientRect();
     const vw = window.innerWidth;
     const phone = window.matchMedia(PHONE_QUERY).matches;
-    const w = Math.min(PANEL_W, vw - 2 * EDGE);
+    // A phone's panel spans the screen up to the launcher lane, so nothing of it lies under the floating buttons.
+    const lane = phone ? cssPx(this.host, '--sc-fab-clear-inline') : EDGE;
+    const w = Math.min(PANEL_W, vw - EDGE - lane);
     const left = phone ? EDGE : Math.min(Math.max(EDGE, r.right - w), vw - EDGE - w);
     this.host.style.setProperty('--hm-w', `${w}px`);
     this.host.style.setProperty('--hm-left', `${Math.round(left - r.left)}px`);
@@ -362,12 +368,36 @@ export class CodexHoloHangarMenuComponent {
     }
   }
 
+  /** "Zuordnen" opened the picker in the flow: bring it into view inside the scrolling body. */
+  onPanelClick(ev: MouseEvent): void {
+    if (!(ev.target instanceof Element) || !ev.target.closest('button.assign')) return;
+    setTimeout(() => this.host.querySelector('sc-item-path-assign')?.scrollIntoView?.({ block: 'nearest' }));
+  }
+
+  /** A station re-rendered under the focus (the add button became the counter): focus stays in the panel. */
+  onPanelFocusOut(): void {
+    setTimeout(() => {
+      if (!this.open() || (document.activeElement && document.activeElement !== document.body)) return;
+      (this.host.querySelector('.menu .scp-frame') as HTMLElement | null)?.focus({ preventScroll: true });
+    });
+  }
+
   /** A press beside the button and the panel closes it; a press in a dialog or tooltip it opened (CDK overlay) does not. */
   onOutside(ev: PointerEvent): void {
     if (!this.open() || !(ev.target instanceof Element)) return;
     if (this.host.contains(ev.target) || ev.target.closest('.cdk-overlay-container')) return;
     this.close();
   }
+}
+
+/** A length token in px, resolved through a probe (the token is a calc() over env() and other tokens). */
+function cssPx(at: HTMLElement, token: string): number {
+  const probe = document.createElement('div');
+  probe.style.cssText = `position:absolute;visibility:hidden;inline-size:var(${token}, 0px)`;
+  at.appendChild(probe);
+  const px = probe.getBoundingClientRect().width;
+  probe.remove();
+  return px || EDGE;
 }
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';

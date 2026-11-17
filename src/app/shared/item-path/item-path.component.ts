@@ -108,6 +108,9 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
  * (`sc-item-path-assign`). The ownership station mirrors it: head with counter -> one-line strip "N× im Inventar ·
  * <nearest place> +k weitere Orte" -> or only its button. Rows and cards never assign; an assigned wish node carries
  * the small Route badge. Lowering the wish always runs through WishRemovalFlowService (C6).
+ *
+ * Host slots (primary): `[ipWishExtra]` at the end of the wish station, `[ipOwnTools]` in the ownership head (only while
+ * owned), `[ipOwnExtra]` under the ownership strip or button.
  */
 @Component({
   selector: 'sc-item-path',
