@@ -84,6 +84,16 @@
         "hunks": [
           "306d663f2c2c"
         ]
+      },
+      {
+        "ship": "claude/holotisch-decks-display-5750f7",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree",
+        "decided": true,
+        "at": "2026-11-17T23:43:48.404Z",
+        "hunks": [
+          "8b2b6cc09011"
+        ]
       }
     ],
     ".claude/project-map.md›data-uploader/python/tests›count": [
