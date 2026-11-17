@@ -1420,7 +1420,47 @@
         "view3dHint": "drag · turn · wheel · zoom",
         "zoomIn": "Zoom in",
         "zoomOut": "Zoom out",
-        "viewReset": "Reset the view"
+        "viewReset": "Reset the view",
+        "one": {
+          "grid": "Cargo grid",
+          "lift": "Lift",
+          "stairs": "Stairs",
+          "ladder": "Ladder",
+          "ramp": "Ramp",
+          "airlock": "Airlock",
+          "dockingTube": "Docking tube",
+          "escapePod": "Escape pod",
+          "medBed": "Med bed",
+          "respawn": "Respawn point",
+          "weaponRack": "Weapon rack",
+          "locker": "Locker",
+          "fireExt": "Fire extinguisher",
+          "relay": "Relay",
+          "powerPlant": "Power plant",
+          "cooler": "Cooler",
+          "shield": "Shield generator",
+          "quantumDrive": "Quantum drive",
+          "jumpDrive": "Jump module",
+          "lifeSupport": "Life support",
+          "radar": "Radar",
+          "fuelTank": "Fuel tank",
+          "maintenance": "Maintenance point",
+          "turret": "Turret (access)",
+          "computer": "Computer",
+          "bed": "Bed",
+          "head": "Toilet & shower",
+          "door": "Door"
+        },
+        "oneDoor": {
+          "room": "Room door",
+          "inner": "Inner door / hatch",
+          "lift": "Lift door",
+          "hangar": "Hangar door",
+          "bow": "Bow door",
+          "airlock": "Airlock door",
+          "ramp": "Ramp door",
+          "cell": "Cell door"
+        }
       }
     },
     "empty": {

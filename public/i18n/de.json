@@ -1420,7 +1420,47 @@
         "view3dHint": "ziehen · drehen · Rad · zoomen",
         "zoomIn": "Näher heran",
         "zoomOut": "Weiter weg",
-        "viewReset": "Blick zurücksetzen"
+        "viewReset": "Blick zurücksetzen",
+        "one": {
+          "grid": "Fracht-Grid",
+          "lift": "Aufzug",
+          "stairs": "Treppe",
+          "ladder": "Leiter",
+          "ramp": "Rampe",
+          "airlock": "Luftschleuse",
+          "dockingTube": "Andockröhre",
+          "escapePod": "Rettungskapsel",
+          "medBed": "Medbett",
+          "respawn": "Respawn-Punkt",
+          "weaponRack": "Waffenständer",
+          "locker": "Spind",
+          "fireExt": "Feuerlöscher",
+          "relay": "Relais",
+          "powerPlant": "Kraftwerk",
+          "cooler": "Kühler",
+          "shield": "Schildgenerator",
+          "quantumDrive": "Quantenantrieb",
+          "jumpDrive": "Sprungmodul",
+          "lifeSupport": "Lebenserhaltung",
+          "radar": "Radar",
+          "fuelTank": "Tank",
+          "maintenance": "Wartungspunkt",
+          "turret": "Turm (Zugang)",
+          "computer": "Computer",
+          "bed": "Bett",
+          "head": "WC & Bad",
+          "door": "Tür"
+        },
+        "oneDoor": {
+          "room": "Raumtür",
+          "inner": "Innentür / Klappe",
+          "lift": "Aufzugstür",
+          "hangar": "Hangartor",
+          "bow": "Bugtür",
+          "airlock": "Schleusentür",
+          "ramp": "Rampentor",
+          "cell": "Zellentür"
+        }
       }
     },
     "empty": {

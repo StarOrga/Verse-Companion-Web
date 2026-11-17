@@ -43,6 +43,8 @@ export interface OuterPartRef {
   port: string;
   label: string;
   terms: readonly string[];
+  /** Parts of the same name (eleven turrets of one kind) are one hit. */
+  count: number;
 }
 
 type SearchTarget =
@@ -169,6 +171,7 @@ type SearchTarget =
     .srch svg { position: absolute; inset-inline-start: 10px; width: 15px; height: 15px; fill: none; stroke: var(--sc-fg-2); stroke-width: 1.8; pointer-events: none; }
     .srch input { width: 100%; box-sizing: border-box; min-height: 32px; padding: 0 12px 0 32px; border: 1px solid var(--sc-border); border-radius: 16px;
       background: color-mix(in srgb, var(--sc-bg-0) 60%, transparent); color: var(--sc-fg-0); font: inherit; font-size: max(12.5px, var(--f)); }
+    .srch input::-webkit-search-cancel-button { appearance: none; }
     .srch input:focus { border-color: color-mix(in srgb, var(--sc-accent) 60%, var(--sc-border)); }
     .srch input:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
     h4 { margin: 6px 0 2px; font-size: max(10.5px, var(--f)); letter-spacing: 0.12em; text-transform: uppercase; color: var(--sc-fg-2); font-weight: 600; }
@@ -353,7 +356,7 @@ export class CodexHoloInteriorComponent {
       if (!g) return null;
       const meta = [deckLabel(g.deck), roomLabel(g.room)].filter(Boolean).join(' · ');
       return {
-        title: this.t('codex.holo.interior.cat.grid'),
+        title: this.t('codex.holo.interior.one.grid'),
         group: 'cargo' as ShipInteriorGroup,
         glyph: GROUP_GLYPH.cargo,
         meta,
@@ -376,7 +379,7 @@ export class CodexHoloInteriorComponent {
     const z = poi.pos[2];
     facts.push({ k: 'codex.holo.interior.fact.height', v: `${z >= 0 ? '+' : ''}${this.fmt(z)} m` });
     return {
-      title: this.rowLabel(row),
+      title: this.t(row.doorKind ? `codex.holo.interior.oneDoor.${row.doorKind}` : `codex.holo.interior.one.${poi.cat}`),
       group: GROUP_OF_CAT[poi.cat],
       glyph: glyphOf(poi.cat),
       meta: [deckLabel(poi.deck), roomLabel(poi.room)].filter(Boolean).join(' · '),
@@ -391,7 +394,7 @@ export class CodexHoloInteriorComponent {
   readonly entries = computed<SearchEntry<SearchTarget>[]>(() => {
     const out: SearchEntry<SearchTarget>[] = [];
     for (const part of this.parts()) {
-      out.push({ id: `p:${part.port}`, side: 'outer', label: part.label, terms: [part.label, ...part.terms], count: 1, target: { type: 'part', port: part.port } });
+      out.push({ id: `p:${part.port}`, side: 'outer', label: part.label, terms: [part.label, ...part.terms], count: part.count, target: { type: 'part', port: part.port } });
     }
     const int = this.interior();
     if (int) {
@@ -405,9 +408,20 @@ export class CodexHoloInteriorComponent {
           out.push({ id: `r:${row.id}`, side: 'inner', label, terms: [label, groupName, ...new Set(classes.filter(Boolean))], count: row.items.length, target: { type: 'row', row } });
         }
       }
+      // One hit per room name and deck (an Idris has four "Turret Access" on one deck).
+      const seen = new Map<string, SearchEntry<SearchTarget>>();
       for (const room of this.rooms()) {
+        if (!room.label.trim()) continue;
         const deck = this.deckLabels().get(room.deck) ?? room.deck;
-        out.push({ id: `m:${room.key}`, side: 'inner', label: `${room.label} · ${deck}`, terms: [room.label, room.key], count: 1, target: { type: 'room', room } });
+        const label = `${room.label} · ${deck}`;
+        const had = seen.get(label);
+        if (had) {
+          had.count += 1;
+          continue;
+        }
+        const entry: SearchEntry<SearchTarget> = { id: `m:${room.key}`, side: 'inner', label, terms: [room.label, room.key], count: 1, target: { type: 'room', room } };
+        seen.set(label, entry);
+        out.push(entry);
       }
     }
     return out;

@@ -1,0 +1,76 @@
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import type { ShipInteriorGroup } from '../codex.types';
+import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
+
+/**
+ * The interior's element groups above the holotable (concept 20261117-1810 B8):
+ * multi-select chips in the groups' colours, the role preset they opened on
+ * („Voreinstellung Fregatte“) and its reset. Nothing here is remembered.
+ */
+@Component({
+  selector: 'sc-codex-holo-interior-chips',
+  standalone: true,
+  imports: [TranslatePipe, ScActionDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <div class="ig" role="group" [attr.aria-label]="'codex.holo.interior.groupsAria' | translate">
+      <div class="ig-row">
+        @for (g of chips; track g.id) {
+          <button type="button" class="ig-chip" [attr.data-g]="g.id" [class.on]="groups().has(g.id)"
+                  [attr.aria-pressed]="groups().has(g.id)" (click)="groupToggle.emit(g.id)">
+            <svg class="ig-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" class="ic-bg" /><path [attr.d]="g.glyph.d" [class.fill]="g.glyph.fill" /></svg>
+            {{ g.labelKey | translate }}
+          </button>
+        }
+      </div>
+      <span class="ig-tag">{{ 'codex.holo.interior.presetTag' | translate }} <b>{{ presetLabel() }}</b></span>
+      <button type="button" scAction tier="secondary" class="ig-reset" [attr.aria-disabled]="untouched() ? true : null"
+              (click)="presetReset.emit()">{{ 'codex.holo.interior.presetReset' | translate }}</button>
+    </div>
+  `,
+  styles: [`
+    :host { display: block; min-width: 0; }
+  .ig { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1 1 auto; }
+  .ig-row { display: flex; gap: 5px; min-width: 0; flex: 0 1 auto; overflow-x: auto; overscroll-behavior-x: contain; padding: 2px 24px 4px 0;
+  mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); }
+  .ig-tag, .ig-reset { flex: none; }
+  .ig-reset { min-height: 26px; padding-block: 0; font-size: max(11.5px, var(--f)); }
+  .ig-chip { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px 0 4px; border: 1px solid var(--l1); border-radius: 13px;
+  background: none; color: var(--sc-fg-2); font: inherit; font-size: max(11.5px, var(--f)); white-space: nowrap; cursor: pointer;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease; --g: var(--sc-accent); }
+  .ig-chip[data-g='cargo'] { --g: var(--sc-int-cargo); }
+  .ig-chip[data-g='ways'] { --g: var(--sc-int-ways); }
+  .ig-chip[data-g='med'] { --g: var(--sc-int-med); }
+  .ig-chip[data-g='weapons'] { --g: var(--sc-int-weapons); }
+  .ig-chip[data-g='lockers'] { --g: var(--sc-int-lockers); }
+  .ig-chip[data-g='fire'] { --g: var(--sc-int-fire); }
+  .ig-chip[data-g='tech'] { --g: var(--sc-int-tech); }
+  .ig-chip[data-g='living'] { --g: var(--sc-int-living); }
+  .ig-chip[data-g='doors'] { --g: var(--sc-int-doors); }
+  .ig-ic { width: 18px; height: 18px; flex: none; color: var(--g); opacity: 0.55; }
+  .ig-ic .ic-bg { fill: var(--sc-bg-0); stroke: currentColor; stroke-width: 1.6px; }
+  .ig-ic path { fill: none; stroke: currentColor; stroke-width: 1.8px; }
+  .ig-ic path.fill { fill: currentColor; stroke: none; }
+  .ig-chip.on { color: var(--sc-fg-0); border-color: color-mix(in srgb, var(--g) 70%, transparent); background: color-mix(in srgb, var(--g) 14%, transparent); }
+  .ig-chip.on .ig-ic { opacity: 1; }
+  .ig-chip:hover { color: var(--sc-fg-0); border-color: var(--l2); }
+  .ig-chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+  .ig-tag { font-size: max(11px, var(--f)); color: var(--sc-fg-2); white-space: nowrap; }
+  .ig-tag b { color: var(--sc-fg-0); font-weight: 600; }
+  @media (pointer: coarse) { .ig-chip { height: var(--sc-tap-min, 44px); } }
+  /* Narrow: the chips take their own line and scroll; the preset and its reset sit under them. */
+  @media (max-width: 1000px) { .ig { flex-wrap: wrap; } .ig-row { flex: 1 1 100%; } }
+  `],
+})
+export class CodexHoloInteriorChipsComponent {
+  readonly groups = input<ReadonlySet<ShipInteriorGroup>>(new Set());
+  readonly presetLabel = input('');
+  /** The preset is on as it opened: the reset has nothing to do. */
+  readonly untouched = input(true);
+  readonly groupToggle = output<ShipInteriorGroup>();
+  readonly presetReset = output<void>();
+
+  readonly chips = INTERIOR_GROUPS.map((id) => ({ id, labelKey: `codex.holo.interior.group.${id}`, glyph: GLYPH_PATHS[GROUP_GLYPH[id]] }));
+}

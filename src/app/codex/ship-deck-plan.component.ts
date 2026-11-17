@@ -368,7 +368,8 @@ export class ShipDeckPlanComponent {
     });
     const icons = interior.pois.flatMap((p, index) => {
       const group = GROUP_OF_CAT[p.cat];
-      if (p.deck !== deck.key || !groups.has(group)) return [];
+      const picked = pick?.kind === 'poi' && pick.index === index;
+      if (p.deck !== deck.key || (!groups.has(group) && !picked)) return [];
       return [{ index, group, glyph: glyphOf(p.cat), door: p.cat === 'door', ...at(p.pos[0], p.pos[1]) }];
     });
     const el = pick ? (pick.kind === 'grid' ? interior.cargoGrids[pick.index] : interior.pois[pick.index]) : null;

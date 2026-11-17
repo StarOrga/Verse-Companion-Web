@@ -273,7 +273,8 @@ export function buildScene3d(input: Scene3dInput): Scene3d | null {
   const icons: Scene3dIcon[] = [];
   interior?.pois.forEach((p, index) => {
     const group = GROUP_OF_CAT[p.cat];
-    if (!shown(p.deck) || !input.groups.has(group) || p.cat === 'ladder') return;
+    const picked = input.pick?.kind === 'poi' && input.pick.index === index;
+    if (!shown(p.deck) || (!input.groups.has(group) && !picked) || p.cat === 'ladder') return;
     icons.push({ index, cat: p.cat, group, glyph: glyphOf(p.cat), at: cam.p(p.pos[0], p.pos[1], p.pos[2]), door: p.cat === 'door' });
   });
   // Far icons first, so a near one is drawn over them.

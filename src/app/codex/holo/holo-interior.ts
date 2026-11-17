@@ -302,12 +302,22 @@ export interface SearchEntry<T> {
   target: T;
 }
 
-/** The entries matching `query`, best first; empty for a query under two letters. */
+/**
+ * The entries matching `query`, best first; empty for a query under two letters. The label
+ * counts in full, every further term (group, type, class name) a little less: "Tür" finds the
+ * doors before a turret whose type merely starts the same way.
+ */
 export function searchEntries<T>(query: string, entries: readonly SearchEntry<T>[], max = 30): SearchEntry<T>[] {
   const q = foldText(query);
   if (q.length < 2) return [];
+  // Folding drops the umlaut ("tür" would equal "tur" of "Turret"): a label that holds the query as typed ranks first.
+  const typed = query.trim().toLocaleLowerCase();
+  const score = (e: SearchEntry<T>) => {
+    const s = Math.max(fuzzyScore(q, e.label), ...e.terms.map((t) => (t === e.label ? fuzzyScore(q, t) : fuzzyScore(q, t) - 15)), 0);
+    return s > 0 && e.label.toLocaleLowerCase().includes(typed) ? s + 12 : s;
+  };
   return entries
-    .map((e, i) => ({ e, i, s: Math.max(0, ...e.terms.map((t) => fuzzyScore(q, t))) }))
+    .map((e, i) => ({ e, i, s: score(e) }))
     .filter((x) => x.s > 0)
     .sort((a, b) => b.s - a.s || a.i - b.i)
     .slice(0, max)

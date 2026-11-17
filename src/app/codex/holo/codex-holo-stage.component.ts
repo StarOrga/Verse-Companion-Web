@@ -74,9 +74,6 @@ import { RoomLabelTranslations } from '../room-label-translations';
 import type { Lang, ShipDeck, ShipInteriorGroup, ShipPayload } from '../codex.types';
 import { AnalyticsService } from '../../core/analytics.service';
 import {
-  GLYPH_PATHS,
-  GROUP_GLYPH,
-  INTERIOR_GROUPS,
   InteriorPick,
   PRESET_GROUPS,
   cargoGapOf,
@@ -87,6 +84,7 @@ import {
   scuByDeck,
   startDeckOf,
 } from './holo-interior';
+import { CodexHoloInteriorChipsComponent } from './codex-holo-interior-chips.component';
 import { CodexHoloInteriorComponent, type InteriorRoomCard, type InteriorRoomRef, type OuterPartRef } from './codex-holo-interior.component';
 import { CodexHoloInspectorComponent, partFocusOf } from './codex-holo-inspector.component';
 import { CodexHoloChangesComponent } from './codex-holo-changes.component';
@@ -298,6 +296,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
     CodexHoloTableComponent,
     CodexHoloInspectorComponent,
     CodexHoloInteriorComponent,
+    CodexHoloInteriorChipsComponent,
     CodexHoloChangesComponent,
     CodexLoadoutSaveBarComponent,
     ScTooltipDirective,
@@ -374,20 +373,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
             @if (interiorOnTable() && interior()) {
               <!-- The interior's element groups (concept 20261117-1810 B8): multi-select, opened on the
                    ship role's preset; nothing of it is remembered (r2-remember = none). -->
-              <div class="ig" role="group" [attr.aria-label]="'codex.holo.interior.groupsAria' | translate">
-                <div class="ig-row">
-                  @for (g of interiorChips; track g.id) {
-                    <button type="button" class="ig-chip" [attr.data-g]="g.id" [class.on]="interiorGroups().has(g.id)"
-                            [attr.aria-pressed]="interiorGroups().has(g.id)" (click)="toggleGroup(g.id)">
-                      <svg class="ig-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" class="ic-bg" /><path [attr.d]="g.glyph.d" [class.fill]="g.glyph.fill" /></svg>
-                      {{ g.labelKey | translate }}
-                    </button>
-                  }
-                </div>
-                <span class="ig-tag">{{ 'codex.holo.interior.presetTag' | translate }} <b>{{ presetLabel() }}</b></span>
-                <button type="button" scAction tier="secondary" class="ig-reset" [attr.aria-disabled]="presetUntouched() ? true : null"
-                        (click)="resetPreset()">{{ 'codex.holo.interior.presetReset' | translate }}</button>
-              </div>
+              <sc-codex-holo-interior-chips class="ig-host" [groups]="interiorGroups()" [presetLabel]="presetLabel()" [untouched]="presetUntouched()"
+                (groupToggle)="toggleGroup($event)" (presetReset)="resetPreset()" />
             }
           </div>
           <!-- slot [holoAkte]: the Akte view (description card on the RSI image, C20), over the table while "Akte" is the view. -->
@@ -990,6 +977,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   /* ── Table head: the classic shell's hangar dock and the no-geometry note; nothing else (C1, C2) ── */
   .table-head { position: relative; z-index: 5; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 4px; }
   .table-head:empty { display: none; }
+  .ig-host { flex: 1 1 auto; min-width: 0; }
   .hangar-dock { flex: none; display: flex; align-items: center; }
   .no-geometry-badge { margin: 0; cursor: help; font-size: max(10px, var(--f)); color: var(--sc-fg-2); }
   /* The Akte (slot [holoAkte]) lies over the table; the table keeps its size under it (no canvas re-layout). */
@@ -1045,32 +1033,6 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .vd-gap { flex: none; white-space: nowrap; font-size: max(11px, var(--f)); color: var(--sc-warning); padding: 0 8px; line-height: 24px;
   border: 1px dashed color-mix(in srgb, var(--sc-warning) 55%, transparent); border-radius: 13px; }
   .vd-gap:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
-  /* B8: the interior's element groups above the table, the role preset and its reset. */
-  .ig { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1 1 auto; flex-wrap: wrap; }
-  .ig-row { display: flex; gap: 5px; min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; padding: 2px 0 4px; }
-  .ig-chip { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px 0 4px; border: 1px solid var(--l1); border-radius: 13px;
-  background: none; color: var(--sc-fg-2); font: inherit; font-size: max(11.5px, var(--f)); white-space: nowrap; cursor: pointer;
-  transition: color 160ms ease, border-color 160ms ease, background 160ms ease; --g: var(--sc-accent); }
-  .ig-chip[data-g='cargo'] { --g: var(--sc-int-cargo); }
-  .ig-chip[data-g='ways'] { --g: var(--sc-int-ways); }
-  .ig-chip[data-g='med'] { --g: var(--sc-int-med); }
-  .ig-chip[data-g='weapons'] { --g: var(--sc-int-weapons); }
-  .ig-chip[data-g='lockers'] { --g: var(--sc-int-lockers); }
-  .ig-chip[data-g='fire'] { --g: var(--sc-int-fire); }
-  .ig-chip[data-g='tech'] { --g: var(--sc-int-tech); }
-  .ig-chip[data-g='living'] { --g: var(--sc-int-living); }
-  .ig-chip[data-g='doors'] { --g: var(--sc-int-doors); }
-  .ig-ic { width: 18px; height: 18px; flex: none; color: var(--g); opacity: 0.55; }
-  .ig-ic .ic-bg { fill: var(--sc-bg-0); stroke: currentColor; stroke-width: 1.6px; }
-  .ig-ic path { fill: none; stroke: currentColor; stroke-width: 1.8px; }
-  .ig-ic path.fill { fill: currentColor; stroke: none; }
-  .ig-chip.on { color: var(--sc-fg-0); border-color: color-mix(in srgb, var(--g) 70%, transparent); background: color-mix(in srgb, var(--g) 14%, transparent); }
-  .ig-chip.on .ig-ic { opacity: 1; }
-  .ig-chip:hover { color: var(--sc-fg-0); border-color: var(--l2); }
-  .ig-chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-  .ig-tag { font-size: max(11px, var(--f)); color: var(--sc-fg-2); white-space: nowrap; }
-  .ig-tag b { color: var(--sc-fg-0); font-weight: 600; }
-  @media (pointer: coarse) { .ig-chip { height: var(--sc-tap-min, 44px); } }
   /* The fixed card's patch slot (C18): only on the Änderungen tab. */
   .patch-slot { margin-bottom: 10px; }
   .chg-sw { display: block; margin-bottom: 10px; }
@@ -1655,7 +1617,6 @@ export class CodexHoloStageComponent {
   readonly interiorDeckKey = computed(() => this.tableDeck()?.key ?? this.interior3d()?.focus ?? null);
 
   // B8: the element groups and the role preset.
-  readonly interiorChips = INTERIOR_GROUPS.map((id) => ({ id, labelKey: `codex.holo.interior.group.${id}`, glyph: GLYPH_PATHS[GROUP_GLYPH[id]] }));
   readonly rolePreset = computed(() => rolePresetOf(this.shipPayload()?.role, this.shipPayload()?.career));
   readonly interiorGroups = signal<ReadonlySet<ShipInteriorGroup>>(new Set());
   /** The deck the preset opens on (most SCU for cargo presets, else most preset elements). */
@@ -1708,6 +1669,7 @@ export class CodexHoloStageComponent {
       this.deckFilter.set(deck);
       this.deckRoom.set(null);
     }
+    this.deckRoom.set(null);
     this.interiorPick.set(p);
     this.panelTab.set('parts');
     if (this.soundOn()) this.tone('blip');
@@ -1763,9 +1725,18 @@ export class CodexHoloStageComponent {
   readonly cargoGap = computed(() => cargoGapOf(this.shipPayload()?.cargoScu, this.interior()));
 
   /** B7: the outside parts the search can find. */
-  readonly outerParts = computed<readonly OuterPartRef[]>(() =>
-    this.pins().map((p) => ({ port: p.portName, label: p.label, terms: [p.portName, p.slot?.typeLabel ?? '', p.slot?.className ?? ''].filter(Boolean) })),
-  );
+  readonly outerParts = computed<readonly OuterPartRef[]>(() => {
+    const byLabel = new Map<string, OuterPartRef & { terms: string[] }>();
+    for (const p of this.pins()) {
+      const terms = [p.portName, p.slot?.typeLabel ?? '', p.slot?.className ?? ''].filter(Boolean);
+      const had = byLabel.get(p.label);
+      if (had) {
+        had.count += 1;
+        for (const t of terms) if (!had.terms.includes(t)) had.terms.push(t);
+      } else byLabel.set(p.label, { port: p.portName, label: p.label, terms, count: 1 });
+    }
+    return [...byLabel.values()];
+  });
 
   onPartsSearch(e: { scope: 'outer' | 'inner' | 'both'; hits: number }): void {
     this.analytics.track('codex:parts_search', e);
