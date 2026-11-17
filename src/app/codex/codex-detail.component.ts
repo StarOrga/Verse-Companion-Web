@@ -935,7 +935,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               (saveAsExemplar)="saveWerkAsExemplar()"
               (addCopy)="addHangarCopy()"
               (addWish)="addHangarWish()" />
-            <sc-codex-holo-akte holoAkte
+            <sc-codex-holo-akte holoAkte [attr.id]="shipSourceFragment" [openBuy]="sourceLinkRequested()"
               [description]="description()"
               [facts]="akteFacts()"
               [heroArt]="heroArt()"
@@ -951,32 +951,6 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                 <sc-compare-icon [on]="isPinned()" /> {{ (isPinned() ? 'codex.compare.pinned' : 'codex.compare.pin') | translate }}
               </button>
             </sc-codex-holo-akte>
-            <!-- The side column below the first screen (concept holotisch-unten r1, d2). The
-                 description, the liveries and the compare pin moved into the Akte; the pledge-link
-                 form and the wish/supply badges went with the ownership into the hangar button. -->
-            <div htSide class="ho-side">
-              <section class="sc-card side-card" [attr.id]="shipSourceFragment">
-                <h2 class="side-h">{{ 'codex.detail.whereToBuy' | translate }}</h2>
-                @if (buyLoading()) {
-                  <p class="muted">{{ 'codex.detail.whereToBuyLoading' | translate }}</p>
-                } @else if (buyError()) {
-                  <p class="err-inline">{{ 'codex.detail.whereToBuyError' | translate }}</p>
-                } @else if (buyOptions().length === 0) {
-                  <p class="muted">{{ 'codex.detail.whereToBuyEmpty' | translate }}</p>
-                } @else {
-                  <ul class="side-buy">
-                    @for (opt of buyOptions(); track opt.terminal + opt.price) {
-                      <li>
-                        <b class="buy-price">{{ fmt(opt.price) }} aUEC</b>
-                        <span>{{ opt.terminal }}</span>
-                        <small class="muted">{{ opt.location }}</small>
-                      </li>
-                    }
-                  </ul>
-                }
-                <p class="hint buy-attribution">{{ 'codex.detail.whereToBuyAttribution' | translate }}</p>
-              </section>
-            </div>
             <ng-container [ngTemplateOutlet]="tailLoadout" />
             @if (recipeView(); as rv) {
               <sc-codex-recipe-card [recipe]="rv" />
@@ -1368,9 +1342,6 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     }
   `,
   styles: [`
-    .ho-side { display: contents; }
-    .side-card { margin: 0; padding: 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-    .side-h { margin: 0; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-accent); font-family: var(--sc-font-display); font-weight: 400; }
     /* The model links under the ship name (r3/r4 d1 .b3-models): plain words, the current one underlined. */
     .ho-models { display: flex; align-items: center; flex-wrap: wrap; gap: 1px; font-size: max(12px, var(--sc-fs-floor)); }
     .ho-models a { padding: 2px 6px; border-radius: 6px; color: var(--sc-fg-2); text-decoration: none; white-space: nowrap; }
@@ -1379,10 +1350,6 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .ho-models a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .ho-models i { color: var(--sc-fg-2); font-style: normal; opacity: 0.6; }
     @media (pointer: coarse) { .ho-models a { min-height: 48px; display: inline-flex; align-items: center; } }
-    .side-buy { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-    .side-buy li { display: grid; gap: 1px; min-width: 0; font-size: max(0.78rem, var(--sc-fs-floor)); }
-    .side-buy li > * { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .side-card .buy-attribution { margin: 0; }
     .foreign-note { margin: 0 0 12px; padding: 10px 14px; font-size: max(0.8rem, var(--sc-fs-floor)); color: var(--sc-fg-1); border-left: 3px solid var(--sc-warning); }
     .personal-uses { margin: 0 0 12px; }
     :host { display: block; }

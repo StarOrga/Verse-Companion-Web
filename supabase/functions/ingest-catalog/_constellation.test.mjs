@@ -1,7 +1,15 @@
 // node --test supabase/functions/ingest-catalog/_constellation.test.mjs
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { earliestByClass, lockConstellation, patchLineOf, pickNewest, sanitizeCandidates } from './_constellation.ts';
+import {
+  candidateRowChunks,
+  earliestByClass,
+  isMissingServerRule,
+  lockConstellation,
+  patchLineOf,
+  pickNewest,
+  sanitizeCandidates,
+} from './_constellation.ts';
 
 const STARS = [[0.5, 0], [0.9, 0.4], [0.9, 0.5], [0.51, 1], [0.49, 1], [0.1, 0.5], [0.1, 0.4]];
 const cand = (class_name, kind = 'ship') => ({ class_name, kind, points: STARS });
@@ -147,5 +155,26 @@ describe('lockConstellation', () => {
     assert.equal(store.calls.find, 0);
     await lockConstellation(store, row('4.3', 'X', 'b2'));
     assert.equal(store.calls.find, 1);
+  });
+});
+
+describe('candidateRowChunks', () => {
+  it('tags every candidate with the build and splits into chunks', () => {
+    const chunks = candidateRowChunks('b1', [cand('A'), cand('B'), cand('C', 'ground')], 2);
+    assert.equal(chunks.length, 2);
+    assert.deepEqual(chunks[1], [{ build_id: 'b1', class_name: 'C', kind: 'ground', points: STARS }]);
+    assert.deepEqual(candidateRowChunks('b1', []), []);
+  });
+});
+
+describe('isMissingServerRule', () => {
+  it('recognises a database without the 20261117204000 migration', () => {
+    assert.equal(isMissingServerRule({ code: 'PGRST202', message: 'Could not find the function public.verse_constellation_lock' }), true);
+    assert.equal(isMissingServerRule({ code: 'PGRST205', message: 'Could not find the table' }), true);
+    assert.equal(isMissingServerRule({ code: '42P01', message: 'relation does not exist' }), true);
+  });
+  it('lets real failures through', () => {
+    assert.equal(isMissingServerRule({ code: '23514', message: 'violates check constraint' }), false);
+    assert.equal(isMissingServerRule(new Error('timeout')), false);
   });
 });

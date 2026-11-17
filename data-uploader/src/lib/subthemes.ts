@@ -287,7 +287,11 @@ export function planSubthemes(input: SubthemePlanInput): SubthemePlan {
   if (!input.ledger) return { skip: [], pending: all, reason: 'no-ledger' };
   const revisions = input.revisions ?? currentRevisions();
   const held = new Map<string, number>();
-  for (const row of input.ledger) held.set(row.subtheme, row.revision);
+  // Several rows per subtheme (one build under two patch labels): a row at the
+  // current revision wins, so a relabel can never make a held part look open.
+  for (const row of input.ledger) {
+    if (held.get(row.subtheme) !== revisions[row.subtheme as SubthemeKey]) held.set(row.subtheme, row.revision);
+  }
   const skip: SubthemeKey[] = [];
   const pending: SubthemeKey[] = [];
   for (const key of all) {

@@ -132,7 +132,7 @@ describe('decideAutoRun', () => {
 
 describe('describeDecision', () => {
   it('describes a run', () => {
-    expect(describeDecision(decideAutoRun(base))).toBe('LIVE: local 4.0.1 vs server 4.0.0 — starting');
+    expect(describeDecision(decideAutoRun(base))).toBe('LIVE: local 4.0.1 vs server 4.0.0 (1) parts [all] — starting');
   });
 
   it('describes a skip', () => {

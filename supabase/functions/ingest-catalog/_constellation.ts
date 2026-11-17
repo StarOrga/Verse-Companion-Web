@@ -1,5 +1,11 @@
 // Verse-hub constellation: pure helpers for the `constellation` op.
 //
+// Since 20261117204000 the CHOICE lives in SQL (verse_constellation_lock /
+// verse_constellation_pick): index.ts stores every candidate in
+// verse_constellation_candidates and calls the RPC, which also heals stored
+// lines whose class stopped being eligible. pickNewest below is only the
+// fallback for a database without that migration.
+//
 // The Data Uploader precomputes 7 stars per ship silhouette
 // (data-uploader/python/sc_extract/constellation.py) and sends them all as
 // candidates. This module validates them and picks the patch's newest vehicle;
@@ -131,4 +137,30 @@ export async function lockConstellation(store: ConstellationStore, row: Constell
   // A conflict without a readable row cannot happen unless the row was deleted
   // in between; report the attempted pick as not written.
   return { row: existing ?? row, created: false };
+}
+
+/** Rows of verse_constellation_candidates for one build, in insert chunks. */
+export function candidateRowChunks(
+  buildId: string,
+  candidates: ConstellationCandidate[],
+  size = 200,
+): { build_id: string; class_name: string; kind: 'ship' | 'ground'; points: [number, number][] }[][] {
+  const out = [];
+  for (let i = 0; i < candidates.length; i += size) {
+    out.push(candidates.slice(i, i + size).map((c) => ({ build_id: buildId, class_name: c.class_name, kind: c.kind, points: c.points })));
+  }
+  return out;
+}
+
+/**
+ * True when the database predates the server-side rule (no
+ * verse_constellation_candidates table or no verse_constellation_lock RPC):
+ * the op then falls back to the in-function pick.
+ */
+export function isMissingServerRule(error: unknown): boolean {
+  const msg = ((error as { message?: string })?.message ?? '').toLowerCase();
+  const code = (error as { code?: string })?.code;
+  return code === 'PGRST202' || code === 'PGRST205' || code === '42883' || code === '42P01' ||
+    msg.includes('could not find the function') || msg.includes('could not find the table') ||
+    msg.includes('does not exist');
 }
