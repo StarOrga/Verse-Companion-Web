@@ -28,7 +28,7 @@ export function missionColor(id: MissionId): string {
  */
 const MISSION_SECTIONS: Readonly<Record<MissionId, readonly ShipModuleSection[] | null>> = {
   all: null,
-  combat: ['weapons', 'remoteTurrets', 'missiles', 'pod', 'shields'],
+  combat: ['weapons', 'remoteTurrets', 'mannedTurrets', 'missiles', 'pod', 'shields'],
   transport: ['quantum', 'shields', 'powerPlants'],
   travel: ['quantum', 'powerPlants', 'coolers'],
   stealth: ['coolers', 'shields', 'countermeasures'],

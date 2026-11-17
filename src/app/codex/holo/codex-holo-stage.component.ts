@@ -126,6 +126,7 @@ export type HoloPartFilter = 'weapons' | 'missiles' | 'components' | 'other';
 const PART_FILTER_OF: Readonly<Record<ShipModuleSection, HoloPartFilter>> = {
   weapons: 'weapons',
   remoteTurrets: 'weapons',
+  mannedTurrets: 'weapons',
   pod: 'weapons',
   missiles: 'missiles',
   shields: 'components',
@@ -167,7 +168,7 @@ const VIEW_ICONS: Readonly<Record<HoloView | 'deck', { box: string; paths: reado
 };
 /** Which column of "Bauteile im Detail" a section stands in: the strip area it moves. */
 const PART_AREAS: readonly { id: Perspective; sections: readonly ShipModuleSection[] }[] = [
-  { id: 'offensive', sections: ['weapons', 'remoteTurrets', 'missiles', 'pod'] },
+  { id: 'offensive', sections: ['weapons', 'remoteTurrets', 'mannedTurrets', 'missiles', 'pod'] },
   { id: 'defensive', sections: ['shields', 'countermeasures', 'structure'] },
   { id: 'movement', sections: ['quantum', 'powerPlants'] },
   { id: 'signature', sections: ['coolers', 'radar', 'lifeSupport'] },
@@ -2513,7 +2514,7 @@ export class CodexHoloStageComponent {
       // Pulse the perspective the selected port belongs to (concept pe4-pulse).
       const section = this.slotByRawPort().get(next)?.section ?? null;
       const tile: Perspective | null =
-        section === 'weapons' || section === 'missiles' || section === 'remoteTurrets' || section === 'pod' ? 'offensive'
+        section === 'weapons' || section === 'missiles' || section === 'remoteTurrets' || section === 'mannedTurrets' || section === 'pod' ? 'offensive'
         : section === 'shields' ? 'defensive'
         : section === 'quantum' ? 'movement'
         : section === 'coolers' || section === 'radar' ? 'signature'
