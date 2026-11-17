@@ -876,6 +876,14 @@ export class NachschubService {
   }
 
   /**
+   * The plan with the user's own split over the Operationen (packageId -> pieces), for the removal dialog's per-Operation
+   * steppers: the last-wish / dissolve flags follow the split. Null when the split does not add up. Changes nothing.
+   */
+  planWishRemovalWithSplit(ref: WishRef, removeQty: number, split: Readonly<Record<string, number>>): RemovalPlan | null {
+    return withSplit(this.planWishRemoval(ref, removeQty), this.holdersOf(ref), split);
+  }
+
+  /**
    * Remove `removeQty` pieces of a wish: free pieces first (A4), the rest out of the Nachschuebe - the preset (most
    * recently assigned first) or the caller's `split` (packageId -> pieces, must add up). A Nachschub left without an
    * open line is dissolved when it has no Einsatz, or when its id is in `dissolve` (A7). One undo brings back the wish
