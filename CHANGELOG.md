@@ -4,6 +4,16 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.277.2] - 2026-11-17
+
+### Fixed
+- Data Uploader 0.82.1: a stalled job is reported under one stable message per job and stage, so a late timer no longer opens a new error report each time.
+
+## [0.277.1] - 2026-11-17
+
+### Fixed
+- 3D model upload: a short storage hiccup while a ship's hull is checked or tidied up is answered as "try again" instead of a server error, and Data Uploader 0.82.1 retries it with a back-off, so the ship no longer goes missing after the run.
+
 ## [0.277.0] - 2026-11-17
 
 ### Added
