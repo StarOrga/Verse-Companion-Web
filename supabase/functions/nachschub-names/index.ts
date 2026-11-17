@@ -5,12 +5,13 @@
 //
 // Graceful: every failure is a 200 with a status and no name; the client then uses its rule-based fallback, so the
 // feature never depends on this function. The key lives only here (ANTHROPIC_API_KEY secret); model override via
-// NACHSCHUB_NAMES_MODEL. verify_jwt stays ON (default) - the platform rejects calls without a session; the handler
-// additionally requires a real user, not the bare publishable key. Output is never labelled as AI.
+// NACHSCHUB_NAMES_MODEL. verify_jwt is OFF (supabase/config.toml): with the platform gate on, every call of a
+// signed-in web session was answered 401 before the handler ran. The handler requires a real, approved user
+// (getUser with the bearer token + is_approved), not the bare publishable key. Output is never labelled as AI.
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
-import { CORS, buildPrompt, limitOf, parseName, parseRequest, preflight } from './_names.ts';
+import { CORS, bearerToken, buildPrompt, limitOf, parseName, parseRequest, preflight } from './_names.ts';
 import { callClaude } from '../_shared/ai-ledger.ts';
 import { withPosthog } from '../_shared/posthog.ts';
 
@@ -48,12 +49,15 @@ Deno.serve(withPosthog('nachschub-names', async (req) => {
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
   // A real signed-in user, not just the anon/publishable key.
-  const auth = req.headers.get('authorization') ?? '';
+  // The token is handed to getUser() explicitly: the client has no stored session, and reading it back from a
+  // custom header depends on the header's spelling in the supabase-js version in use.
+  const jwt = bearerToken(req.headers.get('authorization'));
+  if (!jwt) return json({ error: 'unauthorized' }, 401);
   const sb = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
-    global: { headers: { authorization: auth } },
+    global: { headers: { Authorization: `Bearer ${jwt}` } },
     auth: { persistSession: false },
   });
-  const { data: user, error } = await sb.auth.getUser();
+  const { data: user, error } = await sb.auth.getUser(jwt);
   if (error || !user?.user) return json({ error: 'unauthorized' }, 401);
   const { data: approved, error: apprErr } = await sb.rpc('is_approved');
   if (apprErr || approved !== true) return json({ error: 'not_approved' }, 403);
