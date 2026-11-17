@@ -25,6 +25,7 @@ export type EventArea = (typeof EVENT_AREAS)[number];
 export const EVENT_VERBS = [
   'view', 'open', 'close', 'create', 'add', 'remove', 'update', 'change', 'submit', 'send', 'start', 'finish', 'fail',
   'share', 'search', 'select', 'toggle', 'import', 'export', 'earn', 'request', 'sign_in', 'sign_out', 'show', 'accept',
+  'assign', 'release',
 ] as const;
 export type EventVerb = (typeof EVENT_VERBS)[number];
 
@@ -90,6 +91,8 @@ export const EVENTS = {
   'hq:wishlist_open': ev<{ surface: 'popout' | 'cart' }>('hq', 'Die Wünsche wurden geöffnet (Popout in der Kopfzeile oder großes Fenster).'),
   'hq:wish_search_open': ev<{ surface: 'popout' | 'cart' }>('hq', 'Aus den leeren Wünschen heraus wurde die Suche geöffnet.'),
   'hq:events_view': ev('hq', 'Der Ereignis-Abschnitt des HQ wurde angezeigt.'),
+  'hq:path_group_assign': ev<{ surface: 'codex' | 'hq' | 'wishlist'; created: boolean }>('hq', 'Stücke eines Wunschs wurden einer Operation zugeordnet (Ort; created = dafür eine neue Operation angelegt).'),
+  'hq:path_group_release': ev<{ surface: 'codex' | 'hq' | 'wishlist'; pieces: number; dissolved: boolean }>('hq', 'Zugeordnete Stücke eines Wunschs haben ihre Operation verlassen (Ort, Anzahl Stücke; dissolved = eine Operation wurde mit aufgelöst).'),
 
   // --- search ------------------------------------------------------------
   'search:palette_open': ev<{ surface: 'palette' | 'codex_bar' }>('search', 'Die Suche wurde geöffnet (Palette oder Codex-Leiste).'),

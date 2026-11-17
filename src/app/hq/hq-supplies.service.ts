@@ -349,6 +349,16 @@ export class HqSuppliesService {
     return this.items().filter((i) => i.packageId === packageId);
   }
 
+  /**
+   * Re-label where lines came from. Only the one-time reconcile of wish lines uses it (`search` -> `wish`, concept
+   * 20261117-1110-pfad-stationen A11): the label is what makes that reconcile idempotent across devices.
+   */
+  setSource(ids: readonly string[], source: SupplySource): void {
+    const set = new Set(ids);
+    const now = nowIso();
+    this.commit(this.rows().map((i) => (set.has(i.id) && !i.deletedAt && i.source !== source ? { ...i, source, updatedAt: now, dirty: true } : i)));
+  }
+
   /** Move lines into a Nachschub (or out of it with null). */
   assignPackage(ids: readonly string[], packageId: string | null): void {
     const set = new Set(ids);
@@ -716,7 +726,7 @@ function sanitize(r: unknown, keepSync: boolean): SupplyItem | null {
   const setKind = o['setKind'] === 'ship' || o['setKind'] === 'fps' ? o['setKind'] : null;
   const setId = str('setId');
   const stepKind = typeof o['stepKind'] === 'string' && STEP_KINDS_SET.has(o['stepKind']) ? (o['stepKind'] as StepKind) : null;
-  const source = o['source'] === 'set' || o['source'] === 'search' || o['source'] === 'live' ? o['source'] : 'manual';
+  const source = o['source'] === 'set' || o['source'] === 'search' || o['source'] === 'live' || o['source'] === 'wish' ? o['source'] : 'manual';
   return {
     id: o['id'],
     name: o['name'].slice(0, SUPPLY_NAME_MAX),
