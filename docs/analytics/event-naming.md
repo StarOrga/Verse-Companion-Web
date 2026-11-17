@@ -16,7 +16,8 @@ build on it).
   `view`, `open`, `close`, `create`, `add`, `remove`, `update`, `change`, `submit`,
   `send`, `start`, `finish`, `fail`, `share`, `search`, `select`, `toggle`,
   `import`, `export`, `earn`, `request`, `sign_in`, `sign_out`, `show`, `accept` (added for
-  `social:invite_accept`, the one step no other verb names).
+  `social:invite_accept`, the one step no other verb names), `deselect` (added for
+  `codex:part_deselect`: undoing a `select` is its own step).
   Never past tense (`ship_added`), never the verb first.
 - Examples: `hangar:ship_add`, `auth:user_sign_in`, `codex:ship_link_create`,
   `app:error_show`, `verse:star_earn`.

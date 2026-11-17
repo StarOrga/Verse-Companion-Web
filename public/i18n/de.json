@@ -1002,7 +1002,7 @@
           "changes": "Änderungen"
         },
         "backToParts": "Alle Bauteile",
-        "backHint": "Zurück zur Liste (Esc)",
+        "backHint": "Hebt die Auswahl im Modell auf (Esc)",
         "partsTotal": "{{n}} Bauteile",
         "partSize": "Größe",
         "partGrade": "Klasse",
@@ -2847,7 +2847,6 @@
         "open": "{{name}} im Codex öffnen",
         "prev": "Vorheriger Platz",
         "next": "Nächster Platz",
-        "close": "Auswahl aufheben",
         "emptySlot": "Freier Platz"
       },
       "allParts": "Alle Teile",

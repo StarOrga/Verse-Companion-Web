@@ -89,7 +89,7 @@ import { CodexHoloInteriorComponent, type InteriorRoomCard, type InteriorRoomRef
 import { CodexHoloInspectorComponent, partFocusOf } from './codex-holo-inspector.component';
 import { CodexHoloChangesComponent } from './codex-holo-changes.component';
 import { missionColor, missionRelevantSections } from './codex-holo-mission';
-import type { CalloutValue, PlacementRow, PlacementSelection } from '../asset-package/asset-package-viewer.component';
+import type { CalloutValue, PlacementRow, PlacementSelection, SelectionIntent } from '../asset-package/asset-package-viewer.component';
 import type { HotspotScope } from '../asset-package/asset-package.model';
 import { CodexLoadoutSaveBarComponent } from '../codex-loadout-save-bar.component';
 import { HoloPhase, JournalEntry, PinGroup, PinRing, StagePin, ringPositions, shipNameWithoutMaker, spreadStackedPins } from './codex-holo-model';
@@ -425,6 +425,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
             [still]="reducedMotion()"
             (hovered)="hovered.emit($event)"
             (pinInspect)="inspectPin($event)"
+            (partIntent)="onPartIntent($event)"
             (partSelected)="onPartSelected($event)"
             (partSwap)="onPartSwap($event)"
             (previewError)="previewFailed.set(true)"
@@ -515,8 +516,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
                     [allParts]="hotspotScope() === 'all'"
                     [packageRows]="packageRows()"
                     [changedPorts]="changedPorts()"
-                    (closed)="closeInspector()"
-                    (pinInspect)="inspectPin($event)"
+                    (closed)="onInspectorBack()"
+                    (pinInspect)="onListInspect($event)"
                     (hovered)="hovered.emit($event)"
                     (swapRequested)="swapRequested.emit($event)"
                     (inspected)="inspected.emit($event)"
@@ -1164,6 +1165,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
 })
 export class CodexHoloStageComponent {
   private readonly t = inject(TranslateService);
+  private readonly analytics = inject(AnalyticsService);
   /** Beta shell: the hangar button in the table head is retired (concept r1-flag). */
   protected readonly shellBeta = inject(BetaService).isEnabled('shell');
   private readonly skins = inject(ShipSkinsService);
@@ -1527,7 +1529,6 @@ export class CodexHoloStageComponent {
   }
   readonly detailsOpen = signal(false);
   // ── Decks and interior (concept 20261117-1810 B1–B11) ─────────────────
-  private readonly analytics = inject(AnalyticsService);
   private readonly shipPayload = computed<ShipPayload | null>(() => {
     const d = this.detail();
     return d.kind === 'ship' && d.payload && typeof d.payload === 'object' ? (d.payload as ShipPayload) : null;
@@ -2170,7 +2171,10 @@ export class CodexHoloStageComponent {
     const target = ev.target as HTMLElement | null;
     if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
     if (document.querySelector('[role="dialog"], dialog[open]')) return;
-    if (ev.key === 'Escape' && this.inspectedPort()) this.closeInspector();
+    if (ev.key === 'Escape' && this.inspectedPort()) {
+      this.analytics.track('codex:part_deselect', { via: 'escape' });
+      this.closeInspector();
+    }
   }
 
   /**
@@ -2679,8 +2683,27 @@ export class CodexHoloStageComponent {
     if (it) this.swapRequested.emit(partFocusOf(it, this.inspectedSection()).target);
   }
 
+  /** The model reported how a selection started or ended (concept 20261117-1809 C20). */
+  onPartIntent(intent: SelectionIntent): void {
+    if (intent.kind === 'select') this.analytics.track('codex:part_select', { source: intent.source });
+    else this.analytics.track('codex:part_deselect', { via: intent.via });
+  }
+
+  /** The panel's back control ("Alle Bauteile"): drop the selection, the panel shows the list of all parts (C11). */
+  onInspectorBack(): void {
+    if (this.inspectedPort() || this.viewerSelection()) this.analytics.track('codex:part_deselect', { via: 'panel' });
+    this.closeInspector();
+  }
+
+  /** A part picked in the panel's list. */
+  onListInspect(port: string): void {
+    if (this.inspectedPort() !== port) this.analytics.track('codex:part_select', { source: 'list' });
+    this.inspectPin(port);
+  }
+
   /** A row under "Alle Teile". */
   onRowPick(r: PlacementRow): void {
+    this.analytics.track('codex:part_select', { source: 'list' });
     this.onPartSelected({ id: r.p.id, portName: r.p.portName, itemClass: r.p.itemClass, swappable: false });
   }
 

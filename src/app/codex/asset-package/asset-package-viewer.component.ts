@@ -4,6 +4,7 @@ import {
   DestroyRef,
   ElementRef,
   NgZone,
+  afterNextRender,
   computed,
   effect,
   inject,
@@ -112,6 +113,30 @@ export interface PartCallout extends CalloutPlacement {
  */
 export type ViewerInteraction = 'classic' | 'table';
 
+/** How a selection on the model started or ended (the stage turns it into an analytics event). */
+export type SelectionIntent =
+  | { readonly kind: 'select'; readonly source: 'model' | 'keyboard' }
+  | { readonly kind: 'deselect'; readonly via: 'empty' | 'again' | 'escape' };
+
+/** A pointer that travelled less than this between down and up clicked; more is a rotate (C4). */
+export const CLICK_TRAVEL_PX = 4;
+/** Invisible minimum hit area around a part's projected centre: fine pointer / touch or pen (C4, C14). */
+export const PICK_SLOP_FINE_PX = 24;
+export const PICK_SLOP_COARSE_PX = 48;
+/** Gap between a part's screen box and its name tag. */
+const TAG_GAP_PX = 6;
+
+/** A part's name at the part: the hovered one and the selected one, never every part. */
+export interface NameTag {
+  readonly id: string;
+  readonly name: string;
+  readonly x: number;
+  readonly y: number;
+  /** No room above the part: the tag hangs below it. */
+  readonly below: boolean;
+  readonly selected: boolean;
+}
+
 /** Hover grace: the pointer may travel from a hotspot to the label without losing the selection. */
 export const HOVER_GRACE_MS = 280;
 
@@ -140,7 +165,11 @@ const WHEEL_LINE_PX = 33;
   host: { '[style.--holo-mfr-rgb]': 'mfrRgb()' },
   template: `
     <div class="pkg" [class.ready]="status() === 'ready'">
-      <canvas #canvas class="stage" aria-hidden="true" (dblclick)="resetView()"></canvas>
+      <!-- The parts take the pointer on the canvas itself (scene.pick): hover, click, a second click and a click
+           into empty space; a drag rotates. A double click re-frames, but only off a part. -->
+      <canvas #canvas class="stage" aria-hidden="true" [style.cursor]="overPart() ? 'pointer' : null"
+              (click)="onCanvasClick($event)" (auxclick)="onCanvasClick($event)"
+              (dblclick)="onCanvasDblClick($event)"></canvas>
 
       @if (status() === 'loading') {
         <p class="state" role="status">{{ 'codex.assetPackage.loading' | translate }}</p>
@@ -152,31 +181,29 @@ const WHEEL_LINE_PX = 33;
       }
 
       @if (status() === 'ready') {
+        <!-- Keyboard targets only (concept 20261117-1809 C3/C18): no dots are drawn, the lit part is the mark.
+             Each one sits on its part, takes no pointer and only shows the focus ring under Tab. -->
         <div class="hotspots">
           @for (h of hotspots(); track h.p.id) {
-            @if (h.link) {
-              <a class="hs" [class.on]="focusSet().has(h.p.id)" [class.sel]="pinned() === h.p.id" [class.minor]="h.minor" [class.q]="h.quiet"
-                 [attr.href]="h.href" [attr.aria-current]="pinned() === h.p.id ? 'true' : null"
-                 [style.left.px]="h.x" [style.top.px]="h.y"
+            @if (h.link && !table()) {
+              <a class="hs" [attr.href]="h.href" [style.left.px]="h.x" [style.top.px]="h.y"
                  [attr.aria-label]="'codex.assetPackage.hotspotTip' | translate: tipParams(h)"
-                 
-                 (mouseenter)="focus(h.p)" (mouseleave)="blur(h.p)" (focus)="focus(h.p)" (blur)="blur(h.p)"
-                 (click)="onPick($event, h)"></a>
+                 (focus)="focus(h.p)" (blur)="blur(h.p)" (click)="onPick($event, h)"></a>
             } @else {
-              <span class="hs" tabindex="0" [attr.role]="table() ? 'button' : 'img'" [class.on]="focusSet().has(h.p.id)"
-                    [class.sel]="pinned() === h.p.id" [class.minor]="h.minor" [class.q]="h.quiet"
+              <span class="hs" tabindex="0" [attr.role]="table() ? 'button' : 'img'"
+                    [attr.aria-pressed]="table() ? pinned() === h.p.id : null"
                     [style.left.px]="h.x" [style.top.px]="h.y"
                     [attr.aria-label]="'codex.assetPackage.hotspotTip' | translate: tipParams(h)"
-                    
-                    (mouseenter)="focus(h.p)" (mouseleave)="blur(h.p)" (focus)="focus(h.p)" (blur)="blur(h.p)"
-                    (click)="onPick($event, h)" (keydown.enter)="onPick($event, h)" (keydown.space)="onPick($event, h)"></span>
+                    (focus)="focus(h.p)" (blur)="blur(h.p)"
+                    (keydown.enter)="onKeyPick($event, h)" (keydown.space)="onKeyPick($event, h)"></span>
             }
           }
         </div>
 
-        @if (hoverTag(); as t) {
-          <!-- Not a tooltip bubble: it must never take the pointer from the dots around it. -->
-          <span class="dot-name" [class.flip]="t.flip" [style.left.px]="t.x" [style.top.px]="t.y" aria-hidden="true">{{ t.name }}</span>
+        @for (t of nameTags(); track t.id) {
+          <!-- The part's name at the part: the hovered one, and the selected one in green. No close control (C12). -->
+          <span class="name-tag" [class.sel]="t.selected" [class.below]="t.below"
+                [style.left.px]="t.x" [style.top.px]="t.y" aria-hidden="true">{{ t.name }}</span>
         }
 
         @if (callout(); as co) {
@@ -225,11 +252,6 @@ const WHEEL_LINE_PX = 33;
               <button type="button" class="step" (click)="step(1)"
                       [attr.aria-label]="'codex.assetPackage.label.next' | translate"
                       [scTooltip]="'codex.assetPackage.label.next' | translate" scTooltipTier="label">›</button>
-            }
-            @if (pinned()) {
-              <button type="button" class="step close" (click)="unpin()"
-                      [attr.aria-label]="'codex.assetPackage.label.close' | translate"
-                      [scTooltip]="'codex.assetPackage.label.close' | translate" scTooltipTier="label">×</button>
             }
           </div>
         }
@@ -299,49 +321,23 @@ const WHEEL_LINE_PX = 33;
       }
       .state.err { color: var(--sc-fg-1); }
       .hotspots { position: absolute; inset: 0; pointer-events: none; }
+      /* Keyboard targets: invisible, pointer-transparent; only Tab shows the ring (focus-modality blanks it otherwise). */
       .hs {
-        --hs-c: var(--holo-e, var(--sc-accent));
-        position: absolute; width: 0.75rem; height: 0.75rem; margin: -0.375rem 0 0 -0.375rem;
-        border-radius: 50%; border: 1px solid var(--hs-c); background: rgb(from var(--hs-c) r g b / 0.25);
-        pointer-events: auto; transition: transform 0.15s ease, background 0.15s ease;
+        position: absolute; width: 1.5rem; height: 1.5rem; margin: -0.75rem 0 0 -0.75rem; border-radius: 50%;
+        pointer-events: none; opacity: 0; outline: none;
       }
-      /* Hit area: 18px, as wide as the spacing of a fanned-out stack (holo-overlay FAN_SPACING_PX). */
-      .hs::after { content: ''; position: absolute; inset: -0.1875rem; border-radius: 50%; }
-      .hs:hover, .hs:focus-visible, .hs.on { background: var(--hs-c); transform: scale(1.35); outline: none; }
-      .hs:focus-visible { box-shadow: 0 0 0 2px var(--sc-bg-0), 0 0 0 4px var(--hs-c); }
-      /* A part that cannot be swapped: smaller dot, same hit area. The selected one is white. */
-      @media (pointer: fine) {
-        .hs.minor { width: 0.5rem; height: 0.5rem; margin: -0.25rem 0 0 -0.25rem; }
-        .hs.minor::after { inset: -0.3125rem; }
-        .hs.sel { background: var(--sc-fg-0); border-color: var(--hs-c); transform: scale(1.35); }
+      .hs:focus-visible { opacity: 1; outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+      /* The part's name tag (mock d1): beside the part, never on it; green with dark text when selected. */
+      .name-tag {
+        position: absolute; transform: translate(-50%, -100%); pointer-events: none; white-space: nowrap;
+        max-width: min(18rem, calc(100% - 1rem)); overflow: hidden; text-overflow: ellipsis;
+        padding: 0.1875rem var(--sc-pad-1); border-radius: 0.25rem; border: 1px solid var(--sc-accent);
+        background: rgb(from var(--sc-bg-0) r g b / 0.92); color: var(--sc-fg-0);
+        font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; line-height: 1.3;
+        transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
       }
-      /* Not relevant to the picked Einsatz: quiet, but it still takes the pointer. */
-      .hs.q { opacity: 0.3; }
-      .hs.q:hover, .hs.q:focus-visible, .hs.q.on, .hs.q.sel { opacity: 1; }
-      /* Touch: the hotspot itself is a 48px hit box (a pseudo-element extends the hit area but not
-         the measured target), the 12px dot is drawn inside it. */
-      @media (pointer: coarse) {
-        .hs, .hs:hover, .hs:focus-visible, .hs.on {
-          width: 48px; height: 48px; margin: -24px 0 0 -24px;
-          border: 0; background: none; box-shadow: none; transform: none;
-        }
-        .hs::after { display: none; }
-        .hs::before {
-          content: ''; position: absolute; left: 50%; top: 50%; width: 0.75rem; height: 0.75rem; margin: -0.375rem 0 0 -0.375rem;
-          box-sizing: border-box; border-radius: 50%; border: 1px solid var(--hs-c); background: rgb(from var(--hs-c) r g b / 0.25);
-          transition: transform 0.15s ease, background 0.15s ease;
-        }
-        .hs:focus-visible::before, .hs.on::before { background: var(--sc-accent); transform: scale(1.35); }
-        .hs:focus-visible::before { box-shadow: 0 0 0 2px var(--sc-bg-0), 0 0 0 4px var(--sc-accent); }
-        .hs.minor::before { transform: scale(0.66); }
-        .hs.sel::before { background: var(--sc-fg-0); transform: scale(1.35); }
-      }
-      .dot-name {
-        position: absolute; transform: translate(0.875rem, -50%); pointer-events: none; white-space: nowrap;
-        padding: 0.125rem var(--sc-pad-1); border-radius: 0.375rem; font-size: 0.75rem; color: var(--sc-fg-0);
-        background: rgb(from var(--sc-bg-1) r g b / 0.9); border: 1px solid var(--sc-border);
-      }
-      .dot-name.flip { transform: translate(calc(-100% - 0.875rem), -50%); }
+      .name-tag.below { transform: translate(-50%, 0); }
+      .name-tag.sel { border-color: var(--sc-holo-select); background: var(--sc-holo-select); color: var(--sc-holo-select-ink); }
       .leader { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
       .leader line { stroke: var(--holo-mfr); stroke-width: 1.25; stroke-dasharray: 4 3; opacity: 0.9; }
       .leader .tip { fill: var(--holo-mfr); }
@@ -408,7 +404,7 @@ const WHEEL_LINE_PX = 33;
       a.name:hover { color: var(--sc-accent); }
       .meta { flex: none; color: var(--sc-fg-2); font-size: 0.75rem; }
       .free { color: var(--sc-fg-2); font-style: italic; padding-left: 2.5rem; }
-      @media (prefers-reduced-motion: reduce) { .hs, .hs::before { transition: none; } }
+      @media (prefers-reduced-motion: reduce) { .name-tag { transition: none; } }
     `,
   ],
 })
@@ -467,6 +463,8 @@ export class AssetPackageViewerComponent {
   readonly locatable = output<string[]>();
   /** Table: a click, keyboard or Escape changed the selected part. Not fired for a `selectedPort` change. */
   readonly selectionChange = output<PlacementSelection | null>();
+  /** Table: what started or ended a selection, sent just before `selectionChange`. */
+  readonly selectionIntent = output<SelectionIntent>();
   /** Table: the callout's swap icon. */
   readonly swapRequested = output<PlacementSelection>();
   /** The hull is on screen or will not come (error): a host holding its previous view lets go. */
@@ -506,6 +504,14 @@ export class AssetPackageViewerComponent {
   private readonly viewport = signal<Size>({ w: 0, h: 0 });
   private readonly labelSize = signal<Size>(LABEL_SIZE_GUESS);
   private readonly attempt = signal(0);
+  /** The pointer is over a part (cursor) / over the model's screen box (the turntable holds, C13). */
+  readonly overPart = signal(false);
+  readonly pointerOver = signal(false);
+  /** Screen boxes of the parts that carry a name tag, refreshed with the camera. */
+  private readonly tagRects = signal<ReadonlyMap<string, Rect>>(new Map());
+  /** The press that may become a click: where it started and how far it travelled. */
+  private press: { x: number; y: number; travel: number; id: number } | null = null;
+  private lastTravel = 0;
 
   private readonly zone = inject(NgZone);
   private scene: PackageScene | null = null;
@@ -541,8 +547,17 @@ export class AssetPackageViewerComponent {
     return [...new Set([...held, ...focusedPlacementIds(m, this.localFocus(), this.activePorts())])];
   });
   readonly focusSet = computed(() => new Set(this.focusIds()));
-  /** Classic: every focus x-rays. Table: only a selection does, a hover never dims anything. */
-  private readonly seeThrough = computed(() => (this.table() ? this.pinned() !== null : this.focusIds().length > 0));
+  /**
+   * What the scene lights: the pinned placements take the green selection look, every
+   * other focused one the hover look. No see-through from either (concept 20261117-1809, C1).
+   */
+  private readonly highlight = computed(() => {
+    const m = this.manifest();
+    const pinned = this.pinned();
+    const selected = m && pinned ? focusedPlacementIds(m, pinned, []) : [];
+    const held = new Set(selected);
+    return { hover: this.focusIds().filter((id) => !held.has(id)), selected };
+  });
 
   /** Parts the picked Einsatz leaves quiet. */
   readonly quietIds = computed<ReadonlySet<string>>(() => {
@@ -633,12 +648,43 @@ export class AssetPackageViewerComponent {
     return this.points().get(id) ?? null;
   });
 
-  /** The name beside the dot under the pointer (table: the selected part has its callout instead). */
-  readonly hoverTag = computed(() => {
-    const id = this.localFocus();
-    if (!this.table() || !id || id === this.pinned()) return null;
-    const dot = this.hotspots().find((h) => h.p.id === id);
-    return dot ? { x: dot.x, y: dot.y, name: dot.name, flip: dot.x > this.viewport().w / 2 } : null;
+  /** Parts the canvas can pick: the ones that carry a keyboard target, visible. */
+  readonly pickable = computed<ReadonlySet<string>>(() => {
+    const m = this.manifest();
+    if (!m) return new Set();
+    const visible = this.visibleIds();
+    const list = this.table() ? scopedHotspots(m, this.hotspotScope(), this.swappablePorts()) : hotspotPlacements(m);
+    return new Set(list.filter((p) => visible.has(p.id)).map((p) => p.id));
+  });
+
+  /** Which parts carry a name tag (table): the hovered one and the selected one. */
+  readonly tagIds = computed<readonly string[]>(() => {
+    if (!this.table()) return [];
+    return [...new Set([this.pinned(), this.localFocus()].filter((id): id is string => !!id))];
+  });
+
+  /**
+   * The name tags, above the part's screen box (below it when there is no room),
+   * kept inside the stage: they never cover the part and follow it while it turns.
+   */
+  readonly nameTags = computed<NameTag[]>(() => {
+    const vp = this.viewport();
+    const rects = this.tagRects();
+    const pinned = this.pinned();
+    const out: NameTag[] = [];
+    for (const id of this.tagIds()) {
+      const p = this.byId().get(id);
+      const r = rects.get(id);
+      if (!p || !r || vp.w <= 0) continue;
+      const name = p.itemClass ? this.toRow(p, true).name : p.portName;
+      // Half the tag's width, estimated from the name (0.75rem semibold), to keep it inside the stage.
+      const half = Math.min(vp.w / 2 - 4, name.length * 3.6 + 10);
+      const x = Math.min(Math.max((r.left + r.right) / 2, half + 4), vp.w - half - 4);
+      const below = r.top - TAG_GAP_PX < 26;
+      const y = below ? Math.min(r.bottom + TAG_GAP_PX, vp.h - 26) : Math.min(r.top - TAG_GAP_PX, vp.h - 4);
+      out.push({ id, name, x, y, below, selected: id === pinned });
+    }
+    return out;
   });
 
   /** The callout in its gutter; null without a selection or when no gutter holds it. */
@@ -694,6 +740,24 @@ export class AssetPackageViewerComponent {
     this.zone.runOutsideAngular(() =>
       this.host.nativeElement.addEventListener('wheel', this.onWheel, { capture: true, passive: false }),
     );
+    // Pointer travel and hover run outside Angular (a move must not check the whole page);
+    // only a signal that changes reaches the view. Clicks stay template listeners.
+    afterNextRender(() => {
+      const el = this.canvas().nativeElement;
+      const down = (ev: PointerEvent) => this.onPointerDown(ev);
+      const move = (ev: PointerEvent) => this.onPointerMove(ev);
+      const leave = () => this.onPointerLeave();
+      this.zone.runOutsideAngular(() => {
+        el.addEventListener('pointerdown', down);
+        el.addEventListener('pointermove', move);
+        el.addEventListener('pointerleave', leave);
+      });
+      destroyRef.onDestroy(() => {
+        el.removeEventListener('pointerdown', down);
+        el.removeEventListener('pointermove', move);
+        el.removeEventListener('pointerleave', leave);
+      });
+    });
     if (typeof IntersectionObserver === 'function') {
       this.visObs = new IntersectionObserver((entries) => {
         const last = entries[entries.length - 1];
@@ -726,11 +790,11 @@ export class AssetPackageViewerComponent {
       });
     });
     effect(() => {
-      const ids = this.focusIds();
-      const seeThrough = this.seeThrough();
+      const state = this.highlight();
       this.labelTarget();
+      this.tagIds();
       untracked(() => {
-        this.scene?.setFocus(ids, seeThrough);
+        this.scene?.setHighlight(state);
         this.projectDirty = true;
         this.reproject();
       });
@@ -902,10 +966,118 @@ export class AssetPackageViewerComponent {
     void this.router.navigate(r.link);
   }
 
-  /** Select a part and hold it until replaced, or until Escape or the host clears it. */
-  select(p: PackagePlacement): void {
+  /**
+   * Select a part and hold it until replaced, or until a second click on it, a click
+   * into empty space, Escape or the host clears it (C8).
+   */
+  select(p: PackagePlacement, source: 'model' | 'keyboard' = 'model'): void {
     this.clearGrace();
+    if (this.pinned() === p.id) {
+      this.deselect('again');
+      return;
+    }
+    if (this.table()) this.selectionIntent.emit({ kind: 'select', source });
     this.setPinned(p.id);
+  }
+
+  /** Drop the selection; the stage's panel goes back to the list of all parts. */
+  private deselect(via: 'empty' | 'again'): void {
+    if (!this.pinned()) return;
+    if (this.table()) this.selectionIntent.emit({ kind: 'deselect', via });
+    this.setPinned(null);
+    const hover = this.localFocus();
+    this.hovered.emit(hover ? [this.byId().get(hover)?.portName ?? hover] : null);
+  }
+
+  /** Enter / Space on a part's keyboard target: select it, or drop it when it is the selected one (C18). */
+  onKeyPick(ev: Event, r: PlacementRow): void {
+    ev.preventDefault();
+    if (this.table()) this.select(r.p, 'keyboard');
+    else this.onPick(ev, r);
+  }
+
+  private pickAt(ev: MouseEvent): string | null {
+    const coarse = (ev as Partial<PointerEvent>).pointerType && (ev as PointerEvent).pointerType !== 'mouse';
+    return this.scene?.pick(ev.clientX, ev.clientY, coarse ? PICK_SLOP_COARSE_PX : PICK_SLOP_FINE_PX, this.pickable()) ?? null;
+  }
+
+  onPointerDown(ev: PointerEvent): void {
+    this.press = { x: ev.clientX, y: ev.clientY, travel: 0, id: ev.pointerId };
+  }
+
+  /** Hover on the canvas: the part under the pointer lights and shows its name; a drag only rotates. */
+  onPointerMove(ev: PointerEvent): void {
+    const press = this.press;
+    if (press && press.id === ev.pointerId) {
+      press.travel = Math.max(press.travel, Math.hypot(ev.clientX - press.x, ev.clientY - press.y));
+    }
+    if (ev.buttons !== 0 || ev.pointerType === 'touch') return;
+    this.pointerOver.set(this.overModel(ev));
+    this.hoverTo(this.pickAt(ev));
+  }
+
+  onPointerLeave(): void {
+    this.pointerOver.set(false);
+    this.hoverTo(null);
+  }
+
+  private hoverTo(id: string | null): void {
+    this.overPart.set(id !== null);
+    const cur = this.localFocus();
+    if (id === cur) return;
+    const p = id ? this.byId().get(id) : undefined;
+    if (p) {
+      this.focus(p);
+      return;
+    }
+    const prev = cur ? this.byId().get(cur) : undefined;
+    if (prev) this.blur(prev);
+  }
+
+  /** The pointer is over the model's projected box (the turntable holds there, C13). */
+  private overModel(ev: MouseEvent): boolean {
+    const sil = this.silhouette();
+    if (!sil) return false;
+    const rect = this.canvas().nativeElement.getBoundingClientRect();
+    const x = ev.clientX - rect.left;
+    const y = ev.clientY - rect.top;
+    return x >= sil.left && x <= sil.right && y >= sil.top && y <= sil.bottom;
+  }
+
+  /**
+   * A click on the canvas. A press that travelled was a rotate: nothing happens. The
+   * second click of a double click belongs to the double click (it must not toggle back).
+   * Table: a part toggles, empty space (beside the model or on the hull) deselects.
+   * Elsewhere: a part navigates; a modified or middle click opens it in a new tab, like an anchor.
+   */
+  onCanvasClick(ev: MouseEvent): void {
+    const travel = this.press?.travel ?? 0;
+    this.press = null;
+    this.lastTravel = travel;
+    if (travel >= CLICK_TRAVEL_PX || ev.detail > 1) return;
+    if (ev.type === 'auxclick' && ev.button !== 1) return;
+    const id = this.pickAt(ev);
+    const p = id ? this.byId().get(id) : undefined;
+    if (this.table()) {
+      if (ev.type === 'auxclick' || !isPlainLeftClick(ev)) return;
+      if (p) this.select(p, 'model');
+      else this.deselect('empty');
+      return;
+    }
+    const row = p ? this.toRow(p, true) : null;
+    if (!row?.link) return;
+    if (ev.type === 'auxclick' || !isPlainLeftClick(ev)) {
+      if (row.href) window.open(row.href, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    this.onActivate(ev);
+    void this.router.navigate(row.link);
+  }
+
+  /** A double click re-frames the view, but only off a part: on a part the click already toggled. */
+  onCanvasDblClick(ev: MouseEvent): void {
+    if (this.lastTravel >= CLICK_TRAVEL_PX || this.pickAt(ev)) return;
+    this.resetView();
   }
 
   private setPinned(id: string | null): void {
@@ -987,6 +1159,7 @@ export class AssetPackageViewerComponent {
     const dialogs = document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog[open]');
     const top = dialogs.item(dialogs.length - 1);
     if (top && !top.contains(this.host.nativeElement)) return;
+    if (this.table() && this.pinned()) this.selectionIntent.emit({ kind: 'deselect', via: 'escape' });
     if (this.clearSelection()) ev.stopImmediatePropagation();
   };
 
@@ -1030,7 +1203,7 @@ export class AssetPackageViewerComponent {
   }
 
   private readonly effectiveSpin = computed<TurntableSpin>(() =>
-    this.still() || this.pinned() !== null || this.reducedMotion() ? 'none' : this.spin(),
+    this.still() || this.pinned() !== null || this.pointerOver() || this.reducedMotion() ? 'none' : this.spin(),
   );
 
   private reducedMotion(): boolean {
@@ -1091,7 +1264,7 @@ export class AssetPackageViewerComponent {
       this.manifest.set(m);
       scene.setVisibility(this.visibleIds(), this.groupsOn().has('interior'));
       scene.frame(this.frameBounds(m), this.facing());
-      scene.setFocus(this.focusIds(), this.seeThrough());
+      scene.setHighlight(this.highlight());
       scene.setQuiet(this.quietIds());
       this.status.set('ready');
       this.drawn.emit();
@@ -1169,6 +1342,12 @@ export class AssetPackageViewerComponent {
       const el = this.canvas().nativeElement;
       const vp = { w: el.clientWidth, h: el.clientHeight };
       if (!sameSize(this.viewport(), vp)) this.viewport.set(vp);
+      const rects = new Map<string, Rect>();
+      for (const id of this.tagIds()) {
+        const r = scene.partRect(id) ?? pointRect(next.get(id) ?? scene.project([id]).get(id));
+        if (r) rects.set(id, r);
+      }
+      if (!sameRects(this.tagRects(), rects)) this.tagRects.set(rects);
     }
     const box = this.labelBox()?.nativeElement;
     if (box) {
@@ -1200,6 +1379,17 @@ function samePoints(a: ReadonlyMap<string, ScreenPoint>, b: ReadonlyMap<string, 
 function sameRect(a: Rect | null, b: Rect | null): boolean {
   if (!a || !b) return a === b;
   return near(a.left, b.left) && near(a.top, b.top) && near(a.right, b.right) && near(a.bottom, b.bottom);
+}
+
+/** An empty slot has no body: its anchor stands in for the box. */
+function pointRect(p: ScreenPoint | undefined): Rect | null {
+  return p?.onScreen ? { left: p.x - 6, right: p.x + 6, top: p.y - 6, bottom: p.y + 6 } : null;
+}
+
+function sameRects(a: ReadonlyMap<string, Rect>, b: ReadonlyMap<string, Rect>): boolean {
+  if (a.size !== b.size) return false;
+  for (const [id, r] of b) if (!sameRect(a.get(id) ?? null, r)) return false;
+  return true;
 }
 
 function sameSize(a: Size, b: Size): boolean {

@@ -60,6 +60,17 @@ describe('CodexHeroHoloOverlayComponent', () => {
     expect(o.querySelector('.scp-frame')!.getAttribute('aria-modal')).toBeNull();
   });
 
+  it('keeps its click behaviour: a pick opens the part, a deselect on the model (second click, empty click) closes it', () => {
+    const { fixture, open } = setup();
+    open();
+    const o = fixture.debugElement.query((d) => d.name === 'sc-codex-hero-holo-overlay').componentInstance as CodexHeroHoloOverlayComponent;
+    const picks: unknown[] = [];
+    o.partPicked.subscribe((v) => picks.push(v ? v.portChain : null));
+    o.onSelection({ id: 'hp_shield', portName: 'hp_shield', itemClass: 'S', swappable: false });
+    o.onSelection(null);
+    expect(picks).toEqual([['hp_shield'], null]);
+  });
+
   it('closes on its X', () => {
     const { fixture, overlay, open } = setup();
     open();

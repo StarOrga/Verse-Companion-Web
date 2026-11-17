@@ -24,7 +24,7 @@ export type EventArea = (typeof EVENT_AREAS)[number];
 /** The fixed present-tense verb list; an event name's last word(s) must be one of these. */
 export const EVENT_VERBS = [
   'view', 'open', 'close', 'create', 'add', 'remove', 'update', 'change', 'submit', 'send', 'start', 'finish', 'fail',
-  'share', 'search', 'select', 'toggle', 'import', 'export', 'earn', 'request', 'sign_in', 'sign_out', 'show', 'accept',
+  'share', 'search', 'select', 'toggle', 'import', 'export', 'earn', 'request', 'sign_in', 'sign_out', 'show', 'accept', 'deselect',
 ] as const;
 export type EventVerb = (typeof EVENT_VERBS)[number];
 
@@ -62,6 +62,8 @@ export const EVENTS = {
   'codex:section_view': ev<{ section: 'fps' | 'keybinds' | 'upcoming' | 'upcoming_entry' }>('codex', 'Ein Codex-Abschnitt abseits der Detailseiten wurde geöffnet.'),
   'codex:compare_start': ev<{ kind: string; count: number }>('codex', 'Der Vergleich wurde möglich: das zweite Objekt liegt im Vergleichsfach.'),
   'codex:holotable_open': ev<{ kind: string }>('codex', 'Der Holotisch einer Detailseite wurde bewusst eingeschaltet.'),
+  'codex:part_select': ev<{ source: 'model' | 'list' | 'keyboard' }>('codex', 'Ein Bauteil wurde auf dem Holotisch gewählt (Quelle: Klick aufs 3D-Modell, Liste im Seitenpanel oder Tastatur).'),
+  'codex:part_deselect': ev<{ via: 'empty' | 'again' | 'panel' | 'escape' }>('codex', 'Die Bauteil-Auswahl auf dem Holotisch wurde aufgehoben (Klick ins Leere, zweiter Klick aufs Bauteil, Zurück im Seitenpanel oder Escape).'),
   'codex:buy_open': ev<{ kind: string; tab_remembered: boolean }>('codex', 'Der Reiter Kaufen der Holotisch-Akte wurde geöffnet (Art; ob er die gemerkte Wahl war).'),
   'codex:wish_add': ev<{ kind: string; source: 'shop' | 'wikelo' }>('codex', 'Ein Eintrag wurde aus dem Reiter Kaufen auf die Wunschliste gesetzt (Quelle: Laden oder Wikelo-Tausch).'),
   'codex:deck_select': ev<{ ship: string; deck: string; view: '2d' | '3d' }>('codex', 'Im Holotisch wurde im Deck-Filter ein Deck gewählt (Schiff, Deck-Schlüssel oder hull/all, Ansicht 2D oder 3D).'),
