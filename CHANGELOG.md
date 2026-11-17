@@ -4,6 +4,19 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.275.0] - 2026-11-17
+
+### Added
+- A translation job holds what it is really billed against its budget (its estimate plus a quarter) and against the monthly cap. A large job sends its first batch group alone and reads its bill: more than 10 % above the estimate, it stops and waits for approval with the corrected figure instead of sending the rest.
+- Admin: the job list says why a job waits for approval and which paid steps a job left out because its budget or the month was used up.
+
+### Changed
+- The judge sample and the second attempts of a translation job are only paid while the job's budget allows it; a job that has spent it publishes what passed and counts the texts left untranslated.
+
+### Fixed
+- A translation job that ends early also counts a judge batch and second attempts that were sent and never read against the month.
+- The cost of an answer is taken from the model that ran it, also when the provider names a dated snapshot of it.
+
 ## [0.274.2] - 2026-11-17
 
 ### Changed

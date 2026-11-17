@@ -98,6 +98,20 @@ export interface Stats {
   /** The job has ended and its work files are still there: the tick deletes them in slices. */
   sweep?: boolean;
   /**
+   * The first batch group of a job of several groups, read before the others are sent: what it was
+   * estimated at, what it cost, and the ratio the rest of the job is expected to follow.
+   */
+  probe?: { est: number; usd: number; ratio: number };
+  /** Estimated spend of the judge batch that was sent (booked when the job ends before it is read). */
+  judgeSent?: number;
+  /** Estimated spend of the post-edit batches sent so far (their real spend is read after all are sent). */
+  peSent?: number;
+  /**
+   * Paid steps the job left out because it had spent its budget or the month had reached its cap:
+   * the judge sample (`judge`) and the second attempt of `texts` texts, which stay untranslated.
+   */
+  capped?: { reason: 'job_budget' | 'monthly_cap'; spent: number; limit: number; judge: boolean; texts: number };
+  /**
    * How often this job was started again (`start_full` on an ended run). Part of its ledger refs:
    * the batches of a second run are other batches, and their spend must not be taken for a repeat.
    */
@@ -150,7 +164,7 @@ export interface Db {
   resetRetranslate(ids: string[]): Promise<void>;
   /** Sum of estimate_usd of the other jobs of this build that are not failed/cancelled/skipped. */
   buildEstimateSum(buildId: string, excludeJobId: string): Promise<number>;
-  /** Ledger sum of the month plus the unspent part of in-flight jobs (excluding `excludeJobId`). */
+  /** Ledger sum of the month plus what the other in-flight jobs may still spend (`reserveOf`; `excludeJobId` is left out). */
   monthCommitted(month: string, excludeJobId: string): Promise<number>;
   /** Books spend. With `ref`, a second booking of the same (job, ref) is ignored: a repeated slice books once. */
   addLedger(jobId: string, month: string, usd: number, ref?: string): Promise<void>;
@@ -169,7 +183,8 @@ export interface BatchResult {
 export interface Llm {
   createBatch(requests: { custom_id: string; params: BatchParams }[]): Promise<{ id: string }>;
   isEnded(id: string): Promise<boolean>;
-  results(id: string): AsyncIterable<BatchResult>;
+  /** `record: false` = a read that only looks at the bill (the probe): the call log is left to the read that uses the results. */
+  results(id: string, opts?: { record?: boolean }): AsyncIterable<BatchResult>;
   cancel(id: string): Promise<void>;
 }
 
@@ -213,6 +228,31 @@ export const MAX_ATTEMPTS = 5;
 export const JUDGE_CAP = 150;
 
 export const round4 = (n: number) => Math.round(n * 1e6) / 1e6; // micro-dollars; the name is historical
+
+/**
+ * What a job may spend beyond its estimate: a quarter, at least 5 cents. The estimate covers the
+ * first attempt of every text; the judge sample and the second attempts come out of this margin, and
+ * so does a first attempt that costs more than estimated. Past it the job pays for nothing more.
+ */
+export const OVERRUN_SHARE = 0.25;
+export const OVERRUN_MIN_USD = 0.05;
+/**
+ * How far above its estimate the first batch group of a large job may be billed before a person is
+ * asked again. Less than the margin: what is left of it is for the judge and the second attempts, and
+ * a job that used it all up on first attempts would leave those out without anyone having decided so.
+ */
+export const PROBE_SHARE = 0.1;
+
+/** The most a job may spend: its estimate (what was approved, by the caps or by a person) and the margin. */
+export function budgetOf(job: Pick<Job, 'estimate_usd'>): number {
+  const est = Number(job.estimate_usd ?? 0);
+  return round4(est + Math.max(est * OVERRUN_SHARE, OVERRUN_MIN_USD));
+}
+
+/** What an open job may still spend. The month's cap counts this for every open job, not the estimate alone. */
+export function reserveOf(job: Pick<Job, 'estimate_usd' | 'spent_usd'>): number {
+  return Math.max(0, round4(budgetOf(job) - Number(job.spent_usd ?? 0)));
+}
 export const monthOf = (d: Date) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-01`;
 
 export function addStats(job: Job, patch: Partial<Stats>): Stats {

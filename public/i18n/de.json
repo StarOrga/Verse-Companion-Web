@@ -4211,6 +4211,17 @@
         "cancelTitle": "Auftrag für {{lang}} abbrechen?",
         "cancelText": "Der Auftrag wird beendet; bereits angefallene Kosten bleiben.",
         "progress": "{{pct}} %",
+        "hold": {
+          "full": "Ein Voll-Lauf startet erst nach deiner Freigabe.",
+          "upload_cap": "Die Schätzung liegt über dem Limit pro Upload.",
+          "monthly_cap": "Mit diesem Auftrag wäre das Monatslimit überschritten.",
+          "overrun": "Die erste Batch-Gruppe hat {{pct}} % mehr gekostet als geschätzt. Die Schätzung ist angepasst, der Rest startet erst nach deiner Freigabe."
+        },
+        "capped": {
+          "job_budget": "Budget des Auftrags erreicht: {{texts}} Texte bekamen keinen zweiten Versuch und bleiben unübersetzt.",
+          "monthly_cap": "Monatslimit erreicht: {{texts}} Texte bekamen keinen zweiten Versuch und bleiben unübersetzt.",
+          "judge": "Budget erreicht: Die Judge-Stichprobe wurde ausgelassen."
+        },
         "cols": {
           "build": "Build",
           "lang": "Sprache",
