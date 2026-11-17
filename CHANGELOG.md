@@ -4,6 +4,13 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.273.1] - 2026-11-17
+
+### Security
+- Public cron endpoints (event sync, event sheets, patch teaser, translation source sync) take an atomic run claim, so parallel anonymous calls can no longer start several paid runs at once. The event sync runs at most once per hour.
+- Uploader ingest, ship links, concept pages, API tokens and the translation admin functions check the role through `is_admin` / `is_collaborator`: a suspended or unapproved account no longer passes.
+- `readme-sync` accepts only the real service key, not a token that merely claims the service role; service-key comparisons run in constant time.
+
 ## [0.273.0] - 2026-11-17
 
 ### Added
