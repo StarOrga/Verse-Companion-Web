@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.274.2] - 2026-11-17
+
+### Changed
+- Concepts: the area-symbols and holo-table-border concept page has a fourth round with colour alternatives for signature and cooling, star-shaped countermeasure symbols, real snowflakes for coolers and gear or engine symbols for propulsion and systems.
+
 ## [0.274.1] - 2026-11-17
 
 ### Fixed
