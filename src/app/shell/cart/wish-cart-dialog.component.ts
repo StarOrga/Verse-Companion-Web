@@ -84,7 +84,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
                           <span class="foot">
                             <sc-qty-stepper class="step" [value]="it.qty" [groupLabel]="'cart.qtyOf' | translate: { name: cart.nameOf(it) }"
                                             [lessLabel]="'cart.less' | translate" [moreLabel]="'cart.more' | translate"
-                                            (valueChange)="bump(it, $event - it.qty)">
+                                            [highlight]="cart.flashed() === it.key" (valueChange)="bump(it, $event - it.qty)">
                               {{ it.qty }}@if (it.kind === 'material') { <small class="unit"> {{ 'blueprint.detail.unitScu' | translate }}</small> }
                             </sc-qty-stepper>
                             <button type="button" scAction tier="tertiary" tone="danger"

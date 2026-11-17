@@ -70,7 +70,7 @@ interface WishLine {
               </a>
               <sc-qty-stepper class="step" [value]="l.item.qty" [groupLabel]="'cart.qtyOf' | translate: { name: l.row.title }"
                               [lessLabel]="'cart.less' | translate" [moreLabel]="'cart.more' | translate"
-                              (valueChange)="bump(l.item, $event - l.item.qty)" />
+                              [highlight]="cart.flashed() === l.item.key" (valueChange)="bump(l.item, $event - l.item.qty)" />
               <a scAction tier="tertiary" class="move" [routerLink]="['/hq']" [fragment]="'planen'" [queryParams]="pickParams(l.item)"
                  [attr.aria-label]="'quick.toNachschub' | translate: { name: l.row.title }" [scTooltip]="'quick.toNachschub' | translate: { name: l.row.title }" scTooltipTier="label"
                  (click)="onOpen($event)">

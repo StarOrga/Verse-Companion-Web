@@ -32,6 +32,7 @@ import {
   positionKey,
 } from '../nachschub/nachschub.model';
 import { NachschubService, type NachschubResult } from '../nachschub/nachschub.service';
+import { WishRemovalFlowService } from '../nachschub/wish-removal-flow.service';
 import { STEP_ICON_PATHS, TRANSPORT_WHEELS } from '../nachschub/step-icons';
 import { HqNeedSourcesService, bestSource } from './hq-need-sources.service';
 import { HqNachschubSellFormComponent } from './hq-nachschub-sell-form.component';
@@ -485,6 +486,7 @@ export class HqNachschubFlowComponent {
   readonly done = output<NachschubResult>();
 
   private readonly svc = inject(NachschubService);
+  private readonly removal = inject(WishRemovalFlowService);
   protected readonly minQualityStore = inject(NachschubMinQualityStore);
   private readonly einsatz = inject(HqEinsatzService);
   private readonly naming = inject(NachschubNamingService);
@@ -767,6 +769,21 @@ export class HqNachschubFlowComponent {
   }
 
   protected async removeExisting(lineId: string): Promise<void> {
+    // A wish line is released only after the confirmation of C7 (Lösen / also delete from the wishlist / cancel).
+    if (this.svc.releaseInfo(lineId)) {
+      const name = this.existing().find((l) => l.id === lineId)?.name ?? '';
+      const released = await this.removal.release(lineId, name, 'hq');
+      if (!released) return;
+      if (!released.ok) {
+        this.error.set(released.key);
+        return;
+      }
+      this.removed.update((s) => new Set([...s, lineId]));
+      this.removal.announce(released, (key) => this.error.set(key));
+      // The Operation went with its last wish: there is nothing left to edit.
+      if (Number(released.params?.['dissolved'] ?? 0) > 0) this.closed.emit();
+      return;
+    }
     const r = await this.svc.removeLine(lineId, true);
     if (r.ok) this.removed.update((s) => new Set([...s, lineId]));
     else this.error.set(r.key);

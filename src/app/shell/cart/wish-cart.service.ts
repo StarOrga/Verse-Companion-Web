@@ -20,6 +20,8 @@ import {
   type Recommendation,
 } from '../../hq/nachschub/recommend';
 import { positionKey } from '../../hq/nachschub/nachschub.model';
+import { NachschubService, type WishRef } from '../../hq/nachschub/nachschub.service';
+import { WishRemovalFlowService } from '../../hq/nachschub/wish-removal-flow.service';
 import { CART_PARAM } from '../../hq/hq-routes';
 import { UndoToastService } from '../../shared/undo-toast/undo-toast.service';
 import { cartGroups, lastAdded, type CartItem } from './wish-cart.model';
@@ -52,6 +54,8 @@ export class WishCartService {
   private readonly inventory = inject(HqInventoryService);
   private readonly codex = inject(CodexService);
   private readonly undo = inject(UndoToastService);
+  private readonly nachschub = inject(NachschubService);
+  private readonly removal = inject(WishRemovalFlowService);
 
   private readonly url = signal(this.router.url);
   readonly isOpen = computed(() => queryOf(this.url()).has(CART_PARAM));
@@ -154,8 +158,44 @@ export class WishCartService {
 
   // ---------------------------------------------------------------------------------------------------- writing
 
+  /** The position whose counter a removal just changed: lit in its row for a moment (D3), then null. */
+  readonly flashed = signal<string | null>(null);
+  private flashTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private flash(key: string): void {
+    if (this.flashTimer !== null) clearTimeout(this.flashTimer);
+    this.flashed.set(key);
+    this.flashTimer = setTimeout(() => this.flashed.set(null), 1600);
+  }
+
+  private wishRef(i: CartItem): WishRef & { name: string } {
+    return { kind: i.kind, className: i.className, forClassName: i.forClassName, name: this.nameOf(i) };
+  }
+
+  /** A wished position that has pieces assigned to an Operation (a Hangar-row ship wish never has). */
+  private isAssigned(i: CartItem): boolean {
+    return !i.shipId && this.nachschub.allocationOf(this.wishRef(i)).assigned > 0;
+  }
+
+  /**
+   * Lower or remove a position through the ONE removal flow (C6): free pieces go first and need no question; a removal
+   * that cuts into assigned pieces opens the dialog. The result's undo goes on the toast, the counter is lit.
+   */
+  private async lower(i: CartItem, by: number): Promise<boolean> {
+    const r = await this.removal.lower(this.wishRef(i), by, 'wishlist');
+    if (!r) return false;
+    if (!r.ok) {
+      logWarn('cart', 'lower failed', r.key);
+      return false;
+    }
+    this.removal.announce(r);
+    this.flash(i.key);
+    return true;
+  }
+
   async setQty(i: CartItem, qty: number): Promise<boolean> {
     const next = Math.min(999, Math.max(1, Math.round(qty)));
+    if (next < i.qty && !i.shipId) return this.lower(i, i.qty - next);
     if (i.shipId) return this.hangar.updateShip(i.shipId, { qty: next });
     return this.store.setQty({ kind: i.kind, className: i.className, name: i.name, forClassName: i.forClassName }, next);
   }
@@ -163,6 +203,20 @@ export class WishCartService {
   /** Remove positions with an undo window; nothing is written before the toast closes. */
   remove(items: readonly CartItem[], messageKey = 'cart.removed', params?: Record<string, unknown>): void {
     if (!items.length) return;
+    // A position with pieces assigned to an Operation goes through the removal flow (it may ask); the rest keeps the delayed delete.
+    const held = items.filter((i) => this.isAssigned(i));
+    if (held.length) {
+      const rest = items.filter((i) => !held.includes(i));
+      void (async () => {
+        for (const i of held) if (!(await this.lower(i, i.qty))) return;
+        if (rest.length) this.removeDelayed(rest, messageKey, rest.length === items.length ? params : undefined);
+      })();
+      return;
+    }
+    this.removeDelayed(items, messageKey, params);
+  }
+
+  private removeDelayed(items: readonly CartItem[], messageKey: string, params?: Record<string, unknown>): void {
     const keys = items.map((i) => i.key);
     this.hidden.update((h) => new Map([...h, ...items.map((i) => [i.key, stamp(i)] as const)]));
     this.undo.offer({
