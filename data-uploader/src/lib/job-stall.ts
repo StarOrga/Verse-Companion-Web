@@ -84,13 +84,14 @@ export interface JobStallReport {
 
 export function jobStallReport(kind: string, jobId: string, idleMs: number, t: StallTracker): JobStallReport {
   const counter = stallCounter(t);
-  // Only the stage NAME goes into the message — counters would split one
-  // stall into a new error group per position; they sit in `extra`.
+  // Only the stage NAME goes into the message — counters and the waited
+  // seconds (a late timer reports 1201 s instead of 1200 s) would split one
+  // stall into a new error group each; both sit in `extra`.
   const where = t.stage ?? t.phase;
   return {
     errorType: 'hang',
     name: 'JobStall',
-    message: `${kind} job made no progress for ${Math.round(idleMs / 1000)}s${where ? ` (${where})` : ''}`,
+    message: `${kind} job stalled${where ? ` (${where})` : ''}`,
     stack: null,
     extra: {
       kind,

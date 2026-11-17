@@ -1,7 +1,39 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.277.1",
+  "current": "0.277.3",
   "releases": [
+    {
+      "version": "0.277.3",
+      "date": "2026-11-17",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "3D views and the start-page planet: when a part of the page cannot be loaded (usually an old tab after an update), the page shows a hint with \"Neu laden\" instead of staying empty, and an untouched page reloads itself once to pick up the new version."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.277.2",
+      "date": "2026-11-17",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader 0.82.1: a stalled job is reported under one stable message per job and stage, so a late timer no longer opens a new error report each time."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.277.1",
       "date": "2026-11-17",

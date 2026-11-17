@@ -8,6 +8,7 @@ import { CodexCategoryIconComponent } from '../codex-category-icon.component';
 import { CodexService, type CodexKind } from '../codex.service';
 import { FallbackImageComponent } from '../fallback-image.component';
 import type { HoloSilhouette } from '../holo-silhouette';
+import { DeferErrorComponent } from '../../shared/defer-error/defer-error.component';
 
 /** What the stage shows: the traced outline, or the 3D model of the asset package. */
 export type ItemStageView = 'silhouette' | '3d';
@@ -25,7 +26,7 @@ export type ItemStageView = 'silhouette' | '3d';
 @Component({
   selector: 'sc-codex-item-stage',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective, AssetPackageViewerComponent, CodexCategoryIconComponent, FallbackImageComponent],
+  imports: [DeferErrorComponent, TranslatePipe, ScTooltipDirective, AssetPackageViewerComponent, CodexCategoryIconComponent, FallbackImageComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="table" [attr.aria-label]="'itemStage.aria' | translate: { name: displayName() }">
@@ -56,6 +57,8 @@ export type ItemStageView = 'silhouette' | '3d';
             <sc-asset-package-viewer class="pkg" [row]="pkg" [still]="still()" />
           } @placeholder {
             <div class="pkg" aria-hidden="true"></div>
+          } @error {
+            <sc-defer-error class="pkg" source="codex.itemStage" />
           }
         } @else if (silhouette(); as s) {
           <svg class="sil ce-draw" [attr.viewBox]="s.viewBox" preserveAspectRatio="xMidYMid meet" role="img" [attr.aria-label]="displayName()">
