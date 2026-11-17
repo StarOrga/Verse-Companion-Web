@@ -4649,6 +4649,7 @@ export class CodexDetailComponent implements OnInit {
   private static readonly MOUNT_CHAIN_SECTIONS: ReadonlySet<ShipModuleSection> = new Set([
     'weapons',
     'remoteTurrets',
+    'mannedTurrets',
     'missiles',
   ]);
 

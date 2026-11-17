@@ -2,6 +2,7 @@
 // out, sizes counted), the jobs table, and a batch provider that "translates" by prefixing.
 import { buildShards, indexKey, shardKey } from '../ingest-catalog/_locale-shards.ts';
 import { tmIndexKey, tmShardKey } from './_io.ts';
+import { reserveOf } from './_job.ts';
 
 export const NEW = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 export const OLD = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
@@ -104,7 +105,12 @@ export function fakeDb({ settings = {}, glossary = [] } = {}) {
     async insertGlossary(_l, rows) { glossary.push(...rows.map((r, i) => ({ ...r, id: `g${glossary.length + i}` }))); },
     async resetRetranslate() {},
     async buildEstimateSum() { return 0; },
-    async monthCommitted() { return ledger.reduce((a, r) => a + r.usd, 0); },
+    // As the real adapter: what the month was billed, and what the other in-flight jobs may still spend.
+    async monthCommitted(_month, excludeJobId) {
+      const reserved = [...jobs.values()].filter((j) => j.id !== excludeJobId && ['queued', 'submitted', 'validating', 'post_editing'].includes(j.status))
+        .reduce((a, j) => a + reserveOf(j), 0);
+      return ledger.reduce((a, r) => a + r.usd, 0) + reserved;
+    },
     async addLedger(jobId, month, usd, ref) { if (ref && ledger.some((r) => r.jobId === jobId && r.ref === ref)) return; ledger.push({ jobId, month, usd, ref }); },
     async hasNewerPublished() { return false; },
   };
@@ -114,28 +120,37 @@ export function fakeDb({ settings = {}, glossary = [] } = {}) {
 /**
  * A batch provider. A main request is answered with `DE: <text>` per string; `bad(text, request)` makes
  * an answer fail QA (it drops the placeholders) on the first attempt. The judge gives 9, or `judge(sample)`.
+ * `model(request)` is the model id the answer names (default: the one asked for); `lost(request)` makes a
+ * request expire (no answer, no bill). `reads` lists every read of a batch and whether it was logged.
  */
-export function fakeLlm({ bad = () => false, judge = () => 9 } = {}) {
+export function fakeLlm({ bad = () => false, judge = () => 9, usage = () => undefined, ended = () => true, model = (r) => r.params.model, lost = () => false } = {}) {
   const batches = [];
+  const reads = [];
   const llm = {
     batches,
+    reads,
     async createBatch(requests) { batches.push({ id: `b${batches.length}`, requests }); return { id: `b${batches.length - 1}` }; },
-    async isEnded() { return true; },
+    async isEnded(id) { return ended(id); },
     async cancel() {},
-    async *results(id) {
+    async *results(id, opts) {
+      reads.push({ id, record: opts?.record !== false });
       const b = batches.find((x) => x.id === id);
       for (const r of [...b.requests].reverse()) { // arbitrary order on purpose
         const msg = r.params.messages[0].content;
+        if (r.custom_id !== 'j0' && lost(r)) {
+          yield { custom_id: r.custom_id, type: 'expired' };
+          continue;
+        }
         if (r.custom_id === 'j0') {
           const sample = JSON.parse(msg);
-          yield { custom_id: 'j0', type: 'succeeded', text: JSON.stringify({ r: sample.map((s) => ({ score: judge(s), back: 'x', terms: [] })) }), stop_reason: 'end_turn', usage: { input_tokens: 100, output_tokens: 100 }, model: 'claude-opus-5-5' };
+          yield { custom_id: 'j0', type: 'succeeded', text: JSON.stringify({ r: sample.map((s) => ({ score: judge(s), back: 'x', terms: [] })) }), stop_reason: 'end_turn', usage: usage(r, 'judge') ?? { input_tokens: 100, output_tokens: 100 }, model: 'claude-opus-5-5' };
           continue;
         }
         const g = JSON.parse(msg.slice(msg.indexOf('{"g"'))).g;
         const flat = g.flatMap((x) => x.s);
         const isPost = r.custom_id.startsWith('p');
         const t = flat.map((s) => (!isPost && bad(s[1], r) ? 'DE: \n broken' : `DE: ${s[1]}`));
-        yield { custom_id: r.custom_id, type: 'succeeded', text: JSON.stringify({ t }), stop_reason: 'end_turn', usage: { input_tokens: 1000, output_tokens: 500, cache_read_input_tokens: 2000 }, model: r.params.model };
+        yield { custom_id: r.custom_id, type: 'succeeded', text: JSON.stringify({ t }), stop_reason: 'end_turn', usage: usage(r, isPost ? 'post' : 'main') ?? { input_tokens: 1000, output_tokens: 500, cache_read_input_tokens: 2000 }, model: model(r) };
       }
     },
   };

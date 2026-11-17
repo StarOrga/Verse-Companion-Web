@@ -58,7 +58,7 @@ function weaponTypeOf(className: string): string | null {
  * ("Kühler", "Schild"). Null = unknown — the caller falls back to the category.
  */
 export function partTypeKey(section: ShipModuleSection | null, className: string | null): string | null {
-  if (section === 'weapons' || section === 'remoteTurrets') {
+  if (section === 'weapons' || section === 'remoteTurrets' || section === 'mannedTurrets') {
     const t = className ? weaponTypeOf(className) : null;
     return t ? `codex.holo.partType.${t}` : null;
   }

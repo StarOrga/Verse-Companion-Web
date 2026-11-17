@@ -250,6 +250,7 @@ export function classifyPowerGroup(occupant: SummaryOccupant): PowerGroup | null
   switch (occupant.section) {
     case 'weapons':
     case 'remoteTurrets':
+    case 'mannedTurrets':
     case 'missiles':
       return 'weapons';
     case 'shields':

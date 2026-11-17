@@ -355,6 +355,7 @@ export function buildFoldPreview(
       return buildShieldPreview(occupants);
     case 'weapons':
     case 'remoteTurrets':
+    case 'mannedTurrets':
       return buildWeaponPreview(occupants, section);
     case 'missiles':
       return buildMissilePreview(occupants);

@@ -95,6 +95,39 @@ export function jobProgress(status: string, stats: unknown): number | null {
   return null;
 }
 
+const HOLDS = new Set(['full', 'upload_cap', 'monthly_cap', 'overrun']);
+
+/** Jobs that ended without a result: what they left out for want of money is of no interest any more. */
+const NO_RESULT = new Set(['cancelled', 'failed', 'skipped']);
+
+export interface JobNote { key: string; params: Record<string, number> }
+
+/**
+ * The sentences under a job's status that say why it waits for approval, or which paid steps it left
+ * out because money ran short (`stats.hold`, `stats.probe`, `stats.capped` of the orchestrator): the
+ * texts without a second attempt and the judge sample are two things and each gets its own line.
+ */
+export function jobNotes(status: string, stats: unknown): JobNote[] {
+  const s = (stats ?? {}) as {
+    hold?: string; probe?: { ratio?: number } | null;
+    capped?: { reason?: string; judge?: boolean; texts?: number } | null;
+  };
+  const base = 'admin.translations.jobs';
+  if (status === 'awaiting_approval') {
+    if (typeof s.hold !== 'string' || !HOLDS.has(s.hold)) return [];
+    const ratio = Number(s.probe?.ratio);
+    const pct = Number.isFinite(ratio) ? Math.max(0, Math.round((ratio - 1) * 100)) : 0;
+    return [{ key: `${base}.hold.${s.hold}`, params: s.hold === 'overrun' ? { pct } : {} }];
+  }
+  const c = s.capped;
+  if (!c || NO_RESULT.has(status)) return [];
+  const notes: JobNote[] = [];
+  const texts = Math.max(0, Math.round(Number(c.texts) || 0));
+  if (texts > 0) notes.push({ key: `${base}.capped.${c.reason === 'monthly_cap' ? 'monthly_cap' : 'job_budget'}`, params: { texts } });
+  if (c.judge) notes.push({ key: `${base}.capped.judge`, params: {} });
+  return notes;
+}
+
 /** i18n key for a job's / orchestrator's error code; unknown codes get a generic sentence, never raw text. */
 export function jobErrorKey(code: string | null | undefined): string | null {
   if (!code) return null;

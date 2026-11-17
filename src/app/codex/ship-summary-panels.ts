@@ -115,7 +115,7 @@ export function buildDamagePanel(occupants: readonly SummaryOccupant[]): ShipSum
   let ordnanceCount = 0;
 
   for (const o of occupants) {
-    if (o.section === 'weapons' || o.section === 'remoteTurrets') mountCount += o.count;
+    if (o.section === 'weapons' || o.section === 'remoteTurrets' || o.section === 'mannedTurrets') mountCount += o.count;
     // Countermeasures moved into their own block (1add86a4) but are still
     // ordnance hardpoints — the headline count must not silently shrink.
     if (o.section === 'missiles' || o.section === 'countermeasures') ordnanceCount += o.count;

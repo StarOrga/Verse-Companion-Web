@@ -835,10 +835,11 @@ export class CodexHoloTableComponent {
     const map = new Map<string, { type: string; text: string }>();
     for (const p of [...(this.labelPins() ?? []), ...this.pins()]) {
       if (map.has(p.portName)) continue;
-      const held = p.section === 'weapons' || p.section === 'remoteTurrets' ? p.slot?.children?.find((c) => !!c.name) : undefined;
+      const held = p.section === 'weapons' || p.section === 'remoteTurrets' || p.section === 'mannedTurrets' ? p.slot?.children?.find((c) => !!c.name) : undefined;
       // E6: an unresolved turret reads "Fernturm", not the section's long name ("Ferngesteuerte Türm…").
       const typeKey = partTypeKey(p.section, held?.className ?? p.slot?.className ?? null)
-        ?? (p.section === 'remoteTurrets' ? 'codex.holo.partType.remoteTurret' : null);
+        ?? (p.section === 'remoteTurrets' ? 'codex.holo.partType.remoteTurret'
+          : p.section === 'mannedTurrets' ? 'codex.holo.partType.mannedTurret' : null);
       const type = this.i18n.instant(typeKey ?? (p.section ? `codex.moduleSection.${p.section}` : 'codex.holo.stage.pinGroupOther'));
       const size = sizeOfPin(p);
       map.set(p.portName, { type, text: size != null ? `${type} S${size}` : type });
