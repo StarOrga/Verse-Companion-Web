@@ -184,7 +184,7 @@ hosted page, whatever donor it was built from:
 
 A note's anchor needs no marker after a reload: the engine resolves it by tag,
 index and text. While a sent round waits for the routine, the round is veiled
-("Claude arbeitet"); the first click — Ctrl or not — only lifts the veil, the
+(grey content dimmer); the first click — Ctrl or not — only lifts the veil, the
 next Ctrl + click sets the note. That is the engine's behaviour locally too,
 it just lasts longer hosted because the routine answers on its own cadence.
 
