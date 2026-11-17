@@ -1,7 +1,59 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.273.3",
+  "current": "0.273.6",
   "releases": [
+    {
+      "version": "0.273.6",
+      "date": "2026-11-17",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Server errors reach error tracking as one issue per function, status and error code (desktop crashes per product and error type) instead of one catch-all issue for every error."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.273.5",
+      "date": "2026-11-17",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Creating a feedback topic from a telemetry finding while another topic is open in the feedback panel now closes that topic and shows the composer with the new text; opening an existing topic from telemetry switches to it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.273.4",
+      "date": "2026-11-17",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "A finished translation is published right away instead of waiting until the other languages of the same upload have been estimated."
+            },
+            {
+              "title": "",
+              "text": "Publishing a translation no longer ends in a killed worker: the learning pass, which does not fit one request yet, is recorded as due instead of being run with the publish."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.273.3",
       "date": "2026-11-17",
