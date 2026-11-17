@@ -2693,7 +2693,6 @@
         "open": "Open {{name}} in the Codex",
         "prev": "Previous slot",
         "next": "Next slot",
-        "close": "Clear selection",
         "emptySlot": "Free slot"
       },
       "allParts": "All parts",
