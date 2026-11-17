@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.273.5] - 2026-11-17
+
+### Fixed
+- Creating a feedback topic from a telemetry finding while another topic is open in the feedback panel now closes that topic and shows the composer with the new text; opening an existing topic from telemetry switches to it.
+
 ## [0.273.4] - 2026-11-17
 
 ### Fixed
