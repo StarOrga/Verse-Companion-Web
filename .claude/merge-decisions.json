@@ -496,6 +496,16 @@
         "ship": "#1174",
         "by": "Jerry",
         "value": "migrations/ (189) — Database migrations"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:29:19.037Z",
+        "hunks": [
+          "5a2eca2cfd5c"
+        ]
       }
     ],
     ".claude/project-map.md›migrations›count": [
@@ -734,6 +744,16 @@
         "ship": "#1174",
         "by": "Jerry",
         "value": "supabase/ (459)"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:29:19.037Z",
+        "hunks": [
+          "00065aec8218"
+        ]
       }
     ],
     ".claude/project-map.md›supabase›count": [
