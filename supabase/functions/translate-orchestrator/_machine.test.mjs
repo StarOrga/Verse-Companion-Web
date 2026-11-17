@@ -246,6 +246,30 @@ describe('caps and approval', () => {
   });
 });
 
+describe('publishing', () => {
+  it('records that learning is due and runs no learning pass in the publish request', async () => {
+    const w = world();
+    const calls = [];
+    // A learning adapter that only knows what a tick and the estimate may ask; anything else is a learning pass.
+    w.deps.learn = new Proxy({ listApprovedLangs: async () => [], getStyle: async () => null }, {
+      get(target, name) {
+        calls.push(String(name));
+        return target[name] ?? (async () => { throw new Error(`unexpected learn.${String(name)}`); });
+      },
+    });
+    const j = await newJob(w);
+    await run(w, TERMINAL);
+    const job = w.jobs.get(j.id);
+    assert.equal(job.status, 'published', job.error);
+    assert.deepEqual([...new Set(calls)].sort(), ['getStyle', 'listApprovedLangs']);
+    const due = w.files.get('translation-work/learn-de/due.json');
+    assert.equal(due.trigger, 'publish');
+    assert.equal(due.build_id, NEW);
+    assert.equal(due.at, job.stats.published_at);
+    assert.equal(job.stats.run_at, undefined);
+  });
+});
+
 describe('one heavy job per tick', () => {
   it('a job ready to publish goes before an estimate, whatever the list order', async () => {
     const w = world();

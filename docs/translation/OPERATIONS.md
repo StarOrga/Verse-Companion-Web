@@ -165,13 +165,27 @@ All with an admin JWT or the service role (`sync_sources` also with the publisha
 
 ## Learning step: work keys and spend
 
-The learning step (`_learn.ts`, `_arbiter.ts`, `_revise.ts`, `_cards.ts`) runs after every publish, after
-every seed import or sync, and on `op: learn`. Its LLM parts (Haiku pre-decision, pairwise arbiter, B1
-term alignment, web research) are Message Batches resumed by later ticks. Progress lives in R2:
+The learning step (`_learn.ts`, `_arbiter.ts`, `_revise.ts`, `_cards.ts`) runs after every seed import
+or sync and on `op: learn`. Its LLM parts (Haiku pre-decision, pairwise arbiter, B1 term alignment, web
+research) are Message Batches resumed by later ticks.
+
+**It does not fit an edge request yet.** The pass (`runLearning`) reads the whole English table, the CIG
+table and the whole TM and hashes or mines every line, the same shape the estimate had before it was
+sliced. Run inside the publish tick it took the worker over the 2 s CPU limit right after the job was
+published (2026-11-17, pt-BR: published at 14:05:10 UTC, worker killed at 14:05:30 with `CPUTime`), and
+no pass has finished in production so far: no language has a learned `style.at`, there are no cards, no
+`mined` glossary rows and no learning ledger rows. Since 0.273.4 a publish therefore only writes
+`translation-work/learn-<lang>/due.json` (`trigger`, `at`, `build_id`) and runs nothing; `op: learn` and
+the seed / sync hooks still call the unsliced pass and will hit the same limit on a table of this size.
+Slicing the pass (scan parts that merge, as in `_scan.ts`) is the open work; it also switches on the
+learning spend below for the first time.
+
+Progress lives in R2:
 
 | Key | Content |
 |---|---|
 | `translation-work/learn-<lang>/state.json` | phase of the running learning pass |
+| `translation-work/learn-<lang>/due.json` | written by a publish: a learning pass is due (nothing reads it yet) |
 | `translation-work/learn-<lang>/arbiter.json` | open pairwise comparisons (both orders) |
 | `translation-work/learn-<lang>/revise.json` | per-release change counter (hysteresis budget) |
 | `translation-work/learn-<lang>/notes.json` | admin card notes fed into prompts |
