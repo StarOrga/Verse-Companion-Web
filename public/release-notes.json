@@ -41,6 +41,22 @@
       ]
     },
     {
+      "version": "0.278.2",
+      "date": "2026-11-18",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Admin concept \"Lager — Suche, Mengen & stabile Leiste\": round 2 (storing and taking out from a hit, compact multi-location rows, load log, place autocomplete, own location)."
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.278.1",
       "date": "2026-11-18",
       "sections": [
