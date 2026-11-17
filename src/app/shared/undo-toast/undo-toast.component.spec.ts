@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideTranslateService } from '@ngx-translate/core';
+import { TranslateService, provideTranslateService } from '@ngx-translate/core';
 import { PATH_ICONS } from '../item-path/path-icons';
 import { UndoToastComponent } from './undo-toast.component';
 import { UndoToastService } from './undo-toast.service';
@@ -63,7 +63,7 @@ describe('UndoToastComponent', () => {
     svc.offer({ messageKey: 'itemPath.done.ownWish', messageParams: { name: 'Polaris' }, commit: () => undefined, onUndo: () => undefined });
     f.detectChanges();
     const toast = f.nativeElement.querySelector('.toast') as HTMLElement;
-    expect(toast.querySelector('.msg')!.firstChild!.textContent).toContain('itemPath.done.ownWish');
+    expect(toast.querySelector('.msg')!.textContent).toContain('itemPath.done.ownWish');
     expect(toast.querySelector('.msg-detail')!.textContent).toContain('itemPath.done.ownWishDetail');
     const star = toast.querySelector('svg.wish-fall')!;
     expect(star.querySelectorAll('path').length).toBe(PATH_ICONS.wish.length);
@@ -80,6 +80,33 @@ describe('UndoToastComponent', () => {
     svc.offer({ messageKey: 'itemPath.done.hangar', commit: () => undefined, onUndo: () => undefined });
     expect(svc.current()?.detailKey).toBeUndefined();
     expect(svc.current()?.icon).toBeUndefined();
+    svc.undo();
+  });
+
+  it('sets the item name bold inside the sentence and draws the time line on a track', () => {
+    const svc = TestBed.inject(UndoToastService);
+    const t = TestBed.inject(TranslateService);
+    t.setTranslation('de', { done: '{{count}} × {{name}} entfernt.' });
+    t.use('de');
+    const f = TestBed.createComponent(UndoToastComponent);
+    svc.offer({ messageKey: 'done', messageParams: { count: 2, name: 'Karna Rifle' }, commit: () => undefined, onUndo: () => undefined });
+    f.detectChanges();
+    const msg = f.nativeElement.querySelector('.msg') as HTMLElement;
+    expect(msg.querySelector('b')!.textContent).toBe('Karna Rifle');
+    expect(msg.textContent!.replace(/\s+/g, ' ').trim()).toBe('2 × Karna Rifle entfernt.');
+    const track = f.nativeElement.querySelector('.drain-track') as HTMLElement;
+    expect(track.querySelector('.drain')).not.toBeNull();
+    expect(getComputedStyle(track).height).toBe('3px');
+    expect((track.querySelector('.drain') as HTMLElement).style.animationDuration).toBe('6000ms');
+    svc.undo();
+  });
+
+  it('a message without a name stays plain', () => {
+    const svc = TestBed.inject(UndoToastService);
+    const f = TestBed.createComponent(UndoToastComponent);
+    svc.offer({ messageKey: 'cart.removedGroup', messageParams: { n: 3 }, commit: () => undefined, onUndo: () => undefined });
+    f.detectChanges();
+    expect(f.nativeElement.querySelector('.msg b')).toBeNull();
     svc.undo();
   });
 });
