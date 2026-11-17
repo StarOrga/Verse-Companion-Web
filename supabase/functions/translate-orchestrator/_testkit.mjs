@@ -51,10 +51,13 @@ export function textStore() {
   };
 }
 
-export function putTable(ts, build, lang, entries) {
-  const { index, shards } = buildShards(build, lang, 'gen001', entries);
+/** Publishes a table. Publishing a build's table again (another `gen`) removes the shards of the one before. */
+export function putTable(ts, build, lang, entries, gen = 'gen001') {
+  const { index, shards } = buildShards(build, lang, gen, entries);
+  const dir = indexKey(build, lang).replace(/index\.json$/, '');
+  for (const k of [...ts.files.keys()]) if (k.startsWith(dir)) ts.files.delete(k);
   ts.files.set(indexKey(build, lang), JSON.stringify(index));
-  for (const [name, s] of shards) ts.files.set(shardKey(build, lang, 'gen001', name), JSON.stringify(s));
+  for (const [name, s] of shards) ts.files.set(shardKey(build, lang, gen, name), JSON.stringify(s));
   return index;
 }
 

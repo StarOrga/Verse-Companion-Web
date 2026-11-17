@@ -37,7 +37,7 @@ import { jobKey, jobPrefix, monthOf, PART_CHUNKS, round4, slice } from './_job.t
 import type { Deps, EstState, Job, Stats } from './_job.ts';
 import { buildFewShotIndex, buildSystem, pickSimilar } from './_prompt.ts';
 import type { CigPair, GlossaryRow } from './_prompt.ts';
-import { diffRows, DIGITS, F_CIG, HEX, loadKeySlice, loadRows, loadTmDigit, openRowReaders, rowsOf, writeRows } from './_rows.ts';
+import { diffRows, DIGITS, F_CIG, HEX, loadKeySlice, loadRows, loadTmDigit, openRowReaders, rowsOf, tableMark, writeRows } from './_rows.ts';
 import { SCAN_SHARDS } from './_scan.ts';
 import { cigTableFor } from './_sources.ts';
 
@@ -216,8 +216,9 @@ export async function estimateSlice(deps: Deps, job: Job): Promise<Job> {
     if (!readers.en.index || !readers.en.index.count) throw new TranslateError('translate.english_missing');
     if (job.mode === 'delta' && (!readers.base?.index || !readers.base.index.count)) throw new TranslateError('translate.base_build_missing');
     const total = readers.en.names().length;
-    // The table was published again since the walk began: its shards are other shards now.
-    const cursor = e.total === total ? e.cursor : 0;
+    const mark = tableMark(readers);
+    // A table was published again since the walk began: its shards are other shards now.
+    const cursor = e.total === total && e.mark === mark ? e.cursor : 0;
     const ks = await loadKeySlice(readers, cursor);
     const r = rowsOf(ks);
     await writeRows(store, workPrefix(job.id), cursor, r.byDigit);
@@ -239,7 +240,7 @@ export async function estimateSlice(deps: Deps, job: Job): Promise<Job> {
     const blank = (cursor === 0 ? 0 : e.blank ?? 0) + r.blank;
     return slice(deps, job, est(job, next >= total
       ? { phase: 'diff', cursor: 0, total, blank }
-      : { phase: 'rows', cursor: next, total, blank }, cursor === 0 ? { counts: undefined } : {}));
+      : { phase: 'rows', cursor: next, total, mark, blank }, cursor === 0 ? { counts: undefined } : {}));
   }
 
   if (e.phase === 'diff') {

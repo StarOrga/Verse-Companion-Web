@@ -15,7 +15,7 @@ import { overlayKey, overlayMetaOf, overlayUsage, ROOM_LABEL_PREFIX, roomOverlay
 import type { Overlay, OverlayMeta, SourceMetaRow, Store } from './_io.ts';
 import { commit, mergeState, passPrefix } from './_pass.ts';
 import type { Pass, PassStep } from './_pass.ts';
-import { diffRows, DIGITS, HEX, loadKeySlice, loadRows, loadTmDigit, openRowReaders, rowsOf, tmRevision, writeRows } from './_rows.ts';
+import { diffRows, DIGITS, HEX, loadKeySlice, loadRows, loadTmDigit, openRowReaders, rowsOf, tableMark, tmRevision, writeRows } from './_rows.ts';
 import type { Row } from './_rows.ts';
 import { SCAN_SHARDS } from './_scan.ts';
 import { cigTableFor } from './_sources.ts';
@@ -143,6 +143,8 @@ const CLEAN_KEYS = 150;
 interface OverlayPassState {
   /** The published table with CIG's own translation; null = none to respect. */
   cig?: string | null;
+  /** The publication of the tables the rows walk reads (`tableMark`). */
+  mark?: string;
   /** TM revision when the join began. */
   rev?: number;
   rejoins?: number;
@@ -170,11 +172,13 @@ export const overlayStep: PassStep = async (d, pass) => {
   if (pass.phase === 'rows') {
     const readers = await openRowReaders(d.store, pass.build_id!, st.cig ?? null);
     if (!readers.en.index) throw new TranslateError('translate.english_missing');
-    // The table was published again while the pass ran: start over with the new layout.
-    if (readers.en.names().length !== pass.total) return commit(d, pass, { phase: 'start', pos: 0, total: 0 });
+    // A table was published again while the pass ran: start over with the new one.
+    const mark = tableMark(readers);
+    if (readers.en.names().length !== pass.total || (pass.pos > 0 && st.mark !== mark)) return commit(d, pass, { phase: 'start', pos: 0, total: 0 });
     await writeRows(d.store, prefix, pass.pos, rowsOf(await loadKeySlice(readers, pass.pos)).byDigit);
     const next = pass.pos + SCAN_SHARDS;
-    return commit(d, pass, next >= pass.total ? { phase: 'join', pos: 0 } : { pos: next });
+    const state = mergeState(pass, { mark });
+    return commit(d, pass, next >= pass.total ? { phase: 'join', pos: 0, state } : { pos: next, state });
   }
 
   if (pass.phase === 'join') {

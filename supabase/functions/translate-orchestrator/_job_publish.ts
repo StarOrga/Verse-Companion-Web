@@ -29,7 +29,7 @@ import { resKey } from './_job_run.ts';
 import type { ResMap } from './_job_run.ts';
 import { requestLearning } from './_learn_pass.ts';
 import { assembleOverlay, loadOverlayParts, overlayEntries, overlayPartKey, overlayPartOf, writeOverlayText } from './_overlay.ts';
-import { DIGITS, HEX, loadKeySlice, loadRows, loadTmDigit, openRowReaders, rowsOf, tmRevision, writeRows } from './_rows.ts';
+import { DIGITS, HEX, loadKeySlice, loadRows, loadTmDigit, openRowReaders, rowsOf, tableMark, tmRevision, writeRows } from './_rows.ts';
 import { SCAN_SHARDS } from './_scan.ts';
 import { cigTableFor } from './_sources.ts';
 
@@ -95,11 +95,12 @@ export async function stepPublishing(deps: Deps, job: Job): Promise<void> {
     const readers = await openRowReaders(store, job.build_id, await cigTableFor(deps, job.lang));
     if (!readers.en.index || !readers.en.index.count) throw new TranslateError('translate.english_missing');
     const total = readers.en.names().length;
-    // The table was published again since the walk began: its shards are other shards now.
-    const cursor = pub.total === total ? pos : 0;
+    const mark = tableMark(readers);
+    // A table was published again since the walk began: its shards are other shards now.
+    const cursor = pub.total === total && pub.mark === mark ? pos : 0;
     await writeRows(store, prefix, cursor, rowsOf(await loadKeySlice(readers, cursor)).byDigit);
     const next = cursor + SCAN_SHARDS;
-    await slice(deps, job, { pub: { ...pub, total }, ...(next >= total ? { phase: 'join', pos: 0 } : { pos: next }) });
+    await slice(deps, job, { pub: { ...pub, total, mark }, ...(next >= total ? { phase: 'join', pos: 0 } : { pos: next }) });
     return;
   }
 

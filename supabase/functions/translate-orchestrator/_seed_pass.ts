@@ -31,7 +31,7 @@ import type { Pass, PassStep } from './_pass.ts';
 import { SCAN_SHARDS } from './_scan.ts';
 import { addCounts, decideSeed, emptySeedCounts, mergeSeedCands, packTextPct, seedCandidates } from './_seed.ts';
 import type { SeedCand, SeedConflict, SeedCounts, TextCounts } from './_seed.ts';
-import { groupOfShard, HEX, loadKeySlice, loadTmDigit, openRowReaders } from './_rows.ts';
+import { groupOfShard, HEX, loadKeySlice, loadTmDigit, openRowReaders, tableMark } from './_rows.ts';
 import { isUsable } from './_sources.ts';
 
 /** Work files deleted per cleanup slice. */
@@ -53,6 +53,8 @@ interface SeedState {
   confs?: number[];
   /** Number of the walk: a walk that starts over must not find the decisions of the one before. */
   walk?: number;
+  /** The publication of the tables the scan reads (`tableMark`). */
+  mark?: string;
 }
 
 /** What `apply` decided for one digit, written before the TM so that a repeated slice reads it instead of deciding again. */
@@ -124,7 +126,9 @@ export const seedStep: PassStep = async (d, pass) => {
   if (pass.phase === 'scan') {
     const readers = await openRowReaders(d.store, pass.build_id!, st.cig);
     if (!readers.en.index) throw new TranslateError('translate.english_missing');
-    if (readers.en.names().length !== pass.total) return commit(d, pass, { phase: 'start', pos: 0, total: 0 });
+    // A table was published again while the pass ran: start over with the new one.
+    const mark = tableMark(readers);
+    if (readers.en.names().length !== pass.total || (pass.pos > 0 && st.mark !== mark)) return commit(d, pass, { phase: 'start', pos: 0, total: 0 });
     const sl = await loadKeySlice(readers, pass.pos);
     const have = new Set(st.groups ?? []);
     const packs = new Map<string, Record<string, string>>();
@@ -148,7 +152,7 @@ export const seedStep: PassStep = async (d, pass) => {
     // Every digit is written, also an empty one: a retry after a re-publish must not leave an old bucket behind.
     for (const x of HEX) await d.store.putJson(workKey(pass, `cand-${x}-${pass.pos}`), buckets.get(x) ?? []);
     const next = pass.pos + SCAN_SHARDS;
-    const state = mergeState(pass, { counts: addCounts({ ...st.counts }, counts) });
+    const state = mergeState(pass, { mark, counts: addCounts({ ...st.counts }, counts) });
     return commit(d, pass, next >= pass.total ? { phase: 'apply', pos: 0, state } : { pos: next, state });
   }
 

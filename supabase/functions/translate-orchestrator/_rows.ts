@@ -60,6 +60,17 @@ export async function openRowReaders(
   };
 }
 
+/**
+ * Which publication of its tables a walk reads: the generation and shard count of each. A table of a
+ * build can be published again (a new generation; the shards of the old one go away), and a walk that
+ * went on would join rows of two publications - or rows of nothing. A walk notes the mark with its
+ * first slice and starts over when a later slice finds another one.
+ */
+export function tableMark(r: RowReaders): string {
+  const of = (t: TableReader | null | undefined) => (t?.index ? `${t.index.gen}:${t.names().length}` : '-');
+  return [of(r.en), of(r.cig), of(r.base), of(r.baseCig)].join('|');
+}
+
 /** What a slice of the English table holds once everything addressed by key is joined. No TM. */
 export interface KeySlice {
   /** Shard names this slice covers (`<group>-<n>`). */

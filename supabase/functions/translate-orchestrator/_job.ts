@@ -38,6 +38,8 @@ export interface EstState {
   cursor: number;
   /** English shard count of the walk. */
   total: number;
+  /** rows: the publication of the tables the walk reads (`tableMark`). */
+  mark?: string;
   /** Keys with blank English (counted by the rows walk, which writes no row for them). */
   blank?: number;
   /** Todo items per segment (`_job_estimate.ts: segmentsOf`), and the hash digits that hold some of them. */
@@ -77,7 +79,7 @@ export interface Stats {
   /** Batch groups that have a post-edit batch, in batch order. */
   pe?: number[];
   /** Publishing: when it began (TM entries of this job carry it) and the TM revision the overlay was joined at. */
-  pub?: { at: string; total?: number; rev?: number; rejoins?: number };
+  pub?: { at: string; total?: number; mark?: string; rev?: number; rejoins?: number };
   /** Heavy step in flight since (ISO); still set after RUN_STALE_MS = that run was killed (_attempts.ts). */
   run_at?: string;
   /** Killed runs in a row without progress. */

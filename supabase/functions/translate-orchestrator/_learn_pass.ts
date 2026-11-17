@@ -33,7 +33,7 @@ import type { Deps } from './_job.ts';
 import { advancePass, commit, memPasses, mergeState, passPrefix } from './_pass.ts';
 import type { Pass, PassDb, PassKind, PassStep } from './_pass.ts';
 import type { GlossaryRow } from './_prompt.ts';
-import { DIGITS, F_CIG, loadKeySlice, loadRows, loadTmDigit, openRowReaders, rowsOf, writeRows } from './_rows.ts';
+import { DIGITS, F_CIG, loadKeySlice, loadRows, loadTmDigit, openRowReaders, rowsOf, writeRows, tableMark } from './_rows.ts';
 import type { Row } from './_rows.ts';
 import { SCAN_SHARDS } from './_scan.ts';
 import { cigTableFor } from './_sources.ts';
@@ -73,6 +73,8 @@ interface PassState {
   sum: LearnSummary;
   /** The published table with CIG's own translation (`cigTableFor`); null = none to respect. */
   cig?: string | null;
+  /** The publication of the tables the rows walk reads (`tableMark`). */
+  mark?: string;
   /** A batch create in flight: written before the provider call, cleared with the step. */
   intent?: { kind: string; at: string };
   /** Batches created again after a request died with its intent open: each may exist twice. */
@@ -138,11 +140,13 @@ async function rows(d: D, pass: Pass): Promise<Pass | null> {
   const st = stateOf(pass);
   const readers = await openRowReaders(d.store, pass.build_id!, st.cig === undefined ? pass.lang : st.cig);
   if (!readers.en.index) throw new TranslateError('translate.english_missing');
-  // The table was published again while the pass ran: start over with the new layout.
-  if (readers.en.names().length !== pass.total) return commit(d, pass, { phase: 'start', pos: 0, total: 0 });
+  // A table was published again while the pass ran: start over with the new one.
+  const mark = tableMark(readers);
+  if (readers.en.names().length !== pass.total || (pass.pos > 0 && st.mark !== mark)) return commit(d, pass, { phase: 'start', pos: 0, total: 0 });
   await writeRows(d.store, passPrefix(pass), pass.pos, rowsOf(await loadKeySlice(readers, pass.pos)).byDigit);
   const next = pass.pos + SCAN_SHARDS;
-  return commit(d, pass, next >= pass.total ? { phase: 'mine', pos: 0 } : { pos: next });
+  const state = mergeState(pass, { mark });
+  return commit(d, pass, next >= pass.total ? { phase: 'mine', pos: 0, state } : { pos: next, state });
 }
 
 /** A rows file vanished: the table is walked again. */

@@ -453,6 +453,49 @@ describe('dead runs', () => {
   });
 });
 
+describe('a table published again while a walk is under way', () => {
+  it('the estimate starts its walk over and counts the new table, although the shard count is the same', async () => {
+    const { en, cig, base } = bigTables(20000);
+    const w = world({ tables: { en, cig, base } });
+    const job = await w.newJob();
+    await until(w, () => (w.jobs.get(job.id).stats.est?.cursor ?? 0) >= SCAN_SHARDS);
+    assert.equal(w.jobs.get(job.id).stats.est.phase, 'rows');
+    // Same keys, same sizes, so the same shards; one text of a shard the walk has passed reads differently.
+    const first = Object.keys(en).filter((k) => k.startsWith('item_')).sort()[0];
+    const en2 = { ...en, [first]: en[first].replace('Text number', 'Line number') };
+    const before = w.ts.json(`codex-locale/${NEW}/en/index.json`);
+    const after = putTable(w.ts, NEW, 'en', en2, 'gen002');
+    assert.deepEqual([after.groups, after.misc], [before.groups, before.misc]);
+
+    await until(w, () => w.jobs.get(job.id).status !== 'estimating');
+    const done = w.jobs.get(job.id);
+    assert.equal(done.status, 'queued', done.error);
+    const whole = await diffStrings({ en: en2, cig, tm: {}, mode: 'delta', baseEn: base });
+    assert.deepEqual(done.stats.counts, whole.counts);
+    const items = (await planOf(w, done)).flatMap((c) => c.items);
+    assert.deepEqual(items.map((it) => it.h).sort(), whole.todo.map((u) => u.h).sort());
+    assert.ok(items.some((it) => it.key === first), 'the text that changed in the new publication is translated');
+  });
+
+  it('a publish joins the overlay from one publication of the table', async () => {
+    const en = { ui_a: 'Open the main door of the hangar', ui_b: 'Close the main door of the hangar', ui_old: 'Old' };
+    const w = world({ tables: { en, cig: {}, base: { ui_old: 'Old' } } });
+    const job = await w.newJob();
+    await until(w, () => w.jobs.get(job.id).status === 'publishing' && w.jobs.get(job.id).stats.phase === 'join');
+    const mark = w.jobs.get(job.id).stats.pub.mark;
+    assert.match(mark, /^gen001:\d+\|/);
+    // The rows of the walk are there; a walk that begins again after a re-publish notes the new mark.
+    putTable(w.ts, NEW, 'en', en, 'gen002');
+    const cur = w.jobs.get(job.id);
+    w.jobs.set(job.id, { ...cur, stats: { ...cur.stats, phase: 'rows', pos: SCAN_SHARDS } });
+    await tickAll(w.deps, ONE);
+    assert.match(w.jobs.get(job.id).stats.pub.mark, /^gen002:/);
+    await until(w, () => ['published', 'failed'].includes(w.jobs.get(job.id).status));
+    assert.equal(w.jobs.get(job.id).status, 'published', w.jobs.get(job.id).error);
+    assert.deepEqual(Object.keys(w.ts.json(overlayKey('de', NEW)).entries).sort(), ['ui_a', 'ui_b']);
+  });
+});
+
 describe('the fast lane', () => {
   it('starts a queued job and creates its batch, but asks no batch that is under way', async () => {
     const w = world({ tables: { en: { ui_a: 'One', ui_b: 'Two', ui_old: 'Old' }, cig: {}, base: { ui_old: 'Old' } } });
