@@ -9,6 +9,8 @@ import {
   HOLO_SELECT,
   HOLO_GHOST_FLAG,
   HOLO_DIM_FILL,
+  HOLO_DIM_EDGE_ALPHA,
+  HOLO_EDGE_OPACITY,
   HoloLook,
   countTriangles,
   creaseEdges,
@@ -259,8 +261,15 @@ describe('HoloLook focus tween', () => {
     }
   });
 
+  it('dims the hull visibly while a selection exists (thousands of lines saturate the mock\'s .46 → .30)', () => {
+    // Effective line alpha well under the mock's .30, fill clearly darker, still readable.
+    expect(HOLO_EDGE_OPACITY * HOLO_DIM_EDGE_ALPHA).toBeLessThan(0.25);
+    expect(HOLO_EDGE_OPACITY * HOLO_DIM_EDGE_ALPHA).toBeGreaterThan(0.12);
+    expect(HOLO_DIM_FILL).toBeLessThanOrEqual(0.55);
+  });
+
   it('keeps the dim soft enough to read the rest of the model', () => {
-    expect(HOLO_DIM_FILL).toBeGreaterThan(0.5);
+    expect(HOLO_DIM_FILL).toBeGreaterThanOrEqual(0.4);
   });
 });
 

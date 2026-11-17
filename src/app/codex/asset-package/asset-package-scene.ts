@@ -17,6 +17,7 @@ import type { Bounds, PackagePlacement } from './asset-package.model';
 import {
   HoloLook,
   HOLO_GHOST_FLAG,
+  HOLO_OUTLINE_FLAG,
   HOLO_PART_LINE,
   HOLO_SELECT,
   countTriangles,
@@ -66,6 +67,29 @@ const HULL_OPACITY_INTERIOR = 0.28;
 /** Render order: hull → part bodies → the hovered / selected body. */
 const ORDER_FOCUS = 10;
 const ORDER_RING = 20;
+const ORDER_PULSE = 40;
+/** The select pulse: one expanding green ring, once per select (never with reduced motion). */
+export const PULSE_S = 0.75;
+/** Smallest on-screen start radius of the pulse ring, CSS px: a 12 px part is still found. */
+export const PULSE_MIN_START_PX = 22;
+/** Start radius of the ring as a share of the pulse quad's half size (it grows to ~0.95). */
+const PULSE_START = 0.3;
+
+const PULSE_FRAGMENT = /* glsl */ `
+uniform vec3 uColor;
+uniform float uP;
+varying vec2 vUv;
+void main() {
+  float r = length(vUv);
+  float aa = fwidth(r) * 1.5;
+  float e = 1.0 - (1.0 - uP) * (1.0 - uP);
+  float rad = mix(${PULSE_START.toFixed(2)}, 0.95, e);
+  float w = mix(0.07, 0.025, uP);
+  float ring = smoothstep(rad - w - aa, rad - w, r) * (1.0 - smoothstep(rad, rad + aa, r));
+  float a = ring * (1.0 - uP);
+  gl_FragColor = vec4(uColor * a, a);
+}
+`;
 
 // The empty-slot ring: a dashed outer ring that rotates, a thin inner ring and
 // a soft core, all in the manufacturer accent, drawn on a camera-facing quad.
@@ -179,6 +203,14 @@ export class PackageScene {
   private readonly ringSelMat: THREE.ShaderMaterial;
   private readonly rings: THREE.Mesh[] = [];
   private readonly raycaster = new THREE.Raycaster();
+  /** The select pulse quad; `pulseStart` (scene seconds) is null while none runs. */
+  private readonly pulseMat: THREE.ShaderMaterial;
+  private readonly pulse: THREE.Mesh;
+  private pulseStart: number | null = null;
+  private readonly pulseAt = new THREE.Vector3();
+  private pulseRadius = 0;
+  /** How many pulses fired (spec aid). */
+  private pulseCount = 0;
   constructor(
     private readonly canvas: HTMLCanvasElement,
     base: Rgb,
@@ -188,7 +220,7 @@ export class PackageScene {
     /** Runs `fn` outside Angular's zone (the frame loop must not trigger change detection). */
     private readonly outsideZone: <T>(fn: () => T) => T = (fn) => fn(),
   ) {
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, stencil: true, powerPreference: 'high-performance' });
     // Without a GPU (software WebGL, hardware acceleration switched off) one
     // frame of the hull takes seconds; the animated loop would freeze the page.
     // Such a device gets the reduced-motion scene: rendered on demand only.
@@ -228,6 +260,22 @@ export class PackageScene {
       });
     this.ringMat = ring(HOLO_PART_LINE);
     this.ringSelMat = ring(HOLO_SELECT);
+    this.pulseMat = new THREE.ShaderMaterial({
+      vertexShader: RING_VERTEX,
+      fragmentShader: PULSE_FRAGMENT,
+      uniforms: { uColor: { value: new THREE.Color(HOLO_SELECT[0] / 255, HOLO_SELECT[1] / 255, HOLO_SELECT[2] / 255) }, uP: { value: 1 } },
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+      premultipliedAlpha: true,
+      blending: THREE.NormalBlending,
+      toneMapped: false,
+    });
+    this.pulse = new THREE.Mesh(this.ringGeo, this.pulseMat);
+    this.pulse.visible = false;
+    this.pulse.renderOrder = ORDER_PULSE;
+    this.pulse.raycast = () => undefined;
+    this.scene.add(this.pulse);
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enableDamping = !reducedMotion;
     this.controls.dampingFactor = 0.12;
@@ -345,8 +393,14 @@ export class PackageScene {
     const hovered = new Set(state.hover.filter((id) => !selected.has(id)));
     if ([...hovered].some((id) => !this.hovered.has(id) && this.placed.has(id))) this.look.easeIn('hover');
     if ([...selected].some((id) => !this.selected.has(id) && this.placed.has(id))) this.look.easeIn('select');
+    const fresh = [...selected].filter((id) => !this.selected.has(id) && (this.placed.has(id) || this.anchors.has(id)));
+    // The green silhouette follows the selection (placed parts; an empty slot has its ring).
+    for (const [id, node] of this.placed) {
+      if (selected.has(id) !== this.selected.has(id)) this.look.setOutline(node, selected.has(id));
+    }
     this.hovered = hovered;
     this.selected = selected;
+    if (fresh.length) this.startPulse(fresh[fresh.length - 1]);
     this.applyRoles();
     // While a selection exists the hull lines and the other parts drop to about a third.
     this.look.setDim(selected.size > 0);
@@ -380,7 +434,7 @@ export class PackageScene {
       // Ghost children and edge lines share the body's geometry: only the body mesh counts.
       const hit = this.raycaster
         .intersectObject(node, true)
-        .find((h) => (h.object as THREE.Mesh).isMesh && !h.object.userData[HOLO_GHOST_FLAG] && !(h.object as THREE.LineSegments).isLineSegments);
+        .find((h) => (h.object as THREE.Mesh).isMesh && !h.object.userData[HOLO_GHOST_FLAG] && !h.object.userData[HOLO_OUTLINE_FLAG] && !(h.object as THREE.LineSegments).isLineSegments);
       if (hit && hit.distance < bestDist) {
         bestDist = hit.distance;
         best = id;
@@ -442,6 +496,49 @@ export class PackageScene {
       m.material = i < selectedAt.length ? this.ringSelMat : this.ringMat;
     });
     this.poseRings(this.elapsed());
+  }
+
+  /**
+   * One green ring that grows out from a newly selected part and fades, PULSE_S long.
+   * It starts just outside the part (at least PULSE_MIN_START_PX on screen) and never
+   * stays. None with reduced motion.
+   */
+  private startPulse(id: string): void {
+    if (this.reducedMotion) return;
+    const node = this.placed.get(id);
+    if (node) {
+      const box = new THREE.Box3().setFromObject(node);
+      box.getCenter(this.pulseAt);
+      this.pulseRadius = box.getSize(this.tmp).length() / 2;
+    } else {
+      this.pulseAt.copy(this.anchors.get(id)!);
+      this.pulseRadius = 0;
+    }
+    this.pulseStart = this.elapsed();
+    this.pulseCount++;
+    this.pulse.visible = true;
+    this.posePulse(this.pulseStart);
+    this.requestRender();
+  }
+
+  private posePulse(seconds: number): void {
+    if (this.pulseStart === null) return;
+    const p = (seconds - this.pulseStart) / PULSE_S;
+    if (p >= 1) {
+      this.pulseStart = null;
+      this.pulse.visible = false;
+      return;
+    }
+    this.pulseMat.uniforms['uP'].value = Math.max(p, 0);
+    // World size of one CSS pixel at the pulse's distance.
+    const h = Math.max(this.canvas.clientHeight || this.height, 1);
+    const dist = Math.max(this.camera.position.distanceTo(this.pulseAt), 1e-3);
+    const perPx = (2 * dist * Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2))) / h;
+    const startR = Math.max(this.pulseRadius * 1.15, PULSE_MIN_START_PX * perPx);
+    this.pulse.position.copy(this.pulseAt);
+    this.pulse.quaternion.copy(this.camera.quaternion);
+    // The quad is 1x1 with uv in [-1, 1]: half size = scale / 2.
+    this.pulse.scale.setScalar((startR / PULSE_START) * 2);
   }
 
   /** Billboard + animate the rings (static pose with reduced motion). */
@@ -665,6 +762,7 @@ export class PackageScene {
     this.width = width;
     this.height = height;
     this.renderer.setSize(width, height, false);
+    this.look.setViewport(width, height, this.renderer.getPixelRatio());
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.baseDistance = null;
@@ -771,11 +869,12 @@ export class PackageScene {
       const t = this.elapsed();
       this.look.tick(t);
       this.poseRings(t);
+      this.posePulse(t);
       this.renderer.render(this.scene, this.camera);
       this.onFrame();
       // The scan band and the slot ring keep the loop alive; with reduced
       // motion the scene renders on demand only.
-      if (moving || this.look.animated || this.look.tweening) this.requestRender();
+      if (moving || this.look.animated || this.look.tweening || this.pulseStart !== null) this.requestRender();
     }));
   }
 
@@ -788,6 +887,7 @@ export class PackageScene {
     this.look.dispose();
     this.ringMat.dispose();
     this.ringSelMat.dispose();
+    this.pulseMat.dispose();
     this.ringGeo.dispose();
     this.envTarget.dispose();
     this.pmrem.dispose();

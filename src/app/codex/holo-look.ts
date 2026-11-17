@@ -110,12 +110,51 @@ export const HOLO_EDGE_OPACITY = 0.46;
 // Highlight tuning, in one place so the look can be A/B-compared by editing a
 // number. There is no see-through any more (concept 20261117-1809, C1): a hover
 // or a selection never makes the hull translucent; the parts carry the highlight.
+// The mock's hull drop (.46 → .30 per line) does not carry on a wireframe with
+// thousands of crease lines (coverage saturates), so the factors are stronger:
+// measured on ANVL_Valkyrie the hull's mean luminance falls by about 40 %.
 /** Fill colour factor of the hull while a selection exists (1 = no dimming). */
-export const HOLO_DIM_FILL = 0.65;
+export const HOLO_DIM_FILL = 0.5;
 /** Crease-line colour factor of the hull while a selection exists. */
-export const HOLO_DIM_EDGE_COLOR = 1;
-/** Crease-line alpha factor of the hull while a selection exists: `.46` → `.30`. */
-export const HOLO_DIM_EDGE_ALPHA = 0.3 / 0.46;
+export const HOLO_DIM_EDGE_COLOR = 0.8;
+/** Crease-line alpha factor of the hull while a selection exists: `.46` → about `.21`. */
+export const HOLO_DIM_EDGE_ALPHA = 0.45;
+/** Width of the selected part's green silhouette, CSS px. */
+export const HOLO_OUTLINE_PX = 2;
+/** Mark on the outline kit (stencil mask + offset copies) of a selected body. */
+export const HOLO_OUTLINE_FLAG = 'holoOutline';
+const OUTLINE_DIRS: readonly (readonly [number, number])[] = [
+  [1, 0], [-1, 0], [0, 1], [0, -1],
+  [0.7071, 0.7071], [-0.7071, 0.7071], [0.7071, -0.7071], [-0.7071, -0.7071],
+];
+/** Render order of the outline: after the hull, the ghosts and the selected body. */
+const ORDER_OUTLINE = 30;
+
+// Silhouette outline: the mesh drawn again, shifted by a few pixels in clip
+// space in 8 directions, only where the stencil mask of the unshifted mesh is
+// not set. Screen-space, so it needs no reliable normals (the stripped exports
+// have none) and stays 2 px wide at any zoom; depth test off, so it reads
+// through the hull too.
+const OUTLINE_VERTEX = /* glsl */ `
+uniform vec2 uOffset;
+uniform vec2 uViewport;
+uniform float uPx;
+void main() {
+  vec4 local = vec4(position, 1.0);
+#ifdef USE_INSTANCING
+  local = instanceMatrix * local;
+#endif
+  vec4 clip = projectionMatrix * modelViewMatrix * local;
+  clip.xy += uOffset * uPx * 2.0 / uViewport * clip.w;
+  gl_Position = clip;
+}
+`;
+const OUTLINE_FRAGMENT = /* glsl */ `
+uniform vec3 uColor;
+void main() {
+  gl_FragColor = vec4(uColor, 1.0);
+}
+`;
 /** Brightness of a part that is not relevant to the picked Einsatz (`part` is 1.1). */
 export const HOLO_QUIET_LEVEL = 0.42;
 /** Crease-line factor of such a part. */
@@ -432,6 +471,9 @@ export class HoloLook {
     uFocusCount: { value: 0 },
     uFocusRadius: { value: 1 },
   };
+  private readonly outlineViewport = { value: new THREE.Vector2(1, 1) };
+  private readonly outlinePx = { value: HOLO_OUTLINE_PX };
+  private readonly outlineMats: THREE.ShaderMaterial[] = [];
   /** Body uniforms per body role, shared by its main and ghost materials. */
   private readonly body = new Map<HoloRole, { color: { value: THREE.Color }; alpha: { value: number }; glow: { value: number }; line: { value: THREE.Color }; lineAlpha: { value: number } }>();
 
@@ -623,7 +665,9 @@ export class HoloLook {
   dress(root: THREE.Object3D, role: HoloRole, accept: (mesh: THREE.Mesh) => boolean = () => true): void {
     const meshes: THREE.Mesh[] = [];
     root.traverse((o) => {
-      if ((o as THREE.Mesh).isMesh && !o.userData[HOLO_GHOST_FLAG] && accept(o as THREE.Mesh)) meshes.push(o as THREE.Mesh);
+      if ((o as THREE.Mesh).isMesh && !o.userData[HOLO_GHOST_FLAG] && !o.userData[HOLO_OUTLINE_FLAG] && accept(o as THREE.Mesh)) {
+        meshes.push(o as THREE.Mesh);
+      }
     });
     const detail = role === 'hull' || role === 'interior' ? this.hullDetail : FULL_DETAIL;
     if (detail.minArea > 0) root.updateWorldMatrix(true, true);
@@ -731,6 +775,7 @@ export class HoloLook {
     const body = isBody(role);
     const ghostOrder = GHOST_ORDER[role] ?? 2;
     root.traverse((o) => {
+      if (o.userData[HOLO_OUTLINE_FLAG]) return;
       const ghost = !!o.userData[HOLO_GHOST_FLAG];
       if (ghost) {
         o.visible = body;
@@ -746,6 +791,72 @@ export class HoloLook {
         o.renderOrder = renderOrder + 1;
       }
     });
+  }
+
+  /** Drawing-buffer size the outline offsets are measured in; call on every resize. */
+  setViewport(width: number, height: number, pixelRatio = 1): void {
+    this.outlineViewport.value.set(Math.max(width * pixelRatio, 1), Math.max(height * pixelRatio, 1));
+    this.outlinePx.value = HOLO_OUTLINE_PX * pixelRatio;
+  }
+
+  /**
+   * The green silhouette (HOLO_OUTLINE_PX wide) around every body mesh under
+   * `root`, on or off. Built on first use per mesh and kept hidden afterwards.
+   * Needs a renderer with a stencil buffer.
+   */
+  setOutline(root: THREE.Object3D, on: boolean): void {
+    const meshes: THREE.Mesh[] = [];
+    root.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh && !o.userData[HOLO_GHOST_FLAG] && !o.userData[HOLO_OUTLINE_FLAG]) meshes.push(o as THREE.Mesh);
+    });
+    for (const mesh of meshes) {
+      let kit = mesh.children.find((c) => c.userData[HOLO_OUTLINE_FLAG]);
+      if (!kit && on) {
+        kit = new THREE.Group();
+        kit.userData[HOLO_OUTLINE_FLAG] = true;
+        kit.matrixAutoUpdate = false;
+        const mats = this.outlineMaterials();
+        mats.forEach((mat, i) => {
+          const m = new THREE.Mesh(mesh.geometry, mat);
+          m.userData[HOLO_OUTLINE_FLAG] = true;
+          m.raycast = () => undefined;
+          m.matrixAutoUpdate = false;
+          m.renderOrder = ORDER_OUTLINE + (i === 0 ? 0 : 1);
+          kit!.add(m);
+        });
+        mesh.add(kit);
+      }
+      if (kit) kit.visible = on;
+    }
+  }
+
+  /** [stencil mask, 8 shifted copies], created once. */
+  private outlineMaterials(): THREE.ShaderMaterial[] {
+    if (this.outlineMats.length) return this.outlineMats;
+    const color = { value: new THREE.Color(HOLO_SELECT[0] / 255, HOLO_SELECT[1] / 255, HOLO_SELECT[2] / 255) };
+    const make = (offset: readonly [number, number], mask: boolean) =>
+      new THREE.ShaderMaterial({
+        vertexShader: OUTLINE_VERTEX,
+        fragmentShader: OUTLINE_FRAGMENT,
+        uniforms: {
+          uOffset: { value: new THREE.Vector2(offset[0], offset[1]) },
+          uViewport: this.outlineViewport,
+          uPx: this.outlinePx,
+          uColor: color,
+        },
+        side: THREE.DoubleSide,
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
+        colorWrite: !mask,
+        stencilWrite: true,
+        stencilRef: 1,
+        stencilFunc: mask ? THREE.AlwaysStencilFunc : THREE.NotEqualStencilFunc,
+        stencilZPass: mask ? THREE.ReplaceStencilOp : THREE.KeepStencilOp,
+        toneMapped: false,
+      });
+    this.outlineMats.push(make([0, 0], true), ...OUTLINE_DIRS.map((d) => make(d, false)));
+    return this.outlineMats;
   }
 
   /**
@@ -853,6 +964,7 @@ export class HoloLook {
     this.disposed = true;
     this.edgeJobs.clear();
     for (const map of [this.fills, this.lines, this.ghostFills, this.ghostLines]) for (const m of map.values()) m.dispose();
+    for (const m of this.outlineMats) m.dispose();
     for (const g of this.edgeCache.values()) g?.dispose();
     this.edgeCache.clear();
   }

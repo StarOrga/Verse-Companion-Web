@@ -103,6 +103,10 @@ interface HighlightInternals {
   anchors: Map<string, THREE.Vector3>;
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
+  reducedMotion: boolean;
+  pulse: THREE.Mesh;
+  pulseCount: number;
+  pulseStart: number | null;
 }
 
 describe('PackageScene highlight and pick', () => {
@@ -154,6 +158,47 @@ describe('PackageScene highlight and pick', () => {
     expect(b.material).toBe(look.fill('part'));
     expect(look.dimmed).toBe(false);
     expect(look.fill('hull').transparent).toBe(false);
+  });
+
+  it('pulses once per select, never on a hover, a repeat or with reduced motion', () => {
+    part('a', [0, 0, 0]);
+    part('b', [3, 0, 0]);
+    internals.reducedMotion = false;
+    scene.setHighlight({ hover: ['a'], selected: [] });
+    expect(internals.pulseCount).toBe(0);
+    scene.setHighlight({ hover: [], selected: ['a'] });
+    expect(internals.pulseCount).toBe(1);
+    expect(internals.pulse.visible).toBe(true);
+    // The same selection again (a hover elsewhere re-sends it): no second pulse.
+    scene.setHighlight({ hover: ['b'], selected: ['a'] });
+    expect(internals.pulseCount).toBe(1);
+    // It never stays: past PULSE_S the ring is gone.
+    internals.pulseStart = -10;
+    (scene as unknown as { posePulse(t: number): void }).posePulse(0);
+    expect(internals.pulse.visible).toBe(false);
+    internals.reducedMotion = true;
+    scene.setHighlight({ hover: [], selected: ['b'] });
+    expect(internals.pulseCount).toBe(1);
+    expect(internals.pulse.visible).toBe(false);
+  });
+
+  it('draws the green silhouette around the selected part only', () => {
+    const a = part('a', [0, 0, 0]);
+    const kit = () => a.children.find((c) => c.userData['holoOutline']);
+    scene.setHighlight({ hover: ['a'], selected: [] });
+    expect(kit()).toBeUndefined();
+    scene.setHighlight({ hover: [], selected: ['a'] });
+    expect(kit()!.visible).toBe(true);
+    // Mask + 8 shifted copies, through the hull (no depth test), stencil-gated.
+    const copies = kit()!.children as THREE.Mesh[];
+    expect(copies.length).toBe(9);
+    const outline = copies[1].material as THREE.ShaderMaterial;
+    expect(outline.depthTest).toBe(false);
+    expect(outline.stencilFunc).toBe(THREE.NotEqualStencilFunc);
+    // A role change keeps the outline's own materials.
+    expect(copies[1].material).toBe(outline);
+    scene.setHighlight({ hover: [], selected: [] });
+    expect(kit()!.visible).toBe(false);
   });
 
   it('picks the part under the pointer, else the nearest anchor within the slop, only among the candidates', () => {
