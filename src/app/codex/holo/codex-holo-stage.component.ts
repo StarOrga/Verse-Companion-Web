@@ -85,6 +85,7 @@ import type { CodexBuild } from '../codex.types';
 import type { PowerSheet } from '../codex-power';
 import type { SummaryOccupant } from '../ship-summary-panels';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { AreaSymbolComponent } from '../../shared/area-symbol/area-symbol.component';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScSegmentedComponent, ScSegmentOption } from '../../shared/segmented-control.component';
 import { HoloHotkeyAction, HoloSurface, holoHotkeyFor, holoHotkeyLabel, nextHoloSurface } from './codex-holo-hotkeys';
@@ -251,7 +252,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
 @Component({
   selector: 'sc-codex-holo-stage',
   standalone: true,
-  imports: [FeedbackSpotDirective,
+  imports: [FeedbackSpotDirective, AreaSymbolComponent,
     ScActionDirective,
     ScSegmentedComponent,
     NgTemplateOutlet,
@@ -615,7 +616,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
         </div>
         @for (a of partAreas(); track a.id) {
           <section class="below-area" [attr.data-p]="a.id" [attr.aria-label]="a.labelKey | translate">
-            <h3 class="area-h">{{ a.labelKey | translate }}</h3>
+            <h3 class="area-h"><sc-area-symbol [area]="a.id" />{{ a.labelKey | translate }}</h3>
             @if (a.sections.length > 0) {
               <sc-codex-hardpoint-layout
                 [calm]="true"
@@ -980,7 +981,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .below-area[data-p="defensive"] { --p: var(--holo-p-defensive); }
   .below-area[data-p="movement"] { --p: var(--holo-p-movement); }
   .below-area[data-p="signature"] { --p: var(--holo-p-signature); border-inline-end: 1px solid var(--l1); }
-  .area-h { margin: 6px 0 4px; font-family: var(--d); font-weight: 400; text-transform: uppercase; font-size: max(9.5px, var(--f)); letter-spacing: 0.14em; color: var(--p, var(--sc-accent)); }
+  .area-h { display: flex; align-items: center; gap: 6px; margin: 6px 0 4px; font-family: var(--d); font-weight: 400; text-transform: uppercase; font-size: max(9.5px, var(--f)); letter-spacing: 0.14em; color: var(--p, var(--sc-accent)); }
   .area-empty { margin: 4px 0; font-size: max(11.5px, var(--f)); color: var(--sc-fg-2); }
   .holo-below .holo-details { grid-column: 2 / 6; grid-row: 3; min-width: 0; }
   /* At the page's end the perspectives sit right on the strip. */
