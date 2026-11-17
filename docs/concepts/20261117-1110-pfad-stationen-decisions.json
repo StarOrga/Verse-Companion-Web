@@ -124,7 +124,36 @@
     {
       "iteration": 3,
       "template": "design",
-      "status": "open",
+      "action": "iterate",
+      "submission_id": "sub-mwkoas1b-wupt2eyt",
+      "favorite": null,
+      "general": "",
+      "decided": {
+        "r3-d-name3": "operation (preselected, untouched: not looked at, asked again in round 4)",
+        "r3-d-frei": "yes",
+        "r3-d-dialog": "menge",
+        "r3-d-mehrere": "neueste",
+        "r3-d-leer": "einsaetze",
+        "r3-d-erfuellt": "yes",
+        "r3-d-hq": "no (deviates from the recommendation: releasing in the HQ asks)"
+      },
+      "annotations": [
+        { "id": "r3-pfad-liste-a1", "design": "pfad", "screen": "pfad-liste", "answer": "ja" },
+        { "id": "r3-entfernen-frei-a1", "design": "entfernen", "screen": "entfernen-frei", "answer": "der ist noch nicht so suppper hübsch... gern polishen! Muss mehr eye catching sein" },
+        { "id": "r3-entfernen-dialog-a1", "design": "entfernen", "screen": "entfernen-dialog", "answer": "jain, die balken waren mir nicht zugeordnet genugg zur legende, sprich was die balken zu tun haben dort war erst auf dem driitten blick kalr" },
+        { "id": "r3-entfernen-mehrere-a1", "design": "entfernen", "screen": "entfernen-mehrere", "answer": "sehr gut!" },
+        { "id": "r3-entfernen-letzter-a1", "design": "entfernen", "screen": "entfernen-letzter", "answer": "sehr gut!" },
+        { "id": "r3-entfernen-aufgeloest-a1", "design": "entfernen", "screen": "entfernen-aufgeloest", "answer": "Sehr gut!" }
+      ],
+      "user_pins": [
+        { "id": "up-mwknv49q9yz4", "screen": "pfad-offen", "target": "Keiner Operation zugeordnet · Zuordnen", "text": "wenn keiner operation zugeordnet, reicht einfach der zuronden button ohne die ganze leiste, analog zu ins inventar!" },
+        { "id": "up-mwknvhorsj2w", "screen": "pfad-offen", "target": "Ins Inventar", "text": "Wenn es im inventar ist, sieht man darunter auch so eine leiste, die z. B. anzeigt wo? Ich würde gern die beiden kästen ähnlich halten !" },
+        { "id": "up-mwknxddbg0ea", "screen": "pfad-zuordnen", "target": "Einer Operation zuordnen", "text": "finde ich super, aber irgendwie nicht zugeordnet zu dem zurodnen button!? Das sollte sich ja visuell daran anschließen" },
+        { "id": "up-mwknxx4s1r5z", "screen": "pfad-zuordnen", "target": "Flotte ausbauen 2/5", "text": "Ich denke es wäre gut, dass danach anzuordnen welcher als letztes erstellt wurde oben und neue operation unten belassen" },
+        { "id": "up-mwknyuuim75d", "screen": "pfad-zuordnen", "target": "3 von 7 Plätzen belegt · Einsätze planst du im HQ", "text": "hq als link!? zur planen sektion!?" },
+        { "id": "up-mwko3wxxjgj1", "screen": "entfernen-letzter", "target": "1 aus Operation „Flotte ausbauen“", "text": "aber dann hier ohne balken? Naja, das balken thema eh nochmal überarbeiten" }
+      ],
+      "reading": "The rules are settled as recommended, except releasing in the HQ, which shall ask. The name question was not looked at; the owner already writes 'Operation' in their own notes. What remains is polish: both stations built alike (button only when empty, a status strip when filled, the ownership strip showing the place), the picker hanging on its button with the newest Operation on top and a link to HQ Planen, a split bar that labels itself and appears in every dialog, a louder toast.",
       "generated_at": "2026-11-17T12:18:46Z",
       "design_set": "topics",
       "designs": [
@@ -158,6 +187,39 @@
       "proposed_rules": "free pieces first without a question; a dialog with a quantity stepper as soon as a removal cuts into assigned pieces; several groups: most recently assigned gives first, adjustable; a group losing its last wish stays when it has Einsaetze (checkbox to dissolve), otherwise it is dissolved along (danger tone); one undo restores everything; unassigning in the HQ asks nothing; a fulfilled wish stays ticked in the group",
       "analytics": "hq:path_group_assign { surface, created }, hq:path_group_release { surface, pieces, dissolved }",
       "brief": "docs/concepts/20261117-1110-pfad-stationen/briefs/03.md"
+    },
+    {
+      "iteration": 4,
+      "template": "design",
+      "status": "open",
+      "generated_at": "2026-11-17T12:48:54Z",
+      "design_set": "topics",
+      "designs": [
+        "pfad Der Pfad (offen, beides, schiff, zuordnen)",
+        "entfernen Entfernen (frei, dialog, mehrere, letzter, aufgeloest, hq)"
+      ],
+      "analysis_view": {
+        "id": "r4-regeln4",
+        "topics": [
+          "r4-t-rest"
+        ],
+        "decisions": [
+          "r4-d-name4",
+          "r4-d-hqfrage"
+        ]
+      },
+      "working_title": "Operation",
+      "settled": [
+        "free pieces go first without a question",
+        "a removal that cuts into assigned pieces opens a dialog with a quantity stepper",
+        "several Operationen: the most recently assigned gives first, adjustable",
+        "an Operation losing its last wish stays when it has Einsaetze, otherwise it is dissolved along",
+        "a fulfilled wish stays in the Operation as reached",
+        "releasing a wish in the HQ asks (when exactly: r4-d-hqfrage)",
+        "rows and cards: solid ring, badge only"
+      ],
+      "changes_from_round_3": "both stations built alike (button only when empty, status strip when filled; the ownership strip shows quantity and place); the picker hangs on its button, newest Operation first, 'im HQ' links to /hq#planen; one self-labelled split bar in all four dialogs, no legend; a louder toast with accent edge, undo pill and time line; new screen entfernen-hq with a short confirmation",
+      "brief": "docs/concepts/20261117-1110-pfad-stationen/briefs/04.md"
     }
   ]
 }
