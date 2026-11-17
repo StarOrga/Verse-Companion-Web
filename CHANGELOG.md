@@ -4,6 +4,23 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.274.0] - 2026-11-17
+
+### Added
+- Translation learning, the import of community language packs and the overlay rebuild run as background passes in small slices, so they finish on a string table of production size. Learning now runs after every publish and import.
+- A full translation run of a language estimates itself in the background and then waits for approval with its cost and string count; the job list shows how far an estimate or a publish is.
+
+### Changed
+- Every step of a translation job (estimate, batches, quality checks, publish) works in slices of a fixed size, whatever the number of strings. Admin: the cost of a full run is confirmed when it is approved.
+
+### Fixed
+- CIG's own translations are respected: they were looked up under the wrong table name, so strings CIG already translates were translated again.
+- The nightly sync of community language packs no longer ends in a killed worker.
+- A translation job that is started again books the spend of its second run.
+- Cancelling a translation job no longer leaves a paid batch behind or sends its texts again as corrections; the part of a job that was sent and never read is counted against the monthly budget.
+- A translation job stops after three unanswered batch creations instead of risking one paid duplicate after another, and it survives network errors while it waits for a batch.
+- What an admin or a community pack wrote for a text while a job was running is no longer overwritten by the job, and the overlay served by default is always the one of the live build.
+
 ## [0.273.6] - 2026-11-17
 
 ### Fixed
