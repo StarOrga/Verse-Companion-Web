@@ -382,6 +382,13 @@ export const api = {
     /** Ask main whether an unattended run should start now. */
     decide: (signedIn: boolean): Promise<AutoRunDecision> =>
       ipcRenderer.invoke('sc:autorun:decide', signedIn),
+    /** A finished extract of this exact build still on disk (models-only runs), or null. */
+    reuseExtract: (req: {
+      installPath: string;
+      channel: string;
+      buildNumber: string;
+      patchVersion: string;
+    }): Promise<ExtractResultPayload | null> => ipcRenderer.invoke('sc:extract:reuse', req),
     /** The tray's Resume item asks the renderer to re-drive the stages. */
     onResumeRequested: (cb: () => void): (() => void) => {
       const listener = (): void => cb();
