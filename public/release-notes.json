@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.274.0",
+  "current": "0.274.1",
   "releases": [
+    {
+      "version": "0.274.1",
+      "date": "2026-11-17",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The import of a community language pack no longer runs out of memory: the pack is downloaded, stored and split in pieces instead of being held whole."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.274.0",
       "date": "2026-11-17",
