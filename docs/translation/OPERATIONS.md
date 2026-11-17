@@ -53,8 +53,25 @@ shards missing) ends the job `skipped` (`translate.no_base_build` / `translate.b
 one step) · `translate.nothing_to_do` (skipped) ·
 `translate.worker_limit` (the worker was killed by the runtime's CPU / memory limit 3 times in a row).
 A transient error (network, R2) only bumps `stats.attempts`; the next tick retries the same step.
-A crash between the claim and the batch creation is retried after 15 minutes; in the worst case it
-leaves one orphan batch (visible in the Console) that is paid but unused.
+
+## Submitting a batch at most once
+
+The provider has no idempotency key or metadata for a batch (checked 2026-11-17), so a create cannot
+be made repeatable. All three submissions (main, judge, post-edit) go through `submitGroups`:
+
+- Before each create it writes the intent `stats.submit` (`kind`, group, time) as a compare-and-set.
+  Of two runs that resume the same stale job only one wins that write; the other stops before it
+  creates anything. A create the provider refuses clears the intent again.
+- Its last write sets the phase the step waits in (`running`, or `judge` for the judge batch) in the
+  same compare-and-set that ends the submission. A `validating` job still found in `running` (a
+  judge batch from before this change whose second write was lost) is read as `judge`.
+- A submission that never finished (phase `submitting` / `judge_submitting`) is resumed after 15 minutes.
+
+What remains is a kill between the provider's answer and the write of the batch ref (one DB round
+trip). The resume then finds the intent without a ref, creates that group again, logs
+`translate batch may exist twice` and counts it in `stats.resubmits`; the first batch is an orphan
+(visible in the Console) that is paid and never read. `resubmits > 0` on a job is the cue to look.
+The learning step's batches (`_learn_batch.ts`, ids in R2 work keys) do not use this guard.
 
 ## Estimating runs in slices (why a tick cannot die on it)
 
@@ -65,6 +82,14 @@ in `translation-work/<job>/` (R2): `scan` reads `SCAN_SHARDS` (8) English shards
 base / CIG tables through the shard layout; `shots` picks the few-shot pairs of 15 chunks per slice. A tick
 keeps slicing for ~0.9 s of wall time, at most **one** estimating / publishing job per tick. Tunables:
 `SCAN_SHARDS`, `SHOT_CHUNKS` (`_scan.ts`), `ESTIMATE_BUDGET_MS` (`_machine.ts`).
+
+Measured on production, 2026-11-17 (154 English shards per build): a scan slice of 8 shards costs
+150-450 ms CPU and 4-8 s wall (the time is R2 reads), an isolate holds 22-28 MB. A warm isolate is
+reused for back-to-back ticks and retired by the runtime at about 1 s of summed CPU; none was killed
+in 63 ticks. So one job needs about 20 scan ticks plus three for `finalize` / `shots` / `complete`,
+roughly 4 hours on the 10-minute cron, and the jobs of one upload estimate one after another. There
+is headroom for about two slices per tick, not for more: do not raise `SCAN_SHARDS` past 16 without
+measuring again (`function_logs`, `Shutdown` rows, `cpu_time_used`).
 
 A worker the runtime kills (546) never reaches a catch block. Before an estimating / publishing step the
 driver stamps `stats.run_at`; a clean end clears it. A stamp older than 5 minutes is a dead run and bumps
