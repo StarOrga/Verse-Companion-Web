@@ -1,8 +1,10 @@
 // A community-source import in slices (why: _pass.ts; the filter itself: _seed.ts).
 //
 //   start      source usable? pin the LIVE build, read the upstream marker
-//   fetch      download the pack (~12 MB global.ini), store its decoded text
-//   split      parse it and write one part per key group of the English table (`pack-<group>`)
+//   fetch      download the pack (~12 MB global.ini) and store its text in pieces of whole lines
+//              (`raw-<n>`), each as it fills: the pack is never held (the note on memory: _pack.ts)
+//   split      one piece per slice: parse it and write its lines by key group of the English table
+//              (`pack-<piece>-<group>`), so a slice of the table reads only the groups it covers
 //   scan       SCAN_SHARDS English shards per slice: votes per English text, bucketed by the
 //              first hex digit of its hash -> `cand-<digit>-<pos>`
 //   apply      one hash digit per slice: merge its buckets, decide against the 16 TM shards of
@@ -25,7 +27,7 @@ import { TranslateError } from './_errors.ts';
 import type { TmEntry } from './_diff.ts';
 import { saveTm, sweepPrefix } from './_io.ts';
 import { requestLearning } from './_learn_pass.ts';
-import { decodeIni, parseIni, resolveSource, upstreamToken } from './_pack.ts';
+import { iniDecoder, lineCutter, openSource, parseIni, upstreamToken } from './_pack.ts';
 import { commit, mergeState, passPrefix } from './_pass.ts';
 import type { Pass, PassStep } from './_pass.ts';
 import { SCAN_SHARDS } from './_scan.ts';
@@ -36,6 +38,8 @@ import { isUsable } from './_sources.ts';
 
 /** Work files deleted per cleanup slice. */
 export const CLEAN_KEYS = 150;
+/** Characters of one piece of a pack (`raw-<n>`): ~1-3 MB of JSON, a twelfth of a usual pack. */
+export const PIECE_CHARS = 1_000_000;
 
 interface SeedState {
   /** The published table with CIG's own translation; null = none to respect (ru in the korean slot). */
@@ -46,9 +50,12 @@ interface SeedState {
   token?: string | null;
   at: string;
   counts: SeedCounts;
+  /** Pieces the download was stored in (`raw-0` ... `raw-<pieces - 1>`). */
+  pieces?: number;
+  /** Lines of the pack, added up piece by piece (a key that two pieces carry counts twice). */
   packKeys?: number;
-  /** Pack parts written by `split`. */
-  groups?: string[];
+  /** Key group -> the pieces that carry lines of it, in the order of the file (`pack-<piece>-<group>`). */
+  parts?: Record<string, number[]>;
   /** Hash digits whose bucket produced conflicts. */
   confs?: number[];
   /** Number of the walk: a walk that starts over must not find the decisions of the one before. */
@@ -96,31 +103,57 @@ export const seedStep: PassStep = async (d, pass) => {
 
   if (pass.phase === 'fetch') {
     const src = await sources.load(pass.source_id);
-    const resolved = await resolveSource(src, sources.fetchFn, sources.ghToken);
-    await d.store.putJson(workKey(pass, 'raw'), { text: decodeIni(resolved.bytes) });
-    return commit(d, pass, { phase: 'split', state: mergeState(pass, { token: resolved.token }) });
+    const opened = await openSource(src, sources.fetchFn, sources.ghToken);
+    const decoder = iniDecoder();
+    const cutter = lineCutter(sources.pieceChars ?? PIECE_CHARS);
+    let pieces = 0;
+    // A piece is stored before the next bytes are asked for, so what this slice holds is one piece.
+    const put = async (text: string) => {
+      await d.store.putJson(workKey(pass, `raw-${pieces}`), { text });
+      pieces++;
+    };
+    for await (const bytes of opened.chunks) {
+      for (const piece of cutter.push(decoder.push(bytes))) await put(piece);
+    }
+    for (const piece of cutter.push(decoder.end())) await put(piece);
+    const rest = cutter.end();
+    if (rest !== null) await put(rest);
+    // `parts` starts empty with every download: a file of a download before this one is on no list.
+    return commit(d, pass, { phase: 'split', pos: 0, state: mergeState(pass, { token: opened.token, pieces, packKeys: 0, parts: {} }) });
   }
 
   if (pass.phase === 'split') {
-    const raw = (await d.store.getJson(workKey(pass, 'raw'))) as { text?: string } | null;
-    if (!raw || typeof raw.text !== 'string') return commit(d, pass, { phase: 'fetch' });
+    // No count of pieces: the download was stored by an older layout (one `raw` file). Fetch it again.
+    if (typeof st.pieces !== 'number') return commit(d, pass, { phase: 'fetch', pos: 0 });
+    const pieces = st.pieces;
+    if (pass.pos >= pieces) return commit(d, pass, { phase: 'scan', pos: 0 });
+    const raw = (await d.store.getJson(workKey(pass, `raw-${pass.pos}`))) as { text?: string } | null;
+    if (!raw || typeof raw.text !== 'string') return commit(d, pass, { phase: 'fetch', pos: 0 });
     const pack = parseIni(raw.text);
     const readers = await openRowReaders(d.store, pass.build_id!, null);
     if (!readers.en.index) throw new TranslateError('translate.english_missing');
     // A key lives in the part of its group, exactly as the English table groups its shards, so a slice
     // of the table needs only the parts of the groups it covers.
     const own = readers.en.index.groups;
-    const parts = new Map<string, Record<string, string>>();
+    const grouped = new Map<string, Record<string, string>>();
     for (const [key, value] of pack.map) {
       const g = keyGroup(key);
       const name = g && Object.hasOwn(own, g) ? g : MISC_GROUP;
-      let part = parts.get(name);
-      if (!part) parts.set(name, (part = {}));
+      let part = grouped.get(name);
+      if (!part) grouped.set(name, (part = {}));
       part[key] = value;
     }
-    for (const [name, part] of parts) await d.store.putJson(workKey(pass, `pack-${name}`), part);
-    await d.store.deleteKey(workKey(pass, 'raw')).catch(() => {});
-    return commit(d, pass, { phase: 'scan', pos: 0, state: mergeState(pass, { packKeys: pack.map.size, groups: [...parts.keys()].sort() }) });
+    // A piece writes files of its own and reads none: however the lines of a pack are ordered, a slice
+    // moves one piece. Which pieces carry a group is noted in the order of the file, so the scan lets a
+    // line that a later piece repeats win, as one pass over the file does.
+    const parts: Record<string, number[]> = { ...(st.parts ?? {}) };
+    for (const [name, part] of grouped) {
+      await d.store.putJson(workKey(pass, `pack-${pass.pos}-${name}`), part);
+      const ids = parts[name] ?? [];
+      if (!ids.includes(pass.pos)) parts[name] = [...ids, pass.pos];
+    }
+    const state = mergeState(pass, { packKeys: (st.packKeys ?? 0) + pack.map.size, parts });
+    return commit(d, pass, pass.pos + 1 < pieces ? { pos: pass.pos + 1, state } : { phase: 'scan', pos: 0, state });
   }
 
   if (pass.phase === 'scan') {
@@ -129,11 +162,21 @@ export const seedStep: PassStep = async (d, pass) => {
     // A table was published again while the pass ran: start over with the new one.
     const mark = tableMark(readers);
     if (readers.en.names().length !== pass.total || (pass.pos > 0 && st.mark !== mark)) return commit(d, pass, { phase: 'start', pos: 0, total: 0 });
+    // No list of parts: the pack was split by an older layout (one file per group). Start over.
+    if (!st.parts) return commit(d, pass, { phase: 'start', pos: 0, total: 0 });
     const sl = await loadKeySlice(readers, pass.pos);
-    const have = new Set(st.groups ?? []);
     const packs = new Map<string, Record<string, string>>();
     for (const g of new Set(sl.names.map(groupOfShard))) {
-      if (have.has(g)) packs.set(g, ((await d.store.getJson(workKey(pass, `pack-${g}`))) ?? {}) as Record<string, string>);
+      if (!Object.hasOwn(st.parts, g)) continue;
+      const lines: Record<string, string> = {};
+      for (const piece of st.parts[g]) {
+        const part = (await d.store.getJson(workKey(pass, `pack-${piece}-${g}`))) as Record<string, string> | null;
+        // A part that is on the list and not in the bucket: importing the rest would report a pack with
+        // holes as the whole pack. Start over.
+        if (!part) return commit(d, pass, { phase: 'start', pos: 0, total: 0 });
+        Object.assign(lines, part);
+      }
+      packs.set(g, lines);
     }
     const own = readers.en.index.groups;
     const lookup = (key: string) => {

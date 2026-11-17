@@ -1,7 +1,9 @@
 // Community global.ini packs: parsing and source resolution (concept 2026-11-08).
-// Plain, erasable TypeScript (node --test + Deno). Memory: packs are ~12 MB, so a pack is decoded
-// ONCE, parsed line by line into a Map and the bytes are dropped by the caller. A zip is only
-// inflated for its one entry (fflate `filter`).
+// Plain, erasable TypeScript (node --test + Deno). Memory: a pack is ~12 MB and a request has 256 MB,
+// of which a download can take far more than its size (see `readCapped`). The import therefore never
+// holds a pack: `openSource` hands out its bytes as they arrive, `iniDecoder` + `lineCutter` turn them
+// into pieces of whole lines, and each piece is stored and parsed on its own. A zip is only inflated
+// for its one entry (fflate `filter`).
 
 export interface ParsedPack {
   /** normalised key → value (the Frontend_PU_Version header line is NOT in here). */
@@ -26,6 +28,85 @@ export function decodeIni(bytes: Uint8Array): string {
   if (bytes.length >= 4 && bytes[1] === 0 && bytes[3] === 0 && bytes[0] !== 0) return new TextDecoder('utf-16le').decode(bytes);
   if (bytes.length >= 3 && bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) return new TextDecoder('utf-8').decode(bytes.subarray(3));
   return new TextDecoder('utf-8').decode(bytes);
+}
+
+/** Which encoding `decodeIni` would pick, read from the first bytes; null = more bytes are needed to tell. */
+function encodingOf(head: Uint8Array, complete: boolean): string | null {
+  if (head.length >= 2 && head[0] === 0xff && head[1] === 0xfe) return 'utf-16le';
+  if (head.length >= 2 && head[0] === 0xfe && head[1] === 0xff) return 'utf-16be';
+  if (head.length < 4 && !complete) return null;
+  if (head.length >= 4 && head[1] === 0 && head[3] === 0 && head[0] !== 0) return 'utf-16le';
+  return 'utf-8';
+}
+
+export interface IniDecoder {
+  /** The text of these bytes; a character cut by the end of a chunk comes with the next one. */
+  push(bytes: Uint8Array): string;
+  /** What is left when the bytes are over. */
+  end(): string;
+}
+
+/**
+ * `decodeIni` for bytes that arrive in chunks: same encodings, same result, but the whole file is never
+ * held. The BOM is dropped by the decoder itself.
+ */
+export function iniDecoder(): IniDecoder {
+  let dec: TextDecoder | null = null;
+  let head: Uint8Array | null = new Uint8Array(0);
+  const start = (complete: boolean): string => {
+    const enc = encodingOf(head!, complete);
+    if (!enc) return '';
+    dec = new TextDecoder(enc);
+    const first = head!;
+    head = null;
+    return dec.decode(first, { stream: true });
+  };
+  return {
+    push(bytes) {
+      if (dec) return dec.decode(bytes, { stream: true });
+      const joined = new Uint8Array(head!.length + bytes.length);
+      joined.set(head!, 0);
+      joined.set(bytes, head!.length);
+      head = joined;
+      return start(false);
+    },
+    end() {
+      const first = dec ? '' : start(true);
+      return first + dec!.decode();
+    },
+  };
+}
+
+export interface LineCutter {
+  /** Adds text and returns the pieces that are full: each ends on a line break. */
+  push(text: string): string[];
+  /** The rest, or null when nothing is left. */
+  end(): string | null;
+}
+
+/** Cuts a text that arrives in parts into pieces of about `size` characters, never inside a line. */
+export function lineCutter(size: number): LineCutter {
+  let buf = '';
+  return {
+    push(text) {
+      buf += text;
+      const out: string[] = [];
+      while (buf.length >= size) {
+        // The last line break inside the first `size` characters; a line longer than that ends the piece.
+        let cut = buf.lastIndexOf('\n', size - 1);
+        if (cut === -1) cut = buf.indexOf('\n', size);
+        if (cut === -1) break;
+        out.push(buf.slice(0, cut + 1));
+        buf = buf.slice(cut + 1);
+      }
+      return out;
+    },
+    end() {
+      const rest = buf;
+      buf = '';
+      return rest ? rest : null;
+    },
+  };
 }
 
 const HEADER_KEY = 'frontend_pu_version';
@@ -114,39 +195,70 @@ const GH_HEADERS = (token?: string): Record<string, string> => ({
   ...(token ? { authorization: `Bearer ${token}` } : {}),
 });
 
-async function readCapped(res: Response, max: number): Promise<Uint8Array> {
+/**
+ * The bytes of a response as they arrive, at most `max` of them.
+ *
+ * A chunk must not be kept: the runtime reads into a buffer of 64 KB and hands out a view of the part
+ * that was filled, so a list of chunks holds 64 KB for every few KB that came in. The first live import
+ * (2026-11-17, a pack of 11.8 MB) had 203 MB of such buffers when the worker was killed at its 256 MB.
+ * Whoever reads this uses a chunk before asking for the next one.
+ */
+async function* bodyChunks(res: Response, max: number): AsyncGenerator<Uint8Array> {
   const len = Number(res.headers.get('content-length') ?? 0);
-  if (len > max) throw new Error('translate.source_too_large');
+  if (len > max) {
+    await res.body?.cancel().catch(() => {});
+    throw new Error('translate.source_too_large');
+  }
   if (!res.body) {
     const buf = new Uint8Array(await res.arrayBuffer());
     if (buf.length > max) throw new Error('translate.source_too_large');
-    return buf;
+    yield buf;
+    return;
   }
-  const chunks: Uint8Array[] = [];
   let total = 0;
   const reader = res.body.getReader();
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    total += value.length;
-    if (total > max) {
-      await reader.cancel();
-      throw new Error('translate.source_too_large');
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) return;
+      total += value.length;
+      if (total > max) throw new Error('translate.source_too_large');
+      yield value;
     }
-    chunks.push(value);
+  } finally {
+    // Also when the reader of the chunks stops early or throws: the connection is given back.
+    await reader.cancel().catch(() => {});
   }
-  const out = new Uint8Array(total);
-  let o = 0;
-  for (const c of chunks) {
-    out.set(c, o);
-    o += c.length;
+}
+
+/** All bytes of a response in ONE buffer that grows as they arrive (no chunk is kept, see `bodyChunks`). */
+async function readCapped(res: Response, max: number): Promise<Uint8Array> {
+  const len = Number(res.headers.get('content-length') ?? 0);
+  let out = new Uint8Array(Math.min(Math.max(len, 1 << 20), max));
+  let total = 0;
+  for await (const chunk of bodyChunks(res, max)) {
+    if (total + chunk.length > out.length) {
+      const grown = new Uint8Array(Math.min(Math.max(out.length * 2, total + chunk.length), Math.max(max, total + chunk.length)));
+      grown.set(out.subarray(0, total), 0);
+      out = grown;
+    }
+    out.set(chunk, total);
+    total += chunk.length;
   }
-  return out;
+  return out.subarray(0, total);
+}
+
+async function openUrl(f: FetchFn, url: string, headers?: Record<string, string>): Promise<Response> {
+  const res = await f(url, { headers, redirect: 'follow', signal: AbortSignal.timeout(60_000) });
+  if (!res.ok) {
+    await res.body?.cancel().catch(() => {});
+    throw new Error(`translate.source_fetch_${res.status}`);
+  }
+  return res;
 }
 
 async function getBytes(f: FetchFn, url: string, max: number, headers?: Record<string, string>): Promise<{ bytes: Uint8Array; res: Response }> {
-  const res = await f(url, { headers, redirect: 'follow', signal: AbortSignal.timeout(60_000) });
-  if (!res.ok) throw new Error(`translate.source_fetch_${res.status}`);
+  const res = await openUrl(f, url, headers);
   return { bytes: await readCapped(res, max), res };
 }
 
@@ -180,23 +292,63 @@ export async function unzipEntry(zip: Uint8Array, path: string, unzip?: UnzipFn)
   return hit;
 }
 
-/** Fetches the bytes of one source's global.ini (raw url · latest release asset · zip entry). */
+/**
+ * The whole global.ini of one source in memory. For tests and scripts only: an edge request takes it
+ * through `openSource`, piece by piece.
+ */
 export async function resolveSource(src: PackSource, f: FetchFn = fetch, ghToken?: string, unzip?: UnzipFn): Promise<ResolvedPack> {
+  const opened = await openSource(src, f, ghToken, unzip);
+  const parts: Uint8Array[] = [];
+  let total = 0;
+  for await (const chunk of opened.chunks) {
+    parts.push(chunk.slice());
+    total += chunk.length;
+  }
+  const bytes = new Uint8Array(total);
+  let o = 0;
+  for (const p of parts) {
+    bytes.set(p, o);
+    o += p.length;
+  }
+  return { bytes, token: opened.token, url: opened.url };
+}
+
+export interface OpenedPack {
+  /** The bytes of the global.ini as they arrive. Use each chunk before asking for the next one. */
+  chunks: AsyncIterable<Uint8Array>;
+  /** Version marker of what is being fetched (release tag, ETag …), best effort. */
+  token: string | null;
+  url: string;
+}
+
+/** What a zip entry is handed out in: it is in memory already, the reader still gets it in small parts. */
+const ENTRY_CHUNK = 256 * 1024;
+
+/**
+ * Opens one source's global.ini (raw url · latest release asset · zip entry) without reading it: the
+ * import takes the bytes chunk by chunk and never holds the file. Only a zip has to be held whole, to
+ * inflate its one entry.
+ */
+export async function openSource(src: PackSource, f: FetchFn = fetch, ghToken?: string, unzip?: UnzipFn): Promise<OpenedPack> {
   const r = parseResolver(src.resolver);
   if (src.resolver && !r) throw new Error('translate.source_resolver_invalid');
   if (r?.kind === 'github-release') {
     const rel = await latestRelease(f, r, ghToken);
-    const { bytes } = await getBytes(f, rel.assetUrl, MAX_INI_BYTES, GH_HEADERS(ghToken));
-    return { bytes, token: `${rel.tag}@${rel.assetUpdated ?? ''}`, url: rel.assetUrl };
+    const res = await openUrl(f, rel.assetUrl, GH_HEADERS(ghToken));
+    return { chunks: bodyChunks(res, MAX_INI_BYTES), token: `${rel.tag}@${rel.assetUpdated ?? ''}`, url: rel.assetUrl };
   }
   if (!src.raw_url) throw new Error('translate.source_no_url');
   if (r?.kind === 'zip-entry') {
     const { bytes, res } = await getBytes(f, src.raw_url, MAX_ZIP_BYTES);
     const entry = await unzipEntry(bytes, r.path, unzip);
-    return { bytes: entry, token: res.headers.get('etag') ?? res.headers.get('last-modified'), url: src.raw_url };
+    if (entry.length > MAX_INI_BYTES) throw new Error('translate.source_too_large');
+    const parts = (async function* () {
+      for (let o = 0; o < entry.length; o += ENTRY_CHUNK) yield entry.subarray(o, o + ENTRY_CHUNK);
+    })();
+    return { chunks: parts, token: res.headers.get('etag') ?? res.headers.get('last-modified'), url: src.raw_url };
   }
-  const { bytes, res } = await getBytes(f, src.raw_url, MAX_INI_BYTES);
-  return { bytes, token: res.headers.get('etag'), url: src.raw_url };
+  const res = await openUrl(f, src.raw_url);
+  return { chunks: bodyChunks(res, MAX_INI_BYTES), token: res.headers.get('etag'), url: src.raw_url };
 }
 
 /**
