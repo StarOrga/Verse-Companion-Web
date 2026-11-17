@@ -5,6 +5,7 @@ import {
   canCancel,
   glossarySearchFilter,
   jobErrorKey,
+  jobProgress,
   judgeScore,
   monthStartUtc,
   revertPatch,
@@ -50,7 +51,22 @@ describe('translations.logic', () => {
     expect(judgeScore(null)).toBeNull();
   });
 
+  it('reads how far an estimate or a publish is, and nothing for a wait', () => {
+    expect(jobProgress('estimating', {})).toBe(0);
+    expect(jobProgress('estimating', { est: { phase: 'rows', cursor: 77, total: 154 } })).toBe(20);
+    expect(jobProgress('estimating', { est: { phase: 'diff', cursor: 8, total: 154 } })).toBe(50);
+    expect(jobProgress('estimating', { est: { phase: 'shots', cursor: 23, total: 154 }, plan: { parts: 46 } })).toBe(88);
+    expect(jobProgress('estimating', { est: { phase: 'complete', cursor: 0 } })).toBe(98);
+    expect(jobProgress('publishing', { phase: 'rows', pos: 154, pub: { total: 154 } })).toBe(65);
+    expect(jobProgress('publishing', { phase: 'join', pos: 16 })).toBe(95);
+    expect(jobProgress('publishing', { phase: 'rows', pos: 8 })).toBe(35);
+    expect(jobProgress('submitted', { phase: 'running' })).toBeNull();
+    expect(jobProgress('published', null)).toBeNull();
+    expect(jobProgress('estimating', { est: { phase: 'new phase' } })).toBeNull();
+  });
+
   it('maps job errors to keys, unknown codes to the generic one', () => {
+    expect(jobErrorKey('translate.nothing_to_do')).toBe('admin.translations.jobErrors.nothing_to_do');
     expect(jobErrorKey(null)).toBeNull();
     expect(jobErrorKey('translate.no_api_key')).toBe('admin.translations.jobErrors.no_api_key');
     expect(jobErrorKey('some raw failure text')).toBe('admin.translations.jobErrors.unknown');

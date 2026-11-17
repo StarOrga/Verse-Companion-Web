@@ -1,13 +1,13 @@
 // translate-orchestrator — game-string translation job state machine.
 // Contract: docs/translation/ARCHITECTURE.md. Operations: docs/translation/OPERATIONS.md.
 //
-//   POST { op: 'tick' }                              advance every open job one step
+//   POST { op: 'tick', fast? }                       ask every waiting job, run slices of one job or pass
 //   POST { op: 'approve' | 'cancel', job_id }        admin
-//   POST { op: 'estimate', build_id, lang, mode? }   admin dry run, no writes
-//   POST { op: 'start_full', build_id, lang }        admin, always parks in awaiting_approval
-//   POST { op: 'import_seed', source_id }            admin, community pack -> TM (licensed|permitted only)
-//   POST { op: 'sync_sources' }                      daily pg_cron (publishable key) or admin
-//   POST { op: 'learn', lang }                       admin, learning backfill (hook)
+//   POST { op: 'start_full', build_id, lang }        admin: starts a full job; it is estimated in slices and then awaits approval
+//   POST { op: 'import_seed', source_id }            admin, starts the import pass of a community pack (licensed|permitted only)
+//   POST { op: 'sync_sources' }                      daily pg_cron (publishable key) or admin: starts a pass per changed source
+//   POST { op: 'learn', lang }                       admin, starts a learning pass
+// import_seed / sync_sources / learn only start a pass (translation_passes); later ticks run it in slices.
 //   POST { op: 'draft_outreach', source_id }         admin, maintainer message DRAFT (never sent)
 //
 // AUTH (verify_jwt = false in config.toml; checked here):
@@ -19,23 +19,25 @@
 //   * the anon/publishable key -> also `sync_sources` (daily cron): it only re-imports enabled
 //                               licensed|permitted sources whose upstream changed, and a public-key
 //                               caller is throttled to one run per 6 h (atomic claim_run) because it
-//                               makes outbound GitHub calls with the server token.
+//                               makes outbound GitHub calls with the server token. A `tick` without
+//                               `fast` (it asks the provider about every batch) is throttled to one
+//                               per 30 s for the same reason; a fast tick only takes the lock.
 //   * a signed-in user for whom public.is_admin() is true (approved, not suspended; asked with the
 //     CALLER's client, the rpc reads auth.uid()) -> every op
 // The Anthropic key is TRANSLATE_ANTHROPIC_API_KEY only; absent -> jobs fail with
 // `translate.no_api_key`. It is never the sc-events-sync key.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
-import { deleteObject, getObject, putObject, r2FromEnv } from '../ingest-skins/_r2.ts';
+import { deleteObject, getObject, listObjects, putObject, r2FromEnv } from '../ingest-skins/_r2.ts';
 import { BUILD_ID_RE, LANG_RE } from '../ingest-catalog/_locale-shards.ts';
 import { makeLlm } from './_anthropic.ts';
 import { makeDb } from './_db.ts';
-import { approve, cancel, dryRun, startFull, tick, TranslateError } from './_machine.ts';
+import { approve, cancel, startFull, tickAll, TranslateError } from './_machine.ts';
 import type { Deps } from './_machine.ts';
 import type { Store } from './_io.ts';
-import { learningHooks } from './_hooks.ts';
-import { draftOutreach, importSeed, listSources, syncSources } from './_sources.ts';
-import { buildOverlayMeta } from './_io.ts';
+import { requestLearning } from './_learn_pass.ts';
+import { makePassDb, PASS_STEPS } from './_pass_db.ts';
+import { draftOutreach, makeSourceDb, startImport, syncSources } from './_sources.ts';
 import { writeAlerts } from './_alerts.ts';
 import { makeLearnDb } from './_learn_db.ts';
 import { withPosthog } from '../_shared/posthog.ts';
@@ -51,7 +53,13 @@ function logError(msg: string, data?: Record<string, unknown>): void {
 
 // sync_sources by a public-key caller (the daily cron): at most one run per 6 h, claimed atomically (claim_run).
 const SYNC_SOURCES_PUBLIC_MIN_MS = 6 * 3600_000;
+// A full tick by a public-key caller: the cron sends one every 10 minutes, nobody needs more.
+const TICK_PUBLIC_MIN_MS = 30_000;
 const SOURCE_ID_RE = /^[a-z0-9][a-z0-9_-]{0,63}$/;
+// The heavy-work lock (lock_claim / lock_release). It is given back when the request has done its slices; the
+// time to live only frees it after a request that was killed, so it is as long as the platform lets a request live.
+const HEAVY_LOCK = 'translate-orchestrator:heavy';
+const HEAVY_LOCK_TTL = '150 seconds';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -123,7 +131,9 @@ Deno.serve(withPosthog('translate-orchestrator', async (req) => {
       }
     },
     putJson: (key, value) => putObject(r2, key, JSON.stringify(value), 'application/json'),
+    putText: (key, text) => putObject(r2, key, text, 'application/json'),
     deleteKey: (key) => deleteObject(r2, key),
+    list: async (prefix) => (await listObjects(r2, prefix)).map((o) => o.key),
   };
   const apiKey = (Deno.env.get('TRANSLATE_ANTHROPIC_API_KEY') ?? '').trim();
   const deps: Deps = {
@@ -133,19 +143,37 @@ Deno.serve(withPosthog('translate-orchestrator', async (req) => {
     now: () => new Date(),
     log: (msg, data) => logWarn(msg, data),
     learn: makeLearnDb(admin, () => new Date()),
-    overlayMeta: async (lang, entries, tm) => buildOverlayMeta(lang, entries, tm, await listSources(admin, lang)),
     alerts: async (lang, buildId, rows) => {
       await writeAlerts(admin, lang, buildId, rows);
+    },
+    passes: makePassDb(admin, () => new Date()),
+    passSteps: PASS_STEPS,
+    sources: makeSourceDb(admin, { ghToken: Deno.env.get('GITHUB_TOKEN') ?? undefined }),
+    lock: {
+      // Fails closed: when the rpc errors nobody slices (a slice that runs twice at once is worse than one that waits).
+      claim: async () => {
+        const { data, error } = await admin.rpc('lock_claim', { p_name: HEAVY_LOCK, p_ttl: HEAVY_LOCK_TTL });
+        if (error) logWarn('lock_claim failed', { error: error.message });
+        return typeof data === 'string' && data ? data : null;
+      },
+      release: async (token) => {
+        const { error } = await admin.rpc('lock_release', { p_name: HEAVY_LOCK, p_token: token });
+        if (error) logWarn('lock_release failed', { error: error.message });
+      },
     },
   };
 
   try {
     switch (op) {
       case 'tick': {
-        const work = tick(deps);
+        const fast = body.fast === true;
+        if (publicKeyCaller && !fast && !(await claimRun(admin, 'translate-orchestrator:tick', TICK_PUBLIC_MIN_MS))) {
+          return json({ ok: true, throttled: true, jobs: [], passes: [], learned: [], swept: [], heavy: false });
+        }
+        const work = tickAll(deps, { fast });
         // A tick can outlast the response; the platform keeps the isolate alive for it.
         (globalThis as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime?.waitUntil?.(work.catch(() => {}));
-        return json({ ok: true, jobs: await work });
+        return json({ ok: true, ...(await work) });
       }
       case 'approve':
         if (!body.job_id) return json({ error: 'job_id_required' }, 400);
@@ -153,36 +181,28 @@ Deno.serve(withPosthog('translate-orchestrator', async (req) => {
       case 'cancel':
         if (!body.job_id) return json({ error: 'job_id_required' }, 400);
         return json({ ok: true, job: await cancel(deps, String(body.job_id)) });
-      case 'estimate':
       case 'start_full': {
         const build_id = String(body.build_id ?? '');
         const lang = String(body.lang ?? '');
         if (!BUILD_ID_RE.test(build_id) || !LANG_RE.test(lang)) return json({ error: 'bad_params' }, 400);
-        if (op === 'start_full') return json({ ok: true, job: await startFull(deps, build_id, lang) });
-        const mode = body.mode === 'full' ? 'full' : 'delta';
-        let base: string | null = null;
-        if (mode === 'delta') {
-          base = BUILD_ID_RE.test(String(body.base_build_id ?? '')) ? String(body.base_build_id) : null;
-        }
-        return json({ ok: true, estimate: await dryRun(deps, build_id, lang, mode, base) });
+        return json({ ok: true, job: await startFull(deps, build_id, lang) });
       }
       case 'import_seed': {
         const sourceId = String(body.source_id ?? '');
         if (!SOURCE_ID_RE.test(sourceId)) return json({ error: 'bad_params' }, 400);
-        return json({ ok: true, ...(await importSeed(deps, admin, sourceId, { ghToken: Deno.env.get('GITHUB_TOKEN') ?? undefined })) });
+        return json({ ok: true, ...(await startImport(deps, sourceId)) });
       }
       case 'sync_sources': {
         if (publicKeyCaller && !(await claimRun(admin, 'translate-orchestrator:sync_sources', SYNC_SOURCES_PUBLIC_MIN_MS))) {
           return json({ ok: true, throttled: true, checked: 0, changed: 0, errors: [] });
         }
-        const work = syncSources(deps, admin, { ghToken: Deno.env.get('GITHUB_TOKEN') ?? undefined });
-        (globalThis as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime?.waitUntil?.(work.catch(() => {}));
-        return json({ ok: true, ...(await work) });
+        return json({ ok: true, ...(await syncSources(deps)) });
       }
       case 'learn': {
         const lang = String(body.lang ?? '');
         if (!LANG_RE.test(lang)) return json({ error: 'bad_params' }, 400);
-        return json({ ok: true, lang, result: await learningHooks.runLearning(deps, lang, 'backfill') });
+        const pass = await requestLearning(deps, lang, 'backfill');
+        return json({ ok: true, lang, queued: !!pass, pass_id: pass?.id ?? null });
       }
       case 'draft_outreach': {
         const sourceId = String(body.source_id ?? '');

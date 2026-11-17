@@ -56,58 +56,96 @@ function isUpper(s: string): boolean {
   return letters.length >= 3 && letters === letters.toUpperCase() && letters !== letters.toLowerCase();
 }
 
-export function styleStats(lang: string, pairs: StylePair[], from: string[] = []): LearnedStyle {
+/**
+ * The raw counts behind a LearnedStyle. Sums only, so the counts of two sets of pairs add up to the
+ * counts of their union: a pass takes them slice by slice and merges (`mergeStyleCounts`).
+ */
+export interface StyleCounts {
+  n: number;
+  informal: number;
+  formal: number;
+  comma: number;
+  point: number;
+  spaced: number;
+  tight: number;
+  q: Record<string, number>;
+  /** head -> [strings, of them in full upper case] */
+  up: Record<string, [number, number]>;
+}
+
+export const emptyStyleCounts = (): StyleCounts => ({ n: 0, informal: 0, formal: 0, comma: 0, point: 0, spaced: 0, tight: 0, q: {}, up: {} });
+
+export function styleCounts(lang: string, pairs: StylePair[]): StyleCounts {
   const addr = ADDRESS[lang];
-  let informal = 0;
-  let formal = 0;
-  let comma = 0;
-  let point = 0;
-  let spaced = 0;
-  let tight = 0;
-  const q: Record<string, number> = {};
-  const up = new Map<string, { n: number; u: number }>();
+  const c = emptyStyleCounts();
+  c.n = pairs.length;
   for (const p of pairs) {
     const t = p.t;
     if (addr) {
-      informal += count(t, addr.informal);
-      formal += count(t, addr.formal);
+      c.informal += count(t, addr.informal);
+      c.formal += count(t, addr.formal);
     }
     // Decimal numbers only where the English has one (so "1.000" thousands groups do not count).
     if (/\d\.\d/.test(p.en)) {
-      comma += count(t, /\d,\d/g);
-      point += count(t, /\d\.\d/g);
+      c.comma += count(t, /\d,\d/g);
+      c.point += count(t, /\d\.\d/g);
     }
     if (/\d\s?%/.test(p.en)) {
-      spaced += count(t, /\d[\s  ]%/g);
-      tight += count(t, /\d%/g);
+      c.spaced += count(t, /\d[\s  ]%/g);
+      c.tight += count(t, /\d%/g);
     }
     for (const [name, re] of Object.entries(QUOTES)) {
       const n = count(t, re);
-      if (n) q[name] = (q[name] ?? 0) + n;
+      if (n) c.q[name] = (c.q[name] ?? 0) + n;
     }
     if (!isUpper(p.en) && /\p{L}{3}/u.test(t)) {
       const head = p.key.split('_', 1)[0].toLowerCase();
-      const s = up.get(head) ?? { n: 0, u: 0 };
-      s.n++;
-      if (isUpper(t)) s.u++;
-      up.set(head, s);
+      const s = (c.up[head] ??= [0, 0]);
+      s[0]++;
+      if (isUpper(t)) s[1]++;
     }
   }
-  const upper: LearnedStyle['upper'] = {};
-  for (const [head, s] of [...up].sort((a, b) => b[1].n - a[1].n).slice(0, 40)) {
-    if (s.n >= 20) upper[head] = { n: s.n, share: Math.round((s.u / s.n) * 1000) / 1000 };
+  return c;
+}
+
+export function mergeStyleCounts(a: StyleCounts, b: StyleCounts): StyleCounts {
+  const out: StyleCounts = {
+    n: a.n + b.n, informal: a.informal + b.informal, formal: a.formal + b.formal, comma: a.comma + b.comma,
+    point: a.point + b.point, spaced: a.spaced + b.spaced, tight: a.tight + b.tight, q: { ...a.q }, up: {},
+  };
+  for (const [k, n] of Object.entries(b.q)) out.q[k] = (out.q[k] ?? 0) + n;
+  for (const src of [a.up, b.up]) {
+    for (const [h, [n, u]] of Object.entries(src)) {
+      const s = (out.up[h] ??= [0, 0]);
+      s[0] += n;
+      s[1] += u;
+    }
   }
-  const dominant = Object.entries(q).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+  return out;
+}
+
+export function styleFromCounts(lang: string, c: StyleCounts, from: string[] = []): LearnedStyle {
+  const upper: LearnedStyle['upper'] = {};
+  // Largest families first; ties by name, so the result does not depend on the order the pairs came in.
+  const heads = Object.entries(c.up).sort((a, b) => b[1][0] - a[1][0] || (a[0] < b[0] ? -1 : 1)).slice(0, 40);
+  for (const [head, [n, u]] of heads) {
+    if (n >= 20) upper[head] = { n, share: Math.round((u / n) * 1000) / 1000 };
+  }
+  const dominant = Object.entries(c.q).sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))[0]?.[0] ?? null;
   return {
     v: 1,
-    n: pairs.length,
+    n: c.n,
     from,
-    address: addr ? { informal, formal, ratio: share(informal, formal) } : null,
-    decimal: { comma, point, share: share(comma, point) },
-    percent: { spaced, tight, share: share(spaced, tight) },
-    quotes: { counts: q, dominant },
+    address: ADDRESS[lang] ? { informal: c.informal, formal: c.formal, ratio: share(c.informal, c.formal) } : null,
+    decimal: { comma: c.comma, point: c.point, share: share(c.comma, c.point) },
+    percent: { spaced: c.spaced, tight: c.tight, share: share(c.spaced, c.tight) },
+    quotes: { counts: c.q, dominant },
     upper,
   };
+}
+
+export function styleStats(lang: string, pairs: StylePair[], from: string[] = []): LearnedStyle {
+  return styleFromCounts(lang, styleCounts(lang, pairs), from);
 }
 
 /** Minimum hits before a statistic becomes an instruction (below it the static STYLE decides). */

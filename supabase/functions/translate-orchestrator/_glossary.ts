@@ -8,7 +8,7 @@ import { tokensOf } from './_mask.ts';
 import { containsTerm } from './_qa.ts';
 import type { GlossaryRow } from './_prompt.ts';
 
-const LABEL_KEY_RE = /^(item_Name|vehicle_Name|ui_|hud_|mobiGlas)/i;
+export const LABEL_KEY_RE = /^(item_Name|vehicle_Name|ui_|hud_|mobiGlas)/i;
 const MAX_LABELS = 1500;
 const MAX_AI_TERMS = 300;
 
@@ -45,19 +45,42 @@ const NGRAM_RE = /(?<=[a-z,;:] )[A-Z][\p{L}\p{N}'-]+(?: [A-Z][\p{L}\p{N}'-]+){0,
  * verbatim in ≥ 90 % of its translations become `dnt` rows, origin ai.
  */
 export function deriveAiTerms(pairs: { en: string; t: string }[], minCount = 5): GlossaryRow[] {
-  const seen = new Map<string, { n: number; kept: number }>();
+  return aiTermsFromCounts(aiTermCounts(pairs), minCount);
+}
+
+/** Per n-gram: `[occurrences, kept verbatim]`. Adds up across the batch groups of a job. */
+export type AiTermCounts = Record<string, [number, number]>;
+
+export function aiTermCounts(pairs: { en: string; t: string }[]): AiTermCounts {
+  const seen: AiTermCounts = Object.create(null);
   for (const p of pairs) {
     const found = new Set(p.en.match(NGRAM_RE) ?? []);
     for (const term of found) {
-      const s = seen.get(term) ?? { n: 0, kept: 0 };
-      s.n++;
-      if (p.t.includes(term)) s.kept++;
-      seen.set(term, s);
+      const s = (seen[term] ??= [0, 0]);
+      s[0]++;
+      if (p.t.includes(term)) s[1]++;
     }
   }
+  return seen;
+}
+
+export function mergeAiTermCounts(parts: AiTermCounts[]): AiTermCounts {
+  const out: AiTermCounts = Object.create(null);
+  for (const part of parts) {
+    for (const term of Object.keys(part)) {
+      const s = (out[term] ??= [0, 0]);
+      s[0] += part[term][0];
+      s[1] += part[term][1];
+    }
+  }
+  return out;
+}
+
+export function aiTermsFromCounts(counts: AiTermCounts, minCount = 5): GlossaryRow[] {
   const rows: GlossaryRow[] = [];
-  for (const [term, s] of seen) {
-    if (s.n >= minCount && s.kept / s.n >= 0.9) {
+  for (const term of Object.keys(counts)) {
+    const [n, kept] = counts[term];
+    if (n >= minCount && kept / n >= 0.9) {
       rows.push({ source_term: term, target_term: term, category: 'dnt', origin: 'ai' });
     }
   }

@@ -7,7 +7,8 @@ import { detectOverrideAlerts, writeAlerts } from './_alerts.ts';
 import { buildOutreachDraft, messageLang, outreachKind } from './_outreach.ts';
 import { attributionLine, buildOverlayMeta, makeOverlay } from './_io.ts';
 import { diffStrings, sha256Hex } from './_diff.ts';
-import { learningHooks } from './_hooks.ts';
+import { requestLearning } from './_learn_pass.ts';
+import { arbitrate } from './_arbiter.ts';
 
 const enc = (s) => new TextEncoder().encode(s);
 const sha = sha256Hex;
@@ -298,9 +299,9 @@ describe('overlay extension and precedence', () => {
   });
 });
 
-describe('_hooks', () => {
-  it('defaults are no-ops returning null', async () => {
-    assert.equal(await learningHooks.runLearning({}, 'de', 'seed'), null);
-    assert.equal(await learningHooks.arbitrate({}, 'de', []), null);
+describe('without the learning adapter', () => {
+  it('asking for learning and arbitrating are no-ops', async () => {
+    assert.equal(await requestLearning({}, 'de', 'seed'), null);
+    assert.equal((await arbitrate({}, 'de', [])).skipped, 'no_learn_db');
   });
 });
