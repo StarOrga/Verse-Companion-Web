@@ -4,6 +4,12 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.273.4] - 2026-11-17
+
+### Fixed
+- A finished translation is published right away instead of waiting until the other languages of the same upload have been estimated.
+- Publishing a translation no longer ends in a killed worker: the learning pass, which does not fit one request yet, is recorded as due instead of being run with the publish.
+
 ## [0.273.3] - 2026-11-17
 
 ### Fixed
