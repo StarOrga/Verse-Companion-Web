@@ -992,9 +992,15 @@ function paintConnection(): void {
   const chip = $('#connection-chip');
   if (chip) {
     const who = s?.connected ? escapeHtml(s.email ?? '') : pillText;
-    const serverBit = snap?.channels[0]
-      ? ` · ${escapeHtml(snap.channels[0].channel.toUpperCase())} v${escapeHtml(snap.channels[0].patchVersion)}`
-      : '';
+    // The game identity comes from the local install (x.y.z + build, lib/discovery
+    // resolveGameIdentity); the server row only fills in when nothing is installed.
+    const serverTag = snap?.channels[0]?.channel.toUpperCase();
+    const localCh = state.channels.find((c) => c.channel === serverTag && c.version) ?? state.channels.find((c) => c.version);
+    const serverBit = localCh
+      ? ` · ${escapeHtml(localCh.channel)} v${escapeHtml(formatIdentity(localCh.version, localCh.buildNumber))}`
+      : snap?.channels[0]
+        ? ` · ${escapeHtml(snap.channels[0].channel.toUpperCase())} v${escapeHtml(snap.channels[0].patchVersion)}`
+        : '';
     chip.innerHTML = `<span class="conn-dot conn-dot--${pillCls}"></span> ${who}${serverBit}`;
   }
 
@@ -3323,7 +3329,11 @@ async function buildAndUploadSkins(
   startStage('skinsBuild');
 
   const manifest = `${result.output_dir}/skins/_build_manifest.json`;
-  const skinsOut = `${ch.installPath}/.sc-companion-extracts/skins-${result.patch_version}`;
+  // The hull cache follows the extract folder's label (`LIVE-4.10.0` →
+  // `skins-4.10.0`), not the identity: a models-only run that reuses an extract
+  // made under an older label continues the hulls already built next to it.
+  const extractLabel = (result.output_dir.split(/[\\/]/).pop() ?? '').replace(`${result.channel}-`, '');
+  const skinsOut = `${ch.installPath}/.sc-companion-extracts/skins-${extractLabel || result.patch_version}`;
   const label = t('skins.building');
 
   // 1. ensure cgf-converter (first-use download ~117 MB).
