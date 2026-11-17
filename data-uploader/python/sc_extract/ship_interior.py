@@ -25,8 +25,14 @@ FALLBACK_DECK_KEY = "unassigned"  # same as dataforge_extract.FALLBACK_DECK_KEY 
 POS_ROUND = 1                  # metres in the payload: 0.1 m
 SCU_CELL_M = 1.25              # edge of one SCU cell
 PANEL_MAX_M = 3.0              # a door control panel this close belongs to the door
-CELL_PANEL_MAX_M = 5.0         # a brig cell panel sits further off its door (Idris-P: 4.7 m) — one door per cell panel
+# Brig cell doors. The cell panels are no per-door panels: on the Idris-P all six
+# (`…_Physical_Cell1`…`Cell6`) sit within 0.15 m of each other on the console of the security
+# room. The cells are the inner doors of the cell-block room, in a row 4 m apart. So a ship with
+# N cell panels gets its N cell-block doors nearest to that console as kind `cell`.
 CELL_PANEL_RX = re.compile(r"cell", re.I)
+CELL_BLOCK_ROOM_RX = re.compile(r"brig|cell|prison|jail", re.I)
+CELL_BLOCK_NOT_RX = re.compile(r"control|security", re.I)
+CELL_DOOR_MAX_M = 30.0         # a cell door this close to the cell console (Idris-P: 5.6–24.1 m)
 LIFT_CLUSTER_M = 5.0           # stops of one shaft sit this close in x/y (TransitDestination is offset from its door)
 LIFT_STOP_MIN_GAP_M = 1.0      # two stops of one shaft differ in height by more than this
 DECK_TOLERANCE_M = 0.8         # a point stands on the highest deck floor up to this much above it
@@ -114,11 +120,13 @@ def classify_door(cls: str, name: str = "", from_loadout: bool = False) -> Dict[
 
 
 def attach_panels(doors: List[Dict[str, Any]], panels: List[Dict[str, Any]],
-                  max_dist: float = PANEL_MAX_M, cell_max_dist: float = CELL_PANEL_MAX_M) -> None:
-    """Sets `door.panel` (nearest control panel within `max_dist`, else None), then gives
-    every brig cell panel to the nearest room / inner door within `cell_max_dist` and turns
-    that door into kind `cell` — one door per cell panel, so the wider radius never marks a
-    corridor door next to the cell."""
+                  max_dist: float = PANEL_MAX_M,
+                  room_of: Optional[Callable[[Dict[str, Any]], Optional[str]]] = None) -> None:
+    """Sets `door.panel` (nearest control panel within `max_dist`, else None) and marks the
+    brig cell doors (see `CELL_PANEL_RX`): with N cell panels, the N inner doors (a cell is no
+    room of its own, so its door is no `RoomConnector`) of a cell-block room (`room_of(door)` matches `CELL_BLOCK_ROOM_RX`, not `CELL_BLOCK_NOT_RX`)
+    nearest to the cell console become kind `cell`, their panel the console. Without
+    `room_of` no door is guessed to be a cell."""
     for d in doors:
         best, best_d = None, max_dist
         for p in panels:
@@ -126,21 +134,21 @@ def attach_panels(doors: List[Dict[str, Any]], panels: List[Dict[str, Any]],
             if dist <= best_d:
                 best, best_d = p, dist
         d["door"]["panel"] = r1(best["pos"]) if best else None
-    taken = set()
-    for p in panels:
-        if not CELL_PANEL_RX.search(f"{p.get('cls', '')} {p.get('name', '')}"):
-            continue
-        best_i, best_d = None, cell_max_dist
-        for i, d in enumerate(doors):
-            if i in taken or d["door"]["kind"] not in ("room", "inner"):
-                continue
-            dist = math.dist(d["pos"], p["pos"])
-            if dist <= best_d:
-                best_i, best_d = i, dist
-        if best_i is not None:
-            taken.add(best_i)
-            doors[best_i]["door"]["panel"] = r1(p["pos"])
-            doors[best_i]["door"]["kind"] = "cell"
+    cells = [p for p in panels if CELL_PANEL_RX.search(f"{p.get('cls', '')} {p.get('name', '')}")]
+    if not cells or room_of is None:
+        return
+    console = [sum(p["pos"][i] for p in cells) / len(cells) for i in range(3)]
+
+    def in_cell_block(d: Dict[str, Any]) -> bool:
+        key = room_of(d) or ""
+        return bool(CELL_BLOCK_ROOM_RX.search(key)) and not CELL_BLOCK_NOT_RX.search(key)
+
+    near = sorted((math.dist(d["pos"], console), i) for i, d in enumerate(doors)
+                  if d["door"]["kind"] == "inner" and in_cell_block(d))
+    for dist, i in near[:len(cells)]:
+        if dist <= CELL_DOOR_MAX_M:
+            doors[i]["door"]["kind"] = "cell"
+            doors[i]["door"]["panel"] = r1(console)
 
 
 # ── cargo ────────────────────────────────────────────────────────────────────
@@ -487,7 +495,10 @@ def assemble(*, decks: List[Dict[str, Any]], floors: List[Tuple[float, str]],
             panels.append(e)
         elif e["cat"] == "door":
             doors.append(e)
-    attach_panels(doors, panels)
+    def door_room(d: Dict[str, Any]) -> Optional[str]:
+        return room_at(decks, deck_of(d["pos"]), d["pos"])
+
+    attach_panels(doors, panels, room_of=door_room)
     shafts = cluster_lifts([(*e["pos"][:3], 1 if re.search(r"gateway", e.get("cls") or "", re.I) else 0)
                             for e in entities if e["cat"] == "lift"])
     seen_climb: List[Tuple[str, Sequence[float]]] = []

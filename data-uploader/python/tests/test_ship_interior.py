@@ -43,33 +43,43 @@ def test_door_kinds_follow_the_idris_classes() -> None:
     assert k("Door_NoRoomConnector_Template") == {"kind": "inner", "breachable": False}
 
 
-def test_panel_within_three_metres_attaches_and_a_cell_panel_makes_a_cell_door() -> None:
+def test_panel_within_three_metres_attaches() -> None:
     doors = [{"pos": [0, 0, 6], "door": {"kind": "room", "breachable": True, "panel": None}},
-             {"pos": [20, 0, 6], "door": {"kind": "inner", "breachable": False, "panel": None}},
              {"pos": [40, 0, 6], "door": {"kind": "lift", "breachable": False, "panel": None}}]
     panels = [{"pos": [1.0, 1.0, 6.5], "cls": "ControlPanel_Screen_DoorControl", "name": "x"},
-              {"pos": [20.5, 0.0, 6.0], "cls": "ControlPanel_Screen_DoorControl_Physical_AEGS_Brig_Celldoor", "name": "Cell3"},
               {"pos": [45.0, 0.0, 6.0], "cls": "ControlPanel_Screen_DoorControl", "name": "far"}]
     si.attach_panels(doors, panels)
     assert doors[0]["door"]["panel"] == [1.0, 1.0, 6.5] and doors[0]["door"]["kind"] == "room"
-    assert doors[1]["door"]["kind"] == "cell"
-    assert doors[2]["door"]["panel"] is None
+    assert doors[1]["door"]["panel"] is None
 
 
-def test_a_cell_panel_up_to_five_metres_off_marks_only_its_nearest_door() -> None:
-    # Idris-P brig: the cell panels sit 4.7 m from their door, beyond the 3 m door-panel radius
-    doors = [{"pos": [0, 0, 6], "door": {"kind": "room", "breachable": True, "panel": None}},
-             {"pos": [0, 3.0, 6], "door": {"kind": "room", "breachable": True, "panel": None}},
-             {"pos": [10, 0, 6], "door": {"kind": "lift", "breachable": False, "panel": None}},
-             {"pos": [30, 0, 6], "door": {"kind": "inner", "breachable": False, "panel": None}}]
-    panels = [{"pos": [0, -4.7, 6], "cls": "ControlPanel_Screen_DoorControl_Physical_AEGS_Brig_Celldoor", "name": "Cell1"},
-              {"pos": [10, 4.0, 6], "cls": "ControlPanel_Screen_DoorControl_Physical_AEGS_Brig_Celldoor", "name": "Cell2"},
-              {"pos": [30, 5.5, 6], "cls": "ControlPanel_Screen_DoorControl_Physical_AEGS_Brig_Celldoor", "name": "Cell3"}]
+def test_the_cell_console_marks_the_cell_block_doors_not_the_security_room_door() -> None:
+    # Idris-P LIVE 4.10.2: six cell panels on one console in the security room (within 0.15 m),
+    # the security-room door 4.7 m off, the six cell doors 5.6–24.1 m off in a row 4 m apart.
+    def door(x, y, kind, room):
+        return {"pos": [x, y, 6.0], "room": room, "door": {"kind": kind, "breachable": True, "panel": None}}
+    doors = [door(-44.1, -49.1, "room", "Left_Stairwells_Brig_ControlRoom_SecurityRoom1"),
+             door(-39.0, -49.0, "room", "Left_Stairwells_Brig_Room")]
+    doors += [door(-41.8, y, "inner", "Left_Stairwells_Brig_Room") for y in (-41, -37, -33, -29, -25, -21)]
+    doors.append(door(-41.8, -45.0, "lift", "Left_Stairwells_Brig_Room"))
+    cls = "ControlPanel_Screen_DoorControl_Physical_AEGS_Brig_Celldoor"
+    panels = [{"pos": [-45.83 + i * 0.01, -44.75, 6.78], "cls": cls, "name": f"ControlPanel_Screen_DoorControl_Physical_Cell{i + 1}"}
+              for i in range(6)]
+    si.attach_panels(doors, panels, room_of=lambda d: d["room"])
+    kinds = [d["door"]["kind"] for d in doors]
+    assert kinds[0] == "room"                      # security-room door, nearest to the console
+    assert kinds[2:8] == ["cell"] * 6              # the six cell doors
+    assert kinds[8] == "lift"
+    assert kinds[1] == "room"                      # the brig's room door (8.1 m) joins two rooms: no cell
+    assert sum(k == "cell" for k in kinds) == 6
+    assert doors[2]["door"]["panel"] == [-45.8, -44.8, 6.8]
+
+
+def test_cell_panels_without_room_information_mark_no_door() -> None:
+    doors = [{"pos": [0, 0, 6], "door": {"kind": "inner", "breachable": False, "panel": None}}]
+    panels = [{"pos": [0.5, 0, 6], "cls": "ControlPanel_Screen_DoorControl_Physical_AEGS_Brig_Celldoor", "name": "Cell1"}]
     si.attach_panels(doors, panels)
-    assert doors[0]["door"]["kind"] == "cell" and doors[0]["door"]["panel"] == [0.0, -4.7, 6.0]
-    assert doors[1]["door"]["kind"] == "room"   # the neighbour door stays a room door
-    assert doors[2]["door"]["kind"] == "lift"   # a lift door never becomes a cell
-    assert doors[3]["door"]["kind"] == "inner" and doors[3]["door"]["panel"] is None  # 5.5 m is too far
+    assert doors[0]["door"]["kind"] == "inner"
 
 
 # ── cargo ────────────────────────────────────────────────────────────────────
