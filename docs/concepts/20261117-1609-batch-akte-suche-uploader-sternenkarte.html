@@ -6370,13 +6370,8 @@ Danach
           data-issue-module="data-uploader"
           data-oq-origin="shortfall"
           data-route-default="ignore"
-          data-route-reason="selten">
+          data-route-reason="selten" data-routed>
         <span class="oq-label">Spieldateien neu gelesen</span>
-        <dl class="fr-fkv">
-          <dt>Was</dt><dd>Nicht umgesetzt, weil der 3D-Bau Listen aus dem Zwischenstand braucht: fehlt der auf der Platte, liest der Uploader die Spieldateien lokal neu. Hochgeladen wird trotzdem nur Offenes.</dd>
-          <dt>Wo</dt><dd>Data Uploader · Start mit offenen 3D-Modellen</dd>
-          <dt>Warum vorbelegt</dt><dd>✕ Weglassen — der Zwischenstand bleibt jetzt liegen, bis alles Offene gelandet ist; der Fall ist selten.</dd>
-        </dl>
       </li>
       <li data-oq-id="oq-rpc-timeouts"
           data-issue-title="[BUG] Several codex and HQ RPCs hit the statement timeout on production"
@@ -6385,13 +6380,9 @@ Danach
           data-issue-module="supabase"
           data-oq-origin="found"
           data-route-default="issue"
-          data-route-reason="riskant">
+          data-route-reason="riskant" data-routed>
         <span class="oq-label">Server-Abfragen laufen ab</span>
-        <dl class="fr-fkv">
-          <dt>Was</dt><dd>Auf dem Live-Server liefen heute mehrere Abfragen in die Zeitgrenze, am häufigsten die Patch-Übersicht der Flotte (14-mal). In der Suche bleibt dann „Neu in diesem Patch“ leer.</dd>
-          <dt>Wo</dt><dd>Live-Datenbank · Flotte, Codex, Missionssuche</dd>
-          <dt>Warum vorbelegt</dt><dd>📌 Issue — braucht Messungen an der Live-Datenbank, bevor jemand etwas ändert.</dd>
-        </dl>
+        <span class="oq-done">✓ umgesetzt — drei Abfragen laufen jetzt unter einer Sekunde</span>
       </li>
       <li data-oq-id="oq-akte-glyph"
           data-issue-title="[BUG] Akte tiles without an image draw a hard-coded ship glyph"
@@ -6400,13 +6391,9 @@ Danach
           data-issue-module="codex"
           data-oq-origin="found"
           data-route-default="now"
-          data-route-reason="klein">
+          data-route-reason="klein" data-routed>
         <span class="oq-label">Erfundene Schiffsform</span>
-        <dl class="fr-fkv">
-          <dt>Was</dt><dd>Kacheln ohne Bild zeigen in der Akte ein fest eingebautes Schiffs-Symbol, obwohl die Regel „nie eine geratene Form“ gilt.</dd>
-          <dt>Wo</dt><dd>Schiffsseite · Akte · Lackierungen</dd>
-          <dt>Warum vorbelegt</dt><dd>⚡ Jetzt — kleine Änderung an einer Stelle, im selben Bauteil.</dd>
-        </dl>
+        <span class="oq-done">✓ umgesetzt — Kacheln ohne Bild zeigen einen neutralen Ring</span>
       </li>
     </ul>
   </details>
@@ -6417,8 +6404,8 @@ Danach
       <li>Branch <code>claude/batch-82d91f</code> · Bereiche: codex/holo, codex/search, shell, verse, data-uploader, supabase, i18n, posthog</li>
       <li><code>src/app/codex/search/search-families.ts</code>, <code>data-uploader/src/lib/auto-run.ts</code>, <code>supabase/migrations/20261117164700_verse_constellation_auto_pick.sql</code></li>
       <li>Tests: Web 7180 grün, Uploader 659, Functions 646, Gate 167 · typecheck, lint, build, Subtheme-Guard grün · zwei unabhängige Prüfungen: <code>checks/implement-qa.md</code>, <code>checks/implement-qa-2.md</code></li>
-      <li>Reihenfolge beim Shippen: beide Migrationen, <code>notify pgrst, 'reload schema'</code> und <code>ingest-catalog</code> vor dem nächsten Uploader-Release (Ledger-Abgleich über Kanal und Build)</li>
-      <li>Ursachen: Footer = <code>scroll-margin-top</code> 80 px am Hub zusätzlich zum Seitenabstand · 4.10.0 = erster Treffer im Manifest war der Branch-Name; 4.10.3 steht im Launcher-Log beim Build 13165946 · Sternenkarte = gespeicherte Klasse wurde zur Variante</li>
+      <li>Im Abschluss gebaut: <code>supabase/migrations/20261117203000_rpc_statement_timeouts.sql</code> (Flotten-Patch 4,6 s → unter 1 s, Missionssuche 10 s → 0,6 s, Hersteller-Filter 4,6 s → 0,3 s; gleiche Ergebnisse) · neutraler Ring in <code>codex-holo-akte.component.ts</code></li>
+      <li>Reihenfolge beim Shippen: beide Migrationen, <code>notify pgrst, 'reload schema'</code> und <code>ingest-catalog</code> vor dem nächsten Uploader-Release (Ledger-Abgleich über Kanal und Build) · Ursachen: Footer = <code>scroll-margin-top</code> 80 px am Hub zusätzlich zum Seitenabstand · 4.10.0 = erster Treffer im Manifest war der Branch-Name; 4.10.3 steht im Launcher-Log beim Build 13165946 · Sternenkarte = gespeicherte Klasse wurde zur Variante</li>
     </ul>
   </details>
   </div>

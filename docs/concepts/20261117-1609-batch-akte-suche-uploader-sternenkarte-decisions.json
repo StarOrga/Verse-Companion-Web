@@ -142,5 +142,58 @@
       ]
     },
     "userPins": []
+  },
+  {
+    "iteration": "2",
+    "action": "finalize",
+    "implement": {
+      "run": true,
+      "items": [
+        {
+          "id": "oq-rpc-timeouts",
+          "title": "[BUG] Several codex and HQ RPCs hit the statement timeout on production"
+        },
+        {
+          "id": "oq-akte-glyph",
+          "title": "[BUG] Akte tiles without an image draw a hard-coded ship glyph"
+        }
+      ]
+    },
+    "ship": {
+      "run": true
+    },
+    "tests": [
+      {
+        "id": "t-uploader",
+        "text": "Uploader starten: 4.10.3, kein neuer Lauf?",
+        "mode": "self",
+        "guide": null
+      },
+      {
+        "id": "t-phone",
+        "text": "Suche am Handy: Varianten-Links antippen",
+        "mode": "self",
+        "guide": null
+      },
+      {
+        "id": "t-starmap",
+        "text": "Sternenkarte 4.10: sieben Schiffe zum Raten da?",
+        "mode": "self",
+        "guide": null
+      }
+    ],
+    "handoffs": [],
+    "disposition": {
+      "mode": "discard",
+      "moveTo": null
+    },
+    "results": {
+      "implemented": [
+        "oq-rpc-timeouts",
+        "oq-akte-glyph"
+      ],
+      "misses": [],
+      "note": "oq-rpc-timeouts: three RPCs fixed (hq_fleet_patch, search_missions, codex_facet_values); codex_swap_candidates and codex_added_class_names showed no defect in isolation and stay unchanged. oq-uploader-reread left as is (route ignore)."
+    }
   }
 ]
