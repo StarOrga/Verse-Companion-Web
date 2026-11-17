@@ -27,7 +27,8 @@ import { detectOverrideAlerts } from './_alerts.ts';
 import { loadNotes } from './_cards.ts';
 import { buildChunks, familyOf, isLoreKey, toChunkItem } from './_chunk.ts';
 import type { Chunk, ChunkItem } from './_chunk.ts';
-import { estimateFromTotals, estimateOutputTokens, estimateTokens } from './_cost.ts';
+import { estimateFromTotals, estimateOutputTokens, estimateTokens, shotsUsd } from './_cost.ts';
+import type { CostTotals } from './_cost.ts';
 import type { DiffCounts, TmEntry, UniqueText } from './_diff.ts';
 import { TranslateError } from './_errors.ts';
 import { deriveCigLabels, LABEL_KEY_RE, mergeGlossary, newRows } from './_glossary.ts';
@@ -446,6 +447,22 @@ export async function estimateSlice(deps: Deps, job: Job): Promise<Job> {
   return await complete(deps, job, e);
 }
 
+/**
+ * What a set of requests is estimated to cost, by the rules of the job's estimate: the batch of them
+ * pays the system prompt as one cache write and reads it for the rest. Used to compare a batch that
+ * was read with what it was expected to cost, and to price a batch before it is sent.
+ */
+export function requestsEstimateUsd(lang: string, systemChars: number, chunks: Chunk[], shots = 0): number {
+  const totals: CostTotals = {};
+  for (const c of chunks) {
+    const t = (totals[c.model] ??= { requests: 0, inTok: 0, outTok: 0 });
+    t.requests++;
+    t.inTok += estimateTokens(c.inputChars);
+    t.outTok += estimateOutputTokens(lang, { model: c.model, enChars: c.enChars, strings: c.items.length });
+  }
+  return estimateFromTotals(totals, estimateTokens(systemChars)).usd + shotsUsd(shots);
+}
+
 /** The estimate, caps and holds. The spending rules are the ones the unsliced estimate had. */
 async function complete(deps: Deps, job: Job, e: EstState): Promise<Job> {
   const { db } = deps;
@@ -466,7 +483,7 @@ async function complete(deps: Deps, job: Job, e: EstState): Promise<Job> {
   if (!head) throw new TranslateError('translate.plan_missing');
   const estimate = estimateFromTotals(e.cost ?? {}, estimateTokens(head.system.length));
   // The few-shot pairs ride in the (uncached) user message.
-  estimate.usd += ((e.shots ?? 0) * 60 * 0.9 * 3) / 1e6;
+  estimate.usd += shotsUsd(e.shots ?? 0);
   // Against the glossary as it is now: another job of the language may have added some of them since `prep`.
   const fresh = head.newGlossary.length ? newRows(await db.listGlossary(job.lang), head.newGlossary) : [];
   if (fresh.length) await db.insertGlossary(job.lang, fresh);

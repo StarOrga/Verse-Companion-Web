@@ -5,6 +5,7 @@ import {
   canCancel,
   glossarySearchFilter,
   jobErrorKey,
+  jobNote,
   jobProgress,
   judgeScore,
   monthStartUtc,
@@ -63,6 +64,22 @@ describe('translations.logic', () => {
     expect(jobProgress('submitted', { phase: 'running' })).toBeNull();
     expect(jobProgress('published', null)).toBeNull();
     expect(jobProgress('estimating', { est: { phase: 'new phase' } })).toBeNull();
+  });
+
+  it('says why a job waits and which paid steps it left out', () => {
+    const base = 'admin.translations.jobs';
+    expect(jobNote('awaiting_approval', { hold: 'full' })).toEqual({ key: `${base}.hold.full`, params: {} });
+    expect(jobNote('awaiting_approval', { hold: 'monthly_cap' })).toEqual({ key: `${base}.hold.monthly_cap`, params: {} });
+    expect(jobNote('awaiting_approval', { hold: 'overrun', probe: { ratio: 1.874 } })).toEqual({ key: `${base}.hold.overrun`, params: { pct: 87 } });
+    expect(jobNote('awaiting_approval', { hold: 'overrun' })).toEqual({ key: `${base}.hold.overrun`, params: { pct: 0 } });
+    // A hold the page does not know gets no sentence, and a hold of an earlier state does not show later.
+    expect(jobNote('awaiting_approval', { hold: 'something new' })).toBeNull();
+    expect(jobNote('submitted', { hold: 'full' })).toBeNull();
+    expect(jobNote('published', { capped: { reason: 'job_budget', judge: true, texts: 412 } })).toEqual({ key: `${base}.capped.job_budget`, params: { texts: 412 } });
+    expect(jobNote('publishing', { capped: { reason: 'monthly_cap', judge: false, texts: 3 } })).toEqual({ key: `${base}.capped.monthly_cap`, params: { texts: 3 } });
+    expect(jobNote('published', { capped: { reason: 'job_budget', judge: true, texts: 0 } })).toEqual({ key: `${base}.capped.judge`, params: {} });
+    expect(jobNote('published', { capped: { reason: 'job_budget', judge: false, texts: 0 } })).toBeNull();
+    expect(jobNote('published', null)).toBeNull();
   });
 
   it('maps job errors to keys, unknown codes to the generic one', () => {

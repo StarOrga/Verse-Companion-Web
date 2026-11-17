@@ -1,6 +1,7 @@
 // Postgres adapter for the state machine (tables: docs/translation/ARCHITECTURE.md § Data).
 // Runs with the service-role client; RLS is bypassed, auth happens in index.ts.
 
+import { reserveOf } from './_job.ts';
 import type { Db, Job, JobPatch, Settings } from './_job.ts';
 import { selectAll } from './_page.ts';
 import type { GlossaryRow } from './_prompt.ts';
@@ -112,7 +113,7 @@ export function makeDb(sb: Client, now: () => Date): Db {
       if (fly.error) fail(fly.error);
       const spent = led.reduce((a, r) => a + Number(r.usd), 0);
       const reserved = ((fly.data ?? []) as { estimate_usd: number | null; spent_usd: number | null }[])
-        .reduce((a, r) => a + Math.max(0, Number(r.estimate_usd ?? 0) - Number(r.spent_usd ?? 0)), 0);
+        .reduce((a, r) => a + reserveOf({ estimate_usd: r.estimate_usd, spent_usd: Number(r.spent_usd ?? 0) }), 0);
       return spent + reserved;
     },
     async addLedger(jobId, month, usd, ref) {

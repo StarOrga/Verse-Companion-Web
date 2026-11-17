@@ -5,6 +5,8 @@
 // the size of the job - a delta has one group, the whole gap of a language a few dozen.
 //
 //   submitted     submitting    one batch per slice (the intent protocol below)
+//                 probe         wait (jobs of several groups): the first batch has ended? Its real
+//                               spend against its estimate decides whether the others are sent
 //                 running       wait: every batch has ended?
 //   validating    results       one group per slice: read its batch, QA -> `r/res-<g>`, judge candidates
 //                 judge_plan    the judge sample from all groups -> `r/judge`
@@ -25,18 +27,30 @@
 // trip), or a create whose answer never arrived. The next request finds the stale intent, creates
 // that group again and counts it in `stats.resubmits` - the first batch, if it exists, is paid for
 // and never read.
+//
+// Spending. Caps and approvals are given for an estimate; what a job really costs is known batch by
+// batch. So the real figures are asked again wherever a decision is still open:
+// - A job of several groups sends its first group alone and reads what it cost (`probe`). When the
+//   job as a whole would end above its budget (`budgetOf`: estimate + a quarter), it stops there and
+//   waits for approval with the corrected estimate - one group is paid, not all of them.
+// - The estimate covers the first attempts. Before the judge batch and before every post-edit batch
+//   the job asks `spendStop`: its real spend plus what it has sent plus the next batch against its
+//   budget, and - for a job no person approved - the month's ledger against the monthly cap. A step
+//   that is refused is left out, with everything after it: the job publishes what passed, the texts
+//   without a second attempt stay untranslated (the next job takes them), and `stats.capped` says so.
+// A job of one group has nothing to probe: its first attempts are one batch, paid when it is sent.
 
 import { buildChunks } from './_chunk.ts';
 import type { Chunk, ChunkItem } from './_chunk.ts';
-import { usageCostUsd } from './_cost.ts';
+import { estimateTokens, OPUS_THINKING_FACTOR, priceOf, usageCostUsd } from './_cost.ts';
 import { TranslateError } from './_errors.ts';
 import { extractJudgeTerms, mergeGlossary } from './_glossary.ts';
 import {
-  addStats, groupsOf, jobKey, JUDGE_CAP, JUDGE_MODEL, JUDGE_THRESHOLD, LostRace, MAX_RESUBMITS, monthOf, must, partsOfGroup, requireLlm,
-  round4, slice, STALE_SUBMIT_MS,
+  addStats, budgetOf, groupsOf, jobKey, JUDGE_CAP, JUDGE_MODEL, JUDGE_THRESHOLD, LostRace, MAX_RESUBMITS, monthOf, must, partsOfGroup,
+  requireLlm, round4, slice, STALE_SUBMIT_MS,
 } from './_job.ts';
 import type { BatchRef, Deps, Job, QaStats, Stats } from './_job.ts';
-import { readPlan, readPlanPart } from './_job_estimate.ts';
+import { readPlan, readPlanPart, requestsEstimateUsd } from './_job_estimate.ts';
 import type { PlanHead } from './_job_estimate.ts';
 import { addJudgeCandidates } from './_learn.ts';
 import { mask, unmask } from './_mask.ts';
@@ -100,6 +114,50 @@ async function groupChunks(deps: Deps, job: Job, g: number): Promise<{ chunks: C
     }
   }
   return { chunks, requests };
+}
+
+/** What the first attempts of batch group `g` are estimated to cost, by the rules of the job's estimate. */
+async function groupEstimateUsd(deps: Deps, job: Job, g: number): Promise<{ usd: number; models: Map<string, string> }> {
+  const head = await readPlan(deps, job);
+  const chunks: Chunk[] = [];
+  let shots = 0;
+  for (const p of partsOfGroup(g, shape(job).parts)) {
+    const part = await readPlanPart(deps, job, p);
+    for (const c of part.chunks) {
+      chunks.push(c);
+      shots += part.fewShot[c.id]?.length ?? 0;
+    }
+  }
+  return { usd: requestsEstimateUsd(job.lang, head.system.length, chunks, shots), models: new Map(chunks.map((c) => [c.id, c.model])) };
+}
+
+/** What the judge batch is estimated to cost: the sample in, a back-translation and a score per text out. */
+function judgeEstimateUsd(sample: { key: string; en: string; t: string }[]): number {
+  const p = priceOf(JUDGE_MODEL);
+  const inTok = estimateTokens(1200 + sample.reduce((a, s) => a + s.key.length + s.en.length + s.t.length + 24, 0));
+  const outTok = sample.reduce((a, s) => a + s.en.length * 0.3 + 30, 0) * OPUS_THINKING_FACTOR;
+  return (inTok * p.in + outTok * p.out) / 1e6;
+}
+
+export type SpendStop = { reason: 'job_budget' | 'monthly_cap'; spent: number; limit: number };
+
+/**
+ * May the job pay for a batch of about `next` USD beyond its first attempts? null = yes.
+ * `sent` is the estimated spend of batches it has sent and not read yet. Real figures on both sides:
+ * `spent_usd` is what its batches were billed, the ledger what the month was billed.
+ */
+export async function spendStop(deps: Deps, job: Job, sent: number, next: number): Promise<SpendStop | null> {
+  const spent = round4(job.spent_usd + sent);
+  const budget = budgetOf(job);
+  if (spent + next > budget) return { reason: 'job_budget', spent, limit: budget };
+  // A person approved this job (or it is a full run, which only starts approved): the month's cap was
+  // theirs to exceed by this job, and the job's own budget bounds by how much.
+  if (job.approved_by || job.mode === 'full') return null;
+  const settings = await deps.db.getSettings();
+  const committed = await deps.db.monthCommitted(monthOf(deps.now()), job.id);
+  // The ledger already holds what this job was billed; `committed` leaves its reserve out.
+  if (committed + sent + next > settings.monthly_cap_usd) return { reason: 'monthly_cap', spent: round4(committed + sent), limit: settings.monthly_cap_usd };
+  return null;
 }
 
 /** Is an intent for another create in the way? `wait` = leave the job alone for now. */
@@ -278,12 +336,70 @@ export async function stepSubmitted(deps: Deps, job: Job): Promise<void> {
       return;
     }
     const last = g + 1 >= groupsOf(shape(job).parts);
+    // Several groups: the first one is read before the others are sent (see `probe` below).
+    const probe = g === 0 && !last && !job.stats?.probe;
     await createBatch(deps, job, 'main', g, async () => (await groupChunks(deps, job, g)).requests,
-      last ? { phase: 'running', pos: undefined } : { pos: g + 1 });
+      last ? { phase: 'running', pos: undefined } : probe ? { phase: 'probe', pos: undefined } : { pos: g + 1 });
+    return;
+  }
+  if (job.stats?.phase === 'probe') {
+    await stepProbe(deps, job);
     return;
   }
   if (!(await allEnded(deps, job, 'main'))) return;
   await deps.db.cas(job, { status: 'validating', stats: addStats(job, { phase: 'results', pos: 0, qg: {} }) });
+}
+
+/**
+ * The first batch group has ended: what did it cost against what it was estimated at? The whole job
+ * is expected to follow that ratio. Inside the budget the other groups are sent; above it the job
+ * waits for approval with the corrected estimate, and only this one group is paid.
+ *
+ * Its spend goes into the ledger here, under the ref the read of the group uses later (`main:0`), so
+ * it is booked once whichever comes first - also when the job is cancelled while it waits.
+ * `spent_usd` is left to that read.
+ */
+async function stepProbe(deps: Deps, job: Job): Promise<void> {
+  const llm = requireLlm(deps);
+  const first = batchesOf(job, 'main')[0];
+  if (!first) {
+    await slice(deps, job, { phase: 'submitting', pos: 0 });
+    return;
+  }
+  if (!(await llm.isEnded(first.id))) return;
+  const { usd: est, models } = await groupEstimateUsd(deps, job, 0);
+  let usd = 0;
+  for await (const r of llm.results(first.id)) {
+    const model = r.model ?? models.get(r.custom_id);
+    if (r.usage && model) usd += usageCostUsd(model, r.usage);
+  }
+  await ledger(deps, job, 'main:0', usd);
+  // Nothing billed (the batch expired or failed as a whole) says nothing about the price of the rest.
+  const ratio = est > 0 && usd > 0 ? usd / est : 1;
+  const probe = { est: round4(est), usd: round4(usd), ratio: Math.round(ratio * 1000) / 1000 };
+  const projected = round4((job.estimate_usd ?? 0) * ratio);
+  if (projected <= budgetOf(job)) {
+    await slice(deps, job, { probe, phase: 'submitting', pos: 1 });
+    return;
+  }
+  deps.log('translate job above its estimate', { job: job.id, estimate: job.estimate_usd, projected, ...probe });
+  // The approval it had was for the old figure. Approved again, it goes on with the second group.
+  await slice(deps, job, { probe, hold: 'overrun', phase: 'submitting', pos: 1 }, {
+    status: 'awaiting_approval', estimate_usd: projected, approved_by: null,
+  });
+}
+
+/** The texts of the given groups that still fail stay untranslated: their QA says so (`dropped`). */
+function dropFailing(job: Job, groups: number[]): { qg: Record<string, QaStats>; qa: QaStats; texts: number } {
+  const qg = { ...(job.stats?.qg ?? {}) };
+  let texts = 0;
+  for (const g of groups) {
+    const q = qg[g];
+    if (!q) continue;
+    qg[g] = { ...q, dropped: q.failed };
+    texts += q.failed;
+  }
+  return { qg, qa: sumQa(qg), texts };
 }
 
 export async function stepValidating(deps: Deps, job: Job): Promise<void> {
@@ -334,10 +450,17 @@ export async function stepValidating(deps: Deps, job: Job): Promise<void> {
       await slice(deps, job, { phase: 'judge', pos: undefined });
       return;
     }
-    await createBatch(deps, job, 'judge', 0, async () => {
-      const sample = ((await store.getJson(judgeKeyOf(job.id))) ?? []) as JudgeSample[];
-      return [{ custom_id: 'j0', params: judgeParams(job.lang, JUDGE_MODEL, sample.map((s) => ({ key: s.key, en: s.en, t: s.t }))) }];
-    }, { phase: 'judge', pos: undefined });
+    const sample = ((await store.getJson(judgeKeyOf(job.id))) ?? []) as JudgeSample[];
+    // An intent that is open belongs to a create that may have gone through: that one is not asked again.
+    const stop = job.stats?.submit ? null : await spendStop(deps, job, 0, judgeEstimateUsd(sample));
+    if (stop) {
+      // No sample: what passed the checks is taken as it is, as for a job too small to have one.
+      await slice(deps, job, { phase: 'pe_plan', pos: 0, judge: null, capped: { ...stop, judge: true, texts: 0 } });
+      return;
+    }
+    await createBatch(deps, job, 'judge', 0, async () => (
+      [{ custom_id: 'j0', params: judgeParams(job.lang, JUDGE_MODEL, sample.map((s) => ({ key: s.key, en: s.en, t: s.t }))) }]
+    ), { phase: 'judge', pos: undefined });
     return;
   }
 
@@ -446,12 +569,24 @@ export async function stepPostEditing(deps: Deps, job: Job): Promise<void> {
       return;
     }
     const g = pe[i];
-    await createBatch(deps, job, 'postedit', i, async () => {
-      const head = await readPlan(deps, job);
-      const plan = (await store.getJson(peKey(job.id, g))) as { chunks: Chunk[] } | null;
-      if (!plan) throw new TranslateError('translate.plan_missing');
-      return plan.chunks.map((c) => ({ custom_id: c.id, params: requestParams(c.model, c.maxTokens, head.system, postEditMessage(c)) }));
-    }, i + 1 >= pe.length ? { phase: 'running', pos: undefined } : { pos: i + 1 });
+    const head = await readPlan(deps, job);
+    const plan = (await store.getJson(peKey(job.id, g))) as { chunks: Chunk[] } | null;
+    if (!plan) throw new TranslateError('translate.plan_missing');
+    const sent = job.stats?.peSent ?? 0;
+    const next = requestsEstimateUsd(job.lang, head.system.length, plan.chunks);
+    // An intent that is open belongs to a create that may have gone through: that one is not asked again.
+    const stop = job.stats?.submit ? null : await spendStop(deps, job, sent, next);
+    if (stop) {
+      // This group and the ones after it get no second attempt. What was sent is still read.
+      const left = dropFailing(job, pe.slice(i));
+      const capped = { ...stop, judge: job.stats?.capped?.judge === true, texts: left.texts };
+      if (i === 0) await slice(deps, job, { qg: left.qg, qa: left.qa, pe: [], capped, phase: 'route', pos: 0 }, { status: 'publishing' });
+      else await slice(deps, job, { qg: left.qg, qa: left.qa, pe: pe.slice(0, i), capped, phase: 'running', pos: undefined });
+      return;
+    }
+    await createBatch(deps, job, 'postedit', i, async () => (
+      plan.chunks.map((c) => ({ custom_id: c.id, params: requestParams(c.model, c.maxTokens, head.system, postEditMessage(c)) }))
+    ), { peSent: round4(sent + next), ...(i + 1 >= pe.length ? { phase: 'running', pos: undefined } : { pos: i + 1 }) });
     return;
   }
 

@@ -73,6 +73,9 @@ export function usageCostUsd(model: string, u: Usage): number {
     searches * WEB_SEARCH_USD;
 }
 
+/** Few-shot pairs ride in the (uncached) user message: about 60 characters each. */
+export const shotsUsd = (pairs: number) => (pairs * 60 * INPUT_TOK_PER_CHAR * 3) / 1e6;
+
 export interface Estimate {
   usd: number;
   inputTokens: number;

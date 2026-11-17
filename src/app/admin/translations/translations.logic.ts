@@ -95,6 +95,32 @@ export function jobProgress(status: string, stats: unknown): number | null {
   return null;
 }
 
+const HOLDS = new Set(['full', 'upload_cap', 'monthly_cap', 'overrun']);
+
+/**
+ * A sentence under a job's status that says why it waits for approval, or which paid steps it left
+ * out because money ran short (`stats.hold`, `stats.probe`, `stats.capped` of the orchestrator).
+ */
+export function jobNote(status: string, stats: unknown): { key: string; params: Record<string, number> } | null {
+  const s = (stats ?? {}) as {
+    hold?: string; probe?: { ratio?: number } | null;
+    capped?: { reason?: string; judge?: boolean; texts?: number } | null;
+  };
+  const base = 'admin.translations.jobs';
+  if (status === 'awaiting_approval' && typeof s.hold === 'string' && HOLDS.has(s.hold)) {
+    const ratio = Number(s.probe?.ratio);
+    const pct = Number.isFinite(ratio) ? Math.max(0, Math.round((ratio - 1) * 100)) : 0;
+    return { key: `${base}.hold.${s.hold}`, params: s.hold === 'overrun' ? { pct } : {} };
+  }
+  const c = s.capped;
+  if (c) {
+    const texts = Math.max(0, Math.round(Number(c.texts) || 0));
+    if (texts > 0) return { key: `${base}.capped.${c.reason === 'monthly_cap' ? 'monthly_cap' : 'job_budget'}`, params: { texts } };
+    if (c.judge) return { key: `${base}.capped.judge`, params: {} };
+  }
+  return null;
+}
+
 /** i18n key for a job's / orchestrator's error code; unknown codes get a generic sentence, never raw text. */
 export function jobErrorKey(code: string | null | undefined): string | null {
   if (!code) return null;
