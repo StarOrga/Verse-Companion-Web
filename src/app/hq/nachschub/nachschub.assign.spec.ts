@@ -179,12 +179,30 @@ describe('NachschubService: wishes assigned to an Operation', () => {
   let stock: ReturnType<typeof signal<{ class_name: string | null; qty: number }[]>>;
   let tracked: [string, unknown][];
   let failDrop: boolean;
+  let gateNextRead: Promise<void> | null = null;
   let svc: NachschubService;
+
+  /** Holds the next package read until `open()` is called. */
+  const holdNextRead = (): (() => void) => {
+    let open!: () => void;
+    gateNextRead = new Promise<void>((r) => (open = r));
+    return open;
+  };
+  /** The service as on a fresh page: nothing loaded yet. */
+  const unload = (): void => {
+    const s = svc as unknown as { loadedFor: string | null };
+    s.loadedFor = null;
+    svc.loaded.set(false);
+    svc.packages.set([]);
+  };
+  const settle = async (): Promise<void> => {
+    for (let i = 0; i < 10; i++) await Promise.resolve();
+  };
 
   const idOf = (call: FakeCall): unknown =>
     (call.chain.filter(([m]) => m === 'eq').map(([, a]) => a).find((a) => a[0] === 'id') ?? [])[1];
 
-  const answer = (call: FakeCall): FakeResult => {
+  const answer = (call: FakeCall): FakeResult | Promise<FakeResult> => {
     if (call.target !== 'hq_supply_packages') return { data: null };
     const upsert = chainArgs(call, 'upsert');
     if (upsert) {
@@ -199,7 +217,14 @@ describe('NachschubService: wishes assigned to an Operation', () => {
       if (hit) Object.assign(hit, update[0]);
       return { data: hit ? [{ id: hit.id }] : [] };
     }
-    return { data: server.filter((s) => !s.deleted_at) };
+    const snapshot = server.filter((s) => !s.deleted_at).map((s) => ({ ...s }));
+    if (gateNextRead) {
+      // A read that left before the writes below and answers after them (the first load racing an assign).
+      const gate = gateNextRead;
+      gateNextRead = null;
+      return gate.then(() => ({ data: snapshot }));
+    }
+    return { data: snapshot };
   };
 
   beforeEach(async () => {
@@ -542,6 +567,55 @@ describe('NachschubService: wishes assigned to an Operation', () => {
     for (let i = 0; i < 5; i++) await Promise.resolve();
     await new Promise((res) => setTimeout(res, 0));
     expect(wish.qty('medpen')).toBe(3);
+  });
+
+  it('round 3: an assign started while the first load is in flight waits for it and lands in the state', async () => {
+    wishFor('medpen', 3);
+    await svc.assignWish(medpen, 1, 'new', { name: 'Old' });
+    unload();
+    const open = holdNextRead();
+    const pending = svc.assignWish(medpen, 2, 'new', { name: 'Neu' });
+    await settle();
+    expect(svc.packages().length).toBe(0); // still waiting for the load
+    open();
+    const r = await pending;
+    expect(r.ok).toBe(true);
+    expect(svc.packages().map((p) => p.name).sort()).toEqual(['Neu', 'Old']);
+    expect(svc.linesOf(r.id!).map((l) => [l.source, l.qty])).toEqual([['wish', 2]]);
+    expect(alloc()).toEqual(expect.objectContaining({ wished: 3, assigned: 3, free: 0 }));
+  });
+
+  it('round 3: a read that answers after a local write never drops it (a new package stays, a deleted one stays gone)', async () => {
+    wishFor('medpen', 4);
+    await svc.assignWish(medpen, 1, 'new', { name: 'Gone' });
+    const gone = pkgNamed('Gone')?.id ?? '';
+    const open = holdNextRead();
+    const late = svc.reload(); // left before the writes below
+    await settle();
+    const made = await svc.assignWish(medpen, 2, 'new', { name: 'Neu' });
+    expect(made.ok).toBe(true);
+    await svc.remove(gone, true);
+    open();
+    expect(await late).toBe(true);
+    expect(svc.packages().map((p) => p.name)).toEqual(['Neu']);
+    expect(alloc()).toEqual(expect.objectContaining({ assigned: 2, free: 2 }));
+  });
+
+  it('round 3: a removal started before the first load counts against the loaded Operationen', async () => {
+    wishFor('medpen', 3);
+    await svc.assignWish(medpen, 3, 'new', { name: 'Op' });
+    const line = alloc().assignments[0].lineIds[0];
+    einsaetze.set([{ id: 'E1', packageId: pkgNamed('Op')?.id ?? '', status: 'planned' }]);
+    unload();
+    const open = holdNextRead();
+    const pending = svc.applyWishRemoval(medpen, 2);
+    await settle();
+    open();
+    const r = await pending;
+    expect(r.ok).toBe(true);
+    expect(wish.qty('medpen')).toBe(1);
+    expect(supplies.line(line)?.qty).toBe(1); // without the wait the lines would have kept 3 above a wish of 1
+    expect(alloc()).toEqual(expect.objectContaining({ wished: 1, assigned: 1, free: 0 }));
   });
 
   describe('A11 legacy lines (H3)', () => {

@@ -151,7 +151,15 @@ export class NachschubService {
     // live purchase changes no stock, so no reconcile pass would follow it.
     effect(() => {
       const pending = this.loaded() && this.supplies.items().some((l) => (l.source === 'wish' && l.done) || (l.source === 'wish_met' && !l.done));
-      if (pending) untracked(() => void this.fulfilWishLines().catch((err: unknown) => logWarn('nachschub', 'wish fulfilment failed', err)));
+      // Then a full pass: an Operation whose lines are all met archives itself and frees its slot (r4 s3-a1) also
+      // when the line was met outside the HQ (no stock change, so no other pass would follow).
+      if (pending) {
+        untracked(() =>
+          void this.fulfilWishLines()
+            .then(() => this.reconcile())
+            .catch((err: unknown) => logWarn('nachschub', 'wish fulfilment failed', err)),
+        );
+      }
     });
   }
 
@@ -214,6 +222,10 @@ export class NachschubService {
   }
 
   private async fetchPackages(uid: string, reportError: boolean): Promise<boolean> {
+    // A read that was on its way while this client wrote a package (an assign during the first load, a delete) must
+    // not take that write back: for every package written after the read started, the local copy wins - kept, or kept
+    // gone. Everything else is the server's.
+    const since = this.writeSeq;
     try {
       const { data, error } = await this.sb.client
         .from('hq_supply_packages' as never)
@@ -222,7 +234,15 @@ export class NachschubService {
         .order('created_at', { ascending: true });
       if (this.auth.user()?.id !== uid) return false;
       if (error) throw error;
-      this.packages.set(((data ?? []) as unknown as HqSupplyPackageRow[]).map(fromRow));
+      const next = new Map(((data ?? []) as unknown as HqSupplyPackageRow[]).map(fromRow).map((p) => [p.id, p] as const));
+      const local = new Map(this.packages().map((p) => [p.id, p] as const));
+      for (const [id, seq] of this.touched) {
+        if (seq <= since) continue;
+        const mine = local.get(id);
+        if (mine) next.set(id, mine);
+        else next.delete(id);
+      }
+      this.packages.set([...next.values()]);
       this.loaded.set(true);
       this.error.set(null);
       return true;
@@ -897,10 +917,22 @@ export class NachschubService {
    * (A3). Undo takes the assignment back (and a Nachschub this call created). With `surface` the success is tracked
    * as `hq:path_group_assign`.
    */
-  async assignWish(ref: WishRef, qty: number, target: string | 'new', opts: { name?: string; surface?: PathGroupSurface } = {}): Promise<NachschubResult> {
-    // Outside the HQ the list may not be loaded yet: free pieces are counted only against every Operation (A3).
+  /**
+   * Waits until the three stores a wish write counts against are there: the Nachschub list, the supply lines' first
+   * pull and the wishlist. False when the list could not be loaded (the write then refuses instead of guessing).
+   */
+  private async readyForWishes(): Promise<boolean> {
     await this.ensureLoaded();
-    if (!this.loaded()) return fail(this.error() ?? 'errors.generic');
+    const s = this.supplies as Partial<HqSuppliesService>;
+    if (s.ready && !s.ready() && s.sync) await s.sync.call(this.supplies);
+    const w = this.wish as Partial<WishlistStore>;
+    if (w.loaded && !w.loaded() && w.ensureLoaded) await w.ensureLoaded.call(this.wish);
+    return this.loaded();
+  }
+
+  async assignWish(ref: WishRef, qty: number, target: string | 'new', opts: { name?: string; surface?: PathGroupSurface } = {}): Promise<NachschubResult> {
+    // Outside the HQ the stores may still be loading: free pieces are counted only against every Operation and line (A3).
+    if (!(await this.readyForWishes())) return fail(this.error() ?? 'errors.generic');
     if (this.allocationOf(ref).free <= 0) return fail('hq.nachschub.nothingFree');
     const picks = [{ key: positionKey(ref), qty: Math.max(1, Math.round(qty)) }];
     const r = target === 'new' ? await this.createFromWishlist({ picks, name: opts.name }) : await this.addFromWishlist(target, picks);
@@ -935,6 +967,8 @@ export class NachschubService {
   ): Promise<NachschubResult> {
     const uid = this.auth.user()?.id;
     if (!uid) return fail('errors.generic');
+    // Before the first load every piece would read as free: the removal would lower the wish and leave its lines.
+    if (!(await this.readyForWishes())) return fail(this.error() ?? 'errors.generic');
     const holders = this.holdersOf(ref);
     const planned = planRemoval(this.wishQtyOf({ ...ref, name: null, qty: 0 }), holders, removeQty);
     const plan = opts.split ? withSplit(planned, holders, opts.split) : planned;
@@ -1005,6 +1039,7 @@ export class NachschubService {
 
   private async releaseLine(lineId: string, opts: { alsoRemoveWish?: boolean; dissolve?: boolean; surface?: PathGroupSurface }, autoDissolve: boolean): Promise<NachschubResult> {
     const uid = this.auth.user()?.id;
+    if (!(await this.readyForWishes())) return fail(this.error() ?? 'errors.generic');
     await this.fulfilWishLines(); // a met line of the same Nachschub lowers its wish before a dissolve can take it
     const info = this.releaseInfo(lineId);
     const l = this.supplies.items().find((x) => x.id === lineId);
@@ -1427,6 +1462,7 @@ export class NachschubService {
         .eq('id', id);
       const { data, error } = await (revive ? base : base.is('deleted_at', null)).select('id');
       if (error) throw error;
+      this.touch(id);
       if (!(data as unknown[] | null)?.length) {
         this.packages.update((ps) => ps.filter((p) => p.id !== id));
         this.error.set('hq.nachschub.gone');
@@ -1438,10 +1474,19 @@ export class NachschubService {
     }
   }
 
+  private writeSeq = 0;
+  /** Package id -> sequence number of its last local write that the server accepted (see {@link fetchPackages}). */
+  private readonly touched = new Map<string, number>();
+
+  private touch(id: string): void {
+    this.touched.set(id, ++this.writeSeq);
+  }
+
   private async write(row: Record<string, unknown>, op: string): Promise<Outcome> {
     try {
       const { error } = await this.sb.client.from('hq_supply_packages' as never).upsert(row as never, { onConflict: 'user_id,id' });
       if (error) throw error;
+      if (typeof row['id'] === 'string') this.touch(row['id']);
       return 'ok';
     } catch (err) {
       return this.failed(err, op);
@@ -1469,6 +1514,7 @@ export class NachschubService {
         .eq('user_id', uid)
         .eq('id', id);
       if (error) throw error;
+      this.touch(id);
       this.packages.update((ps) => ps.filter((p) => p.id !== id));
       return true;
     } catch (err) {
