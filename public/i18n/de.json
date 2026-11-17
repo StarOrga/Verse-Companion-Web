@@ -4168,9 +4168,12 @@
         "revokeText": "Neue Uploads werden nicht mehr nach {{lang}} übersetzt. Bestehende Übersetzungen bleiben."
       },
       "fullRun": {
-        "title": "Voll-Lauf für {{lang}} starten?",
-        "text": "Kostet ca. {{usd}} $ ({{count}} Texte) — alle bisherigen Texte werden komplett übersetzt. Der Auftrag wartet danach noch auf deine Freigabe.",
-        "confirm": "Voll-Lauf anlegen"
+        "title": "Voll-Lauf für {{lang}} freigeben?",
+        "text": "Kostet ca. {{usd}} $ ({{count}} Texte) — alle bisher unübersetzten Texte werden übersetzt. Für einen Voll-Lauf gilt die Kostenobergrenze pro Upload nicht.",
+        "confirm": "Kostenpflichtig freigeben",
+        "startTitle": "Voll-Lauf für {{lang}} anlegen?",
+        "startText": "Der Auftrag wird zuerst geschätzt. Das kostet nichts und dauert einige Minuten. Danach wartet er mit Kosten und Textzahl in der Auftragsliste auf deine Freigabe.",
+        "startConfirm": "Anlegen und schätzen"
       },
       "jobs": {
         "title": "Aufträge",
@@ -4180,6 +4183,7 @@
         "cancel": "Abbrechen",
         "cancelTitle": "Auftrag für {{lang}} abbrechen?",
         "cancelText": "Der Auftrag wird beendet; bereits angefallene Kosten bleiben.",
+        "progress": "{{pct}} %",
         "cols": {
           "build": "Build",
           "lang": "Sprache",
@@ -4224,7 +4228,14 @@
         "results_missing": "Die Ergebnisse fehlen.",
         "r2_not_configured": "Der Speicher (R2) ist nicht eingerichtet.",
         "internal": "Interner Fehler der Übersetzungs-Pipeline.",
-        "worker_limit": "Der Auftrag hat das CPU- oder Speicherlimit des Workers mehrfach hintereinander überschritten und wurde gestoppt."
+        "worker_limit": "Der Auftrag hat das CPU- oder Speicherlimit des Workers mehrfach hintereinander überschritten und wurde gestoppt.",
+        "no_live_build": "Es gibt keinen aktuellen LIVE-Build.",
+        "source_not_permitted": "Für diese Quelle ist die Lizenz nicht geklärt.",
+        "source_unknown": "Die Quelle gibt es nicht (mehr).",
+        "nothing_to_do": "Es gab nichts zu übersetzen.",
+        "phase_unknown": "Der Auftrag steht in einem unbekannten Schritt.",
+        "job_cleanup_pending": "Der vorige Auftrag wird noch aufgeräumt. Bitte in einer Minute erneut versuchen.",
+        "resubmit_limit": "Das Anlegen eines Batches ist mehrfach ohne Antwort geblieben. Der Auftrag wurde gestoppt, damit kein Batch doppelt bezahlt wird. Bitte in der Anthropic-Konsole nach verwaisten Batches sehen."
       },
       "glossary": {
         "title": "Glossar",
@@ -4319,18 +4330,17 @@
         "intro": "Community-Pakete, aus denen die Übersetzung startet. Import nur bei geklärter Lizenz.",
         "syncAll": "Jetzt abgleichen",
         "syncTitle": "Alle Quellen abgleichen?",
-        "syncText": "Prüft jede aktive Quelle auf Änderungen und importiert geänderte neu.",
+        "syncText": "Prüft jede aktive Quelle auf Änderungen und startet für geänderte einen Import im Hintergrund.",
         "import": "Seed importieren",
         "importTitle": "Seed von {{name}} importieren?",
-        "importText": "Das Paket für {{lang}} wird geprüft und in die Übersetzungsbasis übernommen. CIG-Zeilen bleiben unberührt.",
+        "importText": "Das Paket für {{lang}} wird im Hintergrund geprüft und in die Übersetzungsbasis übernommen. CIG-Zeilen bleiben unberührt.",
         "importLocked": "Erst möglich, wenn die Lizenz geklärt ist (lizenziert oder erlaubt).",
-        "importResult": "Ergebnis des Imports",
-        "imported": "{{name}}: {{count}} Zeilen importiert.",
-        "synced": "Abgeglichen: {{checked}} geprüft, {{changed}} geändert, {{errors}} Fehler.",
+        "importStarted": "{{name}}: Import gestartet. Er läuft im Hintergrund, der Stand steht unter „Hintergrundläufe“.",
+        "synced": "Abgeglichen: {{checked}} geprüft, {{changed}} Importe gestartet, {{errors}} Fehler.",
         "learn": "Lernen",
         "learnTitle": "Lernschritt für {{lang}} starten?",
         "learnText": "Leitet Begriffe, Stil und Karten für {{lang}} aus den vorhandenen Texten ab. Kann Kosten verursachen.",
-        "learnResult": "Ergebnis des Lernschritts",
+        "learnStarted": "Lernschritt für {{lang}} gestartet. Er läuft im Hintergrund, der Stand steht unter „Hintergrundläufe“.",
         "draft": "Anfrage-Entwurf erstellen",
         "drafted": "Entwurf für {{name}} erstellt – siehe Anfragen.",
         "empty": "Keine Quellen eingetragen.",
@@ -4354,6 +4364,45 @@
           "awaiting_permission": "Erlaubnis offen",
           "permitted": "Erlaubt",
           "refused": "Abgelehnt"
+        }
+      },
+      "passes": {
+        "title": "Hintergrundläufe",
+        "intro": "Import, Overlay-Aufbau und Lernen laufen in Teilschritten im Hintergrund. Ein abgebrochener Teilschritt wird wiederholt.",
+        "empty": "Keine Läufe in den letzten 7 Tagen.",
+        "cols": {
+          "kind": "Art",
+          "lang": "Sprache",
+          "source": "Quelle",
+          "state": "Stand",
+          "updated": "Zuletzt"
+        },
+        "kinds": {
+          "seed": "Import",
+          "overlay": "Overlay-Aufbau",
+          "learn": "Lernen"
+        },
+        "status": {
+          "open": "läuft",
+          "done": "fertig",
+          "failed": "fehlgeschlagen"
+        },
+        "phases": {
+          "start": "Vorbereitung",
+          "fetch": "Paket laden",
+          "split": "Paket aufteilen",
+          "scan": "Texte durchgehen",
+          "apply": "Übersetzungen eintragen",
+          "arbitrate": "Konflikte prüfen",
+          "finish": "Abschluss",
+          "cleanup": "Aufräumen",
+          "mine": "Begriffe sammeln",
+          "plan": "Auswerten",
+          "insert": "Glossar ergänzen",
+          "detect": "Beispiele suchen",
+          "submit": "Aufträge einreichen",
+          "assemble": "Overlay schreiben",
+          "done": "fertig"
         }
       },
       "outreach": {

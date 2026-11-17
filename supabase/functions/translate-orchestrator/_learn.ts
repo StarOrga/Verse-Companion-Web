@@ -1,5 +1,9 @@
-// C · The learning step. Runs after every publish (C0, from _machine.ts), after every seed
-// import / source sync (pipeline hooks) and once as a backfill (`op: learn`). Token-free first:
+// C · The learning step: what it computes. It is asked for after every publish, after every seed
+// import / source sync and as a backfill (`op: learn`), and runs as a sliced pass (_learn_pass.ts):
+// this file holds the pure parts, the batch requests and the reading of finished batches.
+// Everything a slice computes can be merged with the other slices' results (votes add up, the
+// smallest key decides a spelling), so the pass gives what one run over the whole table would.
+// Token-free first:
 //   C1 mine short pairs from the TM + CIG table → term candidates with votes
 //   C2 dnt: codex names (manufacturers, ships, locations) kept verbatim in ≥ 90 % of pairs
 //   C3 style statistics → translation_languages.style
@@ -12,16 +16,15 @@
 // Every write is idempotent (insert-only glossary rows, TM upserts by hash, cards deduped), so a
 // re-run after a crash or a second trigger converges instead of duplicating.
 
-import { applyAnsweredCards, createCards, termCard } from './_cards.ts';
+import { createCards, termCard } from './_cards.ts';
 import type { ApplySummary } from './_cards.ts';
 import { arbitrate } from './_arbiter.ts';
 import type { ArbiterSummary, PairJudgement } from './_arbiter.ts';
 import { bothOrders, hardFailures, PAIR_SCHEMA } from './_arbiter.ts';
 import { priceOf } from './_cost.ts';
-import { isCigValid, sha256Hex } from './_diff.ts';
 import type { TmEntry } from './_diff.ts';
 import type { JudgeTerm } from './_glossary.ts';
-import { loadTm, readLocaleTable, saveTm, tmShardKey } from './_io.ts';
+import { saveTm, tmShardKey } from './_io.ts';
 import type { Store } from './_io.ts';
 import type { CardRow, LearnGlossaryRow, LearnSettings } from './_learn_db.ts';
 import {
@@ -29,14 +32,13 @@ import {
   submitLearnBatch,
 } from './_learn_batch.ts';
 import type { LearnBatch, LearnDeps } from './_learn_batch.ts';
-import type { BatchResult, Deps } from './_machine.ts';
+import type { BatchResult, Deps } from './_job.ts';
 import { tokensOf } from './_mask.ts';
 import { glossaryBlock, LANG_NAMES, OUTPUT_SCHEMA } from './_prompt.ts';
 import type { BatchParams, GlossaryRow } from './_prompt.ts';
 import { containsStem, containsTerm } from './_qa.ts';
 import { propagateGlossaryChange, reviseStateFor, shouldReplace } from './_revise.ts';
 import type { ReviseState } from './_revise.ts';
-import { styleStats } from './_style.ts';
 
 export type LearnTrigger = 'publish' | 'seed' | 'sync' | 'backfill';
 export type LineOrigin = 'admin' | 'cig' | 'community' | 'ai' | 'judge';
@@ -44,12 +46,12 @@ export type LineOrigin = 'admin' | 'cig' | 'community' | 'ai' | 'judge';
 export const HAIKU_MODEL = 'claude-haiku-5-5';
 export const WEB_MODEL = 'claude-sonnet-5-5';
 const MAX_TERM_WORDS = 4;
-const HAIKU_ITEMS = 150;
+export const HAIKU_ITEMS = 150;
 const ALIGN_LINES = 400;
-const ALIGN_PER_REQUEST = 30;
+export const ALIGN_PER_REQUEST = 30;
 const WEB_CARDS = 3;
 const WEB_USD_PER_CARD = 0.08;
-const STYLE_MIN_TRUSTED = 200;
+export const STYLE_MIN_TRUSTED = 200;
 
 // ── pure: mining (C1 / C8) ───────────────────────────────────────────────────
 
@@ -81,23 +83,100 @@ export function isShortTerm(s: string): boolean {
   return t.split(/\s+/).length <= MAX_TERM_WORDS;
 }
 
-export function mineCandidates(lines: MineLine[]): Map<string, Candidate> {
-  const out = new Map<string, Candidate>();
+/** Judge votes sort after every table line, as the one-pass run appended them last. */
+const JUDGE_MARK = String.fromCharCode(0xffff);
+const orderOf = (l: Pick<MineLine, 'key' | 'o'>) => (l.o === 'judge' ? JUDGE_MARK + l.key : l.key);
+
+/** One variant of a mined term; `k` is the smallest line that spelled it this way. */
+export interface MinedVariant {
+  t: string;
+  k: string;
+  n: number;
+  by: Partial<Record<LineOrigin, number>>;
+}
+
+/** A mined term as a slice stores it: `k` = smallest line, `keys` = its 20 smallest lines. */
+export interface MinedTerm {
+  s: string;
+  k: string;
+  v: MinedVariant[];
+  keys: string[];
+}
+
+interface AccTerm {
+  s: string;
+  k: string;
+  v: Map<string, MinedVariant>;
+  keys: string[];
+}
+/** Accumulator of mined terms by lower-cased source. Order-independent: any order of lines or parts gives the same result. */
+export type MineAcc = Map<string, AccTerm>;
+
+function keepSmallest(keys: string[], more: string[]): string[] {
+  if (!more.length) return keys;
+  const all = [...new Set([...keys, ...more])].sort();
+  return all.length > 20 ? all.slice(0, 20) : all;
+}
+
+function addVariant(c: AccTerm, v: MinedVariant): void {
+  const vk = v.t.toLowerCase();
+  const have = c.v.get(vk);
+  if (!have) {
+    c.v.set(vk, { t: v.t, k: v.k, n: v.n, by: { ...v.by } });
+    return;
+  }
+  if (v.k < have.k) {
+    have.k = v.k;
+    have.t = v.t;
+  }
+  have.n += v.n;
+  for (const [o, n] of Object.entries(v.by) as [LineOrigin, number][]) have.by[o] = (have.by[o] ?? 0) + n;
+}
+
+/** Folds one slice's (or the judge's) terms into the accumulator. */
+export function addMined(acc: MineAcc, terms: MinedTerm[]): MineAcc {
+  for (const t of terms) {
+    const k = t.s.toLowerCase();
+    let c = acc.get(k);
+    if (!c) acc.set(k, (c = { s: t.s, k: t.k, v: new Map(), keys: [] }));
+    else if (t.k < c.k) {
+      c.k = t.k;
+      c.s = t.s;
+    }
+    for (const v of t.v) addVariant(c, v);
+    c.keys = keepSmallest(c.keys, t.keys);
+  }
+  return acc;
+}
+
+/** Mines short pairs into mergeable terms (what a slice writes). */
+export function mineLines(lines: MineLine[]): MinedTerm[] {
+  const acc: MineAcc = new Map();
   for (const l of lines) {
     if (!isShortTerm(l.en) || !l.t.trim() || /[\r\n]/.test(l.t) || l.t.length > 60) continue;
-    const src = l.en.trim();
-    const k = src.toLowerCase();
-    let c = out.get(k);
-    if (!c) out.set(k, (c = { source: src, variants: new Map(), keys: [] }));
-    const t = l.t.trim();
-    const vk = t.toLowerCase();
-    let v = c.variants.get(vk);
-    if (!v) c.variants.set(vk, (v = { text: t, votes: 0, by: {} }));
-    v.votes++;
-    v.by[l.o] = (v.by[l.o] ?? 0) + 1;
-    if (c.keys.length < 20) c.keys.push(l.key);
+    const ord = orderOf(l);
+    addMined(acc, [{ s: l.en.trim(), k: ord, v: [{ t: l.t.trim(), k: ord, n: 1, by: { [l.o]: 1 } }], keys: [ord] }]);
+  }
+  return [...acc.values()].map((c) => ({ s: c.s, k: c.k, v: [...c.v.values()], keys: c.keys }));
+}
+
+const plainKey = (k: string) => (k.startsWith(JUDGE_MARK) ? k.slice(1) : k);
+
+/** Candidates in the order of their first line, as one pass over the sorted table sees them. */
+export function candidatesOf(acc: MineAcc): Map<string, Candidate> {
+  const out = new Map<string, Candidate>();
+  for (const [k, c] of [...acc].sort((x, y) => (x[1].k < y[1].k ? -1 : x[1].k > y[1].k ? 1 : 0))) {
+    const variants = new Map<string, Variant>();
+    for (const [vk, v] of [...c.v].sort((x, y) => (x[1].k < y[1].k ? -1 : x[1].k > y[1].k ? 1 : 0))) {
+      variants.set(vk, { text: v.t, votes: v.n, by: v.by });
+    }
+    out.set(k, { source: c.s, variants, keys: c.keys.map(plainKey) });
   }
   return out;
+}
+
+export function mineCandidates(lines: MineLine[]): Map<string, Candidate> {
+  return candidatesOf(addMined(new Map(), mineLines(lines)));
 }
 
 export interface Assessment {
@@ -199,13 +278,21 @@ function hasWord(text: string, term: string): boolean {
   return false;
 }
 
-/**
- * Codex names that the translations keep verbatim in ≥ `ratio` of the pairs whose English
- * contains them (case-sensitive, whole words), with at least `minEvidence` such pairs.
- */
-export function dntFromNames(
-  names: string[], pairs: { en: string; t: string }[], minEvidence: number, ratio = 0.9,
-): LearnGlossaryRow[] {
+/** The names worth counting: 3-40 chars, capitalised, each once (first spelling). */
+function usableNames(names: string[]): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const raw of names) {
+    const name = raw.trim();
+    if (name.length < 3 || name.length > 40 || seen.has(name.toLowerCase()) || !/^\p{Lu}/u.test(name)) continue;
+    seen.add(name.toLowerCase());
+    out.push(name);
+  }
+  return out;
+}
+
+/** Per name `[name, pairs whose English contains it, of them kept verbatim]`; only names that occur. Sums add up across slices. */
+export function dntCounts(names: string[], pairs: { en: string; t: string }[]): [string, number, number][] {
   const byFirst = new Map<string, number[]>();
   pairs.forEach((p, i) => {
     for (const w of new Set(p.en.match(/\p{Lu}[\p{L}\p{N}'-]*/gu) ?? [])) {
@@ -214,12 +301,8 @@ export function dntFromNames(
       l.push(i);
     }
   });
-  const out: LearnGlossaryRow[] = [];
-  const seen = new Set<string>();
-  for (const raw of names) {
-    const name = raw.trim();
-    if (name.length < 3 || name.length > 40 || seen.has(name.toLowerCase()) || !/^\p{Lu}/u.test(name)) continue;
-    seen.add(name.toLowerCase());
+  const out: [string, number, number][] = [];
+  for (const name of usableNames(names)) {
     const first = name.split(/\s+/)[0].replace(/[^\p{L}\p{N}'-]+$/u, '');
     let n = 0;
     let kept = 0;
@@ -229,14 +312,48 @@ export function dntFromNames(
       n++;
       if (p.t.includes(name)) kept++;
     }
+    if (n) out.push([name, n, kept]);
+  }
+  return out;
+}
+
+export function addDntCounts(into: Map<string, [number, number]>, part: [string, number, number][]): Map<string, [number, number]> {
+  for (const [name, n, kept] of part) {
+    const c = into.get(name);
+    if (c) {
+      c[0] += n;
+      c[1] += kept;
+    } else into.set(name, [n, kept]);
+  }
+  return into;
+}
+
+export function dntFromCounts(
+  names: string[], counts: Map<string, [number, number]>, minEvidence: number, ratio = 0.9,
+): LearnGlossaryRow[] {
+  const out: LearnGlossaryRow[] = [];
+  for (const name of usableNames(names)) {
+    const [n, kept] = counts.get(name) ?? [0, 0];
     if (n >= minEvidence && kept / n >= ratio) {
       out.push({ source_term: name, target_term: name, category: 'dnt', origin: 'mined', evidence: n });
     }
   }
-  return out.sort((a, b) => (b.evidence ?? 0) - (a.evidence ?? 0)).slice(0, 1000);
+  return out.sort((x, y) => (y.evidence ?? 0) - (x.evidence ?? 0)).slice(0, 1000);
+}
+
+/**
+ * Codex names that the translations keep verbatim in ≥ `ratio` of the pairs whose English
+ * contains them (case-sensitive, whole words), with at least `minEvidence` such pairs.
+ */
+export function dntFromNames(
+  names: string[], pairs: { en: string; t: string }[], minEvidence: number, ratio = 0.9,
+): LearnGlossaryRow[] {
+  return dntFromCounts(names, addDntCounts(new Map(), dntCounts(names, pairs)), minEvidence, ratio);
 }
 
 // ── pure: B1 line detection ──────────────────────────────────────────────────
+
+const TOKEN_RE = /[\p{L}\p{N}]+/gu;
 
 /**
  * Case-sensitive whole-word hit of a game term. A single-word term must not only stand at the
@@ -274,13 +391,29 @@ export function findMisaligned(
   const usable = terms.filter((g) => g.category === 'term' && g.source_term.length >= 3 && g.target_term &&
     g.source_term.toLowerCase() !== g.target_term.toLowerCase());
   if (!usable.length) return [];
+  // A whole-word hit of a term means the term's first run of letters/digits is a whole token of the
+  // line, so only the terms that share a token with the line are checked (thousands of terms otherwise).
+  const byToken = new Map<string, number[]>();
+  const loose: number[] = [];
+  usable.forEach((g, i) => {
+    const tok = g.source_term.match(TOKEN_RE)?.[0];
+    if (!tok) loose.push(i);
+    else {
+      const l = byToken.get(tok);
+      if (l) l.push(i);
+      else byToken.set(tok, [i]);
+    }
+  });
   const out: AlignLine[] = [];
   const seen = new Set<string>();
   for (const l of lines) {
     if (out.length >= cap) break;
     if ((l.entry.o !== 'community' && l.entry.o !== 'ai') || seen.has(l.h)) continue;
+    const cand = new Set<number>(loose);
+    for (const tok of new Set(l.en.match(TOKEN_RE) ?? [])) for (const i of byToken.get(tok) ?? []) cand.add(i);
     const miss: { source: string; target: string }[] = [];
-    for (const g of usable) {
+    for (const i of [...cand].sort((x, y) => x - y)) {
+      const g = usable[i];
       if (termHit(l.en, g.source_term) && !containsStem(l.entry.t, g.target_term)) miss.push({ source: g.source_term, target: g.target_term });
       if (miss.length >= 4) break;
     }
@@ -292,19 +425,100 @@ export function findMisaligned(
   return out;
 }
 
+/** The first `cap` distinct lines in key order: what `findMisaligned` over the whole table returns. */
+export function mergeMisaligned(parts: AlignLine[][], cap = ALIGN_LINES): AlignLine[] {
+  const all = parts.flat().sort((x, y) => (x.key < y.key ? -1 : x.key > y.key ? 1 : 0));
+  const out: AlignLine[] = [];
+  const seen = new Set<string>();
+  for (const l of all) {
+    if (out.length >= cap) break;
+    if (seen.has(l.h)) continue;
+    seen.add(l.h);
+    out.push(l);
+  }
+  return out;
+}
+
+// ── pure: example lines for the Haiku pre-decision (C6) ──────────────────────
+
+export interface Example {
+  /** Key of the line (decides which examples survive a merge). */
+  k: string;
+  en: string;
+  t: string;
+}
+
+/**
+ * For each needle (an English term and one of its translations) the first `per` lines, in key order,
+ * whose English uses the term and whose translation uses that translation. Returns `[needle index, lines]`.
+ */
+export function findExamples(
+  lines: { key: string; en: string; t: string }[], needles: { src: string; t: string }[], per = 2,
+): [number, Example[]][] {
+  const byToken = new Map<string, number[]>();
+  const loose: number[] = [];
+  needles.forEach((n, i) => {
+    const tok = n.src.toLowerCase().match(TOKEN_RE)?.[0];
+    if (!tok) loose.push(i);
+    else {
+      const l = byToken.get(tok);
+      if (l) l.push(i);
+      else byToken.set(tok, [i]);
+    }
+  });
+  const found = new Map<number, Example[]>();
+  for (const l of lines) {
+    if (l.en.length > 200) continue;
+    const lower = l.en.toLowerCase();
+    const cand = new Set<number>(loose);
+    for (const tok of new Set(lower.match(TOKEN_RE) ?? [])) for (const i of byToken.get(tok) ?? []) cand.add(i);
+    for (const i of cand) {
+      const have = found.get(i);
+      if (have && have.length >= per) continue;
+      const n = needles[i];
+      if (!lower.includes(n.src.toLowerCase()) || !containsTerm(l.en, n.src) || !containsStem(l.t, n.t)) continue;
+      if (have) have.push({ k: l.key, en: l.en, t: l.t });
+      else found.set(i, [{ k: l.key, en: l.en, t: l.t }]);
+    }
+  }
+  return [...found];
+}
+
+export function mergeExamples(parts: [number, Example[]][][], per = 2): Map<number, { en: string; t: string }[]> {
+  const all = new Map<number, Example[]>();
+  for (const part of parts) {
+    for (const [i, ex] of part) {
+      const l = all.get(i);
+      if (l) l.push(...ex);
+      else all.set(i, [...ex]);
+    }
+  }
+  const out = new Map<number, { en: string; t: string }[]>();
+  for (const [i, ex] of all) {
+    ex.sort((x, y) => (x.k < y.k ? -1 : x.k > y.k ? 1 : 0));
+    out.set(i, ex.slice(0, per).map(({ en, t }) => ({ en, t })));
+  }
+  return out;
+}
+
 // ── judge candidates (C5) ────────────────────────────────────────────────────
 
-const judgeKey = (lang: string) => learnKey(lang, 'judge-terms');
+export const judgeKey = (lang: string) => learnKey(lang, 'judge-terms');
 
 /** Appends the judge's term corrections; they vote in the next mining pass (origin 'judge'). */
-export async function addJudgeCandidates(store: Store, lang: string, terms: JudgeTerm[]): Promise<void> {
-  const cur = ((await store.getJson(judgeKey(lang))) ?? []) as JudgeTerm[];
-  await store.putJson(judgeKey(lang), [...cur, ...terms].slice(-2000));
+/**
+ * Adds the judge's term corrections of one job. `ref` names the job: what it added before is replaced,
+ * so a slice that is repeated after a kill does not vote twice.
+ */
+export async function addJudgeCandidates(store: Store, lang: string, terms: JudgeTerm[], ref?: string): Promise<void> {
+  const cur = ((await store.getJson(judgeKey(lang))) ?? []) as (JudgeTerm & { ref?: string })[];
+  const kept = ref ? cur.filter((t) => t.ref !== ref) : cur;
+  await store.putJson(judgeKey(lang), [...kept, ...terms.map((t) => (ref ? { ...t, ref } : t))].slice(-2000));
 }
 
 // ── state ────────────────────────────────────────────────────────────────────
 
-interface HaikuItem {
+export interface HaikuItem {
   source: string;
   /** a = incumbent (top variant / current row), b = challenger. */
   a: string;
@@ -327,7 +541,7 @@ interface WebItem {
   month: string;
 }
 
-interface LearnState {
+export interface LearnState {
   v: 1;
   haiku: LearnBatch<HaikuItem[]> | null;
   align: LearnBatch<AlignLine[]> | null;
@@ -339,7 +553,7 @@ interface LearnState {
 
 export const stateKey = (lang: string) => learnKey(lang, 'state');
 
-async function loadState(store: Store, lang: string): Promise<LearnState> {
+export async function loadState(store: Store, lang: string): Promise<LearnState> {
   const s = (await store.getJson(stateKey(lang))) as LearnState | null;
   return s && s.v === 1 ? s : { v: 1, haiku: null, align: null, web: null };
 }
@@ -357,11 +571,17 @@ export interface LearnSummary {
   web?: { submitted: number; attached: number };
   arbiter?: ArbiterSummary;
   blocked: string[];
+  /** resume only: a finished batch was read and applied in this call. */
+  applied?: boolean;
 }
 
 // ── run ──────────────────────────────────────────────────────────────────────
 
-/** Resumes in-flight learning batches only (cheap; called from every tick). */
+/**
+ * Reads the learning batches that have ended (Haiku, align, web, arbiter) and applies them. Cheap while
+ * they run; applying one writes glossary rows, cards and TM shards, so a tick does this for one language
+ * at a time, as its heavy step (`applied` tells the caller that it was one).
+ */
 export async function resumeLearning(deps: Deps, lang: string): Promise<LearnSummary> {
   const sum: LearnSummary = { lang, trigger: 'resume', blocked: [] };
   if (!hasLearn(deps)) return { ...sum, skipped: 'no_learn_db' };
@@ -371,159 +591,13 @@ export async function resumeLearning(deps: Deps, lang: string): Promise<LearnSum
   if (!busy) return { ...sum, skipped: 'idle' };
   const settings = await deps.learn.getLearnSettings();
   await pollBatches(deps, lang, settings, state, sum);
-  await deps.store.putJson(stateKey(lang), state);
   if (arb) sum.arbiter = await arbitrate(deps, lang, []);
+  const a = sum.arbiter;
+  sum.applied = !!(sum.haiku || sum.align || sum.web || (a && (a.replaced || a.kept || a.cards || a.submitted)));
   return sum;
 }
 
-export async function runLearning(deps: Deps, lang: string, trigger: LearnTrigger): Promise<LearnSummary> {
-  const sum: LearnSummary = { lang, trigger, blocked: [] };
-  if (!hasLearn(deps)) return { ...sum, skipped: 'no_learn_db' };
-  const d = deps;
-  const { store, learn } = d;
-  const settings = await learn.getLearnSettings();
-  sum.cards = await applyAnsweredCards(d, lang);
-  const state = await loadState(store, lang);
-  await pollBatches(d, lang, settings, state, sum);
-
-  const buildId = await learn.currentBuildId();
-  const language = await d.db.getLanguage(lang);
-  if (!buildId || !language) {
-    await store.putJson(stateKey(lang), state);
-    return { ...sum, skipped: buildId ? 'lang_unknown' : 'no_build' };
-  }
-  const en = await readLocaleTable(store, buildId, 'en');
-  if (!Object.keys(en).length) {
-    await store.putJson(stateKey(lang), state);
-    return { ...sum, skipped: 'english_missing' };
-  }
-  const cig = await readLocaleTable(store, buildId, language.cig_folder || lang);
-  const tm = await loadTm(store, lang);
-
-  // One line per key with its current target and origin (CIG valid → CIG, else the TM).
-  const lines: MineLine[] = [];
-  const tmLines: { key: string; h: string; en: string; entry: TmEntry }[] = [];
-  const hashOf = new Map<string, string>();
-  for (const key of Object.keys(en).sort()) {
-    const e = en[key];
-    if (!e || !e.trim()) continue;
-    if (isCigValid(e, cig[key])) {
-      lines.push({ key, en: e, t: cig[key], o: 'cig' });
-      continue;
-    }
-    let h = hashOf.get(e);
-    if (!h) hashOf.set(e, (h = await sha256Hex(e)));
-    const hit = tm[h];
-    if (!hit) continue;
-    lines.push({ key, en: e, t: hit.t, o: hit.o });
-    tmLines.push({ key, h, en: e, entry: hit });
-  }
-
-  // C3 style: CIG + admin teach it; the community joins only where CIG says too little.
-  const trusted = lines.filter((l) => l.o === 'cig' || l.o === 'admin');
-  const stylePairs: MineLine[] = trusted.length >= STYLE_MIN_TRUSTED ? trusted : lines.filter((l) => l.o !== 'ai');
-  if (stylePairs.length) {
-    const from = [...new Set(stylePairs.map((l) => l.o))].sort();
-    await learn.setStyle(lang, { ...styleStats(lang, stylePairs, from), at: d.now().toISOString() });
-    sum.style = true;
-  }
-
-  // C1 + C5 candidates, C8 promotion.
-  const judge = ((await store.getJson(judgeKey(lang))) ?? []) as JudgeTerm[];
-  const mineInput: MineLine[] = [...lines, ...judge.map((j, i) => ({ key: `judge:${i}`, en: j.source, t: j.target, o: 'judge' as const }))];
-  const cands = mineCandidates(mineInput);
-  let glossary = await learn.listGlossary(lang);
-  const plan = planGlossary(cands, glossary, settings);
-  const promoted = plan.promote.length ? await learn.insertGlossary(lang, plan.promote) : 0;
-  sum.mined = { candidates: cands.size, promoted, contested: plan.contested.length, revise: plan.revise.length };
-
-  // C2 dnt from codex names.
-  const names = await learn.codexNames(buildId).catch(() => [] as string[]);
-  if (names.length) {
-    glossary = await learn.listGlossary(lang);
-    const have = new Set(glossary.map((g) => g.source_term.toLowerCase()));
-    const dnt = dntFromNames(names, lines, settings.promote_min_evidence).filter((r) => !have.has(r.source_term.toLowerCase()));
-    sum.dnt = dnt.length ? await learn.insertGlossary(lang, dnt) : 0;
-  }
-
-  // C6: contested candidates and row challenges → one Haiku batch (both orders).
-  if (!state.haiku && (plan.contested.length || plan.revise.length)) {
-    const exampleOf = (src: string, t: string) => {
-      const lo = src.toLowerCase();
-      const out: { en: string; t: string }[] = [];
-      for (const l of lines) {
-        if (out.length >= 2) break;
-        if (l.en.length <= 200 && l.en.toLowerCase().includes(lo) && containsTerm(l.en, src) && containsStem(l.t, t)) out.push({ en: l.en, t: l.t });
-      }
-      return out;
-    };
-    // Never ask twice in one release: a term with an open card, or a pair Haiku already judged
-    // for this build, waits (for the admin, or for the next build's evidence).
-    const openTerms = new Set((await learn.listOpenCards(lang, ['meta', 'wording', 'style'], 1000)).map((c) => c.dedupe_key));
-    const seen = state.seen?.build_id === buildId ? state.seen.sigs : {};
-    const sig = (s: string, a: string, b: string) => `${s.toLowerCase()}|${a.toLowerCase()}|${b.toLowerCase()}`;
-    const fresh = <T extends { source: string }>(x: T, a: string, b: string) => !openTerms.has(`term:${x.source.toLowerCase()}`) && !seen[sig(x.source, a, b)];
-    const items: HaikuItem[] = [
-      ...plan.revise.map((r) => ({
-        source: r.source, a: r.row.target_term, b: r.target, a_ev: r.row.evidence ?? 0, b_ev: r.evidence, total: r.total, keys: r.keys,
-        row_id: r.row.id, row_origin: r.row.origin, examples: [...exampleOf(r.source, r.row.target_term), ...exampleOf(r.source, r.target)],
-      })),
-      ...plan.contested.map((c) => ({
-        source: c.source, a: c.a.text, b: c.b.text, a_ev: c.a_ev, b_ev: c.b_ev, total: c.total, keys: c.keys,
-        examples: [...exampleOf(c.source, c.a.text), ...exampleOf(c.source, c.b.text)],
-      })),
-    ].filter((x) => fresh(x, x.a, x.b)).slice(0, HAIKU_ITEMS);
-    const est = estimateUsd(HAIKU_MODEL, items.length * 2, 2500, items.length * 2 * 50, items.length * 2 * 400);
-    const block = items.length ? await spendBlock(d, settings, est) : 'nothing';
-    if (block && block !== 'nothing') sum.blocked.push(`haiku:${block}`);
-    else if (!block) {
-      const id = await submitLearnBatch(d, haikuRequests(lang, items, glossary));
-      state.haiku = { id, submitted_at: d.now().toISOString(), items };
-      const sigs = { ...seen };
-      for (const x of items) sigs[sig(x.source, x.a, x.b)] = 1;
-      state.seen = { build_id: buildId, sigs };
-      sum.haiku = { promoted: 0, replaced: 0, cards: 0, ...sum.haiku, submitted: items.length };
-    }
-  }
-
-  // B1: align community/AI lines to CIG terms.
-  if (!state.align) {
-    // CIG terms = protected rows plus the candidates CIG itself decides this run (pool cig/admin).
-    const cigTerms: GlossaryRow[] = glossary.filter((g) => g.origin === 'cig' || g.origin === 'admin' || g.locked);
-    const known = new Set(cigTerms.map((g) => g.source_term.toLowerCase()));
-    for (const c of cands.values()) {
-      if (known.has(c.source.toLowerCase())) continue;
-      const a = assessCandidate(c, settings.promote_min_evidence, settings.promote_min_agreement);
-      if (a.status === 'promote' && a.pool !== 'rest' && /\p{Lu}/u.test(c.source)) {
-        cigTerms.push({ source_term: c.source, target_term: a.target, category: 'term', origin: 'cig' });
-      }
-    }
-    const mis = findMisaligned(tmLines, cigTerms);
-    if (mis.length) {
-      const chars = mis.reduce((a, l) => a + l.en.length + l.entry.t.length, 0);
-      const est = estimateUsd(settings.arbiter_model, Math.ceil(mis.length / ALIGN_PER_REQUEST), 1500, Math.ceil(chars * 0.6), chars * 0.9);
-      const block = await spendBlock(d, settings, est);
-      if (block) sum.blocked.push(`align:${block}`);
-      else {
-        const id = await submitLearnBatch(d, alignRequests(lang, settings.arbiter_model, mis));
-        state.align = { id, submitted_at: d.now().toISOString(), items: mis };
-        sum.align = { rewritten: 0, ...sum.align, submitted: mis.length };
-      }
-    }
-  }
-
-  // C7: web research for the top open meta/wording cards, hard monthly cap.
-  if (!state.web) await submitWeb(d, lang, settings, state, sum);
-
-  // Arbiter queue (conflicts from seed/sync) advances with every run as well.
-  if (await store.getJson(learnKey(lang, 'arbiter'))) sum.arbiter = await arbitrate(d, lang, []);
-
-  state.last = { trigger, at: d.now().toISOString(), build_id: buildId };
-  await store.putJson(stateKey(lang), state);
-  return sum;
-}
-
-function estimateUsd(model: string, requests: number, systemTok: number, outTok: number, inTok: number): number {
+export function estimateUsd(model: string, requests: number, systemTok: number, outTok: number, inTok: number): number {
   const p = priceOf(model);
   return (((requests * systemTok + inTok) * p.in + outTok * p.out) / 1e6) * 1.5;
 }
@@ -573,12 +647,13 @@ export function alignRequests(lang: string, model: string, lines: AlignLine[]): 
   return reqs;
 }
 
-async function pollBatches(d: LearnDeps, lang: string, settings: LearnSettings, state: LearnState, sum: LearnSummary): Promise<void> {
+export async function pollBatches(d: LearnDeps, lang: string, settings: LearnSettings, state: LearnState, sum: LearnSummary): Promise<void> {
   if (state.haiku) {
     const read = await readLearnBatch(d, state.haiku.id, 'haiku', HAIKU_MODEL, lang);
     if (read) {
       sum.haiku = { submitted: 0, ...(await applyHaiku(d, lang, settings, state.haiku.items, read.results)) };
       state.haiku = null;
+      await d.store.putJson(stateKey(lang), state);
     }
   }
   if (state.align) {
@@ -586,6 +661,7 @@ async function pollBatches(d: LearnDeps, lang: string, settings: LearnSettings, 
     if (read) {
       sum.align = { submitted: 0, rewritten: await applyAlign(d, lang, state.align.items, read.results, settings.arbiter_model) };
       state.align = null;
+      await d.store.putJson(stateKey(lang), state);
     }
   }
   if (state.web) {
@@ -604,6 +680,7 @@ async function pollBatches(d: LearnDeps, lang: string, settings: LearnSettings, 
       }
       sum.web = { submitted: 0, attached };
       state.web = null;
+      await d.store.putJson(stateKey(lang), state);
     }
   }
 }
@@ -687,7 +764,10 @@ async function applyAlign(
   return Object.keys(writes).length;
 }
 
-async function submitWeb(d: LearnDeps, lang: string, settings: LearnSettings, state: LearnState, sum: LearnSummary): Promise<void> {
+/** `before` runs right before the batch is created (the caller records its intent there). */
+export async function submitWeb(
+  d: LearnDeps, lang: string, settings: LearnSettings, state: LearnState, sum: LearnSummary, before?: () => Promise<void>,
+): Promise<void> {
   if (!(settings.web_research_cap_usd > 0)) return;
   const month = monthOfDate(d.now());
   const spent = (await d.learn.monthKindSpent(month, 'web')) + (await monthKindSpend(d.store, month, 'web_reserved'));
@@ -723,6 +803,7 @@ Search the web (e.g. starcitizen.tools in ${name}, the RSI website, ${name} comm
       } as BatchParams,
     };
   });
+  await before?.();
   const id = await submitLearnBatch(d, reqs);
   // Reserve the estimate now so two languages in one tick cannot both pass the cap; the real spend
   // is booked (ledger row, kind 'web') when the results are read, and the reservation released then.

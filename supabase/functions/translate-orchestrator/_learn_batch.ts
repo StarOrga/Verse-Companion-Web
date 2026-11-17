@@ -6,12 +6,10 @@
 import { usageCostUsd } from './_cost.ts';
 import type { Store } from './_io.ts';
 import type { LearnDb, LearnSettings } from './_learn_db.ts';
-import type { BatchResult, Deps } from './_machine.ts';
+import type { BatchResult, Deps } from './_job.ts';
 import type { BatchParams } from './_prompt.ts';
 
 export const learnKey = (lang: string, name: string) => `translation-work/learn-${lang}/${name}.json`;
-/** Written by a publish: a learning pass is due for this language (`{ trigger, at, build_id }`). Nothing reads it yet. */
-export const learnDueKey = (lang: string) => learnKey(lang, 'due');
 /** Month totals of web-research RESERVATIONS (kind web_reserved) so two languages in one tick cannot both pass the cap. Real spend is in the ledger. */
 export const spendKey = (month: string) => `translation-work/learn-spend/${month}.json`;
 
@@ -59,13 +57,14 @@ export async function readLearnBatch(
     results.set(r.custom_id, r);
     if (r.usage) usd += usageCostUsd(r.model ?? defaultModel, r.usage);
   }
-  await bookSpend(deps, kind, usd, lang);
+  // The batch id is the ledger row's idempotency key: a read that is repeated books nothing twice.
+  await bookSpend(deps, kind, usd, lang, id);
   return { results, usd };
 }
 
-export async function bookSpend(deps: LearnDeps, kind: LearnKind, usd: number, lang: string): Promise<void> {
+export async function bookSpend(deps: LearnDeps, kind: LearnKind, usd: number, lang: string, ref?: string): Promise<void> {
   if (!(usd > 0)) return;
-  await deps.learn.addLearnLedger(monthOfDate(deps.now()), Math.round(usd * 1e6) / 1e6, kind, lang);
+  await deps.learn.addLearnLedger(monthOfDate(deps.now()), Math.round(usd * 1e6) / 1e6, kind, lang, ref);
 }
 
 /** Adds delta (may be negative, floor 0) to a month's per-kind total — reservations for hard caps. */

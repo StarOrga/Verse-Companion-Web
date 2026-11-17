@@ -7,7 +7,8 @@ import { arbitrate, bothOrders, hardFailures, ruleVerdict, sameModuloPunct } fro
 import { applyAnsweredCards, compareCards, notesKey, reachOf, termCard, tmCard } from './_cards.ts';
 import { sha256Hex } from './_diff.ts';
 import { extractJudgeTerms } from './_glossary.ts';
-import { assessCandidate, dntFromNames, findMisaligned, isShortTerm, mineCandidates, planGlossary, runLearning, termHit } from './_learn.ts';
+import { assessCandidate, dntFromNames, findMisaligned, isShortTerm, mineCandidates, planGlossary, termHit } from './_learn.ts';
+import { runLearning } from './_learn_pass.ts';
 import { releaseBudget, shouldReplace } from './_revise.ts';
 import { styleBlock, styleStats } from './_style.ts';
 import { buildShards, indexKey, shardKey } from '../ingest-catalog/_locale-shards.ts';
