@@ -110,9 +110,12 @@ const inverse = (applied: readonly Shift[]): Shift[] => [...applied].reverse().m
  * and persists the outcome. Owner-only RLS, up to 7 active slots (a partial unique index backs that up server-side).
  *
  *   ensureLoaded()                          load the user's Nachschuebe once; reload() refreshes them
- *   createFromWishlist({ picks, name? })    take wishlist positions (full qty by default, split allowed) into a new Nachschub
+ *   createFromWishlist({ picks, name? })    assign FREE wish pieces (all by default, split allowed) to a new Nachschub
  *   rename(id, name) / reactivate(id)
- *   empty(id, backToWishlist) / remove(id, backToWishlist)   open lines go back to the wishlist (counted up) or are dropped
+ *   empty(id, backToWishlist) / remove(id, backToWishlist)   a wish line's wish stays (free again) or goes with it;
+ *                                           other open lines are counted up on the wishlist or dropped
+ *   allocationOf / assignTargets / assignWish / planWishRemoval / applyWishRemoval / releaseInfo / release
+ *                                           wishes assigned to a Nachschub ("Operation", concept 20261117-1110-pfad-stationen)
  *   reconcile()                             close lines whose stock rose vs the snapshot, archive finished Nachschuebe
  *   evaluation(id)                          status per line / progress of one Nachschub
  *
@@ -287,9 +290,9 @@ export class NachschubService {
   // ------------------------------------------------------------------------------------------------ writing
 
   /**
-   * "Neuer Nachschub": take wishlist positions into a fresh Nachschub in the lowest free slot. A pick without `qty`
-   * takes the full quantity; a smaller `qty` splits and the rest stays on the wishlist. Only positions that really
-   * got a line leave the wishlist; with no line at all nothing is saved. Undo puts back exactly what was taken.
+   * "Neuer Nachschub": assign wishlist positions to a fresh Nachschub in the lowest free slot. A pick without `qty`
+   * takes every FREE piece; a smaller `qty` splits. The wish keeps its quantity (A1): the 'wish' line is the
+   * assignment. With no line at all nothing is saved. Undo removes the Nachschub and its lines.
    */
   async createFromWishlist(opts: { picks: readonly WishPick[]; name?: string; event?: EventBinding }): Promise<NachschubResult> {
     const uid = this.auth.user()?.id;

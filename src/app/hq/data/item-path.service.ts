@@ -19,7 +19,9 @@ import { HqInventoryService } from './hq-inventory.service';
 /*
  * ItemPathService - THE contract of the way an item takes outside the HQ (concept nachschub-hq r4-d1-s8): two stops,
  * Wunschliste -> Inventar / Hangar / Sammlung by kind. Every surface (search rows, Codex pages, popups) reads and
- * writes the path through this service only. Nachschub is built in the HQ (`hq/nachschub`), never from here.
+ * writes the path through this service only. Since concept 20261117-1110-pfad-stationen a wish can be assigned to a
+ * Nachschub ("Operation") from here too (assignWish / planWishRemoval / removeWishPieces delegate to NachschubService);
+ * the assignment lives inside the wish stop, there is no third stop.
  *
  * READ  `state(kind, className, name?)` -> Signal<ItemPathState>
  *   wished / wishQty  on the wishlist, and how many (SearchWishlistService adds up a ship's two homes)
