@@ -64,6 +64,16 @@
         "hunks": [
           "72d685fc6281"
         ]
+      },
+      {
+        "ship": "claude/holotisch-decks-display-5750f7",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree",
+        "decided": true,
+        "at": "2026-11-17T23:20:43.379Z",
+        "hunks": [
+          "fe719d4fedb7"
+        ]
       }
     ],
     ".claude/project-map.md›data-uploader/python/tests›count": [
@@ -1408,6 +1418,16 @@
         "at": "2026-11-17T11:47:43.406Z",
         "hunks": [
           "8c5d7febe401"
+        ]
+      },
+      {
+        "ship": "claude/holotisch-decks-display-5750f7",
+        "by": "JerryT2T",
+        "value": "0.279.0, regenerated from CHANGELOG",
+        "decided": true,
+        "at": "2026-11-17T23:20:43.379Z",
+        "hunks": [
+          "6005910eb87d"
         ]
       }
     ],
