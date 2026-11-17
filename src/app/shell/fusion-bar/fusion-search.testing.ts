@@ -12,7 +12,7 @@ import type { PolyHitKind, PolySearchHit } from '../../codex/codex-poly-search';
 import { CodexService } from '../../codex/codex.service';
 import { CodexSearchEngine } from '../../codex/search/codex-search-engine';
 import { CodexSearchHub } from '../../codex/search/codex-search-hub.service';
-import type { CodexSearchGroup } from '../../codex/search/codex-search-model';
+import { CodexSearchGroup, PageLocation, pageLocationOf } from '../../codex/search/codex-search-model';
 import { ComposeInput, composeSearchResult } from '../../codex/search/search-compose';
 import type { SearchChip } from '../../codex/search/search-result-model';
 import { SearchWishlistService } from '../../codex/search/search-wishlist.service';
@@ -47,10 +47,11 @@ export function fakeEngine(init: FakeEngineInit = {}) {
   const removed = signal<string[]>([]);
   const extraChips = signal<SearchChip[]>(init.extraChips ?? []);
   const compose = signal<Partial<ComposeInput>>(init.compose ?? {});
-  const calls = { setChipValue: [] as [string, string][], removeLastChip: 0, noteOpened: 0, setContext: 0 };
+  const here = signal<PageLocation>(pageLocationOf('/'));
+  const calls = { setChipValue: [] as [string, string][], removeLastChip: 0, noteOpened: 0, noteVariantOpened: 0, setContext: 0 };
   const activeChips = computed(() => [...context().chips, ...extraChips()].filter((c) => !removed().includes(c.id)));
   const result = computed(() =>
-    composeSearchResult({ term: input(), groups: input().trim() ? groups() : [], context: context(), chips: activeChips(), signedIn: true, ...compose() }),
+    composeSearchResult({ term: input(), groups: input().trim() ? groups() : [], context: context(), chips: activeChips(), signedIn: true, here: here(), ...compose() }),
   );
   return {
     input,
@@ -82,6 +83,11 @@ export function fakeEngine(init: FakeEngineInit = {}) {
     noteOpened: () => {
       calls.noteOpened++;
     },
+    noteVariantOpened: () => {
+      calls.noteVariantOpened++;
+    },
+    /** Where the reader stands (the real engine follows the router). */
+    here,
     removeChip: (id: string) => removed.set([...removed(), id]),
     removeLastChip: () => {
       calls.removeLastChip++;

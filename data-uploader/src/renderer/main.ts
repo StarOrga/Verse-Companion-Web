@@ -10,7 +10,8 @@
 // build can strip their remote Google-Fonts @import — see electron.vite.config.ts.
 import '@starorga/star-ui/lib/design-tokens.css';
 import { load as loadI18n, t } from '../lib/i18n.js';
-import { shouldAutoResume, shouldQuitAfterAutoRun, launchAction } from '../lib/auto-run.js';
+import { shouldAutoResume, shouldQuitAfterAutoRun, launchAction, formatIdentity, planContinuation, type ContinuationPlan } from '../lib/auto-run.js';
+import { catalogAlreadyLanded } from '../lib/resume-compat.js';
 import { startPatchCountdown, repaintPatchCountdown } from './patch-countdown.js';
 import { initTooltips } from './tooltip.js';
 import { tallySkinUpload, skinUploadFrame, skinUploadStatus } from '../lib/skin-upload-summary.js';
@@ -273,6 +274,9 @@ export const state = {
   // Subthemes the server already holds for this build (lib/subthemes.ts) —
   // decided once per run before the extraction; null = skip nothing.
   subthemePlan: null as SubthemePlan | null,
+  /** This run continues only the 3D hulls from an extract already on disk. */
+  /** Set while the run only continues local builds (silhouettes / 3D hulls) of a build whose catalogue the server holds. */
+  continuation: null as ContinuationPlan | null,
   /** Install step's "Alles neu erzwingen" — per run, never persisted. */
   forceAll: false,
   lastResult: null as ExtractResultPayload | null,
@@ -517,6 +521,20 @@ async function maybeAutoRun(): Promise<void> {
   // may still be extracting or uploading: never start a second run beside it.
   if (await Promise.resolve(window.sc.work?.busy()).catch(() => false)) return;
   if (operatorHasMoved()) return;
+  const leftover = state.resumableJob?.resumable
+    ? ((await window.sc.uploadJob.get().catch(() => null))?.state ?? null)
+    : null;
+  if (leftover && state.authToken && leftover.catalog.status !== 'done') {
+    // A leftover catalog upload of a build whose catalogue the server already
+    // holds is pure waste (and writes into a fresh staging build row): drop it,
+    // the decision below continues only what is really open.
+    const plan = await window.sc.subthemes.plan(leftover.nat, false).catch(() => null);
+    if (catalogAlreadyLanded(leftover, plan)) {
+      window.sc.log?.write('info', `[autorun] dropping leftover catalog job for build ${leftover.nat.buildNumber}: the server already holds its catalogue`);
+      state.resumableJob = await window.sc.uploadJob.cancel();
+      await refreshJobView();
+    }
+  }
   if (state.resumableJob?.resumable) {
     state.view = resumeStep();
     render();
@@ -577,7 +595,9 @@ async function maybeAutoRun(): Promise<void> {
     const found = decision;
     startPatchCountdown({
       channel: found.channel?.channel ?? '',
-      version: found.localVersion ?? found.channel?.version ?? '?',
+      version: formatIdentity(found.localVersion ?? found.channel?.version, found.localBuild ?? found.channel?.buildNumber),
+      // Same build, parts open: the banner names them instead of "new game patch".
+      parts: found.kind === 'parts' && found.pending ? found.pending.map((k) => subthemeName(k)).join(', ') : null,
       isBusy: operatorHasMoved,
       onStart: () => void startAutoRun(found),
       onCancel: () => {
@@ -619,12 +639,19 @@ async function startAutoRun(decision: Awaited<ReturnType<typeof window.sc.autoRu
   ];
   state.scanned = true;
   if (!state.settings) return;
+  // Say what is really happening: a same-build start names the open parts, a
+  // new identity names both sides with their build numbers — never
+  // "new version (4.10.0 vs 4.10.0)" when nothing is new.
+  const local = formatIdentity(decision.localVersion ?? decision.channel.version, decision.localBuild ?? decision.channel.buildNumber);
+  const parts = decision.pending?.map((k) => subthemeName(k)).join(', ');
   setStatus(
-    t('autorun.starting', {
-      channel: decision.channel.channel,
-      local: decision.localVersion ?? '?',
-      server: decision.serverVersion ?? '—',
-    }),
+    decision.kind === 'parts' && parts
+      ? t('autorun.continuingParts', { channel: decision.channel.channel, version: local, parts })
+      : t('autorun.starting', {
+          channel: decision.channel.channel,
+          local,
+          server: decision.serverVersion ? formatIdentity(decision.serverVersion, decision.serverBuild) : '—',
+        }),
   );
   // The self-started plan always rolls the extraction straight into the upload
   // (when signed in) — see `buildRunPlan`. `startRun` is the single entry
@@ -966,9 +993,15 @@ function paintConnection(): void {
   const chip = $('#connection-chip');
   if (chip) {
     const who = s?.connected ? escapeHtml(s.email ?? '') : pillText;
-    const serverBit = snap?.channels[0]
-      ? ` · ${escapeHtml(snap.channels[0].channel.toUpperCase())} v${escapeHtml(snap.channels[0].patchVersion)}`
-      : '';
+    // The game identity comes from the local install (x.y.z + build, lib/discovery
+    // resolveGameIdentity); the server row only fills in when nothing is installed.
+    const serverTag = snap?.channels[0]?.channel.toUpperCase();
+    const localCh = state.channels.find((c) => c.channel === serverTag && c.version) ?? state.channels.find((c) => c.version);
+    const serverBit = localCh
+      ? ` · ${escapeHtml(localCh.channel)} v${escapeHtml(formatIdentity(localCh.version, localCh.buildNumber))}`
+      : snap?.channels[0]
+        ? ` · ${escapeHtml(snap.channels[0].channel.toUpperCase())} v${escapeHtml(snap.channels[0].patchVersion)}`
+        : '';
     chip.innerHTML = `<span class="conn-dot conn-dot--${pillCls}"></span> ${who}${serverBit}`;
   }
 
@@ -1706,6 +1739,30 @@ async function cancelExtract(btn: HTMLButtonElement): Promise<void> {
   render();
 }
 
+/** i18n key of the honest line for a continuation run (see `subthemes.cont*`). */
+function continuationKey(cont: ContinuationPlan, how: 'reuse' | 'local'): string {
+  const what = cont.steps.length === 2 ? 'Both' : cont.steps[0] === 'silhouettes' ? 'Sil' : 'Models';
+  return `subthemes.cont${what}${how === 'reuse' ? 'Reuse' : 'Local'}`;
+}
+
+/**
+ * A continuation never shows a step it does not run: the Metadaten rows
+ * (bundle, entries) and whatever is not pending are marked skipped up front,
+ * so no row flashes "running" for work that never starts.
+ */
+function markContinuationStages(cont: ContinuationPlan): void {
+  setStage('bundle', 'skipped');
+  setStage('entries', 'skipped');
+  if (!cont.steps.includes('silhouettes')) {
+    setStage('silBuild', 'skipped');
+    setStage('silUpload', 'skipped');
+  }
+  if (!cont.steps.includes('hulls')) {
+    setStage('skinsBuild', 'skipped');
+    setStage('skinsUpload', 'skipped');
+  }
+}
+
 /** Metadaten step, first row: read the game data out of the Data.p4k. Returns true on success. */
 async function runRealExtract(): Promise<boolean> {
   const progress = uploadProgress;
@@ -1741,6 +1798,7 @@ async function runRealExtract(): Promise<boolean> {
   // (lib/subthemes.ts). Only asked when the run will upload — without a
   // session nothing is uploaded, so nothing can be skipped either.
   state.subthemePlan = null;
+  state.continuation = null;
   if (state.runPlan?.uploadAfter && state.authToken) {
     const plan = await window.sc.subthemes.plan(
       {
@@ -1754,6 +1812,36 @@ async function runRealExtract(): Promise<boolean> {
     refreshRunEta();
     if (plan.skip.length) {
       appendLog(t('subthemes.skipping', { list: plan.skip.map(subthemeName).join(', ') }));
+    }
+    if (plan.reason === 'ledger' && planContinuation(plan.pending, true)) {
+      // Only silhouettes and/or 3D hulls are open: the catalogue, bundle and
+      // metadata are on the server. Continue from this build's extract on disk;
+      // without one the extractor re-creates the manifests locally (below) —
+      // either way nothing of the catalogue is read for upload again, no bundle,
+      // no metadata, no new build row.
+      const reused = await window.sc.autoRun
+        .reuseExtract({
+          installPath: channel.installPath,
+          channel: channel.channel,
+          buildNumber: channel.buildNumber ?? '',
+          patchVersion: channel.version ?? '',
+        })
+        .catch(() => null);
+      const cont = planContinuation(plan.pending, Boolean(reused))!;
+      state.continuation = cont;
+      markContinuationStages(cont);
+      if (reused) {
+        state.lastResult = reused;
+        state.extractDone = true;
+        appendLog(t(continuationKey(cont, 'reuse')), 'success');
+        for (const key of ['extract', 'bundle', 'entries'] as const) setStage(key, 'skipped');
+        tipStage('extract', t(continuationKey(cont, 'reuse')));
+        progress.update({ indeterminate: false });
+        progress.stop();
+        return true;
+      }
+      appendLog(t(continuationKey(cont, 'local')));
+      setStatus(t(continuationKey(cont, 'local')));
     }
     if (plan.reason === 'ledger' && plan.pending.length === 0) {
       // Same game build, nothing the uploader would now do differently — no
@@ -2324,9 +2412,18 @@ async function doStartUpload(): Promise<void> {
   // The extraction row stays as it ended; every upload-side row starts over
   // (a resume re-derives done stages from the job as it goes).
   if (state.lastResult && stageState('extract') === 'pending') setStage('extract', 'done');
-  resetStages(['bundle', 'entries', 'silBuild', 'silUpload', 'skinsBuild', 'skinsUpload']);
+  if (state.continuation) {
+    // Rows of the parts this run does not do stay "skipped"; only its own reset.
+    const own: StageKey[] = [];
+    if (state.continuation.steps.includes('silhouettes')) own.push('silBuild', 'silUpload');
+    if (state.continuation.steps.includes('hulls')) own.push('skinsBuild', 'skinsUpload');
+    resetStages(own);
+    markContinuationStages(state.continuation);
+  } else {
+    resetStages(['bundle', 'entries', 'silBuild', 'silUpload', 'skinsBuild', 'skinsUpload']);
+  }
   resetUploadCategories();
-  startStage('bundle');
+  if (!state.continuation) startStage('bundle');
   try {
     if (!state.authToken) {
       uploadProgress?.update({
@@ -2447,6 +2544,10 @@ async function doUploadAfterAuth(): Promise<void> {
     patchVersion: result.patch_version,
     buildNumber: result.build_number,
   };
+  if (state.continuation) {
+    await runContinuation(result, ledgerKey, state.continuation);
+    return;
+  }
 
   // ── Step 1 · Metadaten: bundle → entries (the build goes live) ───────────────
   // On a resume whose bundle already landed, the bundle POST returns instantly
@@ -2547,6 +2648,9 @@ async function doUploadAfterAuth(): Promise<void> {
 
   // ── Step 3 · 3D-Modelle: build → upload ──────────────────────────────────
   goStep('models');
+  // The extract stays on disk until the hulls landed: a later start continues
+  // the models from it instead of reading the P4K again (models-only run).
+  let hullsSettled = skipped.has('hulls');
   // Reads the extract's build manifest, cached per patch version. Fully
   // non-fatal: the codex is already confirmed.
   try {
@@ -2558,6 +2662,7 @@ async function doUploadAfterAuth(): Promise<void> {
       // True only when every ship landed — a lost ship, a pause or missing
       // tools leave the hulls unrecorded, so the next run uploads them again.
       if (await buildAndUploadSkins(result, uploadProgress)) {
+        hullsSettled = true;
         void window.sc.subthemes.record(ledgerKey, ['hulls']);
       }
     }
@@ -2585,7 +2690,8 @@ async function doUploadAfterAuth(): Promise<void> {
 
   // Upload confirmed — reclaim the run's extracted files so they don't fill
   // the disk. Best-effort: the main process guards + swallows failures.
-  const outDir = state.lastResult?.output_dir;
+  const outDir = hullsSettled ? state.lastResult?.output_dir : undefined;
+  if (!hullsSettled) drawerAppendLog(t('subthemes.contOpen'));
   if (outDir) {
     const cleaned = await window.sc.cleanup.extractDir(outDir, {
       bundleId: r.bundleId,
@@ -2613,12 +2719,86 @@ async function doUploadAfterAuth(): Promise<void> {
 }
 
 /**
+ * The open parts are only the silhouettes and/or the 3D hulls (lib/auto-run
+ * `planContinuation`): this runs exactly `cont.steps`. No bundle, no metadata,
+ * no catalogue upload, no new codex build row - the silhouettes attach to the
+ * published row the server already holds, the hull build skips every ship
+ * already built on disk, so an interrupted model build continues.
+ */
+async function runContinuation(
+  result: ExtractResultPayload,
+  ledgerKey: { channel: string; patchVersion: string; buildNumber: string },
+  cont: ContinuationPlan,
+): Promise<void> {
+  markContinuationStages(cont);
+  let silOk = !cont.steps.includes('silhouettes');
+  let hullsOk = !cont.steps.includes('hulls');
+  if (cont.steps.includes('silhouettes')) {
+    goStep('silhouettes');
+    const buildId = await window.sc.catalog.currentBuild(ledgerKey).catch(() => null);
+    if (!buildId) {
+      // Nothing to attach the outlines to - never mint a row for them.
+      setStage('silBuild', 'skipped');
+      setStage('silUpload', 'skipped');
+      drawerAppendLog(t('subthemes.noLiveBuild'), 'warn');
+      setAuthStatus(t('subthemes.noLiveBuild'), 'warn');
+    } else {
+      const sil = await runSilhouetteStep(result, false, buildId);
+      if (sil === 'paused') {
+        pauseActiveStage();
+        setAuthStatus(t('upload.job.paused'), 'warn');
+        uploadProgress?.stop();
+        return;
+      }
+      if (sil === 'ok') {
+        silOk = true;
+        void window.sc.subthemes.record(ledgerKey, ['silhouettes']);
+      }
+    }
+  }
+  if (cont.steps.includes('hulls')) {
+    goStep('models');
+    try {
+      hullsOk = await buildAndUploadSkins(result, uploadProgress);
+      if (hullsOk) void window.sc.subthemes.record(ledgerKey, ['hulls']);
+    } catch (err) {
+      uploadProgress?.update({ indeterminate: false });
+      const msg = `${t('skins.buildFailed')}: ${(err as Error).message}`;
+      state.skinUploadStatus = msg;
+      setStage(activeStage() ?? 'skinsBuild', 'warn');
+      setAuthStatus(msg, 'warn');
+    }
+  }
+  uploadProgress?.stop();
+  const after = await window.sc.uploadJob.get();
+  if (after.state?.status === 'paused') {
+    pauseActiveStage();
+    setAuthStatus(t('upload.job.paused'), 'warn');
+    return;
+  }
+  await window.sc.uploadJob.finish();
+  state.continuation = null;
+  if (silOk && hullsOk) {
+    // Everything open is on the server: the extract has served its purpose.
+    await window.sc.cleanup.extractDir(result.output_dir, { channel: result.channel, version: result.patch_version });
+    setAuthStatus(t('subthemes.contDone'), 'ok');
+  } else if (!state.skinUploadStatus) {
+    // Kept on disk: the next start continues from it.
+    setAuthStatus(t('subthemes.contOpen'), 'warn');
+  }
+}
+
+/**
  * Step 2 · Silhouetten. Builds the top-down outlines (Holotable + tile art)
  * locally, then sends them to the build row the Codex step created. Non-fatal
  * like before: without outlines the Codex simply shows its entries without
  * geometry — only a pause stops the run here.
  */
-async function runSilhouetteStep(result: ExtractResultPayload, skip: boolean): Promise<'ok' | 'warn' | 'skipped' | 'paused'> {
+async function runSilhouetteStep(
+  result: ExtractResultPayload,
+  skip: boolean,
+  buildId?: string,
+): Promise<'ok' | 'warn' | 'skipped' | 'paused'> {
   if (skip) {
     setStage('silBuild', 'skipped');
     setStage('silUpload', 'skipped');
@@ -2686,7 +2866,7 @@ async function runSilhouetteStep(result: ExtractResultPayload, skip: boolean): P
     });
   });
   try {
-    const res = await window.sc.catalog.silhouettes(state.authToken, result.output_dir);
+    const res = await window.sc.catalog.silhouettes(state.authToken, result.output_dir, buildId ?? null);
     if (res.ok) {
       const n = res.counts?.['silhouettes'] ?? 0;
       uploadProgress?.update({ overallPct: 100, indeterminate: false });
@@ -3220,7 +3400,11 @@ async function buildAndUploadSkins(
   startStage('skinsBuild');
 
   const manifest = `${result.output_dir}/skins/_build_manifest.json`;
-  const skinsOut = `${ch.installPath}/.sc-companion-extracts/skins-${result.patch_version}`;
+  // The hull cache follows the extract folder's label (`LIVE-4.10.0` →
+  // `skins-4.10.0`), not the identity: a models-only run that reuses an extract
+  // made under an older label continues the hulls already built next to it.
+  const extractLabel = (result.output_dir.split(/[\\/]/).pop() ?? '').replace(`${result.channel}-`, '');
+  const skinsOut = `${ch.installPath}/.sc-companion-extracts/skins-${extractLabel || result.patch_version}`;
   const label = t('skins.building');
 
   // 1. ensure cgf-converter (first-use download ~117 MB).

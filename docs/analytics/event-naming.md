@@ -39,8 +39,13 @@ build on it).
   per term and session). The owner moved the former admin card "Häufig ohne
   Treffer" to PostHog (concept 2026-11-15, B4.8) so the dashboard shows exactly
   which terms fail (tile "Suchen ohne Treffer" on "Wird es genutzt?"). Searches
-  that found something never send their text (`search:result_open` stays area
-  + rank).
+  that found something never send their text: `search:result_open` carries
+  only `area` (the hit's kind; `ship` for a mini link), `rank` (place in the
+  list), `new_tab`, `current` (the greyed "Du bist hier" row of the open page
+  was chosen — it only closes the search) and `variant` (a mini link of a ship
+  row was chosen: another model of the family such as Valiant, or one of the
+  reader's own variants). The tile "Suche: „Du bist hier“ und Varianten-Links
+  (30 Tage)" splits the opens by `current` / `variant`.
 - Super properties added by the service on every event: `app_version`, `release`,
   the UTM trio of the landing page, and — for signed-in users with consent — the
   person property `role` (viewer / collaborator / admin).
