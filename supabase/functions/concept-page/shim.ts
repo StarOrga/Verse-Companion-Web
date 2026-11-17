@@ -35,6 +35,21 @@
 // pre-#330 behaviour. `navigator.sendBeacon` gets the same treatment because
 // the engine flushes the draft mirror through it on pagehide.
 //
+// Ctrl/⌘ + click notes on mock parts (admin feedback #369). In a decision /
+// free round the engine's document pins (wireDocumentPins) only anchor to a
+// `p`, `li`, `tr` — or, in pages built after #354, an element marked
+// `[data-pin]`. The routine's concepts show most of a round as a MOCK built
+// from divs/spans, so a Ctrl + click on the mock silently did nothing (a
+// design round's screens take a pin anywhere — which is why the admin saw it
+// work in other concepts). The shim registers a capture listener BEFORE the
+// engine (it runs first in <head>): on a Ctrl/⌘ + click — or the first touch
+// of a long press — on an element of the live round that has no block above
+// it and is no native control or engine chrome, it marks that element
+// `data-pin`, so the engine's own handler right after takes it as the block.
+// Anchors need no marker on reload (the engine resolves them by tag + index +
+// text). The function upgrades pages whose engine predates `[data-pin]`
+// (upgrade.ts), so every hosted page gets this.
+//
 // Kept as a string (not a .js asset) so the function stays one self-contained
 // deploy unit. Plain ES5-ish on purpose: it runs inside the page's CSP
 // (`script-src 'self' 'unsafe-inline'`), not in Deno.
@@ -109,6 +124,29 @@ export function shimSource(cfg: ShimConfig | null): string {
       var target = rewrite(String(url));
       return origBeacon(target === null ? url : target, data);
     };
+  }
+  // #369: mock parts take a Ctrl/⌘ + click note (see the header comment).
+  var PIN_BLOCK = 'p, li, tr, [data-pin]';
+  var PIN_SKIP = 'a, button, input, select, textarea, label, summary, [contenteditable=""], [contenteditable="true"], ' +
+    '.upin, .dpin-layer, [data-engine-store], [data-device-clone], [data-analysis], script, template';
+  function markPinTarget(t) {
+    if (t && t.nodeType !== 1) t = t.parentElement;
+    if (!t || !t.closest) return;
+    var it = t.closest('section[data-iteration][data-active]');
+    if (!it || t === it) return;
+    // A design round pins on its screens itself; only its question views are documents.
+    if (it.getAttribute('data-iteration-template') === 'design' && !t.closest('section[data-view]')) return;
+    if (t.closest(PIN_BLOCK) || t.closest(PIN_SKIP)) return;
+    var svg = t.closest('svg');
+    if (svg && it.contains(svg)) t = svg;
+    if (t.tagName === 'SECTION') return;
+    t.setAttribute('data-pin', '');
+  }
+  if (document.addEventListener) {
+    document.addEventListener('click', function (e) { if (e.ctrlKey || e.metaKey) markPinTarget(e.target); }, true);
+    document.addEventListener('pointerdown', function (e) {
+      if (e.ctrlKey || e.metaKey || (e.pointerType && e.pointerType !== 'mouse' && e.isPrimary)) markPinTarget(e.target);
+    }, true);
   }
   document.documentElement.dataset.conceptHosted = '1';
 })();`;

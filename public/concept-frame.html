@@ -82,14 +82,34 @@
     return;
   }
 
+  // An expired ticket (12 h) answers 401. That happens to a tab left open
+  // overnight the moment a republish makes the engine reload it: instead of
+  // the dead "Zugang abgelaufen" page, go back through the app route
+  // /concept/<id>, which mints a fresh ticket and replaces itself with this
+  // loader again (#369). At most once a minute per concept (sessionStorage,
+  // shared with the shim's own 401 path), so a ticket the app cannot renew
+  // shows the expired copy instead of a reload loop.
+  function remint() {
+    var key = 'concept-remint-' + id;
+    try {
+      var now = Date.now();
+      if (now - Number(sessionStorage.getItem(key) || 0) < 60000) return false;
+      sessionStorage.setItem(key, String(now));
+    } catch (e) { return false; }
+    location.replace('/concept/' + id);
+    return true;
+  }
+
   say(COPY.loading, false);
   // redirect: 'error' — a redirect could hand the loader html from anywhere.
   fetch(target, { cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer', redirect: 'error' })
     .then(function (res) {
       if (res.redirected || (res.url && res.url !== target)) throw new Error('redirected');
+      if (res.status === 401 && remint()) return null;
       return res.text();
     })
     .then(function (html) {
+      if (html === null) return;
       // The function answers html for the document and for an expired ticket;
       // anything else (a gateway JSON error) is not a page.
       if (!/<html[\s>]/i.test(html)) throw new Error('not html');
