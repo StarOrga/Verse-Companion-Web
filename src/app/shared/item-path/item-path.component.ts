@@ -230,6 +230,8 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
                   <span>{{ 'pathCtl.go.wish' | translate }}</span>
                 </button>
               }
+              <!-- The host's own wish entries under the station (Holotisch menu: wishes with a loadout, "wish this build"). -->
+              <ng-content select="[ipWishExtra]" />
             </li>
             @if (own(); as o) {
               <li #ownStop class="stop" data-station="own" tabindex="-1" [class.on]="ownOn()" [class.flash]="flashing()">
@@ -510,6 +512,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
       .stop + .stop::before { left: 28px; top: -11px; width: 2px; height: 10px; }
       .own { flex-wrap: wrap; }
     }
+    .anc:has(> sc-item-path-assign.inline) { width: 100%; }
     .tools { display: inline-flex; align-items: center; gap: 2px; }
     .tools:empty { display: none; }
     .stop[data-station="own"] { outline: none; transition: box-shadow 0.3s ease, border-color 0.3s ease; }
@@ -546,6 +549,8 @@ export class ItemPathComponent implements OnDestroy {
   readonly forceOwned = input(false);
   /** A ship's own name, shown in the ownership strip ("Im Hangar · „Name“"). */
   readonly ownName = input<string | null>(null);
+  /** The picker opens in the flow under "Zuordnen" at every width (a host that is itself a popover, the Holotisch menu). */
+  readonly pickerInFlow = input(false);
 
   private readonly path = inject(ItemPathService);
   /** Resolved on click only: building the cart (wishlist store, Supabase client) is not the price of drawing a path control. */
@@ -837,7 +842,7 @@ export class ItemPathComponent implements OnDestroy {
     const at = ev.currentTarget as HTMLElement;
     this.closePop();
     void this.path.loadAssignTargets();
-    if (isPhone()) {
+    if (this.pickerInFlow() || isPhone()) {
       this.anchor.set(at);
       this.pickInline.set(true);
       this.mode.set('assign');

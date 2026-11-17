@@ -917,14 +917,14 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
             }
             <sc-codex-holo-hangar-menu htOwn
               [shipName]="displayName()"
+              [className]="detail()!.classNameSlug"
               [count]="hangarQty()"
-              [wishQty]="hangarWishQty()"
               [signedIn]="!!currentUserId()"
+              [forceOwned]="hqHosted()"
               [exemplars]="hangarExemplars()"
               [wishes]="hangarWishes()"
               [activeId]="activeVariantId()"
               [werkLink]="werkLink()"
-              [hangarLink]="hangarMenuLink()"
               [werkChanged]="activeVariantId() === null ? draftChangedCount() : 0"
               [pinned]="(cardShip()?.pinnedRank ?? null) !== null"
               [busy]="menuBusy()"
@@ -2491,7 +2491,6 @@ export class CodexDetailComponent implements OnInit {
     const qty = Math.max(1, s?.hangarQty ?? 0);
     return this.hqHosted() || s?.inHangar ? qty : 0;
   });
-  readonly hangarWishQty = computed(() => (this.ownState()?.wished ? (this.ownState()?.wishQty ?? 0) : 0));
   readonly menuBusy = signal(false);
   readonly menuError = signal<string | null>(null);
   /** Summaries known to the page (written by ExemplarAiService on a switch or when the page is left). */
@@ -2565,7 +2564,6 @@ export class CodexDetailComponent implements OnInit {
     if (this.hqHosted() && id) return hqShipLink(id);
     return { commands: ['/codex', 'ship', this.detail()?.classNameSlug ?? ''], queryParams: { [HQ_VARIANT_PARAM]: null } };
   });
-  readonly hangarMenuLink = computed<HangarMenuLink | null>(() => (this.hangarQty() > 0 ? { commands: [hqHangar], queryParams: {} } : null));
 
   /** The Holotisch save bar: an exemplar saves into itself; on Werk the build becomes a new exemplar — offered, never forced (C23). */
   onHoloSaveDraft(): void {
