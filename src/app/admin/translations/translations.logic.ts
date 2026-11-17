@@ -44,7 +44,7 @@ const KNOWN_JOB_ERRORS = new Set([
   'translate.job_not_found', 'translate.lang_unknown', 'translate.no_api_key',
   'translate.no_base_build', 'translate.not_awaiting_approval', 'translate.not_cancellable',
   'translate.plan_missing', 'translate.results_missing', 'translate.r2_not_configured',
-  'translate.internal',
+  'translate.internal', 'translate.worker_limit',
 ]);
 
 /** i18n key for a job's / orchestrator's error code; unknown codes get a generic sentence, never raw text. */

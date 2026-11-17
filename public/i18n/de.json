@@ -4250,7 +4250,8 @@
         "plan_missing": "Der Übersetzungsplan fehlt.",
         "results_missing": "Die Ergebnisse fehlen.",
         "r2_not_configured": "Der Speicher (R2) ist nicht eingerichtet.",
-        "internal": "Interner Fehler der Übersetzungs-Pipeline."
+        "internal": "Interner Fehler der Übersetzungs-Pipeline.",
+        "worker_limit": "Der Auftrag hat das CPU- oder Speicherlimit des Workers mehrfach hintereinander überschritten und wurde gestoppt."
       },
       "glossary": {
         "title": "Glossar",
