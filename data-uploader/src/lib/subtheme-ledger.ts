@@ -64,6 +64,40 @@ export async function fetchLedger(opts: LedgerClientOptions, key: LedgerKey): Pr
   }
 }
 
+/**
+ * The id of the published (finalized, not superseded) codex build of this
+ * channel + build number — what a silhouettes-only continuation attaches its
+ * outlines to when the catalogue run that made the row is long gone. Same
+ * visibility rule as the public read policy of `codex_builds`. Null = none
+ * found or unreachable: the caller then sends nothing (never `init`s a row).
+ */
+export async function fetchLiveBuildId(opts: LedgerClientOptions, key: LedgerKey): Promise<string | null> {
+  if (!key.buildNumber.trim()) return null;
+  try {
+    const q = new URLSearchParams({
+      select: 'id',
+      channel: `eq.${key.channel.toUpperCase()}`,
+      build_number: `eq.${key.buildNumber.trim()}`,
+      finalized_at: 'not.is.null',
+      superseded_at: 'is.null',
+      order: 'created_at.desc',
+      limit: '1',
+    });
+    const res = await fetchWithTimeout(
+      `${opts.apiBase}/rest/v1/codex_builds?${q.toString()}`,
+      { method: 'GET', headers: headers(opts) },
+      opts.timeoutMs ?? 15_000,
+      opts.fetchImpl ?? fetch,
+    );
+    if (!res.ok) return null;
+    const rows = (await res.json()) as unknown;
+    const id = Array.isArray(rows) ? (rows[0] as { id?: unknown } | undefined)?.id : null;
+    return typeof id === 'string' && /^[0-9a-f-]{36}$/i.test(id) ? id : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function recordLedger(
   opts: LedgerClientOptions,
   key: LedgerKey,

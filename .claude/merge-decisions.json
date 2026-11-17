@@ -13,6 +13,23 @@
         ]
       }
     ],
+    ".claude/project-map.md›concepts/›file count": [
+      {
+        "ship": "#1163",
+        "by": "Jerry",
+        "value": "concepts/ (714)"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:21:01.476Z",
+        "hunks": [
+          "ea539ea64a5e"
+        ]
+      }
+    ],
     ".claude/project-map.md›concepts/›file-count": [
       {
         "ship": "claude/popup-popout-animation-concepts-0f27ef",
@@ -81,6 +98,23 @@
         ]
       }
     ],
+    ".claude/project-map.md›data-uploader/›file count": [
+      {
+        "ship": "#1158",
+        "by": "Jerry",
+        "value": "data-uploader/ (339)"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:21:01.476Z",
+        "hunks": [
+          "6f7f2e3963bd"
+        ]
+      }
+    ],
     ".claude/project-map.md›data-uploader›count": [
       {
         "ship": "claude/ship-data-extraction-validation-8d0c76",
@@ -112,6 +146,23 @@
         "at": "2026-11-17T00:17:56.554Z",
         "hunks": [
           "1225ec8aa64c"
+        ]
+      }
+    ],
+    ".claude/project-map.md›docs/›file count": [
+      {
+        "ship": "#1163",
+        "by": "Jerry",
+        "value": "docs/ (779) — Documentation"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:21:01.476Z",
+        "hunks": [
+          "273fe833cb12"
         ]
       }
     ],
@@ -425,6 +476,38 @@
         ]
       }
     ],
+    ".claude/project-map.md›migrations/›file count": [
+      {
+        "ship": "#1170",
+        "by": "Jerry",
+        "value": "migrations/ (188) — Database migrations"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:21:01.476Z",
+        "hunks": [
+          "d8366f9a4bd9"
+        ]
+      },
+      {
+        "ship": "#1174",
+        "by": "Jerry",
+        "value": "migrations/ (189) — Database migrations"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:29:19.037Z",
+        "hunks": [
+          "5a2eca2cfd5c"
+        ]
+      }
+    ],
     ".claude/project-map.md›migrations›count": [
       {
         "ship": "claude/batch-901bea",
@@ -469,6 +552,23 @@
         ]
       }
     ],
+    ".claude/project-map.md›shell/›file count": [
+      {
+        "ship": "#1163",
+        "by": "Jerry",
+        "value": "shell/ (96)"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:21:01.476Z",
+        "hunks": [
+          "c1061ebe8c22"
+        ]
+      }
+    ],
     ".claude/project-map.md›src and app›count": [
       {
         "ship": "PR #1163",
@@ -505,6 +605,23 @@
         "at": "2026-11-15T16:02:02.965Z",
         "hunks": [
           "c0342f654b62"
+        ]
+      }
+    ],
+    ".claude/project-map.md›src/›file count": [
+      {
+        "ship": "#1163",
+        "by": "Jerry",
+        "value": "src/ (1399) — Source code / app/ (1392) — Application code / codex/ (399)"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:21:01.476Z",
+        "hunks": [
+          "e0c125b89c45"
         ]
       }
     ],
@@ -607,6 +724,38 @@
         ]
       }
     ],
+    ".claude/project-map.md›supabase/›file count": [
+      {
+        "ship": "#1170",
+        "by": "Jerry",
+        "value": "supabase/ (457)"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:21:01.476Z",
+        "hunks": [
+          "81e6924b63b5"
+        ]
+      },
+      {
+        "ship": "#1174",
+        "by": "Jerry",
+        "value": "supabase/ (459)"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:29:19.037Z",
+        "hunks": [
+          "00065aec8218"
+        ]
+      }
+    ],
     ".claude/project-map.md›supabase›count": [
       {
         "ship": "claude/batch-901bea",
@@ -651,6 +800,40 @@
         ]
       }
     ],
+    ".claude/project-map.md›test/›file count": [
+      {
+        "ship": "#1158",
+        "by": "Jerry",
+        "value": "test/ (64) — Tests"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:21:01.476Z",
+        "hunks": [
+          "59ce0daa6e70"
+        ]
+      }
+    ],
+    ".claude/project-map.md›tracked files.›file count": [
+      {
+        "ship": "#1170",
+        "by": "Jerry",
+        "value": "3230 tracked files."
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:21:01.476Z",
+        "hunks": [
+          "b5716cbd6ee4"
+        ]
+      }
+    ],
     ".claude/project-map.md›tracked files›count": [
       {
         "ship": "PR #1163",
@@ -670,6 +853,23 @@
         "at": "2026-11-17T00:17:56.554Z",
         "hunks": [
           "a3afcb1fb860"
+        ]
+      }
+    ],
+    ".claude/project-map.md›tracked files›file count": [
+      {
+        "ship": "#1174",
+        "by": "Jerry",
+        "value": "3232 tracked files."
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-17T20:21:01.476Z",
+        "hunks": [
+          "f9782c442f6c"
         ]
       }
     ],
@@ -778,6 +978,23 @@
         "at": "2026-11-11T17:28:44.035Z",
         "hunks": [
           "becb5e302089"
+        ]
+      }
+    ],
+    "docs/analytics/event-naming.md›search:result_open›properties": [
+      {
+        "ship": "#1124",
+        "by": "Jerry",
+        "value": "area + rank"
+      },
+      {
+        "ship": "claude/batch-82d91f",
+        "by": "JerryT2T",
+        "value": "area, rank, new_tab, current, variant",
+        "decided": true,
+        "at": "2026-11-17T19:31:21.386Z",
+        "hunks": [
+          "8e75d40f8989"
         ]
       }
     ],

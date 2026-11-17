@@ -7,10 +7,10 @@
 // rows because the sources are empty.
 
 import type { HangarRoleLoadout, HangarShip, HangarShipConfig } from '../../hangar/hangar.types';
-import { hqLocker, ownShipLink, hqSet, hqHangar } from '../../hq/hq-routes';
+import { hqLocker, ownShipLink, ownVariantLink, hqSet, hqHangar } from '../../hq/hq-routes';
 import { humanizeClassName } from '../codex-format';
 import { recordScore, searchMatcher } from '../codex-search';
-import type { SearchTarget } from './codex-search-model';
+import type { SearchTarget, SearchVariantLink } from './codex-search-model';
 import type { OwnRowType, SearchResultRow } from './search-result-model';
 
 /** The own ship's page: its personal Codex view (active variant), not a hangar detail page. */
@@ -49,6 +49,35 @@ export interface OwnSearchResult {
 
 const KIND_ORDER: Record<OwnRowType, number> = { ship: 0, config: 1, set: 2, item: 3 };
 
+/**
+ * The reader's own variants per ship class (lower case): every saved variant of every owned hangar
+ * ship of that class, the active one first; a ship without a saved variant gives its `?mine` link.
+ * What the catalog row of that ship carries as mini links when the own row folds into it (C11).
+ */
+export function ownVariantsByClass(src: Pick<OwnSources, 'ships' | 'configs'>, hq = false): Map<string, SearchVariantLink[]> {
+  const out = new Map<string, SearchVariantLink[]>();
+  for (const s of src.ships) {
+    if (s.status !== 'owned' || !s.shipClassName) continue;
+    const key = s.shipClassName.toLowerCase();
+    const list = out.get(key) ?? [];
+    const cfgs = src.configs
+      .filter((c) => c.hangarShipId === s.id)
+      .map((c, i) => ({ c, i }))
+      .sort((a, b) => Number(b.c.isActive) - Number(a.c.isActive) || a.i - b.i);
+    if (cfgs.length) {
+      for (const { c } of cfgs) {
+        const l = ownVariantLink(s, c.id, hq);
+        list.push({ id: c.id, label: c.name, target: { link: l.commands, queryParams: l.queryParams }, active: c.isActive });
+      }
+    } else {
+      const t = ownTarget(s, [], hq);
+      list.push({ id: `mine-${s.id}`, label: s.customName?.trim() || '', labelKey: 'search.row.variantMine', target: t, active: true });
+    }
+    out.set(key, list);
+  }
+  return out;
+}
+
 /** Where "Alle N im HQ öffnen" leads for a set of own rows. */
 export function ownMoreTarget(rows: readonly OwnMatch[], term: string): SearchTarget {
   const q = term.trim();
@@ -83,34 +112,42 @@ export function searchOwn(
   };
 
   const owned = src.ships.filter((s) => s.status === 'owned');
-  const shipsById = new Map(src.ships.map((s) => [s.id, s]));
 
-  if (want('ship')) {
+  // ONE row per hangar ship (concept 2026-11-17, d-variant): the ship and its saved variants
+  // ("Meine …", `?v=`) are one page, so a matching variant no longer adds a row of its own.
+  // The row opens the active (default) variant; with two or more variants it carries them as
+  // mini text links, the ones the term matched first. Only a variant matched → kind 'config'
+  // (the second line names the ship), the variant's name stands beside the type.
+  if (want('ship') || want('config')) {
     for (const s of owned) {
       const type = nameOf(s.shipClassName);
-      if (!match(s.customName, type, s.shipClassName)) continue;
+      const cfgs = src.configs.filter((c) => c.hangarShipId === s.id);
+      const shipHit = want('ship') && match(s.customName, type, s.shipClassName);
+      const cfgHits = want('config') ? cfgs.filter((c) => match(c.name)) : [];
+      if (!shipHit && !cfgHits.length) continue;
+      const matched = new Set(cfgHits.map((c) => c.id));
+      const variants: SearchVariantLink[] | undefined =
+        cfgs.length >= 2
+          ? cfgs
+              .map((c, i) => ({ c, i }))
+              .sort((a, b) => Number(matched.has(b.c.id)) - Number(matched.has(a.c.id)) || Number(b.c.isActive) - Number(a.c.isActive) || a.i - b.i)
+              .map(({ c }) => {
+                const l = ownVariantLink(s, c.id, !!opts.hq);
+                return { id: c.id, label: c.name, target: { link: l.commands, queryParams: l.queryParams }, active: c.isActive };
+              })
+          : undefined;
+      const customName = s.customName?.trim() || null;
       add(
         {
-          type: 'own', id: `own-ship-${s.id}`, ownKind: 'ship', title: type, ownName: s.customName?.trim() || null,
-          subtitle: null, classNameSlug: s.shipClassName, qty: null,
+          type: 'own', id: `own-ship-${s.id}`, ownKind: shipHit ? 'ship' : 'config', title: type,
+          ownName: shipHit ? customName : cfgHits[0].name,
+          subtitle: shipHit ? null : customName,
+          classNameSlug: s.shipClassName, qty: null,
           target: ownTarget(s, src.configs, !!opts.hq),
+          ...(variants ? { variants } : {}),
         },
-        [s.customName, type],
-        [s.shipClassName],
-      );
-    }
-  }
-  if (want('config')) {
-    for (const c of src.configs) {
-      const ship = shipsById.get(c.hangarShipId);
-      if (!ship || ship.status !== 'owned' || !match(c.name)) continue;
-      add(
-        {
-          type: 'own', id: `own-config-${c.id}`, ownKind: 'config', title: nameOf(ship.shipClassName),
-          ownName: c.name, subtitle: ship.customName?.trim() || null, classNameSlug: ship.shipClassName, qty: null,
-          target: ownTarget(ship, src.configs, !!opts.hq),
-        },
-        [c.name],
+        shipHit ? [s.customName, type, ...cfgHits.map((c) => c.name)] : cfgHits.map((c) => c.name),
+        shipHit ? [s.shipClassName] : [],
       );
     }
   }
