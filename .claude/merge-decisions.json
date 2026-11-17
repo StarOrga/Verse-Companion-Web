@@ -1106,6 +1106,16 @@
         "hunks": [
           "a86b9f32e335"
         ]
+      },
+      {
+        "ship": "claude/user-security-gap-investigation-747d11",
+        "by": "JerryT2T",
+        "value": "0.273.1 (generated with this release's version bump)",
+        "decided": true,
+        "at": "2026-11-17T11:47:43.406Z",
+        "hunks": [
+          "8c5d7febe401"
+        ]
       }
     ],
     "public/release-notes.json›root›current": [
