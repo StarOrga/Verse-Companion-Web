@@ -200,8 +200,9 @@ export const AKTE_TAB_PREF_KEY = 'sc.codex.holo.akteTab';
     .ak-sw .t { position: relative; display: block; width: 58px; height: 34px; border-radius: 5px; overflow: hidden;
       border: 1px solid var(--sc-border); background: linear-gradient(170deg, var(--sc-bg-1), color-mix(in srgb, var(--sc-accent) 18%, var(--sc-bg-1))); }
     .ak-sw .t img { display: block; width: 100%; height: 100%; object-fit: contain; background: var(--sc-bg-0); }
-    .ak-sw .t i { position: absolute; inset: 22% 30%; background: color-mix(in srgb, var(--sc-accent) 55%, transparent);
-      clip-path: polygon(50% 0, 60% 29%, 100% 62%, 100% 73%, 65% 65%, 62% 86%, 72% 95%, 72% 100%, 50% 96%, 28% 100%, 28% 95%, 38% 86%, 35% 65%, 0 73%, 0 62%, 40% 29%); }
+    /* No picture: a neutral ring like the table's placeholder, never a drawn hull (a guessed shape would stand for the wrong ship). */
+    .ak-sw .t i { position: absolute; inset: 0; margin: auto; width: 16px; height: 16px; border-radius: 50%;
+      border: 1px dashed color-mix(in srgb, var(--sc-accent) 55%, transparent); }
     .ak-sw small { max-width: 64px; overflow: hidden; text-align: center; line-height: 1.2; overflow-wrap: anywhere; hyphens: auto;
       display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; font-size: max(9px, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     .ak-sw:hover .t { border-color: color-mix(in srgb, var(--sc-accent) 60%, var(--sc-border)); }
