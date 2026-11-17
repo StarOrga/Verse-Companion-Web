@@ -42,6 +42,7 @@ const tick = (): string => `2026-11-17T10:${String(Math.floor(clock / 60)).padSt
 class FakeSupplies {
   readonly rows = signal<Ln[]>([]);
   readonly items = computed(() => this.rows().filter((r) => !r.deletedAt));
+  readonly open = computed(() => this.items().filter((r) => !r.done));
   /** The server's copy of each line's source (the compare-and-set runs against it). */
   readonly server = new Map<string, string>();
   /** The compare-and-set fails (offline). */
@@ -616,6 +617,60 @@ describe('NachschubService: wishes assigned to an Operation', () => {
     expect(wish.qty('medpen')).toBe(1);
     expect(supplies.line(line)?.qty).toBe(1); // without the wait the lines would have kept 3 above a wish of 1
     expect(alloc()).toEqual(expect.objectContaining({ wished: 1, assigned: 1, free: 0 }));
+  });
+
+  describe('round 4: archived Operationen', () => {
+    const archivedRow = (id: string, name: string): ServerPkg => ({ id, name, status: 'archived', slot: null, snapshot: {}, archived_at: tick(), deleted_at: null, created_at: tick() });
+
+    it('an open wish line left in an archived Operation is removed on load; the empty Operation goes (no Einsatz) and never takes a slot', async () => {
+      server = [archivedRow('A1', 'RSI Polaris'), archivedRow('A2', 'Kept')];
+      await svc.reload();
+      const polaris = supplies.put({ name: 'RSI Polaris', qty: 1, className: 'rsi_polaris', entityKind: 'ship', packageId: 'A1', source: 'wish' });
+      supplies.put({ name: 'Medpen', qty: 2, className: 'medpen', packageId: 'A2', source: 'wish' });
+      einsaetze.set([{ id: 'E1', packageId: 'A2', status: 'done' }]);
+      wishFor('medpen', 2);
+      expect(alloc().assigned).toBe(0); // an archived Operation holds no assignment
+      await svc.reconcile();
+      expect(supplies.line(polaris)?.deletedAt).not.toBeNull();
+      expect(pkgNamed('RSI Polaris')).toBeUndefined();
+      // With an Einsatz it stays, archived and empty; the wish stays and is free.
+      expect(pkgNamed('Kept')).toEqual(expect.objectContaining({ status: 'archived', slot: null }));
+      expect(svc.linesOf('A2').length).toBe(0);
+      expect(alloc()).toEqual(expect.objectContaining({ wished: 2, assigned: 0, free: 2 }));
+      expect(svc.active().length).toBe(0);
+    });
+
+    it('a met line keeps its archived Operation as history (A8)', async () => {
+      server = [archivedRow('A3', 'Omnisky')];
+      await svc.reload();
+      const met = supplies.put({ name: 'Omnisky', qty: 1, className: 'omnisky', packageId: 'A3', source: 'wish_met', done: true });
+      await svc.reconcile();
+      expect(supplies.line(met)?.deletedAt).toBeNull();
+      expect(pkgNamed('Omnisky')?.status).toBe('archived');
+    });
+
+    it('a finished Operation archives only after its ticks reached the server', async () => {
+      wishFor('medpen', 1);
+      await svc.assignWish(medpen, 1, 'new', { name: 'Op' });
+      await svc.reconcile();
+      supplies.setDone(svc.linesOf(pkgNamed('Op')?.id ?? '')[0].id, true);
+      supplies.syncError.set('errors.offline');
+      await svc.reconcile();
+      expect(pkgNamed('Op')?.status).toBe('active');
+      supplies.syncError.set(null);
+      await svc.reconcile();
+      expect(pkgNamed('Op')?.status).toBe('archived');
+    });
+
+    it('the head counter counts open lines of active Operationen only', async () => {
+      server = [archivedRow('A4', 'Old')];
+      await svc.reload();
+      supplies.put({ name: 'Left', qty: 1, className: 'left', packageId: 'A4', source: 'search' });
+      supplies.put({ name: 'Loose', qty: 1, className: 'loose', packageId: null, source: 'manual' });
+      wishFor('medpen', 1);
+      await svc.assignWish(medpen, 1, 'new', { name: 'Live' });
+      expect(svc.openActiveLines().map((l) => l.name)).toEqual(['medpen']);
+    });
   });
 
   describe('A11 legacy lines (H3)', () => {

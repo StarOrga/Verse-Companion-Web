@@ -176,6 +176,15 @@ export class NachschubService {
   readonly archived = computed(() =>
     this.packages().filter((n) => n.status === 'archived').sort((a, b) => (b.archivedAt ?? '').localeCompare(a.archivedAt ?? '')),
   );
+  /**
+   * Open lines of ACTIVE Operationen - what the HQ head counts ("N in Operationen"). Lines of archived Operationen
+   * and loose lines are not shown in Planen, so they are not counted either.
+   */
+  readonly openActiveLines = computed(() => {
+    const ids = new Set(this.active().map((p) => p.id));
+    return this.supplies.open().filter((l) => !!l.packageId && ids.has(l.packageId));
+  });
+
   /** i18n key explaining why "Neuer Nachschub" is blocked, else null. */
   readonly newBlock = computed(() => newNachschubBlock(this.packages()));
 
@@ -787,11 +796,39 @@ export class NachschubService {
         if (!(await this.ensureStock())) return;
         await this.reconcileLegacyWishLines();
         await this.reconcileOnce(uid);
+        await this.healArchived(uid);
         await this.fulfilWishLines();
         await this.trimOverAssigned(true);
       } while (this.reconcileAgain);
     } finally {
       this.reconciling = false;
+    }
+  }
+
+  /** Push pending line edits; false when that failed (fakes without a sync count as pushed). */
+  private async ticksPushed(): Promise<boolean> {
+    const s = this.supplies as Partial<HqSuppliesService>;
+    if (!s.sync) return true;
+    await s.sync.call(this.supplies);
+    return !s.syncError?.();
+  }
+
+  /**
+   * Leftovers in the Archiv (A3): an archived Operation is finished, so an OPEN wish line in it is no assignment
+   * (`assignedLines` counts active ones only) and must not linger. It is removed; its wish, if there still is one,
+   * stays on the wishlist and is free. An archived Operation left without any line and without an Einsatz is removed
+   * too (A7: an Operation with no wish and no Einsatz goes); with an Einsatz it stays archived and empty. Never
+   * reactivated, so it never takes a slot. Met lines (A8) are not touched: they are the history of a finished one.
+   */
+  private async healArchived(uid: string): Promise<void> {
+    if (!this.storesReady()) return;
+    for (const n of this.archived()) {
+      if ((n.type ?? 'normal') !== 'normal') continue;
+      const lines = this.linesOf(n.id);
+      const leftovers = lines.filter((l) => isWishLine(l) && !l.done);
+      if (!leftovers.length) continue;
+      this.supplies.removeMany(leftovers.map((l) => l.id));
+      if (lines.length === leftovers.length && this.einsatzSvc.ofPackage(n.id).length === 0) await this.drop(n.id, uid);
     }
   }
 
@@ -802,7 +839,9 @@ export class NachschubService {
       if (!ev) continue;
       for (const lid of ev.closeIds) this.supplies.setDone(lid, true);
       let next: Nachschub = ev.snapshotChanged ? { ...n, snapshot: ev.snapshot } : n;
-      if (ev.finished) next = archive(next, new Date().toISOString());
+      // Archive only once the ticks are on the server: an archive written while a line's tick was still queued (tab
+      // closed, push failed, another tab's stale copy won) left an archived Operation with an open line.
+      if (ev.finished && (await this.ticksPushed())) next = archive(next, new Date().toISOString());
       if (next === n) continue;
       const cols: Record<string, unknown> = {};
       if (next.snapshot !== n.snapshot) cols['snapshot'] = next.snapshot;
