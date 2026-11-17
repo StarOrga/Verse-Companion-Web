@@ -36,11 +36,6 @@ export interface CurrentBuild {
   build_number: string;
 }
 
-export interface FullEstimate {
-  string_count: number;
-  estimate_usd: number;
-}
-
 export interface GlossaryEntry {
   id: string;
   lang: string;
@@ -282,16 +277,10 @@ export class TranslationsService {
     return this.orchestrator({ op: 'cancel', job_id: jobId });
   }
 
-  async estimateFull(buildId: string, lang: string): Promise<FullEstimate> {
-    const r = await this.orchestrator<{ estimate: { string_count: number; estimate_usd: number } }>({
-      op: 'estimate',
-      build_id: buildId,
-      lang,
-      mode: 'full',
-    });
-    return { string_count: num(r.estimate.string_count), estimate_usd: num(r.estimate.estimate_usd) };
-  }
-
+  /**
+   * Orders a full run. Nothing is spent by it: the job is estimated in the background (a few minutes
+   * for a whole language) and then waits for approval with its cost and string count.
+   */
   startFull(buildId: string, lang: string) {
     return this.orchestrator({ op: 'start_full', build_id: buildId, lang });
   }

@@ -1,12 +1,14 @@
 // The learning pass in slices (why: _pass.ts; what it computes: _learn.ts).
 //
 //   start    answered cards, pin the build, fetch the codex names
-//   mine     SCAN_SHARDS English shards per slice -> `mine-<pos>`: term votes, style counts, name counts
+//   rows     SCAN_SHARDS English shards per slice: the rows of the table by hash digit (_rows.ts)
+//   mine     one hash digit per slice -> `mine-<digit>`: term votes, style counts, name counts
 //   plan     merge the parts: style, promotions, contested terms, CIG terms -> `plan`
 //   insert   the glossary rows of the plan, INSERT_ROWS per slice
-//   detect   second walk, only when the plan asks questions: example lines for contested terms,
-//            community/AI lines that miss a CIG term -> `det-<pos>`
-//   submit   one batch per slice: Haiku pre-decision, align, then web research + arbiter + done
+//   detect   the digits again, only when the plan asks questions: example lines for contested terms,
+//            community/AI lines that miss a CIG term -> `det-<digit>`
+//   submit   one batch per slice: Haiku pre-decision, align, then web research + arbiter
+//   cleanup  the work files, CLEAN_KEYS per slice
 //
 // The one-request run this replaces read the whole table and the whole TM, and searched every line
 // for every contested term; it never finished once in production. Merging the parts gives exactly
@@ -14,9 +16,9 @@
 
 import { applyAnsweredCards } from './_cards.ts';
 import { arbitrate } from './_arbiter.ts';
-import { isCigValid } from './_diff.ts';
 import type { TmEntry } from './_diff.ts';
 import { TranslateError } from './_errors.ts';
+import { sweepPrefix } from './_io.ts';
 import type { JudgeTerm } from './_glossary.ts';
 import {
   addDntCounts, addMined, alignRequests, ALIGN_PER_REQUEST, assessCandidate, candidatesOf, dntCounts, dntFromCounts,
@@ -27,18 +29,21 @@ import type { AlignLine, Example, HaikuItem, LearnSummary, LearnTrigger, MineAcc
 import { hasLearn, learnKey, spendBlock, submitLearnBatch } from './_learn_batch.ts';
 import type { LearnDeps } from './_learn_batch.ts';
 import type { LearnGlossaryRow } from './_learn_db.ts';
-import type { Deps } from './_machine.ts';
-import { advancePass, commit, memPasses, mergeState } from './_pass.ts';
+import type { Deps } from './_job.ts';
+import { advancePass, commit, memPasses, mergeState, passPrefix } from './_pass.ts';
 import type { Pass, PassDb, PassKind, PassStep } from './_pass.ts';
 import type { GlossaryRow } from './_prompt.ts';
+import { DIGITS, F_CIG, loadKeySlice, loadRows, loadTmDigit, openRowReaders, rowsOf, writeRows } from './_rows.ts';
+import type { Row } from './_rows.ts';
 import { SCAN_SHARDS } from './_scan.ts';
-import { deleteKeys, loadSlice, openSliceReaders } from './_slice.ts';
-import type { Slice } from './_slice.ts';
+import { cigTableFor } from './_sources.ts';
 import { emptyStyleCounts, mergeStyleCounts, styleCounts, styleFromCounts } from './_style.ts';
 import type { StyleCounts } from './_style.ts';
 
 /** Glossary rows written per slice (bulk inserts, see `insertGlossary`). */
 export const INSERT_ROWS = 500;
+/** Work files deleted per cleanup slice. */
+const CLEAN_KEYS = 150;
 
 const STYLE_ORIGINS = ['admin', 'cig', 'community'] as const;
 type StyleOrigin = typeof STYLE_ORIGINS[number];
@@ -66,8 +71,8 @@ interface DetectPart {
 
 interface PassState {
   sum: LearnSummary;
-  /** CIG folder of the language. */
-  cig?: string;
+  /** The published table with CIG's own translation (`cigTableFor`); null = none to respect. */
+  cig?: string | null;
   /** A batch create in flight: written before the provider call, cleared with the step. */
   intent?: { kind: string; at: string };
   /** Batches created again after a request died with its intent open: each may exist twice. */
@@ -76,30 +81,35 @@ interface PassState {
 
 type D = LearnDeps & { passes: PassDb };
 
-const workKey = (pass: Pass, name: string) => `translation-work/learn-${pass.lang}/p-${pass.id}/${name}.json`;
+const workKey = (pass: Pass, name: string) => `${passPrefix(pass)}${name}.json`;
 const stateOf = (pass: Pass) => pass.state as unknown as PassState;
 
 /** The pass belongs to another request now: stop without touching anything. */
 class Lost extends Error {}
 
 /** One line per key with its current target and origin (CIG valid -> CIG, else the TM). */
-function linesOf(sl: Slice): { lines: MineLine[]; tmLines: { key: string; h: string; en: string; entry: TmEntry }[] } {
+function linesOf(rows: Row[], tm: Record<string, TmEntry>): { lines: MineLine[]; tmLines: { key: string; h: string; en: string; entry: TmEntry }[] } {
   const lines: MineLine[] = [];
   const tmLines: { key: string; h: string; en: string; entry: TmEntry }[] = [];
-  for (const key of sl.keys) {
-    const e = sl.en[key];
-    if (!e || !e.trim()) continue;
-    if (isCigValid(e, sl.cig[key])) {
-      lines.push({ key, en: e, t: sl.cig[key], o: 'cig' });
+  for (const [key, h, e, c, f] of rows) {
+    if (f & F_CIG) {
+      lines.push({ key, en: e, t: c, o: 'cig' });
       continue;
     }
-    const h = sl.hashes.get(e);
-    const hit = h ? sl.tm[h] : undefined;
-    if (!h || !hit) continue;
+    const hit = Object.hasOwn(tm, h) ? tm[h] : undefined;
+    if (!hit) continue;
     lines.push({ key, en: e, t: hit.t, o: hit.o });
     tmLines.push({ key, h, en: e, entry: hit });
   }
   return { lines, tmLines };
+}
+
+/** The lines of one hash digit; null when a rows file is gone and the table must be walked again. */
+async function digitLines(d: D, pass: Pass) {
+  const rows = await loadRows(d.store, passPrefix(pass), pass.pos, pass.total);
+  if (!rows) return null;
+  const { tm } = await loadTmDigit(d.store, pass.lang, pass.pos);
+  return linesOf(rows, tm);
 }
 
 function done(d: D, pass: Pass, sum: LearnSummary): Promise<Pass | null> {
@@ -114,30 +124,34 @@ async function start(d: D, pass: Pass): Promise<Pass | null> {
   const buildId = await d.learn.currentBuildId();
   const language = await d.db.getLanguage(lang);
   if (!buildId || !language) return done(d, pass, { ...sum, skipped: buildId ? 'lang_unknown' : 'no_build' });
-  const readers = await openSliceReaders(d.store, buildId, null);
+  const readers = await openRowReaders(d.store, buildId, null);
   if (!readers.en.index || !readers.en.index.count) return done(d, pass, { ...sum, skipped: 'english_missing' });
   const names = await d.learn.codexNames(buildId).catch(() => [] as string[]);
   await d.store.putJson(workKey(pass, 'names'), names);
   return commit(d, pass, {
-    phase: 'mine', pos: 0, total: readers.en.names().length, build_id: buildId,
-    state: { sum, cig: language.cig_folder || lang },
+    phase: 'rows', pos: 0, total: readers.en.names().length, build_id: buildId,
+    state: { sum, cig: await cigTableFor(d, lang) },
   });
 }
 
-/** The readers of the pinned build; null when the table was published again and the walk must restart. */
-async function readersFor(d: D, pass: Pass) {
-  const readers = await openSliceReaders(d.store, pass.build_id!, stateOf(pass).cig ?? pass.lang);
+async function rows(d: D, pass: Pass): Promise<Pass | null> {
+  const st = stateOf(pass);
+  const readers = await openRowReaders(d.store, pass.build_id!, st.cig === undefined ? pass.lang : st.cig);
   if (!readers.en.index) throw new TranslateError('translate.english_missing');
-  return readers.en.names().length === pass.total ? readers : null;
+  // The table was published again while the pass ran: start over with the new layout.
+  if (readers.en.names().length !== pass.total) return commit(d, pass, { phase: 'start', pos: 0, total: 0 });
+  await writeRows(d.store, passPrefix(pass), pass.pos, rowsOf(await loadKeySlice(readers, pass.pos)).byDigit);
+  const next = pass.pos + SCAN_SHARDS;
+  return commit(d, pass, next >= pass.total ? { phase: 'mine', pos: 0 } : { pos: next });
 }
 
-const restart = (d: D, pass: Pass) => commit(d, pass, { phase: 'start', pos: 0, total: 0 });
+/** A rows file vanished: the table is walked again. */
+const rewalk = (d: D, pass: Pass) => commit(d, pass, { phase: 'rows', pos: 0 });
 
 async function mine(d: D, pass: Pass): Promise<Pass | null> {
-  const readers = await readersFor(d, pass);
-  if (!readers) return restart(d, pass);
-  const sl = await loadSlice(d.store, readers, pass.lang, pass.pos);
-  const { lines } = linesOf(sl);
+  const got = await digitLines(d, pass);
+  if (!got) return rewalk(d, pass);
+  const { lines } = got;
   const names = ((await d.store.getJson(workKey(pass, 'names'))) ?? []) as string[];
   const style: MinePart['style'] = {};
   for (const o of STYLE_ORIGINS) {
@@ -146,8 +160,7 @@ async function mine(d: D, pass: Pass): Promise<Pass | null> {
   }
   const part: MinePart = { terms: mineLines(lines), style, dnt: names.length ? dntCounts(names, lines) : [] };
   await d.store.putJson(workKey(pass, `mine-${pass.pos}`), part);
-  const next = pass.pos + SCAN_SHARDS;
-  return commit(d, pass, next >= pass.total ? { phase: 'plan', pos: 0 } : { pos: next });
+  return commit(d, pass, pass.pos + 1 >= DIGITS ? { phase: 'plan', pos: 0 } : { pos: pass.pos + 1 });
 }
 
 async function plan(d: D, pass: Pass): Promise<Pass | null> {
@@ -159,9 +172,9 @@ async function plan(d: D, pass: Pass): Promise<Pass | null> {
   const acc: MineAcc = new Map();
   const style: Record<StyleOrigin, StyleCounts> = { admin: emptyStyleCounts(), cig: emptyStyleCounts(), community: emptyStyleCounts() };
   const dnt = new Map<string, [number, number]>();
-  for (let pos = 0; pos < pass.total; pos += SCAN_SHARDS) {
+  for (let pos = 0; pos < DIGITS; pos++) {
     const part = (await store.getJson(workKey(pass, `mine-${pos}`))) as MinePart | null;
-    // A part vanished (a cleanup raced a retry): walk again.
+    // A part vanished (a cleanup raced a retry): mine again.
     if (!part) return commit(d, pass, { phase: 'mine', pos: 0 });
     addMined(acc, part.terms);
     for (const o of STYLE_ORIGINS) if (part.style[o]) style[o] = mergeStyleCounts(style[o], part.style[o]!);
@@ -258,24 +271,22 @@ async function insert(d: D, pass: Pass): Promise<Pass | null> {
 }
 
 async function detect(d: D, pass: Pass): Promise<Pass | null> {
-  const readers = await readersFor(d, pass);
-  if (!readers) return restart(d, pass);
+  const got = await digitLines(d, pass);
+  if (!got) return rewalk(d, pass);
   const p = await readPlan(d, pass);
-  const sl = await loadSlice(d.store, readers, pass.lang, pass.pos);
-  const { lines, tmLines } = linesOf(sl);
+  const { lines, tmLines } = got;
   const needles = p.items.flatMap((x) => [{ src: x.source, t: x.a }, { src: x.source, t: x.b }]);
   const part: DetectPart = {
     ex: needles.length ? findExamples(lines, needles) : [],
     mis: p.cigTerms.length ? findMisaligned(tmLines, p.cigTerms) : [],
   };
   await d.store.putJson(workKey(pass, `det-${pass.pos}`), part);
-  const next = pass.pos + SCAN_SHARDS;
-  return commit(d, pass, next >= pass.total ? { phase: 'submit', pos: 0 } : { pos: next });
+  return commit(d, pass, pass.pos + 1 >= DIGITS ? { phase: 'submit', pos: 0 } : { pos: pass.pos + 1 });
 }
 
 async function detectParts(d: D, pass: Pass): Promise<DetectPart[]> {
   const out: DetectPart[] = [];
-  for (let pos = 0; pos < pass.total; pos += SCAN_SHARDS) {
+  for (let pos = 0; pos < DIGITS; pos++) {
     const part = (await d.store.getJson(workKey(pass, `det-${pos}`))) as DetectPart | null;
     if (part) out.push(part);
   }
@@ -377,12 +388,14 @@ async function submit(d: D, pass: Pass): Promise<Pass | null> {
 
   state.last = { trigger: pass.reason as LearnTrigger, at: d.now().toISOString(), build_id: pass.build_id };
   await store.putJson(stateKey(lang), state);
-  const files = ['names', 'plan'];
-  for (let pos = 0; pos < pass.total; pos += SCAN_SHARDS) files.push(`mine-${pos}`, `det-${pos}`);
-  await deleteKeys(store, files.map((n) => workKey(pass, n)));
   // The marker 0.273.4 wrote at a publish, before passes existed.
   await store.deleteKey(learnKey(lang, 'due')).catch(() => {});
-  return commit(d, cur, { status: 'done', phase: 'done', pos: 0, state: { sum } });
+  return commit(d, cur, { phase: 'cleanup', pos: 0, state: { sum } });
+}
+
+async function cleanup(d: D, pass: Pass): Promise<Pass | null> {
+  const swept = await sweepPrefix(d.store, passPrefix(pass), CLEAN_KEYS);
+  return commit(d, pass, swept ? { status: 'done', phase: 'done', pos: 0 } : { pos: pass.pos + 1 });
 }
 
 export const learnStep: PassStep = async (deps, pass) => {
@@ -393,11 +406,13 @@ export const learnStep: PassStep = async (deps, pass) => {
   try {
     switch (pass.phase) {
       case 'start': return await start(d, pass);
+      case 'rows': return await rows(d, pass);
       case 'mine': return await mine(d, pass);
       case 'plan': return await plan(d, pass);
       case 'insert': return await insert(d, pass);
       case 'detect': return await detect(d, pass);
       case 'submit': return await submit(d, pass);
+      case 'cleanup': return await cleanup(d, pass);
       default: throw new TranslateError('translate.pass_phase_unknown');
     }
   } catch (e) {
@@ -407,9 +422,9 @@ export const learnStep: PassStep = async (deps, pass) => {
 };
 
 /** Asks for a learning pass of one language (a second request while one runs makes it run once more). */
-export async function requestLearning(deps: Deps, lang: string, reason: LearnTrigger): Promise<Pass | null> {
+export async function requestLearning(deps: Deps, lang: string, reason: LearnTrigger, token?: string): Promise<Pass | null> {
   if (!deps.learn || !deps.passes) return null;
-  return await deps.passes.open({ kind: 'learn', lang, reason });
+  return await deps.passes.open({ kind: 'learn', lang, reason, token });
 }
 
 /**

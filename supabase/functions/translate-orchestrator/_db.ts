@@ -1,7 +1,8 @@
 // Postgres adapter for the state machine (tables: docs/translation/ARCHITECTURE.md § Data).
 // Runs with the service-role client; RLS is bypassed, auth happens in index.ts.
 
-import type { Db, Job, JobPatch, Settings } from './_machine.ts';
+import type { Db, Job, JobPatch, Settings } from './_job.ts';
+import { selectAll } from './_page.ts';
 import type { GlossaryRow } from './_prompt.ts';
 
 // deno-lint-ignore no-explicit-any
@@ -20,6 +21,17 @@ export function makeDb(sb: Client, now: () => Date): Db {
       const { data, error } = await sb.from('translation_jobs').select(cols).in('status', OPEN).order('created_at');
       if (error) fail(error);
       return (data ?? []) as Job[];
+    },
+    async listSweepJobs() {
+      const { data, error } = await sb.from('translation_jobs').select(cols).eq('stats->>sweep', 'true').order('updated_at').limit(20);
+      if (error) fail(error);
+      return (data ?? []) as Job[];
+    },
+    async findJob(build_id, lang, mode) {
+      const { data, error } = await sb.from('translation_jobs').select(cols)
+        .eq('build_id', build_id).eq('lang', lang).eq('mode', mode).maybeSingle();
+      if (error) fail(error);
+      return (data as Job | null) ?? null;
     },
     async getJob(id) {
       const { data, error } = await sb.from('translation_jobs').select(cols).eq('id', id).maybeSingle();
@@ -58,9 +70,8 @@ export function makeDb(sb: Client, now: () => Date): Db {
       return data ?? null;
     },
     async listGlossary(lang) {
-      const { data, error } = await sb.from('translation_glossary').select('*').eq('lang', lang).limit(20000);
-      if (error) fail(error);
-      return (data ?? []) as GlossaryRow[];
+      return await selectAll<GlossaryRow>((from, to) =>
+        sb.from('translation_glossary').select('*').eq('lang', lang).order('id').range(from, to));
     },
     async insertGlossary(lang, rows) {
       for (let i = 0; i < rows.length; i += 500) {
@@ -84,19 +95,20 @@ export function makeDb(sb: Client, now: () => Date): Db {
       return ((data ?? []) as { estimate_usd: number | null }[]).reduce((a, r) => a + Number(r.estimate_usd ?? 0), 0);
     },
     async monthCommitted(month, excludeJobId) {
-      const led = await sb.from('translation_ledger').select('usd').eq('month', month);
-      if (led.error) fail(led.error);
+      const led = await selectAll<{ usd: number }>((from, to) =>
+        sb.from('translation_ledger').select('usd').eq('month', month).order('id').range(from, to));
       const fly = await sb.from('translation_jobs').select('estimate_usd,spent_usd')
         .in('status', ['queued', 'submitted', 'validating', 'post_editing']).neq('id', excludeJobId);
       if (fly.error) fail(fly.error);
-      const spent = ((led.data ?? []) as { usd: number }[]).reduce((a, r) => a + Number(r.usd), 0);
+      const spent = led.reduce((a, r) => a + Number(r.usd), 0);
       const reserved = ((fly.data ?? []) as { estimate_usd: number | null; spent_usd: number | null }[])
         .reduce((a, r) => a + Math.max(0, Number(r.estimate_usd ?? 0) - Number(r.spent_usd ?? 0)), 0);
       return spent + reserved;
     },
-    async addLedger(jobId, month, usd) {
-      const { error } = await sb.from('translation_ledger').insert({ job_id: jobId, month, usd });
-      if (error) fail(error);
+    async addLedger(jobId, month, usd, ref) {
+      const { error } = await sb.from('translation_ledger').insert({ job_id: jobId, month, usd, ref: ref ?? null });
+      // 23505 on (job, ref): a slice that was repeated after a kill books its spend once.
+      if (error && !(ref && error.code === '23505')) fail(error);
     },
     async hasNewerPublished(job) {
       const mine = await sb.from('codex_builds').select('created_at').eq('id', job.build_id).maybeSingle();

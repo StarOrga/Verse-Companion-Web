@@ -11,7 +11,7 @@ import { saveTm, tmIndexKey } from './_io.ts';
 import type { CardRow } from './_learn_db.ts';
 import { hasLearn, jsonParams, learnKey, readLearnBatch, resultJson, spendBlock, submitLearnBatch } from './_learn_batch.ts';
 import type { LearnBatch } from './_learn_batch.ts';
-import type { BatchResult, Deps } from './_machine.ts';
+import type { BatchResult, Deps } from './_job.ts';
 import { priceOf } from './_cost.ts';
 import { sameMultiset, tokensOf } from './_mask.ts';
 import { glossaryBlock, LANG_NAMES } from './_prompt.ts';
@@ -248,7 +248,11 @@ export async function arbitrate(deps: Deps, lang: string, conflicts: Conflict[])
 
   // 1. rules
   const queued = new Map(state.queue.map((c) => [c.h, c]));
+  // A conflict whose batch is under way is decided by that batch. Without this check a repeated import
+  // slice (killed after this state was written) would queue it again and pay for a second verdict.
+  const inFlight = new Set((state.batch?.items ?? []).map((c) => c.h));
   for (const c of conflicts) {
+    if (inFlight.has(c.h)) continue;
     const v = ruleVerdict({ en: c.en, incumbent: c.incumbent, challenger: c.challenger, glossary, decided: decided[c.h] ?? null });
     if (v.winner === 'challenger') {
       sum.ruled++;

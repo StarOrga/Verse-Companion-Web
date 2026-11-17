@@ -1,6 +1,8 @@
 // Content diff: which (key, sha256(english)) pairs still need a translation.
 // Trigger = content diff, never build novelty (contract § Ground rules).
 
+import { sha256HexSync } from './_sha256.ts';
+
 export interface TmEntry {
   t: string;
   o: 'ai' | 'cig' | 'admin' | 'community';
@@ -20,9 +22,9 @@ export interface UniqueText {
   keys: string[];
 }
 
+/** sha256 hex of a text. Async for its callers' sake; the work is synchronous (_sha256.ts says why). */
 export async function sha256Hex(s: string): Promise<string> {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
-  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  return sha256HexSync(s);
 }
 
 /**

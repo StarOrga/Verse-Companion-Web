@@ -56,6 +56,7 @@ function world({ en, cig = {}, glossary = [], names = [], settings = {}, sources
     async putJson(k, v) { sized(k, v); files.set(k, structuredClone(v)); },
     async putText(k, t) { files.set(k, JSON.parse(t)); },
     async deleteKey(k) { files.delete(k); },
+    async list(prefix) { return [...files.keys()].filter((k) => k.startsWith(prefix)); },
   };
   let clock = T0;
   const now = () => new Date(clock += 1000);
@@ -96,7 +97,8 @@ function world({ en, cig = {}, glossary = [], names = [], settings = {}, sources
   const db = {
     async getSettings() { return { enabled: true, upload_cap_usd: 20, monthly_cap_usd: 190, lore_model: null, rest_model: null }; },
     async listOpenJobs() { return []; },
-    async getLanguage(lang) { return { lang, cig_folder: lang, approved: true }; },
+    // The folder name inside the game is not the name of the published table (that is the language code).
+    async getLanguage(lang) { return { lang, cig_folder: 'german_(germany)', approved: true }; },
     async monthCommitted() { return ledger.reduce((a, r) => a + r.usd, 0); },
   };
   const sourceRows = new Map(sources.map((s) => [s.id, {
@@ -122,6 +124,9 @@ function world({ en, cig = {}, glossary = [], names = [], settings = {}, sources
   return { deps, files, io, learn, llm, rows, cardRows, ledger, passes, sourceRows, net, logs, enIndex, setClock: (t) => { clock = t; } };
 }
 
+/** One slice per tick, so that a test can count slices and stop between two of them. */
+const ONE = { fast: true, sliceBudgetMs: 0 };
+
 /** Ticks until no pass is open; returns how many ticks ran a slice. */
 async function drain(w, until = () => false, max = 2000) {
   let n = 0;
@@ -129,7 +134,7 @@ async function drain(w, until = () => false, max = 2000) {
     if (until()) return n;
     const open = await w.passes.listOpen();
     if (!open.length) return n;
-    const r = await tickAll(w.deps, { fast: true });
+    const r = await tickAll(w.deps, ONE);
     if (r.passes.some((p) => p.ran)) n++;
   }
   throw new Error(`passes stuck: ${JSON.stringify([...w.passes.rows.values()].map((p) => [p.kind, p.status, p.phase, p.pos, p.error]))}`);
@@ -270,7 +275,7 @@ describe('learning pass in slices', () => {
     let worst = 0;
     for (let i = 0; i < 500 && (await w.passes.listOpen()).length; i++) {
       w.io.tableReads = 0;
-      await tickAll(w.deps, { fast: true });
+      await tickAll(w.deps, ONE);
       worst = Math.max(worst, w.io.tableReads);
     }
     assert.equal(passOf(w, 'learn').status, 'done');
@@ -284,7 +289,7 @@ describe('learning pass in slices', () => {
     const w = world({ en: t.en, cig: t.cig });
     await saveTm(w.deps.store, 'de', t.tm);
     const first = await w.passes.open({ kind: 'learn', lang: 'de', reason: 'publish' });
-    await tickAll(w.deps, { fast: true });
+    await tickAll(w.deps, ONE);
     const again = await w.passes.open({ kind: 'learn', lang: 'de', reason: 'sync' });
     assert.equal(again.id, first.id);
     await drain(w);
@@ -307,7 +312,7 @@ describe('learning pass in slices', () => {
       if (k === 'translation-work/learn-de/state.json') throw new Error('killed');
       return real(k, v);
     };
-    await tickAll(w.deps, { fast: true });
+    await tickAll(w.deps, ONE);
     w.deps.store.putJson = real;
     const mid = passOf(w, 'learn');
     assert.equal(mid.state.intent.kind, 'haiku');
@@ -438,7 +443,7 @@ describe('seed import in slices', () => {
     // Run every apply slice twice: the second run starts from the row as it was before the first commit.
     for (let i = 0; i < 2000 && passOf(w, 'seed').status === 'open'; i++) {
       const before = structuredClone(passOf(w, 'seed'));
-      await tickAll(w.deps, { fast: true });
+      await tickAll(w.deps, ONE);
       if (before.phase === 'apply') {
         const steps = { seed: PASS_STEPS.seed };
         const ghost = { ...before, id: 'ghost' };
@@ -528,7 +533,41 @@ describe('pass driver', () => {
     }
     o = await advancePass(w.deps, p, die);
     p = await w.passes.get(p.id);
-    assert.deepEqual([o.ran, p.status, p.error], [false, 'failed', WORKER_LIMIT_KEY]);
+    // It gives up, and deletes its work files before it ends.
+    assert.deepEqual([o.ran, p.status, p.phase, p.error], [false, 'open', 'abort', WORKER_LIMIT_KEY]);
+    await w.deps.store.putJson(`translation-work/learn-de/p-${p.id}/mine-0.json`, {});
+    await advancePass(w.deps, p, die);
+    p = await w.passes.get(p.id);
+    assert.deepEqual([p.status, p.error], ['failed', WORKER_LIMIT_KEY]);
+    assert.deepEqual([...w.files.keys()].filter((k) => k.includes(`/p-${p.id}/`)), []);
+  });
+
+  it('a pass killed while it cleans up after giving up ends as failed', async () => {
+    const w = small();
+    let p = await w.passes.open({ kind: 'seed', lang: 'de', source_id: 'x', reason: 'seed' });
+    p = await w.passes.cas(p, { phase: 'abort', error: 'translate.internal', dead: MAX_DEAD_ATTEMPTS - 1, run_at: new Date(T0).toISOString() });
+    w.setClock(T0 + RUN_STALE_MS + 60_000);
+    await advancePass(w.deps, p, steps(async () => { throw new Error('unreachable'); }));
+    p = await w.passes.get(p.id);
+    assert.deepEqual([p.status, p.error], ['failed', 'translate.internal']);
+  });
+
+  it('a pass that was asked for again is followed by one with the state of that request, also when it failed', async () => {
+    const w = small();
+    const first = await w.passes.open({ kind: 'overlay', lang: 'de', reason: 'seed', state: { cig: 'de' } });
+    // The same asker asking twice (its slice was repeated) orders nothing more.
+    await w.passes.open({ kind: 'overlay', lang: 'de', reason: 'seed', token: 'seed:1', state: { cig: null } });
+    assert.equal((await w.passes.get(first.id)).again, true);
+    const fail = steps(async () => { throw new TranslateError('translate.no_live_build'); });
+    await advancePass(w.deps, await w.passes.get(first.id), fail);
+    await advancePass(w.deps, await w.passes.get(first.id), fail);
+    const all = [...w.passes.rows.values()];
+    assert.deepEqual(all.map((p) => [p.status, p.reason, p.state.cig]), [['failed', 'seed', 'de'], ['open', 'again', null]]);
+
+    const w2 = small();
+    const a = await w2.passes.open({ kind: 'learn', lang: 'de', reason: 'seed', token: 'seed:7' });
+    const b = await w2.passes.open({ kind: 'learn', lang: 'de', reason: 'seed', token: 'seed:7' });
+    assert.deepEqual([b.id, b.again], [a.id, false]);
   });
 
   it('a young stamp means another request is running: nothing is done', async () => {
@@ -547,13 +586,20 @@ describe('pass driver', () => {
     for (let i = 1; i <= MAX_PASS_ATTEMPTS; i++) {
       await advancePass(w.deps, p, boom);
       p = await w.passes.get(p.id);
-      assert.deepEqual([p.status, p.attempts, p.run_at], [i < MAX_PASS_ATTEMPTS ? 'open' : 'failed', i, null]);
+      assert.deepEqual([p.status, p.phase, p.run_at], ['open', i < MAX_PASS_ATTEMPTS ? 'start' : 'abort', null]);
+      if (i < MAX_PASS_ATTEMPTS) assert.equal(p.attempts, i);
     }
-    assert.equal(p.error, 'translate.internal');
+    await advancePass(w.deps, p, boom);
+    p = await w.passes.get(p.id);
+    assert.deepEqual([p.status, p.error], ['failed', 'translate.internal']);
     let q = await w.passes.open({ kind: 'overlay', lang: 'de', reason: 'seed' });
-    await advancePass(w.deps, q, steps(async () => { throw new TranslateError('translate.no_live_build'); }));
+    const verdict = steps(async () => { throw new TranslateError('translate.no_live_build'); });
+    await advancePass(w.deps, q, verdict);
     q = await w.passes.get(q.id);
-    assert.deepEqual([q.status, q.error, q.attempts], ['failed', 'translate.no_live_build', 1]);
+    assert.deepEqual([q.status, q.phase, q.error], ['open', 'abort', 'translate.no_live_build']);
+    await advancePass(w.deps, q, verdict);
+    q = await w.passes.get(q.id);
+    assert.deepEqual([q.status, q.error], ['failed', 'translate.no_live_build']);
   });
 
   it('one heavy step per tick, and none while another request holds the lock', async () => {
@@ -562,18 +608,29 @@ describe('pass driver', () => {
     await w.passes.open({ kind: 'learn', lang: 'de', reason: 'backfill' });
     await w.passes.open({ kind: 'overlay', lang: 'de', reason: 'seed' });
     let held = true;
-    let released = 0;
-    w.deps.lock = { claim: async () => !held, release: async () => { released++; } };
-    let r = await tickAll(w.deps, { fast: true });
-    assert.deepEqual([r.heavy, r.passes.length, released], [false, 0, 0]);
+    const released = [];
+    w.deps.lock = { claim: async () => (held ? null : 'mine'), release: async (token) => { released.push(token); } };
+    let r = await tickAll(w.deps, ONE);
+    assert.deepEqual([r.heavy, r.passes.length, released], [false, 0, []]);
     held = false;
-    r = await tickAll(w.deps, { fast: true });
-    assert.deepEqual([r.heavy, r.passes.map((p) => p.kind), released], [true, ['learn'], 1]);
+    r = await tickAll(w.deps, ONE);
+    assert.deepEqual([r.heavy, r.passes.map((p) => p.kind), released], [true, ['learn'], ['mine']]);
     const phases = [...w.passes.rows.values()].map((p) => p.phase);
-    assert.deepEqual(phases, ['mine', 'start'], 'the second pass waits for the next tick');
+    assert.deepEqual(phases, ['rows', 'start'], 'the second pass waits for the next tick');
     // A step that throws still gives the lock back.
     w.deps.passSteps = { ...PASS_STEPS, learn: async () => { throw new Error('boom'); } };
-    await tickAll(w.deps, { fast: true });
-    assert.equal(released, 2);
+    await tickAll(w.deps, ONE);
+    assert.deepEqual(released, ['mine', 'mine']);
+  });
+
+  it('a request goes on with slices of the same pass while it has time, and with no other pass', async () => {
+    const t = await learningTable();
+    const w = world({ en: t.en, cig: t.cig });
+    await w.passes.open({ kind: 'overlay', lang: 'de', reason: 'seed' });
+    await w.passes.open({ kind: 'learn', lang: 'de', reason: 'backfill' });
+    w.deps.perfNow = () => 0; // a clock that does not move: the budget is never used up
+    const r = await tickAll(w.deps, { fast: true });
+    assert.deepEqual(r.passes.map((p) => [p.kind, p.from, p.to]), [['overlay', 'start:0', 'done']]);
+    assert.equal(passOf(w, 'learn').phase, 'start');
   });
 });

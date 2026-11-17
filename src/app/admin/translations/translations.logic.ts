@@ -45,8 +45,54 @@ const KNOWN_JOB_ERRORS = new Set([
   'translate.no_base_build', 'translate.not_awaiting_approval', 'translate.not_cancellable',
   'translate.plan_missing', 'translate.results_missing', 'translate.r2_not_configured',
   'translate.internal', 'translate.worker_limit', 'translate.no_live_build', 'translate.source_not_permitted',
-  'translate.source_unknown',
+  'translate.source_unknown', 'translate.nothing_to_do', 'translate.phase_unknown', 'translate.job_cleanup_pending',
 ]);
+
+const HASH_DIGITS = 16;
+const share = (pos: unknown, total: unknown): number => {
+  const p = Number(pos);
+  const t = Number(total);
+  return t > 0 && p >= 0 ? Math.min(1, p / t) : 0;
+};
+
+/**
+ * How far a job is inside a step that takes many requests (0..99), or null where the step has no
+ * measure (a wait for a batch, a job that ended). Read from the position the orchestrator keeps in
+ * `stats`: an estimate and a publish walk the table in slices, and without a number they look stuck.
+ */
+export function jobProgress(status: string, stats: unknown): number | null {
+  const s = (stats ?? {}) as {
+    phase?: string; pos?: number; est?: { phase?: string; cursor?: number; total?: number } | null;
+    plan?: { parts?: number } | null; pub?: { total?: number } | null;
+  };
+  const span = (from: number, to: number, part: number) => Math.min(99, Math.round(from + (to - from) * part));
+  if (status === 'estimating') {
+    const e = s.est;
+    if (!e) return 0;
+    switch (e.phase) {
+      case 'adm': return span(0, 5, share(e.cursor, HASH_DIGITS));
+      case 'rows': return span(5, 35, share(e.cursor, e.total));
+      case 'diff': return span(35, 65, share(e.cursor, HASH_DIGITS));
+      case 'prep': return 65;
+      case 'chunk': return 70;
+      case 'shots': return span(78, 97, share(e.cursor, s.plan?.parts));
+      case 'clean':
+      case 'complete': return 98;
+      default: return null;
+    }
+  }
+  if (status === 'publishing') {
+    switch (s.phase) {
+      case 'route': return 5;
+      case 'tm': return span(10, 35, share(s.pos, HASH_DIGITS));
+      case 'rows': return span(35, 65, share(s.pos, s.pub?.total));
+      case 'join': return span(65, 95, share(s.pos, HASH_DIGITS));
+      case 'assemble': return 97;
+      default: return null;
+    }
+  }
+  return null;
+}
 
 /** i18n key for a job's / orchestrator's error code; unknown codes get a generic sentence, never raw text. */
 export function jobErrorKey(code: string | null | undefined): string | null {

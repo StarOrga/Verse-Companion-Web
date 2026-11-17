@@ -2,7 +2,7 @@
 // State-machine transitions against in-memory fakes (no network, no real SDK).
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { advance, approve, cancel, startFull, tick, dryRun } from './_machine.ts';
+import { advance, approve, cancel, isHeavy, startFull, tick, tickAll } from './_machine.ts';
 import { buildShards, indexKey, shardKey } from '../ingest-catalog/_locale-shards.ts';
 import { overlayKey, roomOverlayKey, tmIndexKey } from './_io.ts';
 import { sha256Hex } from './_diff.ts';
@@ -30,6 +30,8 @@ function world({ settings = {}, hasBase = true, llmMode = 'good', noKey = false,
   const db = {
     jobs, ledger, glossary,
     async listOpenJobs() { return [...jobs.values()].filter((j) => ['estimating', 'queued', 'submitted', 'validating', 'post_editing', 'publishing'].includes(j.status)).map((j) => ({ ...j })); },
+    async listSweepJobs() { return [...jobs.values()].filter((j) => j.stats?.sweep).map((j) => ({ ...j })); },
+    async findJob(build_id, lang, mode) { const j = [...jobs.values()].find((x) => x.build_id === build_id && x.lang === lang && x.mode === mode); return j ? { ...j } : null; },
     async getJob(id) { const j = jobs.get(id); return j ? { ...j } : null; },
     async cas(job, patch) {
       const cur = jobs.get(job.id);
@@ -44,19 +46,21 @@ function world({ settings = {}, hasBase = true, llmMode = 'good', noKey = false,
       return { ...row };
     },
     async getSettings() { return { enabled: true, upload_cap_usd: 20, monthly_cap_usd: 190, lore_model: null, rest_model: null, ...settings }; },
-    async getLanguage(lang) { return { lang, cig_folder: lang, approved: true }; },
+    // The folder name inside the game is not the name of the published table (that is the language code).
+    async getLanguage(lang) { return { lang, cig_folder: 'german_(germany)', approved: true }; },
     async listGlossary() { return glossary.map((g) => ({ ...g })); },
     async insertGlossary(_l, rows) { glossary.push(...rows.map((r, i) => ({ ...r, id: `g${glossary.length + i}` }))); },
     async resetRetranslate() {},
     async buildEstimateSum() { return 0; },
     async monthCommitted() { return ledger.reduce((a, r) => a + r.usd, 0); },
-    async addLedger(jobId, month, usd) { ledger.push({ jobId, month, usd }); },
+    async addLedger(jobId, month, usd, ref) { if (ref && ledger.some((r) => r.jobId === jobId && r.ref === ref)) return; ledger.push({ jobId, month, usd, ref }); },
     async hasNewerPublished() { return false; },
   };
   const store = {
     async getJson(k) { return files.has(k) ? structuredClone(files.get(k)) : null; },
     async putJson(k, v) { files.set(k, structuredClone(v)); },
     async deleteKey(k) { files.delete(k); },
+    async list(prefix) { return [...files.keys()].filter((k) => k.startsWith(prefix)); },
   };
   const batches = [];
   const llm = {
@@ -85,8 +89,19 @@ function world({ settings = {}, hasBase = true, llmMode = 'good', noKey = false,
       }
     },
   };
-  const deps = { db, store, llm: noKey ? null : llm, now: () => new Date(clock += 1000), log() {} };
+  // A clock that does not move for the slice budget: a tick takes every slice of the unit it works on.
+  const deps = { db, store, llm: noKey ? null : llm, now: () => new Date(clock += 1000), perfNow: () => 0, log() {} };
   return { deps, files, db, llm, jobs, ledger, newEn, NEW, OLD, hasBase };
+}
+
+/** One slice per tick, so that a test can stop between two of them. */
+const ONE = { sliceBudgetMs: 0 };
+async function until(w, done, opts = ONE, max = 400) {
+  for (let i = 0; i < max; i++) {
+    if (done()) return;
+    await tickAll(w.deps, opts);
+  }
+  throw new Error(`never got there: ${[...w.jobs.values()].map((j) => `${j.status}/${j.stats?.phase}/${j.stats?.est?.phase}`)}`);
 }
 
 async function newJob(w, over = {}) {
@@ -138,8 +153,30 @@ describe('delta lifecycle', () => {
     assert.ok(job.spent_usd > 0);
     assert.ok(job.estimate_usd > 0 && Number.isFinite(job.estimate_usd));
     assert.ok(job.stats.judge && job.stats.judge.mean === 9);
-    // Work files are cleaned up after publishing.
-    assert.ok(![...w.files.keys()].some((k) => k.startsWith('translation-work/')));
+    assert.equal(job.stats.qa.ok, 3);
+    assert.deepEqual(w.ledger.map((r) => r.ref).sort(), ['judge', 'main:0']);
+    // The work files of an ended job are deleted by the ticks that follow.
+    assert.equal(job.stats.sweep, true);
+    await until(w, () => !w.jobs.get(job.id).stats.sweep);
+    assert.deepEqual([...w.files.keys()].filter((k) => k.startsWith('translation-work/')), []);
+  });
+
+  it('CIG\'s own translation is read from the table under the language code and wins over the TM', async () => {
+    const w = world();
+    // Published by the uploader under `de`; the game folder (`cig_folder`) is another name.
+    putTable(w.files, NEW, 'de', { ui_a_1: 'Tür öffnen', ui_a_2: 'Close the door' });
+    await newJob(w);
+    await run(w, TERMINAL);
+    const job = [...w.jobs.values()][0];
+    assert.equal(job.status, 'published', job.error);
+    assert.equal(job.stats.counts.cig, 1);
+    // What is asked to be translated is the `{"g": …}` part of a request; CIG's line may be a reference pair above it.
+    const asked = w.llm.batches.flatMap((b) => b.requests).filter((r) => r.custom_id.startsWith('c'))
+      .map((r) => r.params.messages[0].content).map((m) => m.slice(m.indexOf('{"g"'))).join(' ');
+    assert.ok(asked.includes('Close the door') && !asked.includes('Open the door'), 'CIG translated it: it is not a string to translate');
+    const overlay = w.files.get(overlayKey('de', NEW));
+    // ui_a_2 is "translated" as its own English: not valid, so it is ours.
+    assert.deepEqual(Object.keys(overlay.entries).sort(), ['pu_m_1', 'ui_a_2']);
   });
 
   it('routes lore to opus and the rest to sonnet with the contract request shape', async () => {
@@ -234,16 +271,69 @@ describe('caps and approval', () => {
 
   it('full mode ALWAYS awaits approval, even far below every cap', async () => {
     const w = world({ settings: { upload_cap_usd: 1e9, monthly_cap_usd: 1e9 } });
-    const job = await startFull(w.deps, NEW, 'de');
-    assert.equal(job.mode, 'full');
+    const started = await startFull(w.deps, NEW, 'de');
+    // The op only starts the job: nothing of the table is read in that request.
+    assert.deepEqual([started.mode, started.status], ['full', 'estimating']);
+    await run(w, TERMINAL);
+    const job = w.jobs.get(started.id);
     assert.equal(job.status, 'awaiting_approval');
     assert.equal(job.stats.hold, 'full');
+    assert.ok(job.estimate_usd > 0 && job.string_count === 4);
     await tick(w.deps);
     assert.equal([...w.jobs.values()][0].status, 'awaiting_approval');
     assert.equal(w.llm.batches.length, 0);
     // Full includes the back catalogue (ui_old) in its gap.
-    const plan = w.files.get(`translation-work/${job.id}/plan.json`);
-    assert.ok(JSON.stringify(plan.chunks).includes('Unchanged text'));
+    const part = w.files.get(`translation-work/${job.id}/plan-0.json`);
+    assert.ok(JSON.stringify(part.chunks).includes('Unchanged text'));
+    // Asked again while it waits: the same job, untouched.
+    assert.equal((await startFull(w.deps, NEW, 'de')).status, 'awaiting_approval');
+  });
+
+  it('a full run is estimated while the pipeline is switched off, a delta is not', async () => {
+    const w = world({ settings: { enabled: false } });
+    const full = await startFull(w.deps, NEW, 'de');
+    const delta = await newJob(w, { lang: 'it' });
+    for (let i = 0; i < 5; i++) await tick(w.deps);
+    assert.equal(w.jobs.get(full.id).status, 'awaiting_approval');
+    assert.equal(w.jobs.get(delta.id).status, 'estimating');
+    assert.equal(w.jobs.get(delta.id).stats.est, undefined);
+  });
+
+  it('a full run that has ended is started again; not while its work files are still being deleted', async () => {
+    const w = world();
+    const first = await startFull(w.deps, NEW, 'de');
+    await run(w, TERMINAL);
+    await cancel(w.deps, first.id);
+    await assert.rejects(startFull(w.deps, NEW, 'de'), { key: 'translate.job_cleanup_pending' });
+    await until(w, () => !w.jobs.get(first.id).stats.sweep);
+    assert.deepEqual([...w.files.keys()].filter((k) => k.startsWith('translation-work/')), []);
+    const again = await startFull(w.deps, NEW, 'de');
+    assert.deepEqual([again.id, again.status, again.stats, again.estimate_usd], [first.id, 'estimating', { run: 1 }, null]);
+    await run(w, TERMINAL);
+    assert.equal(w.jobs.get(first.id).status, 'awaiting_approval');
+  });
+
+  it('a second run of a job books its own spend: its batches are not taken for repeats of the first', async () => {
+    const w = world();
+    const job = await startFull(w.deps, NEW, 'de');
+    await run(w, TERMINAL);
+    await approve(w.deps, job.id, 'admin');
+    await until(w, () => w.jobs.get(job.id).status === 'published' && !w.jobs.get(job.id).stats.sweep);
+    const firstRefs = w.ledger.map((r) => r.ref).sort();
+    const firstSpend = w.jobs.get(job.id).spent_usd;
+    assert.deepEqual(firstRefs, ['judge', 'main:0']);
+    assert.ok(firstSpend > 0);
+
+    // A string the first run could not know: the second run has something to pay for.
+    putTable(w.files, NEW, 'en', { ...w.newEn, ui_later: 'Added after the first run' });
+    await startFull(w.deps, NEW, 'de');
+    await run(w, TERMINAL);
+    await approve(w.deps, job.id, 'admin');
+    await until(w, () => w.jobs.get(job.id).status === 'published' && !w.jobs.get(job.id).stats.sweep);
+    const done = w.jobs.get(job.id);
+    assert.deepEqual(w.ledger.map((r) => r.ref).sort(), ['judge', 'judge#1', 'main:0', 'main:0#1']);
+    assert.ok(Math.abs(done.spent_usd - w.ledger.reduce((a, r) => a + r.usd, 0)) < 1e-6, 'the job row holds what the ledger holds');
+    assert.ok(done.spent_usd > firstSpend);
   });
 });
 
@@ -275,8 +365,7 @@ describe('one heavy job per tick', () => {
   it('a job ready to publish goes before an estimate, whatever the list order', async () => {
     const w = world();
     const pub = await newJob(w);
-    for (let i = 0; i < 20 && w.jobs.get(pub.id).status !== 'publishing'; i++) await tick(w.deps);
-    assert.equal(w.jobs.get(pub.id).status, 'publishing');
+    await until(w, () => w.jobs.get(pub.id).status === 'publishing');
     const est = await newJob(w, { lang: 'it' });
     // Same created_at in production means any order: put the estimate first.
     const row = w.jobs.get(pub.id);
@@ -296,43 +385,56 @@ describe('one heavy job per tick', () => {
 describe('idempotency', () => {
   it('a racing second advance with a stale row creates no second batch', async () => {
     const w = world();
-    await newJob(w);
+    const j = await newJob(w);
     await tick(w.deps); // estimating -> queued
     const [queued] = await w.db.listOpenJobs();
     assert.equal(queued.status, 'queued');
     await Promise.all([advance(w.deps, queued), advance(w.deps, queued)]);
+    // Claimed for submission; the batch is created by a slice. Two requests at that slice: one batch.
+    const claimed = await w.db.getJob(j.id);
+    assert.deepEqual([claimed.status, claimed.stats.phase, isHeavy(claimed)], ['submitted', 'submitting', true]);
+    await Promise.all([advance(w.deps, claimed), advance(w.deps, { ...claimed })]);
     const main = w.llm.batches.filter((b) => b.requests.some((r) => !r.custom_id.startsWith('j')));
     assert.equal(main.length, 1);
+    await run(w, TERMINAL);
+    assert.equal(w.llm.batches.filter((b) => b.requests.some((r) => r.custom_id.startsWith('c'))).length, 1);
   });
 
-  it('resumes a crash between claim and batch creation after the stale window', async () => {
+  it('a job claimed for submission without an intent goes on at once (nobody is creating its batch)', async () => {
     const w = world();
     const j = await newJob(w);
     await tick(w.deps); // queued
     const queued = await w.db.getJob(j.id);
-    // simulate crash: claimed (submitted/submitting) but no batch created
+    // The request that claimed it was killed before it wrote an intent.
     await w.db.cas(queued, { status: 'submitted', stats: { ...queued.stats, phase: 'submitting' } });
     await tick(w.deps);
-    assert.equal(w.llm.batches.length, 0); // not stale yet
-    for (let i = 0; i < 1000 && w.llm.batches.length === 0; i++) w.deps.now(); // advance the fake clock
-    w.deps.now = (() => { const base = Date.now() + 3_600_000; return () => new Date(base); })();
-    // updated_at strings in the fake are not dates; make it parseable
-    const cur = w.jobs.get(j.id);
-    cur.updated_at = new Date(0).toISOString();
-    await tick(w.deps);
     assert.equal(w.llm.batches.length, 1);
+    assert.equal(w.jobs.get(j.id).stats.resubmits, undefined);
+  });
+
+  it('a young intent of another request is left alone, and the job does not hold the slot meanwhile', async () => {
+    const w = world();
+    const j = await newJob(w);
+    await tick(w.deps); // queued
+    const queued = await w.db.getJob(j.id);
+    const at = new Date(w.deps.now().getTime() + 60_000).toISOString();
+    await w.db.cas(queued, { status: 'submitted', stats: { ...queued.stats, phase: 'submitting', submit: { kind: 'main', g: 0, at } } });
+    const other = await newJob(w, { lang: 'it' });
+    const out = await tick(w.deps);
+    assert.equal(w.llm.batches.length, 0);
+    assert.deepEqual(out.map((o) => o.id), [other.id]);
   });
 
   // Brings a job to `validating` with its main batch ended and the judge batch not created yet
   // (the run that should have created it was killed), stale enough for a resume.
   async function staleJudgeSubmission(w, failure = new Error('connection lost')) {
     const j = await newJob(w);
-    for (let i = 0; i < 10 && w.jobs.get(j.id).status !== 'validating'; i++) await tick(w.deps);
-    assert.equal(w.jobs.get(j.id).status, 'validating');
+    await until(w, () => w.jobs.get(j.id).stats?.phase === 'running');
     const create = w.llm.createBatch;
     w.llm.createBatch = async () => { throw failure; };
-    await tick(w.deps); // results collected, judge claim written, create dies
+    await tick(w.deps); // results collected, judge sample taken, intent written, create dies
     w.llm.createBatch = create;
+    assert.equal(w.jobs.get(j.id).status, 'validating');
     const cur = w.jobs.get(j.id);
     assert.equal(cur.stats.phase, 'judge_submitting');
     cur.updated_at = new Date(0).toISOString();
@@ -367,18 +469,6 @@ describe('idempotency', () => {
     await Promise.all([advance(w.deps, snap), advance(w.deps, { ...snap })]);
     assert.equal(w.llm.batches.length, 1);
     assert.equal(w.jobs.get(j.id).stats.phase, 'running');
-  });
-
-  it('a judge submission whose phase write was lost (legacy `running`) still finishes', async () => {
-    const w = world();
-    const j = await newJob(w);
-    for (let i = 0; i < 10 && w.jobs.get(j.id).stats?.phase !== 'judge'; i++) await tick(w.deps);
-    const cur = w.jobs.get(j.id);
-    assert.equal(cur.status, 'validating');
-    cur.stats = { ...cur.stats, phase: 'running' };
-    await run(w, TERMINAL);
-    assert.equal(w.jobs.get(j.id).status, 'published', w.jobs.get(j.id).error);
-    assert.equal(judgeBatches(w).length, 1);
   });
 
   it('a run killed after its create is resumed once and counted as a possible duplicate', async () => {
@@ -417,12 +507,33 @@ describe('idempotency', () => {
     assert.equal(w.jobs.get(id).stats.submit, undefined);
   });
 
-  it('dry-run estimate writes nothing', async () => {
-    const w = world();
-    const before = w.files.size;
-    const e = await dryRun(w.deps, NEW, 'de', 'delta', OLD);
-    assert.ok(e.string_count > 0 && e.estimate_usd > 0);
-    assert.equal(w.files.size, before);
-    assert.equal(w.llm.batches.length, 0);
+  it('a slice that is repeated after a kill books its spend once and leaves the same results', async () => {
+    const w = world({ llmMode: 'badfirst' });
+    const j = await newJob(w);
+    // Every slice twice: the second run starts from the row as it was before the first one committed.
+    for (let i = 0; i < 600 && !['published', 'failed'].includes(w.jobs.get(j.id).status); i++) {
+      const before = structuredClone(w.jobs.get(j.id));
+      await tickAll(w.deps, ONE);
+      const after = structuredClone(w.jobs.get(j.id));
+      if (!isHeavy(before) || before.status === 'estimating') continue;
+      // Put the row back, run the slice again, and it must end where the first run ended.
+      const files = structuredClone([...w.files]);
+      const batches = w.llm.batches.length;
+      w.jobs.set(j.id, structuredClone(before));
+      await advance(w.deps, structuredClone(before));
+      const again = w.jobs.get(j.id);
+      if (w.llm.batches.length > batches) {
+        // The one thing that cannot be repeated for free: a create (its intent was not there yet).
+        w.llm.batches.length = batches;
+      }
+      assert.deepEqual([again.status, again.stats.phase, again.stats.pos, again.spent_usd], [after.status, after.stats.phase, after.stats.pos, after.spent_usd], `${before.status}/${before.stats.phase}`);
+      w.jobs.set(j.id, after);
+      for (const [k, v] of files) if (k.startsWith('translation-work/')) w.files.set(k, v);
+    }
+    const job = w.jobs.get(j.id);
+    assert.equal(job.status, 'published', job.error);
+    assert.deepEqual(w.ledger.map((r) => r.ref).sort(), ['judge', 'main:0', 'postedit:0']);
+    const overlay = w.files.get(overlayKey('de', NEW));
+    assert.deepEqual(Object.keys(overlay.entries).sort(), ['pu_m_1', 'ui_a_1', 'ui_a_2']);
   });
 });

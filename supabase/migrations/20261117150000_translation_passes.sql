@@ -4,11 +4,12 @@
 -- edge request and died at the CPU limit every time: the learning pass (never finished once in production), the
 -- community-source import (`sync_sources` answered 546 every night, no source was ever imported) and the overlay
 -- rebuild after an import. They now run as passes: one bounded slice per request, progress in this table, so a
--- killed request loses one slice and the next tick goes on where it stopped.
+-- killed request loses one slice and the next tick goes on where it stopped. Jobs (translation_jobs) run every step
+-- in slices as well; their position is in `stats`, and they share the lock, the ledger key and the fast lane below.
 --
 --   translation_passes            one row per pass (learn | seed | overlay), compare-and-set on updated_at
 --   translation_ledger.ref        idempotency key of a ledger row (a retried slice books its spend once)
---   release_run(name)             gives a claim_run() claim back early (the heavy-work lock of the orchestrator)
+--   lock_claim / lock_release     the heavy-work lock of the orchestrator: a claim that expires, given back by its owner only
 --   translation_work_pending()    true while a job or pass has a slice to run (gate of the fast-lane cron)
 --   cron translate-orchestrator-fast            every 10 s, but only while work is pending
 --   cron translate-orchestrator-housekeeping    daily: old run details of the fast lane, finished passes > 30 d
@@ -20,7 +21,7 @@
 --   select cron.unschedule('translate-orchestrator-fast');
 --   select cron.unschedule('translate-orchestrator-housekeeping');
 --   drop function public.translation_work_pending();
---   drop function public.release_run(text);
+--   drop function public.lock_release(text, timestamptz); drop function public.lock_claim(text, interval);
 --   drop index public.translation_ledger_ref_uniq; alter table public.translation_ledger drop column ref;
 --   drop table public.translation_passes;
 
@@ -43,8 +44,11 @@ create table if not exists public.translation_passes (
   run_at     timestamptz,
   dead       integer not null default 0 check (dead >= 0),
   attempts   integer not null default 0 check (attempts >= 0),
-  -- asked for again while it was running: one more pass follows this one
+  -- asked for again while it was running: one more pass follows this one, starting with next_state
   again      boolean not null default false,
+  next_state jsonb,
+  -- who asked: the same asker asking twice (a slice repeated after a kill) does not order a second pass
+  token      text,
   error      text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -78,25 +82,62 @@ create unique index if not exists translation_ledger_ref_uniq
   on public.translation_ledger (coalesce(job_id::text, ''), ref)
   where ref is not null;
 
--- claim_run() claims expire by time only. The orchestrator uses one as a lock around heavy work and gives it back as
--- soon as the slice is done; a killed request still frees it through the interval.
-create or replace function public.release_run(p_name text)
-returns void
+-- The heavy-work lock of the orchestrator (same table as claim_run). A claim expires after p_ttl, so a request the
+-- runtime killed frees it; a request that ends gives it back at once. The claim's timestamp is the owner's token:
+-- lock_release only frees the claim it was given, never the one a later request took after an expiry.
+create or replace function public.lock_claim(p_name text, p_ttl interval)
+returns timestamptz
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_at timestamptz;
+begin
+  if p_name is null or length(p_name) = 0 or length(p_name) > 200 then
+    raise exception 'lock_claim: bad name' using errcode = '22023';
+  end if;
+  if p_ttl is null or p_ttl <= interval '0' then
+    raise exception 'lock_claim: bad ttl' using errcode = '22023';
+  end if;
+
+  insert into public.guard_runs as g (mode, last_run_at)
+  values (p_name, clock_timestamp())
+  on conflict (mode) do update
+    set last_run_at = excluded.last_run_at
+    where g.last_run_at <= excluded.last_run_at - p_ttl
+  returning g.last_run_at into v_at;
+
+  return v_at;
+end;
+$$;
+
+create or replace function public.lock_release(p_name text, p_token timestamptz)
+returns boolean
 language sql
 security definer
 set search_path = ''
 as $$
-  update public.guard_runs set last_run_at = 'epoch'::timestamptz where mode = p_name;
+  with freed as (
+    update public.guard_runs set last_run_at = 'epoch'::timestamptz
+    where mode = p_name and last_run_at = p_token
+    returning 1
+  )
+  select exists (select 1 from freed);
 $$;
 
-comment on function public.release_run(text) is
-  'Gives a claim_run() claim back early so the next caller can claim at once. service_role only.';
+comment on function public.lock_claim(text, interval) is
+  'Claims a named lock that expires after p_ttl; returns the claim timestamp (the owner token) or null when it is held. service_role only.';
+comment on function public.lock_release(text, timestamptz) is
+  'Gives a lock_claim() claim back; only the claim with this token is freed. service_role only.';
 
-revoke all on function public.release_run(text) from public, anon, authenticated;
-grant execute on function public.release_run(text) to service_role;
+revoke all on function public.lock_claim(text, interval) from public, anon, authenticated;
+revoke all on function public.lock_release(text, timestamptz) from public, anon, authenticated;
+grant execute on function public.lock_claim(text, interval) to service_role;
+grant execute on function public.lock_release(text, timestamptz) to service_role;
 
 -- True while something has a slice to run right now. Jobs that only wait for a batch are not pending: the 10-minute
--- tick polls those. `stats.heavy` is set by the orchestrator on every phase whose next step is a slice.
+-- tick asks those. Nothing is stored for this: status and phase of a job tell it.
 create or replace function public.translation_work_pending()
 returns boolean
 language sql
@@ -106,10 +147,21 @@ set search_path = ''
 as $$
   select exists (
       select 1 from public.translation_jobs j
+      -- The same rule as isHeavy() in translate-orchestrator/_machine.ts: status and phase say whether the
+      -- next step is a slice of work or a wait for a batch. Keep the two in step.
       where j.status = 'publishing'
+         -- an estimate costs nothing; a full run is the admin's own order and is estimated even while paused
          or (j.status = 'estimating'
+             and (j.mode = 'full'
+                  or coalesce((select s.enabled from public.translation_settings s where s.id = 1), false)))
+         -- queued -> submitted is one status change; the fast lane takes it so that an approved job starts at once
+         or (j.status = 'queued'
              and coalesce((select s.enabled from public.translation_settings s where s.id = 1), false))
-         or (j.status in ('submitted', 'validating', 'post_editing') and j.stats ->> 'heavy' = 'true')
+         or (j.status = 'submitted' and j.stats ->> 'phase' = 'submitting')
+         or (j.status = 'validating' and coalesce(j.stats ->> 'phase', 'results') <> 'judge')
+         or (j.status = 'post_editing' and coalesce(j.stats ->> 'phase', 'submitting') <> 'running')
+         -- an ended job whose work files are still to be deleted
+         or j.stats ->> 'sweep' = 'true'
     )
     or exists (select 1 from public.translation_passes p where p.status = 'open');
 $$;
@@ -130,9 +182,9 @@ begin
   end if;
 end $$;
 
--- Fast lane: a sliced step needs many requests (an estimate ~25, a publish ~25, a pass 20-60). On the 10-minute tick
--- alone that is hours per language. This job asks every 10 seconds but posts only while work is pending, and the
--- function runs one slice per request behind a lock, so overlapping posts do nothing.
+-- Fast lane: a sliced step needs many requests (a pass ~40, a delta job ~95, the whole gap of a language ~390). On
+-- the 10-minute tick alone that is hours to days per language. This job asks every 10 seconds but posts only while
+-- work is pending, and the function runs slices of one unit per request behind a lock, so overlapping posts do nothing.
 select cron.schedule(
   'translate-orchestrator-fast',
   '10 seconds',
@@ -141,7 +193,7 @@ select cron.schedule(
     url := 'https://hcnqhvzlavdycidqyaai.supabase.co/functions/v1/translate-orchestrator',
     headers := '{"Content-Type":"application/json","apikey":"sb_publishable_ZWbS9qWheOQB0s77mlWLvw_wEcmTVDQ"}'::jsonb,
     body := '{"op":"tick","fast":true}'::jsonb,
-    timeout_milliseconds := 120000
+    timeout_milliseconds := 60000
   )
   where public.translation_work_pending();
   $job$

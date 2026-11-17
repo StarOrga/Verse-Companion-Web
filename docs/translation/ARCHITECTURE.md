@@ -21,8 +21,10 @@ Decided in the concept `docs/concepts/2026-10-29-ki-spieluebersetzung.html`
   (`base_build_id`, read from its R2 locale shards), minus what the TM already holds
   and minus valid CIG translations. The untranslated back catalogue is never picked up
   by a delta. With no previous build to compare against, the job is `skipped`. A
-  `mode = 'full'` job (the whole gap) exists only through the admin op `start_full`
-  and always parks as `awaiting_approval` with its estimate, whatever the caps say.
+  `mode = 'full'` job (the whole gap) exists only through the admin op `start_full`.
+  It estimates itself (free, also while the pipeline is switched off) and then always
+  parks as `awaiting_approval` with its estimate, whatever the caps say; the admin UI
+  states the cost when it is approved.
 - **Budget.** `upload_cap_usd` (default **20**) per upload, summed over all its
   languages; `monthly_cap_usd` (default **190**, the Max-20x monthly API credit minus a
   reserve) as a hard ledger per calendar month. An estimate above either cap parks the
@@ -99,6 +101,9 @@ community entries also carry `src` (source id) and `lic` (licence).
   with `use_cig_table = false` (ru) no key is skipped as CIG-valid. The op only starts a background pass
   (`translation_passes`, kind `seed`); the work runs in slices on later ticks, because the whole table, the
   whole pack and the whole TM do not fit one edge request (OPERATIONS.md § Background passes).
+- **CIG's own translation of a language** is the table published under the language code
+  (`codex-locale/<build>/<lang>/`), not under `cig_folder` (the folder name inside the game, which only the
+  uploader and the overlay's `game_folder` use). `cigTableFor` is the one place that names it.
 - **Sync = "both"** (decision d-sync): AI deltas keep running right after each upload as before; a daily
   pg_cron call `op: sync_sources` compares each usable source's upstream marker (GitHub commit of the
   file / latest release tag + asset time / zip ETag) with `last_seen_commit` and starts an import pass for
@@ -147,9 +152,9 @@ them**. MIT sources (it, pt-BR, ja) keep the copyright and licence notice in `so
 |---|---|
 | `translation_settings` (singleton, `id = 1`) | `enabled bool default false`, `upload_cap_usd numeric default 20`, `monthly_cap_usd numeric default 190`, `lore_model text`, `rest_model text`, `updated_at`, `updated_by` |
 | `translation_languages` | `lang text pk` (short code as in `localization.py`), `cig_folder text`, `approved bool default false`, `approved_at`, `approved_by` |
-| `translation_jobs` | `id uuid pk`, `build_id uuid → codex_builds`, `lang`, `mode text default 'delta'` (`delta · full`), `base_build_id uuid → codex_builds` (previous build of the channel, null for full), `status` (`estimating · awaiting_approval · queued · submitted · validating · post_editing · publishing · published · failed · cancelled · skipped`), `string_count int`, `estimate_usd numeric`, `spent_usd numeric default 0`, `batch_ids jsonb default '[]'`, `stats jsonb` (qa counts, judge score), `error text`, `created_at`, `updated_at`, `approved_by` |
-| `translation_ledger` | `id`, `job_id → translation_jobs` (null for learning rows), `kind` (`job`, `learn`, `arbiter`, `align`, `haiku`, `web`), `lang` (job-less rows), `month date` (first of month, UTC), `usd numeric`, `ref text` (idempotency key: a batch id, unique per job / per job-less row), `created_at` — sum per month = spend, all kinds |
-| `translation_passes` | background passes that run in slices: `id uuid pk`, `kind` (`learn · seed · overlay`), `lang`, `source_id → translation_sources` (seed), `build_id` (pinned at the start), `reason`, `status` (`open · done · failed`), `phase`, `pos`, `total`, `state jsonb`, `run_at` / `dead` / `attempts` (dead-run and error bookkeeping), `again bool`, `error`, `created_at`, `updated_at`; one open pass per kind, language and source (OPERATIONS.md § Background passes) |
+| `translation_jobs` | `id uuid pk`, `build_id uuid → codex_builds`, `lang`, `mode text default 'delta'` (`delta · full`), `base_build_id uuid → codex_builds` (previous build of the channel, null for full), `status` (`estimating · awaiting_approval · queued · submitted · validating · post_editing · publishing · published · failed · cancelled · skipped`), `string_count int`, `estimate_usd numeric`, `spent_usd numeric default 0`, `batch_ids jsonb default '[]'`, `stats jsonb` (qa counts, judge score, and the position of the step that is under way: `est`, `phase`, `pos`, `plan`, `pub`, `run_at` / `dead`, `submit`, `sweep`, `run`), `error text`, `created_at`, `updated_at`, `approved_by` |
+| `translation_ledger` | `id`, `job_id → translation_jobs` (null for learning rows), `kind` (`job`, `learn`, `arbiter`, `align`, `haiku`, `web`), `lang` (job-less rows), `month date` (first of month, UTC), `usd numeric`, `ref text` (idempotency key, unique per job / per job-less row: `main:<group>`, `judge`, `postedit:<group>` for a job, a batch id for learning), `created_at` — sum per month = spend, all kinds |
+| `translation_passes` | background passes that run in slices: `id uuid pk`, `kind` (`learn · seed · overlay`), `lang`, `source_id → translation_sources` (seed), `build_id` (pinned at the start), `reason`, `status` (`open · done · failed`), `phase`, `pos`, `total`, `state jsonb`, `run_at` / `dead` / `attempts` (dead-run and error bookkeeping), `again bool` + `next_state jsonb` (asked for again while running), `token text` (who asked), `error`, `created_at`, `updated_at`; one open pass per kind, language and source (OPERATIONS.md § Background passes) |
 | `translation_glossary` | `id uuid pk`, `lang`, `source_term text`, `target_term text`, `category` (`term · label · unit · dnt`), `origin` (`cig · ai · admin`), `locked bool default false`, `needs_retranslate bool default false`, `updated_by`, `updated_at`; `unique (lang, lower(source_term))` |
 | `translation_glossary_history` | `id`, `glossary_id`, `before jsonb`, `after jsonb`, `actor uuid`, `at` — written by trigger |
 | `translation_sources` | community packs: licence, status, resolver, `last_seen_commit`, `coverage` (see § Community seed) |
@@ -166,7 +171,9 @@ service role for the edge functions. Nothing public.
 
 | Key | Content |
 |---|---|
-| `translation-tm/<lang>/index.json` + shards | translation memory: `{ "<sha256(en)>": { "t": "…", "o": "ai\|cig\|admin\|community", "m": "<model>", "at": "<iso>", "src": "<source id>", "lic": "<licence>" } }` (`src`/`lic` only for community entries), sharded by the first two hex chars of the hash |
+| `translation-tm/<lang>/index.json` + shards | translation memory: `{ "<sha256(en)>": { "t": "…", "o": "ai\|cig\|admin\|community", "m": "<model>", "at": "<iso>", "src": "<source id>", "lic": "<licence>" } }` (`src`/`lic` only for community entries), sharded by the first two hex chars of the hash; the index carries the entry count per shard and a revision (`rev`, +1 per write). `translation-tm/<lang>/admin.json` holds the admin entries alone (the override alerts need only them) |
+| `translation-work/<job id>/` | what a job leaves between its slices: `plan.json` + `plan-<n>.json` (the requests, 15 per part), `e/` (estimate), `r/` (results per batch group), `p/` (publish); deleted when the job has ended |
+| `translation-work/learn-<lang>/p-<pass id>/`, `…/seed-<pass id>/`, `…/ovl-<pass id>/` | work files of a background pass; deleted when it ends |
 | `translation-overlay/<lang>/<build_id>.json` | delivery overlay for one build: `{ "v": 1, "lang", "build_id", "generated_at", "count", "entries": { "<key>": { "h": "<sha256(en)>", "t": "…" } }, "sources": [{ "id", "name", "url", "license", "attribution" }], "attribution": "<one line>", "game_folder": "<Data/Localization folder or null>", "use_cig_table": true }` — community + AI + admin entries only, CIG keys excluded. The last four fields are the additive v1 extension (older clients ignore them); `ru` ships in `korean_(south_korea)` with `use_cig_table: false`. |
 | `translation-overlay/<lang>/latest.json` | same shape, newest published build of that language |
 
@@ -179,7 +186,7 @@ as a public Worker path.
 | Function | Contract |
 |---|---|
 | `ingest-catalog` (changed) | keeps **all** languages in staging and the R2 locale publish (drop the de/en-only filter); after a **verified** publish, if `translation_settings.enabled`, inserts one `translation_jobs` row per approved language with status `estimating` (idempotent per `(build_id, lang)`), then fire-and-forget calls `translate-orchestrator` `{op:"tick"}` |
-| `translate-orchestrator` (new, service role / admin JWT) | `op: "tick"` (also run by pg_cron every 10 min): advances every open job one step — `estimating` (diff vs TM, dedupe, chunk, cost estimate with measured ratios: input ≈ 0.90 tok/char incl. keys, German output ≈ 1.74× English tokens, Opus +30 % thinking) → `queued` or `awaiting_approval` → `submitted` (create batch) → `validating` (stream results, QA) → `post_editing` (one retry batch for failures) → `publishing` (TM + overlay to R2, ledger row) → `published`. Resumable at every step, idempotent (compare-and-set on `status`). `op: "approve" \| "cancel"` `{job_id}` (admin). `op: "estimate"` `{build_id, lang, mode}` dry run (admin). `op: "start_full"` `{build_id, lang}` (admin) creates a `full` job that always waits in `awaiting_approval`. |
+| `translate-orchestrator` (new, service role / admin JWT) | `op: "tick"` (pg_cron every 10 min; every 10 s as `{fast: true}` while work is pending): asks every job that waits for a batch, then runs slices of ONE job or background pass behind a lock — `estimating` (diff vs TM, dedupe, chunk, cost estimate with measured ratios: input ≈ 0.90 tok/char incl. keys, German output ≈ 1.74× English tokens, Opus +30 % thinking) → `queued` or `awaiting_approval` → `submitted` (one batch per group of ≤ 30 requests) → `validating` (results, QA, 5 % judge) → `post_editing` (one retry batch per group for failures) → `publishing` (TM, then the overlay of the build from the whole TM) → `published`. Every step is a walk in slices whose size does not depend on the size of the job (OPERATIONS.md § A job runs in slices); resumable and repeatable at every slice (compare-and-set on `status` + `updated_at`, ledger refs, batch intents). `op: "approve" \| "cancel"` `{job_id}` (admin). `op: "start_full"` `{build_id, lang}` (admin) creates (or restarts) the `full` job of a build and language; it estimates itself and then waits in `awaiting_approval`. |
 | `translate-orchestrator` community ops (admin JWT / service role) | `op: "import_seed"` `{source_id}` (refuses `translate.source_not_permitted`) → `{source_id, lang, queued, pass_id}` (the counts land in `translation_sources.coverage` when the pass is done); `op: "sync_sources"` (daily cron with the publishable key, or admin) → `{checked, changed, errors}` (`changed` = import passes started); `op: "learn"` `{lang}` → `{lang, queued, pass_id}`; `op: "draft_outreach"` `{source_id}` → the `translation_outreach` draft row |
 | `translation-overlay` (new, signed-in user) | `GET ?lang=de[&build_id=…]` → the overlay JSON (`latest` without `build_id`); 401 without a user JWT; 404 when the language has no published overlay |
 
@@ -214,8 +221,9 @@ learning step and the arbiter) with
 
 - **Overview:** the enabled switch (off by default, explains "applies from the next
   upload"), both caps, month spend vs cap, languages with approve/revoke, jobs list
-  (build, language, status, strings, estimate, spent, QA/judge stats) with approve /
-  cancel for `awaiting_approval`.
+  (build, language, status with a percentage while it estimates or publishes, strings,
+  estimate, spent, QA/judge stats) with approve / cancel for `awaiting_approval`. A full
+  run is ordered per language (free: it estimates itself); approving one asks with its cost.
 - **Glossary editor:** search over source and target, filter by language, origin
   (CIG · KI · Admin) and category (term · label · unit · dnt), edit and lock an entry
   (admin entry wins), mark for retranslation (next job re-translates the strings that

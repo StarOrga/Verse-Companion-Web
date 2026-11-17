@@ -4195,9 +4195,12 @@
         "revokeText": "Neue Uploads werden nicht mehr nach {{lang}} übersetzt. Bestehende Übersetzungen bleiben."
       },
       "fullRun": {
-        "title": "Voll-Lauf für {{lang}} starten?",
-        "text": "Kostet ca. {{usd}} $ ({{count}} Texte) — alle bisherigen Texte werden komplett übersetzt. Der Auftrag wartet danach noch auf deine Freigabe.",
-        "confirm": "Voll-Lauf anlegen"
+        "title": "Voll-Lauf für {{lang}} freigeben?",
+        "text": "Kostet ca. {{usd}} $ ({{count}} Texte) — alle bisher unübersetzten Texte werden übersetzt. Für einen Voll-Lauf gilt die Kostenobergrenze pro Upload nicht.",
+        "confirm": "Kostenpflichtig freigeben",
+        "startTitle": "Voll-Lauf für {{lang}} anlegen?",
+        "startText": "Der Auftrag wird zuerst geschätzt. Das kostet nichts und dauert einige Minuten. Danach wartet er mit Kosten und Textzahl in der Auftragsliste auf deine Freigabe.",
+        "startConfirm": "Anlegen und schätzen"
       },
       "jobs": {
         "title": "Aufträge",
@@ -4207,6 +4210,7 @@
         "cancel": "Abbrechen",
         "cancelTitle": "Auftrag für {{lang}} abbrechen?",
         "cancelText": "Der Auftrag wird beendet; bereits angefallene Kosten bleiben.",
+        "progress": "{{pct}} %",
         "cols": {
           "build": "Build",
           "lang": "Sprache",
@@ -4254,7 +4258,10 @@
         "worker_limit": "Der Auftrag hat das CPU- oder Speicherlimit des Workers mehrfach hintereinander überschritten und wurde gestoppt.",
         "no_live_build": "Es gibt keinen aktuellen LIVE-Build.",
         "source_not_permitted": "Für diese Quelle ist die Lizenz nicht geklärt.",
-        "source_unknown": "Die Quelle gibt es nicht (mehr)."
+        "source_unknown": "Die Quelle gibt es nicht (mehr).",
+        "nothing_to_do": "Es gab nichts zu übersetzen.",
+        "phase_unknown": "Der Auftrag steht in einem unbekannten Schritt.",
+        "job_cleanup_pending": "Der vorige Auftrag wird noch aufgeräumt. Bitte in einer Minute erneut versuchen."
       },
       "glossary": {
         "title": "Glossar",

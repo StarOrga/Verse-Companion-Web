@@ -6,7 +6,7 @@
 import { usageCostUsd } from './_cost.ts';
 import type { Store } from './_io.ts';
 import type { LearnDb, LearnSettings } from './_learn_db.ts';
-import type { BatchResult, Deps } from './_machine.ts';
+import type { BatchResult, Deps } from './_job.ts';
 import type { BatchParams } from './_prompt.ts';
 
 export const learnKey = (lang: string, name: string) => `translation-work/learn-${lang}/${name}.json`;

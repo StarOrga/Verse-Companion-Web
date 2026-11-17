@@ -2,7 +2,7 @@
 // the state machine sees just the `Llm` interface, tests never import this file.
 
 import Anthropic from 'npm:@anthropic-ai/sdk';
-import type { BatchResult, Llm } from './_machine.ts';
+import type { BatchResult, Llm } from './_job.ts';
 import { recordAiCalls, type AiCallRow } from '../_shared/ai-ledger.ts';
 import { usageCostUsd } from './_cost.ts';
 

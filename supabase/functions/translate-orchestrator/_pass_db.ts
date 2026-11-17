@@ -22,6 +22,7 @@ export function makePassDb(sb: Client, now: () => Date): PassDb {
   const insert = (req: PassRequest) =>
     sb.from(T).insert({
       kind: req.kind, lang: req.lang, source_id: req.source_id ?? null, reason: req.reason, state: req.state ?? {},
+      token: req.token ?? null,
     }).select('*').maybeSingle();
   return {
     async listOpen() {
@@ -49,9 +50,17 @@ export function makePassDb(sb: Client, now: () => Date): PassDb {
         // 23505 on translation_passes_one_open: one is running. It is told to run once more; `updated_at`
         // stays as it is, so the slice in flight keeps its compare-and-set.
         if (ins.error && ins.error.code !== '23505') fail(ins.error);
-        let q = sb.from(T).update({ again: true }).eq('kind', req.kind).eq('lang', req.lang).eq('status', 'open');
-        q = req.source_id ? q.eq('source_id', req.source_id) : q.is('source_id', null);
-        const { data, error } = await q.select('*').maybeSingle();
+        const open = (q: Client) => {
+          const o = q.eq('kind', req.kind).eq('lang', req.lang).eq('status', 'open');
+          return req.source_id ? o.eq('source_id', req.source_id) : o.is('source_id', null);
+        };
+        if (req.token) {
+          // The asker asks a second time (its slice was killed after the first): the pass it opened stands.
+          const mine = await open(sb.from(T).select('*')).eq('token', req.token).maybeSingle();
+          if (mine.error) fail(mine.error);
+          if (mine.data) return mine.data as Pass;
+        }
+        const { data, error } = await open(sb.from(T).update({ again: true, next_state: req.state ?? {} })).select('*').maybeSingle();
         if (error) fail(error);
         if (data) return data as Pass;
         // It ended between the two statements: insert again.

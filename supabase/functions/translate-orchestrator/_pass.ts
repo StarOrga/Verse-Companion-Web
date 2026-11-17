@@ -10,7 +10,8 @@
 // _learn_pass.ts, _seed_pass.ts and _overlay.ts. Pure of Deno and of Postgres: the table comes in as PassDb.
 
 import { MAX_DEAD_ATTEMPTS, runVerdict, WORKER_LIMIT_KEY } from './_attempts.ts';
-import type { Deps } from './_machine.ts';
+import { sweepPrefix } from './_io.ts';
+import type { Deps } from './_job.ts';
 import { TranslateError } from './_errors.ts';
 
 export type PassKind = 'learn' | 'seed' | 'overlay';
@@ -32,6 +33,10 @@ export interface Pass {
   dead: number;
   attempts: number;
   again: boolean;
+  /** The state the pass that follows (`again`) starts with: what the newest request asked for. */
+  next_state: Record<string, unknown> | null;
+  /** Who asked (see PassRequest.token). */
+  token: string | null;
   error: string | null;
   created_at: string;
   updated_at: string;
@@ -45,6 +50,17 @@ export interface PassRequest {
   source_id?: string | null;
   reason: string;
   state?: Record<string, unknown>;
+  /**
+   * Names the asker. A request that is repeated with the token of the open pass (a slice that was
+   * killed after it asked) changes nothing, instead of ordering one more pass.
+   */
+  token?: string | null;
+}
+
+/** Where a pass keeps its work files; everything under it goes when the pass ends, either way. */
+export function passPrefix(pass: Pick<Pass, 'id' | 'kind' | 'lang'>): string {
+  if (pass.kind === 'learn') return `translation-work/learn-${pass.lang}/p-${pass.id}/`;
+  return pass.kind === 'seed' ? `translation-work/seed-${pass.id}/` : `translation-work/ovl-${pass.id}/`;
 }
 
 export interface PassDb {
@@ -55,7 +71,8 @@ export interface PassDb {
   cas(pass: Pass, patch: PassPatch): Promise<Pass | null>;
   /**
    * Opens a pass. When one of this kind, language and source is already open, that one is flagged `again`
-   * (one more pass follows it) and returned: a request is never lost and never runs twice at once.
+   * (one more pass follows it, with the state of this request) and returned: a request is never lost and
+   * never runs twice at once.
    */
   open(req: PassRequest): Promise<Pass>;
 }
@@ -86,6 +103,17 @@ export interface PassOutcome {
 
 const label = (p: Pass) => (p.status === 'open' ? `${p.phase}:${p.pos}` : p.status);
 
+/** The phase of a pass that gave up: it deletes its work files, then ends as `failed` with the error it kept. */
+export const ABORT_PHASE = 'abort';
+/** Work files deleted per slice of an aborting pass. */
+const ABORT_KEYS = 150;
+
+/** A pass that was asked for again while it ran is followed by one more, whether it ended well or not. */
+async function follow(passes: PassDb, ended: Pass | null): Promise<void> {
+  if (!ended || ended.status === 'open' || !ended.again) return;
+  await passes.open({ kind: ended.kind, lang: ended.lang, source_id: ended.source_id, reason: 'again', state: ended.next_state ?? {} });
+}
+
 /**
  * One slice of one pass. A stamp left by a request that never ended means the runtime killed it; after
  * MAX_DEAD_ATTEMPTS in a row without progress the pass is failed instead of dying the same way forever.
@@ -100,9 +128,14 @@ export async function advancePass(deps: Deps, pass: Pass, steps: Record<PassKind
 
   const v = runVerdict({ run_at: pass.run_at ?? undefined, dead: pass.dead }, deps.now().getTime());
   if (v.kind === 'busy') return out(null, false);
+  const aborting = pass.phase === ABORT_PHASE;
   if (v.kind === 'fail') {
     deps.log('translate pass killed repeatedly', { pass: pass.id, kind: pass.kind, phase: pass.phase, dead: v.dead });
-    const failed = await passes.cas(pass, { status: 'failed', error: WORKER_LIMIT_KEY, run_at: null, dead: v.dead });
+    // Killed while it was cleaning up: nothing more to try. Otherwise it gives up and cleans up first.
+    const failed = await passes.cas(pass, aborting
+      ? { status: 'failed', error: pass.error ?? WORKER_LIMIT_KEY, run_at: null, dead: v.dead }
+      : { phase: ABORT_PHASE, pos: 0, error: WORKER_LIMIT_KEY, run_at: null, dead: 0, attempts: 0 });
+    await follow(passes, failed);
     return out(failed, false);
   }
   const stamped = await passes.cas(pass, { run_at: deps.now().toISOString(), dead: v.dead });
@@ -110,7 +143,12 @@ export async function advancePass(deps: Deps, pass: Pass, steps: Record<PassKind
 
   let after: Pass | null = null;
   try {
-    after = await steps[pass.kind](d, stamped);
+    if (aborting) {
+      const swept = await sweepPrefix(deps.store, passPrefix(stamped), ABORT_KEYS);
+      after = await passes.cas(stamped, swept
+        ? { status: 'failed', run_at: null, dead: 0, attempts: 0 }
+        : { pos: stamped.pos + 1, run_at: null, dead: 0, attempts: 0 });
+    } else after = await steps[pass.kind](d, stamped);
   } catch (e) {
     const fresh = (await passes.get(pass.id)) ?? stamped;
     if (fresh.status !== 'open') return out(fresh, true);
@@ -120,17 +158,18 @@ export async function advancePass(deps: Deps, pass: Pass, steps: Record<PassKind
     deps.log('translate pass step error', { pass: pass.id, kind: pass.kind, phase: fresh.phase, error });
     // A translated key is a verdict (source not permitted, no build …): repeating the step cannot change it.
     const giveUp = !!key || attempts >= MAX_PASS_ATTEMPTS;
-    after = await passes.cas(fresh, giveUp
-      ? { status: 'failed', error: key ?? 'translate.internal', run_at: null, attempts }
-      : { run_at: null, attempts, error });
+    if (!giveUp) after = await passes.cas(fresh, { run_at: null, attempts, error: aborting ? fresh.error : error });
+    // The work files of a pass that gives up are deleted before it ends (the abort phase); a pass that
+    // cannot even do that ends as it is.
+    else if (aborting) after = await passes.cas(fresh, { status: 'failed', run_at: null, attempts });
+    else after = await passes.cas(fresh, { phase: ABORT_PHASE, pos: 0, error: key ?? 'translate.internal', run_at: null, dead: 0, attempts: 0 });
+    await follow(passes, after);
     return out(after ?? fresh, true);
   }
   // A step that returned without a commit (lost a race, nothing to do yet): give the stamp back.
   const cur = after ?? (await passes.get(pass.id));
   if (cur && cur.status === 'open' && cur.run_at) await passes.cas(cur, { run_at: null });
-  if (cur && cur.status === 'done' && cur.again) {
-    await passes.open({ kind: cur.kind, lang: cur.lang, source_id: cur.source_id, reason: 'again' });
-  }
+  await follow(passes, cur);
   return out(cur, true);
 }
 
@@ -160,13 +199,16 @@ export function memPasses(now: () => Date = () => new Date()): PassDb & { rows: 
     async open(req) {
       const have = [...rows.values()].find((p) => same(p, req));
       if (have) {
+        if (req.token && have.token === req.token) return structuredClone(have);
         have.again = true;
+        have.next_state = structuredClone(req.state ?? {});
         return structuredClone(have);
       }
       const row: Pass = {
         id: `pass${rows.size + 1}`, kind: req.kind, lang: req.lang, source_id: req.source_id ?? null, build_id: null,
         reason: req.reason, status: 'open', phase: 'start', pos: 0, total: 0, state: structuredClone(req.state ?? {}),
-        run_at: null, dead: 0, attempts: 0, again: false, error: null, created_at: now().toISOString(), updated_at: `p${++seq}`,
+        run_at: null, dead: 0, attempts: 0, again: false, next_state: null, token: req.token ?? null, error: null,
+        created_at: now().toISOString(), updated_at: `p${++seq}`,
       };
       rows.set(row.id, row);
       return structuredClone(row);

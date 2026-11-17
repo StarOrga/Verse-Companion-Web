@@ -32,7 +32,7 @@ import {
   submitLearnBatch,
 } from './_learn_batch.ts';
 import type { LearnBatch, LearnDeps } from './_learn_batch.ts';
-import type { BatchResult, Deps } from './_machine.ts';
+import type { BatchResult, Deps } from './_job.ts';
 import { tokensOf } from './_mask.ts';
 import { glossaryBlock, LANG_NAMES, OUTPUT_SCHEMA } from './_prompt.ts';
 import type { BatchParams, GlossaryRow } from './_prompt.ts';
@@ -506,9 +506,14 @@ export function mergeExamples(parts: [number, Example[]][][], per = 2): Map<numb
 export const judgeKey = (lang: string) => learnKey(lang, 'judge-terms');
 
 /** Appends the judge's term corrections; they vote in the next mining pass (origin 'judge'). */
-export async function addJudgeCandidates(store: Store, lang: string, terms: JudgeTerm[]): Promise<void> {
-  const cur = ((await store.getJson(judgeKey(lang))) ?? []) as JudgeTerm[];
-  await store.putJson(judgeKey(lang), [...cur, ...terms].slice(-2000));
+/**
+ * Adds the judge's term corrections of one job. `ref` names the job: what it added before is replaced,
+ * so a slice that is repeated after a kill does not vote twice.
+ */
+export async function addJudgeCandidates(store: Store, lang: string, terms: JudgeTerm[], ref?: string): Promise<void> {
+  const cur = ((await store.getJson(judgeKey(lang))) ?? []) as (JudgeTerm & { ref?: string })[];
+  const kept = ref ? cur.filter((t) => t.ref !== ref) : cur;
+  await store.putJson(judgeKey(lang), [...kept, ...terms.map((t) => (ref ? { ...t, ref } : t))].slice(-2000));
 }
 
 // ── state ────────────────────────────────────────────────────────────────────

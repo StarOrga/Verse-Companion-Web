@@ -18,7 +18,7 @@ import {
   TranslationSettings,
   TranslationsService,
 } from './translations.service';
-import { canApprove, canCancel, jobErrorKey, judgeScore, spendPercent } from './translations.logic';
+import { canApprove, canCancel, jobErrorKey, jobProgress, judgeScore, spendPercent } from './translations.logic';
 
 type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary';
 
@@ -173,6 +173,9 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
                       <span class="pill" [class.ok]="j.status === 'published'" [class.bad]="j.status === 'failed'">
                         {{ 'admin.translations.jobs.status.' + j.status | translate }}
                       </span>
+                      @if (progress(j); as p) {
+                        <div class="progress-line">{{ 'admin.translations.jobs.progress' | translate: { pct: p.pct } }}</div>
+                      }
                       @if (errorKey(j); as ek) {
                         <div class="err-line">{{ ek | translate }}</div>
                       }
@@ -252,6 +255,7 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
       .jobs .num { text-align: end; font-variant-numeric: tabular-nums; }
       .jobs .actions { display: flex; gap: var(--sc-space-2); }
       .err-line { color: var(--sc-danger); font-size: 0.78rem; white-space: normal; max-width: 28ch; }
+      .progress-line { color: var(--sc-fg-2); font-size: 0.78rem; font-variant-numeric: tabular-nums; }
     `,
   ],
 })
@@ -277,6 +281,11 @@ export class AdminTranslationsComponent implements OnInit {
   readonly canApprove = canApprove;
   readonly canCancel = canCancel;
   readonly errorKey = (j: TranslationJob) => jobErrorKey(j.error);
+  /** Wrapped in an object so that 0 % still renders. */
+  readonly progress = (j: TranslationJob) => {
+    const pct = jobProgress(j.status, j.stats);
+    return pct === null ? null : { pct };
+  };
   readonly score = (j: TranslationJob) => {
     const s = judgeScore(j.stats);
     return s === null ? null : s.toFixed(2);
@@ -368,7 +377,18 @@ export class AdminTranslationsComponent implements OnInit {
     });
   }
 
+  /** A full run is the one job that spends without a cap: its approval states the cost first. */
   async approve(j: TranslationJob): Promise<void> {
+    if (j.mode === 'full') {
+      const ok = await this.confirmSvc.confirm({
+        titleKey: 'admin.translations.fullRun.title',
+        messageKey: 'admin.translations.fullRun.text',
+        params: { lang: j.lang, usd: (j.estimate_usd ?? 0).toFixed(2), count: j.string_count ?? 0 },
+        confirmKey: 'admin.translations.fullRun.confirm',
+        tone: 'danger',
+      });
+      if (!ok) return;
+    }
     await this.run('approve', () => this.svc.approve(j.id), () => this.reloadJobs());
   }
 
@@ -383,31 +403,22 @@ export class AdminTranslationsComponent implements OnInit {
     await this.run('cancel', () => this.svc.cancel(j.id), () => this.reloadJobs());
   }
 
-  /** Full run for the current build: dry-run estimate → danger confirm → start (still needs approval). */
+  /**
+   * Full run for the current build. Ordering it costs nothing: the job estimates itself in the
+   * background (the whole gap of a language is too large for one request) and then waits in the list
+   * with its cost; the money question is asked when it is approved.
+   */
   async startFull(l: TranslationLanguage): Promise<void> {
     const build = this.builds()[0];
     if (!build) {
       this.flash.set({ kind: 'error', key: 'admin.translations.jobs.noBuild' });
       return;
     }
-    this.busy.set(true);
-    this.flash.set(null);
-    let estimate;
-    try {
-      estimate = await this.svc.estimateFull(build.id, l.lang);
-    } catch (e) {
-      const code = (e as { code?: string })?.code;
-      this.flash.set({ kind: 'error', key: (code ? jobErrorKey(code) : null) ?? toErrorKey('admin-translations', 'estimate', e) });
-      return;
-    } finally {
-      this.busy.set(false);
-    }
     const ok = await this.confirmSvc.confirm({
-      titleKey: 'admin.translations.fullRun.title',
-      messageKey: 'admin.translations.fullRun.text',
-      params: { lang: l.lang, usd: estimate.estimate_usd.toFixed(2), count: estimate.string_count },
-      confirmKey: 'admin.translations.fullRun.confirm',
-      tone: 'danger',
+      titleKey: 'admin.translations.fullRun.startTitle',
+      messageKey: 'admin.translations.fullRun.startText',
+      params: { lang: l.lang },
+      confirmKey: 'admin.translations.fullRun.startConfirm',
     });
     if (!ok) return;
     await this.run('start-full', () => this.svc.startFull(build.id, l.lang), () => this.reloadJobs());

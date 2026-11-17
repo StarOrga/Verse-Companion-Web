@@ -4,7 +4,7 @@
 
 import { TranslateError } from './_errors.ts';
 import type { SourceMetaRow } from './_io.ts';
-import type { Deps } from './_machine.ts';
+import type { Deps } from './_job.ts';
 import { upstreamToken } from './_pack.ts';
 import type { FetchFn, PackSource } from './_pack.ts';
 import { buildOutreachDraft } from './_outreach.ts';
@@ -51,6 +51,23 @@ function fail(e: { message?: string } | null): never {
 
 export const isUsable = (s: Pick<SourceRow, 'status' | 'enabled'>) =>
   s.enabled && (s.status === 'licensed' || s.status === 'permitted');
+
+/**
+ * The published table that holds CIG's own translation into a language, or null when there is none to respect.
+ *
+ * It is the table under the language's short code: the uploader publishes every `global.ini` of the game
+ * under the code of `localization.py` (`de`, `ja`, …). `translation_languages.cig_folder` is the folder
+ * name inside the game (`german_(germany)`), which only the app needs. Until 0.274.0 the pipeline read
+ * the table `<cig_folder>`, found nothing, and so never respected a single line of CIG's own translation
+ * (German: 22 993 keys) - every one of them was a candidate for the AI and for a community pack.
+ *
+ * null: a usable source of the language says the folder it installs into holds another language
+ * (`use_cig_table = false`, ru in the korean slot).
+ */
+export async function cigTableFor(deps: Pick<Deps, 'sources'>, lang: string): Promise<string | null> {
+  const rows = deps.sources ? await deps.sources.list(lang) : [];
+  return rows.some((r) => isUsable(r) && r.use_cig_table === false) ? null : lang;
+}
 
 export async function loadSource(sb: Client, id: string): Promise<SourceRow> {
   const { data, error } = await sb.from('translation_sources').select('*').eq('id', id).maybeSingle();

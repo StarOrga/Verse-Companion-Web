@@ -6,6 +6,7 @@
 // (migration 20261108180000). `monthCommitted` sums every row, so the monthly cap sees all kinds;
 // the web-research cap sums kind='web' of the month.
 
+import { selectAll } from './_page.ts';
 import type { GlossaryRow } from './_prompt.ts';
 import type { LearnedStyle } from './_style.ts';
 
@@ -120,9 +121,13 @@ export function makeLearnDb(sb: Client, now: () => Date = () => new Date()): Lea
     async codexNames(buildId) {
       const out = new Set<string>();
       for (const [table, col] of [['codex_manufacturers', 'name_localized'], ['codex_ships', 'name_localized'], ['codex_locations', 'name']]) {
-        const { data, error } = await sb.from(table).select(col).eq('build_id', buildId).limit(10000);
-        if (error) continue; // a missing table degrades to fewer names
-        for (const r of (data ?? []) as Record<string, string | null>[]) {
+        let data: Record<string, string | null>[];
+        try {
+          data = await selectAll((from, to) => sb.from(table).select(col).eq('build_id', buildId).order(col).range(from, to));
+        } catch {
+          continue; // a missing table degrades to fewer names
+        }
+        for (const r of data) {
           const n = (r[col] ?? '').trim();
           if (n) out.add(n);
         }
@@ -140,9 +145,8 @@ export function makeLearnDb(sb: Client, now: () => Date = () => new Date()): Lea
       if (error) fail(error);
     },
     async listGlossary(lang) {
-      const { data, error } = await sb.from('translation_glossary').select('*').eq('lang', lang).limit(20000);
-      if (error) fail(error);
-      return (data ?? []) as LearnGlossaryRow[];
+      return await selectAll<LearnGlossaryRow>((from, to) =>
+        sb.from('translation_glossary').select('*').eq('lang', lang).order('id').range(from, to));
     },
     async insertGlossary(lang, rows) {
       const shape = (r: LearnGlossaryRow) => ({
@@ -216,14 +220,15 @@ export function makeLearnDb(sb: Client, now: () => Date = () => new Date()): Lea
       if (error && !(ref && error.code === '23505')) fail(error);
     },
     async monthKindSpent(month, kind) {
-      const { data, error } = await sb.from('translation_ledger').select('usd').eq('month', month).eq('kind', kind);
-      if (error) fail(error);
-      return ((data ?? []) as { usd: number }[]).reduce((a, r) => a + Number(r.usd), 0);
+      // The caps are read from these sums: a list cut at the API's row cap would let the pipeline overspend.
+      const rows = await selectAll<{ usd: number }>((from, to) =>
+        sb.from('translation_ledger').select('usd').eq('month', month).eq('kind', kind).order('id').range(from, to));
+      return rows.reduce((a, r) => a + Number(r.usd), 0);
     },
     async monthSpent(month) {
-      const { data, error } = await sb.from('translation_ledger').select('usd').eq('month', month);
-      if (error) fail(error);
-      return ((data ?? []) as { usd: number }[]).reduce((a, r) => a + Number(r.usd), 0);
+      const rows = await selectAll<{ usd: number }>((from, to) =>
+        sb.from('translation_ledger').select('usd').eq('month', month).order('id').range(from, to));
+      return rows.reduce((a, r) => a + Number(r.usd), 0);
     },
     async listApprovedLangs() {
       const { data, error } = await sb.from('translation_languages').select('lang').eq('approved', true);
