@@ -47,6 +47,14 @@ class FakeSupplies {
   /** The compare-and-set fails (offline). */
   casFails = false;
   casCalls = 0;
+  /** What a pull brings in from the server (another tab's edits). */
+  onSync: (() => void) | null = null;
+  readonly syncError = signal<string | null>(null);
+  syncs = 0;
+  async sync(): Promise<void> {
+    this.syncs++;
+    this.onSync?.();
+  }
   private n = 0;
   addLine(name: string, qty: number, meta: { entityKind?: string; className?: string; forClassName?: string | null; packageId?: string | null; source?: string } = {}) {
     const pkg = meta.packageId ?? null;
@@ -486,6 +494,54 @@ describe('NachschubService: wishes assigned to an Operation', () => {
     await svc.reconcile();
     expect(alloc().assigned).toBe(0);
     expect(svc.linesOf(pkgNamed('Old')?.id ?? '').length).toBe(0);
+  });
+
+  it('round 2 #1: with two tabs the trim pulls the lines first, so a line another tab met is never cut; a failed sync trims nothing', async () => {
+    wishFor('medpen', 5);
+    await svc.assignWish(medpen, 2, 'new', { name: 'L' });
+    await svc.assignWish(medpen, 3, 'new', { name: 'M' });
+    const lLine = svc.linesOf(pkgNamed('L')?.id ?? '')[0].id;
+    const mLine = svc.linesOf(pkgNamed('M')?.id ?? '')[0].id;
+    // Tab A ticked L: on the server L is met and the wish is down to 3. This tab still holds L as an open wish line.
+    await wish.setQty({ kind: 'item', className: 'medpen' }, 3);
+    supplies.syncError.set('errors.offline');
+    await svc.reconcile();
+    expect([supplies.line(lLine)?.qty, supplies.line(mLine)?.qty]).toEqual([2, 3]);
+
+    supplies.syncError.set(null);
+    supplies.onSync = () => {
+      supplies.server.set(lLine, 'wish_met');
+      supplies.rows.update((rs) => rs.map((r) => (r.id === lLine ? { ...r, done: true, source: 'wish_met' } : r)));
+    };
+    await svc.reconcile();
+    expect(supplies.line(mLine)?.qty).toBe(3);
+    expect(supplies.line(lLine)).toEqual(expect.objectContaining({ deletedAt: null, source: 'wish_met' }));
+    expect(wish.qty('medpen')).toBe(3);
+  });
+
+  it('round 2 #2: a live purchase closes the line, then the Operation is deleted - the wish drops exactly once', async () => {
+    wishFor('medpen', 5);
+    await svc.assignWish(medpen, 2, 'new', { name: 'Op' });
+    const id = pkgNamed('Op')?.id ?? '';
+    const line = svc.linesOf(id)[0].id;
+    supplies.setDone(line, true); // what tickByClassName does for a whole live purchase - no stock change, no reconcile
+    const r = await svc.remove(id, true);
+    expect(r.ok).toBe(true);
+    expect(wish.qty('medpen')).toBe(3);
+    TestBed.tick();
+    await svc.reconcile();
+    expect(wish.qty('medpen')).toBe(3);
+  });
+
+  it('round 2 #2: a wish line that becomes done lowers its wish without any reconcile pass', async () => {
+    wishFor('medpen', 5);
+    wishFor('rattler', 1);
+    await svc.assignWish(medpen, 2, 'new', { name: 'Op' });
+    supplies.setDone(svc.linesOf(pkgNamed('Op')?.id ?? '')[0].id, true);
+    TestBed.tick();
+    for (let i = 0; i < 5; i++) await Promise.resolve();
+    await new Promise((res) => setTimeout(res, 0));
+    expect(wish.qty('medpen')).toBe(3);
   });
 
   describe('A11 legacy lines (H3)', () => {

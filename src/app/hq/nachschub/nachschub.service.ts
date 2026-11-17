@@ -147,6 +147,12 @@ export class NachschubService {
       const ids = this.loaded() ? new Set(this.packages().map((p) => p.id)) : null;
       untracked(() => this.einsatzSvc.setKnownPackages(ids));
     });
+    // A wish line that became done (a whole live purchase, a tick by hand, another tab) lowers its wish at once - a
+    // live purchase changes no stock, so no reconcile pass would follow it.
+    effect(() => {
+      const pending = this.loaded() && this.supplies.items().some((l) => (l.source === 'wish' && l.done) || (l.source === 'wish_met' && !l.done));
+      if (pending) untracked(() => void this.fulfilWishLines().catch((err: unknown) => logWarn('nachschub', 'wish fulfilment failed', err)));
+    });
   }
 
   private readonly searchWish = inject(SearchWishlistService);
@@ -653,6 +659,7 @@ export class NachschubService {
 
   /** "Nachschub leeren": open lines leave (back to the wishlist when asked), closed ones stay as history. */
   async empty(id: string, backToWishlist: boolean): Promise<NachschubResult> {
+    await this.fulfilWishLines(); // a met wish line lowers its wish before anything is removed
     const plan = this.planClear(id, backToWishlist);
     if (!plan) return fail('errors.generic');
     const put = await this.shiftWishes(plan.shifts);
@@ -678,6 +685,7 @@ export class NachschubService {
    */
   async remove(id: string, backToWishlist: boolean): Promise<NachschubResult> {
     const uid = this.auth.user()?.id;
+    await this.fulfilWishLines(); // a met wish line lowers its wish before the Nachschub and its lines go
     const plan = this.planClear(id, backToWishlist);
     if (!uid || !plan) return fail('errors.generic');
     const n = plan.n;
@@ -994,6 +1002,7 @@ export class NachschubService {
 
   private async releaseLine(lineId: string, opts: { alsoRemoveWish?: boolean; dissolve?: boolean; surface?: PathGroupSurface }, autoDissolve: boolean): Promise<NachschubResult> {
     const uid = this.auth.user()?.id;
+    await this.fulfilWishLines(); // a met line of the same Nachschub lowers its wish before a dissolve can take it
     const info = this.releaseInfo(lineId);
     const l = this.supplies.items().find((x) => x.id === lineId);
     if (!uid || !info || !l) return fail('errors.generic');
@@ -1073,7 +1082,16 @@ export class NachschubService {
    * it fails). A `wish_met` line that is open again (undo, unticked) gives the pieces back the same way. The line
    * stays in its Operation, ticked as reached. Arrivals in between never touch the wish: the line answers them.
    */
-  private async fulfilWishLines(): Promise<void> {
+  private fulfilWishLines(): Promise<void> {
+    // One pass at a time: a trigger while one runs queues behind it (the next pass sees the new state).
+    const run = this.fulfilChain.then(() => this.fulfilOnce());
+    this.fulfilChain = run.catch(() => undefined);
+    return run;
+  }
+
+  private fulfilChain: Promise<void> = Promise.resolve();
+
+  private async fulfilOnce(): Promise<void> {
     if (!this.storesReady()) return;
     const met = new Map<string, SupplyItem[]>();
     const reopened = new Map<string, SupplyItem[]>();
@@ -1112,6 +1130,13 @@ export class NachschubService {
   private async trimOverAssigned(fresh: boolean, onlyKey?: string): Promise<void> {
     if (!this.storesReady()) return;
     if (fresh) {
+      // Lines AND wishlist as the server has them now: a tab that has not pulled another tab's tick (line met, wish
+      // lowered) would otherwise cut a line that is still wanted. Offline, a failed sync or no sync: trim nothing.
+      const s = this.supplies as Partial<HqSuppliesService>;
+      if (!s.sync || (typeof navigator !== 'undefined' && navigator.onLine === false)) return;
+      await s.sync.call(this.supplies);
+      if (s.syncError?.()) return;
+      await this.fulfilWishLines(); // a line the pull just brought in ticked lowers its wish before it is compared
       const reload = (this.wish as Partial<WishlistStore>).reload;
       if (!reload || !(await reload.call(this.wish))) return;
     }
