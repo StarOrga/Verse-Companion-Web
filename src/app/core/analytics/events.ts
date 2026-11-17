@@ -93,7 +93,7 @@ export const EVENTS = {
 
   // --- search ------------------------------------------------------------
   'search:palette_open': ev<{ surface: 'palette' | 'codex_bar' }>('search', 'Die Suche wurde geöffnet (Palette oder Codex-Leiste).'),
-  'search:result_open': ev<{ area: string; rank: number; new_tab: boolean; current: boolean; variant: boolean }>('search', 'Ein Suchtreffer wurde geöffnet (Bereich, Rang in der Liste; nie der Suchtext). current: die ausgegraute Zeile „Du bist hier“ (schließt nur die Suche); variant: ein Varianten-Minilink einer Schiffszeile.'),
+  'search:result_open': ev<{ area: string; rank: number; new_tab: boolean; current: boolean; variant: boolean }>('search', 'Ein Suchtreffer wurde geöffnet (Bereich, Rang in der Liste; nie der Suchtext). current: die ausgegraute Zeile „Du bist hier“ (schließt nur die Suche); variant: ein Minilink einer Schiffszeile (ein anderes Modell der Familie wie Valiant/Pirate oder eine eigene Variante „Meine …“); area ist dann ship.'),
   'search:miss_show': ev<{ area: string; term: string }>('search', 'Eine Suche blieb ohne Treffer: Bereich und Suchtext (getrimmt, klein, max. 80 Zeichen; einmal je Begriff und Sitzung) — die einzige Stelle, an der ein Suchtext gesendet wird.'),
 
   // --- settings ----------------------------------------------------------

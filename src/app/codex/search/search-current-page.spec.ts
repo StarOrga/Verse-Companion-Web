@@ -16,7 +16,8 @@ import {
   suggestionOptions,
 } from './codex-search-model';
 import { composeSearchResult, isNearExactRow } from './search-compose';
-import { searchOwn } from './search-own';
+import { OwnMatch, searchOwn } from './search-own';
+import { familyFromRows, foldShipFamilies } from './search-families';
 import type { SearchResultRow } from './search-result-model';
 
 const AEGIS = { key: 'manufacturer_aegs', de: 'Aegis Dynamics', en: 'Aegis Dynamics' };
@@ -248,5 +249,95 @@ describe('one own row per ship (d-variant)', () => {
     const row = r.groups.find((g) => g.id === 'own')!.rows[0];
     expect(row.current).toBe(true);
     expect(row.type === 'own' && row.variants!.filter((v) => v.current).map((v) => v.id)).toEqual(['c3']);
+  });
+});
+
+describe('one row per ship family (foldShipFamilies + compose)', () => {
+  const DUNLEVY = ship('AEGS_Gladius_Dunlevy', 'Aegis Gladius Dunlevy');
+  const family = [GLADIUS, DUNLEVY, PIRATE, VALIANT];
+  const familyOf = (c: string) => familyFromRows(family, c);
+  const ownRow = {
+    type: 'own', id: 'own-ship-h1', ownKind: 'ship', title: 'Aegis Gladius', ownName: 'Nachtfalke', subtitle: null,
+    classNameSlug: 'AEGS_Gladius', qty: null, target: { link: ['/codex/ship', 'AEGS_Gladius'], queryParams: { v: 'c1' } },
+  } as OwnMatch;
+  const ownV = { id: 'c1', label: 'Meine Jagd', target: { link: ['/codex/ship', 'AEGS_Gladius'], queryParams: { v: 'c1' } }, active: true };
+  function compose(term: string, hits: PolySearchHit[], url: string, ctxUrl = url) {
+    const fold = foldShipFamilies([group('ship', hits, 9, true), group('item', [LIVERY])], familyOf);
+    const links = (c: string) => {
+      const k = fold.baseOf.get(c.toLowerCase()) ?? c.toLowerCase();
+      return [...(fold.links.get(k) ?? []), ...(k === 'aegs_gladius' ? [ownV] : [])];
+    };
+    return composeSearchResult({
+      term, groups: fold.groups, context: searchContextOf(ctxUrl), chips: [], signedIn: true,
+      own: { rows: [ownRow], total: 1 }, here: pageLocationOf(url), ownVariants: links,
+      shipBaseOf: (c) => fold.baseOf.get(c.toLowerCase()) ?? c.toLowerCase(),
+    });
+  }
+  const shipRows = (r: ReturnType<typeof compose>) => r.groups.flatMap((g) => g.rows).filter((x) => x.type === 'hit' && x.hit.kind === 'ship');
+
+  it('Gladius, Dunlevy, Pirate, Valiant and the own Gladius are ONE row to Standard; the livery stays an item row', () => {
+    const r = compose('gladius', family, '/codex/index');
+    const rows = shipRows(r);
+    expect(rows.length).toBe(1);
+    expect(rows[0].target.link).toEqual(['/codex', 'ship', 'AEGS_Gladius']);
+    expect(rows[0].type === 'hit' && rows[0].variants!.map((v) => v.label)).toEqual(['Dunlevy', 'Pirate', 'Valiant', 'Meine Jagd']);
+    expect(r.groups.find((g) => g.id === 'own')).toBeUndefined(); // the own row folded in
+    expect(r.groups.find((g) => g.id === 'ship')!.total).toBe(9); // counters keep the index sums
+    expect(r.groups.find((g) => g.id === 'item')!.rows.length).toBe(1);
+  });
+
+  it('"valiant": the family row (Standard drawn from the family), the Valiant link first and emphasised', () => {
+    const r = compose('valiant', [VALIANT], '/codex/index');
+    const row = shipRows(r)[0];
+    expect(row.type === 'hit' && row.hit.nameLocalized).toBe('Aegis Gladius');
+    expect(row.type === 'hit' && row.variants![0]).toEqual(expect.objectContaining({ id: 'ed-AEGS_Gladius_Valiant', matched: true, emphasis: true }));
+  });
+
+  it('the own group standing first (HQ): the family row takes the own row\'s place', () => {
+    const r = compose('gladius', family, '/hq', '/hq');
+    expect(r.groups[0].id).toBe('own');
+    expect(r.groups[0].rows.map((x) => x.id)).toEqual(['hit-ship-AEGS_Gladius']);
+    expect(r.groups.find((g) => g.id === 'ship')).toBeUndefined();
+  });
+
+  it('Standard page: weak "gla" keeps the row greyed because other models match; own variant page marks the own link', () => {
+    const weak = compose('gla', family, '/codex/ship/AEGS_Gladius');
+    expect(shipRows(weak)[0].current).toBe(true);
+    const onV = compose('gladius', family, '/codex/ship/AEGS_Gladius?v=c1');
+    const row = shipRows(onV)[0];
+    expect(row.current).toBe(true);
+    expect(row.type === 'hit' && row.variants!.filter((v) => v.current).map((v) => v.id)).toEqual(['c1']);
+  });
+
+  it('Valiant page: a normal row, only the Valiant link marked', () => {
+    const row = shipRows(compose('gladius valiant', [VALIANT], '/codex/ship/AEGS_Gladius_Valiant'))[0];
+    expect(row.current).toBeUndefined();
+    expect(row.type === 'hit' && row.variants!.filter((v) => v.current).map((v) => v.id)).toEqual(['ed-AEGS_Gladius_Valiant']);
+  });
+
+  it('a single-model ship folds nothing; an own row whose hull is not listed stays an own row', () => {
+    const arrow = ship('ANVL_Arrow', 'Anvil Arrow');
+    const fold = foldShipFamilies([group('ship', [arrow])], (c) => familyFromRows([arrow], c));
+    expect(fold.groups[0].hits).toEqual([arrow]);
+    expect(fold.links.size).toBe(0);
+    const r = compose('nachtfalke', [], '/codex/index');
+    expect(r.groups.find((g) => g.id === 'own')!.rows[0].id).toBe('own-ship-h1');
+  });
+
+  it('the empty field and the only-the-open-page result stay as the rule says (C6 / C9)', () => {
+    const fresh = suggestionOptions([], [GLADIUS, VALIANT], ON_GLADIUS);
+    expect(fresh.some((o) => o.type === 'fresh' && o.hit.classNameSlug === 'AEGS_Gladius')).toBe(false);
+    // Weak term, no other model matched: the family row is hidden (C7), the livery stays.
+    const weak = compose('gla', [GLADIUS], '/codex/ship/AEGS_Gladius');
+    expect(shipRows(weak)).toEqual([]);
+    expect(weak.groups.map((g) => g.id)).toEqual(['item']);
+    // The open page as the only hit: greyed instead of an empty panel (C9).
+    const fold = foldShipFamilies([group('ship', [GLADIUS])], familyOf);
+    const only = composeSearchResult({
+      term: 'gla', groups: fold.groups, context: searchContextOf('/codex/ship/AEGS_Gladius'), chips: [], signedIn: true,
+      here: ON_GLADIUS, ownVariants: (c) => fold.links.get(c.toLowerCase()),
+    });
+    expect(only.empty).toBe(false);
+    expect(only.groups[0].rows.map((x) => [x.id, x.current])).toEqual([['hit-ship-AEGS_Gladius', true]]);
   });
 });

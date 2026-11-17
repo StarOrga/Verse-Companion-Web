@@ -109,6 +109,34 @@ describe('CodexSearchBarComponent', () => {
     expect(host.querySelector('.group-head .count')?.textContent?.trim()).toBe('14');
   }));
 
+  it('a family mini link: a plain click opens it and collapses, a Ctrl+click is left to the browser', fakeAsync(() => {
+    fixture.componentInstance.activate();
+    fixture.componentInstance.engine.searchFor('gladius');
+    tick();
+    fixture.detectChanges();
+    const link = host.querySelector<HTMLAnchorElement>('.variants a.vl')!;
+    const click = (init: MouseEventInit): boolean => {
+      let left = false;
+      const swallow = (ev: Event) => {
+        left = !ev.defaultPrevented;
+        ev.preventDefault();
+      };
+      link.addEventListener('click', swallow);
+      link.dispatchEvent(new MouseEvent('click', { button: 0, bubbles: true, cancelable: true, ...init }));
+      link.removeEventListener('click', swallow);
+      return left;
+    };
+    expect(click({ ctrlKey: true })).toBe(true);
+    fixture.detectChanges();
+    expect(host.classList).toContain('active');
+    click({});
+    tick();
+    fixture.detectChanges();
+    expect(host.classList).not.toContain('active');
+    expect(fixture.componentInstance.engine.recent()).toEqual(['gladius']);
+    tick(1000);
+  }));
+
   it('ArrowDown sets aria-activedescendant on the field; Enter opens the active hit and collapses', fakeAsync(() => {
     const nav = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     fixture.componentInstance.activate();

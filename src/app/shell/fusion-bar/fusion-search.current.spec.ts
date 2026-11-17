@@ -125,10 +125,8 @@ describe('FusionSearchComponent current page', () => {
     const s = await setupOn('/codex/ship/AEGS_Gladius?v=c2', own);
     s.type('gladius');
     const links = [...s.el.querySelectorAll('.variants a.vl')] as HTMLAnchorElement[];
-    expect(links.slice(0, 3).map((a) => a.textContent?.trim())).toEqual(['Meine Jagd', 'Meine PvP', 'Meine Fracht']);
-    // Three shown, the fourth behind "+n".
-    expect(links.length).toBe(4);
-    expect(links[3].classList).toContain('more');
+    // Four shown (VARIANT_LINKS_SHOWN), nothing behind "+n".
+    expect(links.map((a) => a.textContent?.trim())).toEqual(['Meine Jagd', 'Meine PvP', 'Meine Fracht', 'Meine Rennbuild']);
     const here = links[1];
     expect(here.getAttribute('aria-current')).toBe('page');
     expect(links[0].getAttribute('href')).toContain('v=c1');
