@@ -7661,7 +7661,7 @@
       "foot": {
         "open": "Richtig erkannt, erscheint der Name in der Sternkarte und der Kreis bekommt ein Häkchen.",
         "wrong": "Diesmal kein Stern – die Auflösung bleibt in der Sternkarte stehen.",
-        "unavailable": "Sobald die Spielwerte geladen sind, kannst du hier tippen."
+        "unavailable": "Für diese Sternkarte steht gerade kein Schiff zum Erkennen fest. Es wird automatisch gewählt, sobald der Codex die Spielwerte des Patches hat – dann kannst du hier tippen."
       },
       "undoToast": "Tipp abgegeben: {{name}}"
     },

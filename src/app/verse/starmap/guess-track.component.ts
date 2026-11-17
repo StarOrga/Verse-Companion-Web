@@ -36,7 +36,7 @@ export function shortShipName(name: string): string {
         </svg>
         {{ 'starmap.guess.kind' | translate }}
       </span>
-      <b [scTooltip]="'starmap.guess.state.' + g.state | translate" scTooltipTier="label">{{ headKey() | translate: { name: answerName() } }}</b>
+      <b [scTooltip]="'starmap.guess.state.' + state() | translate" scTooltipTier="label">{{ headKey() | translate: { name: answerName() } }}</b>
       <button type="button" class="info" [attr.aria-label]="'starmap.guess.ruleAria' | translate"
               [scTooltip]="'starmap.guess.rule' | translate">i</button>
     </div>
@@ -45,6 +45,9 @@ export function shortShipName(name: string): string {
         {{ loadError()! | translate }}
         <button type="button" class="retry" (click)="load()">{{ 'errors.retry' | translate }}</button>
       </p>
+    } @else if (unavailable()) {
+      <!-- No answer for this patch (or the server said so on load): say why instead of seven silent ghost tokens. -->
+      <p class="none" role="status">{{ 'starmap.guess.foot.unavailable' | translate }}</p>
     } @else {
       <div class="rail" [style.--k]="rimK + 'px'" [style.--rim]="curve.height + 'px'" [attr.aria-busy]="options().length === 0">
         @for (o of options(); track o.className; let i = $index) {
@@ -97,6 +100,7 @@ export function shortShipName(name: string): string {
       .tok.ship.answer small { color: var(--sc-fg-0); }
       .tok.ship.mine:not(.answer) small { text-decoration: underline dotted; text-underline-offset: 2px; }
       .tok.ship.ghost { opacity: 0.35; cursor: default; }
+      .none { margin: 0; padding: var(--sc-space-3, 12px) 0; color: var(--sc-fg-2); font-size: max(0.85rem, var(--sc-fs-floor)); line-height: 1.45; max-width: var(--sc-measure, 60ch); }
       @media (max-width: 760px) { .tok.ship { flex: 0 0 64px; } }
       @media (prefers-reduced-motion: reduce) { .tok.ship svg { transition: none; } }
     `,
@@ -115,6 +119,8 @@ export class GuessTrackComponent {
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
   readonly loadError = signal<string | null>(null);
+  /** True once the options of the current patch line arrived without an error. */
+  private readonly loaded = signal(false);
   /** The picked class while its undo window is open — nothing sent yet. */
   readonly pending = signal<string | null>(null);
   /** The answer right after a guess, before the reloaded explorer state arrives. */
@@ -123,9 +129,23 @@ export class GuessTrackComponent {
 
   readonly answered = computed(() => this.answer() !== null);
   readonly answerName = computed(() => this.guess().answerName ?? this.answer() ?? '');
-  readonly headKey = computed(() => `starmap.guess.head.${this.guess().state}`);
-  /** No foot line once the guess was right: the header and the lit star say it. */
-  readonly footKey = computed(() => (this.guess().state === 'correct' ? null : `starmap.guess.foot.${this.guess().state}`));
+  /**
+   * Unavailable when the explorer state says so, or when the options call (the
+   * fresher read) came back empty: an explorer state cached from before the
+   * answer stopped resolving would otherwise leave seven ghost tokens forever.
+   */
+  readonly unavailable = computed(
+    () => this.guess().state === 'unavailable' || (this.loaded() && !this.loadError() && this.options().length === 0),
+  );
+  readonly state = computed(() => (this.unavailable() ? 'unavailable' : this.guess().state));
+  readonly headKey = computed(() => `starmap.guess.head.${this.state()}`);
+  /**
+   * No foot line once the guess was right (the header and the lit star say it)
+   * nor when unavailable (the explanation stands in place of the rail).
+   */
+  readonly footKey = computed(() =>
+    this.state() === 'correct' || this.state() === 'unavailable' ? null : `starmap.guess.foot.${this.state()}`,
+  );
 
   constructor() {
     effect(() => {
@@ -133,6 +153,8 @@ export class GuessTrackComponent {
       const state = this.guess().state;
       this.answer.set(null);
       this.error.set(null);
+      this.loaded.set(false);
+      this.options.set([]);
       if (state !== 'unavailable') void this.load();
     });
     // A pick stays marked through state refreshes of the same patch (its offer
@@ -148,8 +170,10 @@ export class GuessTrackComponent {
     this.loadError.set(null);
     const r = await this.api.guessOptions(line);
     if (line !== this.patchLine()) return;
-    if (r.ok) this.options.set(r.data.options);
-    else this.loadError.set(r.errorKey);
+    if (r.ok) {
+      this.options.set(r.data.options);
+      this.loaded.set(true);
+    } else this.loadError.set(r.errorKey);
   }
 
   /** Holds the pick in the undo window; the guess is sent when it closes. */
