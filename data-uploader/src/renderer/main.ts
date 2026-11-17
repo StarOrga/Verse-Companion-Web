@@ -10,7 +10,8 @@
 // build can strip their remote Google-Fonts @import — see electron.vite.config.ts.
 import '@starorga/star-ui/lib/design-tokens.css';
 import { load as loadI18n, t } from '../lib/i18n.js';
-import { shouldAutoResume, shouldQuitAfterAutoRun, launchAction } from '../lib/auto-run.js';
+import { shouldAutoResume, shouldQuitAfterAutoRun, launchAction, formatIdentity, isModelsOnly } from '../lib/auto-run.js';
+import { catalogAlreadyLanded } from '../lib/resume-compat.js';
 import { startPatchCountdown, repaintPatchCountdown } from './patch-countdown.js';
 import { initTooltips } from './tooltip.js';
 import { tallySkinUpload, skinUploadFrame, skinUploadStatus } from '../lib/skin-upload-summary.js';
@@ -273,6 +274,8 @@ export const state = {
   // Subthemes the server already holds for this build (lib/subthemes.ts) —
   // decided once per run before the extraction; null = skip nothing.
   subthemePlan: null as SubthemePlan | null,
+  /** This run continues only the 3D hulls from an extract already on disk. */
+  modelsOnly: false,
   /** Install step's "Alles neu erzwingen" — per run, never persisted. */
   forceAll: false,
   lastResult: null as ExtractResultPayload | null,
@@ -517,6 +520,20 @@ async function maybeAutoRun(): Promise<void> {
   // may still be extracting or uploading: never start a second run beside it.
   if (await Promise.resolve(window.sc.work?.busy()).catch(() => false)) return;
   if (operatorHasMoved()) return;
+  const leftover = state.resumableJob?.resumable
+    ? ((await window.sc.uploadJob.get().catch(() => null))?.state ?? null)
+    : null;
+  if (leftover && state.authToken && leftover.catalog.status !== 'done') {
+    // A leftover catalog upload of a build whose catalogue the server already
+    // holds is pure waste (and writes into a fresh staging build row): drop it,
+    // the decision below continues only what is really open.
+    const plan = await window.sc.subthemes.plan(leftover.nat, false).catch(() => null);
+    if (catalogAlreadyLanded(leftover, plan)) {
+      window.sc.log?.write('info', `[autorun] dropping leftover catalog job for build ${leftover.nat.buildNumber}: the server already holds its catalogue`);
+      state.resumableJob = await window.sc.uploadJob.cancel();
+      await refreshJobView();
+    }
+  }
   if (state.resumableJob?.resumable) {
     state.view = resumeStep();
     render();
@@ -577,7 +594,9 @@ async function maybeAutoRun(): Promise<void> {
     const found = decision;
     startPatchCountdown({
       channel: found.channel?.channel ?? '',
-      version: found.localVersion ?? found.channel?.version ?? '?',
+      version: formatIdentity(found.localVersion ?? found.channel?.version, found.localBuild ?? found.channel?.buildNumber),
+      // Same build, parts open: the banner names them instead of "new game patch".
+      parts: found.kind === 'parts' && found.pending ? found.pending.map((k) => subthemeName(k)).join(', ') : null,
       isBusy: operatorHasMoved,
       onStart: () => void startAutoRun(found),
       onCancel: () => {
@@ -619,12 +638,19 @@ async function startAutoRun(decision: Awaited<ReturnType<typeof window.sc.autoRu
   ];
   state.scanned = true;
   if (!state.settings) return;
+  // Say what is really happening: a same-build start names the open parts, a
+  // new identity names both sides with their build numbers — never
+  // "new version (4.10.0 vs 4.10.0)" when nothing is new.
+  const local = formatIdentity(decision.localVersion ?? decision.channel.version, decision.localBuild ?? decision.channel.buildNumber);
+  const parts = decision.pending?.map((k) => subthemeName(k)).join(', ');
   setStatus(
-    t('autorun.starting', {
-      channel: decision.channel.channel,
-      local: decision.localVersion ?? '?',
-      server: decision.serverVersion ?? '—',
-    }),
+    decision.kind === 'parts' && parts
+      ? t('autorun.continuingParts', { channel: decision.channel.channel, version: local, parts })
+      : t('autorun.starting', {
+          channel: decision.channel.channel,
+          local,
+          server: decision.serverVersion ? formatIdentity(decision.serverVersion, decision.serverBuild) : '—',
+        }),
   );
   // The self-started plan always rolls the extraction straight into the upload
   // (when signed in) — see `buildRunPlan`. `startRun` is the single entry
@@ -1741,6 +1767,7 @@ async function runRealExtract(): Promise<boolean> {
   // (lib/subthemes.ts). Only asked when the run will upload — without a
   // session nothing is uploaded, so nothing can be skipped either.
   state.subthemePlan = null;
+  state.modelsOnly = false;
   if (state.runPlan?.uploadAfter && state.authToken) {
     const plan = await window.sc.subthemes.plan(
       {
@@ -1754,6 +1781,31 @@ async function runRealExtract(): Promise<boolean> {
     refreshRunEta();
     if (plan.skip.length) {
       appendLog(t('subthemes.skipping', { list: plan.skip.map(subthemeName).join(', ') }));
+    }
+    if (plan.reason === 'ledger' && isModelsOnly(plan.pending)) {
+      // Only the 3D hulls are open: continue them from this build's extract
+      // on disk — no catalogue read of the P4K, no bundle, no metadata, no new
+      // build row. Without such an extract the run falls through to a full one.
+      const reused = await window.sc.autoRun
+        .reuseExtract({
+          installPath: channel.installPath,
+          channel: channel.channel,
+          buildNumber: channel.buildNumber ?? '',
+          patchVersion: channel.version ?? '',
+        })
+        .catch(() => null);
+      if (reused) {
+        state.lastResult = reused;
+        state.extractDone = true;
+        state.modelsOnly = true;
+        appendLog(t('subthemes.modelsOnly'), 'success');
+        for (const key of ['extract', 'bundle', 'entries', 'silBuild', 'silUpload'] as const) setStage(key, 'skipped');
+        tipStage('extract', t('subthemes.modelsOnly'));
+        progress.update({ indeterminate: false });
+        progress.stop();
+        return true;
+      }
+      appendLog(t('subthemes.modelsOnlyNoExtract'));
     }
     if (plan.reason === 'ledger' && plan.pending.length === 0) {
       // Same game build, nothing the uploader would now do differently — no
@@ -2447,6 +2499,10 @@ async function doUploadAfterAuth(): Promise<void> {
     patchVersion: result.patch_version,
     buildNumber: result.build_number,
   };
+  if (state.modelsOnly) {
+    await runModelsOnly(result, ledgerKey);
+    return;
+  }
 
   // ── Step 1 · Metadaten: bundle → entries (the build goes live) ───────────────
   // On a resume whose bundle already landed, the bundle POST returns instantly
@@ -2547,6 +2603,9 @@ async function doUploadAfterAuth(): Promise<void> {
 
   // ── Step 3 · 3D-Modelle: build → upload ──────────────────────────────────
   goStep('models');
+  // The extract stays on disk until the hulls landed: a later start continues
+  // the models from it instead of reading the P4K again (models-only run).
+  let hullsSettled = skipped.has('hulls');
   // Reads the extract's build manifest, cached per patch version. Fully
   // non-fatal: the codex is already confirmed.
   try {
@@ -2558,6 +2617,7 @@ async function doUploadAfterAuth(): Promise<void> {
       // True only when every ship landed — a lost ship, a pause or missing
       // tools leave the hulls unrecorded, so the next run uploads them again.
       if (await buildAndUploadSkins(result, uploadProgress)) {
+        hullsSettled = true;
         void window.sc.subthemes.record(ledgerKey, ['hulls']);
       }
     }
@@ -2585,7 +2645,8 @@ async function doUploadAfterAuth(): Promise<void> {
 
   // Upload confirmed — reclaim the run's extracted files so they don't fill
   // the disk. Best-effort: the main process guards + swallows failures.
-  const outDir = state.lastResult?.output_dir;
+  const outDir = hullsSettled ? state.lastResult?.output_dir : undefined;
+  if (!hullsSettled) drawerAppendLog(t('subthemes.modelsOpen'));
   if (outDir) {
     const cleaned = await window.sc.cleanup.extractDir(outDir, {
       bundleId: r.bundleId,
@@ -2610,6 +2671,48 @@ async function doUploadAfterAuth(): Promise<void> {
   render();
   await maybeShutdownAfterUpload();
   await maybeQuitAfterUpload();
+}
+
+/**
+ * Only the 3D hulls are open for this build (lib/auto-run `isModelsOnly`):
+ * straight to step 3. No bundle, no metadata, no silhouettes, no new codex
+ * build row; the hull build skips every ship already built on disk, so an
+ * interrupted model build continues instead of starting over.
+ */
+async function runModelsOnly(
+  result: ExtractResultPayload,
+  ledgerKey: { channel: string; patchVersion: string; buildNumber: string },
+): Promise<void> {
+  for (const key of ['bundle', 'entries', 'silBuild', 'silUpload'] as const) setStage(key, 'skipped');
+  goStep('models');
+  let landed = false;
+  try {
+    landed = await buildAndUploadSkins(result, uploadProgress);
+    if (landed) void window.sc.subthemes.record(ledgerKey, ['hulls']);
+  } catch (err) {
+    uploadProgress?.update({ indeterminate: false });
+    const msg = `${t('skins.buildFailed')}: ${(err as Error).message}`;
+    state.skinUploadStatus = msg;
+    setStage(activeStage() ?? 'skinsBuild', 'warn');
+    setAuthStatus(msg, 'warn');
+  }
+  uploadProgress?.stop();
+  const after = await window.sc.uploadJob.get();
+  if (after.state?.status === 'paused') {
+    pauseActiveStage();
+    setAuthStatus(t('upload.job.paused'), 'warn');
+    return;
+  }
+  await window.sc.uploadJob.finish();
+  state.modelsOnly = false;
+  if (landed) {
+    // Hulls on the server: the extract has served its purpose.
+    await window.sc.cleanup.extractDir(result.output_dir, { channel: result.channel, version: result.patch_version });
+    setAuthStatus(t('subthemes.modelsDone'), 'ok');
+  } else if (!state.skinUploadStatus) {
+    // Kept on disk: the next start continues the models from it.
+    setAuthStatus(t('subthemes.modelsOpen'), 'warn');
+  }
 }
 
 /**

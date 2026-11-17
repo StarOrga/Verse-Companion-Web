@@ -447,15 +447,17 @@
     "minimizeHint": "The X hides the window to the tray instead of quitting."
   },
   "autorun": {
-    "starting": "New version detected ({{channel}}: {{local}} vs {{server}}) — starting automatically.",
+    "starting": "Game build changed ({{channel}}: {{local}} vs {{server}} on the server) — checking and uploading what is open.",
     "resumeFirst": "Found an interrupted upload — skipped the automatic run.",
     "resuming": "Found an interrupted upload — resuming it automatically.",
     "banner": {
       "aria": "New game patch",
       "text": "New game patch {{patch}} — upload starts automatically in",
       "now": "Upload now",
-      "cancel": "Cancel"
-    }
+      "cancel": "Cancel",
+      "partsText": "{{patch}} is on the server — still open: {{parts}}. Continuing automatically in"
+    },
+    "continuingParts": "{{channel}} {{version}} is on the server — still open: {{parts}}. Continuing automatically."
   },
   "subthemes": {
     "allCurrent": "The server already holds this build in full — nothing changed, extraction and upload are skipped. \"Force everything\" runs anyway.",
@@ -470,7 +472,11 @@
       "codex_extra": "Other metadata",
       "silhouettes": "Silhouettes",
       "hulls": "3D hulls"
-    }
+    },
+    "modelsOnly": "Only the 3D models are open — continuing them from the extract on disk, no new metadata upload.",
+    "modelsOnlyNoExtract": "Only the 3D models are open, but no extract of this build is left on disk — extracting again.",
+    "modelsDone": "The 3D models of this build are on the server.",
+    "modelsOpen": "3D models not complete yet — the extract stays on disk, the next start continues them."
   },
   "res": {
     "title": "Performance",
