@@ -4,6 +4,17 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.279.0] - 2026-11-18
+
+### Added
+- Beta holotable shows a ship's interior: decks as a filter under the view row, a 3D view with a ghost hull, doors by kind (incl. brig cells), ladders, lifts, stairs and cargo grids.
+- Clicking a room fills Bauteile with its deck, height, cargo, powering relay and contents; an interior overview by type and a mini search across outside parts and inside elements.
+- Role presets (combat, cargo, medical, industry) pick the interior groups and the start deck; cargo that cannot be placed is named instead of hidden.
+- Data Uploader 0.83.0 extracts the interior from Data.p4k.
+
+### Fixed
+- The holotable no longer scrolls sideways on phones.
+
 ## [0.278.0] - 2026-11-17
 
 ### Changed
