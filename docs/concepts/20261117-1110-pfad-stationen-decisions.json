@@ -1,0 +1,92 @@
+{
+  "concept": "20261117-1110-pfad-stationen",
+  "title": "Pfad eines Gegenstands",
+  "continues": "docs/concepts/nachschub-hq-ui-spec.md",
+  "iterations": [
+    {
+      "iteration": 1,
+      "template": "design",
+      "action": "iterate",
+      "submission_id": "sub-mwklrqo5-ascnszbt",
+      "submitted_at": "2026-11-17T11:22:21.815Z",
+      "designs": [
+        "d1 Zwei Stationen",
+        "d2 Drei bei Bedarf",
+        "d3 Fünf Stationen"
+      ],
+      "favorite": "d2",
+      "general": "",
+      "annotations": [
+        {
+          "id": "r1-d2-schiff-a1",
+          "design": "d2",
+          "screen": "d2-schiff",
+          "question": "Nachschub erscheint nur, wenn etwas unterwegs ist. Soll die Station stattdessen immer zu sehen sein, auch leer?",
+          "answer": "Ja, immer  ansehen. Und lass uns Nachschub umbenennen auch von der ikonografie. Man versteht aktuell nicht, dass es eher ein Einsatzgruppe ist, in der man mehrere Einsätze macht (darunter Typen Missionen vom Spiel oder auch nur Sammeln, tranpsortieren usw.) um dann letztlich sich u. A. hier die Polaris als Nachschub zu erspielen. \nWir könnten nachschub auch lassen und dafür einfach hier und im HQ hervorheben das der Hauptpunkt der Einsatzgruppe an sich ist und dabei fällt dann Nachschub für Inventar und Hagnar usw. ab.\nOder wir machen das wording weg und am Ende hat man in der ... Einsatzgruppe... (anderer Name!) einfach elemente der wunschliste. Sprich Wünsche sind einer Einsatzgruppe zugeordnet, was hier dann eher unter wünsche fallen würde, statt ein dritter kasten.\n\nIch tendiere zu letzteren, aber lass uns das bitte in der nächsten Runde nbochmal intensiv concepten."
+        },
+        {
+          "id": "r1-d2-schiff-a2",
+          "design": "d2",
+          "screen": "d2-schiff",
+          "question": "Ein Klick führt ins HQ zum Paket. Soll man von hier aus auch selbst etwas in einen Nachschub legen können?",
+          "answer": "Ja schon, aber wie, wie viel. Check auch das mit devops agents und mach vorschläge.."
+        },
+        {
+          "id": "r1-d2-liste-a1",
+          "design": "d2",
+          "screen": "d2-liste",
+          "question": "In Zeilen wird Nachschub zum dritten Kreis, sobald etwas unterwegs ist. Auch hier zeigen, oder nur auf der Detailseite?",
+          "answer": "Hmmm, hänmgt von der schiffseite ab den überlegungen"
+        }
+      ],
+      "unanswered": [
+        "r1-d2-item-a1",
+        "all pins of d1 and d3"
+      ],
+      "reading": "d2 is the starting point. The middle station is always visible. The word and the icon 'Nachschub' are in question: the thing is a group of Einsätze that earns the wishes; the owner leans towards 'wishes are assigned to such a group' (shown inside the wish station) instead of a third box. Assigning from the Codex: yes, the how and how much are open. Rows and cards follow whatever the detail page settles."
+    },
+    {
+      "iteration": 2,
+      "template": "design",
+      "status": "open",
+      "generated_at": "2026-11-17T11:40:52Z",
+      "designs": [
+        "wunsch Am Wunsch",
+        "station Eigene Station",
+        "band Fortschrittsband"
+      ],
+      "screens": [
+        "schiff (zugeordnet)",
+        "offen (noch nicht zugeordnet)",
+        "zuordnen",
+        "liste"
+      ],
+      "analysis_view": {
+        "id": "regeln",
+        "topics": [
+          "t-name",
+          "t-regel",
+          "t-codex"
+        ],
+        "decisions": [
+          "d-name",
+          "d-icon",
+          "d-wort",
+          "d-menge",
+          "d-zaehler",
+          "d-entfernen",
+          "d-weg",
+          "d-wieviel",
+          "d-neu",
+          "d-zeilen"
+        ]
+      },
+      "working_title": "Projekt",
+      "lenses": {
+        "product": "devops:pox: assign a wish to a group, the wish stays a wish; name Projekt; picker with whole quantity preselected",
+        "design": "devops:designer: assignment inside the wish station; name Operation; glyph Route"
+      },
+      "brief": "docs/concepts/20261117-1110-pfad-stationen/briefs/02.md"
+    }
+  ]
+}
