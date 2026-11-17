@@ -5,7 +5,7 @@ The next concept or implementation for wishlist, Nachschub, Inventar, Hangar, Sa
 ## Accepted
 
 ### Model
-- One path: **Wunschliste → Nachschub → Bestand** (Inventar · Hangar · Sammlung). Shortcuts allowed: an item can go straight to Bestand; news and gallery go straight to Sammlung.
+- **REPLACED by concept `20261117-1110-pfad-stationen` (see "Pfad eines Gegenstands" below); kept as history:** One path: **Wunschliste → Nachschub → Bestand** (Inventar · Hangar · Sammlung). Shortcuts allowed: an item can go straight to Bestand; news and gallery go straight to Sammlung.
 - **Wunschliste** = a shopping cart with **quantity** for everything, incl. ships (2× Cutlass) and material (raw materials do get a wishlist). Default quantity 1; stepper in the cart and on the Codex detail page, search rows show only the count. Presented as a cart popup; "Ganze Wunschliste" opens it (real anchor with its own URL).
 - **Nachschub** = a named **package** built in HQ → Planen from wishlist items. Taking a wishlist position moves the full quantity by default; splitting (5 of 20) is allowed, the rest stays on the wishlist. A package is planned as a whole and holds 1–x Einsätze (Missionen, Bergbau, Handel …).
 - Up to **7 active package slots**; more are archived ("Neuer Nachschub" is blocked with a hint while all 7 slots are active).
@@ -19,7 +19,7 @@ The next concept or implementation for wishlist, Nachschub, Inventar, Hangar, Sa
 - No guests: the login wall already gates every shell route (`app.routes.ts`); every signed-out branch is dead code to remove.
 
 ### Areas
-- **Codex and search:** two nodes only — Wunschliste (with quantity) and Besitz. No Nachschub node outside HQ. Blueprint page: "Material ×N auf die Wunschliste", grouped under the blueprint / crafted item.
+- **Codex and search (REPLACED by concept `20261117-1110-pfad-stationen`: still two stations, but wish and ownership, with the assignment inside the wish station; history kept):** two nodes only — Wunschliste (with quantity) and Besitz. No Nachschub node outside HQ. Blueprint page: "Material ×N auf die Wunschliste", grouped under the blueprint / crafted item.
 - **HQ Planen:** the up-to-7 package cards on top, "Neuer Nachschub" takes from the wishlist, each package lists its Einsätze and route. Every line is selectable (also loose lines without a set). Much more present than today's popup.
 - **HQ Jetzt:** runs the Einsatz bundle of exactly one package and always shows which package it serves.
 - **HQ Bestand:** Inventar · Hangar · Sammlung; per row a quiet hint ("auf der Wunschliste N" / "im Nachschub ‚Paket‘") plus "Nachholen" (= auf die Wunschliste); additionally **"Kürzlich aufgebraucht"** — only what was used up in the last 48 h, to re-wish quickly.
@@ -35,9 +35,24 @@ The next concept or implementation for wishlist, Nachschub, Inventar, Hangar, Sa
 - **Analytics:** `hq:wishlist_open`, `hq:wish_search_open` `{ surface: 'popout' | 'cart' }`; PostHog flow `wish`.
 - **Path control stays at two nodes.** The concept's Codex mock drew a five-station strip; that was a drawing, not a decision. A close-out request to build five stations was not built, because it contradicts "two nodes only" and "No Nachschub node outside HQ" above, and Inventar / Hangar / Sammlung exclude each other per item. Changing the path needs its own concept.
 
+### Pfad eines Gegenstands (concept `20261117-1110-pfad-stationen`, 2026-11-17)
+Replaces the lines marked "REPLACED" above and the old "moves off the wishlist" contract.
+- **Two stations in the Codex and in search: wish and ownership.** No third station. The assignment to an Operation lives inside the wish station (a picker there), not as a node of its own.
+- **A wish stays a wish when it is assigned.** Assigning to an Operation does not take the quantity off the wishes; the Operation references the wish, and one wish may be split over several Operations.
+- **The word is "Operation"** (German and English, singular and plural: Operationen / Operations). "Nachschub" is gone from every visible text; key names and code identifiers keep `nachschub`. "Einsatzgruppe" is not used (it names friends groups). An Operation is a group of Einsätze with a goal; wishes are assigned to it.
+- **The symbol is the Route glyph** (two waypoint rings joined by a path, stroke icon, `viewBox 0 0 24 24`) in `PATH_ICONS.nachschub` and `NACHSCHUB_ICON_PATHS`; the tray-with-arrow is retired.
+- **Rows show the badge only** (the assignment badge on list rows, no extra node or pill); the picker is on the detail page.
+- **Removing a wish:**
+  - free pieces (not assigned to any Operation) go first;
+  - when assigned pieces would be hit, a dialog asks with a quantity;
+  - the most recently assigned Operation gives its pieces first;
+  - an Operation left without a wish stays only if it has Einsätze, otherwise it goes;
+  - a fulfilled wish (item now owned) stays as "reached";
+  - releasing a piece from an Operation in the HQ always asks first.
+
 ## Rejected
 - Nachschub as its own sixth HQ page or as a Bestand tab.
-- Three status nodes everywhere in the Codex; a Nachschub pill on Codex detail pages.
+- ~~Three status nodes everywhere in the Codex; a Nachschub pill on Codex detail pages.~~ **Replaced by concept `20261117-1110-pfad-stationen`:** the Codex path control shows two stations (wish, ownership); the assignment to an Operation lives inside the wish station, and rows show the badge only. History kept.
 - Disappearing done lines after N days; closing lines by time.
 - A guest storage of any kind.
 - Panel names "Merkliste", the bookmark icon for the panel; the clock / wish / grid icons proposed in round 1.
