@@ -122,8 +122,9 @@ another one. The learning step's batches (`_learn_batch.ts`, ids in R2 work keys
 **Ending a job that has batches.** `cancel` and a failure set the status first and cancel the batches
 after it, so a job that lost that race keeps its batches. A create that is in flight at that moment
 loses its own compare-and-set and cancels the batch it just made. The share of the estimate that was
-sent and never read is booked under the ledger ref `unread`: the real spend of those batches is not
-known, and the monthly ledger may over-count but never under-count.
+sent and never read is booked in the ledger (under the ref of each batch, see "What a job may
+spend"): the real spend of those batches is not known, and the monthly ledger may over-count but
+never under-count.
 
 Spend is booked once per batch: `translation_ledger.ref` is `main:<group>`, `judge` or
 `postedit:<group>` (with `#<run>` on a restarted job), unique per job, so a slice that is repeated after
@@ -181,9 +182,10 @@ output (at least 2 048), which is the ceiling of what such a batch can cost; in 
 (German, `OUTPUT_TOK_PER_CHAR` in `_cost.ts`) for every language until others are measured - the
 probe is what catches a language whose tokens run longer.
 
-A job that ends early with a judge batch (`stats.judgeSent`) or second attempts (`stats.peSent`) sent
-and not read books their estimate under `unread`, together with the first attempts that were sent and
-not read.
+A job that ends early books the estimate of every batch that was sent and not read: first attempts
+and the judge batch (`stats.judgeSent`) under the ref their read would have used (`main:<g>`, `judge` -
+so a batch whose bill a killed slice had booked already is not booked twice), second attempts
+(`stats.peSent`) under `unread`.
 
 ## A job runs in slices (why a tick cannot die on it)
 

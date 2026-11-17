@@ -312,9 +312,49 @@ describe('a job of several batch groups', () => {
     const cur = w.jobs.get(job.id);
     await cancel(w.deps, job.id);
     const rows = Object.fromEntries(w.db.ledger.map((r) => [r.ref, r.usd]));
-    assert.deepEqual(Object.keys(rows).sort(), ['main:0', 'unread']);
+    assert.deepEqual(Object.keys(rows).sort(), ['main:0', 'main:1']);
     assert.equal(rows['main:0'], cur.stats.probe.usd);
-    near(rows.unread, Math.round((cur.estimate_usd / groups) * 1e6) / 1e6, 'one group of the estimate, not two');
+    near(rows['main:1'], Math.round((cur.estimate_usd / groups) * 1e6) / 1e6, 'one group of the estimate, not two');
+  });
+
+  it('a read of the bill that died after it was booked does not book the first group again when the job ends', async () => {
+    const w = world({ n: N, mode: 'full' });
+    const job = await w.newJob();
+    await until(w, at(w, job.id, 'awaiting_approval'));
+    await approve(w.deps, job.id, 'admin');
+    await until(w, at(w, job.id, 'submitted', 'probe'));
+    // The slice dies between its ledger row and its compare-and-set: the job row knows nothing of the read.
+    const cas = w.deps.db.cas;
+    w.deps.db.cas = async (j, patch) => {
+      if (patch.stats?.probe) throw new Error('killed');
+      return cas(j, patch);
+    };
+    await tickAll(w.deps, ONE);
+    w.deps.db.cas = cas;
+    const cur = w.jobs.get(job.id);
+    assert.deepEqual([cur.stats.phase, cur.stats.probe, cur.spent_usd], ['probe_read', undefined, 0]);
+    assert.deepEqual(w.db.ledger.map((r) => r.ref), ['main:0']);
+    const bill = w.db.ledger[0].usd;
+    await cancel(w.deps, job.id);
+    assert.deepEqual(w.db.ledger.map((r) => [r.ref, r.usd]), [['main:0', bill]]);
+
+    // The read that follows a death books nothing twice either.
+    const w2 = world({ n: N, mode: 'full' });
+    const job2 = await w2.newJob();
+    await until(w2, at(w2, job2.id, 'awaiting_approval'));
+    await approve(w2.deps, job2.id, 'admin');
+    await until(w2, at(w2, job2.id, 'submitted', 'probe'));
+    const cas2 = w2.deps.db.cas;
+    let dies = true;
+    w2.deps.db.cas = async (j, patch) => {
+      if (dies && patch.stats?.probe) { dies = false; throw new Error('killed'); }
+      return cas2(j, patch);
+    };
+    await until(w2, ended(w2, job2.id));
+    const done = w2.jobs.get(job2.id);
+    assert.equal(done.status, 'published', done.error);
+    assert.equal(w2.db.ledger.filter((r) => r.ref === 'main:0').length, 1);
+    near(done.spent_usd, sum(w2.db.ledger));
   });
 
   it('a first batch that billed nothing says nothing about the price: the job goes on', async () => {
@@ -465,8 +505,8 @@ describe('paid steps beyond the first attempts', () => {
     assert.equal(w.kinds().judge.length, 1);
     await cancel(w.deps, job.id);
     const rows = Object.fromEntries(w.db.ledger.map((r) => [r.ref, r.usd]));
-    assert.deepEqual(Object.keys(rows).sort(), ['main:0', 'unread']);
-    near(rows.unread, cur.stats.judgeSent);
+    assert.deepEqual(Object.keys(rows).sort(), ['judge', 'main:0']);
+    near(rows.judge, cur.stats.judgeSent);
   });
 
   describe('a batch that may exist twice (its create was answered by nobody)', () => {

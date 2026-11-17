@@ -58,6 +58,11 @@ export function isHeavy(job: Pick<Job, 'status' | 'stats'>): boolean {
  * A job that ends early may leave batches that ran and were never read. Their spend is not known, so
  * their share of the estimate goes into the ledger: a month may be over-counted, never under-counted.
  * `job` is the job as it stood before it ended.
+ *
+ * A batch of first attempts and the judge batch are booked under the ref their read would have used
+ * (`main:<g>`, `judge`). A slice that read one and was killed between its ledger row and its
+ * compare-and-set has booked the real bill already, and the job row does not know: the ledger takes a
+ * ref once per job, so that batch is not booked a second time here.
  */
 async function bookUnread(deps: Deps, job: Job): Promise<void> {
   const main = job.batch_ids.filter((b) => b.kind === 'main').length;
@@ -76,14 +81,20 @@ async function bookUnread(deps: Deps, job: Job): Promise<void> {
   // The judge batch, sent and not read.
   const vPhase = job.stats?.phase;
   const judge = job.status === 'validating' && (vPhase === 'judge' || vPhase === 'judge_read') ? job.stats?.judgeSent ?? 0 : 0;
-  const usd = round4((job.estimate_usd ?? 0) * ((main - read) / groups) + edits + judge);
-  if (usd <= 0) return;
   const run = job.stats?.run;
-  try {
-    await deps.db.addLedger(job.id, monthOf(deps.now()), usd, run ? `unread#${run}` : 'unread');
-  } catch (e) {
-    deps.log('translate unread spend not booked', { job: job.id, usd, error: String((e as Error)?.message ?? e) });
-  }
+  const month = monthOf(deps.now());
+  const book = async (ref: string, sum: number) => {
+    const usd = round4(sum);
+    if (usd <= 0) return;
+    try {
+      await deps.db.addLedger(job.id, month, usd, run ? `${ref}#${run}` : ref);
+    } catch (e) {
+      deps.log('translate unread spend not booked', { job: job.id, ref, usd, error: String((e as Error)?.message ?? e) });
+    }
+  };
+  for (let g = read; g < main; g++) await book(`main:${g}`, (job.estimate_usd ?? 0) / groups);
+  await book('judge', judge);
+  await book('unread', edits);
 }
 
 /** Ends a job as failed. The status goes first: batches are only cancelled for a job that really ended here. */
