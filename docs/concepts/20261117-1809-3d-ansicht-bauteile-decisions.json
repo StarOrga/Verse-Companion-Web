@@ -33,7 +33,13 @@
         "\"gut und auch horizontal machen können\" read as: select, switch and deselect also work in phone landscape."
       ],
       "deviations_from_mock": "Dimmed part lines .08 instead of .42 and a 42 % hull luminance drop instead of .30 per line: the mock's values did not show on a real wireframe.",
-      "not_verified": ["real GPU (frame rate, tween, pulse)", "real touch device"]
+      "not_verified": ["real GPU (frame rate, tween, pulse)", "real touch device"],
+      "closeout": {
+        "action": "finalize",
+        "ship": true,
+        "disposition": "discard (built page only; the source stays in git, project concept rule 5)",
+        "followup_declined": "oq-phone-centre, routed \"Jetzt umsetzen\" by the owner, was not built: the model sits left of centre on phone portrait on purpose, the inline-end lane is kept free for the floating button column (codex-holo-stage.component.ts, `.holo-table { padding-inline-end: var(--sc-fab-clear-inline) }`, QA Q4). The orchestrator's Fund was a misdiagnosis."
+      }
     }
   }
 ]
