@@ -104,6 +104,63 @@
       ],
       "annotations": [],
       "outcome": "iterated → round 2 (3D mit Hülle, Einfach + Deckfilter, Bauteile & Suche)"
+    },
+    {
+      "iteration": 2,
+      "template": "design",
+      "action": "implement",
+      "submitted_at": "2026-11-17T19:43:32.652Z",
+      "designs": {
+        "r2d1": "3D mit Hülle",
+        "r2d2": "Einfach + Deckfilter",
+        "r2d3": "Bauteile & Suche"
+      },
+      "comments": {
+        "general": {
+          "text": "wichtig nur umsetzung für beta holotisch",
+          "attachments": []
+        },
+        "designs": {
+          "r2d1": "sehr gut so machen!"
+        }
+      },
+      "decisions": [
+        {
+          "id": "r2-presets",
+          "label": "Vorauswahl je Schiffsrolle",
+          "mode": "yesnoalt",
+          "value": {
+            "answer": "yes",
+            "alt": ""
+          },
+          "rec": "yes",
+          "deviates": false,
+          "note": ""
+        },
+        {
+          "id": "r2-remember",
+          "label": "Geänderte Filter merken",
+          "mode": "single",
+          "value": "none",
+          "rec": "role",
+          "deviates": true,
+          "note": ""
+        },
+        {
+          "id": "r2-doors",
+          "label": "Tür-Eigenschaften im Extrakt",
+          "mode": "multi",
+          "value": [
+            "kind",
+            "breach",
+            "panel",
+            "cell"
+          ],
+          "rec": "kind breach panel cell",
+          "deviates": false,
+          "note": ""
+        }
+      ]
     }
   ]
 }

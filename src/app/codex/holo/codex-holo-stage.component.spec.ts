@@ -9,6 +9,8 @@ import { ShipCapabilities } from '../codex-mission';
 import type { LayoutSection, LayoutSlot } from '../codex-hardpoint-layout.component';
 import type { KpiStripCell } from '../codex-kpi-sets';
 import type { HardpointFrame } from '../hardpoint-map';
+import { AnalyticsService } from '../../core/analytics.service';
+import { vi } from 'vitest';
 
 const CAPS: ShipCapabilities = { hasCargo: false, hasQuantum: true, hasMining: false, hasSalvage: false };
 
@@ -988,6 +990,56 @@ describe('CodexHoloStageComponent lower part (concept holotisch-unten r1, d2)', 
     expect(c.tableDeck()?.pick).toEqual({ kind: 'poi', index: 2 });
     expect(el.querySelector('sc-ship-deck-plan .ov-pick')).toBeTruthy();
     expect(el.querySelector('.vd-gap')).toBeTruthy();
+  });
+
+  it('B11: deck pick, group toggle, element pick and parts search each send their event, never the search text', async () => {
+    const f = await setup({ detail: shipWithInterior() });
+    f.componentRef.setInput('decks', twoDecks);
+    f.componentRef.setInput('detail', { ...shipWithInterior(), classNameSlug: 'misc_freighter' });
+    f.detectChanges();
+    const c = f.componentInstance;
+    const track = vi.spyOn(TestBed.inject(AnalyticsService), 'track');
+    c.pickSurface('simple');
+    c.pickDeck('D1');
+    expect(track).toHaveBeenCalledWith('codex:deck_select', { ship: 'misc_freighter', deck: 'D1', view: '2d' });
+    c.toggleGroup('med');
+    expect(track).toHaveBeenCalledWith('codex:interior_filter_toggle', { group: 'med', on: true });
+    c.onInteriorPick({ kind: 'poi', index: 1 });
+    expect(track).toHaveBeenCalledWith('codex:interior_element_select', { ship: 'misc_freighter', kind: 'lift', deck: 'D2' });
+    c.onPartsSearch({ scope: 'both', hits: 3 });
+    expect(track).toHaveBeenCalledWith('codex:parts_search', { scope: 'both', hits: 3 });
+    expect(JSON.stringify(track.mock.calls)).not.toMatch(/query|text|term/);
+  });
+
+  it('B7: a search hit jumps to it — a room opens on its deck, an element type picks its first element', async () => {
+    const f = await setup({ detail: shipWithInterior() });
+    f.componentRef.setInput('decks', twoDecks);
+    f.componentRef.setInput('detail', { ...shipWithInterior(), classNameSlug: 'misc_freighter' });
+    f.detectChanges();
+    const c = f.componentInstance;
+    c.panelTab.set('parts');
+    f.detectChanges();
+    const el: HTMLElement = f.nativeElement;
+    const search = (q: string) => {
+      const input = el.querySelector<HTMLInputElement>('sc-codex-holo-interior .srch input')!;
+      expect(el.querySelector('sc-codex-holo-interior .srch svg')).toBeTruthy(); // the magnifier
+      input.value = q;
+      input.dispatchEvent(new Event('input'));
+      f.detectChanges();
+      return Array.from(el.querySelectorAll<HTMLButtonElement>('sc-codex-holo-interior .hits .row'));
+    };
+    const rooms = search('Engineering');
+    expect(rooms.length).toBeGreaterThan(0);
+    rooms[0].click();
+    f.detectChanges();
+    expect(c.deckFilter()).toBe('D2');
+    expect(c.deckRoom()).toBe('R4');
+    // No translations in the spec: the element type is found by its group / label key.
+    const lifts = search('lift');
+    expect(lifts.length).toBe(1);
+    lifts[0].click();
+    f.detectChanges();
+    expect(c.interiorPick()).toEqual({ kind: 'poi', index: 1 });
   });
 
   it('old builds without an interior show no interior, never zeros', async () => {
