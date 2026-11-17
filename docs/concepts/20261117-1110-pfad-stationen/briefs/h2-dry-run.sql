@@ -203,7 +203,7 @@ begin
     raise exception 'case 7: authenticated can execute the trigger function';
   end if;
   -- trigger order: the guard must fire after hq_supplies_a_sync and hq_supplies_b_cap
-  if (select array_agg(tgname order by tgname) from pg_trigger
+  if (select array_agg(tgname::text order by tgname) from pg_trigger
        where tgrelid = 'public.hq_supplies'::regclass and not tgisinternal)
      <> array['hq_supplies_a_sync', 'hq_supplies_b_cap', 'hq_supplies_c_met_guard'] then
     raise exception 'case 7: unexpected trigger set on hq_supplies';
