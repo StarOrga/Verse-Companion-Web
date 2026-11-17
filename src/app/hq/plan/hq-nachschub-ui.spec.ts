@@ -355,6 +355,80 @@ describe('Nachschub board, panel and dialogs', () => {
     const btn = (f.nativeElement as HTMLElement).querySelector('.list button') as HTMLButtonElement;
     expect(btn.disabled).toBe(true);
   });
+
+  it('archive dialog (H3): every row has an icon-only danger delete that emits its id, the list empties with the last one', () => {
+    const svc = setup();
+    svc.packages.set([nach('o1', 'Altes', null, 'archived'), nach('o2', 'Noch älter', null, 'archived')]);
+    const f = TestBed.createComponent(HqNachschubArchiveDialogComponent);
+    const removed: string[] = [];
+    f.componentInstance.removeArchived.subscribe((id) => removed.push(id));
+    f.detectChanges();
+    const el = f.nativeElement as HTMLElement;
+    const del = el.querySelectorAll<HTMLButtonElement>('.list .rm');
+    expect(del.length).toBe(2);
+    expect(del[0].getAttribute('aria-label')).toContain('hq.archive.removeAria');
+    expect(del[0].disabled).toBe(false); // a delete never needs a free slot, unlike "Wieder aktivieren"
+    click(f, del[1]);
+    expect(removed).toEqual(['o2']);
+    svc.packages.set([]);
+    f.detectChanges();
+    expect(el.querySelector('.list')).toBeNull();
+    expect(el.textContent).toContain('hq.archive.empty');
+  });
+
+  describe('plain-line hint (H4)', () => {
+    const plain = (id: string) => ({ id }) as never;
+    function panel(lines: number) {
+      const svc = setup();
+      svc.packages.set([nach('a', 'Rattler-Vorrat', 1)]);
+      vi.spyOn(svc, 'plainSearchLinesOf').mockReturnValue(Array.from({ length: lines }, (_, i) => plain(`l${i}`)));
+      const f = TestBed.createComponent(HqNachschubPanelComponent);
+      f.componentRef.setInput('nachschub', svc.packages()[0]);
+      f.detectChanges();
+      return { svc, f, el: f.nativeElement as HTMLElement };
+    }
+
+    it('shows one quiet row with the two secondary actions when there are candidates, none without', () => {
+      expect(panel(0).el.querySelector('.plain')).toBeNull();
+      const { el } = panel(3);
+      expect(el.querySelector('.plain')).not.toBeNull();
+      expect(el.querySelector('.plain-txt b')?.textContent).toContain('hq.panel.plain.other');
+      expect(panel(1).el.querySelector('.plain-txt b')?.textContent).toContain('hq.panel.plain.one');
+      const btns = [...el.querySelectorAll('.plain-acts button')];
+      expect(btns.map((b) => b.textContent?.trim())).toEqual(['hq.panel.plain.adopt', 'hq.panel.plain.keep']);
+    });
+
+    it('both buttons are busy / disabled while an answer runs (no double submit); the result goes to the page', async () => {
+      const { svc, f, el } = panel(2);
+      let finish!: (r: { ok: boolean; key: string }) => void;
+      const spy = vi.spyOn(svc, 'adoptPlainLines').mockReturnValue(new Promise((r) => (finish = r)));
+      const keep = vi.spyOn(svc, 'keepPlainLines');
+      const results: string[] = [];
+      f.componentInstance.answered.subscribe((r) => results.push(r.key));
+      const [adopt, stay] = [...el.querySelectorAll<HTMLButtonElement>('.plain-acts button')];
+      click(f, adopt);
+      expect(adopt.disabled).toBe(true);
+      expect(stay.disabled).toBe(true);
+      click(f, stay);
+      click(f, adopt);
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(keep).not.toHaveBeenCalled();
+      finish({ ok: false, key: 'hq.nachschub.wishlistFailed' });
+      await f.whenStable();
+      f.detectChanges();
+      expect(results).toEqual(['hq.nachschub.wishlistFailed']);
+      expect(adopt.disabled).toBe(false);
+      expect(el.querySelector('.plain')).not.toBeNull(); // a failed answer keeps the hint
+    });
+
+    it('"So lassen" asks the service for the keep answer', async () => {
+      const { svc, f, el } = panel(2);
+      const keep = vi.spyOn(svc, 'keepPlainLines').mockResolvedValue({ ok: true, key: 'hq.nachschub.done.plainKept', params: { count: 2 } });
+      click(f, el.querySelectorAll('.plain-acts button')[1]);
+      await f.whenStable();
+      expect(keep).toHaveBeenCalledWith('a');
+    });
+  });
 });
 
 describe('HqNachschubFlowComponent', () => {

@@ -311,7 +311,7 @@ export class HqNachschubPanelComponent {
     this.plainBusy.set(choice);
     try {
       const res = choice === 'adopt' ? await this.svc.adoptPlainLines(id) : await this.svc.keepPlainLines(id);
-      if (res.ok) this.analytics.track('hq:plain_lines_answer', { choice, count: Number(res.params?.['count'] ?? 0) });
+      if (res.ok) this.analytics.track('hq:plain_lines_select', { choice, count: Number(res.params?.['count'] ?? 0) });
       this.answered.emit(res);
     } finally {
       this.plainBusy.set(null);
