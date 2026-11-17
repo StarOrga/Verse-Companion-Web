@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, TemplateRef, ViewContainerRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { TemplatePortal } from '@angular/cdk/portal';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ItemPathService } from '../../hq/data/item-path.service';
@@ -26,7 +28,7 @@ export interface HangarExemplar {
   readonly link: HangarMenuLink;
 }
 
-/** The phone / overlay breakpoint: the panel then spans the screen and ends above the feedback launcher. */
+/** The phone / overlay breakpoint: the panel then is a bottom sheet left of the launcher lane. */
 const PHONE_QUERY = '(max-width: 720px)';
 /** The panel's width on wider screens (`--sc-ov-s`, 28rem). */
 const PANEL_W = 448;
@@ -66,14 +68,17 @@ const EDGE = 8;
             <i class="op-badge" data-badge="operation" aria-hidden="true"><svg viewBox="0 0 24 24">@for (d of routeIcon; track $index) { <path [attr.d]="d" /> }</svg></i>
           }
         </span>
-        <b>{{ count() > 0 ? ('codex.head.own.hangarN' | translate: { n: count() }) : ('codex.head.notOwn.hangar' | translate) }}</b>
-        <span class="sep" aria-hidden="true">·</span>
-        <span class="ex">{{ shownName() ?? ('codex.holo.hangar.werk' | translate) }}</span>
-        @if ((shownDiff() ?? 0) > 0) { <sc-holo-diff-marker /> }
+        <!-- The sentence wraps onto a second line in a narrow head instead of being clipped. -->
+        <span class="t">
+          <b>{{ count() > 0 ? ('codex.head.own.hangarN' | translate: { n: count() }) : ('codex.head.notOwn.hangar' | translate) }} <span class="sep" aria-hidden="true">·</span></b>
+          <span class="ex">{{ shownName() ?? ('codex.holo.hangar.werk' | translate) }}@if ((shownDiff() ?? 0) > 0) { <sc-holo-diff-marker /> }</span>
+        </span>
         @if (assigned() > 0) { <span class="sc-sr-only">{{ 'pathCtl.wishAssigned' | translate: { n: assigned() } }}</span> }
         <span class="car" aria-hidden="true">▾</span>
       </button>
-      @if (open()) {
+    </div>
+    <!-- The panel lives in the CDK overlay: above the page's docks, under its button on wide screens, a bottom sheet on phones. -->
+    <ng-template #panelTpl>
         <sc-popup #panel id="holo-hangar-menu" class="menu" kind="panel" size="s" [float]="true" [backdrop]="false" [backClose]="false"
                   [title]="shipName()" [returnFocus]="trigger" (closed)="close()" (keydown)="onPanelKey($event)"
                   (click)="onPanelClick($event)" (focusout)="onPanelFocusOut()">
@@ -133,7 +138,7 @@ const EDGE = 8;
 
           @if (signedIn() && className()) {
             <sc-item-path class="stations" level="primary" layout="stacked" kind="ship" [className]="className()" [name]="shipName()"
-                          [forceOwned]="forceOwned()" [ownName]="exemplarName()" [pickerInFlow]="true" (leave)="close()">
+                          [forceOwned]="forceOwned()" [ownName]="exemplarName()" [pickerInFlow]="true" [bare]="true" (leave)="close()">
               <div ipWishExtra class="xtra">
                 @if (activeId() === null && werkChanged() > 0) {
                   <!-- D1: the swapped Werk goes onto the wishlist WITH its swaps - the page writes it (it holds the table). -->
@@ -183,40 +188,38 @@ const EDGE = 8;
           }
           @if (errorKey(); as err) { <p class="err" role="alert">{{ err | translate }}</p> }
         </sc-popup>
-      }
-    </div>
+    </ng-template>
   `,
   styles: [`
     :host { display: inline-flex; min-width: 0; }
     .hm { position: relative; display: inline-flex; min-width: 0; }
-    .hb { display: inline-flex; align-items: center; gap: 7px; height: 32px; min-width: 0; max-width: 100%; padding: 0 10px 0 6px;
+    .hb { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; min-width: 0; max-width: 100%; padding: 3px 10px 3px 6px;
       border: 1px solid color-mix(in srgb, var(--sc-accent) 45%, transparent); border-radius: 16px; background: transparent;
-      color: var(--sc-fg-1); font: inherit; font-size: max(12.5px, var(--sc-fs-floor)); white-space: nowrap; cursor: pointer; }
-    .ic-w { position: relative; flex: none; display: inline-flex; }
+      color: var(--sc-fg-1); font: inherit; font-size: max(12.5px, var(--sc-fs-floor)); text-align: start; cursor: pointer; }
+    .ic-w { position: relative; flex: none; display: inline-flex; margin-inline-end: 3px; }
+    .hb .t { display: inline-flex; flex-wrap: wrap; align-items: center; column-gap: 6px; min-width: 0; line-height: 1.25; }
+    .hb .t b { white-space: nowrap; }
+    .hb .ex { display: inline-flex; align-items: center; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
     .hb .ic { flex: none; width: 22px; height: 22px; padding: 4px; box-sizing: border-box; border-radius: 11px; color: var(--sc-accent);
       background: color-mix(in srgb, var(--sc-accent) 12%, transparent); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
     /* The Route badge, as on the rows' wish node (sc-item-path .op-badge). */
-    .op-badge { position: absolute; right: -5px; bottom: -5px; display: grid; place-items: center; width: 15px; height: 15px; border-radius: 50%;
+    .op-badge { position: absolute; right: -8px; bottom: -6px; display: grid; place-items: center; width: 14px; height: 14px; box-sizing: border-box; border-radius: 50%;
       border: 1px solid var(--sc-accent); background: var(--sc-bg-0); color: var(--sc-accent); font-style: normal; pointer-events: none; }
     .op-badge svg { width: 10px; height: 10px; display: block; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
     .hb b { color: var(--sc-fg-0); font-weight: 600; }
     .hb .sep { color: var(--sc-fg-2); }
-    .hb .ex { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--sc-fg-0); }
+    .hb .ex { color: var(--sc-fg-0); }
     .hb .car { color: var(--sc-accent); font-size: 10px; }
     .hb:hover, .hb.open { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); border-color: var(--sc-accent); }
     .hb:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-    /*
-     * Anchored under its button, shifted so it stays on screen (--hm-left from place()); as tall as the room under the
-     * button allows, the body scrolls. On a phone it also ends above the feedback launcher (--sc-fab-clear-block).
-     */
-    .menu { position: absolute; top: calc(100% + 6px); left: var(--hm-left, auto); z-index: 30;
-      inline-size: var(--hm-w, min(28rem, calc(100vw - 16px))); max-inline-size: none;
-      --sc-popup-max-h: min(600px, calc(100dvh - var(--hm-top, 120px) - 16px)); }
-    .menu ::ng-deep .scp-frame { inline-size: 100%; }
-    /* Phones: the right edge stays out of the launcher lane (place()), the bottom above the floating buttons and docks. */
-    @media (max-width: 720px) {
-      .menu { --sc-popup-max-h: calc(100dvh - var(--hm-top, 120px) - var(--sc-toast-bottom, var(--sc-fab-clear-block))); }
-    }
+    /* The panel's frame fills the overlay pane (its width and height come from place()). */
+    .menu { display: block; inline-size: 100%; }
+    .menu ::ng-deep .scp-frame { inline-size: 100%; max-inline-size: 100%; }
+    /* A compact head: the ship's name as a small eyebrow line beside the close button, not a title. */
+    .menu ::ng-deep .scp-h { align-items: center; }
+    .menu ::ng-deep .scp-title { font: 600 max(10.5px, var(--sc-fs-floor))/1.3 var(--sc-font-body, inherit); letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--sc-fg-2); }
+    .menu ::ng-deep .scp-b { margin-top: 2px; }
     .grp { display: flex; flex-direction: column; gap: 2px; margin-block-end: 12px; }
     .gh { padding: 0 10px 2px; font-size: max(9px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); }
     .row { display: flex; align-items: flex-start; gap: 9px; width: 100%; box-sizing: border-box; min-height: 32px; padding: 7px 10px;
@@ -241,14 +244,18 @@ const EDGE = 8;
     .xtra .sc-action span { white-space: normal; text-align: start; }
     .sign-in { align-self: flex-start; }
     .err { margin: 10px 0 0; font-size: max(11px, var(--sc-fs-floor)); color: var(--sc-danger); }
-    @media (pointer: coarse) { .hb { height: 48px; min-width: 48px; flex-shrink: 0; border-radius: 24px; } .row { min-height: 48px; align-items: center; } }
+    @media (pointer: coarse) { .hb { min-height: 48px; min-width: 48px; flex-shrink: 1; border-radius: 24px; padding-block: 4px; } .row { min-height: 48px; align-items: center; } }
   `],
 })
-export class CodexHoloHangarMenuComponent {
+export class CodexHoloHangarMenuComponent implements OnDestroy {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly path = inject(ItemPathService);
   private readonly trigger = viewChild<ElementRef<HTMLElement>>('trigger');
   private readonly panel = viewChild('panel', { read: ElementRef });
+  private readonly panelTpl = viewChild.required<TemplateRef<unknown>>('panelTpl');
+  private readonly overlay = inject(Overlay);
+  private readonly vcr = inject(ViewContainerRef);
+  private ref: OverlayRef | null = null;
 
   /** The hull's short name ("Gladius") for "Noch eine Gladius in den Hangar" and the panel's title. */
   readonly shipName = input('');
@@ -310,28 +317,65 @@ export class CodexHoloHangarMenuComponent {
       this.close();
       return;
     }
-    this.place();
     this.open.set(true);
+    this.attach();
   }
 
   close(): void {
     this.open.set(false);
+    const ref = this.ref;
+    this.ref = null;
+    ref?.dispose();
   }
 
-  /** Where the panel stands: under the button, right-aligned to it, shifted to stay on screen; as tall as the room below. */
+  ngOnDestroy(): void {
+    this.close();
+  }
+
+  /** A resize or rotation: the pane follows its button (or stays a sheet). */
   place(): void {
+    this.ref?.updatePosition();
+  }
+
+  /**
+   * Wide screens: under its button, end-aligned (start-aligned when there is no room), as tall as the room below allows.
+   * Phones (<= 720px): a sheet at the bottom, as tall as its content up to the full height, its right edge left of the
+   * launcher lane - so it lies above the page's own docks and nothing of it under the floating buttons.
+   */
+  private attach(): void {
     const btn = this.trigger()?.nativeElement;
     if (!btn || typeof window === 'undefined') return;
-    const r = btn.getBoundingClientRect();
-    const vw = window.innerWidth;
     const phone = window.matchMedia(PHONE_QUERY).matches;
-    // A phone's panel spans the screen up to the launcher lane, so nothing of it lies under the floating buttons.
-    const lane = phone ? cssPx(this.host, '--sc-fab-clear-inline') : EDGE;
-    const w = Math.min(PANEL_W, vw - EDGE - lane);
-    const left = phone ? EDGE : Math.min(Math.max(EDGE, r.right - w), vw - EDGE - w);
-    this.host.style.setProperty('--hm-w', `${w}px`);
-    this.host.style.setProperty('--hm-left', `${Math.round(left - r.left)}px`);
-    this.host.style.setProperty('--hm-top', `${Math.round(r.bottom + 6)}px`);
+    const r = btn.getBoundingClientRect();
+    const position = phone
+      ? this.overlay.position().global().left(`${EDGE}px`).bottom(`calc(${EDGE}px + var(--sc-safe-bottom, 0px))`)
+      : this.overlay
+          .position()
+          .flexibleConnectedTo(btn)
+          .withPositions([
+            { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 6 },
+            { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 6 },
+          ])
+          .withPush(false)
+          .withViewportMargin(EDGE)
+          .withFlexibleDimensions(false);
+    const ref = this.overlay.create({
+      positionStrategy: position,
+      scrollStrategy: this.overlay.scrollStrategies.reposition(),
+      disposeOnNavigation: true,
+      width: phone ? `calc(100vw - ${EDGE}px - var(--sc-fab-clear-inline, ${EDGE}px))` : `${Math.min(PANEL_W, window.innerWidth - 2 * EDGE)}px`,
+    });
+    const maxH = phone
+      ? `calc(100dvh - ${2 * EDGE}px - var(--sc-safe-bottom, 0px))`
+      : `${Math.max(280, Math.min(600, window.innerHeight - r.bottom - 6 - 2 * EDGE))}px`;
+    ref.overlayElement.style.setProperty('--sc-popup-max-h', maxH);
+    ref.attach(new TemplatePortal(this.panelTpl(), this.vcr));
+    ref.detachments().subscribe(() => {
+      if (this.ref !== ref) return;
+      this.ref = null;
+      this.open.set(false);
+    });
+    this.ref = ref;
   }
 
   /** Closes the menu first, then asks the page (a prompt, a navigation or a new exemplar follows). */
@@ -371,14 +415,14 @@ export class CodexHoloHangarMenuComponent {
   /** "Zuordnen" opened the picker in the flow: bring it into view inside the scrolling body. */
   onPanelClick(ev: MouseEvent): void {
     if (!(ev.target instanceof Element) || !ev.target.closest('button.assign')) return;
-    setTimeout(() => this.host.querySelector('sc-item-path-assign')?.scrollIntoView?.({ block: 'nearest' }));
+    setTimeout(() => (this.panel()?.nativeElement as HTMLElement | undefined)?.querySelector('sc-item-path-assign')?.scrollIntoView?.({ block: 'nearest' }));
   }
 
   /** A station re-rendered under the focus (the add button became the counter): focus stays in the panel. */
   onPanelFocusOut(): void {
     setTimeout(() => {
       if (!this.open() || (document.activeElement && document.activeElement !== document.body)) return;
-      (this.host.querySelector('.menu .scp-frame') as HTMLElement | null)?.focus({ preventScroll: true });
+      ((this.panel()?.nativeElement as HTMLElement | undefined)?.querySelector('.scp-frame') as HTMLElement | null)?.focus({ preventScroll: true });
     });
   }
 
@@ -388,16 +432,6 @@ export class CodexHoloHangarMenuComponent {
     if (this.host.contains(ev.target) || ev.target.closest('.cdk-overlay-container')) return;
     this.close();
   }
-}
-
-/** A length token in px, resolved through a probe (the token is a calc() over env() and other tokens). */
-function cssPx(at: HTMLElement, token: string): number {
-  const probe = document.createElement('div');
-  probe.style.cssText = `position:absolute;visibility:hidden;inline-size:var(${token}, 0px)`;
-  at.appendChild(probe);
-  const px = probe.getBoundingClientRect().width;
-  probe.remove();
-  return px || EDGE;
 }
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';

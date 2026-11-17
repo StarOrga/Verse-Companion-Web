@@ -22,8 +22,10 @@ describe('CodexHoloHangarMenuComponent', () => {
   let fixture: ComponentFixture<CodexHoloHangarMenuComponent>;
   let path: FakeItemPath;
   let flow: { lower: ReturnType<typeof vi.fn>; announce: ReturnType<typeof vi.fn> };
-  const q = (sel: string) => fixture.nativeElement.querySelector(sel) as HTMLElement | null;
-  const all = (sel: string) => Array.from(fixture.nativeElement.querySelectorAll(sel)) as HTMLElement[];
+  // The trigger lives in the host, the panel in the CDK overlay container.
+  const q = (sel: string) => (fixture.nativeElement.querySelector(sel) ?? document.querySelector(sel)) as HTMLElement | null;
+  const all = (sel: string) =>
+    [...Array.from(fixture.nativeElement.querySelectorAll(sel)), ...Array.from(document.querySelectorAll(`.cdk-overlay-container ${sel}`))] as HTMLElement[];
 
   beforeEach(() => {
     path = fakeItemPath({ inHangar: true, hangarQty: 2, hangarShipId: 'ship-1' });
@@ -107,7 +109,8 @@ describe('CodexHoloHangarMenuComponent', () => {
     expect(picker).not.toBeNull();
     expect(picker!.classList).toContain('inline');
     expect(fixture.componentInstance.open()).toBe(true);
-    expect(document.querySelector('.cdk-overlay-container sc-item-path-assign')).toBeNull();
+    // In the flow of the panel: no second floating layer next to it.
+    expect(document.querySelectorAll('.cdk-overlay-pane').length).toBe(1);
 
     const esc = () => new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
     picker!.querySelector('.scp-frame')!.dispatchEvent(esc());
@@ -203,6 +206,23 @@ describe('CodexHoloHangarMenuComponent', () => {
     open();
     expect(q('sc-item-path')).toBeNull();
     expect(q('a.sign-in')!.getAttribute('href')).toBe('/login');
+  });
+
+  it('the stations stand without an extra frame inside the panel', () => {
+    open();
+    expect(q('sc-item-path')!.classList).toContain('ip-bare');
+    expect(fixture.componentInstance.open()).toBe(true);
+    fixture.componentInstance.close();
+    fixture.detectChanges();
+    expect(document.querySelector('.cdk-overlay-container .menu')).toBeNull();
+  });
+
+  it('the trigger sentence can wrap, never clips the shown Ausstattung', () => {
+    fixture.detectChanges();
+    const hb = q('.hb')!;
+    expect(getComputedStyle(hb).whiteSpace).not.toBe('nowrap');
+    expect(getComputedStyle(q('.hb .t')!).flexWrap).toBe('wrap');
+    expect(getComputedStyle(q('.hb .ex')!).overflow).toBe('visible');
   });
 
   it('a press beside it closes it; a press inside does not', () => {

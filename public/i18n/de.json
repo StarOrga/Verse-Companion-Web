@@ -8831,6 +8831,8 @@
       "newest": "zuletzt erstellt",
       "new": "Neue Operation",
       "newHint": "Name wird vorgeschlagen",
+      "loading": "Operationen werden geladen …",
+      "working": "Wird zugeordnet …",
       "slots": "{{used}} von {{max}} Plätzen belegt",
       "planHint": "Einsätze planst du",
       "inHq": "im HQ",

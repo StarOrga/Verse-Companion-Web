@@ -20,6 +20,7 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { logWarn } from '../../core/log';
 import { isPlainLeftClick } from '../../core/modified-click.util';
 import {
   ItemPathService,
@@ -117,7 +118,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
   standalone: true,
   imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective, ItemPathAssignComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '[class.ip-primary]': "level() === 'primary'", '[class.ip-stacked]': "layout() === 'stacked'" },
+  host: { '[class.ip-primary]': "level() === 'primary'", '[class.ip-stacked]': "layout() === 'stacked'", '[class.ip-bare]': 'bare()' },
   template: `
     <ng-template #rail>
       <span class="rail">
@@ -289,7 +290,8 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
     }
 
     <ng-template #assignTpl let-inline="inline">
-      <sc-item-path-assign [name]="name() ?? ''" [free]="state().free" [assigned]="state().assigned" [targets]="targets()" [busy]="assigning()"
+      <sc-item-path-assign [name]="name() ?? ''" [free]="state().free" [assigned]="state().assigned" [targets]="targets()"
+                           [busy]="assigning() || assignPending()" [busyKey]="pickerBusyKey()"
                            [inline]="!!inline" [caret]="caret()" [returnFocus]="anchor()"
                            (assign)="onAssign($event)" (closed)="closePop()" (leave)="onLink($event)" />
     </ng-template>
@@ -516,6 +518,7 @@ export function nextStepOf(s: ItemPathState): PathStep | null {
       .own { flex-wrap: wrap; }
     }
     .anc:has(> sc-item-path-assign.inline) { width: 100%; }
+    :host(.ip-bare) .primary { padding: 0; border: 0; border-radius: 0; background: none; }
     .tools { display: inline-flex; align-items: center; gap: 2px; }
     .tools:empty { display: none; }
     .stop[data-station="own"] { outline: none; transition: box-shadow 0.3s ease, border-color 0.3s ease; }
@@ -552,6 +555,8 @@ export class ItemPathComponent implements OnDestroy {
   readonly forceOwned = input(false);
   /** A ship's own name, shown in the ownership strip ("Im Hangar · „Name“"). */
   readonly ownName = input<string | null>(null);
+  /** No frame around the two stations: the host is already a frame (the Holotisch panel). */
+  readonly bare = input(false);
   /** The picker opens in the flow under "Zuordnen" at every width (a host that is itself a popover, the Holotisch menu). */
   readonly pickerInFlow = input(false);
 
@@ -632,6 +637,8 @@ export class ItemPathComponent implements OnDestroy {
     const s = this.state();
     return s.signedIn && s.wished && s.hint === null && s.assignmentsKnown === false;
   });
+  /** The picker's rows are off while the Operationen load or a write runs - and it says so (never a click that is lost). */
+  readonly pickerBusyKey = computed(() => (this.assigning() ? 'pathCtl.assign.working' : this.assignPending() ? 'pathCtl.assign.loading' : null));
   readonly shownAssignments = computed(() => {
     const a = this.state().assignments;
     return a.length > MAX_ASSIGNMENT_LINES ? a.slice(0, MAX_ASSIGNMENT_LINES) : a;
@@ -855,7 +862,8 @@ export class ItemPathComponent implements OnDestroy {
   }
 
   async onAssign(pick: AssignPick): Promise<void> {
-    if (this.assigning()) return;
+    // The rows are disabled in both phases (pickerBusyKey says why); this only guards a click that raced the render.
+    if (this.assigning() || this.assignPending()) return;
     const at = this.anchor();
     this.assigning.set(true);
     try {
@@ -937,7 +945,13 @@ export class ItemPathComponent implements OnDestroy {
   }
 
   private showError(key: string, at: HTMLElement | null, tone: PathTone = 'error'): void {
-    if (this.destroyed || !at?.isConnected) return;
+    // A refusal is never swallowed: when its anchor was re-rendered away, the message hangs on the control itself.
+    const host = this.host.isConnected ? (this.host.querySelector<HTMLElement>('button.assign, .st') ?? this.host) : null;
+    if (!this.destroyed && !at?.isConnected) at = host;
+    if (this.destroyed || !at) {
+      logWarn('itemPath', 'result without a surface to show it', { key });
+      return;
+    }
     this.closePop();
     this.errorKey.set(key);
     this.errorTone.set(tone);

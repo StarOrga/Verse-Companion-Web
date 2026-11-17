@@ -52,7 +52,11 @@ export interface AssignPick {
         </span>
         <span class="mut">{{ (assigned() > 0 ? 'pathCtl.assign.ofFree' : 'pathCtl.assign.ofWished') | translate: { n: free() } }}</span>
       </div>
-      <ul class="ap-list">
+      @if (busyKey(); as k) {
+        <!-- Nothing can be assigned in this phase (the Operationen load, or a write is under way): the rows are off and say why. -->
+        <p class="ap-busy" role="status"><i class="ap-spin" aria-hidden="true"></i>{{ k | translate }}</p>
+      }
+      <ul class="ap-list" [attr.aria-busy]="busy() ? 'true' : null">
         @for (t of targets().operations; track t.id; let first = $first) {
           <li>
             <button type="button" class="ap-row" data-target="op" [disabled]="busy()" (click)="pick(t.id)">
@@ -127,6 +131,11 @@ export interface AssignPick {
     .ap-row:hover:not(:disabled) { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
     .ap-row:disabled { cursor: default; opacity: 0.6; }
     .ap-row.new { border-style: dashed; }
+    .ap-busy { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; color: var(--sc-fg-1); font-size: 0.75rem; }
+    .ap-spin { inline-size: 12px; block-size: 12px; flex: none; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--sc-accent) 25%, transparent);
+      border-block-start-color: var(--sc-accent); animation: ap-spin 0.8s linear infinite; }
+    @keyframes ap-spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .ap-spin { animation: none; } }
     .ap-i { inline-size: 16px; block-size: 16px; flex: none; fill: none; stroke: var(--sc-accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .ap-pn { display: flex; flex-direction: column; flex: 1 1 auto; min-inline-size: 0; }
     /* Names wrap, never cut (B10; a name is at most 28 characters). */
@@ -154,6 +163,8 @@ export class ItemPathAssignComponent {
   readonly assigned = input(0);
   readonly targets = input.required<AssignTargets>();
   readonly busy = input(false);
+  /** Why the rows are off right now (`pathCtl.assign.loading` / `.working`); null = nothing to say. */
+  readonly busyKey = input<string | null>(null);
   readonly inline = input(false);
   readonly caret = input<AssignCaret>('top');
   readonly returnFocus = input<HTMLElement | null>(null);

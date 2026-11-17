@@ -474,6 +474,41 @@ describe('ItemPathComponent: the two-node path', () => {
       expect(t.path.assignWish).toHaveBeenCalledWith('item', 'cls', 3, 'new', { name: 'Helm', surface: 'codex' });
     });
 
+    it('while the Operationen load the picker rows are off and say so; once loaded a click assigns', async () => {
+      const t = setup({ level: 'primary', state: { wished: true, wishQty: 3, free: 3, assignmentsKnown: true } });
+      t.path.targets.set(targets);
+      await t.click(wishStation(t).querySelector<HTMLButtonElement>('button.assign')!);
+      // The store reloads under the open picker: nothing may be clicked into the void.
+      t.path.current.set({ wished: true, wishQty: 3, free: 0, assignmentsKnown: false });
+      await t.settle();
+      const p = picker()!;
+      expect(p.querySelector('.ap-busy')!.textContent).toContain('pathCtl.assign.loading');
+      const rows = Array.from(p.querySelectorAll<HTMLButtonElement>('.ap-row'));
+      expect(rows.every((b) => b.disabled)).toBe(true);
+      rows[rows.length - 1].click();
+      await t.settle();
+      expect(t.path.assignWish).not.toHaveBeenCalled();
+      t.path.current.set({ wished: true, wishQty: 3, free: 3, assignmentsKnown: true });
+      await t.settle();
+      expect(picker()!.querySelector('.ap-busy')).toBeNull();
+      picker()!.querySelector<HTMLButtonElement>('.ap-row[data-target="new"]')!.click();
+      await t.settle();
+      expect(t.path.assignWish).toHaveBeenCalledTimes(1);
+    });
+
+    it('a write under way shows "Wird zugeordnet" in the picker; a refused assign shows its translated message', async () => {
+      const t = setup({ level: 'primary', state: { wished: true, wishQty: 2, free: 2 } });
+      let finish: (v: unknown) => void = () => undefined;
+      t.path.assignWish.mockReturnValueOnce(new Promise((res) => (finish = res)));
+      await t.click(wishStation(t).querySelector<HTMLButtonElement>('button.assign')!);
+      picker()!.querySelector<HTMLButtonElement>('.ap-row[data-target="new"]')!.click();
+      await t.settle();
+      expect(picker()!.querySelector('.ap-busy')!.textContent).toContain('pathCtl.assign.working');
+      finish({ ok: false, key: 'hq.nachschub.nothingFree' });
+      await t.settle();
+      expect(document.querySelector('.cdk-overlay-container .rp')!.textContent).toContain('hq.nachschub.nothingFree');
+    });
+
     it('rows and cards: a small Route badge on an assigned wish node, the ring stays solid, nothing to assign (B8)', () => {
       const t = setup({ state: { wished: true, wishQty: 2, assigned: 1, free: 1, assignments: [asg({ qty: 1 })] } });
       const node = t.node('wish')!;
