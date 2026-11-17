@@ -243,20 +243,20 @@ describe('AssetPackageViewerComponent (state logic, no WebGL)', () => {
       return made;
     }
 
-    it('a hover lights the part without the see-through, a selection turns it on and holds', () => {
+    it('a hover lights the part, a selection takes the green look and holds, neither turns the see-through on', () => {
       const { c } = table();
       const seen: unknown[] = [];
       c.selectionChange.subscribe((v) => seen.push(v?.id ?? null));
       const pp = c.manifest()!.placements[0];
       c.focus(pp);
       expect(c.focusIds()).toEqual([pp.id]);
-      expect(c['seeThrough']()).toBe(false);
+      expect(c['highlight']()).toEqual({ hover: [pp.id], selected: [] });
       c.blur(pp);
       expect(c.focusIds()).toEqual([]);
 
       c.onPick(new MouseEvent('click', { button: 0, cancelable: true }), c.toRowFor(pp));
       expect(c.pinned()).toBe(pp.id);
-      expect(c['seeThrough']()).toBe(true);
+      expect(c['highlight']()).toEqual({ hover: [], selected: [pp.id] });
       expect(seen).toEqual([pp.id]);
       // The pointer goes on to a neighbour: the selection and its see-through stay, both are lit.
       const other = c.manifest()!.placements[1];
@@ -410,7 +410,7 @@ describe('AssetPackageViewerComponent (state logic, no WebGL)', () => {
     it('leaves a wheel without Ctrl to the page and hints once; Ctrl + wheel zooms', fakeAsync(() => {
       const { fixture, c } = table();
       const zoomBy = vi.fn().mockName('zoomBy');
-      c['scene'] = { zoomBy, dispose: () => undefined, setFocus: () => undefined, setPaused: () => undefined } as never;
+      c['scene'] = { zoomBy, dispose: () => undefined, setHighlight: () => undefined, setPaused: () => undefined } as never;
       const host: HTMLElement = fixture.nativeElement;
       const orbit = vi.fn().mockName('orbit');
       const canvas = host.querySelector('canvas')!;
@@ -439,8 +439,8 @@ describe('AssetPackageViewerComponent (state logic, no WebGL)', () => {
       const { fixture, c } = create();
       const pp = c.manifest()!.placements[0];
       c.focus(pp);
-      expect(c['seeThrough']()).toBe(true);
-      c['scene'] = { zoomBy: () => undefined, dispose: () => undefined, setFocus: () => undefined, setPaused: () => undefined } as never;
+      expect(c['highlight']()).toEqual({ hover: [pp.id], selected: [] });
+      c['scene'] = { zoomBy: () => undefined, dispose: () => undefined, setHighlight: () => undefined, setPaused: () => undefined } as never;
       const plain = wheel({});
       const canvas = (fixture.nativeElement as HTMLElement).querySelector('canvas')!;
       const orbit = vi.fn().mockName('orbit');

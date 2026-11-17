@@ -25,9 +25,67 @@ import { HoloEdgeJob, creaseEdgeArray } from './holo-edges';
 import type { HoloEdgeCompute } from './holo-edges-link';
 
 export type { Rgb } from './holo-manufacturer';
-export type HoloRole = 'hull' | 'part' | 'interior' | 'focus' | 'quiet';
+/**
+ * `part` / `quiet` / `hover` / `select` are lit bodies (fixed colours, a ghost pass
+ * through the hull); `hull` / `interior` are the hologram surface; `focus` is the
+ * legacy accent-lit model (kept for the landing hologram's API, unused by the package scene).
+ */
+export type HoloRole = 'hull' | 'part' | 'interior' | 'focus' | 'quiet' | 'hover' | 'select';
 
-const ROLES: readonly HoloRole[] = ['hull', 'part', 'interior', 'focus', 'quiet'];
+const ROLES: readonly HoloRole[] = ['hull', 'part', 'interior', 'focus', 'quiet', 'hover', 'select'];
+/** Roles drawn as lit bodies (fixed colours, ghost pass through the hull). */
+export const HOLO_BODY_ROLES: readonly HoloRole[] = ['part', 'quiet', 'hover', 'select'];
+const isBody = (role: HoloRole) => HOLO_BODY_ROLES.includes(role);
+
+/**
+ * The one selection colour of every ship (concept 20261117-1809, "Grün", like the
+ * game's selection). Same value as the CSS token `--sc-holo-select` in src/styles.scss.
+ */
+export const HOLO_SELECT: Rgb = [125, 255, 156];
+/** Idle part body (concept d1): line `#a6eaff`, fill 36 % of `rgb(96,205,240)`. */
+export const HOLO_PART_LINE: Rgb = [166, 234, 255];
+export const HOLO_PART_FILL: Rgb = [96, 205, 240];
+/** Hovered part: white line, fill 36 % of `rgb(196,240,255)`. */
+export const HOLO_HOVER_FILL: Rgb = [196, 240, 255];
+/** Parts that are not the selection while one exists: line `rgba(82,193,230,.42)`, fill 5 %. */
+export const HOLO_DIM_PART: Rgb = [82, 193, 230];
+
+export interface BodyLook {
+  readonly line: Rgb;
+  readonly lineAlpha: number;
+  readonly fill: Rgb;
+  readonly fillAlpha: number;
+  /** Fresnel glow in the fill colour (the mock's box-shadow). */
+  readonly glow: number;
+}
+export const HOLO_BODY_IDLE: BodyLook = { line: HOLO_PART_LINE, lineAlpha: 1, fill: HOLO_PART_FILL, fillAlpha: 0.36, glow: 0.55 };
+export const HOLO_BODY_DIM: BodyLook = { line: HOLO_DIM_PART, lineAlpha: 0.42, fill: HOLO_DIM_PART, fillAlpha: 0.05, glow: 0 };
+export const HOLO_BODY_HOVER: BodyLook = { line: [255, 255, 255], lineAlpha: 1, fill: HOLO_HOVER_FILL, fillAlpha: 0.36, glow: 0.7 };
+export const HOLO_BODY_SELECT: BodyLook = { line: HOLO_SELECT, lineAlpha: 1, fill: HOLO_SELECT, fillAlpha: 0.64, glow: 0.9 };
+/** A part of another Einsatz: between idle and dimmed. */
+export const HOLO_BODY_QUIET: BodyLook = mixBody(HOLO_BODY_IDLE, HOLO_BODY_DIM, 0.6);
+/**
+ * Strength of a body where the hull (or another part) is in front of it: the ghost
+ * pass (depthFunc GreaterDepth). Quieter than the visible body; the selection stays
+ * readable through the hull.
+ */
+export const HOLO_GHOST: Readonly<Record<'part' | 'quiet' | 'hover' | 'select', number>> = {
+  part: 0.5,
+  quiet: 0.4,
+  hover: 0.7,
+  select: 0.85,
+};
+
+export function mixBody(a: BodyLook, b: BodyLook, t: number): BodyLook {
+  const m = (x: number, y: number) => x + (y - x) * t;
+  return {
+    line: [m(a.line[0], b.line[0]), m(a.line[1], b.line[1]), m(a.line[2], b.line[2])],
+    lineAlpha: m(a.lineAlpha, b.lineAlpha),
+    fill: [m(a.fill[0], b.fill[0]), m(a.fill[1], b.fill[1]), m(a.fill[2], b.fill[2])],
+    fillAlpha: m(a.fillAlpha, b.fillAlpha),
+    glow: m(a.glow, b.glow),
+  };
+}
 
 /** Crease angle for panel/character lines on a normal-sized hull: below it a seam is "smooth surface". */
 export const HOLO_CREASE_DEG = 30;
@@ -39,25 +97,23 @@ export const HOLO_EDGE_MAX_TRIANGLES = 1_200_000;
 export const HOLO_MAX_FOCUS = 4;
 /** Strength of the fine static scanlines (the concept study had 0.05 — kept, but quieter). */
 export const HOLO_SCANLINES = 0.022;
-/** Strength of the slow sweep band (concept study: 0.32). */
-export const HOLO_SWEEP = 0.2;
-/** Opacity of the crease lines. */
-export const HOLO_EDGE_OPACITY = 0.45;
+/**
+ * Strength of the slow sweep band (concept study: 0.32). Subtle: the band must
+ * not light a whole flat hull panel (brightness would swing with the angle).
+ */
+export const HOLO_SWEEP = 0.08;
+/** Opacity of the hull's crease lines (concept d1: `rgba(82,193,230,.46)`). */
+export const HOLO_EDGE_OPACITY = 0.46;
 
-// Focus / x-ray tuning, in one place so the look can be A/B-compared by editing
-// a number. While something is focused the rest of the model must stay readable
-// (hovering a neighbour needs to see it): the hull is a translucent ghost, not
-// a near-invisible one.
-/** Hull opacity while a part is focused (1 = opaque). */
-export const HOLO_XRAY_HULL_OPACITY = 0.45;
-/** Opacity of the (unfocused) parts while a part is focused. */
-export const HOLO_XRAY_PART_OPACITY = 0.4;
-/** Fill colour factor of everything that is not the focus (1 = no dimming). */
+// Highlight tuning, in one place so the look can be A/B-compared by editing a
+// number. There is no see-through any more (concept 20261117-1809, C1): a hover
+// or a selection never makes the hull translucent; the parts carry the highlight.
+/** Fill colour factor of the hull while a selection exists (1 = no dimming). */
 export const HOLO_DIM_FILL = 0.65;
-/** Crease-line colour factor of everything that is not the focus. */
-export const HOLO_DIM_EDGE_COLOR = 0.78;
-/** Crease-line alpha factor of everything that is not the focus. */
-export const HOLO_DIM_EDGE_ALPHA = 0.8;
+/** Crease-line colour factor of the hull while a selection exists. */
+export const HOLO_DIM_EDGE_COLOR = 1;
+/** Crease-line alpha factor of the hull while a selection exists: `.46` → `.30`. */
+export const HOLO_DIM_EDGE_ALPHA = 0.3 / 0.46;
 /** Brightness of a part that is not relevant to the picked Einsatz (`part` is 1.1). */
 export const HOLO_QUIET_LEVEL = 0.42;
 /** Crease-line factor of such a part. */
@@ -184,20 +240,21 @@ void main() {
   float fres = pow(1.0 - ndv, 2.4);
   float rim = pow(1.0 - ndv, 4.0);
   float up = N.y * 0.5 + 0.5;
-  // Body in the app accent: a faint fill graded by facing and height of the
-  // normal, fine static scanlines and one slow sweep band.
+  // Body in the app accent: a faint fill, fine static scanlines and one slow
+  // sweep band. The facing / height grading is held to a narrow range, so a
+  // dense, steep side (a Valkyrie's underside) reads as bright as a flat top.
   float y = vWorld.y * uScale;
   float lines = smoothstep(0.55, 1.0, sin(y * 520.0)) * uLines;
   float band = fract(y * 0.8 - uTime * 0.05);
   float sweep = smoothstep(0.0, 0.05, band) * (1.0 - smoothstep(0.05, 0.14, band)) * uScan;
-  vec3 col = uTint * (0.035 + 0.11 * ndv * (0.35 + 0.65 * up));
-  col += uTint * (lines + sweep * uSweep) * (0.35 + ndv);
+  vec3 col = uTint * (0.058 + 0.034 * ndv * (0.6 + 0.4 * up));
+  col += uTint * (lines + sweep * uSweep) * 0.7;
   // A soft Fresnel rim in the body colour; the grazing fringe of it in the
-  // manufacturer's accent. Kept narrow and bright: a dim warm accent spread
-  // over whole panels reads as brown, not as light.
-  col += mix(uTint, vec3(1.0), 0.25) * rim * 0.55;
-  float fringe = smoothstep(0.8, 0.98, 1.0 - ndv);
-  col += mix(uAccent, vec3(1.0), 0.15) * fringe * 0.8;
+  // manufacturer's accent. Kept narrow and quiet: many grazing facets must not
+  // add up to a bright side.
+  col += mix(uTint, vec3(1.0), 0.25) * rim * 0.28;
+  float fringe = smoothstep(0.85, 0.98, 1.0 - ndv);
+  col += mix(uAccent, vec3(1.0), 0.15) * fringe * 0.4;
   col *= uLevel;
   // Highlight: everything else dims, a glow cloud lights the hull around the
   // focus points, a focused component renders as a lit model in the accent.
@@ -232,12 +289,59 @@ void main() {
 }
 `;
 
-const ROLE_LEVEL: Record<HoloRole, number> = { hull: 1, part: 1.1, interior: 0.6, focus: 1, quiet: HOLO_QUIET_LEVEL };
+// Lit bodies (clickable parts): a flat fill in the body colour plus a Fresnel
+// glow. The main pass is opaque (over the dark stage the mock's 36 % fill is
+// colour × alpha); the ghost pass (uGhost > 0, depthFunc GreaterDepth) only
+// draws where something is in front and blends over it.
+const BODY_FRAGMENT = /* glsl */ `
+uniform vec3 uBodyColor;
+uniform float uBodyAlpha;
+uniform float uGlowAmt;
+uniform float uGhost;
+varying vec3 vViewPos;
+varying vec3 vWorld;
+void main() {
+  vec3 N = normalize(cross(dFdx(vViewPos), dFdy(vViewPos)));
+  vec3 V = normalize(-vViewPos);
+  if (dot(N, V) < 0.0) N = -N;
+  float ndv = clamp(dot(N, V), 0.0, 1.0);
+  float rim = pow(1.0 - ndv, 2.0);
+  vec3 glow = mix(uBodyColor, vec3(1.0), 0.25) * rim * uGlowAmt * 0.55;
+  if (uGhost > 0.0) {
+    gl_FragColor = vec4(uBodyColor * (0.85 + 0.15 * ndv) + glow, clamp((uBodyAlpha + rim * uGlowAmt * 0.25) * uGhost, 0.0, 1.0));
+    return;
+  }
+  gl_FragColor = vec4(uBodyColor * uBodyAlpha * (0.8 + 0.25 * ndv) + glow, 1.0);
+}
+`;
+
+const BODY_EDGE_FRAGMENT = /* glsl */ `
+uniform vec3 uColor;
+uniform float uAlpha;
+uniform float uGhostMul;
+void main() {
+  gl_FragColor = vec4(uColor, uAlpha * uGhostMul);
+}
+`;
+
+const ROLE_LEVEL: Record<HoloRole, number> = {
+  hull: 1,
+  part: 1.1,
+  interior: 0.6,
+  focus: 1,
+  quiet: HOLO_QUIET_LEVEL,
+  hover: 1,
+  select: 1,
+};
 /** Crease-line opacity per role: the interior and quiet parts recede. */
 const edgeOpacity = (role: HoloRole) => HOLO_EDGE_OPACITY * (role === 'interior' ? 0.5 : role === 'quiet' ? HOLO_QUIET_EDGE : 1);
 
 /** Mark on a LineSegments child this module added. */
 const EDGE_FLAG = 'holoEdges';
+/** Mark on the ghost children (fill mesh, edge lines) of a lit body. */
+export const HOLO_GHOST_FLAG = 'holoGhost';
+/** Render order of a body's ghost pass per role (after the hull; the selection last). */
+const GHOST_ORDER: Readonly<Record<string, number>> = { part: 2, quiet: 2, hover: 6, select: 8 };
 
 /** A value that eases to its target over {@link HOLO_TWEEN_S}; the start time is taken from the first tick (on-demand renders can be seconds apart). */
 class Eased {
@@ -290,6 +394,8 @@ class Eased {
 
 const toColor = (c: Rgb) => new THREE.Color(c[0] / 255, c[1] / 255, c[2] / 255);
 
+type BodyRole = 'part' | 'quiet' | 'hover' | 'select';
+
 export class HoloLook {
   /** Animated scan running (off with reduced motion). */
   readonly animated: boolean;
@@ -297,6 +403,9 @@ export class HoloLook {
   private readonly accentColor: THREE.Color;
   private readonly fills = new Map<HoloRole, THREE.ShaderMaterial>();
   private readonly lines = new Map<HoloRole, THREE.ShaderMaterial>();
+  /** Ghost pass of the body roles (where the hull or another part is in front). */
+  private readonly ghostFills = new Map<HoloRole, THREE.ShaderMaterial>();
+  private readonly ghostLines = new Map<HoloRole, THREE.ShaderMaterial>();
   /** source geometry → its crease edges; computed once, disposed with the look. */
   private readonly edgeCache = new Map<THREE.BufferGeometry, THREE.BufferGeometry | null>();
   /** Edges in flight from {@link dressAsync}, per source geometry. */
@@ -305,6 +414,9 @@ export class HoloLook {
   /** Line detail of the fitted hull (hull + interior roles). */
   private hullDetail: EdgeDetail = FULL_DETAIL;
   private readonly easeDim = new Eased(0);
+  /** Hover / select looks ease in from the part look when a part takes them. */
+  private readonly easeHover = new Eased(1);
+  private readonly easeSelect = new Eased(1);
   private readonly easeOpacity = new Map<HoloRole, Eased>(ROLES.map((r) => [r, new Eased(1)]));
   /** Focus / x-ray changes ease in (off: they apply instantly, as the legacy viewer expects). */
   private readonly tweenFocus: boolean;
@@ -318,11 +430,13 @@ export class HoloLook {
     uFocusCount: { value: 0 },
     uFocusRadius: { value: 1 },
   };
+  /** Body uniforms per body role, shared by its main and ghost materials. */
+  private readonly body = new Map<HoloRole, { color: { value: THREE.Color }; alpha: { value: number }; glow: { value: number }; line: { value: THREE.Color }; lineAlpha: { value: number } }>();
 
   /**
    * @param base   body colour (the app accent, same for every ship)
-   * @param accent manufacturer accent (rim, highlight)
-   * @param tweenFocus ease opacity / dim over {@link HOLO_TWEEN_S}; the caller must keep
+   * @param accent manufacturer accent (rim fringe; the legacy focus model)
+   * @param tweenFocus ease dim / hover / select over {@link HOLO_TWEEN_S}; the caller must keep
    *        rendering while {@link tweening} (never with reduced motion: instant there)
    */
   constructor(base: Rgb, accent: Rgb, reducedMotion: boolean, tweenFocus = false) {
@@ -331,8 +445,11 @@ export class HoloLook {
     this.shared.uScan.value = this.animated ? 1 : 0;
     this.tint = toColor(base);
     this.accentColor = toColor(accent);
-    const edgeColor = this.tint.clone().lerp(new THREE.Color(1, 1, 1), 0.3);
     for (const role of ROLES) {
+      if (isBody(role)) {
+        this.makeBody(role);
+        continue;
+      }
       const focus = role === 'focus';
       const fill = new THREE.ShaderMaterial({
         vertexShader: VERTEX,
@@ -349,10 +466,8 @@ export class HoloLook {
         },
         side: THREE.DoubleSide,
         // Opaque: a translucent hull over its own interior surfaces adds up
-        // to a white blob and needs sorting. The glow is in the colours (dark
-        // fill, bright rim) on the dark stage instead. The focus is the one
-        // exception: it sits in the transparent pass (alpha 1, depth written)
-        // so it draws after the glow halo and stays recognisable inside it.
+        // to a white blob and needs sorting. The legacy focus model sits in the
+        // transparent pass (alpha 1, depth written).
         transparent: focus,
         depthWrite: true,
         // Pushed back a hair so the crease lines draw on top without z-fighting.
@@ -369,19 +484,83 @@ export class HoloLook {
           uFocus: this.shared.uFocus,
           uFocusCount: this.shared.uFocusCount,
           uFocusRadius: this.shared.uFocusRadius,
-          uColor: { value: edgeColor.clone() },
+          // The hull lines are the body colour itself (concept d1: rgba(82,193,230,.46)).
+          uColor: { value: focus ? this.tint.clone().lerp(new THREE.Color(1, 1, 1), 0.3) : this.tint.clone() },
           uAccent: { value: this.accentColor.clone() },
           uOpacity: { value: edgeOpacity(role) },
           uGlow: { value: focus ? 1 : 0 },
         },
         transparent: true,
         depthWrite: false,
-        // Lines add up (glow on dark) instead of blending over.
-        blending: THREE.AdditiveBlending,
+        // Lines blend over, never add up: a side dense with creases (the
+        // Valkyrie's underside) must not read several times brighter than a sparse one.
+        blending: THREE.NormalBlending,
         toneMapped: false,
       });
       this.fills.set(role, fill);
       this.lines.set(role, line);
+    }
+    this.applyBody();
+  }
+
+  private makeBody(role: HoloRole): void {
+    const u = {
+      color: { value: new THREE.Color() },
+      alpha: { value: 0 },
+      glow: { value: 0 },
+      line: { value: new THREE.Color() },
+      lineAlpha: { value: 1 },
+    };
+    this.body.set(role, u);
+    const fill = (ghost: number) =>
+      new THREE.ShaderMaterial({
+        vertexShader: VERTEX,
+        fragmentShader: BODY_FRAGMENT,
+        uniforms: { uBodyColor: u.color, uBodyAlpha: u.alpha, uGlowAmt: u.glow, uGhost: { value: ghost } },
+        side: THREE.DoubleSide,
+        transparent: ghost > 0,
+        depthWrite: ghost === 0,
+        depthFunc: ghost > 0 ? THREE.GreaterDepth : THREE.LessEqualDepth,
+        polygonOffset: true,
+        polygonOffsetFactor: 1,
+        polygonOffsetUnits: 1,
+        toneMapped: false,
+      });
+    const line = (ghost: number) =>
+      new THREE.ShaderMaterial({
+        vertexShader: EDGE_VERTEX,
+        fragmentShader: BODY_EDGE_FRAGMENT,
+        uniforms: { uColor: u.line, uAlpha: u.lineAlpha, uGhostMul: { value: ghost || 1 } },
+        transparent: true,
+        depthWrite: false,
+        depthFunc: ghost > 0 ? THREE.GreaterDepth : THREE.LessEqualDepth,
+        blending: THREE.NormalBlending,
+        toneMapped: false,
+      });
+    const g = HOLO_GHOST[role as BodyRole];
+    this.fills.set(role, fill(0));
+    this.lines.set(role, line(0));
+    this.ghostFills.set(role, fill(g));
+    this.ghostLines.set(role, line(g));
+  }
+
+  /** Write the body uniforms from the eased dim / hover / select state. */
+  private applyBody(): void {
+    const d = this.easeDim.value;
+    const part = mixBody(HOLO_BODY_IDLE, HOLO_BODY_DIM, d);
+    const looks: Record<BodyRole, BodyLook> = {
+      part,
+      quiet: mixBody(HOLO_BODY_QUIET, HOLO_BODY_DIM, d),
+      hover: mixBody(part, HOLO_BODY_HOVER, this.easeHover.value),
+      select: mixBody(part, HOLO_BODY_SELECT, this.easeSelect.value),
+    };
+    for (const [role, u] of this.body) {
+      const l = looks[role as BodyRole];
+      u.color.value.setRGB(l.fill[0] / 255, l.fill[1] / 255, l.fill[2] / 255);
+      u.alpha.value = l.fillAlpha;
+      u.glow.value = l.glow;
+      u.line.value.setRGB(l.line[0] / 255, l.line[1] / 255, l.line[2] / 255);
+      u.lineAlpha.value = l.lineAlpha;
     }
   }
 
@@ -391,6 +570,15 @@ export class HoloLook {
 
   line(role: HoloRole): THREE.ShaderMaterial {
     return this.lines.get(role)!;
+  }
+
+  /** Ghost pass of a body role (drawn only where something is in front); undefined for hull roles. */
+  ghostFill(role: HoloRole): THREE.ShaderMaterial | undefined {
+    return this.ghostFills.get(role);
+  }
+
+  ghostLine(role: HoloRole): THREE.ShaderMaterial | undefined {
+    return this.ghostLines.get(role);
   }
 
   /** The manufacturer accent as a three colour (for markers the scene draws itself). */
@@ -425,31 +613,56 @@ export class HoloLook {
 
   /**
    * Put every mesh under `root` into `role`: swap its material for the look's
-   * fill and give it one crease-edge child. Re-dressing an already dressed
-   * mesh only swaps materials (the edge child is reused). Hull and interior
+   * fill and give it one crease-edge child. A body role also gets its ghost
+   * children (fill + lines through the hull). Re-dressing an already dressed
+   * mesh only swaps materials (the children are reused). Hull and interior
    * use the fitted line detail, parts keep every crease.
    */
   dress(root: THREE.Object3D, role: HoloRole, accept: (mesh: THREE.Mesh) => boolean = () => true): void {
     const meshes: THREE.Mesh[] = [];
     root.traverse((o) => {
-      if ((o as THREE.Mesh).isMesh && accept(o as THREE.Mesh)) meshes.push(o as THREE.Mesh);
+      if ((o as THREE.Mesh).isMesh && !o.userData[HOLO_GHOST_FLAG] && accept(o as THREE.Mesh)) meshes.push(o as THREE.Mesh);
     });
     const detail = role === 'hull' || role === 'interior' ? this.hullDetail : FULL_DETAIL;
     if (detail.minArea > 0) root.updateWorldMatrix(true, true);
     for (const mesh of meshes) {
       mesh.material = this.fill(role);
-      let edge = mesh.children.find((c) => c.userData[EDGE_FLAG]) as THREE.LineSegments | undefined;
+      let edge = mesh.children.find((c) => c.userData[EDGE_FLAG] && !c.userData[HOLO_GHOST_FLAG]) as THREE.LineSegments | undefined;
       if (!edge) {
         const scale = detail.minArea > 0 ? mesh.matrixWorld.getMaxScaleOnAxis() : 1;
         const geo = this.edgesFor(mesh.geometry, detail, scale);
-        if (!geo) continue;
-        edge = new THREE.LineSegments(geo, this.line(role));
-        edge.userData[EDGE_FLAG] = true;
-        edge.raycast = () => undefined;
-        edge.matrixAutoUpdate = false;
-        mesh.add(edge);
+        if (geo) {
+          edge = new THREE.LineSegments(geo, this.line(role));
+          edge.userData[EDGE_FLAG] = true;
+          edge.raycast = () => undefined;
+          edge.matrixAutoUpdate = false;
+          mesh.add(edge);
+        }
       }
-      edge.material = this.line(role);
+      if (edge) edge.material = this.line(role);
+      if (isBody(role) && !mesh.children.some((c) => c.userData[HOLO_GHOST_FLAG])) {
+        const ghost = new THREE.Mesh(mesh.geometry, this.ghostFill(role));
+        ghost.userData[HOLO_GHOST_FLAG] = true;
+        ghost.raycast = () => undefined;
+        ghost.matrixAutoUpdate = false;
+        mesh.add(ghost);
+        if (edge) {
+          const gl = new THREE.LineSegments(edge.geometry, this.ghostLine(role));
+          gl.userData[EDGE_FLAG] = true;
+          gl.userData[HOLO_GHOST_FLAG] = true;
+          gl.raycast = () => undefined;
+          gl.matrixAutoUpdate = false;
+          mesh.add(gl);
+        }
+      }
+      for (const g of mesh.children) {
+        if (!g.userData[HOLO_GHOST_FLAG]) continue;
+        g.visible = isBody(role);
+        if (!g.visible) continue;
+        const isLine = !!g.userData[EDGE_FLAG];
+        (g as THREE.Mesh).material = isLine ? this.ghostLine(role)! : this.ghostFill(role)!;
+        g.renderOrder = (GHOST_ORDER[role] ?? 2) + (isLine ? 1 : 0);
+      }
     }
   }
 
@@ -457,6 +670,7 @@ export class HoloLook {
    * {@link dress} with the crease edges computed by `compute` (the edge worker): the fill
    * materials are on at once, each mesh's edge child follows when its edges arrive, then
    * `onEdges` runs (queue a render). A look disposed in the meantime adds nothing.
+   * Hull roles only (no ghost pass).
    */
   dressAsync(
     root: THREE.Object3D,
@@ -510,10 +724,19 @@ export class HoloLook {
     });
   }
 
-  /** Swap materials of an already dressed subtree (focus on/off). */
+  /** Swap materials of an already dressed subtree (role change: hover, select, quiet). */
   setRole(root: THREE.Object3D, role: HoloRole, renderOrder = 0): void {
+    const body = isBody(role);
+    const ghostOrder = GHOST_ORDER[role] ?? 2;
     root.traverse((o) => {
-      if ((o as THREE.Mesh).isMesh) {
+      const ghost = !!o.userData[HOLO_GHOST_FLAG];
+      if (ghost) {
+        o.visible = body;
+        if (!body) return;
+        const edge = !!o.userData[EDGE_FLAG];
+        (o as THREE.Mesh).material = edge ? this.ghostLine(role)! : this.ghostFill(role)!;
+        o.renderOrder = ghostOrder + (edge ? 1 : 0);
+      } else if ((o as THREE.Mesh).isMesh) {
         (o as THREE.Mesh).material = this.fill(role);
         o.renderOrder = renderOrder;
       } else if (o.userData[EDGE_FLAG]) {
@@ -536,13 +759,17 @@ export class HoloLook {
     this.hullDetail = edgeDetail(extent, triangles);
   }
 
-  /** World radius of the glow cloud (after {@link fit}). */
+  /** World radius of the glow cloud / slot ring (after {@link fit}). */
   get focusRadius(): number {
     return this.shared.uFocusRadius.value;
   }
 
-  /** Overall opacity of a role (x-ray); the fill turns transparent below 1. */
+  /**
+   * Overall opacity of a hull role (the interior layer the user switches on);
+   * the fill turns transparent below 1. Body roles stay opaque (no-op).
+   */
   setOpacity(role: HoloRole, opacity: number): void {
+    if (isBody(role)) return;
     this.easeOpacity.get(role)!.set(opacity, this.tweenFocus);
     this.applyOpacity(role);
   }
@@ -560,19 +787,29 @@ export class HoloLook {
       fill.depthWrite = role === 'focus' || !transparent;
       fill.needsUpdate = true;
     }
-    // Lines keep a floor so an x-rayed hull still reads as a wireframe ghost.
+    // Lines keep a floor so a glassy hull still reads as a wireframe.
     this.line(role).uniforms['uOpacity'].value = edgeOpacity(role) * Math.max(opacity, 0.45);
   }
 
-  /** Dim everything that is not a focus (hull, other parts). */
+  /** A selection exists: the hull lines and the other parts drop to about a third. */
   setDim(dim: boolean): void {
     this.easeDim.set(dim ? 1 : 0, this.tweenFocus);
     this.shared.uDim.value = this.easeDim.value;
+    this.applyBody();
   }
 
-  /** An opacity / dim change is still easing: keep rendering. */
+  /** A part just took the hover / select look: ease it in from the part look (instant with reduced motion). */
+  easeIn(role: 'hover' | 'select'): void {
+    const e = role === 'hover' ? this.easeHover : this.easeSelect;
+    if (!this.tweenFocus) return;
+    e.set(0, false);
+    e.set(1, true);
+    this.applyBody();
+  }
+
+  /** A dim / opacity / hover / select change is still easing: keep rendering. */
   get tweening(): boolean {
-    if (this.easeDim.active) return true;
+    if (this.easeDim.active || this.easeHover.active || this.easeSelect.active) return true;
     for (const e of this.easeOpacity.values()) if (e.active) return true;
     return false;
   }
@@ -581,7 +818,7 @@ export class HoloLook {
     return this.shared.uDim.value > 0;
   }
 
-  /** World-space points the hull glows around (the glow cloud); empty clears. */
+  /** World-space points the hull glows around (legacy glow cloud); empty clears. */
   setFocusPoints(points: readonly THREE.Vector3[]): void {
     const n = Math.min(points.length, HOLO_MAX_FOCUS);
     for (let i = 0; i < n; i++) this.shared.uFocus.value[i].copy(points[i]);
@@ -592,13 +829,16 @@ export class HoloLook {
     return this.shared.uFocusCount.value;
   }
 
-  /** Advance the scan and any running focus tween (seconds). Scan: a no-op when the look is not animated. */
+  /** Advance the scan and any running tween (seconds). Scan: a no-op when the look is not animated. */
   tick(seconds: number): void {
     if (this.animated) this.shared.uTime.value = seconds;
     if (!this.tweening) return;
-    if (this.easeDim.active) {
+    if (this.easeDim.active || this.easeHover.active || this.easeSelect.active) {
       this.easeDim.step(seconds);
+      this.easeHover.step(seconds);
+      this.easeSelect.step(seconds);
       this.shared.uDim.value = this.easeDim.value;
+      this.applyBody();
     }
     for (const [role, e] of this.easeOpacity) {
       if (!e.active) continue;
@@ -610,8 +850,7 @@ export class HoloLook {
   dispose(): void {
     this.disposed = true;
     this.edgeJobs.clear();
-    for (const m of this.fills.values()) m.dispose();
-    for (const m of this.lines.values()) m.dispose();
+    for (const map of [this.fills, this.lines, this.ghostFills, this.ghostLines]) for (const m of map.values()) m.dispose();
     for (const g of this.edgeCache.values()) g?.dispose();
     this.edgeCache.clear();
   }

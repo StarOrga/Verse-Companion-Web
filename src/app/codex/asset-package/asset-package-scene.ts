@@ -16,9 +16,9 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import type { Bounds, PackagePlacement } from './asset-package.model';
 import {
   HoloLook,
-  HOLO_MAX_FOCUS,
-  HOLO_XRAY_HULL_OPACITY,
-  HOLO_XRAY_PART_OPACITY,
+  HOLO_GHOST_FLAG,
+  HOLO_PART_LINE,
+  HOLO_SELECT,
   countTriangles,
   type HoloRole,
   type Rgb,
@@ -59,11 +59,11 @@ export function startViewDir(facing: StartFacing): readonly [number, number, num
   return facing === 'nose' ? [-1, 0.55, -1.25] : [1, 0.55, 1.25];
 }
 
-// X-ray opacities and the dim factor live in holo-look.ts (HOLO_XRAY_*, HOLO_DIM_*).
+// The dim factors live in holo-look.ts (HOLO_DIM_*, HOLO_BODY_*). No see-through
+// on hover or selection: only the interior layer the user switches on glazes the hull.
 const HULL_OPACITY_INTERIOR = 0.28;
 
-/** Render order: x-rayed hull/parts → glow halo → focused component on top of it. */
-const ORDER_HALO = 5;
+/** Render order: hull → part bodies → the hovered / selected body. */
 const ORDER_FOCUS = 10;
 const ORDER_RING = 20;
 
@@ -115,24 +115,6 @@ const MAX_FIT_POINTS = 2500;
 /** How much the straight top/bottom view counts in the fixed orbit distance (E4). */
 const POLE_FIT_WEIGHT = 0.8;
 
-/** Soft radial falloff (white, alpha only) for the glow halo; tinted by the sprite colour. */
-function haloTexture(size = 64): THREE.DataTexture {
-  const data = new Uint8Array(size * size * 4);
-  const c = (size - 1) / 2;
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const d = Math.min(Math.hypot(x - c, y - c) / c, 1);
-      const a = Math.pow(1 - d, 2.2);
-      const i = (y * size + x) * 4;
-      data[i] = data[i + 1] = data[i + 2] = 255;
-      data[i + 3] = Math.round(a * 255);
-    }
-  }
-  const tex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
-  tex.needsUpdate = true;
-  return tex;
-}
-
 function sameMatrix(a: THREE.Matrix4, b: THREE.Matrix4): boolean {
   return a.elements.every((v, i) => Math.abs(v - b.elements[i]) < 1e-5);
 }
@@ -160,13 +142,12 @@ export class PackageScene {
   /** placement id → its world position, for hotspot projection. */
   private readonly anchors = new Map<string, THREE.Vector3>();
   private readonly geometries = new Set<THREE.BufferGeometry>();
-  private focused = new Set<string>();
+  private hovered = new Set<string>();
+  private selected = new Set<string>();
   /** Parts not relevant to the picked Einsatz: quieter, still there. */
   private quiet: ReadonlySet<string> = new Set();
   /** Current look role per placed node, so a role change only touches what changed. */
   private readonly roles = new Map<string, HoloRole>();
-  /** Hull see-through. Follows the focus unless the caller says otherwise (holotable: selection only). */
-  private seeThrough = false;
   /** Box of everything framed (hull + placed parts): its projection is the label's "silhouette". */
   private readonly contentBox = new THREE.Box3();
   private frameId = 0;
@@ -192,14 +173,12 @@ export class PackageScene {
   private readonly seenView = new THREE.Matrix4();
   private readonly seenProjection = new THREE.Matrix4();
 
-  // Highlight markers: glow halos (focused anchors) and empty-slot rings.
-  private readonly haloTex = haloTexture();
-  private readonly haloMat: THREE.SpriteMaterial;
-  private readonly halos: THREE.Sprite[] = [];
+  // Empty-slot rings: hover in the part line colour, green when that slot is selected.
   private readonly ringGeo = new THREE.PlaneGeometry(1, 1);
   private readonly ringMat: THREE.ShaderMaterial;
+  private readonly ringSelMat: THREE.ShaderMaterial;
   private readonly rings: THREE.Mesh[] = [];
-
+  private readonly raycaster = new THREE.Raycaster();
   constructor(
     private readonly canvas: HTMLCanvasElement,
     base: Rgb,
@@ -234,29 +213,21 @@ export class PackageScene {
     // highlight in the manufacturer accent; focus/x-ray only flip uniforms.
     this.look = new HoloLook(base, accent, reducedMotion, true);
 
-    this.haloMat = new THREE.SpriteMaterial({
-      map: this.haloTex,
-      color: this.look.accent,
-      transparent: true,
-      depthTest: false,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      opacity: 0.55,
-      toneMapped: false,
-    });
-    this.ringMat = new THREE.ShaderMaterial({
-      vertexShader: RING_VERTEX,
-      fragmentShader: RING_FRAGMENT,
-      uniforms: { uColor: { value: this.look.accent }, uAlpha: { value: 1 }, uAngle: { value: 0 } },
-      transparent: true,
-      // Never occluded: an empty slot is often inside the hull.
-      depthTest: false,
-      depthWrite: false,
-      premultipliedAlpha: true,
-      blending: THREE.NormalBlending,
-      toneMapped: false,
-    });
-
+    const ring = (c: Rgb) =>
+      new THREE.ShaderMaterial({
+        vertexShader: RING_VERTEX,
+        fragmentShader: RING_FRAGMENT,
+        uniforms: { uColor: { value: new THREE.Color(c[0] / 255, c[1] / 255, c[2] / 255) }, uAlpha: { value: 1 }, uAngle: { value: 0 } },
+        transparent: true,
+        // Never occluded: an empty slot is often inside the hull.
+        depthTest: false,
+        depthWrite: false,
+        premultipliedAlpha: true,
+        blending: THREE.NormalBlending,
+        toneMapped: false,
+      });
+    this.ringMat = ring(HOLO_PART_LINE);
+    this.ringSelMat = ring(HOLO_SELECT);
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enableDamping = !reducedMotion;
     this.controls.dampingFactor = 0.12;
@@ -360,42 +331,78 @@ export class PackageScene {
 
   private interiorOn = false;
 
-  /**
-   * Hull/part translucency: x-ray while something is focused; with the
-   * interior layer on, the hull alone turns glassy so the cabin reads.
-   */
+  /** Hull translucency: only the interior layer (switched on by the user) glazes the hull. */
   private applyOpacity(): void {
-    const xray = this.seeThrough;
-    for (const role of ['hull', 'part', 'interior', 'quiet'] as const) {
-      let opacity = 1;
-      if (xray) opacity = role === 'hull' ? HOLO_XRAY_HULL_OPACITY : HOLO_XRAY_PART_OPACITY;
-      else if (this.interiorOn && role === 'hull') opacity = HULL_OPACITY_INTERIOR;
-      this.look.setOpacity(role, opacity);
+    for (const role of ['hull', 'interior'] as const) {
+      this.look.setOpacity(role, this.interiorOn && role === 'hull' ? HULL_OPACITY_INTERIOR : 1);
     }
-    // Highlight: everything that is not the focus dims, the focus glows.
-    this.look.setDim(xray);
     this.requestRender();
   }
 
-  /**
-   * Highlight: the focused placements render as lit models in the accent
-   * inside a glow cloud; a focused empty slot shows its ring marker instead.
-   * The x-ray over the hull comes with any focus by default; the holotable
-   * keeps it for a selection (a hover only lights).
-   */
-  setFocus(ids: readonly string[], seeThrough = ids.length > 0): void {
-    this.focused = new Set(ids);
-    this.seeThrough = seeThrough;
+  /** Lights parts: `hover` = pointer/keyboard focus look, `selected` = the green selection look. No see-through, ever. */
+  setHighlight(state: { hover: readonly string[]; selected: readonly string[] }): void {
+    const selected = new Set(state.selected);
+    const hovered = new Set(state.hover.filter((id) => !selected.has(id)));
+    if ([...hovered].some((id) => !this.hovered.has(id) && this.placed.has(id))) this.look.easeIn('hover');
+    if ([...selected].some((id) => !this.selected.has(id) && this.placed.has(id))) this.look.easeIn('select');
+    this.hovered = hovered;
+    this.selected = selected;
     this.applyRoles();
-    const points = ids.map((id) => this.anchors.get(id)).filter((p): p is THREE.Vector3 => !!p);
-    this.look.setFocusPoints(points);
-    this.syncMarkers(
-      points.slice(0, HOLO_MAX_FOCUS),
-      ids.filter((id) => !this.placed.has(id) && this.anchors.has(id)).map((id) => this.anchors.get(id)!),
-    );
-    this.applyOpacity();
+    // While a selection exists the hull lines and the other parts drop to about a third.
+    this.look.setDim(selected.size > 0);
+    const empty = (ids: ReadonlySet<string>) =>
+      [...ids].filter((id) => !this.placed.has(id) && this.anchors.has(id)).map((id) => this.anchors.get(id)!);
+    this.syncRings(empty(hovered), empty(selected));
+    this.requestRender();
   }
 
+  /** Placements currently in the hover / selected look (spec + debugging aid). */
+  highlight(): { hover: readonly string[]; selected: readonly string[] } {
+    return { hover: [...this.hovered], selected: [...this.selected] };
+  }
+
+  /**
+   * The placement under a client point, or null. A ray hit on a placed part's meshes wins (front-most);
+   * otherwise the nearest projected anchor within `slopPx` CSS pixels. Only ids in `candidates` are considered.
+   * Parts inside the hull are pickable (the hull does not block the pick).
+   */
+  pick(clientX: number, clientY: number, slopPx: number, candidates: ReadonlySet<string>): string | null {
+    const rect = this.canvas.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    this.camera.updateMatrixWorld();
+    this.raycaster.setFromCamera(new THREE.Vector2((x / rect.width) * 2 - 1, -(y / rect.height) * 2 + 1), this.camera);
+    let best: string | null = null;
+    let bestDist = Infinity;
+    for (const [id, node] of this.placed) {
+      if (!candidates.has(id) || !node.visible) continue;
+      // Ghost children and edge lines share the body's geometry: only the body mesh counts.
+      const hit = this.raycaster
+        .intersectObject(node, true)
+        .find((h) => (h.object as THREE.Mesh).isMesh && !h.object.userData[HOLO_GHOST_FLAG] && !(h.object as THREE.LineSegments).isLineSegments);
+      if (hit && hit.distance < bestDist) {
+        bestDist = hit.distance;
+        best = id;
+      }
+    }
+    if (best) return best;
+    // project() works in the canvas' CSS size; scale to the on-screen rect (CSS transforms).
+    const sx = rect.width / Math.max(this.canvas.clientWidth, 1);
+    const sy = rect.height / Math.max(this.canvas.clientHeight, 1);
+    let near = slopPx;
+    for (const [id, p] of this.project([...candidates])) {
+      if (!p.onScreen) continue;
+      const node = this.placed.get(id);
+      if (node && !node.visible) continue;
+      const d = Math.hypot(p.x * sx - x, p.y * sy - y);
+      if (d <= near) {
+        near = d;
+        best = id;
+      }
+    }
+    return best;
+  }
   /** Mark the parts that stay quiet (another Einsatz); they keep their place and their hotspot. */
   setQuiet(ids: ReadonlySet<string>): void {
     this.quiet = ids;
@@ -405,31 +412,23 @@ export class PackageScene {
 
   private applyRoles(): void {
     for (const [id, node] of this.placed) {
-      const role: HoloRole = this.focused.has(id) ? 'focus' : this.quiet.has(id) ? 'quiet' : 'part';
+      const role: HoloRole = this.selected.has(id)
+        ? 'select'
+        : this.hovered.has(id)
+          ? 'hover'
+          : this.quiet.has(id)
+            ? 'quiet'
+            : 'part';
       if ((this.roles.get(id) ?? 'part') === role) continue;
       this.roles.set(id, role);
-      this.look.setRole(node, role, role === 'focus' ? ORDER_FOCUS : 0);
+      this.look.setRole(node, role, role === 'select' || role === 'hover' ? ORDER_FOCUS : 0);
     }
   }
 
-  /** One halo per glow point, one ring per empty slot (pooled). */
-  private syncMarkers(haloAt: readonly THREE.Vector3[], ringAt: readonly THREE.Vector3[]): void {
-    const r = this.look.focusRadius;
-    while (this.halos.length < haloAt.length) {
-      const s = new THREE.Sprite(this.haloMat);
-      s.renderOrder = ORDER_HALO;
-      s.raycast = () => undefined;
-      this.halos.push(s);
-      this.scene.add(s);
-    }
-    this.halos.forEach((s, i) => {
-      s.visible = i < haloAt.length;
-      if (s.visible) {
-        s.position.copy(haloAt[i]);
-        s.scale.setScalar(r * 2.2);
-      }
-    });
-    while (this.rings.length < ringAt.length) {
+  /** One ring per highlighted empty slot (pooled); a selected slot's ring is green. */
+  private syncRings(hoverAt: readonly THREE.Vector3[], selectedAt: readonly THREE.Vector3[]): void {
+    const at = [...selectedAt, ...hoverAt];
+    while (this.rings.length < at.length) {
       const m = new THREE.Mesh(this.ringGeo, this.ringMat);
       m.renderOrder = ORDER_RING;
       m.raycast = () => undefined;
@@ -437,8 +436,10 @@ export class PackageScene {
       this.scene.add(m);
     }
     this.rings.forEach((m, i) => {
-      m.visible = i < ringAt.length;
-      if (m.visible) m.position.copy(ringAt[i]);
+      m.visible = i < at.length;
+      if (!m.visible) return;
+      m.position.copy(at[i]);
+      m.material = i < selectedAt.length ? this.ringSelMat : this.ringMat;
     });
     this.poseRings(this.elapsed());
   }
@@ -446,8 +447,10 @@ export class PackageScene {
   /** Billboard + animate the rings (static pose with reduced motion). */
   private poseRings(seconds: number): void {
     const pose = ringPose(seconds, this.reducedMotion);
-    this.ringMat.uniforms['uAngle'].value = pose.angle;
-    this.ringMat.uniforms['uAlpha'].value = pose.alpha;
+    for (const mat of [this.ringMat, this.ringSelMat]) {
+      mat.uniforms['uAngle'].value = pose.angle;
+      mat.uniforms['uAlpha'].value = pose.alpha;
+    }
     const size = this.look.focusRadius * 1.6 * pose.scale;
     for (const m of this.rings) {
       if (!m.visible) continue;
@@ -783,9 +786,8 @@ export class PackageScene {
     this.controls.dispose();
     for (const g of this.geometries) g.dispose();
     this.look.dispose();
-    this.haloMat.dispose();
-    this.haloTex.dispose();
     this.ringMat.dispose();
+    this.ringSelMat.dispose();
     this.ringGeo.dispose();
     this.envTarget.dispose();
     this.pmrem.dispose();

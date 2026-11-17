@@ -541,8 +541,17 @@ export class AssetPackageViewerComponent {
     return [...new Set([...held, ...focusedPlacementIds(m, this.localFocus(), this.activePorts())])];
   });
   readonly focusSet = computed(() => new Set(this.focusIds()));
-  /** Classic: every focus x-rays. Table: only a selection does, a hover never dims anything. */
-  private readonly seeThrough = computed(() => (this.table() ? this.pinned() !== null : this.focusIds().length > 0));
+  /**
+   * What the scene lights: the pinned placements take the green selection look, every
+   * other focused one the hover look. No see-through from either (concept 20261117-1809, C1).
+   */
+  private readonly highlight = computed(() => {
+    const m = this.manifest();
+    const pinned = this.pinned();
+    const selected = m && pinned ? focusedPlacementIds(m, pinned, []) : [];
+    const held = new Set(selected);
+    return { hover: this.focusIds().filter((id) => !held.has(id)), selected };
+  });
 
   /** Parts the picked Einsatz leaves quiet. */
   readonly quietIds = computed<ReadonlySet<string>>(() => {
@@ -726,11 +735,10 @@ export class AssetPackageViewerComponent {
       });
     });
     effect(() => {
-      const ids = this.focusIds();
-      const seeThrough = this.seeThrough();
+      const state = this.highlight();
       this.labelTarget();
       untracked(() => {
-        this.scene?.setFocus(ids, seeThrough);
+        this.scene?.setHighlight(state);
         this.projectDirty = true;
         this.reproject();
       });
@@ -1091,7 +1099,7 @@ export class AssetPackageViewerComponent {
       this.manifest.set(m);
       scene.setVisibility(this.visibleIds(), this.groupsOn().has('interior'));
       scene.frame(this.frameBounds(m), this.facing());
-      scene.setFocus(this.focusIds(), this.seeThrough());
+      scene.setHighlight(this.highlight());
       scene.setQuiet(this.quietIds());
       this.status.set('ready');
       this.drawn.emit();
