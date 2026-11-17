@@ -50,8 +50,9 @@ describe('jobStallReport', () => {
     noteStallEvent(t, { type: 'log', level: 'info', message: 'convert C:/Users/jerry/x/a.cgf' });
     const r = jobStallReport('skin', 'skin-1', 1_234_567, t);
     expect(r.name).toBe('JobStall');
-    // Stage name only — no counters in the grouping text.
-    expect(r.message).toBe('skin job made no progress for 1235s (armor-packages)');
+    // Stage name only — no counters, no seconds in the grouping text.
+    expect(r.message).toBe('skin job stalled (armor-packages)');
+    expect(jobStallReport('skin', 'skin-1', 1_201_000, t).message).toBe(r.message);
     expect(r.extra).toEqual({
       kind: 'skin',
       jobId: 'skin-1',
@@ -65,8 +66,8 @@ describe('jobStallReport', () => {
 
   it('falls back to the phase, then to the bare message', () => {
     const t = newStallTracker();
-    expect(jobStallReport('extract', 'j', 300_000, t).message).toBe('extract job made no progress for 300s');
+    expect(jobStallReport('extract', 'j', 300_000, t).message).toBe('extract job stalled');
     noteStallEvent(t, { type: 'phase', phase: 'discover' });
-    expect(jobStallReport('extract', 'j', 300_000, t).message).toBe('extract job made no progress for 300s (discover)');
+    expect(jobStallReport('extract', 'j', 300_000, t).message).toBe('extract job stalled (discover)');
   });
 });
