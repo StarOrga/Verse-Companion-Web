@@ -72,6 +72,11 @@
         "admin": "Nur für Admins sichtbar",
         "collab": "Nur für Admins und Collaborators sichtbar"
       }
+    },
+    "deferError": {
+      "message": "Die 3D-Ansicht konnte nicht geladen werden.",
+      "deckPlan": "Der Deckplan konnte nicht geladen werden.",
+      "reload": "Neu laden"
     }
   },
   "date": {

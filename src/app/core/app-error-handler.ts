@@ -2,6 +2,7 @@ import { ErrorHandler, Injectable, Injector, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AnalyticsService, pageviewUrl } from './analytics.service';
 import { logError } from './log';
+import { RouteLoadRecoveryService, isRouteChunkError } from './route-load-recovery.service';
 
 /** At most this many `$exception` events per page session. */
 const MAX_REPORTS = 10;
@@ -30,8 +31,13 @@ export class AppErrorHandler implements ErrorHandler {
   handleError(error: unknown): void {
     try {
       const route = this.route();
-      logError('app', 'unhandled error', { route, error });
-      this.forward(error, route);
+      const deferChunk = isDeferLoadError(error);
+      logError('app', deferChunk ? 'defer chunk failed' : 'unhandled error', { route, error });
+      // A `@defer` block without an `@error` branch whose chunk did not load
+      // (#367): the same one-shot recovery as a dead route chunk. Reported as
+      // handled — the app answers it, the reader is not left on a placeholder.
+      if (deferChunk) this.recover();
+      this.forward(error, route, deferChunk);
     } catch {
       // Reporting must never become the next unhandled error.
     }
@@ -45,7 +51,15 @@ export class AppErrorHandler implements ErrorHandler {
     }
   }
 
-  private forward(error: unknown, route: string): void {
+  private recover(): void {
+    try {
+      this.injector.get(RouteLoadRecoveryService).recoverFromStaleChunk({ notice: true });
+    } catch {
+      // Recovery is best effort; reporting below still runs.
+    }
+  }
+
+  private forward(error: unknown, route: string, handled = false): void {
     if (this.sent.size >= MAX_REPORTS) return;
     const err = error instanceof Error ? error : null;
     const name = err?.name || 'Error';
@@ -57,8 +71,23 @@ export class AppErrorHandler implements ErrorHandler {
     const safe = new Error(redactErrorText(msg));
     safe.name = name;
     safe.stack = redactErrorText(err?.stack ?? '');
-    this.injector.get(AnalyticsService).captureException(safe, { $current_url: route, handled: false });
+    this.injector.get(AnalyticsService).captureException(safe, { $current_url: route, handled });
   }
+}
+
+/**
+ * True for Angular's NG0750 (DEFER_LOADING_FAILED): a `@defer` block's chunk
+ * did not load and the block has no `@error` branch. Production builds carry
+ * only the code (`RuntimeError.code === -750`, message "NG0750"); dev builds
+ * add the cause to the message, which {@link isRouteChunkError} also matches.
+ */
+export function isDeferLoadError(error: unknown): boolean {
+  if (error == null || typeof error !== 'object') return false;
+  const code = (error as { code?: unknown }).code;
+  if (code === -750 || code === 750) return true;
+  const raw = (error as { message?: unknown }).message;
+  if (typeof raw !== 'string') return false;
+  return /^NG0750/.test(raw) || (raw.includes('@defer') && isRouteChunkError(error));
 }
 
 const BEARER_PATH = /(\/shared\/loadout\/|\/hangar\/shared\/)[^/\s'")?#]+/g;

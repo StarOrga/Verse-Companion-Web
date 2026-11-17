@@ -293,6 +293,7 @@ import { PageHeaderComponent } from '../shared/page-header/page-header.component
 import { HANGAR_ROOT_CRUMB, NavOriginService, PageCrumb, originTrail } from '../shared/page-header/nav-origin.service';
 import { ClassChipComponent } from '../shared/class-chip/class-chip.component';
 import { FeedbackSpotDirective } from '../feedback/feedback-spot.directive';
+import { DeferErrorComponent } from '../shared/defer-error/defer-error.component';
 
 // Engine placeholders that identify no attach type — never build a fit on them.
 /** Which stored loadout the URL puts on the table (#646): a shared link
@@ -312,7 +313,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
 @Component({
   selector: 'sc-codex-detail',
   standalone: true,
-  imports: [ShipArrivalComponent, CompareIconComponent, FeedbackSpotDirective, PageHeaderComponent, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexHardpointLayoutComponent, CodexComponentModalComponent, CodexSwapPickerComponent, CodexWeaponDetailComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, CodexLoadoutSaveBarComponent, CodexSavedLoadoutsComponent, CodexKpiBandComponent, ScTooltipDirective, ScActionDirective, CodexMissionBarComponent, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, CodexRankCardComponent, CodexEnergyDockComponent, InfoNoteComponent, CodexHoloStageComponent, CodexShipStageComponent, CodexHeroHoloOverlayComponent, CodexHeroPartPopupComponent, CodexVariantPickerComponent, CodexShipActionsComponent, CodexShipLinkFormComponent, CodexPortListComponent, CodexSpecSheetComponent, CodexRecipeCardComponent, AssetPackageViewerComponent, NgTemplateOutlet, AddToSetComponent, ClassChipComponent, CodexModeSwitchComponent, CodexPersonalUsesComponent, HangarPickerComponent, CodexHoloShareComponent, ScDialogDirective, NotFoundComponent, CodexOwnSegmentComponent, CodexOwnCardComponent, ShareButtonComponent, HeightVarDirective, ScEntryDirective, CodexItemStageComponent, CodexDetailClassicComponent, CodexHoloAkteComponent, CodexHoloHangarMenuComponent],
+  imports: [DeferErrorComponent, ShipArrivalComponent, CompareIconComponent, FeedbackSpotDirective, PageHeaderComponent, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexHardpointLayoutComponent, CodexComponentModalComponent, CodexSwapPickerComponent, CodexWeaponDetailComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, CodexLoadoutSaveBarComponent, CodexSavedLoadoutsComponent, CodexKpiBandComponent, ScTooltipDirective, ScActionDirective, CodexMissionBarComponent, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, CodexRankCardComponent, CodexEnergyDockComponent, InfoNoteComponent, CodexHoloStageComponent, CodexShipStageComponent, CodexHeroHoloOverlayComponent, CodexHeroPartPopupComponent, CodexVariantPickerComponent, CodexShipActionsComponent, CodexShipLinkFormComponent, CodexPortListComponent, CodexSpecSheetComponent, CodexRecipeCardComponent, AssetPackageViewerComponent, NgTemplateOutlet, AddToSetComponent, ClassChipComponent, CodexModeSwitchComponent, CodexPersonalUsesComponent, HangarPickerComponent, CodexHoloShareComponent, ScDialogDirective, NotFoundComponent, CodexOwnSegmentComponent, CodexOwnCardComponent, ShareButtonComponent, HeightVarDirective, ScEntryDirective, CodexItemStageComponent, CodexDetailClassicComponent, CodexHoloAkteComponent, CodexHoloHangarMenuComponent],
   providers: [ShipLinkFormStore, CodexLoadoutDraftStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -805,6 +806,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                 (hovered)="setActivePorts($event)"
                 (locatable)="glbLocatablePorts.set($event)"
                 (available)="onArtAvailable($event)" />
+            } @error {
+              <sc-defer-error source="codex.skinViewer" />
             }
           }
         }
@@ -815,6 +818,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
             <sc-ship-deck-plan [decks]="decks" [lang]="deckPlanLang()" />
           } @placeholder {
             <div aria-hidden="true"></div>
+          } @error {
+            <sc-defer-error source="codex.deckPlan" messageKey="common.deferError.deckPlan" />
           }
         }
         <ng-container [ngTemplateOutlet]="tailLoadout" />
@@ -1041,6 +1046,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
           <sc-asset-package-viewer class="pkg-viewer" [row]="pkg" [still]="prefersReducedMotion()" />
         } @placeholder {
           <div class="pkg-viewer" aria-hidden="true"></div>
+        } @error {
+          <sc-defer-error class="pkg-viewer" source="codex.assetPackage" />
         }
       </section>
     }
