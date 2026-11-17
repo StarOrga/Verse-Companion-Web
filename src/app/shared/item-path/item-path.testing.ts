@@ -1,5 +1,6 @@
 import { signal } from '@angular/core';
 import { stepsOf, type ItemPathState, type PathResult } from '../../hq/data/item-path.service';
+import type { AssignTargets } from '../../hq/nachschub/nachschub.service';
 
 const ok = (key: string): PathResult => ({ ok: true, key, undo: async () => ({ ok: true, key: 'itemPath.done.undone' }) });
 
@@ -47,6 +48,13 @@ export function fakeItemPath(start?: Partial<ItemPathState>) {
     nachholen: vi.fn().mockName('nachholen').mockResolvedValue(ok('itemPath.done.wishOn')),
     addToHangar: vi.fn().mockName('addToHangar').mockResolvedValue(ok('itemPath.done.hangar')),
     removeFromHangar: vi.fn().mockName('removeFromHangar').mockResolvedValue({ ok: true, key: 'itemPath.done.hangarOff' }),
+    /** The picker's rows (B7); set `targets` to what a spec needs. */
+    targets: signal<AssignTargets>({ operations: [], slotsUsed: 0, slotsMax: 7, canCreate: true, blockKey: null }),
+    assignTargets(): AssignTargets {
+      return this.targets();
+    },
+    loadAssignTargets: vi.fn().mockName('loadAssignTargets').mockResolvedValue(undefined),
+    assignWish: vi.fn().mockName('assignWish').mockResolvedValue(ok('hq.nachschub.assigned')),
     ownedBlueprints: signal<ReadonlySet<string>>(new Set()),
     setBlueprintOwned: vi.fn().mockName('setBlueprintOwned').mockResolvedValue(ok('itemPath.done.inventar')),
   };
