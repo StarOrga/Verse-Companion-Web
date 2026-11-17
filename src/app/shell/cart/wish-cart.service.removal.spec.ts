@@ -78,4 +78,24 @@ describe('WishCartService removal (C6, D3)', () => {
     expect(announce).not.toHaveBeenCalled();
     expect(cart.flashed()).toBeNull();
   });
+
+  it('a failed lowering shows its translated key, leaves the counter alone and clears on the next try', async () => {
+    const { cart, lower, announce, store, item } = setup(0);
+    lower.mockResolvedValueOnce({ ok: false, key: 'hq.nachschub.wishlistFailed' });
+    expect(await cart.setQty(item, 2)).toBe(false);
+    expect(cart.error()).toBe('hq.nachschub.wishlistFailed');
+    expect(announce).not.toHaveBeenCalled();
+    expect(cart.flashed()).toBeNull();
+    expect(cart.items()[0].qty).toBe(3);
+    expect(store.setQty).not.toHaveBeenCalled();
+    expect(await cart.setQty(item, 2)).toBe(true);
+    expect(cart.error()).toBeNull();
+  });
+
+  it('a throwing flow becomes an errors.* key, never raw text', async () => {
+    const { cart, lower, item } = setup(0);
+    lower.mockRejectedValueOnce(new Error('boom'));
+    expect(await cart.setQty(item, 2)).toBe(false);
+    expect(cart.error()).toMatch(/^errors\./);
+  });
 });

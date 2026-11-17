@@ -3,6 +3,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { WishNamesService } from '../../codex/search/wish-names.service';
 import { CodexService } from '../../codex/codex.service';
 import { humanizeClassName } from '../../codex/codex-format';
+import { toErrorKey } from '../../core/describe-error';
 import { logWarn } from '../../core/log';
 import { AuthService } from '../../auth/auth.service';
 import { HangarService } from '../../hangar/hangar.service';
@@ -162,6 +163,17 @@ export class WishCartService {
   readonly flashed = signal<string | null>(null);
   private flashTimer: ReturnType<typeof setTimeout> | null = null;
 
+  /** The i18n key of the last failed removal, shown in the cart and the wishlist popout for a few seconds, else null. */
+  readonly error = signal<string | null>(null);
+  private errorTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private fail(key: string): false {
+    if (this.errorTimer !== null) clearTimeout(this.errorTimer);
+    this.error.set(key);
+    this.errorTimer = setTimeout(() => this.error.set(null), 6000);
+    return false;
+  }
+
   private flash(key: string): void {
     if (this.flashTimer !== null) clearTimeout(this.flashTimer);
     this.flashed.set(key);
@@ -182,11 +194,18 @@ export class WishCartService {
    * that cuts into assigned pieces opens the dialog. The result's undo goes on the toast, the counter is lit.
    */
   private async lower(i: CartItem, by: number): Promise<boolean> {
-    const r = await this.removal.lower(this.wishRef(i), by, 'wishlist');
+    this.error.set(null);
+    let r;
+    try {
+      r = await this.removal.lower(this.wishRef(i), by, 'wishlist');
+    } catch (err) {
+      return this.fail(toErrorKey('cart', 'lower', err));
+    }
     if (!r) return false;
     if (!r.ok) {
+      // The service rolled the write back: the counter still shows the real quantity. Say so.
       logWarn('cart', 'lower failed', r.key);
-      return false;
+      return this.fail(r.key);
     }
     this.removal.announce(r);
     this.flash(i.key);

@@ -44,6 +44,9 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
     <sc-popup kind="large" [scEntry]="'cart'" [eyebrow]="'hq.title' | translate" [title]="'cart.title' | translate" [backClose]="false" (closed)="cart.close()" data-cart>
       <svg popupIcon viewBox="0 0 24 24">@for (d of wishPath; track $index) { <path [attr.d]="d" /> }</svg>
       <div class="cart-body">
+          @if (cart.error(); as e) {
+            <p class="cart-err" role="alert">{{ e | translate }}</p>
+          }
           @if (cart.count() === 0) {
             <sc-wish-empty (searchWish)="searchWish()" />
           } @else {
@@ -156,6 +159,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
   styles: [
     `
       :host { display: contents; }
+      .cart-err { margin: 0 0 8px; padding: 8px 10px; border-inline-start: 2px solid var(--sc-danger); border-radius: 0 8px 8px 0; background: color-mix(in srgb, var(--sc-danger) 12%, transparent); color: var(--sc-fg-0); font-size: 0.8125rem; }
       .cart-status { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; justify-content: flex-end; }
       .cart-sum { color: var(--sc-fg-2); }
       .full-hint { color: var(--sc-fg-2); font-size: max(0.82rem, var(--sc-fs-floor, 0.75rem)); max-width: 46ch; }

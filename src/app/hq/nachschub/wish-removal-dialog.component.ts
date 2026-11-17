@@ -23,7 +23,7 @@ export interface WishRemovalChoice {
  * row each and the sum line; for a last wish the hint, the unticked "Operation auch auflösen" or - for an Operation
  * without Einsatz - the danger hint and the danger action. Opened by `WishRemovalFlowService` (a `sc-popup` in a CDK
  * overlay, like ScConfirmService); a modal, so only the ✕, Abbrechen or Escape close it. On a phone `sc-popup` is a
- * full-height sheet in dvh whose body scrolls.
+ * bottom sheet as tall as its content (max-height in dvh, scrolls inside).
  */
 @Component({
   selector: 'sc-wish-removal-dialog',
@@ -32,7 +32,7 @@ export interface WishRemovalChoice {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form class="wr" (submit)="submit($event)">
-      <sc-popup kind="dialog" size="s" dialogRole="alertdialog" [backdrop]="false"
+      <sc-popup kind="dialog" size="s" [sheet]="true" dialogRole="alertdialog" [backdrop]="false"
                 [title]="'wishRemoval.title' | translate: { name: name() }" (closed)="closed.emit(null)">
         <div class="wr-body">
           <div class="wr-how">

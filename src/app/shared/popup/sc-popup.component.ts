@@ -88,6 +88,8 @@ let uid = 0;
  *               scrolling itself: for content that owns its scroller (a table box, a viewer).
  * - `float`     a coach mark / floating card: stays a card on phones instead of going full screen
  *               (the host positions it; `--sc-popup-max-h` caps its height).
+ * - `sheet`     a short question: on a phone a bottom sheet as tall as its content (rounded top, safe area,
+ *               scrolls inside when taller than the screen); landscape a centred card. Desktop: unchanged.
  * - `access`    'admin' → top edge `--sc-accent-hot`, 'collab' → `--sc-accent-collab`, plus
  *               screen-reader text; no visible role words.
  * - `modal`     override; default true for dialog + large, false otherwise.
@@ -158,6 +160,7 @@ let uid = 0;
         [attr.data-size]="widthTier()"
         [attr.data-body]="bodyFill() ? 'fill' : null"
         [attr.data-float]="float() ? '' : null"
+        [attr.data-sheet]="sheet() ? '' : null"
         [attr.data-light]="light() ? '' : null"
         [attr.data-access]="access()"
         [attr.role]="frameRole()"
@@ -230,6 +233,8 @@ export class ScPopupComponent implements OnInit, OnDestroy {
   readonly access = input<ScPopupAccess>(null);
   readonly bodyFill = input(false);
   readonly float = input(false);
+  /** A short question: on a phone a bottom-anchored sheet as tall as its content instead of a full screen (landscape: a centred card). */
+  readonly sheet = input(false);
   readonly modal = input<boolean | null>(null);
   readonly backdrop = input<boolean | null>(null);
   readonly dialogRole = input<'dialog' | 'alertdialog'>('dialog');

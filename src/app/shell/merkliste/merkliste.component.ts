@@ -59,6 +59,9 @@ interface WishLine {
                The title is the list's name; the count stands once, in the footer. -->
           <sc-popup kind="panel" [title]="'quick.wish' | translate"
                     [returnFocus]="trigger" [backClose]="false" (closed)="close()">
+          @if (cart.error(); as e) {
+            <p class="cart-err" role="alert">{{ e | translate }}</p>
+          }
           @if (cart.count() === 0) {
             <sc-wish-empty (searchWish)="searchWish()" />
           } @else {
@@ -113,6 +116,7 @@ interface WishLine {
       .trigger:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       /* Only the position at the trigger; frame, width, head and ✕ come from <sc-popup kind="panel">. */
       .panel { position: absolute; top: calc(100% + 8px); right: 0; z-index: 60; }
+      .cart-err { margin: 0 0 8px; padding: 8px 10px; border-inline-start: 2px solid var(--sc-danger); border-radius: 0 8px 8px 0; background: color-mix(in srgb, var(--sc-danger) 12%, transparent); color: var(--sc-fg-0); font-size: 0.8125rem; }
       .qrow { display: grid; grid-template-columns: minmax(0, 1fr) auto 32px 32px; align-items: center; gap: 4px; min-height: 50px; padding: 2px 4px; border: 1px solid transparent; border-radius: 8px; }
       .qrow:hover, .qrow:focus-within { background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }
       .open { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: 8px; min-width: 0; min-height: 44px; border-radius: 8px; color: var(--sc-fg-0); text-decoration: none; }

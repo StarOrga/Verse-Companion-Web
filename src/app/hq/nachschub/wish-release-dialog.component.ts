@@ -24,7 +24,7 @@ export interface WishReleaseChoice {
   imports: [TranslatePipe, ScPopupComponent, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <sc-popup kind="dialog" size="s" dialogRole="alertdialog" [backdrop]="false"
+    <sc-popup kind="dialog" size="s" [sheet]="true" dialogRole="alertdialog" [backdrop]="false"
               [title]="'wishRemoval.release.title' | translate: { name: name() }" (closed)="closed.emit(null)">
       <div class="wr-body">
         <p class="wr-text">{{ (info().pieces === 1 ? 'wishRemoval.release.textOne' : 'wishRemoval.release.text') | translate: { n: info().pieces } }}</p>

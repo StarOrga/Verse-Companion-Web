@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { TranslateService, provideTranslateService } from '@ngx-translate/core';
 import de from '../../../../public/i18n/de.json';
+import { useViewport } from '../../testing/viewport';
 import { UndoToastService } from '../../shared/undo-toast/undo-toast.service';
 import { planRemoval, withSplit, type RemovalHolder } from './nachschub.model';
 import { NachschubService, type NachschubResult, type WishRef } from './nachschub.service';
@@ -141,5 +142,26 @@ describe('WishRemovalFlowService', () => {
     expect(toast.current()?.detailKey).toBe('wishRemoval.toastDissolved');
     toast.undo();
     expect(undo).toHaveBeenCalledOnce();
+  });
+});
+
+describe('removal dialog on a phone (C8)', () => {
+  useViewport(390, 780);
+  afterEach(() => TestBed.inject(OverlayContainer).ngOnDestroy());
+
+  it('is a bottom-anchored sheet as tall as its content, not a full screen', async () => {
+    const { flow } = setup(5, [holder('a', 'Bodentrupp ausrüsten', 3, '2026-11-02')]);
+    void flow.lower(REF, 4, 'wishlist');
+    await settle();
+    const frame = q('.scp-frame')!;
+    const r = frame.getBoundingClientRect();
+    expect(frame.hasAttribute('data-sheet')).toBe(true);
+    expect(Math.round(r.bottom)).toBe(window.innerHeight);
+    // Full width (a desktop test browser keeps a ~10 px scrollbar the phone does not have).
+    expect(r.left).toBe(0);
+    expect(r.width).toBeGreaterThanOrEqual(window.innerWidth - 20);
+    expect(r.height).toBeLessThan(window.innerHeight - 24);
+    expect(getComputedStyle(frame).borderTopLeftRadius).toBe('16px');
+    q<HTMLButtonElement>('button.cancel')!.click();
   });
 });
