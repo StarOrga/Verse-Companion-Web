@@ -137,6 +137,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›docs/concepts/›file count": [
+      {
+        "ship": "claude/3d-view-component-visibility-27ac32",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (873)",
+        "decided": true,
+        "at": "2026-11-17T22:42:12.676Z",
+        "hunks": [
+          "a851e1eac5b9"
+        ]
+      }
+    ],
     ".claude/project-map.md›docs/concepts›count": [
       {
         "ship": "PR #1163",
@@ -163,6 +175,16 @@
         "at": "2026-11-17T20:21:01.476Z",
         "hunks": [
           "273fe833cb12"
+        ]
+      },
+      {
+        "ship": "claude/3d-view-component-visibility-27ac32",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (938)",
+        "decided": true,
+        "at": "2026-11-17T22:42:12.676Z",
+        "hunks": [
+          "024456ae2a52"
         ]
       }
     ],
@@ -328,6 +350,16 @@
         "at": "2026-11-17T11:32:30.936Z",
         "hunks": [
           "cd496d198d70"
+        ]
+      },
+      {
+        "ship": "claude/3d-view-component-visibility-27ac32",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (3405 files)",
+        "decided": true,
+        "at": "2026-11-17T22:42:12.676Z",
+        "hunks": [
+          "df74e833baaf"
         ]
       }
     ],
@@ -608,6 +640,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›src/app/shared/›file count": [
+      {
+        "ship": "claude/3d-view-component-visibility-27ac32",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree",
+        "decided": true,
+        "at": "2026-11-17T22:42:12.676Z",
+        "hunks": [
+          "68a39c281c1f"
+        ]
+      }
+    ],
     ".claude/project-map.md›src/›file count": [
       {
         "ship": "#1163",
@@ -622,6 +666,16 @@
         "at": "2026-11-17T20:21:01.476Z",
         "hunks": [
           "e0c125b89c45"
+        ]
+      },
+      {
+        "ship": "claude/3d-view-component-visibility-27ac32",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree",
+        "decided": true,
+        "at": "2026-11-17T22:42:12.676Z",
+        "hunks": [
+          "9562d50ef598"
         ]
       }
     ],
@@ -753,6 +807,16 @@
         "at": "2026-11-17T20:29:19.037Z",
         "hunks": [
           "00065aec8218"
+        ]
+      },
+      {
+        "ship": "claude/3d-view-component-visibility-27ac32",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree",
+        "decided": true,
+        "at": "2026-11-17T22:42:12.676Z",
+        "hunks": [
+          "fe4606b50ae2"
         ]
       }
     ],
