@@ -25,6 +25,8 @@ FALLBACK_DECK_KEY = "unassigned"  # same as dataforge_extract.FALLBACK_DECK_KEY 
 POS_ROUND = 1                  # metres in the payload: 0.1 m
 SCU_CELL_M = 1.25              # edge of one SCU cell
 PANEL_MAX_M = 3.0              # a door control panel this close belongs to the door
+CELL_PANEL_MAX_M = 5.0         # a brig cell panel sits further off its door (Idris-P: 4.7 m) — one door per cell panel
+CELL_PANEL_RX = re.compile(r"cell", re.I)
 LIFT_CLUSTER_M = 5.0           # stops of one shaft sit this close in x/y (TransitDestination is offset from its door)
 LIFT_STOP_MIN_GAP_M = 1.0      # two stops of one shaft differ in height by more than this
 DECK_TOLERANCE_M = 0.8         # a point stands on the highest deck floor up to this much above it
@@ -112,9 +114,11 @@ def classify_door(cls: str, name: str = "", from_loadout: bool = False) -> Dict[
 
 
 def attach_panels(doors: List[Dict[str, Any]], panels: List[Dict[str, Any]],
-                  max_dist: float = PANEL_MAX_M) -> None:
-    """Sets `door.panel` (nearest control panel within `max_dist`, else None) and turns a
-    room / inner door whose panel is a brig cell panel into kind `cell`."""
+                  max_dist: float = PANEL_MAX_M, cell_max_dist: float = CELL_PANEL_MAX_M) -> None:
+    """Sets `door.panel` (nearest control panel within `max_dist`, else None), then gives
+    every brig cell panel to the nearest room / inner door within `cell_max_dist` and turns
+    that door into kind `cell` — one door per cell panel, so the wider radius never marks a
+    corridor door next to the cell."""
     for d in doors:
         best, best_d = None, max_dist
         for p in panels:
@@ -122,9 +126,21 @@ def attach_panels(doors: List[Dict[str, Any]], panels: List[Dict[str, Any]],
             if dist <= best_d:
                 best, best_d = p, dist
         d["door"]["panel"] = r1(best["pos"]) if best else None
-        if best and re.search(r"cell", f"{best.get('cls', '')} {best.get('name', '')}", re.I) \
-                and d["door"]["kind"] in ("room", "inner"):
-            d["door"]["kind"] = "cell"
+    taken = set()
+    for p in panels:
+        if not CELL_PANEL_RX.search(f"{p.get('cls', '')} {p.get('name', '')}"):
+            continue
+        best_i, best_d = None, cell_max_dist
+        for i, d in enumerate(doors):
+            if i in taken or d["door"]["kind"] not in ("room", "inner"):
+                continue
+            dist = math.dist(d["pos"], p["pos"])
+            if dist <= best_d:
+                best_i, best_d = i, dist
+        if best_i is not None:
+            taken.add(best_i)
+            doors[best_i]["door"]["panel"] = r1(p["pos"])
+            doors[best_i]["door"]["kind"] = "cell"
 
 
 # ── cargo ────────────────────────────────────────────────────────────────────

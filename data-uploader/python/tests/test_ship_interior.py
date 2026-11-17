@@ -56,6 +56,22 @@ def test_panel_within_three_metres_attaches_and_a_cell_panel_makes_a_cell_door()
     assert doors[2]["door"]["panel"] is None
 
 
+def test_a_cell_panel_up_to_five_metres_off_marks_only_its_nearest_door() -> None:
+    # Idris-P brig: the cell panels sit 4.7 m from their door, beyond the 3 m door-panel radius
+    doors = [{"pos": [0, 0, 6], "door": {"kind": "room", "breachable": True, "panel": None}},
+             {"pos": [0, 3.0, 6], "door": {"kind": "room", "breachable": True, "panel": None}},
+             {"pos": [10, 0, 6], "door": {"kind": "lift", "breachable": False, "panel": None}},
+             {"pos": [30, 0, 6], "door": {"kind": "inner", "breachable": False, "panel": None}}]
+    panels = [{"pos": [0, -4.7, 6], "cls": "ControlPanel_Screen_DoorControl_Physical_AEGS_Brig_Celldoor", "name": "Cell1"},
+              {"pos": [10, 4.0, 6], "cls": "ControlPanel_Screen_DoorControl_Physical_AEGS_Brig_Celldoor", "name": "Cell2"},
+              {"pos": [30, 5.5, 6], "cls": "ControlPanel_Screen_DoorControl_Physical_AEGS_Brig_Celldoor", "name": "Cell3"}]
+    si.attach_panels(doors, panels)
+    assert doors[0]["door"]["kind"] == "cell" and doors[0]["door"]["panel"] == [0.0, -4.7, 6.0]
+    assert doors[1]["door"]["kind"] == "room"   # the neighbour door stays a room door
+    assert doors[2]["door"]["kind"] == "lift"   # a lift door never becomes a cell
+    assert doors[3]["door"]["kind"] == "inner" and doors[3]["door"]["panel"] is None  # 5.5 m is too far
+
+
 # ── cargo ────────────────────────────────────────────────────────────────────
 def test_scu_is_the_floor_product_of_the_1_25_m_cells() -> None:
     assert si.scu_of([5.0, 5.0, 5.0]) == 64            # Idris hangar grid, 16 of them = 1024
