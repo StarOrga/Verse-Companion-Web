@@ -10,7 +10,7 @@
 // build can strip their remote Google-Fonts @import — see electron.vite.config.ts.
 import '@starorga/star-ui/lib/design-tokens.css';
 import { load as loadI18n, t } from '../lib/i18n.js';
-import { shouldAutoResume, shouldQuitAfterAutoRun, launchAction, formatIdentity, isModelsOnly } from '../lib/auto-run.js';
+import { shouldAutoResume, shouldQuitAfterAutoRun, launchAction, formatIdentity, planContinuation, type ContinuationPlan } from '../lib/auto-run.js';
 import { catalogAlreadyLanded } from '../lib/resume-compat.js';
 import { startPatchCountdown, repaintPatchCountdown } from './patch-countdown.js';
 import { initTooltips } from './tooltip.js';
@@ -275,7 +275,8 @@ export const state = {
   // decided once per run before the extraction; null = skip nothing.
   subthemePlan: null as SubthemePlan | null,
   /** This run continues only the 3D hulls from an extract already on disk. */
-  modelsOnly: false,
+  /** Set while the run only continues local builds (silhouettes / 3D hulls) of a build whose catalogue the server holds. */
+  continuation: null as ContinuationPlan | null,
   /** Install step's "Alles neu erzwingen" — per run, never persisted. */
   forceAll: false,
   lastResult: null as ExtractResultPayload | null,
@@ -1738,6 +1739,30 @@ async function cancelExtract(btn: HTMLButtonElement): Promise<void> {
   render();
 }
 
+/** i18n key of the honest line for a continuation run (see `subthemes.cont*`). */
+function continuationKey(cont: ContinuationPlan, how: 'reuse' | 'local'): string {
+  const what = cont.steps.length === 2 ? 'Both' : cont.steps[0] === 'silhouettes' ? 'Sil' : 'Models';
+  return `subthemes.cont${what}${how === 'reuse' ? 'Reuse' : 'Local'}`;
+}
+
+/**
+ * A continuation never shows a step it does not run: the Metadaten rows
+ * (bundle, entries) and whatever is not pending are marked skipped up front,
+ * so no row flashes "running" for work that never starts.
+ */
+function markContinuationStages(cont: ContinuationPlan): void {
+  setStage('bundle', 'skipped');
+  setStage('entries', 'skipped');
+  if (!cont.steps.includes('silhouettes')) {
+    setStage('silBuild', 'skipped');
+    setStage('silUpload', 'skipped');
+  }
+  if (!cont.steps.includes('hulls')) {
+    setStage('skinsBuild', 'skipped');
+    setStage('skinsUpload', 'skipped');
+  }
+}
+
 /** Metadaten step, first row: read the game data out of the Data.p4k. Returns true on success. */
 async function runRealExtract(): Promise<boolean> {
   const progress = uploadProgress;
@@ -1773,7 +1798,7 @@ async function runRealExtract(): Promise<boolean> {
   // (lib/subthemes.ts). Only asked when the run will upload — without a
   // session nothing is uploaded, so nothing can be skipped either.
   state.subthemePlan = null;
-  state.modelsOnly = false;
+  state.continuation = null;
   if (state.runPlan?.uploadAfter && state.authToken) {
     const plan = await window.sc.subthemes.plan(
       {
@@ -1788,10 +1813,12 @@ async function runRealExtract(): Promise<boolean> {
     if (plan.skip.length) {
       appendLog(t('subthemes.skipping', { list: plan.skip.map(subthemeName).join(', ') }));
     }
-    if (plan.reason === 'ledger' && isModelsOnly(plan.pending)) {
-      // Only the 3D hulls are open: continue them from this build's extract
-      // on disk — no catalogue read of the P4K, no bundle, no metadata, no new
-      // build row. Without such an extract the run falls through to a full one.
+    if (plan.reason === 'ledger' && planContinuation(plan.pending, true)) {
+      // Only silhouettes and/or 3D hulls are open: the catalogue, bundle and
+      // metadata are on the server. Continue from this build's extract on disk;
+      // without one the extractor re-creates the manifests locally (below) —
+      // either way nothing of the catalogue is read for upload again, no bundle,
+      // no metadata, no new build row.
       const reused = await window.sc.autoRun
         .reuseExtract({
           installPath: channel.installPath,
@@ -1800,18 +1827,21 @@ async function runRealExtract(): Promise<boolean> {
           patchVersion: channel.version ?? '',
         })
         .catch(() => null);
+      const cont = planContinuation(plan.pending, Boolean(reused))!;
+      state.continuation = cont;
+      markContinuationStages(cont);
       if (reused) {
         state.lastResult = reused;
         state.extractDone = true;
-        state.modelsOnly = true;
-        appendLog(t('subthemes.modelsOnly'), 'success');
-        for (const key of ['extract', 'bundle', 'entries', 'silBuild', 'silUpload'] as const) setStage(key, 'skipped');
-        tipStage('extract', t('subthemes.modelsOnly'));
+        appendLog(t(continuationKey(cont, 'reuse')), 'success');
+        for (const key of ['extract', 'bundle', 'entries'] as const) setStage(key, 'skipped');
+        tipStage('extract', t(continuationKey(cont, 'reuse')));
         progress.update({ indeterminate: false });
         progress.stop();
         return true;
       }
-      appendLog(t('subthemes.modelsOnlyNoExtract'));
+      appendLog(t(continuationKey(cont, 'local')));
+      setStatus(t(continuationKey(cont, 'local')));
     }
     if (plan.reason === 'ledger' && plan.pending.length === 0) {
       // Same game build, nothing the uploader would now do differently — no
@@ -2382,9 +2412,18 @@ async function doStartUpload(): Promise<void> {
   // The extraction row stays as it ended; every upload-side row starts over
   // (a resume re-derives done stages from the job as it goes).
   if (state.lastResult && stageState('extract') === 'pending') setStage('extract', 'done');
-  resetStages(['bundle', 'entries', 'silBuild', 'silUpload', 'skinsBuild', 'skinsUpload']);
+  if (state.continuation) {
+    // Rows of the parts this run does not do stay "skipped"; only its own reset.
+    const own: StageKey[] = [];
+    if (state.continuation.steps.includes('silhouettes')) own.push('silBuild', 'silUpload');
+    if (state.continuation.steps.includes('hulls')) own.push('skinsBuild', 'skinsUpload');
+    resetStages(own);
+    markContinuationStages(state.continuation);
+  } else {
+    resetStages(['bundle', 'entries', 'silBuild', 'silUpload', 'skinsBuild', 'skinsUpload']);
+  }
   resetUploadCategories();
-  startStage('bundle');
+  if (!state.continuation) startStage('bundle');
   try {
     if (!state.authToken) {
       uploadProgress?.update({
@@ -2505,8 +2544,8 @@ async function doUploadAfterAuth(): Promise<void> {
     patchVersion: result.patch_version,
     buildNumber: result.build_number,
   };
-  if (state.modelsOnly) {
-    await runModelsOnly(result, ledgerKey);
+  if (state.continuation) {
+    await runContinuation(result, ledgerKey, state.continuation);
     return;
   }
 
@@ -2652,7 +2691,7 @@ async function doUploadAfterAuth(): Promise<void> {
   // Upload confirmed — reclaim the run's extracted files so they don't fill
   // the disk. Best-effort: the main process guards + swallows failures.
   const outDir = hullsSettled ? state.lastResult?.output_dir : undefined;
-  if (!hullsSettled) drawerAppendLog(t('subthemes.modelsOpen'));
+  if (!hullsSettled) drawerAppendLog(t('subthemes.contOpen'));
   if (outDir) {
     const cleaned = await window.sc.cleanup.extractDir(outDir, {
       bundleId: r.bundleId,
@@ -2680,27 +2719,55 @@ async function doUploadAfterAuth(): Promise<void> {
 }
 
 /**
- * Only the 3D hulls are open for this build (lib/auto-run `isModelsOnly`):
- * straight to step 3. No bundle, no metadata, no silhouettes, no new codex
- * build row; the hull build skips every ship already built on disk, so an
- * interrupted model build continues instead of starting over.
+ * The open parts are only the silhouettes and/or the 3D hulls (lib/auto-run
+ * `planContinuation`): this runs exactly `cont.steps`. No bundle, no metadata,
+ * no catalogue upload, no new codex build row - the silhouettes attach to the
+ * published row the server already holds, the hull build skips every ship
+ * already built on disk, so an interrupted model build continues.
  */
-async function runModelsOnly(
+async function runContinuation(
   result: ExtractResultPayload,
   ledgerKey: { channel: string; patchVersion: string; buildNumber: string },
+  cont: ContinuationPlan,
 ): Promise<void> {
-  for (const key of ['bundle', 'entries', 'silBuild', 'silUpload'] as const) setStage(key, 'skipped');
-  goStep('models');
-  let landed = false;
-  try {
-    landed = await buildAndUploadSkins(result, uploadProgress);
-    if (landed) void window.sc.subthemes.record(ledgerKey, ['hulls']);
-  } catch (err) {
-    uploadProgress?.update({ indeterminate: false });
-    const msg = `${t('skins.buildFailed')}: ${(err as Error).message}`;
-    state.skinUploadStatus = msg;
-    setStage(activeStage() ?? 'skinsBuild', 'warn');
-    setAuthStatus(msg, 'warn');
+  markContinuationStages(cont);
+  let silOk = !cont.steps.includes('silhouettes');
+  let hullsOk = !cont.steps.includes('hulls');
+  if (cont.steps.includes('silhouettes')) {
+    goStep('silhouettes');
+    const buildId = await window.sc.catalog.currentBuild(ledgerKey).catch(() => null);
+    if (!buildId) {
+      // Nothing to attach the outlines to - never mint a row for them.
+      setStage('silBuild', 'skipped');
+      setStage('silUpload', 'skipped');
+      drawerAppendLog(t('subthemes.noLiveBuild'), 'warn');
+      setAuthStatus(t('subthemes.noLiveBuild'), 'warn');
+    } else {
+      const sil = await runSilhouetteStep(result, false, buildId);
+      if (sil === 'paused') {
+        pauseActiveStage();
+        setAuthStatus(t('upload.job.paused'), 'warn');
+        uploadProgress?.stop();
+        return;
+      }
+      if (sil === 'ok') {
+        silOk = true;
+        void window.sc.subthemes.record(ledgerKey, ['silhouettes']);
+      }
+    }
+  }
+  if (cont.steps.includes('hulls')) {
+    goStep('models');
+    try {
+      hullsOk = await buildAndUploadSkins(result, uploadProgress);
+      if (hullsOk) void window.sc.subthemes.record(ledgerKey, ['hulls']);
+    } catch (err) {
+      uploadProgress?.update({ indeterminate: false });
+      const msg = `${t('skins.buildFailed')}: ${(err as Error).message}`;
+      state.skinUploadStatus = msg;
+      setStage(activeStage() ?? 'skinsBuild', 'warn');
+      setAuthStatus(msg, 'warn');
+    }
   }
   uploadProgress?.stop();
   const after = await window.sc.uploadJob.get();
@@ -2710,14 +2777,14 @@ async function runModelsOnly(
     return;
   }
   await window.sc.uploadJob.finish();
-  state.modelsOnly = false;
-  if (landed) {
-    // Hulls on the server: the extract has served its purpose.
+  state.continuation = null;
+  if (silOk && hullsOk) {
+    // Everything open is on the server: the extract has served its purpose.
     await window.sc.cleanup.extractDir(result.output_dir, { channel: result.channel, version: result.patch_version });
-    setAuthStatus(t('subthemes.modelsDone'), 'ok');
+    setAuthStatus(t('subthemes.contDone'), 'ok');
   } else if (!state.skinUploadStatus) {
-    // Kept on disk: the next start continues the models from it.
-    setAuthStatus(t('subthemes.modelsOpen'), 'warn');
+    // Kept on disk: the next start continues from it.
+    setAuthStatus(t('subthemes.contOpen'), 'warn');
   }
 }
 
@@ -2727,7 +2794,11 @@ async function runModelsOnly(
  * like before: without outlines the Codex simply shows its entries without
  * geometry — only a pause stops the run here.
  */
-async function runSilhouetteStep(result: ExtractResultPayload, skip: boolean): Promise<'ok' | 'warn' | 'skipped' | 'paused'> {
+async function runSilhouetteStep(
+  result: ExtractResultPayload,
+  skip: boolean,
+  buildId?: string,
+): Promise<'ok' | 'warn' | 'skipped' | 'paused'> {
   if (skip) {
     setStage('silBuild', 'skipped');
     setStage('silUpload', 'skipped');
@@ -2795,7 +2866,7 @@ async function runSilhouetteStep(result: ExtractResultPayload, skip: boolean): P
     });
   });
   try {
-    const res = await window.sc.catalog.silhouettes(state.authToken, result.output_dir);
+    const res = await window.sc.catalog.silhouettes(state.authToken, result.output_dir, buildId ?? null);
     if (res.ok) {
       const n = res.counts?.['silhouettes'] ?? 0;
       uploadProgress?.update({ overallPct: 100, indeterminate: false });

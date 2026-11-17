@@ -84,7 +84,7 @@ import { ProgressHub } from '../lib/progress-hub.js';
 import { initTray, updateTray, destroyTray, notifyHidden, hasTray, type TrayMenuLabels } from './tray.js';
 import { applyLedger, decideAutoRun, describeDecision, formatIdentity, pickSubthemeCandidates, type AutoRunDecision, type LedgerVerdict } from '../lib/auto-run.js';
 import { planSubthemes, type SubthemeKey, type SubthemePlan } from '../lib/subthemes.js';
-import { fetchLedger, recordLedger, type LedgerKey } from '../lib/subtheme-ledger.js';
+import { fetchLedger, fetchLiveBuildId, recordLedger, type LedgerKey } from '../lib/subtheme-ledger.js';
 
 // Configure logging + install uncaughtException/unhandledRejection handlers
 // before any window or IPC work, so a startup failure lands in main.log and
@@ -1469,7 +1469,7 @@ ipcMain.handle(
 // wiring as the catalog — its rows are phase `codex_silhouettes` of that cursor.
 ipcMain.handle(
   'sc:catalog:silhouettes',
-  async (event, accessToken: string, outDir: string): Promise<CatalogUploadResult> => {
+  async (event, accessToken: string, outDir: string, buildId?: string | null): Promise<CatalogUploadResult> => {
     try {
       const result = await uploadCatalog(
         () => freshToken(accessToken),
@@ -1478,7 +1478,13 @@ ipcMain.handle(
           hub.update('upload', p.phase, p.total > 0 ? (p.current / p.total) * 100 : null);
           safeSend(event.sender, 'sc:catalog:event', p);
         },
-        { ...uploadJob.hooksForCatalog(), mode: 'silhouettes' },
+        {
+          ...uploadJob.hooksForCatalog(),
+          mode: 'silhouettes',
+          // A silhouettes-only continuation has no catalogue run of its own: the
+          // published row the server already holds is the target.
+          ...(typeof buildId === 'string' && buildId ? { buildId } : {}),
+        },
       );
       if (result.ok) uploadJob.update((s) => ({ ...s, silhouettes: { status: 'done' } }));
       return result;
@@ -1491,6 +1497,13 @@ ipcMain.handle(
     }
   },
 );
+
+/** The published codex build of this identity (silhouettes-only continuation); null = none. */
+ipcMain.handle('sc:catalog:currentBuild', async (_e, key: LedgerKey): Promise<string | null> => {
+  const { token } = await ensureAccessToken();
+  if (!token) return null;
+  return fetchLiveBuildId({ apiBase: API_BASE, anonKey: SUPABASE_ANON_KEY, accessToken: token }, key);
+});
 
 /** The Silhouetten step had nothing to send (skipped by the ledger, or no build) — record it as passed. */
 ipcMain.handle('sc:catalog:silhouettesSkipped', () => {

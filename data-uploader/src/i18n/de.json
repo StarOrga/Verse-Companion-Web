@@ -473,10 +473,15 @@
       "silhouettes": "Silhouetten",
       "hulls": "3D-Hüllen"
     },
-    "modelsOnly": "Nur die 3D-Modelle sind offen — setze sie aus dem Extrakt auf der Platte fort, kein neuer Metadaten-Upload.",
-    "modelsOnlyNoExtract": "Nur die 3D-Modelle sind offen, aber kein Extrakt dieses Builds liegt mehr auf der Platte — extrahiere neu.",
-    "modelsDone": "Die 3D-Modelle dieses Builds sind auf dem Server.",
-    "modelsOpen": "3D-Modelle noch nicht vollständig — der Extrakt bleibt auf der Platte, der nächste Start setzt sie fort."
+    "contModelsReuse": "Nur die 3D-Modelle sind offen — setze sie aus dem Extrakt auf der Platte fort. Es wird nichts erneut hochgeladen.",
+    "contModelsLocal": "Nur die 3D-Modelle sind offen. Die Spieldateien werden lokal gelesen, um die Schiffsliste für den Modell-Build zu erzeugen — Katalog, Bundle und Metadaten werden nicht erneut hochgeladen.",
+    "contSilReuse": "Nur die Silhouetten sind offen — setze sie aus dem Extrakt auf der Platte fort. Es wird nichts außer den Silhouetten hochgeladen.",
+    "contSilLocal": "Nur die Silhouetten sind offen. Die Spieldateien werden lokal gelesen, um sie zu bauen — Katalog, Bundle und Metadaten werden nicht erneut hochgeladen.",
+    "contBothReuse": "Silhouetten und 3D-Modelle sind offen — setze sie aus dem Extrakt auf der Platte fort. Katalog, Bundle und Metadaten werden nicht erneut hochgeladen.",
+    "contBothLocal": "Silhouetten und 3D-Modelle sind offen. Die Spieldateien werden lokal gelesen, um sie zu bauen — Katalog, Bundle und Metadaten werden nicht erneut hochgeladen.",
+    "contDone": "Alles Offene dieses Builds ist auf dem Server.",
+    "contOpen": "Noch nicht alles hochgeladen — der Extrakt bleibt auf der Platte, der nächste Start setzt fort.",
+    "noLiveBuild": "Der Server hat zu diesem Build noch keinen veröffentlichten Codex — die Silhouetten werden nicht hochgeladen."
   },
   "res": {
     "title": "Performance",

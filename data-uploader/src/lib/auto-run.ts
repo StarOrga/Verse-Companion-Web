@@ -169,6 +169,42 @@ export function isModelsOnly(pending: readonly SubthemeKey[] | undefined | null)
 }
 
 /**
+ * A run that continues only parts the server cannot hold without a local
+ * build: the silhouettes and/or the 3D hulls. Everything else (the catalogue,
+ * its bundle, the metadata) is on the server for this identity.
+ *
+ * What these two builds need as input is the extract's own manifests
+ * (`skins/_build_manifest.json`, `silhouettes/_build_manifest.json`: the
+ * ship/entity list with geometry and material references) plus the install's
+ * Data.p4k. The server holds neither, so when no extract of this build is left
+ * on disk the extractor runs again LOCALLY to re-create them — and nothing of
+ * it is uploaded: no bundle, no metadata/catalogue, no new `codex_builds` row.
+ * `steps` is the whole list of network-facing work; it never names the bundle
+ * or the metadata.
+ */
+export interface ContinuationPlan {
+  /** `reuse`: this build's extract is still on disk. `local`: re-create it from the P4K, upload nothing from it. */
+  extract: 'reuse' | 'local';
+  /** The only steps that run, in order. */
+  steps: ('silhouettes' | 'hulls')[];
+}
+
+export function isLocalOnly(pending: readonly SubthemeKey[] | undefined | null): boolean {
+  return Boolean(pending && pending.length > 0 && pending.every((k) => k === 'hulls' || k === 'silhouettes'));
+}
+
+export function planContinuation(
+  pending: readonly SubthemeKey[] | undefined | null,
+  extractOnDisk: boolean,
+): ContinuationPlan | null {
+  if (!isLocalOnly(pending)) return null;
+  const steps: ContinuationPlan['steps'] = [];
+  if (pending!.includes('silhouettes')) steps.push('silhouettes');
+  if (pending!.includes('hulls')) steps.push('hulls');
+  return { extract: extractOnDisk ? 'reuse' : 'local', steps };
+}
+
+/**
  * Installs worth asking the subtheme ledger about once `decideAutoRun` said
  * `already-uploaded`: only those with a readable version AND build number (the
  * ledger key), in channel priority order. Without a build number nothing could

@@ -473,10 +473,15 @@
       "silhouettes": "Silhouettes",
       "hulls": "3D hulls"
     },
-    "modelsOnly": "Only the 3D models are open — continuing them from the extract on disk, no new metadata upload.",
-    "modelsOnlyNoExtract": "Only the 3D models are open, but no extract of this build is left on disk — extracting again.",
-    "modelsDone": "The 3D models of this build are on the server.",
-    "modelsOpen": "3D models not complete yet — the extract stays on disk, the next start continues them."
+    "contModelsReuse": "Only the 3D models are open — continuing them from the extract on disk. Nothing is uploaded again.",
+    "contModelsLocal": "Only the 3D models are open. The game files are read locally to produce the ship list for the model build — catalogue, bundle and metadata are not uploaded again.",
+    "contSilReuse": "Only the silhouettes are open — continuing them from the extract on disk. Nothing but the silhouettes is uploaded.",
+    "contSilLocal": "Only the silhouettes are open. The game files are read locally to build them — catalogue, bundle and metadata are not uploaded again.",
+    "contBothReuse": "Silhouettes and 3D models are open — continuing them from the extract on disk. Catalogue, bundle and metadata are not uploaded again.",
+    "contBothLocal": "Silhouettes and 3D models are open. The game files are read locally to build them — catalogue, bundle and metadata are not uploaded again.",
+    "contDone": "Everything that was open for this build is on the server.",
+    "contOpen": "Not everything is uploaded yet — the extract stays on disk, the next start continues.",
+    "noLiveBuild": "The server has no published codex for this build yet — the silhouettes are not uploaded."
   },
   "res": {
     "title": "Performance",
