@@ -12,7 +12,20 @@
 // static loader `public/concept-frame.html` fetches the document as text and
 // writes it into its own app-origin document instead.
 //
-// So the shim rewrites exactly those five paths — root-relative or on the
+// The engine also says goodbye on unload (`/bye`) and acknowledges a closed
+// session (`/closed-ack`); both go to the function too (it answers them with
+// a no-op) instead of 404ing on the app origin.
+//
+// An EXPIRED ticket (12 h, see index.ts) answers every bridge call with 401.
+// A tab the admin left open would then miss every republish without saying
+// so. On a 401 the shim sends the tab back through the app route
+// `/concept/<id>`, which mints a fresh ticket and replaces itself with the
+// loader again — the engine keeps its state in localStorage under the loader
+// path, so nothing typed is lost. Never while a text field has focus (the
+// next poll retries), and at most once a minute per concept (sessionStorage),
+// so a ticket the app cannot renew never turns into a reload loop.
+//
+// So the shim rewrites exactly those paths — root-relative or on the
 // document's own origin — to the ABSOLUTE function URL
 //   <SUPABASE_URL>/functions/v1/concept-page/<id><path>?t=<ticket>
 // which the function bakes in when it serves the document (`buildShim`), and
@@ -46,7 +59,7 @@ function scriptJson(value: unknown): string {
 export function shimSource(cfg: ShimConfig | null): string {
   return `(function () {
   var cfg = ${scriptJson(cfg ?? {})};
-  var BRIDGE = /^\\/(decisions|heartbeat|reload|draft|attachments)(\\?|$)/;
+  var BRIDGE = /^\\/(decisions|heartbeat|reload|draft|attachments|bye|closed-ack)(\\?|$)/;
   var base = cfg.base ? String(cfg.base).replace(/\\/+$/, '')
            : location.origin + location.pathname.replace(/\\/+$/, '');
   var ticket = cfg.ticket || new URLSearchParams(location.search).get('t') || '';
@@ -64,12 +77,31 @@ export function shimSource(cfg: ShimConfig | null): string {
     var sep = qs.indexOf('?') === 0 ? '&' : '?';
     return base + path + qs + sep + 't=' + encodeURIComponent(ticket);
   }
+  var conceptId = cfg.base ? String(cfg.base).replace(/\\/+$/, '').split('/').pop() : '';
+  function remint() {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(conceptId)) return;
+    var a = document.activeElement;
+    if (a && (a.tagName === 'TEXTAREA' || a.tagName === 'INPUT' || a.isContentEditable)) return;
+    var key = 'concept-remint-' + conceptId;
+    try {
+      var now = Date.now();
+      if (now - Number(sessionStorage.getItem(key) || 0) < 60000) return;
+      sessionStorage.setItem(key, String(now));
+    } catch (e) { return; }
+    location.replace(location.origin + '/concept/' + conceptId);
+  }
+  function watch(p) {
+    return p.then(function (res) {
+      if (res && res.status === 401) remint();
+      return res;
+    });
+  }
   var origFetch = window.fetch.bind(window);
   window.fetch = function (input, init) {
     var target = rewrite(input);
     if (target === null) return origFetch(input, init);
-    if (typeof input === 'string' || (typeof URL !== 'undefined' && input instanceof URL)) return origFetch(target, init);
-    return origFetch(new Request(target, input), init);
+    if (typeof input === 'string' || (typeof URL !== 'undefined' && input instanceof URL)) return watch(origFetch(target, init));
+    return watch(origFetch(new Request(target, input), init));
   };
   if (navigator.sendBeacon) {
     var origBeacon = navigator.sendBeacon.bind(navigator);
