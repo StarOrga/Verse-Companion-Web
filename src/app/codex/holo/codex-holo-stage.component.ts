@@ -57,6 +57,7 @@ import { HardpointFrame, HardpointMarker } from '../hardpoint-map';
 import type { HardpointPortRef } from '../hardpoint-port-ref';
 import { CodexHoloStripComponent } from './codex-holo-strip.component';
 import { CodexHoloEinsatzComponent } from './codex-holo-einsatz.component';
+import { CodexDetailHeadComponent } from '../detail/codex-detail-head.component';
 import { HangarPickerComponent, HangarPickerItem } from '../stage/hangar-picker.component';
 import {
   CodexHoloPatchComponent,
@@ -302,6 +303,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
     CodexHoloChangesComponent,
     CodexLoadoutSaveBarComponent,
     ScTooltipDirective,
+    CodexDetailHeadComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -309,34 +311,21 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
              [class.ph-wait]="phase() === 'wait'" [class.ph-hero]="phase() === 'hero'" [class.ph-reveal]="phase() === 'reveal'"
              [attr.data-mission]="activeMissionId()" [style.--holo-e]="missionHue()">
 
-      <!-- ── Head (concept holotisch-feinschliff r4 d1): name + models left,
-           Einsatz top centre, the hangar button right. No patch picker here —
-           the patch choice lives in the card's Änderungen tab (C18). ── -->
-      <div class="holo-topbar" [scFeedbackSpot]="'feedbackSpot.headline'">
-        <div class="ht-left">
-          <!-- Keyed on the name: a hull switch re-enters the title with it. -->
-          @for (name of [shortName()]; track name) {
-            <div class="ht-title">
-              @if (manufacturerName(); as maker) { <span class="ht-kicker">{{ maker }}</span> }
-              <h1 class="ht-name" tabindex="0" [scTooltip]="eyebrowTitle()" scTooltipTier="label">{{ name }}</h1>
-            </div>
-          }
-          <!-- slot [htModels]: the model variants as real anchors, only when they exist (C3). -->
-          <div class="ht-models"><ng-content select="[htModels]" /></div>
-        </div>
-        <div class="ht-centre">
-          <sc-codex-holo-einsatz
-            [active]="activeMissionId()"
-            [missions]="missionSegments()"
-            [defaultLabelKey]="rankClassLabel()"
-            [cohortLabel]="cohortLabel()"
-            (missionChange)="missionChange.emit($event)" />
-        </div>
+      <!-- ── Head band (concept batch-holotisch-kopf-vorlage r1 d2): the shared sticky glass band under the
+           subheader — name + models left, Einsatz centre, the hangar button right; slim once scrolled. ── -->
+      <sc-codex-detail-head class="holo-topbar" [scFeedbackSpot]="'feedbackSpot.headline'"
+        [name]="shortName()" [kicker]="manufacturerName()" [tooltip]="eyebrowTitle()" [scan]="shellBeta() && !reducedMotion()">
+        <!-- slot [htModels]: the model variants as real anchors, only when they exist (C3). -->
+        <div headExtra class="ht-models"><ng-content select="[htModels]" /></div>
+        <sc-codex-holo-einsatz headCentre
+          [active]="activeMissionId()"
+          [missions]="missionSegments()"
+          [defaultLabelKey]="rankClassLabel()"
+          [cohortLabel]="cohortLabel()"
+          (missionChange)="missionChange.emit($event)" />
         <!-- slot [htOwn]: the one hangar button (count + shown loadout ▾, C5). -->
-        <div class="ht-right">
-          <div class="sc-head-strip" role="group" [attr.aria-label]="'codex.head.stripAria' | translate"><ng-content select="[htOwn]" /></div>
-        </div>
-      </div>
+        <div headOwn class="sc-head-strip" role="group" [attr.aria-label]="'codex.head.stripAria' | translate"><ng-content select="[htOwn]" /></div>
+      </sc-codex-detail-head>
 
       <!-- A shared link's loadout on the table, read-only until adopted (#646). -->
       @if (sharedBanner(); as sb) {
@@ -833,20 +822,9 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   @keyframes rise { from { opacity: 0; transform: translateY(var(--holo-rise)); } }
   @keyframes fade-in { from { opacity: 0; } }
 
-  /* ── Head (r4 d1): name + models | Einsatz centred | hangar button ── */
-  .holo-topbar { position: relative; z-index: 6; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: end; gap: 6px 14px; min-height: 40px; }
-  .ht-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .ht-title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .ht-name { margin: 0; font-weight: 500; font-size: clamp(20px, 1.25vw, 24px); line-height: 1.15; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sc-fg-0);
-  white-space: nowrap; animation: name-in 520ms var(--e-out) backwards; }
-  .ht-kicker { min-width: 0; font-size: max(11px, var(--f)); letter-spacing: 0.04em; color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  animation: fade-in 480ms ease-out 120ms backwards; }
+  /* ── Head: the shared band (detail/codex-detail-head.component.ts); only the models row is styled here. ── */
   .ht-models { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; }
   .ht-models:empty { display: none; }
-  /* Opens like a projected line: clip-path only, the row never re-lays out while the name arrives. */
-  @keyframes name-in { from { opacity: 0; clip-path: inset(0 100% 0 0); } }
-  .ht-centre { justify-self: center; min-width: 0; }
-  .ht-right { justify-self: end; display: flex; justify-content: flex-end; align-items: center; gap: 10px; min-width: 0; max-width: 100%; flex-wrap: wrap; }
   .mobile-tabs { display: none; gap: 6px; }
   .mobile-tabs button { flex: 1; min-height: var(--sc-tap-min, 32px); padding: 6px 10px; border-radius: 3px; border: 1px solid var(--l2); background: var(--glass); color: var(--sc-fg-1); cursor: pointer;
   font-size: max(10px, var(--f)); letter-spacing: 0.14em; transition: color 160ms ease, border-color 160ms ease; }
@@ -900,16 +878,6 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .dock { --dk-ease: cubic-bezier(0.16, 0.84, 0.24, 1); }
   .dock:not(.first) :is(.holo-body, .holo-below) { transform-origin: 40% 50%; animation: dk-push 700ms var(--dk-ease) backwards; }
   @keyframes dk-push { from { transform: scale(0.965); } }
-  .dock .holo-topbar .ht-title { position: relative; }
-  .dock .ht-name { position: relative; animation: dk-scan 760ms var(--dk-ease) 120ms backwards; }
-  .dock .ht-name::after { content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; transform-origin: left; pointer-events: none;
-  background: linear-gradient(90deg, var(--sc-accent), transparent); box-shadow: 0 0 10px var(--sc-accent); animation: dk-scan-line 1000ms var(--dk-ease) 120ms both; }
-  @keyframes dk-scan {
-    0% { clip-path: inset(-40% 100% -40% 0); opacity: 1; filter: brightness(2.2) drop-shadow(0 0 0 var(--sc-accent)); }
-    55% { clip-path: inset(-40% -10% -40% 0); filter: brightness(1.6) drop-shadow(0 0 10px var(--sc-accent)); }
-    100% { clip-path: inset(-40% -10% -40% 0); filter: none; }
-  }
-  @keyframes dk-scan-line { 0% { transform: scaleX(0); opacity: 0; } 12% { opacity: 1; } 58% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
   .dock:not(.first) .holo-table { transform-origin: 35% 55%; animation: dk-holo 1000ms linear 260ms backwards; }
   @keyframes dk-holo {
     0% { opacity: 0; transform: scale(1.03); filter: brightness(2) saturate(0.4); }
@@ -956,10 +924,6 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .statics .v { font-family: var(--m); font-size: 12.5px; color: var(--sc-fg-0); white-space: nowrap; }
   /* Touch: the focusable chips carry the tooltip, so they are tap targets. */
   @media (pointer: coarse) { .statics div { min-width: var(--sc-tap-min); min-height: var(--sc-tap-min); align-content: center; } }
-  /* Touch: the focusable title reaches the tap minimum. */
-  @media (pointer: coarse) {
-    .ht-name { min-height: var(--sc-tap-min); line-height: var(--sc-tap-min); }
-  }
   .cohort-link { font-size: max(10.5px, var(--f)); color: var(--sc-fg-2); text-decoration: none; text-align: center; transition: color 160ms ease; }
   .cohort-link:hover { color: var(--sc-accent); }
   /* The patch Δ fits the fixed card: no column wider than the card, the card scrolls inside (C18). */
@@ -1143,12 +1107,6 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
      the hull and its pins keep that lane free instead of lying under it (QA Q4). */
   .holo-table { padding-inline-end: var(--sc-fab-clear-inline); }
   .switch.mobile-only { display: inline-flex; }
-  .holo-topbar { grid-template-columns: auto minmax(0, 1fr); }
-  .ht-left { grid-column: 1 / -1; }
-  .ht-centre { justify-self: start; }
-  /* Its own row: beside the Einsatz box the hangar button (48 px tall, no shrink on touch)
-     ran 53–61 px past a 375 px phone and the page scrolled sideways. */
-  .ht-right { grid-column: 1 / -1; justify-content: flex-end; }
   .holo-body { gap: 10px; }
   .table-head { flex-wrap: wrap; gap: 6px; padding: 0; }
   .holo-below { grid-template-columns: 1fr; }

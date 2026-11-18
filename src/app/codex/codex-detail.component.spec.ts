@@ -613,7 +613,7 @@ describe('CodexDetailComponent — missile on the item stage', () => {
     const el: HTMLElement = fixture.nativeElement;
     expect(el.querySelector('.item-page sc-codex-item-stage')).not.toBeNull();
     expect(el.querySelector('header.hero')).toBeNull();
-    expect(el.querySelector('.it-pane sc-codex-rank-card')).not.toBeNull();
+    expect(el.querySelector('.sh-pane sc-codex-rank-card')).not.toBeNull();
   });
 });
 
@@ -644,8 +644,8 @@ describe('CodexDetailComponent — crafting recipe (#187)', () => {
 
   it('prints each material amount in SCU without the float noise', async () => {
     const fixture = await setup('weapon', [], NOMAD_PAYLOAD, { getCraftingRecipe: async () => RECIPE });
-    // The recipe lives behind the "Herstellung" tab of the item page.
-    (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('.it-tab')[1].click();
+    // The recipe lives behind the "Bezug" tab of the item page.
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('#dt-tab-bezug')!.click();
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
     const section = Array.from(el.querySelectorAll('section')).find((s) =>
@@ -668,8 +668,8 @@ describe('CodexDetailComponent — crafting recipe (#187)', () => {
       ],
     };
     const fixture = await setup('weapon', [], NOMAD_PAYLOAD, { getCraftingRecipe: async () => recipe });
-    // The recipe lives behind the "Herstellung" tab of the item page.
-    (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('.it-tab')[1].click();
+    // The recipe lives behind the "Bezug" tab of the item page.
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('#dt-tab-bezug')!.click();
     fixture.detectChanges();
     const translate = TestBed.inject(TranslateService);
     translate.setTranslation('en', { codex: { detail: { minQuality: 'min. quality {{value}}' } } });

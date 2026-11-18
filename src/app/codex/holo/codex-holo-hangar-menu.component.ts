@@ -145,15 +145,19 @@ export interface HangarExemplar {
   styles: [`
     :host { display: inline-flex; min-width: 0; }
     .hm { position: relative; display: inline-flex; min-width: 0; }
-    .hb { display: inline-flex; align-items: center; gap: 7px; height: 32px; min-width: 0; max-width: 100%; padding: 0 10px 0 6px;
-      border: 1px solid color-mix(in srgb, var(--sc-accent) 45%, transparent); border-radius: 16px; background: transparent;
+    /* The band's pill language (detail/codex-detail-head.component.ts tokens), the same as the Einsatz pill. */
+    .hb { display: inline-flex; align-items: center; gap: 8px; box-sizing: border-box; height: var(--hb-pill-h, 34px); min-width: 0; max-width: 100%; padding: 0 14px 0 5px;
+      border: 1px solid var(--hb-pill-bd, color-mix(in srgb, var(--sc-accent) 30%, transparent)); border-radius: var(--hb-pill-r, 999px);
+      background: var(--hb-pill-bg, color-mix(in srgb, var(--sc-bg-0) 52%, transparent)); transition: border-color 160ms ease, background 160ms ease, height 220ms ease;
       color: var(--sc-fg-1); font: inherit; font-size: max(12.5px, var(--sc-fs-floor)); white-space: nowrap; cursor: pointer; }
-    .hb .ic { flex: none; width: 22px; height: 22px; padding: 4px; box-sizing: border-box; border-radius: 11px; color: var(--sc-accent);
+    .hb .ic { flex: none; width: 24px; height: 24px; padding: 5px; box-sizing: border-box; border-radius: 50%; color: var(--sc-accent);
       background: color-mix(in srgb, var(--sc-accent) 12%, transparent); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
     .hb b { color: var(--sc-fg-0); font-weight: 600; }
     .hb .sep { color: var(--sc-fg-2); }
     .hb .ex { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--sc-fg-0); }
-    .hb .car { color: var(--sc-accent); font-size: 10px; }
+    .hb .car { color: var(--sc-accent); font-size: 0.75em; }
+    /* Phone, slim band: the count stays, the loadout name goes (it is in the menu). */
+    @media (max-width: 640px) { :host-context(.slim) .hb :is(.sep, .ex) { display: none; } }
     .hb:hover, .hb.open { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); border-color: var(--sc-accent); }
     .hb:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* Anchored under its button; frame and width (menu tier) come from sc-popup. */

@@ -38,7 +38,8 @@ export interface StripMission {
             (click)="toggle($event)" (keydown.escape)="open() && close($event)">
       <small class="lab">{{ 'codex.holo.strip.einsatz' | translate }}</small>
       <span class="val"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="activeIcon()" /></svg>{{ activeLabel() | translate }}</span>
-      <span class="sub" [class.gapv]="!cohortLabel()">{{ cohortLabel() ?? ('codex.kpi.gap' | translate) }}<span class="caret" aria-hidden="true">▾</span></span>
+      <span class="sub" [class.gapv]="!cohortLabel()">{{ cohortLabel() ?? ('codex.kpi.gap' | translate) }}</span>
+      <span class="caret" aria-hidden="true">▾</span>
     </button>
     @if (open()) {
       <div class="mission-pop" role="radiogroup" tabindex="-1"[attr.aria-label]="'codex.mission.label' | translate" (keydown.escape)="close($event)">
@@ -57,17 +58,20 @@ export interface StripMission {
   styles: [
     `
       :host { position: relative; display: inline-block; min-width: 0; }
-      .einsatz { display: grid; grid-template-columns: auto auto; column-gap: 10px; align-items: baseline; padding: 5px 14px 6px; min-block-size: var(--sc-tap-min, 0px);
-        border: 1px solid color-mix(in srgb, var(--sc-accent) 40%, transparent); border-radius: 12px;
-        background: color-mix(in srgb, var(--sc-bg-0) 70%, transparent); color: var(--sc-fg-0); font: inherit; text-align: start; cursor: pointer;
-        transition: border-color 160ms ease, background 160ms ease; max-inline-size: 100%; }
-      .einsatz:hover, .einsatz[aria-expanded='true'] { border-color: var(--sc-accent); background: color-mix(in srgb, var(--holo-e, var(--sc-accent)) 12%, var(--sc-bg-0)); }
+      /* The band's pill language (detail/codex-detail-head.component.ts tokens): one row, the same height,
+         radius, edge and glass as the hangar pill; the slim band hides the label and the cohort line. */
+      .einsatz { display: inline-flex; align-items: center; gap: 8px; box-sizing: border-box; block-size: var(--hb-pill-h, 34px); padding: 0 14px;
+        border: 1px solid var(--hb-pill-bd, color-mix(in srgb, var(--sc-accent) 30%, transparent)); border-radius: var(--hb-pill-r, 999px);
+        background: var(--hb-pill-bg, color-mix(in srgb, var(--sc-bg-0) 52%, transparent)); color: var(--sc-fg-0); font: inherit; cursor: pointer; white-space: nowrap;
+        transition: border-color 160ms ease, background 160ms ease, block-size 220ms ease; max-inline-size: 100%; min-inline-size: 0; }
+      .einsatz:hover, .einsatz[aria-expanded='true'] { border-color: var(--sc-accent); background: color-mix(in srgb, var(--holo-e, var(--sc-accent)) 12%, transparent); }
       .einsatz:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-      .lab { grid-column: 1 / -1; font-family: var(--sc-font-display); font-size: max(9.5px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); }
-      .val { display: inline-flex; align-items: center; gap: 6px; font-family: var(--sc-font-display); font-size: max(14px, var(--sc-fs-floor)); font-weight: 600; letter-spacing: 0.04em;
+      .lab { display: var(--hb-pill-meta, inline); padding-inline-end: 8px; border-inline-end: 1px solid color-mix(in srgb, var(--sc-accent) 22%, transparent);
+        font-family: var(--sc-font-display); font-size: max(9.5px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); }
+      .val { display: inline-flex; align-items: center; gap: 6px; font-family: var(--sc-font-display); font-size: max(13px, var(--sc-fs-floor)); font-weight: 600; letter-spacing: 0.04em;
         color: var(--holo-e, var(--sc-fg-0)); white-space: nowrap; transition: color var(--holo-t-base, 200ms) ease; }
-      .sub { font-size: max(11px, var(--sc-fs-floor)); color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .caret { margin-inline-start: 4px; color: var(--sc-accent); font-size: 0.85em; }
+      .sub { display: var(--hb-pill-meta, inline); min-inline-size: 0; font-size: max(11px, var(--sc-fs-floor)); color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .caret { color: var(--sc-accent); font-size: 0.75em; }
       .gapv { color: var(--sc-fg-2); }
       .mp-l svg, .val svg { inline-size: 1.15em; block-size: 1.15em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .mission-pop { position: absolute; inset-block-start: calc(100% + 6px); inset-inline-start: 50%; translate: -50% 0; z-index: 30; display: grid; gap: 2px; padding: 6px; min-inline-size: 260px;

@@ -248,6 +248,17 @@
     "enterFailedDismiss": "Verwerfen"
   },
   "codex": {
+    "detailShell": {
+      "tabsAria": "Abschnitte",
+      "panelAria": "Werte und Informationen",
+      "tab": {
+        "einordnung": "Einordnung",
+        "werte": "Werte",
+        "bezug": "Bezug",
+        "verbaut": "Verbaut in",
+        "aenderungen": "Änderungen"
+      }
+    },
     "own": {
       "group": "Dein Schiff",
       "rename": "Umbenennen",

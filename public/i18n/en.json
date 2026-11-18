@@ -248,6 +248,17 @@
     "enterFailedDismiss": "Dismiss"
   },
   "codex": {
+    "detailShell": {
+      "tabsAria": "Sections",
+      "panelAria": "Values and information",
+      "tab": {
+        "einordnung": "Ranking",
+        "werte": "Values",
+        "bezug": "Sourcing",
+        "verbaut": "Used in",
+        "aenderungen": "Changes"
+      }
+    },
     "own": {
       "group": "Your ship",
       "rename": "Rename",
