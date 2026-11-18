@@ -381,6 +381,11 @@ export const routes: Routes = [
             canMatch: [() => (inject(BetaService).isEnabled('shell')() ? inject(Router).parseUrl(hqPageHref('planen')) : true)],
             loadComponent: () => import('./hq/hq-ops.component').then((m) => m.HqOpsComponent),
           },
+          {
+            path: 'spots',
+            data: { layout: 'tool' },
+            loadComponent: () => import('./hq/spots/hq-spots.component').then((m) => m.HqSpotsComponent),
+          },
         ],
       },
       {

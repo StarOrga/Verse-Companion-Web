@@ -96,6 +96,8 @@ export const EVENTS = {
   'hq:wishlist_open': ev<{ surface: 'popout' | 'cart' }>('hq', 'Die Wünsche wurden geöffnet (Popout in der Kopfzeile oder großes Fenster).'),
   'hq:wish_search_open': ev<{ surface: 'popout' | 'cart' }>('hq', 'Aus den leeren Wünschen heraus wurde die Suche geöffnet.'),
   'hq:events_view': ev('hq', 'Der Ereignis-Abschnitt des HQ wurde angezeigt.'),
+  'hq:spot_rename': ev('hq', 'Ein gespeicherter Spot wurde auf der Spots-Seite umbenannt.'),
+  'hq:spot_delete': ev('hq', 'Ein gespeicherter Spot wurde auf der Spots-Seite gelöscht.'),
 
   // --- search ------------------------------------------------------------
   'search:palette_open': ev<{ surface: 'palette' | 'codex_bar' }>('search', 'Die Suche wurde geöffnet (Palette oder Codex-Leiste).'),

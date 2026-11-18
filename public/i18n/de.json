@@ -6647,7 +6647,8 @@
       "overview": "Übersicht",
       "locker": "Sets",
       "hangar": "Hangar",
-      "ops": "Einsätze"
+      "ops": "Einsätze",
+      "spots": "Spots"
     },
     "supplies": {
       "button": "Nachschub",
@@ -6686,6 +6687,21 @@
         "store": "Ablegen",
         "tickOnly": "Nur abhaken"
       }
+    },
+    "spots": {
+      "title": "Spots",
+      "subtitle": "Deine gespeicherten Orte aus der Desktop-App. Hier umbenennen oder löschen; die App übernimmt es beim nächsten Abgleich.",
+      "loading": "Deine Spots werden geladen …",
+      "empty": "Noch keine Spots. Spots legst du in der Desktop-App an (Verse Navigation); nach dem Abgleich erscheinen sie hier.",
+      "retry": "Erneut versuchen",
+      "nameLabel": "Name des Spots",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "rename": "Umbenennen",
+      "delete": "Löschen",
+      "created": "Angelegt am {{date}}",
+      "deleteTitle": "Diesen Spot löschen?",
+      "deleteMessage": "„{{name}}“ wird von allen deinen Geräten entfernt."
     },
     "ops": {
       "title": "Einsätze",

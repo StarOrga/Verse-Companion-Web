@@ -6647,7 +6647,8 @@
       "overview": "Overview",
       "locker": "Sets",
       "hangar": "Hangar",
-      "ops": "Ops"
+      "ops": "Ops",
+      "spots": "Spots"
     },
     "supplies": {
       "button": "Supplies",
@@ -6686,6 +6687,21 @@
         "store": "Put down",
         "tickOnly": "Just tick off"
       }
+    },
+    "spots": {
+      "title": "Spots",
+      "subtitle": "Your saved places from the desktop app. Rename or delete them here; the app picks the change up on its next sync.",
+      "loading": "Loading your spots …",
+      "empty": "No spots yet. Spots are created in the desktop app (Verse Navigation); once synced, they show up here.",
+      "retry": "Try again",
+      "nameLabel": "Spot name",
+      "save": "Save",
+      "cancel": "Cancel",
+      "rename": "Rename",
+      "delete": "Delete",
+      "created": "Created {{date}}",
+      "deleteTitle": "Delete this spot?",
+      "deleteMessage": "\"{{name}}\" will be removed from all your devices."
     },
     "ops": {
       "title": "Ops",
