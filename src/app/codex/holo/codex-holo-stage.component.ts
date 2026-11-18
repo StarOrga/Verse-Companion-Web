@@ -2024,7 +2024,7 @@ export class CodexHoloStageComponent {
           else if (el.matches('.hs-row')) stage?.style.setProperty('--holo-row-h', `${h}px`);
           else if (el.matches('.holo-views')) stage?.style.setProperty('--holo-views-h', `${h}px`);
           else if (el.matches('.below-persp')) { el.style.setProperty('--persp-h', `${h}px`); queueJoin(); }
-          else if (el.matches('.holo-topbar')) measureTop();
+          else measureTop(); // the head band, or a box above the stage that settled late
         }
         pending.clear();
       };
@@ -2039,6 +2039,10 @@ export class CodexHoloStageComponent {
         const el = root.querySelector(sel);
         if (el) ro.observe(el);
       }
+      // What stands above the body (page head, banner, head band) can still settle after the first
+      // measure; its container grows with it, so a stale --holo-top (the strip sitting a band's height
+      // below the views bar) is caught here.
+      for (const el of [root, root.parentElement]) if (el) ro.observe(el);
       this.destroyRef.onDestroy(() => ro.disconnect());
     });
 
