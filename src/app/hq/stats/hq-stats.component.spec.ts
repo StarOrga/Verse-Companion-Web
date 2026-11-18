@@ -1,5 +1,6 @@
 import type { Mock } from 'vitest';
 import { HqLiveService } from '../now/hq-live.service';
+import { HqLiveStore } from '../now/hq-live.store';
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { provideRouter } from '@angular/router';
@@ -19,7 +20,8 @@ describe('HqStatsComponent', () => {
         provideTranslateService({ fallbackLang: 'en' }),
         { provide: SupabaseClientProvider, useValue: { client: { rpc } } },
         { provide: AuthService, useValue: { user: signal({ id: 'u1' }) } },
-        { provide: HqLiveService, useValue: { state: liveState } },
+        { provide: HqLiveService, useValue: { state: liveState, events: () => [] } },
+        { provide: HqLiveStore, useValue: { fetchEventsOfTypes: async () => [] } },
       ],
     });
     const fixture = TestBed.createComponent(HqStatsComponent);

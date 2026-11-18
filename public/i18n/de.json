@@ -7390,6 +7390,26 @@
           "e3": "Die letzten Ereignisse, z. B. „Mission abgeschlossen“ oder „Quantum-Sprung beendet“."
         }
       }
+    },
+    "logbook": {
+      "title": "Logbuch",
+      "loading": "Logbuch wird geladen …",
+      "retry": "Erneut versuchen",
+      "empty": "Noch keine Spielsitzung. Verbinde die SCC-App, dann erscheint hier jede Sitzung als Karte.",
+      "emptyLinked": "In den letzten 30 Tagen keine Spielsitzung aufgezeichnet.",
+      "jumps": "Quantensprünge",
+      "contracts": "Aufträge",
+      "auec": "aUEC-Bilanz",
+      "losses": "Verluste",
+      "lossesSub": "{{deaths}} Tode · {{ships}} Schiffe zerstört · {{claims}} Versicherungsfälle",
+      "end": {
+        "noQuit": "Ohne Beenden zu Ende (Absturz oder App geschlossen)",
+        "live": "Läuft gerade"
+      },
+      "showAll": "Alle {{n}} Sitzungen zeigen",
+      "note": "Sitzungen der letzten {{days}} Tage aus der SCC-App. Die aUEC-Bilanz ist Verkauf minus Einkauf.",
+      "durH": "{{h}} h {{m}} min",
+      "durM": "{{m}} min"
     }
   },
   "verse": {

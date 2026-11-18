@@ -30,6 +30,20 @@ export class HqLiveStore {
     return (data ?? []) as HqLiveEventRow[];
   }
 
+  /** Events of these types since `sinceIso`, newest first (the logbook, #896). */
+  async fetchEventsOfTypes(uid: string, types: readonly string[], sinceIso: string, limit: number): Promise<HqLiveEventRow[]> {
+    const { data, error } = await this.sb.client
+      .from('hq_live_events')
+      .select('type,at,data')
+      .eq('user_id', uid)
+      .in('type', [...types])
+      .gte('at', sinceIso)
+      .order('at', { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return (data ?? []) as HqLiveEventRow[];
+  }
+
   /** Atomic claim: only one tab/device gets `true` for a not yet applied event. */
   async claim(uid: string, id: string, marker: Record<string, unknown>): Promise<boolean> {
     const { data, error } = await this.sb.client
