@@ -83,6 +83,7 @@ import { HQ_SPOT_NAME_MAX, HqSpot, HqSpotsService } from './hq-spots.service';
   styles: [
     `
       :host { display: block; }
+      sc-page-header { margin-bottom: var(--sc-space-4); }
       .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-space-3); }
       .row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--sc-space-3); padding: var(--sc-space-4); }
       .main { flex: 1 1 16rem; min-width: 0; display: flex; flex-direction: column; gap: var(--sc-space-1); }
@@ -129,7 +130,7 @@ export class HqSpotsComponent {
     this.busy.set(null);
     if (ok) {
       this.editing.set(null);
-      this.analytics.track('hq:spot_rename');
+      this.analytics.track('hq:spot_update');
     }
   }
 
@@ -145,6 +146,6 @@ export class HqSpotsComponent {
     this.busy.set(s.id);
     const ok = await this.svc.remove(s.id);
     this.busy.set(null);
-    if (ok) this.analytics.track('hq:spot_delete');
+    if (ok) this.analytics.track('hq:spot_remove');
   }
 }

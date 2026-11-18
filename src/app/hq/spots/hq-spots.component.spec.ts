@@ -90,7 +90,7 @@ describe('HqSpotsComponent', () => {
     el.querySelector('form')!.dispatchEvent(new Event('submit'));
     await fixture.whenStable();
     expect(svc.rename).toHaveBeenCalledWith('a', 'Renamed');
-    expect(track).toHaveBeenCalledWith('hq:spot_rename');
+    expect(track).toHaveBeenCalledWith('hq:spot_update');
   });
 
   it('asks before deleting and deletes only on yes', async () => {
@@ -106,6 +106,6 @@ describe('HqSpotsComponent', () => {
     del().click();
     await fixture.whenStable();
     expect(svc.remove).toHaveBeenCalledWith('a');
-    expect(track).toHaveBeenCalledWith('hq:spot_delete');
+    expect(track).toHaveBeenCalledWith('hq:spot_remove');
   });
 });
