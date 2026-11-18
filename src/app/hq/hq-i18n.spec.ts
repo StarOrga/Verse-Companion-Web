@@ -12,8 +12,11 @@ function leaves(node: Tree, prefix: string): [string, string][] {
   );
 }
 
-/** HQ wording (concept 2026-10-30 §2.2): these words never appear in the German `hq.*` strings. */
-const BANNED = ['gedeckt', 'Auftrag', 'Operation', 'Schritt-Modus'];
+/**
+ * HQ wording (concept 2026-10-30 §2.2): these words never appear in the German `hq.*` strings. "Operation" left the
+ * list with concept 20261117-1110-pfad-stationen (E1: "Operation" is now the visible word for a Nachschub).
+ */
+const BANNED = ['gedeckt', 'Auftrag', 'Schritt-Modus'];
 
 describe('hq.* wording', () => {
   const deHq = leaves((de as unknown as { hq: Tree }).hq, 'hq');

@@ -12,6 +12,7 @@ import { EINSATZ_CACHE_KEY, HqEinsatzService as EinsatzServiceToken } from '../d
 import { HqOwnershipService } from '../hq-ownership.service';
 import { SUPPLIES_CACHE_KEY, SUPPLIES_STORAGE_KEY, HqSuppliesService } from '../hq-supplies.service';
 import { HqPageNavService } from '../hq-page-nav.service';
+import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { HqPlanComponent } from './hq-plan.component';
 
 describe('HqPlanComponent', () => {
@@ -149,6 +150,20 @@ describe('HqPlanComponent', () => {
     const { f, el } = make(false);
     click(f, el.querySelector('.board .archive'));
     expect(el.querySelector('sc-hq-nachschub-archive-dialog')).not.toBeNull();
+  });
+
+  it('H3: deleting an archived Operation asks first (danger) and only then deletes; "no" deletes nothing', async () => {
+    const { f } = make(false);
+    const ns = f.componentInstance['ns'];
+    const confirm = vi.spyOn(TestBed.inject(ScConfirmService), 'confirm').mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    const del = vi.spyOn(ns, 'removeArchived').mockResolvedValue({ ok: true, key: 'hq.nachschub.done.removed', undo: async () => ({ ok: true, key: 'hq.nachschub.done.undone' }) });
+    await f.componentInstance['removeArchived']('old');
+    expect(del).not.toHaveBeenCalled();
+    await f.componentInstance['removeArchived']('old');
+    expect(confirm.mock.calls[1][0]).toEqual(expect.objectContaining({ tone: 'danger', messageKey: 'hq.archive.removeMsg' }));
+    expect(del).toHaveBeenCalledWith('old');
+    f.detectChanges();
+    expect((f.nativeElement as HTMLElement).querySelector('.notice button')).not.toBeNull(); // the undo toast
   });
 
   it('W5.2: the classic Auswahl / Route face, the opt-in, Blueprint progress, commodity prices and shared Einsaetze are gone from Planen', () => {

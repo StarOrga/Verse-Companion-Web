@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, input, output, signal } fro
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
+import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { ScTristateComponent } from '../../shared/tristate/sc-tristate.component';
 import { NachschubService } from '../nachschub/nachschub.service';
 import { NACHSCHUB_ICON_PATHS } from '../nachschub/step-icons';
@@ -54,12 +55,14 @@ export class HqNachschubRemoveDialogComponent {
 @Component({
   selector: 'sc-hq-nachschub-archive-dialog',
   standalone: true,
-  imports: [TranslatePipe, ScActionDirective, ScPopupComponent],
+  imports: [TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <sc-popup kind="dialog" [eyebrow]="'hq.title' | translate" [title]="'hq.slots.archive' | translate" (closed)="closed.emit()">
       <div class="pbody">
-        <p class="dlg-msg hint">{{ svc.newBlock() ? (svc.newBlock()! | translate) : ('hq.archive.slotFree' | translate) }}</p>
+        @if (svc.archived().length > 0) {
+          <p class="dlg-msg hint">{{ svc.newBlock() ? (svc.newBlock()! | translate) : ('hq.archive.slotFree' | translate) }}</p>
+        }
         @if (svc.archived().length === 0) {
           <p class="dlg-msg">{{ 'hq.archive.empty' | translate }}</p>
         } @else {
@@ -67,7 +70,13 @@ export class HqNachschubRemoveDialogComponent {
             @for (n of svc.archived(); track n.id) {
               <li>
                 <span class="nm">{{ n.name }}</span>
+                <span class="acts">
                 <button type="button" scAction tier="secondary" [disabled]="svc.newBlock() !== null" (click)="reactivate.emit(n.id)">{{ 'hq.archive.reactivate' | translate }}</button>
+                <button type="button" scAction tier="tertiary" tone="danger" class="rm" [attr.aria-label]="'hq.archive.removeAria' | translate: { name: n.name }"
+                        [scTooltip]="'hq.archive.remove' | translate" scTooltipTier="label" (click)="removeArchived.emit(n.id)">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 7V4.5h4V7M6.5 7l1 13h9l1-13M10 11v5.5M14 11v5.5" /></svg>
+                </button>
+                </span>
               </li>
             }
           </ul>
@@ -80,11 +89,17 @@ export class HqNachschubRemoveDialogComponent {
     `.hint { color: var(--sc-fg-2); font-size: 0.85rem; }
      .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); }
      .list li { display: flex; align-items: center; gap: var(--sc-space-3, 12px); padding: var(--sc-space-2, 8px) var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-bg-0); }
-     .nm { flex: 1; min-width: 0; overflow-wrap: anywhere; }`,
+     .nm { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+     .acts { display: flex; align-items: center; flex: none; gap: var(--sc-space-2, 8px); }
+     .rm svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+     @media (pointer: coarse) { .acts > button { min-height: 48px; min-width: 48px; } }
+     @media (max-width: 480px) { .list li { flex-wrap: wrap; } .nm { flex-basis: 100%; } .acts { margin-left: auto; } }`,
   ],
 })
 export class HqNachschubArchiveDialogComponent {
   protected readonly svc = inject(NachschubService);
   readonly reactivate = output<string>();
+  /** Delete one archived Operation (the page asks first). */
+  readonly removeArchived = output<string>();
   readonly closed = output<void>();
 }

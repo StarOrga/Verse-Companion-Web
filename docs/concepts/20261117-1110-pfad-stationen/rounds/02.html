@@ -1,0 +1,684 @@
+<section data-iteration="2" data-iteration-template="design" data-design-set="alternatives" data-viewports="desktop phone" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]},"designs":{},"screens":{},"views":{},"favorite":"wunsch"}</script>
+<style>
+:is([data-design], .design-ov-scale) .ipm{position:relative;height:100%;min-height:640px;overflow:hidden;container-type:inline-size;background:radial-gradient(ellipse 80% 60% at 50% -10%,#12354a 0%,#0a1c2a 55%,#061724 100%);color:#c8e4f1;font:13px/1.45 Inter,system-ui,"Segoe UI",sans-serif;--a:#52c1e6;--mut:#7fa3b6;--ink:#f2fafe;--edge:rgba(130,220,255,.28);box-sizing:border-box}
+:is([data-design], .design-ov-scale) .ipm *{box-sizing:border-box}
+:is([data-design], .design-ov-scale) .ipm [data-screen-link]{cursor:pointer}
+:is([data-design], .design-ov-scale) .ipm-i{width:18px;height:18px;display:block;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+:is([data-design], .design-ov-scale) .ipm-i.on{fill:color-mix(in srgb,currentColor 28%,transparent)}
+:is([data-design], .design-ov-scale) .ipm-bar{position:absolute;left:28px;right:28px;top:72px;height:52px;display:flex;align-items:center;gap:14px;padding:0 10px 0 16px;border:1px solid var(--edge);border-radius:8px;background:linear-gradient(180deg,rgba(14,40,56,.94),rgba(7,26,39,.94));z-index:3}
+:is([data-design], .design-ov-scale) .ipm-logo{font:700 12px/1 Orbitron,"Segoe UI",sans-serif;letter-spacing:.16em;color:var(--ink);white-space:nowrap}
+:is([data-design], .design-ov-scale) .ipm-nav{display:flex;gap:16px;color:var(--mut);font:600 11px/1 Orbitron,"Segoe UI",sans-serif;letter-spacing:.1em;text-transform:uppercase}
+:is([data-design], .design-ov-scale) .ipm-nav b{color:var(--a);font-weight:600}
+:is([data-design], .design-ov-scale) .ipm-search{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;border:1px solid var(--edge);border-radius:999px;color:var(--mut);white-space:nowrap;overflow:hidden}
+:is([data-design], .design-ov-scale) .ipm-search span{overflow:hidden;text-overflow:ellipsis}
+:is([data-design], .design-ov-scale) .ipm-trig{position:relative;display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--edge);border-radius:50%;color:var(--a);flex:none}
+:is([data-design], .design-ov-scale) .ipm-trig i{position:absolute;right:-3px;top:-3px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:var(--a);color:#061724;font:600 10px/15px Inter,sans-serif;font-style:normal;text-align:center}
+:is([data-design], .design-ov-scale) .ipm-ava{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#143a50;color:var(--ink);font-weight:600;flex:none}
+:is([data-design], .design-ov-scale) .ipm-body{position:absolute;left:28px;right:28px;top:142px;bottom:24px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+:is([data-design], .design-ov-scale) .ipm-crumb{color:var(--mut);font-size:12px}
+:is([data-design], .design-ov-scale) .ipm-crumb b{color:var(--ink);font-weight:500}
+:is([data-design], .design-ov-scale) .ipm-hero{display:flex;align-items:center;gap:18px}
+:is([data-design], .design-ov-scale) .ipm-sil{display:grid;place-items:center;width:132px;height:72px;border:1px solid var(--edge);border-radius:10px;background:rgba(8,28,42,.7);flex:none}
+:is([data-design], .design-ov-scale) .ipm-sil svg{width:92px;height:46px;fill:rgba(82,193,230,.16);stroke:var(--a);stroke-width:1;stroke-linejoin:round}
+:is([data-design], .design-ov-scale) .ipm-eb{display:block;color:var(--a);font:600 10.5px/1.2 Orbitron,"Segoe UI",sans-serif;letter-spacing:.14em;text-transform:uppercase}
+:is([data-design], .design-ov-scale) .ipm-h1{margin:4px 0 0;color:var(--ink);font:600 26px/1.15 Orbitron,"Segoe UI",sans-serif;letter-spacing:.03em}
+:is([data-design], .design-ov-scale) .ipm-prim{position:relative;display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid color-mix(in srgb,var(--a) 40%,transparent);border-radius:12px;background:color-mix(in srgb,var(--a) 5%,transparent)}
+:is([data-design], .design-ov-scale) .ipm-stops{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:18px;margin:0;padding:0;list-style:none}
+:is([data-design], .design-ov-scale) .ipm-stop{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;padding:12px 14px;border:1px solid rgba(130,220,255,.2);border-radius:10px;background:rgba(6,23,36,.7)}
+:is([data-design], .design-ov-scale) .ipm-stop + .ipm-stop::before{content:"";position:absolute;left:-19px;top:22px;width:18px;height:2px;background:rgba(130,220,255,.2)}
+:is([data-design], .design-ov-scale) .ipm-stop.on + .ipm-stop::before{background:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-stop.on{border-color:color-mix(in srgb,var(--a) 55%,transparent)}
+:is([data-design], .design-ov-scale) .ipm-sh{display:inline-flex;align-items:center;gap:8px;color:#c8e4f1;min-width:0}
+:is([data-design], .design-ov-scale) .ipm-stop.on .ipm-sh{color:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-sh b{font:500 12.5px/1.2 Orbitron,"Segoe UI",sans-serif;letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:is([data-design], .design-ov-scale) .ipm-stop p{margin:0;font-size:12.5px;color:#c8e4f1}
+:is([data-design], .design-ov-scale) .ipm-q{color:var(--ink);font-weight:600}
+:is([data-design], .design-ov-scale) .ipm-mut{color:var(--mut);font-size:12px}
+:is([data-design], .design-ov-scale) .ipm-a{color:var(--a);font-size:12.5px;white-space:nowrap}
+:is([data-design], .design-ov-scale) .ipm-line{display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px 12px;max-width:100%}
+:is([data-design], .design-ov-scale) .ipm-st{display:inline-flex;align-items:center;gap:2px}
+:is([data-design], .design-ov-scale) .ipm-st span{display:grid;place-items:center;width:28px;height:28px;border:1px solid rgba(130,220,255,.28);border-radius:7px}
+:is([data-design], .design-ov-scale) .ipm-st b{min-width:28px;text-align:center;color:var(--ink);font-weight:500}
+:is([data-design], .design-ov-scale) .ipm-btn{display:inline-flex;align-items:center;gap:8px;min-height:32px;padding:4px 14px;border:1px solid color-mix(in srgb,var(--a) 60%,transparent);border-radius:999px;color:var(--a);font-weight:600;font-size:12.5px;max-width:100%}
+:is([data-design], .design-ov-scale) .ipm-btn .ipm-i{width:15px;height:15px}
+:is([data-design], .design-ov-scale) .ipm-specs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+:is([data-design], .design-ov-scale) .ipm-spec{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid rgba(130,220,255,.14);border-radius:8px;background:rgba(6,23,36,.5)}
+:is([data-design], .design-ov-scale) .ipm-spec small{color:var(--mut);font-size:11px}
+:is([data-design], .design-ov-scale) .ipm-spec b{color:var(--ink);font-weight:500}
+:is([data-design], .design-ov-scale) .ipm-cols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:22px;min-height:0}
+:is([data-design], .design-ov-scale) .ipm-rows{display:flex;flex-direction:column;gap:6px;min-width:0}
+:is([data-design], .design-ov-scale) .ipm-row{display:flex;align-items:center;gap:12px;padding:8px 12px;border:1px solid rgba(130,220,255,.14);border-radius:8px;background:rgba(6,23,36,.55);min-width:0}
+:is([data-design], .design-ov-scale) .ipm-th,:is([data-design], .design-ov-scale) .ipm-cth{display:grid;place-items:center;width:34px;height:34px;border-radius:7px;background:#0f3145;color:var(--a);font:600 12px/1 Orbitron,sans-serif;flex:none}
+:is([data-design], .design-ov-scale) .ipm-rt{display:flex;flex-direction:column;flex:1 1 auto;min-width:0}
+:is([data-design], .design-ov-scale) .ipm-rt b{color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:is([data-design], .design-ov-scale) .ipm-rt small{color:var(--mut);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:is([data-design], .design-ov-scale) .ipm-rail{display:inline-flex;align-items:center;flex:none;padding:4px}
+:is([data-design], .design-ov-scale) .ipm-n{position:relative;display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(130,220,255,.28);border-radius:50%;color:#9fc3d4;background:rgba(6,23,36,.9)}
+:is([data-design], .design-ov-scale) .ipm-n .ipm-i{width:15px;height:15px}
+:is([data-design], .design-ov-scale) .ipm-n.on{color:var(--a);border-color:color-mix(in srgb,var(--a) 60%,transparent)}
+:is([data-design], .design-ov-scale) .ipm-n i{position:absolute;right:-3px;top:-4px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:var(--a);color:#061724;font:600 10px/15px Inter,sans-serif;font-style:normal;text-align:center}
+:is([data-design], .design-ov-scale) .ipm-ln{display:block;width:9px;height:2px;background:rgba(130,220,255,.25)}
+:is([data-design], .design-ov-scale) .ipm-ln.on{background:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-cards{display:flex;flex-direction:column;gap:8px;min-width:0}
+:is([data-design], .design-ov-scale) .ipm-card{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:12px;border:1px solid rgba(130,220,255,.2);border-radius:10px;background:linear-gradient(180deg,rgba(13,42,60,.7),rgba(6,23,36,.7))}
+:is([data-design], .design-ov-scale) .ipm-seg{display:inline-flex;gap:3px;align-items:center}
+:is([data-design], .design-ov-scale) .ipm-seg i{display:block;width:16px;height:5px;border-radius:3px;background:rgba(130,220,255,.2)}
+:is([data-design], .design-ov-scale) .ipm-seg i.on{background:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-asg{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;width:100%;padding:8px 10px;border-left:2px solid var(--a);border-radius:0 8px 8px 0;background:rgba(82,193,230,.08)}
+:is([data-design], .design-ov-scale) .ipm-asg .ipm-i{width:16px;height:16px;color:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-chg{margin-left:auto;color:var(--mut);font-size:12px;text-decoration:underline;text-underline-offset:3px}
+:is([data-design], .design-ov-scale) .ipm-stop > .ipm-chg{margin-left:0}
+:is([data-design], .design-ov-scale) .ipm-band{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;padding:10px 12px;border:1px solid rgba(130,220,255,.2);border-radius:10px;background:rgba(6,23,36,.6)}
+:is([data-design], .design-ov-scale) .ipm-band > .ipm-i{color:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-band > .ipm-q{margin-left:auto}
+:is([data-design], .design-ov-scale) .ipm-steps{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;margin:0;padding:0;list-style:none}
+:is([data-design], .design-ov-scale) .ipm-steps li{display:inline-flex;align-items:center;gap:6px;color:var(--mut);font-size:12px}
+:is([data-design], .design-ov-scale) .ipm-steps li.on{color:#c8e4f1}
+:is([data-design], .design-ov-scale) .ipm-steps i{display:grid;place-items:center;width:16px;height:16px;border:1px solid rgba(130,220,255,.35);border-radius:50%}
+:is([data-design], .design-ov-scale) .ipm-steps li.on i{background:var(--a);border-color:var(--a);color:#061724}
+:is([data-design], .design-ov-scale) .ipm-steps i .ipm-i{width:11px;height:11px;stroke-width:2.6}
+:is([data-design], .design-ov-scale) .ipm-n.asg{outline:1.5px dashed var(--a);outline-offset:2px}
+:is([data-design], .design-ov-scale) .ipm-badge{position:absolute;right:-5px;bottom:-5px;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#061724;border:1px solid var(--a);color:var(--a);text-decoration:none}
+:is([data-design], .design-ov-scale) .ipm-badge .ipm-i{width:10px;height:10px;stroke-width:2.4}
+:is([data-design], .design-ov-scale) .ipm-pop{position:absolute;top:calc(100% - 10px);z-index:4;display:flex;flex-direction:column;gap:10px;width:340px;max-width:calc(100% - 32px);padding:14px 16px 12px;border:1px solid var(--edge);border-left:3px solid var(--a);border-radius:10px;background:linear-gradient(180deg,#0e2c3e,#081d2b);box-shadow:0 18px 40px rgba(0,0,0,.55)}
+:is([data-design], .design-ov-scale) .ipm-pop--wunsch,:is([data-design], .design-ov-scale) .ipm-pop--band{left:30px}
+:is([data-design], .design-ov-scale) .ipm-pop--station{left:calc(33.3% + 22px)}
+:is([data-design], .design-ov-scale) .ipm-pt{color:var(--ink);font:600 14px/1.2 Orbitron,"Segoe UI",sans-serif;letter-spacing:.03em}
+:is([data-design], .design-ov-scale) .ipm-plist{display:flex;flex-direction:column;gap:6px}
+:is([data-design], .design-ov-scale) .ipm-prow{display:flex;align-items:center;gap:10px;min-height:38px;padding:6px 10px;border:1px solid rgba(130,220,255,.18);border-radius:8px;color:#c8e4f1}
+:is([data-design], .design-ov-scale) .ipm-prow b{flex:1 1 auto;min-width:0;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:is([data-design], .design-ov-scale) .ipm-prow .ipm-i{width:16px;height:16px;color:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-prow.on{border-color:var(--a);background:rgba(82,193,230,.1)}
+:is([data-design], .design-ov-scale) .ipm-prow.new{border-style:dashed}
+:is([data-design], .design-ov-scale) .ipm-pf{font-size:11.5px}
+:is([data-design], .design-ov-scale) .device-shell .ipm,.device-shell .ipm{min-height:0}
+:is([data-design], .design-ov-scale) .device-shell .ipm-bar,.device-shell .ipm-bar{top:12px;left:12px;right:12px}
+:is([data-design], .design-ov-scale) .device-shell .ipm-body,.device-shell .ipm-body{top:76px;left:12px;right:12px;bottom:10px;overflow:auto}
+@container (max-width: 560px){
+:is([data-design], .design-ov-scale) .ipm-bar{left:10px;right:10px;top:12px;gap:8px;padding:0 8px 0 10px}
+:is([data-design], .design-ov-scale) .ipm-nav,:is([data-design], .design-ov-scale) .ipm-logo{display:none}
+:is([data-design], .design-ov-scale) .ipm-body{left:10px;right:10px;top:76px;bottom:10px;gap:12px;overflow:auto}
+:is([data-design], .design-ov-scale) .ipm-sil{width:84px;height:52px}
+:is([data-design], .design-ov-scale) .ipm-sil svg{width:60px;height:30px}
+:is([data-design], .design-ov-scale) .ipm-h1{font-size:20px}
+:is([data-design], .design-ov-scale) .ipm-stops{grid-template-columns:minmax(0,1fr);gap:8px}
+:is([data-design], .design-ov-scale) .ipm-stop + .ipm-stop::before{display:none}
+:is([data-design], .design-ov-scale) .ipm-stop{padding:10px 12px}
+:is([data-design], .design-ov-scale) .ipm-specs{grid-template-columns:repeat(2,minmax(0,1fr))}
+:is([data-design], .design-ov-scale) .ipm-cols{grid-template-columns:minmax(0,1fr)}
+:is([data-design], .design-ov-scale) .ipm-cards{display:none}
+:is([data-design], .design-ov-scale) .ipm-row{flex-wrap:wrap;gap:8px 10px}
+:is([data-design], .design-ov-scale) .ipm-n{width:38px;height:38px}
+:is([data-design], .design-ov-scale) .ipm-ln{width:5px}
+:is([data-design], .design-ov-scale) .ipm-steps span{display:none}
+:is([data-design], .design-ov-scale) .ipm-pop{position:static;width:auto;max-width:none}
+}
+</style>
+<header class="iteration-intro">
+  <h2>{{iteration.tab}} 2 · Wunsch und Projekt</h2>
+  <p>Aus Runde 1 übernommen: Dein Favorit „Drei bei Bedarf“ lebt als „Eigene Station“ weiter, jetzt immer sichtbar. Deine Tendenz, die Zuordnung am Wunsch zu zeigen statt in einem dritten Kasten, ist „Am Wunsch“; „Fortschrittsband“ ist ein dritter Weg dazwischen. „Projekt“ ist nur der Arbeitstitel, Name und Symbol entscheidest du in der Analyse. „Einsatzgruppe“ scheidet aus: Das Wort ist historisch belastet, und die App nutzt es schon für Freundesgruppen. Fest steht: Aus dem Codex wird nur zugeordnet, geplant wird im HQ. Die beiden Agents (Produkt und Design) empfehlen unabhängig voneinander „Am Wunsch“ mit einer kleinen Auswahl beim Zuordnen. Gemessen wird ein neuer Klick <code>hq:path_group_assign</code> mit <code>{ surface, created }</code>, sichtbar als Schritt im PostHog-Ablauf „wish“.</p>
+</header>
+<section data-design="wunsch" data-nav-label="Am Wunsch" data-design-active="true" data-screen-fit="full" data-ov-demo=".ipm-prim" data-design-motto="Der Wunsch weiß, wohin er gehört" data-design-traits="Zwei Kästen, die Zuordnung steht als Zeile im Wunsch|Suchzeilen: Ring und kleines Zeichen am Wunsch-Kreis|Keine angenommene Regel zum Pfad ändert sich" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;&gt;&lt;circle cx=&quot;7&quot; cy=&quot;12&quot; r=&quot;4&quot;/&gt;&lt;path d=&quot;M5 12h4&quot;/&gt;&lt;path d=&quot;M11 12h3&quot;/&gt;&lt;circle cx=&quot;18&quot; cy=&quot;12&quot; r=&quot;3.5&quot;/&gt;&lt;/svg&gt;" data-design-color="#d9c38a">
+<section id="wunsch-schiff" data-nav-label="Zugeordnet" data-screen data-screen-active="true"><div class="ipm ipm--wunsch"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="wunsch-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="wunsch-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="wunsch-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="wunsch-liste">Codex</span> › <span data-screen-link="wunsch-liste">Schiffe</span> › <b>Polaris</b></span><div class="ipm-hero"><span class="ipm-sil"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M2 13l9-5h20l8-3 7 8-7 6-8-2H11z"/></svg></span><div><span class="ipm-eb">RSI · Korvette</span><h3 class="ipm-h1">Polaris</h3></div></div><div class="ipm-prim" data-m="wunsch-schiff-prim"><ol class="ipm-stops" style="--n:2"><li class="ipm-stop on"><span class="ipm-sh"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><b>Wünsche</b></span><span class="ipm-line"><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipm-a">Alle Wünsche öffnen</span></span><span class="ipm-asg" data-m="wunsch-schiff-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span class="ipm-a">Flotte ausbauen</span><span class="ipm-mut">2 von 5 Einsätzen erledigt</span><span class="ipm-seg" aria-label="2 von 5 Einsätzen erledigt"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="ipm-chg">Ändern</span></span></li><li class="ipm-stop"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg><b>Hangar</b></span><p>Noch nicht im Hangar</p><span class="ipm-btn"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg>In den Hangar</span></li></ol></div><div class="ipm-specs"><span class="ipm-spec"><small>Besatzung</small><b>6–14</b></span><span class="ipm-spec"><small>Länge</small><b>155 m</b></span><span class="ipm-spec"><small>Fracht</small><b>576 SCU</b></span><span class="ipm-spec"><small>Rolle</small><b>Korvette</b></span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r2-wunsch-schiff-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;wunsch-schiff-asg&quot;]" style="--anno-x:30%;--anno-y:62%"><button class="anno-pin" type="button" data-anno-pin="r2-wunsch-schiff-a1" aria-expanded="false" aria-controls="anno-bubble-r2-wunsch-schiff-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r2-wunsch-schiff-a1" data-anno-bubble="r2-wunsch-schiff-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r2-wunsch-schiff-a1" aria-expanded="false" aria-controls="anno-bubble-r2-wunsch-schiff-a1"><span class="anno-bubble-question">Die Zuordnung steht als Zeile im Wunsch-Kasten, so wie du es zuletzt beschrieben hast. Fällt sie dir hier genug auf, oder geht sie unter?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-wunsch-schiff-a1" data-annotation="r2-wunsch-schiff-a1" data-attachable placeholder="{{anno.answer_placeholder}}">finde ich gut hier! </textarea><div class="attach-slot" data-attach-slot="anno-r2-wunsch-schiff-a1"></div></div></div></div></div></section>
+<section id="wunsch-offen" data-nav-label="Noch nicht zugeordnet" data-screen hidden><div class="ipm ipm--wunsch"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="wunsch-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="wunsch-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="wunsch-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="wunsch-liste">Codex</span> › <span data-screen-link="wunsch-liste">Waffen</span> › <b>Karna Rifle</b></span><div class="ipm-hero"><span class="ipm-sil"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M3 10h30l2-3h8v5h-6l-2 3H24l-2 5h-6l1-5H3z"/></svg></span><div><span class="ipm-eb">Kastak Arms · Sturmgewehr</span><h3 class="ipm-h1">Karna Rifle</h3></div></div><div class="ipm-prim" data-m="wunsch-offen-prim"><ol class="ipm-stops" style="--n:2"><li class="ipm-stop on"><span class="ipm-sh"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><b>Wünsche</b></span><span class="ipm-line"><span class="ipm-st"><span>−</span><b>3</b><span>+</span></span><span class="ipm-a">Alle Wünsche öffnen</span></span><span class="ipm-btn" data-screen-link="wunsch-zuordnen" data-m="wunsch-offen-assign"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg>Einem Projekt zuordnen</span></li><li class="ipm-stop"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg><b>Inventar</b></span><p>Noch nicht im Inventar</p><span class="ipm-btn"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg>Ins Inventar</span></li></ol></div><div class="ipm-specs"><span class="ipm-spec"><small>Schaden</small><b>34</b></span><span class="ipm-spec"><small>Feuerrate</small><b>550 /min</b></span><span class="ipm-spec"><small>Magazin</small><b>30</b></span><span class="ipm-spec"><small>Klasse</small><b>Sturmgewehr</b></span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r2-wunsch-offen-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;wunsch-offen-assign&quot;]" style="--anno-x:26%;--anno-y:62%"><button class="anno-pin" type="button" data-anno-pin="r2-wunsch-offen-a1" aria-expanded="false" aria-controls="anno-bubble-r2-wunsch-offen-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r2-wunsch-offen-a1" data-anno-bubble="r2-wunsch-offen-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r2-wunsch-offen-a1" aria-expanded="false" aria-controls="anno-bubble-r2-wunsch-offen-a1"><span class="anno-bubble-question">Der Knopf zum Zuordnen sitzt im Wunsch-Kasten. Richtige Stelle, oder gehört er prominenter hin?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-wunsch-offen-a1" data-annotation="r2-wunsch-offen-a1" data-attachable placeholder="{{anno.answer_placeholder}}">sehr gut </textarea><div class="attach-slot" data-attach-slot="anno-r2-wunsch-offen-a1"></div></div></div></div></div></section>
+<section id="wunsch-zuordnen" data-nav-label="Zuordnen" data-screen hidden><div class="ipm ipm--wunsch"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="wunsch-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="wunsch-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="wunsch-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="wunsch-liste">Codex</span> › <span data-screen-link="wunsch-liste">Waffen</span> › <b>Karna Rifle</b></span><div class="ipm-hero"><span class="ipm-sil"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M3 10h30l2-3h8v5h-6l-2 3H24l-2 5h-6l1-5H3z"/></svg></span><div><span class="ipm-eb">Kastak Arms · Sturmgewehr</span><h3 class="ipm-h1">Karna Rifle</h3></div></div><div class="ipm-prim" data-m="wunsch-zuordnen-prim"><ol class="ipm-stops" style="--n:2"><li class="ipm-stop on"><span class="ipm-sh"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><b>Wünsche</b></span><span class="ipm-line"><span class="ipm-st"><span>−</span><b>3</b><span>+</span></span><span class="ipm-a">Alle Wünsche öffnen</span></span><span class="ipm-btn" data-screen-link="wunsch-zuordnen" data-m="wunsch-zuordnen-assign"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg>Einem Projekt zuordnen</span></li><li class="ipm-stop"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg><b>Inventar</b></span><p>Noch nicht im Inventar</p><span class="ipm-btn"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg>Ins Inventar</span></li></ol><div class="ipm-pop ipm-pop--wunsch" data-m="wunsch-zuordnen-pop"><span class="ipm-eb">Karna Rifle</span><b class="ipm-pt">Einem Projekt zuordnen</b><span class="ipm-line" data-m="wunsch-zuordnen-qty"><span class="ipm-mut">Wie viele?</span><span class="ipm-st"><span>−</span><b>3</b><span>+</span></span><span class="ipm-mut">von 3 gewünschten</span></span><span class="ipm-plist"><span class="ipm-prow on"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Flotte ausbauen</b><span class="ipm-mut">2/5</span><span class="ipm-seg" aria-label="2 von 5 Einsätzen erledigt"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span></span><span class="ipm-prow"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Loadout Polaris</b><span class="ipm-mut">0/3</span><span class="ipm-seg" aria-label="0 von 3 Einsätzen erledigt"><i></i><i></i><i></i></span></span><span class="ipm-prow"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Handelsroute Stanton</b><span class="ipm-mut">4/6</span><span class="ipm-seg" aria-label="4 von 6 Einsätzen erledigt"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></span></span><span class="ipm-prow new" data-m="wunsch-zuordnen-new"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><b>Neues Projekt</b><span class="ipm-mut">Name wird vorgeschlagen</span></span><span class="ipm-mut ipm-pf">3 von 7 Plätzen belegt · Einsätze planst du im HQ</span></div></div><div class="ipm-specs"><span class="ipm-spec"><small>Schaden</small><b>34</b></span><span class="ipm-spec"><small>Feuerrate</small><b>550 /min</b></span><span class="ipm-spec"><small>Magazin</small><b>30</b></span><span class="ipm-spec"><small>Klasse</small><b>Sturmgewehr</b></span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r2-wunsch-zuordnen-a1" data-anno-side="right" data-anno-target="[data-m=&quot;wunsch-zuordnen-qty&quot;]" style="--anno-x:40%;--anno-y:60%"><button class="anno-pin" type="button" data-anno-pin="r2-wunsch-zuordnen-a1" aria-expanded="false" aria-controls="anno-bubble-r2-wunsch-zuordnen-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r2-wunsch-zuordnen-a1" data-anno-bubble="r2-wunsch-zuordnen-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r2-wunsch-zuordnen-a1" aria-expanded="false" aria-controls="anno-bubble-r2-wunsch-zuordnen-a1"><span class="anno-bubble-question">Voreingestellt ist die ganze Wunschmenge, hier 3. Passt das, oder soll erst einmal nur 1 Stück vorgeschlagen werden?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-wunsch-zuordnen-a1" data-annotation="r2-wunsch-zuordnen-a1" data-attachable placeholder="{{anno.answer_placeholder}}">sehr gut, immer das maximale vorgeschlagne </textarea><div class="attach-slot" data-attach-slot="anno-r2-wunsch-zuordnen-a1"></div></div></div></div><div class="anno" data-anno="r2-wunsch-zuordnen-a2" data-anno-side="right" data-anno-target="[data-m=&quot;wunsch-zuordnen-new&quot;]" style="--anno-x:40%;--anno-y:80%"><button class="anno-pin" type="button" data-anno-pin="r2-wunsch-zuordnen-a2" aria-expanded="false" aria-controls="anno-bubble-r2-wunsch-zuordnen-a2" aria-label="{{anno.pin_label}}">2</button><div class="anno-bubble" id="anno-bubble-r2-wunsch-zuordnen-a2" data-anno-bubble="r2-wunsch-zuordnen-a2" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r2-wunsch-zuordnen-a2" aria-expanded="false" aria-controls="anno-bubble-r2-wunsch-zuordnen-a2"><span class="anno-bubble-question">Von hier aus entsteht ein neues Projekt nur mit Namen, ohne Einsatz. Die Einsätze planst du danach im HQ. In Ordnung so?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-wunsch-zuordnen-a2" data-annotation="r2-wunsch-zuordnen-a2" data-attachable placeholder="{{anno.answer_placeholder}}">Das macht Sinn! </textarea><div class="attach-slot" data-attach-slot="anno-r2-wunsch-zuordnen-a2"></div></div></div></div></div></section>
+<section id="wunsch-liste" data-nav-label="Suche und Karten" data-screen hidden><div class="ipm ipm--wunsch"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="wunsch-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="wunsch-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="wunsch-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><b>Codex</b> · Suche „a“ · 6 Treffer</span><div class="ipm-cols"><div class="ipm-rows"><div class="ipm-row" data-screen-link="wunsch-schiff"><span class="ipm-th">S</span><span class="ipm-rt"><b>Polaris</b><small>RSI · Korvette</small></span><span class="ipm-rail"><span class="ipm-n on asg" aria-label="Wünsche: 1, in Projekt „Flotte ausbauen“"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i><u class="ipm-badge"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></u></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Hangar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg></span></span></div><div class="ipm-row" data-screen-link="wunsch-offen"><span class="ipm-th">W</span><span class="ipm-rt"><b>Karna Rifle</b><small>Kastak Arms · Sturmgewehr</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 3"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Inventar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg></span></span></div><div class="ipm-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Cutlass Black</b><small>Drake · Mehrzweck</small></span><span class="ipm-rail"><span class="ipm-n on asg" aria-label="Wünsche: 1, in Projekt „Flotte ausbauen“"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i><u class="ipm-badge"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></u></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Hangar: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg><i>1</i></span></span></div><div class="ipm-row"><span class="ipm-th">B</span><span class="ipm-rt"><b>Blaupause: Arclight II</b><small>Klaus &amp; Werner · Pistole</small></span><span class="ipm-rail"><span class="ipm-n" aria-label="Wünsche"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Sammlung: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l9 4.5-9 4.5L3 8z"/><path d="M3 12.5l9 4.5 9-4.5"/><path d="M3 17l9 4.5 9-4.5"/></svg><i>1</i></span></span></div><div class="ipm-row"><span class="ipm-th">V</span><span class="ipm-rt"><b>MedPen</b><small>CureLife · Verbrauch</small></span><span class="ipm-rail"><span class="ipm-n" aria-label="Wünsche"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Inventar: 12"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg><i>12</i></span></span></div><div class="ipm-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Perseus</b><small>RSI · angekündigt</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i></span></span></div></div><div class="ipm-cards"><span class="ipm-eb">Als Karten</span><div class="ipm-card"><span class="ipm-cth">W</span><span class="ipm-rt"><b>Karna Rifle</b><small>Kastak Arms · Sturmgewehr</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 3"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Inventar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg></span></span></div><div class="ipm-card"><span class="ipm-cth">B</span><span class="ipm-rt"><b>Blaupause: Arclight II</b><small>Klaus &amp; Werner · Pistole</small></span><span class="ipm-rail"><span class="ipm-n" aria-label="Wünsche"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Sammlung: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l9 4.5-9 4.5L3 8z"/><path d="M3 12.5l9 4.5 9-4.5"/><path d="M3 17l9 4.5 9-4.5"/></svg><i>1</i></span></span></div><div class="ipm-card"><span class="ipm-cth" data-m="wunsch-liste-card">S</span><span class="ipm-rt"><b>Polaris</b><small>RSI · Korvette</small></span><span class="ipm-rail"><span class="ipm-n on asg" aria-label="Wünsche: 1, in Projekt „Flotte ausbauen“"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i><u class="ipm-badge"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></u></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Hangar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg></span></span></div></div></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r2-wunsch-liste-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;wunsch-liste-card&quot;]" style="--anno-x:70%;--anno-y:50%"><button class="anno-pin" type="button" data-anno-pin="r2-wunsch-liste-a1" aria-expanded="false" aria-controls="anno-bubble-r2-wunsch-liste-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r2-wunsch-liste-a1" data-anno-bubble="r2-wunsch-liste-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r2-wunsch-liste-a1" aria-expanded="false" aria-controls="anno-bubble-r2-wunsch-liste-a1"><span class="anno-bubble-question">Gestrichelter Ring plus kleines Zeichen am Wunsch-Kreis heißt: gehört zu einem Projekt. Erkennst du das in Zeilen und Karten?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-wunsch-liste-a1" data-annotation="r2-wunsch-liste-a1" data-attachable placeholder="{{anno.answer_placeholder}}">gestrichelt ist zu viel, aber das projekt icon ist supoer </textarea><div class="attach-slot" data-attach-slot="anno-r2-wunsch-liste-a1"></div></div></div></div></div></section>
+</section>
+<section data-design="station" data-nav-label="Eigene Station" hidden data-screen-fit="full" data-ov-demo=".ipm-prim" data-design-motto="Drei Kästen, immer sichtbar" data-design-traits="Das Projekt ist ein eigener Kasten zwischen Wunsch und Besitz|Suchzeilen: dritter Kreis in jeder Zeile|Ändert die Regel „nur zwei Knoten“" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;&gt;&lt;circle cx=&quot;4.5&quot; cy=&quot;12&quot; r=&quot;2.5&quot;/&gt;&lt;path d=&quot;M7 12h2.5&quot;/&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;2.5&quot;/&gt;&lt;path d=&quot;M14.5 12H17&quot;/&gt;&lt;circle cx=&quot;19.5&quot; cy=&quot;12&quot; r=&quot;2.5&quot;/&gt;&lt;/svg&gt;" data-design-color="#8fd3a8">
+<section id="station-schiff" data-nav-label="Zugeordnet" data-screen data-screen-active="true"><div class="ipm ipm--station"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="station-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="station-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="station-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="station-liste">Codex</span> › <span data-screen-link="station-liste">Schiffe</span> › <b>Polaris</b></span><div class="ipm-hero"><span class="ipm-sil"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M2 13l9-5h20l8-3 7 8-7 6-8-2H11z"/></svg></span><div><span class="ipm-eb">RSI · Korvette</span><h3 class="ipm-h1">Polaris</h3></div></div><div class="ipm-prim" data-m="station-schiff-prim"><ol class="ipm-stops" style="--n:3"><li class="ipm-stop on"><span class="ipm-sh"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><b>Wünsche</b></span><span class="ipm-line"><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipm-a">Alle Wünsche öffnen</span></span></li><li class="ipm-stop on" data-m="station-schiff-grp"><span class="ipm-sh"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Projekt</b></span><span class="ipm-a">Flotte ausbauen</span><span class="ipm-line"><span class="ipm-mut">2 von 5 Einsätzen erledigt</span><span class="ipm-seg" aria-label="2 von 5 Einsätzen erledigt"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span></span><span class="ipm-chg">Ändern</span></li><li class="ipm-stop"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg><b>Hangar</b></span><p>Noch nicht im Hangar</p><span class="ipm-btn"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg>In den Hangar</span></li></ol></div><div class="ipm-specs"><span class="ipm-spec"><small>Besatzung</small><b>6–14</b></span><span class="ipm-spec"><small>Länge</small><b>155 m</b></span><span class="ipm-spec"><small>Fracht</small><b>576 SCU</b></span><span class="ipm-spec"><small>Rolle</small><b>Korvette</b></span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r2-station-schiff-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;station-schiff-grp&quot;]" style="--anno-x:50%;--anno-y:62%"><button class="anno-pin" type="button" data-anno-pin="r2-station-schiff-a1" aria-expanded="false" aria-controls="anno-bubble-r2-station-schiff-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r2-station-schiff-a1" data-anno-bubble="r2-station-schiff-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r2-station-schiff-a1" aria-expanded="false" aria-controls="anno-bubble-r2-station-schiff-a1"><span class="anno-bubble-question">Der dritte Kasten ist immer zu sehen, wie in Runde 1 gewünscht. Fühlt sich das neben „Am Wunsch“ noch richtig an?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-station-schiff-a1" data-annotation="r2-station-schiff-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r2-station-schiff-a1"></div></div></div></div></div></section>
+<section id="station-offen" data-nav-label="Noch nicht zugeordnet" data-screen hidden><div class="ipm ipm--station"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="station-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="station-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="station-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="station-liste">Codex</span> › <span data-screen-link="station-liste">Waffen</span> › <b>Karna Rifle</b></span><div class="ipm-hero"><span class="ipm-sil"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M3 10h30l2-3h8v5h-6l-2 3H24l-2 5h-6l1-5H3z"/></svg></span><div><span class="ipm-eb">Kastak Arms · Sturmgewehr</span><h3 class="ipm-h1">Karna Rifle</h3></div></div><div class="ipm-prim" data-m="station-offen-prim"><ol class="ipm-stops" style="--n:3"><li class="ipm-stop on"><span class="ipm-sh"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><b>Wünsche</b></span><span class="ipm-line"><span class="ipm-st"><span>−</span><b>3</b><span>+</span></span><span class="ipm-a">Alle Wünsche öffnen</span></span></li><li class="ipm-stop" data-m="station-offen-grp"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Projekt</b></span><p>Keinem Projekt zugeordnet</p><span class="ipm-btn" data-screen-link="station-zuordnen" data-m="station-offen-assign"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg>Zuordnen</span></li><li class="ipm-stop"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg><b>Inventar</b></span><p>Noch nicht im Inventar</p><span class="ipm-btn"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg>Ins Inventar</span></li></ol></div><div class="ipm-specs"><span class="ipm-spec"><small>Schaden</small><b>34</b></span><span class="ipm-spec"><small>Feuerrate</small><b>550 /min</b></span><span class="ipm-spec"><small>Magazin</small><b>30</b></span><span class="ipm-spec"><small>Klasse</small><b>Sturmgewehr</b></span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r2-station-offen-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;station-offen-grp&quot;]" style="--anno-x:50%;--anno-y:62%"><button class="anno-pin" type="button" data-anno-pin="r2-station-offen-a1" aria-expanded="false" aria-controls="anno-bubble-r2-station-offen-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r2-station-offen-a1" data-anno-bubble="r2-station-offen-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r2-station-offen-a1" aria-expanded="false" aria-controls="anno-bubble-r2-station-offen-a1"><span class="anno-bubble-question">Leer steht hier „Keinem Projekt zugeordnet“. Ist ein leerer Kasten für dich eine Einladung oder nur Lärm?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-station-offen-a1" data-annotation="r2-station-offen-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r2-station-offen-a1"></div></div></div></div></div></section>
+<section id="station-zuordnen" data-nav-label="Zuordnen" data-screen hidden><div class="ipm ipm--station"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="station-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="station-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="station-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="station-liste">Codex</span> › <span data-screen-link="station-liste">Waffen</span> › <b>Karna Rifle</b></span><div class="ipm-hero"><span class="ipm-sil"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M3 10h30l2-3h8v5h-6l-2 3H24l-2 5h-6l1-5H3z"/></svg></span><div><span class="ipm-eb">Kastak Arms · Sturmgewehr</span><h3 class="ipm-h1">Karna Rifle</h3></div></div><div class="ipm-prim" data-m="station-zuordnen-prim"><ol class="ipm-stops" style="--n:3"><li class="ipm-stop on"><span class="ipm-sh"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><b>Wünsche</b></span><span class="ipm-line"><span class="ipm-st"><span>−</span><b>3</b><span>+</span></span><span class="ipm-a">Alle Wünsche öffnen</span></span></li><li class="ipm-stop" data-m="station-zuordnen-grp"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Projekt</b></span><p>Keinem Projekt zugeordnet</p><span class="ipm-btn" data-screen-link="station-zuordnen" data-m="station-zuordnen-assign"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg>Zuordnen</span></li><li class="ipm-stop"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg><b>Inventar</b></span><p>Noch nicht im Inventar</p><span class="ipm-btn"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg>Ins Inventar</span></li></ol><div class="ipm-pop ipm-pop--station" data-m="station-zuordnen-pop"><span class="ipm-eb">Karna Rifle</span><b class="ipm-pt">Einem Projekt zuordnen</b><span class="ipm-line" data-m="station-zuordnen-qty"><span class="ipm-mut">Wie viele?</span><span class="ipm-st"><span>−</span><b>3</b><span>+</span></span><span class="ipm-mut">von 3 gewünschten</span></span><span class="ipm-plist"><span class="ipm-prow on"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Flotte ausbauen</b><span class="ipm-mut">2/5</span><span class="ipm-seg" aria-label="2 von 5 Einsätzen erledigt"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span></span><span class="ipm-prow"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Loadout Polaris</b><span class="ipm-mut">0/3</span><span class="ipm-seg" aria-label="0 von 3 Einsätzen erledigt"><i></i><i></i><i></i></span></span><span class="ipm-prow"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Handelsroute Stanton</b><span class="ipm-mut">4/6</span><span class="ipm-seg" aria-label="4 von 6 Einsätzen erledigt"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></span></span><span class="ipm-prow new" data-m="station-zuordnen-new"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><b>Neues Projekt</b><span class="ipm-mut">Name wird vorgeschlagen</span></span><span class="ipm-mut ipm-pf">3 von 7 Plätzen belegt · Einsätze planst du im HQ</span></div></div><div class="ipm-specs"><span class="ipm-spec"><small>Schaden</small><b>34</b></span><span class="ipm-spec"><small>Feuerrate</small><b>550 /min</b></span><span class="ipm-spec"><small>Magazin</small><b>30</b></span><span class="ipm-spec"><small>Klasse</small><b>Sturmgewehr</b></span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r2-station-zuordnen-a1" data-anno-side="right" data-anno-target="[data-m=&quot;station-zuordnen-pop&quot;]" style="--anno-x:55%;--anno-y:70%"><button class="anno-pin" type="button" data-anno-pin="r2-station-zuordnen-a1" aria-expanded="false" aria-controls="anno-bubble-r2-station-zuordnen-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r2-station-zuordnen-a1" data-anno-bubble="r2-station-zuordnen-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r2-station-zuordnen-a1" aria-expanded="false" aria-controls="anno-bubble-r2-station-zuordnen-a1"><span class="anno-bubble-question">Reichen Name und Fortschritt je Projekt, um das richtige zu wählen?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-station-zuordnen-a1" data-annotation="r2-station-zuordnen-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r2-station-zuordnen-a1"></div></div></div></div></div></section>
+<section id="station-liste" data-nav-label="Suche und Karten" data-screen hidden><div class="ipm ipm--station"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="station-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="station-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="station-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><b>Codex</b> · Suche „a“ · 6 Treffer</span><div class="ipm-cols"><div class="ipm-rows"><div class="ipm-row" data-screen-link="station-schiff"><span class="ipm-th">S</span><span class="ipm-rt"><b>Polaris</b><small>RSI · Korvette</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Projekt: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Hangar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg></span></span></div><div class="ipm-row" data-screen-link="station-offen"><span class="ipm-th">W</span><span class="ipm-rt"><b>Karna Rifle</b><small>Kastak Arms · Sturmgewehr</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 3"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Projekt"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></span><i class="ipm-ln"></i><span class="ipm-n" aria-label="Inventar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg></span></span></div><div class="ipm-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Cutlass Black</b><small>Drake · Mehrzweck</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Projekt: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Hangar: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg><i>1</i></span></span></div><div class="ipm-row"><span class="ipm-th">B</span><span class="ipm-rt"><b>Blaupause: Arclight II</b><small>Klaus &amp; Werner · Pistole</small></span><span class="ipm-rail"><span class="ipm-n" aria-label="Wünsche"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg></span><i class="ipm-ln"></i><span class="ipm-n" aria-label="Projekt"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Sammlung: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l9 4.5-9 4.5L3 8z"/><path d="M3 12.5l9 4.5 9-4.5"/><path d="M3 17l9 4.5 9-4.5"/></svg><i>1</i></span></span></div><div class="ipm-row"><span class="ipm-th">V</span><span class="ipm-rt"><b>MedPen</b><small>CureLife · Verbrauch</small></span><span class="ipm-rail"><span class="ipm-n" aria-label="Wünsche"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg></span><i class="ipm-ln"></i><span class="ipm-n" aria-label="Projekt"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Inventar: 12"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg><i>12</i></span></span></div><div class="ipm-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Perseus</b><small>RSI · angekündigt</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i></span></span></div></div><div class="ipm-cards"><span class="ipm-eb">Als Karten</span><div class="ipm-card"><span class="ipm-cth">W</span><span class="ipm-rt"><b>Karna Rifle</b><small>Kastak Arms · Sturmgewehr</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 3"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Projekt"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></span><i class="ipm-ln"></i><span class="ipm-n" aria-label="Inventar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg></span></span></div><div class="ipm-card"><span class="ipm-cth">B</span><span class="ipm-rt"><b>Blaupause: Arclight II</b><small>Klaus &amp; Werner · Pistole</small></span><span class="ipm-rail"><span class="ipm-n" aria-label="Wünsche"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg></span><i class="ipm-ln"></i><span class="ipm-n" aria-label="Projekt"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Sammlung: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l9 4.5-9 4.5L3 8z"/><path d="M3 12.5l9 4.5 9-4.5"/><path d="M3 17l9 4.5 9-4.5"/></svg><i>1</i></span></span></div><div class="ipm-card"><span class="ipm-cth" data-m="station-liste-card">S</span><span class="ipm-rt"><b>Polaris</b><small>RSI · Korvette</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Projekt: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Hangar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg></span></span></div></div></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r2-station-liste-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;station-liste-card&quot;]" style="--anno-x:70%;--anno-y:50%"><button class="anno-pin" type="button" data-anno-pin="r2-station-liste-a1" aria-expanded="false" aria-controls="anno-bubble-r2-station-liste-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r2-station-liste-a1" data-anno-bubble="r2-station-liste-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r2-station-liste-a1" aria-expanded="false" aria-controls="anno-bubble-r2-station-liste-a1"><span class="anno-bubble-question">Drei Kreise in jeder Zeile und Karte, der mittlere ist das Projekt. Zu viel für Zeilen und Karten?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-station-liste-a1" data-annotation="r2-station-liste-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r2-station-liste-a1"></div></div></div></div></div></section>
+</section>
+<section data-design="band" data-nav-label="Fortschrittsband" hidden data-screen-fit="full" data-ov-demo=".ipm-prim" data-design-motto="Der Weg dorthin als Schritte" data-design-traits="Zwei Kästen, darunter ein Band mit den Einsätzen als Schritte|Zeigt den Fortschritt des Projekts schon im Codex|Ohne Zuordnung gibt es kein Band" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;&gt;&lt;circle cx=&quot;6&quot; cy=&quot;8&quot; r=&quot;3&quot;/&gt;&lt;path d=&quot;M9 8h6&quot;/&gt;&lt;circle cx=&quot;18&quot; cy=&quot;8&quot; r=&quot;3&quot;/&gt;&lt;path d=&quot;M4 17h3M9.5 17h3M15 17h5&quot;/&gt;&lt;/svg&gt;" data-design-color="#c79be8">
+<section id="band-schiff" data-nav-label="Zugeordnet" data-screen data-screen-active="true"><div class="ipm ipm--band"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="band-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="band-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="band-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="band-liste">Codex</span> › <span data-screen-link="band-liste">Schiffe</span> › <b>Polaris</b></span><div class="ipm-hero"><span class="ipm-sil"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M2 13l9-5h20l8-3 7 8-7 6-8-2H11z"/></svg></span><div><span class="ipm-eb">RSI · Korvette</span><h3 class="ipm-h1">Polaris</h3></div></div><div class="ipm-prim" data-m="band-schiff-prim"><ol class="ipm-stops" style="--n:2"><li class="ipm-stop on"><span class="ipm-sh"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><b>Wünsche</b></span><span class="ipm-line"><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipm-a">Alle Wünsche öffnen</span></span></li><li class="ipm-stop"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg><b>Hangar</b></span><p>Noch nicht im Hangar</p><span class="ipm-btn"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg>In den Hangar</span></li></ol><div class="ipm-band" data-m="band-schiff-band"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span class="ipm-a">Projekt „Flotte ausbauen“</span><ol class="ipm-steps"><li class="on"><i><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i><span>Erz schürfen</span></li><li class="on"><i><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i><span>Fracht nach Area18</span></li><li><i></i><span>Kopfgeld-Serie</span></li><li><i></i><span>Bergungstour</span></li><li><i></i><span>Verkauf</span></li></ol><b class="ipm-q">2/5</b></div></div><div class="ipm-specs"><span class="ipm-spec"><small>Besatzung</small><b>6–14</b></span><span class="ipm-spec"><small>Länge</small><b>155 m</b></span><span class="ipm-spec"><small>Fracht</small><b>576 SCU</b></span><span class="ipm-spec"><small>Rolle</small><b>Korvette</b></span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r2-band-schiff-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;band-schiff-band&quot;]" style="--anno-x:45%;--anno-y:68%"><button class="anno-pin" type="button" data-anno-pin="r2-band-schiff-a1" aria-expanded="false" aria-controls="anno-bubble-r2-band-schiff-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r2-band-schiff-a1" data-anno-bubble="r2-band-schiff-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r2-band-schiff-a1" aria-expanded="false" aria-controls="anno-bubble-r2-band-schiff-a1"><span class="anno-bubble-question">Das Band zeigt die Einsätze des Projekts als Schritte. Hilft dir das schon im Codex, oder gehört das nur ins HQ?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-band-schiff-a1" data-annotation="r2-band-schiff-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r2-band-schiff-a1"></div></div></div></div></div></section>
+<section id="band-offen" data-nav-label="Noch nicht zugeordnet" data-screen hidden><div class="ipm ipm--band"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="band-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="band-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="band-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="band-liste">Codex</span> › <span data-screen-link="band-liste">Waffen</span> › <b>Karna Rifle</b></span><div class="ipm-hero"><span class="ipm-sil"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M3 10h30l2-3h8v5h-6l-2 3H24l-2 5h-6l1-5H3z"/></svg></span><div><span class="ipm-eb">Kastak Arms · Sturmgewehr</span><h3 class="ipm-h1">Karna Rifle</h3></div></div><div class="ipm-prim" data-m="band-offen-prim"><ol class="ipm-stops" style="--n:2"><li class="ipm-stop on"><span class="ipm-sh"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><b>Wünsche</b></span><span class="ipm-line"><span class="ipm-st"><span>−</span><b>3</b><span>+</span></span><span class="ipm-a">Alle Wünsche öffnen</span></span><span class="ipm-btn" data-screen-link="band-zuordnen" data-m="band-offen-assign"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg>Einem Projekt zuordnen</span></li><li class="ipm-stop"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg><b>Inventar</b></span><p>Noch nicht im Inventar</p><span class="ipm-btn"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg>Ins Inventar</span></li></ol></div><div class="ipm-specs"><span class="ipm-spec"><small>Schaden</small><b>34</b></span><span class="ipm-spec"><small>Feuerrate</small><b>550 /min</b></span><span class="ipm-spec"><small>Magazin</small><b>30</b></span><span class="ipm-spec"><small>Klasse</small><b>Sturmgewehr</b></span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r2-band-offen-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;band-offen-assign&quot;]" style="--anno-x:26%;--anno-y:62%"><button class="anno-pin" type="button" data-anno-pin="r2-band-offen-a1" aria-expanded="false" aria-controls="anno-bubble-r2-band-offen-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r2-band-offen-a1" data-anno-bubble="r2-band-offen-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r2-band-offen-a1" aria-expanded="false" aria-controls="anno-bubble-r2-band-offen-a1"><span class="anno-bubble-question">Ohne Zuordnung gibt es kein Band, nur diesen Knopf. Reicht das als Hinweis, dass es Projekte gibt?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-band-offen-a1" data-annotation="r2-band-offen-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r2-band-offen-a1"></div></div></div></div></div></section>
+<section id="band-zuordnen" data-nav-label="Zuordnen" data-screen hidden><div class="ipm ipm--band"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="band-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="band-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="band-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="band-liste">Codex</span> › <span data-screen-link="band-liste">Waffen</span> › <b>Karna Rifle</b></span><div class="ipm-hero"><span class="ipm-sil"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M3 10h30l2-3h8v5h-6l-2 3H24l-2 5h-6l1-5H3z"/></svg></span><div><span class="ipm-eb">Kastak Arms · Sturmgewehr</span><h3 class="ipm-h1">Karna Rifle</h3></div></div><div class="ipm-prim" data-m="band-zuordnen-prim"><ol class="ipm-stops" style="--n:2"><li class="ipm-stop on"><span class="ipm-sh"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><b>Wünsche</b></span><span class="ipm-line"><span class="ipm-st"><span>−</span><b>3</b><span>+</span></span><span class="ipm-a">Alle Wünsche öffnen</span></span><span class="ipm-btn" data-screen-link="band-zuordnen" data-m="band-zuordnen-assign"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg>Einem Projekt zuordnen</span></li><li class="ipm-stop"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg><b>Inventar</b></span><p>Noch nicht im Inventar</p><span class="ipm-btn"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg>Ins Inventar</span></li></ol><div class="ipm-pop ipm-pop--band" data-m="band-zuordnen-pop"><span class="ipm-eb">Karna Rifle</span><b class="ipm-pt">Einem Projekt zuordnen</b><span class="ipm-line" data-m="band-zuordnen-qty"><span class="ipm-mut">Wie viele?</span><span class="ipm-st"><span>−</span><b>3</b><span>+</span></span><span class="ipm-mut">von 3 gewünschten</span></span><span class="ipm-plist"><span class="ipm-prow on"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Flotte ausbauen</b><span class="ipm-mut">2/5</span><span class="ipm-seg" aria-label="2 von 5 Einsätzen erledigt"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span></span><span class="ipm-prow"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Loadout Polaris</b><span class="ipm-mut">0/3</span><span class="ipm-seg" aria-label="0 von 3 Einsätzen erledigt"><i></i><i></i><i></i></span></span><span class="ipm-prow"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Handelsroute Stanton</b><span class="ipm-mut">4/6</span><span class="ipm-seg" aria-label="4 von 6 Einsätzen erledigt"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></span></span><span class="ipm-prow new" data-m="band-zuordnen-new"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><b>Neues Projekt</b><span class="ipm-mut">Name wird vorgeschlagen</span></span><span class="ipm-mut ipm-pf">3 von 7 Plätzen belegt · Einsätze planst du im HQ</span></div></div><div class="ipm-specs"><span class="ipm-spec"><small>Schaden</small><b>34</b></span><span class="ipm-spec"><small>Feuerrate</small><b>550 /min</b></span><span class="ipm-spec"><small>Magazin</small><b>30</b></span><span class="ipm-spec"><small>Klasse</small><b>Sturmgewehr</b></span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r2-band-zuordnen-a1" data-anno-side="right" data-anno-target="[data-m=&quot;band-zuordnen-pop&quot;]" style="--anno-x:40%;--anno-y:70%"><button class="anno-pin" type="button" data-anno-pin="r2-band-zuordnen-a1" aria-expanded="false" aria-controls="anno-bubble-r2-band-zuordnen-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r2-band-zuordnen-a1" data-anno-bubble="r2-band-zuordnen-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r2-band-zuordnen-a1" aria-expanded="false" aria-controls="anno-bubble-r2-band-zuordnen-a1"><span class="anno-bubble-question">Nach dem Zuordnen erscheint das Band mit den Einsätzen. Bei einem neuen Projekt wäre es leer: zeigen oder verbergen, bis ein Einsatz geplant ist?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-band-zuordnen-a1" data-annotation="r2-band-zuordnen-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r2-band-zuordnen-a1"></div></div></div></div></div></section>
+<section id="band-liste" data-nav-label="Suche und Karten" data-screen hidden><div class="ipm ipm--band"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="band-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="band-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="band-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><b>Codex</b> · Suche „a“ · 6 Treffer</span><div class="ipm-cols"><div class="ipm-rows"><div class="ipm-row" data-screen-link="band-schiff"><span class="ipm-th">S</span><span class="ipm-rt"><b>Polaris</b><small>RSI · Korvette</small></span><span class="ipm-rail"><span class="ipm-n on asg" aria-label="Wünsche: 1, in Projekt „Flotte ausbauen“"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i><u class="ipm-badge"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></u></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Hangar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg></span></span></div><div class="ipm-row" data-screen-link="band-offen"><span class="ipm-th">W</span><span class="ipm-rt"><b>Karna Rifle</b><small>Kastak Arms · Sturmgewehr</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 3"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Inventar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg></span></span></div><div class="ipm-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Cutlass Black</b><small>Drake · Mehrzweck</small></span><span class="ipm-rail"><span class="ipm-n on asg" aria-label="Wünsche: 1, in Projekt „Flotte ausbauen“"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i><u class="ipm-badge"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></u></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Hangar: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg><i>1</i></span></span></div><div class="ipm-row"><span class="ipm-th">B</span><span class="ipm-rt"><b>Blaupause: Arclight II</b><small>Klaus &amp; Werner · Pistole</small></span><span class="ipm-rail"><span class="ipm-n" aria-label="Wünsche"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Sammlung: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l9 4.5-9 4.5L3 8z"/><path d="M3 12.5l9 4.5 9-4.5"/><path d="M3 17l9 4.5 9-4.5"/></svg><i>1</i></span></span></div><div class="ipm-row"><span class="ipm-th">V</span><span class="ipm-rt"><b>MedPen</b><small>CureLife · Verbrauch</small></span><span class="ipm-rail"><span class="ipm-n" aria-label="Wünsche"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Inventar: 12"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg><i>12</i></span></span></div><div class="ipm-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Perseus</b><small>RSI · angekündigt</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i></span></span></div></div><div class="ipm-cards"><span class="ipm-eb">Als Karten</span><div class="ipm-card"><span class="ipm-cth">W</span><span class="ipm-rt"><b>Karna Rifle</b><small>Kastak Arms · Sturmgewehr</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 3"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>3</i></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Inventar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg></span></span></div><div class="ipm-card"><span class="ipm-cth">B</span><span class="ipm-rt"><b>Blaupause: Arclight II</b><small>Klaus &amp; Werner · Pistole</small></span><span class="ipm-rail"><span class="ipm-n" aria-label="Wünsche"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Sammlung: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l9 4.5-9 4.5L3 8z"/><path d="M3 12.5l9 4.5 9-4.5"/><path d="M3 17l9 4.5 9-4.5"/></svg><i>1</i></span></span></div><div class="ipm-card"><span class="ipm-cth" data-m="band-liste-card">S</span><span class="ipm-rt"><b>Polaris</b><small>RSI · Korvette</small></span><span class="ipm-rail"><span class="ipm-n on asg" aria-label="Wünsche: 1, in Projekt „Flotte ausbauen“"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i><u class="ipm-badge"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></u></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Hangar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg></span></span></div></div></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r2-band-liste-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;band-liste-card&quot;]" style="--anno-x:70%;--anno-y:50%"><button class="anno-pin" type="button" data-anno-pin="r2-band-liste-a1" aria-expanded="false" aria-controls="anno-bubble-r2-band-liste-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r2-band-liste-a1" data-anno-bubble="r2-band-liste-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r2-band-liste-a1" aria-expanded="false" aria-controls="anno-bubble-r2-band-liste-a1"><span class="anno-bubble-question">In Zeilen und Karten bleibt es beim Ring am Wunsch-Kreis, der Fortschritt steht nur im Tooltip. Genug?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-band-liste-a1" data-annotation="r2-band-liste-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r2-band-liste-a1"></div></div></div></div></div></section>
+</section>
+<!-- ANALYSIS-VIEW-START -->
+<section data-view="regeln" data-view-kind="analysis" data-analysis="full" data-nav-label="Analyse" hidden>
+
+  <section id="r2-briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>Geprüft wurde, wie der Pfad zeigt, dass ein Wunsch schon verfolgt wird, und was „Nachschub“ dabei heißen soll. Ergebnis beider Prüfungen: Ein Wunsch wird einer Gruppe von Einsätzen zugeordnet und bleibt ein Wunsch.</p>
+    <p data-briefing-why>Heute verschwindet ein Wunsch aus der Liste, sobald er im Nachschub liegt, und im Codex sieht man davon nichts.</p>
+    <div data-briefing-potential data-viz="kpi" data-viz-spec='{"value":"69","unit":"Textzeilen","label":"tragen heute das Wort Nachschub"}'>69 Textzeilen</div>
+    <a data-briefing-topic="t-name" data-share="30">Name und Symbol</a>
+    <a data-briefing-topic="t-regel" data-share="40">Was Zuordnen bedeutet</a>
+    <a data-briefing-topic="t-codex" data-share="30">Zuordnen aus dem Codex</a>
+    <p data-briefing-duration>≈ 5 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"69","unit":"Textzeilen","label":"tragen heute das Wort Nachschub"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Wunsch","value":"bleibt in der Liste"},{"label":"Zuordnung","value":"an eine Gruppe"},{"label":"Einsätze","value":"Missionen, Sammeln, Transport"},{"label":"Besitz","value":"Inventar, Hangar"}]}'></div>
+        <p>Eine Gruppe ist ein Ziel mit Einsätzen: Missionen aus dem Spiel, Sammeln, Transportieren oder ein Verkauf. Wünsche lassen sich ihr zuordnen, eine Wunschliste ist sie trotzdem nicht, denn sie hält auch Dinge, die nie ein Wunsch waren. Offen sind drei Felder: wie die Gruppe heißt, was Zuordnen mit der Menge macht und wie du im Codex zuordnest.</p>
+      </div>
+    </div>
+    <textarea data-comment="r2-briefing-note" hidden></textarea>
+  </section>
+
+  <section id="t-name" data-topic data-nav-label="Name und Symbol">
+    <div data-alevel="2" data-title="Name und Symbol">
+      <div data-slot="short"><p>Wort und Symbol sagen heute „Lieferung“, gemeint ist ein Ziel aus mehreren Einsätzen.</p></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"das Wort allein","value":67},{"label":"in Zusammensetzungen","value":7}],"unit":"×","hl":"das Wort allein"}'></div>
+        <p>„Nachschub“ steht in 69 Zeilen der deutschen Texte, fast immer als Wort allein. Ein neuer Name trifft also vor allem sichtbare Texte und das HQ-Menü; der Bezeichner im Code kann bleiben. Das Symbol, ein Fach mit Pfeil, erzählt dieselbe Geschichte von einer Lieferung.</p>
+      </div>
+    </div>
+
+    <section id="d-name" data-nav-label="Name der Gruppe" data-decision="d-name" data-decision-mode="wording"
+             data-label="Name der Gruppe" data-rec="projekt"
+             data-rec-why="Sofort verständlich, passt zu Bergbau, Handel und Verkauf, keine Kollision mit Spielbegriffen."
+             data-applies-to="HQ, Codex und alle sichtbaren Texte" data-finding="f-name">
+      <p data-applies>Gilt für: HQ, Codex und alle sichtbaren Texte</p>
+      <p data-situation>„Einsatzgruppe“ scheidet aus: Das Wort ist geschichtlich belastet, und die App nennt so schon Freundesgruppen.</p>
+      <h3 data-question>Wie soll die Gruppe von Einsätzen heißen?</h3>
+      <p data-stakes>Rund 69 sichtbare Textzeilen und das HQ-Menü.</p>
+      <div data-options>
+        <label data-opt="projekt" data-recommended>
+          <input type="radio" name="dm-d-name" value="projekt" data-text="Projekt" checked>
+          <span data-opt-label>Projekt</span>
+          <span data-opt-consequence>Sofort verständlich, passt zu Bergbau, Handel und Verkauf, kollidiert mit keinem Spielbegriff.</span>
+        </label>
+        <label data-opt="operation">
+          <input type="radio" name="dm-d-name" value="operation" data-text="Operation">
+          <span data-opt-label>Operation</span>
+          <span data-opt-consequence>Spielerjargon, aber Orgs planen ihre „Ops“, und es ist fast ein anderes Wort für Einsatz.</span>
+        </label>
+        <label data-opt="vorhaben">
+          <input type="radio" name="dm-d-name" value="vorhaben" data-text="Vorhaben">
+          <span data-opt-label>Vorhaben</span>
+          <span data-opt-consequence>Weich und deutsch, aber ohne gutes englisches Gegenstück.</span>
+        </label>
+        <label data-opt="kampagne">
+          <input type="radio" name="dm-d-name" value="kampagne" data-text="Kampagne">
+          <span data-opt-label>Kampagne</span>
+          <span data-opt-consequence>Klingt nach einem Story-Event des Spiels.</span>
+        </label>
+        <label data-opt="custom">
+          <input type="radio" name="dm-d-name" value="custom" data-text="">
+          <span data-opt-label>Eigener Name</span>
+          <span data-opt-consequence>Du gibst den Namen selbst vor.</span>
+          <input type="text" name="dm-d-name-text" value="" placeholder="Dein Name für die Gruppe">
+        </label>
+      </div>
+      <textarea data-comment="d-name-note" placeholder="Notiz (optional)">Projekt finde ich gut, aber wenig thematisch und klingt nach monaten des beschäftigens hmmm
+
+Weitere vorhscläge?</textarea>
+      <input type="hidden" name="dm-d-name-none" value="">
+      <input type="hidden" name="dm-d-name-hes" value="{&quot;ms&quot;:69096,&quot;revisits&quot;:0,&quot;median&quot;:19731}">
+      <input type="hidden" name="dm-d-name-touched" value="1">
+      <input type="hidden" name="dm-d-name-issue" value="">
+      <input type="hidden" name="dm-d-name-epic" value="">
+      <div data-alevel="3" data-title="Name der Gruppe">
+        <div data-slot="short"><p>Der Name muss ein Ziel mit Einsätzen tragen, keine Lieferung.</p></div>
+        <div data-slot="long">
+          <div data-viz="kpi" data-viz-spec='{"value":"69","unit":"Zeilen","label":"sichtbare Texte mit dem Wort Nachschub"}'></div>
+          <p>Der neue Name ersetzt rund 69 sichtbare Zeilen und den Eintrag im HQ-Menü. Er muss für Bergbau, Handel und Verkauf gleich gut passen.</p>
+        </div>
+        <div data-example>
+          <p>Vorher</p>
+          <pre>Nachschub „Flotte ausbauen“ · 2 von 5 Einsätzen</pre>
+          <p>Nachher, mit einem neuen Namen</p>
+          <pre>Projekt „Flotte ausbauen“ · 2 von 5 Einsätzen</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-icon" data-nav-label="Symbol der Gruppe" data-decision="d-icon" data-decision-mode="picture"
+             data-label="Symbol der Gruppe" data-rec="route"
+             data-rec-why="Ein Weg mit Start und Ziel erzählt mehrere Einsätze bis zum Besitz, dieselbe Bildsprache wie die Route im HQ."
+             data-applies-to="HQ-Menü, Pfad und Markierungen" data-finding="f-icon"
+             data-ui-ok="Das Zeichen der Gruppe ist in allen drei Entwürfen dasselbe; gefragt ist seine Bedeutung, nicht die Gestaltung eines Entwurfs">
+      <p data-applies>Gilt für: HQ-Menü, Pfad und Markierungen</p>
+      <p data-situation>Das heutige Symbol, ein Fach mit Pfeil, sagt „Lieferung“. Gemeint ist ein Weg aus mehreren Einsätzen.</p>
+      <h3 data-question>Welches Symbol steht für die Gruppe?</h3>
+      <p data-context>Die Entwürfe dieser Runde zeigen „Route“ schon als Platzhalter.</p>
+      <p data-stakes>Das Zeichen im HQ-Menü, auf dem Pfad und an jeder Markierung.</p>
+      <div data-options>
+        <label data-opt="route" data-recommended>
+          <input type="radio" name="dm-d-icon" value="route" checked>
+          <span data-opt-media><svg viewBox="0 0 24 24" width="72" height="72" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></span>
+          <span data-opt-label>Route</span>
+          <span data-opt-consequence>Ein Weg mit Start und Ziel, dieselbe Bildsprache wie die Route im HQ.</span>
+        </label>
+        <label data-opt="knoten">
+          <input type="radio" name="dm-d-icon" value="knoten">
+          <span data-opt-media><svg viewBox="0 0 24 24" width="72" height="72" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M5 16a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 16a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M10.9 6.9L6.1 16.1"/><path d="M13.1 6.9L17.9 16.1"/><path d="M7 18h10"/></svg></span>
+          <span data-opt-label>Verbundene Punkte</span>
+          <span data-opt-consequence>Mehreres gehört zusammen, liest sich aber leicht als „Teilen“.</span>
+        </label>
+        <label data-opt="fahne">
+          <input type="radio" name="dm-d-icon" value="fahne">
+          <span data-opt-media><svg viewBox="0 0 24 24" width="72" height="72" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V3"/><path d="M6 4.5h12l-3 3.5 3 3.5H6"/><path d="M3 21h6M13 21h2M18 21h3"/></svg></span>
+          <span data-opt-label>Fahne am Weg</span>
+          <span data-opt-consequence>Ein Ziel, aber nur eines, und es erinnert an „melden“.</span>
+        </label>
+        <label data-opt="stufen">
+          <input type="radio" name="dm-d-icon" value="stufen">
+          <span data-opt-media><svg viewBox="0 0 24 24" width="72" height="72" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h5v-5h5v-5h5V7"/><path d="M18 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></span>
+          <span data-opt-label>Stufen zum Ziel</span>
+          <span data-opt-consequence>Schritt für Schritt, liest sich aber als Rang oder Level.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-icon-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-icon-none" value="">
+      <input type="hidden" name="dm-d-icon-hes" value="{&quot;ms&quot;:24624,&quot;revisits&quot;:1,&quot;median&quot;:19731}">
+      <input type="hidden" name="dm-d-icon-touched" value="1">
+      <input type="hidden" name="dm-d-icon-issue" value="">
+      <input type="hidden" name="dm-d-icon-epic" value="">
+      <div data-alevel="3" data-title="Symbol der Gruppe">
+        <div data-slot="short"><p>Das Zeichen verspricht ein Paket, die Gruppe ist aber ein Plan.</p></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Zeichen heute","value":"Fach mit Pfeil"},{"label":"gelesen als","value":"Lieferung"},{"label":"gemeint","value":"Weg aus Einsätzen"}]}'></div>
+          <p>Wer das Zeichen sieht, erwartet ein Paket, keinen Plan.</p>
+        </div>
+        <div data-example>
+          <p>Vorher: das Fach mit Pfeil (Skizze)</p>
+          <svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14h4l1.5 3h5l1.5-3h4"/><path d="M4 14v5h16v-5l-2.5-7h-11z"/><path d="M12 3v7"/><path d="M9 7.5l3 3 3-3"/></svg>
+          <p>Nachher, zum Beispiel: der Weg aus Einsätzen</p>
+          <svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-wort" data-nav-label="Wort Nachschub" data-decision="d-wort" data-decision-mode="yesnoalt"
+             data-label="Wort Nachschub" data-rec="yes"
+             data-rec-why="Was ankommt, heißt schon Inventar, Hangar oder Sammlung; ein viertes Wort für denselben Zustand verwirrt."
+             data-applies-to="alle sichtbaren Texte" data-finding="f-wort">
+      <p data-applies>Gilt für: alle sichtbaren Texte</p>
+      <p data-situation>Was aus einer Gruppe ankommt, heißt schon Inventar, Hangar oder Sammlung.</p>
+      <h3 data-question>Soll das Wort „Nachschub“ ganz verschwinden?</h3>
+      <p data-stakes>Zwei Begriffe im HQ oder einer.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-d-wort" value="yes" checked>
+          <span data-opt-label>Ja, überall ersetzen</span>
+          <span data-opt-consequence>Alle sichtbaren Texte tragen den neuen Namen; im Code und in der Messung bleibt der alte Bezeichner.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-d-wort" value="no">
+          <span data-opt-label>Nein, für das Ankommen behalten</span>
+          <span data-opt-consequence>„Nachschub“ bleibt als Wort für das, was aus der Gruppe ankommt.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-wort" value="alt">
+          <span data-opt-label>Anders lösen</span>
+          <span data-opt-consequence>Du schreibst, wo das Wort bleiben soll.</span>
+          <input type="text" name="dm-d-wort-alt" value="" placeholder="Wo soll „Nachschub“ bleiben?">
+        </label>
+      </div>
+      <textarea data-comment="d-wort-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-wort-none" value="">
+      <input type="hidden" name="dm-d-wort-hes" value="{&quot;ms&quot;:6687,&quot;revisits&quot;:0,&quot;median&quot;:19731}">
+      <input type="hidden" name="dm-d-wort-touched" value="1">
+      <input type="hidden" name="dm-d-wort-issue" value="">
+      <input type="hidden" name="dm-d-wort-epic" value="">
+      <div data-alevel="3" data-title="Wort Nachschub">
+        <div data-slot="short"><p>Für das, was ankommt, hat die App schon drei Wörter.</p></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Gruppe","value":"Ziel mit Einsätzen"},{"label":"Einsätze","value":"erledigt"},{"label":"kommt an in","value":"Inventar · Hangar · Sammlung"}]}'></div>
+          <p>Im Code und in der Messung heißt alles weiter „nachschub“, wie auch immer die Antwort lautet.</p>
+        </div>
+        <div data-example>
+          <p>Vorher</p>
+          <pre>Neuer Nachschub
+An „Flotte ausbauen“ anhängen</pre>
+          <p>Nachher, wenn das Wort ganz verschwindet</p>
+          <pre>Neues Projekt
+An „Flotte ausbauen“ anhängen</pre>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section id="t-regel" data-topic data-nav-label="Was Zuordnen bedeutet">
+    <div data-alevel="2" data-title="Was Zuordnen bedeutet">
+      <div data-slot="short"><p>Beim Nehmen geht der Wunsch verloren; die Regel entscheidet, ob er künftig bleibt.</p></div>
+      <div data-slot="long">
+        <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Wunsch","value":"3 Stück"},{"label":"Nehmen","value":"Menge wandert"},{"label":"danach","value":"Wunsch 0 · Gruppe 3"},{"label":"Leeren","value":"Wunsch wieder 3"}]}'></div>
+        <p>Das Nehmen verschiebt heute die Menge, und ein Wunsch weiß nichts von seiner Gruppe. Die einzige Verbindung ist der Gegenstand selbst. Daran hängen die Zahl im Kopf, das Leeren und das Entfernen eines Wunsches.</p>
+      </div>
+    </div>
+
+    <section id="d-menge" data-nav-label="Wunsch bleibt Wunsch" data-decision="d-menge" data-decision-mode="single"
+             data-label="Wunsch bleibt Wunsch" data-rec="bleibt"
+             data-rec-why="Sonst „verschwindet“ der Wunsch genau dann, wenn man anfängt, ihn zu verfolgen."
+             data-applies-to="Wunschliste, HQ und Codex" data-finding="f-menge"
+             data-ui-ok="Gefragt ist die Mengenregel; „zugeordnet“ ist hier das Verb, nicht der gleichnamige Screen der Entwürfe">
+      <p data-applies>Gilt für: Wunschliste, HQ und Codex</p>
+      <p data-situation>Ein Wunsch verschwindet aus der Liste, sobald du ihn verfolgst: Das Nehmen verschiebt seine Menge in die Gruppe.</p>
+      <h3 data-question>Was passiert mit einem Wunsch, wenn er zugeordnet wird?</h3>
+      <p data-stakes>Zähler, „Leeren“ und Rückgängig hängen daran.</p>
+      <div data-options>
+        <label data-opt="bleibt" data-recommended>
+          <input type="radio" name="dm-d-menge" value="bleibt" checked>
+          <span data-opt-label>Er bleibt ein Wunsch und ist markiert</span>
+          <span data-opt-consequence>Die Liste zeigt ihn weiter, „Leeren“ löst nur die Zuordnung.</span>
+        </label>
+        <label data-opt="wandert">
+          <input type="radio" name="dm-d-menge" value="wandert">
+          <span data-opt-label>Die Menge wandert wie heute in die Gruppe</span>
+          <span data-opt-consequence>Der Wunsch verschwindet aus der Liste, bis die Gruppe geleert wird.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-menge-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-menge-none" value="">
+      <input type="hidden" name="dm-d-menge-hes" value="{&quot;ms&quot;:7936,&quot;revisits&quot;:0,&quot;median&quot;:19731}">
+      <input type="hidden" name="dm-d-menge-touched" value="1">
+      <input type="hidden" name="dm-d-menge-issue" value="">
+      <input type="hidden" name="dm-d-menge-epic" value="">
+      <div data-alevel="3" data-title="Wunsch bleibt Wunsch">
+        <div data-slot="short"><p>Wer anfängt, einen Wunsch zu verfolgen, sieht ihn aus der Liste verschwinden.</p></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"heute: Wunsch nach dem Nehmen","value":0},"after":{"label":"neu: Wunsch, 3 zugeordnet","value":3},"unit":"Stück"}'></div>
+          <p>Der Wunsch kennt seine Gruppe nicht; verbunden sind beide nur über den Gegenstand. Erst „Leeren“ bringt offene Mengen zurück.</p>
+        </div>
+        <div data-example>
+          <p>Vorher</p>
+          <pre>Wunschliste   Laser-Bohrkopf  3 Stk.
+nach dem Nehmen: Wunschliste leer · Gruppe „Flotte ausbauen“: Laser-Bohrkopf 3 Stk.</pre>
+          <p>Nachher, wenn der Wunsch bleibt</p>
+          <pre>Wunschliste   Laser-Bohrkopf  3 Stk. · 3 zugeordnet zu „Flotte ausbauen“</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-zaehler" data-nav-label="Zähler im Kopf" data-decision="d-zaehler" data-decision-mode="yesnoalt"
+             data-label="Zähler im Kopf" data-rec="yes"
+             data-rec-why="Ein zugeordneter Wunsch ist noch nicht erfüllt."
+             data-applies-to="Kopfzeile und Wunschliste" data-finding="f-zaehler"
+             data-ui-ok="Gefragt ist, was die Zahl zählt; „Symbol“ meint den Zähler in der Kopfzeile, nicht die Gestaltung eines Entwurfs">
+      <p data-applies>Gilt für: Kopfzeile und Wunschliste</p>
+      <p data-situation>Die Zahl im Kopf sinkt, sobald ein Wunsch in eine Gruppe wandert, obwohl er noch nicht erfüllt ist.</p>
+      <h3 data-question>Zählt die Zahl am Wünsche-Symbol zugeordnete Wünsche mit?</h3>
+      <p data-stakes>Ob die Zahl im Kopf schon beim Planen springt.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-d-zaehler" value="yes" checked>
+          <span data-opt-label>Ja, alle offenen Wünsche zählen</span>
+          <span data-opt-consequence>Die Zahl sinkt erst, wenn ein Wunsch erfüllt ist.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-d-zaehler" value="no">
+          <span data-opt-label>Nein, nur freie Wünsche zählen</span>
+          <span data-opt-consequence>Die Zahl zeigt nur, was noch keiner Gruppe gehört.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-zaehler" value="alt">
+          <span data-opt-label>Anders zählen</span>
+          <span data-opt-consequence>Du schreibst, was die Zahl zeigen soll.</span>
+          <input type="text" name="dm-d-zaehler-alt" value="" placeholder="Was soll die Zahl zählen?">
+        </label>
+      </div>
+      <textarea data-comment="d-zaehler-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-zaehler-none" value="">
+      <input type="hidden" name="dm-d-zaehler-hes" value="{&quot;ms&quot;:20489,&quot;revisits&quot;:0,&quot;median&quot;:19731}">
+      <input type="hidden" name="dm-d-zaehler-touched" value="1">
+      <input type="hidden" name="dm-d-zaehler-issue" value="">
+      <input type="hidden" name="dm-d-zaehler-epic" value="">
+      <div data-alevel="3" data-title="Zähler im Kopf">
+        <div data-slot="short"><p>Die Zahl im Kopf meldet weniger offene Wünsche, als es gibt.</p></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"ohne die verfolgten","value":2},"after":{"label":"mit den verfolgten","value":5},"unit":"Wünsche"}'></div>
+          <p>Bleibt der Wunsch künftig in der Liste, muss die Zahl sagen, ob sie offene oder alle Wünsche meint.</p>
+        </div>
+        <div data-example>
+          <p>Beispiel: 5 Wünsche, 3 davon einer Gruppe zugeordnet</p>
+          <pre>Kopfzeile, mitgezählt:   Wünsche  5
+Kopfzeile, nur freie:    Wünsche  2</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-entfernen" data-nav-label="Entfernen, wenn zugeordnet" data-decision="d-entfernen" data-decision-mode="single"
+             data-label="Entfernen, wenn zugeordnet" data-rec="fragen"
+             data-rec-why="Eine Gruppe soll ihr Ziel nie ohne Hinweis verlieren; ein Dialog mehr ist der kleinere Preis."
+             data-applies-to="Wunschliste und Codex" data-finding="f-entfernen"
+             data-ui-ok="Gefragt ist die Regel beim Entfernen; „zugeordnet“ ist hier das Verb, nicht der gleichnamige Screen der Entwürfe">
+      <p data-applies>Gilt für: Wunschliste und Codex</p>
+      <p data-situation>Wird ein zugeordneter Wunsch entfernt, verliert die Gruppe ein Ziel, für das schon Einsätze geplant sind.</p>
+      <h3 data-question>Was passiert, wenn du einen zugeordneten Wunsch entfernst?</h3>
+      <p data-stakes>Ob eine Gruppe still ein Ziel verlieren kann.</p>
+      <div data-options>
+        <label data-opt="fragen" data-recommended>
+          <input type="radio" name="dm-d-entfernen" value="fragen" checked>
+          <span data-opt-label>Nachfragen, ob auch die Zuordnung gelöst wird</span>
+          <span data-opt-consequence>Ein Dialog mehr, aber keine stille Lücke in der Gruppe.</span>
+        </label>
+        <label data-opt="still">
+          <input type="radio" name="dm-d-entfernen" value="still">
+          <span data-opt-label>Die Zuordnung wird still mitgelöst</span>
+          <span data-opt-consequence>Schnell, aber der Einsatzplan der Gruppe verliert sein Ziel ohne Hinweis.</span>
+        </label>
+        <label data-opt="sperren">
+          <input type="radio" name="dm-d-entfernen" value="sperren">
+          <span data-opt-label>Entfernen geht erst nach dem Lösen</span>
+          <span data-opt-consequence>Sicher, aber zwei Schritte.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-entfernen-note" placeholder="Notiz (optional)">Genau, aber man muss sich entscheiden, wenn man so viele von der wunschliste von dem gegenstand entfernt, dass nur noch die übrig bleiben die zugeordnet sind, dann solld er nutzer gefragt werden, ob und wie viele entfernt werden sollen, und das diese aus dem projekt auch entefrfertn werden - ggf. inkl. hinweis, dass dadurch dasg esamte projekt aufgelöst ist, falls das so ist und das das einzige drin war. Denke das ochmla tief durhc</textarea>
+      <input type="hidden" name="dm-d-entfernen-none" value="">
+      <input type="hidden" name="dm-d-entfernen-hes" value="{&quot;ms&quot;:136046,&quot;revisits&quot;:0,&quot;median&quot;:19731}">
+      <input type="hidden" name="dm-d-entfernen-touched" value="1">
+      <input type="hidden" name="dm-d-entfernen-issue" value="">
+      <input type="hidden" name="dm-d-entfernen-epic" value="">
+      <div data-alevel="3" data-title="Entfernen, wenn zugeordnet">
+        <div data-slot="short"><p>Hängen Wunsch und Gruppe zusammen, kann ein Entfernen ein geplantes Ziel treffen.</p></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Wunsch entfernen","value":"in der Wunschliste"},{"label":"Zuordnung","value":"hängt noch an der Gruppe"},{"label":"Gruppe","value":"Einsätze ohne Ziel"}]}'></div>
+          <p>Den Fall gibt es bisher nicht, weil die Menge wandert; künftig hängen Wunsch und Gruppe zusammen.</p>
+        </div>
+        <div data-example>
+          <p>Beispiel einer Rückfrage</p>
+          <pre>Wunsch „Laser-Bohrkopf“ entfernen?
+Er ist der Gruppe „Flotte ausbauen“ zugeordnet.
+[Abbrechen]   [Entfernen und Zuordnung lösen]</pre>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section id="t-codex" data-topic data-nav-label="Zuordnen aus dem Codex">
+    <div data-alevel="2" data-title="Zuordnen aus dem Codex">
+      <div data-slot="short"><p>Außerhalb des HQ ordnet heute nichts zu; der Warenkorb springt nur per Link ins HQ.</p></div>
+      <div data-slot="long">
+        <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Warenkorb","value":"Link"},{"label":"HQ","value":"Planen"},{"label":"Auswahl","value":"Gruppe wählen"},{"label":"zurück","value":"Seite neu suchen"}]}'></div>
+        <p>Technisch geht Zuordnen von überall, ohne Änderung an der Datenbank: Der Dienst gilt app-weit, nur ruft ihn außerhalb des HQ niemand auf. Eine Auswahl für ein Ziel oder eine neue Gruppe gibt es im Bestand schon. Offen sind der Weg, die Menge, das Anlegen und die Suchzeilen.</p>
+      </div>
+    </div>
+
+    <section id="d-weg" data-nav-label="Weg zum Zuordnen" data-decision="d-weg" data-decision-mode="chain"
+             data-label="Weg zum Zuordnen" data-rec="auswahl"
+             data-rec-why="Das falsche Ziel still zu wählen ist der teuerste Fehler."
+             data-applies-to="Codex-Detailseiten" data-finding="f-weg"
+             data-ui-ok="Gefragt sind die Schritte und wer das Ziel wählt; „Zuordnen“ ist hier das Verb, die Stelle im Entwurf fragen die Entwürfe">
+      <p data-applies>Gilt für: Codex-Detailseiten</p>
+      <p data-situation>Wer heute aus dem Warenkorb plant, springt per Link ins HQ und verlässt die Seite.</p>
+      <h3 data-question>Wie ordnest du auf einer Codex-Seite zu?</h3>
+      <p data-stakes>Ob du die Seite verlässt und ob das Ziel bewusst gewählt ist.</p>
+      <div data-options>
+        <label data-opt="auswahl" data-recommended>
+          <input type="radio" name="dm-d-weg" value="auswahl" checked>
+          <span data-opt-label>Kleine Auswahl</span>
+          <ol data-opt-steps><li>Knopf</li><li data-step-new>Gruppe wählen</li><li>zugeordnet</li></ol>
+          <span data-opt-consequence>Zwei Klicks, das Ziel ist immer bewusst gewählt.</span>
+        </label>
+        <label data-opt="direkt">
+          <input type="radio" name="dm-d-weg" value="direkt">
+          <span data-opt-label>Ein Klick in die zuletzt genutzte</span>
+          <ol data-opt-steps><li>Knopf</li><li>zugeordnet</li></ol>
+          <span data-opt-consequence>Am schnellsten, trifft aber still die falsche Gruppe.</span>
+        </label>
+        <label data-opt="hq">
+          <input type="radio" name="dm-d-weg" value="hq">
+          <span data-opt-label>Nur ein Link ins HQ</span>
+          <ol data-opt-steps><li>Knopf</li><li>HQ Planen</li><li>Gruppe wählen</li><li>zurück</li></ol>
+          <span data-opt-consequence>Nichts Neues zu bauen, aber die Seite ist weg.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-weg-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-weg-none" value="">
+      <input type="hidden" name="dm-d-weg-hes" value="{&quot;ms&quot;:10615,&quot;revisits&quot;:0,&quot;median&quot;:19731}">
+      <input type="hidden" name="dm-d-weg-touched" value="1">
+      <input type="hidden" name="dm-d-weg-issue" value="">
+      <input type="hidden" name="dm-d-weg-epic" value="">
+      <div data-alevel="3" data-title="Weg zum Zuordnen">
+        <div data-slot="short"><p>Der einzige Weg von außen führt heute aus der Seite hinaus ins HQ.</p></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Warenkorb","value":"Link"},{"label":"HQ Planen","value":"Seite weg"},{"label":"Gruppe wählen","value":"im HQ"}]}'></div>
+          <p>Im Bestand gibt es schon eine Auswahl: Ziel wählen oder neu anlegen.</p>
+        </div>
+        <div data-example>
+          <p>So sieht die Auswahl im Bestand heute aus</p>
+          <pre>Aus dem Lager planen
+Wohin
+( ) An „Flotte ausbauen“ anhängen
+( ) Neuer Nachschub
+[Hinzufügen]</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-wieviel" data-nav-label="Wie viel" data-decision="d-wieviel" data-decision-mode="single"
+             data-label="Wie viel" data-rec="alle"
+             data-rec-why="Der Normalfall ist die ganze Menge; wer nur einen Teil will, stellt ihn am Stepper ein."
+             data-applies-to="Codex und HQ" data-finding="f-wieviel"
+             data-ui-ok="Gefragt ist die vorgeschlagene Menge; „Zuordnen“ ist hier das Verb, nicht der gleichnamige Screen der Entwürfe">
+      <p data-applies>Gilt für: Codex und HQ</p>
+      <p data-situation>Jedes Stück, das der Vorschlag verfehlt, kostet einen Klick am Stepper.</p>
+      <h3 data-question>Wie viele Stück werden beim Zuordnen vorgeschlagen?</h3>
+      <p data-stakes>Wie oft du beim Zuordnen nachstellen musst.</p>
+      <div data-options>
+        <label data-opt="alle" data-recommended>
+          <input type="radio" name="dm-d-wieviel" value="alle" checked>
+          <span data-opt-label>Die ganze Wunschmenge, änderbar</span>
+          <span data-opt-consequence>Ein Klick für den Normalfall, ein Stepper für einen Teil.</span>
+        </label>
+        <label data-opt="eins">
+          <input type="radio" name="dm-d-wieviel" value="eins">
+          <span data-opt-label>Immer 1 Stück</span>
+          <span data-opt-consequence>Vorsichtig, aber bei 20 Stück 19 Klicks.</span>
+        </label>
+        <label data-opt="fragen">
+          <input type="radio" name="dm-d-wieviel" value="fragen">
+          <span data-opt-label>Immer erst die Zahl eingeben</span>
+          <span data-opt-consequence>Kein Vorschlag, jeder Vorgang ein Schritt länger.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-wieviel-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-wieviel-none" value="">
+      <input type="hidden" name="dm-d-wieviel-hes" value="{&quot;ms&quot;:13488,&quot;revisits&quot;:0,&quot;median&quot;:19731}">
+      <input type="hidden" name="dm-d-wieviel-touched" value="1">
+      <input type="hidden" name="dm-d-wieviel-issue" value="">
+      <input type="hidden" name="dm-d-wieviel-epic" value="">
+      <div data-alevel="3" data-title="Wie viel">
+        <div data-slot="short"><p>Ein schlechter Vorschlag kostet pro fehlendem Stück einen Klick.</p></div>
+        <div data-slot="long">
+          <div data-viz="bar" data-viz-spec='{"value":5,"max":20,"unit":"Stück","label":"geteilt: 5 von 20 gewünschten"}'></div>
+          <p>Im HQ wandert standardmäßig die ganze Menge; teilen ist erlaubt, etwa 5 von 20. Eine Wunschmenge reicht bis 999 Stück.</p>
+        </div>
+        <div data-example>
+          <p>So sieht das Teilen im HQ aus (Beispiel)</p>
+          <pre>Wohin: An „Flotte ausbauen“ anhängen
+Laser-Bohrkopf   [−]  5  [+] Stk.   von 20
+[Hinzufügen]</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-neu" data-nav-label="Neue Gruppe aus dem Codex" data-decision="d-neu" data-decision-mode="yesnoalt"
+             data-label="Neue Gruppe aus dem Codex" data-rec="yes"
+             data-rec-why="Sonst endet der Weg bei 0 Gruppen in einer Sackgasse."
+             data-applies-to="Codex und HQ" data-finding="f-neu">
+      <p data-applies>Gilt für: Codex und HQ</p>
+      <p data-situation>Wer noch keine Gruppe hat, kommt im Codex nicht weiter.</p>
+      <h3 data-question>Darf im Codex eine neue Gruppe ohne Einsatz entstehen?</h3>
+      <p data-context>Sind alle 7 Plätze belegt, ist „neu“ in jedem Fall gesperrt.</p>
+      <p data-stakes>Ob der erste Wunsch im Codex schon ein Ziel bekommt.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-d-neu" value="yes" checked>
+          <span data-opt-label>Ja, nur mit Namen anlegen</span>
+          <span data-opt-consequence>Sie entsteht nur mit Namen (vorgeschlagen oder deiner) und steht im HQ als „noch ungeplant“.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-d-neu" value="no">
+          <span data-opt-label>Nein, nur im HQ anlegen</span>
+          <span data-opt-consequence>Neue Gruppen gibt es nur im HQ; der Codex zeigt dann einen Link dorthin.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-neu" value="alt">
+          <span data-opt-label>Anders regeln</span>
+          <span data-opt-consequence>Du schreibst, wann eine neue Gruppe entstehen darf.</span>
+          <input type="text" name="dm-d-neu-alt" value="" placeholder="Wann darf eine Gruppe entstehen?">
+        </label>
+      </div>
+      <textarea data-comment="d-neu-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-neu-none" value="">
+      <input type="hidden" name="dm-d-neu-hes" value="{&quot;ms&quot;:18973,&quot;revisits&quot;:0,&quot;median&quot;:19731}">
+      <input type="hidden" name="dm-d-neu-touched" value="1">
+      <input type="hidden" name="dm-d-neu-issue" value="">
+      <input type="hidden" name="dm-d-neu-epic" value="">
+      <div data-alevel="3" data-title="Neue Gruppe aus dem Codex">
+        <div data-slot="short"><p>Ohne eine Gruppe endet der Weg im Codex, bevor er anfängt.</p></div>
+        <div data-slot="long">
+          <div data-viz="kpi" data-viz-spec='{"value":"7","unit":"Plätze","label":"aktive Gruppen höchstens"}'></div>
+          <p>Es gibt 7 Plätze für aktive Gruppen; sind alle belegt, ist eine neue gesperrt. Ein Name darf 28 Zeichen lang sein.</p>
+        </div>
+        <div data-example>
+          <p>Beispiel mit 0 Gruppen</p>
+          <pre>Wohin
+(noch keine Gruppe)
+( ) Neue Gruppe „Bergbau-Start“ · noch ungeplant</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-zeilen" data-nav-label="Zuordnen in Suchzeilen" data-decision="d-zeilen" data-decision-mode="single"
+             data-label="Zuordnen in Suchzeilen" data-rec="nur-detail"
+             data-rec-why="Eine ganze Zeile ist schon ein Link; eine zweite Bedeutung auf so wenig Fläche führt zu Fehlklicks."
+             data-applies-to="Suche und Codex-Listen" data-finding="f-zeilen"
+             data-ui-ok="Gefragt ist, welche Fläche eine Zuordnung schreiben darf, nicht wie Zeilen sie zeigen">
+      <p data-applies>Gilt für: Suche und Codex-Listen</p>
+      <p data-situation>Jede zweite Bedeutung in einer Suchzeile macht Fehlklicks wahrscheinlicher, denn die ganze Zeile ist ein Link zur Detailseite.</p>
+      <h3 data-question>Kannst du auch aus einer Suchzeile heraus zuordnen?</h3>
+      <p data-context>Wie eine Zeile eine Zuordnung zeigt, fragen die Entwürfe; hier geht es nur darum, ob sie sie auch schreiben darf.</p>
+      <p data-stakes>Wie viele Stellen eine Zuordnung schreiben dürfen.</p>
+      <div data-options>
+        <label data-opt="nur-detail" data-recommended>
+          <input type="radio" name="dm-d-zeilen" value="nur-detail" checked>
+          <span data-opt-label>Nein, nur auf der Detailseite</span>
+          <span data-opt-consequence>Zeilen zeigen nur, dass zugeordnet ist.</span>
+        </label>
+        <label data-opt="auch-zeilen">
+          <input type="radio" name="dm-d-zeilen" value="auch-zeilen">
+          <span data-opt-label>Ja, über das Zeichen in der Zeile</span>
+          <span data-opt-consequence>Schneller, aber ein Klick mehr Bedeutung auf 30 Pixeln.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-zeilen-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-zeilen-none" value="">
+      <input type="hidden" name="dm-d-zeilen-hes" value="{&quot;ms&quot;:25576,&quot;revisits&quot;:0,&quot;median&quot;:19731}">
+      <input type="hidden" name="dm-d-zeilen-touched" value="1">
+      <input type="hidden" name="dm-d-zeilen-issue" value="">
+      <input type="hidden" name="dm-d-zeilen-epic" value="">
+      <div data-alevel="3" data-title="Zuordnen in Suchzeilen">
+        <div data-slot="short"><p>Auf einer Suchzeile teilt sich ein Link die Fläche mit jeder weiteren Bedeutung.</p></div>
+        <div data-slot="long">
+          <div data-viz="kpi" data-viz-spec='{"value":"≈ 30","unit":"px","label":"Fläche für das Zeichen in einer Suchzeile"}'></div>
+          <p>Das Zeichen für einen Wunsch misst dort rund 30 Pixel.</p>
+        </div>
+        <div data-example>
+          <p>Eine Suchzeile, Beispiel</p>
+          <pre>Laser-Bohrkopf · Bergbau · Größe 1        [Wunsch]   → Detailseite</pre>
+          <p>Mit Schreiben in der Zeile hätte das Zeichen eine zweite Aufgabe</p>
+          <pre>Laser-Bohrkopf · Bergbau · Größe 1        [Wunsch · Gruppe wählen]</pre>
+        </div>
+      </div>
+    </section>
+  </section>
+</section>
+<!-- ANALYSIS-VIEW-END -->
+</section>

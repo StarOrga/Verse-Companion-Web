@@ -4,6 +4,24 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.280.0] - 2026-11-19
+
+### Added
+- A wish stays on the wishlist when it is assigned to an Operation. Item, ship, blueprint and preview pages in the Codex show the same two stations, wish and ownership, and assign a wish to an Operation in place; the Holotisch hangar menu reads the same way.
+- Removing a wish asks only when assigned pieces are hit, takes them from the newest Operation first and can be undone in one step. Releasing a line in the HQ offers to delete the wish as well.
+- The Archiv in HQ Planen can delete an archived Operation.
+- An Operation with plain lines from before this change asks once whether they should stand as wishes on the wishlist. Nothing changes without the answer.
+
+### Changed
+- The supply group is called "Operation" everywhere and carries the Route glyph, and every undo toast has the new look.
+- The HQ start tile counts only lines of active Operationen.
+
+### Fixed
+- Undo of a wish removal gives back exactly what the removal took, so a change made on another device in between survives, and a ship wish comes back with its name and notes.
+- A fulfilled wish line stays fulfilled when a second device pushes an outdated copy of it.
+- An archived Operation no longer keeps open wish lines.
+- Name proposals for a new Operation work for signed-in users; the service had rejected every request.
+
 ## [0.279.2] - 2026-11-18
 
 ### Changed
