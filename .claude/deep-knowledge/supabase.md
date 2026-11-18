@@ -243,6 +243,42 @@ mail): that the hook's event carries `app_metadata.provider` and
 legitimate, allowlisted person is refused with `signup_not_allowed`, look
 there first; an invite mail is the way in meanwhile.
 
+## The instance swaps: memory, not data, is the IO budget (2026-11-18)
+
+Supabase's "Disk IO budget" mail on the Free plan is a memory problem here. Measured: 453 MB RAM
+(`shared_buffers` 224 MB, the platform default), ~590 MB in swap, 1.28 TB read from the system/swap volume
+against 0.11 TB from the database volume, while the 331 MB database showed a cache hit rate of 99.96 %. A buffer
+"hit" in `pg_stat_*` can still be a read from swap, so those views do not show it: four catalog requests cost
+~9 600 swap reads within five seconds. Every bit of activity is a burst above the instance's sustained IO rate,
+and bursts are what the budget counts.
+
+**What used it up was our own automation, not users.** API requests per day (`edge_logs`): 14.11. 12 747 ·
+15.11. 201 137, of which 142 871 from headless browsers (agent checks and night runs against prod, every app
+page) · 16.11. 51 819 (30 797 from edge functions: a codex ingest) · 17.11. 94 633 (53 629 headless, 16 232
+edge functions: the translation pipeline) · a quiet day ~5 000. A browser run against prod is a load test of a
+0.5 GB machine.
+
+**How to measure (in this order, before naming a cause).**
+
+1. Read the machine, not Postgres. `GET https://<ref>.supabase.co/customer/v1/privileged/metrics` with HTTP
+   basic auth `service_role:<sb_secret key>` (key recipe: `storage.md` → locale GC). `nvme0n1` is the
+   system/swap volume, `nvme1n1` is `/data`; `node_disk_reads_completed_total`, `node_vmstat_pgmajfault` and
+   `node_vmstat_pswpin` are counters: two samples, divided by the seconds between them.
+2. Trace in 5-second steps. Idle is 0 reads/s with a burst of 500-1 600 for one step, about every 63 s.
+   Averages over 90 s and medians over 30-second steps both pointed at the wrong cause here.
+3. Ask the logs who sent the requests: `edge_logs` carries method, path and user agent in `event_message`
+   (`HeadlessChrome`, `Deno/`, …); group by day and hour.
+4. Test a suspect by switching it off and counting bursts. Pausing the 10-second cron
+   `translate-orchestrator-fast` changed nothing, and neither did pausing it together with the 2-minute
+   `codex-derived-refresh` (6 bursts in 6 minutes either way). Do not rebuild those jobs for IO reasons.
+
+**Known and open.** `archive_timeout` is 120 s and a 16 MB WAL segment is archived whenever anything was
+written since the last switch - 671 segments a day for a few kB of pg_cron bookkeeping
+(`cron.job_run_details`) and heartbeats; that is the database volume's IO, a small part of the total. The
+source of the ~63-second idle burst is not identified. Levers that change the picture: fewer automated browser
+runs against prod, more RAM (Micro has 1 GB, paid), or a smaller `shared_buffers`
+(`supabase --experimental postgres-config update`, restarts the database; untested).
+
 ## Atomic run claims for public cron endpoints (`claim_run`)
 
 Audit 2026-11-16. Edge functions with `verify_jwt = false` that pg_cron calls with the publishable key are open to
