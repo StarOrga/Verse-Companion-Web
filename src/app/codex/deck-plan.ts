@@ -55,6 +55,12 @@ export interface DeckPlanSet {
   viewBox: string;
   width: number;
   height: number;
+  /**
+   * Model → viewBox offsets: `x' = x + ox`, `y' = oy − y` (nose up). Anything placed in the
+   * hull's model frame (cargo grids, interior elements) lands on the plan with these.
+   */
+  ox: number;
+  oy: number;
 }
 
 const PAD_M = 1.5;
@@ -278,5 +284,5 @@ export function buildDeckPlans(
       // Largest first, so a small room drawn later stays on top and hoverable.
       .sort((a, b) => b.area - a.area),
   }));
-  return { decks: out, viewBox: `0 0 ${r2(width)} ${r2(height)}`, width: r2(width), height: r2(height) };
+  return { decks: out, viewBox: `0 0 ${r2(width)} ${r2(height)}`, width: r2(width), height: r2(height), ox: PAD_M - minX, oy: maxY + PAD_M };
 }

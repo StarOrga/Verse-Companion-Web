@@ -1203,13 +1203,6 @@ function arrive(fixture: ComponentFixture<CodexDetailComponent>): void {
   fixture.detectChanges();
 }
 
-/** The side column below the first screen (description + RSI, where to buy, variants — concept holotisch-unten d2). */
-function openBlock(fixture: ComponentFixture<CodexDetailComponent>): HTMLElement {
-  const open = (fixture.nativeElement as HTMLElement).querySelector('.holo-below .below-side') as HTMLElement;
-  expect(open, 'open block').not.toBeNull();
-  return open;
-}
-
 function openDetails(fixture: ComponentFixture<CodexDetailComponent>): HTMLElement {
   const el: HTMLElement = fixture.nativeElement;
   (el.querySelector('.details-toggle') as HTMLButtonElement).click();
@@ -1275,12 +1268,13 @@ describe('CodexDetailComponent — Holotable (Nomad fixture)', () => {
 describe('CodexDetailComponent — Holotable basics stand open (d-drawer)', () => {
   beforeEach(() => configureSetup('ship'));
 
-  it('Beschreibung, Wo zu kaufen and the variants sit open on the page, the drawer keeps the rest', fakeAsync(() => {
+  it('the sources live only in the Akte (no side card); #bezugsquelle is the Akte, the drawer keeps the rest', fakeAsync(() => {
     const fixture = renderOnFakeClock();
     arrive(fixture);
     const el: HTMLElement = fixture.nativeElement;
-    const open = openBlock(fixture);
-    expect(open.querySelector('#bezugsquelle'), 'where to buy, open').not.toBeNull();
+    expect(el.querySelector('.below-side, .side-card'), 'no side card').toBeNull();
+    expect(el.querySelectorAll('#bezugsquelle').length, 'one jump target').toBe(1);
+    expect(el.querySelector('sc-codex-holo-akte#bezugsquelle'), 'the Akte is the target').not.toBeNull();
     expect(el.querySelector('.details-body'), 'drawer still closed').toBeNull();
     const body = openDetails(fixture);
     expect(body.querySelector('#bezugsquelle')).toBeNull();

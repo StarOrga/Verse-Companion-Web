@@ -1,0 +1,124 @@
+<section data-iteration="3" data-iteration-template="free" data-final-report>
+  <p class="fr-sentence">Der Beta-Holotisch zeigt das Innenleben jetzt aus der Data.p4k: Decks als Filter, 3D mit Hülle, Türen, Leitern, Aufzüge und Fracht-Grids, alles in Bauteile durchsuchbar.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🧊</span><span><b>3D mit Hülle</b>: das Deck steht fest im Geisterschiff, drehbar und zoombar.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🚪</span><span>Idris: <b>94 Türen nach Art</b>, 6 Arrestzellen, 1374 SCU in Grids verortet.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🔍</span><span><b>Raum anklicken</b> füllt Bauteile, die Lupe findet außen und innen.</span></li>
+      </ul>
+      <p class="fr-try-auth">🔑 Noch nicht live: sichtbar nach dem Shippen, einem Uploader-Release und einem neuen Codex-Upload</p>
+    </div>
+    <div class="fr-ba" data-label-before="{{final.before}}" data-label-after="{{final.after}}">
+      <figure class="fr-shot"><img src="20261117-1810-holotisch-innenleben/qa/before-idris-frachtraum.jpg" alt="Beta-Holotisch vorher: Idris Ebene 6 als flacher Plan, der gewählte Frachtraum mit schwarzem Rand"><figcaption>Flacher Plan, Raum mit schwarzem Rand</figcaption></figure>
+      <figure class="fr-shot"><img src="20261117-1810-holotisch-innenleben/qa/verify/b2-idris-3d-hauptdeck.png" alt="Beta-Holotisch nachher: Idris-Hauptdeck in 3D in der Geisterhülle, unten Ansicht-Leiste und Deck-Filter"><figcaption>Hauptdeck in 3D, Deck-Filter unten</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Alle 2810 Codex-Tests, 16 Uploader-Tests für das Innenleben, Typen und Lint ohne Fehler; Anforderung: keine roten Tests (geschätzt).">
+        <span class="fr-meter-name">🧱 Stabilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">2826 ✓</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 93%" data-tip="Gegen die echte Data.p4k: Idris 6 Decks, 94 Türen, 6 Zellen, 1374 von 1374 SCU; Reclaimer 420 von 420 SCU und ein Aufzug mit 6 Halten; Starlancer 96 von 224 SCU, die Lücke wird offen genannt. Anforderung: jedes Element am richtigen Ort (geschätzt).">
+        <span class="fr-meter-name">🗄 Datenintegrität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">3 Schiffe</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Am Handy (375 px, Touch) in Beta- und klassischer Shell: Seitenbreite 375, kein Element über dem Rand; die Deck-Leiste läuft seitlich. Anforderung: kein Querscrollen (geschätzt).">
+        <span class="fr-meter-name">📱 Kompatibilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">375 px ✓</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="5 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ✓ {{final.level_interplay}} · ✓ {{final.level_local}} · ✓ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_prod}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_live}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 3 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-reclaimer-lifts" data-routed
+          data-issue-title="[FEATURE] Uploader: derive lift shafts from lift doors when a ship has no Transit entities"
+          data-issue-type="feature"
+          data-issue-body="Concept 20261117-1810-holotisch-innenleben, checklist A7 (lifts). ship_interior.cluster_lifts() builds shafts from TransitDestination / TransitGateway entities only. The AEGS_Reclaimer has none, so interior.lifts is [] although the extract finds 5 lift doors (door.kind 'lift'). Idris-P (3 shafts) and Starlancer MAX (2) are fine. Fix: when no Transit entity exists, cluster the lift doors by x/y (LIFT_CLUSTER_M) and take their z as stops; add a test with the Reclaimer door positions and re-run real_run.py on AEGS_Reclaimer."
+          data-issue-module="data-uploader"
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="machbar">
+        <span class="oq-label">Reclaimer ohne Aufzüge</span>
+        <span class="oq-done">✓ umgesetzt — ein Schacht mit 6 Haltepunkten aus den Elevator_Floor-Einträgen</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Nicht umgesetzt, weil die Reclaimer keine Aufzugs-Ziele in der Data.p4k hat; ihre 5 Aufzugtüren sind aber da.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Uploader, Aufzugschächte</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — die Schächte lassen sich aus den Aufzugtüren ableiten.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-posthog-tile" data-routed
+          data-issue-title="[CHORE] PostHog: add an 'Innen genutzt' tile for the four holotable interior events"
+          data-issue-type="chore"
+          data-issue-body="Concept 20261117-1810-holotisch-innenleben, checklist B11. The events codex:deck_select, codex:interior_filter_toggle, codex:interior_element_select and codex:parts_search are in src/app/core/analytics/events.ts and fire (stage spec 'B11'). The dashboard tile was not created because the PostHog MCP rejected its token (401) in this session. Add one insight to the codex dashboard: weekly unique users per event, broken down by ship for deck_select and by group for interior_filter_toggle."
+          data-issue-module="analytics"
+          data-oq-origin="shortfall"
+          data-route-default="issue"
+          data-route-reason="außerhalb Repo">
+        <span class="oq-label">PostHog-Kachel fehlt</span>
+        <span class="oq-done">✓ umgesetzt — 3 Kacheln als Code, Anlegen braucht den PostHog-Schlüssel</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Nicht umgesetzt, weil PostHog den Zugang abgelehnt hat; die vier Events selbst laufen.</dd>
+          <dt>{{final.fund_where}}</dt><dd>PostHog, Codex-Dashboard</dd>
+          <dt>{{final.fund_why}}</dt><dd>📌 Issue — liegt außerhalb des Repos.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-phone-overflow" data-routed
+          data-issue-title="[BUG] Holotable page scrolls sideways on phones (hangar menu and patch strip)"
+          data-issue-type="bug"
+          data-issue-body="Found by the independent QA of concept 20261117-1810-holotisch-innenleben at 375x812: the beta holotable page scrolls horizontally by 53-61 px. The overflowing elements are a B, span.sep and span.car in src/app/codex/holo/codex-holo-hangar-menu.component.ts and codex-holo-patch.component.ts, which this branch did not touch. Project rule: nothing on a phone page may scroll sideways. Reproduce: open any ship's beta holotable at 375 px width, compare document.documentElement.scrollWidth with clientWidth."
+          data-issue-module="codex"
+          data-oq-origin="found"
+          data-route-default="now"
+          data-route-reason="im Repo">
+        <span class="oq-label">Handy scrollt quer</span>
+        <span class="oq-done">✓ umgesetzt — Hangar-Knopf in eigener Zeile, 375 px ohne Querscrollen</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Die Holotisch-Seite lässt sich am Handy 53–61 px zur Seite schieben.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Hangar-Menü und Patch-Leiste oben</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — klein und im Repo.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Branch <code>claude/holotisch-decks-display-5750f7</code> · Uploader <code>71d984c12</code>, <code>2f2982658</code> · UI <code>7916d60d5</code>, <code>b89db1677</code>, <code>590da2794</code> · ships-Subtheme Revision 17</li>
+      <li><code>data-uploader/python/sc_extract/ship_interior.py</code>, <code>src/app/codex/holo/holo-interior.ts</code>, <code>src/app/codex/holo/holo-interior-3d.ts</code></li>
+      <li>Tests: Codex 2810 grün (180 Dateien), Uploader-Innenleben 16, typecheck, lint 0 Fehler, build grün · unabhängige Prüfung mit 40 Screenshots in <code>qa/verify/</code></li>
+      <li>Zellentüren: die 6 Zellen-Panels sind eine Konsole im Sicherheitsraum, ein 5-m-Radius hätte dessen Tür getroffen; Regel jetzt N Panels → N Innentüren des Brig-Raums · 3D als SVG-Projektion statt WebGL · Element-Zähler rechnet die UI, kein <code>counts</code>-Feld</li>
+      <li>Im Abschluss gebaut: <code>d5412bab3</code> Reclaimer-Aufzug, <code>99ad59f13</code> Handy-Kopfzeile, <code>2d623ef23</code> PostHog-Kacheln · Offen im Uploader: <code>Door_Ship_Switch</code> zählt als Schalter, nicht als Tür · Deck-Zusammenlegung (350 m², 3,2 m) an der Idris abgestimmt</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-big-ships" data-crit="mid" data-guide="">Decks von Polaris und 890 Jump ansehen</li>
+    </ul>
+  </section>
+  <section data-handoffs hidden aria-label="{{final.group_handoffs}}">
+    <ul>
+      <li data-todo-id="h-upload" data-crit="high" data-guide="">Nach dem Uploader-Release Codex neu hochladen</li>
+      <li data-todo-id="h-posthog" data-crit="mid" data-guide="">npm run posthog:apply mit PostHog-Schlüssel</li>
+    </ul>
+  </section>
+</section>

@@ -2,7 +2,7 @@
      rewrites it on every tab switch. body overflow is set by that function,
      the inline style below is only the first-paint value. -->
 <!DOCTYPE html>
-<html lang="de" data-theme="dark" data-page-version="2026-11-15T14:00:00" data-template="decision">
+<html lang="de" data-theme="dark" data-page-version="2026-11-18T12:00:00" data-template="decision">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -5719,7 +5719,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
       </header>
       <style>html[data-template="design"] [data-page-header] { display: none; }</style>
       <main>
-<section data-iteration="1" data-iteration-template="decision" data-wide data-tab-label="Runde 1" id="iter-1" data-active>
+<section data-iteration="1" data-iteration-template="decision" data-wide data-tab-label="Runde 1" id="iter-1" hidden>
 <style>
 [data-iteration="1"] {
   --k-bg0: #0d2635; --k-bg1: #123246; --k-bg2: #0b2130; --k-fg0: #e8ebed; --k-fg1: #9fb3c8; --k-fg2: #84a0b6;
@@ -6127,6 +6127,836 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
   render();
   bar();
   setTimeout(bar, 400);
+})();
+</script>
+</section>
+<section data-iteration="2" data-iteration-template="decision" data-wide data-tab-label="Runde 2" id="iter-2" data-active>
+<style>
+[data-iteration="2"] {
+  --k-bg0: #0d2635; --k-bg1: #123246; --k-bg2: #0b2130; --k-fg0: #e8ebed; --k-fg1: #9fb3c8; --k-fg2: #84a0b6;
+  --k-border: rgba(82, 193, 230, 0.18); --k-accent: #52c1e6; --k-warn: #f0c27b; --k-ok: #7fd1a4;
+}
+[data-iteration="2"] .iteration-intro { display: block; margin-bottom: 1rem; }
+[data-iteration="2"] .iteration-intro p { max-width: 86ch; line-height: 1.6; }
+[data-iteration="2"] .k-iter { display: inline-block; font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--k-accent); border: 1px solid color-mix(in srgb, var(--k-accent) 45%, transparent); border-radius: 3px; padding: .1rem .5rem; margin-bottom: .5rem; }
+[data-iteration="2"] .k-pinhint { display: flex; gap: .8rem; align-items: flex-start; margin: 0 0 1.2rem; padding: .75rem 1rem; max-width: 92ch;
+  border: 1px solid color-mix(in srgb, var(--k-accent) 55%, transparent); border-radius: 6px; background: rgba(82,193,230,.08); font-size: .9rem; line-height: 1.55; }
+[data-iteration="2"] .k-pinhint .k-dot { flex: none; width: 26px; height: 26px; border-radius: 50%; margin-top: 2px; background: var(--k-accent); box-shadow: 0 0 0 4px rgba(82,193,230,.22); display: grid; place-items: center; }
+[data-iteration="2"] .k-pinhint .k-dot::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+[data-iteration="2"] kbd { display: inline-block; min-width: 1.6em; padding: 0 .4em; border: 1px solid var(--k-border); border-bottom-width: 2px; border-radius: 4px; background: var(--k-bg0); font: 600 .8rem/1.5 ui-monospace, Consolas, monospace; text-align: center; }
+[data-iteration="2"] .k-changes { margin: .6rem 0 0; padding: .7rem 1rem .7rem 1.1rem; border-left: 3px solid var(--k-accent); background: rgba(82,193,230,.06); max-width: 92ch; }
+[data-iteration="2"] .k-changes h3 { margin: 0 0 .35rem; font-size: .95rem; }
+[data-iteration="2"] .k-changes ul { margin: 0; padding-left: 1.1rem; font-size: .86rem; line-height: 1.55; }
+[data-iteration="2"] .k-recap { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; margin: .7rem 0 0; padding: 0; list-style: none; }
+[data-iteration="2"] .k-recap li { border: 1px solid var(--k-border); border-radius: 4px; background: var(--k-bg1); padding: .4rem .6rem; font-size: .8rem; line-height: 1.4; color: var(--k-fg1); }
+[data-iteration="2"] .k-recap li b { display: block; color: var(--k-fg0); font-size: .78rem; }
+[data-iteration="2"] > section[id] { margin: 2.4rem 0 0; padding-top: 1.4rem; border-top: 1px solid var(--k-border); }
+[data-iteration="2"] > section[id] > h2 { font-size: 1.15rem; margin: 0 0 .35rem; }
+[data-iteration="2"] .lead { color: var(--text-secondary); font-size: .9rem; margin: 0 0 .8rem; max-width: 86ch; line-height: 1.6; }
+[data-iteration="2"] code { font-size: .85em; }
+[data-iteration="2"] .k-h3 { font-size: .98rem; margin: 1.6rem 0 .5rem; }
+[data-iteration="2"] .k-note { border-left: 3px solid var(--k-warn); padding: .55rem .9rem; background: rgba(240,194,123,.07); font-size: .85rem; line-height: 1.55; margin: .9rem 0 0; max-width: 86ch; }
+[data-iteration="2"] .k-map { width: 100%; border-collapse: collapse; font-size: .84rem; margin: .4rem 0 0; }
+[data-iteration="2"] .k-map th, [data-iteration="2"] .k-map td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid var(--k-border); vertical-align: top; }
+[data-iteration="2"] .k-map th { font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--text-tertiary); font-weight: 600; }
+[data-iteration="2"] .k-dec { border: 1px solid var(--k-border); border-radius: 4px; background: var(--k-bg1); padding: .7rem .8rem; color: var(--k-fg0); margin-top: 10px; }
+[data-iteration="2"] .k-dec h4 { margin: 0 0 .2rem; font-size: .88rem; }
+[data-iteration="2"] .k-dec p { margin: 0 0 .5rem; font-size: .8rem; color: var(--k-fg1); line-height: 1.45; }
+[data-iteration="2"] .k-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+[data-iteration="2"] .k-pill { position: relative; display: inline-flex; align-items: center; gap: .4rem; padding: .35rem .7rem; border: 1px solid var(--k-border); border-radius: 999px; font-size: .8rem; color: var(--k-fg1); cursor: pointer; background: var(--k-bg0); }
+[data-iteration="2"] .k-pill input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+[data-iteration="2"] .k-pill:has(input:checked) { border-color: var(--k-accent); color: var(--k-fg0); background: rgba(82,193,230,.12); }
+[data-iteration="2"] .k-pill:has(input:focus-visible) { outline: 2px solid var(--k-accent); outline-offset: 2px; }
+[data-iteration="2"] .k-pill i { font-style: normal; font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; color: var(--k-warn); }
+[data-iteration="2"] textarea[data-comment] { width: 100%; min-height: 90px; background: var(--input-bg, #0d1117); color: var(--text-primary); border: 1px solid var(--border-default, #30363d); border-radius: 4px; padding: .6rem .7rem; font: inherit; font-size: .88rem; box-sizing: border-box; margin-top: .6rem; }
+
+/* ── Mock ── (no rule on the mock root's direct children: the note layer lives there) */
+[data-iteration="2"] .k2-mk { border-radius: 6px; padding: 16px; color: var(--k-fg0); font: 13px/1.4 Inter, system-ui, "Segoe UI", sans-serif;
+  background: radial-gradient(ellipse 130% 95% at 58% 0%, #0f2c3d 0%, #0b2130 45%, #071722 100%); box-shadow: 0 0 0 1px var(--k-border); margin-top: .8rem; }
+[data-iteration="2"] .k2-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+[data-iteration="2"] .k2-ti { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--k-border); border-radius: 10px; color: var(--k-accent); font-size: 18px; }
+[data-iteration="2"] .k2-ttl small { display: block; color: var(--k-fg2); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
+[data-iteration="2"] .k2-ttl b { display: block; font: 600 20px/1.2 Orbitron, Inter, sans-serif; letter-spacing: .03em; }
+[data-iteration="2"] .k2-tabs { display: inline-flex; padding: 3px; border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-bg0); }
+[data-iteration="2"] .k2-tab { display: inline-flex; align-items: center; min-height: 30px; padding: 0 14px; border-radius: 999px; color: var(--k-fg2); cursor: pointer; user-select: none; }
+[data-iteration="2"] .k2-tab[aria-current="page"] { color: var(--k-fg0); background: rgba(82,193,230,.2); box-shadow: 0 0 0 1px var(--k-accent); }
+[data-iteration="2"] .k2-search { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr) minmax(100px, .7fr) auto; gap: 8px; margin-top: 14px; align-items: end; }
+@media (max-width: 760px) { [data-iteration="2"] .k2-search { grid-template-columns: 1fr; } }
+[data-iteration="2"] .k2-fld { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+[data-iteration="2"] .k2-fld > span { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--k-fg2); }
+[data-iteration="2"] .k2-ac { position: relative; }
+[data-iteration="2"] .k2-mk input { box-sizing: border-box; width: 100%; min-height: 36px; padding: 0 10px; border: 1px solid var(--k-border); border-radius: 8px; background: var(--k-bg0); color: var(--k-fg0); font: inherit; }
+[data-iteration="2"] .k2-mk input:focus-visible { outline: 2px solid var(--k-accent); outline-offset: 1px; }
+[data-iteration="2"] .k2-ghost { position: absolute; left: 0; top: 0; bottom: 0; right: 0; display: flex; align-items: center; padding: 0 11px; color: var(--k-fg2); white-space: pre; overflow: hidden; pointer-events: none; font: inherit; }
+[data-iteration="2"] .k2-ghost .k2-gh-t { visibility: hidden; }
+[data-iteration="2"] .k2-ghost kbd { margin-left: 6px; font-size: 10px; line-height: 1.4; color: var(--k-fg2); visibility: visible; }
+[data-iteration="2"] .k2-sug { position: absolute; z-index: 6; left: 0; right: 0; top: calc(100% + 4px); border: 1px solid var(--k-border); border-radius: 8px; background: #0c2231; box-shadow: 0 10px 24px rgba(0,0,0,.45); padding: 4px; }
+[data-iteration="2"] .k2-opt { display: flex; justify-content: space-between; gap: 10px; padding: 6px 8px; border-radius: 6px; cursor: pointer; color: var(--k-fg1); }
+[data-iteration="2"] .k2-opt[aria-selected="true"] { background: rgba(82,193,230,.16); color: var(--k-fg0); }
+[data-iteration="2"] .k2-opt small { color: var(--k-fg2); white-space: nowrap; }
+[data-iteration="2"] .k2-opt b { color: var(--k-accent); font-weight: 600; }
+[data-iteration="2"] .k2-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 14px; border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-bg0); color: var(--k-fg1); font-size: 12px; cursor: pointer; user-select: none; white-space: nowrap; }
+[data-iteration="2"] .k2-btn:hover { color: var(--k-fg0); border-color: color-mix(in srgb, var(--k-accent) 60%, transparent); }
+[data-iteration="2"] .k2-btn.pri { min-height: 36px; background: var(--k-accent); border-color: var(--k-accent); color: #04202c; font-weight: 600; }
+[data-iteration="2"] .k2-mk [role="button"]:focus-visible { outline: 2px solid var(--k-accent); outline-offset: 2px; }
+[data-iteration="2"] .k2-me { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; }
+[data-iteration="2"] .k2-me-l { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--k-fg2); }
+[data-iteration="2"] .k2-loc { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 12px; border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-bg0); }
+[data-iteration="2"] .k2-loc .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--k-ok); box-shadow: 0 0 0 3px rgba(127,209,164,.2); }
+[data-iteration="2"] .k2-loc.stale .dot { background: transparent; box-shadow: inset 0 0 0 1.5px var(--k-fg2); }
+[data-iteration="2"] .k2-loc small { color: var(--k-fg2); }
+[data-iteration="2"] .k2-loc .k2-ac { width: 190px; }
+[data-iteration="2"] .k2-loc .k2-ac input { min-height: 26px; border-radius: 999px; }
+[data-iteration="2"] .k2-sim { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; color: var(--k-fg2); font-size: 11px; }
+[data-iteration="2"] .k2-seg { padding: 2px 9px; border: 1px dashed var(--k-border); border-radius: 999px; cursor: pointer; }
+[data-iteration="2"] .k2-seg[aria-pressed="true"] { border-style: solid; border-color: var(--k-warn); color: var(--k-fg0); }
+[data-iteration="2"] .k2-add { margin-top: 10px; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--k-accent) 55%, transparent); border-radius: 6px; background: rgba(82,193,230,.06); }
+[data-iteration="2"] .k2-add-g { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr) minmax(90px, .6fr) auto auto; gap: 8px; align-items: end; }
+@media (max-width: 760px) { [data-iteration="2"] .k2-add-g { grid-template-columns: 1fr; } }
+[data-iteration="2"] .k2-hint { margin: 6px 0 0; font-size: 12px; color: var(--k-fg2); }
+[data-iteration="2"] .k2-hint.err { color: var(--k-warn); }
+[data-iteration="2"] .k2-modes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
+[data-iteration="2"] .k2-mode { display: inline-flex; align-items: center; user-select: none; min-height: 30px; padding: 0 12px; border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-bg0); color: var(--k-fg1); font-size: 12px; cursor: pointer; }
+[data-iteration="2"] .k2-mode[aria-pressed="true"] { color: var(--k-fg0); border-color: var(--k-accent); background: rgba(82,193,230,.14); }
+[data-iteration="2"] .k2-modes small { color: var(--k-fg2); font-size: 11px; margin-left: 4px; }
+[data-iteration="2"] .k2-body { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 12px; margin-top: 12px; align-items: start; }
+[data-iteration="2"] .k2-body[data-log="unten"] { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 900px) { [data-iteration="2"] .k2-body { grid-template-columns: minmax(0, 1fr); } }
+[data-iteration="2"] .k2-res { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+[data-iteration="2"] .k2-row { border: 1px solid var(--k-border); border-radius: 6px; background: var(--k-bg1); padding: 7px 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+[data-iteration="2"] .k2-nm { font-size: 13px; min-width: 7em; }
+[data-iteration="2"] .k2-tot { color: var(--k-fg2); font-size: 11px; min-width: 7.5em; }
+[data-iteration="2"] .k2-chips { display: flex; flex-wrap: wrap; gap: 5px; flex: 1 1 260px; min-width: 0; }
+[data-iteration="2"] .k2-chip { display: inline-flex; align-items: baseline; gap: 4px; padding: 3px 9px; border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-bg0); font-size: 12px; color: var(--k-fg1); cursor: pointer; user-select: none; white-space: nowrap; }
+[data-iteration="2"] .k2-chip b { color: var(--k-fg0); font-variant-numeric: tabular-nums; }
+[data-iteration="2"] .k2-chip small { color: var(--k-fg2); font-size: 10px; }
+[data-iteration="2"] .k2-chip.on { border-color: var(--k-accent); background: rgba(82,193,230,.16); color: var(--k-fg0); }
+[data-iteration="2"] .k2-chip.more { border-style: dashed; }
+[data-iteration="2"] .k2-desk { border: 1px solid color-mix(in srgb, var(--k-accent) 60%, transparent); border-radius: 6px; background: #0e2a3b; padding: 8px 10px; display: flex; flex-direction: column; gap: 8px; }
+[data-iteration="2"] .k2-desk-h { display: flex; align-items: baseline; gap: 8px; }
+[data-iteration="2"] .k2-desk-h small { color: var(--k-fg2); }
+[data-iteration="2"] .k2-x { margin-left: auto; cursor: pointer; color: var(--k-fg2); padding: 0 6px; font-size: 16px; line-height: 1; }
+[data-iteration="2"] .k2-desk-r { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+[data-iteration="2"] .k2-desk-r > small { color: var(--k-fg2); font-size: 11px; }
+[data-iteration="2"] .k2-lbl { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--k-fg2); min-width: 5.5em; }
+[data-iteration="2"] .k2-step { display: inline-grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--k-border); border-radius: 8px; background: var(--k-bg0); cursor: pointer; user-select: none; font-size: 15px; }
+[data-iteration="2"] .k2-mk input.k2-num { width: 78px; min-height: 30px; text-align: right; }
+[data-iteration="2"] .k2-card { border: 1px solid var(--k-border); border-radius: 6px; background: var(--k-bg1); padding: 9px 11px; display: flex; flex-direction: column; gap: 7px; }
+[data-iteration="2"] .k2-card.best { border-color: color-mix(in srgb, var(--k-accent) 70%, transparent); }
+[data-iteration="2"] .k2-card-h { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+[data-iteration="2"] .k2-card-h b { margin-right: auto; }
+[data-iteration="2"] .k2-tag { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--k-fg2); border: 1px solid var(--k-border); border-radius: 999px; padding: 1px 8px; }
+[data-iteration="2"] .k2-tag.ok { color: var(--k-ok); border-color: rgba(127,209,164,.4); }
+[data-iteration="2"] .k2-tag.warn { color: var(--k-warn); border-color: rgba(240,194,123,.4); }
+[data-iteration="2"] .k2-acts { display: flex; flex-wrap: wrap; gap: 6px; }
+[data-iteration="2"] .k2-empty { color: var(--k-fg2); font-size: 12px; padding: 6px 2px; }
+[data-iteration="2"] .k2-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+[data-iteration="2"] .k2-tbl th, [data-iteration="2"] .k2-tbl td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--k-border); }
+[data-iteration="2"] .k2-tbl th { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--k-fg2); font-weight: 600; }
+[data-iteration="2"] .k2-log { border: 1px solid var(--k-border); border-radius: 6px; background: var(--k-bg1); padding: 9px 11px; }
+[data-iteration="2"] .k2-log h5 { margin: 0; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--k-fg1); }
+[data-iteration="2"] .k2-log .flt { margin: 3px 0 6px; font-size: 11px; color: var(--k-fg2); }
+[data-iteration="2"] .k2-log ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+[data-iteration="2"] .k2-log li { display: grid; grid-template-columns: 16px 58px minmax(0, 1fr) auto; gap: 6px; align-items: baseline; font-size: 12px; padding: 3px 0; border-bottom: 1px solid rgba(82,193,230,.08); }
+[data-iteration="2"] .k2-log li .ico { color: var(--k-fg2); text-align: center; }
+[data-iteration="2"] .k2-log li[data-k="add"] .ico, [data-iteration="2"] .k2-log li[data-k="add"] .d { color: var(--k-ok); }
+[data-iteration="2"] .k2-log li[data-k="out"] .ico, [data-iteration="2"] .k2-log li[data-k="out"] .d { color: var(--k-warn); }
+[data-iteration="2"] .k2-log li .d { font-variant-numeric: tabular-nums; text-align: right; }
+[data-iteration="2"] .k2-log li .m small { display: block; color: var(--k-fg2); font-size: 10px; }
+[data-iteration="2"] .k2-log li .u { font-size: 11px; color: var(--k-accent); cursor: pointer; }
+[data-iteration="2"] .k2-log .k2-more { margin-top: 6px; font-size: 11px; color: var(--k-accent); cursor: pointer; display: inline-block; }
+[data-iteration="2"] .k2-toast { min-height: 1.2em; margin: 8px 0 0; font-size: 12px; color: var(--k-ok); }
+[data-iteration="2"] .k-cap { font-size: .74rem; color: var(--text-tertiary); margin: .4rem 0 0; }
+[data-iteration="2"] .k2-src { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: .6rem; }
+@media (max-width: 760px) { [data-iteration="2"] .k2-src { grid-template-columns: 1fr; } }
+[data-iteration="2"] .k2-src > div { border: 1px solid var(--k-border); border-radius: 6px; background: var(--k-bg1); padding: 8px 10px; font-size: .8rem; color: var(--k-fg1); line-height: 1.45; }
+[data-iteration="2"] .k2-src b { display: block; color: var(--k-fg0); margin-bottom: 2px; }
+</style>
+
+  <div class="iteration-intro">
+    <span class="k-iter">Runde 2</span>
+    <p class="k-pinhint" data-pin><span class="k-dot" aria-hidden="true"></span><span><strong>Notiz an eine Stelle setzen:</strong> <kbd>Strg</kbd> gedrückt halten (Mac: <kbd>⌘</kbd>) und auf die Stelle klicken, die du meinst, auch auf jedes Teil im Entwurf (ein Ort-Chip, das Bedienfeld, eine Zeile im Ladeprotokoll). Am Tablet oder Handy lange drücken. <kbd>Enter</kbd> speichert, <kbd>Esc</kbd> verwirft.</span></p>
+    <h2>Suchen und gleich ändern: Einlagern, Rausnehmen, Ladeprotokoll, Vorschläge und dein Standort</h2>
+    <p>Deine zehn Entscheidungen aus Runde 1 gelten, so wie du sie angenommen hast (Kasten unten). Diese Runde geht auf deine Notiz ein. Jeder Punkt hat einen eigenen Abschnitt mit einem Vorschlag und, wo es eine echte Wahl gibt, einer Frage mit vorgewählter Empfehlung. Ganz unten steht der Entwurf: Dort kannst du suchen, im Treffer direkt einlagern und rausnehmen, das Ladeprotokoll läuft mit, der Ort ergänzt sich beim Tippen, und dein Standort lässt sich simulieren.</p>
+    <div class="k-changes">
+      <h3>Das hast du in Runde 1 festgelegt</h3>
+      <ul class="k-recap">
+        <li data-pin><b>Wo die Suche steht</b>Eigenes Feld über der Liste, die Kopfzeilen-Suche sucht im Lager nicht mehr</li>
+        <li data-pin><b>Was das erste Feld durchsucht</b>Gegenstände und Orte, mit Planet und System</li>
+        <li data-pin><b>Ort</b>Ort, Planet oder System wählbar</li>
+        <li data-pin><b>Menge</b>Eine Zahl: „mindestens so viel“</li>
+        <li data-pin><b>Bereiche</b>Suche überall, „Menge“ nur bei Alles und Inventar</li>
+        <li data-pin><b>Drei Arten</b>Drei Knöpfe, „An einem Ort“ vorgewählt</li>
+        <li data-pin><b>Maß für „nah“</b>Stufen mit Planetenringen, wie in „Planen“</li>
+        <li data-pin><b>Höchstens Orte je Gruppe</b>3</li>
+        <li data-pin><b>Was ein Treffer anbietet</b>„Abholen planen“ legt die Orte als Route an</li>
+        <li data-pin><b>Leiste</b>Titel bleibt immer „Lager“, der Bereich ist nur in der Leiste markiert</li>
+      </ul>
+    </div>
+  </div>
+
+  <section id="k2-now" data-nav-label="Was es schon gibt">
+    <h2>Was es heute schon gibt und was fehlt</h2>
+    <p class="lead">Deine Fragen „wo ist das möglich?“ und „wo wird das geprüft?“ zuerst ehrlich beantwortet. Einiges davon kann das Lager schon, nur nicht an der Stelle, an der du suchst.</p>
+    <table class="k-map">
+      <thead><tr><th>Punkt aus deiner Notiz</th><th>Heute</th><th>Was neu gebaut werden muss</th></tr></thead>
+      <tbody>
+        <tr><td>Einlagern</td><td>Gibt es als „Eintrag von Hand anlegen“ im Lager-Fenster (<code>hq-stock-popup.component.ts</code>, <code>addManual</code> in <code>hq-inventory.service.ts:576</code>). Mit Live-Sync liest die App das Inventar im Spiel per Bilderkennung selbst ein.</td><td>Ein Knopf neben der Suche, der Suchtext, Ort und Menge übernimmt.</td></tr>
+        <tr><td>Menge ändern, Rausnehmen</td><td>Gibt es im Lager-Fenster: −/+ in Schritten, Menge korrigieren, Rausnehmen, Reservieren, Löschen (<code>takeOut</code>, <code>setAmount</code>, <code>deleteRow</code>, ab <code>:479</code>). Reservierte Mengen werden beim Rausnehmen zuletzt angefasst.</td><td>Dasselbe Bedienfeld direkt am Treffer der Suche, damit du nicht erst das Fenster öffnen musst.</td></tr>
+        <tr><td>Mehrere Orte</td><td>Jeder Ort ist eine eigene Zeile. Liegt Eisen an sieben Orten, sind das sieben Zeilen.</td><td>Eine Zeile je Gegenstand, die Orte als kleine Chips nebeneinander.</td></tr>
+        <tr><td>Ladeprotokoll</td><td>Gibt es oben neben den Ladebuchten (<code>hq-stock-log.component.ts</code>): die letzten drei Änderungen, „Alle Änderungen“, „Nachbestellen“. Es zeigt aber nur Abgänge und Reservierungen. Was du einlagerst oder nach oben korrigierst, steht nicht drin, weil die Tabelle <code>hq_inventory_removals</code> nur Abgänge speichert. Im Entwurf von Runde 1 hatte ich es weggelassen.</td><td>Eine Tabelle für alle Bewegungen (neue Migration) und das Protokoll neben der Trefferliste.</td></tr>
+        <tr><td>Vorschläge beim Tippen</td><td>Die Ortsauswahl im Filter hat ein Suchfeld, das die Liste kürzt. Es ergänzt aber nichts und kennt <kbd>Tab</kbd> nicht.</td><td>Ein Ort-Feld, das beim Tippen ergänzt („Stan“ → „Stanton“), mit <kbd>Tab</kbd>, <kbd>Enter</kbd> oder Klick.</td></tr>
+        <tr><td>Eigener Standort</td><td>Die Desktop-App schreibt mit eingeschaltetem Live-Sync (Standard: aus) deinen Ort und ein Lebenszeichen in <code>hq_live_state</code> (Vertrag <code>docs/contracts/hq-live.md</code>, Version 2). „Jetzt“ zeigt den Ort nur als aktuell, wenn das Spiel läuft und das Lebenszeichen höchstens 3 Minuten alt ist. Das Lager nimmt diesen Ort heute nur als Vorschlag beim Anlegen von Hand (<code>lastKnownLocation</code>, <code>hq-inventory.service.ts:225</code>) und prüft das Alter dabei nicht.</td><td>Die 3-Minuten-Prüfung auch im Lager, ein Standort von Hand und die Rechnung „nah ab mir“. Die App selbst muss nichts Neues senden.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="k2-edit" data-nav-label="a · Einlagern &amp; ändern">
+    <h2>a · Im Treffer einlagern, ändern und rausnehmen</h2>
+    <p class="lead">Du hast recht: Mit der Suche aus Runde 1 hättest du nur gefunden, nicht gehandelt. Neu: Ein Klick auf einen Ort-Chip öffnet direkt darunter das Bedienfeld für genau diesen Vorrat. Dort stehen −/+, die Menge zum Korrigieren, „Rausnehmen“ und „Hier einlagern“. Rechts neben der Suche steht ein Knopf „Einlagern“ für etwas Neues. Er übernimmt, was du schon eingetippt hast: „Eisen“, Ort „Lorville“, Menge „30“ wird zu „30 SCU Eisen in Lorville einlagern“. Liegt dort schon Eisen, steht vor dem Abschicken „kommt zu 18 SCU dazu, dann 48 SCU“.</p>
+
+    <div data-decision="e-where" data-label="Wo man im Treffer ändert">
+      <div class="k-dec">
+        <h4>Wo man ändert</h4>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-e-where" value="in-der-zeile" checked>Direkt unter dem Treffer, dasselbe Bedienfeld wie im Lager-Fenster <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-e-where" value="fenster">Klick öffnet das Lager-Fenster an dieser Stelle</label>
+        </div>
+      </div>
+    </div>
+
+    <div data-decision="e-word" data-label="Name des Knopfs zum Einlagern">
+      <div class="k-dec">
+        <h4>Wie der Knopf heißt</h4>
+        <p>Ein Name für eine Sache, überall gleich. Heute heißt es „Eintrag von Hand anlegen“. Der neue Name würde auch dort gelten, das Gegenstück heißt „Rausnehmen“.</p>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-e-word" value="einlagern" checked>„Einlagern“ <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-e-word" value="einfuegen">„Einfügen“</label>
+          <label class="k-pill"><input type="radio" name="dec-e-word" value="hinzufuegen">„Hinzufügen“</label>
+        </div>
+      </div>
+    </div>
+
+    <div data-decision="e-prefill" data-label="Was „Einlagern“ übernimmt">
+      <div class="k-dec">
+        <h4>Was „Einlagern“ vorausfüllt</h4>
+        <p>Ist das Ort-Feld leer oder nur ein Planet oder System, nimmt es deinen Standort (Abschnitt e).</p>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-e-prefill" value="aus-suche" checked>Suchtext, Ort und Menge aus der Suche <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-e-prefill" value="leer">Leeres Formular</label>
+        </div>
+      </div>
+    </div>
+
+    <div data-decision="e-card" data-label="Rausnehmen an einem Mengen-Treffer">
+      <div class="k-dec">
+        <h4>Ein Mengen-Treffer bucht auch ab</h4>
+        <p>Sucht man 30 SCU und die Karte zeigt zwei Orte, kann ein Knopf die 30 SCU gleich von diesen Orten abbuchen, den größten Teil zuerst. Das steht dann im Ladeprotokoll und lässt sich rückgängig machen.</p>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-e-card" value="planen-und-rausnehmen" checked>„Abholen planen“ und „Rausnehmen“ <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-e-card" value="nur-planen">Nur „Abholen planen“ wie in Runde 1</label>
+        </div>
+      </div>
+    </div>
+    <textarea data-comment="r2-edit" placeholder="Notiz zum Einlagern und Ändern …"></textarea>
+  </section>
+
+  <section id="k2-rows" data-nav-label="b · Kurze Zeilen">
+    <h2>b · Mehrere Orte in einer Zeile</h2>
+    <p class="lead">Eine Zeile je Gegenstand: links der Name und die Summe, daneben die Orte als Chips mit der Menge („18 Lorville“). Bis zu vier Chips stehen sichtbar, der Rest hinter „+3 weitere“. Auf dem Handy brechen die Chips in eine zweite Zeile um, sie werden nicht abgeschnitten. Kennt die App deinen Standort, steht der nächste Ort vorn und der Chip sagt, wie weit er weg ist („gleicher Planet“).</p>
+    <div data-decision="r-layout" data-label="Darstellung mehrerer Orte">
+      <div class="k-dec">
+        <h4>Darstellung</h4>
+        <p>Stell es hier um, der Entwurf unten folgt sofort. Ist eine Menge eingetragen, zeigen die Karten der drei Arten ihre Orte ebenfalls als Chips.</p>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-r-layout" value="chips" checked>Eine Zeile je Gegenstand, Orte als Chips <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-r-layout" value="zeile-je-ort">Eine Zeile je Ort, wie heute</label>
+          <label class="k-pill"><input type="radio" name="dec-r-layout" value="tabelle">Tabelle mit Spalten Gegenstand, Ort, Planet, Menge</label>
+        </div>
+      </div>
+    </div>
+    <div data-decision="r-order" data-label="Reihenfolge der Ort-Chips">
+      <div class="k-dec">
+        <h4>Reihenfolge der Chips</h4>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-r-order" value="naehe-sonst-menge" checked>Nächster Ort zuerst, ohne Standort die größte Menge zuerst <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-r-order" value="menge">Immer die größte Menge zuerst</label>
+        </div>
+      </div>
+    </div>
+    <textarea data-comment="r2-rows" placeholder="Notiz zu den Zeilen …"></textarea>
+  </section>
+
+  <section id="k2-log" data-nav-label="c · Ladeprotokoll">
+    <h2>c · Ladeprotokoll</h2>
+    <p class="lead">Das Ladeprotokoll steht neben der Trefferliste und folgt der Suche: Suchst du „Eisen“ in „Stanton“, zeigt es nur, was sich bei Eisen in Stanton getan hat. Jede Zeile hat ein Zeichen, die Änderung, den Gegenstand, den Ort und die Zeit. Die letzten drei stehen offen, „Alle Änderungen“ zeigt den Rest. Deine letzte eigene Änderung lässt sich dort rückgängig machen.</p>
+    <table class="k-map">
+      <thead><tr><th>Zeichen</th><th>Was es aufzeichnet</th><th>Heute im Protokoll?</th></tr></thead>
+      <tbody>
+        <tr><td>+</td><td>Einlagern, von Hand oder mit „+“</td><td>Nein, neu</td></tr>
+        <tr><td>−</td><td>Rausnehmen, „−“, Ausgeben an jemanden, Löschen</td><td>Ja</td></tr>
+        <tr><td>✎</td><td>Menge korrigiert (mit alter und neuer Menge)</td><td>Nur nach unten, nach oben neu</td></tr>
+        <tr><td>⧉</td><td>Reserviert für jemanden oder etwas</td><td>Ja</td></tr>
+        <tr><td>⟳</td><td>Abgleich durch die App: was zwischen zwei Inventar-Aufnahmen eines Ortes dazukam oder fehlt</td><td>Nur was fehlt, Zugänge neu</td></tr>
+      </tbody>
+    </table>
+    <div data-decision="l-scope" data-label="Was das Ladeprotokoll aufzeichnet">
+      <div class="k-dec">
+        <h4>Was es aufzeichnet</h4>
+        <p>„Alles“ braucht eine neue Tabelle für Bewegungen statt nur für Abgänge. In der Alpha ist das eine einfache Migration, die alten Abgänge ziehen mit um.</p>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-l-scope" value="alles" checked>Alles: Zugänge, Abgänge, Korrekturen, Reservierungen, App-Abgleich <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-l-scope" value="wie-heute">Wie heute: nur Abgänge und Reservierungen</label>
+        </div>
+      </div>
+    </div>
+    <div data-decision="l-place" data-label="Wo das Ladeprotokoll steht">
+      <div class="k-dec">
+        <h4>Wo es steht</h4>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-l-place" value="neben" checked>Neben der Trefferliste, folgt der Suche <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-l-place" value="unten">Unter der Trefferliste</label>
+        </div>
+      </div>
+    </div>
+    <div data-decision="l-undo" data-label="Rückgängig im Ladeprotokoll">
+      <div class="k-dec">
+        <h4>Rückgängig</h4>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-l-undo" value="letzte-eigene" checked>Die letzte eigene Änderung lässt sich rückgängig machen <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-l-undo" value="jede-eigene">Jede eigene Änderung der letzten 24 Stunden</label>
+          <label class="k-pill"><input type="radio" name="dec-l-undo" value="keins">Kein Rückgängig</label>
+        </div>
+      </div>
+    </div>
+    <textarea data-comment="r2-log" placeholder="Notiz zum Ladeprotokoll …"></textarea>
+  </section>
+
+  <section id="k2-auto" data-nav-label="d · Vorschläge">
+    <h2>d · Vorschläge beim Tippen</h2>
+    <p class="lead">Tippst du „Stan“ ins Feld Ort, erscheint „ton“ grau hinter dem Text und darunter eine kurze Liste: Stanton (System), dann passende Planeten und Orte. Annehmen mit <kbd>Tab</kbd>, <kbd>Enter</kbd> oder Klick. <kbd>↑</kbd> <kbd>↓</kbd> wählen einen anderen Vorschlag, <kbd>Esc</kbd> schließt die Liste. Was mit dem Getippten anfängt, steht oben, danach was es irgendwo enthält („bab“ findet New Babbage).</p>
+    <div data-decision="a-keys" data-label="Tab übernimmt den Vorschlag">
+      <div class="k-dec">
+        <h4>Was <kbd>Tab</kbd> tut</h4>
+        <p>Ohne sichtbaren Vorschlag springt <kbd>Tab</kbd> wie immer ins nächste Feld, so bleibt die Seite mit der Tastatur bedienbar. Im Entwurf umschaltbar.</p>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-a-keys" value="tab-vorschlag" checked><kbd>Tab</kbd> übernimmt, wenn ein Vorschlag sichtbar ist <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-a-keys" value="nur-enter">Nur <kbd>Enter</kbd> und Klick übernehmen</label>
+        </div>
+      </div>
+    </div>
+    <div data-decision="a-item" data-label="Vorschläge auch für Gegenstände">
+      <div class="k-dec">
+        <h4>Auch im ersten Feld?</h4>
+        <p>Im ersten Feld und im Feld „Einlagern“ kämen die Namen aus dem Lager und dem Codex. Was du nicht hast, steht mit „nicht im Lager“ dabei.</p>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-a-item" value="beide" checked>Ja, auch Gegenstände <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-a-item" value="nur-ort">Nur im Feld Ort</label>
+        </div>
+      </div>
+    </div>
+    <textarea data-comment="r2-auto" placeholder="Notiz zu den Vorschlägen …"></textarea>
+  </section>
+
+  <section id="k2-me" data-nav-label="e · Mein Standort">
+    <h2>e · Dein eigener Standort</h2>
+    <p class="lead">Unter der Suche steht „Mein Standort“. Er kommt aus der Desktop-App, wenn sie gerade ein Lebenszeichen schickt, sonst wählst du ihn von Hand. So ist es geprüft:</p>
+    <div class="k2-src">
+      <div data-pin><b>● Live aus der App</b>Live-Sync ist eingeschaltet, das Spiel läuft, das letzte Lebenszeichen ist höchstens 3 Minuten alt. Dieselbe Regel wie auf „Jetzt“ (<code>hq-app-status.util.ts</code>). Fliegst du weiter, folgt der Standort von selbst.</div>
+      <div data-pin><b>○ Zuletzt gesehen</b>App zu oder Spiel beendet: Der letzte Ort steht grau mit Zeit da („Lorville, vor 2 Std“). Er zählt weiter für „nah“, bis du ihn änderst, denn meist bist du dort ausgeloggt.</div>
+      <div data-pin><b>✎ Von Hand</b>Ein Klick auf den Standort öffnet ein Ort-Feld mit denselben Vorschlägen. Ein Ort von Hand gilt, bis die App wieder live meldet. Er wird nur auf diesem Gerät gemerkt, das braucht keine neue Tabelle.</div>
+    </div>
+    <p class="k-note">Ehrlich zur Grenze: Die App meldet den Ort so, wie das Spiel ihn ins Log schreibt. In Städten und an Stationen ist das genau genug. Mitten im All, im Quantensprung oder an einem Außenposten außerhalb der Ortsliste kennt die Suche nur das System. Dann rechnet „nah“ ab dem System und der Chip sagt „unterwegs in Stanton“. Echte Flugzeiten gibt es weiterhin nicht, „nah“ bleibt die Stufenrechnung aus Runde 1.</p>
+    <h3 class="k-h3">Wie „nah“ deinen Standort nutzt</h3>
+    <p class="lead">„An einem Ort“: Von den Orten, an denen die ganze Menge liegt, steht der nächste oben. „Nah beisammen“: Zur Spanne der Gruppe kommt der Anflug von dir zur nächsten Station der Gruppe. 30 SCU auf Hurston schlagen dann 30 SCU auf microTech, wenn du in Lorville stehst, obwohl beide Gruppen gleich eng beisammen liegen. Ohne Standort bleibt alles wie in Runde 1.</p>
+    <div data-decision="o-src" data-label="Woher der Standort kommt">
+      <div class="k-dec">
+        <h4>Woher der Standort kommt</h4>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-o-src" value="live-sonst-hand" checked>Live aus der App, sonst zuletzt gesehen, jederzeit von Hand änderbar <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-o-src" value="nur-hand">Nur von Hand</label>
+          <label class="k-pill"><input type="radio" name="dec-o-src" value="nur-live">Nur live, ohne Signal kein Standort</label>
+        </div>
+      </div>
+    </div>
+    <div data-decision="o-use" data-label="Wie „nah“ den Standort nutzt">
+      <div class="k-dec">
+        <h4>Wie „nah“ ihn nutzt</h4>
+        <p>Im Entwurf umschaltbar: Stell den Standort auf „Lorville“ und such 30 SCU Eisen „Nah beisammen“.</p>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-o-use" value="anflug-und-spanne" checked>Anflug plus Spanne, der nächste Treffer zuerst <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-o-use" value="nur-gleichstand">Nur bei Gleichstand nach Nähe sortieren</label>
+          <label class="k-pill"><input type="radio" name="dec-o-use" value="gar-nicht">Gar nicht, „nah“ heißt nur „nah beisammen“</label>
+        </div>
+      </div>
+    </div>
+    <textarea data-comment="r2-me" placeholder="Notiz zum Standort …"></textarea>
+  </section>
+
+  <section id="k2-mock" data-nav-label="Entwurf">
+    <h2>Entwurf: Suchen und gleich ändern</h2>
+    <p class="lead">Zum Ausprobieren: Klick auf einen Ort-Chip und nimm etwas raus oder lagere etwas ein, das Ladeprotokoll rechts schreibt mit. Leere das Feld Ort und tipp „Stan“, dann <kbd>Tab</kbd>. Schalte rechts „Im Entwurf simulieren“ um, um zu sehen, wie sich der Standort auf die Reihenfolge auswirkt. Trag bei Menge 30 ein und wechsle zu „Nah beisammen“. Die Daten sind erfunden, nichts wird gespeichert.</p>
+    <div class="k2-mk" id="k2-mk" aria-label="Entwurf der Lagerseite, Runde 2">
+      <div class="k2-head" data-pin>
+        <span class="k2-ti" aria-hidden="true">▦</span>
+        <div class="k2-ttl" data-pin><small>HQ</small><b>Lager</b></div>
+        <div class="k2-tabs" data-pin>
+          <span class="k2-tab" data-pin role="link" tabindex="0" aria-current="page">Alles</span>
+          <span class="k2-tab" data-pin role="link" tabindex="0">Inventar</span>
+          <span class="k2-tab" data-pin role="link" tabindex="0">Hangar</span>
+          <span class="k2-tab" data-pin role="link" tabindex="0">Sammlungen</span>
+        </div>
+      </div>
+      <div class="k2-search" data-pin>
+        <div class="k2-fld" data-pin><span>Gegenstand oder Ort</span>
+          <div class="k2-ac"><input id="k2-q" type="search" autocomplete="off" role="combobox" aria-autocomplete="both" aria-expanded="false" aria-controls="k2-q-l" aria-label="Gegenstand oder Ort" placeholder="z. B. Eisen oder Area18" value="Eisen"><span class="k2-ghost" aria-hidden="true"></span><div class="k2-sug" id="k2-q-l" role="listbox" hidden></div></div></div>
+        <div class="k2-fld" data-pin><span>Ort</span>
+          <div class="k2-ac"><input id="k2-place" type="search" autocomplete="off" role="combobox" aria-autocomplete="both" aria-expanded="false" aria-controls="k2-place-l" aria-label="Ort" placeholder="Ort, Planet oder System" value="Stanton"><span class="k2-ghost" aria-hidden="true"></span><div class="k2-sug" id="k2-place-l" role="listbox" hidden></div></div></div>
+        <div class="k2-fld" data-pin><span>Menge ab (SCU)</span><input id="k2-qty" type="number" min="0" step="1" value="" placeholder="0" aria-label="Menge ab (SCU)"></div>
+        <span class="k2-btn pri" role="button" tabindex="0" data-act="add-open" id="k2-addbtn" data-pin>+ <span class="k2-word">Einlagern</span></span>
+      </div>
+      <div class="k2-add" id="k2-add" hidden data-pin></div>
+      <div class="k2-me" data-pin>
+        <span class="k2-me-l">Mein Standort</span>
+        <span id="k2-loc"></span>
+        <span class="k2-sim" data-pin>Im Entwurf simulieren:
+          <span class="k2-seg" role="button" tabindex="0" data-sim="live" aria-pressed="true">App live</span>
+          <span class="k2-seg" role="button" tabindex="0" data-sim="stale" aria-pressed="false">App aus</span>
+          <span class="k2-seg" role="button" tabindex="0" data-sim="manual" aria-pressed="false">Von Hand</span>
+        </span>
+      </div>
+      <div class="k2-modes" id="k2-modes" data-pin>
+        <span class="k2-mode" role="button" tabindex="0" data-mode="one" aria-pressed="true">An einem Ort</span>
+        <span class="k2-mode" role="button" tabindex="0" data-mode="split" aria-pressed="false">Verteilt</span>
+        <span class="k2-mode" role="button" tabindex="0" data-mode="near" aria-pressed="false">Nah beisammen</span>
+        <small id="k2-sum"></small>
+      </div>
+      <div class="k2-body" id="k2-body" data-log="neben">
+        <div class="k2-res" id="k2-res" aria-live="polite"></div>
+        <div class="k2-log" id="k2-logbox" data-pin></div>
+      </div>
+      <p class="k2-toast" id="k2-toast" aria-live="polite"></p>
+    </div>
+    <p class="k-cap">Der Entwurf zeigt nur die Kopfzeile, die Suche, die Treffer und das Ladeprotokoll. Filterleiste, Ladebuchten und Containerdeck bleiben wie heute. Reservieren und Löschen bleiben im Bedienfeld wie im Lager-Fenster und sind hier weggelassen.</p>
+  </section>
+
+  <section id="k2-notes" data-nav-label="Notizen">
+    <h2>Notizen</h2>
+    <p class="lead">Was noch fehlt oder stört. Bilder bitte in den Feedback-Thread, die Seite kann keine Anhänge annehmen.</p>
+    <p class="lead">Abschicken: Soll noch etwas anders werden, schick „Zur nächsten Runde“. Passt es, klick im Panel rechts auf den Pfeil ▾ neben „Zur nächsten Runde“ und dann auf „Jetzt umsetzen“. Ich baue dann den Bereich „Lager“ mit beiden Runden um: zuerst Suche, Leiste, Zeilen und Vorschläge, dann Ladeprotokoll mit der neuen Tabelle, zuletzt den Standort.</p>
+    <textarea data-comment="r2-notes" placeholder="Deine Anmerkungen …"></textarea>
+  </section>
+
+<script>
+(function () {
+  const it = document.querySelector('[data-iteration="2"]');
+  if (!it) return;
+  const $ = (s) => it.querySelector(s);
+  const dec = (id, def) => (it.querySelector('input[name="dec-' + id + '"]:checked') || {}).value || def;
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const low = (s) => String(s || '').toLowerCase();
+  const RING = { hurston: 0, crusader: 1, arccorp: 2, microtech: 3 };
+  // [body, system]; Pyro stations without a body in this sample (system level only).
+  const PLACES = {
+    'Area18': ['ArcCorp', 'Stanton'], 'Baijini Point': ['ArcCorp', 'Stanton'],
+    'Lorville': ['Hurston', 'Stanton'], 'Everus Harbor': ['Hurston', 'Stanton'],
+    'Orison': ['Crusader', 'Stanton'], 'Seraphim Station': ['Crusader', 'Stanton'], 'Grim HEX': ['Crusader', 'Stanton'],
+    'New Babbage': ['microTech', 'Stanton'], 'Port Tressler': ['microTech', 'Stanton'],
+    'Ruin Station': [null, 'Pyro'], 'Checkmate': [null, 'Pyro'], 'Levski': ['Delamar', 'Nyx'],
+  };
+  const SYSTEMS = ['Stanton', 'Pyro', 'Nyx'];
+  const BODIES = [...new Map(Object.values(PLACES).filter((v) => v[0]).map((v) => [v[0], v[1]])).entries()];
+  const CATALOG = ['Eisen', 'Kupfer', 'Titan', 'Quantanium', 'Aluminium', 'Gold', 'Agricium'];
+  let seq = 0;
+  const S = (item, place, qty) => ({ id: 's' + (++seq), item, place, qty });
+  let STOCK = [
+    S('Eisen', 'Lorville', 18), S('Eisen', 'Everus Harbor', 16), S('Eisen', 'Area18', 12), S('Eisen', 'Baijini Point', 9),
+    S('Eisen', 'New Babbage', 24), S('Eisen', 'Port Tressler', 14), S('Eisen', 'Ruin Station', 45),
+    S('Kupfer', 'Orison', 22), S('Kupfer', 'Seraphim Station', 11), S('Kupfer', 'Area18', 6),
+    S('Titan', 'Grim HEX', 14), S('Titan', 'Lorville', 31), S('Quantanium', 'Checkmate', 8), S('Quantanium', 'Levski', 5),
+  ];
+  let LOG = [
+    { kind: 'out', delta: -6, item: 'Kupfer', place: 'Area18', when: 'gestern' },
+    { kind: 'sync', delta: -4, item: 'Eisen', place: 'Port Tressler', when: 'vor 3 Std' },
+    { kind: 'sync', delta: 24, item: 'Eisen', place: 'New Babbage', when: 'vor 3 Std' },
+    { kind: 'res', delta: 10, item: 'Titan', place: 'Lorville', when: 'vor 5 Std', note: 'für Kai' },
+    { kind: 'add', delta: 9, item: 'Eisen', place: 'Baijini Point', when: 'vor 2 Tagen' },
+    { kind: 'fix', delta: 2, item: 'Eisen', place: 'Lorville', when: 'vor 3 Tagen' },
+  ];
+  const ICON = { add: '+', out: '−', fix: '✎', res: '⧉', sync: '⟳' };
+  const WHY = { add: 'eingelagert', out: 'rausgenommen', fix: 'korrigiert', res: 'reserviert', sync: 'App-Abgleich' };
+
+  const dist = (a, b) => {
+    if (!a || !b) return 1000;
+    if (a === b) return 0;
+    const A = PLACES[a], B = PLACES[b];
+    if (!A || !B || A[1] !== B[1]) return 1000;
+    if (!A[0] || !B[0]) return 20;
+    if (A[0] === B[0]) return 1;
+    return Math.abs((RING[low(A[0])] ?? 3) - (RING[low(B[0])] ?? 3)) * 10 + 5;
+  };
+  const spanWord = (s) => (s === 0 ? 'ein Ort' : s === 1 ? 'ein Planet' : s < 1000 ? 'ein System' : 'mehrere Systeme');
+  const nearWord = (d) => (d === 0 ? 'hier' : d === 1 ? 'gleicher Planet' : d < 1000 ? 'im System' : 'anderes System');
+  const MAX = 3;
+  let mode = 'one', desk = null, deskAmt = null, addOpen = false, logAll = false;
+  const expanded = new Set();
+  const me = { src: 'live', live: 'Area18', last: 'Lorville', manual: '' };
+  const myPlace = () => {
+    const src = dec('o-src', 'live-sonst-hand');
+    if (me.src === 'manual') return PLACES[me.manual] ? me.manual : null;
+    if (src === 'nur-hand') return null;
+    if (me.src === 'live') return me.live;
+    return src === 'nur-live' ? null : me.last;
+  };
+  const near = () => (dec('o-use', 'anflug-und-spanne') === 'gar-nicht' ? null : myPlace());
+  const wordAdd = () => ({ einlagern: 'Einlagern', einfuegen: 'Einfügen', hinzufuegen: 'Hinzufügen' }[dec('e-word', 'einlagern')]);
+
+  // ── Matching ──
+  const KNOWN = new Set([...Object.keys(PLACES), ...BODIES.map((b) => b[0]), ...SYSTEMS].map(low));
+  const levels = (p) => [p, PLACES[p][0], PLACES[p][1]].filter(Boolean);
+  function placeOk(p, v) {
+    const lv = low(v).trim();
+    if (!lv) return true;
+    return KNOWN.has(lv) ? levels(p).some((h) => low(h) === lv) : levels(p).some((h) => low(h).includes(lv));
+  }
+  function textOk(item, p, q) {
+    const words = low(q).split(/\s+/).filter(Boolean);
+    const hay = [item, ...levels(p)].map(low);
+    return words.every((w) => hay.some((h) => h.includes(w)));
+  }
+  const hits = () => STOCK.filter((s) => s.qty > 0 && textOk(s.item, s.place, $('#k2-q').value) && placeOk(s.place, $('#k2-place').value));
+  const sum = (rows) => rows.reduce((t, r) => t + r.qty, 0);
+  const span = (rows) => { let m = 0; rows.forEach((a) => rows.forEach((b) => { m = Math.max(m, dist(a.place, b.place)); })); return m; };
+  const approach = (rows, mp) => Math.min(...rows.map((r) => dist(mp, r.place)));
+
+  // ── Rendering ──
+  const chip = (s) => {
+    const mp = near();
+    return '<span class="k2-chip' + (desk === s.id ? ' on' : '') + '" role="button" tabindex="0" data-stack="' + s.id + '" aria-expanded="' + (desk === s.id) + '"><b>' + s.qty + '</b>' + esc(s.place) +
+      (mp ? ' <small>' + nearWord(dist(mp, s.place)) + '</small>' : '') + '</span>';
+  };
+  const sortChips = (rows) => {
+    const mp = near();
+    const byNear = mp && dec('r-order', 'naehe-sonst-menge') === 'naehe-sonst-menge';
+    return [...rows].sort((a, b) => (byNear ? dist(mp, a.place) - dist(mp, b.place) : 0) || b.qty - a.qty);
+  };
+  function deskHtml(s) {
+    if (!s) return '';
+    const amt = deskAmt ?? Math.max(1, Math.min(s.qty, Number($('#k2-qty').value) || 1));
+    return '<div class="k2-desk" data-pin><div class="k2-desk-h"><b>' + esc(s.item) + '</b> · ' + esc(s.place) + ' <small>' + esc(levels(s.place).slice(1).join(' · ')) + '</small>' +
+      '<span class="k2-x" role="button" tabindex="0" data-act="close" aria-label="Bedienfeld schließen">×</span></div>' +
+      '<div class="k2-desk-r"><span class="k2-lbl">Menge</span><span class="k2-step" role="button" tabindex="0" data-act="minus" aria-label="1 SCU weniger">−</span>' +
+      '<input class="k2-num" data-act="set" type="number" min="0" step="1" value="' + s.qty + '" aria-label="Menge in SCU korrigieren"><span class="k2-step" role="button" tabindex="0" data-act="plus" aria-label="1 SCU mehr">+</span>' +
+      '<small>SCU · eine neue Zahl hier ist eine Korrektur</small></div>' +
+      '<div class="k2-desk-r"><span class="k2-lbl">Bewegen</span><input class="k2-num" id="k2-amt" type="number" min="1" step="1" value="' + amt + '" aria-label="Anzahl SCU">' +
+      '<span class="k2-btn" role="button" tabindex="0" data-act="out">Rausnehmen</span><span class="k2-btn" role="button" tabindex="0" data-act="in">Hier ' + wordAdd().toLowerCase() + '</span></div></div>';
+  }
+  const deskFor = (rows) => { const s = rows.find((r) => r.id === desk); return s ? deskHtml(s) : ''; };
+
+  function listHtml(rows) {
+    const lay = dec('r-layout', 'chips');
+    if (lay === 'tabelle') {
+      const sorted = sortChips(rows);
+      return '<table class="k2-tbl" data-pin><thead><tr><th>Gegenstand</th><th>Ort</th><th>Planet</th><th>Menge</th></tr></thead><tbody>' +
+        sorted.map((s) => '<tr><td>' + esc(s.item) + '</td><td>' + chip(s) + '</td><td>' + esc(PLACES[s.place][0] || PLACES[s.place][1]) + '</td><td>' + s.qty + ' SCU</td></tr>' +
+          (desk === s.id ? '<tr><td colspan="4">' + deskHtml(s) + '</td></tr>' : '')).join('') + '</tbody></table>';
+    }
+    if (lay === 'zeile-je-ort') {
+      return sortChips(rows).map((s) => '<div class="k2-row" data-pin><span class="k2-nm">' + esc(s.item) + '</span><span class="k2-chips">' + chip(s) + '</span></div>' + (desk === s.id ? deskHtml(s) : '')).join('');
+    }
+    const groups = new Map();
+    rows.forEach((r) => { if (!groups.has(r.item)) groups.set(r.item, []); groups.get(r.item).push(r); });
+    return [...groups.entries()].map(([item, g]) => {
+      const sorted = sortChips(g);
+      const open = expanded.has(item) || sorted.length <= 5 || sorted.slice(4).some((s) => s.id === desk);
+      const shown = open ? sorted : sorted.slice(0, 4);
+      const rest = sorted.length - shown.length;
+      return '<div class="k2-row" data-pin><span class="k2-nm"><b>' + esc(item) + '</b></span><span class="k2-tot">' + sum(g) + ' SCU · ' + g.length + (g.length === 1 ? ' Ort' : ' Orte') + '</span>' +
+        '<span class="k2-chips">' + shown.map(chip).join('') +
+        (rest > 0 ? '<span class="k2-chip more" role="button" tabindex="0" data-act="more" data-item="' + esc(item) + '">+' + rest + ' weitere</span>' : '') +
+        (expanded.has(item) && sorted.length > 5 ? '<span class="k2-chip more" role="button" tabindex="0" data-act="less" data-item="' + esc(item) + '">weniger</span>' : '') +
+        '</span></div>' + deskFor(g);
+    }).join('');
+  }
+
+  function card(title, tags, rows, best, want) {
+    const take = dec('e-card', 'planen-und-rausnehmen') === 'planen-und-rausnehmen';
+    return '<div class="k2-card' + (best ? ' best' : '') + '" data-pin><div class="k2-card-h"><b>' + esc(title) + '</b>' +
+      tags.map((t) => '<span class="k2-tag ' + t[1] + '">' + esc(t[0]) + '</span>').join('') + '</div>' +
+      '<div class="k2-chips">' + rows.map(chip).join('') + '</div>' + deskFor(rows) +
+      '<div class="k2-acts"><span class="k2-btn" role="button" tabindex="0" data-act="plan" data-n="' + rows.length + '">Abholen planen</span>' +
+      (take ? '<span class="k2-btn" role="button" tabindex="0" data-act="take" data-ids="' + rows.map((r) => r.id).join(',') + '" data-want="' + want + '">' + want + ' SCU rausnehmen</span>' : '') +
+      '</div></div>';
+  }
+
+  function modesHtml(rows, want) {
+    const mp = near();
+    const use = dec('o-use', 'anflug-und-spanne');
+    const appTag = (g) => (mp ? [['Anflug: ' + nearWord(approach(g, mp)), approach(g, mp) >= 1000 ? 'warn' : '']] : []);
+    if (mode === 'one') {
+      const ok = rows.filter((r) => r.qty >= want).sort((a, b) =>
+        (mp && use === 'anflug-und-spanne' ? dist(mp, a.place) - dist(mp, b.place) : 0) || a.qty - b.qty || (mp ? dist(mp, a.place) - dist(mp, b.place) : 0));
+      if (!ok.length) return '<div class="k2-empty">An keinem Ort liegen ' + want + ' SCU allein. Probier „Verteilt“ oder „Nah beisammen“.</div>';
+      return ok.slice(0, 4).map((r, i) => card(r.place, [[i === 0 ? (mp && use === 'anflug-und-spanne' ? 'am nächsten' : 'passt am knappsten') : 'reicht allein', 'ok'], ...appTag([r])], [r], i === 0, want)).join('');
+    }
+    if (mode === 'split') {
+      const pick = [];
+      for (const r of [...rows].sort((a, b) => b.qty - a.qty)) { if (sum(pick) >= want || pick.length >= MAX) break; pick.push(r); }
+      if (sum(pick) < want) return '<div class="k2-empty">Auch mit ' + MAX + ' Orten kommen nur ' + sum(pick) + ' SCU zusammen.</div>';
+      return card(pick.length === 1 ? pick[0].place : pick.length + ' Orte, ' + sum(pick) + ' SCU', [['Spanne: ' + spanWord(span(pick)), span(pick) >= 1000 ? 'warn' : ''], ...appTag(pick)], pick, true, want);
+    }
+    const groups = [];
+    rows.forEach((a) => {
+      const g = [];
+      for (const r of [...rows].sort((x, y) => dist(a.place, x.place) - dist(a.place, y.place) || y.qty - x.qty)) { if (sum(g) >= want || g.length >= MAX) break; g.push(r); }
+      if (sum(g) >= want && g.every((r) => sum(g) - r.qty < want)) groups.push(g);
+    });
+    const key = (g) => g.map((r) => r.id).sort().join('|');
+    const score = (g) => (mp && use === 'anflug-und-spanne' ? span(g) + approach(g, mp) : span(g));
+    const tie = (g) => (mp && use !== 'gar-nicht' ? approach(g, mp) : 0);
+    const uniq = [...new Map(groups.map((g) => [key(g), g])).values()]
+      .sort((x, y) => score(x) - score(y) || x.length - y.length || tie(x) - tie(y) || sum(y) - sum(x)).slice(0, 3);
+    if (!uniq.length) return '<div class="k2-empty">Keine Gruppe aus höchstens ' + MAX + ' Orten reicht für ' + want + ' SCU.</div>';
+    return uniq.map((g, i) => card(g.length === 1 ? g[0].place : g.length + ' Orte, ' + sum(g) + ' SCU',
+      [['Spanne: ' + spanWord(span(g)), span(g) >= 1000 ? 'warn' : 'ok'], ...appTag(g)], g, i === 0, want)).join('');
+  }
+
+  function logHtml() {
+    const q = $('#k2-q').value, pl = $('#k2-place').value;
+    const all = dec('l-scope', 'alles') === 'alles';
+    const undo = dec('l-undo', 'letzte-eigene');
+    const lines = LOG.filter((l) => (all || l.kind === 'out' || l.kind === 'res' || (l.kind === 'sync' && l.delta < 0)) && PLACES[l.place] && textOk(l.item, l.place, q) && placeOk(l.place, pl));
+    const firstMine = LOG.findIndex((l) => l.undo);
+    const shown = logAll ? lines : lines.slice(0, 3);
+    const flt = [q.trim(), pl.trim()].filter(Boolean).join(' · ');
+    return '<h5>Ladeprotokoll</h5><p class="flt">' + (flt ? 'folgt der Suche: ' + esc(flt) : 'alle Orte') + ' · ' + lines.length + '</p>' +
+      (shown.length ? '<ul>' + shown.map((l) => {
+        const i = LOG.indexOf(l);
+        const canUndo = l.undo && (!l.batch || LOG.findIndex((x) => x.batch === l.batch) === i) && (undo === 'jede-eigene' || (undo === 'letzte-eigene' && i === firstMine));
+        const d = l.kind === 'add' || l.kind === 'out' || l.kind === 'res' ? Math.abs(l.delta) : (l.delta > 0 ? '+' : '−') + Math.abs(l.delta);
+        return '<li data-k="' + (l.kind === 'sync' ? (l.delta > 0 ? 'add' : 'out') : l.kind) + '"><span class="ico" aria-hidden="true">' + ICON[l.kind] + '</span><b class="d">' + d + ' SCU</b>' +
+          '<span class="m">' + esc(l.item) + ' · ' + esc(l.place) + '<small>' + WHY[l.kind] + (l.note ? ' ' + esc(l.note) : '') + (l.from != null ? ' (' + l.from + ' → ' + l.to + ')' : '') + ' · ' + esc(l.when) + '</small></span>' +
+          (canUndo ? '<span class="u" role="button" tabindex="0" data-act="undo" data-i="' + LOG.indexOf(l) + '">Rückgängig</span>' : '<span></span>') + '</li>';
+      }).join('') + '</ul>' : '<p class="flt">Noch keine Änderung.</p>') +
+      (lines.length > 3 ? '<span class="k2-more" role="button" tabindex="0" data-act="logall">' + (logAll ? 'Weniger' : 'Alle ' + lines.length + ' Änderungen') + '</span>' : '');
+  }
+
+  function render() {
+    const want = Math.max(0, Number($('#k2-qty').value) || 0);
+    const rows = hits();
+    if (desk && !rows.some((r) => r.id === desk)) desk = null;
+    $('#k2-sum').textContent = rows.length ? rows.length + ' Treffer · zusammen ' + sum(rows) + ' SCU' : '';
+    $('#k2-modes').querySelectorAll('.k2-mode').forEach((b) => { b.style.display = want ? '' : 'none'; });
+    $('#k2-res').innerHTML = !rows.length ? '<div class="k2-empty">Nichts gefunden. Ort oder Suchtext lockern, oder etwas einlagern.</div>' : want ? modesHtml(rows, want) : listHtml(rows);
+    $('#k2-body').dataset.log = dec('l-place', 'neben');
+    $('#k2-logbox').innerHTML = logHtml();
+    it.querySelectorAll('.k2-word').forEach((w) => { w.textContent = wordAdd(); });
+  }
+
+  // ── Own location ──
+  function renderLoc() {
+    const box = $('#k2-loc');
+    it.querySelectorAll('.k2-seg').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.sim === me.src)));
+    const src = dec('o-src', 'live-sonst-hand');
+    if (me.src === 'manual' || src === 'nur-hand') {
+      box.innerHTML = '<span class="k2-loc" data-pin><span aria-hidden="true">✎</span>' + acHtml('k2-mine', 'Mein Standort von Hand', 'Ort wählen …', me.manual) + '<small>von Hand, gilt bis die App wieder live meldet</small></span>';
+      makeAuto($('#k2-mine'), placeOnly);
+      $('#k2-mine').addEventListener('input', (e) => { me.manual = e.target.value; render(); });
+      return;
+    }
+    if (me.src === 'live') {
+      box.innerHTML = '<span class="k2-loc" data-pin><span class="dot" aria-hidden="true"></span><b>' + me.live + '</b><small>live aus der App · ArcCorp · vor 1 Min</small></span>';
+      return;
+    }
+    box.innerHTML = src === 'nur-live'
+      ? '<span class="k2-loc stale" data-pin><span class="dot" aria-hidden="true"></span><small>kein Signal, kein Standort</small></span>'
+      : '<span class="k2-loc stale" data-pin><span class="dot" aria-hidden="true"></span><b>' + me.last + '</b><small>zuletzt gesehen vor 2 Std · App aus</small></span>';
+  }
+
+  // ── Autocomplete (combobox): ghost completion + list; Tab / Enter / click accept, arrows move, Escape closes ──
+  const acHtml = (id, label, ph, val) => '<span class="k2-ac"><input id="' + id + '" type="search" autocomplete="off" role="combobox" aria-autocomplete="both" aria-expanded="false" aria-controls="' + id + '-l" aria-label="' + esc(label) + '" placeholder="' + esc(ph) + '" value="' + esc(val) + '"><span class="k2-ghost" aria-hidden="true"></span><span class="k2-sug" id="' + id + '-l" role="listbox" hidden></span></span>';
+  const placeAll = () => [
+    ...SYSTEMS.map((n) => ({ name: n, kind: 'System', rank: 0 })),
+    ...BODIES.map(([b, s]) => ({ name: b, kind: 'Planet · ' + s, rank: 1 })),
+    ...Object.keys(PLACES).map((p) => ({ name: p, kind: 'Ort · ' + (PLACES[p][0] || PLACES[p][1]), rank: 2 })),
+  ];
+  const placeOnly = () => placeAll().filter((o) => o.rank === 2);
+  const itemsAll = () => (dec('a-item', 'beide') === 'nur-ort' ? [] : CATALOG.map((n) => {
+    const q = sum(STOCK.filter((s) => s.item === n));
+    return { name: n, kind: q ? 'im Lager · ' + q + ' SCU' : 'nicht im Lager', rank: q ? 0 : 1 };
+  }));
+  const itemsOrPlaces = () => [...itemsAll(), ...(dec('a-item', 'beide') === 'nur-ort' ? [] : placeAll().map((o) => ({ ...o, rank: o.rank + 2 })))];
+  function hl(name, v) {
+    const i = low(name).indexOf(low(v));
+    return i < 0 ? esc(name) : esc(name.slice(0, i)) + '<b>' + esc(name.slice(i, i + v.length)) + '</b>' + esc(name.slice(i + v.length));
+  }
+  function makeAuto(inp, source) {
+    const box = inp.parentElement, ghost = box.querySelector('.k2-ghost'), list = box.querySelector('.k2-sug');
+    let opts = [], act = -1, skip = false;
+    const close = () => { list.hidden = true; inp.setAttribute('aria-expanded', 'false'); inp.removeAttribute('aria-activedescendant'); ghost.innerHTML = ''; opts = []; act = -1; };
+    const paint = () => {
+      list.innerHTML = opts.map((o, i) => '<span class="k2-opt" style="display:flex" role="option" id="' + list.id + '-' + i + '" aria-selected="' + (i === act) + '" data-i="' + i + '"><span>' + hl(o.name, inp.value.trim()) + '</span><small>' + esc(o.kind) + '</small></span>').join('');
+      if (act >= 0) inp.setAttribute('aria-activedescendant', list.id + '-' + act);
+      const o = opts[act], v = inp.value;
+      const tabOn = dec('a-keys', 'tab-vorschlag') === 'tab-vorschlag';
+      ghost.innerHTML = o && v && low(o.name).startsWith(low(v)) ? '<span class="k2-gh-t">' + esc(v) + '</span>' + esc(o.name.slice(v.length)) + '<kbd>' + (tabOn ? 'Tab' : 'Enter') + '</kbd>' : '';
+    };
+    const update = () => {
+      const v = low(inp.value).trim();
+      if (!v) { close(); return; }
+      opts = source().filter((o) => low(o.name).includes(v) && low(o.name) !== v)
+        .sort((a, b) => (Number(low(b.name).startsWith(v)) - Number(low(a.name).startsWith(v))) || a.rank - b.rank || a.name.localeCompare(b.name)).slice(0, 6);
+      if (!opts.length) { close(); return; }
+      act = 0; list.hidden = false; inp.setAttribute('aria-expanded', 'true'); paint();
+    };
+    const accept = (i) => { const o = opts[i]; if (!o) return; inp.value = o.name; close(); skip = true; inp.dispatchEvent(new Event('input', { bubbles: true })); };
+    inp.addEventListener('input', () => { if (skip) { skip = false; return; } update(); });
+    inp.addEventListener('keydown', (e) => {
+      const open = !list.hidden && opts.length;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!open) { update(); return; }
+        act = (act + (e.key === 'ArrowDown' ? 1 : opts.length - 1)) % opts.length; paint();
+      } else if (e.key === 'Enter' && open && act >= 0) { e.preventDefault(); accept(act); }
+      else if (e.key === 'Tab' && !e.shiftKey && open && act >= 0 && dec('a-keys', 'tab-vorschlag') === 'tab-vorschlag') { e.preventDefault(); accept(act); }
+      else if (e.key === 'Escape' && open) { e.preventDefault(); e.stopPropagation(); close(); }
+    });
+    inp.addEventListener('blur', () => setTimeout(close, 120));
+    list.addEventListener('mousedown', (e) => e.preventDefault());
+    list.addEventListener('click', (e) => { if (e.ctrlKey || e.metaKey) return; const o = e.target.closest('.k2-opt'); if (o) accept(Number(o.dataset.i)); });
+    list.addEventListener('mousemove', (e) => { const o = e.target.closest('.k2-opt'); if (o && Number(o.dataset.i) !== act) { act = Number(o.dataset.i); paint(); } });
+  }
+
+  // ── Changes + log ──
+  const toast = (t) => { $('#k2-toast').textContent = t; };
+  const byId = (id) => STOCK.find((s) => s.id === id);
+  function record(kind, s, delta, prev, created, extra) {
+    LOG.unshift(Object.assign({ kind, delta, item: s.item, place: s.place, when: 'gerade eben', undo: () => {
+      if (created) STOCK = STOCK.filter((x) => x !== s);
+      else { s.qty = prev; if (!STOCK.includes(s)) STOCK.push(s); }
+    } }, extra || {}));
+  }
+  function change(s, next, kind) {
+    const prev = s.qty;
+    next = Math.max(0, Math.round(next));
+    if (next === prev) return;
+    s.qty = next;
+    if (!next) { STOCK = STOCK.filter((x) => x !== s); desk = null; }
+    record(kind, s, next - prev, prev, false, kind === 'fix' ? { from: prev, to: next } : null);
+  }
+  function addForm() {
+    const box = $('#k2-add');
+    box.hidden = !addOpen;
+    if (!addOpen) { box.innerHTML = ''; return; }
+    const pre = dec('e-prefill', 'aus-suche') === 'aus-suche';
+    const pv = $('#k2-place').value.trim();
+    const place = pre ? (PLACES[Object.keys(PLACES).find((p) => low(p) === low(pv))] ? Object.keys(PLACES).find((p) => low(p) === low(pv)) : (myPlace() || '')) : '';
+    const item = pre ? $('#k2-q').value.trim() : '';
+    const qty = pre ? (Number($('#k2-qty').value) || 1) : '';
+    box.innerHTML = '<div class="k2-add-g"><div class="k2-fld"><span>Gegenstand</span>' + acHtml('k2-a-item', 'Gegenstand', 'z. B. Eisen', item) + '</div>' +
+      '<div class="k2-fld"><span>Ort</span>' + acHtml('k2-a-place', 'Ort zum ' + wordAdd(), 'Ort wählen …', place) + '</div>' +
+      '<div class="k2-fld"><span>Menge (SCU)</span><input id="k2-a-qty" type="number" min="1" step="1" value="' + qty + '" aria-label="Menge in SCU"></div>' +
+      '<span class="k2-btn pri" role="button" tabindex="0" data-act="add-ok">' + wordAdd() + '</span><span class="k2-btn" role="button" tabindex="0" data-act="add-cancel">Abbrechen</span></div>' +
+      '<p class="k2-hint" id="k2-a-hint"></p>';
+    makeAuto($('#k2-a-item'), itemsAll);
+    makeAuto($('#k2-a-place'), placeOnly);
+    ['#k2-a-item', '#k2-a-place', '#k2-a-qty'].forEach((s) => $(s).addEventListener('input', addHint));
+    addHint();
+    $('#k2-a-' + (item ? (place ? 'qty' : 'place') : 'item')).focus();
+  }
+  function addTarget() {
+    const item = $('#k2-a-item').value.trim(), pv = $('#k2-a-place').value.trim(), qty = Math.round(Number($('#k2-a-qty').value) || 0);
+    const place = Object.keys(PLACES).find((p) => low(p) === low(pv));
+    const hit = STOCK.find((s) => low(s.item) === low(item) && s.place === place);
+    return { item, place, qty, hit };
+  }
+  function addHint() {
+    const t = addTarget(), h = $('#k2-a-hint');
+    h.className = 'k2-hint';
+    if (!t.item) h.textContent = 'Was möchtest du ' + wordAdd().toLowerCase() + '?';
+    else if (!t.place) h.textContent = 'Wähl einen Ort aus der Liste.';
+    else if (t.qty <= 0) h.textContent = 'Wie viel?';
+    else h.textContent = t.hit ? 'Kommt zu ' + t.hit.qty + ' SCU dazu, dann ' + (t.hit.qty + t.qty) + ' SCU ' + t.hit.item + ' in ' + t.place + '.' : 'Neu: ' + t.qty + ' SCU ' + t.item + ' in ' + t.place + '.';
+  }
+  function addSubmit() {
+    const t = addTarget();
+    if (!t.item || !t.place || t.qty <= 0) { addHint(); $('#k2-a-hint').className = 'k2-hint err'; return; }
+    if (t.hit) change(t.hit, t.hit.qty + t.qty, 'add');
+    else {
+      const name = CATALOG.find((c) => low(c) === low(t.item)) || t.item;
+      const s = S(name, t.place, t.qty); STOCK.push(s); record('add', s, t.qty, 0, true);
+    }
+    addOpen = false; addForm();
+    toast(t.qty + ' SCU ' + t.item + ' in ' + t.place + ' ' + ({ Einlagern: 'eingelagert', 'Einfügen': 'eingefügt', 'Hinzufügen': 'hinzugefügt' }[wordAdd()]) + '.');
+    render();
+    $('#k2-addbtn').focus();
+  }
+
+  // ── Wiring ──
+  makeAuto($('#k2-q'), itemsOrPlaces);
+  makeAuto($('#k2-place'), placeAll);
+  ['#k2-q', '#k2-place', '#k2-qty'].forEach((s) => $(s).addEventListener('input', () => { deskAmt = null; render(); }));
+  it.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"], [role="link"]')) { e.preventDefault(); e.target.click(); }
+    if (e.key === 'Enter' && e.target.id && e.target.id.startsWith('k2-a-') && !e.defaultPrevented) { e.preventDefault(); addSubmit(); }
+    if (e.key === 'Escape' && addOpen && e.target.closest('#k2-add') && !e.defaultPrevented) { addOpen = false; addForm(); $('#k2-addbtn').focus(); }
+  });
+  it.addEventListener('input', (e) => { if (e.target.id === 'k2-amt') deskAmt = Math.max(1, Math.round(Number(e.target.value) || 1)); });
+  it.addEventListener('change', (e) => {
+    if (e.target.matches('.k2-num[data-act="set"]') && desk) { const s = byId(desk); if (s) { change(s, Number(e.target.value) || 0, 'fix'); render(); } return; }
+    if (e.target.name && e.target.name.startsWith('dec-')) { if (/^dec-o-/.test(e.target.name)) renderLoc(); if (addOpen && /^dec-e-/.test(e.target.name)) addForm(); render(); }
+  });
+  it.addEventListener('click', (e) => {
+    if (e.ctrlKey || e.metaKey) return;
+    const tab = e.target.closest('.k2-tab');
+    if (tab) { it.querySelectorAll('.k2-tab').forEach((t) => t.setAttribute('aria-current', t === tab ? 'page' : 'false')); return; }
+    const m = e.target.closest('.k2-mode');
+    if (m) { mode = m.dataset.mode; it.querySelectorAll('.k2-mode').forEach((b) => b.setAttribute('aria-pressed', String(b === m))); render(); return; }
+    const sim = e.target.closest('[data-sim]');
+    if (sim) { me.src = sim.dataset.sim; renderLoc(); render(); if (me.src === 'manual' && $('#k2-mine')) $('#k2-mine').focus(); return; }
+    const c = e.target.closest('[data-stack]');
+    if (c) { desk = desk === c.dataset.stack ? null : c.dataset.stack; deskAmt = null; render(); const f = it.querySelector('.k2-desk .k2-num'); if (desk && f) f.focus(); return; }
+    const a = e.target.closest('[data-act]');
+    if (!a || a.tagName === 'INPUT') return;
+    const s = desk ? byId(desk) : null;
+    const amt = () => Math.max(1, Math.round(Number(($('#k2-amt') || {}).value) || 1));
+    switch (a.dataset.act) {
+      case 'close': desk = null; break;
+      case 'minus': if (s) change(s, s.qty - 1, 'out'); break;
+      case 'plus': if (s) change(s, s.qty + 1, 'add'); break;
+      case 'out': if (s) { const n = Math.min(amt(), s.qty); change(s, s.qty - n, 'out'); toast(n + ' SCU ' + s.item + ' aus ' + s.place + ' rausgenommen.'); } break;
+      case 'in': if (s) { const n = amt(); change(s, s.qty + n, 'add'); toast(n + ' SCU ' + s.item + ' in ' + s.place + ' dazu.'); } break;
+      case 'more': expanded.add(a.dataset.item); break;
+      case 'less': expanded.delete(a.dataset.item); break;
+      case 'plan': toast('Entwurf: Route mit ' + a.dataset.n + (a.dataset.n === '1' ? ' Ort' : ' Orten') + ' in „Planen“ angelegt.'); return;
+      case 'take': {
+        let left = Number(a.dataset.want);
+        const legs = a.dataset.ids.split(',').map(byId).filter(Boolean).sort((x, y) => y.qty - x.qty);
+        const before = LOG.length, batch = {};
+        for (const l of legs) { if (left <= 0) break; const n = Math.min(left, l.qty); change(l, l.qty - n, 'out'); left -= n; }
+        LOG.slice(0, LOG.length - before).forEach((x) => { x.batch = batch; });
+        toast(a.dataset.want + ' SCU von ' + legs.length + (legs.length === 1 ? ' Ort' : ' Orten') + ' abgebucht, steht im Ladeprotokoll.');
+        break;
+      }
+      case 'logall': logAll = !logAll; break;
+      case 'undo': {
+        const l = LOG[Number(a.dataset.i)];
+        if (!l || !l.undo) break;
+        const set = l.batch ? LOG.filter((x) => x.batch === l.batch) : [l];
+        set.forEach((x) => x.undo());
+        LOG = LOG.filter((x) => !set.includes(x));
+        toast('Rückgängig gemacht: ' + WHY[l.kind] + ', ' + set.map((x) => x.item + ' in ' + x.place).join(', ') + '.');
+        break;
+      }
+      case 'add-open': addOpen = !addOpen; addForm(); return;
+      case 'add-ok': addSubmit(); return;
+      case 'add-cancel': addOpen = false; addForm(); $('#k2-addbtn').focus(); return;
+      default: return;
+    }
+    render();
+  });
+  renderLoc();
+  render();
 })();
 </script>
 </section>

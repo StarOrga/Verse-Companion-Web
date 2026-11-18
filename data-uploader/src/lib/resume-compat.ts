@@ -96,3 +96,20 @@ export function applyReset(
   if (stages.includes('skins')) next.skins = { status: 'pending', doneShips: [] };
   return next;
 }
+
+/**
+ * A leftover job whose catalog part the server already holds for the same
+ * build — e.g. a full re-run started only because the 3D hulls were open
+ * (17.11.: Metadaten 15/17 into a fresh staging build). Resuming it would
+ * re-send the whole catalogue for nothing; the caller drops it and lets the
+ * auto-run continue only what is open. Only a ledger actually read counts.
+ */
+export function catalogAlreadyLanded(
+  job: Pick<UploadJobState, 'nat' | 'catalog'>,
+  plan: { reason: string; pending: readonly SubthemeKey[] } | null,
+): boolean {
+  if (!plan || plan.reason !== 'ledger') return false;
+  if (job.catalog.status === 'done') return false;
+  if (!String(job.nat.buildNumber ?? '').trim()) return false;
+  return !plan.pending.some((k) => (CATALOG_SUBTHEMES as readonly SubthemeKey[]).includes(k));
+}

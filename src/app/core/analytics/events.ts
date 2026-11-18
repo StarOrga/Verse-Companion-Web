@@ -24,7 +24,7 @@ export type EventArea = (typeof EVENT_AREAS)[number];
 /** The fixed present-tense verb list; an event name's last word(s) must be one of these. */
 export const EVENT_VERBS = [
   'view', 'open', 'close', 'create', 'add', 'remove', 'update', 'change', 'submit', 'send', 'start', 'finish', 'fail',
-  'share', 'search', 'select', 'toggle', 'import', 'export', 'earn', 'request', 'sign_in', 'sign_out', 'show', 'accept',
+  'share', 'search', 'select', 'toggle', 'import', 'export', 'earn', 'request', 'sign_in', 'sign_out', 'show', 'accept', 'deselect',
   'assign', 'release',
 ] as const;
 export type EventVerb = (typeof EVENT_VERBS)[number];
@@ -63,8 +63,14 @@ export const EVENTS = {
   'codex:section_view': ev<{ section: 'fps' | 'keybinds' | 'upcoming' | 'upcoming_entry' }>('codex', 'Ein Codex-Abschnitt abseits der Detailseiten wurde geöffnet.'),
   'codex:compare_start': ev<{ kind: string; count: number }>('codex', 'Der Vergleich wurde möglich: das zweite Objekt liegt im Vergleichsfach.'),
   'codex:holotable_open': ev<{ kind: string }>('codex', 'Der Holotisch einer Detailseite wurde bewusst eingeschaltet.'),
+  'codex:part_select': ev<{ source: 'model' | 'list' | 'keyboard' }>('codex', 'Ein Bauteil wurde auf dem Holotisch gewählt (Quelle: Klick aufs 3D-Modell, Liste im Seitenpanel oder Tastatur).'),
+  'codex:part_deselect': ev<{ via: 'empty' | 'again' | 'panel' | 'escape' }>('codex', 'Die Bauteil-Auswahl auf dem Holotisch wurde aufgehoben (Klick ins Leere, zweiter Klick aufs Bauteil, Zurück im Seitenpanel oder Escape).'),
   'codex:buy_open': ev<{ kind: string; tab_remembered: boolean }>('codex', 'Der Reiter Kaufen der Holotisch-Akte wurde geöffnet (Art; ob er die gemerkte Wahl war).'),
   'codex:wish_add': ev<{ kind: string; source: 'shop' | 'wikelo' }>('codex', 'Ein Eintrag wurde aus dem Reiter Kaufen auf die Wunschliste gesetzt (Quelle: Laden oder Wikelo-Tausch).'),
+  'codex:deck_select': ev<{ ship: string; deck: string; view: '2d' | '3d' }>('codex', 'Im Holotisch wurde im Deck-Filter ein Deck gewählt (Schiff, Deck-Schlüssel oder hull/all, Ansicht 2D oder 3D).'),
+  'codex:interior_filter_toggle': ev<{ group: string; on: boolean }>('codex', 'Im Holotisch wurde eine Innen-Elementgruppe (Fracht, Wege, Medizin …) ein- oder ausgeschaltet.'),
+  'codex:interior_element_select': ev<{ ship: string; kind: string; deck: string }>('codex', 'Im Holotisch wurde ein Innen-Element gewählt (Schiff, Art des Elements, Deck).'),
+  'codex:parts_search': ev<{ scope: 'outer' | 'inner' | 'both'; hits: number }>('codex', 'Die Bauteile-Suche des Holotischs lieferte ein Ergebnis (Außen-, Innen- oder beide Treffer, Anzahl; nie der Suchtext).'),
   'codex:filter_change': ev<{ kind: string; filter_count: number }>('codex', 'Im Codex-Index wurden Filter angewendet (Art, Anzahl aktiver Filter, nie die Werte).'),
   'codex:ship_link_create': ev<{ shipSlug: string }>('codex', 'Ein Codex-Schiff wurde mit einem Hangar-Schiff verknüpft.'),
   'codex:ship_link_remove': ev<{ shipSlug: string }>('codex', 'Die Verknüpfung eines Codex-Schiffs wurde gelöst.'),
@@ -97,7 +103,7 @@ export const EVENTS = {
 
   // --- search ------------------------------------------------------------
   'search:palette_open': ev<{ surface: 'palette' | 'codex_bar' }>('search', 'Die Suche wurde geöffnet (Palette oder Codex-Leiste).'),
-  'search:result_open': ev<{ area: string; rank: number; new_tab: boolean }>('search', 'Ein Suchtreffer wurde geöffnet (Bereich, Rang in der Liste; nie der Suchtext).'),
+  'search:result_open': ev<{ area: string; rank: number; new_tab: boolean; current: boolean; variant: boolean }>('search', 'Ein Suchtreffer wurde geöffnet (Bereich, Rang in der Liste; nie der Suchtext). current: die ausgegraute Zeile „Du bist hier“ (schließt nur die Suche); variant: ein Minilink einer Schiffszeile (ein anderes Modell der Familie wie Valiant/Pirate oder eine eigene Variante „Meine …“); area ist dann ship.'),
   'search:miss_show': ev<{ area: string; term: string }>('search', 'Eine Suche blieb ohne Treffer: Bereich und Suchtext (getrimmt, klein, max. 80 Zeichen; einmal je Begriff und Sitzung) — die einzige Stelle, an der ein Suchtext gesendet wird.'),
 
   // --- settings ----------------------------------------------------------

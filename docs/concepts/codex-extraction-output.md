@@ -269,6 +269,30 @@ interface Ship extends BaseEntity {
 }
 ```
 
+#### `interior` and `decks[].rooms[].poweredBy` (concept 20261117-1810, ships subtheme revision 17)
+
+Optional, absent on builds before revision 17 and on vehicles without interior object containers.
+Types: `ShipInterior` in `src/app/codex/codex.types.ts`; logic: `sc_extract/ship_interior.py`
+(`CodexExtractor._build_interior`). Positions are metres in the hull model frame, rounded to 0.1.
+
+- `pois[]` `{cat, pos, deck, room?, cls?, port?, door?, connects?}` - interior entities of the socpak object
+  containers plus the default loadout's components. Doors are real doors only (`door_navlink`,
+  `Door_Ship_Sensor_Proximity*` and `Door_Ship_Switch` are dropped); `door = {kind, breachable, panel}` with the
+  kind from the entity class (room / inner / lift / hangar / bow / airlock / ramp / cell) and `panel` the
+  nearest `DoorControl` panel within 3 m (a brig cell panel there makes it a `cell`). Panels are no POIs.
+- `cargoGrids[]` `{port, cls, dims, pos, scu, deck, room?}` from the `*_CargoGrid*` loadout items;
+  SCU = floor(x/1.25)*floor(y/1.25)*floor(z/1.25). `cargoGaps[]` lists grid ports without item class /
+  dimensions / position (`noClass` / `noDims` / `noPos`) and the uploader log warns with located vs total SCU.
+- `lifts[]` `{at, stops, decks}` - `TransitDestination` / `TransitGateway` clustered per shaft (x/y within 5 m,
+  one stop per height, destination height wins).
+- Decks: a hull with derived levels (Idris) merges them: a level is a deck when a lift stops at it or it holds
+  >= 350 m2 of real room floor, lower levels that only hold landings join the deck above (unless they share
+  the area name with the deck below within 3.2 m). Rooms of the catch-all deck of an authored hull move to
+  the deck whose floor they stand on (Starlancer MAX). Derived deck names come from the dominant area word
+  of the real rooms (`Argo Bay`, `Hangar`, `Main Deck`, `Turrets`, `Bridge`; a repeat is `Upper ...`).
+- `rooms[].poweredBy`: `objectContainers[].resourceNetworkItemportName` of the room's container. The relay ->
+  single component edge is empty in the item records and not modelled.
+
 ### weapons/&lt;className&gt;.json
 ```ts
 interface Weapon extends BaseEntity {

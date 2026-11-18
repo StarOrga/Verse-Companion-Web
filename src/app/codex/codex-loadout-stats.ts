@@ -187,7 +187,7 @@ export function computeKpiSheet(
   let shieldCount = 0;
 
   for (const o of occupants) {
-    if ((o.section === 'weapons' || o.section === 'remoteTurrets') && entityKindOf(o) === 'weapon') {
+    if ((o.section === 'weapons' || o.section === 'remoteTurrets' || o.section === 'mannedTurrets') && entityKindOf(o) === 'weapon') {
       const alpha = alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);
       if (alpha !== null) {
         gunCount += o.count;
@@ -466,7 +466,7 @@ export function buildOffensivePanel(occupants: readonly SummaryOccupant[]): Offe
   const speeds: number[] = [];
 
   for (const o of occupants) {
-    if (o.section !== 'weapons' && o.section !== 'remoteTurrets') continue;
+    if (o.section !== 'weapons' && o.section !== 'remoteTurrets' && o.section !== 'mannedTurrets') continue;
     if (entityKindOf(o) !== 'weapon') continue;
     const p = o.payload as { className?: string; size?: number | null; weaponParams?: Record<string, unknown> } | null;
     const alpha = alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);

@@ -16,6 +16,7 @@ import { CodexRecipeCardComponent } from './codex-recipe-card.component';
 import { CodexSpecSheetComponent } from './codex-spec-sheet.component';
 import { NgTemplateOutlet } from '@angular/common';
 import type { CodexDetailComponent } from '../codex-detail.component';
+import { DeferErrorComponent } from '../../shared/defer-error/defer-error.component';
 
 /**
  * What the frozen Klassisch page may read from the page component. Anything not listed here cannot
@@ -38,7 +39,7 @@ export type CodexClassicCtx = Pick<
 @Component({
   selector: 'sc-codex-detail-classic',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, CompareIconComponent, AssetPackageViewerComponent, FallbackImageComponent, CodexCategoryIconComponent, ClassChipComponent, ScTooltipDirective, CodexVariantPickerComponent, AddToSetComponent, CodexRankCardComponent, FeedbackSpotDirective, CodexPortListComponent, CodexRecipeCardComponent, CodexSpecSheetComponent, NgTemplateOutlet],
+  imports: [DeferErrorComponent, TranslatePipe, RouterLink, CompareIconComponent, AssetPackageViewerComponent, FallbackImageComponent, CodexCategoryIconComponent, ClassChipComponent, ScTooltipDirective, CodexVariantPickerComponent, AddToSetComponent, CodexRankCardComponent, FeedbackSpotDirective, CodexPortListComponent, CodexRecipeCardComponent, CodexSpecSheetComponent, NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
 <div class="m-top" [class.missile-mode]="c.isMissile()" [scFeedbackSpot]="'feedbackSpot.headline'">
@@ -51,6 +52,8 @@ export type CodexClassicCtx = Pick<
                 <sc-asset-package-viewer class="pkg-viewer" [row]="pkg" facing="nose" [still]="c.prefersReducedMotion()" />
               } @placeholder {
                 <div class="pkg-viewer" aria-hidden="true"></div>
+              } @error {
+                <sc-defer-error class="pkg-viewer" source="codex.classic.missile" />
               }
             } @else {
             <div class="art">
@@ -158,6 +161,8 @@ export type CodexClassicCtx = Pick<
           <sc-asset-package-viewer class="pkg-viewer" [row]="pkg" [still]="c.prefersReducedMotion()" />
         } @placeholder {
           <div class="pkg-viewer" aria-hidden="true"></div>
+        } @error {
+          <sc-defer-error class="pkg-viewer" source="codex.classic.assetPackage" />
         }
       </section>
     }

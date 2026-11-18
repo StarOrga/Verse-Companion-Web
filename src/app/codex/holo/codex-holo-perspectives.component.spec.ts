@@ -168,7 +168,8 @@ describe('CodexHoloPerspectivesComponent row layout (concept holotisch-unten r1)
     f.detectChanges();
     const el: HTMLElement = f.nativeElement;
     expect(el.classList).toContain('row');
-    expect(el.querySelector('.lead')).toBeTruthy();
+    expect(el.querySelector('.lead'), 'no lead column').toBeNull();
+    expect(el.querySelector('.all-line .all-expand'), 'the switch keeps a slim line').toBeTruthy();
     expect(el.querySelectorAll('.ptile').length).toBe(4);
     (el.querySelector('.all-expand') as HTMLButtonElement).click();
     f.detectChanges();

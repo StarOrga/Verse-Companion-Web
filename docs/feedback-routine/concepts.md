@@ -73,7 +73,7 @@ does not apply the rewrite — check a hosted page on a deployment.
 | Piece | Where | What it does |
 |---|---|---|
 | Table `concept_pages` | `supabase/migrations/20260914160000_concept_pages.sql` | `html`, `decisions` (what the page submitted), `draft` (note mirror), `submitted_at`, `processed_at`, `reload_counter`. Admin-only SELECT, **no client write policy** — the routine and the function write with the service role |
-| Edge function `concept-page` | `supabase/functions/concept-page/` | `POST /ticket` (admin JWT → 12-h HMAC ticket + document URL), `GET /:id?t=` (the html with the shim injected), `/:id/decisions`, `/reload`, `/heartbeat`, `/draft`, `/attachments` (501) — the exact protocol the concept engine expects from the local bridge |
+| Edge function `concept-page` | `supabase/functions/concept-page/` | `POST /ticket` (admin JWT → 12-h HMAC ticket + document URL), `GET /:id?t=` (the html with the shim injected), `/:id/decisions`, `/reload`, `/heartbeat`, `/draft`, `/attachments` (501), `/bye` + `/closed-ack` (no-ops) — the protocol the concept engine expects from the local bridge; serves the html through `upgrade.ts` (see § Notes) |
 | Angular route `/concept/:id` | `src/app/admin/concepts/` | Outside the shell, `authGuard` + `approvedGuard` + `roleGuard('admin')`; mints the ticket with the session and `location.replace()`s to the loader `/concept-frame/<id>.html#<function URL>` (full-screen, no in-app page). Failure copies with a back link to `/admin/feedback` |
 | Loader | `public/concept-frame.html` + `vercel.json` (rewrite + own headers) | Fetches the ticketed document as text and writes it into its app-origin document (#330) |
 | Routine tooling | `scripts/routine-gate.mjs concept-publish` / `concept-read` | Publish/republish a page, read the submission back |
@@ -91,7 +91,9 @@ every open.
    page reach the function. Every choice must be inside a `[data-decision]`
    container (`data-label` = its title) with a radio group `name="dec-<id>"`,
    every free text a `textarea[data-comment]` — that is what
-   `collectDecisionDecisions()` + `allFields` pick up.
+   `collectDecisionDecisions()` + `allFields` pick up. Mock parts that should
+   take a note need nothing extra hosted (§ Notes); a local page needs
+   `data-pin` on them.
 2. From the **primary checkout** (the token lives there):
 
    ```
@@ -158,6 +160,48 @@ echo that failed): a run has to look on its own —
   echo the routine's queue does **not** see it; check it as part of the topic's
   continuation (query (d)/(b) fire when the admin writes in the thread — ask
   him to, in the reply that posts the link).
+
+## Notes (Ctrl/⌘ + click) on a hosted page (#369)
+
+The engine's own notes in a decision / free round (`wireDocumentPins`) anchor
+only to a `p`, `li` or `tr`. A design round's screens take a pin anywhere,
+but the routine's concepts are decision rounds whose mocks are built from
+divs and spans — so a Ctrl + click on the mock silently did nothing, which
+read as "notes do not work on the hosted page". Two pieces fix that for every
+hosted page, whatever donor it was built from:
+
+- **The shim** (`shim.ts`, first script in `<head>`, so its capture listener
+  runs before the engine's) marks the clicked element `data-pin` on a
+  Ctrl/⌘ + click — or at the first touch of a long press — when it lies in the
+  live round, has no `p`/`li`/`tr`/`[data-pin]` above it and is no native
+  control (`a`, `button`, `label`, fields, `summary`) or engine chrome
+  (`.upin`, `.dpin-layer`, engine stores). An `svg` part is marked as its
+  `svg`. A design round is left alone except for its question views.
+- **`upgrade.ts`** widens the engine literal `const BLOCK = 'p, li, tr';` to
+  `'p, li, tr, [data-pin]'` when the function serves the document (pages
+  built from a pre-#354 donor). A page already published gets it without a
+  republish; html that does not carry the literal verbatim stays untouched.
+
+A note's anchor needs no marker after a reload: the engine resolves it by tag,
+index and text. While a sent round waits for the routine, the round is veiled
+(grey content dimmer); the first click — Ctrl or not — only lifts the veil, the
+next Ctrl + click sets the note. That is the engine's behaviour locally too,
+it just lasts longer hosted because the routine answers on its own cadence.
+
+## Reload and an expired ticket
+
+An open tab polls `/reload` every 3 s and reloads the loader when
+`concept-publish --id` bumps `reload_counter`; the loader refetches with the
+ticket in its fragment. Tickets live 12 h, so a tab left open overnight would
+then get 401s: the shim (on a 401 bridge answer, never while a text field has
+focus) and the loader (on a 401 document) send the tab back through
+`/concept/<id>`, which mints a fresh ticket and replaces itself with the
+loader again — at most once a minute per concept (`sessionStorage`
+`concept-remint-<id>`), so a ticket the app cannot renew shows the expired
+copy instead of looping. Engine state survives (localStorage on the loader
+path). After a submit the panel returns to ready once `processed_at` is newer
+than the submit and `reload_counter` advanced (republish, then
+`--mark-processed`), or after 5 min with only `processed_at`.
 
 ## What the hosted page cannot do (v1)
 

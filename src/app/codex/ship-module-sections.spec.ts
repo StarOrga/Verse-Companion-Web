@@ -28,6 +28,15 @@ describe('classifyShipModule', () => {
     expect(classifyShipModule('hardpoint_turret_top')).toBe('remoteTurrets');
   });
 
+  it('gives manned turrets their own block (#330)', () => {
+    expect(classifyShipModule('hardpoint_turret', { subType: 'MannedTurret' })).toBe('mannedTurrets');
+    expect(classifyShipModule('hardpoint_turret_bottom', { subType: 'BallTurret' })).toBe('mannedTurrets');
+    expect(classifyShipModule('hardpoint_turret_gunner')).toBe('mannedTurrets');
+    // A port that says remote stays remote, whatever the occupant reports.
+    expect(classifyShipModule('hardpoint_remote_turret_top', { subType: 'MannedTurret' })).toBe('remoteTurrets');
+    expect(classifyShipModule('hardpoint_turret_top', { subType: 'GunTurret' })).toBe('remoteTurrets');
+  });
+
   it('reads a gimbal mount as a weapon even though the extract types it GunTurret', () => {
     // Mount_Gimbal_S2 really is `subType: GunTurret` in the catalog — only the
     // port it bolts onto tells a pilot it is a pilot-fired wing gun.
@@ -155,6 +164,7 @@ describe('SHIP_MODULE_SECTION_ORDER', () => {
     expect(SHIP_MODULE_SECTION_ORDER.slice(0, CONFIGURABLE_SHIP_SECTIONS.length)).toEqual([
       'weapons',
       'remoteTurrets',
+      'mannedTurrets',
       'missiles',
       'pod',
       'shields',

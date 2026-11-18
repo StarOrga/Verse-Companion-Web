@@ -1,0 +1,469 @@
+<section data-iteration="1" data-iteration-template="decision" data-analysis="full" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]}}</script>
+  <style>
+    [data-iteration="1"] .r1-sk { display: block; width: 100%; height: auto; color: var(--text-color, currentColor); }
+    [data-iteration="1"] .r1-sk .f { fill: none; stroke: currentColor; stroke-width: 1.2; opacity: .35; }
+    [data-iteration="1"] .r1-sk .t { fill: currentColor; opacity: .3; }
+    [data-iteration="1"] .r1-sk .k { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    [data-iteration="1"] .r1-sk .g { fill: none; stroke: var(--accent-color, #49c2e8); stroke-width: 1.6; }
+    [data-iteration="1"] .r1-sk .a { fill: var(--accent-color, #49c2e8); opacity: .55; }
+    [data-iteration="1"] .r1-sk text { fill: currentColor; font-size: 7px; opacity: .7; }
+    [data-iteration="1"] .r1-ex { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    [data-iteration="1"] .r1-ex figure { margin: 0; }
+    [data-iteration="1"] .r1-ex figcaption { font-size: 12px; opacity: .75; margin-bottom: 4px; }
+  </style>
+  <div class="iteration-intro">
+    <h2>Feedback-Paket vom 17.11.</h2>
+    <p>Neun Notizen, fünf Bündel, acht Punkte, die nur du entscheiden kannst.</p>
+  </div>
+
+  <section id="briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>Neun Notizen ergeben fünf Bündel, die keine Datei teilen und parallel laufen. Für Uploader und Sternenkarte ist die Ursache gefunden.</p>
+    <p data-briefing-why>Der Uploader liest seit dem 15.11. bei jedem Start die ganze Spieldatei neu ein.</p>
+    <div data-briefing-potential data-viz="kpi"
+         data-viz-spec='{"value":"5","unit":"Bündel","label":"aus 9 Notizen, alle parallel"}'>5 Bündel</div>
+    <a data-briefing-topic="t-ship" data-share="30">Schiffsseite und Verse-Start</a>
+    <a data-briefing-topic="t-search" data-share="30">Suche</a>
+    <a data-briefing-topic="t-data" data-share="40">Uploader und Sternenkarte</a>
+    <p data-briefing-duration>≈ 6 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"5","unit":"Bündel","label":"aus 9 Notizen"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="text" data-viz-spec='{"text":"**Abdeckung der 9 Notizen**\n- **#1** übernommen: Sternenkarte 4.10 zeigt nur Platzhalter, Form-Raten nicht möglich (B4)\n- **#2** übernommen: Bild-Knopf in der Akte wird ein sehr dezenter Minimieren-Knopf (B1)\n- **#3** zusammengeführt mit #2: „letzteres ist in akte auf der schiffsseite“ nennt den Ort des Knopfs\n- **#4** übernommen: Suche zeigt die aktuelle Detailseite nicht, bei nahezu exaktem Treffer ausgegraut; mit Agent durchdacht (B2)\n- **#5** übernommen: Uploader erkennt bei jedem Start 4.10.0 und „neue Version“ (B3)\n- **#6** zusammengeführt mit #5: x.y.z-Build, jede Änderung an einem der vier Werte wird geprüft (B3)\n- **#7** übernommen: „Wo zu kaufen“ aus dem Holotisch entfernen, steht in der Akte (B1)\n- **#8** übernommen: Perspektiven-Spalte raus, vier Kacheln an der unteren Leiste ausrichten (B1)\n- **#9** übernommen: Verse-Startseite, Footer nicht auf der Linie und Rest-Scroll (B5)"}'></div>
+        <p>Keine Notiz widerspricht einer anderen, nichts ist unmachbar. Die fünf Bündel gehen unverändert in den Umsetzen-Klick; die acht Fragen ändern nur, was darin gebaut wird.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ Thema 1 · Schiffsseite und Verse-Start ═════════ -->
+  <section id="t-ship" data-topic data-nav-label="Schiffsseite und Verse-Start">
+    <div data-alevel="2" data-title="Schiffsseite und Verse-Start">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"2","unit":"offene Punkte","label":"bei 4 Notizen zur Oberfläche"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="text" data-viz-spec='{"text":"- **B1 Schiffsseite / Holotisch** (#2 #3 #7 #8): Minimieren-Knopf der Akte, „Wo zu kaufen“ aus der Seitenspalte, Perspektiven-Spalte raus und vier Kacheln auf dem Raster der unteren Leiste\n- **B5 Verse-Startseite** (#9): Footer auf die Linie, kein Rest-Scroll nach Seite 2; die Ursache wird zuerst gemessen und im Abschluss benannt\n- **Fest steht ohne Frage:** „Wo zu kaufen“ verschwindet aus dem Holotisch, der Kauf-Tab der Akte bleibt"}'></div>
+        <p>Beide Bündel laufen ohne Rückfrage, bis auf zwei Punkte, die man sehen muss: wie der Knopf aussieht und wohin zwei Elemente der gestrichenen Spalte wandern.</p>
+      </div>
+    </div>
+
+    <section id="d-min" data-nav-label="Minimieren-Knopf" data-decision="d-min" data-decision-mode="picture"
+             data-label="Minimieren-Knopf der Akte" data-rec="chevron"
+             data-rec-why="Eine Pfeilspitze zeigt die Richtung des Einklappens und kommt ohne Rahmen aus, also so dezent wie gewünscht."
+             data-applies-to="Akte auf der Schiffsseite" data-finding="f-min" data-finding-quant="false">
+      <p data-applies>Gilt für: Akte auf der Schiffsseite</p>
+      <p data-situation>Der Schalter, der den Text der Akte ausblendet, sieht aus wie ein Bild-Knopf und leuchtet stärker als alles um ihn herum.</p>
+      <h3 data-question>Wie sieht der dezente Minimieren-Knopf der Akte aus?</h3>
+      <p data-stakes>Ob man den Knopf auf einen Blick als Einklappen liest</p>
+      <div data-options>
+        <label data-opt="chevron" data-recommended>
+          <input type="radio" name="dm-d-min" value="chevron">
+          <span data-opt-media><svg class="r1-sk" viewBox="0 0 160 60" aria-hidden="true"><rect class="f" x="4" y="8" width="152" height="44" rx="6"/><rect class="t" x="14" y="18" width="26" height="6" rx="3"/><rect class="t" x="46" y="18" width="26" height="6" rx="3"/><rect class="t" x="78" y="18" width="26" height="6" rx="3"/><rect class="t" x="14" y="34" width="96" height="4" rx="2"/><path class="k" d="M134 18l6 6 6-6"/></svg></span>
+          <span data-opt-label>Als Pfeilspitze ohne Rahmen zeigen</span>
+          <span data-opt-consequence>Zeigt nach unten zum Einklappen, nach oben zum Aufklappen; wird erst beim Überfahren heller.</span>
+        </label>
+        <label data-opt="dash">
+          <input type="radio" name="dm-d-min" value="dash">
+          <span data-opt-media><svg class="r1-sk" viewBox="0 0 160 60" aria-hidden="true"><rect class="f" x="4" y="8" width="152" height="44" rx="6"/><rect class="t" x="14" y="18" width="26" height="6" rx="3"/><rect class="t" x="46" y="18" width="26" height="6" rx="3"/><rect class="t" x="78" y="18" width="26" height="6" rx="3"/><rect class="t" x="14" y="34" width="96" height="4" rx="2"/><path class="k" d="M134 22h12"/></svg></span>
+          <span data-opt-label>Als kurzen Strich zeigen</span>
+          <span data-opt-consequence>Wie das Minimieren eines Fensters; eingeklappt wird daraus ein kleines Quadrat.</span>
+        </label>
+        <label data-opt="arrows">
+          <input type="radio" name="dm-d-min" value="arrows" checked>
+          <span data-opt-media><svg class="r1-sk" viewBox="0 0 160 60" aria-hidden="true"><rect class="f" x="4" y="8" width="152" height="44" rx="6"/><rect class="t" x="14" y="18" width="26" height="6" rx="3"/><rect class="t" x="46" y="18" width="26" height="6" rx="3"/><rect class="t" x="78" y="18" width="26" height="6" rx="3"/><rect class="t" x="14" y="34" width="96" height="4" rx="2"/><path class="k" d="M146 15l-5 5m0-4v4h4M134 27l5-5m0 4v-4h-4"/></svg></span>
+          <span data-opt-label>Als zwei Pfeile nach innen zeigen</span>
+          <span data-opt-consequence>Deutlichstes Zeichen für Verkleinern, aber die unruhigste Form.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-min-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-min-none" value="">
+      <input type="hidden" name="dm-d-min-hes" value="{&quot;ms&quot;:16334,&quot;revisits&quot;:1,&quot;median&quot;:37073}">
+      <input type="hidden" name="dm-d-min-touched" value="1">
+      <input type="hidden" name="dm-d-min-issue" value="">
+      <input type="hidden" name="dm-d-min-epic" value="">
+      <div data-alevel="3" data-title="Minimieren-Knopf">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Ein Bild-Symbol mit leuchtendem Rahmen steht für eine Einklapp-Funktion."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="text" data-viz-spec='{"text":"**Symbol:** Rahmen mit Berg, wie für eine Galerie\n**Wirkung:** blendet den Text der Akte aus und wieder ein\n**Rahmen:** Cyan mit Schein, lauter als die Tabs daneben"}'></div>
+          <p>Die Funktion bleibt, wie sie ist.</p>
+        </div>
+        <div data-example>
+          <div class="r1-ex">
+            <figure><figcaption>Heute</figcaption><svg class="r1-sk" viewBox="0 0 160 60" aria-hidden="true"><rect class="f" x="4" y="8" width="152" height="44" rx="6"/><rect class="t" x="14" y="18" width="26" height="6" rx="3"/><rect class="t" x="46" y="18" width="26" height="6" rx="3"/><rect class="t" x="78" y="18" width="26" height="6" rx="3"/><rect class="t" x="14" y="34" width="96" height="4" rx="2"/><rect class="g" x="128" y="12" width="22" height="20" rx="4"/><rect class="k" x="133" y="17" width="12" height="10" rx="1.5"/><path class="k" d="M133 25l3-3 3 2 2-2 4 4"/></svg></figure>
+            <figure><figcaption>Danach (Beispiel Pfeilspitze)</figcaption><svg class="r1-sk" viewBox="0 0 160 60" aria-hidden="true"><rect class="f" x="4" y="8" width="152" height="44" rx="6"/><rect class="t" x="14" y="18" width="26" height="6" rx="3"/><rect class="t" x="46" y="18" width="26" height="6" rx="3"/><rect class="t" x="78" y="18" width="26" height="6" rx="3"/><rect class="t" x="14" y="34" width="96" height="4" rx="2"/><path class="k" d="M134 18l6 6 6-6"/></svg></figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-all" data-nav-label="Satz und Sammel-Schalter" data-decision="d-all" data-decision-mode="picture"
+             data-label="Satz und Sammel-Schalter" data-rec="head"
+             data-rec-why="Satz und Schalter bleiben bei den Werten, zu denen sie gehören, und die vier Kacheln stehen trotzdem genau über den vier Gruppen."
+             data-applies-to="Perspektiven-Zeile im Holotisch" data-finding="f-all">
+      <p data-applies>Gilt für: Perspektiven-Zeile im Holotisch</p>
+      <p data-situation>Ohne die Perspektiven-Spalte verlieren zwei Dinge ihren Platz: der Satz „Bewertet als Kampfschiff, verglichen mit 238 Schiffen“ und der Schalter „Alle Werte aller vier“.</p>
+      <h3 data-question>Wohin kommen Bewertungs-Satz und „Alle Werte aller vier“?</h3>
+      <p data-stakes>Höhe der Zeile und ob alle vier Kacheln mit einem Klick aufgehen</p>
+      <div data-options>
+        <label data-opt="head" data-recommended>
+          <input type="radio" name="dm-d-all" value="head">
+          <span data-opt-media><svg class="r1-sk" viewBox="0 0 160 70" aria-hidden="true"><rect class="a" x="4" y="4" width="70" height="5" rx="2.5"/><rect class="a" x="126" y="4" width="30" height="5" rx="2.5"/><rect class="f" x="4" y="14" width="36" height="30"/><rect class="f" x="42.7" y="14" width="36" height="30"/><rect class="f" x="81.3" y="14" width="36" height="30"/><rect class="f" x="120" y="14" width="36" height="30"/><rect class="t" x="4" y="50" width="36" height="12"/><rect class="t" x="42.7" y="50" width="36" height="12"/><rect class="t" x="81.3" y="50" width="36" height="12"/><rect class="t" x="120" y="50" width="36" height="12"/></svg></span>
+          <span data-opt-label>In eine schmale Kopfzeile über den Kacheln legen</span>
+          <span data-opt-consequence>Satz links, Schalter rechts; kostet etwa eine Textzeile Höhe.</span>
+        </label>
+        <label data-opt="strip">
+          <input type="radio" name="dm-d-all" value="strip">
+          <span data-opt-media><svg class="r1-sk" viewBox="0 0 160 70" aria-hidden="true"><rect class="f" x="4" y="6" width="36" height="34"/><rect class="f" x="42.7" y="6" width="36" height="34"/><rect class="f" x="81.3" y="6" width="36" height="34"/><rect class="f" x="120" y="6" width="36" height="34"/><rect class="t" x="4" y="46" width="36" height="12"/><rect class="t" x="42.7" y="46" width="36" height="12"/><rect class="t" x="81.3" y="46" width="36" height="12"/><rect class="t" x="120" y="46" width="36" height="12"/><rect class="a" x="4" y="62" width="60" height="4" rx="2"/><rect class="a" x="128" y="62" width="28" height="4" rx="2"/></svg></span>
+          <span data-opt-label>Unter die untere Leiste hängen</span>
+          <span data-opt-consequence>Die Kacheln bleiben ohne Kopf; der Schalter sitzt weiter weg von den Werten, die er öffnet.</span>
+        </label>
+        <label data-opt="drop">
+          <input type="radio" name="dm-d-all" value="drop">
+          <span data-opt-media><svg class="r1-sk" viewBox="0 0 160 70" aria-hidden="true"><rect class="f" x="4" y="6" width="36" height="34"/><rect class="f" x="42.7" y="6" width="36" height="34"/><rect class="f" x="81.3" y="6" width="36" height="34"/><rect class="f" x="120" y="6" width="36" height="34"/><rect class="a" x="8" y="33" width="16" height="3" rx="1.5"/><rect class="a" x="46.7" y="33" width="16" height="3" rx="1.5"/><rect class="a" x="85.3" y="33" width="16" height="3" rx="1.5"/><rect class="a" x="124" y="33" width="16" height="3" rx="1.5"/><rect class="t" x="4" y="46" width="36" height="12"/><rect class="t" x="42.7" y="46" width="36" height="12"/><rect class="t" x="81.3" y="46" width="36" height="12"/><rect class="t" x="120" y="46" width="36" height="12"/></svg></span>
+          <span data-opt-label>Schalter streichen, Satz als Hinweis zeigen</span>
+          <span data-opt-consequence>Niedrigste Zeile; jede Kachel öffnet nur noch über ihr eigenes „Alle Werte“.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-all-note" placeholder="Notiz (optional)">schjalter benötigen wir ja noch füpr das energiepanel? den bewertungsssatz kannst du dort streichen, das haben wi rschon oben in einorndung!</textarea>
+      <input type="hidden" name="dm-d-all-none" value="1">
+      <input type="hidden" name="dm-d-all-hes" value="{&quot;ms&quot;:55870,&quot;revisits&quot;:0,&quot;median&quot;:37073}">
+      <input type="hidden" name="dm-d-all-touched" value="1">
+      <input type="hidden" name="dm-d-all-issue" value="">
+      <input type="hidden" name="dm-d-all-epic" value="">
+      <div data-alevel="3" data-title="Satz und Sammel-Schalter">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"5 über 4","unit":"Spalten","label":"oben eine mehr als in der Leiste darunter"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Spalten in der Perspektiven-Zeile","value":5},{"label":"Gruppen in der unteren Leiste","value":4}],"unit":"Spalten","hl":"Spalten in der Perspektiven-Zeile"}'></div>
+          <p>Die Zusatzspalte schiebt alle vier Kacheln nach rechts.</p>
+        </div>
+        <div data-example>
+          <div class="r1-ex">
+            <figure><figcaption>Heute: fünf Spalten über vier Gruppen</figcaption><svg class="r1-sk" viewBox="0 0 160 70" aria-hidden="true"><rect class="g" x="4" y="6" width="24" height="34"/><rect class="f" x="30" y="6" width="30" height="34"/><rect class="f" x="62" y="6" width="30" height="34"/><rect class="f" x="94" y="6" width="30" height="34"/><rect class="f" x="126" y="6" width="30" height="34"/><rect class="t" x="4" y="46" width="36" height="12"/><rect class="t" x="42.7" y="46" width="36" height="12"/><rect class="t" x="81.3" y="46" width="36" height="12"/><rect class="t" x="120" y="46" width="36" height="12"/></svg></figure>
+            <figure><figcaption>Danach: vier über vier, Kante auf Kante</figcaption><svg class="r1-sk" viewBox="0 0 160 70" aria-hidden="true"><rect class="f" x="4" y="6" width="36" height="34"/><rect class="f" x="42.7" y="6" width="36" height="34"/><rect class="f" x="81.3" y="6" width="36" height="34"/><rect class="f" x="120" y="6" width="36" height="34"/><rect class="t" x="4" y="46" width="36" height="12"/><rect class="t" x="42.7" y="46" width="36" height="12"/><rect class="t" x="81.3" y="46" width="36" height="12"/><rect class="t" x="120" y="46" width="36" height="12"/></svg></figure>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ═════════ Thema 2 · Suche ═════════ -->
+  <section id="t-search" data-topic data-nav-label="Suche">
+    <div data-alevel="2" data-title="Suche">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"3","unit":"Suchflächen","label":"bekommen dieselbe Regel"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Leeres Feld","value":"aktuelle Seite fehlt, Liste rückt nach"},{"label":"Getippt, schwacher Treffer","value":"aktuelle Seite fehlt"},{"label":"Getippt, exakter Name","value":"grau mit „Du bist hier“"},{"label":"Enter oder Klick darauf","value":"schließt nur die Suche"}]}'></div>
+        <p>B2 (#4), vom Agent durchdacht: Die Regel sitzt im gemeinsamen Suchkern und gilt in der Leiste, der Codex-Suche und unter Strg+K gleich. Varianten wie Gladius Valiant bleiben immer erreichbar. Auswertung: Das Event search:result_open bekommt das Merkmal current, sichtbar als neue Kachel neben „Suchen ohne Treffer (30 Tage)“.</p>
+      </div>
+    </div>
+
+    <section id="d-rule" data-nav-label="Regel für die eigene Seite" data-decision="d-rule" data-decision-mode="verify"
+             data-label="Regel für die eigene Seite" data-rec="ok"
+             data-rec-why="Sie setzt deine Notiz um und verhindert, dass der exakte Name ins Leere läuft."
+             data-applies-to="Suche auf jeder Detailseite" data-finding="f-rule">
+      <p data-applies>Gilt für: Suche auf jeder Detailseite</p>
+      <p data-situation>Auf der Gladius-Seite führt der oberste Vorschlag der Suche zurück auf die Gladius: einer von drei Plätzen unter „Zuletzt geöffnet“ ist verschenkt.</p>
+      <h3 data-question>Stimmt die Regel: schwacher Treffer fehlt, exakter Name steht grau da?</h3>
+      <p data-context>Das Beispiel zeigt Zeile für Zeile, was auf der Gladius-Seite bei welcher Eingabe passiert.</p>
+      <p data-stakes>Ob die Suche beim Tippen des eigenen Namens kaputt wirkt</p>
+      <div data-options>
+        <label data-opt="ok" data-recommended>
+          <input type="radio" name="dm-d-rule" value="ok" checked>
+          <span data-opt-label>Stimmt, so bauen</span>
+          <span data-opt-consequence>„Nahezu exakt“ heißt: Name, Name ohne Hersteller oder Klassenname gleich der Eingabe.</span>
+        </label>
+        <label data-opt="partial">
+          <input type="radio" name="dm-d-rule" value="partial">
+          <span data-opt-label>Teilweise, ein Fall soll anders laufen</span>
+          <span data-opt-consequence>Schreib den Fall ins Feld, der Rest bleibt wie gezeigt.</span>
+        </label>
+        <label data-opt="wrong">
+          <input type="radio" name="dm-d-rule" value="wrong">
+          <span data-opt-label>Stimmt nicht, die eigene Seite soll immer fehlen</span>
+          <span data-opt-consequence>Aufgeräumter, aber wer „gladius“ tippt, sieht nur schwächere Treffer und Enter springt woanders hin.</span>
+        </label>
+        <input type="text" name="dm-d-rule-fix" placeholder="Was soll anders laufen?" value="">
+      </div>
+      <textarea data-comment="d-rule-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-rule-none" value="">
+      <input type="hidden" name="dm-d-rule-hes" value="{&quot;ms&quot;:10281,&quot;revisits&quot;:0,&quot;median&quot;:37073}">
+      <input type="hidden" name="dm-d-rule-touched" value="">
+      <input type="hidden" name="dm-d-rule-issue" value="">
+      <input type="hidden" name="dm-d-rule-epic" value="">
+      <div data-alevel="3" data-title="Regel für die eigene Seite">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"1 von 3","unit":"Plätzen","label":"zeigt dorthin, wo du schon bist"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bar" data-viz-spec='{"value":1,"max":3,"label":"Plätze unter „Zuletzt geöffnet“, die auf die offene Seite zeigen","unit":"von 3"}'></div>
+          <p>Die Suche kennt die offene Seite bisher nicht.</p>
+        </div>
+        <div data-example><pre>Du bist auf: Gladius
+
+Eingabe            Heute                 Danach
+(leer)             Gladius ganz oben     Gladius fehlt, nächster Eintrag rückt nach
+gla                Gladius, Valiant …    Valiant, Pirate … (Gladius fehlt)
+aegis              Gladius, Avenger …    Avenger, Sabre … (Gladius fehlt)
+gladius valiant    Valiant, Gladius      Valiant
+gladius            Gladius               Gladius · grau · „Du bist hier“
+Aegis Gladius      Gladius               Gladius · grau · „Du bist hier“
+
+Enter oder Klick auf die graue Zeile: Suche schließt, Seite und Ansicht bleiben.
+Wäre die eigene Seite der einzige Treffer, steht sie grau da statt einer leeren Liste.</pre></div>
+      </div>
+    </section>
+
+    <section id="d-variant" data-nav-label="Eigene Variante" data-decision="d-variant" data-decision-mode="yesnoalt"
+             data-label="Treffer bei eigener Variante" data-rec="no"
+             data-rec-why="Serienzustand und deine Ausstattung sind zwei Ansichten; der Katalog-Treffer führt wirklich woanders hin."
+             data-applies-to="Schiffsseite mit eigener Ausstattung" data-finding="f-variant" data-finding-quant="false">
+      <p data-applies>Gilt für: Schiffsseite mit eigener Ausstattung</p>
+      <p data-situation>Wer seine eigene Gladius offen hat und „gladius“ tippt, bekommt den Katalog-Treffer zur Serien-Gladius: dieselbe Seite, aber eine andere Ausstattung.</p>
+      <h3 data-question>Gilt der Katalog-Treffer auf deiner eigenen Variante als „Du bist hier“?</h3>
+      <p data-stakes>Ob du von deiner Variante per Suche zum Serienzustand kommst</p>
+      <div data-options>
+        <label data-opt="yes">
+          <input type="radio" name="dm-d-variant" value="yes">
+          <span data-opt-label>Ja, auch dort grau markieren</span>
+          <span data-opt-consequence>Ein Schiff, eine Regel; zum Serienzustand kommst du dann nur über die Seite selbst.</span>
+        </label>
+        <label data-opt="no" data-recommended>
+          <input type="radio" name="dm-d-variant" value="no">
+          <span data-opt-label>Nein, dort bleibt er ein normaler Treffer</span>
+          <span data-opt-consequence>Ein Klick führt von deiner Ausstattung zum Serienzustand.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-variant" value="alt">
+          <span data-opt-label>Anders</span>
+          <input type="text" name="dm-d-variant-alt" placeholder="Dein Weg" value="">
+        </label>
+      </div>
+      <textarea data-comment="d-variant-note" placeholder="Notiz (optional)">bitte in der suche anpassen, dass das nicht jeweils ein eintrag ist sondern ein eintrag mit mini textlinks zu varianten fallls man nicht auf den eintrag klickt, der zur default variante füphrt</textarea>
+      <input type="hidden" name="dm-d-variant-none" value="1">
+      <input type="hidden" name="dm-d-variant-hes" value="{&quot;ms&quot;:73929,&quot;revisits&quot;:0,&quot;median&quot;:37073}">
+      <input type="hidden" name="dm-d-variant-touched" value="1">
+      <input type="hidden" name="dm-d-variant-issue" value="">
+      <input type="hidden" name="dm-d-variant-epic" value="">
+      <div data-alevel="3" data-title="Eigene Variante">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Eigene Variante und Serien-Schiff teilen sich eine Seite, unterscheiden sich aber in der Ausstattung."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="text" data-viz-spec='{"text":"**Serien-Gladius:** Adresse ohne Zusatz\n**Deine Gladius:** dieselbe Adresse mit dem Zusatz für deine Variante\n**Treffer „Meine Gladius“:** führt immer zu deiner Variante"}'></div>
+          <p>Die Suche führt beide als getrennte Treffer.</p>
+        </div>
+        <div data-example><pre>Du bist auf: Meine Gladius (eigene Ausstattung)
+Eingabe: gladius
+
+Treffer „Gladius“ (Katalog)
+  Ja   →  grau · „Du bist hier“
+  Nein →  normaler Treffer, öffnet den Serienzustand
+
+Treffer „Meine Gladius“
+  in beiden Fällen grau · „Du bist hier“</pre></div>
+      </div>
+    </section>
+
+    <section id="d-actions" data-nav-label="Schnellaktionen" data-decision="d-actions" data-decision-mode="yesnoalt"
+             data-label="Aktionen der grauen Zeile" data-rec="no"
+             data-rec-why="Die Seite selbst bietet beides an; aktive Knöpfe auf einer grauen Zeile widersprechen sich."
+             data-applies-to="graue Zeile „Du bist hier“" data-finding="f-actions" data-finding-quant="false">
+      <p data-applies>Gilt für: graue Zeile „Du bist hier“</p>
+      <p data-situation>Jeder Schiffs-Treffer trägt zwei Schnellaktionen, „merken“ und „vergleichen“; auf der grauen Zeile stünden sie neben einem Eintrag, der selbst nirgends hinführt.</p>
+      <h3 data-question>Behält die graue Zeile „merken“ und „vergleichen“?</h3>
+      <p data-stakes>Wie ruhig die markierte Zeile wirkt</p>
+      <div data-options>
+        <label data-opt="yes">
+          <input type="radio" name="dm-d-actions" value="yes">
+          <span data-opt-label>Ja, beide Aktionen bleiben nutzbar</span>
+          <span data-opt-consequence>Merken und Vergleichen gehen ohne Umweg, die Zeile wirkt aber halb aktiv.</span>
+        </label>
+        <label data-opt="no" data-recommended>
+          <input type="radio" name="dm-d-actions" value="no" checked>
+          <span data-opt-label>Nein, die Zeile zeigt nur Name und Hinweis</span>
+          <span data-opt-consequence>Eindeutig ruhig; beide Aktionen stehen ohnehin auf der offenen Seite.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-actions" value="alt">
+          <span data-opt-label>Anders</span>
+          <input type="text" name="dm-d-actions-alt" placeholder="Dein Weg" value="">
+        </label>
+      </div>
+      <textarea data-comment="d-actions-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-actions-none" value="">
+      <input type="hidden" name="dm-d-actions-hes" value="{&quot;ms&quot;:18275,&quot;revisits&quot;:0,&quot;median&quot;:37073}">
+      <input type="hidden" name="dm-d-actions-touched" value="1">
+      <input type="hidden" name="dm-d-actions-issue" value="">
+      <input type="hidden" name="dm-d-actions-epic" value="">
+      <div data-alevel="3" data-title="Schnellaktionen">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Zwei Schnellaktionen pro Schiffs-Treffer, auch auf der Zeile, die nirgends hinführt."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="text" data-viz-spec='{"text":"**Normale Zeile:** Name, Pfad-Symbole, Aufruf-Knopf, merken, vergleichen\n**Graue Zeile:** Name und „Du bist hier“, kein Aufruf-Knopf, keine Pfad-Symbole"}'></div>
+          <p>Offen sind nur die beiden Schnellaktionen.</p>
+        </div>
+        <div data-example><pre>Normale Zeile
+  Gladius Valiant        [merken] [vergleichen]  [öffnen →]
+
+Graue Zeile, Ja
+  Gladius · Du bist hier [merken] [vergleichen]
+
+Graue Zeile, Nein
+  Gladius · Du bist hier</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ═════════ Thema 3 · Uploader und Sternenkarte ═════════ -->
+  <section id="t-data" data-topic data-nav-label="Uploader und Sternenkarte">
+    <div data-alevel="2" data-title="Uploader und Sternenkarte">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"5","unit":"Starts","label":"seit dem 15.11., jeder mit vollem Neu-Einlesen"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="text" data-viz-spec='{"text":"- **B3 Data Uploader** (#5 #6): Version aus dem richtigen Feld lesen, alle vier Werte vergleichen, nur Fehlendes bauen, ehrliche Statuszeile statt „Neue Version erkannt (4.10.0 vs. 4.10.0)“\n- **B4 Sternenkarte** (#1): hinterlegte Form auf das Serien-Schiff umhängen, Auswahl künftiger Formen ohne Ausstellungs-Kopien, keine leeren Platzhalter ohne Erklärung\n- **Fest steht aus #6:** verglichen werden x.y.z und Build; ändert sich einer der vier Werte, wird geprüft, und Unverändertes wird übersprungen"}'></div>
+        <p>Beide Fehler sind Datenfehler mit bekannter Ursache. Drei Punkte bestimmen, wie der Fix aussieht: woher x.y.z kommt, was ein Start mit offenen 3D-Modellen tut und ob die Deutung der Sternenkarte stimmt.</p>
+      </div>
+    </div>
+
+    <section id="d-ident" data-nav-label="Quelle der Version" data-decision="d-ident" data-decision-mode="single"
+             data-label="Quelle für x.y.z im Uploader" data-rec="manifest"
+             data-rec-why="Das Versionsfeld liegt lokal vor, bevor irgendetwas hochgeladen ist, und ändert sich bei jedem Patch und Hotfix."
+             data-applies-to="Data Uploader, Erkennung des Spielstands" data-finding="f-ident">
+      <p data-applies>Gilt für: Data Uploader, Erkennung des Spielstands</p>
+      <p data-situation>Der Uploader hält jeden 4.10-Patch für 4.10.0, weil er die Version aus dem Zweignamen liest; für denselben Build gibt es drei verschiedene Angaben.</p>
+      <h3 data-question>Welche Angabe ist das x.y.z, das der Uploader vergleicht?</h3>
+      <p data-context>Fest steht aus deiner Notiz: verglichen werden x.y.z und Build, alle vier Werte. Offen ist nur die Quelle für x.y.z.</p>
+      <p data-stakes>Ob ein neuer Patch sicher erkannt und ein alter nie doppelt gebaut wird</p>
+      <div data-options>
+        <label data-opt="manifest" data-recommended>
+          <input type="radio" name="dm-d-ident" value="manifest" checked>
+          <span data-opt-label>Das Versionsfeld der Installation nehmen (4.10.200)</span>
+          <span data-opt-consequence>Liegt sofort lokal vor; der Name 4.10.3 kommt weiter vom Server und dient nur der Anzeige.</span>
+        </label>
+        <label data-opt="server">
+          <input type="radio" name="dm-d-ident" value="server">
+          <span data-opt-label>Die Server-Angabe nehmen (4.10.3)</span>
+          <span data-opt-consequence>Lesbarste Zahl, aber der Uploader kennt sie erst, nachdem ein Build einmal hochgeladen wurde.</span>
+        </label>
+        <label data-opt="build">
+          <input type="radio" name="dm-d-ident" value="build">
+          <span data-opt-label>Nur die Build-Nummer vergleichen</span>
+          <span data-opt-consequence>Einfachster Schlüssel; x.y.z wäre dann reine Anzeige und kein Prüfwert mehr.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-ident-note" placeholder="Notiz (optional)">Aber das von der installation sollte ja auch 4.10.3- buildnr sein!? Aber ja immer das lokale nehmen, ist ja der uploader, ggf. dann online matchen auf dem server, ehrlich gesagt, sollte es aber keine andere versionsnummer geben!</textarea>
+      <input type="hidden" name="dm-d-ident-none" value="">
+      <input type="hidden" name="dm-d-ident-hes" value="{&quot;ms&quot;:60761,&quot;revisits&quot;:1,&quot;median&quot;:37073}">
+      <input type="hidden" name="dm-d-ident-touched" value="1">
+      <input type="hidden" name="dm-d-ident-issue" value="">
+      <input type="hidden" name="dm-d-ident-epic" value="">
+      <div data-alevel="3" data-title="Quelle der Version">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"3","unit":"Angaben","label":"für denselben Build 13165946"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Zweigname","value":"4.10.0"},{"label":"Versionsfeld","value":"4.10.200.58746"},{"label":"Server","value":"4.10.3"}]}'></div>
+          <p>Alle drei meinen Build 13165946.</p>
+        </div>
+        <div data-example><pre>LIVE\build_manifest.id (deine Installation)
+  "Branch":               "sc-alpha-4.10.0"     ← wird heute gelesen
+  "RequestedP4ChangeNum": "13165946"            ← Build
+  "Version":              "4.10.200.58746"      ← echtes Versionsfeld
+
+Uploader-Kopf heute:   LIVE v4.10.0
+Server für den Build:  4.10.3</pre></div>
+      </div>
+    </section>
+
+    <section id="d-resume" data-nav-label="Start mit offenen 3D" data-decision="d-resume" data-decision-mode="single"
+             data-label="Start mit offenen 3D" data-rec="resume"
+             data-rec-why="Die 3D-Modelle werden fertig, ohne dass bereits Hochgeladenes noch einmal Rechenzeit kostet."
+             data-applies-to="Data Uploader, jeder Programmstart" data-finding="f-resume">
+      <p data-applies>Gilt für: Data Uploader, jeder Programmstart</p>
+      <p data-situation>Seit dem 15.11. liest jeder Start die komplette Spieldatei neu ein und lädt Metadaten erneut hoch, obwohl 7 von 8 Teilen dieses Builds schon auf dem Server liegen.</p>
+      <h3 data-question>Was macht ein Start, wenn nur noch die 3D-Modelle fehlen?</h3>
+      <p data-stakes>Rechenzeit bei jedem Start und wann die 3D-Modelle fertig werden</p>
+      <div data-options>
+        <label data-opt="resume" data-recommended>
+          <input type="radio" name="dm-d-resume" value="resume" checked>
+          <span data-opt-label>Nur die 3D-Modelle fortsetzen</span>
+          <span data-opt-consequence>Kein Neu-Einlesen, kein zweiter Metadaten-Upload; der Autostart macht still weiter, ein von dir geöffnetes Fenster zeigt vorher den Countdown.</span>
+        </label>
+        <label data-opt="offer">
+          <input type="radio" name="dm-d-resume" value="offer">
+          <span data-opt-label>Fortsetzen nur anbieten</span>
+          <span data-opt-consequence>Kein unerwarteter Rechenlauf; die 3D-Modelle bleiben liegen, bis du klickst.</span>
+        </label>
+        <label data-opt="manual">
+          <input type="radio" name="dm-d-resume" value="manual">
+          <span data-opt-label>3D-Modelle aus dem Autostart herausnehmen</span>
+          <span data-opt-consequence>Der Autostart endet nach den Daten; 3D baut nur noch ein eigener Knopf.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-resume-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-resume-none" value="">
+      <input type="hidden" name="dm-d-resume-hes" value="{&quot;ms&quot;:17755,&quot;revisits&quot;:0,&quot;median&quot;:37073}">
+      <input type="hidden" name="dm-d-resume-touched" value="1">
+      <input type="hidden" name="dm-d-resume-issue" value="">
+      <input type="hidden" name="dm-d-resume-epic" value="">
+      <div data-alevel="3" data-title="Start mit offenen 3D">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"7 von 8","unit":"Teilen","label":"liegen schon auf dem Server"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bar" data-viz-spec='{"value":7,"max":8,"label":"Teile dieses Builds, die schon auf dem Server liegen","unit":"von 8"}'></div>
+          <p>Offen sind nur die 3D-Modelle, deren Bau viele Stunden dauert.</p>
+        </div>
+        <div data-example><pre>Protokoll, 17.11. 12:04
+  [autorun] no auto-run (already-uploaded)
+  [autorun] LIVE: subthemes pending [hulls] — starting
+  [subthemes] skip [strings, ships, components, weapons, items,
+              codex_extra, silhouettes] pending [hulls]
+  [extract-py] opening …\LIVE\Data.p4k          ← volles Neu-Einlesen
+  … Metadaten Schritt 15 / 17                    ← zweiter Upload
+
+Statuszeile heute:   Neue Version erkannt (LIVE: 4.10.0 vs. 4.10.0) — starte automatisch.
+Statuszeile danach:  3D-Modelle für diesen Build noch offen — setze fort.</pre></div>
+      </div>
+    </section>
+
+    <section id="d-star" data-nav-label="Sternenkarte 4.10" data-decision="d-star" data-decision-mode="verify"
+             data-label="Sternenkarte 4.10" data-rec="ok"
+             data-rec-why="Die Form bleibt dieselbe, nur der Verweis zeigt wieder auf ein Schiff, das zur Auswahl stehen darf."
+             data-applies-to="Sternenkarte, Patch 4.10" data-finding="f-star">
+      <p data-applies>Gilt für: Sternenkarte, Patch 4.10</p>
+      <p data-situation>Auf der Sternenkarte 4.10 kann niemand die Form raten: statt 7 Schiffen stehen 7 leere Platzhalter in der Leiste.</p>
+      <h3 data-question>Stimmt der Weg: Die Karte 4.10 zeigt künftig die Avenger Stalker zum Raten?</h3>
+      <p data-context>Deine Notiz war knapp („nur platzhalter … kein shape erraten“); wenn du etwas anderes meinst, wähle „Stimmt nicht“ und beschreib es.</p>
+      <p data-stakes>Ob das Form-Raten wieder geht und bei neuen Patches nicht erneut ausfällt</p>
+      <div data-options>
+        <label data-opt="ok" data-recommended>
+          <input type="radio" name="dm-d-star" value="ok" checked>
+          <span data-opt-label>Stimmt, auf die Serien-Stalker umhängen</span>
+          <span data-opt-consequence>Sieben Schiffe stehen wieder zur Auswahl; schon abgegebene Tipps gelten weiter.</span>
+        </label>
+        <label data-opt="partial">
+          <input type="radio" name="dm-d-star" value="partial">
+          <span data-opt-label>Teilweise, da fehlt noch etwas</span>
+          <span data-opt-consequence>Der Fix läuft, dein Zusatz aus dem Feld kommt dazu.</span>
+        </label>
+        <label data-opt="wrong">
+          <input type="radio" name="dm-d-star" value="wrong">
+          <span data-opt-label>Stimmt nicht, ich meinte etwas anderes</span>
+          <span data-opt-consequence>B4 wartet auf deine Beschreibung, die anderen Bündel laufen weiter.</span>
+        </label>
+        <input type="text" name="dm-d-star-fix" placeholder="Was meinst du stattdessen?" value="">
+      </div>
+      <textarea data-comment="d-star-note" placeholder="Notiz (optional)">Das soll ein automatismus sein bei jedem neuen Patch, kreigire einen algorythmus dafür - wir wissen ja was neue raumschiffe sind und wednn in dem patch es keine neuen gibt, dann gern welche neuste aus dem letzten wo es welche gab! 
+Aber ich will das hier nicht fü+r jeden aptcvh manuell korigiieren, bitte das automatisieren, u8nd wenn das so nicht geht bitte die claude code api anbindung hinzuziehen um das richtige schiff zu finden - obwohl ich glaueb das isxt nicht nötig</textarea>
+      <input type="hidden" name="dm-d-star-none" value="">
+      <input type="hidden" name="dm-d-star-hes" value="{&quot;ms&quot;:96411,&quot;revisits&quot;:0,&quot;median&quot;:37073}">
+      <input type="hidden" name="dm-d-star-touched" value="1">
+      <input type="hidden" name="dm-d-star-issue" value="">
+      <input type="hidden" name="dm-d-star-epic" value="">
+      <div data-alevel="3" data-title="Sternenkarte 4.10">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"0 von 7","unit":"Schiffen","label":"stehen zum Raten bereit"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"Schiffe zur Auswahl heute","value":0},"after":{"label":"nach dem Umhängen","value":7},"unit":"Schiffe"}'></div>
+          <p>Die hinterlegte Form gehört zu einer Ausstellungs-Kopie der Avenger Stalker, die seit dem letzten Schiffs-Update als Variante zählt.</p>
+        </div>
+        <div data-example><pre>Sternenkarte 4.10, Leiste „Die Form erraten“
+
+Heute
+  hinterlegt:  AEGS_Avenger_Stalker_Display  (gilt als Variante)
+  Auswahl:     ○ ○ ○ ○ ○ ○ ○   sieben leere Platzhalter
+
+Danach
+  hinterlegt:  Avenger Stalker (Serien-Schiff, gleiche Form)
+  Auswahl:     sieben Schiffe, eines davon die Stalker</pre></div>
+      </div>
+    </section>
+  </section>
+</section>

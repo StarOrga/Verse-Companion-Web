@@ -97,3 +97,84 @@ test('a hostile ticket cannot break out of the inline script', () => {
   env.window.fetch('/reload');
   assert.deepEqual(env.fetched, [`${BASE}/reload?t=${encodeURIComponent('</script>')}`]);
 });
+
+// ── #369: Ctrl/⌘ + click on a mock part ─────────────────────────────────────
+
+/** A tiny element tree with just enough closest()/matches() for the shim's selectors. */
+type FakeEl = {
+  nodeType: number; tagName: string; parentElement: FakeEl | null; attrs: Record<string, string>; cls: string[];
+  closest(sel: string): FakeEl | null; matches(sel: string): boolean; contains(n: FakeEl): boolean;
+  getAttribute(k: string): string | null; setAttribute(k: string, v: string): void;
+};
+function simple(el: FakeEl, sel: string): boolean {
+  const m = /^([a-z0-9]*)((?:\[[^\]]+\]|\.[a-z0-9-]+)*)$/i.exec(sel.trim());
+  if (!m) return false;
+  if (m[1] && m[1].toUpperCase() !== el.tagName) return false;
+  for (const part of m[2].match(/\[[^\]]+\]|\.[a-z0-9-]+/gi) ?? []) {
+    if (part.startsWith('.')) { if (!el.cls.includes(part.slice(1))) return false; continue; }
+    const [k, v] = part.slice(1, -1).split('=');
+    if (!(k in el.attrs)) return false;
+    if (v !== undefined && el.attrs[k] !== v.replace(/"/g, '')) return false;
+  }
+  return true;
+}
+function el(tag: string, attrs: Record<string, string> = {}, parent: FakeEl | null = null, cls: string[] = []): FakeEl {
+  const n: FakeEl = {
+    nodeType: 1, tagName: tag.toUpperCase(), parentElement: parent, attrs, cls,
+    matches: (sel) => sel.split(',').some((s) => simple(n, s)),
+    closest: (sel) => { for (let c: FakeEl | null = n; c; c = c.parentElement) if (c.matches(sel)) return c; return null; },
+    contains: (o) => { for (let c: FakeEl | null = o; c; c = c.parentElement) if (c === n) return true; return false; },
+    getAttribute: (k) => (k in attrs ? attrs[k] : null),
+    setAttribute: (k, v) => { attrs[k] = v; },
+  };
+  return n;
+}
+
+/** Runs the shim with a document that records its listeners; returns a dispatcher. */
+function runPins() {
+  const listeners: Record<string, ((e: unknown) => void)[]> = {};
+  const ctx = vm.createContext({
+    window: { fetch: () => Promise.resolve('ok') },
+    navigator: {},
+    location: { origin: 'https://app.example', pathname: `/concept-frame/${ID}.html`, search: '' },
+    document: {
+      documentElement: { dataset: {} },
+      addEventListener: (t: string, fn: (e: unknown) => void) => { (listeners[t] ||= []).push(fn); },
+    },
+    URLSearchParams, URL, Request: class {},
+  });
+  vm.runInContext(shimSource({ base: BASE, ticket: 't' }), ctx);
+  return (type: string, e: Record<string, unknown>) => (listeners[type] ?? []).forEach((fn) => fn(e));
+}
+
+test('a Ctrl/⌘ + click on a mock part of the live round marks it data-pin for the engine', () => {
+  const fire = runPins();
+  const it = el('section', { 'data-iteration': '2', 'data-active': '', 'data-iteration-template': 'decision' });
+  const mock = el('div', {}, el('div', {}, it), ['mock-row']);
+  fire('click', { ctrlKey: true, target: mock });
+  assert.equal(mock.attrs['data-pin'], '');
+  const meta = el('span', {}, it);
+  fire('click', { metaKey: true, target: meta });
+  assert.equal(meta.attrs['data-pin'], '');
+  const touch = el('div', {}, it);
+  fire('pointerdown', { pointerType: 'touch', isPrimary: true, target: touch });
+  assert.equal(touch.attrs['data-pin'], '', 'the long press decides at pointerdown');
+});
+
+test('never marks plain clicks, blocks, native controls, engine chrome or other rounds', () => {
+  const fire = runPins();
+  const it = el('section', { 'data-iteration': '2', 'data-active': '' });
+  const plain = el('div', {}, it);
+  fire('click', { target: plain });
+  fire('pointerdown', { pointerType: 'mouse', isPrimary: true, target: plain });
+  assert.ok(!('data-pin' in plain.attrs));
+  const inP = el('span', {}, el('p', {}, it));
+  const inBtn = el('span', {}, el('button', {}, it));
+  const inPin = el('div', {}, el('div', {}, it, ['upin']));
+  const frozen = el('div', {}, el('section', { 'data-iteration': '1' }));
+  const design = el('div', {}, el('section', { 'data-iteration': '3', 'data-active': '', 'data-iteration-template': 'design' }));
+  for (const t of [inP, inBtn, inPin, frozen, design, it]) {
+    fire('click', { ctrlKey: true, target: t });
+    assert.ok(!('data-pin' in t.attrs), t.tagName);
+  }
+});

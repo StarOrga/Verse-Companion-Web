@@ -54,6 +54,17 @@
   --sc-idle: #3d5a6c;
   --sc-idle-bg: #0a1c26;
   --sc-offense: #e8864a;
+  /* Interior element groups of the holotable (concept 20261117-1810): one hue per
+     filter chip — cargo amber, ways cyan, medical green, weapons the offense orange. */
+  --sc-int-cargo: #f2c46b;
+  --sc-int-ways: #52c1e6;
+  --sc-int-med: #5fd39a;
+  --sc-int-weapons: var(--sc-offense);
+  --sc-int-lockers: #b7a3e8;
+  --sc-int-fire: #ff6b5b;
+  --sc-int-tech: #d9b45f;
+  --sc-int-living: #9fb3c8;
+  --sc-int-doors: #8fc0d8;
   --sc-danger: var(--accent-danger-light);
   --sc-border: var(--border-subtle);
   --sc-glow: var(--shadow-glow);
@@ -393,6 +404,11 @@ html[data-sc-layout] { scroll-padding-top: var(--sc-bar-h); }
   /* The hologram cyan and its hot core (codex holotable, holodeck). */
   --sc-holo: #8fe3ff;
   --sc-holo-hi: #dff6ff;
+  /* The one selection colour of the holotable, every ship (concept 20261117-1809 "Grün").
+     Same value as HOLO_SELECT in src/app/codex/holo-look.ts. */
+  --sc-holo-select: #7dff9c;
+  /* Text on the green: the selected part's name tag. */
+  --sc-holo-select-ink: #04202e;
   --holo-t-fast: 160ms;
   --holo-t-base: 280ms;
   --holo-t-slow: 900ms;
@@ -401,12 +417,24 @@ html[data-sc-layout] { scroll-padding-top: var(--sc-bar-h); }
   --holo-rise: 6px;
   --holo-r-xs: 2px;
   --holo-r: 4px;
-  /* Perspective hues (tiles, strip). Movement is violet, not green: green
-     already means "better" in the deltas inside the same tile. */
-  --holo-p-offensive: var(--sc-accent);
-  --holo-p-defensive: var(--cat-game);
-  --holo-p-movement: var(--cat-ai);
-  --holo-p-signature: var(--accent-gold);
+  /* Perspective hues (tiles, strip): the four loadout AREAS, one colour
+     each in the Holotable and the classic loadout view (feedback #330, concept
+     2026-11-10-bereichs-symbole-umrandung). Offensive is its own holo red,
+     never --sc-accent-hot (admin) nor --sc-danger (errors). Movement is
+     violet, not green: green already means "better" in the deltas inside the
+     same tile. --sc-area-ice is the snowflake's fixed second colour on the
+     cooler symbol. --sc-area-line is how strong an area's line on top of a
+     block is drawn. */
+  --sc-area-offensive: #e5484d;
+  --sc-area-defensive: #5b8def;
+  --sc-area-movement: var(--cat-ai);
+  --sc-area-signature: #7cd4ef;
+  --sc-area-ice: #a9dcf5;
+  --sc-area-line: 60%;
+  --holo-p-offensive: var(--sc-area-offensive);
+  --holo-p-defensive: var(--sc-area-defensive);
+  --holo-p-movement: var(--sc-area-movement);
+  --holo-p-signature: var(--sc-area-signature);
   /* The Einsatz signal on the Holotable (glow, strip, dots, hexagon): quiet hues, always with a
      symbol beside them. The default stays the accent. Never red, never the warning colour. */
   --sc-mission-all: var(--sc-accent);

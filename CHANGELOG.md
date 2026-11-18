@@ -4,6 +4,78 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.279.0] - 2026-11-18
+
+### Added
+- Beta holotable shows a ship's interior: decks as a filter under the view row, a 3D view with a ghost hull, doors by kind (incl. brig cells), ladders, lifts, stairs and cargo grids.
+- Clicking a room fills Bauteile with its deck, height, cargo, powering relay and contents; an interior overview by type and a mini search across outside parts and inside elements.
+- Role presets (combat, cargo, medical, industry) pick the interior groups and the start deck; cargo that cannot be placed is named instead of hidden.
+- Data Uploader 0.83.0 extracts the interior from Data.p4k.
+
+### Fixed
+- The holotable no longer scrolls sideways on phones.
+
+## [0.278.2] - 2026-11-18
+
+### Changed
+- Admin concept "Lager — Suche, Mengen & stabile Leiste": round 2 (storing and taking out from a hit, compact multi-location rows, load log, place autocomplete, own location).
+
+## [0.278.1] - 2026-11-18
+
+### Fixed
+- Admin concept pages: Ctrl/⌘ + click (or a long press) sets a note on any element of a mock, not only on paragraphs and list rows, also on pages published earlier. A concept tab left open overnight picks up a new ticket by itself and keeps following new rounds.
+
+## [0.278.0] - 2026-11-17
+
+### Changed
+- 3D view of a ship: the picture keeps the same brightness from every angle and no longer turns see-through when a part is hovered or selected.
+- 3D view: clickable parts glow as their own bodies, also through the hull, and take hover and click themselves; the small rings are gone.
+- 3D view: a selected part is green with an outline, a short pulse and a name tag, while the hull and the other parts dim. The other parts stay clickable.
+
+### Added
+- 3D view: leave a selection with a second click on the part, a click into empty space, Escape or "Alle Bauteile" in the side panel. Works with the keyboard and on a phone in portrait and landscape.
+
+### Fixed
+- 3D view: a selected part no longer hides under a coloured halo, and the ship no longer flares up when something is selected.
+
+## [0.277.3] - 2026-11-17
+
+### Fixed
+- 3D views and the start-page planet: when a part of the page cannot be loaded (usually an old tab after an update), the page shows a hint with "Neu laden" instead of staying empty, and an untouched page reloads itself once to pick up the new version.
+
+## [0.277.2] - 2026-11-17
+
+### Fixed
+- Data Uploader 0.82.1: a stalled job is reported under one stable message per job and stage, so a late timer no longer opens a new error report each time.
+
+## [0.277.1] - 2026-11-17
+
+### Fixed
+- 3D model upload: a short storage hiccup while a ship's hull is checked or tidied up is answered as "try again" instead of a server error, and Data Uploader 0.82.1 retries it with a back-off, so the ship no longer goes missing after the run.
+
+## [0.277.0] - 2026-11-17
+
+### Added
+- Search: one row per ship. A ship's editions (Standard, Valiant, Pirate …) and your own variants are mini links of that row instead of rows of their own; the row itself opens the standard edition.
+- Search: the page you are on no longer shows up in the suggestions. For a near-exact term it stays as a greyed "Du bist hier" row that only closes the search.
+- Star map: the ship to recognise is picked automatically for every patch (a new ship of the patch, else the newest one from the last patch that had any) and repairs itself when its record changes.
+
+### Changed
+- Ship page: the Akte's collapse control is a quiet pair of arrows; "Wo zu kaufen" lives only in the Akte's buy tab; the four perspectives line up with the four groups of the lower strip.
+- Data Uploader 0.82.0: the game version is x.y.z plus build, read from the installation. A start only continues what is still open and says which parts.
+
+### Fixed
+- Data Uploader: it no longer reports "4.10.0" for every 4.10.x build and no longer restarts a full upload on every start while only the 3D models were open.
+- Star map 4.10: the guess shows seven ships again instead of empty placeholders.
+- Verse start: the page no longer scrolls a little further behind its second page, and the footer sits on the line of the round buttons.
+- Fleet patch overview, mission search and the maker filter no longer time out on the server.
+- Ship page: the jump to the sources opens the Akte's buy tab; in the classic header the hangar button no longer covers the Akte's tabs; Akte tiles without a picture show a neutral ring instead of a made-up ship outline.
+
+## [0.276.0] - 2026-11-17
+
+### Added
+- Codex ship pages: every loadout area has its own symbol and a top line in its area colour (offensive red, defensive blue, movement violet, signature & cooling ice cyan), in the classic view and the holo table alike; manned turrets get their own block and countermeasures a new flare symbol.
+
 ## [0.275.0] - 2026-11-17
 
 ### Added

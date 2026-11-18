@@ -18,7 +18,8 @@ build on it).
   `import`, `export`, `earn`, `request`, `sign_in`, `sign_out`, `show`, `accept` (added for
   `social:invite_accept`, the one step no other verb names), `assign`, `release` (added for
   `hq:path_group_assign` / `hq:path_group_release`: a wish is assigned to an Operation and released from it
-  again - "add"/"remove" would read as the wish itself coming or going, which it does not).
+  again - "add"/"remove" would read as the wish itself coming or going, which it does not), `deselect` (added for
+  `codex:part_deselect`: undoing a `select` is its own step).
   Never past tense (`ship_added`), never the verb first.
 - Examples: `hangar:ship_add`, `auth:user_sign_in`, `codex:ship_link_create`,
   `app:error_show`, `verse:star_earn`.
@@ -41,8 +42,13 @@ build on it).
   per term and session). The owner moved the former admin card "Häufig ohne
   Treffer" to PostHog (concept 2026-11-15, B4.8) so the dashboard shows exactly
   which terms fail (tile "Suchen ohne Treffer" on "Wird es genutzt?"). Searches
-  that found something never send their text (`search:result_open` stays area
-  + rank).
+  that found something never send their text: `search:result_open` carries
+  only `area` (the hit's kind; `ship` for a mini link), `rank` (place in the
+  list), `new_tab`, `current` (the greyed "Du bist hier" row of the open page
+  was chosen — it only closes the search) and `variant` (a mini link of a ship
+  row was chosen: another model of the family such as Valiant, or one of the
+  reader's own variants). The tile "Suche: „Du bist hier“ und Varianten-Links
+  (30 Tage)" splits the opens by `current` / `variant`.
 - Super properties added by the service on every event: `app_version`, `release`,
   the UTM trio of the landing page, and — for signed-in users with consent — the
   person property `role` (viewer / collaborator / admin).

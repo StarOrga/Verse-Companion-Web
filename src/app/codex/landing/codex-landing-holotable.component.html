@@ -16,6 +16,10 @@
                                      (available)="onAvailable(it.className, $event)" />
               } @placeholder {
                 <span class="viewer" aria-hidden="true"></span>
+              } @error {
+                <!-- Decorative tile: the chunk did not load (#367) — treat it as a hull-less ship, no hint. -->
+                <span class="viewer" aria-hidden="true"></span>
+                <sc-defer-error quiet source="codex.landingHolotable" (failed)="onAvailable(it.className, false)" />
               }
             } @else {
               <span class="sil" aria-hidden="true" [style.left.%]="figure().rect.x" [style.top.%]="figure().rect.y"
