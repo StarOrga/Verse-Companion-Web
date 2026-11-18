@@ -38,7 +38,8 @@ export interface HangarExemplar {
   template: `
     <div class="hm" [scPopoverDismiss]="open()" (dismissed)="open.set(false)">
       <button type="button" class="hb" [class.open]="open()" aria-haspopup="menu" [attr.aria-expanded]="open()"
-              [attr.aria-controls]="open() ? 'holo-hangar-menu' : null" (click)="toggle()" (keydown)="onTriggerKey($event)">
+              [attr.aria-controls]="open() ? 'holo-hangar-menu' : null" (click)="toggle()"
+              [attr.aria-label]="(count() > 0 ? ('codex.head.own.hangarN' | translate: { n: count() }) : ('codex.head.notOwn.hangar' | translate)) + ' · ' + (shownName() ?? ('codex.holo.hangar.werk' | translate))" (keydown)="onTriggerKey($event)">
         <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9H3zM9 20v-6h6v6" /></svg>
         <b>{{ count() > 0 ? ('codex.head.own.hangarN' | translate: { n: count() }) : ('codex.head.notOwn.hangar' | translate) }}</b>
         <span class="sep" aria-hidden="true">·</span>
@@ -156,8 +157,8 @@ export interface HangarExemplar {
     .hb .sep { color: var(--sc-fg-2); }
     .hb .ex { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--sc-fg-0); }
     .hb .car { color: var(--sc-accent); font-size: 0.75em; }
-    /* Phone, slim band: the count stays, the loadout name goes (it is in the menu). */
-    @media (max-width: 640px) { :host-context(.slim) .hb :is(.sep, .ex) { display: none; } }
+    /* Phone, slim band (--hb-pill-text: none): icon and caret only; the menu names count and loadout. */
+    .hb :is(b, .sep, .ex) { display: var(--hb-pill-text, inline); }
     .hb:hover, .hb.open { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); border-color: var(--sc-accent); }
     .hb:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* Anchored under its button; frame and width (menu tier) come from sc-popup. */

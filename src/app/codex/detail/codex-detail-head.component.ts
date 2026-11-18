@@ -147,7 +147,7 @@ export function nextSlim(slim: boolean, scrollY: number, stuck: boolean): boolea
         .ht-centre { justify-self: start; }
         /* Its own row: beside the Einsatz pill the hangar pill ran past a 375 px phone. */
         .ht-right { grid-column: 1 / -1; }
-        :host(.slim) { grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; padding: 0 10px; }
+        :host(.slim) { --hb-pill-text: none; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; padding: 0 10px; }
         :host(.slim) .ht-left, :host(.slim) .ht-right { grid-column: auto; }
         :host(.slim) .ht-kicker { display: none; }
         :host(.slim) .ht-centre { justify-self: end; }

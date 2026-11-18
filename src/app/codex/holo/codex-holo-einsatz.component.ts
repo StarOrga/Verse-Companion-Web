@@ -37,7 +37,7 @@ export interface StripMission {
             [scTooltip]="'codex.holo.strip.einsatzPick' | translate" scTooltipTier="label"
             (click)="toggle($event)" (keydown.escape)="open() && close($event)">
       <small class="lab">{{ 'codex.holo.strip.einsatz' | translate }}</small>
-      <span class="val"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="activeIcon()" /></svg>{{ activeLabel() | translate }}</span>
+      <span class="val"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="activeIcon()" /></svg><span class="vt">{{ activeLabel() | translate }}</span></span>
       <span class="sub" [class.gapv]="!cohortLabel()">{{ cohortLabel() ?? ('codex.kpi.gap' | translate) }}</span>
       <span class="caret" aria-hidden="true">▾</span>
     </button>
@@ -71,6 +71,7 @@ export interface StripMission {
       .val { display: inline-flex; align-items: center; gap: 6px; font-family: var(--sc-font-display); font-size: max(13px, var(--sc-fs-floor)); font-weight: 600; letter-spacing: 0.04em;
         color: var(--holo-e, var(--sc-fg-0)); white-space: nowrap; transition: color var(--holo-t-base, 200ms) ease; }
       .sub { display: var(--hb-pill-meta, inline); min-inline-size: 0; font-size: max(11px, var(--sc-fs-floor)); color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .vt { display: var(--hb-pill-text, inline); }
       .caret { color: var(--sc-accent); font-size: 0.75em; }
       .gapv { color: var(--sc-fg-2); }
       .mp-l svg, .val svg { inline-size: 1.15em; block-size: 1.15em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
