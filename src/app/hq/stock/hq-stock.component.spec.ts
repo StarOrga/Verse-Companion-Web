@@ -11,6 +11,7 @@ import { HangarService } from '../../hangar/hangar.service';
 import { FriendsService } from '../../social/friends.service';
 import type { BestandKind } from '../data/hq-codex-kind';
 import { HqInventoryService } from '../data/hq-inventory.service';
+import { BlueprintLinkService } from '../data/blueprint-link';
 import { ScrapInfoService } from '../data/scrap-info';
 import { WishlistStore } from '../data/wishlist.store';
 import { HqOwnershipService } from '../hq-ownership.service';
@@ -75,6 +76,7 @@ describe('HqStockComponent · Frachtdeck', () => {
         { provide: SammlungService, useValue: { blueprints: signal([{ kind: 'blueprint', id: 'gallant_bp', name: 'Gallant' }]), rep: signal([]), news: signal(new Set()), gallery: signal(new Set(['g1'])), load: () => Promise.resolve() } },
         { provide: NachschubEdgeService, useValue: { resetIngameStock: vi.fn().mockName('reset').mockResolvedValue(true), lastError: null } },
         { provide: HqLiveService, useValue: { state: signal(null), events: signal([]) } },
+        { provide: BlueprintLinkService, useValue: { blueprintsOf: () => [], load: () => Promise.resolve() } },
         { provide: ScrapInfoService, useValue: { info: () => ({ state: 'unknown' }), load: () => Promise.resolve() } },
         { provide: FriendsService, useValue: { graph: signal({ friends: [] }) } },
         { provide: NachschubTargetPicker, useValue: picker },

@@ -187,7 +187,7 @@ export function alternativesFor(
   f: DeckFilter,
   scrapYes: (c: DeckCrate) => boolean,
   blueprints: readonly { id: string; name: string | null }[],
-  blueprintOf: (className: string | null) => string | null = () => null,
+  blueprintsOf: (className: string | null) => readonly string[] = () => [],
 ): Alternatives | null {
   if (!f.text || hits.length > ALT_MAX_HITS) return null;
   const hitKeys = new Set(hits.map((h) => h.key));
@@ -196,7 +196,7 @@ export function alternativesFor(
   const ref = hits[0] ?? elsewhere[0] ?? null;
   const swap = ref
     ? crates
-        .filter((c) => sameSlot(c, ref) && sameBlueprint(c, ref, blueprintOf) && itemKey(c) !== itemKey(ref) && !textMatches(c.name, c.className, f.text) && (f.minQ === null || (c.max ?? 0) >= f.minQ) && c.available > 0)
+        .filter((c) => sameSlot(c, ref) && sameBlueprint(c, ref, blueprintsOf) && itemKey(c) !== itemKey(ref) && !textMatches(c.name, c.className, f.text) && (f.minQ === null || (c.max ?? 0) >= f.minQ) && c.available > 0)
         .slice(0, 2)
     : [];
   const craft = blueprints
@@ -216,11 +216,16 @@ export function sameSlot(a: DeckCrate, b: DeckCrate): boolean {
   return swapArchetype(bare(a), a.name, null) === swapArchetype(bare(b), b.name, null);
 }
 
-/** Same blueprint: when the blueprint of BOTH is known they must be the same one, else the slot decides alone. */
-export function sameBlueprint(a: DeckCrate, b: DeckCrate, blueprintOf: (className: string | null) => string | null): boolean {
-  const x = blueprintOf(a.className);
-  const y = blueprintOf(b.className);
-  return !x || !y || x === y;
+/**
+ * Same blueprint: an item sits in many blueprints (output or ingredient), so they match when their sets overlap.
+ * When either side has no known blueprint (empty list) the slot decides alone. The stock ref prefix is stripped.
+ */
+export function sameBlueprint(a: DeckCrate, b: DeckCrate, blueprintsOf: (className: string | null) => readonly string[]): boolean {
+  const bare = (c: DeckCrate): string | null => parseStockRef(c.className)?.className ?? c.className;
+  const x = blueprintsOf(bare(a));
+  const y = blueprintsOf(bare(b));
+  if (x.length === 0 || y.length === 0) return true;
+  return x.some((id) => y.includes(id));
 }
 
 const itemKey = (c: Pick<DeckCrate, 'className' | 'name'>): string => (c.className || c.name).toLowerCase();

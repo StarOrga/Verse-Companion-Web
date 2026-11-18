@@ -206,7 +206,9 @@ export class ItemPathService {
     const out = new Set<string>();
     for (const i of this.inventory.items()) {
       if (i.location !== PLACE_BLUEPRINTS) continue;
-      const cls = parseStockRef(i.class_name)?.className;
+      // Contract v3 (hq-live.md, Blueprint shelf): a shelf row may carry the plain class or a `blueprint:<class>` ref.
+      const raw = i.class_name?.trim() ?? '';
+      const cls = raw.startsWith('blueprint:') ? raw.slice('blueprint:'.length) || null : parseStockRef(raw)?.className;
       if (cls) out.add(cls);
     }
     return out;

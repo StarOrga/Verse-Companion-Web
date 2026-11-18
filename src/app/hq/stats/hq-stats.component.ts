@@ -8,6 +8,7 @@ import { ScSegmentedComponent, ScSegmentOption } from '../../shared/segmented-co
 import type { HqStats, HqStatsRange } from '../data/hq-db.types';
 import { HQ_STATS_RANGES, HqStatsService } from '../data/hq-stats.service';
 import { HqAppLaunchComponent } from '../hq-app-launch.component';
+import { HqLogbookComponent } from './hq-logbook.component';
 import { HqSparkComponent } from './hq-spark.component';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 
@@ -37,7 +38,7 @@ export interface HqTile {
 @Component({
   selector: 'sc-hq-stats',
   standalone: true,
-  imports: [TranslatePipe, ScSegmentedComponent, HqSparkComponent, ScPopupComponent, HqAppLaunchComponent, ScActionDirective],
+  imports: [TranslatePipe, ScSegmentedComponent, HqSparkComponent, ScPopupComponent, HqAppLaunchComponent, ScActionDirective, HqLogbookComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="head">
@@ -115,6 +116,10 @@ export interface HqTile {
           }
         </ul>
       </section>
+    }
+
+    @if (auth.user()) {
+      <sc-hq-logbook />
     }
 
     @if (detail(); as d) {

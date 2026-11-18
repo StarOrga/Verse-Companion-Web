@@ -1,0 +1,54 @@
+{
+  "schema": "scc-app-i18n-index/1",
+  "sourceRevision": "b9184ac8a5bc",
+  "locales": {
+    "en": {
+      "packVersion": "b9184ac8a5bc",
+      "keys": 3311
+    },
+    "de": {
+      "packVersion": "b9184ac8a5bc",
+      "keys": 3311
+    },
+    "fr": {
+      "packVersion": "2026.11.15-1456",
+      "keys": 3311
+    },
+    "es": {
+      "packVersion": "2026.11.15-1456",
+      "keys": 3311
+    },
+    "it": {
+      "packVersion": "2026.11.15-1456",
+      "keys": 3311
+    },
+    "pt-BR": {
+      "packVersion": "2026.11.15-1456",
+      "keys": 3311
+    },
+    "pl": {
+      "packVersion": "2026.11.15-1456",
+      "keys": 3311
+    },
+    "ru": {
+      "packVersion": "2026.11.15-1456",
+      "keys": 3311
+    },
+    "zh-CN": {
+      "packVersion": "2026.11.15-1456",
+      "keys": 3311
+    },
+    "ja": {
+      "packVersion": "2026.11.15-1456",
+      "keys": 3311
+    },
+    "hi": {
+      "packVersion": "2026.11.15-1456",
+      "keys": 3311
+    },
+    "ko": {
+      "packVersion": "2026.11.15-1456",
+      "keys": 3311
+    }
+  }
+}
