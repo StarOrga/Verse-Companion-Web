@@ -120,6 +120,26 @@ publish; `lists_publish` (`{ "op": "lists_publish", "build_id": "<uuid>" }`)
 redoes it for one build. `locale_gc` also removes the `codex-lists/` prefixes of
 builds gone from `codex_builds` (report under `lists`).
 
+**Client read path** (`src/app/codex/`): `CodexListSnapshots` (`codex-list-snapshots.ts`)
+fetches the index and the files through the Worker, keeps the parsed files of the
+current build in memory (they are the list cache) and answers `null` for anything
+it cannot use: index 404 (not published yet — remembered 5 min, not logged), an
+outage or an unexpected shape (logged once, retried next call), or a file still
+downloading after 3 s (that call uses the database, the download goes on). The pure
+`codex-list-engine.ts` answers a read from the rows with PostgREST semantics (default
+browse filters, every `filteredListQuery` filter incl. NULL handling, the ILIKE
+token groups plus `searchMatcher`, paging, exact counts) and declines (`null`) on
+`payload: 'full'`, a payload key the file lacks, a regex outside its POSIX subset,
+an unknown filter key or a column the table lacks. `CodexService` tries the file
+first in `listByKind`, `countByKind`, `countSearchMatches`, `countItemsByAttachType`,
+`facetValues` (+ ship sizes), `weaponFacets`, `listFpsCatalog`, `backfillCohortNames`
+and `allShipRows` (whole cohort from `ship-rank.json`); on `null` the old query runs
+unchanged. Still on the database: the German-name fallback (`codex_search` RPC +
+an `in` list read), `getMissileCohort` / `getItemRankCohort` (full payload /
+`weaponParams` / `stats` are not in the files), detail, search (`searchAll`) and
+every other read. Specs never reach the Worker: `vitest-setup.ts` answers
+`/codex-lists/` with 404.
+
 ## Localization strings (R2 since 2026-10-03)
 
 Measured 2026-10-03 before the move: database 496 MB, `codex_locale_strings`
