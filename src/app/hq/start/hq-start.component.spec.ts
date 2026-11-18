@@ -12,6 +12,7 @@ import { HqStatsService } from '../data/hq-stats.service';
 import { HqOwnershipService } from '../hq-ownership.service';
 import { HqPageNavService } from '../hq-page-nav.service';
 import { HqSuppliesService } from '../hq-supplies.service';
+import { NachschubService } from '../nachschub/nachschub.service';
 import { HqLiveService } from '../now/hq-live.service';
 import { HqPatchHit } from './hq-start-feed.service';
 import { HqStartComponent } from './hq-start.component';
@@ -95,6 +96,8 @@ function providers(o: Setup) {
         useValue: { upcoming: signal(o.upcoming ?? []), items: signal(o.upcoming ?? []), ready: signal(o.einsatzReady ?? true), syncError: signal(o.syncError ?? null), sync },
       },
       { provide: HqSuppliesService, useValue: { open: signal(Array.from({ length: o.supplies ?? 0 }, (_, i) => ({ id: `n${i}` }))) } },
+      // "N in Operationen" counts the open lines of active Operationen (NachschubService.openActiveLines).
+      { provide: NachschubService, useValue: { openActiveLines: signal(Array.from({ length: o.supplies ?? 0 }, (_, i) => ({ id: `n${i}` }))) } },
       { provide: SccAppLauncherService, useValue: launcher },
       {
         provide: EventHqService,

@@ -14,7 +14,8 @@ import { NachschubNamingService } from '../nachschub/nachschub-naming';
 import { pickablePlaces } from './map/hq-places';
 import { NachschubFocusService } from '../nachschub/nachschub-focus.service';
 import { EINSATZ_NAME_MAX, NACHSCHUB_NAME_MAX, type Nachschub, clampName } from '../nachschub/nachschub.model';
-import { NachschubService } from '../nachschub/nachschub.service';
+import { type NachschubResult, NachschubService } from '../nachschub/nachschub.service';
+import { AnalyticsService } from '../../core/analytics.service';
 import { NACHSCHUB_ICON_PATHS, STEP_ICON_PATHS, TRANSPORT_WHEELS } from '../nachschub/step-icons';
 import { EventHqService } from '../events/event-hq.service';
 import { isEventNachschub } from '../events/event-nachschub';
@@ -102,6 +103,20 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       </header>
 
       <sc-hq-nachschub-gather [nachschub]="nachschub()" />
+
+      @if (plainLines().length; as plain) {
+        <div class="plain" role="group" [attr.aria-label]="'hq.panel.plain.ask' | translate">
+          <span class="plain-ic"><svg viewBox="0 0 24 24" aria-hidden="true">@for (p of tray; track p) { <path [attr.d]="p" /> }</svg></span>
+          <p class="plain-txt">
+            <b>{{ (plain === 1 ? 'hq.panel.plain.one' : 'hq.panel.plain.other') | translate: { count: plain } }}</b>
+            {{ 'hq.panel.plain.ask' | translate }}
+          </p>
+          <span class="plain-acts">
+            <button type="button" scAction tier="secondary" [busy]="plainBusy() === 'adopt'" [disabled]="plainBusy() !== null" (click)="answerPlain('adopt')">{{ 'hq.panel.plain.adopt' | translate }}</button>
+            <button type="button" scAction tier="secondary" [busy]="plainBusy() === 'keep'" [disabled]="plainBusy() !== null" (click)="answerPlain('keep')">{{ 'hq.panel.plain.keep' | translate }}</button>
+          </span>
+        </div>
+      }
 
       @if (isEvent()) {
         <sc-hq-event-section [nachschub]="nachschub()" (abortAsk)="abortEvent()" />
@@ -265,6 +280,12 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       .af-acts { display: flex; justify-content: flex-end; gap: var(--sc-space-2, 8px); flex-wrap: wrap; }
       .seg { align-self: flex-start; }
       @media (pointer: coarse) { .add-e { min-height: 48px; } }
+      .plain { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc-space-2, 8px) var(--sc-space-3, 12px); padding: var(--sc-space-2, 8px) var(--sc-space-3, 12px); border: 1px dashed var(--sc-border); border-radius: 10px; background: var(--sc-bg-0); margin-bottom: var(--sc-space-3, 12px); }
+      .plain-ic svg { width: 20px; height: 20px; fill: none; stroke: var(--sc-accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; display: block; }
+      .plain-txt { margin: 0; flex: 1 1 18rem; min-width: 0; color: var(--sc-fg-2); font-size: 0.85rem; overflow-wrap: anywhere; }
+      .plain-txt b { color: var(--sc-fg); font-weight: 600; }
+      .plain-acts { display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); }
+      @media (pointer: coarse) { .plain-acts > button { min-height: 48px; } }
       .n-title { margin: 0; font-weight: 600; }
       .n-hint { margin: 0; color: var(--sc-fg-2); max-width: 52ch; }
       @media (max-width: 1023px) { .body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(220px, 1fr); } }
@@ -280,6 +301,23 @@ export class HqNachschubPanelComponent {
   private readonly confirmSvc = inject(ScConfirmService);
   protected readonly isEvent = computed(() => isEventNachschub(this.nachschub()));
 
+  /** Old plain item / ship lines of this Operation: the owner says once whether they are wishes (H4). */
+  protected readonly plainLines = computed(() => this.svc.plainSearchLinesOf(this.nachschub().id));
+  protected readonly plainBusy = signal<'adopt' | 'keep' | null>(null);
+
+  protected async answerPlain(choice: 'adopt' | 'keep'): Promise<void> {
+    if (this.plainBusy()) return;
+    const id = this.nachschub().id;
+    this.plainBusy.set(choice);
+    try {
+      const res = choice === 'adopt' ? await this.svc.adoptPlainLines(id) : await this.svc.keepPlainLines(id);
+      if (res.ok) this.analytics.track('hq:plain_lines_select', { choice, count: Number(res.params?.['count'] ?? 0) });
+      this.answered.emit(res);
+    } finally {
+      this.plainBusy.set(null);
+    }
+  }
+
   /** Abort an event Nachschub: the slot frees, progress stays, nothing goes back to the wishlist; resumable from the Archiv. */
   protected async abortEvent(): Promise<void> {
     const n = this.nachschub();
@@ -287,6 +325,9 @@ export class HqNachschubPanelComponent {
     if (ok) await this.eventsSvc.abort(n);
   }
   readonly remove = output<void>();
+  /** The result of an H4 answer (the page shows it as its notice with the undo). */
+  readonly answered = output<NachschubResult>();
+  private readonly analytics = inject(AnalyticsService);
 
   protected readonly svc = inject(NachschubService);
   private readonly einsatzSvc = inject(HqEinsatzService);

@@ -1,9 +1,10 @@
 import { ShipArrivalComponent } from './ship-arrival/ship-arrival.component';
+import { PATH_ICONS } from '../shared/item-path/path-icons';
 import { SilThumbsService } from '../shared/sil-thumb/sil-thumbs.service';
 import { SILHOUETTE_HOLD_MS, arrivalThumbOf } from './ship-arrival/arrival-thumb';
 import { StarTriggerService } from '../verse/starmap/star-trigger.service';
 import { PageCornerService, type PageShare, type PageViewToggle } from '../shell/corners/page-corner.service';
-import { CodexOwnCardComponent } from './detail/codex-own-card.component';
+import { CodexOwnStationsComponent } from './detail/codex-own-stations.component';
 import { CodexHoloShareComponent } from './holo/codex-holo-share.component';
 import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
 import { CodexOwnSegmentComponent } from './detail/codex-own-segment.component';
@@ -71,7 +72,6 @@ import { InfoNoteComponent } from '../shared/info-note.component';
 import { ShareButtonComponent } from '../shared/share-button/share-button.component';
 import { ScEntryDirective } from '../shared/entry-motion/entry-motion';
 import { NachschubService } from '../hq/nachschub/nachschub.service';
-import { NACHSCHUB_ICON_PATHS } from '../hq/nachschub/step-icons';
 import { CodexItemStageComponent } from './detail/codex-item-stage.component';
 import { DisplayStatGroup, toDisplayStatGroups } from './detail/stat-labels';
 import { CodexShipStageComponent } from './detail/codex-ship-stage.component';
@@ -313,7 +313,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
 @Component({
   selector: 'sc-codex-detail',
   standalone: true,
-  imports: [DeferErrorComponent, ShipArrivalComponent, CompareIconComponent, FeedbackSpotDirective, PageHeaderComponent, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexHardpointLayoutComponent, CodexComponentModalComponent, CodexSwapPickerComponent, CodexWeaponDetailComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, CodexLoadoutSaveBarComponent, CodexSavedLoadoutsComponent, CodexKpiBandComponent, ScTooltipDirective, ScActionDirective, CodexMissionBarComponent, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, CodexRankCardComponent, CodexEnergyDockComponent, InfoNoteComponent, CodexHoloStageComponent, CodexShipStageComponent, CodexHeroHoloOverlayComponent, CodexHeroPartPopupComponent, CodexVariantPickerComponent, CodexShipActionsComponent, CodexShipLinkFormComponent, CodexPortListComponent, CodexSpecSheetComponent, CodexRecipeCardComponent, AssetPackageViewerComponent, NgTemplateOutlet, AddToSetComponent, ClassChipComponent, CodexModeSwitchComponent, CodexPersonalUsesComponent, HangarPickerComponent, CodexHoloShareComponent, ScDialogDirective, NotFoundComponent, CodexOwnSegmentComponent, CodexOwnCardComponent, ShareButtonComponent, HeightVarDirective, ScEntryDirective, CodexItemStageComponent, CodexDetailClassicComponent, CodexHoloAkteComponent, CodexHoloHangarMenuComponent],
+  imports: [DeferErrorComponent, ShipArrivalComponent, CompareIconComponent, FeedbackSpotDirective, PageHeaderComponent, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexHardpointLayoutComponent, CodexComponentModalComponent, CodexSwapPickerComponent, CodexWeaponDetailComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, CodexLoadoutSaveBarComponent, CodexSavedLoadoutsComponent, CodexKpiBandComponent, ScTooltipDirective, ScActionDirective, CodexMissionBarComponent, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, CodexRankCardComponent, CodexEnergyDockComponent, InfoNoteComponent, CodexHoloStageComponent, CodexShipStageComponent, CodexHeroHoloOverlayComponent, CodexHeroPartPopupComponent, CodexVariantPickerComponent, CodexShipActionsComponent, CodexShipLinkFormComponent, CodexPortListComponent, CodexSpecSheetComponent, CodexRecipeCardComponent, AssetPackageViewerComponent, NgTemplateOutlet, AddToSetComponent, ClassChipComponent, CodexModeSwitchComponent, CodexPersonalUsesComponent, HangarPickerComponent, CodexHoloShareComponent, ScDialogDirective, NotFoundComponent, CodexOwnSegmentComponent, CodexOwnStationsComponent, ShareButtonComponent, HeightVarDirective, ScEntryDirective, CodexItemStageComponent, CodexDetailClassicComponent, CodexHoloAkteComponent, CodexHoloHangarMenuComponent],
   providers: [ShipLinkFormStore, CodexLoadoutDraftStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -427,7 +427,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               </div>
             </sc-codex-item-stage>
             <aside class="it-panel ce" style="--ce: 1" [attr.aria-label]="'itemStage.panelAria' | translate">
-              <div class="it-path ce" style="--ce: 1"><ng-container [ngTemplateOutlet]="ownCard" /></div>
+              <div class="it-path ce" style="--ce: 1"><ng-container [ngTemplateOutlet]="ownCard" [ngTemplateOutletContext]="{ layout: 'stacked' }" /></div>
               <div class="it-tabs ce" style="--ce: 2" role="tablist" [attr.aria-label]="'itemStage.tabsAria' | translate">
                 @for (t of itemTabs(); track t.id) {
                   <button type="button" role="tab" class="it-tab" [class.on]="itemTab() === t.id" [attr.aria-selected]="itemTab() === t.id"
@@ -454,7 +454,10 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
         </div>
         } @else if (kind() !== 'ship') {
         <!-- Klassisch for every non-ship: the frozen view in detail/codex-detail-classic.component.ts. -->
-        <sc-codex-detail-classic [ctx]="classicCtx" />
+        <sc-codex-detail-classic [ctx]="classicCtx">
+          <!-- R5 (G4): the same two stations under the head of the classic item page. -->
+          <ng-container [ngTemplateOutlet]="ownCard" [ngTemplateOutletContext]="{ layout: 'auto' }" />
+        </sc-codex-detail-classic>
         } @else {
         <!-- ── Masthead: hero | Einordnung, 1fr 1fr (MASTER §1/§3) ── -->
         @if (kind() === 'ship') {
@@ -528,7 +531,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
           <!-- The ownership card (C5) sits directly under the picture (#323:
                it had no business in the headline's side column). It takes its
                own height; the stretching stage above gives up the room. -->
-          <div class="hero-own"><ng-container [ngTemplateOutlet]="ownCard" /></div>
+          <div class="hero-own"><ng-container [ngTemplateOutlet]="ownCard" [ngTemplateOutletContext]="{ layout: 'auto' }" /></div>
           <!-- "Zur 3D-Ansicht wechseln" (#334): the Holotisch's 3D view as a
                non-modal panel over the picture and the card — no scrim, the
                page around it stays usable; "Vollbild" enlarges it. -->
@@ -919,14 +922,14 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
             }
             <sc-codex-holo-hangar-menu htOwn
               [shipName]="displayName()"
+              [className]="detail()!.classNameSlug"
               [count]="hangarQty()"
-              [wishQty]="hangarWishQty()"
               [signedIn]="!!currentUserId()"
+              [forceOwned]="hqHosted()"
               [exemplars]="hangarExemplars()"
               [wishes]="hangarWishes()"
               [activeId]="activeVariantId()"
               [werkLink]="werkLink()"
-              [hangarLink]="hangarMenuLink()"
               [werkChanged]="activeVariantId() === null ? draftChangedCount() : 0"
               [pinned]="(cardShip()?.pinnedRank ?? null) !== null"
               [busy]="menuBusy()"
@@ -1220,9 +1223,10 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
             [personal]="personalMode()" [hangarShipId]="hqShipId()" [forceOwned]="hqHosted()" (jump)="revealOwnCard()" />
         }
       </ng-template>
-      <ng-template #ownCard>
+      <!-- R5 "Zwei Kästen": the wish and ownership stations of sc-item-path in place of the former ownership card. -->
+      <ng-template #ownCard let-layout="layout">
         @if (detail(); as d) {
-          <sc-codex-own-card [kind]="d.kind" [className]="d.classNameSlug" [name]="displayName()"
+          <sc-codex-own-stations [kind]="d.kind" [className]="d.classNameSlug" [name]="displayName()" [layout]="layout ?? 'auto'"
             [ship]="cardShip()" [forceOwned]="hqHosted()" [nachschubName]="d.kind === 'ship' ? (holdingNachschub()?.name ?? null) : null" />
         }
       </ng-template>
@@ -1816,7 +1820,8 @@ export class CodexDetailComponent implements OnInit {
   private get nachschub(): NachschubService {
     return (this.nachschubSvc ??= this.lazyInjector.get(NachschubService));
   }
-  protected readonly nachschubIcon = NACHSCHUB_ICON_PATHS;
+  /** The Route glyph of an Operation (B9), from the item path's icon family. */
+  protected readonly nachschubIcon = PATH_ICONS.nachschub;
   /** Every kind but ships (which keep their own stage) gets the stage layout; a missile too, with its own values and rank. */
   /** The frozen Klassisch view reads the page through this (see CodexClassicCtx for what it may touch). */
   protected readonly classicCtx: CodexClassicCtx = this;
@@ -1885,7 +1890,7 @@ export class CodexDetailComponent implements OnInit {
    * every other kind lists where the reader fitted / packed it. Codex mode is
    * the game's knowledge, the same for everyone, never saved.
    */
-  /** The hangar row the ownership card's rename / note / pin / remove act on: the hosted copy in the HQ, else the reader's owned row of this hull. */
+  /** The hangar row the ownership station's rename / note / pin / remove act on: the hosted copy in the HQ, else the reader's owned row of this hull. */
   readonly cardShip = computed(() => {
     if (this.hqHosted()) {
       const id = this.hostShipId();
@@ -1894,7 +1899,7 @@ export class CodexDetailComponent implements OnInit {
     const cls = this.detail()?.classNameSlug;
     return cls ? (this.hangar.ships().find((s) => s.shipClassName === cls && s.status === 'owned') ?? null) : null;
   });
-  private readonly ownCardRef = viewChild(CodexOwnCardComponent);
+  private readonly ownCardRef = viewChild(CodexOwnStationsComponent);
   private readonly holoStage = viewChild(CodexHoloStageComponent);
   /** The ship whose catalog came back without any 3D model; null = unknown or has one. */
   private readonly noModelSlug = signal<string | null>(null);
@@ -1911,7 +1916,7 @@ export class CodexDetailComponent implements OnInit {
     });
   });
   private readonly swapPicker = viewChild<CodexSwapPickerComponent>('swapPicker');
-  /** The head's "Nicht im Hangar / Inventar": the ownership card comes into view and lights up (C2). */
+  /** The head's "Nicht im Hangar / Inventar": the ownership station comes into view and lights up (C2, R5). */
   revealOwnCard(): void {
     this.ownCardRef()?.reveal();
   }
@@ -2460,7 +2465,6 @@ export class CodexDetailComponent implements OnInit {
     const qty = Math.max(1, s?.hangarQty ?? 0);
     return this.hqHosted() || s?.inHangar ? qty : 0;
   });
-  readonly hangarWishQty = computed(() => (this.ownState()?.wished ? (this.ownState()?.wishQty ?? 0) : 0));
   readonly menuBusy = signal(false);
   readonly menuError = signal<string | null>(null);
   /** Summaries known to the page (written by ExemplarAiService on a switch or when the page is left). */
@@ -2534,7 +2538,6 @@ export class CodexDetailComponent implements OnInit {
     if (this.hqHosted() && id) return hqShipLink(id);
     return { commands: ['/codex', 'ship', this.detail()?.classNameSlug ?? ''], queryParams: { [HQ_VARIANT_PARAM]: null } };
   });
-  readonly hangarMenuLink = computed<HangarMenuLink | null>(() => (this.hangarQty() > 0 ? { commands: [hqHangar], queryParams: {} } : null));
 
   /** The Holotisch save bar: an exemplar saves into itself; on Werk the build becomes a new exemplar — offered, never forced (C23). */
   onHoloSaveDraft(): void {

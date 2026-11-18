@@ -33,6 +33,8 @@ export type CodexClassicCtx = Pick<
  * (concept batch-feedback-codex-hq, #9: "Bitte ändere die klassische nicht"). Do NOT edit this to
  * follow a change of the Holotisch view or of the ship page; the Holotisch is the item stage in
  * codex-detail.component.ts. The host is display:contents so the cards sit in the page's own flow.
+ * One owner-approved addition (concept pfad-stationen R5, r5-d-einfach): the page projects its wish / ownership
+ * stations (`sc-codex-own-stations`) under the head through the one `<ng-content>`.
  */
 @Component({
   selector: 'sc-codex-detail-classic',
@@ -116,6 +118,8 @@ export type CodexClassicCtx = Pick<
             </div>
           </div>
 </header>
+<!-- R5 (G4, owner decision r5-d-einfach): the page's two stations (projected by the page) under the head. -->
+<ng-content />
 </div>
 @if (c.isMissile()) {
           <sc-codex-rank-card

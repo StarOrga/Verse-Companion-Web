@@ -216,6 +216,29 @@
     padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px)
       env(safe-area-inset-left, 0px);
   }
+  /* A short question (`sheet`): not a full screen but a bottom sheet as tall as its content - full width, rounded top
+     corners, safe area below - that scrolls inside only when taller than the screen. Landscape: a centred card. */
+  .sc-popup .scp-frame[data-sheet]:is([data-kind='dialog'], [data-kind='large']):not([data-float]) {
+    inset: auto 0 0 0;
+    block-size: auto;
+    max-block-size: calc(100vh - 24px);
+    max-block-size: calc(100dvh - 24px);
+    border: 1px solid var(--sc-sub-rule, var(--sc-border));
+    border-block-end: 0;
+    border-radius: 16px 16px 0 0;
+  }
+  @media (orientation: landscape) {
+    .sc-popup .scp-frame[data-sheet]:is([data-kind='dialog'], [data-kind='large']):not([data-float]) {
+      inset: 0;
+      margin: auto;
+      inline-size: min(var(--scp-w, var(--sc-ov-s)), calc(100% - 32px));
+      block-size: fit-content;
+      max-block-size: calc(100vh - 16px);
+      max-block-size: calc(100dvh - 16px);
+      border-width: 1px;
+      border-radius: 12px;
+    }
+  }
   .sc-popup .scp-frame[data-access]:is([data-kind='dialog'], [data-kind='panel'], [data-kind='large']):not([data-float]) {
     border-top: 2px solid var(--scp-access);
   }

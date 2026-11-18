@@ -44,12 +44,15 @@ Deno.serve(withPosthog('exemplar-ai', async (req) => {
   if (pre) return pre;
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
-  const auth = req.headers.get('authorization') ?? '';
+  // The bearer token goes to getUser() explicitly; the lower-case header + getUser() without a token is what made
+  // nachschub-names answer every web session with 401 (same code, fixed there on 2026-11-17).
+  const jwt = /^\s*Bearer\s+(\S+)\s*$/i.exec(req.headers.get('authorization') ?? '')?.[1];
+  if (!jwt) return json({ error: 'unauthorized' }, 401);
   const sb = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
-    global: { headers: { authorization: auth } },
+    global: { headers: { Authorization: `Bearer ${jwt}` } },
     auth: { persistSession: false },
   });
-  const { data: user, error } = await sb.auth.getUser();
+  const { data: user, error } = await sb.auth.getUser(jwt);
   if (error || !user?.user) return json({ error: 'unauthorized' }, 401);
   const { data: approved, error: apprErr } = await sb.rpc('is_approved');
   if (apprErr || approved !== true) return json({ error: 'not_approved' }, 403);

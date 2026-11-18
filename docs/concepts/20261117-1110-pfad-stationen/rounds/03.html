@@ -1,0 +1,595 @@
+<section data-iteration="3" data-iteration-template="design" data-design-set="topics" data-viewports="desktop phone" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]},"designs":{},"screens":{},"views":{},"userPins":[{"id":"up-mwknv49q9yz4","design":"pfad","screen":"pfad-offen","x":3.7,"y":39.9,"target":"span.ipr-free \"Keiner Operation zugeordnetZuordnen\"","text":"wenn keiner operation zugeordnet, reicht einfach der zuronden button ohne die ganze leiste, analog zu ins inventar!","attachments":[]},{"id":"up-mwknvhorsj2w","design":"pfad","screen":"pfad-offen","x":54.1,"y":38.1,"target":"span.ipm-btn \"Ins Inventar\"","text":"Wenn es im inventar ist, sieht man darunter auch so eine leiste, die z. B. anzeigt wo? Ich würde gern die beiden kästen ähnlich halten !","attachments":[]},{"id":"up-mwknxddbg0ea","design":"pfad","screen":"pfad-zuordnen","x":17,"y":50.7,"target":"b.ipm-pt \"Einer Operation zuordnen\"","text":"finde ich super, aber irgendwie nicht zugeordnet zu dem zurodnen button!? Das sollte sich ja visuell daran anschließen","attachments":[]},{"id":"up-mwknxx4s1r5z","design":"pfad","screen":"pfad-zuordnen","x":15.3,"y":61.2,"target":"span.ipm-prow.on \"Flotte ausbauen2/5\"","text":"Ich denke es wäre gut, dass danach anzuordnen welcher als letztes erstellt wurde oben und neue operation unten belassen","attachments":[]},{"id":"up-mwknyuuim75d","design":"pfad","screen":"pfad-zuordnen","x":17.6,"y":80.3,"target":"span.ipm-mut.ipm-pf \"3 von 7 Plätzen belegt · Einsätze planst\"","text":"hq als link!? zur planen sektion!?","attachments":[]},{"id":"up-mwko3wxxjgj1","design":"entfernen","screen":"entfernen-letzter","x":46.4,"y":46.6,"target":"span \"1 aus Operation „Flotte ausbauen“\"","text":"aber dann hier ohne balken? Naja, das balken thema eh nochmal überarbeiten","attachments":[]}]}</script>
+<style>
+:is([data-design], .design-ov-scale) .ipm{position:relative;height:100%;min-height:640px;overflow:hidden;container-type:inline-size;background:radial-gradient(ellipse 80% 60% at 50% -10%,#12354a 0%,#0a1c2a 55%,#061724 100%);color:#c8e4f1;font:13px/1.45 Inter,system-ui,"Segoe UI",sans-serif;--a:#52c1e6;--mut:#7fa3b6;--ink:#f2fafe;--edge:rgba(130,220,255,.28);box-sizing:border-box}
+:is([data-design], .design-ov-scale) .ipm *{box-sizing:border-box}
+:is([data-design], .design-ov-scale) .ipm [data-screen-link]{cursor:pointer}
+:is([data-design], .design-ov-scale) .ipm-i{width:18px;height:18px;display:block;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+:is([data-design], .design-ov-scale) .ipm-i.on{fill:color-mix(in srgb,currentColor 28%,transparent)}
+:is([data-design], .design-ov-scale) .ipm-bar{position:absolute;left:28px;right:28px;top:72px;height:52px;display:flex;align-items:center;gap:14px;padding:0 10px 0 16px;border:1px solid var(--edge);border-radius:8px;background:linear-gradient(180deg,rgba(14,40,56,.94),rgba(7,26,39,.94));z-index:3}
+:is([data-design], .design-ov-scale) .ipm-logo{font:700 12px/1 Orbitron,"Segoe UI",sans-serif;letter-spacing:.16em;color:var(--ink);white-space:nowrap}
+:is([data-design], .design-ov-scale) .ipm-nav{display:flex;gap:16px;color:var(--mut);font:600 11px/1 Orbitron,"Segoe UI",sans-serif;letter-spacing:.1em;text-transform:uppercase}
+:is([data-design], .design-ov-scale) .ipm-nav b{color:var(--a);font-weight:600}
+:is([data-design], .design-ov-scale) .ipm-search{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;border:1px solid var(--edge);border-radius:999px;color:var(--mut);white-space:nowrap;overflow:hidden}
+:is([data-design], .design-ov-scale) .ipm-search span{overflow:hidden;text-overflow:ellipsis}
+:is([data-design], .design-ov-scale) .ipm-trig{position:relative;display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--edge);border-radius:50%;color:var(--a);flex:none}
+:is([data-design], .design-ov-scale) .ipm-trig i{position:absolute;right:-3px;top:-3px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:var(--a);color:#061724;font:600 10px/15px Inter,sans-serif;font-style:normal;text-align:center}
+:is([data-design], .design-ov-scale) .ipm-ava{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#143a50;color:var(--ink);font-weight:600;flex:none}
+:is([data-design], .design-ov-scale) .ipm-body{position:absolute;left:28px;right:28px;top:142px;bottom:24px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+:is([data-design], .design-ov-scale) .ipm-crumb{color:var(--mut);font-size:12px}
+:is([data-design], .design-ov-scale) .ipm-crumb b{color:var(--ink);font-weight:500}
+:is([data-design], .design-ov-scale) .ipm-hero{display:flex;align-items:center;gap:18px}
+:is([data-design], .design-ov-scale) .ipm-sil{display:grid;place-items:center;width:132px;height:72px;border:1px solid var(--edge);border-radius:10px;background:rgba(8,28,42,.7);flex:none}
+:is([data-design], .design-ov-scale) .ipm-sil svg{width:92px;height:46px;fill:rgba(82,193,230,.16);stroke:var(--a);stroke-width:1;stroke-linejoin:round}
+:is([data-design], .design-ov-scale) .ipm-eb{display:block;color:var(--a);font:600 10.5px/1.2 Orbitron,"Segoe UI",sans-serif;letter-spacing:.14em;text-transform:uppercase}
+:is([data-design], .design-ov-scale) .ipm-h1{margin:4px 0 0;color:var(--ink);font:600 26px/1.15 Orbitron,"Segoe UI",sans-serif;letter-spacing:.03em}
+:is([data-design], .design-ov-scale) .ipm-prim{position:relative;display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid color-mix(in srgb,var(--a) 40%,transparent);border-radius:12px;background:color-mix(in srgb,var(--a) 5%,transparent)}
+:is([data-design], .design-ov-scale) .ipm-stops{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:18px;margin:0;padding:0;list-style:none}
+:is([data-design], .design-ov-scale) .ipm-stop{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;padding:12px 14px;border:1px solid rgba(130,220,255,.2);border-radius:10px;background:rgba(6,23,36,.7)}
+:is([data-design], .design-ov-scale) .ipm-stop + .ipm-stop::before{content:"";position:absolute;left:-19px;top:22px;width:18px;height:2px;background:rgba(130,220,255,.2)}
+:is([data-design], .design-ov-scale) .ipm-stop.on + .ipm-stop::before{background:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-stop.on{border-color:color-mix(in srgb,var(--a) 55%,transparent)}
+:is([data-design], .design-ov-scale) .ipm-sh{display:inline-flex;align-items:center;gap:8px;color:#c8e4f1;min-width:0}
+:is([data-design], .design-ov-scale) .ipm-stop.on .ipm-sh{color:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-sh b{font:500 12.5px/1.2 Orbitron,"Segoe UI",sans-serif;letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:is([data-design], .design-ov-scale) .ipm-stop p{margin:0;font-size:12.5px;color:#c8e4f1}
+:is([data-design], .design-ov-scale) .ipm-q{color:var(--ink);font-weight:600}
+:is([data-design], .design-ov-scale) .ipm-mut{color:var(--mut);font-size:12px}
+:is([data-design], .design-ov-scale) .ipm-a{color:var(--a);font-size:12.5px;white-space:nowrap}
+:is([data-design], .design-ov-scale) .ipm-line{display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px 12px;max-width:100%}
+:is([data-design], .design-ov-scale) .ipm-st{display:inline-flex;align-items:center;gap:2px}
+:is([data-design], .design-ov-scale) .ipm-st span{display:grid;place-items:center;width:28px;height:28px;border:1px solid rgba(130,220,255,.28);border-radius:7px}
+:is([data-design], .design-ov-scale) .ipm-st b{min-width:28px;text-align:center;color:var(--ink);font-weight:500}
+:is([data-design], .design-ov-scale) .ipm-btn{display:inline-flex;align-items:center;gap:8px;min-height:32px;padding:4px 14px;border:1px solid color-mix(in srgb,var(--a) 60%,transparent);border-radius:999px;color:var(--a);font-weight:600;font-size:12.5px;max-width:100%}
+:is([data-design], .design-ov-scale) .ipm-btn .ipm-i{width:15px;height:15px}
+:is([data-design], .design-ov-scale) .ipm-specs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+:is([data-design], .design-ov-scale) .ipm-spec{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid rgba(130,220,255,.14);border-radius:8px;background:rgba(6,23,36,.5)}
+:is([data-design], .design-ov-scale) .ipm-spec small{color:var(--mut);font-size:11px}
+:is([data-design], .design-ov-scale) .ipm-spec b{color:var(--ink);font-weight:500}
+:is([data-design], .design-ov-scale) .ipm-cols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:22px;min-height:0}
+:is([data-design], .design-ov-scale) .ipm-rows{display:flex;flex-direction:column;gap:6px;min-width:0}
+:is([data-design], .design-ov-scale) .ipm-row{display:flex;align-items:center;gap:12px;padding:8px 12px;border:1px solid rgba(130,220,255,.14);border-radius:8px;background:rgba(6,23,36,.55);min-width:0}
+:is([data-design], .design-ov-scale) .ipm-th,:is([data-design], .design-ov-scale) .ipm-cth{display:grid;place-items:center;width:34px;height:34px;border-radius:7px;background:#0f3145;color:var(--a);font:600 12px/1 Orbitron,sans-serif;flex:none}
+:is([data-design], .design-ov-scale) .ipm-rt{display:flex;flex-direction:column;flex:1 1 auto;min-width:0}
+:is([data-design], .design-ov-scale) .ipm-rt b{color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:is([data-design], .design-ov-scale) .ipm-rt small{color:var(--mut);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:is([data-design], .design-ov-scale) .ipm-rail{display:inline-flex;align-items:center;flex:none;padding:4px}
+:is([data-design], .design-ov-scale) .ipm-n{position:relative;display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(130,220,255,.28);border-radius:50%;color:#9fc3d4;background:rgba(6,23,36,.9)}
+:is([data-design], .design-ov-scale) .ipm-n .ipm-i{width:15px;height:15px}
+:is([data-design], .design-ov-scale) .ipm-n.on{color:var(--a);border-color:color-mix(in srgb,var(--a) 60%,transparent)}
+:is([data-design], .design-ov-scale) .ipm-n i{position:absolute;right:-3px;top:-4px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:var(--a);color:#061724;font:600 10px/15px Inter,sans-serif;font-style:normal;text-align:center}
+:is([data-design], .design-ov-scale) .ipm-ln{display:block;width:9px;height:2px;background:rgba(130,220,255,.25)}
+:is([data-design], .design-ov-scale) .ipm-ln.on{background:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-cards{display:flex;flex-direction:column;gap:8px;min-width:0}
+:is([data-design], .design-ov-scale) .ipm-card{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:12px;border:1px solid rgba(130,220,255,.2);border-radius:10px;background:linear-gradient(180deg,rgba(13,42,60,.7),rgba(6,23,36,.7))}
+:is([data-design], .design-ov-scale) .ipm-seg{display:inline-flex;gap:3px;align-items:center}
+:is([data-design], .design-ov-scale) .ipm-seg i{display:block;width:16px;height:5px;border-radius:3px;background:rgba(130,220,255,.2)}
+:is([data-design], .design-ov-scale) .ipm-seg i.on{background:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-asg{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;width:100%;padding:8px 10px;border-left:2px solid var(--a);border-radius:0 8px 8px 0;background:rgba(82,193,230,.08)}
+:is([data-design], .design-ov-scale) .ipm-asg .ipm-i{width:16px;height:16px;color:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-chg{margin-left:auto;color:var(--mut);font-size:12px;text-decoration:underline;text-underline-offset:3px}
+:is([data-design], .design-ov-scale) .ipm-stop > .ipm-chg{margin-left:0}
+:is([data-design], .design-ov-scale) .ipm-band{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;padding:10px 12px;border:1px solid rgba(130,220,255,.2);border-radius:10px;background:rgba(6,23,36,.6)}
+:is([data-design], .design-ov-scale) .ipm-band > .ipm-i{color:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-band > .ipm-q{margin-left:auto}
+:is([data-design], .design-ov-scale) .ipm-steps{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;margin:0;padding:0;list-style:none}
+:is([data-design], .design-ov-scale) .ipm-steps li{display:inline-flex;align-items:center;gap:6px;color:var(--mut);font-size:12px}
+:is([data-design], .design-ov-scale) .ipm-steps li.on{color:#c8e4f1}
+:is([data-design], .design-ov-scale) .ipm-steps i{display:grid;place-items:center;width:16px;height:16px;border:1px solid rgba(130,220,255,.35);border-radius:50%}
+:is([data-design], .design-ov-scale) .ipm-steps li.on i{background:var(--a);border-color:var(--a);color:#061724}
+:is([data-design], .design-ov-scale) .ipm-steps i .ipm-i{width:11px;height:11px;stroke-width:2.6}
+:is([data-design], .design-ov-scale) .ipm-badge{position:absolute;right:-5px;bottom:-5px;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#061724;border:1px solid var(--a);color:var(--a);text-decoration:none}
+:is([data-design], .design-ov-scale) .ipm-badge .ipm-i{width:10px;height:10px;stroke-width:2.4}
+:is([data-design], .design-ov-scale) .ipm-pop{position:absolute;top:calc(100% - 10px);z-index:4;display:flex;flex-direction:column;gap:10px;width:340px;max-width:calc(100% - 32px);padding:14px 16px 12px;border:1px solid var(--edge);border-left:3px solid var(--a);border-radius:10px;background:linear-gradient(180deg,#0e2c3e,#081d2b);box-shadow:0 18px 40px rgba(0,0,0,.55)}
+:is([data-design], .design-ov-scale) .ipm-pop--wunsch,:is([data-design], .design-ov-scale) .ipm-pop--band{left:30px}
+:is([data-design], .design-ov-scale) .ipm-pt{color:var(--ink);font:600 14px/1.2 Orbitron,"Segoe UI",sans-serif;letter-spacing:.03em}
+:is([data-design], .design-ov-scale) .ipm-plist{display:flex;flex-direction:column;gap:6px}
+:is([data-design], .design-ov-scale) .ipm-prow{display:flex;align-items:center;gap:10px;min-height:38px;padding:6px 10px;border:1px solid rgba(130,220,255,.18);border-radius:8px;color:#c8e4f1}
+:is([data-design], .design-ov-scale) .ipm-prow b{flex:1 1 auto;min-width:0;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:is([data-design], .design-ov-scale) .ipm-prow .ipm-i{width:16px;height:16px;color:var(--a)}
+:is([data-design], .design-ov-scale) .ipm-prow.on{border-color:var(--a);background:rgba(82,193,230,.1)}
+:is([data-design], .design-ov-scale) .ipm-prow.new{border-style:dashed}
+:is([data-design], .design-ov-scale) .ipm-pf{font-size:11.5px}
+:is([data-design], .design-ov-scale) .device-shell .ipm,.device-shell .ipm{min-height:0}
+:is([data-design], .design-ov-scale) .device-shell .ipm-bar,.device-shell .ipm-bar{top:12px;left:12px;right:12px}
+:is([data-design], .design-ov-scale) .device-shell .ipm-body,.device-shell .ipm-body{top:76px;left:12px;right:12px;bottom:10px;overflow:auto}
+@container (max-width: 560px){
+:is([data-design], .design-ov-scale) .ipm-bar{left:10px;right:10px;top:12px;gap:8px;padding:0 8px 0 10px}
+:is([data-design], .design-ov-scale) .ipm-nav,:is([data-design], .design-ov-scale) .ipm-logo{display:none}
+:is([data-design], .design-ov-scale) .ipm-body{left:10px;right:10px;top:76px;bottom:10px;gap:12px;overflow:auto}
+:is([data-design], .design-ov-scale) .ipm-sil{width:84px;height:52px}
+:is([data-design], .design-ov-scale) .ipm-sil svg{width:60px;height:30px}
+:is([data-design], .design-ov-scale) .ipm-h1{font-size:20px}
+:is([data-design], .design-ov-scale) .ipm-stops{grid-template-columns:minmax(0,1fr);gap:8px}
+:is([data-design], .design-ov-scale) .ipm-stop + .ipm-stop::before{display:none}
+:is([data-design], .design-ov-scale) .ipm-stop{padding:10px 12px}
+:is([data-design], .design-ov-scale) .ipm-specs{grid-template-columns:repeat(2,minmax(0,1fr))}
+:is([data-design], .design-ov-scale) .ipm-cols{grid-template-columns:minmax(0,1fr)}
+:is([data-design], .design-ov-scale) .ipm-cards{display:none}
+:is([data-design], .design-ov-scale) .ipm-row{flex-wrap:wrap;gap:8px 10px}
+:is([data-design], .design-ov-scale) .ipm-n{width:38px;height:38px}
+:is([data-design], .design-ov-scale) .ipm-ln{width:5px}
+:is([data-design], .design-ov-scale) .ipm-steps span{display:none}
+:is([data-design], .design-ov-scale) .ipm-pop{position:static;width:auto;max-width:none}
+}
+:is([data-design], .design-ov-scale) .ipr{--dng:#ff7b7b}
+:is([data-design], .design-ov-scale) .ipr-free{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;width:100%;padding:6px 6px 6px 10px;border-left:2px solid rgba(130,220,255,.28);border-radius:0 8px 8px 0;background:rgba(6,23,36,.45)}
+:is([data-design], .design-ov-scale) .ipr-free > .ipm-i{width:16px;height:16px;color:var(--mut)}
+:is([data-design], .design-ov-scale) .ipr-free > .ipm-btn{margin-left:auto}
+:is([data-design], .design-ov-scale) .ipr-list{display:flex;flex-direction:column;gap:6px;min-width:0}
+:is([data-design], .design-ov-scale) .ipr-row{display:grid;grid-template-columns:34px minmax(0,1fr) minmax(0,1.4fr) auto auto;align-items:center;gap:8px 14px;padding:7px 12px;border:1px solid rgba(130,220,255,.14);border-radius:10px;background:rgba(6,23,36,.55);min-width:0}
+:is([data-design], .design-ov-scale) .ipr-row.on{border-color:color-mix(in srgb,var(--a) 55%,transparent);background:rgba(82,193,230,.07)}
+:is([data-design], .design-ov-scale) .ipr-asg{display:flex;align-items:center;gap:6px;min-width:0;color:#c8e4f1;font-size:12px}
+:is([data-design], .design-ov-scale) .ipr-asg > .ipm-i{width:15px;height:15px;color:var(--a)}
+:is([data-design], .design-ov-scale) .ipr-asg > span{min-width:0}
+:is([data-design], .design-ov-scale) .ipr-asg.off,.ipr-asg.off > .ipm-i{color:var(--mut)}
+:is([data-design], .design-ov-scale) .ipr-del{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(130,220,255,.2);border-radius:50%;color:var(--mut)}
+:is([data-design], .design-ov-scale) .ipr-del .ipm-i{width:15px;height:15px}
+:is([data-design], .design-ov-scale) .ipr-toast{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:5;display:flex;align-items:center;gap:16px;padding:10px 14px 10px 16px;border:1px solid var(--edge);border-radius:10px;background:#0e2c3e;box-shadow:0 12px 30px rgba(0,0,0,.5);color:var(--ink);white-space:nowrap}
+:is([data-design], .design-ov-scale) .ipr-toast b{color:var(--a);font-weight:600}
+:is([data-design], .design-ov-scale) .ipr-scrim{position:absolute;inset:0;z-index:6;background:rgba(2,10,16,.64)}
+:is([data-design], .design-ov-scale) .ipr-dlg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:7;display:flex;flex-direction:column;gap:12px;width:440px;max-width:calc(100% - 32px);padding:18px 20px 16px;border:1px solid var(--edge);border-radius:14px;background:linear-gradient(180deg,#0f2f42,#081d2b);box-shadow:0 24px 60px rgba(0,0,0,.6)}
+:is([data-design], .design-ov-scale) .ipr-dh{display:flex;align-items:center;gap:10px}
+:is([data-design], .design-ov-scale) .ipr-dh .ipm-pt{flex:1 1 auto;min-width:0}
+:is([data-design], .design-ov-scale) .ipr-x{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;color:var(--mut)}
+:is([data-design], .design-ov-scale) .ipr-x .ipm-i{width:16px;height:16px}
+:is([data-design], .design-ov-scale) .ipr-what{display:flex;flex-direction:column;gap:8px}
+:is([data-design], .design-ov-scale) .ipr-split{display:flex;gap:3px;height:8px}
+:is([data-design], .design-ov-scale) .ipr-split i{flex:var(--w) 1 0;border-radius:4px;background:rgba(130,220,255,.28)}
+:is([data-design], .design-ov-scale) .ipr-split i.on{background:var(--a)}
+:is([data-design], .design-ov-scale) .ipr-legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;color:#c8e4f1}
+:is([data-design], .design-ov-scale) .ipr-dot{display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:rgba(130,220,255,.35)}
+:is([data-design], .design-ov-scale) .ipr-dot.on{background:var(--a)}
+:is([data-design], .design-ov-scale) .ipr-orows{display:flex;flex-direction:column;gap:6px}
+:is([data-design], .design-ov-scale) .ipr-orow{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:6px 10px;border:1px solid rgba(130,220,255,.18);border-radius:8px}
+:is([data-design], .design-ov-scale) .ipr-orow > .ipm-i{width:16px;height:16px;color:var(--a)}
+:is([data-design], .design-ov-scale) .ipr-orow > b{flex:1 1 auto;min-width:0;color:var(--ink);font-weight:500}
+:is([data-design], .design-ov-scale) .ipr-orow .ipm-st span{width:24px;height:24px}
+:is([data-design], .design-ov-scale) .ipr-sum{font-size:12.5px;color:var(--mut)}
+:is([data-design], .design-ov-scale) .ipr-sum b{color:var(--ink);font-weight:600}
+:is([data-design], .design-ov-scale) .ipr-hint{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-left:2px solid var(--a);border-radius:0 8px 8px 0;background:rgba(82,193,230,.08);font-size:12.5px;color:#c8e4f1}
+:is([data-design], .design-ov-scale) .ipr-hint > .ipm-i{width:16px;height:16px;color:var(--a)}
+:is([data-design], .design-ov-scale) .ipr-hint.dng{border-left-color:var(--dng);background:color-mix(in srgb,var(--dng) 12%,transparent);color:#ffd9d9}
+:is([data-design], .design-ov-scale) .ipr-hint.dng > .ipm-i{color:var(--dng)}
+:is([data-design], .design-ov-scale) .ipr-chk{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:#c8e4f1}
+:is([data-design], .design-ov-scale) .ipr-chk i{display:block;width:16px;height:16px;border:1.5px solid rgba(130,220,255,.55);border-radius:4px}
+:is([data-design], .design-ov-scale) .ipr-acts{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin-top:4px}
+:is([data-design], .design-ov-scale) .ipr-b2{display:inline-flex;align-items:center;min-height:34px;padding:4px 16px;border:1px solid rgba(130,220,255,.35);border-radius:999px;color:#c8e4f1;font-weight:600;font-size:12.5px}
+:is([data-design], .design-ov-scale) .ipr-b1{display:inline-flex;align-items:center;min-height:34px;padding:4px 18px;border-radius:999px;background:var(--a);color:#061724;font-weight:600;font-size:12.5px}
+:is([data-design], .design-ov-scale) .ipr-b1.dng{background:var(--dng);color:#2a0606}
+:is([data-design], .design-ov-scale) .ipr-crumb-h{margin:0;color:var(--ink);font:600 22px/1.15 Orbitron,"Segoe UI",sans-serif;letter-spacing:.03em}
+@container (max-width: 560px){
+:is([data-design], .design-ov-scale) .ipr-row{grid-template-columns:34px minmax(0,1fr) auto auto;gap:6px 10px}
+:is([data-design], .design-ov-scale) .ipr-row > .ipr-asg{grid-column:2 / -1;grid-row:2}
+:is([data-design], .design-ov-scale) .ipr-dlg{left:0;right:0;top:auto;bottom:0;transform:none;width:auto;max-width:none;border-radius:16px 16px 0 0;padding:16px 16px 20px}
+:is([data-design], .design-ov-scale) .ipr-toast{left:10px;right:10px;bottom:12px;transform:none;white-space:normal;justify-content:space-between}
+:is([data-design], .design-ov-scale) .ipr-acts > span{flex:1 1 auto;justify-content:center}
+}
+</style>
+<header class="iteration-intro">
+  <h2>{{iteration.tab}} 3 · Der Pfad und das Entfernen</h2>
+  <p>Die Richtung „Am Wunsch“ steht. „Der Pfad“ zeigt sie mit deinen Korrekturen: Der Wunsch-Kreis behält seinen durchgezogenen Ring, nur das kleine Routen-Zeichen markiert die Zuordnung. „Entfernen“ arbeitet den einen schweren Fall durch: einen Wunsch verringern oder entfernen, der zu einer Operation gehört. „Operation“ ist nur der Arbeitstitel, bis der Name in der Analyse entschieden ist. Gemessen wird das Zuordnen weiter mit <code>hq:path_group_assign</code>, das Lösen über den Dialog neu mit <code>hq:path_group_release { surface, pieces, dissolved }</code>, sichtbar als Ablauf „Wunsch → zugeordnet → erfüllt“ im HQ-Dashboard in PostHog.</p>
+</header>
+<section data-design="pfad" data-nav-label="Der Pfad" data-design-active="true" data-screen-fit="full" data-design-motto="Die Zuordnung steht im Wunsch" data-design-traits="Detailseite: die Operation als Zeile im Wunsch-Kasten|Zuordnen über eine kleine Auswahl mit voller Menge|Suchzeilen: nur das Routen-Zeichen am Wunsch-Kreis" data-design-improved="Durchgezogener Ring, nur das Zeichen" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;&gt;&lt;path d=&quot;M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3&quot;/&gt;&lt;path d=&quot;M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z&quot;/&gt;&lt;path d=&quot;M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z&quot;/&gt;&lt;/svg&gt;" data-design-color="#d9c38a">
+<section id="pfad-schiff" data-nav-label="Zugeordnet" data-screen data-screen-active="true"><div class="ipm ipm--pfad"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="pfad-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="pfad-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="pfad-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>5</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="pfad-liste">Codex</span> › <span data-screen-link="pfad-liste">Schiffe</span> › <b>Polaris</b></span><div class="ipm-hero"><span class="ipm-sil"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M2 13l9-5h20l8-3 7 8-7 6-8-2H11z"/></svg></span><div><span class="ipm-eb">RSI · Korvette</span><h3 class="ipm-h1">Polaris</h3></div></div><div class="ipm-prim" data-m="pfad-schiff-prim"><ol class="ipm-stops" style="--n:2"><li class="ipm-stop on"><span class="ipm-sh"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><b>Wünsche</b></span><span class="ipm-line"><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipm-a">Alle Wünsche öffnen</span></span><span class="ipm-asg" data-m="pfad-schiff-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span class="ipm-a">Operation „Flotte ausbauen“</span><span class="ipm-mut">2 von 5 Einsätzen</span><span class="ipm-seg" aria-label="2 von 5 Einsätzen erledigt"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="ipm-chg">Ändern</span></span></li><li class="ipm-stop"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg><b>Hangar</b></span><p>Noch nicht im Hangar</p><span class="ipm-btn"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg>In den Hangar</span></li></ol></div><div class="ipm-specs"><span class="ipm-spec"><small>Besatzung</small><b>6–14</b></span><span class="ipm-spec"><small>Länge</small><b>155 m</b></span><span class="ipm-spec"><small>Fracht</small><b>576 SCU</b></span><span class="ipm-spec"><small>Rolle</small><b>Korvette</b></span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-pfad-schiff-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;pfad-schiff-asg&quot;]" style="--anno-x:30%;--anno-y:62%"><button class="anno-pin" type="button" data-anno-pin="r3-pfad-schiff-a1" aria-expanded="false" aria-controls="anno-bubble-r3-pfad-schiff-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r3-pfad-schiff-a1" data-anno-bubble="r3-pfad-schiff-a1" data-open="false"><p class="anno-bubble-improved"><strong>{{design.change_improved}}</strong> „Operation“ statt „Projekt“</p><button type="button" class="anno-bubble-summary" data-anno-summary="r3-pfad-schiff-a1" aria-expanded="false" aria-controls="anno-bubble-r3-pfad-schiff-a1"><span class="anno-bubble-question">Hier steht jetzt „Operation“ statt „Projekt“. Liest sich die Zeile so, oder stolperst du?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r3-pfad-schiff-a1" data-annotation="r3-pfad-schiff-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r3-pfad-schiff-a1"></div></div></div></div></div></section>
+<section id="pfad-offen" data-nav-label="Noch nicht zugeordnet" data-screen hidden><div class="ipm ipm--pfad"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="pfad-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="pfad-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="pfad-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>5</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="pfad-liste">Codex</span> › <span data-screen-link="pfad-liste">Waffen</span> › <b>Karna Rifle</b></span><div class="ipm-hero"><span class="ipm-sil"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M3 10h30l2-3h8v5h-6l-2 3H24l-2 5h-6l1-5H3z"/></svg></span><div><span class="ipm-eb">Kastak Arms · Sturmgewehr</span><h3 class="ipm-h1">Karna Rifle</h3></div></div><div class="ipm-prim" data-m="pfad-offen-prim"><ol class="ipm-stops" style="--n:2"><li class="ipm-stop on"><span class="ipm-sh"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><b>Wünsche</b></span><span class="ipm-line"><span class="ipm-st"><span>−</span><b>5</b><span>+</span></span><span class="ipm-a">Alle Wünsche öffnen</span></span><span class="ipr-free" data-m="pfad-offen-free"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span class="ipm-mut">Keiner Operation zugeordnet</span><span class="ipm-btn" data-screen-link="pfad-zuordnen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg>Zuordnen</span></span></li><li class="ipm-stop"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg><b>Inventar</b></span><p>Noch nicht im Inventar</p><span class="ipm-btn"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg>Ins Inventar</span></li></ol></div><div class="ipm-specs"><span class="ipm-spec"><small>Schaden</small><b>34</b></span><span class="ipm-spec"><small>Feuerrate</small><b>550 /min</b></span><span class="ipm-spec"><small>Magazin</small><b>30</b></span><span class="ipm-spec"><small>Klasse</small><b>Sturmgewehr</b></span></div></div></div></section>
+<section id="pfad-zuordnen" data-nav-label="Zuordnen" data-screen hidden><div class="ipm ipm--pfad"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="pfad-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="pfad-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="pfad-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>5</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="pfad-liste">Codex</span> › <span data-screen-link="pfad-liste">Waffen</span> › <b>Karna Rifle</b></span><div class="ipm-hero"><span class="ipm-sil"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M3 10h30l2-3h8v5h-6l-2 3H24l-2 5h-6l1-5H3z"/></svg></span><div><span class="ipm-eb">Kastak Arms · Sturmgewehr</span><h3 class="ipm-h1">Karna Rifle</h3></div></div><div class="ipm-prim" data-m="pfad-zuordnen-prim"><ol class="ipm-stops" style="--n:2"><li class="ipm-stop on"><span class="ipm-sh"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><b>Wünsche</b></span><span class="ipm-line"><span class="ipm-st"><span>−</span><b>5</b><span>+</span></span><span class="ipm-a">Alle Wünsche öffnen</span></span><span class="ipr-free" data-m="pfad-zuordnen-free"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span class="ipm-mut">Keiner Operation zugeordnet</span><span class="ipm-btn" data-screen-link="pfad-zuordnen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg>Zuordnen</span></span></li><li class="ipm-stop"><span class="ipm-sh"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg><b>Inventar</b></span><p>Noch nicht im Inventar</p><span class="ipm-btn"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg>Ins Inventar</span></li></ol><div class="ipm-pop ipm-pop--wunsch" data-m="pfad-zuordnen-pop"><span class="ipm-eb">Karna Rifle</span><b class="ipm-pt">Einer Operation zuordnen</b><span class="ipm-line" data-m="pfad-zuordnen-qty"><span class="ipm-mut">Wie viele?</span><span class="ipm-st"><span>−</span><b>5</b><span>+</span></span><span class="ipm-mut">von 5 gewünschten</span></span><span class="ipm-plist"><span class="ipm-prow on"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Flotte ausbauen</b><span class="ipm-mut">2/5</span><span class="ipm-seg" aria-label="2 von 5 Einsätzen erledigt"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span></span><span class="ipm-prow"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Bodentrupp ausrüsten</b><span class="ipm-mut">1/4</span><span class="ipm-seg" aria-label="1 von 4 Einsätzen erledigt"><i class="on"></i><i></i><i></i><i></i></span></span><span class="ipm-prow"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>Vorrat Lazarett</b><span class="ipm-mut">0/2</span><span class="ipm-seg" aria-label="0 von 2 Einsätzen erledigt"><i></i><i></i></span></span></span><span class="ipm-prow new" data-m="pfad-zuordnen-new"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><b>Neue Operation</b><span class="ipm-mut">Name wird vorgeschlagen</span></span><span class="ipm-mut ipm-pf">3 von 7 Plätzen belegt · Einsätze planst du im HQ</span></div></div><div class="ipm-specs"><span class="ipm-spec"><small>Schaden</small><b>34</b></span><span class="ipm-spec"><small>Feuerrate</small><b>550 /min</b></span><span class="ipm-spec"><small>Magazin</small><b>30</b></span><span class="ipm-spec"><small>Klasse</small><b>Sturmgewehr</b></span></div></div></div></section>
+<section id="pfad-liste" data-nav-label="Suche und Karten" data-screen hidden><div class="ipm ipm--pfad"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="pfad-liste">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><b data-screen-link="pfad-liste">Codex</b><span>HQ</span><span>News</span></span><span class="ipm-search" data-screen-link="pfad-liste"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>5</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><b>Codex</b> · Suche „a“ · 6 Treffer</span><div class="ipm-cols"><div class="ipm-rows"><div class="ipm-row" data-screen-link="pfad-schiff"><span class="ipm-th">S</span><span class="ipm-rt"><b>Polaris</b><small>RSI · Korvette</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 1, in Operation „Flotte ausbauen“"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i><u class="ipm-badge" data-m="pfad-liste-badge"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></u></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Hangar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg></span></span></div><div class="ipm-row" data-screen-link="pfad-offen"><span class="ipm-th">W</span><span class="ipm-rt"><b>Karna Rifle</b><small>Kastak Arms · Sturmgewehr</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 5"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>5</i></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Inventar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg></span></span></div><div class="ipm-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Cutlass Black</b><small>Drake · Mehrzweck</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 1, in Operation „Flotte ausbauen“"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i><u class="ipm-badge"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></u></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Hangar: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg><i>1</i></span></span></div><div class="ipm-row"><span class="ipm-th">B</span><span class="ipm-rt"><b>Blaupause: Arclight II</b><small>Klaus &amp; Werner · Pistole</small></span><span class="ipm-rail"><span class="ipm-n" aria-label="Wünsche"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Sammlung: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l9 4.5-9 4.5L3 8z"/><path d="M3 12.5l9 4.5 9-4.5"/><path d="M3 17l9 4.5 9-4.5"/></svg><i>1</i></span></span></div><div class="ipm-row"><span class="ipm-th">V</span><span class="ipm-rt"><b>Medipen</b><small>CureLife · Verbrauch</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 6, in Operation „Bodentrupp ausrüsten“"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>6</i><u class="ipm-badge"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></u></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Inventar: 12"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg><i>12</i></span></span></div><div class="ipm-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Perseus</b><small>RSI · angekündigt</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 1"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i></span></span></div></div><div class="ipm-cards"><span class="ipm-eb">Als Karten</span><div class="ipm-card"><span class="ipm-cth">W</span><span class="ipm-rt"><b>Karna Rifle</b><small>Kastak Arms · Sturmgewehr</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 5"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>5</i></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Inventar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg></span></span></div><div class="ipm-card"><span class="ipm-cth">V</span><span class="ipm-rt"><b>Medipen</b><small>CureLife · Verbrauch</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 6, in Operation „Bodentrupp ausrüsten“"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>6</i><u class="ipm-badge"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></u></span><i class="ipm-ln on"></i><span class="ipm-n on" aria-label="Inventar: 12"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/></svg><i>12</i></span></span></div><div class="ipm-card"><span class="ipm-cth">S</span><span class="ipm-rt"><b>Polaris</b><small>RSI · Korvette</small></span><span class="ipm-rail"><span class="ipm-n on" aria-label="Wünsche: 1, in Operation „Flotte ausbauen“"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>1</i><u class="ipm-badge"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg></u></span><i class="ipm-ln on"></i><span class="ipm-n" aria-label="Hangar"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l9-6 9 6v10"/><path d="M7 20v-7h10v7"/><path d="M7 16h10"/></svg></span></span></div></div></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-pfad-liste-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;pfad-liste-badge&quot;]" style="--anno-x:60%;--anno-y:24%"><button class="anno-pin" type="button" data-anno-pin="r3-pfad-liste-a1" aria-expanded="false" aria-controls="anno-bubble-r3-pfad-liste-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r3-pfad-liste-a1" data-anno-bubble="r3-pfad-liste-a1" data-open="false"><p class="anno-bubble-improved"><strong>{{design.change_improved}}</strong> Ring durchgezogen, nur das Zeichen</p><button type="button" class="anno-bubble-summary" data-anno-summary="r3-pfad-liste-a1" aria-expanded="false" aria-controls="anno-bubble-r3-pfad-liste-a1"><span class="anno-bubble-question">Der Ring ist wieder durchgezogen, nur das kleine Zeichen zeigt die Operation. Reicht das, um zugeordnete Wünsche zu erkennen?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r3-pfad-liste-a1" data-annotation="r3-pfad-liste-a1" data-attachable placeholder="{{anno.answer_placeholder}}">ja</textarea><div class="attach-slot" data-attach-slot="anno-r3-pfad-liste-a1"></div></div></div></div></div></section>
+</section>
+<section data-design="entfernen" data-nav-label="Entfernen" data-screen-fit="full" data-design-motto="Dialog erst bei zugeordneten Stücken" data-design-traits="Wunschliste: freie Stücke gehen ohne Frage, nur Rückgängig|Dialog mit Menge und Aufteilung je Operation|Hinweis, wenn eine Operation ihren letzten Wunsch verliert" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;&gt;&lt;path d=&quot;M5 7h14&quot;/&gt;&lt;path d=&quot;M10 4h4&quot;/&gt;&lt;path d=&quot;M7 7l1 13h8l1-13&quot;/&gt;&lt;path d=&quot;M10 11v5M14 11v5&quot;/&gt;&lt;/svg&gt;" data-design-color="#b9c98a" hidden>
+<section id="entfernen-frei" data-nav-label="Freie Stücke" data-screen data-screen-active="true"><div class="ipm ipr ipm--entfernen"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="entfernen-frei">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><span>Codex</span><b data-screen-link="entfernen-frei">HQ</b><span>News</span></span><span class="ipm-search" data-screen-link="entfernen-frei"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>6</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="entfernen-frei">HQ</span> › <b>Wünsche</b></span><h3 class="ipr-crumb-h">Wünsche</h3><div class="ipr-list"><div class="ipr-row on"><span class="ipm-th">W</span><span class="ipm-rt"><b>Karna Rifle</b><small>Kastak Arms · Sturmgewehr</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>3 in Operation „Bodentrupp ausrüsten“ · 1 frei</span></span><span class="ipm-st"><span data-screen-link="entfernen-frei">−</span><b>4</b><span>+</span></span><span class="ipr-del" aria-label="Karna Rifle aus den Wünschen entfernen" data-screen-link="entfernen-dialog"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">V</span><span class="ipm-rt"><b>Medipen</b><small>CureLife · Verbrauch</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>3 in „Bodentrupp ausrüsten“ · 2 in „Vorrat Lazarett“ · 1 frei</span></span><span class="ipm-st"><span data-screen-link="entfernen-mehrere">−</span><b>6</b><span>+</span></span><span class="ipr-del" aria-label="Medipen aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">R</span><span class="ipm-rt"><b>ORC-mkX</b><small>CDS · Schwere Rüstung</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>2 in Operation „Bodentrupp ausrüsten“</span></span><span class="ipm-st"><span>−</span><b>2</b><span>+</span></span><span class="ipr-del" aria-label="ORC-mkX aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">M</span><span class="ipm-rt"><b>ParaMed</b><small>CureLife · Medizingerät</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Vorrat Lazarett“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="ParaMed aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Polaris</b><small>RSI · Korvette</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Flotte ausbauen“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="Polaris aus den Wünschen entfernen" data-screen-link="entfernen-letzter"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Arrow</b><small>Anvil · Leichter Jäger</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Zweitschiff“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="Arrow aus den Wünschen entfernen" data-screen-link="entfernen-aufgeloest"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div></div></div><div class="ipr-toast" role="status" data-m="entfernen-frei-toast"><span>1 Karna Rifle entfernt</span><b>Rückgängig</b></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-entfernen-frei-a1" data-anno-side="top" data-anno-target="[data-m=&quot;entfernen-frei-toast&quot;]" style="--anno-x:50%;--anno-y:88%"><button class="anno-pin" type="button" data-anno-pin="r3-entfernen-frei-a1" aria-expanded="false" aria-controls="anno-bubble-r3-entfernen-frei-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r3-entfernen-frei-a1" data-anno-bubble="r3-entfernen-frei-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r3-entfernen-frei-a1" aria-expanded="false" aria-controls="anno-bubble-r3-entfernen-frei-a1"><span class="anno-bubble-question">Hier fragt nichts nach, unten erscheint nur der Hinweis mit „Rückgängig“. Fällt er dir auf, oder übersiehst du ihn?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r3-entfernen-frei-a1" data-annotation="r3-entfernen-frei-a1" data-attachable placeholder="{{anno.answer_placeholder}}">der ist noch nicht so suppper hübsch... gern polishen! Muss mehr eye catching sein</textarea><div class="attach-slot" data-attach-slot="anno-r3-entfernen-frei-a1"></div></div></div></div></div></section>
+<section id="entfernen-dialog" data-nav-label="Es trifft eine Operation" data-screen hidden><div class="ipm ipr ipm--entfernen"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="entfernen-frei">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><span>Codex</span><b data-screen-link="entfernen-frei">HQ</b><span>News</span></span><span class="ipm-search" data-screen-link="entfernen-frei"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>6</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="entfernen-frei">HQ</span> › <b>Wünsche</b></span><h3 class="ipr-crumb-h">Wünsche</h3><div class="ipr-list"><div class="ipr-row on"><span class="ipm-th">W</span><span class="ipm-rt"><b>Karna Rifle</b><small>Kastak Arms · Sturmgewehr</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>3 in Operation „Bodentrupp ausrüsten“ · 2 frei</span></span><span class="ipm-st"><span data-screen-link="entfernen-frei">−</span><b>5</b><span>+</span></span><span class="ipr-del" aria-label="Karna Rifle aus den Wünschen entfernen" data-screen-link="entfernen-dialog"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">V</span><span class="ipm-rt"><b>Medipen</b><small>CureLife · Verbrauch</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>3 in „Bodentrupp ausrüsten“ · 2 in „Vorrat Lazarett“ · 1 frei</span></span><span class="ipm-st"><span data-screen-link="entfernen-mehrere">−</span><b>6</b><span>+</span></span><span class="ipr-del" aria-label="Medipen aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">R</span><span class="ipm-rt"><b>ORC-mkX</b><small>CDS · Schwere Rüstung</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>2 in Operation „Bodentrupp ausrüsten“</span></span><span class="ipm-st"><span>−</span><b>2</b><span>+</span></span><span class="ipr-del" aria-label="ORC-mkX aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">M</span><span class="ipm-rt"><b>ParaMed</b><small>CureLife · Medizingerät</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Vorrat Lazarett“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="ParaMed aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Polaris</b><small>RSI · Korvette</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Flotte ausbauen“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="Polaris aus den Wünschen entfernen" data-screen-link="entfernen-letzter"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Arrow</b><small>Anvil · Leichter Jäger</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Zweitschiff“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="Arrow aus den Wünschen entfernen" data-screen-link="entfernen-aufgeloest"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div></div></div><div class="ipr-scrim"></div><div class="ipr-dlg" role="dialog" aria-modal="true" aria-label="Karna Rifle entfernen"><div class="ipr-dh"><b class="ipm-pt">Karna Rifle entfernen</b><span class="ipr-x" aria-label="Schließen" data-screen-link="entfernen-frei"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></span></div><span class="ipm-line"><span class="ipm-q">Wie viele entfernen?</span><span class="ipm-st"><span>−</span><b>5</b><span>+</span></span><span class="ipm-mut">von 5</span></span><div class="ipr-what" data-m="entfernen-dialog-split"><div class="ipr-split" aria-hidden="true"><i style="--w:2"></i><i class="on" style="--w:3"></i></div><span class="ipr-legend"><span><i class="ipr-dot"></i>2 frei</span><span><i class="ipr-dot on"></i>3 aus Operation „Bodentrupp ausrüsten“</span></span></div><span class="ipm-mut">Die Operation behält 2 andere Wünsche.</span><div class="ipr-acts"><span class="ipr-b2" data-screen-link="entfernen-frei">Abbrechen</span><span class="ipr-b1">5 entfernen</span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-entfernen-dialog-a1" data-anno-side="right" data-anno-target="[data-m=&quot;entfernen-dialog-split&quot;]" style="--anno-x:60%;--anno-y:50%"><button class="anno-pin" type="button" data-anno-pin="r3-entfernen-dialog-a1" aria-expanded="false" aria-controls="anno-bubble-r3-entfernen-dialog-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r3-entfernen-dialog-a1" data-anno-bubble="r3-entfernen-dialog-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r3-entfernen-dialog-a1" aria-expanded="false" aria-controls="anno-bubble-r3-entfernen-dialog-a1"><span class="anno-bubble-question">Unter dem Zähler steht sofort, was frei ist und was aus der Operation fällt. Verstehst du diese Zeile auf einen Blick?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r3-entfernen-dialog-a1" data-annotation="r3-entfernen-dialog-a1" data-attachable placeholder="{{anno.answer_placeholder}}">jain, die balken waren mir nicht zugeordnet genugg zur legende, sprich was die balken zu tun haben dort war erst auf dem driitten blick kalr</textarea><div class="attach-slot" data-attach-slot="anno-r3-entfernen-dialog-a1"></div></div></div></div></div></section>
+<section id="entfernen-mehrere" data-nav-label="Mehrere Operationen" data-screen hidden><div class="ipm ipr ipm--entfernen"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="entfernen-frei">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><span>Codex</span><b data-screen-link="entfernen-frei">HQ</b><span>News</span></span><span class="ipm-search" data-screen-link="entfernen-frei"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>6</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="entfernen-frei">HQ</span> › <b>Wünsche</b></span><h3 class="ipr-crumb-h">Wünsche</h3><div class="ipr-list"><div class="ipr-row"><span class="ipm-th">W</span><span class="ipm-rt"><b>Karna Rifle</b><small>Kastak Arms · Sturmgewehr</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>3 in Operation „Bodentrupp ausrüsten“ · 2 frei</span></span><span class="ipm-st"><span data-screen-link="entfernen-frei">−</span><b>5</b><span>+</span></span><span class="ipr-del" aria-label="Karna Rifle aus den Wünschen entfernen" data-screen-link="entfernen-dialog"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row on"><span class="ipm-th">V</span><span class="ipm-rt"><b>Medipen</b><small>CureLife · Verbrauch</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>3 in „Bodentrupp ausrüsten“ · 2 in „Vorrat Lazarett“ · 1 frei</span></span><span class="ipm-st"><span data-screen-link="entfernen-mehrere">−</span><b>6</b><span>+</span></span><span class="ipr-del" aria-label="Medipen aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">R</span><span class="ipm-rt"><b>ORC-mkX</b><small>CDS · Schwere Rüstung</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>2 in Operation „Bodentrupp ausrüsten“</span></span><span class="ipm-st"><span>−</span><b>2</b><span>+</span></span><span class="ipr-del" aria-label="ORC-mkX aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">M</span><span class="ipm-rt"><b>ParaMed</b><small>CureLife · Medizingerät</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Vorrat Lazarett“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="ParaMed aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Polaris</b><small>RSI · Korvette</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Flotte ausbauen“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="Polaris aus den Wünschen entfernen" data-screen-link="entfernen-letzter"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Arrow</b><small>Anvil · Leichter Jäger</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Zweitschiff“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="Arrow aus den Wünschen entfernen" data-screen-link="entfernen-aufgeloest"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div></div></div><div class="ipr-scrim"></div><div class="ipr-dlg" role="dialog" aria-modal="true" aria-label="Medipen entfernen"><div class="ipr-dh"><b class="ipm-pt">Medipen entfernen</b><span class="ipr-x" aria-label="Schließen" data-screen-link="entfernen-frei"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></span></div><span class="ipm-line"><span class="ipm-q">Wie viele entfernen?</span><span class="ipm-st"><span>−</span><b>4</b><span>+</span></span><span class="ipm-mut">von 6</span></span><div class="ipr-what"><div class="ipr-split" aria-hidden="true"><i style="--w:1"></i><i class="on" style="--w:3"></i></div><span class="ipr-legend"><span><i class="ipr-dot"></i>1 frei</span><span><i class="ipr-dot on"></i>3 aus Operationen</span></span></div><div class="ipr-orows" data-m="entfernen-mehrere-rows"><span class="ipr-orow"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>aus „Vorrat Lazarett“</b><span class="ipm-mut">zuletzt zugeordnet</span><span class="ipm-st"><span>−</span><b>2</b><span>+</span></span><span class="ipm-mut">von 2</span></span><span class="ipr-orow"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><b>aus „Bodentrupp ausrüsten“</b><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipm-mut">von 3</span></span></div><span class="ipr-sum"><b>4 von 4 verteilt</b> · 1 frei, 2 und 1 aus den Operationen</span><span class="ipm-mut">Beide Operationen behalten andere Wünsche.</span><div class="ipr-acts"><span class="ipr-b2" data-screen-link="entfernen-frei">Abbrechen</span><span class="ipr-b1">4 entfernen</span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-entfernen-mehrere-a1" data-anno-side="right" data-anno-target="[data-m=&quot;entfernen-mehrere-rows&quot;]" style="--anno-x:60%;--anno-y:52%"><button class="anno-pin" type="button" data-anno-pin="r3-entfernen-mehrere-a1" aria-expanded="false" aria-controls="anno-bubble-r3-entfernen-mehrere-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r3-entfernen-mehrere-a1" data-anno-bubble="r3-entfernen-mehrere-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r3-entfernen-mehrere-a1" aria-expanded="false" aria-controls="anno-bubble-r3-entfernen-mehrere-a1"><span class="anno-bubble-question">Jede Operation hat ihre eigene Zeile mit Zähler, darunter steht die Summe. Siehst du auf einen Blick, was aus welcher Operation fällt?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r3-entfernen-mehrere-a1" data-annotation="r3-entfernen-mehrere-a1" data-attachable placeholder="{{anno.answer_placeholder}}">sehr gut!</textarea><div class="attach-slot" data-attach-slot="anno-r3-entfernen-mehrere-a1"></div></div></div></div></div></section>
+<section id="entfernen-letzter" data-nav-label="Letzter Wunsch, Operation bleibt" data-screen hidden><div class="ipm ipr ipm--entfernen"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="entfernen-frei">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><span>Codex</span><b data-screen-link="entfernen-frei">HQ</b><span>News</span></span><span class="ipm-search" data-screen-link="entfernen-frei"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>6</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="entfernen-frei">HQ</span> › <b>Wünsche</b></span><h3 class="ipr-crumb-h">Wünsche</h3><div class="ipr-list"><div class="ipr-row"><span class="ipm-th">W</span><span class="ipm-rt"><b>Karna Rifle</b><small>Kastak Arms · Sturmgewehr</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>3 in Operation „Bodentrupp ausrüsten“ · 2 frei</span></span><span class="ipm-st"><span data-screen-link="entfernen-frei">−</span><b>5</b><span>+</span></span><span class="ipr-del" aria-label="Karna Rifle aus den Wünschen entfernen" data-screen-link="entfernen-dialog"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">V</span><span class="ipm-rt"><b>Medipen</b><small>CureLife · Verbrauch</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>3 in „Bodentrupp ausrüsten“ · 2 in „Vorrat Lazarett“ · 1 frei</span></span><span class="ipm-st"><span data-screen-link="entfernen-mehrere">−</span><b>6</b><span>+</span></span><span class="ipr-del" aria-label="Medipen aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">R</span><span class="ipm-rt"><b>ORC-mkX</b><small>CDS · Schwere Rüstung</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>2 in Operation „Bodentrupp ausrüsten“</span></span><span class="ipm-st"><span>−</span><b>2</b><span>+</span></span><span class="ipr-del" aria-label="ORC-mkX aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">M</span><span class="ipm-rt"><b>ParaMed</b><small>CureLife · Medizingerät</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Vorrat Lazarett“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="ParaMed aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row on"><span class="ipm-th">S</span><span class="ipm-rt"><b>Polaris</b><small>RSI · Korvette</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Flotte ausbauen“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="Polaris aus den Wünschen entfernen" data-screen-link="entfernen-letzter"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Arrow</b><small>Anvil · Leichter Jäger</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Zweitschiff“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="Arrow aus den Wünschen entfernen" data-screen-link="entfernen-aufgeloest"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div></div></div><div class="ipr-scrim"></div><div class="ipr-dlg" role="dialog" aria-modal="true" aria-label="Polaris entfernen"><div class="ipr-dh"><b class="ipm-pt">Polaris entfernen</b><span class="ipr-x" aria-label="Schließen" data-screen-link="entfernen-frei"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></span></div><span class="ipm-line"><span class="ipm-q">Wie viele entfernen?</span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipm-mut">von 1</span></span><span class="ipr-legend"><span><i class="ipr-dot on"></i>1 aus Operation „Flotte ausbauen“</span></span><div class="ipr-hint"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z"/><path d="M12 11v6"/><path d="M12 7.5v.5"/></svg><span>„Flotte ausbauen“ hat danach keinen Wunsch mehr. Die 5 Einsätze bleiben.</span></div><span class="ipr-chk" data-m="entfernen-letzter-chk"><i aria-hidden="true"></i>Operation auch auflösen</span><div class="ipr-acts"><span class="ipr-b2" data-screen-link="entfernen-frei">Abbrechen</span><span class="ipr-b1">Wunsch entfernen</span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-entfernen-letzter-a1" data-anno-side="right" data-anno-target="[data-m=&quot;entfernen-letzter-chk&quot;]" style="--anno-x:45%;--anno-y:60%"><button class="anno-pin" type="button" data-anno-pin="r3-entfernen-letzter-a1" aria-expanded="false" aria-controls="anno-bubble-r3-entfernen-letzter-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r3-entfernen-letzter-a1" data-anno-bubble="r3-entfernen-letzter-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r3-entfernen-letzter-a1" aria-expanded="false" aria-controls="anno-bubble-r3-entfernen-letzter-a1"><span class="anno-bubble-question">Der Hinweis sagt, dass die Operation ohne Wunsch zurückbleibt, darunter sitzt der Haken zum Auflösen. Klar genug, oder zu viel Text?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r3-entfernen-letzter-a1" data-annotation="r3-entfernen-letzter-a1" data-attachable placeholder="{{anno.answer_placeholder}}">sehr gut!</textarea><div class="attach-slot" data-attach-slot="anno-r3-entfernen-letzter-a1"></div></div></div></div></div></section>
+<section id="entfernen-aufgeloest" data-nav-label="Letzter Wunsch, leere Operation" data-screen hidden><div class="ipm ipr ipm--entfernen"><div class="ipm-bar"><span class="ipm-logo" data-screen-link="entfernen-frei">VERSE COMPANION</span><span class="ipm-nav"><span>Verse</span><span>Codex</span><b data-screen-link="entfernen-frei">HQ</b><span>News</span></span><span class="ipm-search" data-screen-link="entfernen-frei"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13z"/><path d="M15.5 15.5L20 20"/></svg><span>Schiff, Waffe, Rüstung suchen …</span></span><span class="ipm-trig" aria-label="Wünsche"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z"/><path d="M11.5 12.5L4 20"/><path d="M8.5 10.5L5 14"/><path d="M13.5 15.5L10 19"/></svg><i>6</i></span><span class="ipm-ava" aria-hidden="true">J</span></div><div class="ipm-body"><span class="ipm-crumb"><span data-screen-link="entfernen-frei">HQ</span> › <b>Wünsche</b></span><h3 class="ipr-crumb-h">Wünsche</h3><div class="ipr-list"><div class="ipr-row"><span class="ipm-th">W</span><span class="ipm-rt"><b>Karna Rifle</b><small>Kastak Arms · Sturmgewehr</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>3 in Operation „Bodentrupp ausrüsten“ · 2 frei</span></span><span class="ipm-st"><span data-screen-link="entfernen-frei">−</span><b>5</b><span>+</span></span><span class="ipr-del" aria-label="Karna Rifle aus den Wünschen entfernen" data-screen-link="entfernen-dialog"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">V</span><span class="ipm-rt"><b>Medipen</b><small>CureLife · Verbrauch</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>3 in „Bodentrupp ausrüsten“ · 2 in „Vorrat Lazarett“ · 1 frei</span></span><span class="ipm-st"><span data-screen-link="entfernen-mehrere">−</span><b>6</b><span>+</span></span><span class="ipr-del" aria-label="Medipen aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">R</span><span class="ipm-rt"><b>ORC-mkX</b><small>CDS · Schwere Rüstung</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>2 in Operation „Bodentrupp ausrüsten“</span></span><span class="ipm-st"><span>−</span><b>2</b><span>+</span></span><span class="ipr-del" aria-label="ORC-mkX aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">M</span><span class="ipm-rt"><b>ParaMed</b><small>CureLife · Medizingerät</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Vorrat Lazarett“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="ParaMed aus den Wünschen entfernen"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row"><span class="ipm-th">S</span><span class="ipm-rt"><b>Polaris</b><small>RSI · Korvette</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Flotte ausbauen“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="Polaris aus den Wünschen entfernen" data-screen-link="entfernen-letzter"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div><div class="ipr-row on"><span class="ipm-th">S</span><span class="ipm-rt"><b>Arrow</b><small>Anvil · Leichter Jäger</small></span><span class="ipr-asg"><svg class="ipm-i on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3"/><path d="M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/><path d="M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z"/></svg><span>1 in Operation „Zweitschiff“</span></span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipr-del" aria-label="Arrow aus den Wünschen entfernen" data-screen-link="entfernen-aufgeloest"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg></span></div></div></div><div class="ipr-scrim"></div><div class="ipr-dlg" role="dialog" aria-modal="true" aria-label="Arrow entfernen"><div class="ipr-dh"><b class="ipm-pt">Arrow entfernen</b><span class="ipr-x" aria-label="Schließen" data-screen-link="entfernen-frei"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></span></div><span class="ipm-line"><span class="ipm-q">Wie viele entfernen?</span><span class="ipm-st"><span>−</span><b>1</b><span>+</span></span><span class="ipm-mut">von 1</span></span><span class="ipr-legend"><span><i class="ipr-dot on"></i>1 aus Operation „Zweitschiff“</span></span><div class="ipr-hint dng"><svg class="ipm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5"/><path d="M12 18v.5"/></svg><span>„Zweitschiff“ hat keinen Einsatz und wird mit aufgelöst.</span></div><div class="ipr-acts"><span class="ipr-b2" data-screen-link="entfernen-frei">Abbrechen</span><span class="ipr-b1 dng" data-m="entfernen-aufgeloest-go">Entfernen und auflösen</span></div></div></div><div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-entfernen-aufgeloest-a1" data-anno-side="right" data-anno-target="[data-m=&quot;entfernen-aufgeloest-go&quot;]" style="--anno-x:60%;--anno-y:62%"><button class="anno-pin" type="button" data-anno-pin="r3-entfernen-aufgeloest-a1" aria-expanded="false" aria-controls="anno-bubble-r3-entfernen-aufgeloest-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r3-entfernen-aufgeloest-a1" data-anno-bubble="r3-entfernen-aufgeloest-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r3-entfernen-aufgeloest-a1" aria-expanded="false" aria-controls="anno-bubble-r3-entfernen-aufgeloest-a1"><span class="anno-bubble-question">Hinweis und Knopf sind hier rot, weil die Operation mit verschwindet. Angemessen deutlich, oder zu alarmierend?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r3-entfernen-aufgeloest-a1" data-annotation="r3-entfernen-aufgeloest-a1" data-attachable placeholder="{{anno.answer_placeholder}}">Sehr gut!</textarea><div class="attach-slot" data-attach-slot="anno-r3-entfernen-aufgeloest-a1"></div></div></div></div></div></section>
+</section>
+
+<!-- ANALYSIS-VIEW-START -->
+<section data-view="r3-regeln3" data-view-kind="analysis" data-analysis="full" data-nav-label="Analyse" hidden>
+
+  <section id="r3-briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>Zwei Punkte aus Runde 2 waren noch offen: der Name der Gruppe und was beim Entfernen eines zugeordneten Wunsches passiert. Alles andere steht fest.</p>
+    <p data-briefing-why>Ohne klare Regel verschwinden Wünsche aus einer Operation, ohne dass man es merkt, oder eine Operation bleibt als leere Hülle zurück.</p>
+    <div data-briefing-potential data-viz="kpi" data-viz-spec='{"value":"3","unit":"Auslöser","label":"können eine Zuordnung brechen: weniger wünschen, Wunsch entfernen, Wunsch erfüllt"}'>3 Auslöser</div>
+    <a data-briefing-topic="r3-t-name" data-share="30">Der Name, zweiter Anlauf</a>
+    <a data-briefing-topic="r3-t-entfernen" data-share="70">Entfernen in Schritten</a>
+    <p data-briefing-duration>≈ 4 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"3","unit":"Auslöser","label":"können eine Zuordnung brechen"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="text" data-viz-spec='{"text":"**Fest steht aus Runde 2**\n- Symbol der Gruppe: die Route\n- Das Wort „Nachschub“ verschwindet aus allen sichtbaren Texten\n- Ein zugeordneter Wunsch bleibt ein Wunsch und zählt im Kopf weiter\n- Zuordnen im Codex: eine kleine Auswahl, die ganze Wunschmenge ist voreingestellt\n- Eine neue Gruppe entsteht dort nur mit Namen, die Einsätze planst du im HQ\n- Suchzeilen und Karten zeigen nur das Zeichen, sie ordnen nicht zu"}'></div>
+        <p>Gefragt wird nur, was noch offen ist: ein Name, der nicht nach Monaten klingt, und die Regeln, wenn ein zugeordneter Wunsch kleiner wird oder verschwindet. Die Entwürfe nutzen „Operation“ als Arbeitstitel.</p>
+      </div>
+    </div>
+    <textarea data-comment="r3-briefing-note" hidden></textarea>
+  </section>
+
+  <section id="r3-t-name" data-topic data-nav-label="Der Name, zweiter Anlauf">
+    <div data-alevel="2" data-title="Der Name, zweiter Anlauf">
+      <div data-slot="short"><p>Gesucht ist ein Wort für ein kurzes Ziel aus mehreren Einsätzen, das zum Spiel passt.</p></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Nachschub","value":69},{"label":"Route","value":17},{"label":"Auftrag","value":12},{"label":"Operation","value":0}],"unit":"Textzeilen","hl":"Nachschub"}'></div>
+        <p>So viele sichtbare Textzeilen tragen die Wörter heute. Der neue Name ersetzt die 69 Zeilen mit „Nachschub“ und den Eintrag im HQ-Menü. Ein Wort, das die App schon für etwas anderes nutzt, würde zwei Dinge gleich nennen.</p>
+      </div>
+    </div>
+
+    <section id="r3-d-name3" data-nav-label="Name der Gruppe" data-decision="r3-d-name3" data-decision-mode="wording"
+             data-label="Name der Gruppe" data-rec="operation"
+             data-rec-why="Spieler sagen ohnehin „Op“, das Wort klingt nach einer begrenzten Aktion, ist im Englischen dasselbe und in der App noch frei."
+             data-applies-to="HQ, Codex und alle sichtbaren Texte" data-finding="r3-f-name3">
+      <p data-applies>Gilt für: HQ, Codex und alle sichtbaren Texte</p>
+      <p data-situation>Ein Name, der nach Monaten Arbeit klingt, macht aus ein paar Einsätzen eine Last.</p>
+      <h3 data-question>Welches Wort passt für ein paar Einsätze mit einem gemeinsamen Ziel, das nicht nach Monaten klingt?</h3>
+      <p data-stakes>Rund 69 sichtbare Textzeilen und das HQ-Menü.</p>
+      <div data-options>
+        <label data-opt="operation" data-recommended>
+          <input type="radio" name="dm-r3-d-name3" value="operation" data-text="Operation" checked>
+          <span data-opt-label>Operation</span>
+          <span data-opt-consequence>Spieler sagen ohnehin „Op“; klingt nach einer begrenzten Aktion, nicht nach Monaten; „Operation aus mehreren Einsätzen“ ist eine gewohnte Rangfolge; im Englischen dasselbe Wort; in der App noch unbenutzt. Einwand der Produkt-Prüfung: Orgs nennen ihre gemeinsamen Abende auch „Ops“, und das Wort liegt nah an „Einsatz“.</span>
+        </label>
+        <label data-opt="einsatzplan">
+          <input type="radio" name="dm-r3-d-name3" value="einsatzplan" data-text="Einsatzplan">
+          <span data-opt-label>Einsatzplan</span>
+          <span data-opt-consequence>Sagt wörtlich, was es ist, und ist rein deutsch; aber lang in engen Zeilen, und es klingt nach Planen, nicht nach Tun.</span>
+        </label>
+        <label data-opt="vorhaben">
+          <input type="radio" name="dm-r3-d-name3" value="vorhaben" data-text="Vorhaben">
+          <span data-opt-label>Vorhaben</span>
+          <span data-opt-consequence>Neutral und kurzfristig, aber farblos und ohne gutes englisches Gegenstück.</span>
+        </label>
+        <label data-opt="beutezug">
+          <input type="radio" name="dm-r3-d-name3" value="beutezug" data-text="Beutezug">
+          <span data-opt-label>Beutezug</span>
+          <span data-opt-consequence>Thematisch und kurz gedacht, am Ende steht die Beute; klingt aber nach Piraterie und passt schlecht zu Handel oder Bergbau.</span>
+        </label>
+        <label data-opt="unternehmung">
+          <input type="radio" name="dm-r3-d-name3" value="unternehmung" data-text="Unternehmung">
+          <span data-opt-label>Unternehmung</span>
+          <span data-opt-consequence>Passt inhaltlich, ist aber mit zwölf Buchstaben das längste Wort.</span>
+        </label>
+        <label data-opt="custom">
+          <input type="radio" name="dm-r3-d-name3" value="custom" data-text="">
+          <span data-opt-label>Eigener Name</span>
+          <span data-opt-consequence>Du gibst den Namen selbst vor.</span>
+          <input type="text" name="dm-r3-d-name3-text" value="" placeholder="Dein Name für die Gruppe">
+        </label>
+      </div>
+      <textarea data-comment="r3-d-name3-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-name3-none" value="">
+      <input type="hidden" name="dm-r3-d-name3-hes" value="{&quot;ms&quot;:32518,&quot;revisits&quot;:0,&quot;median&quot;:30867}">
+      <input type="hidden" name="dm-r3-d-name3-touched" value="">
+      <input type="hidden" name="dm-r3-d-name3-issue" value="">
+      <input type="hidden" name="dm-r3-d-name3-epic" value="">
+      <div data-alevel="3" data-title="Name der Gruppe">
+        <div data-slot="short"><p>„Projekt“ war dir zu wenig thematisch und klingt nach Monaten.</p></div>
+        <div data-slot="long">
+          <div data-viz="text" data-viz-spec='{"text":"**Schon ausgeschieden**\n- „Projekt“: wenig thematisch, klingt nach Monaten\n- „Auftrag“, „Kontrakt“, „Mission“: Begriffe des Spiels; „Auftrag“ steht schon in 12 Textzeilen der App\n- „Route“: 17 Textzeilen, die Handelsrouten\n- „Tour“: so heißt die Einführung der App\n- „Kampagne“: klingt noch länger als Projekt\n- „Ziel“: eine Gruppe hat schon ein aUEC-Ziel\n- „Einsatzgruppe“: Runde 2"}'></div>
+          <p>Neun Wörter scheiden schon aus, weil Spiel oder App sie belegen oder sie nach Monaten klingen.</p>
+        </div>
+        <div data-example>
+          <p>Mit „Operation“, drei echte Zeilen der App</p>
+          <pre>Operation „Flotte ausbauen“ · 2 von 5 Einsätzen
+Neue Operation
+Keiner Operation zugeordnet</pre>
+          <p>Zum Vergleich mit „Projekt“</p>
+          <pre>Projekt „Flotte ausbauen“ · 2 von 5 Einsätzen
+Neues Projekt
+Keinem Projekt zugeordnet</pre>
+          <p>Mit „Einsatzplan“</p>
+          <pre>Einsatzplan „Flotte ausbauen“ · 2 von 5 Einsätzen
+Neuer Einsatzplan
+Keinem Einsatzplan zugeordnet</pre>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section id="r3-t-entfernen" data-topic data-nav-label="Entfernen in Schritten">
+    <div data-alevel="2" data-title="Entfernen in Schritten">
+      <div data-slot="short"><p>Freie Stücke gehen still, erst wenn eine Operation etwas verliert, fragt ein Dialog.</p></div>
+      <div data-slot="long">
+        <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Entfernen","value":"oder weniger wünschen"},{"label":"Reichen die freien Stücke?","value":"ja: fertig, mit Rückgängig"},{"label":"nein: Dialog","value":"Menge und Folgen sehen"},{"label":"Letzter Wunsch der Operation?","value":"ja: Hinweis vor dem Klick"}]}'></div>
+        <p>Eine Regel hält alles zusammen: Einer Operation sind nie mehr Stücke zugeordnet, als du dir wünschst. Drei Dinge können das brechen: weniger wünschen, einen Wunsch entfernen, einen Wunsch erfüllen. Die Fragen gehen den Weg Schritt für Schritt durch.</p>
+      </div>
+    </div>
+
+    <section id="r3-d-frei" data-nav-label="Freie Stücke zuerst" data-decision="r3-d-frei" data-decision-mode="yesnoalt"
+             data-label="Freie Stücke zuerst" data-rec="yes"
+             data-rec-why="Wer nur freie Stücke wegnimmt, nimmt keiner Operation etwas; „Rückgängig“ reicht als Netz."
+             data-applies-to="Wunschliste, Codex und Pfad" data-finding="r3-f-frei"
+             data-ui-ok="Gefragt ist die Regel, ob freie Stücke ohne Rückfrage gehen; „freie Stücke“ ist hier die Menge, nicht der gleichnamige Screen">
+      <p data-applies>Gilt für: Wunschliste, Codex und Pfad</p>
+      <p data-situation>Eine Rückfrage bei einem harmlosen Schritt kostet einen Klick, obwohl keiner Operation danach etwas fehlt.</p>
+      <h3 data-question>Sollen freie Stücke ohne Nachfrage zuerst gehen?</h3>
+      <p data-stakes>Wie oft beim Ändern einer Menge ein Dialog kommt.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-r3-d-frei" value="yes" checked>
+          <span data-opt-label>Ja, freie Stücke gehen zuerst</span>
+          <span data-opt-consequence>Kein Dialog bei harmlosen Schritten, nur „Rückgängig“.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-r3-d-frei" value="no">
+          <span data-opt-label>Nein, jede Änderung fragt nach</span>
+          <span data-opt-consequence>Jede Änderung an einem zugeordneten Wunsch fragt nach.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-r3-d-frei" value="alt">
+          <span data-opt-label>Anders lösen</span>
+          <span data-opt-consequence>Du schreibst, wie es sein soll.</span>
+          <input type="text" name="dm-r3-d-frei-alt" value="" placeholder="Wann soll nachgefragt werden?">
+        </label>
+      </div>
+      <textarea data-comment="r3-d-frei-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-frei-none" value="">
+      <input type="hidden" name="dm-r3-d-frei-hes" value="{&quot;ms&quot;:37406,&quot;revisits&quot;:0,&quot;median&quot;:30867}">
+      <input type="hidden" name="dm-r3-d-frei-touched" value="1">
+      <input type="hidden" name="dm-r3-d-frei-issue" value="">
+      <input type="hidden" name="dm-r3-d-frei-epic" value="">
+      <div data-alevel="3" data-title="Freie Stücke zuerst">
+        <div data-slot="short"><p>Ein Teil der Wunschmenge gehört oft keiner Operation.</p></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"frei","value":2},{"label":"zugeordnet","value":3}],"unit":"Stück","hl":"frei"}'></div>
+          <p>Von 5 gewünschten Karna Rifle sind 2 frei und 3 zugeordnet; wer auf 4 senkt, nimmt der Operation nichts weg.</p>
+        </div>
+        <div data-example>
+          <p>Vorher</p>
+          <pre>Karna Rifle   5   3 in Operation „Bodentrupp ausrüsten“ · 2 frei</pre>
+          <p>Nach „−1“, ohne Rückfrage</p>
+          <pre>Karna Rifle   4   3 in Operation „Bodentrupp ausrüsten“ · 1 frei
+1 Karna Rifle entfernt · Rückgängig</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="r3-d-dialog" data-nav-label="Was der Dialog fragt" data-decision="r3-d-dialog" data-decision-mode="single"
+             data-label="Was der Dialog fragt" data-rec="menge"
+             data-rec-why="Du wolltest gefragt werden, ob und wie viele; ein Stepper mit den Folgen darunter beantwortet beides in einem Schritt."
+             data-applies-to="Wunschliste, Codex und Pfad" data-finding="r3-f-dialog"
+             data-ui-ok="Gefragt ist der Inhalt der Rückfrage; „Entfernen“ ist hier die Handlung, nicht der gleichnamige Entwurf">
+      <p data-applies>Gilt für: Wunschliste, Codex und Pfad</p>
+      <p data-situation>Trifft ein Entfernen eine Operation, fehlen ihr danach Stücke, für die schon Einsätze geplant sind.</p>
+      <h3 data-question>Was soll gefragt werden, wenn das Entfernen eine Operation trifft?</h3>
+      <p data-stakes>Ob du die Menge in der Rückfrage noch ändern kannst.</p>
+      <div data-options>
+        <label data-opt="menge" data-recommended>
+          <input type="radio" name="dm-r3-d-dialog" value="menge" checked>
+          <span data-opt-label>Menge wählen</span>
+          <span data-opt-consequence>Ein Stepper, die Folgen stehen sofort darunter: wie viele frei, wie viele aus welcher Operation.</span>
+        </label>
+        <label data-opt="bestaetigen">
+          <input type="radio" name="dm-r3-d-dialog" value="bestaetigen">
+          <span data-opt-label>Nur bestätigen</span>
+          <span data-opt-consequence>Die Menge steht fest, du sagst nur Ja oder Abbrechen.</span>
+        </label>
+        <label data-opt="sperren">
+          <input type="radio" name="dm-r3-d-dialog" value="sperren">
+          <span data-opt-label>Erst im HQ lösen</span>
+          <span data-opt-consequence>Entfernen geht nicht, solange Stücke zugeordnet sind; du löst sie vorher im HQ.</span>
+        </label>
+      </div>
+      <textarea data-comment="r3-d-dialog-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-dialog-none" value="">
+      <input type="hidden" name="dm-r3-d-dialog-hes" value="{&quot;ms&quot;:9217,&quot;revisits&quot;:0,&quot;median&quot;:30867}">
+      <input type="hidden" name="dm-r3-d-dialog-touched" value="1">
+      <input type="hidden" name="dm-r3-d-dialog-issue" value="">
+      <input type="hidden" name="dm-r3-d-dialog-epic" value="">
+      <div data-alevel="3" data-title="Was der Dialog fragt">
+        <div data-slot="short"><p>Ein Entfernen kann einer Operation Stücke nehmen.</p></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Entfernen","value":"5 Karna Rifle"},{"label":"frei","value":"2 Stück"},{"label":"aus der Operation","value":"3 Stück"},{"label":"„Bodentrupp ausrüsten“","value":"behält 2 andere Wünsche"}]}'></div>
+          <p>Deine Notiz aus Runde 2 verlangt eine Frage, „ob und wie viele“ entfernt werden.</p>
+        </div>
+        <div data-example>
+          <p>Die Rückfrage, wie sie der Entwurf zeigt</p>
+          <pre>Karna Rifle entfernen
+Wie viele entfernen?   [−] 5 [+]   von 5
+2 frei · 3 aus Operation „Bodentrupp ausrüsten“
+Die Operation behält 2 andere Wünsche.
+[Abbrechen]   [5 entfernen]</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="r3-d-mehrere" data-nav-label="Mehrere Operationen" data-decision="r3-d-mehrere" data-decision-mode="single"
+             data-label="Mehrere Operationen" data-rec="neueste"
+             data-rec-why="Wie ein Rückgängig: was zuletzt dazukam, geht zuerst, und du kannst es noch verschieben."
+             data-applies-to="Wunschliste, Codex und Pfad" data-finding="r3-f-mehrere"
+             data-ui-ok="Gefragt ist die Reihenfolge der Abgabe; „mehrere Operationen“ und „zugeordnet“ sind hier Sachverhalte, nicht die gleichnamigen Screens">
+      <p data-applies>Gilt für: Wunschliste, Codex und Pfad</p>
+      <p data-situation>Halten zwei Operationen dasselbe Teil, entscheidet die Voreinstellung, welche danach ihr Ziel verfehlt.</p>
+      <h3 data-question>Aus welcher Operation fallen die Stücke zuerst, wenn mehrere sie halten?</h3>
+      <p data-stakes>Welche Operation nach dem Entfernen Stücke vermisst.</p>
+      <div data-options>
+        <label data-opt="neueste" data-recommended>
+          <input type="radio" name="dm-r3-d-mehrere" value="neueste" checked>
+          <span data-opt-label>Die zuletzt zugeordnete zuerst</span>
+          <span data-opt-consequence>Wie ein Rückgängig; du kannst die Aufteilung im Dialog ändern.</span>
+        </label>
+        <label data-opt="selbst">
+          <input type="radio" name="dm-r3-d-mehrere" value="selbst">
+          <span data-opt-label>Nichts vorschlagen</span>
+          <span data-opt-consequence>Du verteilst selbst; entfernt wird erst, wenn alles verteilt ist.</span>
+        </label>
+        <label data-opt="gleich">
+          <input type="radio" name="dm-r3-d-mehrere" value="gleich">
+          <span data-opt-label>Gleichmäßig aus allen</span>
+          <span data-opt-consequence>Jede Operation gibt ungefähr gleich viel ab.</span>
+        </label>
+      </div>
+      <textarea data-comment="r3-d-mehrere-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-mehrere-none" value="">
+      <input type="hidden" name="dm-r3-d-mehrere-hes" value="{&quot;ms&quot;:30867,&quot;revisits&quot;:0,&quot;median&quot;:30867}">
+      <input type="hidden" name="dm-r3-d-mehrere-touched" value="1">
+      <input type="hidden" name="dm-r3-d-mehrere-issue" value="">
+      <input type="hidden" name="dm-r3-d-mehrere-epic" value="">
+      <div data-alevel="3" data-title="Mehrere Operationen">
+        <div data-slot="short"><p>Ein Teil kann in zwei Operationen zugleich stecken.</p></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"frei","value":1},{"label":"Bodentrupp ausrüsten","value":3},{"label":"Vorrat Lazarett","value":2}],"unit":"Stück"}'></div>
+          <p>Beispiel Medipen: 6 gewünscht, 1 frei, 3 in „Bodentrupp ausrüsten“, 2 in „Vorrat Lazarett“; entfernt werden sollen 4.</p>
+        </div>
+        <div data-example>
+          <p>Die Rückfrage für 4 Medipen</p>
+          <pre>Medipen entfernen
+Wie viele entfernen?   [−] 4 [+]   von 6
+1 frei
+aus „Vorrat Lazarett“ (zuletzt zugeordnet)   [−] 2 [+]   von 2
+aus „Bodentrupp ausrüsten“                    [−] 1 [+]   von 3
+4 von 4 verteilt
+[Abbrechen]   [4 entfernen]</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="r3-d-leer" data-nav-label="Operation ohne Wunsch" data-decision="r3-d-leer" data-decision-mode="single"
+             data-label="Operation ohne Wunsch" data-rec="einsaetze"
+             data-rec-why="Geplante und erledigte Einsätze gehen nie still verloren, und eine leere Hülle bleibt nicht liegen."
+             data-applies-to="Wunschliste, Codex, Pfad und HQ" data-finding="r3-f-leer">
+      <p data-applies>Gilt für: Wunschliste, Codex, Pfad und HQ</p>
+      <p data-situation>Löst sich eine Operation mit ihrem letzten Wunsch auf, verschwinden auch ihre Einsätze, geplante wie erledigte.</p>
+      <h3 data-question>Was passiert mit einer Operation, die ihren letzten Wunsch verliert?</h3>
+      <p data-stakes>Ob Einsätze mit dem letzten Wunsch verloren gehen.</p>
+      <div data-options>
+        <label data-opt="einsaetze" data-recommended>
+          <input type="radio" name="dm-r3-d-leer" value="einsaetze" checked>
+          <span data-opt-label>Bleibt, wenn sie Einsätze hat</span>
+          <span data-opt-consequence>Sonst wird sie mit aufgelöst; der Dialog sagt es vor dem Klick, und ein Haken bietet das Auflösen an.</span>
+        </label>
+        <label data-opt="immer-weg">
+          <input type="radio" name="dm-r3-d-leer" value="immer-weg">
+          <span data-opt-label>Wird immer aufgelöst</span>
+          <span data-opt-consequence>Auch geplante und erledigte Einsätze verschwinden aus dem HQ.</span>
+        </label>
+        <label data-opt="immer-bleibt">
+          <input type="radio" name="dm-r3-d-leer" value="immer-bleibt">
+          <span data-opt-label>Bleibt immer</span>
+          <span data-opt-consequence>Auch als leere Hülle ohne Wunsch und ohne Einsatz.</span>
+        </label>
+      </div>
+      <textarea data-comment="r3-d-leer-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-leer-none" value="">
+      <input type="hidden" name="dm-r3-d-leer-hes" value="{&quot;ms&quot;:12504,&quot;revisits&quot;:0,&quot;median&quot;:30867}">
+      <input type="hidden" name="dm-r3-d-leer-touched" value="1">
+      <input type="hidden" name="dm-r3-d-leer-issue" value="">
+      <input type="hidden" name="dm-r3-d-leer-epic" value="">
+      <div data-alevel="3" data-title="Operation ohne Wunsch">
+        <div data-slot="short"><p>Eine Operation hält mehr als ihre Wünsche.</p></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Flotte ausbauen","value":5},{"label":"Zweitschiff","value":0}],"unit":"Einsätze"}'></div>
+          <p>Eine Operation kann schon leer entstehen, Name zuerst, Einsätze später, und Dinge halten, die kein Wunsch sind, etwa einen Verkauf mit aUEC-Ziel.</p>
+        </div>
+        <div data-example>
+          <p>Letzter Wunsch, die Operation hat Einsätze</p>
+          <pre>Polaris entfernen
+„Flotte ausbauen“ hat danach keinen Wunsch mehr. Die 5 Einsätze bleiben.
+[ ] Operation auch auflösen
+[Abbrechen]   [Wunsch entfernen]</pre>
+          <p>Letzter Wunsch, die Operation hat keinen Einsatz</p>
+          <pre>Arrow entfernen
+„Zweitschiff“ hat keinen Einsatz und wird mit aufgelöst.
+[Abbrechen]   [Entfernen und auflösen]</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="r3-d-erfuellt" data-nav-label="Wunsch erfüllt" data-decision="r3-d-erfuellt" data-decision-mode="yesnoalt"
+             data-label="Wunsch erfüllt" data-rec="yes"
+             data-rec-why="Eine Operation, die ihre erreichten Ziele zeigt, erzählt am Ende, was sie gebracht hat."
+             data-applies-to="HQ und Pfad" data-finding="r3-f-erfuellt">
+      <p data-applies>Gilt für: HQ und Pfad</p>
+      <p data-situation>Verschwindet ein erfüllter Wunsch aus der Operation, sieht man ihr am Ende nicht mehr an, was sie gebracht hat.</p>
+      <h3 data-question>Soll ein erfüllter Wunsch in der Operation als erreicht stehen bleiben?</h3>
+      <p data-stakes>Ob eine fertige Operation ihr Ergebnis zeigt.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-r3-d-erfuellt" value="yes" checked>
+          <span data-opt-label>Ja, als erreicht stehen lassen</span>
+          <span data-opt-consequence>Die Operation zeigt, was sie gebracht hat; es wird nichts gefragt.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-r3-d-erfuellt" value="no">
+          <span data-opt-label>Nein, die Zeile verschwindet</span>
+          <span data-opt-consequence>Die Zeile verschwindet mit dem Wunsch.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-r3-d-erfuellt" value="alt">
+          <span data-opt-label>Anders lösen</span>
+          <span data-opt-consequence>Du schreibst, wie es sein soll.</span>
+          <input type="text" name="dm-r3-d-erfuellt-alt" value="" placeholder="Was soll mit der Zeile passieren?">
+        </label>
+      </div>
+      <textarea data-comment="r3-d-erfuellt-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-erfuellt-none" value="">
+      <input type="hidden" name="dm-r3-d-erfuellt-hes" value="{&quot;ms&quot;:29589,&quot;revisits&quot;:0,&quot;median&quot;:30867}">
+      <input type="hidden" name="dm-r3-d-erfuellt-touched" value="1">
+      <input type="hidden" name="dm-r3-d-erfuellt-issue" value="">
+      <input type="hidden" name="dm-r3-d-erfuellt-epic" value="">
+      <div data-alevel="3" data-title="Wunsch erfüllt">
+        <div data-slot="short"><p>Erfüllen ist der dritte Weg, auf dem ein Wunsch die Operation verlässt.</p></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Wunsch","value":"Polaris ×1"},{"label":"Einsätze","value":"5 von 5 erledigt"},{"label":"Hangar","value":"Polaris angekommen"},{"label":"Operation","value":"Zeile bleibt oder geht"}]}'></div>
+          <p>Erfüllt heißt: Das Teil kommt im Inventar oder im Hangar an.</p>
+        </div>
+        <div data-example>
+          <p>Die Operation, nachdem die Polaris im Hangar ist</p>
+          <pre>Operation „Flotte ausbauen“ · 5 von 5 Einsätzen
+✓ Polaris ×1 · erreicht</pre>
+          <p>Ohne die Zeile</p>
+          <pre>Operation „Flotte ausbauen“ · 5 von 5 Einsätzen
+(keine Wünsche)</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="r3-d-hq" data-nav-label="Lösen im HQ" data-decision="r3-d-hq" data-decision-mode="yesnoalt"
+             data-label="Lösen im HQ" data-rec="yes"
+             data-rec-why="Dabei geht nichts verloren: Der Wunsch bleibt, „Rückgängig“ reicht."
+             data-applies-to="HQ" data-finding="r3-f-hq">
+      <p data-applies>Gilt für: HQ</p>
+      <p data-situation>Eine Rückfrage beim Lösen im HQ bremst, obwohl dabei nichts verloren geht.</p>
+      <h3 data-question>Soll das Lösen eines Wunsches aus einer Operation im HQ ohne Nachfrage gehen?</h3>
+      <p data-stakes>Ob Aufräumen im HQ einen Klick mehr kostet.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-r3-d-hq" value="yes">
+          <span data-opt-label>Ja, lösen ohne Nachfrage</span>
+          <span data-opt-consequence>Der Wunsch wird wieder frei, der Hinweis bietet „Rückgängig“; das gilt auch beim Auflösen einer Operation.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-r3-d-hq" value="no" checked>
+          <span data-opt-label>Nein, auch hier nachfragen</span>
+          <span data-opt-consequence>Jedes Lösen und Auflösen im HQ fragt erst.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-r3-d-hq" value="alt">
+          <span data-opt-label>Anders lösen</span>
+          <span data-opt-consequence>Du schreibst, wie es sein soll.</span>
+          <input type="text" name="dm-r3-d-hq-alt" value="" placeholder="Wann soll das HQ nachfragen?">
+        </label>
+      </div>
+      <textarea data-comment="r3-d-hq-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-hq-none" value="">
+      <input type="hidden" name="dm-r3-d-hq-hes" value="{&quot;ms&quot;:46432,&quot;revisits&quot;:0,&quot;median&quot;:30867}">
+      <input type="hidden" name="dm-r3-d-hq-touched" value="1">
+      <input type="hidden" name="dm-r3-d-hq-issue" value="">
+      <input type="hidden" name="dm-r3-d-hq-epic" value="">
+      <div data-alevel="3" data-title="Lösen im HQ">
+        <div data-slot="short"><p>Lösen im HQ macht einen Wunsch nur wieder frei.</p></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"frei vor dem Lösen","value":2},"after":{"label":"frei danach","value":5},"unit":"Karna Rifle"}'></div>
+          <p>Der Wunsch bleibt dabei ein Wunsch und wird nur wieder frei, auch wenn die ganze Operation aufgelöst wird.</p>
+        </div>
+        <div data-example>
+          <p>Im HQ, Operation „Bodentrupp ausrüsten“</p>
+          <pre>Karna Rifle ×3   [Lösen]</pre>
+          <p>Danach</p>
+          <pre>Karna Rifle aus „Bodentrupp ausrüsten“ gelöst · Rückgängig
+Wunschliste: Karna Rifle 5 · 5 frei</pre>
+        </div>
+      </div>
+    </section>
+  </section>
+</section>
+<!-- ANALYSIS-VIEW-END -->
+</section>

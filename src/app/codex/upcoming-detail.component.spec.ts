@@ -114,6 +114,9 @@ describe('UpcomingDetailComponent', () => {
     const el: HTMLElement = fixture.nativeElement;
     expect(el.querySelector('sc-item-path')).not.toBeNull();
     expect(el.querySelector('button.watch')).toBeNull();
+    // R5 (r5-d-bauplan): signed in, the preview page shows the full form - only the wish station for an announced hull.
+    expect(el.querySelector('sc-item-path')!.classList).toContain('ip-primary');
+    expect(el.querySelectorAll('sc-item-path [data-station]').length).toBe(1);
   });
 
   it('says "in concept" for a hull RSI is still building and "flight-ready" for one we just have not ingested', async () => {

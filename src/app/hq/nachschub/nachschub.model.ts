@@ -501,3 +501,166 @@ export function ingameSources(): readonly string[] {
 export function nextShipCopies(current: number | undefined): number {
   return Math.min(WISH_QTY_MAX, Math.max(1, Math.round(current ?? 1)) + 1);
 }
+
+// ---------------------------------------------------------------------------------------------------------
+// Wishes assigned to an Operation (concept 20261117-1110-pfad-stationen, A1-A10)
+// ---------------------------------------------------------------------------------------------------------
+//
+// A wish stays a wish when it is assigned (A1): the wishlist keeps the quantity, an open line with source 'wish'
+// in an active Nachschub ("Operation" in the UI) IS the assignment. Per wish position:
+//   assigned = the open wish lines' pieces still to come (line quantity minus what already arrived), over all
+//              active Operationen;  free = wished - assigned  (A3: assigned never exceeds wished).
+
+/** One open wish line of an active Operation, as the allocation rules see it. */
+export interface AssignedLine {
+  readonly lineId: string;
+  readonly packageId: string;
+  /** {@link positionKey} of the wish the line answers. */
+  readonly key: string;
+  /** Pieces still assigned: the line's quantity minus what already arrived (never below 0). */
+  readonly qty: number;
+  /** Last time pieces were assigned to this line (the line's edit time, ISO). */
+  readonly assignedAt: string;
+}
+
+/** Wished / assigned / free of one wish position. `assigned` is clamped to `wished` (A3). */
+export interface Allocation {
+  readonly wished: number;
+  readonly assigned: number;
+  readonly free: number;
+}
+
+export function allocate(wished: number, lines: readonly Pick<AssignedLine, 'qty'>[]): Allocation {
+  const w = Math.max(0, Math.round(wished));
+  const assigned = Math.min(w, lines.reduce((n, l) => n + Math.max(0, Math.round(l.qty)), 0));
+  return { wished: w, assigned, free: w - assigned };
+}
+
+/** The lines of one wish grouped per Operation, most recently assigned first (A6 preset order). */
+export interface PackageShare {
+  readonly packageId: string;
+  readonly qty: number;
+  readonly assignedAt: string;
+  /** The Operation's wish lines of this item, most recently assigned first. */
+  readonly lineIds: readonly string[];
+}
+
+export function sharesByPackage(lines: readonly AssignedLine[]): readonly PackageShare[] {
+  const by = new Map<string, { qty: number; assignedAt: string; lines: AssignedLine[] }>();
+  for (const l of lines) {
+    if (l.qty <= 0) continue;
+    const g = by.get(l.packageId) ?? { qty: 0, assignedAt: '', lines: [] };
+    g.qty += l.qty;
+    if (l.assignedAt > g.assignedAt) g.assignedAt = l.assignedAt;
+    g.lines.push(l);
+    by.set(l.packageId, g);
+  }
+  return [...by.entries()]
+    .map(([packageId, g]) => ({
+      packageId,
+      qty: g.qty,
+      assignedAt: g.assignedAt,
+      lineIds: [...g.lines].sort((a, b) => b.assignedAt.localeCompare(a.assignedAt)).map((l) => l.lineId),
+    }))
+    .sort((a, b) => b.assignedAt.localeCompare(a.assignedAt) || a.packageId.localeCompare(b.packageId));
+}
+
+/** What the removal planner needs to know about one Operation that holds pieces of the wish. */
+export interface RemovalHolder {
+  readonly packageId: string;
+  readonly packageName: string;
+  /** Pieces of this wish assigned there (the most the removal can take from it). */
+  readonly max: number;
+  readonly assignedAt: string;
+  /** Open pieces of every OTHER line of that Operation (other wishes, Bestand lines): 0 = this wish is all it holds. */
+  readonly otherOpen: number;
+  /** Einsaetze of the Operation, planned or done. */
+  readonly einsaetze: number;
+}
+
+export interface RemovalPart {
+  readonly packageId: string;
+  readonly packageName: string;
+  /** Pieces this removal takes from the Operation. */
+  readonly qty: number;
+  readonly max: number;
+  /** After this part the Operation holds no open line any more (A7). */
+  readonly lastWish: boolean;
+  readonly einsaetze: number;
+  /** lastWish without any Einsatz: the Operation is dissolved along, always (A7). */
+  readonly dissolves: boolean;
+}
+
+export interface RemovalPlan {
+  /** Pieces that leave the wishlist (clamped to 0..wished). */
+  readonly remove: number;
+  /** Of them taken from the free pieces (A4: free first). */
+  readonly free: number;
+  /** Every Operation holding the wish, most recently assigned first, with the preset split (A6). */
+  readonly parts: readonly RemovalPart[];
+  /** True when the removal cuts into assigned pieces: the UI asks first (A5). */
+  readonly needsConfirm: boolean;
+}
+
+function removalPart(h: RemovalHolder, qty: number): RemovalPart {
+  const lastWish = qty > 0 && qty >= h.max && h.otherOpen <= 0;
+  return { packageId: h.packageId, packageName: h.packageName, qty, max: h.max, lastWish, einsaetze: h.einsaetze, dissolves: lastWish && h.einsaetze <= 0 };
+}
+
+/**
+ * Plan "remove `removeQty` pieces of a wish": free pieces go first (A4); what is left comes out of the Operationen,
+ * the most recently assigned one first (A6). Nothing is changed - the caller applies the plan (after the UI asked
+ * when `needsConfirm`).
+ */
+export function planRemoval(wished: number, holders: readonly RemovalHolder[], removeQty: number): RemovalPlan {
+  const ordered = [...holders]
+    .filter((h) => h.max > 0)
+    .sort((a, b) => b.assignedAt.localeCompare(a.assignedAt) || a.packageId.localeCompare(b.packageId));
+  const alloc = allocate(wished, ordered.map((h) => ({ qty: h.max })));
+  const remove = Math.min(alloc.wished, Math.max(0, Math.round(Number.isFinite(removeQty) ? removeQty : 0)));
+  const free = Math.min(remove, alloc.free);
+  let rest = remove - free;
+  const parts = ordered.map((h) => {
+    const take = Math.min(rest, h.max);
+    rest -= take;
+    return removalPart(h, take);
+  });
+  return { remove, free, parts, needsConfirm: remove > free };
+}
+
+/**
+ * The user's own split over the Operationen (`split` = packageId -> pieces; a missing id = 0). Null when it does not
+ * add up: every part a whole number in 0..max, no unknown id, and the parts together exactly what the plan takes from
+ * the Operationen (the free share stays as planned).
+ */
+export function withSplit(plan: RemovalPlan, holders: readonly RemovalHolder[], split: Readonly<Record<string, number>>): RemovalPlan | null {
+  if (Object.keys(split).some((id) => !plan.parts.some((p) => p.packageId === id))) return null;
+  let sum = 0;
+  const parts: RemovalPart[] = [];
+  for (const p of plan.parts) {
+    const raw = split[p.packageId] ?? 0;
+    if (!Number.isInteger(raw) || raw < 0 || raw > p.max) return null;
+    sum += raw;
+    const h = holders.find((x) => x.packageId === p.packageId);
+    parts.push(h ? removalPart(h, raw) : { ...p, qty: raw });
+  }
+  return sum === plan.remove - plan.free ? { ...plan, parts } : null;
+}
+
+/** Operationen the removal dissolves: always those left empty without an Einsatz, plus the ones the user ticked (A7). */
+export function dissolvedBy(plan: Pick<RemovalPlan, 'parts'>, alsoDissolve: readonly string[] = []): readonly string[] {
+  return plan.parts.filter((p) => p.lastWish && (p.dissolves || alsoDissolve.includes(p.packageId))).map((p) => p.packageId);
+}
+
+/** Lower lines (in the order given) by `n` pieces in total: line id -> new quantity (0 = the line goes). */
+export function takeFromLines(lines: readonly { readonly id: string; readonly qty: number }[], n: number): ReadonlyMap<string, number> {
+  const out = new Map<string, number>();
+  let left = Math.max(0, Math.round(n));
+  for (const l of lines) {
+    if (left <= 0) break;
+    const take = Math.min(left, l.qty);
+    out.set(l.id, l.qty - take);
+    left -= take;
+  }
+  return out;
+}

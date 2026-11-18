@@ -1007,7 +1007,7 @@
         "partSize": "Size",
         "partGrade": "Grade",
         "iconWishlist": "Wishes",
-        "iconSupply": "Supplies",
+        "iconSupply": "Operation",
         "iconStock": "Inventory",
         "previewTitle": "Detail page preview",
         "previewMaker": "Manufacturer",
@@ -1227,7 +1227,6 @@
         }
       },
       "hangar": {
-        "menuAria": "Hangar and loadout",
         "loadouts": "Loadout",
         "werk": "Factory",
         "werkChanged": "Unsaved swaps: {{n}}",
@@ -1238,24 +1237,19 @@
         "removeExemplar": "Remove exemplar",
         "removeTitle": "Remove “{{name}}”?",
         "removeBody": "The loadout “{{name}}” is deleted. The ship stays in the hangar.",
-        "hangar": "Hangar",
         "copy": "Copy this exemplar",
         "copyName": "{{name}} (copy)",
         "newFromWerk": "New exemplar from factory",
         "saveWerk": "Add to hangar as exemplar",
         "saveBuild": "Save build as exemplar",
         "anotherCopy": "Another {{name}} into the hangar",
-        "openHangar": "Open in hangar",
-        "wishlist": "Wishes",
-        "toWishlist": "Add to wishes",
-        "wishAgain": "Wish for another",
         "nameTitle": "Exemplar name",
         "nameLabel": "Name",
         "nameSuggested": "Suggestion: “{{name}}” — take it or enter your own name.",
         "autosavedOne": "Saved · 1 change",
         "autosavedMany": "Saved · {{n}} changes",
-        "wishWithOne": "with 1 swapped part",
-        "wishWithMany": "with {{n}} swapped parts",
+        "wishWithOne": "Wish this build · 1 swapped part",
+        "wishWithMany": "Wish this build · {{n}} swapped parts",
         "wishName": "Wish: {{name}}",
         "wishLoadoutUnavailable": "Among your wishes — its loadout cannot be stored there yet."
       },
@@ -2670,9 +2664,9 @@
         "lensLimits": "limits the set for this mission"
       },
       "supplies": {
-        "add": "Add missing to supplies ({{n}})",
-        "none": "Everything owned or already in supplies.",
-        "added": "{{n}} parts added to supplies.",
+        "add": "Add missing to Operation ({{n}})",
+        "none": "Everything owned or already in an Operation.",
+        "added": "{{n}} parts added to the Operation.",
         "toPlan": "Go to Plan"
       },
       "notFoundPage": {
@@ -3077,38 +3071,17 @@
       }
     },
     "ownCard": {
-      "haveTitle": "Got it?",
-      "mineShip": "Your copy",
-      "mineItem": "Your storage",
-      "mineBlueprint": "Your blueprint",
-      "collected": "In your collection",
       "removeSammlung": "Remove from collection",
       "removeSammlungTitle": "Remove from collection?",
       "removeSammlungBody": "{{name}} leaves your collection.",
-      "noneShip": "Not in your hangar, not among your wishes.",
-      "noneItem": "Not in your inventory, not among your wishes.",
-      "noneSammlung": "Not in your collection, not among your wishes.",
-      "wished": "{{n}}× among your wishes.",
       "signedOut": "Sign in to wish for it or mark it as yours.",
       "signIn": "Sign in",
-      "toWishlist": "Wishes",
-      "toHangar": "Hangar",
-      "toInventar": "Inventory",
-      "toSammlung": "Collections",
-      "openWishlist": "Open wishes",
-      "wishQtyAria": "Quantity among your wishes: {{name}}",
-      "qtyAria": "Quantity in the inventory: {{name}}",
-      "less": "One less",
-      "more": "One more",
-      "inInventar": "in inventory",
       "removeItem": "Remove from inventory",
       "removeTitle": "Remove from inventory?",
       "removeBody": "{{n}}× {{name}} leaves every place in your inventory.",
       "removeConfirm": "Remove",
-      "inNachschub": "In supply “{{name}}”",
-      "showInHq": "Show in HQ",
-      "noteTitle": "Note on this item",
-      "wishAgain": "Wish for another"
+      "inNachschub": "In the Operation “{{name}}”",
+      "noteTitle": "Note on this item"
     },
     "itemRank": {
       "nAll": "{{n}} parts of this kind",
@@ -6147,43 +6120,48 @@
       "fit": "Fit map",
       "legend": "Legend",
       "legendAria": "Show and hide actions",
-      "shared": "{{place}} also serves the Nachschub \"{{name}}\"",
+      "shared": "{{place}} also serves the Operation \"{{name}}\"",
       "open": "Place open"
     },
     "slots": {
-      "aria": "Nachschub slots",
+      "aria": "Operation slots",
       "finished": "done",
       "einsaetze": "{{n}} Einsätze",
       "einsatzOne": "1 Einsatz",
       "delete": "Delete \"{{name}}\"",
-      "newAria": "New Nachschub in slot {{n}}",
+      "newAria": "New Operation in slot {{n}}",
       "free": "Slot {{n}}",
       "archive": "Archive",
-      "archiveAria": "Archive, {{n}} Nachschübe",
-      "introTitle": "No Nachschub yet",
-      "introText": "Tap a plus and take things from your wishes with you. They become a Nachschub with Einsätze that you work through step by step in Jetzt.",
-      "newAriaEvent": "New Nachschub in slot {{n}} – event available"
+      "archiveAria": "Archive, {{n}} Operations",
+      "introTitle": "No Operation yet",
+      "introText": "Tap a plus and create an Operation: a group of Einsätze with a goal. You assign your wishes to it and they stay wishes. You work through the Einsätze step by step in Jetzt.",
+      "newAriaEvent": "New Operation in slot {{n}} – event available"
     },
     "remove": {
       "titleRemove": "Delete \"{{name}}\"?",
       "titleEmpty": "Empty \"{{name}}\"?",
-      "msgRemove": "The Nachschub goes away. Open positions: {{n}}.",
-      "msgEmpty": "The Nachschub stays, its open positions leave it. Open positions: {{n}}.",
-      "back": "Open positions back to your wishes",
-      "backOn": "They are counted up among your wishes.",
-      "backOff": "They are dropped for good.",
+      "msgRemove": "The Operation goes away. Open positions: {{n}}.",
+      "msgEmpty": "The Operation stays, its open positions leave it. Open positions: {{n}}.",
+      "back": "Wishes stay on the wishlist",
+      "backOn": "Wishes from the Operation stay on your wishlist and become free again. Other open positions are added as wishes.",
+      "backOff": "Wishes from the Operation are also deleted from your wishlist; other open positions are dropped.",
       "confirmRemove": "Delete",
       "confirmEmpty": "Empty"
     },
     "archive": {
-      "slotFree": "A slot is free, you can bring a Nachschub back.",
-      "empty": "Nothing in the archive yet. A finished Nachschub moves here by itself and frees its slot.",
+      "slotFree": "A slot is free, you can bring an Operation back.",
+      "empty": "Nothing in the archive yet. A finished Operation moves here by itself and frees its slot.",
       "reactivate": "Reactivate",
+      "remove": "Delete",
+      "removeAria": "Delete Operation \"{{name}}\"",
+      "removeTitle": "Delete \"{{name}}\"?",
+      "removeMsg": "This Operation is in the archive and holds only finished work. It is deleted. Your wishlist and the seven slots stay as they are.",
+      "removeConfirm": "Delete",
       "close": "Close"
     },
     "flow": {
-      "titleNew": "New Nachschub",
-      "titleEdit": "Edit Nachschub",
+      "titleNew": "New Operation",
+      "titleEdit": "Edit Operation",
       "slotOf": "Slot {{n}} of {{max}}",
       "stepsAria": "Steps",
       "step": {
@@ -6203,10 +6181,10 @@
       "qtyOf": "Quantity of {{name}}",
       "less": "Take fewer",
       "more": "Take more",
-      "nameLabel": "Name of the Nachschub",
-      "alreadyIn": "Already in the Nachschub",
+      "nameLabel": "Name of the Operation",
+      "alreadyIn": "Already in the Operation",
       "forBp": "for {{name}}",
-      "removeLine": "Take \"{{name}}\" out of the Nachschub",
+      "removeLine": "Take \"{{name}}\" out of the Operation",
       "einsaetze": "Einsätze",
       "einsatzCount": "{{n}} Einsätze · {{s}} steps",
       "noNewLines": "No new positions, so no new Einsätze.",
@@ -6235,7 +6213,7 @@
       "haveEinsaetze": "Already planned",
       "back": "Back",
       "next": "Next",
-      "create": "Create Nachschub",
+      "create": "Create Operation",
       "saveEdit": "Save",
       "close": "Close",
       "namePlaceholder": "Leave empty to get a suggestion",
@@ -6265,11 +6243,18 @@
       }
     },
     "panel": {
-      "renameAria": "New name of the Nachschub",
+      "plain": {
+        "one": "1 position is not a wish yet.",
+        "other": "{{count}} positions are not wishes yet.",
+        "ask": "Created before the rebuild. Should they stand as wishes on your wishlist?",
+        "adopt": "Keep as wishes",
+        "keep": "Leave as is"
+      },
+      "renameAria": "New name of the Operation",
       "rename": "Change name",
       "positions": "positions",
       "edit": "Edit",
-      "noEinsaetze": "This Nachschub has no Einsätze yet.",
+      "noEinsaetze": "This Operation has no Einsätze yet.",
       "noEinsaetzeHint": "The positions turn into Einsätze: buy, mine, missions, crafting last.",
       "proposeEinsaetze": "Propose Einsätze",
       "einsaetze": "Einsätze",
@@ -6280,19 +6265,19 @@
       "places": "{{n}} places"
     },
     "run": {
-      "aria": "Nachschub that Jetzt runs",
+      "aria": "Operation that Jetzt runs",
       "for": "for",
       "stepOf": "Step {{n}} of {{total}}",
-      "switch": "Switch Nachschub",
-      "emptyTitle": "No Nachschub in progress",
+      "switch": "Switch Operation",
+      "emptyTitle": "No Operation in progress",
       "toPlanen": "Go to Planen",
       "finish": "Step done",
       "sharedStop": "This place also serves \"{{name}}\".",
       "doneKicker": "All ticked off",
       "allDone": "All steps of this Einsatz are done.",
-      "allDoneHint": "Pick another Einsatz of the Nachschub or switch the Nachschub.",
-      "einsaetze": "Einsätze of this Nachschub",
-      "archived": "Finished: this Nachschub sits in the archive, its Einsätze keep running here. Reactivate it under Planen › Archive."
+      "allDoneHint": "Pick another Einsatz of the Operation or switch the Operation.",
+      "einsaetze": "Einsätze of this Operation",
+      "archived": "Finished: this Operation sits in the archive, its Einsätze keep running here. Reactivate it under Planen › Archive."
     },
     "ticker": {
       "none": "no event yet",
@@ -6344,7 +6329,7 @@
       "prev": "Previous page",
       "next": "Next page",
       "hintWish": "among your wishes: {{n}}",
-      "hintNachschub": "in the Nachschub \"{{name}}\"",
+      "hintNachschub": "in the Operation \"{{name}}\"",
       "bpPick": {
         "hint": "Pick from the Codex so materials and the Codex page match.",
         "label": "Search blueprint",
@@ -6537,7 +6522,7 @@
       }
     },
     "nachschub": {
-      "slotsFull": "All 7 Nachschub slots are in use. Finish or delete one to free a slot.",
+      "slotsFull": "All 7 Operation slots are in use. Finish or delete one to free a slot.",
       "nothingPicked": "Pick at least one item from your wishes.",
       "sellGoalInvalid": "Enter a goal of at least 1 aUEC.",
       "target": {
@@ -6550,12 +6535,12 @@
         },
         "lead": "{{n}} item(s) from your storage",
         "where": "Where to",
-        "new": "New Nachschub",
-        "newSell": "New Nachschub: make money",
+        "new": "New Operation",
+        "newSell": "New Operation: make money",
         "append": "Add to \"{{name}}\"",
         "goal": "Goal in aUEC",
         "goalPlaceholder": "e.g. 1,500,000",
-        "create": "Create Nachschub",
+        "create": "Create Operation",
         "add": "Add",
         "sellName": "Make money",
         "scu": "SCU",
@@ -6567,7 +6552,7 @@
         "einsatzMany": "Pick up"
       },
       "sellForm": {
-        "kindAria": "What is the Nachschub for?",
+        "kindAria": "What is the Operation for?",
         "wish": "From your wishes",
         "sell": "Make money",
         "goal": "Goal in aUEC",
@@ -6603,12 +6588,16 @@
       "done": {
         "created": "\"{{name}}\" is created.",
         "undone": "Undone.",
-        "reactivated": "Nachschub is active again.",
-        "emptied": "Nachschub emptied.",
-        "removed": "Nachschub deleted.",
-        "added": "Added to the Nachschub.",
+        "reactivated": "Operation is active again.",
+        "plainAdopted": "{{count}} positions are now wishes on your wishlist.",
+        "plainKept": "{{count}} positions stay as they are.",
+        "emptied": "Operation emptied.",
+        "removed": "Operation deleted.",
+        "added": "Added to the Operation.",
         "lineRemoved": "Position removed.",
-        "edited": "Nachschub saved."
+        "edited": "Operation saved.",
+        "wishRemoved": "Removed {{count}} × {{name}} from the wishlist.",
+        "released": "Released {{name}} from the Operation."
       },
       "rec": {
         "reason": {
@@ -6633,12 +6622,16 @@
           "buy": "Buy"
         }
       },
-      "linesFull": "Your Nachschub list is full (100 positions). Remove some positions first, then your wishes can move in.",
-      "partial": "{{count}} positions stayed behind: your Nachschub list is full.",
+      "linesFull": "Your Operation is full (100 positions). Remove some positions first, then you can assign more.",
+      "partial": "{{count}} positions stayed behind: your Operation is full.",
       "wishlistFailed": "Your wishes could not be changed. Nothing was moved.",
+      "plainGone": "These positions were already answered on another device. The view is refreshing.",
       "wishCapped": "{{count}} units no longer fit among your wishes (999 per entry at most) and are lost.",
-      "gone": "This Nachschub no longer exists (deleted on another device). The view is refreshing.",
-      "capReached": "You reached the limit of stored Nachschübe. Delete old ones from the archive and it works again."
+      "gone": "This Operation no longer exists (deleted on another device). The view is refreshing.",
+      "capReached": "You reached the limit of stored Operations. Delete old ones from the archive and it works again.",
+      "nothingFree": "Every piece of this wish is already assigned to an Operation.",
+      "splitInvalid": "The split across the Operations does not add up.",
+      "dissolveFailed": "An Operation could not be dissolved and stays."
     },
     "title": "HQ",
     "eyebrow": "Personal area",
@@ -6651,7 +6644,7 @@
       "spots": "Spots"
     },
     "supplies": {
-      "button": "Supplies",
+      "button": "Operations",
       "add": {
         "search": "Search for an item"
       },
@@ -6662,20 +6655,20 @@
       "remove": "Remove {{name}}",
       "sum": "{{open}} open ({{units}} pcs) · {{done}} got",
       "clearDone": "Remove ticked",
-      "buttonAria": "Open supplies ({{count}} entries)",
-      "title": "Supplies",
-      "close": "Close supplies",
-      "empty": "Nothing on the supplies list yet.",
-      "emptyHint": "Search for an item and add it to Supplies: Plan then shows where to get it and how to get there.",
+      "buttonAria": "Open Operations ({{count}} entries)",
+      "title": "Operations",
+      "close": "Close Operations",
+      "empty": "Nothing in your Operations yet.",
+      "emptyHint": "Search for an item and assign it to an Operation: Plan then shows where to get it and how to get there.",
       "tabsAria": "Lists",
       "tabs": {
         "wish": "Wishes",
-        "nachschub": "Supplies"
+        "nachschub": "Operations"
       },
       "wish": {
         "empty": "Make a wish",
-        "emptyHint": "Search for an item or a ship and make it a wish. From here it moves to Supplies with one click.",
-        "toNachschub": "To Supplies",
+        "emptyHint": "Search for an item or a ship and make it a wish. From here you assign it to an Operation with one click.",
+        "toNachschub": "Assign to an Operation",
         "remove": "Take {{name}} off your wishes",
         "notYet": "not in the game yet"
       },
@@ -6715,9 +6708,9 @@
       "noVariant": "Stock loadout",
       "activeSet": "Active set",
       "nextOps": "Next ops",
-      "suppliesPreview": "Supplies",
+      "suppliesPreview": "Operations",
       "opsOpen": "Open ops",
-      "suppliesOpen": "Open supplies",
+      "suppliesOpen": "Open Operations",
       "opsEmpty": "No ops planned yet.",
       "suppliesEmpty": "Nothing to fetch.",
       "noShip": "No ship in your hangar yet.",
@@ -6798,9 +6791,9 @@
       },
       "planen": {
         "empty": "Nothing planned yet",
-        "emptyHint": "Your Nachschub turns into an Einsatz.",
+        "emptyHint": "An Operation turns into an Einsatz.",
         "count": "{{n}} open",
-        "needs": "{{n}} in supplies",
+        "needs": "{{n}} in Operations",
         "open": "Open planning"
       },
       "stats": {
@@ -7287,12 +7280,12 @@
       "pick": {
         "title": "Events",
         "hint": "Running events you have not finished – choose the rewards you want to get.",
-        "sightseeing": "No reward – as a sightseeing Nachschub."
+        "sightseeing": "No reward – as a sightseeing Operation."
       },
       "draft": {
         "area": "The event area instead of a fixed place"
       },
-      "severalHint": "Several events in one Nachschub work, but are not recommended.",
+      "severalHint": "Several events in one Operation work, but are not recommended.",
       "doneTag": "Done",
       "abort": "Abort",
       "complete": "Event done",
@@ -7355,8 +7348,8 @@
         "confirm": "Claim"
       },
       "offer": {
-        "area": "You are in the area of {{event}}. Switch to this Nachschub?",
-        "ac": "Arena Commander is running – fits {{event}}. Switch to this Nachschub?",
+        "area": "You are in the area of {{event}}. Switch to this Operation?",
+        "ac": "Arena Commander is running – fits {{event}}. Switch to this Operation?",
         "switch": "Switch",
         "notNow": "Not now"
       },
@@ -7382,7 +7375,7 @@
         "start": "With the app you see here, live, where you are, what you fly and what comes next.",
         "inventar": "The app reads your inventory and your ships from the game. You type nothing in.",
         "jetzt": "The app reports where you are right now and ticks off steps by itself:",
-        "planen": "The app notices when a Nachschub line arrives and closes it.",
+        "planen": "The app notices when a line of your Operation arrives and closes it.",
         "statistik": "The app counts along while you play: playtime, sessions, missions and losses. Without it this page stays empty.",
         "jetztList": {
           "e1": "Your location and ship, e.g. \"Stanton › New Babbage\".",
@@ -7613,8 +7606,8 @@
       "hqEventOne": "{{name}} is on · 1 day left",
       "hqEventToday": "{{name}} is on · ends today",
       "hqEventOpen": "{{name}} is on",
-      "hqSupplies": "{{n}} open Nachschübe",
-      "hqSuppliesOne": "1 open Nachschub",
+      "hqSupplies": "{{n}} open Operations",
+      "hqSuppliesOne": "1 open Operation",
       "hqCalm": "All quiet at HQ",
       "admin": "Admin station",
       "adminValue": "Straight to the admin hub",
@@ -8390,7 +8383,7 @@
     },
     "signIn": {
       "title": "Sign in?",
-      "message": "Wishes, inventory and supplies belong to your account. Sign in to save this.",
+      "message": "Wishes, inventory and Operations belong to your account. Sign in to save this.",
       "confirm": "Go to sign-in"
     },
     "done": {
@@ -8551,7 +8544,7 @@
         "t": "Your own hits always come first"
       },
       {
-        "t": "\"missing\" before a word searches only your supplies"
+        "t": "\"missing\" before a word searches only your Operations"
       },
       {
         "t": "The search remembers where you open it"
@@ -8933,14 +8926,15 @@
     },
     "err": {
       "failed": "That did not work. Try again.",
-      "unavailable": "This step does not exist here."
+      "unavailable": "This step does not exist here.",
+      "wishAssigned": "These pieces are assigned to an Operation. Remove them through the dialog."
     },
     "hint": {
       "notYetInGame": "not in the game yet"
     }
   },
   "quick": {
-    "toNachschub": "Into a Nachschub: {{name}}",
+    "toNachschub": "Into an Operation: {{name}}",
     "wish": "Wishes",
     "allWish": "All wishes",
     "allWishCount": "{{n}} wishes",
@@ -8964,8 +8958,37 @@
       "news": "News"
     }
   },
+  "wishRemoval": {
+    "title": "Remove {{name}}",
+    "howMany": "How many to remove?",
+    "caption": "These {{n}} pieces go:",
+    "captionOne": "This piece goes:",
+    "barLabel": "Where the pieces go",
+    "free": "{{n}} free",
+    "fromOp": "{{n}} from “{{name}}”",
+    "latest": "assigned last",
+    "of": "of {{n}}",
+    "rowLabel": "Pieces from “{{name}}”",
+    "sum": "{{done}} of {{total}} distributed",
+    "keeps": "“{{name}}” keeps other wishes.",
+    "lastStays": "“{{name}}” has no wish left afterwards. Its {{n}} Einsätze stay.",
+    "lastStaysOne": "“{{name}}” has no wish left afterwards. Its Einsatz stays.",
+    "dissolves": "“{{name}}” has no Einsatz and is dissolved along with it.",
+    "alsoDissolve": "Also dissolve the Operation",
+    "alsoDissolveNamed": "Also dissolve the Operation “{{name}}”",
+    "confirm": "Remove {{n}}",
+    "confirmDissolve": "Remove and dissolve",
+    "toastDissolved": "The Operation was dissolved along with it.",
+    "release": {
+      "title": "Release {{name}} from the Operation?",
+      "text": "The {{n}} pieces stay on your wishlist and become free again.",
+      "textOne": "The piece stays on your wishlist and becomes free again.",
+      "confirm": "Release",
+      "deleteToo": "Also delete from the wishlist"
+    }
+  },
   "cart": {
-    "title": "Wishes",
+    "title":"Wishes",
     "summary": "{{n}} wishes · {{g}} groups",
     "summaryOne": "1 wish · 1 group",
     "summaryOneGroup": "{{n}} wishes · 1 group",
@@ -8994,7 +9017,7 @@
     "removedGroup": "{{name}} removed ({{n}} wishes)",
     "selected": "selected",
     "clear": "Deselect all",
-    "toNachschub": "Into a Nachschub",
+    "toNachschub": "Into an Operation",
     "kind": {
       "ship": "Ship",
       "vehicle": "Vehicle",
@@ -9012,8 +9035,8 @@
       "add": "to your wishes",
       "dismiss": "Do not suggest {{name}}"
     },
-    "slotsFullHint": "All 7 Nachschub slots are in use. The selection goes into an existing Nachschub.",
-    "toExisting": "Into an existing Nachschub",
+    "slotsFullHint": "All 7 Operation slots are in use. The selection goes into an existing Operation.",
+    "toExisting": "Into an existing Operation",
     "open": "Open “{{name}}” in the Codex"
   },
   "pathCtl": {
@@ -9067,7 +9090,32 @@
     "whereTitle": "Where is it?",
     "otherPlace": "Other place …",
     "otherPlaceholder": "Enter a place",
-    "store": "Put down"
+    "store": "Put down",
+    "wishAssigned": "{{n}} of them assigned to an Operation",
+    "assign": {
+      "go": "Assign",
+      "title": "Assign to an Operation",
+      "howMany": "How many?",
+      "ofWished": "of {{n}} wished",
+      "ofFree": "of {{n}} free",
+      "newest": "created last",
+      "new": "New Operation",
+      "newHint": "A name is proposed",
+      "loading": "Loading Operationen …",
+      "working": "Assigning …",
+      "slots": "{{used}} of {{max}} slots in use",
+      "planHint": "You plan Einsätze",
+      "inHq": "in the HQ",
+      "progress": "{{done}} of {{total}} Einsätze",
+      "noEinsatz": "No Einsatz planned yet",
+      "line": "{{n}} in Operation “{{name}}”",
+      "moreOne": "+1 more Operation",
+      "more": "+{{n}} more Operations"
+    },
+    "own": {
+      "morePlacesOne": "+1 more place",
+      "morePlaces": "+{{n}} more places"
+    }
   },
   "itemStage": {
     "aria": "Stage: {{name}}",
@@ -9079,7 +9127,7 @@
     "noSilhouette": "no silhouette",
     "noSilhouetteReason": "This build has no silhouette for this item; the preview image stands in.",
     "no3dReason": "This build has no 3D model of this item.",
-    "inNachschub": "Part of the Nachschub “{{name}}”",
+    "inNachschub": "Part of the Operation “{{name}}”",
     "panelAria": "Values and information",
     "tabsAria": "Sections",
     "tab": {
