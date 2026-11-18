@@ -1,0 +1,36 @@
+[
+  {
+    "iteration": 1,
+    "submission_id": "sub-mwmq7e71-i5mwabcn",
+    "submitted_at": "2026-11-18T23:01:55Z",
+    "action": "implement",
+    "decisions": [
+      {
+        "id": "d-agents",
+        "label": "Automatische Browser-Läufe",
+        "value": "warm",
+        "recommended": "warm",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-ram",
+        "label": "Arbeitsspeicher der Instanz",
+        "value": "buffers",
+        "recommended": "buffers",
+        "deviates": false,
+        "note": ""
+      },
+      {
+        "id": "d-cache",
+        "label": "Cache für Katalog-Listen",
+        "value": "snapshot",
+        "recommended": "slim",
+        "deviates": true,
+        "note": ""
+      }
+    ],
+    "comments": { "general": "", "items": [] },
+    "pins": []
+  }
+]

@@ -99,6 +99,25 @@ legacy `SC_GATE_EMAIL`/`SC_GATE_PASSWORD`, then the Credential Manager entry.
   account, for Claude's browsers only; the admin has no account there. "Sieh es dir
   an" means the live site after a ship, never `127.0.0.1:4200` or a dev port, also
   in a concept's try-it link. Say so instead of offering the link.
+- **These browsers do not see every database answer fresh.** The init page also
+  installs the Supabase guard (`scripts/lib/agent-supabase-guard.cjs`), signed in
+  or not, because agent browsers were the largest load on the live instance
+  (142 871 of 201 137 API requests on 2026-11-15, `supabase.md` → "The instance
+  swaps"). Two effects:
+  - Catalog reads of one build (`GET /rest/v1/codex_*?build_id=eq.<uuid>` except
+    `codex_builds`, and `rpc/codex_facet_values`) are answered from
+    `%TEMP%\sc-agent-catalog-cache`, shared by all of Claude's browsers on this
+    machine, for up to 12 hours. A new build has a new id and a checkout with a
+    newer migration gets its own cache, so both are read fresh on their own.
+    **You changed catalog rows in place or a catalog view without a migration
+    file and want to see it:** `node scripts/lib/agent-supabase-guard.cjs --clear`,
+    or start the session with `SC_AGENT_SUPABASE_GUARD=off`.
+  - Every other request to `/rest/v1/` passes through 4 slots shared by the same
+    browsers and waits at most 3 s for one. Never measure load times or request
+    timing of the app through these browsers without `SC_AGENT_SUPABASE_GUARD=off`.
+  `%TEMP%\sc-test-session.log` shows per context how many requests came from the
+  cache (`guard: … requests, … from the catalog cache`). A standalone script that
+  calls the init page gets the guard too; one that builds its own context does not.
 - **Standalone script, no Playwright MCP in the session:** install `playwright-core`
   in the scratchpad, run the script from the repo root (the init page checks the
   cwd), `require('scripts/playwright/test-session.cjs')` and call it with `{ page }`.
