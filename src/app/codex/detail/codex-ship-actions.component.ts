@@ -19,10 +19,13 @@ import { ShipLinkFormStore } from './ship-link-form.store';
   imports: [TranslatePipe, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <code class="cls">{{ classNameSlug() }}</code>
+    @if (showClass()) {
+      <code class="cls">{{ classNameSlug() }}</code>
+    }
     @if (spacer()) {
       <span class="tool-spacer"></span>
     }
+    @if (showLinks()) {
     <!-- Deep-link out to the official RSI site. We have no reliable
          per-ship RSI slug (our classNameSlug is not the RSI URL slug),
          so without a pinned link this lands on the official ships
@@ -45,6 +48,7 @@ import { ShipLinkFormStore } from './ship-link-form.store';
         {{ (links.myPledgeLink() ? 'codex.shipLink.edit' : 'codex.shipLink.add') | translate }}
       </button>
     }
+    }
   `,
   styles: [`
     :host { display: contents; }
@@ -61,4 +65,8 @@ export class CodexShipActionsComponent {
   readonly classNameSlug = input.required<string>();
   /** Classic tool row: a flexible gap pushes the actions to the row's end. */
   readonly spacer = input(false);
+  /** The class name code. Off in the classic head row, which carries only the links (#374). */
+  readonly showClass = input(true);
+  /** The RSI link and the pledge-link action. Off in the classic tool row: they moved up beside the name (#374). */
+  readonly showLinks = input(true);
 }
