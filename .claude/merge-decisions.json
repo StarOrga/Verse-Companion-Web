@@ -1114,6 +1114,18 @@
         ]
       }
     ],
+    "docs/analytics/event-naming.md›verb list›deselect": [
+      {
+        "ship": "#1184",
+        "by": "JerryT2T",
+        "value": "both kept: assign/release inserted before deselect, deselect and its reason unchanged",
+        "decided": true,
+        "at": "2026-11-18T21:12:57.460Z",
+        "hunks": [
+          "706c32b203cc"
+        ]
+      }
+    ],
     "docs/concepts/20261115-0216-popup-aufbau.html›page›content": [
       {
         "ship": "claude/modest-napier-9d1e5a",
