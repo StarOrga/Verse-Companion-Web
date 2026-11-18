@@ -1,7 +1,39 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.279.0",
+  "current": "0.279.2",
   "releases": [
+    {
+      "version": "0.279.2",
+      "date": "2026-11-18",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Admin concept \"Lager — Suche, Mengen & stabile Leiste\": round 3 (quantity matches across one or more stops with a per-user filter, one-click Einlagern and Rausnehmen with undo)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.279.1",
+      "date": "2026-11-18",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "/verse: the HQ outpost under the HQ event link no longer appears with the world; it fades in with its beacon in the staged entrance."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.279.0",
       "date": "2026-11-18",
