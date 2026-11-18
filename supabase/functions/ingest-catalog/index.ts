@@ -59,6 +59,7 @@
 //         and deletes the rows once the public Worker serves them — see below)
 //   POST { op: "locale_publish",   build_id, lang?, delete_source? }   -> { ok, results }
 //        (service role or the gates below; one language per call keeps it short)
+//   POST { op: "lists_publish",     build_id }                          -> { ok, result }  (codex-lists/ files)
 //   POST { op: "locale_gc",        dry_run? (default true) }           -> { ok, ...GcResult }
 //        (SERVICE ROLE ONLY. Deletes codex-locale/<build>/ prefixes in R2 whose
 //         build id is no longer in codex_builds, i.e. pruned builds. Send
