@@ -4,7 +4,7 @@ import { WishEmptyComponent } from './wish-empty.component';
 import { WISH_SKY_DOTS, WishSkyComponent } from './wish-sky.component';
 
 describe('WishSkyComponent', () => {
-  function mount(variant?: 'hero' | 'strip') {
+  function mount(variant?: 'hero' | 'strip' | 'backdrop') {
     const fixture = TestBed.createComponent(WishSkyComponent);
     if (variant) fixture.componentRef.setInput('variant', variant);
     fixture.detectChanges();
@@ -28,6 +28,14 @@ describe('WishSkyComponent', () => {
     const strip = mount('strip');
     expect(strip.host.getAttribute('data-variant')).toBe('strip');
     expect(strip.host.getBoundingClientRect().height).toBe(84);
+  });
+
+  it('as the backdrop it fills its positioned host without a frame of its own (batch note #6)', () => {
+    const { host } = mount('backdrop');
+    const css = getComputedStyle(host);
+    expect(css.position).toBe('absolute');
+    expect(css.pointerEvents).toBe('none');
+    expect(getComputedStyle(host.querySelector('.sky')!).borderTopWidth).toBe('0px');
   });
 
   it('moves with the concept timings: dots 3.2 s ease-in-out, streaks 5 s ease-in, the second 2.6 s late', () => {

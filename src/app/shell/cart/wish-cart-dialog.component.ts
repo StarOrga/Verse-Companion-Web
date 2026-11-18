@@ -47,7 +47,7 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
           @if (cart.count() === 0) {
             <sc-wish-empty (searchWish)="searchWish()" />
           } @else {
-            <sc-wish-sky class="strip" variant="strip" />
+            <sc-wish-sky class="strip" variant="backdrop" />
             <div class="groups">
               @for (g of cart.groups(); track g.id) {
                 <section class="group ce" [class.bp]="g.type === 'blueprint'" [style.--n]="span(g)" [style.--ce]="$index + 1" [attr.aria-label]="groupTitle(g)">
@@ -159,7 +159,8 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       .cart-status { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; justify-content: flex-end; }
       .cart-sum { color: var(--sc-fg-2); }
       .full-hint { color: var(--sc-fg-2); font-size: max(0.82rem, var(--sc-fs-floor, 0.75rem)); max-width: 46ch; }
-      .cart-body { display: flex; flex-direction: column; gap: var(--sc-space-4); }
+      .cart-body { position: relative; isolation: isolate; display: flex; flex-direction: column; gap: var(--sc-space-4); }
+      .cart-body > :not(sc-wish-sky) { position: relative; z-index: 1; }
       .groups { flex: none; }
       .sugs { flex: none; margin-top: var(--sc-space-4); }
       .groups { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
@@ -207,7 +208,8 @@ const OPEN = ['M14 5h5v5M19 5l-8 8M17 14v5H5V7h5'] as const;
       .sel-count { font-size: 0.85rem; color: var(--sc-fg-1); }
       .sel-count b { color: var(--sc-accent); font-variant-numeric: tabular-nums; }
       .go.off { opacity: 0.45; cursor: default; }
-      .strip { margin-bottom: 12px; }
+      /* The sky is the backdrop of the list's top (batch note #6), not a strip of its own above it. */
+      .cart-body > .strip { inset: 0 0 auto 0; height: 180px; }
       @media (max-width: 900px) {
         .group { flex-basis: 100%; }
         .s-row { grid-template-columns: 1fr; }
