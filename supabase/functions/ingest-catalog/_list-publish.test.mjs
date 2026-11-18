@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
   LIST_COLUMNS,
-  LIST_KINDS,
+  LIST_FILES,
+  RANK_PAGE,
+  SHIP_RANK_PAYLOAD_KEYS,
   NAME_RE,
   PAYLOAD_KEYS,
   SHIP_PAYLOAD_KEYS,
@@ -25,7 +27,8 @@ describe('list snapshot builders', () => {
   it('keeps the key shapes of the contract', () => {
     assert.equal(listsIndexKey(BUILD), `codex-lists/${BUILD}/index.json`);
     assert.equal(listsFileKey(BUILD, 'mgaq1z2k', 'ship'), `codex-lists/${BUILD}/mgaq1z2k/ship.json`);
-    assert.ok(NAME_RE.test('facets') && NAME_RE.test('blueprint'));
+    assert.ok(NAME_RE.test('facets') && NAME_RE.test('blueprint') && NAME_RE.test('ship-rank'));
+    assert.ok(!NAME_RE.test('ship-rankx'));
     assert.ok(!NAME_RE.test('shipx') && !NAME_RE.test('../ship') && !NAME_RE.test('codex_ships'));
   });
 
@@ -34,6 +37,15 @@ describe('list snapshot builders', () => {
     assert.deepEqual(LIST_COLUMNS.blueprint, ['class_name', 'name_localized', 'category', 'tier', 'craft_time_seconds', 'dismantle_time_seconds']);
     assert.deepEqual(PAYLOAD_KEYS.item, ['name', 'previewImage', 'manufacturer']);
     assert.deepEqual(SHIP_PAYLOAD_KEYS, ['name', 'previewImage', 'manufacturer', 'sizeClass', 'career', 'dimensions']);
+  });
+
+  it('ship-rank mirrors the ship columns and the client rank keys', () => {
+    assert.deepEqual(LIST_COLUMNS['ship-rank'], LIST_COLUMNS.ship);
+    assert.deepEqual(SHIP_RANK_PAYLOAD_KEYS, ['career', 'defaultLoadout', 'flight', 'hull', 'armorHp', 'cargoScu', 'stats']);
+    const file = JSON.parse(kindFileJson('ship-rank', []));
+    assert.equal(file.kind, 'ship-rank');
+    assert.deepEqual(file.payloadKeys, SHIP_RANK_PAYLOAD_KEYS);
+    assert.match(selectFor('ship-rank'), /p_stats:payload->stats$/);
   });
 
   it('selects payload slices server-side, never the whole payload', () => {
@@ -67,7 +79,7 @@ function fixture({ failOn, usageBlocked, existing = [] } = {}) {
     gate: async () => (usageBlocked ? { code: 'r2_free_tier_guard', message: 'near limit' } : null),
     async readRows(build, kind, from, limit) {
       reads.push([kind, from, limit]);
-      const total = kind === 'item' ? LIST_PAGE + 5 : kind === 'weapon' ? 0 : 2;
+      const total = kind === 'item' ? LIST_PAGE + 5 : kind === 'ship-rank' ? RANK_PAGE + 1 : kind === 'weapon' ? 0 : 2;
       const n = Math.max(0, Math.min(limit, total - from));
       return Array.from({ length: n }, (_, i) => ({ class_name: `${kind}_${from + i}`, name_localized: `N${from + i}` }));
     },
@@ -89,12 +101,15 @@ describe('publishLists', () => {
     const { deps, log, reads } = fixture();
     const res = await publishLists(BUILD, deps);
     const gen = res.gen;
-    assert.deepEqual(log, [...LIST_KINDS.map((k) => listsFileKey(BUILD, gen, k)), listsFileKey(BUILD, gen, 'facets'), listsIndexKey(BUILD)]);
+    assert.deepEqual(log, [...LIST_FILES.map((k) => listsFileKey(BUILD, gen, k)), listsFileKey(BUILD, gen, 'facets'), listsIndexKey(BUILD)]);
     assert.equal(res.verified, true);
     assert.equal(res.files.item.rows, LIST_PAGE + 5);
     assert.equal(res.files.weapon.rows, 0);
     assert.equal(res.files.facets.rows, 4);
     assert.ok(res.files.ship.bytes > 0);
+    assert.equal(res.files['ship-rank'].rows, RANK_PAGE + 1);
+    assert.deepEqual(log.slice(0, 3).map((k) => k.split('/').pop()), ['ship.json', 'ship-rank.json', 'weapon.json']);
+    assert.deepEqual(reads.filter(([k]) => k === 'ship-rank'), [['ship-rank', 0, RANK_PAGE], ['ship-rank', RANK_PAGE, RANK_PAGE]]);
     // paging: item needed two pages, weapon one empty page
     assert.deepEqual(reads.filter(([k]) => k === 'item').map((r) => r[1]), [0, LIST_PAGE]);
   });

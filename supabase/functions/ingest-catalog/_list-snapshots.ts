@@ -24,14 +24,19 @@ export const LIST_KINDS = ['ship', 'weapon', 'component', 'item', 'ammunition', 
 export type ListKind = (typeof LIST_KINDS)[number];
 /** Kinds `codex_facet_values` answers with real values (the others return empty lists). */
 export const FACET_KINDS = ['ship', 'weapon', 'component', 'item'] as const;
-export const FILE_NAMES = [...LIST_KINDS, 'facets'] as const;
+/** A list file built from table rows: a kind, or the ship rank slice. */
+export type ListName = ListKind | 'ship-rank';
+/** Publish order of the row files: ship-rank right after ship. */
+export const LIST_FILES: readonly ListName[] = ['ship', 'ship-rank', 'weapon', 'component', 'item', 'ammunition', 'manufacturer', 'blueprint'];
+export const FILE_NAMES = [...LIST_FILES, 'facets'] as const;
 export type FileName = (typeof FILE_NAMES)[number];
 
-export const NAME_RE = /^(ship|weapon|component|item|ammunition|manufacturer|blueprint|facets)$/;
+export const NAME_RE = /^(ship-rank|ship|weapon|component|item|ammunition|manufacturer|blueprint|facets)$/;
 export const GEN_RE = /^[0-9a-z]{6,16}$/;
 
-export const LIST_TABLES: Record<ListKind, string> = {
+export const LIST_TABLES: Record<ListName, string> = {
   ship: 'codex_ships',
+  'ship-rank': 'codex_ships',
   weapon: 'codex_weapons',
   component: 'codex_components',
   item: 'codex_items',
@@ -41,8 +46,10 @@ export const LIST_TABLES: Record<ListKind, string> = {
 };
 
 /** LIST_SELECT of codex.service.ts without `payload`; the order is the row layout. */
-export const LIST_COLUMNS: Record<ListKind, readonly string[]> = {
-  ship: ['class_name', 'guid', 'name_localized', 'manufacturer_code', 'role', 'crew_size', 'is_variant'],
+const SHIP_COLUMNS = ['class_name', 'guid', 'name_localized', 'manufacturer_code', 'role', 'crew_size', 'is_variant'] as const;
+export const LIST_COLUMNS: Record<ListName, readonly string[]> = {
+  ship: SHIP_COLUMNS,
+  'ship-rank': SHIP_COLUMNS,
   weapon: ['class_name', 'name_localized', 'manufacturer_code', 'weapon_class', 'attach_type', 'sub_type', 'size', 'grade', 'is_variant'],
   component: ['class_name', 'name_localized', 'manufacturer_code', 'kind', 'attach_type', 'sub_type', 'size', 'grade', 'is_variant'],
   item: ['class_name', 'name_localized', 'manufacturer_code', 'attach_type', 'sub_type', 'size', 'grade', 'is_variant'],
@@ -63,8 +70,19 @@ export const CARD_PAYLOAD_KEYS: readonly string[] = ['name', 'previewImage', 'ma
  */
 export const SHIP_PAYLOAD_KEYS: readonly string[] = [...CARD_PAYLOAD_KEYS, 'sizeClass', 'career', 'dimensions'];
 
-export const PAYLOAD_KEYS: Record<ListKind, readonly string[]> = {
+/**
+ * Payload keys of the rank cohort file. Must equal RANK_PAYLOAD_KEYS in
+ * src/app/codex/codex.service.ts (same keys, same order): the client reads this
+ * file instead of `allShipRows`.
+ */
+export const SHIP_RANK_PAYLOAD_KEYS: readonly string[] = ['career', 'defaultLoadout', 'flight', 'hull', 'armorHp', 'cargoScu', 'stats'];
+
+/** Rows per page of ship-rank: each row carries several kB (allShipRows pages by 200). */
+export const RANK_PAGE = 200;
+
+export const PAYLOAD_KEYS: Record<ListName, readonly string[]> = {
   ship: SHIP_PAYLOAD_KEYS,
+  'ship-rank': SHIP_RANK_PAYLOAD_KEYS,
   weapon: CARD_PAYLOAD_KEYS,
   component: CARD_PAYLOAD_KEYS,
   item: CARD_PAYLOAD_KEYS,
@@ -76,14 +94,14 @@ export const PAYLOAD_KEYS: Record<ListKind, readonly string[]> = {
 export const PAYLOAD_ALIAS = 'p_';
 
 /** PostgREST select of one kind: list columns plus server-side payload slices. */
-export function selectFor(kind: ListKind): string {
+export function selectFor(kind: ListName): string {
   return [...LIST_COLUMNS[kind], ...PAYLOAD_KEYS[kind].map((k) => `${PAYLOAD_ALIAS}${k}:payload->${k}`)].join(', ');
 }
 
 export type ListRow = Record<string, unknown>;
 
 /** One database row (as PostgREST returns it with selectFor) to the columnar array. */
-export function rowToArray(kind: ListKind, row: ListRow): unknown[] {
+export function rowToArray(kind: ListName, row: ListRow): unknown[] {
   const out: unknown[] = [];
   for (const c of LIST_COLUMNS[kind]) out.push(row[c] ?? null);
   for (const k of PAYLOAD_KEYS[kind]) out.push(row[`${PAYLOAD_ALIAS}${k}`] ?? null);
@@ -91,7 +109,7 @@ export function rowToArray(kind: ListKind, row: ListRow): unknown[] {
 }
 
 /** The file body of one kind. `rows` are already arrays (see rowToArray). */
-export function kindFileJson(kind: ListKind, rows: unknown[][]): string {
+export function kindFileJson(kind: ListName, rows: unknown[][]): string {
   return JSON.stringify({
     v: 1,
     kind,

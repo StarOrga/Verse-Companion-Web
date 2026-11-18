@@ -13,8 +13,8 @@
 
 import {
   FACET_KINDS,
-  LIST_KINDS,
-  type ListKind,
+  LIST_FILES,
+  type ListName,
   type ListRow,
   type ListsIndex,
   facetsFileJson,
@@ -28,11 +28,13 @@ import {
   rowToArray,
 } from './_list-snapshots.ts';
 
+import { RANK_PAGE } from './_list-snapshots.ts';
+
 export const LIST_PAGE = 1000;
 
 export interface ListPublishDeps {
   /** One page of one kind's rows in list order (selectFor shape), `from` offset. */
-  readRows(buildId: string, kind: ListKind, from: number, limit: number): Promise<ListRow[]>;
+  readRows(buildId: string, kind: ListName, from: number, limit: number): Promise<ListRow[]>;
   /** Verbatim result of rpc codex_facet_values(p_build_id, p_kind). */
   facetValues(buildId: string, kind: string): Promise<unknown>;
   /** Fails closed while R2 usage is unknown or over budget; null = writes may go ahead. */
@@ -62,12 +64,13 @@ export async function publishLists(buildId: string, deps: ListPublishDeps): Prom
   const files: ListsIndex['files'] = {};
   let sample: { key: string; body: string } | null = null;
 
-  for (const kind of LIST_KINDS) {
+  for (const kind of LIST_FILES) {
+    const pageSize = kind === 'ship-rank' ? RANK_PAGE : LIST_PAGE;
     let rows: unknown[][] = [];
-    for (let from = 0;; from += LIST_PAGE) {
-      const page = await deps.readRows(buildId, kind, from, LIST_PAGE);
+    for (let from = 0;; from += pageSize) {
+      const page = await deps.readRows(buildId, kind, from, pageSize);
       for (const r of page) rows.push(rowToArray(kind, r));
-      if (page.length < LIST_PAGE) break;
+      if (page.length < pageSize) break;
     }
     const body = kindFileJson(kind, rows);
     const count = rows.length;

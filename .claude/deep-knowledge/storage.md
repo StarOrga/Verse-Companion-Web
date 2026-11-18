@@ -99,16 +99,20 @@ tables stay the source and the client's fallback; nothing is deleted from them.
 | `codex-lists/<build uuid>/index.json` | `max-age=300` (names the current gen) |
 | `codex-lists/<build uuid>/<gen>/<name>.json` | immutable (a new gen per publish) |
 
-`<name>` is `ship`, `weapon`, `component`, `item`, `ammunition`, `manufacturer`,
+`<name>` is `ship`, `ship-rank`, `weapon`, `component`, `item`, `ammunition`, `manufacturer`,
 `blueprint` or `facets`. A kind file holds ALL rows of the build (variants
 included) in the database list order (`name_localized asc nulls last, class_name asc`),
 columnar: `{ v, kind, columns, payloadKeys, rows: [[...columns, ...payload slices]] }`.
 `facets.json` stores the `codex_facet_values` result per kind (ship, weapon,
 component, item) unchanged. The ship payload slice is `SHIP_PAYLOAD_KEYS` in
 `_list-snapshots.ts` (card keys + `sizeClass`, `career`, `dimensions`; the rank-cohort
-keys hold the loadout tree and stats and stay in the table).
+keys hold the loadout tree and stats and live in their own file, `ship-rank.json`:
+the same ship columns, `payloadKeys` = `SHIP_RANK_PAYLOAD_KEYS` (equal to
+`RANK_PAYLOAD_KEYS` in `codex.service.ts`), all ships in `ship.json` order, read in
+pages of 200 because each row carries several kB; a browser reads it once per build
+for the rank cohort).
 
-Publish (`_list-publish.ts`): one kind at a time (pages of 1000, one file, then
+Publish (`_list-publish.ts`; put order ship, ship-rank, the other kinds, facets, index): one file at a time (pages of 1000, one file, then
 dropped), facets, the index last, read-back through the public Worker, then older
 generations of that build are deleted. It runs after `finalize` (after the
 response, a failure is only logged), behind the same R2 usage gate as the locale

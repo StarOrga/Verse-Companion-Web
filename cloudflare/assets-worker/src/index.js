@@ -80,7 +80,7 @@ const LOCALE_INDEX_CACHE_CONTROL = 'public, max-age=300';
 const LISTS_DIR = String.raw`codex-lists\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`;
 const LISTS_INDEX_RE = new RegExp(String.raw`^${LISTS_DIR}\/index\.json$`);
 const LISTS_FILE_RE = new RegExp(
-  String.raw`^${LISTS_DIR}\/[0-9a-z]{6,16}\/(ship|weapon|component|item|ammunition|manufacturer|blueprint|facets)\.json$`,
+  String.raw`^${LISTS_DIR}\/[0-9a-z]{6,16}\/(ship-rank|ship|weapon|component|item|ammunition|manufacturer|blueprint|facets)\.json$`,
 );
 
 function isListsKey(key) {

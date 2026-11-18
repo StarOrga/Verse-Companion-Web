@@ -207,7 +207,7 @@ describe('fetch', () => {
     };
     const miss = await worker.fetch(new Request(`https://w.dev/${dir}/mgaq1z2k/facets.json`), env());
     assert.equal(miss.status, 404);
-    for (const name of ['ship', 'weapon', 'component', 'item', 'ammunition', 'manufacturer', 'blueprint', 'facets']) {
+    for (const name of ['ship', 'ship-rank', 'weapon', 'component', 'item', 'ammunition', 'manufacturer', 'blueprint', 'facets']) {
       assert.equal(keyFor(`/${dir}/mgaq1z2k/${name}.json`), `${dir}/mgaq1z2k/${name}.json`);
     }
   });
@@ -218,6 +218,8 @@ describe('fetch', () => {
     assert.equal(keyFor(`/${dir}/gen12345/silhouettes.json`), null);
     assert.equal(keyFor(`/${dir}/mgaq1z2k/../ship.json`), null);
     assert.equal(keyFor(`/${dir}/ship.json`), null);
+    assert.equal(keyFor(`/${dir}/mgaq1z2k/ship-rankx.json`), null);
+    assert.equal(keyFor(`/${dir}/mgaq1z2k/ship-.json`), null);
     assert.equal(keyFor(`/${dir}/mgaq1z2k/ship.json.bak`), null);
   });
 
