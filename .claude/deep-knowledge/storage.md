@@ -88,6 +88,34 @@ copies the existing objects (dry run unless `--apply`); a change to
 - `codex_locale_strings` moved to R2 (2026-10-03, § Localization strings).
   The table is now only an ingest's staging area.
 
+## Catalog lists (R2 per build)
+
+Every list read of the catalog costs the instance swap IO, so each build's lists
+are published once as files and served by the Worker with a permanent cache. The
+tables stay the source and the client's fallback; nothing is deleted from them.
+
+| Key | Cache |
+|---|---|
+| `codex-lists/<build uuid>/index.json` | `max-age=300` (names the current gen) |
+| `codex-lists/<build uuid>/<gen>/<name>.json` | immutable (a new gen per publish) |
+
+`<name>` is `ship`, `weapon`, `component`, `item`, `ammunition`, `manufacturer`,
+`blueprint` or `facets`. A kind file holds ALL rows of the build (variants
+included) in the database list order (`name_localized asc nulls last, class_name asc`),
+columnar: `{ v, kind, columns, payloadKeys, rows: [[...columns, ...payload slices]] }`.
+`facets.json` stores the `codex_facet_values` result per kind (ship, weapon,
+component, item) unchanged. The ship payload slice is `SHIP_PAYLOAD_KEYS` in
+`_list-snapshots.ts` (card keys + `sizeClass`, `career`, `dimensions`; the rank-cohort
+keys hold the loadout tree and stats and stay in the table).
+
+Publish (`_list-publish.ts`): one kind at a time (pages of 1000, one file, then
+dropped), facets, the index last, read-back through the public Worker, then older
+generations of that build are deleted. It runs after `finalize` (after the
+response, a failure is only logged), behind the same R2 usage gate as the locale
+publish; `lists_publish` (`{ "op": "lists_publish", "build_id": "<uuid>" }`)
+redoes it for one build. `locale_gc` also removes the `codex-lists/` prefixes of
+builds gone from `codex_builds` (report under `lists`).
+
 ## Localization strings (R2 since 2026-10-03)
 
 Measured 2026-10-03 before the move: database 496 MB, `codex_locale_strings`

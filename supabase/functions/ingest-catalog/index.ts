@@ -96,6 +96,8 @@ import { bucketBytes, deleteObject, listObjects, putObject, r2FromEnv, readUsage
 import { usageGate } from '../ingest-skins/_r2-usage.ts';
 import { BUILD_ID_RE, LANG_RE } from './_locale-shards.ts';
 import { publishLocale } from './_locale-publish.ts';
+import { type ListPublishDeps, publishLists } from './_list-publish.ts';
+import { LIST_TABLES, LISTS_ROOT, selectFor } from './_list-snapshots.ts';
 import { enqueueTranslationJobs } from './_translation-enqueue.ts';
 import { gcLocalePrefixes } from './_locale-gc.ts';
 import {
@@ -279,6 +281,35 @@ function publishDeps(admin: Admin, r2: R2): PublishDeps {
         if (n < LOCALE_PAGE) return total;
       }
     },
+  };
+}
+
+/** Deps of the catalog-list publish (_list-publish.ts): reads the tables, writes R2. */
+function listPublishDeps(admin: Admin, r2: R2): ListPublishDeps {
+  const base = publishDeps(admin, r2);
+  return {
+    async readRows(buildId, kind, from, limit) {
+      // The database's list order (codex.service.ts): name asc, nulls last, then class_name.
+      const { data, error } = await admin
+        .from(LIST_TABLES[kind])
+        .select(selectFor(kind))
+        .eq('build_id', buildId)
+        .order('name_localized', { ascending: true, nullsFirst: false })
+        .order('class_name', { ascending: true })
+        .range(from, from + limit - 1);
+      if (error) throw error;
+      return (data ?? []) as unknown as Record<string, unknown>[];
+    },
+    async facetValues(buildId, kind) {
+      const { data, error } = await admin.rpc('codex_facet_values', { p_build_id: buildId, p_kind: kind });
+      if (error) throw error;
+      return data;
+    },
+    gate: () => r2WriteBlocked(r2),
+    putJson: base.putJson,
+    readPublic: base.readPublic,
+    listKeys: base.listKeys,
+    deleteKey: base.deleteKey,
   };
 }
 
@@ -986,6 +1017,12 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
           })
           .catch((e) => console.error(`ingest-catalog: locale publish ${buildId} failed: ${(e as Error).message}`)),
       );
+      // The catalog lists as files per build; a failure only leaves the tables as the source.
+      afterResponse(
+        publishLists(buildId, listPublishDeps(admin, r2))
+          .then((r) => console.log(`ingest-catalog: lists publish ${buildId}: ${JSON.stringify(r)}`))
+          .catch((e) => console.error(`ingest-catalog: lists publish ${buildId} failed: ${(e as Error).message}`)),
+      );
       return json({ ok: true, current: true, ...replaced, locale_publish: 'started' });
     }
 
@@ -1005,12 +1042,23 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       return json({ ok: true, results });
     }
 
+    if (op === 'lists_publish') {
+      const buildId = String(body.build_id ?? '');
+      if (!BUILD_ID_RE.test(buildId)) return json({ error: 'invalid_body', message: 'build_id (uuid) required' }, 400);
+      const r2 = r2FromEnv((k) => Deno.env.get(k));
+      if (!r2) return json({ error: 'r2_not_configured' }, 503);
+      const result = await publishLists(buildId, listPublishDeps(admin, r2));
+      if (result.blocked) return json({ error: 'r2_write_blocked', message: result.blocked }, 507);
+      console.log(`ingest-catalog: lists_publish ${buildId}: ${JSON.stringify(result)}`);
+      return json({ ok: true, result });
+    }
+
     if (op === 'locale_gc') {
       // Destructive and operator-only: the uploader gates must not reach it.
       if (!(authHeader && authHeader === `Bearer ${serviceKey}`)) return json({ error: 'forbidden', message: 'service role only' }, 403);
       const r2 = r2FromEnv((k) => Deno.env.get(k));
       if (!r2) return json({ error: 'r2_not_configured' }, 503);
-      const result = await gcLocalePrefixes({
+      const gcDeps = {
         async liveBuildIds() {
           const { data, error } = await admin.from('codex_builds').select('id').limit(10_000);
           if (error) throw error;
@@ -1018,11 +1066,15 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
           if (ids.length >= 10_000) throw new Error('locale_gc: codex_builds read looks truncated');
           return ids;
         },
-        listKeys: async (prefix) => (await listObjects(r2, prefix)).map((o) => o.key),
-        deleteKey: (key) => deleteObject(r2, key),
-      }, { dryRun: body.dry_run !== false });
-      console.log(`ingest-catalog: locale_gc ${JSON.stringify(result)}`);
-      return json({ ok: true, ...result });
+        listKeys: async (prefix: string) => (await listObjects(r2, prefix)).map((o) => o.key),
+        deleteKey: (key: string) => deleteObject(r2, key),
+      };
+      const dryRun = body.dry_run !== false;
+      const result = await gcLocalePrefixes(gcDeps, { dryRun });
+      // codex-lists/ follows the same rule (live ids first, dry run default).
+      const lists = await gcLocalePrefixes(gcDeps, { dryRun, root: LISTS_ROOT });
+      console.log(`ingest-catalog: locale_gc ${JSON.stringify(result)} lists ${JSON.stringify(lists)}`);
+      return json({ ok: true, ...result, lists });
     }
 
     return json({ error: 'invalid_body', message: `unknown op '${op}'` }, 400);
