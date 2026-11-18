@@ -32,12 +32,13 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from .dataforge import DataForge, Record
 from .localization import Localizer
+from . import ship_interior as sint
 from .ship_decks import SHIP_SETUP, build_deck_index, project_decks, sections_for_class
 from .ship_rooms import (LEVEL_WINDOW_FLOOR_M, LEVEL_WINDOW_POS_M, ang3_quat, bounds_of,
                          derive_levels, is_connector,
                          bare_loc_key, cry_guid_to_record_id, deck_by_level, decode_cryxml, humanize_room_key,
                          is_unnamed, room_label_key, tidy_room_label, move,
-                         read_zip_entry, rooms_in_container, soc_entities, soc_entries)
+                         read_zip_entry, rooms_in_container, soc_entities, soc_entries, _vec as _vec_of)
 
 # ── Blueprint candidate-field lists (R1/R2: UNCONFIRMED — see extract_blueprints) ──────────
 # RISK HIGH: these leaf-field names are hypotheses derived from SC crafting data
@@ -1876,9 +1877,149 @@ class CodexExtractor:
         # absent (never []) when the hull family has no authored decks.
         decks = self._ship_decks(base["className"]) or []
         self._attach_deck_rooms(decks, vcp, base["className"])
+        interior = self._attach_interior(base, vcp, decks)
         if decks:
             base["decks"] = decks
+        if interior:
+            base["interior"] = interior
         return base
+
+    def _attach_interior(self, base: Dict[str, Any], vcp: Dict[str, Any],
+                         decks: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        """`payload.interior` (concept 20261117-1810) — and the final deck set it needs:
+        merged derived levels, rooms of the catch-all deck moved to the deck they stand on.
+        Optional and never fatal: a failure logs and leaves the ship without it."""
+        try:
+            return self._build_interior(base, vcp, decks)
+        except Exception as exc:  # noqa: BLE001 — the interior is optional, never abort a ship
+            self.on_log("warn", f"interior of {base.get('className')} failed: {exc}")
+            return None
+
+    def _build_interior(self, base: Dict[str, Any], vcp: Dict[str, Any],
+                        decks: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        containers = [oc for oc in vcp.get("objectContainers") or [] if isinstance(oc, dict) and oc.get("fileName")]
+        if not containers:
+            return None
+        cls = base.get("className")
+        entities: List[Dict[str, Any]] = []
+        for oc in containers:
+            offset = oc.get("Offset") if isinstance(oc.get("Offset"), dict) else {}
+            p = offset.get("Position") if isinstance(offset.get("Position"), dict) else {}
+            try:
+                origin = tuple(float(p.get(k) or 0) for k in ("x", "y", "z"))
+            except (TypeError, ValueError):
+                origin = (0.0, 0.0, 0.0)
+            rot = ang3_quat(offset.get("Rotation") if isinstance(offset.get("Rotation"), dict) else {})
+            name = oc["fileName"].replace("\\", "/").split("/")[-1].replace(".socpak", "")
+            for ecls, ename, epos in self._container_entities(oc["fileName"]):
+                cat = sint.cat_of(sint.ENT_CATS, ecls)
+                if not cat or (cat == "door" and not sint.is_real_door(ecls)):
+                    continue
+                e = {"cat": cat, "cls": ecls, "name": ename, "pos": move(list(epos), rot, origin)}
+                if cat == "door":
+                    e["door"] = sint.classify_door(ecls, ename)
+                entities.append(e)
+            if "stairs" in name.lower():
+                entities.append({"cat": "stairs", "cls": None, "name": name, "pos": list(origin)})
+        # Deck set: merge derived levels by lift stops, then place catch-all rooms by floor.
+        levels = [(d["floorZ"], d["key"]) for d in decks if d.get("derived") and d.get("floorZ") is not None]
+        stops = [e["pos"][2] for e in entities if e["cat"] == "lift"]
+        mapping = sint.merge_derived_decks(decks, stops)
+        sint.reassign_fallback(decks)
+        floors = [(z, mapping.get(k, k)) for z, k in levels] if mapping else sint.deck_floors(decks)
+        # Loadout elements and cargo grids.
+        tf = base.get("hardpointTransforms") or {}
+        flat = sint.flatten_loadout(base.get("defaultLoadout"))
+        lo_pois: List[Dict[str, Any]] = []
+        for e in flat:
+            port = e.get("itemPortName") or e.get("portName") or ""
+            ecls = e.get("entityClassName") or ""
+            t = tf.get(port)
+            cat = sint.cat_of(sint.LO_CATS, ecls)
+            if not cat or not t or not t.get("position") or "cargogrid" in ecls.lower():
+                continue
+            row = {"cat": cat, "cls": ecls, "port": port, "pos": list(t["position"]), "name": port}
+            if cat == "door":
+                if not sint.is_real_door(ecls):
+                    continue
+                row["door"] = sint.classify_door(ecls, port, from_loadout=True)
+            lo_pois.append(row)
+        port_names = [str(p.get("name") or p.get("portName") or "") for p in base.get("itemPorts") or []
+                      if isinstance(p, dict)] + list(tf.keys())
+        grids, gaps = sint.locate_grids(flat, port_names, tf, self._cargo_grid_dims)
+        if not decks:
+            decks.append({"key": FALLBACK_DECK_KEY, "name": FALLBACK_DECK_NAMES["all"], "order": 0, "fallback": True})
+        out = sint.assemble(decks=decks, floors=floors, entities=entities, loadout_pois=lo_pois,
+                            grids=grids, gaps=gaps)
+        total = base.get("cargoScu")
+        located = out["cargoScuLocated"]
+        if gaps or (isinstance(total, (int, float)) and total and located != total):
+            unplaced = ", ".join(g["port"] + " (" + g["reason"] + ")" for g in gaps) or "none (sum differs)"
+            self.on_log("warn", f"cargo grids of {cls}: {located} of {total if total is not None else '?'} SCU "
+                                f"located; unplaced ports: {unplaced}")
+        if not (out["pois"] or out["cargoGrids"] or out["lifts"]):
+            if len(decks) == 1 and decks[0].get("fallback") and not decks[0].get("rooms"):
+                decks.clear()
+            return None
+        self.on_log("info", f"interior {cls}: {len(out['pois'])} element(s), {len(out['cargoGrids'])} cargo grid(s) "
+                            f"({located} SCU), {len(out['lifts'])} lift(s), {len(decks)} deck(s)")
+        return out
+
+    def _cargo_grid_dims(self, class_name: str) -> Optional[List[float]]:
+        """Interior box [x, y, z] (m) of a cargo grid item class, None without one."""
+        dims = None
+        for cc in self._entity_class_comps(class_name):
+            if isinstance(cc, dict):
+                for field in self._CARGO_CONTAINER_FIELDS:
+                    d = self._interior_dimensions(cc.get(field))
+                    if d:
+                        dims = [float(d.get(a) or 0) for a in "xyz"]
+        return dims
+
+    def _container_entities(self, file_name: str) -> List[Tuple[str, str, Tuple[float, float, float]]]:
+        """`(entity class, name, pos)` of every interior entity of one socpak in its own frame
+        (cached per file, like `_container_rooms`); `[]` when the file is missing."""
+        if not hasattr(self, "_container_entities_cache"):
+            self._container_entities_cache: Dict[str, list] = {}
+        key = file_name.replace("\\", "/").lower()
+        if key in self._container_entities_cache:
+            return self._container_entities_cache[key]
+        out: list = []
+        if self.p4k is not None:
+            try:
+                import io as _io
+                import zipfile
+
+                if not hasattr(self, "_p4k_by_lower"):
+                    self._p4k_by_lower = {n.lower().replace("\\", "/"): n for n in self.p4k.namelist()}
+                real = self._p4k_by_lower.get(key) or self._p4k_by_lower.get("data/" + key)
+                if real:
+                    with self.p4k.open(self.p4k.getinfo(real)) as f:
+                        blob = f.read()
+                    zf = zipfile.ZipFile(_io.BytesIO(blob))
+                    for info in soc_entries(zf):
+                        if "/" in info.filename.replace("\\", "/"):
+                            continue  # nested container: placement unknown (see _container_rooms)
+                        try:
+                            soc = read_zip_entry(blob, info)
+                            for m in re.finditer(rb"CryXmlB", soc):
+                                try:
+                                    root = decode_cryxml(soc[m.start():])
+                                except Exception:  # noqa: BLE001 — a non-entity chunk, try the next one
+                                    continue
+                                if root is None or root.tag != "Entities":
+                                    continue
+                                for ent in root:
+                                    ecls = ent.get("EntityClass") or ""
+                                    if sint.cat_of(sint.ENT_CATS, ecls):
+                                        out.append((ecls, ent.get("Name") or "", _vec_of(ent.get("Pos"))))
+                        except Exception as exc:  # noqa: BLE001 — one bad .soc never drops the others
+                            self.on_log("warn", f"object container entry {info.filename} in {file_name}: {exc}")
+            except Exception as exc:  # noqa: BLE001 — best-effort, never abort a ship
+                self.on_log("warn", f"object container entities failed for {file_name}: {exc}")
+                out = []
+        self._container_entities_cache[key] = out
+        return out
 
     def _attach_deck_rooms(self, decks: List[Dict[str, Any]], vcp: Dict[str, Any],
                            class_name: Optional[str] = None) -> None:
@@ -1950,9 +2091,7 @@ class CodexExtractor:
                     placed[i] = (r, by_key[key])
         unassigned: List[Dict[str, Any]] = []
         for room, deck in placed:
-            row = {k: room[k] for k in ("key", "pos", "floorZ", "height", "shapes", "tris")}
-            row["name"] = None if is_unnamed(room["locKey"]) else self._deck_name(room["locKey"])
-            self._label_room(row, room["locKey"])
+            row = self._room_row(room)
             if deck is None:
                 unassigned.append(row)
                 continue
@@ -1975,6 +2114,8 @@ class CodexExtractor:
         row = {k: room[k] for k in ("key", "pos", "floorZ", "height", "shapes", "tris")}
         row["name"] = None if is_unnamed(room["locKey"]) else self._deck_name(room["locKey"])
         self._label_room(row, room["locKey"])
+        if room.get("poweredBy"):
+            row["poweredBy"] = room["poweredBy"]
         return row
 
     def _derive_decks(self, decks: List[Dict[str, Any]], rooms: List[Dict[str, Any]]) -> bool:
@@ -2088,6 +2229,9 @@ class CodexExtractor:
             rot = ang3_quat(offset.get("Rotation") if isinstance(offset.get("Rotation"), dict) else {})
             for room in self._container_rooms(oc["fileName"]):
                 moved = dict(room)
+                # The relay that powers the container (resource network item port).
+                if oc.get("resourceNetworkItemportName"):
+                    moved["poweredBy"] = str(oc["resourceNetworkItemportName"])
                 # Entity names are unique per container only; front/middle/rear
                 # may reuse one, and the UI keys rooms by it.
                 seen[room["key"]] += 1

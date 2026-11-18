@@ -1,7 +1,45 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.278.2",
+  "current": "0.279.0",
   "releases": [
+    {
+      "version": "0.279.0",
+      "date": "2026-11-18",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Beta holotable shows a ship's interior: decks as a filter under the view row, a 3D view with a ghost hull, doors by kind (incl. brig cells), ladders, lifts, stairs and cargo grids."
+            },
+            {
+              "title": "",
+              "text": "Clicking a room fills Bauteile with its deck, height, cargo, powering relay and contents; an interior overview by type and a mini search across outside parts and inside elements."
+            },
+            {
+              "title": "",
+              "text": "Role presets (combat, cargo, medical, industry) pick the interior groups and the start deck; cargo that cannot be placed is named instead of hidden."
+            },
+            {
+              "title": "",
+              "text": "Data Uploader 0.83.0 extracts the interior from Data.p4k."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The holotable no longer scrolls sideways on phones."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.278.2",
       "date": "2026-11-18",

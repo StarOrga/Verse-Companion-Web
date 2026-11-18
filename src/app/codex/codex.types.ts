@@ -215,6 +215,105 @@ export interface ShipDeckRoom {
    * (it is listed on each of them).
    */
   connects?: string[];
+  /**
+   * Relay item port that powers the room's object container
+   * (`objectContainers[].resourceNetworkItemportName`, e.g. `hardpoint_relay_messhall_left`).
+   * Absent when the container names none and on builds before the interior extract.
+   */
+  poweredBy?: string;
+}
+
+/**
+ * Interior element groups (concept 20261117-1810 r1-scope): the filter chips of the
+ * holotable and the group of every `ShipInteriorPoi.cat`.
+ */
+export type ShipInteriorGroup = 'cargo' | 'ways' | 'med' | 'weapons' | 'lockers' | 'fire' | 'tech' | 'living' | 'doors';
+
+/** Category of one interior element; each belongs to exactly one `ShipInteriorGroup`. */
+export type ShipInteriorCat =
+  // ways
+  | 'lift' | 'stairs' | 'ladder' | 'ramp' | 'airlock' | 'dockingTube' | 'escapePod'
+  // med
+  | 'medBed' | 'respawn'
+  // weapons / lockers
+  | 'weaponRack' | 'locker'
+  // fire
+  | 'fireExt'
+  // tech
+  | 'relay' | 'powerPlant' | 'cooler' | 'shield' | 'quantumDrive' | 'jumpDrive' | 'lifeSupport'
+  | 'radar' | 'fuelTank' | 'maintenance' | 'turret' | 'computer'
+  // living
+  | 'bed' | 'head'
+  // doors
+  | 'door';
+
+/** Kind of a door (r2-doors `kind`). */
+export type ShipDoorKind = 'room' | 'inner' | 'lift' | 'hangar' | 'bow' | 'airlock' | 'ramp' | 'cell';
+
+/** One interior element in the hull model frame (metres, +X starboard, +Y nose, +Z up). */
+export interface ShipInteriorPoi {
+  cat: ShipInteriorCat;
+  /** Position [x, y, z], rounded to 0.1 m. */
+  pos: number[];
+  /** Key of the `ShipDeck` it stands on. */
+  deck: string;
+  /** Key of the `ShipDeckRoom` it stands in, when one contains it. */
+  room?: string;
+  /** Entity / item class (`Weapon_Rack_…`, `POWR_AEGS_S04_Idris_SCItem`) — search + fallback label. */
+  cls?: string;
+  /** Loadout item port for loadout elements (components, relays, turrets). */
+  port?: string;
+  /** Doors only (r2-doors). */
+  door?: {
+    kind: ShipDoorKind;
+    breachable: boolean;
+    /** Nearest door control panel [x, y, z], null when none sits beside it. */
+    panel: number[] | null;
+  };
+  /** Ladders and stairs: the deck keys they join (bottom first). */
+  connects?: string[];
+}
+
+/** One cargo grid of the default loadout. */
+export interface ShipCargoGrid {
+  port: string;
+  cls: string;
+  /** Interior dimensions [x, y, z] in metres. */
+  dims: number[];
+  /** Centre of the grid floor [x, y, z]. */
+  pos: number[];
+  /** floor(x/1.25)·floor(y/1.25)·floor(z/1.25). */
+  scu: number;
+  deck: string;
+  room?: string;
+}
+
+/** A lift shaft: its position and every stop. */
+export interface ShipLift {
+  /** Shaft position [x, y]. */
+  at: number[];
+  /** Stop floor heights (m), ascending. */
+  stops: number[];
+  /** Deck keys it serves, bottom first. */
+  decks: string[];
+}
+
+/**
+ * Interior of a ship (concept 20261117-1810): elements, cargo grids, lifts and the
+ * cargo the extract could not place. Absent on every build before the interior extract
+ * and on vehicles without interior containers — the UI then shows no interior, never zeros.
+ */
+export interface ShipInterior {
+  pois: ShipInteriorPoi[];
+  cargoGrids: ShipCargoGrid[];
+  lifts: ShipLift[];
+  /** SCU the extract placed (sum of `cargoGrids[].scu`). */
+  cargoScuLocated: number;
+  /**
+   * Cargo grid ports the extract could not place (no item class, no dimensions) —
+   * r1-gaps "show": the UI names the gap against the ship's SCU.
+   */
+  cargoGaps: { port: string; reason: 'noClass' | 'noDims' | 'noPos' }[];
 }
 
 export interface ShipPayload extends BaseEntityPayload {
@@ -248,6 +347,8 @@ export interface ShipPayload extends BaseEntityPayload {
    * extracted before the uploader emitted it.
    */
   decks?: ShipDeck[];
+  /** Interior elements, cargo grids and lifts (concept 20261117-1810); see `ShipInterior`. */
+  interior?: ShipInterior;
   // Whitelist-only ship stats (PR A task 1) — currently just the signature
   // system (SSCSignatureSystemParams: IR/EM/cross-section). Same struct-keyed
   // shape as ComponentPayload.stats, but on an allowlist (not the item/

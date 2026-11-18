@@ -68,15 +68,28 @@ import { CodexHoloSharedBannerComponent, HoloSharedBanner } from './codex-holo-s
 import { CodexHoloRankStateComponent } from './codex-holo-rank-state.component';
 export type { HoloSharedBanner } from './codex-holo-shared-banner.component';
 import { CodexHoloPerspectivesComponent, HoloGhost, HoloPerspectiveView } from './codex-holo-perspectives.component';
-import { CodexHoloTableComponent, type HoloDeckView } from './codex-holo-table.component';
+import { CodexHoloTableComponent, type HoloDeckView, type HoloInterior3dView } from './codex-holo-table.component';
 import { buildDeckPlans } from '../deck-plan';
 import { RoomLabelTranslations } from '../room-label-translations';
-import type { Lang, ShipDeck } from '../codex.types';
+import type { Lang, ShipDeck, ShipInteriorGroup, ShipPayload } from '../codex.types';
+import { AnalyticsService } from '../../core/analytics.service';
+import {
+  InteriorPick,
+  PRESET_GROUPS,
+  cargoGapOf,
+  deckOfPick,
+  readInterior,
+  roomContents,
+  rolePresetOf,
+  scuByDeck,
+  startDeckOf,
+} from './holo-interior';
+import { CodexHoloInteriorChipsComponent } from './codex-holo-interior-chips.component';
+import { CodexHoloInteriorComponent, type InteriorRoomCard, type InteriorRoomRef, type OuterPartRef } from './codex-holo-interior.component';
 import { CodexHoloInspectorComponent, partFocusOf } from './codex-holo-inspector.component';
 import { CodexHoloChangesComponent } from './codex-holo-changes.component';
 import { missionColor, missionRelevantSections } from './codex-holo-mission';
 import type { CalloutValue, PlacementRow, PlacementSelection, SelectionIntent } from '../asset-package/asset-package-viewer.component';
-import { AnalyticsService } from '../../core/analytics.service';
 import type { HotspotScope } from '../asset-package/asset-package.model';
 import { CodexLoadoutSaveBarComponent } from '../codex-loadout-save-bar.component';
 import { HoloPhase, JournalEntry, PinGroup, PinRing, StagePin, ringPositions, shipNameWithoutMaker, spreadStackedPins } from './codex-holo-model';
@@ -148,7 +161,7 @@ const PART_FILTER_CHIPS: readonly { id: HoloPartFilter; labelKey: string }[] = [
   { id: 'other', labelKey: 'codex.holo.stage.filterOther' },
 ];
 
-/** One thumbnail of the bottom row: id = the view, or `deck:<key>` for a deck (Innen). */
+/** One thumbnail of the bottom row's „Ansicht“ group. */
 interface ViewThumb {
   id: string;
   labelKey: string | null;
@@ -156,17 +169,31 @@ interface ViewThumb {
   disabledKey: string | null;
   icon: { box: string; paths: readonly string[] };
   view: HoloView;
-  deck: string | null;
+}
+
+/** The deck filter's value for "every deck equal" (3D only); null = the hull. */
+export const ALL_DECKS = '*';
+
+/** One chip of the „Deck · Filter“ row (concept 20261117-1810 B1). */
+export interface DeckFilterChip {
+  /** null = Alle (the hull), `ALL_DECKS` = every deck in 3D, else the deck's key. */
+  key: string | null;
+  id: string;
+  labelKey: string | null;
+  label: string;
+  /** SCU located on the deck (> 0 shows on the chip). */
+  scu: number;
+  sub: string;
+  disabledKey: string | null;
 }
 const HULL_TOP = 'M400 26 L432 130 L560 250 L560 292 L448 262 L438 340 L470 372 L470 390 L400 376 L330 390 L330 372 L362 340 L352 262 L240 292 L240 250 L368 130 Z';
-const VIEW_ICONS: Readonly<Record<HoloView | 'deck', { box: string; paths: readonly string[] }>> = {
+const VIEW_ICONS: Readonly<Record<HoloView, { box: string; paths: readonly string[] }>> = {
   akte: { box: '0 0 60 36', paths: ['M26 9 L46 20 L42 25 L28 21 L16 25 L14 20 Z'] },
   '3d': { box: '0 0 60 36', paths: ['M30 5 L47 21 L43 27 L30 22 L17 27 L13 21 Z', 'M30 9 L33 20 L27 20 Z'] },
   simple: { box: '0 0 800 420', paths: [HULL_TOP, 'M400 102 a18 18 0 1 0 0.1 0 Z', 'M300 222 a18 18 0 1 0 0.1 0 Z', 'M500 222 a18 18 0 1 0 0.1 0 Z'] },
   top: { box: '0 0 800 420', paths: [HULL_TOP] },
   side: { box: '0 0 60 36', paths: ['M6 20 L22 15 L44 14 L54 19 L44 23 L12 23 Z'] },
   front: { box: '0 0 60 36', paths: ['M30 11 L40 17 L53 19 L40 22 L30 26 L20 22 L7 19 L20 17 Z'] },
-  deck: { box: '0 0 60 36', paths: ['M24 6 L36 6 L37 22 L32 31 L28 31 L23 22 Z'] },
 };
 /** Which column of "Bauteile im Detail" a section stands in: the strip area it moves. */
 const PART_AREAS: readonly { id: Perspective; sections: readonly ShipModuleSection[] }[] = [
@@ -270,6 +297,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
     CodexHoloRankStateComponent,
     CodexHoloTableComponent,
     CodexHoloInspectorComponent,
+    CodexHoloInteriorComponent,
+    CodexHoloInteriorChipsComponent,
     CodexHoloChangesComponent,
     CodexLoadoutSaveBarComponent,
     ScTooltipDirective,
@@ -340,8 +369,14 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
                   (open)="hangarOpen.emit()" />
               </div>
             }
-            @if (!silhouette() && viewMode() === 'holo') {
+            @if (!silhouette() && viewMode() === 'holo' && !tableDeck()) {
               <p class="no-geometry-badge" tabindex="0" [scTooltip]="'codex.holo.stage.noGeometryReason' | translate" scTooltipTier="label">{{ 'codex.holo.noGeometry' | translate }}</p>
+            }
+            @if (interiorOnTable() && interior()) {
+              <!-- The interior's element groups (concept 20261117-1810 B8): multi-select, opened on the
+                   ship role's preset; nothing of it is remembered (r2-remember = none). -->
+              <sc-codex-holo-interior-chips class="ig-host" [groups]="interiorGroups()" [presetLabel]="presetLabel()" [untouched]="presetUntouched()"
+                (groupToggle)="toggleGroup($event)" (presetReset)="resetPreset()" />
             }
           </div>
           <!-- slot [holoAkte]: the Akte view (description card on the RSI image, C20), over the table while "Akte" is the view. -->
@@ -379,7 +414,10 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
             [(hotspotScope)]="hotspotScope"
             [patchPortPins]="patchPortPins()"
             [deckPlan]="tableDeck()"
-            (deckRoomChange)="deckRoom.set($event)"
+            [interior3d]="interior3d()"
+            (deckRoomChange)="onPlanRoom($event)"
+            (interiorPick)="onInteriorPick($event)"
+            (interiorDeck)="pickDeck($event)"
             [displayName]="displayName()"
             [dense]="dense()"
             [hasUnresolved]="hasUnresolvedPins()"
@@ -441,6 +479,26 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
             @if (bodyReady()) {
               @switch (panelTab()) {
                 @case ('parts') {
+                  <!-- Concept 20261117-1810 B5–B7: the mini search over outside and inside, the picked
+                       room or element and the interior's overview; the parts below while the hull is on. -->
+                  <sc-codex-holo-interior
+                    [interior]="interiorOnTable() ? interior() : null"
+                    [deck]="interiorDeckKey()"
+                    [deckLabels]="deckLabels()"
+                    [rooms]="roomRefs()"
+                    [room]="interiorOnTable() ? roomCard() : null"
+                    [pick]="interiorPick()"
+                    [groups]="interiorGroups()"
+                    [presetName]="presetTitle()"
+                    [gap]="cargoGap()"
+                    [parts]="outerParts()"
+                    (pickChange)="onInteriorPick($event)"
+                    (pickClear)="interiorPick.set(null)"
+                    (roomSelect)="onRoomSelect($event)"
+                    (roomClear)="deckRoom.set(null)"
+                    (partSelect)="inspectPin($event)"
+                    (searched)="onPartsSearch($event)" />
+                  @if (!interiorOnTable() || inspectedPort()) {
                   <sc-codex-holo-inspector
                     [target]="inspectorTarget()"
                     [isRawPort]="inspectorIsRawPort()"
@@ -467,6 +525,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
                     (rowPick)="onRowPick($event)"
                     (rowFocus)="onRowFocus($event)"
                     (rowEye)="assetViewer()?.togglePlacement($event)" />
+                  }
                 }
                 @case ('rank') {
                   <div class="rankbody" [scFeedbackSpot]="'codex.holo.stage.einordnung'">
@@ -570,22 +629,31 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
             }
           </div>
           <span class="vw-sep" aria-hidden="true"></span>
-          @if (tableDeck()) {
-            <!-- D5: inside a deck the parts filters have nothing to filter (no part markers on a deck),
-                 so their slot lists the deck's rooms — one line, scrolling sideways when they don't fit. -->
-            <div class="vf vr" role="group" [attr.aria-label]="'codex.holo.stage.roomsAria' | translate">
-              <span class="vw-gl">{{ 'codex.holo.stage.rooms' | translate }}</span>
-              <div class="vf-row vr-row">
-                @for (r of roomChips(); track r.key) {
-                  <button type="button" class="vf-chip vr-chip" [attr.data-room]="r.key"
-                          [class.on]="deckRoomLabel() === r.label" [attr.aria-pressed]="deckRoomLabel() === r.label"
-                          (click)="pickRoom(r.key)">{{ r.label }}</button>
-                } @empty {
-                  <span class="vr-none">{{ 'codex.holo.stage.roomsNone' | translate }}</span>
+          @if (deckFilterChips().length > 0) {
+            <!-- B1 „Deck · Filter“: Alle (the hull) and every deck, for 3D and Einfach alike; a deck's
+                 located SCU on its chip, and an open cargo gap said aloud (r1-gaps = show). -->
+            <div class="vf vd" role="group" [attr.aria-label]="'codex.holo.interior.deckFilterAria' | translate">
+              <span class="vw-gl">{{ 'codex.holo.interior.deckFilter' | translate }}</span>
+              <div class="vf-row vd-row">
+                @for (c of deckFilterChips(); track c.id) {
+                  <button type="button" class="vf-chip vd-chip" [attr.data-deck]="c.id"
+                          [class.on]="c.key === deckFilter()" [attr.aria-pressed]="c.key === deckFilter()"
+                          [attr.aria-disabled]="c.disabledKey || activeView() === 'akte' ? true : null"
+                          [scTooltip]="c.disabledKey ? (c.disabledKey | translate) : null" scTooltipTier="label"
+                          (click)="pickDeckChip(c)">
+                    {{ c.labelKey ? (c.labelKey | translate) : c.label }}
+                    @if (c.scu > 0) { <small class="vd-scu">{{ c.scu }} SCU</small> } @else if (c.sub) { <small class="vd-sub">{{ c.sub }}</small> }
+                  </button>
+                }
+                @if (cargoGap(); as g) {
+                  <span class="vd-gap" tabindex="0" [scTooltip]="'codex.holo.interior.gapHint' | translate" scTooltipTier="label">
+                    {{ 'codex.holo.interior.gap' | translate: { located: g.located, total: g.total } }}
+                  </span>
                 }
               </div>
             </div>
-          } @else {
+          }
+          @if (deckFilter() === null) {
           <div class="vf" role="group" [attr.aria-label]="'codex.holo.stage.filtersAria' | translate">
             <span class="vw-gl">{{ 'codex.holo.stage.filterParts' | translate }}</span>
             <div class="vf-row">
@@ -907,6 +975,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   /* ── Table head: the classic shell's hangar dock and the no-geometry note; nothing else (C1, C2) ── */
   .table-head { position: relative; z-index: 5; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 4px; }
   .table-head:empty { display: none; }
+  .ig-host { flex: 1 1 auto; min-width: 0; }
   .hangar-dock { flex: none; display: flex; align-items: center; }
   .no-geometry-badge { margin: 0; cursor: help; font-size: max(10px, var(--f)); color: var(--sc-fg-2); }
   /* The Akte (slot [holoAkte]) lies over the table; the table keeps its size under it (no canvas re-layout). */
@@ -956,13 +1025,16 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .vf-chip[aria-disabled="true"] { opacity: 0.4; cursor: not-allowed; }
   .vf-chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
   @media (pointer: coarse) { .vf-chip { height: var(--sc-tap-min, 44px); } }
-  /* D5: the rooms take the filters' slot and the rest of the row; overflow scrolls sideways, the row stays one line. */
-  .vr { flex: 1 1 auto; }
-  .vr-row { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity;
-  scrollbar-width: thin; mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); padding-inline-end: 40px; }
-  /* A chip never shrinks: it keeps its whole name and the row scrolls (E5). */
-  .vr-chip { flex: none; white-space: nowrap; padding: 0 11px; scroll-snap-align: start; }
-  .vr-none { font-size: max(11.5px, var(--f)); color: var(--sc-fg-2); line-height: 26px; }
+  /* B1 „Deck · Filter“: one line of deck chips; overflow scrolls sideways (phones too), a chip never shrinks. */
+  .vd { flex: 1 1 auto; }
+  .vd-row { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; align-items: center;
+  mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent); padding-inline-end: 32px; }
+  .vd-chip { padding: 0 11px; scroll-snap-align: start; }
+  .vd-chip small { font-size: max(10px, var(--f)); color: var(--sc-fg-2); }
+  .vd-chip .vd-scu { color: var(--sc-int-cargo); font-family: var(--font-monospace, monospace); }
+  .vd-gap { flex: none; white-space: nowrap; font-size: max(11px, var(--f)); color: var(--sc-warning); padding: 0 8px; line-height: 24px;
+  border: 1px dashed color-mix(in srgb, var(--sc-warning) 55%, transparent); border-radius: 13px; }
+  .vd-gap:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
   /* The fixed card's patch slot (C18): only on the Änderungen tab. */
   .patch-slot { margin-bottom: 10px; }
   .chg-sw { display: block; margin-bottom: 10px; }
@@ -1074,7 +1146,9 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .holo-topbar { grid-template-columns: auto minmax(0, 1fr); }
   .ht-left { grid-column: 1 / -1; }
   .ht-centre { justify-self: start; }
-  .ht-right { justify-content: flex-end; }
+  /* Its own row: beside the Einsatz box the hangar button (48 px tall, no shrink on touch)
+     ran 53–61 px past a 375 px phone and the page scrolled sideways. */
+  .ht-right { grid-column: 1 / -1; justify-content: flex-end; }
   .holo-body { gap: 10px; }
   .table-head { flex-wrap: wrap; gap: 6px; padding: 0; }
   .holo-below { grid-template-columns: 1fr; }
@@ -1292,7 +1366,7 @@ export class CodexHoloStageComponent {
   readonly surface = computed<HoloSurface>(() => {
     const c = this.chosenSurface() ?? (this.auto3d() ? '3d' : 'simple');
     const can: Record<HoloSurface, boolean> = {
-      '3d': this.has3d(),
+      '3d': this.can3d(),
       simple: true,
       top: this.schemaAvailable(),
       side: this.drawingAvailable(),
@@ -1333,12 +1407,8 @@ export class CodexHoloStageComponent {
   readonly akteOpen = signal(false);
   /** The view the row has on: the Akte or the table's surface. */
   readonly activeView = computed<HoloView>(() => (this.akteOpen() ? 'akte' : this.surface()));
-  /** The checked thumbnail: a deck reads `deck:<key>`, Außen "Einfach" only while no deck is on. */
-  readonly activeViewId = computed(() => {
-    const v = this.activeView();
-    const deck = this.deckView();
-    return v === 'simple' && deck && this.tableDeck() ? `deck:${deck}` : v;
-  });
+  /** The checked thumbnail: the view itself — the deck is a filter beside it, not a view (B1). */
+  readonly activeViewId = computed<string>(() => this.activeView());
   /** Every view change, for the page (the Akte surface, the share link). */
   readonly viewChange = output<HoloView>();
   /** The parts filters that are on; all four by default. */
@@ -1351,33 +1421,27 @@ export class CodexHoloStageComponent {
     return f.has(p.section ? PART_FILTER_OF[p.section] : 'other');
   }
 
-  /** The row's three groups: Akte | Außen (3D, Einfach, Oben, Seite, Front) | Innen (decks, only with rooms). */
+  /** The row's one group „Ansicht“ (concept 20261117-1810 B1): Akte · 3D · Einfach · Oben · Seite · Front. No Außen/Innen split — the decks are the filter beside it. */
   readonly viewGroups = computed<readonly { id: string; labelKey: string | null; items: readonly ViewThumb[] }[]>(() => {
     const thumb = (view: HoloView, labelKey: string, disabledKey: string | null): ViewThumb => ({
-      id: view, labelKey, label: '', disabledKey, icon: VIEW_ICONS[view], view, deck: null,
+      id: view, labelKey, label: '', disabledKey, icon: VIEW_ICONS[view], view,
     });
     const schema = new Map(this.schemaOptions().map((o) => [o.id, o.disabledKey]));
-    const outside: ViewThumb[] = [
-      thumb('3d', 'codex.holo.stage.view3d', this.has3d() ? null : 'codex.holo.stage.view3dUnavailable'),
-      thumb('simple', 'codex.holo.stage.surfaceSimple', null),
-      thumb('top', 'codex.holo.stage.surfaceTop', schema.get('top') ?? null),
-      thumb('side', 'codex.holo.stage.surfaceSide', schema.get('side') ?? null),
-      thumb('front', 'codex.holo.stage.surfaceFront', schema.get('front') ?? null),
-    ];
-    const inside: ViewThumb[] = this.deckChips()
-      .filter((c): c is { key: string; label: string; labelKey: string | null } => c.key !== null)
-      .map((c) => ({ id: `deck:${c.key}`, labelKey: c.labelKey, label: c.label, disabledKey: null, icon: VIEW_ICONS.deck, view: 'simple', deck: c.key }));
-    return [
-      { id: 'akte', labelKey: null, items: [thumb('akte', 'codex.holo.stage.viewAkte', null)] },
-      { id: 'outside', labelKey: 'codex.holo.stage.deckOutside', items: outside },
-      // Floor levels the uploader grouped (Idris) say so in the group's name.
-      ...(inside.length > 0
-        ? [{ id: 'inside', labelKey: this.decksDerived() ? 'codex.holo.stage.deckInsideDerived' : 'codex.holo.stage.deckInside', items: inside }]
-        : []),
-    ];
+    return [{
+      id: 'views',
+      labelKey: 'codex.holo.interior.views',
+      items: [
+        thumb('akte', 'codex.holo.stage.viewAkte', null),
+        thumb('3d', 'codex.holo.stage.view3d', this.can3d() ? null : 'codex.holo.stage.view3dUnavailable'),
+        thumb('simple', 'codex.holo.stage.surfaceSimple', null),
+        thumb('top', 'codex.holo.stage.surfaceTop', schema.get('top') ?? null),
+        thumb('side', 'codex.holo.stage.surfaceSide', schema.get('side') ?? null),
+        thumb('front', 'codex.holo.stage.surfaceFront', schema.get('front') ?? null),
+      ],
+    }];
   });
 
-  /** A thumbnail: the Akte, a surface (Außen) or a deck (Innen, on "Einfach"). A disabled one only shows its reason. */
+  /** A thumbnail: the Akte or a surface. A disabled one only shows its reason. */
   pickView(v: ViewThumb): void {
     if (v.disabledKey) return;
     const before = this.activeViewId();
@@ -1386,13 +1450,9 @@ export class CodexHoloStageComponent {
       this.akteOpen.set(true);
     } else {
       this.akteOpen.set(false);
-      if (v.deck) {
-        this.pickSurface('simple');
-        this.pickDeck(v.deck);
-      } else {
-        this.deckView.set(null);
-        this.pickSurface(v.view);
-      }
+      this.pickSurface(v.view);
+      // "Alle Decks" is a 3D view; Einfach shows one deck at a time.
+      if (v.view !== '3d' && this.deckFilter() === ALL_DECKS) this.deckFilter.set(this.presetDeck());
     }
     if (this.activeViewId() !== before) this.viewChange.emit(this.activeView());
   }
@@ -1468,62 +1528,223 @@ export class CodexHoloStageComponent {
     }
   }
   readonly detailsOpen = signal(false);
-  /** The deck on the table in "Einfach"; null = Außen (the hull and its parts). */
-  readonly deckView = signal<string | null>(null);
-  /** Außen + one chip per deck with rooms; one deck = Außen/Innen; no rooms = none (r1-decks). */
-  readonly deckChips = computed<readonly { key: string | null; label: string; labelKey: string | null }[]>(() => {
-    const set = buildDeckPlans(this.decks(), this.deckLang(), this.roomLabels.labels(this.deckLang()));
-    if (!set || set.decks.length === 0) return [];
-    const outside = { key: null, label: '', labelKey: 'codex.holo.stage.deckOutside' };
-    // One deck (often the uploader's fallback "Alle Räume"): its own name, else "Innen".
-    if (set.decks.length === 1) {
-      const only = set.decks[0];
-      return [outside, { key: only.key, label: only.label, labelKey: only.label ? null : 'codex.holo.stage.deckInside' }];
-    }
-    // The catch-all deck beside named decks reads "Weitere": "Weitere Räume" did not fit its thumbnail (B13).
-    return [outside, ...set.decks.map((d) => ({ key: d.key, label: d.label, labelKey: d.fallback ? 'codex.holo.stage.deckRest' : null }))];
+  // ── Decks and interior (concept 20261117-1810 B1–B11) ─────────────────
+  private readonly shipPayload = computed<ShipPayload | null>(() => {
+    const d = this.detail();
+    return d.kind === 'ship' && d.payload && typeof d.payload === 'object' ? (d.payload as ShipPayload) : null;
   });
+  /** The ship's interior; null on builds before the interior extract (then no interior shows, never zeros). */
+  readonly interior = computed(() => readInterior(this.shipPayload()?.interior));
+  /** The deck filter (B1): null = Alle (the hull), `ALL_DECKS` = every deck in 3D, else one deck. */
+  readonly deckFilter = signal<string | null>(null);
+  readonly deckPlans = computed(() => buildDeckPlans(this.decks(), this.deckLang(), this.roomLabels.labels(this.deckLang())));
+  /** Decks the filter offers: every deck with rooms; the uploader's catch-all only beside nothing else. */
+  private readonly filterDecks = computed(() => {
+    const decks = this.deckPlans()?.decks ?? [];
+    const real = decks.filter((d) => !d.fallback);
+    return real.length > 0 ? [...real, ...decks.filter((d) => d.fallback)] : decks;
+  });
+  readonly deckLabels = computed<ReadonlyMap<string, string>>(() => new Map(this.filterDecks().map((d) => [d.key, d.fallback && this.filterDecks().length > 1 ? this.t.instant('codex.holo.stage.deckRest') : d.label || this.t.instant('codex.holo.stage.deckInside')])));
   /** The decks are floor levels derived by the uploader, not decks the game names. */
   readonly decksDerived = computed(() => (this.decks() ?? []).some((d) => !d.fallback && d.derived));
-  /** What the table draws for the picked deck; null = the hull. */
-  readonly tableDeck = computed<HoloDeckView | null>(() => {
-    const key = this.deckView();
-    const decks = this.decks();
-    if (!key || !decks || this.surface() !== 'simple' || !this.deckChips().some((c) => c.key === key)) return null;
-    return { decks, lang: this.deckLang(), key, room: this.deckRoom() };
+  /** 3D: the hull model, or the interior in its ghost when the ship has decks with rooms (B2). */
+  readonly can3d = computed(() => this.has3d() || this.filterDecks().length > 0);
+
+  /** „Deck · Filter“ (B1): Alle, every deck in 3D, then each deck with its located SCU. */
+  readonly deckFilterChips = computed<readonly DeckFilterChip[]>(() => {
+    const decks = this.filterDecks();
+    if (decks.length === 0) return [];
+    const scu = scuByDeck(this.interior());
+    const chips: DeckFilterChip[] = [
+      { key: null, id: 'hull', labelKey: 'codex.holo.interior.deckAll', label: '', scu: 0, sub: this.t.instant('codex.holo.interior.deckAllSub'), disabledKey: null },
+    ];
+    if (decks.length > 1) {
+      chips.push({
+        key: ALL_DECKS, id: 'all', labelKey: 'codex.holo.interior.deckEvery', label: '', scu: 0,
+        sub: this.t.instant('codex.holo.interior.deckCount', { n: decks.length }),
+        disabledKey: this.surface() === '3d' ? null : 'codex.holo.interior.deckEveryOnly3d',
+      });
+    }
+    for (const d of decks) {
+      chips.push({ key: d.key, id: d.key, labelKey: null, label: this.deckLabels().get(d.key) ?? d.key, scu: Math.round(scu.get(d.key) ?? 0), sub: '', disabledKey: null });
+    }
+    return chips;
   });
+
+  /** A deck filter chip; on Oben/Seite/Front or the Akte it brings Einfach back, where a deck shows. */
+  pickDeckChip(c: DeckFilterChip): void {
+    if (c.disabledKey || this.activeView() === 'akte') return;
+    if (c.key !== null && this.surface() !== '3d' && this.surface() !== 'simple') this.pickSurface('simple');
+    this.pickDeck(c.key);
+  }
+
+  /** B1/B11: the deck filter changes; a room or element of another deck lets go. */
   pickDeck(key: string | null): void {
-    if (key !== this.deckView() && this.soundOn()) this.tone('switch');
-    if (key !== this.deckView()) this.deckRoom.set(null);
-    this.deckView.set(key);
+    if (key === this.deckFilter()) return;
+    if (this.soundOn()) this.tone('switch');
+    this.deckRoom.set(null);
+    this.deckFilter.set(key);
+    const pick = this.interiorPick();
+    if (pick && (key === null || (key !== ALL_DECKS && deckOfPick(this.interior(), pick) !== key))) this.interiorPick.set(null);
+    this.analytics.track('codex:deck_select', {
+      ship: this.detail().classNameSlug,
+      deck: key === null ? 'hull' : key === ALL_DECKS ? 'all' : key,
+      view: this.surface() === '3d' ? '3d' : '2d',
+    });
   }
-  /** D5: the room picked in the bottom row or on the plan (its key); null = none. */
+
+  /** What the table draws for the picked deck in Einfach; null = the hull. */
+  readonly tableDeck = computed<HoloDeckView | null>(() => {
+    const key = this.deckFilter();
+    const decks = this.decks();
+    if (!key || key === ALL_DECKS || !decks || this.surface() !== 'simple' || !this.deckLabels().has(key)) return null;
+    return { decks, lang: this.deckLang(), key, room: this.deckRoom(), interior: this.interior(), groups: this.interiorGroups(), pick: this.interiorPick() };
+  });
+  /** "3D mit Hülle" (B2): a deck or every deck in 3D; the hull model stays the 3D of „Alle“. */
+  readonly interior3d = computed<HoloInterior3dView | null>(() => {
+    if (this.surface() !== '3d') return null;
+    const decks = this.decks();
+    if (!decks || this.filterDecks().length === 0) return null;
+    let key = this.deckFilter();
+    if (key === null) {
+      if (this.has3d()) return null;
+      key = ALL_DECKS;
+    }
+    const focus = key === ALL_DECKS ? null : key;
+    if (focus !== null && !this.deckLabels().has(focus)) return null;
+    return { decks, interior: this.interior(), focus, focusLabel: focus ? this.deckLabels().get(focus) ?? focus : '', groups: this.interiorGroups(), pick: this.interiorPick() };
+  });
+  /** The interior is on the table (a deck in Einfach, or the interior in 3D). */
+  readonly interiorOnTable = computed(() => this.activeView() !== 'akte' && (!!this.tableDeck() || !!this.interior3d()));
+  /** The deck the Bauteile overview counts for; null = the whole ship. */
+  readonly interiorDeckKey = computed(() => this.tableDeck()?.key ?? this.interior3d()?.focus ?? null);
+
+  // B8: the element groups and the role preset.
+  readonly rolePreset = computed(() => rolePresetOf(this.shipPayload()?.role, this.shipPayload()?.career));
+  readonly interiorGroups = signal<ReadonlySet<ShipInteriorGroup>>(new Set());
+  /** The deck the preset opens on (most SCU for cargo presets, else most preset elements). */
+  readonly presetDeck = computed<string | null>(() => {
+    if (!this.interior()) return null;
+    return startDeckOf(this.interior(), this.rolePreset(), this.filterDecks().filter((d) => !d.fallback || this.filterDecks().length === 1).map((d) => d.key));
+  });
+  readonly presetLabel = computed(() => this.roleName() ?? this.t.instant(`codex.holo.interior.preset.${this.rolePreset()}`));
+  readonly presetTitle = computed(() => this.t.instant('codex.holo.interior.presetTitle', { role: this.presetLabel() }));
+  readonly presetUntouched = computed(() => {
+    const on = this.interiorGroups();
+    const preset = PRESET_GROUPS[this.rolePreset()];
+    return on.size === preset.length && preset.every((g) => on.has(g)) && this.deckFilter() === this.presetDeck();
+  });
+
+  /** Every open starts here (r2-remember = none): the preset's groups on its start deck. */
+  private applyPreset(): void {
+    this.interiorGroups.set(new Set(PRESET_GROUPS[this.rolePreset()]));
+    this.interiorPick.set(null);
+    this.deckRoom.set(null);
+    this.deckFilter.set(this.presetDeck());
+  }
+
+  resetPreset(): void {
+    if (this.presetUntouched()) return;
+    if (this.soundOn()) this.tone('switch');
+    this.applyPreset();
+  }
+
+  toggleGroup(g: ShipInteriorGroup): void {
+    const next = new Set(this.interiorGroups());
+    const on = !next.has(g);
+    if (on) next.add(g);
+    else next.delete(g);
+    this.interiorGroups.set(next);
+    this.analytics.track('codex:interior_filter_toggle', { group: g, on });
+  }
+
+  // B5/B6: picks.
+  /** The interior element picked in the panel, on the plan or in 3D. */
+  readonly interiorPick = signal<InteriorPick | null>(null);
+
+  onInteriorPick(p: InteriorPick): void {
+    const interior = this.interior();
+    const deck = deckOfPick(interior, p);
+    if (!interior || !deck) return;
+    this.akteOpen.set(false);
+    if (this.surface() !== '3d' && this.surface() !== 'simple') this.pickSurface('simple');
+    if (this.deckFilter() !== deck && !(this.deckFilter() === ALL_DECKS && this.surface() === '3d')) {
+      this.deckFilter.set(deck);
+      this.deckRoom.set(null);
+    }
+    this.deckRoom.set(null);
+    this.interiorPick.set(p);
+    this.panelTab.set('parts');
+    if (this.soundOn()) this.tone('blip');
+    this.analytics.track('codex:interior_element_select', {
+      ship: this.detail().classNameSlug,
+      kind: p.kind === 'grid' ? 'cargoGrid' : interior.pois[p.index]?.cat ?? 'unknown',
+      deck,
+    });
+  }
+
+  /** D5: the room picked on the plan or in the Bauteile list (its key); null = none. */
   readonly deckRoom = signal<string | null>(null);
-  /** D5: the rooms of the deck on the table, one chip per readable name, A-Z. */
-  readonly roomChips = computed<readonly { key: string; label: string }[]>(() => {
-    const t = this.tableDeck();
-    if (!t) return [];
-    const deck = buildDeckPlans(t.decks, t.lang, this.roomLabels.labels(t.lang))?.decks.find((d) => d.key === t.key);
-    const seen = new Set<string>();
-    // One chip per name: case and stray spaces don't make a second "Turret Rear Foyer".
-    const norm = (l: string) => l.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
-    return [...(deck?.rooms ?? [])]
-      .sort((a, b) => a.label.localeCompare(b.label))
-      .filter((r) => r.label.trim() && (seen.has(norm(r.label)) ? false : (seen.add(norm(r.label)), true)))
-      .map((r) => ({ key: r.key, label: r.label }));
-  });
-  /** The label of the picked room — every chip of that name reads as on. */
-  readonly deckRoomLabel = computed(() => {
-    const key = this.deckRoom();
-    const t = this.tableDeck();
-    if (!key || !t) return null;
-    return buildDeckPlans(t.decks, t.lang, this.roomLabels.labels(t.lang))?.decks.find((d) => d.key === t.key)?.rooms.find((r) => r.key === key)?.label ?? null;
-  });
-  /** A room chip: picks the room on the plan, a second press lets it go. */
-  pickRoom(key: string): void {
-    const on = this.deckRoomLabel() === this.roomChips().find((r) => r.key === key)?.label;
-    this.deckRoom.set(on ? null : key);
+
+  /** A room clicked on the plan: Bauteile shows what it holds (B5). */
+  onPlanRoom(key: string | null): void {
+    this.deckRoom.set(key);
+    this.interiorPick.set(null);
+    if (key) this.panelTab.set('parts');
   }
+
+  /** A room from the Bauteile list or the search: its deck in Einfach, the room picked. */
+  onRoomSelect(r: InteriorRoomRef): void {
+    this.akteOpen.set(false);
+    if (this.surface() !== 'simple') this.pickSurface('simple');
+    if (this.deckFilter() !== r.deck) this.pickDeck(r.deck);
+    this.interiorPick.set(null);
+    this.deckRoom.set(r.key);
+    this.panelTab.set('parts');
+  }
+
+  /** Every room of every deck, by its plan label. */
+  readonly roomRefs = computed<readonly InteriorRoomRef[]>(() =>
+    this.filterDecks().flatMap((d) => d.rooms.map((r) => ({ key: r.key, deck: d.key, label: r.label }))),
+  );
+  /** The picked room for Bauteile (B5): deck, floor, height, relay, contents. */
+  readonly roomCard = computed<InteriorRoomCard | null>(() => {
+    const key = this.deckRoom();
+    if (!key) return null;
+    const ref = this.roomRefs().find((r) => r.key === key);
+    if (!ref) return null;
+    const raw = (this.decks() ?? []).find((d) => d.key === ref.deck)?.rooms?.find((r) => r.key === key);
+    return {
+      ...ref,
+      deckLabel: this.deckLabels().get(ref.deck) ?? ref.deck,
+      floorZ: typeof raw?.floorZ === 'number' ? raw.floorZ : null,
+      height: typeof raw?.height === 'number' ? raw.height : null,
+      poweredBy: raw?.poweredBy ?? null,
+      contents: roomContents(this.interior(), key),
+    };
+  });
+
+  /** B10: located SCU below the ship's SCU — the gap is said, never hidden. */
+  readonly cargoGap = computed(() => cargoGapOf(this.shipPayload()?.cargoScu, this.interior()));
+
+  /** B7: the outside parts the search can find. */
+  readonly outerParts = computed<readonly OuterPartRef[]>(() => {
+    const byLabel = new Map<string, OuterPartRef & { terms: string[] }>();
+    for (const p of this.pins()) {
+      const terms = [p.portName, p.slot?.typeLabel ?? '', p.slot?.className ?? ''].filter(Boolean);
+      const had = byLabel.get(p.label);
+      if (had) {
+        had.count += 1;
+        for (const t of terms) if (!had.terms.includes(t)) had.terms.push(t);
+      } else byLabel.set(p.label, { port: p.portName, label: p.label, terms, count: 1 });
+    }
+    return [...byLabel.values()];
+  });
+
+  onPartsSearch(e: { scope: 'outer' | 'inner' | 'both'; hits: number }): void {
+    this.analytics.track('codex:parts_search', e);
+  }
+
   readonly inspectedPort = signal<string | null>(null);
   /** The placement a click on the model chose, when it says more than the slot's port (a gun on its mount). */
   private readonly viewerSelection = signal<string | null>(null);
@@ -1710,7 +1931,8 @@ export class CodexHoloStageComponent {
         this.previewFailed.set(false);
         this.closeInspector();
         this.panelTab.set('rank');
-        this.deckView.set(null);
+        // r2-presets / r2-remember: every open starts on the role preset, nothing of the last ship stays.
+        this.applyPreset();
         this.hotspotScope.set('swappable');
         this.partFilter.set(new Set(ALL_PART_FILTERS));
         const pref = CodexHoloStageComponent.readSurfacePref();
@@ -1979,7 +2201,7 @@ export class CodexHoloStageComponent {
         const before = this.activeViewId();
         this.akteOpen.set(false);
         this.pickSurface(nextHoloSurface(this.surface(), {
-          has3d: this.has3d(),
+          has3d: this.can3d(),
           top: this.schemaAvailable(),
           side: this.drawingAvailable(),
           front: this.frontAvailable(),
@@ -2528,8 +2750,10 @@ export class CodexHoloStageComponent {
 
   inspectPin(port: string): void {
     this.keepSimpleForPin();
-    // A part has no marker inside a deck: back outside, where it sits.
-    this.deckView.set(null);
+    // A part has no marker inside a deck: back to the hull, where it sits.
+    this.deckFilter.set(null);
+    this.deckRoom.set(null);
+    this.interiorPick.set(null);
     this.viewerSelection.set(null);
     this.looseSelection.set(null);
     this.panelTab.set('parts');
