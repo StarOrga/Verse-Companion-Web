@@ -267,6 +267,7 @@ export interface TrailPart {
   /** Where it leads; null = the current page (plain text) or the folded "…". */
   link: string | readonly unknown[] | null;
   queryParams?: Record<string, unknown> | null;
+  fragment?: string | null;
   /** The folded middle ("…"). */
   fold?: boolean;
 }

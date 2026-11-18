@@ -178,7 +178,7 @@ const MAX_TOKENS = 3;
                       @if (c.fold) {
                         <span aria-hidden="true">…</span><span class="sr-only">{{ trailText() }}</span>
                       } @else if (c.link) {
-                        <a [routerLink]="$any(c.link)" [queryParams]="$any(c.queryParams) ?? null">{{ c.label ?? (c.labelKey! | translate: (c.labelParams ?? undefined)) }}</a>
+                        <a [routerLink]="$any(c.link)" [queryParams]="$any(c.queryParams) ?? null" [fragment]="c.fragment ?? undefined">{{ c.label ?? (c.labelKey! | translate: (c.labelParams ?? undefined)) }}</a>
                       } @else {
                         <span class="here" [attr.aria-current]="$last ? 'page' : null">{{ c.label ?? (c.labelKey! | translate: (c.labelParams ?? undefined)) }}</span>
                       }
