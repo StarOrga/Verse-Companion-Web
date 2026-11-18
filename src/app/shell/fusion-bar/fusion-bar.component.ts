@@ -613,6 +613,7 @@ export class FusionBarComponent {
       if (typeof document !== 'undefined') {
         document.documentElement.style.removeProperty('--sc-topbar-h');
         document.documentElement.style.removeProperty('--sc-bar-stack-h');
+        document.documentElement.style.removeProperty('--sc-route-h');
       }
     });
   }
@@ -968,6 +969,10 @@ export class FusionBarComponent {
     // Phone: the whole bottom stack (bar + panel) the page must keep free.
     const stack = this.phone() && !staged ? Math.round(h) : 0;
     setRootVar('--sc-bar-stack-h', `${stack}px`);
+    // Phone: the route line is fixed at the top (the bar itself sits at the bottom); a page's own
+    // sticky head parks below it (--sc-route-h), not under it.
+    const routeEl = el.querySelector<HTMLElement>('.route');
+    setRootVar('--sc-route-h', `${this.phone() && !staged && routeEl ? Math.round(routeEl.offsetHeight) : 0}px`);
   }
 
   /**

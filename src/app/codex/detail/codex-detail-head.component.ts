@@ -60,7 +60,8 @@ export function nextSlim(slim: boolean, scrollY: number, stuck: boolean): boolea
         --hb-pill-bg: color-mix(in srgb, var(--sc-bg-0) 52%, transparent);
         --hb-pill-meta: inline;
         position: sticky;
-        top: calc(var(--sc-imp-banner-h, 0px) + var(--sc-topbar-h, 0px) + env(safe-area-inset-top, 0px));
+        /* Phone: below the route line (--sc-route-h, it already holds the safe area), not under it. */
+        top: calc(var(--sc-imp-banner-h, 0px) + var(--sc-topbar-h, 0px) + max(var(--sc-route-h, 0px), env(safe-area-inset-top, 0px)));
         /* Over the page (stage z 6, sticky strip), under the shell bar (z 20) and its search panel. */
         z-index: 12;
         display: grid;
