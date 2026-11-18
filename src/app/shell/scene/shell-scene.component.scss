@@ -243,6 +243,11 @@ html[data-sc-scene] body { background: transparent; }
   // world (mock d5-pb-main-fadein: 0.2-1.6 s) - while the hub's dolly starts at 0.8 s.
   .scene[data-ignite] .sky { animation: sc-scene-ignite 900ms ease-out both; }
   .scene[data-ignite] :is(.world, .live-planet) { animation: sc-scene-ignite 1400ms ease-in-out 200ms both; }
+  // The HQ outpost joins the hub's staged entrance (#371): it arrives with its beacon (briefing-beacons
+  // .hq-l, 4.45 s, a beat after the sun), not with the world. Announced but not started ('hold'): it
+  // stands at its hidden first frame, like the main header. A skip hurries it (verse-briefing inEntrance).
+  .scene[data-intro] .hqst { animation: sc-scene-ignite 0.6s ease-out 4.45s both; }
+  .scene[data-intro='hold'] .hqst { animation-play-state: paused; }
 
   // Reduced motion: the camera jumps (SceneCameraService), the scene crossfades in 420 ms: a frozen
   // copy of the old scene (.scene-ghost) fades out over the new one. Only this layer fades; the page
@@ -255,7 +260,7 @@ html[data-sc-scene] body { background: transparent; }
 
   @media (prefers-reduced-motion: reduce) {
     .o, .veil, .starmap .const, .starmap .map { transition: none !important; }
-    .tilt, .planet .lights { animation: none !important; }
+    .tilt, .planet .lights, .scene[data-intro] .hqst { animation: none !important; }
     .scene { transform: none !important; transition: none; }
     .scene::after { transition-duration: 160ms !important; }
   }

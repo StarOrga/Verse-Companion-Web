@@ -1,7 +1,7 @@
 @if (on()) {
   <div class="scene" [attr.data-pose]="cam.target()" [attr.data-pushed]="cam.pushed() ? '' : null"
        [attr.data-flying]="cam.flying() ? '' : null" [attr.data-carry]="carry() ? '' : null" [attr.data-live]="cam.planetState() === 'drawn' ? '' : null" [attr.data-fade]="cam.fadeTick() % 2"
-       [attr.data-ignite]="igniting() ? '' : null" [attr.data-warm]="warming() ? '' : null" [style]="vars()">
+       [attr.data-ignite]="igniting() ? '' : null" [attr.data-intro]="intro()" [attr.data-warm]="warming() ? '' : null" [style]="vars()">
     <!-- Far layer: the sky follows the camera damped and tilts least with scroll. -->
     <div class="tilt far"><div class="sky" #sky><div class="neb"></div><div class="stars"></div><div class="stars near"></div></div></div>
     <!-- The one planet, live (G1): the hub's WebGL planet, drawn exactly over the world's planet
