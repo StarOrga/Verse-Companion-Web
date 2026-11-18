@@ -97,6 +97,8 @@ export const EVENTS = {
   'hq:wishlist_open': ev<{ surface: 'popout' | 'cart' }>('hq', 'Die Wünsche wurden geöffnet (Popout in der Kopfzeile oder großes Fenster).'),
   'hq:wish_search_open': ev<{ surface: 'popout' | 'cart' }>('hq', 'Aus den leeren Wünschen heraus wurde die Suche geöffnet.'),
   'hq:events_view': ev('hq', 'Der Ereignis-Abschnitt des HQ wurde angezeigt.'),
+  'hq:spot_update': ev('hq', 'Ein gespeicherter Spot wurde auf der Spots-Seite umbenannt.'),
+  'hq:spot_remove': ev('hq', 'Ein gespeicherter Spot wurde auf der Spots-Seite gelöscht.'),
   'hq:path_group_assign': ev<{ surface: 'codex' | 'hq' | 'wishlist'; created: boolean }>('hq', 'Stücke eines Wunschs wurden einer Operation zugeordnet (Ort; created = dafür eine neue Operation angelegt).'),
   'hq:plain_lines_select': ev<{ choice: 'adopt' | 'keep'; count: number }>('hq', 'Zu alten Zeilen einer Operation wurde die Frage "Sind das Wünsche?" beantwortet (als Wünsche führen oder so lassen; Anzahl Zeilen).'),
   'hq:path_group_release': ev<{ surface: 'codex' | 'hq' | 'wishlist'; pieces: number; dissolved: boolean }>('hq', 'Zugeordnete Stücke eines Wunschs haben ihre Operation verlassen (Ort, Anzahl Stücke; dissolved = eine Operation wurde mit aufgelöst).'),

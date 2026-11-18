@@ -24,8 +24,8 @@ describe('HqShellComponent', () => {
   it('renders the category tabs as real anchors: Übersicht, Spind, Hangar, Einsätze', () => {
     const el: HTMLElement = setup().nativeElement;
     const hrefs = Array.from(el.querySelectorAll('nav.hq-tabs a')).map((a) => a.getAttribute('href'));
-    expect(hrefs).toEqual(['/hq', '/hq/locker', '/hq/hangar', '/hq/ops']);
-    expect(HQ_TABS.length).toBe(4);
+    expect(hrefs).toEqual(['/hq', '/hq/locker', '/hq/hangar', '/hq/ops', '/hq/spots']);
+    expect(HQ_TABS.length).toBe(5);
   });
 
   it('shows the Nachschub link to Planen with the number of active slots (zero without any)', () => {
