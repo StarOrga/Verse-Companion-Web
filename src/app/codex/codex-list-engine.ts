@@ -123,7 +123,7 @@ export function snapshotNameFor(kind: CodexKind, payload: ListPayload | undefine
 }
 
 /** `payload->>key`: the JSON value as Postgres text, NULL for absent/null. */
-function jsonText(v: unknown): string | null {
+export function jsonTextOf(v: unknown): string | null {
   if (v === null || v === undefined) return null;
   if (typeof v === 'string') return v;
   if (typeof v === 'number' || typeof v === 'boolean') return String(v);
@@ -234,7 +234,7 @@ function predicates(snap: ListSnapshot, kind: CodexKind, filters: CodexListFilte
     if (kind === 'ship') {
       const i = keyIdx('sizeClass');
       const want = String(filters.size);
-      out.push((r) => jsonText(r[i]) === want);
+      out.push((r) => jsonTextOf(r[i]) === want);
     } else eq('size', filters.size);
   }
   if (filters.grade) eq('grade', filters.grade);
@@ -267,7 +267,7 @@ function predicates(snap: ListSnapshot, kind: CodexKind, filters: CodexListFilte
       const i = keyIdx('career');
       const set = new Set(filters.careerIn);
       out.push((r) => {
-        const t = jsonText(r[i]);
+        const t = jsonTextOf(r[i]);
         return t !== null && set.has(t);
       });
     }

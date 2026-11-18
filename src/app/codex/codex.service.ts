@@ -58,6 +58,21 @@ export interface SearchAllFilters {
 import { ilikeTokenGroups, ilikeTokenPatterns, normalizeSearch, searchMatcher, searchTokens } from './codex-search';
 import { UpcomingShipsService } from './upcoming-ships.service';
 import { CodexLocaleShards } from './codex-locale-shards';
+import { CodexListSnapshots } from './codex-list-snapshots';
+import {
+  CARD_PAYLOAD_KEYS,
+  INTERNAL_ITEM_ATTACH_TYPES,
+  ListSnapshot,
+  NON_SHIP_VEHICLE_PREFIXES,
+  SearchMode,
+  countFromSnapshot,
+  jsonTextOf,
+  listFromSnapshot,
+  matchRows,
+  snapshotNameFor,
+} from './codex-list-engine';
+
+export { CARD_PAYLOAD_KEYS, INTERNAL_ITEM_ATTACH_TYPES };
 import { ShipStatDelta, computeShipRowDeltas } from './codex-build-diff';
 import { PatchTimelineEntry, buildPatchTimeline } from './codex-patch-timeline';
 import { skinQueryPrefix } from './codex-skin-group';
@@ -364,9 +379,9 @@ const RANK_PAYLOAD_KEYS: readonly string[] = ['career', 'defaultLoadout', 'fligh
  * Avenger Titan" card), orbital sentry turrets and comm probes. The extractor
  * files them as vehicles without the variant flag, so the default browse drops
  * them by class name; "include variants" still lists them. 16 records in the
- * 4.10 LIVE build (audit 2026-09-25).
+ * 4.10 LIVE build (audit 2026-09-25). The list lives in codex-list-engine.ts
+ * (NON_SHIP_VEHICLE_PREFIXES), shared with the snapshot reads.
  */
-const NON_SHIP_VEHICLE_PREFIXES = ['SalvageableDebris', 'Orbital_Sentry', 'probe_'] as const;
 
 /** Guard for listFpsCatalog's paging loop — ~5× today's largest on-foot category. */
 const FPS_CATALOG_HARD_CAP = 12000;
@@ -521,8 +536,7 @@ const LIST_SELECT: Record<CodexKind, string> = {
  */
 export type ListPayload = 'full' | 'card' | 'none' | readonly string[];
 
-/** Payload keys a list card reads (browse, search hits, hangar/HQ ship cards). */
-export const CARD_PAYLOAD_KEYS: readonly string[] = ['name', 'previewImage', 'manufacturer'];
+// CARD_PAYLOAD_KEYS (what a list card reads) lives in codex-list-engine.ts and is re-exported above.
 
 const PAYLOAD_ALIAS = 'p_';
 
@@ -561,6 +575,8 @@ function yieldToEventLoop(): Promise<void> {
 export class CodexService {
   private readonly sb = inject(SupabaseClientProvider);
   private readonly localeShards = inject(CodexLocaleShards);
+  /** Catalog lists as files per build (R2); every read falls back to the database on `null`. */
+  private readonly listSnapshots = inject(CodexListSnapshots);
   /**
    * The RSI announcement feed, read-only from here. Injected purely so
    * {@link searchAll} can cover ships that exist on a concept page but not in
@@ -915,7 +931,67 @@ export class CodexService {
     const limit = filters.limit ?? PAGE_SIZE;
     const offset = filters.offset ?? 0;
 
-    let query = this.filteredListQuery(kind, build.id, filters);
+    const result = (await this.snapshotList(kind, build.id, filters, limit, offset)) ??
+      (await this.listByKindFromDb(kind, build.id, filters, limit, offset));
+
+    // `name_localized` is English only. When the English/class-name search
+    // finds nothing at all, ask the German names (codex_search RPC) — see
+    // listByGermanName for why this is a fallback and not the primary path.
+    if (filters.search && result.count === 0) {
+      return (await this.listByGermanName(kind, build.id, filters, limit, offset)) ?? result;
+    }
+    return result;
+  }
+
+  /**
+   * The snapshot file that answers a read of `kind` with this payload, or
+   * `null` (no file can, not published, outage, still loading after the wait).
+   * Never throws.
+   */
+  private async snapshotOf(buildId: string, kind: CodexKind, payload: ListPayload | undefined): Promise<ListSnapshot | null> {
+    const name = snapshotNameFor(kind, payload);
+    if (!name) return null;
+    try {
+      return await this.listSnapshots.rows(buildId, name);
+    } catch {
+      return null;
+    }
+  }
+
+  /** listByKind answered from the build's list file, or `null` to use the database. */
+  private async snapshotList(
+    kind: CodexKind,
+    buildId: string,
+    filters: CodexListFilters,
+    limit: number,
+    offset: number,
+  ): Promise<CodexListResult | null> {
+    const snap = await this.snapshotOf(buildId, kind, filters.payload);
+    const hit = snap && listFromSnapshot(snap, kind, filters, limit, offset);
+    if (!hit) return null;
+    return { rows: hit.records.map((r) => mapListRow(kind, r)), count: hit.count };
+  }
+
+  /** A head-only count answered from the build's list file, or `null` to use the database. */
+  private async snapshotCount(
+    kind: CodexKind,
+    buildId: string,
+    filters: CodexListFilters,
+    mode: SearchMode,
+  ): Promise<number | null> {
+    const snap = await this.snapshotOf(buildId, kind, 'none');
+    return snap && countFromSnapshot(snap, kind, filters, mode);
+  }
+
+  /** The database path of {@link listByKind} (before the German-name fallback), unchanged. */
+  private async listByKindFromDb(
+    kind: CodexKind,
+    buildId: string,
+    filters: CodexListFilters,
+    limit: number,
+    offset: number,
+  ): Promise<CodexListResult> {
+    let query = this.filteredListQuery(kind, buildId, filters);
 
     // manufacturer/ammunition still have name_localized + class_name.
     if (filters.search) query = applySearchTokens(query, filters.search);
@@ -933,15 +1009,8 @@ export class CodexService {
     // "Caterpillar BIS 2949"); the shared matcher drops those false hits.
     const matches = filters.search ? searchMatcher(filters.search) : null;
     const rows = matches ? mapped.filter((r) => matches(r.nameLocalized, r.classNameSlug)) : mapped;
-    const result = { rows, count: Math.max(rows.length, (count ?? mapped.length) - (mapped.length - rows.length)) };
-
-    // `name_localized` is English only. When the English/class-name search
-    // finds nothing at all, ask the German names (codex_search RPC) — see
-    // listByGermanName for why this is a fallback and not the primary path.
-    if (filters.search && result.count === 0) {
-      return (await this.listByGermanName(kind, build.id, filters, limit, offset)) ?? result;
-    }
-    return result;
+    // A per-page estimate of the matcher's drops; the snapshot path counts exactly.
+    return { rows, count: Math.max(rows.length, (count ?? mapped.length) - (mapped.length - rows.length)) };
   }
 
   /**
@@ -951,6 +1020,8 @@ export class CodexService {
   async countByKind(kind: CodexKind, filters: CodexListFilters = {}): Promise<number | null> {
     const build = await this.buildOrThrow();
     if (!build) return null;
+    const fromFile = await this.snapshotCount(kind, build.id, filters, 'ignore');
+    if (fromFile !== null) return fromFile;
     try {
       const { count, error } = await this.filteredListQuery(kind, build.id, filters, true);
       return error ? null : (count ?? 0);
@@ -1162,6 +1233,9 @@ export class CodexService {
 
   /** One head-only count for `countSearchMatches`; null when the query failed. */
   private async countOneKind(buildId: string, kind: CodexKind, term: string): Promise<number | null> {
+    // Default browse filters + the server's ILIKE token groups only (no matcher), as below.
+    const fromFile = await this.snapshotCount(kind, buildId, { search: term }, 'tokens');
+    if (fromFile !== null) return fromFile;
     const query = applyDefaultBrowseFilters(
       this.sb.client
         .from(CODEX_ENTITY_TABLES[kind])
@@ -1185,6 +1259,14 @@ export class CodexService {
     if (!build || attachTypes.length === 0) return out;
     if (this.attachTypeCounts?.buildId !== build.id) this.attachTypeCounts = { buildId: build.id, counts: new Map() };
     const cache = this.attachTypeCounts.counts;
+    const missing = attachTypes.filter((t) => !cache.has(t));
+    const snap = missing.length ? await this.snapshotOf(build.id, 'item', 'none') : null;
+    if (snap) {
+      for (const attachType of missing) {
+        const count = countFromSnapshot(snap, 'item', { attachType }, 'ignore');
+        if (count !== null) cache.set(attachType, count);
+      }
+    }
     await Promise.all(
       attachTypes
         .filter((t) => !cache.has(t))
@@ -1260,7 +1342,38 @@ export class CodexService {
     }
   }
 
+  /**
+   * facetValues from the build's facets.json (the RPC answer stored verbatim)
+   * plus, for ships, the size classes of the ship file; `null` = use the database.
+   */
+  private async facetValuesFromSnapshot(buildId: string, kind: CodexKind): Promise<CodexFacetValues | null> {
+    let facets: Record<string, unknown> | null;
+    try {
+      facets = await this.listSnapshots.facets(buildId);
+    } catch {
+      return null;
+    }
+    const d = facets?.[kind];
+    if (!d || typeof d !== 'object' || Array.isArray(d)) return null;
+    const r = d as Record<string, unknown>;
+    let sizes: number[];
+    if (kind === 'ship') {
+      const ships = await this.snapshotOf(buildId, 'ship', ['sizeClass']);
+      sizes = ships ? shipSizeClassesOf(ships) : await this.shipSizeClasses(buildId);
+    } else {
+      sizes = ((r['sizes'] as unknown[]) ?? []) as number[];
+    }
+    return {
+      manufacturers: ((r['manufacturers'] as unknown[]) ?? []) as CodexFacetValues['manufacturers'],
+      sizes,
+      grades: ((r['grades'] as unknown[]) ?? []) as string[],
+      componentKinds: ((r['componentKinds'] as unknown[]) ?? []) as string[],
+    };
+  }
+
   private async fetchFacetValues(buildId: string, kind: CodexKind): Promise<CodexFacetValues | null> {
+    const fromFile = await this.facetValuesFromSnapshot(buildId, kind);
+    if (fromFile) return fromFile;
     try {
       const { data, error } = await this.sb.client.rpc('codex_facet_values', {
         p_build_id: buildId,
@@ -1351,6 +1464,21 @@ export class CodexService {
     if (!build) return [];
     if (this.weaponFacetCache?.buildId === build.id) return this.weaponFacetCache.rows;
 
+    // Every weapon row of the build, variants included. The file is in list
+    // order, not class_name order: the taxonomy only counts these rows.
+    const snap = await this.snapshotOf(build.id, 'weapon', 'none');
+    if (snap) {
+      const at = (r: readonly unknown[], c: string) => (r[snap.col.get(c)!] as string | null) ?? null;
+      const rows = snap.rows.map((r) => ({
+        weaponClass: at(r, 'weapon_class'),
+        attachType: at(r, 'attach_type'),
+        subType: at(r, 'sub_type'),
+        isVariant: r[snap.col.get('is_variant')!] === true,
+      }));
+      this.weaponFacetCache = { buildId: build.id, rows };
+      return rows;
+    }
+
     const page = 1000; // PostgREST caps a response at 1000 rows
     const out: WeaponFacetRow[] = [];
     for (let offset = 0; offset < WEAPON_FACET_HARD_CAP; offset += page) {
@@ -1409,6 +1537,32 @@ export class CodexService {
     if (!build) return [];
     const run = async (): Promise<CodexListRow[]> => {
       const kind: CodexKind = category === 'weapon' ? 'weapon' : 'item';
+      const snap = await this.snapshotOf(build.id, kind, 'card');
+      const fromFile = snap && CARD_PAYLOAD_KEYS.every((k) => snap.key.has(k))
+        ? matchRows(
+            snap,
+            kind,
+            category === 'weapon'
+              ? { weaponClass: 'FPS', includeVariants }
+              : { attachTypeIn: [...FPS_ARMOR_ATTACH_TYPES], includeVariants },
+            'ignore',
+          )
+        : null;
+      if (snap && fromFile) {
+        const col = (r: readonly unknown[], c: string) => r[snap.col.get(c)!] ?? null;
+        const key = (r: readonly unknown[], k: string) => r[snap.key.get(k)!] ?? null;
+        return fromFile.slice(0, FPS_CATALOG_HARD_CAP).map((r) => {
+          const record: Record<string, unknown> = {};
+          for (const c of ['class_name', 'name_localized', 'manufacturer_code', 'attach_type', 'sub_type', 'size', 'grade', 'is_variant']) {
+            record[c] = col(r, c);
+          }
+          if (category === 'weapon') record['weapon_class'] = col(r, 'weapon_class');
+          record['payload'] = lean
+            ? {}
+            : { name: key(r, 'name'), previewImage: key(r, 'previewImage'), manufacturer: key(r, 'manufacturer') };
+          return mapListRow(kind, record);
+        });
+      }
       const select = [
         'class_name, name_localized, manufacturer_code, attach_type, sub_type, size, grade, is_variant',
         ...(category === 'weapon' ? ['weapon_class'] : []),
@@ -2359,6 +2513,15 @@ export class CodexService {
    * read (class name + name only) instead of a full re-score; a failed read
    * simply keeps the cached cohort as it was. */
   private async backfillCohortNames(key: string, buildId: string, cached: RankShipInput[]): Promise<RankShipInput[]> {
+    const snap = await this.snapshotOf(buildId, 'ship', 'none');
+    if (snap) {
+      const cn = snap.col.get('class_name')!;
+      const nl = snap.col.get('name_localized')!;
+      const names = new Map(snap.rows.map((r) => [r[cn] as string, cleanLocaleValue((r[nl] as string | null) ?? null) || null] as const));
+      const named = cached.map((s) => ({ ...s, name: names.get(s.className) ?? null }));
+      writeCohortCache(key, named);
+      return named;
+    }
     try {
       const { data, error } = await this.sb.client
         .from('codex_ships')
@@ -2379,6 +2542,12 @@ export class CodexService {
   /** Every buyable ship row of the current build, unpaginated (the cohort
    * needs the whole fleet, not a browse page). */
   private async allShipRows(): Promise<CodexListRow[]> {
+    // The whole cohort from the one ship-rank file when the build has it.
+    const build = await this.loadCurrentBuild();
+    if (build) {
+      const whole = await this.snapshotList('ship', build.id, { payload: RANK_PAYLOAD_KEYS }, Number.MAX_SAFE_INTEGER, 0);
+      if (whole) return whole.rows;
+    }
     const out: CodexListRow[] = [];
     let offset = 0;
     const limit = 200;
@@ -2908,6 +3077,23 @@ function mapBuild(r: Record<string, unknown>): CodexBuild {
   };
 }
 
+/**
+ * The ship size classes (S1-S6) of a ship list file, ascending — what
+ * `shipSizeClasses` reads from the table (`payload->>sizeClass` of every row of the build).
+ */
+function shipSizeClassesOf(snap: ListSnapshot): number[] {
+  const i = snap.key.get('sizeClass');
+  if (i === undefined) return [];
+  const sizes = new Set<number>();
+  for (const row of snap.rows) {
+    const text = jsonTextOf(row[i]);
+    if (text === null) continue;
+    const n = Number(text);
+    if (Number.isInteger(n) && n >= 1 && n <= 6) sizes.add(n);
+  }
+  return [...sizes].sort((a, b) => a - b);
+}
+
 function mapListRow(kind: CodexKind, r: Record<string, unknown>): CodexListRow {
   return {
     classNameSlug: r['class_name'] as string,
@@ -3051,27 +3237,8 @@ function applyDefaultBrowseFilters<T extends BrowseFilterable>(query: T, kind: C
   return out;
 }
 
-/**
- * `codex_items.attach_type` values that are engine plumbing, never a player
- * item (measured on LIVE 4.10.0, 2026-10-07: ~6 000 of 23 600 item rows).
- * Hidden from every list, count and search; a detail page reached through a
- * ship's port list still opens.
- */
-export const INTERNAL_ITEM_ATTACH_TYPES: readonly string[] = [
-  'AIModule', 'AirTrafficController', 'AmmoBox', 'AttachedPart', 'Audio', 'Button',
-  'CapacitorAssignmentController', 'Char_Accessory_Head', 'Char_Body', 'Char_Flair', 'Char_Hair_Color',
-  'Char_Hair_Prop', 'Char_Head', 'Char_Head_Beard', 'Char_Head_Eyebrow', 'Char_Head_Eyelash',
-  'Char_Head_Eyes', 'Char_Head_Hair', 'Char_Head_Piercings', 'Char_Head_Stubble', 'Char_Lens',
-  'Char_Skin_Color', 'CommsController', 'Container', 'ControlPanel', 'CoolerController', 'Debris',
-  'Decal', 'DockingAnimator', 'DockingCollar', 'Door', 'DoorController', 'Display', 'Elevator',
-  'EnergyController', 'FPS_Radar', 'FuelController', 'Hangar', 'LandingGear', 'LandingSystem',
-  'LifeSupportVent', 'Light', 'LightController', 'Lightgroup', 'MiningController', 'MissileController',
-  'NOITEM_Player', 'NOITEM_Vehicle', 'PersistentHab', 'Player', 'Relay', 'RemoteConnection', 'Room',
-  'SalvageController', 'SalvageFieldEmitter', 'SalvageFieldSupporter', 'SalvageFillerStation',
-  'SalvageInternalStorage', 'Seat', 'SeatAccess', 'SeatDashboard', 'Sensor', 'ShieldController',
-  'ShopDisplay', 'StatusScreen', 'TargetSelector', 'Thumbnail', 'Visor', 'WeaponController',
-  'WheeledController',
-];
+// INTERNAL_ITEM_ATTACH_TYPES (engine plumbing hidden from every list) lives in
+// codex-list-engine.ts and is re-exported above.
 
 /**
  * PostgREST `or` clause for "column is none of these values" that ALSO keeps
