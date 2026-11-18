@@ -15,6 +15,7 @@ export const HQ_ROOT = '/hq';
 export const hqHangar = '/hq/hangar';
 export const hqLocker = '/hq/locker';
 export const hqOps = '/hq/ops';
+export const hqSpots = '/hq/spots';
 
 /**
  * The five HQ pages of the beta landing (`/hq`): one route, five scroll stages.

@@ -6651,7 +6651,8 @@
       "overview": "Übersicht",
       "locker": "Sets",
       "hangar": "Hangar",
-      "ops": "Einsätze"
+      "ops": "Einsätze",
+      "spots": "Spots"
     },
     "supplies": {
       "button": "Operationen",
@@ -6690,6 +6691,21 @@
         "store": "Ablegen",
         "tickOnly": "Nur abhaken"
       }
+    },
+    "spots": {
+      "title": "Spots",
+      "subtitle": "Deine gespeicherten Orte aus der Desktop-App. Hier umbenennen oder löschen; die App übernimmt es beim nächsten Abgleich.",
+      "loading": "Deine Spots werden geladen …",
+      "empty": "Noch keine Spots. Spots legst du in der Desktop-App an (Verse Navigation); nach dem Abgleich erscheinen sie hier.",
+      "retry": "Erneut versuchen",
+      "nameLabel": "Name des Spots",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "rename": "Umbenennen",
+      "delete": "Löschen",
+      "created": "Angelegt am {{date}}",
+      "deleteTitle": "Diesen Spot löschen?",
+      "deleteMessage": "„{{name}}“ wird von allen deinen Geräten entfernt."
     },
     "ops": {
       "title": "Einsätze",
@@ -7378,6 +7394,26 @@
           "e3": "Die letzten Ereignisse, z. B. „Mission abgeschlossen“ oder „Quantum-Sprung beendet“."
         }
       }
+    },
+    "logbook": {
+      "title": "Logbuch",
+      "loading": "Logbuch wird geladen …",
+      "retry": "Erneut versuchen",
+      "empty": "Noch keine Spielsitzung. Verbinde die SCC-App, dann erscheint hier jede Sitzung als Karte.",
+      "emptyLinked": "In den letzten 30 Tagen keine Spielsitzung aufgezeichnet.",
+      "jumps": "Quantensprünge",
+      "contracts": "Aufträge",
+      "auec": "aUEC-Bilanz",
+      "losses": "Verluste",
+      "lossesSub": "{{deaths}} Tode · {{ships}} Schiffe zerstört · {{claims}} Versicherungsfälle",
+      "end": {
+        "noQuit": "Ohne Beenden zu Ende (Absturz oder App geschlossen)",
+        "live": "Läuft gerade"
+      },
+      "showAll": "Alle {{n}} Sitzungen zeigen",
+      "note": "Sitzungen der letzten {{days}} Tage aus der SCC-App. Die aUEC-Bilanz ist Verkauf minus Einkauf.",
+      "durH": "{{h}} h {{m}} min",
+      "durM": "{{m}} min"
     }
   },
   "verse": {

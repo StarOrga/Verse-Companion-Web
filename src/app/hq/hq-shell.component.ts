@@ -7,7 +7,7 @@ import { BetaService } from '../core/beta.service';
 import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ShellChromeService } from '../shell/fusion-bar/shell-chrome.service';
 import { NachschubService } from './nachschub/nachschub.service';
-import { HQ_ROOT, hqHangar, hqLocker, hqOps, hqPage } from './hq-routes';
+import { HQ_ROOT, hqHangar, hqLocker, hqOps, hqPage, hqSpots } from './hq-routes';
 
 /** One category tab of the HQ frame. */
 export interface HqTab {
@@ -22,6 +22,7 @@ export const HQ_TABS: readonly HqTab[] = [
   { link: hqLocker, labelKey: 'hq.tabs.locker', exact: false },
   { link: hqHangar, labelKey: 'hq.tabs.hangar', exact: false },
   { link: hqOps, labelKey: 'hq.tabs.ops', exact: false },
+  { link: hqSpots, labelKey: 'hq.tabs.spots', exact: false },
 ];
 
 /**

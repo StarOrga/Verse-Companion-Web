@@ -181,10 +181,10 @@ describe('real 404 page', () => {
 describe('HQ routes', () => {
   const hq = shellOf()?.children?.find((c) => c.path === 'hq');
 
-  it('registers overview, hangar, import, ship, locker, set and ops under /hq', () => {
+  it('registers overview, hangar, import, ship, locker, set, ops and spots under /hq', () => {
     expect(hq?.loadComponent).toBeDefined();
     const paths = (hq?.children ?? []).map((c) => c.path);
-    expect(paths).toEqual(['', 'hangar', 'hangar/import', 'hangar/:id', 'locker', 'locker/:id', 'ops']);
+    expect(paths).toEqual(['', 'hangar', 'hangar/import', 'hangar/:id', 'locker', 'locker/:id', 'ops', 'spots']);
     // ops: with the shell beta on its canMatch redirects to /hq#planen, else today's page
     // import before :id, so "import" is never read as a ship id
     expect(paths.indexOf('hangar/import')).toBeLessThan(paths.indexOf('hangar/:id'));

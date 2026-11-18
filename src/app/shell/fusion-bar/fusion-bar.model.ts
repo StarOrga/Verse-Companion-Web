@@ -3,7 +3,7 @@
 import type { PageLayout } from '../../core/layout/page-layout';
 import type { CodexKind } from '../../codex/codex.service';
 import type { StageSearchState } from './shell-chrome.service';
-import { HQ_ROOT, hqHangar, hqLocker, hqOps } from '../../hq/hq-routes';
+import { HQ_ROOT, hqHangar, hqLocker, hqOps, hqSpots } from '../../hq/hq-routes';
 
 /** The admin hub: tiles to Benutzer, Telemetrie and the other admin pages. */
 export const ADMIN_HUB = '/admin/hub';
@@ -135,6 +135,7 @@ export const AREA_SECTIONS: Readonly<Partial<Record<AreaId, readonly AreaSection
     { id: 'locker', labelKey: 'hq.tabs.locker', link: hqLocker, exact: false },
     { id: 'hangar', labelKey: 'hq.tabs.hangar', link: hqHangar, exact: false },
     { id: 'ops', labelKey: 'hq.tabs.ops', link: hqOps, exact: false },
+    { id: 'spots', labelKey: 'hq.tabs.spots', link: hqSpots, exact: false },
   ],
 };
 

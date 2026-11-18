@@ -25,6 +25,7 @@ import { FriendsService } from '../../social/friends.service';
 import { SHIP_ROLES, type ShipRole } from '../../codex/codex-ship-filters';
 import { HqInventoryService } from '../data/hq-inventory.service';
 import { aggregateQuality, averageLabel, itemIdentity, qualityBands, rangeLabel } from '../data/hq-quality';
+import { BlueprintLinkService } from '../data/blueprint-link';
 import { ScrapInfoService } from '../data/scrap-info';
 import { WishlistStore } from '../data/wishlist.store';
 import { HqOwnershipService } from '../hq-ownership.service';
@@ -692,6 +693,7 @@ export class HqStockComponent implements OnInit {
   private readonly picker = inject(NachschubTargetPicker);
   private readonly reserveDialog = inject(HqReserveDialog);
   private readonly scrapSvc = inject(ScrapInfoService);
+  private readonly bpLink = inject(BlueprintLinkService);
   private readonly friends = inject(FriendsService);
   private readonly chrome = inject(ShellChromeService);
   private readonly route = inject(ActivatedRoute);
@@ -844,7 +846,7 @@ export class HqStockComponent implements OnInit {
     const seen = new Set<string>();
     return { active: tiers.active, rest: tiers.rest.filter((e) => !seen.has(e.area + e.key) && seen.add(e.area + e.key)).slice(0, 8) };
   });
-  protected readonly alts = computed(() => (this.isDeckTab() ? alternativesFor(this.crates(), this.shownCrates(), this.filter(), this.scrapYes, this.blueprints()) : null));
+  protected readonly alts = computed(() => (this.isDeckTab() ? alternativesFor(this.crates(), this.shownCrates(), this.filter(), this.scrapYes, this.blueprints(), (cn) => this.bpLink.blueprintsOf(cn)) : null));
 
   protected readonly selectedCrates = computed(() => this.crates().filter((c) => this.selection().has(c.key)));
   /** I6: one material selected (any places) or the search shows one material only → its quality view. */
@@ -975,6 +977,7 @@ export class HqStockComponent implements OnInit {
       untracked(() => {
         void this.inv.ensureKinds(classes);
         void this.scrapSvc.load(classes);
+        void this.bpLink.load(classes);
       });
     });
     effect(() => {
