@@ -61,7 +61,8 @@ export function nextSlim(slim: boolean, scrollY: number, stuck: boolean): boolea
         --hb-pill-meta: inline;
         position: sticky;
         top: calc(var(--sc-imp-banner-h, 0px) + var(--sc-topbar-h, 0px) + env(safe-area-inset-top, 0px));
-        z-index: 20;
+        /* Over the page (stage z 6, sticky strip), under the shell bar (z 20) and its search panel. */
+        z-index: 12;
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
         align-items: end;

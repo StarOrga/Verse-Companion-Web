@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 
 import { CodexDetailHeadComponent, nextSlim } from './codex-detail-head.component';
 import { CodexDetailShellComponent } from './codex-detail-shell.component';
@@ -52,7 +52,7 @@ class HostComponent {
 
 describe('CodexDetailShellComponent', () => {
   it('renders the head band, the stage slot and a keyboard tablist', async () => {
-    TestBed.configureTestingModule({ imports: [HostComponent, TranslateModule.forRoot()] });
+    TestBed.configureTestingModule({ imports: [HostComponent], providers: [provideTranslateService({})] });
     const fixture = TestBed.createComponent(HostComponent);
     fixture.detectChanges();
     await fixture.whenStable();
