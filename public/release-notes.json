@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.281.1",
+  "current": "0.281.2",
   "releases": [
+    {
+      "version": "0.281.2",
+      "date": "2026-11-18",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Ship and item pages: the edition and skin dropdown opens fully visible above the page instead of being cut off by the content around it."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.281.1",
       "date": "2026-11-18",
