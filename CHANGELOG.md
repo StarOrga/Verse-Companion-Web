@@ -4,6 +4,16 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.279.2] - 2026-11-18
+
+### Changed
+- Admin concept "Lager — Suche, Mengen & stabile Leiste": round 3 (quantity matches across one or more stops with a per-user filter, one-click Einlagern and Rausnehmen with undo).
+
+## [0.279.1] - 2026-11-18
+
+### Fixed
+- /verse: the HQ outpost under the HQ event link no longer appears with the world; it fades in with its beacon in the staged entrance.
+
 ## [0.279.0] - 2026-11-18
 
 ### Added
