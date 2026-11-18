@@ -25,7 +25,7 @@ export interface HqSupplyRow {
   set_id: string | null;
   step_kind: HqStepKind | null;
   wanted: boolean;
-  source: 'manual' | 'set' | 'search' | 'live';
+  source: 'manual' | 'set' | 'search' | 'live' | 'wish' | 'wish_met';
   /** Migration 20261109000200: pick-up line over several places (route order = array order); null = an ordinary line. */
   gather?: HqGatherStop[] | null;
   /** Migration 20261109000600: minimum quality 1..1000 the supply must meet; null = any. */

@@ -1,7 +1,7 @@
 // node --test supabase/functions/nachschub-names/_names.test.mjs
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { EINSATZ_MAX, NACHSCHUB_MAX, buildPrompt, clampName, limitOf, parseName, parseRequest } from './_names.ts';
+import { EINSATZ_MAX, NACHSCHUB_MAX, bearerToken, buildPrompt, clampName, limitOf, parseName, parseRequest } from './_names.ts';
 
 describe('limits', () => {
   it('Nachschub 28, Einsatz 40', () => {
@@ -66,5 +66,19 @@ describe('buildPrompt', () => {
     assert.ok(n.includes('"Nachschub"') && n.includes('"neu"') && /not a list/.test(n));
     const e = buildPrompt({ kind: 'einsatz', locale: 'de', items: [{ name: 'Titan-Erz abbauen', qty: 1 }] });
     assert.ok(e.includes('- Titan-Erz abbauen') && !e.includes('1x'));
+  });
+});
+
+describe('bearerToken', () => {
+  it('reads the token of a Bearer header in any spelling', () => {
+    assert.equal(bearerToken('Bearer abc.def.ghi'), 'abc.def.ghi');
+    assert.equal(bearerToken('bearer  abc.def.ghi '), 'abc.def.ghi');
+  });
+  it('is null without a header, without a token and for another scheme', () => {
+    assert.equal(bearerToken(null), null);
+    assert.equal(bearerToken(''), null);
+    assert.equal(bearerToken('Bearer '), null);
+    assert.equal(bearerToken('Basic abc'), null);
+    assert.equal(bearerToken('Bearer a b'), null);
   });
 });

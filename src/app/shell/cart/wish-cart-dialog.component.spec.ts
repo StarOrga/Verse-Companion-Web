@@ -43,7 +43,21 @@ function setup(rows: WishRow[], catalogue: { armor?: CodexListRow[]; weapon?: Co
       provideTranslateService({}),
       { provide: AuthService, useValue: { user: signal({ id: 'u1' }) } },
       { provide: WishlistStore, useValue: store },
-      { provide: NachschubService, useValue: { newBlock: signal(newBlock), ensureLoaded: () => Promise.resolve() } },
+      {
+        provide: NachschubService,
+        useValue: {
+          newBlock: signal(newBlock),
+          ensureLoaded: () => Promise.resolve(),
+          // Nothing of the wish is assigned to an Operation: a removal is free pieces only and never asks.
+          allocationOf: () => ({ key: '', wished: 0, assigned: 0, free: 0, assignments: [] }),
+          planWishRemoval: (_r: unknown, n: number) => ({ remove: n, free: n, parts: [], needsConfirm: false }),
+          applyWishRemoval: async (r: { kind: string; className: string; name?: string | null; forClassName?: string | null }, n: number) => {
+            const row = rows.find((w) => w.kind === r.kind && w.className === r.className);
+            await store.setQty({ kind: r.kind, className: r.className, name: r.name ?? null, forClassName: r.forClassName ?? null }, (row?.qty ?? n) - n);
+            return { ok: true, key: 'hq.nachschub.done.wishRemoved', params: { name: r.name ?? r.className, count: n, dissolved: 0 }, undo: async () => ({ ok: true, key: 'x' }) };
+          },
+        },
+      },
       { provide: HangarService, useValue: { ships: signal([]), updateShip: async () => true, removeShip: async () => true } },
       { provide: HqInventoryService, useValue: { items: signal([]) } },
       { provide: WishNamesService, useValue: { request: () => undefined, nameOf: () => null } },

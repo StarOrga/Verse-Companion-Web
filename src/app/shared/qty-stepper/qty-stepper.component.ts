@@ -20,7 +20,7 @@ const MINUS = 'M5 12h14';
   standalone: true,
   imports: [ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'sc-qty-stepper', role: 'group', '[attr.aria-label]': 'groupLabel() || null' },
+  host: { class: 'sc-qty-stepper', '[class.sc-qs-hl]': 'highlight()', role: 'group', '[attr.aria-label]': 'groupLabel() || null' },
   template: `
     <button type="button" class="qs-btn qs-less" [disabled]="disabled() || value() <= min()"
             [attr.aria-label]="lessLabel()" [scTooltip]="lessLabel()" scTooltipTier="label" (click)="go(-1)">
@@ -42,6 +42,10 @@ const MINUS = 'M5 12h14';
     .qs-btn svg { inline-size: 14px; block-size: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
     .qs-val { min-inline-size: 2ch; padding: 0 2px; text-align: center; font-variant-numeric: tabular-nums;
       font-size: 0.85rem; font-weight: 600; color: var(--sc-fg-0); white-space: nowrap; }
+    /* The counter a removal just changed: lit for a moment so the eye connects the row and the undo toast (D3). */
+    :host(.sc-qs-hl) .qs-val { background: color-mix(in srgb, var(--sc-accent) 24%, transparent); box-shadow: inset 0 0 0 1px var(--sc-accent); color: var(--sc-accent); animation: qs-flash 1.6s ease-out; }
+    @keyframes qs-flash { from { background: color-mix(in srgb, var(--sc-accent) 55%, transparent); } }
+    @media (prefers-reduced-motion: reduce) { :host(.sc-qs-hl) .qs-val { animation: none; } }
     .qs-val ::ng-deep small { font-size: 0.68rem; font-weight: 600; color: var(--sc-fg-2); }
     /* Touch floor of the mobile gate: 48 px (a 44 px value measures 43). */
     @media (pointer: coarse), (max-width: 749px) { .qs-btn { inline-size: 48px; block-size: 48px; } }
@@ -52,6 +56,8 @@ export class ScQtyStepperComponent {
   readonly min = input(1);
   readonly max = input(999);
   readonly disabled = input(false);
+  /** Lights the value briefly (a removal changed it); the caller sets it for ~1.6 s. */
+  readonly highlight = input(false);
   /** Accessible name of the group, already translated ("Menge von Aluminium"). */
   readonly groupLabel = input('');
   /** Already translated labels of the two buttons. */

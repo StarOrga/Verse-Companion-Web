@@ -13,6 +13,30 @@
         ]
       }
     ],
+    ".claude/project-map.md›codex/›count": [
+      {
+        "ship": "#1184",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-18T23:06:11.660Z",
+        "hunks": [
+          "3dff6a209474"
+        ]
+      }
+    ],
+    ".claude/project-map.md›concepts/›count": [
+      {
+        "ship": "#1184",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-18T23:06:11.660Z",
+        "hunks": [
+          "258773f15f1c"
+        ]
+      }
+    ],
     ".claude/project-map.md›concepts/›file count": [
       {
         "ship": "#1163",
@@ -210,6 +234,18 @@
         "at": "2026-11-17T00:17:56.554Z",
         "hunks": [
           "1225ec8aa64c"
+        ]
+      }
+    ],
+    ".claude/project-map.md›docs/›count": [
+      {
+        "ship": "#1184",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-18T23:06:11.660Z",
+        "hunks": [
+          "888be58c3d38"
         ]
       }
     ],
@@ -558,6 +594,16 @@
         "hunks": [
           "927683df957c"
         ]
+      },
+      {
+        "ship": "#1184",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-18T23:06:11.660Z",
+        "hunks": [
+          "28e137a55a2a"
+        ]
       }
     ],
     ".claude/project-map.md›migrations/›file count": [
@@ -636,6 +682,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›shared/›count": [
+      {
+        "ship": "#1184",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-18T23:06:11.660Z",
+        "hunks": [
+          "857671959e1c"
+        ]
+      }
+    ],
     ".claude/project-map.md›shell/›file count": [
       {
         "ship": "#1163",
@@ -701,6 +759,18 @@
         "at": "2026-11-17T22:42:12.676Z",
         "hunks": [
           "68a39c281c1f"
+        ]
+      }
+    ],
+    ".claude/project-map.md›src/›count": [
+      {
+        "ship": "#1184",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-18T23:06:11.660Z",
+        "hunks": [
+          "f685c2f94ea9"
         ]
       }
     ],
@@ -828,6 +898,16 @@
         "hunks": [
           "0e9328573472"
         ]
+      },
+      {
+        "ship": "#1184",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-18T23:06:11.660Z",
+        "hunks": [
+          "53f10728b7dc"
+        ]
       }
     ],
     ".claude/project-map.md›supabase/›file count": [
@@ -930,6 +1010,18 @@
         "at": "2026-11-17T20:21:01.476Z",
         "hunks": [
           "59ce0daa6e70"
+        ]
+      }
+    ],
+    ".claude/project-map.md›tracked files.›count": [
+      {
+        "ship": "#1184",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-18T23:06:11.660Z",
+        "hunks": [
+          "a09dea4abc7d"
         ]
       }
     ],
@@ -1111,6 +1203,18 @@
         "at": "2026-11-17T19:31:21.386Z",
         "hunks": [
           "8e75d40f8989"
+        ]
+      }
+    ],
+    "docs/analytics/event-naming.md›verb list›deselect": [
+      {
+        "ship": "#1184",
+        "by": "JerryT2T",
+        "value": "both kept: assign/release inserted before deselect, deselect and its reason unchanged",
+        "decided": true,
+        "at": "2026-11-18T21:12:57.460Z",
+        "hunks": [
+          "706c32b203cc"
         ]
       }
     ],
