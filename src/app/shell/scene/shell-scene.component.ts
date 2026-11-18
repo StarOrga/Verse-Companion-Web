@@ -86,6 +86,15 @@ export class ShellSceneComponent {
    * world) — the hub dollies it in from there, so nothing ever shows the final pose first (D3).
    */
   readonly igniting = signal(false);
+  /**
+   * The hub's full entrance (#371): the HQ outpost waits for the hub's staged entrance and arrives
+   * with its beacon (briefing-beacons, 4.45 s) instead of with the world. 'hold' = announced, not
+   * started yet (it stands at its hidden first frame, like the main header); null = no entrance.
+   */
+  readonly intro = computed<'hold' | 'play' | null>(() => {
+    const h = this.chrome.heroIntro();
+    return h?.full ? (h.hold ? 'hold' : 'play') : null;
+  });
   /** The pieces' body canvases show until the engine drew each once (scene-bodies.component). */
   readonly warming = signal(true);
 
