@@ -197,6 +197,22 @@ describe('ItemPathService', () => {
     expect(stock().map((i) => i.name)).toEqual(['Gold']);
   });
 
+  it('#1045: a shelf row the desktop app writes (plain class, qty 1) counts as owned like a web mark', () => {
+    const { svc, stock } = setup();
+    stock.set([
+      { location: 'Blueprints', name: 'P4-AR Rifle', class_name: 'BP_P4AR', qty: 1, unit: 'pcs' },
+      { location: 'Blueprints', name: 'Rifle', class_name: 'blueprint:BP_Rifle', qty: 1, unit: 'pcs' },
+      { location: 'Lorville', name: 'Gold', class_name: 'item:Gold', qty: 3, unit: 'pcs' },
+    ]);
+    expect([...svc.ownedBlueprints()].sort()).toEqual(['BP_P4AR', 'BP_Rifle']);
+  });
+
+  it('#1045: a shelf row without a class name is not counted', () => {
+    const { svc, stock } = setup();
+    stock.set([{ location: 'Blueprints', name: 'Unknown', class_name: null, qty: 1, unit: 'pcs' }]);
+    expect(svc.ownedBlueprints().size).toBe(0);
+  });
+
   it('#303: signed out the blueprint mark is not written', async () => {
     const { svc, stock } = setup({ user: false });
     expect((await svc.setBlueprintOwned('BP_Rifle', 'Rifle', true)).key).toBe('itemPath.err.failed');
