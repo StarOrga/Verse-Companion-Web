@@ -1,6 +1,6 @@
 # HQ live contract (desktop <-> SCC-Web)
 
-Contract version: 2 (2026-11-05). This file exists in BOTH repos (SCC-App
+Contract version: 3 (2026-11-08). This file exists in BOTH repos (SCC-App
 `docs/contracts/hq-live.md`, SCC-Web copy); a change needs both repos. The web repo holds an
 identical copy at `docs/contracts/hq-live.md` - keep the two byte-identical.
 
@@ -108,6 +108,27 @@ cannot empty the location.
 for someone or something ("Spieler X", "Verkauf"); available = `qty` minus their amounts. The
 desktop never writes it: its upsert leaves the column alone, and a name it deletes takes its
 reservations with it.
+
+### Blueprint shelf (`hq_inventory_items` at `location = 'Blueprints'`)
+
+Since contract version 3 the desktop also pushes its blueprint journal (`blueprint.journal.get`,
+the app's own view scope: the active character, or every character with the aggregate toggle)
+to the web Sammlung. Same opt-in as the events (`hq.liveSync.enabled`), same token, no snapshot
+row and no event row.
+
+- Row: `location 'Blueprints'`, `class_name` = the blueprint's codex class name (plain, no
+  `blueprint:` prefix), `name` = the app's display name, `qty 1`, `unit 'pcs'`. Upsert
+  `on_conflict=user_id,location,name` with `ignore-duplicates`.
+- A class already on the shelf (any name, plain or `blueprint:<class>` ref) is not written
+  again, so a mark made on the web keeps its row and label.
+- Removal: only a class the desktop put there itself (local ledger per account) and that the
+  player marked `MISSING` or `SOLD` by hand in the app. `UNKNOWN` never removes, and a web mark
+  ("Ich habe diese") is never deleted by the desktop.
+- When: on every `blueprint.journal.changed`, and once in full after sign-in, an account
+  switch or turning the opt-in on. An unchanged plan writes nothing.
+- The 400-items cap applies: the desktop adds at most up to 400 rows at `Blueprints` and logs
+  the overflow.
+- Live pickups keep their own path: `blueprint.received` events, applied by the web.
 
 ### `hq_ship_storage` (user_id, ship_ref, location, source, taken_at)
 

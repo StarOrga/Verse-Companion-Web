@@ -6640,7 +6640,8 @@
       "overview": "Overview",
       "locker": "Sets",
       "hangar": "Hangar",
-      "ops": "Ops"
+      "ops": "Ops",
+      "spots": "Spots"
     },
     "supplies": {
       "button": "Operations",
@@ -6679,6 +6680,21 @@
         "store": "Put down",
         "tickOnly": "Just tick off"
       }
+    },
+    "spots": {
+      "title": "Spots",
+      "subtitle": "Your saved places from the desktop app. Rename or delete them here; the app picks the change up on its next sync.",
+      "loading": "Loading your spots …",
+      "empty": "No spots yet. Spots are created in the desktop app (Verse Navigation); once synced, they show up here.",
+      "retry": "Try again",
+      "nameLabel": "Spot name",
+      "save": "Save",
+      "cancel": "Cancel",
+      "rename": "Rename",
+      "delete": "Delete",
+      "created": "Created {{date}}",
+      "deleteTitle": "Delete this spot?",
+      "deleteMessage": "\"{{name}}\" will be removed from all your devices."
     },
     "ops": {
       "title": "Ops",
@@ -7367,6 +7383,26 @@
           "e3": "The latest events, e.g. \"Mission completed\" or \"Quantum jump finished\"."
         }
       }
+    },
+    "logbook": {
+      "title": "Logbook",
+      "loading": "Loading the logbook …",
+      "retry": "Try again",
+      "empty": "No game session yet. Connect the SCC App and every session shows up here as a card.",
+      "emptyLinked": "No game session recorded in the last 30 days.",
+      "jumps": "Quantum jumps",
+      "contracts": "Contracts",
+      "auec": "aUEC balance",
+      "losses": "Losses",
+      "lossesSub": "{{deaths}} deaths · {{ships}} ships destroyed · {{claims}} insurance claims",
+      "end": {
+        "noQuit": "Ended without a quit (crash or app closed)",
+        "live": "Running now"
+      },
+      "showAll": "Show all {{n}} sessions",
+      "note": "Sessions of the last {{days}} days from the SCC App. The aUEC balance is sells minus buys.",
+      "durH": "{{h}} h {{m}} min",
+      "durM": "{{m}} min"
     }
   },
   "verse": {

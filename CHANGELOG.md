@@ -4,6 +4,22 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.281.1] - 2026-11-18
+
+### Changed
+- Ship page, classic view: "Bei RSI ansehen" and "Pledge-Link hinzufügen" sit up next to the ship name instead of at the end of the action row.
+
+## [0.281.0] - 2026-11-19
+
+### Added
+- HQ: a "Spots" page lists the places you saved in the desktop app; rename or delete them and the app takes it over on its next sync (#1056).
+- HQ Statistik: a logbook with one card per game session — duration, quantum jumps, contracts, aUEC balance and losses (#896).
+- HQ Bestand: the Ersatz suggestions also offer materials that the same blueprint accepts (#1057).
+- The desktop app's UI language packs are now hosted under `/i18n/scc-app/` so translation fixes reach players without an app release (#1055).
+
+### Changed
+- HQ live contract v3: blueprints the desktop app puts on your shelf count as owned in the Sammlung and the Nachschub craft check (#1045).
+
 ## [0.280.0] - 2026-11-19
 
 ### Added

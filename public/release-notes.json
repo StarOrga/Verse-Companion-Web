@@ -1,7 +1,125 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.279.2",
+  "current": "0.281.1",
   "releases": [
+    {
+      "version": "0.281.1",
+      "date": "2026-11-18",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Ship page, classic view: \"Bei RSI ansehen\" and \"Pledge-Link hinzufügen\" sit up next to the ship name instead of at the end of the action row."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.281.0",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "HQ: a \"Spots\" page lists the places you saved in the desktop app; rename or delete them and the app takes it over on its next sync (#1056)."
+            },
+            {
+              "title": "",
+              "text": "HQ Statistik: a logbook with one card per game session — duration, quantum jumps, contracts, aUEC balance and losses (#896)."
+            },
+            {
+              "title": "",
+              "text": "HQ Bestand: the Ersatz suggestions also offer materials that the same blueprint accepts (#1057)."
+            },
+            {
+              "title": "",
+              "text": "The desktop app's UI language packs are now hosted under /i18n/scc-app/ so translation fixes reach players without an app release (#1055)."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "HQ live contract v3: blueprints the desktop app puts on your shelf count as owned in the Sammlung and the Nachschub craft check (#1045)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.280.0",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "A wish stays on the wishlist when it is assigned to an Operation. Item, ship, blueprint and preview pages in the Codex show the same two stations, wish and ownership, and assign a wish to an Operation in place; the Holotisch hangar menu reads the same way."
+            },
+            {
+              "title": "",
+              "text": "Removing a wish asks only when assigned pieces are hit, takes them from the newest Operation first and can be undone in one step. Releasing a line in the HQ offers to delete the wish as well."
+            },
+            {
+              "title": "",
+              "text": "The Archiv in HQ Planen can delete an archived Operation."
+            },
+            {
+              "title": "",
+              "text": "An Operation with plain lines from before this change asks once whether they should stand as wishes on the wishlist. Nothing changes without the answer."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The supply group is called \"Operation\" everywhere and carries the Route glyph, and every undo toast has the new look."
+            },
+            {
+              "title": "",
+              "text": "The HQ start tile counts only lines of active Operationen."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Undo of a wish removal gives back exactly what the removal took, so a change made on another device in between survives, and a ship wish comes back with its name and notes."
+            },
+            {
+              "title": "",
+              "text": "A fulfilled wish line stays fulfilled when a second device pushes an outdated copy of it."
+            },
+            {
+              "title": "",
+              "text": "An archived Operation no longer keeps open wish lines."
+            },
+            {
+              "title": "",
+              "text": "Name proposals for a new Operation work for signed-in users; the service had rejected every request."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.279.2",
       "date": "2026-11-18",
