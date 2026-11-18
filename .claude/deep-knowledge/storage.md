@@ -136,8 +136,8 @@ first in `listByKind`, `countByKind`, `countSearchMatches`, `countItemsByAttachT
 and `allShipRows` (whole cohort from `ship-rank.json`); on `null` the old query runs
 unchanged. Still on the database: the German-name fallback (`codex_search` RPC +
 an `in` list read), `getMissileCohort` / `getItemRankCohort` (full payload /
-`weaponParams` / `stats` are not in the files), detail, search (`searchAll`) and
-every other read. Specs never reach the Worker: `vitest-setup.ts` answers
+`weaponParams` / `stats` are not in the files), detail pages and every other
+non-list read. `searchAll` pages through `listByKind`, so it reads the files too. Specs never reach the Worker: `vitest-setup.ts` answers
 `/codex-lists/` with 404.
 
 ## Localization strings (R2 since 2026-10-03)
