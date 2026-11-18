@@ -324,3 +324,170 @@ describe('installSupabaseGuard', () => {
     assert.match(lines.at(-1), /1 requests, 0 from the catalog cache, 0 stored, 1 passed a full queue/);
   });
 });
+
+/** A fake of the mobile gate's CDP client: records commands, lets a test fire events. */
+function fakeCdp({ body = '[{"class_name":"a"}]', base64Encoded = false, failOn = null } = {}) {
+  const cdp = { sent: [], handlers: new Map() };
+  cdp.send = async (method, params, sessionId) => {
+    cdp.sent.push({ method, params, sessionId });
+    if (method === failOn) throw new Error(`${method} failed`);
+    if (method === 'Fetch.getResponseBody') return { body, base64Encoded };
+    return {};
+  };
+  cdp.on = (sessionId, event, handler) => cdp.handlers.set(`${sessionId}|${event}`, handler);
+  cdp.pause = async (params) => {
+    cdp.handlers.get('s1|Fetch.requestPaused')(params);
+    // The handler is fire-and-forget, as with a real socket: let it settle.
+    await new Promise((r) => setTimeout(r, 15));
+  };
+  cdp.commands = (method) => cdp.sent.filter((c) => c.method === method);
+  return cdp;
+}
+
+describe('installSupabaseGuardCdp (the mobile gate)', () => {
+  const request = (extra = {}) => ({
+    method: 'GET',
+    url: shipList(),
+    headers: { Origin: 'http://127.0.0.1:4310', Prefer: 'count=exact' },
+    ...extra,
+  });
+  const answerHeaders = [
+    { name: 'Content-Type', value: 'application/json' },
+    { name: 'Content-Range', value: '0-0/1' },
+    { name: 'Content-Encoding', value: 'br' },
+    { name: 'Access-Control-Allow-Origin', value: 'http://localhost:4200' },
+  ];
+
+  async function install(cdp, options = {}) {
+    const dirs = { cacheDir: options.cacheDir ?? scratch('cdp-cache'), slotDir: options.slotDir ?? scratch('cdp-slot') };
+    const handle = await guard.installSupabaseGuardCdp(cdp, 's1', {
+      supabaseUrl: SUPABASE,
+      cwd: dirs.cacheDir,
+      env: {},
+      ...options,
+      ...dirs,
+    });
+    return { handle, ...dirs };
+  }
+
+  it('is off when switched off and enables nothing', async () => {
+    const cdp = fakeCdp();
+    assert.equal(
+      await guard.installSupabaseGuardCdp(cdp, 's1', { supabaseUrl: SUPABASE, env: { SC_AGENT_SUPABASE_GUARD: 'off' } }),
+      null,
+    );
+    assert.equal(await guard.installSupabaseGuardCdp(cdp, 's1', { env: {} }), null);
+    assert.equal(cdp.sent.length, 0);
+  });
+
+  it('pauses the REST API of this project at both stages', async () => {
+    const cdp = fakeCdp();
+    await install(cdp);
+    const [enable] = cdp.commands('Fetch.enable');
+    assert.equal(enable.sessionId, 's1');
+    assert.deepEqual(enable.params.patterns, [
+      { urlPattern: `${SUPABASE}/rest/v1/*`, requestStage: 'Request' },
+      { urlPattern: `${SUPABASE}/rest/v1/*`, requestStage: 'Response' },
+    ]);
+  });
+
+  it('stores a catalog answer and gives it to the next device with its own origin allowed', async () => {
+    const cdp = fakeCdp();
+    const { handle, cacheDir, slotDir } = await install(cdp);
+    await cdp.pause({ requestId: 'r1', request: request() });
+    assert.equal(cdp.commands('Fetch.continueRequest').length, 1);
+    assert.equal(fs.readdirSync(slotDir).length, 1, 'the request holds a slot while it is on the network');
+    await cdp.pause({ requestId: 'r1', request: request(), responseStatusCode: 200, responseHeaders: answerHeaders });
+    assert.equal(cdp.commands('Fetch.getResponseBody').length, 1);
+    assert.equal(cdp.commands('Fetch.continueRequest').length, 2, 'the paused answer is let through');
+    assert.equal(fs.readdirSync(slotDir).length, 0);
+
+    const next = fakeCdp();
+    const second = await install(next, { cacheDir, slotDir });
+    await next.pause({
+      requestId: 'r9',
+      request: request({ headers: { origin: 'http://127.0.0.1:4311', prefer: 'count=exact' } }),
+    });
+    assert.equal(next.commands('Fetch.continueRequest').length, 0);
+    const [fulfilled] = next.commands('Fetch.fulfillRequest');
+    assert.equal(fulfilled.params.responseCode, 200);
+    assert.equal(Buffer.from(fulfilled.params.body, 'base64').toString(), '[{"class_name":"a"}]');
+    const headers = Object.fromEntries(fulfilled.params.responseHeaders.map((h) => [h.name, h.value]));
+    assert.deepEqual(headers, {
+      'content-type': 'application/json',
+      'content-range': '0-0/1',
+      'access-control-allow-origin': 'http://127.0.0.1:4311',
+    });
+    assert.match(handle.summary(), /1 database requests, 0 from the catalog cache, 1 stored/);
+    assert.match(second.handle.summary(), /1 database requests, 1 from the catalog cache, 0 stored/);
+  });
+
+  it('keeps the count read without asking for a body', async () => {
+    const cdp = fakeCdp();
+    const { cacheDir } = await install(cdp);
+    await cdp.pause({ requestId: 'h1', request: request({ method: 'HEAD' }) });
+    await cdp.pause({
+      requestId: 'h1',
+      request: request({ method: 'HEAD' }),
+      responseStatusCode: 206,
+      responseHeaders: answerHeaders,
+    });
+    assert.equal(cdp.commands('Fetch.getResponseBody').length, 0);
+    assert.equal(fs.readdirSync(cacheDir).length, 1);
+  });
+
+  it('queues other requests, caches nothing and lets preflights straight through', async () => {
+    const cdp = fakeCdp();
+    const { cacheDir, slotDir } = await install(cdp);
+    const profiles = { method: 'GET', url: `${SUPABASE}/rest/v1/profiles?select=id`, headers: {} };
+    await cdp.pause({ requestId: 'o1', request: { ...profiles, method: 'OPTIONS' } });
+    assert.equal(fs.readdirSync(slotDir).length, 0);
+    await cdp.pause({ requestId: 'p1', request: profiles });
+    assert.equal(fs.readdirSync(slotDir).length, 1);
+    await cdp.pause({ requestId: 'p1', request: profiles, responseStatusCode: 200, responseHeaders: answerHeaders });
+    assert.equal(fs.readdirSync(slotDir).length, 0);
+    assert.equal(cdp.commands('Fetch.getResponseBody').length, 0);
+    assert.deepEqual(fs.readdirSync(cacheDir), []);
+    assert.equal(cdp.commands('Fetch.continueRequest').length, 3);
+  });
+
+  it('does not key an RPC whose body Chrome did not hand over', async () => {
+    const cdp = fakeCdp();
+    const { cacheDir } = await install(cdp);
+    const rpc = { method: 'POST', url: `${SUPABASE}/rest/v1/rpc/codex_facet_values`, headers: {}, hasPostData: true };
+    await cdp.pause({ requestId: 'f1', request: rpc });
+    await cdp.pause({ requestId: 'f1', request: rpc, responseStatusCode: 200, responseHeaders: answerHeaders });
+    assert.deepEqual(fs.readdirSync(cacheDir), []);
+    const withBody = { ...rpc, postData: JSON.stringify({ p_build_id: BUILD, p_kind: 'ship' }) };
+    await cdp.pause({ requestId: 'f2', request: withBody });
+    await cdp.pause({ requestId: 'f2', request: withBody, responseStatusCode: 200, responseHeaders: answerHeaders });
+    assert.equal(fs.readdirSync(cacheDir).length, 1);
+  });
+
+  it('frees the slot on a failed request, a lost answer and at teardown', async () => {
+    const cdp = fakeCdp();
+    const { handle, slotDir } = await install(cdp, { holdMs: 20 });
+    await cdp.pause({ requestId: 'e1', request: request() });
+    await cdp.pause({ requestId: 'e1', request: request(), responseErrorReason: 'Failed' });
+    assert.equal(fs.readdirSync(slotDir).length, 0);
+    assert.equal(cdp.commands('Fetch.getResponseBody').length, 0);
+
+    await cdp.pause({ requestId: 'lost', request: request() });
+    assert.equal(fs.readdirSync(slotDir).length, 1);
+    await new Promise((r) => setTimeout(r, 40));
+    assert.equal(fs.readdirSync(slotDir).length, 0, 'an answer that never came gives the slot back');
+
+    await cdp.pause({ requestId: 'open', request: { method: 'GET', url: `${SUPABASE}/rest/v1/profiles`, headers: {} } });
+    handle.dispose();
+    assert.equal(fs.readdirSync(slotDir).length, 0);
+  });
+
+  it('never fails a request when its own bookkeeping fails', async () => {
+    const cdp = fakeCdp({ failOn: 'Fetch.getResponseBody' });
+    const { cacheDir } = await install(cdp);
+    await cdp.pause({ requestId: 'b1', request: request() });
+    await cdp.pause({ requestId: 'b1', request: request(), responseStatusCode: 200, responseHeaders: answerHeaders });
+    assert.deepEqual(fs.readdirSync(cacheDir), []);
+    assert.equal(cdp.commands('Fetch.continueRequest').length, 2);
+  });
+});

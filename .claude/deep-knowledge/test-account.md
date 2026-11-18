@@ -116,8 +116,14 @@ legacy `SC_GATE_EMAIL`/`SC_GATE_PASSWORD`, then the Credential Manager entry.
     browsers and waits at most 3 s for one. Never measure load times or request
     timing of the app through these browsers without `SC_AGENT_SUPABASE_GUARD=off`.
   `%TEMP%\sc-test-session.log` shows per context how many requests came from the
-  cache (`guard: … requests, … from the catalog cache`). A standalone script that
-  calls the init page gets the guard too; one that builds its own context does not.
+  cache (`guard: … requests, … from the catalog cache`). Measured on live
+  (2026-11-19, five Codex pages): a browser with a warm cache sends 230 database
+  requests instead of 451 and no catalog list read at all. A standalone script
+  that calls the init page gets the guard too; one that builds its own context
+  does not. The mobile gate drives Chrome over raw CDP and installs the same
+  guard through the Fetch domain (`installSupabaseGuardCdp`, one `load` line per
+  device in its output) — one `--auth` run was ~5 000 database requests and
+  pushed anonymous reads into their 3 s timeout (2026-11-18).
 - **Standalone script, no Playwright MCP in the session:** install `playwright-core`
   in the scratchpad, run the script from the repo root (the init page checks the
   cwd), `require('scripts/playwright/test-session.cjs')` and call it with `{ page }`.

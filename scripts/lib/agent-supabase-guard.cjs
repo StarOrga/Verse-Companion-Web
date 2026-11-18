@@ -128,7 +128,8 @@ function cacheKey(req) {
   }
   const method = req.method.toUpperCase();
   let build = null;
-  if (method === 'GET' && CATALOG_PATH.test(url.pathname)) build = buildIdOfQuery(url);
+  // HEAD is the count read of the same list (`Prefer: count=exact`, answer in content-range).
+  if ((method === 'GET' || method === 'HEAD') && CATALOG_PATH.test(url.pathname)) build = buildIdOfQuery(url);
   else if (method === 'POST' && CACHED_RPCS.has(url.pathname)) build = buildIdOfBody(req.body);
   if (!build) return null;
   const headers = req.headers ?? {};
@@ -316,6 +317,127 @@ async function installSupabaseGuard(
   return true;
 }
 
+/**
+ * The same guard for a browser driven over raw CDP (scripts/mobile-gate.mjs has
+ * no Playwright context): the Fetch domain pauses every request to /rest/v1/
+ * twice. At the request stage a cached catalog read is answered at once, any
+ * other request takes a slot and goes on; at the response stage the slot is
+ * freed and a catalog answer is stored. `cdp` needs `send(method, params,
+ * sessionId)` and `on(sessionId, event, handler)`.
+ *
+ * Returns `{ summary }` or null when switched off. A failure in here never
+ * fails a request: whatever goes wrong, the request continues untouched.
+ */
+async function installSupabaseGuardCdp(
+  cdp,
+  sessionId,
+  {
+    supabaseUrl,
+    cwd = process.cwd(),
+    env = process.env,
+    cacheDir = CACHE_DIR,
+    slotDir = SLOT_DIR,
+    slotOptions = {},
+    holdMs = SLOT_STALE_MS,
+  } = {},
+) {
+  if (!supabaseUrl || String(env.SC_AGENT_SUPABASE_GUARD ?? '').toLowerCase() === 'off') return null;
+  const origin = new URL(supabaseUrl).origin;
+  pruneCache(cacheDir);
+  const namespace = schemaStamp(cwd);
+  const stats = { requests: 0, cached: 0, stored: 0, waitedOut: 0 };
+  /** requestId → what a request that went on to the network holds until its answer is there. */
+  const onNetwork = new Map();
+  const send = (method, params) => cdp.send(method, params, sessionId).catch(() => {}); // the tab may be gone
+  const settle = (requestId) => {
+    const held = onNetwork.get(requestId);
+    if (!held) return null;
+    onNetwork.delete(requestId);
+    clearTimeout(held.timer);
+    held.slot.release();
+    return held;
+  };
+
+  async function atResponse(p) {
+    const held = settle(p.requestId);
+    const status = p.responseStatusCode;
+    if (held?.key && (status === 200 || status === 206)) {
+      try {
+        let body = Buffer.alloc(0);
+        if (held.method !== 'HEAD') {
+          const got = await cdp.send('Fetch.getResponseBody', { requestId: p.requestId }, sessionId);
+          body = Buffer.from(got.body ?? '', got.base64Encoded ? 'base64' : 'utf8');
+        }
+        const headers = Object.fromEntries((p.responseHeaders ?? []).map((h) => [h.name.toLowerCase(), h.value]));
+        if (writeEntry(cacheDir, held.key, { status, headers, body })) stats.stored++;
+      } catch {
+        /* no body to keep: the answer still reaches the page below */
+      }
+    }
+    // Without overrides this lets the paused response through as it came.
+    return send('Fetch.continueRequest', { requestId: p.requestId });
+  }
+
+  async function atRequest(p) {
+    const { requestId, request } = p;
+    const method = String(request.method).toUpperCase();
+    // A CORS preflight never reaches Postgres; nothing to cache or to queue.
+    if (method === 'OPTIONS') return send('Fetch.continueRequest', { requestId });
+    const headers = Object.fromEntries(Object.entries(request.headers ?? {}).map(([n, v]) => [n.toLowerCase(), v]));
+    // A body Chrome did not hand over (hasPostData without postData) cannot be keyed.
+    const body = request.postData ?? null;
+    const key = request.hasPostData && body === null ? null : cacheKey({ method, url: request.url, headers, body, namespace });
+    stats.requests++;
+    if (key) {
+      const hit = readEntry(cacheDir, key);
+      if (hit) {
+        stats.cached++;
+        // The stored answer was given to some page of ours; this page needs its own origin allowed.
+        const answer = { ...hit.headers, 'access-control-allow-origin': headers.origin ?? '*' };
+        return send('Fetch.fulfillRequest', {
+          requestId,
+          responseCode: hit.status,
+          responseHeaders: Object.entries(answer).map(([name, value]) => ({ name, value: String(value) })),
+          body: hit.body.toString('base64'),
+        });
+      }
+    }
+    const slot = await acquireSlot({ dir: slotDir, ...slotOptions });
+    if (slot.waitedOut) stats.waitedOut++;
+    // A request whose answer never comes (the tab navigated away) must not keep its slot.
+    const timer = setTimeout(() => settle(requestId), holdMs);
+    timer.unref?.();
+    onNetwork.set(requestId, { key, method, slot, timer });
+    return send('Fetch.continueRequest', { requestId });
+  }
+
+  cdp.on(sessionId, 'Fetch.requestPaused', (p) => {
+    const stage = p.responseStatusCode !== undefined || p.responseErrorReason !== undefined ? atResponse : atRequest;
+    stage(p).catch(() => {
+      settle(p.requestId);
+      return send('Fetch.continueRequest', { requestId: p.requestId });
+    });
+  });
+  await cdp.send(
+    'Fetch.enable',
+    {
+      patterns: [
+        { urlPattern: `${origin}/rest/v1/*`, requestStage: 'Request' },
+        { urlPattern: `${origin}/rest/v1/*`, requestStage: 'Response' },
+      ],
+    },
+    sessionId,
+  );
+  return {
+    summary: () =>
+      `${stats.requests} database requests, ${stats.cached} from the catalog cache, ${stats.stored} stored, ${stats.waitedOut} passed a full queue`,
+    /** Frees whatever is still held; call before the tab goes. */
+    dispose() {
+      for (const requestId of [...onNetwork.keys()]) settle(requestId);
+    },
+  };
+}
+
 module.exports = {
   CACHE_DIR,
   CACHE_TTL_MS,
@@ -325,6 +447,7 @@ module.exports = {
   cacheKey,
   identityOf,
   installSupabaseGuard,
+  installSupabaseGuardCdp,
   isSupabaseRest,
   pruneCache,
   readEntry,
