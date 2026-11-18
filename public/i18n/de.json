@@ -6153,10 +6153,10 @@
       "empty": "Noch nichts im Archiv. Eine fertige Operation rutscht von selbst hierher und macht seinen Platz frei.",
       "reactivate": "Wieder aktivieren",
       "remove": "Löschen",
-      "removeAria": "Operation „{{name}}“ endgültig löschen",
+      "removeAria": "Operation „{{name}}“ löschen",
       "removeTitle": "„{{name}}“ löschen?",
-      "removeMsg": "Die Operation liegt im Archiv und enthält nur Erledigtes. Sie wird endgültig gelöscht und lässt sich nicht zurückholen. Deine Wunschliste und die sieben Plätze bleiben, wie sie sind.",
-      "removeConfirm": "Endgültig löschen",
+      "removeMsg": "Die Operation liegt im Archiv und enthält nur Erledigtes. Sie wird gelöscht. Deine Wunschliste und die sieben Plätze bleiben, wie sie sind.",
+      "removeConfirm": "Löschen",
       "close": "Schließen"
     },
     "flow": {

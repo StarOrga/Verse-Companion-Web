@@ -6153,10 +6153,10 @@
       "empty": "Nothing in the archive yet. A finished Operation moves here by itself and frees its slot.",
       "reactivate": "Reactivate",
       "remove": "Delete",
-      "removeAria": "Delete Operation \"{{name}}\" for good",
+      "removeAria": "Delete Operation \"{{name}}\"",
       "removeTitle": "Delete \"{{name}}\"?",
-      "removeMsg": "This Operation is in the archive and holds only finished work. It is deleted for good and cannot be brought back. Your wishlist and the seven slots stay as they are.",
-      "removeConfirm": "Delete for good",
+      "removeMsg": "This Operation is in the archive and holds only finished work. It is deleted. Your wishlist and the seven slots stay as they are.",
+      "removeConfirm": "Delete",
       "close": "Close"
     },
     "flow": {

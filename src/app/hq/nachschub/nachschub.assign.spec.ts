@@ -840,7 +840,7 @@ describe('NachschubService: wishes assigned to an Operation', () => {
       const a = line('Medpen', 'medpen', 3);
       const b = line('Polaris', 'polaris', 1, { entityKind: 'ship' });
       const out = [
-        line('New', 'newer', 1, { createdAt: '2026-11-18T09:00:00.000Z' }),
+        line('New', 'newer', 1, { createdAt: '2026-11-19T09:00:00.000Z' }),
         line('Blueprint', 'bolt', 1, { forClassName: 'bp_gun' }),
         line('Gather', 'gold', 1, { gather: [{ place: 'X', qty: 1 }] as never }),
         line('Step', 'step', 1, { stepKind: 'pickup' }),

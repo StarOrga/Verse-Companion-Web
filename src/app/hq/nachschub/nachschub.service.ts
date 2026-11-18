@@ -1803,10 +1803,10 @@ export function isLegacyWishLine(l: SupplyItem): boolean {
 }
 
 /**
- * End of the day the `wish` source went live (released 2026-11-17 in the evening): plain lines made up to then may be
+ * End of the day the `wish` source went live (released 2026-11-18): plain lines made up to then may be
  * wishes the old contract moved off the wishlist - the client in production wrote them that way until the release.
  */
-export const PLAIN_LINE_CUTOFF = '2026-11-18T00:00:00Z';
+export const PLAIN_LINE_CUTOFF = '2026-11-19T00:00:00Z';
 
 /**
  * The complement of {@link isLegacyWishLine} (H4): an open, plain `search` item / ship line made before the cut-off.

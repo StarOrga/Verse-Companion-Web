@@ -60,7 +60,9 @@ export class HqNachschubRemoveDialogComponent {
   template: `
     <sc-popup kind="dialog" [eyebrow]="'hq.title' | translate" [title]="'hq.slots.archive' | translate" (closed)="closed.emit()">
       <div class="pbody">
-        <p class="dlg-msg hint">{{ svc.newBlock() ? (svc.newBlock()! | translate) : ('hq.archive.slotFree' | translate) }}</p>
+        @if (svc.archived().length > 0) {
+          <p class="dlg-msg hint">{{ svc.newBlock() ? (svc.newBlock()! | translate) : ('hq.archive.slotFree' | translate) }}</p>
+        }
         @if (svc.archived().length === 0) {
           <p class="dlg-msg">{{ 'hq.archive.empty' | translate }}</p>
         } @else {
