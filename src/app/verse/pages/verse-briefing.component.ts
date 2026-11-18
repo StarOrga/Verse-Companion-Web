@@ -225,7 +225,7 @@ export function fitTitle(h: HTMLElement): boolean {
 /** The hub, and the header and search that build with it: not a toast or dialog elsewhere on the page. */
 function inEntrance(a: Animation): boolean {
   const target = a.effect instanceof KeyframeEffect ? a.effect.target : null;
-  return !!target?.closest('sc-verse-briefing, sc-main-header, sc-fusion-bar');
+  return !!target?.closest('sc-verse-briefing, sc-main-header, sc-fusion-bar, .sc-shell-scene .hqst');
 }
 
 /** Lets a finite animation that has not ended reach its end within `ms`. Endless ones run on. */
