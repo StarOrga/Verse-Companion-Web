@@ -121,6 +121,8 @@ export const NAV_STANDS_MS = 2300;
 export const NAV_SEARCH_K = 0.4565;
 /** Menu switch: the search ignites this long after the click (2.3 s * k). */
 export const NAV_SEARCH_AT_MS = 1050;
+/** Menu switch: the beacons (Patches' sun, the HQ link) and the scene's HQ outpost arrive this long after the click (briefing-beacons, .bstage.nav). */
+export const NAV_BEACONS_AT_MS = 1300;
 /** A mount later than this after the click is not shifted further (a cold chunk): the build plays from its start. */
 export const NAV_LAG_MAX_MS = 700;
 /** On the entrance the shell's search ignite runs at this pace (0.75 s * k open); its start is a beat of its own. */
@@ -586,6 +588,7 @@ export class VerseBriefingComponent {
     inject(DestroyRef).onDestroy(() => this.stopTracking?.());
 
     this.startCalm();
+    this.mirrorCalm();
     this.startNavIn();
     this.armStands();
     this.destroyRef.onDestroy(() => this.introTimers.forEach(clearTimeout));
@@ -804,7 +807,7 @@ export class VerseBriefingComponent {
     // (~0.45 s late, QA E4), so everything that would start later starts that much further in.
     const lag = this.navLag = Math.round(this.chrome.sinceNavStart(NAV_LAG_MAX_MS));
     this.navIn.set(true);
-    this.chrome.startHeroIntro(NAV_SEARCH_K, false, { searchAtMs: Math.max(0, NAV_SEARCH_AT_MS - lag) });
+    this.chrome.startHeroIntro(NAV_SEARCH_K, false, { searchAtMs: Math.max(0, NAV_SEARCH_AT_MS - lag), outpostAtMs: Math.max(0, NAV_BEACONS_AT_MS - lag) });
     if (lag > 0) this.alignNavBuild(inject<ElementRef<HTMLElement>>(ElementRef).nativeElement, lag);
     this.introTimers.push(setTimeout(() => {
       this.navIn.set(false);
@@ -897,6 +900,18 @@ export class VerseBriefingComponent {
       const state = this.api.digestState();
       if (this.api.digest() || state === 'ready' || state === 'error') untracked(show);
     }, { injector: this.injector });
+  }
+
+  /**
+   * The scene's HQ outpost fades in with the hub after a reload (#371): the shell announced the
+   * wait at boot, the hub's own calm takes it over - or drops it when this visit does not wait.
+   */
+  private mirrorCalm(): void {
+    effect(() => {
+      const calm = this.calm();
+      untracked(() => this.chrome.hubCalm.set(calm));
+    }, { injector: this.injector });
+    this.destroyRef.onDestroy(() => this.chrome.hubCalm.set(null));
   }
 
   /** Starts the entrance on a full visit (never under reduced motion); otherwise the final state shows at once. */

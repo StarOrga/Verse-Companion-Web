@@ -33,13 +33,18 @@ export interface HeroIntro {
   searchAtMs?: number;
   /** Start of the main header's entrance in ms; default 1.9 s * k. */
   headerAtMs?: number;
+  /**
+   * Menu switch: start of the scene's HQ outpost fade in ms, with the hub's beacons and
+   * Patches (#371). Unset = the outpost does not wait (the full entrance times it in CSS).
+   */
+  outpostAtMs?: number;
 }
 
 /**
  * The two start beats of an entrance, set apart instead of one shared factor: the full
  * entrance (rounds/05 d5-pb-main) puts the search at 3.5 s and the header after it at 4.3 s.
  */
-export type HeroIntroBeats = Pick<HeroIntro, 'searchAtMs' | 'headerAtMs'>;
+export type HeroIntroBeats = Pick<HeroIntro, 'searchAtMs' | 'headerAtMs' | 'outpostAtMs'>;
 
 /** CSS value of a beat, or null when the stylesheet's `k`-scaled default applies. */
 export function introBeatCss(ms: number | undefined): string | null {
@@ -186,6 +191,21 @@ export class ShellChromeService {
 
   /** The hub's running title sequence, or null (set by the hub, read by the bar and the main header). */
   readonly heroIntro = this.introState.asReadonly();
+
+  /**
+   * A reload of the hub (#371): it shows the stars first and fades in as one ('wait', then 'in').
+   * The scene's HQ outpost waits for it instead of standing there with the world. Announced by
+   * the shell at boot (the hub's chunk is still loading), mirrored by the hub once it runs.
+   */
+  readonly hubCalm = signal<'wait' | 'in' | null>(null);
+
+  /** A hub reload is ahead: the outpost waits; dropped by itself if no hub takes it over. */
+  holdHubCalm(): void {
+    this.hubCalm.set('wait');
+    setTimeout(() => {
+      if (this.hubCalm() === 'wait') this.hubCalm.set(null);
+    }, HERO_INTRO_HOLD_MAX_MS);
+  }
 
   /** The newest page header's crumbs + title, or null. */
   readonly crumbs = computed<ChromeCrumbs | null>(() => {
