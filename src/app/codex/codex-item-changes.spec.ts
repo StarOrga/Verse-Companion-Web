@@ -11,6 +11,33 @@ describe('diffItemPayloads', () => {
     expect(out[1]).toMatchObject({ labelKey: 'codex.detail.changes.stat.heatPerShot', from: 2, to: 3, tone: 'worse' });
   });
 
+  it('maps the armour, helmet and backpack keys the current codex build carries', () => {
+    const clothing = (min: number, max: number, g: number, rad: number) => ({
+      stats: {
+        SCItemClothingParams: {
+          TemperatureResistance: { MinResistance: min, MaxResistance: max },
+          Flight: { gForceResistance: g },
+          RadiationResistance: { MaximumRadiationCapacity: rad, RadiationDissipationRate: 1 },
+        },
+        SCItemSuitHelmetParams: { atmosphereCapacity: 10, dofBlurAmount: 1 },
+        ResourceContainer: { capacity: { microSCU: 1000 } },
+        SEntityPhysicsControllerParams: { PhysType: { Mass: 5, Damping: 1 } },
+      },
+      weaponParams: { heat: { coolingPerSecond: 10, overheatFixTime: 3, timeTillCoolingStarts: 1 } },
+    });
+    const before = clothing(-20, 40, 2, 100);
+    const after = { ...clothing(-30, 45, 2.5, 120) };
+    after.stats.SCItemSuitHelmetParams = { atmosphereCapacity: 12, dofBlurAmount: 2 };
+    after.stats.ResourceContainer = { capacity: { microSCU: 2000 } };
+    after.stats.SEntityPhysicsControllerParams = { PhysType: { Mass: 6, Damping: 2 } };
+    after.weaponParams.heat = { coolingPerSecond: 12, overheatFixTime: 4, timeTillCoolingStarts: 0.5 };
+    const byKey = new Map(diffItemPayloads(before, after).map((c) => [c.labelKey.split('.').pop(), c.tone]));
+    expect(Object.fromEntries(byKey)).toEqual({
+      coldResistance: 'better', heatResistance: 'better', gForceResistance: 'better', radiationCapacity: 'better',
+      atmosphereCapacity: 'better', capacity: 'better', mass: 'worse',
+      coolingPerSecond: 'better', overheatFix: 'worse', coolingDelay: 'better',
+    });
+  });
   it('drops keys that are not curated instead of showing their raw name', () => {
     const out = diffItemPayloads(
       { stats: { SomeParams: { zzzQuux: 1, internalTuning: 5, health: 10 } } },

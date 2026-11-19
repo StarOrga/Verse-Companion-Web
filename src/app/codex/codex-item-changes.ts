@@ -94,6 +94,18 @@ const STAT_MAP: Readonly<Record<string, StatDef>> = (() => {
     'inventorycapacity': { label: `${CH}capacity`, dir: 'up' },
     'temperaturemin': { label: `${CH}temperatureMin`, unit: '°C', dir: 'neutral' },
     'temperaturemax': { label: `${CH}temperatureMax`, unit: '°C', dir: 'neutral' },
+    // Weapon heat (weaponParams.heat) — keys as the current codex build carries them.
+    'heat.coolingpersecond': { label: `${CH}coolingPerSecond`, unit: '/s', dir: 'up' },
+    'heat.overheattemperature': { label: `${CH}overheatTemperature`, dir: 'up' },
+    'heat.timetillcoolingstarts': { label: `${CH}coolingDelay`, unit: 's', dir: 'down' },
+    // Armour, undersuits, helmets, backpacks (stats.SCItemClothingParams / SCItemSuitHelmetParams / ResourceContainer).
+    'temperatureresistance.minresistance': { label: `${CH}coldResistance`, unit: '°C', dir: 'down' },
+    'temperatureresistance.maxresistance': { label: `${CH}heatResistance`, unit: '°C', dir: 'up' },
+    'gforceresistance': { label: `${CH}gForceResistance`, dir: 'up' },
+    'radiationresistance.maximumradiationcapacity': { label: `${CH}radiationCapacity`, dir: 'up' },
+    'radiationresistance.radiationdissipationrate': { label: `${CH}radiationDissipation`, unit: '/s', dir: 'up' },
+    'atmospherecapacity': { label: `${CH}atmosphereCapacity`, dir: 'up' },
+    'capacity.microscu': { label: `${CH}capacity`, unit: 'µSCU', dir: 'up' },
   };
   // Damage a weapon deals per channel, and the damage armour lets through (a multiplier: lower is better).
   for (const ch of DAMAGE_CHANNELS) {

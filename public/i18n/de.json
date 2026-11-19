@@ -1831,7 +1831,16 @@
             "thermal": "Erlittener thermischer Schaden",
             "biochemical": "Erlittener biochemischer Schaden",
             "stun": "Erlittener Betäubungsschaden"
-          }
+          },
+          "coolingPerSecond": "Abkühlung",
+          "overheatTemperature": "Überhitzungsgrenze",
+          "coolingDelay": "Abkühlverzögerung",
+          "coldResistance": "Kälteschutz bis",
+          "heatResistance": "Hitzeschutz bis",
+          "gForceResistance": "G-Kraft-Widerstand",
+          "radiationCapacity": "Strahlungsaufnahme",
+          "radiationDissipation": "Strahlungsabbau",
+          "atmosphereCapacity": "Atemluftvorrat"
         }
       },
       "usedInBlueprints": "Verwendet in Blueprints",

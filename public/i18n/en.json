@@ -1831,7 +1831,16 @@
             "thermal": "Thermal damage taken",
             "biochemical": "Biochemical damage taken",
             "stun": "Stun damage taken"
-          }
+          },
+          "coolingPerSecond": "Cooling",
+          "overheatTemperature": "Overheat limit",
+          "coolingDelay": "Cooling delay",
+          "coldResistance": "Cold protection to",
+          "heatResistance": "Heat protection to",
+          "gForceResistance": "G-force resistance",
+          "radiationCapacity": "Radiation capacity",
+          "radiationDissipation": "Radiation dissipation",
+          "atmosphereCapacity": "Air supply"
         }
       },
       "usedInBlueprints": "Used in blueprints",
