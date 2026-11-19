@@ -350,6 +350,16 @@
         "hunks": [
           "d49afe7cb729"
         ]
+      },
+      {
+        "ship": "claude/data-uploader-extraction-spike-be3dcb",
+        "by": "JerryT2T",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-19T23:22:30.121Z",
+        "hunks": [
+          "c56f789fb4c6"
+        ]
       }
     ],
     ".claude/project-map.md›generated counts›value": [
