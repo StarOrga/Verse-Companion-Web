@@ -90,7 +90,7 @@ describe('search words for own data (A10)', () => {
   });
 
   it('A10: every own word alone is a chip with an empty term, so it lists exactly its set', () => {
-    for (const [text, key] of [['gemerkt', 'wished'], ['wunschliste', 'wished'], ['fehlt mir', 'needed'], ['needed', 'needed'], ['lager', 'ownOnly'], ['inventar', 'ownOnly']] as const) {
+    for (const [text, key] of [['gemerkt', 'wished'], ['wunschliste', 'wished'], ['wünsche', 'wished'], ['Wuensche', 'wished'], ['wunsch', 'wished'], ['wishes', 'wished'], ['fehlt mir', 'needed'], ['needed', 'needed'], ['lager', 'ownOnly'], ['inventar', 'ownOnly']] as const) {
       const p = parseQuery(text);
       expect(p.rest, text).toBe('');
       expect(p.chips.length, text).toBe(1);

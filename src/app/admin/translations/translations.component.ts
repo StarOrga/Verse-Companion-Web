@@ -1,3 +1,4 @@
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { toErrorKey } from '../../core/describe-error';
@@ -17,7 +18,7 @@ import {
   TranslationSettings,
   TranslationsService,
 } from './translations.service';
-import { canApprove, canCancel, jobErrorKey, judgeScore, spendPercent } from './translations.logic';
+import { canApprove, canCancel, jobErrorKey, jobNotes, jobProgress, judgeScore, spendPercent } from './translations.logic';
 
 type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary';
 
@@ -38,6 +39,7 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
     TranslationSourcesComponent,
     TranslationOutreachComponent,
     TranslationAlertsComponent,
+    ScActionDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -73,7 +75,7 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
     } @else if (loadError()) {
       <div class="sc-card state error" role="alert">
         <p>{{ loadError()! | translate }}</p>
-        <button type="button" class="sc-btn" (click)="load()">{{ 'admin.translations.retry' | translate }}</button>
+        <button type="button" scAction tier="secondary" (click)="load()">{{ 'admin.translations.retry' | translate }}</button>
       </div>
     } @else if (loading()) {
       <div class="sc-card state" role="status">{{ 'admin.translations.loading' | translate }}</div>
@@ -124,11 +126,11 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
               </span>
               <span class="grow"></span>
               @if (l.approved) {
-                <button type="button" class="sc-btn micro" [disabled]="busy()" (click)="startFull(l)">
+                <button type="button" scAction tier="secondary" [disabled]="busy()" (click)="startFull(l)">
                   {{ 'admin.translations.languages.fullRun' | translate }}
                 </button>
               }
-              <button type="button" class="sc-btn micro" [class.danger]="l.approved" [disabled]="busy()"
+              <button type="button" scAction tier="secondary" [tone]="l.approved ? 'danger' : 'default'" [disabled]="busy()"
                       (click)="toggleLanguage(l)">
                 {{ (l.approved ? 'admin.translations.languages.revoke' : 'admin.translations.languages.approve') | translate }}
               </button>
@@ -140,7 +142,7 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
       <section class="sc-card block">
         <div class="block-head">
           <h2>{{ 'admin.translations.jobs.title' | translate }}</h2>
-          <button type="button" class="sc-btn micro" (click)="reloadJobs()">{{ 'admin.translations.refresh' | translate }}</button>
+          <button type="button" scAction tier="secondary" (click)="reloadJobs()">{{ 'admin.translations.refresh' | translate }}</button>
         </div>
         @if (jobs().length === 0) {
           <p class="hint">{{ 'admin.translations.jobs.empty' | translate }}</p>
@@ -171,6 +173,12 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
                       <span class="pill" [class.ok]="j.status === 'published'" [class.bad]="j.status === 'failed'">
                         {{ 'admin.translations.jobs.status.' + j.status | translate }}
                       </span>
+                      @if (progress(j); as p) {
+                        <div class="progress-line">{{ 'admin.translations.jobs.progress' | translate: { pct: p.pct } }}</div>
+                      }
+                      @for (n of notes(j); track n.key) {
+                        <div class="progress-line">{{ n.key | translate: n.params }}</div>
+                      }
                       @if (errorKey(j); as ek) {
                         <div class="err-line">{{ ek | translate }}</div>
                       }
@@ -182,12 +190,12 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
                     <td>{{ j.created_at | scDate: 'datetime' }}</td>
                     <td class="actions">
                       @if (canApprove(j.status)) {
-                        <button type="button" class="sc-btn micro sc-btn-primary" [disabled]="busy()" (click)="approve(j)">
+                        <button type="button" scAction tier="secondary" [disabled]="busy()" (click)="approve(j)">
                           {{ 'admin.translations.jobs.approve' | translate }}
                         </button>
                       }
                       @if (canCancel(j.status)) {
-                        <button type="button" class="sc-btn micro danger" [disabled]="busy()" (click)="cancel(j)">
+                        <button type="button" scAction tier="secondary" tone="danger" [disabled]="busy()" (click)="cancel(j)">
                           {{ 'admin.translations.jobs.cancel' | translate }}
                         </button>
                       }
@@ -250,7 +258,7 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
       .jobs .num { text-align: end; font-variant-numeric: tabular-nums; }
       .jobs .actions { display: flex; gap: var(--sc-space-2); }
       .err-line { color: var(--sc-danger); font-size: 0.78rem; white-space: normal; max-width: 28ch; }
-      .sc-btn.danger { border-color: var(--sc-danger); color: var(--sc-danger); }
+      .progress-line { color: var(--sc-fg-2); font-size: 0.78rem; font-variant-numeric: tabular-nums; }
     `,
   ],
 })
@@ -276,6 +284,12 @@ export class AdminTranslationsComponent implements OnInit {
   readonly canApprove = canApprove;
   readonly canCancel = canCancel;
   readonly errorKey = (j: TranslationJob) => jobErrorKey(j.error);
+  readonly notes = (j: TranslationJob) => jobNotes(j.status, j.stats);
+  /** Wrapped in an object so that 0 % still renders. */
+  readonly progress = (j: TranslationJob) => {
+    const pct = jobProgress(j.status, j.stats);
+    return pct === null ? null : { pct };
+  };
   readonly score = (j: TranslationJob) => {
     const s = judgeScore(j.stats);
     return s === null ? null : s.toFixed(2);
@@ -367,7 +381,18 @@ export class AdminTranslationsComponent implements OnInit {
     });
   }
 
+  /** A full run is the one job that spends without a cap: its approval states the cost first. */
   async approve(j: TranslationJob): Promise<void> {
+    if (j.mode === 'full') {
+      const ok = await this.confirmSvc.confirm({
+        titleKey: 'admin.translations.fullRun.title',
+        messageKey: 'admin.translations.fullRun.text',
+        params: { lang: j.lang, usd: (j.estimate_usd ?? 0).toFixed(2), count: j.string_count ?? 0 },
+        confirmKey: 'admin.translations.fullRun.confirm',
+        tone: 'danger',
+      });
+      if (!ok) return;
+    }
     await this.run('approve', () => this.svc.approve(j.id), () => this.reloadJobs());
   }
 
@@ -382,31 +407,22 @@ export class AdminTranslationsComponent implements OnInit {
     await this.run('cancel', () => this.svc.cancel(j.id), () => this.reloadJobs());
   }
 
-  /** Full run for the current build: dry-run estimate → danger confirm → start (still needs approval). */
+  /**
+   * Full run for the current build. Ordering it costs nothing: the job estimates itself in the
+   * background (the whole gap of a language is too large for one request) and then waits in the list
+   * with its cost; the money question is asked when it is approved.
+   */
   async startFull(l: TranslationLanguage): Promise<void> {
     const build = this.builds()[0];
     if (!build) {
       this.flash.set({ kind: 'error', key: 'admin.translations.jobs.noBuild' });
       return;
     }
-    this.busy.set(true);
-    this.flash.set(null);
-    let estimate;
-    try {
-      estimate = await this.svc.estimateFull(build.id, l.lang);
-    } catch (e) {
-      const code = (e as { code?: string })?.code;
-      this.flash.set({ kind: 'error', key: (code ? jobErrorKey(code) : null) ?? toErrorKey('admin-translations', 'estimate', e) });
-      return;
-    } finally {
-      this.busy.set(false);
-    }
     const ok = await this.confirmSvc.confirm({
-      titleKey: 'admin.translations.fullRun.title',
-      messageKey: 'admin.translations.fullRun.text',
-      params: { lang: l.lang, usd: estimate.estimate_usd.toFixed(2), count: estimate.string_count },
-      confirmKey: 'admin.translations.fullRun.confirm',
-      tone: 'danger',
+      titleKey: 'admin.translations.fullRun.startTitle',
+      messageKey: 'admin.translations.fullRun.startText',
+      params: { lang: l.lang },
+      confirmKey: 'admin.translations.fullRun.startConfirm',
     });
     if (!ok) return;
     await this.run('start-full', () => this.svc.startFull(build.id, l.lang), () => this.reloadJobs());

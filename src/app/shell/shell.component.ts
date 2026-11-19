@@ -13,7 +13,9 @@ import {
   inject,
   signal,
   untracked,
+  viewChildren,
 } from '@angular/core';
+import { claimRootAttr, setRootVar } from '../core/root-var';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   NavigationCancel,
@@ -33,7 +35,10 @@ import { ViewAs } from '../auth/impersonation-policy';
 import { ProfileService } from '../auth/profile.service';
 import { VerseApiService } from '../verse/data/verse-api.service';
 import { KartographCrestComponent } from '../verse/starmap/kartograph-crest.component';
+import { rankProgressOf } from '../verse/starmap/starmap.model';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { ScPopupMotionDirective } from '../shared/popup-motion/sc-popup-motion.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import { AppsMenuComponent } from './apps-menu.component';
 import { HeaderPopoutService } from './header-popout.service';
 import { ScActionDirective } from '../shared/action/sc-action.directive';
@@ -75,7 +80,7 @@ import { avatarUrlOf } from './avatar-url';
 @Component({
   selector: 'sc-shell',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe, FooterComponent, QuickSearchComponent, VerseStatusChipComponent, FeedbackFabComponent, UserFeedbackFabComponent, StarToastComponent, UndoToastComponent, AccountNoticeComponent, CodexSearchBarComponent, FeedbackSpotsComponent, FeedbackCaptureComponent, BetaFabComponent, ViewToggleFabComponent, NgTemplateOutlet, FusionBarComponent, ShellSceneComponent, MainHeaderComponent, ScTooltipDirective, KartographCrestComponent, AppsMenuComponent, MerklisteComponent, ScActionDirective, WishCartDialogComponent, SlowNavigationComponent],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe, FooterComponent, QuickSearchComponent, VerseStatusChipComponent, FeedbackFabComponent, UserFeedbackFabComponent, StarToastComponent, UndoToastComponent, AccountNoticeComponent, CodexSearchBarComponent, FeedbackSpotsComponent, FeedbackCaptureComponent, BetaFabComponent, ViewToggleFabComponent, NgTemplateOutlet, FusionBarComponent, ShellSceneComponent, MainHeaderComponent, ScTooltipDirective, KartographCrestComponent, AppsMenuComponent, MerklisteComponent, ScActionDirective, WishCartDialogComponent, SlowNavigationComponent, ScPopupMotionDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[class.verse-overlay]': 'verseOverlay()',
@@ -89,14 +94,17 @@ import { avatarUrlOf } from './avatar-url';
   animations: [
     // A menu switch between two main pages (beta shell) holds the new page back
     // while the scene's camera travels (delay), then lets it rise in.
+    // Under the beta shell the reveal is opacity only: a transform on <main> (even mid-animation) makes it the
+    // containing block of every position: fixed child (section rail, HQ rail), which then jumps when it ends.
+    // The pages' own entrances (page-motion) carry the rise there.
     trigger('routeReveal', [
       transition(
         ':increment',
         [
-          style({ opacity: 0, transform: 'translateY({{rise}}px) scale(0.994)' }),
-          animate('{{dur}}ms {{delay}}ms cubic-bezier(0.2, 0.8, 0.2, 1)', style({ opacity: 1, transform: 'none' })),
+          style({ opacity: 0, transform: '{{from}}' }),
+          animate('{{dur}}ms {{delay}}ms cubic-bezier(0.2, 0.8, 0.2, 1)', style({ opacity: 1, transform: '{{to}}' })),
         ],
-        { params: { delay: 0, dur: 320, rise: 10 } },
+        { params: { delay: 0, dur: 320, from: 'translateY(10px) scale(0.994)', to: 'none' } },
       ),
     ]),
   ],
@@ -117,7 +125,7 @@ import { avatarUrlOf } from './avatar-url';
         routerLink="/verse"
         [attr.aria-label]="'nav.brandAria' | translate"
         (click)="onNavActivate($event, '/verse')">
-        <img class="logo" src="icons/brand/scc-mark.svg" alt="" width="36" height="36" />
+        <img class="logo" src="icons/brand/vc-mark.svg" alt="" width="36" height="36" />
         <span class="wordmark">
           <span class="title">{{ brandName }}</span>
           <span class="alpha-badge">{{ 'nav.phaseBadge' | translate }}</span>
@@ -174,7 +182,7 @@ import { avatarUrlOf } from './avatar-url';
           <a routerLink="/admin/translations" routerLinkActive="active" class="admin-link admin-inline">
             {{ 'nav.translations' | translate }}
           </a>
-          <!-- Between the phone layout and ~1180px the two admin entries fold
+          <!-- Between the phone layout and 1600px the admin entries fold
                into this one menu, so the header stays a single row (the CSS
                swaps .admin-inline for .admin-more). Red like the entries it
                holds - elevated access - and it says "Admin" in words too. -->
@@ -194,6 +202,9 @@ import { avatarUrlOf } from './avatar-url';
             @if (adminMenuOpen()) {
               <div class="dropdown admin-dropdown" role="menu" [attr.aria-label]="'nav.adminMenu' | translate"
                    (keydown)="onAdminMenuKeydown($event)">
+                <sc-popup kind="menu" access="admin" [backdrop]="false" initialFocus="container" [title]="'nav.adminMenu' | translate"
+                          (closed)="closeAdminMenu(true)">
+                <div class="dd-body">
                 <a class="dropdown-item elevated" role="menuitem" routerLink="/admin"
                    (click)="onAdminMenuNavigate($event)">
                   <span class="di-label">{{ 'nav.admin' | translate }}</span>
@@ -209,6 +220,8 @@ import { avatarUrlOf } from './avatar-url';
                   <span class="di-label">{{ 'nav.translations' | translate }}</span>
                   <span class="sc-sr-only">{{ 'nav.adminOnly' | translate }}</span>
                 </a>
+                </div>
+                </sc-popup>
               </div>
             }
           </div>
@@ -275,6 +288,7 @@ import { avatarUrlOf } from './avatar-url';
           <button
             type="button"
             class="avatar-btn"
+            [attr.data-feedback-name]="'nav.profilePicture' | translate"
             (click)="toggleMenu($event)"
             [attr.aria-label]="(requestCount() > 0 ? 'nav.accountMenuRequests' : 'nav.accountMenu') | translate: { count: requestCount() }"
             aria-haspopup="menu"
@@ -295,12 +309,15 @@ import { avatarUrlOf } from './avatar-url';
             <span class="avatar-crest" role="img"
                   [attr.aria-label]="'starmap.badge.caption' | translate: { rank: kr }"
                   [scTooltip]="'starmap.badge.caption' | translate: { rank: kr }" scTooltipTier="label">
-              <sc-kartograph-crest [rank]="kr" [size]="18" state="current" />
+              <sc-kartograph-crest [tier]="kr" [size]="18" state="current" />
             </span>
           }
 
-          @if (menuOpen()) {
-            <div class="dropdown" role="menu" (keydown)="onMenuKeydown($event)">
+          @if (menuShown()) {
+            <div class="dropdown" role="menu" scPopupMotion scPopupMotionItems=".dropdown-item" scPopupMotionOrigin="tr" (keydown)="onMenuKeydown($event)">
+              <sc-popup kind="menu" [backdrop]="false" initialFocus="container" [title]="'nav.accountMenu' | translate: { count: 0 }"
+                        (closed)="onMenuPopupClosed()">
+              <div class="dd-body">
               <div class="dropdown-header">
                 <div class="dh-id">
                   <span class="dh-name">{{ displayName() }}</span>
@@ -427,6 +444,8 @@ import { avatarUrlOf } from './avatar-url';
                   {{ 'nav.viewAs.exit' | translate }}
                 </button>
               }
+              </div>
+              </sc-popup>
             </div>
           }
         </div>
@@ -642,9 +661,8 @@ import { avatarUrlOf } from './avatar-url';
       max-width: calc(100vw - 2 * var(--sc-fab-clear-inline));
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       padding: 4px 14px; border-radius: 999px;
-      background: color-mix(in srgb, var(--sc-bg-2) 88%, transparent);
+      background: color-mix(in srgb, var(--sc-bg-2) 93%, transparent);
       border: 1px solid color-mix(in srgb, var(--sc-accent) 40%, transparent);
-      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
       font-family: var(--sc-font-display); font-size: max(0.62rem, var(--sc-fs-floor)); letter-spacing: 0.16em;
       text-transform: uppercase; color: var(--sc-accent);
       animation: sc-reveal-in 0.3s ease both;
@@ -658,7 +676,7 @@ import { avatarUrlOf } from './avatar-url';
       &:hover { color: var(--sc-accent-hot); background: rgba(255, 87, 34, 0.1); }
       &.active { color: var(--sc-accent-hot); box-shadow: inset 0 -2px 0 var(--sc-accent-hot); }
     }
-    /* The folded admin menu - only between the phone layout and ~1180px. */
+    /* The folded admin menu - only between the phone layout and 1600px. */
     .admin-more { display: none; position: relative; }
     .admin-more-btn {
       display: inline-flex; align-items: center; gap: 4px;
@@ -668,11 +686,11 @@ import { avatarUrlOf } from './avatar-url';
       transition: all 0.18s ease;
     }
     .admin-more-btn:hover { background: rgba(255, 87, 34, 0.1); }
-    .admin-more-btn:focus-visible { outline: 2px solid var(--sc-accent-hot); outline-offset: 1px; }
+    .admin-more-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-hot); }
     .admin-more-btn.active { box-shadow: inset 0 -2px 0 var(--sc-accent-hot); }
     .admin-more-btn .caret { width: 14px; height: 14px; transition: transform 0.16s; }
     .admin-more-btn[aria-expanded='true'] .caret { transform: rotate(180deg); }
-    .admin-dropdown { left: 0; right: auto; width: min(var(--sc-ov-menu), calc(100vw - 32px)); }
+    .admin-dropdown { left: 0; right: auto; }
     .actions {
       display: flex;
       gap: 8px;
@@ -680,7 +698,9 @@ import { avatarUrlOf } from './avatar-url';
       flex: 1 1 0;
       justify-content: flex-end;
     }
-    .profile-menu { position: relative; }
+    /* Flex, not block: a block would set the inline-flex avatar on a text line, whose
+       descender gap made the box ~45px and lifted the avatar 2–3px above apps and wishlist. */
+    .profile-menu { position: relative; display: flex; }
     .avatar-crest { position: absolute; right: -6px; bottom: -6px; z-index: 1; display: inline-flex; line-height: 0; }
     .avatar-btn {
       display: inline-flex;
@@ -710,20 +730,9 @@ import { avatarUrlOf } from './avatar-url';
       box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.35);
     }
 
-    .dropdown {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      width: min(var(--sc-ov-menu), calc(100vw - 32px));
-      display: flex;
-      flex-direction: column;
-      padding: 6px;
-      background: linear-gradient(180deg, var(--sc-bg-2), var(--sc-bg-1));
-      border: 1px solid var(--sc-border);
-      border-radius: 8px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), var(--sc-glow);
-      z-index: 30;
-    }
+    /* Position at the trigger only: frame, width, rail and role edge come from <sc-popup kind="menu">. */
+    .dropdown { position: absolute; top: calc(100% + 8px); right: 0; z-index: 30; }
+    .dd-body { display: flex; flex-direction: column; }
     .dropdown-header {
       display: flex;
       align-items: center;
@@ -847,7 +856,9 @@ import { avatarUrlOf } from './avatar-url';
        integrations / view-as). Plain <hr>, matching .dropdown-sep's border
        tone rather than a browser-default rule. */
     .menu-sep {
-      width: 100%;
+      /* Stretched by the flex column, never width: 100% — with the 2px side margins that
+         overflowed the menu by 4px and gave it a horizontal scrollbar. */
+      align-self: stretch;
       margin: 6px 2px 4px;
       border: 0;
       border-top: 1px solid var(--sc-border);
@@ -985,7 +996,10 @@ import { avatarUrlOf } from './avatar-url';
          <1380  tighter gaps, nav padding and wordmark tracking; the flanks
                 stop sharing the leftover evenly (that centring is what broke
                 the wordmark), the nav takes the space between them;
-         <1180  the two admin entries fold into the red "Admin" menu;
+         <1600  the admin entries (three since telemetry and translations)
+                fold into the red "Admin" menu - inline they need ~430px and
+                pushed the header 60px past a 1280px window and the actions
+                onto a second row at 1440px;
          <1000  the wordmark gives way to logo + badge, as on a phone;
          <820   too narrow for one row: the nav takes a row of its own, as on
                 a phone (the header scrolls away here, so the row is cheap). */
@@ -997,7 +1011,7 @@ import { avatarUrlOf } from './avatar-url';
       .nav > a { padding: 8px 9px; letter-spacing: 0.06em; white-space: nowrap; }
       .actions { flex: 0 0 auto; }
     }
-    @media (min-width: 721px) and (max-width: 1179px) {
+    @media (min-width: 721px) and (max-width: 1599px) {
       .nav > a.admin-inline { display: none; }
       .admin-more { display: block; }
     }
@@ -1073,8 +1087,8 @@ export class ShellComponent implements AfterViewInit {
   private readonly verseApi = inject(VerseApiService);
   /** Kartograph rank for the avatar's corner crest; null until a rank exists (or the star-map state is not loaded). */
   readonly kartographRank = computed<number | null>(() => {
-    const k = this.verseApi.explorer()?.kartograph;
-    return k?.unlocked && k.rank >= 1 ? k.rank : null;
+    const tier = rankProgressOf(this.verseApi.explorer()).tier;
+    return tier >= 1 ? tier : null;
   });
   /** Signed in under the beta shell → load the star-map state once, so the crest shows on every page. */
   private readonly crestLoad = effect(() => {
@@ -1100,8 +1114,12 @@ export class ShellComponent implements AfterViewInit {
   /** The Admin hub, the first red entry of the account menu. */
   protected readonly adminHub = ADMIN_HUB;
   readonly menuOpen = signal(false);
+  /** The profile menu stays mounted while its close (the open reversed in 60 %) plays. */
+  readonly menuShown = signal(false);
+  private readonly menuMotions = viewChildren(ScPopupMotionDirective);
+  private menuHideTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly popouts = inject(HeaderPopoutService);
-  /** The folded admin menu (721-1179px). */
+  /** The folded admin menu (721-1599px). */
   readonly adminMenuOpen = signal(false);
   /** On /admin or /admin/telemetry - the folded menu's button carries the active mark. */
   readonly adminRoute = signal(isAdminNavRoute(this.router.url));
@@ -1156,6 +1174,24 @@ export class ShellComponent implements AfterViewInit {
   private topbarHeightPx: number | null = null;
 
   constructor() {
+    // The layout on <html> too: global rules read html[data-sc-layout], never html:has([data-layout]).
+    effect(() => claimRootAttr('data-sc-layout', this, this.shellOn() ? this.layout.layout() : null));
+    inject(DestroyRef).onDestroy(() => claimRootAttr('data-sc-layout', this, null));
+    // Profile menu: mount on open, keep it until its reversed close has played.
+    effect(() => {
+      const open = this.menuOpen();
+      untracked(() => {
+        if (this.menuHideTimer !== null) { clearTimeout(this.menuHideTimer); this.menuHideTimer = null; }
+        if (open) {
+          if (this.menuShown()) this.menuMotions().forEach((m) => m.restart());
+          else this.menuShown.set(true);
+        } else if (this.menuShown()) {
+          const exits = this.menuMotions().map((m) => m.exit());
+          if (exits.length === 0) { this.menuShown.set(false); return; }
+          void Promise.all(exits).then(() => { if (!this.menuOpen()) this.menuShown.set(false); });
+        }
+      });
+    });
     // Another header popout (wishlist / apps) took the slot: the profile menu folds away.
     effect(() => {
       if (this.popouts.active() !== 'profile' && untracked(() => this.menuOpen())) this.menuOpen.set(false);
@@ -1244,7 +1280,7 @@ export class ShellComponent implements AfterViewInit {
     const px = parked ? Math.round(bar.getBoundingClientRect().height) : 0;
     if (px === this.topbarHeightPx) return;
     this.topbarHeightPx = px;
-    document.documentElement.style.setProperty('--sc-topbar-h', `${px}px`);
+    setRootVar('--sc-topbar-h', `${px}px`);
   }
 
   private stopTopbarProbe(): void {
@@ -1299,7 +1335,7 @@ export class ShellComponent implements AfterViewInit {
       this.switchInTimer = setTimeout(() => this.switchingIn.set(false), REVEAL_SWITCH.delay + REVEAL_SWITCH.dur);
       return;
     }
-    this.revealParams.set(REVEAL_PLAIN);
+    this.revealParams.set(this.shellOn() ? REVEAL_FRAME : REVEAL_PLAIN);
     this.reveal.update((n) => n + 1);
   }
 
@@ -1471,6 +1507,19 @@ export class ShellComponent implements AfterViewInit {
     }
   }
 
+  /**
+   * Escape inside the menu's frame never reaches `document` (`[scDialog]` stops it), so the
+   * scaffold's `closed` event folds the menu away and gives focus back to its avatar button.
+   */
+  onMenuPopupClosed() {
+    // Two account menus can be mounted (header + bar): the one holding focus is the one that closed.
+    const root = this.host.nativeElement as HTMLElement;
+    const holder = (document.activeElement as HTMLElement | null)?.closest('.profile-menu') ?? root.querySelector('.profile-menu');
+    const trigger = holder?.querySelector<HTMLElement>('.avatar-btn');
+    this.closeMenu();
+    trigger?.focus({ preventScroll: true });
+  }
+
   @HostListener('document:keydown.escape')
   onEscape() {
     if (this.menuOpen()) this.closeMenu();
@@ -1535,15 +1584,19 @@ export function isAdminNavRoute(url: string): boolean {
   return path === '/admin' || path === '/admin/hub' || path === '/admin/telemetry' || path.startsWith('/admin/telemetry/');
 }
 
-interface RevealParams {
+export interface RevealParams {
   delay: number;
   dur: number;
-  rise: number;
+  /** Start / end transform of <main>; `none` → `none` animates opacity alone. */
+  from: string;
+  to: string;
 }
-/** Reveal of an ordinary navigation. */
-const REVEAL_PLAIN: RevealParams = { delay: 0, dur: 320, rise: 10 };
-/** Reveal after a menu switch: held while the camera travels, then a longer rise. */
-const REVEAL_SWITCH: RevealParams = { delay: 420, dur: 520, rise: 22 };
+/** Reveal of an ordinary navigation (classic shell). */
+export const REVEAL_PLAIN: RevealParams = { delay: 0, dur: 320, from: 'translateY(10px) scale(0.994)', to: 'none' };
+/** Beta shell: no transform on <main>, so a fixed child (rail) never takes it as its containing block. */
+export const REVEAL_FRAME: RevealParams = { delay: 0, dur: 320, from: 'none', to: 'none' };
+/** Length of the menu-switch phase (`.switch-in` on <main>). */
+const REVEAL_SWITCH = { delay: 420, dur: 520 };
 
 /** True on exactly `/verse` (query and fragment ignored) — not on its sub-pages. */
 export function isVerseHome(url: string): boolean {

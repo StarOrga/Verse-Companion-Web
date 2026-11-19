@@ -10,6 +10,7 @@ import { ImpersonationService } from './impersonation.service';
 import { LoginComponent } from './login.component';
 import { SupabaseClientProvider } from '../core/supabase.client';
 import { ViewAs } from './impersonation-policy';
+import { VerseBodiesService } from '../verse/pages/briefing/bodies/body.directive';
 
 /**
  * Defect B regression: while previewing as the signed-out visitor,
@@ -17,8 +18,9 @@ import { ViewAs } from './impersonation-policy';
  * `authGuard` bounces every route back to `/login?redirect=…` even after a
  * REAL, successful sign-in — the credential paths must refuse instead of
  * silently looping. The banner/menu "Exit" control already reaches this
- * page (mounted app-level), so the fix here is only: (1) don't attempt the
- * sign-in, (2) explain why, (3) offer `leavePreview()` as a shortcut.
+ * page (mounted app-level) and stays the only exit (batch #6: no second
+ * exit box inside the form), so the fix here is only: (1) don't attempt the
+ * sign-in, (2) explain why.
  */
 describe('LoginComponent — signed-out preview lock', () => {
   let signInWithPassword: Mock;
@@ -39,9 +41,10 @@ describe('LoginComponent — signed-out preview lock', () => {
         provideRouter([]),
         { provide: AccessRequestService, useValue: { submit: () => Promise.resolve({ kind: 'ok' }) } },
         { provide: AuthService, useValue: { ready: () => false, realUser: () => null, signInWithPassword, signInWithGoogle, signInWithDiscord } },
-        { provide: AnalyticsService, useValue: { capture: () => {} } },
+        { provide: AnalyticsService, useValue: { track: () => {} } },
         { provide: SupabaseClientProvider, useValue: { client: {} } },
         { provide: ImpersonationService, useValue: { viewAs: () => viewAs, exit } },
+        { provide: VerseBodiesService, useValue: { attach: () => () => undefined } },
       ],
     });
     const fixture = TestBed.createComponent(LoginComponent);
@@ -57,7 +60,9 @@ describe('LoginComponent — signed-out preview lock', () => {
     expect(el.querySelector('h1')).toBeTruthy();
     expect(el.querySelector('form')).toBeTruthy();
     expect(el.querySelector('input[type="email"]')).toBeTruthy();
-    expect(el.querySelector('.notice.preview-locked')).toBeTruthy();
+    // The banner on top is the exit: no inline preview box (batch #6, B3.5).
+    expect(el.querySelector('.notice.preview-locked')).toBeNull();
+    expect(el.textContent).not.toContain('auth.previewLocked.exit');
   });
 
   it('refuses onSubmit(), never calls signInWithPassword, and surfaces the notice', async () => {
@@ -70,8 +75,9 @@ describe('LoginComponent — signed-out preview lock', () => {
     fixture.detectChanges();
 
     expect(signInWithPassword).not.toHaveBeenCalled();
-    expect(comp.errorMsg()).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('.notice.preview-locked')).toBeTruthy();
+    expect(comp.errorMsg()).toBe('auth.previewLocked.body');
+    expect(fixture.nativeElement.querySelector('.err')?.textContent).toContain('auth.previewLocked.body');
+    expect(exit).not.toHaveBeenCalled();
   });
 
   it('refuses signInWithGoogle() while previewing as anon', async () => {
@@ -113,12 +119,24 @@ describe('LoginComponent — signed-out preview lock', () => {
     expect(fixture.nativeElement.querySelectorAll('button.oauth').length).toBe(2);
   });
 
-  it('leavePreview() calls ImpersonationService.exit()', () => {
+  it('keeps the sign-in submit the one primary step in the preview too (B3.5)', () => {
     viewAs = 'anon';
     const fixture = setup();
-    fixture.componentInstance.leavePreview();
-    expect(exit).toHaveBeenCalledTimes(1);
+    fixture.detectChanges();
+    const primaries = fixture.nativeElement.querySelectorAll('.sc-action--primary');
+    expect(primaries.length).toBe(1);
+    expect((primaries[0] as HTMLElement).getAttribute('type')).toBe('submit');
   });
+
+  it('makes the sign-in submit the primary step outside a preview (#970)', () => {
+    viewAs = null;
+    const fixture = setup();
+    fixture.detectChanges();
+    const primaries = fixture.nativeElement.querySelectorAll('.sc-action--primary');
+    expect(primaries.length).toBe(1);
+    expect((primaries[0] as HTMLElement).getAttribute('type')).toBe('submit');
+  });
+
 
   it('does not block sign-in for non-anon previews (viewer/collaborator never shadow auth)', async () => {
     viewAs = 'viewer';

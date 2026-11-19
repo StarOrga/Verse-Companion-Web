@@ -42,6 +42,9 @@ const SC_TOOLTIP_MOVE_TOLERANCE = 8;
 @Injectable({ providedIn: 'root' })
 export class ScTooltipState {
   lastCloseAt = 0;
+  /** Every live tooltip host, so a host can tell whether the pointer sits on
+   *  a tooltip host nested inside it (a stat chip inside a slot card). */
+  readonly hosts = new WeakMap<Element, ScTooltipDirective>();
 }
 
 /** Best-effort `:focus-visible` equivalent, tracked ourselves (rather than
@@ -90,6 +93,9 @@ const POSITIONS: ConnectedPosition[] = [
   { originX: 'end', originY: 'center', overlayX: 'start', overlayY: 'center', offsetX: 8 },
 ];
 
+/** Over the host's bottom caption line: the bubble's bottom edge sits just below the host. */
+const CAPTION_POSITION: ConnectedPosition = { originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'bottom', offsetY: 10 };
+
 /**
  * App-styled replacement for the native `title` attribute (ui-defaults.md
  * R0/R1): a CDK-overlay-portaled bubble (`sc-tooltip-bubble`), with
@@ -108,12 +114,25 @@ export class ScTooltipDirective implements OnDestroy {
   readonly scTooltip = input<string | null | undefined>(null);
   readonly scTooltipTier = input<'info' | 'label'>('info');
   readonly scTooltipDisabled = input(false);
+  /**
+   * Preferred side; the others stay as fallbacks. `below` for a host whose label sits right above it;
+   * `caption` lays the bubble over the host's own bottom caption (a tile whose cut name it spells out),
+   * so it covers neither the heading above nor the control below.
+   */
+  readonly scTooltipPlacement = input<'above' | 'below' | 'caption'>('above');
 
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly overlay = inject(Overlay);
   private readonly state = inject(ScTooltipState);
 
   private overlayRef: OverlayRef | null = null;
+
+  private positions(): ConnectedPosition[] {
+    const placement = this.scTooltipPlacement();
+    if (placement === 'below') return [POSITIONS[1], POSITIONS[0], POSITIONS[2], POSITIONS[3]];
+    if (placement === 'caption') return [CAPTION_POSITION, ...POSITIONS];
+    return POSITIONS;
+  }
   private bubble: ComponentRef<ScTooltipComponent> | null = null;
 
   private openTimer: ReturnType<typeof setTimeout> | null = null;
@@ -125,6 +144,10 @@ export class ScTooltipDirective implements OnDestroy {
   private suppressNextClick = false;
 
   private hoveringHost = false;
+  /** The pointer is over a nested tooltip host inside this one — the inner
+   *  tooltip speaks, this one stays shut (one tooltip at a time, never a
+   *  tooltip stacked over another). */
+  private coveredByInner = false;
   private hoveringBubble = false;
   private focusedOpen = false;
 
@@ -132,6 +155,7 @@ export class ScTooltipDirective implements OnDestroy {
 
   constructor() {
     installModalityListeners();
+    this.state.hosts.set(this.host.nativeElement, this);
     // A tooltip that is open while its text changes (★ pin → "pinned") says
     // the new text, instead of the one it opened with; an emptied text closes it.
     effect(() => {
@@ -145,6 +169,7 @@ export class ScTooltipDirective implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.state.hosts.delete(this.host.nativeElement);
     this.clearAllTimers();
     this.disposeOverlay();
     if (this.isTouchOpen) document.removeEventListener('pointerdown', this.onDocumentPointerDown, true);
@@ -157,13 +182,47 @@ export class ScTooltipDirective implements OnDestroy {
     if (ev.pointerType === 'touch') return;
     this.hoveringHost = true;
     this.cancelCloseTimer();
-    this.scheduleOpen();
+    if (!this.coveredByInner) this.scheduleOpen();
+  }
+
+  // pointerover bubbles and fires (before pointerenter) on every element the
+  // pointer moves onto: it tells whether the pointer is on this host's own
+  // area or on a nested tooltip host, whose tooltip then wins.
+  @HostListener('pointerover', ['$event'])
+  onPointerOver(ev: PointerEvent): void {
+    if (ev.pointerType === 'touch') return;
+    const covered = this.innerHostAt(ev.target);
+    if (covered === this.coveredByInner) return;
+    this.coveredByInner = covered;
+    if (covered) {
+      this.cancelOpenTimer();
+      if (!this.focusedOpen) this.close();
+    } else if (this.hoveringHost) {
+      this.scheduleOpen();
+    }
+  }
+
+  /** Whether `target` lies inside a nested host whose tooltip would show. */
+  private innerHostAt(target: EventTarget | null): boolean {
+    const own: HTMLElement = this.host.nativeElement;
+    let el = target instanceof Element ? target : null;
+    while (el && el !== own) {
+      if (this.state.hosts.get(el)?.canShow()) return true;
+      el = el.parentElement;
+    }
+    return false;
+  }
+
+  /** Has something to say right now (text set, not disabled). */
+  canShow(): boolean {
+    return !!this.scTooltip() && !this.scTooltipDisabled();
   }
 
   @HostListener('pointerleave', ['$event'])
   onPointerLeave(ev: PointerEvent): void {
     if (ev.pointerType === 'touch') return;
     this.hoveringHost = false;
+    this.coveredByInner = false;
     this.cancelOpenTimer();
     this.scheduleCloseIfIdle();
   }
@@ -285,7 +344,7 @@ export class ScTooltipDirective implements OnDestroy {
       positionStrategy: this.overlay
         .position()
         .flexibleConnectedTo(this.anchorElement())
-        .withPositions(POSITIONS)
+        .withPositions(this.positions())
         .withPush(true),
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
       panelClass: 'sc-tooltip-panel',

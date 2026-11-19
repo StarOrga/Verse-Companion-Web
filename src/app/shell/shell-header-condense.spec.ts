@@ -144,6 +144,19 @@ describe('ShellComponent condensed header', () => {
     expect(document.activeElement).toBe(button());
   }));
 
+  it('Escape pressed on an entry (the scaffold frame consumes it) closes the menu and returns focus to its button', fakeAsync(() => {
+    setup(true);
+    button().click();
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+    items()[0].focus();
+    items()[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    fixture.detectChanges();
+    expect(el.querySelector('.admin-dropdown')).toBeNull();
+    expect(document.activeElement).toBe(button());
+  }));
+
   it('a plain click on an entry folds it away; a modified click opens a tab and leaves it open', () => {
     setup(true);
     button().click();
@@ -167,9 +180,9 @@ describe('ShellComponent condensed header', () => {
     expect(fixture.componentInstance.menuOpen()).toBe(true);
   });
 
-  it('between the phone layout and 1180px the inline admin entries give way to the menu', ({ skip }) => {
+  it('between the phone layout and 1600px the inline admin entries give way to the menu', ({ skip }) => {
     setup(true);
-    if (!matchMedia('(min-width: 721px) and (max-width: 1179px)').matches) {
+    if (!matchMedia('(min-width: 721px) and (max-width: 1599px)').matches) {
       skip('the window is outside the folded range');
       return;
     }

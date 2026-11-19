@@ -47,8 +47,10 @@ export const LOG_VISIBLE = 3;
             <span class="ico" aria-hidden="true">{{ l.kind === 'reserve' ? '⧉' : '−' }}</span>
             <b class="d mono">{{ qtyText(l) }}</b>
             <span class="nm">{{ l.name }}</span>
-            <small class="pl">{{ l.place }}</small>
-            <small class="at">{{ l.at | scDate: 'datetime' }}</small>
+            <span class="meta">
+              <small class="pl">{{ l.place }}</small>
+              <small class="at">{{ l.at | scDate: 'datetime' }}</small>
+            </span>
             @if (l.kind === 'out') {
               <button type="button" scAction tier="tertiary" class="again" [attr.aria-label]="'hq.bestand.catchUpOne' | translate: { name: l.name }"
                       [scTooltip]="'hq.bestand.catchUpOne' | translate: { name: l.name }" scTooltipTier="label" (click)="wishOne.emit(l)">
@@ -81,18 +83,19 @@ export const LOG_VISIBLE = 3;
       .flt b { color: var(--sc-accent); }
       .flt svg { width: 13px; height: 13px; flex: none; fill: none; stroke: var(--sc-accent); stroke-width: 1.8; stroke-linejoin: round; }
       .lines { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
-      .lines li { display: grid; grid-template-columns: 1.1rem auto 1fr auto; grid-template-areas: 'i d n b' 'i p p at'; column-gap: 6px; align-items: center; padding: 4px 0; border-bottom: 1px dashed var(--sc-border); font-size: 0.75rem; }
+      .lines li { display: grid; grid-template-columns: 1.1rem auto 1fr auto; grid-template-areas: 'i d n b' 'i m m m'; column-gap: 6px; align-items: center; padding: 4px 0; border-bottom: 1px dashed var(--sc-border); font-size: 0.75rem; }
       .ico { grid-area: i; color: var(--sc-warning); font-weight: 700; text-align: center; }
       .res .ico, .res .d { color: var(--sc-accent); }
       .d { grid-area: d; color: var(--sc-warning); }
       .nm { grid-area: n; min-width: 0; overflow-wrap: anywhere; }
-      .pl { grid-area: p; color: var(--sc-fg-2); font-size: 0.68rem; }
-      .at { grid-area: at; color: var(--sc-fg-2); font-size: 0.68rem; white-space: nowrap; }
+      .meta { grid-area: m; display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 8px; min-width: 0; }
+      .pl { min-width: 0; color: var(--sc-fg-2); font-size: 0.68rem; overflow-wrap: anywhere; }
+      .at { margin-inline-start: auto; color: var(--sc-fg-2); font-size: 0.68rem; white-space: nowrap; }
       .again { grid-area: b; }
       .again svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
       .foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
       .more { min-height: 30px; padding: 0; border: 0; background: none; color: var(--sc-accent); font: inherit; font-size: 0.75rem; cursor: pointer; }
-      .more:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .more:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .none { margin: 0; color: var(--sc-fg-2); font-size: 0.75rem; }
       @media (pointer: coarse) { .more { min-height: 48px; } }
     `,

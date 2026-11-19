@@ -45,6 +45,7 @@ import {
   resourceKey,
   tractorBeamKey,
 } from './codex.types';
+import { isMissileRow, readCombatMetrics } from './codex-missile';
 
 /** How the UI renders a raw stat value (source units documented per case). */
 export type EquippedStatFormat =
@@ -79,6 +80,57 @@ export interface EquippedStat {
    * not the mass it can lift.
    */
   hintKey?: string;
+}
+
+/**
+ * Stat formats whose value does NOT add up across identical units — a reach,
+ * a speed, a duration, an angle, a ratio, a size class. Two SureGrips do not
+ * reach 300 m (feedback #233), where three Panthers do deal 3× the alpha.
+ */
+const PER_UNIT_FORMATS: ReadonlySet<EquippedStatFormat> = new Set<EquippedStatFormat>([
+  'seconds',
+  'metres',
+  'metresDec',
+  'mps',
+  'gm',
+  'kms',
+  'size',
+  'percent',
+  'degrees',
+]);
+
+/**
+ * Counted stats that are still a property of ONE unit, not an amount the run
+ * pools: three Panthers each fire 600 rpm (they do not fire "3× 600"), a flare
+ * keeps its own signature, a tractor beam pulls its own target.
+ */
+const PER_UNIT_LABELS: ReadonlySet<string> = new Set([
+  'codex.equipped.fireRate',
+  'codex.equipped.cmInfrared',
+  'codex.equipped.cmElectromagnetic',
+  'codex.equipped.cmCrossSection',
+  'codex.equipped.tractorForce',
+  'codex.equipped.radarSensitivity',
+]);
+
+/**
+ * Whether a stat is an AMOUNT that adds up across a stacked run (damage, HP,
+ * output, draw) — only those carry the "3×" reminder on a collapsed row and
+ * are summed into its "Gesamt" figure. Everything else (range, speed, fire
+ * rate, timings) is the same for every unit and reads once, unprefixed
+ * (feedback #351: "Reichweite braucht da nicht 3× 1924 m").
+ */
+export function statAddsUp(stat: Pick<EquippedStat, 'labelKey' | 'format'>): boolean {
+  return !PER_UNIT_FORMATS.has(stat.format) && !PER_UNIT_LABELS.has(stat.labelKey);
+}
+
+/**
+ * Identity of a stat run for stacking: two units only fold into one row when
+ * every curated value matches — "2× 1000 m + 1× 1200 m" are two different
+ * items and must keep their own rows (feedback #351).
+ */
+export function statsFingerprint(stats: readonly EquippedStat[] | null | undefined): string {
+  return (stats ?? []).map((s) => `${s.labelKey}=${s.value}`).join(';');
 }
 
 /**
@@ -664,6 +716,23 @@ function componentStats(kind: string, payload: unknown): EquippedStat[] {
   return out;
 }
 
+/**
+ * A missile, torpedo or rocket on a rack (feedback #331): the warhead leads —
+ * it is the row's headline figure — then reach, speed and lock time, read from
+ * `stats.SCItemMissileParams` exactly as the missile's own page reads them. A
+ * build uploaded before items revision 5 carries none of these, so the row
+ * stays bare instead of printing zeros.
+ */
+function missileStats(payload: unknown): EquippedStat[] {
+  const m = readCombatMetrics(payload);
+  const out: EquippedStat[] = [];
+  push(out, 'codex.missile.stat.damage', m.damage ?? null, 'int');
+  push(out, 'codex.missile.stat.range', m.range ?? null, 'metres');
+  push(out, 'codex.missile.stat.speed', m.speed ?? null, 'mps');
+  push(out, 'codex.missile.stat.lockTime', m.lockTime ?? null, 'seconds');
+  return out;
+}
+
 /** How many stats a single hardpoint row shows before it hurts readability. */
 export const MAX_STATS_PER_SLOT = 6;
 
@@ -696,6 +765,8 @@ export function equippedStats(item: EquippedItem, limit = MAX_STATS_PER_SLOT): E
     rows = weaponStats(payload, ammoPayload);
   } else if (entityKind === 'component') {
     rows = componentStats((payload as { kind?: string }).kind ?? '', payload);
+  } else if (isMissileRow({ attach_type: (payload as { attachType?: unknown }).attachType })) {
+    rows = missileStats(payload);
   } else {
     // Plain items (controllers, seats, racks…) carry no performance stats.
     rows = [];
@@ -853,7 +924,7 @@ export interface GroupableSlot {
   /**
    * Opt this hardpoint OUT of collapsing entirely — it stands for one decision
    * a pilot makes individually (a shield bay, a countermeasure launcher, an
-   * unfitted mount). Set by the ship page; see `isIndividualSection`.
+   * unfitted mount). Set by the ship page for unfitted configurable ports.
    */
   noCollapse?: boolean;
   /**

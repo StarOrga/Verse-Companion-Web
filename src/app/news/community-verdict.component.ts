@@ -7,6 +7,7 @@ import {
   BUILD_VOTE_DAILY_CAP, CommunityCorrection, MIN_EFFECTIVE_VOTES, StabilityWord, VOTE_CHANGE_HOURS, VOTE_MIN_ACCOUNT_DAYS, VoteAggregate,
 } from './patch-stability';
 import { CastResult, PatchStabilityVotesService } from './patch-stability-votes.service';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 const WORDS: readonly StabilityWord[] = ['stabil', 'wackelig', 'instabil'];
 
@@ -54,14 +55,14 @@ export interface VoteSource {
 @Component({
   selector: 'sc-community-verdict',
   standalone: true,
-  imports: [TranslatePipe, RouterLink],
+  imports: [TranslatePipe, RouterLink, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="cv" [attr.aria-label]="'stability.vote.title' | translate">
       @if (src().error() && !src().aggregate()) {
         <div class="state" role="alert">
           <p>{{ src().error() ?? 'errors.generic' | translate }}</p>
-          <button type="button" class="sc-btn" (click)="retry()">{{ 'errors.retry' | translate }}</button>
+          <button type="button" scAction tier="secondary" (click)="retry()">{{ 'errors.retry' | translate }}</button>
         </div>
       } @else if (!src().aggregate()) {
         <p class="state muted">{{ 'stability.vote.loading' | translate }}</p>
@@ -188,7 +189,7 @@ export interface VoteSource {
     .vb[data-word='stabil'] b { color: var(--sc-success); }
     .vb[data-word='wackelig'] b, .vb[data-word='instabil'] b { color: var(--sc-warning); }
     .vb:hover:not(:disabled) { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 10%, var(--sc-bg-0)); }
-    .vb:focus-visible, .lnk:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .vb:focus-visible, .lnk:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .vb[aria-pressed='true'] { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 14%, var(--sc-bg-0)); }
     .vb:disabled { cursor: not-allowed; opacity: 0.6; }
     .alt { display: flex; flex-wrap: wrap; gap: 4px 16px; }

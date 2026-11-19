@@ -11,9 +11,11 @@
  */
 
 import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
+import { createSidecarLogger } from './bridge-log.js';
 import { createInterface } from 'node:readline';
 import { createRequire } from 'node:module';
-import { createWriteStream, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { createReadStream, createWriteStream, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { app } from 'electron';
 import log from 'electron-log';
@@ -24,9 +26,13 @@ import { readWithStallTimeout } from '../lib/fetch-timeout.js';
 import { packageExportArgs } from '../lib/asset-package.js';
 import { recipeTag } from '../lib/build-recipes.js';
 
-const CGF_CONVERTER_URL =
-  'https://github.com/Markemp/Cryengine-Converter/releases/download/v2.0.0/cgf-converter.exe';
-const CGF_CONVERTER_MIN_BYTES = 100_000_000; // ~117 MB self-contained .NET binary
+import {
+  CGF_CONVERTER_FILE,
+  CGF_CONVERTER_LEGACY_FILES,
+  CGF_CONVERTER_MIN_BYTES,
+  CGF_CONVERTER_SHA256,
+  CGF_CONVERTER_URL,
+} from '../lib/cgf-converter.js';
 
 export interface SkinExportRequest {
   p4kPath: string;
@@ -104,16 +110,51 @@ export interface SkinExportHandle {
 
 /** Where the downloaded cgf-converter binary lives (per-user, not bundled). */
 export function converterPath(): string {
-  return resolve(app.getPath('userData'), 'tools', 'cgf-converter-2.exe');
+  return resolve(app.getPath('userData'), 'tools', CGF_CONVERTER_FILE);
+}
+
+/** Drop the converter builds this uploader no longer runs. Best effort. */
+function removeLegacyConverters(dest: string): void {
+  for (const name of CGF_CONVERTER_LEGACY_FILES) {
+    try {
+      rmSync(resolve(dest, '..', name), { force: true });
+    } catch {
+      /* in use or locked — tried again on the next start */
+    }
+  }
 }
 
 const CGF_HEADER_TIMEOUT_MS = 30_000;
 const CGF_STALL_TIMEOUT_MS = 60_000;
 
-/** Download cgf-converter to userData/tools on first use; no-op if present. */
+/** sha256 of a file, streamed (the converter is ~117 MB). */
+function fileSha256(path: string): Promise<string> {
+  return new Promise((ok, fail) => {
+    const hash = createHash('sha256');
+    createReadStream(path)
+      .on('data', (chunk) => hash.update(chunk))
+      .on('error', fail)
+      .on('end', () => ok(hash.digest('hex')));
+  });
+}
+
+/** The converter file checked against its pin in this app session (hashed once). */
+let verifiedConverter: string | null = null;
+
+/** Download cgf-converter to userData/tools on first use; no-op if present and matching its pin. */
 export async function ensureConverter(onProgress: (pct: number) => void): Promise<string> {
   const dest = converterPath();
-  if (existsSync(dest) && statSync(dest).size >= CGF_CONVERTER_MIN_BYTES) return dest;
+  if (existsSync(dest) && statSync(dest).size >= CGF_CONVERTER_MIN_BYTES) {
+    // Size alone would accept a truncated or swapped file under this name;
+    // one that does not match the pin is downloaded again.
+    if (verifiedConverter === dest || (await fileSha256(dest)) === CGF_CONVERTER_SHA256) {
+      verifiedConverter = dest;
+      removeLegacyConverters(dest);
+      return dest;
+    }
+    log.warn('[skin-bridge] cgf-converter does not match its pinned sha256 — downloading it again');
+    rmSync(dest, { force: true });
+  }
   mkdirSync(resolve(dest, '..'), { recursive: true });
 
   // 30 s until the headers arrive, then a stall deadline on the body: the
@@ -132,6 +173,7 @@ export async function ensureConverter(onProgress: (pct: number) => void): Promis
   const total = Number(res.headers.get('content-length') ?? 0);
   const tmp = `${dest}.part`;
   const out = createWriteStream(tmp);
+  const hash = createHash('sha256');
   let got = 0;
   let failed = false;
   try {
@@ -140,6 +182,7 @@ export async function ensureConverter(onProgress: (pct: number) => void): Promis
       CGF_STALL_TIMEOUT_MS,
       (value) => {
         got += value.byteLength;
+        hash.update(value);
         out.write(Buffer.from(value));
         if (total) onProgress(Math.round((got / total) * 100));
       },
@@ -154,9 +197,19 @@ export async function ensureConverter(onProgress: (pct: number) => void): Promis
     if (failed) rmSync(tmp, { force: true });
   }
   if (statSync(tmp).size < CGF_CONVERTER_MIN_BYTES) {
+    rmSync(tmp, { force: true });
     throw new Error('cgf-converter download too small — aborted');
   }
+  // Pinned build: anything else (a swapped release asset, a proxy's error
+  // page that happens to be large) is never run.
+  const digest = hash.digest('hex');
+  if (digest !== CGF_CONVERTER_SHA256) {
+    rmSync(tmp, { force: true });
+    throw new Error(`cgf-converter download does not match its pinned sha256 (got ${digest.slice(0, 12)}…) — aborted`);
+  }
   renameSync(tmp, dest);
+  verifiedConverter = dest;
+  removeLegacyConverters(dest);
   return dest;
 }
 
@@ -266,6 +319,7 @@ export function startSkinExport(
   let lastError: string | undefined;
   let cancelled = false;
 
+  const logEvent = createSidecarLogger('skin');
   const rl = createInterface({ input: child.stdout });
   rl.on('line', (line) => {
     const trimmed = line.trim();
@@ -283,6 +337,7 @@ export function startSkinExport(
       if (r?.ships) ships = r.ships;
     }
     if (ev.type === 'error' && ev.message) lastError = ev.message;
+    logEvent(ev);
     onEvent(ev);
   });
 

@@ -44,9 +44,24 @@ import {
   type PortRow,
   type KeybindData,
 } from '../lib/catalog-map.js';
+import { collapseErrorBody } from '../lib/error-body.js';
 import { isCarryTable, planCarry, rowsToSend } from '../lib/catalog-carry.js';
 
 const CHUNK = 500; // entity/string rows per request
+/**
+ * Tables whose rows are heavy enough that CHUNK times out in Postgres. Field log
+ * (2026-11, ~50 timeouts): codex_ships only ever succeeded at 45-90 rows,
+ * blueprints and items at 250. Starting there skips the timeout + backoff + split
+ * ladder each run used to climb; sendSlice still halves further when needed.
+ */
+const ENTITY_CHUNK: Record<string, number> = {
+  codex_ships: 90,
+  codex_blueprints: 250,
+  codex_items: 250,
+  // Field log 2026-11-15: 500-row chunks hit the statement timeout ~6 times
+  // over 7,271 rows (edge-point arrays make the rows heavy).
+  codex_silhouettes: 250,
+};
 const LOCALE_CHUNK = 1000; // locale rows per request (small rows)
 
 // ── transient-failure handling ───────────────────────────────────────────────
@@ -88,7 +103,7 @@ export class IngestHttpError extends Error {
     readonly code: string,
     readonly serverMessage: string,
   ) {
-    super(`${op} → HTTP ${status} ${code} ${serverMessage}`.trim());
+    super(`${op} → HTTP ${status} ${code} ${collapseErrorBody(serverMessage)}`.trim());
   }
 
   /**
@@ -367,14 +382,22 @@ export async function uploadCatalog(
    * around the wait, so pausing during a retry storm still unwinds promptly
    * instead of sitting out the full backoff.
    */
+  let splitOnTimeout = false;
   const post = async (op: string, extra: Record<string, unknown>): Promise<Record<string, unknown>> => {
     let last: unknown;
+    // Inside `sendSlice`, a statement timeout on a multi-row batch says the
+    // BATCH is too heavy: hand it straight back for the split instead of
+    // resending it unchanged up to four times first (field log 2026-11-15:
+    // silhouette chunks of 500 timed out 1-3 times each before they landed,
+    // and the batch size never shrank because the retry eventually won).
+    const splitInstead = splitOnTimeout && Array.isArray(extra['rows']) && extra['rows'].length > 1;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       try {
         return await postOnce(op, extra);
       } catch (err) {
         if (isInterrupt(err)) throw err;
         last = err;
+        if (splitInstead && err instanceof IngestHttpError && err.isTimeout) throw err;
         if (attempt === MAX_ATTEMPTS || !isTransientFailure(err)) throw err;
         const wait = hooks.backoffMs?.(attempt) ?? BACKOFF_MS[Math.min(attempt - 1, BACKOFF_MS.length - 1)]!;
         log.warn(
@@ -403,9 +426,14 @@ export async function uploadCatalog(
     // `progress()` only fires AFTER a chunk lands, so it cannot name the phase a
     // failing FIRST chunk belonged to — set the marker where the request is.
     livePhase = phase;
+    // Requests are sequential, so one flag scopes "a timeout here gets split"
+    // to exactly this slice's requests (see `post`).
+    const outer = splitOnTimeout;
+    splitOnTimeout = slice.length > 1;
     try {
       await send(slice);
     } catch (err) {
+      splitOnTimeout = outer;
       if (isInterrupt(err)) throw err;
       const timedOut = err instanceof IngestHttpError && err.isTimeout;
       if (!timedOut || slice.length <= 1) throw err;
@@ -420,7 +448,9 @@ export async function uploadCatalog(
       );
       await sendSlice(phase, send, slice.slice(0, half), budget);
       await sendSlice(phase, send, slice.slice(half), budget);
+      return;
     }
+    splitOnTimeout = outer;
   };
 
   const isPhaseDone = (phase: string): boolean => (hooks.donePhases ?? []).includes(phase);
@@ -534,7 +564,7 @@ export async function uploadCatalog(
   };
 
   const sendEntity = async (table: string, rows: unknown[], buildId: string): Promise<number> =>
-    sendChunks(table, rows, CHUNK, (slice) =>
+    sendChunks(table, rows, ENTITY_CHUNK[table] ?? CHUNK, (slice) =>
       sendIncremental(table, buildId, slice, (r) => post('upsert', { table, rows: r })),
     );
 
@@ -616,7 +646,7 @@ export async function uploadCatalog(
         counts.silhouettes = await sendChunks(
           'codex_silhouettes',
           rows,
-          CHUNK,
+          ENTITY_CHUNK['codex_silhouettes'] ?? CHUNK,
           (slice) =>
             sendIncremental(
               'codex_silhouettes',

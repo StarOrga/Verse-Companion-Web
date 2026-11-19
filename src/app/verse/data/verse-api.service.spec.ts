@@ -114,6 +114,25 @@ describe('VerseApiService', () => {
     expect(calls.length).toBe(0);
   });
 
+  it("reads the x.y.z comet target and returns null when the RPC is missing", async () => {
+    const svc = TestBed.inject(VerseApiService);
+    rpc.mockResolvedValue({ data: { patch_version: "4.4.2", patch_line: "4.4", live_version: "4.4.1", comet: { state: "none", locked: false } }, error: null });
+    expect((await svc.cometVersion())?.patchVersion).toBe("4.4.2");
+    expect(rpc).toHaveBeenCalledWith("verse_comet_version_state");
+    rpc.mockResolvedValue({ data: null, error: { message: "not found", code: "PGRST202" } });
+    expect(await svc.cometVersion()).toBeNull();
+  });
+
+  it("tips an x.y.z patch via its own RPC and maps a lock refusal", async () => {
+    const svc = TestBed.inject(VerseApiService);
+    rpc.mockResolvedValue({ data: {}, error: null });
+    expect(await svc.submitVersionPrediction("4.4.2", "2030-01-01")).toEqual({ ok: true, data: undefined });
+    expect(rpc).toHaveBeenCalledWith("verse_submit_version_prediction", { p_patch_version: "4.4.2", p_date: "2030-01-01" });
+    rpc.mockResolvedValue({ data: null, error: { message: "comet_locked", code: "P0001" } });
+    expect(await svc.submitVersionPrediction("4.4.2", "2030-01-01")).toEqual({ ok: false, errorKey: "errors.cometLocked" });
+    expect((await svc.submitVersionPrediction("4.4.2", "1.1.2030")).ok).toBe(false);
+  });
+
   it('filters the star pool to known keys', async () => {
     rpc.mockResolvedValue({ data: ['notes', 'comet', 'cx-compare'], error: null });
     const r = await TestBed.inject(VerseApiService).starPool('4.4');
@@ -273,13 +292,35 @@ describe('VerseApiService', () => {
     });
   });
 
-  it('inserts a suggestion and translates a refusal', async () => {
-    const svc = TestBed.inject(VerseApiService);
-    expect((await svc.suggest('/verse/patches/4.4', '')).ok).toBe(true);
-    expect(calls.find((c) => c.method === 'insert')?.args[0]).toEqual({ item_url: '/verse/patches/4.4', note: null });
-    fromRes = { data: null, error: { code: '42501', message: 'new row violates row-level security policy' } };
-    const r = await svc.suggest('/x', null);
-    expect(r.ok).toBe(false);
-    expect(!r.ok && r.errorKey.startsWith('errors.')).toBe(true);
+  describe('reward ideas', () => {
+    it('lists ideas and treats a missing RPC (PGRST202) as "no section"', async () => {
+      const svc = TestBed.inject(VerseApiService);
+      rpc.mockResolvedValue({ data: [{ id: 'a', body: 'Idea', votes: 2 }], error: null });
+      const r = await svc.rankIdeas();
+      expect(rpc).toHaveBeenCalledWith('verse_rank_ideas');
+      expect(r.ok && r.data?.[0].votes).toBe(2);
+      rpc.mockResolvedValue({ data: null, error: { code: 'PGRST202', message: 'Could not find the function' } });
+      expect(await svc.rankIdeas()).toEqual({ ok: true, data: null });
+      rpc.mockResolvedValue({ data: null, error: { code: 'XX000', message: 'boom' } });
+      const bad = await svc.rankIdeas();
+      expect(!bad.ok && bad.errorKey.startsWith('errors.')).toBe(true);
+    });
+
+    it('submits, votes and archives through their RPCs and translates the refusals', async () => {
+      const svc = TestBed.inject(VerseApiService);
+      rpc.mockResolvedValue({ data: 'new-id', error: null });
+      expect(await svc.submitRankIdea('A paint')).toEqual({ ok: true, data: 'new-id' });
+      expect(rpc).toHaveBeenCalledWith('verse_submit_rank_idea', { p_body: 'A paint' });
+      rpc.mockResolvedValue({ data: { voted: true, votes: 4 }, error: null });
+      expect(await svc.voteRankIdea('i1')).toEqual({ ok: true, data: { voted: true, votes: 4 } });
+      expect(rpc).toHaveBeenCalledWith('verse_vote_rank_idea', { p_id: 'i1' });
+      rpc.mockResolvedValue({ data: null, error: null });
+      expect((await svc.archiveRankIdea('i1')).ok).toBe(true);
+      expect(rpc).toHaveBeenCalledWith('verse_archive_rank_idea', { p_id: 'i1' });
+      rpc.mockResolvedValue({ data: null, error: { message: 'rank_tier_too_low' } });
+      expect(await svc.submitRankIdea('x')).toEqual({ ok: false, errorKey: 'errors.rankTierTooLow' });
+      rpc.mockResolvedValue({ data: null, error: { message: 'rank_idea_limit' } });
+      expect(await svc.submitRankIdea('x')).toEqual({ ok: false, errorKey: 'errors.rankIdeaLimit' });
+    });
   });
 });

@@ -255,7 +255,7 @@ describe('Nachschub board, panel and dialogs', () => {
       const mission = [...form.querySelectorAll('.seg button')].find((b) => b.textContent?.includes('hq.step.kind.mission'))!;
       click(f, mission);
       expect(save.disabled).toBe(false);
-      const more = form.querySelectorAll('.stepper .step')[1] as HTMLButtonElement;
+      const more = form.querySelectorAll('.stepper .qs-btn')[1] as HTMLButtonElement;
       click(f, more);
       click(f, save);
       await f.whenStable();
@@ -331,10 +331,10 @@ describe('Nachschub board, panel and dialogs', () => {
     const got: boolean[] = [];
     f.componentInstance.confirmed.subscribe((b) => got.push(b));
     expect(el.querySelector('.hint')?.textContent).toContain('hq.remove.backOn');
-    click(f, el.querySelector('.dlg-foot button:last-child'));
+    click(f, el.querySelector('.scp-acts button:first-child'));
     click(f, el.querySelector('.opt sc-tristate button'));
     expect(el.querySelector('.hint')?.textContent).toContain('hq.remove.backOff');
-    click(f, el.querySelector('.dlg-foot button:last-child'));
+    click(f, el.querySelector('.scp-acts button:first-child'));
     expect(got).toEqual([true, false]);
   });
 
@@ -354,6 +354,80 @@ describe('Nachschub board, panel and dialogs', () => {
     f.detectChanges();
     const btn = (f.nativeElement as HTMLElement).querySelector('.list button') as HTMLButtonElement;
     expect(btn.disabled).toBe(true);
+  });
+
+  it('archive dialog (H3): every row has an icon-only danger delete that emits its id, the list empties with the last one', () => {
+    const svc = setup();
+    svc.packages.set([nach('o1', 'Altes', null, 'archived'), nach('o2', 'Noch älter', null, 'archived')]);
+    const f = TestBed.createComponent(HqNachschubArchiveDialogComponent);
+    const removed: string[] = [];
+    f.componentInstance.removeArchived.subscribe((id) => removed.push(id));
+    f.detectChanges();
+    const el = f.nativeElement as HTMLElement;
+    const del = el.querySelectorAll<HTMLButtonElement>('.list .rm');
+    expect(del.length).toBe(2);
+    expect(del[0].getAttribute('aria-label')).toContain('hq.archive.removeAria');
+    expect(del[0].disabled).toBe(false); // a delete never needs a free slot, unlike "Wieder aktivieren"
+    click(f, del[1]);
+    expect(removed).toEqual(['o2']);
+    svc.packages.set([]);
+    f.detectChanges();
+    expect(el.querySelector('.list')).toBeNull();
+    expect(el.textContent).toContain('hq.archive.empty');
+  });
+
+  describe('plain-line hint (H4)', () => {
+    const plain = (id: string) => ({ id }) as never;
+    function panel(lines: number) {
+      const svc = setup();
+      svc.packages.set([nach('a', 'Rattler-Vorrat', 1)]);
+      vi.spyOn(svc, 'plainSearchLinesOf').mockReturnValue(Array.from({ length: lines }, (_, i) => plain(`l${i}`)));
+      const f = TestBed.createComponent(HqNachschubPanelComponent);
+      f.componentRef.setInput('nachschub', svc.packages()[0]);
+      f.detectChanges();
+      return { svc, f, el: f.nativeElement as HTMLElement };
+    }
+
+    it('shows one quiet row with the two secondary actions when there are candidates, none without', () => {
+      expect(panel(0).el.querySelector('.plain')).toBeNull();
+      const { el } = panel(3);
+      expect(el.querySelector('.plain')).not.toBeNull();
+      expect(el.querySelector('.plain-txt b')?.textContent).toContain('hq.panel.plain.other');
+      expect(panel(1).el.querySelector('.plain-txt b')?.textContent).toContain('hq.panel.plain.one');
+      const btns = [...el.querySelectorAll('.plain-acts button')];
+      expect(btns.map((b) => b.textContent?.trim())).toEqual(['hq.panel.plain.adopt', 'hq.panel.plain.keep']);
+    });
+
+    it('both buttons are busy / disabled while an answer runs (no double submit); the result goes to the page', async () => {
+      const { svc, f, el } = panel(2);
+      let finish!: (r: { ok: boolean; key: string }) => void;
+      const spy = vi.spyOn(svc, 'adoptPlainLines').mockReturnValue(new Promise((r) => (finish = r)));
+      const keep = vi.spyOn(svc, 'keepPlainLines');
+      const results: string[] = [];
+      f.componentInstance.answered.subscribe((r) => results.push(r.key));
+      const [adopt, stay] = [...el.querySelectorAll<HTMLButtonElement>('.plain-acts button')];
+      click(f, adopt);
+      expect(adopt.disabled).toBe(true);
+      expect(stay.disabled).toBe(true);
+      click(f, stay);
+      click(f, adopt);
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(keep).not.toHaveBeenCalled();
+      finish({ ok: false, key: 'hq.nachschub.wishlistFailed' });
+      await f.whenStable();
+      f.detectChanges();
+      expect(results).toEqual(['hq.nachschub.wishlistFailed']);
+      expect(adopt.disabled).toBe(false);
+      expect(el.querySelector('.plain')).not.toBeNull(); // a failed answer keeps the hint
+    });
+
+    it('"So lassen" asks the service for the keep answer', async () => {
+      const { svc, f, el } = panel(2);
+      const keep = vi.spyOn(svc, 'keepPlainLines').mockResolvedValue({ ok: true, key: 'hq.nachschub.done.plainKept', params: { count: 2 } });
+      click(f, el.querySelectorAll('.plain-acts button')[1]);
+      await f.whenStable();
+      expect(keep).toHaveBeenCalledWith('a');
+    });
   });
 });
 
@@ -377,6 +451,7 @@ describe('HqNachschubFlowComponent', () => {
     });
     const fake = {
       wishPositions: () => live(),
+      freeWishPositions: () => live(),
       packages: signal<Nachschub[]>([]),
       linesOf: () => [],
       createFromWishlist: created,
@@ -406,6 +481,7 @@ describe('HqNachschubFlowComponent', () => {
     TestBed.resetTestingModule();
     const fake = {
       wishPositions: () => [] as WishPosition[],
+      freeWishPositions: () => [] as WishPosition[],
       packages: signal<Nachschub[]>([opts.plain ? nach('n1', 'Bestehend', 1) : { ...nach('n1', 'Bestehend', 1), type: 'event', eventId: 'ev0' }]),
       error: signal<string | null>(null),
       update: vi.fn().mockName('update').mockResolvedValue(true),
@@ -532,9 +608,9 @@ describe('HqNachschubFlowComponent', () => {
     expect(el.querySelector('.name-field input')).not.toBeNull();
     let closes = 0;
     f.componentInstance.closed.subscribe(() => closes++);
-    click(f, el.querySelector('.scrim'));
+    click(f, el.querySelector('.scp-scrim'));
     expect(closes).toBe(0);
-    click(f, el.querySelector('.dlg-head [scAction]'));
+    click(f, el.querySelector('.scp-x'));
     expect(closes).toBe(1);
   });
 
@@ -545,12 +621,12 @@ describe('HqNachschubFlowComponent', () => {
     expect(el.querySelector('.tally')?.textContent).toContain('hq.flow.picked');
     expect(el.querySelectorAll('.grp li.on').length).toBe(3);
     // Next stays off until something is picked.
-    expect((el.querySelector('.dlg-foot button:last-child') as HTMLButtonElement).disabled).toBe(false);
+    expect((el.querySelector('.scp-acts button[tier=primary]') as HTMLButtonElement).disabled).toBe(false);
   });
 
   it('cannot go on without a pick', () => {
     const { el } = setup();
-    expect((el.querySelector('.dlg-foot button:last-child') as HTMLButtonElement).disabled).toBe(true);
+    expect((el.querySelector('.scp-acts button[tier=primary]') as HTMLButtonElement).disabled).toBe(true);
   });
 
   it('walks the two steps and creates the Nachschub with its Einsätze, crafting last', async () => {
@@ -559,7 +635,7 @@ describe('HqNachschubFlowComponent', () => {
     const done: unknown[] = [];
     f.componentInstance.done.subscribe((r) => done.push(r));
     click(f, el.querySelector('.pick-bar button'));
-    click(f, el.querySelector('.dlg-foot button:last-child')); // Weiter
+    click(f, el.querySelector('.scp-acts button[tier=primary]')); // Weiter
     await whenIdle(f);
     expect(el.querySelectorAll('.steps li').length).toBe(2);
     expect(el.querySelector('.steps li.on b')?.textContent).toBe('2');
@@ -578,7 +654,7 @@ describe('HqNachschubFlowComponent', () => {
     expect(item.querySelector('button.leave')).not.toBeNull();
     expect(el.querySelectorAll('.ecard').length).toBe(cards.length);
 
-    click(f, el.querySelector('.dlg-foot button:last-child')); // Nachschub anlegen
+    click(f, el.querySelector('.scp-acts button[tier=primary]')); // Nachschub anlegen
     await whenIdle(f);
     expect(created).toHaveBeenCalledTimes(1);
     const arg = vi.mocked(created).mock.lastCall![0] as { picks: { key: string; qty: number }[]; name: string };
@@ -593,11 +669,11 @@ describe('HqNachschubFlowComponent', () => {
     const { f, el, created } = setup(WISH, new Map(), true);
     const einsatz = TestBed.inject(HqEinsatzService);
     click(f, el.querySelector('.pick-bar button'));
-    click(f, el.querySelector('.dlg-foot button:last-child'));
+    click(f, el.querySelector('.scp-acts button[tier=primary]'));
     await whenIdle(f);
     const cards = el.querySelectorAll('.ecard').length;
     expect(cards).toBeGreaterThanOrEqual(2);
-    click(f, el.querySelector('.dlg-foot button:last-child')); // Nachschub anlegen: the wishlist is empty from here on
+    click(f, el.querySelector('.scp-acts button[tier=primary]')); // Nachschub anlegen: the wishlist is empty from here on
     await whenIdle(f);
     expect(created).toHaveBeenCalledTimes(1);
     expect(einsatz.ofPackage('new').length).toBe(cards);
@@ -609,7 +685,7 @@ describe('HqNachschubFlowComponent', () => {
     await toStep2(r);
     const alu = () => [...r.el.querySelectorAll('.mats li')].find((li) => li.textContent?.includes('Aluminium'))!;
     const seg = (label: string) => [...alu().querySelectorAll('.seg button')].find((b) => b.textContent?.includes(label)) as HTMLButtonElement;
-    const pressed = () => [...alu().querySelectorAll('.seg button')].map((b) => b.getAttribute('aria-pressed'));
+    const pressed = () => [...alu().querySelectorAll('.seg button')].map((b) => b.getAttribute('aria-checked'));
     // No shop known: mined by default.
     expect(pressed()).toEqual(['false', 'true']);
     click(r.f, seg('hq.step.kind.mine'));
@@ -619,7 +695,7 @@ describe('HqNachschubFlowComponent', () => {
     click(r.f, seg('hq.step.kind.buy'));
     expect(pressed()).toEqual(['true', 'false']);
     // A mixed split: "Abbauen" mines all of it (it used to buy all).
-    click(r.f, alu().querySelector('.stepper button.step'));
+    click(r.f, alu().querySelector('.stepper button.qs-btn'));
     expect(pressed()).toEqual(['false', 'false']);
     click(r.f, seg('hq.step.kind.mine'));
     expect(pressed()).toEqual(['false', 'true']);
@@ -627,7 +703,7 @@ describe('HqNachschubFlowComponent', () => {
 
   async function toStep2(r: ReturnType<typeof setup>) {
     click(r.f, r.el.querySelector('.pick-bar button'));
-    click(r.f, r.el.querySelector('.dlg-foot button:last-child'));
+    click(r.f, r.el.querySelector('.scp-acts button[tier=primary]'));
     await whenIdle(r.f);
   }
   const itemRow = (el: HTMLElement) => [...el.querySelectorAll('.mats li')].find((li) => li.textContent?.includes('Medpen'))!;
@@ -667,9 +743,9 @@ describe('HqNachschubFlowComponent', () => {
   it('splitting a quantity takes only that part into the Einsätze', async () => {
     const { f, el } = setup();
     click(f, el.querySelector('.grp li sc-tristate button'));
-    const more = [...el.querySelectorAll('.grp li .step')];
+    const more = [...el.querySelectorAll('.grp li .qs-btn')];
     click(f, more[0]); // less
-    click(f, el.querySelector('.dlg-foot button:last-child'));
+    click(f, el.querySelector('.scp-acts button[tier=primary]'));
     await whenIdle(f);
     expect(itemRow(el).textContent).toContain('×11');
   });
@@ -700,6 +776,7 @@ describe('HqNachschubFlowComponent', () => {
       TestBed.resetTestingModule();
       const fake = {
         wishPositions: () => [],
+        freeWishPositions: () => [],
         packages: signal<Nachschub[]>([nach('p1', 'Gallant-Ausrüstung', 1)]),
         linesOf: () => lines,
         rename: vi.fn().mockName('rename').mockResolvedValue(true),
@@ -738,7 +815,7 @@ describe('HqNachschubFlowComponent', () => {
       expect(cards.length).toBeGreaterThan(0);
       // Only the open lines count: the ticked titan line is not proposed again.
       expect(el.textContent).not.toContain('titan');
-      click(f, el.querySelector('.dlg-foot button:last-child'));
+      click(f, el.querySelector('.scp-acts button[tier=primary]'));
       await whenIdle(f);
       const made = einsatz.ofPackage('p1');
       expect(made.length).toBe(cards.length);
@@ -756,11 +833,11 @@ describe('HqNachschubFlowComponent', () => {
 
   it('new mode shows the slot number only while a slot is free (never a taken one)', () => {
     const { f, el } = setup();
-    expect(el.querySelector('.dlg-title small')?.textContent).toContain('hq.flow.slotOf');
+    expect(el.querySelector('.scp-st')?.textContent).toContain('hq.flow.slotOf');
     const fake = TestBed.inject(NachschubService) as unknown as { packages: { set(v: Nachschub[]): void } };
     fake.packages.set(Array.from({ length: 7 }, (_, i) => nach(`n${i}`, `N${i}`, i + 1)));
     f.detectChanges();
-    expect(el.querySelector('.dlg-title small')).toBeNull();
+    expect(el.querySelector('.scp-st')?.textContent?.trim()).toBe('');
   });
 
   it('AUD-L10: the flow numbers the new Nachschub like the board tile (next display place), not the DB slot', () => {
@@ -781,7 +858,7 @@ describe('HqNachschubFlowComponent', () => {
     const groups = [...el.querySelectorAll('.grp')];
     click(f, groups[1].querySelector('header sc-tristate button'));
     const aluminium = groups[1].querySelectorAll('li')[1];
-    for (let i = 0; i < 8; i++) click(f, aluminium.querySelector('.stepper .step'));
+    for (let i = 0; i < 8; i++) click(f, aluminium.querySelector('.stepper .qs-btn'));
     const bp = groups[1].querySelectorAll('li')[0];
     expect(bp.querySelector('.stepper .n')?.textContent?.trim()).toContain('1');
   });

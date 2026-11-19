@@ -71,7 +71,7 @@ export interface StockStart {
         @if (inv.error() && !inv.loaded()) {
           <div class="state" role="alert">
             <p>{{ inv.error()! | translate }}</p>
-            <button type="button" class="sc-btn" (click)="inv.load()">{{ 'hq.stock.retry' | translate }}</button>
+            <button type="button" scAction tier="secondary" (click)="inv.load()">{{ 'hq.stock.retry' | translate }}</button>
           </div>
         } @else if (mode() === 'browse') {
           <div class="search">
@@ -404,7 +404,7 @@ export interface StockStart {
                 <span>{{ 'hq.stock.capture.location' | translate }}</span>
                 <input name="location" [(ngModel)]="location" maxlength="200" autocomplete="off" [placeholder]="'hq.stock.capture.locationHint' | translate" />
               </label>
-              <button type="submit" class="sc-btn sc-btn-primary" [disabled]="!valid()">{{ 'hq.stock.capture.save' | translate }}</button>
+              <button type="submit" scAction tier="primary" [disabled]="!valid()">{{ 'hq.stock.capture.save' | translate }}</button>
             </div>
             @if (justAdded()) {
               <p class="ok" role="status">{{ 'hq.stock.captured' | translate }}</p>
@@ -421,7 +421,6 @@ export interface StockStart {
     `
       :host { display: contents; }
       .pop { display: flex; flex-direction: column; gap: var(--sc-space-3, 12px); height: min(70vh, 44rem); height: min(70dvh, 44rem); min-height: 0; }
-      @media (max-width: 720px) { .pop { height: calc(100dvh - 5.5rem - env(safe-area-inset-bottom, 0px)); } }
       h3 { margin: 0; font: 600 1.05rem / 1.2 var(--sc-font-display); }
       .muted { color: var(--sc-fg-2); margin: 0; }
       .ok { margin: 0; color: var(--sc-accent); }
@@ -441,7 +440,7 @@ export interface StockStart {
         font: inherit; color: var(--sc-fg); background: var(--sc-bg-0, var(--sc-bg-1)); border: 1px solid var(--sc-border);
         border-radius: var(--sc-radius); padding: var(--sc-space-2, 8px); min-height: 2.75rem; box-sizing: border-box; width: 100%;
       }
-      input:focus-visible, .chip:focus-visible, .list:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      input:focus-visible, .chip:focus-visible, .list:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .lost { color: var(--sc-warning); }
       .chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc-space-2, 8px); }
       .chip {
@@ -479,7 +478,7 @@ export interface StockStart {
       }
       .step:hover:not(:disabled) { border-color: var(--sc-accent); color: var(--sc-fg-0); }
       .step:disabled { opacity: 0.5; cursor: default; }
-      .step:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .step:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       @media (pointer: coarse) { .step { inline-size: 44px; block-size: 44px; } }
       .desk {
         display: grid; gap: var(--sc-space-2, 8px); padding: var(--sc-space-3, 12px); margin: 0 0 var(--sc-space-2, 8px);
@@ -497,7 +496,7 @@ export interface StockStart {
       .ships { margin-top: var(--sc-space-3, 12px); }
       .ships h3 { padding: var(--sc-space-2, 8px) 0; }
       a { color: var(--sc-accent); }
-      a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .more { padding: var(--sc-space-3, 12px) 0; text-align: center; }
       .find, .capture { display: grid; gap: var(--sc-space-3, 12px); align-content: start; overflow: auto; min-height: 0; }
       .row-f { display: flex; flex-wrap: wrap; gap: var(--sc-space-3, 12px); align-items: end; }

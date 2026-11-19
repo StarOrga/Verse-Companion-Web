@@ -121,15 +121,21 @@ describe('CodexEnergyDockComponent', () => {
     expect(c['sheet']().weaponsCut).toBe(false);
   });
 
-  it('stealth preset drives every eligible group to its minimum', async () => {
+  it('stealth preset leaves only the drive and the cooling on, cooling ≤ 100 % (#352)', async () => {
     const fixture = await setup();
     const c = fixture.componentInstance;
     c['setPreset']('stealth');
     fixture.detectChanges();
     const sheet = c['sheet']();
     for (const g of sheet.groups) {
-      if (g.state === 'active') expect(g.allocated).toBe(g.minimum);
+      if (g.state === 'active') expect(['thrusters', 'coolers']).toContain(g.group);
     }
+    expect(sheet.weaponsCut).toBe(true);
+    if (sheet.coolant.percent !== null) expect(sheet.coolant.percent).toBeLessThanOrEqual(100);
+    // back to Auto drops the stealth cuts again
+    c['setPreset']('auto');
+    fixture.detectChanges();
+    expect(c['sheet']().cutGroups.size).toBe(0);
   });
 
   it('NAV mode gives the quantum drive a channel and drops the shield channel', async () => {
@@ -460,12 +466,21 @@ describe('CodexEnergyDockComponent', () => {
     expect(rowOf(c, 'cooler2').allocated).toBe(2);
     expect(rowOf(c, 'cooler2').pinned).toBe(false);
 
-    pipsOf(root, 'cooler1')[2].click(); // level 3 — one more than the reactor has
+    // #351: one segment is free, so level 3 (two more) is out of reach —
+    // the pip is disabled and the dock never prints 15 / 14.
+    const top = pipsOf(root, 'cooler1')[2];
+    expect(top.disabled).toBe(true);
+    expect(top.classList).toContain('out');
+    top.click();
     fixture.detectChanges();
-    expect(rowOf(c, 'cooler1').allocated).toBe(3);
-    expect(c['sheet']().budgetUsed).toBe(15);
-    expect(c['sheet']().overBudget).toBe(true);
-    expect(root.querySelector('.bud')?.classList).toContain('over');
+    expect(rowOf(c, 'cooler1').allocated).toBe(1);
+
+    pipsOf(root, 'cooler1')[1].click(); // level 2 — exactly what is free
+    fixture.detectChanges();
+    expect(rowOf(c, 'cooler1').allocated).toBe(2);
+    expect(c['sheet']().budgetUsed).toBe(14);
+    expect(c['sheet']().overBudget).toBe(false);
+    expect(root.querySelector('.bud')?.classList).not.toContain('over');
     // the other groups kept what the auto deal gave them
     expect(rowOf(c, 'shields').allocated).toBe(4);
     expect(rowOf(c, 'weapons').allocated).toBe(3);
@@ -539,9 +554,12 @@ describe('CodexEnergyDockComponent', () => {
     c['setPreset']('stealth');
     fixture.detectChanges();
     expect(rowOf(c, 'shields').pinned).toBe(false);
-    expect(rowOf(c, 'shields').allocated).toBe(2);
+    // #352 — stealth switches the shields off instead of idling them
+    expect(rowOf(c, 'shields').cut).toBe(true);
+    expect(rowOf(c, 'shields').allocated).toBe(0);
 
-    const pw = encodePowerParam({ ...DEFAULT_POWER_DRAFT, levels: { cooler2: 3 } })!;
+    // shields lowered to 2 frees the segment cooler2's raise needs (#351)
+    const pw = encodePowerParam({ ...DEFAULT_POWER_DRAFT, levels: { shields: 2, cooler2: 3 } })!;
     const fixture2 = await setup({ queryParam: pw });
     expect(rowOf(fixture2.componentInstance, 'cooler2').allocated).toBe(3);
     expect(rowOf(fixture2.componentInstance, 'cooler1').allocated).toBe(2);
@@ -588,12 +606,13 @@ describe('CodexEnergyDockComponent', () => {
   });
 
   it('a legacy draft with a single `coolers` pin or cut is mapped onto every unit', async () => {
-    // a pw link shared before the split: the summed group pinned at 5 → ⌈5/2⌉ = 3 per unit
+    // a pw link shared before the split: the summed group pinned at 5 → ⌈5/2⌉ = 3 per unit,
+    // but the reactor has nothing free, so each unit stays at its 2 (#351: never 16 / 14)
     const pinned = await setup({ queryParam: encodePowerParam({ ...DEFAULT_POWER_DRAFT, levels: { coolers: 5 } })! });
-    expect(rowOf(pinned.componentInstance, 'cooler1').allocated).toBe(3);
-    expect(rowOf(pinned.componentInstance, 'cooler2').allocated).toBe(3);
+    expect(rowOf(pinned.componentInstance, 'cooler1').allocated).toBe(2);
+    expect(rowOf(pinned.componentInstance, 'cooler2').allocated).toBe(2);
     expect(rowOf(pinned.componentInstance, 'cooler2').pinned).toBe(true);
-    expect(pinned.componentInstance['sheet']().budgetUsed).toBe(16);
+    expect(pinned.componentInstance['sheet']().budgetUsed).toBe(14);
 
     // a localStorage draft with the group cut: both units off, and a
     // per-unit toggle brings ONE back without fighting the old group cut

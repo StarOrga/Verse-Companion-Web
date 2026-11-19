@@ -1,11 +1,16 @@
-import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScPopupMotionDirective, ensurePopupMotionStyles } from '../shared/popup-motion/sc-popup-motion.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ItemPathComponent } from '../shared/item-path/item-path.component';
 import { searchMatcher } from './codex-search';
 import { logWarn } from '../core/log';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
+  EnvironmentInjector,
+  NgZone,
   computed,
   effect,
   inject,
@@ -25,6 +30,8 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import { CodexKind, CodexService, CompatibleItem } from './codex.service';
 import { ammoClassNameFor, ammoClassNamesFor, formatEquippedStat } from './codex-equipped-stats';
 import { CodexSwapCandidatesService } from './codex-swap-candidates.service';
+import { attachTypeLabel } from './detail/codex-detail-facts';
+import { partTypeKey } from './holo/holo-callout-values';
 import {
   ColumnDef,
   ColumnFacet,
@@ -122,6 +129,32 @@ export interface SwapPick {
 
 const COLUMN_STORAGE_KEY = 'scc-codex-picker-cols:v1';
 
+/**
+ * Rows in the open's first frame (the 16 that cascade); a longer list follows ROW_SLICE per frame while
+ * the plate is still invisible. Each slice re-lays the table out, so a short list is never sliced.
+ */
+export const FIRST_ROWS = 16;
+export const ROW_SLICE = 16;
+/** A list built on a slot card's press is dropped when the picker is not opened within this time. */
+export const PREPARED_TTL_MS = 4000;
+
+/** The built list of one target. */
+interface BuiltPick {
+  types: string[];
+  rows: SwapCandidate[];
+}
+
+interface PreparedPick {
+  key: string;
+  result: BuiltPick | null;
+  timer: ReturnType<typeof setTimeout> | null;
+}
+
+/** What makes two targets the same list (the inputs of CodexSwapCandidatesService.load plus the factory part). */
+function preparedKey(t: SwapTarget): string {
+  return JSON.stringify([t.className, t.size, t.attachTypes ?? [], t.factoryClassName ?? null, t.name]);
+}
+
 /** Sentinel `typeFilter()` value for "no restriction" — a real attach type never equals it. */
 const TYPE_ALL = '__all__';
 
@@ -176,39 +209,28 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
 @Component({
   selector: 'sc-codex-swap-picker',
   standalone: true,
-  imports: [ItemPathComponent, TranslatePipe, RouterLink, ScSegmentedComponent, ScColumnMenuComponent, ScTooltipDirective, ScDialogDirective],
+  imports: [ItemPathComponent, TranslatePipe, RouterLink, ScSegmentedComponent, ScColumnMenuComponent, ScTooltipDirective, ScPopupComponent, ScActionDirective, ScPopupMotionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (target(); as t) {
-      <div class="pick-veil">
-        <p class="pick-hint">{{ 'codex.picker.hint' | translate }}</p>
-        <!-- [scDialog]: focus in, Tab trap, Escape, focus back to the opener
-             (audit S15). An open sc-select consumes its own Escape first. -->
-        <article class="pick-win" role="dialog" aria-modal="true"
-                 aria-labelledby="pick-title"
-                 scDialog (scDialogEscape)="closed.emit()"
-                 (click)="$event.stopPropagation()">
-          <header class="pick-head">
-            <div class="pick-titles">
-              <h2 id="pick-title">{{ 'codex.picker.title' | translate: { port: t.port, size: t.size ?? '' } }}</h2>
-              @if (t.name) {
-                <p class="pick-installed">{{ 'codex.picker.installed' | translate: { name: t.name } }}</p>
-              } @else {
-                <p class="pick-installed">{{ 'codex.swap.installedNone' | translate }}</p>
-              }
-              @if (t.count > 1) {
-                <p class="pick-applies">{{ 'codex.swap.appliesToMany' | translate: { count: t.count, port: t.port } }}</p>
-              } @else {
-                <p class="pick-applies">{{ 'codex.swap.appliesToOne' | translate: { port: t.port } }}</p>
-              }
-            </div>
-            <button type="button" class="pick-clear" (click)="clearSlot()">
-              {{ 'codex.swap.clearSlot' | translate }}
-            </button>
-            <button type="button" class="pick-close" (click)="closed.emit()"
-                    [attr.aria-label]="'codex.picker.close' | translate"
-                    [scTooltip]="'codex.picker.close' | translate">✕</button>
-          </header>
+      <sc-popup kind="large" [title]="'codex.picker.title' | translate: { port: slotLabel(t), size: t.size ?? '' }"
+                [eyebrow]="eyebrow(t)" [initialFocus]="'first'" [bodyFill]="true" style="--sc-popup-body-gap: var(--sc-space-3)"
+                scPopupMotion="large" scPopupMotionPlate=".scp-frame" scPopupMotionFoot=".scp-f"
+                (closed)="dismiss()">
+          <!-- sc-popup: focus in, Tab trap, Escape, focus back to the opener
+               (audit S15). An open sc-select consumes its own Escape first. -->
+          <div class="pick-titles">
+            @if (t.name) {
+              <p class="pick-installed">{{ 'codex.picker.installed' | translate: { name: t.name } }}</p>
+            } @else {
+              <p class="pick-installed">{{ 'codex.swap.installedNone' | translate }}</p>
+            }
+            @if (t.count > 1) {
+              <p class="pick-applies">{{ 'codex.swap.appliesToMany' | translate: { count: t.count, port: t.port } }}</p>
+            } @else {
+              <p class="pick-applies">{{ 'codex.swap.appliesToOne' | translate: { port: slotLabel(t) } }}</p>
+            }
+          </div>
 
           @if (t.fitInferred) {
             <p class="pick-hint inferred">{{ 'codex.swap.fitInferred' | translate }}</p>
@@ -225,8 +247,8 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
           } @else {
             <div class="pick-scope">
               <label class="pick-search">
-                <span class="sr-only">{{ 'codex.picker.searchLabel' | translate }}</span>
-                <input #search type="search" autocomplete="off" [value]="query()"
+                <span class="sc-sr-only">{{ 'codex.picker.searchLabel' | translate }}</span>
+                <input #search cdkFocusInitial type="search" autocomplete="off" [value]="query()"
                        (input)="setQuery($event)"
                        [attr.placeholder]="'codex.picker.searchPlaceholder' | translate" />
               </label>
@@ -257,9 +279,11 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
 
               <p class="pick-count">{{ 'codex.picker.count' | translate: { n: rows().length, total: candidates().length } }}</p>
 
-              <details class="pick-cols">
-                <summary class="pick-cols-sum">{{ 'codex.picker.columns' | translate }} ▾</summary>
-                <div class="pick-cols-pop">
+              <div class="pick-cols">
+                <button type="button" class="pick-cols-sum" [attr.aria-expanded]="colsOpen()" (click)="colsOpen.set(!colsOpen())">{{ 'codex.picker.columns' | translate }} ▾</button>
+                @if (colsOpen()) {
+                <sc-popup class="pick-cols-pop" kind="menu" [backdrop]="false" [title]="'codex.picker.columns' | translate" (closed)="colsOpen.set(false)">
+                  <div class="pc-body">
                   @for (v of catalogue; track v.key) {
                     @if (v.key !== NAME_KEY && !unavailable().has(v.key)) {
                       <label class="pc-row">
@@ -285,8 +309,10 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
                   <button type="button" class="pc-reset" (click)="resetColumns()">
                     {{ 'codex.picker.menu.clear' | translate }}
                   </button>
-                </div>
-              </details>
+                  </div>
+                </sc-popup>
+                }
+              </div>
             </div>
 
             @if (rows().length === 0) {
@@ -349,7 +375,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
                     </tr>
                   </thead>
                   <tbody>
-                    @for (c of rows(); track c.className) {
+                    @for (c of shownRows(); track c.className) {
                       <tr class="pick-row" tabindex="0" [class.cur]="c.className === baselineClass()" [class.pinned]="shell() && c.className === baselineClass()"
                           [attr.aria-label]="'codex.picker.pickRow' | translate: { name: c.name }"
                           (click)="pick(c)" (keydown.enter)="pick(c)" (keydown.space)="pick(c); $event.preventDefault()">
@@ -441,63 +467,40 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
                 <p class="pick-sorthint">{{ 'codex.swap.sortHint' | translate }}</p>
               }
 
-              <p class="pick-note">{{ 'codex.picker.dashNote' | translate }}</p>
+              <!-- Only the half of the note that a dash in the shown table needs (B13: not under a cooler). -->
+              @if (dashNoteKey(); as note) {
+                <p class="pick-note">{{ note | translate }}</p>
+              }
               @if (baselineOutOfSet()) {
                 <p class="pick-note baseline-note">{{ 'codex.picker.baselineOutOfSet' | translate }}</p>
               }
             }
           }
 
-          <footer class="pick-foot">
-            @if (missingColumnsText(); as missing) {
-              <p class="pick-missing">{{ 'codex.picker.footerMissing' | translate: { fields: missing } }}</p>
-            }
-          </footer>
-        </article>
-      </div>
+          <ng-container popupActions>
+            <button scAction type="button" (click)="clearSlot()">{{ 'codex.swap.clearSlot' | translate }}</button>
+          </ng-container>
+          @if (missingColumnsText(); as missing) {
+            <span popupStatus class="pick-missing">{{ 'codex.picker.footerMissing' | translate: { fields: missing } }}</span>
+          }
+      </sc-popup>
     }
   `,
   styles: [`
     :host { display: contents; }
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-    /* Concept part-01:403-404. padding 3.2rem 4.5rem at the mock's 13px root
-       = 42px 58px, and cursor:pointer - the veil IS the close affordance, so it
-       has to read as clickable. The window takes the arrow back (part-01:406). */
-    .pick-veil { position: fixed; inset: 0; z-index: 150;
-      background: color-mix(in srgb, var(--sc-bg-0) 60%, transparent);
-      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-      display: grid; place-items: center; padding: 42px 58px; overflow-y: auto;
-      cursor: pointer; }
-    .pick-hint { position: absolute; top: 16px; left: 0; right: 0; text-align: center;
-      font-size: max(0.75rem, var(--sc-fs-floor)); color: var(--sc-fg-2); pointer-events: none; margin: 0; }
-    .pick-hint.inferred { position: static; pointer-events: auto; text-align: left; margin: 0 18px;
+    .pick-hint.inferred { text-align: left; margin: 0; font-size: max(0.75rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
       border-left: 2px solid color-mix(in srgb, var(--sc-warn) 55%, transparent); padding-left: 8px; }
 
-    .pick-win { position: relative; width: 100%; max-width: var(--sc-ov-area); max-height: min(100%, var(--sc-ov-max-h));
-      display: flex; flex-direction: column; background: var(--sc-bg-1);
-      border: 1px solid color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0));
-      border-radius: var(--radius-md, 4px); box-shadow: 0 24px 70px rgb(0 0 0 / .7);
-      overflow: hidden; padding: 16px 18px 14px; gap: 10px; cursor: default; }
-
-    .pick-head { display: flex; align-items: flex-start; gap: 10px;
-      background: linear-gradient(180deg, var(--sc-bg-2), var(--sc-bg-1));
-      margin: -16px -18px 0; padding: 12px 16px; }
+    /* The popup body is the one scroller; the table box inside it keeps its own scroll. */
     .pick-titles { flex: 1 1 auto; min-width: 0; }
-    .pick-titles h2 { margin: 0; font-size: 1.02rem; }
     .pick-installed { margin: 3px 0 0; font-size: max(0.74rem, var(--sc-fs-floor)); color: var(--sc-fg-1); overflow-wrap: anywhere; }
     .pick-applies { margin: 2px 0 0; font-size: max(0.7rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
-    .pick-clear { flex: 0 0 auto; padding: 5px 10px; border-radius: 6px; background: var(--sc-bg-0);
-      border: 1px dashed var(--sc-border); color: var(--sc-fg-1); font: inherit; font-size: max(0.72rem, var(--sc-fs-floor)); cursor: pointer; }
-    .pick-clear:hover { border-color: var(--sc-danger); color: var(--sc-danger); }
-    .pick-close { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; background: var(--sc-bg-0);
-      border: 1px solid var(--sc-border); color: var(--sc-fg-1); cursor: pointer; font-size: 0.9rem; }
-    .pick-close:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
     .pick-msg { margin: 6px 0; font-size: 0.8rem; color: var(--sc-fg-2); }
     .pick-msg.err { color: var(--sc-danger); }
     .pick-retry { align-self: flex-start; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-accent); color: var(--sc-accent); font-family: inherit; font-size: max(0.78rem, var(--sc-fs-floor)); cursor: pointer; }
     .pick-retry:hover { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
-    .pick-retry:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .pick-retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @media (pointer: coarse) { .pick-retry { min-height: 44px; } }
 
     /* Concept .scope-bar (part-01:632-634): ONE centred row - label, chips,
@@ -541,10 +544,17 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
     .pick-cols { position: relative; align-self: flex-end; }
     .pick-cols-sum { cursor: pointer; padding: 6px 10px; border-radius: 6px; background: var(--sc-bg-0);
       border: 1px solid var(--sc-border); color: var(--sc-fg-1); font-size: max(0.76rem, var(--sc-fs-floor)); list-style: none; }
+    .pick-cols-sum { min-block-size: var(--sc-tap-min); }
+    .pick-cols-sum:focus-visible, .pc-reset:focus-visible, .fc button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .pick-cols-sum::-webkit-details-marker { display: none; }
-    .pick-cols-pop { position: absolute; top: calc(100% + 4px); right: 0; z-index: 6; width: 220px; max-height: 320px;
-      overflow-y: auto; background: var(--sc-bg-2); border: 1px solid var(--sc-border); border-radius: var(--radius-md, 4px);
-      box-shadow: 0 10px 28px rgb(0 0 0 / .6); padding: 8px; display: flex; flex-direction: column; gap: 3px; }
+    .pick-cols-pop { position: absolute; top: calc(100% + 4px); left: 0; z-index: 6;
+      /* The host is capped at its containing block (the narrow button, .sc-popup caps it at 100%): give it the menu width, so labels are not cut off. */
+      inline-size: min(var(--sc-ov-menu), calc(100vw - 2 * var(--sc-space-4))); max-inline-size: none; }
+    /* Phone: the menu opens inline below the button (full toolbar width) instead of hanging off the screen edge. */
+    @media (max-width: 720px) {
+      .pick-cols-pop { position: static; inline-size: 100%; margin-top: var(--sc-space-1); }
+    }
+    .pc-body { display: flex; flex-direction: column; gap: 3px; max-height: min(320px, 45dvh); overflow-y: auto; }
     .pc-row { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
     .pc-row.off { color: var(--sc-fg-2); cursor: not-allowed; }
     /* LOW-6: the unavailable columns render as a disabled fieldset group, not
@@ -553,7 +563,8 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
       border-top: 1px dashed var(--sc-border); }
     .pc-unavail { margin: 0 0 2px; padding: 0; font-size: 11px; color: var(--sc-fg-2); font-style: italic; }
     .pc-reset { margin-top: 6px; padding: 4px 8px; border-radius: 4px; background: transparent;
-      border: 1px solid var(--sc-border); color: var(--sc-fg-2); font: inherit; font-size: 11px; cursor: pointer; align-self: flex-start; }
+      border: 1px solid var(--sc-border); color: var(--sc-fg-2); font: inherit; font-size: 11px; cursor: pointer; align-self: flex-start;
+      min-block-size: var(--sc-tap-min); }
 
     /* MEDIUM-5: the column-menu popover used to be an absolutely-positioned
        child of the th cell, so this scroll box had to drop its own clipping
@@ -565,7 +576,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
        Overlay (see column-menu.component.ts), so .pick-scroll never has to
        relax its overflow at all — it stays a normal, always-scrollable
        container regardless of any open menu. */
-    .pick-scroll { overflow: auto; border: 1px solid var(--sc-border); border-radius: var(--radius-md, 4px); flex: 1 1 auto; }
+    .pick-scroll { min-height: 0; overflow: auto; border: 1px solid var(--sc-border); border-radius: var(--radius-md, 4px); flex: 1 1 auto; }
     /* Concept table.wt part-01:621-622 - 11px body, and a 9px / .08em head
        that must NOT wrap: without white-space:nowrap a two-word column title
        broke over two lines and doubled the height of the whole header band.
@@ -589,7 +600,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
     .pick-row.cur { background: color-mix(in srgb, var(--sc-warn) 8%, transparent); }
     .pick-row.cur td.c-name { background: color-mix(in srgb, var(--sc-warn) 14%, var(--sc-bg-0)); }
 
-    td.c-name { padding: 4px 5px; }
+    td.c-name { padding: 4px 5px; min-inline-size: 14rem; }
     .pick-path { display: inline-flex; margin-inline-start: auto; }
     .pick-detail { position: absolute; inset-inline-end: 4px; top: 50%; transform: translateY(-50%); display: inline-flex; align-items: center; justify-content: center;
       min-width: 28px; min-height: max(28px, var(--sc-tap-min)); border-radius: 6px; color: var(--sc-fg-2);
@@ -600,8 +611,8 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
     .pick-row.pinned td { position: sticky; top: 34px; z-index: 1; background: color-mix(in srgb, var(--sc-warn) 14%, var(--sc-bg-1)); }
     .pick-row.pinned td.c-name { z-index: 3; }
     .pick-ident { display: flex; flex-direction: column; gap: 1px; min-width: 0; margin-left: 4px; }
-    .pick-name { font-size: 0.8rem; color: var(--sc-fg-0); overflow-wrap: anywhere; display: inline-flex; align-items: center; gap: 6px; }
-    .pick-meta { font-size: max(0.64rem, var(--sc-fs-floor)); color: var(--sc-fg-2); overflow-wrap: anywhere; }
+    .pick-name { font-size: 0.8rem; color: var(--sc-fg-0); overflow-wrap: break-word; word-break: normal; display: inline-flex; align-items: center; gap: 6px; }
+    .pick-meta { font-size: max(0.64rem, var(--sc-fs-floor)); color: var(--sc-fg-2); overflow-wrap: break-word; }
     .size-tag { font-size: max(0.62rem, var(--sc-fs-floor)); font-weight: 600; padding: 1px 6px; border-radius: 4px;
       color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent);
       border: 1px solid color-mix(in srgb, var(--sc-accent) 45%, transparent); }
@@ -637,20 +648,25 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
     .fc { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 999px;
       border: 1px solid color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0));
       background: color-mix(in srgb, var(--sc-accent) 10%, transparent); color: var(--sc-accent); font-size: 11px; }
-    .fc button { background: transparent; border: none; color: inherit; cursor: pointer; font: inherit; padding: 0; }
+    .fc button { background: transparent; border: none; color: inherit; cursor: pointer; font: inherit; padding: 0;
+      min-block-size: var(--sc-tap-min); min-inline-size: var(--sc-tap-min); }
 
     .pick-cues { display: flex; justify-content: space-between; font-size: 11px; color: var(--sc-fg-2); margin-top: 2px; }
 
-    .pick-foot { padding-top: 6px; }
     .pick-missing { margin: 0; font-size: 11px; color: var(--sc-fg-2); font-style: italic; }
 
-    /* Tablet: a wide sheet with a little air; phone: full-screen takeover. */
-    @media (max-width: 1080px) { .pick-veil { padding: 24px 16px; } }
     @media (max-width: 720px) {
-      .pick-veil { padding: 0; }
-      .pick-win { max-width: none; width: 100%; border-radius: 0; padding-bottom: env(safe-area-inset-bottom, 0px); height: 100vh; height: 100dvh; max-height: 100dvh; }
-      .pick-scope { flex-direction: column; align-items: stretch; }
-      .pick-count, .pick-cols { align-self: flex-start; }
+      .pick-scope { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+      /* Phone: label above its switch, the switch spans the column and scrolls inside its own pill
+         when the labels are wider than the screen, the hint wraps below - nothing runs off the edge. */
+      .pick-seg { flex-wrap: wrap; min-inline-size: 0; }
+      .pick-seg-label { flex: 1 0 100%; }
+      .pick-seg sc-segmented { display: block; inline-size: 100%; }
+      .pick-preview-hint { flex: 1 0 100%; max-width: none; }
+      .pick-search { flex: 0 0 auto; min-width: 0; max-inline-size: 100%; }
+      .pick-count { align-self: flex-start; }
+      .pick-cols { align-self: stretch; min-inline-size: 0; }
+      .pick-cols-sum { align-self: flex-start; }
       .pick-count { margin-left: 0; }
     }
   `],
@@ -659,6 +675,7 @@ export class CodexSwapPickerComponent {
   private readonly svc = inject(CodexService);
   private readonly source = inject(CodexSwapCandidatesService);
   private readonly i18n = inject(TranslateService);
+  private readonly zone = inject(NgZone);
   /** Shell beta: detail-page icon link per row, baseline pinned under the header. */
   protected readonly shell = inject(BetaService).isEnabled('shell');
 
@@ -695,8 +712,28 @@ export class CodexSwapPickerComponent {
    */
   readonly portTypes = signal<string[]>([]);
   readonly typeFilter = signal<string>(TYPE_ALL);
+  /** The column chooser menu (an `sc-popup kind="menu"` under its button). */
+  readonly colsOpen = signal(false);
+
+  /** Rail eyebrow: "Slot · S3". */
+  eyebrow(t: SwapTarget): string {
+    return [this.slotLabel(t), t.size != null ? `S${t.size}` : ''].filter(Boolean).join(' · ');
+  }
 
   private readonly search = viewChild<ElementRef<HTMLInputElement>>('search');
+  private readonly motion = viewChild(ScPopupMotionDirective);
+  private dismissing = false;
+
+  /** Close through the popup motion (a collapse to a line, about half the open time), then tell the host. */
+  dismiss(): void {
+    const m = this.motion();
+    if (!m) { this.closed.emit(); return; }
+    if (this.dismissing) return;
+    this.dismissing = true;
+    // A rejected or never-settling exit must not leave the picker unable to close: finish either way.
+    const safety = new Promise<void>((resolve) => setTimeout(resolve, 1500));
+    void Promise.race([m.exit().catch(() => undefined), safety]).then(() => { this.dismissing = false; this.closed.emit(); });
+  }
   private loadToken = 0;
 
   /** Value keys that get a magnitude bar (MASTER §9: Alpha, DPS only). */
@@ -723,6 +760,12 @@ export class CodexSwapPickerComponent {
         .subscribe((e) => this.isPhone.set(e.matches));
     }
 
+    ensurePopupMotionStyles(inject(EnvironmentInjector));
+    inject(DestroyRef).onDestroy(() => {
+      this.stopRamp();
+      this.dropPrepared();
+    });
+
     effect(() => {
       const t = this.target();
       this.loadToken += 1;
@@ -734,13 +777,30 @@ export class CodexSwapPickerComponent {
       this.portTypes.set([]);
       this.columnMenu.set(EMPTY_COLUMN_MENU_STATE);
       this.error.set(false);
-      if (t) void this.load(t, this.loadToken);
+      this.stopRamp();
+      this.rowCap.set(Infinity);
+      if (!t) return;
+      const ready = this.takePrepared(t);
+      if (ready) {
+        // Built on the card's press: the plate's first frame already has its table.
+        this.portTypes.set(ready.types);
+        this.showCandidates(ready.rows);
+        return;
+      }
+      void this.load(t, this.loadToken);
     });
 
+    // The search field takes focus. When it is there with the dialog's first render, [scDialog] focuses it
+    // (cdkFocusInitial) in the layout it reads anyway. When it comes later (the list loaded after the open),
+    // it is focused after the next frame: a focus() right in the render forced a second full layout of the
+    // freshly built table inside the open (about 40 ms, r6 popup frames).
     effect(() => {
-      if (this.candidates().length > 0 || this.loading()) {
-        queueMicrotask(() => this.search()?.nativeElement.focus());
-      }
+      const input = this.search()?.nativeElement;
+      if (!input || (this.candidates().length === 0 && !this.loading())) return;
+      if (typeof requestAnimationFrame !== 'function') { input.focus(); return; }
+      this.zone.runOutsideAngular(() => requestAnimationFrame(() => setTimeout(() => {
+        if (input.isConnected && document.activeElement !== input) input.focus({ preventScroll: true });
+      })));
     });
   }
 
@@ -758,75 +818,165 @@ export class CodexSwapPickerComponent {
   private async load(t: SwapTarget, token: number): Promise<void> {
     this.loading.set(true);
     try {
-      const installedName = t.className;
-      // One call through codex_swap_candidates, cached per build and shared by
-      // identical hardpoints (#244) — see CodexSwapCandidatesService.
-      const data = await this.source.load({
-        installed: installedName,
-        types: t.attachTypes ?? [],
-        size: t.size,
-      });
-      if (token !== this.loadToken) return;
-      const installed = installedName ? data.payloads.get(installedName) : undefined;
-      const attachType = (installed?.payload as { attachType?: string | null } | undefined)?.attachType;
-      const types = attachType ? [attachType] : (t.attachTypes ?? []).filter(Boolean);
-      this.portTypes.set(types);
-      if (types.length === 0) {
-        this.candidates.set([]);
-        return;
-      }
-
-      // The factory part is not part of the cache key (identical hardpoints
-      // share a list whatever they shipped with). It is nearly always in the
-      // list already; only when it is not is it fetched on its own.
-      let payloads = data.payloads;
-      let ammo = data.ammo;
-      const factory = t.factoryClassName;
-      if (factory && !payloads.has(factory)) {
-        const extra = await this.svc.getEntityPayloads([factory]);
-        const extraAmmo = await this.svc.getAmmoPayloads(
-          ammoClassNamesFor([factory], (cn) => extra.get(cn)?.payload),
-        );
-        if (token !== this.loadToken) return;
-        payloads = new Map([...payloads, ...extra]);
-        ammo = new Map([...ammo, ...extraAmmo]);
-      }
-
-      const items = data.items;
-      const seedNames = [installedName, factory].filter((n): n is string => !!n);
-      const rows = items.map((it) =>
-        this.toCandidate(it, payloads, ammo, it.classNameSlug === installedName),
-      );
-      for (const extra of seedNames) {
-        if (items.some((i) => i.classNameSlug === extra)) continue;
-        if (rows.some((r) => r.className === extra)) continue;
-        const hit = payloads.get(extra);
-        if (!hit) continue;
-        rows.unshift(
-          this.toCandidate(
-            {
-              kind: hit.kind,
-              classNameSlug: extra,
-              nameLocalized: extra === installedName ? t.name : null,
-              manufacturerCode: null,
-              size: t.size,
-              subType: (hit.payload as { subType?: string | null } | undefined)?.subType ?? null,
-              grade: null,
-            },
-            payloads,
-            ammo,
-            extra === installedName,
-          ),
-        );
-      }
-
-      this.candidates.set(rows);
+      const built = await this.build(t, () => token !== this.loadToken);
+      if (!built) return;
+      this.portTypes.set(built.types);
+      this.showCandidates(built.rows);
     } catch (error) {
       logWarn('codex', 'swap candidates failed', error);
       if (token === this.loadToken) this.error.set(true);
     } finally {
       if (token === this.loadToken) this.loading.set(false);
     }
+  }
+
+  // ── prepared on press ──────────────────────────────────────────────────────
+
+  /**
+   * The press (pointerdown / focus) on a slot card that opens this picker: load and build its
+   * candidate rows now, so the open does not spend its first frames on the query, the row
+   * build and a loading state before the table. Nothing is shown; an entry the reader does
+   * not open within PREPARED_TTL_MS is dropped.
+   */
+  prepare(t: SwapTarget): void {
+    if (this.target()) return;
+    const key = preparedKey(t);
+    if (this.prepared?.key === key) return;
+    this.dropPrepared();
+    const entry: PreparedPick = { key, result: null, timer: null };
+    this.prepared = entry;
+    entry.timer = setTimeout(() => {
+      if (this.prepared === entry) this.dropPrepared();
+    }, PREPARED_TTL_MS);
+    this.build(t, () => this.prepared !== entry)
+      .then((r) => {
+        if (this.prepared === entry) entry.result = r;
+      })
+      .catch(() => {
+        // The open loads again and shows the error state with retry.
+        if (this.prepared === entry) this.dropPrepared();
+      });
+  }
+
+  private prepared: PreparedPick | null = null;
+
+  private takePrepared(t: SwapTarget): BuiltPick | null {
+    const p = this.prepared;
+    const hit = p && p.key === preparedKey(t) ? p.result : null;
+    this.dropPrepared();
+    return hit;
+  }
+
+  private dropPrepared(): void {
+    if (this.prepared?.timer != null) clearTimeout(this.prepared.timer);
+    this.prepared = null;
+  }
+
+  // ── first draw in slices ───────────────────────────────────────────────────
+
+  /**
+   * How many table rows are in the DOM. A fresh list starts with FIRST_ROWS and grows by
+   * ROW_SLICE per frame: the plate's fill starts only at 42 % of 900 ms, so
+   * the whole table is built across those frames instead of in the open's first one, and the
+   * cascade (rows from 1000 ms on) sees the finished table.
+   */
+  readonly rowCap = signal(Infinity);
+  readonly shownRows = computed<SwapCandidate[]>(() => {
+    const rows = this.rows();
+    const cap = this.rowCap();
+    return cap >= rows.length ? rows : rows.slice(0, cap);
+  });
+  private rampFrame = 0;
+
+  private showCandidates(rows: SwapCandidate[]): void {
+    this.stopRamp();
+    if (rows.length > FIRST_ROWS && typeof requestAnimationFrame === 'function') {
+      this.rowCap.set(FIRST_ROWS);
+      this.zone.runOutsideAngular(() => {
+        const step = (): void => {
+          const next = this.rowCap() + ROW_SLICE;
+          if (next >= this.rows().length) {
+            this.rampFrame = 0;
+            this.zone.run(() => this.rowCap.set(Infinity));
+            return;
+          }
+          this.zone.run(() => this.rowCap.set(next));
+          this.rampFrame = requestAnimationFrame(step);
+        };
+        this.rampFrame = requestAnimationFrame(step);
+      });
+    } else {
+      this.rowCap.set(Infinity);
+    }
+    this.candidates.set(rows);
+  }
+
+  private stopRamp(): void {
+    if (this.rampFrame) cancelAnimationFrame(this.rampFrame);
+    this.rampFrame = 0;
+  }
+
+  /** Query and build the candidate rows of a target; null when `stale()` turned true meanwhile. */
+  private async build(t: SwapTarget, stale: () => boolean): Promise<BuiltPick | null> {
+    const installedName = t.className;
+    // One call through codex_swap_candidates, cached per build and shared by
+    // identical hardpoints (#244) — see CodexSwapCandidatesService.
+    const data = await this.source.load({
+      installed: installedName,
+      types: t.attachTypes ?? [],
+      size: t.size,
+    });
+    if (stale()) return null;
+    const installed = installedName ? data.payloads.get(installedName) : undefined;
+    const attachType = (installed?.payload as { attachType?: string | null } | undefined)?.attachType;
+    const types = attachType ? [attachType] : (t.attachTypes ?? []).filter(Boolean);
+    if (types.length === 0) return { types, rows: [] };
+
+    // The factory part is not part of the cache key (identical hardpoints
+    // share a list whatever they shipped with). It is nearly always in the
+    // list already; only when it is not is it fetched on its own.
+    let payloads = data.payloads;
+    let ammo = data.ammo;
+    const factory = t.factoryClassName;
+    if (factory && !payloads.has(factory)) {
+      const extra = await this.svc.getEntityPayloads([factory]);
+      const extraAmmo = await this.svc.getAmmoPayloads(
+        ammoClassNamesFor([factory], (cn) => extra.get(cn)?.payload),
+      );
+      if (stale()) return null;
+      payloads = new Map([...payloads, ...extra]);
+      ammo = new Map([...ammo, ...extraAmmo]);
+    }
+
+    const items = data.items;
+    const seedNames = [installedName, factory].filter((n): n is string => !!n);
+    const rows = items.map((it) =>
+      this.toCandidate(it, payloads, ammo, it.classNameSlug === installedName),
+    );
+    for (const extra of seedNames) {
+      if (items.some((i) => i.classNameSlug === extra)) continue;
+      if (rows.some((r) => r.className === extra)) continue;
+      const hit = payloads.get(extra);
+      if (!hit) continue;
+      rows.unshift(
+        this.toCandidate(
+          {
+            kind: hit.kind,
+            classNameSlug: extra,
+            nameLocalized: extra === installedName ? t.name : null,
+            manufacturerCode: null,
+            size: t.size,
+            subType: (hit.payload as { subType?: string | null } | undefined)?.subType ?? null,
+            grade: null,
+          },
+          payloads,
+          ammo,
+          extra === installedName,
+        ),
+      );
+    }
+
+    return { types, rows };
   }
 
   private toCandidate(
@@ -894,6 +1044,7 @@ export class CodexSwapPickerComponent {
 
   /** Translates the raw damage-channel id `sameFamily` carries into a word. */
   private resolveScopeParams(scope: SwapScope, params: Record<string, string | number>): Record<string, string | number> {
+    if (scope === 'sameClass' && typeof params['class'] === 'string') return { ...params, class: this.term(params['class']) };
     if (scope !== 'sameFamily') return params;
     const family = params['family'];
     if (typeof family !== 'string' || !family) return params;
@@ -954,7 +1105,7 @@ export class CodexSwapPickerComponent {
       { value: TYPE_ALL, label: this.i18n.instant('codex.swap.filterAll') as string },
     ];
     for (const type of [...counts.keys()].sort()) {
-      opts.push({ value: type, label: `${type} (${counts.get(type)})` });
+      opts.push({ value: type, label: `${this.term(type)} (${counts.get(type)})` });
     }
     return opts;
   });
@@ -1069,6 +1220,60 @@ export class CodexSwapPickerComponent {
     this.columnDefFor(NAME_SORT_KEY),
     ...this.displayColumns().map((c) => c.def),
   ]);
+
+  /** Which "—" note the shown table needs: Ammo on an energy weapon, Spread, both or none. */
+  readonly dashNoteKey = computed<string | null>(() => {
+    const cols = new Set(this.displayColumns().map((c) => c.key));
+    const rows = this.rows();
+    const dash = (key: string) => cols.has(key) && rows.some((c) => swapCellState(c, key) === 'notApplicable');
+    const ammo = dash('codex.picker.col.ammo');
+    const spread = dash('codex.picker.col.spread');
+    if (ammo && spread) return 'codex.picker.dashNote';
+    if (ammo) return 'codex.picker.dashNoteAmmo';
+    return spread ? 'codex.picker.dashNoteSpread' : null;
+  });
+
+  /**
+   * The slot in words for the head: the port name without its engine prefix ("Hardpoint Cooler Left" →
+   * "Cooler Left"); a bare class port ("Hardpoint Class 2", a gun inside a mount) names what it holds — the
+   * weapon type ("Gatling"), else the attach type ("Schiffswaffe").
+   */
+  slotLabel(t: SwapTarget): string {
+    const bare = t.port.replace(/^hardpoint[\s_-]*/i, '').trim();
+    if (bare && !/^class\s*\d+$/i.test(bare)) return this.term(bare);
+    const types = t.rawTypes?.length ? t.rawTypes : (t.attachTypes ?? []);
+    const weaponKey = types.includes('WeaponGun') ? partTypeKey('weapons', t.className) : null;
+    if (weaponKey) return this.i18n.instant(weaponKey);
+    const typed = types.length ? attachTypeLabel(types[0], (k) => this.i18n.instant(k)) : null;
+    return typed ?? this.term(bare || t.port);
+  }
+
+  /**
+   * A game word in the UI language (round-7 E1): the whole phrase when it has a key ("Power Plant" →
+   * "Generator", "Ballistic Gatling"), else word by word ("Cooler Left" → "Kühler links"). A word
+   * without a key stays as the game spells it — a product name is not translated.
+   */
+  term(label: string | null | undefined): string {
+    if (!label) return '';
+    this.lang();
+    const look = (raw: string): string | null => {
+      const id = raw.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (!id) return null;
+      const key = `codex.picker.term.${id}`;
+      const hit = this.i18n.instant(key) as string;
+      return hit && hit !== key ? hit : null;
+    };
+    const whole = look(label);
+    if (whole) return whole;
+    const words = label.split(/[\s_]+/).filter(Boolean);
+    const out: string[] = [];
+    for (let i = 0; i < words.length; i++) {
+      const pair = i + 1 < words.length ? look(`${words[i]}${words[i + 1]}`) : null;
+      if (pair) { out.push(pair); i++; continue; }
+      out.push(look(words[i]) ?? words[i]);
+    }
+    return out.join(' ');
+  }
 
   readonly rows = computed<SwapCandidate[]>(() =>
     applyColumnMenu(this.searched(), this.allMenuColumns(), this.columnMenu()),
@@ -1252,6 +1457,7 @@ export class CodexSwapPickerComponent {
   cellText(c: SwapCandidate, v: SwapValueDef): string {
     if (v.key === 'codex.picker.col.deltaSustained') return this.deltaText(c);
     const state = swapCellState(c, v.key);
+    if (state === 'value' && v.key === 'codex.picker.col.archetype') return this.term(c.archetype);
     if (state === 'value') return swapCell(c, { key: v.key, format: v.format, derived: false });
     return this.i18n.instant('codex.picker.dashCell') as string;
   }
@@ -1274,23 +1480,25 @@ export class CodexSwapPickerComponent {
 
   /** "KLA · Laser Repeater · Grade A" — catalog data, so untranslated. */
   metaLine(c: SwapCandidate): string {
-    return [c.manufacturerCode, c.typeLabel, c.grade].filter(Boolean).join(' · ');
+    return [c.manufacturerCode, c.typeLabel ? this.term(c.typeLabel) : null, c.grade].filter(Boolean).join(' · ');
   }
 
   setQuery(ev: Event): void {
     this.query.set((ev.target as HTMLInputElement).value);
   }
 
-  /** Row click picks the component directly (MASTER §9). */
+  /** Row click picks the component directly (MASTER §9); the draft lands at once, the picker then closes through its reverse motion. */
   pick(c: SwapCandidate): void {
     const t = this.target();
-    if (!t) return;
+    if (!t || this.dismissing) return;
     this.picked.emit({ className: c.className, target: t });
+    this.dismiss();
   }
 
   clearSlot(): void {
     const t = this.target();
-    if (!t) return;
+    if (!t || this.dismissing) return;
     this.picked.emit({ className: null, target: t });
+    this.dismiss();
   }
 }

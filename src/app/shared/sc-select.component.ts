@@ -123,6 +123,13 @@ let uid = 0;
     }
     .trigger:hover:not(:disabled) { border-color: color-mix(in srgb, var(--sc-accent) 55%, var(--sc-border)); }
     .trigger.open { border-color: var(--sc-accent); }
+    /* Compact (the segmented control's density, pointer only): 32px, the height of a compact segment row beside it. */
+    :host(.compact) .trigger { min-height: 32px; padding: 4px 10px; font-size: max(0.8rem, var(--sc-fs-floor)); }
+    @media (pointer: coarse) { :host(.compact) .trigger { min-height: 48px; } }
+    /* quiet: a subtle in-scene switcher (no fill, no frame until hover / open / focus). */
+    :host(.quiet) .trigger { background: transparent; border-color: transparent; color: var(--sc-fg-1); }
+    :host(.quiet) .trigger:hover:not(:disabled), :host(.quiet) .trigger.open, :host(.quiet) .trigger:focus-visible {
+      background: color-mix(in srgb, var(--sc-bg-0) 70%, transparent); border-color: var(--sc-border); color: var(--sc-fg-0); }
     .trigger:disabled { opacity: 0.45; cursor: not-allowed; }
 
     .value { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

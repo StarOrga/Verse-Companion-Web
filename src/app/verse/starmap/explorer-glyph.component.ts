@@ -19,7 +19,7 @@ import { STARS_PER_PATCH, defaultPatch } from './starmap.model';
       [attr.aria-label]="'starmap.glyph.aria' | translate: { lit: lit(), total: total }"
       [scTooltip]="'starmap.glyph.aria' | translate: { lit: lit(), total: total }"
       scTooltipTier="label">
-      <sc-constellation-figure class="fig" size="small" [points]="points()" [starCount]="lit()" [sun]="sun()" />
+      <sc-constellation-figure class="fig" size="small" [points]="points()" [starCount]="lit()" />
       <span class="count">{{ lit() }}</span>
     </a>
   `,
@@ -29,7 +29,7 @@ import { STARS_PER_PATCH, defaultPatch } from './starmap.model';
       .glyph { display: inline-flex; align-items: center; gap: 4px; min-height: var(--sc-tap-min, 44px); padding: 0 var(--sc-pad-1);
         border-radius: 8px; color: var(--sc-fg-1); text-decoration: none; }
       .glyph:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
-      .glyph:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .glyph:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .fig { width: 26px; }
       .count { font: 600 0.8rem var(--sc-font-display); font-variant-numeric: tabular-nums; }
     `,
@@ -46,7 +46,6 @@ export class ExplorerGlyphComponent {
   });
   readonly points = computed(() => this.current()?.constellation?.points ?? null);
   readonly lit = computed(() => Math.min(STARS_PER_PATCH, this.current()?.starCount ?? 0));
-  readonly sun = computed(() => this.current()?.sun ?? false);
 
   constructor() {
     effect(() => {

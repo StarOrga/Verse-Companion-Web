@@ -4,6 +4,770 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.281.3] - 2026-11-19
+
+### Fixed
+- Holotable: switching to 3D no longer freezes the page; a loading animation shows where the model will appear and the page stays scrollable while it loads.
+
+## [0.281.2] - 2026-11-18
+
+### Fixed
+- Ship and item pages: the edition and skin dropdown opens fully visible above the page instead of being cut off by the content around it.
+
+## [0.281.1] - 2026-11-18
+
+### Changed
+- Ship page, classic view: "Bei RSI ansehen" and "Pledge-Link hinzufügen" sit up next to the ship name instead of at the end of the action row.
+
+## [0.281.0] - 2026-11-19
+
+### Added
+- HQ: a "Spots" page lists the places you saved in the desktop app; rename or delete them and the app takes it over on its next sync (#1056).
+- HQ Statistik: a logbook with one card per game session — duration, quantum jumps, contracts, aUEC balance and losses (#896).
+- HQ Bestand: the Ersatz suggestions also offer materials that the same blueprint accepts (#1057).
+- The desktop app's UI language packs are now hosted under `/i18n/scc-app/` so translation fixes reach players without an app release (#1055).
+
+### Changed
+- HQ live contract v3: blueprints the desktop app puts on your shelf count as owned in the Sammlung and the Nachschub craft check (#1045).
+
+## [0.280.0] - 2026-11-19
+
+### Added
+- A wish stays on the wishlist when it is assigned to an Operation. Item, ship, blueprint and preview pages in the Codex show the same two stations, wish and ownership, and assign a wish to an Operation in place; the Holotisch hangar menu reads the same way.
+- Removing a wish asks only when assigned pieces are hit, takes them from the newest Operation first and can be undone in one step. Releasing a line in the HQ offers to delete the wish as well.
+- The Archiv in HQ Planen can delete an archived Operation.
+- An Operation with plain lines from before this change asks once whether they should stand as wishes on the wishlist. Nothing changes without the answer.
+
+### Changed
+- The supply group is called "Operation" everywhere and carries the Route glyph, and every undo toast has the new look.
+- The HQ start tile counts only lines of active Operationen.
+
+### Fixed
+- Undo of a wish removal gives back exactly what the removal took, so a change made on another device in between survives, and a ship wish comes back with its name and notes.
+- A fulfilled wish line stays fulfilled when a second device pushes an outdated copy of it.
+- An archived Operation no longer keeps open wish lines.
+- Name proposals for a new Operation work for signed-in users; the service had rejected every request.
+
+## [0.279.2] - 2026-11-18
+
+### Changed
+- Admin concept "Lager — Suche, Mengen & stabile Leiste": round 3 (quantity matches across one or more stops with a per-user filter, one-click Einlagern and Rausnehmen with undo).
+
+## [0.279.1] - 2026-11-18
+
+### Fixed
+- /verse: the HQ outpost under the HQ event link no longer appears with the world; it fades in with its beacon in the staged entrance.
+
+## [0.279.0] - 2026-11-18
+
+### Added
+- Beta holotable shows a ship's interior: decks as a filter under the view row, a 3D view with a ghost hull, doors by kind (incl. brig cells), ladders, lifts, stairs and cargo grids.
+- Clicking a room fills Bauteile with its deck, height, cargo, powering relay and contents; an interior overview by type and a mini search across outside parts and inside elements.
+- Role presets (combat, cargo, medical, industry) pick the interior groups and the start deck; cargo that cannot be placed is named instead of hidden.
+- Data Uploader 0.83.0 extracts the interior from Data.p4k.
+
+### Fixed
+- The holotable no longer scrolls sideways on phones.
+
+## [0.278.2] - 2026-11-18
+
+### Changed
+- Admin concept "Lager — Suche, Mengen & stabile Leiste": round 2 (storing and taking out from a hit, compact multi-location rows, load log, place autocomplete, own location).
+
+## [0.278.1] - 2026-11-18
+
+### Fixed
+- Admin concept pages: Ctrl/⌘ + click (or a long press) sets a note on any element of a mock, not only on paragraphs and list rows, also on pages published earlier. A concept tab left open overnight picks up a new ticket by itself and keeps following new rounds.
+
+## [0.278.0] - 2026-11-17
+
+### Changed
+- 3D view of a ship: the picture keeps the same brightness from every angle and no longer turns see-through when a part is hovered or selected.
+- 3D view: clickable parts glow as their own bodies, also through the hull, and take hover and click themselves; the small rings are gone.
+- 3D view: a selected part is green with an outline, a short pulse and a name tag, while the hull and the other parts dim. The other parts stay clickable.
+
+### Added
+- 3D view: leave a selection with a second click on the part, a click into empty space, Escape or "Alle Bauteile" in the side panel. Works with the keyboard and on a phone in portrait and landscape.
+
+### Fixed
+- 3D view: a selected part no longer hides under a coloured halo, and the ship no longer flares up when something is selected.
+
+## [0.277.3] - 2026-11-17
+
+### Fixed
+- 3D views and the start-page planet: when a part of the page cannot be loaded (usually an old tab after an update), the page shows a hint with "Neu laden" instead of staying empty, and an untouched page reloads itself once to pick up the new version.
+
+## [0.277.2] - 2026-11-17
+
+### Fixed
+- Data Uploader 0.82.1: a stalled job is reported under one stable message per job and stage, so a late timer no longer opens a new error report each time.
+
+## [0.277.1] - 2026-11-17
+
+### Fixed
+- 3D model upload: a short storage hiccup while a ship's hull is checked or tidied up is answered as "try again" instead of a server error, and Data Uploader 0.82.1 retries it with a back-off, so the ship no longer goes missing after the run.
+
+## [0.277.0] - 2026-11-17
+
+### Added
+- Search: one row per ship. A ship's editions (Standard, Valiant, Pirate …) and your own variants are mini links of that row instead of rows of their own; the row itself opens the standard edition.
+- Search: the page you are on no longer shows up in the suggestions. For a near-exact term it stays as a greyed "Du bist hier" row that only closes the search.
+- Star map: the ship to recognise is picked automatically for every patch (a new ship of the patch, else the newest one from the last patch that had any) and repairs itself when its record changes.
+
+### Changed
+- Ship page: the Akte's collapse control is a quiet pair of arrows; "Wo zu kaufen" lives only in the Akte's buy tab; the four perspectives line up with the four groups of the lower strip.
+- Data Uploader 0.82.0: the game version is x.y.z plus build, read from the installation. A start only continues what is still open and says which parts.
+
+### Fixed
+- Data Uploader: it no longer reports "4.10.0" for every 4.10.x build and no longer restarts a full upload on every start while only the 3D models were open.
+- Star map 4.10: the guess shows seven ships again instead of empty placeholders.
+- Verse start: the page no longer scrolls a little further behind its second page, and the footer sits on the line of the round buttons.
+- Fleet patch overview, mission search and the maker filter no longer time out on the server.
+- Ship page: the jump to the sources opens the Akte's buy tab; in the classic header the hangar button no longer covers the Akte's tabs; Akte tiles without a picture show a neutral ring instead of a made-up ship outline.
+
+## [0.276.0] - 2026-11-17
+
+### Added
+- Codex ship pages: every loadout area has its own symbol and a top line in its area colour (offensive red, defensive blue, movement violet, signature & cooling ice cyan), in the classic view and the holo table alike; manned turrets get their own block and countermeasures a new flare symbol.
+
+## [0.275.0] - 2026-11-17
+
+### Added
+- A translation job holds what it is really billed against its budget (its estimate plus a quarter) and against the monthly cap. A large job sends its first batch group alone and reads its bill: more than 10 % above the estimate, it stops and waits for approval with the corrected figure instead of sending the rest.
+- Admin: the job list says why a job waits for approval and which paid steps a job left out because its budget or the month was used up.
+
+### Changed
+- The judge sample and the second attempts of a translation job are only paid while the job's budget allows it; a job that has spent it publishes what passed and counts the texts left untranslated.
+
+### Fixed
+- A translation job that ends early also counts a judge batch and second attempts that were sent and never read against the month.
+- The cost of an answer is taken from the model that ran it, also when the provider names a dated snapshot of it.
+
+## [0.274.2] - 2026-11-17
+
+### Changed
+- Concepts: the area-symbols and holo-table-border concept page has a fourth round with colour alternatives for signature and cooling, star-shaped countermeasure symbols, real snowflakes for coolers and gear or engine symbols for propulsion and systems.
+
+## [0.274.1] - 2026-11-17
+
+### Fixed
+- The import of a community language pack no longer runs out of memory: the pack is downloaded, stored and split in pieces instead of being held whole.
+
+## [0.274.0] - 2026-11-17
+
+### Added
+- Translation learning, the import of community language packs and the overlay rebuild run as background passes in small slices, so they finish on a string table of production size. Learning now runs after every publish and import.
+- A full translation run of a language estimates itself in the background and then waits for approval with its cost and string count; the job list shows how far an estimate or a publish is.
+
+### Changed
+- Every step of a translation job (estimate, batches, quality checks, publish) works in slices of a fixed size, whatever the number of strings. Admin: the cost of a full run is confirmed when it is approved.
+
+### Fixed
+- CIG's own translations are respected: they were looked up under the wrong table name, so strings CIG already translates were translated again.
+- The nightly sync of community language packs no longer ends in a killed worker.
+- A translation job that is started again books the spend of its second run.
+- Cancelling a translation job no longer leaves a paid batch behind or sends its texts again as corrections; the part of a job that was sent and never read is counted against the monthly budget.
+- A translation job stops after three unanswered batch creations instead of risking one paid duplicate after another, and it survives network errors while it waits for a batch.
+- What an admin or a community pack wrote for a text while a job was running is no longer overwritten by the job, and the overlay served by default is always the one of the live build.
+
+## [0.273.6] - 2026-11-17
+
+### Fixed
+- Server errors reach error tracking as one issue per function, status and error code (desktop crashes per product and error type) instead of one catch-all issue for every error.
+
+## [0.273.5] - 2026-11-17
+
+### Fixed
+- Creating a feedback topic from a telemetry finding while another topic is open in the feedback panel now closes that topic and shows the composer with the new text; opening an existing topic from telemetry switches to it.
+
+## [0.273.4] - 2026-11-17
+
+### Fixed
+- A finished translation is published right away instead of waiting until the other languages of the same upload have been estimated.
+- Publishing a translation no longer ends in a killed worker: the learning pass, which does not fit one request yet, is recorded as due instead of being run with the publish.
+
+## [0.273.3] - 2026-11-17
+
+### Fixed
+- A translation job can no longer submit the same batch twice when two runs resume it at the same moment.
+- A translation job no longer gets stuck in validation when the worker is killed right after the quality-check batch was created.
+
+## [0.273.2] - 2026-11-17
+
+### Fixed
+- Translation jobs no longer hang in the estimate: the orchestrator works through the string tables in slices instead of loading everything into one request, which the edge runtime killed on every tick.
+- A translation job whose worker is killed three times in a row now fails with a clear message instead of retrying forever.
+
+### Removed
+- The unused `verify-release-token` edge function.
+
+## [0.273.1] - 2026-11-17
+
+### Security
+- Public cron endpoints (event sync, event sheets, patch teaser, translation source sync) take an atomic run claim, so parallel anonymous calls can no longer start several paid runs at once. The event sync runs at most once per hour.
+- Uploader ingest, ship links, concept pages, API tokens and the translation admin functions check the role through `is_admin` / `is_collaborator`: a suspended or unapproved account no longer passes.
+- `readme-sync` accepts only the real service key, not a token that merely claims the service role; service-key comparisons run in constant time.
+
+## [0.273.0] - 2026-11-17
+
+### Added
+- An empty wish list now shows a night sky and "Wunsch suchen": it opens the search of the page you are on, with the cursor already in the field.
+- Adding a wish plays a short shooting-star moment on its symbol. When a wished item arrives in your Hangar or Inventar, the note reads "… ist da — Dein Wunsch ist in Erfüllung gegangen".
+
+### Changed
+- The wishlist is now called "Wünsche" (Wishes) and has one symbol everywhere, a shooting star: in the header, on every item, in the search and in the large window. Saved news keep the bookmark.
+- Small popouts that open at their button (apps, wishes, the HQ app chips) show only the coloured edge; the side rail with icon and vertical title is gone there. The HQ chip now reads "Jetzt starten".
+
+### Fixed
+- The account menu no longer scrolls sideways.
+- The "Mit der App" card in the HQ keeps its full width instead of shrinking to its chip.
+
+## [0.272.0] - 2026-11-16
+
+### Added
+- Gallery: filter segment with an animated, three-phase staged load; "Sammlung" replaces "Meine Votes".
+- Holo dossier: tabs Datenblatt / Beschreibung / Kaufen with a fixed panel size; the Kaufen tab lists the nearest shops to the HQ, a fuzzy mini search and wishlist entries with their source. The last tab is remembered across ships.
+- Data Upload: bundle history as an inline timeline (disable per patch, delete per bundle, choose the leading bundle) and the holotable silhouettes moved here from the admin users page.
+- Admin users page: requests and invites in one access panel, people panel with search.
+- Login redesigned as the "Brücke" with an intro scene, Discord/Google logos and the real header and footer.
+
+### Changed
+- Search misses are tracked in PostHog (`search:miss_show`) instead of the admin card "Häufig ohne Treffer"; the `search_misses` table is dropped.
+- Star-map glyph removed from the Galerie, Patches and News headers.
+
+### Fixed
+- Lightbox: the right-most pixel column of the screen is clickable again.
+- Unit tests can no longer write to the cloud database (guard in the Vitest setup); the 1292 "gladius" misses came from a spec.
+- Login brand channel readable on phones; energy verdict pill has a full touch target.
+
+## [0.271.5] - 2026-11-16
+
+### Fixed
+- Text fields no longer get an extra frame when you click into them. The focus ring now shows only while you move through the page with Tab; a clicked field just recolours the border it already has. This covers the search field in the header, the quick search and every input in settings, social, hangar, Codex and admin.
+- With Tab, the ring of the round search field now follows the field itself instead of drawing a rectangle inside it.
+
+## [0.271.4] - 2026-11-16
+
+### Fixed
+- Admin event datasheets: confidence now follows who states a value: RSI comm-links, RSI pages and Spectrum posts by CIG staff (now read) give 85–95 % and publish directly, the wiki and the previous edition stay in review. Rewards are captured in full (mode rewards, entry gifts, contest prizes; for unannounced editions the previous year's as a suggestion), and prerequisites read "None" when nothing was found (#364).
+
+## [0.271.3] - 2026-11-16
+
+### Security
+- Sign-up gate: an account is only created for an invited address, through a verified Google / OAuth sign-in or an admin invite. A direct sign-in no longer leaves an unapproved account behind.
+- Unapproved and suspended accounts count as viewers for every role check and can no longer write to their own rows, the star-map game tables or their profile name.
+- AI functions and the translation overlay require an approved account; deleting an account removes its invitation.
+- Login redirects are limited to the production site (a wildcard and two retired hosts were allowed before).
+
+### Changed
+- Admin people list marks accounts that were never approved and approves them with one click.
+- The login page explains a rejected sign-up and points to the access request.
+
+## [0.271.2] - 2026-11-15
+
+### Fixed
+- Data Uploader 0.81.5: an upload paused before an uploader update now restarts at the extraction when the update changed the metadata extraction, and only the silhouette or 3D step when just those changed — no more mix of old and new data on the server. Unchanged data is still skipped.
+- Data Uploader 0.81.5: opening the uploader while its update is still installing waits for the install and restarts by itself instead of failing with "No module named sc_extract".
+
+## [0.271.1] - 2026-11-15
+
+### Fixed
+- Admin event datasheets: the crawl + AI pipeline now reads every event that has no current sheet (past editions and announced 2957 events, not only the running ones), finds each event by its own comm-link, a year-aware comm-link title search and the wiki page regardless of case, and "Fehlende auswerten" on /admin/events backfills them all at once. Estimated values of unannounced editions wait for admin approval.
+
+## [0.271.0] - 2026-11-15
+
+### Changed
+- Every remaining action button in Admin, Codex, settings, Starscape, the consent banner, the phone hand-off, the feedback panel, the P4K history, the extension install page and About now uses the one action control (scAction). Each view shows at most one primary step, and destructive actions use the danger tone (#970).
+
+### Added
+- Prebuild guard `check-legacy-actions` fails the build on a new legacy `.sc-btn` / `.btn` / `.link-btn` button (#970).
+
+## [0.270.21] - 2026-11-15
+
+### Fixed
+- Data Uploader 0.81.4: the 3D build no longer reports a false "no progress" stall while a large part is converting — skin jobs get 20 minutes, every converter call logs the part it works on, standby no longer counts, and a real stall report names the phase, counter and last log line.
+
+## [0.270.20] - 2026-11-15
+
+### Changed
+- Codex: in "New in this patch" the component types (Armour and the others) switch every 24 s instead of every 8 s, so each one stays on the holotable long enough to read.
+
+## [0.270.19] - 2026-11-15
+
+### Fixed
+- Data Uploader 0.81.3: big ship hulls (Polaris, Galaxy, Constellations …) are simplified as far as they stay gap-free instead of being kept unsimplified when the first simplify step tore them — Polaris 8.38 → 4.20 MB, Galaxy 3.23 → 1.41 MB. Hulls within the size budget are unchanged.
+
+## [0.270.18] - 2026-11-15
+
+### Changed
+- Sign-in, password, star map, briefing and news retry buttons use the shared action control — the sign-in form keeps the page's one main step (#970).
+
+### Fixed
+- Main action buttons keep a readable 12 px label on touch screens.
+
+## [0.270.17] - 2026-11-15
+
+### Fixed
+- Data Uploader 0.81.2: the 25 ships that never got a 3D model (Galaxy, Polaris, Perseus, Salvation, the Constellations, all Vanguards, Vulture, Hull B, Blade, Guardian MX, San'tok.yāi …) now build one. The uploader runs a fixed geometry converter; every existing model stays exactly as it was, so nothing is rebuilt.
+
+## [0.270.16] - 2026-11-15
+
+### Fixed
+- Desktop app: signing in from Verse Companion versions up to 0.109.1 no longer ends on the 404 page — /desktop/connect forwards to /apps/starscape/connect and keeps the sign-in handoff (cb, state).
+
+## [0.270.15] - 2026-11-15
+
+### Fixed
+- Ship energy panel (classic view): the readiness verdict shows a short label with the full reason in a tooltip, and the cooling-load numbers moved into their tooltip, so nothing runs past the field any more.
+
+## [0.270.14] - 2026-11-15
+
+### Changed
+- A concept link opens the concept full screen in a new tab; the in-app page with a sub-header in between is gone.
+
+## [0.270.13] - 2026-11-15
+
+### Fixed
+- Codex "New in": the hotfix build carries the live patch label (4.10.3) instead of the older branch name, entries are grouped by category with a header per block, and unnamed entries no longer show raw keys.
+
+## [0.270.12] - 2026-11-15
+
+### Changed
+- HQ: retry, undo, crew, sharing and stock buttons use the shared action control — one main step per view, red tone for revoke and remove (#970).
+
+## [0.270.11] - 2026-11-15
+
+### Added
+- Feedback composers have a microphone button for dictation (Alt+M / ⌥M), shown in its tooltip; spoken text appears live at the cursor.
+
+## [0.270.10] - 2026-11-15
+
+### Changed
+- Telemetry: a finding that already has a feedback topic shows a speech bubble with a check mark that opens that topic.
+
+## [0.270.9] - 2026-11-15
+
+### Changed
+- The "new version" notice is now a toast in the bottom-right stack (like undo), stays until you reload.
+- All toasts line up with the round buttons at the bottom right; on phones they share one edge with the compare tray.
+- The compare tray uses the same frame as the toasts and shows real names in its chips.
+
+### Fixed
+- Popups (undo, apps, wishlist) no longer show square corners around their rounded frame.
+- Popup side rails no longer show a generic stand-in icon; only a fitting icon or a thin accent edge.
+
+## [0.270.8] - 2026-11-15
+
+### Removed
+- The unused xAI (Grok) provider is gone: no more hourly xAI check, no Grok fallback for event summaries, and no xAI entry in the service list.
+
+## [0.270.7] - 2026-11-15
+
+### Changed
+- Hangar: every action button uses the shared action control — one main step per view, red tone for delete (#970).
+
+## [0.270.6] - 2026-11-15
+
+### Fixed
+- Data Uploader 0.81.1: 3D package re-runs no longer rewrite the 17 MB part index after every package — a fully cached pass is minutes instead of hours.
+- Data Uploader: a statement timeout on a catalog batch splits the batch at once instead of resending it unchanged; silhouette batches start smaller.
+- Data Uploader log: failed model conversions name the converter's real exception, cached ships are summarised in one line, and a Windows shutdown under a running job is recorded with its resume point.
+
+## [0.270.5] - 2026-11-15
+
+### Fixed
+- Codex rank: a ship's place and the group median now count each hull once — editions and duplicate records of one hull no longer inflate a comparison group (#968).
+
+### Changed
+- Social pages: every action button uses the shared action control (one main step per page, red tone for report and delete) (#970).
+
+## [0.270.4] - 2026-11-15
+
+### Fixed
+- The hourly service check now records the reason a provider gives for a refused request (for example missing credits or a blocked key) instead of a bare HTTP status, with any key in it masked.
+
+## [0.270.3] - 2026-11-15
+
+### Fixed
+- With admin access the header no longer runs past a 1280 px window or breaks onto two rows at 1440 px: the admin entries fold into the Admin menu below 1600 px.
+- Popup row cascades keep their exact 30 ms rhythm even on a busy machine.
+
+## [0.270.1] - 2026-11-15
+
+### Fixed
+- Swap picker on phones: the "compare with" and "delta against" switches no longer run off the screen; their labels sit above them and the hint wraps.
+- The image viewer no longer closes on a click beside the picture; use ✕ or Escape.
+
+### Changed
+- One quantity stepper everywhere (wish cart, wish list, HQ Nachschub), with labelled −/+ buttons and touch-sized targets.
+- Choice pills in the HQ dialogs (claim channel, Nachschub target, wish/sell, buy/mine, mode, kind) share one control with arrow-key support.
+
+## [0.270.0] - 2026-11-15
+
+### Added
+- Every popup now shares one frame in the "Kommando-Spalte" look: a coloured strip on the left with the popup's symbol and a vertical area label, the title and ✕ in the head, actions left in the footer with the main action first, and only the content scrolls.
+- Admin-only popups carry a red top edge, admin-and-collaborator popups a copper one.
+- On phones dialogs, panels and large windows open fullscreen; the back gesture closes the popup first and only then leaves the page.
+
+### Changed
+- Dialogs never close on a click beside them; Escape closes them and focus returns to where it was. The confirm dialog gets an ✕.
+- Popup widths follow the four overlay sizes everywhere; the apps menu, wish list, hand-off and wish cart lost their own widths.
+- Form fields in popups carry their label inside the field.
+- Toasts have no ✕; the app notice offers "Später" instead.
+
+## [0.269.1] - 2026-11-15
+
+### Fixed
+- The patch-tip update (one announced target, ±1 day) now actually reaches the database: its migration shared a version number with another one and would have been skipped.
+
+## [0.269.0] - 2026-11-15
+
+### Changed
+- Focus indication is now a soft glow that only appears when navigating by keyboard — no more hard rings after a mouse click.
+- Star maps never show a default constellation: with nothing discovered yet you see one single star, otherwise only the shape you discovered. The legend is gone; hovering a star explains it.
+- Patch tip: there is only ever one tip — on the next patch CIG has actually announced. Without an announced patch there is no tip. A tip now counts as a hit within ±1 day (was ±2); existing tips were re-evaluated.
+- Codex landing: "Alle …" and "+N neue & aktualisierte" sit together as one group, the hologram beam fans out from a light point, and the data sheet lists up to seven values with a "<Name> ansehen" button.
+- Codex detail pages of items without a 3D model open on the Akte.
+- The label in the search field takes only its text width and widens to show its remove button on hover.
+
+### Fixed
+- Small texts on the rank page, the patch-tip hint and the data sheet now meet the 12 px mobile minimum.
+
+## [0.268.1] - 2026-11-15
+
+### Fixed
+- Admin telemetry: the attention line uses the singular when exactly one topic needs attention
+
+## [0.268.0] - 2026-11-15
+
+### Added
+- PostHog as the single telemetry source: typed event catalogue across all areas, error-only session replay, dead clicks and heatmaps, source maps, `/ingest` proxy
+- Server-side PostHog: errors and cron runs of every edge function, Claude call costs (`ai_calls` ledger + `$ai_generation`), desktop telemetry forwarding
+- „PostHog-Wächter“: new errors, trend breaks, quota warnings and service outages land on the admin feedback board with problem, PostHog link and a proposed fix
+- Admin telemetry page as topic cards, including external services (Claude, PostHog, Supabase, R2, UEX, RSI, xAI, readme.io)
+- PostHog dashboards, actions and flags as code (`npm run posthog:apply`)
+
+### Removed
+- Own `telemetry_events` table and stats RPC, own web-vitals capture
+
+## [0.267.1] - 2026-11-15
+
+### Changed
+- /verse HQ: the comm mast now towers over the hangar, the hall is lit on both flanks, the departing fighter shows its landing gear, the storage yard is two flat rows of containers instead of a pyramid, the runway lamps under the entrance blink from both outer ends in to the centre and stay within the hangar width, and the hangar carries the number "1".
+
+## [0.267.0] - 2026-11-15
+
+### Added
+- Popups open as a hologram "Vektor-Aufriss": a spark at the trigger, a short light line, the outline unrolling from it, the window filling from the top and the content resolving from blur; closing collapses back into the spark.
+- Large windows get a scrim with a faint dot grid instead of the horizon and star plate.
+
+### Changed
+- Open and close timings are staged per popup kind (menu 300 ms, dialog 500 ms, large window 900 ms); a re-open reverses from where the close stands; reduced motion shows popups instantly.
+- The page no longer zooms in behind a large window.
+
+## [0.266.0] - 2026-11-15
+
+### Changed
+- Codex: the "Schleichen" preset now works like silent running in the game: weapons, shields, quantum, tractor, radar and life support off, the drive at its minimum and the coolers only as high as needed to stay under 100 % cooling; a second cooler that is not needed goes off.
+- Codex: the cooling meter is computed like in the game (100 % = output of the active coolers at their power), shows the headroom or the shortfall in percent and marks more than 100 % as a warning.
+
+## [0.265.5] - 2026-11-15
+
+### Added
+- Concepts: an admin-only concept page for the HQ storage area: its own search over item, location and quantity, three quantity modes (one location, split across locations, nearby locations), a stable tab bar, and point notes by Ctrl/⌘+click that now also work on the mock.
+
+## [0.265.4] - 2026-11-15
+
+### Changed
+- Starscape app: the wallpaper follows your rank like the website — Companions from tier 3 and the Amber tint from tier 4.
+- Rank page: the extras (community star map, sun collection, badge and reward ideas) are tidy cards now; the locked ideas section reads as a calm hint, and the comet tip header wraps cleanly on phones.
+
+## [0.265.3] - 2026-11-15
+
+### Fixed
+- HQ: in the recent changes list the item name uses the full width between amount and bookmark button; location and time share one line below it.
+
+## [0.265.2] - 2026-11-15
+
+### Fixed
+- Codex: stacked modules (guns, shields, coolers, drives, missiles and more) keep the "3×" only on values that add up, such as damage, DPS, power and signatures; range, projectile speed, fire rate and timings show once. Modules with different stats are no longer stacked into one row.
+- Codex: the energy dock can no longer be set above what the power plant supplies; info texts open beside the pips instead of covering them, the facts area is more compact, the screen-edge dock keeps every system on one row and starts level with the ship picture.
+
+## [0.265.1] - 2026-11-15
+
+### Changed
+- Rank page: the header shows your current star map in outline, like the star map page, instead of the generic planet emblem.
+
+## [0.265.0] - 2026-11-15
+
+### Added
+- Rank page: reward ideas with voting from tier 5 (Astrograf, 18 stars); admins can archive ideas. Replaces the old "suggest a top entry" form.
+- Comet: an x.y.z tip that hits earns a sun splinter; three splinters make a small sun in the sun collection. Splinters never count as stars.
+- New rank rewards: Companions (tier 3, older patch constellations faintly in your sky) and Amber tint (tier 4).
+- Verse hub: the star-map planet shows a dot when the rank page has something new.
+
+### Changed
+- Rank tiers now count lit stars (1 · 3 · 7 · 12 · 18 · 26 · 35) instead of completed star maps, so every star moves the bar.
+- Comet: the x.y.z tip comes first when a hotfix target is known; the target is now also detected from Evocati patch notes on Spectrum, before PTU or EPTU exist.
+- Wallpapers: your constellation glows softly with a faint blue veil behind it, and 4K, phone and ultrawide are available from tier 1. The Starscape app draws the same glow and veil.
+
+### Fixed
+- Star map on phones: the comet strip no longer sits under the bottom search bar and feedback launcher.
+
+## [0.264.0] - 2026-11-15
+
+### Added
+- Codex: the Offensive analysis of the classic ship view lists the mounted missiles in their own table (name, size, tracking signal, count, damage per missile and in total) with the full salvo, kept apart from the guns DPS. Missiles were missing before because their warhead damage was read from the place guns keep it.
+
+## [0.263.3] - 2026-11-15
+
+### Fixed
+- Codex: the reset icon of a swapped module now sits in the corner of the favourite/hangar control, left of the info button, and no longer shifts the row when it appears or disappears; the reset icon at the Loadout heading keeps its space too.
+
+## [0.263.2] - 2026-11-15
+
+### Changed
+- Concepts: the area-symbols and holo-table-border concept page has a third round that shows the classic view with every choice made so far, keeps the alternatives collapsed and adds the open points (cooler as thermometer, manned turrets, what goes into the holo table now).
+
+## [0.263.1] - 2026-11-14
+
+### Fixed
+- Codex: a new data upload of an already published game build no longer writes into the live catalog while it runs. Every upload is staged as its own build, takes over what it skipped from the previous one, is checked for completeness and only then replaces the live build in one step, so the Codex never shows a mix of old and new data or half an upload.
+- Codex: derived lookups ("matching ships", changed-in-patch markers) and cached comparison numbers now follow every new upload instead of keeping the data of an earlier one.
+
+## [0.263.0] - 2026-11-14
+
+### Added
+- Rank page (`/verse/explorer/rank`) with seven tiers, an animated ladder, your star map as a gallery-style tile with lightbox and 4K / phone / ultrawide downloads, the series, rank rewards and "Meine Sternbilder"
+- Comet tips on concrete x.y.z patches next to the line tip
+- Admin satellite on the Verse hub and a completion celebration the next time you open a finished star map
+
+### Changed
+- Star map: gallery-style header, frameless "?" tour for every reader (it now explains everything the Logbuch did), quiet patch switcher top left, no sun, the comet leads, calmer background, rank crest with a "new" marker
+- HQ on the Verse hub redrawn as hangar and storage yard; the hub's star-map miniature matches the map inside
+- Wallpaper: realistic night sky without Milky Way, your constellation small but readable
+
+### Fixed
+- The star-map glyph in Verse headers no longer turns yellow after a comet hit
+
+## [0.262.0] - 2026-11-13
+
+### Changed
+- Classic ship view: the explainer notes of the loadout blocks (shield generators, passive shield, countermeasures, missing stock weapons) moved behind an info icon with a tooltip at the block heading.
+
+## [0.261.0] - 2026-11-13
+
+### Added
+- Classic ship view: a reset icon at the Loadout heading returns the whole loadout to stock (asks first when more than one slot changed), and every swapped slot and sub-slot has its own reset icon.
+
+## [0.260.1] - 2026-11-13
+
+### Changed
+- Concept page for area symbols and holo-table borders: iteration 2 (admin picks preselected, redrawn turret/pod/shield-generator/O2 symbols, red offensive and blue defensive borders).
+
+## [0.260.0] - 2026-11-12
+
+### Added
+- Connect screens for the Data Uploader and Starscape share one stage in the splash/404 look (VC Web — link — app).
+
+### Changed
+- Boot splash shows its logo, streaks and word only after 600 ms and leaves with a fade and a short push-in.
+- The hint after "SCC-App starten" is a star toast that leaves by itself once the app is connected.
+
+### Fixed
+- Starscape connect page no longer answered by the 404.
+- Data Uploader 0.81.0: no sends to a disposed renderer, no second run after a renderer reload, catalog upserts hash each payload once (statement timeouts), known-bad LOD0 meshes skipped, short converter cwd, async safeStorage, updater without the failing differential download, mission props no longer counted as ships, transient blueprint sign retry, heartbeat logging.
+
+## [0.259.6] - 2026-11-12
+
+### Changed
+- Codex loadout: identical items stack in every block like the weapons do — shield generators and countermeasures included — as "3× …" with the "Einzeln" toggle; a passive shield generator keeps its own row next to the active ones. The shield note counts the generators instead of saying "all three".
+
+## [0.259.5] - 2026-11-12
+
+### Fixed
+- Tooltips no longer stack: hovering an element with its own tooltip inside another tooltip-bearing element (e.g. a stat chip inside a loadout slot card) opens only the inner tooltip; the outer one returns when the pointer is back on the outer element.
+
+## [0.259.4] - 2026-11-12
+
+### Changed
+- Codex loadout (classic view): the block boxes (Bewaffnung and the other loadout blocks) are built like the Offensive card — same 4px rounding, an even 1px border without the square-looking accent bar on top, same card background — and the weapon rows inside are rounded at 4px too.
+
+## [0.259.3] - 2026-11-12
+
+### Changed
+- Codex mission bar: the unclear "Linse zurücksetzen" button is now "Zurück auf „Alles“", explains itself in a tooltip and only appears while a mission other than "Alles" is picked (ship and armour-set pages).
+
+## [0.259.2] - 2026-11-12
+
+### Fixed
+- Concept pages linked from admin feedback (`/concept/<id>`) render as the real, clickable page instead of their HTML source. They load through a small loader page on the site that only accepts this project's own concept-page function.
+
+## [0.259.1] - 2026-11-12
+
+### Fixed
+- The Verse Companion logo is the desktop app's current icon again everywhere on the site — browser tab, home-screen icon, link previews, header, login and apps menu — and in the browser extension, the Data Uploader 0.80.1 and Starscape 0.11.2. The site had kept the September version after the app redrew its icon in October.
+
+## [0.259.0] - 2026-11-11
+
+### Added
+- Ships without authored decks (Idris) get decks derived from floor height, marked as derived in the deck plan, the hull facts and the Holotable; stairs, ladders and lifts appear on every level they connect and name where they lead (uploader 0.80.0).
+
+## [0.258.1] - 2026-11-11
+
+### Fixed
+- Admin feedback, Alt+click picker: a click in the header, the bar, a navigation, a menu or a dialog now names that region ("Kopfzeile", "Menü „Konto“") instead of the page's route, and the Codex view only stands in front of clicks inside the page. An icon or image inside a button or link names the button or link ("Button „Profilbild (Konto-Menü)“" for the avatar) instead of a nameless "Bild".
+
+## [0.258.0] - 2026-11-11
+
+### Fixed
+- Data Uploader 0.79.0: ship values validated against the wiki and erkul (Starlancer MAX/TAC, ROC/ROC-DS, Idris-M/P) — armour from the fitted armour item, ore pods by their real capacity, ground-vehicle top and reverse speed, fuel capacity, liveries from the game data (names, which ship they fit, 3D hull for the Starlancer), Wikelo special names, mission/event copies of a ship no longer listed as ships, no more hull-mass warning per variant.
+- Codex ship facts show hull HP, hull mass and armour instead of a gap.
+
+## [0.257.4] - 2026-11-11
+
+### Fixed
+- Header: the profile picture now sits level with the Merkliste and apps buttons instead of 2–3 px higher.
+
+## [0.257.3] - 2026-11-11
+
+### Fixed
+- Verse hub (shell beta): the HQ link and label sit on the ground station on the planet; the space station no longer says HQ.
+- Verse hub: News, Patches and Galerie show their name under the planet on hover, like the sun, instead of a tooltip.
+- Verse hub: the placeholder below the stage has the hub's height, so the scrollbar no longer jumps when the hub appears.
+
+## [0.257.2] - 2026-11-11
+
+### Fixed
+- Missile Einordnung: the comparison groups now hold what their names say. "Alle Lenkraketen" compares against every missile of its kind (no torpedoes, no rockets), "Alle Infrarot-Lenkraketen" only against the same tracking signal (IR, EM or cross-section), and "Alle S2-Lenkraketen" only against exactly the same size.
+
+## [0.257.1] - 2026-11-11
+
+### Fixed
+- Kennzahlen: Dauer-DPS is no longer a copy of Salven-DPS. It now counts the pauses for reloading, energy regeneration and overheating; where a weapon has no known cycle yet, the cell says so instead of repeating the burst value.
+
+## [0.257.0] - 2026-11-11
+
+### Changed
+- The Data Uploader is now called Verse Data Uploader everywhere: on the site, in the app's window and tray, and in the Windows start menu.
+
+## [0.256.1] - 2026-11-11
+
+### Fixed
+- Swap picker: coolers, shields and drives show their type ("Kühler") under the name instead of repeating the product name in English.
+
+## [0.256.0] - 2026-11-11
+
+### Added
+- Kamera-Welt (shell beta): Verse, Codex and HQ share one continuous camera scene. Page loads and every page and subpage switch are camera pans and zooms on straight paths instead of background swaps; the header morphs into the subheader, and on phones it moves into the bottom thumb bar.
+- Verse hub projector: the newest item projects first, 5 s on and 5 s off, then projects back out in reverse.
+- Popups open and close as one motion (Horizont); small menus close as a real reverse.
+- Hovering, focusing or pressing a link prepares the target page's code and data before the click.
+
+### Changed
+- Reduced motion crossfades only the scene in 420 ms; the page stays clickable during the fade.
+- Codex, HQ and the Verse hub build their lower parts after the camera has landed, so the flight stays smoother.
+
+### Fixed
+- Scrolling on /codex and /hq: far fewer stutter frames (snap no longer pulls back each wheel notch, no page-wide restyles while scrolling).
+- Ship detail on phones: the floating button column no longer covers the Hangar button.
+- Restored the named loadout layouts with share link and the Codex landing side panes, which an earlier merge had dropped.
+
+## [0.255.0] - 2026-11-10
+
+### Changed
+- Settings → Feedback-Button: switching the feedback button off now also hides the beta button for collaborators and admins — one shared setting.
+
+## [0.254.0] - 2026-11-11
+
+### Added
+- Holotisch: type callouts with a swap button, the ◆ marker for parts that differ from the stock loadout, a hangar menu for Werk, exemplars and wishes, AI name and summary per exemplar.
+- Holotisch: changes in your own exemplar save on their own with a short toast; parts inside gimbals can be saved; wishes keep their loadout.
+- Deck plan and room chips show translated room names.
+
+### Changed
+- Holotisch: one bottom row (Akte · Außen · Innen · part filters), a lighter header, a fixed right card (Einordnung · Bauteile · Änderungen) with rank, group picker, hexagon ⇄ bars and a single-line patch choice.
+- 3D view keeps its distance while rotating.
+
+### Fixed
+- Swap picker was empty for coolers, shields, quantum drives and life support, and wrapped item names letter by letter.
+- Opening an exemplar no longer leads to a dead hangar route; removing the active exemplar no longer leaves its draft behind.
+
+## [0.253.0] - 2026-11-11
+
+### Added
+- Settings → Feedback-Button: an admin can switch the feedback title to a plain green/red routine light (working or reachable = green, offline or paused = red), saved per account; everyone else keeps the four-colour light.
+
+## [0.252.0] - 2026-11-11
+
+### Added
+- Codex classic ship view: clicking a hotspot in the 3D overlay opens a small popup over the Einordnung with that part's own 3D model and its key values; another hotspot swaps it, X or Escape close it.
+
+## [0.251.2] - 2026-11-10
+
+### Fixed
+- Codex classic ship view: the "Nur n Schiffe in dieser Gruppe" hint of the Einordnung is a small warning marker beside the group bar with the text as its tooltip, so picking a small group no longer shifts the card or the headline.
+
+## [0.251.1] - 2026-11-10
+
+### Fixed
+- Codex classic ship view: the hangar button sits in its own row above the headline, so the ship picture and the Einordnung start on the same line and the picture still ends level with the Einordnung.
+
+## [0.251.0] - 2026-11-10
+
+### Added
+- Codex classic ship view: "Zur 3D-Ansicht wechseln" opens a small non-modal overlay over the picture and "Dein Exemplar" with the same 3D view as the Holotisch, nose front-left and a slow counter-clockwise turn over the front (still under reduced motion), plus a "Vollbild" button; X or Escape go back.
+
+## [0.250.6] - 2026-11-10
+
+### Changed
+- Codex classic ship view: the "Zelle & feste Systeme" block starts collapsed also under the default "Alles" Einsatz and opens with a click; every other block still starts expanded.
+
+## [0.250.5] - 2026-11-10
+
+### Fixed
+- Codex Einordnung: the scope bar (Alle/Art/Größe/Signal) always stays visible; a missile group with too few differing values keeps its scope and shows "Nicht genug Vergleichswerte" instead of the score, plus the bars for the values that still differ.
+
+## [0.250.4] - 2026-11-10
+
+### Fixed
+- HQ inventory: all containers share one tile size instead of a quantity-based one, and Hangar and Sammlung tiles keep a fixed height; long names and details are shortened instead of growing the tile.
+
+## [0.250.3] - 2026-11-10
+
+### Changed
+- Codex classic ship view: the Loadout column drops its outer card; like Analyse, only the heading (Loadout, count, info) sits above the individual area boxes, which keep their backgrounds.
+
+## [0.250.2] - 2026-11-10
+
+### Changed
+- Codex classic ship view: the Einordnung card shows the same content as on the Holotisch (group names, comparison line, "Besser als n %", side note and the same values) while keeping its classic layout and position.
+
+## [0.250.1] - 2026-11-10
+
+### Fixed
+- HQ: a dialog that blocks page scroll (e.g. "Einträge löschen?") no longer makes the collapsed headline expand as if the page were back at the top.
+
+## [0.250.0] - 2026-11-10
+
+### Changed
+- Codex classic ship view: the separate draft box is gone; the Einsatz row now carries a narrow layout dropdown ("Neu" plus the saved layouts), a save icon with an unsaved-changes dot, the share link and a cart icon (still disabled), while the Einsatz chips keep their size.
+
+## [0.249.0] - 2026-11-10
+
+### Added
+- Codex ship loadout: every missile shows its damage as the headline figure (rack total), plus range, speed and lock time, and a tag with its seeker signal (infrared, electromagnetic or cross-section); a value missing in the data leaves its line out.
+
+## [0.248.2] - 2026-11-10
+
+### Fixed
+- Codex classic ship view: the empty crumb row above the headline is gone, so the maker and role line sits under the normal page spacing instead of a large gap.
+
+## [0.248.1] - 2026-11-10
+
+### Fixed
+- **Deck plans: rooms land on their deck (Data Uploader 0.77.1).** Rooms the game data files under no deck now go to the deck of the authored rooms on their floor level, taken from the ship and its sister hulls. The Starlancer MAX shows its rooms on Deck 01 and Deck 02 instead of all 24 under "All rooms"; the Carrack keeps 5 rooms under "Other rooms" instead of 20, the Ironclad none instead of 7. Ships whose whole family names no deck for any room (890 Jump, Retaliator, Redeemer, Starlifter, Vulture) keep the "All rooms" deck. Takes effect with the next uploader run.
+
 ## [0.248.0] - 2026-11-09
 
 ### Added

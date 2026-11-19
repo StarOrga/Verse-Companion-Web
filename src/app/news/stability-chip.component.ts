@@ -121,7 +121,7 @@ export function chipFromVerdict(
     .cc { width: 1.05em; height: 0.8em; fill: currentColor; flex: none; }
     a.chip:hover { background: color-mix(in srgb, var(--c) 14%, transparent); }
     a.chip[data-word='instabil']:hover { background: color-mix(in srgb, var(--sc-warning) 82%, var(--sc-fg-0)); }
-    .chip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* Touch: the pill keeps its look, the hit area grows to the tap minimum. */
     @media (pointer: coarse) {
       .chip { min-height: var(--sc-tap-min); }

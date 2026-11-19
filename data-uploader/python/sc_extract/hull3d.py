@@ -53,6 +53,16 @@ LogFn = Callable[[str, str], None]
 # gated by the hole check, so the ladder stops at the first error that tears.
 SIMPLIFY_LADDER = (0.0, 0.0005, 0.001, 0.002)
 MAX_SIMPLIFY_ERROR = SIMPLIFY_LADDER[-1]
+# When a rung tears the skin while the last gap-free one is still over budget,
+# the ladder does not stop there: it bisects between the two this many times.
+# The rungs are relative to the mesh extent, so the first step (0 -> 0.0005) is
+# ~1 cm on a Gladius but ~8 cm on a 155 m Polaris — the big hulls tore at it
+# and stayed unsimplified (Polaris 8.38 MB). A hull that fits a rung, or whose
+# next rung does not tear, never reaches the bisection, so it is unchanged.
+FIT_BISECT_STEPS = 3
+# Bumped when the over-budget search changes: an over-budget hull built by an
+# older search is not reused (see `needs_refit`); every other hull still is.
+FIT_REVISION = 1
 MIN_TEXTURE_SIZE = 256
 
 # Identifiers that flow into filenames, storage object paths, and (on Windows)
@@ -92,6 +102,13 @@ def _reject_shell_meta(argv: List[str]) -> None:
     for a in argv:
         if _SHELL_META.search(a):
             raise ValueError(f"refusing shell exec: metacharacter in {a!r}")
+
+
+def _describe_gltf_args(args: List[str]) -> str:
+    """``"<command> <input file name>"`` for the log line before an optimizer call."""
+    command = args[0] if args else "?"
+    src = next((a for a in args[1:] if a.lower().endswith((".glb", ".gltf"))), None)
+    return f"{command} {Path(src).name}" if src else command
 
 
 def _noop(level: str, msg: str) -> None:  # default logger
@@ -164,6 +181,17 @@ _CHECKED_MARKERS = (".package-uploaded", ".blueprint-uploaded")
 # Vouches for the ship's files as a whole — carried only when they are unchanged.
 _UPLOAD_MARKER = ".uploaded"
 _MARKERS = (_UPLOAD_MARKER,) + _CHECKED_MARKERS
+
+
+def needs_refit(entry: dict, max_model_bytes: int) -> bool:
+    """A catalog entry whose hull ended over budget under an older over-budget
+    search (FIT_REVISION): it must be built again, not reused — the current
+    search may get it smaller. Hulls within the budget, and every hull with
+    the budget off, stay reusable."""
+    mb = entry.get("model_mb")
+    if max_model_bytes <= 0 or not entry.get("model") or not mb or mb * 1e6 <= max_model_bytes:
+        return False
+    return int(entry.get("fit") or 0) < FIT_REVISION
 
 
 def _tree_bytes(root: Path) -> Dict[str, bytes]:
@@ -270,15 +298,37 @@ class Hull3DExporter:
                "-objectdir", str(objectdir), "-loglevel", "Error"]
         if mtl_rel:
             cmd += ["-mtl", mtl_rel]
+        # One line per converter call: it resets the host's stall watchdog
+        # before a hull that may take minutes, and names the hull if it hangs.
+        self.log("info", f"  convert {cga_disk.name}")
         with stage_timing.timed("convert"):
             r = subprocess.run(cmd, cwd=str(cga_disk.parent), capture_output=True, timeout=600)
+            if mtl_rel and self._bad_material(r, produced):
+                # Converter bug on a material with two texture slots it cannot
+                # name (RSI Salvation, VNCL Blade): the geometry is fine, and
+                # the hull is published without textures anyway, so retry
+                # with a texture-free copy of the paint .mtl (as parts do).
+                from .glb_materials import strip_mtl_textures
+                mtl_disk = cga_disk.parent / mtl_rel
+                mtl_disk.write_bytes(strip_mtl_textures(mtl_disk.read_bytes()))
+                self.log("info", f"  {cga_disk.name}: material texture slots the converter "
+                                 "cannot read — converted with a texture-free copy")
+                r = subprocess.run(cmd, cwd=str(cga_disk.parent), capture_output=True, timeout=600)
         # cgf-converter's exit code is unreliable (non-zero on success in some
         # paths), so the freshly-produced output file is the success signal —
         # robust now that any stale glb was unlinked above. rc is logged only.
         if not produced.exists() or produced.stat().st_size < 4096:
+            from .converter_report import converter_reason
             raise RuntimeError(
-                f"cgf-converter produced no usable glb for {cga_disk.name} (rc={r.returncode})")
+                f"cgf-converter produced no usable glb for {cga_disk.name} "
+                f"(rc={r.returncode}{converter_reason(r)})")
         produced.replace(out_glb)
+
+    @staticmethod
+    def _bad_material(r: subprocess.CompletedProcess, produced: Path) -> bool:
+        if produced.exists() and produced.stat().st_size >= 4096:
+            return False
+        return b"same key has already been added" in (r.stdout or b"")
 
     def _gltf_transform(self, args: List[str]) -> subprocess.CompletedProcess:
         """Run one @gltf-transform/cli command (bundled Node, or npx in dev)."""
@@ -286,6 +336,9 @@ class Hull3DExporter:
         import os
         import sys
         host_argv = os.environ.get("SC_GLTF_TRANSFORM_ARGV")
+        # Same as the converter: a sign of life before a call that may run for
+        # minutes, naming the file it works on.
+        self.log("info", f"  gltf-transform {_describe_gltf_args(args)}")
         if host_argv:
             # Host (Electron) provides the runtime: a JSON argv prefix that runs
             # the bundled @gltf-transform/cli through its OWN Node, so the
@@ -417,9 +470,11 @@ class Hull3DExporter:
         kept even if still over budget. With one (raw triangles, see
         `raw_reference`) every rung is measured by `mesh_integrity` before it
         is compressed. A rung that tears the skin ends the ladder — more
-        simplification only tears more — and the last rung that passed is kept
-        even over budget: a big hull beats a gappy one. If the first rung
-        already fails, HullIntegrityError is raised and no hull is exported.
+        simplification only tears more — and the search narrows down between
+        the last gap-free rung and the tearing one (`_bisect_fit`); the best
+        gap-free attempt is kept even over budget: a big hull beats a gappy
+        one. If the first rung already fails, HullIntegrityError is raised and
+        no hull is exported.
         """
         from . import glb_materials
         budget = self.cfg.max_model_bytes
@@ -431,30 +486,13 @@ class Hull3DExporter:
             for i, (ts, err) in enumerate(ladder):
                 if reference is None:
                     self._optimize(in_glb, out_glb, ts, err)
-                else:
-                    from . import mesh_integrity
-                    check = out_glb.with_name(out_glb.stem + ".check.glb")
-                    try:
-                        self._optimize(in_glb, check, ts, err, compress=False)
-                        with stage_timing.timed("hole-gate"):
-                            report = mesh_integrity.check_hull(reference, check,
-                                                               self.cfg.max_hole_ratio)
-                        self.last_integrity = report
-                        self.log("info" if report.ok else "warn",
-                                 f"  {skin_id}: simplify {err}: {report.summary()}")
-                        if not report.ok:
-                            if not have_kept:
-                                raise mesh_integrity.HullIntegrityError(
-                                    f"{skin_id}: exterior has holes — {report.summary()}")
-                            kept.replace(out_glb)
-                            size = out_glb.stat().st_size
-                            self.log("warn", f"  {skin_id}: keeping the last gap-free "
-                                             f"attempt ({size/1e6:.2f} MB, over the "
-                                             f"{budget/1e6:.2f} MB budget)")
-                            return size
-                        self.compress(check, out_glb)
-                    finally:
-                        check.unlink(missing_ok=True)
+                elif not self._gated_attempt(in_glb, out_glb, skin_id, ts, err, reference):
+                    if not have_kept:
+                        from . import mesh_integrity
+                        raise mesh_integrity.HullIntegrityError(
+                            f"{skin_id}: exterior has holes — {self.last_integrity.summary()}")
+                    return self._bisect_fit(in_glb, out_glb, skin_id, ts, ladder[i - 1][1],
+                                            err, kept, hardpoints, reference)
                 if hardpoints:
                     glb_materials.embed_hardpoints(out_glb, hardpoints)
                 size = out_glb.stat().st_size
@@ -473,6 +511,68 @@ class Hull3DExporter:
             return size
         finally:
             kept.unlink(missing_ok=True)
+
+    def _gated_attempt(self, in_glb: Path, out_glb: Path, skin_id: str,
+                       ts: int, err: float, reference) -> bool:
+        """One hole-gated attempt: optimize uncompressed, measure it against
+        ``reference``, meshopt-compress it into ``out_glb`` only if it passed.
+        False = the attempt tore the skin; ``out_glb`` is left untouched."""
+        from . import mesh_integrity
+        check = out_glb.with_name(out_glb.stem + ".check.glb")
+        try:
+            self._optimize(in_glb, check, ts, err, compress=False)
+            with stage_timing.timed("hole-gate"):
+                report = mesh_integrity.check_hull(reference, check, self.cfg.max_hole_ratio)
+            self.last_integrity = report
+            self.log("info" if report.ok else "warn",
+                     f"  {skin_id}: simplify {err}: {report.summary()}")
+            if not report.ok:
+                return False
+            self.compress(check, out_glb)
+            return True
+        finally:
+            check.unlink(missing_ok=True)
+
+    def _bisect_fit(self, in_glb: Path, out_glb: Path, skin_id: str, ts: int,
+                    lo: float, hi: float, kept: Path,
+                    hardpoints: Optional[Dict[str, List[float]]], reference) -> int:
+        """The rung ``hi`` tore the skin and ``kept`` (built at ``lo``) is over
+        budget: bisect between them, FIT_BISECT_STEPS times, for the most
+        simplification that stays gap-free. Stops early at the first gap-free
+        attempt within the budget; otherwise the best gap-free one is kept,
+        over budget or not."""
+        from . import glb_materials
+        budget = self.cfg.max_model_bytes
+        kept_report = None
+        trial = out_glb.with_name(out_glb.stem + ".trial.glb")
+        try:
+            for _ in range(FIT_BISECT_STEPS):
+                mid = round((lo + hi) / 2, 8)
+                if not self._gated_attempt(in_glb, trial, skin_id, ts, mid, reference):
+                    hi = mid
+                    continue
+                if hardpoints:
+                    glb_materials.embed_hardpoints(trial, hardpoints)
+                lo, kept_report = mid, self.last_integrity
+                trial.replace(kept)
+                if kept.stat().st_size <= budget:
+                    break
+        finally:
+            trial.unlink(missing_ok=True)
+        if kept_report is not None:
+            self.last_integrity = kept_report
+        kept.replace(out_glb)
+        size = out_glb.stat().st_size
+        if size <= budget:
+            self.log("info", f"  {skin_id}: {size/1e6:.2f} MB at simplify {lo} — gap-free "
+                             f"within the {budget/1e6:.2f} MB budget")
+        else:
+            self.log("warn", f"  {skin_id}: keeping the last gap-free attempt (simplify {lo}, "
+                             f"{size/1e6:.2f} MB, over the {budget/1e6:.2f} MB budget)")
+        return size
+
+    def needs_refit(self, entry: dict) -> bool:
+        return needs_refit(entry, self.cfg.max_model_bytes)
 
     # ---- public API --------------------------------------------------------
     def export_ship(self, spec: ShipSpec) -> dict:
@@ -591,14 +691,21 @@ class Hull3DExporter:
             for entry in cat.get("skins", []):
                 if entry.get("hull_src") != src or not entry.get("model"):
                     continue
+                if self.needs_refit(entry):
+                    self.log("info", f"  {paint.id}: {entry.get('model_mb')} MB over budget "
+                                     f"from an older fit search — building it again")
+                    continue
                 prev_glb = Path(d) / spec.ship_id / entry["model"]
                 if not prev_glb.is_file():
                     continue
                 web_glb = ship_out / "models" / f"{spec.ship_id}_{paint.id}.glb"
                 shutil.copyfile(prev_glb, web_glb)
                 self.log("info", f"  {paint.id}: hull unchanged since {Path(d).name} — reused")
-                return {"model": f"models/{web_glb.name}", "model_mb": entry.get("model_mb"),
-                        "hull_src": src, "reused": True}
+                reused = {"model": f"models/{web_glb.name}", "model_mb": entry.get("model_mb"),
+                          "hull_src": src, "reused": True}
+                if entry.get("fit"):
+                    reused["fit"] = entry["fit"]
+                return reused
         return None
 
     def _export_hull(self, spec: ShipSpec, paint: Paint, ship_out: Path) -> dict:
@@ -674,7 +781,12 @@ class Hull3DExporter:
         web_glb = ship_out / "models" / f"{spec.ship_id}_{paint.id}.glb"
         size_bytes = self._optimize_to_budget(raw_glb, web_glb, paint.id, hardpoints,
                                               reference=reference)
-        return {"model": f"models/{web_glb.name}", "model_mb": round(size_bytes / 1e6, 2)}
+        out = {"model": f"models/{web_glb.name}", "model_mb": round(size_bytes / 1e6, 2)}
+        # Only an over-budget hull carries the search that sized it: the catalog
+        # of every hull within the budget stays byte-identical.
+        if 0 < self.cfg.max_model_bytes < size_bytes:
+            out["fit"] = FIT_REVISION
+        return out
 
     @staticmethod
     def raw_reference(raw_glb: Path):

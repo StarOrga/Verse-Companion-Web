@@ -22,6 +22,7 @@ import json
 import os
 import shutil
 import subprocess
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
@@ -35,6 +36,46 @@ OptimizeFn = Callable[[Path, Path, int, float], None]
 # Bump when the part pipeline changes output; older index rows are rebuilt.
 # v2: rows carry `src` (content key) — v1 rows had none and are rebuilt once.
 PART_FORMAT = "part-geometry-v2"
+
+#: Least seconds between two index writes inside a run (`PartStore.checkpoint`).
+#: A full catalog's index is ~17 MB of JSON; rewriting it after every package
+#: cost ~2 s each, so a 6,300-package pass spent hours serialising (field log
+#: 2026-11-15: items/armor ran at ~2.5 s per package with every part cached).
+#: A kill loses at most this window of rows — their blobs stay on disk and only
+#: those few parts are converted again on the next run.
+INDEX_SAVE_INTERVAL_S = 60.0
+
+
+class _TrackedIndex(dict):
+    """The part index, remembering whether it changed since the last write —
+    so a run where every part is a cache hit writes nothing at all."""
+
+    dirty = False
+
+    def __setitem__(self, key, value) -> None:
+        super().__setitem__(key, value)
+        self.dirty = True
+
+    def __delitem__(self, key) -> None:
+        super().__delitem__(key)
+        self.dirty = True
+
+    def update(self, *args, **kwargs) -> None:
+        super().update(*args, **kwargs)
+        self.dirty = True
+
+    def setdefault(self, key, default=None):
+        if key not in self:
+            self.dirty = True
+        return super().setdefault(key, default)
+
+    def pop(self, *args):
+        self.dirty = True
+        return super().pop(*args)
+
+    def clear(self) -> None:
+        super().clear()
+        self.dirty = True
 
 
 @dataclass
@@ -193,7 +234,7 @@ class PartStore:
         # concurrent read-modify-write. Every index file is read on start, so
         # a later run sees what all workers of the previous one built.
         self.index_path = self.dir / index_name
-        self.index: Dict[str, dict] = {}
+        self.index: Dict[str, dict] = _TrackedIndex()
         for path in sorted(self.dir.glob("index*.json")):
             try:
                 idx = json.loads(path.read_text(encoding="utf-8"))
@@ -202,6 +243,9 @@ class PartStore:
             if isinstance(idx, dict) and idx.get("_format") == PART_FORMAT:
                 self.index.update(idx)
         self.index["_format"] = PART_FORMAT
+        # What was just read is on disk already; only later rows need a write.
+        self.index.dirty = False
+        self._last_save = time.monotonic()
         self.hits = self.misses = 0
         # Pipeline tag folded into every content key (`build_cache.pipeline_tag`).
         self.pipeline = pipeline
@@ -212,9 +256,27 @@ class PartStore:
         self._raw_cache: Dict[str, Tuple[Path, Optional[str], Path]] = {}
 
     def save_index(self) -> None:
+        """Write the index now (atomically), changed or not."""
         tmp = self.index_path.with_suffix(".json.tmp")
         tmp.write_text(json.dumps(self.index, indent=1, sort_keys=True), encoding="utf-8")
         tmp.replace(self.index_path)
+        self.index.dirty = False
+        self._last_save = time.monotonic()
+
+    def checkpoint(self, interval_s: float = INDEX_SAVE_INTERVAL_S) -> bool:
+        """Between two builds: write the index when it changed AND the last
+        write is at least ``interval_s`` old. Returns whether it wrote."""
+        if not self.index.dirty or time.monotonic() - self._last_save < interval_s:
+            return False
+        self.save_index()
+        return True
+
+    def flush(self) -> bool:
+        """End of a run or worker: write whatever changed since the last write."""
+        if not self.index.dirty:
+            return False
+        self.save_index()
+        return True
 
     def release_raw(self) -> None:
         """Drop raw glbs `helpers()` kept for an `export()` that never came."""
@@ -354,6 +416,9 @@ class PartStore:
             cmd += ["-mtl", os.path.relpath(mtl, mesh.parent).replace("\\", "/")]
         produced = mesh.with_suffix(".glb")
         produced.unlink(missing_ok=True)
+        # One line per converter call: it resets the host's stall watchdog
+        # before a part that may take minutes, and names the part if it hangs.
+        self.log("info", f"  convert {geometry_path}")
         with stage_timing.timed("convert"):
             r = subprocess.run(cmd, cwd=str(root), capture_output=True, timeout=600)
             if self._bad_material(r, produced) and material_path and self.exists(material_path):
@@ -371,14 +436,9 @@ class PartStore:
 
     @staticmethod
     def _converter_reason(r) -> str:
-        """First ``ArgumentException``-style line of the converter's report."""
-        out = (r.stdout or b"").decode("utf-8", "replace")
-        for line in out.splitlines():
-            line = line.strip()
-            if line.startswith(("ArgumentException", "NullReferenceException", "InvalidDataException",
-                                "KeyNotFoundException", "NotSupportedException")):
-                return f": {line[:160]}"
-        return ""
+        """The innermost exception of the converter's report (`converter_report`)."""
+        from ..converter_report import converter_reason
+        return converter_reason(r)
 
     @classmethod
     def _bad_material(cls, r, produced: Path) -> bool:

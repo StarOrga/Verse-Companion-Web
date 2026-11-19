@@ -1,4 +1,5 @@
 import { BetaService } from '../../core/beta.service';
+import { onScrollTick } from '../../core/scroll-tick';
 import { logWarn } from '../../core/log';
 import {
   ChangeDetectionStrategy,
@@ -11,6 +12,7 @@ import {
   effect,
   inject,
   input,
+  linkedSignal,
   output,
   signal,
   untracked,
@@ -36,7 +38,7 @@ import {
   RankScope,
   RankShipInput,
   rankClassLabelKey,
-  rankClassPluralKey,
+  rankCohortLabel,
   rankMissionNoteKey,
   rankProfileForMission,
 } from '../codex-rank';
@@ -54,6 +56,7 @@ import { displayItemName, formatNumber, humanizeClassName } from '../codex-forma
 import { HardpointFrame, HardpointMarker } from '../hardpoint-map';
 import type { HardpointPortRef } from '../hardpoint-port-ref';
 import { CodexHoloStripComponent } from './codex-holo-strip.component';
+import { CodexHoloEinsatzComponent } from './codex-holo-einsatz.component';
 import { HangarPickerComponent, HangarPickerItem } from '../stage/hangar-picker.component';
 import {
   CodexHoloPatchComponent,
@@ -65,13 +68,28 @@ import { CodexHoloSharedBannerComponent, HoloSharedBanner } from './codex-holo-s
 import { CodexHoloRankStateComponent } from './codex-holo-rank-state.component';
 export type { HoloSharedBanner } from './codex-holo-shared-banner.component';
 import { CodexHoloPerspectivesComponent, HoloGhost, HoloPerspectiveView } from './codex-holo-perspectives.component';
-import { CodexHoloTableComponent, type HoloDeckView } from './codex-holo-table.component';
+import { CodexHoloTableComponent, type HoloDeckView, type HoloInterior3dView } from './codex-holo-table.component';
 import { buildDeckPlans } from '../deck-plan';
-import type { Lang, ShipDeck } from '../codex.types';
+import { RoomLabelTranslations } from '../room-label-translations';
+import type { Lang, ShipDeck, ShipInteriorGroup, ShipPayload } from '../codex.types';
+import { AnalyticsService } from '../../core/analytics.service';
+import {
+  InteriorPick,
+  PRESET_GROUPS,
+  cargoGapOf,
+  deckOfPick,
+  readInterior,
+  roomContents,
+  rolePresetOf,
+  scuByDeck,
+  startDeckOf,
+} from './holo-interior';
+import { CodexHoloInteriorChipsComponent } from './codex-holo-interior-chips.component';
+import { CodexHoloInteriorComponent, type InteriorRoomCard, type InteriorRoomRef, type OuterPartRef } from './codex-holo-interior.component';
 import { CodexHoloInspectorComponent, partFocusOf } from './codex-holo-inspector.component';
 import { CodexHoloChangesComponent } from './codex-holo-changes.component';
 import { missionColor, missionRelevantSections } from './codex-holo-mission';
-import type { CalloutValue, PlacementRow, PlacementSelection } from '../asset-package/asset-package-viewer.component';
+import type { CalloutValue, PlacementRow, PlacementSelection, SelectionIntent } from '../asset-package/asset-package-viewer.component';
 import type { HotspotScope } from '../asset-package/asset-package.model';
 import { CodexLoadoutSaveBarComponent } from '../codex-loadout-save-bar.component';
 import { HoloPhase, JournalEntry, PinGroup, PinRing, StagePin, ringPositions, shipNameWithoutMaker, spreadStackedPins } from './codex-holo-model';
@@ -81,6 +99,9 @@ import type { CodexBuild } from '../codex.types';
 import type { PowerSheet } from '../codex-power';
 import type { SummaryOccupant } from '../ship-summary-panels';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { AreaSymbolComponent } from '../../shared/area-symbol/area-symbol.component';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { ScSegmentedComponent, ScSegmentOption } from '../../shared/segmented-control.component';
 import { HoloHotkeyAction, HoloSurface, holoHotkeyFor, holoHotkeyLabel, nextHoloSurface } from './codex-holo-hotkeys';
 import { ShipBlueprintService } from '../ship-blueprint/ship-blueprint.service';
 import { type BlueprintViewName, blueprintView } from '../ship-blueprint/ship-blueprint.model';
@@ -111,9 +132,72 @@ interface MissionSegment {
 
 /** The panel's three tabs (concept glas3). */
 export type HoloPanelTab = 'parts' | 'rank' | 'changes';
+
+/** What the bottom row shows (concept holotisch-feinschliff C6): the Akte, or one of the table's surfaces. */
+export type HoloView = 'akte' | HoloSurface;
+/** The parts filters of the bottom row (multi-select; "Alle Teile" is the hotspot scope on top). */
+export type HoloPartFilter = 'weapons' | 'missiles' | 'components' | 'other';
+
+const PART_FILTER_OF: Readonly<Record<ShipModuleSection, HoloPartFilter>> = {
+  weapons: 'weapons',
+  remoteTurrets: 'weapons',
+  mannedTurrets: 'weapons',
+  pod: 'weapons',
+  missiles: 'missiles',
+  shields: 'components',
+  powerPlants: 'components',
+  quantum: 'components',
+  radar: 'components',
+  coolers: 'components',
+  lifeSupport: 'components',
+  countermeasures: 'other',
+  structure: 'other',
+};
+const ALL_PART_FILTERS: readonly HoloPartFilter[] = ['weapons', 'missiles', 'components', 'other'];
+const PART_FILTER_CHIPS: readonly { id: HoloPartFilter; labelKey: string }[] = [
+  { id: 'weapons', labelKey: 'codex.holo.stage.filterWeapons' },
+  { id: 'missiles', labelKey: 'codex.holo.stage.filterMissiles' },
+  { id: 'components', labelKey: 'codex.holo.stage.filterComponents' },
+  { id: 'other', labelKey: 'codex.holo.stage.filterOther' },
+];
+
+/** One thumbnail of the bottom row's „Ansicht“ group. */
+interface ViewThumb {
+  id: string;
+  labelKey: string | null;
+  label: string;
+  disabledKey: string | null;
+  icon: { box: string; paths: readonly string[] };
+  view: HoloView;
+}
+
+/** The deck filter's value for "every deck equal" (3D only); null = the hull. */
+export const ALL_DECKS = '*';
+
+/** One chip of the „Deck · Filter“ row (concept 20261117-1810 B1). */
+export interface DeckFilterChip {
+  /** null = Alle (the hull), `ALL_DECKS` = every deck in 3D, else the deck's key. */
+  key: string | null;
+  id: string;
+  labelKey: string | null;
+  label: string;
+  /** SCU located on the deck (> 0 shows on the chip). */
+  scu: number;
+  sub: string;
+  disabledKey: string | null;
+}
+const HULL_TOP = 'M400 26 L432 130 L560 250 L560 292 L448 262 L438 340 L470 372 L470 390 L400 376 L330 390 L330 372 L362 340 L352 262 L240 292 L240 250 L368 130 Z';
+const VIEW_ICONS: Readonly<Record<HoloView, { box: string; paths: readonly string[] }>> = {
+  akte: { box: '0 0 60 36', paths: ['M26 9 L46 20 L42 25 L28 21 L16 25 L14 20 Z'] },
+  '3d': { box: '0 0 60 36', paths: ['M30 5 L47 21 L43 27 L30 22 L17 27 L13 21 Z', 'M30 9 L33 20 L27 20 Z'] },
+  simple: { box: '0 0 800 420', paths: [HULL_TOP, 'M400 102 a18 18 0 1 0 0.1 0 Z', 'M300 222 a18 18 0 1 0 0.1 0 Z', 'M500 222 a18 18 0 1 0 0.1 0 Z'] },
+  top: { box: '0 0 800 420', paths: [HULL_TOP] },
+  side: { box: '0 0 60 36', paths: ['M6 20 L22 15 L44 14 L54 19 L44 23 L12 23 Z'] },
+  front: { box: '0 0 60 36', paths: ['M30 11 L40 17 L53 19 L40 22 L30 26 L20 22 L7 19 L20 17 Z'] },
+};
 /** Which column of "Bauteile im Detail" a section stands in: the strip area it moves. */
 const PART_AREAS: readonly { id: Perspective; sections: readonly ShipModuleSection[] }[] = [
-  { id: 'offensive', sections: ['weapons', 'remoteTurrets', 'missiles', 'pod'] },
+  { id: 'offensive', sections: ['weapons', 'remoteTurrets', 'mannedTurrets', 'missiles', 'pod'] },
   { id: 'defensive', sections: ['shields', 'countermeasures', 'structure'] },
   { id: 'movement', sections: ['quantum', 'powerPlants'] },
   { id: 'signature', sections: ['coolers', 'radar', 'lifeSupport'] },
@@ -163,9 +247,6 @@ export function resetHoloArrivalSession(): void {
  * on a ring of ~250 px radius, 8 labels of 120–220 px is the most that
  * stays legible without collisions (wave 5 A2.4). */
 const DENSE_PIN_COUNT = 8;
-/** Digit hotkeys cover 1–9 and 0 (= 10); the inspector hint must not
- * promise more (wave 5 B1.4). */
-const HOTKEY_PIN_MAX = 10;
 
 /** What a pin says: for a gun mount the gun it holds, the part a pilot asks about; else the occupant. */
 function pinLabel(slot: LayoutSlot | null, section: ShipModuleSection | null, raw: string): string {
@@ -199,7 +280,9 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
 @Component({
   selector: 'sc-codex-holo-stage',
   standalone: true,
-  imports: [FeedbackSpotDirective,
+  imports: [FeedbackSpotDirective, AreaSymbolComponent,
+    ScActionDirective,
+    ScSegmentedComponent,
     NgTemplateOutlet,
     TranslatePipe,
     RouterLink,
@@ -207,52 +290,51 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
     CodexHardpointLayoutComponent,
     CodexHoloPerspectivesComponent,
     CodexHoloStripComponent,
+    CodexHoloEinsatzComponent,
     HangarPickerComponent,
     CodexHoloPatchComponent,
     CodexHoloSharedBannerComponent,
     CodexHoloRankStateComponent,
     CodexHoloTableComponent,
     CodexHoloInspectorComponent,
+    CodexHoloInteriorComponent,
+    CodexHoloInteriorChipsComponent,
     CodexHoloChangesComponent,
     CodexLoadoutSaveBarComponent,
     ScTooltipDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="holo-stage" [class.reduced-motion]="reducedMotion()" [class.arrived]="arrived()" [class.first]="!hadBody()"
+    <section class="holo-stage" [class.dock]="shellBeta() && !reducedMotion()" [class.reduced-motion]="reducedMotion()" [class.arrived]="arrived()" [class.first]="!hadBody()"
              [class.ph-wait]="phase() === 'wait'" [class.ph-hero]="phase() === 'hero'" [class.ph-reveal]="phase() === 'reveal'"
              [attr.data-mission]="activeMissionId()" [style.--holo-e]="missionHue()">
 
-      <!-- ── One row: the ship left, data line + patch + view switch right ── -->
+      <!-- ── Head (concept holotisch-feinschliff r4 d1): name + models left,
+           Einsatz top centre, the hangar button right. No patch picker here —
+           the patch choice lives in the card's Änderungen tab (C18). ── -->
       <div class="holo-topbar" [scFeedbackSpot]="'feedbackSpot.headline'">
-        <!-- Keyed on the name: a hull switch re-enters the title with it. -->
-        @for (name of [shortName()]; track name) {
-          <div class="ht-title">
-            <h1 class="ht-name" tabindex="0" [scTooltip]="eyebrowTitle()" scTooltipTier="label">{{ name }}</h1>
-            @if (kicker(); as k) { <span class="ht-kicker">{{ k }}</span> }
-          </div>
-        }
-        <!-- The head strip (concept codex-kopf-besitz, d1 "Kennleiste"): [Patch ▾ | Besitz] on the title's
-             line, the same strip the classic view draws. The page projects the ownership segment. -->
+        <div class="ht-left">
+          <!-- Keyed on the name: a hull switch re-enters the title with it. -->
+          @for (name of [shortName()]; track name) {
+            <div class="ht-title">
+              @if (manufacturerName(); as maker) { <span class="ht-kicker">{{ maker }}</span> }
+              <h1 class="ht-name" tabindex="0" [scTooltip]="eyebrowTitle()" scTooltipTier="label">{{ name }}</h1>
+            </div>
+          }
+          <!-- slot [htModels]: the model variants as real anchors, only when they exist (C3). -->
+          <div class="ht-models"><ng-content select="[htModels]" /></div>
+        </div>
+        <div class="ht-centre">
+          <sc-codex-holo-einsatz
+            [active]="activeMissionId()"
+            [missions]="missionSegments()"
+            [defaultLabelKey]="rankClassLabel()"
+            [cohortLabel]="cohortLabel()"
+            (missionChange)="missionChange.emit($event)" />
+        </div>
+        <!-- slot [htOwn]: the one hangar button (count + shown loadout ▾, C5). -->
         <div class="ht-right">
-          <div class="sc-head-strip" role="group" [attr.aria-label]="'codex.head.stripAria' | translate">
-            <!-- slot: patch-delta trigger; the comparison itself opens in the panel's Änderungen tab. -->
-            @if (buildRef(); as ab) {
-              <sc-codex-holo-patch
-                [hotkey]="hkLabel.patch"
-                [dockDelta]="true"
-                [className]="detail().classNameSlug"
-                [channel]="channel()"
-                [activeBuild]="ab"
-                [activeKpiSheet]="activeKpiSheet()"
-                [activeOccupants]="activeOccupants()"
-                [resolveComparisonSide]="resolveComparisonSide()"
-                (kpiGhosts)="patchGhosts.set($event)"
-                (portPins)="patchPortPins.set($event)"
-                (comparisonBuild)="onPatchCompared($event)" />
-            }
-            <ng-content select="[htOwn]" />
-          </div>
+          <div class="sc-head-strip" role="group" [attr.aria-label]="'codex.head.stripAria' | translate"><ng-content select="[htOwn]" /></div>
         </div>
       </div>
 
@@ -287,47 +369,29 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
                   (open)="hangarOpen.emit()" />
               </div>
             }
-            <p class="table-eyebrow">
-              {{ eyebrowKey() | translate: { n: tablePins().length } }}
-              @if (!silhouette() && viewMode() === 'holo') {
-                <span class="no-geometry-badge" tabindex="0" [scTooltip]="'codex.holo.stage.noGeometryReason' | translate" scTooltipTier="label">· {{ 'codex.holo.noGeometry' | translate }}</span>
-              }
-            </p>
-            <div class="tools5">
-              @if (has3d()) {
-                <button type="button" class="tt" [class.on]="viewMode() === '3d'" [attr.aria-pressed]="viewMode() === '3d'" [attr.aria-keyshortcuts]="hkLabel.view" (click)="pickSurface('3d')">{{ 'codex.holo.stage.view3d' | translate }}<kbd class="hk" aria-hidden="true">{{ hkLabel.view }}</kbd></button>
-              }
-              <button type="button" class="tt" [class.on]="viewMode() !== '3d'" [attr.aria-pressed]="viewMode() !== '3d'" [attr.aria-keyshortcuts]="hkLabel.view"
-                      (click)="pickSurface(lastSchemaSurface())">{{ 'codex.holo.stage.viewSchema' | translate }}<kbd class="hk" aria-hidden="true">{{ hkLabel.view }}</kbd></button>
-            </div>
+            @if (!silhouette() && viewMode() === 'holo' && !tableDeck()) {
+              <p class="no-geometry-badge" tabindex="0" [scTooltip]="'codex.holo.stage.noGeometryReason' | translate" scTooltipTier="label">{{ 'codex.holo.noGeometry' | translate }}</p>
+            }
+            @if (interiorOnTable() && interior()) {
+              <!-- The interior's element groups (concept 20261117-1810 B8): multi-select, opened on the
+                   ship role's preset; nothing of it is remembered (r2-remember = none). -->
+              <sc-codex-holo-interior-chips class="ig-host" [groups]="interiorGroups()" [presetLabel]="presetLabel()" [untouched]="presetUntouched()"
+                (groupToggle)="toggleGroup($event)" (presetReset)="resetPreset()" />
+            }
           </div>
-
-          @if (viewMode() !== '3d') {
-            <!-- Schema's sub-views. -->
-            <div class="sub-views" role="group" [attr.aria-label]="'codex.holo.stage.viewSchema' | translate">
-              @for (o of schemaOptions(); track o.id) {
-                <span style="display: contents" [scTooltip]="o.disabledKey ? (o.disabledKey | translate) : null" scTooltipTier="label">
-                  <button type="button" class="sv" [class.on]="surface() === o.id" [attr.aria-pressed]="surface() === o.id"
-                          [disabled]="!!o.disabledKey" (click)="pickSurface(o.id)">{{ o.labelKey | translate }}</button>
-                </span>
-              }
-              <!-- Decks in "Einfach" (concept r1-decks): Außen = the hull with
-                   its parts, a deck = its rooms; one deck reads Außen/Innen.
-                   No room data, no chips. -->
-              @if (surface() === 'simple' && deckChips().length > 0) {
-                <i class="sv-sep" aria-hidden="true"></i>
-                <span class="decks" role="group" [attr.aria-label]="'codex.holo.stage.decksAria' | translate">
-                  @for (c of deckChips(); track c.key ?? '') {
-                    <button type="button" class="sv deck" [class.on]="deckView() === c.key" [attr.aria-pressed]="deckView() === c.key"
-                            (click)="pickDeck(c.key)">{{ c.labelKey ? (c.labelKey | translate) : c.label }}</button>
-                  }
-                </span>
-              }
-            </div>
-          }
+          <!-- slot [holoAkte]: the Akte view (description card on the RSI image, C20), over the table while "Akte" is the view. -->
+          <div class="holo-akte" [class.on]="activeView() === 'akte'" [attr.aria-hidden]="activeView() !== 'akte'" [attr.inert]="activeView() !== 'akte' ? '' : null">
+            <ng-content select="[holoAkte]" />
+          </div>
           <sc-codex-holo-table
+            [class.under-akte]="activeView() === 'akte'"
+            [attr.inert]="activeView() === 'akte' ? '' : null"
             [pins]="tablePins()"
-            [labelPins]="pins()"
+            [labelPins]="labelPins()"
+            [partFilter]="partFilter()"
+            [diffPorts]="changedPorts()"
+            [hintHidden]="!!undoToast() || !!copyToast()"
+            (portSwap)="onPortSwap($event)"
             [schemaView]="schemaView()"
             [orbit]="pinRing()"
             [silhouette]="silhouette()"
@@ -350,6 +414,10 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
             [(hotspotScope)]="hotspotScope"
             [patchPortPins]="patchPortPins()"
             [deckPlan]="tableDeck()"
+            [interior3d]="interior3d()"
+            (deckRoomChange)="onPlanRoom($event)"
+            (interiorPick)="onInteriorPick($event)"
+            (interiorDeck)="pickDeck($event)"
             [displayName]="displayName()"
             [dense]="dense()"
             [hasUnresolved]="hasUnresolvedPins()"
@@ -357,6 +425,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
             [still]="reducedMotion()"
             (hovered)="hovered.emit($event)"
             (pinInspect)="inspectPin($event)"
+            (partIntent)="onPartIntent($event)"
             (partSelected)="onPartSelected($event)"
             (partSwap)="onPartSwap($event)"
             (previewError)="previewFailed.set(true)"
@@ -380,9 +449,56 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
             }
           </div>
           <div class="pbody" id="holo-tabpanel" role="tabpanel" tabindex="-1" [attr.aria-labelledby]="'holo-tab-' + panelTab()">
+            <!-- slot: the patch choice (C18) — moved out of the head into the Änderungen tab.
+                 Stays alive across tab switches (its comparison feeds the strip's ghosts and the pins). -->
+            @if (panelTab() === 'changes') {
+              <!-- C17: what the reader changed vs. what a patch changed — a segment switch, not an action. -->
+              <sc-segmented class="compact chg-sw"
+                [options]="changeViews"
+                [value]="changeView()"
+                [ariaLabel]="'codex.holo.card.changesAria' | translate"
+                (valueChange)="changeView.set($event === 'patch' ? 'patch' : 'mine')" />
+            }
+            @if (buildRef(); as ab) {
+              <div class="patch-slot" [hidden]="panelTab() !== 'changes' || changeView() !== 'patch'">
+                <sc-codex-holo-patch
+                  [hotkey]="hkLabel.patch"
+                  [shipName]="displayName()"
+                  [autoCompare]="panelTab() === 'changes' && changeView() === 'patch'"
+                  [className]="detail().classNameSlug"
+                  [channel]="channel()"
+                  [activeBuild]="ab"
+                  [activeKpiSheet]="activeKpiSheet()"
+                  [activeOccupants]="activeOccupants()"
+                  [resolveComparisonSide]="resolveComparisonSide()"
+                  (kpiGhosts)="patchGhosts.set($event)"
+                  (portPins)="patchPortPins.set($event)"
+                  (comparisonBuild)="onPatchCompared($event)" />
+              </div>
+            }
             @if (bodyReady()) {
               @switch (panelTab()) {
                 @case ('parts') {
+                  <!-- Concept 20261117-1810 B5–B7: the mini search over outside and inside, the picked
+                       room or element and the interior's overview; the parts below while the hull is on. -->
+                  <sc-codex-holo-interior
+                    [interior]="interiorOnTable() ? interior() : null"
+                    [deck]="interiorDeckKey()"
+                    [deckLabels]="deckLabels()"
+                    [rooms]="roomRefs()"
+                    [room]="interiorOnTable() ? roomCard() : null"
+                    [pick]="interiorPick()"
+                    [groups]="interiorGroups()"
+                    [presetName]="presetTitle()"
+                    [gap]="cargoGap()"
+                    [parts]="outerParts()"
+                    (pickChange)="onInteriorPick($event)"
+                    (pickClear)="interiorPick.set(null)"
+                    (roomSelect)="onRoomSelect($event)"
+                    (roomClear)="deckRoom.set(null)"
+                    (partSelect)="inspectPin($event)"
+                    (searched)="onPartsSearch($event)" />
+                  @if (!interiorOnTable() || inspectedPort()) {
                   <sc-codex-holo-inspector
                     [target]="inspectorTarget()"
                     [isRawPort]="inspectorIsRawPort()"
@@ -393,15 +509,15 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
                     [index]="inspectedIndex()"
                     [total]="pins().length"
                     [pinGroups]="pinGroups()"
-                    [hotkeyPinCount]="hotkeyPinCount()"
                     [activePorts]="activePorts()"
                     [readOnly]="readOnly()"
                     [relevantPorts]="relevantPorts()"
                     [modelPorts]="modelPortSet()"
                     [allParts]="hotspotScope() === 'all'"
                     [packageRows]="packageRows()"
-                    (closed)="closeInspector()"
-                    (pinInspect)="inspectPin($event)"
+                    [changedPorts]="changedPorts()"
+                    (closed)="onInspectorBack()"
+                    (pinInspect)="onListInspect($event)"
                     (hovered)="hovered.emit($event)"
                     (swapRequested)="swapRequested.emit($event)"
                     (inspected)="inspected.emit($event)"
@@ -409,17 +525,14 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
                     (rowPick)="onRowPick($event)"
                     (rowFocus)="onRowFocus($event)"
                     (rowEye)="assetViewer()?.togglePlacement($event)" />
+                  }
                 }
                 @case ('rank') {
                   <div class="rankbody" [scFeedbackSpot]="'codex.holo.stage.einordnung'">
-                    <div class="rh">
-                      @if (rankResult()?.overall != null) {
-                        <strong>{{ rankResult()!.bandKey! | translate }}</strong>
-                        <span>{{ rankResult()!.overall }} %</span>
-                      } @else {
-                        <strong>{{ roleName() ?? (rankClassLabel() | translate) }}</strong>
-                      }
-                    </div>
+                    <!-- With a ranking the card itself opens with "Rang N von M" (C15). -->
+                    @if ((rankResult()?.overall ?? null) === null) {
+                      <div class="rh"><strong>{{ roleName() ?? (rankClassLabel() | translate) }}</strong></div>
+                    }
                     <div class="statics">
                       @for (k of staticKeys; track k) {
                         <div tabindex="0" [scTooltip]="staticChipTitle(k)" scTooltipTier="label">
@@ -453,32 +566,117 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
                   </div>
                 }
                 @case ('changes') {
-                  <sc-codex-holo-changes [journal]="journal()" [readOnly]="readOnly()" (reverted)="reverted.emit($event)">
+                  @if (changeView() === 'mine') {
+                    <sc-codex-holo-changes [journal]="journal()" [readOnly]="readOnly()" (reverted)="reverted.emit($event)" />
+                  } @else {
                     <div class="patchdiff">
                       @if (patchDeltaBody(); as tpl) {
                         <ng-container [ngTemplateOutlet]="tpl" />
                       } @else {
-                        <div class="sub"><span>{{ 'codex.holo.stage.patchDiff' | translate }}</span><i></i></div>
-                        <p class="patchhint">{{ 'codex.holo.stage.patchDiffHint' | translate }}</p>
+                        <p class="patchhint">{{ 'codex.holo.patch.hint' | translate }}</p>
                       }
                     </div>
-                  </sc-codex-holo-changes>
+                  }
                 }
               }
             }
           </div>
+          <!-- The unsaved draft lives in the card (wide screens): never over the bottom row, the strip or the legend. -->
+          @if (draftChangedCount() > 0 && !readOnly()) {
+            <sc-codex-loadout-save-bar
+              class="draft-card"
+              [changed]="draftChangedCount()"
+              [saveable]="saveableCount()"
+              [saving]="saving()"
+              [error]="saveError()"
+              [inHangar]="inHangar()"
+              (save)="saveDraft.emit()"
+              (discard)="discardDraft.emit()"
+              (addAndSave)="saveDraft.emit()" />
+          }
           <button type="button" class="pdetails" (click)="openDetailsDrawer()" [attr.aria-expanded]="detailsOpen()">
             {{ (detailsOpen() ? 'codex.holo.stage.detailsHide' : 'codex.holo.stage.detailsShow') | translate }}
           </button>
         </aside>
+
+        <!-- ── The one bottom row (r4 d1, C6): Akte › views (Außen | Innen),
+             a single choice; then the parts filters, multi-select chips. ── -->
+        <div class="holo-views mobile-table" [scFeedbackSpot]="'codex.holo.stage.viewsAria'">
+          <div class="vw" role="radiogroup" tabindex="-1" [attr.aria-label]="'codex.holo.stage.viewsAria' | translate"
+               [attr.aria-keyshortcuts]="hkLabel.view" (keydown)="onViewKey($event)">
+            @for (g of viewGroups(); track g.id; let first = $first) {
+              @if (!first) { <span class="vw-div" aria-hidden="true"></span> }
+              <div class="vw-grp" role="group" [attr.aria-label]="g.labelKey ? (g.labelKey | translate) : null">
+                <span class="vw-gl" aria-hidden="true">{{ g.labelKey ? (g.labelKey | translate) : '' }}</span>
+                <div class="vw-row">
+                  @for (v of g.items; track v.id) {
+                    <button type="button" class="vw-thumb" role="radio" [attr.data-view]="v.id"
+                            [class.on]="v.id === activeViewId()" [attr.aria-checked]="v.id === activeViewId()"
+                            [attr.tabindex]="v.id === activeViewId() ? 0 : -1"
+                            [attr.aria-disabled]="v.disabledKey ? true : null" [class.dis]="!!v.disabledKey"
+                            [scTooltip]="v.disabledKey ? (v.disabledKey | translate) : null" scTooltipTier="label"
+                            (click)="pickView(v)">
+                      <i class="vw-ic" [class.akte]="v.id === 'akte'" aria-hidden="true">
+                        <svg [attr.viewBox]="v.icon.box" preserveAspectRatio="xMidYMid meet">
+                          @for (d of v.icon.paths; track $index) { <path [attr.d]="d" /> }
+                        </svg>
+                      </i>
+                      <span class="vw-l">{{ v.labelKey ? (v.labelKey | translate) : v.label }}</span>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          <span class="vw-sep" aria-hidden="true"></span>
+          @if (deckFilterChips().length > 0) {
+            <!-- B1 „Deck · Filter“: Alle (the hull) and every deck, for 3D and Einfach alike; a deck's
+                 located SCU on its chip, and an open cargo gap said aloud (r1-gaps = show). -->
+            <div class="vf vd" role="group" [attr.aria-label]="'codex.holo.interior.deckFilterAria' | translate">
+              <span class="vw-gl">{{ 'codex.holo.interior.deckFilter' | translate }}</span>
+              <div class="vf-row vd-row">
+                @for (c of deckFilterChips(); track c.id) {
+                  <button type="button" class="vf-chip vd-chip" [attr.data-deck]="c.id"
+                          [class.on]="c.key === deckFilter()" [attr.aria-pressed]="c.key === deckFilter()"
+                          [attr.aria-disabled]="c.disabledKey || activeView() === 'akte' ? true : null"
+                          [scTooltip]="c.disabledKey ? (c.disabledKey | translate) : null" scTooltipTier="label"
+                          (click)="pickDeckChip(c)">
+                    {{ c.labelKey ? (c.labelKey | translate) : c.label }}
+                    @if (c.scu > 0) { <small class="vd-scu">{{ c.scu }} SCU</small> } @else if (c.sub) { <small class="vd-sub">{{ c.sub }}</small> }
+                  </button>
+                }
+                @if (cargoGap(); as g) {
+                  <span class="vd-gap" tabindex="0" [scTooltip]="'codex.holo.interior.gapHint' | translate" scTooltipTier="label">
+                    {{ 'codex.holo.interior.gap' | translate: { located: g.located, total: g.total } }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+          @if (deckFilter() === null) {
+          <div class="vf" role="group" [attr.aria-label]="'codex.holo.stage.filtersAria' | translate">
+            <span class="vw-gl">{{ 'codex.holo.stage.filterParts' | translate }}</span>
+            <div class="vf-row">
+              @for (f of partFilterChips; track f.id) {
+                <button type="button" class="vf-chip" [class.on]="partFilter().has(f.id)" [attr.aria-pressed]="partFilter().has(f.id)"
+                        [attr.aria-disabled]="activeView() === 'akte' ? true : null" (click)="togglePartFilter(f.id)">
+                  <span class="ck" aria-hidden="true"></span>{{ f.labelKey | translate }}
+                </button>
+              }
+              <button type="button" class="vf-chip all" [class.on]="hotspotScope() === 'all'" [attr.aria-pressed]="hotspotScope() === 'all'"
+                      [attr.aria-disabled]="activeView() === 'akte' ? true : null" (click)="toggleAllParts()">
+                <span class="ck" aria-hidden="true"></span>{{ 'codex.holo.stage.filterAll' | translate }}
+              </button>
+            </div>
+          </div>
+          }
+        </div>
       </div>
 
-      <!-- ── Below (concept holotisch-unten r1, d2): on the strip's own
-           columns — a side column as wide as the Einsatz (Beschreibung, Wo zu
-           kaufen, Varianten; projected [htSide]) and the parts in four columns
-           over the strip's four areas, then the details. ─────────────── -->
+      <!-- ── Below: the parts in four columns over the strip's four areas
+           (no side column since the Akte carries description, sources and
+           variants), then the details. ─────────────── -->
       <div class="holo-below mobile-data">
-        <aside class="below-side"><ng-content select="[htSide]" /></aside>
         <div class="below-head sh" [scFeedbackSpot]="'codex.detail.columnLoadout'">
           <span class="t">{{ 'codex.holo.below.parts' | translate }}</span>
           <span class="n">{{ 'codex.holo.below.partsCount' | translate: { n: pins().length } }}</span>
@@ -486,7 +684,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
         </div>
         @for (a of partAreas(); track a.id) {
           <section class="below-area" [attr.data-p]="a.id" [attr.aria-label]="a.labelKey | translate">
-            <h3 class="area-h">{{ a.labelKey | translate }}</h3>
+            <h3 class="area-h"><sc-area-symbol [area]="a.id" />{{ a.labelKey | translate }}</h3>
             @if (a.sections.length > 0) {
               <sc-codex-hardpoint-layout
                 [calm]="true"
@@ -553,7 +751,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
         @if (undoToast()) {
           <div class="undo-toast" role="status" animate.enter="toast-enter" animate.leave="toast-leave">
             <span>{{ 'codex.holo.stage.journalChanged' | translate: { label: undoToastLabel() } }}</span>
-            <button type="button" class="btn quiet" (click)="undoToastAction()">{{ 'codex.holo.stage.undo' | translate }}</button>
+            <button type="button" scAction tier="secondary" (click)="undoToastAction()">{{ 'codex.holo.stage.undo' | translate }}</button>
           </div>
         }
         @if (copyToast(); as ct) {
@@ -595,11 +793,6 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
         [userId]="userId()"
         [crossSection]="crossSection()"
         [cells]="allKpiCells()"
-        [active]="activeMissionId()"
-        [missions]="missionSegments()"
-        [defaultLabelKey]="rankClassLabel()"
-        [cohortLabel]="cohortLabel()"
-        (missionChange)="missionChange.emit($event)"
         [capabilities]="shipCapabilities()"
         (sheetChange)="onSheetChange($event)">
         <sc-codex-holo-perspectives
@@ -628,33 +821,32 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   --holo-gold: var(--accent-gold, #c8a84b); --holo-gold-rgb: var(--accent-gold-rgb, 200, 168, 75);
   --a4: color-mix(in srgb, var(--sc-accent) 4%, transparent); --a5: color-mix(in srgb, var(--sc-accent) 5%, transparent); --a7: color-mix(in srgb, var(--sc-accent) 7%, transparent); --a10: color-mix(in srgb, var(--sc-accent) 10%, transparent); --a12: color-mix(in srgb, var(--sc-accent) 12%, transparent); --a14: color-mix(in srgb, var(--sc-accent) 14%, transparent); --a22: color-mix(in srgb, var(--sc-accent) 22%, transparent); --a28: color-mix(in srgb, var(--sc-accent) 28%, transparent); --a40: color-mix(in srgb, var(--sc-accent) 40%, transparent); --a50: color-mix(in srgb, var(--sc-accent) 50%, transparent); --a55: color-mix(in srgb, var(--sc-accent) 55%, transparent); --a80: color-mix(in srgb, var(--sc-accent) 80%, transparent);
   --e-out: var(--holo-e-out); --e-io: var(--holo-e-io);
-  --panel-w: clamp(300px, 22.2vw, 340px);
-  /* The strip's columns, shared by everything below the first screen (concept
-     r1 d2): a narrow lead column (Einsatz on the strip; Beschreibung + Wo zu
-     kaufen above it), the four areas evenly, the strip's arrow. */
-  --holo-lead-w: clamp(150px, 15%, 230px); --holo-ctl-w: max(44px, var(--sc-tap-min, 0px));
-  --holo-cols: var(--holo-lead-w) repeat(4, minmax(0, 1fr)) var(--holo-ctl-w) var(--holo-fab-clear, 0px);
+  --panel-w: clamp(320px, 22.2vw, 360px);
+  /* The fixed right card and the Akte card share one height (concept holotisch-feinschliff C14/C20). */
+  --holo-card-h: min(100%, 540px);
+  /* The strip's columns, shared by everything below the first screen: the four areas evenly, edge on edge with the strip's four groups. */
+  --holo-cols: repeat(4, minmax(0, 1fr));
   display: flex; flex-direction: column; gap: 6px;
   }
-  .btn, .mobile-tabs button, .statics .k, .sub, .tt, .table-eyebrow, .sh, .details-toggle, .switch { font-family: var(--d); text-transform: uppercase; }
+  .mobile-tabs button, .statics .k, .sub, .sh, .details-toggle, .switch { font-family: var(--d); text-transform: uppercase; }
   .rule { flex: 1; height: 1px; background: var(--l1); }
-  .btn { min-height: var(--sc-tap-min, 32px); padding: 5px 12px; border-radius: 3px; border: 1px solid var(--l2); background: var(--a10);
-  color: var(--sc-fg-0); cursor: pointer; font-size: max(11px, var(--f)); letter-spacing: 0.08em; transition: border-color 160ms ease, color 160ms ease; }
-  .btn.quiet { background: none; border-color: var(--l1); color: var(--sc-fg-1); }
-  .btn:hover, .btn:focus-visible { border-color: var(--sc-accent); color: var(--sc-accent); }
   @keyframes rise { from { opacity: 0; transform: translateY(var(--holo-rise)); } }
   @keyframes fade-in { from { opacity: 0; } }
 
-  /* ── One row: name, maker + class | data line, patch, view switch ── */
-  .holo-topbar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; min-height: 40px; }
-  .ht-title { display: flex; align-items: baseline; gap: 14px; min-width: 0; flex: 1 1 auto; }
-  .ht-name { margin: 0; font-weight: 500; font-size: clamp(18px, 1.15vw, 22px); line-height: 1.15; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sc-fg-0);
+  /* ── Head (r4 d1): name + models | Einsatz centred | hangar button ── */
+  .holo-topbar { position: relative; z-index: 6; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: end; gap: 6px 14px; min-height: 40px; }
+  .ht-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .ht-title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .ht-name { margin: 0; font-weight: 500; font-size: clamp(20px, 1.25vw, 24px); line-height: 1.15; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sc-fg-0);
   white-space: nowrap; animation: name-in 520ms var(--e-out) backwards; }
-  .ht-kicker { min-width: 0; font-size: max(12px, var(--f)); letter-spacing: 0.04em; color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  .ht-kicker { min-width: 0; font-size: max(11px, var(--f)); letter-spacing: 0.04em; color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   animation: fade-in 480ms ease-out 120ms backwards; }
+  .ht-models { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; }
+  .ht-models:empty { display: none; }
   /* Opens like a projected line: clip-path only, the row never re-lays out while the name arrives. */
   @keyframes name-in { from { opacity: 0; clip-path: inset(0 100% 0 0); } }
-  .ht-right { display: flex; justify-content: flex-end; align-items: center; gap: 10px; min-width: 0; flex: 0 1 auto; flex-wrap: wrap; }
+  .ht-centre { justify-self: center; min-width: 0; }
+  .ht-right { justify-self: end; display: flex; justify-content: flex-end; align-items: center; gap: 10px; min-width: 0; max-width: 100%; flex-wrap: wrap; }
   .mobile-tabs { display: none; gap: 6px; }
   .mobile-tabs button { flex: 1; min-height: var(--sc-tap-min, 32px); padding: 6px 10px; border-radius: 3px; border: 1px solid var(--l2); background: var(--glass); color: var(--sc-fg-1); cursor: pointer;
   font-size: max(10px, var(--f)); letter-spacing: 0.14em; transition: color 160ms ease, border-color 160ms ease; }
@@ -662,8 +854,9 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
 
   /* ── Model | panel. Exactly the height the first screen has left above the
      strip; the stage measures --holo-top, the page frame owns the width. ── */
-  .holo-body { display: grid; grid-template-columns: minmax(0, 1fr) var(--panel-w); gap: 12px; align-items: stretch;
-  height: calc(100dvh - var(--holo-top, 170px) - var(--holo-row-h, 68px) - 8px); min-height: 400px; }
+  /* Row 1: the table | the fixed card (as high as the Akte card, --holo-card-h); row 2: the views row over the full width, docked on the strip. */
+  .holo-body { display: grid; grid-template-columns: minmax(0, 1fr) var(--panel-w); grid-template-rows: minmax(0, 1fr) auto; column-gap: 16px; row-gap: 8px; align-items: stretch;
+  height: calc(100dvh - var(--holo-top, 170px) - var(--holo-strip-h, 82px) - 8px); min-height: 460px; }
   /* The glow, not a frame: the Einsatz hue under the model, the page shows through. */
   .holo-table { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
   .holo-table::before { content: ''; position: absolute; inset: -40px -10px; z-index: 0; pointer-events: none;
@@ -671,8 +864,9 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   transition: background var(--holo-t-base) ease; }
   /* One sheet of glass, one hairline. */
   .holo-panel { position: relative; z-index: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden;
-  border: 1px solid var(--hair); border-radius: 16px; background: color-mix(in srgb, var(--sc-bg-0) 50%, transparent);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  align-self: start; height: var(--holo-card-h);
+  border: 1px solid var(--hair); border-radius: 16px; background: color-mix(in srgb, var(--sc-bg-0) 73%, transparent);
+ }
 
   /* ── Tabs: a glowing pill slides under the word ── */
   .ptabs { position: relative; flex: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 10px 10px 0; min-height: max(38px, var(--sc-tap-min, 0px));
@@ -686,18 +880,69 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   color: var(--sc-fg-2); font: inherit; font-size: max(12px, var(--f)); white-space: nowrap; transition: color 180ms ease; }
   .ptab svg { width: 1.15em; height: 1.15em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .ptab:hover, .ptab.on { color: var(--sc-fg-0); }
-  .ptab:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+  .ptab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
   .tcount { font-family: var(--m); font-size: max(10px, var(--f)); color: var(--sc-accent); }
   .ptab.on .tcount { color: var(--sc-fg-0); }
-  .pbody { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 12px 16px; animation: rise var(--rise-dur, 300ms) var(--e-out) var(--rise-delay, 60ms) backwards;
-  transition: opacity var(--holo-t-fast) var(--e-io); }
+  .pbody { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding: 12px 16px; animation: rise var(--rise-dur, 300ms) var(--e-out) var(--rise-delay, 60ms) backwards;
+  transition: opacity var(--holo-t-fast) var(--e-io);
+  /* The card scrolls; its bottom edge fades instead of cutting a line in half, and the extra bottom
+     padding lets the last line scroll fully clear of the fade (QA: "Außen – fast bester Wert…"). */
+  padding-bottom: 28px; scroll-padding-bottom: 28px;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); }
   .ph-reveal .pbody { --rise-dur: 560ms; --rise-delay: 260ms; }
   .holo-stage:not(.first):is(.ph-wait, .ph-hero) :is(.holo-below, .pbody) { opacity: 0.35; }
   .pbody:focus-visible { outline: none; }
+
+  /* ── Docking (camera world D1, rounds/05 d5-pb-detail): the page pushes in 0.7 s with the header standing, the title scans
+     open, the ship materialises as a hologram (a brief flicker), the side panel docks with an overshoot and a light edge,
+     and the four part columns ignite left to right. Every open of a detail page plays it (shell beta); the session's very
+     first ship keeps its longer arrival (.first) and only adds the title scan and the columns once it is revealed. ── */
+  .dock { --dk-ease: cubic-bezier(0.16, 0.84, 0.24, 1); }
+  .dock:not(.first) :is(.holo-body, .holo-below) { transform-origin: 40% 50%; animation: dk-push 700ms var(--dk-ease) backwards; }
+  @keyframes dk-push { from { transform: scale(0.965); } }
+  .dock .holo-topbar .ht-title { position: relative; }
+  .dock .ht-name { position: relative; animation: dk-scan 760ms var(--dk-ease) 120ms backwards; }
+  .dock .ht-name::after { content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; transform-origin: left; pointer-events: none;
+  background: linear-gradient(90deg, var(--sc-accent), transparent); box-shadow: 0 0 10px var(--sc-accent); animation: dk-scan-line 1000ms var(--dk-ease) 120ms both; }
+  @keyframes dk-scan {
+    0% { clip-path: inset(-40% 100% -40% 0); opacity: 1; filter: brightness(2.2) drop-shadow(0 0 0 var(--sc-accent)); }
+    55% { clip-path: inset(-40% -10% -40% 0); filter: brightness(1.6) drop-shadow(0 0 10px var(--sc-accent)); }
+    100% { clip-path: inset(-40% -10% -40% 0); filter: none; }
+  }
+  @keyframes dk-scan-line { 0% { transform: scaleX(0); opacity: 0; } 12% { opacity: 1; } 58% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
+  .dock:not(.first) .holo-table { transform-origin: 35% 55%; animation: dk-holo 1000ms linear 260ms backwards; }
+  @keyframes dk-holo {
+    0% { opacity: 0; transform: scale(1.03); filter: brightness(2) saturate(0.4); }
+    10% { opacity: 0.6; }
+    17% { opacity: 0.15; }
+    28% { opacity: 0.9; }
+    38% { opacity: 0.4; }
+    62%, 100% { opacity: 1; transform: none; filter: none; }
+  }
+  .dock:is(:not(.first), .ph-reveal) .holo-panel { animation: dk-dock 900ms var(--dk-ease) 560ms backwards; }
+  @keyframes dk-dock {
+    0% { opacity: 0; transform: translateX(46px); filter: brightness(1.7); }
+    52% { opacity: 1; transform: translateX(-6px); filter: brightness(1.4); }
+    76% { transform: translateX(1.5px); }
+    100% { transform: none; filter: none; }
+  }
+  .dock:is(:not(.first), .ph-reveal) .holo-panel::after { content: ''; position: absolute; z-index: 2; inset-block: 8% 8%; inset-inline-start: 0; width: 2px; pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--sc-accent), transparent); box-shadow: 0 0 12px var(--sc-accent); animation: dk-edge 1100ms ease-out 560ms both; }
+  @keyframes dk-edge { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
+  .dock:is(:not(.first), .ph-reveal) .below-area { animation: dk-ignite 520ms var(--dk-ease) calc(1100ms + var(--dk-i, 0) * 70ms) backwards; }
+  .below-area[data-p="offensive"] { --dk-i: 0; }
+  .below-area[data-p="defensive"] { --dk-i: 1; }
+  .below-area[data-p="movement"] { --dk-i: 2; }
+  .below-area[data-p="signature"] { --dk-i: 3; }
+  @keyframes dk-ignite {
+    0% { opacity: 0; transform: translateY(6px) scale(0.985); filter: brightness(2.4); }
+    40% { opacity: 1; transform: none; filter: brightness(1.7); }
+    100% { opacity: 1; transform: none; filter: none; }
+  }
   .pdetails { flex: none; display: block; width: 100%; min-height: max(30px, var(--sc-tap-min, 0px)); background: none; border: 0; border-block-start: 1px solid var(--hair); color: var(--sc-fg-2); cursor: pointer;
   font: inherit; font-size: max(11px, var(--f)); transition: color 160ms ease; }
   .pdetails:hover { color: var(--sc-accent); }
-  .pdetails:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+  .pdetails:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
 
   /* ── Tab Einordnung ── */
   .rankbody { display: grid; gap: 10px; min-width: 0; }
@@ -711,72 +956,111 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .statics .v { font-family: var(--m); font-size: 12.5px; color: var(--sc-fg-0); white-space: nowrap; }
   /* Touch: the focusable chips carry the tooltip, so they are tap targets. */
   @media (pointer: coarse) { .statics div { min-width: var(--sc-tap-min); min-height: var(--sc-tap-min); align-content: center; } }
-  .sub { font-size: max(8.5px, var(--f)); letter-spacing: 0.14em; color: var(--sc-accent); display: flex; align-items: center; gap: 8px; }
-  .sub i { flex: 1; height: 1px; background: var(--hair); }
   /* Touch: the focusable title reaches the tap minimum. */
   @media (pointer: coarse) {
     .ht-name { min-height: var(--sc-tap-min); line-height: var(--sc-tap-min); }
   }
   .cohort-link { font-size: max(10.5px, var(--f)); color: var(--sc-fg-2); text-decoration: none; text-align: center; transition: color 160ms ease; }
   .cohort-link:hover { color: var(--sc-accent); }
-  .patchdiff { display: grid; gap: 8px; min-width: 0; }
+  /* The patch Δ fits the fixed card: no column wider than the card, the card scrolls inside (C18). */
+  .patchdiff { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; min-width: 0; overflow-x: auto; }
+  .patchdiff ::ng-deep .delta-table thead th { letter-spacing: 0; font-size: max(9.5px, var(--sc-fs-floor)); }
+  .patchdiff ::ng-deep .delta-table th[scope="row"] { white-space: normal; hyphens: auto; }
   .patchdiff ::ng-deep .delta-table { font-size: max(11px, var(--f)); }
   .patchdiff ::ng-deep .delta-table th, .patchdiff ::ng-deep .delta-table td { padding: 4px 3px; }
   .patchdiff ::ng-deep .delta-head { flex-wrap: wrap; }
   .patchdiff ::ng-deep .admin-schema-row { box-sizing: border-box; max-width: 100%; overflow-wrap: anywhere; }
   .patchhint { margin: 0; font-size: max(12px, var(--f)); color: var(--sc-fg-2); }
 
-  /* Schema's sub-views: one calm row under the table head. */
-  .sub-views { position: relative; z-index: 5; flex: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 2px 12px 0; }
-  .sv { font-family: var(--d); text-transform: uppercase; font-size: max(9px, var(--f)); letter-spacing: 0.1em; padding: 3px 10px; min-height: var(--sc-tap-min, 26px);
-  background: none; border: 1px solid var(--l1); border-radius: 3px; color: var(--sc-fg-1); cursor: pointer; transition: color 160ms ease, border-color 160ms ease, background 160ms ease; }
-  .sv:hover:not(:disabled) { color: var(--sc-fg-0); border-color: var(--l2); }
-  .sv.on { color: var(--sc-accent); border-color: var(--sc-accent); background: var(--a10); }
-  .sv:disabled { opacity: 0.4; cursor: not-allowed; }
-  .sv:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
-  /* ── Table head: hangar | what the surface shows | view tools ── */
-  .table-head { position: relative; z-index: 5; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 4px; min-height: 34px; }
+  /* ── Table head: the classic shell's hangar dock and the no-geometry note; nothing else (C1, C2) ── */
+  .table-head { position: relative; z-index: 5; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 4px; }
+  .table-head:empty { display: none; }
+  .ig-host { flex: 1 1 auto; min-width: 0; }
   .hangar-dock { flex: none; display: flex; align-items: center; }
-  .table-eyebrow { flex: 1; min-width: 0; margin: 0; font-size: max(9px, var(--f)); color: var(--sc-fg-2); letter-spacing: 0.14em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .no-geometry-badge { cursor: help; }
-  .tools5 { flex: none; display: flex; gap: 14px; align-items: center; opacity: 0.8; transition: opacity 160ms ease; }
-  .holo-table:hover .tools5, .holo-table:focus-within .tools5, .tools5:has(.on), .tools5.open { opacity: 1; }
-  @media (hover: none) { .tools5 { opacity: 1; } }
-  .tt { position: relative; background: none; border: none; padding: 4px 2px; cursor: pointer; font-size: max(8.5px, var(--f));
-  letter-spacing: 0.14em; color: var(--sc-fg-1); min-height: var(--sc-tap-min, 24px); transition: color 160ms ease, text-shadow 160ms ease; }
-  .tt::after { content: ''; position: absolute; left: 2px; right: 2px; bottom: 1px; height: 1px; background: currentColor; scale: 0 1; transition: scale 220ms var(--e-out); }
-  .tt:hover:not(:disabled) { color: var(--sc-fg-0); }
-  .tt:hover:not(:disabled)::after, .tt.on::after { scale: 1 1; }
-  .tt.on { color: var(--sc-accent); text-shadow: 0 0 8px var(--a50); }
-  .tt:disabled { opacity: 0.4; cursor: not-allowed; }
-  .tt:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-  /* Hotkey badges (#644): discreet until the control is hovered or focused;
-     a touch screen has no keyboard to press them with. */
-  .hk { margin-inline-start: 6px; padding: 0 4px; border: 1px solid var(--l1); border-radius: 2px; font-family: var(--m); font-size: 9px;
-  letter-spacing: 0; color: var(--sc-fg-2); opacity: 0.55; transition: opacity 160ms ease; }
-  .tt:hover .hk, .tt:focus-visible .hk, .tt.on .hk { opacity: 1; }
-  @media (hover: none), (pointer: coarse) { .hk { display: none; } }
+  .no-geometry-badge { margin: 0; cursor: help; font-size: max(10px, var(--f)); color: var(--sc-fg-2); }
+  /* The Akte (slot [holoAkte]) lies over the table; the table keeps its size under it (no canvas re-layout). */
+  .holo-akte { position: absolute; inset: 0; z-index: 4; display: none; min-width: 0; min-height: 0; }
+  .holo-akte.on { display: flex; flex-direction: column; }
+  /* A filled head row (classic shell: the hangar dock) stays above the Akte instead of on its tabs. */
+  .table-head:not(:empty) ~ .holo-akte { inset-block-start: 40px; }
+  /* The source jump (#bezugsquelle) targets the projected Akte: it lands clear of the top bar (the classic shell sets no scroll padding) with room for that head row. */
+  .holo-akte ::ng-deep [holoAkte] { scroll-margin-top: 96px; }
+  .under-akte { visibility: hidden; }
+
+  /* ── The bottom row (r4 d1, C6): views = one choice as thumbnails, filters = multi-select chips ── */
+  .holo-views { grid-column: 1 / -1; grid-row: 2; position: relative; z-index: 2; display: flex; align-items: flex-end; gap: 12px; min-width: 0;
+  padding: 6px 10px 7px; margin-bottom: calc(-1 * 8px); border: 1px solid color-mix(in srgb, var(--sc-accent) 42%, transparent); border-bottom: 0;
+  border-radius: 12px 12px 0 0; background: color-mix(in srgb, var(--sc-bg-0) 88%, var(--sc-accent) 4%); }
+  .vw { display: flex; align-items: flex-end; gap: 6px; min-width: 0; flex: none; }
+  .vw-grp { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .vw-gl { font-family: var(--d); font-size: max(9px, var(--f)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); padding-inline-start: 2px; min-height: 1.2em; white-space: nowrap; }
+  .vw-row { display: flex; gap: 5px; }
+  .vw-div { width: 1px; align-self: stretch; background: var(--l1); margin: 0 3px; }
+  .vw-thumb { flex: none; width: 62px; display: flex; flex-direction: column; align-items: stretch; gap: 3px; padding: 0; background: none; border: 0; cursor: pointer; color: var(--sc-fg-2); font: inherit; }
+  .vw-ic { display: block; height: 36px; border: 1px solid var(--l1); border-radius: 7px; background: color-mix(in srgb, var(--sc-bg-1) 90%, transparent); overflow: hidden;
+  transition: border-color 160ms ease, box-shadow 160ms ease; }
+  .vw-ic svg { display: block; width: 100%; height: 100%; }
+  .vw-ic path { fill: var(--a12); stroke: color-mix(in srgb, var(--sc-accent) 70%, var(--sc-fg-0)); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+  .vw-ic.akte { background: linear-gradient(170deg, var(--sc-bg-1), color-mix(in srgb, var(--holo-gold) 45%, var(--sc-bg-1)) 60%, color-mix(in srgb, var(--holo-gold) 70%, var(--sc-bg-1))); }
+  .vw-l { font-size: max(10px, var(--f)); text-align: center; overflow: hidden; line-height: 1.15; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
+  .vw-thumb:hover:not(.dis) .vw-ic { border-color: var(--l2); }
+  .vw-thumb:hover:not(.dis) .vw-l { color: var(--sc-fg-0); }
+  .vw-thumb.on .vw-ic { border-color: var(--sc-accent); box-shadow: 0 0 0 1px var(--sc-accent); }
+  .vw-thumb.on .vw-l { color: var(--sc-fg-0); }
+  .vw-thumb.dis { opacity: 0.42; cursor: not-allowed; }
+  .vw-thumb:focus-visible { outline: none; }
+  .vw-thumb:focus-visible .vw-ic { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+  /* Views | filters: a full-height rule; the filters read as their own kind (chips with a check). */
+  .vw-sep { flex: none; width: 2px; align-self: stretch; margin: 2px 6px; border-radius: 1px; background: color-mix(in srgb, var(--sc-accent) 55%, transparent); }
+  .vf { flex: 0 1 auto; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
+  .vf-row { display: flex; gap: 6px; flex-wrap: nowrap; justify-content: flex-start; padding-bottom: 4px; min-width: 0; }
+  .vf-chip { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 11px 0 8px; border: 1px solid var(--l1); border-radius: 13px; background: none;
+  color: var(--sc-fg-2); font: inherit; font-size: max(11.5px, var(--f)); white-space: nowrap; cursor: pointer; transition: color 160ms ease, border-color 160ms ease, background 160ms ease; }
+  .vf-chip .ck { width: 10px; height: 10px; border: 1px solid currentColor; border-radius: 3px; flex: none; }
+  .vf-chip.on { color: var(--sc-fg-0); border-color: var(--sc-accent); background: var(--a22); }
+  .vf-chip.on .ck { background: var(--sc-accent); border-color: var(--sc-accent); box-shadow: inset 0 0 0 2px var(--sc-bg-0); }
+  .vf-chip.all { border-style: dashed; }
+  .vf-chip.all.on { border-style: solid; }
+  .vf-chip:hover:not([aria-disabled="true"]) { color: var(--sc-fg-0); border-color: var(--l2); }
+  .vf-chip[aria-disabled="true"] { opacity: 0.4; cursor: not-allowed; }
+  .vf-chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+  @media (pointer: coarse) { .vf-chip { height: var(--sc-tap-min, 44px); } }
+  /* B1 „Deck · Filter“: one line of deck chips; overflow scrolls sideways (phones too), a chip never shrinks. */
+  .vd { flex: 1 1 auto; }
+  .vd-row { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; align-items: center;
+  mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent); padding-inline-end: 32px; }
+  .vd-chip { padding: 0 11px; scroll-snap-align: start; }
+  .vd-chip small { font-size: max(10px, var(--f)); color: var(--sc-fg-2); }
+  .vd-chip .vd-scu { color: var(--sc-int-cargo); font-family: var(--font-monospace, monospace); }
+  .vd-gap { flex: none; white-space: nowrap; font-size: max(11px, var(--f)); color: var(--sc-warning); padding: 0 8px; line-height: 24px;
+  border: 1px dashed color-mix(in srgb, var(--sc-warning) 55%, transparent); border-radius: 13px; }
+  .vd-gap:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
+  /* The fixed card's patch slot (C18): only on the Änderungen tab. */
+  .patch-slot { margin-bottom: 10px; }
+  .chg-sw { display: block; margin-bottom: 10px; }
+  .chg-sw ::ng-deep .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; width: 100%; }
+  .patch-slot[hidden] { display: none; }
   /* On a desktop the panel's part list replaces the dense key under the table: one list, not two. */
   @media (min-width: 1001px) { .holo-stage ::ng-deep .pin-key { display: none; } }
 
   /* ── Below: side column | four area columns (the strip's columns) ── */
   .holo-below { display: grid; grid-template-columns: var(--holo-cols); column-gap: 0; row-gap: 8px; align-items: start; margin-top: 10px; }
-  .below-side { grid-column: 1; grid-row: 1 / span 3; position: sticky; top: 84px; display: flex; flex-direction: column; gap: 10px; min-width: 0; padding-inline-end: 12px; }
-  .below-side:empty { display: none; }
-  .below-head { grid-column: 2 / 6; grid-row: 1; margin-bottom: 0; }
+  .below-head { grid-column: 1 / 5; grid-row: 1; margin-bottom: 0; }
   .below-head .n { font-family: var(--m); letter-spacing: 0; text-transform: none; color: var(--sc-fg-2); }
   .below-area { grid-row: 2; min-width: 0; padding: 4px 10px 8px; border-inline-start: 1px solid var(--l1); box-shadow: inset 0 2px 0 var(--p); }
   .below-area[data-p="offensive"] { --p: var(--holo-p-offensive); }
   .below-area[data-p="defensive"] { --p: var(--holo-p-defensive); }
   .below-area[data-p="movement"] { --p: var(--holo-p-movement); }
   .below-area[data-p="signature"] { --p: var(--holo-p-signature); border-inline-end: 1px solid var(--l1); }
-  .area-h { margin: 6px 0 4px; font-family: var(--d); font-weight: 400; text-transform: uppercase; font-size: max(9.5px, var(--f)); letter-spacing: 0.14em; color: var(--p, var(--sc-accent)); }
+  .area-h { display: flex; align-items: center; gap: 6px; margin: 6px 0 4px; font-family: var(--d); font-weight: 400; text-transform: uppercase; font-size: max(9.5px, var(--f)); letter-spacing: 0.14em; color: var(--p, var(--sc-accent)); }
   .area-empty { margin: 4px 0; font-size: max(11.5px, var(--f)); color: var(--sc-fg-2); }
-  .holo-below .holo-details { grid-column: 2 / 6; grid-row: 3; min-width: 0; }
+  .holo-below .holo-details { grid-column: 1 / 5; grid-row: 3; min-width: 0; }
   /* At the page's end the perspectives sit right on the strip. */
   .below-persp { margin-top: 14px; margin-bottom: 0; }
   /* The stage is a flex column with gap: 6px; the panel cancels it toward the strip so the two meet without a seam (feedback #4). */
   @media (min-width: 901px) { .below-persp { margin-bottom: -6px; } }
+  /* The strip ends before the launcher lane (it measures --holo-fab-clear): what stands on its columns ends there too, or the four columns drift apart. */
+  @media (min-width: 641px) { .holo-below, .below-persp { margin-inline-end: var(--holo-fab-clear, 0px); } }
   .holo-stage.first:is(.ph-wait, .ph-hero) .holo-below { opacity: 0; }
   .first.ph-reveal .holo-below { animation: rise 600ms var(--e-out) 440ms backwards; }
   .holo-below { transition: opacity var(--holo-t-fast) var(--e-io); }
@@ -802,12 +1086,17 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .switch .track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 8px; height: 8px; border-radius: 50%; background: var(--sc-fg-2); transition: transform 200ms var(--e-out), background 160ms ease; }
   .switch input:checked + .track { background: color-mix(in srgb, var(--sc-accent) 30%, var(--sc-bg-0)); border-color: var(--sc-accent); }
   .switch input:checked + .track::after { transform: translateX(14px); background: var(--sc-accent); }
-  .switch input:focus-visible + .track { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+  .switch input:focus-visible + .track { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
   /* The toast rides above the strip, whatever height the strip has. */
   .toasts { position: fixed; bottom: calc(var(--holo-strip-h, 64px) + 16px + var(--holo-strip-lift, 0px)); left: 50%; translate: -50% 0; z-index: 20;
   display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
-  .draft-float { pointer-events: auto; width: min(560px, calc(100vw - 32px)); padding: 8px 12px; background: var(--sc-bg-0); border: 1px solid var(--sc-accent);
-  border-radius: 4px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.4), 0 0 0 1px var(--a10); }
+  /* Wide: the views + parts-filter row stands on the strip — the toast rides above that row too,
+     never over the chips (QA 1920x1080). */
+  @media (min-width: 901px) {
+    .toasts { bottom: calc(var(--holo-strip-h, 64px) + var(--holo-views-h, 0px) + 12px + var(--holo-strip-lift, 0px)); }
+  }
+  /* The draft's two places (.draft-card in the card, .draft-float above the strip) style themselves:
+     codex-loadout-save-bar.component.ts, :host(.draft-card) / :host(.draft-float) — stage CSS budget (B13). */
   .undo-toast { pointer-events: auto;
   display: flex; align-items: center; gap: 10px; background: var(--sc-bg-0); border: 1px solid var(--sc-accent);
   border-radius: 4px; padding: 8px 12px; font-size: max(12px, var(--f)); color: var(--sc-fg-0); box-shadow: 0 8px 24px rgb(0 0 0 / 0.4), 0 0 0 1px var(--a10); }
@@ -823,7 +1112,6 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .below-head, .holo-below .holo-details { grid-column: 1 / -1; grid-row: auto; }
   .below-area { grid-row: auto; }
   .below-area[data-p="defensive"], .below-area[data-p="signature"] { border-inline-end: 1px solid var(--l1); }
-  .below-side { grid-column: 1 / -1; grid-row: auto; order: 5; position: static; padding-inline-end: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); align-items: start; }
   .holo-below .holo-details { order: 6; }
   }
   @media (max-width: 640px) {
@@ -832,8 +1120,14 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   }
   /* Tablet and phone: the panel goes under the model, its full width, and grows with its content. */
   @media (max-width: 1000px) {
-  .holo-body { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; }
-  .holo-panel { overflow: visible; }
+  .holo-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; height: auto; min-height: 0; }
+  .holo-panel { overflow: visible; height: auto; align-self: stretch; }
+  /* The row stands under the table on its own: rounded all round, views and filters wrap onto two lines. */
+  .holo-views { flex-wrap: wrap; margin-bottom: 0; border-bottom: 1px solid color-mix(in srgb, var(--sc-accent) 42%, transparent); border-radius: 12px; }
+  .vw { max-width: 100%; overflow-x: auto; }
+  .vw-sep { display: none; }
+  .vf { flex-basis: 100%; align-items: flex-start; }
+  .vf-row { overflow-x: auto; justify-content: flex-start; max-width: 100%; }
   .pbody { overflow: visible; }
   }
   /* A phone on its side: the model takes the whole height of the screen. */
@@ -845,17 +1139,18 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   /* Beta shell: the search capsule floats at the bottom edge, the strip rides above it. */
   :host-context([data-layout]) .holo-stage { --holo-strip-lift: calc(var(--sc-float-bottom) + var(--sc-bar-h)); }
   .mobile-tabs { display: flex; }
+  /* The floating button column (β, view switch, share, feedback) stands at the inline end:
+     the hull and its pins keep that lane free instead of lying under it (QA Q4). */
+  .holo-table { padding-inline-end: var(--sc-fab-clear-inline); }
   .switch.mobile-only { display: inline-flex; }
-  .holo-topbar { flex-direction: column; align-items: stretch; }
-  .ht-title { flex-wrap: wrap; gap: 2px 10px; }
-  .ht-right { justify-content: flex-start; }
+  .holo-topbar { grid-template-columns: auto minmax(0, 1fr); }
+  .ht-left { grid-column: 1 / -1; }
+  .ht-centre { justify-self: start; }
+  /* Its own row: beside the Einsatz box the hangar button (48 px tall, no shrink on touch)
+     ran 53–61 px past a 375 px phone and the page scrolled sideways. */
+  .ht-right { grid-column: 1 / -1; justify-content: flex-end; }
   .holo-body { gap: 10px; }
-  /* Phone: dock and tools share the first line, the surface label its own. */
   .table-head { flex-wrap: wrap; gap: 6px; padding: 0; }
-  .table-head .hangar-dock { order: 1; }
-  .table-head .tools5 { order: 2; margin-inline-start: auto; gap: 8px; }
-  .tt { letter-spacing: 0.1em; padding: 4px 0; }
-  .table-head .table-eyebrow { order: 3; flex-basis: 100%; }
   .holo-below { grid-template-columns: 1fr; }
   .holo-body.mobile-hide-table .mobile-table { display: none; }
   .holo-body.mobile-hide-data .mobile-data { display: none; }
@@ -870,6 +1165,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
 })
 export class CodexHoloStageComponent {
   private readonly t = inject(TranslateService);
+  private readonly analytics = inject(AnalyticsService);
   /** Beta shell: the hangar button in the table head is retired (concept r1-flag). */
   protected readonly shellBeta = inject(BetaService).isEnabled('shell');
   private readonly skins = inject(ShipSkinsService);
@@ -967,15 +1263,9 @@ export class CodexHoloStageComponent {
   readonly missionLabelKey = computed(() => (this.activeMissionId() === 'all' ? this.rankClassLabel() : 'codex.mission.' + this.activeMissionId()));
   readonly missionHue = computed(() => missionColor(this.activeMissionId()));
   /** Who the Einsatz cell compares with: "26 × Leichter Jäger", "41 Kampfschiffe", "120 Schiffe". */
-  readonly cohortLabel = computed<string | null>(() => {
-    const r = this.rankResult();
-    if (!r) return null;
-    const n = r.cohortSize;
-    const role = this.roleName();
-    if (r.scope === 'role' && role) return this.t.instant('codex.holo.strip.cohortRole', { n, role });
-    if (r.scope === 'career') return `${n} ${this.t.instant(rankClassPluralKey(this.rankShipClass()))}`;
-    return this.t.instant('codex.holo.strip.shipCount', { n });
-  });
+  readonly cohortLabel = computed<string | null>(() =>
+    rankCohortLabel(this.t, this.rankResult(), this.roleName(), this.rankShipClass()),
+  );
   readonly rankDisabledReasons = input<Partial<Record<RankProfileId, string | null>>>({});
   readonly rankCohort = input<readonly RankShipInput[] | null>(null);
   readonly recentlyViewedShips = input<readonly string[]>([]);
@@ -1000,7 +1290,10 @@ export class CodexHoloStageComponent {
   /** A shared link's loadout is the draft: no swap, revert or save. */
   readonly readOnly = input(false);
   /** Draft paths already stored in the hangar config (e.g. after `?config=`). */
+  private readonly roomLabels = inject(RoomLabelTranslations);
   readonly savedPorts = input<ReadonlySet<string>>(new Set());
+  /** Own exemplar with autosave on: the store shows its own "Gespeichert" toast, so no undo toast here. */
+  readonly autosaving = input(false);
   readonly sharedBanner = input<HoloSharedBanner | null>(null);
   readonly adoptingShared = input(false);
   readonly adoptShared = output<void>();
@@ -1073,7 +1366,7 @@ export class CodexHoloStageComponent {
   readonly surface = computed<HoloSurface>(() => {
     const c = this.chosenSurface() ?? (this.auto3d() ? '3d' : 'simple');
     const can: Record<HoloSurface, boolean> = {
-      '3d': this.has3d(),
+      '3d': this.can3d(),
       simple: true,
       top: this.schemaAvailable(),
       side: this.drawingAvailable(),
@@ -1104,8 +1397,99 @@ export class CodexHoloStageComponent {
   readonly tablePins = computed<StagePin[]>(() => {
     const all = this.pins();
     const swappable = all.filter((p) => !!p.slot && !!p.section && isConfigurableSection(p.section));
-    return swappable.length > 0 ? swappable : all;
+    return (swappable.length > 0 ? swappable : all).filter((p) => this.pinPassesFilter(p));
   });
+  /** The pins the table may label: every pin the parts filters let through. */
+  readonly labelPins = computed<StagePin[]>(() => this.pins().filter((p) => this.pinPassesFilter(p)));
+
+  // ── The bottom row (concept holotisch-feinschliff r4 d1, C6): Akte › views › parts filters ──
+  /** The Akte lies over the table; any other view closes it. */
+  readonly akteOpen = signal(false);
+  /** The view the row has on: the Akte or the table's surface. */
+  readonly activeView = computed<HoloView>(() => (this.akteOpen() ? 'akte' : this.surface()));
+  /** The checked thumbnail: the view itself — the deck is a filter beside it, not a view (B1). */
+  readonly activeViewId = computed<string>(() => this.activeView());
+  /** Every view change, for the page (the Akte surface, the share link). */
+  readonly viewChange = output<HoloView>();
+  /** The parts filters that are on; all four by default. */
+  readonly partFilter = signal<ReadonlySet<HoloPartFilter>>(new Set(ALL_PART_FILTERS));
+  readonly partFilterChips = PART_FILTER_CHIPS;
+
+  private pinPassesFilter(p: StagePin): boolean {
+    const f = this.partFilter();
+    if (f.size === ALL_PART_FILTERS.length) return true;
+    return f.has(p.section ? PART_FILTER_OF[p.section] : 'other');
+  }
+
+  /** The row's one group „Ansicht“ (concept 20261117-1810 B1): Akte · 3D · Einfach · Oben · Seite · Front. No Außen/Innen split — the decks are the filter beside it. */
+  readonly viewGroups = computed<readonly { id: string; labelKey: string | null; items: readonly ViewThumb[] }[]>(() => {
+    const thumb = (view: HoloView, labelKey: string, disabledKey: string | null): ViewThumb => ({
+      id: view, labelKey, label: '', disabledKey, icon: VIEW_ICONS[view], view,
+    });
+    const schema = new Map(this.schemaOptions().map((o) => [o.id, o.disabledKey]));
+    return [{
+      id: 'views',
+      labelKey: 'codex.holo.interior.views',
+      items: [
+        thumb('akte', 'codex.holo.stage.viewAkte', null),
+        thumb('3d', 'codex.holo.stage.view3d', this.can3d() ? null : 'codex.holo.stage.view3dUnavailable'),
+        thumb('simple', 'codex.holo.stage.surfaceSimple', null),
+        thumb('top', 'codex.holo.stage.surfaceTop', schema.get('top') ?? null),
+        thumb('side', 'codex.holo.stage.surfaceSide', schema.get('side') ?? null),
+        thumb('front', 'codex.holo.stage.surfaceFront', schema.get('front') ?? null),
+      ],
+    }];
+  });
+
+  /** A thumbnail: the Akte or a surface. A disabled one only shows its reason. */
+  pickView(v: ViewThumb): void {
+    if (v.disabledKey) return;
+    const before = this.activeViewId();
+    if (v.view === 'akte') {
+      if (!this.akteOpen() && this.soundOn()) this.tone('switch');
+      this.akteOpen.set(true);
+    } else {
+      this.akteOpen.set(false);
+      this.pickSurface(v.view);
+      // "Alle Decks" is a 3D view; Einfach shows one deck at a time.
+      if (v.view !== '3d' && this.deckFilter() === ALL_DECKS) this.deckFilter.set(this.presetDeck());
+    }
+    if (this.activeViewId() !== before) this.viewChange.emit(this.activeView());
+  }
+
+  /** Arrow keys walk the views like one radio group, skipping the disabled ones. */
+  onViewKey(ev: KeyboardEvent): void {
+    const step = ev.key === 'ArrowRight' || ev.key === 'ArrowDown' ? 1 : ev.key === 'ArrowLeft' || ev.key === 'ArrowUp' ? -1 : 0;
+    const edge = ev.key === 'Home' ? 'first' : ev.key === 'End' ? 'last' : null;
+    if (!step && !edge) return;
+    const items = this.viewGroups().flatMap((g) => g.items).filter((i) => !i.disabledKey);
+    if (items.length === 0) return;
+    ev.preventDefault();
+    const at = items.findIndex((i) => i.id === this.activeViewId());
+    const next = edge === 'first' ? items[0] : edge === 'last' ? items[items.length - 1] : items[(at + step + items.length) % items.length];
+    this.pickView(next);
+    const host = this.host.nativeElement.querySelector<HTMLElement>(`.vw-thumb[data-view="${next.id}"]`);
+    host?.focus({ preventScroll: true });
+  }
+
+  /** A parts chip on/off; the last one on stays on (an empty table helps no one). */
+  togglePartFilter(id: HoloPartFilter): void {
+    if (this.activeView() === 'akte') return;
+    const next = new Set(this.partFilter());
+    if (next.has(id)) {
+      if (next.size === 1) return;
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    this.partFilter.set(next);
+  }
+
+  /** "Alle Teile": every raw port on the model and every row in the panel. */
+  toggleAllParts(): void {
+    if (this.activeView() === 'akte') return;
+    this.hotspotScope.set(this.hotspotScope() === 'all' ? 'swappable' : 'all');
+  }
 
   /** The swappable parts' ports, the one rule for the dots in 3D and in Einfach. */
   readonly swappablePorts = computed<ReadonlySet<string>>(() => new Set(this.tablePins().map((p) => p.portName)));
@@ -1144,27 +1528,223 @@ export class CodexHoloStageComponent {
     }
   }
   readonly detailsOpen = signal(false);
-  /** The deck on the table in "Einfach"; null = Außen (the hull and its parts). */
-  readonly deckView = signal<string | null>(null);
-  /** Außen + one chip per deck with rooms; one deck = Außen/Innen; no rooms = none (r1-decks). */
-  readonly deckChips = computed<readonly { key: string | null; label: string; labelKey: string | null }[]>(() => {
-    const set = buildDeckPlans(this.decks(), this.deckLang());
-    if (!set || set.decks.length === 0) return [];
-    const outside = { key: null, label: '', labelKey: 'codex.holo.stage.deckOutside' };
-    if (set.decks.length === 1) return [outside, { key: set.decks[0].key, label: '', labelKey: 'codex.holo.stage.deckInside' }];
-    return [outside, ...set.decks.map((d) => ({ key: d.key, label: d.label, labelKey: null }))];
+  // ── Decks and interior (concept 20261117-1810 B1–B11) ─────────────────
+  private readonly shipPayload = computed<ShipPayload | null>(() => {
+    const d = this.detail();
+    return d.kind === 'ship' && d.payload && typeof d.payload === 'object' ? (d.payload as ShipPayload) : null;
   });
-  /** What the table draws for the picked deck; null = the hull. */
-  readonly tableDeck = computed<HoloDeckView | null>(() => {
-    const key = this.deckView();
-    const decks = this.decks();
-    if (!key || !decks || this.surface() !== 'simple' || !this.deckChips().some((c) => c.key === key)) return null;
-    return { decks, lang: this.deckLang(), key };
+  /** The ship's interior; null on builds before the interior extract (then no interior shows, never zeros). */
+  readonly interior = computed(() => readInterior(this.shipPayload()?.interior));
+  /** The deck filter (B1): null = Alle (the hull), `ALL_DECKS` = every deck in 3D, else one deck. */
+  readonly deckFilter = signal<string | null>(null);
+  readonly deckPlans = computed(() => buildDeckPlans(this.decks(), this.deckLang(), this.roomLabels.labels(this.deckLang())));
+  /** Decks the filter offers: every deck with rooms; the uploader's catch-all only beside nothing else. */
+  private readonly filterDecks = computed(() => {
+    const decks = this.deckPlans()?.decks ?? [];
+    const real = decks.filter((d) => !d.fallback);
+    return real.length > 0 ? [...real, ...decks.filter((d) => d.fallback)] : decks;
   });
-  pickDeck(key: string | null): void {
-    if (key !== this.deckView() && this.soundOn()) this.tone('switch');
-    this.deckView.set(key);
+  readonly deckLabels = computed<ReadonlyMap<string, string>>(() => new Map(this.filterDecks().map((d) => [d.key, d.fallback && this.filterDecks().length > 1 ? this.t.instant('codex.holo.stage.deckRest') : d.label || this.t.instant('codex.holo.stage.deckInside')])));
+  /** The decks are floor levels derived by the uploader, not decks the game names. */
+  readonly decksDerived = computed(() => (this.decks() ?? []).some((d) => !d.fallback && d.derived));
+  /** 3D: the hull model, or the interior in its ghost when the ship has decks with rooms (B2). */
+  readonly can3d = computed(() => this.has3d() || this.filterDecks().length > 0);
+
+  /** „Deck · Filter“ (B1): Alle, every deck in 3D, then each deck with its located SCU. */
+  readonly deckFilterChips = computed<readonly DeckFilterChip[]>(() => {
+    const decks = this.filterDecks();
+    if (decks.length === 0) return [];
+    const scu = scuByDeck(this.interior());
+    const chips: DeckFilterChip[] = [
+      { key: null, id: 'hull', labelKey: 'codex.holo.interior.deckAll', label: '', scu: 0, sub: this.t.instant('codex.holo.interior.deckAllSub'), disabledKey: null },
+    ];
+    if (decks.length > 1) {
+      chips.push({
+        key: ALL_DECKS, id: 'all', labelKey: 'codex.holo.interior.deckEvery', label: '', scu: 0,
+        sub: this.t.instant('codex.holo.interior.deckCount', { n: decks.length }),
+        disabledKey: this.surface() === '3d' ? null : 'codex.holo.interior.deckEveryOnly3d',
+      });
+    }
+    for (const d of decks) {
+      chips.push({ key: d.key, id: d.key, labelKey: null, label: this.deckLabels().get(d.key) ?? d.key, scu: Math.round(scu.get(d.key) ?? 0), sub: '', disabledKey: null });
+    }
+    return chips;
+  });
+
+  /** A deck filter chip; on Oben/Seite/Front or the Akte it brings Einfach back, where a deck shows. */
+  pickDeckChip(c: DeckFilterChip): void {
+    if (c.disabledKey || this.activeView() === 'akte') return;
+    if (c.key !== null && this.surface() !== '3d' && this.surface() !== 'simple') this.pickSurface('simple');
+    this.pickDeck(c.key);
   }
+
+  /** B1/B11: the deck filter changes; a room or element of another deck lets go. */
+  pickDeck(key: string | null): void {
+    if (key === this.deckFilter()) return;
+    if (this.soundOn()) this.tone('switch');
+    this.deckRoom.set(null);
+    this.deckFilter.set(key);
+    const pick = this.interiorPick();
+    if (pick && (key === null || (key !== ALL_DECKS && deckOfPick(this.interior(), pick) !== key))) this.interiorPick.set(null);
+    this.analytics.track('codex:deck_select', {
+      ship: this.detail().classNameSlug,
+      deck: key === null ? 'hull' : key === ALL_DECKS ? 'all' : key,
+      view: this.surface() === '3d' ? '3d' : '2d',
+    });
+  }
+
+  /** What the table draws for the picked deck in Einfach; null = the hull. */
+  readonly tableDeck = computed<HoloDeckView | null>(() => {
+    const key = this.deckFilter();
+    const decks = this.decks();
+    if (!key || key === ALL_DECKS || !decks || this.surface() !== 'simple' || !this.deckLabels().has(key)) return null;
+    return { decks, lang: this.deckLang(), key, room: this.deckRoom(), interior: this.interior(), groups: this.interiorGroups(), pick: this.interiorPick() };
+  });
+  /** "3D mit Hülle" (B2): a deck or every deck in 3D; the hull model stays the 3D of „Alle“. */
+  readonly interior3d = computed<HoloInterior3dView | null>(() => {
+    if (this.surface() !== '3d') return null;
+    const decks = this.decks();
+    if (!decks || this.filterDecks().length === 0) return null;
+    let key = this.deckFilter();
+    if (key === null) {
+      if (this.has3d()) return null;
+      key = ALL_DECKS;
+    }
+    const focus = key === ALL_DECKS ? null : key;
+    if (focus !== null && !this.deckLabels().has(focus)) return null;
+    return { decks, interior: this.interior(), focus, focusLabel: focus ? this.deckLabels().get(focus) ?? focus : '', groups: this.interiorGroups(), pick: this.interiorPick() };
+  });
+  /** The interior is on the table (a deck in Einfach, or the interior in 3D). */
+  readonly interiorOnTable = computed(() => this.activeView() !== 'akte' && (!!this.tableDeck() || !!this.interior3d()));
+  /** The deck the Bauteile overview counts for; null = the whole ship. */
+  readonly interiorDeckKey = computed(() => this.tableDeck()?.key ?? this.interior3d()?.focus ?? null);
+
+  // B8: the element groups and the role preset.
+  readonly rolePreset = computed(() => rolePresetOf(this.shipPayload()?.role, this.shipPayload()?.career));
+  readonly interiorGroups = signal<ReadonlySet<ShipInteriorGroup>>(new Set());
+  /** The deck the preset opens on (most SCU for cargo presets, else most preset elements). */
+  readonly presetDeck = computed<string | null>(() => {
+    if (!this.interior()) return null;
+    return startDeckOf(this.interior(), this.rolePreset(), this.filterDecks().filter((d) => !d.fallback || this.filterDecks().length === 1).map((d) => d.key));
+  });
+  readonly presetLabel = computed(() => this.roleName() ?? this.t.instant(`codex.holo.interior.preset.${this.rolePreset()}`));
+  readonly presetTitle = computed(() => this.t.instant('codex.holo.interior.presetTitle', { role: this.presetLabel() }));
+  readonly presetUntouched = computed(() => {
+    const on = this.interiorGroups();
+    const preset = PRESET_GROUPS[this.rolePreset()];
+    return on.size === preset.length && preset.every((g) => on.has(g)) && this.deckFilter() === this.presetDeck();
+  });
+
+  /** Every open starts here (r2-remember = none): the preset's groups on its start deck. */
+  private applyPreset(): void {
+    this.interiorGroups.set(new Set(PRESET_GROUPS[this.rolePreset()]));
+    this.interiorPick.set(null);
+    this.deckRoom.set(null);
+    this.deckFilter.set(this.presetDeck());
+  }
+
+  resetPreset(): void {
+    if (this.presetUntouched()) return;
+    if (this.soundOn()) this.tone('switch');
+    this.applyPreset();
+  }
+
+  toggleGroup(g: ShipInteriorGroup): void {
+    const next = new Set(this.interiorGroups());
+    const on = !next.has(g);
+    if (on) next.add(g);
+    else next.delete(g);
+    this.interiorGroups.set(next);
+    this.analytics.track('codex:interior_filter_toggle', { group: g, on });
+  }
+
+  // B5/B6: picks.
+  /** The interior element picked in the panel, on the plan or in 3D. */
+  readonly interiorPick = signal<InteriorPick | null>(null);
+
+  onInteriorPick(p: InteriorPick): void {
+    const interior = this.interior();
+    const deck = deckOfPick(interior, p);
+    if (!interior || !deck) return;
+    this.akteOpen.set(false);
+    if (this.surface() !== '3d' && this.surface() !== 'simple') this.pickSurface('simple');
+    if (this.deckFilter() !== deck && !(this.deckFilter() === ALL_DECKS && this.surface() === '3d')) {
+      this.deckFilter.set(deck);
+      this.deckRoom.set(null);
+    }
+    this.deckRoom.set(null);
+    this.interiorPick.set(p);
+    this.panelTab.set('parts');
+    if (this.soundOn()) this.tone('blip');
+    this.analytics.track('codex:interior_element_select', {
+      ship: this.detail().classNameSlug,
+      kind: p.kind === 'grid' ? 'cargoGrid' : interior.pois[p.index]?.cat ?? 'unknown',
+      deck,
+    });
+  }
+
+  /** D5: the room picked on the plan or in the Bauteile list (its key); null = none. */
+  readonly deckRoom = signal<string | null>(null);
+
+  /** A room clicked on the plan: Bauteile shows what it holds (B5). */
+  onPlanRoom(key: string | null): void {
+    this.deckRoom.set(key);
+    this.interiorPick.set(null);
+    if (key) this.panelTab.set('parts');
+  }
+
+  /** A room from the Bauteile list or the search: its deck in Einfach, the room picked. */
+  onRoomSelect(r: InteriorRoomRef): void {
+    this.akteOpen.set(false);
+    if (this.surface() !== 'simple') this.pickSurface('simple');
+    if (this.deckFilter() !== r.deck) this.pickDeck(r.deck);
+    this.interiorPick.set(null);
+    this.deckRoom.set(r.key);
+    this.panelTab.set('parts');
+  }
+
+  /** Every room of every deck, by its plan label. */
+  readonly roomRefs = computed<readonly InteriorRoomRef[]>(() =>
+    this.filterDecks().flatMap((d) => d.rooms.map((r) => ({ key: r.key, deck: d.key, label: r.label }))),
+  );
+  /** The picked room for Bauteile (B5): deck, floor, height, relay, contents. */
+  readonly roomCard = computed<InteriorRoomCard | null>(() => {
+    const key = this.deckRoom();
+    if (!key) return null;
+    const ref = this.roomRefs().find((r) => r.key === key);
+    if (!ref) return null;
+    const raw = (this.decks() ?? []).find((d) => d.key === ref.deck)?.rooms?.find((r) => r.key === key);
+    return {
+      ...ref,
+      deckLabel: this.deckLabels().get(ref.deck) ?? ref.deck,
+      floorZ: typeof raw?.floorZ === 'number' ? raw.floorZ : null,
+      height: typeof raw?.height === 'number' ? raw.height : null,
+      poweredBy: raw?.poweredBy ?? null,
+      contents: roomContents(this.interior(), key),
+    };
+  });
+
+  /** B10: located SCU below the ship's SCU — the gap is said, never hidden. */
+  readonly cargoGap = computed(() => cargoGapOf(this.shipPayload()?.cargoScu, this.interior()));
+
+  /** B7: the outside parts the search can find. */
+  readonly outerParts = computed<readonly OuterPartRef[]>(() => {
+    const byLabel = new Map<string, OuterPartRef & { terms: string[] }>();
+    for (const p of this.pins()) {
+      const terms = [p.portName, p.slot?.typeLabel ?? '', p.slot?.className ?? ''].filter(Boolean);
+      const had = byLabel.get(p.label);
+      if (had) {
+        had.count += 1;
+        for (const t of terms) if (!had.terms.includes(t)) had.terms.push(t);
+      } else byLabel.set(p.label, { port: p.portName, label: p.label, terms, count: 1 });
+    }
+    return [...byLabel.values()];
+  });
+
+  onPartsSearch(e: { scope: 'outer' | 'inner' | 'both'; hits: number }): void {
+    this.analytics.track('codex:parts_search', e);
+  }
+
   readonly inspectedPort = signal<string | null>(null);
   /** The placement a click on the model chose, when it says more than the slot's port (a gun on its mount). */
   private readonly viewerSelection = signal<string | null>(null);
@@ -1197,6 +1777,14 @@ export class CodexHoloStageComponent {
   readonly patchGhosts = signal<HoloPatchKpiGhosts | null>(null);
   readonly patchPortPins = signal<Readonly<Record<string, PortPinBadge>> | null>(null);
   readonly patchComparisonBuild = signal<CodexBuild | null>(null);
+  /** Änderungen sub-view (C17): an exemplar opens on the reader's own changes, the Werk on the patch comparison. */
+  readonly changeViews: readonly ScSegmentOption[] = [
+    { value: 'mine', labelKey: 'codex.holo.card.changesMine' },
+    { value: 'patch', labelKey: 'codex.holo.card.changesPatch' },
+  ];
+  readonly changeView = linkedSignal<'mine' | 'patch'>(() => (this.inHangar() ? 'mine' : 'patch'));
+  /** Ports whose part differs from the Werk — the ◆ marker in the Bauteile list (C19). */
+  readonly changedPorts = computed<ReadonlySet<string>>(() => new Set(this.journal().map((e) => e.port)));
 
   /** 3D model availability, answered by the skin catalog (never by a mounted
    * viewer, which would only exist once the user is already in 3D). */
@@ -1292,9 +1880,16 @@ export class CodexHoloStageComponent {
               }, REVEAL_MS),
             );
           });
+        // β shell (Kamera-Welt): the camera's push-in is the arrival. No waiting
+        // frame and no hero photo before the table - they read as a bright slab,
+        // a photo flash and a blank frame ahead of the hologram (QA D11).
+        if (this.shellBeta()) {
+          reveal();
+          return;
+        }
         // A render is a hero; the game's flat top-down icon is not (a white
         // cut-out filling the table) — that one already IS the ghost hull.
-        const src = this.heroArt().find((u) => !!u && u !== this.previewSilhouette()) ?? null;
+        const src =this.heroArt().find((u) => !!u && u !== this.previewSilhouette()) ?? null;
         if (!src || typeof Image === 'undefined') {
           reveal();
           return;
@@ -1336,8 +1931,10 @@ export class CodexHoloStageComponent {
         this.previewFailed.set(false);
         this.closeInspector();
         this.panelTab.set('rank');
-        this.deckView.set(null);
+        // r2-presets / r2-remember: every open starts on the role preset, nothing of the last ship stays.
+        this.applyPreset();
         this.hotspotScope.set('swappable');
+        this.partFilter.set(new Set(ALL_PART_FILTERS));
         const pref = CodexHoloStageComponent.readSurfacePref();
         this.chosenSurface.set(pref);
         if (pref && pref !== '3d') this.lastSchemaSurface.set(pref);
@@ -1375,6 +1972,11 @@ export class CodexHoloStageComponent {
     effect(() => {
       if (this.openDetails()) {
         untracked(() => {
+          // The sources live in the Akte: the jump has to bring that view up, or it scrolls to a hidden target.
+          if (!this.akteOpen()) {
+            this.akteOpen.set(true);
+            this.viewChange.emit('akte');
+          }
           if (typeof requestAnimationFrame !== 'function') return;
           requestAnimationFrame(() => {
             const host: HTMLElement = this.host.nativeElement;
@@ -1402,6 +2004,8 @@ export class CodexHoloStageComponent {
     effect(() => {
       if (this.chosenSurface() !== null || !this.has3d() || !this.model3dReady()) return;
       if (this.phase() !== 'done' || this.activePorts().length > 0) return;
+      // The Holotisch beta opens on Einfach whenever the hull has schema data (brief s1); 3D only without it.
+      if (this.shellBeta() && (!!this.silhouette() || this.schemaAvailable())) return;
       // A phone opens on Einfach, 3D on request: no model download on the way (d-start simple).
       if (typeof matchMedia === 'function' && matchMedia('(max-width: 640px)').matches) return;
       untracked(() => this.auto3d.set(true));
@@ -1443,11 +2047,11 @@ export class CodexHoloStageComponent {
       };
       const queueJoin = (): void => { joinRaf ||= requestAnimationFrame(measureJoin); };
       queueJoin();
-      document.addEventListener('scroll', queueJoin, { capture: true, passive: true });
+      const offScroll = onScrollTick(measureJoin, { anyTarget: true });
       window.addEventListener('resize', queueJoin, { passive: true });
       this.destroyRef.onDestroy(() => {
         cancelAnimationFrame(joinRaf);
-        document.removeEventListener('scroll', queueJoin, { capture: true });
+        offScroll();
         window.removeEventListener('resize', queueJoin);
       });
       if (typeof ResizeObserver !== 'function') return;
@@ -1460,6 +2064,7 @@ export class CodexHoloStageComponent {
           const h = Math.round(el.getBoundingClientRect().height);
           if (el.matches('.holo-strip')) stage?.style.setProperty('--holo-strip-h', `${h}px`);
           else if (el.matches('.hs-row')) stage?.style.setProperty('--holo-row-h', `${h}px`);
+          else if (el.matches('.holo-views')) stage?.style.setProperty('--holo-views-h', `${h}px`);
           else if (el.matches('.below-persp')) { el.style.setProperty('--persp-h', `${h}px`); queueJoin(); }
           else if (el.matches('.holo-topbar')) measureTop();
         }
@@ -1472,7 +2077,7 @@ export class CodexHoloStageComponent {
       this.destroyRef.onDestroy(() => cancelAnimationFrame(raf));
       // The strip's inner bar, not its host: on a phone the bar is position:
       // fixed and the host collapses to 0px, which put the toast on the bar.
-      for (const sel of ['sc-codex-holo-strip .holo-strip', 'sc-codex-holo-strip .hs-row', '.below-persp', '.holo-topbar']) {
+      for (const sel of ['sc-codex-holo-strip .holo-strip', 'sc-codex-holo-strip .hs-row', '.below-persp', '.holo-topbar', '.holo-views']) {
         const el = root.querySelector(sel);
         if (el) ro.observe(el);
       }
@@ -1514,7 +2119,7 @@ export class CodexHoloStageComponent {
       seenPorts = nowPorts;
       // A shared link's loadout, or a config that was just put on the table,
       // is not an edit of the reader's — nothing to undo.
-      if (added && !untracked(this.readOnly) && !untracked(this.savedPorts).has(added.port)) {
+      if (added && !untracked(this.readOnly) && !untracked(this.autosaving) && !untracked(this.savedPorts).has(added.port)) {
         this.undoToast.set(added);
         if (toastTimer) clearTimeout(toastTimer);
         toastTimer = setTimeout(() => this.undoToast.set(null), UNDO_TOAST_MS);
@@ -1558,24 +2163,18 @@ export class CodexHoloStageComponent {
     this.sheetChange.emit(sheet);
   }
 
-  /** Digit hotkeys select pins ("tippe 1 bis N"), Esc closes the inspector. Inert while any dialog (swap picker, weapon
-   * detail, …) is open — those own the keyboard (wave 5 B2.4). */
+  /** Esc closes the inspector (the digit pin keys are gone, concept holotisch-feinschliff C11). Inert while any dialog
+   * (swap picker, weapon detail, …) is open — those own the keyboard (wave 5 B2.4). */
   @HostListener('document:keydown', ['$event'])
   onKeydown(ev: KeyboardEvent): void {
     if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
     const target = ev.target as HTMLElement | null;
     if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
     if (document.querySelector('[role="dialog"], dialog[open]')) return;
-    if (ev.key === 'Escape') {
-      if (this.inspectedPort()) this.closeInspector();
-      return;
+    if (ev.key === 'Escape' && this.inspectedPort()) {
+      this.analytics.track('codex:part_deselect', { via: 'escape' });
+      this.closeInspector();
     }
-    if (!/^[0-9]$/.test(ev.key)) return;
-    const n = ev.key === '0' ? 10 : Number(ev.key);
-    const pin = this.pins().find((p) => p.index === n);
-    if (!pin) return;
-    ev.preventDefault();
-    this.inspectPin(pin.portName);
   }
 
   /**
@@ -1593,16 +2192,24 @@ export class CodexHoloStageComponent {
         void this.copyLinkByKey();
         break;
       case 'patch':
+        // The patch choice sits in the Änderungen tab (C18): the key opens that tab with it.
+        this.panelTab.set('changes');
+        this.changeView.set('patch');
         this.patchChooser()?.toggle();
         break;
-      case 'view':
+      case 'view': {
+        const before = this.activeViewId();
+        this.akteOpen.set(false);
         this.pickSurface(nextHoloSurface(this.surface(), {
-          has3d: this.has3d(),
+          has3d: this.can3d(),
           top: this.schemaAvailable(),
           side: this.drawingAvailable(),
           front: this.frontAvailable(),
         }));
+        // A hotkey pick is a user choice too: the parent must not override it later (Akte default).
+        if (this.activeViewId() !== before) this.viewChange.emit(this.activeView());
         break;
+      }
     }
   }
 
@@ -1625,9 +2232,6 @@ export class CodexHoloStageComponent {
     this.copyToastTimer = setTimeout(() => this.copyToast.set(null), result === 'ok' ? 2000 : 3500);
   }
 
-  /** How many pins the digit hotkeys can reach — what the empty inspector may promise. */
-  readonly hotkeyPinCount = computed(() => Math.min(this.pins().length, HOTKEY_PIN_MAX));
-
   readonly eyebrowTitle = computed(() => {
     const career = this.heroChips().find((c) => c.key === 'career')?.text?.trim();
     return [this.manufacturerName(), this.displayName(), career].filter((p) => !!p).join(' · ');
@@ -1635,23 +2239,6 @@ export class CodexHoloStageComponent {
 
   /** The title without the maker's own first word — the kicker names the maker. */
   readonly shortName = computed(() => shipNameWithoutMaker(this.displayName(), this.manufacturerName()));
-
-  /** Beside the name: maker · role; the career goes into the name's tooltip. */
-  readonly kicker = computed(() => {
-    const chips = this.heroChips();
-    const parts = [this.manufacturerName(), chips.find((c) => c.key === 'role')?.text ?? chips.find((c) => c.key === 'career')?.text ?? null]
-      .filter((p): p is string => !!p && p.trim().length > 0);
-    return [...new Set(parts)].join(' · ') || null;
-  });
-
-  /** What the table surface currently shows. */
-  readonly eyebrowKey = computed(() =>
-    this.viewMode() === '3d' ? 'codex.holo.stage.eyebrow3d'
-    // The perspective views show the same parts as "Einfach" (concept r1-callout).
-    : this.viewMode() === 'schema' && this.drawingAvailable() ? 'codex.holo.stage.eyebrowTop'
-    : this.viewMode() === 'schema' ? 'codex.holo.stage.eyebrowSchema'
-    : 'codex.holo.stage.eyebrowTop',
-  );
 
   private keepSimpleForPin(): void {
     // Working with the pins: the default's switch to 3D must not pull them away.
@@ -2088,8 +2675,35 @@ export class CodexHoloStageComponent {
     if (it) this.swapRequested.emit(partFocusOf(it, this.inspectedSection()).target);
   }
 
+  /** A table callout's swap icon (schema views): inspect that port, then swap it. */
+  onPortSwap(port: string): void {
+    if (this.readOnly() || this.inspectorIsRawPort()) return;
+    if (this.inspectedPort() !== port) this.inspectPin(port);
+    const it = this.inspectorTarget();
+    if (it) this.swapRequested.emit(partFocusOf(it, this.inspectedSection()).target);
+  }
+
+  /** The model reported how a selection started or ended (concept 20261117-1809 C20). */
+  onPartIntent(intent: SelectionIntent): void {
+    if (intent.kind === 'select') this.analytics.track('codex:part_select', { source: intent.source });
+    else this.analytics.track('codex:part_deselect', { via: intent.via });
+  }
+
+  /** The panel's back control ("Alle Bauteile"): drop the selection, the panel shows the list of all parts (C11). */
+  onInspectorBack(): void {
+    if (this.inspectedPort() || this.viewerSelection()) this.analytics.track('codex:part_deselect', { via: 'panel' });
+    this.closeInspector();
+  }
+
+  /** A part picked in the panel's list. */
+  onListInspect(port: string): void {
+    if (this.inspectedPort() !== port) this.analytics.track('codex:part_select', { source: 'list' });
+    this.inspectPin(port);
+  }
+
   /** A row under "Alle Teile". */
   onRowPick(r: PlacementRow): void {
+    this.analytics.track('codex:part_select', { source: 'list' });
     this.onPartSelected({ id: r.p.id, portName: r.p.portName, itemClass: r.p.itemClass, swappable: false });
   }
 
@@ -2104,7 +2718,10 @@ export class CodexHoloStageComponent {
   onPatchCompared(build: CodexBuild | null): void {
     const had = this.patchComparisonBuild();
     this.patchComparisonBuild.set(build);
-    if (build && build !== had) this.panelTab.set('changes');
+    if (build && build !== had) {
+      this.panelTab.set('changes');
+      this.changeView.set('patch');
+    }
   }
 
   /** The tabs are one control: arrows, Home and End walk them, focus follows. */
@@ -2133,8 +2750,10 @@ export class CodexHoloStageComponent {
 
   inspectPin(port: string): void {
     this.keepSimpleForPin();
-    // A part has no marker inside a deck: back outside, where it sits.
-    this.deckView.set(null);
+    // A part has no marker inside a deck: back to the hull, where it sits.
+    this.deckFilter.set(null);
+    this.deckRoom.set(null);
+    this.interiorPick.set(null);
     this.viewerSelection.set(null);
     this.looseSelection.set(null);
     this.panelTab.set('parts');
@@ -2148,7 +2767,7 @@ export class CodexHoloStageComponent {
       // Pulse the perspective the selected port belongs to (concept pe4-pulse).
       const section = this.slotByRawPort().get(next)?.section ?? null;
       const tile: Perspective | null =
-        section === 'weapons' || section === 'missiles' || section === 'remoteTurrets' || section === 'pod' ? 'offensive'
+        section === 'weapons' || section === 'missiles' || section === 'remoteTurrets' || section === 'mannedTurrets' || section === 'pod' ? 'offensive'
         : section === 'shields' ? 'defensive'
         : section === 'quantum' ? 'movement'
         : section === 'coolers' || section === 'radar' ? 'signature'
@@ -2316,6 +2935,16 @@ export class CodexHoloStageComponent {
             label: slot.name ?? slot.port,
             state: slot.draftState,
             paths: slot.draftPaths ?? [],
+          });
+        }
+        // A part swapped inside a mount (the gun in a gimbal) is a change of the mount's pin too.
+        for (const child of slot.children ?? []) {
+          if (!child.draftState) continue;
+          entries.push({
+            port: slot.rawPort ?? slot.port,
+            label: child.name ?? child.port,
+            state: child.draftState,
+            paths: child.draftPaths ?? [],
           });
         }
       }

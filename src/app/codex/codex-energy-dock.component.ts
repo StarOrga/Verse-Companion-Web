@@ -50,12 +50,14 @@ import {
   clickPowerPip,
   computePowerSheet,
   coolerUnitCount,
+  coolingMargin,
   isDockPosition,
   isFlightMode,
   migrateLegacyCoolerDraft,
   parsePowerGroups,
   parsePowerLevels,
   resetPowerState,
+  stealthPowerState,
   togglePowerGroup,
 } from './codex-power';
 import {
@@ -249,7 +251,8 @@ let uidSeq = 0;
                         (isTopOffPip(row, $index + 1) ? 'codex.energy.pip.topOff' : 'codex.energy.pip.level')
                           | translate: { group: (row.labelKey | translate: row.labelParams), n: $index + 1, m: row.capacity }
                       "
-                      [disabled]="!pipsEnabled(row)"
+                      [class.out]="pipOutOfReach(row, $index + 1)"
+                      [disabled]="!pipsEnabled(row) || pipOutOfReach(row, $index + 1)"
                       (click)="clickPip(row, $index + 1)"
                     ></button>
                   } @empty {
@@ -334,20 +337,29 @@ let uidSeq = 0;
                 <div class="t" [class.over]="sheet().coolant.percent! > 100">
                   <div class="fill" [style.width.%]="minPct(sheet().coolant.percent)"></div>
                 </div>
-                <span class="v">{{ 'codex.energy.coolingPercent' | translate: { pct: sheet().coolant.percent } }}</span>
-                <span class="sub">{{ 'codex.energy.coolingValue' | translate: { used: sheet().coolant.used, total: sheet().coolant.total } }}</span>
+                <span class="v" [class.over]="sheet().coolant.percent! > 100">{{ 'codex.energy.coolingPercent' | translate: { pct: sheet().coolant.percent } }}</span>
+                @if (coolMargin(); as m) {
+                  <span class="margin" [class.over]="m.over">{{ (m.over ? 'codex.energy.coolingDeficit' : 'codex.energy.coolingHeadroom') | translate: { pct: m.pct } }}</span>
+                }
               } @else {
                 <span class="gapv">{{ coolantGapKey() | translate }}</span>
               }
               <div class="tipbox" [id]="heatTipId" role="tooltip">
                 <b>{{ 'codex.energy.fact.coolingLoad' | translate }}</b>
                 <p>{{ 'codex.energy.tooltip.coolingLoad' | translate }}</p>
+                @if (sheet().coolant.percent !== null) {
+                  <p class="sub">{{ 'codex.energy.coolingValue' | translate: { used: sheet().coolant.used, total: sheet().coolant.total } }}</p>
+                }
               </div>
             </div>
 
-            <div class="md-ok" [class.no]="!sheet().ready">
+            <!-- #352: the full verdict did not fit the narrow facts column —
+                 the short verdict stays visible, the reason sits in the
+                 tooltip (aria-describedby, long-press on touch). -->
+            <div class="md-ok" [class.no]="!sheet().ready" tabindex="0"
+              [scTooltip]="sheet().readinessKey | translate">
               <span aria-hidden="true">{{ sheet().ready ? '✓' : '✕' }}</span>
-              {{ sheet().readinessKey | translate }}
+              {{ (sheet().ready ? 'codex.energy.readiness.shortOk' : 'codex.energy.readiness.shortNo') | translate }}
             </div>
           </div>
         </div>
@@ -360,7 +372,8 @@ let uidSeq = 0;
               </button>
             }
           </div>
-          <button type="button" [class.on]="preset() === 'stealth'" (click)="setPreset('stealth')">
+          <button type="button" [class.on]="preset() === 'stealth'" (click)="setPreset('stealth')"
+            [scTooltip]="'codex.energy.preset.stealthHint' | translate">
             {{ 'codex.energy.preset.stealth' | translate }}
           </button>
           <button type="button" [class.on]="preset() === 'auto'" (click)="setPreset('auto')">
@@ -408,6 +421,9 @@ let uidSeq = 0;
         block-size: 0;
       }
       .mini-dock {
+        /* the containing block of the info boxes, which open BESIDE / above
+           the dock instead of over its pips (#351) */
+        position: relative;
         inline-size: fit-content;
         max-inline-size: 100%;
         margin-inline: auto;
@@ -435,9 +451,11 @@ let uidSeq = 0;
       .mini-dock[data-pos='edgeLeft'],
       .mini-dock[data-pos='edgeRight'] {
         position: fixed;
-        inset-block-start: max(var(--sc-chrome-top, 24px), calc(var(--sc-imp-banner-h, 0px) + var(--sc-topbar-h, 0px) + 8px));
+        /* level with the ship picture (#351), never above the chrome */
+        --_edge-top-at: max(var(--sc-chrome-top, 24px), calc(var(--sc-imp-banner-h, 0px) + var(--sc-topbar-h, 0px) + 8px), var(--_edge-top, 0px));
+        inset-block-start: var(--_edge-top-at);
         inline-size: var(--_edge-w, 280px);
-        max-block-size: calc(100dvh - max(var(--sc-chrome-top, 24px), calc(var(--sc-imp-banner-h, 0px) + var(--sc-topbar-h, 0px) + 8px)) - var(--sc-fab-lane, 80px) - 12px);
+        max-block-size: calc(100dvh - var(--_edge-top-at) - var(--sc-fab-lane, 80px) - 12px);
         overflow-y: auto;
         margin: 0;
         border-radius: 12px;
@@ -461,6 +479,29 @@ let uidSeq = 0;
       .mini-dock[data-pos='edgeLeft'] .vr,
       .mini-dock[data-pos='edgeRight'] .vr {
         display: none;
+      }
+      /* Side dock (#351, screenshot 3): every system's pips in ONE row, so the
+         whole strip is always in view — same pip size, tighter spacing. The
+         group button gives up its fixed minimum width to the column. */
+      .mini-dock[data-pos='edgeLeft'] .md-pips,
+      .mini-dock[data-pos='edgeRight'] .md-pips {
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        gap: 1px;
+      }
+      .mini-dock[data-pos='edgeLeft'] .md-col,
+      .mini-dock[data-pos='edgeRight'] .md-col {
+        flex: 0 1 auto;
+        min-inline-size: var(--pip-w);
+      }
+      .mini-dock[data-pos='edgeLeft'] .grp-btn,
+      .mini-dock[data-pos='edgeRight'] .grp-btn {
+        min-inline-size: var(--pip-w);
+        padding: 0;
+      }
+      .mini-dock[data-pos='edgeLeft'] .md-facts,
+      .mini-dock[data-pos='edgeRight'] .md-facts {
+        max-inline-size: none;
       }
       .slot-move {
         display: inline-flex;
@@ -615,11 +656,17 @@ let uidSeq = 0;
         cursor: pointer;
       }
       .stack .pip:focus-visible {
-        outline: 2px solid var(--sc-accent);
-        outline-offset: 1px;
+        outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+        outline-offset: 0;
       }
       .stack .pip:disabled {
         cursor: default;
+      }
+      /* above what the reactor still has free — not settable (#351) */
+      .stack .pip.out {
+        background: transparent;
+        border: 1px dashed color-mix(in srgb, var(--sc-fg-2) 26%, transparent);
+        cursor: not-allowed;
       }
       .stack .pip.ghost,
       .md-col.absent .stack .pip {
@@ -692,8 +739,13 @@ let uidSeq = 0;
         line-height: 1.2;
         min-block-size: 1.2em;
       }
+      /* The info boxes used to open right above their own icon — straight over
+         the pips the pilot was setting (#351, screenshot 2). They now open
+         OUTSIDE the dock: above its top edge for the docks at the page's foot,
+         beside it for the screen-edge docks. The .tipw only carries the
+         hover/focus trigger; the box is placed against the .mini-dock. */
       .tipw {
-        position: relative;
+        position: static;
       }
       .tipbox {
         display: block;
@@ -702,8 +754,7 @@ let uidSeq = 0;
         transition: opacity 0.12s ease;
         position: absolute;
         inset-block-end: calc(100% + 8px);
-        inset-inline-start: 50%;
-        transform: translateX(-50%);
+        inset-inline-end: 0;
         inline-size: 230px;
         padding: 8px 10px;
         background: var(--sc-bg-2);
@@ -713,14 +764,22 @@ let uidSeq = 0;
         font-size: max(12px, var(--sc-fs-floor));
         z-index: 20;
       }
-      .tipbox::after {
-        content: '';
-        position: absolute;
-        inset-block-start: 100%;
-        inset-inline-start: 50%;
-        transform: translateX(-50%);
-        border: 5px solid transparent;
-        border-block-start-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0));
+      .mini-dock[data-pos='left'] .tipbox {
+        inset-inline: 0 auto;
+      }
+      /* The edge dock scrolls inside itself, so an absolute box would be
+         clipped: it rides fixed, level with the dock's top, in the page-side
+         gap next to it. */
+      .mini-dock[data-pos='edgeLeft'] .tipbox,
+      .mini-dock[data-pos='edgeRight'] .tipbox {
+        position: fixed;
+        inset-block: var(--_edge-top-at) auto;
+      }
+      .mini-dock[data-pos='edgeLeft'] .tipbox {
+        inset-inline: calc(12px + var(--_edge-w, 280px) + 8px) auto;
+      }
+      .mini-dock[data-pos='edgeRight'] .tipbox {
+        inset-inline: auto calc(12px + var(--_edge-w, 280px) + 8px);
       }
       .tipbox b {
         display: block;
@@ -736,13 +795,15 @@ let uidSeq = 0;
       }
       .tipbox p.gapv,
       .tipbox p.demand,
-      .tipbox p.warnv {
+      .tipbox p.warnv,
+      .tipbox p.sub {
         margin-block-start: 4px;
       }
       .tipbox p.demand {
         font-variant-numeric: tabular-nums;
       }
-      .tipbox p.warnv {
+      .tipbox p.warnv,
+      .tipbox p.sub {
         color: var(--sc-warn);
       }
       .tipw:hover .tipbox,
@@ -766,11 +827,28 @@ let uidSeq = 0;
       .md-heat {
         cursor: help;
       }
+      /* Kept narrow (#351: "den rechten Bereich noch kleiner machen"): two
+         facts a row, and the cooling and readiness lines wrap inside it
+         instead of stretching the whole dock. */
       .md-facts {
         display: grid;
-        grid-template-columns: repeat(3, auto);
-        gap: 4px 14px;
+        grid-template-columns: repeat(2, max-content);
+        gap: 3px 12px;
         align-content: start;
+        max-inline-size: 300px;
+      }
+      .md-heat .gapv {
+        flex: 1 1 0;
+        min-inline-size: 0;
+        font-size: max(11px, var(--sc-fs-floor));
+        line-height: 1.3;
+      }
+      .md-heat {
+        align-items: flex-start;
+      }
+      .md-heat > .k,
+      .md-heat > .ico {
+        flex: none;
       }
       .md-fact {
         display: flex;
@@ -822,10 +900,19 @@ let uidSeq = 0;
       }
       .md-heat .fill {
         block-size: 100%;
-        background: var(--sc-warn);
+        background: var(--sc-accent);
       }
       .md-heat .t.over .fill {
-        background: var(--sc-danger);
+        background: var(--sc-warning);
+      }
+      /* #352 — over 100 % is a shortfall, not an error: warning, never danger */
+      .md-heat .v.over,
+      .md-heat .margin.over {
+        color: var(--sc-warning);
+      }
+      .md-heat .margin {
+        font-size: max(11px, var(--sc-fs-floor));
+        color: var(--sc-fg-2);
       }
       .md-ok {
         grid-column: 1 / -1;
@@ -837,6 +924,18 @@ let uidSeq = 0;
       }
       .md-ok.no {
         color: var(--sc-warn);
+      }
+      .md-ok {
+        justify-self: start;
+        cursor: help;
+      }
+      /* Focusable for its tooltip, so on touch it needs a full tap target. */
+      @media (pointer: coarse) {
+        .md-ok { min-height: max(48px, var(--sc-tap-min, 0px)); }
+      }
+      .md-heat {
+        flex-wrap: wrap;
+        row-gap: 2px;
       }
       /* Five values, no wrap, in a fixed 100%-wide box below 640px: the last
          two fell off the screen, and a fixed element makes no scrollbar to get
@@ -1103,6 +1202,8 @@ export class CodexEnergyDockComponent {
 
   protected readonly irFact = computed(() => this.sheet().facts.find((f) => f.key === 'ir'));
   protected readonly emFact = computed(() => this.sheet().facts.find((f) => f.key === 'em'));
+  /** "22 % Luft" / "30 % zu wenig" under the cooling usage (#352). */
+  protected readonly coolMargin = computed(() => coolingMargin(this.sheet().coolant.percent));
   /** WHY the cooling load is empty — no coolers vs. no stated draw. */
   protected readonly coolantGapKey = computed(
     () => this.sheet().facts.find((f) => f.key === 'coolant')?.gapKey ?? 'codex.energy.gap.noCoolingData',
@@ -1160,15 +1261,58 @@ export class CodexEnergyDockComponent {
     const destroyRef = inject(DestroyRef);
     afterNextRender(() => {
       if (typeof window === 'undefined') return;
-      const measure = () => this.measureEdgeRoom();
+      const measure = () => {
+        this.measureEdgeRoom();
+        this.alignEdgeTop();
+      };
+      // The edge dock starts level with the ship picture and only then sticks
+      // under the chrome (#351, screenshot 4). Written straight to the host's
+      // style, once per frame — no change detection per scroll event.
+      let frame = 0;
+      const onScroll = () => {
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          this.alignEdgeTop();
+        });
+      };
       window.addEventListener('resize', measure, { passive: true });
-      destroyRef.onDestroy(() => window.removeEventListener('resize', measure));
+      window.addEventListener('scroll', onScroll, { passive: true });
+      destroyRef.onDestroy(() => {
+        window.removeEventListener('resize', measure);
+        window.removeEventListener('scroll', onScroll);
+        if (frame) cancelAnimationFrame(frame);
+      });
       measure();
     });
     effect(() => {
       this.position();
       untracked(() => this.measureEdgeRoom());
     });
+    effect(() => {
+      this.effectivePosition();
+      untracked(() => this.alignEdgeTop());
+    });
+  }
+
+  /**
+   * Where the edge dock's top sits while the page is scrolled to the top: the
+   * picture's top edge (`[data-energy-dock-anchor]`). Scrolled past it, the
+   * CSS `max()` with the chrome offset takes over and the dock sticks.
+   */
+  private alignEdgeTop(): void {
+    const el = this.hostEl.nativeElement as HTMLElement;
+    if (typeof document === 'undefined' || !el?.style) return;
+    const pos = this.effectivePosition();
+    const anchor =
+      pos === 'edgeLeft' || pos === 'edgeRight'
+        ? document.querySelector<HTMLElement>('[data-energy-dock-anchor]')
+        : null;
+    if (!anchor) {
+      el.style.removeProperty('--_edge-top');
+      return;
+    }
+    el.style.setProperty('--_edge-top', `${Math.round(anchor.getBoundingClientRect().top)}px`);
   }
 
   private measureEdgeRoom(): void {
@@ -1350,9 +1494,27 @@ export class CodexEnergyDockComponent {
     return !row.cut && level === row.capacity && row.allocated === row.capacity && row.capacity > 0;
   }
 
+  /**
+   * The highest level this column can be raised to: what it holds now plus
+   * the segments the reactor still has free. Pips above it are out of reach —
+   * the dock never sets more than the ship supplies (#351).
+   */
+  protected reachableLevel(row: PowerGroupRow): number {
+    const s = this.sheet();
+    const free = s.budgetTotal === null ? 0 : Math.max(0, s.budgetTotal - s.budgetUsed);
+    return Math.min(row.capacity, (row.cut ? 0 : row.allocated) + free);
+  }
+
+  /** A pip above {@link reachableLevel}; the full column's own top-off pip stays live. */
+  protected pipOutOfReach(row: PowerGroupRow, level: number): boolean {
+    return level > this.reachableLevel(row) && !this.isTopOffPip(row, level);
+  }
+
   /** Click pip `level` (1 = bottom): pin the group there, or cut it from the top. */
   protected clickPip(row: PowerGroupRow, level: number): void {
     if (!this.pipsEnabled(row)) return;
+    if (this.pipOutOfReach(row, level)) level = this.reachableLevel(row);
+    if (level < 1) return;
     const next = clickPowerPip(this.cutGroups(), this.levels(), row, level);
     this.cutGroups.set(next.cutGroups);
     this.levels.set(next.levels);
@@ -1377,10 +1539,25 @@ export class CodexEnergyDockComponent {
     this.persistDraft();
   }
 
-  /** A preset is a full re-deal — it clears every pin, the cuts stay. */
+  /** A preset is a full re-deal — it clears every pin. `Schleichen` sets its
+   * own cuts and pins (#352, `stealthPowerState`); leaving it for `Auto`
+   * drops them again, any other cut stays. */
   protected setPreset(preset: PowerPreset): void {
+    const from = this.preset();
     this.preset.set(preset);
-    this.levels.set({});
+    if (preset === 'stealth') {
+      const next = stealthPowerState({
+        occupants: this.occupants(),
+        shipStats: this.shipStats(),
+        schemaVersion: this.schemaVersion(),
+        mode: this.mode(),
+      });
+      this.cutGroups.set(next.cutGroups);
+      this.levels.set(next.levels);
+    } else {
+      if (from === 'stealth') this.cutGroups.set(new Set<PowerColumnKey>());
+      this.levels.set({});
+    }
     this.persistDraft();
   }
 

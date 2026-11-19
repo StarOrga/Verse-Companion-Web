@@ -59,9 +59,25 @@
     "dialog": {
       "confirm": "Confirm",
       "cancel": "Cancel",
-      "close": "Close"
+      "close": "Close",
+      "save": "Save",
+      "apply": "Apply",
+      "done": "Done",
+      "previous": "Previous",
+      "next": "Next"
     },
-    "undo": "Undo"
+    "undo": "Undo",
+    "popup": {
+      "access": {
+        "admin": "Visible to admins only",
+        "collab": "Visible to admins and collaborators only"
+      }
+    },
+    "deferError": {
+      "message": "The 3D view could not be loaded.",
+      "deckPlan": "The deck plan could not be loaded.",
+      "reload": "Reload"
+    }
   },
   "date": {
     "relative": {
@@ -81,14 +97,11 @@
   },
   "update": {
     "available": "A new version is available",
-    "reload": "Reload",
-    "dismiss": "Later"
+    "reload": "Reload"
   },
   "auth": {
     "previewLocked": {
-      "title": "You are previewing as a signed-out visitor",
-      "body": "Signing in will not work here — the preview overrides what the app shows you, even after a successful sign-in. Leave the preview first.",
-      "exit": "Leave preview and sign in"
+      "body": "Signing in will not work here — the preview overrides what the app shows you, even after a successful sign-in. Leave the preview in the banner at the top first."
     },
     "tagline": "Your terminal to the verse",
     "email": "Email",
@@ -126,6 +139,7 @@
     "continueDiscord": "Continue with Discord",
     "inviteOnly": "Access is invite-only. Ask an admin to invite you.",
     "deniedInvite": "This account hasn't been invited yet. The site is invite-only — ask an admin to send you an invitation.",
+    "deniedSignup": "This account is not approved yet. Access is invite-only — request access first, then sign in again.",
     "unavailable": {
       "title": "We couldn't verify your access",
       "body": "Your profile could not be loaded just now — usually a brief hiccup right after signing in. You are still signed in.",
@@ -144,7 +158,13 @@
       },
       "applyCta": "Apply for access",
       "applyInline": "Apply now",
-      "backToSignIn": "Back to sign-in"
+      "backToSignIn": "Back to sign-in",
+      "headerNav": "Site navigation",
+      "consoleAria": "Sign-in console",
+      "scene": {
+        "approach": "Approach",
+        "target": "microTech · Stanton"
+      }
     },
     "apply": {
       "title": "Apply for access",
@@ -184,6 +204,7 @@
     "phaseBadge": "Alpha",
     "badge": "Cartographer badge",
     "accountMenu": "Account menu",
+    "profilePicture": "Profile picture (account menu)",
     "adminOnly": "Admin only",
     "adminMenu": "Admin",
     "telemetry": "Telemetry",
@@ -338,7 +359,6 @@
         "open": "Open patch summary {{patch}}",
         "unread": "New summary",
         "title": "What {{patch}} changes",
-        "source": "AI summary",
         "notes": "Patch notes at CIG",
         "notesOverview": "All patch notes at CIG"
       },
@@ -466,8 +486,7 @@
       "values": {
         "key": "Key values",
         "more": "Data sheet",
-        "legend": "Class average",
-        "toPage": "To the {{name}} page"
+        "view": "View {{name}}"
       },
       "set": {
         "label": "Values",
@@ -594,7 +613,7 @@
       "coverage": "Coverage",
       "qualityHint": "Quality score is preliminary until it's computed for real.",
       "stale": "Requires a data upload — a newer game version is live than this catalog reflects.",
-      "staleUploadLink": "Open Data Uploader"
+      "staleUploadLink": "Open Verse Data Uploader"
     },
     "search": {
       "didYouMean": "Did you mean:",
@@ -623,6 +642,8 @@
         "allUpcoming": "All {{n}} in Upcoming Ships",
         "folded": "{{n}} variants folded in",
         "foldedAtLeast": "at least {{n}} variants folded in",
+        "foldedOne": "1 variant folded in",
+        "foldedAtLeastOne": "at least 1 variant folded in",
         "grade": "Grade {{grade}}",
         "livery": "Livery",
         "upcomingBadge": "Not in the game yet",
@@ -761,8 +782,8 @@
       }
     },
     "weaponDetail": {
+      "eyebrow": "Weapon",
       "intro": "The picker's 17 columns are not everything. This is what a ship weapon really carries in the P4K — grouped by origin, with the struct named beside it. Cyan = present, gold dashed = not in the game files.",
-      "close": "Close",
       "card": {
         "damageChannels": "Damage per channel",
         "fireBallistics": "Fire & ballistics",
@@ -915,11 +936,10 @@
         "einordnung": "Standing",
         "cohortLink": "View all ships",
         "view3d": "3D",
-        "viewSchema": "Schema",
         "surfaceSimple": "Simple",
-        "surfaceTop": "Top view",
-        "surfaceSide": "Side view",
-        "surfaceFront": "Front view",
+        "surfaceTop": "Top",
+        "surfaceSide": "Side",
+        "surfaceFront": "Front",
         "surfaceFrontPending": "The front view arrives with this ship's next data upload.",
         "silhouetteAria": "Silhouette of {{name}}",
         "noGeometryReason": "No silhouette has been generated for this ship yet.",
@@ -928,7 +948,6 @@
         "detailHide": "Detail ▴",
         "allValues": "All values ▾",
         "allValuesHide": "All values ▴",
-        "journal": "Change journal",
         "journalChanged": "Changed: {{label}}",
         "undo": "Undo",
         "detailsShow": "Details ▾",
@@ -950,15 +969,11 @@
         "portsCount": "{{n}} ports",
         "legendConfigurable": "configurable",
         "legendMissiles": "missiles",
-        "legendHint": "Hover = short values · click = inspector",
         "inspectorEmptyTitle": "No hardpoint selected",
-        "inspectorEmptyBody": "Click a pin — or press “1” to “{{n}}”.",
         "emptyBay": "Empty bay",
         "journalEmpty": "Nothing yet — factory loadout.",
         "allPorts": "All {{n}} ports",
         "perspectives": "Perspectives",
-        "decksAria": "Decks",
-        "deckOutside": "Outside",
         "deckInside": "Inside",
         "percentileAria": "Percentile {{p}}",
         "say": {
@@ -977,9 +992,6 @@
         "pinLabels": "Pin labels on the hull",
         "legendUnresolved": "Position estimated",
         "rawPortHint": "Raw port from the game data — nothing to swap or open.",
-        "eyebrowTop": "Swappable parts · {{n}}",
-        "eyebrow3d": "Drag to rotate",
-        "eyebrowSchema": "All hardpoints",
         "pinListTitle": "All hardpoints",
         "pinGroupOther": "Hardpoints",
         "rankLoading": "Comparing with the whole fleet … the first visit per patch takes a moment.",
@@ -990,13 +1002,12 @@
           "changes": "Changes"
         },
         "backToParts": "All parts",
-        "backHint": "Back to the list (Esc)",
+        "backHint": "Clears the selection in the model (Esc)",
         "partsTotal": "{{n}} parts",
-        "partsInstalled": "{{n}} fitted",
         "partSize": "Size",
         "partGrade": "Grade",
-        "iconWishlist": "Wishlist",
-        "iconSupply": "Supplies",
+        "iconWishlist": "Wishes",
+        "iconSupply": "Operation",
         "iconStock": "Inventory",
         "previewTitle": "Detail page preview",
         "previewMaker": "Manufacturer",
@@ -1005,8 +1016,20 @@
         "previewBuy": "Where to buy",
         "previewAlternatives": "Alternatives",
         "previewOpen": "Open detail page",
-        "patchDiff": "Patch comparison",
-        "patchDiffHint": "Pick another patch in the patch menu above and this shows what changed on this ship."
+        "viewAkte": "File",
+        "view3dUnavailable": "There is no 3D model for this ship yet.",
+        "viewsAria": "View",
+        "filtersAria": "Show parts on the table",
+        "filterParts": "Parts",
+        "filterWeapons": "Weapons",
+        "filterMissiles": "Missiles",
+        "filterComponents": "Components",
+        "filterOther": "Other",
+        "filterAll": "All parts",
+        "deckRest": "Other",
+        "statShort": {
+          "projectileSpeed": "Bullet speed"
+        }
       },
       "strip": {
         "einsatz": "Mission",
@@ -1032,25 +1055,18 @@
         "areaEmpty": "No components in this area."
       },
       "persp": {
-        "lead": "Rated as {{mission}}, compared with {{n}} ships.",
-        "leadNoCohort": "Rated as {{mission}}.",
         "allShow": "All values of all four ▾",
         "allHide": "Collapse all values ▴"
-      },
-      "side": {
-        "variants": "Variants & compare"
       },
       "patch": {
         "trigger": {
           "idle": "{{active}}-{{channel}}",
-          "comparing": "Comparing with {{patch}}",
           "hotkeyHint": "Compare with another patch"
         },
-        "popTitle": "Choose a patch",
         "loading": "Loading …",
         "empty": "No further patches available.",
         "notFinalised": "Not finalised",
-        "clear": "Stop comparing",
+        "reset": "Reset to the default comparison",
         "comparing": "Loading comparison …",
         "perspective": {
           "offensive": "Offensive",
@@ -1080,7 +1096,23 @@
         },
         "deltaShow": "Show changes",
         "deltaHide": "Hide changes",
-        "current": "active"
+        "current": "current",
+        "hint": "Pick an older patch on the left and this shows what changed on this ship.",
+        "fromAria": "From {{patch}} — pick a patch",
+        "toAria": "To {{patch}} — pick a patch",
+        "fromTitle": "From patch",
+        "toTitle": "To patch",
+        "pickFrom": "Pick a patch",
+        "orderHint": "The right side is always the newer patch. Pick older ones on the left under “from”.",
+        "onOtherSide": "already on the other side",
+        "newerThan": "not older than {{patch}}",
+        "olderThan": "not newer than {{patch}}",
+        "changedOn": "What changed on the {{name}}",
+        "channel": {
+          "LIVE": "Live",
+          "PTU": "PTU",
+          "EPTU": "EPTU"
+        }
       },
       "share": {
         "copyLink": "Copy link",
@@ -1123,6 +1155,312 @@
         "loadError": "The shared loadout could not be loaded.",
         "exit": "Back to my loadout",
         "readOnlyHint": "Shared loadout — read-only. Create a copy to change or save it."
+      },
+      "diffMarker": "differs from stock",
+      "callout": {
+        "swap": "Swap part",
+        "aria": "{{type}}: {{name}}"
+      },
+      "table": {
+        "tagAria": "{{type}} {{size}}: {{name}}",
+        "legendDiff": "differs from stock",
+        "legendHint": "Click = pick a part"
+      },
+      "card": {
+        "rank": "Rank {{n}} of {{m}}",
+        "overallTip": "Overall: better than {{pct}} % of the group",
+        "compareWith": "Compare with",
+        "scopeOff": "{{name}} · no data",
+        "shapeAria": "How the ranking is drawn",
+        "shapeHex": "Hexagon",
+        "shapeBars": "Bars",
+        "changesAria": "Kind of changes",
+        "changesMine": "Your changes",
+        "changesPatch": "Patch comparison",
+        "changesHead": "Swapped against the stock loadout",
+        "backToWerk": "Back to stock"
+      },
+      "inspector": {
+        "diffLegend": "differs from stock"
+      },
+      "akte": {
+        "imageOnly": "Collapse the file",
+        "showText": "Expand the file",
+        "descriptionAria": "Description",
+        "noDescription": "There is no description for this ship.",
+        "liveries": "Livery",
+        "standard": "Standard",
+        "maker": "Manufacturer",
+        "modelsAria": "Model",
+        "tabsAria": "View of the file",
+        "tabSheet": "Data sheet",
+        "tabText": "Description",
+        "tabBuy": "Buy",
+        "buy": {
+          "loading": "Loading prices …",
+          "error": "The prices could not be loaded.",
+          "retry": "Try again",
+          "empty": "No place to buy this ship is known.",
+          "shops": "Buy in game",
+          "nearest": "Nearest to {{place}}",
+          "cheapest": "Cheapest first",
+          "grouped": "By system and place",
+          "showAll": "All {{n}} places",
+          "showLess": "Fewer",
+          "searchLabel": "Search places to buy",
+          "searchPlaceholder": "Search a place or shop …",
+          "noMatch": "No place matches “{{q}}”.",
+          "aUEC": "aUEC",
+          "wish": "Add to wishlist",
+          "wished": "On the wishlist",
+          "wishedFrom": "Source: {{source}}",
+          "undo": "Undo",
+          "wishError": "The entry could not be added.",
+          "signIn": "Sign in to save this.",
+          "wikelo": "Trade at Wikelo",
+          "wikeloRow": "Wikelo trade",
+          "wikeloPlace": "Wikelo Emporium · Kinga Station",
+          "wikeloNoData": "The required parts are not in the Codex data yet.",
+          "wikeloHave": "{{have}} of {{need}} in stock",
+          "wikeloSource": "Wikelo trade",
+          "attribution": "Prices: UEX Corp · Wikelo: Codex trade data"
+        }
+      },
+      "hangar": {
+        "loadouts": "Loadout",
+        "werk": "Factory",
+        "werkChanged": "Unsaved swaps: {{n}}",
+        "diffOne": "1 part differs from factory",
+        "diffMany": "{{n}} parts differ from factory",
+        "diffNone": "as factory",
+        "selectedAria": "Actions for {{name}}",
+        "removeExemplar": "Remove exemplar",
+        "removeTitle": "Remove “{{name}}”?",
+        "removeBody": "The loadout “{{name}}” is deleted. The ship stays in the hangar.",
+        "copy": "Copy this exemplar",
+        "copyName": "{{name}} (copy)",
+        "newFromWerk": "New exemplar from factory",
+        "saveWerk": "Add to hangar as exemplar",
+        "saveBuild": "Save build as exemplar",
+        "anotherCopy": "Another {{name}} into the hangar",
+        "nameTitle": "Exemplar name",
+        "nameLabel": "Name",
+        "nameSuggested": "Suggestion: “{{name}}” — take it or enter your own name.",
+        "autosavedOne": "Saved · 1 change",
+        "autosavedMany": "Saved · {{n}} changes",
+        "wishWithOne": "Wish this build · 1 swapped part",
+        "wishWithMany": "Wish this build · {{n}} swapped parts",
+        "wishName": "Wish: {{name}}",
+        "wishLoadoutUnavailable": "Among your wishes — its loadout cannot be stored there yet."
+      },
+      "partType": {
+        "gatling": "Gatling",
+        "remoteTurret": "Remote turret",
+        "mannedTurret": "Manned turret",
+        "scattergun": "Scattergun",
+        "massDriver": "Mass driver",
+        "railgun": "Railgun",
+        "laserRepeater": "Laser repeater",
+        "ballisticRepeater": "Ballistic repeater",
+        "distortionRepeater": "Distortion repeater",
+        "repeater": "Repeater",
+        "laserCannon": "Laser cannon",
+        "ballisticCannon": "Ballistic cannon",
+        "distortionCannon": "Distortion cannon",
+        "cannon": "Cannon",
+        "tractorBeam": "Tractor beam",
+        "shield": "Shield",
+        "powerPlant": "Power plant",
+        "cooler": "Cooler",
+        "quantumDrive": "Quantum drive",
+        "radar": "Radar",
+        "lifeSupport": "Life support",
+        "missileRack": "Missile rack",
+        "countermeasure": "Countermeasure"
+      },
+      "statShort": {
+        "dps": "DPS",
+        "alphaDamage": "Alpha",
+        "fireRate": "Rate",
+        "range": "Range",
+        "projectileSpeed": "Speed",
+        "missileCount": "Count",
+        "missileSize": "Size",
+        "tractorForce": "Force",
+        "tractorRange": "Range",
+        "tractorSpeed": "Speed",
+        "shieldHp": "HP",
+        "shieldRegen": "Regen",
+        "regenDelay": "Delay",
+        "downedDelay": "Down",
+        "powerOutput": "Power",
+        "health": "HP",
+        "emSignature": "EM",
+        "irSignature": "IR",
+        "driveSpeed": "Speed",
+        "jumpRange": "Jump",
+        "spoolTime": "Spool",
+        "fuelRate": "Fuel",
+        "radarSensitivity": "Sensor",
+        "pingCooldown": "Ping",
+        "aimAssistRange": "Aim assist",
+        "coolingRate": "Cooling",
+        "powerDraw": "Draw",
+        "coolantDraw": "Coolant",
+        "cmCapacity": "Stock",
+        "cmLifetime": "Life",
+        "cmRadius": "Radius"
+      },
+      "interior": {
+        "views": "View",
+        "deckFilter": "Deck · Filter",
+        "deckFilterAria": "Deck filter for 3D and Simple",
+        "deckAll": "All",
+        "deckAllSub": "Hull",
+        "deckEvery": "All decks",
+        "deckCount": "{{n}} decks",
+        "deckEveryOnly3d": "All decks at once is a 3D view only — Simple always shows one deck.",
+        "gap": "{{located}} of {{total}} SCU located",
+        "gapHint": "Not every cargo grid of this ship is located in the game data. The gap stays visible instead of quietly filling up the total.",
+        "groupsAria": "Show interior elements on the table",
+        "groupsOn": "Shown",
+        "presetTag": "Preset",
+        "presetTitle": "{{role}} · preset",
+        "presetReset": "reset",
+        "preset": {
+          "combat": "Combat ship",
+          "cargo": "Freighter",
+          "medical": "Medical ship",
+          "industry": "Industry & salvage",
+          "other": "Other"
+        },
+        "group": {
+          "cargo": "Cargo",
+          "ways": "Routes",
+          "med": "Medical",
+          "weapons": "Weapons",
+          "lockers": "Lockers",
+          "fire": "Fire safety",
+          "tech": "Engineering",
+          "living": "Living",
+          "doors": "Doors"
+        },
+        "cat": {
+          "grid": "Cargo grids",
+          "lift": "Lifts",
+          "stairs": "Stairs",
+          "ladder": "Ladders",
+          "ramp": "Ramps",
+          "airlock": "Airlocks",
+          "dockingTube": "Docking tubes",
+          "escapePod": "Escape pods",
+          "medBed": "Med beds",
+          "respawn": "Respawn points",
+          "weaponRack": "Weapon racks",
+          "locker": "Lockers",
+          "fireExt": "Fire extinguishers",
+          "relay": "Relays",
+          "powerPlant": "Power plants",
+          "cooler": "Coolers",
+          "shield": "Shield generators",
+          "quantumDrive": "Quantum drives",
+          "jumpDrive": "Jump modules",
+          "lifeSupport": "Life support",
+          "radar": "Radar",
+          "fuelTank": "Fuel tanks",
+          "maintenance": "Maintenance points",
+          "turret": "Turrets (access)",
+          "computer": "Computers",
+          "bed": "Beds",
+          "head": "Toilets & showers",
+          "door": "Doors"
+        },
+        "door": {
+          "room": "Room doors",
+          "inner": "Inner doors & hatches",
+          "lift": "Lift doors",
+          "hangar": "Hangar doors",
+          "bow": "Bow doors",
+          "airlock": "Airlock doors",
+          "ramp": "Ramp doors",
+          "cell": "Cell doors"
+        },
+        "fact": {
+          "scu": "Capacity",
+          "dims": "Inner size",
+          "breachable": "Breachable",
+          "panel": "Control panel beside it",
+          "connects": "Connects",
+          "height": "Height"
+        },
+        "yes": "yes",
+        "no": "no",
+        "searchLabel": "Search parts, rooms and doors",
+        "searchPlaceholder": "Search a part, room or door …",
+        "searchPlaceholderOuter": "Search a part …",
+        "hitsAria": "Search results",
+        "hits": "Results “{{q}}” · {{n}}",
+        "noHits": "Nothing found for “{{q}}”.",
+        "sideOuter": "Outside",
+        "sideInner": "Inside",
+        "scopeDeck": "{{deck}} · {{n}} elements",
+        "scopeShip": "Whole ship · {{n}} elements on {{decks}} decks",
+        "othersOff": "More (hidden)",
+        "roomsOfDeck": "Rooms · {{n}}",
+        "overview": "Overview",
+        "inRoom": "In the room",
+        "roomEmpty": "No located element stands in this room.",
+        "inGrids": "in {{n}} grids",
+        "poweredBy": "Powered by",
+        "relay": "Relay {{name}}",
+        "floorAt": "floor {{z}} m",
+        "roomHeight": "room height {{h}} m",
+        "view3dAria": "Interior in 3D, deck {{deck}}. Arrow keys turn it, plus and minus zoom.",
+        "view3dAllAria": "Interior in 3D, all decks. Arrow keys turn it, plus and minus zoom.",
+        "view3dHint": "drag · turn · wheel · zoom",
+        "zoomIn": "Zoom in",
+        "zoomOut": "Zoom out",
+        "viewReset": "Reset the view",
+        "one": {
+          "grid": "Cargo grid",
+          "lift": "Lift",
+          "stairs": "Stairs",
+          "ladder": "Ladder",
+          "ramp": "Ramp",
+          "airlock": "Airlock",
+          "dockingTube": "Docking tube",
+          "escapePod": "Escape pod",
+          "medBed": "Med bed",
+          "respawn": "Respawn point",
+          "weaponRack": "Weapon rack",
+          "locker": "Locker",
+          "fireExt": "Fire extinguisher",
+          "relay": "Relay",
+          "powerPlant": "Power plant",
+          "cooler": "Cooler",
+          "shield": "Shield generator",
+          "quantumDrive": "Quantum drive",
+          "jumpDrive": "Jump module",
+          "lifeSupport": "Life support",
+          "radar": "Radar",
+          "fuelTank": "Fuel tank",
+          "maintenance": "Maintenance point",
+          "turret": "Turret (access)",
+          "computer": "Computer",
+          "bed": "Bed",
+          "head": "Toilet & shower",
+          "door": "Door"
+        },
+        "oneDoor": {
+          "room": "Room door",
+          "inner": "Inner door / hatch",
+          "lift": "Lift door",
+          "hangar": "Hangar door",
+          "bow": "Bow door",
+          "airlock": "Airlock door",
+          "ramp": "Ramp door",
+          "cell": "Cell door"
+        }
       }
     },
     "empty": {
@@ -1253,7 +1591,6 @@
         "actionGroup": {
           "flight_control": "Flight Control",
           "weapons": "Weapons",
-          "targeting": "Targeting",
           "shields": "Shields",
           "power": "Power",
           "mfd_hud": "MFD / HUD",
@@ -1423,11 +1760,13 @@
       },
       "group": {
         "of": "All {{name}}",
-        "smallHint": "Only {{n}} ships in this group, so the comparison is rough."
+        "smallHint": "Only {{n}} ships in this group, so the comparison is rough.",
+        "ofRole": "{{name}} role"
       },
       "noMiningData": "Mining and salvage output: no data",
-      "rimNote": "Outside = close to the group best (95 %), stronger values end there. Square-root scale: small values stay visible, the rings mark 33 and 67 %.",
-      "betterThan": "Better than {{n}} %"
+      "rimNote": "Outside = close to the group best (95 %), stronger values end there. Square-root scale: small values stay visible, the rings mark 33 and 67 %.",
+      "betterThan": "Better than {{n}} %",
+      "rimLabel": "Scale"
     },
     "detail": {
       "manufacturer": "Manufacturer",
@@ -1498,9 +1837,20 @@
       "heroView2d": "2D",
       "heroSwitchTo3d": "Switch to the 3D view",
       "heroSwitchTo2d": "Switch back to the 2D image",
+      "holoOverlay": {
+        "label": "3D view: {{name}}",
+        "fullscreen": "Fullscreen",
+        "exitFullscreen": "Exit fullscreen"
+      },
+      "partPopup": {
+        "label": "Component: {{name}}",
+        "eyebrow": "Component",
+        "noValues": "No values known for this component."
+      },
       "stageLaunchers": "{{n}} launchers",
       "stageMissileRacks": "Missile racks",
       "stageRemoteTurret": "Remote turret",
+      "stageMannedTurret": "Manned turret",
       "stageTractorBeam": "Tractor beam",
       "stageTractorBeams": "Tractor beams",
       "linkCopied": "Link copied",
@@ -1579,7 +1929,7 @@
         "ir": "Your heat signature. It rises with the cooling load and with everything that draws power. Low IR means thermal sensors pick you up later.",
         "em": "The sum of every powered component. Shields and coolers are the biggest items — cut a group and its share disappears. What a part emits comes from the game files; energy weapons carry 0 there.",
         "crossSection": "How large you look on radar. It comes from the hull, not the equipment — no loadout changes it.",
-        "coolingLoad": "How much of the installed cooling capacity is in use right now. Above 100 % the ship runs hot and the IR signature spikes."
+        "coolingLoad": "How much cooling is in use right now — counted like in game: 100 % is exactly what the switched-on coolers deliver with the power they get. 30 % means 70 % headroom, 130 % means 30 % short: the ship runs hot and the IR signature spikes. Leanest just below 100 %."
       },
       "fact": {
         "ir": "IR",
@@ -1604,7 +1954,8 @@
       "preset": {
         "stealth": "Stealth",
         "auto": "Auto",
-        "reset": "Reset"
+        "reset": "Reset",
+        "stealthHint": "Lowest EM signature: weapons, shields, quantum, tractor, radar and life support off, drive at the bare minimum, coolers only as far as cooling stays below 100 %."
       },
       "gap": {
         "noReactorData": "No reactor data in this build — the power budget stays empty until the extract carries it.",
@@ -1621,7 +1972,9 @@
         "ir": "Infrared",
         "em": "Electromagnetic",
         "crossSection": "Cross-section"
-      }
+      },
+      "coolingHeadroom": "{{pct}} % headroom",
+      "coolingDeficit": "{{pct}} % short"
     },
     "swap": {
       "open": "Swap component",
@@ -1634,7 +1987,7 @@
       "close": "Close",
       "typeFilter": "Item type",
       "filterAll": "All",
-      "appliesToOne": "Applies to the {{port}} hardpoint",
+      "appliesToOne": "Applies to this slot only: {{port}}",
       "appliesToMany": "Applies to all {{count}} identical hardpoints",
       "sortHint": "Click a column to sort, Ctrl-click to add a secondary sort.",
       "installedNone": "Bay empty (stock)",
@@ -1649,6 +2002,10 @@
       "saveErrorHangar": "Could not reach your hangar right now — the draft is kept, try saving again.",
       "saveErrorGeneric": "Could not save the loadout right now — the draft is kept, try again.",
       "revert": "Revert to stock",
+      "resetAll": "Reset the whole loadout to stock",
+      "resetAllTitle": "Reset the whole loadout?",
+      "resetAllBody": "All {{n}} changes to this loadout will be lost and every slot gets its stock part back.",
+      "resetAllConfirm": "Reset",
       "defaultConfigName": "Codex loadout",
       "draftState": {
         "changed": "Changed",
@@ -1680,12 +2037,11 @@
       "tray": "Compare ({{count}})",
       "open": "Open comparison",
       "clear": "Clear",
-      "remove": "Remove",
+      "remove": "Remove {{name}}",
       "property": "Property",
       "close": "Close",
       "noCommon": "No comparable values for this mix of entries.",
       "diffOnly": "Differences only",
-      "showAll": "All rows",
       "mixedKind": "Like-for-like only: the tray already holds {{kind}} entries. Clear it to compare something else."
     },
     "portCategory": {
@@ -1702,8 +2058,6 @@
     "picker": {
       "title": "Pick a component — {{port}} · S{{size}}",
       "installed": "fitted: {{name}}",
-      "hint": "Click beside the window to go back",
-      "close": "Close",
       "searchPlaceholder": "Search … name, manufacturer, damage type",
       "searchLabel": "Search components",
       "compareWith": "Compare with",
@@ -1716,7 +2070,7 @@
       "columnsUnavailable": "not in the game files",
       "dashCell": "—",
       "dashCellTitle": "Not applicable to this class",
-      "dashNote": "Ammo and spread read “—” because energy weapons have no magazine and the P4K only carries spread as a modifier. Not an extractor gap.",
+      "dashNote": "Ammo and spread read „—“: energy weapons have no magazine, and the game states spread only as a modifier on other values.",
       "footerMissing": "Not in the game files: {{fields}}",
       "pickRow": "Fit {{name}}",
       "openDetail": "Open details for {{name}}",
@@ -1779,6 +2133,75 @@
         "deg": "°",
         "perSec": "/s",
         "percent": "%"
+      },
+      "dashNoteAmmo": "Ammo reads „—“ for energy weapons because they have no magazine.",
+      "dashNoteSpread": "Spread reads „—“ because the game states it only as a modifier on other values.",
+      "term": {
+        "armor": "Armor",
+        "back": "Rear",
+        "ballistic": "Ballistic",
+        "ballisticcannon": "Ballistic Cannon",
+        "ballisticgatling": "Ballistic Gatling",
+        "ballisticrepeater": "Ballistic Repeater",
+        "ballisticscattergun": "Ballistic Scattergun",
+        "bottom": "Bottom",
+        "cannon": "Cannon",
+        "center": "Center",
+        "centre": "Center",
+        "cooler": "Cooler",
+        "countermeasure": "Countermeasure",
+        "distortion": "Distortion",
+        "distortioncannon": "Distortion Cannon",
+        "distortionrepeater": "Distortion Repeater",
+        "emp": "EMP",
+        "front": "Front",
+        "fuelintake": "Fuel Intake",
+        "fueltank": "Fuel Tank",
+        "gatling": "Gatling",
+        "gun": "Gun",
+        "gunturret": "Gun Turret",
+        "jumpmodule": "Jump Module",
+        "laser": "Laser",
+        "lasercannon": "Laser Cannon",
+        "lasergatling": "Laser Gatling",
+        "laserrepeater": "Laser Repeater",
+        "left": "Left",
+        "lifesupport": "Life Support",
+        "lower": "Lower",
+        "mainthruster": "Main Thruster",
+        "massdriver": "Mass Driver",
+        "mid": "Mid",
+        "middle": "Middle",
+        "mininglaser": "Mining Laser",
+        "missile": "Missile",
+        "missilelauncher": "Missile Launcher",
+        "missilerack": "Missile Rack",
+        "nose": "Nose",
+        "power": "Power",
+        "powerplant": "Power Plant",
+        "quantumdrive": "Quantum Drive",
+        "quantumfueltank": "Quantum Fuel Tank",
+        "radar": "Radar",
+        "railgun": "Railgun",
+        "rear": "Rear",
+        "repeater": "Repeater",
+        "right": "Right",
+        "rocketpod": "Rocket Pod",
+        "salvagebeam": "Salvage Beam",
+        "scanner": "Scanner",
+        "scattergun": "Scattergun",
+        "selfdestruct": "Self-Destruct",
+        "shield": "Shield",
+        "shieldgenerator": "Shield Generator",
+        "tail": "Tail",
+        "thruster": "Thruster",
+        "top": "Top",
+        "tractorbeam": "Tractor Beam",
+        "turret": "Turret",
+        "upper": "Upper",
+        "utility": "Utility",
+        "weapon": "Weapon",
+        "wing": "Wing"
       }
     },
     "hardpointMap": {
@@ -1799,7 +2222,9 @@
       "aria": "{{deck}}: deck plan, rooms: {{count}}",
       "nose": "Nose",
       "readoutIdle": "No room selected",
-      "roomsAria": "Rooms on {{deck}}"
+      "roomsAria": "Rooms on {{deck}}",
+      "derivedHint": "The game names no decks on this ship: the levels are derived from floor height. Stairs and lifts appear on every level they connect.",
+      "connects": "leads to {{decks}}"
     },
     "shipBlueprint": {
       "schema": {
@@ -1807,6 +2232,8 @@
         "topAria": "Top view of the ship with {{count}} hardpoints marked",
         "extent": "{{length}} × {{beam}} × {{height}} m",
         "hint": "Seen from above, nose to the right. Point at a marker for size and type, click it for the component.",
+        "hintSide": "Seen from the side, nose to the right. Point at a marker for size and type, click it for the component.",
+        "hintFront": "Seen from the front, nose towards you. Point at a marker for size and type, click it for the component.",
         "noPositions": "No hardpoint positions for this hull yet — they arrive with its next 3D upload.",
         "listLabel": "Hardpoints",
         "size": "Size {{size}}"
@@ -1918,6 +2345,7 @@
     "moduleSection": {
       "weapons": "Armament",
       "remoteTurrets": "Remote turrets",
+      "mannedTurrets": "Manned turrets",
       "missiles": "Missiles",
       "pod": "Pods",
       "shields": "Shield generators",
@@ -1932,6 +2360,7 @@
       "countermeasures": "Countermeasures",
       "shieldsNote": "Every bay in this block is a swappable shield generator, including the ones that ship empty. The shield control module sits with the fixed systems: it is not a shield of its own and cannot be swapped in game.",
       "countermeasuresNote": "Launchers cannot be changed in game, so this block is for reference only. Decoys pull heat-seeking missiles away, noise (chaff) blinds radar-guided ones. How many you need is on a launcher's info sheet (ⓘ): it sets the signature per launch against the ship's own.",
+      "infoLabel": "About this block",
       "splitRows": "Individually",
       "groupRows": "Group",
       "splitRowsHint": "List every hardpoint on its own row so you can change them one by one",
@@ -1953,9 +2382,11 @@
         "passive": "Passive · off the grid",
         "pool": "Pool"
       },
-      "shieldNote": "All three are shield generators and all three can be swapped. The passive one costs no power and still counts fully towards the pool — but it hangs off the active ones: if they fail, the backup goes with them.",
+      "shieldNote": "All {{count}} are shield generators and each can be swapped on its own — identical ones are stacked here, “Individually” lists them bay by bay.",
+      "shieldPassiveNote": "The passive one costs no power and still counts fully towards the pool — but it hangs off the active ones: if they fail, the backup goes with them.",
       "peek": {
         "sustainedDpsTotal": "Total sustained DPS",
+        "burstDpsTotal": "Total burst DPS",
         "missileTotal": "Full salvo",
         "budget": "Reactor budget",
         "coolingTotal": "Total cooling"
@@ -1981,6 +2412,7 @@
       "gap": {
         "noStockGuns": "This hull's stock guns are not in the extract — the game keeps default weapon fits in a separate loadout record we do not resolve yet, so the mounts below show the seat rather than the gun.",
         "noFireRate": "No fire rate in this extract{{patch}}, so sustained DPS cannot be derived yet.",
+        "noSustainedCycle": "No energy regen, reload time or overheat data for the weapons in this extract{{patch}}, so sustained DPS cannot be derived yet. Burst DPS counts no pauses.",
         "noShields": "No shield generator in this ship's stock loadout.",
         "noHullHp": "Hull HP is not part of the P4K extract yet.",
         "noResistances": "Per-channel damage resistances are not extracted — no ship or armour entity carries them.",
@@ -2006,7 +2438,9 @@
       "stealth": "Stealth",
       "mining": "Mining",
       "salvage": "Salvage",
-      "lensReset": "Reset lens",
+      "lensReset": "Back to “All”",
+      "lensResetTip": "Sets the mission back to “All”: every equipment block is unfolded again in the default order, and the key figures show the neutral overview. The loadout itself does not change.",
+      "setLensResetTip": "Sets the mission back to “All”: every value counts equally again, and the parts in the picture no longer show a mission-specific value. The set itself does not change.",
       "disabled": {
         "noMining": "No mining hardpoints",
         "noSalvage": "No salvage hardpoints",
@@ -2046,7 +2480,7 @@
       "deltaUp": "{{value}} better than factory",
       "deltaDown": "{{value}} worse than factory",
       "tooltipBurstDps": "Continuous fire until the magazine is empty — reloading not counted.",
-      "tooltipSustainedDps": "Averaged over a long fight — reload pauses counted.",
+      "tooltipSustainedDps": "Averaged over a long fight — pauses for energy regen, reloading and overheating counted.",
       "short": {
         "alpha": "Alpha",
         "burstDps": "Burst DPS",
@@ -2106,7 +2540,16 @@
         "targeting": "Targeting",
         "slowestMissileNote": "Lock time of the slowest missile.",
         "hintDps": "{{value}} DPS",
-        "hintAlpha": "{{value}} Alpha"
+        "hintAlpha": "{{value}} Alpha",
+        "colMissile": "Missile",
+        "colTracking": "Tracking signal",
+        "colCount": "Count",
+        "colWarhead": "Warhead",
+        "colMissileTotal": "Total damage",
+        "salvoNote": "One salvo of every missile at once — one-off damage, not part of the weapons DPS.",
+        "salvoPartial": "Not every missile has warhead figures; the salvo counts only the known ones.",
+        "noWarheadData": "The current data carries no warhead figures for these missiles yet.",
+        "hintMissiles": "{{value}} missile salvo"
       },
       "defensive": {
         "title": "Defence",
@@ -2143,8 +2586,12 @@
     "hull": {
       "title": "Hull & flight",
       "hullHp": "Hull HP",
+      "hullMass": "Hull mass",
+      "armorHp": "Armour HP",
+      "reverseSpeed": "Reverse speed",
       "dimensions": "Dimensions (L×W×H)",
       "decks": "Decks",
+      "decksDerived": "derived from floor height",
       "crew": "Crew",
       "equippedMass": "Equipment mass",
       "scmSpeed": "SCM speed",
@@ -2156,7 +2603,6 @@
       "flightMissing": "Flight characteristics live in the vehicle definition, which our P4K extractor does not resolve yet — the rows stay here so they fill in by themselves once it does."
     },
     "inspect": {
-      "close": "Close",
       "hardpoint": "Hardpoint",
       "parameters": "Parameters",
       "general": "General",
@@ -2218,9 +2664,9 @@
         "lensLimits": "limits the set for this mission"
       },
       "supplies": {
-        "add": "Add missing to supplies ({{n}})",
-        "none": "Everything owned or already in supplies.",
-        "added": "{{n}} parts added to supplies.",
+        "add": "Add missing to Operation ({{n}})",
+        "none": "Everything owned or already in an Operation.",
+        "added": "{{n}} parts added to the Operation.",
         "toPlan": "Go to Plan"
       },
       "notFoundPage": {
@@ -2395,7 +2841,6 @@
         "open": "Open {{name}} in the Codex",
         "prev": "Previous slot",
         "next": "Next slot",
-        "close": "Clear selection",
         "emptySlot": "Free slot"
       },
       "allParts": "All parts",
@@ -2440,7 +2885,6 @@
       "eyebrow": "Codex index",
       "filtersAria": "Filters",
       "filtersTitle": "Filters",
-      "closeFilters": "Close filters",
       "filterButton": "Filters ({{count}})",
       "showResults": "Show {{count}} results",
       "areaLabel": "Area",
@@ -2487,9 +2931,18 @@
       "scopeOff": "Too few weapons to compare with in this group.",
       "scope": {
         "all": "All",
-        "kind": "Kind",
         "size": "Size",
-        "signal": "Signal"
+        "signal": "Signal",
+        "allOf": "All {{kind}}",
+        "signalOf": "All {{signal}} {{kind}}",
+        "sizeOf": "All S{{size}} {{kind}}",
+        "plural": {
+          "missile": "guided missiles",
+          "torpedo": "torpedoes",
+          "rocket": "rockets",
+          "ground": "ground vehicle missiles",
+          "any": "guided weapons"
+        }
       },
       "axis": {
         "damage": "DAMAGE",
@@ -2504,7 +2957,6 @@
       },
       "rank": {
         "nAll": "{{n}} guided weapons",
-        "nKind": "{{n}} guided weapons of the same kind",
         "nSize": "{{n}} guided weapons of size {{k}}",
         "nSignal": "{{n}} guided weapons with the same tracking signal",
         "verdict": "{{pct}} % — {{band}} against {{n}} guided weapons.",
@@ -2515,8 +2967,9 @@
         "legendBelow": "below median",
         "compareInfo": "Each axis runs from 0 (centre) to the highest value among the chosen weapons (rim). Blue is this weapon, the dashed line the group's median.",
         "note": "Compares only what the game data holds for this weapon.",
-        "gapNoData": "The current data does not include damage, speed, agility and range yet. The comparison appears once a build is uploaded with Data Uploader 0.73.3 or later.",
+        "gapNoData": "The current data does not include damage, speed, agility and range yet. The comparison appears once a build is uploaded with Verse Data Uploader 0.73.3 or later.",
         "gapTooFew": "Too few missiles differ in damage, speed, agility and range to rank this one.",
+        "gapThinGroup": "Not enough to compare: too few values differ in this group to rank this one.",
         "gapNoCohort": "The comparison group could not be loaded."
       },
       "data": {
@@ -2618,38 +3071,17 @@
       }
     },
     "ownCard": {
-      "haveTitle": "Got it?",
-      "mineShip": "Your copy",
-      "mineItem": "Your storage",
-      "mineBlueprint": "Your blueprint",
-      "collected": "In your collection",
       "removeSammlung": "Remove from collection",
       "removeSammlungTitle": "Remove from collection?",
       "removeSammlungBody": "{{name}} leaves your collection.",
-      "noneShip": "Not in your hangar, not on your wishlist.",
-      "noneItem": "Not in your inventory, not on your wishlist.",
-      "noneSammlung": "Not in your collection, not on your wishlist.",
-      "wished": "{{n}}× on your wishlist.",
       "signedOut": "Sign in to wish for it or mark it as yours.",
       "signIn": "Sign in",
-      "toWishlist": "Wishlist",
-      "toHangar": "Hangar",
-      "toInventar": "Inventory",
-      "toSammlung": "Collections",
-      "openWishlist": "Open wishlist",
-      "wishQtyAria": "Quantity on the wishlist: {{name}}",
-      "qtyAria": "Quantity in the inventory: {{name}}",
-      "less": "One less",
-      "more": "One more",
-      "inInventar": "in inventory",
       "removeItem": "Remove from inventory",
       "removeTitle": "Remove from inventory?",
       "removeBody": "{{n}}× {{name}} leaves every place in your inventory.",
       "removeConfirm": "Remove",
-      "inNachschub": "In supply “{{name}}”",
-      "showInHq": "Show in HQ",
-      "noteTitle": "Note on this item",
-      "wishAgain": "Wish for another"
+      "inNachschub": "In the Operation “{{name}}”",
+      "noteTitle": "Note on this item"
     },
     "itemRank": {
       "nAll": "{{n}} parts of this kind",
@@ -2704,7 +3136,8 @@
       "cartSoon": "Coming soon: puts this loadout's components into the cart.",
       "layouts": "Choose layout",
       "saveInto": "Save the changes into “{{name}}”.",
-      "newLayout": "New layout",
+      "pickNew": "New",
+      "saveAsNew": "Save as a new layout",
       "newTitle": "New layout",
       "newMessage": "Saved in this browser, for this ship. Without a name it keeps the suggested one; the same name overwrites.",
       "defaultName": "Layout {{n}}",
@@ -2841,8 +3274,7 @@
       "pickSlot": "Slot in {{set}}",
       "replaces": "Replaces the current piece",
       "done": "{{item}} is now in {{slot}} of {{set}}",
-      "toSet": "To the set",
-      "close": "Close"
+      "toSet": "To the set"
     }
   },
   "news": {
@@ -3067,7 +3499,6 @@
         "olderHide": "Collapse older patches"
       },
       "dossier": {
-        "close": "Close dossier",
         "toc": "Sections",
         "unknown": "No patch data for Alpha {{line}}.",
         "section": {
@@ -3082,7 +3513,8 @@
           "nextPast": "What came next?"
         },
         "noteOf": "Changes in {{version}} · part of Alpha {{line}}",
-        "wholeLine": "View the whole {{line}} patch"
+        "wholeLine": "View the whole {{line}} patch",
+        "eyebrow": "Patch"
       },
       "prep": {
         "source": "per the Spectrum post (\"Important Build Info\")",
@@ -3203,7 +3635,7 @@
       }
     },
     "detail": {
-      "back": "Back"
+      "eyebrow": "Verse News"
     },
     "openExternal": "Opens {{host}}",
     "relative": {
@@ -3219,7 +3651,7 @@
       "title": "Upcoming Ships",
       "addedOne": "1 new ship on the ship matrix",
       "addedMany": "{{count}} new ships on the ship matrix",
-      "wishedUpdated": "{{count}} ships on your wishlist changed status",
+      "wishedUpdated": "{{count}} ships among your wishes changed status",
       "more": "+{{count}} more",
       "open": "Open upcoming ships",
       "dismiss": "Dismiss notice"
@@ -3344,7 +3776,7 @@
   },
   "p4k": {
     "title": "P4K Bundle History",
-    "subtitle": "Pre-digested bundles from the Data Uploader. Uploads only happen via the tool, not from the website.",
+    "subtitle": "Pre-digested bundles from the Verse Data Uploader. Uploads only happen via the tool, not from the website.",
     "loading": "Loading bundles…",
     "errorTitle": "Could not load bundles",
     "retentionHint": "Retention: the last 3 uploader versions per build, max. 20 bundles total — older ones are removed automatically.",
@@ -3353,7 +3785,7 @@
     },
     "empty": {
       "title": "No bundles yet",
-      "hint": "Once someone runs the Data Uploader and uploads, results show up here."
+      "hint": "Once someone runs the Verse Data Uploader and uploads, results show up here."
     },
     "col": {
       "entities": "Entities",
@@ -3364,7 +3796,10 @@
     "actions": {
       "disable": "Disable",
       "reenable": "Re-enable",
-      "delete": "Delete"
+      "delete": "Delete",
+      "disablePatch": "Disable patch",
+      "reenablePatch": "Re-enable patch",
+      "lead": "Use as leading"
     },
     "diff": {
       "title": "Diff details (vs. previous build)",
@@ -3382,11 +3817,20 @@
       "delete": "Permanently delete bundle \"{{name}}\"?\n\nThis cannot be undone.",
       "disableTitle": "Disable bundle “{{name}}”?",
       "reasonLabel": "Reason (optional)",
-      "deleteTitle": "Delete bundle?"
+      "deleteTitle": "Delete bundle?",
+      "disablePatchTitle": "Disable patch {{name}} ({{count}} active uploads)?",
+      "reenablePatch": "Re-enable patch {{name}}? Per channel its newest upload leads again.",
+      "leadTitle": "Use “{{name}}” as leading?",
+      "leadMessage": "The other active uploads of the same patch and channel are disabled (with a note) and stay in the history."
     },
     "superseded": {
       "badge": "Superseded",
       "title": "Superseded by a newer upload"
+    },
+    "leading": {
+      "badge": "Leading",
+      "tip": "The Codex uses this bundle for its patch and channel.",
+      "reason": "Stepped back: {{name}} was chosen as leading."
     }
   },
   "profile": {
@@ -3550,6 +3994,20 @@
         "label": "Show the feedback button",
         "descOn": "The feedback button sits in the bottom-right corner of every page.",
         "descOff": "The feedback button is hidden — replies and questions from the team stay out of sight with it. Switch it back on here to open your feedback."
+      },
+      "staff": {
+        "title": "Feedback & beta buttons",
+        "hint": "The corner buttons: send feedback and see replies from the team, with the beta switch above it.",
+        "label": "Show the feedback and beta buttons",
+        "audience": "(admins and collaborators only)",
+        "descOn": "The feedback and beta buttons sit in the bottom-right corner of every page.",
+        "descOff": "The feedback and beta buttons are hidden — replies and questions from the team stay out of sight with them. Switch them back on here to open your feedback or the beta switches."
+      },
+      "routineTint": {
+        "label": "Feedback title green / red only",
+        "audience": "(admins only)",
+        "descOn": "The “Feedback” title glows green while the routine is up or working, and red while nothing is being worked on. Applies to your account only.",
+        "descOff": "The “Feedback” title shows four states: green ready, blue working right now, amber paused, red unreachable."
       }
     },
     "danger": {
@@ -3605,7 +4063,8 @@
         "role_assign_failed": "Invited, but the role could not be assigned.",
         "existing_account_not_updated": "The email is on the allowlist, but the existing account was not changed — most likely a protected admin.",
         "user_exists": "This email is already registered. The allowlist was updated anyway."
-      }
+      },
+      "open": "Invite someone"
     },
     "share": {
       "button": "Copy share link",
@@ -3613,6 +4072,13 @@
       "copyFailed": "Could not copy the link — copy it manually."
     },
     "people": {
+      "unapproved": "Not approved",
+      "unapprovedTip": "This account signed up on its own, was never approved and has no access to the app.",
+      "approve": "Approve",
+      "approveTitle": "Approve account?",
+      "approveConfirm": "Approve {{email}}? The account gets access to the app as a viewer; assign a higher role afterwards.",
+      "unapprovedOne": "{{n}} account not approved",
+      "unapprovedMany": "{{n}} accounts not approved",
       "title": "People",
       "subtitle": "Accounts and still-open invitations in one list. An invitation drops out of it the moment the address signs in.",
       "invitedPill": "Invited",
@@ -3695,11 +4161,9 @@
         "title": "Create API token",
         "subtitle": "Pick a friendly name + one or more scopes. The plaintext token is shown ONCE — save it before closing.",
         "nameLabel": "Name",
-        "namePlaceholder": "e.g. Discord Bot, Personal CLI",
         "scopesLabel": "Scopes",
         "create": "Create token",
         "creating": "Creating…",
-        "cancel": "Cancel",
         "errorTitle": "Could not create token"
       },
       "scopeDescriptions": {
@@ -3719,7 +4183,8 @@
         "ack": "I have saved it",
         "tokenLabel": "Plaintext token"
       },
-      "revokeTitle": "Revoke token?"
+      "revokeTitle": "Revoke token?",
+      "eyebrow": "API tokens"
     },
     "filter": {
       "searchPlaceholder": "Search name, username or email…",
@@ -3730,7 +4195,7 @@
     },
     "requests": {
       "title": "Access requests",
-      "subtitle": "Applications from the landing page. Accepting registers the email just like the form below — plus an invite mail whose link leads straight to the page where the person picks their own password. We never issue a password.",
+      "subtitle": "Applications from the landing page. Accepting registers the email just like the invite form behind the + — plus an invite mail whose link leads straight to the page where the person picks their own password. We never issue a password.",
       "empty": "No open requests.",
       "accept": "Accept",
       "decline": "Decline",
@@ -3856,9 +4321,12 @@
         "revokeText": "New uploads will no longer be translated into {{lang}}. Existing translations stay."
       },
       "fullRun": {
-        "title": "Start a full run for {{lang}}?",
-        "text": "Costs about {{usd}} $ ({{count}} strings) — the whole backlog is translated. The job still waits for your approval afterwards.",
-        "confirm": "Create full run"
+        "title": "Approve the full run for {{lang}}?",
+        "text": "Costs about {{usd}} $ ({{count}} strings) — every string without a translation is translated. The per-upload cost cap does not apply to a full run.",
+        "confirm": "Approve and spend",
+        "startTitle": "Create a full run for {{lang}}?",
+        "startText": "The job is estimated first. That costs nothing and takes a few minutes. It then waits in the job list with its cost and string count for your approval.",
+        "startConfirm": "Create and estimate"
       },
       "jobs": {
         "title": "Jobs",
@@ -3868,6 +4336,18 @@
         "cancel": "Cancel",
         "cancelTitle": "Cancel the job for {{lang}}?",
         "cancelText": "The job is stopped; costs already incurred stay.",
+        "progress": "{{pct}} %",
+        "hold": {
+          "full": "A full run only starts after your approval.",
+          "upload_cap": "The estimate is above the limit per upload.",
+          "monthly_cap": "This job would take the month above its limit.",
+          "overrun": "The first batch group cost {{pct}} % more than estimated. The estimate is corrected, the rest only starts after your approval."
+        },
+        "capped": {
+          "job_budget": "Job budget reached: {{texts}} texts got no second attempt and stay untranslated.",
+          "monthly_cap": "Monthly limit reached: {{texts}} texts got no second attempt and stay untranslated.",
+          "judge": "Budget reached: the judge sample was left out."
+        },
         "cols": {
           "build": "Build",
           "lang": "Language",
@@ -3911,7 +4391,15 @@
         "plan_missing": "The translation plan is missing.",
         "results_missing": "The results are missing.",
         "r2_not_configured": "Storage (R2) is not configured.",
-        "internal": "Internal error in the translation pipeline."
+        "internal": "Internal error in the translation pipeline.",
+        "worker_limit": "The job exceeded the worker's CPU or memory limit several times in a row and was stopped.",
+        "no_live_build": "There is no current LIVE build.",
+        "source_not_permitted": "The licence of this source is not settled.",
+        "source_unknown": "The source does not exist (any more).",
+        "nothing_to_do": "There was nothing to translate.",
+        "phase_unknown": "The job is in an unknown step.",
+        "job_cleanup_pending": "The previous job is still being cleaned up. Please try again in a minute.",
+        "resubmit_limit": "Creating a batch went unanswered several times. The job was stopped so that no batch is paid for twice. Please check the Anthropic Console for orphaned batches."
       },
       "glossary": {
         "title": "Glossary",
@@ -4006,18 +4494,17 @@
         "intro": "Community packs the translation starts from. Import only once the licence is clear.",
         "syncAll": "Sync now",
         "syncTitle": "Sync all sources?",
-        "syncText": "Checks every active source for changes and re-imports changed ones.",
+        "syncText": "Checks every active source for changes and starts a background import for the changed ones.",
         "import": "Import seed",
         "importTitle": "Import the seed of {{name}}?",
-        "importText": "The {{lang}} pack is checked and taken into the translation base. CIG lines stay untouched.",
+        "importText": "The {{lang}} pack is checked in the background and taken into the translation base. CIG lines stay untouched.",
         "importLocked": "Only possible once the licence is clear (licensed or permitted).",
-        "importResult": "Import result",
-        "imported": "{{name}}: {{count}} lines imported.",
-        "synced": "Synced: {{checked}} checked, {{changed}} changed, {{errors}} errors.",
+        "importStarted": "{{name}}: import started. It runs in the background; see \"Background runs\" for its progress.",
+        "synced": "Synced: {{checked}} checked, {{changed}} imports started, {{errors}} errors.",
         "learn": "Learn",
         "learnTitle": "Start the learning step for {{lang}}?",
         "learnText": "Derives terms, style and cards for {{lang}} from the existing data. May cost money.",
-        "learnResult": "Learning step result",
+        "learnStarted": "Learning step for {{lang}} started. It runs in the background; see \"Background runs\" for its progress.",
         "draft": "Create request draft",
         "drafted": "Draft for {{name}} created – see Requests.",
         "empty": "No sources registered.",
@@ -4041,6 +4528,45 @@
           "awaiting_permission": "Awaiting permission",
           "permitted": "Permitted",
           "refused": "Refused"
+        }
+      },
+      "passes": {
+        "title": "Background runs",
+        "intro": "Import, overlay build and learning run in the background, one step at a time. A step that was cut off is repeated.",
+        "empty": "No runs in the last 7 days.",
+        "cols": {
+          "kind": "Kind",
+          "lang": "Language",
+          "source": "Source",
+          "state": "State",
+          "updated": "Last update"
+        },
+        "kinds": {
+          "seed": "Import",
+          "overlay": "Overlay build",
+          "learn": "Learning"
+        },
+        "status": {
+          "open": "running",
+          "done": "done",
+          "failed": "failed"
+        },
+        "phases": {
+          "start": "Preparing",
+          "fetch": "Loading the pack",
+          "split": "Splitting the pack",
+          "scan": "Walking the texts",
+          "apply": "Writing translations",
+          "arbitrate": "Checking conflicts",
+          "finish": "Finishing",
+          "cleanup": "Cleaning up",
+          "mine": "Collecting terms",
+          "plan": "Evaluating",
+          "insert": "Extending the glossary",
+          "detect": "Finding examples",
+          "submit": "Submitting requests",
+          "assemble": "Writing the overlay",
+          "done": "done"
         }
       },
       "outreach": {
@@ -4104,20 +4630,11 @@
         "saveEdit": "Save text",
         "resolved": "Alert resolved."
       }
-    },
-    "searchMisses": {
-      "title": "Often without hits",
-      "subtitle": "Searches without a single hit, counted anonymously (text and count only).",
-      "query": "Search",
-      "hits": "Count",
-      "last": "Last",
-      "empty": "No search without hits yet.",
-      "retry": "Reload"
     }
   },
   "desktop": {
     "title": "Data Upload",
-    "subtitle": "Download the Data Uploader for your local Star Citizen install.",
+    "subtitle": "Download the Verse Data Uploader for your local Star Citizen install.",
     "bundleHistory": "Bundle History",
     "loading": "Loading release…",
     "released": "Released",
@@ -4133,12 +4650,27 @@
       "label": "Promote this version to",
       "action": "Promote"
     },
-    "appTitle": "Data Uploader",
+    "appTitle": "Verse Data Uploader",
     "appDesc": "Reads your local Star Citizen install and uploads the Codex bundles from it.",
     "close": "Close",
     "access": {
       "fullPage": "Full Data Upload page",
       "note": "Windows only · signs in with your Verse Companion account · uploads data, never code."
+    },
+    "historyEyebrow": "Uploader",
+    "build": {
+      "title": "Latest bundle",
+      "since": "since {{date}}",
+      "quality": "Quality {{q}}",
+      "none": "No active bundle yet."
+    },
+    "steps": {
+      "title": "Setup",
+      "done": "Set up — you have uploaded before.",
+      "doneSr": "done",
+      "s1": "Download and start the uploader",
+      "s2": "Sign in with your Verse Companion account",
+      "s3": "Choose your Star Citizen folder — the uploader reads Data.p4k and uploads the bundles"
     }
   },
   "download": {
@@ -4148,7 +4680,15 @@
       "text": "Imports your RSI hangar into the HQ - for Chrome and Edge.",
       "open": "Install the extension"
     },
-    "subtitle": "Get the Data Uploader for your local Star Citizen install."
+    "subtitle": "Get the Verse Data Uploader for your local Star Citizen install."
+  },
+  "appLink": {
+    "web": "VC Web",
+    "app": {
+      "uploader": "Data Uploader",
+      "starscape": "Starscape",
+      "scc": "VC App"
+    }
   },
   "desktopConnect": {
     "title": "Connect Verse Companion",
@@ -4158,24 +4698,30 @@
     "redirectingHint": "You can close this window in a moment.",
     "errorMissingParams": "Missing callback or state parameter.",
     "errorBadCallback": "Callback URL is not a 127.0.0.1 loopback in the expected port range.",
-    "errorNoToken": "No access token in session."
+    "errorNoToken": "No access token in session.",
+    "retry": "Try again",
+    "handedOver": "Back to the app",
+    "handedOverHint": "The app is taking over your session, you can close this window. If it did not connect, start the connection again in the app."
   },
   "desktopAuth": {
-    "title": "Authorize Data Uploader",
+    "title": "Authorize Verse Data Uploader",
     "authorizing": "Checking your session…",
     "loginRequired": "Sign in first, then confirm the connection.",
     "redirecting": "Authorized. Sending token to the app…",
     "redirectingHint": "You can close this window in a moment.",
-    "unauthorized": "Your account can't use the Data Uploader.",
+    "unauthorized": "Your account can't use the Verse Data Uploader.",
     "unauthorizedHint": "You need collaborator or admin role. Ask an admin.",
     "errorMissingParams": "Missing callback or state parameter.",
     "errorBadCallback": "Callback URL is not a 127.0.0.1 loopback in the expected port range.",
     "errorNoToken": "No access token in session.",
-    "confirmPrompt": "Connect the Data Uploader on port {{port}} to your account?",
-    "confirmHint": "Only confirm if you just started the sign-in from the Data Uploader yourself.",
+    "confirmPrompt": "Connect the Verse Data Uploader on port {{port}} to your account?",
+    "confirmHint": "Only confirm if you just started the sign-in from the Verse Data Uploader yourself.",
     "confirm": "Connect",
     "cancel": "Cancel",
-    "cancelled": "Cancelled — nothing was sent. You can close this window."
+    "cancelled": "Cancelled — nothing was sent. You can close this window.",
+    "retry": "Try again",
+    "handedOver": "Back to the app",
+    "handedOverHint": "The app is taking over your session, you can close this window. If it did not connect, start the connection again in the app."
   },
   "footer": {
     "madeByCommunity": "Made by the Community",
@@ -4241,7 +4787,7 @@
         "title": "In short",
         "noAds": "No advertising, no ad networks.",
         "signIn": "There are exactly two ways to sign in: e-mail address and password, or your Google account. The Google route is optional and does send data to Google.",
-        "noTracking": "No advertising trackers. Product analytics via PostHog (EU) only run if you allow them — off by default.",
+        "noTracking": "No advertising trackers. Product analytics via PostHog (EU) only run if you allow them — off by default. Our own server reports its errors and run times without any personal data.",
         "minimal": "Only the data the features need — nothing is sold or shared for marketing.",
         "euHosting": "Application data is stored in the EU (Supabase, region eu-central-1 / Frankfurt)."
       },
@@ -4279,7 +4825,7 @@
           "statistics": "\"Statistics\" category — the state of the anonymous product analytics (PostHog). Only created if you allow it; withdrawing your consent deletes it immediately."
         },
         "p2": "During a Google sign-in there is briefly one extra entry in session storage (sc.oauth-redirect-qs) so that you land back on the page you came from. It disappears when the tab closes at the latest.",
-        "p3": "If you explicitly authorize one of our desktop tools (data uploader, Starscape), the browser hands your session's access token to the program running locally on your machine (127.0.0.1) — not to a third party, and never via the address bar.",
+        "p3": "If you explicitly authorize one of our desktop tools (Verse Data Uploader, Starscape), the browser hands your session's access token to the program running locally on your machine (127.0.0.1) — not to a third party, and never via the address bar.",
         "p4": "As an installable web app (PWA), a service worker caches static assets on your device for faster loading and offline use — this cache contains no personal data and can be cleared by uninstalling the app or clearing site data."
       },
       "thirdParty": {
@@ -4288,7 +4834,8 @@
         "supabase": "Supabase (database, authentication, file storage) — EU region eu-central-1 (Frankfurt); processes your account and application data on our behalf.",
         "vercel": "Vercel Inc. (hosting, CDN) — delivery of the static app.",
         "google": "Google Sign-In (Google Ireland Limited / Google LLC) — only if you choose to sign in with Google; details in the \"Signing in with Google\" section.",
-        "posthog": "PostHog (product analytics and error diagnostics) — EU cloud (eu.i.posthog.com); captures anonymous usage events, page load times and errors, and only after you consent.",
+        "posthog": "PostHog (product analytics and error diagnostics) — EU cloud; requests go through this site's own address (/ingest). Only after you consent it captures usage events, page load times, dead clicks and heatmaps, and errors. Sessions in which an error occurs are recorded for replay with all inputs masked. If you are signed in, PostHog sees a pseudonymous ID (a salted hash of your account ID) and your role (viewer, collaborator or admin) — never your e-mail address or name.",
+        "posthogServer": "PostHog (server side) — our own server functions report their errors and run times to PostHog (EU cloud), without IP address, user ID or content. This does not depend on your consent because no personal data is involved. The desktop apps forward their crash reports (and usage counts, if you allow it in the app) the same way — tied only to a pre-hashed installation identifier, never to your account.",
         "fonts": "Google Fonts — font files are loaded from Google servers; Google may see your IP address.",
         "rsiMedia": "Images in the Verse news are partly loaded straight from Roberts Space Industries servers (media.robertsspaceindustries.com, theverse.robertsspaceindustries.com) — RSI sees your IP address while they load.",
         "gameApis": "Public Star Citizen data: status.robertsspaceindustries.com and api.star-citizen.wiki (read-only, no account data is sent)."
@@ -4334,7 +4881,7 @@
     "subtitle": "Your personal fleet: ship configurations, component loadouts and role sets — built on the live game data in the Codex.",
     "counts": {
       "owned": "Owned",
-      "wishlist": "Wishlist"
+      "wishlist": "Wishes"
     },
     "flagship": {
       "set": "Set as flagship",
@@ -4352,7 +4899,7 @@
     },
     "status": {
       "owned": "Owned",
-      "wishlist": "Wishlist"
+      "wishlist": "Wishes"
     },
     "add": {
       "title": "Add ship",
@@ -4458,7 +5005,7 @@
       "subtitle": "Sign in to build your fleet — free, invite-based during alpha.",
       "save": {
         "title": "Save your ships",
-        "text": "Keep your whole fleet in one place: owned ships and wishlist, with custom names and notes."
+        "text": "Keep your whole fleet in one place: owned ships and wishes, with custom names and notes."
       },
       "overview": {
         "title": "Fleet overview",
@@ -4540,110 +5087,85 @@
     "open": "Search"
   },
   "telemetry": {
-    "title": "Telemetry & Crash Stats",
-    "subtitle": "Anonymous crash reports and opt-in usage from every desktop client.",
-    "refresh": "Refresh",
-    "loading": "Loading telemetry…",
-    "empty": "No data in this window.",
+    "eyebrow": "Operations",
+    "title": "Telemetry",
+    "subtitle": "What matters right now. The details live in PostHog.",
+    "asOf": "As of",
+    "openPosthog": "Open PostHog ↗",
+    "loading": "Loading telemetry …",
     "errorTitle": "Error",
-    "generatedAt": "Generated",
-    "window": {
-      "7": "Last 7 days",
-      "30": "Last 30 days",
-      "90": "Last 90 days",
-      "label": "Time range",
-      "short": {
-        "7": "7d",
-        "30": "30d",
-        "90": "90d"
-      }
+    "retry": "Try again",
+    "unavailable": "Data from PostHog is not available. The cards only show what is known without PostHog; this is not an all-clear.",
+    "cardUnavailable": "No data available.",
+    "status": {
+      "attention": "{{n}} things need attention",
+      "attentionOne": "1 thing needs attention",
+      "calm": "All quiet, nothing to do",
+      "blind": "No complete picture, PostHog unreachable",
+      "since": "Since your last visit on {{date}}",
+      "firstVisit": "First visit, looking back over the last 7 days"
     },
-    "totals": {
-      "crashes": "Crashes",
-      "usage": "Usage events",
-      "installs": "Installs",
-      "sessions": "Sessions"
+    "level": {
+      "ok": "OK",
+      "warn": "Warning",
+      "error": "Problem",
+      "unknown": "No data"
     },
-    "byVersion": "Crashes by version",
-    "crashesByType": "Crashes by type",
-    "crashesByRole": "By process",
-    "recent": "Recent crashes",
-    "aborts": {
-      "title": "Aborted extractions",
-      "hint": "An aborted P4K extraction cannot be resumed — the scan restarts from zero. Aborted uploads are deliberately not counted here; those simply resume.",
-      "byReason": "By reason",
-      "recent": "Recent aborts",
-      "reason": {
-        "cancelled": "Cancelled by user",
-        "quit": "App quit",
-        "error": "Error"
-      },
-      "col": {
-        "reason": "Reason",
-        "phase": "Phase",
-        "progress": "Progress"
-      }
+    "card": {
+      "quota": "PostHog quota",
+      "errors": "Errors · web, server, desktop",
+      "services": "External services",
+      "usage": "Usage · 7 days",
+      "ai": "AI cost · {{month}}",
+      "desktop": "Desktop apps"
     },
-    "product": {
-      "label": "Product",
-      "scc-app": "Verse Companion App",
-      "data-uploader": "Data Uploader",
-      "all": "All",
-      "starscape": "Starscape"
+    "unit": {
+      "quotaPct": "of the tightest free quota",
+      "newErrors": "new error groups",
+      "servicesDown": "disrupted",
+      "activeUsers": "active users today",
+      "aiCostUsd": "this month",
+      "desktopInstalls": "active installations"
     },
-    "col": {
-      "at": "When",
-      "version": "Version",
-      "role": "Process",
-      "name": "Error",
-      "message": "Message"
+    "forecast": "forecast {{value}}",
+    "barLabel": "{{pct}} % used, {{month}} % of the month elapsed",
+    "sparkLabel": "Active users per day, last 7 days",
+    "badge": {
+      "web": "Web",
+      "server": "Server",
+      "desktop": "Desktop"
     },
-    "products": {
-      "title": "Products side by side",
-      "hint": "Every client in the selected window. Pick a card to scope everything below to that product.",
-      "crashesShort": "crashes",
-      "healthy": "No crashes",
-      "silent": "No data",
-      "lastSeen": "Last seen",
-      "never": "Never reported"
+    "toFeedback": "Turn into feedback",
+    "openFeedback": "Open feedback topic",
+    "quotaFeedback": "Saving proposal as feedback",
+    "upgrade": "Plan in PostHog ↗",
+    "boardWaitingOne": "{{n}} board item waits for an answer",
+    "boardWaitingMany": "{{n}} board items wait for an answer",
+    "calm": {
+      "quotaCalm": "All free quotas are sufficient.",
+      "errorsCalm": "No new errors since your last visit.",
+      "servicesCalm": "All services without findings.",
+      "usageCalm": "No notable movement.",
+      "aiCalm": "No spend so far.",
+      "desktopCalm": "No desktop data in the last 7 days."
     },
-    "detail": {
-      "title": "Details"
+    "link": {
+      "billing": "Billing ↗",
+      "errorTracking": "Errors in PostHog ↗",
+      "serviceHealth": "Services in PostHog ↗",
+      "webAnalytics": "Usage in PostHog ↗",
+      "dashboards": "Dashboards ↗",
+      "llmObservability": "Cost in PostHog ↗",
+      "desktopEvents": "Desktop in PostHog ↗"
     },
-    "byChannel": "By release ring",
-    "usageByMetric": "Usage by event",
-    "channel": {
-      "stable": "Stable",
-      "beta": "Beta",
-      "alpha": "Alpha",
-      "dev": "Dev"
-    },
-    "diagnostics": {
-      "title": "Warnings & errors from uploader logs",
-      "hint": "Data Uploader runs that wrote [warn] or [err] lines to their log – including runs that otherwise finished fine. Unfold a row for the transcript; “Report as topic” opens the feedback panel with a pre-filled topic and the log attached. Nothing is sent until you press send.",
-      "byOutcome": "By outcome",
-      "recent": "Recent runs",
-      "warningsShort": "warn.",
-      "errorsShort": "errors",
-      "reported": "Handed to composer",
-      "noLines": "No transcript was sent.",
-      "report": "Report as topic",
-      "reportHint": "Opens a new feedback topic, pre-filled and with the log attached – editable, not sent yet.",
-      "outcome": {
-        "ok": "Completed",
-        "failed": "Failed",
-        "cancelled": "Cancelled by user",
-        "quit": "App quit"
-      },
-      "kind": {
-        "extract": "Extraction",
-        "skin": "Skin export"
-      },
-      "topic": {
-        "head": "Data Uploader {{version}} ({{ring}}) logged {{warnings}} warning(s) and {{errors}} error(s) during {{kind}} ({{outcome}}) – game {{game}}, OS {{os}}, telemetry event #{{id}}.",
-        "ask": "Please analyse the attached log: find the cause of the warnings/errors, judge whether data is missing or extracted wrongly because of them, and implement a fix in the Data Uploader (data-uploader/) or the Python sidecar (data-uploader/python/sc_extract). If the message is harmless, lower the log level or handle the cause quietly so it stops surfacing as a warning.",
-        "excerpt": "Log excerpt:"
-      }
+    "service": {
+      "claude": "Claude API",
+      "posthog": "PostHog",
+      "supabase": "Supabase",
+      "r2": "Cloudflare R2",
+      "uex": "UEX",
+      "rsi": "RSI",
+      "readme": "readme.io"
     }
   },
   "adminFeedback": {
@@ -4747,7 +5269,15 @@
       "imagesOnly": "Only images can be attached here.",
       "fileTooLarge": "File too large – {{max}} MB per attachment at most.",
       "charCount": "{{used}} of {{max}} characters",
-      "charLimit": "Character limit reached: {{max}} characters per message."
+      "charLimit": "Character limit reached: {{max}} characters per message.",
+      "dictate": "Dictate ({{key}})",
+      "dictateStop": "Stop dictation ({{key}})",
+      "dictateUnsupported": "This browser cannot dictate – Chrome, Edge or Safari can.",
+      "dictateDenied": "No microphone access – please allow it in the browser settings.",
+      "dictateNoMic": "No microphone found.",
+      "dictateNoSpeech": "Nothing heard – please try again.",
+      "dictateNetwork": "Speech recognition unreachable – check your connection.",
+      "dictateFailed": "Dictation did not work – please try again."
     },
     "dashboard": {
       "weekTitle": "This week",
@@ -4981,7 +5511,11 @@
       "more": "More actions"
     },
     "deleteTitle": "Delete message?",
-    "threadsStale": "Replies could not be loaded — some cards may be filed under an outdated state."
+    "threadsStale": "Replies could not be loaded — some cards may be filed under an outdated state.",
+    "guard": {
+      "name": "PostHog-Wächter",
+      "title": "PostHog guard (created automatically)"
+    }
   },
   "feedbackFab": {
     "open": "Open feedback",
@@ -5011,7 +5545,18 @@
       "tab": "Tab",
       "section": "Section",
       "label": "Label",
+      "menuitem": "Menu item",
       "element": "Element"
+    },
+    "area": {
+      "header": "Header",
+      "bar": "Header bar",
+      "footer": "Footer",
+      "navigation": "Navigation",
+      "sidebar": "Sidebar",
+      "dialog": "Dialog",
+      "menu": "Menu",
+      "search": "Search"
     }
   },
   "releaseNotes": {
@@ -5156,7 +5701,7 @@
       },
       "statistics": {
         "label": "Statistics",
-        "desc": "Anonymous usage statistics and anonymous error reports (PostHog, EU servers) to understand which areas get used and where things break. Off by default, no identification, no session recording. Turning this off deletes the stored values."
+        "desc": "Anonymous usage statistics and anonymous error reports (PostHog, EU servers) to understand which areas get used and where things break. Off by default. Signed in, you appear under a pseudonymous ID with your role only — never your name or e-mail; sessions with an error may be recorded with all inputs masked. Turning this off deletes the stored values."
       }
     }
   },
@@ -5172,10 +5717,9 @@
       "all": "All",
       "newest": "Newest",
       "top": "Community top",
-      "mine": "My votes",
-      "mineCount": "My votes · {{n}}",
-      "mineSignedOut": "Sign in to see the wallpapers you voted for",
-      "emptyMine": "You have not voted for a wallpaper yet. Tap the thumbs-up on an image to collect it here."
+      "sammlung": "Collection",
+      "sammlungSignedOut": "Sign in to see your collection",
+      "emptySammlung": "Your collection is still empty. Give an image a thumbs-up and it lands here."
     },
     "lightboxAria": "Wallpaper",
     "source": {
@@ -5227,6 +5771,10 @@
       "cta": "Get it for Windows",
       "note": "Windows only · ~0.3 MB · quit any time from the tray menu",
       "dismiss": "Don't show again"
+    },
+    "stage": {
+      "new": "New",
+      "sammlung": "Collection"
     }
   },
   "userFeedback": {
@@ -5519,7 +6067,7 @@
   "conceptPage": {
     "title": "Concept page",
     "back": "Back to feedback",
-    "openTab": "Open in new tab",
+    "retry": "Try again",
     "loading": "Opening the concept page…",
     "forbidden": "This concept page is only available to admins.",
     "notFound": "This concept page does not exist (any more).",
@@ -5541,7 +6089,11 @@
     "rateLimit": "Too many requests — please wait a moment.",
     "server": "The server reported an error.",
     "generic": "Something went wrong.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "rankTierTooLow": "This opens at tier 5.",
+    "rankIdeaInvalid": "An idea needs 3 to 280 characters.",
+    "rankIdeaLimit": "You already have 3 open ideas.",
+    "rankIdeaGone": "This idea is gone or archived."
   },
   "pageHeader": {
     "crumbsAria": "Breadcrumb",
@@ -5568,50 +6120,55 @@
       "fit": "Fit map",
       "legend": "Legend",
       "legendAria": "Show and hide actions",
-      "shared": "{{place}} also serves the Nachschub \"{{name}}\"",
+      "shared": "{{place}} also serves the Operation \"{{name}}\"",
       "open": "Place open"
     },
     "slots": {
-      "aria": "Nachschub slots",
+      "aria": "Operation slots",
       "finished": "done",
       "einsaetze": "{{n}} Einsätze",
       "einsatzOne": "1 Einsatz",
       "delete": "Delete \"{{name}}\"",
-      "newAria": "New Nachschub in slot {{n}}",
+      "newAria": "New Operation in slot {{n}}",
       "free": "Slot {{n}}",
       "archive": "Archive",
-      "archiveAria": "Archive, {{n}} Nachschübe",
-      "introTitle": "No Nachschub yet",
-      "introText": "Tap a plus and take things from your wishlist with you. They become a Nachschub with Einsätze that you work through step by step in Jetzt.",
-      "newAriaEvent": "New Nachschub in slot {{n}} – event available"
+      "archiveAria": "Archive, {{n}} Operations",
+      "introTitle": "No Operation yet",
+      "introText": "Tap a plus and create an Operation: a group of Einsätze with a goal. You assign your wishes to it and they stay wishes. You work through the Einsätze step by step in Jetzt.",
+      "newAriaEvent": "New Operation in slot {{n}} – event available"
     },
     "remove": {
       "titleRemove": "Delete \"{{name}}\"?",
       "titleEmpty": "Empty \"{{name}}\"?",
-      "msgRemove": "The Nachschub goes away. Open positions: {{n}}.",
-      "msgEmpty": "The Nachschub stays, its open positions leave it. Open positions: {{n}}.",
-      "back": "Open positions back onto the wishlist",
-      "backOn": "They are counted up on the wishlist.",
-      "backOff": "They are dropped for good.",
+      "msgRemove": "The Operation goes away. Open positions: {{n}}.",
+      "msgEmpty": "The Operation stays, its open positions leave it. Open positions: {{n}}.",
+      "back": "Wishes stay on the wishlist",
+      "backOn": "Wishes from the Operation stay on your wishlist and become free again. Other open positions are added as wishes.",
+      "backOff": "Wishes from the Operation are also deleted from your wishlist; other open positions are dropped.",
       "confirmRemove": "Delete",
       "confirmEmpty": "Empty"
     },
     "archive": {
-      "slotFree": "A slot is free, you can bring a Nachschub back.",
-      "empty": "Nothing in the archive yet. A finished Nachschub moves here by itself and frees its slot.",
+      "slotFree": "A slot is free, you can bring an Operation back.",
+      "empty": "Nothing in the archive yet. A finished Operation moves here by itself and frees its slot.",
       "reactivate": "Reactivate",
+      "remove": "Delete",
+      "removeAria": "Delete Operation \"{{name}}\"",
+      "removeTitle": "Delete \"{{name}}\"?",
+      "removeMsg": "This Operation is in the archive and holds only finished work. It is deleted. Your wishlist and the seven slots stay as they are.",
+      "removeConfirm": "Delete",
       "close": "Close"
     },
     "flow": {
-      "titleNew": "New Nachschub",
-      "titleEdit": "Edit Nachschub",
+      "titleNew": "New Operation",
+      "titleEdit": "Edit Operation",
       "slotOf": "Slot {{n}} of {{max}}",
       "stepsAria": "Steps",
       "step": {
         "1": "Select",
         "2": "Einsätze"
       },
-      "emptyWish": "Your wishlist is empty.",
+      "emptyWish": "Make a wish",
       "all": "Take everything",
       "none": "Take nothing",
       "picked": "{{n}} positions · {{p}} pieces",
@@ -5624,10 +6181,10 @@
       "qtyOf": "Quantity of {{name}}",
       "less": "Take fewer",
       "more": "Take more",
-      "nameLabel": "Name of the Nachschub",
-      "alreadyIn": "Already in the Nachschub",
+      "nameLabel": "Name of the Operation",
+      "alreadyIn": "Already in the Operation",
       "forBp": "for {{name}}",
-      "removeLine": "Take \"{{name}}\" out of the Nachschub",
+      "removeLine": "Take \"{{name}}\" out of the Operation",
       "einsaetze": "Einsätze",
       "einsatzCount": "{{n}} Einsätze · {{s}} steps",
       "noNewLines": "No new positions, so no new Einsätze.",
@@ -5656,22 +6213,22 @@
       "haveEinsaetze": "Already planned",
       "back": "Back",
       "next": "Next",
-      "create": "Create Nachschub",
+      "create": "Create Operation",
       "saveEdit": "Save",
       "close": "Close",
       "namePlaceholder": "Leave empty to get a suggestion",
-      "wishTitle": "Wishlist",
-      "emptyHintSearch": "Search above for what you need and put it on the wishlist.",
+      "wishTitle": "Wishes",
+      "emptyHintSearch": "Search above for what you need and make it a wish.",
       "search": {
-        "label": "More for the wishlist",
+        "label": "More for your wishes",
         "placeholder": "Search an item, ship or material",
         "searching": "Searching …",
         "none": "Nothing found.",
         "results": "Search results",
-        "onList": "on the wishlist",
-        "add": "To the wishlist",
-        "addAria": "Put “{{name}}” on the wishlist",
-        "addFailed": "That could not be put on the wishlist. Try again."
+        "onList": "among your wishes",
+        "add": "Add to wishes",
+        "addAria": "Add “{{name}}” to your wishes",
+        "addFailed": "That could not be added to your wishes. Try again."
       },
       "craft": {
         "aria": "What crafting {{name}} takes",
@@ -5686,11 +6243,18 @@
       }
     },
     "panel": {
-      "renameAria": "New name of the Nachschub",
+      "plain": {
+        "one": "1 position is not a wish yet.",
+        "other": "{{count}} positions are not wishes yet.",
+        "ask": "Created before the rebuild. Should they stand as wishes on your wishlist?",
+        "adopt": "Keep as wishes",
+        "keep": "Leave as is"
+      },
+      "renameAria": "New name of the Operation",
       "rename": "Change name",
       "positions": "positions",
       "edit": "Edit",
-      "noEinsaetze": "This Nachschub has no Einsätze yet.",
+      "noEinsaetze": "This Operation has no Einsätze yet.",
       "noEinsaetzeHint": "The positions turn into Einsätze: buy, mine, missions, crafting last.",
       "proposeEinsaetze": "Propose Einsätze",
       "einsaetze": "Einsätze",
@@ -5701,19 +6265,19 @@
       "places": "{{n}} places"
     },
     "run": {
-      "aria": "Nachschub that Jetzt runs",
+      "aria": "Operation that Jetzt runs",
       "for": "for",
       "stepOf": "Step {{n}} of {{total}}",
-      "switch": "Switch Nachschub",
-      "emptyTitle": "No Nachschub in progress",
+      "switch": "Switch Operation",
+      "emptyTitle": "No Operation in progress",
       "toPlanen": "Go to Planen",
       "finish": "Step done",
       "sharedStop": "This place also serves \"{{name}}\".",
       "doneKicker": "All ticked off",
       "allDone": "All steps of this Einsatz are done.",
-      "allDoneHint": "Pick another Einsatz of the Nachschub or switch the Nachschub.",
-      "einsaetze": "Einsätze of this Nachschub",
-      "archived": "Finished: this Nachschub sits in the archive, its Einsätze keep running here. Reactivate it under Planen › Archive."
+      "allDoneHint": "Pick another Einsatz of the Operation or switch the Operation.",
+      "einsaetze": "Einsätze of this Operation",
+      "archived": "Finished: this Operation sits in the archive, its Einsätze keep running here. Reactivate it under Planen › Archive."
     },
     "ticker": {
       "none": "no event yet",
@@ -5746,7 +6310,7 @@
       "used48": "last 48 h",
       "catchUp": "Catch up",
       "catchUpAll": "Catch up on all",
-      "catchUpOne": "\"{{name}}\" to the wishlist",
+      "catchUpOne": "\"{{name}}\" to your wishes",
       "addItem": "Add an entry by hand",
       "addShip": "Add a ship",
       "addShipLabel": "Name of the ship",
@@ -5764,8 +6328,8 @@
       "range": "{{from}}–{{to}} of {{total}}",
       "prev": "Previous page",
       "next": "Next page",
-      "hintWish": "on the wishlist: {{n}}",
-      "hintNachschub": "in the Nachschub \"{{name}}\"",
+      "hintWish": "among your wishes: {{n}}",
+      "hintNachschub": "in the Operation \"{{name}}\"",
       "bpPick": {
         "hint": "Pick from the Codex so materials and the Codex page match.",
         "label": "Search blueprint",
@@ -5836,7 +6400,7 @@
           "ground": "Ground vehicle",
           "multirole": "Multi-role"
         },
-        "wishCount": "{{n}} on the wishlist",
+        "wishCount": "{{n}} among your wishes",
         "artAria": "Kind",
         "art": {
           "blueprints": "Blueprints",
@@ -5849,7 +6413,7 @@
         "baysAria": "Loading bays by place",
         "byQuality": "{{name}} by quality",
         "resSummary": "{{qty}} at {{n}} places",
-        "toWishlist": "Add to wishlist",
+        "toWishlist": "Add to wishes",
         "bandTip": "Q {{from}}–{{to}}: {{qty}}, {{res}} of it reserved",
         "qUnknown": "Q ?",
         "qUnknownLong": "Quality unknown",
@@ -5874,7 +6438,7 @@
         },
         "pickup": "Plan pick-up",
         "alsoIn": "Also in your storage",
-        "inCodex": "In the Codex: “{{q}}” – onto the wishlist",
+        "inCodex": "In the Codex: “{{q}}” – to your wishes",
         "setItems": "{{n}} pieces",
         "addSet": "Create set",
         "setName": "Set name",
@@ -5912,7 +6476,7 @@
         "reserveLabel": "For whom or what?",
         "reserveNeedsNote": "A reservation needs a purpose.",
         "codexTier": "Also in the Codex",
-        "onWishlist": "On the wishlist",
+        "onWishlist": "Among your wishes",
         "rsv": {
           "title": "Reserve",
           "titleEdit": "Edit reservation",
@@ -5958,8 +6522,8 @@
       }
     },
     "nachschub": {
-      "slotsFull": "All 7 Nachschub slots are in use. Finish or delete one to free a slot.",
-      "nothingPicked": "Pick at least one item from the wishlist.",
+      "slotsFull": "All 7 Operation slots are in use. Finish or delete one to free a slot.",
+      "nothingPicked": "Pick at least one item from your wishes.",
       "sellGoalInvalid": "Enter a goal of at least 1 aUEC.",
       "target": {
         "minQ": "min. Q {{q}}",
@@ -5971,12 +6535,12 @@
         },
         "lead": "{{n}} item(s) from your storage",
         "where": "Where to",
-        "new": "New Nachschub",
-        "newSell": "New Nachschub: make money",
+        "new": "New Operation",
+        "newSell": "New Operation: make money",
         "append": "Add to \"{{name}}\"",
         "goal": "Goal in aUEC",
         "goalPlaceholder": "e.g. 1,500,000",
-        "create": "Create Nachschub",
+        "create": "Create Operation",
         "add": "Add",
         "sellName": "Make money",
         "scu": "SCU",
@@ -5988,8 +6552,8 @@
         "einsatzMany": "Pick up"
       },
       "sellForm": {
-        "kindAria": "What is the Nachschub for?",
-        "wish": "From the wishlist",
+        "kindAria": "What is the Operation for?",
+        "wish": "From your wishes",
         "sell": "Make money",
         "goal": "Goal in aUEC",
         "goalPlaceholder": "e.g. 1,500,000",
@@ -6024,12 +6588,16 @@
       "done": {
         "created": "\"{{name}}\" is created.",
         "undone": "Undone.",
-        "reactivated": "Nachschub is active again.",
-        "emptied": "Nachschub emptied.",
-        "removed": "Nachschub deleted.",
-        "added": "Added to the Nachschub.",
+        "reactivated": "Operation is active again.",
+        "plainAdopted": "{{count}} positions are now wishes on your wishlist.",
+        "plainKept": "{{count}} positions stay as they are.",
+        "emptied": "Operation emptied.",
+        "removed": "Operation deleted.",
+        "added": "Added to the Operation.",
         "lineRemoved": "Position removed.",
-        "edited": "Nachschub saved."
+        "edited": "Operation saved.",
+        "wishRemoved": "Removed {{count}} × {{name}} from the wishlist.",
+        "released": "Released {{name}} from the Operation."
       },
       "rec": {
         "reason": {
@@ -6054,12 +6622,16 @@
           "buy": "Buy"
         }
       },
-      "linesFull": "Your Nachschub list is full (100 positions). Remove some positions first, then the wishlist can move in.",
-      "partial": "{{count}} positions stayed behind: your Nachschub list is full.",
-      "wishlistFailed": "The wishlist could not be changed. Nothing was moved.",
-      "wishCapped": "{{count}} units no longer fit on the wishlist (999 per entry at most) and are lost.",
-      "gone": "This Nachschub no longer exists (deleted on another device). The view is refreshing.",
-      "capReached": "You reached the limit of stored Nachschübe. Delete old ones from the archive and it works again."
+      "linesFull": "Your Operation is full (100 positions). Remove some positions first, then you can assign more.",
+      "partial": "{{count}} positions stayed behind: your Operation is full.",
+      "wishlistFailed": "Your wishes could not be changed. Nothing was moved.",
+      "plainGone": "These positions were already answered on another device. The view is refreshing.",
+      "wishCapped": "{{count}} units no longer fit among your wishes (999 per entry at most) and are lost.",
+      "gone": "This Operation no longer exists (deleted on another device). The view is refreshing.",
+      "capReached": "You reached the limit of stored Operations. Delete old ones from the archive and it works again.",
+      "nothingFree": "Every piece of this wish is already assigned to an Operation.",
+      "splitInvalid": "The split across the Operations does not add up.",
+      "dissolveFailed": "An Operation could not be dissolved and stays."
     },
     "title": "HQ",
     "eyebrow": "Personal area",
@@ -6068,10 +6640,11 @@
       "overview": "Overview",
       "locker": "Sets",
       "hangar": "Hangar",
-      "ops": "Ops"
+      "ops": "Ops",
+      "spots": "Spots"
     },
     "supplies": {
-      "button": "Supplies",
+      "button": "Operations",
       "add": {
         "search": "Search for an item"
       },
@@ -6082,21 +6655,21 @@
       "remove": "Remove {{name}}",
       "sum": "{{open}} open ({{units}} pcs) · {{done}} got",
       "clearDone": "Remove ticked",
-      "buttonAria": "Open supplies ({{count}} entries)",
-      "title": "Supplies",
-      "close": "Close supplies",
-      "empty": "Nothing on the supplies list yet.",
-      "emptyHint": "Search for an item and add it to Supplies: Plan then shows where to get it and how to get there.",
+      "buttonAria": "Open Operations ({{count}} entries)",
+      "title": "Operations",
+      "close": "Close Operations",
+      "empty": "Nothing in your Operations yet.",
+      "emptyHint": "Search for an item and assign it to an Operation: Plan then shows where to get it and how to get there.",
       "tabsAria": "Lists",
       "tabs": {
-        "wish": "Wishlist",
-        "nachschub": "Supplies"
+        "wish": "Wishes",
+        "nachschub": "Operations"
       },
       "wish": {
-        "empty": "Nothing on the wishlist yet.",
-        "emptyHint": "Search for an item or a ship and put it on the wishlist. From here it moves to Supplies with one click.",
-        "toNachschub": "To Supplies",
-        "remove": "Take {{name}} off the wishlist",
+        "empty": "Make a wish",
+        "emptyHint": "Search for an item or a ship and make it a wish. From here you assign it to an Operation with one click.",
+        "toNachschub": "Assign to an Operation",
+        "remove": "Take {{name}} off your wishes",
         "notYet": "not in the game yet"
       },
       "got": "Got it",
@@ -6107,6 +6680,21 @@
         "store": "Put down",
         "tickOnly": "Just tick off"
       }
+    },
+    "spots": {
+      "title": "Spots",
+      "subtitle": "Your saved places from the desktop app. Rename or delete them here; the app picks the change up on its next sync.",
+      "loading": "Loading your spots …",
+      "empty": "No spots yet. Spots are created in the desktop app (Verse Navigation); once synced, they show up here.",
+      "retry": "Try again",
+      "nameLabel": "Spot name",
+      "save": "Save",
+      "cancel": "Cancel",
+      "rename": "Rename",
+      "delete": "Delete",
+      "created": "Created {{date}}",
+      "deleteTitle": "Delete this spot?",
+      "deleteMessage": "\"{{name}}\" will be removed from all your devices."
     },
     "ops": {
       "title": "Ops",
@@ -6120,9 +6708,9 @@
       "noVariant": "Stock loadout",
       "activeSet": "Active set",
       "nextOps": "Next ops",
-      "suppliesPreview": "Supplies",
+      "suppliesPreview": "Operations",
       "opsOpen": "Open ops",
-      "suppliesOpen": "Open supplies",
+      "suppliesOpen": "Open Operations",
       "opsEmpty": "No ops planned yet.",
       "suppliesEmpty": "Nothing to fetch.",
       "noShip": "No ship in your hangar yet.",
@@ -6203,9 +6791,9 @@
       },
       "planen": {
         "empty": "Nothing planned yet",
-        "emptyHint": "Your Nachschub turns into an Einsatz.",
+        "emptyHint": "An Operation turns into an Einsatz.",
         "count": "{{n}} open",
-        "needs": "{{n}} in supplies",
+        "needs": "{{n}} in Operations",
         "open": "Open planning"
       },
       "stats": {
@@ -6236,7 +6824,6 @@
     "log": {
       "undo": "Undo",
       "title": "Log",
-      "close": "Close",
       "empty": "No events yet.",
       "showAll": "Show all",
       "more": "Load more",
@@ -6402,7 +6989,6 @@
       "loading": "Loading statistics …",
       "zero": "Nothing recorded in this range.",
       "details": "Details",
-      "close": "Close",
       "day": "Day",
       "week": "Week",
       "tile": {
@@ -6519,7 +7105,7 @@
         "noMatch": "Nothing matches these filters.",
         "empty": "Nothing in your inventory yet.",
         "ships": "Ships at terminal",
-        "onWishlist": "To the wishlist"
+        "onWishlist": "Add to wishes"
       },
       "retry": "Try again",
       "destroyed": "Last destroyed: {{at}}",
@@ -6627,6 +7213,7 @@
     },
     "app": {
       "launch": "Start app",
+      "launchNow": "Start now",
       "starting": "Starting the app …",
       "started": "The app is starting. Sign in there and your data will come through here.",
       "downloading": "App not found: the download is running now (about 500 MB). Run the setup afterwards.",
@@ -6635,7 +7222,7 @@
       "download": "Download app",
       "downloadCta": "Download app",
       "downloadStarted": "The download is running (about 500 MB). Run the setup afterwards.",
-      "tipDownload": "Downloads the installer right away. If the app is already installed, start it once: as soon as it connects, this says “Start app”. You can always find it again under Apps at the top right.",
+      "tipDownload": "Downloads the installer right away. If the app is already installed, start it once: as soon as it connects, you start it from here. You can always find it again under Apps at the top right.",
       "tipLaunch": "Opens the app on your PC. If it does not answer, the download starts. You can always find it again under Apps at the top right.",
       "close": "Close"
     },
@@ -6693,12 +7280,12 @@
       "pick": {
         "title": "Events",
         "hint": "Running events you have not finished – choose the rewards you want to get.",
-        "sightseeing": "No reward – as a sightseeing Nachschub."
+        "sightseeing": "No reward – as a sightseeing Operation."
       },
       "draft": {
         "area": "The event area instead of a fixed place"
       },
-      "severalHint": "Several events in one Nachschub work, but are not recommended.",
+      "severalHint": "Several events in one Operation work, but are not recommended.",
       "doneTag": "Done",
       "abort": "Abort",
       "complete": "Event done",
@@ -6723,7 +7310,8 @@
         "cargo-ship": "Cargo ship",
         "mining-ship": "Mining ship",
         "medical-ship": "Medical ship",
-        "any-ship": "Any ship"
+        "any-ship": "Any ship",
+        "none": "None"
       },
       "progress": {
         "title": "Progress",
@@ -6760,14 +7348,14 @@
         "confirm": "Claim"
       },
       "offer": {
-        "area": "You are in the area of {{event}}. Switch to this Nachschub?",
-        "ac": "Arena Commander is running – fits {{event}}. Switch to this Nachschub?",
+        "area": "You are in the area of {{event}}. Switch to this Operation?",
+        "ac": "Arena Commander is running – fits {{event}}. Switch to this Operation?",
         "switch": "Switch",
         "notNow": "Not now"
       },
       "abortDialog": {
         "title": "Abort {{name}}?",
-        "message": "Progress stays saved and nothing goes back to the wishlist. You can resume the event from the archive any time."
+        "message": "Progress stays saved and nothing goes back to your wishes. You can resume the event from the archive any time."
       }
     },
     "appStatus": {
@@ -6787,7 +7375,7 @@
         "start": "With the app you see here, live, where you are, what you fly and what comes next.",
         "inventar": "The app reads your inventory and your ships from the game. You type nothing in.",
         "jetzt": "The app reports where you are right now and ticks off steps by itself:",
-        "planen": "The app notices when a Nachschub line arrives and closes it.",
+        "planen": "The app notices when a line of your Operation arrives and closes it.",
         "statistik": "The app counts along while you play: playtime, sessions, missions and losses. Without it this page stays empty.",
         "jetztList": {
           "e1": "Your location and ship, e.g. \"Stanton › New Babbage\".",
@@ -6795,6 +7383,26 @@
           "e3": "The latest events, e.g. \"Mission completed\" or \"Quantum jump finished\"."
         }
       }
+    },
+    "logbook": {
+      "title": "Logbook",
+      "loading": "Loading the logbook …",
+      "retry": "Try again",
+      "empty": "No game session yet. Connect the SCC App and every session shows up here as a card.",
+      "emptyLinked": "No game session recorded in the last 30 days.",
+      "jumps": "Quantum jumps",
+      "contracts": "Contracts",
+      "auec": "aUEC balance",
+      "losses": "Losses",
+      "lossesSub": "{{deaths}} deaths · {{ships}} ships destroyed · {{claims}} insurance claims",
+      "end": {
+        "noQuit": "Ended without a quit (crash or app closed)",
+        "live": "Running now"
+      },
+      "showAll": "Show all {{n}} sessions",
+      "note": "Sessions of the last {{days}} days from the SCC App. The aUEC balance is sells minus buys.",
+      "durH": "{{h}} h {{m}} min",
+      "durM": "{{m}} min"
     }
   },
   "verse": {
@@ -6972,7 +7580,6 @@
       }
     },
     "gallery": {
-      "mine": "My star maps",
       "connected": "Starscape connected",
       "share": "Share gallery",
       "heroTitle": "Starscape brings the gallery to your desktop",
@@ -6999,9 +7606,12 @@
       "hqEventOne": "{{name}} is on · 1 day left",
       "hqEventToday": "{{name}} is on · ends today",
       "hqEventOpen": "{{name}} is on",
-      "hqSupplies": "{{n}} open Nachschübe",
-      "hqSuppliesOne": "1 open Nachschub",
+      "hqSupplies": "{{n}} open Operations",
+      "hqSuppliesOne": "1 open Operation",
       "hqCalm": "All quiet at HQ",
+      "admin": "Admin station",
+      "adminValue": "Straight to the admin hub",
+      "adminHint": "visible to admins only",
       "newsEmpty": "No news right now.",
       "patchesEmpty": "No patch notes yet.",
       "patchTitle": "Star Citizen Alpha {{v}}",
@@ -7032,21 +7642,19 @@
     "sun": {
       "faded": {
         "aria": "Sun: faded",
-        "tip": "The sun is faded. Set your patch tip below on the day {{patch}} goes LIVE – land within ±2 days and the sun lights up."
+        "tip": "The sun is faded. Set your patch tip below on the day {{patch}} goes LIVE – land within ±1 day and the sun lights up."
       },
       "tipped": {
         "aria": "Sun: patch tip set, waiting for the LIVE day",
-        "tip": "Your patch tip is set: the sun glows until {{patch}} goes LIVE. Land within ±2 days and it lights up."
+        "tip": "Your patch tip is set: the sun glows until {{patch}} goes LIVE. Land within ±1 day and it lights up."
       },
       "hit": {
         "aria": "Sun: lit",
-        "tip": "Hit: your patch tip landed at most 2 days from the LIVE day, the sun is lit."
+        "tip": "Hit: your patch tip landed at most 1 day from the LIVE day, the sun is lit."
       }
     },
     "export": {
       "wallpaper": "Download wallpaper (4K)",
-      "busy": "Rendering …",
-      "gallery": "My star maps",
       "failed": "The wallpaper could not be created. Please try again."
     },
     "task": {
@@ -7139,9 +7747,6 @@
       }
     },
     "kartograph": {
-      "title": "Cartographer",
-      "rank": "Rank {{rank}}",
-      "perks": "Early access to beta features, suggestions for the top list and a badge you can share as a public link.",
       "locked": "Collect stars to unlock the cartographer rank."
     },
     "community": {
@@ -7152,14 +7757,15 @@
     },
     "suns": {
       "title": "Sun collection",
-      "none": "No sun yet. Place your patch tip in Patch News."
+      "none": "No sun yet. Place your comet tip on the star map.",
+      "small": "Small sun",
+      "splinter": "Splinter {{n}} of {{per}}"
     },
     "glyph": {
       "aria": "Star map: {{lit}} of {{total}} stars"
     },
     "gallery": {
       "title": "My star maps",
-      "subtitle": "Every completed star map lands here automatically.",
       "empty": "No star map completed yet.",
       "toMap": "Go to the star map",
       "appHint": "The last 7 are in the Starscape app as well.",
@@ -7179,28 +7785,6 @@
       "invalid": "This badge link is incomplete.",
       "toVerse": "Go to the Verse"
     },
-    "suggest": {
-      "title": "Suggest a top item",
-      "url": "Link (https://… or a path like /verse/patches/4.4)",
-      "note": "Why? (optional)",
-      "submit": "Send suggestion",
-      "sent": "Thanks! Your suggestion is with the admin team.",
-      "status": {
-        "open": "open",
-        "pinned": "pinned",
-        "dismissed": "not taken"
-      },
-      "admin": {
-        "title": "Cartographer suggestions",
-        "empty": "No open suggestions.",
-        "promote": "Pin",
-        "dismiss": "Dismiss",
-        "promoteTitle": "Pin suggestion",
-        "promoteMessage": "The link {{url}} appears as a pin in the briefing's top list.",
-        "pinTitle": "Pin title",
-        "promoted": "Pinned."
-      }
-    },
     "map": {
       "title": "Star map {{patch}}",
       "subtitle": "{{total}} stars · the shape gives away a new ship",
@@ -7213,12 +7797,11 @@
     },
     "tour": {
       "open": "How the star map works",
-      "title": "The star map and the Logbook",
-      "p1": "Every patch has one star map of 7 stars. Each task you finish lights one.",
-      "p2": "Two challenges sit on the rim: the patch tip and recognising the star map.",
-      "p3": "The Logbook holds the community sky, your Kartograph rank and the series rewards.",
+      "title": "How the star map works",
+      "p1": "Every patch has one star map of 7 stars. Each task you finish lights one; once all 7 shine, the shape shows a ship and the map joins your collection.",
+      "p2": "Two challenges sit under the dome: the comet tip for the LIVE day of the next patch, and recognising the ship behind the shape.",
+      "p3": "Lit stars raise your Kartograph rank. The crest top right opens your rank page with the series, its rewards and the wallpapers.",
       "start": "Show me",
-      "close": "Close",
       "back": "Back",
       "next": "Next",
       "done": "Done",
@@ -7226,33 +7809,31 @@
       "step": {
         "stage": {
           "title": "The dome",
-          "text": "The star map of the selected patch. Lit stars are finished tasks; the pulsing one is the suggested next."
+          "text": "The star map of the selected patch. Lit stars are finished tasks, the pulsing one is the suggested next, hollow rings are still open. Click a star to see its task. From 3 stars you also shine in this patch's community sky: brighter stars mean more explorers lit them."
         },
-        "count": {
-          "title": "Shape and rank",
-          "text": "The caption names the shape of this map and your Kartograph rank. The crests below show the ranks behind and ahead of you; your current crest opens your badge."
+        "patch": {
+          "title": "Pick a patch",
+          "text": "Top left you switch to the star map of an earlier patch. Every map stays, even long after its patch went LIVE."
         },
-        "tracks": {
-          "title": "The two challenges",
-          "text": "Give your patch tip for the next LIVE day and guess which ship the star map shows."
+        "comet": {
+          "title": "The comet",
+          "text": "Tip the day the next patch goes LIVE. Hit it and the comet lights a sun for your sun collection and a star on the map."
         },
-        "series": {
-          "title": "The series",
-          "text": "Your streak across patches - rewards unlock along it."
+        "guess": {
+          "title": "Guess the shape",
+          "text": "Guess which ship the star map shows. A hit earns a star; afterwards the shape's name sits under the dome."
         },
-        "more": {
-          "title": "The Logbook",
-          "text": "Opens the side sheet: community star map, suns, Kartograph rank, suggestions and rewards."
+        "rank": {
+          "title": "Your Kartograph rank",
+          "text": "Every lit star moves your rank on: tiers at 1, 3, 7, 12, 18, 26 and 35 stars, from Observer to Keeper of the Atlas. Each unlocks something, from the shareable badge and companions to the amber tint and crest details from tier 5. Your series, its rewards and every wallpaper format live on the rank page."
         }
-      }
+      },
+      "eyebrow": "Star map"
     },
     "more": {
-      "open": "Logbook",
-      "title": "Logbook",
-      "rewards": "Series rewards"
+      "title": "Extras"
     },
     "card": {
-      "close": "Close",
       "eyebrowDone": "Star {{n}} · lit",
       "eyebrowNext": "Star {{n}} · suggested next",
       "eyebrowOpen": "Star {{n}} · open",
@@ -7272,7 +7853,9 @@
     "comet": {
       "kind": "Patch tip",
       "ruleAria": "Patch tip rules",
-      "rule": "Tip the day {{patch}} goes LIVE – one click on a day sets your patch tip, one tip per patch. Land within ±2 days and the sun lights up top right in the sky. Tips close once {{patch}} is LIVE or the LIVE date was officially announced.",
+      "rule": "Tip the day {{patch}} goes LIVE – one click on a day sets your patch tip, one tip per patch. Land within ±1 day and the comet lights a sun for your collection on the rank page. Tips close once {{patch}} is LIVE or the LIVE date was officially announced.",
+      "ruleVersion": "Tip the day {{patch}} goes LIVE – one tip per patch. Tips close once {{patch}} is LIVE or its LIVE date was officially announced. The patch star only comes with the line tip.",
+      "noTip": "There is currently no patch tip – CIG has not announced another patch.",
       "state": {
         "none": "open",
         "tipped": "set · waiting for LIVE",
@@ -7293,7 +7876,14 @@
       "earlier": "Earlier days",
       "later": "Later days",
       "dayAria": "Set patch tip on {{date}}",
-      "undoToast": "Patch tip for {{patch}} set: {{date}}"
+      "undoToast": "Patch tip for {{patch}} set: {{date}}",
+      "source": {
+        "ptu": "recognised from the PTU",
+        "eptu": "recognised from the EPTU",
+        "evocati": "recognised from Evocati patch notes",
+        "derived": "derived"
+      },
+      "splinterNote": "A hit earns a sun splinter."
     },
     "guess": {
       "kind": "Recognise",
@@ -7315,7 +7905,7 @@
       "foot": {
         "open": "Guess right and the name appears in the star map and the circle gets a check mark.",
         "wrong": "No star this time – the answer stays in the star map.",
-        "unavailable": "Once the game data has loaded you can guess here."
+        "unavailable": "No ship to recognise is set for this star map right now. It is picked automatically once the codex has the patch's game data – then you can guess here."
       },
       "undoToast": "Guess placed: {{name}}"
     },
@@ -7338,6 +7928,129 @@
       "current": "Kartograph rank {{rank}} - open your badge",
       "earned": "Kartograph rank {{rank}} - earned",
       "next": "Kartograph rank {{rank}} - still locked"
+    },
+    "rank": {
+      "link": "{{name}} · open your rank page",
+      "none": "No rank yet · how to climb",
+      "news": "New on your rank page"
+    },
+    "celebrate": {
+      "eyebrow": "Constellation complete",
+      "named": "{{name}} shines in the sky",
+      "done": "All 7 stars shine"
+    },
+    "rankPage": {
+      "title": "Rank",
+      "subtitle": "Seven tiers, one star map that grows with you.",
+      "standingAria": "Your current rank and star map",
+      "current": "Your rank",
+      "unranked": "No rank yet",
+      "unrankedMeaning": "Light your first star on a star map and you enter the ladder as an Observer.",
+      "count": "{{n}} stars lit",
+      "countOne": "1 star lit",
+      "progressAria": "Progress to {{name}}",
+      "toNext": "{{n}} more stars to {{name}}",
+      "toNextOne": "1 more star to {{name}}",
+      "top": "Highest tier reached. Every further star still joins your sky.",
+      "perks": "Your rank opens early access to beta features, item suggestions and the rank rewards below.",
+      "mapOpen": "Open your star map large",
+      "mapAlt": "Your star map: the constellations of your patches in one night sky",
+      "mapNone": "Light your first star on the star map and your sky appears here.",
+      "mapCaption": "Your star map",
+      "mapUpdates": "Updates itself with every rank you climb.",
+      "downloadPhone": "Phone wallpaper",
+      "downloadUltrawide": "Ultrawide (5120 × 1440)",
+      "downloadLocked": "Light your first star to download your sky as a wallpaper.",
+      "ladderTitle": "The seven tiers",
+      "at": "from {{n}} stars",
+      "atOne": "from 1 star",
+      "new": "New",
+      "state": {
+        "earned": "reached",
+        "current": "your current tier",
+        "locked": "not reached yet"
+      },
+      "rewardsTitle": "Rank rewards",
+      "rewardsLead": "Each tier adds something to your sky. All formats are open from tier 1; the tiers change what your wallpaper shows and how it looks.",
+      "rewardFrom": "from {{name}}",
+      "reward": {
+        "wallpaper": {
+          "title": "Wallpaper in every format",
+          "desc": "Your sky as a wallpaper: 4K (3840 × 2160), phone portrait and ultrawide (5120 × 1440)."
+        },
+        "badge": {
+          "title": "Shareable badge",
+          "desc": "Your crest and newest star map as a public link for friends."
+        },
+        "companions": {
+          "title": "Companions",
+          "desc": "The constellations of your older patches glow faintly as companions in your sky."
+        },
+        "tint": {
+          "title": "Amber tint",
+          "desc": "Your own constellation, its glow and the veil behind it turn a warm amber."
+        },
+        "frame": {
+          "title": "Survey ring",
+          "desc": "A second, dotted ring around your crest, everywhere it appears."
+        },
+        "deepfield": {
+          "title": "Deep field",
+          "desc": "A nebula glows behind every wallpaper you download."
+        },
+        "orbit": {
+          "title": "Turning rose",
+          "desc": "The star of your crest slowly turns, like a compass on the chart table."
+        }
+      },
+      "seriesTitle": "Series",
+      "extrasTitle": "Badge and reward ideas",
+      "tier": {
+        "observer": {
+          "name": "Observer",
+          "meaning": "Your first star shines on the chart."
+        },
+        "surveyor": {
+          "name": "Surveyor",
+          "meaning": "You measure the sky star by star."
+        },
+        "navigator": {
+          "name": "Navigator",
+          "meaning": "You find your way across several patches."
+        },
+        "cartographer": {
+          "name": "Cartographer",
+          "meaning": "Your stars cover a real stretch of the Verse."
+        },
+        "astrographer": {
+          "name": "Astrographer",
+          "meaning": "About three patches of stars: the late rewards open."
+        },
+        "master": {
+          "name": "Master Cartographer",
+          "meaning": "Few skies are as densely lit as yours."
+        },
+        "keeper": {
+          "name": "Keeper of the Atlas",
+          "meaning": "Your atlas spans years of the Verse."
+        }
+      }
+    },
+    "ideas": {
+      "title": "Reward ideas",
+      "lead": "What should a rank give in future? The team reads the most-voted ideas first.",
+      "label": "Your idea for a new rank reward",
+      "submit": "Send idea",
+      "sent": "Thanks! Your idea is on the list.",
+      "locked": "From tier 5 ({{name}}, {{stars}} stars) you can submit ideas and vote.",
+      "retry": "Try again",
+      "empty": "No ideas yet.",
+      "votes": "Votes: {{count}}",
+      "voteAria": "Vote for this idea, currently {{votes}} votes",
+      "archived": "archived",
+      "archive": "Archive",
+      "archiveTitle": "Archive idea?",
+      "archiveMessage": "\"{{body}}\" disappears from the players' list."
     }
   },
   "beta": {
@@ -7475,7 +8188,7 @@
       },
       "telemetry": {
         "title": "Telemetry",
-        "text": "Usage, products and diagnostics of the desktop apps."
+        "text": "What matters right now: quota, errors, services, usage and cost at a glance."
       },
       "feedback": {
         "title": "Feedback",
@@ -7486,7 +8199,7 @@
         "text": "Manage API tokens for external services."
       },
       "uploader": {
-        "title": "Data Uploader",
+        "title": "Verse Data Uploader",
         "text": "Ingest game data from Data.p4k."
       },
       "translations": {
@@ -7511,7 +8224,7 @@
       "desc": "Your desktop becomes a window into the Verse — a new picture from the gallery every day."
     },
     "uploader": {
-      "name": "Data Uploader",
+      "name": "Verse Data Uploader",
       "desc": "Reads your Star Citizen install and fills the Codex with ships, stats and 3D models."
     },
     "footer": "This is the stable version. Pick Beta and Alpha in the app after logging in — which channels you see depends on your role."
@@ -7519,7 +8232,7 @@
   "appNotice": {
     "aria": "App notice",
     "eyebrow": "App",
-    "close": "Close",
+    "later": "Later",
     "download": "Download",
     "scc": {
       "line": "Verse Companion App for your desktop",
@@ -7534,10 +8247,10 @@
     "hub": {
       "eyebrow": "Apps",
       "title": "Apps",
-      "subtitle": "Everything that runs next to the website: the uploader, Starscape and the browser extension.",
+      "subtitle": "Everything that runs next to the website: the Verse Data Uploader, Starscape and the browser extension.",
       "breadcrumbAria": "Apps",
       "uploader": {
-        "name": "Data Uploader",
+        "name": "Verse Data Uploader",
         "desc": "Reads your Star Citizen install and uploads the data to the Codex."
       },
       "starscape": {
@@ -7560,7 +8273,7 @@
         "gallery": "Gallery",
         "fps": "FPS"
       },
-      "wished": "Wishlist",
+      "wished": "Wishes",
       "needed": "Needed",
       "section": {
         "weapons": "Weapons",
@@ -7640,6 +8353,12 @@
       "setsOne": "in 1 set"
     },
     "row": {
+      "current": "You are here",
+      "variants": "Variants",
+      "variantMine": "My ship",
+      "variantsMore": "+{{n}}",
+      "variantsMoreAria": "{{n}} more variants on the ship page",
+      "variantCurrent": "This variant is open right now",
       "patch": "Patch {{line}}",
       "patchMeta": "Patch note · {{version}}",
       "galleryMeta": "Gallery",
@@ -7664,7 +8383,7 @@
     },
     "signIn": {
       "title": "Sign in?",
-      "message": "Wishlist, inventory and supplies belong to your account. Sign in to save this.",
+      "message": "Wishes, inventory and Operations belong to your account. Sign in to save this.",
       "confirm": "Go to sign-in"
     },
     "done": {
@@ -7812,7 +8531,7 @@
         "t": "\"inventory\" before a word searches only your inventory"
       },
       {
-        "t": "\"wishlist\" before a word searches only your wishlist. Wished items always come first"
+        "t": "\"wishes\" or \"wishlist\" before a word searches only your wishes. Wished items always come first"
       },
       {
         "t": "In the hangar \"patrol\" finds your loadout"
@@ -7825,7 +8544,7 @@
         "t": "Your own hits always come first"
       },
       {
-        "t": "\"missing\" before a word searches only your supplies"
+        "t": "\"missing\" before a word searches only your Operations"
       },
       {
         "t": "The search remembers where you open it"
@@ -7998,11 +8717,10 @@
         "stats": "Comparison numbers"
       },
       "title": "What friends see",
-      "done": "Done",
       "general": "In general",
       "generalHint": "Applies to all friends unless you set something else for one below. Changes are saved at once.",
       "facetHint": {
-        "hangar": "Your ships (including the wishlist), without notes and without configurations.",
+        "hangar": "Your ships (including wishes), without notes and without configurations.",
         "flagship": "The ship you pinned at the top of your hangar.",
         "presence": "Whether you are online right now. Never an exact time.",
         "stats": "Numbers such as ships, sets, missions, active days and Kartograph rank."
@@ -8015,7 +8733,8 @@
       "on": "On",
       "off": "Off",
       "result": "This friend sees:",
-      "nothing": "none of it"
+      "nothing": "none of it",
+      "eyebrow": "Social"
     },
     "teams": {
       "title": "Groups",
@@ -8160,7 +8879,7 @@
       "flagship": "Flagship",
       "hangarHidden": "This friend does not show you their hangar.",
       "hangarEmpty": "The hangar is empty.",
-      "wishlist": "Wishlist",
+      "wishlist": "Wishes",
       "kindSet": "Set",
       "kindVariant": "Variant",
       "kindEinsatz": "Mission",
@@ -8190,8 +8909,8 @@
   },
   "itemPath": {
     "done": {
-      "wishOn": "\"{{name}}\" is on your wishlist",
-      "wishOff": "\"{{name}}\" is off your wishlist",
+      "wishOn": "\"{{name}}\" is among your wishes",
+      "wishOff": "\"{{name}}\" is no longer among your wishes",
       "inventar": "\"{{name}}\" now lies in {{where}}",
       "hangar": "\"{{name}}\" is in your hangar",
       "undone": "Undone",
@@ -8200,23 +8919,26 @@
       "inventarBlueprint": "Blueprint \"{{name}}\" collected",
       "hangarOff": "\"{{name}}\" is out of your hangar",
       "hangarCopy": "You now have {{n}}× \"{{name}}\" in your hangar",
-      "ownWish": "\"{{name}}\" is yours – wish fulfilled",
-      "ownWishLeft": "\"{{name}}\" is yours – {{left}} more on your wishlist"
+      "ownWish": "“{{name}}” is here",
+      "ownWishDetail": "Your wish has come true",
+      "ownWishLeft": "“{{name}}” is here",
+      "ownWishLeftDetail": "One wish has come true, {{left}} still to go"
     },
     "err": {
       "failed": "That did not work. Try again.",
-      "unavailable": "This step does not exist here."
+      "unavailable": "This step does not exist here.",
+      "wishAssigned": "These pieces are assigned to an Operation. Remove them through the dialog."
     },
     "hint": {
       "notYetInGame": "not in the game yet"
     }
   },
   "quick": {
-    "toNachschub": "Into a Nachschub: {{name}}",
-    "wish": "Wishlist",
-    "emptyWish": "Nothing on the wishlist yet.",
-    "allWish": "Whole wishlist · {{n}} items",
-    "allWishOne": "Whole wishlist · 1 item",
+    "toNachschub": "Into an Operation: {{name}}",
+    "wish": "Wishes",
+    "allWish": "All wishes",
+    "allWishCount": "{{n}} wishes",
+    "allWishCountOne": "1 wish",
     "section": {
       "inventar": "Inventory",
       "hangar": "Hangar",
@@ -8236,12 +8958,44 @@
       "news": "News"
     }
   },
+  "wishRemoval": {
+    "title": "Remove {{name}}",
+    "howMany": "How many to remove?",
+    "caption": "These {{n}} pieces go:",
+    "captionOne": "This piece goes:",
+    "barLabel": "Where the pieces go",
+    "free": "{{n}} free",
+    "fromOp": "{{n}} from “{{name}}”",
+    "latest": "assigned last",
+    "of": "of {{n}}",
+    "rowLabel": "Pieces from “{{name}}”",
+    "sum": "{{done}} of {{total}} distributed",
+    "keeps": "“{{name}}” keeps other wishes.",
+    "lastStays": "“{{name}}” has no wish left afterwards. Its {{n}} Einsätze stay.",
+    "lastStaysOne": "“{{name}}” has no wish left afterwards. Its Einsatz stays.",
+    "dissolves": "“{{name}}” has no Einsatz and is dissolved along with it.",
+    "alsoDissolve": "Also dissolve the Operation",
+    "alsoDissolveNamed": "Also dissolve the Operation “{{name}}”",
+    "confirm": "Remove {{n}}",
+    "confirmDissolve": "Remove and dissolve",
+    "toastDissolved": "The Operation was dissolved along with it.",
+    "release": {
+      "title": "Release {{name}} from the Operation?",
+      "text": "The {{n}} pieces stay on your wishlist and become free again.",
+      "textOne": "The piece stays on your wishlist and becomes free again.",
+      "confirm": "Release",
+      "deleteToo": "Also delete from the wishlist"
+    }
+  },
   "cart": {
-    "title": "Wishlist",
-    "summary": "{{n}} items · {{g}} groups",
+    "title":"Wishes",
+    "summary": "{{n}} wishes · {{g}} groups",
+    "summaryOne": "1 wish · 1 group",
+    "summaryOneGroup": "{{n}} wishes · 1 group",
     "close": "Close",
-    "empty": "The wishlist is empty.",
-    "emptyHint": "Put items from the Codex or the search here.",
+    "empty": "Make a wish",
+    "emptyHint": "Every shooting star is a wish. Pick your first one.",
+    "emptyAction": "Find a wish",
     "group": {
       "weapons": "Weapons",
       "armor": "Armor",
@@ -8259,11 +9013,11 @@
     "more": "More",
     "remove": "Remove {{name}}",
     "removeGroup": "Remove group {{name}}",
-    "removed": "{{name}} removed from the wishlist",
-    "removedGroup": "{{name}} removed ({{n}} items)",
+    "removed": "{{name}} removed from your wishes",
+    "removedGroup": "{{name}} removed ({{n}} wishes)",
     "selected": "selected",
     "clear": "Deselect all",
-    "toNachschub": "Into a Nachschub",
+    "toNachschub": "Into an Operation",
     "kind": {
       "ship": "Ship",
       "vehicle": "Vehicle",
@@ -8278,23 +9032,23 @@
     "suggest": {
       "title": "Goes with it",
       "count": "{{n}} suggestions",
-      "add": "to the wishlist",
+      "add": "to your wishes",
       "dismiss": "Do not suggest {{name}}"
     },
-    "slotsFullHint": "All 7 Nachschub slots are in use. The selection goes into an existing Nachschub.",
-    "toExisting": "Into an existing Nachschub",
+    "slotsFullHint": "All 7 Operation slots are in use. The selection goes into an existing Operation.",
+    "toExisting": "Into an existing Operation",
     "open": "Open “{{name}}” in the Codex"
   },
   "pathCtl": {
     "node": {
-      "wish": "Wishlist",
+      "wish": "Wishes",
       "inventar": "Inventory",
       "hangar": "Hangar",
       "sammlung": "Collections"
     },
     "tip": {
-      "wishOff": "Put on the wishlist",
-      "wishOn": "{{qty}}× on the wishlist · open the wishlist",
+      "wishOff": "Add to wishes",
+      "wishOn": "{{qty}}× among your wishes · open wishes",
       "inventarOff": "Put into the inventory",
       "inventarOn": "{{qty}}× in the inventory · show in HQ",
       "hangarOff": "Put into the hangar",
@@ -8303,7 +9057,7 @@
       "sammlungOn": "In the collection · show in HQ"
     },
     "go": {
-      "wish": "To the wishlist",
+      "wish": "Add to wishes",
       "inventar": "Into the inventory",
       "hangar": "Into the hangar",
       "sammlung": "To the collections"
@@ -8316,8 +9070,8 @@
     },
     "less": "Less",
     "more": "More",
-    "openCart": "Open the wishlist",
-    "wishOff": "Not on the wishlist yet.",
+    "openCart": "Open wishes",
+    "wishOff": "Not among your wishes yet.",
     "ownOn": {
       "inventar": "{{n}}× in the inventory",
       "hangar": "In the hangar",
@@ -8336,7 +9090,32 @@
     "whereTitle": "Where is it?",
     "otherPlace": "Other place …",
     "otherPlaceholder": "Enter a place",
-    "store": "Put down"
+    "store": "Put down",
+    "wishAssigned": "{{n}} of them assigned to an Operation",
+    "assign": {
+      "go": "Assign",
+      "title": "Assign to an Operation",
+      "howMany": "How many?",
+      "ofWished": "of {{n}} wished",
+      "ofFree": "of {{n}} free",
+      "newest": "created last",
+      "new": "New Operation",
+      "newHint": "A name is proposed",
+      "loading": "Loading Operationen …",
+      "working": "Assigning …",
+      "slots": "{{used}} of {{max}} slots in use",
+      "planHint": "You plan Einsätze",
+      "inHq": "in the HQ",
+      "progress": "{{done}} of {{total}} Einsätze",
+      "noEinsatz": "No Einsatz planned yet",
+      "line": "{{n}} in Operation “{{name}}”",
+      "moreOne": "+1 more Operation",
+      "more": "+{{n}} more Operations"
+    },
+    "own": {
+      "morePlacesOne": "+1 more place",
+      "morePlaces": "+{{n}} more places"
+    }
   },
   "itemStage": {
     "aria": "Stage: {{name}}",
@@ -8348,7 +9127,7 @@
     "noSilhouette": "no silhouette",
     "noSilhouetteReason": "This build has no silhouette for this item; the preview image stands in.",
     "no3dReason": "This build has no 3D model of this item.",
-    "inNachschub": "Part of the Nachschub “{{name}}”",
+    "inNachschub": "Part of the Operation “{{name}}”",
     "panelAria": "Values and information",
     "tabsAria": "Sections",
     "tab": {
@@ -8367,8 +9146,8 @@
   },
   "blueprintWish": {
     "craftTimes": "How many times to craft",
-    "button": "Material ×{{n}} to the wishlist",
-    "done": "{{n}}× {{name}}: material put on the wishlist"
+    "button": "Material ×{{n}} to your wishes",
+    "done": "{{n}}× {{name}}: material added to your wishes"
   },
   "adminEvents": {
     "eyebrow": "Admin",
@@ -8381,6 +9160,9 @@
     "loading": "Loading …",
     "empty": "No events.",
     "reextract": "Re-evaluate",
+    "backfill": "Evaluate missing",
+    "backfillProgress": "{{n}} data sheets written …",
+    "backfillDone": "Done: {{n}} data sheets written.",
     "col": {
       "field": "Field",
       "value": "Value",

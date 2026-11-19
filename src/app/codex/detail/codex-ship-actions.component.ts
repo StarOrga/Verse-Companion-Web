@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../auth/auth.service';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ShipLinkFormStore } from './ship-link-form.store';
 
 /**
@@ -15,13 +16,16 @@ import { ShipLinkFormStore } from './ship-link-form.store';
 @Component({
   selector: 'sc-codex-ship-actions',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <code class="cls">{{ classNameSlug() }}</code>
+    @if (showClass()) {
+      <code class="cls">{{ classNameSlug() }}</code>
+    }
     @if (spacer()) {
       <span class="tool-spacer"></span>
     }
+    @if (showLinks()) {
     <!-- Deep-link out to the official RSI site. We have no reliable
          per-ship RSI slug (our classNameSlug is not the RSI URL slug),
          so without a pinned link this lands on the official ships
@@ -29,20 +33,21 @@ import { ShipLinkFormStore } from './ship-link-form.store';
          value is attacker-controlled, so it is bound with [href] on a
          plain anchor and nothing else: no innerHTML, no LLM prompt. -->
     @if (links.pledgeLink(); as pledge) {
-      <a class="btn rsi-link" [href]="pledge" target="_blank" rel="noopener noreferrer nofollow">
+      <a scAction tier="secondary" class="rsi-link" [href]="pledge" target="_blank" rel="noopener noreferrer nofollow">
         {{ 'codex.detail.viewOnRsi' | translate }} <span aria-hidden="true">↗</span>
       </a>
     } @else {
-      <a class="btn rsi-link"
+      <a scAction tier="secondary" class="rsi-link"
          href="https://robertsspaceindustries.com/en/pledge/ships?sortField=name&sortDirection=asc"
          target="_blank" rel="noopener noreferrer">
         {{ 'codex.detail.viewOnRsi' | translate }} <span aria-hidden="true">↗</span>
       </a>
     }
     @if (auth.user()) {
-      <button type="button" class="btn quiet" (click)="links.toggle()">
+      <button type="button" scAction tier="secondary" (click)="links.toggle()">
         {{ (links.myPledgeLink() ? 'codex.shipLink.edit' : 'codex.shipLink.add') | translate }}
       </button>
+    }
     }
   `,
   styles: [`
@@ -51,24 +56,6 @@ import { ShipLinkFormStore } from './ship-link-form.store';
     .tool-spacer { flex: 1 1 auto; }
     .err-inline { color: var(--sc-danger); font-size: 0.8rem; }
 
-    /* The page's button (concept section 2, part-02:159), the .btn half of
-       codex-detail's shared .btn/.pin rule. The 48px floor holds for coarse
-       pointers (the mobile gate emulates one); a mouse gets the drawn 24px. */
-    .btn { position: relative; display: inline-flex; align-items: center; gap: 5px;
-      padding: 4px 8px; min-height: 48px;
-      border: 1px solid var(--sc-border); border-radius: 3px;
-      background: color-mix(in srgb, var(--sc-bg-0) 72%, transparent);
-      color: var(--sc-fg-2); font-family: var(--sc-font-display); text-decoration: none;
-      font-size: max(10px, var(--sc-fs-floor)); letter-spacing: 0.12em; text-transform: uppercase;
-      cursor: pointer; }
-    @media (pointer: fine) {
-      .btn { min-height: 24px; }
-    }
-    .btn:hover { color: var(--sc-fg-0);
-      border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0)); }
-    .btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-    .btn:disabled { opacity: 0.38; cursor: not-allowed; }
-    .btn.quiet { text-transform: none; letter-spacing: 0; background: transparent; }
   `],
 })
 export class CodexShipActionsComponent {
@@ -78,4 +65,8 @@ export class CodexShipActionsComponent {
   readonly classNameSlug = input.required<string>();
   /** Classic tool row: a flexible gap pushes the actions to the row's end. */
   readonly spacer = input(false);
+  /** The class name code. Off in the classic head row, which carries only the links (#374). */
+  readonly showClass = input(true);
+  /** The RSI link and the pledge-link action. Off in the classic tool row: they moved up beside the name (#374). */
+  readonly showLinks = input(true);
 }

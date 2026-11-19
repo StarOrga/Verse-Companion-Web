@@ -3,7 +3,7 @@
 import type { PageLayout } from '../../core/layout/page-layout';
 import type { CodexKind } from '../../codex/codex.service';
 import type { StageSearchState } from './shell-chrome.service';
-import { HQ_ROOT, hqHangar, hqLocker, hqOps } from '../../hq/hq-routes';
+import { HQ_ROOT, hqHangar, hqLocker, hqOps, hqSpots } from '../../hq/hq-routes';
 
 /** The admin hub: tiles to Benutzer, Telemetrie and the other admin pages. */
 export const ADMIN_HUB = '/admin/hub';
@@ -135,6 +135,7 @@ export const AREA_SECTIONS: Readonly<Partial<Record<AreaId, readonly AreaSection
     { id: 'locker', labelKey: 'hq.tabs.locker', link: hqLocker, exact: false },
     { id: 'hangar', labelKey: 'hq.tabs.hangar', link: hqHangar, exact: false },
     { id: 'ops', labelKey: 'hq.tabs.ops', link: hqOps, exact: false },
+    { id: 'spots', labelKey: 'hq.tabs.spots', link: hqSpots, exact: false },
   ],
 };
 
@@ -204,11 +205,25 @@ export const STAGE_UNDOCK_PX = 24;
  * (header expanded, search field standing in the scene), 1 = docked (header
  * compressed into the subheader), linear in between and reversible — half
  * scrolled is half docked.
+ *
+ * `snapTravel`: on a page that snaps from its stage to its lower part (native
+ * scroll-snap, `wireSnap`), the morph spans that whole step instead of the first
+ * {@link DOCK_SCROLL_PX}: it runs from {@link DOCK_MORPH_FROM} to {@link DOCK_MORPH_TO}
+ * of the travel, the order of the mock (rounds/05 d5-pb-scroll, 0.1–0.85 s of the
+ * snap), so the header is never done while the page is still gliding.
  */
-export function dockProgress(scrollY: number): number {
+export function dockProgress(scrollY: number, snapTravel: number | null = null): number {
   if (!Number.isFinite(scrollY) || scrollY <= 0) return 0;
+  if (snapTravel && snapTravel > DOCK_SCROLL_PX) {
+    const t = scrollY / snapTravel;
+    return Math.min(1, Math.max(0, (t - DOCK_MORPH_FROM) / (DOCK_MORPH_TO - DOCK_MORPH_FROM)));
+  }
   return Math.min(1, scrollY / DOCK_SCROLL_PX);
 }
+/** Share of the snap travel where the header morph starts … */
+export const DOCK_MORPH_FROM = 0.1;
+/** … and where it has landed (rounds/05 d5-pb-scroll, 0.1–0.85 s). */
+export const DOCK_MORPH_TO = 0.85;
 
 /** Reduced motion: no glide, the progress jumps between 0 and 1 at the (hysteresis) thresholds. */
 export function nextStageDocked(docked: boolean, scrollY: number): boolean {

@@ -5,6 +5,8 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { FriendsService } from '../../social/friends.service';
 import { SocialService } from '../../social/social.service';
 import { EinsatzCrew, SLOTS_MAX, SLOT_LABEL_MAX, friendPath } from '../../social/social.types';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 
 /**
  * The owner's side of the crew of one Einsatz (C05): name the slots, see who answered what. Shown
@@ -15,19 +17,19 @@ import { EinsatzCrew, SLOTS_MAX, SLOT_LABEL_MAX, friendPath } from '../../social
 @Component({
   selector: 'sc-hq-einsatz-crew',
   standalone: true,
-  imports: [TranslatePipe, FormsModule, RouterLink],
+  imports: [TranslatePipe, FormsModule, RouterLink, ScActionDirective, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (friends.friendCount() > 0) {
       <div class="crew">
-        <button type="button" class="sc-btn tiny ghost" [attr.aria-expanded]="open()" (click)="toggle()">
+        <button type="button" scAction tier="secondary" [attr.aria-expanded]="open()" (click)="toggle()">
           {{ 'hq.friends.crew.open' | translate }}
         </button>
         @if (open()) {
           <div class="panel">
             @if (loadFailed()) {
               <p class="err" role="alert">{{ social.error() ?? 'errors.generic' | translate }}</p>
-              <button type="button" class="sc-btn tiny" (click)="load()">{{ 'hq.stock.retry' | translate }}</button>
+              <button type="button" scAction tier="secondary" (click)="load()">{{ 'hq.stock.retry' | translate }}</button>
             } @else {
               <p class="hint">{{ 'hq.friends.crew.hint' | translate }}</p>
               <ul class="slots">
@@ -35,13 +37,13 @@ import { EinsatzCrew, SLOTS_MAX, SLOT_LABEL_MAX, friendPath } from '../../social
                   <li>
                     <input type="text" [ngModel]="l" (ngModelChange)="setLabel($index, $event)" [attr.maxlength]="labelMax"
                            [attr.aria-label]="'hq.friends.crew.slotLabel' | translate" />
-                    <button type="button" class="sc-btn tiny ghost" [attr.aria-label]="'hq.friends.crew.removeSlot' | translate" (click)="removeSlot($index)">✕</button>
+                    <button type="button" scAction tier="tertiary" tone="danger" [attr.aria-label]="'hq.friends.crew.removeSlot' | translate" [scTooltip]="'hq.friends.crew.removeSlot' | translate" scTooltipTier="label" (click)="removeSlot($index)">✕</button>
                   </li>
                 }
               </ul>
               <div class="actions">
-                <button type="button" class="sc-btn tiny ghost" [disabled]="labels().length >= slotsMax" (click)="addSlot()">{{ 'hq.friends.crew.addSlot' | translate }}</button>
-                <button type="button" class="sc-btn tiny" [disabled]="social.busy()" (click)="save()">{{ 'hq.friends.crew.save' | translate }}</button>
+                <button type="button" scAction tier="secondary" [disabled]="labels().length >= slotsMax" (click)="addSlot()">{{ 'hq.friends.crew.addSlot' | translate }}</button>
+                <button type="button" scAction tier="secondary" [busy]="social.busy()" (click)="save()">{{ 'hq.friends.crew.save' | translate }}</button>
               </div>
               @if (social.error(); as key) {
                 <p class="err" role="alert">{{ key | translate }}</p>
@@ -77,13 +79,13 @@ import { EinsatzCrew, SLOTS_MAX, SLOT_LABEL_MAX, friendPath } from '../../social
       .slots, .rsvps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sc-space-1, 4px); }
       .slots li { display: flex; gap: var(--sc-space-2, 8px); align-items: center; }
       input { flex: 1; min-width: 0; font: inherit; color: var(--sc-fg); background: var(--sc-bg-0, var(--sc-bg-1)); border: 1px solid var(--sc-border); border-radius: var(--sc-radius); padding: var(--sc-space-2, 8px); min-height: 2.5rem; box-sizing: border-box; }
-      input:focus-visible, a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      input:focus-visible, a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .actions { display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); }
       .rsvps li { display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); }
       a { color: var(--sc-accent); }
       .ans { color: var(--sc-fg-2); }
       .err { margin: 0; color: var(--sc-danger); }
-      @media (pointer: coarse) { .sc-btn { min-height: 48px; } input { min-height: 48px; } }
+      @media (pointer: coarse) { input { min-height: 48px; } }
     `,
   ],
 })

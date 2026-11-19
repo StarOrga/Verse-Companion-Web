@@ -4,6 +4,7 @@ import {
   ElementRef,
   OnDestroy,
   OnInit,
+  AfterViewInit,
   computed,
   effect,
   inject,
@@ -11,10 +12,11 @@ import {
   signal,
   untracked,
 } from '@angular/core';
+import { onScrollTick } from '../core/scroll-tick';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
-import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import { LocaleService } from '../core/locale/locale.service';
 import { isPlainLeftClick } from '../core/modified-click.util';
 import { OverlayOriginService } from '../shared/overlay-frame/overlay-origin.service';
@@ -38,6 +40,8 @@ import { RoadmapService, threadSlugOf } from './roadmap.service';
 import { relativeTime } from './relative-time';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import { ShareButtonComponent } from '../shared/share-button/share-button.component';
+import { SectionRailComponent, SectionRailGo, SectionRailItem } from '../shared/section-rail/section-rail.component';
+import { translateTick } from '../shared/section-rail/translate-tick';
 
 type SectionId = 'stabilitaet' | 'builds' | 'prep' | 'contents' | 'fixed' | 'next';
 
@@ -122,19 +126,17 @@ function scrollBehavior(): ScrollBehavior {
   standalone: true,
   imports: [
     TranslatePipe, RouterLink, PatchCycleComponent, PatchEntryRowComponent,
-    PatchNoteDetailComponent, StabilityChipComponent, StabilityLongComponent, BuildVerdictComponent, ScDialogDirective,
-    ScTooltipDirective, ShareButtonComponent,
+    PatchNoteDetailComponent, StabilityChipComponent, StabilityLongComponent, BuildVerdictComponent, ScPopupComponent,
+    ScTooltipDirective, ShareButtonComponent, SectionRailComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="scrim">
-      <div class="panel" role="dialog" aria-modal="true" scDialog (scDialogEscape)="onEscape()" [attr.aria-label]="title()" #panel>
+    <sc-popup kind="large" [title]="title()" [eyebrow]="'news.patch.dossier.eyebrow' | translate" [backClose]="false" (closed)="onEscape()">
+      <div class="panel">
         @if (card(); as c) {
           <header class="hero" [attr.data-status]="c.status">
-            <a class="close" [routerLink]="['/verse/patches']" [queryParams]="closeParams()" (click)="onClose($event)" [attr.aria-label]="'news.patch.dossier.close' | translate" [scTooltip]="'news.patch.dossier.close' | translate">✕</a>
             <div class="hero-row">
               <span class="status" [attr.data-status]="c.status">{{ ('news.patch.status.' + c.status) | translate }}</span>
-              <h2>{{ title() }}</h2>
               <!-- Same corner, same picture as on the board card the reader
                    just came from (owner, 2026-09-05). -->
               @if (chip(); as ch) {
@@ -159,19 +161,8 @@ function scrollBehavior(): ScrollBehavior {
 
           <div class="body" [class.no-toc]="sections().length < 2">
             @if (sections().length >= 2) {
-              <nav class="toc" [attr.aria-label]="'news.patch.dossier.toc' | translate">
-                <ul class="toc-list">
-                  @for (s of sections(); track s) {
-                    <li>
-                      <a class="toc-link" [class.active]="active() === s" [href]="'#' + anchorId(s)"
-                         [attr.aria-current]="active() === s ? 'true' : null" (click)="onToc($event, s)">
-                        <span class="toc-marker" aria-hidden="true"></span>
-                        <span class="toc-text">{{ sectionKey(s) | translate }}</span>
-                      </a>
-                    </li>
-                  }
-                </ul>
-              </nav>
+              <sc-section-rail class="toc" variant="inline" [items]="railItems()" [ariaLabel]="'news.patch.dossier.toc' | translate"
+                               (go)="onRailGo($event)" />
             }
 
             <div class="col">
@@ -423,42 +414,25 @@ function scrollBehavior(): ScrollBehavior {
           </div>
         } @else {
           <header class="hero">
-            <a class="close" routerLink="/verse/patches" [attr.aria-label]="'news.patch.dossier.close' | translate" [scTooltip]="'news.patch.dossier.close' | translate">✕</a>
-            <h2>{{ 'news.patch.line' | translate:{ version: line() } }}</h2>
             <p class="state">{{ 'news.patch.dossier.unknown' | translate:{ line: line() } }}</p>
           </header>
         }
       </div>
-    </div>
+    </sc-popup>
     <sc-share-button [shareTitle]="title()" />
   `,
   styles: [`
     :host { display: block; }
-    .scrim {
-      position: fixed; inset: 0; z-index: 60; display: flex; justify-content: center; align-items: flex-start;
-      padding: 24px 16px; background: color-mix(in srgb, var(--sc-bg-0) 78%, transparent);
-      -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); overflow: hidden;
-    }
-    .panel {
-      width: min(100%, var(--sc-ov-area)); max-height: var(--sc-ov-max-h); overflow-y: auto; overscroll-behavior: contain;
-      border: 1px solid var(--sc-border); border-radius: 12px; background: var(--sc-bg-0);
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5); scrollbar-width: thin;
-    }
+    /* Frame, head, ✕, scrim and width come from <sc-popup kind="large">; the
+       scaffold's body (.scp-b) is the scroller. */
     .hero {
-      position: sticky; top: 0; z-index: 2; padding: 16px 20px 12px;
+      position: sticky; top: 0; z-index: 2; padding: 12px 20px 12px;
       background: linear-gradient(160deg, var(--sc-bg-3) 0%, var(--sc-bg-1) 60%); border-bottom: 1px solid var(--sc-border);
     }
     .hero[data-status='live'] { background: linear-gradient(160deg, color-mix(in srgb, var(--sc-success) 16%, var(--sc-bg-1)), var(--sc-bg-1) 60%); }
     .hero[data-status='next'], .hero[data-status='ptu'], .hero[data-status='evocati'] { background: linear-gradient(160deg, color-mix(in srgb, var(--sc-accent) 16%, var(--sc-bg-1)), var(--sc-bg-1) 60%); }
-    .hero-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding-right: 44px; }
+    .hero-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
     .stab { margin-left: auto; }
-    .hero h2 { margin: 0; font-size: 1.6rem; line-height: 1; }
-    .close {
-      position: absolute; right: 8px; top: 8px; display: inline-flex; align-items: center; justify-content: center;
-      min-width: var(--sc-tap-min); min-height: var(--sc-tap-min); color: var(--sc-fg-2); text-decoration: none; font-size: 1rem;
-    }
-    .close:hover { color: var(--sc-fg-0); }
-    .close:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -3px; border-radius: 6px; }
     .status {
       display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 6px; font-family: var(--sc-font-display);
       font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; white-space: nowrap;
@@ -513,18 +487,9 @@ function scrollBehavior(): ScrollBehavior {
     .muted { margin: 0 0 8px; color: var(--sc-fg-2); font-size: max(0.76rem, var(--sc-fs-floor)); }
     mark { background: color-mix(in srgb, var(--sc-accent) 32%, transparent); color: inherit; border-radius: 3px; padding: 0 1px; }
 
-    /* Settings-page TOC, as a pattern: quiet links, one accent marker. */
+    /* The section menu is the shared rail (icons, light bar, names on hover) — inline, because the file is a dialog. */
     .toc { padding: 16px 8px 16px 16px; border-right: 1px solid var(--sc-border); }
-    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; position: sticky; top: 96px; }
-    .toc-link {
-      display: flex; align-items: center; gap: 10px; padding: 8px 4px; min-height: 36px; color: var(--sc-fg-2); text-decoration: none;
-      font-family: var(--sc-font-display); font-size: max(0.66rem, var(--sc-fs-floor)); letter-spacing: 0.08em; text-transform: uppercase; border-radius: 4px;
-    }
-    .toc-marker { flex: 0 0 auto; width: 2px; align-self: stretch; border-radius: 999px; background: var(--sc-border); }
-    .toc-text { min-width: 0; overflow-wrap: anywhere; }
-    .toc-link:hover { color: var(--sc-fg-0); }
-    .toc-link.active { color: var(--sc-accent); }
-    .toc-link.active .toc-marker { background: var(--sc-accent); }
+    .toc ::ng-deep .rail { position: sticky; top: 96px; }
 
     .prep { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); }
     .prep li { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border: 1px solid var(--sc-border); border-radius: 6px; background: var(--sc-bg-1); }
@@ -557,7 +522,7 @@ function scrollBehavior(): ScrollBehavior {
     .fc .img { position: relative; display: block; min-height: 150px; height: 100%; background: linear-gradient(135deg, var(--sc-bg-3), var(--sc-bg-0)); }
     .fc .img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease; }
     a.img[href]:hover img { transform: scale(1.04); }
-    a.img[href]:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    a.img[href]:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .fc .go {
       position: absolute; right: 6px; bottom: 6px; display: inline-flex; align-items: center; justify-content: center;
       width: 20px; height: 20px; border-radius: 4px; font-size: 0.72rem;
@@ -596,7 +561,7 @@ function scrollBehavior(): ScrollBehavior {
       flex: 1 1 auto; min-height: var(--sc-tap-min); padding: 8px 40px 8px 12px; border: 1px solid var(--sc-border); border-radius: 8px;
       background: var(--sc-bg-0); color: var(--sc-fg-0); font: inherit; font-size: max(0.86rem, var(--sc-fs-input));
     }
-    .s-input:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .s-input:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .s-input::-webkit-search-cancel-button { display: none; }
     .s-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); min-width: var(--sc-tap-min); min-height: var(--sc-tap-min); border: 0; background: transparent; color: var(--sc-fg-2); font-size: 1.2rem; cursor: pointer; }
     .coverage { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 8px 0; font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
@@ -614,18 +579,11 @@ function scrollBehavior(): ScrollBehavior {
     .wave time { color: var(--sc-fg-2); font-size: max(0.7rem, var(--sc-fs-floor)); }
 
     @media (max-width: 720px) {
-      .scrim { padding: 0; align-items: flex-end; }
-      .panel { max-height: 100vh; height: 100vh; max-height: 100dvh; height: 100dvh; border-radius: 0; border: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
-      .hero { padding: 14px 14px 10px; }
-      .hero h2 { font-size: 1.3rem; }
+      .hero { padding: 10px 14px 10px; }
       .body { grid-template-columns: minmax(0, 1fr); }
-      /* Phone: the TOC becomes the settings page's pinned pill row. */
-      .toc { position: sticky; top: 84px; z-index: 2; padding: 8px 12px; border-right: 0; border-bottom: 1px solid var(--sc-border); background: color-mix(in srgb, var(--sc-bg-0) 86%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
-      .toc-list { position: static; flex-direction: row; gap: 6px; overflow-x: auto; scrollbar-width: none; }
-      .toc-list::-webkit-scrollbar { display: none; }
-      .toc-link { flex: 0 0 auto; gap: 0; padding: 9px 12px; min-height: 40px; white-space: nowrap; border-radius: 999px; background: color-mix(in srgb, var(--sc-fg-2) 12%, transparent); color: var(--sc-fg-1); }
-      .toc-marker { display: none; }
-      .toc-link.active { background: var(--sc-accent); color: var(--sc-bg-0); }
+      /* Phone: the rail becomes the pinned pill row (the shared rail does it itself). */
+      .toc { position: sticky; top: 84px; z-index: 2; padding: 0; border-right: 0; }
+      .toc ::ng-deep .rail { position: static; }
       .sec { padding: 12px 14px 14px; scroll-margin-top: 140px; }
       .fc, .fc.open { grid-template-columns: minmax(0, 1fr); }
       .fc .img { min-height: 120px; height: 120px; }
@@ -633,7 +591,7 @@ function scrollBehavior(): ScrollBehavior {
     }
   `],
 })
-export class PatchDossierComponent implements OnInit, OnDestroy {
+export class PatchDossierComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly svc = inject(NewsService);
   readonly roadmap = inject(RoadmapService);
   private readonly t = inject(TranslateService);
@@ -915,10 +873,12 @@ export class PatchDossierComponent implements OnInit, OnDestroy {
       this.previousOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
     }
-    const panel = this.host.nativeElement.querySelector<HTMLElement>('.panel');
+  }
+
+  ngAfterViewInit(): void {
+    const panel = this.host.nativeElement.querySelector<HTMLElement>('.scp-b');
     if (panel) {
-      this.scrollListener = () => this.syncActive(panel);
-      panel.addEventListener('scroll', this.scrollListener, { passive: true });
+      this.scrollListener = onScrollTick(() => this.syncActive(panel), { target: panel });
     }
   }
 
@@ -927,8 +887,7 @@ export class PatchDossierComponent implements OnInit, OnDestroy {
     clearInterval(this.clockTimer);
     if (this.flashTimer !== null) clearTimeout(this.flashTimer);
     if (this.cardFlashTimer !== null) clearTimeout(this.cardFlashTimer);
-    const panel = this.host.nativeElement.querySelector<HTMLElement>('.panel');
-    if (panel && this.scrollListener) panel.removeEventListener('scroll', this.scrollListener);
+    this.scrollListener?.();
   }
 
   /** Escape inside the panel (ScDialogDirective) and the ✕ close; a click on the scrim does not. */
@@ -963,6 +922,31 @@ export class PatchDossierComponent implements OnInit, OnDestroy {
     if (id === 'next' && status === 'superseded') return 'news.patch.dossier.section.nextPast';
     if (id === 'prep' && status === 'superseded') return 'news.patch.dossier.section.prepPast';
     return 'news.patch.dossier.section.' + id;
+  }
+
+  /** Icon of each section (24x24, stroked). */
+  private static readonly ICONS: Readonly<Record<SectionId, string>> = {
+    stabilitaet: 'M3 12h4l2-6 4 12 2-6h6',
+    builds: 'M4 8l8-4 8 4-8 4zM4 12l8 4 8-4M4 16l8 4 8-4',
+    prep: 'M5 7l2 2 3-3M13 7h7M5 15l2 2 3-3M13 15h7',
+    contents: 'M4 6h16M4 12h16M4 18h10',
+    fixed: 'M14 6l4 4-9 9H5v-4zM12 8l4 4',
+    next: 'M5 12h14M13 6l6 6-6 6',
+  };
+  private readonly lang = translateTick(this.t);
+
+  /** The rail's stops: the sections in the page's order, names following the language. */
+  readonly railItems = computed<SectionRailItem[]>(() => {
+    this.lang();
+    const active = this.active();
+    return this.sections().map((s) => {
+      const label = this.t.instant(this.sectionKey(s)) as string;
+      return { id: s, href: '#' + anchorId(s), label, icon: PatchDossierComponent.ICONS[s], active: active === s, current: 'location' as const };
+    });
+  });
+
+  onRailGo({ event, item }: SectionRailGo): void {
+    this.onToc(event, item.id as SectionId);
   }
 
   onToc(ev: MouseEvent, id: SectionId): void {

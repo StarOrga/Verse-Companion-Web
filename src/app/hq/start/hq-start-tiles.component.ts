@@ -16,6 +16,7 @@ import { HqPageId, hqEinsatzHref, hqHangar } from '../hq-routes';
 import { EventHqService } from '../events/event-hq.service';
 import { HqEventNamesComponent } from './hq-event-names.component';
 import { HqSuppliesService } from '../hq-supplies.service';
+import { NachschubService } from '../nachschub/nachschub.service';
 import { HqAppConnectionService } from '../now/hq-app-connection.service';
 import { hqAppAction } from '../now/hq-app-status.util';
 import { HqLiveService } from '../now/hq-live.service';
@@ -155,7 +156,7 @@ export function agoText(iso: string, lang: string | undefined, now: number = Dat
             </small>
           }
           @case ('needs') {
-            <b>{{ 'hq.start.planen.needs' | translate: { n: supplies.open().length } }}</b>
+            <b>{{ 'hq.start.planen.needs' | translate: { n: ns.openActiveLines().length } }}</b>
             <small>{{ 'hq.start.planen.emptyHint' | translate }}</small>
           }
           @default {
@@ -209,11 +210,11 @@ export function agoText(iso: string, lang: string | undefined, now: number = Dat
       /* The launch hint is fixed to the viewport: its tile has to rise above the rail and the cue. */
       .tile:has(.hint) { z-index: 60; }
       .stretch { position: absolute; inset: 0; z-index: 1; border-radius: 4px; }
-      .stretch:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .stretch:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .own { position: relative; z-index: 2; }
       a.own { color: var(--sc-accent); text-decoration: none; }
       a.own:hover { text-decoration: underline; text-underline-offset: 3px; }
-      a.own:focus-visible, .retry:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+      a.own:focus-visible, .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
       .retry { padding: 0; border: 0; background: none; color: var(--sc-accent); font: inherit; cursor: pointer; }
       .retry:hover { text-decoration: underline; text-underline-offset: 3px; }
       .ico { flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -276,7 +277,7 @@ export function agoText(iso: string, lang: string | undefined, now: number = Dat
       .stat .ico { width: 15px; height: 15px; color: var(--sc-accent); }
       .stat b { font-weight: 500; color: var(--sc-fg-0); }
       .stat:hover { color: var(--sc-accent); }
-      .stat:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+      .stat:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
 
       /* Touch: every own target and the quiet link keep a full tap height. */
       @media (pointer: coarse) {
@@ -309,6 +310,8 @@ export class HqStartTilesComponent {
   protected readonly inv = inject(HqInventoryService);
   protected readonly einsatz = inject(HqEinsatzService);
   protected readonly supplies = inject(HqSuppliesService);
+  /** "N in Operationen" counts the lines of active Operationen only (what Planen shows). */
+  protected readonly ns = inject(NachschubService);
   protected readonly live = inject(HqLiveService);
   private readonly appConn = inject(HqAppConnectionService);
   protected readonly nav = inject(HqPageNavService);
@@ -382,7 +385,7 @@ export class HqStartTilesComponent {
   protected readonly plan = computed<'loading' | 'error' | 'plans' | 'needs' | 'empty'>(() => {
     if (this.current()) return 'plans';
     if (this.signedIn() && !this.einsatz.ready()) return this.einsatz.syncError() ? 'error' : 'loading';
-    return this.supplies.open().length > 0 ? 'needs' : 'empty';
+    return this.ns.openActiveLines().length > 0 ? 'needs' : 'empty';
   });
 
   // Statistik

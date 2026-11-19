@@ -1,5 +1,5 @@
 import { LandingCodexCategory, LandingValue } from './codex-landing-data.types';
-import { MAX_CALLOUTS, barOf, compareValue, shipAnchorPorts, shipAnchorPositions, splitCallouts } from './codex-landing-values';
+import { MAX_CALLOUTS, compareValue, shipAnchorPorts, shipAnchorPositions, splitCallouts } from './codex-landing-values';
 import { CLAIMS_PER_CATEGORY, ClaimCursor, buildClaims } from './codex-landing-claims';
 import { HOLO_TIMING, anchorPoint, leaderPath, scanPassAt } from './codex-landing-holotable.component';
 
@@ -37,7 +37,7 @@ describe('splitCallouts', () => {
   });
 });
 
-describe('compareValue / barOf', () => {
+describe('compareValue', () => {
   it('signed delta vs the class mean; a worse value is flagged (warning token, never danger)', () => {
     expect(compareValue(v('hull.hp', 112, { classAvg: 100, classMax: 200, higherIsBetter: true }))).toEqual(
       expect.objectContaining({ kind: 'delta', delta: '+12', worse: false }),
@@ -51,11 +51,6 @@ describe('compareValue / barOf', () => {
     expect(compareValue(v('crew.size', 2, { classAvg: 3, classMax: 5, higherIsBetter: null }))?.kind).toBe('avg');
     expect(compareValue(v('hull.hp', 300, { classAvg: 200, classMax: 300, higherIsBetter: true }))?.kind).toBe('top');
     expect(compareValue(v('hull.hp', 300))).toBeNull();
-  });
-
-  it('bars scale to the class maximum with the mean as tick', () => {
-    expect(barOf(v('x', 50, { classAvg: 25, classMax: 100 }))).toEqual({ fill: 50, avg: 25 });
-    expect(barOf(v('x', 50))).toBeNull();
   });
 });
 

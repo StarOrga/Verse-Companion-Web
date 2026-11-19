@@ -6,6 +6,7 @@ import {
   HostListener,
   inject,
   input,
+  OnDestroy,
   output,
   signal,
   viewChild,
@@ -14,6 +15,7 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScDialogDirective } from '../dialog/sc-dialog.directive';
 import { OverlayNeighbour } from '../overlay-frame/overlay-frame.component';
+import { ScActionDirective } from '../action/sc-action.directive';
 import { ScTooltipDirective } from '../tooltip/sc-tooltip.directive';
 
 /** What the lightbox shows - the same shape for the routed item and the starscape wall. */
@@ -22,7 +24,10 @@ export interface LightboxImage {
   readonly sourceUrl: string;
   /** Phone-sized stand-in for the original (<= 900 px wide screens). */
   readonly previewUrl: string;
-  readonly articleUrl: string;
+  /** Source article (RSI permalink); a generated image (the star-map wallpaper) has none. */
+  readonly articleUrl?: string | null;
+  /** File name for the download link (blob URLs of generated images); default = the browser's choice. */
+  readonly downloadName?: string | null;
 }
 
 /** Wider than this the picture is zoomed to fill the stage; narrower ones get the mirrored blur. */
@@ -48,14 +53,14 @@ const WIDE_RATIO = 1.5;
 @Component({
   selector: 'sc-lightbox',
   standalone: true,
-  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScDialogDirective, ScTooltipDirective],
+  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScDialogDirective, ScActionDirective, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (overlay()) {
-      <div class="root overlay" #root (click)="closed.emit()">
+      <!-- No close on a click beside the picture: the lightbox has its own ✕ (CLAUDE.md, popup-aufbau). -->
+      <div class="root overlay" #root>
         <div class="stage" role="dialog" aria-modal="true" scDialog scDialogInitialFocus="container"
-             (scDialogEscape)="closed.emit()" [attr.aria-label]="image().title || ('overlay.gallery.image' | translate)"
-             (click)="$event.stopPropagation()">
+             (scDialogEscape)="closed.emit()" [attr.aria-label]="image().title || ('overlay.gallery.image' | translate)">
           <ng-container *ngTemplateOutlet="inner" />
         </div>
       </div>
@@ -94,14 +99,18 @@ const WIDE_RATIO = 1.5;
           </button>
         }
         @if (overlay()) {
-          <button type="button" class="ib" (click)="closed.emit()" [attr.aria-label]="'overlay.close' | translate"
-                  [scTooltip]="'overlay.close' | translate" scTooltipTier="label">✕</button>
+          <button type="button" scAction tier="tertiary" class="lb-x" (click)="closed.emit()" [attr.aria-label]="'overlay.close' | translate"
+                  [scTooltip]="'overlay.close' | translate" scTooltipTier="label">
+            <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+          </button>
         }
       </div>
 
       <div class="acts ctl">
-        <a class="ab" [href]="image().sourceUrl" target="_blank" rel="noopener noreferrer" download>{{ 'overlay.gallery.download' | translate }}</a>
-        <a class="ab" [href]="image().articleUrl" target="_blank" rel="noopener noreferrer">{{ 'overlay.gallery.article' | translate }} ↗</a>
+        <a class="ab" [href]="image().sourceUrl" target="_blank" rel="noopener noreferrer" [attr.download]="image().downloadName ?? ''">{{ 'overlay.gallery.download' | translate }}</a>
+        @if (image().articleUrl; as art) {
+          <a class="ab" [href]="art" target="_blank" rel="noopener noreferrer">{{ 'overlay.gallery.article' | translate }} ↗</a>
+        }
       </div>
       <div class="extra ctl"><ng-content /></div>
     </ng-template>
@@ -111,8 +120,9 @@ const WIDE_RATIO = 1.5;
     .root.overlay {
       position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; cursor: zoom-out;
       padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
-      background: rgba(0, 0, 0, 0.85); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+      background: var(--sc-scrim); /* Sonderform: scrim + ✕ are the popup scaffold's */
     }
+    .lb-x { color: var(--sc-fg-0); background: rgba(0, 0, 0, 0.55); }
     .stage {
       position: relative; overflow: hidden; cursor: default; isolation: isolate;
       /* overlay-size: exception — the image drives the size (16:9 stage, centred) */
@@ -123,7 +133,8 @@ const WIDE_RATIO = 1.5;
     .stage:focus { outline: none; }
     .root.page .stage { width: 100%; }
     .root:fullscreen { display: grid; place-items: center; background: #000; padding: 0; }
-    .root:fullscreen .stage { width: 100vw; height: 100vh; height: 100dvh; aspect-ratio: auto; border: 0; border-radius: 0; }
+    /* 100%, not 100vw: vw counts the document scrollbar gutter, which is not part of the fullscreen box. */
+    .root:fullscreen .stage { width: 100%; height: 100%; aspect-ratio: auto; border: 0; border-radius: 0; }
     .root:fullscreen.overlay { cursor: default; }
 
     .mirror {
@@ -149,16 +160,14 @@ const WIDE_RATIO = 1.5;
     .tools { top: 10px; right: 10px; display: flex; gap: 6px; }
     .ib {
       display: inline-grid; place-items: center; min-width: 36px; min-height: max(36px, var(--sc-tap-min, 0px)); border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.22); background: rgba(0, 0, 0, 0.5); color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.22); background: rgba(0, 0, 0, 0.72); color: #fff;
       font: inherit; font-size: 1rem; line-height: 1; text-decoration: none; cursor: pointer;
-      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
     }
     .ib:hover, .ib:focus-visible, .ab:hover, .ab:focus-visible { border-color: var(--sc-accent); color: var(--sc-accent); text-decoration: none; }
     .acts { left: 12px; bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; max-width: calc(100% - 24px); }
     .ab {
-      padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.22); background: rgba(0, 0, 0, 0.55);
+      padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.22); background: rgba(0, 0, 0, 0.75);
       color: #fff; font-size: max(0.82rem, var(--sc-fs-floor, 0px)); text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em;
-      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
     }
     .extra { right: 12px; bottom: 12px; display: flex; gap: 8px; align-items: center; }
     .extra:empty { display: none; }
@@ -171,7 +180,7 @@ const WIDE_RATIO = 1.5;
     .edge.r { right: 0; justify-content: flex-end; padding-right: 12px; background: linear-gradient(to left, rgba(0, 0, 0, 0.35), transparent); }
     .chev { font-size: 2.6rem; line-height: 1; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7); }
     .edge:hover .chev, .edge:focus-visible .chev { color: var(--sc-accent); }
-    .edge:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .edge:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     @media (max-width: 720px) {
       .stage { border-radius: 8px; }
       .edge { width: 22%; }
@@ -179,7 +188,7 @@ const WIDE_RATIO = 1.5;
     }
   `],
 })
-export class LightboxComponent {
+export class LightboxComponent implements OnDestroy {
   private readonly router = inject(Router);
 
   readonly image = input.required<LightboxImage>();
@@ -193,6 +202,7 @@ export class LightboxComponent {
   protected readonly fullscreen = signal(false);
   protected readonly canFullscreen = typeof document !== 'undefined' && !!document.fullscreenEnabled;
   private readonly root = viewChild<ElementRef<HTMLElement>>('root');
+  private gutterReleased = false;
 
 
   protected onLoad(ev: Event): void {
@@ -210,7 +220,35 @@ export class LightboxComponent {
   @HostListener('document:fullscreenchange')
   protected onFullscreenChange(): void {
     if (typeof document === 'undefined') return;
-    this.fullscreen.set(document.fullscreenElement === this.root()?.nativeElement);
+    const on = document.fullscreenElement === this.root()?.nativeElement;
+    this.fullscreen.set(on);
+    this.releaseGutter(on);
+  }
+
+  /**
+   * The outermost right pixel column in full screen (batch note #2: „ganz rechts an den Außenrand …
+   * dann kann man nicht klicken“). The document reserves its scrollbar space for good
+   * (`html { scrollbar-gutter: stable }`, styles.scss), and that gutter stays reserved while an
+   * element is in full screen: the fullscreen box ends a gutter short of the screen edge, and a
+   * click there lands on the document's scrollbar strip, not on the "next" edge. The left edge has
+   * no gutter, which is why it always worked. While the picture is in full screen the document has
+   * nothing to scroll anyway, so its gutter and overflow are released and restored on the way out.
+   */
+  private releaseGutter(on: boolean): void {
+    const html = document.documentElement;
+    if (on && !this.gutterReleased) {
+      this.gutterReleased = true;
+      html.style.setProperty('scrollbar-gutter', 'auto');
+      html.style.setProperty('overflow', 'hidden');
+    } else if (!on && this.gutterReleased) {
+      this.gutterReleased = false;
+      html.style.removeProperty('scrollbar-gutter');
+      html.style.removeProperty('overflow');
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (typeof document !== 'undefined') this.releaseGutter(false);
   }
 
   /** ←/→ walk the neighbours (replacing the history entry), also in full screen. */

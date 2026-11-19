@@ -44,8 +44,89 @@ const KNOWN_JOB_ERRORS = new Set([
   'translate.job_not_found', 'translate.lang_unknown', 'translate.no_api_key',
   'translate.no_base_build', 'translate.not_awaiting_approval', 'translate.not_cancellable',
   'translate.plan_missing', 'translate.results_missing', 'translate.r2_not_configured',
-  'translate.internal',
+  'translate.internal', 'translate.worker_limit', 'translate.no_live_build', 'translate.source_not_permitted',
+  'translate.source_unknown', 'translate.nothing_to_do', 'translate.phase_unknown', 'translate.job_cleanup_pending',
+  'translate.resubmit_limit',
 ]);
+
+const HASH_DIGITS = 16;
+const share = (pos: unknown, total: unknown): number => {
+  const p = Number(pos);
+  const t = Number(total);
+  return t > 0 && p >= 0 ? Math.min(1, p / t) : 0;
+};
+
+/**
+ * How far a job is inside a step that takes many requests (0..99), or null where the step has no
+ * measure (a wait for a batch, a job that ended). Read from the position the orchestrator keeps in
+ * `stats`: an estimate and a publish walk the table in slices, and without a number they look stuck.
+ */
+export function jobProgress(status: string, stats: unknown): number | null {
+  const s = (stats ?? {}) as {
+    phase?: string; pos?: number; est?: { phase?: string; cursor?: number; total?: number } | null;
+    plan?: { parts?: number } | null; pub?: { total?: number } | null;
+  };
+  const span = (from: number, to: number, part: number) => Math.min(99, Math.round(from + (to - from) * part));
+  if (status === 'estimating') {
+    const e = s.est;
+    if (!e) return 0;
+    switch (e.phase) {
+      case 'adm': return span(0, 5, share(e.cursor, HASH_DIGITS));
+      case 'rows': return span(5, 35, share(e.cursor, e.total));
+      case 'diff': return span(35, 65, share(e.cursor, HASH_DIGITS));
+      case 'prep': return 65;
+      case 'chunk': return 70;
+      case 'shots': return span(78, 97, share(e.cursor, s.plan?.parts));
+      case 'clean':
+      case 'complete': return 98;
+      default: return null;
+    }
+  }
+  if (status === 'publishing') {
+    switch (s.phase) {
+      case 'route': return 5;
+      case 'tm': return span(10, 35, share(s.pos, HASH_DIGITS));
+      case 'rows': return span(35, 65, share(s.pos, s.pub?.total));
+      case 'join': return span(65, 95, share(s.pos, HASH_DIGITS));
+      case 'assemble': return 97;
+      default: return null;
+    }
+  }
+  return null;
+}
+
+const HOLDS = new Set(['full', 'upload_cap', 'monthly_cap', 'overrun']);
+
+/** Jobs that ended without a result: what they left out for want of money is of no interest any more. */
+const NO_RESULT = new Set(['cancelled', 'failed', 'skipped']);
+
+export interface JobNote { key: string; params: Record<string, number> }
+
+/**
+ * The sentences under a job's status that say why it waits for approval, or which paid steps it left
+ * out because money ran short (`stats.hold`, `stats.probe`, `stats.capped` of the orchestrator): the
+ * texts without a second attempt and the judge sample are two things and each gets its own line.
+ */
+export function jobNotes(status: string, stats: unknown): JobNote[] {
+  const s = (stats ?? {}) as {
+    hold?: string; probe?: { ratio?: number } | null;
+    capped?: { reason?: string; judge?: boolean; texts?: number } | null;
+  };
+  const base = 'admin.translations.jobs';
+  if (status === 'awaiting_approval') {
+    if (typeof s.hold !== 'string' || !HOLDS.has(s.hold)) return [];
+    const ratio = Number(s.probe?.ratio);
+    const pct = Number.isFinite(ratio) ? Math.max(0, Math.round((ratio - 1) * 100)) : 0;
+    return [{ key: `${base}.hold.${s.hold}`, params: s.hold === 'overrun' ? { pct } : {} }];
+  }
+  const c = s.capped;
+  if (!c || NO_RESULT.has(status)) return [];
+  const notes: JobNote[] = [];
+  const texts = Math.max(0, Math.round(Number(c.texts) || 0));
+  if (texts > 0) notes.push({ key: `${base}.capped.${c.reason === 'monthly_cap' ? 'monthly_cap' : 'job_budget'}`, params: { texts } });
+  if (c.judge) notes.push({ key: `${base}.capped.judge`, params: {} });
+  return notes;
+}
 
 /** i18n key for a job's / orchestrator's error code; unknown codes get a generic sentence, never raw text. */
 export function jobErrorKey(code: string | null | undefined): string | null {
@@ -147,10 +228,17 @@ export function contextLines(v: unknown): string[] {
 }
 
 /** Flat `label: value` pairs of an orchestrator summary object (nested objects as JSON). */
-export function summaryEntries(o: Record<string, unknown> | null | undefined): { k: string; v: string }[] {
-  return Object.entries(o ?? {})
-    .filter(([k]) => k !== 'ok')
-    .map(([k, v]) => ({ k, v: typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v) }));
+/** Phases of a background pass that walk the string table: `pos` of `total` shards. */
+const WALK_PHASES = new Set(['scan', 'mine', 'detect']);
+/** The import writes the translation memory in 16 steps (one per first hash digit). */
+const APPLY_STEPS = 16;
+
+/** Progress of a running pass in percent; null in phases that have nothing to count. */
+export function passProgress(p: { status: string; phase: string; pos: number; total: number }): number | null {
+  if (p.status !== 'open') return null;
+  const total = WALK_PHASES.has(p.phase) ? p.total : p.phase === 'apply' ? APPLY_STEPS : 0;
+  if (!(total > 0)) return null;
+  return Math.max(0, Math.min(100, Math.round((p.pos / total) * 100)));
 }
 
 /** Postgres insufficient-privilege (RPC rights check, e.g. approval by a non-protected admin). */

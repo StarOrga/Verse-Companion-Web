@@ -3,12 +3,14 @@ import { ComponentFixture, TestBed, fakeAsync, flush, flushMicrotasks, tick } fr
 import { provideRouter } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { CodexHoloStageComponent, HOLO_TONES, resetHoloArrivalSession } from './codex-holo-stage.component';
+import { AnalyticsService } from '../../core/analytics.service';
 import { CodexDetail } from '../codex.service';
 import { HoloSilhouette } from '../holo-silhouette';
 import { ShipCapabilities } from '../codex-mission';
 import type { LayoutSection, LayoutSlot } from '../codex-hardpoint-layout.component';
 import type { KpiStripCell } from '../codex-kpi-sets';
 import type { HardpointFrame } from '../hardpoint-map';
+import { vi } from 'vitest';
 
 const CAPS: ShipCapabilities = { hasCargo: false, hasQuantum: true, hasMining: false, hasSalvage: false };
 
@@ -191,22 +193,40 @@ describe('CodexHoloStageComponent', () => {
     });
     const pins = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.pin'));
     expect(pins.length).toBe(3);
-    expect(pins.map((p) => p.querySelector('i')!.textContent!.trim())).toEqual(['1', '2', '3']);
-    expect(pins[0].textContent).toContain('Laser Cannon');
-    expect(pins[2].textContent).toContain('FR-66');
+    expect(fixture.componentInstance.pins().map((p) => p.index)).toEqual([1, 2, 3]); // the order stays; the numbers are no longer drawn (C10)
+    expect(pins[0].getAttribute('aria-label')).toContain('Laser Cannon');
+    expect(pins[2].getAttribute('aria-label')).toContain('FR-66');
     expect((fixture.nativeElement as HTMLElement).textContent).not.toContain('controller_fuel');
   });
 
-  it('a digit hotkey selects the pin of that number and the inspector counter follows', async () => {
+  it('a digit key no longer selects a pin (C11)', async () => {
     const fixture = await setup({
       primaryModuleSections: [{ section: 'weapons', slots: [slot('hardpoint_gun_left', 'Laser Cannon'), slot('hardpoint_gun_right', 'Repeater')] }],
     });
     fixture.componentInstance.onKeydown(new KeyboardEvent('keydown', { key: '2' }));
     fixture.detectChanges();
+    expect(fixture.componentInstance.inspectedPort()).toBeNull();
+  });
+
+  it('the parts filters hide pins by kind; the last chip on stays on (C6)', async () => {
+    const fixture = await setup({
+      primaryModuleSections: [
+        { section: 'weapons', slots: [slot('hardpoint_gun_left', 'Laser Cannon')] },
+        { section: 'shields', slots: [slot('hardpoint_shield', 'FR-66')] },
+      ],
+    });
+    const c = fixture.componentInstance;
     const el: HTMLElement = fixture.nativeElement;
-    expect(fixture.componentInstance.inspectedPort()).toBe('hardpoint_gun_right');
-    expect(el.querySelector('.holo-panel .n')!.textContent!.replace(/\s+/g, '')).toBe('2/2');
-    expect(el.querySelector('.inspector')!.textContent).toContain('Repeater');
+    const chips = Array.from(el.querySelectorAll<HTMLButtonElement>('.holo-views .vf-chip'));
+    expect(chips.map((b) => b.getAttribute('aria-pressed'))).toEqual(['true', 'true', 'true', 'true', 'false']);
+    expect(c.tablePins().map((p) => p.portName)).toEqual(['hardpoint_gun_left', 'hardpoint_shield']);
+    c.togglePartFilter('components');
+    expect(c.tablePins().map((p) => p.portName)).toEqual(['hardpoint_gun_left']);
+    expect(c.labelPins().map((p) => p.portName)).toEqual(['hardpoint_gun_left']);
+    for (const id of ['missiles', 'other', 'weapons'] as const) c.togglePartFilter(id);
+    expect([...c.partFilter()]).toEqual(['weapons']);
+    chips[4].click();
+    expect(c.hotspotScope()).toBe('all');
   });
 
   // The tiles read the FULL sheet: a combat Einsatz still fills "Bewegung".
@@ -295,27 +315,52 @@ describe('CodexHoloStageComponent — wave 5 fixes', () => {
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
     expect(el.querySelector('.table-empty')).toBeTruthy();
-    expect(fixture.componentInstance.hotkeyPinCount()).toBe(0);
     expect(el.querySelector('.holo-panel .empty')!.textContent).toContain('codex.holo.stage.noPorts');
   });
 
-  it('the inspector never promises more digit hotkeys than exist (max 10)', async () => {
-    const fixture = await setup({ detail: detailWithPorts(Array.from({ length: 24 }, (_, i) => `p${i}`)) });
-    expect(fixture.componentInstance.hotkeyPinCount()).toBe(10);
-  });
-
-  it('without hardpoint coordinates only the simple sub-view is on offer, and 3D is hidden without a model', async () => {
+  it('the bottom row: Akte first, then Außen; without coordinates or a model the views say why (C6, C7)', async () => {
     const fixture = await setup({ hardpointFrame: null });
     const el: HTMLElement = fixture.nativeElement;
-    const tts = Array.from(el.querySelectorAll<HTMLButtonElement>('.tools5 .tt'));
-    const schema = tts.find((b) => b.textContent!.includes('viewSchema'))!;
-    expect(schema.disabled).toBe(false);
-    const subs = Array.from(el.querySelectorAll<HTMLButtonElement>('.sub-views .sv'));
-    expect(subs.map((b) => b.disabled)).toEqual([false, true, true, true]);
-    expect(tts.some((b) => b.textContent!.includes('view3d'))).toBe(false);
+    const views = () => Array.from(el.querySelectorAll<HTMLButtonElement>('.holo-views .vw-thumb'));
+    expect(views().map((b) => b.dataset['view'])).toEqual(['akte', '3d', 'simple', 'top', 'side', 'front']);
+    expect(views().map((b) => b.getAttribute('aria-disabled'))).toEqual([null, 'true', null, 'true', 'true', 'true']);
+    expect(el.querySelector('.table-eyebrow'), 'no eyebrow above the table (C1)').toBeNull();
+    expect(el.querySelector('.tools5, .sub-views')).toBeNull();
     fixture.componentInstance.has3d.set(true);
     fixture.detectChanges();
-    expect(Array.from(el.querySelectorAll('.tools5 .tt')).some((b) => b.textContent!.includes('view3d'))).toBe(true);
+    expect(views()[1].getAttribute('aria-disabled')).toBeNull();
+  });
+
+  it('Akte is a view: it lies over the table and any other view closes it', async () => {
+    const fixture = await setup({ detail: detailWithPorts(['hardpoint_gun_left']) });
+    const c = fixture.componentInstance;
+    const el: HTMLElement = fixture.nativeElement;
+    const seen: string[] = [];
+    c.viewChange.subscribe((v) => seen.push(v));
+    el.querySelector<HTMLButtonElement>('.vw-thumb[data-view="akte"]')!.click();
+    fixture.detectChanges();
+    expect(c.activeView()).toBe('akte');
+    expect(el.querySelector('.holo-akte.on')).toBeTruthy();
+    expect(el.querySelector('.vw-thumb[data-view="akte"]')!.getAttribute('aria-checked')).toBe('true');
+    el.querySelector<HTMLButtonElement>('.vw-thumb[data-view="simple"]')!.click();
+    fixture.detectChanges();
+    expect(c.activeView()).toBe('simple');
+    expect(el.querySelector('.holo-akte.on')).toBeNull();
+    expect(seen).toEqual(['akte', 'simple']);
+  });
+
+  it('the source jump (#bezugsquelle) brings the Akte up: the sources live there, not on the table', async () => {
+    const fixture = await setup({ detail: detailWithPorts(['hardpoint_gun_left']) });
+    const c = fixture.componentInstance;
+    const el: HTMLElement = fixture.nativeElement;
+    const seen: string[] = [];
+    c.viewChange.subscribe((v) => seen.push(v));
+    expect(el.querySelector('.holo-akte.on'), 'the table is the default view').toBeNull();
+    fixture.componentRef.setInput('openDetails', true);
+    fixture.detectChanges();
+    expect(c.activeView()).toBe('akte');
+    expect(el.querySelector('.holo-akte.on')).toBeTruthy();
+    expect(seen).toEqual(['akte']);
   });
 
   it('the toolbar has no Teilen any more and Escape closes the inspector (C9)', async () => {
@@ -324,7 +369,8 @@ describe('CodexHoloStageComponent — wave 5 fixes', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('.share-wrap')).toBeNull();
     expect(el.querySelector('sc-codex-holo-share')).toBeNull();
-    expect(el.querySelector('.holo-topbar .sc-head-strip'), 'the head strip on the title row').toBeTruthy();
+    expect(el.querySelector('.holo-topbar .ht-centre sc-codex-holo-einsatz'), 'the Einsatz in the head centre (C4)').toBeTruthy();
+    expect(el.querySelector('.holo-topbar .ht-right'), 'the hangar slot top right (C5)').toBeTruthy();
     c.inspectedPort.set('hardpoint_gun_left');
     c.onKeydown(new KeyboardEvent('keydown', { key: 'Escape' }));
     expect(c.inspectedPort()).toBeNull();
@@ -371,32 +417,43 @@ describe('CodexHoloStageComponent — wave 5 fixes', () => {
   describe('surfaces (3D | Schema with its sub-views)', () => {
     afterEach(() => localStorage.removeItem('sc.codex.holo.surface'));
 
-    it('has no Einsatz bar on any surface, the strip picks; the sub-views stay on Schema', async () => {
+    it('has no Einsatz bar on any surface; the views row stays on every surface', async () => {
       const fixture = await setup({ detail: detailWithPorts(['hardpoint_gun_left']) });
       const c = fixture.componentInstance;
       const el = fixture.nativeElement as HTMLElement;
       fixture.detectChanges();
       expect(el.querySelector('.rolebar')).toBeNull();
-      expect(el.querySelector('.sub-views')).not.toBeNull();
+      expect(el.querySelector('.holo-views')).not.toBeNull();
       c.has3d.set(true);
       c.pickSurface('3d');
       fixture.detectChanges();
       expect(c.viewMode()).toBe('3d');
       expect(el.querySelector('.rolebar')).toBeNull();
-      expect(el.querySelector('.sub-views')).toBeNull();
+      expect(el.querySelector('.vw-thumb[data-view="3d"]')!.getAttribute('aria-checked')).toBe('true');
     });
 
-    it('offers the sub-views and falls back to Einfach for one the hull cannot show', async () => {
+    it('a view the hull cannot show only says why, and the table falls back to Einfach', async () => {
       const fixture = await setup({ detail: detailWithPorts(['hardpoint_gun_left']) });
       const c = fixture.componentInstance;
       const el = fixture.nativeElement as HTMLElement;
       fixture.detectChanges();
-      const buttons = Array.from(el.querySelectorAll<HTMLButtonElement>('.sub-views .sv'));
-      expect(buttons.length).toBe(4);
-      expect(buttons[0].disabled).toBe(false);
-      expect(buttons[3].disabled, 'no front view without a drawing').toBe(true);
+      const front = el.querySelector<HTMLButtonElement>('.vw-thumb[data-view="front"]')!;
+      expect(front.getAttribute('aria-disabled'), 'no front view without a drawing').toBe('true');
+      front.click();
+      expect(c.surface()).toBe('simple');
       c.chosenSurface.set('front');
       expect(c.surface()).toBe('simple');
+    });
+
+    it('arrow keys walk the views like one radio group, skipping the disabled ones', async () => {
+      const fixture = await setup({ detail: detailWithPorts(['hardpoint_gun_left']) });
+      const c = fixture.componentInstance;
+      fixture.detectChanges();
+      expect(c.activeView()).toBe('simple');
+      c.onViewKey(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+      expect(c.activeView()).toBe('akte');
+      c.onViewKey(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+      expect(c.activeView()).toBe('simple');
     });
 
     it('remembers a Schema sub-view across hulls, and 3D is the default again after picking it', async () => {
@@ -537,8 +594,24 @@ describe('CodexHoloStageComponent one panel (concept glas3)', () => {
     expect(el.querySelector('.rankbody')).toBeNull();
     (el.querySelector('#holo-tab-changes') as HTMLButtonElement).click();
     f.detectChanges();
-    expect(el.querySelector('sc-codex-holo-changes')).not.toBeNull();
     expect(c.panelTabIndex()).toBe(2);
+    // C17: the Werk opens on the patch comparison, "Deine Anpassungen" one switch away.
+    expect(c.changeView()).toBe('patch');
+    expect(el.querySelector('.chg-sw')).not.toBeNull();
+    expect(el.querySelector('sc-codex-holo-changes')).toBeNull();
+    c.changeView.set('mine');
+    f.detectChanges();
+    expect(el.querySelector('sc-codex-holo-changes')).not.toBeNull();
+  });
+
+  it('opens Änderungen on "Deine Anpassungen" while an exemplar is shown (C17)', async () => {
+    const f = await setup();
+    f.componentRef.setInput('inHangar', true);
+    f.detectChanges();
+    expect(f.componentInstance.changeView()).toBe('mine');
+    f.componentRef.setInput('inHangar', false);
+    f.detectChanges();
+    expect(f.componentInstance.changeView()).toBe('patch');
   });
 
   it('the tabs are one control for the keyboard', async () => {
@@ -568,6 +641,36 @@ describe('CodexHoloStageComponent one panel (concept glas3)', () => {
     c.onPartSelected(null);
     expect(c.inspectedPort()).toBeNull();
     expect(c.viewerSelectedPort()).toBeNull();
+  });
+
+  it('the panel back control deselects and lands on the list of all parts; every select and deselect is one catalogue event', async () => {
+    const f = await setup({ primaryModuleSections: sections });
+    const c = f.componentInstance;
+    const track = vi.spyOn(TestBed.inject(AnalyticsService), 'track');
+    c.onPartIntent({ kind: 'select', source: 'model' });
+    c.onPartSelected({ id: 'x', portName: 'hp_shield', itemClass: 'S', swappable: true });
+    c.onInspectorBack();
+    expect(c.inspectedPort()).toBeNull();
+    expect(c.viewerSelectedPort()).toBeNull();
+    // No jump to Einordnung: the panel stays on the parts list.
+    expect(c.panelTab()).toBe('parts');
+    // A back with nothing selected sends nothing.
+    c.onInspectorBack();
+    c.onListInspect('hp_gun');
+    c.onPartIntent({ kind: 'deselect', via: 'empty' });
+    c.onPartIntent({ kind: 'deselect', via: 'again' });
+    c.onPartIntent({ kind: 'select', source: 'keyboard' });
+    expect(track.mock.calls).toEqual([
+      ['codex:part_select', { source: 'model' }],
+      ['codex:part_deselect', { via: 'panel' }],
+      ['codex:part_select', { source: 'list' }],
+      ['codex:part_deselect', { via: 'empty' }],
+      ['codex:part_deselect', { via: 'again' }],
+      ['codex:part_select', { source: 'keyboard' }],
+    ]);
+    f.detectChanges();
+    const back = (f.nativeElement as HTMLElement).querySelector('.inspector-close');
+    if (back) expect(back.textContent).toContain('codex.holo.stage.backToParts');
   });
 
   it('a part with no loadout slot is named from the package, with nothing to swap', async () => {
@@ -772,12 +875,10 @@ describe('CodexHoloStageComponent lower part (concept holotisch-unten r1, d2)', 
     expect(persp.classList).toContain('row');
   });
 
-  it('the side column sits in the first (Einsatz) column and holds no chip filter row (C6/C8)', async () => {
+  it('has no side column below the first screen (sources live in the Akte) and holds no chip filter row (C6/C8)', async () => {
     const f = await setup({ primaryModuleSections: sections });
     const el: HTMLElement = f.nativeElement;
-    const side = el.querySelector<HTMLElement>('.holo-below .below-side')!;
-    expect(side).toBeTruthy();
-    expect(getComputedStyle(side).gridColumnStart).toBe('1');
+    expect(el.querySelector('.holo-below .below-side')).toBeNull();
     expect(el.querySelector('.holo-below .chip, .holo-below [role="toolbar"]')).toBeNull();
   });
 
@@ -792,31 +893,193 @@ describe('CodexHoloStageComponent lower part (concept holotisch-unten r1, d2)', 
   });
 
   const room = (key: string) => ({ key, name: null, pos: [0, 0, 0], floorZ: null, height: 3, shapes: [[[-2, -2], [2, -2], [2, 2], [-2, 2]]] });
+  // pickSurface remembers a Schema sub-view; no spec may hand it to the next.
+  afterEach(() => localStorage.removeItem('sc.codex.holo.surface'));
+  const named = (key: string, en: string) => ({ ...room(key), name: { en, de: en } });
+  const twoDecks = [
+    { key: 'D1', name: { en: 'Deck 1', de: 'Deck 1' }, order: 0, rooms: [named('R1', 'Cockpit'), named('R2', 'Cargo Bay')] },
+    { key: 'D2', name: { en: 'Deck 2', de: 'Deck 2' }, order: 1, rooms: [named('R4', 'Engineering')] },
+    { key: 'D3', name: null, order: 2 },
+  ];
+  /** A freighter with its interior (concept 20261117-1810): 48 of 96 SCU located, on Deck 2. */
+  function shipWithInterior(): CodexDetail {
+    const d = detailWithPorts(['hp_gun']);
+    return {
+      ...d,
+      payload: {
+        role: '@vehicle_class_MediumFreight',
+        cargoScu: 96,
+        interior: {
+          pois: [
+            { cat: 'door', pos: [0, 0, 0], deck: 'D1', door: { kind: 'room', breachable: true, panel: null } },
+            { cat: 'lift', pos: [1, 1, 0], deck: 'D2', room: 'R4' },
+            { cat: 'medBed', pos: [1, 1, 0], deck: 'D1', room: 'R1' },
+          ],
+          cargoGrids: [{ port: 'g1', cls: 'Grid', dims: [2.5, 2.5, 2.5], pos: [0, 0, 0], scu: 48, deck: 'D2', room: 'R4' }],
+          lifts: [{ at: [1, 1], stops: [0, 3], decks: ['D1', 'D2'] }],
+          cargoScuLocated: 48,
+          cargoGaps: [{ port: 'g2', reason: 'noClass' }],
+        },
+      },
+    } as unknown as CodexDetail;
+  }
 
-  it('deck chips in Einfach: Außen + one per deck; one deck reads Außen/Innen; no rooms, no chips (C14)', async () => {
+  it('B1: one view group „Ansicht“ (Akte · 3D · Einfach · Oben · Seite · Front), no Außen/Innen and no deck thumbnails', async () => {
+    const f = await setup();
+    f.componentRef.setInput('decks', twoDecks);
+    f.detectChanges();
+    const c = f.componentInstance;
+    expect(c.viewGroups().length).toBe(1);
+    expect(c.viewGroups()[0].items.map((i) => i.id)).toEqual(['akte', '3d', 'simple', 'top', 'side', 'front']);
+    const el: HTMLElement = f.nativeElement;
+    expect(el.querySelector('.vw-thumb[data-view^="deck:"]')).toBeNull();
+    // Decks with rooms make 3D possible even without a hull model (the interior in its ghost).
+    expect(c.viewGroups()[0].items.find((i) => i.id === '3d')!.disabledKey).toBeNull();
+  });
+
+  it('B1: the deck filter offers Alle, Alle Decks and every deck with rooms; it applies to Einfach and to 3D', async () => {
     const f = await setup();
     const c = f.componentInstance;
-    expect(c.deckChips()).toEqual([]);
-    f.componentRef.setInput('decks', [{ key: 'D1', name: { en: 'Deck 1', de: 'Deck 1' }, order: 0, rooms: [room('A')] }]);
+    expect(c.deckFilterChips()).toEqual([]);
+    f.componentRef.setInput('decks', twoDecks);
     f.detectChanges();
-    expect(c.deckChips().map((d) => d.labelKey)).toEqual(['codex.holo.stage.deckOutside', 'codex.holo.stage.deckInside']);
-    f.componentRef.setInput('decks', [
-      { key: 'D1', name: { en: 'Deck 1', de: 'Deck 1' }, order: 0, rooms: [room('A')] },
-      { key: 'D2', name: { en: 'Deck 2', de: 'Deck 2' }, order: 1, rooms: [room('B')] },
-      { key: 'D3', name: null, order: 2 },
-    ]);
-    f.detectChanges();
-    expect(c.deckChips().map((d) => d.key)).toEqual([null, 'D1', 'D2']);
+    expect(c.deckFilterChips().map((d) => d.id)).toEqual(['hull', 'all', 'D1', 'D2']);
     const el: HTMLElement = f.nativeElement;
-    expect(el.querySelectorAll('.sub-views .deck').length).toBe(3);
-    c.pickDeck('D2');
+    // Einfach: "Alle Decks" is a 3D view only.
+    c.pickSurface('simple');
     f.detectChanges();
+    expect(el.querySelector('.vd-chip[data-deck="all"]')!.getAttribute('aria-disabled')).toBe('true');
+    el.querySelector<HTMLButtonElement>('.vd-chip[data-deck="D2"]')!.click();
+    f.detectChanges();
+    expect(c.deckFilter()).toBe('D2');
     expect(c.tableDeck()?.key).toBe('D2');
-    // Inside a deck there are no part markers: the deck plan replaces the hull.
     expect(el.querySelector('sc-ship-deck-plan.deck-sheet')).toBeTruthy();
     expect(el.querySelector('sc-codex-holo-table .shipwrap')).toBeNull();
-    // Picking a part goes back outside, where its marker is.
+    // With a deck on, the parts filters make way.
+    expect(el.querySelector('.vf-chip.all')).toBeNull();
+    // 3D keeps the deck: the interior in the hull's ghost.
+    c.pickSurface('3d');
+    f.detectChanges();
+    expect(c.interior3d()?.focus).toBe('D2');
+    expect(c.tableDeck()).toBeNull();
+    // "Alle Decks" in 3D: every deck equal.
+    c.pickDeck('*');
+    expect(c.interior3d()?.focus).toBeNull();
+    // Picking a part goes back to the hull, where its marker is.
     c.inspectPin('hp_gun');
-    expect(c.deckView()).toBeNull();
+    expect(c.deckFilter()).toBeNull();
+    expect(c.tableDeck()).toBeNull();
+  });
+
+  it('B8/B9: a ship opens on its role preset — groups and start deck — and nothing of a change survives a new hull', async () => {
+    const f = await setup({ detail: shipWithInterior() });
+    f.componentRef.setInput('decks', twoDecks);
+    // A new hull applies the preset (the decks arrive with the detail on the page).
+    f.componentRef.setInput('detail', { ...shipWithInterior(), classNameSlug: 'misc_freighter' });
+    f.detectChanges();
+    const c = f.componentInstance;
+    expect(c.rolePreset()).toBe('cargo');
+    expect([...c.interiorGroups()].sort()).toEqual(['cargo', 'doors', 'ways']);
+    // Cargo preset: the deck with the most SCU.
+    expect(c.deckFilter()).toBe('D2');
+    expect(c.presetUntouched()).toBe(true);
+    c.toggleGroup('med');
+    expect(c.interiorGroups().has('med')).toBe(true);
+    expect(c.presetUntouched()).toBe(false);
+    c.resetPreset();
+    expect(c.interiorGroups().has('med')).toBe(false);
+    expect(c.presetUntouched()).toBe(true);
+    c.toggleGroup('med');
+    f.componentRef.setInput('detail', { ...shipWithInterior(), classNameSlug: 'misc_freighter_2' });
+    f.detectChanges();
+    expect(c.interiorGroups().has('med')).toBe(false);
+  });
+
+  it('B5/B6/B10: a room fills Bauteile, an element is picked on its deck, the cargo gap is named', async () => {
+    const f = await setup({ detail: shipWithInterior() });
+    f.componentRef.setInput('decks', twoDecks);
+    f.componentRef.setInput('detail', { ...shipWithInterior(), classNameSlug: 'misc_freighter' });
+    f.detectChanges();
+    const c = f.componentInstance;
+    c.pickSurface('simple');
+    expect(c.cargoGap()).toEqual({ located: 48, total: 96 });
+    c.onRoomSelect({ key: 'R4', deck: 'D2', label: 'Engineering' });
+    f.detectChanges();
+    expect(c.panelTab()).toBe('parts');
+    const card = c.roomCard()!;
+    expect(card.deckLabel).toBe('Deck 2');
+    expect(card.contents?.scu).toBe(48);
+    expect(card.contents?.elements).toBe(2);
+    const el: HTMLElement = f.nativeElement;
+    expect(el.querySelector('sc-codex-holo-interior .card h3')?.textContent?.trim()).toBe('Engineering');
+    // The med bed stands on Deck 1: picking it moves the filter there and lets the room go.
+    c.onInteriorPick({ kind: 'poi', index: 2 });
+    f.detectChanges();
+    expect(c.deckFilter()).toBe('D1');
+    expect(c.deckRoom()).toBeNull();
+    expect(c.tableDeck()?.pick).toEqual({ kind: 'poi', index: 2 });
+    expect(el.querySelector('sc-ship-deck-plan .ov-pick')).toBeTruthy();
+    expect(el.querySelector('.vd-gap')).toBeTruthy();
+  });
+
+  it('B11: deck pick, group toggle, element pick and parts search each send their event, never the search text', async () => {
+    const f = await setup({ detail: shipWithInterior() });
+    f.componentRef.setInput('decks', twoDecks);
+    f.componentRef.setInput('detail', { ...shipWithInterior(), classNameSlug: 'misc_freighter' });
+    f.detectChanges();
+    const c = f.componentInstance;
+    const track = vi.spyOn(TestBed.inject(AnalyticsService), 'track');
+    c.pickSurface('simple');
+    c.pickDeck('D1');
+    expect(track).toHaveBeenCalledWith('codex:deck_select', { ship: 'misc_freighter', deck: 'D1', view: '2d' });
+    c.toggleGroup('med');
+    expect(track).toHaveBeenCalledWith('codex:interior_filter_toggle', { group: 'med', on: true });
+    c.onInteriorPick({ kind: 'poi', index: 1 });
+    expect(track).toHaveBeenCalledWith('codex:interior_element_select', { ship: 'misc_freighter', kind: 'lift', deck: 'D2' });
+    c.onPartsSearch({ scope: 'both', hits: 3 });
+    expect(track).toHaveBeenCalledWith('codex:parts_search', { scope: 'both', hits: 3 });
+    expect(JSON.stringify(track.mock.calls)).not.toMatch(/query|text|term/);
+  });
+
+  it('B7: a search hit jumps to it — a room opens on its deck, an element type picks its first element', async () => {
+    const f = await setup({ detail: shipWithInterior() });
+    f.componentRef.setInput('decks', twoDecks);
+    f.componentRef.setInput('detail', { ...shipWithInterior(), classNameSlug: 'misc_freighter' });
+    f.detectChanges();
+    const c = f.componentInstance;
+    c.panelTab.set('parts');
+    f.detectChanges();
+    const el: HTMLElement = f.nativeElement;
+    const search = (q: string) => {
+      const input = el.querySelector<HTMLInputElement>('sc-codex-holo-interior .srch input')!;
+      expect(el.querySelector('sc-codex-holo-interior .srch svg')).toBeTruthy(); // the magnifier
+      input.value = q;
+      input.dispatchEvent(new Event('input'));
+      f.detectChanges();
+      return Array.from(el.querySelectorAll<HTMLButtonElement>('sc-codex-holo-interior .hits .row'));
+    };
+    const rooms = search('Engineering');
+    expect(rooms.length).toBeGreaterThan(0);
+    rooms[0].click();
+    f.detectChanges();
+    expect(c.deckFilter()).toBe('D2');
+    expect(c.deckRoom()).toBe('R4');
+    // No translations in the spec: the element type is found by its group / label key.
+    const lifts = search('lift');
+    expect(lifts.length).toBe(1);
+    lifts[0].click();
+    f.detectChanges();
+    expect(c.interiorPick()).toEqual({ kind: 'poi', index: 1 });
+  });
+
+  it('old builds without an interior show no interior, never zeros', async () => {
+    const f = await setup();
+    f.componentRef.setInput('decks', twoDecks);
+    f.detectChanges();
+    const c = f.componentInstance;
+    expect(c.interior()).toBeNull();
+    expect(c.deckFilter()).toBeNull();
+    expect(c.cargoGap()).toBeNull();
+    expect(f.nativeElement.querySelector('.ig')).toBeNull();
   });
 });

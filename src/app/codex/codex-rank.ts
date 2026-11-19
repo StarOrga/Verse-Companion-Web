@@ -16,6 +16,7 @@
 
 import type { KpiKey } from './codex-mission';
 import type { KpiShipInput, KpiSheet } from './codex-loadout-stats';
+import { editionFamilyRoots } from './codex-edition-group';
 
 /** The seven ship classes: a class gives the default axis list. */
 export type RankClassId = 'combat' | 'transport' | 'exploration' | 'resources' | 'support' | 'multirole' | 'competition';
@@ -243,6 +244,24 @@ export function rankMissionNoteKey(missionId: string): string | null {
   return missionId === 'mining' || missionId === 'salvage' ? 'codex.rank.noMiningData' : null;
 }
 
+/**
+ * Who a ranking compares with, in the Holotable's words: "26 × Leichter Jäger",
+ * "41 Kampfschiffe", "120 Schiffe". Shared by the Holotable strip and the
+ * classic "Einordnung" card so both name the cohort the same way (#329).
+ */
+export function rankCohortLabel(
+  t: { instant(key: string, params?: Record<string, unknown>): string },
+  result: { cohortSize: number; scope: RankScope } | null,
+  roleName: string | null,
+  shipClass: RankClassId,
+): string | null {
+  if (!result) return null;
+  const n = result.cohortSize;
+  if (result.scope === 'role' && roleName) return t.instant('codex.holo.strip.cohortRole', { n, role: roleName });
+  if (result.scope === 'career') return `${n} ${t.instant(rankClassPluralKey(shipClass))}`;
+  return t.instant('codex.holo.strip.shipCount', { n });
+}
+
 // ── group names ─────────────────────────────────────────────────────────────
 
 /** A group smaller than this does not give a fair median: the role group falls
@@ -266,6 +285,26 @@ export function rankGroupName(roleLabel: string, lang: string): string {
   const last = words[words.length - 1];
   if (!/s$/i.test(last)) words[words.length - 1] = last + 's';
   return words.join(' ');
+}
+
+/**
+ * Whether a role label names a kind of ship that reads after "Alle" ("Leichter Jäger", "Bomber")
+ * or an activity that does not ("Expedition", "Bergbau", "Schwere Reparatur" — "Alle Expedition"
+ * is wrong German). German only: an English label always takes the plural of {@link rankGroupName}.
+ */
+export function rankRoleReadsAsGroup(roleLabel: string, lang: string): boolean {
+  if (!lang.startsWith('de')) return true;
+  const words = roleLabel.trim().split(/\s+/);
+  return /er$/.test(words[words.length - 1] ?? '');
+}
+
+/**
+ * The band word from the place in the group, not from the mean percentile: "Rang 1 von 16"
+ * always reads "oberes Viertel", never "im Mittelfeld" (B13). Rank 1 = 100, last = 0.
+ */
+export function rankBandOfPlace(rank: number | null, size: number): RankBand | null {
+  if (rank == null || size < 2) return null;
+  return rankBandOf(((size - rank) / (size - 1)) * 100);
 }
 
 /** One cohort member — the ranking never sees payloads, only sheets. */
@@ -333,6 +372,9 @@ export interface RankResult<K extends string = KpiKey> {
   overall: number | null;
   band: RankBand | null;
   bandKey: string | null;
+  /** Place of the target in its group by `overall` (1 = best, ties share the
+   * better place); null when `overall` is null. Out of `cohortSize`. */
+  rank?: number | null;
   /** Which comparison groups the target can actually be put in — a scope
    * whose discriminator the ship lacks is offered disabled, never silently
    * widened behind the user's back. */
@@ -340,6 +382,10 @@ export interface RankResult<K extends string = KpiKey> {
   /** Ships per group (target included) for every scope the target can filter
    * by — the Holotable says "nur N Schiffe" for a group under RANK_MIN_GROUP. */
   scopeSizes?: Partial<Record<RankScope, number>>;
+  /** Set when the group exists but differs on too few values for a verdict
+   * (S2 missiles among S2 missiles): the card keeps its group bar and the
+   * bars it has, and says this i18n key in place of the statistic. */
+  thinKey?: string | null;
 }
 
 /** Percentile band thresholds (MASTER §3). */
@@ -357,11 +403,29 @@ export function rankBandOf(overall: number | null): RankBand | null {
  * ships sharing the target's value — a target with a null discriminator can
  * only ever be compared against the whole field, so we fall back to `all`
  * rather than returning a cohort of one. */
+export interface RankGroupOptions {
+  /** Group the career scope by class (strays join their class). Holo only. */
+  careerByClass?: boolean;
+  /** Count every hull once: editions of one hull (same records under another
+   * file or edition badge, the catalog grid's rule) fold into one member (#968). */
+  foldVariants?: boolean;
+}
+
 export function filterCohort<K extends string = KpiKey>(
   target: RankShipInput<K>,
   cohort: readonly RankShipInput<K>[],
   scope: RankScope,
-  options: { careerByClass?: boolean } = {},
+  options: RankGroupOptions = {},
+): RankShipInput<K>[] {
+  const set = scopeFilter(target, cohort, scope, options);
+  return options.foldVariants ? foldHullVariants(target, set) : set;
+}
+
+function scopeFilter<K extends string>(
+  target: RankShipInput<K>,
+  cohort: readonly RankShipInput<K>[],
+  scope: RankScope,
+  options: RankGroupOptions,
 ): RankShipInput<K>[] {
   const withTarget = cohort.some((c) => c.className === target.className)
     ? [...cohort]
@@ -384,6 +448,29 @@ export function filterCohort<K extends string = KpiKey>(
   return withTarget.filter((c) => c.career === target.career);
 }
 
+/**
+ * One member per hull (#968): `DRAK_Caterpillar`, its Pirate and Best-in-Show
+ * editions and a duplicate file record are one ship, so they count once in the
+ * group size, the median and the place. The family is resolved inside the group
+ * itself (an edition whose base sits in another group stays a member); the
+ * family's base stands for it, and the target stands for its own family. A
+ * member without a name never folds: the rule cannot prove anything about it.
+ */
+export function foldHullVariants<K extends string>(
+  target: RankShipInput<K>,
+  set: readonly RankShipInput<K>[],
+): RankShipInput<K>[] {
+  const roots = editionFamilyRoots(set.map((s) => ({ classNameSlug: s.className, nameLocalized: s.name ?? null })));
+  if (roots.size === 0) return [...set];
+  const familyOf = (className: string): string => roots.get(className) ?? className;
+  const targetFamily = familyOf(target.className);
+  return set.filter((s) => {
+    const family = familyOf(s.className);
+    if (family === targetFamily) return s.className === target.className;
+    return family === s.className;
+  });
+}
+
 /** Which scopes can filter anything for `target` (see `RankResult.scopeAvailable`). */
 export function rankScopeAvailability<K extends string = KpiKey>(target: RankShipInput<K>): Record<RankScope, boolean> {
   return {
@@ -398,7 +485,7 @@ export function rankScopeAvailability<K extends string = KpiKey>(target: RankShi
 export function rankScopeSizes<K extends string = KpiKey>(
   target: RankShipInput<K>,
   cohort: readonly RankShipInput<K>[],
-  options: { careerByClass?: boolean } = {},
+  options: RankGroupOptions = {},
 ): Partial<Record<RankScope, number>> {
   const available = rankScopeAvailability(target);
   const out: Partial<Record<RankScope, number>> = {};
@@ -417,7 +504,7 @@ export function rankScopeSizes<K extends string = KpiKey>(
 export function narrowestRankScope<K extends string = KpiKey>(
   target: RankShipInput<K>,
   cohort: readonly RankShipInput<K>[],
-  options: { careerByClass?: boolean } = {},
+  options: RankGroupOptions = {},
 ): RankScope {
   const sizes = rankScopeSizes(target, cohort, options);
   for (const scope of ['role', 'career'] as const) {
@@ -497,6 +584,34 @@ const WEAK_THRESHOLD = 45;
 /** The single authored "this axis has no value" string (R4). */
 export const RANK_AXIS_GAP_KEY = 'codex.rank.gapAxis';
 
+/** The target's place among `set` by the same mean-of-percentiles score as
+ * `overall`; the target's own cohort row (same className) is skipped, its
+ * sheet may carry a custom loadout. */
+function rankPlace<K extends string>(
+  target: RankShipInput<K>,
+  set: readonly RankShipInput<K>[],
+  overall: number,
+  axes: readonly { key: K; lowerIsBetter: boolean }[],
+  valueOf: (ship: RankShipInput<K>, key: K) => number | null,
+  numbersOf: (ships: readonly RankShipInput<K>[], key: K) => number[],
+): number {
+  const pools = axes.map((a) => ({ a, values: numbersOf(set, a.key) }));
+  let better = 0;
+  for (const ship of set) {
+    if (ship.className === target.className) continue;
+    const ps = pools
+      .map(({ a, values }) => {
+        const v = valueOf(ship, a.key);
+        return typeof v === 'number' && Number.isFinite(v) ? percentileOf(v, values, a.lowerIsBetter) : null;
+      })
+      .filter((p): p is number => p != null);
+    if (ps.length === 0) continue;
+    const score = Math.round((ps.reduce((s, p) => s + p, 0) / ps.length) * 10) / 10;
+    if (score > overall) better++;
+  }
+  return better + 1;
+}
+
 /**
  * Rank one ship against a cohort under one profile + scope. The maths knows
  * nothing about ships: a caller with its own axes (missiles, codex-missile.ts)
@@ -512,6 +627,8 @@ export function rankShip<K extends string = KpiKey>(
     rim?: RankRim;
     /** Group the career scope by class (strays join their class). Holo only. */
     careerByClass?: boolean;
+    /** Count every hull once (`foldHullVariants`). */
+    foldVariants?: boolean;
     /** A group smaller than this widens role -> career -> all
      * (`RANK_MIN_GROUP`); unset = never. */
     minGroup?: number;
@@ -528,7 +645,7 @@ export function rankShip<K extends string = KpiKey>(
   const degraded = !scopeAvailable[requested];
   let scope: RankScope = degraded ? 'all' : requested;
   let scopeFallbackKey = degraded ? 'codex.rank.disabled.noData' : null;
-  const groupOpts = { careerByClass: options.careerByClass };
+  const groupOpts: RankGroupOptions = { careerByClass: options.careerByClass, foldVariants: options.foldVariants };
   let set = filterCohort(target, cohort, scope, groupOpts);
   if (options.minGroup != null && scope !== 'all' && scope !== 'sizeClass') {
     const chain: RankScope[] = scope === 'role' ? ['career', 'all'] : ['all'];
@@ -577,6 +694,7 @@ export function rankShip<K extends string = KpiKey>(
   const overall =
     ranked.length > 0 ? Math.round((ranked.reduce((s, p) => s + p, 0) / ranked.length) * 10) / 10 : null;
   const band = rankBandOf(overall);
+  const rank = overall == null ? null : rankPlace(target, set, overall, profile.axes, valueOf, numbersOf);
 
   // `axes` stays in the profile's fixed order — it drives the radar's spokes,
   // vertices and captions. Only the bar list is sorted by percentile desc,
@@ -593,6 +711,7 @@ export function rankShip<K extends string = KpiKey>(
     overall,
     band,
     bandKey: band ? `codex.rank.band.${band}` : null,
+    rank,
     scopeAvailable,
     scopeSizes: rankScopeSizes(target, cohort, groupOpts),
   };

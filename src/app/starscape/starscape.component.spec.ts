@@ -35,6 +35,7 @@ function serviceStub(wallpapers: Wallpaper[]) {
     error: signal<string | null>(null),
     timedOut: signal(false),
     filter: signal<StarscapeFilterId>('all'),
+    settledView: signal<StarscapeFilterId | null>('all'),
     hasMore: signal(false),
     desktopRelease: signal(null),
     ringReleases: signal([]),
@@ -70,6 +71,11 @@ describe('StarscapeComponent', () => {
   const first = wallpaper('abc123');
 
   const signedIn = signal(true);
+  const newSammlung = () => ({ load: async () => undefined, gallery: signal<ReadonlySet<string>>(new Set<string>()), loaded: signal(true) });
+  let sammlungStub = newSammlung();
+  beforeEach(() => {
+    sammlungStub = newSammlung();
+  });
 
   function configure(
     svc: ReturnType<typeof serviceStub>,
@@ -84,7 +90,7 @@ describe('StarscapeComponent', () => {
         provideNoopAnimations(),
         { provide: StarscapeService, useValue: svc },
         { provide: StarscapeVotesService, useValue: votes },
-        { provide: SammlungService, useValue: { load: async () => undefined, gallery: signal(new Set<string>()) } },
+        { provide: SammlungService, useValue: sammlungStub },
         { provide: RoleService, useValue: { role: signal('viewer') } },
         { provide: AuthService, useValue: { isAuthenticated: signedIn, user: signal(null) } },
         {
@@ -430,51 +436,53 @@ describe('StarscapeComponent', () => {
     f.destroy();
   });
 
-  /** The source filter is an app-styled `<sc-select>`: open the list, then read or click its options. */
-  function optionsOf(host: HTMLElement, f: { detectChanges: () => void }): HTMLElement[] {
-    host.querySelector<HTMLButtonElement>('sc-select.source-filter .trigger')!.click();
-    f.detectChanges();
-    return Array.from(host.querySelectorAll<HTMLElement>('sc-select.source-filter .option'));
+  /** The four views are one app-styled segment in the page head (concept 20261115-2122 d1-segment). */
+  function segmentsOf(host: HTMLElement): HTMLButtonElement[] {
+    return Array.from(host.querySelectorAll<HTMLButtonElement>('header sc-starscape-filter-segment .seg-btn'));
   }
 
-  it('offers exactly the four views, All selected, and no Top-N switch or series filter', () => {
+  it('offers exactly the four views as a segment in the head, no dropdown row and no Sammlung strip', () => {
     const f = setup();
     const host = f.nativeElement as HTMLElement;
-    const options = optionsOf(host, f);
-    expect(options.length).toBe(4);
-    expect(options[0].getAttribute('aria-selected')).toBe('true');
+    const segs = segmentsOf(host);
+    expect(segs.length).toBe(4);
+    expect(segs[0].getAttribute('aria-checked')).toBe('true');
+    expect(segs.map((b) => b.textContent?.trim())).toEqual([
+      'starscape.filter.all', 'starscape.filter.newest', 'starscape.filter.top', 'starscape.filter.sammlung',
+    ]);
+    expect(host.textContent).not.toContain('starscape.filter.mine');
     expect(host.querySelector('.top-toggle')).toBeNull();
-    expect(host.querySelectorAll('sc-select.source-filter').length).toBe(1);
-    expect(host.querySelectorAll('sc-segmented').length).toBe(0);
+    expect(host.querySelector('sc-select')).toBeNull();
+    expect(host.querySelector('.controls')).toBeNull();
+    expect(host.querySelector('sc-sammlung-strip')).toBeNull();
     f.destroy();
   });
 
-  it('picks a view by its stable id', () => {
+  it('picks a view by its stable id; Sammlung is the "mine" view', () => {
     const svc = serviceStub([first]);
     const f = setup(svc);
     const host = f.nativeElement as HTMLElement;
-    optionsOf(host, f)[2].click();
-    f.detectChanges();
+    segmentsOf(host)[2].click();
     expect(svc.setFilter).toHaveBeenCalledWith('top');
-    optionsOf(host, f)[3].click();
+    segmentsOf(host)[3].click();
     expect(svc.setFilter).toHaveBeenCalledWith('mine');
     f.destroy();
   });
 
-  it('keeps "My votes" visible but not pickable while signed out', () => {
+  it('keeps Sammlung visible but not pickable while signed out', () => {
     const svc = serviceStub([first]);
     configure(svc);
     signedIn.set(false);
     const f = TestBed.createComponent(StarscapeComponent);
     f.detectChanges();
-    const mine = optionsOf(f.nativeElement as HTMLElement, f)[3];
+    const mine = segmentsOf(f.nativeElement as HTMLElement)[3];
     expect(mine.getAttribute('aria-disabled')).toBe('true');
     mine.click();
     expect(svc.setFilter).not.toHaveBeenCalled();
     f.destroy();
   });
 
-  it('falls back to All when the user signs out inside "My votes"', () => {
+  it('falls back to All when the user signs out inside the Sammlung', () => {
     const svc = serviceStub([first]);
     svc.filter.set('mine');
     const f = setup(svc);
@@ -484,11 +492,96 @@ describe('StarscapeComponent', () => {
     f.destroy();
   });
 
-  it('says what an empty "My votes" means instead of the generic empty text', () => {
+  it('says what an empty Sammlung means instead of the generic empty text', () => {
     const svc = serviceStub([]);
     svc.filter.set('mine');
     const f = setup(svc);
-    expect(f.nativeElement.querySelector('.empty')?.textContent).toContain('starscape.filter.emptyMine');
+    expect(f.nativeElement.querySelector('.empty')?.textContent).toContain('starscape.filter.emptySammlung');
+    f.destroy();
+  });
+
+  it('holds the old tiles through a view switch - no skeleton, no empty flash - then fades the new wall in', () => {
+    const svc = serviceStub([first, wallpaper('def456')]);
+    const f = setup(svc);
+    const host = f.nativeElement as HTMLElement;
+    // What StarscapeService.setFilter does synchronously: new id, rows dropped, request running.
+    svc.filter.set('top');
+    svc.settledView.set(null);
+    svc.wallpapers.set([]);
+    svc.loading.set(true);
+    f.detectChanges();
+    expect(host.querySelectorAll('.wall .tile').length).toBe(2);
+    expect(host.querySelector('.wall')!.classList).toContain('switching');
+    expect(host.querySelector('.skel-tile')).toBeNull();
+    expect(host.querySelector('.empty')).toBeNull();
+    // The new view's first page lands.
+    svc.wallpapers.set([wallpaper('top001')]);
+    svc.settledView.set('top');
+    svc.loading.set(false);
+    f.detectChanges();
+    const wall = host.querySelector('.wall')!;
+    expect(wall.classList).not.toContain('switching');
+    expect(wall.classList).toContain('arrive');
+    expect(host.querySelectorAll('.wall .tile').length).toBe(1);
+    f.destroy();
+  });
+
+  it('a switch to a view that turns out empty ends on its empty state, not on the held tiles', () => {
+    const svc = serviceStub([first]);
+    const f = setup(svc);
+    const host = f.nativeElement as HTMLElement;
+    svc.filter.set('mine');
+    svc.settledView.set(null);
+    svc.wallpapers.set([]);
+    svc.loading.set(true);
+    f.detectChanges();
+    expect(host.querySelectorAll('.wall .tile').length).toBe(1);
+    svc.settledView.set('mine');
+    svc.loading.set(false);
+    f.detectChanges();
+    expect(host.querySelectorAll('.wall .tile').length).toBe(0);
+    expect(host.querySelector('.empty')?.textContent).toContain('starscape.filter.emptySammlung');
+    f.destroy();
+  });
+
+  it('stages a cold first load: announced Neu, announced Sammlung, then the rest', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+    try {
+      const svc = serviceStub([]);
+      svc.loading.set(true);
+      sammlungStub.gallery.set(new Set(['mine01']));
+      const f = setup(svc);
+      const host = f.nativeElement as HTMLElement;
+      const fresh = { ...wallpaper('new001'), publishedAt: new Date(Date.now() - 86_400_000).toISOString() };
+      svc.wallpapers.set([fresh, wallpaper('mine01'), wallpaper('old001')]);
+      svc.loading.set(false);
+      f.detectChanges();
+      expect(host.querySelector('.wall-stage')!.classList).toContain('stg');
+      const words = Array.from(host.querySelectorAll('.stg-veil .stg-word')).map((w) => w.textContent?.trim());
+      expect(words).toEqual(['starscape.stage.new', 'starscape.stage.sammlung']);
+      const wraps = Array.from(host.querySelectorAll<HTMLElement>('.tile-wrap'));
+      const delay = (el: HTMLElement) => parseFloat(el.style.getPropertyValue('--stg-d'));
+      expect(wraps.every((w) => w.classList.contains('stg-tile'))).toBe(true);
+      expect(wraps[0].classList).toContain('stg-mark');
+      expect(wraps[1].classList).toContain('stg-mark');
+      expect(wraps[2].classList).not.toContain('stg-mark');
+      expect(delay(wraps[0])).toBeLessThan(delay(wraps[1]));
+      expect(delay(wraps[1])).toBeLessThan(delay(wraps[2]));
+      // One-shot: the staging class is gone once the timeline has played.
+      vi.advanceTimersByTime(5000);
+      f.detectChanges();
+      expect(host.querySelector('.wall-stage')!.classList).not.toContain('stg');
+      expect(host.querySelector('.stg-veil')).toBeNull();
+      f.destroy();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('does not replay the staged load when the rows were already there (coming back to the page)', () => {
+    const svc = serviceStub([first]);
+    const f = setup(svc);
+    expect((f.nativeElement as HTMLElement).querySelector('.wall-stage')!.classList).not.toContain('stg');
     f.destroy();
   });
 

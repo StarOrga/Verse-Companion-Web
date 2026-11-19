@@ -5,6 +5,8 @@ import {
   canCancel,
   glossarySearchFilter,
   jobErrorKey,
+  jobNotes,
+  jobProgress,
   judgeScore,
   monthStartUtc,
   revertPatch,
@@ -50,7 +52,48 @@ describe('translations.logic', () => {
     expect(judgeScore(null)).toBeNull();
   });
 
+  it('reads how far an estimate or a publish is, and nothing for a wait', () => {
+    expect(jobProgress('estimating', {})).toBe(0);
+    expect(jobProgress('estimating', { est: { phase: 'rows', cursor: 77, total: 154 } })).toBe(20);
+    expect(jobProgress('estimating', { est: { phase: 'diff', cursor: 8, total: 154 } })).toBe(50);
+    expect(jobProgress('estimating', { est: { phase: 'shots', cursor: 23, total: 154 }, plan: { parts: 46 } })).toBe(88);
+    expect(jobProgress('estimating', { est: { phase: 'complete', cursor: 0 } })).toBe(98);
+    expect(jobProgress('publishing', { phase: 'rows', pos: 154, pub: { total: 154 } })).toBe(65);
+    expect(jobProgress('publishing', { phase: 'join', pos: 16 })).toBe(95);
+    expect(jobProgress('publishing', { phase: 'rows', pos: 8 })).toBe(35);
+    expect(jobProgress('submitted', { phase: 'running' })).toBeNull();
+    expect(jobProgress('published', null)).toBeNull();
+    expect(jobProgress('estimating', { est: { phase: 'new phase' } })).toBeNull();
+  });
+
+  it('says why a job waits and which paid steps it left out', () => {
+    const base = 'admin.translations.jobs';
+    expect(jobNotes('awaiting_approval', { hold: 'full' })).toEqual([{ key: `${base}.hold.full`, params: {} }]);
+    expect(jobNotes('awaiting_approval', { hold: 'monthly_cap' })).toEqual([{ key: `${base}.hold.monthly_cap`, params: {} }]);
+    expect(jobNotes('awaiting_approval', { hold: 'overrun', probe: { ratio: 1.874 } })).toEqual([{ key: `${base}.hold.overrun`, params: { pct: 87 } }]);
+    expect(jobNotes('awaiting_approval', { hold: 'overrun' })).toEqual([{ key: `${base}.hold.overrun`, params: { pct: 0 } }]);
+    // A hold the page does not know gets no sentence, and a hold of an earlier state does not show later.
+    expect(jobNotes('awaiting_approval', { hold: 'something new' })).toEqual([]);
+    expect(jobNotes('submitted', { hold: 'full' })).toEqual([]);
+    // The texts left without a second attempt and the judge sample left out are two things: both are said.
+    expect(jobNotes('published', { capped: { reason: 'job_budget', judge: true, texts: 412 } })).toEqual([
+      { key: `${base}.capped.job_budget`, params: { texts: 412 } }, { key: `${base}.capped.judge`, params: {} },
+    ]);
+    expect(jobNotes('publishing', { capped: { reason: 'monthly_cap', judge: false, texts: 3 } })).toEqual([{ key: `${base}.capped.monthly_cap`, params: { texts: 3 } }]);
+    expect(jobNotes('post_editing', { capped: { reason: 'job_budget', judge: true, texts: 0 } })).toEqual([{ key: `${base}.capped.judge`, params: {} }]);
+    expect(jobNotes('published', { capped: { reason: 'job_budget', judge: false, texts: 0 } })).toEqual([]);
+    // A job that ended without a result says nothing about what it left out.
+    for (const ended of ['cancelled', 'failed', 'skipped']) {
+      expect(jobNotes(ended, { capped: { reason: 'job_budget', judge: true, texts: 412 } })).toEqual([]);
+    }
+    // A job that waits again (above its estimate) says why it waits, not what an earlier step left out.
+    expect(jobNotes('awaiting_approval', { hold: 'overrun', probe: { ratio: 1.3 }, capped: { reason: 'job_budget', judge: true, texts: 5 } }))
+      .toEqual([{ key: `${base}.hold.overrun`, params: { pct: 30 } }]);
+    expect(jobNotes('published', null)).toEqual([]);
+  });
+
   it('maps job errors to keys, unknown codes to the generic one', () => {
+    expect(jobErrorKey('translate.nothing_to_do')).toBe('admin.translations.jobErrors.nothing_to_do');
     expect(jobErrorKey(null)).toBeNull();
     expect(jobErrorKey('translate.no_api_key')).toBe('admin.translations.jobErrors.no_api_key');
     expect(jobErrorKey('some raw failure text')).toBe('admin.translations.jobErrors.unknown');

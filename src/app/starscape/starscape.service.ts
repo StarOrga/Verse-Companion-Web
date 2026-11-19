@@ -97,7 +97,10 @@ export const STARSCAPE_FILTERS: readonly StarscapeFilterOption[] = [
   { id: 'all', labelKey: 'starscape.filter.all' },
   { id: 'newest', labelKey: 'starscape.filter.newest' },
   { id: 'top', labelKey: 'starscape.filter.top' },
-  { id: 'mine', labelKey: 'starscape.filter.mine' },
+  // 'mine' keeps its id (the desktop tray app keys off it) but reads as the
+  // reader's Sammlung: the same set, the wallpapers they up-voted (batch
+  // concept 20261115-2122, P1 — „Statt meine Votes, pack hier Sammlung rein!“).
+  { id: 'mine', labelKey: 'starscape.filter.sammlung' },
 ];
 
 /** Id of the default view. */
@@ -133,6 +136,12 @@ export class StarscapeService {
   readonly wallpapers = signal<Wallpaper[]>([]);
   readonly total = signal(0);
   readonly loading = signal(false);
+  /**
+   * The view whose first page has settled (arrived, came back empty or failed), or null while a
+   * switch is still on its way. What lets the wall hold the old tiles through a switch instead of
+   * flashing a skeleton or the empty state (batch concept 20261115-2122, B1.6).
+   */
+  readonly settledView = signal<StarscapeFilterId | null>(null);
   /** i18n key, never raw text. */
   readonly error = signal<string | null>(null);
   /** The last failure was our own {@link LOAD_TIMEOUT_MS} abort, not a server error. */
@@ -299,6 +308,7 @@ export class StarscapeService {
       this.error.set(expired ? 'errors.timeout' : key);
     } finally {
       clearTimeout(deadline);
+      if (filter === this.filter()) this.settledView.set(filter);
       this.loading.set(false);
     }
   }
@@ -361,6 +371,7 @@ export class StarscapeService {
   async setFilter(id: StarscapeFilterId): Promise<void> {
     if (this.filter() === id) return;
     this.filter.set(id);
+    this.settledView.set(null);
     // Drop the old list at once: tiles of another view must not linger (and
     // be appended to) while the new one loads.
     this.wallpapers.set([]);

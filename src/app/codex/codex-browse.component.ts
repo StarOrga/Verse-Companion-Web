@@ -1,4 +1,5 @@
 import { rankBySearch } from './codex-search';
+import { onScrollTick } from '../core/scroll-tick';
 import { CompareIconComponent } from './compare-icon.component';
 import { CodexBuildDiffService, NEW_SORT_KINDS } from './codex-build-diff.service';
 import { toErrorKey } from '../core/describe-error';
@@ -8,6 +9,7 @@ import {
   OnInit,
   DestroyRef,
   ElementRef,
+  NgZone,
   afterNextRender,
   viewChild,
   computed,
@@ -38,9 +40,10 @@ import {
 import { UpcomingShip, UpcomingShipsService, upcomingRoleLabel } from './upcoming-ships.service';
 import { HoloSilhouette, SilhouetteKind } from './holo-silhouette';
 import { OverlayOriginService } from '../shared/overlay-frame/overlay-origin.service';
-import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import { reloadOnBuildRefresh } from './build-refresh.util';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AnalyticsService } from '../core/analytics.service';
 import {
   cleanLocaleValue,
   formatCraftTime,
@@ -84,6 +87,7 @@ import { CodexSearchTriggerComponent } from './search/codex-search-trigger.compo
 import { CODEX_ROOT_CRUMB, PageCrumb } from '../shared/page-header/nav-origin.service';
 import { BarFacet, BarFilterToken, ShellChromeService } from '../shell/fusion-bar/shell-chrome.service';
 import { BetaService } from '../core/beta.service';
+import { PAGE_MOTION_STYLES } from '../shared/page-motion/page-motion.styles';
 import {
   CREW_BANDS,
   CREW_BAND_RANGE,
@@ -116,6 +120,9 @@ import { BuyOption, UexShopService } from './uex-shop.service';
 type CodexGridRow = EditionGroupedRow<SkinGroupedRow<FoldedRow<CodexListRow>>>;
 
 const PAGE_SIZE = 60;
+/** progressive: rows of the first slice, then rows added per frame. */
+const FIRST_SLICE = 6;
+const ROW_SLICE = 6;
 const SEARCH_DEBOUNCE_MS = 250;
 /** Idle time after which a typed search counts as committed (history entry, L33). */
 export const SEARCH_COMMIT_MS = 1000;
@@ -179,10 +186,10 @@ export function blueprintCategoriesForGroup(
 @Component({
   selector: 'sc-codex-browse',
   standalone: true,
-  imports: [CompareIconComponent, ItemPathComponent, NgTemplateOutlet, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexCategoryIconComponent, CodexStatusBannerComponent, ScSegmentedComponent, ScSelectComponent, ScTooltipDirective, ScActionDirective, CodexDidYouMeanComponent, PageHeaderComponent, CodexSearchTriggerComponent, ScDialogDirective],
+  imports: [CompareIconComponent, ItemPathComponent, NgTemplateOutlet, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexCategoryIconComponent, CodexStatusBannerComponent, ScSegmentedComponent, ScSelectComponent, ScTooltipDirective, ScActionDirective, CodexDidYouMeanComponent, PageHeaderComponent, CodexSearchTriggerComponent, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="browse">
+    <section class="browse" [class.pm-on]="enter()" [class.pm-hold]="!go()">
       <!-- Two columns that start at the top (package B, 2026-11-06): title + area tree on the
            left, filter bar + list on the right, so the list is not pushed below the title. -->
       <div class="layout">
@@ -225,7 +232,7 @@ export function blueprintCategoriesForGroup(
               <button type="button" class="retry" (click)="reload()">{{ 'codex.error.retry' | translate }}</button>
             </div>
           } @else {
-            <div class="list sc-card">
+            <div class="list sc-card" [style.--pm-delay]="rowBase() + 'ms'">
               <div class="list-head">
                 <span class="count" role="status">
                   @if (listLoading() && listLength() === 0) {
@@ -299,8 +306,8 @@ export function blueprintCategoriesForGroup(
                 </div>
               } @else if (isUpcoming()) {
                 <ul class="rows" role="list">
-                  @for (s of upcomingRows(); track s.id) {
-                    <li class="row">
+                  @for (s of upcomingRows(); track s.id; let i = $index) {
+                    <li class="row" [class.pm-pop]="i < ROW_POPS" [style.--pm-i]="i < ROW_POPS ? i : null">
                       <a class="row-link" [routerLink]="['/codex/upcoming', s.id]" (click)="openUpcoming($event)">
                         <span class="sil icon" aria-hidden="true"><sc-codex-icon kind="ship" /></span>
                         <span class="main">
@@ -317,8 +324,8 @@ export function blueprintCategoriesForGroup(
                 </ul>
               } @else {
                 <ul class="rows" role="list">
-                  @for (r of rows(); track r.classNameSlug) {
-                    <li class="row">
+                  @for (r of shownRows(); track r.classNameSlug; let i = $index) {
+                    <li class="row" [class.pm-pop]="i < ROW_POPS" [style.--pm-i]="i < ROW_POPS ? i : null">
                       <a class="row-link" [routerLink]="['/codex', kind(), r.classNameSlug]">
                         @if (silhouetteOf(r); as s) {
                           <span class="sil" aria-hidden="true">
@@ -456,29 +463,25 @@ export function blueprintCategoriesForGroup(
         </div>
       </div>
 
-      <!-- Phones, legacy shell only: the facets live in a bottom sheet behind one button. With the
+      <!-- Phones, legacy shell only: the facets live in a panel popup (full screen on phones) behind one button. With the
            beta shell the bar's own filter panel carries every facet (d-filter = bar). -->
       @if (!shellOn()) {
         <button type="button" class="filter-fab" (click)="filtersOpen.set(true)" [attr.aria-expanded]="filtersOpen()">
           {{ 'codex.browse.filterButton' | translate: { count: activeFilterCount() } }}
         </button>
         @if (filtersOpen()) {
-          <div class="sheet-backdrop" aria-hidden="true"></div>
-          <div class="sheet" scDialog role="dialog" aria-modal="true"
-               [attr.aria-label]="'codex.browse.filtersAria' | translate"
-               (scDialogEscape)="filtersOpen.set(false)">
-            <div class="sheet-head">
-              <strong>{{ 'codex.browse.filtersTitle' | translate }}</strong>
-              <button type="button" class="sheet-close" (click)="filtersOpen.set(false)"
-                      [attr.aria-label]="'codex.browse.closeFilters' | translate"
-                      [scTooltip]="'codex.browse.closeFilters' | translate" scTooltipTier="label">✕</button>
+          <sc-popup kind="panel" [modal]="true" [eyebrow]="'codex.title' | translate" [title]="'codex.browse.filtersTitle' | translate"
+                    (closed)="filtersOpen.set(false)">
+            <div class="sheet-body">
+              <ng-container [ngTemplateOutlet]="treeTpl" />
+              @if (!isUpcoming()) { <div class="sheet-filters"><ng-container [ngTemplateOutlet]="filtersTpl" /></div> }
             </div>
-            <ng-container [ngTemplateOutlet]="treeTpl" />
-            @if (!isUpcoming()) { <div class="sheet-filters"><ng-container [ngTemplateOutlet]="filtersTpl" /></div> }
-            <button type="button" class="sheet-done" (click)="filtersOpen.set(false)">
-              {{ 'codex.browse.showResults' | translate: { count: listTotal() } }}
-            </button>
-          </div>
+            <ng-container popupActions>
+              <button scAction tier="primary" type="button" (click)="filtersOpen.set(false)">
+                {{ 'codex.browse.showResults' | translate: { count: listTotal() } }}
+              </button>
+            </ng-container>
+          </sc-popup>
         }
       }
 
@@ -578,8 +581,20 @@ export function blueprintCategoriesForGroup(
       </ul>
     </ng-template>
   `,
-  styles: [`
+  styles: [PAGE_MOTION_STYLES + `
     :host { display: block; }
+    /* ── Index entrance (camera world S4, rounds/05 d5-pb-scroll left/rows): after the header has transformed there is a
+       gap, then the sidebar and the role filters arrive, then the rows pop one by one (70 ms apart) with a light edge. The
+       whole thing runs once per open (.pm-on is dropped after it); rows loaded later, filtering and scrolling never replay it. ── */
+    .pm-on { --pm-side-at: 900ms; }
+    /* Held until the entrance starts: a paused animation in its delay phase keeps the hidden start frame. */
+    .pm-hold :is(.side, .filterbar, .list-head, .row) { animation-play-state: paused; }
+    .pm-on .side { animation: pm-rise 560ms var(--pm-ease) var(--pm-side-at) backwards; }
+    .pm-on .filterbar { animation: pm-rise 560ms var(--pm-ease) calc(var(--pm-side-at) + 140ms) backwards; }
+    .pm-on .list-head { animation: pm-fade 420ms ease-out calc(var(--pm-side-at) + 260ms) backwards; }
+    @media (prefers-reduced-motion: reduce) {
+      .pm-on .side, .pm-on .filterbar, .pm-on .list-head { animation: pm-fade 200ms ease-out backwards; }
+    }
     .browse { display: flex; flex-direction: column; gap: var(--sc-space-4, 16px); padding-bottom: 80px; }
     .layout { display: grid; grid-template-columns: 256px minmax(0, 1fr); gap: var(--sc-space-4, 16px); align-items: stretch; }
     /* Left column: title, then the sticky area tree under it. */
@@ -621,10 +636,10 @@ export function blueprintCategoriesForGroup(
     .node-tog svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform 120ms ease; }
     .node-tog.open svg { transform: rotate(90deg); }
     .node-tog:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-accent) 8%, transparent); }
-    .node-tog:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .node-tog:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @media (prefers-reduced-motion: reduce) { .node-tog svg { transition: none; } }
     .node:hover { background: color-mix(in srgb, var(--sc-accent) 8%, transparent); }
-    .node:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .node:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .node.on { color: var(--sc-fg-0); }
     .node.current { background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-accent); }
     .node-ct { font-size: 11px; color: var(--sc-fg-2); font-variant-numeric: tabular-nums; }
@@ -632,7 +647,7 @@ export function blueprintCategoriesForGroup(
     .facet.check { flex-direction: row; align-items: center; gap: 8px; font-size: 13px; color: var(--sc-fg-1); cursor: pointer; }
     .facet.check input { accent-color: var(--sc-accent); }
     .reset { align-self: flex-start; background: none; border: 0; padding: 4px 0; color: var(--sc-accent); cursor: pointer; font: inherit; font-size: 13px; text-decoration: underline; }
-    .reset:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .reset:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     .results { display: flex; flex-direction: column; gap: var(--sc-space-3, 12px); min-width: 0; align-self: start; }
     /* The filter bar fills the space beside the title: the list starts right under it. */
@@ -655,7 +670,7 @@ export function blueprintCategoriesForGroup(
     }
     .chip:hover { border-color: var(--sc-accent); color: var(--sc-fg-0); }
     .chip.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-accent); }
-    .chip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .sheet-filters { display: flex; flex-direction: column; gap: var(--sc-space-3, 12px); }
     .list { padding: 0; overflow: hidden; }
     .list-head { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--sc-border); flex-wrap: wrap; }
@@ -672,20 +687,20 @@ export function blueprintCategoriesForGroup(
       font: inherit; font-size: max(13px, var(--sc-fs-input, 0px));
     }
     .ls-input::placeholder { color: var(--sc-fg-2); }
-    .ls-input:focus { outline: none; border-color: var(--sc-accent); box-shadow: var(--sc-glow); }
+    .ls-input:focus { outline: none; border-color: var(--sc-accent); }
     .ls-clear {
       position: absolute; right: 4px; width: 28px; height: 28px; border: 0; border-radius: 4px;
       background: transparent; color: var(--sc-fg-2); cursor: pointer; font: inherit; font-size: 12px;
     }
     .ls-clear:hover { color: var(--sc-fg-0); }
-    .ls-clear:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .ls-clear:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .count { font-size: 13px; color: var(--sc-fg-1); font-variant-numeric: tabular-nums; }
     .fresh-toggle {
       min-height: var(--sc-tap-min); padding: 0 var(--sc-space-3); border: 1px solid var(--sc-border); border-radius: 999px;
       background: none; color: var(--sc-fg-2); font: inherit; font-size: max(0.78rem, var(--sc-fs-floor)); cursor: pointer;
     }
     .fresh-toggle:hover { color: var(--sc-fg-0); border-color: var(--sc-accent); }
-    .fresh-toggle:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .fresh-toggle:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .fresh-toggle.on { color: var(--sc-accent); border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
     .own.on { color: var(--sc-accent); }
     .own-error { color: var(--sc-danger); }
@@ -706,7 +721,7 @@ export function blueprintCategoriesForGroup(
     .row-link:has(.c-where) { grid-template-columns: 56px minmax(0, 21.25rem) min(15rem, 30%) minmax(max-content, 1fr); }
     .row-link:has(.c-where) > .spec { justify-self: end; }
     .row:hover, .row:focus-within { background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }
-    .row-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .row-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .sil { width: 56px; height: 34px; display: inline-flex; align-items: center; justify-content: center; color: var(--sc-accent); }
     .sil svg { width: 100%; height: 100%; overflow: visible; }
     .sil path {
@@ -740,7 +755,7 @@ export function blueprintCategoriesForGroup(
       color: var(--sc-fg-1); cursor: pointer; font: inherit; text-decoration: none;
     }
     .act:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
-    .act:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .act:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .act.pinned { color: var(--sc-accent); border-color: color-mix(in srgb, var(--sc-accent) 45%, transparent); }
     .act .ico { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .act.shop.pinned { background: color-mix(in srgb, var(--sc-accent) 14%, var(--sc-bg-1)); }
@@ -787,16 +802,16 @@ export function blueprintCategoriesForGroup(
     .buy-note { margin: 0; font-size: 13px; color: var(--sc-fg-2); }
     .buy-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
     .to-plan { font-size: 13px; color: var(--sc-accent); }
-    .to-plan:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .to-plan:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .more-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-top: 1px solid var(--sc-border); }
     .showing { font-size: 12px; color: var(--sc-fg-2); }
-    .load-more, .reset-all, .sheet-done {
+    .load-more, .reset-all {
       min-height: max(36px, var(--sc-tap-min, 0px)); padding: 6px 16px; border-radius: 6px; cursor: pointer; font: inherit;
       border: 1px solid var(--sc-accent); background: transparent; color: var(--sc-accent);
     }
-    .load-more:hover, .reset-all:hover, .sheet-done:hover { background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
+    .load-more:hover, .reset-all:hover { background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
     .load-more:disabled { opacity: .6; cursor: default; }
-    .load-more:focus-visible, .reset-all:focus-visible, .sheet-done:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .load-more:focus-visible, .reset-all:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .empty { padding: 24px 14px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; color: var(--sc-fg-1); }
     .empty p { margin: 0; }
     .also { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
@@ -805,15 +820,16 @@ export function blueprintCategoriesForGroup(
       border: 1px dashed var(--sc-border); border-radius: 8px; color: var(--sc-accent); text-decoration: none; font-size: 13px;
     }
     .also-link:hover { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }
-    .also-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .also-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .upcoming-hint { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--sc-fg-1); }
     .soon-badge { padding: 1px 6px; border-radius: 4px; border: 1px solid var(--sc-accent); color: var(--sc-accent); font-size: 11px; }
     .upcoming-link { color: var(--sc-accent); }
     .err { color: var(--sc-danger); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font: inherit; }
-    .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
-    .filter-fab, .sheet, .sheet-backdrop { display: none; }
+    .filter-fab { display: none; }
+    .sheet-body { display: flex; flex-direction: column; gap: 14px; }
     @media (pointer: coarse) {
       .acts .act { opacity: 1; }
       .side-h, .node-ct { font-size: 12px; }
@@ -834,20 +850,8 @@ export function blueprintCategoriesForGroup(
         bottom: var(--sc-float-bottom); min-height: 48px; border-radius: 24px;
         border: 1px solid var(--sc-accent); background: var(--sc-bg-1); color: var(--sc-accent); font: inherit; cursor: pointer;
       }
-      .filter-fab:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .filter-fab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .browse { padding-bottom: calc(var(--sc-fab-clear-block) + 24px); }
-      .sheet-backdrop { display: block; position: fixed; inset: 0; z-index: 40; background: color-mix(in srgb, var(--sc-bg-0) 60%, transparent); }
-      .sheet {
-        display: flex; flex-direction: column; gap: 14px; position: fixed; z-index: 41; left: 0; right: 0; bottom: 0;
-        max-height: 85vh; max-height: 85dvh; overflow-y: auto; padding: 16px 16px calc(16px + var(--sc-safe-bottom, 0px));
-        background: var(--sc-bg-1); border-top: 1px solid var(--sc-border); border-radius: 14px 14px 0 0;
-      }
-      .sheet-head { display: flex; align-items: center; justify-content: space-between; }
-      .sheet-close {
-        width: 44px; height: 44px; border-radius: 8px; border: 1px solid var(--sc-border); background: transparent;
-        color: var(--sc-fg-1); cursor: pointer; font: inherit;
-      }
-      .sheet-close:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
       .node { min-height: 44px; }
       .node-tog { width: 44px; min-height: 44px; }
     }
@@ -861,7 +865,53 @@ export class CodexBrowseComponent implements OnInit {
   /** Beta "shell": kinds + filters move into the Fusion bar. */
   /** 2 when the overview is the lower half of /codex ("Mehr in Codex"): the landing above owns the <h1>. */
   readonly headingLevel = input<1 | 2>(1);
+  /**
+   * Build the first list in slices (FIRST_SLICE rows, then ROW_SLICE per frame) instead of in
+   * one frame. Set by /codex, where the overview is built under the stage right after a camera
+   * flight: one frame for all its cards was the flight's longest (concept 20261109-1752, r6).
+   */
+  readonly progressive = input(false);
   protected readonly shellOn = inject(BetaService).isEnabled('shell');
+  /** How many rows pop in one by one; further rows (and every later load) just appear. */
+  protected readonly ROW_POPS = 14;
+  /** The entrance of the index is running (shell beta, own page, first fill); dropped once it has played. */
+  private readonly entering = signal(true);
+  private readonly zone = inject(NgZone);
+
+  /**
+   * progressive: the first time rows arrive, render FIRST_SLICE of them and add ROW_SLICE per
+   * frame until the list stands. Later loads (filters, load more) render at once. The list sits
+   * under the stage, out of view, so the slices are never seen arriving.
+   */
+  private sliceFirstList(): void {
+    let started = false;
+    let frame = 0;
+    inject(DestroyRef).onDestroy(() => cancelAnimationFrame(frame));
+    effect(() => {
+      const n = this.rows().length;
+      if (started || n === 0 || !this.progressive() || typeof requestAnimationFrame !== 'function') return;
+      started = true;
+      if (n <= FIRST_SLICE) return;
+      untracked(() => this.rowCap.set(FIRST_SLICE));
+      this.zone.runOutsideAngular(() => {
+        const step = (): void => {
+          const next = this.rowCap() + ROW_SLICE;
+          const done = next >= this.rows().length;
+          this.zone.run(() => this.rowCap.set(done ? Infinity : next));
+          frame = done ? 0 : requestAnimationFrame(step);
+        };
+        frame = requestAnimationFrame(step);
+      });
+    });
+  }
+  protected readonly enter = computed(() => this.shellOn() && this.entering());
+  /** The entrance has started: at once on an own page, when the list first scrolls into view as the lower half of /codex. */
+  protected readonly go = signal(false);
+  private goAt = 0;
+  private readonly hostEl = inject<ElementRef<HTMLElement>>(ElementRef);
+  /** When the first row pops, in ms after the open: later than the sidebar, but never long after the data is there. */
+  protected readonly rowBase = signal(1350);
+  private entryTimer: ReturnType<typeof setTimeout> | undefined;
   readonly svc = inject(CodexService);
   private readonly t = inject(TranslateService);
   readonly rsi = inject(UpcomingShipsService);
@@ -1224,13 +1274,13 @@ export class CodexBrowseComponent implements OnInit {
     const schedule = () => { if (!frame) frame = requestAnimationFrame(measure); };
     afterNextRender(() => {
       measure();
-      window.addEventListener('scroll', schedule, { passive: true });
+      const offScroll = onScrollTick(measure);
       window.addEventListener('resize', schedule, { passive: true });
       const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(schedule);
       const el = this.sideEl()?.nativeElement;
       if (ro && el?.parentElement) ro.observe(el.parentElement);
       this.destroyRef.onDestroy(() => {
-        window.removeEventListener('scroll', schedule);
+        offScroll();
         window.removeEventListener('resize', schedule);
         ro?.disconnect();
         if (frame) cancelAnimationFrame(frame);
@@ -1466,6 +1516,7 @@ export class CodexBrowseComponent implements OnInit {
    */
   readonly category = signal<CodexCategory>('ship');
   readonly isUpcoming = computed(() => this.category() === UPCOMING_CATEGORY);
+  private readonly analytics = inject(AnalyticsService);
   readonly kind = signal<CodexKind>('ship');
   readonly searchInput = signal('');
   private readonly searchTerm = signal('');
@@ -1620,6 +1671,14 @@ export class CodexBrowseComponent implements OnInit {
    * pages can be folded, so this is a lower bound on the server count, never
    * below what is actually on screen.
    */
+  /** Rows in the DOM while the first list is still being built in slices; Infinity once it stands. */
+  private readonly rowCap = signal(Infinity);
+  readonly shownRows = computed<CodexGridRow[]>(() => {
+    const rows = this.rows();
+    const cap = this.rowCap();
+    return cap >= rows.length ? rows : rows.slice(0, cap);
+  });
+
   readonly total = computed(() =>
     Math.max(this.rows().length, this.serverTotal() - (this.rawRows().length - this.rows().length)),
   );
@@ -1910,8 +1969,58 @@ export class CodexBrowseComponent implements OnInit {
   });
 
   constructor() {
+    // A filter the reader turned on (not one the URL arrived with): one event per rise of the count.
+    let seenFilters: number | null = null;
+    effect(() => {
+      const n = this.activeFilterCount();
+      const kind = this.kind();
+      if (seenFilters !== null && n > seenFilters) untracked(() => this.analytics.track('codex:filter_change', { kind, filter_count: n }));
+      seenFilters = n;
+    });
     inject(DestroyRef).onDestroy(() => {
       if (this.searchTimer) clearTimeout(this.searchTimer);
+    });
+    this.sliceFirstList();
+    // The entrance plays for the first fill of the list only: the rows take their turn after the sidebar (or right away when
+    // the data arrived late), and the whole motion class is dropped when the last pop has landed.
+    let filled = false;
+    effect(() => {
+      if (filled || !this.go() || this.listLength() === 0) return;
+      filled = true;
+      untracked(() => {
+        const elapsed = typeof performance !== 'undefined' ? performance.now() - this.goAt : 0;
+        const base = Math.max(300, 1350 - elapsed);
+        this.rowBase.set(base);
+        const end = setTimeout(() => this.entering.set(false), base + this.ROW_POPS * 70 + 900);
+        this.entryTimer = end;
+      });
+    });
+    inject(DestroyRef).onDestroy(() => {
+      if (this.entryTimer) clearTimeout(this.entryTimer);
+    });
+    // Starts the entrance: at once when the index is its own page; as the lower half of /codex ("Mehr in Codex") when its top
+    // first comes into view, once. Sections appear once: scrolling back up and down never replays it.
+    const start = (): void => {
+      this.goAt = typeof performance !== 'undefined' ? performance.now() : 0;
+      this.go.set(true);
+    };
+    const destroyRef = inject(DestroyRef);
+    afterNextRender(() => {
+      if (!this.enter()) return;
+      if (this.headingLevel() === 1 || typeof IntersectionObserver === 'undefined') {
+        start();
+        return;
+      }
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((e) => e.isIntersecting)) return;
+          io.disconnect();
+          start();
+        },
+        { rootMargin: '0px 0px -35% 0px' },
+      );
+      io.observe(this.hostEl.nativeElement);
+      destroyRef.onDestroy(() => io.disconnect());
     });
     this.fitAreaPanel();
     // Beta shell: kind switch, filter tokens, hit count and the panel footer live in the bar.

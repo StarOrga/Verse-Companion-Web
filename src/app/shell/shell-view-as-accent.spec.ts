@@ -161,13 +161,21 @@ describe('ShellComponent - elevated-access marking in the account menu', () => {
 
   it('orders the menu: Social, Einstellungen - divider - Admin, Integrationen - divider - Ansehen als', () => {
     const el = setup({ targets: ['collaborator', 'viewer', 'anon'], active: false, admin: true });
-    const seq = Array.from(el.querySelectorAll<HTMLElement>('.dropdown > a.dropdown-item, .dropdown > button.dropdown-item, .dropdown > hr, .dropdown > .dropdown-sep'))
+    const seq = Array.from(el.querySelectorAll<HTMLElement>('.dropdown .dd-body > a.dropdown-item, .dropdown .dd-body > button.dropdown-item, .dropdown .dd-body > hr, .dropdown .dd-body > .dropdown-sep'))
       .map((n) => (n.tagName === 'HR' ? '|' : n.classList.contains('dropdown-sep') ? '|' : (n.getAttribute('href') ?? n.textContent!.trim())));
     expect(seq).toEqual([
       '/social', '/settings',
       '|', '/admin/api-tokens', // the hub entry needs the beta shell, off in this spec
       '|', 'nav.viewAs.collaborator', 'nav.viewAs.viewer', 'nav.viewAs.anon',
     ]);
+  });
+
+  it('never scrolls sideways: the divider stays inside the menu width', () => {
+    const el = setup({ targets: ['collaborator', 'viewer', 'anon'], active: false, admin: true });
+    const body = el.querySelector<HTMLElement>('.dropdown .scp-b')!;
+    expect(el.querySelector('.dropdown hr.menu-sep')).not.toBeNull();
+    // A divider of width: 100% plus side margins once overflowed the body by 4px: a horizontal scrollbar.
+    expect(body.scrollWidth).toBeLessThanOrEqual(body.clientWidth);
   });
 
   it('shows no elevated surface at all for a plain viewer', () => {

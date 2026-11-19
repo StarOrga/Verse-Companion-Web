@@ -15,7 +15,7 @@ account gets you and what the project keeps. The binding version is the
 | Saved posts, news filters | — | ✅ |
 | Hangar, configurations, role sets, flagship | — | ✅ |
 | Settings (callsign, language, region) | — | ✅ |
-| Data Uploader downloads, Bundle History | — | collaborator / admin |
+| Verse Data Uploader downloads, Bundle History | — | collaborator / admin |
 | Admin: users, API tokens, telemetry, feedback | — | admin |
 
 ## Sign-up
@@ -70,8 +70,9 @@ storage, split into three buckets you control in **Settings**:
   Always on; the app cannot work without them.
 - **Preferences** — news channel filter, saved articles, similar convenience
   state. Turning it off deletes the stored values.
-- **Statistics** — anonymous usage statistics (PostHog, EU). **Off by default**,
-  no identification, no session recording.
+- **Statistics** — usage statistics (PostHog, EU). **Off by default**. Signed in,
+  you appear only under a pseudonymous ID with your role, never name or e-mail;
+  sessions with an error may be recorded with all inputs masked.
 
 As an installable PWA, a service worker also caches static assets on your
 device. That cache holds no personal data.

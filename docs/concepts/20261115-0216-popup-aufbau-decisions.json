@@ -1,0 +1,334 @@
+[
+  {
+    "iteration": 1,
+    "action": "implement",
+    "submitted_at": "2026-11-15T01:43:24.462Z",
+    "favorite": "d3",
+    "decisions": [
+      {
+        "id": "r1-types",
+        "label": "Welche Arten",
+        "value": "five",
+        "rec": "five",
+        "note": "",
+        "flagged": false
+      },
+      {
+        "id": "r1-sizes",
+        "label": "Breiten",
+        "value": "tokens",
+        "rec": "tokens",
+        "note": "",
+        "flagged": false
+      },
+      {
+        "id": "r1-stack",
+        "label": "Popup über Popup",
+        "value": "confirm",
+        "rec": "confirm",
+        "note": "",
+        "flagged": false
+      },
+      {
+        "id": "r1-head",
+        "label": "Bausteine im Kopf",
+        "value": [
+          "title",
+          "eyebrow"
+        ],
+        "rec": "title eyebrow",
+        "note": "",
+        "flagged": false
+      },
+      {
+        "id": "r1-close",
+        "label": "Wann ein ✕",
+        "value": "modal",
+        "rec": "modal",
+        "note": "",
+        "flagged": false
+      },
+      {
+        "id": "r1-scroll",
+        "label": "Langer Inhalt",
+        "value": "body",
+        "rec": "body",
+        "note": "",
+        "flagged": false
+      },
+      {
+        "id": "r1-build",
+        "label": "Wie gebaut",
+        "value": "comp",
+        "rec": "comp",
+        "note": "",
+        "flagged": false
+      },
+      {
+        "id": "r1-phone",
+        "label": "Auf dem Handy",
+        "value": "sheet",
+        "rec": "sheet",
+        "note": "aber teste gut, aob nicht alles vollbild besser ist, dass soll ncihht fusselig sein und für fettfinger gedacht, aber andereseites verstehe ich das für harmlose dialog e mitz zwei button s und einer confirm nachricht nicht vollbild nötig ist, dann ggf. prüfen ob man zu mindest ehorizontal ordentlich platz einnimmt. Aber visuell mit dem subehader syncen!",
+        "flagged": true
+      },
+      {
+        "id": "r1-role",
+        "label": "Admin und Collaborator",
+        "value": "edge",
+        "rec": "edge",
+        "note": "",
+        "flagged": false
+      }
+    ],
+    "annotations": [
+      {
+        "id": "r1-d3-dlg-a1",
+        "screen": "d3-dlg",
+        "design": "d3",
+        "question": "Die farbige Spalte trägt Bereich und Symbol und wird bei Löschen rot. Soll ihre Farbe die Art oder die Folge zeigen?",
+        "answer": "Immer die Art für symbol und farbe! Denn folge ist immer teil des popups bzw. buttons im content bereich!"
+      },
+      {
+        "id": "r1-d3-form-a2",
+        "screen": "d3-form",
+        "design": "d3",
+        "question": "Die Hauptaktion steht links unter dem Inhalt, in Leserichtung. Logisch oder gewöhnungsbedürftig?",
+        "answer": "warum nicht ienfach als hinweistext im input field. Ich denke es ist klar, wenn was drin steht was man dort auswählt ;)"
+      },
+      {
+        "id": "r1-d3-big-a3",
+        "screen": "d3-big",
+        "design": "d3",
+        "question": "Die Augenbraue steht senkrecht in der Spalte. Lesbar genug?",
+        "answer": "ja klar"
+      }
+    ],
+    "comments": [
+      {
+        "id": "anno-r1-d3-dlg-a1",
+        "text": "Immer die Art für symbol und farbe! Denn folge ist immer teil des popups bzw. buttons im content bereich!",
+        "attachments": []
+      },
+      {
+        "id": "anno-r1-d3-form-a2",
+        "text": "warum nicht ienfach als hinweistext im input field. Ich denke es ist klar, wenn was drin steht was man dort auswählt ;)",
+        "attachments": []
+      },
+      {
+        "id": "anno-r1-d3-big-a3",
+        "text": "ja klar",
+        "attachments": []
+      },
+      {
+        "id": "r1-phone-note",
+        "text": "aber teste gut, aob nicht alles vollbild besser ist, dass soll ncihht fusselig sein und für fettfinger gedacht, aber andereseites verstehe ich das für harmlose dialog e mitz zwei button s und einer confirm nachricht nicht vollbild nötig ist, dann ggf. prüfen ob man zu mindest ehorizontal ordentlich platz einnimmt. Aber visuell mit dem subehader syncen!",
+        "attachments": []
+      }
+    ],
+    "mappings": [
+      {
+        "id": "r1_arten",
+        "assigned": {
+          "art": [
+            [
+              "apps_menu",
+              "art.menu"
+            ],
+            [
+              "account_menu",
+              "art.menu"
+            ],
+            [
+              "admin_menu",
+              "art.menu"
+            ],
+            [
+              "merkliste",
+              "art.panel"
+            ],
+            [
+              "beta",
+              "art.panel"
+            ],
+            [
+              "handoff",
+              "art.panel"
+            ],
+            [
+              "footer_bubble",
+              "art.panel"
+            ],
+            [
+              "wish_cart",
+              "art.gross"
+            ],
+            [
+              "quick_search",
+              "art.sonder"
+            ],
+            [
+              "confirm",
+              "art.dialog"
+            ],
+            [
+              "star_toast",
+              "art.hinweis"
+            ],
+            [
+              "undo_toast",
+              "art.hinweis"
+            ],
+            [
+              "lightbox",
+              "art.sonder"
+            ],
+            [
+              "column_menu",
+              "art.menu"
+            ],
+            [
+              "item_path",
+              "art.panel"
+            ],
+            [
+              "component_modal",
+              "art.gross"
+            ],
+            [
+              "swap_picker",
+              "art.gross"
+            ],
+            [
+              "compare_tray",
+              "art.gross"
+            ],
+            [
+              "hero_part",
+              "art.panel"
+            ],
+            [
+              "holo_overlay",
+              "art.panel"
+            ],
+            [
+              "hangar_menu",
+              "art.menu"
+            ],
+            [
+              "browse_sheet",
+              "art.panel"
+            ],
+            [
+              "landing_news",
+              "art.panel"
+            ],
+            [
+              "upcoming",
+              "art.gross"
+            ],
+            [
+              "add_to_set",
+              "art.dialog"
+            ],
+            [
+              "event_claim",
+              "art.dialog"
+            ],
+            [
+              "nachschub_target",
+              "art.dialog"
+            ],
+            [
+              "nachschub_remove",
+              "art.dialog"
+            ],
+            [
+              "nachschub_flow",
+              "art.gross"
+            ],
+            [
+              "blueprint_picker",
+              "art.gross"
+            ],
+            [
+              "reserve",
+              "art.dialog"
+            ],
+            [
+              "einsatz_pick",
+              "art.dialog"
+            ],
+            [
+              "log_dialog",
+              "art.dialog"
+            ],
+            [
+              "missions_popover",
+              "art.panel"
+            ],
+            [
+              "live_ticker",
+              "art.panel"
+            ],
+            [
+              "place_select",
+              "art.menu"
+            ],
+            [
+              "stock_popup",
+              "art.gross"
+            ],
+            [
+              "hq_stats",
+              "art.dialog"
+            ],
+            [
+              "app_launch",
+              "art.hinweis"
+            ],
+            [
+              "patch_dossier",
+              "art.gross"
+            ],
+            [
+              "news_item",
+              "art.gross"
+            ],
+            [
+              "status_chip",
+              "art.panel"
+            ],
+            [
+              "star_dome",
+              "art.panel"
+            ],
+            [
+              "starmap_tour",
+              "art.panel"
+            ],
+            [
+              "social_vis",
+              "art.dialog"
+            ],
+            [
+              "desktop_dl",
+              "art.dialog"
+            ],
+            [
+              "api_tokens",
+              "art.dialog"
+            ],
+            [
+              "app_notice",
+              "art.hinweis"
+            ]
+          ]
+        },
+        "diff": [],
+        "unassigned": []
+      }
+    ],
+    "userPins": []
+  }
+]

@@ -3,12 +3,14 @@ import { HqLiveService } from '../now/hq-live.service';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../auth/auth.service';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScSegmentedComponent, ScSegmentOption } from '../../shared/segmented-control.component';
 import type { HqStats, HqStatsRange } from '../data/hq-db.types';
 import { HQ_STATS_RANGES, HqStatsService } from '../data/hq-stats.service';
 import { HqAppLaunchComponent } from '../hq-app-launch.component';
+import { HqLogbookComponent } from './hq-logbook.component';
 import { HqSparkComponent } from './hq-spark.component';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 
 export type HqTileId = 'auec' | 'missions' | 'contracts' | 'deaths' | 'crimestat' | 'refinery' | 'blueprints';
 
@@ -36,7 +38,7 @@ export interface HqTile {
 @Component({
   selector: 'sc-hq-stats',
   standalone: true,
-  imports: [TranslatePipe, ScSegmentedComponent, HqSparkComponent, ScDialogDirective, HqAppLaunchComponent],
+  imports: [TranslatePipe, ScSegmentedComponent, HqSparkComponent, ScPopupComponent, HqAppLaunchComponent, ScActionDirective, HqLogbookComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="head">
@@ -51,7 +53,7 @@ export interface HqTile {
     @if (svc.error() && !svc.stats()) {
       <div class="state" role="alert">
         <p>{{ svc.error()! | translate }}</p>
-        <button type="button" class="sc-btn" (click)="svc.load()">{{ 'hq.stats.retry' | translate }}</button>
+        <button type="button" scAction tier="secondary" (click)="svc.load()">{{ 'hq.stats.retry' | translate }}</button>
       </div>
     } @else if (!svc.stats()) {
       <p class="state muted" role="status" aria-busy="true">{{ 'hq.stats.loading' | translate }}</p>
@@ -116,19 +118,13 @@ export interface HqTile {
       </section>
     }
 
+    @if (auth.user()) {
+      <sc-hq-logbook />
+    }
+
     @if (detail(); as d) {
-      <div class="backdrop" role="presentation"></div>
-      <div
-        class="dialog"
-        scDialog
-        role="dialog"
-        aria-modal="true"
-        [attr.aria-label]="'hq.stats.tile.' + d.id + '.name' | translate"
-        (scDialogEscape)="close()">
-        <header class="d-head">
-          <h3>{{ 'hq.stats.tile.' + d.id + '.name' | translate }}</h3>
-          <button type="button" class="sc-btn micro" (click)="close()">{{ 'hq.stats.close' | translate }}</button>
-        </header>
+      <sc-popup kind="dialog" [eyebrow]="'hq.title' | translate" [title]="'hq.stats.tile.' + d.id + '.name' | translate" (closed)="close()">
+      <div class="d-body">
         <p class="d-sum">{{ d.value }} · {{ d.sub }}</p>
         <sc-hq-spark class="d-spark" [values]="d.series" [values2]="d.series2" [kind]="d.kind" />
         <p class="d-hint">{{ 'hq.stats.tile.' + d.id + '.hint' | translate }}</p>
@@ -163,6 +159,7 @@ export interface HqTile {
           </div>
         }
       </div>
+      </sc-popup>
     }
   `,
   styles: [
@@ -182,7 +179,7 @@ export interface HqTile {
         color: var(--sc-fg);
       }
       .tile:hover { border-color: var(--sc-accent); }
-      .tile:focus-visible, .sc-btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .tile:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .t-name { color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor)); text-transform: uppercase; letter-spacing: 0.04em; }
       .t-value { font: 600 1.7rem / 1.1 var(--sc-font-display); font-variant-numeric: tabular-nums; }
       .t-sub { color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor)); min-height: 1.2em; }
@@ -215,17 +212,8 @@ export interface HqTile {
       .o-text { margin: 0; color: var(--sc-fg-1); }
       @media (max-width: 749px) { .o-actions { display: none; } }
       .o-actions { display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); }
-      .o-actions .sc-btn { min-height: var(--sc-tap-min, 44px); }
-      .backdrop { position: fixed; inset: 0; background: rgb(0 0 0 / 0.55); z-index: 40; }
-      .dialog {
-        position: fixed; z-index: 41; inset-inline: var(--sc-space-3, 12px); top: 50%; transform: translateY(-50%);
-        max-width: 34rem; margin-inline: auto; max-height: 85vh; max-height: 85dvh; overflow: auto;
-        background: var(--sc-bg-1); border: 1px solid var(--sc-border); border-radius: var(--sc-radius);
-        padding: var(--sc-space-4, 16px); display: grid; gap: var(--sc-space-3, 12px);
-      }
-      .d-head { display: flex; justify-content: space-between; align-items: center; gap: var(--sc-space-3, 12px); }
+      .d-body { display: grid; gap: var(--sc-space-3, 12px); }
       .evdone { margin-top: var(--sc-space-4, 16px); } .evdone h3 { margin: 0 0 var(--sc-space-2, 8px); font: 600 1rem var(--sc-font-display); } .evdone ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); } .evdone li { display: flex; flex-direction: column; padding: var(--sc-space-2, 8px) var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-bg-1); } .evdone small { color: var(--sc-fg-2); }
-      .d-head h3 { margin: 0; font: 600 1.2rem / 1.2 var(--sc-font-display); }
       .d-sum { margin: 0; font-variant-numeric: tabular-nums; }
       .d-spark { height: 5rem; }
       .d-hint { margin: 0; color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor)); }

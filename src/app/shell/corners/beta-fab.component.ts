@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, ElementRef, HostListener, computed,
 import { TranslatePipe } from '@ngx-translate/core';
 import { RoleService } from '../../auth/role.service';
 import { BETA_AREAS, BetaArea, BetaService } from '../../core/beta.service';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { FeedbackFabPrefsService } from '../../core/feedback-fab-prefs.service';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 
 /**
@@ -14,11 +15,16 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
  * (`area`, from `betaAreaOf`) in the normal accent, and no FAB where there is
  * no switch. Admins and collaborators get every area; their FAB is the
  * elevated-access red and names the role in its label.
+ *
+ * Staff share one corner setting with the feedback launcher (feedback #339):
+ * "Feedback-Button anzeigen" off hides this FAB too. A viewer's single area
+ * switch is not affected — their settings text never mentions the beta button,
+ * so the setting must not take it away from them either.
  */
 @Component({
   selector: 'sc-beta-fab',
   standalone: true,
-  imports: [TranslatePipe, ScDialogDirective, ScTooltipDirective],
+  imports: [TranslatePipe, ScPopupComponent, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (areas().length) {
@@ -30,9 +36,10 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
           <span class="mark" aria-hidden="true">β</span>
         </button>
         @if (open()) {
-          <div class="panel" scDialog role="dialog" [attr.aria-label]="'beta.chip.title' | translate"
-               (keydown.escape)="open.set(false)">
-            <p class="head">{{ 'beta.chip.title' | translate }}</p>
+          <div class="panel">
+            <sc-popup kind="panel" size="menu" [title]="'beta.chip.title' | translate" [access]="staff() ? 'collab' : null"
+                      [backClose]="false" (closed)="open.set(false)">
+            <div class="pbody">
             @for (a of areas(); track a) {
               <button type="button" role="switch" class="sw"
                       [attr.aria-checked]="beta.state()[a]"
@@ -45,6 +52,8 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
               </button>
             }
             @if (staff()) { <p class="sc-sr-only">{{ 'beta.chip.note' | translate }}</p> }
+            </div>
+            </sc-popup>
           </div>
         }
       </aside>
@@ -74,21 +83,11 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
     .staff .fab { color: var(--sc-accent-collab); border-color: color-mix(in srgb, var(--sc-accent-collab) 55%, var(--sc-border)); }
     .fab:hover, .fab[aria-expanded='true'] { background: color-mix(in srgb, var(--sc-accent) 14%, var(--sc-bg-1)); border-color: var(--sc-accent); }
     .staff .fab:hover, .staff .fab[aria-expanded='true'] { background: color-mix(in srgb, var(--sc-accent-collab) 14%, var(--sc-bg-1)); border-color: var(--sc-accent-collab); }
-    .fab:focus-visible, .sw:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .fab:focus-visible, .sw:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .mark { font-family: var(--sc-font-display); font-weight: 700; font-size: 1.1rem; }
-    .panel {
-      display: flex; flex-direction: column; gap: var(--sc-space-1);
-      min-width: 220px; max-width: min(var(--sc-ov-menu, 20rem), 100vw - 32px); padding: var(--sc-space-3);
-      max-height: calc(100vh - var(--sc-fab-clear-block, 96px) - var(--sc-space-4));
-      max-height: calc(100dvh - var(--sc-fab-clear-block, 96px) - var(--sc-space-4));
-      overflow-y: auto;
-      background: color-mix(in srgb, var(--sc-bg-1) 96%, transparent);
-      border: 1px solid var(--sc-border); border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);
-    }
-    .head { margin: 0 0 var(--sc-space-1); font-family: var(--sc-font-display); letter-spacing: 0.08em;
-      text-transform: uppercase; font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
-    .note { margin: var(--sc-space-1) 0 0; font-size: max(0.7rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
+    /* Position only (opens upward from the FAB); frame, width, head and ✕ come from <sc-popup kind="panel">. */
+    .panel { display: block; }
+    .pbody { display: flex; flex-direction: column; gap: var(--sc-space-1); }
     .sw {
       display: flex; align-items: center; justify-content: space-between; gap: var(--sc-space-3);
       min-height: var(--sc-tap-min); padding: 0 var(--sc-space-2); border: 0; border-radius: 8px;
@@ -97,7 +96,6 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
     .sw:hover { background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
     .sw:disabled { opacity: 0.45; cursor: not-allowed; }
     .label { font-size: max(0.82rem, var(--sc-fs-floor)); }
-    .only { margin-inline-start: var(--sc-space-1); font-size: max(0.7rem, var(--sc-fs-floor)); color: var(--sc-accent-collab); text-transform: uppercase; letter-spacing: 0.06em; }
     .knob-track { position: relative; flex: none; width: 38px; height: 22px; border-radius: 999px;
       background: var(--sc-bg-2); border: 1px solid var(--sc-border); transition: background 0.16s; }
     .knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
@@ -110,6 +108,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 export class BetaFabComponent {
   protected readonly beta = inject(BetaService);
   protected readonly roles = inject(RoleService);
+  private readonly fabPrefs = inject(FeedbackFabPrefsService);
   private readonly host = inject(ElementRef<HTMLElement>);
 
   /** The area the reader is in (`betaAreaOf`); viewers get only this switch. */
@@ -117,7 +116,7 @@ export class BetaFabComponent {
   protected readonly open = signal(false);
   protected readonly staff = computed(() => this.roles.isCollaborator());
   protected readonly areas = computed<readonly BetaArea[]>(() => {
-    if (this.staff()) return BETA_AREAS;
+    if (this.staff()) return this.fabPrefs.show() ? BETA_AREAS : [];
     const a = this.area();
     return a ? [a] : [];
   });

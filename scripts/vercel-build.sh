@@ -27,4 +27,10 @@ npm run prebuild || exit $?
 
 node scripts/build-with-exit-guard.mjs || exit $?
 
+# Production source maps are hidden (angular.json). Upload them to PostHog
+# error tracking (skips with a log line without POSTHOG_CLI_TOKEN /
+# POSTHOG_CLI_ENV_ID), re-hash the injected bundles in ngsw.json and delete
+# every .map from dist before Vercel serves it. Never fails the deploy.
+node scripts/posthog-sourcemaps.mjs || echo "posthog-sourcemaps: failed, continuing without source maps"
+
 npm run postbuild

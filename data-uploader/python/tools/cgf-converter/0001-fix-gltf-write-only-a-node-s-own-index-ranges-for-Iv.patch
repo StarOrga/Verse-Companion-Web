@@ -1,0 +1,86 @@
+From 6f18cce0559eb9e0b4157b5ebe16b3ad1452660b Mon Sep 17 00:00:00 2001
+From: JerryT2T <noreply@users.noreply.github.com>
+Date: Sun, 15 Nov 2026 14:55:08 +0100
+Subject: [PATCH 1/2] fix(gltf): write only a node's own index ranges for Ivo
+ meshes
+
+Ivo .cga files share one index stream across all nodes. Each node wrote
+the whole stream (zero-filled outside its subsets) as its own index
+bufferView, so the glb binary chunk grew nodes x stream: 219 nodes x
+9.9 MB on the RSI Galaxy, past int.MaxValue -> OverflowException in
+BaseGltfRenderer.Compile(). Pack the node's subset ranges back to back
+and point each index accessor at its packed range. Accessor values,
+names and min/max are unchanged.
+---
+ .../Gltf/BaseGltfRenderer.Geometry.cs         | 34 ++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
+
+diff --git a/CgfConverter/Renderers/Gltf/BaseGltfRenderer.Geometry.cs b/CgfConverter/Renderers/Gltf/BaseGltfRenderer.Geometry.cs
+index 19e50dd..a58c530 100644
+--- a/CgfConverter/Renderers/Gltf/BaseGltfRenderer.Geometry.cs
++++ b/CgfConverter/Renderers/Gltf/BaseGltfRenderer.Geometry.cs
+@@ -1069,6 +1069,14 @@ public partial class BaseGltfRenderer
+ 
+         baseName = $"${gltfNode.Name}/index";
+         uint[] finalIndices;
++        // Ivo meshes share ONE index stream across every node of the file, and
++        // each node only uses its own subsets' ranges of it. Writing the whole
++        // stream per node made the glb buffer nodes x stream long: 219 nodes x
++        // 9.9 MB on the RSI Galaxy, past int.MaxValue -> OverflowException in
++        // Compile(). Only the node's own subset ranges are written now, packed
++        // back to back; every index accessor keeps its values, name and min/max
++        // and points at its range in the packed view.
++        Dictionary<(int First, int Count), int>? packedStart = null;
+ 
+         if (usePerSubsetExtraction)
+         {
+@@ -1092,6 +1100,20 @@ public partial class BaseGltfRenderer
+                 currentOffset += (uint)subset.NumVertices;
+             }
+             finalIndices = remappedIndices;
++
++            packedStart = [];
++            var packed = new List<uint>();
++            foreach (var subset in meshChunk.GeometryInfo.GeometrySubsets ?? [])
++            {
++                if (subset.NumIndices <= 0 || packedStart.ContainsKey((subset.FirstIndex, subset.NumIndices)))
++                    continue;
++                packedStart[(subset.FirstIndex, subset.NumIndices)] = packed.Count;
++                packed.AddRange(new ArraySegment<uint>(remappedIndices, subset.FirstIndex, subset.NumIndices));
++            }
++            if (packed.Count > 0)
++                finalIndices = packed.ToArray();
++            else
++                packedStart = null;
+         }
+         else
+         {
+@@ -1123,10 +1145,11 @@ public partial class BaseGltfRenderer
+                             Color0 = new ParsedGenMask(mat?.CryMaterial.GenMask).UseVertexColors ? accessors.Color0 : null,
+                         },
+                         Indices = GetAccessorOrDefault(baseName, v.FirstIndex, v.FirstIndex + v.NumIndices)
+-                                  ?? AddAccessor(
++                                  ?? RebaseIndexAccessor(AddAccessor(
+                                       $"{nodeChunk.Name}/index",
+                                       indexBufferView, GltfBufferViewTarget.ElementArrayBuffer,
+                                       indices.Data, v.FirstIndex, v.FirstIndex + v.NumIndices),
++                                      v.FirstIndex, v.NumIndices),
+                         Material = mat?.Index,
+                     };
+                 })
+@@ -1135,6 +1158,15 @@ public partial class BaseGltfRenderer
+ 
+         return newMesh.Primitives.Any();
+ 
++        // AddAccessor placed the accessor at FirstIndex of the full stream;
++        // move it to where that range sits in the packed view.
++        int RebaseIndexAccessor(int accessor, int firstIndex, int numIndices)
++        {
++            if (packedStart is not null && packedStart.TryGetValue((firstIndex, numIndices), out var start))
++                Root.Accessors[accessor].ByteOffset = (long)start * sizeof(uint);
++            return accessor;
++        }
++
+         WrittenMaterial? FindMaterial(int matId)
+         {
+             // TODO: This only works for models with a single material file. Should be almost all models, but some may fail here.

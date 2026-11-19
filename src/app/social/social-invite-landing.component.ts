@@ -6,6 +6,7 @@ import { FriendsService } from './friends.service';
 import { edgeLabel } from './friends.types';
 import { SocialService } from './social.service';
 import { InviteRedeemResult, friendPath, isValidInviteToken } from './social.types';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 type State =
   | { kind: 'loading' }
@@ -23,7 +24,7 @@ type State =
 @Component({
   selector: 'sc-social-invite-landing',
   standalone: true,
-  imports: [TranslatePipe, RouterLink],
+  imports: [ScActionDirective, TranslatePipe, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
@@ -33,11 +34,11 @@ type State =
           @case ('loading') { <p>{{ 'social.inviteLanding.loading' | translate }}</p> }
           @case ('dead') {
             <p>{{ 'social.inviteLanding.dead' | translate }}</p>
-            <a class="sc-btn" routerLink="/social">{{ 'social.inviteLanding.toSocial' | translate }}</a>
+            <a scAction tier="secondary" routerLink="/social">{{ 'social.inviteLanding.toSocial' | translate }}</a>
           }
           @case ('error') {
             <p class="err" role="alert">{{ errorKey() | translate }}</p>
-            <button type="button" class="sc-btn" (click)="ngOnInit()">{{ 'errors.retry' | translate }}</button>
+            <button type="button" scAction tier="secondary" (click)="ngOnInit()">{{ 'errors.retry' | translate }}</button>
           }
           @case ('ready') {
             <p>{{ (handle() ? 'social.inviteLanding.from' : 'social.inviteLanding.fromAnon') | translate: { name: handle() } }}</p>
@@ -46,19 +47,19 @@ type State =
                 {{ ('social.inviteLanding.result.' + r.verdict) | translate: { name: resultName(r) } }}
               </p>
               @if (r.verdict === 'pending') {
-                <a class="sc-btn" routerLink="/social">{{ 'social.inviteLanding.toSocial' | translate }}</a>
+                <a scAction tier="secondary" routerLink="/social">{{ 'social.inviteLanding.toSocial' | translate }}</a>
               } @else {
-                <a class="sc-btn sc-btn-primary" [routerLink]="friendLink(r)">{{ 'social.inviteLanding.toFriend' | translate: { name: resultName(r) } }}</a>
+                <a scAction tier="primary" [routerLink]="friendLink(r)">{{ 'social.inviteLanding.toFriend' | translate: { name: resultName(r) } }}</a>
               }
             } @else if (auth.isAuthenticated()) {
               @if (social.error(); as key) { <p class="err" role="alert">{{ key | translate }}</p> }
               <p class="hint">{{ 'social.inviteLanding.hint' | translate }}</p>
-              <button type="button" class="sc-btn sc-btn-primary" [disabled]="social.busy()" (click)="redeem()">
+              <button type="button" scAction tier="primary" [disabled]="social.busy()" (click)="redeem()">
                 {{ 'social.inviteLanding.accept' | translate }}
               </button>
             } @else {
               <p class="hint">{{ 'social.inviteLanding.signInHint' | translate }}</p>
-              <a class="sc-btn sc-btn-primary" routerLink="/login" [queryParams]="{ redirect: returnPath() }">
+              <a scAction tier="primary" routerLink="/login" [queryParams]="{ redirect: returnPath() }">
                 {{ 'social.inviteLanding.signIn' | translate }}
               </a>
             }
@@ -75,8 +76,6 @@ type State =
     .hint { color: var(--sc-fg-2); }
     .err { color: var(--sc-danger); }
     .ok { color: var(--sc-success); }
-    a.sc-btn { text-decoration: none; display: inline-flex; align-items: center; }
-    @media (pointer: coarse) { .sc-btn { min-height: 48px; } }
   `],
 })
 export class SocialInviteLandingComponent implements OnInit {

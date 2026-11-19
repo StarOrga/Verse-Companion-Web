@@ -1,9 +1,10 @@
 import { ShipArrivalComponent } from './ship-arrival/ship-arrival.component';
+import { PATH_ICONS } from '../shared/item-path/path-icons';
 import { SilThumbsService } from '../shared/sil-thumb/sil-thumbs.service';
+import { SILHOUETTE_HOLD_MS, arrivalThumbOf } from './ship-arrival/arrival-thumb';
 import { StarTriggerService } from '../verse/starmap/star-trigger.service';
-import { ItemPathComponent } from '../shared/item-path/item-path.component';
 import { PageCornerService, type PageShare, type PageViewToggle } from '../shell/corners/page-corner.service';
-import { CodexOwnCardComponent } from './detail/codex-own-card.component';
+import { CodexOwnStationsComponent } from './detail/codex-own-stations.component';
 import { CodexHoloShareComponent } from './holo/codex-holo-share.component';
 import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
 import { CodexOwnSegmentComponent } from './detail/codex-own-segment.component';
@@ -11,6 +12,7 @@ import { noteOpenedPage } from '../shell/merkliste/merkliste-opened';
 import { CompareIconComponent } from './compare-icon.component';
 import { ingredientTokenOfCrate } from '../hq/stock/hq-stock-ref';
 import { logWarn } from '../core/log';
+import { AnalyticsService } from '../core/analytics.service';
 import { toErrorKey } from '../core/describe-error';
 import { AccountPrefsService } from '../core/account-prefs.service';
 import {
@@ -58,7 +60,8 @@ import {
 import { AddToSetComponent } from './set/add-to-set.component';
 import { roleSlotForAttachType } from './codex-landing-kpi';
 import { HangarService } from '../hangar/hangar.service';
-import { HangarShipConfig, PeekedSharedLoadout } from '../hangar/hangar.types';
+import { ConfigLoadoutEntry, HangarShipConfig, PeekedSharedLoadout, ShipConfigRole } from '../hangar/hangar.types';
+import type { PathResult } from '../hq/data/item-path.service';
 import { HqOwnershipService } from '../hq/hq-ownership.service';
 import { HQ_MINE_PARAM, HQ_ROOT, HQ_VARIANT_PARAM, hqHangar, hqShipLink, personalShipLink } from '../hq/hq-routes';
 import { CodexModeSwitchComponent, CodexPersonalUsesComponent } from './detail/codex-personal-mode.component';
@@ -69,10 +72,11 @@ import { InfoNoteComponent } from '../shared/info-note.component';
 import { ShareButtonComponent } from '../shared/share-button/share-button.component';
 import { ScEntryDirective } from '../shared/entry-motion/entry-motion';
 import { NachschubService } from '../hq/nachschub/nachschub.service';
-import { NACHSCHUB_ICON_PATHS } from '../hq/nachschub/step-icons';
 import { CodexItemStageComponent } from './detail/codex-item-stage.component';
 import { DisplayStatGroup, toDisplayStatGroups } from './detail/stat-labels';
 import { CodexShipStageComponent } from './detail/codex-ship-stage.component';
+import { CodexHeroHoloOverlayComponent } from './detail/codex-hero-holo-overlay.component';
+import { CodexHeroPartPopupComponent, resolveHeroPart, type HeroPartPick } from './detail/codex-hero-part-popup.component';
 import { CodexVariantPickerComponent } from './detail/codex-variant-picker.component';
 import { CodexShipActionsComponent } from './detail/codex-ship-actions.component';
 import { CodexShipLinkFormComponent } from './detail/codex-ship-link-form.component';
@@ -89,6 +93,7 @@ import {
   buildStageCounts,
   fmtGm,
   shipDeckNames,
+  shipDecksDerived,
 } from './detail/codex-detail-facts';
 import { ShipLinkFormStore } from './detail/ship-link-form.store';
 import { CodexLoadoutDraftStore } from './detail/codex-loadout-draft.store';
@@ -125,6 +130,7 @@ import {
   ammoClassNamesFor,
   damageChannelsOf,
   equippedStats,
+  statsFingerprint,
   equippedStatsNoteKey,
   equippedTypeLabel,
   isWeaponMountPort,
@@ -136,7 +142,6 @@ import {
   classifyShipModule,
   shipModuleGroupOf,
   isConfigurableSection,
-  isIndividualSection,
   shipPortFamily,
   classNamePositionFamily,
 } from './ship-module-sections';
@@ -153,7 +158,14 @@ import {
   StageCountChip,
 } from './detail/codex-detail.types';
 import { SkinOption, resolveSkinGroup } from './codex-skin-group';
-import { EditionOption, resolveEditionGroup } from './codex-edition-group';
+import { EditionOption, ModelVariantOption, resolveEditionGroup, resolveModelVariants } from './codex-edition-group';
+import { AKTE_STANDARD_LIVERY, AkteEdition, AkteFact, AkteLivery, CodexHoloAkteComponent } from './holo/codex-holo-akte.component';
+import { CodexHoloHangarMenuComponent, HangarExemplar, HangarMenuLink } from './holo/codex-holo-hangar-menu.component';
+import { ShipSkinsService } from './ship-skins.service';
+import { ExemplarAiService, ExemplarPartChange } from '../hangar/exemplar-ai.service';
+import { ItemPathService } from '../hq/data/item-path.service';
+import { ScConfirmService } from '../shared/dialog/sc-confirm.service';
+import { UndoToastService } from '../shared/undo-toast/undo-toast.service';
 import { SummaryOccupant } from './ship-summary-panels';
 import { CodexCompareTrayComponent } from './codex-compare-tray.component';
 import { CodexLoadoutSaveBarComponent } from './codex-loadout-save-bar.component';
@@ -179,15 +191,16 @@ import {
 } from './codex-loadout-stats';
 import { CodexKpiBandComponent } from './codex-kpi-band.component';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import type { RankCardCopy, RankCardScope } from './codex-rank-card.component';
 import {
   MissileRecord,
-  defaultMissileScope,
   hasCombatMetrics,
   isMissileRow,
   missileKeywords,
   missileRecordOf,
   missileStatGroups,
+  missileFieldKind,
   rankMissile,
 } from './codex-missile';
 import { ShellChromeService } from '../shell/fusion-bar/shell-chrome.service';
@@ -216,6 +229,7 @@ import {
   narrowestRankScope,
   readRankScopePref,
   rankShip,
+  rankMissionNoteKey,
   resolveCareerLabel,
   writeRankScopePref,
 } from './codex-rank';
@@ -245,6 +259,7 @@ import {
   ComponentInspectEntry,
 } from './codex-component-modal.component';
 import { CodexSwapPickerComponent, SwapPick, SwapTarget } from './codex-swap-picker.component';
+import { carriedWithDraft } from './detail/carried-draft';
 import { CodexWeaponDetailComponent, ShipSignature, WeaponDetailEntry } from './codex-weapon-detail.component';
 import { borrowedCountermeasureNameKey } from './codex-countermeasure';
 import { ShipDeckPlanComponent } from './ship-deck-plan.component';
@@ -278,6 +293,7 @@ import { PageHeaderComponent } from '../shared/page-header/page-header.component
 import { HANGAR_ROOT_CRUMB, NavOriginService, PageCrumb, originTrail } from '../shared/page-header/nav-origin.service';
 import { ClassChipComponent } from '../shared/class-chip/class-chip.component';
 import { FeedbackSpotDirective } from '../feedback/feedback-spot.directive';
+import { DeferErrorComponent } from '../shared/defer-error/defer-error.component';
 
 // Engine placeholders that identify no attach type — never build a fit on them.
 /** Which stored loadout the URL puts on the table (#646): a shared link
@@ -297,12 +313,12 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
 @Component({
   selector: 'sc-codex-detail',
   standalone: true,
-  imports: [ShipArrivalComponent, CompareIconComponent, ItemPathComponent, FeedbackSpotDirective, PageHeaderComponent, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexHardpointLayoutComponent, CodexComponentModalComponent, CodexSwapPickerComponent, CodexWeaponDetailComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, CodexLoadoutSaveBarComponent, CodexSavedLoadoutsComponent, CodexKpiBandComponent, ScTooltipDirective, CodexMissionBarComponent, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, CodexRankCardComponent, CodexEnergyDockComponent, InfoNoteComponent, CodexHoloStageComponent, CodexShipStageComponent, CodexVariantPickerComponent, CodexShipActionsComponent, CodexShipLinkFormComponent, CodexPortListComponent, CodexSpecSheetComponent, CodexRecipeCardComponent, AssetPackageViewerComponent, NgTemplateOutlet, AddToSetComponent, ClassChipComponent, CodexModeSwitchComponent, CodexPersonalUsesComponent, HangarPickerComponent, CodexHoloShareComponent, ScDialogDirective, NotFoundComponent, CodexOwnSegmentComponent, CodexOwnCardComponent, ShareButtonComponent, HeightVarDirective, ScEntryDirective, CodexItemStageComponent, CodexDetailClassicComponent],
+  imports: [DeferErrorComponent, ShipArrivalComponent, CompareIconComponent, FeedbackSpotDirective, PageHeaderComponent, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexHardpointLayoutComponent, CodexComponentModalComponent, CodexSwapPickerComponent, CodexWeaponDetailComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, CodexLoadoutSaveBarComponent, CodexSavedLoadoutsComponent, CodexKpiBandComponent, ScTooltipDirective, ScActionDirective, CodexMissionBarComponent, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, CodexRankCardComponent, CodexEnergyDockComponent, InfoNoteComponent, CodexHoloStageComponent, CodexShipStageComponent, CodexHeroHoloOverlayComponent, CodexHeroPartPopupComponent, CodexVariantPickerComponent, CodexShipActionsComponent, CodexShipLinkFormComponent, CodexPortListComponent, CodexSpecSheetComponent, CodexRecipeCardComponent, AssetPackageViewerComponent, NgTemplateOutlet, AddToSetComponent, ClassChipComponent, CodexModeSwitchComponent, CodexPersonalUsesComponent, HangarPickerComponent, CodexHoloShareComponent, ScDialogDirective, NotFoundComponent, CodexOwnSegmentComponent, CodexOwnStationsComponent, ShareButtonComponent, HeightVarDirective, ScEntryDirective, CodexItemStageComponent, CodexDetailClassicComponent, CodexHoloAkteComponent, CodexHoloHangarMenuComponent],
   providers: [ShipLinkFormStore, CodexLoadoutDraftStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="detail-page">
-      <sc-page-header class="crumbrow" [class.holo-on]="holoStageOn()" [crumbs]="crumbs()" [rememberAs]="detail() ? displayName() : null">
+      <sc-page-header class="crumbrow" [class.holo-on]="holoStageOn()" [class.ship-classic]="kind() === 'ship' && !holoStageOn()" [crumbs]="crumbs()" [rememberAs]="detail() ? displayName() : null">
         <!-- The head strip [Patch | Besitz] (concept codex-kopf-besitz C1) sits on the title's line: the
              Holotable's title row, the classic ship head row (.c-head), the item name. Items keep the
              old [Codex | Meine] switch here outside the shell beta. -->
@@ -325,14 +341,14 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
 
       @if (loading() && skeletonStage() && arrivalThumb(); as arrival) {
         <!-- The loading ship's real silhouette (silhouette only, no backdrop) when the build has it. -->
-        <div class="sc-card skel-stage arrival" role="status" [attr.aria-label]="'codex.detail.loadingStage' | translate">
+        <div class="sc-card skel-stage arrival" [class.bare]="shellBeta()" animate.leave="skel-leave" role="status" [attr.aria-label]="'codex.detail.loadingStage' | translate">
           <sc-ship-arrival [thumb]="arrival" />
         </div>
       } @else if (loading() && skeletonStage()) {
         <!-- Holodeck skeleton: the page frame + header are already up; the
              stage's own lock ring and scan line run until the ship arrives and
              the real stage replaces this box in place (same min-height). -->
-        <div class="sc-card skel-stage" role="status" [attr.aria-label]="'codex.detail.loadingStage' | translate">
+        <div class="sc-card skel-stage" [class.bare]="shellBeta()" animate.leave="skel-leave" role="status" [attr.aria-label]="'codex.detail.loadingStage' | translate">
           <i class="skel-ring" aria-hidden="true"></i>
           <i class="skel-scan" aria-hidden="true"></i>
         </div>
@@ -411,7 +427,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               </div>
             </sc-codex-item-stage>
             <aside class="it-panel ce" style="--ce: 1" [attr.aria-label]="'itemStage.panelAria' | translate">
-              <div class="it-path ce" style="--ce: 1"><ng-container [ngTemplateOutlet]="ownCard" /></div>
+              <div class="it-path ce" style="--ce: 1"><ng-container [ngTemplateOutlet]="ownCard" [ngTemplateOutletContext]="{ layout: 'stacked' }" /></div>
               <div class="it-tabs ce" style="--ce: 2" role="tablist" [attr.aria-label]="'itemStage.tabsAria' | translate">
                 @for (t of itemTabs(); track t.id) {
                   <button type="button" role="tab" class="it-tab" [class.on]="itemTab() === t.id" [attr.aria-selected]="itemTab() === t.id"
@@ -438,7 +454,10 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
         </div>
         } @else if (kind() !== 'ship') {
         <!-- Klassisch for every non-ship: the frozen view in detail/codex-detail-classic.component.ts. -->
-        <sc-codex-detail-classic [ctx]="classicCtx" />
+        <sc-codex-detail-classic [ctx]="classicCtx">
+          <!-- R5 (G4): the same two stations under the head of the classic item page. -->
+          <ng-container [ngTemplateOutlet]="ownCard" [ngTemplateOutletContext]="{ layout: 'auto' }" />
+        </sc-codex-detail-classic>
         } @else {
         <!-- ── Masthead: hero | Einordnung, 1fr 1fr (MASTER §1/§3) ── -->
         @if (kind() === 'ship') {
@@ -447,10 +466,33 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
           <header class="c-head">
             <div class="c-tt">
               @if (heroEyebrow(); as eb) { <p class="c-eyebrow">{{ eb }}</p> }
-              <h1 class="c-name">{{ displayName() }}</h1>
+              <!-- The RSI link and the pledge-link action sit beside the name (#374: "weiter nach oben"). -->
+              <div class="c-name-row">
+                <h1 class="c-name">{{ displayName() }}</h1>
+                <div class="c-links"><sc-codex-ship-actions [classNameSlug]="detail()!.classNameSlug" [showClass]="false" /></div>
+              </div>
             </div>
             <ng-container [ngTemplateOutlet]="headStrip" />
           </header>
+          <!-- Pin your own RSI pledge link (feedback f7d3bd9a), opened from the head row above. Private to
+               you; an admin can publish one for everyone, never automatic. -->
+          @if (shipLinkForm.open()) {
+            <div class="c-link-form"><sc-codex-ship-link-form /></div>
+          }
+        }
+        @if (kind() === 'ship' && !shellBeta()) {
+          <!-- The hangar control sits ABOVE the picture (#239: "Hangar im
+               Bild raus, dafür gibt es über dem Bild einen Button") — the
+               same docked HangarPicker the Holotable carries in its table
+               head: the button opens the hangar, its chain switches to one
+               of the three recently chosen hulls. Nothing it offered inside
+               the picture is lost. It is a row of its own ABOVE the masthead
+               grid (#335): inside the left column it pushed only the picture
+               down, out of line with the Einordnung beside it. -->
+          <div class="stage-top">
+            <sc-hangar-picker kind="ship" [docked]="true" [items]="shipPickerItems()"
+              (pick)="onShipPickerPick($event)" (open)="onHangarPickerOpen()" />
+          </div>
         }
         <div class="m-top" [class.ship-mode]="kind() === 'ship'" [class.missile-mode]="isMissile()" [scFeedbackSpot]="'feedbackSpot.headline'">
         <div class="hero-stack">
@@ -464,19 +506,10 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
              included (they existed nowhere else on the page).
              Every other codex kind keeps the two-column hero it always had: it
              has no analysis card to move its facts into. ── -->
-        @if (kind() === 'ship' && !shellBeta()) {
-          <!-- The hangar control sits ABOVE the picture (#239: "Hangar im
-               Bild raus, dafür gibt es über dem Bild einen Button") — the
-               same docked HangarPicker the Holotable carries in its table
-               head: the button opens the hangar, its chain switches to one
-               of the three recently chosen hulls. Nothing it offered inside
-               the picture is lost. -->
-          <div class="stage-top">
-            <sc-hangar-picker kind="ship" [docked]="true" [items]="shipPickerItems()"
-              (pick)="onShipPickerPick($event)" (open)="onHangarPickerOpen()" />
-          </div>
-        }
-        <header class="hero sc-card" [class.bay]="kind() === 'ship'" [class.stage]="kind() === 'ship'" [class.missile]="isMissile()">
+        <!-- The picture and the ownership card are one positioned box, so the
+             3D overlay (#334) covers exactly the two of them and nothing else. -->
+        <div class="hero-pair">
+        <header class="hero sc-card" data-energy-dock-anchor [class.bay]="kind() === 'ship'" [class.stage]="kind() === 'ship'" [class.missile]="isMissile()">
           @if (kind() === 'ship') {
             <!-- Extracted to keep this file's component-style budget under the
                  Angular build budget (AUD-062) — same DOM, classes and
@@ -487,7 +520,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               [heroSub]="heroSub()"
               [heroArt]="heroArt()"
               [displayName]="displayName()"
-              [heroView3d]="heroView3d()"
+              [heroView3d]="false"
               [shipClassName]="shipClassName()"
               [hardpointPortRefs]="hardpointPortRefs()"
               [activePorts]="activePorts()"
@@ -507,7 +540,28 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
           <!-- The ownership card (C5) sits directly under the picture (#323:
                it had no business in the headline's side column). It takes its
                own height; the stretching stage above gives up the room. -->
-          <div class="hero-own"><ng-container [ngTemplateOutlet]="ownCard" /></div>
+          <div class="hero-own"><ng-container [ngTemplateOutlet]="ownCard" [ngTemplateOutletContext]="{ layout: 'auto' }" /></div>
+          <!-- "Zur 3D-Ansicht wechseln" (#334): the Holotisch's 3D view as a
+               non-modal panel over the picture and the card — no scrim, the
+               page around it stays usable; "Vollbild" enlarges it. -->
+          @if (heroView3d() && shipClassName(); as cls) {
+            <sc-codex-hero-holo-overlay
+              [shipClassName]="cls"
+              [displayName]="displayName()"
+              [still]="prefersReducedMotion()"
+              [hardpointPortRefs]="hardpointPortRefs()"
+              [activePorts]="activePorts()"
+              (hovered)="setActivePorts($event)"
+              [selectedPart]="heroPart()?.id ?? null"
+              (partPicked)="heroPart.set($event)"
+              (fullChange)="heroFull.set($event)"
+              (locatable)="glbLocatablePorts.set($event)"
+              (closed)="closeHero3d()" />
+          }
+        }
+        </div>
+
+        @if (kind() === 'ship') {
 
           <!-- ── One action row directly under the picture ─────────────────
                The four frequent actions sat on the art until feedback 140dfb7e
@@ -518,15 +572,15 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                pickers stay one click away and the rarer actions sit at its end.
                Wraps on a phone. ── -->
           <div class="stage-actions">
-            <button type="button" class="btn" [class.on]="isPinned()" (click)="togglePin()">
+            <button type="button" scAction tier="secondary" [class.on]="isPinned()" [attr.aria-pressed]="isPinned()" (click)="togglePin()">
               <sc-compare-icon [on]="isPinned()" />
               {{ (isPinned() ? 'codex.compare.pinned' : 'codex.detail.actionCompare') | translate }}
             </button>
-            <button type="button" class="btn" (click)="discardLoadoutDraft()">
+            <button type="button" scAction tier="secondary" (click)="discardLoadoutDraft()">
               {{ 'codex.detail.actionFactoryLoadout' | translate }}
             </button>
             @if (!shareFab()) {
-              <button type="button" class="btn copy" (click)="copyShareLink()">
+              <button type="button" scAction tier="secondary" class="copy" (click)="copyShareLink()">
                 {{ 'codex.detail.actionCopyLink' | translate }}
                 @if (linkCopied()) {
                   <span class="copy-toast" role="status">{{ 'codex.detail.linkCopied' | translate }}</span>
@@ -534,7 +588,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               </button>
             }
             <!-- Navigates, so it is an anchor and never a button (§2). -->
-            <a class="btn on" [routerLink]="['/codex']" [queryParams]="{ kind: 'ship' }">
+            <a scAction tier="secondary" [routerLink]="['/codex']" [queryParams]="{ kind: 'ship' }">
               {{ 'codex.detail.actionSwitchShip' | translate }} <span aria-hidden="true">⇄</span>
             </a>
             @if (editionOptions().length > 1) {
@@ -545,20 +599,19 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               <sc-codex-variant-picker class="in-toolrow" variant="skin" [kind]="detail()!.kind" [currentSlug]="detail()!.classNameSlug"
                 [options]="skinPickerOptions()" [current]="currentLivery()" />
             }
-            <sc-codex-ship-actions [classNameSlug]="detail()!.classNameSlug" [spacer]="true" />
+            <sc-codex-ship-actions [classNameSlug]="detail()!.classNameSlug" [spacer]="true" [showLinks]="false" />
           </div>
-
-          <!-- Pin your own RSI pledge link (feedback f7d3bd9a). Private to
-               you; an admin can publish one for everyone, never automatic. -->
-          @if (shipLinkForm.open()) {
-            <sc-codex-ship-link-form />
-          }
         }
         </div>
 
         @if (kind() === 'ship') {
           <!-- The side column: the Einordnung (the ownership card moved under the picture, #323). -->
           <div class="m-side">
+          <!-- A hotspot picked in the 3D overlay (#334): its part in a small popup over the Einordnung, no scrim. -->
+          @if (heroView3d() && heroPartFocus(); as part) {
+            <sc-codex-hero-part-popup [part]="part" [still]="prefersReducedMotion()" [overFull]="heroFull()"
+              (closed)="heroPart.set(null)" />
+          }
           <sc-codex-rank-card
             [shipName]="displayName()"
             [sizeClass]="null"
@@ -567,6 +620,10 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
             [profile]="rankProfile()"
             [scope]="rankScope()"
             [disabledReasons]="rankDisabledReasons()"
+            [holoContent]="true"
+            [shipClass]="rankShipClass()"
+            [roleName]="rankRoleName()"
+            [missionNoteKey]="rankMissionNote()"
             (profileChange)="rankProfile.set($event)"
             (scopeChange)="setRankScope($event)" />
           </div>
@@ -589,26 +646,38 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               [capabilities]="shipCapabilities()"
               [changed]="draftChangedCount()"
               (missionChange)="setMission($event)" />
-            <sc-codex-loadout-save-bar
-              class="draft-controls"
-              [changed]="draftChangedCount()"
-              [saveable]="saveableEntries().length"
-              [saving]="saving()"
-              [error]="saveError()"
-              [inHangar]="personalMode()"
-              (save)="saveLoadoutDraft()"
-              (discard)="discardLoadoutDraft()"
-              (addAndSave)="addToHangar()" />
-            <!-- #322: named loadouts per ship (local) + the prepared cart action. -->
-            @if (detail(); as d) {
-              <sc-codex-saved-loadouts
-                class="saved-loadouts"
-                [shipClassName]="d.classNameSlug"
-                [buildId]="build()?.id ?? null"
-                [draft]="draft()"
-                [readOnly]="draftReadOnly()"
-                (recall)="recallSavedLoadout($event)" />
-            }
+            <!-- #322: the layout controls replaced the separate ENTWURF box here.
+                 One dropdown (Neu + this ship's layouts), save icon with the
+                 "not saved" dot, share link, cart icon — narrow, so the
+                 mission chips beside them keep their size. Discarding is the
+                 stage row's "Werks-Loadout". -->
+            <div class="draft-side">
+              @if (personalMode()) {
+                <!-- A hangar variant still saves into the hangar: only its
+                     save control stays, without the box. -->
+                <sc-codex-loadout-save-bar
+                  class="draft-controls"
+                  [compact]="true"
+                  [changed]="draftChangedCount()"
+                  [saveable]="saveableEntries().length"
+                  [saving]="saving()"
+                  [error]="saveError()"
+                  [inHangar]="true"
+                  (save)="saveLoadoutDraft()"
+                  (discard)="discardLoadoutDraft()"
+                  (addAndSave)="addToHangar()" />
+              }
+              @if (detail(); as d) {
+                <sc-codex-saved-loadouts
+                  class="saved-loadouts"
+                  [shipClassName]="d.classNameSlug"
+                  [buildId]="build()?.id ?? null"
+                  [draft]="draft()"
+                  [changed]="draftChangedCount()"
+                  [readOnly]="draftReadOnly()"
+                  (recall)="recallSavedLoadout($event)" />
+              }
+            </div>
           </div>
         }
 
@@ -624,7 +693,10 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
           <!-- ── Ship modules, configurable blocks first (461288f9), now
                mission-ordered/folded (PR C) ── -->
           @if (primaryModuleSections().length > 0) {
-            <section class="sc-card block col-loadout col-stick" scHeightVar="--_h" [scFeedbackSpot]="'codex.detail.columnLoadout'">
+            <!-- No outer card (#332): like the Analyse column beside it, the
+                 heading stands bare above the area boxes (Bewaffnung, Raketen,
+                 Türme, …), which keep their own boxes and backgrounds. -->
+            <section class="col-loadout col-stick" scHeightVar="--_h" [scFeedbackSpot]="'codex.detail.columnLoadout'">
               <h2 class="col-head">
                 <span class="label">{{ 'codex.detail.columnLoadout' | translate }}</span>
                 <span class="n">{{ moduleCount() }}</span>
@@ -641,6 +713,23 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                   <p>{{ 'codex.detail.moduleOrderHint' | translate }}</p>
                 </sc-info-note>
                 <span class="rule" aria-hidden="true"></span>
+                <!-- #345: the whole loadout back to stock, right at its heading,
+                     only while something differs from it. Each slot keeps its
+                     own reset icon in the rows below. Its slot is held open
+                     even while there is nothing to reset, so the icon coming
+                     and going never moves the heading (#345 follow-up). -->
+                @if (!draftReadOnly()) {
+                  <span class="head-reset-slot">
+                    @if (draftChangedCount() > 0) {
+                      <button type="button" scAction tier="tertiary" class="head-reset"
+                              [attr.aria-label]="'codex.loadout.resetAll' | translate"
+                              [scTooltip]="'codex.loadout.resetAll' | translate" scTooltipTier="label"
+                              (click)="resetWholeLoadout()">
+                        <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.35-5.65M4 4v4.5h4.5" /></svg>
+                      </button>
+                    }
+                  </span>
+                }
               </h2>
               <!-- The "no stock guns in this extract" disclosure used to sit here,
                    far above the block it is about. It now rides on the Weapons
@@ -660,7 +749,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                 (reverted)="onRevertPaths($event)"
                 (hovered)="setActivePorts($event)"
                 (inspected)="openInspect($event)"
-                (swapRequested)="openSwapPicker($event)" />
+                (swapRequested)="openSwapPicker($event)"
+                (swapWarm)="prepareSwapPicker($event)" />
             </section>
           }
 
@@ -722,6 +812,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                 (hovered)="setActivePorts($event)"
                 (locatable)="glbLocatablePorts.set($event)"
                 (available)="onArtAvailable($event)" />
+            } @error {
+              <sc-defer-error source="codex.skinViewer" />
             }
           }
         }
@@ -732,6 +824,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
             <sc-ship-deck-plan [decks]="decks" [lang]="deckPlanLang()" />
           } @placeholder {
             <div aria-hidden="true"></div>
+          } @error {
+            <sc-defer-error source="codex.deckPlan" messageKey="common.deferError.deckPlan" />
           }
         }
         <ng-container [ngTemplateOutlet]="tailLoadout" />
@@ -739,7 +833,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
         <ng-container [ngTemplateOutlet]="infoBlocks" />
         }
         } @else {
-          <sc-codex-holo-stage animate.enter="view-in"
+          <sc-codex-holo-stage animate.enter="view-in" (viewChange)="onStageViewChange()"
             [detail]="detail()!"
             [displayName]="displayName()"
             [manufacturerName]="manufacturerName()"
@@ -803,6 +897,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
             (reverted)="onRevertPaths($event)"
             [readOnly]="draftReadOnly()"
             [savedPorts]="draftSavedPaths()"
+            [autosaving]="draftStore.autosave()"
             [sharedBanner]="sharedDraft()"
             [adoptingShared]="adoptingShared()"
             (adoptShared)="adoptSharedDraft()"
@@ -811,73 +906,62 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
             (missionChange)="setMission($event)"
             (rankProfileChange)="rankProfile.set($event)"
             (rankScopeChange)="setRankScope($event)"
-            (saveDraft)="saveLoadoutDraft()"
+            (saveDraft)="onHoloSaveDraft()"
             (discardDraft)="discardLoadoutDraft()"
             (locatable)="glbLocatablePorts.set($event)"
             (sheetChange)="powerSheet.set($event)"
             (arrivedShip)="onHoloArrived($event)"
             [openDetails]="sourceLinkRequested()">
-            <div htOwn class="strip-own"><ng-container [ngTemplateOutlet]="ownSegment" /></div>
-            <div htCard><ng-container [ngTemplateOutlet]="ownCard" /></div>
-            <!-- The side column below the first screen (concept holotisch-unten
-                 r1, d2): as wide as the strip's Einsatz, on the left. Every
-                 action lives in a box — Bei RSI in Beschreibung, the wish list
-                 in Wo zu kaufen, Edition/Lackierung/Vergleich in their own box.
-                 The deck plan moved into the table's Schema "Einfach" chips. -->
-            <div htSide class="ho-side">
-              <section class="sc-card side-card">
-                <h2 class="side-h">{{ 'codex.detail.description' | translate }}</h2>
-                @if (description(); as d) {
-                  <p class="desc side-desc">{{ d }}</p>
+            <!-- Concept holotisch-feinschliff r4 d1: the models under the name (C3), the one hangar
+                 button (C5/C22), the Akte over the table (C20/C21). Ownership lives only in the button. -->
+            @if (modelOptions().length > 1) {
+              <nav htModels class="ho-models" [attr.aria-label]="'codex.holo.akte.modelsAria' | translate">
+                @for (m of modelOptions(); track m.classNameSlug; let last = $last) {
+                  <a [routerLink]="['/codex', 'ship', m.classNameSlug]" [class.on]="m.classNameSlug === detail()!.classNameSlug"
+                     [attr.aria-current]="m.classNameSlug === detail()!.classNameSlug ? 'page' : null">{{ m.label ?? ('codex.holo.akte.standard' | translate) }}</a>
+                  @if (!last) { <i aria-hidden="true">·</i> }
                 }
-                <div class="side-acts">
-                  <sc-codex-ship-actions [classNameSlug]="detail()!.classNameSlug" />
-                </div>
-                @if (shipLinkForm.open()) {
-                  <sc-codex-ship-link-form />
-                }
-              </section>
-              <section class="sc-card side-card" [attr.id]="shipSourceFragment">
-                <h2 class="side-h">{{ 'codex.detail.whereToBuy' | translate }}</h2>
-                @if (buyLoading()) {
-                  <p class="muted">{{ 'codex.detail.whereToBuyLoading' | translate }}</p>
-                } @else if (buyError()) {
-                  <p class="err-inline">{{ 'codex.detail.whereToBuyError' | translate }}</p>
-                } @else if (buyOptions().length === 0) {
-                  <p class="muted">{{ 'codex.detail.whereToBuyEmpty' | translate }}</p>
-                } @else {
-                  <ul class="side-buy">
-                    @for (opt of buyOptions(); track opt.terminal + opt.price) {
-                      <li>
-                        <b class="buy-price">{{ fmt(opt.price) }} aUEC</b>
-                        <span>{{ opt.terminal }}</span>
-                        <small class="muted">{{ opt.location }}</small>
-                      </li>
-                    }
-                  </ul>
-                }
-                <p class="hint buy-attribution">{{ 'codex.detail.whereToBuyAttribution' | translate }}</p>
-                <!-- Secondary, not primary: the page's head and ownership card carry no primary (C5/C6). -->
-                <sc-item-path kind="ship" level="secondary" [className]="detail()!.classNameSlug" [name]="displayName()" />
-              </section>
-              <section class="sc-card side-card">
-                <h2 class="side-h">{{ 'codex.holo.side.variants' | translate }}</h2>
-                <div class="side-variants">
-                  @if (editionOptions().length > 1) {
-                    <sc-codex-variant-picker variant="edition" [kind]="detail()!.kind" [currentSlug]="detail()!.classNameSlug"
-                      [options]="editionPickerOptions()" [current]="currentEdition()" />
-                  }
-                  @if (skinOptions().length > 1) {
-                    <sc-codex-variant-picker variant="skin" [kind]="detail()!.kind" [currentSlug]="detail()!.classNameSlug"
-                      [options]="skinPickerOptions()" [current]="currentLivery()" />
-                  }
-                  <!-- Pin to the compare tray (the classic view pins from its stage actions). -->
-                  <button type="button" class="pin" [class.pinned]="isPinned()" [attr.aria-pressed]="isPinned()" (click)="togglePin()">
-                    <sc-compare-icon [on]="isPinned()" /> {{ (isPinned() ? 'codex.compare.pinned' : 'codex.compare.pin') | translate }}
-                  </button>
-                </div>
-              </section>
-            </div>
+              </nav>
+            }
+            <sc-codex-holo-hangar-menu htOwn
+              [shipName]="displayName()"
+              [className]="detail()!.classNameSlug"
+              [count]="hangarQty()"
+              [signedIn]="!!currentUserId()"
+              [forceOwned]="hqHosted()"
+              [exemplars]="hangarExemplars()"
+              [wishes]="hangarWishes()"
+              [activeId]="activeVariantId()"
+              [werkLink]="werkLink()"
+              [werkChanged]="activeVariantId() === null ? draftChangedCount() : 0"
+              [pinned]="(cardShip()?.pinnedRank ?? null) !== null"
+              [busy]="menuBusy()"
+              [errorKey]="menuError()"
+              (rename)="renameExemplar($event)"
+              (note)="noteExemplar()"
+              (pin)="pinExemplarShip()"
+              (remove)="removeExemplar($event)"
+              (copyExemplar)="copyExemplar($event)"
+              (newFromWerk)="newExemplarFromWerk()"
+              (saveAsExemplar)="saveWerkAsExemplar()"
+              (addCopy)="addHangarCopy()"
+              (addWish)="addHangarWish()" />
+            <sc-codex-holo-akte holoAkte [attr.id]="shipSourceFragment" [openBuy]="sourceLinkRequested()"
+              [description]="description()"
+              [facts]="akteFacts()"
+              [heroArt]="heroArt()"
+              [previewSilhouette]="previewSilhouetteUrl()"
+              [liveries]="akteLiveries()"
+              [editions]="akteEditions()"
+              [currentSlug]="detail()!.classNameSlug"
+              [rsiHref]="shipLinkForm.pledgeLink() ?? rsiShipsUrl"
+              [buyOptions]="buyOptions()" [buyLoading]="buyLoading()" [buyError]="buyError()"
+              [itemName]="displayName()" [wikelo]="isWikeloRecord()"
+              (buyRetry)="retryWhereToBuy()">
+              <button type="button" class="pin ak-pin" [class.pinned]="isPinned()" [attr.aria-pressed]="isPinned()" (click)="togglePin()">
+                <sc-compare-icon [on]="isPinned()" /> {{ (isPinned() ? 'codex.compare.pinned' : 'codex.compare.pin') | translate }}
+              </button>
+            </sc-codex-holo-akte>
             <ng-container [ngTemplateOutlet]="tailLoadout" />
             @if (recipeView(); as rv) {
               <sc-codex-recipe-card [recipe]="rv" />
@@ -924,7 +1008,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
       <!-- Full stat sheet for one clicked module (461288f9). Rendered last so
            its fixed-position backdrop sits above everything on the page. -->
       <sc-codex-component-modal [entry]="inspected()" (closed)="closeInspect()" />
-      <sc-codex-swap-picker [target]="swapTarget()" (closed)="swapTarget.set(null)" (picked)="onSwapPicked($event)" />
+      <sc-codex-swap-picker #swapPicker [target]="swapTarget()" (closed)="swapTarget.set(null)" (picked)="onSwapPicked($event)" />
       <sc-codex-weapon-detail [entry]="weaponDetail()" [shipSignature]="shipSignature()" (closed)="closeWeaponDetail()" />
 
       <ng-template #infoBlocks>
@@ -942,6 +1026,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
           <sc-asset-package-viewer class="pkg-viewer" [row]="pkg" [still]="prefersReducedMotion()" />
         } @placeholder {
           <div class="pkg-viewer" aria-hidden="true"></div>
+        } @error {
+          <sc-defer-error class="pkg-viewer" source="codex.assetPackage" />
         }
       </section>
     }
@@ -972,7 +1058,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
         [result]="missileRank()"
         [loading]="missileCohortLoading()"
         [profiles]="[]"
-        [scopes]="missileRankScopes"
+        [scopes]="missileRankScopes()"
         [copy]="missileRankCopy"
         [gapKey]="missileRankGapKey()"
         [scope]="missileRankScope()"
@@ -1140,9 +1226,10 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
             [personal]="personalMode()" [hangarShipId]="hqShipId()" [forceOwned]="hqHosted()" (jump)="revealOwnCard()" />
         }
       </ng-template>
-      <ng-template #ownCard>
+      <!-- R5 "Zwei Kästen": the wish and ownership stations of sc-item-path in place of the former ownership card. -->
+      <ng-template #ownCard let-layout="layout">
         @if (detail(); as d) {
-          <sc-codex-own-card [kind]="d.kind" [className]="d.classNameSlug" [name]="displayName()"
+          <sc-codex-own-stations [kind]="d.kind" [className]="d.classNameSlug" [name]="displayName()" [layout]="layout ?? 'auto'"
             [ship]="cardShip()" [forceOwned]="hqHosted()" [nachschubName]="d.kind === 'ship' ? (holdingNachschub()?.name ?? null) : null" />
         }
       </ng-template>
@@ -1215,7 +1302,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               (reverted)="onRevertPaths($event)"
               (hovered)="setActivePorts($event)"
               (inspected)="openInspect($event)"
-              (swapRequested)="openSwapPicker($event)" />
+              (swapRequested)="openSwapPicker($event)"
+                (swapWarm)="prepareSwapPicker($event)" />
           </section>
         }
       </ng-template>
@@ -1268,15 +1356,14 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     }
   `,
   styles: [`
-    .ho-side { display: contents; }
-    .side-card { margin: 0; padding: 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-    .side-h { margin: 0; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-accent); font-family: var(--sc-font-display); font-weight: 400; }
-    .side-desc { font-size: max(0.8rem, var(--sc-fs-floor)); }
-    .side-acts, .side-variants { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-width: 0; }
-    .side-buy { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-    .side-buy li { display: grid; gap: 1px; min-width: 0; font-size: max(0.78rem, var(--sc-fs-floor)); }
-    .side-buy li > * { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .side-card .buy-attribution { margin: 0; }
+    /* The model links under the ship name (r3/r4 d1 .b3-models): plain words, the current one underlined. */
+    .ho-models { display: flex; align-items: center; flex-wrap: wrap; gap: 1px; font-size: max(12px, var(--sc-fs-floor)); }
+    .ho-models a { padding: 2px 6px; border-radius: 6px; color: var(--sc-fg-2); text-decoration: none; white-space: nowrap; }
+    .ho-models a:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
+    .ho-models a.on { color: var(--sc-fg-0); border-radius: 0; box-shadow: inset 0 -1.5px 0 var(--sc-accent); }
+    .ho-models a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    .ho-models i { color: var(--sc-fg-2); font-style: normal; opacity: 0.6; }
+    @media (pointer: coarse) { .ho-models a { min-height: 48px; display: inline-flex; align-items: center; } }
     .foreign-note { margin: 0 0 12px; padding: 10px 14px; font-size: max(0.8rem, var(--sc-fs-floor)); color: var(--sc-fg-1); border-left: 3px solid var(--sc-warning); }
     .personal-uses { margin: 0 0 12px; }
     :host { display: block; }
@@ -1291,12 +1378,17 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .detail-page .sc-card,
     .detail-page .sc-card.block { border-radius: 4px; box-shadow: none; }
     .crumbrow { margin-bottom: 10px; }
-    /* Beta shell: the trail is in the Fusion bar, the aside in the Holotable's title row, nothing is left here. */
-    @media (min-width: 721px) { :host-context([data-layout]) .crumbrow.holo-on { display: none; } }
+    /* Beta shell: the trail is in the Fusion bar, the aside in the Holotable's title row, nothing is left here.
+       The classic ship view has no aside either (its head strip sits in .c-head), so its crumb row was an empty
+       28px band plus margin and gap above the maker line (#321: "ein Zwischenraum wofuer?"). */
+    @media (min-width: 721px) { :host-context([data-layout]) .crumbrow:is(.holo-on, .ship-classic) { display: none; } }
     .crumb-aside { display: flex; align-items: center; gap: 10px 16px; flex-wrap: wrap; }
     .c-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px 20px; flex-wrap: wrap; margin-block-end: 12px; }
     .c-tt { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
     .c-eyebrow { margin: 0; font-family: var(--sc-font-display); font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.08em; text-transform: uppercase; color: var(--sc-fg-2); }
+    .c-name-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; min-width: 0; }
+    .c-links { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+    .c-link-form { margin-block-end: 12px; }
     .c-name { margin: 0; font-weight: 500; font-size: clamp(18px, 1.15vw + 6px, 26px); line-height: 1.15; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-0); overflow-wrap: anywhere; }
     .m-side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
     .it-strip { margin-block-start: 6px; }
@@ -1314,7 +1406,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
        and the stage takes up the slack - its art is absolutely positioned, so
        a taller card is simply more picture. One column (<=1100px) keeps auto rows. */
     .m-top.ship-mode { align-items: stretch; }
-    .m-top.ship-mode > .hero-stack > .hero.stage { flex: 1 1 auto; }
+    .m-top.ship-mode > .m-side { position: relative; }
+    .m-top.ship-mode > .hero-stack > .hero-pair, .m-top.ship-mode > .hero-stack > .hero-pair > .hero.stage { flex: 1 1 auto; }
 
     /* Loadout | Analyse (MASTER §1/§6/§7) */
     .m-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
@@ -1338,6 +1431,14 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .col-head .head-note { flex: 0 0 auto; text-transform: none; letter-spacing: normal; }
     .col-head .head-note p { margin: 0 0 6px; }
     .col-head .head-note p:last-child { margin-bottom: 0; }
+    /* A fixed-width slot that exists whether or not the icon is in it, so the
+       rule never grows or shrinks as the loadout leaves and returns to stock. */
+    .col-head .head-reset-slot { flex: 0 0 26px; display: inline-flex; justify-content: center; align-items: center; height: 18px; }
+    .col-head .head-reset { flex: 0 0 auto; width: 26px; height: 26px; }
+    @media (pointer: coarse) {
+      .col-head .head-reset-slot { flex-basis: 48px; height: 24px; }
+      .col-head .head-reset { width: 48px; height: 48px; }
+    }
     .col-analyse { display: flex; flex-direction: column; gap: 12px; }
     /* The shorter column stays on screen (the longer one fills the grid row,
        so it has no sticky travel at all). It parks under the sticky KPI strip
@@ -1362,8 +1463,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .mission-draft-bar { display: flex; align-items: center; justify-content: space-between;
       gap: 12px; flex-wrap: wrap; }
     .mission-draft-bar sc-codex-mission-bar { flex: 1 1 auto; min-width: 0; }
-    .draft-controls { flex: 0 0 auto; }
-    .saved-loadouts { flex: 0 1 auto; margin-left: auto; }
+    .draft-side { flex: 0 0 auto; margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .draft-controls, .saved-loadouts { flex: 0 0 auto; }
 
     /* The ship stage's own hero chip row (.hchip, career/role/crew/cargo/mass)
        moved to sc-codex-ship-stage (AUD-062) along with everything else the
@@ -1374,7 +1475,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
        half, so the row sits directly under the stage rather than in the next
        grid track. */
     .hero-stack { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-    .hero-stack > .hero-own { flex: 0 0 auto; display: flex; flex-direction: column; }
+    .hero-pair { position: relative; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .hero-pair > .hero-own { flex: 0 0 auto; display: flex; flex-direction: column; }
 
     /* ── BUEHNE (concept section 2) ── sc-codex-ship-stage (AUD-062) renders
        with display:contents inside this header, so its content becomes this
@@ -1393,41 +1495,36 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
 
     /* The hangar control directly ABOVE the stage (#239), left-aligned like the
        page's other rows; the picker itself lays out in normal flow (docked). */
-    .stage-top { display: flex; align-items: center; gap: 6px; }
+    .stage-top { display: flex; align-items: center; gap: 6px; margin-block-end: 10px; }
     /* The one action row directly under the stage: the four frequent actions,
        then Ausfuehrung / Lackierung and the rarer actions (the old tool row,
        folded in by #321). The pickers' compact sizing lives in
        sc-codex-variant-picker (:host(.in-toolrow)); the spacer that pushes the
        rarer actions to the end lives in sc-codex-ship-actions. */
     .stage-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-    /* The one button on this page (concept section 2, part-02:159). Never the
-       hot accent: nothing here is admin-gated. A 3px rectangle with a 10px
-       uppercase label at .12em - the mock's button, not a pill.
-       The hero actions used to keep a compact size of their own right here;
-       they no longer need to, because this rule IS the concept's button at
-       every occurrence, so the four German labels on the half-width hero and
-       the rarer ones at the end of that row are one and the same control. */
-    .btn, .pin { position: relative; display: inline-flex; align-items: center; gap: 5px;
+    /* The stage actions are scAction pills. A pinned compare keeps the accent
+       state; .copy anchors its toast. */
+    .stage-actions .sc-action.on { color: var(--sc-accent);
+      border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0));
+      background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
+    .stage-actions .copy { position: relative; }
+    .pin { position: relative; display: inline-flex; align-items: center; gap: 5px;
       padding: 4px 8px; min-height: 48px;
       border: 1px solid var(--sc-border); border-radius: 3px;
       background: color-mix(in srgb, var(--sc-bg-0) 72%, transparent);
       color: var(--sc-fg-2); font-family: var(--sc-font-display); text-decoration: none;
       font-size: max(10px, var(--sc-fs-floor)); letter-spacing: 0.12em; text-transform: uppercase;
       cursor: pointer; }
-    /* The mock draws this button about 24px tall. A mouse gets exactly that;
-       coarse pointers - and therefore the mobile gate, which emulates one -
-       keep the 48px floor declared above. */
     @media (pointer: fine) {
-      .btn, .pin { min-height: 24px; }
+      .pin { min-height: 24px; }
     }
-    .btn:hover, .pin:hover { color: var(--sc-fg-0);
+    .pin:hover { color: var(--sc-fg-0);
       border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0)); }
-    .btn.on, .pin.pinned { color: var(--sc-accent);
+    .pin.pinned { color: var(--sc-accent);
       border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0));
       background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-    .btn:focus-visible, .pin:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-    .btn:disabled, .pin:disabled { opacity: 0.38; cursor: not-allowed; }
-    .btn.quiet { text-transform: none; letter-spacing: 0; background: transparent; }
+    .pin:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    .pin:disabled { opacity: 0.38; cursor: not-allowed; }
 
     /* The 2D/3D switch (.view-switch) moved to sc-codex-ship-stage — see
        codex-ship-stage.component.ts. */
@@ -1484,7 +1581,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .mchip { font-size: max(10px, var(--sc-fs-floor)); padding: 3px 7px; border-radius: 3px; letter-spacing: 0.12em;
       text-transform: uppercase; background: color-mix(in srgb, var(--sc-bg-0) 72%, transparent);
       border: 1px solid var(--sc-border); color: var(--sc-fg-1); cursor: default; }
-    .mchip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .mchip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     /* Skin / edition picker: sc-codex-variant-picker owns its rules. */
 
@@ -1585,6 +1682,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .skel-card { height: 260px; }
     .skel-stage { position: relative; min-height: 520px; overflow: hidden; }
     .skel-stage > i { position: absolute; pointer-events: none; }
+    /* β shell: the scene behind is the stage while the ship loads - no card slab before the hologram (QA D11). */
+    .skel-stage.bare { background: transparent; border-color: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
     .skel-ring { left: 50%; top: 50%; width: 76px; height: 76px; margin: -38px 0 0 -38px; border-radius: 50%;
       border: 1px solid color-mix(in srgb, var(--sc-accent) 60%, transparent);
       box-shadow: 0 0 22px color-mix(in srgb, var(--sc-accent) 30%, transparent), inset 0 0 14px color-mix(in srgb, var(--sc-accent) 20%, transparent);
@@ -1595,12 +1694,17 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     @keyframes skel-lock { 0%, 100% { transform: scale(0.82); opacity: 0.45; } 50% { transform: scale(1); opacity: 1; } }
     @keyframes skel-scan { 0% { bottom: 14%; opacity: 0; } 15%, 85% { opacity: 1; } 100% { bottom: 86%; opacity: 0; } }
     @media (max-width: 720px) { .skel-stage { min-height: 360px; } }
-    @media (prefers-reduced-motion: reduce) { .skel-ring, .skel-scan { animation: none; } }
+    /* The skeleton hands over to the stage instead of vanishing: it takes no room while it
+       leaves (the stage enters in its place) and fades out under the stage's own view-in (D11). */
+    .skel-stage.skel-leave { margin-bottom: -520px; pointer-events: none; animation: skel-out 420ms var(--holo-e-out, ease-out) forwards; }
+    @media (max-width: 720px) { .skel-stage.skel-leave { margin-bottom: -360px; } }
+    @keyframes skel-out { to { opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) { .skel-ring, .skel-scan { animation: none; } .skel-stage.skel-leave { animation-duration: 160ms; } }
     /* No own padding: .sc-card's density scale (--sc-pad-1) tightens it on phones. */
     .err { color: var(--sc-danger); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .err .retry:hover { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .empty { text-align: center; padding: 40px; color: var(--sc-fg-2); }
 
     @media (max-width: 760px) {
@@ -1615,7 +1719,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
          card chrome (grid → flex, the wash's height) stays here. */
       .hero.stage { display: flex; flex-direction: column; min-height: 0; padding: 0; gap: 0; }
       .hero.stage::before { inset: 0 0 auto 0; height: 190px; }
-      .stage-actions .btn { flex: 1 1 auto; justify-content: center; }
+      .stage-actions .sc-action { flex: 1 1 auto; justify-content: center; }
     }
     @media (max-width: 400px) {
       .hero-body { padding: 16px; }
@@ -1653,6 +1757,7 @@ export class CodexDetailComponent implements OnInit {
     return this.route.snapshot.fragment === SHIP_SOURCE_FRAGMENT;
   }
   private readonly router = inject(Router);
+  private readonly analytics = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly t = inject(TranslateService);
   private readonly hangar = inject(HangarService);
@@ -1663,7 +1768,7 @@ export class CodexDetailComponent implements OnInit {
   private readonly shipLinks = inject(ShipLinkService);
   private readonly auth = inject(AuthService);
   private readonly uexShop = inject(UexShopService);
-  private readonly draftStore = inject(CodexLoadoutDraftStore);
+  protected readonly draftStore = inject(CodexLoadoutDraftStore);
   private readonly sharedAdopter = inject(SharedLoadoutAdopter);
 
   readonly detail = signal<CodexDetail | null>(null);
@@ -1721,7 +1826,8 @@ export class CodexDetailComponent implements OnInit {
   private get nachschub(): NachschubService {
     return (this.nachschubSvc ??= this.lazyInjector.get(NachschubService));
   }
-  protected readonly nachschubIcon = NACHSCHUB_ICON_PATHS;
+  /** The Route glyph of an Operation (B9), from the item path's icon family. */
+  protected readonly nachschubIcon = PATH_ICONS.nachschub;
   /** Every kind but ships (which keep their own stage) gets the stage layout; a missile too, with its own values and rank. */
   /** The frozen Klassisch view reads the page through this (see CodexClassicCtx for what it may touch). */
   protected readonly classicCtx: CodexClassicCtx = this;
@@ -1790,7 +1896,7 @@ export class CodexDetailComponent implements OnInit {
    * every other kind lists where the reader fitted / packed it. Codex mode is
    * the game's knowledge, the same for everyone, never saved.
    */
-  /** The hangar row the ownership card's rename / note / pin / remove act on: the hosted copy in the HQ, else the reader's owned row of this hull. */
+  /** The hangar row the ownership station's rename / note / pin / remove act on: the hosted copy in the HQ, else the reader's owned row of this hull. */
   readonly cardShip = computed(() => {
     if (this.hqHosted()) {
       const id = this.hostShipId();
@@ -1799,8 +1905,24 @@ export class CodexDetailComponent implements OnInit {
     const cls = this.detail()?.classNameSlug;
     return cls ? (this.hangar.ships().find((s) => s.shipClassName === cls && s.status === 'owned') ?? null) : null;
   });
-  private readonly ownCardRef = viewChild(CodexOwnCardComponent);
-  /** The head's "Nicht im Hangar / Inventar": the ownership card comes into view and lights up (C2). */
+  private readonly ownCardRef = viewChild(CodexOwnStationsComponent);
+  private readonly holoStage = viewChild(CodexHoloStageComponent);
+  /** The ship whose catalog came back without any 3D model; null = unknown or has one. */
+  private readonly noModelSlug = signal<string | null>(null);
+  /** The reader switched the view on this page, so the no-model default must not override it. */
+  private readonly viewPicked = signal(false);
+  /** A ship without a 3D model opens on the Akte (once per page load, only while the reader has not chosen). */
+  private readonly akteDefault = effect(() => {
+    const slug = this.noModelSlug();
+    const stage = this.holoStage();
+    if (!slug || !stage || this.viewPicked() || this.detail()?.classNameSlug !== slug) return;
+    untracked(() => {
+      stage.akteOpen.set(true);
+      this.noModelSlug.set(null);
+    });
+  });
+  private readonly swapPicker = viewChild<CodexSwapPickerComponent>('swapPicker');
+  /** The head's "Nicht im Hangar / Inventar": the ownership station comes into view and lights up (C2, R5). */
   revealOwnCard(): void {
     this.ownCardRef()?.reveal();
   }
@@ -1822,15 +1944,31 @@ export class CodexDetailComponent implements OnInit {
   /**
    * Which view the hero stage shows. 2D is the default — the store render is
    * the picture of the ship, and it costs nothing. The switch on the card
-   * swaps in the interactive model, and the standalone livery section below
+   * opens the Holotisch's 3D view as an overlay over the picture and the
+   * ownership card (#334), and the standalone livery section below
    * steps aside while it does, so only one glb is ever live (see the template).
    */
   readonly heroView3d = signal(false);
+  /** The part picked in the classic 3D overlay (#334): its popup sits over the Einordnung. */
+  readonly heroPart = signal<HeroPartPick | null>(null);
+  /** The classic 3D overlay is fullscreen: the part popup follows it above. */
+  readonly heroFull = signal(false);
+  readonly heroPartFocus = computed(() => {
+    const pick = this.heroPart();
+    return pick ? resolveHeroPart([...this.primaryModuleSections(), ...this.tailModuleSections()], pick) : null;
+  });
+  closeHero3d(): void {
+    this.heroView3d.set(false);
+    this.heroPart.set(null);
+    this.heroFull.set(false);
+  }
   /** The skin catalog actually has a 3D model — no model, no switch. */
   readonly has3dView = signal(false);
 
   toggleHeroView(): void {
     this.heroView3d.update((v) => !v);
+    this.heroPart.set(null);
+    this.heroFull.set(false);
   }
 
   /**
@@ -1872,7 +2010,8 @@ export class CodexDetailComponent implements OnInit {
   /** The silhouette of the ship being loaded, once the (advisory, never awaited) batched read has answered. */
   readonly arrivalThumb = computed(() => {
     const cls = this.requestClass();
-    return cls && this.requestKind() === 'ship' ? this.silThumbs.thumbOf('ship', cls) : null;
+    if (!cls || this.requestKind() !== 'ship') return null;
+    return this.silThumbs.thumbOf('ship', cls) ?? arrivalThumbOf(this.shipSilhouette());
   });
   readonly skeletonStage = computed(() => this.requestKind() === 'ship' && this.holoView());
   private static readonly HOLO_VIEW_STORAGE_KEY = 'sc.codex.holoView';
@@ -2178,6 +2317,7 @@ export class CodexDetailComponent implements OnInit {
       this.draftStore.reset();
     }
     this.holoView.set(next);
+    if (next) this.analytics.track('codex:holotable_open', { kind: this.kind() ?? 'unknown' });
     try {
       localStorage.setItem(CodexDetailComponent.HOLO_VIEW_STORAGE_KEY, next ? 'holo' : 'classic');
     } catch {
@@ -2279,6 +2419,400 @@ export class CodexDetailComponent implements OnInit {
   // The edition family of this ship, base record first (feedback 77ecad2a).
   // Fewer than two entries means "nothing to pick" and hides the picker.
   readonly editionOptions = signal<EditionOption[]>([]);
+
+  // ── Holotisch head + Akte (concept holotisch-feinschliff r4 d1: C3, C5, C20–C23) ──
+  private readonly shipSkins = inject(ShipSkinsService);
+  private readonly itemPath = inject(ItemPathService);
+  private readonly confirmDialog = inject(ScConfirmService);
+  private readonly undoToast = inject(UndoToastService);
+  private readonly exemplarAi = inject(ExemplarAiService);
+  /** The separate models of this hull family, for the links under the name (C3); empty = one model. */
+  readonly modelOptions = signal<ModelVariantOption[]>([]);
+  /** The paints of this record (ship_skins) as the Akte's Lackierung tiles (C21). */
+  readonly akteLiveries = signal<AkteLivery[]>([]);
+  protected readonly rsiShipsUrl = 'https://robertsspaceindustries.com/en/pledge/ships?sortField=name&sortDirection=asc';
+  /** Editions (same hull, another record or marketing name) fold into the Akte tiles as links (C21). */
+  readonly akteEditions = computed<AkteEdition[]>(() =>
+    this.editionOptions().map((o) => ({ classNameSlug: o.classNameSlug, label: o.editionName ?? this.displayName() })),
+  );
+  /**
+   * The record is a Wikelo trade item (its name or class carries the marker the edition folding knows). The Codex
+   * holds no trade data (parts, quantities) yet, so the Akte's Wikelo row shows without a parts list.
+   */
+  readonly isWikeloRecord = computed(() => /wikelo/i.test(`${this.displayName()} ${this.detail()?.classNameSlug ?? ''}`));
+  /** The Kaufen tab's "Erneut versuchen": the shop lookup again. */
+  retryWhereToBuy(): void {
+    const d = this.detail();
+    if (d) void this.loadWhereToBuy(d);
+  }
+  /** The Akte's facts: maker plus a few hull lines that have a value. */
+  readonly akteFacts = computed<AkteFact[]>(() => {
+    const out: AkteFact[] = [];
+    const maker = this.manufacturerName();
+    if (maker) out.push({ labelKey: 'codex.holo.akte.maker', value: maker });
+    const rows = this.shipFactGroups().flatMap((g) => g.rows);
+    for (const key of AKTE_FACT_KEYS) {
+      const row = rows.find((r) => r.labelKey === key && !!r.value);
+      if (row?.value) out.push({ labelKey: key, value: row.value });
+    }
+    return out;
+  });
+
+  private readonly ownState = computed(() => {
+    const d = this.detail();
+    return d && d.kind === 'ship' ? this.itemPath.state('ship', d.classNameSlug, this.displayName())() : null;
+  });
+  private readonly ownStateLoad = effect(() => {
+    if (this.kind() === 'ship') void this.itemPath.ensureLoaded();
+  });
+  /** Copies in the hangar (0 = none); the HQ page is an own copy by definition. */
+  readonly hangarQty = computed(() => {
+    const s = this.ownState();
+    const qty = Math.max(1, s?.hangarQty ?? 0);
+    return this.hqHosted() || s?.inHangar ? qty : 0;
+  });
+  readonly menuBusy = signal(false);
+  readonly menuError = signal<string | null>(null);
+  /** Summaries known to the page (written by ExemplarAiService on a switch or when the page is left). */
+  private readonly exemplarSummaries = signal<ReadonlyMap<string, string>>(new Map());
+
+  /** Stock occupant per port (path and bare name, lower case) — what "Werk" means for the ◆ count. */
+  private readonly stockByPort = computed(() => {
+    const m = new Map<string, string>();
+    const walk = (list: readonly LoadoutEntry[] | undefined, prefix: string, depth: number): void => {
+      if (!Array.isArray(list) || depth > 4) return;
+      for (const e of list) {
+        const port = e?.itemPortName?.trim();
+        if (!port) continue;
+        const path = prefix ? `${prefix}/${port}` : port;
+        const cls = (e.entityClassName ?? '').toLowerCase();
+        m.set(path.toLowerCase(), cls);
+        if (!m.has(port.toLowerCase())) m.set(port.toLowerCase(), cls);
+        walk(e.entries, path, depth + 1);
+      }
+    };
+    walk((this.detail()?.payload as ShipPayload | undefined)?.defaultLoadout, '', 0);
+    return m;
+  });
+
+  /** Werk part → own part per slot that differs (display names where the page knows them). */
+  exemplarChanges(loadout: readonly ConfigLoadoutEntry[]): ExemplarPartChange[] {
+    const stock = this.stockByPort();
+    const names = this.loadoutEntities();
+    const label = (cls: string): string => {
+      const e = names.get(cls);
+      return (e?.name ? pickLocalized(e.name, this.lang()) : null) || e?.nameLocalized || cls || '—';
+    };
+    const out: ExemplarPartChange[] = [];
+    for (const entry of loadout) {
+      const port = entry.portName.toLowerCase();
+      const from = stock.get(port) ?? stock.get(port.replace(/\./g, '/')) ?? stock.get(port.split(/[/.>]/).pop() ?? port) ?? '';
+      if (from === (entry.className ?? '').toLowerCase()) continue;
+      out.push({ slot: entry.portName, from: label(from), to: label(entry.className) });
+    }
+    return out;
+  }
+
+  /** Where an exemplar opens: HQ › Hangar › ship (shell beta), else the personal Codex view. */
+  private exemplarLink(hangarShipId: string, configId: string): HangarMenuLink {
+    const slug = this.detail()?.classNameSlug ?? '';
+    return this.shellBeta() ? hqShipLink(hangarShipId, configId) : personalShipLink(slug, configId);
+  }
+
+  readonly hangarExemplars = computed<HangarExemplar[]>(() => this.menuConfigs(false));
+  /** Wishes of this hull that carry a loadout (`is_wish` configs, D1) — listed under Wunschliste, opened like an exemplar. */
+  readonly hangarWishes = computed<HangarExemplar[]>(() => this.menuConfigs(true));
+  private menuConfigs(wishes: boolean): HangarExemplar[] {
+    const summaries = this.exemplarSummaries();
+    const out: HangarExemplar[] = [];
+    for (const ref of this.myVariants()) {
+      const cfg = this.ownershipSvc.configById(ref.id);
+      if (!cfg || !!cfg.isWish !== wishes) continue;
+      out.push({
+        id: ref.id,
+        name: ref.name,
+        diffCount: this.exemplarChanges(cfg.loadout).length,
+        summary: summaries.get(ref.id) ?? null,
+        link: this.exemplarLink(cfg.hangarShipId, ref.id),
+      });
+    }
+    return out;
+  }
+  /** "Werk": the HQ page without a variant, or the Codex page itself. */
+  readonly werkLink = computed<HangarMenuLink>(() => {
+    const id = this.hostShipId();
+    if (this.hqHosted() && id) return hqShipLink(id);
+    return { commands: ['/codex', 'ship', this.detail()?.classNameSlug ?? ''], queryParams: { [HQ_VARIANT_PARAM]: null } };
+  });
+
+  /** The Holotisch save bar: an exemplar saves into itself; on Werk the build becomes a new exemplar — offered, never forced (C23). */
+  onHoloSaveDraft(): void {
+    if (this.personalMode()) void this.saveLoadoutDraft();
+    else void this.saveWerkAsExemplar();
+  }
+
+  /** Keep the Werk table (with its swaps) as a new exemplar, then offer a name — the AI's when it differs from Werk. */
+  async saveWerkAsExemplar(): Promise<void> {
+    if (this.addBusy()) return;
+    this.addBusy.set(true);
+    this.addFailed.set(false);
+    let created: HangarShipConfig | null = null;
+    try {
+      created = await this.adoptAndOpen();
+      if (!created) this.addFailed.set(true);
+      this.ownershipSvc.invalidate();
+      // Busy stays up through the name offer: its AI suggestion takes seconds, and a second save
+      // click in that wait used to create a second "Codex-Loadout" (round-7 E8).
+      if (created) await this.offerExemplarName(created.id, created.name, created.loadout);
+    } catch {
+      if (!created) this.addFailed.set(true);
+    } finally {
+      this.addBusy.set(false);
+    }
+  }
+
+  private async offerExemplarName(id: string, current: string, loadout: readonly ConfigLoadoutEntry[]): Promise<void> {
+    const changes = this.exemplarChanges(loadout);
+    const suggestion = changes.length ? await this.exemplarAi.suggestName(this.displayName(), changes) : null;
+    const v = await this.confirmDialog.prompt({
+      titleKey: 'codex.holo.hangar.nameTitle',
+      messageKey: suggestion ? 'codex.holo.hangar.nameSuggested' : undefined,
+      params: { name: suggestion ?? '' },
+      inputLabelKey: 'codex.holo.hangar.nameLabel',
+      inputMaxLength: 80,
+      initialValue: suggestion ?? current,
+      confirmKey: 'hangar.detail.save',
+    });
+    const name = v?.trim();
+    if (!name || name === current) return;
+    await this.hangar.updateConfig(id, { name });
+    this.ownershipSvc.invalidate();
+  }
+
+  async renameExemplar(id: string): Promise<void> {
+    const cfg = this.ownershipSvc.configById(id);
+    if (!cfg) return;
+    const changes = this.exemplarChanges(cfg.loadout);
+    // The suggestion only fills the dialog's hint; the player's own name stays in the field and wins.
+    const suggestion = changes.length ? await this.exemplarAi.suggestName(this.displayName(), changes) : null;
+    const v = await this.confirmDialog.prompt({
+      titleKey: 'codex.own.renameTitle',
+      messageKey: suggestion ? 'codex.holo.hangar.nameSuggested' : undefined,
+      params: { name: suggestion ?? '' },
+      inputLabelKey: 'codex.holo.hangar.nameLabel',
+      inputMaxLength: 80,
+      initialValue: cfg.name,
+      confirmKey: 'hangar.detail.save',
+    });
+    const name = v?.trim();
+    if (!name || name === cfg.name) return;
+    await this.runMenu(async () => {
+      if (!(await this.hangar.updateConfig(id, { name }))) throw new Error('rename failed');
+    }, 'updateConfig');
+  }
+
+  async noteExemplar(): Promise<void> {
+    const s = this.cardShip();
+    if (!s) return;
+    const v = await this.confirmDialog.prompt({
+      titleKey: 'codex.own.noteTitle',
+      inputLabelKey: 'hangar.detail.notes',
+      inputMaxLength: 500,
+      initialValue: s.notes ?? '',
+      confirmKey: 'hangar.detail.save',
+    });
+    if (v === null) return;
+    await this.hangar.updateShip(s.id, { notes: v.trim() || null });
+  }
+
+  async pinExemplarShip(): Promise<void> {
+    const s = this.cardShip();
+    if (!s) return;
+    if (s.pinnedRank !== null) {
+      await this.hangar.pinShip(s.id, null);
+      return;
+    }
+    const taken = new Set(this.hangar.ships().map((x) => x.pinnedRank));
+    const rank = ([1, 2, 3] as const).find((r) => !taken.has(r)) ?? 3;
+    await this.hangar.pinShip(s.id, rank);
+  }
+
+  async removeExemplar(id: string): Promise<void> {
+    const cfg = this.ownershipSvc.configById(id);
+    if (!cfg) return;
+    const ok = await this.confirmDialog.confirm({
+      titleKey: 'codex.holo.hangar.removeTitle',
+      messageKey: 'codex.holo.hangar.removeBody',
+      params: { name: cfg.name },
+      confirmKey: 'codex.holo.hangar.removeExemplar',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    const wasActive = this.activeVariantId() === id;
+    // Flush a pending autosave into the exemplar BEFORE it goes, and stop autosaving into it.
+    if (wasActive) this.draftStore.setAutosave(false);
+    const done = await this.runMenu(async () => {
+      if (!(await this.hangar.deleteConfig(id))) throw new Error('delete failed');
+    }, 'deleteConfig');
+    if (done && wasActive) {
+      // The removed exemplar's swaps must not leak into the Werk sandbox as a draft.
+      this.draftStore.reset();
+      const w = this.werkLink();
+      // 'merge' alone kept `?v=` of the removed exemplar on the HQ page (its Werk link carries no `v: null`).
+      void this.router.navigate(w.commands as unknown[], {
+        queryParams: { ...w.queryParams, [HQ_VARIANT_PARAM]: null, loadout: null },
+        queryParamsHandling: 'merge',
+      });
+    }
+  }
+
+  async copyExemplar(id: string): Promise<void> {
+    const cfg = this.ownershipSvc.configById(id);
+    if (!cfg) return;
+    const name = this.t.instant('codex.holo.hangar.copyName', { name: cfg.name }) as string;
+    await this.createExemplar(cfg.hangarShipId, name, cfg.role, cfg.loadout);
+  }
+
+  async newExemplarFromWerk(): Promise<void> {
+    const shipId = this.ownershipSvc.configById(this.activeVariantId())?.hangarShipId ?? this.cardShip()?.id;
+    if (!shipId) return;
+    await this.createExemplar(shipId, this.t.instant('codex.loadout.defaultConfigName') as string, 'multipurpose', []);
+  }
+
+  private async createExemplar(shipId: string, name: string, role: ShipConfigRole, loadout: readonly ConfigLoadoutEntry[]): Promise<void> {
+    // The whole create → navigate → name flow is one action: a repeat click while the name
+    // offer waits for its AI suggestion must not create a second exemplar (round-7 E8).
+    if (this.exemplarFlowBusy) return;
+    this.exemplarFlowBusy = true;
+    try {
+      let created: HangarShipConfig | null = null;
+      await this.runMenu(async () => {
+        created = await this.hangar.createConfig(shipId, name, role, [...loadout]);
+        if (!created) throw new Error('create failed');
+      }, 'createConfig');
+      const c = created as HangarShipConfig | null;
+      if (!c) return;
+      const link = this.exemplarLink(shipId, c.id);
+      await this.router.navigate(link.commands as unknown[], { queryParams: link.queryParams });
+      await this.offerExemplarName(c.id, c.name, c.loadout);
+    } finally {
+      this.exemplarFlowBusy = false;
+    }
+  }
+
+  private exemplarFlowBusy = false;
+
+  async addHangarCopy(): Promise<void> {
+    const d = this.detail();
+    if (!d) return;
+    await this.runPath(() => this.itemPath.addToHangar(d.classNameSlug, this.displayName()));
+  }
+
+  async addHangarWish(): Promise<void> {
+    const d = this.detail();
+    if (!d) return;
+    const s = this.ownState();
+    // A swapped Werk goes onto the wishlist WITH its swaps (D1); an exemplar or an untouched Werk is the hull alone.
+    const loadout = this.activeVariantId() === null ? this.draftStore.draftAsLoadout() : [];
+    await this.runPath(async () => {
+      const res = s?.wished
+        ? await this.itemPath.setWishQty('ship', d.classNameSlug, this.displayName(), s.wishQty + 1)
+        : await this.itemPath.addWish('ship', d.classNameSlug, this.displayName());
+      if (!res.ok || loadout.length === 0) return res;
+      return this.attachWishLoadout(d.classNameSlug, loadout, res);
+    });
+  }
+
+  /** The wish was written; now its loadout as an `is_wish` config on the hull's hangar row. The hull wish stands either way. */
+  private async attachWishLoadout(slug: string, loadout: ConfigLoadoutEntry[], res: PathResult): Promise<PathResult> {
+    const ship = this.hangar.shipByClassName(slug);
+    if (!ship) return res;
+    const name = this.t.instant('codex.holo.hangar.wishName', { name: this.displayName() }) as string;
+    const { config, columnMissing } = await this.hangar.createWishConfig(ship.id, name, loadout);
+    if (!config) {
+      // The database cannot keep a wish's loadout yet (migration not pushed) or the write failed: say so, never silently.
+      this.menuError.set(columnMissing ? 'codex.holo.hangar.wishLoadoutUnavailable' : (this.hangar.error() ?? 'errors.generic'));
+      const undoHull = res.undo;
+      // Taking the wish back also takes back the note about its loadout.
+      return undoHull ? { ...res, undo: () => { this.menuError.set(null); return undoHull(); } } : res;
+    }
+    this.ownershipSvc.invalidate();
+    const undoWish = res.undo;
+    return {
+      ...res,
+      undo: async () => {
+        await this.hangar.deleteConfig(config.id);
+        this.ownershipSvc.invalidate();
+        return undoWish ? undoWish() : { ok: true, key: res.key };
+      },
+    };
+  }
+
+  private async runPath(write: () => Promise<PathResult>): Promise<void> {
+    if (this.menuBusy()) return;
+    this.menuBusy.set(true);
+    this.menuError.set(null);
+    try {
+      const res = await write();
+      if (!res.ok) {
+        this.menuError.set(res.key);
+        return;
+      }
+      const undo = res.undo;
+      if (undo) {
+        this.undoToast.offer({
+          messageKey: res.key,
+          messageParams: res.params,
+          commit: () => undefined,
+          onUndo: () => void undo().then((back) => { if (!back.ok) this.menuError.set(back.key); }),
+        });
+      }
+    } finally {
+      this.menuBusy.set(false);
+    }
+  }
+
+  /** One hangar write from the menu: busy flag, then the ownership index re-reads; a failure becomes an errors.* key. */
+  private async runMenu(write: () => Promise<void>, op: string): Promise<boolean> {
+    if (this.menuBusy()) return false;
+    this.menuBusy.set(true);
+    this.menuError.set(null);
+    try {
+      await write();
+      this.ownershipSvc.invalidate();
+      return true;
+    } catch (error) {
+      logWarn('codex', 'hangar menu write failed', { op, error });
+      this.menuError.set(toErrorKey('hangar', op, error));
+      return false;
+    } finally {
+      this.menuBusy.set(false);
+    }
+  }
+
+  /**
+   * The summary of an exemplar is refreshed only when the reader leaves it — a switch to another loadout or
+   * leaving the page — and only when its parts changed since the last one (ExemplarAiService compares a hash).
+   */
+  private refreshExemplarSummary(id: string | null): void {
+    if (!id) return;
+    const cfg = this.ownershipSvc.configById(id);
+    if (!cfg) return;
+    void this.exemplarAi
+      .ensureSummary(id, { shipName: this.displayName(), loadout: cfg.loadout, changes: this.exemplarChanges(cfg.loadout) })
+      .then((r) => {
+        if (!r.summary) return;
+        this.exemplarSummaries.update((m) => new Map(m).set(id, r.summary as string));
+      });
+  }
+  private lastExemplarId: string | null = null;
+  private readonly exemplarSwitch = effect(() => {
+    const id = this.activeVariantId();
+    const prev = this.lastExemplarId;
+    this.lastExemplarId = id;
+    if (prev && prev !== id) untracked(() => this.refreshExemplarSummary(prev));
+  });
+  private readonly exemplarLeave = inject(DestroyRef).onDestroy(() => this.refreshExemplarSummary(this.lastExemplarId));
   /** The picked entry's edition name, or null while the base record is open. */
   readonly currentEdition = computed(
     () =>
@@ -2312,16 +2846,41 @@ export class CodexDetailComponent implements OnInit {
   readonly missileCohortLoading = signal(false);
   /** The group the reader picked; null = the page's default for this missile. */
   readonly missileScopeChoice = signal<RankScope | null>(null);
-  readonly missileRankScopes: readonly RankCardScope[] = [
-    { id: 'all', labelKey: 'codex.missile.scope.all', reasonKey: '' },
-    { id: 'career', labelKey: 'codex.missile.scope.kind', reasonKey: 'codex.missile.scopeOff' },
-    { id: 'sizeClass', labelKey: 'codex.missile.scope.size', reasonKey: 'codex.missile.scopeOff' },
-    { id: 'role', labelKey: 'codex.missile.scope.signal', reasonKey: 'codex.missile.scopeOff' },
-  ];
+  /** Re-reads the group names once translations load or the language changes. */
+  private readonly missileLangTick = signal(0);
+  /**
+   * The missile's groups, named like the cohort they hold (#331): all of its
+   * kind, the same tracking signal, exactly the same size — "Alle Lenkraketen",
+   * "Alle Infrarot-Lenkraketen", "Alle S2-Lenkraketen". The kind is the field
+   * itself, so it has no group of its own.
+   */
+  readonly missileRankScopes = computed<readonly RankCardScope[]>(() => {
+    this.missileLangTick();
+    const target = this.missileRecord();
+    const kind = target ? missileFieldKind(target, this.missileCohort() ?? []) : null;
+    const t = this.t;
+    const kindName = t.instant(`codex.missile.scope.plural.${kind ?? 'any'}`);
+    const signal = target?.signal ? t.instant(`codex.missile.signal.${target.signal}`) : null;
+    const size = target?.size ?? null;
+    return [
+      { id: 'all', labelKey: 'codex.missile.scope.all', label: t.instant('codex.missile.scope.allOf', { kind: kindName }), reasonKey: '' },
+      {
+        id: 'role',
+        labelKey: 'codex.missile.scope.signal',
+        label: signal ? t.instant('codex.missile.scope.signalOf', { signal, kind: kindName }) : undefined,
+        reasonKey: 'codex.missile.scopeOff',
+      },
+      {
+        id: 'sizeClass',
+        labelKey: 'codex.missile.scope.size',
+        label: size != null ? t.instant('codex.missile.scope.sizeOf', { size, kind: kindName }) : undefined,
+        reasonKey: 'codex.missile.scopeOff',
+      },
+    ];
+  });
   readonly missileRankCopy: RankCardCopy = {
     cohort: {
       all: 'codex.missile.rank.nAll',
-      career: 'codex.missile.rank.nKind',
       sizeClass: 'codex.missile.rank.nSize',
       role: 'codex.missile.rank.nSignal',
     },
@@ -2343,8 +2902,8 @@ export class CodexDetailComponent implements OnInit {
     return known ?? missileRecordOf({ ...d.row, class_name: d.classNameSlug }, d.payload, null);
   });
   readonly missileRankScope = computed<RankScope>(() => {
-    const target = this.missileRecord();
-    return this.missileScopeChoice() ?? (target ? defaultMissileScope(target, this.missileCohort() ?? []) : 'all');
+    // Opens on all of its kind; the reader narrows to signal or size.
+    return this.missileScopeChoice() ?? 'all';
   });
   readonly missileRank = computed(() => {
     const target = this.missileRecord();
@@ -2617,7 +3176,10 @@ export class CodexDetailComponent implements OnInit {
     });
     this.t.onLangChange
       .pipe(takeUntilDestroyed())
-      .subscribe((e) => this.lang.set(toLang(e.lang)));
+      .subscribe((e) => {
+        this.lang.set(toLang(e.lang));
+        this.missileLangTick.update((n) => n + 1);
+      });
   }
 
   /**
@@ -2689,7 +3251,7 @@ export class CodexDetailComponent implements OnInit {
     else this.initItemView();
     // A new ship is a new answer to "is there a model?" — see onArtAvailable.
     this.has3dView.set(false);
-    this.heroView3d.set(false);
+    this.closeHero3d();
     this.loading.set(true);
     this.error.set(null);
     this.expandedPort.set(null);
@@ -2710,6 +3272,10 @@ export class CodexDetailComponent implements OnInit {
     this.activeMissionId.set('all');
     this.skinOptions.set([]);
     this.editionOptions.set([]);
+    this.modelOptions.set([]);
+    this.akteLiveries.set([]);
+    this.noModelSlug.set(null);
+    this.viewPicked.set(false);
     this.rankCohort.set(null);
     this.rankCohortLoading.set(false);
     this.rankCohortFailed.set(false);
@@ -2717,6 +3283,17 @@ export class CodexDetailComponent implements OnInit {
     this.foreignVariant.set(false);
     this.activeVariantId.set(null);
     this.mineFlag.set(!this.shellBeta() && (this.route.snapshot.queryParamMap?.has?.(HQ_MINE_PARAM) ?? false));
+    // Ships: the hull silhouette is read alongside the detail, not after it, so the
+    // skeleton can draw it and the Holotable enters with its hull (D11: no dark,
+    // empty table between the skeleton and the hologram). Memoised in the service.
+    const silEarly: Promise<unknown> =
+      kind === 'ship'
+        ? (this.svc.silhouette?.('ship', className) ?? Promise.resolve(null))
+            .then((sil) => {
+              if (seq === this.loadSeq && sil) this.shipSilhouette.set(sil);
+            })
+            .catch(() => undefined)
+        : Promise.resolve();
     try {
       const d = await this.svc.getDetail(kind, className);
       if (seq !== this.loadSeq) return;
@@ -2729,6 +3306,9 @@ export class CodexDetailComponent implements OnInit {
           this.resolveLocale(d, seq),
           this.resolveShipTech(d, seq),
         ]);
+        if (seq !== this.loadSeq) return;
+        // The stage waits (briefly) for its hull rather than entering on an empty table.
+        if (kind === 'ship') await Promise.race([silEarly, new Promise<void>((r) => setTimeout(r, SILHOUETTE_HOLD_MS))]);
         if (seq !== this.loadSeq) return;
         if (kind === 'ship') {
           this.activeMissionId.set(loadStoredMission(d.classNameSlug) ?? 'all');
@@ -2975,10 +3555,34 @@ export class CodexDetailComponent implements OnInit {
       // late answer must not paint the previous ship's family.
       if (this.detail()?.classNameSlug !== className) return;
       this.editionOptions.set(resolveEditionGroup(siblings, className) ?? []);
+      this.modelOptions.set(resolveModelVariants(siblings, className) ?? []);
     } catch (error) {
       logWarn('codex', 'edition group failed', { className, error });
       this.editionOptions.set([]);
+      this.modelOptions.set([]);
     }
+    if (kind === 'ship') void this.loadShipLiveries(className);
+  }
+
+  /** The paints of this record for the Akte's Lackierung tiles (ship_skins, C21). Best effort. */
+  private async loadShipLiveries(className: string): Promise<void> {
+    const { skins, error } = await this.shipSkins.listSkins(className);
+    if (this.detail()?.classNameSlug !== className) return;
+    const tiles: AkteLivery[] = skins.map((s) => ({
+      id: s.skinId,
+      label: cleanLiveryName(s.name, this.displayName()),
+      imageUrl: this.shipSkins.assetUrl(s.iconPath),
+    }));
+    // The factory paint leads; it carries the official image.
+    tiles.sort((a, b) => Number(b.id === AKTE_STANDARD_LIVERY) - Number(a.id === AKTE_STANDARD_LIVERY));
+    this.akteLiveries.set(tiles);
+    // No catalog error and no skin with a model: the 3D view cannot show anything, so the Akte leads.
+    if (!error && !skins.some((s) => !!s.modelPath)) this.noModelSlug.set(className);
+  }
+
+  /** The reader picked a view on the bottom row: from here on the default no longer decides. */
+  onStageViewChange(): void {
+    this.viewPicked.set(true);
   }
 
   /** Reverse lookup: crafting blueprints that consume this entity as an ingredient. */
@@ -3312,7 +3916,18 @@ export class CodexDetailComponent implements OnInit {
    * targets the CHILD (the gun inside the gimbal), because that is the thing a
    * pilot swaps — the mount itself stays put.
    */
+  /** Press / focus on a slot card: the picker builds that slot's list before the click opens it. */
+  prepareSwapPicker(ev: LayoutTarget): void {
+    const t = this.swapTargetFor(ev);
+    if (t) this.swapPicker()?.prepare(t);
+  }
+
   openSwapPicker(ev: LayoutTarget): void {
+    const t = this.swapTargetFor(ev);
+    if (t) this.swapTarget.set(t);
+  }
+
+  private swapTargetFor(ev: LayoutTarget): SwapTarget | null {
     const src = ev.child ?? ev.slot;
     const port = ev.child ? ev.child.port : ev.slot.port;
     if (!src.className) {
@@ -3324,8 +3939,8 @@ export class CodexDetailComponent implements OnInit {
           ? { types: ev.child.rawTypes, size: ev.child.size, inferred: false }
           : null
         : this.emptyFits().get(ev.slot.rawPort ?? '');
-      if (!fit) return;
-      this.swapTarget.set({
+      if (!fit) return null;
+      return {
         port,
         count: ev.count,
         className: null,
@@ -3337,10 +3952,9 @@ export class CodexDetailComponent implements OnInit {
         fitInferred: fit.inferred,
         rawPorts: ev.rawPorts,
         rawTypes: fit.types,
-      });
-      return;
+      };
     }
-    this.swapTarget.set({
+    return {
       port,
       count: ev.count,
       className: src.className,
@@ -3350,26 +3964,43 @@ export class CodexDetailComponent implements OnInit {
       factoryClassName: ev.rawPorts && ev.rawPorts.length > 0 ? this.draftStore.stockValueForPath(ev.rawPorts[0]) : null,
       rawPorts: ev.rawPorts,
       rawTypes: ev.child ? ev.child.rawTypes : (this.detail()?.ports.find((p) => p.portName === ev.slot.rawPort)?.types ?? []),
-    });
+    };
   }
 
   // ── loadout draft write path (PR B) ─────────────────────────────────────────
 
-  /** `codex_item_ports.port_name` — the only paths a draft entry can be saved against (R2). */
+  /**
+   * The top-level ports a draft entry can be saved against (R2): every `codex_item_ports.port_name`
+   * plus every top-level port of the ship's stock loadout. The item-ports table lists only part of a
+   * ship's ports (a Gladius: weapons, racks, controllers — no power plant, cooler, shield, radar or
+   * quantum drive), but a stored config entry is a plain `portName` that `applyStoredLoadout` puts back
+   * through the same stock loadout, so those components are storable too. Nested paths
+   * (`mount.gun`) stay draft-only.
+   */
   private readonly joinablePorts = computed<ReadonlySet<string>>(() => {
     const d = this.detail();
-    return new Set((d?.ports ?? []).map((p) => p.portName).filter((p): p is string => !!p));
+    const out = new Set((d?.ports ?? []).map((p) => p.portName).filter((p): p is string => !!p));
+    for (const l of this.loadoutAll()) if (l.port) out.add(l.port);
+    return out;
   });
 
   readonly draftChangedCount = this.draftStore.draftChangedCount;
+  /**
+   * D3: on the Holotisch, the reader's own exemplar (`?v=`, not Werk, not a shared read-only link, not a config that
+   * still follows its owner) saves every swap by itself. The classic view keeps its explicit save.
+   */
+  private readonly autosaveSwitch = effect(() => {
+    const on =
+      this.holoStageOn() && this.personalMode() && !this.draftReadOnly() && !(this.activeHangarConfig()?.followsOwner ?? false);
+    untracked(() => this.draftStore.setAutosave(on));
+  });
   readonly saveableEntries = this.draftStore.saveableEntries;
   /** A shared link is on the Holotable read-only (#646). */
   readonly draftReadOnly = this.draftStore.readOnly;
   readonly draftSavedPaths = this.draftStore.savedPaths;
 
-  /** "Übernehmen" / "Slot leeren" from the picker — closes it, then drafts every covered path. */
+  /** "Übernehmen" / "Slot leeren" from the picker — drafts every covered path; the picker closes itself through its reverse motion and then emits `closed`. */
   onSwapPicked(pick: SwapPick): void {
-    this.swapTarget.set(null);
     this.draftStore.applySwap(pick);
   }
 
@@ -3428,6 +4059,27 @@ export class CodexDetailComponent implements OnInit {
 
   discardLoadoutDraft(): void {
     this.draftStore.discardLoadoutDraft();
+  }
+
+  /**
+   * #345: the Loadout heading's reset icon. One change is undone as easily as
+   * it was made, so it goes straight away; several changes are real work and
+   * ask first.
+   */
+  async resetWholeLoadout(): Promise<void> {
+    const n = this.draftChangedCount();
+    if (n === 0 || this.draftReadOnly()) return;
+    if (n > 1) {
+      const ok = await this.confirmDialog.confirm({
+        titleKey: 'codex.loadout.resetAllTitle',
+        messageKey: 'codex.loadout.resetAllBody',
+        params: { n },
+        confirmKey: 'codex.loadout.resetAllConfirm',
+        tone: 'danger',
+      });
+      if (!ok) return;
+    }
+    this.discardLoadoutDraft();
   }
 
   /** #322: a named loadout from this browser goes back on the table as the draft. */
@@ -3700,7 +4352,7 @@ export class CodexDetailComponent implements OnInit {
         },
       ];
       if (draftEntry === undefined) {
-        out.push(...this.carriedOccupants(r.section, r.item.carried, r.item.nested));
+        out.push(...this.carriedDraftOccupants(r.section, r.item.port, r.item.carried, r.item.nested ?? [], configurable));
       }
       return out;
     }),
@@ -3786,7 +4438,7 @@ export class CodexDetailComponent implements OnInit {
   private readonly holoNarrowestScope = computed<RankScope>(() => {
     const target = this.rankShipInput();
     const cohort = this.rankCohort();
-    return target && cohort ? narrowestRankScope(target, cohort, { careerByClass: true }) : 'role';
+    return target && cohort ? narrowestRankScope(target, cohort, { careerByClass: true, foldVariants: true }) : 'role';
   });
   /**
    * Classic card: the account-wide choice, Alle when never chosen (untouched).
@@ -3894,17 +4546,25 @@ export class CodexDetailComponent implements OnInit {
     const target = this.rankShipInput();
     const cohort = this.rankCohort();
     if (!target || !cohort) return null;
-    // Holotable: rim at the group's 95th percentile, a "Karriere" group is the
-    // class, and the picked group applies even under RANK_MIN_GROUP (the card
-    // says "nur N Schiffe", concept r1-small). The classic card keeps the
-    // best-value rim and the raw career.
-    const holo = this.holoView();
+    // Both views rank the Holotable way (#329): rim at the group's 95th
+    // percentile, a "Karriere" group is the class, and the picked group applies
+    // even under RANK_MIN_GROUP (the card says "nur N Schiffe", concept
+    // r1-small). The classic card shows the same content in its own layout.
     return rankShip(target, cohort, {
       profile: this.rankProfile(),
       scope: this.rankScope(),
-      ...(holo ? { rim: 'p95' as const, careerByClass: true } : {}),
+      rim: 'p95',
+      careerByClass: true,
+      foldVariants: true,
     });
   });
+
+  /** The role as the page shows it ("Leichter Jäger") — names the role group. */
+  readonly rankRoleName = computed<string | null>(
+    () => this.heroChips().find((c) => c.key === 'role')?.text?.trim() || null,
+  );
+  /** The honest line under the hexagon for an Einsatz without data. */
+  readonly rankMissionNote = computed<string | null>(() => rankMissionNoteKey(this.activeMissionId()));
 
   readonly rankDisabledReasons = computed<Partial<Record<RankProfileId, string | null>>>(() => {
     if (this.kind() !== 'ship') return {};
@@ -3972,6 +4632,7 @@ export class CodexDetailComponent implements OnInit {
   private static readonly MOUNT_CHAIN_SECTIONS: ReadonlySet<ShipModuleSection> = new Set([
     'weapons',
     'remoteTurrets',
+    'mannedTurrets',
     'missiles',
   ]);
 
@@ -4008,7 +4669,7 @@ export class CodexDetailComponent implements OnInit {
         });
       }
       if (draftEntry === undefined) {
-        for (const occ of this.carriedOccupants(r.section, r.item.carried)) push(occ);
+        for (const occ of this.carriedDraftOccupants(r.section, r.item.port, r.item.carried, [], configurable)) push(occ);
       }
     }
     const grouped = new Map<ShipModuleSection, readonly SummaryOccupant[]>();
@@ -4057,7 +4718,8 @@ export class CodexDetailComponent implements OnInit {
 
   readonly defensivePanel = computed(() => {
     if (this.kind() !== 'ship') return null;
-    return buildDefensivePanel(this.draftSummaryOccupants(), this.armorPayload());
+    const hull = (this.detail()?.payload as ShipPayload | undefined)?.hull;
+    return buildDefensivePanel(this.draftSummaryOccupants(), this.armorPayload(), hull?.hp ?? null);
   });
 
   /** Sections the active mission folds away — feeds both the loadout layout
@@ -4089,6 +4751,7 @@ export class CodexDetailComponent implements OnInit {
         kpiSheet: this.currentKpiSheet(),
         occupants: this.draftSummaryOccupants(),
         decks: shipDeckNames(d.payload as ShipPayload | undefined, this.lang()),
+        decksDerived: shipDecksDerived(d.payload as ShipPayload | undefined),
       },
       this.translate,
     );
@@ -4186,14 +4849,14 @@ export class CodexDetailComponent implements OnInit {
   private childrenFor(
     className: string | null,
     carried: ReadonlyMap<string, string>,
+    /** The mount's raw port — set for configurable blocks, whose sub-slots can carry nested drafts. */
+    parentPort: string | null = null,
   ): LayoutChild[] {
     if (!className) return [];
     const payload = this.loadoutPayloads().get(className)?.payload as
       | { itemPorts?: ItemPort[] }
       | undefined;
     const resolved = this.loadoutEntities();
-    const payloads = this.loadoutPayloads();
-    const ammo = this.ammoPayloads();
     const slots = carriedSlots(
       payload?.itemPorts,
       carried,
@@ -4208,15 +4871,36 @@ export class CodexDetailComponent implements OnInit {
     // The gun in the gimbal is the weapon this ship shoots with, so it gets the
     // same identity and stat run a top-level occupant does — the concept draws
     // it as a full row, not as a name under a mount (part-06.html:320-324).
+    const draft = parentPort ? this.draft() : null;
     return slots.map((slot) => {
+      // A nested draft (`mount.gun`): the swapped occupant replaces the stock one in this
+      // sub-slot, so every reader of the children (callout, inspector, Anpassungen) sees it.
+      const kids = slot.rawPorts.length > 0 ? slot.rawPorts : [slot.port];
+      const draftPaths = draft ? kids.map((k) => `${parentPort}.${k}`).filter((p) => draft.has(p)) : [];
+      if (draftPaths.length > 0) {
+        const path = draftPaths[0];
+        const stock = slot.className ? this.childItemOf(slot.className) : { kind: null, payload: null, ammoPayload: undefined };
+        const o = this.draftOverlayFor(path, draft!.get(path), stock);
+        const pending = o.state === 'pending';
+        return {
+          ...slot,
+          className: o.className,
+          kind: o.kind,
+          name: o.name,
+          size: o.size ?? slot.size,
+          grade: o.grade,
+          manufacturerCode: o.manufacturerCode,
+          damageChannels: damageChannelsOf(o.item.payload, o.item.ammoPayload),
+          stats: pending ? [] : equippedStats(o.item),
+          statsMissing: pending ? false : weaponStatsUnavailable(o.item),
+          statsNoteKey: pending ? null : equippedStatsNoteKey(o.item),
+          draftState: o.state,
+          draftPaths,
+        };
+      }
       if (!slot.className) return slot;
       const hit = resolved.get(slot.className);
-      const payloadHit = payloads.get(slot.className);
-      const item = {
-        kind: payloadHit?.kind ?? hit?.kind ?? null,
-        payload: payloadHit?.payload ?? null,
-        ammoPayload: ammo.get(ammoClassNameFor(slot.className, payloadHit?.payload) ?? ''),
-      };
+      const item = this.childItemOf(slot.className);
       return {
         ...slot,
         grade: hit?.grade ?? null,
@@ -4229,6 +4913,17 @@ export class CodexDetailComponent implements OnInit {
     });
   }
 
+  /** The stock item of a carried class, resolved like a top-level occupant. */
+  private childItemOf(className: string): { kind: CodexKind | null; payload: unknown; ammoPayload: unknown } {
+    const hit = this.loadoutEntities().get(className);
+    const payloadHit = this.loadoutPayloads().get(className);
+    return {
+      kind: payloadHit?.kind ?? hit?.kind ?? null,
+      payload: payloadHit?.payload ?? null,
+      ammoPayload: this.ammoPayloads().get(ammoClassNameFor(className, payloadHit?.payload) ?? ''),
+    };
+  }
+
   /**
    * The stock items sitting in the sub-slots of a hardpoint's occupant, as
    * summary occupants of the SAME block: a gimbal's gun belongs to the weapons
@@ -4237,6 +4932,37 @@ export class CodexDetailComponent implements OnInit {
    * `nested` adds what sits one level deeper still (a manned turret's gimbal →
    * its gun, feedback #225): those guns draw weapon power and deal damage too.
    */
+  /** `carriedOccupants` with the nested draft (`mount.gun`) applied — what the strip and panels aggregate (E9). */
+  private carriedDraftOccupants(
+    section: ShipModuleSection,
+    topPort: string,
+    carried: ReadonlyMap<string, string>,
+    nested: readonly string[],
+    configurable: boolean,
+  ): SummaryOccupant[] {
+    if (!configurable) return this.carriedOccupants(section, carried, nested);
+    const ammo = this.ammoPayloads();
+    const payloads = this.loadoutPayloads();
+    const items = carriedWithDraft(
+      topPort,
+      carried,
+      this.draft(),
+      (className) => {
+        const hit = payloads.get(className);
+        return hit ? { kind: hit.kind, payload: hit.payload, ammoPayload: ammo.get(ammoClassNameFor(className, hit.payload) ?? '') } : null;
+      },
+      (path, value) => {
+        const o = this.draftOverlayFor(path, value, { kind: null, payload: null, ammoPayload: undefined });
+        if (o.state === 'pending') return 'pending';
+        return o.item.payload == null ? null : o.item;
+      },
+    );
+    return [
+      ...items.map((i) => ({ section, kind: i.kind as CodexKind | null, payload: i.payload, ammoPayload: i.ammoPayload, count: 1 })),
+      ...this.carriedOccupants(section, new Map(), nested),
+    ];
+  }
+
   private carriedOccupants(
     section: ShipModuleSection,
     carried: ReadonlyMap<string, string>,
@@ -4287,7 +5013,7 @@ export class CodexDetailComponent implements OnInit {
       if (fixedRest && !r.item.className && !showEmpty) continue;
       const l = r.item;
       const item = { kind: r.kind, payload: r.payload, ammoPayload: r.ammoPayload };
-      const children = fixedRest ? [] : this.childrenFor(l.className, l.carried);
+      const children = fixedRest ? [] : this.childrenFor(l.className, l.carried, configurable ? l.port : null);
       const fit = l.className ? undefined : this.emptyFits().get(l.port);
       // Grouping stays anchored to the STOCK identity, computed BEFORE any
       // draft overlay below — a per-slot draft edit can never split or
@@ -4297,7 +5023,8 @@ export class CodexDetailComponent implements OnInit {
       // itself (feedback #235), so two racks loaded with the same missile
       // must still fold together even if the extract names the sub-ports'
       // occupant class per side.
-      const variantKey = children
+      const stockKids = children.some((c) => !!c.draftState) ? this.childrenFor(l.className, l.carried) : children;
+      const variantKey = stockKids
         .map((c) => `${classNamePositionFamily(c.className)}:${c.count}`)
         .join(',');
       // Grouped by the occupant's POSITION FAMILY, not its raw class name —
@@ -4306,7 +5033,31 @@ export class CodexDetailComponent implements OnInit {
       // position-agnostic, so raw-class grouping folded the weapons but never
       // the racks (feedback #235: 'wie bei der Bewaffnung'). `grade` still
       // guards two genuinely different grades of the same base part apart.
-      const groupKey = `${classNamePositionFamily(l.className) || ' '}|${l.size ?? ''}|${l.grade ?? ''}|${variantKey}`;
+      // A shield bay's STOCK role is part of its identity (#348): two active
+      // generators fold into "2×", the passive one keeps its own row — folding
+      // all three under one "Aktiv" tag would hide the generator that draws no
+      // power. Taken from the stock item, so a draft swap never regroups.
+      const stockRole =
+        r.section === 'shields' && l.className
+          ? isPassiveShield({
+              section: r.section,
+              kind: r.kind,
+              payload: r.payload,
+              ammoPayload: r.ammoPayload,
+              count: 1,
+              passive: this.passiveByPort(r.section, l.port),
+            })
+            ? 'passive'
+            : 'active'
+          : '';
+      // Same class family is not enough: per-side classes can carry different
+      // numbers, and "2× 1000 m + 1× 1200 m" are two items that must keep
+      // their own rows (#351). The STOCK stats (own + carried) join the key.
+      const stockStats = [
+        statsFingerprint(l.className ? equippedStats(item) : []),
+        ...stockKids.map((c) => statsFingerprint(c.stats)),
+      ].join('/');
+      const groupKey = `${classNamePositionFamily(l.className) || ' '}|${l.size ?? ''}|${l.grade ?? ''}|${variantKey}|${stockRole}|${stockStats}`;
 
       const draftEntry = configurable ? this.draft().get(l.port) : undefined;
       const overlay = this.draftOverlayFor(l.port, draftEntry, item);
@@ -4332,9 +5083,9 @@ export class CodexDetailComponent implements OnInit {
         // Two identical mounts holding different things must not collapse.
         variantKey,
         groupKey,
-        // Every bay in an individual block, and every unfitted configurable
-        // hardpoint, is a decision of its own and keeps its own row (1add86a4).
-        noCollapse: isIndividualSection(r.section) || (configurable && !l.className),
+        // Every unfitted configurable hardpoint is a decision of its own and
+        // keeps its own row (1add86a4); fitted ones stack in every block (#348).
+        noCollapse: configurable && !l.className,
         emptyLabelKey: isWeaponMountPort(l.port)
           ? 'codex.detail.loadoutEmptyWeaponMount'
           : null,
@@ -4411,9 +5162,13 @@ export class CodexDetailComponent implements OnInit {
       // free of charge but riding on the others (MASTER §6 / B §2).
       const generatorCount = slots.filter((s) => s.className).length;
       const hasPassive = slots.some((s) => s.roleKey === 'codex.module.badge.passive');
-      if (hasPassive || generatorCount > 1) {
-        notes.push({ key: 'codex.module.shieldNote' });
+      // Stacked rows (#348) must not hide that each generator is its own
+      // swap, so the count is said in words; the passive explainer only
+      // appears when a passive generator is actually fitted.
+      if (generatorCount > 1) {
+        notes.push({ key: 'codex.module.shieldNote', params: { count: generatorCount } });
       }
+      if (hasPassive) notes.push({ key: 'codex.module.shieldPassiveNote' });
       return notes;
     }
     if (section === 'countermeasures') return [{ key: 'codex.moduleSection.countermeasuresNote' }];
@@ -4680,4 +5435,30 @@ export class CodexDetailComponent implements OnInit {
   toggleEmptyLoadout(): void {
     this.showEmptyLoadout.update((v) => !v);
   }
+}
+
+/** Hull lines the Akte lists after the maker, in this order, when they have a value. */
+const AKTE_FACT_KEYS = ['codex.hull.crew', 'codex.hull.dimensions', 'codex.hull.equippedMass', 'codex.hull.hullHp', 'codex.hull.scmSpeed', 'codex.hull.maxSpeed'] as const;
+
+/**
+ * A livery's tile label from its ship_skins name: "Gladius Frostbite Camo Livery" → "Frostbite Camo",
+ * "Gladius (Standard)" → "Standard", "Gladius Gladius Rp" → "Gladius RP". Never empty.
+ * A name the uploader title-cased from a skin id ("gladius_rp" → "Rp") gets its acronyms
+ * back: a vowelless word of two or three letters is an abbreviation, never a word.
+ */
+export function cleanLiveryName(raw: string, shipName: string): string {
+  let s = (raw ?? '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b[A-Za-z][b-df-hj-np-tv-xzB-DF-HJ-NP-TV-XZ]{1,2}\b/g, (w) => (/[aeiouy]/i.test(w) ? w : w.toUpperCase()));
+  const paren = /^.*\(([^)]+)\)$/.exec(s);
+  if (paren) return paren[1].trim();
+  s = s.replace(/\s+(Livery|Paint|Skin)$/i, '');
+  const words = shipName.split(' ').filter(Boolean);
+  // Drop the hull's own word once when it leads ("Gladius …"), keeping the rest.
+  for (const w of [...words].reverse()) {
+    const lead = `${w.toLowerCase()} `;
+    if (s.toLowerCase().startsWith(lead) && s.length > lead.length) { s = s.slice(lead.length); break; }
+  }
+  return s || raw;
 }

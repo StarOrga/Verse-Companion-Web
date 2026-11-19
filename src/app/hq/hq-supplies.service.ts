@@ -1,6 +1,7 @@
 import { DestroyRef, Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { formatQuantity } from '../codex/codex-format';
+import { AnalyticsService } from '../core/analytics.service';
 import { toErrorKey } from '../core/describe-error';
 import { logWarn } from '../core/log';
 import { SupabaseClientProvider } from '../core/supabase.client';
@@ -60,6 +61,8 @@ export interface SupplyItem {
   readonly minQuality?: number | null;
   /** Client edit time (ISO) - the LWW key. */
   readonly updatedAt: string;
+  /** When the line was made (ISO; the server's `created_at` once pulled). Stable: ticks and edits never move it. */
+  readonly createdAt?: string;
   /** Tombstone (ISO) while a deletion is on its way to the server; never listed in `items`. */
   readonly deletedAt: string | null;
   /** Not yet accepted by the server. */
@@ -143,6 +146,7 @@ interface CacheShape {
 export class HqSuppliesService {
   private readonly sb = inject(SupabaseClientProvider);
   private readonly auth = inject(AuthService);
+  private readonly analytics = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
 
   /** True once the signed-in account's first pull finished (live auto-apply waits for it). */
@@ -225,7 +229,9 @@ export class HqSuppliesService {
         i.name.toLowerCase() === clean.toLowerCase() &&
         (i.forClassName ?? '').toLowerCase() === (forClassName ?? '').toLowerCase() &&
         i.packageId === packageId &&
-        (i.amount !== null) === (amount !== null),
+        (i.amount !== null) === (amount !== null) &&
+        // A wish's assignment (source 'wish') never merges with a Bestand / manual line of the same item, either way.
+        (i.source === 'wish') === (meta.source === 'wish'),
     );
     if (same) {
       this.patch(same.id, {
@@ -257,10 +263,12 @@ export class HqSuppliesService {
         gather,
         minQuality,
         updatedAt: nowIso(),
+        createdAt: nowIso(),
         deletedAt: null,
         dirty: true,
       };
       this.commit([...this.rows(), row]);
+      this.analytics.track('hq:supply_add', { qty: q });
       return { id: row.id, prevQty: 0, prevAmount: null };
     }
   }
@@ -327,23 +335,79 @@ export class HqSuppliesService {
    * Brings back a removed line (undo of {@link remove}); a newer edit clears the tombstone. A tombstone the sync
    * already dropped (clean + pushed, ~500 ms after the removal) is re-inserted from the snapshot taken at removal,
    * as a dirty row with the same id, so it pushes again and the server tombstone is overwritten.
+   * False when the line is gone for good (no row, no snapshot): a caller that undoes a removal must not report success.
    */
-  restore(id: string): void {
+  restore(id: string): boolean {
     const i = this.rows().find((x) => x.id === id);
     if (i) {
       if (i.deletedAt) this.patch(id, { deletedAt: null });
       this.removedSnapshots.delete(id);
-      return;
+      return true;
     }
     const snap = this.removedSnapshots.get(id);
-    if (!snap) return;
+    if (!snap) return false;
     this.removedSnapshots.delete(id);
     this.commit([...this.rows(), { ...snap, deletedAt: null, updatedAt: nowIso(), dirty: true }]);
+    return true;
   }
 
   /** Lines of one Nachschub (open and closed). */
   linesOfPackage(packageId: string): SupplyItem[] {
     return this.items().filter((i) => i.packageId === packageId);
+  }
+
+  /** Re-label where lines came from (local, pushed like any edit). */
+  setSource(ids: readonly string[], source: SupplySource): void {
+    const set = new Set(ids);
+    const now = nowIso();
+    this.commit(this.rows().map((i) => (set.has(i.id) && !i.deletedAt && i.source !== source ? { ...i, source, updatedAt: now, dirty: true } : i)));
+  }
+
+  /**
+   * Compare-and-set of the source ON THE SERVER: lines among `ids` whose server row still has source `from` get `to`,
+   * in one conditional update. Returns the ids THIS call changed (another device or an earlier pass that got there
+   * first changes nothing here), or null when the write failed / nobody is signed in. Afterwards the local copies
+   * take the server's source of every id, so a later push cannot carry the old label back. This is the exactly-once
+   * marker of the wish transitions (concept 20261117-1110-pfad-stationen A8 / A11): only the caller that won a line
+   * moves its wish. The write is the server function `hq_supplies_cas_source` (migration 20261117160000): besides the
+   * conditional update it marks the transaction, which is what lets a met line be reopened here and nowhere else.
+   */
+  async casSource(ids: readonly string[], from: SupplySource, to: SupplySource): Promise<string[] | null> {
+    const uid = this.uid;
+    if (!uid || !ids.length) return uid ? [] : null;
+    try {
+      const now = nowIso();
+      // The server function marks its transaction as the deliberate move: the guard trigger on hq_supplies lets
+      // `wish_met` -> `wish` through only there, never for a stale full-row upsert of a device that missed the met state.
+      const { data, error } = await this.sb.client.rpc(
+        'hq_supplies_cas_source' as never,
+        { p_ids: [...ids], p_from: from, p_to: to, p_at: now } as never,
+      );
+      if (error) throw error;
+      const won = ((data ?? []) as { won_id: string }[]).map((r) => r.won_id);
+      const read = await this.sb.client.from('hq_supplies' as never).select('id, source, updated_at').eq('user_id', uid).in('id', [...ids]);
+      const server = new Map(((read.data ?? []) as { id: string; source: SupplySource; updated_at: string }[]).map((r) => [r.id, r] as const));
+      for (const id of won) if (!server.has(id)) server.set(id, { id, source: to, updated_at: now });
+      // Adopt the server's label. A clean row takes the server's edit time; a row with a pending local edit gets a
+      // fresh one, so its push wins the LWW check and carries the adopted label instead of the old one.
+      const later = nowIso();
+      this.commit(this.rows().map((i) => {
+        const s = server.get(i.id);
+        if (!s || s.source === i.source) return i;
+        return { ...i, source: s.source, updatedAt: i.dirty ? later : s.updated_at };
+      }));
+      return won;
+    } catch (err) {
+      logWarn('hq', 'supplies source cas failed', err);
+      return null;
+    }
+  }
+
+  /** Point lines at another item (an announced ship's wish became a real ship's: kind and class change, M2). */
+  retarget(ids: readonly string[], entityKind: string, className: string): void {
+    const set = new Set(ids);
+    const now = nowIso();
+    this.commit(this.rows().map((i) => (set.has(i.id) && !i.deletedAt ? { ...i, entityKind, className, updatedAt: now, dirty: true } : i)));
   }
 
   /** Move lines into a Nachschub (or out of it with null). */
@@ -390,7 +454,12 @@ export class HqSuppliesService {
     if (!key) return null;
     const n = clampQty(qty);
     const hits = this.items().filter(
-      (i) => !i.done && ((i.className ?? '').toLowerCase() === key || (!i.className && i.name.toLowerCase() === key)),
+      (i) =>
+        !i.done &&
+        ((i.className ?? '').toLowerCase() === key || (!i.className && i.name.toLowerCase() === key)) &&
+        // A wish's assignment is only ever closed whole (the wish then shrinks once by the whole line, H2); a purchase
+        // smaller than it leaves it to the stock rise.
+        (i.source !== 'wish' || n >= i.qty),
     );
     const hit = hits.find((i) => i.wanted) ?? hits[0];
     if (!hit) return null;
@@ -667,6 +736,7 @@ function fromRow(r: HqSupplyRow): SupplyItem {
     gather: parseGather(r.gather),
     minQuality: parseMinQuality(r.min_quality),
     updatedAt: r.updated_at,
+    ...(r.created_at ? { createdAt: r.created_at } : {}),
     deletedAt: r.deleted_at,
     dirty: false,
   };
@@ -713,7 +783,7 @@ function sanitize(r: unknown, keepSync: boolean): SupplyItem | null {
   const setKind = o['setKind'] === 'ship' || o['setKind'] === 'fps' ? o['setKind'] : null;
   const setId = str('setId');
   const stepKind = typeof o['stepKind'] === 'string' && STEP_KINDS_SET.has(o['stepKind']) ? (o['stepKind'] as StepKind) : null;
-  const source = o['source'] === 'set' || o['source'] === 'search' || o['source'] === 'live' ? o['source'] : 'manual';
+  const source = o['source'] === 'set' || o['source'] === 'search' || o['source'] === 'live' || o['source'] === 'wish' || o['source'] === 'wish_met' ? o['source'] : 'manual';
   return {
     id: o['id'],
     name: o['name'].slice(0, SUPPLY_NAME_MAX),
@@ -732,6 +802,7 @@ function sanitize(r: unknown, keepSync: boolean): SupplyItem | null {
     gather: parseGather(o['gather']),
     minQuality: parseMinQuality(o['minQuality']),
     updatedAt: str('updatedAt') ?? nowIso(),
+    ...(str('createdAt') ? { createdAt: str('createdAt') as string } : {}),
     deletedAt: keepSync ? str('deletedAt') : null,
     dirty: keepSync ? o['dirty'] === true : false,
   };

@@ -1,5 +1,9 @@
 // Community-seed filter (pure): which pack lines become TM entries (concept 2026-11-08, A4).
 // Precedence: admin > CIG (blind) > community vs AI (the arbiter decides conflicts, never this file).
+//
+// Two steps, so an import can run in slices: `seedCandidates` collects, per English text, the votes of
+// the keys that carry it (a slice of the table at a time), `decideSeed` turns merged candidates into TM
+// writes and conflicts. `seedEntries` is both in one go.
 
 import { isCigValid, sha256Hex } from './_diff.ts';
 import type { TmEntry } from './_diff.ts';
@@ -37,16 +41,33 @@ export interface SeedCounts {
   cig_kept: number;
 }
 
+/** The counts that are per key (they add up across slices). */
+export type KeyCounts = Pick<SeedCounts, 'keys' | 'skipped_cig' | 'skipped_same' | 'missing' | 'rejected_qa'>;
+/** The counts that are per distinct English text (known once the candidates are merged). */
+export type TextCounts = Pick<SeedCounts, 'imported' | 'unchanged' | 'conflicts' | 'admin_kept' | 'cig_kept'>;
+
+export const emptySeedCounts = (): SeedCounts => ({
+  keys: 0, skipped_cig: 0, skipped_same: 0, missing: 0, rejected_qa: 0,
+  imported: 0, unchanged: 0, conflicts: 0, admin_kept: 0, cig_kept: 0,
+});
+
+export function addCounts<T extends Partial<SeedCounts>>(into: SeedCounts, part: T): SeedCounts {
+  for (const [k, n] of Object.entries(part) as [keyof SeedCounts, number][]) into[k] = (into[k] ?? 0) + (n ?? 0);
+  return into;
+}
+
 export interface SeedResult {
   updates: Record<string, TmEntry>;
   conflicts: SeedConflict[];
   counts: SeedCounts;
 }
 
+export type PackLookup = Map<string, string> | Record<string, string> | ((normalizedKey: string) => string | undefined);
+
 export interface SeedInput {
   en: Record<string, string>;
   cig: Record<string, string>;
-  pack: Map<string, string> | Record<string, string>;
+  pack: PackLookup;
   sourceId: string;
   lic: string;
   at: string;
@@ -67,18 +88,53 @@ export function placeholdersMatch(en: string, v: string): boolean {
   return sameMultiset(tokensOf(en), tokensOf(v)) && !/[\r\n]/.test(v);
 }
 
-export async function seedEntries(input: SeedInput): Promise<SeedResult> {
+/** One translation of an English text: how many keys carry it and the smallest of them. */
+export interface SeedVote {
+  v: string;
+  n: number;
+  k: string;
+}
+
+/** One TM slot: an English text with the votes of its keys. `key` is the smallest key carrying it. */
+export interface SeedCand {
+  h: string;
+  en: string;
+  key: string;
+  votes: SeedVote[];
+}
+
+/** Folds candidates of several slices into one per English text (votes add up, the smallest key stays). */
+export function mergeSeedCands(parts: SeedCand[][]): SeedCand[] {
+  const by = new Map<string, { en: string; key: string; votes: Map<string, SeedVote> }>();
+  for (const part of parts) {
+    for (const c of part) {
+      let m = by.get(c.h);
+      if (!m) by.set(c.h, (m = { en: c.en, key: c.key, votes: new Map() }));
+      else if (c.key < m.key) m.key = c.key;
+      for (const v of c.votes) {
+        const have = m.votes.get(v.v);
+        if (!have) m.votes.set(v.v, { ...v });
+        else {
+          have.n += v.n;
+          if (v.k < have.k) have.k = v.k;
+        }
+      }
+    }
+  }
+  return [...by].map(([h, m]) => ({ h, en: m.en, key: m.key, votes: [...m.votes.values()] }))
+    .sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
+}
+
+export async function seedCandidates(
+  input: Pick<SeedInput, 'en' | 'cig' | 'pack' | 'hash'>,
+): Promise<{ cands: SeedCand[]; counts: KeyCounts }> {
   const hash = input.hash ?? sha256Hex;
-  const tm = input.tm ?? {};
-  const get = input.pack instanceof Map
-    ? (k: string) => (input.pack as Map<string, string>).get(k)
-    : (k: string) => (input.pack as Record<string, string>)[k];
-  const counts: SeedCounts = {
-    keys: 0, skipped_cig: 0, skipped_same: 0, missing: 0, rejected_qa: 0,
-    imported: 0, unchanged: 0, conflicts: 0, admin_kept: 0, cig_kept: 0,
-  };
-  // h → { en, key (first, sorted), votes: value → count } — one TM slot per English text.
-  const cand = new Map<string, { en: string; key: string; votes: Map<string, number> }>();
+  const pack = input.pack;
+  const get = typeof pack === 'function' ? pack : pack instanceof Map
+    ? (k: string) => pack.get(k)
+    : (k: string) => (Object.hasOwn(pack, k) ? pack[k] : undefined);
+  const counts: KeyCounts = { keys: 0, skipped_cig: 0, skipped_same: 0, missing: 0, rejected_qa: 0 };
+  const one: SeedCand[] = [];
   const cache = new Map<string, string>();
 
   for (const key of Object.keys(input.en).sort()) {
@@ -104,41 +160,48 @@ export async function seedEntries(input: SeedInput): Promise<SeedResult> {
     }
     let h = cache.get(en);
     if (!h) cache.set(en, (h = await hash(en)));
-    const c = cand.get(h);
-    if (c) c.votes.set(v, (c.votes.get(v) ?? 0) + 1);
-    else cand.set(h, { en, key, votes: new Map([[v, 1]]) });
+    one.push({ h, en, key, votes: [{ v, n: 1, k: key }] });
   }
+  return { cands: mergeSeedCands([one]), counts };
+}
 
+/** Merged candidates against the TM: what to write, what the arbiter must decide. */
+export function decideSeed(
+  cands: SeedCand[], tm: Record<string, TmEntry>, src: { sourceId: string; lic: string; at: string },
+): { updates: Record<string, TmEntry>; conflicts: SeedConflict[]; counts: TextCounts } {
+  const counts: TextCounts = { imported: 0, unchanged: 0, conflicts: 0, admin_kept: 0, cig_kept: 0 };
   const updates: Record<string, TmEntry> = {};
   const conflicts: SeedConflict[] = [];
-  for (const [h, c] of cand) {
-    // Most frequent translation among the keys sharing this English; ties keep the first seen.
-    let t = '';
-    let best = 0;
-    for (const [v, n] of c.votes) {
-      if (n > best) {
-        best = n;
-        t = v;
-      }
-    }
-    const challenger: TmEntry = { t, o: 'community', src: input.sourceId, lic: input.lic, at: input.at };
-    const inc = tm[h];
+  for (const c of cands) {
+    // Most frequent translation among the keys sharing this English; ties keep the one seen first (smallest key).
+    let best: SeedVote | null = null;
+    for (const v of c.votes) if (!best || v.n > best.n || (v.n === best.n && v.k < best.k)) best = v;
+    if (!best) continue;
+    const t = best.v;
+    const challenger: TmEntry = { t, o: 'community', src: src.sourceId, lic: src.lic, at: src.at };
+    const inc = Object.hasOwn(tm, c.h) ? tm[c.h] : undefined;
     if (!inc) {
-      updates[h] = challenger;
+      updates[c.h] = challenger;
       counts.imported++;
     } else if (inc.o === 'admin') counts.admin_kept++;
     else if (inc.o === 'cig') counts.cig_kept++;
     else if (inc.t === t) counts.unchanged++;
-    else if (inc.o === 'community' && inc.src === input.sourceId) {
+    else if (inc.o === 'community' && inc.src === src.sourceId) {
       // The same source changed its own text: a refresh, not a dispute.
-      updates[h] = challenger;
+      updates[c.h] = challenger;
       counts.imported++;
     } else {
-      conflicts.push({ key: c.key, h, en: c.en, incumbent: inc, challenger });
+      conflicts.push({ key: c.key, h: c.h, en: c.en, incumbent: inc, challenger });
       counts.conflicts++;
     }
   }
   return { updates, conflicts, counts };
+}
+
+export async function seedEntries(input: SeedInput): Promise<SeedResult> {
+  const { cands, counts: perKey } = await seedCandidates(input);
+  const d = decideSeed(cands, input.tm ?? {}, input);
+  return { updates: d.updates, conflicts: d.conflicts, counts: { ...perKey, ...d.counts } };
 }
 
 /** Share (0..100, one decimal) of the non-blank English keys the pack really translates. */

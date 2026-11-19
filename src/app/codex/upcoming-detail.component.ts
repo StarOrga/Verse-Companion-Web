@@ -13,8 +13,10 @@ import { CodexCategoryIconComponent } from './codex-category-icon.component';
 import { FallbackImageComponent } from './fallback-image.component';
 import { NeuroFieldDirective } from '../core/neuro-field.directive';
 import { BetaService } from '../core/beta.service';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ItemPathComponent } from '../shared/item-path/item-path.component';
 import { pathLevelFor } from './path-level.util';
+import { ItemPathService } from '../hq/data/item-path.service';
 import { OverlayFrameComponent } from '../shared/overlay-frame/overlay-frame.component';
 import { OverlayOriginService } from '../shared/overlay-frame/overlay-origin.service';
 import {
@@ -47,7 +49,7 @@ import { NavOriginService, PageCrumb, originTrail } from '../shared/page-header/
 @Component({
   selector: 'sc-upcoming-detail',
   standalone: true,
-  imports: [PageHeaderComponent, ItemPathComponent, 
+  imports: [PageHeaderComponent, ItemPathComponent, ScActionDirective,
     NgTemplateOutlet,
     OverlayFrameComponent,
     NeuroFieldDirective,
@@ -104,7 +106,7 @@ import { NavOriginService, PageCrumb, originTrail } from '../shared/page-header/
 
               @if (s.rsiUrl) {
                 <!-- Secondary, never the primary destination any more (#130). -->
-                <a class="sc-btn ghost" [href]="s.rsiUrl" target="_blank" rel="noopener noreferrer">
+                <a scAction tier="secondary" [href]="s.rsiUrl" target="_blank" rel="noopener noreferrer">
                   {{ 'codex.upcomingDetail.rsiLink' | translate }}
                   <span class="ext" aria-hidden="true">↗</span>
                 </a>
@@ -179,9 +181,6 @@ import { NavOriginService, PageCrumb, originTrail } from '../shared/page-header/
     .notice { margin: 4px 0 0; color: var(--sc-fg-2); font-size: 0.86rem; line-height: 1.5; }
 
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
-    .actions .sc-btn { cursor: pointer; text-decoration: none; }
-    .actions .ghost { color: var(--sc-fg-1); border-color: var(--sc-border); }
-    .actions .ghost:hover { background: var(--sc-bg-2); color: var(--sc-fg-0); box-shadow: none; }
 
 
 
@@ -198,7 +197,7 @@ import { NavOriginService, PageCrumb, originTrail } from '../shared/page-header/
     .load-err .retry { margin-left: auto; min-height: max(36px, var(--sc-tap-min)); padding: 6px 14px; border-radius: 6px; background: transparent;
       border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .load-err .retry:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .load-err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .load-err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .load-err .retry:disabled { opacity: 0.5; cursor: default; }
 
   `],
@@ -222,7 +221,12 @@ export class UpcomingDetailComponent implements OnInit {
   roleLabel(value: string | null): string {
     return upcomingRoleLabel(value, (k) => this.translate.instant(k));
   }
-  protected readonly pathLevel = computed(() => pathLevelFor(this.navOrigin));
+  private readonly itemPath = inject(ItemPathService);
+  /** Signed in: always the two stations (R5 r5-d-bauplan); signed out the full form only from Planen or a set (D2). */
+  protected readonly pathLevel = computed(() => {
+    const s = this.ship();
+    return pathLevelFor(this.navOrigin, !!s && this.itemPath.state('upcoming', s.id, null)().signedIn);
+  });
 
   readonly loading = signal(true);
   readonly retrying = signal(false);

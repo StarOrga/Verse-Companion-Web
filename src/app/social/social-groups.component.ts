@@ -7,6 +7,7 @@ import { FriendsService } from './friends.service';
 import { edgeLabel } from './friends.types';
 import { SocialService } from './social.service';
 import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, friendPath, isValidGroupName } from './social.types';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /**
  * Groups (C18, R2): an owner-private list of friends, kind org or
@@ -16,7 +17,7 @@ import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, frien
 @Component({
   selector: 'sc-social-groups',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, ScSegmentedComponent],
+  imports: [ScActionDirective, TranslatePipe, RouterLink, ScSegmentedComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="sc-card section" id="social-groups">
@@ -36,7 +37,7 @@ import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, frien
                [attr.maxlength]="nameMax"
                [placeholder]="'social.groups.namePlaceholder' | translate"
                [attr.aria-label]="'social.groups.namePlaceholder' | translate" autocomplete="off" />
-        <button type="submit" class="sc-btn sc-btn-primary" [disabled]="social.busy() || !nameValid()">
+        <button type="submit" scAction tier="secondary" [disabled]="social.busy() || !nameValid()">
           {{ 'social.groups.create' | translate }}
         </button>
       </form>
@@ -44,7 +45,7 @@ import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, frien
       @if (social.loadError(); as key) {
         <div class="load-error" role="alert">
           <span>{{ key | translate }}</span>
-          <button type="button" class="sc-btn micro" (click)="reload()">{{ 'errors.retry' | translate }}</button>
+          <button type="button" scAction tier="secondary" (click)="reload()">{{ 'errors.retry' | translate }}</button>
         </div>
       } @else if (social.groups().length === 0) {
         <p class="empty-inline">{{ 'social.groups.empty' | translate }}</p>
@@ -56,10 +57,10 @@ import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, frien
                 <span class="group-name">{{ g.name }}</span>
                 <span class="kind">{{ 'social.group.kind.' + g.kind | translate }}</span>
                 <span class="group-actions">
-                  <button type="button" class="sc-btn micro" [disabled]="social.busy()" (click)="rename(g)">
+                  <button type="button" scAction tier="secondary" [disabled]="social.busy()" (click)="rename(g)">
                     {{ 'social.groups.rename' | translate }}
                   </button>
-                  <button type="button" class="sc-btn micro danger" [disabled]="social.busy()" (click)="remove(g)">
+                  <button type="button" scAction tier="secondary" tone="danger" [disabled]="social.busy()" (click)="remove(g)">
                     {{ 'social.groups.delete' | translate }}
                   </button>
                 </span>
@@ -107,7 +108,7 @@ import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, frien
       flex: 1 1 180px; min-width: 0; padding: 9px 12px; background: var(--sc-bg-1); color: var(--sc-fg-0);
       border: 1px solid var(--sc-border); border-radius: 4px; font: inherit; font-size: max(0.9rem, var(--sc-fs-input));
     }
-    .text-input:focus { outline: none; border-color: var(--sc-accent); box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.25); }
+    .text-input:focus { outline: none; border-color: var(--sc-accent); }
     .groups { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; }
     .group { padding: 12px 0; border-bottom: 1px solid var(--sc-border); }
     .group:last-child { border-bottom: 0; }
@@ -125,11 +126,8 @@ import { FRIEND_GROUP_KINDS, FriendGroup, FriendGroupKind, GROUP_NAME_MAX, frien
     }
     .chip:hover:not(:disabled) { border-color: var(--sc-accent); }
     .chip.on { border-color: var(--sc-accent); background: rgba(0, 212, 255, 0.12); color: var(--sc-accent); }
-    .chip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-    .sc-btn.micro { padding: 4px 10px; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.04em; }
-    .sc-btn.micro.danger { color: var(--sc-danger); border-color: var(--sc-danger); }
-    .sc-btn.micro.danger:hover:not(:disabled) { background: var(--sc-danger); color: var(--sc-bg-0); }
-    @media (pointer: coarse) { .sc-btn, .chip { min-height: 48px; } }
+    .chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    @media (pointer: coarse) { .chip { min-height: 48px; } }
   `],
 })
 export class SocialGroupsComponent implements OnInit {

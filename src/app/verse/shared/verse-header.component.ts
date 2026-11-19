@@ -4,10 +4,9 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { NavOriginService, PageCrumb } from '../../shared/page-header/nav-origin.service';
 import { ShellChromeService } from '../../shell/fusion-bar/shell-chrome.service';
 import { FeedbackSpotDirective } from '../../feedback/feedback-spot.directive';
-import { ExplorerGlyphComponent } from '../starmap/explorer-glyph.component';
 import { BetaService } from '../../core/beta.service';
 import { VerseStatusComponent } from './verse-status.component';
-import { VerseWorld } from './verse-world';
+import { VerseWorld, verseEmblemShown } from './verse-world';
 
 /**
  * `<sc-verse-header>` — the one page head of the Verse subpages (News,
@@ -28,6 +27,7 @@ import { VerseWorld } from './verse-world';
  *                            tablet up the shell subheader carries the trail
  *       [eyebrow]="..."      legacy; used as the h1 text when no title is given
  *       [root]="true">       legacy (hub only): no crumbs
+ *     <button vhTitle ...>?</button>    one small control right after the h1 (e.g. a plain "?")
  *     <a vhActions ...>…</a>          right-aligned actions/aside row; every direct
  *     <button vhActions ...>…</button>  child gets a fine divider to its left, no boxes
  *   </sc-verse-header>
@@ -39,13 +39,14 @@ import { VerseWorld } from './verse-world';
  *
  * Shell beta: hands title + trail to the Fusion bar (`publishCrumbs`), the way
  * `<sc-page-header>` does, so the subheader path keeps working. Without the
- * shell beta the slim status instrument joins the actions; while the Verse
- * beta is on, the star-map glyph is the last action (not on the Sternkarte).
+ * shell beta the slim status instrument joins the actions. No star-map glyph
+ * any more: the star map is reached through the Verse itself (batch concept
+ * 20261115-2122, note #1).
  */
 @Component({
   selector: 'sc-verse-header',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, FeedbackSpotDirective, VerseStatusComponent, ExplorerGlyphComponent],
+  imports: [RouterLink, TranslatePipe, FeedbackSpotDirective, VerseStatusComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // Not encapsulated: the dividers style the PROJECTED actions. Every rule is scoped under `sc-verse-header`.
   encapsulation: ViewEncapsulation.None,
@@ -66,7 +67,7 @@ import { VerseWorld } from './verse-world';
       </nav>
     }
     <div class="vh-row">
-      @if (planet(); as p) {
+      @if (emblem(); as p) {
         <span class="vh-emblem" [attr.data-world]="p" aria-hidden="true">
           @if (p === 'starmap') {
             <ng-content select="[vhEmblem]">
@@ -78,13 +79,12 @@ import { VerseWorld } from './verse-world';
         </span>
       }
       <div class="vh-line" [scFeedbackSpot]="'feedbackSpot.headline'" [scFeedbackSpotText]="heading()">
-        @if (heading(); as h) { <h1 class="vh-title">{{ h }}</h1> }
+        <span class="vh-head">@if (heading(); as h) { <h1 class="vh-title">{{ h }}</h1> }<ng-content select="[vhTitle]" /></span>
         @if (subtitle(); as s) { <p class="vh-sub">{{ s }}<ng-content select="[vhSub]" /></p> }
       </div>
       <div class="vh-actions">
         <ng-content select="[vhActions]" />
         @if (!shell()) { <sc-verse-status /> }
-        @if (starmap() && planet() !== 'starmap') { <sc-explorer-glyph /> }
       </div>
     </div>
   `,
@@ -103,8 +103,12 @@ export class VerseHeaderComponent {
   readonly crumbs = computed<readonly PageCrumb[]>(() => (this.root() ? [] : this.trail()));
   /** The one h1: the title, else the legacy eyebrow. */
   readonly heading = computed(() => this.title() ?? this.eyebrow() ?? null);
-  readonly starmap = this.beta.isEnabled('verse');
   readonly shell = this.beta.isEnabled('shell');
+  /** The planet whose emblem the head shows; shell β drops it where the scene shows the planet big (`verseEmblemShown`). */
+  readonly emblem = computed(() => {
+    const p = this.planet();
+    return p && verseEmblemShown(p, this.shell()) ? p : null;
+  });
 
   constructor() {
     const origin = inject(NavOriginService);

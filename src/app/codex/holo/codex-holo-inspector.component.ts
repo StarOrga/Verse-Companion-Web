@@ -8,7 +8,6 @@ import type { EquippedStat } from '../codex-equipped-stats';
 import { displayItemName } from '../codex-format';
 import { CodexService, manufacturerLabel, toLang } from '../codex.service';
 import type { CodexKind } from '../codex.service';
-import { ICON_PATHS } from '../codex-category-icon.component';
 import type { ShipModuleSection } from '../ship-module-sections';
 import type { PlacementRow } from '../asset-package/asset-package-viewer.component';
 import { resolveIcons } from '../search/search-cta';
@@ -19,6 +18,15 @@ import { isPlainLeftClick } from '../../core/modified-click.util';
 import type { PortPinBadge } from './codex-holo-patch.component';
 import { PinGroup, StagePin } from './codex-holo-model';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { HoloDiffMarkerComponent } from './holo-diff-marker';
+import { partTypeKey } from './holo-callout-values';
+
+/** Stat names too long for a third of the card get a short form; the rest keep their own label. */
+const SHORT_STAT: Readonly<Record<string, string>> = { projectileSpeed: 'codex.holo.stage.statShort.projectileSpeed' };
+function shortStatKey(key: string): string {
+  return SHORT_STAT[key.slice(key.lastIndexOf('.') + 1)] ?? key;
+}
 
 /** The part the panel talks about: what a pilot asks about, the gun rather than its mount. */
 export interface PartFocus {
@@ -97,7 +105,7 @@ function chipSize(pin: StagePin): number | null {
 @Component({
   selector: 'sc-codex-holo-inspector',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective, RouterLink, ItemPathComponent],
+  imports: [TranslatePipe, ScTooltipDirective, ScActionDirective, RouterLink, ItemPathComponent, HoloDiffMarkerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (target(); as it) {
@@ -107,10 +115,9 @@ function chipSize(pin: StagePin): number | null {
         <div class="inspector" role="region" [attr.aria-label]="'codex.holo.stage.tab.parts' | translate">
           <div class="insp-top">
             <button type="button" class="back inspector-close" (click)="closed.emit()" [scTooltip]="'codex.holo.stage.backHint' | translate" scTooltipTier="label">‹ {{ 'codex.holo.stage.backToParts' | translate }}</button>
-            @if (index() > 0) { <span class="n">{{ index() }} / {{ total() }}</span> }
           </div>
           <div class="pn">
-            <h2>{{ part.name ? itemName(part.name) : ((it.slot.emptyLabelKey ?? 'codex.holo.stage.emptyBay') | translate) }}</h2>
+            <h2>@if (isChanged(inspectedPort())) { <sc-holo-diff-marker class="dm" /> }{{ part.name ? itemName(part.name) : ((it.slot.emptyLabelKey ?? 'codex.holo.stage.emptyBay') | translate) }}</h2>
             <small>{{ partMeta(part) }}</small>
           </div>
           @if (patchPin(); as pin) {
@@ -158,9 +165,6 @@ function chipSize(pin: StagePin): number | null {
             <p class="mut">{{ 'codex.holo.stage.rawPortHint' | translate }}</p>
           }
           <div class="prev">
-            @if (part.className) {
-              <span class="th" aria-hidden="true"><svg viewBox="0 0 24 24"><path [attr.d]="sectionGlyph()" /></svg></span>
-            }
             <small>{{ 'codex.holo.stage.previewTitle' | translate }}</small>
             <ul>
               <li><span>{{ 'codex.holo.stage.previewMaker' | translate }}</span>{{ maker(part.manufacturerCode) ?? '—' }}</li>
@@ -184,10 +188,10 @@ function chipSize(pin: StagePin): number | null {
               </div>
               <div class="insp-actions">
                 @if (!readOnly()) {
-                  <button type="button" class="btn quiet ico" [scTooltip]="('codex.swap.open' | translate) + ': ' + (mount.name ? itemName(mount.name) : '')" scTooltipTier="label"
+                  <button type="button" scAction tier="tertiary" [scTooltip]="('codex.swap.open' | translate) + ': ' + (mount.name ? itemName(mount.name) : '')" scTooltipTier="label"
                           [attr.aria-label]="('codex.swap.open' | translate) + ': ' + (mount.name ? itemName(mount.name) : '')" (click)="swapRequested.emit(it)">⇄</button>
                 }
-                <button type="button" class="btn quiet ico" [scTooltip]="('codex.inspect.openStats' | translate) + ': ' + (mount.name ? itemName(mount.name) : '')" scTooltipTier="label"
+                <button type="button" scAction tier="tertiary" [scTooltip]="('codex.inspect.openStats' | translate) + ': ' + (mount.name ? itemName(mount.name) : '')" scTooltipTier="label"
                         [attr.aria-label]="('codex.inspect.openStats' | translate) + ': ' + (mount.name ? itemName(mount.name) : '')" (click)="inspected.emit(it)">≡</button>
               </div>
             </div>
@@ -210,11 +214,11 @@ function chipSize(pin: StagePin): number | null {
               }
               <div class="insp-actions">
                 @if ((kid.className || kid.rawTypes.length > 0) && !readOnly()) {
-                  <button type="button" class="btn quiet ico" [scTooltip]="('codex.swap.open' | translate) + ': ' + (kid.name ? itemName(kid.name) : '')" scTooltipTier="label"
+                  <button type="button" scAction tier="tertiary" [scTooltip]="('codex.swap.open' | translate) + ': ' + (kid.name ? itemName(kid.name) : '')" scTooltipTier="label"
                           [attr.aria-label]="('codex.swap.open' | translate) + ': ' + (kid.name ? itemName(kid.name) : '')" (click)="swapRequested.emit(childTarget(it, kid))">⇄</button>
                 }
                 @if (kid.className) {
-                  <button type="button" class="btn quiet ico" [scTooltip]="('codex.inspect.openStats' | translate) + ': ' + (kid.name ? itemName(kid.name) : '')" scTooltipTier="label"
+                  <button type="button" scAction tier="tertiary" [scTooltip]="('codex.inspect.openStats' | translate) + ': ' + (kid.name ? itemName(kid.name) : '')" scTooltipTier="label"
                           [attr.aria-label]="('codex.inspect.openStats' | translate) + ': ' + (kid.name ? itemName(kid.name) : '')" (click)="inspected.emit(childTarget(it, kid))">≡</button>
                 }
               </div>
@@ -229,7 +233,7 @@ function chipSize(pin: StagePin): number | null {
         <p class="plist-head"><b>{{ 'codex.holo.stage.partsTotal' | translate: { n: packageRows().length } }}</b></p>
         @for (g of rowGroups(); track g.group) {
           <div class="pgroup">
-            <span class="pg-head"><b>{{ ('codex.assetPackage.groups.' + g.group) | translate }}</b> · {{ g.rows.length }}</span>
+            <span class="pg-head"><b>{{ ('codex.assetPackage.groups.' + g.group) | translate }}</b></span>
             <div class="pchips">
               @for (r of g.rows; track r.p.id) {
                 <span class="pline" [class.off]="!r.visible">
@@ -263,11 +267,13 @@ function chipSize(pin: StagePin): number | null {
       <div class="plist" role="region" [attr.aria-label]="'codex.holo.stage.tab.parts' | translate">
         <p class="plist-head">
           <b>{{ 'codex.holo.stage.partsTotal' | translate: { n: total() } }}</b>
-          <small class="plist-hint">{{ 'codex.holo.stage.inspectorEmptyBody' | translate: { n: hotkeyPinCount() } }}</small>
+          @if (changedPorts().size > 0) {
+            <small class="plist-legend"><sc-holo-diff-marker />{{ 'codex.holo.inspector.diffLegend' | translate }}</small>
+          }
         </p>
         @for (g of pinGroups(); track g.key) {
           <div class="pgroup">
-            <span class="pg-head"><b>{{ g.labelKey | translate }}</b> · {{ 'codex.holo.stage.partsInstalled' | translate: { n: installedCount(g) } }}</span>
+            <span class="pg-head"><b>{{ g.labelKey | translate }}</b></span>
             <div class="pchips">
               @for (pin of g.pins; track pin.portName) {
                 @if (pinHref(pin); as href) {
@@ -282,7 +288,7 @@ function chipSize(pin: StagePin): number | null {
                      (focus)="hovered.emit([pin.portName])"
                      (blur)="hovered.emit(null)"
                      (click)="pickPin($event, pin.portName)">
-                    @if (sizeOf(pin) !== null) { <i>S{{ sizeOf(pin) }}</i> }<span class="pname">{{ pin.label }}</span>
+                    @if (isChanged(pin.portName)) { <sc-holo-diff-marker class="dm" /> }@if (sizeOf(pin) !== null) { <i>S{{ sizeOf(pin) }}</i> }<span class="pname">{{ pin.label }}</span>
                   </a>
                 } @else {
                   <button type="button" class="part"
@@ -296,7 +302,7 @@ function chipSize(pin: StagePin): number | null {
                           (focus)="hovered.emit([pin.portName])"
                           (blur)="hovered.emit(null)"
                           (click)="pinInspect.emit(pin.portName)">
-                    @if (sizeOf(pin) !== null) { <i>S{{ sizeOf(pin) }}</i> }<span class="pname">{{ pin.label }}</span>
+                    @if (isChanged(pin.portName)) { <sc-holo-diff-marker class="dm" /> }@if (sizeOf(pin) !== null) { <i>S{{ sizeOf(pin) }}</i> }<span class="pname">{{ pin.label }}</span>
                   </button>
                 }
               }
@@ -319,10 +325,6 @@ function chipSize(pin: StagePin): number | null {
     .lnk { background: none; border: none; padding: 0; color: var(--sc-accent); cursor: pointer; font: inherit;
       font-size: max(11px, var(--f)); min-height: var(--sc-tap-min, 24px); justify-self: start; }
     .lnk:hover { text-decoration: underline; }
-    .btn { min-height: var(--sc-tap-min, 28px); padding: 3px 8px; border-radius: 3px; border: 1px solid var(--hair); background: none;
-      color: var(--sc-fg-1); cursor: pointer; font: inherit; font-size: max(11px, var(--f));
-      transition: border-color 160ms ease, color 160ms ease; }
-    .btn:hover, .btn:focus-visible { border-color: var(--sc-accent); color: var(--sc-accent); }
     .empty { display: grid; place-items: center; text-align: center; gap: 8px; color: var(--sc-fg-2); padding: 40px 10px; font-size: max(12px, var(--f)); }
     .empty b { font-size: max(11px, var(--f)); letter-spacing: 0.14em; color: var(--sc-fg-1); font-weight: 400; }
     .mut { margin: 0; font-size: max(12px, var(--f)); color: var(--sc-fg-2); }
@@ -334,8 +336,7 @@ function chipSize(pin: StagePin): number | null {
     .back { background: none; border: 0; border-radius: 5px; color: var(--sc-accent); cursor: pointer; font: inherit; font-size: max(12.5px, var(--f)); padding: 3px 9px 3px 6px;
       min-height: var(--sc-tap-min, 26px); transition: background 160ms ease; }
     .back:hover { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
-    .back:focus-visible, .lnk:focus-visible, .swap:focus-visible, .act button:focus-visible, .more:focus-visible, .part:focus-visible, .eye:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-    .n { font-family: var(--m); font-size: max(10px, var(--f)); color: var(--sc-fg-2); }
+    .back:focus-visible, .lnk:focus-visible, .swap:focus-visible, .act button:focus-visible, .more:focus-visible, .part:focus-visible, .eye:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .pn { display: grid; gap: 1px; min-width: 0; }
     .pn h2 { margin: 0; font-family: var(--sc-font-body); font-size: 19px; font-weight: 600; color: var(--sc-fg-0); overflow-wrap: anywhere; line-height: 1.2; }
     .pn small { font-size: max(12px, var(--f)); color: var(--sc-fg-2); overflow-wrap: anywhere; }
@@ -344,7 +345,7 @@ function chipSize(pin: StagePin): number | null {
     /* minmax(0,1fr): a long label ("Geschossgeschwindigkeit") wraps inside its cell. */
     .insp-stats { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px 6px; }
     .insp-stats div { display: grid; gap: 2px; align-content: space-between; min-width: 0; }
-    .insp-stats dt { font-family: inherit; text-transform: none; font-size: max(9.5px, var(--f)); color: var(--sc-fg-2); overflow-wrap: anywhere; hyphens: auto; }
+    .insp-stats dt { font-family: inherit; text-transform: none; font-size: max(9.5px, var(--f)); color: var(--sc-fg-2); overflow-wrap: normal; word-break: normal; hyphens: manual; }
     .insp-stats dd { margin: 0; font-family: var(--m); font-size: 15px; color: var(--sc-fg-0); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .insp-draft { margin: 0; display: flex; align-items: center; gap: 8px; }
     .tag.draft { font-size: max(10px, var(--f)); color: var(--sc-accent); border: 1px solid var(--sc-accent); border-radius: 2px; padding: 1px 6px; }
@@ -360,14 +361,10 @@ function chipSize(pin: StagePin): number | null {
     .act span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .insp-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .insp-actions:empty { display: none; }
-    .insp-kid .btn.ico { min-inline-size: var(--sc-tap-min, 32px); min-block-size: var(--sc-tap-min, 32px); padding-inline: 8px; }
     .swap { flex: 1 1 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: max(38px, var(--sc-tap-min, 0px)); border: 1px solid var(--sc-accent); border-radius: 7px;
       background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); cursor: pointer; font: inherit; font-size: max(13px, var(--f)); font-weight: 600; transition: background 160ms ease; }
     .swap:hover { background: color-mix(in srgb, var(--sc-accent) 28%, transparent); }
     .prev { display: grid; gap: 7px; padding-block: 10px; border-block: 1px solid var(--hair); }
-    .th { display: grid; place-items: center; height: 72px; border-radius: 6px; color: var(--sc-accent);
-      background: radial-gradient(ellipse at 50% 50%, color-mix(in srgb, var(--sc-accent) 14%, transparent), transparent 75%); }
-    .th svg { width: 48px; height: 48px; fill: none; stroke: currentColor; stroke-width: 0.9; stroke-linecap: round; stroke-linejoin: round; }
     .prev > small { font-size: max(10px, var(--f)); letter-spacing: 0.09em; text-transform: uppercase; color: var(--sc-fg-2); }
     .prev ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: max(12px, var(--f)); color: var(--sc-fg-0); }
     .prev li { display: flex; justify-content: space-between; gap: 8px; min-width: 0; text-align: end; }
@@ -388,8 +385,8 @@ function chipSize(pin: StagePin): number | null {
     @keyframes list-in { from { opacity: 0; } }
     .plist-head { margin: 0; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: max(13px, var(--f)); color: var(--sc-fg-0); }
     .plist-head b { font-weight: 600; white-space: nowrap; }
-    .plist-hint { font-size: max(10px, var(--f)); color: var(--sc-fg-2); text-align: end; }
-    @media (hover: none), (pointer: coarse) { .plist-hint { display: none; } }
+    .plist-legend { display: inline-flex; align-items: center; gap: 6px; font-size: max(10.5px, var(--f)); color: var(--sc-fg-2); white-space: nowrap; }
+    .dm { margin-inline-end: 6px; vertical-align: middle; }
     .pgroup { display: grid; gap: 3px; min-width: 0; }
     .pg-head { font-family: inherit; text-transform: none; font-size: max(10.5px, var(--f)); color: var(--sc-fg-2); }
     .pg-head b { font-family: var(--d); text-transform: uppercase; font-weight: 500; font-size: max(10px, var(--f)); letter-spacing: 0.09em; color: var(--sc-fg-1); }
@@ -434,7 +431,8 @@ export class CodexHoloInspectorComponent {
   readonly index = input(0);
   readonly total = input(0);
   readonly pinGroups = input<readonly PinGroup[]>([]);
-  readonly hotkeyPinCount = input(0);
+  /** Ports whose part differs from the Werk loadout — the ◆ marker (C19). */
+  readonly changedPorts = input<ReadonlySet<string>>(new Set());
   readonly activePorts = input<readonly string[]>([]);
   /** A shared link's loadout is on the table (#646): no swap, undo or save. */
   readonly readOnly = input(false);
@@ -493,16 +491,6 @@ export class CodexHoloInspectorComponent {
     return it ? partFocusOf(it, this.section()) : null;
   });
 
-  readonly sectionGlyph = computed(() => {
-    const s = this.section();
-    const key = s === 'weapons' || s === 'remoteTurrets' || s === 'missiles' || s === 'pod' ? 'weapon'
-      : s === 'shields' ? 'shield'
-      : s === 'powerPlants' ? 'power'
-      : s === 'coolers' ? 'cooler'
-      : s === 'quantum' ? 'quantum'
-      : 'component';
-    return ICON_PATHS[key] ?? ICON_PATHS['component'];
-  });
 
   readonly rowGroups = computed(() => {
     const groups = new Map<string, PlacementRow[]>();
@@ -546,7 +534,10 @@ export class CodexHoloInspectorComponent {
 
   partMeta(part: PartFocus): string {
     const size = part.size != null ? `S${part.size}` : null;
-    return [size, part.typeLabel, this.maker(part.manufacturerCode)].filter((x): x is string => !!x).join(' · ');
+    // The type in the reader's language ("Gatling", "Kühler"), not the extract's English "Weapon Gun" (B13).
+    const typeKey = partTypeKey(this.section(), part.className);
+    const type = typeKey ? this.injector.get(TranslateService).instant(typeKey) : part.typeLabel;
+    return [size, type, this.maker(part.manufacturerCode)].filter((x): x is string => !!x).join(' · ');
   }
 
   /** The part's values: its size and grade, then what the extract knows about it. */
@@ -554,7 +545,7 @@ export class CodexHoloInspectorComponent {
     const out: { key: string; value: string }[] = [];
     if (part.size != null) out.push({ key: 'codex.holo.stage.partSize', value: `S${part.size}` });
     if (part.grade) out.push({ key: 'codex.holo.stage.partGrade', value: part.grade });
-    for (const st of part.stats.slice(0, 6 - out.length)) out.push({ key: st.labelKey, value: formatEquippedStat(st) });
+    for (const st of part.stats.slice(0, 6 - out.length)) out.push({ key: shortStatKey(st.labelKey), value: formatEquippedStat(st) });
     return out;
   }
 
@@ -570,8 +561,8 @@ export class CodexHoloInspectorComponent {
     return formatEquippedStat(stat);
   }
 
-  installedCount(g: PinGroup): number {
-    return g.pins.filter((p) => !!p.slot?.className).length;
+  isChanged(port: string | null): boolean {
+    return !!port && this.changedPorts().has(port);
   }
 
   isQuiet(port: string): boolean {

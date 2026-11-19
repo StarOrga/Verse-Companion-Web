@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { HqEinsatzService } from '../data/hq-einsatz.service';
 import type { Nachschub, NachschubLineInput } from './nachschub.model';
 import { NachschubService } from './nachschub.service';
@@ -138,8 +138,8 @@ describe('NachschubTargetDialogComponent', () => {
 
   it('asks the aUEC goal for a sale into a new Nachschub and rejects an unusable goal', async () => {
     const { fixture, el, closed } = setup('sell');
-    expect(el.querySelector('input.input')).not.toBeNull();
-    const input = el.querySelector<HTMLInputElement>('input.input')!;
+    expect(el.querySelector('input.sc-input')).not.toBeNull();
+    const input = el.querySelector<HTMLInputElement>('input.sc-input')!;
     input.value = 'abc';
     input.dispatchEvent(new Event('input'));
     fixture.detectChanges();
@@ -163,7 +163,7 @@ describe('NachschubTargetDialogComponent', () => {
     expect(sellTargets.length).toBe(2);
     sellTargets[1].click();
     fixture.detectChanges();
-    expect(el.querySelector('input.input')).toBeNull();
+    expect(el.querySelector('input.sc-input')).toBeNull();
     primary(el).click();
     await fixture.whenStable();
     expect(addToNachschub).toHaveBeenCalledWith('b', expect.any(Array));
@@ -181,10 +181,21 @@ describe('NachschubTargetDialogComponent', () => {
     expect(closed).toEqual([]);
   });
 
+  it('relabels the existing Nachschub options when the language changes', () => {
+    packages.set([pkg('s0', 1)]);
+    const { fixture, el } = setup('pickup');
+    const i18n = TestBed.inject(TranslateService);
+    i18n.setTranslation('xx', { hq: { nachschub: { target: { append: 'XX {{name}}' } } } });
+    i18n.use('xx');
+    fixture.detectChanges();
+    expect(radios(el)[1].textContent).toContain('XX ');
+  });
+
   it('blocks "new" and falls back to an existing Nachschub when all 7 slots are in use', () => {
     packages.set(Array.from({ length: 7 }, (_, i) => pkg(`s${i}`, i + 1)));
     const { el } = setup('pickup');
-    expect(radios(el)[0].disabled).toBe(true);
+    // aria-disabled, not disabled: the blocked option keeps its tooltip with the reason (sc-segmented).
+    expect(radios(el)[0].getAttribute('aria-disabled')).toBe('true');
     expect(radios(el)[1].getAttribute('aria-checked')).toBe('true');
   });
 });

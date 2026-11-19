@@ -345,6 +345,10 @@ export const api = {
     patch: (partial: Partial<Omit<PublicSettings, 'telemetryEnabled'>>): Promise<PublicSettings> =>
       ipcRenderer.invoke('sc:settings:patch', partial),
   },
+  work: {
+    /** True while main still runs an extraction/skin/silhouette child or an upload run. */
+    busy: (): Promise<boolean> => ipcRenderer.invoke('sc:work:busy'),
+  },
   tray: {
     /** Push resolved i18n strings to main (the tray lives there). */
     setLabels: (labels: TrayLabelPush): void => ipcRenderer.send('sc:tray:labels', labels),
@@ -378,6 +382,13 @@ export const api = {
     /** Ask main whether an unattended run should start now. */
     decide: (signedIn: boolean): Promise<AutoRunDecision> =>
       ipcRenderer.invoke('sc:autorun:decide', signedIn),
+    /** A finished extract of this exact build still on disk (models-only runs), or null. */
+    reuseExtract: (req: {
+      installPath: string;
+      channel: string;
+      buildNumber: string;
+      patchVersion: string;
+    }): Promise<ExtractResultPayload | null> => ipcRenderer.invoke('sc:extract:reuse', req),
     /** The tray's Resume item asks the renderer to re-drive the stages. */
     onResumeRequested: (cb: () => void): (() => void) => {
       const listener = (): void => cb();
@@ -440,8 +451,12 @@ export const api = {
     silhouettes: (
       accessToken: string,
       outDir: string,
+      buildId?: string | null,
     ): Promise<{ ok: boolean; buildId?: string; counts?: Record<string, number>; error?: string; errorCode?: string }> =>
-      ipcRenderer.invoke('sc:catalog:silhouettes', accessToken, outDir),
+      ipcRenderer.invoke('sc:catalog:silhouettes', accessToken, outDir, buildId ?? null),
+    /** The published codex build of this identity — the target of a silhouettes-only continuation. */
+    currentBuild: (key: { channel: string; patchVersion: string; buildNumber: string }): Promise<string | null> =>
+      ipcRenderer.invoke('sc:catalog:currentBuild', key),
     /** Mark the Silhouetten step as passed without sending (ledger skip / nothing built). */
     silhouettesSkipped: (): Promise<void> => ipcRenderer.invoke('sc:catalog:silhouettesSkipped'),
     onEvent: (

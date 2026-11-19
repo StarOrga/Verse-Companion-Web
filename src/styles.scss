@@ -3,6 +3,9 @@
 // The scene's star fields, reused for the boot sky below (same seeds, same tiles).
 @use 'app/shell/scene/starfield' as boot-stars;
 
+// The two shared star fields as custom properties (_starfield.scss): one copy for the boot sky and the scene.
+:root { @include boot-stars.shared-fields; }
+
 /* StarOrga shared design system — single source of truth for tokens, fonts and
    base visuals. The local --sc-* tokens below are now thin aliases onto StarUI
    tokens, so every component (which references var(--sc-*)) adopts the StarOrga
@@ -19,6 +22,8 @@
    below the feedback panel (1400) and the bundle-history popups (1200). */
 .cdk-overlay-container { z-index: 1500; }
 .sc-dialog-backdrop { background: rgb(0 0 0 / 55%); }
+/* r1-stack (popup-aufbau): a confirm over an open dialog keeps the page at the first layer's dim. */
+.sc-dialog-backdrop.sc-dialog-backdrop--stacked { background: transparent; }
 
 :root {
   /* The app is dark-only (body.sc-theme-dark): native popups, spinners,
@@ -49,6 +54,17 @@
   --sc-idle: #3d5a6c;
   --sc-idle-bg: #0a1c26;
   --sc-offense: #e8864a;
+  /* Interior element groups of the holotable (concept 20261117-1810): one hue per
+     filter chip — cargo amber, ways cyan, medical green, weapons the offense orange. */
+  --sc-int-cargo: #f2c46b;
+  --sc-int-ways: #52c1e6;
+  --sc-int-med: #5fd39a;
+  --sc-int-weapons: var(--sc-offense);
+  --sc-int-lockers: #b7a3e8;
+  --sc-int-fire: #ff6b5b;
+  --sc-int-tech: #d9b45f;
+  --sc-int-living: #9fb3c8;
+  --sc-int-doors: #8fc0d8;
   --sc-danger: var(--accent-danger-light);
   --sc-border: var(--border-subtle);
   --sc-glow: var(--shadow-glow);
@@ -159,7 +175,7 @@
      container pads only what the frame's own gutter leaves short of it (see hq-pages). */
   --hq-rail-clear: calc(max(var(--sc-fab-inset, 24px), env(safe-area-inset-left, 0px)) + 36px + 12px);
 }
-html:has([data-layout]) {
+html[data-sc-layout] {
   --sc-page-gutter: var(--sc-rand);
   --sc-content-max: min(max(80rem, 67vw), 200vh);
   --sc-b-gutter: var(--sc-rand);
@@ -171,10 +187,10 @@ html:has([data-layout]) {
   font-size: clamp(16px, 100vh / 90, 32px);
 }
 /* Body text keeps today's 15px at the 16px root and scales with it. */
-html:has([data-layout]) body { font-size: 0.9375rem; }
+html[data-sc-layout] body { font-size: 0.9375rem; }
 @media (max-width: 720px) {
   /* Phones: the chip is not beside the subheader (that is the thumb bar). */
-  html:has([data-layout]) { --sc-b-gutter: var(--sc-rand); }
+  html[data-sc-layout] { --sc-b-gutter: var(--sc-rand); }
 }
 /* Scroll-linked condense of the main header into the subheader (0 = header
    expanded, 1 = docked): set per frame on the header, the bar and the β chip
@@ -257,13 +273,21 @@ html:has([data-layout]) body { font-size: 0.9375rem; }
   --sc-sub-kbd: linear-gradient(180deg, #17384c, #0b2231);
   /* Focus on the satin edge itself: a brighter edge and a soft outer glow (no inner ring). */
   --sc-sub-edge-focus: linear-gradient(160deg, rgba(225, 248, 255, 0.95) 0%, rgba(130, 220, 255, 0.7) 35%, rgba(90, 170, 205, 0.6) 65%, rgba(200, 240, 255, 0.9) 100%);
+  /* Keyboard focus: a thin soft glow that follows the element's own radius (box-shadow,
+     outline stays transparent). :focus-visible only, never after a mouse click. */
+  --sc-focus-ring: 0 0 0 1px rgba(0, 212, 255, 0.45), 0 0 8px rgba(0, 212, 255, 0.25);
+  --sc-focus-ring-inset: inset 0 0 0 1px rgba(0, 212, 255, 0.45), inset 0 0 8px rgba(0, 212, 255, 0.2);
+  --sc-focus-ring-hot: 0 0 0 1px rgba(255, 80, 70, 0.45), 0 0 8px rgba(255, 80, 70, 0.25);
+  /* The same ring for the wrapper of a text field (a round search field around a bare
+     input): empty until Tab moves focus, see "Keyboard focus ring" below. */
+  --sc-tab-ring: 0 0 0 0 transparent;
   --sc-sub-focus-glow: 0 0 0 1px rgba(130, 220, 255, 0.35), 0 0 22px rgba(82, 193, 230, 0.3);
   --sc-sub-box: rgba(130, 220, 255, 0.45);
 }
 /* Phone, beta shell: the top carries the subheader's route line (category + ◂ back) —
    the page header's own crumbs would repeat it right below. */
 @media (max-width: 720px) {
-  html:has(sc-fusion-bar) sc-page-header nav.crumbs { display: none; }
+  html[data-sc-bar] sc-page-header nav.crumbs { display: none; }
 }
 /* The subheader's light trace runs its conic edge around once (needs a typed angle). */
 @property --sc-sub-trace-ang {
@@ -296,9 +320,9 @@ html:has([data-layout]) body { font-size: 0.9375rem; }
 
 /* Anchors / focus never hide under the bar (WCAG 2.4.11): the bar is on top
    on desktop and at the bottom on phones. */
-html:has([data-layout]) { scroll-padding-top: var(--sc-bar-h); }
+html[data-sc-layout] { scroll-padding-top: var(--sc-bar-h); }
 @media (max-width: 720px) {
-  html:has([data-layout]) { scroll-padding-top: 0; scroll-padding-bottom: var(--sc-bar-h); }
+  html[data-sc-layout] { scroll-padding-top: 0; scroll-padding-bottom: var(--sc-bar-h); }
 }
 
 /* The frame (β only: the shell's <main> and the public layout's carry
@@ -380,6 +404,11 @@ html:has([data-layout]) { scroll-padding-top: var(--sc-bar-h); }
   /* The hologram cyan and its hot core (codex holotable, holodeck). */
   --sc-holo: #8fe3ff;
   --sc-holo-hi: #dff6ff;
+  /* The one selection colour of the holotable, every ship (concept 20261117-1809 "Grün").
+     Same value as HOLO_SELECT in src/app/codex/holo-look.ts. */
+  --sc-holo-select: #7dff9c;
+  /* Text on the green: the selected part's name tag. */
+  --sc-holo-select-ink: #04202e;
   --holo-t-fast: 160ms;
   --holo-t-base: 280ms;
   --holo-t-slow: 900ms;
@@ -388,12 +417,24 @@ html:has([data-layout]) { scroll-padding-top: var(--sc-bar-h); }
   --holo-rise: 6px;
   --holo-r-xs: 2px;
   --holo-r: 4px;
-  /* Perspective hues (tiles, strip). Movement is violet, not green: green
-     already means "better" in the deltas inside the same tile. */
-  --holo-p-offensive: var(--sc-accent);
-  --holo-p-defensive: var(--cat-game);
-  --holo-p-movement: var(--cat-ai);
-  --holo-p-signature: var(--accent-gold);
+  /* Perspective hues (tiles, strip): the four loadout AREAS, one colour
+     each in the Holotable and the classic loadout view (feedback #330, concept
+     2026-11-10-bereichs-symbole-umrandung). Offensive is its own holo red,
+     never --sc-accent-hot (admin) nor --sc-danger (errors). Movement is
+     violet, not green: green already means "better" in the deltas inside the
+     same tile. --sc-area-ice is the snowflake's fixed second colour on the
+     cooler symbol. --sc-area-line is how strong an area's line on top of a
+     block is drawn. */
+  --sc-area-offensive: #e5484d;
+  --sc-area-defensive: #5b8def;
+  --sc-area-movement: var(--cat-ai);
+  --sc-area-signature: #7cd4ef;
+  --sc-area-ice: #a9dcf5;
+  --sc-area-line: 60%;
+  --holo-p-offensive: var(--sc-area-offensive);
+  --holo-p-defensive: var(--sc-area-defensive);
+  --holo-p-movement: var(--sc-area-movement);
+  --holo-p-signature: var(--sc-area-signature);
   /* The Einsatz signal on the Holotable (glow, strip, dots, hexagon): quiet hues, always with a
      symbol beside them. The default stays the accent. Never red, never the warning colour. */
   --sc-mission-all: var(--sc-accent);
@@ -556,6 +597,9 @@ html:has([data-layout]) { scroll-padding-top: var(--sc-bar-h); }
      --sc-fab-clear-block, plus the β FAB's lane, and on a phone with the shell bar at the bottom
      it sits above the share button's lane too. */
   --sc-toast-bottom: calc(var(--sc-fab-clear-block) + var(--sc-beta-fab-lane) + var(--sc-view-fab-lane, 0px));
+  /* A toast's right edge: flush with the launcher column (the feedback disc and the β FAB above it), so the
+     stack and the round buttons under it share one edge. */
+  --sc-toast-end: max(var(--sc-fab-inset), env(safe-area-inset-right, 0px));
 }
 @media (max-width: 720px) {
   :root {
@@ -572,6 +616,52 @@ html:has([data-layout]) { scroll-padding-top: var(--sc-bar-h); }
     /* The β FAB stacks above the share button's lane; toasts ride above the β FAB. */
     --sc-toast-bottom: calc(var(--sc-beta-fab-bottom) + var(--sc-beta-fab-lane) + var(--sc-view-fab-lane, 0px));
   }
+}
+
+/* ---- POPUP FIELD (in-field label) ----
+   Concept popup-aufbau a2: inside a popup the label sits in the empty field and shrinks to the
+   field's top edge once a value is in or the field has focus. Still a real <label>, so assistive
+   tech reads it; the input needs placeholder=" " (the empty-state test). A non-input control
+   (sc-select) sets .is-filled on the wrapper instead.
+     <label class="sc-float-field">
+       <input class="sc-input" placeholder=" " ... />
+       <span class="sc-float-label">{{ 'x.label' | translate }}</span>
+     </label> */
+.sc-float-field {
+  position: relative;
+  display: block;
+  min-inline-size: 0;
+}
+.sc-float-field > .sc-input {
+  padding-top: 20px;
+  padding-bottom: 6px;
+  min-block-size: max(48px, var(--sc-tap-min, 0px));
+}
+.sc-float-field > .sc-float-label {
+  position: absolute;
+  inset-inline-start: 15px;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  max-inline-size: calc(100% - 30px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--sc-fg-1);
+  font-size: max(1em, var(--sc-fs-input, 1em));
+  pointer-events: none;
+  transition: transform 0.15s ease, font-size 0.15s ease, top 0.15s ease, color 0.15s ease;
+}
+.sc-float-field > .sc-input:focus + .sc-float-label,
+.sc-float-field > .sc-input:not(:placeholder-shown) + .sc-float-label,
+.sc-float-field.is-filled > .sc-float-label {
+  inset-block-start: 6px;
+  transform: none;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+.sc-float-field > .sc-input:focus + .sc-float-label { color: var(--sc-accent); }
+@media (prefers-reduced-motion: reduce) {
+  .sc-float-field > .sc-float-label { transition: none; }
 }
 
 /* ---- HEAD STRIP ----
@@ -786,14 +876,6 @@ html:has([data-layout]) { scroll-padding-top: var(--sc-bar-h); }
     vertical-align: middle;
   }
 
-  /* The compact `.sc-btn.micro` variant several admin panels define keeps its
-     small type and padding on touch, but never its small hit area. The
-     doubled classes beat encapsulation as with .sc-nest: the component rules
-     that shrink it are 0,3,0 already, so this is 0,4,0. */
-  .sc-btn.sc-btn.micro.micro {
-    min-height: var(--sc-tap-min);
-  }
-
   /* Fields that set no size of their own fall back to the UA's ~13px.
      :where() keeps this at zero specificity, so any component rule still
      wins and brings its own max(..., var(--sc-fs-input)). */
@@ -944,9 +1026,10 @@ body::before {
    the app has rendered but its lazily loaded page has not), the page background
    IS the shell scene's sky — same base colour, same nebula, the very same star
    fields (seeds and tiles of shell-scene.component.scss, box of its .sky) — so
-   the scene takes over without a seam instead of after a flat blue frame. */
-html:has(.sc-boot),
-html:has(.routed-content > router-outlet:last-child) {
+   the scene takes over without a seam instead of after a flat blue frame.
+   html[data-sc-booting] = AppComponent rendered, first page not activated yet (an attribute,
+   not html:has(): a :has() on the root restyles the whole document on every DOM change). */
+html[data-sc-booting] {
   background-color: #02070d;
   background-image:
     radial-gradient(ellipse 34% 26% at 22% 30%, rgba(46, 120, 190, 0.36), transparent 70%),
@@ -964,7 +1047,7 @@ html:has(.routed-content > router-outlet:last-child) {
   body::before {
     inset: -8% -24% -8% -8%;
     opacity: 0.55;
-    @include boot-stars.field-image(170, 1931, 1213, 7, (1px, 1px, 1.4px, 1px), (#fff, #cfe8ff, #fff, #9cc));
+    @include boot-stars.far-field;
   }
   body::after {
     content: '';
@@ -973,14 +1056,9 @@ html:has(.routed-content > router-outlet:last-child) {
     z-index: -1;
     pointer-events: none;
     opacity: 0.7; // the scene's near stars (shell-scene), so the handover does not dim them
-    @include boot-stars.field-image(56, 2203, 1381, 101, (1.6px, 1.3px, 1.8px, 1.2px), (#fff, #ffe7c4, #d9f2ff, #fff));
+    @include boot-stars.near-field;
   }
 }
-/* The splash (index.html) lets the sky through; its ring and word wait 1.2 s, so a
-   quick start shows nothing but stars and a slow one still says it is loading. */
-html .sc-boot { background: transparent; }
-html .sc-boot > * { animation: sc-boot-late 0.4s ease-out 1.2s both; }
-@keyframes sc-boot-late { from { opacity: 0; } to { opacity: 1; } }
 
 h1, h2, h3, h4 {
   font-family: var(--sc-font-display);
@@ -1011,10 +1089,29 @@ button {
 /* Keyboard focus ring — applies app-wide to every interactive element.
    Uses :focus-visible so it only shows for keyboard/AT users, never on mouse click. */
 :focus-visible {
-  outline: 2px solid var(--sc-accent);
-  outline-offset: 2px;
-  border-radius: 2px;
+  outline: 1px solid transparent; /* forced-colors / Windows high contrast still draws it */
+  outline-offset: 0;
+  box-shadow: var(--sc-focus-ring);
 }
+
+/* A text field matches :focus-visible after a click as well (the browser rings whatever can
+   be typed into), so the rule above would frame every clicked field. Until focus is moved with
+   Tab (`data-sc-tabbing`, core/focus-modality.ts) the ring tokens are blank on a focused text
+   field: a clicked field shows focus by recolouring the border it already has, never by a
+   second frame. Any `box-shadow: var(--sc-focus-ring…)` on a field follows without a rule of
+   its own; a field's focus rule therefore never hard-codes a ring. */
+:root:not([data-sc-tabbing]) :is(
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='button'], [type='submit'], [type='reset'], [type='file'], [type='color'], [type='image']),
+  textarea,
+  [contenteditable]:not([contenteditable='false'])
+):focus {
+  --sc-focus-ring: 0 0 0 0 transparent;
+  --sc-focus-ring-inset: 0 0 0 0 transparent;
+  --sc-focus-ring-hot: 0 0 0 0 transparent;
+}
+/* Where the wrapper is the visible field, the wrapper takes the ring: the bare input drops
+   its own and the wrapper adds `var(--sc-tab-ring)` on `:has(input:focus-visible)`. */
+:root[data-sc-tabbing] { --sc-tab-ring: var(--sc-focus-ring); }
 
 /* A dialog container (ScDialogDirective, tabindex="-1") is no Tab stop; its
    focus is only the starting point for screen readers and the next Tab, so
@@ -1250,41 +1347,6 @@ button {
   .sc-detail-hero__body h1 { font-size: 1.4rem; }
 }
 
-.sc-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  background: transparent;
-  color: var(--sc-accent);
-  border: 1px solid var(--sc-accent);
-  border-radius: 4px;
-  font-family: var(--sc-font-display);
-  font-size: 0.85rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  transition: all 0.18s ease;
-
-  &:hover:not(:disabled) {
-    background: var(--sc-accent);
-    color: var(--sc-bg-0);
-    box-shadow: var(--sc-glow);
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  &.sc-btn-primary {
-    background: var(--sc-accent);
-    color: var(--sc-bg-0);
-    &:hover:not(:disabled) {
-      background: var(--accent-strong);
-    }
-  }
-}
-
 .sc-input {
   width: 100%;
   padding: 10px 14px;
@@ -1297,7 +1359,6 @@ button {
   &:focus {
     outline: none;
     border-color: var(--sc-accent);
-    box-shadow: var(--sc-glow);
   }
 }
 
@@ -1682,8 +1743,7 @@ button {
 .item-page .it-stage { min-height: 0; }
 .item-page .it-panel {
   position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden;
-  border: 1px solid var(--sc-border); border-radius: 16px; background: color-mix(in srgb, var(--sc-bg-0) 50%, transparent);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border: 1px solid var(--sc-border); border-radius: 16px; background: color-mix(in srgb, var(--sc-bg-0) 73%, transparent);
 }
 .item-page .it-path { flex: none; padding: 12px 12px 0; }
 .item-page .it-tabs { flex: none; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); margin: 10px 12px 0; border: 1px solid color-mix(in srgb, var(--sc-accent) 24%, transparent); border-radius: 19px; overflow: hidden; }
@@ -1694,7 +1754,7 @@ button {
 .item-page .it-tab small { font: 500 0.72rem var(--sc-font-body, inherit); color: var(--sc-fg-2); }
 .item-page .it-tab:hover { color: var(--sc-fg-0); }
 .item-page .it-tab.on { color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 14%, transparent); text-shadow: 0 0 8px color-mix(in srgb, var(--sc-accent) 40%, transparent); }
-.item-page .it-tab:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+.item-page .it-tab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
 .item-page .it-pane { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px 12px 12px; }
 .item-page .it-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .item-page .tt-share {
@@ -1702,7 +1762,7 @@ button {
   font: 500 max(8.5px, 0.62rem) var(--sc-font-display, inherit); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-1);
 }
 .item-page .tt-share:hover { color: var(--sc-fg-0); }
-.item-page .tt-share:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+.item-page .tt-share:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 /* Holotisch: the values panel grows with its content — nothing scrolls inside the small box; the stage stays in view beside it. */
 .item-page.flow .it-grid { height: auto; min-height: 440px; align-items: start; }
 .item-page.flow .it-stage { position: sticky; top: calc(var(--sc-header-h, 64px) + 12px); height: calc(100dvh - var(--it-top, 300px)); min-height: 440px; }
@@ -1732,17 +1792,36 @@ button {
 
 /* Deep space behind the flight, where neither page covers the view. */
 html[data-verse-flight]::view-transition { background: #02070d; }
-html[data-verse-flight='side']::view-transition-old(root) { animation: sc-flight-away-up 560ms cubic-bezier(0.55, 0, 0.75, 0.2) both; }
-html[data-verse-flight='side']::view-transition-new(root) { animation: sc-flight-fade-in 420ms ease-out 240ms both; }
-html[data-verse-flight='down']::view-transition-old(root) {
-  transform-origin: var(--vf-ox) var(--vf-oy);
-  animation: sc-flight-dive 700ms var(--vf-cam) both;
+/* Shell scene (beta shell, concept 2026-11-09 Kamera-Welt C2): the background
+   scene is taken out of every snapshot. The root drops its name, so nothing but
+   the page content (#sc-main, named vf-page) is captured; the scene, header and
+   menus stay live underneath the transition and the camera keeps moving
+   (SceneCameraService) while only the content flies. No backdrop over it. */
+html[data-sc-scene][data-verse-flight] { view-transition-name: none; }
+html[data-sc-scene][data-verse-flight] #sc-main { view-transition-name: vf-page; }
+html[data-sc-scene][data-verse-flight]::view-transition { background: none; }
+@each $vf in root, vf-page {
+  html[data-verse-flight='side']::view-transition-old(#{$vf}) { animation: sc-flight-away-up 560ms cubic-bezier(0.55, 0, 0.75, 0.2) both; }
+  html[data-verse-flight='side']::view-transition-new(#{$vf}) { animation: sc-flight-fade-in 420ms ease-out 240ms both; }
+  html[data-verse-flight='down']::view-transition-old(#{$vf}) {
+    transform-origin: var(--vf-ox) var(--vf-oy);
+    animation: sc-flight-dive 700ms var(--vf-cam) both;
+  }
+  html[data-verse-flight='down']::view-transition-new(#{$vf}) { animation: sc-flight-hold-in 1800ms linear both; }
+  html[data-verse-flight='up']::view-transition-old(#{$vf}) { animation: sc-flight-sink 520ms cubic-bezier(0.55, 0, 0.75, 0.2) both; }
+  html[data-verse-flight='up']::view-transition-new(#{$vf}) {
+    transform-origin: var(--vf-ox) var(--vf-oy);
+    animation: sc-flight-pull-out 1500ms var(--vf-cam) both;
+  }
 }
-html[data-verse-flight='down']::view-transition-new(root) { animation: sc-flight-hold-in 1800ms linear both; }
-html[data-verse-flight='up']::view-transition-old(root) { animation: sc-flight-sink 520ms cubic-bezier(0.55, 0, 0.75, 0.2) both; }
-html[data-verse-flight='up']::view-transition-new(root) {
+/* The content group itself stays put (the page frame does not move); only its images fly. */
+html[data-sc-scene][data-verse-flight]::view-transition-group(vf-page) { animation: none; }
+/* Shell scene, down: the camera does the dive (SceneCameraService push-in). The hub's content only
+   leans in with it and is gone well before mid-flight, so none of its planets or its sun stands beside
+   the planet the camera flies to (D7, r3 "nicht die andere planeten sehen"). */
+html[data-sc-scene][data-verse-flight='down']::view-transition-old(vf-page) {
   transform-origin: var(--vf-ox) var(--vf-oy);
-  animation: sc-flight-pull-out 1500ms var(--vf-cam) both;
+  animation: sc-flight-dive-scene 700ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 /* Star streaks radiate from the tile while the old page dives (own layer, only in the old state). */
 .sc-flight-streaks {
@@ -1801,6 +1880,11 @@ html[data-verse-flight='down'] .sc-enter-stagger > * {
   16% { opacity: 1; transform: scale(1.06); filter: none; }
   100% { opacity: 0; transform: scale(3); filter: blur(5px); }
 }
+@keyframes sc-flight-dive-scene {
+  0% { opacity: 1; transform: none; }
+  50% { opacity: 0; transform: scale(1.3); }
+  100% { opacity: 0; transform: scale(1.3); }
+}
 @keyframes sc-flight-hold-in { 0%, 22% { opacity: 0; } 34%, 100% { opacity: 1; } }
 @keyframes sc-flight-pull-out { from { opacity: 0; transform: scale(3); filter: blur(5px); } 35% { opacity: 1; } to { opacity: 1; transform: none; filter: none; } }
 @keyframes sc-flight-streaks { 0% { opacity: 0; transform: scale(0.8); } 30% { opacity: 0.85; } 100% { opacity: 0; transform: scale(2.2); } }
@@ -1844,11 +1928,13 @@ html[data-verse-flight='down'] .sc-enter-stagger > * {
   transition: opacity 220ms ease-in-out;
 }
 /* Part two: the new page's title swaps its text in place, the rest rises in
-   from 22 px (mock-sw-in, 400 ms ease-out) behind it. */
-#sc-main.switch-in:not(:has(.bstage.intro)) :is(*:has(h1, [data-stage-slot])) > :not(:has(h1, [data-stage-slot]), h1, [data-stage-slot]) {
+   from 22 px (mock-sw-in, 400 ms ease-out) behind it. A page that builds itself on a menu switch (the Verse hub's
+   own d5-pb-nav sequence, `.bstage.nav`; its entrance, `.bstage.intro`) is left alone: one sequence, never two
+   animations stacked on the same elements. */
+#sc-main.switch-in:not(:has(.bstage:is(.intro, .nav))) :is(*:has(h1, [data-stage-slot])) > :not(:has(h1, [data-stage-slot]), h1, [data-stage-slot]) {
   animation: sc-switch-in 400ms 160ms ease-out both;
 }
-#sc-main.switch-in h1 {
+#sc-main.switch-in:not(:has(.bstage:is(.intro, .nav))) h1 {
   animation: sc-switch-title 260ms ease-out both;
 }
 @keyframes sc-switch-in {
@@ -1902,12 +1988,12 @@ html[data-verse-flight='down'] .sc-enter-stagger > * {
 [data-stage-hero] > :not([data-stage-slot]) {
   transition: opacity 1s ease-in-out, transform 1s ease-in-out;
 }
-html:has(sc-fusion-bar[data-mode='docked']) [data-stage-hero] > :not([data-stage-slot]) {
+[data-stage-hero][data-hero-docked] > :not([data-stage-slot]) {
   opacity: 0;
   transform: translateY(-40px);
   transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
 }
-html:has(sc-fusion-bar.snap) [data-stage-hero] > :not([data-stage-slot]) {
+[data-stage-hero][data-hero-snap] > :not([data-stage-slot]) {
   transition: none;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1916,7 +2002,7 @@ html:has(sc-fusion-bar.snap) [data-stage-hero] > :not([data-stage-slot]) {
 /* Phone: the route line sits fixed at the top while the bar is docked at the thumb —
    the page keeps that strip free so its own chips never slide under it. */
 @media (max-width: 720px) {
-  html:has(sc-fusion-bar:not([data-mode='stage'])) #sc-main {
+  html[data-sc-bar]:not([data-sc-bar='stage']) #sc-main {
     padding-top: calc(env(safe-area-inset-top, 0px) + 48px);
   }
 }
@@ -2093,7 +2179,8 @@ html.sc-unfocused {
   background: var(--sc-action-t);
   color: var(--sc-action-on);
   font-family: var(--sc-font-display);
-  font-size: 0.78rem;
+  /* Touch screens raise it to the 12px readable floor (mobile gate). */
+  font-size: max(0.78rem, var(--sc-fs-floor));
   line-height: 1.2;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -2119,7 +2206,7 @@ html.sc-unfocused {
 .sc-action.sc-action--tertiary:hover:not(:disabled, .is-busy, [aria-disabled='true']) {
   background: color-mix(in srgb, var(--sc-action-t) 14%, transparent);
 }
-.sc-action:focus-visible { outline: 2px solid var(--sc-action-t); outline-offset: 2px; }
+.sc-action:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 .sc-action:disabled,
 .sc-action[aria-disabled='true'] {
   opacity: 0.38;
@@ -2150,3 +2237,20 @@ html.sc-unfocused {
   .sc-action.sc-action--tertiary { width: 48px; height: 48px; }
 }
 /* ===== /ACTION ===== */
+
+/* ===== WISH STAR ===== */
+/* The twinkling star dot on a wish's thumbnail (concept wunschliste-gefuehl, design d3): 4 px, top right, soft glow,
+   twinkling like the night sky of <sc-wish-sky>. Put `sc-wish-dot` on the thumbnail box; it is the one place that
+   marks "this is a wish" on a picture. Reduced motion: lit, static. */
+.sc-wish-dot { position: relative; }
+.sc-wish-dot::after {
+  content: ''; position: absolute; right: 4px; top: 4px; width: 4px; height: 4px; border-radius: 50%; pointer-events: none;
+  background: color-mix(in srgb, white 88%, var(--sc-accent));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--sc-accent) 90%, white);
+  animation: sc-wish-tw 3.2s ease-in-out infinite;
+}
+@keyframes sc-wish-tw { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .sc-wish-dot::after { animation: none; opacity: 0.85; }
+}
+/* ===== /WISH STAR ===== */

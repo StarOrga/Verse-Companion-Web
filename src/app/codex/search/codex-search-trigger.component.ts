@@ -47,7 +47,7 @@ import { CodexSearchHub } from './codex-search-hub.service';
       transition: border-color 0.16s, color 0.16s, background 0.16s;
     }
     .trigger:hover { border-color: var(--sc-accent); color: var(--sc-fg-0); }
-    .trigger:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .trigger:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .trigger[aria-expanded='true'] { border-color: var(--sc-accent); color: var(--sc-accent); }
     .icon { width: 16px; height: 16px; flex: none; color: var(--sc-accent); }
     .key {

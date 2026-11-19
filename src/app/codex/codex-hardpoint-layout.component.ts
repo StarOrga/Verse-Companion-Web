@@ -13,7 +13,9 @@ import {
 } from '@angular/core';
 import { ItemPathComponent } from '../shared/item-path/item-path.component';
 import { NgTemplateOutlet } from '@angular/common';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { merge } from 'rxjs';
 import { CodexKind } from './codex.service';
 import {
   FOLD_PEEK_LOCK_KEY,
@@ -24,7 +26,7 @@ import {
 import type { SummaryOccupant } from './ship-summary-panels';
 import {
   EquippedStat,
-  EquippedStatFormat,
+  statAddsUp,
   GroupedSlot,
   commonPortLabel,
   formatEquippedStat,
@@ -40,8 +42,11 @@ import {
   shipModuleGroupLabelKey,
   shipModuleGroupOf,
 } from './ship-module-sections';
+import { trackingSignalOf } from './codex-missile';
 import { displayItemName, formatNumber } from './codex-format';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
+import { AreaSymbolComponent } from '../shared/area-symbol/area-symbol.component';
 import { FeedbackSpotDirective } from '../feedback/feedback-spot.directive';
 import { CodexSwapCandidatesService, swapPreloadQueries } from './codex-swap-candidates.service';
 
@@ -86,29 +91,15 @@ export interface LayoutChild {
    * numbers). Unlike `statsMissing` it renders even when some rows exist.
    */
   statsNoteKey?: string | null;
+  /** A nested draft (`mount.gun`) swapped this sub-slot's occupant — same states as `LayoutSlot.draftState`. */
+  draftState?: 'changed' | 'pending' | 'unresolved' | null;
+  /** The dotted `parent.child` draft path(s) behind `draftState`, for the revert action. */
+  draftPaths?: string[];
 }
-
-/**
- * Stat formats whose value does NOT add up across identical units — a reach,
- * a speed, a duration, an angle, a ratio, a size class. A collapsed run of
- * such rows quotes ONE unit's value and drops "Gesamt": two SureGrips do not
- * reach 300 m (feedback #233), where three Panthers do deal 3× the alpha.
- */
-const PER_UNIT_FORMATS: ReadonlySet<EquippedStatFormat> = new Set<EquippedStatFormat>([
-  'seconds',
-  'metres',
-  'metresDec',
-  'mps',
-  'gm',
-  'kms',
-  'size',
-  'percent',
-  'degrees',
-]);
 
 /** The stat scaled to `mult` units where that is a sum, unchanged where it is not. */
 function scaledFigure(stat: EquippedStat, mult: number): { stat: EquippedStat; summed: boolean } {
-  if (mult <= 1 || PER_UNIT_FORMATS.has(stat.format)) return { stat, summed: false };
+  if (mult <= 1 || !statAddsUp(stat)) return { stat, summed: false };
   return { stat: { ...stat, value: stat.value * mult }, summed: true };
 }
 
@@ -226,7 +217,7 @@ export interface LayoutTarget {
 export interface LayoutSection {
   section: ShipModuleSection;
   slots: LayoutSlot[];
-  /** Optional explanatory note rendered under this block's heading. */
+  /** Optional explanatory notes, shown as one info tooltip at this block's heading (#349). */
   notes?: SectionNote[];
 }
 
@@ -308,7 +299,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
 @Component({
   selector: 'sc-codex-hardpoint-layout',
   standalone: true,
-  imports: [ItemPathComponent, FeedbackSpotDirective, TranslatePipe, NgTemplateOutlet, ScTooltipDirective],
+  imports: [ItemPathComponent, FeedbackSpotDirective, TranslatePipe, NgTemplateOutlet, ScTooltipDirective, ScActionDirective, AreaSymbolComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.calm]': 'calm()' },
   template: `
@@ -324,7 +315,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                    [scFeedbackSpot]="'codex.detail.columnLoadout'" [scFeedbackSpotSub]="grp.labelKey"
                    [open]="grp.open" (toggle)="onGroupToggle(grp.group, $event)">
             <summary class="sec-head">
-              <span class="sec-glyph" aria-hidden="true">◈</span>
+              <sc-area-symbol class="sec-glyph" [area]="grp.group" />
               {{ grp.labelKey | translate }}
               <span class="sec-ct">{{ (grp.count === 1 ? 'codex.module.censusSlot' : 'codex.module.censusSlots') | translate: { slots: grp.count } }}</span>
               <span class="caret" [class.open]="grp.open">
@@ -378,9 +369,16 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
 
     <!-- One block heading, used at both nesting levels. -->
     <ng-template #secSummary let-sec>
-            <span class="sec-glyph" aria-hidden="true">◈</span>
+            <sc-area-symbol class="sec-glyph" [area]="sec.section" />
             {{ ('codex.moduleSection.' + sec.section) | translate }}
             <span class="sec-ct">{{ censusKey(sec) | translate: censusParams(sec) }}</span>
+            <!-- What this block can and cannot tell you sits behind an info
+                 icon at its heading, not as running text in the block (#349). -->
+            @if (sec.notes.length) {
+              <button type="button" class="sec-info" (click)="$event.stopPropagation(); $event.preventDefault()"
+                      [attr.aria-label]="'codex.moduleSection.infoLabel' | translate"
+                      [scTooltip]="noteText(sec.notes)"><span aria-hidden="true">i</span></button>
+            }
             @if (!sec.configurable) {
               <span class="sec-tag">{{ 'codex.moduleSection.fixedTag' | translate }}</span>
             }
@@ -427,11 +425,6 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
 
     <!-- One block body, used at both nesting levels. -->
     <ng-template #secBody let-sec>
-          <!-- What this block can and cannot tell you — named where it is read,
-               not once at the top of the page (1add86a4). -->
-          @for (n of sec.notes; track n.key) {
-            <p class="sec-note">{{ n.key | translate: n.params }}</p>
-          }
           <ul class="sec-rows" [class.dense]="!sec.configurable" [class.no-detail]="calm() && !isDetailOpen(sec.section)">
             @for (row of sec.rows; track rowKey(row)) {
               <li class="slot" [class.empty]="!row.slot.className"
@@ -448,7 +441,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                        flow as the sub-slot list and ended up beside the gun. -->
                   <div class="main">
                   @if (row.slot.className) {
-                    <button type="button" class="slot-btn linked" (click)="openSlot(row, sec.configurable)"
+                    <button type="button" class="slot-btn linked" (click)="openSlot(row, sec.configurable)" (pointerdown)="warmSlot(row, sec.configurable)" (focus)="warmSlot(row, sec.configurable)"
                             [scTooltip]="portTitle(row)" scTooltipTier="label">
                       <span class="slot-top">
                         <span class="slot-head">
@@ -463,8 +456,16 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                               @for (ch of row.slot.damageChannels; track ch) {
                                 <span class="tag dmg">{{ ('codex.damage.' + ch) | translate }}</span>
                               }
+                              @if (seeker(row.slot.className, row.slot.stats); as sk) {
+                                <span class="tag seeker" [scTooltip]="sk.tipKey | translate">{{ sk.labelKey | translate }}</span>
+                              }
                               @if (row.slot.grade) { <span class="tag">{{ row.slot.grade }}</span> }
                               @if (row.slot.statChip) { <span class="tag accent">{{ row.slot.statChip }}</span> }
+                              @if (row.slot.draftState; as ds) {
+                                <span class="tag draft" [class.pending]="ds === 'pending'" [class.unresolved]="ds === 'unresolved'">
+                                  {{ ('codex.loadout.draftState.' + ds) | translate }}
+                                </span>
+                              }
                             </span>
                           </span>
                         </span>
@@ -494,15 +495,17 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                       <span class="slot-port">{{ portLabel(row) }}</span>
                       @if (secondaryStats(row); as rest) {
                         @if (rest.length) {
-                          <!-- Per-item values. A collapsed run says how many
-                               units each one stands for ("3× Alphaschaden
-                               43,65") so the per-unit number is never read
-                               as the total; a split block drops the prefix. -->
+                          <!-- Per-item values. An AMOUNT on a collapsed run
+                               says how many units it stands for ("3×
+                               Alphaschaden 43,65") so it is never read as the
+                               total; a value every unit shares (range, speed,
+                               fire rate) reads once, unprefixed (#351). A
+                               split block drops the prefix entirely. -->
                           <dl class="slot-stats">
                             @for (st of rest; track st.labelKey) {
                               <div class="stat" [scTooltip]="st.hintKey ? (st.hintKey | translate) : null">
                                 <dt>
-                                  @if (row.count > 1) { <span class="mult">{{ row.count }}×</span> }
+                                  @if (row.count > 1 && addsUp(st)) { <span class="mult">{{ row.count }}×</span> }
                                   {{ st.labelKey | translate }}
                                   @if (st.derived) {
                                     <span class="derived"
@@ -533,7 +536,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                          third shield slot is pickable even though it ships
                          empty (1add86a4). -->
                     <button type="button" class="slot-btn linked open-bay"
-                            (click)="openSlot(row, sec.configurable)"
+                            (click)="openSlot(row, sec.configurable)" (pointerdown)="warmSlot(row, sec.configurable)" (focus)="warmSlot(row, sec.configurable)"
                             [scTooltip]="portTitle(row)" scTooltipTier="label">
                       <span class="slot-head">
                         @if (emptyBadge(row); as b) { <span class="size-tag muted">{{ b }}</span> }
@@ -569,13 +572,21 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                   <!-- Draft write-path (PR B): a row edited away from stock
                        carries a chip naming its state, plus a revert action. -->
                   @if (row.slot.draftState; as ds) {
-                    <span class="tag draft" [class.pending]="ds === 'pending'" [class.unresolved]="ds === 'unresolved'">
-                      {{ ('codex.loadout.draftState.' + ds) | translate }}
-                    </span>
-                    @if (row.slot.draftPaths?.length) {
-                      <button type="button" class="slot-revert" (click)="revertRow(row)"
+                    <!-- A row with an occupant names its state inside its own
+                         card and carries its reset icon in the tool cell below,
+                         so neither moves the row's tools (#345 follow-up); only
+                         an emptied row keeps both out here. -->
+                    @if (!row.slot.className) {
+                      <span class="tag draft" [class.pending]="ds === 'pending'" [class.unresolved]="ds === 'unresolved'">
+                        {{ ('codex.loadout.draftState.' + ds) | translate }}
+                      </span>
+                    }
+                    @if (row.slot.draftPaths?.length && !row.slot.className) {
+                      <button type="button" scAction tier="tertiary" class="slot-revert" (click)="revertRow(row)"
                               [attr.aria-label]="'codex.loadout.revert' | translate"
-                              [scTooltip]="'codex.loadout.revert' | translate" scTooltipTier="label">↺</button>
+                              [scTooltip]="'codex.loadout.revert' | translate" scTooltipTier="label">
+                        <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.35-5.65M4 4v4.5h4.5" /></svg>
+                      </button>
                     }
                   }
                   <!-- The full stat sheet, on EVERY occupied row (feedback
@@ -585,14 +596,27 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                        so — a thruster is as worth reading as a gun. The swap
                        action stays on the rows that actually have a choice. -->
                   @if (row.slot.className) {
-                    @if (row.slot.kind) {
-                      <sc-item-path [kind]="row.slot.kind" [className]="row.slot.className" [name]="row.slot.name" />
-                    }
+                    <!-- #345 follow-up (admin screenshot): the reset icon sits
+                         at the top right of the favourite/hangar cell, just
+                         left of the info button, laid OVER the cell rather
+                         than beside it, so a swap never pushes the tools. -->
+                    <span class="tools" [class.bare]="!row.slot.kind">
+                      @if (row.slot.kind) {
+                        <sc-item-path [kind]="row.slot.kind" [className]="row.slot.className" [name]="row.slot.name" />
+                      }
+                      @if (row.slot.draftState && row.slot.draftPaths?.length) {
+                        <button type="button" scAction tier="tertiary" class="slot-revert" (click)="revertRow(row)"
+                                [attr.aria-label]="'codex.loadout.revert' | translate"
+                                [scTooltip]="'codex.loadout.revert' | translate" scTooltipTier="label">
+                          <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.35-5.65M4 4v4.5h4.5" /></svg>
+                        </button>
+                      }
+                    </span>
                     <button type="button" class="slot-swap" (click)="inspectRow(row)"
                             [attr.aria-label]="'codex.inspect.openStats' | translate"
                             [scTooltip]="'codex.inspect.openStats' | translate" scTooltipTier="label">ⓘ</button>
                     @if (sec.configurable) {
-                      <button type="button" class="slot-swap-action" (click)="openSlot(row, true)"
+                      <button type="button" class="slot-swap-action" (click)="openSlot(row, true)" (pointerdown)="warmSlot(row, true)" (focus)="warmSlot(row, true)"
                               [attr.aria-label]="'codex.swap.open' | translate"
                               [scTooltip]="'codex.swap.open' | translate" scTooltipTier="label">⇄</button>
                     }
@@ -627,6 +651,9 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                                       @for (ch of kid.damageChannels; track ch) {
                                         <span class="tag dmg">{{ ('codex.damage.' + ch) | translate }}</span>
                                       }
+                                      @if (seeker(kid.className, kid.stats, kid.rawTypes); as sk) {
+                                        <span class="tag seeker" [scTooltip]="sk.tipKey | translate">{{ sk.labelKey | translate }}</span>
+                                      }
                                       @if (kid.grade) { <span class="tag">{{ kid.grade }}</span> }
                                     </span>
                                   </span>
@@ -656,7 +683,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                                   @for (st of kid.stats; track st.labelKey) {
                                     <div class="stat" [scTooltip]="st.hintKey ? (st.hintKey | translate) : null">
                                       <dt>
-                                        @if (kidMult(row, kid) > 1) { <span class="mult">{{ kidMult(row, kid) }}×</span> }
+                                        @if (kidMult(row, kid) > 1 && addsUp(st)) { <span class="mult">{{ kidMult(row, kid) }}×</span> }
                                         {{ st.labelKey | translate }}
                                         @if (st.derived) {
                                           <span class="derived"
@@ -683,9 +710,19 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                                  before (feedback dbdb2ffe: *"von den Waffen
                                  fehlt es komplett"*) — the mount's ⓘ describes
                                  the mount, which is not the thing that shoots. -->
-                            @if (kid.kind) {
-                              <sc-item-path [kind]="kid.kind" [className]="kid.className" [name]="kid.name" />
-                            }
+                            <span class="tools" [class.bare]="!kid.kind">
+                              @if (kid.kind) {
+                                <sc-item-path [kind]="kid.kind" [className]="kid.className" [name]="kid.name" />
+                              }
+                              <!-- #345: a swapped sub-slot (the gun in a gimbal) resets on its own, too. -->
+                              @if (kid.draftState && kid.draftPaths?.length) {
+                                <button type="button" scAction tier="tertiary" class="slot-revert kid-revert" (click)="revertChild(kid)"
+                                        [attr.aria-label]="'codex.loadout.revert' | translate"
+                                        [scTooltip]="'codex.loadout.revert' | translate" scTooltipTier="label">
+                                  <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.35-5.65M4 4v4.5h4.5" /></svg>
+                                </button>
+                              }
+                            </span>
                             <button type="button" class="slot-swap kid-swap" (click)="inspectChild(row, kid)"
                                     [attr.aria-label]="'codex.inspect.openStats' | translate"
                                     [scTooltip]="'codex.inspect.openStats' | translate" scTooltipTier="label">ⓘ</button>
@@ -745,14 +782,31 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     }
     .layout { display: flex; flex-direction: column; gap: 14px; }
 
-    .mod-sec { border-radius: 4px; background: var(--sc-bg-1); border: 1px solid var(--sc-border);
-      padding: 10px 12px; }
-    /* Concept section 0 bans the hot accent on this page (nothing here is
-       admin-gated) and bans mock literals outright, so the per-block colour
-       coding this list used to carry (#ff7a45 / #ff5252 / #f0c419 / #ffc14d) is
-       gone. A configurable block is marked by ONE accent hairline; the airframe
-       keeps none. */
-    .mod-sec:not(.fixed) { border-top: 2px solid color-mix(in srgb, var(--sc-accent) 45%, transparent); }
+    /* A block box is built like the Offensive / Defensive cards beside it in
+       the Analyse column (codex-detail .detail-page .sc-card): the same 4px
+       corner, the same even 1px border all round and the same bg-2 to bg-1
+       card surface (#346). The 2px accent bar a configurable block used to
+       carry on its top edge squared off the top corners, so the boxes read as
+       a different build from the cards next to them; the airframe still steps
+       back through .fixed below. Concept section 0 keeps the hot accent and
+       mock literals off this page. */
+    .mod-sec { border-radius: 4px; background: linear-gradient(180deg, var(--sc-bg-2), var(--sc-bg-1));
+      border: 1px solid var(--sc-border); padding: 10px 12px; }
+    /* Area colours (feedback #330, concept 2026-11-10-bereichs-symbole-umrandung):
+       every block carries its Holotable area — Offensive, Verteidigung,
+       Bewegung, Signatur & Kühlung — as a 2px line on top at --sc-area-line
+       strength and in its heading. The line is an inset shadow, so it follows
+       the 4px corners instead of squaring them off. "Antrieb & Systeme" stays
+       neutral outside; its sub-blocks carry their own area. */
+    .mod-sec, .mod-sub { --p: var(--sc-accent); --pb: color-mix(in srgb, var(--p) var(--sc-area-line), transparent);
+      box-shadow: inset 0 2px 0 var(--pb); }
+    [data-sec="weapons"], [data-sec="remoteTurrets"], [data-sec="mannedTurrets"], [data-sec="missiles"], [data-sec="pod"] { --p: var(--sc-area-offensive); }
+    [data-sec="shields"], [data-sec="countermeasures"], [data-sec="structure"] { --p: var(--sc-area-defensive); }
+    [data-sec="powerPlants"], [data-sec="quantum"] { --p: var(--sc-area-movement); }
+    [data-sec="coolers"], [data-sec="radar"], [data-sec="lifeSupport"] { --p: var(--sc-area-signature); }
+    .mod-sec.merged { --pb: var(--sc-border); }
+    .mod-sec.merged > .sec-head { color: var(--sc-fg-1); }
+    .mod-sec.fixed { --pb: color-mix(in srgb, var(--p) 30%, transparent); }
     /* "Antrieb & Systeme": the merged block and its nested sections. */
     .sub-stack { display: flex; flex-direction: column; gap: 8px; }
     .mod-sub { border-radius: 4px; background: var(--sc-bg-2); border: 1px solid var(--sc-border);
@@ -773,7 +827,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
        label. The px value is the mock's rem rendered at ITS 13px root; the
        max() keeps the coarse-pointer readability floor from styles.scss. */
     .sec-head { margin: 0 0 8px; font-size: max(10.5px, var(--sc-fs-floor)); text-transform: uppercase; letter-spacing: 0.14em;
-      font-weight: 600; color: var(--sc-accent); display: flex; align-items: center; flex-wrap: wrap; gap: 6px; min-width: 0;
+      font-weight: 600; color: var(--p, var(--sc-accent)); display: flex; align-items: center; flex-wrap: wrap; gap: 6px; min-width: 0;
       cursor: pointer; list-style: none; }
     .sec-head::-webkit-details-marker { display: none; }
     /* An OPEN block draws a hairline under its heading (part-01.html:675) —
@@ -783,7 +837,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
       border-bottom: 1px solid var(--sc-border); }
     .mod-sub[open] > .sub-head { margin-inline: -10px; padding: 0 10px 8px;
       border-bottom: 1px solid var(--sc-border); }
-    .sec-glyph { color: var(--sc-accent); font-size: 0.8rem; }
+    .sec-glyph { font-size: max(14px, var(--sc-fs-floor)); }
     /* The heading's 600 belongs to the heading TEXT; the mock keeps every
        child of .m-h2 at the body weight (part-02.html:142-144). */
     .caret { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-weight: 400;
@@ -834,10 +888,14 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     @media (prefers-reduced-motion: reduce) { .sec-btn .chev { transition: none; } }
     /* Data-gap / mechanic note: readable, but never loud enough to read as an
        app error — nothing is broken, the extract just stops here. */
-    .sec-note { margin: 0 0 8px; font-size: max(0.68rem, var(--sc-fs-floor)); line-height: 1.45;
-      color: var(--sc-fg-2);
-      border-left: 2px solid color-mix(in srgb, var(--sc-warn, #e8a33d) 55%, transparent);
-      padding-left: 8px; }
+    .sec-info { display: inline-grid; place-items: center; flex: none; width: 16px; height: 16px; padding: 0;
+      border-radius: 50%; cursor: help; background: transparent; color: var(--sc-fg-2);
+      border: 1px solid color-mix(in srgb, var(--sc-fg-2) 55%, transparent);
+      font-family: var(--sc-font-display); font-size: max(0.58rem, var(--sc-fs-floor)); font-weight: 600;
+      line-height: 1; letter-spacing: 0; text-transform: none; }
+    .sec-info:hover, .sec-info:focus-visible { color: var(--sc-accent); border-color: var(--sc-accent); }
+    .sec-info:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    @media (pointer: coarse) { .sec-info { width: max(24px, 1.5rem); height: max(24px, 1.5rem); } }
 
     .sec-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
     .sec-rows.dense { display: grid; gap: 6px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
@@ -903,15 +961,34 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     .tag.draft.unresolved { color: var(--sc-danger, #ff5252);
       border-color: color-mix(in srgb, var(--sc-danger, #ff5252) 45%, transparent);
       background: color-mix(in srgb, var(--sc-danger, #ff5252) 10%, transparent); }
-    .slot-revert { flex: 0 0 auto; align-self: center; width: 26px; height: 26px; border-radius: 50%;
-      background: var(--sc-bg-0); border: 1px solid var(--sc-border); color: var(--sc-fg-2);
-      font-size: 0.85rem; cursor: pointer; }
-    .slot-revert:hover { color: var(--sc-accent); border-color: var(--sc-accent); }
+    /* #345: scAction tertiary. An emptied row keeps it in the flow beside its
+       draft chip; every occupied row carries it in the .tools cell. */
+    .slot-revert { flex: 0 0 auto; align-self: center; width: 26px; height: 26px; }
+    @media (pointer: coarse) { .slot-revert { width: 48px; height: 48px; } }
+    /* The favourite/hangar cell. The reset icon is laid over its top right
+       corner (the spot the admin marked, left of the info button) instead of
+       taking a column of its own, so a swap and its reset never move the
+       info/swap tools or the card's width. The rail's nodes are round and
+       centred, so that corner is free. */
+    .tools { flex: 0 0 auto; position: relative; display: inline-flex; align-items: center; }
+    .tools:empty { display: none; }
+    .tools > .slot-revert { position: absolute; top: 0; right: 0; z-index: 1;
+      width: 22px; height: 22px; background: var(--sc-bg-0); }
+    .tools > .slot-revert .sc-action-icon { width: 14px; height: 14px; }
+    /* No rail to sit on (an item without a wish/hangar path): plain flow. */
+    .tools.bare > .slot-revert { position: static; width: 26px; height: 26px; }
+    /* Touch: a 48px target cannot hide in a corner; it stacks above the rail,
+       so the row may grow in height but never shifts sideways. */
+    @media (pointer: coarse) {
+      .tools { flex-direction: column; justify-content: center; align-items: flex-end; gap: 2px; }
+      .tools > .slot-revert, .tools.bare > .slot-revert { position: static; width: 48px; height: 48px; }
+    }
 
-    /* .m-slot (part-02.html:204): 3px, and RAISED off the card — the row sits
-       ON the module, so it is the lighter of the two surfaces. */
+    /* .m-slot (part-02.html:204), RAISED off the card — the row sits ON the
+       module, so it is the lighter of the two surfaces. Its corner is the
+       block's own 4px (#346), so row and box are rounded alike. */
     .slot-btn, .kid-btn { display: flex; flex-direction: column; gap: 3px; padding: 7px 8px;
-      border-radius: 3px; background: var(--sc-slot-ground); border: 1px solid var(--sc-border);
+      border-radius: 4px; background: var(--sc-slot-ground); border: 1px solid var(--sc-border);
       text-decoration: none; text-align: left; width: 100%; font: inherit; color: inherit; }
     button.slot-btn, button.kid-btn { cursor: pointer; }
     button.slot-btn:hover, button.kid-btn:hover { border-color: var(--sc-accent);
@@ -962,11 +1039,15 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     .tag.dmg { color: var(--sc-warn);
       border-color: color-mix(in srgb, var(--sc-warn) 45%, transparent);
       background: color-mix(in srgb, var(--sc-warn) 10%, transparent); }
+    /* What a missile homes in on (IR / EM / cross section) — the one word that
+       decides which countermeasure beats it (feedback #331). */
+    .tag.seeker { color: var(--sc-accent);
+      border-color: color-mix(in srgb, var(--sc-accent) 45%, transparent); }
     /* The concept's "tuned" edge (section 6): a slot that no longer holds its
        factory part wears a gold rail. The hover state it also asks for is
        already there on the card itself (button.slot-btn:hover above) and stays
        at the app's stronger accent - polish follows the app (section 14). */
-    .slot:has(.tag.draft) { border-inline-start: 2px solid var(--sc-warn); border-radius: 3px; }
+    .slot:has(.tag.draft) { border-inline-start: 2px solid var(--sc-warn); border-radius: 4px; }
 
     /* Port name is context, not headline — it sits last and quiet. The mock's
        .l3 is plain --m-mut with no extra opacity (part-02.html:209); dropping
@@ -1004,15 +1085,15 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
        the hovered/located row lights up. Every control stays (split, caret,
        ⓘ, ⇄, revert); the per-row stats fold behind the group's "Detail ▾". ── */
     :host(.calm) .layout { gap: 8px; }
-    :host(.calm) .mod-sec, :host(.calm) .mod-sub { background: transparent; border: 0; border-radius: 0; padding: 0 0 6px; }
-    :host(.calm) .mod-sec:not(.fixed) { border-top: 0; }
+    :host(.calm) .mod-sec, :host(.calm) .mod-sub { background: transparent; border: 0; border-radius: 0; padding: 0 0 6px; box-shadow: none; }
     :host(.calm) .mod-sec.fixed { opacity: 1; }
     :host(.calm) .sub-stack { gap: 4px; }
     :host(.calm) .sec-head { margin: 0 0 4px; padding: 6px 0; font-family: var(--sc-font-display); font-weight: 400;
       font-size: max(9px, var(--sc-fs-floor)); letter-spacing: 0.16em; color: var(--sc-fg-1); gap: 10px; }
     :host(.calm) .sec-head::after { content: ''; order: 1; flex: 1 1 24px; height: 1px; background: var(--sc-border); }
-    :host(.calm) .sec-head > .sec-glyph { display: none; }
-    :host(.calm) .sec-head > .sec-ct, :host(.calm) .sec-head > .sec-tag, :host(.calm) .sec-head > .sec-btn, :host(.calm) .sec-head > .caret { order: 2; }
+    /* The Holotable column already names the area; each part keeps its symbol in the area colour (#330). */
+    :host(.calm) .sec-head > .sec-glyph { color: var(--p); font-size: max(13px, var(--sc-fs-floor)); }
+    :host(.calm) .sec-head > .sec-ct, :host(.calm) .sec-head > .sec-info, :host(.calm) .sec-head > .sec-tag, :host(.calm) .sec-head > .sec-btn, :host(.calm) .sec-head > .caret { order: 2; }
     :host(.calm) .sec-head > .fold-preview { order: 3; font-family: var(--sc-font-body); letter-spacing: 0; }
     /* The caret beside the heading already says "aufklappen". */
     :host(.calm) .fp-lock { display: none; }
@@ -1042,7 +1123,6 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     :host(.calm) .slot-stats { border-top: 0; padding-top: 2px; gap: 2px 18px; }
     :host(.calm) .slot-stats dd { font-family: var(--font-monospace, monospace); color: var(--sc-fg-0); }
     :host(.calm) .kids { border-left-color: color-mix(in srgb, var(--sc-accent) 30%, transparent); }
-    :host(.calm) .sec-note { font-size: max(0.66rem, var(--sc-fs-floor)); }
   `],
 })
 export class CodexHardpointLayoutComponent {
@@ -1070,6 +1150,8 @@ export class CodexHardpointLayoutComponent {
    * inside a gimbal mount opens the picker for the GUN, not for the mount).
    */
   readonly swapRequested = output<LayoutTarget>();
+  /** Press / focus on a card that opens the picker: the host may build the picker's list ahead of the click. */
+  readonly swapWarm = output<LayoutTarget>();
   /**
    * A card was clicked — the parent opens the component overlay. Emits the row
    * plus, for a sub-slot click, which child was picked.
@@ -1100,8 +1182,8 @@ export class CodexHardpointLayoutComponent {
    */
   readonly foldedSections = input<ReadonlySet<ShipModuleSection>>(new Set());
   /**
-   * Start with EVERY block and every nested section open, the airframe
-   * included — the "Alles" lens (#240: *"Wenn man unter 'alles' ist beim
+   * Start with every block and every nested section open, the airframe
+   * excepted (#333) — the "Alles" lens (#240: *"Wenn man unter 'alles' ist beim
    * Einsatz, bitte auch alles ausgeklappt lassen"*). Manual folds still work;
    * like a mission switch, flipping this resets them.
    */
@@ -1110,6 +1192,17 @@ export class CodexHardpointLayoutComponent {
   readonly occupantsBySection = input<ReadonlyMap<ShipModuleSection, readonly SummaryOccupant[]>>(new Map());
 
   private readonly swapSource = inject(CodexSwapCandidatesService);
+  private readonly translate = inject(TranslateService);
+  /** Ticks on language / translation load, so the joined note tooltip re-translates. */
+  private readonly i18nTick = toSignal(merge(this.translate.onLangChange, this.translate.onTranslationChange), {
+    initialValue: null,
+  });
+
+  /** A block's explainer notes as one tooltip text (#349). */
+  noteText(notes: readonly SectionNote[]): string {
+    this.i18nTick();
+    return notes.map((n) => this.translate.instant(n.key, n.params) as string).join(' ');
+  }
 
   constructor() {
     // Warm the swap picker's lists for every fitted slot this view can swap,
@@ -1135,8 +1228,12 @@ export class CodexHardpointLayoutComponent {
           .filter((s) => s.slots.length > 0)
           .map((s) => s.section);
         if (expandAll) {
-          this.openGroups.set(new Set(present.map((sec) => shipModuleGroupOf(sec))));
-          this.openSections.set(new Set(present));
+          // Everything open except the airframe: "Zelle & feste Systeme" is a
+          // hull inventory, not a decision, and starts folded even under
+          // "Alles" (#333: *"Standardgemäß eingeklappt!"*). A click opens it.
+          const open = present.filter((sec) => !FOLDABLE_SECTIONS.has(sec));
+          this.openGroups.set(new Set(open.map((sec) => shipModuleGroupOf(sec))));
+          this.openSections.set(new Set(open));
           return;
         }
         const closedDefault = new Set<ShipModuleSection>([...FOLDABLE_SECTIONS, ...folded]);
@@ -1237,6 +1334,18 @@ export class CodexHardpointLayoutComponent {
    * else fits here"; in a fixed block there is nothing to swap, so the click
    * falls back to the read-only stat sheet.
    */
+  /**
+   * Focus on / press of a card that opens the picker: start its list now (not on hover: a
+   * pointer sweeping over a loadout would fire a read per card at the pool),
+   * ahead of the idle-time preload, so the picker does not wait for (or parse) it on open.
+   * Same query as the preload for a fitted slot (`swapPreloadQueries`).
+   */
+  warmSlot(row: GroupedSlot<LayoutSlot>, configurable: boolean): void {
+    if (!configurable || !row.slot.className) return;
+    this.swapSource.prefetch({ installed: row.slot.className, types: [], size: row.slot.size });
+    this.swapWarm.emit({ slot: row.slot, count: row.count, child: null, rawPorts: this.rawPorts(row) });
+  }
+
   openSlot(row: GroupedSlot<LayoutSlot>, configurable: boolean): void {
     const target: LayoutTarget = { slot: row.slot, count: row.count, child: null, rawPorts: this.rawPorts(row) };
     (configurable ? this.swapRequested : this.inspected).emit(target);
@@ -1257,6 +1366,11 @@ export class CodexHardpointLayoutComponent {
 
   revertRow(row: GroupedSlot<LayoutSlot>): void {
     if (row.slot.draftPaths?.length) this.reverted.emit(row.slot.draftPaths);
+  }
+
+  /** #345: a sub-slot's own reset icon — emits only that sub-slot's draft paths. */
+  revertChild(kid: LayoutChild): void {
+    if (kid.draftPaths?.length) this.reverted.emit(kid.draftPaths);
   }
 
   /** The ⓘ side button: always the full stat sheet for the mount itself. */
@@ -1489,6 +1603,26 @@ export class CodexHardpointLayoutComponent {
     return [row.slot.manufacturerCode, row.slot.typeLabel].filter(Boolean).join(' · ');
   }
 
+  /**
+   * The tracking signal of a missile, torpedo or rocket (feedback #331), as
+   * CIG's class name states it — the same source the missile's own page uses.
+   * Only for ordnance: a missile port, or a row whose stats are missile stats,
+   * so a gun whose class name happens to carry `_EM_` never gets the tag.
+   */
+  seeker(
+    className: string | null,
+    stats: readonly EquippedStat[] | undefined,
+    rawTypes: readonly string[] = [],
+  ): { labelKey: string; tipKey: string } | null {
+    const ordnance =
+      rawTypes.some((t) => t.trim().toLowerCase() === 'missile') ||
+      (stats ?? []).some((st) => st.labelKey.startsWith('codex.missile.stat.'));
+    const signal = ordnance ? trackingSignalOf(className) : null;
+    return signal
+      ? { labelKey: `codex.missile.signal.${signal}`, tipKey: `codex.missile.keywordTip.${signal}` }
+      : null;
+  }
+
   /** The carried item's meta line, read the same way a top-level row's is. */
   kidMetaLine(kid: LayoutChild): string {
     return [kid.manufacturerCode, kid.typeLabel].filter(Boolean).join(' · ');
@@ -1522,6 +1656,11 @@ export class CodexHardpointLayoutComponent {
       unitKey: stat.labelKey,
       total: scaled.summed,
     };
+  }
+
+  /** Only amounts that pool across a stacked run carry the "3×" reminder (#351). */
+  addsUp(stat: EquippedStat): boolean {
+    return statAddsUp(stat);
   }
 
   fmtStat(stat: EquippedStat): string {

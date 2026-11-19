@@ -37,6 +37,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 
 import { PAGES } from './content.ts';
 import { ReadmeApi, classify, pickBranch } from './readme-api.ts';
+import { withPosthog } from '../_shared/posthog.ts';
+import { safeEqual } from '../_shared/safe-equal.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -59,27 +61,7 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-/**
- * Read the `role` claim out of a JWT **without** verifying it — the platform's
- * `verify_jwt = true` gate has already checked the signature by the time this
- * runs, so this only reads an already-authenticated token. Returns null for
- * anything that is not a well-formed JWT (e.g. opaque `sb_*` keys).
- */
-function jwtRole(token: string): string | null {
-  const parts = token.split('.');
-  if (parts.length !== 3) return null;
-  try {
-    const pad = '='.repeat((4 - (parts[1].length % 4)) % 4);
-    const payload = JSON.parse(
-      atob(parts[1].replace(/-/g, '+').replace(/_/g, '/') + pad),
-    ) as { role?: unknown };
-    return typeof payload.role === 'string' ? payload.role : null;
-  } catch {
-    return null;
-  }
-}
-
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('readme-sync', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST' && req.method !== 'GET') {
     return json({ error: 'method not allowed' }, 405);
@@ -96,19 +78,11 @@ Deno.serve(async (req: Request): Promise<Response> => {
     return json({ error: 'server misconfigured (missing env)' }, 500);
   }
 
-  // A service_role bearer counts as admin: it already outranks every profile
-  // role, so accepting it grants nothing new — it just makes the check runnable
-  // headlessly (CI / release scripts) instead of only from a browser session.
-  //
-  // Two forms are accepted because the project may be on legacy JWT keys or the
-  // newer opaque `sb_secret_*` keys: an exact match against the env secret, or
-  // a `role: service_role` claim. Trusting the claim is sound here precisely
-  // because `verify_jwt = true` (config.toml) — the platform has already
-  // validated the signature against this project before we ever see the token,
-  // and an anon JWT carries `role: anon`, so it cannot pass.
+  // A service_role bearer counts as admin: it already outranks every profile role, so it makes the check runnable
+  // headlessly. It is compared against the actual SUPABASE_SERVICE_ROLE_KEY secret (constant time); a token that merely
+  // claims `role: service_role` is NOT trusted, so this no longer depends on verify_jwt staying on.
   const bearer = authHeader.replace(/^Bearer\s+/i, '').trim();
-  const isServiceRole =
-    (!!serviceKey && bearer === serviceKey) || jwtRole(bearer) === 'service_role';
+  const isServiceRole = !!serviceKey && safeEqual(bearer, serviceKey);
 
   if (!isServiceRole) {
     const userClient = createClient(supabaseUrl, anonKey, {
@@ -120,12 +94,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
     } = await userClient.auth.getUser();
     if (authErr || !user) return json({ error: 'unauthorized' }, 401);
 
-    const { data: profile, error: profErr } = await userClient
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-    if (profErr || profile?.role !== 'admin') {
+    // is_admin() = approved, not suspended, role admin (profiles.role alone ignores suspended_at / is_approved).
+    const { data: isAdmin, error: roleErr } = await userClient.rpc('is_admin');
+    if (roleErr || isAdmin !== true) {
       return json({ error: 'forbidden — admin role required' }, 403);
     }
   }
@@ -216,4 +187,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
       })),
     },
   });
-});
+}));

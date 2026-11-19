@@ -13,6 +13,7 @@ import { StageHeroDirective } from '../shell/fusion-bar/stage-hero.directive';
 import { HqSpotStageComponent } from './hq-spot-stage.component';
 import { HqOwnershipService } from './hq-ownership.service';
 import { HqLink, hqHangar, hqLocker, hqOps, hqSet, ownShipLink, personalShipLink } from './hq-routes';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /**
  * HQ landing ("Übersicht"): the active ship with its active variant, the
@@ -27,7 +28,7 @@ import { HqLink, hqHangar, hqLocker, hqOps, hqSet, ownShipLink, personalShipLink
 @Component({
   selector: 'sc-hq-overview',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, PageHeaderComponent, StageSearchDirective, StageHeroDirective, HqSpotStageComponent],
+  imports: [RouterLink, TranslatePipe, PageHeaderComponent, StageSearchDirective, StageHeroDirective, HqSpotStageComponent, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- The main page hero (beta shell): eyebrow · title · stage slot, centred, the slot
@@ -42,7 +43,7 @@ import { HqLink, hqHangar, hqLocker, hqOps, hqSet, ownShipLink, personalShipLink
     @if (loadError(); as err) {
       <div class="sc-card err sc-below-stage" role="alert">
         <span>{{ 'hq.overview.loadFailed' | translate }}</span>
-        <button type="button" class="sc-btn small" (click)="retry()">{{ 'errors.retry' | translate }}</button>
+        <button type="button" scAction tier="secondary" (click)="retry()">{{ 'errors.retry' | translate }}</button>
       </div>
     }
 
@@ -141,8 +142,8 @@ import { HqLink, hqHangar, hqLocker, hqOps, hqSet, ownShipLink, personalShipLink
       .tile-link { color: var(--sc-accent); text-decoration: none; align-self: flex-start; }
       .tile-link:hover { text-decoration: underline; }
       .tile-main:focus-visible, .tile-link:focus-visible, .chip:focus-visible {
-        outline: 2px solid var(--sc-accent);
-        outline-offset: 2px;
+        outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+        outline-offset: 0;
       }
       .tile--soon { border-style: dashed; }
       .soon-tag {

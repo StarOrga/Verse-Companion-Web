@@ -11,6 +11,7 @@
 //         403 { error: 'forbidden' }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -25,7 +26,7 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('check-bundle', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'GET') return json({ error: 'method_not_allowed' }, 405);
 
@@ -52,12 +53,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
     error: authErr,
   } = await userClient.auth.getUser();
   if (authErr || !user) return json({ error: 'unauthorized' }, 401);
-  const { data: profile } = await userClient
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!profile || !['admin', 'collaborator'].includes((profile as { role?: string }).role ?? '')) {
+  // is_collaborator() (admin or collaborator, approved, not suspended) - profiles.role alone ignores suspended_at /
+  // is_approved. The rpc reads auth.uid(), so it must run on the CALLER's client.
+  const { data: isCollaborator } = await userClient.rpc('is_collaborator');
+  if (isCollaborator !== true) {
     return json({ error: 'forbidden' }, 403);
   }
 
@@ -98,4 +97,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
     uploaded_at: row.created_at,
     uploader_email: uploaderEmail,
   });
-});
+}));

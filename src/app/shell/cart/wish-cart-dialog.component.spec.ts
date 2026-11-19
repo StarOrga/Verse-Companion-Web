@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../auth/auth.service';
+import { AnalyticsService } from '../../core/analytics.service';
 import { CodexService, type CodexListRow } from '../../codex/codex.service';
 import { WishNamesService } from '../../codex/search/wish-names.service';
 import { HangarService } from '../../hangar/hangar.service';
@@ -10,6 +11,7 @@ import { HqInventoryService } from '../../hq/data/hq-inventory.service';
 import { WishlistStore, type WishRow } from '../../hq/data/wishlist.store';
 import { UndoToastService } from '../../shared/undo-toast/undo-toast.service';
 import { NachschubService } from '../../hq/nachschub/nachschub.service';
+import { SearchOpenService } from '../search-open.service';
 import { WishCartDialogComponent } from './wish-cart-dialog.component';
 import { WishCartService } from './wish-cart.service';
 
@@ -31,13 +33,31 @@ function setup(rows: WishRow[], catalogue: { armor?: CodexListRow[]; weapon?: Co
     remove: vi.fn().mockName('remove').mockResolvedValue(true),
     add: vi.fn().mockName('add').mockResolvedValue(true),
   };
+  const track = vi.fn().mockName('track');
+  const searchOpen = { open: vi.fn().mockName('open'), openAfterRender: vi.fn().mockName('openAfterRender') };
   TestBed.configureTestingModule({
     providers: [
       provideRouter([{ path: '**', children: [] }]),
+      { provide: AnalyticsService, useValue: { track } },
+      { provide: SearchOpenService, useValue: searchOpen },
       provideTranslateService({}),
       { provide: AuthService, useValue: { user: signal({ id: 'u1' }) } },
       { provide: WishlistStore, useValue: store },
-      { provide: NachschubService, useValue: { newBlock: signal(newBlock), ensureLoaded: () => Promise.resolve() } },
+      {
+        provide: NachschubService,
+        useValue: {
+          newBlock: signal(newBlock),
+          ensureLoaded: () => Promise.resolve(),
+          // Nothing of the wish is assigned to an Operation: a removal is free pieces only and never asks.
+          allocationOf: () => ({ key: '', wished: 0, assigned: 0, free: 0, assignments: [] }),
+          planWishRemoval: (_r: unknown, n: number) => ({ remove: n, free: n, parts: [], needsConfirm: false }),
+          applyWishRemoval: async (r: { kind: string; className: string; name?: string | null; forClassName?: string | null }, n: number) => {
+            const row = rows.find((w) => w.kind === r.kind && w.className === r.className);
+            await store.setQty({ kind: r.kind, className: r.className, name: r.name ?? null, forClassName: r.forClassName ?? null }, (row?.qty ?? n) - n);
+            return { ok: true, key: 'hq.nachschub.done.wishRemoved', params: { name: r.name ?? r.className, count: n, dissolved: 0 }, undo: async () => ({ ok: true, key: 'x' }) };
+          },
+        },
+      },
       { provide: HangarService, useValue: { ships: signal([]), updateShip: async () => true, removeShip: async () => true } },
       { provide: HqInventoryService, useValue: { items: signal([]) } },
       { provide: WishNamesService, useValue: { request: () => undefined, nameOf: () => null } },
@@ -52,7 +72,7 @@ function setup(rows: WishRow[], catalogue: { armor?: CodexListRow[]; weapon?: Co
   });
   const fixture = TestBed.createComponent(WishCartDialogComponent);
   fixture.detectChanges();
-  return { fixture, el: fixture.nativeElement as HTMLElement, store, cart: TestBed.inject(WishCartService), toast: TestBed.inject(UndoToastService) };
+  return { fixture, track, searchOpen, el: fixture.nativeElement as HTMLElement, store, cart: TestBed.inject(WishCartService), toast: TestBed.inject(UndoToastService) };
 }
 
 describe('WishCartDialogComponent (Warenkorb)', () => {
@@ -71,7 +91,7 @@ describe('WishCartDialogComponent (Warenkorb)', () => {
     const groups = Array.from(el.querySelectorAll('section.group')).map((g) => g.classList.contains('bp'));
     expect(groups).toEqual([false, false, true]);
     expect(el.querySelectorAll('.tile').length).toBe(4);
-    expect(el.querySelector('.dlg-title small')!.textContent).toContain('cart.summary');
+    expect(el.querySelector('.cart-sum')!.textContent).toContain('cart.summary');
   });
 
   it('the Codex page is a real anchor on the tile (the arrow); the silhouette box never stretches (contain)', () => {
@@ -98,7 +118,7 @@ describe('WishCartDialogComponent (Warenkorb)', () => {
   it('a click beside the cart keeps it open (the selection would be lost)', () => {
     const { el } = setup(rows);
     const close = vi.spyOn(TestBed.inject(WishCartService), 'close').mockReturnValue(undefined as never);
-    el.querySelector<HTMLElement>('.scrim')!.click();
+    el.querySelector<HTMLElement>('.scp-scrim')!.click();
     expect(close).not.toHaveBeenCalled();
   });
 
@@ -152,11 +172,10 @@ describe('WishCartDialogComponent (Warenkorb)', () => {
     fixture.detectChanges();
     expect(go.getAttribute('href')).toContain('/hq');
     expect(go.getAttribute('aria-disabled')).toBeNull();
+    // The empty state has no Nachschub footer at all: its one primary action is "Wunsch suchen".
     TestBed.resetTestingModule();
     const empty = setup([]);
-    const emptyGo = empty.el.querySelector<HTMLAnchorElement>('a.go')!;
-    expect(emptyGo.hasAttribute('href')).toBe(false);
-    expect(emptyGo.getAttribute('aria-disabled')).toBe('true');
+    expect(empty.el.querySelector('a.go')).toBeNull();
   });
 
   it('the red trash removes at once and offers an undo, no question; undo brings it back and writes nothing', () => {
@@ -214,10 +233,45 @@ describe('WishCartDialogComponent (Warenkorb)', () => {
     expect(store.setQty).toHaveBeenCalledWith(expect.objectContaining({ className: 'klwe_rifle_energy_01' }), 3);
   });
 
-  it('shows the empty state without a retry', () => {
+  it('shows the empty state without a retry: night sky, headline, text, one primary action and no footer', () => {
     const { el } = setup([]);
-    expect(el.querySelector('.empty-t')).not.toBeNull();
+    const empty = el.querySelector('sc-wish-empty')!;
+    expect(empty.querySelector('sc-wish-sky[aria-hidden="true"]')).not.toBeNull();
+    expect(empty.querySelector('.we-t')!.textContent).toContain('cart.empty');
+    expect(empty.querySelector('.we-x')!.textContent).toContain('cart.emptyHint');
+    expect(empty.querySelector('button.we-go')!.textContent).toContain('cart.emptyAction');
+    expect(el.querySelectorAll('.sc-action--primary').length).toBe(1);
+    const footer = el.querySelector('.scp-f');
+    expect(!footer || getComputedStyle(footer).display === 'none', 'the footer is not shown').toBe(true);
     expect(el.querySelector('section.group')).toBeNull();
+    expect(el.querySelector('.strip')).toBeNull();
+  });
+
+  it('with wishes it carries the 84 px sky strip above the groups and the star dot on every thumbnail', () => {
+    const { el } = setup(rows);
+    const strip = el.querySelector('sc-wish-sky.strip')!;
+    expect(strip.getAttribute('data-variant')).toBe('strip');
+    expect(strip.getBoundingClientRect().height).toBe(84);
+    expect(strip.compareDocumentPosition(el.querySelector('.groups')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(el.querySelectorAll('.tile .sil.sc-wish-dot').length).toBeGreaterThan(0);
+    expect(el.querySelector('sc-wish-empty')).toBeNull();
+    // The rail symbol is the shooting star: all four paths.
+    expect(el.querySelectorAll('svg[popupIcon] path, .scp-sym svg path').length).toBe(4);
+  });
+
+  it('tracks the window opening with the cart surface', () => {
+    const { track } = setup(rows);
+    expect(track).toHaveBeenCalledWith('hq:wishlist_open', { surface: 'cart' });
+  });
+
+  it('"Wunsch suchen" tracks the cart surface, closes the window and opens the page search after the render', async () => {
+    const t = setup([]);
+    const close = vi.spyOn(t.cart, 'close').mockResolvedValue(true);
+    t.el.querySelector<HTMLButtonElement>('button.we-go')!.click();
+    expect(t.track).toHaveBeenCalledWith('hq:wish_search_open', { surface: 'cart' });
+    expect(close).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(t.searchOpen.openAfterRender).toHaveBeenCalledTimes(1));
+    expect(t.searchOpen.open).not.toHaveBeenCalled();
   });
 
   describe('Passt dazu', () => {

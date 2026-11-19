@@ -6,7 +6,6 @@ import {
   classifyShipModule,
   groupByShipSection,
   isConfigurableSection,
-  isIndividualSection,
   isShieldControlPort,
   shipPortFamily,
   classNamePositionFamily,
@@ -27,6 +26,15 @@ describe('classifyShipModule', () => {
   it('separates remote turrets from the pilot weapons', () => {
     expect(classifyShipModule('hardpoint_remote_turret_bottom')).toBe('remoteTurrets');
     expect(classifyShipModule('hardpoint_turret_top')).toBe('remoteTurrets');
+  });
+
+  it('gives manned turrets their own block (#330)', () => {
+    expect(classifyShipModule('hardpoint_turret', { subType: 'MannedTurret' })).toBe('mannedTurrets');
+    expect(classifyShipModule('hardpoint_turret_bottom', { subType: 'BallTurret' })).toBe('mannedTurrets');
+    expect(classifyShipModule('hardpoint_turret_gunner')).toBe('mannedTurrets');
+    // A port that says remote stays remote, whatever the occupant reports.
+    expect(classifyShipModule('hardpoint_remote_turret_top', { subType: 'MannedTurret' })).toBe('remoteTurrets');
+    expect(classifyShipModule('hardpoint_turret_top', { subType: 'GunTurret' })).toBe('remoteTurrets');
   });
 
   it('reads a gimbal mount as a weapon even though the extract types it GunTurret', () => {
@@ -156,6 +164,7 @@ describe('SHIP_MODULE_SECTION_ORDER', () => {
     expect(SHIP_MODULE_SECTION_ORDER.slice(0, CONFIGURABLE_SHIP_SECTIONS.length)).toEqual([
       'weapons',
       'remoteTurrets',
+      'mannedTurrets',
       'missiles',
       'pod',
       'shields',
@@ -188,15 +197,6 @@ describe('SHIP_MODULE_SECTION_ORDER', () => {
   it('marks the countermeasures and the airframe as non-configurable', () => {
     for (const s of SHIP_MODULE_SECTION_ORDER) {
       expect(isConfigurableSection(s)).toBe(s !== 'structure' && s !== 'countermeasures');
-    }
-  });
-
-  it('lists shields and countermeasures slot by slot, everything else collapsed', () => {
-    // 4263fed1: coolers fold like weapons again ("2× UltraFlow" with the
-    // cooling total on the card); the per-block "Einzeln" toggle still lists
-    // them one by one, which is what 32659942 actually needed.
-    for (const s of SHIP_MODULE_SECTION_ORDER) {
-      expect(isIndividualSection(s)).toBe(s === 'shields' || s === 'countermeasures');
     }
   });
 });

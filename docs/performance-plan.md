@@ -100,7 +100,7 @@ Prebuild-Guards ✔, `gate:mobile:quick` grün ✔.
 Deploy-Workflow nach dem Merge.
 
 Noch nicht untersucht: LCP liegt in der Lab-Messung auf `/verse` und `/codex`
-bei ~3 s (vor wie nach den Änderungen) — mit echten `web_vitals`-Daten aus
+bei ~3 s (vor wie nach den Änderungen) — mit echten Web-Vitals-Daten aus
 PostHog prüfen, ob das echte Nutzer betrifft, bevor man es angeht.
 
 ## 4. Offen — in dieser Reihenfolge
@@ -154,8 +154,15 @@ committen → pushen → hier abhaken.
 6. ~~**Gezieltes Vorladen**~~ — erledigt (`core/idle-preloading.strategy.ts`):
    Routen mit `data: { preload: true }` (Verse-Start, Codex-Landing,
    Codex-Detail, HQ + HQ-Landing) laden ≥ 3 s nach dem Start im Leerlauf,
-   nacheinander, nur eingeloggt, nie bei Save-Data/2G. Offen als Ergänzung:
-   Vorladen bei Hover/Touch eines Links (braucht URL→Route-Zuordnung).
+   nacheinander, nur eingeloggt, nie bei Save-Data/2G. Ergänzt um Vorladen
+   bei Absicht (`core/prefetch/`, app-weit): Hover ≥ 80 ms, Fokus oder
+   Druck auf einen App-Link lädt den Code der Zielroute (URL → Router-Config,
+   `loadComponent`/`loadChildren`, je Route einmal) und — eingeloggt — die
+   ersten Daten über registrierte Warmer (`PREFETCH_WARMERS`: Codex-Landing,
+   Schiffs-Silhouette, Codex-Detail nur bei Druck, Verse-Hub). Hover/Fokus im
+   Leerlauf und nie während einer Navigation plus 1,3 s Flugfenster; Save-Data
+   und 2G nichts, 3G nur Code. Neuer Warmer: `PrefetchWarmer` mit `import()`
+   im `warm`, damit das Boot-Bundle schlank bleibt.
    Ursprüngliche Notiz:
    eigene `PreloadingStrategy` — nach dem ersten Paint im Leerlauf die
    Nachbarbereiche der Einstiegsseite (Verse → Codex-Landing, HQ; Codex →
@@ -216,12 +223,11 @@ committen → pushen → hier abhaken.
     Regression). Gewinn klein: zone.js ≈ 40 ms Haupt-Thread pro Laden,
     11,6 kB gz.
 
-11. ~~**Echte Nutzerdaten**~~ — erledigt (`core/web-vitals.service.ts`):
-    Ereignis `web_vitals` (area = erstes Pfadsegment, navigation, ttfb, fcp,
-    lcp, cls, inp, long_tasks, long_task_ms, connection), einmal pro Laden beim
-    Verlassen/Ausblenden, nur mit Statistik-Einwilligung. Datenschutzerklärung
-    nennt jetzt „Ladezeiten“ (Stand November 2026). In PostHog auswerten, um zu
-    sehen, wo echte Nutzer hängen — die Lab-Messung sieht keine echten Geräte.
+11. ~~**Echte Nutzerdaten**~~ — erledigt: PostHogs eigene Web-Vitals-Erfassung
+    (`capture_performance: { web_vitals: true }`, LCP/INP/CLS/FCP), nur mit
+    Statistik-Einwilligung; der frühere eigene `web_vitals`-Dienst entfiel
+    (Telemetrie-Audit, November 2026). In PostHog auswerten, um zu sehen, wo
+    echte Nutzer hängen — die Lab-Messung sieht keine echten Geräte.
 
 12. **Abschluss**: voller Lauf (`npm run lint`, `npm test`, `npm run test:gate`,
     `npm run test:functions`, `npm run build`), Nachmessung mit dem Profiler,

@@ -11,6 +11,7 @@
 // Deploy with --no-verify-jwt (public, see config.toml).
 
 import { parseSccRelease, type SccReleaseMeta } from './_parse.ts';
+import { withPosthog } from '../_shared/posthog.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -41,7 +42,7 @@ async function fetchMeta(): Promise<{ meta: SccReleaseMeta; ok: boolean }> {
   }
 }
 
-Deno.serve(async (req) => {
+Deno.serve(withPosthog('scc-release-meta', async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
   if (req.method !== 'GET') return new Response('method_not_allowed', { status: 405, headers: CORS });
 
@@ -59,4 +60,4 @@ Deno.serve(async (req) => {
       'Cache-Control': `public, max-age=${Math.floor(cache.ttl / 1000)}`,
     },
   });
-});
+}));

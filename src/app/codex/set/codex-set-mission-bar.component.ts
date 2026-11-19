@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { TranslatePipe } from '@ngx-translate/core';
 import { SET_LENSES, SetLensId } from './set-rating';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 
 /**
  * "Einsatz" for the on-foot set page — mirrors `CodexMissionBarComponent`'s
@@ -15,7 +16,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 @Component({
   selector: 'sc-codex-set-mission-bar',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective],
+  imports: [TranslatePipe, ScTooltipDirective, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mission-bar">
@@ -49,7 +50,14 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
       </div>
       @if (lens() !== 'all') {
         <span class="idle-draft">
-          <button type="button" class="btn" (click)="lensChange.emit('all')">
+          <button
+            type="button"
+            scAction
+            tier="secondary"
+            [scTooltip]="'codex.mission.setLensResetTip' | translate"
+            scTooltipTier="info"
+            (click)="lensChange.emit('all')"
+          >
             {{ 'codex.mission.lensReset' | translate }}
           </button>
         </span>
@@ -109,18 +117,9 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
     .mission-chip:disabled { opacity: 0.38; cursor: not-allowed; }
     .chip-icon { font-size: inherit; }
     .idle-draft { display: flex; align-items: center; gap: 5px; flex: none; margin-left: auto; }
-    .idle-draft .btn {
-      padding: 8px 14px; border-radius: 3px; cursor: pointer;
-      background: color-mix(in srgb, var(--sc-bg-0) 72%, transparent);
-      border: 1px solid var(--sc-border); color: var(--sc-fg-2);
-      font-family: var(--sc-font-body);
-      font-size: max(10px, var(--sc-fs-floor));
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
 
     @media (pointer: fine) {
-      .mission-chip, .idle-draft .btn { min-height: 24px; padding: 4px 8px; }
+      .mission-chip { min-height: 24px; padding: 4px 8px; }
     }
   `],
 })

@@ -142,7 +142,7 @@ const ZOOM_STEP = 1.25;
     `
       :host { display: block; min-height: 0; min-width: 0; height: 100%; }
       .map { position: relative; height: 100%; min-height: 160px; border: 1px solid var(--sc-border); border-radius: var(--sc-radius, 10px); background: radial-gradient(120% 90% at 50% 40%, color-mix(in srgb, var(--sc-accent) 7%, var(--sc-bg-0)), var(--sc-bg-0)); overflow: hidden; touch-action: none; }
-      .map:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .map:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .route { display: block; width: 100%; height: 100%; cursor: grab; user-select: none; }
       .route:active { cursor: grabbing; }
       .sys { fill: color-mix(in srgb, var(--sc-accent) 5%, transparent); stroke: color-mix(in srgb, var(--sc-accent) 28%, transparent); stroke-width: 1.2; }
@@ -170,14 +170,14 @@ const ZOOM_STEP = 1.25;
       .shared:focus-visible circle, .shared:hover circle { stroke-width: 2.4; fill: color-mix(in srgb, var(--sc-accent) 25%, var(--sc-bg-1)); outline: none; }
       .ctl { position: absolute; top: 8px; right: 8px; display: flex; flex-direction: column; gap: 4px; }
       .ctl .g svg, .lg-btn svg, .lic svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-      .ctl .g { background: color-mix(in srgb, var(--sc-bg-0) 80%, transparent); backdrop-filter: blur(4px); }
+      .ctl .g { background: color-mix(in srgb, var(--sc-bg-0) 89%, transparent); }
       .ctl .g svg { width: 18px; height: 18px; }
       .legend { position: absolute; right: 8px; bottom: 8px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
       .lg-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 10px; border: 1px solid var(--sc-border); border-radius: 999px; background: color-mix(in srgb, var(--sc-bg-0) 85%, transparent); color: var(--sc-fg-1); font: inherit; font-size: 0.8rem; cursor: pointer; }
       .lg-btn svg { width: 15px; height: 15px; }
       .lg-btn i { font-style: normal; color: var(--sc-fg-2); font-size: 0.75rem; }
       .lg-btn:hover, .legend.open .lg-btn { border-color: var(--sc-accent); color: var(--sc-fg-0); }
-      .lg-btn:focus-visible, .row:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .lg-btn:focus-visible, .row:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .pop { display: grid; grid-template-columns: repeat(2, auto); gap: 2px 12px; padding: 8px 10px; border: 1px solid var(--sc-border); border-radius: 10px; background: color-mix(in srgb, var(--sc-bg-0) 94%, transparent); box-shadow: 0 8px 28px rgb(0 0 0 / 0.45); }
       .row { display: flex; align-items: center; gap: 8px; min-height: 28px; padding: 0 4px; border: 0; border-radius: 6px; background: transparent; color: var(--sc-fg-1); font: inherit; font-size: 0.8rem; text-align: start; cursor: pointer; }
       .row:hover { background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }

@@ -1,6 +1,7 @@
 import { TranslateService } from '@ngx-translate/core';
 import { formatNumber, humanizeClassName } from '../codex-format';
 import { LandingCategory, LandingValue } from './codex-landing-data.types';
+import { statLabelI18nKey } from '../detail/stat-labels';
 
 /** Callouts at the hologram (round 1 look): at most three, the rest goes to the bars pane. */
 export const MAX_CALLOUTS = 3;
@@ -169,7 +170,15 @@ export function valueLabel(t: Pick<TranslateService, 'instant'>, key: string): s
   const out = t.instant(k);
   if (typeof out === 'string' && out !== k) return out;
   const last = key.split('.').pop() ?? key;
-  return humanizeClassName(last.replace(/([a-z])([A-Z])/g, '$1 $2'));
+  // A non-ship value carries the engine's field name (weaponParams.fireRate): reuse the
+  // detail pages' stat translations before falling back to the humanized English name.
+  const words = last.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase());
+  const statKey = statLabelI18nKey(words);
+  if (statKey) {
+    const stat = t.instant(statKey);
+    if (typeof stat === 'string' && stat !== statKey) return stat;
+  }
+  return humanizeClassName(words);
 }
 
 export function valueText(v: Pick<LandingValue, 'value' | 'unit' | 'text'>): string {
@@ -209,12 +218,3 @@ export function compareValue(v: LandingValue): ValueComparison | null {
   return { kind: 'delta', delta, avg: avgText, worse };
 }
 
-/** Bar fill (value) and average tick, both in % of the class maximum; null without class data. */
-export function barOf(v: LandingValue): { fill: number; avg: number | null } | null {
-  const max = Math.max(v.classMax ?? 0, v.value);
-  if (!(max > 0)) return null;
-  const clamp = (n: number) => Math.max(2, Math.min(100, Math.round((n / max) * 100)));
-  const avg = v.classAvg && v.classAvg > 0 ? clamp(v.classAvg) : null;
-  if (avg === null && !v.classMax) return null;
-  return { fill: clamp(v.value), avg };
-}

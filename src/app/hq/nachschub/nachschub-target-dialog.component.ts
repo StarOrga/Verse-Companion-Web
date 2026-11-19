@@ -3,16 +3,16 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { toErrorKey } from '../../core/describe-error';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
+import { ScSegmentedComponent, type ScSegmentOption } from '../../shared/segmented-control.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
-import { HQ_DIALOG_STYLES } from '../plan/hq-dialog.styles';
+import { HQ_POPUP_CONTENT_STYLES } from '../plan/hq-popup-content.styles';
 import { HqEinsatzService } from '../data/hq-einsatz.service';
 import { gatherToSteps } from '../data/hq-gather';
 import { newNachschubBlock, parseSellGoal, type NachschubLineInput } from './nachschub.model';
 import { NachschubService, type NachschubResult } from './nachschub.service';
 import { moveLineStop, routeOrdered, targetsFor } from './nachschub-target.util';
 import type { NachschubTargetIntent, NachschubTargetResult } from './nachschub-target-picker';
-import { NACHSCHUB_ICON_PATHS } from './step-icons';
 
 /**
  * "Aus dem Bestand planen" (round 3, a3-s8): where does the Bestand selection go? Into a new Nachschub or into an
@@ -23,44 +23,27 @@ import { NACHSCHUB_ICON_PATHS } from './step-icons';
 @Component({
   selector: 'sc-nachschub-target-dialog',
   standalone: true,
-  imports: [FormsModule, TranslatePipe, ScActionDirective, ScDialogDirective, ScTooltipDirective],
+  imports: [FormsModule, TranslatePipe, ScActionDirective, ScPopupComponent, ScTooltipDirective, ScSegmentedComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="scrim">
-      <div class="sheet" role="dialog" aria-modal="true" scDialog (scDialogEscape)="closed.emit(null)" aria-labelledby="ntd-title">
-        <header class="dlg-head">
-          <span class="dlg-ic"><svg viewBox="0 0 24 24" aria-hidden="true">@for (p of tray; track p) { <path [attr.d]="p" /> }</svg></span>
-          <h2 id="ntd-title" class="dlg-title">{{ 'hq.nachschub.target.title' | translate }}<small>{{ 'hq.nachschub.target.intent.' + intent() | translate }}</small></h2>
-          <button type="button" scAction tier="tertiary" [attr.aria-label]="'hq.flow.close' | translate" [scTooltip]="'hq.flow.close' | translate" scTooltipTier="label" (click)="closed.emit(null)">
-            <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-          </button>
-        </header>
-
-        <div class="dlg-body">
+    <sc-popup kind="dialog" [eyebrow]="'hq.nachschub.target.intent.' + intent() | translate" [title]="'hq.nachschub.target.title' | translate" (closed)="closed.emit(null)">
+        <div class="pbody">
           @if (error(); as e) { <p class="dlg-err" role="alert">{{ e | translate }}</p> }
 
           <p class="dlg-msg lead">{{ 'hq.nachschub.target.lead' | translate: { n: work().length } }}</p>
 
           <section class="mix" aria-labelledby="ntd-where">
             <small id="ntd-where">{{ 'hq.nachschub.target.where' | translate }}</small>
-            <div class="seg" role="radiogroup" aria-labelledby="ntd-where">
-              <button type="button" role="radio" [attr.aria-checked]="target() === 'new'" [class.on]="target() === 'new'" [disabled]="newBlock() !== null" (click)="picked.set('new')">
-                {{ (intent() === 'sell' ? 'hq.nachschub.target.newSell' : 'hq.nachschub.target.new') | translate }}
-              </button>
-              @for (n of existing(); track n.id) {
-                <button type="button" role="radio" [attr.aria-checked]="target() === n.id" [class.on]="target() === n.id" (click)="picked.set(n.id)">
-                  {{ 'hq.nachschub.target.append' | translate: { name: n.name } }}
-                </button>
-              }
-            </div>
+            <sc-segmented class="seg" variant="chips" [options]="targetOptions()" [value]="target()" [ariaLabel]="'hq.nachschub.target.where' | translate"
+                          (valueChange)="picked.set($event)" />
             @if (newBlock(); as b) { <p class="hint">{{ b | translate }}</p> }
           </section>
 
           @if (intent() === 'sell' && target() === 'new') {
-            <label class="goal">
-              <span>{{ 'hq.nachschub.target.goal' | translate }}</span>
-              <input type="text" class="input" inputmode="numeric" autocomplete="off" [ngModel]="goalText()" (ngModelChange)="onGoal($event)"
-                     [attr.aria-invalid]="goalBad() ? 'true' : null" [attr.aria-describedby]="goalBad() ? 'ntd-goal-err' : null" [placeholder]="'hq.nachschub.target.goalPlaceholder' | translate" />
+            <label class="sc-float-field">
+              <input type="text" class="sc-input" inputmode="numeric" autocomplete="off" placeholder=" " [ngModel]="goalText()" (ngModelChange)="onGoal($event)"
+                     [attr.aria-invalid]="goalBad() ? 'true' : null" [attr.aria-describedby]="goalBad() ? 'ntd-goal-err' : null" />
+              <span class="sc-float-label">{{ 'hq.nachschub.target.goal' | translate }}</span>
             </label>
             @if (goalBad()) { <p class="dlg-err" id="ntd-goal-err" role="alert">{{ 'hq.nachschub.sellGoalInvalid' | translate }}</p> }
           }
@@ -94,33 +77,22 @@ import { NACHSCHUB_ICON_PATHS } from './step-icons';
             }
           </ol>
         </div>
-
-        <footer class="dlg-foot">
-          <span class="sp"></span>
-          <button type="button" scAction tier="secondary" (click)="closed.emit(null)">{{ 'common.dialog.cancel' | translate }}</button>
+        <ng-container popupActions>
           <button type="button" scAction tier="primary" [busy]="busy()" [disabled]="busy() || !canSave()" (click)="save()">
             {{ (target() === 'new' ? 'hq.nachschub.target.create' : 'hq.nachschub.target.add') | translate }}
           </button>
-        </footer>
-      </div>
-    </div>
+          <button type="button" scAction tier="secondary" (click)="closed.emit(null)">{{ 'common.dialog.cancel' | translate }}</button>
+        </ng-container>
+    </sc-popup>
   `,
   styles: [
-    HQ_DIALOG_STYLES,
+    HQ_POPUP_CONTENT_STYLES,
     `
       .mix { padding: var(--sc-space-3, 12px); border: 1px dashed var(--sc-border); border-radius: 10px; display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); }
       .mix small { color: var(--sc-fg-2); }
-      .seg { display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); }
-      .seg button { min-height: 36px; padding: 0 var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 999px; background: var(--sc-bg-0); color: var(--sc-fg-1); font: inherit; cursor: pointer; }
-      .seg button.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 14%, transparent); color: var(--sc-fg-0); }
-      .seg button:disabled { opacity: 0.5; cursor: not-allowed; }
-      .seg button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .seg { display: block; }
       .hint { margin: 0; color: var(--sc-fg-2); font-size: 0.82rem; }
-      .goal { display: flex; flex-direction: column; gap: 4px; }
-      .goal span { color: var(--sc-fg-2); font-size: 0.82rem; }
-      .input { min-height: 40px; padding: 0 var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-0); color: var(--sc-fg-0); font: inherit; }
-      .input:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
-      .input[aria-invalid='true'] { border-color: var(--sc-warning); }
+      .sc-input[aria-invalid='true'] { border-color: var(--sc-warning); }
       .lines, .stops { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); }
       .lines > li { padding: var(--sc-space-2, 8px) var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-bg-0); }
       .ln { margin: 0 0 4px; }
@@ -131,7 +103,6 @@ import { NACHSCHUB_ICON_PATHS } from './step-icons';
       .stops li > span:not(.mv) { color: var(--sc-fg-2); font-size: 0.82rem; flex: 1; }
       .mv { display: inline-flex; margin-left: auto; }
       button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-      @media (pointer: coarse) { .seg button { min-height: 44px; } }
     `,
   ],
 })
@@ -144,7 +115,6 @@ export class NachschubTargetDialogComponent {
   private readonly einsatz = inject(HqEinsatzService);
   private readonly i18n = inject(TranslateService);
 
-  protected readonly tray = NACHSCHUB_ICON_PATHS;
   protected readonly busy = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly goalText = signal('');
@@ -155,6 +125,17 @@ export class NachschubTargetDialogComponent {
   protected readonly existing = computed(() => targetsFor(this.intent(), this.ns.packages()));
   protected readonly newBlock = computed(() => newNachschubBlock(this.ns.packages()));
   protected readonly picked = signal<string | null>(null);
+  /** New Nachschub first (disabled with its reason as tooltip while no slot is free), then the existing ones. */
+  protected readonly targetOptions = computed<readonly ScSegmentOption[]>(() => {
+    // Explicit dependency on the language signal: the ready-made "append to X" labels must follow a
+    // language switch (instant() reads it today too; this keeps it true if that ever changes).
+    this.i18n.currentLang();
+    const block = this.newBlock();
+    return [
+      { value: 'new', labelKey: this.intent() === 'sell' ? 'hq.nachschub.target.newSell' : 'hq.nachschub.target.new', disabled: block !== null, titleKey: block ?? undefined },
+      ...this.existing().map((n) => ({ value: n.id, label: this.i18n.instant('hq.nachschub.target.append', { name: n.name }) as string })),
+    ];
+  });
   /** The chosen target: the player's pick, else a new one while a slot is free, else the first existing one. */
   protected readonly target = computed<string>(() => this.picked() ?? (this.newBlock() === null ? 'new' : (this.existing()[0]?.id ?? 'new')));
   protected readonly canSave = computed(() => {

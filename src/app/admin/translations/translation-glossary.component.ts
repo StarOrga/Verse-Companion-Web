@@ -1,3 +1,4 @@
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { toErrorKey } from '../../core/describe-error';
@@ -24,7 +25,7 @@ import {
 @Component({
   selector: 'sc-translation-glossary',
   standalone: true,
-  imports: [TranslatePipe, ScDatePipe, ScSelectComponent],
+  imports: [TranslatePipe, ScDatePipe, ScSelectComponent, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="sc-card block">
@@ -59,7 +60,7 @@ import {
     <section class="sc-card block">
       <div class="block-head">
         <h2>{{ 'admin.translations.glossary.title' | translate }} <small>({{ total() }})</small></h2>
-        <button type="button" class="sc-btn micro sc-btn-primary" (click)="adding.set(!adding())">
+        <button type="button" scAction tier="secondary" (click)="adding.set(!adding())">
           {{ 'admin.translations.glossary.add' | translate }}
         </button>
       </div>
@@ -86,7 +87,7 @@ import {
                        [ariaLabel]="'admin.translations.glossary.category' | translate"
                        (valueChange)="patchDraft({ category: $event ?? 'term' })" />
           </div>
-          <button type="submit" class="sc-btn sc-btn-primary" [disabled]="busy() || !canAdd()">
+          <button type="submit" scAction tier="primary" [disabled]="busy() || !canAdd()">
             {{ 'admin.translations.glossary.save' | translate }}
           </button>
         </form>
@@ -95,7 +96,7 @@ import {
       @if (error()) {
         <div class="state error" role="alert">
           <p>{{ error()! | translate }}</p>
-          <button type="button" class="sc-btn" (click)="load()">{{ 'admin.translations.retry' | translate }}</button>
+          <button type="button" scAction tier="secondary" (click)="load()">{{ 'admin.translations.retry' | translate }}</button>
         </div>
       } @else if (loading()) {
         <p class="hint" role="status">{{ 'admin.translations.loading' | translate }}</p>
@@ -132,20 +133,20 @@ import {
                   <td><span class="pill" [class.admin]="r.origin === 'admin'">{{ 'admin.translations.glossary.origins.' + r.origin | translate }}</span></td>
                   <td class="actions">
                     @if (editId() === r.id) {
-                      <button type="button" class="sc-btn micro sc-btn-primary" [disabled]="busy()" (click)="saveEdit(r)">{{ 'admin.translations.glossary.save' | translate }}</button>
-                      <button type="button" class="sc-btn micro" (click)="editId.set(null)">{{ 'admin.translations.glossary.cancelEdit' | translate }}</button>
+                      <button type="button" scAction tier="secondary" [disabled]="busy()" (click)="saveEdit(r)">{{ 'admin.translations.glossary.save' | translate }}</button>
+                      <button type="button" scAction tier="secondary" (click)="editId.set(null)">{{ 'admin.translations.glossary.cancelEdit' | translate }}</button>
                     } @else {
-                      <button type="button" class="sc-btn micro" (click)="startEdit(r)">{{ 'admin.translations.glossary.edit' | translate }}</button>
+                      <button type="button" scAction tier="secondary" (click)="startEdit(r)">{{ 'admin.translations.glossary.edit' | translate }}</button>
                     }
-                    <button type="button" class="sc-btn micro" role="switch" [attr.aria-checked]="r.locked" [disabled]="busy()"
+                    <button type="button" scAction tier="secondary" role="switch" [attr.aria-checked]="r.locked" [disabled]="busy()"
                             [class.on]="r.locked" (click)="toggle(r, 'locked')">
                       {{ (r.locked ? 'admin.translations.glossary.unlock' : 'admin.translations.glossary.lock') | translate }}
                     </button>
-                    <button type="button" class="sc-btn micro" role="switch" [attr.aria-checked]="r.needs_retranslate" [disabled]="busy()"
+                    <button type="button" scAction tier="secondary" role="switch" [attr.aria-checked]="r.needs_retranslate" [disabled]="busy()"
                             [class.on]="r.needs_retranslate" (click)="toggle(r, 'needs_retranslate')">
                       {{ 'admin.translations.glossary.retranslate' | translate }}
                     </button>
-                    <button type="button" class="sc-btn micro" [attr.aria-expanded]="historyId() === r.id" (click)="toggleHistory(r)">
+                    <button type="button" scAction tier="secondary" [attr.aria-expanded]="historyId() === r.id" (click)="toggleHistory(r)">
                       {{ 'admin.translations.glossary.history' | translate }}
                     </button>
                   </td>
@@ -166,7 +167,7 @@ import {
                               <span class="when">{{ h.at | scDate: 'datetime' }}</span>
                               <span class="chg">{{ h.before?.['target_term'] ?? '—' }} → {{ h.after ? h.after['target_term'] : ('admin.translations.glossary.deleted' | translate) }}</span>
                               @if (canRevert(h)) {
-                                <button type="button" class="sc-btn micro" [disabled]="busy()" (click)="revert(r, h)">
+                                <button type="button" scAction tier="secondary" [disabled]="busy()" (click)="revert(r, h)">
                                   {{ 'admin.translations.glossary.undo' | translate }}
                                 </button>
                               }
@@ -182,9 +183,9 @@ import {
           </table>
         </div>
         <div class="pager">
-          <button type="button" class="sc-btn micro" [disabled]="filters().page === 0" (click)="goPage(-1)">{{ 'admin.translations.glossary.prev' | translate }}</button>
+          <button type="button" scAction tier="secondary" [disabled]="filters().page === 0" (click)="goPage(-1)">{{ 'admin.translations.glossary.prev' | translate }}</button>
           <span>{{ 'admin.translations.glossary.pageOf' | translate: { page: filters().page + 1, pages: pages() } }}</span>
-          <button type="button" class="sc-btn micro" [disabled]="filters().page + 1 >= pages()" (click)="goPage(1)">{{ 'admin.translations.glossary.next' | translate }}</button>
+          <button type="button" scAction tier="secondary" [disabled]="filters().page + 1 >= pages()" (click)="goPage(1)">{{ 'admin.translations.glossary.next' | translate }}</button>
         </div>
       }
     </section>
@@ -207,7 +208,7 @@ import {
       .gl th, .gl td { text-align: start; padding: var(--sc-space-2) var(--sc-space-3); border-bottom: 1px solid var(--sc-border); vertical-align: middle; }
       .gl .term { min-width: 12ch; overflow-wrap: anywhere; }
       .gl .actions { display: flex; gap: var(--sc-space-2); flex-wrap: wrap; }
-      .sc-btn.on { border-color: var(--sc-accent); color: var(--sc-accent); }
+      .sc-action.on { border-color: var(--sc-accent); color: var(--sc-accent); }
       .pill { padding: 2px 10px; border-radius: 999px; font-size: 0.78rem; border: 1px solid var(--sc-border); color: var(--sc-fg-1); }
       .pill.admin { border-color: var(--sc-accent); color: var(--sc-accent); }
       .hist { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sc-space-2); }

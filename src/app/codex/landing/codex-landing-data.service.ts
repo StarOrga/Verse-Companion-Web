@@ -18,7 +18,7 @@ import {
   toLang,
 } from '../codex.service';
 import { UpcomingShipsService, normalizeShipName } from '../upcoming-ships.service';
-import { comparePatchVersion, formatNumber } from '../codex-format';
+import { comparePatchVersion, formatNumber, humanizeClassName } from '../codex-format';
 import { shipAnchorPorts, shipAnchorPositions } from './codex-landing-values';
 import { loadoutAnchorPorts, loadoutComponentClasses, loadoutValues, withLoadoutClassStats } from './codex-landing-loadout';
 
@@ -92,6 +92,35 @@ export function freshPool(rows: CodexListRow[], added: CodexListRow[], changed: 
   const changedIds = new Set(changed);
   const updated = rows.filter((r) => changedIds.has(r.classNameSlug) && !addedIds.has(r.classNameSlug));
   return { rows, fresh: [...added, ...updated], added: addedIds, updated: new Set(updated.map((r) => r.classNameSlug)) };
+}
+
+/**
+ * The row's real display name, or null when the extract carries none: no localised name,
+ * an unresolved `@item_Name…` key, the game's "! … NOT FOUND !" marker, or the class name
+ * itself. 4.10.3 brought dozens of such records (ship thrusters, cargo grids, unreleased
+ * weapon tints) - shown as their key names, they flooded "neu in" (feedback #360).
+ */
+export function landingName(r: Pick<CodexListRow, 'nameLocalized' | 'classNameSlug'>): string | null {
+  const n = (r.nameLocalized ?? '').trim();
+  if (!n || n.startsWith('@') || n.startsWith('!') || n.toLowerCase() === r.classNameSlug.toLowerCase()) return null;
+  return n;
+}
+
+/**
+ * The rows a category may show on the landing: outside ships only records with a real
+ * name (an unnamed component or weapon is engine plumbing or unfinished - the game never
+ * shows it either). A ship stays, its name falls back to {@link entryName}.
+ */
+export function namedRows<T extends Pick<CodexListRow, 'nameLocalized' | 'classNameSlug'>>(
+  category: LandingCategory,
+  rows: readonly T[],
+): T[] {
+  return category === 'ship' ? [...rows] : rows.filter((r) => landingName(r) !== null);
+}
+
+/** Name of a list entry: the display name, else the humanised class name, never the raw key. */
+export function entryName(r: Pick<CodexListRow, 'nameLocalized' | 'classNameSlug'>): string {
+  return landingName(r) ?? humanizeClassName(r.classNameSlug);
 }
 
 /** Display name used to spot the same ship listed under two class names. */
@@ -426,7 +455,7 @@ export class CodexLandingDataService {
   }
 
   private async loadPool(category: LandingCategory): Promise<CategoryPool> {
-    const rows = dedupeByName((await this.candidates(category)).filter((r) => !r.isVariant));
+    const rows = dedupeByName(namedRows(category, (await this.candidates(category)).filter((r) => !r.isVariant)));
     const kind = KIND_OF[category];
     // The patch's own record first (it survives a re-upload of the same patch); a kind
     // it holds nothing for falls back to the two-build diff below.
@@ -484,8 +513,9 @@ export class CodexLandingDataService {
     const listRow = rows.find((r) => r.classNameSlug === className) as CodexListRow;
     const row = { ...listRow, payload: detail.payload };
     const payload = detail.payload as { name?: unknown; vehicleName?: unknown; previewImage?: string | null } | null;
-    const name =
-      pickLocalized((payload?.vehicleName ?? payload?.name) as never, lang) || listRow.nameLocalized || className;
+    // A language without the string carries the raw `@…` key: then the list row's name.
+    const localized = pickLocalized((payload?.vehicleName ?? payload?.name) as never, lang);
+    const name = landingName({ nameLocalized: localized || null, classNameSlug: className }) ?? entryName(listRow);
     const manufacturer = manufacturerLabel(row, lang);
     const roleKey = category === 'ship' ? ((detail.payload as { role?: string | null })?.role ?? listRow.role) : null;
     const roleText = roleKey ? ((await this.codex.resolveLocaleKeys([roleKey], lang)).get(roleKey) ?? null) : null;
@@ -569,7 +599,7 @@ export class CodexLandingDataService {
           const discover = fresh.length === 0;
           const ready: LandingCodexEntry[] = (discover ? rows.slice(0, DISCOVER_ENTRIES) : fresh).map((r) => ({
             id: r.classNameSlug,
-            name: r.nameLocalized ?? r.classNameSlug,
+            name: entryName(r),
             route: ['/codex', KIND_OF[category], r.classNameSlug],
             announced: false,
             ...(updated.has(r.classNameSlug) ? { updated: true } : {}),
@@ -627,7 +657,7 @@ export class CodexLandingDataService {
           seen.add(id);
           out.push({
             id,
-            name: r.nameLocalized ?? id,
+            name: entryName(r),
             route: ['/codex', KIND_OF[category], id],
             announced: false,
             patch: g.patch,

@@ -38,8 +38,10 @@ export function fpsEquipMode(): boolean {
  * query. Pinned in app.routes.spec.ts (AUD-144). Old aliases (news, hangar,
  * codex/set, tools/extension, ...) are NOT bridged any more (alpha cleanup,
  * concept 2026-10-30): they fall through to '**', the real 404 page. The app bridges (/hangar/import, /starscape,
- * /uploader/auth, /desktop/connect) went on 2026-11-08: every binary that called them talks to
+ * /uploader/auth) went on 2026-11-08: every binary that called them talks to
  * the removed sc-companion host, so they could no longer be reached.
+ * /desktop/connect is the exception: installed desktop builds (<= v0.109) still
+ * open it on THIS host, so it redirects to /apps/starscape/connect (below).
  */
 export const routes: Routes = [
   {
@@ -151,6 +153,38 @@ export const routes: Routes = [
           import('./auth/access-unavailable.component').then((m) => m.AccessUnavailableComponent),
       },
     ],
+  },
+  {
+    // Legacy entry of the desktop Connect flow: installed builds (<= v0.109)
+    // open /desktop/connect?cb=...&state=... . Relative string redirect so the
+    // query (cb, state) survives (AUD-144); pinned in app.routes.spec.ts.
+    path: 'desktop/connect',
+    pathMatch: 'full',
+    redirectTo: 'apps/starscape/connect',
+  },
+  {
+    // Read-auth handoff for the SCC Electron app — open to ANY approved,
+    // signed-in user. Placed as a top-level sibling to /login, OUTSIDE the
+    // gated shell routes and BEFORE the shell, whose '**' would answer it with the 404 (the loopback callback path is /scc/callback, POST).
+    // Access-control redesign (2026-08-05): approvedGuard added alongside
+    // authGuard — a self-registered-but-unapproved account must not reach a
+    // desktop-app auth handoff any more than it can reach the rest of the app.
+    path: 'apps/starscape/connect',
+    data: { layout: 'cinematic' },
+    canActivate: [...PRIVATE],
+    loadComponent: () =>
+      import('./desktop/desktop-read-auth.component').then((m) => m.DesktopReadAuthComponent),
+  },
+  {
+    // A hosted concept page (admin feedback #224) opens full-screen, never
+    // inside the shell (feedback e4428abd): the route only mints the ticket and
+    // replaces itself with the static loader /concept-frame/<id>.html. Outside
+    // the shell, so it carries the blanket gate itself, plus the admin role.
+    path: 'concept/:id',
+    data: { layout: 'cinematic' },
+    canActivate: [...PRIVATE, roleGuard('admin')],
+    loadComponent: () =>
+      import('./admin/concepts/concept-page.component').then((m) => m.ConceptPageComponent),
   },
   {
     // The shared shell — gated by default (see PRIVATE / canActivateChild
@@ -297,6 +331,10 @@ export const routes: Routes = [
             // The old tab page (fleet dashboard). With the shell beta it is gone: HQ Bestand ▸ Hangar is the fleet,
             // so /hq/hangar leads there (2026-11-08). β off keeps the page. Redirecting canMatch, see ops below.
             path: 'hangar',
+            // 'full': with a prefix match Angular runs this redirecting canMatch for /hq/hangar/:id too
+            // (canMatch runs before the unconsumed segments are checked), so every own-ship page and
+            // exemplar link landed on the Bestand list.
+            pathMatch: 'full',
             data: { layout: 'tool', section: 'hangar' },
             canMatch: [() => (inject(BetaService).isEnabled('shell')() ? inject(Router).createUrlTree([HQ_ROOT], { queryParams: { [HQ_STOCK_TAB_PARAM]: 'hangar' }, fragment: 'inventar' }) : true)],
             loadComponent: () =>
@@ -342,6 +380,11 @@ export const routes: Routes = [
             data: { layout: 'tool' },
             canMatch: [() => (inject(BetaService).isEnabled('shell')() ? inject(Router).parseUrl(hqPageHref('planen')) : true)],
             loadComponent: () => import('./hq/hq-ops.component').then((m) => m.HqOpsComponent),
+          },
+          {
+            path: 'spots',
+            data: { layout: 'tool' },
+            loadComponent: () => import('./hq/spots/hq-spots.component').then((m) => m.HqSpotsComponent),
           },
         ],
       },
@@ -432,13 +475,6 @@ export const routes: Routes = [
           import('./admin/feedback/admin-feedback.component').then((m) => m.AdminFeedbackComponent),
       },
       {
-        path: 'concept/:id',
-        data: { layout: 'tool' },
-        canActivate: [roleGuard('admin')],
-        loadComponent: () =>
-          import('./admin/concepts/concept-page.component').then((m) => m.ConceptPageComponent),
-      },
-      {
         path: 'settings',
         data: { layout: 'content' },
         loadComponent: () =>
@@ -489,18 +525,5 @@ export const routes: Routes = [
           import('./shell/not-found-page/not-found-page.component').then((m) => m.NotFoundPageComponent),
       },
     ],
-  },
-  {
-    // Read-auth handoff for the SCC Electron app — open to ANY approved,
-    // signed-in user. Placed as a top-level sibling to /login, OUTSIDE the
-    // gated shell routes (the loopback callback path is /scc/callback, POST).
-    // Access-control redesign (2026-08-05): approvedGuard added alongside
-    // authGuard — a self-registered-but-unapproved account must not reach a
-    // desktop-app auth handoff any more than it can reach the rest of the app.
-    path: 'apps/starscape/connect',
-    data: { layout: 'cinematic' },
-    canActivate: [...PRIVATE],
-    loadComponent: () =>
-      import('./desktop/desktop-read-auth.component').then((m) => m.DesktopReadAuthComponent),
   },
 ];

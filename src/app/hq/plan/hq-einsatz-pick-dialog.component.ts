@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 
 /** One choosable Einsatz in the picker. */
 export interface EinsatzPickOption {
@@ -12,8 +13,6 @@ export interface EinsatzPickOption {
 /** What the reader chose: an existing Einsatz, a new one, or nothing (null). */
 export type EinsatzPick = { kind: 'existing'; id: string } | { kind: 'new' };
 
-let uid = 0;
-
 /**
  * "Zum Einsatz" (search CTA on a mission row): which planned / active Einsatz
  * the mission joins as a step, or "Neuer Einsatz". A list of real buttons in
@@ -23,12 +22,11 @@ let uid = 0;
 @Component({
   selector: 'sc-hq-einsatz-pick-dialog',
   standalone: true,
-  imports: [TranslatePipe, ScDialogDirective],
+  imports: [TranslatePipe, ScActionDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="pick sc-card" scDialog role="dialog" aria-modal="true" [attr.aria-labelledby]="titleId"
-         (scDialogEscape)="closed.emit(null)">
-      <h2 [id]="titleId">{{ 'hq.einsatz.pick.title' | translate }}</h2>
+    <sc-popup kind="dialog" size="s" [backdrop]="false" [eyebrow]="'hq.title' | translate" [title]="'hq.einsatz.pick.title' | translate" (closed)="closed.emit(null)">
+      <div class="pick">
       <p class="msg">{{ 'hq.einsatz.pick.message' | translate: { name: missionTitle() } }}</p>
       @if (options().length) {
         <ul class="list" (keydown)="onListKey($event)">
@@ -44,37 +42,28 @@ let uid = 0;
       } @else {
         <p class="msg muted">{{ 'hq.einsatz.pick.none' | translate }}</p>
       }
-      <div class="actions">
-        <button type="button" class="sc-btn" (click)="closed.emit(null)">{{ 'common.dialog.cancel' | translate }}</button>
-        <button type="button" class="sc-btn sc-btn-primary" [attr.cdkFocusInitial]="options().length ? null : ''"
-                (click)="closed.emit({ kind: 'new' })">{{ 'hq.einsatz.pick.new' | translate }}</button>
       </div>
-    </div>
+      <ng-container popupActions>
+        <button type="button" scAction tier="primary" [attr.cdkFocusInitial]="options().length ? null : ''"
+                (click)="closed.emit({ kind: 'new' })">{{ 'hq.einsatz.pick.new' | translate }}</button>
+        <button type="button" scAction tier="secondary" (click)="closed.emit(null)">{{ 'common.dialog.cancel' | translate }}</button>
+      </ng-container>
+    </sc-popup>
   `,
   styles: [
     `
       :host { display: block; }
-      .pick {
-        inline-size: min(var(--sc-ov-s), calc(100vw - 32px));
-        max-block-size: calc(100vh - 32px);
-        max-block-size: calc(100dvh - 32px);
-        overflow: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        margin: 0;
-      }
-      h2 { margin: 0; font-family: var(--sc-font-display); font-size: 1.05rem; color: var(--sc-fg-0); overflow-wrap: anywhere; }
+      .pick { display: flex; flex-direction: column; gap: 12px; }
       .msg { margin: 0; color: var(--sc-fg-1); overflow-wrap: anywhere; }
       .muted { color: var(--sc-fg-2); }
-      .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+      .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-space-2); }
       .opt {
         inline-size: 100%;
         min-block-size: 44px;
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 8px 12px;
+        gap: var(--sc-space-3);
+        padding: var(--sc-space-2) var(--sc-space-3);
         border: 1px solid var(--sc-border);
         border-radius: var(--sc-radius, 6px);
         background: var(--sc-bg-1);
@@ -84,12 +73,9 @@ let uid = 0;
         cursor: pointer;
       }
       .opt:hover { border-color: var(--sc-accent); }
-      .opt:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .opt:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .name { flex: 1; min-inline-size: 0; overflow-wrap: anywhere; }
       .n { color: var(--sc-fg-2); font-size: 0.85rem; flex-shrink: 0; }
-      .actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 4px; }
-      .sc-btn { justify-content: center; }
-      @media (max-width: 480px) { .actions .sc-btn { flex: 1 1 100%; } }
     `,
   ],
 })
@@ -97,7 +83,6 @@ export class HqEinsatzPickDialogComponent {
   readonly missionTitle = input('');
   readonly options = input<readonly EinsatzPickOption[]>([]);
   readonly closed = output<EinsatzPick | null>();
-  readonly titleId = `sc-einsatz-pick-${++uid}`;
 
   /** Arrow keys move between the Einsatz buttons (Home / End to the ends). */
   onListKey(ev: KeyboardEvent): void {

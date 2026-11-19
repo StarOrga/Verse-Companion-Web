@@ -23,6 +23,7 @@
 export type ShipModuleSection =
   | 'weapons'
   | 'remoteTurrets'
+  | 'mannedTurrets'
   | 'missiles'
   | 'countermeasures'
   | 'pod'
@@ -43,6 +44,7 @@ export type ShipModuleSection =
 export const CONFIGURABLE_SHIP_SECTIONS: readonly ShipModuleSection[] = [
   'weapons',
   'remoteTurrets',
+  'mannedTurrets',
   'missiles',
   'pod',
   'shields',
@@ -102,33 +104,15 @@ export function isConfigurableSection(section: ShipModuleSection): boolean {
   return CONFIGURABLE_SET.has(section);
 }
 
-/**
- * Sections where every hardpoint is its OWN decision and must therefore keep
- * its own row (admin request 1add86a4: "Nomad hat insgesamt 3 Plätze … hier
- * müssten 3 Stück einzeln auswählbar sein").
- *
- * Collapsing identical occupants is right for twelve manoeuvring thrusters and
- * for a bank of identical guns — but a shield bank of "2× S1 Sechs Shield"
- * hides that those are two independently swappable generators, and a decoy plus
- * a noise launcher are never interchangeable. All three blocks list every slot.
- *
- * `coolers` joined them in 32659942 (*"Coolers müssten 2 sein nicht nur eins!"*)
- * and left again in 4263fed1 (*"Hier auch wie bei Waffen einen Zusammenmodus
- * anbieten. z.B. wenn 2x Ultra Flow drin sind, dann können diese auch als 2x
- * Ultraflow angezeigt werden"*): two identical coolers now fold into one
- * "2× S1 UltraFlow" row whose card carries the block's cooling total, and the
- * per-block "Einzeln" toggle still lists them one by one. Every other block can
- * be split on demand — see the layout component's per-block toggle.
+/*
+ * Every block stacks identical occupants (feedback #348: "alles was mehr als 1
+ * ist könnte ja gestackt werden"). Shields and countermeasures used to list
+ * every bay on its own row (1add86a4); since #348 they fold like weapons —
+ * "3× S1 WEB" — and the per-block "Einzeln" toggle lists the bays one by one
+ * when a pilot wants to swap a single generator. A passive generator never
+ * folds into active ones: the ship page puts the stock role into the
+ * grouping key, so "2× … Aktiv" and "1× … Passiv" stay two rows.
  */
-const INDIVIDUAL_SHIP_SECTIONS: ReadonlySet<ShipModuleSection> = new Set([
-  'shields',
-  'countermeasures',
-]);
-
-/** True when a block must list every hardpoint separately (never collapse). */
-export function isIndividualSection(section: ShipModuleSection): boolean {
-  return INDIVIDUAL_SHIP_SECTIONS.has(section);
-}
 
 // ── Display GROUPS ───────────────────────────────────────────────────────────
 // The classification above is deliberately fine-grained: a cooler is not a
@@ -152,6 +136,7 @@ export function isIndividualSection(section: ShipModuleSection): boolean {
 export type ShipModuleGroup =
   | 'weapons'
   | 'remoteTurrets'
+  | 'mannedTurrets'
   | 'missiles'
   | 'pod'
   | 'shields'
@@ -171,6 +156,7 @@ export const SYSTEMS_GROUP_SECTIONS: readonly ShipModuleSection[] = [
 const SECTION_GROUP: Readonly<Record<ShipModuleSection, ShipModuleGroup>> = {
   weapons: 'weapons',
   remoteTurrets: 'remoteTurrets',
+  mannedTurrets: 'mannedTurrets',
   missiles: 'missiles',
   pod: 'pod',
   shields: 'shields',
@@ -323,8 +309,8 @@ const TYPE_SECTION: Readonly<Record<string, ShipModuleSection>> = {
   weaponmount: 'weapons',
   // turrets
   gunturret: 'remoteTurrets',
-  ballturret: 'remoteTurrets',
-  mannedturret: 'remoteTurrets',
+  ballturret: 'mannedTurrets',
+  mannedturret: 'mannedTurrets',
   pdcturret: 'remoteTurrets',
   topturret: 'remoteTurrets',
   bottomturret: 'remoteTurrets',
@@ -367,6 +353,25 @@ function fromType(raw: string | null | undefined): ShipModuleSection | null {
 }
 
 /**
+ * Bemannte Türme get their own block (feedback #330, concept
+ * 2026-11-10-bereichs-symbole-umrandung, "eigener Block"). The port rule files
+ * every `…_turret…` as a turret; what is bolted in (`MannedTurret`,
+ * `BallTurret`) or a port that names its gunner says someone sits in it. A
+ * port that says `remote` stays remote whatever the occupant reports.
+ */
+const MANNED_TURRET_PORT = /manned|gunner/i;
+const MANNED_TURRET_TYPE = new Set(['mannedturret', 'ballturret']);
+
+function isMannedTurret(port: string, occupant: ShipModuleOccupant | null | undefined): boolean {
+  if (/remote/i.test(port)) return false;
+  if (MANNED_TURRET_PORT.test(port)) return true;
+  if (!occupant) return false;
+  return [occupant.subType, occupant.componentKind, occupant.attachType].some((raw) =>
+    MANNED_TURRET_TYPE.has((raw ?? '').trim().toLowerCase()),
+  );
+}
+
+/**
  * Which block a hardpoint belongs to. Total by construction: an unrecognised
  * port with an unrecognised occupant is `structure`, never dropped.
  */
@@ -374,7 +379,12 @@ export function classifyShipModule(
   portName: string | null | undefined,
   occupant?: ShipModuleOccupant | null,
 ): ShipModuleSection {
-  const port = portName ?? '';
+  const section = classifyByRules(portName ?? '', occupant);
+  if (section === 'remoteTurrets' && isMannedTurret(portName ?? '', occupant)) return 'mannedTurrets';
+  return section;
+}
+
+function classifyByRules(port: string, occupant: ShipModuleOccupant | null | undefined): ShipModuleSection {
   // Two modules that name a configurable block but are not one: the shield
   // CONTROL module and the quantum drive's internal tank. Both are checked
   // before the port rules, which would otherwise file them by their keyword

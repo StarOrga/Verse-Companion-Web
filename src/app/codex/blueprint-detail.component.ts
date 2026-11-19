@@ -42,6 +42,7 @@ import { NavOriginService, PageCrumb, originTrail } from '../shared/page-header/
 import { ItemPathComponent } from '../shared/item-path/item-path.component';
 import { noteOpenedPage } from '../shell/merkliste/merkliste-opened';
 import { pathLevelFor } from './path-level.util';
+import { ItemPathService } from '../hq/data/item-path.service';
 import { blueprintMissions } from './blueprint-missions';
 import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { UndoToastService } from '../shared/undo-toast/undo-toast.service';
@@ -245,7 +246,7 @@ import { blueprintMaterialWishes, clampWishQty } from '../hq/nachschub/nachschub
     .wish-mat .st button { width: max(30px, var(--sc-tap-min, 0px)); height: max(30px, var(--sc-tap-min, 0px)); padding: 0; cursor: pointer; font: inherit; border: 1px solid var(--sc-border); border-radius: 7px; background: none; color: var(--sc-fg-1); }
     .wish-mat .st button:hover:not(:disabled) { color: var(--sc-accent); border-color: var(--sc-accent); }
     .wish-mat .st button:disabled { opacity: 0.4; cursor: default; }
-    .wish-mat .st button:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .wish-mat .st button:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .wish-mat .st b { min-width: 32px; text-align: center; font-weight: 500; font-variant-numeric: tabular-nums; }
     :host { display: block; }
     /* The full page frame (styles.scss, "PAGE FRAME") — no width of its own;
@@ -300,7 +301,7 @@ import { blueprintMaterialWishes, clampWishQty } from '../hq/nachschub/nachschub
     .err { color: var(--sc-danger); padding: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .err .retry:hover { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
   `],
 })
@@ -314,8 +315,12 @@ export class BlueprintDetailComponent implements OnInit {
       labelKey: 'codex.kinds.blueprint', link: '/codex/index', queryParams: { kind: 'blueprint' },
     });
   });
-  /** The full path form when the reader came from Planen or a set, the pill otherwise (D2). */
-  protected readonly pathLevel = computed(() => (this.detail() ? pathLevelFor(this.navOrigin) : 'secondary'));
+  private readonly itemPath = inject(ItemPathService);
+  /** Signed in: always the two stations (R5 r5-d-bauplan); signed out the full form only from Planen or a set (D2). */
+  protected readonly pathLevel = computed(() => {
+    const d = this.detail();
+    return d ? pathLevelFor(this.navOrigin, this.itemPath.state('blueprint', d.classNameSlug, null)().signedIn) : 'secondary';
+  });
   readonly svc = inject(CodexService);
   private readonly route = inject(ActivatedRoute);
   private readonly translate = inject(TranslateService);

@@ -20,6 +20,7 @@ function gun(opts: {
   lifetime?: number;
   count?: number;
   section?: 'weapons' | 'remoteTurrets';
+  cycle?: Record<string, number>;
 }): SummaryOccupant {
   return {
     section: opts.section ?? 'weapons',
@@ -28,7 +29,7 @@ function gun(opts: {
       entityKind: 'weapon',
       className: opts.className ?? 'KLWE_LaserRepeater_S3',
       size: opts.size ?? 3,
-      weaponParams: opts.fireRate != null ? { fireRate: opts.fireRate } : {},
+      weaponParams: { ...(opts.fireRate != null ? { fireRate: opts.fireRate } : {}), ...(opts.cycle ?? {}) },
     },
     ammoPayload: {
       impactDamage: { physical: opts.damage ?? 40 },
@@ -36,6 +37,28 @@ function gun(opts: {
       lifetime: opts.lifetime,
     },
     count: opts.count ?? 1,
+  };
+}
+
+function missile(opts: { className?: string; size?: number; damage?: number; lockTime?: number; range?: number }): SummaryOccupant {
+  return {
+    section: 'missiles',
+    kind: 'item',
+    payload: {
+      entityKind: 'item',
+      className: opts.className ?? 'MISL_S02_IR_NOVP_Rattler',
+      attachType: 'Missile',
+      subType: 'Missile',
+      size: opts.size ?? 2,
+      stats: {
+        SCItemMissileParams: {
+          ...(opts.damage != null ? { 'explosionParams.damage.DamagePhysical': opts.damage } : {}),
+          ...(opts.lockTime != null ? { 'targetingParams.lockTime': opts.lockTime } : {}),
+          ...(opts.range != null ? { 'targetingParams.lockRangeMax': opts.range } : {}),
+        },
+      },
+    },
+    count: 1,
   };
 }
 
@@ -68,8 +91,25 @@ describe('codex-loadout-stats — computeKpiSheet', () => {
       null,
     );
     expect(sheet.alpha).toBe(80);
-    expect(sheet.sustainedDps).toBe(80); // 40dmg * 60rpm/60s * 2 guns
-    expect(sheet.burstDps).toBe(sheet.sustainedDps);
+    expect(sheet.burstDps).toBe(80); // 40dmg * 60rpm/60s * 2 guns
+  });
+
+  it('sustained DPS counts the energy regen pause, never copies burst (#343)', () => {
+    // 60 rpm = 1 shot/s, pool 10 → 10 s firing; 0.5 s cooldown + 10/2 = 5 s refill.
+    const cycle = { 'regen.maxAmmoLoad': 10, 'regen.requestedRegenPerSec': 2, 'regen.regenerationCooldown': 0.5 };
+    const sheet = computeKpiSheet(
+      [gun({ damage: 40, fireRate: 60, cycle }), gun({ damage: 40, fireRate: 60, cycle })],
+      null,
+    );
+    expect(sheet.burstDps).toBe(80);
+    expect(sheet.sustainedDps).toBeCloseTo(80 * 10 / 15.5, 1); // 51.61
+  });
+
+  it('leaves sustained DPS a gap when one gun has no known fire cycle', () => {
+    const cycle = { 'regen.maxAmmoLoad': 10, 'regen.requestedRegenPerSec': 2 };
+    const sheet = computeKpiSheet([gun({ damage: 40, fireRate: 60, cycle }), gun({ damage: 40, fireRate: 60 })], null);
+    expect(sheet.burstDps).toBe(80);
+    expect(sheet.sustainedDps).toBeNull();
   });
 
   it('leaves DPS a gap when no gun carries a fireRate, but keeps alpha', () => {
@@ -235,6 +275,56 @@ describe('codex-loadout-stats — buildOffensivePanel', () => {
     expect(panel.missileSalvoDamage).toBeNull();
   });
 
+  // feedback #350: the warhead lives in SCItemMissileParams, not in an impact record
+  it('reads every carried missile, collapses identical ones and sums the salvo', () => {
+    const rack: SummaryOccupant = {
+      section: 'missiles',
+      kind: 'weapon',
+      payload: { entityKind: 'weapon', className: 'MRCK_S04_CNOU_Quad_S02', attachType: 'MissileLauncher', size: 4 },
+      count: 1,
+    };
+    const panel = buildOffensivePanel([
+      gun({}),
+      rack,
+      missile({ className: 'MISL_S02_IR_NOVP_Rattler', size: 2, damage: 1370, lockTime: 2.5, range: 5000 }),
+      missile({ className: 'MISL_S02_IR_NOVP_Rattler', size: 2, damage: 1370, lockTime: 2.5, range: 5000 }),
+      missile({ className: 'MISL_S03_CS_FSKI_Tempest', size: 3, damage: 2500, lockTime: 3, range: 7000 }),
+    ]);
+    expect(panel.missileCount).toBe(3);
+    expect(panel.missileRows).toEqual([
+      { className: 'MISL_S03_CS_FSKI_Tempest', size: 3, category: 'missile', signal: 'cs', count: 1, damage: 2500, totalDamage: 2500 },
+      { className: 'MISL_S02_IR_NOVP_Rattler', size: 2, category: 'missile', signal: 'ir', count: 2, damage: 1370, totalDamage: 2740 },
+    ]);
+    expect(panel.missileSalvoDamage).toBe(5240);
+    expect(panel.missileSalvoPartial).toBe(false);
+    expect(panel.missileLockTime).toBe(3);
+    expect(panel.missileRange).toBe(5000);
+    expect(panel.missileSignalTypes.sort()).toEqual(['cs', 'ir']);
+    // guns stay guns: the salvo never lands in the gun alpha
+    expect(panel.footerAlpha).toBe(40);
+  });
+
+  it('counts missiles without warhead data but leaves them out of the salvo', () => {
+    const panel = buildOffensivePanel([
+      missile({ className: 'MISL_S02_IR_NOVP_Rattler', size: 2, damage: 1370 }),
+      missile({ className: 'MISL_S02_EM_TALN_Dominator' }),
+    ]);
+    expect(panel.missileCount).toBe(2);
+    expect(panel.missileSalvoDamage).toBe(1370);
+    expect(panel.missileSalvoPartial).toBe(true);
+    expect(panel.missileRows.find((r) => r.signal === 'em')?.damage).toBeNull();
+
+    const bare = buildOffensivePanel([missile({ className: 'MISL_S02_EM_TALN_Dominator' })]);
+    expect(bare.missileCount).toBe(1);
+    expect(bare.missileSalvoDamage).toBeNull();
+    expect(bare.missileSalvoPartial).toBe(false);
+  });
+
+  it('feeds the missile KPI from the same warhead figure', () => {
+    const sheet = computeKpiSheet([missile({ damage: 1370 }), missile({ damage: 1370 })], null);
+    expect(sheet.missiles).toBe(2740);
+  });
+
   it('takes the MINIMUM range across guns as the effective range, noting the outlier', () => {
     const panel = buildOffensivePanel([
       gun({ className: 'ShortGun', speed: 1000, lifetime: 1 }), // 1000m
@@ -305,11 +395,20 @@ describe('codex-loadout-stats — buildDefensivePanel', () => {
     expect(uniform.mixedGeneratorNote).toBe(false);
   });
 
-  it('never computes hull HP or effective HP — always a named gap', () => {
+  it('names the hull-HP gap only on an extract without hull HP', () => {
     const panel = buildDefensivePanel([shield({})], null);
     expect(panel.hullHp).toBeNull();
     expect(panel.effectiveHp).toBeNull();
     expect(panel.gapKeys).toContain('codex.summary.gap.noHullMass');
+  });
+
+  it('takes the hull HP from the ship payload and adds the shields for effective HP', () => {
+    const panel = buildDefensivePanel([shield({ hp: 1000, regen: 50 })], null, 84200);
+    expect(panel.hullHp).toBe(84200);
+    expect(panel.effectiveHp).toBe(85200);
+    expect(panel.gapKeys).not.toContain('codex.summary.gap.noHullMass');
+    // No shield: the hull is known, the effective sum is not.
+    expect(buildDefensivePanel([], null, 84200).effectiveHp).toBeNull();
   });
 
   it('computes armor reduction % as (1 - multiplier) when the extract carries it', () => {

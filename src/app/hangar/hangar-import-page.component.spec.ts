@@ -32,7 +32,7 @@ describe('HangarImportPageComponent', () => {
         provideRouter([]),
         provideTranslateService({ fallbackLang: 'en' }),
         { provide: ExtensionBridgeService, useValue: bridge },
-        { provide: AnalyticsService, useValue: { capture: vi.fn(), flags: () => ({}) } },
+        { provide: AnalyticsService, useValue: { track: vi.fn(), flags: () => ({}) } },
         { provide: LocaleService, useValue: { language: () => 'en', region: () => 'DE' } },
         {
           provide: CodexService,
@@ -71,7 +71,7 @@ describe('HangarImportPageComponent', () => {
 
   it('cancel discards the stash and shows the empty state', async () => {
     await setup({ version: 1, source: 'rsi', capturedAt: 1700000000000, fingerprint: 'fp', ships: SHIPS });
-    (fixture.nativeElement.querySelector('.review .link-btn') as HTMLButtonElement).click();
+    (fixture.nativeElement.querySelector('.review .cancel') as HTMLButtonElement).click();
     fixture.detectChanges();
     expect(bridge.discard).toHaveBeenCalled();
     expect(fixture.nativeElement.querySelector('.state.empty')).toBeTruthy();

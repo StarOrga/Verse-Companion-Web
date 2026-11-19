@@ -1,0 +1,96 @@
+{
+  "$comment": "The eight cross-area flows, in priority order. Steps use catalogue event names only (src/app/core/analytics/events.ts) plus the server/desktop events named in the brief. core-D builds funnels, paths and retention from this file.",
+  "flows": [
+    {
+      "id": "onboard",
+      "name": "Einstieg: Erstbesuch bis Wiederkehr",
+      "steps": [
+        { "event": "auth:login_view" },
+        { "event": "auth:user_sign_in" },
+        { "event": "hangar:ship_add" },
+        { "event": "auth:session_start" }
+      ],
+      "conversionWindowDays": 7,
+      "breakdown": "role"
+    },
+    {
+      "id": "codex",
+      "name": "Codex: Suche bis Vergleich oder Loadout",
+      "steps": [
+        { "event": "search:palette_open" },
+        { "event": "search:result_open" },
+        { "event": "codex:entry_view", "props": { "kind": "ship" } },
+        { "event": "codex:compare_start" }
+      ],
+      "alternativeLastSteps": [{ "event": "hangar:loadout_create" }, { "event": "codex:holotable_open" }],
+      "conversionWindowDays": 1,
+      "breakdown": "area"
+    },
+    {
+      "id": "error",
+      "name": "Fehler: abgebrochen oder weitergemacht",
+      "steps": [
+        { "event": "app:error_show" },
+        { "event": "$pageview" }
+      ],
+      "conversionWindowDays": 1,
+      "breakdown": "key"
+    },
+    {
+      "id": "hangar",
+      "name": "Hangar: Import bis Flaggschiff",
+      "steps": [
+        { "event": "hangar:fleet_import" },
+        { "event": "hq:page_view", "props": { "page": "hangar" } },
+        { "event": "hangar:flagship_select" }
+      ],
+      "conversionWindowDays": 7,
+      "breakdown": "source"
+    },
+    {
+      "id": "feedback",
+      "name": "Feedback: Fenster bis Antwort gelesen",
+      "steps": [
+        { "event": "feedback:composer_open" },
+        { "event": "feedback:item_submit" },
+        { "event": "feedback:reply_view" }
+      ],
+      "conversionWindowDays": 14,
+      "breakdown": "kind"
+    },
+    {
+      "id": "desktop",
+      "name": "Desktop: Download bis Daten im Codex",
+      "steps": [
+        { "event": "desktop:apps_view" },
+        { "event": "desktop:download_start" },
+        { "event": "desktop:usage_metric" },
+        { "event": "codex:entry_view" }
+      ],
+      "conversionWindowDays": 14,
+      "breakdown": "app"
+    },
+    {
+      "id": "verse",
+      "name": "Verse: Briefing bis Stern",
+      "steps": [
+        { "event": "verse:briefing_view" },
+        { "event": "verse:door_open" },
+        { "event": "verse:star_earn" }
+      ],
+      "conversionWindowDays": 7,
+      "breakdown": "door"
+    },
+    {
+      "id": "wish",
+      "name": "Wunsch: öffnen, suchen, hinzufügen",
+      "steps": [
+        { "event": "hq:wishlist_open" },
+        { "event": "hq:wish_search_open" },
+        { "event": "hq:wish_add" }
+      ],
+      "conversionWindowDays": 1,
+      "breakdown": "surface"
+    }
+  ]
+}

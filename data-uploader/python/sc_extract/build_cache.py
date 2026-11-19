@@ -46,6 +46,25 @@ def file_digest(path: Path) -> str:
     return h.hexdigest()
 
 
+#: Converter builds keyed as an earlier build, by sha256. Only for a build whose
+#: output was compared with that one's for every mesh that one could convert
+#: and came out the same (python/tools/cgf-converter/README.md): swapping the
+#: binary then keeps every cached model, and a mesh only the newer build can
+#: convert has no cached output to be mistaken for. A build that changes the
+#: output of an existing mesh must NOT be listed — its own digest rebuilds.
+CONVERTER_ALIASES = {
+    # cgf-converter v2.0.0-sc.1 (v2.0.0 + index-buffer and null-<Textures> fixes) -> v2.0.0
+    "89d73dd2ff76070dea5fb4dd4e130b1dd1d02b1128874b0d80b0141d4d552abe":
+        "75feca2813a6517cad9a8e5df28687860a3b0bab9dcbcfeef65e56850d53b0b7",
+}
+
+
+def converter_identity(converter: Path) -> str:
+    """The converter's digest as the caches key it (see ``CONVERTER_ALIASES``)."""
+    digest = file_digest(converter)
+    return CONVERTER_ALIASES.get(digest, digest)
+
+
 def pipeline_tag(converter: Optional[Path] = None, salt: str = "",
                  modules: Iterable[str] = PIPELINE_MODULES, recipe: str = "") -> str:
     """Short hash of everything besides the P4K inputs that shapes the output.
@@ -66,7 +85,7 @@ def pipeline_tag(converter: Optional[Path] = None, salt: str = "",
                 h.update(f"missing:{name}".encode())
     if converter is not None:
         try:
-            h.update(file_digest(converter).encode())
+            h.update(converter_identity(converter).encode())
         except OSError:
             h.update(b"no-converter")
     h.update(salt.encode("utf-8"))

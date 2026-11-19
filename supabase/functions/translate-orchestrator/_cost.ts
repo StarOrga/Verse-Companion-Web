@@ -33,8 +33,30 @@ export interface Usage {
   server_tool_use?: { web_search_requests?: number };
 }
 
+/**
+ * The entry of the price table a model id belongs to: the id itself, or the alias a dated snapshot id
+ * begins with (`claude-sonnet-5-5-20261001`). null = the table does not know it.
+ */
+export function knownModel(model: string | null | undefined): ModelId | null {
+  if (!model) return null;
+  if (Object.hasOwn(PRICES, model)) return model as ModelId;
+  const hit = (Object.keys(PRICES) as ModelId[]).filter((id) => model.startsWith(`${id}-`)).sort((a, b) => b.length - a.length)[0];
+  return hit ?? null;
+}
+
+/** An id the table does not know is priced as the most expensive model: a bill may be over-counted, never under-counted. */
 export function priceOf(model: string): { in: number; out: number } {
-  return PRICES[model as ModelId] ?? PRICES['claude-opus-5-5'];
+  return PRICES[knownModel(model) ?? 'claude-opus-5-5'];
+}
+
+/**
+ * The model a result is priced as: what the provider says ran it when the price table knows that id,
+ * else what the request asked for. (An answer that names a snapshot the table has never heard of must
+ * not turn a Sonnet request into an Opus bill: budgets and the probe are decided on these figures.)
+ */
+export function billedModel(answered: string | null | undefined, asked: string | null | undefined): string | undefined {
+  if (knownModel(answered)) return answered!;
+  return asked ?? answered ?? undefined;
 }
 
 export function estimateTokens(chars: number): number {
@@ -73,6 +95,9 @@ export function usageCostUsd(model: string, u: Usage): number {
     searches * WEB_SEARCH_USD;
 }
 
+/** Few-shot pairs ride in the (uncached) user message: about 60 characters each. */
+export const shotsUsd = (pairs: number) => (pairs * 60 * INPUT_TOK_PER_CHAR * 3) / 1e6;
+
 export interface Estimate {
   usd: number;
   inputTokens: number;
@@ -80,30 +105,41 @@ export interface Estimate {
   byModel: Record<string, { requests: number; usd: number }>;
 }
 
+/** Per model: the number of requests and the token sums of their user messages and answers. */
+export type CostTotals = Record<string, { requests: number; inTok: number; outTok: number }>;
+
 /**
- * Estimate for a set of requests. The system prompt is paid as one cache write
- * per model, then cache reads (batch caching is best effort; this is the
- * expected case, `usageCostUsd` books the truth afterwards).
+ * Estimate from per-model totals (what a sliced estimate adds up request by request). The system
+ * prompt is paid as one cache write per model, then cache reads (batch caching is best effort; this
+ * is the expected case, `usageCostUsd` books the truth afterwards).
  */
-export function estimateJob(lang: string, chunks: ChunkCostInput[], systemTokens: number): Estimate {
+export function estimateFromTotals(totals: CostTotals, systemTokens: number): Estimate {
   const byModel: Estimate['byModel'] = {};
   let inputTokens = 0;
   let outputTokens = 0;
   let usd = 0;
-  const seen = new Set<string>();
-  for (const c of chunks) {
-    const p = priceOf(c.model);
-    const inTok = estimateTokens(c.inputChars);
-    const outTok = estimateOutputTokens(lang, c);
-    const sysFactor = seen.has(c.model) ? CACHE_READ_FACTOR : CACHE_WRITE_1H_FACTOR;
-    seen.add(c.model);
-    const cost = ((inTok + systemTokens * sysFactor) * p.in + outTok * p.out) / 1e6;
-    inputTokens += inTok + systemTokens;
-    outputTokens += outTok;
+  for (const model of Object.keys(totals).sort()) {
+    const t = totals[model];
+    if (!t.requests) continue;
+    const p = priceOf(model);
+    const sys = systemTokens * (CACHE_WRITE_1H_FACTOR + (t.requests - 1) * CACHE_READ_FACTOR);
+    const cost = ((t.inTok + sys) * p.in + t.outTok * p.out) / 1e6;
+    inputTokens += t.inTok + systemTokens * t.requests;
+    outputTokens += t.outTok;
     usd += cost;
-    const b = (byModel[c.model] ??= { requests: 0, usd: 0 });
-    b.requests++;
-    b.usd += cost;
+    byModel[model] = { requests: t.requests, usd: cost };
   }
   return { usd, inputTokens, outputTokens, byModel };
+}
+
+/** Estimate for a set of requests (see `estimateFromTotals`). */
+export function estimateJob(lang: string, chunks: ChunkCostInput[], systemTokens: number): Estimate {
+  const totals: CostTotals = {};
+  for (const c of chunks) {
+    const t = (totals[c.model] ??= { requests: 0, inTok: 0, outTok: 0 });
+    t.requests++;
+    t.inTok += estimateTokens(c.inputChars);
+    t.outTok += estimateOutputTokens(lang, c);
+  }
+  return estimateFromTotals(totals, systemTokens);
 }

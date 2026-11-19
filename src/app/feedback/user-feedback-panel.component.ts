@@ -1,3 +1,4 @@
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -59,7 +60,7 @@ type UserFeedbackTab = 'compose' | 'mine';
 @Component({
   selector: 'sc-user-feedback-panel',
   standalone: true,
-  imports: [ScDatePipe, TranslatePipe, RouterLink, FeedbackAttachmentsComponent, FeedbackComposerComponent],
+  imports: [ScActionDirective, ScDatePipe, TranslatePipe, RouterLink, FeedbackAttachmentsComponent, FeedbackComposerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="panel-root sc-dense">
@@ -250,18 +251,18 @@ type UserFeedbackTab = 'compose' | 'mine';
                           </span>
                           <button
                             type="button"
-                            class="sc-btn micro danger"
+                            scAction tier="secondary" tone="danger"
                             [disabled]="feedback.busy()"
                             (click)="confirmWithdraw(t.id)">
                             {{ 'userFeedback.withdraw.confirm' | translate }}
                           </button>
-                          <button type="button" class="sc-btn micro" (click)="cancelWithdraw()">
+                          <button type="button" scAction tier="secondary" (click)="cancelWithdraw()">
                             {{ 'userFeedback.withdraw.cancel' | translate }}
                           </button>
                         } @else {
                           <button
                             type="button"
-                            class="sc-btn micro danger"
+                            scAction tier="secondary" tone="danger"
                             [disabled]="feedback.busy()"
                             (click)="askWithdraw(t.id)">
                             {{ 'userFeedback.withdraw.action' | translate }}
@@ -421,9 +422,6 @@ type UserFeedbackTab = 'compose' | 'mine';
       line-height: 1.4;
     }
     .withdraw-ask { color: var(--sc-fg-1); }
-    .sc-btn.micro { padding: 4px 10px; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.04em; }
-    .sc-btn.micro.danger { color: var(--sc-danger); border-color: var(--sc-danger); }
-    .sc-btn.micro.danger:hover:not(:disabled) { background: var(--sc-danger); color: var(--sc-bg-0); }
     /* Scrollport for a marked-up runaway token (.sc-longword, styles.scss): a
        9.800-character run overflows THIS box and nothing else, so the card, the
        panel and the 375px page around it keep their width (admin feedback

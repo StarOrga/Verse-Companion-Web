@@ -10,6 +10,7 @@ import { SocialInviteBoxComponent } from './social-invite-box.component';
 import { SocialVisibilityDialogComponent } from './social-visibility-dialog.component';
 import { SocialService } from './social.service';
 import { VISIBILITY_FACETS } from './social.types';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 export const SOCIAL_NOTICE_KEY = 'sc.social.visibility-notice.dismissed';
 
@@ -22,6 +23,7 @@ export const SOCIAL_NOTICE_KEY = 'sc.social.visibility-notice.dismissed';
   selector: 'sc-social',
   standalone: true,
   imports: [
+    ScActionDirective,
     TranslatePipe,
     PageHeaderComponent,
     FriendsComponent,
@@ -38,7 +40,7 @@ export const SOCIAL_NOTICE_KEY = 'sc.social.visibility-notice.dismissed';
       <sc-page-header
         [title]="'social.page.title' | translate"
         [subtitle]="'social.page.subtitle' | translate">
-        <button phActions type="button" class="sc-btn" (click)="openVisibility()">
+        <button phActions type="button" scAction tier="secondary" (click)="openVisibility()">
           {{ 'social.page.visibilityButton' | translate }}
         </button>
       </sc-page-header>
@@ -47,10 +49,10 @@ export const SOCIAL_NOTICE_KEY = 'sc.social.visibility-notice.dismissed';
         <div class="notice" role="note">
           <p>{{ 'social.notice.text' | translate }}</p>
           <div class="notice-actions">
-            <button type="button" class="sc-btn sc-btn-primary" (click)="openVisibility()">
+            <button type="button" scAction tier="secondary" (click)="openVisibility()">
               {{ 'social.notice.open' | translate }}
             </button>
-            <button type="button" class="sc-btn" (click)="dismissNotice()">
+            <button type="button" scAction tier="secondary" (click)="dismissNotice()">
               {{ 'social.notice.dismiss' | translate }}
             </button>
           </div>
@@ -76,7 +78,6 @@ export const SOCIAL_NOTICE_KEY = 'sc.social.visibility-notice.dismissed';
     }
     .notice p { margin: 0 0 10px; color: var(--sc-fg-1); }
     .notice-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    @media (pointer: coarse) { .notice-actions .sc-btn { min-height: 48px; } }
   `],
 })
 export class SocialComponent implements OnInit {

@@ -1,5 +1,6 @@
-// The job state machine. Pure of Deno/network: everything external comes in through Deps
-// (Postgres rows, R2, the Anthropic batch API), so the transitions are unit-tested with fakes.
+// The job state machine: the driver. The steps live in _job_estimate.ts, _job_run.ts and
+// _job_publish.ts; types and helpers in _job.ts. Pure of Deno/network: everything external comes in
+// through Deps, so the transitions are unit-tested with fakes.
 //
 // estimating -> queued | awaiting_approval | publishing | skipped
 // queued -> submitted -> validating -> (post_editing) -> publishing -> published
@@ -7,714 +8,101 @@
 //
 // Every transition is a compare-and-set on (id, status, updated_at); a second tick racing the
 // first loses the CAS and does nothing. Work in progress lives in R2 (`translation-work/<job>/`)
-// and in `stats.phase`, so a crash at any point resumes where it stopped.
+// and in `stats` (phase, position), so a crash at any point resumes where it stopped.
+//
+// A step is either a WAIT (is the batch done? - cheap, every waiting job is asked on the 10-minute
+// tick) or a SLICE of work (read one batch, write one hash digit of the TM). Slices are sized to an
+// edge request and run one at a time behind a lock; see `tickAll`.
 
-import { buildChunks, toChunkItem } from './_chunk.ts';
-import type { Chunk, ChunkItem } from './_chunk.ts';
-import { estimateJob, estimateTokens, usageCostUsd } from './_cost.ts';
-import type { Estimate, Usage } from './_cost.ts';
-import { diffStrings, sha256Hex } from './_diff.ts';
-import type { DiffCounts, TmEntry } from './_diff.ts';
-import { deriveAiTerms, deriveCigLabels, extractJudgeTerms, mergeGlossary, newRows } from './_glossary.ts';
-import { loadNotes } from './_cards.ts';
-import { addJudgeCandidates, resumeLearning, runLearning } from './_learn.ts';
-import type { LearnDb } from './_learn_db.ts';
-import { loadTm, makeOverlay, overlayKey, readLocaleTable, saveTm, workKey } from './_io.ts';
-import type { OverlayMeta } from './_io.ts';
-import { detectOverrideAlerts } from './_alerts.ts';
-import type { AdminTerm, AlertRow } from './_alerts.ts';
-import type { Store } from './_io.ts';
-import { mask, unmask } from './_mask.ts';
-import {
-  buildFewShotIndex,
-  buildSystem,
-  judgeParams,
-  pickSimilar,
-  postEditMessage,
-  requestParams,
-  userMessage,
-} from './_prompt.ts';
-import type { BatchParams, CigPair, GlossaryRow } from './_prompt.ts';
-import { qaCheck } from './_qa.ts';
-import { isCigValid } from './_diff.ts';
+import { runVerdict, WORKER_LIMIT_KEY } from './_attempts.ts';
+import { TranslateError } from './_errors.ts';
+import { sweepPrefix } from './_io.ts';
+import { addStats, groupsOf, jobPrefix, LostRace, MAX_ATTEMPTS, monthOf, OPEN_STATUSES, round4, TERMINAL_STATUSES } from './_job.ts';
+import type { Deps, Job, Status } from './_job.ts';
+import { estimateSlice } from './_job_estimate.ts';
+import { stepPublishing } from './_job_publish.ts';
+import { intentVerdict, stepPostEditing, stepQueued, stepSubmitted, stepValidating } from './_job_run.ts';
+import { resumeLearning } from './_learn.ts';
+import { advancePass } from './_pass.ts';
+import type { PassOutcome } from './_pass.ts';
 
-export class TranslateError extends Error {
-  key: string;
-  constructor(key: string) {
-    super(key);
-    this.key = key;
-  }
-}
+export { TranslateError };
+export { JUDGE_MODEL, JUDGE_THRESHOLD, MAX_ATTEMPTS, OPEN_STATUSES, STALE_SUBMIT_MS } from './_job.ts';
+export type { BatchRef, BatchResult, Db, Deps, EstState, Job, JobPatch, Llm, Settings, Stats, Status } from './_job.ts';
 
-export type Status =
-  | 'estimating' | 'awaiting_approval' | 'queued' | 'submitted' | 'validating' | 'post_editing'
-  | 'publishing' | 'published' | 'failed' | 'cancelled' | 'skipped';
-
-export const OPEN_STATUSES: Status[] = ['estimating', 'queued', 'submitted', 'validating', 'post_editing', 'publishing'];
-
-export interface BatchRef {
-  id: string;
-  kind: 'main' | 'judge' | 'postedit';
-}
-
-export interface Stats {
-  phase?: string;
-  hold?: string;
-  attempts?: number;
-  counts?: DiffCounts;
-  estimate?: Estimate;
-  qa?: { ok: number; failed: number; reasons: Record<string, number>; dropped?: number };
-  judge?: { n: number; mean: number } | null;
-  ledgered?: string[];
-  [k: string]: unknown;
-}
-
-export interface Job {
-  id: string;
-  build_id: string;
-  lang: string;
-  mode: 'delta' | 'full';
-  base_build_id: string | null;
-  status: Status;
-  string_count: number | null;
-  estimate_usd: number | null;
-  spent_usd: number;
-  batch_ids: BatchRef[];
-  stats: Stats | null;
-  error: string | null;
-  created_at: string;
-  updated_at: string;
-  approved_by: string | null;
-}
-
-export type JobPatch = Partial<Pick<Job, 'status' | 'string_count' | 'estimate_usd' | 'spent_usd' | 'batch_ids' | 'stats' | 'error' | 'approved_by'>>;
-
-export interface Settings {
-  enabled: boolean;
-  upload_cap_usd: number;
-  monthly_cap_usd: number;
-  lore_model: string | null;
-  rest_model: string | null;
-}
-
-export interface Db {
-  listOpenJobs(): Promise<Job[]>;
-  getJob(id: string): Promise<Job | null>;
-  /** Compare-and-set on id + status + updated_at; stamps updated_at; null when someone else won. */
-  cas(job: Job, patch: JobPatch): Promise<Job | null>;
-  insertJob(j: { build_id: string; lang: string; mode: 'delta' | 'full'; base_build_id: string | null; stats?: Stats }): Promise<Job>;
-  getSettings(): Promise<Settings>;
-  getLanguage(lang: string): Promise<{ lang: string; cig_folder: string | null; approved: boolean } | null>;
-  listGlossary(lang: string): Promise<GlossaryRow[]>;
-  insertGlossary(lang: string, rows: GlossaryRow[]): Promise<void>;
-  resetRetranslate(ids: string[]): Promise<void>;
-  /** Sum of estimate_usd of the other jobs of this build that are not failed/cancelled/skipped. */
-  buildEstimateSum(buildId: string, excludeJobId: string): Promise<number>;
-  /** Ledger sum of the month plus the unspent part of in-flight jobs (excluding `excludeJobId`). */
-  monthCommitted(month: string, excludeJobId: string): Promise<number>;
-  addLedger(jobId: string, month: string, usd: number): Promise<void>;
-  hasNewerPublished(job: Job): Promise<boolean>;
-}
-
-export interface BatchResult {
-  custom_id: string;
-  type: 'succeeded' | 'errored' | 'canceled' | 'expired';
-  text?: string;
-  stop_reason?: string | null;
-  usage?: Usage;
-  model?: string;
-}
-
-export interface Llm {
-  createBatch(requests: { custom_id: string; params: BatchParams }[]): Promise<{ id: string }>;
-  isEnded(id: string): Promise<boolean>;
-  results(id: string): AsyncIterable<BatchResult>;
-  cancel(id: string): Promise<void>;
-}
-
-export interface Deps {
-  db: Db;
-  store: Store;
-  /** null = secret TRANSLATE_ANTHROPIC_API_KEY absent. */
-  llm: Llm | null;
-  now(): Date;
-  log(msg: string, data?: Record<string, unknown>): void;
-  /** Learning step adapter (`makeLearnDb`); absent = no learning, no cards (tests, older wiring). */
-  learn?: LearnDb;
-  /** Overlay sources / attribution / game folder for a published overlay (index.ts wires it); absent = bare overlay. */
-  overlayMeta?: (lang: string, entries: Record<string, { h: string; t: string }>, tm: Record<string, TmEntry>) => Promise<OverlayMeta>;
-  /** Writes override alerts (B4, service-role client in index.ts); absent = no alerts. */
-  alerts?: (lang: string, buildId: string, rows: AlertRow[]) => Promise<void>;
-}
-
-export const BATCH_MAX_REQUESTS = 400;
-export const STALE_SUBMIT_MS = 15 * 60_000;
-export const JUDGE_MODEL = 'claude-opus-5-5';
-export const JUDGE_THRESHOLD = 6;
-export const MAX_ATTEMPTS = 5;
-const JUDGE_CAP = 150;
-
-// ── plan ─────────────────────────────────────────────────────────────────────
-
-export interface Plan {
-  v: 1;
-  build_id: string;
-  lang: string;
-  mode: 'delta' | 'full';
-  system: string;
-  chunks: Chunk[];
-  fewShot: Record<string, CigPair[]>;
-  keysByHash: Record<string, string[]>;
-  reused: Record<string, { h: string; t: string }>;
-  forceIds: string[];
-  counts: DiffCounts;
-  newGlossary: GlossaryRow[];
-  /** Admin card notes for keys of this plan (key → hint). */
-  keyNotes?: Record<string, string>;
-}
-
-export interface PlanResult {
-  plan: Plan;
-  estimate: Estimate;
-  stringCount: number;
-  /** Tables already read for the plan, reused by the B4 alert check (not persisted). */
-  inputs?: {
-    en: Record<string, string>;
-    baseEn: Record<string, string> | null;
-    cig: Record<string, string>;
-    cigFolder: string;
-    tm: Record<string, TmEntry>;
-    glossary: AdminTerm[];
-  };
-}
-
-export async function computePlan(
-  deps: Deps,
-  job: Pick<Job, 'build_id' | 'lang' | 'mode' | 'base_build_id'>,
-  settings: Settings,
-): Promise<PlanResult> {
-  const { db, store } = deps;
-  const language = await db.getLanguage(job.lang);
-  if (!language) throw new TranslateError('translate.lang_unknown');
-  const en = await readLocaleTable(store, job.build_id, 'en');
-  if (!Object.keys(en).length) throw new TranslateError('translate.english_missing');
-
-  let baseEn: Record<string, string> | null = null;
-  if (job.mode === 'delta') {
-    if (!job.base_build_id) throw new TranslateError('translate.no_base_build');
-    baseEn = await readLocaleTable(store, job.base_build_id, 'en');
-    if (!Object.keys(baseEn).length) throw new TranslateError('translate.base_build_missing');
-  }
-  const cig = await readLocaleTable(store, job.build_id, language.cig_folder || job.lang);
-  const tm = await loadTm(store, job.lang);
-  const dbGlossary = await db.listGlossary(job.lang);
-  const forced = dbGlossary.filter((g) => g.needs_retranslate);
-  const diff = await diffStrings({
-    en, cig, tm, mode: job.mode, baseEn, forceTerms: forced.map((g) => g.source_term),
-  });
-
-  const derived = deriveCigLabels(en, cig);
-  const glossary = mergeGlossary(dbGlossary, derived);
-  const notes = await loadNotes(store, job.lang);
-  const style = deps.learn ? await deps.learn.getStyle(job.lang).catch(() => null) : null;
-  const system = buildSystem(job.lang, glossary, { style, notes });
-
-  const keysByHash: Record<string, string[]> = {};
-  const items: ChunkItem[] = diff.todo.map((u) => {
-    keysByHash[u.h] = u.keys;
-    return toChunkItem(u);
-  });
-  const chunks = buildChunks(items, (it) => keysByHash[it.h], {
-    lang: job.lang,
-    loreModel: settings.lore_model || undefined,
-    restModel: settings.rest_model || undefined,
-  });
-
-  // C4: references from the whole TM (admin > cig > community > ai), not only CIG pairs.
-  const pairs: CigPair[] = [];
-  const hashOf = new Map<string, string>();
-  for (const k of Object.keys(en)) {
-    const e = en[k];
-    if (!e || e.length > 300) continue;
-    if (isCigValid(e, cig[k])) {
-      pairs.push({ key: k, en: e, t: cig[k], o: 'cig' });
-      continue;
-    }
-    if (!Object.keys(tm).length) continue;
-    let h = hashOf.get(e);
-    if (!h) hashOf.set(e, (h = await sha256Hex(e)));
-    const hit = tm[h];
-    if (hit && hit.o !== 'cig') pairs.push({ key: k, en: e, t: hit.t, o: hit.o });
-  }
-  const index = buildFewShotIndex(pairs);
-  const keyNotes: Record<string, string> = {};
-  for (const ks of Object.values(keysByHash)) for (const k of ks) if (notes.byKey[k]) keyNotes[k] = notes.byKey[k];
-  const fewShot: Record<string, CigPair[]> = {};
-  for (const c of chunks) fewShot[c.id] = pickSimilar(index, c.items, 8);
-
-  const estimate = estimateJob(
-    job.lang,
-    chunks.map((c) => ({ model: c.model, inputChars: c.inputChars, enChars: c.enChars, strings: c.items.length })),
-    estimateTokens(system.length),
-  );
-  // The few-shot pairs ride in the (uncached) user message.
-  estimate.usd += (chunks.reduce((a, c) => a + (fewShot[c.id]?.length ?? 0), 0) * 60 * 0.9 * 3) / 1e6;
-
-  const plan: Plan = {
-    v: 1, build_id: job.build_id, lang: job.lang, mode: job.mode, system, chunks, fewShot, keysByHash,
-    reused: diff.reused, forceIds: forced.map((g) => g.id!).filter(Boolean), counts: diff.counts,
-    newGlossary: newRows(dbGlossary, derived), keyNotes,
-  };
-  return {
-    plan, estimate, stringCount: diff.todo.reduce((a, u) => a + u.keys.length, 0),
-    inputs: { en, baseEn, cig, cigFolder: language.cig_folder || job.lang, tm, glossary: dbGlossary },
-  };
-}
-
-/** Dry run for the admin `estimate` op: no writes. */
-export async function dryRun(deps: Deps, build_id: string, lang: string, mode: 'delta' | 'full', base_build_id: string | null) {
-  const settings = await deps.db.getSettings();
-  const { plan, estimate, stringCount } = await computePlan(deps, { build_id, lang, mode, base_build_id }, settings);
-  return {
-    mode, string_count: stringCount, unique_texts: Object.keys(plan.keysByHash).length, requests: plan.chunks.length,
-    counts: plan.counts, estimate_usd: round4(estimate.usd), by_model: estimate.byModel,
-    needs_approval: mode === 'full' || estimate.usd > settings.upload_cap_usd,
-  };
-}
-
-// ── helpers ──────────────────────────────────────────────────────────────────
-
-const round4 = (n: number) => Math.round(n * 1e6) / 1e6; // micro-dollars; the name is historical
-export const monthOf = (d: Date) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-01`;
-
-interface Res {
-  /** Restored text. */
-  t: string;
-  /** Raw masked model output. */
-  raw: string;
-  ok: boolean;
-  reasons: string[];
-  m: string;
-}
-type ResMap = Record<string, Res>;
-
-function addStats(job: Job, patch: Partial<Stats>): Stats {
-  return { ...(job.stats ?? {}), ...patch };
-}
-
-async function must(job: Job | null): Promise<Job> {
-  if (!job) throw new LostRace();
-  return job;
-}
-class LostRace extends Error {}
-
-async function ledger(deps: Deps, job: Job, kind: string, usd: number): Promise<Job> {
-  const done = job.stats?.ledgered ?? [];
-  if (done.includes(kind) || usd <= 0) return job;
-  await deps.db.addLedger(job.id, monthOf(deps.now()), round4(usd));
-  return job;
-}
-
-async function readPlan(deps: Deps, job: Job): Promise<Plan> {
-  const p = await deps.store.getJson(workKey(job.id, 'plan')) as Plan | null;
-  if (!p) throw new TranslateError('translate.plan_missing');
-  return p;
-}
-
-function requireLlm(deps: Deps): Llm {
-  if (!deps.llm) throw new TranslateError('translate.no_api_key');
-  return deps.llm;
-}
-
-/** Creates the batches that do not exist yet (resumable: refs are saved after each one). */
-async function submitGroups(
-  deps: Deps, job: Job, kind: BatchRef['kind'], reqs: { custom_id: string; params: BatchParams }[],
-): Promise<Job> {
-  const llm = requireLlm(deps);
-  const groups: typeof reqs[] = [];
-  for (let i = 0; i < reqs.length; i += BATCH_MAX_REQUESTS) groups.push(reqs.slice(i, i + BATCH_MAX_REQUESTS));
-  let cur = job;
-  const have = cur.batch_ids.filter((b) => b.kind === kind).length;
-  for (let g = have; g < groups.length; g++) {
-    const { id } = await llm.createBatch(groups[g]);
-    cur = await must(await deps.db.cas(cur, { batch_ids: [...cur.batch_ids, { id, kind }] }));
-  }
-  return await must(await deps.db.cas(cur, { stats: addStats(cur, { phase: 'running' }) }));
-}
-
-async function allEnded(deps: Deps, job: Job, kind: BatchRef['kind']): Promise<boolean> {
-  const llm = requireLlm(deps);
-  for (const b of job.batch_ids.filter((x) => x.kind === kind)) if (!(await llm.isEnded(b.id))) return false;
-  return true;
-}
-
-function parseT(text: string | undefined): string[] | null {
-  try {
-    const o = JSON.parse(text ?? '');
-    return Array.isArray(o?.t) && o.t.every((x: unknown) => typeof x === 'string') ? o.t : null;
-  } catch {
-    return null;
-  }
-}
-
-/** Streams the results of all batches of `kind`, QA-checks them, returns results and real spend. */
-async function collect(
-  deps: Deps, job: Job, kind: BatchRef['kind'], chunks: Chunk[], glossary: GlossaryRow[], prior: ResMap,
-): Promise<{ res: ResMap; usd: number }> {
-  const llm = requireLlm(deps);
-  const byId = new Map(chunks.map((c) => [c.id, c]));
-  const res: ResMap = { ...prior };
-  let usd = 0;
-  const failAll = (c: Chunk, reason: string, model: string) => {
-    for (const it of c.items) {
-      if (!res[it.h] || !res[it.h].ok) res[it.h] = { t: '', raw: '', ok: false, reasons: [reason], m: model };
-    }
-  };
-  const seen = new Set<string>();
-  for (const b of job.batch_ids.filter((x) => x.kind === kind)) {
-    for await (const r of llm.results(b.id)) {
-      const c = byId.get(r.custom_id);
-      if (!c) continue;
-      seen.add(c.id);
-      const model = r.model ?? c.model;
-      if (r.usage) usd += usageCostUsd(model, r.usage);
-      if (r.type !== 'succeeded') {
-        failAll(c, `request:${r.type}`, model);
-        continue;
-      }
-      if (r.stop_reason === 'max_tokens' || r.stop_reason === 'refusal') {
-        failAll(c, `request:${r.stop_reason}`, model);
-        continue;
-      }
-      const t = parseT(r.text);
-      if (!t || t.length !== c.items.length) {
-        failAll(c, 'length_mismatch', model);
-        continue;
-      }
-      c.items.forEach((it, i) => {
-        const original = unmask(it.m, it.toks);
-        const q = qaCheck(original, t[i], it.toks, glossary);
-        res[it.h] = { t: q.text, raw: t[i], ok: q.ok, reasons: q.reasons, m: model };
-      });
-    }
-  }
-  for (const c of chunks) if (!seen.has(c.id)) failAll(c, 'request:missing', c.model);
-  return { res, usd };
-}
-
-function qaStats(res: ResMap, dropped = 0): NonNullable<Stats['qa']> {
-  const reasons: Record<string, number> = {};
-  let ok = 0;
-  let failed = 0;
-  for (const r of Object.values(res)) {
-    if (r.ok) ok++;
-    else {
-      failed++;
-      for (const x of r.reasons) reasons[x.split(':')[0]] = (reasons[x.split(':')[0]] ?? 0) + 1;
-    }
-  }
-  return { ok, failed, reasons, dropped };
-}
-
-function glossaryFor(plan: Plan, db: GlossaryRow[]): GlossaryRow[] {
-  return mergeGlossary(db, plan.newGlossary);
-}
-
-// ── steps ────────────────────────────────────────────────────────────────────
+/** Work files of an ended job deleted per slice. */
+const SWEEP_KEYS = 150;
 
 /**
- * B4: a delta whose English or CIG value changed under an admin correction raises an admin alert
- * with the diff. Never fails the job — an alert is advice, the translation goes on.
+ * Is the next step of this job a slice of work (true) or a wait (false)? Told from status and phase
+ * alone, so nothing has to be kept in step with it - `translation_work_pending()` in SQL reads the same.
  */
-async function checkOverrideAlerts(deps: Deps, job: Job, r: PlanResult): Promise<void> {
-  if (!deps.alerts || job.mode !== 'delta' || !job.base_build_id || !r.inputs?.baseEn) return;
-  try {
-    const { en, baseEn, cig, cigFolder, tm, glossary } = r.inputs;
-    const baseCig = await readLocaleTable(deps.store, job.base_build_id, cigFolder);
-    const rows = await detectOverrideAlerts({ baseEn, en, baseCig, cig, tm, adminGlossary: glossary });
-    if (rows.length) await deps.alerts(job.lang, job.build_id, rows);
-  } catch (e) {
-    deps.log('translate override alerts failed', { lang: job.lang, error: String((e as Error)?.message ?? e) });
+export function isHeavy(job: Pick<Job, 'status' | 'stats'>): boolean {
+  const phase = job.stats?.phase;
+  switch (job.status) {
+    case 'estimating':
+    case 'publishing':
+      return true;
+    case 'submitted':
+      return phase === 'submitting' || phase === 'probe_read';
+    case 'validating':
+      return (phase ?? 'results') !== 'judge';
+    case 'post_editing':
+      return (phase ?? 'submitting') !== 'running';
+    default:
+      return false;
   }
 }
 
-async function stepEstimating(deps: Deps, job: Job): Promise<void> {
-  const { db, store } = deps;
-  const settings = await db.getSettings();
-  let r: PlanResult;
-  try {
-    r = await computePlan(deps, job, settings);
-  } catch (e) {
-    if (e instanceof TranslateError && (e.key === 'translate.no_base_build' || e.key === 'translate.base_build_missing')) {
-      await db.cas(job, { status: 'skipped', error: e.key });
-      return;
-    }
-    throw e;
-  }
-  const { plan, estimate, stringCount } = r;
-  await checkOverrideAlerts(deps, job, r);
-  const stats = addStats(job, { counts: plan.counts, estimate, phase: undefined, hold: undefined });
-  const base = { string_count: stringCount, estimate_usd: round4(estimate.usd) };
-
-  if (!plan.chunks.length) {
-    if (Object.keys(plan.reused).length) {
-      await store.putJson(workKey(job.id, 'plan'), plan);
-      await db.cas(job, { ...base, status: 'publishing', stats });
-    } else {
-      await db.cas(job, { ...base, status: 'skipped', error: 'translate.nothing_to_do', stats });
-    }
-    return;
-  }
-  await store.putJson(workKey(job.id, 'plan'), plan);
-  if (plan.newGlossary.length) await db.insertGlossary(job.lang, plan.newGlossary);
-
-  let hold: string | undefined;
-  if (job.mode === 'full') hold = 'full';
-  else {
-    const others = await db.buildEstimateSum(job.build_id, job.id);
-    if (others + estimate.usd > settings.upload_cap_usd) hold = 'upload_cap';
-    else {
-      const committed = await db.monthCommitted(monthOf(deps.now()), job.id);
-      if (committed + estimate.usd > settings.monthly_cap_usd) hold = 'monthly_cap';
-    }
-  }
-  await db.cas(job, { ...base, status: hold ? 'awaiting_approval' : 'queued', stats: addStats({ ...job, stats }, { hold }) });
-}
-
-async function stepQueued(deps: Deps, job: Job): Promise<void> {
-  const settings = await deps.db.getSettings();
-  if (!settings.enabled) return;
-  requireLlm(deps);
-  if (!job.approved_by && job.mode !== 'full') {
-    const committed = await deps.db.monthCommitted(monthOf(deps.now()), job.id);
-    if (committed + (job.estimate_usd ?? 0) > settings.monthly_cap_usd) {
-      await deps.db.cas(job, { status: 'awaiting_approval', stats: addStats(job, { hold: 'monthly_cap' }) });
-      return;
-    }
-  }
-  const claimed = await deps.db.cas(job, { status: 'submitted', stats: addStats(job, { phase: 'submitting' }) });
-  if (!claimed) return;
-  await submitMain(deps, claimed);
-}
-
-async function submitMain(deps: Deps, job: Job): Promise<void> {
-  const plan = await readPlan(deps, job);
-  const reqs = plan.chunks.map((c) => ({
-    custom_id: c.id,
-    params: requestParams(c.model, c.maxTokens, plan.system, userMessage(c, plan.fewShot[c.id], plan.keyNotes ?? {})),
-  }));
-  await submitGroups(deps, job, 'main', reqs);
-}
-
-async function stepSubmitted(deps: Deps, job: Job): Promise<void> {
-  if (job.stats?.phase === 'submitting') {
-    if (deps.now().getTime() - Date.parse(job.updated_at) > STALE_SUBMIT_MS) await submitMain(deps, job);
-    return;
-  }
-  if (!(await allEnded(deps, job, 'main'))) return;
-  await deps.db.cas(job, { status: 'validating', stats: addStats(job, { phase: 'results' }) });
-}
-
-function judgeSample(res: ResMap): string[] {
-  const okH = Object.keys(res).filter((h) => res[h].ok).sort();
-  if (!okH.length) return [];
-  const n = Math.min(JUDGE_CAP, Math.max(Math.min(5, okH.length), Math.ceil(okH.length * 0.05)));
-  return okH.slice(0, n);
-}
-
-function itemOf(plan: Plan, h: string): ChunkItem | undefined {
-  for (const c of plan.chunks) for (const it of c.items) if (it.h === h) return it;
-  return undefined;
-}
-
-async function stepValidating(deps: Deps, job: Job): Promise<void> {
-  const { db, store } = deps;
-  const plan = await readPlan(deps, job);
-  const dbGlossary = await db.listGlossary(job.lang);
-  const phase = job.stats?.phase ?? 'results';
-
-  if (phase === 'results') {
-    const { res, usd } = await collect(deps, job, 'main', plan.chunks, glossaryFor(plan, dbGlossary), {});
-    await store.putJson(workKey(job.id, 'main-results'), res);
-    await ledger(deps, job, 'main', usd);
-    const sample = judgeSample(res);
-    const next = addStats(job, {
-      qa: qaStats(res), ledgered: [...(job.stats?.ledgered ?? []), 'main'], phase: sample.length ? 'judge_submitting' : 'judged',
-    });
-    const cur = await db.cas(job, { spent_usd: round4(job.spent_usd + usd), stats: next });
-    if (!cur) return;
-    if (sample.length) await submitJudge(deps, cur, plan, res, sample);
-    else await afterJudge(deps, cur, plan, res);
-    return;
-  }
-
-  const res = (await store.getJson(workKey(job.id, 'main-results'))) as ResMap | null;
-  if (!res) throw new TranslateError('translate.results_missing');
-  if (phase === 'judge_submitting') {
-    if (deps.now().getTime() - Date.parse(job.updated_at) > STALE_SUBMIT_MS) await submitJudge(deps, job, plan, res, judgeSample(res));
-    return;
-  }
-  if (phase === 'judge') {
-    if (!(await allEnded(deps, job, 'judge'))) return;
-    const sample = judgeSample(res);
-    const scored = await readJudge(deps, job, plan, res, sample);
-    await store.putJson(workKey(job.id, 'main-results'), scored.res);
-    await ledger(deps, job, 'judge', scored.usd);
-    const cur = await db.cas(job, {
-      spent_usd: round4(job.spent_usd + scored.usd),
-      stats: addStats(job, {
-        judge: scored.judge, qa: qaStats(scored.res), ledgered: [...(job.stats?.ledgered ?? []), 'judge'], phase: 'judged',
-      }),
-    });
-    if (cur) await afterJudge(deps, cur, plan, scored.res);
-    return;
-  }
-  if (phase === 'judged') await afterJudge(deps, job, plan, res);
-}
-
-async function submitJudge(deps: Deps, job: Job, plan: Plan, res: ResMap, sample: string[]): Promise<void> {
-  const samples = sample.map((h) => {
-    const it = itemOf(plan, h)!;
-    return { key: it.key, en: unmask(it.m, it.toks), t: res[h].t };
-  });
-  const reqs = [{ custom_id: 'j0', params: judgeParams(job.lang, JUDGE_MODEL, samples) }];
-  const claimed = job.stats?.phase === 'judge_submitting' ? job : await must(await deps.db.cas(job, { stats: addStats(job, { phase: 'judge_submitting' }) }));
-  const out = await submitGroups(deps, claimed, 'judge', reqs);
-  await deps.db.cas(out, { stats: addStats(out, { phase: 'judge' }) });
-}
-
-async function readJudge(deps: Deps, job: Job, plan: Plan, res: ResMap, sample: string[]) {
-  const llm = requireLlm(deps);
-  let usd = 0;
-  let scores: number[] | null = null;
-  let terms: ReturnType<typeof extractJudgeTerms> = [];
-  for (const b of job.batch_ids.filter((x) => x.kind === 'judge')) {
-    for await (const r of llm.results(b.id)) {
-      if (r.usage) usd += usageCostUsd(r.model ?? JUDGE_MODEL, r.usage);
-      if (r.type !== 'succeeded') continue;
-      try {
-        const o = JSON.parse(r.text ?? '');
-        if (Array.isArray(o?.r) && o.r.length === sample.length) {
-          scores = o.r.map((x: { score: number }) => Number(x.score));
-          // C5: term corrections become glossary candidates (the learning step votes on them).
-          const ens = sample.map((h) => { const it = itemOf(plan, h); return it ? unmask(it.m, it.toks) : ''; });
-          terms = extractJudgeTerms(o.r, ens);
-        }
-      } catch { /* judge output unusable: no scores */ }
-    }
-  }
-  if (terms.length) await addJudgeCandidates(deps.store, job.lang, terms).catch(() => {});
-  const out: ResMap = { ...res };
-  if (!scores) return { res: out, usd, judge: null };
-  scores.forEach((s, i) => {
-    if (Number.isFinite(s) && s < JUDGE_THRESHOLD) out[sample[i]] = { ...out[sample[i]], ok: false, reasons: [...out[sample[i]].reasons, `judge:${s}`] };
-  });
-  const valid = scores.filter((s) => Number.isFinite(s));
-  return { res: out, usd, judge: { n: valid.length, mean: round4(valid.reduce((a, b) => a + b, 0) / Math.max(1, valid.length)) } };
-}
-
-async function afterJudge(deps: Deps, job: Job, plan: Plan, res: ResMap): Promise<void> {
-  const failing = Object.keys(res).filter((h) => !res[h].ok);
-  if (!failing.length) {
-    await deps.db.cas(job, { status: 'publishing', stats: addStats(job, { phase: undefined }) });
-    return;
-  }
-  const items: ChunkItem[] = [];
-  for (const h of failing) {
-    const it = itemOf(plan, h);
-    if (it) items.push({ ...it, prev: res[h].raw || mask(res[h].t).m, reason: res[h].reasons });
-  }
-  const chunks = buildChunks(items, (it) => plan.keysByHash[it.h], { lang: job.lang, maxItems: 50, idPrefix: 'p' });
-  await deps.store.putJson(workKey(job.id, 'postedit-plan'), { chunks });
-  const claimed = await deps.db.cas(job, { status: 'post_editing', stats: addStats(job, { phase: 'submitting' }) });
-  if (!claimed) return;
-  await submitPostEdit(deps, claimed, plan, chunks);
-}
-
-async function submitPostEdit(deps: Deps, job: Job, plan: Plan, chunks: Chunk[]): Promise<void> {
-  const reqs = chunks.map((c) => ({
-    custom_id: c.id,
-    params: requestParams(c.model, c.maxTokens, plan.system, postEditMessage(c)),
-  }));
-  await submitGroups(deps, job, 'postedit', reqs);
-}
-
-async function stepPostEditing(deps: Deps, job: Job): Promise<void> {
-  const { db, store } = deps;
-  const plan = await readPlan(deps, job);
-  const pe = (await store.getJson(workKey(job.id, 'postedit-plan'))) as { chunks: Chunk[] } | null;
-  if (!pe) throw new TranslateError('translate.plan_missing');
-  if (job.stats?.phase === 'submitting') {
-    if (deps.now().getTime() - Date.parse(job.updated_at) > STALE_SUBMIT_MS) await submitPostEdit(deps, job, plan, pe.chunks);
-    return;
-  }
-  if (!(await allEnded(deps, job, 'postedit'))) return;
-  const prior = (await store.getJson(workKey(job.id, 'main-results'))) as ResMap;
-  const dbGlossary = await db.listGlossary(job.lang);
-  const { res: edited, usd } = await collect(deps, job, 'postedit', pe.chunks, glossaryFor(plan, dbGlossary), {});
-  const merged: ResMap = { ...prior };
-  for (const [h, r] of Object.entries(edited)) merged[h] = r;
-  await store.putJson(workKey(job.id, 'main-results'), merged);
-  await ledger(deps, job, 'postedit', usd);
-  const dropped = Object.values(merged).filter((r) => !r.ok).length;
-  await db.cas(job, {
-    status: 'publishing',
-    spent_usd: round4(job.spent_usd + usd),
-    stats: addStats(job, { qa: qaStats(merged, dropped), ledgered: [...(job.stats?.ledgered ?? []), 'postedit'], phase: undefined }),
-  });
-}
-
-async function stepPublishing(deps: Deps, job: Job): Promise<void> {
-  const { db, store } = deps;
-  const plan = await readPlan(deps, job);
-  const res = ((await store.getJson(workKey(job.id, 'main-results'))) ?? {}) as ResMap;
-  const at = deps.now().toISOString();
-  const entries: Record<string, { h: string; t: string }> = { ...plan.reused };
-  const tmUpdates: Record<string, TmEntry> = {};
-  const pairs: { en: string; t: string }[] = [];
-  for (const [h, r] of Object.entries(res)) {
-    if (!r.ok) continue;
-    tmUpdates[h] = { t: r.t, o: 'ai', m: r.m, at };
-    for (const k of plan.keysByHash[h] ?? []) entries[k] = { h, t: r.t };
-    const it = itemOf(plan, h);
-    if (it) pairs.push({ en: unmask(it.m, it.toks), t: r.t });
-  }
-  await saveTm(store, job.lang, tmUpdates);
-  // A6: sources + uniform attribution + game folder; the TM is re-read so this job's entries count.
-  let meta: OverlayMeta = {};
-  if (deps.overlayMeta) {
+/**
+ * A job that ends early may leave batches that ran and were never read. Their spend is not known, so
+ * their share of the estimate goes into the ledger: a month may be over-counted, never under-counted.
+ * `job` is the job as it stood before it ended.
+ *
+ * A batch of first attempts and the judge batch are booked under the ref their read would have used
+ * (`main:<g>`, `judge`). A slice that read one and was killed between its ledger row and its
+ * compare-and-set has booked the real bill already, and the job row does not know: the ledger takes a
+ * ref once per job, so that batch is not booked a second time here.
+ */
+async function bookUnread(deps: Deps, job: Job): Promise<void> {
+  const main = job.batch_ids.filter((b) => b.kind === 'main').length;
+  const groups = groupsOf(job.stats?.plan?.parts ?? 0) || main;
+  if (!main || !groups) return;
+  // The first group of a job of several groups is booked when it is probed, before any group is read.
+  const probed = job.stats?.probe ? 1 : 0;
+  const read = job.status === 'submitted' || job.status === 'awaiting_approval' || job.status === 'queued'
+    ? Math.min(main, probed)
+    : job.status === 'validating' && (job.stats?.phase ?? 'results') === 'results' ? Math.min(main, Math.max(probed, job.stats?.pos ?? 0)) : main;
+  // Second attempts that were sent and not read yet: their estimate was added up as they went out
+  // (`peSent`); once they are being read, the share of the batches that are still to come.
+  const pe = job.stats?.pe?.length ?? 0;
+  const left = (job.stats?.phase ?? 'submitting') === 'results' ? (pe ? Math.max(0, pe - (job.stats?.pos ?? 0)) / pe : 0) : 1;
+  const edits = job.status === 'post_editing' ? (job.stats?.peSent ?? 0) * left : 0;
+  // The judge batch, sent and not read.
+  const vPhase = job.stats?.phase;
+  const judge = job.status === 'validating' && (vPhase === 'judge' || vPhase === 'judge_read') ? job.stats?.judgeSent ?? 0 : 0;
+  const run = job.stats?.run;
+  const month = monthOf(deps.now());
+  const book = async (ref: string, sum: number) => {
+    const usd = round4(sum);
+    if (usd <= 0) return;
     try {
-      meta = await deps.overlayMeta(job.lang, entries, await loadTm(store, job.lang));
+      await deps.db.addLedger(job.id, month, usd, run ? `${ref}#${run}` : ref);
     } catch (e) {
-      deps.log('translate overlay meta failed', { lang: job.lang, error: String((e as Error)?.message ?? e) });
+      deps.log('translate unread spend not booked', { job: job.id, ref, usd, error: String((e as Error)?.message ?? e) });
     }
-  }
-  const overlay = makeOverlay(job.lang, job.build_id, entries, at, meta);
-  await store.putJson(overlayKey(job.lang, job.build_id), overlay);
-  if (!(await db.hasNewerPublished(job))) await store.putJson(overlayKey(job.lang, 'latest'), overlay);
-
-  const have = await db.listGlossary(job.lang);
-  const ai = newRows(have, deriveAiTerms(pairs));
-  if (ai.length) await db.insertGlossary(job.lang, ai);
-  if (plan.forceIds.length) await db.resetRetranslate(plan.forceIds);
-
-  const cur = await db.cas(job, { status: 'published', stats: addStats(job, { phase: undefined, published_at: at, overlay_count: overlay.count }) });
-  if (cur) {
-    for (const n of ['plan', 'main-results', 'postedit-plan']) await store.deleteKey(workKey(job.id, n)).catch(() => {});
-    // C0: learn from what was just published. Never fails the (already published) job.
-    if (deps.learn) {
-      await runLearning(deps, job.lang, 'publish').catch((e) =>
-        deps.log('translate learning failed', { lang: job.lang, error: String((e as Error)?.message ?? e) })
-      );
-    }
-  }
+  };
+  for (let g = read; g < main; g++) await book(`main:${g}`, (job.estimate_usd ?? 0) / groups);
+  await book('judge', judge);
+  await book('unread', edits);
 }
 
-// ── driver ───────────────────────────────────────────────────────────────────
-
+/** Ends a job as failed. The status goes first: batches are only cancelled for a job that really ended here. */
 export async function fail(deps: Deps, job: Job, key: string): Promise<void> {
-  await cancelBatches(deps, job);
-  await deps.db.cas(job, { status: 'failed', error: key });
+  const ended = await deps.db.cas(job, { status: 'failed', error: key, stats: addStats(job, { sweep: true, run_at: undefined, submit: undefined }) });
+  if (!ended) return;
+  await cancelBatches(deps, ended);
+  await bookUnread(deps, job);
 }
 
 async function cancelBatches(deps: Deps, job: Job): Promise<void> {
@@ -722,29 +110,75 @@ async function cancelBatches(deps: Deps, job: Job): Promise<void> {
   for (const b of job.batch_ids) await deps.llm.cancel(b.id).catch(() => {});
 }
 
-export async function advance(deps: Deps, job: Job): Promise<Status> {
+async function stepEstimating(deps: Deps, job: Job): Promise<void> {
   try {
-    switch (job.status) {
-      case 'estimating': await stepEstimating(deps, job); break;
-      case 'queued': await stepQueued(deps, job); break;
-      case 'submitted': await stepSubmitted(deps, job); break;
-      case 'validating': await stepValidating(deps, job); break;
-      case 'post_editing': await stepPostEditing(deps, job); break;
-      case 'publishing': await stepPublishing(deps, job); break;
-    }
+    await estimateSlice(deps, job);
   } catch (e) {
-    if (e instanceof LostRace) return job.status;
+    if (e instanceof TranslateError && (e.key === 'translate.no_base_build' || e.key === 'translate.base_build_missing')) {
+      const cur = (await deps.db.getJob(job.id)) ?? job;
+      await deps.db.cas(cur, { status: 'skipped', error: e.key, stats: addStats(cur, { est: undefined, run_at: undefined, dead: undefined, sweep: true }) });
+      return;
+    }
+    throw e;
+  }
+}
+
+/** One step of one job: a wait is asked, a slice is run. Returns the status afterwards. */
+export async function advance(deps: Deps, job: Job): Promise<Status> {
+  let cur = job;
+  const marked = isHeavy(job);
+  if (marked) {
+    // A stamp left by a run that never ended means the runtime killed it (546): count it, and after
+    // MAX_DEAD_ATTEMPTS in a row fail the job instead of repeating the same death every tick.
+    const v = runVerdict(job.stats, deps.now().getTime());
+    if (v.kind === 'busy') return job.status;
+    if (v.kind === 'fail') {
+      deps.log('translate job killed repeatedly', { job: job.id, status: job.status, phase: job.stats?.phase, dead: v.dead });
+      await fail(deps, job, WORKER_LIMIT_KEY);
+      return (await deps.db.getJob(job.id))?.status ?? job.status;
+    }
+    const stamped = await deps.db.cas(job, { stats: addStats(job, { run_at: deps.now().toISOString(), dead: v.dead || undefined }) });
+    if (!stamped) return job.status;
+    cur = stamped;
+  }
+  let ok = false;
+  try {
+    // Batches were sent for a plan this code cannot read (an older layout, or the plan is gone): say so.
+    // Going on would read no result, book nothing and publish the job as if it had worked.
+    if ((cur.status === 'submitted' || cur.status === 'validating' || cur.status === 'post_editing') && !cur.stats?.plan?.parts) {
+      throw new TranslateError('translate.plan_missing');
+    }
+    switch (cur.status) {
+      case 'estimating': await stepEstimating(deps, cur); break;
+      case 'queued': await stepQueued(deps, cur); break;
+      case 'submitted': await stepSubmitted(deps, cur); break;
+      case 'validating': await stepValidating(deps, cur); break;
+      case 'post_editing': await stepPostEditing(deps, cur); break;
+      case 'publishing': await stepPublishing(deps, cur); break;
+    }
+    ok = true;
+  } catch (e) {
+    if (e instanceof LostRace) return (await deps.db.getJob(job.id))?.status ?? cur.status;
     if (e instanceof TranslateError) {
-      await fail(deps, job, e.key);
+      await fail(deps, (await deps.db.getJob(job.id)) ?? cur, e.key);
     } else {
-      const fresh = (await deps.db.getJob(job.id)) ?? job;
+      const fresh = (await deps.db.getJob(job.id)) ?? cur;
       const attempts = (fresh.stats?.attempts ?? 0) + 1;
-      deps.log('translate step error', { job: job.id, status: fresh.status, error: String((e as Error)?.message ?? e) });
+      deps.log('translate step error', { job: job.id, status: fresh.status, phase: fresh.stats?.phase, error: String((e as Error)?.message ?? e) });
       if (attempts >= MAX_ATTEMPTS) await fail(deps, fresh, 'translate.internal');
-      else await deps.db.cas(fresh, { stats: addStats(fresh, { attempts }) });
+      else await deps.db.cas(fresh, { stats: addStats(fresh, { attempts, run_at: undefined }) });
     }
   }
-  return (await deps.db.getJob(job.id))?.status ?? job.status;
+  const after = (await deps.db.getJob(job.id)) ?? cur;
+  if (marked && after.stats?.run_at && OPEN_STATUSES.includes(after.status)) {
+    // The step ended without a slice of its own (it had nothing to do yet): give the stamp back.
+    await deps.db.cas(after, { stats: addStats(after, { run_at: undefined }) });
+  } else if (ok && !marked && after.stats?.attempts && OPEN_STATUSES.includes(after.status)) {
+    // A wait that was asked without an error: the errors before it are not "in a row" any more. A job
+    // waits up to a day on a batch, and five network errors over that day must not end it.
+    await deps.db.cas(after, { stats: addStats(after, { attempts: undefined }) });
+  }
+  return after.status;
 }
 
 export interface TickSummary {
@@ -754,27 +188,187 @@ export interface TickSummary {
   to: Status;
 }
 
-export async function tick(deps: Deps, budgetMs = 110_000): Promise<TickSummary[]> {
+export interface TickOptions {
+  /** Wall-clock budget of the whole request. */
+  budgetMs?: number;
+  /** Fast-lane call (every 10 s while work is pending): only slices, no asking of batches. */
+  fast?: boolean;
+  /** How long a request keeps taking further slices of the unit it works on. */
+  sliceBudgetMs?: number;
+}
+
+export interface TickResult {
+  jobs: TickSummary[];
+  passes: PassOutcome[];
+  /** Languages whose finished learning batches were applied in this tick. */
+  learned: string[];
+  /** Ended jobs whose work files were deleted (a slice of them). */
+  swept: string[];
+  /** false = another request holds the heavy-work lock, so this one ran no slice. */
+  heavy: boolean;
+}
+
+/**
+ * A request goes on with further slices of the same job or pass while it has used less than this.
+ * The platform retires a worker that has used about a second of CPU and kills one at about two, so
+ * a request must stay well under one second whatever worker it lands on: wall time is an upper
+ * bound of CPU time, and one slice is sized to a few hundred milliseconds.
+ */
+export const SLICE_BUDGET_MS = 400;
+/** Slices per request at most (a guard for clocks that do not move). */
+const MAX_SLICES = 400;
+/** The 10-minute tick waits this long for the lock a fast-lane request holds for a moment. */
+const LOCK_WAIT_MS = 2_500;
+const LOCK_TRIES = 8;
+
+/** Where a job stands, as far as "did the last step get anywhere" is concerned. */
+function mark(job: Job): string {
+  const s = job.stats ?? {};
+  return [job.status, s.phase, s.pos, s.est?.phase, s.est?.cursor, s.est?.off, job.batch_ids.length, s.pub?.rejoins].join('|');
+}
+
+async function claimLock(deps: Deps, patient: boolean): Promise<string | null | undefined> {
+  if (!deps.lock) return undefined;
+  for (let i = 0; ; i++) {
+    const token = await deps.lock.claim();
+    if (token || !patient || i + 1 >= LOCK_TRIES) return token;
+    await new Promise((r) => setTimeout(r, LOCK_WAIT_MS));
+  }
+}
+
+/**
+ * One tick.
+ *
+ * 1. Every job that waits is asked (not on a fast-lane call).
+ * 2. Behind the lock, ONE unit of heavy work gets this request: the learning batches that have ended
+ *    (not on a fast-lane call), else a job, else the work files of an ended job, else a background
+ *    pass. The request takes slice after slice of that unit until SLICE_BUDGET_MS is used.
+ *
+ * One unit, behind a lock, because the CPU limit belongs to the worker, not to the request: two
+ * requests that slice at the same time add up, and they could rewrite the same TM shard.
+ */
+export async function tickAll(deps: Deps, opts: TickOptions = {}): Promise<TickResult> {
+  const perf = deps.perfNow ?? (() => performance.now());
+  const t0 = perf();
+  const left = () => perf() - t0 <= (opts.budgetMs ?? 110_000);
+  const sliceLeft = () => perf() - t0 < (opts.sliceBudgetMs ?? SLICE_BUDGET_MS);
   const settings = await deps.db.getSettings();
-  const started = deps.now().getTime();
-  const out: TickSummary[] = [];
-  for (const job of await deps.db.listOpenJobs()) {
-    if (deps.now().getTime() - started > budgetMs) break;
-    if (!settings.enabled && (job.status === 'estimating' || job.status === 'queued')) continue;
-    out.push({ id: job.id, lang: job.lang, from: job.status, to: await advance(deps, job) });
-  }
-  // Learning batches started on an earlier tick (arbiter, Haiku, align, web) are read here.
-  if (deps.learn && deps.now().getTime() - started <= budgetMs) {
-    try {
-      for (const lang of await deps.learn.listApprovedLangs()) {
-        if (deps.now().getTime() - started > budgetMs) break;
-        await resumeLearning(deps, lang);
-      }
-    } catch (e) {
-      deps.log('translate learning resume failed', { error: String((e as Error)?.message ?? e) });
+  const res: TickResult = { jobs: [], passes: [], learned: [], swept: [], heavy: true };
+  const nowMs = () => deps.now().getTime();
+  // A job that cannot take a slice right now (one is in flight or was just killed, or a batch create
+  // of another request is under way) must not hold the slot while other work waits.
+  const ready = (job: Job) => runVerdict(job.stats, nowMs()).kind !== 'busy' && intentVerdict(job, nowMs()) !== 'wait';
+  // A full run is the admin's own order: it is estimated (which costs nothing) even while the pipeline is off.
+  const paused = (job: Job) => !settings.enabled && ((job.status === 'estimating' && job.mode !== 'full') || job.status === 'queued');
+
+  // The jobs of one upload share their created_at, so the list order is arbitrary. A publish goes
+  // first: it is the last step of work already paid for. The sort is stable.
+  const jobs = await deps.db.listOpenJobs();
+  jobs.sort((a, b) => Number(b.status === 'publishing') - Number(a.status === 'publishing'));
+  const heavyJobs: Job[] = [];
+  for (const job of jobs) {
+    if (!left()) break;
+    if (paused(job)) continue;
+    if (isHeavy(job)) {
+      if (ready(job)) heavyJobs.push(job);
+      continue;
     }
+    // A fast-lane call asks no batch. A queued job only changes its status, so it is taken there too:
+    // an approved job starts within seconds, not at the next 10-minute tick.
+    if (opts.fast && job.status !== 'queued') continue;
+    const to = await advance(deps, job);
+    res.jobs.push({ id: job.id, lang: job.lang, from: job.status, to });
+    // A wait that ended leaves a slice behind: it can go on in this request.
+    const now = await deps.db.getJob(job.id);
+    if (now && isHeavy(now) && ready(now)) heavyJobs.push(now);
   }
-  return out;
+
+  const passes = deps.passes && deps.passSteps ? await deps.passes.listOpen() : [];
+  const sweeps = deps.db.listSweepJobs ? await deps.db.listSweepJobs() : [];
+  const resume = !opts.fast && !!deps.learn;
+  if (!heavyJobs.length && !passes.length && !sweeps.length && !resume) return res;
+  const token = await claimLock(deps, !opts.fast);
+  if (token === null) return { ...res, heavy: false };
+  try {
+    let taken = false;
+    // Learning batches started earlier (arbiter, Haiku, align, web): one language's results per tick.
+    // First, and only on the 10-minute tick: behind the slices of a long pass they would wait for hours.
+    if (resume && left()) {
+      try {
+        for (const lang of await deps.learn!.listApprovedLangs()) {
+          if (!left()) break;
+          if ((await resumeLearning(deps, lang)).applied) {
+            res.learned.push(lang);
+            taken = true;
+            break;
+          }
+        }
+      } catch (e) {
+        deps.log('translate learning resume failed', { error: String((e as Error)?.message ?? e) });
+      }
+    }
+
+    for (const job of heavyJobs) {
+      if (taken || !left()) break;
+      let cur = job;
+      let to = job.status;
+      for (let n = 0; n < MAX_SLICES; n++) {
+        to = await advance(deps, cur);
+        const next = await deps.db.getJob(job.id);
+        if (!next || mark(next) === mark(cur) || !isHeavy(next) || !ready(next) || !sliceLeft()) break;
+        cur = next;
+      }
+      res.jobs.push({ id: job.id, lang: job.lang, from: job.status, to });
+      // A job that ended without doing work (failed, skipped) leaves the slot to the next one.
+      if (!['failed', 'skipped', 'cancelled'].includes(to)) taken = true;
+    }
+
+    for (const job of sweeps) {
+      if (taken || !left()) break;
+      try {
+        let cur: Job | null = job;
+        for (let n = 0; cur && n < MAX_SLICES; n++) {
+          const done = await sweepPrefix(deps.store, jobPrefix(cur.id), SWEEP_KEYS);
+          if (done) {
+            await deps.db.cas(cur, { stats: addStats(cur, { sweep: undefined }) });
+            break;
+          }
+          if (!sliceLeft()) break;
+          cur = await deps.db.getJob(job.id);
+        }
+        res.swept.push(job.id);
+        taken = true;
+      } catch (e) {
+        deps.log('translate job sweep failed', { job: job.id, error: String((e as Error)?.message ?? e) });
+      }
+    }
+
+    for (const pass of passes) {
+      if (taken || !left()) break;
+      try {
+        let cur = pass;
+        let o = await advancePass(deps, cur, deps.passSteps!);
+        for (let n = 1; o.ran && n < MAX_SLICES && sliceLeft(); n++) {
+          const next = await deps.passes!.get(pass.id);
+          if (!next || next.status !== 'open' || `${next.phase}:${next.pos}` === `${cur.phase}:${cur.pos}`) break;
+          cur = next;
+          const more = await advancePass(deps, cur, deps.passSteps!);
+          o = { ...more, from: o.from };
+        }
+        res.passes.push(o);
+        if (o.ran) taken = true;
+      } catch (e) {
+        deps.log('translate pass failed', { pass: pass.id, kind: pass.kind, error: String((e as Error)?.message ?? e) });
+      }
+    }
+  } finally {
+    if (token) await deps.lock!.release(token).catch(() => {});
+  }
+  return res;
+}
+
+export async function tick(deps: Deps, budgetMs = 110_000): Promise<TickSummary[]> {
+  return (await tickAll(deps, { budgetMs })).jobs;
 }
 
 export async function approve(deps: Deps, jobId: string, userId: string | null): Promise<Job> {
@@ -790,17 +384,37 @@ export async function cancel(deps: Deps, jobId: string): Promise<Job> {
   const job = await deps.db.getJob(jobId);
   if (!job) throw new TranslateError('translate.job_not_found');
   if (job.status !== 'awaiting_approval' && !OPEN_STATUSES.includes(job.status)) throw new TranslateError('translate.not_cancellable');
-  await cancelBatches(deps, job);
-  const next = await deps.db.cas(job, { status: 'cancelled' });
+  // The status goes first. Cancelling the batches before it left a job that lost this race running
+  // with dead batches, and their texts were then sent again as post-edits. A create that is in flight
+  // right now loses its own compare-and-set and stops the batch it made (_job_run.ts: createBatch).
+  const next = await deps.db.cas(job, { status: 'cancelled', stats: addStats(job, { sweep: true, run_at: undefined, submit: undefined }) });
   if (!next) throw new TranslateError('translate.conflict');
+  await cancelBatches(deps, next);
+  await bookUnread(deps, job);
   return next;
 }
 
-/** Admin op: a `full` job (the whole gap) that always waits for approval, whatever the caps. */
+/**
+ * Admin op: a `full` job (the whole gap of a language). It is only started here; the ticks estimate
+ * it in slices and it then waits for approval, whatever the caps. The answer is the job as it stands.
+ *
+ * There is one job per build, language and mode. One that still runs or waits is returned as it is;
+ * one that has ended is started again.
+ */
 export async function startFull(deps: Deps, build_id: string, lang: string): Promise<Job> {
   const language = await deps.db.getLanguage(lang);
   if (!language) throw new TranslateError('translate.lang_unknown');
-  const job = await deps.db.insertJob({ build_id, lang, mode: 'full', base_build_id: null });
-  await advance(deps, job);
-  return (await deps.db.getJob(job.id)) ?? job;
+  const have = deps.db.findJob ? await deps.db.findJob(build_id, lang, 'full') : null;
+  if (!have) return await deps.db.insertJob({ build_id, lang, mode: 'full', base_build_id: null });
+  if (!TERMINAL_STATUSES.includes(have.status)) return have;
+  // Its work files are still being deleted: a new run would lose its own files to that.
+  if (have.stats?.sweep) throw new TranslateError('translate.job_cleanup_pending');
+  // `spent_usd` starts again with the run: the reserve of an open job is its estimate minus what it has
+  // spent, and the spend of an earlier run would shrink it. The ledger keeps every run.
+  const again = await deps.db.cas(have, {
+    status: 'estimating', stats: { run: (have.stats?.run ?? 0) + 1 }, batch_ids: [], error: null, spent_usd: 0, estimate_usd: null,
+    string_count: null, approved_by: null,
+  });
+  if (!again) throw new TranslateError('translate.conflict');
+  return again;
 }

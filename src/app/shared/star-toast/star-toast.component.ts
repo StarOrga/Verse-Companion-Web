@@ -1,3 +1,4 @@
+import { ScPopupMotionDirective } from '../popup-motion/sc-popup-motion.directive';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { ToastSlotDirective } from '../toast-stack/toast-stack';
 import { RouterLink } from '@angular/router';
@@ -6,7 +7,7 @@ import { AuthService } from '../../auth/auth.service';
 import { BetaService } from '../../core/beta.service';
 import { VerseApiService } from '../../verse/data/verse-api.service';
 import { StarEarnedEvent } from '../../verse/data/verse.models';
-import { ScTooltipDirective } from '../tooltip/sc-tooltip.directive';
+import { ScPopupComponent } from '../popup/sc-popup.component';
 
 /** How long a toast stays before it dismisses itself (paused while hovered or focused). */
 export const STAR_TOAST_MS = 8000;
@@ -25,62 +26,51 @@ const UNLOCK_PRIORITY = [
 @Component({
   selector: 'sc-star-toast',
   standalone: true,
-  imports: [ToastSlotDirective, RouterLink, TranslatePipe, ScTooltipDirective],
+  imports: [ScPopupMotionDirective, ToastSlotDirective, RouterLink, TranslatePipe, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @for (ev of shown(); track ev) {
-      <div class="toast" scToastSlot role="status" aria-live="polite" [class.paused]="held()"
+      <div class="toast" scToastSlot scPopupMotion scPopupMotionOrigin="br" animate.leave="pm-out" [class.paused]="held()"
            (mouseenter)="hold(true)" (mouseleave)="hold(false)" (focusin)="hold(true)" (focusout)="hold(false)">
-        <i class="star" aria-hidden="true">★</i>
-        <a class="body" routerLink="/verse/explorer">
-          <small>{{ ev.patchLine }}</small>
-          <b>{{ 'verse.toast.lit' | translate: { task: taskName(ev) } }}</b>
-          <span class="count">{{ 'verse.toast.count' | translate: { lit: ev.lit, total: ev.total } }}</span>
-          <span class="note">{{ note(ev) }}</span>
-        </a>
-        <button type="button" class="x" (click)="dismiss()" [attr.aria-label]="'verse.toast.close' | translate"
-                [scTooltip]="'verse.toast.close' | translate">×</button>
-        <i class="drain" aria-hidden="true" [style.animation-duration.ms]="duration"></i>
+        <!-- A notice carries no X (r1-close): it leaves on its own after STAR_TOAST_MS, or when the reader follows the link. -->
+        <sc-popup kind="notice" [title]="'verse.toast.lit' | translate: { task: taskName(ev) }">
+          <svg popupIcon viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 17l-5.2 2.7 1-5.9L3.5 9.7l5.9-.8z" /></svg>
+          <a class="body" routerLink="/verse/explorer" (click)="dismiss()">
+            <small>{{ ev.patchLine }}</small>
+            <b>{{ 'verse.toast.lit' | translate: { task: taskName(ev) } }}</b>
+            <span class="count">{{ 'verse.toast.count' | translate: { lit: ev.lit, total: ev.total } }}</span>
+            <span class="note">{{ note(ev) }}</span>
+          </a>
+          <i class="drain" aria-hidden="true" [style.animation-duration.ms]="duration"></i>
+        </sc-popup>
       </div>
     }
   `,
   styles: [`
     :host { display: contents; }
+    /* Position only (bottom right, above the launcher); frame, width, rail and symbol come from <sc-popup kind="notice">. */
     .toast {
       position: fixed; z-index: 1450;
-      inset-inline-end: var(--sc-fab-gutter, 16px);
+      inset-inline-end: var(--sc-toast-end, 24px);
       bottom: calc(var(--sc-toast-bottom, var(--sc-fab-clear-block, 80px)) + var(--sc-toast-offset, 0px));
-      width: min(var(--sc-toast-w, 24rem), calc(100vw - 2 * var(--sc-fab-gutter, 16px)));
-      display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: start;
-      padding: 14px 14px 16px; border-radius: 14px; overflow: hidden;
-      background: color-mix(in srgb, var(--sc-bg-1) 94%, transparent);
-      border: 1px solid color-mix(in srgb, var(--sc-accent) 45%, var(--sc-border));
-      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55), 0 0 30px color-mix(in srgb, var(--sc-accent) 14%, transparent);
-      backdrop-filter: blur(10px);
-      animation: toast-in 0.28s ease-out both;
     }
-    .star { font-style: normal; font-size: 22px; line-height: 1; color: var(--sc-accent); text-shadow: 0 0 10px var(--sc-accent); }
     .body { display: grid; gap: 3px; color: inherit; text-decoration: none; min-width: 0; border-radius: 6px; }
     .body small { font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.18em; text-transform: uppercase; color: var(--sc-accent); }
     .body b { font-size: 0.95rem; font-weight: 600; color: var(--sc-fg-0); }
     .count { font-size: max(0.8rem, var(--sc-fs-floor)); color: var(--sc-fg-1); }
     .note { font-size: max(0.8rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     .body:hover b, .body:focus-visible b { text-decoration: underline; }
-    .body:focus-visible, .x:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-    .x {
-      width: 32px; height: 32px; border-radius: 50%; padding: 0; cursor: pointer; font-size: 16px; line-height: 1;
-      background: none; border: 1px solid var(--sc-border); color: var(--sc-fg-2);
-    }
-    .x:hover { color: var(--sc-fg-0); border-color: var(--sc-accent); }
+    .body:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .drain {
-      position: absolute; inset: auto 0 0 0; height: 2px; background: var(--sc-accent); transform-origin: left center;
+      /* Along the card's bottom edge, like the undo toast's window. */
+      position: absolute; inset-inline: 0; bottom: 0;
+      display: block; height: 2px; background: var(--sc-accent); transform-origin: left center;
       animation: toast-drain linear forwards;
     }
     .toast.paused .drain { animation-play-state: paused; }
     @keyframes toast-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
     @keyframes toast-drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
     @media (prefers-reduced-motion: reduce) {
-      .toast { animation: toast-fade 0.2s linear both; }
       @keyframes toast-fade { from { opacity: 0; } to { opacity: 1; } }
     }
   `],

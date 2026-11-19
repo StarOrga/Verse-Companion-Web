@@ -131,7 +131,7 @@ describe('AddToSetComponent (L09)', () => {
   it('closes on Escape inside the popover', async () => {
     const { fixture, el } = await setup({ sets: [] });
     await open(fixture);
-    el.querySelector('.ats-pop')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    el.querySelector('.ats-pop .scp-frame')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     fixture.detectChanges();
     expect(el.querySelector('.ats-pop')).toBeNull();
   });

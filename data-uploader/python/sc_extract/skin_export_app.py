@@ -41,7 +41,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from . import stage_timing
 from .events import count, done, error, log, phase, progress
-from .hull3d import EXPORT_FORMAT, Hull3DExporter, HullExportConfig
+from .hull3d import EXPORT_FORMAT, Hull3DExporter, HullExportConfig, needs_refit
 from .live_limits import LiveLimits
 from .ship_discovery import SHIPS_ROOT, ShipDiscovery, ShipRef
 from .ship_export import parse_ship
@@ -73,6 +73,8 @@ def _refs_from_manifest(path: Path) -> list[ShipRef]:
             ship_id=s["ship_id"], mfr=s["mfr"],
             ship=s["ship"], series_token=s.get("series_token", s["ship"]),
             root=s.get("root", SHIPS_ROOT),  # absent in pre-ground manifests = ships
+            # DataCore liveries (absent in older manifests -> heuristics).
+            paints=s.get("paints"), base_mtl=s.get("base_mtl"),
         ))
     return out
 
@@ -137,7 +139,7 @@ class _PackageBuilder:
                                            raw_glb=self._interior_raw)
             res = build_ship_package(ship_id, self.source, self.reader, self.store,
                                      hull_glb, self.out / ship_id, interior)
-            self.store.save_index()
+            self.store.checkpoint()
         except Exception as exc:  # noqa: BLE001 — the hull still ships
             log("warn", f"{ship_id}: package failed: {type(exc).__name__}: {exc}")
             return {"error": str(exc)[:300]}
@@ -218,10 +220,13 @@ class _PackageBuilder:
             progress(f"{kind}-packages", current=i + 1, total=len(classes))
             try:
                 res = build(cls)
-                self.store.save_index()
             except Exception as exc:  # noqa: BLE001 — one class never costs the run
                 log("warn", f"{cls}: {kind} package failed: {type(exc).__name__}: {exc}")
                 continue
+            finally:
+                # Throttled: rewriting the ~17 MB index after every class was
+                # most of this loop's time (`parts.INDEX_SAVE_INTERVAL_S`).
+                self.store.checkpoint()
             if res is None:
                 skipped.append(cls)
                 continue
@@ -244,6 +249,7 @@ class _PackageBuilder:
             log("info", f"{cls}: {kind} package root {row['rootBytes'] / 1e3:.0f} kB, "
                         f"{row['parts']} part(s), {row['withPart']}/{len(pl)} placements "
                         f"with geometry")
+        self.store.flush()
         if skipped:
             log("warn", skipped_summary(kind, skipped))
         return rows
@@ -432,7 +438,8 @@ class _ShipRun:
         args, cfg, pkg = self.args, self.cfg, self.pkg
         t0, before = time.perf_counter(), stage_timing.snapshot()
         if args.skip_existing:
-            prev = _cached_catalog(args.out, ref.ship_id, getattr(args, "stamp", None))
+            prev = _cached_catalog(args.out, ref.ship_id, getattr(args, "stamp", None),
+                           _budget_bytes(args))
             if prev is not None:
                 log("info", f"{ref.ship_id}: cached — skipping build")
                 count(ref.ship_id, _cached_model_count(prev))
@@ -497,7 +504,8 @@ class _ShipRun:
 
 
 def _cached_catalog(out: Path, ship_id: str,
-                    stamp: Optional[Dict[str, str]] = None) -> Optional[dict]:
+                    stamp: Optional[Dict[str, str]] = None,
+                    max_model_bytes: int = 0) -> Optional[dict]:
     """The ship's skins.json if it is a build of the CURRENT format — a cache
     from the textured per-skin export must be rebuilt, or its textured glbs
     would be uploaded again — and, given a ``stamp``, of the same game build
@@ -510,9 +518,30 @@ def _cached_catalog(out: Path, ship_id: str,
         return None
     if not isinstance(prev, dict) or prev.get("format") != EXPORT_FORMAT:
         return None
-    if stamp is not None and prev.get("stamp") != stamp:
+    if stamp is not None:
+        # The converter's raw digest rides along in the stamp but does not
+        # decide by itself: an output-equivalent converter build is keyed like
+        # the old one (build_cache.CONVERTER_ALIASES), so a ship WITH a model
+        # stays cached. A ship that ended without one is built once more by a
+        # converter it was not tried with — that build may be the one that
+        # converts it (v2.0.0-sc.1: the 25 hulls v2.0.0 overflowed on).
+        old = dict(prev.get("stamp") or {})
+        new = dict(stamp)
+        old_conv, new_conv = old.pop("converter", None), new.pop("converter", None)
+        if old != new:
+            return None
+        if new_conv and old_conv != new_conv and _cached_model_count(prev) == 0:
+            return None
+    # A hull left over budget by an older over-budget search goes back through
+    # the build; its hull_src still matches, so this skip and the hull reuse
+    # in hull3d are the two places that must let it through.
+    if any(needs_refit(s, max_model_bytes) for s in prev.get("skins", [])):
         return None
     return prev
+
+
+def _budget_bytes(args) -> int:
+    return int((getattr(args, "max_model_mb", 0) or 0) * 1e6)
 
 
 def _cached_model_count(prev: dict) -> int:
@@ -528,12 +557,15 @@ def _fully_cached(args, ref: ShipRef) -> Optional[dict]:
     """Entry for a ship the parent can answer without a worker (no P4K)."""
     if not args.skip_existing:
         return None
-    prev = _cached_catalog(args.out, ref.ship_id, getattr(args, "stamp", None))
+    prev = _cached_catalog(args.out, ref.ship_id, getattr(args, "stamp", None),
+                           _budget_bytes(args))
     if prev is None:
         return None
     if args.package and not (args.out / ref.ship_id / "package.json").exists():
         return None
-    log("info", f"{ref.ship_id}: cached — skipping build")
+    # No per-ship line: on a resumed run ~300 of them filled the host's info
+    # cap and hid every later line (3D cache, package summary). The caller
+    # logs one summary instead.
     count(ref.ship_id, _cached_model_count(prev))
     return _cached_entry(args.out.resolve(), ref.ship_id)
 
@@ -584,6 +616,8 @@ def _worker_main(args, wid: int, tasks, events_q, active=None) -> None:
         events_q.put({"type": "__ship", "worker": wid, "idx": idx,
                       "entry": entry, "barren": barren})
     pkg = run.pkg
+    if pkg:
+        pkg.store.flush()
     events_q.put({"type": "__exit", "worker": wid,
                   "timing": stage_timing.snapshot(),
                   "parts": [r["parts"] for r in pkg.rows if "parts" in r] if pkg else [],
@@ -734,10 +768,14 @@ def main() -> int:
         # without opening the P4K; only the rest needs a worker.
         # Build stamp: a cached ship only counts when it came from this game
         # build and this pipeline (see `_cached_catalog`).
-        from .build_cache import pipeline_tag
+        from .build_cache import file_digest, pipeline_tag
         args.stamp = {"game_build": args.game_build,
                       "pipeline": pipeline_tag(args.converter, args.cache_salt,
                                                recipe=args.recipe)}
+        try:
+            args.stamp["converter"] = file_digest(args.converter)
+        except OSError:
+            pass
         jobs: List[Tuple[int, ShipRef]] = []
         for i, ref in enumerate(refs):
             entry = _fully_cached(args, ref)
@@ -745,6 +783,9 @@ def main() -> int:
                 results[i] = (entry, None)
             else:
                 jobs.append((i, ref))
+        if len(jobs) < len(refs):
+            log("info", f"{len(refs) - len(jobs)} of {len(refs)} ship(s) cached — skipping build; "
+                        f"{len(jobs)} to build")
         # Cross-patch reuse (build_cache): a new patch's dir starts from the
         # previous patch's content-addressed stores, and every hull, part and
         # interior whose P4K inputs and pipeline are byte-identical is taken
@@ -838,6 +879,8 @@ def main() -> int:
             run_result["itemPackages"] = run.pkg.standalone("items", args.item, args.max_packages)
         if run is not None and run.pkg and args.armor:
             run_result["armorPackages"] = run.pkg.standalone("armor", args.armor_class, args.max_packages)
+        if run is not None and run.pkg:
+            run.pkg.store.flush()  # rows of in-process ships since the last checkpoint
         if args.package or args.fps or args.items:
             if run is not None and run.pkg:
                 pkg_parts.extend(r["parts"] for r in run.pkg.rows if "parts" in r)

@@ -24,6 +24,7 @@ import { CalloutValue, ValueComparison, compareValue, splitCallouts, valueLabel,
 import type { HardpointPortRef } from '../hardpoint-port-ref';
 import { CodexLandingCalloutSetService, hasLoadoutSet, valuesForSet } from './codex-landing-callout-set.service';
 import { CodexLandingSetToggleComponent } from './codex-landing-set-toggle.component';
+import { DeferErrorComponent } from '../../shared/defer-error/defer-error.component';
 
 /** How long a "no hull" answer of the viewer is doubted: its first emit precedes the skin catalog read. */
 const NO_HULL_GRACE_MS = 3000;
@@ -142,6 +143,7 @@ interface CalloutView {
   selector: 'sc-codex-landing-holotable',
   standalone: true,
   imports: [
+    DeferErrorComponent,
     TranslatePipe,
     ScDialogDirective,
     ScTooltipDirective,
@@ -169,7 +171,7 @@ export class CodexLandingHolotableComponent {
   readonly switchNo = input(0);
   /** Bumps on every rotation step: restarts the rim progress. */
   readonly cycle = input(0);
-  readonly cycleMs = input(8000);
+  readonly cycleMs = input(24000);
   /** A paint preview is open — the landing holds the rotation meanwhile. */
   readonly paintOpen = model(false);
 

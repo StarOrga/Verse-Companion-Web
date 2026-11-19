@@ -76,7 +76,7 @@ export interface ScSegmentOption {
   standalone: true,
   imports: [TranslatePipe, RouterLink, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'sc-segmented' },
+  host: { class: 'sc-segmented', '[class.chips]': "variant() === 'chips'" },
   template: `
     <div
       class="seg"
@@ -146,7 +146,7 @@ export interface ScSegmentOption {
     }
     .seg-btn:last-child { border-right: 0; }
     .seg-btn:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-fg-0) 6%, transparent); }
-    .seg-btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .seg-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .seg-btn.active { background: var(--sc-accent); color: var(--sc-bg-0); font-weight: 600; }
     .seg-btn.active:hover { background: var(--sc-accent); color: var(--sc-bg-0); }
     .seg-btn.disabled, .seg-btn.disabled:hover { color: color-mix(in srgb, var(--sc-fg-2) 45%, transparent); background: transparent; cursor: not-allowed; }
@@ -156,6 +156,20 @@ export interface ScSegmentOption {
     @media (pointer: coarse) { :host(.compact) .seg-btn { min-height: 48px; } }
 
     @media (max-width: 560px) { .seg-btn { padding: 0 0.75rem; } }
+
+    /* Chips: the same radio group drawn as separate pills that WRAP - for choices whose count or
+       label length comes from data ("An Nachschub X anhängen"), where one scrolling bar would hide
+       options. Replaces the hand-rolled pill groups in the HQ dialogs (popup-aufbau polish #26). */
+    :host(.chips) .seg { flex-wrap: wrap; gap: 6px; border: 0; border-radius: 0; background: none; overflow: visible; }
+    :host(.chips) .seg-btn { flex: 0 1 auto; min-height: 36px; padding: 0 12px; white-space: normal; text-align: start;
+      border: 1px solid var(--sc-border); border-radius: 999px; background: var(--sc-bg-0); color: var(--sc-fg-1); }
+    :host(.chips) .seg-btn:hover { border-color: var(--sc-accent); color: var(--sc-fg-0); background: var(--sc-bg-0); }
+    :host(.chips) .seg-btn:focus-visible { box-shadow: var(--sc-focus-ring); }
+    :host(.chips) .seg-btn.active, :host(.chips) .seg-btn.active:hover {
+      border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-fg-0); font-weight: 600; }
+    :host(.chips) .seg-btn.disabled, :host(.chips) .seg-btn.disabled:hover { border-color: var(--sc-border); background: var(--sc-bg-0); }
+    :host(.chips.compact) .seg-btn { min-height: 28px; padding: 0 10px; font-size: max(0.78rem, var(--sc-fs-floor)); }
+    @media (pointer: coarse) { :host(.chips) .seg-btn, :host(.chips.compact) .seg-btn { min-height: 48px; } }
   `],
 })
 export class ScSegmentedComponent {
@@ -166,6 +180,12 @@ export class ScSegmentedComponent {
   readonly value = input<string | null>(null);
   /** Accessible name of the group — already translated by the caller. */
   readonly ariaLabel = input<string>('');
+
+  /**
+   * `bar` (default): one pill that scrolls sideways. `chips`: separate pills that wrap, for a
+   * data-driven number of options or long labels.
+   */
+  readonly variant = input<'bar' | 'chips'>('bar');
 
   /** Emitted on a pick in button mode. Link mode navigates instead. */
   readonly valueChange = output<string>();

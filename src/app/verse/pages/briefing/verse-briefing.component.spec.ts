@@ -6,6 +6,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { AnalyticsService } from '../../../core/analytics.service';
 import { BetaService } from '../../../core/beta.service';
 import { AuthService } from '../../../auth/auth.service';
+import { RoleService } from '../../../auth/role.service';
 import { NewsService } from '../../../news/news.service';
 import { VerseApiService } from '../../data/verse-api.service';
 import { VerseDigest, VerseDigestItem, VerseExplorerPatch } from '../../data/verse.models';
@@ -16,19 +17,17 @@ import { MOON_SLOT_S } from './briefing-moon.component';
 import { SKY_STEP_S } from './briefing-sky.component';
 import { NewsListComponent } from '../../../news/news-list.component';
 import { PLANET_SOURCES } from './planet/planet-assets';
-import { CALM_WAIT_MS, INTRO_BUILD_MS, INTRO_FINALE_MS, INTRO_PLANET_WAIT_MS, INTRO_SKIP_MS, INTRO_SWITCH_MS, VerseBriefingComponent, hurry, linkKey, verseItemLink } from '../verse-briefing.component';
+import { CALM_WAIT_MS, ENTRANCE_BEATS, ENTRANCE_SEARCH_K, INTRO_BUILD_MS, INTRO_FINALE_MS, INTRO_PLANET_WAIT_MS, INTRO_SKIP_MS, INTRO_SWITCH_MS, VerseBriefingComponent, hurry, linkKey, verseItemLink } from '../verse-briefing.component';
 import { ShellChromeService } from '../../../shell/fusion-bar/shell-chrome.service';
 import { By } from '@angular/platform-browser';
 import { BriefingPlanetComponent } from './briefing-planet.component';
 import { VERSE_STAGED_BUILD } from './staged-build';
+import { fakeSupabase } from '../../../testing/fake-supabase';
 import {
   INTRO_FLAG,
-  localDay,
+  VERSE_DOCUMENT_ENTRY,
   briefingStatus,
-  claimIntro,
-  resetIntroDocument,
   explorerLit,
-  followingLine,
   liveStatusKey,
   newestFor,
   nextStatusKey,
@@ -56,12 +55,6 @@ const item = (key: string, rank: number, url: string, kind: VerseDigestItem['kin
 });
 
 describe('Verse briefing — model', () => {
-  it('followingLine bumps the minor line', () => {
-    expect(followingLine('4.10')).toBe('4.11');
-    expect(followingLine('4.9.1')).toBe('4.10');
-    expect(followingLine('x')).toBeNull();
-  });
-
   it('status keys pick the singular and the direction', () => {
     expect(liveStatusKey(null)).toBe('verse.briefing.status.liveNow');
     expect(liveStatusKey(0)).toBe('verse.briefing.status.liveToday');
@@ -138,21 +131,6 @@ describe('Verse briefing — model (more)', () => {
     expect(skyFigure(FALLBACK_POINTS, 7).stars.every((s) => s.state === 'lit')).toBe(true);
   });
 
-  it('claimIntro plays the full entrance once per local day and survives blocked storage', () => {
-    const store = new Map<string, string>();
-    const fake = { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => void store.set(k, v) };
-    const day = () => new Date(2026, 10, 5, 9, 0);
-    resetIntroDocument();
-    expect(claimIntro(fake, day)).toBe('full');
-    expect(store.get(INTRO_FLAG)).toBe('2026-11-05');
-    expect(claimIntro(fake, day)).toBe('short');
-    expect(claimIntro(fake, () => new Date(2026, 10, 6, 9, 0))).toBe('full');
-    const broken = { getItem: () => { throw new Error('blocked'); }, setItem: () => undefined };
-    resetIntroDocument();
-    expect(claimIntro(broken)).toBe('full');
-    resetIntroDocument();
-    expect(claimIntro(null)).toBe('full');
-  });
 
   it('fillGallery tops the digest up to the candidate count from the gallery source, without repeats', () => {
     const g = (id: string, image = `${id}.jpg`) => ({ ...item(`gallery:${id}`, 1, `/verse/gallery?image=${id}`, 'gallery'), image });
@@ -180,7 +158,7 @@ class NewsListStub {}
 
 describe('Verse briefing — component', () => {
   const beta = signal<Record<string, boolean>>({ verse: true, codex: true });
-  const captureVerse = vi.fn().mockName('captureVerse');
+  const track = vi.fn().mockName('track');
   const markSeen = vi.fn().mockName('markSeen').mockResolvedValue({ ok: true, data: undefined });
   const cancels: Mock[] = [];
   const trackShown = vi.fn().mockName('trackShown').mockImplementation(() => {
@@ -200,22 +178,26 @@ describe('Verse briefing — component', () => {
   const loadSeen = vi.fn().mockName('loadSeen');
 
   beforeEach(() => {
-    localStorage.removeItem(INTRO_FLAG);
-    captureVerse.mockClear();
+    sessionStorage.removeItem(INTRO_FLAG);
+    track.mockClear();
     trackShown.mockClear();
     loadSeen.mockClear();
     cancels.length = 0;
     TestBed.configureTestingModule({
       providers: [
+        // Never the real client: the patch-stability panel would call patch_stability_vote_state on the cloud project.
+        fakeSupabase().provider,
         { provide: VERSE_STAGED_BUILD, useValue: false },
+        { provide: VERSE_DOCUMENT_ENTRY, useValue: () => ({ bare: true, revisit: false }) },
         provideRouter([]),
         provideTranslateService({}),
         // A real download settles outside fakeAsync's clock: generate the planet in fake time instead.
         { provide: PLANET_SOURCES, useValue: () => Promise.reject(new Error('specs generate the planet')) },
-        { provide: AnalyticsService, useValue: { captureVerse, flags: () => ({}) } },
+        { provide: AnalyticsService, useValue: { track, flags: () => ({}) } },
         { provide: BriefingGalleryFillService, useValue: { items: signal([]), load: () => Promise.resolve() } },
         { provide: BetaService, useValue: { state: beta, isEnabled: (a: string) => () => beta()[a] } },
         { provide: AuthService, useValue: { isAuthenticated: signal(false), user: signal(null) } },
+        { provide: RoleService, useValue: { isAdmin: signal(false) } },
         {
           provide: VerseApiService,
           useValue: {
@@ -243,7 +225,7 @@ describe('Verse briefing — component', () => {
   afterEach(() => {
     TestBed.resetTestingModule();
     beta.set({ ...beta(), shell: false });
-    localStorage.removeItem(INTRO_FLAG);
+    sessionStorage.removeItem(INTRO_FLAG);
   });
 
   it('renders the hero CTA, moons and the constellation star-map link as anchors and the story pills as buttons', () => {
@@ -304,9 +286,9 @@ describe('Verse briefing — component', () => {
     const el = fixture.nativeElement as HTMLElement;
     middleClick(el.querySelector('a.cta')!);
     expect(markSeen).toHaveBeenCalledWith(['a']);
-    expect(captureVerse).toHaveBeenCalledWith('verse_top_open', { key: 'a', kind: 'patch', rank: 1, pinned: false });
+    expect(track).toHaveBeenCalledWith('verse:top_open', { key: 'a', kind: 'patch', rank: 1, pinned: false });
     middleClick(el.querySelectorAll('nav.moons a.moon')[2]);
-    expect(captureVerse).toHaveBeenCalledWith('verse_door_open', { door: 'gallery' });
+    expect(track).toHaveBeenCalledWith('verse:door_open', { door: 'gallery' });
   });
 
   it('rotates the stories and restarts the "shown" clock per story', () => {
@@ -351,7 +333,7 @@ describe('Verse briefing — component', () => {
     expect(fixture.componentInstance.current()?.item.key).toBe('c');
     expect(el.querySelector('a.cta')?.getAttribute('href')).toBe('https://example.com/c');
     expect(markSeen).not.toHaveBeenCalled();
-    expect(captureVerse).not.toHaveBeenCalledWith('verse_top_open', expect.anything());
+    expect(track).not.toHaveBeenCalledWith('verse:top_open', expect.anything());
     expect(el.querySelectorAll('.story button.sbar')[2].getAttribute('aria-pressed')).toBe('true');
   });
 
@@ -378,7 +360,7 @@ describe('Verse briefing — component', () => {
   });
 
   it('plays the short entrance on a later visit in the same session', () => {
-    localStorage.setItem(INTRO_FLAG, localDay());
+    sessionStorage.setItem(INTRO_FLAG, '1');
     const fixture = TestBed.createComponent(VerseBriefingComponent);
     fixture.detectChanges();
     expect((fixture.nativeElement as HTMLElement).querySelector('.stage')?.classList).toContain('short');
@@ -390,7 +372,7 @@ describe('Verse briefing — component', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('sc-news-list')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('.stage')).toBeNull();
-    expect(localStorage.getItem(INTRO_FLAG)).toBeNull();
+    expect(sessionStorage.getItem(INTRO_FLAG)).toBeNull();
     expect(trackShown).not.toHaveBeenCalled();
     beta.set({ ...beta(), verse: true });
   });
@@ -438,12 +420,13 @@ describe('Verse briefing — component', () => {
       fixture.detectChanges();
       expect(stage(fixture)?.classList, 'a modifier alone is no input').toContain('intro');
       window.dispatchEvent(new Event('pointerdown'));
-      expect(fixture.componentInstance.holoStands()).toBe(true);
+      expect(fixture.componentInstance.stands(), 'not before the skip has run out').toBe(false);
       tick(INTRO_SKIP_MS);
       fixture.detectChanges();
       expect(stage(fixture)?.classList).not.toContain('intro');
       expect(stage(fixture)?.classList).not.toContain('finale');
       expect(title(fixture)?.querySelector('.brand')).toBeNull();
+      expect(fixture.componentInstance.stands(), 'the page stands after the skip').toBe(true);
       expect(chrome.heroIntro()).toBeNull();
       tick(10_000);
       expect(stage(fixture)?.classList, 'no comet afterwards').not.toContain('finale');
@@ -454,9 +437,9 @@ describe('Verse briefing — component', () => {
       const fixture = TestBed.createComponent(VerseBriefingComponent);
       fixture.detectChanges();
       const c = fixture.componentInstance;
-      expect(c.holoStands()).toBe(false);
+      expect(c.stands()).toBe(false);
       const tx = (): HTMLElement => (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>('sc-briefing-transmit')!;
-      expect(tx().dataset['phase'], 'nothing sent during the entrance').toBe('out');
+      expect(tx().dataset['phase'], 'nothing sent during the entrance').toBe('rest');
       tick(10_000);
       fixture.detectChanges();
       expect(c.brand()).toBe(false);
@@ -478,7 +461,7 @@ describe('Verse briefing — component', () => {
     });
 
     it('a reload waits behind the stars for the story, at most the calm wait, then fades in', fakeAsync(() => {
-      localStorage.setItem(INTRO_FLAG, localDay());
+      sessionStorage.setItem(INTRO_FLAG, '1');
       const fixture = TestBed.createComponent(VerseBriefingComponent);
       fixture.detectChanges();
       const c = fixture.componentInstance;
@@ -501,7 +484,7 @@ describe('Verse briefing — component', () => {
       const c = fixture.componentInstance;
       expect(c.intro).toBe('full');
       expect(stage(fixture)?.classList).toContain('intro');
-      expect(chrome.heroIntro(), 'the hub took the announced entrance over').toEqual({ k: 1, full: true });
+      expect(chrome.heroIntro(), 'the hub took the announced entrance over').toEqual({ k: ENTRANCE_SEARCH_K, full: true, ...ENTRANCE_BEATS });
       // The app's name in the hero: no story title, no eyebrow, no chevrons yet.
       expect(title(fixture)?.querySelector('.tl.brand')).not.toBeNull();
       expect(title(fixture)?.querySelectorAll('i.ltr').length).toBeGreaterThan(0);
@@ -550,7 +533,7 @@ describe('Verse briefing — component', () => {
     }));
 
     it('a return within the session shows everything at once and releases an announced hold', fakeAsync(() => {
-      localStorage.setItem(INTRO_FLAG, localDay());
+      sessionStorage.setItem(INTRO_FLAG, '1');
       chrome.holdHeroIntro();
       const fixture = TestBed.createComponent(VerseBriefingComponent);
       fixture.detectChanges();
@@ -560,15 +543,14 @@ describe('Verse briefing — component', () => {
       tick(10_000);
     }));
 
-    it('shows the CSS planet only when no live planet can come — never on a timer', fakeAsync(() => {
+    it('draws no planet of its own under the shell: the scene holds the one planet (G1)', fakeAsync(() => {
       chrome.holdHeroIntro();
       const fixture = TestBed.createComponent(VerseBriefingComponent);
       fixture.detectChanges();
       tick(10_000);
       fixture.detectChanges();
-      const clip = fixture.nativeElement.querySelector('.world-clip') as HTMLElement;
-      const planet = fixture.debugElement.query(By.directive(BriefingPlanetComponent)).componentInstance as BriefingPlanetComponent;
-      expect(clip.classList.contains('css-planet')).toBe(planet.failed());
+      expect(fixture.debugElement.query(By.directive(BriefingPlanetComponent))).toBeNull();
+      expect(fixture.nativeElement.querySelector('.world-clip .brief-world')).not.toBeNull();
     }));
   });
 });

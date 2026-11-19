@@ -20,6 +20,15 @@ import {
 import { equippedMass, itemMass, SummaryOccupant } from './ship-summary-panels';
 import { findStat, toFiniteNumber } from '../hangar/loadout-stats';
 import { KpiKey, MissionDef } from './codex-mission';
+import { sustainedDps, weaponParamsOf } from './codex-sustained-dps';
+import {
+  MissileCategory,
+  MissileSignal,
+  isMissileRow,
+  missileCategoryOf,
+  readCombatMetrics,
+  trackingSignalOf,
+} from './codex-missile';
 
 export type { SummaryOccupant };
 
@@ -45,6 +54,24 @@ function entityKindOf(o: SummaryOccupant): string {
 
 function classNameOf(payload: unknown): string {
   return ((payload as { className?: string } | null | undefined)?.className ?? '').trim();
+}
+
+/**
+ * A missile, torpedo or rocket the loadout carries — wherever its rack sits.
+ * The extract files every one of them under attach type `Missile`; the rack
+ * itself (`MissileLauncher`) is no warhead and never counts.
+ */
+function isMissileOccupant(o: SummaryOccupant): boolean {
+  return isMissileRow({ attach_type: (o.payload as { attachType?: unknown } | null | undefined)?.attachType });
+}
+
+/**
+ * One missile's warhead: the explosion damage in `stats.SCItemMissileParams`
+ * (feedback #350 — the old gun-style impact read found nothing on a missile,
+ * so the section never appeared), an impact-damage record as the fallback.
+ */
+function missileDamageOf(o: SummaryOccupant): number | null {
+  return usable(readCombatMetrics(o.payload).damage ?? null) ?? alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);
 }
 
 // ── KPI sheet ─────────────────────────────────────────────────────────────────
@@ -150,6 +177,8 @@ export function computeKpiSheet(
 
   let totalAlpha = 0;
   let totalDps = 0;
+  let totalSustained = 0;
+  let sustainedComplete = true;
   let gunCount = 0;
   let missileDamage = 0;
   let missileCount = 0;
@@ -158,7 +187,7 @@ export function computeKpiSheet(
   let shieldCount = 0;
 
   for (const o of occupants) {
-    if ((o.section === 'weapons' || o.section === 'remoteTurrets') && entityKindOf(o) === 'weapon') {
+    if ((o.section === 'weapons' || o.section === 'remoteTurrets' || o.section === 'mannedTurrets') && entityKindOf(o) === 'weapon') {
       const alpha = alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);
       if (alpha !== null) {
         gunCount += o.count;
@@ -169,11 +198,16 @@ export function computeKpiSheet(
           ] ?? null,
         );
         const dps = damagePerSecond(alpha, fireRate);
-        if (dps !== null) totalDps += dps * o.count;
+        if (dps !== null) {
+          totalDps += dps * o.count;
+          const sus = sustainedDps(dps, fireRate, weaponParamsOf(o.payload)).value;
+          if (sus === null) sustainedComplete = false;
+          else totalSustained += sus * o.count;
+        }
       }
     }
-    if (o.section === 'missiles') {
-      const alpha = alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);
+    if (isMissileOccupant(o)) {
+      const alpha = missileDamageOf(o);
       if (alpha !== null) {
         missileDamage += alpha * o.count;
         missileCount += o.count;
@@ -196,12 +230,12 @@ export function computeKpiSheet(
   }
 
   sheet.alpha = gunCount > 0 ? usable(totalAlpha) : null;
-  // The extract does not distinguish a "burst" fire rate from the sustained
-  // one — a weapon fires at its one documented `fireRate` until it stops, so
-  // both KPI cells show the SAME derived continuous-fire number rather than
-  // inventing a separate burst figure.
+  // Burst = every gun firing without a pause. Sustained counts the pauses
+  // (energy regen, reload, overheat — `codex-sustained-dps.ts`) and is only
+  // shown when EVERY gun with a burst figure has a known cycle: a partial sum
+  // would read as a weaker loadout, a copy of burst as no pauses at all (#343).
   sheet.burstDps = totalDps > 0 ? usable(totalDps) : null;
-  sheet.sustainedDps = sheet.burstDps;
+  sheet.sustainedDps = sheet.burstDps !== null && sustainedComplete ? usable(totalSustained) : null;
   sheet.missiles = missileCount > 0 ? usable(missileDamage) : null;
   sheet.shieldHp = shieldCount > 0 ? usable(shieldHp) : null;
   sheet.shieldRegen = shieldCount > 0 ? usable(shieldRegen) : null;
@@ -299,7 +333,7 @@ const KPI_META: Record<KpiKey, KpiMeta> = {
   sustainedDps: {
     labelKey: 'codex.kpi.sustainedDps',
     format: 'perSec',
-    gapKey: 'codex.summary.gap.noFireRate',
+    gapKey: 'codex.summary.gap.noSustainedCycle',
   },
   missiles: { labelKey: 'codex.kpi.missiles', format: 'dec', gapKey: 'codex.summary.gap.noMissiles' },
   shieldHp: { labelKey: 'codex.kpi.shieldHp', format: 'int', gapKey: 'codex.summary.gap.noShields' },
@@ -374,6 +408,19 @@ export interface WeaponRow {
   burstDps: number | null;
 }
 
+/** One kind of missile on the loadout, identical ones collapsed. */
+export interface MissileRow {
+  className: string;
+  size: number | null;
+  category: MissileCategory | null;
+  signal: MissileSignal | null;
+  count: number;
+  /** One warhead; null when the build carries no warhead numbers. */
+  damage: number | null;
+  /** damage × count; null with `damage`. */
+  totalDamage: number | null;
+}
+
 export interface OffensivePanel {
   weaponCount: number;
   weaponRows: WeaponRow[];
@@ -381,17 +428,24 @@ export interface OffensivePanel {
   hasDpsColumn: boolean;
   footerAlpha: number | null;
   footerDps: number | null;
+  /** Σ sustained DPS — null unless every gun with a burst figure has a known cycle (#343). */
+  footerSustainedDps: number | null;
   damageChannelTotals: { channel: string; value: number }[];
   effectiveRange: number | null;
   longestRangeGun: string | null;
   mixedRangeWarning: boolean;
   projectileSpeed: number | null;
+  /** Every missile, torpedo and rocket on the racks — with or without warhead data. */
   missileCount: number;
+  missileRows: MissileRow[];
+  /** Σ warhead damage of every missile fired at once — a burst, never a DPS. */
   missileSalvoDamage: number | null;
+  /** True when some missiles lack warhead data, so the salvo sum leaves them out. */
+  missileSalvoPartial: boolean;
   missileLockTime: number | null;
   missileLockNoteSlowest: boolean;
   missileRange: number | null;
-  missileSignalTypes: string[];
+  missileSignalTypes: MissileSignal[];
   gapKeys: string[];
 }
 
@@ -403,6 +457,8 @@ export function buildOffensivePanel(occupants: readonly SummaryOccupant[]): Offe
   const rows: WeaponRow[] = [];
   let footerAlpha = 0;
   let footerDps = 0;
+  let footerSustained = 0;
+  let sustainedComplete = true;
   let hasAlpha = false;
   let hasDps = false;
   const channelTotals = new Map<string, number>();
@@ -410,19 +466,20 @@ export function buildOffensivePanel(occupants: readonly SummaryOccupant[]): Offe
   const speeds: number[] = [];
 
   for (const o of occupants) {
-    if (o.section !== 'weapons' && o.section !== 'remoteTurrets') continue;
+    if (o.section !== 'weapons' && o.section !== 'remoteTurrets' && o.section !== 'mannedTurrets') continue;
     if (entityKindOf(o) !== 'weapon') continue;
     const p = o.payload as { className?: string; size?: number | null; weaponParams?: Record<string, unknown> } | null;
     const alpha = alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);
     if (alpha === null) continue;
     const fireRate = toFiniteNumber(p?.weaponParams?.['fireRate'] ?? null);
     const dps = damagePerSecond(alpha, fireRate);
+    const sustained = sustainedDps(dps, fireRate, p?.weaponParams).value;
     for (let i = 0; i < o.count; i++) {
       rows.push({
         className: classNameOf(p) || 'unknown',
         size: toFiniteNumber(p?.size ?? null),
         alpha,
-        sustainedDps: dps,
+        sustainedDps: sustained,
         burstDps: dps,
       });
     }
@@ -431,6 +488,8 @@ export function buildOffensivePanel(occupants: readonly SummaryOccupant[]): Offe
     if (dps !== null) {
       footerDps += dps * o.count;
       hasDps = true;
+      if (sustained === null) sustainedComplete = false;
+      else footerSustained += sustained * o.count;
     }
 
     for (const c of impactDamageChannels(o.ammoPayload ?? o.payload)) {
@@ -455,25 +514,43 @@ export function buildOffensivePanel(occupants: readonly SummaryOccupant[]): Offe
 
   let missileCount = 0;
   let missileDamage = 0;
+  let missileWithDamage = 0;
   let missileMaxLock: number | null = null;
   let missileMinRange: number | null = null;
-  const signalTypes = new Set<string>();
+  const signalTypes = new Set<MissileSignal>();
+  const missileRows = new Map<string, MissileRow>();
   for (const o of occupants) {
-    if (o.section !== 'missiles') continue;
-    const p = o.payload as { weaponParams?: Record<string, unknown>; subType?: string | null } | null;
-    const alpha = alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);
-    if (alpha !== null) {
-      missileDamage += alpha * o.count;
-      missileCount += o.count;
+    if (!isMissileOccupant(o)) continue;
+    const p = o.payload as { className?: string; size?: number | null; subType?: unknown } | null;
+    const className = classNameOf(p) || 'unknown';
+    const damage = missileDamageOf(o);
+    missileCount += o.count;
+    if (damage !== null) {
+      missileDamage += damage * o.count;
+      missileWithDamage += o.count;
     }
-    const lock = usable(
-      toFiniteNumber(p?.weaponParams?.['lockTime'] ?? p?.weaponParams?.['timeToLock'] ?? null),
-    );
+    const row = missileRows.get(className);
+    if (row) {
+      row.count += o.count;
+      row.totalDamage = row.damage !== null ? row.damage * row.count : null;
+    } else {
+      const signal = trackingSignalOf(className);
+      missileRows.set(className, {
+        className,
+        size: usable(toFiniteNumber(p?.size ?? null)),
+        category: missileCategoryOf(p?.subType),
+        signal,
+        count: o.count,
+        damage,
+        totalDamage: damage !== null ? damage * o.count : null,
+      });
+    }
+    const metrics = readCombatMetrics(o.payload);
+    const lock = metrics.lockTime ?? null;
     if (lock !== null) missileMaxLock = missileMaxLock === null ? lock : Math.max(missileMaxLock, lock);
-    const ammo = o.ammoPayload as { speed?: number | null; lifetime?: number | null } | undefined;
-    const range = projectileRange(ammo?.speed, ammo?.lifetime);
+    const range = metrics.range ?? null;
     if (range !== null) missileMinRange = missileMinRange === null ? range : Math.min(missileMinRange, range);
-    const sig = (p?.subType ?? '').trim();
+    const sig = trackingSignalOf(className);
     if (sig) signalTypes.add(sig);
   }
 
@@ -488,13 +565,19 @@ export function buildOffensivePanel(occupants: readonly SummaryOccupant[]): Offe
     hasDpsColumn: hasDps,
     footerAlpha: hasAlpha ? footerAlpha : null,
     footerDps: hasDps ? footerDps : null,
+    footerSustainedDps: hasDps && sustainedComplete ? Math.round(footerSustained * 100) / 100 : null,
     damageChannelTotals: [...channelTotals.entries()].map(([channel, value]) => ({ channel, value })),
     effectiveRange,
     longestRangeGun,
     mixedRangeWarning,
     projectileSpeed,
     missileCount,
-    missileSalvoDamage: missileCount > 0 ? usable(missileDamage) : null,
+    // Biggest warhead first: the row that decides the salvo leads.
+    missileRows: [...missileRows.values()].sort(
+      (a, b) => (b.size ?? 0) - (a.size ?? 0) || (b.damage ?? 0) - (a.damage ?? 0) || a.className.localeCompare(b.className),
+    ),
+    missileSalvoDamage: missileWithDamage > 0 ? usable(missileDamage) : null,
+    missileSalvoPartial: missileWithDamage > 0 && missileWithDamage < missileCount,
     missileLockTime: missileMaxLock,
     missileLockNoteSlowest: missileMaxLock !== null,
     missileRange: missileMinRange,
@@ -578,6 +661,8 @@ function armorReductionOf(stats: Record<string, Record<string, unknown>> | undef
 export function buildDefensivePanel(
   occupants: readonly SummaryOccupant[],
   armorPayload: unknown,
+  /** The ship's own `hull.hp` (Σ `Part@damageMax` of the vehicle XML), absent on old extracts. */
+  hullHpRaw: number | null = null,
 ): DefensivePanel {
   const shields: {
     hp: number | null;
@@ -627,7 +712,10 @@ export function buildDefensivePanel(
 
   const gapKeys: string[] = [];
   if (shields.length === 0) gapKeys.push('codex.summary.gap.noShields');
-  gapKeys.push('codex.summary.gap.noHullMass');
+  // Hull HP is in every extract since schema 3 (the vehicle XML); only an
+  // older build without it still gets the gap.
+  const hullHp = usable(toFiniteNumber(hullHpRaw));
+  if (hullHp === null) gapKeys.push('codex.summary.gap.noHullMass');
   if (!armor) gapKeys.push('codex.summary.gap.noArmorStats');
 
   return {
@@ -640,8 +728,9 @@ export function buildDefensivePanel(
     mixedGeneratorNote: distinctClasses > 1,
     resistances,
     armor,
-    hullHp: null, // not in the 4.9.0 extract — always a gap, never guessed
-    effectiveHp: null, // requires hull HP, which is always null today
+    hullHp,
+    // Shields + hull, only when both are known — never a half sum.
+    effectiveHp: hullHp !== null && shields.length > 0 ? hullHp + shieldHp : null,
     gapKeys,
   };
 }

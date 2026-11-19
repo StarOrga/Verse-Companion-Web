@@ -49,6 +49,9 @@ export const VIEW_FAB_LANE_VAR = '--sc-view-fab-lane';
     @media (max-width: 720px) {
       .wrap { bottom: var(--sc-beta-fab-bottom, var(--sc-fab-clear-block, 96px)); }
     }
+    /* A large popup (scPopupMotion="large"/"panel", html.sc-popup-large-open) covers the page: the page's own
+       view switch does not float over it (it stood on the swap picker on phones). */
+    :host-context(html.sc-popup-large-open) .wrap { visibility: hidden; }
     .fab {
       display: inline-grid; place-items: center; width: var(--_d); height: var(--_d);
       border-radius: 50%; padding: 0; cursor: pointer;
@@ -56,7 +59,7 @@ export const VIEW_FAB_LANE_VAR = '--sc-view-fab-lane';
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
     .fab:hover { background: color-mix(in srgb, var(--sc-accent) 14%, var(--sc-bg-1)); border-color: var(--sc-accent); }
-    .fab:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .fab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
   `],
 })

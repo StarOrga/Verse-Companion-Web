@@ -65,9 +65,15 @@ const CATALOG_SHARED = [
 export const SUBTHEMES: readonly Subtheme[] = [
   {
     key: 'strings',
-    revision: 1,
+    // 2: E14 — the English table gains the `scc_room_*` room labels
+    // (ship_rooms.py), the translation pipeline's input for room names.
+    revision: 2,
     phases: ['codex_locale_strings'],
-    sources: [...CATALOG_SHARED, 'data-uploader/python/sc_extract/localization.py'],
+    sources: [
+      ...CATALOG_SHARED,
+      'data-uploader/python/sc_extract/localization.py',
+      'data-uploader/python/sc_extract/ship_rooms.py',
+    ],
   },
   {
     key: 'ships',
@@ -91,23 +97,44 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // and count ore pods; no hull is "unmeasured" for a missing grid anymore.
     // 11: payload.sizeClass (S1-S6 from the vehicle's AttachDef.Size) for the
     // Codex index size filter.
-    revision: 11,
+    // 12: rooms without an interiorMapSection on a multi-deck ship take the
+    // deck of the authored rooms on their floor level, this hull's and its
+    // family's (Starlancer MAX from the TAC) — fewer rooms on "Other rooms".
+    // 13: E14 — rooms carry `locKey` (the game's loc key) and, without a
+    // German string, `labelKey` (`scc_room_*`, translated by the pipeline).
+    // 14: validated against the wiki / erkul on Starlancer MAX, ROC, Idris —
+    // armorHp from the loadout's armour item (MAX had none), ore pods sized
+    // by their resource capacity (ROC-DS 3.4, not 1.28), wheeled vehicles get
+    // maxSpeed / reverseSpeed, payload.fuel + payload.boundingBox, liveries
+    // from the DataCore (payload.skins), `,P` loc keys resolve (Wikelo
+    // names), mission / event / game-mode hull copies are variants.
+    // 15: a hull with no authored deck (Idris) gets `derived` decks grouped by
+    // floor height ("Level N" / "Ebene N"); stairs, ladders and lifts sit on
+    // every level they join and name them in `rooms[].connects`.
+    // 16: mission-objective props (EAObjective*, e.g. the Satellite) are no ships.
+    // 17: concept 20261117-1810 — payload.interior (elements, doors, cargo grids, lifts, cargo
+    // gaps), decks merged by lift stops, rooms carry `poweredBy`, catch-all rooms land on their deck.
+    revision: 17,
     phases: ['codex_ships'],
     sources: [
       ...CATALOG_SHARED,
       'data-uploader/python/sc_extract/geometry.py',
       'data-uploader/python/sc_extract/ship_decks.py',
       'data-uploader/python/sc_extract/ship_discovery.py',
+      'data-uploader/python/sc_extract/ship_interior.py',
       'data-uploader/python/sc_extract/ship_rooms.py',
       'data-uploader/python/sc_extract/thresholds.py',
     ],
   },
   // components 4 / items 4: #842 — ship radars move from codex_items to
   // codex_components (kind Radar) with flat range / sensitivity keys.
-  { key: 'components', revision: 4, phases: ['codex_components'], sources: CATALOG_SHARED },
-  { key: 'weapons', revision: 3, phases: ['codex_weapons', 'codex_ammunition'], sources: CATALOG_SHARED },
+  // components 5 / weapons 5 / items 6: names behind a `,P`-marked loc key
+  // resolve instead of showing the raw `@key`.
+  { key: 'components', revision: 5, phases: ['codex_components'], sources: CATALOG_SHARED },
+  // weapons 4: #343 — weaponParams gains regen.* / heat.* (sustained DPS).
+  { key: 'weapons', revision: 5, phases: ['codex_weapons', 'codex_ammunition'], sources: CATALOG_SHARED },
   // items 5: missiles carry stats.SCItemMissileParams (feedback e7b6a2a1).
-  { key: 'items', revision: 5, phases: ['codex_items'], sources: CATALOG_SHARED },
+  { key: 'items', revision: 6, phases: ['codex_items'], sources: CATALOG_SHARED },
   {
     key: 'codex_extra',
     // 2: #643 — codex_item_ports.helper_name / position / rotation resolve on
@@ -120,7 +147,8 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // 6: codex_blueprints.payload.missionSource + codex_missions gains the
     //    career/list contracts that award a blueprint (blueprint_sources.py).
     // 7: codex_blueprints gains dismantle_yield / dismantlable (HQ Bestand, #1058).
-    revision: 7,
+    // 8: codex_entity_strings — names behind a `,P`-marked loc key resolve.
+    revision: 8,
     phases: [
       'codex_manufacturers',
       'codex_blueprints',
@@ -178,7 +206,19 @@ export const SUBTHEMES: readonly Subtheme[] = [
     //    packages that failed on an empty/duplicate placement id (Meteor
     //    Collector) now build. Cached parts are reused; only the missing
     //    ones are built.
-    revision: 5,
+    // 6: liveries come from the DataCore (names, which ship they fit, their
+    //    .mtl) via the build manifest, and `<mesh>_ext.mtl` counts as the
+    //    base material — the Starlancer MAX / TAC had no 3D hull at all.
+    // 7: cgf-converter v2.0.0-sc.1 + a texture-free retry for hull materials
+    //    the converter cannot read — the hulls v2.0.0 overflowed on (Galaxy,
+    //    Polaris, Perseus, Constellations, Vulture, Hull B …), every Vanguard,
+    //    the Salvation and the Blade now build. Cached models are kept (the
+    //    build is keyed as v2.0.0); only the ships that had none are built.
+    // 8: a hull whose next simplify rung tears the skin bisects towards it
+    //    instead of staying unsimplified (Polaris, Galaxy, Constellations …).
+    //    Only hulls left over the size budget are built again (FIT_REVISION);
+    //    every hull within it is reused byte-identical.
+    revision: 8,
     phases: [],
     sources: [
       'data-uploader/python/sc_extract/assets3d/',
@@ -247,7 +287,11 @@ export function planSubthemes(input: SubthemePlanInput): SubthemePlan {
   if (!input.ledger) return { skip: [], pending: all, reason: 'no-ledger' };
   const revisions = input.revisions ?? currentRevisions();
   const held = new Map<string, number>();
-  for (const row of input.ledger) held.set(row.subtheme, row.revision);
+  // Several rows per subtheme (one build under two patch labels): a row at the
+  // current revision wins, so a relabel can never make a held part look open.
+  for (const row of input.ledger) {
+    if (held.get(row.subtheme) !== revisions[row.subtheme as SubthemeKey]) held.set(row.subtheme, row.revision);
+  }
   const skip: SubthemeKey[] = [];
   const pending: SubthemeKey[] = [];
   for (const key of all) {

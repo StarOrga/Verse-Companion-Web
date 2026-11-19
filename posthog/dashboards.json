@@ -1,0 +1,91 @@
+{
+  "$comment": "PostHog as code. Applied idempotently by name via `npm run posthog:apply` (scripts/posthog-apply.mjs). Exactly three dashboards (G2). Tile types: trends/hogql = simple reports, funnel/retention/paths/lifecycle/stickiness = cross-flow reports (~30/70, G3). A funnel tile {flow:<id>} is built from posthog/flows.json at apply time (missing file/flow = tile skipped). Web events without a `source` property show as None in breakdowns = web. Docs: docs/analytics/posthog-setup.md, .claude/deep-knowledge/posthog.md.",
+  "feature_flags": [
+    {
+      "key": "telemetry-saver",
+      "name": "Telemetry saver: pauses session replay and heatmaps near the free quota (errors and core events never)",
+      "active": false
+    }
+  ],
+  "dashboards": [
+    {
+      "name": "Läuft es?",
+      "description": "Gesundheit: Fehler je Quelle, neue Fehler-Issues, Cron-Läufe, Dienste, Web Vitals, Desktop-Abstürze. Einstieg für „ist etwas kaputt?“.",
+      "tiles": [
+        { "name": "Fehler pro Quelle (web / server / desktop)", "desc": "$exception je Quelle; None = Browser.", "type": "trends", "series": [{ "event": "$exception" }], "breakdown": "source", "display": "ActionsBar" },
+        { "name": "Neue Fehler-Issues (7 Tage)", "desc": "Issues, die in den letzten 7 Tagen zum ersten Mal auftraten.", "type": "hogql", "hogql": "select toString(properties.$exception_issue_id) as issue, any(toString(properties.$exception_types)) as type, any(toString(properties.source)) as source, count() as hits, min(timestamp) as first_seen from events where event = '$exception' and timestamp >= now() - interval 7 day group by issue having first_seen >= now() - interval 7 day order by hits desc limit 20" },
+        { "name": "Cron-Läufe: Fehlschläge je Funktion", "desc": "server:cron_run_finish mit ok = false.", "type": "trends", "series": [{ "event": "server:cron_run_finish", "filter": [{ "key": "ok", "value": ["false"] }] }], "breakdown": "function", "display": "ActionsBar" },
+        { "name": "Dienst-Gesundheit: Server-Fehler je Funktion", "desc": "Edge-Function-Fehler (5xx und Exceptions) je Funktion; Dienst-Zustände selbst stehen im Admin unter Telemetrie.", "type": "trends", "series": [{ "event": "$exception", "filter": [{ "key": "source", "value": ["server"] }] }], "breakdown": "function", "display": "ActionsBar" },
+        { "name": "Web Vitals LCP und INP (p75, 14 Tage)", "desc": "PostHogs eigene $web_vitals-Ereignisse.", "type": "hogql", "hogql": "select toDate(timestamp) as day, round(quantile(0.75)(toFloat(properties.$web_vitals_LCP_value))) as lcp_p75_ms, round(quantile(0.75)(toFloat(properties.$web_vitals_INP_value))) as inp_p75_ms from events where event = '$web_vitals' and timestamp >= now() - interval 14 day group by day order by day" },
+        { "name": "Absturzrate Desktop-App (14 Tage)", "desc": "Abstürze im Verhältnis zu Nutzungsmeldungen, weitergeleitet über ingest-telemetry.", "type": "hogql", "hogql": "select toDate(timestamp) as day, countIf(event = '$exception') as crashes, countIf(event = 'desktop:usage_metric') as usage_events, round(100 * crashes / greatest(crashes + usage_events, 1), 2) as crash_pct from events where properties.source = 'desktop' and timestamp >= now() - interval 14 day group by day order by day" },
+        { "name": "Sitzung mit Fehler: Seitenaufruf → Fehlerzustand", "desc": "Wie viele Besucher einen Fehlerzustand sehen.", "type": "funnel", "steps": ["$pageview", "app:error_show"] },
+        { "name": "Kommen Nutzer nach einem Fehler wieder?", "desc": "Wiederkehr nach app:error_show.", "type": "retention", "target": "app:error_show", "returning": "$pageview" },
+        { "name": "Was passiert nach einem Fehler? (Pfade)", "desc": "Ereignisfolge ab app:error_show.", "type": "paths", "start": "app:error_show", "eventTypes": ["custom_event"] },
+        { "name": "Fehler-Lebenszyklus (Personen mit Fehlerzustand)", "desc": "Neu, wiederkehrend, ruhend.", "type": "lifecycle", "series": [{ "event": "app:error_show" }] },
+        { "name": "Desktop-App: Nutzungstage pro Monat", "desc": "Wie oft dieselbe Installation Nutzungsmeldungen sendet.", "type": "stickiness", "series": [{ "event": "desktop:usage_metric" }] },
+        { "name": "Desktop: Nutzung → Absturz", "desc": "Anteil der Installationen mit Absturz nach Nutzung.", "type": "funnel", "steps": ["desktop:usage_metric", "$exception"] },
+        { "name": "Desktop-Installationen kommen wieder", "desc": "Wöchentliche Wiederkehr der Desktop-App.", "type": "retention", "target": "desktop:usage_metric", "returning": "desktop:usage_metric" }
+      ]
+    },
+    {
+      "name": "Wird es genutzt?",
+      "description": "Nutzung: aktive Nutzer, Wiederkehr, Lebenszyklus, Klebrigkeit, Bereiche und die acht Flows (Onboarding, Codex, Fehler, Hangar, Feedback, Desktop, Verse, Wunsch).",
+      "tiles": [
+        { "name": "Aktive Nutzer täglich (DAU)", "desc": "Eindeutige Personen mit Seitenaufruf, mit Einwilligung.", "type": "trends", "series": [{ "event": "$pageview", "name": "DAU", "math": "dau" }] },
+        { "name": "Aktive Nutzer wöchentlich (WAU)", "desc": "Eindeutige Personen pro Woche.", "type": "trends", "series": [{ "event": "$pageview", "name": "WAU", "math": "weekly_active" }], "range": "-90d", "interval": "week" },
+        { "name": "Bereiche: Ereignisse je Kategorie und Ereignis (30 Tage)", "desc": "Jedes Katalog-Ereignis nach Bereich (category:object_action), damit alles erfasste hier erreichbar ist.", "type": "hogql", "hogql": "select splitByString(':', event)[1] as area, event, count() as events, count(distinct person_id) as people from events where event like '%:%' and not startsWith(event, '$') and timestamp >= now() - interval 30 day group by area, event order by area, events desc limit 500" },
+        { "name": "Suchen ohne Treffer (30 Tage)", "desc": "search:miss_show je Suchtext: was gesucht und nicht gefunden wurde, mit Anzahl, Personen, Bereich und letztem Mal. Ersetzt die frühere Admin-Karte „Häufig ohne Treffer“.", "type": "hogql", "hogql": "select toString(properties.term) as term, count() as misses, count(distinct person_id) as persons, any(toString(properties.area)) as area, max(timestamp) as last_seen from events where event = 'search:miss_show' and timestamp >= now() - interval 30 day and toString(properties.term) != '' group by term order by misses desc limit 100" },
+        { "name": "Suche: „Du bist hier“ und Varianten-Links (30 Tage)", "desc": "search:result_open nach Art der Wahl: normale Zeile, die ausgegraute Zeile der aktuellen Seite (current, schließt nur die Suche) und die Varianten-Minilinks einer Schiffszeile (variant), mit Personen.", "type": "hogql", "hogql": "select multiIf(toString(properties.variant) = 'true', 'Varianten-Link', toString(properties.current) = 'true', 'Du bist hier', 'Zeile') as choice, count() as opens, count(distinct person_id) as persons, countIf(toString(properties.new_tab) = 'true') as new_tab from events where event = 'search:result_open' and timestamp >= now() - interval 30 day group by choice order by opens desc" },
+        { "name": "Flow Onboarding", "desc": "Zugang bis erste Nutzung (posthog/flows.json).", "type": "funnel", "flow": "onboard" },
+        { "name": "Wunschpfad: Wunsch → Operation → erfüllt", "desc": "Wie viele Wünsche einer Operation zugeordnet und danach als Bestand gebucht werden (Pfad-Stationen A12).", "type": "funnel", "steps": ["hq:wish_add", "hq:path_group_assign", "hq:inventory_add"] },
+        { "name": "Flow Codex", "desc": "posthog/flows.json", "type": "funnel", "flow": "codex" },
+        { "name": "Flow Fehler", "desc": "posthog/flows.json", "type": "funnel", "flow": "error" },
+        { "name": "Flow Hangar", "desc": "posthog/flows.json", "type": "funnel", "flow": "hangar" },
+        { "name": "Flow Feedback", "desc": "posthog/flows.json", "type": "funnel", "flow": "feedback" },
+        { "name": "Flow Desktop", "desc": "posthog/flows.json", "type": "funnel", "flow": "desktop" },
+        { "name": "Flow Verse", "desc": "posthog/flows.json", "type": "funnel", "flow": "verse" },
+        { "name": "Flow Wunsch", "desc": "posthog/flows.json", "type": "funnel", "flow": "wish" },
+        { "name": "Zugang: Anfrage → Anmeldung", "desc": "Wie viele Anfragen zur ersten Anmeldung führen.", "type": "funnel", "steps": ["auth:access_request", "auth:user_sign_in"] },
+        { "name": "Hangar: Schiff → Konfiguration → Loadout", "desc": "Wie weit Hangar-Nutzer kommen.", "type": "funnel", "steps": ["hangar:ship_add", "hangar:ship_config_update", "hangar:loadout_create"] },
+        { "name": "Wiederkehr: Seitenaufruf wöchentlich", "desc": "Wöchentliche Retention aller Besucher mit Einwilligung.", "type": "retention", "target": "$pageview", "returning": "$pageview" },
+        { "name": "Wiederkehr nach der Anmeldung", "desc": "Wer sich anmeldet, kommt wieder.", "type": "retention", "target": "auth:user_sign_in", "returning": "$pageview" },
+        { "name": "Hangar-Wiederkehr", "desc": "Wer ein Schiff hinzufügt, tut es wieder.", "type": "retention", "target": "hangar:ship_add", "returning": "hangar:ship_add" },
+        { "name": "Galerie: gewählte Ansichten", "desc": "verse:gallery_filter_select je Ansicht (mine = Sammlung).", "type": "trends", "series": [{ "event": "verse:gallery_filter_select" }], "breakdown": "filter", "display": "ActionsBar" },
+        { "name": "Verse-Wiederkehr", "desc": "Wer ein Tor öffnet, kommt zurück ins Verse.", "type": "retention", "target": "verse:door_open", "returning": "verse:door_open" },
+        { "name": "Einstellungen-Wiederkehr", "desc": "Wer Einstellungen ändert, kommt wieder.", "type": "retention", "target": "settings:language_change", "returning": "$pageview" },
+        { "name": "Lebenszyklus der Nutzer", "desc": "Neu, wiederkehrend, wiederbelebt, ruhend.", "type": "lifecycle", "series": [{ "event": "$pageview" }] },
+        { "name": "Lebenszyklus Hangar-Nutzer", "desc": "Lebenszyklus anhand von hangar:ship_add.", "type": "lifecycle", "series": [{ "event": "hangar:ship_add" }] },
+        { "name": "Lebenszyklus Verse-Nutzer", "desc": "Lebenszyklus anhand von verse:door_open.", "type": "lifecycle", "series": [{ "event": "verse:door_open" }] },
+        { "name": "Klebrigkeit: Tage aktiv im Monat", "desc": "An wie vielen Tagen Nutzer aktiv sind.", "type": "stickiness", "series": [{ "event": "$pageview" }] },
+        { "name": "Klebrigkeit Verse", "desc": "Tage mit Verse-Nutzung.", "type": "stickiness", "series": [{ "event": "verse:door_open" }] },
+        { "name": "Klebrigkeit Hangar", "desc": "Tage mit Hangar-Änderungen.", "type": "stickiness", "series": [{ "event": "hangar:ship_add" }] },
+        { "name": "Klebrigkeit Codex", "desc": "Tage mit Codex-Verknüpfungen.", "type": "stickiness", "series": [{ "event": "codex:ship_link_create" }] },
+        { "name": "Bauteil-Auswahl je Holotisch-Besuch", "desc": "codex:part_select und codex:part_deselect je Sitzung mit Holotisch (codex:holotable_open oder eine Auswahl), Quelle und Abwahlweg (14 Tage).", "type": "hogql", "hogql": "select toDate(timestamp) as day, uniqIf($session_id, event in ('codex:holotable_open', 'codex:part_select')) as visits, countIf(event = 'codex:part_select') as selects, round(selects / greatest(visits, 1), 2) as selects_per_visit, countIf(event = 'codex:part_select' and properties.source = 'model') as from_model, countIf(event = 'codex:part_select' and properties.source = 'list') as from_list, countIf(event = 'codex:part_select' and properties.source = 'keyboard') as from_keyboard, countIf(event = 'codex:part_deselect' and properties.via = 'empty') as off_empty, countIf(event = 'codex:part_deselect' and properties.via = 'again') as off_again, countIf(event = 'codex:part_deselect' and properties.via = 'panel') as off_panel, countIf(event = 'codex:part_deselect' and properties.via = 'escape') as off_escape from events where event in ('codex:holotable_open', 'codex:part_select', 'codex:part_deselect') and timestamp >= now() - interval 14 day group by day order by day" },
+        { "name": "Kaufen-Reiter: Wunschliste nach Quelle", "desc": "Wunschlisten-Einträge aus der Holotisch-Akte, getrennt nach Laden und Wikelo-Tausch (codex:wish_add).", "type": "trends", "series": [{ "event": "codex:wish_add" }], "breakdown": "source", "display": "ActionsBar" },
+        { "name": "Kaufen-Reiter geöffnet", "desc": "Wie oft der Reiter Kaufen der Akte geöffnet wird (codex:buy_open).", "type": "trends", "series": [{ "event": "codex:buy_open" }] },
+        { "name": "Holotisch innen genutzt", "desc": "Eindeutige Personen pro Woche, die im Beta-Holotisch ein Deck wählen, eine Innen-Gruppe schalten, ein Element öffnen oder in Bauteile suchen (Concept 20261117-1810).", "type": "trends", "series": [{ "event": "codex:deck_select", "name": "Deck gewählt", "math": "weekly_active" }, { "event": "codex:interior_filter_toggle", "name": "Gruppe geschaltet", "math": "weekly_active" }, { "event": "codex:interior_element_select", "name": "Element geöffnet", "math": "weekly_active" }, { "event": "codex:parts_search", "name": "Bauteile gesucht", "math": "weekly_active" }], "range": "-90d", "interval": "week" },
+        { "name": "Holotisch innen: Deckwahl je Schiff", "desc": "codex:deck_select nach Schiff: welche Innenleben angesehen werden.", "type": "trends", "series": [{ "event": "codex:deck_select" }], "breakdown": "ship", "display": "ActionsBar" },
+        { "name": "Holotisch innen: geschaltete Gruppen", "desc": "codex:interior_filter_toggle nach Gruppe (Fracht, Wege, Türen …): was neben der Rollen-Voreinstellung gebraucht wird.", "type": "trends", "series": [{ "event": "codex:interior_filter_toggle" }], "breakdown": "group", "display": "ActionsBar" },
+        { "name": "Seitenpfade: Wohin gehen Besucher?", "desc": "Pfad von Seite zu Seite.", "type": "paths", "eventTypes": ["$pageview"] },
+        { "name": "Pfade ab der Anmeldung", "desc": "Was Nutzer nach auth:user_sign_in tun.", "type": "paths", "start": "auth:user_sign_in", "eventTypes": ["custom_event"] },
+        { "name": "Pfade im Hangar", "desc": "Was auf hangar:ship_add folgt.", "type": "paths", "start": "hangar:ship_add", "eventTypes": ["custom_event"] },
+        { "name": "Pfade im Verse", "desc": "Was auf verse:door_open folgt.", "type": "paths", "start": "verse:door_open", "eventTypes": ["custom_event"] }
+      ]
+    },
+    {
+      "name": "Was kostet es?",
+      "description": "Kosten: KI-Aufrufe (Kosten, Tokens, Fehler, Latenz), Ereignisvolumen je Ereignis für die Kontingent-Optimierung, Replays.",
+      "tiles": [
+        { "name": "KI-Kosten je Funktion (USD)", "desc": "$ai_generation, Summe von $ai_total_cost_usd.", "type": "trends", "series": [{ "event": "$ai_generation", "math": "sum", "mathProperty": "$ai_total_cost_usd" }], "breakdown": "function", "display": "ActionsBar" },
+        { "name": "KI-Kosten je Modell (USD)", "desc": "Gleiche Summe nach Modell.", "type": "trends", "series": [{ "event": "$ai_generation", "math": "sum", "mathProperty": "$ai_total_cost_usd" }], "breakdown": "$ai_model", "display": "ActionsBar" },
+        { "name": "KI-Tokens (Eingabe und Ausgabe)", "desc": "Summe der Tokens je Tag.", "type": "trends", "series": [{ "event": "$ai_generation", "name": "Eingabe", "math": "sum", "mathProperty": "$ai_input_tokens" }, { "event": "$ai_generation", "name": "Ausgabe", "math": "sum", "mathProperty": "$ai_output_tokens" }] },
+        { "name": "KI: Fehlerrate und Latenz p95 je Funktion", "desc": "Fehlerquote und 95. Perzentil der Latenz (Sekunden), 30 Tage.", "type": "hogql", "hogql": "select toString(properties.function) as function_name, count() as calls, round(100 * countIf(properties.$ai_is_error = true) / count(), 1) as error_pct, round(quantile(0.95)(toFloat(properties.$ai_latency)), 2) as latency_p95_s from events where event = '$ai_generation' and timestamp >= now() - interval 30 day group by function_name order by calls desc" },
+        { "name": "Ereignisvolumen je Ereignis (Kontingent)", "desc": "Alle Ereignisse nach Name, die größten zuerst — hier wird gespart.", "type": "trends", "series": [{ "event": null, "name": "Alle Ereignisse" }], "breakdownHogql": "event", "display": "ActionsBar" },
+        { "name": "Session-Replays pro Tag", "desc": "Aufgezeichnete Replays (nur Sitzungen mit Fehler).", "type": "hogql", "hogql": "select toDate(start_time) as day, count() as replays from session_replay_events where start_time >= now() - interval 30 day group by day order by day" },
+        { "name": "KI-Nutzung: Tage aktiv je Funktion", "desc": "An wie vielen Tagen eine Funktion Claude aufruft.", "type": "stickiness", "series": [{ "event": "$ai_generation" }] },
+        { "name": "KI-Funktionen: neu, aktiv, ruhend", "desc": "Lebenszyklus der Aufrufer von Claude.", "type": "lifecycle", "series": [{ "event": "$ai_generation" }] },
+        { "name": "KI-Aufrufe wiederkehrend", "desc": "Wöchentliche Wiederkehr der Aufrufer.", "type": "retention", "target": "$ai_generation", "returning": "$ai_generation" }
+      ]
+    }
+  ]
+}

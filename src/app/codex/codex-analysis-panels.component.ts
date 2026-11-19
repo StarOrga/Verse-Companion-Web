@@ -157,6 +157,8 @@ const PANEL_STYLES = `
             @if (h.dps) { {{ 'codex.analysis.offensive.hintDps' | translate: { value: h.dps } }} }
             @if (h.dps && h.alpha) { · }
             @if (h.alpha) { {{ 'codex.analysis.offensive.hintAlpha' | translate: { value: h.alpha } }} }
+            @if ((h.dps || h.alpha) && h.missiles) { · }
+            @if (h.missiles) { {{ 'codex.analysis.offensive.hintMissiles' | translate: { value: h.missiles } }} }
           </span>
         }
         <span class="fold-hint">{{ 'codex.analysis.readHint' | translate }}</span>
@@ -195,7 +197,7 @@ const PANEL_STYLES = `
                   <td>{{ 'codex.analysis.offensive.total' | translate }}</td>
                   <td></td>
                   @if (p.hasAlphaColumn) { <td>{{ p.footerAlpha != null ? num(p.footerAlpha) : '—' }}</td> }
-                  @if (p.hasDpsColumn) { <td>{{ p.footerDps != null ? num(p.footerDps) : '—' }}</td> }
+                  @if (p.hasDpsColumn) { <td>{{ p.footerSustainedDps != null ? num(p.footerSustainedDps) : '—' }}</td> }
                   @if (p.hasDpsColumn) { <td>{{ p.footerDps != null ? num(p.footerDps) : '—' }}</td> }
                 </tr>
               </tfoot>
@@ -236,24 +238,71 @@ const PANEL_STYLES = `
 
           @if (p.missileCount > 0) {
             <h3 class="section-title">{{ 'codex.analysis.offensive.missiles' | translate: { count: p.missileCount } }}</h3>
-            <dl class="fact-grid">
+            <!-- Missiles are their own table (feedback #350): one row per missile
+                 kind, its warhead and the whole salvo. A salvo is a one-off
+                 burst, so it never joins the guns' DPS total above. -->
+            <div class="table-wrap">
+            <table class="analysis-table">
+              <thead>
+                <tr>
+                  <th>{{ 'codex.analysis.offensive.colMissile' | translate }}</th>
+                  <th>{{ 'codex.analysis.offensive.colSize' | translate }}</th>
+                  <th>{{ 'codex.analysis.offensive.colTracking' | translate }}</th>
+                  <th>{{ 'codex.analysis.offensive.colCount' | translate }}</th>
+                  @if (p.missileSalvoDamage != null) {
+                    <th>{{ 'codex.analysis.offensive.colWarhead' | translate }}</th>
+                    <th>{{ 'codex.analysis.offensive.colMissileTotal' | translate }}</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (m of p.missileRows; track m.className) {
+                  <tr>
+                    <td>{{ itemName(m.className) }}</td>
+                    <td>{{ m.size != null ? 'S' + m.size : '—' }}</td>
+                    <td>{{ m.signal ? (('codex.missile.signal.' + m.signal) | translate) : '—' }}</td>
+                    <td>{{ m.count }}×</td>
+                    @if (p.missileSalvoDamage != null) {
+                      <td>{{ m.damage != null ? num(m.damage) : '—' }}</td>
+                      <td>{{ m.totalDamage != null ? num(m.totalDamage) : '—' }}</td>
+                    }
+                  </tr>
+                }
+              </tbody>
               @if (p.missileSalvoDamage != null) {
-                <dt>{{ 'codex.analysis.offensive.salvoDamage' | translate }}</dt>
-                <dd>{{ num(p.missileSalvoDamage) }}</dd>
+                <tfoot>
+                  <tr>
+                    <td>{{ 'codex.analysis.offensive.salvoDamage' | translate }}</td>
+                    <td></td>
+                    <td></td>
+                    <td>{{ p.missileCount }}×</td>
+                    <td></td>
+                    <td>{{ num(p.missileSalvoDamage) }}</td>
+                  </tr>
+                </tfoot>
               }
-              @if (p.missileLockTime != null) {
-                <dt>{{ 'codex.analysis.offensive.lockTime' | translate }}</dt>
-                <dd>{{ num(p.missileLockTime) }} s</dd>
-              }
-              @if (p.missileRange != null) {
-                <dt>{{ 'codex.analysis.offensive.range' | translate }}</dt>
-                <dd>{{ num(p.missileRange) }} m</dd>
-              }
-              @if (p.missileSignalTypes.length > 0) {
-                <dt>{{ 'codex.analysis.offensive.targeting' | translate }}</dt>
-                <dd>{{ p.missileSignalTypes.join(', ') }}</dd>
-              }
-            </dl>
+            </table>
+            </div>
+            @if (p.missileSalvoDamage != null) {
+              <p class="note">{{ 'codex.analysis.offensive.salvoNote' | translate }}</p>
+            } @else {
+              <p class="gap-row">{{ 'codex.analysis.offensive.noWarheadData' | translate }}</p>
+            }
+            @if (p.missileSalvoPartial) {
+              <p class="warn-note">{{ 'codex.analysis.offensive.salvoPartial' | translate }}</p>
+            }
+            @if (p.missileLockTime != null || p.missileRange != null) {
+              <dl class="fact-grid">
+                @if (p.missileLockTime != null) {
+                  <dt>{{ 'codex.analysis.offensive.lockTime' | translate }}</dt>
+                  <dd>{{ num(p.missileLockTime) }} s</dd>
+                }
+                @if (p.missileRange != null) {
+                  <dt>{{ 'codex.analysis.offensive.range' | translate }}</dt>
+                  <dd>{{ num(p.missileRange) }} m</dd>
+                }
+              </dl>
+            }
             @if (p.missileLockNoteSlowest) {
               <p class="note">{{ 'codex.analysis.offensive.slowestMissileNote' | translate }}</p>
             }
@@ -278,12 +327,13 @@ export class CodexOffensivePanelComponent {
    * The formatted numbers for the folded head's peek; the words around them
    * come from i18n in the template (AUD-188), not from a TS string.
    */
-  hintParts(): { dps: string | null; alpha: string | null } | null {
+  hintParts(): { dps: string | null; alpha: string | null; missiles: string | null } | null {
     const p = this.panel();
     if (!p || (p.footerDps == null && p.missileSalvoDamage == null)) return null;
     const dps = p.footerDps != null ? this.num(p.footerDps) : null;
     const alpha = p.footerAlpha != null ? this.num(p.footerAlpha) : null;
-    return dps || alpha ? { dps, alpha } : null;
+    const missiles = p.missileSalvoDamage != null ? this.num(p.missileSalvoDamage) : null;
+    return dps || alpha || missiles ? { dps, alpha, missiles } : null;
   }
 
   num(v: number): string {

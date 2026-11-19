@@ -188,7 +188,7 @@ export const HQ_LOCKER_CRUMB: PageCrumb = { labelKey: 'hq.tabs.locker', link: hq
       }
       .share-btn svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
       .share-btn:hover, .share-btn.on { color: var(--sc-accent); border-color: var(--sc-accent); }
-      .share-btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .share-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .hint { color: var(--sc-fg-2); }
       .hint a { color: var(--sc-accent); }
       /* No own padding: .sc-card's density scale (--sc-pad-1) tightens it on phones. */
@@ -198,7 +198,7 @@ export const HQ_LOCKER_CRUMB: PageCrumb = { labelKey: 'hq.tabs.locker', link: hq
         background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); font-family: inherit;
       }
       .load-err .retry:hover { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-      .load-err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+      .load-err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       /* The empty state's only action: a real thumb target, not a line of running text. */
       .hint .create-set { display: inline-flex; align-items: center; min-height: var(--sc-tap-min); }
 

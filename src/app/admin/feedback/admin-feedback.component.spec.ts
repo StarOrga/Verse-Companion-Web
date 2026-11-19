@@ -13,7 +13,9 @@ import { CelebrationService } from './celebration.service';
 import { FeedbackMotionService } from './feedback-motion.service';
 import { AdminFeedbackComponent } from './admin-feedback.component';
 import { PanelNavigationService } from '../../feedback/panel-navigation.service';
+import { FeedbackComposerSeedService } from '../../feedback/feedback-composer-seed.service';
 import { FeedbackMessage, FeedbackRow, FeedbackStatus } from './feedback.types';
+import { POSTHOG_GUARD_PROFILE_ID } from '../../feedback/feedback.types';
 import { provideFakeAttachmentSigner } from '../../feedback/testing/fake-attachment-signer';
 
 /**
@@ -474,15 +476,15 @@ describe('AdminFeedbackComponent — the stream', () => {
   it('puts a delivered row\'s deep link and PR link on the feed card, as real anchors — with unique ids', async () => {
     const { el } = await mount(fixtureTables());
     const done = el.querySelector('#fb-card-d1-feed')!;
-    const view = done.querySelector('a.link-btn[href="/codex"]');
+    const view = done.querySelector('a.sc-action[href="/codex"]');
     expect(view).not.toBeNull();
     const pending = el.querySelector('#fb-card-r1-feed')!;
-    expect(pending.querySelector('a.link-btn[href^="https://github.com"]')?.getAttribute('rel')).toBe('noopener noreferrer');
+    expect(pending.querySelector('a.sc-action[href^="https://github.com"]')?.getAttribute('rel')).toBe('noopener noreferrer');
     // r1 is in "Du bist dran" AND in the feed: two cards, two ids.
     expect(el.querySelectorAll('#fb-card-r1').length).toBe(1);
     expect(el.querySelectorAll('#fb-card-r1-feed').length).toBe(1);
     // Red is the admin avatar and the one primary CTA: the feed's ✓ is not red.
-    expect(pending.querySelector('.card-links .sc-btn.hot')).toBeNull();
+    expect(pending.querySelector('.card-links .sc-action--hot')).toBeNull();
   });
 
   /**
@@ -510,7 +512,7 @@ describe('AdminFeedbackComponent — the stream', () => {
     expect(yours.querySelectorAll('button').length).toBe(1);
 
     const feed = el.querySelector('#fb-card-r9-feed')!;
-    expect(feed.querySelector('.card-links .sc-btn')?.textContent).toContain('adminFeedback.review.accept');
+    expect(feed.querySelector('.card-links .sc-action')?.textContent).toContain('adminFeedback.review.accept');
 
     cmp.openTopic('r9');
     fixture.detectChanges();
@@ -682,6 +684,37 @@ describe('AdminFeedbackComponent — the flight path reads as four steps', () =>
     }
     expect(path.getAttribute('role')).toBe('img');
     expect(path.getAttribute('aria-label')).toContain('adminFeedback.station.pathLabel');
+  });
+
+  it('shows a machine item (origin posthog) from the PostHog-Wächter with the machine glyph, not as unknown', async () => {
+    const { el } = await mount({
+      ...fixtureTables(),
+      admin_feedback: [
+        ...(fixtureTables().admin_feedback as FeedbackRow[]),
+        row('p1', 'open', T('12'), { author_id: null, author: null, origin: 'posthog' }),
+        row('p2', 'open', T('13'), { author_id: null, author: null, origin: 'service' }),
+      ],
+    });
+
+    for (const id of ['p1', 'p2']) {
+      const av = el.querySelector(`#fb-card-${id} .av`)!;
+      expect(av.classList).toContain('bot');
+      expect(av.getAttribute('data-sender')).toBe('guard');
+      expect(av.getAttribute('aria-label')).toBe('adminFeedback.guard.title');
+      expect(av.textContent!.trim()).toBe('');
+      expect(av.querySelector('svg')).not.toBeNull();
+    }
+    // A human row keeps its initials avatar.
+    expect(el.querySelector('#fb-card-o1 .av')!.classList).not.toContain('bot');
+  });
+
+  it('names the guard profile as the sender of a thread reply', async () => {
+    const { cmp: c } = await mount(fixtureTables());
+    expect(c.isMachine('posthog', null)).toBe(true);
+    expect(c.isMachine('human', null)).toBe(false);
+    expect(c.isMachine(null, POSTHOG_GUARD_PROFILE_ID)).toBe(true);
+    expect(c.authorLabel(row('p3', 'open', T('12'), { author_id: null, author: null, origin: 'service' }))).toBe('adminFeedback.guard.name');
+    expect(c.authorLabelFor({ ...msg('m9', 'p3', false, T('12')), author_id: POSTHOG_GUARD_PROFILE_ID, author: null })).toBe('adminFeedback.guard.name');
   });
 
   it('maps each status to the step it is meant to draw', async () => {
@@ -1351,5 +1384,69 @@ describe('AdminFeedbackComponent — new topic focuses the field (admin feedback
     } finally {
       el.remove();
     }
+  });
+});
+
+/**
+ * Admin feedback #358: "Wenn im feedback panel noch ein issue offen ist man
+ * aber auf issue erstellen klickt, dann sollte das issue zugehen und in der
+ * Übersicht ja das neue issue text anzeigen". A request from outside the board
+ * replaces whatever sheet the panel shows: a seed closes the open topic and
+ * unfolds the composer, a topic request switches to that topic.
+ */
+describe('AdminFeedbackComponent — a request from outside replaces the open topic', () => {
+  async function flush(fixture: { detectChanges(): void; whenStable(): Promise<unknown> }) {
+    TestBed.tick();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+  }
+
+  it('closes the open topic and shows the composer when a page seeds a new topic', async () => {
+    const { fixture, cmp, el } = await mount(fixtureTables());
+    const seeds = TestBed.inject(FeedbackComposerSeedService);
+    cmp.openTopic('r1');
+    cmp.toggleMore('r1');
+    fixture.detectChanges();
+    expect(cmp.openRow()?.id).toBe('r1');
+
+    seeds.plant(cmp.draftScope, { body: 'Telemetry finding' });
+    seeds.requestOpen();
+    await flush(fixture);
+
+    expect(cmp.openRow(), 'the open topic closed').toBeNull();
+    expect(cmp.overlayOpen()).toBe(false);
+    expect(cmp.composerOpen(), 'the composer unfolded').toBe(true);
+    expect(el.querySelector('.sheet.topic')).toBeNull();
+    expect(el.querySelector('.compose-sheet sc-feedback-composer')).not.toBeNull();
+  });
+
+  it('closes the filters sheet too when a page seeds a new topic', async () => {
+    const { fixture, cmp } = await mount(fixtureTables());
+    const seeds = TestBed.inject(FeedbackComposerSeedService);
+    cmp.openFilters();
+    fixture.detectChanges();
+
+    seeds.plant(cmp.draftScope, { body: 'Telemetry finding' });
+    seeds.requestOpen();
+    await flush(fixture);
+
+    expect(cmp.filtersOpen()).toBe(false);
+    expect(cmp.composerOpen()).toBe(true);
+  });
+
+  it('switches to the requested topic while another one is open, and folds the composer', async () => {
+    const { fixture, cmp } = await mount(fixtureTables());
+    const seeds = TestBed.inject(FeedbackComposerSeedService);
+    cmp.openComposer();
+    cmp.openTopic('r1');
+    fixture.detectChanges();
+
+    seeds.requestTopic('q1');
+    await flush(fixture);
+
+    expect(cmp.openRow()?.id).toBe('q1');
+    expect(cmp.composerOpen()).toBe(false);
+    expect(seeds.pendingTopic()).toBeNull();
   });
 });

@@ -13,7 +13,9 @@ import { signal } from '@angular/core';
 import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
+import { By } from '@angular/platform-browser';
 import { CodexDetailComponent } from './codex-detail.component';
+import { CodexHoloStageComponent } from './holo/codex-holo-stage.component';
 import { CodexService, ResolvedEntity } from './codex.service';
 import { HangarService } from '../hangar/hangar.service';
 import { AuthService } from '../auth/auth.service';
@@ -246,9 +248,9 @@ describe('CodexDetailComponent — Holotable / classic view toggle', () => {
     expect(el.querySelector('sc-codex-holo-stage')).toBeFalsy();
     expect(el.querySelector('.holo-toggle'), 'no Klassisch | Holotisch segment in the head').toBeNull();
     expect(el.querySelector('.c-head .sc-head-strip sc-codex-own-segment'), 'strip on the classic title row (F1)').toBeTruthy();
-    expect(el.querySelector('.hero-stack > .hero-own sc-codex-own-card'), 'ownership card directly under the picture (#323)').toBeTruthy();
-    expect(el.querySelector('.hero-stack > .hero.stage + .hero-own'), 'right below the stage').toBeTruthy();
-    expect(el.querySelector('.m-side sc-codex-own-card'), 'no longer in the side column').toBeNull();
+    expect(el.querySelector('.hero-stack > .hero-pair > .hero-own sc-codex-own-stations'), 'ownership stations directly under the picture (#323)').toBeTruthy();
+    expect(el.querySelector('.hero-pair > .hero.stage + .hero-own'), 'right below the stage').toBeTruthy();
+    expect(el.querySelector('.m-side sc-codex-own-stations'), 'no longer in the side column').toBeNull();
     const corner = TestBed.inject(PageCornerService);
     expect(corner.view()?.holo()).toBe(false);
     corner.view()!.toggle();
@@ -310,5 +312,30 @@ describe('CodexDetailComponent — Holotable / classic view toggle', () => {
     expect(keys).toContain('boost');
     expect(keys).toContain('ir');
     expect(keys.length).toBeGreaterThan(fixture.componentInstance.kpiCells().length);
+  });
+
+  describe('a ship without a 3D model', () => {
+    const stageOf = (fixture: ComponentFixture<CodexDetailComponent>) =>
+      fixture.debugElement.query(By.directive(CodexHoloStageComponent)).componentInstance as CodexHoloStageComponent;
+
+    it('opens on the Akte by default', async () => {
+      const fixture = await setup();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(stageOf(fixture).activeView()).toBe('akte');
+    });
+
+    it('does not override a view the reader already picked', async () => {
+      const fixture = await setup();
+      const c = fixture.componentInstance;
+      const stage = stageOf(fixture);
+      stage.akteOpen.set(false);
+      c['noModelSlug'].set(null);
+      c.onStageViewChange();
+      c['noModelSlug'].set(c.detail()!.classNameSlug);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(stage.activeView()).not.toBe('akte');
+    });
   });
 });

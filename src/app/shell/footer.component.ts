@@ -8,7 +8,7 @@ import { AREA_ENTRIES, activeAreaOf } from './fusion-bar/fusion-bar.model';
 import { AuthService } from '../auth/auth.service';
 import { BetaService } from '../core/beta.service';
 import { LayoutService } from '../core/layout/layout.service';
-import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
 import { HandoffButtonComponent } from './corners/handoff-button.component';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { ReleaseSeenService } from '../release-notes/release-seen.service';
@@ -23,7 +23,7 @@ import { BRAND_NAME } from '../core/brand';
 @Component({
   selector: 'sc-footer',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, ScTooltipDirective, ScDialogDirective, NgTemplateOutlet, HandoffButtonComponent],
+  imports: [TranslatePipe, RouterLink, ScTooltipDirective, ScPopupComponent, NgTemplateOutlet, HandoffButtonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '(document:pointerdown)': 'onDocumentPointerdown($event)' },
   template: `
@@ -33,13 +33,15 @@ import { BRAND_NAME } from '../core/brand';
           <button type="button" class="sf-badge-btn" aria-haspopup="dialog"
                   [attr.aria-expanded]="bubble() === 'pinned'"
                   [attr.aria-describedby]="bubble() === 'peek' ? 'sf-bubble' : null"
-                  (click)="togglePinned()" (focus)="peek()" (keydown.escape)="bubble.set('closed')">
+                  (click)="togglePinned()" (focus)="peekOnFocus()" (keydown.escape)="bubble.set('closed')">
             <img src="icons/made-by-community.png" [alt]="'footer.badgeAlt' | translate" width="32" height="32" />
             <span class="sf-word">{{ 'footer.madeByCommunity' | translate }}</span>
           </button>
           @if (bubble() === 'pinned') {
-            <div class="sf-bubble" id="sf-bubble" scDialog (scDialogEscape)="bubble.set('closed')" role="dialog" [attr.aria-label]="'footer.disclaimerTitle' | translate">
-              <ng-container *ngTemplateOutlet="disclaimerBody" />
+            <div class="sf-bubble sf-pinned" id="sf-bubble">
+              <sc-popup kind="panel" [title]="'footer.disclaimerTitle' | translate" [backClose]="false" (closed)="closePinned()">
+                <ng-container *ngTemplateOutlet="disclaimerBody" />
+              </sc-popup>
             </div>
           } @else if (bubble() === 'peek') {
             <div class="sf-bubble" id="sf-bubble" role="tooltip">
@@ -144,7 +146,7 @@ import { BRAND_NAME } from '../core/brand';
       }
       /* A detail page's share button sits beside the feedback launcher: the
          links then end the same distance before it. */
-      :host-context(html:has(sc-share-button .dock)) .sf {
+      :host-context(html[data-sc-share-dock]) .sf {
         padding-inline-end: calc(var(--sc-fab-clear-inline) + max(44px, var(--sc-tap-min)) + var(--sc-space-4));
       }
     }
@@ -166,22 +168,28 @@ import { BRAND_NAME } from '../core/brand';
       letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.2; max-width: 11ch;
     }
     .sf-badge-btn:hover, .sf-badge-btn:focus-visible { color: var(--sc-fg-1); }
-    .sf-badge-btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 6px; }
-    /* Speech bubble: grows up out of the badge, tail points at it. */
-    .sf-bubble {
-      position: absolute; left: 0; bottom: calc(100% + var(--sc-space-2)); z-index: 5;
-      width: min(380px, calc(100vw - 2 * var(--sc-space-4)));
+    .sf-badge-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 6px; }
+    /* Grows up out of the badge. The pinned bubble is <sc-popup kind="panel"> (frame, width, ✕ from the scaffold);
+       only the hover peek is a plain tooltip and keeps a light frame of its own. */
+    .sf-bubble { position: absolute; left: 0; bottom: calc(100% + var(--sc-space-2)); z-index: 5; }
+    /* Phone: the pinned bubble is a fixed full-screen frame; its wrapper and the stage footer go onto the popup layer. */
+    @media (max-width: 720px) {
+      .sf-bubble.sf-pinned { z-index: var(--sc-popup-z, 1300); }
+      .sf-stage:has(.sf-pinned) { z-index: var(--sc-popup-z, 1300); }
+    }
+    .sf-bubble:not(.sf-pinned) {
+      width: min(var(--sc-ov-s), calc(100vw - 2 * var(--sc-space-4)));
       padding: var(--sc-space-3) var(--sc-space-4);
       background: color-mix(in srgb, var(--sc-bg-1) 96%, transparent);
       border: 1px solid var(--sc-border); border-radius: 12px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);
       color: var(--sc-fg-2); font-size: max(0.78rem, var(--sc-fs-floor)); line-height: 1.45;
     }
-    .sf-bubble::after {
+    .sf-bubble:not(.sf-pinned)::after {
       content: ''; position: absolute; left: 22px; bottom: -6px; width: 10px; height: 10px; rotate: 45deg;
       background: inherit; border: 1px solid var(--sc-border); border-top: 0; border-left: 0;
     }
-    .sf-bubble p { margin: 0; }
+    .sf-bubble p { margin: 0; font-size: max(0.78rem, var(--sc-fs-floor)); line-height: 1.45; }
     .sf-bubble .sf-tm { margin-top: var(--sc-space-2); opacity: 0.8; font-size: max(0.7rem, var(--sc-fs-floor)); }
     /* Verse / Codex / HQ again at the bottom (the header carries the same three). Badge and
        links share the width equally so this nav sits on the footer's centre line. */
@@ -195,7 +203,7 @@ import { BRAND_NAME } from '../core/brand';
       min-height: var(--sc-tap-min); transition: color 0.16s ease;
     }
     .sf-areas a:hover, .sf-areas a[aria-current] { color: var(--sc-accent); }
-    .sf-areas a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 3px; }
+    .sf-areas a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 3px; }
     @media (min-width: 721px) { .sf-badge, .sf-links { flex: 1 1 0; min-width: 0; } }
     .sf-links {
       display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--sc-space-2);
@@ -203,7 +211,7 @@ import { BRAND_NAME } from '../core/brand';
     }
     .sf-links a { color: var(--sc-fg-2); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
     .sf-links a:hover { color: var(--sc-accent); }
-    .sf-links a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 3px; }
+    .sf-links a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 3px; }
     /* Phone (the bar's breakpoint, <= 720): compact, badge row over the links,
        clear of the bottom bar and the feedback launcher. The wordmark folds away
        (the hub's planet-free strip is ~74px at 375px): the emblem stays, and
@@ -292,8 +300,8 @@ import { BRAND_NAME } from '../core/brand';
     }
     .disclaimer-toggle:hover { color: var(--sc-fg-1); }
     .disclaimer-toggle:focus-visible {
-      outline: 1px solid var(--sc-accent);
-      outline-offset: 2px;
+      outline: 1px solid transparent; box-shadow: var(--sc-focus-ring);
+      outline-offset: 0;
       border-radius: 2px;
     }
     .whatsnew {
@@ -335,8 +343,7 @@ import { BRAND_NAME } from '../core/brand';
         margin: 0; box-sizing: border-box;
         padding: 0 var(--sc-fab-clear-inline) var(--sc-safe-bottom, 0px) 190px;
         height: calc(48px + var(--sc-safe-bottom, 0px));
-        background: color-mix(in srgb, var(--sc-bg-1) 55%, transparent);
-        backdrop-filter: blur(10px);
+        background: color-mix(in srgb, var(--sc-bg-1) 75%, transparent);
         border-top: 1px solid var(--sc-border);
       }
       .overlay .inner { height: 48px; gap: 18px; max-width: none; margin: 0; }
@@ -389,6 +396,13 @@ export class FooterComponent {
   /** Disclaimer bubble: hover / focus peeks, a click pins it (then it is a real dialog). */
   protected readonly bubble = signal<'closed' | 'peek' | 'pinned'>('closed');
   protected peek(): void { if (this.bubble() === 'closed') this.bubble.set('peek'); }
+  /** Closing the pinned bubble returns focus to the badge: that focus must not open the peek again. */
+  private noPeekUntil = 0;
+  protected peekOnFocus(): void { if (Date.now() >= this.noPeekUntil) this.peek(); }
+  protected closePinned(): void {
+    this.noPeekUntil = Date.now() + 400;
+    this.bubble.set('closed');
+  }
   protected unpeek(): void { if (this.bubble() === 'peek') this.bubble.set('closed'); }
   protected togglePinned(): void { this.bubble.set(this.bubble() === 'pinned' ? 'closed' : 'pinned'); }
   /** A press beside the pinned bubble closes it (a popover rule); a press on the badge is the toggle's own. */

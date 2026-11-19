@@ -23,7 +23,8 @@ import { BetaService } from '../core/beta.service';
 import { OverlayOriginService } from '../shared/overlay-frame/overlay-origin.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
-import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { NewsService, VerseNewsItem } from './news.service';
 import { ShellChromeService } from '../shell/fusion-bar/shell-chrome.service';
 import { STREAM_CHANNELS } from './news-stage';
@@ -91,7 +92,8 @@ const SAFE_SVG = new Map<string, SafeHtml>();
     NewsThumbComponent,
     UpcomingShipsNoticeComponent,
     ScTooltipDirective,
-    ScDialogDirective,
+    ScPopupComponent,
+    ScActionDirective,
     SammlungStripComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -329,65 +331,51 @@ const SAFE_SVG = new Map<string, SafeHtml>();
 
     <!-- Enlarged in-app detail (CDK overlay, portaled to <body>). -->
     <ng-template #detailTpl>
-      <div class="nd-overlay" (click)="closeDetail()">
-        @if (selected(); as item) {
-          <article class="nd-panel sc-card" role="dialog" aria-modal="true"
-                   scDialog (scDialogEscape)="closeDetail()"
-                   [attr.aria-label]="item.title" (click)="$event.stopPropagation()">
-            <!-- Same back affordance as the patch board's "← Zurück zu Verse
-                 News": a text link, not a floating ✕ disc. It is a real
-                 <button> because it closes an overlay rather than navigating,
-                 but it carries the link's shape so the two read as one idiom. -->
-            <header class="nd-head">
-              <button type="button" class="nd-back" (click)="closeDetail()">
-                ← {{ 'news.detail.back' | translate }}
-              </button>
-            </header>
-            <div class="thumb-wrap nd-media">
-              <sc-news-thumb
-                [images]="imagesOf(item)"
-                [channel]="item.channel"
-                [channelLabel]="('news.channels.' + item.channel) | translate"
-                [channelIcon]="iconFor(item.channel)"
-                [featured]="true" />
-              <!-- For a video the hero doubles as the play target: one tap from
-                   the detail view straight into the clip. -->
-              @if (isVideo(item)) {
-                <a class="play play-link" [href]="item.url" target="_blank" rel="noopener noreferrer"
-                   [attr.aria-label]="'news.videos.play' | translate"
-                   [scTooltip]="'news.videos.play' | translate" scTooltipTier="label">
-                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.6v12.8a.6.6 0 0 0 .92.5l9.6-6.4a.6.6 0 0 0 0-1L8.92 5.1a.6.6 0 0 0-.92.5z"/></svg>
-                </a>
-              }
+      @if (selected(); as item) {
+        <sc-popup kind="large" [eyebrow]="'news.detail.eyebrow' | translate" [title]="item.title" (closed)="closeDetail()">
+          <div class="thumb-wrap nd-media">
+            <sc-news-thumb
+              [images]="imagesOf(item)"
+              [channel]="item.channel"
+              [channelLabel]="('news.channels.' + item.channel) | translate"
+              [channelIcon]="iconFor(item.channel)"
+              [featured]="true" />
+            <!-- For a video the hero doubles as the play target: one tap from
+                 the detail view straight into the clip. -->
+            @if (isVideo(item)) {
+              <a class="play play-link" [href]="item.url" target="_blank" rel="noopener noreferrer"
+                 [attr.aria-label]="'news.videos.play' | translate"
+                 [scTooltip]="'news.videos.play' | translate" scTooltipTier="label">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.6v12.8a.6.6 0 0 0 .92.5l9.6-6.4a.6.6 0 0 0 0-1L8.92 5.1a.6.6 0 0 0-.92.5z"/></svg>
+              </a>
+            }
+          </div>
+          <div class="nd-body">
+            <div class="nd-chan">
+              <span class="ch-icon" [class.brand-mark]="item.channel === 'youtube'" [innerHTML]="safeIcon(item.channel)"></span>
+              <span>{{ ('news.channels.' + item.channel) | translate }}</span>
+              <span class="dot-sep">·</span>
+              <time>{{ relTime(item.publishedAt) }}</time>
             </div>
-            <div class="nd-body">
-              <div class="nd-chan">
-                <span class="ch-icon" [class.brand-mark]="item.channel === 'youtube'" [innerHTML]="safeIcon(item.channel)"></span>
-                <span>{{ ('news.channels.' + item.channel) | translate }}</span>
-                <span class="dot-sep">·</span>
-                <time>{{ relTime(item.publishedAt) }}</time>
-              </div>
-              <h2>{{ item.title }}</h2>
-              @if (item.summary) { <p class="nd-summary">{{ item.summary }}</p> }
-              <div class="nd-actions">
-                <button type="button" class="sc-btn" [class.on]="isFav(item)"
-                        [attr.aria-pressed]="isFav(item)" [attr.aria-label]="favLabel(item) | translate"
-                        [scTooltip]="favLabel(item) | translate" scTooltipTier="label"
-                        (click)="toggleFavorite($event, item)">
-                  <span class="ic" [innerHTML]="favIcon(isFav(item))"></span>
-                </button>
-                <button type="button" class="sc-btn" (click)="share($event, item)">
-                  <span class="ic" [innerHTML]="shareIcon()"></span>
-                  {{ shareLabel(item) | translate }}
-                </button>
-                <a class="sc-btn primary" [href]="item.url" target="_blank" rel="noopener noreferrer">
-                  {{ 'news.openExternal' | translate:{ host: hostOf(item.url) } }} ↗
-                </a>
-              </div>
-            </div>
-          </article>
-        }
-      </div>
+            @if (item.summary) { <p class="nd-summary">{{ item.summary }}</p> }
+          </div>
+          <ng-container popupActions>
+            <a scAction tier="primary" [href]="item.url" target="_blank" rel="noopener noreferrer">
+              {{ 'news.openExternal' | translate:{ host: hostOf(item.url) } }} ↗
+            </a>
+            <button type="button" scAction [class.on]="isFav(item)"
+                    [attr.aria-pressed]="isFav(item)" [attr.aria-label]="favLabel(item) | translate"
+                    [scTooltip]="favLabel(item) | translate" scTooltipTier="label"
+                    (click)="toggleFavorite($event, item)">
+              <span class="ic" [innerHTML]="favIcon(isFav(item))"></span>
+            </button>
+            <button type="button" scAction (click)="share($event, item)">
+              <span class="ic" [innerHTML]="shareIcon()"></span>
+              {{ shareLabel(item) | translate }}
+            </button>
+          </ng-container>
+        </sc-popup>
+      }
     </ng-template>
   `,
   styles: [`
@@ -450,7 +438,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
     @media (pointer: coarse) {
       .stage-link { display: flex; align-items: center; min-height: max(48px, var(--sc-tap-min)); }
     }
-    .stage-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 4px; border-radius: 4px; }
+    .stage-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
     .stage-deck {
       margin: 0 0 14px; color: var(--sc-fg-1); font-size: 0.9rem; line-height: 1.5;
       display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
@@ -470,7 +458,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       letter-spacing: 0.1em; text-transform: uppercase;
     }
     .cta:hover { background: color-mix(in srgb, var(--sc-accent) 84%, white); }
-    .cta:focus-visible { outline: 2px solid var(--sc-fg-0); outline-offset: 3px; }
+    .cta:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     /* ---------- 2 · Verdict ----------
        Its own surface over the artwork, docked bottom-right. It is the entire
@@ -479,9 +467,8 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       position: absolute; right: 20px; bottom: 20px; z-index: 5;
       width: min(320px, calc(100% - 40px));
       padding: 12px 14px; border-radius: 8px;
-      background: color-mix(in srgb, var(--sc-bg-1) 88%, transparent);
+      background: color-mix(in srgb, var(--sc-bg-1) 93%, transparent);
       border: 1px solid var(--sc-border);
-      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
       box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
     }
     .verdict-label {
@@ -548,7 +535,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       letter-spacing: 0.08em; color: var(--sc-accent); text-decoration: none;
     }
     .verdict-link:hover { color: color-mix(in srgb, var(--sc-accent) 80%, white); }
-    .verdict-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .verdict-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     /* On a narrow viewport the verdict leaves the artwork and becomes a plain
        band under it — a 320px card over a 375px-wide hero would cover the
@@ -592,7 +579,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
     .chip.on { color: var(--sc-bg-0); background: var(--sc-accent); }
     .chip.saved.on { background: var(--sc-warning); }
     .chip.on .chip-num { background: color-mix(in srgb, var(--sc-bg-0) 24%, transparent); }
-    .chip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
 
     .cards {
       display: grid; gap: var(--news-gap);
@@ -607,7 +594,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
     }
     .card-link { color: inherit; text-decoration: none; }
     .card-link-touch-target { position: absolute; inset: 0; z-index: 5; }
-    .card-link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 3px; border-radius: 3px; }
+    .card-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 3px; }
     .card:hover {
       border-color: var(--sc-accent);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4),
@@ -695,13 +682,12 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       display: inline-block; line-height: 1.6;
     }
-    .act:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+    .act:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
     /* On artwork the two controls need a surface of their own to stay readable. */
     .stage-actions .act {
       color: var(--sc-fg-1);
-      background: color-mix(in srgb, var(--sc-bg-0) 58%, transparent);
+      background: color-mix(in srgb, var(--sc-bg-0) 77%, transparent);
       border-color: color-mix(in srgb, var(--sc-border) 85%, transparent);
-      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
     }
     .stage-actions .act.on { color: var(--sc-warning); }
 
@@ -713,7 +699,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       letter-spacing: 0.08em; cursor: pointer;
     }
     .more:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
-    .more:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .more:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     /* ---------- Freshness ---------- */
     .freshness {
@@ -758,7 +744,139 @@ const SAFE_SVG = new Map<string, SafeHtml>();
     .err { color: var(--sc-danger); padding: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .err .retry:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    .err .retry:disabled { opacity: 0.5; cursor: default; }
+
+    /* ---------- Detail popup ----------
+       Frame, head, ✕, footer and width come from <sc-popup kind="large">; only
+       the content area is styled here. */
+    .nd-media { width: 100%; }
+    .play-link { pointer-events: auto; z-index: 6; }
+
+    .card .body { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; flex: 1; }
+    .card .body h3 {
+      font-size: 0.98rem; line-height: 1.3; margin: 0;
+      font-family: var(--sc-font-body); letter-spacing: 0; font-weight: 600;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .card .body .foot {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      margin-top: auto; padding-top: 6px;
+      font-size: max(0.7rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
+      border-top: 1px dashed color-mix(in srgb, var(--sc-border) 70%, transparent);
+    }
+    /* Three controls share this row on a 300px tile. The timestamp keeps its
+       line and the source host gives way first — it is the one label the
+       channel pill above already implies. */
+    .card .body .foot .when { white-space: nowrap; flex: 0 0 auto; }
+    .vid-tag {
+      margin-right: 6px; padding: 1px 6px; border-radius: 4px;
+      font-family: var(--sc-font-display); font-size: max(0.6rem, var(--sc-fs-floor));
+      letter-spacing: 0.08em; color: var(--sc-fg-1);
+      border: 1px solid var(--sc-border);
+    }
+    /* Same shape as the video badge, in the normal accent — it marks a place,
+       not a problem, and nothing here is admin-only. */
+    .stage-tag {
+      margin-right: 6px; padding: 1px 6px; border-radius: 4px;
+      font-family: var(--sc-font-display); font-size: max(0.6rem, var(--sc-fs-floor));
+      letter-spacing: 0.08em; color: var(--sc-accent);
+      border: 1px solid color-mix(in srgb, var(--sc-accent) 45%, transparent);
+    }
+    .actions {
+      display: inline-flex; align-items: center; gap: 2px;
+      flex: 0 1 auto; min-width: 0; position: relative; z-index: 6;
+    }
+    /* One control shape for "Merken" and "Teilen" wherever they appear — stage,
+       stream tile and detail view use the same glyph and the same label; only
+       the tile hides the label, where the foot row has no room for it. */
+    .act {
+      background: transparent; border: 1px solid transparent; border-radius: 6px;
+      cursor: pointer; color: var(--sc-fg-2); font-family: inherit;
+      font-size: max(0.72rem, var(--sc-fs-floor)); line-height: 1; letter-spacing: 0.04em;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 7px 10px;
+      min-width: var(--sc-tap-min); min-height: var(--sc-tap-min);
+    }
+    .act .ic { display: inline-flex; width: 15px; height: 15px; flex: 0 0 auto; }
+    .act .ic svg { width: 100%; height: 100%; display: block; }
+    .act:hover { color: var(--sc-accent); border-color: color-mix(in srgb, var(--sc-accent) 45%, transparent); }
+    .act.on { color: var(--sc-warning); }
+    .act.on:hover { color: var(--sc-warning); border-color: color-mix(in srgb, var(--sc-warning) 55%, transparent); }
+    .act.icon-only { padding: 6px; flex: 0 0 auto; }
+    .act.icon-only .lbl {
+      position: absolute; width: 1px; height: 1px; overflow: hidden;
+      clip-path: inset(50%); white-space: nowrap;
+    }
+    .act.ext {
+      font-size: max(0.68rem, var(--sc-fs-floor)); text-decoration: none;
+      color: var(--sc-accent); padding: 7px 6px;
+      min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      display: inline-block; line-height: 1.6;
+    }
+    .act:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
+    /* On artwork the two controls need a surface of their own to stay readable. */
+    .stage-actions .act {
+      color: var(--sc-fg-1);
+      background: color-mix(in srgb, var(--sc-bg-0) 77%, transparent);
+      border-color: color-mix(in srgb, var(--sc-border) 85%, transparent);
+    }
+    .stage-actions .act.on { color: var(--sc-warning); }
+
+    .more {
+      align-self: center; margin-top: 4px;
+      padding: 9px 20px; border-radius: 999px; min-height: var(--sc-tap-min);
+      background: transparent; border: 1px solid var(--sc-border); color: var(--sc-fg-1);
+      font-family: var(--sc-font-display); font-size: max(0.72rem, var(--sc-fs-floor));
+      letter-spacing: 0.08em; cursor: pointer;
+    }
+    .more:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
+    .more:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+
+    /* ---------- Freshness ---------- */
+    .freshness {
+      display: inline-flex; align-items: center; gap: 7px; margin-left: auto;
+      font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
+      font-variant-numeric: tabular-nums;
+    }
+    .freshness .pulse {
+      width: 6px; height: 6px; border-radius: 50%; flex: 0 0 auto;
+      background: color-mix(in srgb, var(--sc-success) 70%, transparent);
+    }
+    .freshness.stale { color: var(--sc-warning); }
+    .freshness.stale .pulse { background: var(--sc-warning); }
+    .freshness.refreshing { color: var(--sc-accent); }
+    .freshness.refreshing .pulse {
+      background: var(--sc-accent);
+      animation: fresh-pulse 1.1s ease-out infinite;
+    }
+    @keyframes fresh-pulse {
+      0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--sc-accent) 55%, transparent); }
+      70% { box-shadow: 0 0 0 6px transparent; }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .freshness .pulse { animation: none; }
+    }
+
+    /* ---------- Skeletons ---------- */
+    .stage.skel { display: block; min-height: clamp(260px, 34vh, 400px); }
+    .stage.skel .skel-art { position: absolute; inset: 0; display: block; }
+    .stage.skel .stage-body { position: relative; padding-top: 180px; }
+    .card.skel { cursor: default; }
+    .card.skel:hover { transform: none; box-shadow: none; border-color: var(--sc-border); }
+    .skel-thumb { width: 100%; aspect-ratio: 16 / 9; display: block; }
+    .skel-body { display: flex; flex-direction: column; gap: 9px; padding: 14px; flex: 1; }
+    .skel-line { display: block; height: 11px; width: 100%; }
+    .skel-line.lg { height: 20px; width: 78%; }
+    .skel-line.sm { width: 42%; }
+
+
+    .empty { text-align: center; color: var(--sc-fg-2); padding: 36px; margin: 0; background: transparent; border-style: dashed; }
+    .err { color: var(--sc-danger); padding: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
+    .err .retry:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .err .retry:disabled { opacity: 0.5; cursor: default; }
 
     /* ---------- Detail overlay ----------
@@ -801,7 +919,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       font-size: max(0.76rem, var(--sc-fs-floor));
     }
     .nd-back:hover { color: var(--sc-accent); }
-    .nd-back:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 3px; border-radius: 4px; }
+    .nd-back:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
 
     /* The art takes everything the text leaves over — it is the only elastic
        row, so the body can never be squeezed into a scrollbar. */
@@ -815,17 +933,9 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       transform: translate(-50%, -50%) scale(1.1);
       background: var(--sc-accent); color: var(--sc-bg-0); outline: none;
     }
-    .play-link:focus-visible { outline: 2px solid var(--sc-fg-0); outline-offset: 3px; }
+    .play-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
-    /* The density scale (styles.scss) rather than three fixed numbers: at 375px
-       the flat 20px side padding sat inside a 12px backdrop inset and a 1px card
-       border, so a fifth of the screen was frame before the headline started
-       (admin feedback 3bc01a3d). Unchanged above 720px. */
-    .nd-body {
-      flex: 0 0 auto; overflow-y: auto;
-      display: flex; flex-direction: column; gap: var(--sc-gap-2);
-      padding: var(--sc-pad-2) var(--sc-pad-1) calc(var(--sc-pad-2) + 4px);
-    }
+    .nd-body { display: flex; flex-direction: column; gap: var(--sc-gap-2); padding-top: var(--sc-pad-2); }
     .nd-chan {
       display: flex; align-items: center; gap: 8px; color: var(--sc-fg-2);
       font-size: max(0.74rem, var(--sc-fs-floor));
@@ -838,11 +948,6 @@ const SAFE_SVG = new Map<string, SafeHtml>();
     .overline .ch-icon.brand-mark,
     .nd-chan .ch-icon.brand-mark { width: 20px; height: 20px; flex: 0 0 auto; }
     .nd-chan .dot-sep { opacity: 0.6; }
-    .nd-body h2 {
-      margin: 0; font-family: var(--sc-font-display);
-      font-size: clamp(1.1rem, 2.2vw, 1.4rem); line-height: 1.25;
-      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-    }
     /* Clamped so a long Comm-Link teaser cannot push the actions off screen —
        the full text is one click away behind the source link. */
     .nd-summary {
@@ -850,30 +955,9 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       white-space: pre-line;
       display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .nd-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 2px; }
-    .nd-actions .sc-btn {
-      padding: 8px 14px; border-radius: 6px; background: var(--sc-bg-1);
-      border: 1px solid var(--sc-accent); color: var(--sc-accent);
-      font-family: var(--sc-font-display); font-size: max(0.74rem, var(--sc-fs-floor));
-      letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer;
-      text-decoration: none; display: inline-flex; align-items: center; gap: 7px;
-      min-height: var(--sc-tap-min);
-    }
-    .nd-actions .sc-btn .ic { display: inline-flex; width: 15px; height: 15px; flex: 0 0 auto; }
-    .nd-actions .sc-btn .ic svg { width: 100%; height: 100%; display: block; }
-    .nd-actions .sc-btn:hover { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
-    .nd-actions .sc-btn.on {
-      border-color: var(--sc-warning); color: var(--sc-warning);
-      background: color-mix(in srgb, var(--sc-warning) 12%, transparent);
-    }
-    .nd-actions .sc-btn.primary { background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-
-    /* Under ~520px tall (a phone in landscape) the art is worth less than the
-       text it would crowd out. */
-    @media (max-height: 520px) {
-      .nd-media { display: none; }
-      .nd-summary { -webkit-line-clamp: 2; }
-    }
+    .ic { display: inline-flex; width: 15px; height: 15px; flex: 0 0 auto; }
+    .ic svg { width: 100%; height: 100%; display: block; }
+    [scAction].on { color: var(--sc-warning); }
   `],
 })
 export class NewsListComponent implements OnInit, OnDestroy {
@@ -1324,12 +1408,12 @@ export class NewsListComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * The saved glyph: the bookmark of the path family (`PATH_ICONS.wish`), filled when
-   * saved, outlined when not. News says no word for it ("Merken" is the wishlist's
-   * business, not the news'), so the glyph and its tooltip carry the whole control.
+   * The saved glyph: the bookmark (`PATH_ICONS.saved`), filled when saved, outlined when
+   * not. News says no word for it ("Merken" is the wishes' business, not the news'), so
+   * the glyph and its tooltip carry the whole control.
    */
   favIcon(on: boolean): SafeHtml {
-    const d = PATH_ICONS.wish[0];
+    const d = PATH_ICONS.saved[0];
     return this.safeSvg(
       `<svg viewBox="0 0 24 24" fill="${on ? 'currentColor' : 'none'}" fill-opacity="${on ? '0.28' : '0'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`,
     );

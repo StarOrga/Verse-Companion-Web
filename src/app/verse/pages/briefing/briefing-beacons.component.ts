@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, afterNextRender, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, NgZone, afterNextRender, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import type { VersePoint } from '../../data/verse.models';
@@ -7,8 +7,10 @@ import { TREND_GLYPH, StabilityTrend, stabilityWord } from '../../../news/patch-
 import { PatchStabilityService } from '../../../news/patch-stability.service';
 import { splitChars } from './briefing.model';
 import { BodyCanvasDirective } from './bodies/body.directive';
-import { BriefingStationComponent } from './briefing-station.component';
 import { BriefingHqLineService } from './briefing-hq-line';
+import { TX_ART_MS } from './briefing-transmit.component';
+import { BriefingStationComponent } from './briefing-station.component';
+import { RoleService } from '../../../auth/role.service';
 
 /** Quiet time (no scroll, no pointer movement, window focused) before the idle hint. */
 export const IDLE_HINT_MS = 8000;
@@ -18,8 +20,8 @@ export const IDLE_SHOW_MS = 5000;
 /**
  * The stage's three beacons, all real anchors: the sun top right (→ the LIVE
  * patch's status), the current patch's constellation at half height between
- * the search and the Galerie planet (→ the star map), and the HQ station in the
- * left sky (→ /hq; concept 2026-11-08 batch-feedback-15, round 3 "Olisar-Kreuz"),
+ * the search and the Galerie planet (→ the star map), and HQ: the scene's ground station on the
+ * planet's right limb (→ /hq; Kamera-Welt C6 — the space station is the Admin place, never HQ),
  * whose one value line names a running event, else the open Nachschübe, else
  * "Alles ruhig im HQ" ({@link BriefingHqLineService}). Hover: the sun's corona brightens and grows, a flare
  * streak crosses it (the sun itself: concept 2026-10-31 "Sonne & Planeten" —
@@ -38,6 +40,7 @@ export const IDLE_SHOW_MS = 5000;
  */
 @Component({
   selector: 'sc-briefing-beacons',
+  host: { '[class.art]': 'art()' },
   standalone: true,
   imports: [RouterLink, TranslatePipe, BriefingSkyComponent, BodyCanvasDirective, BriefingStationComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -73,18 +76,30 @@ export const IDLE_SHOW_MS = 5000;
     @let hqName = 'verse.hub.hq' | translate;
     @let hqValue = hqLine().key | translate: hqLine().params;
     <a class="hq-l" routerLink="/hq" [class.idle]="idle()" [attr.aria-label]="hqName + ' · ' + hqValue">
-      <span class="obj" aria-hidden="true"><sc-briefing-station /></span>
+      <span class="lock" aria-hidden="true"><i></i></span>
       <span class="lab" aria-hidden="true">
         <span class="lab-n">@for (ch of chars(hqName); track ch.i) {<i [style.--n]="ch.i">{{ ch.c }}</i>}</span>
         <span class="lab-v">{{ hqValue }}</span>
       </span>
     </a>
+    @if (roles.isAdmin()) {
+      @let adName = 'verse.hub.admin' | translate;
+      @let adValue = 'verse.hub.adminValue' | translate;
+      <a class="adm-l" routerLink="/admin" [class.idle]="idle()" [attr.aria-label]="adName + ' · ' + adValue + ' · ' + ('verse.hub.adminHint' | translate)">
+        <span class="sat" aria-hidden="true"><sc-briefing-station /></span>
+        <span class="lab hot" aria-hidden="true">
+          <span class="lab-n">@for (ch of chars(adName); track ch.i) {<i [style.--n]="ch.i">{{ ch.c }}</i>}</span>
+          <span class="lab-v">{{ adValue }}</span>
+        </span>
+      </a>
+    }
     @if (skyReady()) {
       @let mapName = 'starmap.title' | translate;
       @let mapValue = patchLine()
         ? ('starmap.stageAria' | translate: { patch: patchLine() }) + ' · ' + ('starmap.progress' | translate: { lit: lit(), total: total() })
         : ('starmap.progress' | translate: { lit: lit(), total: total() });
-      <a class="const-l" routerLink="/verse/explorer" [class.idle]="idle()" [attr.aria-label]="mapName + ' · ' + mapValue">
+      <a class="const-l" routerLink="/verse/explorer" [class.idle]="idle()" [attr.aria-label]="mapName + ' · ' + mapValue + (rankNews() ? ' · ' + ('starmap.rank.news' | translate) : '')">
+        @if (rankNews()) { <span class="rank-dot" aria-hidden="true"></span> }
         <span class="fig" data-verse-fly="starmap" aria-hidden="true"><sc-briefing-sky [points]="points()" [lit]="lit()" [litSet]="litSet()" /></span>
         <span class="lab" aria-hidden="true">
           <span class="lab-n">@for (ch of chars(mapName); track ch.i) {<i [style.--n]="ch.i">{{ ch.c }}</i>}</span>
@@ -95,6 +110,12 @@ export const IDLE_SHOW_MS = 5000;
   `,
 })
 export class BriefingBeaconsComponent {
+  /**
+   * The sun's CSS art (sun.svg, granulation, prominences) may paint: {@link TX_ART_MS} after mount,
+   * the fallback wait of the planets. Its first raster under the live sun cost ~0.2 s of GPU on a
+   * cold menu switch (QA D12), for layers the WebGL sun replaces anyway.
+   */
+  readonly art = signal(false);
   readonly sunLink = input<string | readonly string[]>('/verse/patches');
   readonly version = input<string | null>(null);
   readonly stability = input<number | null>(null);
@@ -109,6 +130,8 @@ export class BriefingBeaconsComponent {
   readonly total = input(0);
   readonly litSet = input<ReadonlySet<number> | null>(null);
   readonly patchLine = input<string | null>(null);
+  /** New on the rank page: a dot at the star-map beacon, cleared by visiting the rank page. */
+  readonly rankNews = input(false);
 
   /**
    * The sun's prominences: angle on the limb, cycle length, delay into it and
@@ -126,6 +149,9 @@ export class BriefingBeaconsComponent {
   /** The HQ station's one value line: running event > open Nachschübe > all-clear. */
   readonly hqLine = inject(BriefingHqLineService).line;
 
+  /** Admins get the station as a mini satellite in the sky: one click flies the camera there (/admin). */
+  readonly roles = inject(RoleService);
+
   /** The idle hint is showing. */
   readonly idle = signal(false);
 
@@ -133,6 +159,8 @@ export class BriefingBeaconsComponent {
     const reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
     const destroyRef = inject(DestroyRef);
     const hq = inject(BriefingHqLineService);
+    const artTimer = inject(NgZone).runOutsideAngular(() => setTimeout(() => this.art.set(true), TX_ART_MS));
+    destroyRef.onDestroy(() => clearTimeout(artTimer));
     afterNextRender(() => hq.watch(destroyRef));
     if (reduced) return;
     afterNextRender(() => {

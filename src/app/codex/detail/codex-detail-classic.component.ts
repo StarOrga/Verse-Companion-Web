@@ -16,6 +16,7 @@ import { CodexRecipeCardComponent } from './codex-recipe-card.component';
 import { CodexSpecSheetComponent } from './codex-spec-sheet.component';
 import { NgTemplateOutlet } from '@angular/common';
 import type { CodexDetailComponent } from '../codex-detail.component';
+import { DeferErrorComponent } from '../../shared/defer-error/defer-error.component';
 
 /**
  * What the frozen Klassisch page may read from the page component. Anything not listed here cannot
@@ -32,11 +33,13 @@ export type CodexClassicCtx = Pick<
  * (concept batch-feedback-codex-hq, #9: "Bitte ändere die klassische nicht"). Do NOT edit this to
  * follow a change of the Holotisch view or of the ship page; the Holotisch is the item stage in
  * codex-detail.component.ts. The host is display:contents so the cards sit in the page's own flow.
+ * One owner-approved addition (concept pfad-stationen R5, r5-d-einfach): the page projects its wish / ownership
+ * stations (`sc-codex-own-stations`) under the head through the one `<ng-content>`.
  */
 @Component({
   selector: 'sc-codex-detail-classic',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, CompareIconComponent, AssetPackageViewerComponent, FallbackImageComponent, CodexCategoryIconComponent, ClassChipComponent, ScTooltipDirective, CodexVariantPickerComponent, AddToSetComponent, CodexRankCardComponent, FeedbackSpotDirective, CodexPortListComponent, CodexRecipeCardComponent, CodexSpecSheetComponent, NgTemplateOutlet],
+  imports: [DeferErrorComponent, TranslatePipe, RouterLink, CompareIconComponent, AssetPackageViewerComponent, FallbackImageComponent, CodexCategoryIconComponent, ClassChipComponent, ScTooltipDirective, CodexVariantPickerComponent, AddToSetComponent, CodexRankCardComponent, FeedbackSpotDirective, CodexPortListComponent, CodexRecipeCardComponent, CodexSpecSheetComponent, NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
 <div class="m-top" [class.missile-mode]="c.isMissile()" [scFeedbackSpot]="'feedbackSpot.headline'">
@@ -49,6 +52,8 @@ export type CodexClassicCtx = Pick<
                 <sc-asset-package-viewer class="pkg-viewer" [row]="pkg" facing="nose" [still]="c.prefersReducedMotion()" />
               } @placeholder {
                 <div class="pkg-viewer" aria-hidden="true"></div>
+              } @error {
+                <sc-defer-error class="pkg-viewer" source="codex.classic.missile" />
               }
             } @else {
             <div class="art">
@@ -113,6 +118,8 @@ export type CodexClassicCtx = Pick<
             </div>
           </div>
 </header>
+<!-- R5 (G4, owner decision r5-d-einfach): the page's two stations (projected by the page) under the head. -->
+<ng-content />
 </div>
 @if (c.isMissile()) {
           <sc-codex-rank-card
@@ -121,7 +128,7 @@ export type CodexClassicCtx = Pick<
             [result]="c.missileRank()"
             [loading]="c.missileCohortLoading()"
             [profiles]="[]"
-            [scopes]="c.missileRankScopes"
+            [scopes]="c.missileRankScopes()"
             [copy]="c.missileRankCopy"
             [gapKey]="c.missileRankGapKey()"
             [scope]="c.missileRankScope()"
@@ -154,6 +161,8 @@ export type CodexClassicCtx = Pick<
           <sc-asset-package-viewer class="pkg-viewer" [row]="pkg" [still]="c.prefersReducedMotion()" />
         } @placeholder {
           <div class="pkg-viewer" aria-hidden="true"></div>
+        } @error {
+          <sc-defer-error class="pkg-viewer" source="codex.classic.assetPackage" />
         }
       </section>
     }
@@ -327,7 +336,7 @@ export type CodexClassicCtx = Pick<
 }
 .pin:hover { color: var(--sc-fg-0); border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0)); }
 .pin.pinned { color: var(--sc-accent); border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0)); background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-.pin:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+.pin:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 .pin:disabled { opacity: 0.38; cursor: not-allowed; }
 .hero { display: grid; grid-template-columns: minmax(200px, 320px) 1fr; gap: 22px; padding: 0; overflow: hidden; }
 .hero-art { margin: 0; display: flex; align-items: center; justify-content: center; min-height: 240px; --sc-img-max-h: 320px; --sc-img-shadow: drop-shadow(0 6px 24px rgba(0,0,0,0.55)); --sc-icon-max: 132px; background: radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--sc-accent) 12%, var(--sc-bg-1)), var(--sc-bg-0)); }
@@ -348,7 +357,7 @@ export type CodexClassicCtx = Pick<
 .hero.missile .hero-body { padding: 16px 18px; }
 .mchips { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .mchip { font-size: max(10px, var(--sc-fs-floor)); padding: 3px 7px; border-radius: 3px; letter-spacing: 0.12em; text-transform: uppercase; background: color-mix(in srgb, var(--sc-bg-0) 72%, transparent); border: 1px solid var(--sc-border); color: var(--sc-fg-1); cursor: default; }
-.mchip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+.mchip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 .facts { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .fact { display: flex; flex-direction: column; gap: 1px; padding: 6px 12px; border-radius: 8px; background: var(--sc-bg-1); border: 1px solid var(--sc-border); }
 .fact.accent { border-color: color-mix(in srgb, var(--sc-accent) 40%, transparent); }

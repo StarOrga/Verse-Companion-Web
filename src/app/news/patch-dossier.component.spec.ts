@@ -167,10 +167,10 @@ describe('Patch dossier — one patch, opened (rethink Ⓚ)', () => {
 
   it('renders the live patch with all four sections behind a table of contents', async () => {
     await render('4.10');
-    expect(text('.hero h2')).toBe('Alpha 4.10');
+    expect(text('.scp-title')).toBe('Alpha 4.10');
     expect(text('.hero .status')).toBe('Live');
     // Live: preparation is over, so it drops to the end; testing lines lead with it.
-    expect((Array.from(root().querySelectorAll('.toc-link')) as HTMLElement[]).map((a) => a.textContent?.trim())).toEqual([
+    expect((Array.from(root().querySelectorAll('.toc a.stop .full')) as HTMLElement[]).map((a) => a.textContent?.trim())).toEqual([
       'Was steckt drin?', 'Haben sie … gefixt?', 'Wann kommt der nächste?', 'Wie bereite ich mich vor?',
     ]);
     expect((Array.from(root().querySelectorAll('.col > section')) as HTMLElement[]).map((el) => el.id)).toEqual([
@@ -299,7 +299,7 @@ describe('Patch dossier — one patch, opened (rethink Ⓚ)', () => {
   it('picking a section from the table of contents lights it up', async () => {
     const frames = installFrameClock();
     await render('4.10');
-    const link = root().querySelectorAll('.toc-link')[2] as HTMLAnchorElement;
+    const link = root().querySelectorAll('.toc a.stop')[2] as HTMLAnchorElement;
     link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));
     fixture.detectChanges();
     frames.runFrame();
@@ -325,7 +325,7 @@ describe('Patch dossier — one patch, opened (rethink Ⓚ)', () => {
     // No roadmap for 4.9 → the note itself is what the contents section holds.
     expect(root().querySelector('#pd-contents sc-patch-note-detail')).not.toBeNull();
     // Superseded: both questions are past tense, in the TOC and in the heading.
-    const toc = (Array.from(root().querySelectorAll('.toc-link')) as HTMLElement[]).map((a) => a.textContent?.trim());
+    const toc = (Array.from(root().querySelectorAll('.toc a.stop .full')) as HTMLElement[]).map((a) => a.textContent?.trim());
     expect(toc).toContain('Was kam danach?');
     expect(toc).toContain('Was war zu beachten?');
     expect(toc).not.toContain('Wann kommt der nächste?');
@@ -355,17 +355,17 @@ describe('Patch dossier — one patch, opened (rethink Ⓚ)', () => {
     // The hit list leads instead of being scrolled to, so it is the first
     // section in both the table of contents and the DOM.
     await render('4.10', 'quantum');
-    expect(text('.toc-link.active')).toBe('Haben sie … gefixt?');
+    expect(text('.toc a[aria-current] .full')).toBe('Haben sie … gefixt?');
     expect((Array.from(root().querySelectorAll('.col > section')) as HTMLElement[])[0].id).toBe('pd-fixed');
     // Without a query the reading position stays at the first section.
     await render('4.10');
-    expect(text('.toc-link.active')).toBe('Was steckt drin?');
+    expect(text('.toc a[aria-current] .full')).toBe('Was steckt drin?');
   });
 
   it('an unknown line does not crash — it says so and offers the way back', async () => {
     await render('3.0');
     expect(text('.hero .state')).toContain('keine Patch-Daten');
-    expect(root().querySelector('a.close')).not.toBeNull();
+    expect(root().querySelector('.scp-x')).not.toBeNull();
   });
 
   it('a version row picked on the board opens THAT note, framed by its main line (feedback #317)', async () => {
@@ -376,7 +376,7 @@ describe('Patch dossier — one patch, opened (rethink Ⓚ)', () => {
     expect(text('#pd-contents .muted')).toContain('12504217');
     expect(stub.requested.flat()).toContain('p410c');
     // The hero keeps Alpha 4.10 as the frame, names the note and leads back to the whole patch.
-    expect(text('.hero h2')).toBe('Alpha 4.10');
+    expect(text('.scp-title')).toBe('Alpha 4.10');
     expect(text('.hero .sel')).toContain('12504217');
     expect(text('.hero .sel a.src')).toBe('Ganzen Patch 4.10 ansehen');
     expect((root().querySelector('.hero .state a.src') as HTMLAnchorElement).href).toContain('/thread/p410c');

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RoleService } from '../../auth/role.service';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ShipLinkFormStore } from './ship-link-form.store';
 
 /**
@@ -16,7 +17,7 @@ import { ShipLinkFormStore } from './ship-link-form.store';
 @Component({
   selector: 'sc-codex-ship-link-form',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form class="ship-link-form" (submit)="save($event)">
@@ -30,16 +31,16 @@ import { ShipLinkFormStore } from './ship-link-form.store';
           [attr.placeholder]="'codex.shipLink.placeholder' | translate"
           [attr.aria-label]="'codex.shipLink.label' | translate"
           [attr.aria-invalid]="store.error() ? 'true' : null" />
-        <button type="submit" class="btn" [disabled]="store.saving()">
+        <button type="submit" scAction tier="primary" [disabled]="store.saving()">
           {{ 'codex.shipLink.save' | translate }}
         </button>
         @if (store.myPledgeLink()) {
-          <button type="button" class="btn quiet" [disabled]="store.saving()"
+          <button type="button" scAction tier="secondary" tone="danger" [disabled]="store.saving()"
                   (click)="store.remove()">
             {{ 'codex.shipLink.remove' | translate }}
           </button>
         }
-        <button type="button" class="btn quiet" (click)="store.toggle()">
+        <button type="button" scAction tier="secondary" (click)="store.toggle()">
           {{ 'codex.shipLink.cancel' | translate }}
         </button>
       </div>
@@ -54,12 +55,12 @@ import { ShipLinkFormStore } from './ship-link-form.store';
       @if (role.isAdmin()) {
         <div class="sl-admin">
           <span class="sl-admin-tag">{{ 'codex.shipLink.adminTitle' | translate }}</span>
-          <button type="button" class="btn quiet" [disabled]="store.saving()"
+          <button type="button" scAction tier="secondary" [disabled]="store.saving()"
                   (click)="store.promote()">
             {{ 'codex.shipLink.promote' | translate }}
           </button>
           @if (store.globalPledgeLink()) {
-            <button type="button" class="btn quiet" [disabled]="store.saving()"
+            <button type="button" scAction tier="secondary" tone="danger" [disabled]="store.saving()"
                     (click)="store.unpromote()">
               {{ 'codex.shipLink.unpromote' | translate }}
             </button>
@@ -83,24 +84,6 @@ import { ShipLinkFormStore } from './ship-link-form.store';
     .sl-admin-tag { font-size: max(0.72rem, var(--sc-fs-floor)); letter-spacing: 0.08em; text-transform: uppercase; color: var(--sc-fg-2); }
     .sl-admin-hint { font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2); flex: 1 1 220px; }
 
-    /* The page's button (concept section 2, part-02:159), the .btn half of
-       codex-detail's shared .btn/.pin rule. The 48px floor holds for coarse
-       pointers (the mobile gate emulates one); a mouse gets the drawn 24px. */
-    .btn { position: relative; display: inline-flex; align-items: center; gap: 5px;
-      padding: 4px 8px; min-height: 48px;
-      border: 1px solid var(--sc-border); border-radius: 3px;
-      background: color-mix(in srgb, var(--sc-bg-0) 72%, transparent);
-      color: var(--sc-fg-2); font-family: var(--sc-font-display); text-decoration: none;
-      font-size: max(10px, var(--sc-fs-floor)); letter-spacing: 0.12em; text-transform: uppercase;
-      cursor: pointer; }
-    @media (pointer: fine) {
-      .btn { min-height: 24px; }
-    }
-    .btn:hover { color: var(--sc-fg-0);
-      border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0)); }
-    .btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-    .btn:disabled { opacity: 0.38; cursor: not-allowed; }
-    .btn.quiet { text-transform: none; letter-spacing: 0; background: transparent; }
   `],
 })
 export class CodexShipLinkFormComponent {

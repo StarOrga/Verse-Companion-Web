@@ -72,7 +72,7 @@ describe('FooterComponent disclaimer bubble', () => {
 
   it('closes on Escape inside the bubble', () => {
     const { f, el } = open();
-    const bubble = el.querySelector<HTMLElement>('.sf-bubble[role="dialog"]')!;
+    const bubble = el.querySelector<HTMLElement>('.sf-bubble .scp-frame[role="dialog"]')!;
     expect(bubble).not.toBeNull();
     bubble.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
     f.detectChanges();

@@ -1,16 +1,13 @@
-// Community sources: seed import, daily sync, overlay republish, outreach drafts (ops of index.ts).
+// Community sources: the rows, starting an import, the daily sync, outreach drafts (ops of index.ts).
 // Runs with the service-role client; auth happens in index.ts. Contract: docs/translation/ARCHITECTURE.md.
+// The import itself is a sliced pass (_seed_pass.ts); nothing in this file reads a table or a pack.
 
-import { diffStrings } from './_diff.ts';
-import { buildOverlayMeta, loadTm, makeOverlay, overlayKey, readLocaleTable, saveTm } from './_io.ts';
+import { TranslateError } from './_errors.ts';
 import type { SourceMetaRow } from './_io.ts';
-import { learningHooks } from './_hooks.ts';
-import { TranslateError } from './_machine.ts';
-import type { Deps } from './_machine.ts';
-import { parsePack, resolveSource, upstreamToken } from './_pack.ts';
+import type { Deps } from './_job.ts';
+import { upstreamToken } from './_pack.ts';
 import type { FetchFn, PackSource } from './_pack.ts';
 import { buildOutreachDraft } from './_outreach.ts';
-import { packTextPct, seedEntries } from './_seed.ts';
 
 // deno-lint-ignore no-explicit-any
 type Client = any;
@@ -21,21 +18,33 @@ export interface SourceRow extends PackSource, SourceMetaRow {
   coverage: Record<string, unknown> | null;
 }
 
-export interface ImportResult {
+/** What `import_seed` answers: the import runs as a pass, its result lands on the source row. */
+export interface ImportStarted {
   source_id: string;
   lang: string;
-  imported: number;
-  skipped_cig: number;
-  skipped_same: number;
-  rejected_qa: number;
-  conflicts: number;
-  coverage: Record<string, unknown>;
+  queued: true;
+  pass_id: string;
 }
 
 export interface SyncResult {
   checked: number;
+  /** Sources whose upstream changed: an import pass was started for each. */
   changed: number;
   errors: { source_id: string; error: string }[];
+}
+
+/** The source table and the upstream as the passes see them (index.ts wires it; tests pass a fake). */
+export interface SourceDb {
+  load(id: string): Promise<SourceRow>;
+  list(lang?: string): Promise<SourceRow[]>;
+  /** Newest current build of the LIVE channel. */
+  liveBuild(): Promise<string>;
+  /** Records a finished import on the source row. */
+  update(id: string, patch: { coverage: Record<string, unknown>; last_synced_at: string; last_seen_commit: string | null }): Promise<void>;
+  fetchFn?: FetchFn;
+  ghToken?: string;
+  /** Characters per stored piece of a pack; tests cut small pieces, production uses PIECE_CHARS. */
+  pieceChars?: number;
 }
 
 function fail(e: { message?: string } | null): never {
@@ -44,6 +53,23 @@ function fail(e: { message?: string } | null): never {
 
 export const isUsable = (s: Pick<SourceRow, 'status' | 'enabled'>) =>
   s.enabled && (s.status === 'licensed' || s.status === 'permitted');
+
+/**
+ * The published table that holds CIG's own translation into a language, or null when there is none to respect.
+ *
+ * It is the table under the language's short code: the uploader publishes every `global.ini` of the game
+ * under the code of `localization.py` (`de`, `ja`, …). `translation_languages.cig_folder` is the folder
+ * name inside the game (`german_(germany)`), which only the app needs. Until 0.274.0 the pipeline read
+ * the table `<cig_folder>`, found nothing, and so never respected a single line of CIG's own translation
+ * (German: 22 993 keys) - every one of them was a candidate for the AI and for a community pack.
+ *
+ * null: a usable source of the language says the folder it installs into holds another language
+ * (`use_cig_table = false`, ru in the korean slot).
+ */
+export async function cigTableFor(deps: Pick<Deps, 'sources'>, lang: string): Promise<string | null> {
+  const rows = deps.sources ? await deps.sources.list(lang) : [];
+  return rows.some((r) => isUsable(r) && r.use_cig_table === false) ? null : lang;
+}
 
 export async function loadSource(sb: Client, id: string): Promise<SourceRow> {
   const { data, error } = await sb.from('translation_sources').select('*').eq('id', id).maybeSingle();
@@ -69,122 +95,48 @@ export async function currentLiveBuild(sb: Client): Promise<string> {
   return (data as { id: string }).id;
 }
 
-/**
- * Rebuilds `translation-overlay/<lang>/latest.json` for the current LIVE build from the TM:
- * every non-CIG key with a TM hit (+ admin entries over CIG), with sources/attribution.
- */
-export async function republishOverlay(
-  deps: Deps,
-  sb: Client,
-  lang: string,
-  buildId: string,
-  en?: Record<string, string>,
-  cig?: Record<string, string>,
-): Promise<{ count: number; attribution: string }> {
-  const english = en ?? await readLocaleTable(deps.store, buildId, 'en');
-  const cigTable = cig ?? await readCigTable(deps, sb, buildId, lang);
-  const tm = await loadTm(deps.store, lang);
-  const { reused } = await diffStrings({ en: english, cig: cigTable, tm, mode: 'full' });
-  const meta = buildOverlayMeta(lang, reused, tm, await listSources(sb, lang));
-  const overlay = makeOverlay(lang, buildId, reused, deps.now().toISOString(), meta);
-  await deps.store.putJson(overlayKey(lang, buildId), overlay);
-  await deps.store.putJson(overlayKey(lang, 'latest'), overlay);
-  return { count: overlay.count, attribution: overlay.attribution };
-}
-
-async function readCigTable(deps: Deps, sb: Client, buildId: string, lang: string): Promise<Record<string, string>> {
-  const { data, error } = await sb.from('translation_languages').select('cig_folder').eq('lang', lang).maybeSingle();
-  if (error) fail(error);
-  const folder = (data as { cig_folder?: string | null } | null)?.cig_folder || lang;
-  return readLocaleTable(deps.store, buildId, folder);
-}
-
-/**
- * A4: pack → filter → TM (`o:'community'`) → coverage on the source row → hooks → latest overlay.
- * Idempotent: a second run of an unchanged pack changes nothing.
- */
-export async function importSeed(
-  deps: Deps,
-  sb: Client,
-  sourceId: string,
-  opts: { trigger?: 'seed' | 'sync'; fetchFn?: FetchFn; ghToken?: string } = {},
-): Promise<ImportResult> {
-  const src = await loadSource(sb, sourceId);
-  if (!isUsable(src)) throw new TranslateError('translate.source_not_permitted');
-  const trigger = opts.trigger ?? 'seed';
-  const buildId = await currentLiveBuild(sb);
-  const en = await readLocaleTable(deps.store, buildId, 'en');
-  if (!Object.keys(en).length) throw new TranslateError('translate.english_missing');
-  // use_cig_table=false (ru in the korean slot): CIG's table there is another language, skip nothing.
-  const cig = src.use_cig_table ? await readCigTable(deps, sb, buildId, src.lang) : {};
-
-  // The version marker is taken from the cheap probe the sync compares against, then the pack is fetched.
-  const marker = await upstreamToken(src, opts.fetchFn, opts.ghToken).catch(() => null);
-  const resolved = await resolveSource(src, opts.fetchFn, opts.ghToken);
-  const at = deps.now().toISOString();
-  const tm = await loadTm(deps.store, src.lang);
-  let result;
-  let packSize = 0;
-  {
-    const pack = parsePack(resolved.bytes);
-    packSize = pack.map.size;
-    result = await seedEntries({ en, cig, pack: pack.map, sourceId: src.id, lic: src.license, at, tm });
-  }
-  if (Object.keys(result.updates).length) await saveTm(deps.store, src.lang, result.updates);
-
-  const { counts } = result;
-  // gap_pct = share of the keys CIG leaves untranslated that the pack really translates (text_pct stays the seeded whole-table figure).
-  const translated = counts.imported + counts.unchanged + counts.conflicts + counts.admin_kept + counts.cig_kept;
-  const coverage: Record<string, unknown> = {
-    ...(src.coverage ?? {}),
-    gap_pct: packTextPct(translated, counts.keys - counts.skipped_cig),
-    pack_keys: packSize,
-    keys: counts.keys,
-    imported: counts.imported,
-    unchanged: counts.unchanged,
-    skipped_cig: counts.skipped_cig,
-    skipped_same: counts.skipped_same,
-    rejected_qa: counts.rejected_qa,
-    missing: counts.missing,
-    conflicts: counts.conflicts,
-    build_id: buildId,
-    updated_at: at,
-  };
-  const up = await sb.from('translation_sources')
-    .update({ coverage, last_synced_at: at, last_seen_commit: marker ?? resolved.token ?? src.last_seen_commit })
-    .eq('id', src.id);
-  if (up.error) fail(up.error);
-
-  if (result.conflicts.length) await learningHooks.arbitrate(deps, src.lang, result.conflicts);
-  await learningHooks.runLearning(deps, src.lang, trigger);
-  await republishOverlay(deps, sb, src.lang, buildId, en, cig);
-
+export function makeSourceDb(sb: Client, opts: { fetchFn?: FetchFn; ghToken?: string } = {}): SourceDb {
   return {
-    source_id: src.id,
-    lang: src.lang,
-    imported: counts.imported,
-    skipped_cig: counts.skipped_cig,
-    skipped_same: counts.skipped_same,
-    rejected_qa: counts.rejected_qa,
-    conflicts: counts.conflicts,
-    coverage,
+    load: (id) => loadSource(sb, id),
+    list: (lang) => listSources(sb, lang),
+    liveBuild: () => currentLiveBuild(sb),
+    async update(id, patch) {
+      const { error } = await sb.from('translation_sources').update(patch).eq('id', id);
+      if (error) fail(error);
+    },
+    fetchFn: opts.fetchFn,
+    ghToken: opts.ghToken,
   };
 }
 
-/** A5: compare the upstream marker with `last_seen_commit`; re-import what changed. */
-export async function syncSources(
-  deps: Deps,
-  sb: Client,
-  opts: { fetchFn?: FetchFn; ghToken?: string } = {},
-): Promise<SyncResult> {
+/**
+ * A4: asks for the import of one source. The pack is filtered into the TM (`o:'community'`), the
+ * coverage lands on the source row, then the overlay is rebuilt and learning follows - all of it in
+ * the seed pass, slice by slice. Idempotent: a second request while one runs makes it run once more.
+ */
+export async function startImport(deps: Deps, sourceId: string, reason: 'seed' | 'sync' = 'seed'): Promise<ImportStarted> {
+  if (!deps.sources || !deps.passes) throw new TranslateError('translate.internal');
+  const src = await deps.sources.load(sourceId);
+  if (!isUsable(src)) throw new TranslateError('translate.source_not_permitted');
+  const pass = await deps.passes.open({ kind: 'seed', lang: src.lang, source_id: src.id, reason });
+  return { source_id: src.id, lang: src.lang, queued: true, pass_id: pass.id };
+}
+
+/** A5: compare the upstream marker with `last_seen_commit`; start an import for what changed. */
+export async function syncSources(deps: Deps): Promise<SyncResult> {
   const out: SyncResult = { checked: 0, changed: 0, errors: [] };
-  for (const src of (await listSources(sb)).filter(isUsable)) {
+  if (!deps.sources || !deps.passes) return out;
+  const { sources, passes } = deps;
+  const running = new Set((await passes.listOpen()).filter((p) => p.kind === 'seed').map((p) => p.source_id));
+  for (const src of (await sources.list()).filter(isUsable)) {
     out.checked++;
     try {
-      const marker = await upstreamToken(src, opts.fetchFn, opts.ghToken);
+      // An import of this source is under way: it records the marker when it is done.
+      if (running.has(src.id)) continue;
+      const marker = await upstreamToken(src, sources.fetchFn, sources.ghToken);
       // No marker to compare (no ETag at all): do not re-download daily, only when never imported.
       if (marker !== null ? marker === src.last_seen_commit : src.last_synced_at !== null) continue;
-      await importSeed(deps, sb, src.id, { ...opts, trigger: 'sync' });
+      await passes.open({ kind: 'seed', lang: src.lang, source_id: src.id, reason: 'sync' });
       out.changed++;
     } catch (e) {
       const error = String((e as Error)?.message ?? e);

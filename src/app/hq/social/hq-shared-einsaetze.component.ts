@@ -79,7 +79,7 @@ import { RSVP_ANSWERS, RsvpAnswer, SharedEinsatz, friendPath } from '../../socia
       .by, .when, .counts, .lbl { color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor)); }
       .ro { padding: 0 8px; border: 1px solid var(--sc-border); border-radius: 999px; color: var(--sc-fg-2); font-size: max(0.78rem, var(--sc-fs-floor)); }
       a { color: var(--sc-accent); }
-      a:focus-visible, .seg:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      a:focus-visible, .seg:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .steps { display: flex; flex-direction: column; gap: var(--sc-space-1, 4px); }
       .rsvp { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc-space-2, 8px); }
       .seg { min-height: 36px; padding: 0 var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 999px; background: transparent; color: var(--sc-fg-2); font: inherit; cursor: pointer; }

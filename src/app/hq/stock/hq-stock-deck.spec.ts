@@ -80,6 +80,31 @@ describe('hq-stock-deck · Frachtdeck view helpers', () => {
     expect(bays.map((b) => [b.location, b.weight])).toEqual([['Area18', 3], ['Lorville', 3]]);
   });
 
+  describe('Ersatz by blueprint (#1057)', () => {
+    const swapRows: QualityRow[] = [
+      { location: 'Area18', name: 'Kupfer', class_name: 'item:cds_helmet_a', qty: 1, unit: 'pcs' },
+      { location: 'Area18', name: 'Zink', class_name: 'cds_helmet_b', qty: 1, unit: 'pcs' },
+      { location: 'Area18', name: 'Blei', class_name: 'cds_helmet_c', qty: 1, unit: 'pcs' },
+    ];
+    const hk = new Map<string, BestandKind>(['cds_helmet_a', 'cds_helmet_b', 'cds_helmet_c'].map((k) => [k, { area: 'armor', sub: 'helmet', role: null }]));
+    const cs = buildCrates(swapRows, hk, 'Blueprints');
+    const f = { ...NO_DECK_FILTER, text: 'kupfer' };
+    const run = (links: Record<string, string[]>) => {
+      const hits = filterCrates(cs, f, no);
+      return alternativesFor(cs, hits, f, no, [], (cn) => (cn ? (links[cn] ?? []) : []))!.swap.map((c) => c.name);
+    };
+
+    it('keeps an item that shares a blueprint, dropping one from a different blueprint', () => {
+      expect(run({ cds_helmet_a: ['bp1', 'bp2'], cds_helmet_b: ['bp2'], cds_helmet_c: ['bp3'] })).toEqual(['Zink']);
+    });
+
+    it('falls back to the slot alone when either side has no known blueprint', () => {
+      expect(run({}).sort()).toEqual(['Blei', 'Zink']);
+      // Zink is unknown → slot only; Blei is known and differs → dropped.
+      expect(run({ cds_helmet_a: ['bp1'], cds_helmet_c: ['bp3'] })).toEqual(['Zink']);
+    });
+  });
+
   it('reads a minimum quality out of the query', () => {
     expect(parseStockQuery('eisen q>700')).toEqual({ text: 'eisen', minQ: 700 });
     expect(parseStockQuery('Eisen Q ≥ 810')).toEqual({ text: 'eisen', minQ: 810 });

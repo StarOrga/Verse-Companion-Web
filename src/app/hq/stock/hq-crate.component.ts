@@ -27,7 +27,7 @@ export function qualityTone(q: number | null): 'unknown' | 'low' | 'mid' | 'high
   imports: [TranslatePipe, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <button type="button" class="crate" [class.box]="crate().unit !== 'scu'" [class]="'sz-' + size()" [attr.data-tone]="tone()"
+    <button type="button" class="crate" [class.box]="crate().unit !== 'scu'" [attr.data-tone]="tone()"
             [class.sel]="selected()" [attr.aria-pressed]="selected()" [scTooltip]="tip()" scTooltipTier="info" (click)="chosen.emit()">
       @if (crate().unit === 'scu') {
         <i class="qs" aria-hidden="true"></i>
@@ -57,7 +57,7 @@ export function qualityTone(q: number | null): 'unknown' | 'low' | 'mid' | 'high
         background: linear-gradient(180deg, color-mix(in srgb, var(--sc-accent) 14%, transparent), color-mix(in srgb, var(--sc-bg-0) 95%, transparent)), repeating-linear-gradient(90deg, transparent 0 18px, color-mix(in srgb, var(--sc-accent) 5%, transparent) 18px 19px); transition: border-color .15s, box-shadow .15s; }
       .crate.box { justify-content: flex-start; padding: 8px 10px; border-color: var(--sc-border); border-radius: 8px; background: var(--sc-bg-1); }
       .crate:hover { border-color: var(--sc-accent); }
-      .crate:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .crate:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .crate.sel { border-color: var(--sc-accent); box-shadow: 0 0 0 2px var(--sc-accent), 0 0 18px color-mix(in srgb, var(--sc-accent) 45%, transparent); background: color-mix(in srgb, var(--sc-accent) 22%, var(--sc-bg-1)); }
       .crate { --qc: var(--sc-fg-2); }
       .crate[data-tone='unknown'] { --qc: var(--sc-border); }
@@ -72,9 +72,9 @@ export function qualityTone(q: number | null): 'unknown' | 'low' | 'mid' | 'high
       em { position: absolute; right: 7px; top: 9px; display: inline-flex; align-items: center; gap: 3px; color: var(--sc-accent); font-style: normal; font-size: 0.66rem; }
       em svg, .scr svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
       .box em { top: auto; bottom: 7px; }
-      .k { color: var(--sc-fg-2); font-size: 0.6rem; letter-spacing: .12em; text-transform: uppercase; }
+      .k { color: var(--sc-fg-2); font-size: 0.6rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(100% - 16px); letter-spacing: .12em; text-transform: uppercase; }
       .nm { font-size: 0.78rem; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; padding-right: 16px; position: relative; }
-      .s { color: var(--sc-fg-1); font-size: 0.69rem; position: relative; }
+      .s { color: var(--sc-fg-1); font-size: 0.69rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; }
       .box .s { color: var(--sc-accent); font-weight: 700; }
       .pl { color: var(--sc-fg-2); font-size: 0.66rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; }
       .scr { position: absolute; right: 8px; top: 8px; }
@@ -88,8 +88,6 @@ export function qualityTone(q: number | null): 'unknown' | 'low' | 'mid' | 'high
 export class HqCrateComponent {
   private readonly tr = inject(TranslateService);
   readonly crate = input.required<DeckCrate>();
-  /** Size class from the lane: xl / l / m / s (relative, frachtdeck3 `.d14-crate.xl` …). */
-  readonly size = input<'xl' | 'l' | 'm' | 's'>('m');
   readonly selected = input(false);
   readonly showPlace = input(true);
   readonly placeLabel = input('');

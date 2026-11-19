@@ -31,12 +31,13 @@ describe('AnalyticsService', () => {
 
   it('ships with the public PostHog project key configured (EU)', () => {
     expect(environment.posthog.key).toMatch(/^phc_/);
-    expect(environment.posthog.host).toContain('eu.i.posthog.com');
+    expect(environment.posthog.host).toBe('/ingest');
+    expect(environment.posthog.uiHost).toBe('https://eu.posthog.com');
   });
 
-  it('capture() does nothing without statistics consent', () => {
+  it('track() does nothing without statistics consent', () => {
     consent.essentialOnly();
-    expect(() => svc.capture('test_event')).not.toThrow();
+    expect(() => svc.track('auth:user_sign_out')).not.toThrow();
     expect(Object.keys(localStorage).some((k) => k.startsWith('ph_'))).toBe(false);
   });
 

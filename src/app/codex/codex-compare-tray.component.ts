@@ -1,3 +1,4 @@
+import { ScPopupMotionDirective } from '../shared/popup-motion/sc-popup-motion.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -5,6 +6,7 @@ import {
   effect,
   inject,
   signal,
+  untracked,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
@@ -20,7 +22,10 @@ import {
   humanizeClassName,
   rowHasDifferences,
 } from './codex-format';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { CompareIconComponent } from './compare-icon.component';
 
 interface PinnedRef {
   key: string;
@@ -38,11 +43,14 @@ interface PinnedRef {
 @Component({
   selector: 'sc-codex-compare-tray',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, ScTooltipDirective],
+  imports: [RouterLink, TranslatePipe, ScTooltipDirective, ScPopupComponent, ScActionDirective, ScPopupMotionDirective, CompareIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (refs().length > 0) {
       <aside class="tray" [class.expanded]="open()" aria-live="polite">
+        <!-- The popup family's rail (sc-popup): the compare mark, the same one the pin buttons carry. -->
+        <span class="rail" aria-hidden="true"><sc-compare-icon [on]="true" /></span>
+        <div class="main">
         <div class="bar">
           <span class="tray-label">{{ 'codex.compare.tray' | translate: { count: refs().length } }}</span>
           <ul class="chips">
@@ -50,17 +58,19 @@ interface PinnedRef {
               <li class="chip">
                 <a [routerLink]="['/codex', r.kind, r.className]" class="chip-link">{{ chipName(r) }}</a>
                 <button type="button" class="chip-x" (click)="remove(r.key)"
-                        [attr.aria-label]="'codex.compare.remove' | translate"
-                        [scTooltip]="'codex.compare.remove' | translate">×</button>
+                        [attr.aria-label]="'codex.compare.remove' | translate: { name: chipName(r) }"
+                        [scTooltip]="'codex.compare.remove' | translate: { name: chipName(r) }" scTooltipTier="label">×</button>
               </li>
             }
           </ul>
-          @if (refs().length >= 2) {
-            <button type="button" class="toggle" (click)="toggle()">
-              {{ (open() ? 'codex.compare.close' : 'codex.compare.open') | translate }}
-            </button>
-          }
-          <button type="button" class="clear" (click)="clear()">{{ 'codex.compare.clear' | translate }}</button>
+          <span class="acts">
+            @if (refs().length >= 2) {
+              <button type="button" scAction class="toggle" [class.on]="open()" (click)="toggle()">
+                {{ (open() ? 'codex.compare.close' : 'codex.compare.open') | translate }}
+              </button>
+            }
+            <button type="button" scAction class="clear" (click)="clear()">{{ 'codex.compare.clear' | translate }}</button>
+          </span>
         </div>
 
         @if (rejectedKind(); as rk) {
@@ -68,52 +78,54 @@ interface PinnedRef {
             {{ 'codex.compare.mixedKind' | translate: { kind: ('codex.kindSingular.' + rk) | translate } }}
           </p>
         }
+        </div>
+      </aside>
 
-        @if (open() && refs().length >= 2) {
+      @if (open() && refs().length >= 2) {
+        <!-- Outside the aside on purpose: the tray is centred with a transform, which would
+             make a fixed child position against the tray instead of the viewport. -->
+        <sc-popup kind="large" [title]="'codex.compare.tray' | translate: { count: refs().length }"
+                  [eyebrow]="'codex.kindSingular.' + refs()[0].kind | translate"
+                  scPopupMotion="large" scPopupMotionPlate=".scp-frame" scPopupMotionRows=".cmp tbody tr" animate.leave="pm-out"
+                  (closed)="open.set(false)">
           <div class="panel">
             @if (loading()) {
               <p class="muted">{{ 'codex.results.loading' | translate }}</p>
             } @else {
-              <div class="panel-tools">
-                <button type="button" class="diff-toggle" [class.on]="diffOnly()" (click)="toggleDiffOnly()"
-                        [attr.aria-pressed]="diffOnly()">
-                  {{ (diffOnly() ? 'codex.compare.showAll' : 'codex.compare.diffOnly') | translate }}
-                </button>
-              </div>
               <table class="cmp">
                 <thead>
-                  <tr>
-                    <th class="rowhead">{{ 'codex.compare.property' | translate }}</th>
-                    @for (c of columns(); track c.key) {
-                      <th>
-                        <a [routerLink]="['/codex', c.kind, c.className]" class="col-link">{{ c.name }}</a>
-                        <span class="col-kind">{{ ('codex.kindSingular.' + c.kind) | translate }}</span>
-                      </th>
-                    }
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (g of groupedRows(); track g.group) {
-                    <tr class="grp">
-                      <td [attr.colspan]="columns().length + 1">{{ ('codex.statGroup.' + g.group) | translate }}</td>
-                    </tr>
-                    @for (row of g.rows; track row.id) {
-                      <tr>
-                        <td class="rowhead">{{ row.labelKey ? (row.labelKey | translate) : row.label }}</td>
-                        @for (v of row.values; track $index) {
-                          <td [class.na]="v === null"
-                              [class.best]="row.highlight[$index] === 'best'"
-                              [class.worst]="row.highlight[$index] === 'worst'">
-                            <span class="cell-val">{{ v === null ? '—' : v }}</span>
-                            @if (row.barPct[$index] !== null) {
-                              <span class="delta-bar" aria-hidden="true"><span class="delta-fill" [style.width.%]="row.barPct[$index]"></span></span>
-                            }
-                          </td>
-                        }
-                      </tr>
-                    }
+                <tr>
+                  <th class="rowhead">{{ 'codex.compare.property' | translate }}</th>
+                  @for (c of columns(); track c.key) {
+                    <th>
+                      <a [routerLink]="['/codex', c.kind, c.className]" class="col-link">{{ c.name }}</a>
+                      <span class="col-kind">{{ ('codex.kindSingular.' + c.kind) | translate }}</span>
+                    </th>
                   }
-                </tbody>
+                </tr>
+              </thead>
+              <tbody>
+                @for (g of groupedRows(); track g.group) {
+                  <tr class="grp">
+                    <td [attr.colspan]="columns().length + 1">{{ ('codex.statGroup.' + g.group) | translate }}</td>
+                  </tr>
+                  @for (row of g.rows; track row.id) {
+                    <tr>
+                      <td class="rowhead">{{ row.labelKey ? (row.labelKey | translate) : row.label }}</td>
+                      @for (v of row.values; track $index) {
+                        <td [class.na]="v === null"
+                            [class.best]="row.highlight[$index] === 'best'"
+                            [class.worst]="row.highlight[$index] === 'worst'">
+                          <span class="cell-val">{{ v === null ? '—' : v }}</span>
+                          @if (row.barPct[$index] !== null) {
+                            <span class="delta-bar" aria-hidden="true"><span class="delta-fill" [style.width.%]="row.barPct[$index]"></span></span>
+                          }
+                        </td>
+                      }
+                    </tr>
+                  }
+                }
+              </tbody>
               </table>
               @if (tableRows().length === 0) {
                 <p class="muted">{{ 'codex.compare.noCommon' | translate }}</p>
@@ -122,8 +134,13 @@ interface PinnedRef {
               }
             }
           </div>
-        }
-      </aside>
+          <ng-container popupActions>
+            <button scAction type="button" class="diff-toggle" [class.on]="diffOnly()" (click)="toggleDiffOnly()" [attr.aria-pressed]="diffOnly()">
+              {{ 'codex.compare.diffOnly' | translate }}
+            </button>
+          </ng-container>
+        </sc-popup>
+      }
     }
   `,
   styles: [`
@@ -134,13 +151,25 @@ interface PinnedRef {
          under the disc on a mid-width window, and it stands above the safe area. */
       bottom: var(--sc-float-bottom); z-index: 40;
       max-width: min(var(--sc-ov-area), calc(100vw - 2 * var(--sc-fab-clear-inline)));
-      border-radius: 12px;
-      background: color-mix(in srgb, var(--sc-bg-2) 94%, transparent);
-      border: 1px solid var(--sc-accent);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 22px color-mix(in srgb, var(--sc-accent) 30%, transparent);
-      backdrop-filter: blur(10px);
+      /* The popup family's frame (sc-popup.scss .scp-frame): same radius, rule, fill and depth as the
+         toasts at the right, so the floating surfaces read as one set. */
+      display: flex; border-radius: 6px;
+      border: 1px solid var(--sc-sub-rule, var(--sc-border));
+      background: var(--sc-sub-fill, var(--sc-bg-1));
+      box-shadow: 0 30px 80px color-mix(in srgb, var(--sc-depth, #000) 55%, transparent);
     }
-    .bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 14px; }
+    /* The narrow rail of a notice (36 px, kind colour, the mark centred on the bar); its own corners, so the tray needs no overflow clip. */
+    .rail {
+      flex: none; inline-size: 36px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;
+      border-radius: 5px 0 0 5px; border-inline-end: 2px solid var(--sc-accent); color: var(--sc-accent);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--sc-accent) 28%, transparent), color-mix(in srgb, var(--sc-accent) 8%, transparent));
+    }
+    .main { flex: 1; min-inline-size: 0; }
+    .acts { display: flex; gap: 8px; margin-inline-start: auto; }
+    .toggle.on { color: var(--sc-accent); border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 16%, transparent); }
+    /* A toggle with a fixed label (aria-pressed carries the state): the pressed look must be visible too. */
+    .diff-toggle.on { color: var(--sc-accent); border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 16%, transparent); }
+    .bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 12px 10px 14px; }
     .tray-label {
       font-family: var(--sc-font-display); font-size: max(0.74rem, var(--sc-fs-floor)); letter-spacing: 0.08em;
       text-transform: uppercase; color: var(--sc-accent); white-space: nowrap;
@@ -153,14 +182,12 @@ interface PinnedRef {
     }
     .chip-link { color: var(--sc-fg-0); text-decoration: none; max-width: 280px; /* overlay-size: exception — a chip label, not the tray box */ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .chip-link:hover { color: var(--sc-accent); }
-    .chip-x { border: none; background: transparent; color: var(--sc-fg-2); cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0 4px; border-radius: 50%; }
+    .chip-x { border: none; background: transparent; color: var(--sc-fg-2); cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0 var(--sc-space-1); border-radius: 50%;
+      min-block-size: max(24px, var(--sc-tap-min)); min-inline-size: max(24px, var(--sc-tap-min)); }
     .chip-x:hover { color: var(--sc-accent); }
-    .toggle { padding: 5px 14px; border-radius: 6px; background: color-mix(in srgb, var(--sc-accent) 16%, transparent); border: 1px solid var(--sc-accent); color: var(--sc-accent); font-family: var(--sc-font-display); font-size: max(0.72rem, var(--sc-fs-floor)); letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; }
-    .toggle:hover { background: color-mix(in srgb, var(--sc-accent) 26%, transparent); }
-    .clear { margin-left: auto; padding: 5px 12px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-border); color: var(--sc-fg-2); font-family: inherit; font-size: max(0.74rem, var(--sc-fs-floor)); cursor: pointer; }
-    .clear:hover { color: var(--sc-accent); border-color: var(--sc-accent); }
+    .chip-link:focus-visible, .chip-x:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
-    .panel { border-top: 1px solid var(--sc-border); padding: 12px 14px; max-height: min(60vh, 460px); overflow: auto; }
+    .panel { min-width: 0; }
     .muted { color: var(--sc-fg-2); margin: 0; font-size: 0.84rem; }
     .cmp { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
     .cmp th, .cmp td { padding: 6px 10px; text-align: left; border-bottom: 1px solid color-mix(in srgb, var(--sc-border) 60%, transparent); white-space: nowrap; }
@@ -171,7 +198,7 @@ interface PinnedRef {
     .col-link:hover { text-decoration: underline; }
     .col-kind { display: block; font-size: max(0.62rem, var(--sc-fs-floor)); text-transform: uppercase; letter-spacing: 0.06em; color: var(--sc-fg-2); }
     .cmp td.na { color: var(--sc-fg-2); }
-    .cmp td.best { color: #8fe5b5; font-weight: 500; background: color-mix(in srgb, #5fd698 13%, transparent); }
+    .cmp td.best { color: var(--sc-success); font-weight: 500; background: color-mix(in srgb, var(--sc-success) 13%, transparent); }
     .cmp td.worst { color: var(--sc-fg-2); }
     .cmp tr.grp td { padding-top: 12px; font-size: max(0.66rem, var(--sc-fs-floor)); text-transform: uppercase; letter-spacing: 0.08em;
       color: var(--sc-accent); border-bottom: 1px solid color-mix(in srgb, var(--sc-accent) 30%, transparent); }
@@ -181,39 +208,24 @@ interface PinnedRef {
     .delta-fill { display: block; height: 100%; border-radius: 999px;
       background: color-mix(in srgb, var(--sc-accent) 65%, transparent); }
     td.best .delta-fill { background: #5fd698; }
-    .panel-tools { display: flex; justify-content: flex-end; margin: 0 0 8px; }
-    .diff-toggle { padding: 4px 12px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-border);
-      color: var(--sc-fg-2); font-family: inherit; font-size: max(0.72rem, var(--sc-fs-floor)); cursor: pointer; }
-    .diff-toggle:hover, .diff-toggle.on { color: var(--sc-accent); border-color: var(--sc-accent); }
     .reject { margin: 0; padding: 6px 14px 10px; font-size: max(0.74rem, var(--sc-fs-floor)); color: var(--sc-warning, #ffc14d); }
 
     /* Phone: collapsed, the tray runs from the left edge up to the launcher's
-       lane instead of centring across it. Expanded, it becomes a bottom sheet
-       sized to the dynamic viewport (the URL bar does not eat its last rows);
-       the panel's bottom padding lets the last row scroll above the launcher. */
+       lane instead of centring across it. The expanded comparison is an sc-popup. */
     @media (max-width: 720px) {
       .tray {
-        left: 8px; right: var(--sc-fab-clear-inline); transform: none;
+        left: var(--sc-toast-end, 16px); right: var(--sc-fab-clear-inline); transform: none;
         max-width: none;
       }
       /* Label, open and clear share the first row; the chips run in one
          sideways-scrolling row under it instead of stacking a 54px row each. */
       .bar { gap: 6px 8px; padding: 8px 10px; }
+      /* Under the label on a narrow tray: the pills start at the text edge, not pushed to the far side. */
+      .acts { margin-inline-start: 0; }
       .chips { order: 2; flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
       .chips::-webkit-scrollbar { display: none; }
       .chip { flex: 0 0 auto; padding-block: 0; }
       .chip-link { max-width: 160px; display: inline-flex; align-items: center; }
-      .toggle, .clear { padding-inline: 10px; }
-      .tray.expanded {
-        left: 0; right: 0; bottom: 0;
-        border-radius: 12px 12px 0 0; border-bottom-width: 0;
-        padding-bottom: var(--sc-safe-bottom);
-      }
-      .tray.expanded .panel {
-        max-height: calc(100vh - 180px);
-        max-height: calc(100dvh - 180px);
-        padding-bottom: calc(var(--sc-fab-size) + var(--sc-fab-gutter) * 2);
-      }
     }
   `],
 })
@@ -226,9 +238,16 @@ export class CodexCompareTrayComponent {
   private readonly dataLang = signal(toLang(this.t.getCurrentLang()));
 
   readonly open = signal(false);
-  readonly loading = signal(false);
   readonly diffOnly = signal(false);
-  private readonly details = signal<CodexDetail[]>([]);
+  /** One read per pin (null = read, nothing found): the chips need the names, the table the stats. */
+  private readonly loaded = signal<ReadonlyMap<string, CodexDetail | null>>(new Map());
+  private readonly pending = new Set<string>();
+  private readonly details = computed(() =>
+    this.refs()
+      .map((r) => this.loaded().get(r.key))
+      .filter((d): d is CodexDetail => !!d),
+  );
+  readonly loading = computed(() => this.refs().some((r) => !this.loaded().has(r.key)));
 
   /** Like-for-like guard feedback from the service (kind already in the tray). */
   readonly rejectedKind = this.svc.compareRejectedKind;
@@ -249,26 +268,27 @@ export class CodexCompareTrayComponent {
     this.t.onLangChange
       .pipe(takeUntilDestroyed())
       .subscribe((e) => this.dataLang.set(toLang(e.lang)));
-    // Re-fetch details whenever the panel is open and the pinned set changes.
+    // Read each new pin once, already while the tray is collapsed: the chips show the real names
+    // instead of raw class names, and opening the comparison needs no second round trip.
     effect(() => {
-      const refs = this.refs();
-      if (!this.open() || refs.length < 2) {
-        this.details.set([]);
-        return;
+      const known = untracked(this.loaded);
+      for (const r of this.refs()) {
+        if (known.has(r.key) || this.pending.has(r.key)) continue;
+        void this.loadDetail(r);
       }
-      void this.loadDetails(refs);
     });
   }
 
-  private async loadDetails(refs: PinnedRef[]): Promise<void> {
-    this.loading.set(true);
+  private async loadDetail(r: PinnedRef): Promise<void> {
+    this.pending.add(r.key);
+    let detail: CodexDetail | null = null;
     try {
-      const loaded = await Promise.all(refs.map((r) => this.svc.getDetail(r.kind, r.className)));
-      this.details.set(loaded.filter((d): d is CodexDetail => !!d));
+      detail = await this.svc.getDetail(r.kind, r.className);
     } catch {
-      this.details.set([]);
+      // Unreadable pin: its chip keeps the readable class name, the table leaves the column out.
     } finally {
-      this.loading.set(false);
+      this.pending.delete(r.key);
+      this.loaded.update((m) => new Map(m).set(r.key, detail));
     }
   }
 
@@ -308,7 +328,7 @@ export class CodexCompareTrayComponent {
 
   chipName(r: PinnedRef): string {
     const found = this.details().find((d) => d.kind === r.kind && d.classNameSlug === r.className);
-    return found ? this.entityName(found) : r.className;
+    return found ? this.entityName(found) : humanizeClassName(r.className);
   }
 
   toggle(): void {

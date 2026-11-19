@@ -1,0 +1,247 @@
+{
+ "idris": {
+  "argo": {
+   "door": 26,
+   "doorPanel": 17,
+   "ladder": 4,
+   "fireExt": 1,
+   "console": 1,
+   "computer": 1,
+   "dockingTube": 1,
+   "turret": 2,
+   "relay": 1
+  },
+  "hangar": {
+   "door": 21,
+   "locker": 11,
+   "doorPanel": 10,
+   "fireExt": 2,
+   "maintenance": 6,
+   "lift": 2,
+   "fuelTank": 2,
+   "shield": 2,
+   "quantumDrive": 1,
+   "jumpDrive": 1,
+   "lifeSupport": 1
+  },
+  "ohangar": {
+   "maintenance": 6,
+   "locker": 4,
+   "fireExt": 2,
+   "console": 3,
+   "door": 3,
+   "computer": 13,
+   "relay": 2
+  },
+  "haupt": {
+   "door": 158,
+   "weaponRack": 19,
+   "doorPanel": 108,
+   "console": 15,
+   "maintenance": 43,
+   "stairs": 3,
+   "fireExt": 21,
+   "lift": 3,
+   "locker": 29,
+   "bed": 17,
+   "head": 22,
+   "medBed": 10,
+   "respawn": 5,
+   "powerPlant": 2,
+   "cooler": 2,
+   "dockingTube": 2,
+   "turret": 4,
+   "relay": 10
+  },
+  "turm": {
+   "door": 24,
+   "maintenance": 10,
+   "doorPanel": 12,
+   "fireExt": 2,
+   "turret": 5
+  },
+  "bruecke": {
+   "door": 8,
+   "lift": 1,
+   "doorPanel": 4,
+   "fireExt": 1,
+   "console": 1,
+   "radar": 1,
+   "computer": 1,
+   "relay": 2
+  }
+ },
+ "idris_scu": {
+  "argo": 0,
+  "hangar": 1024,
+  "ohangar": 0,
+  "haupt": 350,
+  "turm": 0,
+  "bruecke": 0
+ },
+ "sl": {
+  "unten": {
+   "door": 16,
+   "fireExt": 2,
+   "doorPanel": 14,
+   "ladder": 1,
+   "lift": 2,
+   "dockingTube": 1
+  },
+  "oben": {
+   "doorPanel": 50,
+   "door": 51,
+   "fireExt": 4,
+   "bed": 8,
+   "locker": 4,
+   "lift": 2,
+   "computer": 12,
+   "fuelTank": 2,
+   "powerPlant": 2,
+   "quantumDrive": 1,
+   "cooler": 2,
+   "radar": 1,
+   "shield": 1,
+   "dockingTube": 1,
+   "relay": 3,
+   "lifeSupport": 1
+  }
+ },
+ "sl_scu": {
+  "unten": 96,
+  "oben": 0
+ },
+ "cargo_room": {
+  "key": "MidDeck_Center_CargoRoom_Room",
+  "inside": {
+   "doorPanel": 2,
+   "lift": 2
+  },
+  "grids": [
+   [
+    "CargoGrid_CargoRoom_Front_Medium",
+    10
+   ],
+   [
+    "CargoGrid_CargoRoom_Front_Small_1",
+    4
+   ],
+   [
+    "CargoGrid_CargoRoom_Front_Small_2",
+    4
+   ],
+   [
+    "CargoGrid_CargoRoom_Front",
+    140
+   ],
+   [
+    "CargoGrid_CargoRoom_Back",
+    144
+   ]
+  ]
+ },
+ "idris_lifts": [
+  {
+   "at": [
+    0,
+    -41
+   ],
+   "stops": [
+    6.12,
+    18.12
+   ],
+   "decks": [
+    "bruecke",
+    "haupt"
+   ]
+  },
+  {
+   "at": [
+    12,
+    -16
+   ],
+   "stops": [
+    -7.87,
+    6.0
+   ],
+   "decks": [
+    "hangar",
+    "haupt"
+   ]
+  },
+  {
+   "at": [
+    -12,
+    -16
+   ],
+   "stops": [
+    -8.0,
+    6.0
+   ],
+   "decks": [
+    "hangar",
+    "haupt"
+   ]
+  }
+ ],
+ "sl_lifts": [
+  {
+   "at": [
+    -4,
+    -11
+   ],
+   "stops": [
+    -4.44,
+    0.69
+   ],
+   "decks": [
+    "oben",
+    "unten"
+   ]
+  },
+  {
+   "at": [
+    7,
+    -11
+   ],
+   "stops": [
+    0.69,
+    -4.43
+   ],
+   "decks": [
+    "oben",
+    "unten"
+   ]
+  }
+ ],
+ "sl_rooms": {
+  "unten": [
+   "Frachtraum",
+   "Waffenkammer",
+   "Luftschleuse",
+   "Frachtraum",
+   "Luftschleuse"
+  ],
+  "oben": [
+   "Wohnbereich",
+   "Room_Corridor_003",
+   "Wohnbereich",
+   "Room_Corridor_01",
+   "Room_RN-000",
+   "Room_RN-002",
+   "Room_RN-003",
+   "Room_RN-004",
+   "Room_RN-005",
+   "Rettungskapseln",
+   "Room_RN-014",
+   "Room_RN-015",
+   "Room_RN-016",
+   "Maschinenraum",
+   "Cockpit",
+   "Room_Elevator_Hold_002",
+   "Room_Elevator_Hold_01",
+   "Room_RN-009",
+   "Freizeitbereich"
+  ]
+ }
+}

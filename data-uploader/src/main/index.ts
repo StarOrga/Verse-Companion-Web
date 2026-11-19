@@ -1,14 +1,15 @@
 // FIRST: a dev run gets its own userData before anything reads it (#632).
 import './dev-user-data.js';
-import { app, BrowserWindow, Menu, ipcMain, dialog, shell, clipboard } from 'electron';
+import { app, BrowserWindow, Menu, ipcMain, dialog, shell, clipboard, powerMonitor } from 'electron';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { existsSync } from 'node:fs';
+import { existsSync, promises as fsp } from 'node:fs';
 import { exec } from 'node:child_process';
 import log from 'electron-log';
 import { initLogging, logFromRenderer } from './logging.js';
 import { getSettings, setTelemetryEnabled, patchSettings, syncAutoStartWithOs } from './settings.js';
 import { reportCrash, reportError, reportExtractAbort, reportJobDiagnostics } from './telemetry-reporter.js';
+import { safeSend } from '../lib/safe-send.js';
 import { collectDiagnostic, newJobDiagnostics, type JobDiagnostics, type JobOutcome } from '../lib/job-diagnostics.js';
 import { classifyExtractAbort, type ExtractAbortReason } from '../lib/telemetry.js';
 import { discoverAll, discoverManual, setRememberedInstall } from '../lib/discovery.js';
@@ -17,7 +18,15 @@ import { runOAuthFlow } from '../lib/oauth.js';
 import { raiseWindow } from '../lib/window-focus.js';
 import { settleInitialVisibility, shouldStartHidden } from '../lib/window-visibility.js';
 import { uploadBundle, type UploadPayload } from '../lib/uploader.js';
-import { createWatchdog } from '../lib/watchdog.js';
+import { createWatchdog, type Watchdog } from '../lib/watchdog.js';
+import {
+  jobStallReport,
+  newStallTracker,
+  noteStallEvent,
+  stallTimeoutFor,
+  type StallEvent,
+  type StallTracker,
+} from '../lib/job-stall.js';
 import { RELEASE_TOKEN, TOOL_VERSION, API_BASE, WEB_BASE, SUPABASE_ANON_KEY } from '../lib/release-token.js';
 import { effectiveRing, highestRingFor, isRingPref, type ReleaseRing, type RingPref } from '../lib/update-ring.js';
 import {
@@ -67,14 +76,15 @@ import {
   getCachedSnapshot,
   runSync,
 } from './session.js';
+import { holdForRunningInstall, holdingForInstall } from './install-guard.js';
 import * as uploadJob from './upload-session.js';
 import * as resources from './resources.js';
 import { isInterrupt, PausedError } from '../lib/pause-control.js';
 import { ProgressHub } from '../lib/progress-hub.js';
 import { initTray, updateTray, destroyTray, notifyHidden, hasTray, type TrayMenuLabels } from './tray.js';
-import { decideAutoRun, describeDecision, pickSubthemeCandidates, type AutoRunDecision } from '../lib/auto-run.js';
+import { applyLedger, decideAutoRun, describeDecision, formatIdentity, pickSubthemeCandidates, type AutoRunDecision, type LedgerVerdict } from '../lib/auto-run.js';
 import { planSubthemes, type SubthemeKey, type SubthemePlan } from '../lib/subthemes.js';
-import { fetchLedger, recordLedger, type LedgerKey } from '../lib/subtheme-ledger.js';
+import { fetchLedger, fetchLiveBuildId, recordLedger, type LedgerKey } from '../lib/subtheme-ledger.js';
 
 // Configure logging + install uncaughtException/unhandledRejection handlers
 // before any window or IPC work, so a startup failure lands in main.log and
@@ -142,6 +152,9 @@ function quitForReal(): void {
 /** True once the operator has been told where the window went (once per run). */
 let hiddenNoticeShown = false;
 
+/** Timestamps of recent renderer-exit reloads (loop guard). */
+let rendererReloads: number[] = [];
+
 function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 1180,
@@ -151,7 +164,7 @@ function createWindow(): void {
     show: false,
     autoHideMenuBar: true,
     backgroundColor: '#0d2635', // = --surface-canvas, so resize/launch never flashes a foreign dark
-    title: 'Verse Companion - Data Uploader',
+    title: 'Verse Data Uploader',
     icon: runtimeIcon('icon.png'),
     webPreferences: {
       preload: join(__dirname, '../preload/index.cjs'),
@@ -185,6 +198,55 @@ function createWindow(): void {
       hiddenNoticeShown = true;
       notifyHidden(trayLabels.hiddenHint ?? 'Still running in the tray.');
     }
+  });
+
+  // A destroyed window must not stay in `mainWindow`: showMainWindow() would
+  // raise a dead object instead of building a new one.
+  const win = mainWindow;
+  win.on('closed', () => {
+    if (mainWindow === win) mainWindow = null;
+  });
+
+  // The renderer can exit under a hidden (tray) window — 2026-11-10 it left
+  // "clean-exit" behind and every later progress push hit a disposed frame.
+  // Bring the UI back instead of leaving the job running against nothing; the
+  // job itself lives in main and is unaffected. Capped so a renderer that dies
+  // on load cannot reload in a tight loop.
+  win.webContents.on('render-process-gone', (_e, details) => {
+    if (quitting || win.isDestroyed()) return;
+    const now = Date.now();
+    rendererReloads = rendererReloads.filter((t) => now - t < 60_000);
+    if (rendererReloads.length >= 3) {
+      log.error('[window] renderer keeps exiting — not reloading again', { reason: details.reason });
+      return;
+    }
+    rendererReloads.push(now);
+    log.warn('[window] renderer gone, reloading', { reason: details.reason, exitCode: details.exitCode });
+    try {
+      win.webContents.reload();
+    } catch (err) {
+      log.warn('[window] reload after renderer exit failed', err);
+    }
+  });
+
+  // Windows is logging off / shutting down under a running job. The process
+  // dies right after this, without `before-quit`, so without this line the log
+  // just stops mid-heartbeat — 2026-11-15 a foreign `shutdown /s` ended a
+  // 5-hour run at 07:04 and nothing said why. The job file already holds the
+  // resume point; this only names it.
+  win.on('session-end', (e) => {
+    const reasons = (e as unknown as { reasons?: string[] }).reasons ?? [];
+    let resume = 'no upload job';
+    try {
+      const v = uploadJob.view();
+      if (v.state) resume = `upload job ${v.state.jobId} ${v.state.status}${v.resumeHint ? `, resumes at ${v.resumeHint}` : ''}`;
+    } catch {
+      /* the line matters more than its detail */
+    }
+    log.warn(
+      `[app] Windows session ending${reasons.length ? ` (${reasons.join(', ')})` : ''} — ` +
+        `${activeJobs.size} sidecar job(s) running; ${resume}`,
+    );
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -454,27 +516,82 @@ ipcMain.handle('sc:autorun:decide', async (_e, signedIn: boolean): Promise<AutoR
     channels,
     snapshot: getCachedSnapshot(),
   });
-  log.info(`[autorun] ${describeDecision(decision)}`);
-  if (decision.reason !== 'already-uploaded') return decision;
+  for (const c of channels) {
+    log.info(
+      `[autorun] ${c.channel} install: ${formatIdentity(c.version, c.buildNumber)} (from ${c.versionSource ?? 'unknown'})`,
+    );
+  }
+  log.info(`[autorun] identity check: ${describeDecision(decision)}`);
+  if (!decision.run && decision.reason !== 'already-uploaded') return decision;
 
-  // Same patch as the server — but this uploader may do a subtheme differently
-  // now (revision bumped), or the server may hold another build of that patch.
-  // Only a ledger that was actually read (`reason: 'ledger'`) may start a run:
-  // an unknown build or an unreadable ledger would otherwise restart the whole
-  // pipeline on every launch.
+  // The identity says "differs" or "same" — the ledger says which PARTS of
+  // this exact build the server holds at this uploader's revisions. Only a
+  // ledger that was actually read (`reason: 'ledger'`) may start or stop a run
+  // (lib/auto-run.ts `applyLedger`).
   const { token } = await ensureAccessToken();
   if (!token) return decision;
+  const verdicts: LedgerVerdict[] = [];
   for (const channel of pickSubthemeCandidates(channels)) {
-    const key = { channel: channel.channel, patchVersion: channel.version ?? '', buildNumber: channel.buildNumber ?? '' };
+    const key = ledgerKeyOf(channel);
     const ledger = await fetchLedger({ apiBase: API_BASE, anonKey: SUPABASE_ANON_KEY, accessToken: token }, key);
-    const plan = planSubthemes({ buildNumber: key.buildNumber, ledger, force: false });
-    if (plan.reason === 'ledger' && plan.pending.length > 0) {
-      log.info(`[autorun] ${channel.channel}: subthemes pending [${plan.pending.join(', ')}] — starting`);
-      return { run: true, channel, localVersion: channel.version ?? undefined, serverVersion: channel.version };
-    }
+    verdicts.push({ channel, plan: planSubthemes({ buildNumber: key.buildNumber, ledger, force: false }) });
   }
-  return decision;
+  const final = applyLedger(decision, verdicts);
+  log.info(`[autorun] ${describeDecision(final)}`);
+  return final;
 });
+
+/** The ledger key of an install — the same identity the header and the run use. */
+function ledgerKeyOf(channel: { channel: string; version?: string | null; buildNumber?: string | null }): LedgerKey {
+  return { channel: channel.channel, patchVersion: channel.version ?? '', buildNumber: channel.buildNumber ?? '' };
+}
+
+/**
+ * A finished extract of this exact build still on disk — what a models-only
+ * run continues from (`skins/_build_manifest.json` drives the hull build).
+ * Matched on channel + build number from the extract's own manifest.json, so a
+ * folder named after an older label (`LIVE-4.10.0`) still counts. Null = none;
+ * the run then extracts as before.
+ */
+ipcMain.handle(
+  'sc:extract:reuse',
+  async (_e, req: { installPath: string; channel: string; buildNumber: string; patchVersion: string }) => {
+    const root = join(String(req.installPath ?? ''), '.sc-companion-extracts');
+    let names: string[] = [];
+    try {
+      names = await fsp.readdir(root);
+    } catch {
+      return null;
+    }
+    for (const name of names) {
+      const dir = join(root, name);
+      try {
+        const manifestPath = join(dir, 'manifest.json');
+        const m = JSON.parse(await fsp.readFile(manifestPath, 'utf-8')) as Record<string, unknown>;
+        if (String(m.channel ?? '').toUpperCase() !== String(req.channel).toUpperCase()) continue;
+        if (String(m.build_number ?? '').trim() !== String(req.buildNumber).trim()) continue;
+        await fsp.access(join(dir, 'skins', '_build_manifest.json'));
+        log.info(`[autorun] models-only: reusing extract ${dir} (labelled ${String(m.patch_version)})`);
+        return {
+          channel: String(m.channel),
+          // The identity of the install, not the folder's old label.
+          patch_version: String(req.patchVersion || m.patch_version),
+          build_number: String(m.build_number),
+          schema_version: Number(m.schema_version ?? 0),
+          quality_score: Number(m.quality_score ?? 0),
+          entity_counts: (m.entity_counts ?? {}) as Record<string, number>,
+          manifest_path: manifestPath,
+          output_dir: dir,
+          tool_version: String(m.tool_version ?? ''),
+        };
+      } catch {
+        /* not a usable extract */
+      }
+    }
+    log.info(`[autorun] models-only: no extract of ${req.channel} build ${req.buildNumber} on disk`);
+    return null;
+  },
+);
 
 /**
  * Which subthemes this run can leave out: the server's ledger for the same
@@ -610,7 +727,7 @@ ipcMain.handle('sc:authenticate', async () => {
   // a keyring-less OS falls back to in-memory (re-auth next launch).
   if (result.ok) {
     try {
-      persistAuthResult(result);
+      await persistAuthResult(result);
     } catch {
       /* persistence is best-effort; never block the auth result on it */
     }
@@ -652,7 +769,7 @@ ipcMain.handle('sc:session:role', async () => {
 ipcMain.handle('sc:sync:cached', () => getCachedSnapshot());
 
 ipcMain.handle('sc:sync:start', async (event) =>
-  runSync((p) => event.sender.send('sc:sync:event', p)),
+  runSync((p) => safeSend(event.sender, 'sc:sync:event', p)),
 );
 
 // ============= Resumable upload-job IPC =============
@@ -810,6 +927,10 @@ ipcMain.on('sc:update:check-silent', () => checkForUpdatesSilently());
 // between pipeline steps no child runs while the run is still going), the
 // request stays standing and installs once the work ended or was paused.
 setWorkBusyProbe(() => activeJobs.size > 0 || uploadJob.isRunInFlight());
+// The renderer forgets its own run flags when it is reloaded (render-process-gone
+// below) while main keeps working; its auto-run asks here first so a reloaded UI
+// never starts a second extraction or upload beside the live one.
+ipcMain.handle('sc:work:busy', () => activeJobs.size > 0 || uploadJob.isRunInFlight());
 ipcMain.handle('sc:update:install', () => installUpdateNow());
 ipcMain.handle('sc:update:cancel-install', () => cancelInstallRequest());
 
@@ -948,20 +1069,58 @@ function reportExtractOutcome(
 }
 
 // A long-running native job (Python extract / cgf-converter skin export) that
-// stops emitting events for this long is treated as WEDGED and reported to
-// crash telemetry — a silent hang produces no exception on its own, so without
-// this it would be invisible server-side. Generous enough to clear the longest
-// legitimately-opaque stages ("open" the archive, "datacore" decompress).
-const JOB_STALL_MS = 5 * 60_000;
+// stops emitting events for its stall window (`lib/job-stall.ts`: 5 min, 20 min
+// for the 3D build) is treated as WEDGED and reported to crash telemetry — a
+// silent hang produces no exception on its own, so without this it would be
+// invisible server-side. The report says where the job was (phase, counter,
+// last log line) and how long it actually waited.
 
-/** Fire a one-shot stall crash report for a wedged native job. */
-function reportJobStall(kind: string, idleMs: number, jobId: string): void {
-  void reportCrash({
-    errorType: 'hang',
-    name: 'JobStall',
-    message: `${kind} job made no progress for ${Math.round(idleMs / 1000)}s`,
-    stack: null,
-    extra: { kind, jobId, idleMs },
+interface StallWatch {
+  watchdog: Watchdog;
+  tracker: StallTracker;
+  /** Armed by `startJobStall` — a resume never arms one whose job never ran. */
+  started: boolean;
+}
+
+/** Every live job's watchdog — a system suspend/resume reaches them all. */
+const stallWatches = new Set<StallWatch>();
+
+/** A stall watchdog for one native job, sized for its kind. */
+function watchJobStall(kind: string, jobId: string): StallWatch {
+  const tracker = newStallTracker();
+  const watchdog = createWatchdog({
+    timeoutMs: stallTimeoutFor(kind),
+    onTimeout: (idle) => void reportCrash(jobStallReport(kind, jobId, idle, tracker)),
+  });
+  const watch = { watchdog, tracker, started: false };
+  stallWatches.add(watch);
+  return watch;
+}
+
+/** Sign of life from the sidecar: remember where it is, reset the clock. */
+function petJobStall(watch: StallWatch, ev: StallEvent): void {
+  noteStallEvent(watch.tracker, ev);
+  watch.watchdog.pet();
+}
+
+function startJobStall(watch: StallWatch): void {
+  watch.started = true;
+  watch.watchdog.start();
+}
+
+function endJobStall(watch: StallWatch): void {
+  watch.watchdog.stop();
+  stallWatches.delete(watch);
+}
+
+// Standby is not a stall: the clock halts on suspend and restarts with a fresh
+// window on resume, so the time the PC slept never counts as silence.
+function wireStallPower(): void {
+  powerMonitor.on('suspend', () => {
+    for (const w of stallWatches) w.watchdog.hold();
+  });
+  powerMonitor.on('resume', () => {
+    for (const w of stallWatches) if (w.started) w.watchdog.start();
   });
 }
 
@@ -976,10 +1135,6 @@ ipcMain.handle('sc:extract:start', async (event, req: ExtractRequest): Promise<E
   // sidecar starts — main owns them (see `main/resources.ts`).
   const w = resources.workers();
   req = { ...req, workers: w.dump, memCapMb: w.memCapMb };
-  const watchdog = createWatchdog({
-    timeoutMs: JOB_STALL_MS,
-    onTimeout: (idle) => reportJobStall('extract', idle, jobId),
-  });
   // A new extraction means every earlier extract on disk is superseded — drop
   // them all BEFORE the sidecar starts writing, so two full extracts never sit
   // side by side and fill the drive. The dir this run is about to fill and any
@@ -990,7 +1145,7 @@ ipcMain.handle('sc:extract:start', async (event, req: ExtractRequest): Promise<E
     installRootOf(req.outDir),
   );
   if (purge.removed > 0) {
-    event.sender.send('sc:extract:event', {
+    safeSend(event.sender, 'sc:extract:event', {
       jobId,
       type: 'log',
       message: `cleanup: removed ${purge.removed} older extract folder(s)`,
@@ -1000,15 +1155,16 @@ ipcMain.handle('sc:extract:start', async (event, req: ExtractRequest): Promise<E
 
   hub.start('extract');
   const job = newActiveJob('extract', req.outDir);
+  const stall = watchJobStall('extract', jobId);
   const handle = startExtraction(req, (ev: PythonExtractEvent) => {
     // A heartbeat pulse only says "the process is alive", not "it progressed" —
     // it must not pet the stall watchdog (a spinning hang would never trip it)
     // nor flood the diagnostics. It goes straight to the renderer's bar.
     if (ev.type === 'pulse') {
-      event.sender.send('sc:extract:event', { jobId, ...ev });
+      safeSend(event.sender, 'sc:extract:event', { jobId, ...ev });
       return;
     }
-    watchdog.pet(); // every event is a sign of life — reset the stall timer
+    petJobStall(stall, ev); // every event is a sign of life — reset the stall timer
     collectDiagnostic(job.diagnostics, ev, Date.now() - job.startedAt);
     // Mirror into main's hub so the tray shows extraction progress even while
     // the window is hidden.
@@ -1020,14 +1176,14 @@ ipcMain.handle('sc:extract:start', async (event, req: ExtractRequest): Promise<E
       if (typeof e.pct === 'number') job.lastPct = e.pct;
       hub.update('extract', e.phase ?? null, typeof e.pct === 'number' ? e.pct : null);
     }
-    event.sender.send('sc:extract:event', { jobId, ...ev });
+    safeSend(event.sender, 'sc:extract:event', { jobId, ...ev });
   });
   job.cancel = handle.cancel;
   activeJobs.set(jobId, job);
   // Hand the sidecar to its governor: it gets the limits in effect NOW,
   // and every later switch reaches it without restarting the extraction.
   resources.registerJob(jobId, handle.pid);
-  watchdog.start();
+  startJobStall(stall);
   try {
     const final = await handle.promise;
     hub.finish('extract', final.ok ? 'done' : 'error');
@@ -1044,7 +1200,7 @@ ipcMain.handle('sc:extract:start', async (event, req: ExtractRequest): Promise<E
     reportJobLog('extract', jobId, job, { ok: false, error: message }, { channel: req.channel, patchVersion: req.patchVersion });
     return { ok: false, error: message };
   } finally {
-    watchdog.stop();
+    endJobStall(stall);
     activeJobs.delete(jobId);
     // Deregister BEFORE the OS can recycle the pid — a later switch must never
     // re-prioritise whatever process inherited this number.
@@ -1059,7 +1215,7 @@ ipcMain.handle('sc:extract:start', async (event, req: ExtractRequest): Promise<E
 ipcMain.handle('sc:skin:ensureTools', async (event) => {
   try {
     const path = await ensureConverter((pct) =>
-      event.sender.send('sc:skin:toolProgress', { pct }),
+      safeSend(event.sender, 'sc:skin:toolProgress', { pct }),
     );
     return { ok: true, path };
   } catch (err) {
@@ -1085,20 +1241,17 @@ ipcMain.handle('sc:skin:start', async (event, req: SkinExportRequest): Promise<S
     items: pk.pkgItems,
     armor: pk.pkgArmor,
   };
-  const watchdog = createWatchdog({
-    timeoutMs: JOB_STALL_MS,
-    onTimeout: (idle) => reportJobStall('skin', idle, jobId),
-  });
+  const stall = watchJobStall('skin', jobId);
   const job = newActiveJob('skin', req.outDir);
   const handle = startSkinExport(req, (ev) => {
-    watchdog.pet();
+    petJobStall(stall, ev);
     collectDiagnostic(job.diagnostics, ev, Date.now() - job.startedAt);
-    event.sender.send('sc:skin:event', { jobId, ...ev });
+    safeSend(event.sender, 'sc:skin:event', { jobId, ...ev });
   });
   job.cancel = handle.cancel;
   activeJobs.set(jobId, job);
   resources.registerJob(jobId, handle.pid);
-  watchdog.start();
+  startJobStall(stall);
   try {
     const final = await handle.promise;
     // The build is killed from two places that mean opposite things: an
@@ -1117,7 +1270,7 @@ ipcMain.handle('sc:skin:start', async (event, req: SkinExportRequest): Promise<S
     reportJobLog('skin', jobId, job, { ok: false });
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   } finally {
-    watchdog.stop();
+    endJobStall(stall);
     activeJobs.delete(jobId);
     resources.unregisterJob(jobId);
   }
@@ -1145,13 +1298,13 @@ ipcMain.handle(
           // run that shipped 21 of 309 ships left no trace of what went wrong
           // with the other 288 — not on screen, not on disk.
           if (level === 'warn' || level === 'error') log[level](`[skin-upload] ${message}`);
-          event.sender.send('sc:skin:event', { jobId: 'upload', type: 'log', message, level: level ?? 'info' });
+          safeSend(event.sender, 'sc:skin:event', { jobId: 'upload', type: 'log', message, level: level ?? 'info' });
         },
         {
           ...uploadJob.hooksForSkins(),
           onProgress: (done, total, shipId) => {
             hub.update('upload', 'skins', total > 0 ? (done / total) * 100 : null);
-            event.sender.send('sc:skin:event', {
+            safeSend(event.sender, 'sc:skin:event', {
               jobId: 'upload',
               type: 'progress',
               stage: 'skins',
@@ -1163,7 +1316,7 @@ ipcMain.handle(
           // FPS / item / armor packages after the last ship: own phase, own
           // counter. Without it the card stayed on "312 / 312" for hours.
           onPackageProgress: (kind, done, total, className) => {
-            event.sender.send('sc:skin:event', {
+            safeSend(event.sender, 'sc:skin:event', {
               jobId: 'upload',
               type: 'progress',
               stage: 'packages',
@@ -1196,7 +1349,7 @@ ipcMain.handle(
       if (isInterrupt(err)) {
         // Paused/cancelled between ships — the renderer reads the job view to
         // learn that, so an empty result here is not an error.
-        event.sender.send('sc:upload:paused', uploadJob.view());
+        safeSend(event.sender, 'sc:upload:paused', uploadJob.view());
         return [];
       }
       throw err;
@@ -1216,23 +1369,20 @@ ipcMain.handle(
   'sc:silhouette:start',
   async (event, req: SilhouetteBuildRequest): Promise<SilhouetteBuildFinal> => {
     const jobId = `silhouette-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    const watchdog = createWatchdog({
-      timeoutMs: JOB_STALL_MS,
-      onTimeout: (idle) => reportJobStall('silhouette', idle, jobId),
-    });
+    const stall = watchJobStall('silhouette', jobId);
     // Conversions at once follow the limits, also while the build runs.
     const live = resources.openLiveLimits(jobId, 'silhouette');
     req = { ...req, workers: live.workers, maxWorkers: live.maxWorkers, liveLimitsPath: live.path };
     const job = newActiveJob('silhouette', req.outDir);
     const handle = startSilhouetteBuild(req, (ev) => {
-      watchdog.pet();
+      petJobStall(stall, ev);
       collectDiagnostic(job.diagnostics, ev, Date.now() - job.startedAt);
-      event.sender.send('sc:silhouette:event', { jobId, ...ev });
+      safeSend(event.sender, 'sc:silhouette:event', { jobId, ...ev });
     });
     job.cancel = handle.cancel;
     activeJobs.set(jobId, job);
     resources.registerJob(jobId, handle.pid);
-    watchdog.start();
+    startJobStall(stall);
     try {
       const final = await handle.promise;
       // Same pause/cancel-vs-crash disambiguation as `sc:skin:start` — a
@@ -1248,7 +1398,7 @@ ipcMain.handle(
       reportJobLog('silhouette', jobId, job, { ok: false });
       return { ok: false, error: err instanceof Error ? err.message : String(err) };
     } finally {
-      watchdog.stop();
+      endJobStall(stall);
       activeJobs.delete(jobId);
       resources.unregisterJob(jobId);
     }
@@ -1294,7 +1444,7 @@ ipcMain.handle(
               ? ((p.phaseIndex - 1 + (p.total > 0 ? p.current / p.total : 0)) / p.phaseTotal) * 100
               : null;
           hub.update('upload', p.phase, pct);
-          event.sender.send('sc:catalog:event', p);
+          safeSend(event.sender, 'sc:catalog:event', p);
         },
         {
           ...hooks,
@@ -1306,7 +1456,7 @@ ipcMain.handle(
       return result;
     } catch (err) {
       if (isInterrupt(err)) {
-        event.sender.send('sc:upload:paused', uploadJob.view());
+        safeSend(event.sender, 'sc:upload:paused', uploadJob.view());
         return { ok: false, error: err instanceof PausedError ? 'paused' : 'cancelled' };
       }
       throw err;
@@ -1319,28 +1469,41 @@ ipcMain.handle(
 // wiring as the catalog — its rows are phase `codex_silhouettes` of that cursor.
 ipcMain.handle(
   'sc:catalog:silhouettes',
-  async (event, accessToken: string, outDir: string): Promise<CatalogUploadResult> => {
+  async (event, accessToken: string, outDir: string, buildId?: string | null): Promise<CatalogUploadResult> => {
     try {
       const result = await uploadCatalog(
         () => freshToken(accessToken),
         outDir,
         (p) => {
           hub.update('upload', p.phase, p.total > 0 ? (p.current / p.total) * 100 : null);
-          event.sender.send('sc:catalog:event', p);
+          safeSend(event.sender, 'sc:catalog:event', p);
         },
-        { ...uploadJob.hooksForCatalog(), mode: 'silhouettes' },
+        {
+          ...uploadJob.hooksForCatalog(),
+          mode: 'silhouettes',
+          // A silhouettes-only continuation has no catalogue run of its own: the
+          // published row the server already holds is the target.
+          ...(typeof buildId === 'string' && buildId ? { buildId } : {}),
+        },
       );
       if (result.ok) uploadJob.update((s) => ({ ...s, silhouettes: { status: 'done' } }));
       return result;
     } catch (err) {
       if (isInterrupt(err)) {
-        event.sender.send('sc:upload:paused', uploadJob.view());
+        safeSend(event.sender, 'sc:upload:paused', uploadJob.view());
         return { ok: false, error: err instanceof PausedError ? 'paused' : 'cancelled' };
       }
       throw err;
     }
   },
 );
+
+/** The published codex build of this identity (silhouettes-only continuation); null = none. */
+ipcMain.handle('sc:catalog:currentBuild', async (_e, key: LedgerKey): Promise<string | null> => {
+  const { token } = await ensureAccessToken();
+  if (!token) return null;
+  return fetchLiveBuildId({ apiBase: API_BASE, anonKey: SUPABASE_ANON_KEY, accessToken: token }, key);
+});
 
 /** The Silhouetten step had nothing to send (skipped by the ledger, or no build) — record it as passed. */
 ipcMain.handle('sc:catalog:silhouettesSkipped', () => {
@@ -1394,12 +1557,18 @@ if (!gotLock) {
 }
 
 app.on('second-instance', () => {
+  // Waiting for a running update install: the files are not complete yet.
+  if (holdingForInstall()) return;
   // Also un-hides a tray-resident instance: double-clicking the .exe while the
   // app sits in the tray should bring the window back, not appear to do nothing.
   showMainWindow();
 });
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  // Opened while an update installer still writes the app's files: wait for it,
+  // then restart on the finished install (main/install-guard.ts).
+  if (await holdForRunningInstall()) return;
+  wireStallPower();
   // Every discovery (auto-run, cleanup, Install step) probes the install the
   // operator chose before first — falls back to the search when it is gone.
   setRememberedInstall(getSettings().gamePath);
@@ -1432,7 +1601,7 @@ app.whenReady().then(() => {
         // pick the job back up. Restore the window: an upload the operator just
         // resumed by hand is something they want to watch.
         showMainWindow();
-        mainWindow?.webContents.send('sc:upload:resumeRequested');
+        safeSend(mainWindow?.webContents, 'sc:upload:resumeRequested');
       },
       labels: () => trayLabels,
     },

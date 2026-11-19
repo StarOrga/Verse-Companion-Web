@@ -143,13 +143,20 @@ describe('CodexHardpointLayoutComponent', () => {
     const perItem = Array.from(el.querySelectorAll('.slot-stats dd')).map((d) => d.textContent?.trim());
     expect(perItem[0]).toBe('43.65');
     // 4263fed1: the total lives INSIDE the card, top right, and says "Gesamt";
-    // every per-item stat says how many units it stands for ("3× Alphaschaden").
+    // the damage says how many units it stands for ("3× Alphaschaden"); the
+    // values every gun shares — speed, range, penetration — read once (#351).
     const fig = el.querySelector('button.slot-btn .fig.total')!;
     expect(fig).toBeTruthy();
     expect(fig.querySelector('.fig-l')?.textContent?.trim()).toBe('codex.module.total');
     expect(el.querySelector('.main > .fig')).toBeNull(); // no longer a column beside the card
-    const mults = Array.from(el.querySelectorAll('.slot-stats dt .mult')).map((m) => m.textContent?.trim());
-    expect(mults).toEqual(['3×', '3×', '3×', '3×']);
+    const stats = Array.from(el.querySelectorAll('.slot-stats .stat'));
+    expect(stats.map((st) => st.querySelector('dt .mult')?.textContent?.trim() ?? null)).toEqual([
+      '3×',
+      null,
+      null,
+      null,
+    ]);
+    expect(perItem.slice(1, 3)).toEqual(['1,480 m/s', '1,924 m']);
   });
 
   it('drops "Gesamt" and the "3×" prefix once the block is split into single rows', () => {
@@ -223,8 +230,13 @@ describe('CodexHardpointLayoutComponent', () => {
     expect(el.querySelector('.fig .n')?.textContent?.trim()).toBe('150 m');
     expect(el.querySelector('.fig.total')).toBeNull();
     expect(el.querySelector('.fig-l')).toBeNull();
-    // …while the per-item run still says how many beams each value stands for
-    expect(el.querySelector('.slot-stats dt .mult')?.textContent?.trim()).toBe('2×');
+    // …reach and pull are per beam and read once; only the pooled power draw
+    // says how many beams it stands for (#351).
+    const multed = Array.from(el.querySelectorAll('.slot-stats .stat'))
+      .filter((st) => st.querySelector('dt .mult'))
+      .map((st) => st.textContent);
+    expect(multed.length).toBe(1);
+    expect(multed[0]).toContain('codex.equipped.powerDraw');
   });
 
   it('asks for a re-extract under a beam whose build predates its numbers', () => {
@@ -319,10 +331,13 @@ describe('CodexHardpointLayoutComponent', () => {
     expect(fig.querySelector('.fig-l')?.textContent?.trim()).toBe('codex.module.total');
     expect(fig.querySelector('.n')?.textContent?.trim()).toBe('130.95');
     expect(kid.querySelector('.kid-line > .fig')).toBeNull();
-    // Per-unit values stay per unit, prefixed with how many units they cover.
+    // The damage keeps the "3×" reminder; the speed every gun shares reads
+    // once, without it (#351).
     expect(
-      Array.from(kid.querySelectorAll('.slot-stats dt .mult')).map((m) => m.textContent?.trim()),
-    ).toEqual(['3×', '3×']);
+      Array.from(kid.querySelectorAll('.slot-stats .stat')).map(
+        (st) => st.querySelector('dt .mult')?.textContent?.trim() ?? null,
+      ),
+    ).toEqual(['3×', null]);
     expect(
       Array.from(kid.querySelectorAll('.slot-stats dd')).map((d) => d.textContent?.trim()),
     ).toEqual(['43.65', '1,480 m/s']);
@@ -689,7 +704,7 @@ describe('CodexHardpointLayoutComponent', () => {
     );
   });
 
-  it('renders a block note under its heading', () => {
+  it('puts a block note behind an info tooltip at its heading (#349)', () => {
     const el = render([
       {
         section: 'weapons',
@@ -697,11 +712,13 @@ describe('CodexHardpointLayoutComponent', () => {
         notes: [{ key: 'codex.equipped.armamentMissing', params: { count: 3 } }],
       },
     ]);
-    const note = el.querySelector('.mod-sec[data-sec="weapons"] .sec-note');
-    expect(note?.textContent?.trim()).toBe('codex.equipped.armamentMissing');
+    const info = el.querySelector('.mod-sec[data-sec="weapons"] .sec-head .sec-info');
+    expect(info?.getAttribute('aria-label')).toBe('codex.moduleSection.infoLabel');
+    expect(el.querySelector('.sec-note')).toBeNull();
+    expect(el.querySelector('.mod-sec[data-sec="weapons"]')?.textContent).not.toContain('codex.equipped.armamentMissing');
   });
 
-  it('keeps every shield bay on its own row, empty ones included', () => {
+  it('stacks identical shield generators like weapons, an empty bay keeps its own row (#348)', () => {
     const bay = (port: string, className: string | null) =>
       slot({
         port,
@@ -709,7 +726,8 @@ describe('CodexHardpointLayoutComponent', () => {
         kind: className ? ('component' as const) : null,
         name: className ? 'Sechs Shield' : null,
         size: className ? 1 : null,
-        noCollapse: true,
+        // The ship page only pins UNFITTED configurable bays to their own row.
+        noCollapse: !className,
         roleKey: 'codex.moduleRole.shieldGenerator',
         emptySwappable: !className,
         portSize: 1,
@@ -724,12 +742,18 @@ describe('CodexHardpointLayoutComponent', () => {
         ],
       },
     ]);
-    // Three bays, three rows — never "2× S1" plus one empty.
+    // Empty bay + "2× S1" — the empty one never hides inside the stack.
+    expect(el.querySelectorAll('.slot').length).toBe(2);
+    expect(el.querySelector('.slot:not(.empty) .size-tag')?.textContent?.trim()).toBe('2× S1');
+    // "Einzeln" lists the three bays again, one row each.
+    (el.querySelector('.mod-sec[data-sec="shields"] .sec-btn') as HTMLButtonElement).click();
+    fixture.detectChanges();
     expect(el.querySelectorAll('.slot').length).toBe(3);
     expect(el.querySelectorAll('.tag.role').length).toBe(3);
   });
 
-  it('greys the passive shield generator and says so in words (4263fed1)', () => {
+  it('greys the passive shield generator and never stacks it with the active ones (4263fed1, #348)', () => {
+    // The ship page puts the stock role into the grouping key.
     const bay = (port: string, roleKey: string) =>
       slot({
         port,
@@ -737,8 +761,8 @@ describe('CodexHardpointLayoutComponent', () => {
         kind: 'component',
         name: 'WEB',
         size: 1,
-        noCollapse: true,
         roleKey,
+        groupKey: `SHLD_SECO_S01|1|||${roleKey}`,
         stats: [{ labelKey: 'codex.equipped.shieldHp', value: 2160, format: 'int' }],
       });
     const el = render([
@@ -752,12 +776,39 @@ describe('CodexHardpointLayoutComponent', () => {
       },
     ]);
     const rows = Array.from(el.querySelectorAll('li.slot'));
-    expect(rows.length).toBe(3);
-    expect(rows.map((r) => r.classList.contains('inactive'))).toEqual([false, false, true]);
-    expect(rows[2].querySelector('.tag.role')?.textContent?.trim()).toBe('codex.module.badge.passive');
-    // Single bays: no "Gesamt", no multiplier — each row is one generator.
+    // "2× … Aktiv" + "1× … Passiv" — one tag per row stays true for every bay in it.
+    expect(rows.length).toBe(2);
+    expect(rows.map((r) => r.classList.contains('inactive'))).toEqual([false, true]);
+    expect(rows.map((r) => r.querySelector('.size-tag')?.textContent?.trim())).toEqual(['2× S1', 'S1']);
+    expect(rows[1].querySelector('.tag.role')?.textContent?.trim()).toBe('codex.module.badge.passive');
+    // Split: three single generators, no "Gesamt", no multiplier.
+    (el.querySelector('.mod-sec[data-sec="shields"] .sec-btn') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    const single = Array.from(el.querySelectorAll('li.slot'));
+    expect(single.length).toBe(3);
+    expect(single.map((r) => r.classList.contains('inactive'))).toEqual([false, false, true]);
     expect(el.querySelector('.fig.total')).toBeNull();
     expect(el.querySelector('.slot-stats .mult')).toBeNull();
+  });
+
+  it('stacks identical countermeasure launchers too (#348)', () => {
+    const launcher = (port: string) =>
+      slot({
+        port,
+        className: 'CNOU_Nomad_CML_Flare',
+        kind: 'weapon',
+        name: 'Decoy Launcher',
+        size: 1,
+        typeLabel: 'Countermeasure Launcher',
+      });
+    const el = render([
+      {
+        section: 'countermeasures',
+        slots: [launcher('Hardpoint Countermeasure Left'), launcher('Hardpoint Countermeasure Right')],
+      },
+    ]);
+    expect(el.querySelectorAll('li.slot').length).toBe(1);
+    expect(el.querySelector('.size-tag')?.textContent?.trim()).toBe('2× S1');
   });
 
   it('folds two identical coolers into one "2×" row with the cooling total on the card', () => {
@@ -1042,13 +1093,21 @@ describe('CodexHardpointLayoutComponent', () => {
     expect(blocks).toEqual(['weapons', 'missiles', 'shields', 'systems']);
   });
 
-  it('opens every block, nested section and the airframe under the "Alles" lens (#240)', () => {
+  it('opens every block and nested section under the "Alles" lens (#240), the airframe stays folded (#333)', () => {
     fixture.componentRef.setInput('expandAll', true);
     const thruster = slot({ port: 'Hardpoint Thruster', className: 'T', kind: 'component', name: 'T' });
     const el = render([...FOUR_BLOCK_SHIP, { section: 'structure', slots: [thruster] }]);
     const all = Array.from(el.querySelectorAll<HTMLDetailsElement>('details.mod-sec, details.mod-sub'));
-    expect(all.length).toBeGreaterThan(5);
-    expect(all.every((d) => d.open)).toBe(true);
+    const rest = all.filter((d) => d.getAttribute('data-sec') !== 'structure');
+    expect(rest.length).toBeGreaterThan(5);
+    expect(rest.every((d) => d.open)).toBe(true);
+    const airframe = el.querySelector('.mod-sec[data-sec="structure"]') as HTMLDetailsElement;
+    expect(airframe.open).toBe(false);
+    expect(airframe.querySelector('.sec-rows')).toBeNull();
+
+    // A manual unfold still opens it.
+    fixture.componentInstance.toggleFold('structure');
+    fixture.detectChanges();
     expect(el.querySelector('.mod-sec[data-sec="structure"] .sec-rows')).toBeTruthy();
 
     // Leaving "Alles" restores the default folds (airframe + nested systems).
@@ -1099,5 +1158,58 @@ describe('CodexHardpointLayoutComponent', () => {
     expect(el.querySelector('.mod-sec[data-sec="systems"]')).toBeNull();
     expect(el.querySelector('.mod-sec[data-sec="coolers"]')).toBeTruthy();
     expect(el.querySelector('.mod-sub')).toBeNull();
+  });
+
+  // #345: every swappable slot resets on its own — a swapped gun inside a gimbal too, not only the mount.
+  it('gives a swapped row and a swapped sub-slot each their own reset icon, emitting only their own paths', () => {
+    const swappedGun = child({
+      port: 'Hardpoint Class 3', size: 3, className: 'KLWE_LaserRepeater_S3', kind: 'weapon', name: 'CF-337 Panther Repeater',
+      draftState: 'changed', draftPaths: ['Hardpoint Weapon Wing Left.Hardpoint Class 3'],
+    });
+    const el = render([
+      {
+        section: 'weapons',
+        slots: [
+          { ...PANTHER, draftState: 'changed', draftPaths: ['Hardpoint Weapon Top Left'] },
+          { ...VARIPUCK, children: [swappedGun] },
+        ],
+      },
+    ]);
+    const emitted: string[][] = [];
+    fixture.componentInstance.reverted.subscribe((p) => emitted.push(p));
+    const resets = Array.from(el.querySelectorAll<HTMLButtonElement>('button.slot-revert'));
+    expect(resets.length).toBe(2);
+    for (const b of resets) {
+      expect(b.classList.contains('sc-action--tertiary')).toBe(true);
+      expect(b.getAttribute('aria-label')).toBe('codex.loadout.revert');
+    }
+    // #345 follow-up: each icon rides in its row's favourite/hangar cell, left of the ⓘ.
+    for (const b of resets) {
+      const cell = b.closest('.tools');
+      expect(cell).toBeTruthy();
+      expect(cell!.nextElementSibling?.classList.contains('slot-swap')).toBe(true);
+    }
+    el.querySelector<HTMLButtonElement>('.kid button.kid-revert')!.click();
+    resets.find((b) => !b.classList.contains('kid-revert'))!.click();
+    expect(emitted).toEqual([['Hardpoint Weapon Wing Left.Hardpoint Class 3'], ['Hardpoint Weapon Top Left']]);
+  });
+
+  it('shows no reset icon on a slot that still carries its stock item', () => {
+    const el = render([{ section: 'weapons', slots: [PANTHER, VARIPUCK] }]);
+    expect(el.querySelector('button.slot-revert')).toBeNull();
+  });
+
+  // #345 follow-up: a swap must not shift the row — the info button stays where it was.
+  it('keeps the info button in place when a row is swapped and gets its reset icon', () => {
+    const infoLeft = (swapped: boolean): number => {
+      const el = render([
+        { section: 'weapons', slots: [swapped ? { ...PANTHER, draftState: 'changed', draftPaths: ['Hardpoint Weapon Top Left'] } : PANTHER] },
+      ]);
+      const info = el.querySelector<HTMLElement>('.main > button.slot-swap')!;
+      return info.getBoundingClientRect().left;
+    };
+    const stock = infoLeft(false);
+    const swapped = infoLeft(true);
+    expect(Math.abs(swapped - stock)).toBeLessThan(1);
   });
 });

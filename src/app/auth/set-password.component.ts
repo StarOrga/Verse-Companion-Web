@@ -7,6 +7,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { capturedAuthLinkType } from './auth-link';
 import { AuthService } from './auth.service';
 import { PasswordFormComponent } from './password-form.component';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /**
  * Where an invite mail and a password-reset mail land.
@@ -27,7 +28,7 @@ import { PasswordFormComponent } from './password-form.component';
 @Component({
   selector: 'sc-set-password',
   standalone: true,
-  imports: [AuthStageComponent, PasswordFormComponent, RouterLink, TranslatePipe],
+  imports: [AuthStageComponent, PasswordFormComponent, RouterLink, TranslatePipe, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <sc-auth-stage>
@@ -45,7 +46,7 @@ import { PasswordFormComponent } from './password-form.component';
 
           @if (saved()) {
             <div class="flash success" role="status">{{ 'auth.setPassword.savedLead' | translate }}</div>
-            <a routerLink="/verse/news" class="sc-btn sc-btn-primary continue">
+            <a routerLink="/verse/news" scAction tier="primary" class="continue">
               {{ 'auth.setPassword.continue' | translate }}
             </a>
           } @else {
@@ -77,7 +78,7 @@ import { PasswordFormComponent } from './password-form.component';
               @if (resendError(); as e) {
                 <div class="flash error" role="alert">{{ e | translate }}</div>
               }
-              <button type="submit" class="sc-btn sc-btn-primary" [disabled]="resending() || !emailLooksValid()">
+              <button type="submit" scAction tier="primary" [disabled]="resending() || !emailLooksValid()">
                 {{ (resending() ? 'auth.setPassword.sending' : 'auth.setPassword.sendLink') | translate }}
               </button>
             </form>
@@ -104,11 +105,11 @@ import { PasswordFormComponent } from './password-form.component';
     .flash { padding: 8px 12px; border-radius: 4px; font-size: 0.84rem; }
     .flash.success { background: rgba(74, 222, 128, 0.1); border: 1px solid var(--sc-success); color: var(--sc-success); }
     .flash.error { background: rgba(248, 113, 113, 0.1); border: 1px solid var(--sc-danger); color: var(--sc-danger); }
-    .resend .sc-btn, .continue { align-self: flex-start; justify-content: center; min-height: 44px; text-decoration: none; }
+    .resend .sc-action, .continue { align-self: flex-start; justify-content: center; min-height: 44px; text-decoration: none; }
     .back { margin: 0; font-size: 0.85rem; }
     .back a { color: var(--sc-accent); }
     @media (max-width: 640px) {
-      .resend .sc-btn, .continue { align-self: stretch; }
+      .resend .sc-action, .continue { align-self: stretch; }
     }
   `],
 })

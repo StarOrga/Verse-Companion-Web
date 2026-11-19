@@ -4,8 +4,8 @@ import { CodexService, toLang } from '../../codex/codex.service';
 import { hitTitle } from '../../codex/search/codex-search-model';
 import { toErrorKey } from '../../core/describe-error';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
-import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
-import { HQ_DIALOG_STYLES } from '../plan/hq-dialog.styles';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
+import { HQ_POPUP_CONTENT_STYLES } from '../plan/hq-popup-content.styles';
 
 /** A blueprint the reader picked from the Codex: its class name (the Sammlung key) and its shown name. */
 export interface PickedBlueprint {
@@ -21,21 +21,17 @@ export interface PickedBlueprint {
 @Component({
   selector: 'sc-hq-blueprint-picker',
   standalone: true,
-  imports: [TranslatePipe, ScActionDirective, ScDialogDirective],
+  imports: [TranslatePipe, ScActionDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="scrim">
-      <div class="sheet" role="dialog" aria-modal="true" scDialog (scDialogEscape)="closed.emit()" aria-labelledby="bp-pick-title">
-        <header class="dlg-head">
-          <span class="dlg-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z" /><path d="M4 9h16M9 4v16" /></svg></span>
-          <h2 id="bp-pick-title" class="dlg-title">{{ 'hq.bestand.addBlueprint' | translate }}<small>{{ 'hq.bestand.bpPick.hint' | translate }}</small></h2>
-        </header>
-        <div class="dlg-body">
-          <label class="field">
-            <span>{{ 'hq.bestand.bpPick.label' | translate }}</span>
-            <input #q type="search" name="bp-q" autocomplete="off" maxlength="80" [value]="term()"
-                   [placeholder]="'hq.bestand.bpPick.placeholder' | translate" (input)="onInput($any($event.target).value)"
+    <sc-popup kind="large" [eyebrow]="'hq.title' | translate" [title]="'hq.bestand.addBlueprint' | translate" (closed)="closed.emit()">
+        <div class="pbody">
+          <p class="hint">{{ 'hq.bestand.bpPick.hint' | translate }}</p>
+          <label class="sc-float-field">
+            <input #q class="sc-input" type="search" name="bp-q" autocomplete="off" maxlength="80" [value]="term()"
+                   placeholder=" " (input)="onInput($any($event.target).value)"
                    aria-describedby="bp-pick-msg" />
+            <span class="sc-float-label">{{ 'hq.bestand.bpPick.label' | translate }}</span>
           </label>
           <p id="bp-pick-msg" class="msg" role="status">
             @if (error(); as k) {
@@ -62,17 +58,11 @@ export interface PickedBlueprint {
             </ul>
           }
         </div>
-        <footer class="dlg-foot"><span class="sp"></span><button type="button" scAction tier="secondary" (click)="closed.emit()">{{ 'common.dialog.close' | translate }}</button></footer>
-      </div>
-    </div>
+    </sc-popup>
   `,
   styles: [
-    HQ_DIALOG_STYLES,
-    `.field { display: flex; flex-direction: column; gap: var(--sc-space-1, 4px); }
-     .field span { color: var(--sc-fg-2); font-size: max(0.82rem, var(--sc-fs-floor, 0.75rem)); }
-     .field input { min-height: 44px; padding: 0 var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-bg-0); color: var(--sc-fg); font: inherit; }
-     .field input:hover { border-color: var(--sc-accent); }
-     .field input:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    HQ_POPUP_CONTENT_STYLES,
+    `.hint { margin: 0; color: var(--sc-fg-2); font-size: max(0.82rem, var(--sc-fs-floor, 0.75rem)); }
      .msg { margin: 0; min-height: 1.2em; color: var(--sc-fg-2); font-size: max(0.82rem, var(--sc-fs-floor, 0.75rem)); }
      .err { color: var(--sc-warning); }
      .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); }

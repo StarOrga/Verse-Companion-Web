@@ -6,13 +6,16 @@ import { toErrorKey } from '../../core/describe-error';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { ScQtyStepperComponent } from '../../shared/qty-stepper/qty-stepper.component';
+import { ScSegmentedComponent, type ScSegmentOption } from '../../shared/segmented-control.component';
 import { type Einsatz, HqEinsatzService } from '../data/hq-einsatz.service';
 import { ScSelectComponent, type ScSelectOption } from '../../shared/sc-select.component';
 import { NachschubNamingService } from '../nachschub/nachschub-naming';
 import { pickablePlaces } from './map/hq-places';
 import { NachschubFocusService } from '../nachschub/nachschub-focus.service';
 import { EINSATZ_NAME_MAX, NACHSCHUB_NAME_MAX, type Nachschub, clampName } from '../nachschub/nachschub.model';
-import { NachschubService } from '../nachschub/nachschub.service';
+import { type NachschubResult, NachschubService } from '../nachschub/nachschub.service';
+import { AnalyticsService } from '../../core/analytics.service';
 import { NACHSCHUB_ICON_PATHS, STEP_ICON_PATHS, TRANSPORT_WHEELS } from '../nachschub/step-icons';
 import { EventHqService } from '../events/event-hq.service';
 import { isEventNachschub } from '../events/event-nachschub';
@@ -68,7 +71,7 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
 @Component({
   selector: 'sc-hq-nachschub-panel',
   standalone: true,
-  imports: [NgTemplateOutlet, TranslatePipe, FormsModule, ScActionDirective, ScSelectComponent, ScTooltipDirective, HqRouteGraphicComponent, HqEventSectionComponent, HqNachschubGatherComponent],
+  imports: [NgTemplateOutlet, TranslatePipe, FormsModule, ScActionDirective, ScSelectComponent, ScTooltipDirective, ScQtyStepperComponent, ScSegmentedComponent, HqRouteGraphicComponent, HqEventSectionComponent, HqNachschubGatherComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="panel" [attr.aria-label]="nachschub().name">
@@ -100,6 +103,20 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       </header>
 
       <sc-hq-nachschub-gather [nachschub]="nachschub()" />
+
+      @if (plainLines().length; as plain) {
+        <div class="plain" role="group" [attr.aria-label]="'hq.panel.plain.ask' | translate">
+          <span class="plain-ic"><svg viewBox="0 0 24 24" aria-hidden="true">@for (p of tray; track p) { <path [attr.d]="p" /> }</svg></span>
+          <p class="plain-txt">
+            <b>{{ (plain === 1 ? 'hq.panel.plain.one' : 'hq.panel.plain.other') | translate: { count: plain } }}</b>
+            {{ 'hq.panel.plain.ask' | translate }}
+          </p>
+          <span class="plain-acts">
+            <button type="button" scAction tier="secondary" [busy]="plainBusy() === 'adopt'" [disabled]="plainBusy() !== null" (click)="answerPlain('adopt')">{{ 'hq.panel.plain.adopt' | translate }}</button>
+            <button type="button" scAction tier="secondary" [busy]="plainBusy() === 'keep'" [disabled]="plainBusy() !== null" (click)="answerPlain('keep')">{{ 'hq.panel.plain.keep' | translate }}</button>
+          </span>
+        </div>
+      }
 
       @if (isEvent()) {
         <sc-hq-event-section [nachschub]="nachschub()" (abortAsk)="abortEvent()" />
@@ -168,11 +185,8 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       @if (addOpen()) {
         <form class="ecard addform" ngNoForm (submit)="$event.preventDefault(); saveAdd()" [attr.aria-label]="'hq.einsatz.add.title' | translate">
           <h5 class="af-title">{{ 'hq.einsatz.add.title' | translate }}</h5>
-          <span class="seg" role="group" [attr.aria-label]="'hq.einsatz.add.kindAria' | translate">
-            @for (k of addKinds; track k) {
-              <button type="button" [attr.aria-pressed]="addKind() === k" (click)="addKind.set(k)">{{ 'hq.step.kind.' + k | translate }}</button>
-            }
-          </span>
+          <sc-segmented class="seg compact" variant="chips" [options]="addKindOptions" [value]="addKind()" [ariaLabel]="'hq.einsatz.add.kindAria' | translate"
+                        (valueChange)="addKind.set($any($event))" />
           <label class="af-field">
             <span>{{ ('hq.einsatz.add.what.' + addKind()) | translate }}</span>
             <input #addWhatInput type="text" class="af-input" [maxlength]="einsatzMax" [ngModel]="addWhat()" (ngModelChange)="addWhat.set($event)" name="what"
@@ -186,11 +200,8 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
             </span>
             <span class="af-field af-qty">
               <span>{{ 'hq.einsatz.add.qty' | translate }}</span>
-              <span class="stepper" role="group" [attr.aria-label]="'hq.einsatz.add.qty' | translate">
-                <button type="button" class="step" [disabled]="addQty() <= 1" [attr.aria-label]="'hq.flow.less' | translate" [scTooltip]="'hq.flow.less' | translate" scTooltipTier="label" (click)="addQty.set(addQty() - 1)">−</button>
-                <b class="mono">{{ addQty() }}</b>
-                <button type="button" class="step" [disabled]="addQty() >= 999" [attr.aria-label]="'hq.flow.more' | translate" [scTooltip]="'hq.flow.more' | translate" scTooltipTier="label" (click)="addQty.set(addQty() + 1)">+</button>
-              </span>
+              <sc-qty-stepper class="stepper" [value]="addQty()" [groupLabel]="'hq.einsatz.add.qty' | translate"
+                              [lessLabel]="'hq.flow.less' | translate" [moreLabel]="'hq.flow.more' | translate" (valueChange)="addQty.set($event)" />
             </span>
           </div>
           @if (addError(); as k) { <p class="eerr" role="alert">{{ k | translate }}</p> }
@@ -215,7 +226,7 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       .ic svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .name { display: flex; align-items: center; gap: 4px; margin: 0; font: 700 1.1rem var(--sc-font-display, inherit); letter-spacing: 0.02em; min-width: 0; overflow-wrap: anywhere; }
       .rename { min-height: 36px; width: min(28ch, 100%); padding: 0 10px; border: 1px solid var(--sc-accent); border-radius: 8px; background: var(--sc-bg-0); color: var(--sc-fg); font: 700 1.05rem var(--sc-font-display, inherit); }
-      .rename:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .rename:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .pen svg, .acts svg, .good svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .prog { display: inline-flex; align-items: center; gap: 8px; color: var(--sc-fg-2); font-size: 0.82rem; }
       .prog b { color: var(--sc-fg-0); font-family: var(--sc-font-display, inherit); }
@@ -237,10 +248,10 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       .erename { flex: 1; min-width: 0; min-height: 36px; padding: 0 8px; border: 1px solid var(--sc-accent); border-radius: 8px; background: var(--sc-bg-0); color: var(--sc-fg); font: 600 0.9rem var(--sc-font-body, inherit); }
       .erename[aria-invalid='true'] { border-color: var(--sc-warning); }
       .erename:hover { border-color: var(--sc-accent-hover, var(--sc-accent)); }
-      .erename:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .erename:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .epen svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .eerr { margin: 2px 0 0; color: var(--sc-warning); font-size: max(0.78rem, var(--sc-fs-floor, 0.75rem)); }
-      .pick:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+      .pick:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
       .kinds { display: inline-flex; gap: 3px; }
       .kic { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 5px; background: color-mix(in srgb, var(--sc-accent) 12%, transparent); color: var(--sc-accent); }
       .kic svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -255,7 +266,7 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       .add-wrap { width: min(100%, 420px); text-align: start; }
       .add-e { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 12px; border: 1px dashed color-mix(in srgb, var(--sc-accent) 40%, var(--sc-border)); border-radius: 10px; background: transparent; color: var(--sc-fg-1); font: inherit; font-size: 0.85rem; cursor: pointer; width: 100%; }
       .add-e:hover { border-color: var(--sc-accent); color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }
-      .add-e:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .add-e:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .add-e svg { width: 16px; height: 16px; fill: none; stroke: var(--sc-accent); stroke-width: 2; stroke-linecap: round; }
       .addform { display: flex; flex-direction: column; gap: var(--sc-space-2, 8px); border-style: dashed; }
       .af-title { margin: 0; font-size: 0.85rem; font-weight: 600; }
@@ -263,20 +274,18 @@ export function systemsOf(e: Pick<Einsatz, 'steps'>): string[] {
       .af-field > span:first-child { color: var(--sc-fg-2); font-size: max(0.78rem, var(--sc-fs-floor, 0.75rem)); }
       .af-input { min-height: 36px; padding: 0 10px; border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-0); color: var(--sc-fg); font: inherit; }
       .af-input:hover { border-color: var(--sc-accent); }
-      .af-input:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+      .af-input:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .af-row { display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); align-items: flex-end; }
       .af-where { flex: 1 1 12rem; }
       .af-acts { display: flex; justify-content: flex-end; gap: var(--sc-space-2, 8px); flex-wrap: wrap; }
-      .seg { display: inline-flex; flex-wrap: wrap; align-self: flex-start; padding: 2px; border: 1px solid var(--sc-border); border-radius: 999px; }
-      .seg button { min-height: 28px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: var(--sc-fg-2); font: inherit; font-size: 0.78rem; cursor: pointer; }
-      .seg button[aria-pressed='true'] { color: var(--sc-fg); background: color-mix(in srgb, var(--sc-accent) 22%, transparent); box-shadow: 0 0 0 1px var(--sc-accent); }
-      .seg button:focus-visible, .step:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-      .stepper { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; }
-      .step { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-1); color: var(--sc-fg); font: inherit; cursor: pointer; }
-      .step:hover:not(:disabled) { border-color: var(--sc-accent); }
-      .step:disabled { opacity: 0.4; cursor: default; }
-      .stepper b { min-width: 3ch; text-align: center; }
-      @media (pointer: coarse) { .step { width: 44px; height: 44px; } .seg button { min-height: 44px; } .add-e { min-height: 48px; } }
+      .seg { align-self: flex-start; }
+      @media (pointer: coarse) { .add-e { min-height: 48px; } }
+      .plain { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc-space-2, 8px) var(--sc-space-3, 12px); padding: var(--sc-space-2, 8px) var(--sc-space-3, 12px); border: 1px dashed var(--sc-border); border-radius: 10px; background: var(--sc-bg-0); margin-bottom: var(--sc-space-3, 12px); }
+      .plain-ic svg { width: 20px; height: 20px; fill: none; stroke: var(--sc-accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; display: block; }
+      .plain-txt { margin: 0; flex: 1 1 18rem; min-width: 0; color: var(--sc-fg-2); font-size: 0.85rem; overflow-wrap: anywhere; }
+      .plain-txt b { color: var(--sc-fg); font-weight: 600; }
+      .plain-acts { display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); }
+      @media (pointer: coarse) { .plain-acts > button { min-height: 48px; } }
       .n-title { margin: 0; font-weight: 600; }
       .n-hint { margin: 0; color: var(--sc-fg-2); max-width: 52ch; }
       @media (max-width: 1023px) { .body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(220px, 1fr); } }
@@ -292,6 +301,23 @@ export class HqNachschubPanelComponent {
   private readonly confirmSvc = inject(ScConfirmService);
   protected readonly isEvent = computed(() => isEventNachschub(this.nachschub()));
 
+  /** Old plain item / ship lines of this Operation: the owner says once whether they are wishes (H4). */
+  protected readonly plainLines = computed(() => this.svc.plainSearchLinesOf(this.nachschub().id));
+  protected readonly plainBusy = signal<'adopt' | 'keep' | null>(null);
+
+  protected async answerPlain(choice: 'adopt' | 'keep'): Promise<void> {
+    if (this.plainBusy()) return;
+    const id = this.nachschub().id;
+    this.plainBusy.set(choice);
+    try {
+      const res = choice === 'adopt' ? await this.svc.adoptPlainLines(id) : await this.svc.keepPlainLines(id);
+      if (res.ok) this.analytics.track('hq:plain_lines_select', { choice, count: Number(res.params?.['count'] ?? 0) });
+      this.answered.emit(res);
+    } finally {
+      this.plainBusy.set(null);
+    }
+  }
+
   /** Abort an event Nachschub: the slot frees, progress stays, nothing goes back to the wishlist; resumable from the Archiv. */
   protected async abortEvent(): Promise<void> {
     const n = this.nachschub();
@@ -299,6 +325,9 @@ export class HqNachschubPanelComponent {
     if (ok) await this.eventsSvc.abort(n);
   }
   readonly remove = output<void>();
+  /** The result of an H4 answer (the page shows it as its notice with the undo). */
+  readonly answered = output<NachschubResult>();
+  private readonly analytics = inject(AnalyticsService);
 
   protected readonly svc = inject(NachschubService);
   private readonly einsatzSvc = inject(HqEinsatzService);
@@ -457,7 +486,8 @@ export class HqNachschubPanelComponent {
   // ------------------------------------------------------------------------------------------- guided "Einsatz hinzufügen"
 
   private readonly naming = inject(NachschubNamingService);
-  protected readonly addKinds: readonly AddKind[] = ['buy', 'mission', 'mine', 'pickup'];
+  protected readonly addKindOptions: readonly ScSegmentOption[] = (['buy', 'mission', 'mine', 'pickup'] as const satisfies readonly AddKind[])
+    .map((k) => ({ value: k, labelKey: 'hq.step.kind.' + k }));
   protected readonly placeOptions: readonly ScSelectOption[] = pickablePlaces().map((p) => ({ value: p.id, labelKey: '', label: [p.location, p.system].join(' · ') }));
   private readonly places = new Map(pickablePlaces().map((p) => [p.id, p] as const));
   protected readonly addOpen = signal(false);

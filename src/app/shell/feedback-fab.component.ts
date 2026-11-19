@@ -13,6 +13,7 @@ import {
 import { TranslatePipe } from '@ngx-translate/core';
 import { RoleService } from '../auth/role.service';
 import { FeedbackFabPrefsService } from '../core/feedback-fab-prefs.service';
+import { AnalyticsService } from '../core/analytics.service';
 import { PanelNavigationService } from '../feedback/panel-navigation.service';
 import { FeedbackComposerSeedService } from '../feedback/feedback-composer-seed.service';
 import { FeedbackPeekService } from '../feedback/feedback-peek.service';
@@ -347,6 +348,7 @@ export class FeedbackFabComponent {
   private readonly fabPrefs = inject(FeedbackFabPrefsService);
   private readonly panelNav = inject(PanelNavigationService);
   private readonly seeds = inject(FeedbackComposerSeedService);
+  private readonly analytics = inject(AnalyticsService);
   private readonly spots = inject(FeedbackSpotService);
   readonly peek = inject(FeedbackPeekService);
   private readonly fabRoot = viewChild<ElementRef<HTMLElement>>('fabRoot');
@@ -376,9 +378,10 @@ export class FeedbackFabComponent {
     // A page seeded a topic and wants the panel on screen (the telemetry
     // page's "report as topic"). Mount if needed, un-minimize either way; the
     // embedded board unfolds its composer on the same request.
-    let opens = this.seeds.openRequests();
+    // The same for "open this topic" (a finding that already is one).
+    let opens = this.seeds.panelRequests();
     effect(() => {
-      const n = this.seeds.openRequests();
+      const n = this.seeds.panelRequests();
       if (n === opens) return;
       opens = n;
       if (!untracked(() => this.visible())) return;
@@ -417,9 +420,11 @@ export class FeedbackFabComponent {
     event.stopPropagation();
     if (!this.mounted()) {
       this.mounted.set(true);
+      this.analytics.track('feedback:composer_open', { surface: 'fab' });
       this.minimized.set(false);
       return;
     }
+    if (this.minimized()) this.analytics.track('feedback:composer_open', { surface: 'fab' });
     this.minimized.update((m) => !m);
   }
 

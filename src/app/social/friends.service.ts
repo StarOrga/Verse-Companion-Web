@@ -1,3 +1,4 @@
+import { AnalyticsService } from '../core/analytics.service';
 import { Injectable, computed, inject, signal, Injector } from '@angular/core';
 import { SupabaseClientProvider } from '../core/supabase.client';
 import {
@@ -25,6 +26,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class FriendsService {
   private readonly injector = inject(Injector);
+  private readonly analytics = inject(AnalyticsService);
   /** Resolved on first use: holding this service (every HQ page does) creates no Supabase client. */
   private get sb(): SupabaseClientProvider {
     return this.injector.get(SupabaseClientProvider);
@@ -89,6 +91,7 @@ export class FriendsService {
       if (error) throw error;
       return true;
     }, false);
+    if (ok && accept) this.analytics.track('social:friend_request_accept');
     if (ok) await this.load();
     return ok;
   }

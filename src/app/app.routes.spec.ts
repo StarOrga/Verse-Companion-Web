@@ -52,7 +52,7 @@ describe('retired route aliases', () => {
     'news', 'news/patches', 'news/patches/:line', 'hangar',
     'hangar/ship/:id', 'hangar/loadout/:id', 'codex/set/:id', 'codex/blueprint', 'p4k', 'desktop',
     'desktop/auth', 'admin/integrations', 'konzept/:id', 'companion', 'uploader', 'download',
-    'tools/extension', 'hangar/import', 'starscape', 'uploader/auth', 'desktop/connect',
+    'tools/extension', 'hangar/import', 'starscape', 'uploader/auth',
   ];
   for (const path of retired) {
     it(`has no ${path} route`, () => {
@@ -119,6 +119,32 @@ describe('root redirect keeps the query (AUD-144)', () => {
   });
 });
 
+describe('legacy /desktop/connect redirect', () => {
+  it('is a top-level relative redirect outside the gated shell', () => {
+    const r = routes.find((x) => x.path === 'desktop/connect');
+    expect(r?.redirectTo).toBe('apps/starscape/connect');
+    expect(routes.indexOf(r!)).toBeLessThan(routes.indexOf(shellOf()!));
+  });
+
+  it('keeps cb and state when /desktop/connect redirects to /apps/starscape/connect', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([
+          routes.find((x) => x.path === 'desktop/connect')!,
+          { path: 'apps/starscape/connect', children: [] },
+        ]),
+        provideLocationMocks(),
+      ],
+    });
+    const router = TestBed.inject(Router);
+    const cb = 'http://127.0.0.1:61650/scc/callback';
+    await router.navigateByUrl(`/desktop/connect?cb=${encodeURIComponent(cb)}&state=abc123`);
+    const url = router.parseUrl(router.url);
+    expect(url.root.children['primary'].segments.map((s) => s.path)).toEqual(['apps', 'starscape', 'connect']);
+    expect(url.queryParams).toEqual({ cb, state: 'abc123' });
+  });
+});
+
 describe('real 404 page', () => {
   const wildcard = () => shellOf()?.children?.find((c) => c.path === '**');
 
@@ -155,10 +181,10 @@ describe('real 404 page', () => {
 describe('HQ routes', () => {
   const hq = shellOf()?.children?.find((c) => c.path === 'hq');
 
-  it('registers overview, hangar, import, ship, locker, set and ops under /hq', () => {
+  it('registers overview, hangar, import, ship, locker, set, ops and spots under /hq', () => {
     expect(hq?.loadComponent).toBeDefined();
     const paths = (hq?.children ?? []).map((c) => c.path);
-    expect(paths).toEqual(['', 'hangar', 'hangar/import', 'hangar/:id', 'locker', 'locker/:id', 'ops']);
+    expect(paths).toEqual(['', 'hangar', 'hangar/import', 'hangar/:id', 'locker', 'locker/:id', 'ops', 'spots']);
     // ops: with the shell beta on its canMatch redirects to /hq#planen, else today's page
     // import before :id, so "import" is never read as a ship id
     expect(paths.indexOf('hangar/import')).toBeLessThan(paths.indexOf('hangar/:id'));
@@ -176,6 +202,10 @@ describe('HQ routes', () => {
       if (on) expect(TestBed.inject(Router).serializeUrl(out as UrlTree)).toBe('/hq?bestand=hangar#inventar');
       else expect(out).toBe(true);
     }
+  });
+
+  it('matches the redirecting /hq/hangar only in full, so /hq/hangar/:id (own ship, exemplar links) is never redirected', () => {
+    expect(hq?.children?.find((c) => c.path === 'hangar')?.pathMatch).toBe('full');
   });
 
   it('hands the dashboard its section through route data', () => {

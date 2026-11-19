@@ -34,7 +34,7 @@ Data.p4k
   ├─ DRAK_Cutlass_Black.cga + .cgam   (whole-ship hull mesh — no socpak assembly!)
   └─ <paint>.mtl                      (the factory paint — only to name the submaterials)
         │
-        ▼  cgf-converter v2.0.0  -glb -objectdir <root> -mtl <paint>
+        ▼  cgf-converter v2.0.0-sc.1  -glb -objectdir <root> -mtl <paint>
    raw glb
         │
         ▼  glb_materials repair  (no-op skin · interior strip · strip_to_geometry)
@@ -161,7 +161,9 @@ reference pixels; also logged: open boundary edges and triangle counts.
 `max_hole_ratio` = 0.2 %. Every ladder rung is measured on the uncompressed
 optimize output before `meshopt` (meshopt buffers are not decodable in Python).
 If the first rung fails the hull is not exported (`HullIntegrityError`); if a
-later rung fails, the last gap-free rung is kept even over budget.
+later rung fails while the last gap-free one is still over budget, the search
+bisects between the two (`FIT_BISECT_STEPS` = 3) and keeps the best gap-free
+attempt, over budget or not — see "Size budget".
 
 ## Beyond ships: ground vehicles, silhouettes, other 3D kinds
 
@@ -184,10 +186,18 @@ ids — see `geometry.py`). **Markemp/Cryengine-Converter v2.0.0** is the first
 release that reads them; v1.7.1 fails silently (empty glb). It is a ~117 MB
 self-contained .NET binary → fetched, never committed.
 
+The uploader runs v2.0.0 **plus two fixes** (`python/tools/cgf-converter/`):
+v2.0.0 wrote an Ivo file's whole index stream once per node and overflowed
+`int.MaxValue` on 25 big hulls (Galaxy, Polaris, Constellations, Hull B …),
+and failed every file whose `.mtl` has a submaterial without `<Textures>`
+(all Vanguards). The build is pinned by sha256 and keyed as v2.0.0 in the
+build cache (`build_cache.CONVERTER_ALIASES`), because its output for every
+mesh v2.0.0 could convert is the same.
+
 ## Setup
 
 ```bash
-python tools/fetch_tools.py          # downloads cgf-converter-2.exe to ./tools/
+python tools/fetch_tools.py          # downloads cgf-converter-2.0.0-sc.1.exe to ./tools/
 # @gltf-transform/cli is BUNDLED with the desktop app and run via Electron's own
 # Node (ELECTRON_RUN_AS_NODE) — no global Node/npx needed at runtime. Plain
 # `npx @gltf-transform/cli` is only the dev fallback when running outside the app.
@@ -198,7 +208,7 @@ python tools/fetch_tools.py          # downloads cgf-converter-2.exe to ./tools/
 ```bash
 python -m sc_extract.cutlass_pilot \
     --p4k "C:\...\StarCitizen\LIVE\Data.p4k" \
-    --out ./out --converter ./tools/cgf-converter-2.exe \
+    --out ./out --converter ./tools/cgf-converter-2.0.0-sc.1.exe \
     [--texture-size 512] [--limit 2]
 ```
 
@@ -298,8 +308,16 @@ numpy path runs. Code: `silhouette_gpu.py`.
 
 Each web glb carries a size budget. A hull over budget is re-optimized up the
 simplify ladder `0 → 0.0005 → 0.001 → 0.002` (border-locked) until it fits. The
-hole gate is authoritative: a rung that tears the skin ends the ladder and the
-last gap-free rung is kept, over budget or not. If even the last step is over
+hole gate is authoritative: a rung that tears the skin ends the ladder. The
+rungs are relative to the mesh extent, so the first step (0 → 0.0005) is ~1 cm
+on a Gladius but ~8 cm on a 155 m Polaris, and the big hulls tore right there
+and stayed unsimplified (Polaris 8.38 MB, Galaxy 5.85 MB). So a tearing rung
+is bisected against the last gap-free one, three times, stopping at the first
+gap-free attempt within the budget; the best gap-free attempt is kept, over
+budget or not. A hull that fits a rung, or whose next rung holds, never
+bisects — its output is unchanged. Over-budget hulls carry `"fit":
+FIT_REVISION` in `skins.json`; one without the current revision is built again
+instead of reused (`needs_refit`), every other hull is reused. If even the last step is over
 budget the hull is still exported and a `warn` is logged. `--max-model-mb 0`
 disables the budget. 1.5 MB since the gap-free export: unsimplified hulls
 measured 0.44 MB (Avenger Stalker) to 1.44 MB (Gladius) meshopt-compressed.

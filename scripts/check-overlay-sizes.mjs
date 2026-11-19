@@ -26,6 +26,8 @@ export const OVERLAY_FILES = [
   'src/app/social/loadout-share-panel.component.ts',
   'src/app/shared/column-menu.component.ts',
   'src/app/shared/dialog/sc-confirm-dialog.component.ts',
+  'src/app/shared/popup/sc-popup.component.ts',
+  'src/app/shared/popup/sc-popup.scss',
   'src/app/auth/login.component.ts',
   'src/app/auth/set-password.component.ts',
   'src/app/auth/access-unavailable.component.ts',

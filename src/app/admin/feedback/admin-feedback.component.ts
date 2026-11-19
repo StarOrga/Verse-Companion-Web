@@ -1,3 +1,5 @@
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { POSTHOG_GUARD_PROFILE_ID } from '../../feedback/feedback.types';
 import { ShellChromeService } from '../../shell/fusion-bar/shell-chrome.service';
 import { logWarn } from '../../core/log';
 import { toErrorKey } from '../../core/describe-error';
@@ -16,7 +18,7 @@ import {
   untracked,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { SupabaseClientProvider } from '../../core/supabase.client';
@@ -219,6 +221,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
     RoutineStatusDirective,
     ScTooltipDirective,
     CharCounterComponent,
+    ScActionDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -542,7 +545,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
             class="card-head"
             (click)="openTopic(m.id)"
             [scTooltip]="'adminFeedback.stream.openTopic' | translate">
-            <ng-container [ngTemplateOutlet]="avatar" [ngTemplateOutletContext]="{ $implicit: m.author, self: m.author_id === selfId() }"></ng-container>
+            <ng-container [ngTemplateOutlet]="avatar" [ngTemplateOutletContext]="{ $implicit: m.author, self: m.author_id === selfId(), machine: isMachine(m.origin, m.author_id) }"></ng-container>
             <span class="ch-body">
               <span class="ch-title-line">
                 @if (topicNo(m); as no) {
@@ -607,12 +610,12 @@ type AvatarTone = 'adm' | 'col' | 'usr';
           @if (feed) {
             <div class="card-links">
               @if (inReview(m)) {
-                <button class="sc-btn micro" (click)="acceptReview(m)" [disabled]="busy()">
+                <button scAction tier="secondary" (click)="acceptReview(m)" [disabled]="busy()">
                   ✓ {{ 'adminFeedback.review.accept' | translate }}
                 </button>
               }
               @if (areaLink(m); as href) {
-                <a class="link-btn" [routerLink]="href" (click)="onViewInApp($event)" [scTooltip]="'adminFeedback.stream.viewTitle' | translate: { area: (areaLabelKey(areaOf(m)!) | translate) }">
+                <a scAction tier="secondary" [routerLink]="href" (click)="onViewInApp($event)" [scTooltip]="'adminFeedback.stream.viewTitle' | translate: { area: (areaLabelKey(areaOf(m)!) | translate) }">
                   ▸ {{ 'adminFeedback.stream.view' | translate }}
                 </a>
               }
@@ -624,10 +627,17 @@ type AvatarTone = 'adm' | 'col' | 'usr';
 
       <!-- Role-coloured avatar: admin red (elevated access), collaborator light
            blue, user grey-blue. Initials, never a photo. -->
-      <ng-template #avatar let-a let-self="self" let-focusable="focusable">
+      <ng-template #avatar let-a let-self="self" let-focusable="focusable" let-machine="machine">
         <!-- Own Tab stop only outside the card-head button (no nested interaction);
-             inside it the aria-label already joins the button's name. -->
-        <span class="av" role="img" [attr.tabindex]="focusable ? 0 : null" [class]="'av ' + toneOf(a)" [scTooltip]="roleTitle(a)" scTooltipTier="label" [attr.aria-label]="roleTitle(a)">{{ initials(a, self) }}</span>
+             inside it the aria-label already joins the button's name.
+             A machine sender (PostHog-Wächter) draws a chip glyph, never initials. -->
+        @if (machine) {
+          <span class="av bot" role="img" data-sender="guard" [attr.tabindex]="focusable ? 0 : null" [scTooltip]="'adminFeedback.guard.title' | translate" scTooltipTier="label" [attr.aria-label]="'adminFeedback.guard.title' | translate">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="10" height="8" rx="2"/><path d="M8 2v2.5M5.5 8h.01M10.5 8h.01M6 10.5h4"/></svg>
+          </span>
+        } @else {
+          <span class="av" role="img" [attr.tabindex]="focusable ? 0 : null" [class]="'av ' + toneOf(a)" [scTooltip]="roleTitle(a)" scTooltipTier="label" [attr.aria-label]="roleTitle(a)">{{ initials(a, self) }}</span>
+        }
       </ng-template>
 
       <!-- The flight path: four stations, filled up to the current one; a
@@ -684,7 +694,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
               <span class="who">{{ (msg.from_admin ? 'adminFeedback.userTopic.fromTeam' : 'adminFeedback.userTopic.fromAuthor') | translate }}</span>
               @if (msg.is_question) { <span class="chip">{{ 'adminFeedback.userTopic.questionBadge' | translate }}</span> }
             } @else {
-              <ng-container [ngTemplateOutlet]="avatar" [ngTemplateOutletContext]="{ $implicit: msg.author, self: msg.author_id === selfId(), focusable: true }"></ng-container>
+              <ng-container [ngTemplateOutlet]="avatar" [ngTemplateOutletContext]="{ $implicit: msg.author, self: msg.author_id === selfId(), focusable: true, machine: isMachine(null, msg.author_id) }"></ng-container>
               <span class="who">{{ authorLabelFor(msg) }}</span>
             }
             <span class="msg-ts">{{ msg.created_at | scDate: 'datetime' }}</span>
@@ -709,7 +719,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
         @if (answerOptionsFor(m); as ao) {
           <div class="answer-options" role="group" [attr.aria-label]="'adminFeedback.sheet.options' | translate">
             @for (o of ao.options; track o) {
-              <button type="button" class="sc-btn micro option" (click)="answerWithOption(m, o)" [disabled]="busy() || answering()">{{ o }}</button>
+              <button type="button" scAction tier="secondary" class="option" (click)="answerWithOption(m, o)" [disabled]="busy() || answering()">{{ o }}</button>
             }
           </div>
         }
@@ -727,7 +737,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
             <span class="deploy-lag" [scTooltip]="'adminFeedback.deployLagHint' | translate">⏳ {{ 'adminFeedback.deployLag' | translate }}</span>
           }
           <a
-            class="link-btn quiet ref"
+            scAction tier="tertiary" class="ref"
             [href]="m.ship_ref"
             target="_blank"
             rel="noopener noreferrer"
@@ -850,7 +860,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
                  reply, so it needs neither a button nor a box of its own. -->
             @if (untriaged(m) && !archived(m) && !inReview(m)) {
               <div class="inline-actions">
-                <button class="sc-btn micro" (click)="releaseToRoutine(m)" [disabled]="busy()">
+                <button scAction tier="secondary" (click)="releaseToRoutine(m)" [disabled]="busy()">
                   {{ 'adminFeedback.userTopic.release' | translate }}
                 </button>
               </div>
@@ -945,7 +955,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
                 <button
                   composerAction
                   type="button"
-                  class="sc-btn micro sign-off"
+                  scAction tier="secondary" class="sign-off"
                   (click)="acceptReview(m)"
                   [disabled]="busy()"
                   [scTooltip]="'adminFeedback.review.hint' | translate">
@@ -1009,7 +1019,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
             </div>
           </div>
           <div class="sh-composer">
-            <button type="button" class="sc-btn sc-btn-primary done-btn" (click)="closeFilters()">{{ 'adminFeedback.filters.done' | translate }}</button>
+            <button type="button" scAction tier="primary" class="done-btn" (click)="closeFilters()">{{ 'adminFeedback.filters.done' | translate }}</button>
           </div>
         </div>
       }
@@ -1051,8 +1061,8 @@ type AvatarTone = 'adm' | 'col' | 'usr';
               <sc-char-counter [used]="declineNote().length" [max]="maxChars" />
             </div>
             <div class="inline-actions">
-              <button class="sc-btn micro danger" type="submit" [disabled]="busy()">{{ 'adminFeedback.decline.confirm' | translate }}</button>
-              <button class="sc-btn micro" type="button" (click)="cancelDeclineForm()">{{ 'adminFeedback.decline.cancel' | translate }}</button>
+              <button scAction tier="secondary" tone="danger" type="submit" [disabled]="busy()">{{ 'adminFeedback.decline.confirm' | translate }}</button>
+              <button scAction tier="secondary" type="button" (click)="cancelDeclineForm()">{{ 'adminFeedback.decline.cancel' | translate }}</button>
             </div>
           </form>
         </div>
@@ -1202,11 +1212,9 @@ type AvatarTone = 'adm' | 'col' | 'usr';
     /* Hover: the title takes the accent and a tappable micro button lifts a
        pixel — enough to say "this reacts", never enough to move the layout. */
     .topic-title, .card-head { transition: color 0.16s ease; }
-    .sc-btn.micro, .link-btn, .load-more, .new-topic-bar, .tb-btn, .f-chip { transition: transform 0.16s ease, border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease; }
-    .sc-btn.micro:hover:not(:disabled), .link-btn:hover { transform: translateY(-1px); }
-    .sc-btn.micro:active:not(:disabled), .link-btn:active { transform: none; transition-duration: 0.06s; }
+    .load-more, .new-topic-bar, .tb-btn, .f-chip { transition: transform 0.16s ease, border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease; }
     .card-head { display: flex; align-items: flex-start; gap: 10px; width: 100%; min-height: 44px; padding: 0; background: transparent; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; border-radius: 6px; }
-    .card-head:focus-visible, .band-head:focus-visible, .tb-btn:focus-visible, .sh-btn:focus-visible, .read-more:focus-visible, .link-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.32); }
+    .card-head:focus-visible, .band-head:focus-visible, .tb-btn:focus-visible, .sh-btn:focus-visible, .read-more:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.32); }
     .f-row:focus-visible, .menu-item:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--sc-accent); }
     .ch-body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
     .ch-title-line { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
@@ -1225,19 +1233,16 @@ type AvatarTone = 'adm' | 'col' | 'usr';
     .chip.area { border-style: dashed; }
     .chip.new, .chip.hot { border-color: var(--sc-accent); color: var(--sc-accent); }
     .card-links, .inline-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
-    .link-btn { display: inline-flex; align-items: center; min-height: 36px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--sc-accent); color: var(--sc-accent); font-size: max(0.78rem, var(--sc-fs-floor)); font-weight: 600; text-decoration: none; }
-    .link-btn.quiet { border-color: var(--sc-border); color: var(--sc-fg-1); }
     /* The PR / issue arrow sits on the far right of its row and stays quiet
        until you look for it (feedback d08f1983). */
-    .link-btn.ref { margin-left: auto; min-width: 36px; justify-content: center; padding: 0 8px; border-color: transparent; color: var(--sc-fg-2); font-size: 1rem; }
+    .ref { margin-left: auto; }
     .deploy-lag { margin-left: auto; font-size: max(0.75rem, var(--sc-fs-floor)); color: var(--sc-warning); white-space: nowrap; }
-    .deploy-lag + .link-btn.ref { margin-left: 0; }
-    .link-btn.ref:hover { border-color: var(--sc-border); color: var(--sc-fg-1); }
-    .link-btn:hover { background: rgba(0, 212, 255, 0.08); }
+    .deploy-lag + .ref { margin-left: 0; }
 
     /* ---- Avatar (role colours; red = elevated access) ---- */
     .av { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; font-size: max(0.7rem, var(--sc-fs-floor)); font-weight: 700; letter-spacing: 0.02em; background: rgba(120, 150, 190, 0.28); color: #b9c9de; }
     .av.adm { background: var(--sc-accent-hot); color: var(--sc-bg-0); border: 1px solid var(--sc-accent-hot); }
+    .av.bot { background: rgba(82, 193, 230, 0.12); color: var(--sc-accent); border: 1px dashed var(--sc-accent); }
     .av.col { background: rgba(158, 203, 255, 0.2); color: #9ecbff; border: 1px solid rgba(158, 203, 255, 0.55); }
     .msg-head .av { width: 22px; height: 22px; font-size: max(0.62rem, var(--sc-fs-floor)); }
 
@@ -1283,16 +1288,6 @@ type AvatarTone = 'adm' | 'col' | 'usr';
     /* A message that enters the thread — one more revealed behind "…", or the
        reply just sent — rises in the same way a row does. */
     .thread .msg, .band-empty { animation: fb-rise 200ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-    .sc-btn.micro { padding: 6px 12px; min-height: 40px; font-size: max(0.72rem, var(--sc-fs-floor)); letter-spacing: 0.04em; }
-    .sc-btn.micro.option { min-height: 44px; }
-    /* Touch: links reach the 48px touch minimum (micro buttons via the global
-       .sc-btn.sc-btn.micro.micro rule); the dense 36/40px rows stay for mouse users. */
-    @media (pointer: coarse) {
-      .link-btn { min-height: var(--sc-tap-min); }
-      .link-btn.ref { min-width: var(--sc-tap-min); }
-    }
-    .sc-btn.danger { border-color: var(--sc-danger); color: var(--sc-danger); }
-    .sc-btn.danger:hover:not(:disabled) { background: var(--sc-danger); color: #fff; box-shadow: none; }
     .proc-note { margin: 0; font-size: max(0.8rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     .reopen-hint { margin: 0; font-size: max(0.78rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     .author-channel { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border: 1px dashed var(--sc-accent); border-radius: 8px; }
@@ -1349,7 +1344,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
     .answer-options, .f-chips { display: flex; flex-wrap: wrap; gap: 8px; }
     .f-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-height: 48px; padding: 0 14px; background: var(--sc-bg-2); border: 1px solid var(--sc-border); border-radius: 999px; color: var(--sc-fg-1); font: inherit; font-size: max(0.86rem, var(--sc-fs-floor)); text-align: left; cursor: pointer; }
     .f-chip:hover, .load-more:hover, .new-topic-bar:hover { border-color: var(--sc-accent); color: var(--sc-fg-0); }
-    .f-chip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .f-chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .f-chip.sub { border-style: dashed; }
     /* Selected is a filled pill with a tick — the state has to read without
        colour, the way the old left accent bar did. */
@@ -1921,6 +1916,48 @@ export class AdminFeedbackComponent implements OnInit {
   /** Any sheet over the stream — the stream hides behind it. */
   readonly overlayOpen = computed(() => this.openRow() !== null || this.filtersOpen() || this.declineTopicRow() !== null);
 
+  /**
+   * A topic someone outside the board asked to see (the telemetry page's
+   * "already a topic" link): `?topic=<id>` on the full board, a
+   * `FeedbackComposerSeedService.requestTopic` for the docked panel. It opens
+   * as soon as the row is loaded — the first poll may still be on the wire.
+   */
+  private readonly wantedTopic = signal<string | null>(null);
+  private readonly route = inject(ActivatedRoute, { optional: true });
+  private readonly takeTopicRequest = effect(() => {
+    if (this.seeds.pendingTopic() === null) return;
+    const id = untracked(() => this.seeds.takeTopic());
+    if (id) this.wantedTopic.set(id);
+  });
+  private readonly openWantedTopic = effect(() => {
+    const id = this.wantedTopic();
+    if (!id || !this.messages().some((m) => m.id === id)) return;
+    untracked(() => {
+      this.wantedTopic.set(null);
+      // Another topic, the filters or a decline form may still be open — the
+      // requested topic replaces whatever the panel showed (#358).
+      this.dismissSheets();
+      this.composerOpen.set(false);
+      this.openTopic(id);
+    });
+  });
+
+  /**
+   * Close every sheet over the stream at once — the opened topic, the decline
+   * form, the filters, a ⋯ menu — for a request from outside the board. The
+   * keyboard does not travel back through each sheet's opener: the request
+   * decides what comes on screen next.
+   */
+  dismissSheets(): void {
+    this.openId.set(null);
+    this._moreOpen.set(new Set());
+    this.declineFormFor.set(null);
+    this.declineNote.set('');
+    this.declineReason.set(null);
+    this.filtersOpen.set(false);
+    this._returnFocus.length = 0;
+  }
+
   openTopic(id: string): void {
     this.openId.set(id);
     this.focusSheet();
@@ -2129,7 +2166,13 @@ export class AdminFeedbackComponent implements OnInit {
     return applySignedUrls(renderFeedbackBody(body), this.signer.signed());
   }
 
+  /** True for the PostHog-Wächter: a machine-origin item (no author) or a reply from the guard profile. */
+  isMachine(origin: string | null | undefined, authorId: string | null): boolean {
+    return (!!origin && origin !== 'human') || authorId === POSTHOG_GUARD_PROFILE_ID;
+  }
+
   authorLabel(m: FeedbackRow): string {
+    if (this.isMachine(m.origin, m.author_id)) return this.translate.instant('adminFeedback.guard.name');
     if (m.author_id && m.author_id === this.selfId()) return this.translate.instant('adminFeedback.you');
     return m.author?.display_name
       ?? (m.author?.username ? `@${m.author.username}` : null)
@@ -2137,6 +2180,7 @@ export class AdminFeedbackComponent implements OnInit {
   }
 
   authorLabelFor(msg: FeedbackMessage): string {
+    if (msg.author_id === POSTHOG_GUARD_PROFILE_ID) return this.translate.instant('adminFeedback.guard.name');
     if (msg.is_system) return this.translate.instant('adminFeedback.kind.ai');
     if (msg.author_id && msg.author_id === this.selfId()) return this.translate.instant('adminFeedback.you');
     return msg.author?.display_name
@@ -2219,6 +2263,9 @@ export class AdminFeedbackComponent implements OnInit {
 
   async ngOnInit() {
     purgeRetiredKeys();
+    // Only the routed board reads the URL — the docked panel shares the root route's query.
+    const linked = this.embedded() ? null : this.route?.snapshot.queryParamMap.get('topic');
+    if (linked) this.wantedTopic.set(linked);
     await this.refresh();
     // The marker compares against the previous visit; this one starts now.
     this.stampLastSeen();
@@ -2313,7 +2360,7 @@ export class AdminFeedbackComponent implements OnInit {
       .from('admin_feedback')
       // `author.role` colours the avatar; admins may read every profile
       // (policy profiles_admin_read_all), so no projection is needed.
-      .select('id, seq, author_id, body, status, ship_ref, processing_note, created_at, updated_at, shipped_at, processed_at, reviewed_at, source, triaged, decision_note, area, summary, complex, author:profiles(display_name, username, role)')
+      .select('id, seq, author_id, origin, body, status, ship_ref, processing_note, created_at, updated_at, shipped_at, processed_at, reviewed_at, source, triaged, decision_note, area, summary, complex, author:profiles(display_name, username, role)')
       .order('created_at', { ascending: true });
     if (error) {
       this.errorMsg.set(toErrorKey('admin-feedback', 'load board', error));
@@ -2439,7 +2486,12 @@ export class AdminFeedbackComponent implements OnInit {
     const n = this.seeds.openRequests();
     if (n === this.seenOpenRequests) return;
     this.seenOpenRequests = n;
-    if (untracked(() => this.embedded() || this.phone())) this.composerOpen.set(true);
+    untracked(() => {
+      // An open topic (or filters / decline form) would hide the seeded draft
+      // behind its sheet — the new topic is what the request is about (#358).
+      this.dismissSheets();
+      if (this.embedded() || this.phone()) this.composerOpen.set(true);
+    });
   });
   closeComposer(): void { this.composerOpen.set(false); }
 
@@ -2472,6 +2524,7 @@ export class AdminFeedbackComponent implements OnInit {
       this.errorMsg.set(toErrorKey('admin-feedback', 'create topic', error));
       return false;
     }
+    this.seeds.noteCreated();
     await this.refresh();
     return true;
   }

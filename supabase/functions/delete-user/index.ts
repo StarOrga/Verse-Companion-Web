@@ -1,6 +1,6 @@
 // supabase/functions/delete-user
 // ---------------------------------------------------------------
-// Admin-only delete: removes a user from auth.users. The FK chain
+// Admin-only delete (caller checked via rpc is_admin): removes a user from auth.users. The FK chain
 // (profiles → uploads → bundles, all ON DELETE CASCADE) cleans up
 // the rest automatically. Self-delete is permitted unless the
 // caller is the last remaining admin.
@@ -13,6 +13,12 @@
 //         403 { error: 'protected_admin' }
 //         404 { error: 'user_not_found' }
 //         409 { error: 'cannot_delete_last_admin' }
+//         500 { error: 'allowlist_remove_failed' }  (the target's public.allowed_emails row could not be removed;
+//             the user is NOT deleted)
+//         500 { error: 'delete_failed' }
+//
+// The target's public.allowed_emails row is removed before the auth user, so a deleted person cannot sign up again
+// and be auto-approved at the old role.
 //
 // Founder protection (admin_feedback #83): accounts listed in
 // public.protected_admins can never be deleted here. This check is a
@@ -22,6 +28,7 @@
 // function entirely cannot delete a protected account.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+import { withPosthog } from '../_shared/posthog.ts';
 
 interface DeleteBody {
   userId?: string;
@@ -40,7 +47,7 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-Deno.serve(async (req: Request): Promise<Response> => {
+Deno.serve(withPosthog('delete-user', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -64,12 +71,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
   } = await userClient.auth.getUser();
   if (authErr || !user) return json({ error: 'unauthorized' }, 401);
 
-  const { data: callerProfile } = await userClient
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (callerProfile?.role !== 'admin') {
+  const { data: isAdmin, error: adminErr } = await userClient.rpc('is_admin');
+  if (adminErr || isAdmin !== true) {
     return json({ error: 'forbidden' }, 403);
   }
 
@@ -121,11 +124,15 @@ Deno.serve(async (req: Request): Promise<Response> => {
   // 5. Last-admin protection — applies whether the caller is deleting
   //    themselves or another admin. Prevents leaving the system without
   //    any admin.
+  //    Only admins that count: an unapproved or suspended account with role
+  //    'admin' is a viewer for the database (current_user_role()).
   if (target.role === 'admin') {
     const { count } = await adminClient
       .from('profiles')
       .select('id', { count: 'exact', head: true })
-      .eq('role', 'admin');
+      .eq('role', 'admin')
+      .eq('is_approved', true)
+      .is('suspended_at', null);
     if ((count ?? 0) <= 1) {
       return json(
         {
@@ -138,6 +145,19 @@ Deno.serve(async (req: Request): Promise<Response> => {
     }
   }
 
+  // 6a. Drop the target's allowlist row first, so the deleted person cannot sign up again and be auto-approved at the
+  //     old role. Order matters: "allowlist gone, user still there" is harmless, the reverse is not. No e-mail or no
+  //     row is fine; a FAILED lookup is not (the row would survive the account), so it stops the delete.
+  const { data: targetAuth, error: lookupErr } = await adminClient.auth.admin.getUserById(userId);
+  if (lookupErr || !targetAuth?.user) {
+    return json({ error: 'allowlist_remove_failed', message: lookupErr?.message ?? 'target lookup failed' }, 500);
+  }
+  const targetEmail = targetAuth.user.email?.trim().toLowerCase();
+  if (targetEmail) {
+    const { error: allowErr } = await adminClient.from('allowed_emails').delete().eq('email', targetEmail);
+    if (allowErr) return json({ error: 'allowlist_remove_failed', message: allowErr.message }, 500);
+  }
+
   // 6. Delete from auth.users — FK cascade handles profiles/uploads/bundles.
   const { error: delErr } = await adminClient.auth.admin.deleteUser(userId);
   if (delErr) {
@@ -145,4 +165,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
   }
 
   return json({ ok: true, userId, deletedSelf: userId === user.id });
-});
+}));

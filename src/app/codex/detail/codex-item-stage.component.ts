@@ -8,6 +8,7 @@ import { CodexCategoryIconComponent } from '../codex-category-icon.component';
 import { CodexService, type CodexKind } from '../codex.service';
 import { FallbackImageComponent } from '../fallback-image.component';
 import type { HoloSilhouette } from '../holo-silhouette';
+import { DeferErrorComponent } from '../../shared/defer-error/defer-error.component';
 
 /** What the stage shows: the traced outline, or the 3D model of the asset package. */
 export type ItemStageView = 'silhouette' | '3d';
@@ -25,7 +26,7 @@ export type ItemStageView = 'silhouette' | '3d';
 @Component({
   selector: 'sc-codex-item-stage',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective, AssetPackageViewerComponent, CodexCategoryIconComponent, FallbackImageComponent],
+  imports: [DeferErrorComponent, TranslatePipe, ScTooltipDirective, AssetPackageViewerComponent, CodexCategoryIconComponent, FallbackImageComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="table" [attr.aria-label]="'itemStage.aria' | translate: { name: displayName() }">
@@ -56,6 +57,8 @@ export type ItemStageView = 'silhouette' | '3d';
             <sc-asset-package-viewer class="pkg" [row]="pkg" [still]="still()" />
           } @placeholder {
             <div class="pkg" aria-hidden="true"></div>
+          } @error {
+            <sc-defer-error class="pkg" source="codex.itemStage" />
           }
         } @else if (silhouette(); as s) {
           <svg class="sil ce-draw" [attr.viewBox]="s.viewBox" preserveAspectRatio="xMidYMid meet" role="img" [attr.aria-label]="displayName()">
@@ -103,7 +106,7 @@ export type ItemStageView = 'silhouette' | '3d';
       .tt:hover:not(.off)::after, .tt.on::after { scale: 1 1; }
       .tt.on { color: var(--sc-accent); text-shadow: 0 0 8px color-mix(in srgb, var(--sc-accent) 50%, transparent); }
       .tt.off { opacity: 0.4; cursor: not-allowed; }
-      .tt:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .tt:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .surface { position: relative; z-index: 1; flex: 1 1 auto; min-height: 0; display: grid; place-items: center; padding: 8px 12px; }
       /* Pinned to the surface: a square viewBox (a missile) would otherwise size itself by its width and run out of the stage. */
       .sil { position: absolute; left: 12px; top: 8px; width: calc(100% - 24px); height: calc(100% - 16px); overflow: visible; filter: drop-shadow(0 0 10px color-mix(in srgb, var(--sc-accent) 45%, transparent)); }

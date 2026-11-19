@@ -53,8 +53,15 @@ export function lightRank(points: readonly VersePoint[]): number[] {
 }
 
 /**
- * Fallback shape when a patch has no uploaded constellation yet: a calm,
- * mirror-symmetric "arrow" (nose, two wing pairs, tail pair) in 0..1.
+ * What an emblem/image draws while no constellation of the patch is known: ONE
+ * single star in the middle (0..1), never a made-up shape.
+ */
+export const SINGLE_STAR: readonly VersePoint[] = [[0.5, 0.5]];
+
+/**
+ * Task-slot layout of the dome when a patch has no uploaded constellation yet
+ * (the 7 tasks need 7 places): a calm, mirror-symmetric "arrow" in 0..1.
+ * Never used for emblems or images, see {@link SINGLE_STAR}.
  */
 export const FALLBACK_POINTS: readonly VersePoint[] = [
   [0.5, 0.08],
@@ -340,7 +347,8 @@ export function crossedUnlocks(
     if (pa.unlocks.community && !pb?.unlocks.community) out.push('community');
     if (pa.unlocks.wallpaper && !pb?.unlocks.wallpaper) out.push('wallpaper');
   }
-  if (after.kartograph.unlocked && !before?.kartograph.unlocked) out.push('kartograph');
+  // the rank opens with the first tier (lit stars, not a completed map)
+  if (rankProgressOf(after).tier >= 1 && rankProgressOf(before).tier < 1) out.push('kartograph');
   for (const k of ['road', 'nebula', 'live', 'reserve', 'meteor', 'supernova', 'sunCollection'] as const) {
     if (after.rewards[k] && !before?.rewards[k]) out.push(k);
   }
@@ -509,7 +517,7 @@ export function todayYmd(now: Date = new Date()): string {
   return localYmd(now);
 }
 
-/** One day token of the comet rail; `win` = within ±2 days of the tip. */
+/** One day token of the comet rail; `win` = within ±1 day of the tip. */
 export interface CometDay {
   readonly ymd: string;
   readonly win: boolean;
@@ -521,7 +529,7 @@ export function cometDays(start: string, count: number, tipped: string | null): 
   return Array.from({ length: count }, (_, i) => {
     const ymd = addDays(start, i);
     const diff = Math.abs(Date.parse(`${ymd}T00:00:00Z`) - tipDay) / 86_400_000;
-    return { ymd, win: !Number.isNaN(diff) && diff <= 2, on: ymd === tipped };
+    return { ymd, win: !Number.isNaN(diff) && diff <= 1, on: ymd === tipped };
   });
 }
 
@@ -556,6 +564,160 @@ export interface SeriesStop {
   readonly on: boolean;
   /** The first locked stop — the next reward. */
   readonly next: boolean;
+}
+
+/* ------------------------------------------------------------------ */
+/* Rank tiers (the rank page, note #3 of 2026-11-13).                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Lit stars (all patch lines together) needed for each of the 7 rank tiers.
+ * The server's `kartograph.stars` counts every lit star of every constellation;
+ * the client folds it into 7 tiers (1, 3, 7, 12, 18, 26, 35): the first tiers
+ * come within a patch or two so a new reader feels the climb, tier 5 sits at
+ * about three patches, the top tiers take years of patches, so tier 7 stays rare.
+ */
+export const RANK_TIER_AT = [1, 3, 7, 12, 18, 26, 35] as const;
+export const RANK_TIER_COUNT = RANK_TIER_AT.length;
+/** i18n keys of the tiers (`starmap.rankPage.tier.<key>.name|meaning`), tier 1 first. */
+export const RANK_TIER_KEYS = ['observer', 'surveyor', 'navigator', 'cartographer', 'astrographer', 'master', 'keeper'] as const;
+export type RankTierKey = (typeof RANK_TIER_KEYS)[number];
+
+/** Tier 0..7 for a number of lit stars; 0 = not ranked yet. */
+export function rankTier(stars: number): number {
+  const n = Number.isFinite(stars) ? Math.floor(stars) : 0;
+  let tier = 0;
+  for (const at of RANK_TIER_AT) if (n >= at) tier++;
+  return tier;
+}
+
+/**
+ * The reader's lit stars across all patch lines: the server's `kartograph.stars`
+ * when present, otherwise the sum of every patch's lit stars (older server).
+ */
+export function rankStars(state: Pick<VerseExplorerState, 'kartograph' | 'patches'> | null | undefined): number {
+  if (!state) return 0;
+  const server = state.kartograph.stars;
+  if (typeof server === 'number' && Number.isFinite(server)) return Math.max(0, Math.floor(server));
+  let sum = 0;
+  for (const p of state.patches) sum += Math.min(STARS_PER_PATCH, Math.max(0, p.starCount));
+  return sum;
+}
+
+/** The current tier, the next one and how far the reader is on the way there. */
+export interface RankProgress {
+  /** Lit stars across all patch lines. */
+  readonly stars: number;
+  readonly tier: number;
+  readonly key: RankTierKey | null;
+  /** null on tier 7. */
+  readonly next: { readonly tier: number; readonly key: RankTierKey; readonly at: number } | null;
+  /** Stars still missing for the next tier (0 on tier 7). */
+  readonly toNext: number;
+  /** 0..1 share of the way from the current tier's threshold to the next one. */
+  readonly share: number;
+}
+
+export function rankProgress(starCount: number): RankProgress {
+  const stars = Number.isFinite(starCount) ? Math.max(0, Math.floor(starCount)) : 0;
+  const tier = rankTier(stars);
+  const key = tier > 0 ? RANK_TIER_KEYS[tier - 1] : null;
+  if (tier >= RANK_TIER_COUNT) return { stars, tier, key, next: null, toNext: 0, share: 1 };
+  const at = RANK_TIER_AT[tier];
+  const from = tier > 0 ? RANK_TIER_AT[tier - 1] : 0;
+  return {
+    stars,
+    tier,
+    key,
+    next: { tier: tier + 1, key: RANK_TIER_KEYS[tier], at },
+    toNext: at - stars,
+    share: Math.min(1, Math.max(0, (stars - from) / (at - from))),
+  };
+}
+
+/** Progress straight from the explorer state (null state = unranked). */
+export function rankProgressOf(state: Pick<VerseExplorerState, 'kartograph' | 'patches'> | null | undefined): RankProgress {
+  return rankProgress(rankStars(state));
+}
+
+/** Sun splinters that make one small sun (concept 2026-11-14: an x.y.z hit earns one splinter). */
+export const SPLINTERS_PER_SUN = 3;
+
+/** Splinters folded into small suns plus the remainder ("Splitter n von 3"); never touches stars or rank. */
+export function foldSplinters(count: number | null | undefined): { readonly suns: number; readonly rest: number } {
+  const n = typeof count === 'number' && Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
+  return { suns: Math.floor(n / SPLINTERS_PER_SUN), rest: n % SPLINTERS_PER_SUN };
+}
+
+/** How a tier reads on the ladder. */
+export type TierState = 'earned' | 'current' | 'locked';
+
+export function tierState(tier: number, current: number): TierState {
+  return tier < current ? 'earned' : tier === current ? 'current' : 'locked';
+}
+
+/**
+ * Rank rewards: purely cosmetic, unlocked on the client from the tier alone
+ * (the tier itself comes from the server's rank, nothing else is stored).
+ * Tiers 3 and 4 change what the wallpaper draws (older patch lines as faint
+ * companions, an amber tint); from tier 5 on they change the crest too.
+ */
+export type TierRewardKey = 'wallpaper' | 'badge' | 'companions' | 'tint' | 'frame' | 'deepfield' | 'orbit';
+export const TIER_REWARDS: readonly { readonly key: TierRewardKey; readonly tier: number }[] = [
+  { key: 'wallpaper', tier: 1 },
+  { key: 'badge', tier: 2 },
+  { key: 'companions', tier: 3 },
+  { key: 'tint', tier: 4 },
+  { key: 'frame', tier: 5 },
+  { key: 'deepfield', tier: 6 },
+  { key: 'orbit', tier: 7 },
+];
+
+export function hasTierReward(tier: number, key: TierRewardKey): boolean {
+  return TIER_REWARDS.some((r) => r.key === key && tier >= r.tier);
+}
+
+/** Wallpaper formats, all open from tier 1 (concept 2026-11-14); tiers 3/4 change what is drawn instead. */
+export const WALLPAPER_PHONE = { width: 1179, height: 2556 } as const;
+export const WALLPAPER_ULTRAWIDE = { width: 5120, height: 1440 } as const;
+
+/** localStorage: the rank items the reader has already seen on the rank page. */
+export const RANK_SEEN_KEY = 'sc.starmap.rankSeen';
+
+/**
+ * Everything that counts as "new on the rank page": every reached tier, every
+ * unlocked rank reward and every reached series stop (the server's rewards).
+ */
+export function rankNewsItems(state: Pick<VerseExplorerState, 'kartograph' | 'patches' | 'rewards'>): string[] {
+  const tier = rankProgressOf(state).tier;
+  const out: string[] = [];
+  for (let t = 1; t <= tier; t++) out.push(`tier:${t}`);
+  for (const r of TIER_REWARDS) if (tier >= r.tier) out.push(`reward:${r.key}`);
+  for (const s of STREAK_REWARDS) if (state.rewards[s.key]) out.push(`series:${s.key}`);
+  return out;
+}
+
+/** Items already seen; an unreadable store counts as nothing seen. */
+export function readRankSeen(): Set<string> {
+  try {
+    const raw = JSON.parse(localStorage.getItem(RANK_SEEN_KEY) ?? '[]') as unknown;
+    return new Set(Array.isArray(raw) ? raw.filter((x): x is string => typeof x === 'string') : []);
+  } catch {
+    return new Set();
+  }
+}
+
+export function writeRankSeen(items: readonly string[]): void {
+  try {
+    localStorage.setItem(RANK_SEEN_KEY, JSON.stringify(items));
+  } catch {
+    /* private mode / quota: the marker may show again, nothing breaks */
+  }
+}
+
+/** True when the rank page holds something the reader has not opened yet. */
+export function hasRankNews(items: readonly string[], seen: ReadonlySet<string>): boolean {
+  return items.some((i) => !seen.has(i));
 }
 
 /** Stops of the series road; unlocked state from the server, never from the numbers. */

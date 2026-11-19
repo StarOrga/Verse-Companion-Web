@@ -91,6 +91,13 @@ describe('rankShip', () => {
     expect(result.cohortSize).toBe(4);
   });
 
+  it('places the target in its group by the same overall score (Rang N von M, C15)', () => {
+    expect(result.rank).toBeGreaterThanOrEqual(1);
+    expect(result.rank).toBeLessThanOrEqual(result.cohortSize);
+    const best = ship('ZZZ_Best', 2, 'Combat', { alpha: 9e3, sustainedDps: 9e4, missiles: 9e3, shieldHp: 9e5, agility: 900, boost: 900 });
+    expect(rankShip(best, cohort, { profile: 'combat', scope: 'all' }).rank).toBe(1);
+  });
+
   it('keeps the radar axes in the fixed profile order', () => {
     expect(result.axes.map((a) => a.key)).toEqual(
       RANK_PROFILES.find((p) => p.id === 'combat')!.axes.map((a) => a.key),
@@ -223,6 +230,55 @@ describe('small groups (concept r1-small) and the narrowest default (r1-default)
     expect(narrowestRankScope(lonely, roleCohort, { careerByClass: true })).not.toBe('role');
     // No role, no career: everyone.
     expect(narrowestRankScope({ className: 'X', sizeClass: null, career: null, sheet: {} }, roleCohort)).toBe('all');
+  });
+});
+
+describe('hull variants count once (#968)', () => {
+  const hull = (className: string, name: string | null, alpha: number): RankShipInput => ({
+    className,
+    name,
+    sizeClass: null,
+    career: 'Combat',
+    role: 'Heavy Freight',
+    sheet: { alpha, sustainedDps: alpha, shieldHp: alpha },
+  });
+  const fleet = [
+    hull('DRAK_Caterpillar', 'Drake Caterpillar', 100),
+    hull('DRAK_Caterpillar_Pirate', 'Drake Caterpillar Pirate Edition', 100),
+    hull('DRAK_Caterpillar_ShipShowdown', 'Drake Caterpillar Best In Show Edition', 100),
+    hull('DRAK_Caterpillar_PU_AI', 'Drake Caterpillar', 100),
+    // A prefix-extension with a different model name is a different ship.
+    hull('MISC_Hull_C', 'MISC Hull C', 300),
+    hull('MISC_Hull_C_Expedition', 'MISC Hull C Expedition', 400),
+    hull('CRUS_C2', 'Crusader C2 Hercules', 500),
+  ];
+
+  it('folds the editions of one hull into its base', () => {
+    const set = filterCohort(fleet[4], fleet, 'role', { foldVariants: true });
+    expect(set.map((s) => s.className).sort()).toEqual(['CRUS_C2', 'DRAK_Caterpillar', 'MISC_Hull_C', 'MISC_Hull_C_Expedition']);
+  });
+
+  it('lets the target stand for its own family', () => {
+    const set = filterCohort(fleet[1], fleet, 'role', { foldVariants: true });
+    expect(set.map((s) => s.className).sort()).toEqual(['CRUS_C2', 'DRAK_Caterpillar_Pirate', 'MISC_Hull_C', 'MISC_Hull_C_Expedition']);
+  });
+
+  it('counts the group size, median and place over distinct hulls', () => {
+    const folded = rankShip(fleet[6], fleet, { profile: 'combat', scope: 'role', foldVariants: true });
+    const raw = rankShip(fleet[6], fleet, { profile: 'combat', scope: 'role' });
+    expect(raw.cohortSize).toBe(7);
+    expect(folded.cohortSize).toBe(4);
+    expect(folded.scopeSizes?.role).toBe(4);
+    // Four Caterpillar records pulled the median down to 100; one hull does not.
+    const alpha = (r: typeof folded) => r.axes.find((a) => a.key === 'alpha')?.medianValue;
+    expect(alpha(raw)).toBe(100);
+    expect(alpha(folded)).toBe(350);
+    expect(folded.rank).toBe(1);
+  });
+
+  it('leaves a cohort without names (missiles, old caches) untouched', () => {
+    const nameless = fleet.map((s) => ({ ...s, name: null }));
+    expect(filterCohort(nameless[0], nameless, 'role', { foldVariants: true }).length).toBe(7);
   });
 });
 

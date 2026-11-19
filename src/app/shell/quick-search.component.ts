@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   HostListener,
   TemplateRef,
   ViewContainerRef,
@@ -10,13 +11,16 @@ import {
   viewChild,
 } from '@angular/core';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { AnalyticsService } from '../core/analytics.service';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScDialogDirective } from '../shared/dialog/sc-dialog.directive';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import { CodexSearchEngine } from '../codex/search/codex-search-engine';
 import { CodexSearchResultsComponent } from '../codex/search/codex-search-results.component';
 import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/search/codex-search-hub.service';
+import { SearchOpenService } from './search-open.service';
 
 /**
  * Ctrl+K / "/" and the header's search button.
@@ -30,7 +34,7 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
 @Component({
   selector: 'sc-quick-search',
   standalone: true,
-  imports: [TranslatePipe, ScDialogDirective, ScTooltipDirective, CodexSearchResultsComponent],
+  imports: [TranslatePipe, ScDialogDirective, ScActionDirective, ScTooltipDirective, CodexSearchResultsComponent],
   providers: [CodexSearchEngine],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -77,12 +81,10 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
               [attr.aria-label]="'codex.search.bar.label' | translate"
               [attr.placeholder]="'codex.search.bar.placeholder' | translate" />
             <!-- The phone sheet has no backdrop to tap and no Esc key: closing needs a control. -->
-            <button type="button" class="qs-close" (click)="close()"
+            <button type="button" scAction tier="tertiary" class="qs-close" (click)="close()"
                     [attr.aria-label]="'codex.search.bar.close' | translate"
                     [scTooltip]="'codex.search.bar.close' | translate" scTooltipTier="label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
-                <line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" />
-              </svg>
+              <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
             </button>
           </div>
           <sc-codex-search-results
@@ -105,7 +107,7 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
       color: var(--sc-fg-2); cursor: pointer; font-family: inherit; font-size: max(0.78rem, var(--sc-fs-floor));
     }
     .trigger:hover { border-color: var(--sc-accent); color: var(--sc-fg-0); }
-    .trigger:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .trigger:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .trigger-icon { width: 18px; height: 18px; flex: 0 0 auto; }
     .trigger kbd {
       font-size: max(0.62rem, var(--sc-fs-floor)); padding: 1px 5px; border-radius: 4px;
@@ -115,8 +117,7 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
 
     .overlay {
       position: fixed; inset: 0; z-index: 100;
-      background: rgba(0, 0, 0, 0.68);
-      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+      background: var(--sc-scrim);
       display: flex; justify-content: center; align-items: flex-start;
       padding: 12vh 16px 16px;
     }
@@ -128,22 +129,17 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
       display: flex; align-items: center; gap: 10px; padding: 0 14px; border-radius: 8px;
       background: var(--sc-bg-0); border: 1px solid var(--sc-accent);
     }
-    .field:focus-within { box-shadow: 0 0 0 2px color-mix(in srgb, var(--sc-accent) 25%, transparent); }
+    /* Keyboard focus rings the field, not the bare input inside it; a click adds no frame. */
+    .field:has(.qs-input:focus-visible) { box-shadow: var(--sc-tab-ring); }
+    .qs-input:focus-visible { box-shadow: none; }
     .glyph { width: 20px; height: 20px; flex: none; color: var(--sc-accent); }
     .qs-input {
       flex: 1; min-width: 0; padding: 12px 0; background: transparent; border: 0; outline: none;
       color: var(--sc-fg-0); font-family: inherit; font-size: max(1rem, var(--sc-fs-input));
     }
     .qs-input::-webkit-search-cancel-button { display: none; }
-    .qs-close {
-      flex: none; display: inline-flex; align-items: center; justify-content: center;
-      width: 36px; height: 36px; margin-right: -8px; border: 0; border-radius: 6px;
-      background: none; color: var(--sc-fg-2); cursor: pointer;
-    }
-    .qs-close svg { width: 18px; height: 18px; }
-    .qs-close:hover { color: var(--sc-fg-0); background: var(--sc-bg-2); }
-    .qs-close:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
-    @media (pointer: coarse) { .qs-close { width: 48px; height: 48px; } }
+    /* Sonderform: own frame, but scrim + ✕ are the scaffold's (--sc-scrim, tertiary scAction). */
+    .qs-close { flex: none; margin-right: -8px; color: var(--sc-fg-1); }
     /* The results are the scroll port; the field stays put above them. */
     .qs-results { flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; }
 
@@ -184,6 +180,8 @@ import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/se
 export class QuickSearchComponent {
   readonly engine = inject(CodexSearchEngine);
   private readonly hub = inject(CodexSearchHub);
+  private readonly searchOpen = inject(SearchOpenService);
+  private readonly analytics = inject(AnalyticsService);
   private readonly overlay = inject(Overlay);
   private readonly viewContainer = inject(ViewContainerRef);
 
@@ -191,6 +189,12 @@ export class QuickSearchComponent {
   private overlayRef: OverlayRef | null = null;
 
   readonly visible = signal(false);
+
+  constructor() {
+    // The legacy header's search: the wishes' "Wunsch suchen" and the subheader's Ctrl+K reach it through the service.
+    const unregister = this.searchOpen.register(this, () => this.trigger());
+    inject(DestroyRef).onDestroy(unregister);
+  }
   readonly listboxId = 'qs-results-list';
 
   readonly activeDescendant = computed(() => {
@@ -223,7 +227,9 @@ export class QuickSearchComponent {
 
   /** Ctrl+K, "/" and the header button: the Codex bar on a Codex page, else the overlay. */
   trigger(): void {
-    if (!this.hub.activate()) this.open();
+    const onBar = this.hub.activate();
+    this.analytics.track('search:palette_open', { surface: onBar ? 'codex_bar' : 'palette' });
+    if (!onBar) this.open();
   }
 
   open(): void {
@@ -275,7 +281,7 @@ export class QuickSearchComponent {
     const opt = this.engine.enterOption();
     if (!opt) return;
     const result = this.engine.open(opt, action === 'open-new-tab');
-    if (result === 'navigated') this.close();
+    if (result === 'navigated' || result === 'here') this.close();
     else if (result === 'searched') this.focusField();
   }
 

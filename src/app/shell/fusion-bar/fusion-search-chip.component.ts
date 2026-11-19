@@ -87,22 +87,27 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
       animation: fsc-in 0.22s ease both;
     }
     .lbl {
-      display: inline-flex; align-items: center; gap: 4px; height: 100%; padding: 0 4px 0 10px; margin: 0;
+      display: inline-flex; align-items: center; gap: 0; height: 100%; padding: 0 10px; margin: 0;
       border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; border-radius: inherit;
     }
     .lbl.static { cursor: default; }
+    .lbl { transition: padding 0.18s ease; }
     .txt { overflow: hidden; text-overflow: ellipsis; max-width: 18ch; }
-    .dd, .cx { opacity: 0; transition: opacity 0.12s ease; }
-    .dd { font-size: 10px; }
+    /* Hidden ▾ / × take no room: the chip is only as wide as its text until hover / focus. */
+    .dd, .cx { opacity: 0; transition: opacity 0.16s ease, width 0.18s ease, max-width 0.18s ease, margin 0.18s ease, padding 0.18s ease; }
+    .dd { font-size: 10px; max-width: 0; overflow: hidden; }
     .cx {
-      display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin-right: 3px;
-      padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--sc-fg-1); cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; flex: none; width: 0; height: 22px; margin-right: 0;
+      padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--sc-fg-1); cursor: pointer; overflow: hidden;
     }
     .cx svg { width: 12px; height: 12px; }
     .cx:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-fg-0) 10%, transparent); }
     /* ▾ and × only on hover / focus (r2 t-s3-a1). */
     :host(:hover) .dd, :host(:hover) .cx, :host(:focus-within) .dd, :host(:focus-within) .cx, :host(.open) .dd, :host(.open) .cx { opacity: 0.85; }
-    .lbl:focus-visible, .cx:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    :host(:hover) .dd, :host(:focus-within) .dd, :host(.open) .dd { max-width: 14px; margin-left: 4px; }
+    :host(:hover) .lbl, :host(:focus-within) .lbl, :host(.open) .lbl { padding-right: 4px; }
+    :host(:hover) .cx, :host(:focus-within) .cx, :host(.open) .cx { width: 22px; margin-right: 3px; }
+    .lbl:focus-visible, .cx:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* The menu grows out of the chip, in the chip's colour (r3 ub-s3: no brightness step). */
     .chip.open { border-radius: 12px 12px 0 0; }
     .menu {
@@ -116,7 +121,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
       height: 28px; margin-bottom: 4px; padding: 0 9px; border: 0; border-radius: 7px; outline: none;
       background: var(--sc-bg-0); color: var(--sc-fg-0); font: inherit; font-size: max(0.78rem, var(--sc-fs-floor));
     }
-    .mini:focus-visible { box-shadow: 0 0 0 2px var(--sc-accent); }
+    .mini:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .opts { display: flex; flex-direction: column; gap: 2px; }
     .opt {
       display: flex; justify-content: space-between; gap: var(--sc-space-3); padding: 4px 8px; margin: 0; border: 0;
@@ -127,16 +132,18 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
     .opt.on { background: color-mix(in srgb, var(--sc-fg-0) 12%, transparent); color: var(--sc-fg-0); }
     /* 0 hits: greyed out, still clickable (r3 pin). */
     .opt.zero { opacity: 0.5; }
-    .opt:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .opt:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .none { padding: 4px 8px; color: var(--sc-fg-2); }
     @media (pointer: coarse) {
       .dd, .cx { opacity: 0.85; }
-      .cx { width: 36px; height: 36px; }
+      .dd { max-width: 14px; margin-left: 4px; }
+      .lbl { padding-right: 4px; }
+      .cx { width: 36px; height: 36px; margin-right: 3px; }
       .opt { min-height: 44px; align-items: center; }
     }
     @keyframes fsc-in { from { opacity: 0; transform: scale(0.92); } }
     @keyframes fsc-grow { from { opacity: 0; transform: scaleY(0.6); } }
-    @media (prefers-reduced-motion: reduce) { .chip, .menu { animation: none; } }
+    @media (prefers-reduced-motion: reduce) { .chip, .menu { animation: none; } .dd, .cx, .lbl { transition: none; } }
   `],
 })
 export class FusionSearchChipComponent {

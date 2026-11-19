@@ -1,5 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { AuthService } from '../../auth/auth.service';
+import { AnalyticsService } from '../../core/analytics.service';
 import { SupabaseClientProvider } from '../../core/supabase.client';
 import { logWarn } from '../../core/log';
 import { normalizeShipName } from '../../codex/upcoming-ships.service';
@@ -59,6 +60,7 @@ export function upcomingClassName(name: string): string {
 export class WishlistStore {
   private readonly sb = inject(SupabaseClientProvider);
   private readonly auth = inject(AuthService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly rows = signal<readonly WishRow[]>([]);
   readonly loaded = signal(false);
@@ -121,6 +123,25 @@ export class WishlistStore {
     return this.inFlight;
   }
 
+  /**
+   * Read the wishlist again from the server (another device may have changed it). False when that failed; the rows
+   * stay as they were. The wish-line safety net (NachschubService.reconcile) trims lines only after a fresh read.
+   */
+  async reload(): Promise<boolean> {
+    const uid = this.auth.user()?.id ?? null;
+    if (!uid || this.loadedFor !== uid) return false;
+    try {
+      const { data, error } = await this.sb.client.from('search_wishlist' as never).select('*');
+      if (error || this.loadedFor !== uid) return false;
+      this.rows.set(((data ?? []) as Record<string, unknown>[]).map(mapWishRow));
+      this.loaded.set(true);
+      return true;
+    } catch (err) {
+      logWarn('wishlist', 'reload failed', err);
+      return false;
+    }
+  }
+
   /** Insert a wish. True when it is on the list afterwards (a duplicate counts). */
   async add(entry: WishEntry): Promise<boolean> {
     if (!this.auth.user()) return false;
@@ -143,6 +164,7 @@ export class WishlistStore {
         return false;
       }
       this.rows.update((rs) => [mapWishRow(data as Record<string, unknown>), ...rs]);
+      this.analytics.track('hq:wish_add', { kind: entry.kind });
       return true;
     } catch (err) {
       logWarn('wishlist', 'add failed', err);
@@ -176,6 +198,35 @@ export class WishlistStore {
       return true;
     } catch (err) {
       logWarn('wishlist', 'setQty failed', err);
+      return false;
+    }
+  }
+
+  /**
+   * Set the note of an existing wish (the Akte's Kaufen tab keeps "where to buy" there). A missing wish is created
+   * with the note. True when the list shows the note afterwards.
+   */
+  async setNotes(entry: WishEntry, notes: string | null): Promise<boolean> {
+    if (!this.auth.user()) return false;
+    const hit = this.find(entry.kind, entry.className, entry.name, entry.forClassName);
+    if (!hit) return this.add({ ...entry, notes });
+    const next = notes?.trim().slice(0, 500) || null;
+    if (hit.notes === next) return true;
+    try {
+      const { error } = await this.sb.client
+        .from('search_wishlist' as never)
+        .update({ notes: next } as never)
+        .eq('entity_kind', hit.kind)
+        .eq('class_name', hit.className)
+        .eq('for_class_name', hit.forClassName);
+      if (error) {
+        logWarn('wishlist', 'setNotes failed', error);
+        return false;
+      }
+      this.rows.update((rs) => rs.map((r) => (r === hit ? { ...r, notes: next } : r)));
+      return true;
+    } catch (err) {
+      logWarn('wishlist', 'setNotes failed', err);
       return false;
     }
   }

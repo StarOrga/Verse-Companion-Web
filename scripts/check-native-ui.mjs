@@ -211,5 +211,8 @@ function selftest() {
   console.log(`\nselftest: ${cases.length}/${cases.length} passed`);
 }
 
-if (process.argv.includes('--selftest')) selftest();
-else scan();
+// Only as a script: check-legacy-actions.mjs imports stripComments from here.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  if (process.argv.includes('--selftest')) selftest();
+  else scan();
+}

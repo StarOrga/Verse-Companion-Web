@@ -8,8 +8,8 @@ import { StarmapTourComponent } from './starmap-tour.component';
   template: `
     <section #map style="position: relative; height: 400px">
       <div data-tour="stage" style="height: 100px">stage</div>
-      <span data-tour="count">3/7</span>
-      <button data-tour="more" type="button">Logbuch</button>
+      <span data-tour="patch">4.4</span>
+      <a data-tour="rank" href="/verse/explorer/rank">Rang</a>
       <sc-starmap-tour [root]="map" (closed)="closed = closed + 1" />
     </section>
   `,
@@ -32,30 +32,31 @@ describe('StarmapTourComponent', () => {
   it('opens with three bullets and no ring', () => {
     expect(f.nativeElement.querySelectorAll('.points li').length).toBe(3);
     expect(q('.ring')).toBeNull();
-    expect(q('.card').getAttribute('role')).toBe('dialog');
+    expect(q('.card .scp-frame').getAttribute('role')).toBe('dialog');
   });
 
   it('walks only the steps whose element is on the panel and rings the real element', async () => {
-    q<HTMLButtonElement>('.row .btn').click();
+    q<HTMLButtonElement>('.scp-f button').click();
     f.detectChanges();
     await f.whenStable();
     f.detectChanges();
     expect(q('.ring')).not.toBeNull();
-    expect(q('.count')).not.toBeNull();
-    // stage -> count -> more (tracks and series are absent from this panel): 3 steps
+    // A coach mark is a light popout: its step count is a line above the title, not in the rail.
+    expect(q('.scp-ev-in')).not.toBeNull();
+    // stage -> patch -> rank (comet and guess are absent from this panel): 3 steps
     const next = () => {
-      const b = f.nativeElement.querySelectorAll('.row .btn');
-      (b[1] as HTMLButtonElement).click();
+      const b = f.nativeElement.querySelectorAll('.scp-f button');
+      (b[0] as HTMLButtonElement).click();
       f.detectChanges();
     };
     next();
     next();
-    const last = Array.from(f.nativeElement.querySelectorAll('.row .btn') as NodeListOf<HTMLButtonElement>).map((b) => b.textContent);
-    expect(last.length).toBe(3);
+    const last = Array.from(f.nativeElement.querySelectorAll('.scp-f button') as NodeListOf<HTMLButtonElement>).map((b) => b.textContent);
+    expect(last.length).toBe(2);
   });
 
   it('closes on Escape', () => {
-    q<HTMLElement>('.card').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    q<HTMLElement>('.card .scp-frame').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     expect(f.componentInstance.closed).toBe(1);
   });
 });

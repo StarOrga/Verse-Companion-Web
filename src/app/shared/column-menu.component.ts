@@ -14,6 +14,8 @@ import {
 } from '@angular/core';
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
+import { ScPopupComponent } from './popup/sc-popup.component';
+import { ScTooltipDirective } from './tooltip/sc-tooltip.directive';
 import { ColumnFacet, ColumnKind, SortDir } from '../codex/table-column-menu';
 
 /**
@@ -61,6 +63,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 @Component({
   selector: 'sc-column-menu',
   standalone: true,
+  imports: [ScPopupComponent, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <span class="cm-wrap">
@@ -79,10 +82,13 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
           class="cm-kebab"
           [class.active]="open() || hasFilter()"
           [attr.aria-label]="menuOpenLabel()"
+          [scTooltip]="menuOpenLabel()"
+          scTooltipTier="label"
         >⋮</summary>
       </details>
     </span>
     <ng-template #panelTpl>
+      <sc-popup kind="menu" [backdrop]="false" [title]="sortLabel()" (closed)="closeDetails()">
       <div class="cm-panel" (keydown)="onPanelKeydown($event)">
         <p class="cm-title">{{ sortLabel() }}</p>
         <div class="cm-sortrow">
@@ -104,11 +110,11 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
         @if (kind() === 'numeric') {
           <p class="cm-title">{{ rangeLabel() }}</p>
           <div class="cm-range">
-            <label class="sr-only" [attr.for]="fromId()">{{ fromLabel() }}</label>
+            <label class="sc-sr-only" [attr.for]="fromId()">{{ fromLabel() }}</label>
             <input #fromInput type="number" [id]="fromId()" [value]="range()?.min ?? ''"
                    (change)="applyRange(fromInput.value, toInput.value)" />
             <span class="cm-dash" aria-hidden="true">–</span>
-            <label class="sr-only" [attr.for]="toId()">{{ toLabel() }}</label>
+            <label class="sc-sr-only" [attr.for]="toId()">{{ toLabel() }}</label>
             <input #toInput type="number" [id]="toId()" [value]="range()?.max ?? ''"
                    (change)="applyRange(fromInput.value, toInput.value)" />
           </div>
@@ -131,18 +137,22 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
           <button type="button" class="cm-clear" (click)="doClear()">{{ clearLabel() }}</button>
         </div>
       </div>
+      </sc-popup>
     </ng-template>
   `,
   styles: [`
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .cm-wrap { display: inline-flex; align-items: center; gap: 2px; width: 100%; }
     .cm-label { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 3px;
       background: transparent; border: none; color: inherit; font: inherit; cursor: pointer; text-align: inherit; padding: 0; }
+    .cm-label:focus-visible, .cm-kebab:focus-visible, .cm-sortbtn:focus-visible, .cm-secondary:focus-visible,
+    .cm-clear:focus-visible, .cm-range input:focus-visible {
+      outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    .cm-sortbtn:hover, .cm-secondary:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
     .cm-arrow { color: var(--sc-accent); }
     /* LOW-3: unit floor per UI-spec §0 — an explicit max() rather than a
        relative 0.85em, which derives from a 12px head and lands near 10px. */
     .unit { color: var(--sc-fg-2); font-size: max(11px, var(--sc-fs-floor)); margin-left: 2px; font-weight: 400; }
-    .cm-secondary { padding: 4px 6px; border-radius: 4px; background: var(--sc-bg-1);
+    .cm-secondary { min-block-size: var(--sc-tap-min); padding: 4px 6px; border-radius: 4px; background: var(--sc-bg-1);
       border: 1px dashed var(--sc-border); color: var(--sc-fg-1); font: inherit;
       font-size: max(11px, var(--sc-fs-floor)); cursor: pointer; text-align: left; }
     .cm-secondary.on { color: var(--sc-accent); border-color: var(--sc-accent); border-style: solid; }
@@ -154,17 +164,16 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
     /* MEDIUM-5: positioned by the CDK overlay (flexibleConnectedTo the kebab
        button) rather than position: absolute inside .cm-pop — see the module
        doc comment above the imports. */
-    .cm-panel { width: min(var(--sc-ov-menu), calc(100vw - 32px));
-      background: var(--sc-bg-2); border: 1px solid var(--sc-border); border-radius: var(--radius-md, 4px);
-      box-shadow: 0 10px 28px rgb(0 0 0 / .6); padding: 8px; display: flex; flex-direction: column; gap: 6px;
+    /* Content only: frame, border, shadow and the menu width come from sc-popup. */
+    .cm-panel { display: flex; flex-direction: column; gap: 6px;
       text-transform: none; letter-spacing: normal; font-weight: 400; }
     .cm-title { margin: 4px 0 0; font-size: max(11px, var(--sc-fs-floor)); text-transform: uppercase; letter-spacing: 0.06em; color: var(--sc-fg-2); }
     .cm-sortrow { display: flex; gap: 4px; }
-    .cm-sortbtn { flex: 1 1 0; padding: 4px 6px; border-radius: 4px; background: var(--sc-bg-1);
+    .cm-sortbtn { flex: 1 1 0; min-block-size: var(--sc-tap-min); padding: 4px 6px; border-radius: 4px; background: var(--sc-bg-1);
       border: 1px solid var(--sc-border); color: var(--sc-fg-1); font: inherit; font-size: max(11px, var(--sc-fs-floor)); cursor: pointer; }
     .cm-sortbtn.on { color: var(--sc-accent); border-color: var(--sc-accent); }
     .cm-range { display: flex; align-items: center; gap: 4px; }
-    .cm-range input { width: 54px; padding: 3px 4px; border-radius: 4px; background: var(--sc-bg-1);
+    .cm-range input { width: 54px; min-block-size: var(--sc-tap-min); padding: 3px 4px; border-radius: 4px; background: var(--sc-bg-1);
       border: 1px solid var(--sc-border); color: var(--sc-fg-0); font: inherit; font-size: max(11px, var(--sc-fs-input)); }
     .cm-dash { color: var(--sc-fg-2); }
     .cm-facets { list-style: none; margin: 0; padding: 0; max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
@@ -172,7 +181,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
     .cm-facet-val { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
     .cm-facet-ct { color: var(--sc-fg-2); font-variant-numeric: tabular-nums; }
     .cm-foot { display: flex; justify-content: flex-end; padding-top: 2px; border-top: 1px solid var(--sc-border); }
-    .cm-clear { padding: 3px 8px; border-radius: 4px; background: transparent; border: 1px solid var(--sc-border);
+    .cm-clear { min-block-size: var(--sc-tap-min); padding: 3px 8px; border-radius: 4px; background: transparent; border: 1px solid var(--sc-border);
       color: var(--sc-fg-2); font: inherit; font-size: max(11px, var(--sc-fs-floor)); cursor: pointer; }
     .cm-clear:hover { color: var(--sc-accent); border-color: var(--sc-accent); }
   `],
@@ -271,7 +280,7 @@ export class ScColumnMenuComponent {
   /** Closes both the native `<details>` (so `.cm-kebab` stops reading as open)
    * and the portaled panel — used wherever a close is triggered from outside
    * the native `toggle` event (Escape, Clear, backdrop click, scroll-close). */
-  private closeDetails(): void {
+  protected closeDetails(): void {
     this.disposeOverlay();
     const det = this.detEl()?.nativeElement;
     if (det) det.open = false;

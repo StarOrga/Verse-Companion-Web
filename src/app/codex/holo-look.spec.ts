@@ -6,13 +6,18 @@ import {
   HOLO_SCANLINES,
   HOLO_SWEEP,
   HOLO_TWEEN_S,
-  HOLO_XRAY_HULL_OPACITY,
+  HOLO_SELECT,
+  HOLO_GHOST_FLAG,
   HOLO_DIM_FILL,
+  HOLO_DIM_EDGE_ALPHA,
+  HOLO_DIM_EDGE_COLOR,
+  HOLO_EDGE_OPACITY,
   HoloLook,
   countTriangles,
   creaseEdges,
   edgeDetail,
 } from './holo-look';
+import { HoloEdgeJob, creaseEdgeArray } from './holo-edges';
 
 const BASE = [82, 193, 230] as const;
 const DRAKE = [255, 176, 46] as const;
@@ -84,7 +89,8 @@ describe('HoloLook', () => {
     expect(rgbOf(fill.uniforms['uAccent'].value)).toEqual([...DRAKE]);
     expect(rgbOf(look.line('focus').uniforms['uAccent'].value)).toEqual([...DRAKE]);
     expect(rgbOf(look.accent)).toEqual([...DRAKE]);
-    expect(look.line('hull').blending).toBe(THREE.AdditiveBlending);
+    // Lines blend over, never add up: a dense side must not read brighter than a sparse one.
+    expect(look.line('hull').blending).toBe(THREE.NormalBlending);
     expect(fill.transparent).toBe(false);
   });
 
@@ -209,11 +215,14 @@ describe('HoloLook', () => {
   });
 });
 
+/** A glassy hull (the interior layer). */
+const GLASS = 0.45;
+
 describe('HoloLook focus tween', () => {
   it('eases opacity and dim over HOLO_TWEEN_S, starting at the first tick', () => {
     const look = new HoloLook(BASE, BASE, false, true);
     look.tick(100);
-    look.setOpacity('hull', HOLO_XRAY_HULL_OPACITY);
+    look.setOpacity('hull', GLASS);
     look.setDim(true);
     // Nothing moved yet, but the pass already flipped (no flip mid-fade).
     expect(look.fill('hull').uniforms['uOpacity'].value).toBe(1);
@@ -224,10 +233,10 @@ describe('HoloLook focus tween', () => {
     look.tick(105 + HOLO_TWEEN_S / 2);
     const mid = look.fill('hull').uniforms['uOpacity'].value as number;
     expect(mid).toBeLessThan(1);
-    expect(mid).toBeGreaterThan(HOLO_XRAY_HULL_OPACITY);
+    expect(mid).toBeGreaterThan(GLASS);
     expect(look.tweening).toBe(true);
     look.tick(105 + HOLO_TWEEN_S + 0.01);
-    expect(look.fill('hull').uniforms['uOpacity'].value).toBe(HOLO_XRAY_HULL_OPACITY);
+    expect(look.fill('hull').uniforms['uOpacity'].value).toBe(GLASS);
     expect(look.fill('hull').uniforms['uDim'].value).toBe(1);
     expect(look.tweening).toBe(false);
     // Back to opaque: stays transparent until the fade-in ends, then flips.
@@ -253,8 +262,102 @@ describe('HoloLook focus tween', () => {
     }
   });
 
+  it('dims the hull visibly while a selection exists (thousands of lines saturate the mock\'s .46 → .30)', () => {
+    // Effective line alpha well under the mock's .30, fill clearly darker, still readable.
+    expect(HOLO_EDGE_OPACITY * HOLO_DIM_EDGE_ALPHA).toBeLessThan(0.3);
+    expect(HOLO_DIM_EDGE_ALPHA * HOLO_DIM_EDGE_COLOR).toBeLessThan(0.62);
+    expect(HOLO_DIM_EDGE_ALPHA * HOLO_DIM_EDGE_COLOR).toBeGreaterThan(0.45);
+    expect(HOLO_DIM_FILL).toBeLessThanOrEqual(0.6);
+  });
+
   it('keeps the dim soft enough to read the rest of the model', () => {
-    expect(HOLO_DIM_FILL).toBeGreaterThan(0.5);
-    expect(HOLO_XRAY_HULL_OPACITY).toBeGreaterThanOrEqual(0.4);
+    expect(HOLO_DIM_FILL).toBeGreaterThanOrEqual(0.4);
+  });
+});
+
+describe('HoloLook.dressAsync (edges from the edge worker)', () => {
+  const cube = () => new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial());
+  const edgesOf = (m: THREE.Mesh) => m.children.find((c) => c.userData['holoEdges']) as THREE.LineSegments | undefined;
+  const local = (job: HoloEdgeJob) => Promise.resolve(creaseEdgeArray(job));
+  const tint = BASE;
+
+  it('puts the fill on at once and the same edges as dress() once they arrive', async () => {
+    const look = new HoloLook(tint, tint, false);
+    const a = cube();
+    let drawn = 0;
+    const done = look.dressAsync(a, 'hull', local, () => drawn++);
+    expect(a.material).toBe(look.fill('hull'));
+    expect(edgesOf(a)).toBeUndefined();
+    await done;
+    expect(drawn).toBe(1);
+    const ref = creaseEdges(a.geometry, look.detail.creaseDeg);
+    expect(edgesOf(a)!.geometry.getAttribute('position').count).toBe(ref.getAttribute('position').count);
+    expect(edgesOf(a)!.material).toBe(look.line('hull'));
+    look.dispose();
+  });
+
+  it('adds nothing once the look is disposed', async () => {
+    const look = new HoloLook(tint, tint, false);
+    const a = cube();
+    let drawn = 0;
+    const done = look.dressAsync(a, 'hull', local, () => drawn++);
+    look.dispose();
+    await done;
+    expect(edgesOf(a)).toBeUndefined();
+    expect(drawn).toBe(0);
+  });
+});
+
+describe('HoloLook lit bodies', () => {
+  it('dresses a part with a ghost pass through the hull and swaps it with the role', () => {
+    const look = new HoloLook(BASE, DRAKE, true);
+    const part = box();
+    look.dress(part, 'part');
+    const ghosts = part.children.filter((c) => c.userData[HOLO_GHOST_FLAG]);
+    expect(ghosts.length).toBe(2);
+    const ghostFill = ghosts.find((g) => !g.userData['holoEdges']) as THREE.Mesh;
+    expect(ghostFill.material).toBe(look.ghostFill('part'));
+    expect(look.ghostFill('part')!.depthFunc).toBe(THREE.GreaterDepth);
+    expect(look.ghostFill('part')!.depthWrite).toBe(false);
+    look.setRole(part, 'select', 10);
+    expect(part.material).toBe(look.fill('select'));
+    expect(ghostFill.material).toBe(look.ghostFill('select'));
+    // The selection stays readable through the hull: its ghost is the strongest.
+    expect(look.ghostFill('select')!.uniforms['uGhost'].value).toBeGreaterThan(look.ghostFill('part')!.uniforms['uGhost'].value);
+    look.dispose();
+  });
+
+  it('keeps the brightness ladder: dimmed other < idle < hover < selected, one green for every ship', () => {
+    const look = new HoloLook(BASE, DRAKE, true);
+    const alpha = (r: 'part' | 'hover' | 'select') => look.fill(r).uniforms['uBodyAlpha'].value as number;
+    const rgb = (c: THREE.Color) => [c.r, c.g, c.b].map((v) => Math.round(v * 255));
+    expect(alpha('part')).toBeCloseTo(0.36, 5);
+    expect(rgb(look.line('part').uniforms['uColor'].value)).toEqual([166, 234, 255]);
+    expect(rgb(look.line('hover').uniforms['uColor'].value)).toEqual([255, 255, 255]);
+    expect(rgb(look.fill('select').uniforms['uBodyColor'].value)).toEqual([...HOLO_SELECT]);
+    expect(alpha('select')).toBeCloseTo(0.64, 5);
+    look.setDim(true);
+    // Others drop to about a third, a hovered one keeps the hover look on top.
+    expect(alpha('part')).toBeCloseTo(0.05, 5);
+    expect(look.line('part').uniforms['uAlpha'].value).toBeLessThan(0.42);
+    expect(rgb(look.line('hover').uniforms['uColor'].value)).toEqual([255, 255, 255]);
+    expect(rgb(look.fill('select').uniforms['uBodyColor'].value)).toEqual([...HOLO_SELECT]);
+    look.dispose();
+  });
+
+  it('eases hover in over HOLO_TWEEN_S, instantly with reduced motion', () => {
+    const look = new HoloLook(BASE, DRAKE, false, true);
+    look.tick(10);
+    look.easeIn('hover');
+    expect(look.tweening).toBe(true);
+    look.tick(10.001);
+    look.tick(10.001 + HOLO_TWEEN_S + 0.01);
+    expect(look.tweening).toBe(false);
+    expect(look.line('hover').uniforms['uColor'].value.r).toBe(1);
+    look.dispose();
+    const reduced = new HoloLook(BASE, DRAKE, true, true);
+    reduced.easeIn('select');
+    expect(reduced.tweening).toBe(false);
+    reduced.dispose();
   });
 });

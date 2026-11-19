@@ -1,3 +1,4 @@
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -80,7 +81,7 @@ export interface AnnotationResult {
 @Component({
   selector: 'sc-feedback-attachments',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective],
+  imports: [TranslatePipe, ScTooltipDirective, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (showRow()) {
@@ -284,12 +285,12 @@ export interface AnnotationResult {
                 <p class="lb-err" role="alert">{{ annotateError()! | translate }}</p>
               }
               <div class="lb-nav">
-                <button type="button" class="sc-btn micro" (click)="cancelAnnotate()">
+                <button type="button" scAction tier="secondary" (click)="cancelAnnotate()">
                   {{ 'feedbackAttachments.annotateCancel' | translate }}
                 </button>
                 <button
                   type="button"
-                  class="sc-btn sc-btn-primary micro"
+                  scAction tier="secondary"
                   (click)="saveAnnotation()"
                   [disabled]="shapes().length === 0 || savingAnnotation()">
                   {{ 'feedbackAttachments.annotateSave' | translate }}
@@ -298,7 +299,7 @@ export interface AnnotationResult {
             } @else {
               @if (editable()) {
                 <div class="lb-nav">
-                  <button type="button" class="sc-btn micro" (click)="startAnnotate()">
+                  <button type="button" scAction tier="secondary" (click)="startAnnotate()">
                     ✎ {{ 'feedbackAttachments.annotate' | translate }}
                   </button>
                 </div>
@@ -386,7 +387,7 @@ export interface AnnotationResult {
       cursor: zoom-in;
     }
     .att-thumb:hover { border-color: var(--sc-accent); }
-    .att-thumb:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .att-thumb:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .att-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     /* Placeholder while the signed URL loads: the empty thumbnail box itself. */
     .att-pending { display: block; width: 100%; height: 100%; background: var(--sc-bg-1); }
@@ -459,7 +460,7 @@ export interface AnnotationResult {
       cursor: pointer;
     }
     .att-remove:hover { background: rgba(0, 0, 0, 0.85); }
-    .att-remove:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .att-remove:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     .lb-backdrop {
       position: fixed; inset: 0; z-index: 1300;
@@ -553,7 +554,6 @@ export interface AnnotationResult {
     }
     .lb-step:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
     .lb-count { color: var(--sc-fg-2); font-size: max(0.75rem, var(--sc-fs-floor)); font-variant-numeric: tabular-nums; }
-    .sc-btn.micro { padding: 8px 14px; font-size: max(0.72rem, var(--sc-fs-floor)); letter-spacing: 0.04em; min-height: 48px; }
 
     /* A screenshot is the single most common thing in a feedback thread, so on a
        phone it gets the screen (admin feedback 3bc01a3d). Two things change:

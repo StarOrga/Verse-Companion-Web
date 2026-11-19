@@ -9,15 +9,20 @@ import { CodexSearchEngine, SEARCH_DEBOUNCE_MS } from './codex-search-engine';
 import {
   RECENT_SEARCHES_KEY,
   RECENT_SEARCHES_MAX,
+  SearchOption,
   groupCounts,
   groupHits,
   hitTitle,
   indexTarget,
   isLivery,
+  pageLocationOf,
   pushRecentSearch,
   readRecentSearches,
   targetUrl,
 } from './codex-search-model';
+import { FakeCall, fakeSupabase } from '../../testing/fake-supabase';
+import { AnalyticsService } from '../../core/analytics.service';
+import { MISS_DEBOUNCE_MS } from './search-signals.service';
 
 function hit(kind: PolySearchHit['kind'], slug: string, over: Partial<PolySearchHit> = {}): PolySearchHit {
   return {
@@ -131,13 +136,22 @@ describe('CodexSearchEngine', () => {
   let searchAll: Mock;
   let addedShipsMemo: Mock;
   let engine: CodexSearchEngine;
+  let calls: FakeCall[];
+  let track: Mock;
 
   beforeEach(() => {
     localStorage.removeItem(RECENT_SEARCHES_KEY);
     searchAll = vi.fn().mockName('searchAll');
     addedShipsMemo = vi.fn().mockName('addedShipsMemo').mockResolvedValue([]);
+    // Never the real client: these specs used to send search_log_miss('gladius')
+    // to the cloud project on every run — the 1292 "gladius" misses of 15.11. (B4.9).
+    const fake = fakeSupabase();
+    calls = fake.calls;
+    track = vi.fn().mockName('track');
     TestBed.configureTestingModule({
       providers: [
+        fake.provider,
+        { provide: AnalyticsService, useValue: { track } },
         CodexSearchEngine,
         provideRouter([]),
         provideTranslateService({ fallbackLang: 'en' }),
@@ -257,6 +271,28 @@ describe('CodexSearchEngine', () => {
     expect(engine.keyAction(key('Escape'))).toBe('escape');
   }));
 
+  it('a zero-hit search reaches PostHog once with its text and never writes to the database (B4.8/B4.9)', fakeAsync(() => {
+    searchAll.mockResolvedValue({ hits: [], totals: {} });
+    engine.searchFor('  Gladius ');
+    tick();
+    tick(MISS_DEBOUNCE_MS);
+    engine.searchFor('gladius');
+    tick();
+    tick(MISS_DEBOUNCE_MS);
+    const misses = track.mock.calls.filter(([name]) => name === 'search:miss_show');
+    expect(misses).toEqual([['search:miss_show', { area: 'all', term: 'gladius' }]]);
+    expect(calls.some((c) => c.op === 'rpc' && c.target === 'search_log_miss')).toBe(false);
+  }));
+
+  it('caps the reported search text at 80 characters', fakeAsync(() => {
+    searchAll.mockResolvedValue({ hits: [], totals: {} });
+    engine.searchFor('x'.repeat(200));
+    tick();
+    tick(MISS_DEBOUNCE_MS);
+    const miss = track.mock.calls.find(([name]) => name === 'search:miss_show');
+    expect((miss?.[1] as { term: string }).term.length).toBe(80);
+  }));
+
   it('Enter before the debounce fired runs the search instead of opening anything', fakeAsync(() => {
     searchAll.mockResolvedValue({ hits: [], totals: {} });
     engine.setInput('gladius');
@@ -309,4 +345,122 @@ describe('CodexSearchEngine', () => {
     expect(types).toContain('fresh');
     expect(types.filter((t) => t === 'category').length).toBeGreaterThan(3);
   }));
+
+  // Real hits carry the maker (codex-poly-search `withoutMaker`): without it "gladius" only
+  // word-matches "Aegis Gladius" (score 3) and the rule rightly hides the row as a weak match.
+  const AEGIS = { de: 'Aegis', en: 'Aegis', key: '' };
+  const gladius = (slug: string, name: string): PolySearchHit => hit('ship', slug, { nameLocalized: name, manufacturerName: AEGIS });
+  const familyRows = [
+    { classNameSlug: 'AEGS_Gladius', nameLocalized: 'Aegis Gladius' },
+    { classNameSlug: 'AEGS_Gladius_Dunlevy', nameLocalized: 'Aegis Gladius Dunlevy' },
+    { classNameSlug: 'AEGS_Gladius_PIR', nameLocalized: 'Aegis Gladius Pirate' },
+    { classNameSlug: 'AEGS_Gladius_Valiant', nameLocalized: 'Aegis Gladius Valiant' },
+  ];
+  type HitOption = Extract<SearchOption, { type: 'hit' }>;
+  const hitSlugs = (): string[] => engine.options().flatMap((o) => (o.type === 'hit' ? [o.hit.classNameSlug] : []));
+  const firstRow = (): HitOption | undefined => engine.options().find((o): o is HitOption => o.type === 'hit');
+  const linkIds = (): string[] => (firstRow()?.variants ?? []).map((v) => v.id);
+
+  it('Enter on the greyed current row only closes: no navigation, no recent search, counted as current', fakeAsync(() => {
+    const nav = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    engine.here.set(pageLocationOf('/codex/ship/AEGS_Gladius?view=holo'));
+    searchAll.mockResolvedValue({
+      hits: [gladius('AEGS_Gladius', 'Aegis Gladius'), gladius('AEGS_Gladius_Valiant', 'Aegis Gladius Valiant')],
+      totals: { ship: 2 },
+    });
+    engine.searchFor('gladius');
+    tick();
+
+    // ONE family row: Standard greyed at its rank, Valiant as a usable mini link.
+    expect(hitSlugs()).toEqual(['AEGS_Gladius']);
+    expect(linkIds()).toEqual(['ed-AEGS_Gladius_Valiant']);
+    const first = engine.enterOption()!;
+    expect(first).toEqual(expect.objectContaining({ type: 'hit', current: true }));
+    // The arrow keys reach it too.
+    engine.keyAction(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+    expect(engine.activeOption()).toBe(first);
+    expect(engine.open(first)).toBe('here');
+    expect(nav).not.toHaveBeenCalled();
+    expect(engine.recent()).toEqual([]);
+    expect(track).toHaveBeenCalledWith('search:result_open', expect.objectContaining({ current: true, variant: false, new_tab: false }));
+  }));
+
+  it('family matrix: Standard page / Valiant page / elsewhere x "gla", "gladius", "valiant", "gladius valiant"', fakeAsync(() => {
+    const codex = TestBed.inject(CodexService) as unknown as { listEditionSiblings?: Mock };
+    codex.listEditionSiblings = vi.fn().mockResolvedValue(familyRows);
+    const all = [
+      gladius('AEGS_Gladius', 'Aegis Gladius'), gladius('AEGS_Gladius_Dunlevy', 'Aegis Gladius Dunlevy'),
+      gladius('AEGS_Gladius_PIR', 'Aegis Gladius Pirate'), gladius('AEGS_Gladius_Valiant', 'Aegis Gladius Valiant'),
+    ];
+    const valiant = [gladius('AEGS_Gladius_Valiant', 'Aegis Gladius Valiant')];
+    const run = (term: string, hits: PolySearchHit[]): void => {
+      searchAll.mockResolvedValue({ hits, totals: { ship: hits.length } });
+      engine.searchFor(term);
+      tick();
+    };
+    const cases: [string, PolySearchHit[]][] = [['gla', all], ['gladius', all], ['valiant', valiant], ['gladius valiant', valiant]];
+
+    // Standard page: the ONE row stays greyed (the term named it or another model); other models stay links.
+    engine.here.set(pageLocationOf('/codex/ship/AEGS_Gladius'));
+    for (const [term, hits] of cases) {
+      run(term, hits);
+      expect(hitSlugs(), term).toEqual(['AEGS_Gladius']);
+      expect(firstRow()!.current, term).toBe(true);
+      expect(firstRow()!.variants!.every((v) => !v.current), term).toBe(true);
+    }
+    // "valiant": the matched model's link first and emphasised; the row itself still opens Standard.
+    run('valiant', valiant);
+    expect(linkIds()).toEqual(['ed-AEGS_Gladius_Valiant', 'ed-AEGS_Gladius_Dunlevy', 'ed-AEGS_Gladius_PIR']);
+    expect(firstRow()!.variants![0].emphasis).toBe(true);
+    expect(firstRow()!.variants![1].emphasis).toBeUndefined();
+    expect(firstRow()!.target.link).toEqual(['/codex', 'ship', 'AEGS_Gladius']);
+    expect(codex.listEditionSiblings).toHaveBeenCalledTimes(1); // one read per family prefix
+
+    // Valiant page: a normal row to Standard, the Valiant link marked (not a navigation).
+    engine.here.set(pageLocationOf('/codex/ship/AEGS_Gladius_Valiant'));
+    for (const [term, hits] of cases) {
+      run(term, hits);
+      expect(hitSlugs(), term).toEqual(['AEGS_Gladius']);
+      expect(firstRow()!.current, term).toBeUndefined();
+      expect(firstRow()!.variants!.filter((v) => v.current).map((v) => v.id), term).toEqual(['ed-AEGS_Gladius_Valiant']);
+    }
+
+    // Elsewhere: a normal row, nothing marked.
+    engine.here.set(pageLocationOf('/codex/index'));
+    for (const [term, hits] of cases) {
+      run(term, hits);
+      expect(hitSlugs(), term).toEqual(['AEGS_Gladius']);
+      expect(firstRow()!.current, term).toBeUndefined();
+      expect(firstRow()!.variants!.some((v) => v.current), term).toBe(false);
+    }
+  }));
+
+  it('a single-model ship gets no mini links and keeps the weak-match rule', fakeAsync(() => {
+    const anvil = { de: 'Anvil', en: 'Anvil', key: '' };
+    engine.here.set(pageLocationOf('/codex/ship/ANVL_Arrow'));
+    searchAll.mockResolvedValue({
+      hits: [
+        hit('ship', 'ANVL_Arrow', { nameLocalized: 'Anvil Arrow', manufacturerName: anvil }),
+        hit('ship', 'MISC_Arrowhead', { nameLocalized: 'MISC Arrowhead' }),
+      ],
+      totals: { ship: 2 },
+    });
+    engine.searchFor('arr');
+    tick();
+    expect(hitSlugs()).toEqual(['MISC_Arrowhead']);
+    engine.searchFor('arrow');
+    tick();
+    expect(hitSlugs()).toEqual(['ANVL_Arrow', 'MISC_Arrowhead']);
+    expect(firstRow()!.current).toBe(true);
+    expect(linkIds()).toEqual([]);
+  }));
+
+  // Not fakeAsync: Angular's router runs on native promises the fakeAsync zone cannot flush
+  // (unit-tests.md), so in the old spec the navigation never finished and NavigationEnd never fired.
+  it('a navigation moves the location the rule reads', async () => {
+    const router = TestBed.inject(Router);
+    router.resetConfig([{ path: '**', children: [] }]);
+    expect(await router.navigateByUrl('/codex/ship/AEGS_Gladius?v=c1')).toBe(true);
+    expect(engine.here()).toEqual({ path: '/codex/ship/aegs_gladius', query: { v: 'c1' } });
+  });
 });

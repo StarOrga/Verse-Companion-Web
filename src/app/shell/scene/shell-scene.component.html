@@ -1,17 +1,39 @@
 @if (on()) {
-  <div class="scene" [attr.data-scene]="scene()" [attr.data-mode]="mode()" [attr.data-from]="from()"
-       [attr.data-sub]="sub() ? '' : null" [attr.data-world]="world()" [attr.data-fade]="fadeTick() % 2"
-       [style.--scene-move]="moveMs() ? moveMs() + 'ms' : null" [style.--pose-sky]="pose().sky"
-       [style.--pose-sky-o]="pose().skyOpacity" [style.--pose-detail]="pose().detail" [style.--pose-ground]="pose().ground"
-       [style.--pose-plane]="pose().plane" [style.--pose-dim]="pose().dim">
-    <div class="sky" #sky><div class="neb"></div><div class="stars"></div><div class="stars near"></div></div>
-    <!-- Verse subpage: the page's planet glows faintly where its emblem stands. -->
-    <div class="halo"></div>
-    <!-- Codex: the holo glow the camera turns towards. -->
-    <div class="plane"><i></i></div>
-    <!-- HQ: the night surface the camera dives towards (dark ground, faint city lights). -->
-    <div class="detail"><i class="lights"></i></div>
-    <div class="ground"></div>
-    <div class="dim"></div>
+  <div class="scene" [attr.data-pose]="cam.target()" [attr.data-pushed]="cam.pushed() ? '' : null"
+       [attr.data-flying]="cam.flying() ? '' : null" [attr.data-carry]="carry() ? '' : null" [attr.data-live]="cam.planetState() === 'drawn' ? '' : null" [attr.data-fade]="cam.fadeTick() % 2"
+       [attr.data-ignite]="igniting() ? '' : null" [attr.data-intro]="intro()" [attr.data-warm]="warming() ? '' : null" [style]="vars()">
+    <!-- Far layer: the sky follows the camera damped and tilts least with scroll. -->
+    <div class="tilt far"><div class="sky" #sky><div class="neb"></div><div class="stars"></div><div class="stars near"></div></div></div>
+    <!-- The one planet, live (G1): the hub's WebGL planet, drawn exactly over the world's planet
+         (its anchor), so it rides every camera move. Loaded lazily; the CSS planet stands in until
+         it is drawn and wherever no WebGL comes. -->
+    @defer (on timer(700ms)) {
+      <div class="live-planet"><sc-briefing-planet [anchor]="planetEl" [paused]="planetParked()" (drawn)="onPlanet('drawn')" (unavailable)="onPlanet('failed')" /></div>
+      <!-- The hub's living planets in the scene's pieces (D8), and the body engine kept warm (D12). -->
+      <sc-scene-bodies [canvases]="{ news: newsGl, patches: patchesGl, gallery: galleryGl }" (warmed)="warming.set(false)" />
+    } @error {
+      <!-- The chunk did not load (#367): the CSS planet stays, exactly as without WebGL. -->
+      <sc-defer-error quiet source="shell.scene" (failed)="onPlanet('failed'); warming.set(false)" />
+    }
+    <!-- The one world (rounds/05 .d5-world): every page is a camera pose on it. -->
+    <div class="tilt near">
+      <div class="world" #world>
+        <div class="o planet" #planetEl><i class="night"></i><i class="lights"></i></div>
+        <!-- HQ: the outpost on the right limb (hangar + storage yard, sc-briefing-hq-base); the /verse HQ beacon stands over it. -->
+        <i class="o hqst"><sc-briefing-hq-base /></i>
+        <i class="o pl news"><canvas class="pl-gl" #newsGl></canvas></i>
+        <i class="o pl patches"><canvas class="pl-gl" #patchesGl></canvas></i>
+        <i class="o pl gallery"><canvas class="pl-gl" #galleryGl></canvas></i>
+        <i class="o starmap">
+          <!-- The reader's own constellation (the hub miniature's figure), never a made-up one; none before the map has loaded. -->
+          @if (starFig(); as f) { <sc-briefing-sky class="const" [points]="f.points" [lit]="f.lit" [litSet]="f.litSet" /> }
+          <i class="map"></i>
+        </i>
+        <!-- The admin station: the hub's own station drawing (sc-briefing-station), the mock's hi-station. -->
+        <i class="o station"><sc-briefing-station /></i>
+        <div class="o holo"><i></i></div>
+      </div>
+    </div>
+    <div class="veil"></div>
   </div>
 }

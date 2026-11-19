@@ -4,6 +4,7 @@ import { Params, Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { isPlainLeftClick } from '../../core/modified-click.util';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { comparePatchVersion } from '../codex-format';
 import { CATEGORY_GLYPH } from './codex-landing-holotable.component';
 import { LANDING_CATEGORIES, LandingCategory, LandingCodex, LandingCodexEntry, LandingItem } from './codex-landing-data.types';
@@ -84,8 +85,40 @@ interface RowView {
   entries: (LandingCodexEntry & { onTable: boolean })[];
 }
 
-/** One row of the wheel: an entry of any category, tagged with it; `head` = the header row of an earlier patch's group. */
-export type WheelEntry = LandingCodexEntry & { onTable: boolean; category: LandingCategory; head?: string };
+/**
+ * One row of the wheel: an entry of any category, tagged with it. `head` marks a header row:
+ * `headKind` 'patch' opens an earlier patch's group (`head` = its patch), 'category' a
+ * category's block of the current patch (`head` = the category).
+ */
+export type WheelEntry = LandingCodexEntry & { onTable: boolean; category: LandingCategory; head?: string; headKind?: 'patch' | 'category' };
+
+/**
+ * The current patch's rows grouped by category, `cats` in the given order, each block new
+ * before updated (#328). Every block but the active category's own (its tab already names
+ * it) opens with a header naming its category: a tab whose category brought nothing must
+ * not seem to hold the ships listed under it (feedback #360).
+ */
+export function groupByCategory(
+  cats: readonly { category: LandingCategory; entries: readonly (LandingCodexEntry & { onTable: boolean })[] }[],
+  active: LandingCategory | null,
+): WheelEntry[] {
+  return cats.flatMap((r) => {
+    const rows = r.entries.map((e) => ({ ...e, category: r.category }));
+    const ordered = [...rows.filter((e) => e.isNew), ...rows.filter((e) => !e.isNew)];
+    if (r.category === active || !ordered.length) return ordered;
+    const head: WheelEntry = {
+      id: `cat:${r.category}`,
+      name: r.category,
+      route: [],
+      announced: false,
+      onTable: false,
+      category: r.category,
+      head: r.category,
+      headKind: 'category',
+    };
+    return [head, ...ordered];
+  });
+}
 
 /**
  * The Codex list (round 4, "Zugewandte Kante"): a light pane, its glowing
@@ -107,7 +140,7 @@ export type WheelEntry = LandingCodexEntry & { onTable: boolean; category: Landi
 @Component({
   selector: 'sc-codex-landing-codex-pane',
   standalone: true,
-  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScTooltipDirective],
+  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScTooltipDirective, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.still]': 'still()', '[class.paused]': 'paused()' },
   template: `
@@ -148,10 +181,15 @@ export type WheelEntry = LandingCodexEntry & { onTable: boolean; category: Landi
       @if (entries().length) {
           <div class="open" #openList>
             <ul class="new">
-              @for (e of shown(); track e.head ? 'patch:' + e.head : e.category + ':' + e.id; let i = $index) {
+              @for (e of shown(); track e.head ? e.id : e.category + ':' + e.id; let i = $index) {
                 @if (e.head) {
-                  <li class="grp" [class.cut]="i >= visibleRows()" [attr.aria-hidden]="i >= visibleRows() ? 'true' : null">
-                    <span class="grp-nm">{{ 'codex.landing.codex.patchGroup' | translate: { patch: e.head } }}</span>
+                  <li class="grp" [class.grp-cat]="e.headKind === 'category'" [class.cut]="i >= visibleRows()" [attr.aria-hidden]="i >= visibleRows() ? 'true' : null">
+                    @if (e.headKind === 'category') {
+                      <i class="grp-gl" aria-hidden="true">{{ glyph(e.category) }}</i>
+                      <span class="grp-nm">{{ 'codex.landing.categories.' + e.category | translate }}</span>
+                    } @else {
+                      <span class="grp-nm">{{ 'codex.landing.codex.patchGroup' | translate: { patch: e.head } }}</span>
+                    }
                   </li>
                 } @else {
                 <li [class.table]="e.onTable" [class.own]="e.category === active()" [class.flash]="e.onTable && switchNo() > 0"
@@ -179,18 +217,21 @@ export type WheelEntry = LandingCodexEntry & { onTable: boolean; category: Landi
       }
       <div class="foot">
         @if (activeRow(); as r) {
-          @if (r.entries.length) {
-            <div class="more-slot">
-              @if (more() > 0) {
-                <a class="more" routerLink="/codex/index" [queryParams]="r.discover ? indexQuery(r.category) : searchQuery(r.category)">
-                  {{ (r.discover ? 'codex.landing.codex.moreDiscover' : 'codex.landing.codex.more') | translate: { count: more() } }} <i aria-hidden="true">↗</i>
-                </a>
-              }
-            </div>
-          }
-          <a class="all" routerLink="/codex/index" [queryParams]="indexQuery(r.category)">
-            {{ 'codex.landing.codex.all' | translate: { category: ('codex.landing.categories.' + r.category | translate) } }} <i aria-hidden="true">↗</i>
-          </a>
+          <!-- One group: "Alle …" is the pane's main step, "+ N neue & aktualisierte" its quieter cut of the same index. -->
+          <div class="cta">
+            <a class="all" scAction tier="secondary" routerLink="/codex/index" [queryParams]="indexQuery(r.category)">
+              {{ 'codex.landing.codex.all' | translate: { category: ('codex.landing.categories.' + r.category | translate) } }} <i aria-hidden="true">↗</i>
+            </a>
+            @if (r.entries.length) {
+              <div class="more-slot">
+                @if (more() > 0) {
+                  <a class="more" routerLink="/codex/index" [queryParams]="r.discover ? indexQuery(r.category) : searchQuery(r.category)">
+                    {{ (r.discover ? 'codex.landing.codex.moreDiscover' : 'codex.landing.codex.more') | translate: { count: more() } }} <i aria-hidden="true">↗</i>
+                  </a>
+                }
+              </div>
+            }
+          </div>
         }
         <a class="keys" routerLink="/codex/keybinds"><span aria-hidden="true">⌨</span> {{ 'codex.landing.rail.keybinds' | translate }}</a>
       </div>
@@ -211,7 +252,7 @@ export class CodexLandingCodexPaneComponent {
   readonly paused = input(false);
   readonly still = input(false);
   readonly cycle = input(0);
-  readonly cycleMs = input(8000);
+  readonly cycleMs = input(24000);
   readonly switchNo = input(0);
   readonly pick = output<number>();
   /** A plain left click on an entry: that entry goes onto this page's table and is held. */
@@ -257,11 +298,8 @@ export class CodexLandingCodexPaneComponent {
       const r = this.activeRow();
       return r ? r.entries.map((e) => ({ ...e, category: r.category })) : [];
     }
-    const all = [...real]
-      .sort((a, b) => order(a.category) - order(b.category))
-      .flatMap((r) => r.entries.map((e) => ({ ...e, category: r.category })));
-    // Every completely new entry first, then the updated ones; each group keeps the rotation order (#328).
-    const current = [...all.filter((e) => e.isNew), ...all.filter((e) => !e.isNew)];
+    // One block per category, the active one first, each new before updated (#328), under its name (#360).
+    const current = groupByCategory([...real].sort((a, b) => order(a.category) - order(b.category)), this.active());
     // The space the current patch leaves goes to the patches before it, each under its own header (#318).
     return withEarlierPatches<WheelEntry>(current, earlier, (patch, first) => ({
       id: `patch:${patch}`,
@@ -271,6 +309,7 @@ export class CodexLandingCodexPaneComponent {
       onTable: false,
       category: first.category,
       head: patch,
+      headKind: 'patch',
     }));
   });
   /** The earlier patches' entries of every category, newest patch first, each patch in rotation order. */
@@ -293,7 +332,7 @@ export class CodexLandingCodexPaneComponent {
   /** The current patch brought nothing, the list shows earlier patches only (title "zuletzt neu"). */
   readonly onlyEarlier = computed(() => {
     const list = this.entries();
-    return list.length > 0 && !!list[0].head;
+    return list.length > 0 && list[0].headKind === 'patch';
   });
   /** How many rows the pane's height holds; rows past it stay laid out but hidden, so the height never feeds back. */
   readonly capacity = signal(DEFAULT_ROWS);

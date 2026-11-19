@@ -1,3 +1,4 @@
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { ScConfirmService } from '../shared/dialog/sc-confirm.service';
@@ -5,13 +6,12 @@ import { SupabaseClientProvider } from '../core/supabase.client';
 import { useAutoRefresh } from '../core/auto-refresh';
 import { Role, RoleService } from '../auth/role.service';
 import { AuthService } from '../auth/auth.service';
-import { isDeleteBlocked, isProtectedAccount, isRoleChangeBlocked } from './admin-protection';
+import { isDeleteBlocked, isProtectedAccount, isRoleChangeBlocked, isUnapprovedAccount } from './admin-protection';
+import { AnalyticsService } from '../core/analytics.service';
 import { PeopleRow, mergePeopleRows } from './people-rows';
 import { ScDatePipe } from '../core/locale/sc-date.pipe';
 import { ScSelectComponent, ScSelectOption } from '../shared/sc-select.component';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
-import { SearchMissesComponent } from './search-misses.component';
-import { SilhouetteCoverageComponent } from './silhouette-coverage.component';
 // Pure function, no Angular dependency — the same "vor 3 Std." formatter the
 // news surfaces use (and the `news.relative.*` keys it is documented to read).
 import { relativeTime } from '../news/relative-time';
@@ -61,6 +61,13 @@ interface AdminUserRow extends SuspensionFields {
    * still parses; `lastSeenAt()` falls back to the sign-in.
    */
   last_seen_at?: string | null;
+  /**
+   * `profiles.is_approved` / `approved_at` — added to the RPC by the sign-up-gate
+   * migration. Optional so a client running against a pre-migration DB still
+   * parses; a missing value counts as approved (`isUnapprovedAccount`).
+   */
+  is_approved?: boolean | null;
+  approved_at?: string | null;
 }
 
 /**
@@ -148,7 +155,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
 @Component({
   selector: 'sc-admin',
   standalone: true,
-  imports: [ScDatePipe, ScSelectComponent, TranslatePipe, ScTooltipDirective, SilhouetteCoverageComponent, SearchMissesComponent],
+  imports: [ScDatePipe, ScSelectComponent, TranslatePipe, ScTooltipDirective, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
@@ -167,16 +174,92 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
         mail attached, because the last action was the admin's and the
         applicant has to be told.
       -->
-      <div class="sc-card requests-card">
-        <div class="invite-head">
-          <h2>
-            {{ 'admin.requests.title' | translate }}
-            @if (accessRequests().length > 0) {
-              <span class="req-count">{{ accessRequests().length }}</span>
-            }
-          </h2>
-          <p class="hint">{{ 'admin.requests.subtitle' | translate }}</p>
+      <!--
+        ONE access panel (concept 2026-11-15, P16): the open requests are the
+        panel's list, the invitation is its "+" and the share link its second
+        icon. The invite form used to be a card of its own below the reports.
+      -->
+      <div class="sc-card requests-card access-card">
+        <div class="access-head">
+          <div class="invite-head">
+            <h2>
+              {{ 'admin.requests.title' | translate }}
+              @if (accessRequests().length > 0) {
+                <span class="req-count">{{ accessRequests().length }}</span>
+              }
+            </h2>
+            <p class="hint">{{ 'admin.requests.subtitle' | translate }}</p>
+          </div>
+          <div class="access-tools">
+            <!-- C7: copy action, not a navigation — stays a <button>. -->
+            <button type="button" scAction tier="tertiary" class="share-btn"
+                    [attr.aria-label]="'admin.share.button' | translate"
+                    [scTooltip]="'admin.share.button' | translate" scTooltipTier="label"
+                    (click)="copyShareLink()">
+              <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+                <path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4" />
+              </svg>
+            </button>
+            <button type="button" scAction tier="tertiary" class="invite-toggle"
+                    [class.open]="inviteOpen()"
+                    [attr.aria-expanded]="inviteOpen()"
+                    aria-controls="admin-invite-form"
+                    [attr.aria-label]="'admin.register.open' | translate"
+                    [scTooltip]="'admin.register.open' | translate" scTooltipTier="label"
+                    (click)="inviteOpen.set(!inviteOpen())">
+              <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </button>
+          </div>
         </div>
+
+        @if (inviteOpen()) {
+          <div class="invite-pane">
+            <p class="hint">{{ 'admin.register.subtitle' | translate }}</p>
+            <form id="admin-invite-form" class="invite-form" (submit)="onRegisterSubmit($event)">
+              <input type="email"
+                     [value]="inviteEmail()"
+                     (input)="inviteEmail.set(asInput($event))"
+                     [placeholder]="'admin.register.emailPlaceholder' | translate"
+                     [attr.aria-label]="'admin.register.emailPlaceholder' | translate"
+                     [disabled]="inviteBusy()"
+                     required>
+              <sc-select
+                class="role-select"
+                [options]="roleOptions"
+                [allowEmpty]="false"
+                [value]="inviteRole()"
+                (valueChange)="inviteRole.set(asRole($event))"
+                [ariaLabel]="'admin.col.role' | translate"
+                [disabled]="inviteBusy()" />
+              <label class="send-invite">
+                <input type="checkbox"
+                       [checked]="sendInvite()"
+                       (change)="sendInvite.set(asChecked($event))"
+                       [disabled]="inviteBusy()">
+                {{ 'admin.register.sendInvite' | translate }}
+              </label>
+              <button type="submit"
+                      scAction tier="primary"
+                      [disabled]="inviteBusy() || !inviteEmail().includes('@')">
+                {{ inviteBusy() ? ('admin.register.sending' | translate) : ('admin.register.send' | translate) }}
+              </button>
+            </form>
+          </div>
+        }
+        @if (inviteMsg(); as m) {
+          <div class="invite-msg" [class.error]="m.kind === 'error'" [class.success]="m.kind === 'success'">
+            {{ m.key | translate: m.params }}
+          </div>
+        }
+        @if (shareMsg(); as m) {
+          <div class="invite-msg" [class.error]="m.kind === 'error'" [class.success]="m.kind === 'success'" role="status">
+            {{ m.text }}
+          </div>
+        }
+
 
         @if (accessErrorMsg()) {
           <div class="err">
@@ -214,11 +297,11 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                     (valueChange)="setRequestRole(r.id, asRole($event))"
                     [ariaLabel]="'admin.col.role' | translate"
                     [disabled]="accessBusy()" />
-                  <button type="button" class="sc-btn sc-btn-primary"
+                  <button type="button" scAction tier="secondary"
                           (click)="acceptRequest(r)" [disabled]="accessBusy()">
                     {{ 'admin.requests.accept' | translate }}
                   </button>
-                  <button type="button" class="sc-btn req-decline"
+                  <button type="button" scAction tier="secondary" tone="danger"
                           (click)="declineRequest(r)" [disabled]="accessBusy()">
                     {{ 'admin.requests.decline' | translate }}
                   </button>
@@ -312,31 +395,31 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
 
                   <div class="mod-actions">
                     @if (isUserSuspended(f.user)) {
-                      <button type="button" class="sc-btn micro"
+                      <button type="button" scAction tier="secondary"
                               [disabled]="moderation.busy()" (click)="unsuspend(f.user)">
                         {{ 'admin.moderation.unsuspend' | translate }}
                       </button>
                     } @else {
                       <span class="tip-wrap" [scTooltip]="moderationLockReason(f.user)" scTooltipTier="label">
-                        <button type="button" class="sc-btn micro"
+                        <button type="button" scAction tier="secondary"
                                 [disabled]="moderation.busy() || !canModerate(f.user)"
                                 (click)="openModeration(f.user.id, 'warn')">
                           {{ 'admin.moderation.warn' | translate }}
                         </button>
                       </span>
                       <span class="tip-wrap" [scTooltip]="moderationLockReason(f.user)" scTooltipTier="label">
-                        <button type="button" class="sc-btn micro danger"
+                        <button type="button" scAction tier="secondary" tone="danger"
                                 [disabled]="moderation.busy() || !canModerate(f.user)"
                                 (click)="openModeration(f.user.id, 'suspend')">
                           {{ 'admin.moderation.suspend' | translate }}
                         </button>
                       </span>
                     }
-                    <button type="button" class="sc-btn micro"
+                    <button type="button" scAction tier="secondary"
                             [disabled]="moderation.busy()" (click)="resolveReports(f.user, false)">
                       {{ 'admin.moderation.markReviewed' | translate }}
                     </button>
-                    <button type="button" class="sc-btn micro ghost"
+                    <button type="button" scAction tier="secondary"
                             [disabled]="moderation.busy()" (click)="resolveReports(f.user, true)">
                       {{ 'admin.moderation.dismiss' | translate }}
                     </button>
@@ -376,12 +459,12 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                         <p class="err">{{ key | translate }}</p>
                       }
                       <div class="mod-form-actions">
-                        <button type="button" class="sc-btn micro primary"
+                        <button type="button" scAction tier="secondary"
                                 [disabled]="moderation.busy() || !modReasonValid()"
                                 (click)="submitModeration(f.user)">
                           {{ (modMode() === 'warn' ? 'admin.moderation.confirmWarn' : 'admin.moderation.confirmSuspend') | translate }}
                         </button>
-                        <button type="button" class="sc-btn micro ghost" (click)="cancelModeration()">
+                        <button type="button" scAction tier="secondary" (click)="cancelModeration()">
                           {{ 'admin.moderation.cancel' | translate }}
                         </button>
                       </div>
@@ -397,64 +480,6 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
         </div>
       }
 
-      <div class="sc-card invite-card">
-        <div class="invite-head">
-          <h2>{{ 'admin.register.title' | translate }}</h2>
-          <p class="hint">{{ 'admin.register.subtitle' | translate }}</p>
-        </div>
-        <form class="invite-form" (submit)="onRegisterSubmit($event)">
-          <input type="email"
-                 [value]="inviteEmail()"
-                 (input)="inviteEmail.set(asInput($event))"
-                 [placeholder]="'admin.register.emailPlaceholder' | translate"
-                 [attr.aria-label]="'admin.register.emailPlaceholder' | translate"
-                 [disabled]="inviteBusy()"
-                 required>
-          <sc-select
-            class="role-select"
-            [options]="roleOptions"
-            [allowEmpty]="false"
-            [value]="inviteRole()"
-            (valueChange)="inviteRole.set(asRole($event))"
-            [ariaLabel]="'admin.col.role' | translate"
-            [disabled]="inviteBusy()" />
-          <label class="send-invite">
-            <input type="checkbox"
-                   [checked]="sendInvite()"
-                   (change)="sendInvite.set(asChecked($event))"
-                   [disabled]="inviteBusy()">
-            {{ 'admin.register.sendInvite' | translate }}
-          </label>
-          <button type="submit"
-                  class="sc-btn sc-btn-primary"
-                  [disabled]="inviteBusy() || !inviteEmail().includes('@')">
-            {{ inviteBusy() ? ('admin.register.sending' | translate) : ('admin.register.send' | translate) }}
-          </button>
-          <!-- C7: copy action, not a navigation — stays a <button>. -->
-          <button type="button"
-                  class="sc-btn share-btn"
-                  (click)="copyShareLink()">
-            {{ 'admin.share.button' | translate }}
-          </button>
-        </form>
-        @if (inviteMsg(); as m) {
-          <div class="invite-msg" [class.error]="m.kind === 'error'" [class.success]="m.kind === 'success'">
-            {{ m.key | translate: m.params }}
-          </div>
-        }
-        @if (shareMsg(); as m) {
-          <div class="invite-msg" [class.error]="m.kind === 'error'" [class.success]="m.kind === 'success'" role="status">
-            {{ m.text }}
-          </div>
-        }
-      </div>
-
-      <!-- Holotable silhouette coverage of the current build (#647). -->
-      <sc-silhouette-coverage />
-
-      <!-- Searches without a hit, counted anonymously (search concept 2026-11-02, C10). -->
-      <sc-search-misses />
-
       <!--
         ONE people list (feedback 5e2facd9). The allowlist used to have its own
         card above this table, which meant every invited address that had since
@@ -464,6 +489,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
         on that address), carrying its own timer and a withdraw action, and it
         disappears from the list the moment it turns into an account row.
       -->
+      <div class="sc-card people-card">
       <div class="invite-head people-head">
         <h2>{{ 'admin.people.title' | translate }}</h2>
         <p class="hint">{{ 'admin.people.subtitle' | translate }}</p>
@@ -481,11 +507,11 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
       }
 
       @if (peopleLoading()) {
-        <div class="sc-card empty">{{ 'admin.loading' | translate }}</div>
+        <div class="empty">{{ 'admin.loading' | translate }}</div>
       } @else if (people().length === 0) {
-        <div class="sc-card empty">—</div>
+        <div class="empty">—</div>
       } @else {
-        <div class="filter-bar sc-card">
+        <div class="filter-bar">
           <input type="search"
                  class="filter-search"
                  [value]="search()"
@@ -503,13 +529,24 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
             {{ 'admin.filter.count' | translate: { shown: filteredSortedPeople().length, total: people().length } }}
           </span>
           @if (filtersActive()) {
-            <button type="button" class="sc-btn micro" (click)="clearFilters()">
+            <button type="button" scAction tier="secondary" (click)="clearFilters()">
               {{ 'admin.filter.clear' | translate }}
             </button>
           }
         </div>
 
-        <div class="sc-card table-scroll">
+        @if (unapprovedCount() > 0) {
+          <p class="unapproved-note">
+            {{ (unapprovedCount() === 1 ? 'admin.people.unapprovedOne' : 'admin.people.unapprovedMany') | translate: { n: unapprovedCount() } }}
+          </p>
+        }
+        @if (approveMsg(); as m) {
+          <div class="invite-msg" [class.error]="m.kind === 'error'" [class.success]="m.kind === 'success'" role="status">
+            {{ m.key | translate: m.params }}
+          </div>
+        }
+
+        <div class="table-scroll">
         <table class="table">
           <thead>
             <tr>
@@ -571,6 +608,11 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                       {{ 'admin.protected' | translate }}
                     </span>
                   }
+                  @if (isUnapproved(u)) {
+                    <span class="role-pill pending" tabindex="0" [scTooltip]="'admin.people.unapprovedTip' | translate">
+                      {{ 'admin.people.unapproved' | translate }}
+                    </span>
+                  }
                   @if (isUserSuspended(u)) {
                     <span class="role-pill suspended" [attr.tabindex]="u.suspension_reason ? 0 : null" [scTooltip]="u.suspension_reason ?? ''" scTooltipTier="label">
                       {{ 'admin.moderation.suspendedPill' | translate }}
@@ -587,27 +629,32 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                 <td class="c-stat" [attr.data-label]="'admin.col.since' | translate">{{ u.created_at | scDate }}</td>
                 <td class="c-stat" [attr.data-label]="'admin.col.lastSeen' | translate">{{ lastSeenAt(u) ? (lastSeenAt(u)! | scDate: 'datetime') : '—' }}</td>
                 <td class="actions">
-                  @if (u.role !== 'collaborator') {
+                  @if (isUnapproved(u)) {
+                    <button scAction tier="secondary" (click)="approveAccount(u)" [disabled]="busy()">
+                      {{ 'admin.people.approve' | translate }}
+                    </button>
+                  }
+                  @if (!isUnapproved(u) && u.role !== 'collaborator') {
                     <span class="tip-wrap" [scTooltip]="roleLockReason(u, 'collaborator')" scTooltipTier="label">
-                      <button class="sc-btn micro"
+                      <button scAction tier="secondary"
                               (click)="setRole(u.id, 'collaborator')"
                               [disabled]="busy() || roleLocked(u, 'collaborator')">
                         {{ 'admin.actions.promoteCollab' | translate }}
                       </button>
                     </span>
                   }
-                  @if (u.role !== 'admin') {
+                  @if (!isUnapproved(u) && u.role !== 'admin') {
                     <span class="tip-wrap" [scTooltip]="roleLockReason(u, 'admin')" scTooltipTier="label">
-                      <button class="sc-btn micro"
+                      <button scAction tier="secondary"
                               (click)="setRole(u.id, 'admin')"
                               [disabled]="busy() || roleLocked(u, 'admin')">
                         {{ 'admin.actions.promoteAdmin' | translate }}
                       </button>
                     </span>
                   }
-                  @if (u.role !== 'viewer') {
+                  @if (!isUnapproved(u) && u.role !== 'viewer') {
                     <span class="tip-wrap" [scTooltip]="roleLockReason(u, 'viewer')" scTooltipTier="label">
-                      <button class="sc-btn micro"
+                      <button scAction tier="secondary"
                               (click)="setRole(u.id, 'viewer')"
                               [disabled]="busy() || roleLocked(u, 'viewer')">
                         {{ 'admin.actions.demoteViewer' | translate }}
@@ -620,7 +667,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                        empty once they are closed. Suspending itself stays up
                        there, where the evidence is. -->
                   @if (isUserSuspended(u)) {
-                    <button class="sc-btn micro"
+                    <button scAction tier="secondary"
                             (click)="unsuspend(u)"
                             [disabled]="moderation.busy()"
                             [scTooltip]="u.suspension_reason ?? ''"
@@ -629,7 +676,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                     </button>
                   }
                   <span class="tip-wrap" [scTooltip]="deleteLockReason(u)" scTooltipTier="label">
-                    <button class="sc-btn micro danger"
+                    <button scAction tier="secondary" tone="danger"
                             (click)="deleteUser(u)"
                             [disabled]="busy() || deleteLocked(u)">
                       {{ (u.id === selfId() ? 'admin.actions.leaveSelf' : 'admin.actions.delete') | translate }}
@@ -667,7 +714,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
                 <td class="actions">
                   <!-- The old card said it in a subline nobody re-read; here the
                        promise sits on the button that needs it. -->
-                  <button type="button" class="sc-btn micro danger"
+                  <button type="button" scAction tier="secondary" tone="danger"
                           (click)="withdrawInvite(inv)"
                           [scTooltip]="'admin.people.withdrawTitle' | translate"
                           [disabled]="allowlistBusy()">
@@ -685,6 +732,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
         </table>
         </div>
       }
+      </div>
     </section>
   `,
   styles: [`
@@ -726,7 +774,6 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
     .filter-search:focus {
       outline: none;
       border-color: var(--sc-accent);
-      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.25);
     }
     .filter-count {
       color: var(--sc-fg-2);
@@ -825,6 +872,7 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
     }
     /* The pill is the row's only explanation of what "Eingeladen" means. */
     .invited-row .role-pill.pending { cursor: help; }
+    .unapproved-note { margin: 0 0 8px; color: var(--sc-fg-2); font-size: var(--sc-fs-sm, 0.85rem); }
     .actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
     /* Phone: one card per person instead of a 900px row read by scrolling
@@ -928,8 +976,6 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
     .mod-form .hint.small { margin: 0 0 10px; font-size: max(0.72rem, var(--sc-fs-floor)); }
     .mod-form .err { margin-bottom: 10px; font-size: 0.85rem; }
     .mod-form-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .sc-btn.micro.primary { background: color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-    .sc-btn.micro.ghost { border-color: var(--sc-border); color: var(--sc-fg-1); }
     .mod-flash {
       margin: 12px 0 0;
       padding: 8px 12px;
@@ -940,38 +986,34 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
       font-size: 0.85rem;
     }
 
-    /* 48px, not 44: two overlapping scale(0.994) shell animations shave a
-       hair off every measured box, so a 44px target measures 43. */
-    @media (pointer: coarse) {
-      .mod-actions .sc-btn, .mod-form-actions .sc-btn { min-height: 48px; }
-    }
     @media (max-width: 560px) {
-      .mod-actions .sc-btn, .mod-form-actions .sc-btn { flex: 1 1 100%; }
+      .mod-actions .sc-action, .mod-form-actions .sc-action { flex: 1 1 100%; }
     }
     .muted-zero { color: var(--sc-fg-2); }
 
-    .sc-btn.micro {
-      padding: 4px 10px;
-      font-size: max(0.7rem, var(--sc-fs-floor));
-      letter-spacing: 0.04em;
+
+    /* Access panel (P16): requests + the invitation's "+" and share icons. */
+    .access-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .access-tools { display: flex; gap: 6px; flex: none; }
+    .invite-toggle .sc-action-icon { transition: transform 0.18s ease; }
+    .invite-toggle.open .sc-action-icon { transform: rotate(45deg); }
+    .invite-pane {
+      display: flex; flex-direction: column; gap: 10px;
+      margin-top: 12px; padding: 12px 14px;
+      border: 1px solid var(--sc-border); border-radius: 4px;
+      background: rgba(255, 255, 255, 0.02);
     }
-    .sc-btn.micro.danger {
-      color: var(--sc-danger);
-      border-color: var(--sc-danger);
-    }
-    .sc-btn.micro.danger:hover:not(:disabled) {
-      background: var(--sc-danger);
-      color: var(--sc-bg-0);
+    .invite-pane .hint { margin: 0; }
+    .access-card .invite-msg { margin-top: 10px; }
+    @media (prefers-reduced-motion: reduce) {
+      .invite-toggle .sc-action-icon { transition: none; }
     }
 
-    .invite-card {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    /* The people list has no card of its own (filter bar + table each are one),
-       so its heading sits directly on the page background. */
-    .people-head { margin-top: 4px; }
+    /* People: ONE panel — head, search/filter bar and the table. */
+    .people-card { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+    .people-head { padding: 16px 18px 6px; }
+    .people-card .filter-bar { border-bottom: 1px solid var(--sc-border); }
+    .people-card > .err { margin: 0 14px 10px; }
     /* Access requests (feedback 56f328ea) */
     .req-count {
       display: inline-block;
@@ -1027,8 +1069,6 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
       .req-actions { align-items: stretch; }
       sc-select.role-select { flex: 1 1 100%; width: auto; }
     }
-    .sc-btn.req-decline { color: var(--sc-danger); border-color: var(--sc-danger); }
-    .sc-btn.req-decline:hover:not(:disabled) { background: var(--sc-danger); color: var(--sc-bg-0); }
 
     .invite-head h2 { margin: 0 0 4px; font-size: 1rem; }
     .invite-head .hint { margin: 0; }
@@ -1059,7 +1099,6 @@ const ROLE_RANK: Record<Role, number> = { admin: 3, collaborator: 2, viewer: 1 }
     .invite-form input[type=email]:focus {
       outline: none;
       border-color: var(--sc-accent);
-      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.25);
     }
     .invite-form input[type=email]:disabled {
       opacity: 0.4;
@@ -1094,6 +1133,7 @@ export class AdminComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly translate = inject(TranslateService);
   private readonly dialog = inject(ScConfirmService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly users = signal<AdminUserRow[]>([]);
   readonly busy = signal(false);
@@ -1279,8 +1319,12 @@ export class AdminComponent implements OnInit {
   readonly inviteRole = signal<Role>('collaborator');
   readonly sendInvite = signal(false);
   readonly inviteBusy = signal(false);
+  /** The invite form behind the access panel's "+" (P16); closed until asked for. */
+  readonly inviteOpen = signal(false);
   /** i18n key (+ params), never raw text. */
   readonly inviteMsg = signal<AdminFlash | null>(null);
+  /** Outcome of "Freischalten" on a people-list row. */
+  readonly approveMsg = signal<AdminFlash | null>(null);
 
   // C7 — share-link copy state (separate toast so it doesn't clash with the
   // register form's own success/error message).
@@ -1788,6 +1832,45 @@ export class AdminComponent implements OnInit {
       await this.auth.signOut();
       return;
     }
+    await this.refresh();
+  }
+
+  isUnapproved(u: AdminUserRow): boolean {
+    return isUnapprovedAccount(u);
+  }
+
+  readonly unapprovedCount = computed(() => this.users().filter((u) => isUnapprovedAccount(u)).length);
+
+  /**
+   * Approves an account that signed up on its own and was never approved — the
+   * same `invite-user` call the register form makes, without a mail.
+   */
+  async approveAccount(u: AdminUserRow): Promise<void> {
+    const ok = await this.dialog.confirm({
+      titleKey: 'admin.people.approveTitle',
+      messageKey: 'admin.people.approveConfirm',
+      params: { email: u.email },
+      confirmKey: 'admin.people.approve',
+    });
+    if (!ok) return;
+    this.busy.set(true);
+    this.approveMsg.set(null);
+    const { data, error } = await this.sb.client.functions.invoke('invite-user', {
+      // Always as viewer: an unapproved row's role column was never a decision
+      // anybody made for an approved account. A higher role is a second, explicit step.
+      body: { email: u.email, role: 'viewer', sendInvite: false },
+    });
+    const payload = (data ?? {}) as RegisterResponse;
+    if (error || payload.error || payload.status !== 'approved_existing') {
+      const code = await readEdgeErrorCode(error, data);
+      logWarn('admin', 'approve account failed', { code, error, payload });
+      this.approveMsg.set({ kind: 'error', key: inviteErrorKey(code) });
+      this.busy.set(false);
+      return;
+    }
+    this.analytics.track('admin:user_accept', { source: 'people_list' });
+    this.approveMsg.set({ kind: 'success', key: 'admin.register.status.approved_existing', params: { email: u.email } });
+    this.busy.set(false);
     await this.refresh();
   }
 

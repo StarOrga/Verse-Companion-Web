@@ -14,6 +14,8 @@ import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
+import { ScPopupMotionDirective } from '../shared/popup-motion/sc-popup-motion.directive';
 import { HeaderPopoutService } from './header-popout.service';
 import { environment } from '../../environments/environment';
 import { RoleService } from '../auth/role.service';
@@ -44,7 +46,7 @@ export interface AppEntry {
   id: 'scc' | 'starscape' | 'uploader';
   nameKey: string;
   descKey: string;
-  /** Collaborator-gated app: head painted in the hot accent (no badge, the colour is the signal). */
+  /** Collaborator-gated app: head painted in the collab accent (no badge, the colour is the signal). */
   elevated: boolean;
   /** The stable download, or null when no release resolved (uploader -> its page). */
   href: string | null;
@@ -54,7 +56,7 @@ export interface AppEntry {
 /**
  * `<sc-apps-menu>` - the "Apps" menu next to the avatar (main header and docked
  * subheader). Lists the public desktop apps (SCC App, Starscape) and, for
- * collaborators and admins, the Data Uploader in the hot accent, labelled in words.
+ * collaborators and admins, the Data Uploader in the collab accent (the colour is the signal).
  * Each entry is a real anchor to the download; version and size are read lazily
  * from the release resolvers on first open. Renders nothing on a device that
  * cannot install a desktop app (same rule as the download menu).
@@ -62,7 +64,7 @@ export interface AppEntry {
 @Component({
   selector: 'sc-apps-menu',
   standalone: true,
-  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScTooltipDirective],
+  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScTooltipDirective, ScPopupMotionDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (offered()) {
@@ -77,7 +79,10 @@ export interface AppEntry {
           </svg>
         </button>
         @if (open()) {
-          <div class="pop" [id]="panelId" role="group" [attr.aria-label]="'appsMenu.aria' | translate">
+          <div class="pop" [id]="panelId" scPopupMotion scPopupMotionItems=".entry" scPopupMotionOrigin="tr" animate.leave="pm-out">
+          <sc-popup kind="menu" [backdrop]="false" [title]="'appsMenu.aria' | translate" (closed)="onPopupClosed()">
+            <!-- No rail icon: at its trigger the menu carries only the accent edge, like the account menu. -->
+            <div class="pbody">
             @for (app of apps(); track app.id) {
               @if (app.href) {
                 <a class="entry" [class.elevated]="app.elevated" [href]="app.href" rel="noopener noreferrer" download (click)="onPick($event)">
@@ -91,6 +96,8 @@ export interface AppEntry {
             }
             <!-- Stable only: beta/alpha are picked inside each app after sign-in. -->
             <p class="hint">{{ 'appsMenu.footer' | translate }}</p>
+            </div>
+          </sc-popup>
           </div>
         }
       </div>
@@ -98,9 +105,9 @@ export interface AppEntry {
     <ng-template #appBody let-app>
       <span class="ico" aria-hidden="true">
         @switch (app.id) {
-          @case ('scc') { <img src="icons/brand/scc-mark.svg" alt="" width="22" height="22" /> }
-          @case ('starscape') { <img src="icons/brand/starscape-tray.png" alt="" width="28" height="28" /> }
-          @default { <img src="icons/brand/uploader-tray.png" alt="" width="28" height="28" /> }
+          @case ('scc') { <img src="icons/brand/vc-mark.svg" alt="" width="22" height="22" /> }
+          @case ('starscape') { <img src="icons/brand/starscape-tray-48.png" alt="" width="28" height="28" /> }
+          @default { <img src="icons/brand/uploader-tray-48.png" alt="" width="28" height="28" /> }
         }
       </span>
       <span class="txt">
@@ -121,14 +128,11 @@ export interface AppEntry {
     .trigger svg { width: 22px; height: 22px; }
     .trigger:hover, .trigger.on { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
     .trigger.on { box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-accent) 18%, transparent); }
-    .trigger:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-    .pop {
-      position: absolute; top: calc(100% + 8px); right: 0; z-index: 60;
-      /* 22rem: the chosen two-line copy per app fits at this width (20rem wrapped it to three). */
-      width: min(22rem, calc(100vw - 32px)); display: flex; flex-direction: column; gap: 2px;
-      padding: 6px; border-radius: 12px; border: 1px solid var(--sc-border);
-      background: var(--sc-bg-1); box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
-    }
+    .trigger:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    /* Only the position at the trigger; frame, width, rail and edge come from <sc-popup kind="menu">. */
+    .pop { position: absolute; top: calc(100% + 8px); right: 0; z-index: 60; }
+    .pop sc-popup { display: block; }
+    .pbody { display: flex; flex-direction: column; gap: 2px; }
     .entry {
       display: flex; gap: 12px; align-items: flex-start; padding: 10px; border-radius: 8px;
       color: var(--sc-fg-0); text-decoration: none; min-height: 48px;
@@ -143,10 +147,10 @@ export interface AppEntry {
     .txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
     .txt strong { font-family: var(--sc-font-display); font-size: 0.86rem; font-weight: 600; }
     .desc {
-      font-size: 0.76rem; line-height: 1.35; color: var(--sc-fg-2);
+      font-size: max(0.76rem, var(--sc-fs-floor)); line-height: 1.35; color: var(--sc-fg-2);
       display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
     }
-    .meta { font-size: 0.72rem; color: var(--sc-fg-2); font-variant-numeric: tabular-nums; }
+    .meta { font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2); font-variant-numeric: tabular-nums; }
     .entry.elevated { margin-top: 4px; border-top: 1px solid color-mix(in srgb, var(--sc-accent-collab) 40%, transparent); border-radius: 0 0 8px 8px; }
     .entry.elevated .ico { color: var(--sc-accent-collab); background: color-mix(in srgb, var(--sc-accent-collab) 14%, transparent); }
     .entry.elevated strong { color: var(--sc-accent-collab); }
@@ -154,7 +158,7 @@ export interface AppEntry {
     .entry.elevated:focus-visible { box-shadow: inset 0 0 0 2px var(--sc-accent-collab); }
     .hint {
       margin: 4px 0 0; padding: 8px 10px 4px; border-top: 1px solid var(--sc-border);
-      font-size: 0.72rem; line-height: 1.4; color: var(--sc-fg-2);
+      font-size: max(0.72rem, var(--sc-fs-floor)); line-height: 1.4; color: var(--sc-fg-2);
     }
     /* Phones: the Apps button leaves the header (desktop apps are not installable there). */
     @media (max-width: 749px) { :host { display: none; } }
@@ -289,8 +293,9 @@ export class AppsMenuComponent {
     if (this.open() && !this.host.nativeElement.contains(ev.target as Node)) this.closeMenu();
   }
 
+  /** Escape from anywhere (and from inside the scaffold's frame): fold away, focus back on the trigger. */
   @HostListener('document:keydown.escape')
-  onEscape(): void {
+  onPopupClosed(): void {
     if (!this.open()) return;
     this.closeMenu();
     this.trigger()?.nativeElement.focus();

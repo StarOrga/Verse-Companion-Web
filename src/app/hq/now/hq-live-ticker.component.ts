@@ -3,7 +3,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { DesktopCapabilityService } from '../../core/desktop-capability.service';
 import { ScPopoverDismissDirective } from '../../shared/popover/sc-popover-dismiss.directive';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
-import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { HqAppLaunchComponent } from '../hq-app-launch.component';
 import type { HqPageId } from '../hq-routes';
 import { HqAppConnectionService } from './hq-app-connection.service';
@@ -24,21 +24,15 @@ const TICK_MS = 30_000;
 @Component({
   selector: 'sc-hq-live-ticker',
   standalone: true,
-  imports: [TranslatePipe, ScPopoverDismissDirective, ScTooltipDirective, ScActionDirective, HqAppLaunchComponent],
+  imports: [TranslatePipe, ScPopoverDismissDirective, ScTooltipDirective, ScPopupComponent, HqAppLaunchComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (visible()) {
       @let st = status();
       @let pg = page()!;
-      <div class="dock" [class.above-footer]="pg === 'statistik'" [attr.data-state]="st" [scPopoverDismiss]="open()" (dismissed)="close()">
-        @if (open()) {
-          <div class="aussicht" id="hq-app-aussicht" role="region" [attr.aria-label]="'hq.appStatus.aussicht.aria' | translate">
-            <div class="a-head">
-              <span class="a-k">{{ 'hq.appStatus.aussicht.title' | translate }}</span>
-              <button type="button" scAction tier="tertiary" class="a-x" [attr.aria-label]="'hq.appStatus.close' | translate" [scTooltip]="'hq.appStatus.close' | translate" (click)="close()">
-                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-              </button>
-            </div>
+      <div class="dock" [class.above-footer]="pg === 'statistik'" [attr.data-state]="st" [scPopoverDismiss]="shown()" (dismissed)="close()">
+        @if (shown()) {
+          <sc-popup class="aussicht" id="hq-app-aussicht" kind="panel" [backdrop]="false" [title]="'hq.appStatus.aussicht.title' | translate" (closed)="close()">
             <p class="a-text">{{ 'hq.appStatus.aussicht.' + pg | translate }}</p>
             @if (pg === 'jetzt') {
               <ul class="a-list">
@@ -47,10 +41,10 @@ const TICK_MS = 30_000;
                 <li>{{ 'hq.appStatus.aussicht.jetztList.e3' | translate }}</li>
               </ul>
             }
-          </div>
+          </sc-popup>
         }
         <div class="chip">
-          <button type="button" class="face" [attr.aria-controls]="open() ? 'hq-app-aussicht' : null" [attr.aria-expanded]="open()" [scTooltip]="'hq.appStatus.aussicht.toggle' | translate" (click)="toggle()">
+          <button type="button" class="face" [attr.aria-controls]="shown() ? 'hq-app-aussicht' : null" [attr.aria-expanded]="shown()" [scTooltip]="'hq.appStatus.aussicht.toggle' | translate" (click)="toggle()">
             <i class="mark" aria-hidden="true"></i>
             <b class="state">{{ 'hq.appStatus.state.' + st | translate }}</b>
             @switch (st) {
@@ -112,8 +106,7 @@ const TICK_MS = 30_000;
 
       .chip {
         display: inline-flex; align-items: center; gap: 2px; box-sizing: border-box; height: var(--_h); max-width: 100%; padding: 0 3px 0 0;
-        border: 1px solid var(--_ring); border-radius: 999px; background: color-mix(in srgb, var(--sc-bg-0) 88%, transparent);
-        -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+        border: 1px solid var(--_ring); border-radius: 999px; background: color-mix(in srgb, var(--sc-bg-0) 93%, transparent);
       }
       .face {
         display: inline-flex; align-items: center; gap: 8px; min-width: 0; height: 100%; padding: 0 10px; margin: 0;
@@ -121,7 +114,7 @@ const TICK_MS = 30_000;
         font: inherit; font-size: max(0.8rem, var(--sc-fs-floor)); color: var(--sc-fg-1); white-space: nowrap;
       }
       .face:hover .state { text-decoration: underline; text-underline-offset: 3px; }
-      .face:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+      .face:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .mark { flex: none; box-sizing: border-box; width: 12px; height: 12px; border-radius: 50%; }
       .state { flex: none; font-weight: 600; color: var(--_tone); }
       em { font-style: normal; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
@@ -139,20 +132,13 @@ const TICK_MS = 30_000;
       [data-state='tracking'] { --_tone: var(--sc-success); --_ring: color-mix(in srgb, var(--sc-success) 38%, transparent); }
       [data-state='tracking'] .mark { width: 10px; height: 10px; margin: 1px; background: var(--sc-success); box-shadow: 0 0 8px var(--sc-success); }
 
+      /* The host is shrink-wrapped by the chip it is positioned against (a 200px chip made a 200px card that
+         broke its title into three lines), so it states the s tier itself. */
       .aussicht {
-        position: absolute; left: 0; bottom: calc(100% + var(--sc-space-2, 8px)); box-sizing: border-box;
-        width: min(var(--sc-ov-menu, 20rem), calc(100vw - var(--_left) - var(--sc-space-3, 12px)));
-        padding: var(--sc-space-3, 12px) var(--sc-space-3, 12px) var(--sc-space-3, 12px) var(--sc-space-4, 16px);
-        color: var(--sc-fg-1); font-size: max(0.84rem, var(--sc-fs-floor)); line-height: 1.45;
-        background: color-mix(in srgb, var(--sc-bg-1) 96%, transparent); border: 1px solid var(--_ring); border-radius: 12px;
-        box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-        transform-origin: bottom left; animation: grow 0.16s ease-out;
+        position: absolute; left: 0; bottom: calc(100% + var(--sc-space-2, 8px)); text-align: start;
+        inline-size: min(var(--sc-ov-s), calc(100vw - var(--_left) - var(--sc-rand, 16px))); max-inline-size: none;
       }
-      @keyframes grow { from { opacity: 0; transform: scale(0.92); } }
-      .a-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sc-space-2, 8px); margin-bottom: var(--sc-space-1, 4px); }
-      .a-k { font-family: var(--sc-font-display); font-size: max(0.72rem, var(--sc-fs-floor)); letter-spacing: 0.08em; text-transform: uppercase; color: var(--_tone); }
-      .a-x svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-      .a-text { margin: 0; }
+      .a-text { margin: 0; color: var(--sc-fg-1); line-height: 1.45; }
       .a-list { margin: var(--sc-space-2, 8px) 0 0; padding-left: 1.1em; color: var(--sc-fg-2); }
       .a-list li + li { margin-top: 2px; }
 
@@ -163,7 +149,6 @@ const TICK_MS = 30_000;
         .dock:not([data-state='tracking']) { display: none; }
         .dock .state, .dock .mark, .dock .go, .dock .aussicht { display: none; }
       }
-      @media (prefers-reduced-motion: reduce) { .aussicht { animation: none; } }
     `,
   ],
 })
@@ -184,12 +169,22 @@ export class HqLiveTickerComponent {
 
   /** The page's Aussicht is open (by the reader, or by itself while the app is missing). */
   protected readonly open = signal(false);
+  /** Below 750 px the Aussicht is hidden by CSS: it must not be mounted either (a hidden panel would take a history entry). */
+  private readonly narrow = signal(typeof matchMedia === 'function' && matchMedia('(max-width: 749px)').matches);
+  /** The Aussicht is open and actually on screen. */
+  protected readonly shown = computed(() => this.open() && !this.narrow());
   /** Pages on which the reader closed the Aussicht while the app was missing. */
   private readonly seen = signal(readAussichtSeen(this.readStorage()));
 
   constructor() {
     const t = setInterval(() => this.clock.set(Date.now()), TICK_MS);
     inject(DestroyRef).onDestroy(() => clearInterval(t));
+    if (typeof matchMedia === 'function') {
+      const mq = matchMedia('(max-width: 749px)');
+      const onMq = () => this.narrow.set(mq.matches);
+      mq.addEventListener('change', onMq);
+      inject(DestroyRef).onDestroy(() => mq.removeEventListener('change', onMq));
+    }
     // A new page or a new state decides afresh: open by itself only while the app is missing and only once per page.
     effect(() => {
       const page = this.page();

@@ -43,6 +43,7 @@ function state(patches: VerseExplorerPatch[], extra: Partial<VerseExplorerState>
     upcoming: null,
     totalStars: 0,
     suns: [],
+    sunSplinters: 0,
     streak: { current: 0, best: 0, reserveAvailable: false, reservesUsed: 0 },
     kartograph: { unlocked: false, rank: 0 },
     rewards: { road: false, nebula: false, live: false, reserve: false, meteor: false, supernova: false, sunCollection: false },
@@ -172,10 +173,10 @@ describe('dome view helpers', () => {
     expect(sunState(false, null)).toBe('faded');
   });
 
-  it('comet days mark the tip and its ±2 window', () => {
+  it('comet days mark the tip and its ±1 window', () => {
     const days = cometDays('2026-11-01', 6, '2026-11-03');
     expect(days.map((d) => d.ymd)).toEqual(['2026-11-01', '2026-11-02', '2026-11-03', '2026-11-04', '2026-11-05', '2026-11-06']);
-    expect(days.filter((d) => d.win).length).toBe(5);
+    expect(days.filter((d) => d.win).length).toBe(3);
     expect(days.find((d) => d.on)?.ymd).toBe('2026-11-03');
     expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
     expect(cometWindowStart(null, '2026-10-23')).toBe('2026-10-24');

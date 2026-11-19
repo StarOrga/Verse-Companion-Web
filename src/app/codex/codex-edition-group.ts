@@ -148,6 +148,9 @@ export function editionQueryPrefix(classNameSlug: string): string {
   return classNameSlug.split('_').slice(0, QUERY_PREFIX_SEGMENTS).join('_');
 }
 
+/** What the edition rule reads off a record — a catalog row, or a rank-cohort member. */
+export type EditionKeyed = Pick<CodexListRow, 'classNameSlug' | 'nameLocalized'>;
+
 interface Link {
   readonly base: string;
   /** Set for rule (b); `null` for a same-name duplicate, labelled from the class name. */
@@ -155,7 +158,7 @@ interface Link {
 }
 
 /** Nearest ancestor of every row, when the rule accepts it. */
-function directLinks<T extends CodexListRow>(rows: readonly T[]): Map<string, Link> {
+function directLinks<T extends EditionKeyed>(rows: readonly T[]): Map<string, Link> {
   const byClass = new Map<string, T>();
   for (const row of rows) byClass.set(row.classNameSlug, row);
 
@@ -193,7 +196,7 @@ function rootOf(links: Map<string, Link>, classNameSlug: string): string {
 }
 
 /** family root → the records it absorbed, by the rule in the module comment. */
-function collectGroups<T extends CodexListRow>(rows: readonly T[]): Map<string, EditionRef[]> {
+function collectGroups<T extends EditionKeyed>(rows: readonly T[]): Map<string, EditionRef[]> {
   const links = directLinks(rows);
   const groups = new Map<string, EditionRef[]>();
   for (const [classNameSlug, link] of links) {
@@ -209,6 +212,18 @@ function collectGroups<T extends CodexListRow>(rows: readonly T[]): Map<string, 
     else groups.set(base, [ref]);
   }
   return groups;
+}
+
+/**
+ * Every absorbed record's family root (`DRAK_Caterpillar_Pirate` → `DRAK_Caterpillar`), by the same rule
+ * as the grid; a record that heads its family or stands alone is not in the map. The rank comparison
+ * groups (#968) read it to count each hull once.
+ */
+export function editionFamilyRoots(rows: readonly EditionKeyed[]): Map<string, string> {
+  const links = directLinks(rows);
+  const out = new Map<string, string>();
+  for (const classNameSlug of links.keys()) out.set(classNameSlug, rootOf(links, classNameSlug));
+  return out;
 }
 
 function byEditionName(a: EditionRef, b: EditionRef): number {
@@ -267,4 +282,39 @@ export function resolveEditionGroup<T extends CodexListRow>(
     { classNameSlug: base, editionName: null },
     ...refs.map((r) => ({ classNameSlug: r.classNameSlug, editionName: r.editionName })),
   ];
+}
+
+/** One link of the head's model row (concept holotisch-feinschliff C3). */
+export interface ModelVariantOption {
+  readonly classNameSlug: string;
+  /** The model's own words ("Valiant", "Pirate"); `null` on the base model, which the UI labels "Standard". */
+  readonly label: string | null;
+}
+
+/**
+ * The separate MODELS of the hull family `classNameSlug` belongs to — `AEGS_Gladius`, `_Valiant`, `_PIR`,
+ * `_Dunlevy` — for the links under the ship name. Reads the same sibling rows as the edition picker; editions
+ * are folded first (same hull, they live in the Akte's Lackierung tiles), so only real models remain. The label
+ * is what a model's name adds to the words every model of the family shares ("Aegis Gladius Valiant" →
+ * "Valiant"); the record whose name adds nothing is the base. `null` when the family has a single model.
+ */
+export function resolveModelVariants<T extends CodexListRow>(rows: readonly T[], classNameSlug: string): ModelVariantOption[] | null {
+  const folded = groupEditionRows(rows);
+  const self = folded.find(
+    (r) => r.classNameSlug === classNameSlug || r.editions.some((e) => e.classNameSlug === classNameSlug),
+  );
+  if (!self) return null;
+  const prefix = editionQueryPrefix(self.classNameSlug).toLowerCase();
+  const family = folded.filter((r) => r.classNameSlug.toLowerCase().startsWith(prefix));
+  if (family.length < 2) return null;
+  const words = family.map((r) => normalizeEditionName(r.nameLocalized).split(' ').filter(Boolean));
+  const first = words[0];
+  let shared = 0;
+  while (first && shared < first.length && words.every((w) => shared < w.length && w[shared].toLowerCase() === first[shared].toLowerCase())) shared++;
+  // Every name equals the shared words except the base; a name the rule cannot read falls back to the class name.
+  const out = family.map((r, i) => {
+    const rest = words[i].slice(shared).join(' ');
+    return { classNameSlug: r.classNameSlug, label: rest || (shared > 0 && words[i].length === shared ? null : r.classNameSlug) };
+  });
+  return out.sort((a, b) => (a.label === null ? -1 : b.label === null ? 1 : a.label.localeCompare(b.label)));
 }

@@ -6,11 +6,14 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import {
-  EVENT_SHEET_FIELD_KEYS, approveField, isForbiddenGear, prereqGear, publicSheet, setByAdmin,
+  EVENT_SHEET_FIELD_KEYS, approveField, isForbiddenGear, isNoPrereq, normalizeSheet, prereqGear, publicSheet, setByAdmin,
 } from '../_shared/event-sheet.ts';
 import {
   MAX_LINKS_PER_EVENT, SHEET_TOOL_SCHEMA, buildPrompt, bundleSources, excerptAround, extractMeta, hashText, mergeSheets,
   nameStem, parseModelAnswer, CORS, preflight, parseWikiExtract, pickEvents, sanityCheck, selectSources, sheetFromModel,
+  actorIdFor, commLinkIdFromUrl, editionYears, fillDatesFromCalendar, parseActorId, previousEditionSources, searchTerms, wikiEditionText,
+  EXTRACTOR_MAJOR, NO_OWN_SOURCE_MAX_CONFIDENCE, AUTHORITY_CONFIDENCE, CONFLICTING_CONFIDENCE, PREREQ_DEFAULT_CONFIDENCE,
+  authorityOf, defaultPrerequisites, isSpectrumStaff, scoreField, selectSpectrum, sourceSlugOf,
 } from './_extract.ts';
 // Static JSON imports: the Deno parity run (edge-functions-deploy.yml) grants no --allow-read.
 import fx_day_of_the_vara_2956 from './fixtures/day-of-the-vara-2956.json' with { type: 'json' };
@@ -276,7 +279,13 @@ test('pickEvents: new and running events first, hidden/cancelled/old skipped, ca
     ['just-ended', { lastAiAt: '2026-11-05T00:00:00Z', lastHash: 'a' }],         // last pass was before the end: one more
   ]);
   const ids = pickEvents(events, state, new Map(), now).map((x) => x.id);
-  assert.deepEqual(ids, ['running-stale', 'just-ended']);
+  // backfill: never-read events outside the window follow the window's own needs (#364: 28 of 30 sheets stayed empty)
+  assert.deepEqual(ids, ['running-stale', 'just-ended', 'far', 'ended-long']);
+  // read by the current extractor: the window rules alone; read only by an older major: due again
+  const read = new Map([...state, ['far', { lastAiAt: '2026-11-01T00:00:00Z', lastHash: 'b' }], ['ended-long', { lastAiAt: '2026-11-01T00:00:00Z', lastHash: 'b', stale: true }]]);
+  assert.deepEqual(pickEvents(events, read, new Map(), now).map((x) => x.id), ['running-stale', 'just-ended', 'ended-long']);
+  // older than the backfill reach: skipped
+  assert.equal(pickEvents([e('ancient', '2024-01-01', '2024-01-10')], new Map(), new Map(), now).length, 0);
   // a newer related comm-link makes a fresh running event due again
   const withLink = pickEvents(events, state, new Map([['running-fresh', '2026-11-08T10:00:00Z']]), now).map((x) => x.id);
   assert.ok(withLink.includes('running-fresh'));
@@ -316,4 +325,189 @@ test('a CORS preflight is answered, so the admin re-extract works from the brows
   assert.match(res.headers.get('access-control-allow-headers'), /x-client-info/);
   assert.equal(preflight('POST'), null);
   assert.equal(CORS['Access-Control-Allow-Origin'], '*');
+});
+
+// ------------------------------------------------------------------------------------------------ #364: sheets stayed empty
+
+const ev364 = (extra = {}) => ({ id: 'sf-2956', series: 'stella-fortuna', name: 'Stella Fortuna 2956', start_date: '2026-03-12', end_date: '2026-03-30', date_status: 'confirmed', status: 'scheduled', url: 'https://robertsspaceindustries.com/comm-link/transmission/21077-This-Week-In-Star-Citizen', source_comm_link_id: null, ...extra });
+
+test('#364 search terms, edition years and the comm-link id inside an event url', () => {
+  assert.deepEqual(searchTerms('Stella Fortuna 2956'), ['Stella Fortuna']);
+  assert.deepEqual(searchTerms('Invictus Launch Week / DefenseCon 2957'), ['Invictus Launch Week / DefenseCon', 'Invictus Launch Week', 'DefenseCon']);
+  assert.deepEqual(searchTerms('Drake DefenseCon 2956'), ['Drake DefenseCon', 'DefenseCon']);
+  assert.deepEqual(searchTerms('Red Festival 2957'), ['Red Festival']);
+  assert.deepEqual(editionYears({ start_date: '2026-03-12' }), ['2026', '2956']);
+  assert.deepEqual(editionYears({ start_date: '2027-03-11' }, -1), ['2026', '2956']);
+  assert.equal(commLinkIdFromUrl('https://robertsspaceindustries.com/comm-link/transmission/21077-This-Week-In-Star-Citizen'), 21077);
+  assert.equal(commLinkIdFromUrl('https://robertsspaceindustries.com/en/comm-link/transmission/21374-This-Week-In-Star-Citizen'), 21374);
+  assert.equal(commLinkIdFromUrl('https://robertsspaceindustries.com/comm-link/transmission/21301'), 21301);
+  assert.equal(commLinkIdFromUrl('https://robertsspaceindustries.com/en/ship-showdown-2956/winners'), null);
+  assert.equal(commLinkIdFromUrl(''), null);
+});
+
+test('#364 selectSources: the url post by id, this edition by title year whatever its import date, never another year', () => {
+  const twis = `${'intro '.repeat(400)}Stella Fortuna is in full swing until March 30, and the verse has been draped in gold and green.${' outro'.repeat(400)}`;
+  const links = [
+    link(21077, 'This Week in Star Citizen', '2026-03-23T16:00:00Z', twis),
+    link(21060, 'Stella Fortuna 2956', '2026-09-01T00:00:00Z', 'own post, re-imported with a later date'),
+    link(20500, 'Stella Fortuna 2955', '2026-03-01T00:00:00Z', 'last year, re-imported inside the window'),
+    link(20400, 'Stella Fortuna 2951 Contest', '2026-03-02T00:00:00Z', 'Stella Fortuna contest of 2951, mentioned in its body'),
+  ];
+  const src = selectSources(ev364(), links);
+  assert.deepEqual(src.map((s) => s.url.match(/transmission\/(\d+)/)[1]), ['21077', '21060']);
+  assert.ok(src[0].text.includes('until March 30') && src[0].text.length < twis.length, 'a weekly roundup as source post is cut to its mentions');
+});
+
+test('#364 an edition without a post of its own reads the previous edition, labelled, and stays in review', () => {
+  const next = ev364({ id: 'sf-2957', name: 'Stella Fortuna 2957', start_date: '2027-03-11', end_date: '2027-03-29', date_status: 'estimated', url: '' });
+  const links = [link(21070, 'Stella Fortuna 2956 FAQ', '2026-03-12T00:00:00Z', 'Fly to Mars-themed venues in Stanton.'), link(1, 'Stella Fortuna 2954', '2024-03-12T00:00:00Z', 'old')];
+  assert.equal(selectSources(next, links).length, 0);
+  const prev = previousEditionSources(next, links);
+  assert.equal(prev.length, 1);
+  assert.match(prev[0].label, /^PREVIOUS EDITION \(2956\), not this one: Stella Fortuna 2956 FAQ/);
+  assert.match(buildPrompt(next, bundleSources(prev)), /PREVIOUS EDITION describe last year/);
+  const { sheet, issues } = sheetFromModel({ fields: { venues: { value: ['verse'], confidence: 0.95, source: 'comm-link' } } }, next, { ownSources: false });
+  assert.equal(sheet.fields.venues.confidence, NO_OWN_SOURCE_MAX_CONFIDENCE);
+  assert.equal(sheet.fields.venues.review, 'pending');
+  assert.ok(issues.some((i) => /no source of this edition/.test(i)));
+  // with a post of its own nothing is capped
+  assert.equal(sheetFromModel({ fields: { venues: { value: ['verse'], confidence: 0.95, source: 'comm-link' } } }, next).sheet.fields.venues.review, 'auto');
+});
+
+test('#364 wiki: this edition\'s section first, then the intro; other editions dropped', () => {
+  const page = 'Stella Fortuna is a holiday.\n\n\n== Stella Fortuna 2025 ==\nRacing gear 2025.\n\n\n== Stella Fortuna 2026 ==\nRacing packs 2026.\n\n\n== Gallery ==\n';
+  const text = wikiEditionText(page, { start_date: '2026-03-12' });
+  assert.ok(text.startsWith('== Stella Fortuna 2026 ==\nRacing packs 2026.'));
+  assert.ok(text.includes('Stella Fortuna is a holiday.'));
+  assert.ok(!text.includes('Racing gear 2025'));
+  assert.equal(wikiEditionText('Just an intro.', { start_date: '2026-03-12' }), 'Just an intro.');
+});
+
+test('#364 calendar dates fill an unknown start/end: confirmed = released, estimated = review; a model date wins', () => {
+  const empty = sheetFromModel({ fields: {} }).sheet;
+  const confirmed = fillDatesFromCalendar(empty, ev364());
+  assert.deepEqual([confirmed.fields.start.value, confirmed.fields.end.value], ['2026-03-12', '2026-03-30']);
+  assert.equal(confirmed.fields.start.source, 'calendar');
+  assert.equal(publicSheet(confirmed).fields.end.value, '2026-03-30');
+  const estimated = fillDatesFromCalendar(empty, ev364({ date_status: 'estimated' }));
+  assert.equal(estimated.fields.start.review, 'pending');
+  assert.equal(publicSheet(estimated).fields.start.value, null);
+  const fromModel = sheetFromModel({ fields: { start: { value: '2026-03-13', confidence: 0.95, source: 'comm-link' } } }, ev364()).sheet;
+  assert.equal(fillDatesFromCalendar(fromModel, ev364()).fields.start.value, '2026-03-13');
+});
+
+test('#364 history actor id carries the extractor major; v1 ids read as major 1', () => {
+  assert.equal(actorIdFor('abc'), `sc-event-sheet:${EXTRACTOR_MAJOR}:abc`);
+  assert.deepEqual(parseActorId(actorIdFor('abc')), { hash: 'abc', major: EXTRACTOR_MAJOR });
+  assert.deepEqual(parseActorId('sc-event-sheet:c6w7km'), { hash: 'c6w7km', major: 1 });
+  assert.deepEqual(parseActorId(null), { hash: null, major: 0 });
+  assert.ok(EXTRACTOR_MAJOR >= 2, 'v1 sheets must be read again by the new sources');
+});
+
+// ------------------------------------------------------------------------------------------------ #364 follow-up (v3)
+
+const dotv = (extra = {}) => ({ id: 'dotv-2956', series: 'day-of-the-vara', name: 'Day of the Vara 2956', start_date: '2026-10-21', end_date: '2026-11-03', date_status: 'estimated', status: 'scheduled', url: '', source_comm_link_id: null, ...extra });
+const post = (extra = {}) => ({ id: 'p1', threadSlug: 'day-of-the-vara-2956', subject: 'Day of the Vara 2956', body: 'Every qualifying entry earns "The Hill Horror" helmet.', author: 'Nicou-CIG', createdAt: '2026-10-21T16:00:00Z', staff: true, reply: false, channel: 'Announcements', ...extra });
+
+test('#364 v3 Spectrum staff markers: GM flag, highlighted role or -CIG name; anyone else is community', () => {
+  assert.equal(isSpectrumStaff({ isGM: true, displayname: 'Ulf' }, null), true);
+  assert.equal(isSpectrumStaff({ isGM: false, displayname: 'Big T-O' }, '2'), true);
+  assert.equal(isSpectrumStaff({ isGM: false, displayname: 'Wakapedia-CIG' }, ''), true);
+  assert.equal(isSpectrumStaff({ isGM: false, displayname: 'Guidorocker' }, ''), false);
+  assert.equal(isSpectrumStaff({ isGM: false, displayname: 'Someone' }, null), false);
+  assert.equal(isSpectrumStaff(null, '2'), false);
+});
+
+test('#364 v3 selectSpectrum keeps CIG staff posts of THIS edition, never community posts or other years', () => {
+  const got = selectSpectrum(dotv(), [
+    post(),
+    post({ id: 'p2', subject: '2026 Pumpkin Decorating Contest', author: 'Big T-O', channel: 'General', body: 'Day of the Vara is here. Every qualified entry earns "The Hill Horror" Helmet, permanently attributed to your account.' }),
+    post({ id: 'p3', staff: false, author: 'Guidorocker', subject: 'i didnt get the Day of the Vara Vanduul mask' }),
+    post({ id: 'p4', subject: 'Day of the Vara 2955 Awakens!', createdAt: '2025-10-01T10:00:00Z' }),
+    post({ id: 'p5', subject: 'Alpha 4.10.2 - Fractured', body: `${'x'.repeat(2000)} Day of the Vara starts today. ${'y'.repeat(2000)}`, reply: true }),
+    post({ id: 'p6', subject: 'Day of the Vara', createdAt: '2025-10-02T10:00:00Z' }),
+  ]);
+  assert.deepEqual(got.map((s) => s.label.split(':')[0]), [
+    'CIG staff post on Spectrum by Nicou-CIG in Announcements',
+    'CIG staff post on Spectrum by Big T-O in General',
+    'CIG staff reply on Spectrum by Nicou-CIG in Announcements',
+  ]);
+  assert.ok(got.every((s) => s.kind === 'spectrum' && authorityOf(s) === 'official' && sourceSlugOf(s) === 'spectrum-cig'));
+  assert.ok(got[0].url.endsWith('/spectrum/community/SC/forum/thread/day-of-the-vara-2956'));
+  assert.ok(got[2].text.length < 2000, 'a mention is cut to the passage around it');
+});
+
+test('#364 v3 confidence comes from the cited sources: official stated is released, wiki / previous edition wait', () => {
+  const sources = [
+    { kind: 'comm-link', label: 'Day of the Vara 2956', url: 'https://robertsspaceindustries.com/x', text: 'a' },
+    { kind: 'spectrum', label: 'CIG staff post', url: '', text: 'b' },
+    { kind: 'wiki', label: 'wiki', url: '', text: 'c' },
+    { kind: 'comm-link', label: 'PREVIOUS EDITION', url: '', text: 'd', previous: true },
+    { kind: 'rsi-page', label: 'meta', url: '', text: 'e' },
+  ];
+  assert.deepEqual(scoreField({ basis: [1], support: 'stated' }, sources), { confidence: AUTHORITY_CONFIDENCE.official.stated, source: 'comm-link' });
+  assert.deepEqual(scoreField({ basis: [3, 2], support: 'inferred' }, sources), { confidence: AUTHORITY_CONFIDENCE.official.inferred, source: 'spectrum-cig' });
+  assert.deepEqual(scoreField({ basis: [3], support: 'stated' }, sources), { confidence: AUTHORITY_CONFIDENCE.community.stated, source: 'wiki' });
+  assert.deepEqual(scoreField({ basis: [4], support: 'stated' }, sources), { confidence: AUTHORITY_CONFIDENCE.previous.stated, source: 'previous-edition' });
+  assert.deepEqual(scoreField({ basis: [5], support: 'stated' }, sources), { confidence: AUTHORITY_CONFIDENCE.official.stated, source: 'rsi-page' });
+  assert.equal(scoreField({ basis: [1, 2], support: 'conflicting' }, sources).confidence, CONFLICTING_CONFIDENCE);
+  // No usable citation: the model's own number, never above the review line.
+  assert.deepEqual(scoreField({ basis: [9], support: 'stated', confidence: 0.95 }, sources), { confidence: NO_OWN_SOURCE_MAX_CONFIDENCE, source: 'ai' });
+  assert.deepEqual(scoreField({ basis: [], confidence: 0.3 }, sources), { confidence: 0.3, source: 'ai' });
+  assert.ok(AUTHORITY_CONFIDENCE.official.inferred >= 0.8 && AUTHORITY_CONFIDENCE.community.stated < 0.8 && AUTHORITY_CONFIDENCE.previous.stated < 0.8);
+});
+
+test('#364 v3 sheetFromModel: official rewards are released, previous-edition rewards wait for the admin', () => {
+  const sources = [
+    { kind: 'comm-link', label: 'Day of the Vara 2956', url: 'https://robertsspaceindustries.com/x', text: 'Survive two rounds to claim your Vanduul mask.' },
+    { kind: 'spectrum', label: 'CIG staff post', url: '', text: 'Every qualified entry earns The Hill Horror Helmet.' },
+  ];
+  const rewards = [{ name: 'Vanduul mask', channel: 'unknown', timing: { kind: 'unknown' } }, { name: 'The Hill Horror helmet', channel: 'pledge', timing: { kind: 'after-end' } }];
+  const own = sheetFromModel({ fields: { rewards: { value: rewards, basis: [1, 2], support: 'stated' }, venues: { value: ['arena-commander'], basis: [1], support: 'inferred' } } }, dotv(), { ownSources: true, sources }).sheet;
+  assert.equal(own.fields.rewards.review, 'auto');
+  assert.equal(own.fields.rewards.source, 'comm-link');
+  assert.equal(publicSheet(own).fields.rewards.value.length, 2);
+  assert.equal(own.fields.venues.review, 'auto');
+  const prev = [{ ...sources[0], previous: true }];
+  const nextEdition = dotv({ id: 'dotv-2957', name: 'Day of the Vara 2957', start_date: '2027-10-21', end_date: '2027-11-03' });
+  const next = sheetFromModel({ fields: { rewards: { value: rewards, basis: [1], support: 'stated' } } }, nextEdition, { ownSources: false, sources: prev }).sheet;
+  assert.equal(next.fields.rewards.value.length, 2, 'the previous edition rewards are kept as a hint');
+  assert.equal(next.fields.rewards.review, 'pending');
+  assert.equal(next.fields.rewards.source, 'previous-edition');
+  assert.equal(publicSheet(next).fields.rewards.value, null);
+});
+
+test('#364 v3 prerequisites nothing was found for read "none"; a found tree and a stored value stay', () => {
+  const empty = defaultPrerequisites(sheetFromModel({ fields: {} }).sheet);
+  assert.ok(isNoPrereq(empty.fields.prerequisites.value));
+  assert.equal(empty.fields.prerequisites.confidence, PREREQ_DEFAULT_CONFIDENCE);
+  assert.equal(empty.fields.prerequisites.source, 'default');
+  assert.ok(isNoPrereq(publicSheet(empty).fields.prerequisites.value), 'released: the public sheet reads none');
+  assert.deepEqual(prereqGear(empty.fields.prerequisites.value), []);
+  const found = sheetFromModel({ fields: { prerequisites: { value: { gear: 'combat-ship', label: null }, confidence: 0.9, source: 'official' } } }).sheet;
+  assert.deepEqual(prereqGear(defaultPrerequisites(found).fields.prerequisites.value), ['combat-ship']);
+  // The model may say "none" itself; inside a group "none" is dropped.
+  assert.ok(isNoPrereq(normalizeSheet({ fields: { prerequisites: { value: { gear: 'none' }, confidence: 0.9, source: 'comm-link' } } }).fields.prerequisites.value));
+  assert.deepEqual(normalizeSheet({ fields: { prerequisites: { value: { op: 'or', items: [{ gear: 'none' }, { gear: 'combat-ship' }] }, confidence: 0.9 } } }).fields.prerequisites.value, { gear: 'combat-ship', label: null });
+  // A stored gear reading is not wiped by the default of a later run.
+  assert.deepEqual(prereqGear(mergeSheets(found, empty).fields.prerequisites.value), ['combat-ship']);
+  assert.ok(isNoPrereq(mergeSheets(sheetFromModel({ fields: {} }).sheet, empty).fields.prerequisites.value));
+});
+
+test('#364 v3 prompt: sources carry their authority tag, the schema asks for basis + support', () => {
+  const bundle = bundleSources([
+    { kind: 'comm-link', label: 'Day of the Vara 2956', url: 'u', text: 'a' },
+    { kind: 'spectrum', label: 'CIG staff post', url: '', text: 'b' },
+    { kind: 'wiki', label: 'wiki', url: '', text: 'c' },
+    { kind: 'comm-link', label: 'last year', url: '', text: 'd', previous: true },
+  ]);
+  assert.ok(bundle.includes('### SOURCE 1 [OFFICIAL comm-link]'));
+  assert.ok(bundle.includes('### SOURCE 2 [OFFICIAL spectrum]'));
+  assert.ok(bundle.includes('### SOURCE 3 [COMMUNITY wiki]'));
+  assert.ok(bundle.includes('### SOURCE 4 [PREVIOUS EDITION comm-link]'));
+  assert.deepEqual(SHEET_TOOL_SCHEMA.properties.fields.properties.rewards.required, ['value', 'basis', 'support']);
+  const prompt = buildPrompt(dotv(), bundle);
+  assert.ok(prompt.includes('CIG staff on Spectrum'));
+  assert.ok(prompt.includes('{"gear":"none"}'));
+  assert.ok(EXTRACTOR_MAJOR >= 3, 'v2 sheets are read again with the authority model');
 });

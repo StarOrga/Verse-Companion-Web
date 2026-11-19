@@ -5,7 +5,7 @@ The next concept or implementation for wishlist, Nachschub, Inventar, Hangar, Sa
 ## Accepted
 
 ### Model
-- One path: **Wunschliste → Nachschub → Bestand** (Inventar · Hangar · Sammlung). Shortcuts allowed: an item can go straight to Bestand; news and gallery go straight to Sammlung.
+- **REPLACED by concept `20261117-1110-pfad-stationen` (see "Pfad eines Gegenstands" below); kept as history:** One path: **Wunschliste → Nachschub → Bestand** (Inventar · Hangar · Sammlung). Shortcuts allowed: an item can go straight to Bestand; news and gallery go straight to Sammlung.
 - **Wunschliste** = a shopping cart with **quantity** for everything, incl. ships (2× Cutlass) and material (raw materials do get a wishlist). Default quantity 1; stepper in the cart and on the Codex detail page, search rows show only the count. Presented as a cart popup; "Ganze Wunschliste" opens it (real anchor with its own URL).
 - **Nachschub** = a named **package** built in HQ → Planen from wishlist items. Taking a wishlist position moves the full quantity by default; splitting (5 of 20) is allowed, the rest stays on the wishlist. A package is planned as a whole and holds 1–x Einsätze (Missionen, Bergbau, Handel …).
 - Up to **7 active package slots**; more are archived ("Neuer Nachschub" is blocked with a hint while all 7 slots are active).
@@ -19,16 +19,51 @@ The next concept or implementation for wishlist, Nachschub, Inventar, Hangar, Sa
 - No guests: the login wall already gates every shell route (`app.routes.ts`); every signed-out branch is dead code to remove.
 
 ### Areas
-- **Codex and search:** two nodes only — Wunschliste (with quantity) and Besitz. No Nachschub node outside HQ. Blueprint page: "Material ×N auf die Wunschliste", grouped under the blueprint / crafted item.
+- **Codex and search (REPLACED by concept `20261117-1110-pfad-stationen`: still two stations, but wish and ownership, with the assignment inside the wish station; history kept):** two nodes only — Wunschliste (with quantity) and Besitz. No Nachschub node outside HQ. Blueprint page: "Material ×N auf die Wunschliste", grouped under the blueprint / crafted item.
 - **HQ Planen:** the up-to-7 package cards on top, "Neuer Nachschub" takes from the wishlist, each package lists its Einsätze and route. Every line is selectable (also loose lines without a set). Much more present than today's popup.
 - **HQ Jetzt:** runs the Einsatz bundle of exactly one package and always shows which package it serves.
 - **HQ Bestand:** Inventar · Hangar · Sammlung; per row a quiet hint ("auf der Wunschliste N" / "im Nachschub ‚Paket‘") plus "Nachholen" (= auf die Wunschliste); additionally **"Kürzlich aufgebraucht"** — only what was used up in the last 48 h, to re-wish quickly.
 - **Header quick access ("Schnellzugriff"):** icon only in the header, the word appears only in the opened panel. Count = wishlist positions. Sections: Zuletzt geöffnet 3 (expand to 7), Wunschliste 3 + "Ganze Wunschliste", and a context Bestand section (Hangar / Inventar / Sammlung) filtered by page type; everything filtered by page type. No Nachschub. Pages without a type (HQ start, Verse, Social) show no Bestand section. On news pages the context section is Sammlung (collected news).
 - **Migration:** existing open Nachschub lines become one package "Bisheriger Nachschub"; news bookmarks in localStorage are copied into the account's Sammlung on the next visit.
 
+### Wishes (concept `20261115-2345-wunschliste-gefuehl`, design "Sternschnuppe")
+- **Name:** "Wünsche" / "Wishes" everywhere. No "Wunschliste", no "Positionen gemerkt"; counts read "N Wünsche" / "1 Wunsch", "Alle Wünsche" opens the large window. The search keyword `wunschliste` stays as an alias.
+- **One icon:** the shooting star (`PATH_ICONS.wish`) in the header, the path control, search rows and the large window. News "gemerkt" keeps the bookmark (`PATH_ICONS.saved`); the Explorer achievement keeps its ★.
+- **Empty state:** `<sc-wish-empty>` with the night sky `<sc-wish-sky>`, "Wünsch dir was" and the primary "Wunsch suchen", which opens the search of the page the reader is on through `SearchOpenService` (the same thing Ctrl+K does) with the caret in the field. No footer while empty. The large window shows the sky as a strip above the groups.
+- **Moments:** the wish node plays one add moment per own add (1.7 s); owning a wished item shows the two-line fulfilled toast. Reduced motion: no animation, the picture stays complete.
+- **Light popouts:** a non-modal panel at its trigger shows the accent edge only, no rail icon and no vertical eyebrow (apps menu, wishes, HQ chips).
+- **Analytics:** `hq:wishlist_open`, `hq:wish_search_open` `{ surface: 'popout' | 'cart' }`; PostHog flow `wish`.
+- **Path control stays at two nodes.** The concept's Codex mock drew a five-station strip; that was a drawing, not a decision. A close-out request to build five stations was not built, because it contradicts "two nodes only" and "No Nachschub node outside HQ" above, and Inventar / Hangar / Sammlung exclude each other per item. Changing the path needs its own concept.
+
+### Pfad eines Gegenstands (concept `20261117-1110-pfad-stationen`, 2026-11-17)
+Replaces the lines marked "REPLACED" above and the old "moves off the wishlist" contract.
+- **Two stations in the Codex and in search: wish and ownership.** No third station. The assignment to an Operation lives inside the wish station (a picker there), not as a node of its own.
+- **A wish stays a wish when it is assigned.** Assigning to an Operation does not take the quantity off the wishes; the Operation references the wish, and one wish may be split over several Operations.
+- **The word is "Operation"** (German and English, singular and plural: Operationen / Operations). "Nachschub" is gone from every visible text; key names and code identifiers keep `nachschub`. "Einsatzgruppe" is not used (it names friends groups). An Operation is a group of Einsätze with a goal; wishes are assigned to it.
+- **The symbol is the Route glyph** (two waypoint rings joined by a path, stroke icon, `viewBox 0 0 24 24`) in `PATH_ICONS.nachschub` and `NACHSCHUB_ICON_PATHS`; the tray-with-arrow is retired.
+- **Rows show the badge only** (the assignment badge on list rows, no extra node or pill); the picker is on the detail page.
+- **Removing a wish:**
+  - free pieces (not assigned to any Operation) go first;
+  - when assigned pieces would be hit, a dialog asks with a quantity;
+  - the most recently assigned Operation gives its pieces first;
+  - an Operation left without a wish stays only if it has Einsätze, otherwise it goes;
+  - a fulfilled wish (item now owned) stays as "reached";
+  - releasing a piece from an Operation in the HQ always asks first.
+
+### Where the two stations live (concept `20261117-1110-pfad-stationen`, round 5, design "Zwei Kästen")
+Replaces the ownership card (`sc-codex-own-card`, "Haben?" / "Dein Bestand" / "Dein Exemplar", concept codex-kopf-besitz C5/C7), which is gone.
+- **Item pages, Holotisch view:** the two stations of `sc-item-path` (level primary) at the top of the side panel (`aside.it-panel > .it-path`), one under the other (`layout="stacked"`).
+- **Item pages, Klassisch view:** the same control under the page head (owner decision `r5-d-einfach`), side by side.
+- **Ship pages, Klassisch view:** under the picture (`.hero-own`), side by side with the connector, stacked when the host is narrow (a container query on the control's own width, no page breakpoint).
+- **Blueprint and preview pages:** the full two-station form whenever the reader is signed in (`pathLevelFor`, owner decision `r5-d-bauplan` "Immer, wenn du angemeldet bist"); signed out the pill, or the full form when coming from Planen or a set (D2).
+- **Nothing of the card is lost:** the ownership station's head carries the icon buttons (items: note, pin, remove with the danger confirm; Sammlung: remove un-collects; ships: rename, note, pin, remove via `sc-codex-own-ship-actions`); an item's note text, the Operation a ship sits in and a failed write sit under the strip; a ship's own name stands in the strip ("Im Hangar · „Name“"); the strip's link ("Im Inventar / Im Hangar ansehen") replaces "Im HQ zeigen"; signed out the hint and the sign-in link; the HQ-hosted copy reads owned (`forceOwned`); the head strip's "Nicht im Inventar / Hangar" jumps to the ownership station and lights it up.
+- The host is `sc-codex-own-stations` (`src/app/codex/detail/`); everything codex-specific goes in through the control's slots `[ipOwnTools]` (station head) and `[ipOwnExtra]` (under the strip), so `sc-item-path` knows nothing about hangar internals.
+- **Holotisch, ships:** the hangar menu in the head (`sc-codex-holo-hangar-menu`) is a labelled panel (not a `role="menu"`): Ausstattung first (Werk and the own exemplars as links, the shown exemplar's rename / note / pin / remove as icon buttons), then the same two stations stacked, the picker opening in the flow (`pickerInFlow`), the loadout wishes and "Diesen Umbau wünschen" under the wish station (slot `[ipWishExtra]`), the exemplar actions and "Noch eine … in den Hangar" under the hangar strip; the trigger keeps its sentence and carries the Route badge while a wish of the hull sits in an Operation (round 5, G5).
+- The pages render one template in both shells, so the stations show in the beta shell and the non-beta shell alike.
+
 ## Rejected
 - Nachschub as its own sixth HQ page or as a Bestand tab.
-- Three status nodes everywhere in the Codex; a Nachschub pill on Codex detail pages.
+- ~~Three status nodes everywhere in the Codex; a Nachschub pill on Codex detail pages.~~ **Replaced by concept `20261117-1110-pfad-stationen`:** the Codex path control shows two stations (wish, ownership); the assignment to an Operation lives inside the wish station, and rows show the badge only. History kept.
 - Disappearing done lines after N days; closing lines by time.
 - A guest storage of any kind.
 - Panel names "Merkliste", the bookmark icon for the panel; the clock / wish / grid icons proposed in round 1.
@@ -70,7 +105,7 @@ The next concept or implementation for wishlist, Nachschub, Inventar, Hangar, Sa
 ## Implementation: wave 3 (shell, search, Codex detail)
 - **Schnellzugriff** (`shell/merkliste/`): crate icon "frame" without a count, the word only in the open panel. Zuletzt geöffnet = 3 image tiles, 7 after "Mehr anzeigen" (`RECENT_ROWS_MAX` 12 is the store cap). Wunschliste = the last 3 added (page type, else overall). The context section (Inventar / Hangar / Sammlung) is strictly type-filtered, shows the last 3 added and a "Gesamtes ..." link carrying the filter (`hqStockLink`); pages without a type show no Bestand section.
 - **Warenkorb** (`shell/cart/`): own URL (`?cart=1`, `hqCartLink`), `[scDialog]`. Groups follow `cartGroups()` (weapons first, blueprints last), the group checkbox selects the group, silhouettes via `sc-sil-thumb` (contain), red trash with an undo toast (also for groups, no question), "Passt dazu" 3 of 7 (`WishCartService.suggestions`, catalogue adapter `hq/nachschub/rec-catalogue.ts`, FPS armor and weapons only), one primary "In einen Nachschub" -> `/hq#planen?pick=<key>~<qty>|...`.
-- **Path control** (`shared/item-path/`): two nodes, Wunschliste -> Inventar / Hangar / Sammlung by kind. Empty wish = +1, filled wish opens the cart, the own node deep-links to HQ Bestand.
+- **Path control** (`shared/item-path/`; where its primary form lives on detail pages: see "Where the two stations live" above): two nodes, Wunschliste -> Inventar / Hangar / Sammlung by kind. Empty wish = +1, filled wish opens the cart, the own node deep-links to HQ Bestand.
 - **Codex detail** (`codex/detail/codex-item-stage.component.ts`, `codex-detail.component.ts`, global `ITEM PAGE` block in `styles.scss`): items, weapons, armor and components use the holotable layout (stage left with Silhouette | 3D-Modell switch, tabbed panel right: Werte / Herstellung / Kaufen & Info). Compare lives only in the full-site search overview. Opened from the HQ the page quietly names the Nachschub that holds the item. Blueprint page: "Material xN auf die Wunschliste".
 - **Entry motion** (`shared/entry-motion/`): `[scEntry]` + global `CINEMATIC ENTRY` block; cinematic on the first open of a page, quick afterwards, none under `prefers-reduced-motion`.
 - **Galerie / News**: both show `sc-sammlung-strip`; the gallery source filter is an `<sc-select>`; `NewsService.toggleFavorite` writes to `SammlungService`.
@@ -92,3 +127,7 @@ Source: concept `20261108-2135-hq-bestand` (D4-D6), migration `20261109000200_hq
 - **Type `verkauf` ("Geld verdienen").** A Nachschub with an aUEC goal (`goal_auec`, required for the type) and a progress (`progress_auec`). Offered in Planen's new-Nachschub popup next to the wishlist way; its lines are chosen from the Bestand (selection bar "Verkaufen"), not from the wishlist. It has no physical entity: nothing returns to the wishlist when it is emptied or removed. Progress is raised by sales the app reports (`hq_nachschub_report_sale`, idempotent per sale ref) and can be set by hand; the goal reached marks the Nachschub, the slot is freed by archiving like any other. Model: `Nachschub.type === 'verkauf'`, `goalAuec`, `progressAuec`, `sellProgress()`.
 - **Gather line.** One line that collects ONE item from SEVERAL places (`hq_supplies.gather`, `SupplyItem.gather`): stops `{location, system?, amount, quality?, done}`, route order = array order, built largest free amount first (`buildGatherStops`) and reorderable (`moveStop`). Each stop is ticked on its own (`HqSuppliesService.tickGatherStop`, Jetzt does it when the player picked up); all stops ticked = the line is done. An Einsatz built from the Nachschub gets one `pickup` step per stop (`gatherToSteps`), each with its own place, so a pickup step still holds a single place.
 - **Add repeatedly, no merging.** Pick-up and sell from the Bestand go to an existing active Nachschub (as often as wanted: the same item grows, its places merge) or to a new one (`NachschubService.addToNachschub(target, lines)`). Stops are never merged across different Nachschube (R3 `q-route=none`).
+
+## Close-out follow-ups (H3 / H4, 2026-11-17)
+- **Archiv delete (H3):** every row of the Archiv dialog (`HqNachschubArchiveDialogComponent`) has an icon-only danger delete next to "Wieder aktivieren" (it needs no free slot). The page asks through `ScConfirmService` (`tone: 'danger'`, "Endgültig löschen"); `NachschubService.removeArchived` tombstones the Operation and its history lines, moves no wish and no slot, and offers the normal undo toast, which brings it back ARCHIVED. Replaces "to delete one, reactivate it first".
+- **Old plain lines (H4):** an active normal Operation whose open lines include plain `search` item / ship lines made before 2026-11-19 00:00 UTC, the end of the release day (`isPlainSearchLine`; no blueprint, stops, step, SCU amount or quality) shows one quiet hint row above its Einsätze: "N Positionen sind noch keine Wünsche. Vor dem Umbau angelegt. Sollen sie als Wünsche auf deiner Wunschliste stehen?" with "Als Wünsche führen" (`adoptPlainLines`: compare-and-set `search` -> `wish`, one wishlist write per wish, cap 999, label back on failure) and "So lassen" (`keepPlainLines`: `search` -> `manual`, the question never returns). Both answers come with the undo toast; nothing changes without the click. The date cut-off exists because the Bestand / HQ-search flows (`putLines`, reward lines) still write plain `search` lines that are no wishes. Event `hq:plain_lines_select`.

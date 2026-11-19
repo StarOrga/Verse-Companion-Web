@@ -58,7 +58,10 @@ export function rejectField(sheet: EventSheet, key: EventSheetFieldKey): EventSh
   imports: [TranslatePipe, ScActionDirective, PageHeaderComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <sc-page-header [eyebrow]="'adminEvents.eyebrow' | translate" [title]="'adminEvents.title' | translate" [subtitle]="'adminEvents.subtitle' | translate" />
+    <sc-page-header [eyebrow]="'adminEvents.eyebrow' | translate" [title]="'adminEvents.title' | translate" [subtitle]="'adminEvents.subtitle' | translate">
+      <button phActions type="button" scAction tier="secondary" [busy]="backfilling()" [disabled]="reextracting()" (click)="backfill()">{{ 'adminEvents.backfill' | translate }}</button>
+    </sc-page-header>
+    @if (backfillNote(); as n) { <p class="mute" role="status">{{ n.key | translate: { n: n.n } }}</p> }
     @if (error(); as e) {
       <p class="err" role="alert">{{ e | translate }} <button type="button" scAction tier="secondary" (click)="load()">{{ 'adminEvents.retry' | translate }}</button></p>
     }
@@ -82,7 +85,7 @@ export function rejectField(sheet: EventSheet, key: EventSheetFieldKey): EventSh
         <section class="detail" [attr.aria-label]="ev.name">
           <header class="dh">
             <h2>{{ ev.name }}</h2>
-            <button type="button" scAction tier="secondary" [busy]="reextracting()" (click)="reextract(ev.id)">{{ 'adminEvents.reextract' | translate }}</button>
+            <button type="button" scAction tier="secondary" [busy]="reextracting()" [disabled]="backfilling()" (click)="reextract(ev.id)">{{ 'adminEvents.reextract' | translate }}</button>
           </header>
           @if (actionError(); as ae) { <p class="err" role="alert">{{ ae | translate }}</p> }
           <div class="sc-table-scroll">
@@ -154,7 +157,7 @@ export function rejectField(sheet: EventSheet, key: EventSheetFieldKey): EventSh
       .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: calc(100dvh - 18rem); overflow: auto; }
       .row { width: 100%; text-align: start; display: flex; flex-direction: column; gap: 2px; padding: var(--sc-space-2, 8px) var(--sc-space-3, 12px); border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-bg-1); color: var(--sc-fg); font: inherit; cursor: pointer; }
       .row[aria-pressed='true'] { border-color: var(--sc-accent-hot); background: color-mix(in srgb, var(--sc-accent-hot) 10%, var(--sc-bg-1)); }
-      .row:focus-visible { outline: 2px solid var(--sc-accent-hot); outline-offset: 2px; }
+      .row:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-hot); }
       .badge { align-self: flex-start; padding: 1px 8px; border-radius: 999px; background: color-mix(in srgb, var(--sc-warning) 20%, transparent); color: var(--sc-warning); font-size: 0.74rem; }
       .badge.mute, .mute { color: var(--sc-fg-2); background: none; }
       .dh { display: flex; align-items: center; gap: var(--sc-space-3, 12px); }
@@ -195,6 +198,8 @@ export class AdminEventsComponent {
   protected readonly draftText = signal('');
   protected readonly saving = signal(false);
   protected readonly reextracting = signal(false);
+  protected readonly backfilling = signal(false);
+  protected readonly backfillNote = signal<{ key: string; n: number } | null>(null);
   protected readonly summary = fieldSummary;
 
   protected readonly current = computed(() => this.rows().find((r) => r.id === this.selectedId()) ?? null);
@@ -303,6 +308,36 @@ export class AdminEventsComponent {
       this.actionError.set(toErrorKey('admin', 'events.save', err));
     } finally {
       this.saving.set(false);
+    }
+  }
+
+  /**
+   * "Fehlende auswerten": backfill passes of the edge function (admin JWT) until no event waits for a first reading -
+   * each pass reads up to four events in parallel; capped, so a source that keeps failing cannot loop forever.
+   */
+  protected async backfill(): Promise<void> {
+    this.backfilling.set(true);
+    this.actionError.set(null);
+    this.backfillNote.set(null);
+    let written = 0;
+    try {
+      for (let pass = 0; pass < 12; pass++) {
+        const { data, error } = await this.sb.client.functions.invoke('sc-event-sheet', { body: { backfill: true } });
+        if (error) throw error;
+        const res = (data ?? {}) as { due?: number; runs?: { status?: string }[] };
+        written += (res.runs ?? []).filter((r) => r.status === 'written').length;
+        this.backfillNote.set({ key: 'adminEvents.backfillProgress', n: written });
+        if (!res.due) break;
+      }
+      this.backfillNote.set({ key: 'adminEvents.backfillDone', n: written });
+      await this.load();
+      const id = this.selectedId();
+      if (id) await this.loadHistory(id);
+    } catch (err) {
+      this.actionError.set(toErrorKey('admin', 'events.backfill', err));
+      await this.load();
+    } finally {
+      this.backfilling.set(false);
     }
   }
 

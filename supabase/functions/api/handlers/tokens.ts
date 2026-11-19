@@ -78,12 +78,9 @@ async function getSessionContext(req: Request): Promise<
     return { error: { code: 'unauthorized', message: 'Invalid session.' }, status: 401 };
   }
 
-  const { data: profile } = await userClient
-    .from('profiles')
-    .select('role')
-    .eq('id', userData.user.id)
-    .maybeSingle();
-  const isAdmin = profile?.role === 'admin';
+  // is_admin(): approved, not suspended (profiles.role alone would keep a suspended admin in).
+  const { data: adminAnswer } = await userClient.rpc('is_admin');
+  const isAdmin = adminAnswer === true;
   if (!isAdmin) {
     return { error: { code: 'forbidden', message: 'Admin role required.' }, status: 403 };
   }

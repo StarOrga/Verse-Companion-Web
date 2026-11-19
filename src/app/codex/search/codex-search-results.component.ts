@@ -12,7 +12,7 @@ import { ShipBlueprintIconComponent } from '../ship-blueprint/ship-blueprint-ico
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { PolySearchHit, isUpcomingHit, polyHitIconKind } from '../codex-poly-search';
 import { CodexSearchEngine } from './codex-search-engine';
-import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './codex-search-model';
+import { SearchOption, SearchVariantLink, VARIANT_LINKS_SHOWN, hitManufacturer, hitTitle, isLivery, pinKindOf } from './codex-search-model';
 
 /**
  * The results of the ONE Codex search, rendered the same way under Ctrl+K,
@@ -88,7 +88,7 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
           <span>{{ 'codex.search.bar.failed' | translate }} — {{ err | translate }}</span>
           <button type="button" class="retry" (click)="e.retry()">{{ 'codex.error.retry' | translate }}</button>
         </div>
-      } @else if (e.groups().length === 0) {
+      } @else if (e.listGroups().groups.length === 0) {
         @if (e.loading() || pending()) {
           <p class="state" role="status">{{ 'codex.search.bar.searching' | translate }}</p>
         } @else {
@@ -117,7 +117,7 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
         }
         <div class="listbox" role="listbox" [id]="listboxId()" [attr.aria-label]="'codex.search.bar.resultsAria' | translate"
              [attr.aria-busy]="e.loading()" [class.stale]="e.loading() || pending()">
-          @for (g of e.groups(); track g.kind) {
+          @for (g of e.listGroups().groups; track g.kind) {
             <div class="group" role="group" [attr.aria-labelledby]="listboxId() + '-h-' + g.kind">
               <div class="group-head" role="presentation">
                 <span [id]="listboxId() + '-h-' + g.kind">{{ 'codex.kinds.' + g.kind | translate }}</span>
@@ -155,38 +155,50 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
 
     <ng-template #row let-o>
       @if (o.type === 'hit' || o.type === 'fresh') {
-        <div class="row" role="presentation" [class.active]="isActive(o)" [class.upcoming]="isUpcoming(o.hit)">
-          <a class="hit" role="option" tabindex="-1" [id]="optId(o)" [attr.aria-selected]="isActive(o)"
-             [routerLink]="o.target.link" [queryParams]="o.target.queryParams"
-             (click)="onClick($event, o)" (mouseenter)="hover(o)">
-            <span class="icon" aria-hidden="true">
-              @if (o.hit.kind === 'ship') {
-                <sc-ship-blueprint-icon [shipId]="o.hit.classNameSlug">
-                  <sc-codex-icon [kind]="iconKind(o.hit)" />
-                </sc-ship-blueprint-icon>
-              } @else {
-                <sc-codex-icon [kind]="iconKind(o.hit)" />
+        @let here = isCurrent(o);
+        @let vs = variantsOf(o);
+        <div class="row" role="presentation" [class.active]="isActive(o)" [class.upcoming]="isUpcoming(o.hit)" [class.current]="here"
+             [class.has-variants]="vs.length > 0">
+          @if (here) {
+            <!-- The page the reader is on (note 4): a plain href, not a routerLink — RouterLink navigates
+                 whatever the click handler does; a plain click only closes, a modified one opens a tab. -->
+            <a class="hit" role="option" tabindex="-1" [id]="optId(o)" [attr.aria-selected]="isActive(o)" aria-current="page"
+               [attr.href]="engine().href(o.target)" (click)="onClick($event, o)" (mouseenter)="hover(o)">
+              <ng-container *ngTemplateOutlet="hitBody; context: { $implicit: o, here: true }" />
+            </a>
+          } @else {
+            <a class="hit" role="option" tabindex="-1" [id]="optId(o)" [attr.aria-selected]="isActive(o)"
+               [routerLink]="o.target.link" [queryParams]="o.target.queryParams"
+               (click)="onClick($event, o)" (mouseenter)="hover(o)">
+              <ng-container *ngTemplateOutlet="hitBody; context: { $implicit: o, here: false }" />
+            </a>
+          }
+          @if (vs.length) {
+            <!-- One row per ship page (C11): the row opens the stock ship, these the reader's own variants. -->
+            <span class="variants">
+              <span class="vl-label">{{ 'search.row.variants' | translate }}</span>
+              @for (v of vs.slice(0, variantCap); track v.id) {
+                @if (v.current) {
+                  <a class="vl here" aria-current="page" [attr.href]="engine().href(v.target)"
+                     [scTooltip]="'search.row.variantCurrent' | translate" scTooltipTier="label"
+                     (click)="onVariantClick($event, o, v)">{{ v.label || (v.labelKey ?? '' | translate) }}</a>
+                } @else {
+                  <a class="vl" [class.match]="v.emphasis" [routerLink]="v.target.link" [queryParams]="v.target.queryParams"
+                     (click)="onVariantClick($event, o, v)">{{ v.label || (v.labelKey ?? '' | translate) }}</a>
+                }
+              }
+              @if (vs.length > variantCap) {
+                <a class="vl more" [routerLink]="o.target.link" [queryParams]="o.target.queryParams"
+                   [attr.aria-label]="'search.row.variantsMoreAria' | translate: { n: vs.length - variantCap }"
+                   [scTooltip]="'search.row.variantsMoreAria' | translate: { n: vs.length - variantCap }" scTooltipTier="label"
+                   (click)="onVariantMoreClick($event)">{{ 'search.row.variantsMore' | translate: { n: vs.length - variantCap } }}</a>
               }
             </span>
-            <span class="body">
-              <span class="name">{{ title(o.hit) }}</span>
-              <span class="meta">
-                @if (o.type === 'fresh') {
-                  <span class="kind">{{ 'codex.kindSingular.ship' | translate }}</span>
-                }
-                @if (mfr(o.hit); as m) { <span class="mfr">{{ m }}</span> }
-                @if (o.hit.size != null) { <span class="badge">{{ 'codex.card.size' | translate: { size: o.hit.size } }}</span> }
-                @if (o.hit.grade) { <span class="badge">{{ 'codex.search.bar.grade' | translate: { grade: o.hit.grade } }}</span> }
-                @if (livery(o.hit)) { <span class="badge livery">{{ 'codex.search.bar.livery' | translate }}</span> }
-                <!-- Says in words what the amber tint says in colour: announced, not in the build. -->
-                @if (isUpcoming(o.hit)) { <span class="badge soon">{{ 'codex.search.bar.upcomingBadge' | translate }}</span> }
-              </span>
-            </span>
-          </a>
-          @if (hasPath(o.hit)) {
+          }
+          @if (!here && hasPath(o.hit)) {
             <sc-item-path [kind]="o.hit.kind" [className]="o.hit.classNameSlug" [name]="title(o.hit)" />
           }
-          @if (showPin() && pinKind(o.hit); as pk) {
+          @if (!here && showPin() && pinKind(o.hit); as pk) {
             <button type="button" class="act pin" [class.pinned]="codex.isPinned(pk, o.hit.classNameSlug)"
                     (click)="codex.togglePin(pk, o.hit.classNameSlug)"
                     [attr.aria-pressed]="codex.isPinned(pk, o.hit.classNameSlug)"
@@ -198,6 +210,35 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
           }
         </div>
       }
+    </ng-template>
+
+    <ng-template #hitBody let-o let-here="here">
+          <span class="icon" aria-hidden="true">
+            @if (o.hit.kind === 'ship') {
+              <sc-ship-blueprint-icon [shipId]="o.hit.classNameSlug">
+                <sc-codex-icon [kind]="iconKind(o.hit)" />
+              </sc-ship-blueprint-icon>
+            } @else {
+              <sc-codex-icon [kind]="iconKind(o.hit)" />
+            }
+          </span>
+          <span class="body">
+            <span class="name">{{ title(o.hit) }}</span>
+            <span class="meta">
+              @if (here) {
+                <span class="here">{{ 'search.row.current' | translate }}</span>
+              }
+              @if (o.type === 'fresh') {
+                <span class="kind">{{ 'codex.kindSingular.ship' | translate }}</span>
+              }
+              @if (mfr(o.hit); as m) { <span class="mfr">{{ m }}</span> }
+              @if (o.hit.size != null) { <span class="badge">{{ 'codex.card.size' | translate: { size: o.hit.size } }}</span> }
+              @if (o.hit.grade) { <span class="badge">{{ 'codex.search.bar.grade' | translate: { grade: o.hit.grade } }}</span> }
+              @if (livery(o.hit)) { <span class="badge livery">{{ 'codex.search.bar.livery' | translate }}</span> }
+              <!-- Says in words what the amber tint says in colour: announced, not in the build. -->
+              @if (isUpcoming(o.hit)) { <span class="badge soon">{{ 'codex.search.bar.upcomingBadge' | translate }}</span> }
+            </span>
+          </span>
     </ng-template>
   `,
   styles: [`
@@ -228,7 +269,7 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
       color: var(--sc-fg-2); font: inherit; text-transform: none; letter-spacing: 0;
     }
     .head-action:hover { color: var(--sc-accent); }
-    .head-action:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .head-action:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
 
     .row {
       position: relative; display: flex; align-items: center; gap: 6px;
@@ -248,7 +289,7 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
       padding: 6px 8px; color: inherit; text-decoration: none; border-radius: inherit;
       min-height: 44px;
     }
-    .hit:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .hit:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .icon { flex: 0 0 auto; display: inline-flex; width: 30px; height: 30px; align-items: center; justify-content: center; color: var(--tone, var(--sc-accent)); }
     .icon:has(sc-ship-blueprint-art) { width: 44px; }
     .body { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
@@ -276,7 +317,7 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
       min-width: 36px; min-height: 36px; margin-right: 4px; border-radius: 6px; cursor: pointer;
       background: transparent; color: var(--sc-fg-2); border: 1px solid transparent; font-family: inherit;
     }
-    .act:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .act:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .act.add {
       padding: 0 10px; border-color: color-mix(in srgb, var(--sc-accent) 60%, transparent); color: var(--sc-accent);
       font-family: var(--sc-font-display); font-size: max(0.64rem, var(--sc-fs-floor)); letter-spacing: 0.05em; text-transform: uppercase;
@@ -306,11 +347,11 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
       padding: 6px 14px; border-radius: 6px; background: transparent; cursor: pointer; font-family: inherit;
       border: 1px solid var(--sc-danger); color: var(--sc-danger);
     }
-    .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .did-you-mean { display: flex; flex-wrap: wrap; gap: 4px 10px; margin: 0; padding: 0 8px 6px; color: var(--sc-fg-2); }
     .dym { color: var(--sc-accent); text-decoration: none; border-radius: 4px; }
     .dym:hover { text-decoration: underline; }
-    .dym:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .dym:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .partial {
       display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0; padding: 4px 8px;
       color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor));
@@ -320,7 +361,7 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
       background: none; border: 0; padding: 2px 4px; border-radius: 4px; cursor: pointer;
       color: var(--sc-accent); font: inherit; text-decoration: underline; text-underline-offset: 2px;
     }
-    .partial-retry:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 1px; }
+    .partial-retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* Pinned to the bottom of the scroll port: the key legend must not scroll
        away under a long result list. */
     .nav-hint {
@@ -343,6 +384,37 @@ import { SearchOption, hitManufacturer, hitTitle, isLivery, pinKindOf } from './
     .nav-hint kbd.glyph { font-size: max(1rem, var(--sc-fs-floor)); font-weight: 600; }
 
     .roomy .hit { padding: 8px 10px; }
+    /* The page the reader is on: greyed, still reachable by the arrows; it only closes the search. */
+    .row.current .hit { opacity: 0.62; cursor: default; }
+    .row.current .icon { color: var(--sc-fg-2); }
+    .row.current:hover, .row.current.active {
+      border-color: color-mix(in srgb, var(--sc-fg-2) 45%, transparent);
+      background: color-mix(in srgb, var(--sc-fg-2) 8%, transparent);
+    }
+    /* One row per ship page (C11): the own variants as mini text links under the name; they wrap,
+       never overflow the row; on touch each link grows to a finger-sized target. */
+    .row.has-variants { flex-wrap: wrap; }
+    .row.has-variants .hit { flex-basis: 60%; }
+    .variants {
+      order: 3; flex: 1 0 100%; min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline;
+      gap: 0 var(--sc-space-2); padding: 0 8px 4px calc(44px + 18px);
+      font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
+    }
+    .vl {
+      color: color-mix(in oklab, var(--sc-accent) 80%, var(--sc-fg-0)); text-decoration: underline;
+      text-decoration-color: color-mix(in srgb, var(--sc-accent) 35%, transparent); text-underline-offset: 2px;
+      border-radius: 4px; padding: 2px 0; overflow-wrap: anywhere;
+    }
+    .vl:hover { text-decoration-color: currentColor; }
+    .vl:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    .vl.here { color: var(--sc-fg-1); text-decoration: none; font-weight: 600; cursor: default; }
+    .vl.more { text-decoration: none; }
+    .vl.match { font-weight: 700; color: var(--sc-fg-0); text-decoration-color: currentColor; }
+    @media (pointer: coarse) { .vl { display: inline-flex; align-items: center; min-height: 48px; padding: 0 4px; } }
+    @media (max-width: 599.98px) { .variants { padding-left: 8px; } }
+    .here {
+      font-family: var(--sc-font-display); text-transform: uppercase; letter-spacing: 0.04em; color: var(--sc-fg-1);
+    }
     .roomy .icon { width: 34px; height: 34px; }
     .roomy .icon:has(sc-ship-blueprint-art) { width: 52px; }
 
@@ -399,6 +471,43 @@ export class CodexSearchResultsComponent {
     return `${this.listboxId()}-${o.id}`;
   }
 
+  /** The greyed "Du bist hier" row (note 4). */
+  isCurrent(o: SearchOption): boolean {
+    return o.type === 'hit' && !!o.current;
+  }
+
+  /** Variant mini links shown before "+n". */
+  readonly variantCap = VARIANT_LINKS_SHOWN;
+
+  /** A ship hit's own variants (one row per ship page, C11); empty for every other option. */
+  variantsOf(o: SearchOption): SearchVariantLink[] {
+    return o.type === 'hit' ? (o.variants ?? []) : [];
+  }
+
+  /**
+   * A variant mini link: the open one only closes the search (a plain href); any other one navigates
+   * through its routerLink and is remembered like its row. Modified clicks stay the browser's.
+   */
+  onVariantClick(ev: MouseEvent, o: SearchOption, v: SearchVariantLink): void {
+    ev.stopPropagation();
+    const plain = isPlainLeftClick(ev);
+    const cls = o.type === 'hit' ? o.hit.classNameSlug : null;
+    if (v.current && plain) {
+      ev.preventDefault();
+      this.engine().noteVariantOpened(cls, v);
+      this.navigated.emit();
+      return;
+    }
+    this.engine().noteVariantOpened(cls, v, !plain);
+    if (plain) this.navigated.emit();
+  }
+
+  /** "+n": the ship's page, where every variant can be picked. */
+  onVariantMoreClick(ev: MouseEvent): void {
+    ev.stopPropagation();
+    if (isPlainLeftClick(ev)) this.navigated.emit();
+  }
+
   isActive(o: SearchOption): boolean {
     return this.engine().activeOption()?.id === o.id;
   }
@@ -414,8 +523,15 @@ export class CodexSearchResultsComponent {
    * middle clicks are the browser's (new tab) and leave the search open.
    */
   onClick(ev: MouseEvent, o: SearchOption): void {
-    this.engine().opening(o);
-    if (!isPlainLeftClick(ev)) return;
+    const plain = isPlainLeftClick(ev);
+    this.engine().opening(o, !plain);
+    if (!plain) return;
+    if (this.isCurrent(o)) {
+      // The page the reader is on: only close — URL, query and fragment stay.
+      ev.preventDefault();
+      this.navigated.emit();
+      return;
+    }
     if (o.type === 'recent') {
       ev.preventDefault();
       this.engine().searchFor(o.term);

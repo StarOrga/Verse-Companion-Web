@@ -95,7 +95,7 @@ describe('HqLiveTickerComponent (App-Status)', () => {
 
   it('closing the Aussicht while the app is missing is remembered per page', () => {
     const { f, dock } = mount('planen');
-    (dock!.querySelector('.a-x') as HTMLButtonElement).click();
+    (dock!.querySelector('.scp-x') as HTMLButtonElement).click();
     f.detectChanges();
     expect(dock!.querySelector('.aussicht')).toBeNull();
     expect(JSON.parse(localStorage.getItem(AUSSICHT_SEEN_KEY)!)).toEqual(['planen']);
@@ -109,7 +109,8 @@ describe('HqLiveTickerComponent (App-Status)', () => {
     const { f, dock } = mount('inventar', { state: presence(90, true) });
     expect(dock?.dataset['state']).toBe('off');
     expect(dock?.querySelector('small')?.textContent).toContain('hq.appStatus.last');
-    expect(dock?.querySelector('sc-hq-app-launch a')?.textContent).toContain('hq.app.launch');
+    // Beside "App aus" the action reads "Jetzt starten", not "App starten" again.
+    expect(dock?.querySelector('sc-hq-app-launch a')?.textContent?.trim()).toBe('hq.app.launchNow');
     expect(dock?.querySelector('.aussicht')).toBeNull();
     // A closed panel is not in the DOM, so the toggle must not point at it.
     expect(dock?.querySelector('.face')?.hasAttribute('aria-controls')).toBe(false);

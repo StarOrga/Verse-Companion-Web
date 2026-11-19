@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import type { VersePoint } from '../data/verse.models';
-import type { StarTaskView } from './starmap.model';
-import { constellationEdges, starSlots } from './starmap.model';
+import type { StarSlot, StarTaskView } from './starmap.model';
+import { STARS_PER_PATCH, constellationEdges, starSlots } from './starmap.model';
 
 /**
- * The current star map in small: the very stars and lines of the dome (same
- * slots, same solid-between-two-lit / dashed-otherwise edges), scaled into a
- * header emblem. No circle, no globe. Lit stars glow; it states nothing the big
- * map does not (no task, no next-star hint). Decorative: the page states the
+ * The current star map in small: only what the user has discovered — the lit
+ * stars of the dome at their places and the solid lines between them, scaled
+ * into a header emblem. Never a default shape: with nothing lit yet it is ONE
+ * single star in the middle. No circle, no globe, no open stars, no task or
+ * next-star hint. Decorative: the page states the
  * progress in words.
  */
 @Component({
@@ -16,7 +17,7 @@ import { constellationEdges, starSlots } from './starmap.model';
   template: `
     <svg viewBox="-8 -8 116 116" aria-hidden="true" focusable="false">
       @for (e of edges(); track $index) {
-        <path class="ln" [class.on]="e.lit" [attr.d]="'M' + e.from.x + ' ' + e.from.y + 'L' + e.to.x + ' ' + e.to.y" />
+        <path class="ln on" [attr.d]="'M' + e.from.x + ' ' + e.from.y + 'L' + e.to.x + ' ' + e.to.y" />
       }
       @for (s of slots(); track s.index) {
         <g [attr.transform]="'translate(' + s.x + ' ' + s.y + ')'" [class.done]="s.state === 'done'">
@@ -47,6 +48,12 @@ export class StarmapMiniComponent {
   readonly tasks = input<readonly StarTaskView[]>([]);
   readonly next = input<StarTaskView | null>(null);
 
-  readonly slots = computed(() => starSlots(this.points(), this.tasks(), this.next()));
-  readonly edges = computed(() => constellationEdges(this.slots()));
+  private readonly all = computed(() => starSlots(this.points(), this.tasks(), this.next()));
+  readonly slots = computed<StarSlot[]>(() => {
+    const pts = this.points();
+    const lit = pts && pts.length === STARS_PER_PATCH ? this.all().filter((s) => s.state === 'done') : [];
+    if (lit.length === 0) return [{ index: 0, x: 50, y: 50, rank: 0, state: 'open', task: null }];
+    return lit;
+  });
+  readonly edges = computed(() => (this.slots().length > 1 ? constellationEdges(this.all()).filter((e) => e.lit) : []));
 }

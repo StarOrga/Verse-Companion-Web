@@ -7,6 +7,7 @@ import type { HardpointPortRef } from '../hardpoint-port-ref';
 import { FallbackImageComponent } from '../fallback-image.component';
 import { CodexCategoryIconComponent } from '../codex-category-icon.component';
 import type { StageCountChip } from './codex-detail.types';
+import { DeferErrorComponent } from '../../shared/defer-error/defer-error.component';
 
 /** One hero chip on the ship stage — a career/role/crew/cargo/mass fact or a
  * disclosed gap. Mirrors the shape `codex-detail.component.ts` computes. */
@@ -37,6 +38,7 @@ export interface StageHeroChip {
   selector: 'sc-codex-ship-stage',
   standalone: true,
   imports: [
+    DeferErrorComponent,
     TranslatePipe,
     ScTooltipDirective,
     ShipSkinViewerComponent,
@@ -69,6 +71,15 @@ export interface StageHeroChip {
               <span class="art-note">{{ 'codex.detail.noArtwork' | translate }}</span>
             </span>
           </sc-fallback-image>
+        } @error {
+          <!-- The chunk did not load (#367): the 2D art stays, the hint sits over its foot. -->
+          <sc-fallback-image [candidates]="heroArt()" [alt]="displayName()" [eager]="true">
+            <span class="art-fallback">
+              <sc-codex-icon class="hero-icon" [kind]="kind()" [sub]="heroSub()" />
+              <span class="art-note">{{ 'codex.detail.noArtwork' | translate }}</span>
+            </span>
+          </sc-fallback-image>
+          <sc-defer-error class="stage-defer-error" source="codex.shipStage" />
         }
       } @else {
         <sc-fallback-image [candidates]="heroArt()" [alt]="displayName()" [eager]="true">
@@ -192,6 +203,13 @@ export interface StageHeroChip {
       --sc-icon-max: 132px; }
     /* The live model is the one piece of stage art you may grab. */
     .stage-art.live { pointer-events: auto; }
+    /* #367: the viewer chunk did not load — the hint floats centred over the 2D art. */
+    .stage-defer-error {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      max-width: calc(100% - 2 * var(--sc-space-4));
+      background: color-mix(in srgb, var(--sc-bg-1) 88%, transparent);
+      border: 1px solid var(--sc-border); border-radius: 8px;
+    }
     .stage-art sc-ship-skin-viewer { display: block; width: 100%; height: 100%; }
     /* The bottom-wash gradient (.hero.stage::before) stays with the parent
        header — it is a pseudo-element of the card, not of this content. */
@@ -204,9 +222,9 @@ export interface StageHeroChip {
     .stage-ident { grid-row: 1; align-self: start; justify-self: start; position: relative; z-index: 1;
       max-width: calc(100% - 72px); box-sizing: border-box; pointer-events: none;
       padding: 8px 12px; border-radius: 4px;
-      background: color-mix(in srgb, var(--sc-bg-0) 78%, transparent);
+      background: color-mix(in srgb, var(--sc-bg-0) 88%, transparent);
       border: 1px solid color-mix(in srgb, var(--sc-border) 60%, transparent);
-      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+ }
     /* Typography lifted from the codex fleet tile (.fleet-tile__mfr / __name),
        with the emphasis swapped: the NAME carries the accent now — it is the
        ship this page is about — and the maker/role eyebrow steps back to the
@@ -264,7 +282,7 @@ export interface StageHeroChip {
     .view-switch:hover, .view-switch:focus-visible { opacity: 1; }
     .view-switch.on { color: var(--sc-accent); opacity: 0.85;
       border-color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-bg-0)); }
-    .view-switch:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .view-switch:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* "3D", not "30": the digit keeps the display face, the letter is set in
        the body face (Inter) at a heavier weight so its straight stem and flat
        bowl cannot be mistaken for a zero (feedback 140dfb7e).

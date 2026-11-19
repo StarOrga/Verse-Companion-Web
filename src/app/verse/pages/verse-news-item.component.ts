@@ -5,6 +5,7 @@ import { NewsThumbComponent } from '../../news/news-thumb.component';
 import { NewsService } from '../../news/news.service';
 import { OverlayFrameComponent, OverlayNeighbour } from '../../shared/overlay-frame/overlay-frame.component';
 import { OverlayOriginService } from '../../shared/overlay-frame/overlay-origin.service';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ShareButtonComponent } from '../../shared/share-button/share-button.component';
 
 /**
@@ -15,11 +16,11 @@ import { ShareButtonComponent } from '../../shared/share-button/share-button.com
 @Component({
   selector: 'sc-verse-news-item',
   standalone: true,
-  imports: [TranslatePipe, OverlayFrameComponent, NewsThumbComponent, ShareButtonComponent],
+  imports: [TranslatePipe, ScActionDirective, OverlayFrameComponent, NewsThumbComponent, ShareButtonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (item(); as it) {
-      <sc-overlay-frame [heading]="it.title" [prev]="prev()" [next]="next()" (closed)="close()">
+      <sc-overlay-frame [heading]="it.title" [eyebrow]="('news.channels.' + it.channel) | translate" [prev]="prev()" [next]="next()" (closed)="close()">
         <article class="item">
           <sc-news-thumb
             [images]="images()"
@@ -30,7 +31,7 @@ import { ShareButtonComponent } from '../../shared/share-button/share-button.com
           <p class="meta">{{ ('news.channels.' + it.channel) | translate }} · <time [attr.datetime]="it.publishedAt">{{ when() }}</time></p>
           @if (it.summary) { <p class="sum">{{ it.summary }}</p> }
           <h3 id="read-more" class="sc-sr-only">{{ 'overlay.news.source' | translate }}</h3>
-          <a class="sc-btn primary" [href]="it.url" target="_blank" rel="noopener noreferrer">
+          <a scAction tier="primary" [href]="it.url" target="_blank" rel="noopener noreferrer">
             {{ 'news.openExternal' | translate: { host: host() } }} ↗
           </a>
         </article>
@@ -55,7 +56,7 @@ import { ShareButtonComponent } from '../../shared/share-button/share-button.com
     .err { color: var(--sc-danger); padding: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .err .retry:hover:not(:disabled) { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .err .retry:disabled { opacity: 0.5; cursor: default; }
   `],
 })

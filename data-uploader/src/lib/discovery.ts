@@ -47,6 +47,11 @@ export interface DiscoveredChannel {
    * Null/absent when the manifest does not carry it.
    */
   buildNumber?: string | null;
+  /**
+   * Where `version` came from (see {@link resolveGameIdentity}). Absent on
+   * channels built by hand (tests, older callers) = unknown.
+   */
+  versionSource?: VersionSource | null;
   sizeBytes: number;
   source: 'saved' | 'rsi-launcher' | 'windows' | 'fs-scan' | 'manual';
 }
@@ -126,13 +131,14 @@ async function probeChannel(channelDir: string, source: Source): Promise<Discove
     return null;
   }
   if (!stat.isFile() || stat.size < 1024 * 1024) return null;
-  const ids = await readVersionFile(channelDir);
+  const ids = await readGameIdentity(channelDir);
   return {
     channel: inferChannelFromPath(channelDir),
     installPath: channelDir,
     dataP4kPath: dataP4k,
     version: ids.version,
     buildNumber: ids.buildNumber,
+    versionSource: ids.source,
     sizeBytes: stat.size,
     source,
   };
@@ -511,19 +517,95 @@ function inferChannelFromPath(p: string): ChannelTag {
   return channelOfName(basename(p.replace(/[\\/]+$/, ''))) ?? 'LIVE';
 }
 
-async function readVersionFile(
-  channelDir: string,
-): Promise<{ version: string | null; buildNumber: string | null }> {
-  for (const candidate of ['build_manifest.id', 'f_win_game_client_release_version.txt']) {
-    try {
-      const raw = await fs.readFile(join(channelDir, candidate), 'utf-8');
-      const m = raw.match(/\d+\.\d+(\.\d+)+/);
-      if (m) return { version: m[0], buildNumber: parseBuildNumber(raw) };
-    } catch {
-      /* skip */
-    }
+/** Where a channel's x.y.z came from — strongest first. */
+export type VersionSource = 'launcher-log' | 'manifest-branch' | 'version-file';
+
+/**
+ * The one identity of an installed game build: public patch x.y.z + build
+ * number. Every consumer (uploader header, auto-run decision, subtheme ledger
+ * key, `--patch` of the extractor, log lines) reads it from here.
+ */
+export interface GameIdentity {
+  version: string | null;
+  buildNumber: string | null;
+  source: VersionSource | null;
+}
+
+/**
+ * Resolve the identity from local files only — never from the server.
+ *
+ * - **Build**: `RequestedP4ChangeNum` of `build_manifest.id`.
+ * - **x.y.z, first choice**: the RSI launcher log line that installed exactly
+ *   this build — `Installing Star Citizen LIVE 4.10.3-live.13165946 at …`.
+ *   The launcher is the one local source that names the public patch: CIG
+ *   ships hotfixes on a reused branch (build 13165946 = 4.10.3 carries
+ *   `"Branch": "sc-alpha-4.10.0"`, older than the 4.10.2 build before it), and
+ *   the manifest's `"Version": "4.10.200.58746"` is an internal counter, not
+ *   the patch (4.10.2 / 12913470 had 4.10.197.2878). The build number must
+ *   match, so a log about another build can never relabel this one.
+ * - **Fallback**: the manifest's `Branch` x.y.z, then the first x.y.z of a
+ *   plain version file — deterministic, but may lag a hotfix.
+ */
+export function resolveGameIdentity(input: {
+  manifestRaw?: string | null;
+  versionFileRaw?: string | null;
+  launcherLog?: string | null;
+}): GameIdentity {
+  const buildNumber = input.manifestRaw ? parseBuildNumber(input.manifestRaw) : null;
+  if (buildNumber && input.launcherLog) {
+    const fromLog = patchFromLauncherLog(input.launcherLog, buildNumber);
+    if (fromLog) return { version: fromLog, buildNumber, source: 'launcher-log' };
   }
-  return { version: null, buildNumber: null };
+  if (input.manifestRaw) {
+    const branch = input.manifestRaw.match(/"Branch"\s*:\s*"[^"]*?(\d+\.\d+\.\d+)[^"]*"/);
+    if (branch?.[1]) return { version: branch[1], buildNumber, source: 'manifest-branch' };
+  }
+  const plain = input.versionFileRaw?.match(/\d+\.\d+\.\d+/);
+  if (plain) return { version: plain[0], buildNumber, source: 'version-file' };
+  return { version: null, buildNumber, source: null };
+}
+
+/**
+ * The public x.y.z the launcher logged for `buildNumber`
+ * (`4.10.3-live.13165946`, `4.11.0-ptu.13200000`). The newest line wins.
+ */
+export function patchFromLauncherLog(log: string, buildNumber: string): string | null {
+  const re = /\b(\d+\.\d+\.\d+)-[a-z][a-z-]*\.(\d+)\b/gi;
+  let hit: string | null = null;
+  for (const m of log.matchAll(re)) if (m[2] === buildNumber) hit = m[1]!;
+  return hit;
+}
+
+async function readText(path: string, maxBytes = 8 * 1024 * 1024): Promise<string | null> {
+  try {
+    const stat = await fs.stat(path);
+    if (!stat.isFile()) return null;
+    const fh = await fs.open(path, 'r');
+    try {
+      const len = Math.min(stat.size, maxBytes);
+      const buf = Buffer.alloc(len);
+      await fh.read(buf, 0, len, stat.size - len);
+      return buf.toString('utf-8');
+    } finally {
+      await fh.close();
+    }
+  } catch {
+    return null;
+  }
+}
+
+/** {@link resolveGameIdentity} over the channel folder + the launcher's logs. */
+export async function readGameIdentity(channelDir: string, launcherRoot = launcherDir()): Promise<GameIdentity> {
+  const manifestRaw = await readText(join(channelDir, 'build_manifest.id'));
+  const versionFileRaw = manifestRaw ? null : await readText(join(channelDir, 'f_win_game_client_release_version.txt'));
+  let launcherLog: string | null = null;
+  if (manifestRaw && parseBuildNumber(manifestRaw)) {
+    const logs = await Promise.all(
+      ['log.old.log', 'log.log'].map((n) => readText(join(launcherRoot, 'logs', n))),
+    );
+    launcherLog = logs.filter(Boolean).join('\n') || null;
+  }
+  return resolveGameIdentity({ manifestRaw, versionFileRaw, launcherLog });
 }
 
 /**

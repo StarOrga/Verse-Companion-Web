@@ -9,6 +9,7 @@ import { ExtensionBridgeService, ExtensionHangarPayload } from './extension-brid
 import { HangarImportComponent } from './hangar-import.component';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { HANGAR_ROOT_CRUMB } from '../shared/page-header/nav-origin.service';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /**
  * /hangar/import — the review + confirm screen for the browser-extension
@@ -26,7 +27,7 @@ type Phase = 'waiting' | 'ready' | 'empty' | 'done';
 @Component({
   selector: 'sc-hangar-import-page',
   standalone: true,
-  imports: [PageHeaderComponent, RouterLink, TranslatePipe, HangarImportComponent],
+  imports: [PageHeaderComponent, RouterLink, TranslatePipe, HangarImportComponent, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
@@ -48,10 +49,10 @@ type Phase = 'waiting' | 'ready' | 'empty' | 'done';
             <strong>{{ 'extension.importPage.empty.title' | translate }}</strong>
             <p>{{ 'extension.importPage.empty.text' | translate }}</p>
             <div class="row">
-              <a class="sc-btn" routerLink="/apps/extension">
+              <a scAction tier="secondary" routerLink="/apps/extension">
                 {{ 'extension.importPage.empty.installLink' | translate }}
               </a>
-              <a class="sc-btn" [routerLink]="hangarLink">
+              <a scAction tier="secondary" [routerLink]="hangarLink">
                 {{ 'extension.importPage.empty.hangarLink' | translate }}
               </a>
             </div>
@@ -62,7 +63,7 @@ type Phase = 'waiting' | 'ready' | 'empty' | 'done';
           <div class="sc-card state done">
             <strong>{{ 'extension.importPage.done.title' | translate: { count: importedCount() } }}</strong>
             <p>{{ 'extension.importPage.done.text' | translate }}</p>
-            <a class="sc-btn sc-btn-primary" [routerLink]="hangarLink">
+            <a scAction tier="primary" [routerLink]="hangarLink">
               {{ 'extension.importPage.done.hangarLink' | translate }}
             </a>
           </div>
@@ -87,7 +88,7 @@ type Phase = 'waiting' | 'ready' | 'empty' | 'done';
               [preloadedRows]="rows()"
               [embedded]="true"
               (imported)="onImported($event)" />
-            <button type="button" class="link-btn" (click)="cancel()">
+            <button type="button" scAction tier="secondary" class="cancel" (click)="cancel()">
               {{ 'extension.importPage.cancel' | translate }}
             </button>
           </div>
@@ -111,9 +112,7 @@ type Phase = 'waiting' | 'ready' | 'empty' | 'done';
       .privacy { margin: 10px 0 0; font-size: max(0.78rem, var(--sc-fs-floor)); color: var(--sc-fg-2); line-height: 1.55;
         border-top: 1px solid var(--sc-border); padding-top: 8px; }
       .review h2 { margin: 0 0 10px; font-size: 0.95rem; font-family: var(--sc-font-display); letter-spacing: 0.04em; }
-      .link-btn { background: transparent; border: 0; color: var(--sc-fg-2); cursor: pointer;
-        font-size: max(0.78rem, var(--sc-fs-floor)); margin-top: 10px; text-decoration: underline; padding: 0; }
-      .sc-btn-primary { background: var(--sc-accent); color: var(--sc-bg-0); border-color: var(--sc-accent); }
+      .review .cancel { margin-top: 10px; }
       .spinner { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--sc-border);
         border-top-color: var(--sc-accent); display: inline-block; animation: spin 0.9s linear infinite; }
       @keyframes spin { to { transform: rotate(360deg); } }
@@ -145,7 +144,7 @@ export class HangarImportPageComponent implements OnInit {
     this.payload.set(payload);
     this.rows.set(payload.ships);
     this.phase.set('ready');
-    this.analytics.capture('hangar_extension_handover', { ships_offered: payload.ships.length });
+    this.analytics.track('hangar:extension_import', { ships_offered: payload.ships.length });
   }
 
   capturedLabel(): string {

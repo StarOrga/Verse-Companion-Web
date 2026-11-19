@@ -1,8 +1,10 @@
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
   ElementRef,
+  Injector,
   OnInit,
   computed,
   effect,
@@ -18,19 +20,10 @@ import { OverlayOriginService } from '../shared/overlay-frame/overlay-origin.ser
 import { TranslatePipe } from '@ngx-translate/core';
 import { LightboxComponent, LightboxImage } from '../shared/lightbox/lightbox.component';
 import { AnalyticsService } from '../core/analytics.service';
-import {
-  STARSCAPE_FILTERS,
-  StarscapeService,
-  StarscapeRing,
-  Wallpaper,
-  isStarscapeFilter,
-  ringsForRole,
-} from './starscape.service';
+import { StarscapeService, StarscapeRing, Wallpaper, ringsForRole } from './starscape.service';
 import { AuthService } from '../auth/auth.service';
-import { ScSelectComponent, ScSelectOption } from '../shared/sc-select.component';
 import { ScEntryDirective } from '../shared/entry-motion/entry-motion';
 import { SammlungService } from '../hq/nachschub/sammlung.service';
-import { SammlungStripComponent, SammlungStripItem } from '../shared/sammlung-strip/sammlung-strip.component';
 import { ImgReadyDirective, rsiVariant } from '../news/news-thumb.component';
 import { RoleService } from '../auth/role.service';
 import { AppDownloadMenuComponent } from '../desktop/app-download-menu.component';
@@ -41,6 +34,8 @@ import { StarscapeTilesService } from './starscape-tiles.service';
 import { isPlainLeftClick } from '../core/modified-click.util';
 import { NeuroFieldDirective } from '../core/neuro-field.directive';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { StarscapeFilterSegmentComponent } from './starscape-filter-segment.component';
+import { StagePlan, planStage, prefersReducedMotion } from './starscape-stage';
 
 // Believable, varied masonry-tile shapes for the loading skeletons. The gallery
 // rows carry no dimension metadata, so a fixed cycle of plausible shapes gives
@@ -99,6 +94,8 @@ const IMAGE_STALL_MS = 20_000;
  */
 const FIRST_PAINT_TILES = 24;
 const RENDER_CHUNK = 24;
+/** How long a staged first load waits for the reader's Sammlung before it plays without it. */
+const STAGE_SAMMLUNG_WAIT_MS = 600;
 
 /**
  * Starscape (#133) — high-res wallpaper gallery from crawled RSI news imagery.
@@ -108,15 +105,14 @@ const RENDER_CHUNK = 24;
 @Component({
   selector: 'sc-starscape',
   standalone: true,
-  imports: [NeuroFieldDirective, RouterLink,
+  imports: [ScActionDirective, NeuroFieldDirective, RouterLink,
     TranslatePipe,
     ImgReadyDirective,
     AppDownloadMenuComponent,
     StarscapeAppPromoComponent,
     StarscapeVoteButtonComponent,
-    ScSelectComponent,
     ScEntryDirective,
-    SammlungStripComponent,
+    StarscapeFilterSegmentComponent,
     LightboxComponent,
     ScTooltipDirective,
   ],
@@ -140,29 +136,20 @@ const RENDER_CHUNK = 24;
              The ring is still chosen HERE, before the download: the app reads it
              off the filename and locks to it, no in-app switch. -->
         @if (!embedded()) {
-          <div class="app-cta">
-            <sc-app-download-menu [product]="'starscape'" [fallbackUrl]="appDownloadUrl" />
+          <!-- The four views sit in the head, next to the app menu (concept
+               20261115-2122 d1-segment); embedded, the Verse head carries them. -->
+          <div class="head-acts">
+            <sc-starscape-filter-segment />
+            <div class="app-cta">
+              <sc-app-download-menu [product]="'starscape'" [fallbackUrl]="appDownloadUrl" />
+            </div>
           </div>
         }
       </header>
 
-      <!-- Exactly four views (note #15): All, Newest, Community Top, My votes.
-           Series is no filter any more - it stays a badge on the tile. "My
-           votes" needs an account, so a signed-out visitor sees it disabled,
-           with the reason as its tooltip. -->
-      <div class="controls ce" style="--ce: 1">
-        <sc-select
-          class="source-filter"
-          [allowEmpty]="false"
-          [options]="filterOptions()"
-          [value]="svc.filter()"
-          [ariaLabel]="'starscape.filter.label' | translate"
-          (valueChange)="setFilter($event ?? 'all')" />
-      </div>
-
-      <!-- The Sammlung pattern (concept nachschub-hq r4-d1-s7g): up-voted wallpapers count as collected. Nothing in the
-           gallery below changes. -->
-      <sc-sammlung-strip class="ce" style="--ce: 2" [items]="collectedItems()" [ariaLabel]="'sammlungStrip.galleryAria' | translate" />
+      <!-- No filter row and no Sammlung strip any more (concept 20261115-2122,
+           B1.3/B1.5): the views are a segment in the page head, and the
+           Sammlung is one of them - its images open through the normal tile. -->
 
       <!-- A failed page load is a dead end without a way back in: the request is
            only ever fired on mount, so a phone that lost the connection for one
@@ -179,7 +166,7 @@ const RENDER_CHUNK = 24;
           @if (!svc.timedOut()) {
             <p class="err-detail">{{ err | translate }}</p>
           }
-          <button type="button" class="sc-btn" [disabled]="svc.loading()" (click)="reload()">
+          <button type="button" scAction tier="secondary" [disabled]="svc.loading()" (click)="reload()">
             {{ 'starscape.retry' | translate }}
           </button>
         </div>
@@ -187,7 +174,7 @@ const RENDER_CHUNK = 24;
 
       @if (tiles().length === 0 && !svc.loading() && !svc.error()) {
         <div class="sc-card empty">
-          <p>{{ (svc.filter() === 'mine' ? 'starscape.filter.emptyMine' : 'starscape.empty') | translate }}</p>
+          <p>{{ (svc.filter() === 'mine' ? 'starscape.filter.emptySammlung' : 'starscape.empty') | translate }}</p>
         </div>
       }
 
@@ -195,7 +182,7 @@ const RENDER_CHUNK = 24;
            so the grid reads as "images incoming", never as collapsed stripes.
            The caption is what tells a visitor that the bars ARE the loading
            state — unlabelled, a screen of them just reads as broken content. -->
-      @if (svc.loading() && svc.wallpapers().length === 0) {
+      @if (svc.loading() && svc.wallpapers().length === 0 && held().length === 0) {
         <p class="wall-status" role="status" aria-live="polite">{{ 'starscape.loadingImages' | translate }}</p>
         <div class="wall" aria-hidden="true">
           @for (i of skeletonSlots; track i) {
@@ -210,7 +197,7 @@ const RENDER_CHUNK = 24;
       @if (imagesStalled()) {
         <div class="sc-card stalled" role="status">
           <p>{{ 'starscape.imagesStalled' | translate }}</p>
-          <button type="button" class="sc-btn" (click)="retryImages()">
+          <button type="button" scAction tier="secondary" (click)="retryImages()">
             {{ 'starscape.retryImages' | translate }}
           </button>
         </div>
@@ -220,12 +207,26 @@ const RENDER_CHUNK = 24;
            the wall is re-entered with every page the visitor had loaded, and
            building all of them between two frames is what made coming back from
            another tab stutter (admin feedback 2bf4ab11). -->
-      <div class="wall ce" style="--ce: 3">
+      <!-- Staged first load (B1.7, motion spec in the concept's parity.md): an
+           announced Neu phase, an announced Sammlung phase, then the rest. The
+           veil is decoration only; the tiles stay clickable throughout. -->
+      <div class="wall-stage ce" style="--ce: 3" [class.stg]="stage() !== null" [class.stg-wait]="stagePending()">
+        @if (stage(); as st) {
+          @for (wd of st.words; track wd.key) {
+            <div class="stg-veil" aria-hidden="true" [style.--stg-at.ms]="wd.at">
+              <span class="stg-word">{{ wd.key | translate }}</span>
+            </div>
+          }
+        }
+      @for (k of [wallKey()]; track k) {
+      <div class="wall" [class.switching]="held().length > 0" [class.arrive]="k > 0"
+           [attr.aria-busy]="held().length > 0 ? 'true' : null">
         @for (w of visibleTiles(); track w.imageId; let i = $index) {
         <!-- The wrapper exists so the thumbs-up can be a SIBLING of the tile
              link: a <button> nested inside an <a> is invalid HTML and would eat
              the anchor's middle-click / "open in new tab" behaviour. -->
-        <div class="tile-wrap">
+        <div class="tile-wrap" [class.stg-tile]="stageDelay(w.imageId) !== null"
+             [class.stg-mark]="stageMarked(w.imageId)" [style.--stg-d.ms]="stageDelay(w.imageId)">
           <!-- A tile is a link to the full-res source (d2171662): middle click,
                Ctrl/⌘+click and "open image in new tab" go straight to the CDN
                original; a plain left click keeps the in-page lightbox. -->
@@ -332,13 +333,15 @@ const RENDER_CHUNK = 24;
         </div>
         }
       </div>
+      }
+      </div>
 
       <!-- Auto-load: reaching this marker (it sits well before the end of the
            wall) pulls the next page. The button stays as the fallback and for
            keyboard / reduced-data users. -->
       @if (svc.hasMore()) {
         <div #sentinel class="sentinel" aria-hidden="true"></div>
-        <button type="button" class="sc-btn more" [disabled]="svc.loading()" (click)="svc.load()">
+        <button type="button" scAction tier="secondary" class="more" [busy]="svc.loading()" [disabled]="svc.loading()" (click)="svc.load()">
           {{ (svc.loading() ? 'starscape.loading' : 'starscape.loadMore') | translate }}
         </button>
       }
@@ -364,7 +367,7 @@ const RENDER_CHUNK = 24;
       <sc-lightbox [image]="lightboxImage(w)" (closed)="close()">
         <!-- A phone views images here, so the vote and the share stay reachable. -->
         <sc-vote-button [imageId]="w.imageId" />
-        <button type="button" class="sc-btn lb-share" (click)="share(w)">{{ 'starscape.share.label' | translate }}</button>
+        <button type="button" scAction tier="secondary" class="lb-share" (click)="share(w)">{{ 'starscape.share.label' | translate }}</button>
         @if (shareHint(); as hint) {
           <p class="lb-hint" role="status" aria-live="polite">{{ hint | translate }}</p>
         }
@@ -380,11 +383,62 @@ const RENDER_CHUNK = 24;
     /* Slot for the shared app-download menu — the menu owns its own styling and
        overlay positioning (sc-app-download-menu); this only aligns the column. */
     .app-cta { display: flex; justify-content: flex-end; flex: 0 0 auto; }
+    .head-acts { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; max-width: 100%; }
 
-    /* One row: the four-view filter. It reserves its height so the wall below
-       never jumps when a view loads. */
-    .controls { display: flex; align-items: center; min-height: 48px; }
-    .source-filter { width: min(100%, 15rem); }
+    /* B1.6 - a view switch holds the old tiles dimmed, then the new wall fades
+       in (mock d1-segment-top, fbFade). Never a skeleton wall or an empty flash. */
+    .wall { transition: opacity 160ms ease; }
+    .wall.switching { opacity: 0.4; pointer-events: none; }
+    .wall.arrive { animation: sc-wall-arrive 0.5s ease both; }
+    @keyframes sc-wall-arrive { 0% { opacity: 0; filter: blur(3px); } 100% { opacity: 1; filter: none; } }
+
+    /* B1.7 - staged first load. One-shot CSS only; the class goes when it ends. */
+    .wall-stage { position: relative; }
+    .wall-stage.stg-wait .wall { opacity: 0; }
+    .stg .stg-tile { animation: sc-stg-in 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--stg-d, 0ms); }
+    .stg .stg-tile.stg-mark > .tile {
+      animation: sc-stg-mark 900ms ease-out both; animation-delay: var(--stg-d, 0ms); }
+    .stg-veil {
+      position: absolute; z-index: 5; left: 0; right: 0; top: 0; height: min(100%, 70vh);
+      display: grid; place-items: center; pointer-events: none; border-radius: 12px; overflow: hidden;
+      background: radial-gradient(ellipse at 50% 45%, rgba(2, 7, 13, 0.55), rgba(2, 7, 13, 0.2) 60%, transparent 85%);
+      opacity: 0; animation: sc-stg-veil 1100ms linear both; animation-delay: var(--stg-at, 0ms);
+    }
+    .stg-veil::after {
+      content: ''; position: absolute; left: 8%; right: 8%; top: 58%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--sc-accent), transparent); opacity: 0.7;
+    }
+    .stg-word {
+      font-family: var(--sc-font-display); text-transform: uppercase; color: var(--sc-accent);
+      font-size: clamp(1.6rem, 5vw, 3.2rem); letter-spacing: 0.32em; padding-left: 0.32em;
+      text-shadow: 0 0 24px color-mix(in srgb, var(--sc-accent) 55%, transparent);
+      animation: sc-stg-word 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--stg-at, 0ms);
+    }
+    @keyframes sc-stg-in { 0% { opacity: 0; transform: scale(0.96); filter: blur(6px); } 100% { opacity: 1; transform: none; filter: none; } }
+    @keyframes sc-stg-mark {
+      0% { box-shadow: 0 0 0 0 transparent; }
+      30% { box-shadow: 0 0 0 1px var(--sc-accent), 0 0 22px color-mix(in srgb, var(--sc-accent) 45%, transparent); }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+    @keyframes sc-stg-veil { 0% { opacity: 0; } 20% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; } }
+    @keyframes sc-stg-word {
+      0% { opacity: 0; letter-spacing: 0.6em; transform: translateY(8px); }
+      25% { opacity: 1; letter-spacing: 0.32em; transform: none; }
+      75% { opacity: 1; letter-spacing: 0.32em; }
+      100% { opacity: 0; letter-spacing: 0.32em; }
+    }
+    @media (pointer: coarse) {
+      .wall.arrive { animation-name: sc-wall-arrive-flat; }
+      .stg .stg-tile { animation-name: sc-stg-in-flat; }
+    }
+    @keyframes sc-wall-arrive-flat { 0% { opacity: 0; } 100% { opacity: 1; } }
+    @keyframes sc-stg-in-flat { 0% { opacity: 0; transform: scale(0.96); } 100% { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      .wall { transition: none; }
+      .wall.arrive, .stg .stg-tile, .stg .stg-tile.stg-mark > .tile { animation: none; }
+      .stg-veil { display: none; }
+      .wall-stage.stg-wait .wall { opacity: 1; }
+    }
 
     /* A grid of uniform cells, not CSS columns. Columns balance their height
        on every append, so a loaded page re-flowed tiles sideways and left
@@ -410,7 +464,7 @@ const RENDER_CHUNK = 24;
       color: inherit; text-decoration: none;
       transition: transform 0.16s ease, box-shadow 0.16s ease;
     }
-    .tile:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .tile:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .tile-wrap:hover { transform: translateY(-2px); }
     .tile-wrap:hover > .tile {
       box-shadow: 0 6px 18px rgba(0,0,0,0.45), 0 0 14px color-mix(in srgb, var(--sc-accent) 25%, transparent); }
@@ -429,7 +483,7 @@ const RENDER_CHUNK = 24;
       background: color-mix(in srgb, var(--sc-bg-0) 70%, transparent); color: var(--sc-fg-0);
     }
     .tile-share:hover, .tile-share:focus-visible { color: var(--sc-accent); border-color: var(--sc-accent); }
-    .tile-share:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .tile-share:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .tile-toast {
       position: fixed; z-index: 30; left: 50%; transform: translateX(-50%);
       bottom: var(--sc-float-bottom, 16px); padding: 8px 14px; border-radius: 999px;
@@ -492,8 +546,7 @@ const RENDER_CHUNK = 24;
     .tile-series {
       position: absolute; left: 8px; bottom: 8px;
       padding: 2px 8px; border-radius: 999px; font-size: max(0.62rem, var(--sc-fs-floor));
-      background: rgba(0, 0, 0, 0.6); color: var(--sc-fg-1);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.78); color: var(--sc-fg-1);
     }
 
     /* Broken preview: the tile keeps the shape it reserved and states the case,
@@ -557,17 +610,14 @@ const RENDER_CHUNK = 24;
       /* One full-width column on a phone: the thumbs-up sits on the artwork
          with a safe inset and is never hidden behind a hover it cannot get. */
       .tile-vote { top: 10px; right: 10px; }
-      /* The four segments share the full width as thumb-sized targets. */
-      .source-filter { display: block; width: 100%; }
+      .head-acts { width: 100%; }
     }
 
     /* Touch targets. 48px rather than the 44px minimum because the app-wide
        reveal/press animations scale interactive elements by 0.994, which measures
        a 44px control as 43px. */
     @media (pointer: coarse) {
-      .more { min-height: 48px; }
       .tf-retry { min-height: 48px; }
-      .err .sc-btn, .stalled .sc-btn { min-height: 48px; }
       /* No blur-up on touch hardware. A 12px blur over a full-width phone tile
          is a GPU-composited layer per tile, and while it is up the picture IS a
          grey-blue smear — on a mid-range phone decoding a whole column at once
@@ -576,7 +626,6 @@ const RENDER_CHUNK = 24;
          cannot leave a half-composited layer behind. */
       .tile-img { filter: none; transform: none; transition: opacity 0.3s ease; }
       .tile-img.ready { filter: none; transform: none; }
-      .lb-share { min-height: 48px; }
       /* No hover on touch — the lift and the zoom-in cursor are mouse idioms. */
       .tile { cursor: pointer; }
       .tile-wrap:hover { transform: none; }
@@ -615,6 +664,7 @@ export class StarscapeComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
 
   /**
    * Rings this visitor may download, clamped by role (viewer → stable,
@@ -652,7 +702,11 @@ export class StarscapeComponent implements OnInit {
   );
 
   /** What the grid paints: the active view's rows (the service owns the ordering). */
-  readonly tiles = computed<readonly Wallpaper[]>(() => this.svc.wallpapers());
+  readonly tiles = computed<readonly Wallpaper[]>(() => {
+    const rows = this.svc.wallpapers();
+    const held = this.held();
+    return rows.length === 0 && held.length > 0 ? held : rows;
+  });
 
   /**
    * How much of {@link tiles} is currently in the DOM. Grows one
@@ -669,35 +723,25 @@ export class StarscapeComponent implements OnInit {
     return limit >= list.length ? list : list.slice(0, limit);
   });
 
-  /**
-   * The four views as segments. Ids are stable names (the service owns them),
-   * labels are i18n keys. "My votes" is visible but not pickable while signed
-   * out, with the reason as its tooltip.
-   */
-  readonly filterOptions = computed<readonly ScSelectOption[]>(() => {
-    const signedIn = this.auth.isAuthenticated();
-    const voted = this.sammlung.gallery().size;
-    return STARSCAPE_FILTERS.map((f) => ({
-      value: f.id,
-      labelKey: f.id === 'mine' && voted > 0 ? 'starscape.filter.mineCount' : f.labelKey,
-      labelParams: { n: voted },
-      disabled: f.id === 'mine' && !signedIn,
-    }));
-  });
-
-  /** The collected strip: wallpapers the reader up-voted (the Sammlung's gallery set), newest first. */
+  /** The reader's Sammlung (up-voted wallpapers) - what the staged load's second phase lights up. */
   private readonly sammlung = inject(SammlungService);
-  private readonly collected = signal<readonly Wallpaper[]>([]);
-  readonly collectedItems = computed<readonly SammlungStripItem[]>(() =>
-    this.collected().map((w) => ({
-      id: w.imageId,
-      title: w.title ?? w.series ?? '',
-      thumb: w.previewUrl,
-      link: [],
-      queryParams: { [DEEP_LINK_PARAM]: w.imageId },
-      queryParamsHandling: 'merge' as const,
-    })),
-  );
+
+  /**
+   * B1.6: the tiles of the view being LEFT, kept on screen (dimmed) while the
+   * picked view's first page is on its way. Empty when no switch is pending.
+   */
+  readonly held = signal<readonly Wallpaper[]>([]);
+  /** Bumped when a switched-to view arrives: re-creates the wall so it fades in once. */
+  readonly wallKey = signal(0);
+  private lastPainted: readonly Wallpaper[] = [];
+
+  /** B1.7: the staged first load, or null when it is not (or no longer) playing. */
+  readonly stage = signal<StagePlan | null>(null);
+  /** Rows are in, but the Sammlung is still being read: the wall waits (bounded) for it. */
+  readonly stagePending = signal(false);
+  private stageArmed = false;
+  private stageTimer: ReturnType<typeof setTimeout> | null = null;
+  private stageWaitTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** Scroll marker that pulls the next page - see {@link observeSentinel}. */
   private readonly sentinel = viewChild<ElementRef<HTMLElement>>('sentinel');
@@ -750,11 +794,44 @@ export class StarscapeComponent implements OnInit {
     effect(() => {
       void this.svc.loadRingReleases(this.allowedRings());
     });
-    // The collected strip follows the reader's up-votes (the Sammlung's gallery set).
+    // The staged load's Sammlung phase reads the reader's up-votes.
     void this.sammlung.load();
+    // B1.6 - hold the old tiles through a view switch. `lastPainted` is the
+    // last non-empty list; the service empties its rows synchronously on a
+    // switch, so it still holds the view being left when the filter effect runs.
     effect(() => {
-      const ids = [...this.sammlung.gallery()];
-      untracked(() => void this.svc.loadMany(ids).then((w) => this.collected.set(w)));
+      const rows = this.svc.wallpapers();
+      if (rows.length > 0) this.lastPainted = rows;
+    });
+    let shownFilter = this.svc.filter();
+    effect(() => {
+      const f = this.svc.filter();
+      if (f === shownFilter) return;
+      shownFilter = f;
+      untracked(() => {
+        this.cancelStage();
+        if (this.svc.wallpapers().length === 0 && this.lastPainted.length > 0) this.held.set(this.lastPainted);
+      });
+    });
+    effect(() => {
+      const settled = this.svc.settledView() === this.svc.filter();
+      const rows = this.svc.wallpapers().length;
+      if (!settled && rows === 0) return;
+      untracked(() => {
+        if (this.held().length === 0) return;
+        this.held.set([]);
+        this.wallKey.update((k) => k + 1);
+      });
+    });
+    // B1.7 - stage the first page of a cold mount (see the motion spec).
+    this.stageArmed =
+      this.svc.wallpapers().length === 0 &&
+      !this.route.snapshot.queryParamMap.get(DEEP_LINK_PARAM) &&
+      !prefersReducedMotion();
+    effect(() => {
+      const rows = this.svc.wallpapers();
+      if (!this.stageArmed || rows.length === 0) return;
+      untracked(() => this.startStage());
     });
     // Arm the stall watch as soon as there are rows to draw.
     effect(() => {
@@ -800,6 +877,7 @@ export class StarscapeComponent implements OnInit {
       if (this.shareHintTimer) clearTimeout(this.shareHintTimer);
       if (this.stallTimer) clearTimeout(this.stallTimer);
       if (this.fillHandle !== null) cancelAnimationFrame(this.fillHandle);
+      this.cancelStage();
     });
   }
 
@@ -849,11 +927,61 @@ export class StarscapeComponent implements OnInit {
     await this.openDeepLink();
   }
 
-  /** Switch the gallery's view (see `STARSCAPE_FILTERS`). */
-  setFilter(id: string): void {
-    if (!isStarscapeFilter(id)) return;
-    if (id === 'mine' && !this.auth.isAuthenticated()) return;
-    void this.svc.setFilter(id);
+  /**
+   * Plan and run the staged first load. Waits up to {@link STAGE_SAMMLUNG_WAIT_MS}
+   * for the Sammlung when a signed-in reader's set is still being read, so the
+   * second phase is not skipped just because its rows came in later.
+   */
+  private startStage(): void {
+    this.stageArmed = false;
+    if (this.svc.filter() !== 'all') return;
+    if (!this.auth.isAuthenticated() || this.sammlung.loaded()) {
+      this.runStage();
+      return;
+    }
+    this.stagePending.set(true);
+    let done = false;
+    const go = (): void => {
+      if (done) return;
+      done = true;
+      ref.destroy();
+      if (this.stageWaitTimer) clearTimeout(this.stageWaitTimer);
+      this.stageWaitTimer = null;
+      this.stagePending.set(false);
+      this.runStage();
+    };
+    const ref = effect(() => { if (this.sammlung.loaded()) untracked(go); }, { injector: this.injector });
+    this.stageWaitTimer = setTimeout(go, STAGE_SAMMLUNG_WAIT_MS);
+  }
+
+  private runStage(): void {
+    if (this.svc.filter() !== 'all') return;
+    const plan = planStage(this.visibleTiles(), this.sammlung.gallery(), Date.now());
+    if (!plan) return;
+    this.stage.set(plan);
+    this.stageTimer = setTimeout(() => {
+      this.stageTimer = null;
+      this.stage.set(null);
+    }, plan.total);
+  }
+
+  private cancelStage(): void {
+    this.stageArmed = false;
+    if (this.stageTimer) clearTimeout(this.stageTimer);
+    if (this.stageWaitTimer) clearTimeout(this.stageWaitTimer);
+    this.stageTimer = this.stageWaitTimer = null;
+    this.stage.set(null);
+    this.stagePending.set(false);
+  }
+
+  /** The tile's entrance delay while the staged load plays, else null. */
+  stageDelay(id: string): number | null {
+    return this.stage()?.delays.get(id) ?? null;
+  }
+
+  /** Whether the tile belongs to an announced phase (Neu / Sammlung) and gets the accent mark. */
+  stageMarked(id: string): boolean {
+    return this.stage()?.marked.has(id) ?? false;
   }
 
   /** Start (or restart) the "no picture has arrived yet" deadline. */
@@ -959,7 +1087,7 @@ export class StarscapeComponent implements OnInit {
     const nav = typeof navigator !== 'undefined' ? navigator : undefined;
     const hint = (key: string) => (from === 'tile' ? this.flashTileHint(key) : this.flashShareHint(key));
     if (nav?.share) {
-      this.analytics.captureVerse('starscape_share', { image_id: w.imageId, channel: 'native' });
+      this.analytics.track('verse:starscape_share', { image_id: w.imageId, channel: 'native' });
       try {
         await nav.share({ title: w.title ?? 'Starscape', url });
       } catch {
@@ -974,7 +1102,7 @@ export class StarscapeComponent implements OnInit {
     }
     try {
       await clipboard.writeText(url);
-      this.analytics.captureVerse('starscape_share', { image_id: w.imageId, channel: 'copy' });
+      this.analytics.track('verse:starscape_share', { image_id: w.imageId, channel: 'copy' });
       hint('starscape.share.copied');
     } catch {
       hint('starscape.share.failed');

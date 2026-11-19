@@ -42,7 +42,7 @@ const NAME_LIMIT = 6;
           <ul class="ships">
             @for (ship of addedShown(); track ship.id) {
               <li class="ship" [class.wish]="isWished(ship)">
-                @if (isWished(ship)) { <svg class="sc-action-icon is-filled" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="wishPath" /></svg> }
+                @if (isWished(ship)) { <svg class="sc-action-icon is-filled" viewBox="0 0 24 24" aria-hidden="true">@for (d of wishPath; track $index) { <path [attr.d]="d" /> }</svg> }
                 <span class="nm">{{ ship.name }}</span>
               </li>
             }
@@ -59,7 +59,7 @@ const NAME_LIMIT = 6;
           <ul class="ships">
             @for (ship of wishedUpdates(); track ship.id) {
               <li class="ship wish">
-                <svg class="sc-action-icon is-filled" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="wishPath" /></svg>
+                <svg class="sc-action-icon is-filled" viewBox="0 0 24 24" aria-hidden="true">@for (d of wishPath; track $index) { <path [attr.d]="d" /> }</svg>
                 <span class="nm">{{ ship.name }}</span>
                 @if (ship.productionStatus) { <span class="st">{{ statusLabel(ship) | translate }}</span> }
               </li>
@@ -100,7 +100,7 @@ export class UpcomingShipsNoticeComponent implements OnInit {
 
   readonly added = computed(() => this.svc.diff().added);
   readonly wishedUpdates = computed(() => this.svc.diff().wishedUpdates);
-  protected readonly wishPath = PATH_ICONS.wish[0];
+  protected readonly wishPath = PATH_ICONS.wish;
   readonly count = this.svc.notificationCount;
 
   readonly addedShown = computed(() => this.added().slice(0, NAME_LIMIT));

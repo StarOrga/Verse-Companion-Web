@@ -186,6 +186,8 @@
       "resumed": "Resuming upload…",
       "resumeLost": "The upload cannot be resumed — the extracted data is no longer available.",
       "resumeLostHint": "Please discard the upload and run the extraction again.",
+      "restartedAfterUpdate": "An update changed the metadata extraction ({{list}}) — so the interrupted upload starts over at the extraction. Unchanged data is skipped.",
+      "restartedUnknownOrigin": "The interrupted upload was started by an older uploader version — it starts over at the extraction so no mixed data is uploaded. Unchanged data is skipped.",
       "discard": "Discard",
       "discardConfirm": {
         "title": "Discard upload?",
@@ -227,6 +229,8 @@
   },
   "update": {
     "available": "Update available: v{{version}} — downloading in background…",
+    "installRunningTitle": "Update still installing",
+    "installRunningBody": "The Data Uploader starts on its own as soon as the installation has finished.",
     "progress": "Downloading update: {{pct}}%",
     "downloaded": "Update v{{version}} is downloaded and ready to install.",
     "install": "Install now",
@@ -336,7 +340,7 @@
       "de": "Deutsch",
       "en": "English"
     },
-    "footer": "Data Uploader v{{version}}"
+    "footer": "Verse Data Uploader v{{version}}"
   },
   "telemetry": {
     "hint": "Sends anonymous crash reports (no personal data) so bugs can be fixed. You can turn this off any time."
@@ -443,15 +447,17 @@
     "minimizeHint": "The X hides the window to the tray instead of quitting."
   },
   "autorun": {
-    "starting": "New version detected ({{channel}}: {{local}} vs {{server}}) — starting automatically.",
+    "starting": "Game build changed ({{channel}}: {{local}} vs {{server}} on the server) — checking and uploading what is open.",
     "resumeFirst": "Found an interrupted upload — skipped the automatic run.",
     "resuming": "Found an interrupted upload — resuming it automatically.",
     "banner": {
       "aria": "New game patch",
       "text": "New game patch {{patch}} — upload starts automatically in",
       "now": "Upload now",
-      "cancel": "Cancel"
-    }
+      "cancel": "Cancel",
+      "partsText": "{{patch}} is on the server — still open: {{parts}}. Continuing automatically in"
+    },
+    "continuingParts": "{{channel}} {{version}} is on the server — still open: {{parts}}. Continuing automatically."
   },
   "subthemes": {
     "allCurrent": "The server already holds this build in full — nothing changed, extraction and upload are skipped. \"Force everything\" runs anyway.",
@@ -466,7 +472,16 @@
       "codex_extra": "Other metadata",
       "silhouettes": "Silhouettes",
       "hulls": "3D hulls"
-    }
+    },
+    "contModelsReuse": "Only the 3D models are open — continuing them from the extract on disk. Nothing is uploaded again.",
+    "contModelsLocal": "Only the 3D models are open. The game files are read locally to produce the ship list for the model build — catalogue, bundle and metadata are not uploaded again.",
+    "contSilReuse": "Only the silhouettes are open — continuing them from the extract on disk. Nothing but the silhouettes is uploaded.",
+    "contSilLocal": "Only the silhouettes are open. The game files are read locally to build them — catalogue, bundle and metadata are not uploaded again.",
+    "contBothReuse": "Silhouettes and 3D models are open — continuing them from the extract on disk. Catalogue, bundle and metadata are not uploaded again.",
+    "contBothLocal": "Silhouettes and 3D models are open. The game files are read locally to build them — catalogue, bundle and metadata are not uploaded again.",
+    "contDone": "Everything that was open for this build is on the server.",
+    "contOpen": "Not everything is uploaded yet — the extract stays on disk, the next start continues.",
+    "noLiveBuild": "The server has no published codex for this build yet — the silhouettes are not uploaded."
   },
   "res": {
     "title": "Performance",

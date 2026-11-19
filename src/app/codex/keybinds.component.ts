@@ -433,8 +433,7 @@ const KEYBIND_URL_DEBOUNCE_MS = 300;
       /* Slides down under sc-impersonation-banner while a preview is active —
          see that component's constructor, which owns this var (0px = no-op). */
       position: sticky; top: var(--sc-imp-banner-h, 0px); z-index: 2; padding: 8px 0;
-      background: color-mix(in srgb, var(--sc-bg-0) 88%, transparent);
-      backdrop-filter: blur(6px);
+      background: color-mix(in srgb, var(--sc-bg-0) 93%, transparent);
     }
     .kb-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
     .devices { display: inline-flex; gap: 4px; padding: 4px; border-radius: 10px; background: var(--sc-bg-1); border: 1px solid var(--sc-border); }
@@ -444,14 +443,14 @@ const KEYBIND_URL_DEBOUNCE_MS = 300;
       text-transform: uppercase; border-radius: 7px; cursor: pointer;
     }
     .dev:hover { color: var(--sc-fg-0); }
-    .dev:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .dev:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .dev.active { background: var(--sc-accent); color: var(--sc-bg-0); }
     .search {
       flex: 1 1 220px; padding: 11px 14px; border-radius: 10px;
       background: var(--sc-bg-0); border: 1px solid var(--sc-border); color: var(--sc-fg-0);
       font-family: inherit; font-size: max(0.95rem, var(--sc-fs-input));
     }
-    .search:focus { outline: none; border-color: var(--sc-accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--sc-accent) 22%, transparent); }
+    .search:focus { outline: none; border-color: var(--sc-accent); }
     /* Admin-only tooling: the elevated-access red, never the viewer accent. */
     .assign-toggle {
       flex: 0 0 auto; padding: 10px 16px; border-radius: 10px; cursor: pointer; min-height: 48px;
@@ -461,7 +460,7 @@ const KEYBIND_URL_DEBOUNCE_MS = 300;
       letter-spacing: 0.04em; text-transform: uppercase;
     }
     .assign-toggle:hover { color: var(--sc-fg-0); border-color: var(--sc-accent-hot); }
-    .assign-toggle:focus-visible { outline: 2px solid var(--sc-accent-hot); outline-offset: 2px; }
+    .assign-toggle:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .assign-toggle.on { background: var(--sc-accent-hot); border-color: var(--sc-accent-hot); color: var(--sc-bg-0); }
     /* Same wording tag as the shell's admin menu entries (.di-tag). */
 
@@ -484,7 +483,7 @@ const KEYBIND_URL_DEBOUNCE_MS = 300;
     .seg-btn:last-child { border-right: 0; }
     .seg-btn:hover { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-fg-2) 9%, transparent); }
     .seg-btn.on { color: var(--sc-bg-0); background: var(--sc-accent); }
-    .seg-btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .seg-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .lang-note { margin: -8px 0 0; color: var(--sc-fg-2); font-size: max(0.74rem, var(--sc-fs-floor)); }
 
     /* ── admin assignment bar ─────────────────────────────────────────────── */
@@ -658,7 +657,7 @@ const KEYBIND_URL_DEBOUNCE_MS = 300;
     .err { color: var(--sc-danger); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
     .err .retry:hover { background: color-mix(in srgb, var(--sc-danger) 12%, transparent); }
-    .err .retry:focus-visible { outline: 2px solid var(--sc-danger); outline-offset: 2px; }
+    .err .retry:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .empty { text-align: center; padding: 40px 20px; color: var(--sc-fg-1); }
     .empty p { color: var(--sc-fg-2); margin: 6px 0 0; }
 
@@ -667,7 +666,7 @@ const KEYBIND_URL_DEBOUNCE_MS = 300;
     /* Keyboard parity for the row-wide hit area: the checkbox draws its own
        ring, but the row is what the pointer selects, so it is outlined too. */
     .row:has(.pick-box:focus-visible) {
-      outline: 2px solid var(--sc-accent); outline-offset: 1px;
+      outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); outline-offset: 0;
     }
 
     @media (max-width: 640px) {

@@ -284,7 +284,7 @@ type Slide =
       background: color-mix(in srgb, var(--sc-accent) 14%, transparent);
     }
     .dot:hover { border-color: var(--sc-accent); color: var(--sc-fg-0); }
-    .dot:focus-visible, .cad-play:focus-visible, .win-opt:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .dot:focus-visible, .cad-play:focus-visible, .win-opt:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .cad-play {
       display: inline-flex; align-items: center; justify-content: center;
       min-width: var(--sc-tap-min); min-height: var(--sc-tap-min);

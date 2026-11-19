@@ -132,7 +132,7 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
     .kpi-cell.from-power { border-bottom: 2px solid var(--sc-danger); }
     .kpi-info { position: relative; margin-left: 3px; cursor: help; color: var(--sc-fg-2); font-size: 10px;
       background: none; border: none; padding: 0; font-family: inherit; }
-    .kpi-info:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .kpi-info:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .kpi-tip { position: absolute; display: none; }
     .kpi-info:hover + .kpi-tip, .kpi-info:focus + .kpi-tip {
       display: block; position: absolute; z-index: 25; max-width: 240px; padding: 8px 10px;

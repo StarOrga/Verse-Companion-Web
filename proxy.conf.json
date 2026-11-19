@@ -1,0 +1,20 @@
+{
+  "/ingest/static": {
+    "target": "https://eu-assets.i.posthog.com",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": { "^/ingest": "" }
+  },
+  "/ingest/array": {
+    "target": "https://eu-assets.i.posthog.com",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": { "^/ingest": "" }
+  },
+  "/ingest": {
+    "target": "https://eu.i.posthog.com",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": { "^/ingest": "" }
+  }
+}

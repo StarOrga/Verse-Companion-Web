@@ -5,6 +5,7 @@ import { FriendsService } from './friends.service';
 import { FoundUser, edgeInitial, edgeLabel, isValidHandle } from './friends.types';
 import { SocialService } from './social.service';
 import { inviteLinkFor } from './social.types';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /**
  * The invite box of the Social page (C20): a personal link that expires after
@@ -15,7 +16,7 @@ import { inviteLinkFor } from './social.types';
 @Component({
   selector: 'sc-social-invite-box',
   standalone: true,
-  imports: [TranslatePipe, ScDatePipe],
+  imports: [ScActionDirective, TranslatePipe, ScDatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="sc-card section" id="social-invite">
@@ -37,21 +38,21 @@ import { inviteLinkFor } from './social.types';
           <input type="text" class="text-input" readonly [value]="link()"
                  [attr.aria-label]="'social.invite.linkLabel' | translate"
                  (focus)="selectAll($event)" />
-          <button type="button" class="sc-btn sc-btn-primary" (click)="copy()">
+          <button type="button" scAction tier="primary" (click)="copy()">
             {{ (copied() ? 'social.invite.copied' : 'social.invite.copy') | translate }}
           </button>
         </div>
         <p class="hint">{{ 'social.invite.expires' | translate: { date: (inv.expires_at | scDate) } }}</p>
         <div class="actions">
-          <button type="button" class="sc-btn micro" [disabled]="social.busy()" (click)="renew()">
+          <button type="button" scAction tier="secondary" [disabled]="social.busy()" (click)="renew()">
             {{ 'social.invite.renew' | translate }}
           </button>
-          <button type="button" class="sc-btn micro" [disabled]="social.busy()" (click)="revoke()">
+          <button type="button" scAction tier="secondary" [disabled]="social.busy()" (click)="revoke()">
             {{ 'social.invite.revoke' | translate }}
           </button>
         </div>
       } @else {
-        <button type="button" class="sc-btn sc-btn-primary create" [disabled]="social.busy()" (click)="create()">
+        <button type="button" scAction tier="primary" class="create" [disabled]="social.busy()" (click)="create()">
           {{ 'social.invite.create' | translate }}
         </button>
       }
@@ -63,7 +64,7 @@ import { inviteLinkFor } from './social.types';
                [placeholder]="'friends.add.placeholder' | translate"
                [attr.aria-label]="'friends.add.placeholder' | translate"
                maxlength="20" autocomplete="off" spellcheck="false" />
-        <button type="submit" class="sc-btn" [disabled]="friends.busy() || !handleValid()">
+        <button type="submit" scAction tier="secondary" [disabled]="friends.busy() || !handleValid()">
           {{ 'friends.add.search' | translate }}
         </button>
       </form>
@@ -73,7 +74,7 @@ import { inviteLinkFor } from './social.types';
       @if (found(); as f) {
         <div class="found">
           <span class="found-name">{{ labelOf(f) }}</span>
-          <button type="button" class="sc-btn sc-btn-primary" [disabled]="friends.busy()" (click)="sendRequest(f)">
+          <button type="button" scAction tier="secondary" [disabled]="friends.busy()" (click)="sendRequest(f)">
             {{ 'friends.add.send' | translate }}
           </button>
         </div>
@@ -96,14 +97,12 @@ import { inviteLinkFor } from './social.types';
       flex: 1 1 200px; min-width: 0; padding: 9px 12px; background: var(--sc-bg-1); color: var(--sc-fg-0);
       border: 1px solid var(--sc-border); border-radius: 4px; font: inherit; font-size: max(0.9rem, var(--sc-fs-input));
     }
-    .text-input:focus { outline: none; border-color: var(--sc-accent); box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.25); }
+    .text-input:focus { outline: none; border-color: var(--sc-accent); }
     .found {
       display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 12px; padding: 10px 12px;
       border: 1px solid var(--sc-border); border-radius: 4px; background: var(--sc-bg-1);
     }
     .found-name { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
-    .sc-btn.micro { padding: 4px 10px; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.04em; }
-    @media (pointer: coarse) { .sc-btn { min-height: 48px; } }
   `],
 })
 export class SocialInviteBoxComponent implements OnInit {

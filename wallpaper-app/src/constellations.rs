@@ -217,6 +217,10 @@ pub fn options_for(state: &State, key: &str, w: i32, h: i32) -> Option<RenderOpt
         nebula: state.rewards.nebula,
         road: state.rewards.road,
         supernova,
+        // Rank rewards, as on the website: tier 3 draws the older constellations as companions,
+        // tier 4 tints the own constellation amber.
+        companions: state.rank_tier() >= 3,
+        tint: state.rank_tier() >= 4,
     })
 }
 
@@ -418,7 +422,18 @@ mod tests {
             patches: vec![p("4.5", 2, false, false), p("4.4", 7, true, true), p("4.3", 0, false, false), p("4.2", 3, false, true)],
             rewards: verse::Rewards { road: true, nebula: false, live: true, meteor: false, supernova: true },
             streak_best: 7,
+            stars: 12,
         }
+    }
+
+    #[test]
+    fn rank_tier_switches_companions_and_tint() {
+        let o = options_for(&state(), "4.4", 320, 180).unwrap();
+        assert!(o.companions && o.tint, "12 stars = tier 4");
+        let o = options_for(&State { stars: 7, ..state() }, "4.4", 320, 180).unwrap();
+        assert!(o.companions && !o.tint, "7 stars = tier 3");
+        let o = options_for(&State { stars: 5, ..state() }, "4.4", 320, 180).unwrap();
+        assert!(!o.companions && !o.tint, "5 stars = tier 2");
     }
 
     #[test]

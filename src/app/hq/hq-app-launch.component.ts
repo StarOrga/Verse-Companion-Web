@@ -1,20 +1,34 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Injector, computed, effect, inject, input, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DesktopCapabilityService } from '../core/desktop-capability.service';
+import { logWarn } from '../core/log';
 import { isPlainLeftClick } from '../core/modified-click.util';
 import { SCC_LAUNCH_GRACE_MS, SCC_LAUNCH_WAIT_MS, SccAppLauncherService } from '../desktop/scc-app-launcher.service';
 import { SCC_INSTALLER_URL } from '../news/verse-status-chip.component';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
+import { ScPopupComponent } from '../shared/popup/sc-popup.component';
+import { ScPopupMotionDirective } from '../shared/popup-motion/sc-popup-motion.directive';
+import { ToastSlotDirective } from '../shared/toast-stack/toast-stack';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { HqAppConnectionService } from './now/hq-app-connection.service';
 
 type LaunchStatus = 'idle' | 'starting' | 'started' | 'downloading' | 'downloadStarted' | 'noResponse';
 
+/** Fallback when the app never reports in: the success hint leaves by itself after this. */
 const STARTED_HINT_MS = 6000;
+/** After the app's live signal arrives, the success hint stays this long, then leaves. */
+const CONNECTED_HINT_MS = 2000;
 
 /**
  * The one desktop-app action on the HQ pages that only fill once the app reads the game (Jetzt,
- * Statistik): start the app, and download it when it does not answer. A small hint says which of
- * the two is happening. Public, so normal accent. Hidden on a device that cannot install a
- * desktop application (same rule as the status chip's download).
+ * Statistik): start the app, and download it when it does not answer. A small star toast (the look
+ * of the app notice, stacked with it) says which of the two is happening. Public, so normal accent.
+ * Hidden on a device that cannot install a desktop application (same rule as the status chip's
+ * download).
+ *
+ * The success states ("started", "download running") have nothing left to click, so they carry no
+ * close button and leave by themselves: shortly after the app's live signal arrives, else after
+ * the fallback time. The failure states keep their action (retry / download) and a close.
  *
  * A real anchor at the installer: a modified click, the context menu or a failed script all still
  * reach the download. Only the plain left click tries the app first.
@@ -25,33 +39,48 @@ const STARTED_HINT_MS = 6000;
 @Component({
   selector: 'sc-hq-app-launch',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective],
+  imports: [TranslatePipe, ScTooltipDirective, ScPopupMotionDirective, ToastSlotDirective, ScPopupComponent, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (canInstall()) {
       <a
         class="go"
-        [class.sc-btn]="look() === 'primary'"
-        [class.sc-btn-primary]="look() === 'primary'"
-        [class.pill]="look() === 'pill' || look() === 'chip'"
+        scAction
+        [tier]="look() === 'primary' ? 'primary' : 'secondary'"
         [class.chip]="look() === 'chip'"
         [href]="url"
         [scTooltip]="tip() ? (tip() | translate) : null"
         rel="noopener noreferrer"
         [attr.aria-busy]="status() === 'starting'"
         (click)="onClick($event)"
-      >{{ (mode() === 'download' ? 'hq.app.downloadCta' : 'hq.app.launch') | translate }}</a>
-      <div class="live" role="status">
+      >{{ label() | translate }}</a>
+      <!-- The notice frame is the one live region (role="status" from the scaffold); a second one around it would announce twice. -->
+      <div class="live">
         @if (status() !== 'idle') {
-          <div class="hint">
-            <span class="hint-text">{{ 'hq.app.' + status() | translate }}</span>
-            @if (status() === 'downloading') {
-              <button type="button" class="sc-btn" (click)="start()">{{ 'hq.app.retry' | translate }}</button>
-            } @else if (status() === 'noResponse') {
-              <a class="sc-btn" [href]="url" rel="noopener noreferrer">{{ 'hq.app.download' | translate }}</a>
-            }
-            <button type="button" class="sc-btn" (click)="dismiss()">{{ 'hq.app.close' | translate }}</button>
-          </div>
+          <sc-popup class="toast" kind="notice" [title]="'hq.app.' + status() | translate" scToastSlot scPopupMotion scPopupMotionOrigin="br" animate.leave="pm-out">
+            <svg popupIcon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              @if (done()) {
+                <path d="M5 12.5l4.5 4.5L19 7.5" />
+              } @else if (status() === 'starting') {
+                <path d="M12 4a8 8 0 1 0 8 8" />
+              } @else {
+                <path d="M12 4v10m0 0l-4-4m4 4l4-4M5 19h14" />
+              }
+            </svg>
+            <span class="txt" aria-hidden="true">{{ 'hq.app.' + status() | translate }}</span>
+            <ng-container popupActions>
+                @if (status() === 'downloading') {
+                  <button type="button" scAction tier="secondary" (click)="start()">{{ 'hq.app.retry' | translate }}</button>
+                } @else if (status() === 'noResponse') {
+                  <a scAction tier="secondary" [href]="url" rel="noopener noreferrer">{{ 'hq.app.download' | translate }}</a>
+                }
+                @if (!done()) {
+                  <button type="button" scAction tier="tertiary" [attr.aria-label]="'hq.app.close' | translate" [scTooltip]="'hq.app.close' | translate" (click)="dismiss()">
+                    <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                  </button>
+                }
+            </ng-container>
+          </sc-popup>
         }
       </div>
     }
@@ -63,32 +92,22 @@ const STARTED_HINT_MS = 6000;
       @media (max-width: 749px) { :host { display: none; } }
       /* Only Angular's comment anchors left (cannot install): take no room. */
       :host:empty { display: none; }
-      .go { display: inline-flex; align-items: center; min-height: var(--sc-tap-min, 44px); text-decoration: none; }
-      .pill {
-        min-height: 36px; padding: 0 14px;
-        border: 1px solid color-mix(in srgb, var(--sc-accent) 55%, transparent); border-radius: 999px;
-        background: color-mix(in srgb, var(--sc-bg-1) 75%, transparent); color: var(--sc-accent);
-        font: 500 max(0.84rem, var(--sc-fs-floor)) / 1 var(--sc-font-body);
+      /* Inside the HQ status chip (sc-hq-live-ticker): the secondary pill one size down, so it fits the 32px chip. */
+      .sc-action.chip { min-height: 24px; padding: 0 10px; font-size: max(0.76rem, var(--sc-fs-floor)); }
+      @media (pointer: coarse) { .sc-action.chip { min-height: 48px; } }
+      /* Bottom right; scToastSlot stacks it above a toast that is already up. Frame, rail and width come from sc-popup. */
+      .toast {
+        position: fixed; z-index: 1440;
+        inset-inline-end: var(--sc-toast-end, 24px);
+        bottom: calc(var(--sc-toast-bottom, var(--sc-fab-clear-block, 80px)) + var(--sc-toast-offset, 0px));
       }
-      .pill:hover { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); }
-      .pill:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-      /* Inside the HQ status chip (sc-hq-live-ticker): the same pill, one size down, so it fits the 32px chip. */
-      .pill.chip { min-height: 24px; padding: 0 10px; font-size: max(0.76rem, var(--sc-fs-floor)); }
-      @media (pointer: coarse) { .pill, .pill.chip { min-height: 48px; } }
-      .hint {
-        position: fixed; z-index: 50; left: 50%; transform: translateX(-50%); bottom: var(--sc-float-bottom, 16px);
-        display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc-space-2, 8px);
-        width: max-content; max-width: min(480px, calc(100vw - 2 * var(--sc-space-3, 12px)));
-        padding: var(--sc-space-3, 12px); color: var(--sc-fg);
-        background: var(--sc-bg-1); border: 1px solid var(--sc-accent); border-radius: var(--sc-radius, 10px);
-      }
-      .hint-text { flex: 1 1 16rem; }
-      .hint .sc-btn { min-height: var(--sc-tap-min, 44px); text-decoration: none; }
+      .txt { font-size: max(0.88rem, var(--sc-fs-floor)); line-height: 1.4; color: var(--sc-fg-0); }
     `,
   ],
 })
 export class HqAppLaunchComponent {
   private readonly launcher = inject(SccAppLauncherService);
+  private readonly injector = inject(Injector);
   readonly canInstall = inject(DesktopCapabilityService).canInstall;
   readonly url = SCC_INSTALLER_URL;
   readonly status = signal<LaunchStatus>('idle');
@@ -101,13 +120,24 @@ export class HqAppLaunchComponent {
     if (!this.tipped()) return '';
     return this.mode() === 'download' ? 'hq.app.tipDownload' : 'hq.app.tipLaunch';
   });
+  /** Beside the status chip "App aus" already names the app: there the action reads "Jetzt starten". */
+  protected readonly label = computed(() => {
+    if (this.mode() === 'download') return 'hq.app.downloadCta';
+    return this.look() === 'chip' ? 'hq.app.launchNow' : 'hq.app.launch';
+  });
+  /** Success states have nothing left to click: no close button, they leave by themselves. */
+  protected readonly done = computed(() => this.status() === 'started' || this.status() === 'downloadStarted');
 
   private hideTimer: ReturnType<typeof setTimeout> | undefined;
+  private watch?: { destroy(): void };
   /** Bumped by every start and close, so a late answer of an attempt the reader closed changes nothing. */
   private run = 0;
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => clearTimeout(this.hideTimer));
+    inject(DestroyRef).onDestroy(() => {
+      clearTimeout(this.hideTimer);
+      this.watch?.destroy();
+    });
   }
 
   onClick(ev: MouseEvent): void {
@@ -118,7 +148,7 @@ export class HqAppLaunchComponent {
   }
 
   private download(): void {
-    clearTimeout(this.hideTimer);
+    this.clearWatch();
     this.launcher.downloadInstaller();
     this.status.set('downloadStarted');
     this.hideTimer = setTimeout(() => this.status.set('idle'), STARTED_HINT_MS);
@@ -126,16 +156,28 @@ export class HqAppLaunchComponent {
 
   async start(): Promise<void> {
     if (this.status() === 'starting') return;
-    clearTimeout(this.hideTimer);
+    this.clearWatch();
     const run = ++this.run;
     this.status.set('starting');
     // Seen here before: no download hangs on the answer, so give a cold start time to come to the front.
     const known = this.launcher.launchedBefore();
-    const answered = await this.launcher.launch(known ? SCC_LAUNCH_GRACE_MS : SCC_LAUNCH_WAIT_MS);
+    let answered = false;
+    try {
+      answered = await this.launcher.launch(known ? SCC_LAUNCH_GRACE_MS : SCC_LAUNCH_WAIT_MS);
+    } catch (err) {
+      logWarn('hq-app-launch', 'launch failed', { err: String(err) });
+      if (run === this.run) this.status.set('idle');
+      return;
+    }
     if (run !== this.run) return;
     if (answered) {
       this.status.set('started');
-      this.hideTimer = setTimeout(() => this.status.set('idle'), STARTED_HINT_MS);
+      // No live signal within the hint's time: it leaves anyway, and so does its watcher.
+      this.hideTimer = setTimeout(() => {
+        this.clearWatch();
+        if (run === this.run) this.status.set('idle');
+      }, STARTED_HINT_MS);
+      this.hideOnceConnected(run);
     } else if (known) {
       this.status.set('noResponse');
     } else {
@@ -145,8 +187,40 @@ export class HqAppLaunchComponent {
   }
 
   dismiss(): void {
-    clearTimeout(this.hideTimer);
+    this.clearWatch();
     this.run++;
     this.status.set('idle');
+  }
+
+  private clearWatch(): void {
+    clearTimeout(this.hideTimer);
+    this.watch?.destroy();
+    this.watch = undefined;
+  }
+
+  /**
+   * The app answered the launch; once its live signal shows up the hint has done its job, so it
+   * leaves shortly after. The connection service is looked up only now, not on every page: it
+   * starts the live subscription, which a page that never launched anything must not pay for.
+   */
+  private hideOnceConnected(run: number): void {
+    let conn: HqAppConnectionService;
+    try {
+      conn = this.injector.get(HqAppConnectionService);
+    } catch {
+      return;
+    }
+    this.watch = effect(
+      () => {
+        if (!conn.connected() || run !== this.run || this.status() !== 'started') return;
+        this.watch?.destroy();
+        this.watch = undefined;
+        clearTimeout(this.hideTimer);
+        this.hideTimer = setTimeout(() => {
+          if (run === this.run) this.status.set('idle');
+        }, CONNECTED_HINT_MS);
+      },
+      { injector: this.injector },
+    );
   }
 }

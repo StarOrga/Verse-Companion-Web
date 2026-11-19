@@ -12,7 +12,22 @@ export interface UndoOffer {
   commit: () => void | Promise<void>;
   /** Reverts the optimistic client state. Nothing reached the backend yet. */
   onUndo: () => void;
+  /** Optional second line under the message (i18n key + params); a toast without it stays one line. */
+  detailKey?: string;
+  detailParams?: Record<string, unknown>;
+  /** Optional rail icon instead of the undo arrow: `wish` is the shooting star, falling in once. */
+  icon?: 'wish';
 }
+
+/**
+ * The toast of a wish that was answered ("wie Geschenke auspacken", concept wunschliste-gefuehl): the service result
+ * `itemPath.done.ownWish` / `ownWishLeft` keeps its key, and the toast adds the second line and the falling star.
+ * Applied in `offer()`, so every caller that shows a path result gets it without knowing about it.
+ */
+const WISH_FULFILLED_DETAIL: Readonly<Record<string, string>> = {
+  'itemPath.done.ownWish': 'itemPath.done.ownWishDetail',
+  'itemPath.done.ownWishLeft': 'itemPath.done.ownWishLeftDetail',
+};
 
 interface Pending extends UndoOffer {
   id: number;
@@ -57,7 +72,14 @@ export class UndoToastService {
 
   offer(o: UndoOffer): void {
     this.flush();
-    this.current.set({ ...o, id: ++this.seq });
+    const detailKey = o.detailKey ?? WISH_FULFILLED_DETAIL[o.messageKey];
+    const fulfilled = o.messageKey in WISH_FULFILLED_DETAIL;
+    this.current.set({
+      ...o,
+      ...(detailKey ? { detailKey, detailParams: o.detailParams ?? o.messageParams } : {}),
+      ...(fulfilled && !o.icon ? { icon: 'wish' as const } : {}),
+      id: ++this.seq,
+    });
     this.remaining = UNDO_TOAST_MS;
     this.hovered = this.focused = false;
     this.held.set(false);

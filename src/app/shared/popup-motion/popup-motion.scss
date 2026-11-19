@@ -1,0 +1,121 @@
+// Vektor-Aufriss popup motion (concept 20261115-0215-popup-animation, round 2, design r2d2).
+//
+// Only the static look lives here: the overlay frame (spark, light line, outline, glow, tint),
+// the scrim dot grid, the faint resting edge and the leave timer for `animate.leave="pm-out"`.
+// Every movement is a Web Animation started by ScPopupMotionDirective, so a close can reverse
+// from wherever it stands (C8). Only transform, opacity, filter, clip-path and mask-position move.
+
+.pm-host,
+.pmv-frame {
+  // The outline colour: between the hologram cyan and its hot core (mock #bff1ff).
+  --pmv-wire: color-mix(in srgb, var(--sc-holo, #8fe3ff) 50%, var(--sc-holo-hi, #dff6ff));
+  --pmv-glow: var(--sc-holo, #8fe3ff);
+}
+
+// ---------------------------------------------------------------- overlay frame (lives in <body>)
+// Spark, line and outline are drawn above the popup, not inside it: the popup itself is masked
+// while it fills from the top, and a child would be masked with it.
+.pmv-frame {
+  position: fixed;
+  z-index: 2147483000;
+  pointer-events: none;
+  contain: layout style;
+}
+.pmv-box {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--pmv-r, 0);
+  transform-origin: 50% 50%;
+}
+.pmv-frame :is(.pmv-wire, .pmv-glow, .pmv-tint, .pmv-line, .pmv-spark) {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+}
+.pmv-wire,
+.pmv-glow {
+  inset: -1px;
+  border-radius: inherit;
+  box-sizing: border-box;
+}
+.pmv-wire {
+  border: 1px solid var(--pmv-wire);
+}
+// The glow is its own layer so it can fade out completely while the 1px outline rests at .35.
+.pmv-glow {
+  border: 1px solid transparent;
+  box-shadow:
+    0 0 10px color-mix(in srgb, var(--pmv-glow) 70%, transparent),
+    inset 0 0 10px color-mix(in srgb, var(--pmv-glow) 25%, transparent);
+}
+.pmv-tint {
+  inset: 0;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--pmv-glow) 45%, transparent);
+  mix-blend-mode: screen;
+}
+// The light line: exactly the popup's width (the round-2 line overshot it by 50px a side and
+// read as too big), soft ends, a softer glow than the mock so it hands over to the 1px outline.
+.pmv-line {
+  left: 0;
+  right: 0;
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, transparent, var(--pmv-wire) 12%, var(--sc-holo-hi, #eaffff) 50%, var(--pmv-wire) 88%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--pmv-glow) 80%, transparent), 0 0 18px color-mix(in srgb, var(--pmv-glow) 35%, transparent);
+  transform: scaleX(0);
+}
+.pmv-line-top { top: 0; }
+.pmv-line-bottom { top: 100%; }
+.pmv-line-center { top: 50%; }
+.pmv-spark {
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0, var(--sc-holo-hi, #dff6ff) 30%, color-mix(in srgb, var(--pmv-glow) 40%, transparent) 60%, transparent 72%);
+}
+
+// ---------------------------------------------------------------- veil: scrim with the faint dot grid (P11)
+// Replaces the old horizon / star plate. The veil keeps its own colour; the dots sit above it
+// and below every child (isolation gives the negative z-index a home without moving anything).
+.pm-host.pmv-veil {
+  isolation: isolate;
+}
+.pmv-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  pointer-events: none;
+  background: radial-gradient(circle, color-mix(in srgb, var(--sc-holo, #8fe3ff) 14%, transparent) 1px, transparent 1.6px) 0 0 / 22px 22px;
+}
+
+// ---------------------------------------------------------------- resting edge (r2-r2d2-dlg-a2: stays faint)
+// An outline, not a border or a child: it never moves the layout, never scrolls with the
+// content and leaves the popup's own box-shadow alone.
+.pmv-rest {
+  outline: 1px solid color-mix(in srgb, var(--pmv-wire) 35%, transparent);
+  outline-offset: -1px;
+}
+
+// ---------------------------------------------------------------- animate.leave timer
+// Angular's `animate.leave` waits for the host's longest animation. The close itself is a set of
+// Web Animations; this no-op animation lasts exactly the close (--pmv-close, set by the directive).
+.pm-host.pm-out {
+  animation: pmv-hold calc(var(--pmv-close, 160) * 1ms) linear both;
+}
+.pm-host.pm-out.pmv-still {
+  animation: none;
+}
+@keyframes pmv-hold {
+  from, to { opacity: 1; }
+}
+
+// ---------------------------------------------------------------- reduced motion: nothing moves (C11)
+@media (prefers-reduced-motion: reduce) {
+  .pm-host.pm-out { animation: none; }
+  .pmv-frame { display: none; }
+}

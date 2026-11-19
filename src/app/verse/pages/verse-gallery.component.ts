@@ -5,6 +5,7 @@ import { ChildRouteService } from '../../shared/overlay-frame/child-route.servic
 import { TranslatePipe } from '@ngx-translate/core';
 import { DesktopConnectionService } from '../../desktop/desktop-connection.service';
 import { StarscapeComponent } from '../../starscape/starscape.component';
+import { StarscapeFilterSegmentComponent } from '../../starscape/starscape-filter-segment.component';
 import { BetaService } from '../../core/beta.service';
 import { VerseHeaderComponent } from '../shared/verse-header.component';
 import { DOCK_HOST_CLASS, DOCK_WIDTH_STYLE } from '../shared/dock-width';
@@ -20,7 +21,7 @@ import { DOCK_HOST_CLASS, DOCK_WIDTH_STYLE } from '../shared/dock-width';
   // Subpages sit in the page frame; only the hub runs edge to edge (concept 2026-10-28).
   host: { class: DOCK_HOST_CLASS },
   standalone: true,
-  imports: [RouterLink, RouterOutlet, TranslatePipe, VerseHeaderComponent, StarscapeComponent],
+  imports: [RouterLink, RouterOutlet, TranslatePipe, VerseHeaderComponent, StarscapeComponent, StarscapeFilterSegmentComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div [hidden]="hideList()">
@@ -33,7 +34,9 @@ import { DOCK_HOST_CLASS, DOCK_WIDTH_STYLE } from '../shared/dock-width';
             <button type="button" class="sub-link" (click)="shareGallery()">{{ 'verse.gallery.share' | translate }}</button>
           </ng-container>
         }
-        <a vhActions class="sub-link" routerLink="/verse/gallery/constellations">{{ 'verse.gallery.mine' | translate }}</a>
+        <!-- The four views as one segment in the head (concept 20261115-2122 d1-segment); no star-map
+             link here any more (note #1) - the star map is reached through the Verse. -->
+        <sc-starscape-filter-segment vhActions />
       </sc-verse-header>
 
       @if (hint(); as h) { <p class="hint sc-enter" role="status">{{ h | translate }}</p> }

@@ -2,6 +2,7 @@ import { authErrorKey } from './auth-error-key';
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from './auth.service';
+import { ScActionDirective } from '../shared/action/sc-action.directive';
 
 /** Mirrors the project's Supabase minimum; the sign-in form uses the same 8. */
 const MIN_LENGTH = 8;
@@ -19,7 +20,7 @@ const MIN_LENGTH = 8;
 @Component({
   selector: 'sc-password-form',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form class="pw-form" (submit)="submit($event)" novalidate>
@@ -58,7 +59,7 @@ const MIN_LENGTH = 8;
         <div class="flash success" role="status">{{ 'auth.setPassword.saved' | translate }}</div>
       }
 
-      <button type="submit" class="sc-btn sc-btn-primary" [disabled]="busy() || !valid()">
+      <button type="submit" scAction tier="primary" [disabled]="busy() || !valid()">
         {{ (busy() ? 'auth.setPassword.saving' : submitLabelKey()) | translate }}
       </button>
     </form>
@@ -72,9 +73,9 @@ const MIN_LENGTH = 8;
     .flash { padding: 8px 12px; border-radius: 4px; font-size: 0.84rem; }
     .flash.success { background: rgba(74, 222, 128, 0.1); border: 1px solid var(--sc-success); color: var(--sc-success); }
     .flash.error { background: rgba(248, 113, 113, 0.1); border: 1px solid var(--sc-danger); color: var(--sc-danger); }
-    .pw-form .sc-btn { align-self: flex-start; justify-content: center; min-height: 44px; }
+    .pw-form .sc-action { align-self: flex-start; justify-content: center; min-height: 44px; }
     @media (max-width: 640px) {
-      .pw-form .sc-btn { align-self: stretch; }
+      .pw-form .sc-action { align-self: stretch; }
     }
   `],
 })

@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -32,7 +33,16 @@ import {
   isEditableTarget,
   isTypeToSearchKey,
 } from '../../codex/search/codex-search-hub.service';
-import { SearchTarget, hitManufacturer, hitTitle, targetUrl } from '../../codex/search/codex-search-model';
+import {
+  SearchTarget,
+  SearchVariantLink,
+  VARIANT_LINKS_SHOWN,
+  hitManufacturer,
+  hitTitle,
+  isCurrentTarget,
+  targetUrl,
+} from '../../codex/search/codex-search-model';
+import { searchScore } from '../../codex/codex-search';
 import { resolveCta, resolveIcons } from '../../codex/search/search-cta';
 import {
   SEARCH_ROWS_SHOWN,
@@ -54,6 +64,7 @@ import { RECENT_ROWS_SHOWN, StoredRow, pushRecentRow, readRecentRows } from './s
 import { ItemPathComponent } from '../../shared/item-path/item-path.component';
 import { RowActionResult, SearchRowActionsService } from './search-row-actions.service';
 import { ShellChromeService } from './shell-chrome.service';
+import { SearchOpenService } from '../search-open.service';
 import { SearchContext, SearchPlace, matchPlaces, searchContextOf } from './search-context';
 
 /** Recent searches the empty field offers (A6: the 7 newest). */
@@ -71,6 +82,8 @@ interface PlaceRow {
   target: SearchTarget;
   cta: null;
   icons: SearchRowIcons;
+  /** The app page the reader is on, named exactly: greyed, only closes (note 4). */
+  current?: true;
 }
 
 export type ViewRow = SearchResultRow | PlaceRow;
@@ -111,6 +124,9 @@ function storage(): Storage | null {
 /** Ships a fitted-on meta line names before it counts the rest. */
 const FITTED_SHOWN = 2;
 
+/** The Verse hub (bare domain or /verse): its stage search takes typed letters. */
+const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
+
 /**
  * The Fusion bar's search (concept 2026-11-02 "Suche: Kontext & Aktionen").
  *
@@ -124,10 +140,11 @@ const FITTED_SHOWN = 2;
  * standard icons (Wunschliste · Nachschub · Bestand / In den Hangar).
  * Every row is a real anchor; the field keeps focus (aria-activedescendant).
  */
+
 @Component({
   selector: 'sc-fusion-search',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, ScTooltipDirective, FusionSearchChipComponent, FusionSearchHintComponent, ItemPathComponent],
+  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScTooltipDirective, FusionSearchChipComponent, FusionSearchHintComponent, ItemPathComponent],
   providers: [CodexSearchEngine],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
@@ -307,46 +324,47 @@ const FITTED_SHOWN = 2;
                     @case ('row') {
                       @let r = o.row;
                       @let nm = rowName(r);
-                      <div class="row" role="presentation" [class.active]="isActive(o)" [class.soon]="isSoon(r)">
-                        <a class="hit" role="option" tabindex="-1" [id]="optId(o)" [attr.aria-selected]="isActive(o)"
-                           [routerLink]="r.target.link" [queryParams]="r.target.queryParams" [fragment]="r.target.fragment ?? undefined"
-                           (click)="onRowClick($event, o)" (mouseenter)="hover(o)">
-                          <span class="ico" aria-hidden="true">
-                            @if (silhouetteOf(r); as sil) {
-                              <svg class="sil" [attr.viewBox]="sil.viewBox" preserveAspectRatio="xMidYMid meet"><path [attr.d]="sil.path" vector-effect="non-scaling-stroke" /></svg>
-                            } @else {
-                              <svg viewBox="0 0 24 24">@for (d of kindIcon(r); track $index) { <path [attr.d]="d" /> }</svg>
-                            }
-                          </span>
-                          <span class="body">
-                            <span class="name">
-                              <span class="nm">{{ nm.title }}@if (nm.own) { <span class="ownname"> · „{{ nm.own }}“</span> }</span>
-                              @if (newIn(r); as v) {
-                                <span class="new" tabindex="0" role="img" [attr.aria-label]="'search.newInPatch' | translate: { version: v }"
-                                      [scTooltip]="'search.newInPatch' | translate: { version: v }" scTooltipTier="label">
-                                  <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="actionIcons.fresh[0]" /></svg>
-                                </span>
-                              }
-                            </span>
-                            <span class="meta">
-                              @for (m of metaOf(r); track $index) {
-                                @if (m.key || m.text) {
-                                  <span [class.mine]="m.mine">{{ m.key ? (m.key | translate: m.params) : m.text }}</span>
+                      <div class="row" role="presentation" [class.active]="isActive(o)" [class.soon]="isSoon(r)"
+                           [class.current]="r.current" [class.has-variants]="!!variantsOf(r).length">
+                        @if (r.current) {
+                          <!-- The page the reader is on (note 4): a plain href, not a routerLink (RouterLink navigates
+                               whatever the handler does); a plain click / Enter only closes, a modified click opens a tab. -->
+                          <a class="hit" role="option" tabindex="-1" [id]="optId(o)" [attr.aria-selected]="isActive(o)" aria-current="page"
+                             [attr.href]="href(r.target)" (click)="onRowClick($event, o)" (mouseenter)="hover(o)">
+                            <ng-container *ngTemplateOutlet="rowBody; context: { $implicit: r }" />
+                          </a>
+                        } @else {
+                          <a class="hit" role="option" tabindex="-1" [id]="optId(o)" [attr.aria-selected]="isActive(o)"
+                             [routerLink]="r.target.link" [queryParams]="r.target.queryParams" [fragment]="r.target.fragment ?? undefined"
+                             (click)="onRowClick($event, o)" (mouseenter)="hover(o)">
+                            <ng-container *ngTemplateOutlet="rowBody; context: { $implicit: r }" />
+                          </a>
+                        }
+                        @if (variantsOf(r); as vs) {
+                          @if (vs.length) {
+                            <!-- One row per ship (d-variant): the row opens the default variant, these open the others. -->
+                            <span class="variants">
+                              <span class="vl-label">{{ 'search.row.variants' | translate }}</span>
+                              @for (v of vs.slice(0, variantCap); track v.id) {
+                                @if (v.current) {
+                                  <a class="vl here" aria-current="page" [attr.href]="href(v.target)"
+                                     [scTooltip]="'search.row.variantCurrent' | translate" scTooltipTier="label"
+                                     (click)="onVariantClick($event, r, v)">{{ v.label || (v.labelKey ?? '' | translate) }}</a>
+                                } @else {
+                                  <a class="vl" [class.match]="v.emphasis" [routerLink]="v.target.link" [queryParams]="v.target.queryParams"
+                                     (click)="onVariantClick($event, r, v)">{{ v.label || (v.labelKey ?? '' | translate) }}</a>
                                 }
                               }
-                              @if (fitOf(r); as fit) {
-                                <span class="fit" [class.ok]="fit.verdict === 'fits'" [class.no]="fit.verdict === 'noFit'" [class.unk]="fit.verdict === 'unknown'">
-                                  @switch (fit.verdict) {
-                                    @case ('fits') { ✓ {{ 'search.fit.fits' | translate: { name: compatName() } }} }
-                                    @case ('noFit') { ⚠ {{ 'search.fit.noFit' | translate }}@if (fit.reasonKey) { · {{ fit.reasonKey | translate: fit.reasonParams }} } }
-                                    @default { ? {{ (fit.reasonKey ?? 'search.fit.unknown') | translate }} }
-                                  }
-                                </span>
+                              @if (vs.length > variantCap) {
+                                <a class="vl more" [routerLink]="variantsMoreTarget(r).link" [queryParams]="variantsMoreTarget(r).queryParams"
+                                   [attr.aria-label]="'search.row.variantsMoreAria' | translate: { n: vs.length - variantCap }"
+                                   [scTooltip]="'search.row.variantsMoreAria' | translate: { n: vs.length - variantCap }" scTooltipTier="label"
+                                   (click)="onMoreClick($event)">{{ 'search.row.variantsMore' | translate: { n: vs.length - variantCap } }}</a>
                               }
                             </span>
-                          </span>
-                        </a>
-                        @if (r.cta || hasIcons(r)) {
+                          }
+                        }
+                        @if (!r.current && (r.cta || hasIcons(r))) {
                           <span class="rt">
                             @if (r.cta; as c) {
                               @if (c.type === 'link' && c.target) {
@@ -416,6 +434,48 @@ const FITTED_SHOWN = 2;
         </p>
       </div>
     }
+
+    <ng-template #rowBody let-r>
+      @let nm = rowName(r);
+      <span class="ico" aria-hidden="true">
+        @if (silhouetteOf(r); as sil) {
+          <svg class="sil" [attr.viewBox]="sil.viewBox" preserveAspectRatio="xMidYMid meet"><path [attr.d]="sil.path" vector-effect="non-scaling-stroke" /></svg>
+        } @else {
+          <svg viewBox="0 0 24 24">@for (d of kindIcon(r); track $index) { <path [attr.d]="d" /> }</svg>
+        }
+      </span>
+      <span class="body">
+        <span class="name">
+          <span class="nm">{{ nm.title }}@if (nm.own) { <span class="ownname"> · „{{ nm.own }}“</span> }</span>
+          @if (!r.current && newIn(r); as v) {
+            <span class="new" tabindex="0" role="img" [attr.aria-label]="'search.newInPatch' | translate: { version: v }"
+                  [scTooltip]="'search.newInPatch' | translate: { version: v }" scTooltipTier="label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="actionIcons.fresh[0]" /></svg>
+            </span>
+          }
+        </span>
+        <span class="meta">
+          @if (r.current) {
+            <span class="here">{{ 'search.row.current' | translate }}</span>
+          } @else {
+          @for (m of metaOf(r); track $index) {
+            @if (m.key || m.text) {
+              <span [class.mine]="m.mine">{{ m.key ? (m.key | translate: m.params) : m.text }}</span>
+            }
+          }
+          @if (fitOf(r); as fit) {
+            <span class="fit" [class.ok]="fit.verdict === 'fits'" [class.no]="fit.verdict === 'noFit'" [class.unk]="fit.verdict === 'unknown'">
+              @switch (fit.verdict) {
+                @case ('fits') { ✓ {{ 'search.fit.fits' | translate: { name: compatName() } }} }
+                @case ('noFit') { ⚠ {{ 'search.fit.noFit' | translate }}@if (fit.reasonKey) { · {{ fit.reasonKey | translate: fit.reasonParams }} } }
+                @default { ? {{ (fit.reasonKey ?? 'search.fit.unknown') | translate }} }
+              }
+            </span>
+          }
+          }
+        </span>
+      </span>
+    </ng-template>
   `,
   styles: [`
     :host { position: relative; display: flex; min-width: 0; flex: 1 1 auto; }
@@ -471,7 +531,7 @@ const FITTED_SHOWN = 2;
     .input::-webkit-search-cancel-button { display: none; }
     .close:focus-visible, .cta:focus-visible, .retry:focus-visible, .expand:focus-visible,
     .collapse:focus-visible, .sum-b:focus-visible, .dym-b:focus-visible {
-      outline: 2px solid var(--sc-accent); outline-offset: 1px;
+      outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); outline-offset: 0;
     }
     .hint { display: inline-flex; gap: var(--sc-space-1); flex: none; }
     kbd {
@@ -490,7 +550,7 @@ const FITTED_SHOWN = 2;
       animation: fs-chip-in 0.2s ease both;
     }
     .strip:hover { color: var(--sc-fg-0); }
-    .strip:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+    .strip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .strip-k { color: var(--sc-accent); }
     :host(.bottom) .strip { display: none; }
     .xslot { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; }
@@ -560,7 +620,7 @@ const FITTED_SHOWN = 2;
     /* The whole row is the anchor: its hit area stretches under the CTA and icons, which sit above. */
     .hit::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
     .hit:focus-visible { outline: none; }
-    .hit:focus-visible::after { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .hit:focus-visible::after { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     /* Leading icon: line art inline, no box, no background (r3 owner call). */
     .ico { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 28px; color: color-mix(in oklab, var(--sc-accent) 70%, var(--sc-fg-1)); }
     .ico svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
@@ -575,7 +635,7 @@ const FITTED_SHOWN = 2;
       background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-accent);
     }
     .new svg { width: 11px; height: 11px; fill: currentColor; stroke: none; }
-    .new:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
+    .new:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 4px; }
     .abbr { margin: 0; padding: 4px 12px 0; font-size: max(0.75rem, var(--sc-fs-floor)); color: var(--sc-fg-2); display: flex; flex-wrap: wrap; gap: 0 6px; }
     .abbr b { color: var(--sc-fg-1); font-weight: 600; }
     .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0 6px; font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
@@ -587,6 +647,34 @@ const FITTED_SHOWN = 2;
     .fit.no { background: color-mix(in srgb, var(--sc-warning) 14%, transparent); color: var(--sc-warning); }
     .fit.unk { background: color-mix(in srgb, var(--sc-fg-0) 5%, transparent); color: var(--sc-fg-2); }
     .row.soon .ico { opacity: 0.75; }
+    /* The page the reader is on (note 4): greyed, still an arrow stop; it only closes the search. */
+    .row.current::before { background: color-mix(in srgb, var(--sc-fg-2) 10%, transparent); }
+    .row.current .hit { cursor: default; }
+    .row.current .ico, .row.current .nm { opacity: 0.6; }
+    .row.current .nm { color: var(--sc-fg-1); }
+    .here { font-family: var(--sc-font-display); text-transform: uppercase; letter-spacing: 0.04em; color: var(--sc-fg-1); }
+    /* One row per ship (d-variant): its saved variants as mini text links under the name. */
+    .row.has-variants { flex-wrap: wrap; }
+    .row.has-variants .hit { flex-basis: 60%; }
+    .variants {
+      position: relative; z-index: 1; order: 3; flex: 1 0 100%; display: flex; flex-wrap: wrap; align-items: baseline;
+      gap: 0 var(--sc-space-2); padding: 0 8px 4px calc(40px + var(--sc-space-3) + 8px);
+      font-size: max(0.72rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
+    }
+    .vl {
+      color: color-mix(in oklab, var(--sc-accent) 80%, var(--sc-fg-0)); text-decoration: underline;
+      text-decoration-color: color-mix(in srgb, var(--sc-accent) 35%, transparent); text-underline-offset: 2px;
+      border-radius: 4px; padding: 2px 0;
+    }
+    .vl:hover { text-decoration-color: currentColor; }
+    .vl:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    .vl.here { color: var(--sc-fg-1); text-decoration: none; font-weight: 600; cursor: default; }
+    .vl.more { text-decoration: none; }
+    .vl.match { font-weight: 700; color: var(--sc-fg-0); text-decoration-color: currentColor; }
+    .vl { overflow-wrap: anywhere; }
+    /* Touch: every mini link a finger-sized target; the list wraps under the row, never past it. */
+    @media (pointer: coarse) { .vl { display: inline-flex; align-items: center; min-height: 48px; padding: 0 4px; } }
+    @media (max-width: 599.98px) { .variants { padding-left: 8px; } }
     .rt { position: relative; z-index: 1; flex: none; display: inline-flex; align-items: center; gap: 4px; padding-right: 4px; }
     /* ONE quiet CTA: outlined, the same for every row, filled only on the focused row (B6). */
     .cta {
@@ -664,7 +752,7 @@ const FITTED_SHOWN = 2;
     }
     .mag svg { width: 22px; height: 22px; color: var(--sc-accent); }
     .mag:hover { color: var(--sc-fg-0); background: var(--sc-bg-2); }
-    .mag:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: -2px; }
+    .mag:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     :host(.bottom:not(.open)) .fchip { display: none; }
     @media (pointer: coarse) {
       .hint, .keys { display: none; }
@@ -707,6 +795,7 @@ export class FusionSearchComponent {
   private readonly ownership = inject(HqOwnershipService);
   private readonly wishlist = inject(SearchWishlistService);
   private readonly hub = inject(CodexSearchHub);
+  private readonly searchOpen = inject(SearchOpenService);
   protected readonly chrome = inject(ShellChromeService);
   private readonly router = inject(Router);
   private readonly t = inject(TranslateService);
@@ -776,9 +865,20 @@ export class FusionSearchComponent {
   /** "gemerkt" / "fehlt mir" / "lager": the reader's own set only, so no app pages beside it. */
   private readonly ownSetOnly = computed(() => this.chips().some((c) => c.filter.wished || c.filter.needed || c.filter.ownOnly));
 
-  private readonly places = computed(() =>
-    this.hasText() && !this.ownSetOnly() ? matchPlaces(this.engine.input(), this.context(), (p) => this.t.instant(p.labelKey)).slice(0, PLACES_SHOWN) : [],
-  );
+  private readonly places = computed<{ place: SearchPlace; current: boolean }[]>(() => {
+    if (!this.hasText() || this.ownSetOnly()) return [];
+    const term = this.engine.input();
+    const here = this.engine.here();
+    const label = (p: SearchPlace): string => this.t.instant(p.labelKey);
+    const out: { place: SearchPlace; current: boolean }[] = [];
+    for (const p of matchPlaces(term, this.context(), label)) {
+      const current = isCurrentTarget({ link: p.link, queryParams: p.queryParams }, here);
+      // The page the reader is on: hidden for a weak match, greyed when the term names it.
+      if (current && searchScore(term, label(p)) !== 4) continue;
+      out.push({ place: p, current });
+    }
+    return out.slice(0, PLACES_SHOWN);
+  });
 
   /** The groups as drawn: own first, the outside group after the catalog, patches / gallery / pages last. */
   readonly allGroups = computed<ViewGroup[]>(() => {
@@ -797,9 +897,12 @@ export class FusionSearchComponent {
     if (places.length) {
       out.push({
         id: 'places', labelKey: 'fusionBar.search.places', labelParams: null, count: null, reason: null, own: false, outside: false,
-        options: places.map((p) => ({
+        options: places.map(({ place: p, current }) => ({
           type: 'row' as const, id: `places-${p.id}`, group: 'places',
-          row: { type: 'place', id: `place-${p.id}`, place: p, target: { link: p.link, queryParams: p.queryParams }, cta: null, icons: NO_ICONS },
+          row: {
+            type: 'place' as const, id: `place-${p.id}`, place: p, target: { link: p.link, queryParams: p.queryParams }, cta: null, icons: NO_ICONS,
+            ...(current ? { current: true as const } : {}),
+          },
         })),
         expandable: 0, expanded: false, more: null,
       });
@@ -853,6 +956,7 @@ export class FusionSearchComponent {
     active: this.open.asReadonly(),
   };
   private unregisterHub: (() => void) | null = null;
+  private readonly unregisterOpen = this.searchOpen.register(this, () => this.openSearch());
   private statusTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
@@ -913,6 +1017,7 @@ export class FusionSearchComponent {
     this.loadHints();
     inject(DestroyRef).onDestroy(() => {
       this.unregisterHub?.();
+      this.unregisterOpen();
       if (this.statusTimer) clearTimeout(this.statusTimer);
     });
   }
@@ -999,7 +1104,8 @@ export class FusionSearchComponent {
         expandable: 0, expanded: false, more: null,
       });
     }
-    const opened = this.recentRows().slice(0, RECENT_ROWS_SHOWN);
+    const here = this.engine.here();
+    const opened = this.recentRows().filter((r) => !isCurrentTarget(r.target, here)).slice(0, RECENT_ROWS_SHOWN);
     if (opened.length) {
       const ctx = this.context();
       out.push({
@@ -1207,6 +1313,17 @@ export class FusionSearchComponent {
     else field?.blur();
   }
 
+  /**
+   * Open the search of the page the reader is on, as if they had clicked into it: a page with a field of its own
+   * takes the caret, a landing page's stage field or a Codex page's bar activates, else this subheader field opens.
+   * Ctrl/⌘+K and the wishes' "Wunsch suchen" both come through `SearchOpenService.open()` to here.
+   */
+  private openSearch(): void {
+    if (this.chrome.focusPageSearch()) return;
+    if (this.chrome.stageSearch() === 'stage' && this.hub.activate()) return;
+    this.focus();
+  }
+
   openFromButton(): void {
     this.openPanel();
     setTimeout(() => this.fieldRef()?.nativeElement.focus());
@@ -1283,9 +1400,7 @@ export class FusionSearchComponent {
         this.close();
         return;
       }
-      if (this.chrome.focusPageSearch()) return;
-      if (this.chrome.stageSearch() === 'stage' && this.hub.activate()) return;
-      this.focus();
+      this.searchOpen.open();
       return;
     }
     if (this.open()) {
@@ -1305,6 +1420,13 @@ export class FusionSearchComponent {
     if (this.hub.hasBar() && isTypeToSearchKey(ev)) {
       ev.preventDefault();
       this.hub.activate(ev.key);
+      return;
+    }
+    // The Verse hub's stage field takes typed letters too - also the key that skips the
+    // entrance (it is not consumed there), so the first letter already lands in it (QA D4).
+    if (this.chrome.stageSearch() === 'stage' && VERSE_HOME.test(this.url()) && isTypeToSearchKey(ev)) {
+      ev.preventDefault();
+      this.focus(ev.key);
     }
   }
 
@@ -1418,6 +1540,12 @@ export class FusionSearchComponent {
       this.engine.searchFor(opt.term);
       return;
     }
+    // The page the reader is on: Enter only closes — URL, query and fragment stay, nothing is remembered.
+    if (opt.type === 'row' && opt.row.current && !newTab) {
+      if (opt.row.type !== 'place') this.engine.noteOpened(opt.row);
+      this.close();
+      return;
+    }
     this.noteOpening(opt);
     const target = opt.type === 'row' ? opt.row.target : opt.target;
     if (newTab) {
@@ -1435,8 +1563,10 @@ export class FusionSearchComponent {
         this.engine.remember();
         return;
       }
-      this.engine.noteOpened(r);
-      if (r.type === 'hit' || r.type === 'own') this.recentRows.set(pushRecentRow(preferenceStorage(), this.recentRows(), r));
+      // A modified click on the greyed row opens a tab like any row: counted and remembered as an open.
+      const row = r.current ? { ...r, current: undefined } : r;
+      this.engine.noteOpened(row);
+      if (row.type === 'hit' || row.type === 'own') this.recentRows.set(pushRecentRow(preferenceStorage(), this.recentRows(), row));
     } else if (opt.type === 'more') this.engine.remember();
   }
 
@@ -1460,8 +1590,49 @@ export class FusionSearchComponent {
 
   /** Plain left click navigates through the anchor and closes; modified clicks stay the browser's. */
   onRowClick(ev: MouseEvent, o: FusionOption): void {
+    if (o.type === 'row' && o.row.current && isPlainLeftClick(ev)) {
+      // The page the reader is on: only close (the anchor is a plain href, so nothing else navigates).
+      ev.preventDefault();
+      if (o.row.type !== 'place') this.engine.noteOpened(o.row);
+      this.close();
+      return;
+    }
     this.noteOpening(o);
     if (isPlainLeftClick(ev)) this.close();
+  }
+
+  /** Variant mini links shown before "+n". */
+  readonly variantCap = VARIANT_LINKS_SHOWN;
+
+  /** A ship row's saved variants (one row per ship, d-variant); empty for every other row. */
+  variantsOf(r: ViewRow): SearchVariantLink[] {
+    return r.type === 'hit' || r.type === 'own' ? (r.variants ?? []) : [];
+  }
+
+  /** "+n": the ship's page, where every variant can be picked. */
+  variantsMoreTarget(r: ViewRow): SearchTarget {
+    return r.target;
+  }
+
+  /**
+   * A variant mini link. The variant open on this page only closes the search (a plain href);
+   * any other one navigates through its routerLink and is remembered like its ship row.
+   */
+  onVariantClick(ev: MouseEvent, r: ViewRow, v: SearchVariantLink): void {
+    ev.stopPropagation();
+    if (r.type === 'place') return;
+    const plain = isPlainLeftClick(ev);
+    const cls = r.type === 'hit' ? r.hit.classNameSlug : r.type === 'own' ? r.classNameSlug : null;
+    if (v.current && plain) {
+      ev.preventDefault();
+      this.engine.noteVariantOpened(cls, v);
+      this.close();
+      return;
+    }
+    this.engine.noteVariantOpened(cls, v, !plain);
+    const row = r.current ? { ...r, current: undefined } : r;
+    this.recentRows.set(pushRecentRow(preferenceStorage(), this.recentRows(), row));
+    if (plain) this.close();
   }
 
   /**
