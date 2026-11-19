@@ -1,7 +1,45 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.281.8",
+  "current": "0.282.0",
   "releases": [
+    {
+      "version": "0.282.0",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex detail pages share one template: a glass head band that sticks under the subheader and slims on scroll, one tab pill and one panel for ships, weapons and items."
+            },
+            {
+              "title": "",
+              "text": "Item pages show an Änderungen tab with the stats that changed since the previous patch."
+            },
+            {
+              "title": "",
+              "text": "HQ storage shows its path (HQ › Lager › Inventar) in the subheader."
+            },
+            {
+              "title": "",
+              "text": "The wish sky now sits behind the empty wish list and the top of the wish window."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Gap between the holotable views bar and the KPI strip."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.281.8",
       "date": "2026-11-19",
