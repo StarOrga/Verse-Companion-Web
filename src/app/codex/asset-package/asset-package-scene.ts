@@ -14,6 +14,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import type { Bounds, PackagePlacement } from './asset-package.model';
+import { workerEdgeCompute } from '../holo-edges-link';
+import { logWarn } from '../../core/log';
 import {
   HoloLook,
   HOLO_GHOST_FLAG,
@@ -301,9 +303,42 @@ export class PackageScene {
     return (performance.now() - this.t0) / 1000;
   }
 
-  private parse(buf: ArrayBuffer): Promise<THREE.Object3D> {
-    return new Promise((resolve, reject) => this.loader.parse(buf, '', (g) => resolve(g.scene), reject));
+  /**
+   * Parse a GLB, then give the page a task boundary: several parts resolve back to back as
+   * microtasks, which would chain every parse and dress into one long frozen task (#378).
+   */
+  private async parse(buf: ArrayBuffer): Promise<THREE.Object3D> {
+    const obj = await new Promise<THREE.Object3D>((resolve, reject) => this.loader.parse(buf, '', (g) => resolve(g.scene), reject));
+    await nextTask();
+    return obj;
   }
+
+  /** Crease edges from the edge worker, so `adopt` → `dress` computes none on the main thread (#378). */
+  private async prepare(obj: THREE.Object3D, role: HoloRole): Promise<void> {
+    await this.look.prepareEdges(obj, role, workerEdgeCompute);
+    await nextTask();
+  }
+
+  /**
+   * Draw nothing until {@link warm} ran: the first frame would otherwise compile every shader
+   * synchronously in one long task. Opt-in (the viewer), so a bare scene renders as before.
+   */
+  holdUntilWarm(): void {
+    this.held = true;
+  }
+
+  /** Compile the scene's programs without blocking (KHR_parallel_shader_compile), then draw. */
+  async warm(): Promise<void> {
+    try {
+      if (!this.disposed) await this.renderer.compileAsync(this.scene, this.camera);
+    } catch (err) {
+      logWarn('asset-package', 'shader warm-up failed', { err });
+    }
+    this.held = false;
+    this.requestRender();
+  }
+
+  private held = false;
 
   /** Dress every mesh in the look's `role` (GLBs are geometry-only), remember geometries for disposal. */
   private adopt(obj: THREE.Object3D, role: HoloRole): void {
@@ -321,6 +356,8 @@ export class PackageScene {
     const obj = await this.parse(buf);
     // Fit first: the hull's line detail depends on its size and triangle count.
     this.look.fit(new THREE.Box3().setFromObject(obj), countTriangles(obj));
+    await this.prepare(obj, 'hull');
+    if (this.disposed) return;
     this.adopt(obj, 'hull');
     this.root = obj;
     this.scene.add(obj);
@@ -330,6 +367,8 @@ export class PackageScene {
   async addPart(sha: string, buf: ArrayBuffer): Promise<void> {
     if (this.templates.has(sha)) return;
     const obj = await this.parse(buf);
+    await this.prepare(obj, 'part');
+    if (this.disposed || this.templates.has(sha)) return;
     this.adopt(obj, 'part');
     this.templates.set(sha, obj);
   }
@@ -355,6 +394,8 @@ export class PackageScene {
   async setInterior(buf: ArrayBuffer): Promise<void> {
     if (this.interior) return;
     const obj = await this.parse(buf);
+    await this.prepare(obj, 'interior');
+    if (this.disposed || this.interior) return;
     this.adopt(obj, 'interior');
     this.interior = obj;
     this.scene.add(obj);
@@ -882,7 +923,7 @@ export class PackageScene {
 
   /** Render on demand: one frame, continued only while damping moves the camera or the look animates. */
   requestRender(): void {
-    if (this.frameId || this.disposed || this.paused) return;
+    if (this.frameId || this.disposed || this.paused || this.held) return;
     this.frameId = this.outsideZone(() => requestAnimationFrame(() => {
       this.frameId = 0;
       const now = performance.now();
@@ -921,4 +962,11 @@ export class PackageScene {
     this.renderer.dispose();
     this.renderer.forceContextLoss();
   }
+}
+
+/** Resolve in a fresh task (scheduler.yield where there is one), so input and paint get a turn. */
+function nextTask(): Promise<void> {
+  const sched = (globalThis as { scheduler?: { yield?: () => Promise<void> } }).scheduler;
+  if (typeof sched?.yield === 'function') return sched.yield();
+  return new Promise((resolve) => setTimeout(resolve, 0));
 }

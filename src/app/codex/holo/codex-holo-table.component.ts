@@ -217,7 +217,7 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
     '[class.offscreen]': 'offscreen()',
   },
   template: `
-    <div class="silhouette-frame" #frame [class.mode-3d]="viewMode() === '3d'" [class.mode-schema]="viewMode() === 'schema'" [class.phone-full]="phoneFull()">
+    <div class="silhouette-frame" #frame [class.mode-3d]="viewMode() === '3d'" [class.mode-schema]="viewMode() === 'schema'" [class.phone-full]="phoneFull()" [class.loading-3d]="loading3d()">
       @if (phoneFull()) {
         <button type="button" class="full-close" [attr.aria-label]="'codex.holo.stage.fullscreenExit' | translate" [scTooltip]="'codex.holo.stage.fullscreenExit' | translate" (click)="fullDismissed.set(true)">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -274,6 +274,13 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
           <sc-defer-error class="mode-viewer" source="codex.holoTable" (failed)="markDrawn()" />
         }
         </div>
+        @if (loading3d()) {
+          <!-- #378: the model loads in the background; its spot shows that it is coming, the page stays usable. -->
+          <div class="model-loading" role="status">
+            <i class="ml-ring" aria-hidden="true"></i>
+            <span class="ml-text">{{ 'codex.assetPackage.loading' | translate }}</span>
+          </div>
+        }
       }
       @if (viewMode() === 'schema' && schemaBlueprint(); as bp) {
         <!-- The ship's own blueprint with every hardpoint on it; the box map
@@ -553,6 +560,18 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
     @keyframes ph-lock { 0%, 100% { transform: scale(0.82); opacity: 0.45; } 50% { transform: scale(1); opacity: 1; } }
     @keyframes ph-scan { 0% { bottom: 14%; opacity: 0; } 15%, 85% { opacity: 1; } 100% { bottom: 86%; opacity: 0; } }
     :host(.still) .mode-viewer.is-placeholder::before, :host(.still) .mode-viewer.is-placeholder::after { animation: none; }
+    /* #378: the 3D model is on its way — the table's hull steps back, a lock ring sits where the model lands. */
+    .silhouette-frame.loading-3d .shipwrap { opacity: 0.35; transition: opacity var(--holo-t-base) var(--holo-e-out); }
+    .model-loading { position: absolute; left: 50%; top: 50%; z-index: 2; translate: -50% -50%; display: flex; flex-direction: column;
+      align-items: center; gap: var(--sc-space-3); pointer-events: none; animation: fade-in var(--holo-t-base) var(--holo-e-out) 150ms backwards; }
+    .ml-ring { position: relative; width: 76px; height: 76px; border-radius: 50%;
+      border: 1px solid color-mix(in srgb, var(--sc-accent) 35%, transparent);
+      box-shadow: 0 0 22px color-mix(in srgb, var(--sc-accent) 25%, transparent), inset 0 0 14px color-mix(in srgb, var(--sc-accent) 18%, transparent);
+      animation: ph-lock 1.6s var(--holo-e-io) infinite; }
+    .ml-ring::after { content: ''; position: absolute; inset: -1px; border-radius: 50%; border: 2px solid transparent;
+      border-top-color: var(--sc-accent); animation: holo-sweep 1.1s linear infinite; }
+    .ml-text { font-size: max(0.78rem, var(--sc-fs-floor)); letter-spacing: 0.06em; color: var(--sc-fg-1);
+      text-shadow: 0 0 8px var(--sc-bg-0); }
     .mode-viewer.schema-sheet { padding: 14px 16px; overflow: auto; }
     .surface-leave { animation: surface-out var(--holo-t-fast) var(--holo-e-io) forwards; pointer-events: none; }
     @keyframes surface-out { to { opacity: 0; } }
@@ -1004,6 +1023,8 @@ export class CodexHoloTableComponent {
    * Reset whenever 3D is left or the ship changes; {@link VIEWER_HOLD_MAX_MS} caps the wait.
    */
   readonly viewerDrawn = signal(false);
+  /** The hull model is on its way: the loading ring sits in its spot (#378). */
+  readonly loading3d = computed(() => this.viewMode() === '3d' && !this.interior3d() && !this.viewerDrawn());
   private viewerHoldTimer: ReturnType<typeof setTimeout> | null = null;
 
   markDrawn(): void {
