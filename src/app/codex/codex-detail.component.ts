@@ -467,19 +467,10 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
           <header class="c-head">
             <div class="c-tt">
               @if (heroEyebrow(); as eb) { <p class="c-eyebrow">{{ eb }}</p> }
-              <!-- The RSI link and the pledge-link action sit beside the name (#374: "weiter nach oben"). -->
-              <div class="c-name-row">
-                <h1 class="c-name">{{ displayName() }}</h1>
-                <div class="c-links"><sc-codex-ship-actions [classNameSlug]="detail()!.classNameSlug" [showClass]="false" /></div>
-              </div>
+              <h1 class="c-name">{{ displayName() }}</h1>
             </div>
             <ng-container [ngTemplateOutlet]="headStrip" />
           </header>
-          <!-- Pin your own RSI pledge link (feedback f7d3bd9a), opened from the head row above. Private to
-               you; an admin can publish one for everyone, never automatic. -->
-          @if (shipLinkForm.open()) {
-            <div class="c-link-form"><sc-codex-ship-link-form /></div>
-          }
         }
         @if (kind() === 'ship' && !shellBeta()) {
           <!-- The hangar control sits ABOVE the picture (#239: "Hangar im
@@ -589,6 +580,9 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
             <a scAction tier="secondary" [routerLink]="['/codex']" [queryParams]="{ kind: 'ship' }">
               {{ 'codex.detail.actionSwitchShip' | translate }} <span aria-hidden="true">⇄</span>
             </a>
+            <!-- The RSI link and the pledge-link action sit with the other buttons, right after
+                 "Schiff wechseln" (#374: not beside the name, not pushed to the row's end). -->
+            <sc-codex-ship-actions [classNameSlug]="detail()!.classNameSlug" [showClass]="false" />
             @if (editionOptions().length > 1) {
               <sc-codex-variant-picker class="in-toolrow" variant="edition" [kind]="detail()!.kind" [currentSlug]="detail()!.classNameSlug"
                 [options]="editionPickerOptions()" [current]="currentEdition()" />
@@ -599,6 +593,12 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
             }
             <sc-codex-ship-actions [classNameSlug]="detail()!.classNameSlug" [spacer]="true" [showLinks]="false" />
           </div>
+
+          <!-- Pin your own RSI pledge link (feedback f7d3bd9a), opened from the action row above.
+               Private to you; an admin can publish one for everyone, never automatic. -->
+          @if (shipLinkForm.open()) {
+            <div class="c-link-form"><sc-codex-ship-link-form /></div>
+          }
         }
         </div>
 
@@ -1383,9 +1383,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .c-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px 20px; flex-wrap: wrap; margin-block-end: 12px; }
     .c-tt { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
     .c-eyebrow { margin: 0; font-family: var(--sc-font-display); font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.08em; text-transform: uppercase; color: var(--sc-fg-2); }
-    .c-name-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; min-width: 0; }
-    .c-links { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
-    .c-link-form { margin-block-end: 12px; }
+    .c-link-form { margin-block-start: 12px; }
     .c-name { margin: 0; font-weight: 500; font-size: clamp(18px, 1.15vw + 6px, 26px); line-height: 1.15; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-0); overflow-wrap: anywhere; }
     .m-side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
     .it-strip { margin-block-start: 6px; }
@@ -1497,7 +1495,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
        then Ausfuehrung / Lackierung and the rarer actions (the old tool row,
        folded in by #321). The pickers' compact sizing lives in
        sc-codex-variant-picker (:host(.in-toolrow)); the spacer that pushes the
-       rarer actions to the end lives in sc-codex-ship-actions. */
+       class name to the end lives in sc-codex-ship-actions; the RSI and pledge-link
+       actions follow "Schiff wechseln" (#374). */
     .stage-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
     /* The stage actions are scAction pills. A pinned compare keeps the accent
        state; .copy anchors its toast. */
