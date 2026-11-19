@@ -13,8 +13,8 @@ export const PATH_ICONS = {
   wish: ['M16 3.5l1.3 3.2 3.2 1.3-3.2 1.3L16 12.5l-1.3-3.2L11.5 8l3.2-1.3z', 'M11.5 12.5L4 20', 'M8.5 10.5L5 14', 'M13.5 15.5L10 19'],
   /** "Gemerkt" in the news (and its search rows): the bookmark. It is not a wish, so it keeps its own glyph. */
   saved: ['M7 4h10v16l-5-4-5 4z'],
-  /** Nachschub: a tray with an inbound arrow. */
-  nachschub: ['M12 3v8', 'M8.5 7.5L12 11l3.5-3.5', 'M4 13h5l1.5 2.5h3L15 13h5v7H4z'],
+  /** Operation (key stays nachschub): the Route glyph, two waypoints joined by a path. */
+  nachschub: ['M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3', 'M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z', 'M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z'],
   /** Inventar: a box. */
   inventar: ['M4 8l8-4 8 4v9l-8 4-8-4z', 'M4 8l8 4 8-4M12 12v9'],
   /** Hangar: a hangar with its door. */

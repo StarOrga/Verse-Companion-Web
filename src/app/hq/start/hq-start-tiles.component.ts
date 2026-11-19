@@ -16,6 +16,7 @@ import { HqPageId, hqEinsatzHref, hqHangar } from '../hq-routes';
 import { EventHqService } from '../events/event-hq.service';
 import { HqEventNamesComponent } from './hq-event-names.component';
 import { HqSuppliesService } from '../hq-supplies.service';
+import { NachschubService } from '../nachschub/nachschub.service';
 import { HqAppConnectionService } from '../now/hq-app-connection.service';
 import { hqAppAction } from '../now/hq-app-status.util';
 import { HqLiveService } from '../now/hq-live.service';
@@ -155,7 +156,7 @@ export function agoText(iso: string, lang: string | undefined, now: number = Dat
             </small>
           }
           @case ('needs') {
-            <b>{{ 'hq.start.planen.needs' | translate: { n: supplies.open().length } }}</b>
+            <b>{{ 'hq.start.planen.needs' | translate: { n: ns.openActiveLines().length } }}</b>
             <small>{{ 'hq.start.planen.emptyHint' | translate }}</small>
           }
           @default {
@@ -309,6 +310,8 @@ export class HqStartTilesComponent {
   protected readonly inv = inject(HqInventoryService);
   protected readonly einsatz = inject(HqEinsatzService);
   protected readonly supplies = inject(HqSuppliesService);
+  /** "N in Operationen" counts the lines of active Operationen only (what Planen shows). */
+  protected readonly ns = inject(NachschubService);
   protected readonly live = inject(HqLiveService);
   private readonly appConn = inject(HqAppConnectionService);
   protected readonly nav = inject(HqPageNavService);
@@ -382,7 +385,7 @@ export class HqStartTilesComponent {
   protected readonly plan = computed<'loading' | 'error' | 'plans' | 'needs' | 'empty'>(() => {
     if (this.current()) return 'plans';
     if (this.signedIn() && !this.einsatz.ready()) return this.einsatz.syncError() ? 'error' : 'loading';
-    return this.supplies.open().length > 0 ? 'needs' : 'empty';
+    return this.ns.openActiveLines().length > 0 ? 'needs' : 'empty';
   });
 
   // Statistik

@@ -614,6 +614,11 @@ describe('CodexDetailComponent — missile on the item stage', () => {
     expect(el.querySelector('.item-page sc-codex-item-stage')).not.toBeNull();
     expect(el.querySelector('header.hero')).toBeNull();
     expect(el.querySelector('.it-pane sc-codex-rank-card')).not.toBeNull();
+    // R5 (G1): the panel carries the two stations, one under the other, in place of the former ownership card.
+    const stations = el.querySelector('aside.it-panel > .it-path sc-codex-own-stations sc-item-path.ip-primary');
+    expect(stations, 'the two stations at the top of the item panel').not.toBeNull();
+    expect(stations!.classList).toContain('ip-stacked');
+    expect(Array.from(stations!.querySelectorAll('[data-station]')).map((x) => x.getAttribute('data-station'))).toEqual(['wish', 'own']);
   });
 });
 
@@ -1443,14 +1448,17 @@ describe('CodexDetailComponent — hangar legacy in the shell beta (B3)', () => 
       const cmp = fixture.componentInstance;
       const el: HTMLElement = fixture.nativeElement;
       // Holotisch (C5/C22): ownership lives only in the one hangar button of the head.
-      expect(el.querySelector('.holo-panel sc-codex-own-card'), 'no separate "Dein Exemplar" card').toBeNull();
+      expect(el.querySelector('.holo-panel sc-codex-own-stations'), 'no separate ownership stations').toBeNull();
       expect(el.querySelector('.holo-topbar sc-codex-own-ship-actions'), 'the icon row left the head').toBeNull();
       expect(el.querySelector('.holo-topbar .sc-head-strip sc-codex-holo-hangar-menu')).not.toBeNull();
       expect(el.querySelector('sc-codex-holo-stage sc-codex-own-segment'), 'no strip segment').toBeNull();
       cmp.holoView.set(false);
       fixture.detectChanges();
-      expect(el.querySelector('.hero-stack > .hero-pair > .hero-own sc-codex-own-card'), 'under the picture (#323)').not.toBeNull();
-      expect(el.querySelector('.m-side sc-codex-own-card'), 'not in the headline side column').toBeNull();
+      expect(el.querySelector('.hero-stack > .hero-pair > .hero-own sc-codex-own-stations'), 'under the picture (#323)').not.toBeNull();
+      // R5 (G1): the ship's classic view shows the two stations side by side (auto layout), no card.
+      expect(el.querySelector('.hero-own sc-item-path.ip-primary [data-station="own"]'), 'the hangar station').not.toBeNull();
+      expect(el.querySelector('.hero-own sc-item-path')!.classList).not.toContain('ip-stacked');
+      expect(el.querySelector('.m-side sc-codex-own-stations'), 'not in the headline side column').toBeNull();
       expect(el.querySelector('sc-item-path[level]')?.closest('.crumb-aside'), 'no path panel in the head').toBeFalsy();
     }));
 
@@ -1557,7 +1565,7 @@ describe('CodexDetailComponent — personal mode lives in HQ under the shell bet
       expect(cmp.personalMode(), '?v= on the HQ URL opens the variant').toBe(true);
       // Rename / note / pin / remove and the exemplar choice live in the hangar button's menu (C5).
       expect(el.querySelector('.sc-head-strip sc-codex-holo-hangar-menu'), 'the hangar button in the head').not.toBeNull();
-      expect(el.querySelector('sc-codex-own-card'), 'no separate ownership card').toBeNull();
+      expect(el.querySelector('sc-codex-own-stations'), 'no separate ownership stations').toBeNull();
       expect(cmp.activeVariantId()).toBe('c1');
       expect(cmp.showModeSwitch()).toBe(true);
       expect(cmp.crumbs().map((c) => c.link)).toEqual(['/hq', '/hq/hangar']);
@@ -1585,6 +1593,10 @@ describe('CodexDetailComponent — non-ship Klassisch / Holotisch', () => {
     const el: HTMLElement = (await missile()).nativeElement;
     expect(el.querySelector('.item-page')).toBeNull();
     expect(el.querySelector('header.hero')).not.toBeNull();
+    // R5 (G4): the classic item page carries the same two stations right under its head.
+    const stations = el.querySelector('.hero-stack > header.hero + sc-codex-own-stations sc-item-path.ip-primary');
+    expect(stations, 'the stations under the classic head').not.toBeNull();
+    expect(stations!.classList).not.toContain('ip-stacked');
     // The switch lives in the corner (view toggle FAB): the page registers it for non-ships too.
     const v = TestBed.inject(PageCornerService).view();
     expect(v).not.toBeNull();

@@ -14,6 +14,7 @@ import {
   signal,
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { HintTipComponent } from '../shared/hint-tip/hint-tip.component';
 import { ShipSkin, ShipSkinsService, skinSourceKey } from './ship-skins.service';
 import type { HardpointPortRef } from './hardpoint-port-ref';
 import {
@@ -122,7 +123,7 @@ const GLB_HEAD_TIMEOUT_MS = 10_000;
 @Component({
   selector: 'sc-ship-skin-viewer',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, HintTipComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: { '[class.holo]': 'holo()', '[class.still]': 'still()' },
@@ -243,9 +244,8 @@ const GLB_HEAD_TIMEOUT_MS = 10_000;
                 }
               }
               @if (hotspots().length > 0 && !anchorsOnly()) {
-                <p class="hp-hint">
-                  {{ 'codex.skins.hardpointHint' | translate: { count: hotspots().length } }}
-                </p>
+                <!-- How the markers work: a tooltip on the model's corner, not a written-out line (#375). -->
+                <sc-hint-tip class="hp-hint" [text]="'codex.skins.hardpointHint' | translate: { count: hotspots().length }" />
               }
             } @else if (mode() === '3d' && modelError()) {
               <div class="empty error" role="alert">{{ 'codex.skins.loadError' | translate }}</div>
@@ -609,11 +609,7 @@ const GLB_HEAD_TIMEOUT_MS = 10_000;
         left: 0.6rem;
         bottom: 0.5rem;
         margin: 0;
-        max-width: 60%;
-        font-size: max(0.64rem, var(--sc-fs-floor));
-        line-height: 1.3;
         color: #7f92ab;
-        pointer-events: none;
       }
 
       /* ── Hardpoint markers on the hull (#256) ───────────────────────

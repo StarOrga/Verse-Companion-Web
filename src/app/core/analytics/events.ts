@@ -25,6 +25,7 @@ export type EventArea = (typeof EVENT_AREAS)[number];
 export const EVENT_VERBS = [
   'view', 'open', 'close', 'create', 'add', 'remove', 'update', 'change', 'submit', 'send', 'start', 'finish', 'fail',
   'share', 'search', 'select', 'toggle', 'import', 'export', 'earn', 'request', 'sign_in', 'sign_out', 'show', 'accept', 'deselect',
+  'assign', 'release',
 ] as const;
 export type EventVerb = (typeof EVENT_VERBS)[number];
 
@@ -91,11 +92,16 @@ export const EVENTS = {
   'hq:plan_create': ev<{ steps: number }>('hq', 'Ein Einsatz wurde geplant (Anzahl Schritte).'),
   'hq:plan_update': ev<{ change: 'status' | 'step' | 'remove' }>('hq', 'Ein Einsatz wurde geändert (Status, Schritt oder entfernt).'),
   'hq:inventory_add': ev<{ unit: 'pcs' | 'scu' }>('hq', 'Ein Bestand wurde ins Inventar gebucht.'),
-  'hq:supply_add': ev<{ qty: number }>('hq', 'Ein Nachschub-Posten wurde angelegt.'),
+  'hq:supply_add': ev<{ qty: number }>('hq', 'Ein Posten einer Operation wurde angelegt.'),
   'hq:wish_add': ev<{ kind: string }>('hq', 'Ein Eintrag wurde zu den Wünschen gelegt.'),
   'hq:wishlist_open': ev<{ surface: 'popout' | 'cart' }>('hq', 'Die Wünsche wurden geöffnet (Popout in der Kopfzeile oder großes Fenster).'),
   'hq:wish_search_open': ev<{ surface: 'popout' | 'cart' }>('hq', 'Aus den leeren Wünschen heraus wurde die Suche geöffnet.'),
   'hq:events_view': ev('hq', 'Der Ereignis-Abschnitt des HQ wurde angezeigt.'),
+  'hq:spot_update': ev('hq', 'Ein gespeicherter Spot wurde auf der Spots-Seite umbenannt.'),
+  'hq:spot_remove': ev('hq', 'Ein gespeicherter Spot wurde auf der Spots-Seite gelöscht.'),
+  'hq:path_group_assign': ev<{ surface: 'codex' | 'hq' | 'wishlist'; created: boolean }>('hq', 'Stücke eines Wunschs wurden einer Operation zugeordnet (Ort; created = dafür eine neue Operation angelegt).'),
+  'hq:plain_lines_select': ev<{ choice: 'adopt' | 'keep'; count: number }>('hq', 'Zu alten Zeilen einer Operation wurde die Frage "Sind das Wünsche?" beantwortet (als Wünsche führen oder so lassen; Anzahl Zeilen).'),
+  'hq:path_group_release': ev<{ surface: 'codex' | 'hq' | 'wishlist'; pieces: number; dissolved: boolean }>('hq', 'Zugeordnete Stücke eines Wunschs haben ihre Operation verlassen (Ort, Anzahl Stücke; dissolved = eine Operation wurde mit aufgelöst).'),
 
   // --- search ------------------------------------------------------------
   'search:palette_open': ev<{ surface: 'palette' | 'codex_bar' }>('search', 'Die Suche wurde geöffnet (Palette oder Codex-Leiste).'),

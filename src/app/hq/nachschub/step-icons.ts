@@ -23,5 +23,5 @@ export const TRANSPORT_WHEELS: readonly { cx: number; cy: number; r: number }[] 
   { cx: 17, cy: 18, r: 1.6 },
 ];
 
-/** Tray with a down arrow: the Nachschub icon in HQ. */
-export const NACHSCHUB_ICON_PATHS: readonly string[] = ['M12 3v8', 'M8.5 7.5L12 11l3.5-3.5', 'M4 13h5l1.5 2.5h3L15 13h5v7H4z'];
+/** Route glyph (two waypoints joined by a path): the Operation icon in HQ. */
+export const NACHSCHUB_ICON_PATHS: readonly string[] = ['M5 17v-4a3 3 0 0 1 3-3h8a3 3 0 0 0 3-3', 'M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4z', 'M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z'];

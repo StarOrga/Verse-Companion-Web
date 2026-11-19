@@ -14,6 +14,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import type { Bounds, PackagePlacement } from './asset-package.model';
+import { workerEdgeCompute } from '../holo-edges-link';
+import { logWarn } from '../../core/log';
 import {
   HoloLook,
   HOLO_GHOST_FLAG,
@@ -91,8 +93,8 @@ void main() {
 }
 `;
 
-// The empty-slot ring: a dashed outer ring that rotates, a thin inner ring and
-// a soft core, all in the manufacturer accent, drawn on a camera-facing quad.
+// The empty-slot marker: a soft glow, no rings (#372: a focused part is only
+// coloured, never circled), drawn on a camera-facing quad.
 const RING_VERTEX = /* glsl */ `
 varying vec2 vUv;
 void main() {
@@ -103,21 +105,11 @@ void main() {
 const RING_FRAGMENT = /* glsl */ `
 uniform vec3 uColor;
 uniform float uAlpha;
-uniform float uAngle;
 varying vec2 vUv;
-const float TAU = 6.2831853;
 void main() {
   float r = length(vUv);
-  float aa = fwidth(r) * 1.5;
-  float outer = smoothstep(0.74 - aa, 0.74, r) * (1.0 - smoothstep(0.86, 0.86 + aa, r));
-  float a = atan(vUv.y, vUv.x) + uAngle;
-  float dash = step(0.42, fract(a / TAU * 12.0));
-  float inner = smoothstep(0.5 - aa, 0.5, r) * (1.0 - smoothstep(0.54, 0.54 + aa, r));
-  float core = (1.0 - smoothstep(0.0, 0.5, r)) * 0.35;
-  float halo = (1.0 - smoothstep(0.86, 1.0, r)) * smoothstep(0.6, 0.86, r) * 0.25;
-  float m = max(max(outer * dash, inner * 0.7), max(core, halo));
-  vec3 c = mix(uColor, vec3(1.0), 0.25 * outer * dash);
-  gl_FragColor = vec4(c * m * uAlpha, m * uAlpha);
+  float m = (1.0 - smoothstep(0.0, 0.5, r)) * 0.35;
+  gl_FragColor = vec4(uColor * m * uAlpha, m * uAlpha);
 }
 `;
 
@@ -197,7 +189,7 @@ export class PackageScene {
   private readonly seenView = new THREE.Matrix4();
   private readonly seenProjection = new THREE.Matrix4();
 
-  // Empty-slot rings: hover in the part line colour, green when that slot is selected.
+  // Empty-slot glows: hover in the part line colour, green when that slot is selected.
   private readonly ringGeo = new THREE.PlaneGeometry(1, 1);
   private readonly ringMat: THREE.ShaderMaterial;
   private readonly ringSelMat: THREE.ShaderMaterial;
@@ -249,7 +241,7 @@ export class PackageScene {
       new THREE.ShaderMaterial({
         vertexShader: RING_VERTEX,
         fragmentShader: RING_FRAGMENT,
-        uniforms: { uColor: { value: new THREE.Color(c[0] / 255, c[1] / 255, c[2] / 255) }, uAlpha: { value: 1 }, uAngle: { value: 0 } },
+        uniforms: { uColor: { value: new THREE.Color(c[0] / 255, c[1] / 255, c[2] / 255) }, uAlpha: { value: 1 } },
         transparent: true,
         // Never occluded: an empty slot is often inside the hull.
         depthTest: false,
@@ -301,9 +293,42 @@ export class PackageScene {
     return (performance.now() - this.t0) / 1000;
   }
 
-  private parse(buf: ArrayBuffer): Promise<THREE.Object3D> {
-    return new Promise((resolve, reject) => this.loader.parse(buf, '', (g) => resolve(g.scene), reject));
+  /**
+   * Parse a GLB, then give the page a task boundary: several parts resolve back to back as
+   * microtasks, which would chain every parse and dress into one long frozen task (#378).
+   */
+  private async parse(buf: ArrayBuffer): Promise<THREE.Object3D> {
+    const obj = await new Promise<THREE.Object3D>((resolve, reject) => this.loader.parse(buf, '', (g) => resolve(g.scene), reject));
+    await nextTask();
+    return obj;
   }
+
+  /** Crease edges from the edge worker, so `adopt` → `dress` computes none on the main thread (#378). */
+  private async prepare(obj: THREE.Object3D, role: HoloRole): Promise<void> {
+    await this.look.prepareEdges(obj, role, workerEdgeCompute);
+    await nextTask();
+  }
+
+  /**
+   * Draw nothing until {@link warm} ran: the first frame would otherwise compile every shader
+   * synchronously in one long task. Opt-in (the viewer), so a bare scene renders as before.
+   */
+  holdUntilWarm(): void {
+    this.held = true;
+  }
+
+  /** Compile the scene's programs without blocking (KHR_parallel_shader_compile), then draw. */
+  async warm(): Promise<void> {
+    try {
+      if (!this.disposed) await this.renderer.compileAsync(this.scene, this.camera);
+    } catch (err) {
+      logWarn('asset-package', 'shader warm-up failed', { err });
+    }
+    this.held = false;
+    this.requestRender();
+  }
+
+  private held = false;
 
   /** Dress every mesh in the look's `role` (GLBs are geometry-only), remember geometries for disposal. */
   private adopt(obj: THREE.Object3D, role: HoloRole): void {
@@ -321,6 +346,8 @@ export class PackageScene {
     const obj = await this.parse(buf);
     // Fit first: the hull's line detail depends on its size and triangle count.
     this.look.fit(new THREE.Box3().setFromObject(obj), countTriangles(obj));
+    await this.prepare(obj, 'hull');
+    if (this.disposed) return;
     this.adopt(obj, 'hull');
     this.root = obj;
     this.scene.add(obj);
@@ -330,6 +357,8 @@ export class PackageScene {
   async addPart(sha: string, buf: ArrayBuffer): Promise<void> {
     if (this.templates.has(sha)) return;
     const obj = await this.parse(buf);
+    await this.prepare(obj, 'part');
+    if (this.disposed || this.templates.has(sha)) return;
     this.adopt(obj, 'part');
     this.templates.set(sha, obj);
   }
@@ -355,6 +384,8 @@ export class PackageScene {
   async setInterior(buf: ArrayBuffer): Promise<void> {
     if (this.interior) return;
     const obj = await this.parse(buf);
+    await this.prepare(obj, 'interior');
+    if (this.disposed || this.interior) return;
     this.adopt(obj, 'interior');
     this.interior = obj;
     this.scene.add(obj);
@@ -545,7 +576,6 @@ export class PackageScene {
   private poseRings(seconds: number): void {
     const pose = ringPose(seconds, this.reducedMotion);
     for (const mat of [this.ringMat, this.ringSelMat]) {
-      mat.uniforms['uAngle'].value = pose.angle;
       mat.uniforms['uAlpha'].value = pose.alpha;
     }
     const size = this.look.focusRadius * 1.6 * pose.scale;
@@ -882,7 +912,7 @@ export class PackageScene {
 
   /** Render on demand: one frame, continued only while damping moves the camera or the look animates. */
   requestRender(): void {
-    if (this.frameId || this.disposed || this.paused) return;
+    if (this.frameId || this.disposed || this.paused || this.held) return;
     this.frameId = this.outsideZone(() => requestAnimationFrame(() => {
       this.frameId = 0;
       const now = performance.now();
@@ -921,4 +951,11 @@ export class PackageScene {
     this.renderer.dispose();
     this.renderer.forceContextLoss();
   }
+}
+
+/** Resolve in a fresh task (scheduler.yield where there is one), so input and paint get a turn. */
+function nextTask(): Promise<void> {
+  const sched = (globalThis as { scheduler?: { yield?: () => Promise<void> } }).scheduler;
+  if (typeof sched?.yield === 'function') return sched.yield();
+  return new Promise((resolve) => setTimeout(resolve, 0));
 }

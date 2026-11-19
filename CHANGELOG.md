@@ -4,6 +4,65 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.281.6] - 2026-11-19
+
+### Changed
+- Classic ship view: explanatory notes such as the scale legend show as tooltips instead of written-out text.
+
+## [0.281.5] - 2026-11-19
+
+### Changed
+- Classic ship view: the header no longer carries a factory-loadout button; the factory fit lives in the loadout.
+
+## [0.281.4] - 2026-11-19
+
+### Fixed
+- Holotable 3D: a focused part shows no dashed rings beneath it any more, only its green highlight and its label.
+
+## [0.281.3] - 2026-11-19
+
+### Fixed
+- Holotable: switching to 3D no longer freezes the page; a loading animation shows where the model will appear and the page stays scrollable while it loads.
+
+## [0.281.2] - 2026-11-18
+
+### Fixed
+- Ship and item pages: the edition and skin dropdown opens fully visible above the page instead of being cut off by the content around it.
+
+## [0.281.1] - 2026-11-18
+
+### Changed
+- Ship page, classic view: "Bei RSI ansehen" and "Pledge-Link hinzufügen" sit up next to the ship name instead of at the end of the action row.
+
+## [0.281.0] - 2026-11-19
+
+### Added
+- HQ: a "Spots" page lists the places you saved in the desktop app; rename or delete them and the app takes it over on its next sync (#1056).
+- HQ Statistik: a logbook with one card per game session — duration, quantum jumps, contracts, aUEC balance and losses (#896).
+- HQ Bestand: the Ersatz suggestions also offer materials that the same blueprint accepts (#1057).
+- The desktop app's UI language packs are now hosted under `/i18n/scc-app/` so translation fixes reach players without an app release (#1055).
+
+### Changed
+- HQ live contract v3: blueprints the desktop app puts on your shelf count as owned in the Sammlung and the Nachschub craft check (#1045).
+
+## [0.280.0] - 2026-11-19
+
+### Added
+- A wish stays on the wishlist when it is assigned to an Operation. Item, ship, blueprint and preview pages in the Codex show the same two stations, wish and ownership, and assign a wish to an Operation in place; the Holotisch hangar menu reads the same way.
+- Removing a wish asks only when assigned pieces are hit, takes them from the newest Operation first and can be undone in one step. Releasing a line in the HQ offers to delete the wish as well.
+- The Archiv in HQ Planen can delete an archived Operation.
+- An Operation with plain lines from before this change asks once whether they should stand as wishes on the wishlist. Nothing changes without the answer.
+
+### Changed
+- The supply group is called "Operation" everywhere and carries the Route glyph, and every undo toast has the new look.
+- The HQ start tile counts only lines of active Operationen.
+
+### Fixed
+- Undo of a wish removal gives back exactly what the removal took, so a change made on another device in between survives, and a ship wish comes back with its name and notes.
+- A fulfilled wish line stays fulfilled when a second device pushes an outdated copy of it.
+- An archived Operation no longer keeps open wish lines.
+- Name proposals for a new Operation work for signed-in users; the service had rejected every request.
+
 ## [0.279.2] - 2026-11-18
 
 ### Changed

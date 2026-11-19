@@ -119,3 +119,9 @@ export const CORS: Readonly<Record<string, string>> = {
 export function preflight(method: string): Response | null {
   return method === 'OPTIONS' ? new Response(null, { headers: { ...CORS } }) : null;
 }
+
+/** The bearer token of an Authorization header, or null when there is none (any spelling of "Bearer"). */
+export function bearerToken(header: string | null): string | null {
+  const m = /^\s*Bearer\s+(\S+)\s*$/i.exec(header ?? '');
+  return m ? m[1] : null;
+}

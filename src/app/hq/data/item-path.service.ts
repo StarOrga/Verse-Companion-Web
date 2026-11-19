@@ -7,23 +7,31 @@ import { HangarService } from '../../hangar/hangar.service';
 import { HqOwnershipService } from '../hq-ownership.service';
 import { HqLiveService } from '../now/hq-live.service';
 import { isGameLive, readLocation } from '../now/hq-live.util';
-import { HqSuppliesService, SupplyUnit, lineAmount, roundAmount } from '../hq-supplies.service';
+import { HqSuppliesService, SupplyItem, SupplyUnit, lineAmount, roundAmount } from '../hq-supplies.service';
 import { NachschubEdgeService } from '../nachschub/nachschub-edge.service';
 import { stockMatches } from '../nachschub/nachschub-stock';
-import { NachschubService } from '../nachschub/nachschub.service';
+import type { RemovalPlan } from '../nachschub/nachschub.model';
+import { AssignTargets, NachschubService, WishAssignment, isWishLine } from '../nachschub/nachschub.service';
+import type { PathGroupSurface } from '../nachschub/path-group-analytics';
 import { parseStockRef } from '../stock/hq-stock-ref';
 import { HqInventoryService } from './hq-inventory.service';
+import { restoreShipWish, snapshotShipWish } from './ship-wish-snapshot';
 
 /*
  * ItemPathService - THE contract of the way an item takes outside the HQ (concept nachschub-hq r4-d1-s8): two stops,
  * Wunschliste -> Inventar / Hangar / Sammlung by kind. Every surface (search rows, Codex pages, popups) reads and
- * writes the path through this service only. Nachschub is built in the HQ (`hq/nachschub`), never from here.
+ * writes the path through this service only. Since concept 20261117-1110-pfad-stationen a wish can be assigned to a
+ * Nachschub ("Operation") from here too (assignWish / planWishRemoval / removeWishPieces delegate to NachschubService);
+ * the assignment lives inside the wish stop, there is no third stop.
  *
  * READ  `state(kind, className, name?)` -> Signal<ItemPathState>
  *   wished / wishQty  on the wishlist, and how many (SearchWishlistService adds up a ship's two homes)
  *   inventarQty       units in Inventar over all places;  places[] = [{ location, qty }]
  *   inHangar          ship owned (kind ship); hangarQty its copies, hangarShipId for the link "Im Hangar ansehen"
  *   nachschubQty      units still open in a Nachschub (read only: the HQ hints use it)
+ *   assigned / free / assignments   the own wish's pieces assigned to Operationen (concept 20261117-1110-pfad-stationen:
+ *                     a wish stays a wish when assigned; free = wishQty - assigned), where they sit, Einsatz progress
+ *   nearestPlace / morePlaces       the one place the ownership strip names, and how many other places hold it
  *   steps             item/blueprint wish+inventar, ship wish+hangar, upcoming ONLY wish (hint 'notYetInGame')
  *   The stops run in parallel: an owned ship can be wished again (a second copy is allowed, r1).
  *
@@ -66,8 +74,18 @@ export interface ItemPathState {
   nachschubQty: number;
   /** 'scu' when the open lines count an exact SCU amount (a blueprint's material), else null = pieces. */
   nachschubUnit: SupplyUnit | null;
+  /** Pieces of the own wish assigned to active Operationen (never above `wishQty`). */
+  assigned: number;
+  /** `wishQty - assigned`: what the picker can still assign and a lowering takes first. */
+  free: number;
+  /** Where the assigned pieces sit, most recently assigned first. */
+  assignments: readonly WishAssignment[];
   inventarQty: number;
   places: readonly PathPlace[];
+  /** The place the ownership strip names (B5, see {@link nearestPlaceOf}); null without Inventar stock. */
+  nearestPlace: string | null;
+  /** Further places holding it ("+N weitere Orte"). */
+  morePlaces: number;
   inHangar: boolean;
   /** Owned copies of the ship, 0 when it is not in the Hangar. */
   hangarQty: number;
@@ -75,6 +93,11 @@ export interface ItemPathState {
   steps: readonly PathStep[];
   /** 'notYetInGame' for announced ships (only the wish step exists). */
   hint: 'notYetInGame' | null;
+  /**
+   * False while the data behind `assigned` / `free` / `assignments` is still loading for a wished item (outside the
+   * HQ it loads on the first read). `free` is 0 until then; absent = known (test states).
+   */
+  assignmentsKnown?: boolean;
   signedIn: boolean;
 }
 
@@ -104,6 +127,24 @@ export interface MoveOpts {
 }
 
 const NO_PLACES: readonly PathPlace[] = [];
+const NO_ASSIGNMENTS: readonly WishAssignment[] = [];
+
+/**
+ * The places in the order the ownership strip uses (B5). The app knows the player's position only as a place NAME
+ * (the live state's `location.name` while the game runs, see `readLocation` in hq-live.util) - no coordinates, no
+ * distances - so "nearest" means: the place the player is at right now when it holds the item, then "Bei mir",
+ * then the place with the most pieces, then by name (stable).
+ */
+export function orderPlaces(places: readonly PathPlace[], current: string | null): readonly PathPlace[] {
+  const here = (current ?? '').trim().toLowerCase();
+  const rank = (p: PathPlace): number => (here && p.location.trim().toLowerCase() === here ? 0 : p.location === PLACE_WITH_ME ? 1 : 2);
+  return [...places].sort((a, b) => rank(a) - rank(b) || b.qty - a.qty || a.location.localeCompare(b.location));
+}
+
+/** The one place of {@link orderPlaces}, or null without places. */
+export function nearestPlaceOf(places: readonly PathPlace[], current: string | null): string | null {
+  return orderPlaces(places, current)[0]?.location ?? null;
+}
 
 /** The stops a kind has. */
 export function stepsOf(kind: string): readonly PathStep[] {
@@ -165,7 +206,9 @@ export class ItemPathService {
     const out = new Set<string>();
     for (const i of this.inventory.items()) {
       if (i.location !== PLACE_BLUEPRINTS) continue;
-      const cls = parseStockRef(i.class_name)?.className;
+      // Contract v3 (hq-live.md, Blueprint shelf): a shelf row may carry the plain class or a `blueprint:<class>` ref.
+      const raw = i.class_name?.trim() ?? '';
+      const cls = raw.startsWith('blueprint:') ? raw.slice('blueprint:'.length) || null : parseStockRef(raw)?.className;
       if (cls) out.add(cls);
     }
     return out;
@@ -190,12 +233,43 @@ export class ItemPathService {
 
   /** The reader's place right now (A8): the live location while playing, else "Bei mir". */
   currentPlaceDefault(): string {
+    return this.livePlace() ?? PLACE_WITH_ME;
+  }
+
+  private assignLoad: Promise<void> | null = null;
+
+  /**
+   * Supply lines pulled and the Nachschub list loaded (reactive). Starts the Nachschub load once when it is missing -
+   * from a microtask, so no signal is written while a computed runs; a failed load is logged and the next read
+   * retries. No timer, nothing in the zone that keeps running.
+   */
+  private assignmentsLoaded(): boolean {
+    const ns = this.injector.get(NachschubService);
+    const supplies = this.supplies as Partial<HqSuppliesService>;
+    const linesReady = supplies.ready ? supplies.ready() : true;
+    if (ns.loaded()) return linesReady;
+    if (!this.assignLoad) {
+      this.assignLoad = Promise.resolve()
+        .then(() => untracked(() => ns.ensureLoaded()))
+        .then(() => {
+          if (!untracked(() => ns.loaded())) this.assignLoad = null;
+        })
+        .catch((err: unknown) => {
+          logWarn('itemPath', 'assignments load failed', err);
+          this.assignLoad = null;
+        });
+    }
+    return false;
+  }
+
+  /** The live location name while the game runs and the app knows it, else null. */
+  livePlace(): string | null {
     const state = this.live.state();
     if (state && isGameLive(state, this.live.events(), Date.now())) {
       const loc = readLocation(state);
       if (loc?.name) return loc.name;
     }
-    return PLACE_WITH_ME;
+    return null;
   }
 
   /** Reactive state of one item. Cached per (kind, className, name). */
@@ -217,6 +291,7 @@ export class ItemPathService {
     let places: PathPlace[] = [];
     let nachschubQty = 0;
     let nachschubUnit: SupplyUnit | null = null;
+    let wishLines = false;
     if (kind !== 'upcoming') {
       for (const i of this.inventory.items()) {
         // The same match as the Nachschub line closing (nachschub-stock): manual `<kind>:<Class>` rows and crates.
@@ -230,17 +305,33 @@ export class ItemPathService {
       nachschubUnit = lines[0]?.unit ?? null;
       // Lines of the other kind of quantity (pieces vs SCU) are not added to the first one's.
       nachschubQty = roundAmount(lines.filter((l) => (l.unit ?? null) === nachschubUnit).reduce((n, l) => n + lineAmount(l), 0));
+      wishLines = lines.some((l) => isWishLine(l));
     }
     if (!places.length) places = NO_PLACES as PathPlace[];
+    const wishQty = this.wishlist.qtyOf(kind, className, name);
+    // The assignment needs the supply lines (HqSuppliesService pulls them by itself for a signed-in user) AND the
+    // Nachschub list, which only the HQ loaded so far: a wished item read anywhere (search row, card, detail) asks
+    // for it once (B8/B4). Until both are there `assignmentsKnown` is false and `free` is 0, so no surface offers
+    // assigned pieces as free (A3).
+    const signedIn = !!this.auth.user();
+    const known = wishQty > 0 && signedIn ? this.assignmentsLoaded() : true;
+    const alloc = known && wishLines && wishQty > 0 ? this.injector.get(NachschubService).allocationOf({ kind, className, forClassName: null }) : null;
+    const assigned = Math.min(wishQty, alloc?.assigned ?? 0);
     return {
       kind,
       className,
       wished: this.wishlist.has(kind, className, name),
-      wishQty: this.wishlist.qtyOf(kind, className, name),
+      wishQty,
       nachschubQty,
       nachschubUnit,
+      assigned,
+      free: known ? Math.max(0, wishQty - assigned) : 0,
+      assignments: alloc?.assignments ?? NO_ASSIGNMENTS,
+      assignmentsKnown: known,
       inventarQty: places.reduce((n, p) => n + p.qty, 0),
       places,
+      nearestPlace: places.length ? nearestPlaceOf(places, this.livePlace()) : null,
+      morePlaces: Math.max(0, places.length - 1),
       inHangar: !!owned,
       hangarQty: owned ? (owned.qty ?? 1) : 0,
       hangarShipId: owned?.id ?? null,
@@ -269,6 +360,8 @@ export class ItemPathService {
     if (!this.auth.user()) return fail('itemPath.err.failed');
     if (qty <= 0) return this.removeWish(kind, className, name);
     if (!this.wishlist.has(kind, className, name)) return this.addWish(kind, className, name);
+    // A3: a plain counter never cuts into assigned pieces; that removal goes through planWishRemoval / removeWishPieces.
+    if (qty < this.read(kind, className, name).assigned) return refuse('itemPath.err.wishAssigned');
     try {
       if (!(await this.wishlist.setQty(kind, className, name, qty))) return fail('itemPath.err.failed');
     } catch (err) {
@@ -280,12 +373,66 @@ export class ItemPathService {
 
   async removeWish(kind: string, className: string, name?: string | null): Promise<PathResult> {
     if (!this.auth.user()) return fail('itemPath.err.failed');
+    if (this.read(kind, className, name).assigned > 0) return refuse('itemPath.err.wishAssigned');
+    // A ship wish is a hangar row: its custom name and notes go with it and must come back with the undo.
+    const shipRow = kind === 'ship' ? snapshotShipWish(this.hangar, className) : null;
     try {
       if (!(await this.wishlist.remove(kind, className, name))) return fail('itemPath.err.failed');
     } catch (err) {
       return fail(toErrorKey('itemPath', 'removeWish', err));
     }
-    return { ok: true, key: 'itemPath.done.wishOff', params: { name: name ?? className }, undo: () => this.addWish(kind, className, name) };
+    return {
+      ok: true,
+      key: 'itemPath.done.wishOff',
+      params: { name: name ?? className },
+      undo: async () => {
+        const r = await this.addWish(kind, className, name);
+        return r.ok && !(await restoreShipWish(this.hangar, className, shipRow)) ? fail('itemPath.err.failed') : r;
+      },
+    };
+  }
+
+  // ── assigning the wish to an Operation (concept 20261117-1110-pfad-stationen)
+
+  /** The picker's rows (B7): active Operationen newest first with Einsatz progress, slots used / 7, can a new one be made. */
+  assignTargets(): AssignTargets {
+    return this.injector.get(NachschubService).assignTargets();
+  }
+
+  /** The picker opens on a Codex page where the Operationen may not be loaded yet: load them once (no-op after). */
+  loadAssignTargets(): Promise<void> {
+    return this.injector.get(NachschubService).ensureLoaded();
+  }
+
+  /** Name proposal for a new Operation made for `qty` pieces of this item. */
+  proposeOperationName(name: string, qty: number): Promise<string> {
+    return this.injector.get(NachschubService).proposeName(name, qty);
+  }
+
+  /** Assign `qty` free pieces of the own wish to Operation `target` or a new one ('new'); the wish keeps its quantity. */
+  async assignWish(kind: string, className: string, qty: number, target: string | 'new', opts: { name?: string; surface?: PathGroupSurface } = {}): Promise<PathResult> {
+    if (!this.auth.user()) return fail('itemPath.err.failed');
+    return this.injector.get(NachschubService).assignWish({ kind, className, forClassName: null }, qty, target, opts);
+  }
+
+  /** What lowering the own wish by `removeQty` would do: free pieces first, then the Operationen (A4-A7). Changes nothing. */
+  planWishRemoval(kind: string, className: string, removeQty: number): RemovalPlan {
+    return this.injector.get(NachschubService).planWishRemoval({ kind, className, forClassName: null }, removeQty);
+  }
+
+  /**
+   * Lower the own wish by `removeQty` pieces per the plan (free first; `split` / `dissolve` as the dialog chose). Call
+   * after the UI asked when the plan `needsConfirm`. One undo restores wish, assignments and dissolved Operationen.
+   */
+  async removeWishPieces(
+    kind: string,
+    className: string,
+    name: string | null | undefined,
+    removeQty: number,
+    opts: { split?: Readonly<Record<string, number>>; dissolve?: readonly string[]; surface?: PathGroupSurface } = {},
+  ): Promise<PathResult> {
+    if (!this.auth.user()) return fail('itemPath.err.failed');
+    return this.injector.get(NachschubService).applyWishRemoval({ kind, className, forClassName: null, name: name ?? null }, removeQty, opts);
   }
 
   // ── Inventar ───────────────────────────────────────────────────────────────
@@ -321,8 +468,12 @@ export class ItemPathService {
       else this.supplies.setQty(line.id, line.qty - n);
     }
     if (tracked) void nachschub?.reconcile();
-    // What the line asked for answers the line; only the rest answers the item's own (leftover) wish.
-    const toWish = line ? Math.max(0, n - lineAmount(line)) : n;
+    // What the open lines of active Nachschuebe ask for answers them first - whichever line the stock rise closes, a
+    // wish line then lowers its wish once by the whole line (NachschubService.fulfilWishLines, H2). A loose line
+    // answers its own part here. Only the rest answers the item's own wish directly, so nothing is counted twice.
+    const trackedNeed = this.trackedLines(className).reduce((s, l) => s + lineAmount(l), 0);
+    const looseNeed = line && !tracked ? lineAmount(line) : 0;
+    const toWish = Math.max(0, n - trackedNeed - looseNeed);
     // SCU stock answers a material wish; an item wished as such keeps its own kind.
     const wishKind = scu && !this.wishlist.has(kind, className, name) ? 'material' : kind;
     const wish = toWish > 1e-9 ? await this.fulfilOwnWish(wishKind, className, name, scu ? Math.ceil(toWish - 1e-9) : toWish) : null;
@@ -341,10 +492,31 @@ export class ItemPathService {
           }
         }
         const back = wish ? await wish.restore() : true;
+        // A wish line that was met and is open again gives its pieces back to the wish (NachschubService.reconcile).
+        if (tracked) void nachschub?.reconcile();
         if (!reopened) return fail('itemPath.err.failed');
         return removed && back ? { ok: true, key: 'itemPath.done.undone', params: { name } } : fail('itemPath.err.failed');
       },
     };
+  }
+
+  /** Open lines of a class that sit in an active Nachschub (they close by the stock rise, not here). */
+  private trackedLines(className: string): SupplyItem[] {
+    const open = this.supplies.openLinesFor(className).filter((l) => !!l.packageId);
+    if (!open.length) return [];
+    const active = new Set(this.injector.get(NachschubService).active().map((p) => p.id));
+    return open.filter((l) => active.has(l.packageId ?? ''));
+  }
+
+  /** A tracked wish line answers the arrival: the Nachschub reconcile closes it and lowers the wish once. No wish change here. */
+  private lineAnswers(): null {
+    void this.injector.get(NachschubService).reconcile();
+    return null;
+  }
+
+  /** An open wish line of this ship in an active Nachschub: then the line answers a new copy, not the wish directly. */
+  private shipWishTracked(className: string): boolean {
+    return this.trackedLines(className).some((l) => isWishLine(l));
   }
 
   /** The stepper of the Inventar popover: stock at one place moves, a Nachschub line stays as it is. */
@@ -409,7 +581,7 @@ export class ItemPathService {
         const before = had.qty ?? 1;
         const copies = await this.injector.get(NachschubEdgeService).addShipCopy(className);
         if (!copies) return fail('itemPath.err.failed');
-        const wish = await this.fulfilOwnWish('ship', className, name, 1);
+        const wish = this.shipWishTracked(className) ? this.lineAnswers() : await this.fulfilOwnWish('ship', className, name, 1);
         return {
           ok: true,
           ...(wish ? this.wishDone(label, wish) : { key: 'itemPath.done.hangarCopy', params: { name: label, n: copies } }),
@@ -423,7 +595,7 @@ export class ItemPathService {
       const added = await this.hangar.addShip(className, 'owned');
       if (!added) return fail('itemPath.err.failed');
       // A wish kept from an earlier copy (removed from the Hangar since) is answered by this one.
-      const wish = await this.fulfilOwnWish('ship', className, name, 1);
+      const wish = this.shipWishTracked(className) ? this.lineAnswers() : await this.fulfilOwnWish('ship', className, name, 1);
       return {
         ok: true,
         ...(wish ? this.wishDone(label, wish) : { key: 'itemPath.done.hangar', params: { name: label } }),
@@ -441,7 +613,11 @@ export class ItemPathService {
   /** A ship wished `wished` times is bought once: the row owns one copy, the rest stays on the wishlist. */
   private async buyWishedShip(id: string, wished: number, className: string, label: string): Promise<PathResult> {
     if (!(await this.hangar.updateShip(id, { status: 'owned', qty: 1 }))) return fail('itemPath.err.failed');
-    const left = wished - 1;
+    // With a wish line of the ship in an Operation the line answers the copy (and lowers the wish once when it is
+    // met): the wish keeps its full quantity, now as the owned ship's wish.
+    const tracked = this.shipWishTracked(className);
+    if (tracked) this.lineAnswers();
+    const left = wished - (tracked ? 0 : 1);
     if (left > 0 && !(await this.wishlist.setQty('ship', className, label, left))) {
       // The move is one step for the reader: a wish that cannot stay keeps the purchase out too.
       await this.hangar.updateShip(id, { status: 'wishlist', qty: wished });
