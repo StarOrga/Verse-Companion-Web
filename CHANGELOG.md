@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Gap between the holotable views bar and the KPI strip.
 
+## [0.281.9] - 2026-11-19
+
+### Fixed
+- Nachschub name proposals work again for signed-in web sessions: the `nachschub-names` function no longer sits behind the gateway JWT gate that rejected every web call with 401.
+
+### Docs
+- PostHog audit concept: final report (round 3) with live screenshot.
+
 ## [0.281.8] - 2026-11-19
 
 ### Fixed
