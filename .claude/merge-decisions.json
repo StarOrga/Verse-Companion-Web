@@ -235,6 +235,16 @@
         "hunks": [
           "1225ec8aa64c"
         ]
+      },
+      {
+        "ship": "claude/emails-umbau-decision-6cd563",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (980)",
+        "decided": true,
+        "at": "2026-11-19T22:00:38.035Z",
+        "hunks": [
+          "dd599b0b319e"
+        ]
       }
     ],
     ".claude/project-map.md›docs/›count": [
@@ -307,6 +317,16 @@
         "at": "2026-11-17T00:17:56.554Z",
         "hunks": [
           "f1b092cd8858"
+        ]
+      },
+      {
+        "ship": "claude/emails-umbau-decision-6cd563",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (1046)",
+        "decided": true,
+        "at": "2026-11-19T22:00:38.035Z",
+        "hunks": [
+          "9efb2f25b405"
         ]
       }
     ],
@@ -704,6 +724,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›scripts›count": [
+      {
+        "ship": "claude/emails-umbau-decision-6cd563",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (87)",
+        "decided": true,
+        "at": "2026-11-19T22:00:38.035Z",
+        "hunks": [
+          "d1319209407c"
+        ]
+      }
+    ],
     ".claude/project-map.md›shared/›count": [
       {
         "ship": "#1184",
@@ -755,6 +787,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›src and src/app›count": [
+      {
+        "ship": "claude/emails-umbau-decision-6cd563",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (1441 / 1434)",
+        "decided": true,
+        "at": "2026-11-19T22:00:38.035Z",
+        "hunks": [
+          "d92a4d4aff80"
+        ]
+      }
+    ],
     ".claude/project-map.md›src-counts›count": [
       {
         "ship": "#1146",
@@ -772,6 +816,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›src/app/codex›count": [
+      {
+        "ship": "claude/emails-umbau-decision-6cd563",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (413)",
+        "decided": true,
+        "at": "2026-11-19T22:00:38.035Z",
+        "hunks": [
+          "209f12e61f6e"
+        ]
+      }
+    ],
     ".claude/project-map.md›src/app/shared/›file count": [
       {
         "ship": "claude/3d-view-component-visibility-27ac32",
@@ -781,6 +837,18 @@
         "at": "2026-11-17T22:42:12.676Z",
         "hunks": [
           "68a39c281c1f"
+        ]
+      }
+    ],
+    ".claude/project-map.md›src/app/shared›count": [
+      {
+        "ship": "claude/emails-umbau-decision-6cd563",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (93)",
+        "decided": true,
+        "at": "2026-11-19T22:00:38.035Z",
+        "hunks": [
+          "aef82fc4245b"
         ]
       }
     ],
@@ -994,6 +1062,16 @@
         "hunks": [
           "72caeb6e4c42"
         ]
+      },
+      {
+        "ship": "claude/emails-umbau-decision-6cd563",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (471)",
+        "decided": true,
+        "at": "2026-11-19T22:00:38.035Z",
+        "hunks": [
+          "8e9f712069be"
+        ]
       }
     ],
     ".claude/project-map.md›supabase›file count": [
@@ -1083,6 +1161,16 @@
         "at": "2026-11-17T00:17:56.554Z",
         "hunks": [
           "a3afcb1fb860"
+        ]
+      },
+      {
+        "ship": "claude/emails-umbau-decision-6cd563",
+        "by": "JerryT2T",
+        "value": "regenerated on the merged tree (3575)",
+        "decided": true,
+        "at": "2026-11-19T22:00:38.035Z",
+        "hunks": [
+          "ecb576952acf"
         ]
       }
     ],
