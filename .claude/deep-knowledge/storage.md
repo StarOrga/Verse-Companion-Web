@@ -125,9 +125,12 @@ builds gone from `codex_builds` (report under `lists`).
 **Client read path** (`src/app/codex/`): `CodexListSnapshots` (`codex-list-snapshots.ts`)
 fetches the index and the files through the Worker, keeps the parsed files of the
 current build in memory (they are the list cache) and answers `null` for anything
-it cannot use: index 404 (not published yet — remembered 5 min, not logged), an
-outage or an unexpected shape (logged once, retried next call), or a file still
-downloading after 3 s (that call uses the database, the download goes on). The pure
+it cannot use: index 404 (not published yet — remembered 5 min, not logged), a
+failed download (HTTP error, network, or the 30 s fetch abort; logged once, not
+retried for 60 s), an unexpected shape (logged once, never fetched again for that
+gen — files are immutable), or a file still downloading after 3 s (that call uses
+the database; later calls skip the wait until the same download lands). Any throw
+while answering from a file is logged once and falls back to the database. The pure
 `codex-list-engine.ts` answers a read from the rows with PostgREST semantics (default
 browse filters, every `filteredListQuery` filter incl. NULL handling, the ILIKE
 token groups plus `searchMatcher`, paging, exact counts) and declines (`null`) on
@@ -135,8 +138,11 @@ token groups plus `searchMatcher`, paging, exact counts) and declines (`null`) o
 an unknown filter key or a column the table lacks. `CodexService` tries the file
 first in `listByKind`, `countByKind`, `countSearchMatches`, `countItemsByAttachType`,
 `facetValues` (+ ship sizes), `weaponFacets`, `listFpsCatalog`, `backfillCohortNames`
-and `allShipRows` (whole cohort from `ship-rank.json`); on `null` the old query runs
-unchanged. Still on the database: the German-name fallback (`codex_search` RPC +
+`allShipRows` (whole cohort from `ship-rank.json`) and `listSkinSiblings` /
+`listEditionSiblings` (ILIKE prefix; above 200 matches the database answers, its
+collation decides the cut); on `null` the old query runs unchanged. From the files,
+`countSearchMatches` counts like `listByKind` (token groups + matcher), so "also
+found in …" equals the list's count. Still on the database: the German-name fallback (`codex_search` RPC +
 an `in` list read), `getMissileCohort` / `getItemRankCohort` (full payload /
 `weaponParams` / `stats` are not in the files), detail pages and every other
 non-list read. `searchAll` pages through `listByKind`, so it reads the files too. Specs never reach the Worker: `vitest-setup.ts` answers

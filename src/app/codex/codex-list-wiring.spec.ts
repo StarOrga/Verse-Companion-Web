@@ -118,6 +118,79 @@ describe('CodexService list reads: snapshot first, database as the exact fallbac
     expect(entityCalls(calls).map((c) => c.table)).toEqual(['codex_weapons']);
   });
 
+  it('runs the old query when the engine throws (logged once)', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const broken = weaponSnapshot();
+    Object.defineProperty(broken, 'rows', {
+      get() {
+        throw new Error('engine bug');
+      },
+    });
+    const { svc, calls } = setup(hit(broken));
+    const out = await svc.listByKind('weapon', {});
+    expect(out.rows.map((r) => r.classNameSlug)).toEqual(['FROM_DB']);
+    expect(await svc.countByKind('weapon', {})).toBe(1);
+    expect((await svc.weaponFacets()).length).toBe(1);
+    expect(entityCalls(calls).map((c) => c.table)).toEqual(['codex_weapons', 'codex_weapons', 'codex_weapons']);
+    expect(warn).toHaveBeenCalledTimes(3); // once per read kind (list, count, weapon facets)
+    await svc.listByKind('weapon', {});
+    expect(warn).toHaveBeenCalledTimes(3);
+  });
+
+  describe('search counts', () => {
+    const row = (cn: string, name: string) => [
+      ...SNAPSHOT_COLUMNS.weapon.map((c) => ({ class_name: cn, name_localized: name, is_variant: false })[c] ?? null),
+      null,
+      null,
+      null,
+    ];
+    // ILIKE `*p4_ar*` lets "P4XAR" through; the shared matcher drops it.
+    const searchSnap = () =>
+      makeSnapshot('weapon', SNAPSHOT_COLUMNS.weapon, CARD, [row('BEHR_P4AR', 'P4-AR Rifle'), row('KLWE_P4XAR', 'P4XAR Thing')]);
+    const onlyFalseHits = () => makeSnapshot('weapon', SNAPSHOT_COLUMNS.weapon, CARD, [row('KLWE_P4XAR', 'P4XAR Thing')]);
+
+    it('countSearchMatches counts what listByKind lists for the same term', async () => {
+      const { svc } = setup(hit(searchSnap()));
+      const list = await svc.listByKind('weapon', { search: 'p4ar' });
+      const counts = await svc.countSearchMatches('p4ar', ['weapon']);
+      expect(list.count).toBe(1);
+      expect(counts.get('weapon')).toBe(list.count);
+    });
+
+    it('asks the German names exactly when the post-matcher result is empty', async () => {
+      const empty = setup(hit(onlyFalseHits()));
+      const res = await empty.svc.listByKind('weapon', { search: 'p4ar' });
+      expect(res).toEqual({ rows: [], count: 0 });
+      const rpc = (TestBed.inject(SupabaseClientProvider) as unknown as { client: { rpc: ReturnType<typeof vi.fn> } }).client.rpc;
+      expect(rpc.mock.calls.map((c) => c[0])).toEqual(['codex_search']);
+      TestBed.resetTestingModule();
+
+      const found = setup(hit(searchSnap()));
+      await found.svc.listByKind('weapon', { search: 'p4ar' });
+      const rpc2 = (TestBed.inject(SupabaseClientProvider) as unknown as { client: { rpc: ReturnType<typeof vi.fn> } }).client.rpc;
+      expect(rpc2).not.toHaveBeenCalled();
+    });
+  });
+
+  it('answers the skin siblings from the kind file, the database above the limit', async () => {
+    const row = (cn: string) => [...SNAPSHOT_COLUMNS.weapon.map((c) => ({ class_name: cn, is_variant: true })[c] ?? null), null, null, null];
+    const family = makeSnapshot('weapon', SNAPSHOT_COLUMNS.weapon, CARD, [
+      row('gmni_pistol_ballistic_01_cen01'),
+      row('gmni_pistol_ballistic_01'),
+      row('gmni_rifle_ballistic_01'),
+    ]);
+    const { svc, calls } = setup(hit(family));
+    const out = await svc.listSkinSiblings('weapon', 'gmni_pistol_ballistic_01_cen01');
+    expect(out.map((r) => r.classNameSlug)).toEqual(['gmni_pistol_ballistic_01', 'gmni_pistol_ballistic_01_cen01']);
+    expect(out[0].payload).toEqual({});
+    expect(entityCalls(calls)).toEqual([]);
+
+    TestBed.resetTestingModule();
+    const many = makeSnapshot('weapon', SNAPSHOT_COLUMNS.weapon, CARD, Array.from({ length: 201 }, (_, i) => row(`gmni_pistol_ballistic_${i}`)));
+    const big = setup(hit(many));
+    expect((await big.svc.listSkinSiblings('weapon', 'gmni_pistol_ballistic_01')).map((r) => r.classNameSlug)).toEqual(['FROM_DB']);
+  });
+
   it('uses the database when the file is still loading after 3 s, and the file on the next call', async () => {
     let release!: () => void;
     const gate = new Promise<void>((r) => (release = r));
@@ -158,8 +231,12 @@ describe('CodexService list reads: snapshot first, database as the exact fallbac
     } finally {
       vi.useRealTimers();
     }
+    // While the same download still runs, the next call does not wait again.
+    const again = await svc.listByKind('weapon', {});
+    expect(again.rows.map((r) => r.classNameSlug)).toEqual(['FROM_DB']);
     release();
-    await new Promise((r) => setTimeout(r, 0));
+    const reader = TestBed.inject(CodexListSnapshots);
+    for (let i = 0; i < 50 && !(await reader.rows(BUILD_ID, 'weapon', 10)); i++) await new Promise((r) => setTimeout(r, 5));
     const before = entityCalls(sb.calls).length;
     const second = await svc.listByKind('weapon', {});
     expect(second.rows.map((r) => r.classNameSlug)).toEqual(['W_A', 'W_B']);

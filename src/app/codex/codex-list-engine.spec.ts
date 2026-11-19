@@ -8,6 +8,7 @@ import {
   makeSnapshot,
   matchRows,
   posixRegExp,
+  prefixRowsFromSnapshot,
   snapshotNameFor,
 } from './codex-list-engine';
 
@@ -209,5 +210,37 @@ describe('codex-list-engine', () => {
     expect(posixRegExp('_S[0-9]+_')?.source).toBe('_S[0-9]+_');
     expect(posixRegExp('^AEGS_')).not.toBeNull();
     for (const bad of ['a|b', '(a)', 'a.b', '\\d', '[^0-9]', 'a{2}', '']) expect(posixRegExp(bad), bad).toBeNull();
+  });
+
+  it('escapes `-` and `/` validly under the u flag (pattern and search term)', () => {
+    expect(() => likeRegExp('*a-b/c*', true)).not.toThrow();
+    expect(likeRegExp('*a-b/c*', true).test('XA-B/CY')).toBe(true);
+    expect(likeRegExp('*a-b/c*', true).test('aXb/c')).toBe(false);
+    const s = snap('weapon', [item('P4-AR/Rifle', { name_localized: 'P4-AR / Rifle' }), item('Other')]);
+    expect(names(s, 'weapon', { search: 'p4-ar/rifle' })).toEqual(['P4-AR/Rifle']);
+  });
+
+  describe('prefixRowsFromSnapshot (sibling reads)', () => {
+    const s = snap('item', [
+      item('gmni_pistol_ballistic_01_cen01', { is_variant: true }),
+      item('gmni_pistol_ballistic_01', { name_localized: null }),
+      item('GMNI_PISTOLXBALLISTIC_02'),
+      item('gmni_rifle_01'),
+    ]);
+
+    it('matches the ILIKE prefix (`_` one character, case-insensitive), every row, sorted by class name, no payload', () => {
+      const out = prefixRowsFromSnapshot(s, 'gmni_pistol_ballistic', 200)!;
+      expect(out.map((r) => r['class_name'])).toEqual([
+        'GMNI_PISTOLXBALLISTIC_02',
+        'gmni_pistol_ballistic_01',
+        'gmni_pistol_ballistic_01_cen01',
+      ]);
+      expect(Object.keys(out[0])).toEqual([...SNAPSHOT_COLUMNS.item]);
+    });
+
+    it('declines above the limit (the database would cut by its own collation)', () => {
+      expect(prefixRowsFromSnapshot(s, 'gmni', 3)).toBeNull();
+      expect(prefixRowsFromSnapshot(s, 'gmni', 4)?.length).toBe(4);
+    });
   });
 });
