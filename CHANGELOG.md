@@ -4,6 +4,14 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.281.9] - 2026-11-19
+
+### Fixed
+- Nachschub name proposals work again for signed-in web sessions: the `nachschub-names` function no longer sits behind the gateway JWT gate that rejected every web call with 401.
+
+### Docs
+- PostHog audit concept: final report (round 3) with live screenshot.
+
 ## [0.281.8] - 2026-11-19
 
 ### Fixed
