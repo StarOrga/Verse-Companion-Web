@@ -1242,6 +1242,8 @@ export class AssetPackageViewerComponent {
           ),
       );
       this.scene = scene;
+      // Nothing is drawn until the shaders compiled off the critical path (warm, below) (#378).
+      scene.holdUntilWarm();
       scene.setPaused(this.offScreen || this.tabHidden);
       this.observeSize(scene);
       scene.setSafeArea(this.fullSafeArea());
@@ -1266,6 +1268,8 @@ export class AssetPackageViewerComponent {
       scene.frame(this.frameBounds(m), this.facing());
       scene.setHighlight(this.highlight());
       scene.setQuiet(this.quietIds());
+      await scene.warm();
+      if (token !== this.loadToken) return;
       this.status.set('ready');
       this.drawn.emit();
       this.locatable.emit(hotspotPlacements(m).map((p) => p.portName));

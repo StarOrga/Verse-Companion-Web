@@ -656,6 +656,46 @@ export class HoloLook {
   }
 
   /**
+   * Fill the edge cache for every mesh under `root` with edges computed by `compute` (the edge
+   * worker), so a following {@link dress} finds them cached and computes nothing in its frame.
+   * Same detail and scale rule as `dress`; a geometry already cached or in flight is skipped.
+   */
+  prepareEdges(root: THREE.Object3D, role: HoloRole, compute: HoloEdgeCompute): Promise<void> {
+    const detail = role === 'hull' || role === 'interior' ? this.hullDetail : FULL_DETAIL;
+    if (detail.minArea > 0) root.updateWorldMatrix(true, true);
+    const jobs: Promise<unknown>[] = [];
+    root.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh || o.userData[HOLO_GHOST_FLAG] || o.userData[HOLO_OUTLINE_FLAG]) return;
+      const geometry = mesh.geometry;
+      if (this.edgeCache.has(geometry)) return;
+      let edges = this.edgeJobs.get(geometry);
+      if (!edges) {
+        const scale = detail.minArea > 0 ? mesh.matrixWorld.getMaxScaleOnAxis() || 1 : 1;
+        const tris = trianglesOf(geometry);
+        edges =
+          tris > 0 && tris <= HOLO_EDGE_MAX_TRIANGLES
+            ? compute(edgeJobOf(geometry, detail.creaseDeg, detail.minArea / (scale * scale))).then((arr) => {
+                if (this.disposed) return null;
+                // No edges from the worker: cache the miss, so dress() does not compute them here.
+                if (!arr) {
+                  this.edgeCache.set(geometry, null);
+                  return null;
+                }
+                const g = new THREE.BufferGeometry();
+                g.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3));
+                this.edgeCache.set(geometry, g);
+                return g;
+              })
+            : Promise.resolve(null);
+        this.edgeJobs.set(geometry, edges);
+      }
+      jobs.push(edges);
+    });
+    return Promise.all(jobs).then(() => undefined);
+  }
+
+  /**
    * Put every mesh under `root` into `role`: swap its material for the look's
    * fill and give it one crease-edge child. A body role also gets its ghost
    * children (fill + lines through the hull). Re-dressing an already dressed

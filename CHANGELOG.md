@@ -4,6 +4,21 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.281.3] - 2026-11-19
+
+### Fixed
+- Holotable: switching to 3D no longer freezes the page; a loading animation shows where the model will appear and the page stays scrollable while it loads.
+
+## [0.281.2] - 2026-11-18
+
+### Fixed
+- Ship and item pages: the edition and skin dropdown opens fully visible above the page instead of being cut off by the content around it.
+
+## [0.281.1] - 2026-11-18
+
+### Changed
+- Ship page, classic view: "Bei RSI ansehen" and "Pledge-Link hinzufügen" sit up next to the ship name instead of at the end of the action row.
+
 ## [0.281.0] - 2026-11-19
 
 ### Added
