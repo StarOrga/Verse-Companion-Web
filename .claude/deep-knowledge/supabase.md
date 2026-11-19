@@ -248,36 +248,60 @@ there first; an invite mail is the way in meanwhile.
 Supabase's "Disk IO budget" mail on the Free plan is a memory problem here. Measured: 453 MB RAM
 (`shared_buffers` 224 MB, the platform default), ~590 MB in swap, 1.28 TB read from the system/swap volume
 against 0.11 TB from the database volume, while the 331 MB database showed a cache hit rate of 99.96 %. A buffer
-"hit" in `pg_stat_*` can still be a read from swap, so those views do not show it: four catalog requests cost
-~9 600 swap reads within five seconds. Every bit of activity is a burst above the instance's sustained IO rate,
-and bursts are what the budget counts.
+"hit" in `pg_stat_*` can still be a read from swap, so those views do not show it. The machine reads 150 MB a
+minute from its system volume while nobody uses it and several times that under load; the budget counts the
+IO above the instance's sustained rate.
 
 **What used it up was our own automation, not users.** API requests per day (`edge_logs`): 14.11. 12 747 ·
 15.11. 201 137, of which 142 871 from headless browsers (agent checks and night runs against prod, every app
 page) · 16.11. 51 819 (30 797 from edge functions: a codex ingest) · 17.11. 94 633 (53 629 headless, 16 232
 edge functions: the translation pipeline) · a quiet day ~5 000. A browser run against prod is a load test of a
-0.5 GB machine.
+0.5 GB machine. The mobile gate is the second source and does not say "Headless": it sends the user agents of
+its emulated devices (`iPhone OS 17_5`, `iPad; CPU OS 17_5`, `Android 14; Pixel 7`, `SM-X710`). One `--auth`
+run was 3 562 requests in an hour (2026-11-18 23:00 UTC) and pushed anonymous reads into their 3 s statement
+timeout (500 from PostgREST). The "other browsers" of the spike days above were counted before this was known
+and are most likely gate runs too; the logs are gone, so that stays unproven.
 
 **How to measure (in this order, before naming a cause).**
 
 1. Read the machine, not Postgres. `GET https://<ref>.supabase.co/customer/v1/privileged/metrics` with HTTP
    basic auth `service_role:<sb_secret key>` (key recipe: `storage.md` → locale GC). `nvme0n1` is the
-   system/swap volume, `nvme1n1` is `/data`; `node_disk_reads_completed_total`, `node_vmstat_pgmajfault` and
-   `node_vmstat_pswpin` are counters: two samples, divided by the seconds between them.
-2. Trace in 5-second steps. Idle is 0 reads/s with a burst of 500-1 600 for one step, about every 63 s.
-   Averages over 90 s and medians over 30-second steps both pointed at the wrong cause here.
-3. Ask the logs who sent the requests: `edge_logs` carries method, path and user agent in `event_message`
-   (`HeadlessChrome`, `Deno/`, …); group by day and hour.
-4. Test a suspect by switching it off and counting bursts. Pausing the 10-second cron
-   `translate-orchestrator-fast` changed nothing, and neither did pausing it together with the 2-minute
-   `codex-derived-refresh` (6 bursts in 6 minutes either way). Do not rebuild those jobs for IO reasons.
+   system volume with the swap file, `nvme1n1` is `/data`. Reads of the system volume are swap-ins plus
+   re-reads of program pages the kernel had to drop (`node_vmstat_pswpin` is only the first part, about a
+   tenth here).
+2. **The endpoint refreshes once a minute.** Every counter, CPU seconds included, stands still for ~60 s and
+   then jumps. A trace in 5-second steps therefore shows one "burst" a minute on an idle machine. That
+   artifact was read as an unexplained 63-second idle burst on 2026-11-18, and two on/off tests counted those
+   bursts (6 in 6 minutes either way, which is one per minute by construction). Only compare one refresh with
+   the next: `node scripts/supabase-io-probe.mjs --idle 4 --load 3 --label <name>` prints, per minute, the MB
+   read from both volumes, pages swapped in and out and iowait, first idle and then under a fixed set of
+   catalog requests.
+3. A minute means nothing without knowing who else used the instance in it. Ask the logs for the same window:
+   `edge_logs` carries method, path and user agent in `event_message`; group by 2 minutes and by `Headless`,
+   the gate's device strings, `Deno/` (edge functions) and the rest.
+4. Test a suspect by switching it off and comparing minutes, with step 3 for both windows. Not shown either
+   way so far: the 10-second cron `translate-orchestrator-fast` and the 2-minute `codex-derived-refresh` (the
+   2026-11-18 tests counted the artifact of step 2). Do not rebuild those jobs for IO reasons without a valid
+   test.
 
-**Known and open.** `archive_timeout` is 120 s and a 16 MB WAL segment is archived whenever anything was
-written since the last switch - 671 segments a day for a few kB of pg_cron bookkeeping
-(`cron.job_run_details`) and heartbeats; that is the database volume's IO, a small part of the total. The
-source of the ~63-second idle burst is not identified. Levers that change the picture: fewer automated browser
-runs against prod, more RAM (Micro has 1 GB, paid), or a smaller `shared_buffers`
-(`supabase --experimental postgres-config update`, restarts the database; untested).
+**State on 2026-11-18, after 7 days of uptime** (`shared_buffers` 224 MB, the platform default): 100-160 MB
+available, 540-690 MB in swap. Idle: 155 MB a minute read from the system volume (max 219), 3 700 pages
+swapped in, 19 MB read and 17 MB written on the data volume. Under the probe's load: 260 MB a minute (max
+717), 11 700 pages in. The data volume's ~17 MB a minute at idle is mostly WAL: `archive_timeout` is 120 s
+and a 16 MB segment is written and archived whenever anything was written since the last switch - 671
+segments a day for a few kB of pg_cron bookkeeping (`cron.job_run_details`) and heartbeats.
+
+**What was changed (2026-11-19).**
+
+- Claude's own browsers and the mobile gate answer catalog reads from a cache they share and queue the rest
+  (`scripts/lib/agent-supabase-guard.cjs`, rules in `test-account.md`). Measured on live: a browser with a
+  warm cache sends 230 database requests instead of 451 for five Codex pages, none of them a catalog list.
+- `shared_buffers` is 128 MB (`supabase --experimental postgres-config update --remote=<ref> --config
+  shared_buffers=128MB --yes`; the database restarts, ~90 s without API). Result so far: no gain. Idle, 15 minutes after the restart: 168 MB a minute read from the system volume against 155 before (same probe, about the same foreign traffic). The load windows could not be compared - another session's browsers sent 651 requests in the after window and about 100 in the before window. Verdict needs a settled instance and a quiet window (step 3); roll back with `supabase --experimental postgres-config delete --remote=<ref> --config shared_buffers --yes` (another restart) if it still shows nothing.
+- Catalog lists as immutable files per build on R2 (`storage.md` → "Catalog lists (R2 per build)"); the
+  database stays the fallback.
+
+More RAM stays the lever that removes the cause (Micro has 1 GB, paid).
 
 ## Atomic run claims for public cron endpoints (`claim_run`)
 
