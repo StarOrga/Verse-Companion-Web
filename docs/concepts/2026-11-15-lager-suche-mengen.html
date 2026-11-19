@@ -7752,9 +7752,11 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
 [data-iteration="4"] .k4-search { margin-top: 12px; }
 /* Reason for a greyed-out button: the app's styled tooltip, never a line under the search. */
 [data-iteration="4"] .k4-tipw { position: relative; display: inline-flex; }
-[data-iteration="4"] .k4-tip { position: absolute; right: 0; top: calc(100% + 6px); z-index: 4; width: max-content; max-width: 240px; padding: 6px 9px; border: 1px solid var(--k-border); border-radius: 6px; background: var(--k-bg2); color: var(--k-fg0); font-size: 11px; line-height: 1.4; box-shadow: 0 6px 18px rgba(0,0,0,.4); opacity: 0; pointer-events: none; transition: opacity .12s ease .35s; }
+@media (max-width: 760px) { [data-iteration="4"] .k4-tabs { max-width: 100%; overflow-x: auto; } }
+[data-iteration="4"] .k4-tip { position: absolute; right: 0; top: calc(100% + 6px); z-index: 4; width: max-content; max-width: 200px; padding: 6px 9px; border: 1px solid var(--k-border); border-radius: 6px; background: var(--k-bg2); color: var(--k-fg0); font-size: 11px; line-height: 1.4; box-shadow: 0 6px 18px rgba(0,0,0,.4); opacity: 0; pointer-events: none; transition: opacity .12s ease .35s; }
 [data-iteration="4"] .k4-tipw:hover .k4-tip, [data-iteration="4"] .k4-tipw:focus-within .k4-tip { opacity: 1; }
 [data-iteration="4"] .k4-tip:empty { display: none; }
+[data-iteration="4"] #k4-tip-in { right: auto; left: 0; }
 [data-iteration="4"] .k4-min { font-variant-numeric: tabular-nums; color: var(--k-fg0); font-weight: 600; }
 [data-iteration="4"] .k4-why { font-size: 11px; color: var(--k-fg2); }
 [data-iteration="4"] .k4-ex { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: .6rem 0 0; }
@@ -7837,7 +7839,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
       <div data-pin><b>Außenposten · ≈ 4 min Anflug</b>Landeplatz auf dem Mond oder Planeten, ohne Stadt</div>
       <div data-pin><b>Stadt · ≈ 6 min Anflug</b>Area18, Lorville, New Babbage, Orison</div>
     </div>
-    <p class="k-cap">Dein Beispiel: Du bist in Port Tressler (Station über microTech). New Babbage: 3 min Flug + 6 min Anflug = ≈ 9 min. Area18: 7 min Flug + 6 min Anflug = ≈ 13 min. Also steht New Babbage oben, im Entwurf unten genau so.</p>
+    <p class="k-cap">Dein Beispiel: Du bist in Port Tressler (Station über microTech). New Babbage: 3 min Flug + 6 min Anflug = ≈ 9 min. Area18: 8 min Flug + 6 min Anflug = ≈ 14 min. Baijini Point, die Station über ArcCorp, liegt mit 8 + 2 = ≈ 10 min dazwischen. Also steht New Babbage oben, im Entwurf unten genau so.</p>
     <p class="lead">Die Abwägung aus dem Filter bleibt, rechnet jetzt aber in Minuten: <strong>Kürzester Weg</strong> zählt nur die Minuten, <strong>Ausgewogen</strong> (dein Start-Wert) rechnet für jeden weiteren Stopp 3 Minuten fürs Umladen dazu, <strong>Lieber ein Stopp</strong> 15 Minuten. Der Anflug zählt bei allen drei, weil er echte Zeit ist.</p>
 
     <div data-decision="t-src" data-label="Woher die Flugminuten kommen">
@@ -7990,7 +7992,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
     if (A[1] !== B[1]) return 30;
     if (!A[0] || !B[0]) return 12;
     if (A[0] === B[0]) return 3;
-    return 4 + 3 * Math.abs((RING[low(A[0])] ?? 3) - (RING[low(B[0])] ?? 3));
+    return 5 + 3 * Math.abs((RING[low(A[0])] ?? 3) - (RING[low(B[0])] ?? 3));
   };
   const appr = (p) => APP[PLACES[p] ? PLACES[p][2] : 'stadt'];
   const nearWord = (m) => (m === 0 ? 'hier' : m <= 4 ? 'nah' : m <= 12 ? 'im System' : m < 30 ? 'weit' : 'anderes System');
@@ -8044,7 +8046,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
       left.sort((a, b) => (at ? fly(at, a.place) - fly(at, b.place) : 0) || appr(a.place) - appr(b.place));
       const n = left.shift();
       flight += at ? fly(at, n.place) : 0;
-      approach += appr(n.place);
+      approach += at === n.place ? 0 : appr(n.place);
       order.push(n); at = n.place;
     }
     return { order, flight, approach, total: flight + approach };
@@ -8067,8 +8069,8 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
   const minutes = () => dec('t-show', 'minuten') === 'minuten';
   const chip = (s) => {
     const r = ref();
-    const m = r ? fly(r.p, s.place) + appr(s.place) : null;
-    return '<span class="k4-chip"><b>' + s.qty + '</b>' + esc(s.place) + (m != null ? ' <small>' + (minutes() ? '≈ ' + m + ' min' : nearWord(m - appr(s.place))) + '</small>' : '') + '</span>';
+    const m = r ? (r.p === s.place ? 0 : fly(r.p, s.place) + appr(s.place)) : null;
+    return '<span class="k4-chip"><b>' + s.qty + '</b>' + esc(s.place) + (m != null ? ' <small>' + (minutes() ? (m ? "≈ " + m + " min" : "hier") : nearWord(m ? fly(r.p, s.place) : 0)) + '</small>' : '') + '</span>';
   };
   function card(w, i, need) {
     const g = w.g, n = g.length, rt = w.rt;
@@ -8076,8 +8078,10 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
     const tags = [];
     if (i === 0) tags.push(['beste Wahl', 'ok']);
     tags.push(n === 1 ? ['1 Stopp · reicht allein', 'ok'] : [n + ' Stopps · hier musst du ' + n + '× fliegen', 'warn']);
-    const why = minutes()
-      ? '<span class="k4-min">≈ ' + rt.total + ' min</span> <span class="k4-why">' + rt.flight + ' min Flug + ' + rt.approach + ' min Anflug (' + g.map((x) => TYPE[PLACES[x.place][2]] + ' ' + appr(x.place)).join(', ') + ')</span>'
+    const why = rt.total === 0 && ref()
+      ? '<span class="k4-min">hier</span> <span class="k4-why">du bist schon dort</span>'
+      : minutes()
+      ? '<span class="k4-min">≈ ' + rt.total + ' min</span> <span class="k4-why">' + (ref() ? '' : 'ohne Standort ab dem ersten Stopp: ') + rt.flight + ' min Flug + ' + rt.approach + ' min Anflug (' + g.map((x) => TYPE[PLACES[x.place][2]] + ' ' + appr(x.place)).join(', ') + ')</span>'
       : '<span class="k4-why">' + (ref() ? nearWord(rt.flight) : 'ohne Bezugspunkt, nach Menge') + '</span>';
     return '<div class="k4-card' + (i === 0 ? ' best' : '') + (n > 1 ? ' multi' : '') + '" data-pin><div class="k4-card-h"><b>' + esc(g[0].item) + ' · ' + esc(title) + '</b>' +
       tags.map((t) => '<span class="k4-tag ' + t[1] + '">' + esc(t[0]) + '</span>').join('') + '</div>' +
