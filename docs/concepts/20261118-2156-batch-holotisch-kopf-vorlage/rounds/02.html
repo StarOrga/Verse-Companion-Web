@@ -48,7 +48,7 @@
   <details class="fr-fold" data-open-questions>
     <summary>🔍 3 {{final.funde_fold}}</summary>
     <ul class="fr-funde">
-      <li data-oq-id="oq-wish-empty"
+      <li data-oq-id="oq-wish-empty" data-routed="now"
           data-issue-title="[TEST] Verify the empty wish panel with the sky backdrop on an account without wishes"
           data-issue-type="task"
           data-issue-body="Batch note #6 moved the wish sky behind the empty state (wish-empty.component.ts, wish-sky variant backdrop) and behind the top of the wish window (wish-cart-dialog.component.ts). Specs pass, but the empty popout could not be seen live: the test account has wishes. Check on an account with an empty wish list: the sky sits behind title, hint and button, no framed box, the empty popout is shorter than before (old box 136 px + gap), and reduced motion stops the shooting star."
@@ -57,13 +57,14 @@
           data-route-default="now"
           data-route-reason="im Repo">
         <span class="oq-label">Leeres Wunschpanel ungesehen</span>
+        <span class="oq-done">umgesetzt: Spec misst den leeren Zustand – Sterne hinter dem Inhalt, kein Rahmen, keine Zusatzhöhe</span>
         <dl class="fr-fkv">
           <dt>{{final.fund_what}}</dt><dd>Sterne als Hintergrund sind gebaut und getestet, aber der leere Zustand ließ sich mit dem Testkonto nicht zeigen.</dd>
           <dt>{{final.fund_where}}</dt><dd>Wünsche-Popout und Wunschfenster, leer</dd>
           <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — einmal mit leerer Wunschliste ansehen.</dd>
         </dl>
       </li>
-      <li data-oq-id="oq-item-changes"
+      <li data-oq-id="oq-item-changes" data-routed="now"
           data-issue-title="[FEATURE] Patch changes tab for non-ship detail pages"
           data-issue-type="feature"
           data-issue-body="The shared detail shell (src/app/codex/detail/codex-detail-shell.component.ts, codex-detail-profile.ts) hides a tab without data. The approved tab set for items includes Änderungen (patch differences, as on the ship), but items have no patch history on the detail page, so the tab never shows. Needs a data source per item and patch before it can appear."
@@ -72,13 +73,14 @@
           data-route-default="later"
           data-route-reason="braucht Daten">
         <span class="oq-label">Änderungen-Reiter für Items</span>
+        <span class="oq-done">umgesetzt: vergleicht mit dem letzten Patch, schlechtere Werte in Warnfarbe</span>
         <dl class="fr-fkv">
           <dt>{{final.fund_what}}</dt><dd>Werte, Bezug und Verbaut in sind da; Änderungen bleibt versteckt, weil es für Gegenstände noch keine Patch-Daten gibt.</dd>
           <dt>{{final.fund_where}}</dt><dd>Detailseiten von Waffen, Ausrüstung, Bauteilen</dd>
           <dt>{{final.fund_why}}</dt><dd>🕒 Später — braucht erst eine Datenquelle.</dd>
         </dl>
       </li>
-      <li data-oq-id="oq-ship-body"
+      <li data-oq-id="oq-ship-body" data-routed="now"
           data-issue-title="[REFACTOR] Move the ship holotable body into the shared detail shell"
           data-issue-type="refactor"
           data-issue-body="Batch note #3 asked for one template for all detail pages. Built: one shared head band, tab pill and panel (codex-detail-shell + kind profile) used by ship and item pages. The ship's holotable body (codex-holo-stage.component.ts, ~2950 lines) still renders inside its own component and its panel tabs do not yet use the shared tab pill. Follow-up: render the holotable as the ship profile's stage inside the shell so panel and strip are fully shared."
@@ -87,6 +89,7 @@
           data-route-default="later"
           data-route-reason="großer Umbau">
         <span class="oq-label">Holotisch-Körper separat</span>
+        <span class="oq-done">umgesetzt: Schiff in der Vorlage, Reiter über die geteilte Pille; Panel bleibt im Holotisch</span>
         <dl class="fr-fkv">
           <dt>{{final.fund_what}}</dt><dd>Kopf, Reiter und Panel sind geteilt; der Schiffs-Holotisch selbst und seine Panel-Reiter laufen noch neben der Vorlage.</dd>
           <dt>{{final.fund_where}}</dt><dd>Schiffsseite im Beta-Holotisch</dd>
@@ -105,6 +108,8 @@
       <li>Lücke: Ursache war ein veralteter Messwert der Bühnenoberkante (217 statt 201 px), Leiste jetzt bündig bei 1001 px</li>
       <li>Analytik: <code>codex:detail_tab_select { kind, tab }</code>, Kachel „Codex-Detailseite: gewählte Reiter je Art“ in „Wird es genutzt?“</li>
       <li>Merge mit main: PR #1184 verlangt umbrechenden Hangar-Knopf — volles Band bricht um, schmales Band kürzt mit „…“ und Tooltip; beide Specs grün</li>
+      <li>Nachträge: Wunschpanel-Spec, Reiterpille für alle Arten (ship tabs in sc-codex-detail-tabs, Event kind ship), Änderungen-Reiter für Gegenstände aus Patch-Vergleich (codex-item-changes.ts)</li>
+      <li>Nachträge: Wunschpanel-Spec (9672365f0) · Schiffs-Reiter über <code>sc-codex-detail-tabs</code>, Event auch für <code>kind: ship</code> (a95a4c83b) · Änderungen-Reiter für Gegenstände aus dem Patch-Vergleich, <code>codex-item-changes.ts</code> (e78c150dc)</li>
       <li>Tests: 885 grün in den berührten Bereichen · Typprüfung, Build grün · Checkliste und Belege: <code>briefs/implement.md</code>, Bilder <code>shots/fix-*</code>, <code>shots/qa-*</code></li>
     </ul>
   </details>
