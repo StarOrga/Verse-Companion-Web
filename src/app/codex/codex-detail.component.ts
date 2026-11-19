@@ -577,9 +577,6 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               <sc-compare-icon [on]="isPinned()" />
               {{ (isPinned() ? 'codex.compare.pinned' : 'codex.detail.actionCompare') | translate }}
             </button>
-            <button type="button" scAction tier="secondary" (click)="discardLoadoutDraft()">
-              {{ 'codex.detail.actionFactoryLoadout' | translate }}
-            </button>
             @if (!shareFab()) {
               <button type="button" scAction tier="secondary" class="copy" (click)="copyShareLink()">
                 {{ 'codex.detail.actionCopyLink' | translate }}
@@ -651,7 +648,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                  One dropdown (Neu + this ship's layouts), save icon with the
                  "not saved" dot, share link, cart icon — narrow, so the
                  mission chips beside them keep their size. Discarding is the
-                 stage row's "Werks-Loadout". -->
+                 reset icon in the Loadout heading (#345); the stage row's
+                 "Werksausstattung" button doubled it and went with #373. -->
             <div class="draft-side">
               @if (personalMode()) {
                 <!-- A hangar variant still saves into the hangar: only its
