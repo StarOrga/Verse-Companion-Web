@@ -4,7 +4,7 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.283.0] - 2026-11-19
+## [0.283.0] - 2026-11-20
 
 ### Added
 - Codex: list data (browse lists, counts, filters, rank comparisons, missiles, German-name search) can be served as fixed files per game build instead of from the database; the database stays the fallback. Takes effect once the files are published for a build.
@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Codex weapon rank comparison no longer stops at the first 1,000 weapons when the list files are available.
+
+## [0.282.1] - 2026-11-19
+
+### Changed
+- Classic ship view: 'Bei RSI ansehen' and 'Pledge-Link hinzufügen' now sit in the header action row next to 'Vergleichen' and 'Schiff wechseln'.
 
 ## [0.282.0] - 2026-11-19
 

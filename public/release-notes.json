@@ -4,7 +4,7 @@
   "releases": [
     {
       "version": "0.283.0",
-      "date": "2026-11-19",
+      "date": "2026-11-20",
       "sections": [
         {
           "category": "Added",
@@ -37,6 +37,22 @@
             {
               "title": "",
               "text": "Codex weapon rank comparison no longer stops at the first 1,000 weapons when the list files are available."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.282.1",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Classic ship view: 'Bei RSI ansehen' and 'Pledge-Link hinzufügen' now sit in the header action row next to 'Vergleichen' and 'Schiff wechseln'."
             }
           ]
         }
