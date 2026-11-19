@@ -186,13 +186,30 @@ describe('publishLists', () => {
     for (const k of old) assert.equal(store.get(k), 'old', k);
   });
 
-  it('keeps a newer foreign generation the index names', async () => {
+  it('a publish overtaken by a newer one puts no index and deletes nothing', async () => {
+    // The newer publish finished first: the bucket's index names its generation and its GC
+    // has removed this one's files. Writing an index now would point at nothing.
     const newer = 'zzzzzzzz';
-    const { deps, store } = fixture({
+    const { deps, store, log } = fixture({
       foreignIndexGen: newer,
       existing: [`codex-lists/${BUILD}/${newer}/ship.json`, `codex-lists/${BUILD}/a0000001/ship.json`],
     });
     const res = await publishLists(BUILD, deps);
+    assert.equal(res.superseded, true);
+    assert.equal(res.index_put, false);
+    assert.equal(res.removed_objects, 0);
+    assert.ok(!log.some((k) => k.endsWith('/index.json')));
+    assert.ok(store.has(`codex-lists/${BUILD}/${newer}/ship.json`));
+    assert.ok(store.has(`codex-lists/${BUILD}/a0000001/ship.json`));
+  });
+
+  it('GC keeps a newer generation that is not in the index yet', async () => {
+    const newer = 'zzzzzzzz';
+    const { deps, store } = fixture({
+      existing: [`codex-lists/${BUILD}/${newer}/ship.json`, `codex-lists/${BUILD}/a0000001/ship.json`],
+    });
+    const res = await publishLists(BUILD, deps);
+    assert.equal(res.index_put, true);
     assert.ok(store.has(`codex-lists/${BUILD}/${newer}/ship.json`));
     assert.ok(!store.has(`codex-lists/${BUILD}/a0000001/ship.json`));
     assert.equal(res.removed_objects, 1);

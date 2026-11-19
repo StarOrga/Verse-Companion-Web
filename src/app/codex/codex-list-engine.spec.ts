@@ -212,6 +212,12 @@ describe('codex-list-engine', () => {
     expect(likeRegExp('*p_4ar*', true).test('XP-4AR')).toBe(true);
     expect(likeRegExp('*p_4ar*', true).test('p4ar')).toBe(false);
     expect(likeRegExp('a.b*', false).test('aXb')).toBe(false);
+    // A backslash escapes the next character, as in LIKE: `\_` and `\%` are literal.
+    expect(likeRegExp('a\\_b%', false).test('a_bc')).toBe(true);
+    expect(likeRegExp('a\\_b%', false).test('aXbc')).toBe(false);
+    expect(likeRegExp('50\\%*', false).test('50% off')).toBe(true);
+    expect(likeRegExp('50\\%*', false).test('500 off')).toBe(false);
+    expect(likeRegExp('a\\\\b', false).test('a\\b')).toBe(true);
     expect(posixRegExp('_S[0-9]+_')?.source).toBe('_S[0-9]+_');
     expect(posixRegExp('^AEGS_')).not.toBeNull();
     for (const bad of ['a|b', '(a)', 'a.b', '\\d', '[^0-9]', 'a{2}', '']) expect(posixRegExp(bad), bad).toBeNull();

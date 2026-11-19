@@ -139,6 +139,35 @@ describe('CodexListSnapshots', () => {
     expect(calls.filter((c) => c.endsWith('weapon.json')).length).toBe(2);
   });
 
+  it('reads the index again after a listed file answered 404 (the build was published again)', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    let now = 1_000_000;
+    vi.spyOn(Date, 'now').mockImplementation(() => now);
+    const NEXT = 'zzzzzzzz';
+    let republished = false;
+    const { svc, calls } = setup((url) => {
+      // First the old index, whose generation has been collected; then the new one.
+      if (url === `${dir()}index.json`) {
+        const idx = index(BUILD);
+        const body = republished ? { ...idx, gen: NEXT } : idx;
+        republished = true;
+        return Response.json(body);
+      }
+      if (url === `${dir()}${NEXT}/weapon.json`) return Response.json(weaponFile());
+      return new Response('not found', { status: 404 });
+    });
+
+    expect(await svc.rows(BUILD, 'weapon')).toBeNull();
+    now += FAILED_RETRY_MS + 1;
+    expect((await svc.rows(BUILD, 'weapon'))?.rows.length).toBe(1);
+    expect(calls).toEqual([
+      `${dir()}index.json`,
+      `${dir()}${GEN}/weapon.json`,
+      `${dir()}index.json`,
+      `${dir()}${NEXT}/weapon.json`,
+    ]);
+  });
+
   it('answers null for a file the index does not list, without fetching it', async () => {
     const { svc, calls } = setup(worker());
     expect(await svc.rows(BUILD, 'ship')).toBeNull();

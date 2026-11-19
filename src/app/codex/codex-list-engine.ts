@@ -138,13 +138,21 @@ export function jsonTextOf(v: unknown): string | null {
 
 /** A PostgREST like/ilike pattern (`*` and `%` = any run, `_` = one character) as an anchored RegExp. */
 export function likeRegExp(pattern: string, caseInsensitive: boolean): RegExp {
+  // Only the syntax characters (and `/`) may be escaped under the `u` flag; `\-` is a SyntaxError there.
+  const literal = (ch: string): string => ch.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
   let body = '';
+  let escaped = false;
   for (const ch of pattern) {
-    if (ch === '*' || ch === '%') body += '.*';
+    // A backslash is LIKE's escape character: the character after it stands for itself.
+    if (escaped) {
+      body += literal(ch);
+      escaped = false;
+    } else if (ch === '\\') escaped = true;
+    else if (ch === '*' || ch === '%') body += '.*';
     else if (ch === '_') body += '.';
-    // Only the syntax characters (and `/`) may be escaped under the `u` flag; `\-` is a SyntaxError there.
-    else body += ch.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+    else body += literal(ch);
   }
+  if (escaped) body += literal('\\');
   return new RegExp(`^${body}$`, caseInsensitive ? 'isu' : 'su');
 }
 

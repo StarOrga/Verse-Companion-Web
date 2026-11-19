@@ -250,6 +250,9 @@ export class CodexListSnapshots {
     const id = `${index.gen}/${name}`;
     if (this.malformed.has(id)) return null;
     const res = await this.getJson(`${this.base}/codex-lists/${buildId}/${id}.json`);
+    // A file the index names is gone: the build was published again and the old generation
+    // collected. Forget the index, so the retry reads the new one instead of this gen forever.
+    if (res.status === 404 && this.buildId === buildId) this.index = null;
     if (!res.ok) throw new Error(`list file HTTP ${res.status}`);
     if (name === 'facets') {
       const f = res.body as { v?: unknown; kinds?: unknown } | null;

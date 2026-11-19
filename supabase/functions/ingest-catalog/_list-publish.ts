@@ -11,6 +11,9 @@
 //      `failed` (the client treats a missing name as "not published" -> database)
 //   3. read one file of the NEW generation back through the PUBLIC Worker (not the
 //      index: it is cached for 5 min); a miss stops here - no index, no GC
+//   3b. read the bucket's index: when it already names a NEWER generation, a
+//      concurrent publish finished first and its GC has removed this one's files -
+//      stop without an index (`superseded`), or the index would point at nothing
 //   4. index.json LAST, so a reader never sees an index pointing at missing files
 //   5. read the index back from R2 itself (the bucket, not the Worker)
 //   6. GC: delete only generations OLDER than this publish's own that the index
@@ -87,6 +90,8 @@ export interface ListsPublishResult {
   removed_objects: number;
   /** New files whose build failed; they are not in `files` and not in the index. */
   failed: string[];
+  /** A newer publish of the same build finished first; this one put no index. */
+  superseded?: boolean;
   blocked?: GateBlock;
 }
 
@@ -134,6 +139,12 @@ export async function publishLists(buildId: string, deps: ListPublishDeps): Prom
   if (!verified) return { build: buildId, gen, files, verified: false, index_put: false, removed_objects: 0, failed };
 
   const idxKey = listsIndexKey(buildId);
+  // A publish that started later but finished first owns the index: its GC deleted this
+  // (older) generation, so an index written now would name files that are gone.
+  const current = await deps.readBucket(idxKey);
+  if (isListsIndex(current, buildId) && genOrder(current.gen) > genOrder(gen)) {
+    return { build: buildId, gen, files, verified, index_put: false, removed_objects: 0, failed, superseded: true };
+  }
   await deps.putJson(idxKey, indexJson(buildId, gen, files));
 
   // GC only on the bucket's own word about which generation is live.
