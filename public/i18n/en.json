@@ -2223,6 +2223,7 @@
       "nose": "Nose",
       "readoutIdle": "No room selected",
       "roomsAria": "Rooms on {{deck}}",
+      "derivedLabel": "Levels derived",
       "derivedHint": "The game names no decks on this ship: the levels are derived from floor height. Stairs and lifts appear on every level they connect.",
       "connects": "leads to {{decks}}"
     },
