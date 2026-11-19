@@ -54,13 +54,14 @@
           data-issue-body="Concept 20261119-0040-uploader-entpacken-ram, round 1, decision d-index (approved): after the compact P4K index lands, SKIN_WORKER_MB (data-uploader/src/lib/resource-limits.ts, 3072) should drop to the measured per-worker need. Not done: no 3D worker was measured end to end with the new index. The builder's estimate is about 1 GB after open + DataCore read, plus converter and optimizer. Measure one skin_export_app worker on the real P4K (peak working set of the whole process tree), then set the constant."
           data-oq-origin="shortfall"
           data-route-default="now"
-          data-route-reason="messbar">
+          data-route-reason="messbar" data-routed>
         <span class="oq-label">3D-Worker-RAM nicht gesenkt</span>
         <dl class="fr-fkv">
           <dt>{{final.fund_what}}</dt><dd>Nicht umgesetzt, weil kein 3D-Worker mit dem neuen Index gemessen wurde; er ist weiter mit 3 GB eingeplant.</dd>
           <dt>{{final.fund_where}}</dt><dd>Uploader, Worker-Zahl im 3D-Schritt</dd>
           <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — eine Messung eines Schiffs reicht.</dd>
         </dl>
+        <p class="oq-done">umgesetzt: Carrack-Worker gemessen (Prozessbaum ≤ 1,86 GB), <code>SKIN_WORKER_MB</code> 3072 → 2048 (<code>a1ca0ba56</code>)</p>
       </li>
     </ul>
   </details>
@@ -72,7 +73,7 @@
       <li><code>python/sc_extract/p4k_index.py</code>, <code>src/lib/resource-limits.ts</code>, 6 Öffnungsstellen + <code>hull3d.py</code>/<code>ship_discovery.py</code></li>
       <li>Tests: vitest 662 grün · pytest 154 grün (unabhängig, inkl. 39 Index-Tests)</li>
       <li>Voller Codex-Lauf alt/neu: 29.572 Dateien sha256-gleich; <code>dataforge_extract.py</code> unberührt (kein Subtheme-Bump)</li>
-      <li>Typecheck (tsc) vom Governor zurückgestellt, nicht gelaufen</li>
+      <li>Nachtrag: <code>SKIN_WORKER_MB</code> 2048 nach Messung eines Carrack-Workers (<code>a1ca0ba56</code>); Typecheck (tsc) vom Governor zurückgestellt</li>
     </ul>
   </details>
   </div>
