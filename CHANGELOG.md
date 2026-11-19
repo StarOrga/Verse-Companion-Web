@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Data Uploader 0.84.0: the sidecar opens the Data.p4k through a compact index. Opening the archive takes 404 MB instead of 2.7 GB, a codex run peaks at 2.65 GB instead of 4.48 GB, with byte-identical output.
 - Data Uploader: the RAM limit never goes below what one run needs (3.5 GB), and 3D workers are planned with 2 GB instead of 3 GB each.
 
+## [0.282.3] - 2026-11-19
+
+### Changed
+- Classic ship view: the Analyse cards carry the loadout's area colours and symbols — Offensive in the offensive red, Defensive in the defensive blue, and each group of the Schiff card (flight, mass, systems, signature, hull) in its area.
+
 ## [0.282.2] - 2026-11-19
 
 ### Fixed
