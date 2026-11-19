@@ -1201,7 +1201,10 @@ export class ShellComponent implements AfterViewInit {
     // so the entrance is announced now — header and search field stand hidden from
     // the first frame instead of showing, vanishing and fading in again (owner
     // feedback 2026-11-04). The hub takes it over (or it is dropped after 8 s).
-    if (this.cinemaAhead()) inject(ShellChromeService).holdHeroIntro();
+    const ahead = this.cinemaAhead();
+    if (ahead === 'full') inject(ShellChromeService).holdHeroIntro();
+    // A reload of the hub: it fades in after the stars, and the scene's HQ outpost waits for it (#371).
+    else if (ahead === 'short') inject(ShellChromeService).holdHubCalm();
     this.router.events.pipe(takeUntilDestroyed()).subscribe((e) => {
       if (e instanceof NavigationEnd) {
         this.onCodexSubpage.set(isCodexSubpage(e.urlAfterRedirects));
@@ -1235,11 +1238,12 @@ export class ShellComponent implements AfterViewInit {
   }
 
   /** The page opens on the Verse hub with the β stage, motion allowed, and the hub will play its full entrance. */
-  private cinemaAhead(): boolean {
-    if (typeof window === 'undefined' || !isVerseHome(location.pathname)) return false;
-    if (!this.beta.isEnabled('verse')() || !this.beta.isEnabled('shell')()) return false;
-    if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
-    return peekIntro() === 'full';
+  /** The hub's opening ahead at boot: its full entrance, a reload's calm fade-in, or none. */
+  private cinemaAhead(): 'full' | 'short' | null {
+    if (typeof window === 'undefined' || !isVerseHome(location.pathname)) return null;
+    if (!this.beta.isEnabled('verse')() || !this.beta.isEnabled('shell')()) return null;
+    if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+    return peekIntro();
   }
 
   ngAfterViewInit(): void {
