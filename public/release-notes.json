@@ -41,6 +41,32 @@
       ]
     },
     {
+      "version": "0.281.9",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Nachschub name proposals work again for signed-in web sessions: the nachschub-names function no longer sits behind the gateway JWT gate that rejected every web call with 401."
+            }
+          ]
+        },
+        {
+          "category": "Docs",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "PostHog audit concept: final report (round 3) with live screenshot."
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.281.8",
       "date": "2026-11-19",
       "sections": [
