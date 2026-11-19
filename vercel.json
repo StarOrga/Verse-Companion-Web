@@ -15,9 +15,15 @@
     { "source": "/ingest/array/(.*)", "destination": "https://eu-assets.i.posthog.com/array/$1" },
     { "source": "/ingest/(.*)", "destination": "https://eu.i.posthog.com/$1" },
     { "source": "/concept-frame/:file", "destination": "/concept-frame.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!i18n/scc-app/).*)", "destination": "/index.html" }
   ],
   "headers": [
+    {
+      "source": "/i18n/scc-app/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=300" }
+      ]
+    },
     {
       "source": "/((?!concept-frame/).*)",
       "headers": [
