@@ -70,13 +70,13 @@ describe('list snapshot builders', () => {
   });
 });
 
-function fixture({ failOn, usageBlocked, existing = [] } = {}) {
+function fixture({ failOn, usageBlocked, existing = [], hideFiles = false, foreignIndexGen = null } = {}) {
   const log = [];
   const store = new Map(existing.map((k) => [k, 'old']));
   const reads = [];
   const deps = {
     now: () => 1_800_000_000_000,
-    gate: async () => (usageBlocked ? { code: 'r2_free_tier_guard', message: 'near limit' } : null),
+    gate: async () => (usageBlocked ? { status: 507, code: 'r2_free_tier_guard', message: 'near limit' } : null),
     async readRows(build, kind, from, limit) {
       reads.push([kind, from, limit]);
       const total = kind === 'item' ? LIST_PAGE + 5 : kind === 'ship-rank' ? RANK_PAGE + 1 : kind === 'weapon' ? 0 : 2;
@@ -89,7 +89,11 @@ function fixture({ failOn, usageBlocked, existing = [] } = {}) {
       log.push(key);
       store.set(key, body);
     },
-    readPublic: async (key) => (store.has(key) && store.get(key) !== 'old' ? JSON.parse(store.get(key)) : null),
+    readPublic: async (key) => (!hideFiles && store.has(key) && store.get(key) !== 'old' ? JSON.parse(store.get(key)) : null),
+    async readBucket(key) {
+      if (foreignIndexGen) return { v: 1, build: BUILD, gen: foreignIndexGen, files: {} };
+      return store.has(key) && store.get(key) !== 'old' ? JSON.parse(store.get(key)) : null;
+    },
     listKeys: async (prefix) => [...store.keys()].filter((k) => k.startsWith(prefix)),
     deleteKey: async (key) => void store.delete(key),
   };
@@ -123,30 +127,71 @@ describe('publishLists', () => {
   });
 
   it('a put failure leaves the old generation and the old index untouched', async () => {
-    const old = [`codex-lists/${BUILD}/index.json`, `codex-lists/${BUILD}/oldgen01/ship.json`];
+    const old = [`codex-lists/${BUILD}/index.json`, `codex-lists/${BUILD}/a0000001/ship.json`];
     const { deps, store } = fixture({ failOn: '/item.json', existing: old });
     await assert.rejects(publishLists(BUILD, deps), /put failed/);
     for (const k of old) assert.equal(store.get(k), 'old', k);
   });
 
   it('GC removes only older generations of this build', async () => {
-    const other = `codex-lists/${OTHER}/oldgen01/ship.json`;
+    const other = `codex-lists/${OTHER}/a0000001/ship.json`;
     const { deps, store } = fixture({
-      existing: [`codex-lists/${BUILD}/oldgen01/ship.json`, `codex-lists/${BUILD}/oldgen01/facets.json`, other],
+      existing: [`codex-lists/${BUILD}/a0000001/ship.json`, `codex-lists/${BUILD}/a0000001/facets.json`, other],
     });
     const res = await publishLists(BUILD, deps);
     assert.equal(res.removed_objects, 2);
-    assert.ok(!store.has(`codex-lists/${BUILD}/oldgen01/ship.json`));
+    assert.ok(!store.has(`codex-lists/${BUILD}/a0000001/ship.json`));
     assert.ok(store.has(other));
     assert.ok(store.has(listsIndexKey(BUILD)));
     assert.ok(store.has(listsFileKey(BUILD, res.gen, 'ship')));
+  });
+
+  it('a failed public verification puts no index and deletes nothing', async () => {
+    const old = [`codex-lists/${BUILD}/index.json`, `codex-lists/${BUILD}/a0000001/ship.json`];
+    const { deps, store, log } = fixture({ hideFiles: true, existing: old });
+    const res = await publishLists(BUILD, deps);
+    assert.equal(res.verified, false);
+    assert.equal(res.index_put, false);
+    assert.ok(!log.includes(listsIndexKey(BUILD)));
+    for (const k of old) assert.equal(store.get(k), 'old', k);
+  });
+
+  it('keeps a newer foreign generation the index names', async () => {
+    const newer = 'zzzzzzzz';
+    const { deps, store } = fixture({
+      foreignIndexGen: newer,
+      existing: [`codex-lists/${BUILD}/${newer}/ship.json`, `codex-lists/${BUILD}/a0000001/ship.json`],
+    });
+    const res = await publishLists(BUILD, deps);
+    assert.ok(store.has(`codex-lists/${BUILD}/${newer}/ship.json`));
+    assert.ok(!store.has(`codex-lists/${BUILD}/a0000001/ship.json`));
+    assert.equal(res.removed_objects, 1);
+  });
+
+  it('keeps an older generation the index still names', async () => {
+    const { deps, store } = fixture({
+      foreignIndexGen: 'a0000001',
+      existing: [`codex-lists/${BUILD}/a0000001/ship.json`, `codex-lists/${BUILD}/a0000000/ship.json`],
+    });
+    await publishLists(BUILD, deps);
+    assert.ok(store.has(`codex-lists/${BUILD}/a0000001/ship.json`));
+    assert.ok(!store.has(`codex-lists/${BUILD}/a0000000/ship.json`));
+  });
+
+  it('GC does nothing when the index cannot be read back from the bucket', async () => {
+    const { deps, store } = fixture({ existing: [`codex-lists/${BUILD}/a0000001/ship.json`] });
+    deps.readBucket = async () => null;
+    const res = await publishLists(BUILD, deps);
+    assert.equal(res.removed_objects, 0);
+    assert.ok(store.has(`codex-lists/${BUILD}/a0000001/ship.json`));
   });
 
   it('writes nothing when the usage gate blocks', async () => {
     const { deps, log } = fixture({ usageBlocked: true });
     const res = await publishLists(BUILD, deps);
     assert.equal(log.length, 0);
-    assert.match(res.blocked, /r2_free_tier_guard/);
+    assert.equal(res.blocked.status, 507);
+    assert.equal(res.blocked.code, 'r2_free_tier_guard');
     assert.equal(res.gen, null);
   });
 });

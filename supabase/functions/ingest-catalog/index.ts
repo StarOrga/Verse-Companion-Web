@@ -93,7 +93,7 @@
 //   the caller should halve the batch and retry, see catalog-bridge.ts).
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
-import { bucketBytes, deleteObject, listObjects, putObject, r2FromEnv, readUsage } from '../ingest-skins/_r2.ts';
+import { bucketBytes, deleteObject, getObject, listObjects, putObject, r2FromEnv, readUsage } from '../ingest-skins/_r2.ts';
 import { usageGate } from '../ingest-skins/_r2-usage.ts';
 import { BUILD_ID_RE, LANG_RE } from './_locale-shards.ts';
 import { publishLocale } from './_locale-publish.ts';
@@ -307,6 +307,13 @@ function listPublishDeps(admin: Admin, r2: R2): ListPublishDeps {
       return data;
     },
     gate: () => r2WriteBlocked(r2),
+    async readBucket(key) {
+      try {
+        return JSON.parse(new TextDecoder().decode(await getObject(r2, key, 1_000_000)));
+      } catch {
+        return null;
+      }
+    },
     putJson: base.putJson,
     readPublic: base.readPublic,
     listKeys: base.listKeys,
@@ -1010,20 +1017,24 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       // After the response: the uploader's finalize must not wait ~30 s for
       // 11 languages. A failure only leaves the rows in place (clients keep
       // reading them); locale_publish or the backfill script can redo it.
-      afterResponse(
-        publishBuildLocales(admin, r2, buildId, null, true)
-          .then(async (results) => {
-            console.log(`ingest-catalog: locale publish ${buildId}: ${JSON.stringify(results)}`);
-            await translationAfterPublish(admin, supabaseUrl, serviceKey, buildId, results);
-          })
-          .catch((e) => console.error(`ingest-catalog: locale publish ${buildId} failed: ${(e as Error).message}`)),
-      );
-      // The catalog lists as files per build; a failure only leaves the tables as the source.
-      afterResponse(
-        publishLists(buildId, listPublishDeps(admin, r2))
-          .then((r) => console.log(`ingest-catalog: lists publish ${buildId}: ${JSON.stringify(r)}`))
-          .catch((e) => console.error(`ingest-catalog: lists publish ${buildId} failed: ${(e as Error).message}`)),
-      );
+      // One after the other in the same isolate (memory: 546 before); each
+      // failure is logged on its own and never skips the next step. The catalog
+      // lists as files per build come last; a failure only leaves the tables as the source.
+      afterResponse((async () => {
+        try {
+          const results = await publishBuildLocales(admin, r2, buildId, null, true);
+          console.log(`ingest-catalog: locale publish ${buildId}: ${JSON.stringify(results)}`);
+          await translationAfterPublish(admin, supabaseUrl, serviceKey, buildId, results);
+        } catch (e) {
+          console.error(`ingest-catalog: locale publish ${buildId} failed: ${(e as Error).message}`);
+        }
+        try {
+          const r = await publishLists(buildId, listPublishDeps(admin, r2));
+          console.log(`ingest-catalog: lists publish ${buildId}: ${JSON.stringify(r)}`);
+        } catch (e) {
+          console.error(`ingest-catalog: lists publish ${buildId} failed: ${(e as Error).message}`);
+        }
+      })());
       return json({ ok: true, current: true, ...replaced, locale_publish: 'started' });
     }
 
@@ -1049,7 +1060,7 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       const r2 = r2FromEnv((k) => Deno.env.get(k));
       if (!r2) return json({ error: 'r2_not_configured' }, 503);
       const result = await publishLists(buildId, listPublishDeps(admin, r2));
-      if (result.blocked) return json({ error: 'r2_write_blocked', message: result.blocked }, 507);
+      if (result.blocked) return json({ error: result.blocked.code, message: result.blocked.message }, result.blocked.status);
       console.log(`ingest-catalog: lists_publish ${buildId}: ${JSON.stringify(result)}`);
       return json({ ok: true, result });
     }

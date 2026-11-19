@@ -113,8 +113,10 @@ pages of 200 because each row carries several kB; a browser reads it once per bu
 for the rank cohort).
 
 Publish (`_list-publish.ts`; put order ship, ship-rank, the other kinds, facets, index): one file at a time (pages of 1000, one file, then
-dropped), facets, the index last, read-back through the public Worker, then older
-generations of that build are deleted. It runs after `finalize` (after the
+dropped), facets, one file of the new generation read back through the public Worker, then the
+index (last), the index read back from the bucket, then only generations older than
+this publish and not named by that index are deleted (a failed read-back puts no
+index and deletes nothing). It runs after `finalize` (after the
 response, a failure is only logged), behind the same R2 usage gate as the locale
 publish; `lists_publish` (`{ "op": "lists_publish", "build_id": "<uuid>" }`)
 redoes it for one build. `locale_gc` also removes the `codex-lists/` prefixes of
