@@ -1857,6 +1857,16 @@
         "hunks": [
           "d99c3411e564"
         ]
+      },
+      {
+        "ship": "claude/emails-umbau-decision-6cd563",
+        "by": "JerryT2T",
+        "value": "0.283.0 (regenerated from the merged CHANGELOG; 0.282.1 stays as its own entry)",
+        "decided": true,
+        "at": "2026-11-19T23:18:15.252Z",
+        "hunks": [
+          "f5e073d9e978"
+        ]
       }
     ],
     "public/release-notes.json›root›current": [
