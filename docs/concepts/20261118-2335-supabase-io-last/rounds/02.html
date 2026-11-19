@@ -1,0 +1,132 @@
+<section data-iteration="2" data-iteration-template="free" data-final-report>
+  <p class="fr-sentence">Agenten-Browser und Mobile Gate schonen jetzt die Datenbank, der Postgres-Puffer steht auf 128 MB, und Katalog-Listen kommen künftig als feste Dateien pro Build.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🧊</span><span>Agenten-Browser teilen einen <b>Katalog-Cache</b>: 230 statt 451 Anfragen.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">📦</span><span><b>Katalog-Listen als Dateien</b> pro Build, aktiv nach Ship und Veröffentlichen.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🔬</span><span>Puffer auf 128 MB: <b>bisher kein messbarer Gewinn</b>, Urteil steht aus.</span></li>
+      </ul>
+    </div>
+    <ol class="fr-flow">
+      <li>Ein Agenten-Browser fragt den Katalog an – der gemeinsame Cache antwortet.</li>
+      <li>Alles andere wartet in einer Schlange: höchstens zwei Anfragen gleichzeitig.</li>
+      <li>Nach dem Ship holt die App Listen als Datei; die Datenbank bleibt Rückfall.</li>
+    </ol>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Fünf Codex-Seiten auf der Live-Seite: 230 statt 451 Datenbank-Anfragen bei warmem Cache, keine Katalog-Liste mehr darunter. Anforderung: mindestens ein Drittel weniger (geschätzt).">
+        <span class="fr-meter-name">⚡ Agenten-Last</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">−49 %</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Alle Tests, Typprüfung und Produktions-Build ohne Fehler; eine unabhängige Prüfung fand keinen Blocker, ihre Nachbesserungen sind eingearbeitet. Anforderung: 0 Fehler (geschätzt).">
+        <span class="fr-meter-name">🧱 Stabilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">0 Fehler</b>
+      </div>
+      <div class="fr-meter" data-grade="low" style="--fr-fill: 0%" data-tip="Im Leerlauf liest die Instanz 15 Minuten nach der Umstellung 168 MB pro Minute von der Systemplatte, vorher 155. Anforderung: mindestens ein Fünftel weniger (geschätzt). Die Lastmessung war nicht vergleichbar, weil gleichzeitig eine andere Session die Datenbank belastet hat.">
+        <span class="fr-meter-name">💾 Puffer-Versuch</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">168 statt 155</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="2 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ○ {{final.level_interplay}} (die Listen-Dateien lassen sich erst nach dem Deploy durchspielen; der Agenten-Schutz ist auf der Live-Seite geprüft) · ◌ {{final.level_local}} · ✓ {{final.level_prod}} · ◌ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_dry}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_interplay}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 4 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-ram-verdict"
+          data-issue-title="[CHORE] Re-measure shared_buffers = 128 MB on a settled instance and roll back if it shows no gain"
+          data-issue-type="chore"
+          data-issue-body="Approved in round 1 (d-ram): 'Ich messe vorher und nachher und drehe es zurück, wenn es nichts bringt.' shared_buffers was set to 128 MB on 2026-11-18 23:55 UTC. Same probe before and after (node scripts/supabase-io-probe.mjs --idle 4 --load 3): idle 155 MB/min read from the system volume before, 168 MB/min 15 minutes after; the load windows were not comparable (another session's browsers sent 651 requests in the after window, ~100 in the before window). Open: run the probe again on a settled instance (hours after the restart) in a window that edge_logs shows as quiet, compare with the before values in .claude/deep-knowledge/supabase.md ('State on 2026-11-18'), and roll back with `supabase --experimental postgres-config delete --remote=<ref> --config shared_buffers --yes` (restarts the database, ~90 s) when idle and load show no gain."
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="Messung">
+        <span class="oq-label">Puffer: Urteil steht aus</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Nicht abgeschlossen, weil ein faires Urteil eine ruhige, eingeschwungene Instanz braucht: bisher kein Gewinn, also weder behalten noch zurückgedreht.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Live-Datenbank, Einstellung Postgres-Puffer</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt – ich messe in ruhigem Zustand nach und drehe zurück, wenn es dabei bleibt.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-rest-lists"
+          data-issue-title="[FEATURE] Serve the remaining catalog list reads from the per-build files"
+          data-issue-type="feature"
+          data-issue-body="Approved in round 1 (d-cache): 'Listen kommen aus dem Datei-Speicher mit Dauer-Cache, die Datenbank sieht sie nicht mehr.' After a publish these list reads still reach Postgres: (1) the German-name search fallback (codex_search RPC plus the filtered read) because the files carry no German names; (2) getMissileCohort and getItemRankCohort because they need the full payload / weaponParams / stats, which no file has (add files like weapon-rank, component-rank, missile next to ship-rank: supabase/functions/ingest-catalog/_list-snapshots.ts, cloudflare/assets-worker/src/index.js LISTS_FILE_RE, src/app/codex/codex-list-engine.ts); (3) listBlueprints (full payload); (4) sibling reads with more than 200 matches; (5) every engine decline (payload 'full', unknown filter, untranslatable regex) and every read while a file is missing or still loading. Builds published before this feature have no files until `lists_publish` runs for them."
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="im Repo">
+        <span class="oq-label">Rest-Listen an der Datenbank</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Nicht vollständig umgesetzt, weil die Dateien manche Daten nicht enthalten: die Suche über deutsche Namen und zwei Ranglisten fragen weiter die Datenbank.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Codex: Suche, Raketen- und Waffen-Ranglisten, Blaupausen-Liste</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt – weitere Dateien nach demselben Muster schließen die Lücke.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-queue-not-serial"
+          data-issue-title="[CHORE] Decide whether agent browser runs need a strict one-at-a-time lock"
+          data-issue-type="chore"
+          data-issue-body="Approved in round 1 (d-agents): 'Läufe nacheinander statt parallel, das Browser-Profil mit geladenem Katalog wird wiederverwendet.' Built instead (scripts/lib/agent-supabase-guard.cjs): a machine-wide queue of 2 request slots with a 6 s wait cap (soft: a full queue lets the request through so no test hangs) and a shared on-disk cache of build-scoped catalog reads. Not literal because (a) one persistent browser profile shared by parallel sessions makes Supabase revoke the refresh-token family at the first rotation and Playwright refuses a profile directory in use, and (b) a strict lock around whole runs would stall parallel sessions for minutes. A strict lock (SLOTS = 1, no pass-through, or a run-level mutex) would be the literal reading."
+          data-oq-origin="shortfall"
+          data-route-default="ignore"
+          data-route-reason="gleichwertig">
+        <span class="oq-label">Schlange statt Reihenfolge</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Nicht wörtlich umgesetzt, weil ein geteiltes Browser-Profil parallele Sessions gegenseitig abmeldet: gebaut sind eine Warteschlange und ein gemeinsamer Katalog-Cache.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Agenten-Browser und Mobile Gate</dd>
+          <dt>{{final.fund_why}}</dt><dd>Weglassen – der Zweck ist erreicht, eine harte Sperre würde parallele Sessions minutenlang blockieren.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-cron-tests-void"
+          data-issue-title="[CHORE] Re-test the 10-second translation cron for IO cost with the minute-based probe"
+          data-issue-type="chore"
+          data-issue-body="Round 1 of this concept listed the 10-second cron translate-orchestrator-fast and the 2-minute codex-derived-refresh as 'geprüft und verworfen'. Those on/off tests counted IO 'bursts' in 5-second steps; the machine metrics refresh only once a minute, so one burst a minute appears by construction and the tests prove nothing either way. Re-test: park the job(s) for 10 minutes and compare refresh-to-refresh minutes with scripts/supabase-io-probe.mjs (--idle 10 --load 0) against 10 minutes with the jobs on, in windows edge_logs shows as quiet. Recipe: .claude/deep-knowledge/supabase.md, 'The instance swaps', step 4."
+          data-oq-origin="found"
+          data-route-default="now"
+          data-route-reason="klein">
+        <span class="oq-label">Cron-Tests waren ungültig</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Die Messwerte der Instanz springen nur einmal pro Minute. Die „Spitze alle 63 Sekunden“ aus Runde 1 war dieser Takt, und meine An/Aus-Tests der beiden Crons haben ihn gezählt.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Runde 1 dieser Seite, „geprüft und verworfen“</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt – ein gültiger Test mit Minutenfenstern dauert zwanzig Minuten.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Commits <code>b79fd88f4</code>…<code>bc256308f</code> · Bereiche: scripts, ingest-catalog, assets-worker, codex</li>
+      <li><code>scripts/lib/agent-supabase-guard.cjs</code>, <code>supabase/functions/ingest-catalog/_list-publish.ts</code>, <code>src/app/codex/codex-list-engine.ts</code></li>
+      <li>Tests: 7 300 Unit, 754 Functions, 200 Gate-Skripte, 38 Worker grün · Typprüfung und Build ok</li>
+      <li>Nach dem Ship: Assets-Worker deployen, dann einmal <code>lists_publish</code> für den aktuellen Build</li>
+      <li>Zweite Lastquelle gefunden: Mobile Gate (Geräte-Kennungen, ~5 000 Anfragen je Lauf) · Messung: <code>scripts/supabase-io-probe.mjs</code></li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-lists-live" data-crit="high" data-guide="">Listen-Dateien nach dem Deploy live prüfen</li>
+      <li data-todo-id="t-ingest-memory" data-crit="mid" data-guide="">Speicher der Ingest-Function beim Publish</li>
+    </ul>
+  </section>
+  <section data-handoffs hidden aria-label="{{final.group_handoffs}}">
+    <ul>
+      <li data-todo-id="h-worker-deploy" data-crit="high" data-guide="web">Assets-Worker bei Cloudflare neu deployen</li>
+    </ul>
+  </section>
+</section>

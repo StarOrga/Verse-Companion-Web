@@ -3,7 +3,7 @@
      It MUST be written at generation time with the active iteration's
      data-iteration-template value (normalised), otherwise the page paints the
      wrong layout for one frame before showIteration() runs. -->
-<html lang="de" data-theme="dark" data-page-version="2026-11-18T22:37:04" data-template="decision">
+<html lang="de" data-theme="dark" data-page-version="2026-11-18T22:37:04" data-template="free">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2796,7 +2796,8 @@ body.panel-open .upin-hint, body.panel-open .hk-pin-example { display: none !imp
    (same contract as the design notes' body[data-note-editing] rule). */
 body[data-note-editing="true"] .dpin-layer .upin:not([data-editing="true"]) .upin-pin { opacity: 0.35; animation: none; transition: opacity 0.15s ease; }
 .dpin-layer .upin[data-orphan="true"] .upin-pin { opacity: 0.6; }
-body.dpin-armed section[data-iteration][data-active] :is(p, li, tr) { cursor: crosshair; }
+body.dpin-armed section[data-iteration][data-active] :not(section, a, button, input, select, textarea, label, summary, .dpin-layer, .dpin-layer *, [data-analysis], [data-analysis] *) { cursor: crosshair; }
+body.dpin-armed section[data-iteration][data-active] [data-analysis] :is(p, li, tr, h2, h3, h4, label, [data-opt], [data-options], .an-kind, .an-msg) { cursor: crosshair; }
 body.anno-hidden .dpin-layer .upin:not([data-upin-fresh]), body.anno-hidden .dpin-hint { display: none !important; }
 .dpin-hint {
   position: fixed; left: 50%; bottom: 2rem; transform: translateX(-50%); z-index: 99;
@@ -5843,7 +5844,8 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
       </header>
 
       <main>
-<section data-iteration="1" data-iteration-template="decision" data-analysis="full" id="iter-1" data-active>
+<section data-iteration="1" data-iteration-template="decision" data-analysis="full" data-baked id="iter-1" hidden>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]}}</script>
   <div class="iteration-intro">
     <h2>Supabase-Warnung: Ursache und Richtung</h2>
     <p>Gemessen statt vermutet: woher die Last kommt und drei Entscheidungen, die sie senken.</p>
@@ -5877,34 +5879,34 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
     <section id="d-agents" data-nav-label="Agenten-Läufe" data-decision="d-agents" data-decision-mode="single"
              data-label="Automatische Browser-Läufe" data-rec="warm"
              data-rec-why="Das ist der größte gemessene Lastanteil und der kleinste Eingriff; ob eine eigene Prüfumgebung nötig ist, zeigt die Messung danach."
-             data-applies-to="Prüf- und Nachtläufe der Agenten gegen die Live-Datenbank" data-finding="f-agents">
+             data-applies-to="Prüf- und Nachtläufe der Agenten gegen die Live-Datenbank" data-finding="f-agents"><input type="hidden" name="dm-d-agents-hes" value="{&quot;ms&quot;:16533,&quot;revisits&quot;:0,&quot;median&quot;:16533}" disabled>
       <p data-applies>Gilt für: Prüf- und Nachtläufe der Agenten gegen die Live-Datenbank</p>
       <p data-situation>Jeder Prüflauf eines Agenten ist ein Lasttest der 0,5-GB-Instanz: An den Spitzentagen kamen 57 bis 71 % aller Anfragen aus Headless-Browsern.</p>
       <h3 data-question>Wohin gehen die automatischen Browser-Läufe künftig?</h3>
       <p data-stakes>Ob das IO-Budget an Arbeitstagen reicht und was Agenten noch prüfen können</p>
       <div data-options>
         <label data-opt="warm" data-recommended>
-          <input type="radio" name="dm-d-agents" value="warm" checked>
+          <input type="radio" name="dm-d-agents" value="warm" checked disabled>
           <span data-opt-label>Bei der Live-Datenbank bleiben, gedrosselt und mit warmem Cache</span>
           <span data-opt-consequence>Kleinster Umbau: Läufe nacheinander statt parallel, das Browser-Profil mit geladenem Katalog wird wiederverwendet. Die Last sinkt, verschwindet aber nicht.</span>
         </label>
         <label data-opt="staging">
-          <input type="radio" name="dm-d-agents" value="staging">
+          <input type="radio" name="dm-d-agents" value="staging" disabled>
           <span data-opt-label>Zweites Gratis-Projekt als Prüfumgebung</span>
           <span data-opt-consequence>Sauberste Trennung: Agenten treffen die Live-Datenbank nicht mehr. Kostet Pflege, weil Migrationen und ein kleiner Codex-Build dort mitlaufen müssen.</span>
         </label>
         <label data-opt="local">
-          <input type="radio" name="dm-d-agents" value="local">
+          <input type="radio" name="dm-d-agents" value="local" disabled>
           <span data-opt-label>Lokale Datenbank für Prüfläufe</span>
           <span data-opt-consequence>Keine Cloud-Last, aber Docker und Datenbank laufen auf deinem Rechner neben Spiel und Builds.</span>
         </label>
         <label data-opt="keep">
-          <input type="radio" name="dm-d-agents" value="keep">
+          <input type="radio" name="dm-d-agents" value="keep" disabled>
           <span data-opt-label>So lassen</span>
           <span data-opt-consequence>Kein Aufwand; an Tagen mit vielen Läufen ist das Budget wieder leer und die App wird träge.</span>
         </label>
       </div>
-      <textarea data-comment="d-agents-note" placeholder="Notiz (optional)"></textarea>
+      <textarea data-comment="d-agents-note" placeholder="Notiz (optional)" readonly disabled></textarea>
       <div data-alevel="3" data-title="Agenten-Läufe">
         <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"142 871","unit":"Anfragen","label":"aus Headless-Browsern am 15.11."}'></div></div>
         <div data-slot="long">
@@ -5926,29 +5928,29 @@ Stunde 15 UTC:  16 573 von 21 042</pre></div>
     <section id="d-ram" data-nav-label="Arbeitsspeicher" data-decision="d-ram" data-decision-mode="single"
              data-label="Arbeitsspeicher der Instanz" data-rec="buffers"
              data-rec-why="Der Versuch kostet nichts, ist umkehrbar und zeigt innerhalb eines Tages, ob die Gratis-Instanz reicht."
-             data-applies-to="Supabase-Instanz (Free, 0,5 GB RAM)" data-finding="f-ram">
+             data-applies-to="Supabase-Instanz (Free, 0,5 GB RAM)" data-finding="f-ram"><input type="hidden" name="dm-d-ram-hes" value="{&quot;ms&quot;:7090,&quot;revisits&quot;:0,&quot;median&quot;:16533}" disabled>
       <p data-applies>Gilt für: Supabase-Instanz (Free, 0,5 GB RAM)</p>
       <p data-situation>Jede Lastspitze wird zu Platten-Zugriffen: Vier Katalog-Anfragen lösten 9 600 Lesezugriffe auf der Swap-Platte in fünf Sekunden aus.</p>
       <h3 data-question>Wie bekommt die Instanz genug Arbeitsspeicher?</h3>
       <p data-stakes>Ob jede Aktivität weiter das IO-Budget verbraucht</p>
       <div data-options>
         <label data-opt="buffers" data-recommended>
-          <input type="radio" name="dm-d-ram" value="buffers" checked>
+          <input type="radio" name="dm-d-ram" value="buffers" checked disabled>
           <span data-opt-label>Postgres-Puffer von 224 auf 128 MB senken und messen</span>
           <span data-opt-consequence>Kostenlos und umkehrbar, braucht einen Neustart von etwa einer Minute. Wirkung ungewiss: Ich messe vorher und nachher und drehe es zurück, wenn es nichts bringt.</span>
         </label>
         <label data-opt="pro">
-          <input type="radio" name="dm-d-ram" value="pro">
+          <input type="radio" name="dm-d-ram" value="pro" disabled>
           <span data-opt-label>Pro-Plan mit 1 GB RAM buchen</span>
           <span data-opt-consequence>25 $ im Monat; löst die Ursache sicher und bringt 8 GB Datenbank und Backups. Bricht die Regel, nur Gratis-Stufen zu nutzen.</span>
         </label>
         <label data-opt="none">
-          <input type="radio" name="dm-d-ram" value="none">
+          <input type="radio" name="dm-d-ram" value="none" disabled>
           <span data-opt-label>Nichts ändern</span>
           <span data-opt-consequence>Die Mail kommt an lastreichen Tagen wieder; ein leeres Budget heißt träge App, kein Datenverlust.</span>
         </label>
       </div>
-      <textarea data-comment="d-ram-note" placeholder="Notiz (optional)"></textarea>
+      <textarea data-comment="d-ram-note" placeholder="Notiz (optional)" readonly disabled></textarea>
       <div data-alevel="3" data-title="Arbeitsspeicher">
         <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"590 MB","unit":"im Swap","label":"bei 453 MB Arbeitsspeicher"}'></div></div>
         <div data-slot="long">
@@ -5969,7 +5971,7 @@ Stunde 15 UTC:  16 573 von 21 042</pre></div>
     <section id="d-cache" data-nav-label="Cache für Listen" data-decision="d-cache" data-decision-mode="single"
              data-label="Cache für Katalog-Listen" data-rec="slim"
              data-rec-why="Der kleine Schritt wirkt sofort; feste Dateien pro Build sind die richtige Richtung, aber ein eigenes Konzept wert."
-             data-applies-to="Codex-Listen im Frontend und ihre Datenbank-Abfragen" data-finding="f-cache">
+             data-applies-to="Codex-Listen im Frontend und ihre Datenbank-Abfragen" data-finding="f-cache"><input type="hidden" name="dm-d-cache-hes" value="{&quot;ms&quot;:27696,&quot;revisits&quot;:0,&quot;median&quot;:16533}" disabled>
       <p data-applies>Gilt für: Codex-Listen im Frontend und ihre Datenbank-Abfragen</p>
       <p data-situation>Die Schiffsliste braucht 1,0 bis 1,3 Sekunden, weil die Datenbank für jedes der 332 Schiffe die 55 kB große Beschreibung siebenmal entpackt.</p>
       <h3 data-question>Wie werden Katalog-Listen schnell, ohne die Datenbank zu belasten?</h3>
@@ -5977,27 +5979,27 @@ Stunde 15 UTC:  16 573 von 21 042</pre></div>
       <p data-stakes>Ladezeit der Codex-Seiten und wie viel Lesearbeit bei der Datenbank bleibt</p>
       <div data-options>
         <label data-opt="slim" data-recommended>
-          <input type="radio" name="dm-d-cache" value="slim" checked>
+          <input type="radio" name="dm-d-cache" value="slim" disabled>
           <span data-opt-label>Erst die Schiffsliste in der Datenbank schlank machen</span>
           <span data-opt-consequence>Kleiner Eingriff mit sofortigem Effekt: einmal entpacken, erst sortieren, dann Details. Die Liste bleibt eine Datenbank-Abfrage.</span>
         </label>
         <label data-opt="snapshot">
-          <input type="radio" name="dm-d-cache" value="snapshot">
+          <input type="radio" name="dm-d-cache" value="snapshot" checked disabled>
           <span data-opt-label>Katalog-Listen als feste Dateien pro Build ausliefern</span>
           <span data-opt-consequence>Größter Gewinn: Listen kommen aus dem Datei-Speicher mit Dauer-Cache, die Datenbank sieht sie nicht mehr. Mittlerer bis großer Umbau an Upload und Lesepfad.</span>
         </label>
         <label data-opt="redis">
-          <input type="radio" name="dm-d-cache" value="redis">
+          <input type="radio" name="dm-d-cache" value="redis" disabled>
           <span data-opt-label>Trotzdem einen Redis-Cache einbauen</span>
           <span data-opt-consequence>Braucht eine Zwischenschicht vor der Datenbank, hilft nur bei Wiederholungen und ändert nichts am Speicherproblem.</span>
         </label>
         <label data-opt="none">
-          <input type="radio" name="dm-d-cache" value="none">
+          <input type="radio" name="dm-d-cache" value="none" disabled>
           <span data-opt-label>Nichts ändern</span>
           <span data-opt-consequence>Die Listen bleiben bei einer Sekunde, und jeder Prüflauf lädt sie neu.</span>
         </label>
       </div>
-      <textarea data-comment="d-cache-note" placeholder="Notiz (optional)"></textarea>
+      <textarea data-comment="d-cache-note" placeholder="Notiz (optional)" readonly disabled></textarea>
       <div data-alevel="3" data-title="Cache für Listen">
         <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"1,0 s","unit":"im Schnitt","label":"für die Schiffsliste, 684 Aufrufe in 7 Tagen"}'></div></div>
         <div data-slot="long">
@@ -6015,6 +6017,139 @@ Nach dem kleinen Schritt (Ziel)
   Sortieren          im Speicher, vor den Details</pre></div>
       </div>
     </section>
+  </section>
+</section>
+
+<section data-iteration="2" data-iteration-template="free" data-final-report id="iter-2" data-active>
+  <p class="fr-sentence">Agenten-Browser und Mobile Gate schonen jetzt die Datenbank, der Postgres-Puffer steht auf 128 MB, und Katalog-Listen kommen künftig als feste Dateien pro Build.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">Was kam raus</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🧊</span><span>Agenten-Browser teilen einen <b>Katalog-Cache</b>: 230 statt 451 Anfragen.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">📦</span><span><b>Katalog-Listen als Dateien</b> pro Build, aktiv nach Ship und Veröffentlichen.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🔬</span><span>Puffer auf 128 MB: <b>bisher kein messbarer Gewinn</b>, Urteil steht aus.</span></li>
+      </ul>
+    </div>
+    <ol class="fr-flow">
+      <li>Ein Agenten-Browser fragt den Katalog an – der gemeinsame Cache antwortet.</li>
+      <li>Alles andere wartet in einer Schlange: höchstens zwei Anfragen gleichzeitig.</li>
+      <li>Nach dem Ship holt die App Listen als Datei; die Datenbank bleibt Rückfall.</li>
+    </ol>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">Was es aushält<small>Balken = wie weit die Anforderung erfüllt ist</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Fünf Codex-Seiten auf der Live-Seite: 230 statt 451 Datenbank-Anfragen bei warmem Cache, keine Katalog-Liste mehr darunter. Anforderung: mindestens ein Drittel weniger (geschätzt).">
+        <span class="fr-meter-name">⚡ Agenten-Last</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">−49 %</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Alle Tests, Typprüfung und Produktions-Build ohne Fehler; eine unabhängige Prüfung fand keinen Blocker, ihre Nachbesserungen sind eingearbeitet. Anforderung: 0 Fehler (geschätzt).">
+        <span class="fr-meter-name">🧱 Stabilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">0 Fehler</b>
+      </div>
+      <div class="fr-meter" data-grade="low" style="--fr-fill: 0%" data-tip="Im Leerlauf liest die Instanz 15 Minuten nach der Umstellung 168 MB pro Minute von der Systemplatte, vorher 155. Anforderung: mindestens ein Fünftel weniger (geschätzt). Die Lastmessung war nicht vergleichbar, weil gleichzeitig eine andere Session die Datenbank belastet hat.">
+        <span class="fr-meter-name">💾 Puffer-Versuch</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">168 statt 155</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="2 / 7 · ✓ Code-Check · ✓ Trockentest · ○ Zusammenspiel (die Listen-Dateien lassen sich erst nach dem Deploy durchspielen; der Agenten-Schutz ist auf der Live-Seite geprüft) · ◌ Lokal durchgespielt · ✓ Prod-Build geprüft · ◌ Live vertestet · ◌ Von dir abgenommen">
+    <span class="fr-depth-done">✓ Zuletzt bestanden: <b>Trockentest</b></span>
+    <span class="fr-depth-next">○ Noch nicht gemacht: <b>Zusammenspiel</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 4 Funde unterwegs</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-ram-verdict"
+          data-issue-title="[CHORE] Re-measure shared_buffers = 128 MB on a settled instance and roll back if it shows no gain"
+          data-issue-type="chore"
+          data-issue-body="Approved in round 1 (d-ram): 'Ich messe vorher und nachher und drehe es zurück, wenn es nichts bringt.' shared_buffers was set to 128 MB on 2026-11-18 23:55 UTC. Same probe before and after (node scripts/supabase-io-probe.mjs --idle 4 --load 3): idle 155 MB/min read from the system volume before, 168 MB/min 15 minutes after; the load windows were not comparable (another session's browsers sent 651 requests in the after window, ~100 in the before window). Open: run the probe again on a settled instance (hours after the restart) in a window that edge_logs shows as quiet, compare with the before values in .claude/deep-knowledge/supabase.md ('State on 2026-11-18'), and roll back with `supabase --experimental postgres-config delete --remote=<ref> --config shared_buffers --yes` (restarts the database, ~90 s) when idle and load show no gain."
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="Messung">
+        <span class="oq-label">Puffer: Urteil steht aus</span>
+        <dl class="fr-fkv">
+          <dt>Was</dt><dd>Nicht abgeschlossen, weil ein faires Urteil eine ruhige, eingeschwungene Instanz braucht: bisher kein Gewinn, also weder behalten noch zurückgedreht.</dd>
+          <dt>Wo</dt><dd>Live-Datenbank, Einstellung Postgres-Puffer</dd>
+          <dt>Warum vorbelegt</dt><dd>⚡ Jetzt – ich messe in ruhigem Zustand nach und drehe zurück, wenn es dabei bleibt.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-rest-lists"
+          data-issue-title="[FEATURE] Serve the remaining catalog list reads from the per-build files"
+          data-issue-type="feature"
+          data-issue-body="Approved in round 1 (d-cache): 'Listen kommen aus dem Datei-Speicher mit Dauer-Cache, die Datenbank sieht sie nicht mehr.' After a publish these list reads still reach Postgres: (1) the German-name search fallback (codex_search RPC plus the filtered read) because the files carry no German names; (2) getMissileCohort and getItemRankCohort because they need the full payload / weaponParams / stats, which no file has (add files like weapon-rank, component-rank, missile next to ship-rank: supabase/functions/ingest-catalog/_list-snapshots.ts, cloudflare/assets-worker/src/index.js LISTS_FILE_RE, src/app/codex/codex-list-engine.ts); (3) listBlueprints (full payload); (4) sibling reads with more than 200 matches; (5) every engine decline (payload 'full', unknown filter, untranslatable regex) and every read while a file is missing or still loading. Builds published before this feature have no files until `lists_publish` runs for them."
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="im Repo">
+        <span class="oq-label">Rest-Listen an der Datenbank</span>
+        <dl class="fr-fkv">
+          <dt>Was</dt><dd>Nicht vollständig umgesetzt, weil die Dateien manche Daten nicht enthalten: die Suche über deutsche Namen und zwei Ranglisten fragen weiter die Datenbank.</dd>
+          <dt>Wo</dt><dd>Codex: Suche, Raketen- und Waffen-Ranglisten, Blaupausen-Liste</dd>
+          <dt>Warum vorbelegt</dt><dd>⚡ Jetzt – weitere Dateien nach demselben Muster schließen die Lücke.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-queue-not-serial"
+          data-issue-title="[CHORE] Decide whether agent browser runs need a strict one-at-a-time lock"
+          data-issue-type="chore"
+          data-issue-body="Approved in round 1 (d-agents): 'Läufe nacheinander statt parallel, das Browser-Profil mit geladenem Katalog wird wiederverwendet.' Built instead (scripts/lib/agent-supabase-guard.cjs): a machine-wide queue of 2 request slots with a 6 s wait cap (soft: a full queue lets the request through so no test hangs) and a shared on-disk cache of build-scoped catalog reads. Not literal because (a) one persistent browser profile shared by parallel sessions makes Supabase revoke the refresh-token family at the first rotation and Playwright refuses a profile directory in use, and (b) a strict lock around whole runs would stall parallel sessions for minutes. A strict lock (SLOTS = 1, no pass-through, or a run-level mutex) would be the literal reading."
+          data-oq-origin="shortfall"
+          data-route-default="ignore"
+          data-route-reason="gleichwertig">
+        <span class="oq-label">Schlange statt Reihenfolge</span>
+        <dl class="fr-fkv">
+          <dt>Was</dt><dd>Nicht wörtlich umgesetzt, weil ein geteiltes Browser-Profil parallele Sessions gegenseitig abmeldet: gebaut sind eine Warteschlange und ein gemeinsamer Katalog-Cache.</dd>
+          <dt>Wo</dt><dd>Agenten-Browser und Mobile Gate</dd>
+          <dt>Warum vorbelegt</dt><dd>Weglassen – der Zweck ist erreicht, eine harte Sperre würde parallele Sessions minutenlang blockieren.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-cron-tests-void"
+          data-issue-title="[CHORE] Re-test the 10-second translation cron for IO cost with the minute-based probe"
+          data-issue-type="chore"
+          data-issue-body="Round 1 of this concept listed the 10-second cron translate-orchestrator-fast and the 2-minute codex-derived-refresh as 'geprüft und verworfen'. Those on/off tests counted IO 'bursts' in 5-second steps; the machine metrics refresh only once a minute, so one burst a minute appears by construction and the tests prove nothing either way. Re-test: park the job(s) for 10 minutes and compare refresh-to-refresh minutes with scripts/supabase-io-probe.mjs (--idle 10 --load 0) against 10 minutes with the jobs on, in windows edge_logs shows as quiet. Recipe: .claude/deep-knowledge/supabase.md, 'The instance swaps', step 4."
+          data-oq-origin="found"
+          data-route-default="now"
+          data-route-reason="klein">
+        <span class="oq-label">Cron-Tests waren ungültig</span>
+        <dl class="fr-fkv">
+          <dt>Was</dt><dd>Die Messwerte der Instanz springen nur einmal pro Minute. Die „Spitze alle 63 Sekunden“ aus Runde 1 war dieser Takt, und meine An/Aus-Tests der beiden Crons haben ihn gezählt.</dd>
+          <dt>Wo</dt><dd>Runde 1 dieser Seite, „geprüft und verworfen“</dd>
+          <dt>Warum vorbelegt</dt><dd>⚡ Jetzt – ein gültiger Test mit Minutenfenstern dauert zwanzig Minuten.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 Für Entwickler</summary>
+    <ul class="fr-dev">
+      <li>Commits <code>b79fd88f4</code>…<code>bc256308f</code> · Bereiche: scripts, ingest-catalog, assets-worker, codex</li>
+      <li><code>scripts/lib/agent-supabase-guard.cjs</code>, <code>supabase/functions/ingest-catalog/_list-publish.ts</code>, <code>src/app/codex/codex-list-engine.ts</code></li>
+      <li>Tests: 7 300 Unit, 754 Functions, 200 Gate-Skripte, 38 Worker grün · Typprüfung und Build ok</li>
+      <li>Nach dem Ship: Assets-Worker deployen, dann einmal <code>lists_publish</code> für den aktuellen Build</li>
+      <li>Zweite Lastquelle gefunden: Mobile Gate (Geräte-Kennungen, ~5 000 Anfragen je Lauf) · Messung: <code>scripts/supabase-io-probe.mjs</code></li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="Du testest">
+    <ul>
+      <li data-todo-id="t-lists-live" data-crit="high" data-guide="">Listen-Dateien nach dem Deploy live prüfen</li>
+      <li data-todo-id="t-ingest-memory" data-crit="mid" data-guide="">Speicher der Ingest-Function beim Publish</li>
+    </ul>
+  </section>
+  <section data-handoffs hidden aria-label="Du machst danach">
+    <ul>
+      <li data-todo-id="h-worker-deploy" data-crit="high" data-guide="web">Assets-Worker bei Cloudflare neu deployen</li>
+    </ul>
   </section>
 </section>
 </main>
@@ -6105,7 +6240,8 @@ Nach dem kleinen Schritt (Ziel)
              <section data-iteration="N">, appended by string edit
              (iteration-rules.md § Iteration append checklist). -->
         <nav class="iteration-tabs" role="tablist" aria-label="Runden">
-<button class="iteration-tab" role="tab" data-iteration="1" aria-selected="true" aria-controls="iter-1">Runde 1</button>
+<button class="iteration-tab" role="tab" data-iteration="1" aria-selected="false" aria-controls="iter-1">Runde 1</button>
+<button class="iteration-tab" role="tab" data-final-report data-iteration="2" aria-selected="true" aria-controls="iter-2">Abschlussbericht</button>
 </nav>
 
         <!-- Section TOC — auto-populated from EVERY top-level <section id="..."
@@ -12599,9 +12735,15 @@ function collectFreeDecisions() {
   };
   const blocksOf = (scope, it, kind) =>
     [...scope.querySelectorAll(kind)].filter(n => eligible(n, it) && scopeOf(n, it) === scope);
+  // Mocks built from div / span (#1149): [data-pin] first, then the text
+  // blocks, then the clicked element itself (an svg as a whole), never the
+  // round or one of its sections.
+  const ownOf = (t, it) => (t === it || t.matches(SCOPE) ? null : (t.closest('svg') || t));
   function blockOf(target, it) {
-    let b = target.closest && target.closest(inAnalysis(target) ? ANA_BLOCK : BLOCK);
-    if (!b || !eligible(b, it)) return null;
+    if (!target.closest) return null;
+    let b = inAnalysis(target) ? target.closest(ANA_BLOCK)
+      : (target.closest('[data-pin]') || target.closest(BLOCK) || ownOf(target, it));
+    if (!b || b === it || !eligible(b, it)) return null;
     const row = b.closest('tr');
     if (row && b !== row && b.closest('td, th') && eligible(row, it)) b = row;
     return b;

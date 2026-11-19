@@ -1,4 +1,5 @@
-<section data-iteration="1" data-iteration-template="decision" data-analysis="full">
+<section data-iteration="1" data-iteration-template="decision" data-analysis="full" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]}}</script>
   <div class="iteration-intro">
     <h2>Supabase-Warnung: Ursache und Richtung</h2>
     <p>Gemessen statt vermutet: woher die Last kommt und drei Entscheidungen, die sie senken.</p>
@@ -32,7 +33,7 @@
     <section id="d-agents" data-nav-label="Agenten-Läufe" data-decision="d-agents" data-decision-mode="single"
              data-label="Automatische Browser-Läufe" data-rec="warm"
              data-rec-why="Das ist der größte gemessene Lastanteil und der kleinste Eingriff; ob eine eigene Prüfumgebung nötig ist, zeigt die Messung danach."
-             data-applies-to="Prüf- und Nachtläufe der Agenten gegen die Live-Datenbank" data-finding="f-agents">
+             data-applies-to="Prüf- und Nachtläufe der Agenten gegen die Live-Datenbank" data-finding="f-agents"><input type="hidden" name="dm-d-agents-hes" value="{&quot;ms&quot;:16533,&quot;revisits&quot;:0,&quot;median&quot;:16533}">
       <p data-applies>Gilt für: Prüf- und Nachtläufe der Agenten gegen die Live-Datenbank</p>
       <p data-situation>Jeder Prüflauf eines Agenten ist ein Lasttest der 0,5-GB-Instanz: An den Spitzentagen kamen 57 bis 71 % aller Anfragen aus Headless-Browsern.</p>
       <h3 data-question>Wohin gehen die automatischen Browser-Läufe künftig?</h3>
@@ -81,7 +82,7 @@ Stunde 15 UTC:  16 573 von 21 042</pre></div>
     <section id="d-ram" data-nav-label="Arbeitsspeicher" data-decision="d-ram" data-decision-mode="single"
              data-label="Arbeitsspeicher der Instanz" data-rec="buffers"
              data-rec-why="Der Versuch kostet nichts, ist umkehrbar und zeigt innerhalb eines Tages, ob die Gratis-Instanz reicht."
-             data-applies-to="Supabase-Instanz (Free, 0,5 GB RAM)" data-finding="f-ram">
+             data-applies-to="Supabase-Instanz (Free, 0,5 GB RAM)" data-finding="f-ram"><input type="hidden" name="dm-d-ram-hes" value="{&quot;ms&quot;:7090,&quot;revisits&quot;:0,&quot;median&quot;:16533}">
       <p data-applies>Gilt für: Supabase-Instanz (Free, 0,5 GB RAM)</p>
       <p data-situation>Jede Lastspitze wird zu Platten-Zugriffen: Vier Katalog-Anfragen lösten 9 600 Lesezugriffe auf der Swap-Platte in fünf Sekunden aus.</p>
       <h3 data-question>Wie bekommt die Instanz genug Arbeitsspeicher?</h3>
@@ -124,7 +125,7 @@ Stunde 15 UTC:  16 573 von 21 042</pre></div>
     <section id="d-cache" data-nav-label="Cache für Listen" data-decision="d-cache" data-decision-mode="single"
              data-label="Cache für Katalog-Listen" data-rec="slim"
              data-rec-why="Der kleine Schritt wirkt sofort; feste Dateien pro Build sind die richtige Richtung, aber ein eigenes Konzept wert."
-             data-applies-to="Codex-Listen im Frontend und ihre Datenbank-Abfragen" data-finding="f-cache">
+             data-applies-to="Codex-Listen im Frontend und ihre Datenbank-Abfragen" data-finding="f-cache"><input type="hidden" name="dm-d-cache-hes" value="{&quot;ms&quot;:27696,&quot;revisits&quot;:0,&quot;median&quot;:16533}">
       <p data-applies>Gilt für: Codex-Listen im Frontend und ihre Datenbank-Abfragen</p>
       <p data-situation>Die Schiffsliste braucht 1,0 bis 1,3 Sekunden, weil die Datenbank für jedes der 332 Schiffe die 55 kB große Beschreibung siebenmal entpackt.</p>
       <h3 data-question>Wie werden Katalog-Listen schnell, ohne die Datenbank zu belasten?</h3>
@@ -132,12 +133,12 @@ Stunde 15 UTC:  16 573 von 21 042</pre></div>
       <p data-stakes>Ladezeit der Codex-Seiten und wie viel Lesearbeit bei der Datenbank bleibt</p>
       <div data-options>
         <label data-opt="slim" data-recommended>
-          <input type="radio" name="dm-d-cache" value="slim" checked>
+          <input type="radio" name="dm-d-cache" value="slim">
           <span data-opt-label>Erst die Schiffsliste in der Datenbank schlank machen</span>
           <span data-opt-consequence>Kleiner Eingriff mit sofortigem Effekt: einmal entpacken, erst sortieren, dann Details. Die Liste bleibt eine Datenbank-Abfrage.</span>
         </label>
         <label data-opt="snapshot">
-          <input type="radio" name="dm-d-cache" value="snapshot">
+          <input type="radio" name="dm-d-cache" value="snapshot" checked>
           <span data-opt-label>Katalog-Listen als feste Dateien pro Build ausliefern</span>
           <span data-opt-consequence>Größter Gewinn: Listen kommen aus dem Datei-Speicher mit Dauer-Cache, die Datenbank sieht sie nicht mehr. Mittlerer bis großer Umbau an Upload und Lesepfad.</span>
         </label>
