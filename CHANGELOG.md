@@ -4,7 +4,7 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.282.3] - 2026-11-20
+## [0.282.4] - 2026-11-20
 
 ### Changed
 - Data Uploader 0.84.0: the sidecar opens the Data.p4k through a compact index. Opening the archive takes 404 MB instead of 2.7 GB, a codex run peaks at 2.65 GB instead of 4.48 GB, with byte-identical output.
