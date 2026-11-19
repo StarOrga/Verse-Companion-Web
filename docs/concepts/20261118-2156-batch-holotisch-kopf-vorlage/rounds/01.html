@@ -1,0 +1,363 @@
+<section data-iteration="1" data-iteration-template="design" data-tab-label="Runde 1" data-design-set="alternatives" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]},"designs":{},"screens":{},"views":{},"favorite":"d2","userPins":[{"id":"up-mwmm4nwvb91v","design":"d2","screen":"r1-d2-s1","x":52.2,"y":9.8,"target":"div.mock-hk-head \"Anvil AerospaceLIBERATOREinsatz⌖ Kampf 1\"","text":"gern dann  mitscrollen lassen","attachments":[]},{"id":"up-mwmm4xa5yrux","design":"d2","screen":"r1-d2-s1","x":52.9,"y":14.1,"target":"span.mock-hk-pill \"Einsatz⌖ Kampf 1 Schiffe ▾\"","text":"gern das hier auch mit einsatz... redesignenen, die leiste soll immer oben sein","attachments":[]},{"id":"up-mwmm5qnwtuw5","design":"d2","screen":"r1-d2-s1","x":93.5,"y":15.3,"target":"div.mock-hk-head \"Anvil AerospaceLIBERATOREinsatz⌖ Kampf 1\"","text":"das hangar auch redesignen.","attachments":[]},{"id":"up-mwmm6bhx9vy9","design":"d2","screen":"r1-d2-s2","x":27.5,"y":10.4,"target":"div.mock-hk-head.slim \"LIBERATORAnvil Aerospace⌖ Kampf ▾⌂ 1× im\"","text":"finde ich gut, dass die zeile kleiner wird, bitte visuell auch ggü. der unteren zeile unddem subehader sehen,d dass es in der höhe etc. sinnvoll passt","attachments":[]}]}</script>
+<style>
+.mock-hk { --hk-acc: #52c1e6; --hk-fg: #dff3fb; --hk-dim: #7ea4b6; --hk-bd: rgba(82,193,230,.28); --hk-glass: rgba(8,26,40,.72);
+  position: relative; box-sizing: border-box; min-height: 700px; height: 100%; display: flex; flex-direction: column; gap: 0; padding: 18px 28px 0;
+  background: radial-gradient(120% 90% at 46% 42%, #0b2639 0%, #061421 60%, #040c15 100%); color: var(--hk-fg); font: 500 13px/1.45 Inter, system-ui, sans-serif; overflow: hidden; text-align: left; }
+.mock-hk small { display: block; font: 500 10px/1.3 Inter, system-ui, sans-serif; letter-spacing: .12em; color: var(--hk-dim); text-transform: uppercase; }
+.mock-hk a, .mock-hk button { color: inherit; font: inherit; }
+.mock-hk-sub { position: relative; z-index: 5; display: flex; align-items: center; gap: 16px; padding: 10px 16px; border: 1px solid var(--hk-bd); border-radius: 14px; background: rgba(9,30,46,.88); }
+.mock-hk-logo { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--hk-acc); box-shadow: 0 0 10px rgba(82,193,230,.5); flex: none; }
+.mock-hk-brand b { display: block; font: 700 13px/1.2 Orbitron, Inter, sans-serif; letter-spacing: .1em; }
+.mock-hk-brand b i { font-style: normal; color: var(--hk-acc); font-size: 10px; margin-left: 6px; letter-spacing: .2em; }
+.mock-hk-crumb { font-size: 12px; color: var(--hk-dim); white-space: nowrap; }
+.mock-hk-crumb em { font-style: normal; color: var(--hk-fg); }
+.mock-hk-search { flex: 1; min-width: 120px; display: flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid var(--hk-bd); border-radius: 999px; color: var(--hk-dim); font-size: 12px; }
+.mock-hk-search span { padding: 2px 8px; border-radius: 999px; background: rgba(82,193,230,.18); color: var(--hk-fg); }
+.mock-hk-ic { width: 30px; height: 30px; border: 1px solid var(--hk-bd); border-radius: 9px; flex: none; }
+.mock-hk-head { position: relative; z-index: 4; display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: end; gap: 10px 18px; padding: 22px 4px 12px; }
+.mock-hk-title small { letter-spacing: .04em; text-transform: none; font-size: 11px; }
+.mock-hk-title strong { display: block; font: 600 30px/1.05 Orbitron, Inter, sans-serif; letter-spacing: .08em; }
+.mock-hk-pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--hk-bd); border-radius: 10px; padding: 6px 12px; background: rgba(10,32,48,.7); font: 600 12px/1.3 Inter, sans-serif; white-space: nowrap; }
+.mock-hk-pill b { font: 600 14px/1.2 Orbitron, Inter, sans-serif; color: #7fe3c0; }
+.mock-hk-pill small { display: inline; font-size: 9px; }
+.mock-hk-own { justify-self: end; }
+.mock-hk-body { position: relative; flex: 1; display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 18px; min-height: 380px; }
+.mock-hk-stage { position: relative; border-radius: 12px; overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, transparent 0 24%, rgba(82,193,230,.09) 24.1% 24.4%, transparent 24.5% 38%, rgba(82,193,230,.06) 38.1% 38.4%, transparent 38.5%),
+    linear-gradient(rgba(82,193,230,.04) 1px, transparent 1px) 0 0 / 34px 34px, linear-gradient(90deg, rgba(82,193,230,.04) 1px, transparent 1px) 0 0 / 34px 34px; }
+.mock-hk-ship { position: absolute; left: 50%; top: 50%; width: 150px; height: 300px; transform: translate(-50%,-50%); border: 2px solid rgba(82,193,230,.75); border-radius: 30px 30px 50px 50px; background: rgba(82,193,230,.08); box-shadow: 0 0 24px rgba(82,193,230,.25) inset; }
+.mock-hk-ship::before { content: ''; position: absolute; left: 34%; right: 34%; top: -2px; height: 70px; border: 2px solid rgba(82,193,230,.75); border-top: 0; background: #061421; }
+.mock-hk-item { position: absolute; left: 50%; top: 50%; width: 260px; height: 64px; transform: translate(-50%,-50%) rotate(-6deg); border: 2px solid rgba(82,193,230,.75); border-radius: 8px 30px 8px 8px; background: rgba(82,193,230,.08); }
+.mock-hk-item::after { content: ''; position: absolute; left: 70px; top: 60px; width: 34px; height: 70px; border: 2px solid rgba(82,193,230,.75); border-radius: 4px; transform: rotate(10deg); }
+.mock-hk-lab { position: absolute; display: flex; flex-direction: column; gap: 6px; font: 600 10px/1 Orbitron, Inter, sans-serif; letter-spacing: .08em; }
+.mock-hk-lab span { padding: 6px 10px; border: 1px solid var(--hk-bd); border-radius: 4px; background: rgba(6,20,32,.8); }
+.mock-hk-lab.l { left: 4%; top: 22%; } .mock-hk-lab.r { right: 4%; top: 30%; text-align: right; }
+.mock-hk-panel { border: 1px solid var(--hk-bd); border-radius: 14px; background: var(--hk-glass); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-self: start; }
+.mock-hk-tabs { display: flex; gap: 4px; padding: 3px; border-radius: 999px; border: 1px solid var(--hk-bd); }
+.mock-hk-tabs span { flex: 1; text-align: center; padding: 6px 4px; border-radius: 999px; font-size: 11px; color: var(--hk-dim); }
+.mock-hk-tabs span.on { background: rgba(82,193,230,.22); color: var(--hk-fg); }
+.mock-hk-stats { display: flex; gap: 16px; } .mock-hk-stats b { font: 600 14px/1.2 Orbitron, Inter, sans-serif; }
+.mock-hk-hex { width: 150px; height: 120px; margin: 4px auto; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: rgba(82,193,230,.16); border: 1px solid var(--hk-bd); }
+.mock-hk-row { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid rgba(82,193,230,.12); }
+.mock-hk-row span { color: var(--hk-dim); }
+.mock-hk-strip { position: relative; z-index: 4; margin-top: 10px; display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--hk-bd); border-radius: 14px 14px 0 0; background: rgba(9,30,46,.94); }
+.mock-hk-strip div { padding: 8px 12px; border-left: 1px solid rgba(82,193,230,.14); box-shadow: inset 0 2px 0 var(--p, #52c1e6); }
+.mock-hk-strip div:first-child { border-left: 0; }
+.mock-hk-strip b { font: 600 15px/1.2 Orbitron, Inter, sans-serif; }
+.mock-hk-go { position: absolute; z-index: 6; right: 30px; bottom: 74px; padding: 7px 12px; border: 1px dashed var(--hk-acc); border-radius: 999px; background: rgba(6,20,32,.9); color: var(--hk-acc); font-size: 11px; cursor: pointer; }
+.mock-hk-go.up { bottom: auto; top: 150px; }
+.mock-hk-go.item { right: 150px; }
+.mock-hk-scrolled .mock-hk-body { margin-top: -120px; opacity: .85; }
+.mock-hk-scrolled .mock-hk-body::before { content: 'Seite ist nach unten gescrollt'; position: absolute; z-index: 3; left: 0; top: 130px; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--hk-dim); }
+.mock-hk-it .mock-hk-body { grid-template-columns: minmax(0,1fr) 300px; }
+.mock-hk-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.mock-hk-chips span { padding: 3px 9px; border: 1px solid var(--hk-bd); border-radius: 999px; font-size: 11px; color: var(--hk-dim); }
+
+/* d1 · Andocken: the head melts into the subheader once it scrolls under it */
+.mock-hk-d1 .mock-hk-head { border-top: 1px solid transparent; }
+.mock-hk-d1 .mock-hk-head::before { content: ''; position: absolute; left: 8%; right: 8%; top: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(82,193,230,.55), transparent); }
+.mock-hk-d1 .mock-hk-sub.docked { gap: 12px; }
+.mock-hk-d1 .mock-hk-sub.docked .mock-hk-crumb em { font: 700 13px/1 Orbitron, Inter, sans-serif; letter-spacing: .1em; color: var(--hk-fg); }
+.mock-hk-d1 .mock-hk-sub.docked .mock-hk-search { flex: 0 1 220px; }
+.mock-hk-d1 .mock-hk-sub .mock-hk-pill { padding: 4px 10px; font-size: 11px; }
+.mock-hk-d1 .mock-hk-sub .mock-hk-pill b { font-size: 12px; }
+
+/* d2 · Kommandoleiste: an own thin glass band hangs under the subheader and shrinks */
+.mock-hk-d2 .mock-hk-head { margin: 0 10px; padding: 16px 18px 12px; border: 1px solid var(--hk-bd); border-top: 0; border-radius: 0 0 14px 14px; background: linear-gradient(180deg, rgba(9,30,46,.75), rgba(9,30,46,.35)); }
+.mock-hk-d2 .mock-hk-head::after { content: ''; position: absolute; left: 18px; right: 18px; bottom: -1px; height: 1px; background: linear-gradient(90deg, transparent, rgba(82,193,230,.7), transparent); }
+.mock-hk-d2 .mock-hk-head.slim { padding: 7px 16px; grid-template-columns: auto auto minmax(0,1fr); align-items: center; }
+.mock-hk-d2 .mock-hk-head.slim .mock-hk-title { display: flex; align-items: baseline; gap: 10px; }
+.mock-hk-d2 .mock-hk-head.slim .mock-hk-title strong { font-size: 16px; }
+.mock-hk-d2 .mock-hk-head.slim .mock-hk-pill { padding: 3px 10px; }
+.mock-hk-d2 .mock-hk-head.slim .mock-hk-pill b { font-size: 12px; }
+
+/* d3 · Namensschild: only the name hangs as a tab from the subheader; pills stay at the stage */
+.mock-hk-d3 .mock-hk-tag { position: relative; z-index: 4; align-self: flex-start; margin-left: 22px; padding: 8px 18px 10px; border: 1px solid var(--hk-bd); border-top: 0; border-radius: 0 0 12px 12px; background: rgba(9,30,46,.8); }
+.mock-hk-d3 .mock-hk-tag strong { font: 600 22px/1.05 Orbitron, Inter, sans-serif; letter-spacing: .08em; }
+.mock-hk-d3 .mock-hk-tag.slim strong { font-size: 15px; }
+.mock-hk-d3 .mock-hk-tag.slim small { display: none; }
+.mock-hk-d3 .mock-hk-onstage { position: absolute; z-index: 2; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; }
+</style>
+<header class="iteration-intro">
+  <h2>{{iteration.tab}} 1 · Kopf, eine Vorlage, Kleinkram</h2>
+  <p>Drei Richtungen für den oberen Bereich des Beta-Holotischs (Notiz #2), jede in drei Zuständen: Schiff oben, Schiff gescrollt und dieselbe Vorlage für die P4-AR (Notiz #3). Die gestrichelten Knöpfe im Mock springen zwischen den Zuständen. Unter „Analyse“ stehen der Plan aller 6 Notizen und die Fragen, die sich nicht ansehen lassen.</p>
+</header>
+
+<section data-design="d1" data-nav-label="Andocken" data-design-active="true" data-design-motto="Der Kopf wird Teil des Subheaders" data-design-traits="Oben bleibt der Kopf frei und leicht wie heute|Beim Scrollen ersetzt der Name den letzten Brotkrumen|Einsatz und Hangar rücken rechts in den Subheader" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;&gt;&lt;rect x=&quot;3&quot; y=&quot;4&quot; width=&quot;18&quot; height=&quot;6&quot; rx=&quot;2&quot;/&gt;&lt;path d=&quot;M12 20v-7M9 16l3-3 3 3&quot;/&gt;&lt;/svg&gt;">
+  <section id="r1-d1-s1" data-nav-label="Schiff oben" data-screen data-screen-active="true" data-screen-fit="full"><div class="mock-hk mock-hk-d1">
+    <div class="mock-hk-sub"><i class="mock-hk-logo"></i><div class="mock-hk-brand"><b>VERSE COMPANION<i>ALPHA</i></b><span class="mock-hk-crumb">Codex › Schiffe › <em>Anvil Liberator</em></span></div><div class="mock-hk-search"><span>Anvil Liberator</span>Komponenten, Waffen, Schiffe …</div><i class="mock-hk-ic"></i><i class="mock-hk-ic"></i></div>
+    <div class="mock-hk-head"><div class="mock-hk-title"><small>Anvil Aerospace</small><strong>LIBERATOR</strong></div><span class="mock-hk-pill"><small>Einsatz</small><b>⌖ Kampf</b> 1 Schiffe ▾</span><span class="mock-hk-pill mock-hk-own">⌂ 1× im Hangar · Codex-Loadout ▾</span></div>
+    <div class="mock-hk-body"><div class="mock-hk-stage"><i class="mock-hk-ship"></i><div class="mock-hk-lab l"><span>LASERREPETIERER S2</span><span>RAKETENWERFER S4</span><span>FERNTURM S3</span><span>SCHILD S3</span></div><div class="mock-hk-lab r"><span>RAKETENWERFER S4</span><span>FERNTURM S5</span><span>KÜHLER S3</span></div></div>
+      <aside class="mock-hk-panel"><div class="mock-hk-tabs"><span class="on">Einordnung</span><span>Bauteile</span><span>Änderungen</span></div><div class="mock-hk-stats"><span><small>Crew</small><b>2</b></span><span><small>Masse</small><b>4.151 t</b></span><span><small>Laderaum</small><b>400 SCU</b></span></div><i class="mock-hk-hex"></i></aside></div>
+    <div class="mock-hk-strip"><div style="--p:#e58f52"><small>Offensive</small><b>390,98</b></div><div style="--p:#52c1e6"><small>Verteidigung</small><b>211.200</b></div><div style="--p:#7fe3c0"><small>Bewegung</small><b>270 m/s</b></div><div style="--p:#b49be6"><small>Signatur</small><b>9,3 km</b></div></div>
+    <button type="button" class="mock-hk-go" data-screen-link="r1-d1-s2">↓ nach unten scrollen</button>
+    <button type="button" class="mock-hk-go item" data-screen-link="r1-d1-s3">P4-AR ansehen</button>
+    <div class="anno-layer" data-anno-layer>
+      <div class="anno" data-anno="r1-d1-s1-a1" data-anno-side="bottom" data-anno-target=".mock-hk-head" style="--anno-x:50%;--anno-y:22%">
+        <button class="anno-pin" type="button" data-anno-pin="r1-d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r1-d1-s1-a1" data-anno-bubble="r1-d1-s1-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s1-a1"><span class="anno-bubble-question">Oben bleibt der Kopf ohne Kasten, nur eine feine Lichtlinie bindet ihn an den Subheader. Reicht das als Verbindung, oder fehlt dir da noch etwas?</span></button>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-s1-a1" data-annotation="r1-d1-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-s1-a1"></div></div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+  <section id="r1-d1-s2" data-nav-label="Schiff gescrollt" data-screen hidden data-screen-fit="full"><div class="mock-hk mock-hk-d1 mock-hk-scrolled">
+    <div class="mock-hk-sub docked"><i class="mock-hk-logo"></i><div class="mock-hk-brand"><b>VERSE COMPANION<i>ALPHA</i></b><span class="mock-hk-crumb">Codex › Schiffe › <em>LIBERATOR</em></span></div><div class="mock-hk-search"><span>Liberator</span>Suchen …</div><span class="mock-hk-pill"><b>⌖ Kampf</b> ▾</span><span class="mock-hk-pill">⌂ 1× · Codex-Loadout ▾</span><i class="mock-hk-ic"></i></div>
+    <div class="mock-hk-body" style="margin-top:20px"><div class="mock-hk-stage"><i class="mock-hk-ship" style="top:30%"></i><div class="mock-hk-lab l" style="top:4%"><span>SCHILD S3</span><span>LEBENSERHALTUNG S3</span></div></div>
+      <aside class="mock-hk-panel"><div class="mock-hk-tabs"><span>Einordnung</span><span class="on">Bauteile</span><span>Änderungen</span></div><div class="mock-hk-row"><span>Hersteller</span>Anvil Aerospace</div><div class="mock-hk-row"><span>Verbaut in</span>Anvil Liberator</div></aside></div>
+    <div class="mock-hk-strip"><div style="--p:#e58f52"><small>Offensive</small><b>390,98</b></div><div style="--p:#52c1e6"><small>Verteidigung</small><b>211.200</b></div><div style="--p:#7fe3c0"><small>Bewegung</small><b>270 m/s</b></div><div style="--p:#b49be6"><small>Signatur</small><b>9,3 km</b></div></div>
+    <button type="button" class="mock-hk-go up" data-screen-link="r1-d1-s1">↑ nach oben</button>
+    <div class="anno-layer" data-anno-layer>
+      <div class="anno" data-anno="r1-d1-s2-a1" data-anno-side="bottom" data-anno-target=".mock-hk-sub" style="--anno-x:70%;--anno-y:8%">
+        <button class="anno-pin" type="button" data-anno-pin="r1-d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s2-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r1-d1-s2-a1" data-anno-bubble="r1-d1-s2-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s2-a1"><span class="anno-bubble-question">Beim Scrollen teilen sich Suche, Einsatz und Hangar den Subheader, die Suche wird schmaler. Ist dir die Suche dort wichtiger als die beiden Knöpfe?</span></button>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-s2-a1" data-annotation="r1-d1-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-s2-a1"></div></div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+  <section id="r1-d1-s3" data-nav-label="P4-AR (Gegenstand)" data-screen hidden data-screen-fit="full"><div class="mock-hk mock-hk-d1 mock-hk-it">
+    <div class="mock-hk-sub"><i class="mock-hk-logo"></i><div class="mock-hk-brand"><b>VERSE COMPANION<i>ALPHA</i></b><span class="mock-hk-crumb">Codex › FPS-Waffen › <em>P4-AR</em></span></div><div class="mock-hk-search"><span>P4-AR</span>Suchen …</div><i class="mock-hk-ic"></i><i class="mock-hk-ic"></i></div>
+    <div class="mock-hk-head"><div class="mock-hk-title"><small>Behring · Sturmgewehr</small><strong>P4-AR</strong></div><span class="mock-hk-pill"><small>Einsatz</small><b>⌖ Nahkampf</b> 31 Waffen ▾</span><span class="mock-hk-pill mock-hk-own">⌂ 2× im Lager · Set Fixit ▾</span></div>
+    <div class="mock-hk-body"><div class="mock-hk-stage"><i class="mock-hk-item"></i><div class="mock-hk-lab l"><span>VISIER</span><span>MAGAZIN 40</span></div><div class="mock-hk-lab r"><span>LAUF</span><span>UNTERLAUF</span></div></div>
+      <aside class="mock-hk-panel"><div class="mock-hk-tabs"><span class="on">Einordnung</span><span>Werte</span><span>Bezug</span></div><div class="mock-hk-stats"><span><small>Schaden</small><b>14,4</b></span><span><small>Kadenz</small><b>550</b></span><span><small>Reichweite</small><b>60 m</b></span></div><i class="mock-hk-hex"></i></aside></div>
+    <div class="mock-hk-strip"><div style="--p:#e58f52"><small>Schaden</small><b>132 DPS</b></div><div style="--p:#52c1e6"><small>Handhabung</small><b>Rückstoß mittel</b></div><div style="--p:#7fe3c0"><small>Munition</small><b>40 / 280</b></div><div style="--p:#b49be6"><small>Bezug</small><b>3 Orte</b></div></div>
+    <button type="button" class="mock-hk-go up" data-screen-link="r1-d1-s1">← zurück zum Schiff</button>
+  </div></section>
+</section>
+
+<section data-design="d2" data-nav-label="Kommandoleiste" hidden data-design-motto="Ein dünnes Glasband unter dem Subheader" data-design-traits="Der Kopf hängt als eigenes Band direkt am Subheader|Beim Scrollen schrumpft er auf eine Zeile und bleibt stehen|Suche und Subheader bleiben unverändert" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;&gt;&lt;rect x=&quot;3&quot; y=&quot;3&quot; width=&quot;18&quot; height=&quot;5&quot; rx=&quot;2&quot;/&gt;&lt;path d=&quot;M5 8v4h14V8&quot;/&gt;&lt;/svg&gt;">
+  <section id="r1-d2-s1" data-nav-label="Schiff oben" data-screen data-screen-active="true" data-screen-fit="full"><div class="mock-hk mock-hk-d2">
+    <div class="mock-hk-sub"><i class="mock-hk-logo"></i><div class="mock-hk-brand"><b>VERSE COMPANION<i>ALPHA</i></b><span class="mock-hk-crumb">Codex › Schiffe › <em>Anvil Liberator</em></span></div><div class="mock-hk-search"><span>Anvil Liberator</span>Komponenten, Waffen, Schiffe …</div><i class="mock-hk-ic"></i><i class="mock-hk-ic"></i></div>
+    <div class="mock-hk-head"><div class="mock-hk-title"><small>Anvil Aerospace</small><strong>LIBERATOR</strong></div><span class="mock-hk-pill"><small>Einsatz</small><b>⌖ Kampf</b> 1 Schiffe ▾</span><span class="mock-hk-pill mock-hk-own">⌂ 1× im Hangar · Codex-Loadout ▾</span></div>
+    <div class="mock-hk-body" style="margin-top:14px"><div class="mock-hk-stage"><i class="mock-hk-ship"></i><div class="mock-hk-lab l"><span>LASERREPETIERER S2</span><span>RAKETENWERFER S4</span><span>FERNTURM S3</span><span>SCHILD S3</span></div><div class="mock-hk-lab r"><span>RAKETENWERFER S4</span><span>FERNTURM S5</span><span>KÜHLER S3</span></div></div>
+      <aside class="mock-hk-panel"><div class="mock-hk-tabs"><span class="on">Einordnung</span><span>Bauteile</span><span>Änderungen</span></div><div class="mock-hk-stats"><span><small>Crew</small><b>2</b></span><span><small>Masse</small><b>4.151 t</b></span><span><small>Laderaum</small><b>400 SCU</b></span></div><i class="mock-hk-hex"></i></aside></div>
+    <div class="mock-hk-strip"><div style="--p:#e58f52"><small>Offensive</small><b>390,98</b></div><div style="--p:#52c1e6"><small>Verteidigung</small><b>211.200</b></div><div style="--p:#7fe3c0"><small>Bewegung</small><b>270 m/s</b></div><div style="--p:#b49be6"><small>Signatur</small><b>9,3 km</b></div></div>
+    <button type="button" class="mock-hk-go" data-screen-link="r1-d2-s2">↓ nach unten scrollen</button>
+    <button type="button" class="mock-hk-go item" data-screen-link="r1-d2-s3">P4-AR ansehen</button>
+    <div class="anno-layer" data-anno-layer>
+      <div class="anno" data-anno="r1-d2-s1-a1" data-anno-side="bottom" data-anno-target=".mock-hk-head" style="--anno-x:50%;--anno-y:22%">
+        <button class="anno-pin" type="button" data-anno-pin="r1-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r1-d2-s1-a1" data-anno-bubble="r1-d2-s1-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a1"><span class="anno-bubble-question">Das Band ist halbtransparentes Glas ohne Oberkante, es wächst sichtbar aus dem Subheader heraus. Wirkt das noch leicht genug?</span></button>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s1-a1" data-annotation="r1-d2-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}">joa, gern polishen!</textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s1-a1"></div></div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+  <section id="r1-d2-s2" data-nav-label="Schiff gescrollt" data-screen hidden data-screen-fit="full"><div class="mock-hk mock-hk-d2 mock-hk-scrolled">
+    <div class="mock-hk-sub"><i class="mock-hk-logo"></i><div class="mock-hk-brand"><b>VERSE COMPANION<i>ALPHA</i></b><span class="mock-hk-crumb">Codex › Schiffe › <em>Anvil Liberator</em></span></div><div class="mock-hk-search"><span>Anvil Liberator</span>Komponenten, Waffen, Schiffe …</div><i class="mock-hk-ic"></i><i class="mock-hk-ic"></i></div>
+    <div class="mock-hk-head slim"><div class="mock-hk-title"><strong>LIBERATOR</strong><small>Anvil Aerospace</small></div><span class="mock-hk-pill"><b>⌖ Kampf</b> ▾</span><span class="mock-hk-pill mock-hk-own">⌂ 1× im Hangar · Codex-Loadout ▾</span></div>
+    <div class="mock-hk-body" style="margin-top:14px"><div class="mock-hk-stage"><i class="mock-hk-ship" style="top:30%"></i><div class="mock-hk-lab l" style="top:4%"><span>SCHILD S3</span><span>LEBENSERHALTUNG S3</span></div></div>
+      <aside class="mock-hk-panel"><div class="mock-hk-tabs"><span>Einordnung</span><span class="on">Bauteile</span><span>Änderungen</span></div><div class="mock-hk-row"><span>Hersteller</span>Anvil Aerospace</div><div class="mock-hk-row"><span>Verbaut in</span>Anvil Liberator</div></aside></div>
+    <div class="mock-hk-strip"><div style="--p:#e58f52"><small>Offensive</small><b>390,98</b></div><div style="--p:#52c1e6"><small>Verteidigung</small><b>211.200</b></div><div style="--p:#7fe3c0"><small>Bewegung</small><b>270 m/s</b></div><div style="--p:#b49be6"><small>Signatur</small><b>9,3 km</b></div></div>
+    <button type="button" class="mock-hk-go up" data-screen-link="r1-d2-s1">↑ nach oben</button>
+    <div class="anno-layer" data-anno-layer>
+      <div class="anno" data-anno="r1-d2-s2-a1" data-anno-side="bottom" data-anno-target=".mock-hk-head" style="--anno-x:40%;--anno-y:16%">
+        <button class="anno-pin" type="button" data-anno-pin="r1-d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s2-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r1-d2-s2-a1" data-anno-bubble="r1-d2-s2-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s2-a1"><span class="anno-bubble-question">Gescrollt kostet die Leiste eine Zeile (etwa 40 px) über dem Tisch. Ist das am Laptop noch in Ordnung?</span></button>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s2-a1" data-annotation="r1-d2-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s2-a1"></div></div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+  <section id="r1-d2-s3" data-nav-label="P4-AR (Gegenstand)" data-screen hidden data-screen-fit="full"><div class="mock-hk mock-hk-d2 mock-hk-it">
+    <div class="mock-hk-sub"><i class="mock-hk-logo"></i><div class="mock-hk-brand"><b>VERSE COMPANION<i>ALPHA</i></b><span class="mock-hk-crumb">Codex › FPS-Waffen › <em>P4-AR</em></span></div><div class="mock-hk-search"><span>P4-AR</span>Suchen …</div><i class="mock-hk-ic"></i><i class="mock-hk-ic"></i></div>
+    <div class="mock-hk-head"><div class="mock-hk-title"><small>Behring · Sturmgewehr</small><strong>P4-AR</strong></div><span class="mock-hk-pill"><small>Einsatz</small><b>⌖ Nahkampf</b> 31 Waffen ▾</span><span class="mock-hk-pill mock-hk-own">⌂ 2× im Lager · Set Fixit ▾</span></div>
+    <div class="mock-hk-body" style="margin-top:14px"><div class="mock-hk-stage"><i class="mock-hk-item"></i><div class="mock-hk-lab l"><span>VISIER</span><span>MAGAZIN 40</span></div><div class="mock-hk-lab r"><span>LAUF</span><span>UNTERLAUF</span></div></div>
+      <aside class="mock-hk-panel"><div class="mock-hk-tabs"><span class="on">Einordnung</span><span>Werte</span><span>Bezug</span></div><div class="mock-hk-stats"><span><small>Schaden</small><b>14,4</b></span><span><small>Kadenz</small><b>550</b></span><span><small>Reichweite</small><b>60 m</b></span></div><i class="mock-hk-hex"></i></aside></div>
+    <div class="mock-hk-strip"><div style="--p:#e58f52"><small>Schaden</small><b>132 DPS</b></div><div style="--p:#52c1e6"><small>Handhabung</small><b>Rückstoß mittel</b></div><div style="--p:#7fe3c0"><small>Munition</small><b>40 / 280</b></div><div style="--p:#b49be6"><small>Bezug</small><b>3 Orte</b></div></div>
+    <button type="button" class="mock-hk-go up" data-screen-link="r1-d2-s1">← zurück zum Schiff</button>
+  </div></section>
+</section>
+
+<section data-design="d3" data-nav-label="Namensschild" hidden data-design-motto="Nur der Name hängt am Subheader" data-design-traits="Ein schmales Schild mit dem Namen hängt unter dem Subheader|Einsatz und Hangar liegen als Glas direkt auf der Bühne|Gescrollt bleibt nur das Schild, die Knöpfe scrollen mit" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;&gt;&lt;path d=&quot;M3 4h18M6 4v6h9V4&quot;/&gt;&lt;rect x=&quot;4&quot; y=&quot;14&quot; width=&quot;16&quot; height=&quot;6&quot; rx=&quot;2&quot;/&gt;&lt;/svg&gt;">
+  <section id="r1-d3-s1" data-nav-label="Schiff oben" data-screen data-screen-active="true" data-screen-fit="full"><div class="mock-hk mock-hk-d3">
+    <div class="mock-hk-sub"><i class="mock-hk-logo"></i><div class="mock-hk-brand"><b>VERSE COMPANION<i>ALPHA</i></b><span class="mock-hk-crumb">Codex › Schiffe › <em>Anvil Liberator</em></span></div><div class="mock-hk-search"><span>Anvil Liberator</span>Komponenten, Waffen, Schiffe …</div><i class="mock-hk-ic"></i><i class="mock-hk-ic"></i></div>
+    <div class="mock-hk-tag"><small>Anvil Aerospace</small><strong>LIBERATOR</strong></div>
+    <div class="mock-hk-body" style="margin-top:12px"><div class="mock-hk-stage"><div class="mock-hk-onstage"><span class="mock-hk-pill"><small>Einsatz</small><b>⌖ Kampf</b> 1 Schiffe ▾</span><span class="mock-hk-pill">⌂ 1× im Hangar · Codex-Loadout ▾</span></div><i class="mock-hk-ship"></i><div class="mock-hk-lab l"><span>LASERREPETIERER S2</span><span>RAKETENWERFER S4</span><span>FERNTURM S3</span><span>SCHILD S3</span></div><div class="mock-hk-lab r"><span>RAKETENWERFER S4</span><span>FERNTURM S5</span><span>KÜHLER S3</span></div></div>
+      <aside class="mock-hk-panel"><div class="mock-hk-tabs"><span class="on">Einordnung</span><span>Bauteile</span><span>Änderungen</span></div><div class="mock-hk-stats"><span><small>Crew</small><b>2</b></span><span><small>Masse</small><b>4.151 t</b></span><span><small>Laderaum</small><b>400 SCU</b></span></div><i class="mock-hk-hex"></i></aside></div>
+    <div class="mock-hk-strip"><div style="--p:#e58f52"><small>Offensive</small><b>390,98</b></div><div style="--p:#52c1e6"><small>Verteidigung</small><b>211.200</b></div><div style="--p:#7fe3c0"><small>Bewegung</small><b>270 m/s</b></div><div style="--p:#b49be6"><small>Signatur</small><b>9,3 km</b></div></div>
+    <button type="button" class="mock-hk-go" data-screen-link="r1-d3-s2">↓ nach unten scrollen</button>
+    <button type="button" class="mock-hk-go item" data-screen-link="r1-d3-s3">P4-AR ansehen</button>
+    <div class="anno-layer" data-anno-layer>
+      <div class="anno" data-anno="r1-d3-s1-a1" data-anno-side="bottom" data-anno-target=".mock-hk-onstage" style="--anno-x:55%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="r1-d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r1-d3-s1-a1" data-anno-bubble="r1-d3-s1-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s1-a1"><span class="anno-bubble-question">Einsatz und Hangar liegen hier auf der Bühne selbst, also über dem Hologramm-Raster. Stört dich das am Modell?</span></button>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d3-s1-a1" data-annotation="r1-d3-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d3-s1-a1"></div></div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+  <section id="r1-d3-s2" data-nav-label="Schiff gescrollt" data-screen hidden data-screen-fit="full"><div class="mock-hk mock-hk-d3 mock-hk-scrolled">
+    <div class="mock-hk-sub"><i class="mock-hk-logo"></i><div class="mock-hk-brand"><b>VERSE COMPANION<i>ALPHA</i></b><span class="mock-hk-crumb">Codex › Schiffe › <em>Anvil Liberator</em></span></div><div class="mock-hk-search"><span>Anvil Liberator</span>Komponenten, Waffen, Schiffe …</div><i class="mock-hk-ic"></i><i class="mock-hk-ic"></i></div>
+    <div class="mock-hk-tag slim"><strong>LIBERATOR</strong></div>
+    <div class="mock-hk-body" style="margin-top:12px"><div class="mock-hk-stage"><i class="mock-hk-ship" style="top:30%"></i><div class="mock-hk-lab l" style="top:4%"><span>SCHILD S3</span><span>LEBENSERHALTUNG S3</span></div></div>
+      <aside class="mock-hk-panel"><div class="mock-hk-tabs"><span>Einordnung</span><span class="on">Bauteile</span><span>Änderungen</span></div><div class="mock-hk-row"><span>Hersteller</span>Anvil Aerospace</div><div class="mock-hk-row"><span>Verbaut in</span>Anvil Liberator</div></aside></div>
+    <div class="mock-hk-strip"><div style="--p:#e58f52"><small>Offensive</small><b>390,98</b></div><div style="--p:#52c1e6"><small>Verteidigung</small><b>211.200</b></div><div style="--p:#7fe3c0"><small>Bewegung</small><b>270 m/s</b></div><div style="--p:#b49be6"><small>Signatur</small><b>9,3 km</b></div></div>
+    <button type="button" class="mock-hk-go up" data-screen-link="r1-d3-s1">↑ nach oben</button>
+  </div></section>
+  <section id="r1-d3-s3" data-nav-label="P4-AR (Gegenstand)" data-screen hidden data-screen-fit="full"><div class="mock-hk mock-hk-d3 mock-hk-it">
+    <div class="mock-hk-sub"><i class="mock-hk-logo"></i><div class="mock-hk-brand"><b>VERSE COMPANION<i>ALPHA</i></b><span class="mock-hk-crumb">Codex › FPS-Waffen › <em>P4-AR</em></span></div><div class="mock-hk-search"><span>P4-AR</span>Suchen …</div><i class="mock-hk-ic"></i><i class="mock-hk-ic"></i></div>
+    <div class="mock-hk-tag"><small>Behring · Sturmgewehr</small><strong>P4-AR</strong></div>
+    <div class="mock-hk-body" style="margin-top:12px"><div class="mock-hk-stage"><div class="mock-hk-onstage"><span class="mock-hk-pill"><small>Einsatz</small><b>⌖ Nahkampf</b> 31 Waffen ▾</span><span class="mock-hk-pill">⌂ 2× im Lager · Set Fixit ▾</span></div><i class="mock-hk-item"></i><div class="mock-hk-lab l"><span>VISIER</span><span>MAGAZIN 40</span></div><div class="mock-hk-lab r"><span>LAUF</span><span>UNTERLAUF</span></div></div>
+      <aside class="mock-hk-panel"><div class="mock-hk-tabs"><span class="on">Einordnung</span><span>Werte</span><span>Bezug</span></div><div class="mock-hk-stats"><span><small>Schaden</small><b>14,4</b></span><span><small>Kadenz</small><b>550</b></span><span><small>Reichweite</small><b>60 m</b></span></div><i class="mock-hk-hex"></i></aside></div>
+    <div class="mock-hk-strip"><div style="--p:#e58f52"><small>Schaden</small><b>132 DPS</b></div><div style="--p:#52c1e6"><small>Handhabung</small><b>Rückstoß mittel</b></div><div style="--p:#7fe3c0"><small>Munition</small><b>40 / 280</b></div><div style="--p:#b49be6"><small>Bezug</small><b>3 Orte</b></div></div>
+    <button type="button" class="mock-hk-go up" data-screen-link="r1-d3-s1">← zurück zum Schiff</button>
+  </div></section>
+</section>
+
+<section data-view="r1-analyse" data-view-kind="analysis" data-analysis="full" data-nav-label="Analyse" hidden>
+  <section id="r1-briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>Sechs Notizen: Notiz #4 läuft schon als eigene Backlog-Session, die anderen fünf landen hier in einem Plan mit vier Bündeln.</p>
+    <p data-briefing-why>Offen sind nur Kopf und gemeinsame Vorlage. Lücke, HQ-Pfad und Sternenhimmel haben einen klaren Vorschlag, den du nur bestätigst.</p>
+    <div data-briefing-potential data-viz="kpi" data-viz-spec='{"value":"3","unit":"Vorlagen","label":"getrennte Wege für Detailseiten heute"}'>3 Vorlagen</div>
+    <a data-briefing-topic="r1-t-vorlage" data-share="65">Eine Vorlage für alle Gegenstände</a>
+    <a data-briefing-topic="r1-t-klein" data-share="35">Lücke, HQ-Pfad, Wünsche</a>
+    <p data-briefing-duration>≈ 7 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><p>Sieben Fragen in drei Themen, jede mit Empfehlung. Den Kopf entscheidest du an den drei Varianten.</p></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Schiff (Holotisch)","value":1},{"label":"Gegenstand Beta","value":1},{"label":"Klassisch","value":1}],"unit":"Vorlage","hl":"Gegenstand Beta"}'></div>
+        <div data-example><pre>Abdeckung
+#1 übernommen          Lücke zwischen Ansichten-Leiste und KPI-Strip   → B2
+#2 übernommen          Holotisch-Kopf sticky am Subheader (Concept)    → B1
+#3 zusammengeführt #2  eine Detail-Vorlage für alle Gegenstandstypen  → B1
+#4 Skill-Auftrag       do-run backlog, läuft als eigene Session „devops backlog abarbeiten“
+#5 übernommen          HQ-Brotkrumen fehlen                           → B3
+#6 übernommen          Sternenhimmel als Panel-Hintergrund            → B4
+
+Bündel (parallel, keine gemeinsame Datei)
+B1 Kopf + Vorlage   codex-detail, holo-stage (Kopf), item-stage, holo-table
+B2 Lücke            holo-strip, holo-perspectives (nach B1, falls die Stage mit muss)
+B3 HQ-Pfad          hq-page-bar + i18n
+B4 Wünsche          wish-sky, wish-empty, merkliste, wish-cart-dialog</pre></div>
+        <p>#3 ist machbar, aber der größte Brocken: Schiffe laufen über den Holotisch, Beta-Gegenstände über ein eigenes Layout in <code>codex-detail.component.ts:380–454</code>, alles andere über <code>sc-codex-detail-classic</code>. Ich schneide ihn als eigene Etappe im Bau, nicht in einem Zug mit dem Kopf.</p>
+        <p>Geprüft im Code von <code>codex-detail.component.ts</code> (5.455 Zeilen), <code>codex-holo-stage.component.ts</code>, <code>hq-page-bar.component.ts</code> und <code>wish-empty.component.ts</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="r1-t-vorlage" data-topic data-nav-label="Eine Vorlage für alles">
+    <div data-alevel="2" data-title="Eine Vorlage für alle Gegenstände">
+      <div data-slot="short"><p>Heute erbt die P4-AR keine einzige Verbesserung des Schiffs-Holotischs, weil sie ein eigenes Layout hat.</p></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Kopf","value":2},{"label":"Panel mit Reitern","value":2},{"label":"Bühne","value":2},{"label":"Strip unten","value":1}],"unit":"Umsetzungen","hl":"Kopf"}'></div>
+        <p>Kopf, Panel und Bühne gibt es doppelt, den Strip nur am Schiff. Jede Änderung am Schiff muss heute für Gegenstände ein zweites Mal gebaut werden.</p>
+      </div>
+    </div>
+
+    <section id="r1-tpl" data-nav-label="Aufbau der Vorlage" data-decision="r1-tpl" data-ui-ok="Architektur der Detailseiten, nicht die Kopf-Varianten" data-decision-mode="single" data-label="Aufbau der Vorlage" data-rec="shell" data-rec-why="Neues am Schiff kommt dann von selbst bei allen Gegenständen an, weil Kopf, Panel und Strip nur noch einmal existieren und nur der Inhalt je Typ wechselt." data-applies-to="alle Codex-Detailseiten in der Beta">
+      <p data-applies>Gilt für: alle Codex-Detailseiten in der Beta</p>
+      <p data-situation>Schiff und Gegenstände haben getrennte Layouts, deshalb kommt keine Verbesserung am Holotisch bei der P4-AR an.</p>
+      <h3 data-question>Wie wird die eine Vorlage gebaut?</h3>
+      <p data-stakes>Wie viel umgebaut wird und was künftig automatisch mitwandert.</p>
+      <div data-options>
+        <label data-opt="shell" data-recommended><input type="radio" name="dm-r1-tpl" value="shell" checked><span data-opt-label>Eine Detail-Hülle mit Typ-Profil</span><span data-opt-consequence>Kopf, Bühne, Panel und Strip einmal; ein Profil je Typ sagt, welche Bühne, welche Reiter und welche Strip-Werte. Größter Umbau, danach erbt alles.</span></label><label data-opt="stage"><input type="radio" name="dm-r1-tpl" value="stage"><span data-opt-label>Holotisch verallgemeinern, Gegenstände hineinrendern</span><span data-opt-consequence>Schneller Start; der Holotisch trägt dann viele Schiffs-Sonderfälle mit Abfragen auf den Typ.</span></label><label data-opt="parts"><input type="radio" name="dm-r1-tpl" value="parts"><span data-opt-label>Zwei Layouts behalten, nur Bausteine teilen</span><span data-opt-consequence>Kleinster Umbau; neue Bausteine müssen weiter zweimal eingehängt werden. Erfüllt „ein Template“ nicht.</span></label>
+      </div>
+      <textarea data-comment="r1-tpl-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Aufbau der Vorlage">
+        <div data-slot="short"><p>Das Typ-Profil ist die eine Stelle, an der sich Gegenstände unterscheiden.</p></div>
+        <div data-slot="long"><div data-example><pre>Profil „Schiff“     Bühne 3D/Schema · Reiter Einordnung, Bauteile, Änderungen · Strip 4 Bereiche
+Profil „FPS-Waffe“  Bühne 3D/Bild    · Reiter Einordnung, Werte, Bezug     · Strip Schaden, Handhabung, Munition, Bezug
+Profil „einfach“    Bühne Bild klein · Reiter Werte, Bezug                 · kein Strip</pre></div></div>
+      </div>
+    </section>
+
+    <section id="r1-tabs" data-nav-label="Reiter für Gegenstände" data-decision="r1-tabs" data-decision-mode="multi" data-label="Reiter für Gegenstände" data-rec="werte bezug verbaut aenderungen" data-rec-why="Diese vier gibt es für fast jeden Gegenstand schon als Daten, weil der Uploader Werte, Bezugsorte, Verbauorte und Patch-Änderungen liefert." data-applies-to="Panel rechts bei Nicht-Schiffen">
+      <p data-applies>Gilt für: Panel rechts bei Nicht-Schiffen</p>
+      <p data-situation>„Bauteile“ ergibt bei einer Waffe oder einem Rucksack keinen Sinn; du hast offen gelassen, was dort stattdessen steht.</p>
+      <h3 data-question>Welche Reiter bekommt ein Gegenstand statt „Bauteile“?</h3>
+      <p data-stakes>Was im Panel neben „Einordnung“ steht.</p>
+      <div data-options>
+        <label data-opt="werte" data-recommended><input type="checkbox" name="dm-r1-tabs.werte" checked><span data-opt-label>Werte</span><span data-opt-consequence>Alle Kennzahlen des Gegenstands, gruppiert.</span></label><label data-opt="bezug" data-recommended><input type="checkbox" name="dm-r1-tabs.bezug" checked><span data-opt-label>Bezug</span><span data-opt-consequence>Wo kaufen, mit Wunschliste.</span></label><label data-opt="verbaut" data-recommended><input type="checkbox" name="dm-r1-tabs.verbaut" checked><span data-opt-label>Verbaut in</span><span data-opt-consequence>Bei Bauteilen und Waffen: welche Schiffe oder Sets sie tragen.</span></label><label data-opt="aenderungen" data-recommended><input type="checkbox" name="dm-r1-tabs.aenderungen" checked><span data-opt-label>Änderungen</span><span data-opt-consequence>Patch-Unterschiede wie am Schiff.</span></label><label data-opt="rezept"><input type="checkbox" name="dm-r1-tabs.rezept"><span data-opt-label>Herstellung</span><span data-opt-consequence>Rezept und Rohstoffe, nur wo es eins gibt.</span></label><label data-opt="aufsaetze"><input type="checkbox" name="dm-r1-tabs.aufsaetze"><span data-opt-label>Aufsätze</span><span data-opt-consequence>Visier, Lauf, Magazin bei Waffen, als Gegenstück zu „Bauteile“.</span></label>
+      </div>
+      <textarea data-comment="r1-tabs-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Reiter für Gegenstände">
+        <div data-slot="short"><p>Ein Reiter ohne Daten wird bei dem Gegenstand nicht gezeigt.</p></div>
+        <div data-slot="long"><p>Heute zeigt das Beta-Panel der Gegenstände eigene Reiter aus <code>itemTabs()</code>; die wandern ins Typ-Profil.</p><div data-example><pre>P4-AR      Einordnung · Werte · Bezug · Verbaut in · Änderungen
+Rucksack   Werte · Bezug
+Eisen      Werte · Bezug</pre></div></div>
+      </div>
+    </section>
+
+    <section id="r1-simple" data-nav-label="Einfache Gegenstände" data-decision="r1-simple" data-decision-mode="single" data-label="Einfache Gegenstände" data-rec="compact" data-rec-why="Eisen, Rucksack oder Wasser haben kaum Werte; eine kleine Bühne verhindert eine große leere Fläche, weil der Platz an Werte und Bezug geht." data-applies-to="Gegenstände mit wenig Daten">
+      <p data-applies>Gilt für: Gegenstände mit wenig Daten (Eisen, Rucksack, Wasser)</p>
+      <p data-situation>Eine volle Holotisch-Bühne mit Strip wirkt bei einem Stück Eisen leer.</p>
+      <h3 data-question>Wie sieht ein einfacher Gegenstand in der Vorlage aus?</h3>
+      <p data-stakes>Ob einfache Seiten leer oder aufgeräumt wirken.</p>
+      <div data-options>
+        <label data-opt="compact" data-recommended><input type="radio" name="dm-r1-simple" value="compact" checked><span data-opt-label>Kleine Bühne, Panel daneben breiter, kein Strip</span><span data-opt-consequence>Gleicher Kopf und gleiche Reiter wie überall, die Seite schrumpft auf das, was da ist.</span></label><label data-opt="full"><input type="radio" name="dm-r1-simple" value="full"><span data-opt-label>Immer die volle Bühne</span><span data-opt-consequence>Alle Seiten gleich hoch; einfache Gegenstände zeigen viel Raster.</span></label><label data-opt="card"><input type="radio" name="dm-r1-simple" value="card"><span data-opt-label>Nur Kopf und eine Karte, keine Bühne</span><span data-opt-consequence>Sehr ruhig; bricht mit dem Holotisch-Gefühl.</span></label>
+      </div>
+      <textarea data-comment="r1-simple-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Einfache Gegenstände">
+        <div data-slot="short"><p>Die Schwelle legt das Typ-Profil fest, nicht jede Seite selbst.</p></div>
+        <div data-slot="long"><p>Fehlt ein Wert, steht wie überall „—“, nie 0 oder eine Schätzung.</p><div data-example><pre>Kopf      Rohstoff · EISEN                    ⌂ 120 SCU im Lager ▾
+Bühne     kleines Bild        Panel  Werte | Bezug
+                                     Dichte 7,9 · Wert je SCU —</pre></div></div>
+      </div>
+    </section>
+
+    <section id="r1-order" data-nav-label="Reihenfolge" data-decision="r1-order" data-decision-mode="single" data-label="Reihenfolge" data-rec="together" data-rec-why="Der neue Kopf wird dann gleich das erste gemeinsame Teil der Vorlage, weil er sonst zweimal gebaut wird." data-applies-to="Bündel B1"><input type="hidden" name="dm-r1-order-hes" value="{&quot;ms&quot;:16454,&quot;revisits&quot;:0,&quot;median&quot;:14439}">
+      <p data-applies>Gilt für: Bündel B1</p>
+      <p data-situation>Kopf (#2) und Vorlage (#3) berühren dieselbe Datei.</p>
+      <h3 data-question>In welcher Reihenfolge wird gebaut?</h3>
+      <p data-stakes>Ob der Kopf früher sichtbar wird oder nur einmal gebaut wird.</p>
+      <div data-options>
+        <label data-opt="together" data-recommended><input type="radio" name="dm-r1-order" value="together" checked><span data-opt-label>Gerüst der Vorlage zuerst, der Kopf als erstes gemeinsames Teil</span><span data-opt-consequence>Der Kopf kommt bei Schiff und P4-AR gleichzeitig; dauert länger bis zum ersten Ergebnis.</span></label><label data-opt="head"><input type="radio" name="dm-r1-order" value="head"><span data-opt-label>Erst der Kopf am Schiff, dann die Vorlage</span><span data-opt-consequence>Kopf schnell sichtbar; er wird beim Umbau der Vorlage noch einmal umgezogen.</span></label>
+      </div>
+      <textarea data-comment="r1-order-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Reihenfolge">
+        <div data-slot="short"><p>Beides endet im selben Zustand.</p></div>
+        <div data-slot="long"><p>Analytik für beide Teile: <code>codex:detail_tab_select { kind, tab }</code> für die Reiter, Kachel in der Nutzung-Übersicht.</p><div data-example><pre>Gemeinsam   Woche 1  Gerüst + Kopf  → Schiff und P4-AR zugleich
+Kopf zuerst Woche 1  Kopf am Schiff  → Woche 2 Gerüst, Kopf zieht um</pre></div></div>
+      </div>
+    </section>
+  </section>
+
+  <section id="r1-t-klein" data-topic data-nav-label="Lücke, HQ-Pfad, Wünsche">
+    <div data-alevel="2" data-title="Lücke, HQ-Pfad, Wünsche">
+      <div data-slot="short"><p>Drei kleine Punkte mit klarer Ursache; du bestätigst nur.</p></div>
+      <div data-slot="long"><p>Jeder Punkt ist ein eigenes Bündel und läuft parallel zum Kopf.</p></div>
+    </div>
+
+    <section id="r1-gap" data-nav-label="Lücke im Holotisch" data-decision="r1-gap" data-ui-ok="Unterer Rand des Holotischs, nicht Teil der Kopf-Varianten" data-decision-mode="yesnoalt" data-label="Lücke im Holotisch" data-rec="yes" data-rec-why="Strip und Leiste gehören zusammen, weil der Strip die Werte der darüber gewählten Ansicht zeigt." data-applies-to="Schiffs-Holotisch, unterer Rand (Notiz #1)"><input type="hidden" name="dm-r1-gap-hes" value="{&quot;ms&quot;:3592,&quot;revisits&quot;:0,&quot;median&quot;:14439}">
+      <p data-applies>Gilt für: Schiffs-Holotisch, unterer Rand (Notiz #1)</p>
+      <p data-situation>Zwischen der Ansichten-Leiste (Akte · 3D · Einfach …) und dem KPI-Strip klafft über die ganze Breite ein leerer Streifen; links hängt ein kleiner Tab-Ansatz am Strip.</p>
+      <h3 data-question>Soll der Strip bündig an die Leiste anschließen?</h3>
+      <p data-stakes>Ob der untere Rand als eine Einheit liest.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-gap" value="yes" checked><span data-opt-label>Ja, bündig ohne Streifen, Tab-Ansatz weg</span><span data-opt-consequence>Ursache wird im echten Layout gemessen (Abstand über dem Strip in <code>codex-holo-stage.component.ts:1047</code> oder am Strip selbst).</span></label><label data-opt="no"><input type="radio" name="dm-r1-gap" value="no"><span data-opt-label>Nein, Abstand lassen</span><span data-opt-consequence>Bleibt wie heute.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-gap" value="alt"><span data-opt-label>Anders …</span><input type="text" name="dm-r1-gap-alt" placeholder="Wie stattdessen?" value=""></label>
+      </div>
+      <textarea data-comment="r1-gap-note" placeholder="Notiz (optional)"></textarea>
+    </section>
+
+    <section id="r1-crumb" data-nav-label="HQ-Pfad" data-decision="r1-crumb" data-decision-mode="yesnoalt" data-label="HQ-Pfad" data-rec="yes" data-rec-why="Im HQ fehlt der Pfad nur, weil die HQ-Seitenleiste ihn nicht an den Subheader meldet; alle anderen Bereiche tun das schon." data-applies-to="alle HQ-Seiten (Notiz #5)"><input type="hidden" name="dm-r1-crumb-hes" value="{&quot;ms&quot;:13849,&quot;revisits&quot;:1,&quot;median&quot;:14439}">
+      <p data-applies>Gilt für: alle HQ-Seiten (Notiz #5)</p>
+      <p data-situation>Auf /hq#inventar steht unter VERSE COMPANION nur „HQ“, weil <code>sc-hq-page-bar</code> keine Brotkrumen veröffentlicht.</p>
+      <h3 data-question>Soll das HQ den vollen Pfad zeigen, z. B. „HQ › Lager › Inventar“?</h3>
+      <p data-stakes>Ob man im HQ sieht, wo man ist.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-crumb" value="yes" checked><span data-opt-label>Ja, HQ › Bereich › Seite, jeder Teil ein echter Link</span><span data-opt-consequence>Gilt für Inventar, Hangar, Sammlungen und Lager-Einträge.</span></label><label data-opt="no"><input type="radio" name="dm-r1-crumb" value="no"><span data-opt-label>Nein, nur „HQ“</span><span data-opt-consequence>Bleibt wie heute.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-crumb" value="alt"><span data-opt-label>Anders …</span><input type="text" name="dm-r1-crumb-alt" placeholder="Wie stattdessen?" value=""></label>
+      </div>
+      <textarea data-comment="r1-crumb-note" placeholder="Notiz (optional)"></textarea>
+    </section>
+
+    <section id="r1-wish" data-nav-label="Sternenhimmel" data-decision="r1-wish" data-ui-ok="Wünsche-Panel, eine andere Fläche als die Kopf-Varianten" data-decision-mode="yesnoalt" data-label="Sternenhimmel" data-rec="yes" data-rec-why="Das Panel wird im Leerzustand rund 130 px niedriger und sieht im Popout und im Wunschlisten-Dialog gleich aus, weil derselbe Leerzustand an beiden Stellen hängt." data-applies-to="Wünsche-Popout und Wunschlisten-Dialog (Notiz #6)"><input type="hidden" name="dm-r1-wish-hes" value="{&quot;ms&quot;:15029,&quot;revisits&quot;:1,&quot;median&quot;:14439}">
+      <p data-applies>Gilt für: Wünsche-Popout und Wunschlisten-Dialog (Notiz #6)</p>
+      <p data-situation>Der Sternenhimmel mit Sternschnuppe ist ein eigener gerahmter Kasten über „Wünsch dir was“.</p>
+      <h3 data-question>Soll der Sternenhimmel zum Hintergrund des ganzen Panels werden, an beiden Stellen?</h3>
+      <p data-stakes>Höhe und Ruhe des leeren Panels.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-wish" value="yes" checked><span data-opt-label>Ja, Sterne und Sternschnuppe hinter Text und Knopf</span><span data-opt-consequence>Kein Kasten mehr; Text bleibt lesbar, Bewegung ruht bei „weniger Bewegung“.</span></label><label data-opt="no"><input type="radio" name="dm-r1-wish" value="no"><span data-opt-label>Nein, Kasten behalten</span><span data-opt-consequence>Bleibt wie heute.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-wish" value="alt"><span data-opt-label>Anders …</span><input type="text" name="dm-r1-wish-alt" placeholder="Wie stattdessen?" value=""></label>
+      </div>
+      <textarea data-comment="r1-wish-note" placeholder="Notiz (optional)"></textarea>
+    </section>
+  </section>
+</section>
+</section>

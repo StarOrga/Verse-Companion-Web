@@ -4,7 +4,7 @@ import { WishEmptyComponent } from './wish-empty.component';
 import { WISH_SKY_DOTS, WishSkyComponent } from './wish-sky.component';
 
 describe('WishSkyComponent', () => {
-  function mount(variant?: 'hero' | 'strip') {
+  function mount(variant?: 'hero' | 'strip' | 'backdrop') {
     const fixture = TestBed.createComponent(WishSkyComponent);
     if (variant) fixture.componentRef.setInput('variant', variant);
     fixture.detectChanges();
@@ -28,6 +28,14 @@ describe('WishSkyComponent', () => {
     const strip = mount('strip');
     expect(strip.host.getAttribute('data-variant')).toBe('strip');
     expect(strip.host.getBoundingClientRect().height).toBe(84);
+  });
+
+  it('as the backdrop it fills its positioned host without a frame of its own (batch note #6)', () => {
+    const { host } = mount('backdrop');
+    const css = getComputedStyle(host);
+    expect(css.position).toBe('absolute');
+    expect(css.pointerEvents).toBe('none');
+    expect(getComputedStyle(host.querySelector('.sky')!).borderTopWidth).toBe('0px');
   });
 
   it('moves with the concept timings: dots 3.2 s ease-in-out, streaks 5 s ease-in, the second 2.6 s late', () => {
@@ -63,5 +71,64 @@ describe('WishEmptyComponent', () => {
     expect(go.textContent).toContain('cart.emptyAction');
     go.click();
     expect(search).toHaveBeenCalledTimes(1);
+  });
+
+  it('MEASURED: the sky is a frameless backdrop behind the text, and the empty state is shorter than the old 136 px box + text (oq-wish-empty)', () => {
+    TestBed.configureTestingModule({ providers: [provideTranslateService({})] });
+    const fixture = TestBed.createComponent(WishEmptyComponent);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    document.body.appendChild(el);
+    try {
+      const we = el.querySelector<HTMLElement>('.we')!;
+      const skyHost = el.querySelector<HTMLElement>('sc-wish-sky')!;
+      const sky = skyHost.querySelector<HTMLElement>('.sky')!;
+      const wr = we.getBoundingClientRect();
+      const sr = skyHost.getBoundingClientRect();
+      // (a) absolutely positioned, fills the empty state, does not catch clicks, content stacks above it
+      expect(getComputedStyle(skyHost).position).toBe('absolute');
+      expect(getComputedStyle(skyHost).pointerEvents).toBe('none');
+      expect(Math.abs(sr.width - wr.width)).toBeLessThanOrEqual(1);
+      expect(Math.abs(sr.height - wr.height)).toBeLessThanOrEqual(1);
+      expect(Number(getComputedStyle(skyHost).zIndex)).toBe(0);
+      for (const c of Array.from(we.children).filter((c) => c !== skyHost)) {
+        const cs = getComputedStyle(c);
+        expect(cs.position).toBe('relative');
+        expect(Number(cs.zIndex)).toBeGreaterThan(0);
+      }
+      // (b) no frame
+      const ss = getComputedStyle(sky);
+      expect(ss.borderTopWidth).toBe('0px');
+      expect(ss.borderBottomWidth).toBe('0px');
+      expect(ss.boxShadow).toBe('none');
+      expect(getComputedStyle(skyHost).boxShadow).toBe('none');
+      // (c) the sky takes no room: the height is the text block alone, below text + the old 136 px box + its 10 px gap
+      const textBlock = Array.from(we.children).filter((c) => c !== skyHost).reduce((h, c) => h + c.getBoundingClientRect().height, 0);
+      expect(wr.height).toBeLessThan(textBlock + 136 + 10);
+      expect(wr.height).toBeLessThan(textBlock + 60);
+    } finally {
+      el.remove();
+    }
+  });
+
+  it('under prefers-reduced-motion the dots stop and the shooting stars are dropped (the media rule is shipped)', () => {
+    TestBed.configureTestingModule({ providers: [provideTranslateService({})] });
+    const fixture = TestBed.createComponent(WishSkyComponent);
+    fixture.componentRef.setInput('variant', 'backdrop');
+    fixture.detectChanges();
+    const rules: CSSStyleRule[] = [];
+    for (const sheet of Array.from(document.styleSheets)) {
+      for (const r of Array.from(sheet.cssRules)) {
+        if (r instanceof CSSMediaRule && r.conditionText.includes('prefers-reduced-motion')) {
+          for (const inner of Array.from(r.cssRules)) if (inner instanceof CSSStyleRule) rules.push(inner);
+        }
+      }
+    }
+    const shoot = rules.find((r) => r.selectorText.startsWith('.shoot'));
+    const dot = rules.find((r) => r.selectorText.startsWith('.dot'));
+    expect(shoot, 'a reduced-motion rule for .shoot exists').toBeDefined();
+    expect(shoot!.style.animationName).toBe('none');
+    expect(shoot!.style.display).toBe('none');
+    expect(dot!.style.animationName).toBe('none');
   });
 });

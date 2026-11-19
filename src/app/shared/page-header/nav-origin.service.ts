@@ -14,6 +14,8 @@ export interface PageCrumb {
   /** routerLink target — a path string or command array. */
   link: string | readonly unknown[];
   queryParams?: Params | null;
+  /** Fragment of the link (a page of a scrolling landing, e.g. `/hq#inventar`). */
+  fragment?: string | null;
 }
 
 /** The first crumb of every Codex page. */

@@ -14,7 +14,7 @@ export const WISH_SKY_DOTS: readonly WishSkyDot[] = [
 
 /**
  * `<sc-wish-sky>` - the night sky of the wishes: ten twinkling dots and two shooting stars, purely decorative
- * (`aria-hidden`). `variant="hero"` is the 136 px picture of the empty state, `variant="strip"` the 84 px strip above
+ * (`aria-hidden`). `variant="hero"` is the 136 px picture of the empty state, `variant="backdrop"` fills its positioned host behind the content (the empty state and the cart's top, batch note #6), `variant="strip"` the 84 px strip above
  * the groups of the large window. The sky is dark blues mixed from `--sc-accent` and `--sc-bg-0`, the stars neutral
  * white and the accent: no colour of its own. `prefers-reduced-motion: reduce` keeps the dots lit and drops the streaks.
  */
@@ -36,6 +36,16 @@ export const WISH_SKY_DOTS: readonly WishSkyDot[] = [
     `
       :host { display: block; position: relative; width: 100%; height: 136px; border-radius: 8px; overflow: hidden; }
       :host([data-variant='strip']) { height: 84px; }
+      /* Backdrop (batch note #6): the sky lies behind the panel content instead of standing as its own box. It fills
+         its positioned host, has no frame and fades out downwards so text and actions stay readable. */
+      :host([data-variant='backdrop']) { position: absolute; inset: 0; z-index: 0; width: auto; height: auto; border-radius: inherit; pointer-events: none; }
+      :host([data-variant='backdrop']) .sky {
+        border: 0; border-radius: inherit;
+        background: radial-gradient(ellipse 90% 70% at 78% 0, color-mix(in srgb, var(--sc-accent) 20%, transparent), transparent 72%);
+        -webkit-mask-image: linear-gradient(180deg, black 45%, transparent);
+        mask-image: linear-gradient(180deg, black 45%, transparent);
+      }
+      :host([data-variant='backdrop']) .dot { opacity: 0.5; }
       .sky {
         position: absolute; inset: 0; box-sizing: border-box; overflow: hidden; border-radius: 8px;
         border: 1px solid color-mix(in srgb, var(--sc-accent) 18%, transparent);
@@ -67,5 +77,5 @@ export const WISH_SKY_DOTS: readonly WishSkyDot[] = [
 })
 export class WishSkyComponent {
   protected readonly dots = WISH_SKY_DOTS;
-  readonly variant = input<'hero' | 'strip'>('hero');
+  readonly variant = input<'hero' | 'strip' | 'backdrop'>('hero');
 }
