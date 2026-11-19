@@ -275,7 +275,7 @@ export function buildShipFactGroups(
     {
       titleKey: 'codex.analysis.ship.mass',
       rows: [{ labelKey: 'codex.hull.equippedMass', value: num(mass, 'kg'), gapKey: 'codex.summary.gap.noEquipmentMass' }],
-      note: t('codex.analysis.ship.massEquipmentNote'),
+      tip: t('codex.analysis.ship.massEquipmentNote'),
     },
     {
       titleKey: 'codex.analysis.ship.systems',
@@ -306,8 +306,8 @@ export function buildShipFactGroups(
         // three for its single comparable cell (see crossSectionMax()).
         { labelKey: 'codex.kpi.crossSection', value: crossSectionAxesLabel, gapKey: 'codex.summary.gap.noSignature' },
       ],
-      // #967: IR and EM are our own model, never game values — the note says so.
-      note:
+      // #967: IR and EM are our own model, never game values — the tooltip says so (#375).
+      tip:
         [
           sheet.emIdle != null || sheet.emLoad != null || sheet.ir != null ? t('codex.kpi.modelNote') : null,
           crossSectionAxesLabel != null ? t('codex.analysis.ship.crossSectionNote') : null,
