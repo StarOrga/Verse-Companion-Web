@@ -2222,6 +2222,7 @@
       "nose": "Bug",
       "readoutIdle": "Kein Raum ausgewählt",
       "roomsAria": "Räume auf {{deck}}",
+      "derivedLabel": "Ebenen abgeleitet",
       "derivedHint": "Das Spiel benennt auf diesem Schiff keine Decks: die Ebenen sind nach Bodenhöhe abgeleitet. Treppen und Aufzüge stehen auf jeder Ebene, die sie verbinden.",
       "connects": "führt zu {{decks}}"
     },

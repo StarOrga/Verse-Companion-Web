@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.281.5",
+  "current": "0.281.6",
   "releases": [
+    {
+      "version": "0.281.6",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Classic ship view: explanatory notes such as the scale legend show as tooltips instead of written-out text."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.281.5",
       "date": "2026-11-19",

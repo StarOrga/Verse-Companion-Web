@@ -19,6 +19,7 @@ import {
 } from './codex-rank';
 import { ScSegmentedComponent, ScSegmentOption } from '../shared/segmented-control.component';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { HintTipComponent } from '../shared/hint-tip/hint-tip.component';
 import { formatNumber } from './codex-format';
 import { ScSelectComponent, ScSelectOption } from '../shared/sc-select.component';
 import { modelHintKey } from './codex-em-model';
@@ -94,7 +95,7 @@ function readShapePref(): 'hex' | 'bars' {
 @Component({
   selector: 'sc-codex-rank-card',
   standalone: true,
-  imports: [TranslatePipe, ScSegmentedComponent, ScTooltipDirective, ScSelectComponent],
+  imports: [TranslatePipe, ScSegmentedComponent, ScTooltipDirective, ScSelectComponent, HintTipComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.holo]': 'holo()', '[class.holo-text]': 'holoText()' },
   template: `
@@ -102,10 +103,14 @@ function readShapePref(): 'hex' | 'bars' {
       <div class="rank-head">
         <!-- On the Holotable the rail's own head already says it. -->
         @if (!holo()) {
-          <h2>
-            <span class="glyph" aria-hidden="true">◈</span>
-            {{ 'codex.rank.header' | translate }}
-          </h2>
+          <div class="rank-title">
+            <h2>
+              <span class="glyph" aria-hidden="true">◈</span>
+              {{ 'codex.rank.header' | translate }}
+            </h2>
+            <!-- What the comparison covers: a tooltip, not a written-out line (#375). -->
+            <sc-hint-tip class="lens-note" [text]="copy().note | translate" />
+          </div>
         }
         @if (result()) {
           <p class="cohort-line">
@@ -251,7 +256,8 @@ function readShapePref(): 'hex' | 'bars' {
                 <span class="sr-only">{{ 'codex.rank.rimNote' | translate }}</span>
               </span>
             } @else {
-              <p class="rim-note">{{ 'codex.rank.rimNote' | translate }}</p>
+              <!-- The classic card says it the Holotable's way too: "Skala ⓘ", the sentence in the tooltip (#375). -->
+              <sc-hint-tip class="rim-tip" [label]="'codex.rank.rimLabel' | translate" [text]="'codex.rank.rimNote' | translate" placement="below" />
             }
             @if (missionNoteKey(); as note) {
               <p class="rim-note">{{ note | translate }}</p>
@@ -341,9 +347,6 @@ function readShapePref(): 'hex' | 'bars' {
               </li>
             }
           </ul>
-          @if (!holo()) {
-            <p class="lens-note">{{ copy().note | translate }}</p>
-          }
         }
       </div>
     </section>
@@ -512,7 +515,8 @@ function readShapePref(): 'hex' | 'bars' {
     .gap-dash { color: var(--sc-fg-2); cursor: help; }
     /* The concept's own footnote under the bars: 10px, muted, upright — it is
        a caption, not an aside, so it carries no italic there. */
-    .lens-note { margin: 0; font-size: max(10px, var(--sc-fs-floor)); color: var(--sc-fg-2); }
+    .rank-title { display: flex; align-items: center; gap: 8px; }
+    .rim-tip { align-self: flex-start; }
 
     /* Touch: the radar labels are 6 user units in a 200-unit viewBox, i.e.
        6px at the desktop 210px column. On a coarse pointer the radar gets a
