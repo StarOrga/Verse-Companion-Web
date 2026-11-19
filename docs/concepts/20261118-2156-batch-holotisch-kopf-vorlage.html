@@ -2,7 +2,7 @@
      rewrites it on every tab switch. body overflow is set by that function,
      the inline style below is only the first-paint value. -->
 <!DOCTYPE html>
-<html lang="de" data-theme="dark" data-page-version="2026-11-18T20:56:05" data-template="design">
+<html lang="de" data-theme="dark" data-page-version="2026-11-18T20:56:05" data-template="free">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2796,7 +2796,8 @@ body.panel-open .upin-hint, body.panel-open .hk-pin-example { display: none !imp
    (same contract as the design notes' body[data-note-editing] rule). */
 body[data-note-editing="true"] .dpin-layer .upin:not([data-editing="true"]) .upin-pin { opacity: 0.35; animation: none; transition: opacity 0.15s ease; }
 .dpin-layer .upin[data-orphan="true"] .upin-pin { opacity: 0.6; }
-body.dpin-armed section[data-iteration][data-active] :is(p, li, tr) { cursor: crosshair; }
+body.dpin-armed section[data-iteration][data-active] :not(section, a, button, input, select, textarea, label, summary, .dpin-layer, .dpin-layer *, [data-analysis], [data-analysis] *) { cursor: crosshair; }
+body.dpin-armed section[data-iteration][data-active] [data-analysis] :is(p, li, tr, h2, h3, h4, label, [data-opt], [data-options], .an-kind, .an-msg) { cursor: crosshair; }
 body.anno-hidden .dpin-layer .upin:not([data-upin-fresh]), body.anno-hidden .dpin-hint { display: none !important; }
 .dpin-hint {
   position: fixed; left: 50%; bottom: 2rem; transform: translateX(-50%); z-index: 99;
@@ -5825,7 +5826,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
 }
 </style>
 </head>
-<body style="overflow: hidden">
+<body>
   <div class="concept-layout design fullscreen">
     <div class="concept-content">
       <header class="page-header" data-page-header>
@@ -5834,7 +5835,8 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
       </header>
       <style>html[data-template="design"] [data-page-header] { display: none; }</style>
       <main>
-<section data-iteration="1" data-iteration-template="design" data-tab-label="Runde 1" data-design-set="alternatives" id="iter-1" data-active>
+<section data-iteration="1" data-iteration-template="design" data-tab-label="Runde 1" data-design-set="alternatives" data-baked id="iter-1" hidden>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]},"designs":{},"screens":{},"views":{},"favorite":"d2","userPins":[{"id":"up-mwmm4nwvb91v","design":"d2","screen":"r1-d2-s1","x":52.2,"y":9.8,"target":"div.mock-hk-head \"Anvil AerospaceLIBERATOREinsatz⌖ Kampf 1\"","text":"gern dann  mitscrollen lassen","attachments":[]},{"id":"up-mwmm4xa5yrux","design":"d2","screen":"r1-d2-s1","x":52.9,"y":14.1,"target":"span.mock-hk-pill \"Einsatz⌖ Kampf 1 Schiffe ▾\"","text":"gern das hier auch mit einsatz... redesignenen, die leiste soll immer oben sein","attachments":[]},{"id":"up-mwmm5qnwtuw5","design":"d2","screen":"r1-d2-s1","x":93.5,"y":15.3,"target":"div.mock-hk-head \"Anvil AerospaceLIBERATOREinsatz⌖ Kampf 1\"","text":"das hangar auch redesignen.","attachments":[]},{"id":"up-mwmm6bhx9vy9","design":"d2","screen":"r1-d2-s2","x":27.5,"y":10.4,"target":"div.mock-hk-head.slim \"LIBERATORAnvil Aerospace⌖ Kampf ▾⌂ 1× im\"","text":"finde ich gut, dass die zeile kleiner wird, bitte visuell auch ggü. der unteren zeile unddem subehader sehen,d dass es in der höhe etc. sinnvoll passt","attachments":[]}]}</script>
 <style>
 .mock-hk { --hk-acc: #52c1e6; --hk-fg: #dff3fb; --hk-dim: #7ea4b6; --hk-bd: rgba(82,193,230,.28); --hk-glass: rgba(8,26,40,.72);
   position: relative; box-sizing: border-box; min-height: 700px; height: 100%; display: flex; flex-direction: column; gap: 0; padding: 18px 28px 0;
@@ -5933,7 +5935,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
         <button class="anno-pin" type="button" data-anno-pin="r1-d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s1-a1" aria-label="Frage {n}">1</button>
         <div class="anno-bubble" id="anno-bubble-r1-d1-s1-a1" data-anno-bubble="r1-d1-s1-a1" data-open="false">
           <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s1-a1"><span class="anno-bubble-question">Oben bleibt der Kopf ohne Kasten, nur eine feine Lichtlinie bindet ihn an den Subheader. Reicht das als Verbindung, oder fehlt dir da noch etwas?</span></button>
-          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-s1-a1" data-annotation="r1-d1-s1-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-s1-a1"></div></div>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-s1-a1" data-annotation="r1-d1-s1-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-s1-a1"></div></div>
         </div>
       </div>
     </div>
@@ -5949,7 +5951,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
         <button class="anno-pin" type="button" data-anno-pin="r1-d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s2-a1" aria-label="Frage {n}">1</button>
         <div class="anno-bubble" id="anno-bubble-r1-d1-s2-a1" data-anno-bubble="r1-d1-s2-a1" data-open="false">
           <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s2-a1"><span class="anno-bubble-question">Beim Scrollen teilen sich Suche, Einsatz und Hangar den Subheader, die Suche wird schmaler. Ist dir die Suche dort wichtiger als die beiden Knöpfe?</span></button>
-          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-s2-a1" data-annotation="r1-d1-s2-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-s2-a1"></div></div>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-s2-a1" data-annotation="r1-d1-s2-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-s2-a1"></div></div>
         </div>
       </div>
     </div>
@@ -5978,7 +5980,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
         <button class="anno-pin" type="button" data-anno-pin="r1-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a1" aria-label="Frage {n}">1</button>
         <div class="anno-bubble" id="anno-bubble-r1-d2-s1-a1" data-anno-bubble="r1-d2-s1-a1" data-open="false">
           <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a1"><span class="anno-bubble-question">Das Band ist halbtransparentes Glas ohne Oberkante, es wächst sichtbar aus dem Subheader heraus. Wirkt das noch leicht genug?</span></button>
-          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s1-a1" data-annotation="r1-d2-s1-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s1-a1"></div></div>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s1-a1" data-annotation="r1-d2-s1-a1" data-attachable placeholder="Deine Antwort…" readonly>joa, gern polishen!</textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s1-a1"></div></div>
         </div>
       </div>
     </div>
@@ -5995,7 +5997,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
         <button class="anno-pin" type="button" data-anno-pin="r1-d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s2-a1" aria-label="Frage {n}">1</button>
         <div class="anno-bubble" id="anno-bubble-r1-d2-s2-a1" data-anno-bubble="r1-d2-s2-a1" data-open="false">
           <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s2-a1"><span class="anno-bubble-question">Gescrollt kostet die Leiste eine Zeile (etwa 40 px) über dem Tisch. Ist das am Laptop noch in Ordnung?</span></button>
-          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s2-a1" data-annotation="r1-d2-s2-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s2-a1"></div></div>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s2-a1" data-annotation="r1-d2-s2-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s2-a1"></div></div>
         </div>
       </div>
     </div>
@@ -6024,7 +6026,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
         <button class="anno-pin" type="button" data-anno-pin="r1-d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s1-a1" aria-label="Frage {n}">1</button>
         <div class="anno-bubble" id="anno-bubble-r1-d3-s1-a1" data-anno-bubble="r1-d3-s1-a1" data-open="false">
           <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s1-a1"><span class="anno-bubble-question">Einsatz und Hangar liegen hier auf der Bühne selbst, also über dem Hologramm-Raster. Stört dich das am Modell?</span></button>
-          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d3-s1-a1" data-annotation="r1-d3-s1-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d3-s1-a1"></div></div>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d3-s1-a1" data-annotation="r1-d3-s1-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-r1-d3-s1-a1"></div></div>
         </div>
       </div>
     </div>
@@ -6093,9 +6095,9 @@ B4 Wünsche          wish-sky, wish-empty, merkliste, wish-cart-dialog</pre></di
       <h3 data-question>Wie wird die eine Vorlage gebaut?</h3>
       <p data-stakes>Wie viel umgebaut wird und was künftig automatisch mitwandert.</p>
       <div data-options>
-        <label data-opt="shell" data-recommended><input type="radio" name="dm-r1-tpl" value="shell" checked><span data-opt-label>Eine Detail-Hülle mit Typ-Profil</span><span data-opt-consequence>Kopf, Bühne, Panel und Strip einmal; ein Profil je Typ sagt, welche Bühne, welche Reiter und welche Strip-Werte. Größter Umbau, danach erbt alles.</span></label><label data-opt="stage"><input type="radio" name="dm-r1-tpl" value="stage"><span data-opt-label>Holotisch verallgemeinern, Gegenstände hineinrendern</span><span data-opt-consequence>Schneller Start; der Holotisch trägt dann viele Schiffs-Sonderfälle mit Abfragen auf den Typ.</span></label><label data-opt="parts"><input type="radio" name="dm-r1-tpl" value="parts"><span data-opt-label>Zwei Layouts behalten, nur Bausteine teilen</span><span data-opt-consequence>Kleinster Umbau; neue Bausteine müssen weiter zweimal eingehängt werden. Erfüllt „ein Template“ nicht.</span></label>
+        <label data-opt="shell" data-recommended><input type="radio" name="dm-r1-tpl" value="shell" checked disabled><span data-opt-label>Eine Detail-Hülle mit Typ-Profil</span><span data-opt-consequence>Kopf, Bühne, Panel und Strip einmal; ein Profil je Typ sagt, welche Bühne, welche Reiter und welche Strip-Werte. Größter Umbau, danach erbt alles.</span></label><label data-opt="stage"><input type="radio" name="dm-r1-tpl" value="stage" disabled><span data-opt-label>Holotisch verallgemeinern, Gegenstände hineinrendern</span><span data-opt-consequence>Schneller Start; der Holotisch trägt dann viele Schiffs-Sonderfälle mit Abfragen auf den Typ.</span></label><label data-opt="parts"><input type="radio" name="dm-r1-tpl" value="parts" disabled><span data-opt-label>Zwei Layouts behalten, nur Bausteine teilen</span><span data-opt-consequence>Kleinster Umbau; neue Bausteine müssen weiter zweimal eingehängt werden. Erfüllt „ein Template“ nicht.</span></label>
       </div>
-      <textarea data-comment="r1-tpl-note" placeholder="Notiz (optional)"></textarea>
+      <textarea data-comment="r1-tpl-note" placeholder="Notiz (optional)" readonly></textarea>
       <div data-alevel="3" data-title="Aufbau der Vorlage">
         <div data-slot="short"><p>Das Typ-Profil ist die eine Stelle, an der sich Gegenstände unterscheiden.</p></div>
         <div data-slot="long"><div data-example><pre>Profil „Schiff“     Bühne 3D/Schema · Reiter Einordnung, Bauteile, Änderungen · Strip 4 Bereiche
@@ -6110,9 +6112,9 @@ Profil „einfach“    Bühne Bild klein · Reiter Werte, Bezug                
       <h3 data-question>Welche Reiter bekommt ein Gegenstand statt „Bauteile“?</h3>
       <p data-stakes>Was im Panel neben „Einordnung“ steht.</p>
       <div data-options>
-        <label data-opt="werte" data-recommended><input type="checkbox" name="dm-r1-tabs.werte" checked><span data-opt-label>Werte</span><span data-opt-consequence>Alle Kennzahlen des Gegenstands, gruppiert.</span></label><label data-opt="bezug" data-recommended><input type="checkbox" name="dm-r1-tabs.bezug" checked><span data-opt-label>Bezug</span><span data-opt-consequence>Wo kaufen, mit Wunschliste.</span></label><label data-opt="verbaut" data-recommended><input type="checkbox" name="dm-r1-tabs.verbaut" checked><span data-opt-label>Verbaut in</span><span data-opt-consequence>Bei Bauteilen und Waffen: welche Schiffe oder Sets sie tragen.</span></label><label data-opt="aenderungen" data-recommended><input type="checkbox" name="dm-r1-tabs.aenderungen" checked><span data-opt-label>Änderungen</span><span data-opt-consequence>Patch-Unterschiede wie am Schiff.</span></label><label data-opt="rezept"><input type="checkbox" name="dm-r1-tabs.rezept"><span data-opt-label>Herstellung</span><span data-opt-consequence>Rezept und Rohstoffe, nur wo es eins gibt.</span></label><label data-opt="aufsaetze"><input type="checkbox" name="dm-r1-tabs.aufsaetze"><span data-opt-label>Aufsätze</span><span data-opt-consequence>Visier, Lauf, Magazin bei Waffen, als Gegenstück zu „Bauteile“.</span></label>
+        <label data-opt="werte" data-recommended><input type="checkbox" name="dm-r1-tabs.werte" checked disabled><span data-opt-label>Werte</span><span data-opt-consequence>Alle Kennzahlen des Gegenstands, gruppiert.</span></label><label data-opt="bezug" data-recommended><input type="checkbox" name="dm-r1-tabs.bezug" checked disabled><span data-opt-label>Bezug</span><span data-opt-consequence>Wo kaufen, mit Wunschliste.</span></label><label data-opt="verbaut" data-recommended><input type="checkbox" name="dm-r1-tabs.verbaut" checked disabled><span data-opt-label>Verbaut in</span><span data-opt-consequence>Bei Bauteilen und Waffen: welche Schiffe oder Sets sie tragen.</span></label><label data-opt="aenderungen" data-recommended><input type="checkbox" name="dm-r1-tabs.aenderungen" checked disabled><span data-opt-label>Änderungen</span><span data-opt-consequence>Patch-Unterschiede wie am Schiff.</span></label><label data-opt="rezept"><input type="checkbox" name="dm-r1-tabs.rezept" disabled><span data-opt-label>Herstellung</span><span data-opt-consequence>Rezept und Rohstoffe, nur wo es eins gibt.</span></label><label data-opt="aufsaetze"><input type="checkbox" name="dm-r1-tabs.aufsaetze" disabled><span data-opt-label>Aufsätze</span><span data-opt-consequence>Visier, Lauf, Magazin bei Waffen, als Gegenstück zu „Bauteile“.</span></label>
       </div>
-      <textarea data-comment="r1-tabs-note" placeholder="Notiz (optional)"></textarea>
+      <textarea data-comment="r1-tabs-note" placeholder="Notiz (optional)" readonly></textarea>
       <div data-alevel="3" data-title="Reiter für Gegenstände">
         <div data-slot="short"><p>Ein Reiter ohne Daten wird bei dem Gegenstand nicht gezeigt.</p></div>
         <div data-slot="long"><p>Heute zeigt das Beta-Panel der Gegenstände eigene Reiter aus <code>itemTabs()</code>; die wandern ins Typ-Profil.</p><div data-example><pre>P4-AR      Einordnung · Werte · Bezug · Verbaut in · Änderungen
@@ -6127,9 +6129,9 @@ Eisen      Werte · Bezug</pre></div></div>
       <h3 data-question>Wie sieht ein einfacher Gegenstand in der Vorlage aus?</h3>
       <p data-stakes>Ob einfache Seiten leer oder aufgeräumt wirken.</p>
       <div data-options>
-        <label data-opt="compact" data-recommended><input type="radio" name="dm-r1-simple" value="compact" checked><span data-opt-label>Kleine Bühne, Panel daneben breiter, kein Strip</span><span data-opt-consequence>Gleicher Kopf und gleiche Reiter wie überall, die Seite schrumpft auf das, was da ist.</span></label><label data-opt="full"><input type="radio" name="dm-r1-simple" value="full"><span data-opt-label>Immer die volle Bühne</span><span data-opt-consequence>Alle Seiten gleich hoch; einfache Gegenstände zeigen viel Raster.</span></label><label data-opt="card"><input type="radio" name="dm-r1-simple" value="card"><span data-opt-label>Nur Kopf und eine Karte, keine Bühne</span><span data-opt-consequence>Sehr ruhig; bricht mit dem Holotisch-Gefühl.</span></label>
+        <label data-opt="compact" data-recommended><input type="radio" name="dm-r1-simple" value="compact" checked disabled><span data-opt-label>Kleine Bühne, Panel daneben breiter, kein Strip</span><span data-opt-consequence>Gleicher Kopf und gleiche Reiter wie überall, die Seite schrumpft auf das, was da ist.</span></label><label data-opt="full"><input type="radio" name="dm-r1-simple" value="full" disabled><span data-opt-label>Immer die volle Bühne</span><span data-opt-consequence>Alle Seiten gleich hoch; einfache Gegenstände zeigen viel Raster.</span></label><label data-opt="card"><input type="radio" name="dm-r1-simple" value="card" disabled><span data-opt-label>Nur Kopf und eine Karte, keine Bühne</span><span data-opt-consequence>Sehr ruhig; bricht mit dem Holotisch-Gefühl.</span></label>
       </div>
-      <textarea data-comment="r1-simple-note" placeholder="Notiz (optional)"></textarea>
+      <textarea data-comment="r1-simple-note" placeholder="Notiz (optional)" readonly></textarea>
       <div data-alevel="3" data-title="Einfache Gegenstände">
         <div data-slot="short"><p>Die Schwelle legt das Typ-Profil fest, nicht jede Seite selbst.</p></div>
         <div data-slot="long"><p>Fehlt ein Wert, steht wie überall „—“, nie 0 oder eine Schätzung.</p><div data-example><pre>Kopf      Rohstoff · EISEN                    ⌂ 120 SCU im Lager ▾
@@ -6138,15 +6140,15 @@ Bühne     kleines Bild        Panel  Werte | Bezug
       </div>
     </section>
 
-    <section id="r1-order" data-nav-label="Reihenfolge" data-decision="r1-order" data-decision-mode="single" data-label="Reihenfolge" data-rec="together" data-rec-why="Der neue Kopf wird dann gleich das erste gemeinsame Teil der Vorlage, weil er sonst zweimal gebaut wird." data-applies-to="Bündel B1">
+    <section id="r1-order" data-nav-label="Reihenfolge" data-decision="r1-order" data-decision-mode="single" data-label="Reihenfolge" data-rec="together" data-rec-why="Der neue Kopf wird dann gleich das erste gemeinsame Teil der Vorlage, weil er sonst zweimal gebaut wird." data-applies-to="Bündel B1"><input type="hidden" name="dm-r1-order-hes" value="{&quot;ms&quot;:16454,&quot;revisits&quot;:0,&quot;median&quot;:14439}" disabled>
       <p data-applies>Gilt für: Bündel B1</p>
       <p data-situation>Kopf (#2) und Vorlage (#3) berühren dieselbe Datei.</p>
       <h3 data-question>In welcher Reihenfolge wird gebaut?</h3>
       <p data-stakes>Ob der Kopf früher sichtbar wird oder nur einmal gebaut wird.</p>
       <div data-options>
-        <label data-opt="together" data-recommended><input type="radio" name="dm-r1-order" value="together" checked><span data-opt-label>Gerüst der Vorlage zuerst, der Kopf als erstes gemeinsames Teil</span><span data-opt-consequence>Der Kopf kommt bei Schiff und P4-AR gleichzeitig; dauert länger bis zum ersten Ergebnis.</span></label><label data-opt="head"><input type="radio" name="dm-r1-order" value="head"><span data-opt-label>Erst der Kopf am Schiff, dann die Vorlage</span><span data-opt-consequence>Kopf schnell sichtbar; er wird beim Umbau der Vorlage noch einmal umgezogen.</span></label>
+        <label data-opt="together" data-recommended><input type="radio" name="dm-r1-order" value="together" checked disabled><span data-opt-label>Gerüst der Vorlage zuerst, der Kopf als erstes gemeinsames Teil</span><span data-opt-consequence>Der Kopf kommt bei Schiff und P4-AR gleichzeitig; dauert länger bis zum ersten Ergebnis.</span></label><label data-opt="head"><input type="radio" name="dm-r1-order" value="head" disabled><span data-opt-label>Erst der Kopf am Schiff, dann die Vorlage</span><span data-opt-consequence>Kopf schnell sichtbar; er wird beim Umbau der Vorlage noch einmal umgezogen.</span></label>
       </div>
-      <textarea data-comment="r1-order-note" placeholder="Notiz (optional)"></textarea>
+      <textarea data-comment="r1-order-note" placeholder="Notiz (optional)" readonly></textarea>
       <div data-alevel="3" data-title="Reihenfolge">
         <div data-slot="short"><p>Beides endet im selben Zustand.</p></div>
         <div data-slot="long"><p>Analytik für beide Teile: <code>codex:detail_tab_select { kind, tab }</code> für die Reiter, Kachel in der Nutzung-Übersicht.</p><div data-example><pre>Gemeinsam   Woche 1  Gerüst + Kopf  → Schiff und P4-AR zugleich
@@ -6161,40 +6163,162 @@ Kopf zuerst Woche 1  Kopf am Schiff  → Woche 2 Gerüst, Kopf zieht um</pre></d
       <div data-slot="long"><p>Jeder Punkt ist ein eigenes Bündel und läuft parallel zum Kopf.</p></div>
     </div>
 
-    <section id="r1-gap" data-nav-label="Lücke im Holotisch" data-decision="r1-gap" data-ui-ok="Unterer Rand des Holotischs, nicht Teil der Kopf-Varianten" data-decision-mode="yesnoalt" data-label="Lücke im Holotisch" data-rec="yes" data-rec-why="Strip und Leiste gehören zusammen, weil der Strip die Werte der darüber gewählten Ansicht zeigt." data-applies-to="Schiffs-Holotisch, unterer Rand (Notiz #1)">
+    <section id="r1-gap" data-nav-label="Lücke im Holotisch" data-decision="r1-gap" data-ui-ok="Unterer Rand des Holotischs, nicht Teil der Kopf-Varianten" data-decision-mode="yesnoalt" data-label="Lücke im Holotisch" data-rec="yes" data-rec-why="Strip und Leiste gehören zusammen, weil der Strip die Werte der darüber gewählten Ansicht zeigt." data-applies-to="Schiffs-Holotisch, unterer Rand (Notiz #1)"><input type="hidden" name="dm-r1-gap-hes" value="{&quot;ms&quot;:3592,&quot;revisits&quot;:0,&quot;median&quot;:14439}" disabled>
       <p data-applies>Gilt für: Schiffs-Holotisch, unterer Rand (Notiz #1)</p>
       <p data-situation>Zwischen der Ansichten-Leiste (Akte · 3D · Einfach …) und dem KPI-Strip klafft über die ganze Breite ein leerer Streifen; links hängt ein kleiner Tab-Ansatz am Strip.</p>
       <h3 data-question>Soll der Strip bündig an die Leiste anschließen?</h3>
       <p data-stakes>Ob der untere Rand als eine Einheit liest.</p>
       <div data-options>
-        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-gap" value="yes" checked><span data-opt-label>Ja, bündig ohne Streifen, Tab-Ansatz weg</span><span data-opt-consequence>Ursache wird im echten Layout gemessen (Abstand über dem Strip in <code>codex-holo-stage.component.ts:1047</code> oder am Strip selbst).</span></label><label data-opt="no"><input type="radio" name="dm-r1-gap" value="no"><span data-opt-label>Nein, Abstand lassen</span><span data-opt-consequence>Bleibt wie heute.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-gap" value="alt"><span data-opt-label>Anders …</span><input type="text" name="dm-r1-gap-alt" placeholder="Wie stattdessen?"></label>
+        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-gap" value="yes" checked disabled><span data-opt-label>Ja, bündig ohne Streifen, Tab-Ansatz weg</span><span data-opt-consequence>Ursache wird im echten Layout gemessen (Abstand über dem Strip in <code>codex-holo-stage.component.ts:1047</code> oder am Strip selbst).</span></label><label data-opt="no"><input type="radio" name="dm-r1-gap" value="no" disabled><span data-opt-label>Nein, Abstand lassen</span><span data-opt-consequence>Bleibt wie heute.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-gap" value="alt" disabled><span data-opt-label>Anders …</span><input type="text" name="dm-r1-gap-alt" placeholder="Wie stattdessen?" value="" readonly disabled></label>
       </div>
-      <textarea data-comment="r1-gap-note" placeholder="Notiz (optional)"></textarea>
+      <textarea data-comment="r1-gap-note" placeholder="Notiz (optional)" readonly></textarea>
     </section>
 
-    <section id="r1-crumb" data-nav-label="HQ-Pfad" data-decision="r1-crumb" data-decision-mode="yesnoalt" data-label="HQ-Pfad" data-rec="yes" data-rec-why="Im HQ fehlt der Pfad nur, weil die HQ-Seitenleiste ihn nicht an den Subheader meldet; alle anderen Bereiche tun das schon." data-applies-to="alle HQ-Seiten (Notiz #5)">
+    <section id="r1-crumb" data-nav-label="HQ-Pfad" data-decision="r1-crumb" data-decision-mode="yesnoalt" data-label="HQ-Pfad" data-rec="yes" data-rec-why="Im HQ fehlt der Pfad nur, weil die HQ-Seitenleiste ihn nicht an den Subheader meldet; alle anderen Bereiche tun das schon." data-applies-to="alle HQ-Seiten (Notiz #5)"><input type="hidden" name="dm-r1-crumb-hes" value="{&quot;ms&quot;:13849,&quot;revisits&quot;:1,&quot;median&quot;:14439}" disabled>
       <p data-applies>Gilt für: alle HQ-Seiten (Notiz #5)</p>
       <p data-situation>Auf /hq#inventar steht unter VERSE COMPANION nur „HQ“, weil <code>sc-hq-page-bar</code> keine Brotkrumen veröffentlicht.</p>
       <h3 data-question>Soll das HQ den vollen Pfad zeigen, z. B. „HQ › Lager › Inventar“?</h3>
       <p data-stakes>Ob man im HQ sieht, wo man ist.</p>
       <div data-options>
-        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-crumb" value="yes" checked><span data-opt-label>Ja, HQ › Bereich › Seite, jeder Teil ein echter Link</span><span data-opt-consequence>Gilt für Inventar, Hangar, Sammlungen und Lager-Einträge.</span></label><label data-opt="no"><input type="radio" name="dm-r1-crumb" value="no"><span data-opt-label>Nein, nur „HQ“</span><span data-opt-consequence>Bleibt wie heute.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-crumb" value="alt"><span data-opt-label>Anders …</span><input type="text" name="dm-r1-crumb-alt" placeholder="Wie stattdessen?"></label>
+        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-crumb" value="yes" checked disabled><span data-opt-label>Ja, HQ › Bereich › Seite, jeder Teil ein echter Link</span><span data-opt-consequence>Gilt für Inventar, Hangar, Sammlungen und Lager-Einträge.</span></label><label data-opt="no"><input type="radio" name="dm-r1-crumb" value="no" disabled><span data-opt-label>Nein, nur „HQ“</span><span data-opt-consequence>Bleibt wie heute.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-crumb" value="alt" disabled><span data-opt-label>Anders …</span><input type="text" name="dm-r1-crumb-alt" placeholder="Wie stattdessen?" value="" readonly disabled></label>
       </div>
-      <textarea data-comment="r1-crumb-note" placeholder="Notiz (optional)"></textarea>
+      <textarea data-comment="r1-crumb-note" placeholder="Notiz (optional)" readonly></textarea>
     </section>
 
-    <section id="r1-wish" data-nav-label="Sternenhimmel" data-decision="r1-wish" data-ui-ok="Wünsche-Panel, eine andere Fläche als die Kopf-Varianten" data-decision-mode="yesnoalt" data-label="Sternenhimmel" data-rec="yes" data-rec-why="Das Panel wird im Leerzustand rund 130 px niedriger und sieht im Popout und im Wunschlisten-Dialog gleich aus, weil derselbe Leerzustand an beiden Stellen hängt." data-applies-to="Wünsche-Popout und Wunschlisten-Dialog (Notiz #6)">
+    <section id="r1-wish" data-nav-label="Sternenhimmel" data-decision="r1-wish" data-ui-ok="Wünsche-Panel, eine andere Fläche als die Kopf-Varianten" data-decision-mode="yesnoalt" data-label="Sternenhimmel" data-rec="yes" data-rec-why="Das Panel wird im Leerzustand rund 130 px niedriger und sieht im Popout und im Wunschlisten-Dialog gleich aus, weil derselbe Leerzustand an beiden Stellen hängt." data-applies-to="Wünsche-Popout und Wunschlisten-Dialog (Notiz #6)"><input type="hidden" name="dm-r1-wish-hes" value="{&quot;ms&quot;:15029,&quot;revisits&quot;:1,&quot;median&quot;:14439}" disabled>
       <p data-applies>Gilt für: Wünsche-Popout und Wunschlisten-Dialog (Notiz #6)</p>
       <p data-situation>Der Sternenhimmel mit Sternschnuppe ist ein eigener gerahmter Kasten über „Wünsch dir was“.</p>
       <h3 data-question>Soll der Sternenhimmel zum Hintergrund des ganzen Panels werden, an beiden Stellen?</h3>
       <p data-stakes>Höhe und Ruhe des leeren Panels.</p>
       <div data-options>
-        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-wish" value="yes" checked><span data-opt-label>Ja, Sterne und Sternschnuppe hinter Text und Knopf</span><span data-opt-consequence>Kein Kasten mehr; Text bleibt lesbar, Bewegung ruht bei „weniger Bewegung“.</span></label><label data-opt="no"><input type="radio" name="dm-r1-wish" value="no"><span data-opt-label>Nein, Kasten behalten</span><span data-opt-consequence>Bleibt wie heute.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-wish" value="alt"><span data-opt-label>Anders …</span><input type="text" name="dm-r1-wish-alt" placeholder="Wie stattdessen?"></label>
+        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-wish" value="yes" checked disabled><span data-opt-label>Ja, Sterne und Sternschnuppe hinter Text und Knopf</span><span data-opt-consequence>Kein Kasten mehr; Text bleibt lesbar, Bewegung ruht bei „weniger Bewegung“.</span></label><label data-opt="no"><input type="radio" name="dm-r1-wish" value="no" disabled><span data-opt-label>Nein, Kasten behalten</span><span data-opt-consequence>Bleibt wie heute.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-wish" value="alt" disabled><span data-opt-label>Anders …</span><input type="text" name="dm-r1-wish-alt" placeholder="Wie stattdessen?" value="" readonly disabled></label>
       </div>
-      <textarea data-comment="r1-wish-note" placeholder="Notiz (optional)"></textarea>
+      <textarea data-comment="r1-wish-note" placeholder="Notiz (optional)" readonly></textarea>
     </section>
   </section>
 </section>
+</section>
+
+<section data-iteration="2" data-iteration-template="free" data-final-report id="iter-2" data-active>
+  <p class="fr-sentence">Ein leichtes Glasband als Kopf, gleich für Schiff und Gegenstand, klebt am Subheader; Lücke zu, HQ-Pfad da, Sterne im Hintergrund.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">Was kam raus</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">📌</span><span><b>Kopf klebt am Subheader</b> und schrumpft beim Scrollen auf eine Zeile, ohne Sprung.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🧩</span><span><b>Eine Vorlage</b>: P4-AR und Rucksack teilen Kopf, Reiter und Panel mit dem Schiff.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🧭</span><span><b>Lücke zu, HQ-Pfad da, Sterne im Hintergrund</b>.</span></li>
+      </ul>
+      <a class="fr-try" href="http://127.0.0.1:4200/codex/ship/ANVL_Liberator" target="_blank" rel="noopener noreferrer">▶ Selbst ausprobieren</a>
+      <p class="fr-try-auth">🔑 Lokaler Stand dieses Branches (<code>npm start</code>), Beta-Shell an; anmelden wie gewohnt.</p>
+    </div>
+    <div class="fr-ba" data-label-before="Vorher" data-label-after="Nachher">
+      <figure class="fr-shot"><img src="20261118-2156-batch-holotisch-kopf-vorlage/shots/before-head.webp" alt=""><figcaption>Kopf schwebt lose über der Bühne</figcaption></figure>
+      <figure class="fr-shot"><img src="20261118-2156-batch-holotisch-kopf-vorlage/shots/fix-ship-1920-scrolled.png" alt=""><figcaption>Gescrollt: schmales Band direkt unter dem Subheader</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">Was es aushält<small>Balken = wie weit die Anforderung erfüllt ist</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Alle 885 Tests der berührten Bereiche (Codex-Detail, Holotisch, Shell, HQ, Wünsche) laufen durch, Typprüfung und Build grün; die volle Suite läuft erst beim Ship (geschätzt).">
+        <span class="fr-meter-name">🧱 Stabilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">885 grün</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 80%" data-tip="Unabhängige Prüfung in der Beta-Shell nach der Nacharbeit: Kopf, Lücke, Vorlage und HQ belegt; der leere Wunsch-Zustand ließ sich live nicht zeigen, weil das Testkonto Wünsche hat (geschätzt).">
+        <span class="fr-meter-name">👁 Live geprüft</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">4 / 5 Notizen</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Telefon 375 px: Band unter der Routenzeile, Knöpfe nur als Symbol, nichts unter dem Feedback-Knopf (geschätzt).">
+        <span class="fr-meter-name">📱 Telefon</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">geprüft</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="4 / 7 · ✓ Code-Check · ✓ Trockentest · ✓ Zusammenspiel · ✓ Lokal durchgespielt · ○ Prod-Build geprüft · ○ Live vertestet · ◌ Von dir abgenommen">
+    <span class="fr-depth-done">✓ Zuletzt bestanden: <b>Lokal durchgespielt</b></span>
+    <span class="fr-depth-next">○ Noch nicht gemacht: <b>Prod-Build geprüft</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 3 Funde unterwegs</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-wish-empty"
+          data-issue-title="[TEST] Verify the empty wish panel with the sky backdrop on an account without wishes"
+          data-issue-type="task"
+          data-issue-body="Batch note #6 moved the wish sky behind the empty state (wish-empty.component.ts, wish-sky variant backdrop) and behind the top of the wish window (wish-cart-dialog.component.ts). Specs pass, but the empty popout could not be seen live: the test account has wishes. Check on an account with an empty wish list: the sky sits behind title, hint and button, no framed box, the empty popout is shorter than before (old box 136 px + gap), and reduced motion stops the shooting star."
+          data-issue-module="shell"
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="im Repo">
+        <span class="oq-label">Leeres Wunschpanel ungesehen</span>
+        <dl class="fr-fkv">
+          <dt>Was</dt><dd>Sterne als Hintergrund sind gebaut und getestet, aber der leere Zustand ließ sich mit dem Testkonto nicht zeigen.</dd>
+          <dt>Wo</dt><dd>Wünsche-Popout und Wunschfenster, leer</dd>
+          <dt>Warum vorbelegt</dt><dd>⚡ Jetzt — einmal mit leerer Wunschliste ansehen.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-item-changes"
+          data-issue-title="[FEATURE] Patch changes tab for non-ship detail pages"
+          data-issue-type="feature"
+          data-issue-body="The shared detail shell (src/app/codex/detail/codex-detail-shell.component.ts, codex-detail-profile.ts) hides a tab without data. The approved tab set for items includes Änderungen (patch differences, as on the ship), but items have no patch history on the detail page, so the tab never shows. Needs a data source per item and patch before it can appear."
+          data-issue-module="codex"
+          data-oq-origin="shortfall"
+          data-route-default="later"
+          data-route-reason="braucht Daten">
+        <span class="oq-label">Änderungen-Reiter für Items</span>
+        <dl class="fr-fkv">
+          <dt>Was</dt><dd>Werte, Bezug und Verbaut in sind da; Änderungen bleibt versteckt, weil es für Gegenstände noch keine Patch-Daten gibt.</dd>
+          <dt>Wo</dt><dd>Detailseiten von Waffen, Ausrüstung, Bauteilen</dd>
+          <dt>Warum vorbelegt</dt><dd>🕒 Später — braucht erst eine Datenquelle.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-ship-body"
+          data-issue-title="[REFACTOR] Move the ship holotable body into the shared detail shell"
+          data-issue-type="refactor"
+          data-issue-body="Batch note #3 asked for one template for all detail pages. Built: one shared head band, tab pill and panel (codex-detail-shell + kind profile) used by ship and item pages. The ship's holotable body (codex-holo-stage.component.ts, ~2950 lines) still renders inside its own component and its panel tabs do not yet use the shared tab pill. Follow-up: render the holotable as the ship profile's stage inside the shell so panel and strip are fully shared."
+          data-issue-module="codex"
+          data-oq-origin="shortfall"
+          data-route-default="later"
+          data-route-reason="großer Umbau">
+        <span class="oq-label">Holotisch-Körper separat</span>
+        <dl class="fr-fkv">
+          <dt>Was</dt><dd>Kopf, Reiter und Panel sind geteilt; der Schiffs-Holotisch selbst und seine Panel-Reiter laufen noch neben der Vorlage.</dd>
+          <dt>Wo</dt><dd>Schiffsseite im Beta-Holotisch</dd>
+          <dt>Warum vorbelegt</dt><dd>🕒 Später — eigener Umbau von rund 3.000 Zeilen.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 Für Entwickler</summary>
+    <ul class="fr-dev">
+      <li>Branch <code>claude/batch-0c7514</code> · Bereiche: codex (Detailseiten, Holotisch), shell (Subheader-Pfad), hq, Wünsche, analytics</li>
+      <li>Neu: <code>codex/detail/codex-detail-head.component.ts</code>, <code>codex-detail-shell.component.ts</code>, <code>codex-detail-profile.ts</code>; geändert u. a. <code>codex-holo-stage</code>, <code>codex-holo-einsatz</code>, <code>codex-holo-hangar-menu</code>, <code>hq-pages</code>, <code>fusion-bar.model</code>, <code>wish-sky</code></li>
+      <li>Maße Beta, 1920 px: Subheader 60 px (Radius 20) · Band voll 75 px Schiff / 98 px Gegenstand, schmal 56 px (Radius 14) · Kennzahlen-Leiste 79 px; Band oben auf 84 px bei allen Arten</li>
+      <li>Lücke: Ursache war ein veralteter Messwert der Bühnenoberkante (217 statt 201 px), Leiste jetzt bündig bei 1001 px</li>
+      <li>Analytik: <code>codex:detail_tab_select { kind, tab }</code>, Kachel „Codex-Detailseite: gewählte Reiter je Art“ in „Wird es genutzt?“</li>
+      <li>Merge mit main: PR #1184 verlangt umbrechenden Hangar-Knopf — volles Band bricht um, schmales Band kürzt mit „…“ und Tooltip; beide Specs grün</li>
+      <li>Tests: 885 grün in den berührten Bereichen · Typprüfung, Build grün · Checkliste und Belege: <code>briefs/implement.md</code>, Bilder <code>shots/fix-*</code>, <code>shots/qa-*</code></li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="Du testest">
+    <ul>
+      <li data-todo-id="t-scroll" data-crit="high" data-guide="">Liberator scrollen: Band ruhig am Subheader?</li>
+      <li data-todo-id="t-item" data-crit="mid" data-guide="">P4-AR, Rucksack: Kopf wie beim Schiff?</li>
+      <li data-todo-id="t-hq" data-crit="mid" data-guide="">HQ › Lager: steht der Pfad im Subheader?</li>
+      <li data-todo-id="t-wish" data-crit="low" data-guide="">Leere Wunschliste öffnen: Sterne im Hintergrund?</li>
+    </ul>
+  </section>
 </section>
 </main>
     </div>
@@ -6407,7 +6531,8 @@ Kopf zuerst Woche 1  Kopf am Schiff  → Woche 2 Gerüst, Kopf zieht um</pre></d
       </div>
       <div class="panel-nav-scroll">
       <nav class="iteration-tabs" role="tablist" aria-label="Runden">
-<button class="iteration-tab" role="tab" data-iteration="1" aria-selected="true" aria-controls="iter-1">Runde 1</button>
+<button class="iteration-tab" role="tab" data-iteration="1" aria-selected="false" aria-controls="iter-1">Runde 1</button>
+<button class="iteration-tab" role="tab" data-final-report data-iteration="2" aria-selected="true" aria-controls="iter-2">Abschlussbericht</button>
 </nav>
       <!-- #section-nav also lives on the design skeleton: a free/decision round
            on a design concept (the final report is always free) renders its TOC
@@ -12881,9 +13006,15 @@ function collectFreeDecisions() {
   };
   const blocksOf = (scope, it, kind) =>
     [...scope.querySelectorAll(kind)].filter(n => eligible(n, it) && scopeOf(n, it) === scope);
+  // Mocks built from div / span (#1149): [data-pin] first, then the text
+  // blocks, then the clicked element itself (an svg as a whole), never the
+  // round or one of its sections.
+  const ownOf = (t, it) => (t === it || t.matches(SCOPE) ? null : (t.closest('svg') || t));
   function blockOf(target, it) {
-    let b = target.closest && target.closest(inAnalysis(target) ? ANA_BLOCK : BLOCK);
-    if (!b || !eligible(b, it)) return null;
+    if (!target.closest) return null;
+    let b = inAnalysis(target) ? target.closest(ANA_BLOCK)
+      : (target.closest('[data-pin]') || target.closest(BLOCK) || ownOf(target, it));
+    if (!b || b === it || !eligible(b, it)) return null;
     const row = b.closest('tr');
     if (row && b !== row && b.closest('td, th') && eligible(row, it)) b = row;
     return b;
