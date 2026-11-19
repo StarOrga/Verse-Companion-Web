@@ -6,7 +6,7 @@ import { BriefingSkyComponent } from '../../verse/pages/briefing/briefing-sky.co
 import { explorerLit } from '../../verse/pages/briefing/briefing.model';
 import { VerseApiService } from '../../verse/data/verse-api.service';
 import { STARS_PER_PATCH, defaultPatch } from '../../verse/starmap/starmap.model';
-import { ShellChromeService } from '../fusion-bar/shell-chrome.service';
+import { ShellChromeService, introBeatCss } from '../fusion-bar/shell-chrome.service';
 import { SceneBodiesComponent } from './scene-bodies.component';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationSkipped, NavigationStart, Router } from '@angular/router';
 import { BetaService } from '../../core/beta.service';
@@ -86,15 +86,24 @@ export class ShellSceneComponent {
    * world) — the hub dollies it in from there, so nothing ever shows the final pose first (D3).
    */
   readonly igniting = signal(false);
+  /** The last flight left a pose that already showed the HQ outpost (HQ, the hub itself). */
+  private readonly fromOutpost = signal(false);
   /**
-   * The hub's full entrance (#371): the HQ outpost waits for the hub's staged entrance and arrives
-   * with its beacon (briefing-beacons, 4.45 s) instead of with the world. 'hold' = announced, not
-   * started yet (it stands at its hidden first frame, like the main header); null = no entrance.
+   * The HQ outpost joins the hub's staged build (#371) instead of standing there with the world:
+   * on the full entrance it arrives with its beacon (briefing-beacons, 4.45 s; 'hold' = announced,
+   * not started yet, it stands at its hidden first frame like the main header), on a menu switch
+   * with the beacons and Patches ('nav', at the hub's `outpostAtMs`). Coming from a pose that
+   * showed it already, it stays. null = no staged build.
    */
-  readonly intro = computed<'hold' | 'play' | null>(() => {
+  readonly intro = computed<'hold' | 'play' | 'nav' | null>(() => {
     const h = this.chrome.heroIntro();
-    return h?.full ? (h.hold ? 'hold' : 'play') : null;
+    if (h?.full) return h.hold ? 'hold' : 'play';
+    return h?.outpostAtMs !== undefined && !this.fromOutpost() ? 'nav' : null;
   });
+  /** Menu switch: when the outpost starts its fade, as a CSS delay. */
+  readonly outpostAt = computed(() => introBeatCss(this.chrome.heroIntro()?.outpostAtMs));
+  /** A reload of the hub: the outpost waits for the hub's calm fade-in ('wait') and fades in with it ('in'). */
+  readonly calm = computed(() => this.chrome.hubCalm());
   /** The pieces' body canvases show until the engine drew each once (scene-bodies.component). */
   readonly warming = signal(true);
 
@@ -230,6 +239,7 @@ export class ShellSceneComponent {
     const prev = this.at;
     if (next.pose === prev.pose && next.depth === prev.depth) return;
     this.at = next;
+    this.fromOutpost.set((POSES[prev.pose].show.hqst ?? 0) > 0);
     const base = this.cam.camOf(next.pose);
     // Deeper than before: push in towards the click; shallower or a new pose: the pose itself (pull-out).
     const pushIn = next.depth > 0 && (next.pose !== prev.pose || next.depth > prev.depth);
