@@ -138,7 +138,8 @@ export function likeRegExp(pattern: string, caseInsensitive: boolean): RegExp {
   for (const ch of pattern) {
     if (ch === '*' || ch === '%') body += '.*';
     else if (ch === '_') body += '.';
-    else body += ch.replace(/[.*+?^${}()|[\]\\/-]/g, '\\$&');
+    // Only the syntax characters (and `/`) may be escaped under the `u` flag; `\-` is a SyntaxError there.
+    else body += ch.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
   }
   return new RegExp(`^${body}$`, caseInsensitive ? 'isu' : 'su');
 }
@@ -351,6 +352,35 @@ export function listFromSnapshot(
     records: rows.slice(offset, offset + limit).map((r) => toRecord(snap, r, keys)),
     count: rows.length,
   };
+}
+
+/**
+ * The sibling reads (`listSkinSiblings` / `listEditionSiblings`): every row of
+ * the build — variants included, no browse filters — whose class name matches
+ * the ILIKE pattern `<escapedPrefix>%`, as `listSelect(kind, 'none')` records,
+ * sorted by class name. `null` (decline) when more than `limit` rows match:
+ * which rows the database cuts at the limit depends on its collation order,
+ * which a code-unit sort does not reproduce. Below the limit the set is the
+ * same; the only callers (resolveSkinGroup / resolveEditionGroup) sort their
+ * own output and do not depend on the row order.
+ */
+export function prefixRowsFromSnapshot(
+  snap: ListSnapshot,
+  escapedPrefix: string,
+  limit: number,
+): Record<string, unknown>[] | null {
+  const c = snap.col.get('class_name');
+  if (c === undefined) return null;
+  const re = likeRegExp(`${escapedPrefix}%`, true);
+  const rows = snap.rows.filter((r) => typeof r[c] === 'string' && re.test(r[c] as string));
+  if (rows.length > limit) return null;
+  return rows
+    .map((r) => toRecord(snap, r, []))
+    .sort((a, b) => {
+      const x = a['class_name'] as string;
+      const y = b['class_name'] as string;
+      return x < y ? -1 : x > y ? 1 : 0;
+    });
 }
 
 /** A head-only count of the read (search per `mode`), or `null` to decline. */

@@ -69,6 +69,7 @@ import {
   jsonTextOf,
   listFromSnapshot,
   matchRows,
+  prefixRowsFromSnapshot,
   snapshotNameFor,
 } from './codex-list-engine';
 
@@ -577,6 +578,8 @@ export class CodexService {
   private readonly localeShards = inject(CodexLocaleShards);
   /** Catalog lists as files per build (R2); every read falls back to the database on `null`. */
   private readonly listSnapshots = inject(CodexListSnapshots);
+  /** Snapshot reads whose answer threw once already (logged once each). */
+  private readonly snapshotFailures = new Set<string>();
   /**
    * The RSI announcement feed, read-only from here. Injected purely so
    * {@link searchAll} can cover ships that exist on a concept page but not in
@@ -958,29 +961,59 @@ export class CodexService {
     }
   }
 
+  /**
+   * Runs one snapshot answer. ANY throw (an engine bug, a file shape the
+   * reader let through) is logged once per read and answers `null`, so the
+   * caller goes on with its unchanged database path.
+   */
+  private async fromSnapshot<T>(read: string, answer: () => Promise<T | null> | T | null): Promise<T | null> {
+    try {
+      return await answer();
+    } catch (err) {
+      if (!this.snapshotFailures.has(read)) {
+        this.snapshotFailures.add(read);
+        logWarn('codex', 'list snapshot answer failed, using the database', { read, err });
+      }
+      return null;
+    }
+  }
+
   /** listByKind answered from the build's list file, or `null` to use the database. */
-  private async snapshotList(
+  private snapshotList(
     kind: CodexKind,
     buildId: string,
     filters: CodexListFilters,
     limit: number,
     offset: number,
   ): Promise<CodexListResult | null> {
-    const snap = await this.snapshotOf(buildId, kind, filters.payload);
-    const hit = snap && listFromSnapshot(snap, kind, filters, limit, offset);
-    if (!hit) return null;
-    return { rows: hit.records.map((r) => mapListRow(kind, r)), count: hit.count };
+    return this.fromSnapshot('list', async () => {
+      const snap = await this.snapshotOf(buildId, kind, filters.payload);
+      const hit = snap && listFromSnapshot(snap, kind, filters, limit, offset);
+      if (!hit) return null;
+      return { rows: hit.records.map((r) => mapListRow(kind, r)), count: hit.count };
+    });
   }
 
   /** A head-only count answered from the build's list file, or `null` to use the database. */
-  private async snapshotCount(
+  private snapshotCount(
     kind: CodexKind,
     buildId: string,
     filters: CodexListFilters,
     mode: SearchMode,
   ): Promise<number | null> {
-    const snap = await this.snapshotOf(buildId, kind, 'none');
-    return snap && countFromSnapshot(snap, kind, filters, mode);
+    return this.fromSnapshot('count', async () => {
+      const snap = await this.snapshotOf(buildId, kind, 'none');
+      return snap && countFromSnapshot(snap, kind, filters, mode);
+    });
+  }
+
+  /** A sibling read (class-name prefix, no filters) answered from the kind file, or `null`. */
+  private snapshotSiblings(kind: CodexKind, buildId: string, prefix: string): Promise<CodexListRow[] | null> {
+    return this.fromSnapshot('siblings', async () => {
+      const snap = await this.snapshotOf(buildId, kind, 'none');
+      const records = snap && prefixRowsFromSnapshot(snap, escapeIlike(prefix), SKIN_SIBLING_LIMIT);
+      return records ? records.map((r) => mapListRow(kind, r)) : null;
+    });
   }
 
   /** The database path of {@link listByKind} (before the German-name fallback), unchanged. */
@@ -1233,8 +1266,10 @@ export class CodexService {
 
   /** One head-only count for `countSearchMatches`; null when the query failed. */
   private async countOneKind(buildId: string, kind: CodexKind, term: string): Promise<number | null> {
-    // Default browse filters + the server's ILIKE token groups only (no matcher), as below.
-    const fromFile = await this.snapshotCount(kind, buildId, { search: term }, 'tokens');
+    // From the file: the same definition as listByKind's count (token groups AND the
+    // shared matcher), so "also found in …" matches the list it points at. The
+    // database path below cannot run the matcher and stays the token-only superset.
+    const fromFile = await this.snapshotCount(kind, buildId, { search: term }, 'list');
     if (fromFile !== null) return fromFile;
     const query = applyDefaultBrowseFilters(
       this.sb.client
@@ -1260,12 +1295,18 @@ export class CodexService {
     if (this.attachTypeCounts?.buildId !== build.id) this.attachTypeCounts = { buildId: build.id, counts: new Map() };
     const cache = this.attachTypeCounts.counts;
     const missing = attachTypes.filter((t) => !cache.has(t));
-    const snap = missing.length ? await this.snapshotOf(build.id, 'item', 'none') : null;
-    if (snap) {
-      for (const attachType of missing) {
-        const count = countFromSnapshot(snap, 'item', { attachType }, 'ignore');
-        if (count !== null) cache.set(attachType, count);
-      }
+    if (missing.length) {
+      const fromFile = await this.fromSnapshot('attach counts', async () => {
+        const snap = await this.snapshotOf(build.id, 'item', 'none');
+        if (!snap) return null;
+        const counts = new Map<string, number>();
+        for (const attachType of missing) {
+          const count = countFromSnapshot(snap, 'item', { attachType }, 'ignore');
+          if (count !== null) counts.set(attachType, count);
+        }
+        return counts;
+      });
+      for (const [t, n] of fromFile ?? []) cache.set(t, n);
     }
     await Promise.all(
       attachTypes
@@ -1372,7 +1413,7 @@ export class CodexService {
   }
 
   private async fetchFacetValues(buildId: string, kind: CodexKind): Promise<CodexFacetValues | null> {
-    const fromFile = await this.facetValuesFromSnapshot(buildId, kind);
+    const fromFile = await this.fromSnapshot('facets', () => this.facetValuesFromSnapshot(buildId, kind));
     if (fromFile) return fromFile;
     try {
       const { data, error } = await this.sb.client.rpc('codex_facet_values', {
@@ -1466,17 +1507,20 @@ export class CodexService {
 
     // Every weapon row of the build, variants included. The file is in list
     // order, not class_name order: the taxonomy only counts these rows.
-    const snap = await this.snapshotOf(build.id, 'weapon', 'none');
-    if (snap) {
+    const fromFile = await this.fromSnapshot('weapon facets', async () => {
+      const snap = await this.snapshotOf(build.id, 'weapon', 'none');
+      if (!snap) return null;
       const at = (r: readonly unknown[], c: string) => (r[snap.col.get(c)!] as string | null) ?? null;
-      const rows = snap.rows.map((r) => ({
+      return snap.rows.map((r) => ({
         weaponClass: at(r, 'weapon_class'),
         attachType: at(r, 'attach_type'),
         subType: at(r, 'sub_type'),
         isVariant: r[snap.col.get('is_variant')!] === true,
       }));
-      this.weaponFacetCache = { buildId: build.id, rows };
-      return rows;
+    });
+    if (fromFile) {
+      this.weaponFacetCache = { buildId: build.id, rows: fromFile };
+      return fromFile;
     }
 
     const page = 1000; // PostgREST caps a response at 1000 rows
@@ -1537,6 +1581,7 @@ export class CodexService {
     if (!build) return [];
     const run = async (): Promise<CodexListRow[]> => {
       const kind: CodexKind = category === 'weapon' ? 'weapon' : 'item';
+      const fromFileRows = await this.fromSnapshot('fps catalog', async () => {
       const snap = await this.snapshotOf(build.id, kind, 'card');
       const fromFile = snap && CARD_PAYLOAD_KEYS.every((k) => snap.key.has(k))
         ? matchRows(
@@ -1563,6 +1608,9 @@ export class CodexService {
           return mapListRow(kind, record);
         });
       }
+      return null;
+      });
+      if (fromFileRows) return fromFileRows;
       const select = [
         'class_name, name_localized, manufacturer_code, attach_type, sub_type, size, grade, is_variant',
         ...(category === 'weapon' ? ['weapon_class'] : []),
@@ -1680,6 +1728,8 @@ export class CodexService {
     if (kind !== 'weapon' && kind !== 'item' && kind !== 'component') return [];
     const build = await this.loadCurrentBuild();
     if (!build) return [];
+    const fromFile = await this.snapshotSiblings(kind, build.id, skinQueryPrefix(classNameSlug));
+    if (fromFile) return fromFile;
 
     const { data, error } = await this.sb.client
       .from(CODEX_ENTITY_TABLES[kind])
@@ -1706,6 +1756,8 @@ export class CodexService {
     if (kind !== 'ship') return [];
     const build = await this.loadCurrentBuild();
     if (!build) return [];
+    const fromFile = await this.snapshotSiblings(kind, build.id, editionQueryPrefix(classNameSlug));
+    if (fromFile) return fromFile;
 
     const { data, error } = await this.sb.client
       .from(CODEX_ENTITY_TABLES[kind])
@@ -2513,14 +2565,17 @@ export class CodexService {
    * read (class name + name only) instead of a full re-score; a failed read
    * simply keeps the cached cohort as it was. */
   private async backfillCohortNames(key: string, buildId: string, cached: RankShipInput[]): Promise<RankShipInput[]> {
-    const snap = await this.snapshotOf(buildId, 'ship', 'none');
-    if (snap) {
+    const fromFile = await this.fromSnapshot('cohort names', async () => {
+      const snap = await this.snapshotOf(buildId, 'ship', 'none');
+      if (!snap) return null;
       const cn = snap.col.get('class_name')!;
       const nl = snap.col.get('name_localized')!;
       const names = new Map(snap.rows.map((r) => [r[cn] as string, cleanLocaleValue((r[nl] as string | null) ?? null) || null] as const));
-      const named = cached.map((s) => ({ ...s, name: names.get(s.className) ?? null }));
-      writeCohortCache(key, named);
-      return named;
+      return cached.map((s) => ({ ...s, name: names.get(s.className) ?? null }));
+    });
+    if (fromFile) {
+      writeCohortCache(key, fromFile);
+      return fromFile;
     }
     try {
       const { data, error } = await this.sb.client
