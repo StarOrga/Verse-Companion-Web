@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.281.6",
+  "current": "0.281.7",
   "releases": [
+    {
+      "version": "0.281.7",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Storage concept (admin-only): round 4 folds in the round-3 decisions and asks the last open questions before the build."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.281.6",
       "date": "2026-11-19",
