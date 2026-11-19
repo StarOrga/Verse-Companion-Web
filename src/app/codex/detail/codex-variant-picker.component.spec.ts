@@ -25,7 +25,7 @@ describe('CodexVariantPickerComponent', () => {
 
   it('renders every option as a real anchor and marks the open record', () => {
     const el: HTMLElement = fixture.nativeElement;
-    const details = el.querySelector('details') as HTMLElement;
+    const details = el.querySelector('.picker') as HTMLElement;
     expect(details.classList).toContain('picker');
     expect(details.classList).toContain('edition-picker');
     expect(details.classList).not.toContain('skin-picker');
@@ -46,7 +46,7 @@ describe('CodexVariantPickerComponent', () => {
     fixture.componentRef.setInput('current', null);
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
-    expect(el.querySelector('details')?.classList).toContain('skin-picker');
+    expect(el.querySelector('.picker')?.classList).toContain('skin-picker');
     expect(el.querySelector('.sp-label')?.textContent).toContain('codex.skinPicker.label');
     expect(el.querySelector('.sp-current')?.textContent).toContain('codex.skinPicker.standard');
     expect(el.querySelector('.sp-count')?.textContent).toContain('codex.skinPicker.count');
