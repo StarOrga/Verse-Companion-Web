@@ -247,11 +247,12 @@ describe('WishCartDialogComponent (Warenkorb)', () => {
     expect(el.querySelector('.strip')).toBeNull();
   });
 
-  it('with wishes it carries the 84 px sky strip above the groups and the star dot on every thumbnail', () => {
+  it('with wishes the sky lies as the backdrop behind the top of the groups and the star dot is on every thumbnail', () => {
     const { el } = setup(rows);
     const strip = el.querySelector('sc-wish-sky.strip')!;
-    expect(strip.getAttribute('data-variant')).toBe('strip');
-    expect(strip.getBoundingClientRect().height).toBe(84);
+    expect(strip.getAttribute('data-variant')).toBe('backdrop');
+    expect(getComputedStyle(strip).position).toBe('absolute');
+    expect(strip.getBoundingClientRect().height).toBe(180);
     expect(strip.compareDocumentPosition(el.querySelector('.groups')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(el.querySelectorAll('.tile .sil.sc-wish-dot').length).toBeGreaterThan(0);
     expect(el.querySelector('sc-wish-empty')).toBeNull();

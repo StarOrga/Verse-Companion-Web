@@ -16,7 +16,9 @@ import { pageScrollY } from '../core/page-scroll-y';
 import { SceneCameraService } from '../shell/scene/scene-camera.service';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router, Scroll } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import type { PageCrumb } from '../shared/page-header/nav-origin.service';
 import { ShellChromeService } from '../shell/fusion-bar/shell-chrome.service';
 import { HqCueComponent } from './hq-cue.component';
 import { wireHqPageHotkeys, wireHqPageScroll } from './hq-page-scroll';
@@ -29,7 +31,7 @@ import { HqPageBarComponent } from './hq-page-bar.component';
 import { HqPageNavService } from './hq-page-nav.service';
 import { HqPlanComponent } from './plan/hq-plan.component';
 import { HqRailComponent } from './hq-rail.component';
-import { HQ_EINSATZ_PARAM, HQ_PAGES, HqPageId, hqPageHref, hqPageOfFragment } from './hq-routes';
+import { HQ_EINSATZ_PARAM, HQ_PAGES, HQ_ROOT, HqPageId, hqPageHref, hqPageOfFragment } from './hq-routes';
 import { HqStartFeedService } from './start/hq-start-feed.service';
 import { HqStartComponent } from './start/hq-start.component';
 import { HqStatsComponent } from './stats/hq-stats.component';
@@ -194,6 +196,7 @@ export class HqPagesComponent {
       untracked(() => void this.nachschub.reconcile());
     });
     this.chrome.setHqPage(hqPageOfFragment(this.route.snapshot.fragment) ?? 'start');
+    this.publishTrail();
     effect(() => {
       const page = this.chrome.hqPage();
       if (page) this.syncUrl(page);
@@ -243,6 +246,25 @@ export class HqPagesComponent {
       this.destroyRef.onDestroy(this.watchCue());
       this.destroyRef.onDestroy(wireHqPageHotkeys((p) => this.goTo(p), this.zone));
       this.buildInSteps();
+    });
+  }
+
+  /**
+   * The subheader path of the page in view (batch note #5: "die breadcrumb leiste fehlt wenn man in hq ist"):
+   * HQ › Planen, HQ › Lager › Inventar … Start shows the area root alone. The middle part is a real anchor.
+   */
+  private publishTrail(): void {
+    const translate = inject(TranslateService);
+    const lang = toSignal(translate.onLangChange, { initialValue: null });
+    effect((onCleanup) => {
+      lang();
+      const page = this.chrome.hqPage() ?? 'start';
+      if (page === 'start') return;
+      const tab = page === 'inventar' ? this.nav.stockTab() : null;
+      const crumbs: PageCrumb[] = tab ? [{ labelKey: 'hq.pages.inventar', link: [HQ_ROOT], fragment: 'inventar' }] : [];
+      const title = translate.instant(tab ? 'hq.bestand.tab.' + tab : 'hq.pages.' + page) as string;
+      const unpublish = untracked(() => this.chrome.publishCrumbs(this, { crumbs, title }));
+      onCleanup(unpublish);
     });
   }
 

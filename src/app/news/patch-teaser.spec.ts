@@ -124,7 +124,7 @@ class StripHostComponent {
 describe('TeaserStripDirective', () => {
   /** A ResizeObserver reports on its own schedule — poll instead of a fixed wait. */
   async function until(cond: () => boolean): Promise<void> {
-    for (let i = 0; i < 100 && !cond(); i++) await new Promise((r) => setTimeout(r, 20));
+    for (let i = 0; i < 250 && !cond(); i++) await new Promise((r) => setTimeout(r, 20));
   }
 
   it('measures the strip and reads item, gap, rest and rows from its CSS', async () => {

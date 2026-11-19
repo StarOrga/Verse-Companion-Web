@@ -225,6 +225,25 @@ describe('CodexHoloHangarMenuComponent', () => {
     expect(getComputedStyle(q('.hb .ex')!).overflow).toBe('visible');
   });
 
+  it('in the slim head band the trigger keeps one row: the loadout name ellipsises and the tooltip carries the sentence', () => {
+    const band = document.createElement('sc-codex-detail-head');
+    band.className = 'slim';
+    band.style.cssText = 'display: block; width: 160px';
+    document.body.appendChild(band);
+    band.appendChild(fixture.nativeElement);
+    (fixture.nativeElement as HTMLElement).style.width = '160px';
+    fixture.detectChanges();
+    const ex = q('.hb .ex')!;
+    expect(getComputedStyle(q('.hb .t')!).flexWrap).toBe('nowrap');
+    expect(getComputedStyle(ex).textOverflow).toBe('ellipsis');
+    expect(getComputedStyle(ex).whiteSpace).toBe('nowrap');
+    q('.hb')!.dispatchEvent(new Event('pointerenter'));
+    fixture.detectChanges();
+    expect(ex.scrollWidth).toBeGreaterThan(ex.clientWidth);
+    expect((fixture.componentInstance as unknown as { cutTip: () => string | null }).cutTip()).toBe(q('.hb')!.getAttribute('aria-label'));
+    band.remove();
+  });
+
   it('a press beside it closes it; a press inside does not', () => {
     open();
     q('.grp')!.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));

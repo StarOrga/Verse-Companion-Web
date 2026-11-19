@@ -1,0 +1,104 @@
+<section id="iter-3" data-iteration="3" data-iteration-template="free" data-final-report data-active>
+  <p class="fr-sentence">PostHog ist jetzt die einzige Telemetrie-Quelle: Web, Server und Desktop melden dorthin, und Auffälligkeiten landen als Wächter-Eintrag im Admin-Board.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🗂</span><span><b>Telemetrie als Themen-Karten</b> mit Externe Dienste, KI-Kosten und Kontingent.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🛰</span><span><b>Jede Server-Funktion meldet Fehler</b>, Cron-Läufe und Claude-Kosten an PostHog.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">📊</span><span><b>3 Dashboards, 50 Kacheln, 36 Actions</b> als Code, live angelegt und geprüft.</span></li>
+      </ul>
+      <a class="fr-try" href="https://versecompanion-alpha.vercel.app/admin/telemetry?ngsw-bypass=true" target="_blank" rel="noopener noreferrer">▶ {{final.open_live}}</a>
+      <p class="fr-try-auth">🔑 Mit deinem Admin-Konto angemeldet öffnen.</p>
+    </div>
+    <div class="fr-ba" data-label-before="{{final.before}}" data-label-after="{{final.after}}">
+      <figure class="fr-shot"><img src="20261115-0211-posthog-audit/shots/after.jpg" alt=""><figcaption>Live v0.268.0: Dienste-Karte meldet xAI mit HTTP 403</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Alle 50 Kacheln und 8 Server-Abfragen laufen gegen die echte PostHog-API ohne Fehler; Anforderung alle (geschätzt).">
+        <span class="fr-meter-name">📊 Abfragen</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">58 / 58</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Keine E-Mail, kein Name, kein Suchtext, kein Token und kein Prompt-Text an PostHog (unabhängige Prüfung); Anforderung 0 (geschätzt).">
+        <span class="fr-meter-name">🛡 Datenschutz</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">0 Lecks</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 40%" data-tip="Ohne PostHog-Schlüssel zeigen 4 von 6 Karten „Keine Daten“; erst der Schlüssel macht Fehler, Nutzung, Kontingent und Desktop sichtbar (geschätzt).">
+        <span class="fr-meter-name">🔌 Karten mit Daten</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">2 / 6</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="5 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ✓ {{final.level_interplay}} · ✓ {{final.level_local}} · ✓ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_prod}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_live}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 2 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-events-gaps"
+          data-issue-title="[FEATURE] Track news channel, patch stability and feedback attachments"
+          data-issue-type="feature"
+          data-issue-body="Approved in the PostHog audit concept (F3), not built: news:channel_select, news:patch_stability_view and feedback:attachment_add. The attachment step lives in src/app/admin/feedback/feedback-composer.component.ts, which was owned by another agent in that run. Add them to src/app/core/analytics/events.ts and call track() at the three places."
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="klein">
+        <span class="oq-label">3 Ereignisse fehlen</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>News-Kanal, Patch-Stabilität und Feedback-Anhang senden noch kein Ereignis.</dd>
+          <dt>{{final.fund_where}}</dt><dd>News-Seite, Feedback-Composer</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — drei kleine Aufrufe im vorhandenen Katalog.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-mobile-gate"
+          data-issue-title="[BUG] Mobile gate red on signed-in routes"
+          data-issue-type="bug"
+          data-issue-body="npm run gate:mobile -- --auth on v0.268.0 (unrelated to the PostHog diff): /verse/explorer comet-track labels at 10.8-11.25px (below 12px), /verse/gallery/constellations redirects to /verse/explorer/rank, codex-locale/<build>/de/index.json 404 on the assets worker, rpc/hq_fleet_patch 500 on /hq. All four reproduce on main."
+          data-oq-origin="found"
+          data-route-default="issue"
+          data-route-reason="fremd">
+        <span class="oq-label">Mobile-Gate rot (fremd)</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Kleine Schrift im Explorer, eine Umleitung, ein 404 und ein 500 auf angemeldeten Seiten.</dd>
+          <dt>{{final.fund_where}}</dt><dd>/verse/explorer, /verse/gallery, /codex, /hq</dd>
+          <dt>{{final.fund_why}}</dt><dd>📌 Issue — gehört nicht zu diesem Umbau, steckt schon in main.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>v0.268.0 <code>f259fdf</code> (#1124) + v0.268.1 <code>3eb7838</code> (#1126) · Migrationen 20261115030000/030100 live</li>
+      <li><code>supabase/functions/_shared/posthog.ts</code>, <code>telemetry-overview/</code>, <code>src/app/admin/telemetry-stats.component.ts</code></li>
+      <li>Tests: 581 Vitest-Dateien, 590 Function-Tests, Deno, Gate-Skripte grün · Codex: 1 Befund behoben</li>
+      <li>Setup und Owner-Schritte: <code>docs/analytics/posthog-setup.md</code></li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-guard-item" data-crit="mid" data-guide="">Ersten Wächter-Eintrag im Board ansehen</li>
+    </ul>
+  </section>
+  <section data-handoffs hidden aria-label="{{final.group_handoffs}}">
+    <ul>
+      <li data-todo-id="h-posthog-key" data-crit="high" data-guide="web">PostHog-Key anlegen, in Supabase hinterlegen</li>
+      <li data-todo-id="h-posthog-webhook" data-crit="mid" data-guide="web">PostHog-Webhook und Replay einschalten</li>
+      <li data-todo-id="h-xai-key" data-crit="mid" data-guide="web">xAI-Schlüssel prüfen (HTTP 403)</li>
+    </ul>
+  </section>
+</section>

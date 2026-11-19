@@ -268,6 +268,7 @@ export interface TrailPart {
   /** Where it leads; null = the current page (plain text) or the folded "…". */
   link: string | readonly unknown[] | null;
   queryParams?: Record<string, unknown> | null;
+  fragment?: string | null;
   /** The folded middle ("…"). */
   fold?: boolean;
 }
@@ -280,13 +281,14 @@ function linkPath(link: string | readonly unknown[] | null): string {
 
 /** The path from the area root to the current page: the page header's crumbs + its title; the area root leads it. */
 export function trailOf(
-  crumbs: readonly { label?: string; labelKey?: string; labelParams?: Record<string, string> | null; link: string | readonly unknown[]; queryParams?: Record<string, unknown> | null }[] | null | undefined,
+  crumbs: readonly { label?: string; labelKey?: string; labelParams?: Record<string, string> | null; link: string | readonly unknown[]; queryParams?: Record<string, unknown> | null; fragment?: string | null }[] | null | undefined,
   title: string | null | undefined,
   area: AreaEntry | null,
 ): TrailPart[] {
   const list: TrailPart[] = (crumbs ?? []).map((c) => ({ ...c }));
   if (title) list.push({ label: title, link: null });
-  if (area && (list.length === 0 || linkPath(list[0].link) !== area.link)) {
+  // A first crumb on the area root's path but with a fragment (a page of the HQ landing, /hq#inventar) is not the root itself.
+  if (area && (list.length === 0 || linkPath(list[0].link) !== area.link || !!list[0].fragment)) {
     list.unshift({ labelKey: area.labelKey, link: list.length ? area.link : null });
   }
   return list;

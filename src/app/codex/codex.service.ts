@@ -1889,6 +1889,16 @@ export class CodexService {
     return this.fetchDetailForBuild('ship', className, buildId);
   }
 
+  /** The same build-scoped read for any kind — the item page's Änderungen tab diffs two builds' payloads. */
+  async detailForBuild(kind: CodexKind, className: string, buildId: string): Promise<CodexDetail | null> {
+    return this.fetchDetailForBuild(kind, className, buildId);
+  }
+
+  /** The builds a patch comparison can use (newest first), failing loudly — see {@link recentLiveBuildsOrThrow}. */
+  async comparisonBuilds(limit = 6): Promise<CodexBuild[]> {
+    return this.recentLiveBuildsOrThrow(limit);
+  }
+
   private async fetchDetailForBuild(
     kind: CodexKind,
     classNameSlug: string,

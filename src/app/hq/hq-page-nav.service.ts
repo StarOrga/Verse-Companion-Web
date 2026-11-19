@@ -36,6 +36,8 @@ export class HqPageNavService {
   readonly noHover = typeof matchMedia === 'function' && matchMedia('(hover: none), (pointer: coarse)').matches;
   /** The saved Einsatz whose route Planen should open (from the URL or a plain click on "Route öffnen"). */
   readonly routeFocus = signal<{ id: string } | null>(routeFromUrl());
+  /** The Lager tab the stock page shows (Alles, Inventar, Hangar, Sammlungen); null while it is not built. */
+  readonly stockTab = signal<string | null>(null);
   /** The page in view (Start when the landing has not reported one yet). */
   readonly active = computed<HqPageId>(() => this.chrome.hqPage() ?? 'start');
 

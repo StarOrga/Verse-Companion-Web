@@ -65,6 +65,7 @@ export const EVENTS = {
   'codex:holotable_open': ev<{ kind: string }>('codex', 'Der Holotisch einer Detailseite wurde bewusst eingeschaltet.'),
   'codex:part_select': ev<{ source: 'model' | 'list' | 'keyboard' }>('codex', 'Ein Bauteil wurde auf dem Holotisch gewählt (Quelle: Klick aufs 3D-Modell, Liste im Seitenpanel oder Tastatur).'),
   'codex:part_deselect': ev<{ via: 'empty' | 'again' | 'panel' | 'escape' }>('codex', 'Die Bauteil-Auswahl auf dem Holotisch wurde aufgehoben (Klick ins Leere, zweiter Klick aufs Bauteil, Zurück im Seitenpanel oder Escape).'),
+  'codex:detail_tab_select': ev<{ kind: string; tab: 'einordnung' | 'werte' | 'bezug' | 'verbaut' | 'aenderungen' | 'bauteile' }>('codex', 'Im Seitenpanel einer Detailseite (Holotisch-Beta, Gegenstand oder Schiff) wurde ein Reiter gewählt (Art, Reiter; bauteile nur beim Schiff).'),
   'codex:buy_open': ev<{ kind: string; tab_remembered: boolean }>('codex', 'Der Reiter Kaufen der Holotisch-Akte wurde geöffnet (Art; ob er die gemerkte Wahl war).'),
   'codex:wish_add': ev<{ kind: string; source: 'shop' | 'wikelo' }>('codex', 'Ein Eintrag wurde aus dem Reiter Kaufen auf die Wunschliste gesetzt (Quelle: Laden oder Wikelo-Tausch).'),
   'codex:deck_select': ev<{ ship: string; deck: string; view: '2d' | '3d' }>('codex', 'Im Holotisch wurde im Deck-Filter ein Deck gewählt (Schiff, Deck-Schlüssel oder hull/all, Ansicht 2D oder 3D).'),

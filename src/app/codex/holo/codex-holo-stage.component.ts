@@ -57,6 +57,8 @@ import { HardpointFrame, HardpointMarker } from '../hardpoint-map';
 import type { HardpointPortRef } from '../hardpoint-port-ref';
 import { CodexHoloStripComponent } from './codex-holo-strip.component';
 import { CodexHoloEinsatzComponent } from './codex-holo-einsatz.component';
+import { CodexDetailHeadComponent } from '../detail/codex-detail-head.component';
+import { CodexDetailTabsComponent, type DetailTabItem } from '../detail/codex-detail-shell.component';
 import { HangarPickerComponent, HangarPickerItem } from '../stage/hangar-picker.component';
 import {
   CodexHoloPatchComponent,
@@ -210,6 +212,9 @@ const PANEL_TABS: readonly { id: HoloPanelTab; labelKey: string; icon: string }[
   { id: 'changes', labelKey: 'codex.holo.stage.tab.changes', icon: 'M4 12a8 8 0 1 0 3-6.2M4 4v5h5M12 8v4l3 2' },
 ];
 
+/** The ship tabs in the vocabulary of `codex:detail_tab_select` (one event for every detail page). */
+const SHIP_TAB_EVENT = { rank: 'einordnung', parts: 'bauteile', changes: 'aenderungen' } as const satisfies Record<HoloPanelTab, string>;
+
 type StaticKey = 'crew' | 'mass' | 'cargo';
 
 const SOUND_PREF_KEY = 'sc.codex.holo.sound';
@@ -281,6 +286,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   selector: 'sc-codex-holo-stage',
   standalone: true,
   imports: [FeedbackSpotDirective, AreaSymbolComponent,
+    CodexDetailTabsComponent,
     ScActionDirective,
     ScSegmentedComponent,
     NgTemplateOutlet,
@@ -302,6 +308,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
     CodexHoloChangesComponent,
     CodexLoadoutSaveBarComponent,
     ScTooltipDirective,
+    CodexDetailHeadComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -309,34 +316,21 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
              [class.ph-wait]="phase() === 'wait'" [class.ph-hero]="phase() === 'hero'" [class.ph-reveal]="phase() === 'reveal'"
              [attr.data-mission]="activeMissionId()" [style.--holo-e]="missionHue()">
 
-      <!-- ── Head (concept holotisch-feinschliff r4 d1): name + models left,
-           Einsatz top centre, the hangar button right. No patch picker here —
-           the patch choice lives in the card's Änderungen tab (C18). ── -->
-      <div class="holo-topbar" [scFeedbackSpot]="'feedbackSpot.headline'">
-        <div class="ht-left">
-          <!-- Keyed on the name: a hull switch re-enters the title with it. -->
-          @for (name of [shortName()]; track name) {
-            <div class="ht-title">
-              @if (manufacturerName(); as maker) { <span class="ht-kicker">{{ maker }}</span> }
-              <h1 class="ht-name" tabindex="0" [scTooltip]="eyebrowTitle()" scTooltipTier="label">{{ name }}</h1>
-            </div>
-          }
-          <!-- slot [htModels]: the model variants as real anchors, only when they exist (C3). -->
-          <div class="ht-models"><ng-content select="[htModels]" /></div>
-        </div>
-        <div class="ht-centre">
-          <sc-codex-holo-einsatz
-            [active]="activeMissionId()"
-            [missions]="missionSegments()"
-            [defaultLabelKey]="rankClassLabel()"
-            [cohortLabel]="cohortLabel()"
-            (missionChange)="missionChange.emit($event)" />
-        </div>
+      <!-- ── Head band (concept batch-holotisch-kopf-vorlage r1 d2): the shared sticky glass band under the
+           subheader — name + models left, Einsatz centre, the hangar button right; slim once scrolled. ── -->
+      <sc-codex-detail-head class="holo-topbar" [scFeedbackSpot]="'feedbackSpot.headline'"
+        [name]="shortName()" [kicker]="manufacturerName()" [tooltip]="eyebrowTitle()" [scan]="shellBeta() && !reducedMotion()">
+        <!-- slot [htModels]: the model variants as real anchors, only when they exist (C3). -->
+        <div headExtra class="ht-models"><ng-content select="[htModels]" /></div>
+        <sc-codex-holo-einsatz headCentre
+          [active]="activeMissionId()"
+          [missions]="missionSegments()"
+          [defaultLabelKey]="rankClassLabel()"
+          [cohortLabel]="cohortLabel()"
+          (missionChange)="missionChange.emit($event)" />
         <!-- slot [htOwn]: the one hangar button (count + shown loadout ▾, C5). -->
-        <div class="ht-right">
-          <div class="sc-head-strip" role="group" [attr.aria-label]="'codex.head.stripAria' | translate"><ng-content select="[htOwn]" /></div>
-        </div>
-      </div>
+        <div headOwn class="sc-head-strip" role="group" [attr.aria-label]="'codex.head.stripAria' | translate"><ng-content select="[htOwn]" /></div>
+      </sc-codex-detail-head>
 
       <!-- A shared link's loadout on the table, read-only until adopted (#646). -->
       @if (sharedBanner(); as sb) {
@@ -436,18 +430,9 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
         <aside class="holo-panel mobile-data" [scFeedbackSpot]="'codex.holo.stage.inspector'">
           <!-- The ownership card (concept codex-kopf-besitz C5): Haben? / Dein Exemplar, above the tabs. -->
           <ng-content select="[htCard]" />
-          <div class="ptabs" role="tablist" [attr.aria-label]="'codex.holo.stage.inspector' | translate" [style.--i]="panelTabIndex()" (keydown)="onTabKey($event)">
-            <span class="pill" aria-hidden="true"></span>
-            @for (t of panelTabs; track t.id) {
-              <button type="button" role="tab" class="ptab" [id]="'holo-tab-' + t.id" [class.on]="panelTab() === t.id"
-                      [attr.aria-selected]="panelTab() === t.id" [attr.aria-controls]="'holo-tabpanel'"
-                      [attr.tabindex]="panelTab() === t.id ? 0 : -1" (click)="panelTab.set(t.id)">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="t.icon" /></svg>
-                {{ t.labelKey | translate }}
-                @if (t.id === 'changes' && journal().length > 0) { <span class="tcount">{{ journal().length }}</span> }
-              </button>
-            }
-          </div>
+          <!-- The one detail tab pill (shared with every item page's panel). -->
+          <sc-codex-detail-tabs class="ptabs" [tabs]="panelTabItems()" [active]="panelTab()" idPrefix="holo-tab-"
+            panelId="holo-tabpanel" ariaLabelKey="codex.holo.stage.inspector" (tabSelect)="selectPanelTab($event)" />
           <div class="pbody" id="holo-tabpanel" role="tabpanel" tabindex="-1" [attr.aria-labelledby]="'holo-tab-' + panelTab()">
             <!-- slot: the patch choice (C18) — moved out of the head into the Änderungen tab.
                  Stays alive across tab switches (its comparison feeds the strip's ghosts and the pins). -->
@@ -833,20 +818,9 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   @keyframes rise { from { opacity: 0; transform: translateY(var(--holo-rise)); } }
   @keyframes fade-in { from { opacity: 0; } }
 
-  /* ── Head (r4 d1): name + models | Einsatz centred | hangar button ── */
-  .holo-topbar { position: relative; z-index: 6; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: end; gap: 6px 14px; min-height: 40px; }
-  .ht-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .ht-title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .ht-name { margin: 0; font-weight: 500; font-size: clamp(20px, 1.25vw, 24px); line-height: 1.15; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sc-fg-0);
-  white-space: nowrap; animation: name-in 520ms var(--e-out) backwards; }
-  .ht-kicker { min-width: 0; font-size: max(11px, var(--f)); letter-spacing: 0.04em; color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  animation: fade-in 480ms ease-out 120ms backwards; }
+  /* ── Head: the shared band (detail/codex-detail-head.component.ts); only the models row is styled here. ── */
   .ht-models { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; }
   .ht-models:empty { display: none; }
-  /* Opens like a projected line: clip-path only, the row never re-lays out while the name arrives. */
-  @keyframes name-in { from { opacity: 0; clip-path: inset(0 100% 0 0); } }
-  .ht-centre { justify-self: center; min-width: 0; }
-  .ht-right { justify-self: end; display: flex; justify-content: flex-end; align-items: center; gap: 10px; min-width: 0; max-width: 100%; flex-wrap: wrap; }
   .mobile-tabs { display: none; gap: 6px; }
   .mobile-tabs button { flex: 1; min-height: var(--sc-tap-min, 32px); padding: 6px 10px; border-radius: 3px; border: 1px solid var(--l2); background: var(--glass); color: var(--sc-fg-1); cursor: pointer;
   font-size: max(10px, var(--f)); letter-spacing: 0.14em; transition: color 160ms ease, border-color 160ms ease; }
@@ -868,21 +842,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   border: 1px solid var(--hair); border-radius: 16px; background: color-mix(in srgb, var(--sc-bg-0) 73%, transparent);
  }
 
-  /* ── Tabs: a glowing pill slides under the word ── */
-  .ptabs { position: relative; flex: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 10px 10px 0; min-height: max(38px, var(--sc-tap-min, 0px));
-  border: 1px solid color-mix(in srgb, var(--sc-accent) 20%, transparent); border-radius: 19px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--sc-bg-2) 85%, transparent), color-mix(in srgb, var(--sc-bg-0) 85%, transparent)); }
-  .pill { position: absolute; inset-block: 0; inset-inline-start: 0; width: calc(100% / 3); border-radius: 19px; pointer-events: none;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--sc-accent) 46%, transparent), color-mix(in srgb, var(--sc-accent) 20%, transparent));
-  box-shadow: 0 0 14px color-mix(in srgb, var(--sc-accent) 45%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--sc-accent) 60%, transparent);
-  transform: translateX(calc(var(--i, 0) * 100%)); transition: transform 180ms var(--e-out); }
-  .ptab { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 0; padding: 0 4px; background: none; border: 0; border-radius: 19px; cursor: pointer;
-  color: var(--sc-fg-2); font: inherit; font-size: max(12px, var(--f)); white-space: nowrap; transition: color 180ms ease; }
-  .ptab svg { width: 1.15em; height: 1.15em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .ptab:hover, .ptab.on { color: var(--sc-fg-0); }
-  .ptab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-  .tcount { font-family: var(--m); font-size: max(10px, var(--f)); color: var(--sc-accent); }
-  .ptab.on .tcount { color: var(--sc-fg-0); }
+  /* ── Tabs: the shared detail tab pill (sc-codex-detail-tabs), placed in the glass sheet ── */
+  .ptabs { flex: none; margin: 10px 10px 0; }
   .pbody { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding: 12px 16px; animation: rise var(--rise-dur, 300ms) var(--e-out) var(--rise-delay, 60ms) backwards;
   transition: opacity var(--holo-t-fast) var(--e-io);
   /* The card scrolls; its bottom edge fades instead of cutting a line in half, and the extra bottom
@@ -900,16 +861,6 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .dock { --dk-ease: cubic-bezier(0.16, 0.84, 0.24, 1); }
   .dock:not(.first) :is(.holo-body, .holo-below) { transform-origin: 40% 50%; animation: dk-push 700ms var(--dk-ease) backwards; }
   @keyframes dk-push { from { transform: scale(0.965); } }
-  .dock .holo-topbar .ht-title { position: relative; }
-  .dock .ht-name { position: relative; animation: dk-scan 760ms var(--dk-ease) 120ms backwards; }
-  .dock .ht-name::after { content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; transform-origin: left; pointer-events: none;
-  background: linear-gradient(90deg, var(--sc-accent), transparent); box-shadow: 0 0 10px var(--sc-accent); animation: dk-scan-line 1000ms var(--dk-ease) 120ms both; }
-  @keyframes dk-scan {
-    0% { clip-path: inset(-40% 100% -40% 0); opacity: 1; filter: brightness(2.2) drop-shadow(0 0 0 var(--sc-accent)); }
-    55% { clip-path: inset(-40% -10% -40% 0); filter: brightness(1.6) drop-shadow(0 0 10px var(--sc-accent)); }
-    100% { clip-path: inset(-40% -10% -40% 0); filter: none; }
-  }
-  @keyframes dk-scan-line { 0% { transform: scaleX(0); opacity: 0; } 12% { opacity: 1; } 58% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
   .dock:not(.first) .holo-table { transform-origin: 35% 55%; animation: dk-holo 1000ms linear 260ms backwards; }
   @keyframes dk-holo {
     0% { opacity: 0; transform: scale(1.03); filter: brightness(2) saturate(0.4); }
@@ -956,10 +907,6 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .statics .v { font-family: var(--m); font-size: 12.5px; color: var(--sc-fg-0); white-space: nowrap; }
   /* Touch: the focusable chips carry the tooltip, so they are tap targets. */
   @media (pointer: coarse) { .statics div { min-width: var(--sc-tap-min); min-height: var(--sc-tap-min); align-content: center; } }
-  /* Touch: the focusable title reaches the tap minimum. */
-  @media (pointer: coarse) {
-    .ht-name { min-height: var(--sc-tap-min); line-height: var(--sc-tap-min); }
-  }
   .cohort-link { font-size: max(10.5px, var(--f)); color: var(--sc-fg-2); text-decoration: none; text-align: center; transition: color 160ms ease; }
   .cohort-link:hover { color: var(--sc-accent); }
   /* The patch Δ fits the fixed card: no column wider than the card, the card scrolls inside (C18). */
@@ -1143,12 +1090,6 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
      the hull and its pins keep that lane free instead of lying under it (QA Q4). */
   .holo-table { padding-inline-end: var(--sc-fab-clear-inline); }
   .switch.mobile-only { display: inline-flex; }
-  .holo-topbar { grid-template-columns: auto minmax(0, 1fr); }
-  .ht-left { grid-column: 1 / -1; }
-  .ht-centre { justify-self: start; }
-  /* Its own row: beside the Einsatz box the hangar button (48 px tall, no shrink on touch)
-     ran 53–61 px past a 375 px phone and the page scrolled sideways. */
-  .ht-right { grid-column: 1 / -1; justify-content: flex-end; }
   .holo-body { gap: 10px; }
   .table-head { flex-wrap: wrap; gap: 6px; padding: 0; }
   .holo-below { grid-template-columns: 1fr; }
@@ -1754,7 +1695,11 @@ export class CodexHoloStageComponent {
   readonly viewerSelectedPort = computed(() => this.viewerSelection() ?? this.inspectedPort());
   /** "Alle Teile": every dot on the model and every row in the panel. */
   readonly hotspotScope = signal<HotspotScope>('swappable');
-  readonly panelTabs = PANEL_TABS;
+  /** The panel tabs as the shared pill draws them; Änderungen counts the journal entries. */
+  readonly panelTabItems = computed<DetailTabItem<HoloPanelTab>[]>(() => {
+    const changes = this.journal().length;
+    return PANEL_TABS.map((t) => ({ ...t, count: t.id === 'changes' ? changes : 0 }));
+  });
   readonly panelTab = signal<HoloPanelTab>('rank');
   readonly panelTabIndex = computed(() => PANEL_TABS.findIndex((t) => t.id === this.panelTab()));
   /** The package's rows, for the panel under "Alle Teile". */
@@ -2066,7 +2011,7 @@ export class CodexHoloStageComponent {
           else if (el.matches('.hs-row')) stage?.style.setProperty('--holo-row-h', `${h}px`);
           else if (el.matches('.holo-views')) stage?.style.setProperty('--holo-views-h', `${h}px`);
           else if (el.matches('.below-persp')) { el.style.setProperty('--persp-h', `${h}px`); queueJoin(); }
-          else if (el.matches('.holo-topbar')) measureTop();
+          else measureTop(); // the head band, or a box above the stage that settled late
         }
         pending.clear();
       };
@@ -2081,6 +2026,10 @@ export class CodexHoloStageComponent {
         const el = root.querySelector(sel);
         if (el) ro.observe(el);
       }
+      // What stands above the body (page head, banner, head band) can still settle after the first
+      // measure; its container grows with it, so a stale --holo-top (the strip sitting a band's height
+      // below the views bar) is caught here.
+      for (const el of [root, root.parentElement]) if (el) ro.observe(el);
       this.destroyRef.onDestroy(() => ro.disconnect());
     });
 
@@ -2724,17 +2673,12 @@ export class CodexHoloStageComponent {
     }
   }
 
-  /** The tabs are one control: arrows, Home and End walk them, focus follows. */
-  onTabKey(ev: KeyboardEvent): void {
-    const n = PANEL_TABS.length;
-    const i = this.panelTabIndex();
-    const next = ev.key === 'ArrowRight' ? (i + 1) % n : ev.key === 'ArrowLeft' ? (i - 1 + n) % n : ev.key === 'Home' ? 0 : ev.key === 'End' ? n - 1 : -1;
-    if (next < 0) return;
-    ev.preventDefault();
-    const id = PANEL_TABS[next].id;
-    this.panelTab.set(id);
-    this.host.nativeElement.querySelector<HTMLElement>(`#holo-tab-${id}`)?.focus();
+  /** A tab the reader picked in the pill (keyboard or click); programmatic switches do not count. */
+  selectPanelTab(tab: HoloPanelTab): void {
+    this.panelTab.set(tab);
+    this.analytics.track('codex:detail_tab_select', { kind: 'ship', tab: SHIP_TAB_EVENT[tab] });
   }
+
 
   /** The drawer opens from the panel, and the page goes to it. */
   openDetailsDrawer(): void {
