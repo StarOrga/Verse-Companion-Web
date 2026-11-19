@@ -4,6 +4,18 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.282.0] - 2026-11-19
+
+### Added
+- Codex: list data (browse lists, counts, filters, rank comparisons, missiles, German-name search) can be served as fixed files per game build instead of from the database; the database stays the fallback. Takes effect once the files are published for a build.
+
+### Changed
+- Automated browser checks and the mobile gate share a catalog cache and queue their database requests, so they no longer load the live database like a stress test.
+- Codex search by German name returns every match instead of at most 100 when the list files are available.
+
+### Fixed
+- Codex weapon rank comparison no longer stops at the first 1,000 weapons when the list files are available.
+
 ## [0.281.8] - 2026-11-19
 
 ### Fixed
