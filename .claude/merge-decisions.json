@@ -410,6 +410,16 @@
         "hunks": [
           "139472031288"
         ]
+      },
+      {
+        "ship": "claude/data-uploader-extraction-spike-be3dcb",
+        "by": "JerryT2T",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-19T23:49:06.519Z",
+        "hunks": [
+          "0ed36874ee8e"
+        ]
       }
     ],
     ".claude/project-map.md›generated counts›value": [
@@ -1731,6 +1741,16 @@
         "at": "2026-11-18T23:35:22.343Z",
         "hunks": [
           "f2d38bcbe1d7"
+        ]
+      },
+      {
+        "ship": "claude/data-uploader-extraction-spike-be3dcb",
+        "by": "JerryT2T",
+        "value": "current: 0.283.1 (generated from CHANGELOG)",
+        "decided": true,
+        "at": "2026-11-19T23:49:06.519Z",
+        "hunks": [
+          "83cf0eba4627"
         ]
       }
     ],
