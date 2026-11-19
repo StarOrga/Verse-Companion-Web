@@ -6958,7 +6958,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
 </section>
 
 
-<section data-iteration="3" data-iteration-template="decision" data-wide data-tab-label="Runde 3" id="iter-3" data-active>
+<section data-iteration="3" data-iteration-template="decision" data-wide data-tab-label="Runde 3" id="iter-3" hidden>
 <style>
 [data-iteration="3"] {
   --k-bg0: #0d2635; --k-bg1: #123246; --k-bg2: #0b2130; --k-fg0: #e8ebed; --k-fg1: #9fb3c8; --k-fg2: #84a0b6;
@@ -7606,6 +7606,672 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
         return;
       }
       case 'plan': toast('Entwurf: Route mit ' + a.dataset.n + (a.dataset.n === '1' ? ' Stopp' : ' Stopps') + ' in „Planen“ angelegt.'); return;
+      case 'all': showAll = !showAll; render(); return;
+      case 'undo': undo(Number(a.dataset.i)); render(); return;
+      default: return;
+    }
+  });
+  renderLoc();
+  render();
+})();
+</script>
+</section>
+
+
+<section data-iteration="4" data-iteration-template="decision" data-wide data-tab-label="Runde 4" id="iter-4" data-active>
+<style>
+[data-iteration="4"] {
+  --k-bg0: #0d2635; --k-bg1: #123246; --k-bg2: #0b2130; --k-fg0: #e8ebed; --k-fg1: #9fb3c8; --k-fg2: #84a0b6;
+  --k-border: rgba(82, 193, 230, 0.18); --k-accent: #52c1e6; --k-warn: #f0c27b; --k-ok: #7fd1a4;
+}
+[data-iteration="4"] .k-iter { display: inline-block; font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--k-accent); border: 1px solid color-mix(in srgb, var(--k-accent) 45%, transparent); border-radius: 3px; padding: .1rem .5rem; margin-bottom: .5rem; }
+[data-iteration="4"] .k-pinhint { display: flex; gap: .8rem; align-items: flex-start; margin: 0 0 1.2rem; padding: .75rem 1rem; max-width: 92ch;
+  border: 1px solid color-mix(in srgb, var(--k-accent) 55%, transparent); border-radius: 6px; background: rgba(82,193,230,.08); font-size: .9rem; line-height: 1.55; }
+[data-iteration="4"] .k-pinhint .k-dot { flex: none; width: 26px; height: 26px; border-radius: 50%; margin-top: 2px; background: var(--k-accent); box-shadow: 0 0 0 4px rgba(82,193,230,.22); display: grid; place-items: center; }
+[data-iteration="4"] .k-pinhint .k-dot::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+[data-iteration="4"] kbd { display: inline-block; min-width: 1.6em; padding: 0 .4em; border: 1px solid var(--k-border); border-bottom-width: 2px; border-radius: 4px; background: var(--k-bg0); font: 600 .8rem/1.5 ui-monospace, Consolas, monospace; text-align: center; }
+[data-iteration="4"] .k-changes { margin: .6rem 0 0; padding: .7rem 1rem .7rem 1.1rem; border-left: 3px solid var(--k-accent); background: rgba(82,193,230,.06); max-width: 92ch; }
+[data-iteration="4"] .k-changes h3 { margin: 0 0 .35rem; font-size: .95rem; }
+[data-iteration="4"] .k-recap { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; margin: .7rem 0 0; padding: 0; list-style: none; }
+[data-iteration="4"] .k-recap li { border: 1px solid var(--k-border); border-radius: 4px; background: var(--k-bg1); padding: .4rem .6rem; font-size: .8rem; line-height: 1.4; color: var(--k-fg1); }
+[data-iteration="4"] .k-recap li b { display: block; color: var(--k-fg0); font-size: .78rem; }
+[data-iteration="4"] .k-quote { margin: .8rem 0 0; padding: .55rem .9rem; border-left: 3px solid var(--k-warn); background: rgba(240,194,123,.07); font-size: .86rem; line-height: 1.55; max-width: 92ch; }
+[data-iteration="4"] .k-quote b { display: block; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--k-warn); margin-bottom: .15rem; }
+[data-iteration="4"] > section[id] { margin: 2.4rem 0 0; padding-top: 1.4rem; border-top: 1px solid var(--k-border); }
+[data-iteration="4"] > section[id] > h2 { font-size: 1.15rem; margin: 0 0 .35rem; }
+[data-iteration="4"] .lead { color: var(--text-secondary); font-size: .9rem; margin: 0 0 .8rem; max-width: 86ch; line-height: 1.6; }
+[data-iteration="4"] code { font-size: .85em; }
+[data-iteration="4"] .k-h3 { font-size: .98rem; margin: 1.6rem 0 .5rem; }
+[data-iteration="4"] .k-note { border-left: 3px solid var(--k-warn); padding: .55rem .9rem; background: rgba(240,194,123,.07); font-size: .85rem; line-height: 1.55; margin: .9rem 0 0; max-width: 86ch; }
+[data-iteration="4"] .k-map { width: 100%; border-collapse: collapse; font-size: .84rem; margin: .4rem 0 0; }
+[data-iteration="4"] .k-map th, [data-iteration="4"] .k-map td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid var(--k-border); vertical-align: top; }
+[data-iteration="4"] .k-map th { font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--text-tertiary); font-weight: 600; }
+[data-iteration="4"] .k-dec { border: 1px solid var(--k-border); border-radius: 4px; background: var(--k-bg1); padding: .7rem .8rem; color: var(--k-fg0); margin-top: 10px; }
+[data-iteration="4"] .k-dec h4 { margin: 0 0 .2rem; font-size: .88rem; }
+[data-iteration="4"] .k-dec p { margin: 0 0 .5rem; font-size: .8rem; color: var(--k-fg1); line-height: 1.45; }
+[data-iteration="4"] .k-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+[data-iteration="4"] .k-pill { position: relative; display: inline-flex; align-items: center; gap: .4rem; padding: .35rem .7rem; border: 1px solid var(--k-border); border-radius: 999px; font-size: .8rem; color: var(--k-fg1); cursor: pointer; background: var(--k-bg0); }
+[data-iteration="4"] .k-pill input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+[data-iteration="4"] .k-pill:has(input:checked) { border-color: var(--k-accent); color: var(--k-fg0); background: rgba(82,193,230,.12); }
+[data-iteration="4"] .k-pill:has(input:focus-visible) { outline: 2px solid var(--k-accent); outline-offset: 2px; }
+[data-iteration="4"] .k-pill i { font-style: normal; font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; color: var(--k-warn); }
+[data-iteration="4"] textarea[data-comment] { width: 100%; min-height: 90px; background: var(--input-bg, #0d1117); color: var(--text-primary); border: 1px solid var(--border-default, #30363d); border-radius: 4px; padding: .6rem .7rem; font: inherit; font-size: .88rem; box-sizing: border-box; margin-top: .6rem; }
+[data-iteration="4"] .k-cap { font-size: .74rem; color: var(--text-tertiary); margin: .4rem 0 0; }
+
+/* ── Mock ── (no rule on the mock root's direct children: the note layer lives there) */
+[data-iteration="4"] .k4-mk { border-radius: 6px; padding: 16px; color: var(--k-fg0); font: 13px/1.4 Inter, system-ui, "Segoe UI", sans-serif;
+  background: radial-gradient(ellipse 130% 95% at 58% 0%, #0f2c3d 0%, #0b2130 45%, #071722 100%); box-shadow: 0 0 0 1px var(--k-border); margin-top: .8rem; }
+[data-iteration="4"] .k4-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+[data-iteration="4"] .k4-ti { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--k-border); border-radius: 10px; color: var(--k-accent); font-size: 18px; }
+[data-iteration="4"] .k4-ttl small { display: block; color: var(--k-fg2); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
+[data-iteration="4"] .k4-ttl b { display: block; font: 600 20px/1.2 Orbitron, Inter, sans-serif; letter-spacing: .03em; }
+[data-iteration="4"] .k4-tabs { display: inline-flex; padding: 3px; border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-bg0); }
+[data-iteration="4"] .k4-tab { display: inline-flex; align-items: center; min-height: 30px; padding: 0 14px; border-radius: 999px; color: var(--k-fg2); user-select: none; }
+[data-iteration="4"] .k4-tab[aria-current="page"] { color: var(--k-fg0); background: rgba(82,193,230,.2); box-shadow: 0 0 0 1px var(--k-accent); }
+[data-iteration="4"] .k4-search { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr) minmax(100px, .7fr) auto; gap: 8px; margin-top: 14px; align-items: end; }
+@media (max-width: 760px) { [data-iteration="4"] .k4-search { grid-template-columns: 1fr; } }
+[data-iteration="4"] .k4-fld { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+[data-iteration="4"] .k4-fld > span { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--k-fg2); }
+[data-iteration="4"] .k4-mk input { box-sizing: border-box; width: 100%; min-height: 36px; padding: 0 10px; border: 1px solid var(--k-border); border-radius: 8px; background: var(--k-bg0); color: var(--k-fg0); font: inherit; }
+[data-iteration="4"] .k4-mk input:focus-visible { outline: 2px solid var(--k-accent); outline-offset: 1px; }
+[data-iteration="4"] .k4-acts2 { display: flex; gap: 6px; }
+[data-iteration="4"] .k4-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 14px; border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-bg0); color: var(--k-fg1); font: inherit; font-size: 12px; cursor: pointer; user-select: none; white-space: nowrap; }
+[data-iteration="4"] .k4-btn:hover:not([aria-disabled="true"]) { color: var(--k-fg0); border-color: color-mix(in srgb, var(--k-accent) 60%, transparent); }
+[data-iteration="4"] .k4-btn.pri { min-height: 36px; background: var(--k-accent); border-color: var(--k-accent); color: #04202c; font-weight: 600; }
+[data-iteration="4"] .k4-btn.sec { min-height: 36px; }
+[data-iteration="4"] .k4-btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+[data-iteration="4"] .k4-btn:focus-visible { outline: 2px solid var(--k-accent); outline-offset: 2px; }
+[data-iteration="4"] .k4-loc { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 12px; border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-bg0); }
+[data-iteration="4"] .k4-loc .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--k-ok); box-shadow: 0 0 0 3px rgba(127,209,164,.2); }
+[data-iteration="4"] .k4-loc.none .dot { background: transparent; box-shadow: inset 0 0 0 1.5px var(--k-fg2); }
+[data-iteration="4"] .k4-loc small { color: var(--k-fg2); }
+[data-iteration="4"] .k4-flt { margin-top: 10px; padding: 8px 10px; border: 1px solid var(--k-border); border-radius: 6px; background: var(--k-bg2); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+[data-iteration="4"] .k4-flt-h { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--k-fg1); font-weight: 600; }
+[data-iteration="4"] .k4-set { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--k-fg2); }
+[data-iteration="4"] .k4-sw { display: inline-flex; padding: 2px; border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-bg0); }
+[data-iteration="4"] .k4-sw button { min-height: 26px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: var(--k-fg2); font: inherit; font-size: 12px; cursor: pointer; }
+[data-iteration="4"] .k4-sw button[aria-pressed="true"] { background: rgba(82,193,230,.2); color: var(--k-fg0); box-shadow: 0 0 0 1px var(--k-accent); }
+[data-iteration="4"] .k4-sw button:focus-visible { outline: 2px solid var(--k-accent); outline-offset: 1px; }
+[data-iteration="4"] .k4-ref { font-size: 11px; color: var(--k-fg2); margin-left: auto; }
+[data-iteration="4"] .k4-ref b { color: var(--k-fg0); font-weight: 600; }
+[data-iteration="4"] .k4-body { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 12px; margin-top: 12px; align-items: start; }
+@media (max-width: 900px) { [data-iteration="4"] .k4-body { grid-template-columns: minmax(0, 1fr); } }
+[data-iteration="4"] .k4-res { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+[data-iteration="4"] .k4-sub { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--k-fg2); margin: 4px 0 0; }
+[data-iteration="4"] .k4-card { border: 1px solid var(--k-border); border-radius: 6px; background: var(--k-bg1); padding: 9px 11px; display: flex; flex-direction: column; gap: 7px; }
+[data-iteration="4"] .k4-card.best { border-color: color-mix(in srgb, var(--k-accent) 70%, transparent); }
+[data-iteration="4"] .k4-card.multi { border-left: 3px solid var(--k-warn); }
+[data-iteration="4"] .k4-card-h { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+[data-iteration="4"] .k4-card-h b { margin-right: auto; }
+[data-iteration="4"] .k4-tag { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--k-fg2); border: 1px solid var(--k-border); border-radius: 999px; padding: 1px 8px; }
+[data-iteration="4"] .k4-tag.ok { color: var(--k-ok); border-color: rgba(127,209,164,.4); }
+[data-iteration="4"] .k4-tag.warn { color: var(--k-warn); border-color: rgba(240,194,123,.4); }
+[data-iteration="4"] .k4-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+[data-iteration="4"] .k4-chip { display: inline-flex; align-items: baseline; gap: 4px; padding: 3px 9px; border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-bg0); font-size: 12px; color: var(--k-fg1); white-space: nowrap; }
+[data-iteration="4"] .k4-chip b { color: var(--k-fg0); font-variant-numeric: tabular-nums; }
+[data-iteration="4"] .k4-chip small { color: var(--k-fg2); font-size: 10px; }
+[data-iteration="4"] .k4-row { border: 1px solid var(--k-border); border-radius: 6px; background: var(--k-bg1); padding: 7px 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+[data-iteration="4"] .k4-row .nm { min-width: 7em; }
+[data-iteration="4"] .k4-row .tot { color: var(--k-fg2); font-size: 11px; min-width: 7.5em; }
+[data-iteration="4"] .k4-row-acts { display: flex; flex-wrap: wrap; gap: 6px; }
+[data-iteration="4"] .k4-empty { color: var(--k-fg2); font-size: 12px; padding: 6px 2px; }
+[data-iteration="4"] .k4-more { font-size: 12px; color: var(--k-accent); cursor: pointer; background: none; border: 0; padding: 4px 0; font: inherit; text-align: left; }
+[data-iteration="4"] .k4-log { border: 1px solid var(--k-border); border-radius: 6px; background: var(--k-bg1); padding: 9px 11px; }
+[data-iteration="4"] .k4-log h5 { margin: 0 0 6px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--k-fg1); }
+[data-iteration="4"] .k4-log ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+[data-iteration="4"] .k4-log li { display: grid; grid-template-columns: 16px 58px minmax(0, 1fr) auto; gap: 6px; align-items: baseline; font-size: 12px; padding: 3px 0; border-bottom: 1px solid rgba(82,193,230,.08); }
+[data-iteration="4"] .k4-log li .ico { color: var(--k-fg2); text-align: center; }
+[data-iteration="4"] .k4-log li[data-k="add"] .ico, [data-iteration="4"] .k4-log li[data-k="add"] .d { color: var(--k-ok); }
+[data-iteration="4"] .k4-log li[data-k="out"] .ico, [data-iteration="4"] .k4-log li[data-k="out"] .d { color: var(--k-warn); }
+[data-iteration="4"] .k4-log li .d { font-variant-numeric: tabular-nums; text-align: right; }
+[data-iteration="4"] .k4-log li .m small { display: block; color: var(--k-fg2); font-size: 10px; }
+[data-iteration="4"] .k4-log li .u { font-size: 11px; color: var(--k-accent); cursor: pointer; background: none; border: 0; padding: 0; font: inherit; font-size: 11px; }
+[data-iteration="4"] .k4-toast { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; min-height: 1.6em; margin: 8px 0 0; font-size: 12px; color: var(--k-ok); }
+[data-iteration="4"] .k4-toast .u { color: var(--k-accent); background: none; border: 1px solid var(--k-border); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+[data-iteration="4"] .k4-head { flex-wrap: nowrap; }
+@media (max-width: 760px) { [data-iteration="4"] .k4-head { flex-wrap: wrap; } }
+/* Fixed title width: the tabs never move, whatever the page title says. */
+[data-iteration="4"] .k4-ttl { width: 9.5rem; flex: none; }
+[data-iteration="4"] .k4-ttl b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+[data-iteration="4"] .k4-locbox { position: relative; margin-left: auto; flex: none; }
+[data-iteration="4"] .k4-locbtn { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; max-width: 15rem; padding: 0 12px; border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-bg0); color: var(--k-fg0); font: inherit; font-size: 12px; cursor: pointer; }
+[data-iteration="4"] .k4-locbtn:hover { border-color: color-mix(in srgb, var(--k-accent) 60%, transparent); }
+[data-iteration="4"] .k4-locbtn:focus-visible { outline: 2px solid var(--k-accent); outline-offset: 2px; }
+[data-iteration="4"] .k4-locbtn .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--k-ok); box-shadow: 0 0 0 3px rgba(127,209,164,.2); }
+[data-iteration="4"] .k4-locbtn[data-src="hand"] .dot { background: var(--k-accent); box-shadow: 0 0 0 3px rgba(82,193,230,.2); }
+[data-iteration="4"] .k4-locbtn[data-src="none"] .dot { background: transparent; box-shadow: inset 0 0 0 1.5px var(--k-fg2); }
+[data-iteration="4"] .k4-locbtn b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+[data-iteration="4"] .k4-locbtn small { color: var(--k-fg2); font-size: 10px; }
+[data-iteration="4"] .k4-pop { position: absolute; right: 0; top: calc(100% + 6px); z-index: 5; width: 250px; padding: 8px; border: 1px solid var(--k-border); border-radius: 8px; background: var(--k-bg2); box-shadow: 0 10px 30px rgba(0,0,0,.45); display: flex; flex-direction: column; gap: 6px; }
+[data-iteration="4"] .k4-pop[hidden] { display: none; }
+[data-iteration="4"] .k4-pop p { margin: 0; font-size: 11px; color: var(--k-fg2); }
+[data-iteration="4"] .k4-sug { display: flex; flex-direction: column; gap: 2px; max-height: 170px; overflow: auto; }
+[data-iteration="4"] .k4-sug button { text-align: left; padding: 5px 8px; border: 0; border-radius: 6px; background: transparent; color: var(--k-fg1); font: inherit; font-size: 12px; cursor: pointer; }
+[data-iteration="4"] .k4-sug button:hover, [data-iteration="4"] .k4-sug button:focus-visible { background: rgba(82,193,230,.12); color: var(--k-fg0); outline: none; }
+[data-iteration="4"] .k4-sug small { color: var(--k-fg2); margin-left: 4px; }
+[data-iteration="4"] .k4-search { margin-top: 12px; }
+/* Reason for a greyed-out button: the app's styled tooltip, never a line under the search. */
+[data-iteration="4"] .k4-tipw { position: relative; display: inline-flex; }
+[data-iteration="4"] .k4-tip { position: absolute; right: 0; top: calc(100% + 6px); z-index: 4; width: max-content; max-width: 240px; padding: 6px 9px; border: 1px solid var(--k-border); border-radius: 6px; background: var(--k-bg2); color: var(--k-fg0); font-size: 11px; line-height: 1.4; box-shadow: 0 6px 18px rgba(0,0,0,.4); opacity: 0; pointer-events: none; transition: opacity .12s ease .35s; }
+[data-iteration="4"] .k4-tipw:hover .k4-tip, [data-iteration="4"] .k4-tipw:focus-within .k4-tip { opacity: 1; }
+[data-iteration="4"] .k4-tip:empty { display: none; }
+[data-iteration="4"] .k4-min { font-variant-numeric: tabular-nums; color: var(--k-fg0); font-weight: 600; }
+[data-iteration="4"] .k4-why { font-size: 11px; color: var(--k-fg2); }
+[data-iteration="4"] .k4-ex { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: .6rem 0 0; }
+@media (max-width: 760px) { [data-iteration="4"] .k4-ex { grid-template-columns: 1fr; } }
+[data-iteration="4"] .k4-ex > div { border: 1px solid var(--k-border); border-radius: 6px; background: var(--k-bg1); padding: 8px 10px; font-size: .8rem; color: var(--k-fg1); line-height: 1.45; }
+[data-iteration="4"] .k4-ex b { display: block; color: var(--k-fg0); }
+[data-iteration="4"] .k4-plan { margin: .5rem 0 0; padding-left: 1.2rem; font-size: .88rem; line-height: 1.6; max-width: 86ch; }
+[data-iteration="4"] .k4-fld.miss input { border-color: var(--k-warn); }
+[data-iteration="4"] .k4-missline { min-height: 0; margin: 6px 0 0; font-size: 12px; color: var(--k-warn); }
+[data-iteration="4"] .k4-missline:empty { display: none; }
+</style>
+
+  <div class="iteration-intro">
+    <span class="k-iter">Runde 4</span>
+    <p class="k-pinhint" data-pin><span class="k-dot" aria-hidden="true"></span><span><strong>Notiz an eine Stelle setzen:</strong> <kbd>Strg</kbd> gedrückt halten (Mac: <kbd>⌘</kbd>) und auf die Stelle klicken, die du meinst, auch auf jedes Teil im Entwurf (der Standort oben rechts, eine Ergebniskarte, die Minuten). Am Tablet oder Handy lange drücken. <kbd>Enter</kbd> speichert, <kbd>Esc</kbd> verwirft.</span></p>
+    <h2>Standort klein in die Kopfzeile, Wege in Minuten</h2>
+    <p>Deine 10 Entscheidungen aus Runde 3 gelten (Kasten unten). Deine Notiz habe ich so umgesetzt: (a) „Mein Standort“ ist jetzt ein kleiner Knopf rechts in der Kopfzeile, neben „Alles · Inventar · Hangar · Sammlungen“, und lässt sich ohne App von Hand setzen. (b) Die Liste reiht nach geschätzten Flugminuten, und jeder Anflug auf eine Stadt oder Station zählt mit. (c) Die Zeile unter der Suche ist weg, das Ladeprotokoll rechts bleibt. Offen sind nur noch sieben kleine Fragen, danach kann ich den Bereich „Lager“ bauen.</p>
+    <div class="k-changes">
+      <h3>Das hast du in Runde 3 festgelegt</h3>
+      <ul class="k-recap">
+        <li data-pin><b>Mengen-Suche</b>Eine Liste, eingestellt über den Filter, keine drei Knöpfe</li>
+        <li data-pin><b>Ab wo gemessen wird</b>Ein einzelner Ort im Feld Ort ist der Suchpunkt, sonst dein Standort</li>
+        <li data-pin><b>Höchstens Stopps (Start)</b>3</li>
+        <li data-pin><b>Abwägung (Start)</b>Ausgewogen</li>
+        <li data-pin><b>Filter gemerkt</b>Im Konto, auf allen Geräten gleich</li>
+        <li data-pin><b>Einlagern ohne einzelnen Ort</b>Dein Standort</li>
+        <li data-pin><b>Unbekannter Gegenstand</b>Nur bekannte Namen, sonst ausgegraut</li>
+        <li data-pin><b>Mehr rausnehmen als da ist</b>Ausgegraut</li>
+        <li data-pin><b>Rückgängig</b>Sofort gespeichert, Hinweis und Ladeprotokoll bieten eine Gegenbuchung</li>
+        <li data-pin><b>Schnell mehrmals geklickt</b>Eine Zeile „+5 SCU (5 Klicks)“, „Rückgängig“ nimmt alle zurück</li>
+      </ul>
+    </div>
+    <p class="k-quote" data-pin><b>Deine Notiz aus Runde 3 (gekürzt)</b>„‚Mein Standort‘ bitte kleiner halten, zum Beispiel oben neben Alles, Inventar, Hangar, Sammlung, damit das Fenster nicht zu weit runterrutscht. Gemessen werden muss nach Flugzeit oder Entfernung, und der Anflug an Flughafen oder Raumstation dauert meist länger, als 2 Minuten länger zu fliegen. Ohne verbundene App muss ich meinen Standort irgendwo angeben können. Beispiel: New Babbage 30 Eisen, Area18 15 Eisen, ich brauche 15 Eisen und bin bei Port Tressler: dann soll New Babbage als Nächstes kommen. Das Protokoll im Miniformat unter der Suche ist doppelt und wird nicht gebraucht, das rechts reicht.“</p>
+  </div>
+
+  <section id="k4-loc" data-nav-label="a · Standort">
+    <h2>a · Der Standort als kleiner Knopf in der Kopfzeile</h2>
+    <p class="lead">Die eigene Zeile „Mein Standort“ fällt weg. Rechts in der Kopfzeile steht ein kleiner Knopf mit Punkt und Ortsname: grün = live aus der App, blau = von dir gesetzt, leerer Ring = kein Standort. Ein Klick öffnet ein kleines Feld mit denselben Ort-Vorschlägen wie im Feld Ort, ein Klick auf einen Vorschlag setzt ihn. Damit sich die Leiste nicht verschiebt, bekommt der Titel links eine feste Breite, die Leiste steht dahinter immer an derselben Stelle. Der Knopf rechts wird nie breiter als fest vorgegeben, ein langer Ortsname wird mit „…“ gekürzt.</p>
+    <p class="lead">Zu deiner Frage „Standort mit dem Ort verknüpfen oder anders regeln“: Ich schlage vor, beides getrennt zu lassen. Mit Menge ist das Feld Ort schon der Suchpunkt (deine Entscheidung aus Runde 3), dein Beispiel klappt also so: „Eisen“, Ort „Port Tressler“, Menge 15, und New Babbage steht oben. Würde dasselbe Feld auch den Standort setzen, stünde der Standort beim nächsten „Wo liegt mein Kupfer?“ auf dem Ort, an dem du zuletzt gesucht hast, und nicht da, wo du bist.</p>
+
+    <div data-decision="s-link" data-label="Standort und Feld Ort">
+      <div class="k-dec">
+        <h4>Hängen Standort und Feld Ort zusammen?</h4>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-s-link" value="getrennt" checked>Getrennt: Ort mit Menge ist nur der Suchpunkt, den Standort setzt du am Knopf oben <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-s-link" value="ort-setzt-standort">Ein einzelner Ort im Feld setzt auch den Standort</label>
+        </div>
+      </div>
+    </div>
+
+    <div data-decision="s-keep" data-label="Wie lange ein Standort von Hand gilt">
+      <div class="k-dec">
+        <h4>Wie lange ein Standort von Hand gilt</h4>
+        <p>Ist die App verbunden und meldet einen Ort, gewinnt immer die App.</p>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-s-keep" value="bis-aenderung" checked>Bis du ihn änderst oder die App einen neuen meldet, im Konto gemerkt <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-s-keep" value="sitzung">Nur bis du die Seite schließt</label>
+        </div>
+      </div>
+    </div>
+
+    <div data-decision="s-book" data-label="Buchen verschiebt den Standort">
+      <div class="k-dec">
+        <h4>Verschiebt ein Klick auf „Einlagern“ oder „Rausnehmen“ den Standort?</h4>
+        <p>Wer in Area18 etwas rausnimmt, steht oft dort. Oft trägt man aber auch nachträglich ein, was man irgendwo liegen hat.</p>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-s-book" value="nein" checked>Nein, nur der Knopf oben und die App setzen ihn <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-s-book" value="ja">Ja, der Standort springt an den gebuchten Ort</label>
+        </div>
+      </div>
+    </div>
+    <textarea data-comment="r4-loc" placeholder="Notiz zum Standort …"></textarea>
+  </section>
+
+  <section id="k4-time" data-nav-label="b · Flugminuten">
+    <h2>b · Gereiht nach Flugminuten, Anflug inklusive</h2>
+    <p class="lead">Statt der Stufen aus Runde 3 bekommt jeder Weg eine geschätzte Zeit in Minuten: <strong>Flug</strong> vom Suchpunkt zum ersten Stopp und zwischen den Stopps, plus <strong>Anflug je Stopp</strong>. Der Anflug hängt von der Art des Orts ab: eine Station im Orbit geht schnell, eine Stadt auf dem Planeten dauert wegen Atmosphäre und Landeanflug deutlich länger. So gewinnt, wie du schreibst, eine Station, die 2 Minuten weiter weg liegt, gegen eine Stadt mit langem Anflug.</p>
+    <div class="k4-ex">
+      <div data-pin><b>Station · ≈ 2 min Anflug</b>Port Tressler, Baijini Point, Everus Harbor, Seraphim Station, Ruin Station</div>
+      <div data-pin><b>Außenposten · ≈ 4 min Anflug</b>Landeplatz auf dem Mond oder Planeten, ohne Stadt</div>
+      <div data-pin><b>Stadt · ≈ 6 min Anflug</b>Area18, Lorville, New Babbage, Orison</div>
+    </div>
+    <p class="k-cap">Dein Beispiel: Du bist in Port Tressler (Station über microTech). New Babbage: 3 min Flug + 6 min Anflug = ≈ 9 min. Area18: 7 min Flug + 6 min Anflug = ≈ 13 min. Also steht New Babbage oben, im Entwurf unten genau so.</p>
+    <p class="lead">Die Abwägung aus dem Filter bleibt, rechnet jetzt aber in Minuten: <strong>Kürzester Weg</strong> zählt nur die Minuten, <strong>Ausgewogen</strong> (dein Start-Wert) rechnet für jeden weiteren Stopp 3 Minuten fürs Umladen dazu, <strong>Lieber ein Stopp</strong> 15 Minuten. Der Anflug zählt bei allen drei, weil er echte Zeit ist.</p>
+
+    <div data-decision="t-src" data-label="Woher die Flugminuten kommen">
+      <div class="k-dec">
+        <h4>Woher die Flugminuten kommen</h4>
+        <p>Der Codex hat für Planeten, Monde und Stationen Koordinaten (<code>codex_locations</code>, aus dem Uploader). Daraus lässt sich die Quantensprung-Zeit schätzen. Wo ein Ort keine Koordinaten hat, nehme ich die Stufen aus Runde 3.</p>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-t-src" value="codex" checked>Aus den Codex-Koordinaten geschätzt, Stufen nur als Ersatz <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-t-src" value="stufen">Feste Minuten je Stufe (gleicher Planet, Nachbarplanet, weit, anderes System)</label>
+        </div>
+      </div>
+    </div>
+
+    <div data-decision="t-anflug" data-label="Anflugzeit je Ortsart">
+      <div class="k-dec">
+        <h4>Anflugzeit je Ortsart</h4>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-t-anflug" value="fest" checked>Feste Werte wie oben (2 / 4 / 6 min) <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-t-anflug" value="filter">Im Mengen-Filter selbst einstellbar, Start mit 2 / 4 / 6 min</label>
+        </div>
+      </div>
+    </div>
+
+    <div data-decision="t-show" data-label="Minuten auf der Karte">
+      <div class="k-dec">
+        <h4>Zeigt die Karte die Minuten?</h4>
+        <p>Die Werte sind Schätzungen. Im Entwurf umschaltbar.</p>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-t-show" value="minuten" checked>„≈ 9 min“ auf der Karte, darunter Flug und Anflug einzeln <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-t-show" value="nur-reihe">Keine Minuten, nur die Reihenfolge und „nah / weit“</label>
+        </div>
+      </div>
+    </div>
+    <textarea data-comment="r4-time" placeholder="Notiz zu den Flugminuten …"></textarea>
+  </section>
+
+  <section id="k4-prot" data-nav-label="c · Ein Protokoll">
+    <h2>c · Ein Protokoll, rechts</h2>
+    <p class="lead">Die Zeile unter der Suche („30 SCU Eisen in Area18 einlagern, dann 45 SCU“) ist weg. Es bleiben das Ladeprotokoll rechts und der kurze Hinweis mit „Rückgängig“ nach einem Klick. Eine Sache hat die Zeile bisher noch getan: Sie hat gesagt, warum ein Knopf ausgegraut ist („In Area18 liegen nur 15 SCU“). Das muss irgendwo hin.</p>
+    <div data-decision="p-why" data-label="Warum ein Knopf ausgegraut ist">
+      <div class="k-dec">
+        <h4>Wo der Grund für einen ausgegrauten Knopf steht</h4>
+        <p>Im Entwurf: Feld Ort leeren und den Standort auf „Kein Standort“ stellen, dann mit der Maus auf „Einlagern“ zeigen oder mit <kbd>Tab</kbd> hingehen.</p>
+        <div class="k-pills">
+          <label class="k-pill"><input type="radio" name="dec-p-why" value="tooltip" checked>Im Tooltip am Knopf, wie überall in der App (am Handy beim Antippen) <i>Empfehlung</i></label>
+          <label class="k-pill"><input type="radio" name="dec-p-why" value="feld">Rot umrandetes Feld, das fehlt (Ort, Gegenstand oder Menge), mit kurzem Satz darunter</label>
+        </div>
+      </div>
+    </div>
+    <textarea data-comment="r4-prot" placeholder="Notiz zum Protokoll …"></textarea>
+  </section>
+
+  <section id="k4-mock" data-nav-label="Entwurf">
+    <h2>Entwurf: dein Beispiel aus Port Tressler</h2>
+    <p class="lead">Zum Ausprobieren: „Eisen“, Ort „Port Tressler“, Menge 15. New Babbage steht oben, Area18 darunter. Klick oben rechts auf den Standort und setz ihn von Hand, leer dann das Feld Ort: Jetzt wird ab dem Standort gemessen. Schalte die Abwägung um und erhöh die Menge auf 30 oder 45, dann siehst du, wann zwei Stopps oben stehen. Die Daten sind erfunden, nichts wird gespeichert.</p>
+    <div class="k4-mk" id="k4-mk" aria-label="Entwurf der Lagerseite, Runde 4">
+      <div class="k4-head" data-pin>
+        <span class="k4-ti" aria-hidden="true">▦</span>
+        <div class="k4-ttl" data-pin><small>HQ</small><b>Lager</b></div>
+        <div class="k4-tabs" data-pin>
+          <span class="k4-tab" aria-current="page">Alles</span>
+          <span class="k4-tab">Inventar</span>
+          <span class="k4-tab">Hangar</span>
+          <span class="k4-tab">Sammlungen</span>
+        </div>
+        <div class="k4-locbox" data-pin>
+          <button type="button" class="k4-locbtn" id="k4-locbtn" aria-haspopup="dialog" aria-expanded="false"></button>
+          <div class="k4-pop" id="k4-pop" role="dialog" aria-label="Standort setzen" hidden>
+            <label class="k4-fld"><span>Standort</span><input id="k4-locq" type="search" autocomplete="off" placeholder="Ort suchen"></label>
+            <div class="k4-sug" id="k4-sug"></div>
+            <p id="k4-pophint"></p>
+          </div>
+        </div>
+      </div>
+      <div class="k4-search" data-pin>
+        <label class="k4-fld" data-pin><span>Gegenstand oder Ort</span><input id="k4-q" type="search" autocomplete="off" placeholder="z. B. Eisen" value="Eisen"></label>
+        <label class="k4-fld" data-pin><span>Ort</span><input id="k4-place" type="search" autocomplete="off" placeholder="Ort, Planet oder System" value="Port Tressler"></label>
+        <label class="k4-fld" data-pin><span>Menge (SCU)</span><input id="k4-qty" type="number" min="0" step="1" value="15" placeholder="1"></label>
+        <div class="k4-acts2" data-pin>
+          <span class="k4-tipw"><button type="button" class="k4-btn pri" id="k4-in" data-act="in" aria-describedby="k4-tip-in">Einlagern</button><span class="k4-tip" role="tooltip" id="k4-tip-in"></span></span>
+          <span class="k4-tipw"><button type="button" class="k4-btn sec" id="k4-out" data-act="out" aria-describedby="k4-tip-out">Rausnehmen</button><span class="k4-tip" role="tooltip" id="k4-tip-out"></span></span>
+        </div>
+      </div>
+      <div class="k4-flt" id="k4-flt" data-pin></div>
+      <div class="k4-body">
+        <div class="k4-res" id="k4-res" aria-live="polite"></div>
+        <div class="k4-log" id="k4-log" data-pin></div>
+      </div>
+      <div class="k4-toast" id="k4-toast" aria-live="polite"></div>
+    </div>
+    <p class="k-cap">Vorschläge beim Tippen im Feld Ort, das Bedienfeld am Ort-Chip und die Filterleiste sind wie in Runde 2 und hier weggelassen. Orte: Port Tressler, New Babbage, Area18, Baijini Point, Lorville, Everus Harbor, Orison, Seraphim Station, Ruin Station oder Planeten und Systeme (ArcCorp, Hurston, microTech, Crusader, Stanton, Pyro). Die Minuten sind erfunden und dienen nur der Reihenfolge.</p>
+  </section>
+
+  <section id="k4-notes" data-nav-label="Umsetzen">
+    <h2>Bereit zum Umsetzen</h2>
+    <p class="lead">Mehr ist aus meiner Sicht nicht offen. Passt alles, klick im Panel rechts auf den Pfeil ▾ neben „Zur nächsten Runde“ und dann auf „Jetzt umsetzen“. Willst du noch etwas ändern, schreib es unten hin und schick „Zur nächsten Runde“. Gebaut wird nur der Bereich „Lager“, in dieser Reihenfolge, jeder Schritt einzeln nutzbar:</p>
+    <ol class="k4-plan">
+      <li data-pin>Kopfzeile mit fester Leiste und Standort-Knopf, Suche mit den Feldern Gegenstand, Ort und Menge, Vorschläge beim Tippen.</li>
+      <li data-pin>„Einlagern“ und „Rausnehmen“ mit einem Klick, Hinweis mit „Rückgängig“, Gründe für ausgegraute Knöpfe.</li>
+      <li data-pin>Mengen-Liste mit Flugminuten, Anflug je Ortsart und dem Filter (Höchstens Stopps, Abwägung, im Konto gemerkt).</li>
+      <li data-pin>Ladeprotokoll rechts mit eigener Tabelle, zusammengefasste Klicks, Gegenbuchung.</li>
+      <li data-pin>Standort live aus der App, sonst von Hand.</li>
+    </ol>
+    <p class="lead">Bilder bitte in den Feedback-Thread, die Seite kann keine Anhänge annehmen.</p>
+    <textarea data-comment="r4-notes" placeholder="Deine Anmerkungen …"></textarea>
+  </section>
+<script>
+(function () {
+  const it = document.querySelector('[data-iteration="4"]');
+  if (!it) return;
+  const $ = (s) => it.querySelector(s);
+  const dec = (id, def) => (it.querySelector('input[name="dec-' + id + '"]:checked') || {}).value || def;
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const low = (s) => String(s || '').toLowerCase().trim();
+  const RING = { hurston: 0, crusader: 1, arccorp: 2, microtech: 3 };
+  // name → [body, system, type]
+  const PLACES = {
+    'Port Tressler': ['microTech', 'Stanton', 'station'], 'New Babbage': ['microTech', 'Stanton', 'stadt'],
+    'Area18': ['ArcCorp', 'Stanton', 'stadt'], 'Baijini Point': ['ArcCorp', 'Stanton', 'station'],
+    'Lorville': ['Hurston', 'Stanton', 'stadt'], 'Everus Harbor': ['Hurston', 'Stanton', 'station'],
+    'Orison': ['Crusader', 'Stanton', 'stadt'], 'Seraphim Station': ['Crusader', 'Stanton', 'station'],
+    'Ruin Station': [null, 'Pyro', 'station'],
+  };
+  const TYPE = { station: 'Station', stadt: 'Stadt', aussenposten: 'Außenposten' };
+  const SYSTEMS = ['Stanton', 'Pyro'];
+  const BODIES = ['ArcCorp', 'Hurston', 'Crusader', 'microTech'];
+  const CATALOG = ['Eisen', 'Kupfer', 'Titan', 'Quantanium', 'Gold'];
+  let seq = 0;
+  const S = (item, place, qty) => ({ id: 's' + (++seq), item, place, qty });
+  let STOCK = [
+    S('Eisen', 'New Babbage', 30), S('Eisen', 'Area18', 15), S('Eisen', 'Baijini Point', 15),
+    S('Eisen', 'Lorville', 30), S('Eisen', 'Ruin Station', 45),
+    S('Kupfer', 'Orison', 22), S('Kupfer', 'Area18', 6), S('Titan', 'Lorville', 31),
+  ];
+  let LOG = [
+    { kind: 'out', delta: -6, item: 'Kupfer', place: 'Area18', when: 'gestern' },
+    { kind: 'add', delta: 15, item: 'Eisen', place: 'Baijini Point', when: 'vor 2 Tagen' },
+  ];
+  const ICON = { add: '+', out: '−' };
+  const WHY = { add: 'eingelagert', out: 'rausgenommen' };
+  const SUR = { 'ein-stopp': 15, ausgewogen: 3, kuerzester: 0 };
+  const WEIGH = [['ein-stopp', 'Lieber ein Stopp'], ['ausgewogen', 'Ausgewogen'], ['kuerzester', 'Kürzester Weg']];
+  const APP = { station: 2, aussenposten: 4, stadt: 6 };
+
+  // Flight minutes between two places (made-up estimate for the draft).
+  const fly = (a, b) => {
+    if (!a || !b || a === b) return 0;
+    const A = PLACES[a], B = PLACES[b];
+    if (!A || !B) return 30;
+    if (A[1] !== B[1]) return 30;
+    if (!A[0] || !B[0]) return 12;
+    if (A[0] === B[0]) return 3;
+    return 4 + 3 * Math.abs((RING[low(A[0])] ?? 3) - (RING[low(B[0])] ?? 3));
+  };
+  const appr = (p) => APP[PLACES[p] ? PLACES[p][2] : 'stadt'];
+  const nearWord = (m) => (m === 0 ? 'hier' : m <= 4 ? 'nah' : m <= 12 ? 'im System' : m < 30 ? 'weit' : 'anderes System');
+
+  const me = { at: null, src: 'none' };
+  const set = { stops: 3, weigh: 'ausgewogen' };
+  let showAll = false, toastTimer = null;
+
+  function kindOf(v) {
+    const l = low(v);
+    if (!l) return { kind: 'leer' };
+    const p = Object.keys(PLACES).find((x) => low(x) === l);
+    if (p) return { kind: 'ort', name: p };
+    const b = BODIES.find((x) => low(x) === l);
+    if (b) return { kind: 'planet', name: b };
+    const s = SYSTEMS.find((x) => low(x) === l);
+    if (s) return { kind: 'system', name: s };
+    return { kind: 'text', name: v.trim() };
+  }
+  const levels = (p) => [p, PLACES[p][0], PLACES[p][1]].filter(Boolean);
+  const inArea = (p, area) => levels(p).some((h) => low(h) === low(area));
+  const want = () => Math.max(0, Math.round(Number($('#k4-qty').value) || 0));
+  const amount = () => want() || 1;
+  const pf = () => kindOf($('#k4-place').value);
+  const asPoint = () => pf().kind === 'ort' && want() > 0;
+
+  function ref() {
+    if (asPoint()) return { p: pf().name, why: 'Ort aus der Suche' };
+    return me.at ? { p: me.at, why: me.src === 'app' ? 'Standort live aus der App' : 'Standort von Hand' } : null;
+  }
+  function hits() {
+    const f = pf();
+    const words = low($('#k4-q').value).split(/\s+/).filter(Boolean);
+    return STOCK.filter((s) => {
+      if (s.qty <= 0) return false;
+      const hay = [s.item, ...levels(s.place)].map(low);
+      if (!words.every((w) => hay.some((h) => h.includes(w)))) return false;
+      if (f.kind === 'leer' || asPoint()) return true;
+      if (f.kind === 'text') return levels(s.place).some((h) => low(h).includes(low(f.name)));
+      return inArea(s.place, f.name);
+    });
+  }
+  const sum = (rows) => rows.reduce((t, r) => t + r.qty, 0);
+
+  // Route: nearest stop first, flight + approach per stop.
+  function route(g) {
+    const r = ref();
+    let at = r ? r.p : null, flight = 0, approach = 0;
+    const left = g.slice(), order = [];
+    while (left.length) {
+      left.sort((a, b) => (at ? fly(at, a.place) - fly(at, b.place) : 0) || appr(a.place) - appr(b.place));
+      const n = left.shift();
+      flight += at ? fly(at, n.place) : 0;
+      approach += appr(n.place);
+      order.push(n); at = n.place;
+    }
+    return { order, flight, approach, total: flight + approach };
+  }
+  function ways(rows, need) {
+    const out = [];
+    const walk = (start, pick) => {
+      if (pick.length && sum(pick) >= need) {
+        if (pick.every((r) => sum(pick) - r.qty < need)) out.push(pick.slice());
+        return;
+      }
+      if (pick.length >= set.stops) return;
+      for (let i = start; i < rows.length; i++) { pick.push(rows[i]); walk(i + 1, pick); pick.pop(); }
+    };
+    walk(0, []);
+    return out.map((g) => { const rt = route(g); return { g: rt.order, rt, c: rt.total + SUR[set.weigh] * (g.length - 1) }; })
+      .sort((x, y) => x.c - y.c || x.g.length - y.g.length || (sum(x.g) - need) - (sum(y.g) - need));
+  }
+
+  const minutes = () => dec('t-show', 'minuten') === 'minuten';
+  const chip = (s) => {
+    const r = ref();
+    const m = r ? fly(r.p, s.place) + appr(s.place) : null;
+    return '<span class="k4-chip"><b>' + s.qty + '</b>' + esc(s.place) + (m != null ? ' <small>' + (minutes() ? '≈ ' + m + ' min' : nearWord(m - appr(s.place))) + '</small>' : '') + '</span>';
+  };
+  function card(w, i, need) {
+    const g = w.g, n = g.length, rt = w.rt;
+    const title = g.map((x) => x.place).join(' → ');
+    const tags = [];
+    if (i === 0) tags.push(['beste Wahl', 'ok']);
+    tags.push(n === 1 ? ['1 Stopp · reicht allein', 'ok'] : [n + ' Stopps · hier musst du ' + n + '× fliegen', 'warn']);
+    const why = minutes()
+      ? '<span class="k4-min">≈ ' + rt.total + ' min</span> <span class="k4-why">' + rt.flight + ' min Flug + ' + rt.approach + ' min Anflug (' + g.map((x) => TYPE[PLACES[x.place][2]] + ' ' + appr(x.place)).join(', ') + ')</span>'
+      : '<span class="k4-why">' + (ref() ? nearWord(rt.flight) : 'ohne Bezugspunkt, nach Menge') + '</span>';
+    return '<div class="k4-card' + (i === 0 ? ' best' : '') + (n > 1 ? ' multi' : '') + '" data-pin><div class="k4-card-h"><b>' + esc(g[0].item) + ' · ' + esc(title) + '</b>' +
+      tags.map((t) => '<span class="k4-tag ' + t[1] + '">' + esc(t[0]) + '</span>').join('') + '</div>' +
+      '<div>' + why + '</div>' +
+      '<div class="k4-chips">' + g.map(chip).join('') + '</div>' +
+      '<div class="k4-row-acts"><button type="button" class="k4-btn" data-act="plan" data-n="' + n + '">Abholen planen</button>' +
+      '<button type="button" class="k4-btn" data-act="take" data-ids="' + g.map((x) => x.id).join(',') + '" data-need="' + need + '">' + need + ' SCU rausnehmen</button></div></div>';
+  }
+
+  function filterHtml() {
+    const r = ref();
+    const sw = (key, opts) => '<span class="k4-sw" role="group">' + opts.map((o) => '<button type="button" data-set="' + key + '" data-v="' + o[0] + '" aria-pressed="' + (String(set[key]) === String(o[0])) + '">' + esc(o[1]) + '</button>').join('') + '</span>';
+    const app = dec('t-anflug', 'fest') === 'filter'
+      ? '<span class="k4-set">Anflug Stadt ' + '<span class="k4-sw" role="group">' + [4, 6, 8].map((v) => '<button type="button" data-app="stadt" data-v="' + v + '" aria-pressed="' + (APP.stadt === v) + '">' + v + ' min</button>').join('') + '</span></span>' +
+        '<span class="k4-set">Station ' + '<span class="k4-sw" role="group">' + [1, 2, 3].map((v) => '<button type="button" data-app="station" data-v="' + v + '" aria-pressed="' + (APP.station === v) + '">' + v + ' min</button>').join('') + '</span></span>'
+      : '';
+    return '<span class="k4-flt-h">Mengen-Filter</span>' +
+      '<span class="k4-set">Höchstens Stopps ' + sw('stops', [[1, '1'], [2, '2'], [3, '3']]) + '</span>' +
+      '<span class="k4-set">Abwägung ' + sw('weigh', WEIGH) + '</span>' + app +
+      '<span class="k4-ref">' + (r ? 'gemessen ab <b>' + esc(r.p) + '</b> (' + r.why + ')' : 'kein Bezugspunkt, gereiht nach Menge') + ' · Minuten ' + (dec('t-src', 'codex') === 'codex' ? 'aus Codex-Koordinaten' : 'aus festen Stufen') + ' · gemerkt im Konto</span>';
+  }
+
+  function resultsHtml(rows) {
+    const need = want();
+    if (!rows.length) return '<div class="k4-empty">Nichts gefunden. Ort oder Suchtext lockern.</div>';
+    const groups = new Map();
+    rows.forEach((r) => { if (!groups.has(r.item)) groups.set(r.item, []); groups.get(r.item).push(r); });
+    if (!need) {
+      const rf = ref();
+      return [...groups.entries()].map(([item, g]) => {
+        const sorted = [...g].sort((a, b) => (rf ? (fly(rf.p, a.place) + appr(a.place)) - (fly(rf.p, b.place) + appr(b.place)) : 0) || b.qty - a.qty);
+        return '<div class="k4-row" data-pin><span class="nm"><b>' + esc(item) + '</b></span><span class="tot">' + sum(g) + ' SCU · ' + g.length + (g.length === 1 ? ' Ort' : ' Orte') + '</span><span class="k4-chips">' + sorted.map(chip).join('') + '</span></div>';
+      }).join('') + '<p class="k4-sub">Trag eine Menge ein, dann zeigt die Liste, wo du sie am schnellsten bekommst.</p>';
+    }
+    let html = '';
+    for (const [item, g] of groups) {
+      const w = ways(g, need);
+      if (!w.length) {
+        html += '<div class="k4-empty">' + esc(item) + ': ' + (sum(g) < need ? 'zusammen nur ' + sum(g) + ' SCU da.' : 'mit höchstens ' + set.stops + (set.stops === 1 ? ' Stopp' : ' Stopps') + ' kommen keine ' + need + ' SCU zusammen. Erlaub im Filter mehr Stopps.') + '</div>';
+        continue;
+      }
+      const shown = showAll ? w : w.slice(0, 4);
+      html += shown.map((x, i) => (i === 1 ? '<p class="k4-sub">Weitere Wege</p>' : '') + card(x, i, need)).join('');
+      if (w.length > 4) html += '<button type="button" class="k4-more" data-act="all">' + (showAll ? 'Weniger' : (w.length - 4) + ' weitere') + '</button>';
+    }
+    return html;
+  }
+
+  function logHtml() {
+    const firstMine = LOG.findIndex((l) => l.mine);
+    return '<h5>Ladeprotokoll</h5><ul>' + LOG.slice(0, 7).map((l, i) => {
+      const can = l.mine && i === firstMine;
+      return '<li data-k="' + l.kind + '"><span class="ico" aria-hidden="true">' + ICON[l.kind] + '</span><b class="d">' + Math.abs(l.delta) + ' SCU</b>' +
+        '<span class="m">' + esc(l.item) + ' · ' + esc(l.place) + '<small>' + WHY[l.kind] + (l.clicks > 1 ? ' (' + l.clicks + ' Klicks)' : '') + ' · ' + esc(l.when) + '</small></span>' +
+        (can ? '<button type="button" class="u" data-act="undo" data-i="' + i + '">Rückgängig</button>' : '<span></span>') + '</li>';
+    }).join('') + '</ul>';
+  }
+
+  // ── The two buttons: no preview line any more, the reason sits in the tooltip ──
+  function target() {
+    const q = $('#k4-q').value.trim();
+    const item = [...CATALOG, ...STOCK.map((s) => s.item)].find((n) => low(n) === low(q)) || null;
+    const f = pf();
+    let place = null;
+    if (f.kind === 'ort') place = f.name;
+    else if (me.at && (f.kind === 'leer' || ((f.kind === 'planet' || f.kind === 'system') && inArea(me.at, f.name)))) place = me.at;
+    const have = item && place ? STOCK.find((s) => low(s.item) === low(item) && s.place === place) : null;
+    return { q, item, place, have, n: amount() };
+  }
+  function buttons() {
+    const t = target();
+    let inWhy = '', outWhy = '', miss = '';
+    if (!t.q) { inWhy = outWhy = 'Tipp oben einen Gegenstand ein.'; miss = 'q'; }
+    else if (!t.item) { inWhy = outWhy = '„' + t.q + '“ kenne ich nicht. Wähl einen Namen aus den Vorschlägen.'; miss = 'q'; }
+    else if (!t.place) { inWhy = outWhy = me.at ? 'Trag einen einzelnen Ort ins Feld Ort ein.' : 'Kein Standort bekannt. Trag einen Ort ins Feld Ort ein oder setz oben rechts deinen Standort.'; miss = 'place'; }
+    else {
+      const cur = t.have ? t.have.qty : 0;
+      if (!cur) outWhy = 'In ' + t.place + ' liegt kein ' + t.item + '.';
+      else if (cur < t.n) { outWhy = 'In ' + t.place + ' liegen nur ' + cur + ' SCU ' + t.item + '.'; miss = 'qty'; }
+    }
+    const tip = dec('p-why', 'tooltip') === 'tooltip';
+    $('#k4-in').setAttribute('aria-disabled', String(!!inWhy));
+    $('#k4-out').setAttribute('aria-disabled', String(!!outWhy));
+    $('#k4-tip-in').textContent = tip ? inWhy : '';
+    $('#k4-tip-out').textContent = tip ? outWhy : '';
+    ['q', 'place', 'qty'].forEach((k) => $('#k4-' + k).closest('.k4-fld').classList.toggle('miss', !tip && miss === k));
+    $('#k4-missline').textContent = tip ? '' : (inWhy || outWhy);
+  }
+
+  function toast(text, withUndo) {
+    clearTimeout(toastTimer);
+    $('#k4-toast').innerHTML = esc(text) + (withUndo ? ' <button type="button" class="u" data-act="undo" data-i="0">Rückgängig</button>' : '');
+    toastTimer = setTimeout(() => { $('#k4-toast').innerHTML = ''; }, 6000);
+  }
+  function book(kind, item, place, n) {
+    let s = STOCK.find((x) => low(x.item) === low(item) && x.place === place);
+    const created = !s;
+    if (!s) { s = S(CATALOG.find((c) => low(c) === low(item)) || item, place, 0); STOCK.push(s); }
+    const delta = kind === 'add' ? n : -Math.min(n, s.qty);
+    s.qty += delta;
+    const now = Date.now(), top = LOG[0];
+    if (top && top.mine && top.kind === kind && top.item === s.item && top.place === place && now - top.ts < 8000) {
+      top.delta += delta; top.clicks += 1; top.ts = now; top.rows.push([s, delta, created]);
+    } else {
+      LOG.unshift({ kind, delta, item: s.item, place, when: 'gerade eben', mine: true, ts: now, clicks: 1, rows: [[s, delta, created]] });
+    }
+    if (dec('s-book', 'nein') === 'ja') { me.at = place; me.src = 'hand'; renderLoc(); }
+  }
+  function undo(i) {
+    const l = LOG[i];
+    if (!l || !l.mine) return;
+    l.rows.forEach(([s, d, created]) => { s.qty -= d; if (created && s.qty <= 0) STOCK = STOCK.filter((x) => x !== s); });
+    LOG.splice(i, 1);
+    clearTimeout(toastTimer);
+    $('#k4-toast').textContent = 'Zurückgebucht: ' + Math.abs(l.delta) + ' SCU ' + l.item + ' ' + (l.kind === 'add' ? 'wieder aus ' : 'wieder in ') + l.place + '.';
+  }
+
+  // ── Standort button + small picker ──
+  function renderLoc() {
+    const b = $('#k4-locbtn');
+    b.dataset.src = me.at ? me.src : 'none';
+    b.innerHTML = '<span class="dot" aria-hidden="true"></span>' + (me.at
+      ? '<b>' + esc(me.at) + '</b><small>' + (me.src === 'app' ? 'live' : 'von Hand') + '</small>'
+      : '<small>Standort setzen</small>');
+    b.setAttribute('aria-label', me.at ? 'Mein Standort: ' + me.at + (me.src === 'app' ? ', live aus der App' : ', von Hand gesetzt') + '. Ändern' : 'Mein Standort: keiner. Standort setzen');
+  }
+  function renderSug() {
+    const q = low($('#k4-locq').value);
+    const list = Object.keys(PLACES).filter((p) => !q || levels(p).some((h) => low(h).includes(q)));
+    $('#k4-sug').innerHTML = list.map((p) => '<button type="button" data-loc="' + esc(p) + '">' + esc(p) + '<small>' + esc(TYPE[PLACES[p][2]]) + ' · ' + esc(PLACES[p][0] || PLACES[p][1]) + '</small></button>').join('') +
+      '<button type="button" data-loc="">Kein Standort</button><button type="button" data-loc="@app">Entwurf: App meldet Area18</button>';
+    $('#k4-pophint').textContent = dec('s-keep', 'bis-aenderung') === 'bis-aenderung'
+      ? 'Gilt, bis du ihn änderst oder die App einen neuen Ort meldet. Im Konto gemerkt.'
+      : 'Gilt, bis du die Seite schließt.';
+  }
+  function openPop(open) {
+    $('#k4-pop').hidden = !open;
+    $('#k4-locbtn').setAttribute('aria-expanded', String(open));
+    if (open) { $('#k4-locq').value = ''; renderSug(); $('#k4-locq').focus(); }
+  }
+
+  function render() {
+    if (dec('s-link', 'getrennt') === 'ort-setzt-standort' && pf().kind === 'ort' && me.at !== pf().name) { me.at = pf().name; me.src = 'hand'; renderLoc(); }
+    $('#k4-flt').innerHTML = filterHtml();
+    $('#k4-res').innerHTML = resultsHtml(hits());
+    $('#k4-log').innerHTML = logHtml();
+    buttons();
+  }
+
+  // Line for the "field" variant of p-why (empty in the tooltip variant).
+  const missLine = document.createElement('div');
+  missLine.id = 'k4-missline'; missLine.className = 'k4-missline'; missLine.setAttribute('aria-live', 'polite');
+  $('.k4-search').after(missLine);
+
+  ['#k4-q', '#k4-place', '#k4-qty'].forEach((s) => $(s).addEventListener('input', () => { showAll = false; render(); }));
+  $('#k4-locq').addEventListener('input', renderSug);
+  $('#k4-pop').addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.stopPropagation(); openPop(false); $('#k4-locbtn').focus(); } });
+  it.addEventListener('change', (e) => { if ((e.target.name || '').startsWith('dec-')) { renderLoc(); render(); } });
+  document.addEventListener('click', (e) => { if (!$('#k4-pop').hidden && !e.target.closest('.k4-locbox')) openPop(false); });
+  it.addEventListener('click', (e) => {
+    if (e.ctrlKey || e.metaKey) return;
+    if (e.target.closest('#k4-locbtn')) { openPop($('#k4-pop').hidden); return; }
+    const loc = e.target.closest('[data-loc]');
+    if (loc) {
+      const v = loc.dataset.loc;
+      if (v === '@app') { me.at = 'Area18'; me.src = 'app'; } else { me.at = v || null; me.src = v ? 'hand' : 'none'; }
+      openPop(false); renderLoc(); render(); $('#k4-locbtn').focus(); return;
+    }
+    const sw = e.target.closest('[data-set]');
+    if (sw) { set[sw.dataset.set] = sw.dataset.set === 'stops' ? Number(sw.dataset.v) : sw.dataset.v; showAll = false; render(); return; }
+    const ap = e.target.closest('[data-app]');
+    if (ap) { APP[ap.dataset.app] = Number(ap.dataset.v); render(); return; }
+    const a = e.target.closest('[data-act]');
+    if (!a || !it.contains(a)) return;
+    if (a.getAttribute('aria-disabled') === 'true') return;
+    switch (a.dataset.act) {
+      case 'in': case 'out': {
+        const t = target();
+        book(a.dataset.act === 'in' ? 'add' : 'out', t.item, t.place, t.n);
+        const top = LOG[0];
+        render();
+        toast(Math.abs(top.delta) + ' SCU ' + t.item + (a.dataset.act === 'in' ? ' in ' + t.place + ' eingelagert' : ' aus ' + t.place + ' rausgenommen') + (top.clicks > 1 ? ' (' + top.clicks + ' Klicks).' : '.'), true);
+        a.focus();
+        return;
+      }
+      case 'take': {
+        let left = Number(a.dataset.need);
+        const legs = a.dataset.ids.split(',').map((id) => STOCK.find((s) => s.id === id)).filter(Boolean).sort((x, y) => y.qty - x.qty);
+        for (const l of legs) { if (left <= 0) break; const n = Math.min(left, l.qty); l.qty -= n; left -= n; LOG.unshift({ kind: 'out', delta: -n, item: l.item, place: l.place, when: 'gerade eben', mine: false }); }
+        render();
+        toast(a.dataset.need + ' SCU von ' + legs.length + (legs.length === 1 ? ' Ort' : ' Orten') + ' abgebucht, steht im Ladeprotokoll.', false);
+        return;
+      }
+      case 'plan': toast('Entwurf: Route mit ' + a.dataset.n + (a.dataset.n === '1' ? ' Stopp' : ' Stopps') + ' in „Planen“ angelegt.', false); return;
       case 'all': showAll = !showAll; render(); return;
       case 'undo': undo(Number(a.dataset.i)); render(); return;
       default: return;
