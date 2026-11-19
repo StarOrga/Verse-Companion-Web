@@ -1276,6 +1276,23 @@
         ]
       }
     ],
+    "package.json›scripts.test:gate›test file list": [
+      {
+        "ship": "#1187",
+        "by": "Jerry",
+        "value": "adds scripts/sync-scc-app-i18n.test.mjs"
+      },
+      {
+        "ship": "claude/emails-umbau-decision-6cd563",
+        "by": "JerryT2T",
+        "value": "union: upstream's sync-scc-app-i18n.test.mjs kept, this branch adds agent-supabase-guard.test.mjs",
+        "decided": true,
+        "at": "2026-11-19T20:03:25.215Z",
+        "hunks": [
+          "e1ed53d7fdb8"
+        ]
+      }
+    ],
     "public/i18n/de.json›starmap.comet›rule/ruleVersion/modeAria": [
       {
         "ship": "claude/focus-borders-starmap-4c0ef0",
