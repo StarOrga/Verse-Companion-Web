@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.281.8",
+  "current": "0.281.9",
   "releases": [
+    {
+      "version": "0.281.9",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Classic ship view: 'Bei RSI ansehen' and 'Pledge-Link hinzufügen' now sit in the header action row next to 'Vergleichen' and 'Schiff wechseln'."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.281.8",
       "date": "2026-11-19",
