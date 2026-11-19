@@ -279,10 +279,16 @@ and are most likely gate runs too; the logs are gone, so that stays unproven.
 3. A minute means nothing without knowing who else used the instance in it. Ask the logs for the same window:
    `edge_logs` carries method, path and user agent in `event_message`; group by 2 minutes and by `Headless`,
    the gate's device strings, `Deno/` (edge functions) and the rest.
-4. Test a suspect by switching it off and comparing minutes, with step 3 for both windows. Not shown either
-   way so far: the 10-second cron `translate-orchestrator-fast` and the 2-minute `codex-derived-refresh` (the
-   2026-11-18 tests counted the artifact of step 2). Do not rebuild those jobs for IO reasons without a valid
-   test.
+4. Test a suspect by switching it off and comparing minutes, with step 3 for both windows. Done this way for
+   the 10-second cron `translate-orchestrator-fast` and the 2-minute `codex-derived-refresh` on 2026-11-19
+   (both parked with `cron.alter_job(jobid, active := false)`, 7 refresh minutes per phase, then restored):
+   off 99 MB a minute read from the system volume and 1 028 pages swapped in, on again 104 MB and 997 pages,
+   with the same foreign traffic in both windows (about 9 requests a minute, no browsers). **The two jobs
+   cost no measurable IO; do not rebuild them for IO reasons.** The first "on" window of that run had 185
+   headless requests from another session and 2 799 pages swapped in - the reason step 3 is not optional.
+   The data volume's 16 MB WAL bursts appeared in all three phases (max 17-18 MB a minute each), so the
+   jobs are not what keeps the WAL switching either. One run of 7 minutes per phase: enough to rule out a
+   large effect, not a small one.
 
 **State on 2026-11-18, after 7 days of uptime** (`shared_buffers` 224 MB, the platform default): 100-160 MB
 available, 540-690 MB in swap. Idle: 155 MB a minute read from the system volume (max 219), 3 700 pages
@@ -296,8 +302,18 @@ segments a day for a few kB of pg_cron bookkeeping (`cron.job_run_details`) and 
 - Claude's own browsers and the mobile gate answer catalog reads from a cache they share and queue the rest
   (`scripts/lib/agent-supabase-guard.cjs`, rules in `test-account.md`). Measured on live: a browser with a
   warm cache sends 230 database requests instead of 451 for five Codex pages, none of them a catalog list.
-- `shared_buffers` is 128 MB (`supabase --experimental postgres-config update --remote=<ref> --config
-  shared_buffers=128MB --yes`; the database restarts, ~90 s without API). Result so far: no gain. Idle, 15 minutes after the restart: 168 MB a minute read from the system volume against 155 before (same probe, about the same foreign traffic). The load windows could not be compared - another session's browsers sent 651 requests in the after window and about 100 in the before window. Verdict needs a settled instance and a quiet window (step 3); roll back with `supabase --experimental postgres-config delete --remote=<ref> --config shared_buffers --yes` (another restart) if it still shows nothing.
+- `shared_buffers` was tried at 128 MB for 18.5 hours and is back on the platform default (224 MB) since
+  2026-11-19 18:34 UTC. **Verdict: no gain.** Same probe, quiet windows, before (224 MB) against 18 hours
+  after (128 MB): idle 155 against 150 MB a minute read from the system volume, 3 692 against 3 988 pages
+  swapped in; under load 260 against 194 MB a minute but 11 705 against 11 776 pages swapped in, a request
+  round 751 against 962 ms. A smaller buffer does not free memory the kernel can use better here; do not
+  repeat the trial without a new reason. Mechanics, should it be needed for another setting: `supabase
+  --experimental postgres-config update --remote=<ref> --config <key>=<value> --yes` restarts the database
+  (~90 s without API). `… postgres-config delete --remote=<ref> --config <key> --yes` removed the override
+  but did **not** restart (CLI 3.0.0; `pg_settings.pending_restart` stayed true for 6 minutes) - the
+  restart came only from `PUT /v1/projects/<ref>/config/database/postgres` with `{"restart_database":
+  true}` (2 s). Check `pg_postmaster_start_time()` and `pg_settings` after either command, and never
+  restart while a catalog upload runs (`codex_builds` without `finalized_at`).
 - Catalog lists as immutable files per build on R2 (`storage.md` → "Catalog lists (R2 per build)"); the
   database stays the fallback.
 
