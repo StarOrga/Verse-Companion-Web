@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.282.1",
+  "current": "0.282.2",
   "releases": [
+    {
+      "version": "0.282.2",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Loading screen: the glow behind the logo fades out softly on every side instead of ending in a hard edge on the left."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.282.1",
       "date": "2026-11-19",
