@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideTranslateService } from '@ngx-translate/core';
 
-import { CodexDetailHeadComponent, nextSlim } from './codex-detail-head.component';
+import { CodexDetailHeadComponent, attachPull, nextSlim } from './codex-detail-head.component';
 import { CodexDetailShellComponent } from './codex-detail-shell.component';
 import { detailProfileFor, detailTabs, type DetailTabData, type DetailTabId } from './codex-detail-profile';
 
@@ -21,6 +21,14 @@ describe('detail profile (T1/T3/T4)', () => {
   it('gives a weapon with a comparison the item stage, and a ship the holotable with its strip', () => {
     expect(detailProfileFor('weapon', { ...NONE, einordnung: true }).stage).toBe('item');
     expect(detailProfileFor('ship', NONE)).toEqual({ stage: 'holo', tabs: [], strip: true });
+  });
+});
+
+describe('head band attaches to the subheader (H1/H3)', () => {
+  it('pulls itself up by the gap between its natural top and the capsule edge, stable once pulled', () => {
+    expect(attachPull(174, 0, 84)).toBe(90);
+    expect(attachPull(84, 90, 84)).toBe(90);
+    expect(attachPull(60, 0, 84)).toBe(0);
   });
 });
 

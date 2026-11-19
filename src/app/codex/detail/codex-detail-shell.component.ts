@@ -93,7 +93,7 @@ export class CodexDetailTabsComponent {
       :host { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
       .sh-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 470px); gap: 12px; align-items: start; min-height: 440px; }
       /* The stage stays in view beside the panel, under the slim head band. */
-      .sh-stage { position: sticky; top: calc(var(--sc-imp-banner-h, 0px) + var(--sc-topbar-h, 0px) + 60px);
+      .sh-stage { position: sticky; top: calc(var(--sc-imp-banner-h, 0px) + var(--sc-topbar-h, 0px) + 68px);
         height: calc(100dvh - var(--sc-topbar-h, 64px) - 160px); min-height: 440px; min-width: 0; }
       .sh-stage > ::ng-deep * { height: 100%; }
       .sh-panel { position: relative; display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 12px;
@@ -116,5 +116,6 @@ export class CodexDetailShellComponent {
   readonly profile = input.required<DetailProfile>();
   readonly activeTab = input.required<DetailTabId>();
   readonly tabChange = output<DetailTabId>();
-  protected readonly showTabs = computed(() => this.profile().tabs.length > 1);
+  /** The tab pill shows whenever the page has a tab: one panel chrome on every kind, even a simple item with only Werte (T2/T3). */
+  protected readonly showTabs = computed(() => this.profile().tabs.length > 0);
 }
