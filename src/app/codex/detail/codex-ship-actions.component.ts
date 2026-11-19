@@ -65,8 +65,8 @@ export class CodexShipActionsComponent {
   readonly classNameSlug = input.required<string>();
   /** Classic tool row: a flexible gap pushes the actions to the row's end. */
   readonly spacer = input(false);
-  /** The class name code. Off in the classic head row, which carries only the links (#374). */
+  /** The class name code. Off where the classic action row places only the links (#374). */
   readonly showClass = input(true);
-  /** The RSI link and the pledge-link action. Off in the classic tool row: they moved up beside the name (#374). */
+  /** The RSI link and the pledge-link action. Off at the classic row's end: they follow "Schiff wechseln" (#374). */
   readonly showLinks = input(true);
 }
