@@ -33,7 +33,7 @@ export interface DetailTabData {
   readonly bezug: number;
   /** Where it goes: blueprints that use it, the reader's ships/sets it is fitted to. */
   readonly verbaut: number;
-  /** Patch changes of this record; 0 while the data has none. */
+  /** Number of stats that differ from the previous patch; 0 hides the tab. */
   readonly aenderungen: number;
   /** A 3D package or silhouette worth a full stage. */
   readonly richStage: boolean;
@@ -48,7 +48,7 @@ export function detailTabs(data: DetailTabData): DetailTab[] {
     } else if (id === 'werte') {
       out.push({ id, count: 0 });
     } else if (data[id] > 0) {
-      out.push({ id, count: id === 'verbaut' ? data[id] : 0 });
+      out.push({ id, count: id === 'verbaut' || id === 'aenderungen' ? data[id] : 0 });
     }
   }
   return out;

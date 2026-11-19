@@ -24,6 +24,13 @@ describe('detail profile (T1/T3/T4)', () => {
   });
 });
 
+describe('Änderungen tab (oq-item-changes)', () => {
+  it('shows with its count when the record has changes and is hidden without', () => {
+    expect(detailTabs({ ...NONE, aenderungen: 3 }).find((t) => t.id === 'aenderungen')).toEqual({ id: 'aenderungen', count: 3 });
+    expect(detailTabs(NONE).some((t) => t.id === 'aenderungen')).toBe(false);
+  });
+});
+
 describe('head band attaches to the subheader (H1/H3)', () => {
   it('pulls itself up by the gap between its natural top and the capsule edge, stable once pulled', () => {
     expect(attachPull(174, 0, 84)).toBe(90);

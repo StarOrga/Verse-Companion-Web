@@ -74,6 +74,7 @@ import { ShareButtonComponent } from '../shared/share-button/share-button.compon
 import { ScEntryDirective } from '../shared/entry-motion/entry-motion';
 import { NachschubService } from '../hq/nachschub/nachschub.service';
 import { CodexItemStageComponent } from './detail/codex-item-stage.component';
+import { diffItemPayloads, type ItemChange } from './codex-item-changes';
 import { CodexDetailHeadComponent } from './detail/codex-detail-head.component';
 import { CodexDetailShellComponent } from './detail/codex-detail-shell.component';
 import { detailProfileFor, type DetailProfile, type DetailTabId } from './detail/codex-detail-profile';
@@ -1187,6 +1188,22 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
       </section>
     }
 
+    <!-- ── Patch changes of this record (items; the ship's own tab lives in the holotable) ── -->
+    @if (itemStage() && showTab('aenderungen')) {
+      <section class="sc-card block item-changes">
+        <h2>{{ 'codex.detail.changes.title' | translate: { patch: itemChangesFrom() } }} <span class="ct">{{ itemChanges().length }}</span></h2>
+        <ul class="chg-list">
+          @for (c of itemChanges(); track c.path) {
+            <li class="chg-row" [attr.data-tone]="c.tone">
+              <span class="chg-label">{{ c.label }}</span>
+              <span class="chg-vals mono">{{ fmt(c.from) }} → {{ fmt(c.to) }}@if (c.unit) { {{ c.unit }} }</span>
+              @if (c.tone === 'worse') { <span class="sc-sr-only">{{ 'codex.detail.changes.worse' | translate }}</span> }
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
     <!-- ── Full spec sheet (Manifest, collapsed) + raw payload ── -->
     @if (showTab('werte')) {
       <sc-codex-spec-sheet
@@ -1350,6 +1367,11 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     }
   `,
   styles: [`
+    .chg-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+    .chg-row { display: flex; justify-content: space-between; gap: 12px; padding-block: 4px; border-block-end: 1px solid color-mix(in srgb, var(--sc-fg-1) 14%, transparent); }
+    .chg-vals { color: var(--sc-fg-0); white-space: nowrap; }
+    .chg-row[data-tone='better'] .chg-vals { color: var(--sc-accent); }
+    .chg-row[data-tone='worse'] .chg-vals { color: var(--sc-warning); }
     /* The model links under the ship name (r3/r4 d1 .b3-models): plain words, the current one underlined. */
     .ho-models { display: flex; align-items: center; flex-wrap: wrap; gap: 1px; font-size: max(12px, var(--sc-fs-floor)); }
     .ho-models a { padding: 2px 6px; border-radius: 6px; color: var(--sc-fg-2); text-decoration: none; white-space: nowrap; }
@@ -1869,8 +1891,8 @@ export class CodexDetailComponent implements OnInit {
       werte: 1,
       bezug: this.buyOptions().length + (this.recipeView() ? 1 : 0),
       verbaut: this.usedInBlueprints().length + this.personalCount(),
-      // Items carry no patch history on the detail page yet: the tab stays hidden until they do.
-      aenderungen: 0,
+      // The payload diff against the previous patch; the tab stays hidden while it holds no change.
+      aenderungen: this.itemChanges().length,
       richStage: !!this.itemPackage() || !!this.itemRankKind(),
     }),
   );
@@ -1878,6 +1900,9 @@ export class CodexDetailComponent implements OnInit {
   protected readonly shipProfile: DetailProfile = detailProfileFor('ship', {
     einordnung: true, werte: 1, bezug: 0, verbaut: 0, aenderungen: 0, richStage: true,
   });
+  /** Non-ship pages: the stats that differ from the previous patch (empty while loading, failed or unchanged). */
+  protected readonly itemChanges = signal<ItemChange[]>([]);
+  protected readonly itemChangesFrom = signal<string | null>(null);
   protected readonly activeItemTab = computed<DetailTabId>(() => {
     const tabs = this.itemProfile().tabs;
     return tabs.some((t) => t.id === this.itemTab()) ? this.itemTab() : (tabs[0]?.id ?? 'werte');
@@ -2998,6 +3023,23 @@ export class CodexDetailComponent implements OnInit {
     this.itemRankCohort() ? 'codex.itemRank.gapTooFew' : 'codex.itemRank.gapNoCohort',
   );
 
+  /** Diffs this record's payload with the one of the previous patch's build (client-side, no new endpoint). */
+  private async loadItemChanges(d: CodexDetail, seq: number): Promise<void> {
+    try {
+      const cur = this.svc.build();
+      const builds = await this.svc.comparisonBuilds();
+      const prev = builds.find((b) => b.id !== cur?.id && b.patchVersion !== cur?.patchVersion);
+      if (!prev) return;
+      const before = await this.svc.detailForBuild(d.kind, d.classNameSlug, prev.id);
+      if (seq !== this.loadSeq || !before) return;
+      this.itemChanges.set(diffItemPayloads(before.payload, d.payload));
+      this.itemChangesFrom.set(prev.patchVersion);
+    } catch (err) {
+      // Supplementary: a failed read leaves the tab hidden (it only exists with data), never a page error.
+      logWarn('codex-detail', 'item changes failed', err);
+    }
+  }
+
   private async loadItemRankCohort(seq: number): Promise<void> {
     const kind = this.itemRankKind();
     if (!kind) return;
@@ -3278,6 +3320,8 @@ export class CodexDetailComponent implements OnInit {
     this.ammoPayloads.set(new Map());
     this.showEmptyLoadout.set(false);
     this.usedInBlueprints.set([]);
+    this.itemChanges.set([]);
+    this.itemChangesFrom.set(null);
     this.recipe.set(null);
     this.swapTarget.set(null);
     this.shipLinkForm.reset();
@@ -3338,6 +3382,7 @@ export class CodexDetailComponent implements OnInit {
         if (kind === 'ship') void this.loadEditionGroup(kind, d.classNameSlug);
         // Ships are not crafting ingredients; skip the reverse lookup for them.
         if (kind !== 'ship') void this.loadUsedInBlueprints(d.classNameSlug, seq);
+        if (kind !== 'ship') void this.loadItemChanges(d, seq);
         if (kind === 'weapon' || kind === 'component' || kind === 'item' || kind === 'ammunition') {
           void this.loadItemPackage(kind, d.classNameSlug, seq);
         } else {
