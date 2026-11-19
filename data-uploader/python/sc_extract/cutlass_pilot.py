@@ -96,13 +96,13 @@ def main() -> int:
 
     from .p4k_compat import apply_p4k_compat
     apply_p4k_compat()
-    from scdatatools.p4k import P4KFile
+    from .p4k_index import open_p4k
 
     def log(level, msg):
         print(f"[{level}] {msg}", flush=True)
 
     log("info", f"opening {args.p4k}")
-    p4k = P4KFile(str(args.p4k))
+    p4k = open_p4k(args.p4k)
     log("info", f"opened: {len(p4k.namelist())} entries")
 
     spec = build_cutlass_spec(p4k, limit=args.limit)

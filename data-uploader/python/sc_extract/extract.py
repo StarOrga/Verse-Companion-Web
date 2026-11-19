@@ -261,7 +261,7 @@ def _real_extract(cfg: ExtractConfig) -> ExtractResult:
     from .p4k_compat import apply_p4k_compat
 
     apply_p4k_compat()
-    from scdatatools.p4k import P4KFile  # type: ignore[import-not-found]
+    from .p4k_index import open_p4k
 
     events.phase("discover", pct=6)
     # Opening a ~157 GB archive takes ~30–40 s and gives no intermediate count —
@@ -269,7 +269,7 @@ def _real_extract(cfg: ExtractConfig) -> ExtractResult:
     # a pulsing bar instead of looking frozen.
     events.progress("open", pct=6, detail=cfg.p4k_path.name)
     events.log("info", "opening P4K (compat-patched for SC 4.x)")
-    p4k = P4KFile(str(cfg.p4k_path))
+    p4k = open_p4k(cfg.p4k_path)
     events.log("info", f"P4K opened: {len(p4k.namelist()):,} entries")
 
     dcb_entry = _find_dcb_entry(p4k)

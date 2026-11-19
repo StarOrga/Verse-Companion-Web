@@ -13,6 +13,7 @@ import {
   maxLiveWorkers,
   presetFromLegacyProfile,
   presetLimits,
+  RAM_RUN_FLOOR_MB,
   ramThrottled,
   rangesFor,
   ramOthersMb,
@@ -64,15 +65,30 @@ describe('resource limits', () => {
   it('clamps garbage back into range', () => {
     const l = clampLimits({ cpuPct: 'x', ramMb: -1, readMBs: 1e9, iops: Number.NaN }, pc);
     expect(l.cpuPct).toBe(presetLimits('balanced', pc).cpuPct);
-    expect(l.ramMb).toBe(1024);
+    expect(l.ramMb).toBe(RAM_RUN_FLOOR_MB);
     expect(l.readMBs).toBe(1600);
+  });
+
+  it('never offers less RAM than one run measurably needs', () => {
+    // Measured 2026-11-19: one codex extract with the compact P4K index peaks at 3,150 MB private.
+    expect(RAM_RUN_FLOOR_MB).toBeGreaterThanOrEqual(3150);
+    expect(rangesFor(pc).ramMb.min).toBe(RAM_RUN_FLOOR_MB);
+    expect(presetLimits('gaming', pc).ramMb).toBeGreaterThanOrEqual(RAM_RUN_FLOOR_MB);
+    // A stored value below the floor is raised to it.
+    expect(clampLimits({ ramMb: 2048 }, pc).ramMb).toBe(RAM_RUN_FLOOR_MB);
+    // A box whose whole scale is below the floor gets one honest value, never min > max.
+    const tiny: MachineInfo = { cores: 4, totalRamMb: 5120, disk: DISK_CAPS.hdd };
+    const r = rangesFor(tiny).ramMb;
+    expect(r.min).toBe(r.max);
+    expect(presetLimits('gaming', tiny).ramMb).toBe(r.max);
+    expect(presetLimits('full', tiny).ramMb).toBe(r.max);
   });
 
   it('sizes workers by CPU share and RAM', () => {
     expect(dumpWorkers({ ...presetLimits('full', pc), cpuPct: 50 }, 16)).toBe(8);
     expect(dumpWorkers({ ...presetLimits('full', pc), cpuPct: 90 }, 16)).toBe(14);
-    expect(skinWorkers({ ...presetLimits('full', pc), cpuPct: 90, ramMb: 4096 }, 16)).toBe(1);
-    expect(skinWorkers({ ...presetLimits('full', pc), cpuPct: 90, ramMb: 20000 }, 16)).toBe(6);
+    expect(skinWorkers({ ...presetLimits('full', pc), cpuPct: 90, ramMb: 3072 }, 16)).toBe(1);
+    expect(skinWorkers({ ...presetLimits('full', pc), cpuPct: 90, ramMb: 20000 }, 16)).toBe(7);
     expect(skinWorkers({ ...presetLimits('full', pc), cpuPct: 80, ramMb: 15616 }, 12)).toBe(5);
   });
 

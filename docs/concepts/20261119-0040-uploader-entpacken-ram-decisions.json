@@ -1,0 +1,143 @@
+[
+  {
+    "iteration": 1,
+    "action": "implement",
+    "submitted": true,
+    "decisions": [
+      {
+        "id": "d-codex",
+        "label": "Codex-Ablage",
+        "mode": "single",
+        "value": "keep",
+        "rec": "keep",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Codex-Schritt (Extract → Upload)",
+        "finding": "f-codex",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 48323,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-mirror",
+        "label": "Konverter-Eingang",
+        "mode": "single",
+        "value": "keep",
+        "rec": "keep",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Silhouetten- und 3D-Schritt",
+        "finding": "f-mirror",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 292013,
+          "noteWords": 0,
+          "revisits": 11,
+          "flagged": true
+        }
+      },
+      {
+        "id": "d-budget",
+        "label": "RAM-Grenze",
+        "mode": "single",
+        "value": "floor",
+        "rec": "floor",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Ressourcen-Grenzen, vor allem Voreinstellung „Gaming“",
+        "finding": "f-budget",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 33569,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-index",
+        "label": "Schlanker P4K-Index",
+        "mode": "yesnoalt",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "jeder Prozess, der die P4K öffnet",
+        "finding": "f-index",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 13637,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      }
+    ],
+    "comments": {
+      "general": {
+        "text": "",
+        "attachments": []
+      },
+      "items": []
+    }
+  },
+  {
+    "iteration": 2,
+    "action": "finalize",
+    "implement": {
+      "run": true,
+      "items": [
+        {
+          "id": "oq-skin-worker",
+          "title": "[CHORE] Lower SKIN_WORKER_MB to the measured 3D worker need with the compact P4K index",
+          "type": "chore",
+          "description": "Concept 20261119-0040-uploader-entpacken-ram, round 1, decision d-index (approved): after the compact P4K index lands, SKIN_WORKER_MB (data-uploader/src/lib/resource-limits.ts, 3072) should drop to the measured per-worker need. Not done: no 3D worker was measured end to end with the new index. The builder's estimate is about 1 GB after open + DataCore read, plus converter and optimizer. Measure one skin_export_app worker on the real P4K (peak working set of the whole process tree), then set the constant.",
+          "role": null,
+          "module": null,
+          "milestone": null,
+          "selected": true
+        }
+      ]
+    },
+    "ship": {
+      "run": true
+    },
+    "tests": [
+      {
+        "id": "t-wall",
+        "text": "Codex-Laufzeit ohne laufendes Spiel nachmessen",
+        "mode": "self",
+        "guide": null
+      },
+      {
+        "id": "t-hull",
+        "text": "Eine Hülle alt/neu end-to-end vergleichen",
+        "mode": "self",
+        "guide": null
+      }
+    ],
+    "disposition": {
+      "mode": "discard",
+      "moveTo": null
+    }
+  }
+]

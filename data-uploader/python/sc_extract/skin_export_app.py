@@ -408,12 +408,12 @@ class _ShipRun:
     def __init__(self, args, worker: str = "", many: bool = True) -> None:
         from .p4k_compat import apply_p4k_compat
         apply_p4k_compat()
-        from scdatatools.p4k import P4KFile
+        from .p4k_index import open_p4k
 
         self.args = args
         phase("discover")
         log("info", f"opening {args.p4k}")
-        self.p4k = P4KFile(str(args.p4k))
+        self.p4k = open_p4k(args.p4k)
         log("info", f"opened: {len(self.p4k.namelist())} entries")
         self.disco = ShipDiscovery(self.p4k)
         self.cfg = HullExportConfig(
