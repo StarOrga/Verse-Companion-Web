@@ -1,27 +1,7 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.283.1",
+  "current": "0.283.0",
   "releases": [
-    {
-      "version": "0.283.1",
-      "date": "2026-11-20",
-      "sections": [
-        {
-          "category": "Changed",
-          "label": "",
-          "items": [
-            {
-              "title": "",
-              "text": "Data Uploader 0.84.0: the sidecar opens the Data.p4k through a compact index. Opening the archive takes 404 MB instead of 2.7 GB, a codex run peaks at 2.65 GB instead of 4.48 GB, with byte-identical output."
-            },
-            {
-              "title": "",
-              "text": "Data Uploader: the RAM limit never goes below what one run needs (3.5 GB), and 3D workers are planned with 2 GB instead of 3 GB each."
-            }
-          ]
-        }
-      ]
-    },
     {
       "version": "0.283.0",
       "date": "2026-11-20",
