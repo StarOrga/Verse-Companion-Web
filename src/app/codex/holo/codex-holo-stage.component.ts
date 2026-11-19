@@ -58,6 +58,7 @@ import type { HardpointPortRef } from '../hardpoint-port-ref';
 import { CodexHoloStripComponent } from './codex-holo-strip.component';
 import { CodexHoloEinsatzComponent } from './codex-holo-einsatz.component';
 import { CodexDetailHeadComponent } from '../detail/codex-detail-head.component';
+import { CodexDetailTabsComponent, type DetailTabItem } from '../detail/codex-detail-shell.component';
 import { HangarPickerComponent, HangarPickerItem } from '../stage/hangar-picker.component';
 import {
   CodexHoloPatchComponent,
@@ -211,6 +212,9 @@ const PANEL_TABS: readonly { id: HoloPanelTab; labelKey: string; icon: string }[
   { id: 'changes', labelKey: 'codex.holo.stage.tab.changes', icon: 'M4 12a8 8 0 1 0 3-6.2M4 4v5h5M12 8v4l3 2' },
 ];
 
+/** The ship tabs in the vocabulary of `codex:detail_tab_select` (one event for every detail page). */
+const SHIP_TAB_EVENT = { rank: 'einordnung', parts: 'bauteile', changes: 'aenderungen' } as const satisfies Record<HoloPanelTab, string>;
+
 type StaticKey = 'crew' | 'mass' | 'cargo';
 
 const SOUND_PREF_KEY = 'sc.codex.holo.sound';
@@ -282,6 +286,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   selector: 'sc-codex-holo-stage',
   standalone: true,
   imports: [FeedbackSpotDirective, AreaSymbolComponent,
+    CodexDetailTabsComponent,
     ScActionDirective,
     ScSegmentedComponent,
     NgTemplateOutlet,
@@ -425,18 +430,9 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
         <aside class="holo-panel mobile-data" [scFeedbackSpot]="'codex.holo.stage.inspector'">
           <!-- The ownership card (concept codex-kopf-besitz C5): Haben? / Dein Exemplar, above the tabs. -->
           <ng-content select="[htCard]" />
-          <div class="ptabs" role="tablist" [attr.aria-label]="'codex.holo.stage.inspector' | translate" [style.--i]="panelTabIndex()" (keydown)="onTabKey($event)">
-            <span class="pill" aria-hidden="true"></span>
-            @for (t of panelTabs; track t.id) {
-              <button type="button" role="tab" class="ptab" [id]="'holo-tab-' + t.id" [class.on]="panelTab() === t.id"
-                      [attr.aria-selected]="panelTab() === t.id" [attr.aria-controls]="'holo-tabpanel'"
-                      [attr.tabindex]="panelTab() === t.id ? 0 : -1" (click)="panelTab.set(t.id)">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="t.icon" /></svg>
-                {{ t.labelKey | translate }}
-                @if (t.id === 'changes' && journal().length > 0) { <span class="tcount">{{ journal().length }}</span> }
-              </button>
-            }
-          </div>
+          <!-- The one detail tab pill (shared with every item page's panel). -->
+          <sc-codex-detail-tabs class="ptabs" [tabs]="panelTabItems()" [active]="panelTab()" idPrefix="holo-tab-"
+            panelId="holo-tabpanel" ariaLabelKey="codex.holo.stage.inspector" (tabSelect)="selectPanelTab($event)" />
           <div class="pbody" id="holo-tabpanel" role="tabpanel" tabindex="-1" [attr.aria-labelledby]="'holo-tab-' + panelTab()">
             <!-- slot: the patch choice (C18) — moved out of the head into the Änderungen tab.
                  Stays alive across tab switches (its comparison feeds the strip's ghosts and the pins). -->
@@ -846,21 +842,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   border: 1px solid var(--hair); border-radius: 16px; background: color-mix(in srgb, var(--sc-bg-0) 73%, transparent);
  }
 
-  /* ── Tabs: a glowing pill slides under the word ── */
-  .ptabs { position: relative; flex: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 10px 10px 0; min-height: max(38px, var(--sc-tap-min, 0px));
-  border: 1px solid color-mix(in srgb, var(--sc-accent) 20%, transparent); border-radius: 19px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--sc-bg-2) 85%, transparent), color-mix(in srgb, var(--sc-bg-0) 85%, transparent)); }
-  .pill { position: absolute; inset-block: 0; inset-inline-start: 0; width: calc(100% / 3); border-radius: 19px; pointer-events: none;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--sc-accent) 46%, transparent), color-mix(in srgb, var(--sc-accent) 20%, transparent));
-  box-shadow: 0 0 14px color-mix(in srgb, var(--sc-accent) 45%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--sc-accent) 60%, transparent);
-  transform: translateX(calc(var(--i, 0) * 100%)); transition: transform 180ms var(--e-out); }
-  .ptab { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 0; padding: 0 4px; background: none; border: 0; border-radius: 19px; cursor: pointer;
-  color: var(--sc-fg-2); font: inherit; font-size: max(12px, var(--f)); white-space: nowrap; transition: color 180ms ease; }
-  .ptab svg { width: 1.15em; height: 1.15em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .ptab:hover, .ptab.on { color: var(--sc-fg-0); }
-  .ptab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-  .tcount { font-family: var(--m); font-size: max(10px, var(--f)); color: var(--sc-accent); }
-  .ptab.on .tcount { color: var(--sc-fg-0); }
+  /* ── Tabs: the shared detail tab pill (sc-codex-detail-tabs), placed in the glass sheet ── */
+  .ptabs { flex: none; margin: 10px 10px 0; }
   .pbody { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding: 12px 16px; animation: rise var(--rise-dur, 300ms) var(--e-out) var(--rise-delay, 60ms) backwards;
   transition: opacity var(--holo-t-fast) var(--e-io);
   /* The card scrolls; its bottom edge fades instead of cutting a line in half, and the extra bottom
@@ -1712,7 +1695,11 @@ export class CodexHoloStageComponent {
   readonly viewerSelectedPort = computed(() => this.viewerSelection() ?? this.inspectedPort());
   /** "Alle Teile": every dot on the model and every row in the panel. */
   readonly hotspotScope = signal<HotspotScope>('swappable');
-  readonly panelTabs = PANEL_TABS;
+  /** The panel tabs as the shared pill draws them; Änderungen counts the journal entries. */
+  readonly panelTabItems = computed<DetailTabItem<HoloPanelTab>[]>(() => {
+    const changes = this.journal().length;
+    return PANEL_TABS.map((t) => ({ ...t, count: t.id === 'changes' ? changes : 0 }));
+  });
   readonly panelTab = signal<HoloPanelTab>('rank');
   readonly panelTabIndex = computed(() => PANEL_TABS.findIndex((t) => t.id === this.panelTab()));
   /** The package's rows, for the panel under "Alle Teile". */
@@ -2686,17 +2673,12 @@ export class CodexHoloStageComponent {
     }
   }
 
-  /** The tabs are one control: arrows, Home and End walk them, focus follows. */
-  onTabKey(ev: KeyboardEvent): void {
-    const n = PANEL_TABS.length;
-    const i = this.panelTabIndex();
-    const next = ev.key === 'ArrowRight' ? (i + 1) % n : ev.key === 'ArrowLeft' ? (i - 1 + n) % n : ev.key === 'Home' ? 0 : ev.key === 'End' ? n - 1 : -1;
-    if (next < 0) return;
-    ev.preventDefault();
-    const id = PANEL_TABS[next].id;
-    this.panelTab.set(id);
-    this.host.nativeElement.querySelector<HTMLElement>(`#holo-tab-${id}`)?.focus();
+  /** A tab the reader picked in the pill (keyboard or click); programmatic switches do not count. */
+  selectPanelTab(tab: HoloPanelTab): void {
+    this.panelTab.set(tab);
+    this.analytics.track('codex:detail_tab_select', { kind: 'ship', tab: SHIP_TAB_EVENT[tab] });
   }
+
 
   /** The drawer opens from the panel, and the page goes to it. */
   openDetailsDrawer(): void {

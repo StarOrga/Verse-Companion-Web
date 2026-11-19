@@ -75,4 +75,23 @@ describe('CodexDetailShellComponent', () => {
     expect(el.querySelector('.pane')!.textContent).toContain('werte');
     expect(el.querySelector('#dt-tab-werte')!.getAttribute('aria-selected')).toBe('true');
   });
+
+  it('projects the ship holotable as a full-width stage without its own aside', async () => {
+    @Component({
+      standalone: true,
+      imports: [CodexDetailShellComponent],
+      template: `<sc-codex-detail-shell [profile]="profile" activeTab="einordnung"><i shellStage class="holo"></i><p class="pane">x</p></sc-codex-detail-shell>`,
+    })
+    class ShipHost {
+      readonly profile = detailProfileFor('ship', NONE);
+    }
+    TestBed.configureTestingModule({ imports: [ShipHost], providers: [provideTranslateService({})] });
+    const fixture = TestBed.createComponent(ShipHost);
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('sc-codex-detail-shell')!.getAttribute('data-stage')).toBe('holo');
+    expect(el.querySelector('.sh-stage .holo')).not.toBeNull();
+    expect(el.querySelector('.sh-panel')).toBeNull();
+    expect(el.querySelector('[role="tab"]')).toBeNull();
+  });
 });

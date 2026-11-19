@@ -825,7 +825,10 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
         <ng-container [ngTemplateOutlet]="infoBlocks" />
         }
         } @else {
-          <sc-codex-holo-stage animate.enter="view-in" (viewChange)="onStageViewChange()"
+          <!-- The ship page sits in the same detail shell as every item page: the ship profile projects the
+               holotable as the shell's stage (head band and tab pill are the shared components inside it). -->
+          <sc-codex-detail-shell class="ship-shell" [profile]="shipProfile" activeTab="einordnung">
+          <sc-codex-holo-stage shellStage animate.enter="view-in" (viewChange)="onStageViewChange()"
             [detail]="detail()!"
             [displayName]="displayName()"
             [manufacturerName]="manufacturerName()"
@@ -983,6 +986,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               (toggleSpec)="toggleSpec()"
               (toggleRaw)="toggleRaw()" />
           </sc-codex-holo-stage>
+          </sc-codex-detail-shell>
         }
         <!-- The dock is the LAST element, as the concept places it
              (#f1/#h1: mini-dock closes m-wrap). It is position:sticky,
@@ -1870,6 +1874,10 @@ export class CodexDetailComponent implements OnInit {
       richStage: !!this.itemPackage() || !!this.itemRankKind(),
     }),
   );
+  /** The ship's profile in the shell: the holotable is the stage and brings its own panel. */
+  protected readonly shipProfile: DetailProfile = detailProfileFor('ship', {
+    einordnung: true, werte: 1, bezug: 0, verbaut: 0, aenderungen: 0, richStage: true,
+  });
   protected readonly activeItemTab = computed<DetailTabId>(() => {
     const tabs = this.itemProfile().tabs;
     return tabs.some((t) => t.id === this.itemTab()) ? this.itemTab() : (tabs[0]?.id ?? 'werte');
