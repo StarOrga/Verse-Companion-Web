@@ -1726,36 +1726,12 @@ button {
 }
 [data-entry='still'] .ce { animation: sc-ce-fade 200ms ease-out backwards; animation-delay: 0ms; }
 
-/* ITEM PAGE (concept nachschub-hq r4-d1-s9 / s9h): the stage and one panel of glass with three tabs, like the ship
-   Holotable. The page fits the viewport (the panel scrolls inside), under 1000 px it stacks. */
-.item-page { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.item-page .it-title { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; }
-.item-page .it-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; min-width: 0; }
-.item-page .it-name h1 { margin: 0; font: 600 clamp(1.4rem, 2vw, 1.9rem) / 1.1 var(--sc-font-display, inherit); overflow-wrap: anywhere; }
+/* ITEM PAGE: layout, panel and tab pill live in the detail shell (src/app/codex/detail/codex-detail-shell.component.ts);
+   these rules style the page's own projected parts (the head band's extra row, the stage tools). */
+.item-page .it-name { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-width: 0; }
 .item-page .kind-tag { font: 500 0.72rem var(--sc-font-display, inherit); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-accent); }
-.item-page .mfr { margin: 0; color: var(--sc-fg-1); }
 .item-page .hq-note { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 0.82rem; color: var(--sc-fg-2); }
 .item-page .hq-note svg { width: 15px; height: 15px; fill: none; stroke: var(--sc-accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.item-page .it-grid {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 470px); gap: 12px; align-items: stretch;
-  height: calc(100vh - var(--it-top, 300px)); height: calc(100dvh - var(--it-top, 300px)); min-height: 440px;
-}
-.item-page .it-stage { min-height: 0; }
-.item-page .it-panel {
-  position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden;
-  border: 1px solid var(--sc-border); border-radius: 16px; background: color-mix(in srgb, var(--sc-bg-0) 73%, transparent);
-}
-.item-page .it-path { flex: none; padding: 12px 12px 0; }
-.item-page .it-tabs { flex: none; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); margin: 10px 12px 0; border: 1px solid color-mix(in srgb, var(--sc-accent) 24%, transparent); border-radius: 19px; overflow: hidden; }
-.item-page .it-tab {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: max(38px, var(--sc-tap-min, 0px)); padding: 0 10px; border: 0; background: transparent;
-  font: 500 0.74rem var(--sc-font-display, inherit); letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-fg-1); cursor: pointer;
-}
-.item-page .it-tab small { font: 500 0.72rem var(--sc-font-body, inherit); color: var(--sc-fg-2); }
-.item-page .it-tab:hover { color: var(--sc-fg-0); }
-.item-page .it-tab.on { color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 14%, transparent); text-shadow: 0 0 8px color-mix(in srgb, var(--sc-accent) 40%, transparent); }
-.item-page .it-tab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
-.item-page .it-pane { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px 12px 12px; }
 .item-page .it-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .item-page .tt-share {
   position: relative; background: none; border: 0; padding: 4px 2px; cursor: pointer; min-height: var(--sc-tap-min, 24px);
@@ -1763,16 +1739,6 @@ button {
 }
 .item-page .tt-share:hover { color: var(--sc-fg-0); }
 .item-page .tt-share:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-/* Holotisch: the values panel grows with its content — nothing scrolls inside the small box; the stage stays in view beside it. */
-.item-page.flow .it-grid { height: auto; min-height: 440px; align-items: start; }
-.item-page.flow .it-stage { position: sticky; top: calc(var(--sc-header-h, 64px) + 12px); height: calc(100dvh - var(--it-top, 300px)); min-height: 440px; }
-.item-page.flow .it-panel, .item-page.flow .it-pane { overflow: visible; }
-@media (max-width: 1000px) {
-  .item-page.flow .it-stage { position: static; height: auto; }
-  .item-page .it-grid { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; }
-  .item-page .it-stage { min-height: 320px; }
-  .item-page .it-panel, .item-page .it-pane { overflow: visible; }
-}
 
 /* Camera moves (concept 2026-10-29 startseite-animationen §B). `html[data-verse-aim]`
    names the world whose tile the camera aims at: it stands highlighted, the other

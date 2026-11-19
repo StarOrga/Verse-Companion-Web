@@ -614,17 +614,27 @@ describe('CodexHoloStageComponent one panel (concept glas3)', () => {
     expect(f.componentInstance.changeView()).toBe('patch');
   });
 
-  it('the tabs are one control for the keyboard', async () => {
+  it('the tabs are the shared pill, one control for the keyboard, and report the pick', async () => {
     const f = await setup({ primaryModuleSections: sections });
     const c = f.componentInstance;
-    c.onTabKey(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+    const el: HTMLElement = f.nativeElement;
+    const track = vi.spyOn(TestBed.inject(AnalyticsService), 'track');
+    expect(el.querySelector('sc-codex-detail-tabs [role="tablist"]')).not.toBeNull();
+    const key = (k: string) => {
+      el.querySelector('sc-codex-detail-tabs [role="tablist"]')!.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
+      f.detectChanges();
+    };
+    key('ArrowRight');
     expect(c.panelTab()).toBe('parts');
-    c.onTabKey(new KeyboardEvent('keydown', { key: 'End' }));
+    expect(track).toHaveBeenCalledWith('codex:detail_tab_select', { kind: 'ship', tab: 'bauteile' });
+    key('End');
     expect(c.panelTab()).toBe('changes');
-    c.onTabKey(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+    key('ArrowRight');
     expect(c.panelTab()).toBe('rank');
-    c.onTabKey(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+    expect(track).toHaveBeenCalledWith('codex:detail_tab_select', { kind: 'ship', tab: 'einordnung' });
+    key('ArrowLeft');
     expect(c.panelTab()).toBe('changes');
+    expect(track).toHaveBeenCalledWith('codex:detail_tab_select', { kind: 'ship', tab: 'aenderungen' });
   });
 
   it('selecting a part brings the Bauteile tab forward', async () => {

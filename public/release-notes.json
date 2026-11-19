@@ -1,9 +1,9 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.281.9",
+  "current": "0.282.1",
   "releases": [
     {
-      "version": "0.281.9",
+      "version": "0.282.1",
       "date": "2026-11-19",
       "sections": [
         {
@@ -13,6 +13,70 @@
             {
               "title": "",
               "text": "Classic ship view: 'Bei RSI ansehen' and 'Pledge-Link hinzufügen' now sit in the header action row next to 'Vergleichen' and 'Schiff wechseln'."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.282.0",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex detail pages share one template: a glass head band that sticks under the subheader and slims on scroll, one tab pill and one panel for ships, weapons and items."
+            },
+            {
+              "title": "",
+              "text": "Item pages show an Änderungen tab with the stats that changed since the previous patch."
+            },
+            {
+              "title": "",
+              "text": "HQ storage shows its path (HQ › Lager › Inventar) in the subheader."
+            },
+            {
+              "title": "",
+              "text": "The wish sky now sits behind the empty wish list and the top of the wish window."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Gap between the holotable views bar and the KPI strip."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.281.9",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Nachschub name proposals work again for signed-in web sessions: the nachschub-names function no longer sits behind the gateway JWT gate that rejected every web call with 401."
+            }
+          ]
+        },
+        {
+          "category": "Docs",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "PostHog audit concept: final report (round 3) with live screenshot."
             }
           ]
         }

@@ -1,0 +1,244 @@
+[
+  {
+    "iteration": 1,
+    "action": "implement",
+    "favorite": "d2",
+    "decisions": [
+      {
+        "id": "r1-tpl",
+        "label": "Aufbau der Vorlage",
+        "mode": "single",
+        "value": "shell",
+        "rec": "shell",
+        "deviates": false,
+        "none": false,
+        "untouched": true,
+        "note": "",
+        "appliesTo": "alle Codex-Detailseiten in der Beta",
+        "finding": "",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 0,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        },
+        "view": "r1-analyse"
+      },
+      {
+        "id": "r1-tabs",
+        "label": "Reiter für Gegenstände",
+        "mode": "multi",
+        "value": [
+          "werte",
+          "bezug",
+          "verbaut",
+          "aenderungen"
+        ],
+        "rec": "werte bezug verbaut aenderungen",
+        "deviates": false,
+        "none": false,
+        "untouched": true,
+        "note": "",
+        "appliesTo": "Panel rechts bei Nicht-Schiffen",
+        "finding": "",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 0,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        },
+        "view": "r1-analyse"
+      },
+      {
+        "id": "r1-simple",
+        "label": "Einfache Gegenstände",
+        "mode": "single",
+        "value": "compact",
+        "rec": "compact",
+        "deviates": false,
+        "none": false,
+        "untouched": true,
+        "note": "",
+        "appliesTo": "Gegenstände mit wenig Daten",
+        "finding": "",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 0,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        },
+        "view": "r1-analyse"
+      },
+      {
+        "id": "r1-order",
+        "label": "Reihenfolge",
+        "mode": "single",
+        "value": "together",
+        "rec": "together",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Bündel B1",
+        "finding": "",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 16454,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        },
+        "view": "r1-analyse"
+      },
+      {
+        "id": "r1-gap",
+        "label": "Lücke im Holotisch",
+        "mode": "yesnoalt",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Schiffs-Holotisch, unterer Rand (Notiz #1)",
+        "finding": "",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 3592,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        },
+        "view": "r1-analyse"
+      },
+      {
+        "id": "r1-crumb",
+        "label": "HQ-Pfad",
+        "mode": "yesnoalt",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "alle HQ-Seiten (Notiz #5)",
+        "finding": "",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 13849,
+          "noteWords": 0,
+          "revisits": 1,
+          "flagged": false
+        },
+        "view": "r1-analyse"
+      },
+      {
+        "id": "r1-wish",
+        "label": "Sternenhimmel",
+        "mode": "yesnoalt",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Wünsche-Popout und Wunschlisten-Dialog (Notiz #6)",
+        "finding": "",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 15029,
+          "noteWords": 0,
+          "revisits": 1,
+          "flagged": false
+        },
+        "view": "r1-analyse"
+      }
+    ],
+    "annotations": [
+      {
+        "id": "r1-d2-s1-a1",
+        "screen": "r1-d2-s1",
+        "design": "d2",
+        "question": "Das Band ist halbtransparentes Glas ohne Oberkante, es wächst sichtbar aus dem Subheader heraus. Wirkt das noch leicht genug?",
+        "answer": "joa, gern polishen!"
+      }
+    ],
+    "userPins": [
+      {
+        "id": "up-mwmm4nwvb91v",
+        "design": "d2",
+        "screen": "r1-d2-s1",
+        "x": 52.2,
+        "y": 9.8,
+        "target": "div.mock-hk-head \"Anvil AerospaceLIBERATOREinsatz⌖ Kampf 1\"",
+        "text": "gern dann  mitscrollen lassen",
+        "attachments": []
+      },
+      {
+        "id": "up-mwmm4xa5yrux",
+        "design": "d2",
+        "screen": "r1-d2-s1",
+        "x": 52.9,
+        "y": 14.1,
+        "target": "span.mock-hk-pill \"Einsatz⌖ Kampf 1 Schiffe ▾\"",
+        "text": "gern das hier auch mit einsatz... redesignenen, die leiste soll immer oben sein",
+        "attachments": []
+      },
+      {
+        "id": "up-mwmm5qnwtuw5",
+        "design": "d2",
+        "screen": "r1-d2-s1",
+        "x": 93.5,
+        "y": 15.3,
+        "target": "div.mock-hk-head \"Anvil AerospaceLIBERATOREinsatz⌖ Kampf 1\"",
+        "text": "das hangar auch redesignen.",
+        "attachments": []
+      },
+      {
+        "id": "up-mwmm6bhx9vy9",
+        "design": "d2",
+        "screen": "r1-d2-s2",
+        "x": 27.5,
+        "y": 10.4,
+        "target": "div.mock-hk-head.slim \"LIBERATORAnvil Aerospace⌖ Kampf ▾⌂ 1× im\"",
+        "text": "finde ich gut, dass die zeile kleiner wird, bitte visuell auch ggü. der unteren zeile unddem subehader sehen,d dass es in der höhe etc. sinnvoll passt",
+        "attachments": []
+      }
+    ],
+    "comments": {
+      "general": {
+        "text": "",
+        "attachments": []
+      },
+      "items": [
+        {
+          "id": "anno-r1-d2-s1-a1",
+          "text": "joa, gern polishen!",
+          "attachments": []
+        }
+      ],
+      "designs": {},
+      "screens": {},
+      "views": {}
+    }
+  }
+]

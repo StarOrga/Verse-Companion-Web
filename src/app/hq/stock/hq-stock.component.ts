@@ -29,6 +29,7 @@ import { BlueprintLinkService } from '../data/blueprint-link';
 import { ScrapInfoService } from '../data/scrap-info';
 import { WishlistStore } from '../data/wishlist.store';
 import { HqOwnershipService } from '../hq-ownership.service';
+import { HqPageNavService } from '../hq-page-nav.service';
 import {
   HQ_STOCK_CAT_PARAM,
   HQ_STOCK_FOCUS_PARAM,
@@ -719,6 +720,13 @@ export class HqStockComponent implements OnInit {
   protected readonly P_ART = P_ART;
 
   readonly tab = signal<HqStockTab>('inventar');
+  /** The subheader path names the Lager tab in view (HQ › Lager › Inventar, batch note #5). */
+  private readonly stockTabPublish = (() => {
+    const pageNav = inject(HqPageNavService);
+    effect(() => pageNav.stockTab.set(this.tab()));
+    inject(DestroyRef).onDestroy(() => pageNav.stockTab.set(null));
+    return true;
+  })();
   readonly mode = signal<'deck' | 'table'>('deck');
   readonly kind = signal<DeckKind | null>(null);
   readonly sub = signal<string | null>(null);

@@ -248,6 +248,17 @@
     "enterFailedDismiss": "Verwerfen"
   },
   "codex": {
+    "detailShell": {
+      "tabsAria": "Abschnitte",
+      "panelAria": "Werte und Informationen",
+      "tab": {
+        "einordnung": "Einordnung",
+        "werte": "Werte",
+        "bezug": "Bezug",
+        "verbaut": "Verbaut in",
+        "aenderungen": "Änderungen"
+      }
+    },
     "own": {
       "group": "Dein Schiff",
       "rename": "Umbenennen",
@@ -1787,6 +1798,10 @@
       "hardpointsHint": "Klicke auf einen Hardpoint, um zu sehen, was hineinpasst.",
       "compatLoading": "Kompatible Items werden geladen…",
       "compatNone": "Keine passenden Items in diesem Build.",
+      "changes": {
+        "title": "Änderungen seit Patch {{patch}}",
+        "worse": "Schlechter"
+      },
       "usedInBlueprints": "Verwendet in Blueprints",
       "usedInBlueprintsHint": "Crafting-Rezepte, die diesen Gegenstand als Zutat benötigen.",
       "compatCount": "{{count}} kompatible Items",

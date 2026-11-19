@@ -248,6 +248,17 @@
     "enterFailedDismiss": "Dismiss"
   },
   "codex": {
+    "detailShell": {
+      "tabsAria": "Sections",
+      "panelAria": "Values and information",
+      "tab": {
+        "einordnung": "Ranking",
+        "werte": "Values",
+        "bezug": "Sourcing",
+        "verbaut": "Used in",
+        "aenderungen": "Changes"
+      }
+    },
     "own": {
       "group": "Your ship",
       "rename": "Rename",
@@ -1787,6 +1798,10 @@
       "hardpointsHint": "Click a hardpoint to see which items fit it.",
       "compatLoading": "Loading compatible items…",
       "compatNone": "No matching items in this build.",
+      "changes": {
+        "title": "Changes since patch {{patch}}",
+        "worse": "Worse"
+      },
       "usedInBlueprints": "Used in blueprints",
       "usedInBlueprintsHint": "Crafting recipes that require this item as an ingredient.",
       "compatCount": "{{count}} compatible items",

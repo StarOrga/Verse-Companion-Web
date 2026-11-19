@@ -4,10 +4,21 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.281.10] - 2026-11-19
+## [0.282.1] - 2026-11-19
 
 ### Changed
 - Classic ship view: 'Bei RSI ansehen' and 'Pledge-Link hinzufügen' now sit in the header action row next to 'Vergleichen' and 'Schiff wechseln'.
+
+## [0.282.0] - 2026-11-19
+
+### Added
+- Codex detail pages share one template: a glass head band that sticks under the subheader and slims on scroll, one tab pill and one panel for ships, weapons and items.
+- Item pages show an Änderungen tab with the stats that changed since the previous patch.
+- HQ storage shows its path (HQ › Lager › Inventar) in the subheader.
+- The wish sky now sits behind the empty wish list and the top of the wish window.
+
+### Fixed
+- Gap between the holotable views bar and the KPI strip.
 
 ## [0.281.9] - 2026-11-19
 
