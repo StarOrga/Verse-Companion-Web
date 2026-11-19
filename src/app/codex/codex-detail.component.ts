@@ -1379,6 +1379,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .c-name { margin: 0; font-weight: 500; font-size: clamp(18px, 1.15vw + 6px, 26px); line-height: 1.15; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-0); overflow-wrap: anywhere; }
     .m-side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
     .it-strip { margin-block-start: 6px; }
+    /* Phone, slim head band: only the ownership pill stays beside the name; the patch label waits for the full band. */
+    @media (max-width: 640px) { sc-codex-detail-head.slim .it-strip .sc-head-strip__seg.mono { display: none; } }
     /* Switching into the Holotable fades it in — never a hard cut. */
     .view-in { animation: view-in var(--holo-t-base) var(--holo-e-out); }
     @keyframes view-in { from { opacity: 0; transform: translateY(var(--holo-rise)); } }
