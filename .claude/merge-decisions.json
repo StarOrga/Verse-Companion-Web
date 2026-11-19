@@ -1702,6 +1702,57 @@
         ]
       }
     ],
+    "src/app/codex/codex-detail.component.spec.ts›item panel stations›selector": [
+      {
+        "ship": "#1184",
+        "by": "Jerry",
+        "value": "aside.it-panel > .it-path sc-codex-own-stations"
+      },
+      {
+        "ship": "claude/batch-0c7514",
+        "by": "JerryT2T",
+        "value": ".it-path sc-codex-own-stations (item panel now inside the detail shell; same stacked-stations assertion)",
+        "decided": true,
+        "at": "2026-11-19T19:30:44.926Z",
+        "hunks": [
+          "195c8e774cec"
+        ]
+      }
+    ],
+    "src/app/codex/codex-detail.component.ts›.it-path›ownCard outlet": [
+      {
+        "ship": "#1184",
+        "by": "Jerry",
+        "value": "<div class=\"it-path ce\"> with layout stacked"
+      },
+      {
+        "ship": "claude/batch-0c7514",
+        "by": "JerryT2T",
+        "value": "<div shellPath class=\"it-path ce\"> with ngTemplateOutletContext layout stacked (shell slot attribute added)",
+        "decided": true,
+        "at": "2026-11-19T19:30:44.926Z",
+        "hunks": [
+          "d760fe170bde"
+        ]
+      }
+    ],
+    "src/app/codex/codex-detail.component.ts›Component.imports›list": [
+      {
+        "ship": "#1199",
+        "by": "Jerry",
+        "value": "upstream list incl. HintTipComponent"
+      },
+      {
+        "ship": "claude/batch-0c7514",
+        "by": "JerryT2T",
+        "value": "upstream list incl. HintTipComponent + CodexDetailHeadComponent, CodexDetailShellComponent",
+        "decided": true,
+        "at": "2026-11-19T19:30:44.926Z",
+        "hunks": [
+          "7ebde23f6505"
+        ]
+      }
+    ],
     "src/app/codex/detail/codex-hero-holo-overlay.component.ts›.hho›focus-visible": [
       {
         "ship": "claude/modest-napier-9d1e5a",
@@ -1723,6 +1774,23 @@
         "at": "2026-11-15T05:27:23.865Z",
         "hunks": [
           "60636bbad8e8"
+        ]
+      }
+    ],
+    "src/app/codex/holo/codex-holo-hangar-menu.component.ts›.hb›spacing": [
+      {
+        "ship": "#1184",
+        "by": "Jerry",
+        "value": "min-height 32px, padding 3px 10px 3px 6px, gap 7px"
+      },
+      {
+        "ship": "claude/batch-0c7514",
+        "by": "JerryT2T",
+        "value": "min-height var(--hb-pill-h,34px), padding 3px 14px 3px 5px, gap 8px (wraps as #1184)",
+        "decided": true,
+        "at": "2026-11-19T19:30:44.926Z",
+        "hunks": [
+          "c8225625f12d"
         ]
       }
     ],
