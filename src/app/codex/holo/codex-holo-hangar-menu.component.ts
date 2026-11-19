@@ -204,7 +204,7 @@ const EDGE = 8;
       color: var(--sc-fg-1); font: inherit; font-size: max(12.5px, var(--sc-fs-floor)); text-align: start; cursor: pointer; }
     .hb .ic { flex: none; width: 24px; height: 24px; padding: 5px; box-sizing: border-box; border-radius: 50%; color: var(--sc-accent);
       background: color-mix(in srgb, var(--sc-accent) 12%, transparent); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
-    .ic-w { position: relative; flex: none; display: inline-flex; }
+    .ic-w { position: relative; flex: none; display: inline-flex; margin-inline-end: 3px; }
     .hb .t { display: inline-flex; flex-wrap: wrap; align-items: center; column-gap: 6px; min-width: 0; line-height: 1.25; }
     .hb .t b { white-space: nowrap; }
     .hb .ex { display: inline-flex; align-items: center; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
