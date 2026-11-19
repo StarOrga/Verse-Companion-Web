@@ -112,8 +112,9 @@ legacy `SC_GATE_EMAIL`/`SC_GATE_PASSWORD`, then the Credential Manager entry.
     **You changed catalog rows in place or a catalog view without a migration
     file and want to see it:** `node scripts/lib/agent-supabase-guard.cjs --clear`,
     or start the session with `SC_AGENT_SUPABASE_GUARD=off`.
-  - Every other request to `/rest/v1/` passes through 4 slots shared by the same
-    browsers and waits at most 3 s for one. Never measure load times or request
+  - Every other request to `/rest/v1/` passes through 2 slots shared by the same
+    browsers and waits at most 6 s for one (a soft limit: after that it goes
+    through, so a test never hangs on the queue). Never measure load times or request
     timing of the app through these browsers without `SC_AGENT_SUPABASE_GUARD=off`.
   `%TEMP%\sc-test-session.log` shows per context how many requests came from the
   cache (`guard: … requests, … from the catalog cache`). Measured on live

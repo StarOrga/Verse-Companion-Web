@@ -17,11 +17,11 @@
  *      place (a translated name, a view after a migration) is bounded by the
  *      12-hour lifetime of an entry and by the schema stamp below. The cache
  *      holds public catalog rows only - never a session, never a token.
- *   2. Throttle. Every other request to /rest/v1/ waits for one of a few slots
- *      that all of Claude's browsers on this machine share, so five sessions
- *      loading a page at once reach the database a few requests at a time. A
- *      request never waits longer than SLOT_WAIT_MS: a full queue lets it
- *      through, so a test cannot hang on the throttle.
+ *   2. Queue. Every other request to /rest/v1/ waits for one of two slots that
+ *      all of Claude's browsers on this machine share, so five sessions loading
+ *      a page at once reach the database two requests at a time. A request
+ *      never waits longer than SLOT_WAIT_MS: a full queue lets it through, so a
+ *      test cannot hang on it - the limit is soft by design.
  *
  * Auth, storage, functions and realtime are not touched.
  *
@@ -44,11 +44,15 @@ const SLOT_DIR = join(tmpdir(), 'sc-agent-supabase-slots');
 
 const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 const MAX_ENTRY_BYTES = 8 * 1024 * 1024;
-/** Requests of all agent browsers on this machine that may be in flight at once. */
-const SLOTS = 4;
+/**
+ * Requests of all agent browsers on this machine that may be in flight at once.
+ * Two, not one: a strict queue would turn one slow answer into a timeout in
+ * every waiting test (the app gives a read 20 s).
+ */
+const SLOTS = 2;
 /** A slot older than this belongs to a browser that died; the app's own read deadline is 20 s. */
 const SLOT_STALE_MS = 30_000;
-const SLOT_WAIT_MS = 3_000;
+const SLOT_WAIT_MS = 6_000;
 const SLOT_POLL_MS = 40;
 const STATS_EVERY = 200;
 
@@ -291,7 +295,8 @@ async function installSupabaseGuard(
         const hit = readEntry(cacheDir, key);
         if (hit) {
           stats.cached++;
-          return route.fulfill({ status: hit.status, headers: hit.headers, body: hit.body });
+          // The page may be gone by now; a rejection here would be unhandled in the MCP server's process.
+          return route.fulfill({ status: hit.status, headers: hit.headers, body: hit.body }).catch(() => {});
         }
       }
       const slot = await acquireSlot({ dir: slotDir, ...slotOptions });
