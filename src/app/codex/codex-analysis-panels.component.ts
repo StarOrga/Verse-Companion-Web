@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, input, untracked, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { HintTipComponent } from '../shared/hint-tip/hint-tip.component';
 import { modelHintKey } from './codex-em-model';
 import { displayItemName, formatNumber } from './codex-format';
 import { DefensivePanel, OffensivePanel } from './codex-loadout-stats';
@@ -99,6 +100,9 @@ const PANEL_STYLES = `
     background: color-mix(in srgb, var(--sc-accent) 6%, transparent);
     padding: 6px 8px; margin: 6px 0; font-size: max(11px, var(--sc-fs-floor)); color: var(--sc-fg-2); }
 
+  /* #375: the explanation beside a label, as a tooltip. */
+  sc-hint-tip { margin-inline-start: 5px; text-transform: none; letter-spacing: normal; }
+
   /* Sub-head — concept .m-sub (part-02:229): a 9.5px dim-accent micro-label at
      .15em, sitting tight above its grid. It used to be a 13px muted heading. */
   h3.section-title { font-size: max(9.5px, var(--sc-fs-floor)); font-weight: 400; text-transform: uppercase;
@@ -140,7 +144,7 @@ const PANEL_STYLES = `
 @Component({
   selector: 'sc-codex-offensive-panel',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, HintTipComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <details class="sc-card block" [open]="open()" (toggle)="open.set($any($event.target).open)">
@@ -220,7 +224,7 @@ const PANEL_STYLES = `
 
             <dl class="fact-grid">
               @if (p.effectiveRange != null) {
-                <dt>{{ 'codex.analysis.offensive.effectiveRange' | translate }}</dt>
+                <dt>{{ 'codex.analysis.offensive.effectiveRange' | translate }}@if (p.longestRangeGun) { <sc-hint-tip [text]="'codex.analysis.offensive.longestGunNote' | translate: { name: p.longestRangeGun }" /> }</dt>
                 <dd>{{ num(p.effectiveRange) }} m</dd>
               }
               @if (p.projectileSpeed != null) {
@@ -228,9 +232,6 @@ const PANEL_STYLES = `
                 <dd>{{ num(p.projectileSpeed) }} m/s</dd>
               }
             </dl>
-            @if (p.longestRangeGun) {
-              <p class="note">{{ 'codex.analysis.offensive.longestGunNote' | translate: { name: p.longestRangeGun } }}</p>
-            }
             @if (p.mixedRangeWarning) {
               <p class="warn-note">{{ 'codex.analysis.offensive.mixedRangeWarning' | translate }}</p>
             }
@@ -272,7 +273,7 @@ const PANEL_STYLES = `
               @if (p.missileSalvoDamage != null) {
                 <tfoot>
                   <tr>
-                    <td>{{ 'codex.analysis.offensive.salvoDamage' | translate }}</td>
+                    <td>{{ 'codex.analysis.offensive.salvoDamage' | translate }} <sc-hint-tip [text]="'codex.analysis.offensive.salvoNote' | translate" /></td>
                     <td></td>
                     <td></td>
                     <td>{{ p.missileCount }}×</td>
@@ -283,9 +284,7 @@ const PANEL_STYLES = `
               }
             </table>
             </div>
-            @if (p.missileSalvoDamage != null) {
-              <p class="note">{{ 'codex.analysis.offensive.salvoNote' | translate }}</p>
-            } @else {
+            @if (p.missileSalvoDamage == null) {
               <p class="gap-row">{{ 'codex.analysis.offensive.noWarheadData' | translate }}</p>
             }
             @if (p.missileSalvoPartial) {
@@ -294,7 +293,7 @@ const PANEL_STYLES = `
             @if (p.missileLockTime != null || p.missileRange != null) {
               <dl class="fact-grid">
                 @if (p.missileLockTime != null) {
-                  <dt>{{ 'codex.analysis.offensive.lockTime' | translate }}</dt>
+                  <dt>{{ 'codex.analysis.offensive.lockTime' | translate }}@if (p.missileLockNoteSlowest) { <sc-hint-tip [text]="'codex.analysis.offensive.slowestMissileNote' | translate" /> }</dt>
                   <dd>{{ num(p.missileLockTime) }} s</dd>
                 }
                 @if (p.missileRange != null) {
@@ -302,9 +301,6 @@ const PANEL_STYLES = `
                   <dd>{{ num(p.missileRange) }} m</dd>
                 }
               </dl>
-            }
-            @if (p.missileLockNoteSlowest) {
-              <p class="note">{{ 'codex.analysis.offensive.slowestMissileNote' | translate }}</p>
             }
           }
         }
@@ -437,13 +433,16 @@ export interface ShipFactRow {
 export interface ShipFactGroup {
   titleKey: string;
   rows: ShipFactRow[];
+  /** A visible line: a data gap or status the reader must see. */
   note?: string | null;
+  /** An explanation, shown as a tooltip beside the group title (#375). */
+  tip?: string | null;
 }
 
 @Component({
   selector: 'sc-codex-ship-panel',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective],
+  imports: [TranslatePipe, ScTooltipDirective, HintTipComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <details class="sc-card block" [open]="open()" (toggle)="open.set($any($event.target).open)">
@@ -454,7 +453,7 @@ export interface ShipFactGroup {
       </summary>
       @if (open()) {
         @for (g of groups(); track g.titleKey) {
-          <h3 class="section-title">{{ g.titleKey | translate }}</h3>
+          <h3 class="section-title">{{ g.titleKey | translate }}@if (g.tip) { <sc-hint-tip class="title-tip" [text]="g.tip" /> }</h3>
           <dl class="fact-grid">
             @for (r of g.rows; track r.labelKey) {
               <dt [scTooltip]="modelHint(r.labelKey) ? (modelHint(r.labelKey)! | translate) : null">{{ r.labelKey | translate }}</dt>

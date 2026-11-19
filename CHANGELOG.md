@@ -4,6 +4,16 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.281.6] - 2026-11-19
+
+### Changed
+- Classic ship view: explanatory notes such as the scale legend show as tooltips instead of written-out text.
+
+## [0.281.5] - 2026-11-19
+
+### Changed
+- Classic ship view: the header no longer carries a factory-loadout button; the factory fit lives in the loadout.
+
 ## [0.281.4] - 2026-11-19
 
 ### Fixed

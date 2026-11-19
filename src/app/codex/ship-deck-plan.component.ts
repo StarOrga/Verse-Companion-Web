@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, model, output, signal , inject } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { HintTipComponent } from '../shared/hint-tip/hint-tip.component';
 import type { Lang, ShipDeck, ShipInterior, ShipInteriorGroup } from './codex.types';
 import { GLYPH_PATHS, GROUP_OF_CAT, InteriorPick, glyphOf } from './holo/holo-interior';
 import { buildDeckPlans, DeckPlan, DeckPlanRoom } from './deck-plan';
@@ -22,19 +23,22 @@ let nextDeckPlanId = 0;
 @Component({
   selector: 'sc-ship-deck-plan',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective],
+  imports: [TranslatePipe, ScTooltipDirective, HintTipComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (plans(); as set) {
       <section class="deck-plan" [class.sc-card]="!bare()" [class.bare]="bare()">
         @if (!bare()) {
           <header class="dp-head">
-            <h2>{{ 'codex.deckPlan.title' | translate }}</h2>
-            <p class="hint">{{ 'codex.deckPlan.hint' | translate }}</p>
-            @if (derived()) {
-              <!-- The game names no decks on this hull: the levels are the uploader's grouping. -->
-              <p class="hint derived">{{ 'codex.deckPlan.derivedHint' | translate }}</p>
-            }
+            <!-- How to read the plan, and (when the game names no decks on this hull) that the levels
+                 are the uploader's grouping: tooltips beside the title, not written-out lines (#375). -->
+            <div class="dp-title">
+              <h2>{{ 'codex.deckPlan.title' | translate }}</h2>
+              <sc-hint-tip class="hint" [text]="'codex.deckPlan.hint' | translate" />
+              @if (derived()) {
+                <sc-hint-tip class="hint derived" [label]="'codex.deckPlan.derivedLabel' | translate" [text]="'codex.deckPlan.derivedHint' | translate" />
+              }
+            </div>
           </header>
         }
 
@@ -191,8 +195,8 @@ let nextDeckPlanId = 0;
     .bare .stage { flex: 1; min-height: 0; background: transparent; border: 0; padding: 0; }
     .bare svg { height: 100%; max-height: 100%; }
     .bare-nose { margin: 0 0 6px; text-align: center; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.08em; color: var(--sc-fg-2); }
-    .dp-head h2 { margin: 0 0 2px; }
-    .hint { margin: 0 0 10px; font-size: max(0.7rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
+    .dp-head h2 { margin: 0; }
+    .dp-title { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 10px; }
 
     .switch { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
     .tab { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 4px 12px;
@@ -254,7 +258,7 @@ let nextDeckPlanId = 0;
     .room.link path { stroke-dasharray: 4 3; }
     .chip.link { border-style: dashed; }
     .chip .up { margin-right: 4px; }
-    .hint.derived { color: var(--sc-fg-2); font-style: italic; }
+
 
     .legend { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; }
     .chip { min-height: 32px; padding: 2px 10px; border-radius: 6px; border: 1px solid var(--sc-border);
