@@ -4,10 +4,15 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.282.1] - 2026-11-19
+## [0.282.2] - 2026-11-19
 
 ### Fixed
 - Loading screen: the glow behind the logo fades out softly on every side instead of ending in a hard edge on the left.
+
+## [0.282.1] - 2026-11-19
+
+### Changed
+- Classic ship view: 'Bei RSI ansehen' and 'Pledge-Link hinzufügen' now sit in the header action row next to 'Vergleichen' and 'Schiff wechseln'.
 
 ## [0.282.0] - 2026-11-19
 
