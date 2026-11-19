@@ -93,8 +93,8 @@ void main() {
 }
 `;
 
-// The empty-slot ring: a dashed outer ring that rotates, a thin inner ring and
-// a soft core, all in the manufacturer accent, drawn on a camera-facing quad.
+// The empty-slot marker: a soft glow, no rings (#372: a focused part is only
+// coloured, never circled), drawn on a camera-facing quad.
 const RING_VERTEX = /* glsl */ `
 varying vec2 vUv;
 void main() {
@@ -105,21 +105,11 @@ void main() {
 const RING_FRAGMENT = /* glsl */ `
 uniform vec3 uColor;
 uniform float uAlpha;
-uniform float uAngle;
 varying vec2 vUv;
-const float TAU = 6.2831853;
 void main() {
   float r = length(vUv);
-  float aa = fwidth(r) * 1.5;
-  float outer = smoothstep(0.74 - aa, 0.74, r) * (1.0 - smoothstep(0.86, 0.86 + aa, r));
-  float a = atan(vUv.y, vUv.x) + uAngle;
-  float dash = step(0.42, fract(a / TAU * 12.0));
-  float inner = smoothstep(0.5 - aa, 0.5, r) * (1.0 - smoothstep(0.54, 0.54 + aa, r));
-  float core = (1.0 - smoothstep(0.0, 0.5, r)) * 0.35;
-  float halo = (1.0 - smoothstep(0.86, 1.0, r)) * smoothstep(0.6, 0.86, r) * 0.25;
-  float m = max(max(outer * dash, inner * 0.7), max(core, halo));
-  vec3 c = mix(uColor, vec3(1.0), 0.25 * outer * dash);
-  gl_FragColor = vec4(c * m * uAlpha, m * uAlpha);
+  float m = (1.0 - smoothstep(0.0, 0.5, r)) * 0.35;
+  gl_FragColor = vec4(uColor * m * uAlpha, m * uAlpha);
 }
 `;
 
@@ -199,7 +189,7 @@ export class PackageScene {
   private readonly seenView = new THREE.Matrix4();
   private readonly seenProjection = new THREE.Matrix4();
 
-  // Empty-slot rings: hover in the part line colour, green when that slot is selected.
+  // Empty-slot glows: hover in the part line colour, green when that slot is selected.
   private readonly ringGeo = new THREE.PlaneGeometry(1, 1);
   private readonly ringMat: THREE.ShaderMaterial;
   private readonly ringSelMat: THREE.ShaderMaterial;
@@ -251,7 +241,7 @@ export class PackageScene {
       new THREE.ShaderMaterial({
         vertexShader: RING_VERTEX,
         fragmentShader: RING_FRAGMENT,
-        uniforms: { uColor: { value: new THREE.Color(c[0] / 255, c[1] / 255, c[2] / 255) }, uAlpha: { value: 1 }, uAngle: { value: 0 } },
+        uniforms: { uColor: { value: new THREE.Color(c[0] / 255, c[1] / 255, c[2] / 255) }, uAlpha: { value: 1 } },
         transparent: true,
         // Never occluded: an empty slot is often inside the hull.
         depthTest: false,
@@ -586,7 +576,6 @@ export class PackageScene {
   private poseRings(seconds: number): void {
     const pose = ringPose(seconds, this.reducedMotion);
     for (const mat of [this.ringMat, this.ringSelMat]) {
-      mat.uniforms['uAngle'].value = pose.angle;
       mat.uniforms['uAlpha'].value = pose.alpha;
     }
     const size = this.look.focusRadius * 1.6 * pose.scale;
