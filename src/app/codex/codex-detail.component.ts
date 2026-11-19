@@ -1195,7 +1195,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
         <ul class="chg-list">
           @for (c of itemChanges(); track c.path) {
             <li class="chg-row" [attr.data-tone]="c.tone">
-              <span class="chg-label">{{ c.label }}</span>
+              <span class="chg-label">{{ c.labelKey | translate }}</span>
               <span class="chg-vals mono">{{ fmt(c.from) }} → {{ fmt(c.to) }}@if (c.unit) { {{ c.unit }} }</span>
               @if (c.tone === 'worse') { <span class="sc-sr-only">{{ 'codex.detail.changes.worse' | translate }}</span> }
             </li>

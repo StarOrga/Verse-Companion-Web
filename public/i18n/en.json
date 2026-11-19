@@ -1800,7 +1800,39 @@
       "compatNone": "No matching items in this build.",
       "changes": {
         "title": "Changes since patch {{patch}}",
-        "worse": "Worse"
+        "worse": "Worse",
+        "stat": {
+          "ammoCapacity": "Magazine size",
+          "reloadTime": "Reload time",
+          "heatPerShot": "Heat per shot",
+          "spread": "Spread",
+          "recoil": "Recoil",
+          "energyPool": "Energy pool",
+          "energyRegen": "Energy regeneration",
+          "regenCooldown": "Regeneration delay",
+          "shotCost": "Energy per shot",
+          "overheatFix": "Overheat recovery",
+          "mass": "Mass",
+          "capacity": "Capacity",
+          "temperatureMin": "Min. temperature",
+          "temperatureMax": "Max. temperature",
+          "damage": {
+            "physical": "Physical damage",
+            "energy": "Energy damage",
+            "distortion": "Distortion damage",
+            "thermal": "Thermal damage",
+            "biochemical": "Biochemical damage",
+            "stun": "Stun damage"
+          },
+          "taken": {
+            "physical": "Physical damage taken",
+            "energy": "Energy damage taken",
+            "distortion": "Distortion damage taken",
+            "thermal": "Thermal damage taken",
+            "biochemical": "Biochemical damage taken",
+            "stun": "Stun damage taken"
+          }
+        }
       },
       "usedInBlueprints": "Used in blueprints",
       "usedInBlueprintsHint": "Crafting recipes that require this item as an ingredient.",
@@ -9003,7 +9035,7 @@
     }
   },
   "cart": {
-    "title":"Wishes",
+    "title": "Wishes",
     "summary": "{{n}} wishes · {{g}} groups",
     "summaryOne": "1 wish · 1 group",
     "summaryOneGroup": "{{n}} wishes · 1 group",
