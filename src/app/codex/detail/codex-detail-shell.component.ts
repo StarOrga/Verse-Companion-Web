@@ -39,14 +39,15 @@ export interface DetailTabItem<T extends string = string> {
                 [attr.id]="idPrefix() + t.id" [attr.aria-controls]="panelId()"
                 [attr.tabindex]="active() === t.id ? 0 : -1" (click)="pick(t.id)">
           @if (t.icon) { <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="t.icon" /></svg> }
-          {{ (t.labelKey ?? 'codex.detailShell.tab.' + t.id) | translate }}@if (t.count) { <small>{{ t.count }}</small> }
+          <span class="dt-label">{{ (t.labelKey ?? 'codex.detailShell.tab.' + t.id) | translate }}</span>@if (t.count) { <small>{{ t.count }}</small> }
         </button>
       }
     </div>
   `,
   styles: [
     `
-      :host { display: block; }
+      /* The pill measures its own width, not the viewport: the holotable's panel is ~360 px at any window size. */
+      :host { display: block; min-width: 0; max-width: 100%; container: dt-tabs / inline-size; }
       .dt-tabs { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 2px; padding: 3px;
         border: 1px solid color-mix(in srgb, var(--sc-accent) 24%, transparent); border-radius: 999px;
         background: linear-gradient(180deg, color-mix(in srgb, var(--sc-bg-2) 85%, transparent), color-mix(in srgb, var(--sc-bg-0) 85%, transparent)); }
@@ -60,6 +61,7 @@ export interface DetailTabItem<T extends string = string> {
         padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: var(--sc-fg-1); cursor: pointer;
         font: 500 0.74rem var(--sc-font-display, inherit); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
         transition: color 160ms ease; }
+      .dt-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
       .dt-tab svg { width: 1.2em; height: 1.2em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .dt-tab small { font: 500 0.72rem var(--sc-font-body, inherit); letter-spacing: 0; color: var(--sc-accent); }
       @media (hover: hover) { .dt-tab:hover { color: var(--sc-fg-0); } }
@@ -67,6 +69,15 @@ export interface DetailTabItem<T extends string = string> {
       .dt-tab.on small { color: var(--sc-fg-0); }
       .dt-tab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       @media (prefers-reduced-motion: reduce) { .dt-pill { transition: none; } }
+      /* A narrow pill (the holotable panel, a phone): the icons step aside and the tracking tightens, so the
+         three labels keep their full words side by side instead of running into each other (#batch holo). */
+      @container dt-tabs (max-width: 460px) {
+        .dt-tab { gap: 4px; padding: 0 6px; letter-spacing: 0.05em; }
+        .dt-tab svg { display: none; }
+      }
+      @container dt-tabs (max-width: 300px) {
+        .dt-tab { padding: 0 4px; letter-spacing: 0.02em; font-size: 0.68rem; }
+      }
       /* Narrow: the tabs scroll at their own width, so the pill gives way to a fill on the active tab. */
       @media (max-width: 640px) {
         .dt-tabs { grid-auto-columns: max-content; overflow-x: auto; scrollbar-width: none; }

@@ -921,7 +921,12 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
 
   /* ── Table head: the classic shell's hangar dock and the no-geometry note; nothing else (C1, C2) ── */
   .table-head { position: relative; z-index: 5; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 4px; }
-  .table-head:empty { display: none; }
+  /* The row keeps its height when it has nothing to show (Akte, Oben/Seite/Front, 3D with the hull): the
+     interior chips come and go with the view and the deck, and a collapsing row moved the model's frame by
+     its height on every switch — the 3D canvas re-framed and the outline jumped (v0.282.0 report). */
+  .table-head { min-height: 32px; }
+  .table-head:empty { display: flex; }
+  @media (pointer: coarse) { .table-head { min-height: calc(var(--sc-tap-min, 44px) + 6px); } }
   .ig-host { flex: 1 1 auto; min-width: 0; }
   .hangar-dock { flex: none; display: flex; align-items: center; }
   .no-geometry-badge { margin: 0; cursor: help; font-size: max(10px, var(--f)); color: var(--sc-fg-2); }

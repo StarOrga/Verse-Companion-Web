@@ -37,6 +37,20 @@ export function attachPull(top: number, pull: number, stickTop: number): number 
   return Math.max(0, Math.round(top + pull - stickTop));
 }
 
+/**
+ * Where the band would start without its pull and without sticking: the parent's content edge when the band
+ * is its first child (both hosts are flex columns, so the negative margin never collapses through the parent),
+ * else null. The band's own rect cannot tell: once the pull is too large, sticky clamps the band to its stick
+ * line, the rect reads `stickTop` and the over-pull keeps itself forever — the band then lies over the
+ * holotable's first row and the panel's tab pill (v0.282.0 report).
+ */
+export function naturalTop(host: HTMLElement): number | null {
+  const parent = host.parentElement;
+  if (!parent || parent.firstElementChild !== host) return null;
+  const cs = getComputedStyle(parent);
+  return parent.getBoundingClientRect().top + (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.paddingTop) || 0);
+}
+
 @Component({
   selector: 'sc-codex-detail-head',
   standalone: true,
@@ -216,7 +230,8 @@ export class CodexDetailHeadComponent {
       const readPull = (): void => {
         if (window.scrollY > 0.5) return;
         const stickTop = parseFloat(getComputedStyle(host).top) || 0;
-        nextPull = attachPull(host.getBoundingClientRect().top, pull, stickTop);
+        const natural = naturalTop(host);
+        nextPull = natural === null ? attachPull(host.getBoundingClientRect().top, pull, stickTop) : attachPull(natural, 0, stickTop);
       };
       const writePull = (): void => {
         if (nextPull === pull) return;
@@ -242,6 +257,9 @@ export class CodexDetailHeadComponent {
       let raf = requestAnimationFrame(settle);
       const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(settle); }) : null;
       if (ro && host.parentElement) ro.observe(host.parentElement);
+      // A skeleton or banner above leaving moves the band's parent without resizing it: watch the page frame too.
+      const frame = host.closest('main') ?? document.body;
+      if (ro && frame !== host.parentElement) ro.observe(frame);
       window.addEventListener('resize', settle, { passive: true });
       destroyRef.onDestroy(() => {
         off();
