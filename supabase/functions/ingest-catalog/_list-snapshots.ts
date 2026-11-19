@@ -24,14 +24,18 @@ export const LIST_KINDS = ['ship', 'weapon', 'component', 'item', 'ammunition', 
 export type ListKind = (typeof LIST_KINDS)[number];
 /** Kinds `codex_facet_values` answers with real values (the others return empty lists). */
 export const FACET_KINDS = ['ship', 'weapon', 'component', 'item'] as const;
-/** A list file built from table rows: a kind, or the ship rank slice. */
-export type ListName = ListKind | 'ship-rank';
-/** Publish order of the row files: ship-rank right after ship. */
+/** A list file built from table rows: a kind, or one of the slice files (ship-rank, missile, weapon-rank, component-rank). */
+export type ListName = ListKind | 'ship-rank' | 'missile' | 'weapon-rank' | 'component-rank';
+/** Publish order of the base row files: ship-rank right after ship. */
 export const LIST_FILES: readonly ListName[] = ['ship', 'ship-rank', 'weapon', 'component', 'item', 'ammunition', 'manufacturer', 'blueprint'];
-export const FILE_NAMES = [...LIST_FILES, 'facets'] as const;
+/** Added files, put after `facets`; a failure of one never stops the publish (see publishLists). */
+export const EXTRA_ROW_FILES: readonly ListName[] = ['missile', 'weapon-rank', 'component-rank'];
+/** The German-name file for the search fallback (`codex_search`); not table rows, see namesDeFileJson. */
+export const NAMES_DE = 'names-de';
+export const FILE_NAMES = [...LIST_FILES, 'facets', ...EXTRA_ROW_FILES, NAMES_DE] as const;
 export type FileName = (typeof FILE_NAMES)[number];
 
-export const NAME_RE = /^(ship-rank|ship|weapon|component|item|ammunition|manufacturer|blueprint|facets)$/;
+export const NAME_RE = /^(ship-rank|ship|weapon-rank|weapon|component-rank|component|item|ammunition|manufacturer|blueprint|facets|missile|names-de)$/;
 export const GEN_RE = /^[0-9a-z]{6,16}$/;
 
 export const LIST_TABLES: Record<ListName, string> = {
@@ -43,6 +47,22 @@ export const LIST_TABLES: Record<ListName, string> = {
   ammunition: 'codex_ammunition',
   manufacturer: 'codex_manufacturers',
   blueprint: 'codex_blueprints',
+  missile: 'codex_items',
+  'weapon-rank': 'codex_weapons',
+  'component-rank': 'codex_components',
+};
+
+/**
+ * Row filters of the slice files (all also need build_id = the published build).
+ * missile = getMissileCohort of codex.service.ts (items, attach_type 'Missile', named).
+ * weapon-rank / component-rank = the first two filters of getItemRankCohort
+ * (named, not a variant); its third filter (name_localized not like '!*') and the
+ * component kind filter are applied by the CLIENT on the file, not here.
+ */
+export const LIST_FILTERS: Partial<Record<ListName, { eq?: Record<string, string | boolean>; notNull?: string[] }>> = {
+  missile: { eq: { attach_type: 'Missile' }, notNull: ['name_localized'] },
+  'weapon-rank': { eq: { is_variant: false }, notNull: ['name_localized'] },
+  'component-rank': { eq: { is_variant: false }, notNull: ['name_localized'] },
 };
 
 /** LIST_SELECT of codex.service.ts without `payload`; the order is the row layout. */
@@ -56,6 +76,10 @@ export const LIST_COLUMNS: Record<ListName, readonly string[]> = {
   ammunition: ['class_name', 'name_localized', 'speed', 'lifetime', 'size'],
   manufacturer: ['class_name', 'name_localized', 'manufacturer_code'],
   blueprint: ['class_name', 'name_localized', 'category', 'tier', 'craft_time_seconds', 'dismantle_time_seconds'],
+  // missile carries the WHOLE payload as its last column (64 rows, ~0.6 MB); payloadKeys stays empty.
+  missile: ['class_name', 'name_localized', 'sub_type', 'size', 'attach_type', 'payload'],
+  'weapon-rank': ['class_name', 'name_localized', 'sub_type', 'size'],
+  'component-rank': ['class_name', 'name_localized', 'sub_type', 'size'],
 };
 
 /** CARD_PAYLOAD_KEYS of codex.service.ts: what a list card reads. */
@@ -77,8 +101,10 @@ export const SHIP_PAYLOAD_KEYS: readonly string[] = [...CARD_PAYLOAD_KEYS, 'size
  */
 export const SHIP_RANK_PAYLOAD_KEYS: readonly string[] = ['career', 'defaultLoadout', 'flight', 'hull', 'armorHp', 'cargoScu', 'stats'];
 
-/** Rows per page of ship-rank: each row carries several kB (allShipRows pages by 200). */
+/** Rows per page of the heavy files (ship-rank, missile, component-rank): several kB a row (allShipRows pages by 200). */
 export const RANK_PAGE = 200;
+/** Files read in pages of RANK_PAGE; every other file uses LIST_PAGE (1000). */
+export const RANK_PAGED: readonly ListName[] = ['ship-rank', 'missile', 'component-rank'];
 
 export const PAYLOAD_KEYS: Record<ListName, readonly string[]> = {
   ship: SHIP_PAYLOAD_KEYS,
@@ -89,6 +115,10 @@ export const PAYLOAD_KEYS: Record<ListName, readonly string[]> = {
   ammunition: CARD_PAYLOAD_KEYS,
   manufacturer: CARD_PAYLOAD_KEYS,
   blueprint: CARD_PAYLOAD_KEYS,
+  missile: [],
+  'weapon-rank': ['weaponParams'],
+  // `kind` is payload->kind (the JSON value, what payload->>kind yields as text), `stats` payload->stats.
+  'component-rank': ['kind', 'stats'],
 };
 
 export const PAYLOAD_ALIAS = 'p_';
@@ -117,6 +147,25 @@ export function kindFileJson(kind: ListName, rows: unknown[][]): string {
     payloadKeys: PAYLOAD_KEYS[kind],
     rows,
   });
+}
+
+/**
+ * names-de.json: the German name search of `codex_search` (migration 20261102100000, over the
+ * stored search_text = codex_search_text(name_localized, payload), 20261002230428:45-63).
+ * The German name of a record is payload->name->>de; the function drops it when it is
+ * empty, an unresolved '@loc_key', contains 'TRANSLATION NOT FOUND' or equals the English
+ * name (case-insensitive). The value stored here is the raw German name (the client folds
+ * case/accents itself, like codex-search.ts normalizeSearch).
+ */
+export function germanNameOf(nameLocalized: unknown, de: unknown): string | null {
+  if (typeof de !== 'string' || de === '' || de.startsWith('@') || de.includes('TRANSLATION NOT FOUND')) return null;
+  if (de.toLowerCase() === (typeof nameLocalized === 'string' ? nameLocalized : '').toLowerCase()) return null;
+  return de;
+}
+
+/** One entry list per kind: [class_name, german name], in class_name order. */
+export function namesDeFileJson(kinds: Record<string, [string, string][]>): string {
+  return JSON.stringify({ v: 1, lang: 'de', kinds });
 }
 
 /** facets.json: each RPC result stored unchanged. */

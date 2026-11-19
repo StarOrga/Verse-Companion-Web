@@ -98,7 +98,7 @@ import { usageGate } from '../ingest-skins/_r2-usage.ts';
 import { BUILD_ID_RE, LANG_RE } from './_locale-shards.ts';
 import { publishLocale } from './_locale-publish.ts';
 import { type ListPublishDeps, publishLists } from './_list-publish.ts';
-import { LIST_TABLES, LISTS_ROOT, selectFor } from './_list-snapshots.ts';
+import { LIST_FILTERS, LIST_TABLES, LISTS_ROOT, selectFor } from './_list-snapshots.ts';
 import { enqueueTranslationJobs } from './_translation-enqueue.ts';
 import { gcLocalePrefixes } from './_locale-gc.ts';
 import {
@@ -291,15 +291,29 @@ function listPublishDeps(admin: Admin, r2: R2): ListPublishDeps {
   return {
     async readRows(buildId, kind, from, limit) {
       // The database's list order (codex.service.ts): name asc, nulls last, then class_name.
-      const { data, error } = await admin
-        .from(LIST_TABLES[kind])
-        .select(selectFor(kind))
-        .eq('build_id', buildId)
+      // weapon-rank / component-rank stop at name + is_variant; the client's third filter
+      // (name_localized not like '!*', getItemRankCohort) is applied on the file by the client.
+      let q = admin.from(LIST_TABLES[kind]).select(selectFor(kind)).eq('build_id', buildId);
+      const filter = LIST_FILTERS[kind];
+      for (const [col, val] of Object.entries(filter?.eq ?? {})) q = q.eq(col, val);
+      for (const col of filter?.notNull ?? []) q = q.not(col, 'is', null);
+      const { data, error } = await q
         .order('name_localized', { ascending: true, nullsFirst: false })
         .order('class_name', { ascending: true })
         .range(from, from + limit - 1);
       if (error) throw error;
       return (data ?? []) as unknown as Record<string, unknown>[];
+    },
+    async readNames(buildId, kind, from, limit) {
+      // German name = payload->name->>de (codex_search_text); ammunition has none and yields nulls.
+      const { data, error } = await admin
+        .from(LIST_TABLES[kind])
+        .select('class_name, name_localized, de:payload->name->>de')
+        .eq('build_id', buildId)
+        .order('class_name', { ascending: true })
+        .range(from, from + limit - 1);
+      if (error) throw error;
+      return (data ?? []) as unknown as { class_name: string; name_localized: string | null; de: string | null }[];
     },
     async facetValues(buildId, kind) {
       const { data, error } = await admin.rpc('codex_facet_values', { p_build_id: buildId, p_kind: kind });

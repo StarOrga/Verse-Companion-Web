@@ -100,7 +100,7 @@ tables stay the source and the client's fallback; nothing is deleted from them.
 | `codex-lists/<build uuid>/<gen>/<name>.json` | immutable (a new gen per publish) |
 
 `<name>` is `ship`, `ship-rank`, `weapon`, `component`, `item`, `ammunition`, `manufacturer`,
-`blueprint` or `facets`. A kind file holds ALL rows of the build (variants
+`blueprint`, `facets`, `missile`, `weapon-rank`, `component-rank` or `names-de`. A kind file holds ALL rows of the build (variants
 included) in the database list order (`name_localized asc nulls last, class_name asc`),
 columnar: `{ v, kind, columns, payloadKeys, rows: [[...columns, ...payload slices]] }`.
 `facets.json` stores the `codex_facet_values` result per kind (ship, weapon,
@@ -112,7 +112,24 @@ the same ship columns, `payloadKeys` = `SHIP_RANK_PAYLOAD_KEYS` (equal to
 pages of 200 because each row carries several kB; a browser reads it once per build
 for the rank cohort).
 
-Publish (`_list-publish.ts`; put order ship, ship-rank, the other kinds, facets, index): one file at a time (pages of 1000, one file, then
+Four more files (concept supabase-io-last; the client reads them instead of the database):
+`missile.json` (`getMissileCohort`: items, `attach_type = 'Missile'`, named; columns `class_name,
+name_localized, sub_type, size, attach_type, payload`, the LAST column is the whole payload,
+`payloadKeys` empty; pages of 200), `weapon-rank.json` (weapons, named, `is_variant = false`;
+columns `class_name, name_localized, sub_type, size`, payloadKeys `weaponParams`),
+`component-rank.json` (components, same filters, ALL kinds; payloadKeys `kind`, `stats`; pages of
+200). The client still applies `getItemRankCohort`'s `name_localized not like '!*'` and the
+component kind filter. `names-de.json` = `{ v: 1, lang: "de", kinds: { <kind>: [[class_name,
+german name]] } }` for all seven kinds, class_name order, one entry per record whose
+`payload->name->>de` the `codex_search` text includes (not empty, not `@...`, not `TRANSLATION NOT
+FOUND`, not equal to the English name ignoring case); the name is raw, the client folds case and
+accents. `codex_search` matches `lower(unaccent(en || ' ' || de))` (or `class_name ilike`) against
+EVERY token (LIKE, `*` = wildcard), ranks by `word_similarity` - that rank is not mirrored.
+A failure of one of these four is logged, the name stays out of `index.json` and the publish result
+lists it in `failed`; the client treats a name missing from the index as not published.
+
+Publish (`_list-publish.ts`; put order ship, ship-rank, the other kinds, facets, missile, weapon-rank,
+component-rank, names-de, index): one file at a time (pages of 1000, one file, then
 dropped), facets, one file of the new generation read back through the public Worker, then the
 index (last), the index read back from the bucket, then only generations older than
 this publish and not named by that index are deleted (a failed read-back puts no

@@ -4,6 +4,9 @@ import { describe, it } from 'node:test';
 import {
   LIST_COLUMNS,
   LIST_FILES,
+  LIST_KINDS,
+  germanNameOf,
+  namesDeFileJson,
   RANK_PAGE,
   SHIP_RANK_PAYLOAD_KEYS,
   NAME_RE,
@@ -70,7 +73,7 @@ describe('list snapshot builders', () => {
   });
 });
 
-function fixture({ failOn, usageBlocked, existing = [], hideFiles = false, foreignIndexGen = null } = {}) {
+function fixture({ failReadOn, failOn, usageBlocked, existing = [], hideFiles = false, foreignIndexGen = null } = {}) {
   const log = [];
   const store = new Map(existing.map((k) => [k, 'old']));
   const reads = [];
@@ -79,9 +82,25 @@ function fixture({ failOn, usageBlocked, existing = [], hideFiles = false, forei
     gate: async () => (usageBlocked ? { status: 507, code: 'r2_free_tier_guard', message: 'near limit' } : null),
     async readRows(build, kind, from, limit) {
       reads.push([kind, from, limit]);
+      if (failReadOn === kind) throw new Error('read failed');
       const total = kind === 'item' ? LIST_PAGE + 5 : kind === 'ship-rank' ? RANK_PAGE + 1 : kind === 'weapon' ? 0 : 2;
       const n = Math.max(0, Math.min(limit, total - from));
       return Array.from({ length: n }, (_, i) => ({ class_name: `${kind}_${from + i}`, name_localized: `N${from + i}` }));
+    },
+    async readNames(build, kind, from, limit) {
+      reads.push(['names:' + kind, from, limit]);
+      if (failReadOn === 'names-de') throw new Error('names read failed');
+      const rows = kind === 'ship'
+        ? [
+            { class_name: 'A', name_localized: 'Alpha', de: 'Älpha' },
+            { class_name: 'B', name_localized: 'Beta', de: 'beta' },
+            { class_name: 'C', name_localized: 'Gamma', de: '@loc_c' },
+            { class_name: 'D', name_localized: 'Delta', de: null },
+            { class_name: 'E', name_localized: 'Eps', de: 'TRANSLATION NOT FOUND x' },
+            { class_name: 'F', name_localized: null, de: 'Ohne Englisch' },
+          ]
+        : [];
+      return rows.slice(from, from + limit);
     },
     facetValues: async (build, kind) => ({ manufacturers: [{ code: kind }], sizes: [], grades: [], componentKinds: [] }),
     async putJson(key, body) {
@@ -105,7 +124,18 @@ describe('publishLists', () => {
     const { deps, log, reads } = fixture();
     const res = await publishLists(BUILD, deps);
     const gen = res.gen;
-    assert.deepEqual(log, [...LIST_FILES.map((k) => listsFileKey(BUILD, gen, k)), listsFileKey(BUILD, gen, 'facets'), listsIndexKey(BUILD)]);
+    assert.deepEqual(log, [
+      ...LIST_FILES.map((k) => listsFileKey(BUILD, gen, k)),
+      ...['facets', 'missile', 'weapon-rank', 'component-rank', 'names-de'].map((k) => listsFileKey(BUILD, gen, k)),
+      listsIndexKey(BUILD),
+    ]);
+    assert.deepEqual(res.failed, []);
+    assert.deepEqual(Object.keys(res.files).slice(-5), ['facets', 'missile', 'weapon-rank', 'component-rank', 'names-de']);
+    assert.equal(res.files['names-de'].rows, 2);
+    // missile and component-rank page by RANK_PAGE, weapon-rank by LIST_PAGE
+    assert.deepEqual(reads.filter(([k]) => k === 'missile'), [['missile', 0, RANK_PAGE]]);
+    assert.deepEqual(reads.filter(([k]) => k === 'component-rank'), [['component-rank', 0, RANK_PAGE]]);
+    assert.deepEqual(reads.filter(([k]) => k === 'weapon-rank'), [['weapon-rank', 0, LIST_PAGE]]);
     assert.equal(res.verified, true);
     assert.equal(res.files.item.rows, LIST_PAGE + 5);
     assert.equal(res.files.weapon.rows, 0);
@@ -193,6 +223,59 @@ describe('publishLists', () => {
     assert.equal(res.blocked.status, 507);
     assert.equal(res.blocked.code, 'r2_free_tier_guard');
     assert.equal(res.gen, null);
+  });
+});
+
+describe('added files', () => {
+  it('a failure of one new file keeps the other files and the index, names it in failed', async () => {
+    for (const bad of ['missile', 'component-rank', 'names-de']) {
+      const { deps, store, log } = fixture({ failReadOn: bad });
+      const res = await publishLists(BUILD, deps);
+      assert.deepEqual(res.failed, [bad]);
+      assert.ok(!(bad in res.files), bad);
+      assert.equal(res.verified, true);
+      assert.equal(res.index_put, true);
+      const idx = JSON.parse(store.get(listsIndexKey(BUILD)));
+      assert.ok(!(bad in idx.files));
+      assert.equal(log.at(-1), listsIndexKey(BUILD));
+      assert.ok(!log.includes(listsFileKey(BUILD, res.gen, bad)));
+      assert.ok('ship' in idx.files && 'facets' in idx.files);
+    }
+  });
+
+  it('a put failure of a new file is isolated too, a put failure of a base file still aborts', async () => {
+    const { deps } = fixture({ failOn: '/weapon-rank.json' });
+    const res = await publishLists(BUILD, deps);
+    assert.deepEqual(res.failed, ['weapon-rank']);
+    assert.ok(res.index_put);
+  });
+
+  it('missile carries the whole payload as its last column', async () => {
+    assert.deepEqual(LIST_COLUMNS.missile, ['class_name', 'name_localized', 'sub_type', 'size', 'attach_type', 'payload']);
+    assert.deepEqual(PAYLOAD_KEYS.missile, []);
+    assert.equal(selectFor('missile'), 'class_name, name_localized, sub_type, size, attach_type, payload');
+    const file = JSON.parse(kindFileJson('missile', [rowToArray('missile', { class_name: 'M', payload: { a: 1 } })]));
+    assert.deepEqual(file.rows[0], ['M', null, null, null, null, { a: 1 }]);
+  });
+
+  it('weapon-rank and component-rank select their payload slices', () => {
+    assert.equal(selectFor('weapon-rank'), 'class_name, name_localized, sub_type, size, p_weaponParams:payload->weaponParams');
+    assert.equal(selectFor('component-rank'), 'class_name, name_localized, sub_type, size, p_kind:payload->kind, p_stats:payload->stats');
+    assert.deepEqual(PAYLOAD_KEYS['component-rank'], ['kind', 'stats']);
+  });
+
+  it('names-de keeps only German names codex_search would search, in kind order', async () => {
+    const { deps, store } = fixture();
+    const res = await publishLists(BUILD, deps);
+    const f = JSON.parse(store.get(listsFileKey(BUILD, res.gen, 'names-de')));
+    assert.equal(f.v, 1);
+    assert.equal(f.lang, 'de');
+    assert.deepEqual(Object.keys(f.kinds), [...LIST_KINDS]);
+    assert.deepEqual(f.kinds.ship, [['A', 'Älpha'], ['F', 'Ohne Englisch']]);
+    assert.deepEqual(f.kinds.weapon, []);
+    assert.equal(germanNameOf('Alpha', 'ALPHA'), null);
+    assert.equal(germanNameOf('Alpha', ''), null);
+    assert.equal(namesDeFileJson({ ship: [['A', 'B']] }), '{"v":1,"lang":"de","kinds":{"ship":[["A","B"]]}}');
   });
 });
 
