@@ -72,11 +72,11 @@ export interface DetailTabItem<T extends string = string> {
       /* A narrow pill (the holotable panel, a phone): the icons step aside and the tracking tightens, so the
          three labels keep their full words side by side instead of running into each other (#batch holo). */
       @container dt-tabs (max-width: 460px) {
-        .dt-tab { gap: 4px; padding: 0 6px; letter-spacing: 0.05em; }
+        .dt-tab { gap: 4px; padding: 0 4px; letter-spacing: 0.04em; }
         .dt-tab svg { display: none; }
       }
-      @container dt-tabs (max-width: 300px) {
-        .dt-tab { padding: 0 4px; letter-spacing: 0.02em; font-size: 0.68rem; }
+      @container dt-tabs (max-width: 340px) {
+        .dt-tab { letter-spacing: 0.02em; font-size: 0.68rem; }
       }
       /* Narrow: the tabs scroll at their own width, so the pill gives way to a fill on the active tab. */
       @media (max-width: 640px) {

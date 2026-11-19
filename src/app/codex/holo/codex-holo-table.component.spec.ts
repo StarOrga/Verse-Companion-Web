@@ -63,6 +63,33 @@ describe('CodexHoloTableComponent', () => {
     expect(f.componentInstance.viewerDrawn()).toBe(false);
   });
 
+  it('ignores a stale "drawn" and holds the hull again when 3D comes back from a deck', () => {
+    const f = setup({ viewMode: '3d', phase: 'done', shipClassName: 'ANVL_Liberator' });
+    const c = f.componentInstance;
+    const el = f.nativeElement as HTMLElement;
+    const first = c.viewerEpoch();
+    c.markDrawn(first);
+    f.detectChanges();
+    expect(c.viewerDrawn()).toBe(true);
+    // A deck turns 3D inward: the hull viewer leaves; its late "drawn" changes nothing.
+    f.componentRef.setInput('interior3d', { decks: [], interior: null, focus: null, focusLabel: null, groups: [], pick: null } as never);
+    f.detectChanges();
+    c.markDrawn(first);
+    expect(c.viewerDrawn()).toBe(false);
+    // Back to the hull: a new mount — held, the outline stays on the table, the old mount cannot unhold it.
+    f.componentRef.setInput('interior3d', null);
+    f.detectChanges();
+    expect(c.viewerEpoch()).toBeGreaterThan(first);
+    c.markDrawn(first);
+    f.detectChanges();
+    expect(c.viewerDrawn()).toBe(false);
+    expect(el.querySelector('.viewer-hold')?.classList).toContain('held');
+    expect(el.querySelector('.shipwrap')).toBeTruthy();
+    c.markDrawn(c.viewerEpoch());
+    f.detectChanges();
+    expect(el.querySelector('.viewer-hold')?.classList).not.toContain('held');
+  });
+
   describe('phone on its side', () => {
     function withLandscape(matches: boolean): void {
       const real = window.matchMedia.bind(window);
