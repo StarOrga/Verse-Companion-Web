@@ -33,7 +33,10 @@ from array import array
 from collections.abc import Sequence
 from typing import Iterator, List, Optional
 
-import numpy as np
+try:  # numpy ships with the uploader's Python; only P4KIndex needs it
+    import numpy as np
+except ImportError:  # pragma: no cover
+    np = None  # type: ignore[assignment]
 
 from .p4k_compat import apply_p4k_compat
 
@@ -137,6 +140,8 @@ class P4KIndex:
 
         self.filename = str(path)
         self.key = DEFAULT_P4K_KEY if key is None else key
+        self._dds_h = None
+        self._dds_i = None
         self._lock = threading.RLock()
         self._fileRefCnt = 1
         self.fp = open(self.filename, "rb")
@@ -290,16 +295,19 @@ class P4KIndex:
             bool(self._enc[j]), self._hoff[j],
         )
 
+    def _cands(self, cf: str) -> List[int]:
+        """Archive-ordered indices whose case-folded name hashes like ``cf``."""
+        h = hash(cf)
+        lo = int(np.searchsorted(self._sorted_h, h, side="left"))
+        hi = int(np.searchsorted(self._sorted_h, h, side="right"))
+        return [int(self._order[k]) for k in range(lo, hi)]
+
     def _find(self, name: str, exact_only: bool = False) -> Optional[int]:
         """Index of ``name``: last exact match, else last case-insensitive one."""
         key = _norm(name)
         cf = key.casefold()
-        h = hash(cf)
-        lo = int(np.searchsorted(self._sorted_h, h, side="left"))
-        hi = int(np.searchsorted(self._sorted_h, h, side="right"))
         exact = fold = None
-        for k in range(lo, hi):
-            j = int(self._order[k])
+        for j in self._cands(cf):
             n = self._name(j)
             if n == key:
                 exact = j  # ascending archive order -> the last one wins
@@ -311,6 +319,85 @@ class P4KIndex:
             return None
         # a duplicate that differs only in case: last one in archive order wins
         return fold
+
+    # ---- the three name maps hull3d / silhouette / ship discovery used ----
+    def exact(self, key: str) -> Optional[P4KEntry]:
+        """``{filename: info}.get(key)``: stored names are '/'-normalised, last wins."""
+        if "\\" in key:
+            return None
+        j = self._find(key, exact_only=True)
+        return None if j is None else self.entry(j)
+
+    def lower_last(self, key: str) -> Optional[P4KEntry]:
+        """``{filename.lower(): info}.get(key)``: the last entry whose lower-cased name is ``key``."""
+        hit = None
+        for j in self._cands(key.casefold()):
+            if self._name(j).lower() == key:
+                hit = j
+        return None if hit is None else self.entry(hit)
+
+    def lower_first(self, key: str) -> Optional[P4KEntry]:
+        """``setdefault`` map over the exact map: the first-seen name whose lower
+        case is ``key.lower()``, resolved to its last entry."""
+        want = key.lower()
+        first = {}
+        last = {}
+        for j in self._cands(want.casefold()):
+            n = self._name(j)
+            if n.lower() == want:
+                first.setdefault(n, j)
+                last[n] = j
+        if not first:
+            return None
+        return self.entry(last[min(first, key=first.__getitem__)])
+
+    def _dds_cands(self, key: str) -> List[int]:
+        """Archive-ordered indices of every ``.dds`` piece whose
+        ``<lower name up to the first '.dds'>.dds`` is ``key``."""
+        if self._dds_h is None:
+            hs, ix = array("q"), array("i")
+            for j in range(self._n):
+                fn = self._name(j).lower()
+                if ".dds" in fn:
+                    hs.append(hash(fn.split(".dds")[0] + ".dds"))
+                    ix.append(j)
+            h = np.frombuffer(hs, dtype=np.int64)
+            o = np.argsort(h, kind="stable")
+            self._dds_h = h[o]
+            self._dds_i = np.frombuffer(ix, dtype=np.int32)[o]
+        h = hash(key)
+        lo = int(np.searchsorted(self._dds_h, h, side="left"))
+        hi = int(np.searchsorted(self._dds_h, h, side="right"))
+        out = []
+        for k in range(lo, hi):
+            j = int(self._dds_i[k])
+            fn = self._name(j).lower()
+            if fn.split(".dds")[0] + ".dds" == key:
+                out.append(j)
+        return out
+
+    def dds(self, key: str) -> Optional[P4KEntry]:
+        """First entry (archive order) of the mip-split family ``key`` (hull3d's ``_ddsidx``)."""
+        c = self._dds_cands(key)
+        return self.entry(c[0]) if c else None
+
+    def dds_parts(self, info) -> dict:
+        """``scdatatools.engine.textures.dds.collect_parts`` for an entry of this
+        index, without scanning the archive: ``{file name: entry}`` of the pieces."""
+        from pathlib import Path
+
+        from scdatatools.engine.textures.dds import is_glossmap
+
+        fp = Path(info.filename)
+        basename = (fp.parent / fp.stem.split(".")[0]).with_suffix(".dds").as_posix().casefold()
+        parts = {}
+        for j in self._dds_cands(basename.lower()):
+            e = self.entry(j)
+            if e.filename.casefold().startswith(basename):
+                parts[Path(e.filename).name] = e
+        if is_glossmap(fp):
+            return {k: v for k, v in parts.items() if k.endswith("a")}
+        return {k: v for k, v in parts.items() if not k.endswith("a")}
 
     def namelist(self) -> Sequence:
         return _NameSeq(self)
@@ -401,3 +488,55 @@ def open_p4k(path, key: Optional[bytes] = None) -> P4KIndex:
     """Open ``Data.p4k`` as a compact index (applies the scdatatools compat shim)."""
     apply_p4k_compat()
     return P4KIndex(path, key)
+
+
+class P4KNames:
+    """The name maps the 3D / discovery code keeps over an archive.
+
+    Over a :class:`P4KIndex` every lookup is answered from the packed index, so
+    nothing 1.4 M entries large is built. Over any other object with
+    ``infolist()`` (tests, ``P4KFile``) it builds the dicts those modules used to
+    build themselves, lazily, with the same semantics.
+    """
+
+    def __init__(self, p4k) -> None:
+        self._p4k = p4k
+        self._ix = p4k if isinstance(p4k, P4KIndex) else None
+        self._by = self._lw = self._lf = self._dd = None
+
+    def _byname(self):
+        if self._by is None:
+            self._by = {i.filename.replace("\\", "/"): i for i in self._p4k.infolist()}
+        return self._by
+
+    def exact(self, key: str):
+        return self._ix.exact(key) if self._ix else self._byname().get(key)
+
+    def lower_first(self, key: str):
+        """Case-insensitive fallback of ``_info`` (first-seen name wins)."""
+        if self._ix:
+            return self._ix.lower_first(key)
+        if self._lf is None:
+            self._lf = {}
+            for fn, i in self._byname().items():
+                self._lf.setdefault(fn.lower(), i)
+        return self._lf.get(key.lower())
+
+    def lower_last(self, key: str):
+        """A dict of lower-cased, '/'-normalised names (last wins), looked up by key."""
+        if self._ix:
+            return self._ix.lower_last(key)
+        if self._lw is None:
+            self._lw = {i.filename.lower().replace("\\", "/"): i for i in self._p4k.infolist()}
+        return self._lw.get(key)
+
+    def dds(self, key: str):
+        if self._ix:
+            return self._ix.dds(key)
+        if self._dd is None:
+            self._dd = {}
+            for i in self._p4k.infolist():
+                fn = i.filename.lower().replace("\\", "/")
+                if ".dds" in fn:
+                    self._dd.setdefault(fn.split(".dds")[0] + ".dds", i)
+        return self._dd.get(key)

@@ -28,6 +28,12 @@ ENTRIES = [
     ("Data/Dup/CASE.txt", b"upper", False),
     ("Data/Dup/case.txt", b"lower", False),
     ("Data/Ünï/cödé.xml", b"<x/>", False),
+    ("Data/Tex/Foo.dds", b"DDS " + b"h" * 200, False),
+    ("Data/Tex/Foo.dds.1", b"one" * 50, False),
+    ("Data/Tex/Foo.dds.2", b"two" * 50, False),
+    ("Data/Tex/Foo.dds.1a", b"gloss" * 10, False),
+    ("Data/Tex/Bar.DDS", b"DDS bar", False),
+    ("Data/Tex/Foo_ddna.dds", b"DDS other", False),
 ]
 
 
@@ -128,3 +134,55 @@ def test_bad_archive(tmp_path):
     p.write_bytes(b"not a zip")
     with pytest.raises(zipfile.BadZipFile):
         open_p4k(p)
+
+
+def _same(a, b):
+    assert (a is None) == (b is None)
+    if a is not None:
+        assert (a.filename, a.header_offset, a.file_size) == (b.filename, b.header_offset, b.file_size)
+
+
+QUERIES = [e[0] for e in ENTRIES] + [e[0].upper() for e in ENTRIES] + [e[0].lower() for e in ENTRIES] + [
+    "data/nothing/here.txt", "Data/Dup/CASE.TXT"]
+
+
+def test_name_maps_match_the_dicts_they_replace(pair):
+    """P4KNames over the index == P4KNames' legacy dict path over P4KFile."""
+    from sc_extract.p4k_index import P4KNames
+
+    ref, idx = pair
+    legacy, packed = P4KNames(ref), P4KNames(idx)
+    for q in QUERIES:
+        n = q.replace("\\", "/")
+        _same(packed.exact(n), legacy.exact(n))
+        _same(packed.lower_first(n), legacy.lower_first(n))
+        _same(packed.lower_last(n.lower()), legacy.lower_last(n.lower()))
+        key = n.lower().split(".dds")[0] + ".dds"
+        _same(packed.dds(key), legacy.dds(key))
+
+
+def test_dds_mip_family(pair):
+    ref, idx = pair
+    assert idx.dds("data/tex/foo.dds").filename == "Data/Tex/Foo.dds"
+    assert idx.dds("data/tex/bar.dds").filename == "Data/Tex/Bar.DDS"
+    assert idx.dds("data/tex/missing.dds") is None
+
+
+@pytest.mark.parametrize("name", ["Data/Tex/Foo.dds", "Data/Tex/Foo.dds.1", "Data/Tex/Foo.dds.1a"])
+def test_dds_parts_match_scdatatools(pair, name):
+    from scdatatools.engine.textures import dds as ddsmod
+
+    ref, idx = pair
+    want = ddsmod.collect_parts(ref.getinfo(name))
+    got = idx.dds_parts(idx.getinfo(name))
+    assert sorted(got) == sorted(want)
+    for k in want:
+        assert idx.open(got[k]).read() == ref.open(want[k]).read()
+
+
+def test_lazy_sequences(pair):
+    _, idx = pair
+    names = idx.namelist()
+    assert names[-1] == idx.getinfo(names[-1]).filename
+    assert names[1:3] == [names[1], names[2]]
+    assert len(idx.infolist()) == len(ENTRIES) and idx.infolist()[0].filename == names[0]

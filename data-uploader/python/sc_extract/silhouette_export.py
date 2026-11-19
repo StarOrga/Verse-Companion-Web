@@ -40,6 +40,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from .glb_materials import read_glb, strip_noop_skins
 from .stage_timing import timed
 from .hull3d import _safe_join, safe_id
+from .p4k_index import P4KNames
 from .silhouette import Triangle
 
 LogFn = Callable[[str, str], None]
@@ -395,11 +396,10 @@ class SilhouetteExporter:
         self.cfg.cache_dir.mkdir(parents=True, exist_ok=True)
         self.cfg.work_dir.mkdir(parents=True, exist_ok=True)
         # A worker process (`silhouette_pool`) has no P4K: it only ever converts.
-        self._byname = {i.filename.replace("\\", "/"): i for i in p4k.infolist()} if p4k is not None else {}
+        self._names = P4KNames(p4k) if p4k is not None else None
         # Case-insensitive fallback as ONE dict, built once. It used to be a
         # linear scan of every archive entry (1.37M on LIVE) per miss — and a
         # mesh without a `.cgam` (most items) missed three times per entity.
-        self._lower: Optional[Dict[str, Any]] = None
         self.algo = algo_tag(cfg.recipe)
         self._remote: Any = None
 
@@ -415,13 +415,11 @@ class SilhouetteExporter:
     # ---- P4K (single thread) ------------------------------------------------
     def _info(self, p4k_path: str):
         key = p4k_path.replace("\\", "/")
-        info = self._byname.get(key)
+        if self._names is None:
+            return None
+        info = self._names.exact(key)
         if info is None:
-            if self._lower is None:
-                self._lower = {}
-                for fn, i in self._byname.items():
-                    self._lower.setdefault(fn.lower(), i)
-            info = self._lower.get(key.lower())
+            info = self._names.lower_first(key)
         return info
 
     def _read(self, p4k_path: str) -> bytes:

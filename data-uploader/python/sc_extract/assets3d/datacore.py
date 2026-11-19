@@ -15,6 +15,7 @@ from ..dataforge_extract import (_as_list, _components_of, _default_loadout_of, 
                                  _find_component, _find_geometry_path, _port_types, _to_int)
 from ..geometry import helpers_from_cga_bytes, normalize_geometry_path
 from ..hardpoints import port_helper_name
+from ..p4k_index import P4KNames
 from .entity import EntityDef, LoadoutEntry, PortDef, loadout_from_dicts
 from .transforms import cry_to_gltf, from_pos_quat, to_pos_quat
 
@@ -24,13 +25,21 @@ class P4KReader:
 
     def __init__(self, p4k) -> None:
         self.p4k = p4k
-        self._idx = {i.filename.replace("\\", "/").lower(): i for i in p4k.infolist()}
+        self._names = P4KNames(p4k)
+
+    def first_name(self, suffix: str) -> str:
+        """First archive entry (lower-cased, '/'-normalised) ending in ``suffix``."""
+        for i in self.p4k.infolist():
+            n = i.filename.replace("\\", "/").lower()
+            if n.endswith(suffix):
+                return n
+        raise StopIteration(suffix)
 
     def exists(self, path: str) -> bool:
-        return path.replace("\\", "/").lower() in self._idx
+        return self._names.lower_last(path.replace("\\", "/").lower()) is not None
 
     def read(self, path: str) -> bytes:
-        info = self._idx.get(path.replace("\\", "/").lower())
+        info = self._names.lower_last(path.replace("\\", "/").lower())
         if info is None:
             raise FileNotFoundError(path)
         with stage_timing.timed("~p4k-read"):
@@ -38,7 +47,7 @@ class P4KReader:
 
 
 def load_datacore(reader: P4KReader) -> DataForge:
-    name = next(n for n in reader._idx if n.endswith(".dcb"))
+    name = reader.first_name(".dcb")
     return DataForge(reader.read(name))
 
 
