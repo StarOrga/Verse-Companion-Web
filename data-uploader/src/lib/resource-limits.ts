@@ -113,15 +113,16 @@ export const CPU_MIN_PCT = 5;
 export const RAM_MIN_MB = 1024;
 /**
  * The least a single run actually takes, so the RAM limit never promises
- * less than the uploader can keep to. Measured 2026-11-19 against the LIVE
- * 4.10.3 Data.p4k (concept 20261119-0040-uploader-entpacken-ram): one serial
- * codex extract peaked at 4,476 MB working set (4,829 MB private), of which
- * ≈ 2.5 GB is the P4K index alone; "gaming" used to offer 3.75 GB on a 32 GB
- * machine. 5 GB = that peak plus a margin. The RAM budget is not a hard cap
- * (it only sizes the worker count), so this floor is what keeps the slider
- * honest. Lower it here once a leaner P4K index lands and is re-measured.
+ * less than the uploader can keep to (concept 20261119-0040-uploader-entpacken-ram).
+ * Measured against the LIVE 4.10.3 Data.p4k with one serial codex extract:
+ * 4,476 MB working set / 4,829 MB private with scdatatools' P4K index, then
+ * 2,654 MB / 3,150 MB with the compact index (sc_extract/p4k_index.py). The
+ * remaining peak is the codex path's own name maps in dataforge_extract.py.
+ * 3.5 GB = the private peak plus a margin. The RAM budget is not a hard cap (it
+ * only sizes the worker count), so this floor is what keeps the slider honest.
+ * Re-measure before lowering it again.
  */
-export const RAM_RUN_FLOOR_MB = 5120;
+export const RAM_RUN_FLOOR_MB = 3584;
 /** Kept free for Windows itself at the least (it decides on small machines, where 20 % is less). */
 export const RAM_OS_RESERVE_MB = 2048;
 export const READ_MIN_MBS = 5;

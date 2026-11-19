@@ -70,14 +70,14 @@ describe('resource limits', () => {
   });
 
   it('never offers less RAM than one run measurably needs', () => {
-    // Measured 2026-11-19: a single codex extract peaks at 4.48 GB; "gaming" used to offer 3.75 GB.
-    expect(RAM_RUN_FLOOR_MB).toBeGreaterThanOrEqual(4600);
+    // Measured 2026-11-19: one codex extract with the compact P4K index peaks at 3,150 MB private.
+    expect(RAM_RUN_FLOOR_MB).toBeGreaterThanOrEqual(3150);
     expect(rangesFor(pc).ramMb.min).toBe(RAM_RUN_FLOOR_MB);
-    expect(presetLimits('gaming', pc).ramMb).toBe(RAM_RUN_FLOOR_MB);
-    // A stored value from before the floor is raised to it.
-    expect(clampLimits({ ramMb: 3840 }, pc).ramMb).toBe(RAM_RUN_FLOOR_MB);
+    expect(presetLimits('gaming', pc).ramMb).toBeGreaterThanOrEqual(RAM_RUN_FLOOR_MB);
+    // A stored value below the floor is raised to it.
+    expect(clampLimits({ ramMb: 2048 }, pc).ramMb).toBe(RAM_RUN_FLOOR_MB);
     // A box whose whole scale is below the floor gets one honest value, never min > max.
-    const tiny: MachineInfo = { cores: 4, totalRamMb: 6144, disk: DISK_CAPS.hdd };
+    const tiny: MachineInfo = { cores: 4, totalRamMb: 5120, disk: DISK_CAPS.hdd };
     const r = rangesFor(tiny).ramMb;
     expect(r.min).toBe(r.max);
     expect(presetLimits('gaming', tiny).ramMb).toBe(r.max);
