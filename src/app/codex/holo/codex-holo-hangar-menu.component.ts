@@ -60,7 +60,9 @@ const EDGE = 8;
   template: `
     <div class="hm">
       <button #trigger type="button" class="hb" [class.open]="open()" aria-haspopup="dialog" [attr.aria-expanded]="open()"
-              [attr.aria-controls]="open() ? 'holo-hangar-menu' : null" (click)="toggle()" (keydown)="onTriggerKey($event)">
+              [attr.aria-controls]="open() ? 'holo-hangar-menu' : null" (click)="toggle()"
+              [scTooltip]="cutTip()" scTooltipTier="label" (pointerenter)="checkCut()" (focus)="checkCut()"
+              [attr.aria-label]="(count() > 0 ? ('codex.head.own.hangarN' | translate: { n: count() }) : ('codex.head.notOwn.hangar' | translate)) + ' · ' + (shownName() ?? ('codex.holo.hangar.werk' | translate))" (keydown)="onTriggerKey($event)">
         <span class="ic-w">
           <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9H3zM9 20v-6h6v6" /></svg>
           @if (assigned() > 0) {
@@ -193,15 +195,22 @@ const EDGE = 8;
   styles: [`
     :host { display: inline-flex; min-width: 0; }
     .hm { position: relative; display: inline-flex; min-width: 0; }
-    .hb { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; min-width: 0; max-width: 100%; padding: 3px 10px 3px 6px;
-      border: 1px solid color-mix(in srgb, var(--sc-accent) 45%, transparent); border-radius: 16px; background: transparent;
+    /* The band's pill language (detail/codex-detail-head.component.ts tokens), the same as the Einsatz pill.
+       Full band: the sentence may wrap onto a second line (min-height, never clipped — #1184's contract).
+       Slim band: one row, the loadout name ellipsises and the whole sentence is the tooltip. */
+    .hb { display: inline-flex; align-items: center; gap: 8px; box-sizing: border-box; min-height: var(--hb-pill-h, 34px); min-width: 0; max-width: 100%; padding: 3px 14px 3px 5px;
+      border: 1px solid var(--hb-pill-bd, color-mix(in srgb, var(--sc-accent) 30%, transparent)); border-radius: 17px;
+      background: var(--hb-pill-bg, color-mix(in srgb, var(--sc-bg-0) 52%, transparent)); transition: border-color 160ms ease, background 160ms ease;
       color: var(--sc-fg-1); font: inherit; font-size: max(12.5px, var(--sc-fs-floor)); text-align: start; cursor: pointer; }
+    .hb .ic { flex: none; width: 24px; height: 24px; padding: 5px; box-sizing: border-box; border-radius: 50%; color: var(--sc-accent);
+      background: color-mix(in srgb, var(--sc-accent) 12%, transparent); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
     .ic-w { position: relative; flex: none; display: inline-flex; margin-inline-end: 3px; }
     .hb .t { display: inline-flex; flex-wrap: wrap; align-items: center; column-gap: 6px; min-width: 0; line-height: 1.25; }
     .hb .t b { white-space: nowrap; }
     .hb .ex { display: inline-flex; align-items: center; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
-    .hb .ic { flex: none; width: 22px; height: 22px; padding: 4px; box-sizing: border-box; border-radius: 11px; color: var(--sc-accent);
-      background: color-mix(in srgb, var(--sc-accent) 12%, transparent); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+    :host-context(sc-codex-detail-head.slim) .hb { height: var(--hb-pill-h, 32px); padding-block: 0; border-radius: var(--hb-pill-r, 999px); }
+    :host-context(sc-codex-detail-head.slim) .hb .t { flex-wrap: nowrap; }
+    :host-context(sc-codex-detail-head.slim) .hb .ex { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
     /* The Route badge, as on the rows' wish node (sc-item-path .op-badge). */
     .op-badge { position: absolute; right: -8px; bottom: -6px; display: grid; place-items: center; width: 14px; height: 14px; box-sizing: border-box; border-radius: 50%;
       border: 1px solid var(--sc-accent); background: var(--sc-bg-0); color: var(--sc-accent); font-style: normal; pointer-events: none; }
@@ -209,7 +218,9 @@ const EDGE = 8;
     .hb b { color: var(--sc-fg-0); font-weight: 600; }
     .hb .sep { color: var(--sc-fg-2); }
     .hb .ex { color: var(--sc-fg-0); }
-    .hb .car { color: var(--sc-accent); font-size: 10px; }
+    .hb .car { color: var(--sc-accent); font-size: 0.75em; }
+    /* Phone, slim band (--hb-pill-text: none): icon and caret only; the menu names count and loadout. */
+    :host-context(sc-codex-detail-head.slim) .hb .t { display: var(--hb-pill-text, inline-flex); }
     .hb:hover, .hb.open { background: color-mix(in srgb, var(--sc-accent) 14%, transparent); border-color: var(--sc-accent); }
     .hb:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     /* The panel's frame fills the overlay pane (its width and height come from place()). */
@@ -303,6 +314,13 @@ export class CodexHoloHangarMenuComponent implements OnDestroy {
     return id ? (this.active() ?? this.wishes().find((w) => w.id === id) ?? null) : null;
   });
   protected readonly shownName = computed(() => this.shown()?.name ?? null);
+  /** The trigger's sentence is cut off (slim band): the tooltip carries it whole. */
+  protected readonly cutTip = signal<string | null>(null);
+  protected checkCut(): void {
+    const t = this.host.querySelector<HTMLElement>('.hb .ex');
+    const cut = !!t && t.scrollWidth > t.clientWidth + 1;
+    this.cutTip.set(cut ? (this.host.querySelector('.hb')?.getAttribute('aria-label') ?? null) : null);
+  }
   protected readonly shownDiff = computed(() => this.shown()?.diffCount ?? null);
   /** The ownership strip names the shown exemplar ("1× im Hangar · „PvP-Laser“"). */
   protected readonly exemplarName = computed(() => this.active()?.name ?? null);

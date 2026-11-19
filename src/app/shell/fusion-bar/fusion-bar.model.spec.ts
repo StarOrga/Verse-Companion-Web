@@ -155,6 +155,12 @@ describe('ShellChromeService', () => {
     expect(t[0].link).toBe('/codex');
     // No second area entry when the crumbs already start at the root.
     expect(trailOf([{ labelKey: 'nav.codex', link: '/codex' }], 'X', codex).length).toBe(2);
+    // A page of a scrolling landing (/hq#inventar) shares the root's path but is not the root: HQ › Lager › Inventar.
+    const hq = AREA_ENTRIES.find((e) => e.link === '/hq');
+    if (hq) {
+      const h = trailOf([{ labelKey: 'hq.pages.inventar', link: ['/hq'], fragment: 'inventar' }], 'Inventar', hq);
+      expect(h.map((p) => p.label ?? p.labelKey)).toEqual([hq.labelKey, 'hq.pages.inventar', 'Inventar']);
+    }
     const long = [1, 2, 3, 4, 5].map((n) => ({ label: `p${n}`, link: `/p${n}` }));
     expect(foldTrail(long).map((p) => (p.fold ? '…' : p.label))).toEqual(['p1', '…', 'p5']);
     expect(foldTrail(long.slice(0, 3)).length).toBe(3);

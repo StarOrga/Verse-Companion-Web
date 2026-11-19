@@ -91,6 +91,7 @@ docs/  (1042) — Documentation
     20261117-1609-batch-akte-suche-uploader-sternenkarte/  (97)
     20261117-1809-3d-ansicht-bauteile/  (59)
     20261117-1810-holotisch-innenleben/  (75)
+    20261118-2156-batch-holotisch-kopf-vorlage/  (53)
     blueprint/  (11)
     holo-shader/  (9)
     sonne-und-planeten/  (4)
@@ -128,7 +129,7 @@ src/  (1436) — Source code
   app/  (1429) — Application code
     admin/  (65)
     auth/  (41)
-    codex/  (408)
+    codex/  (414)
     core/  (100)
     desktop/  (28)
     feedback/  (44)

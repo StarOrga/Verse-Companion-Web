@@ -95,6 +95,6 @@ describe('CodexDetailClassicComponent (frozen Klassisch, non-ship)', () => {
 
   it('shows no Holotisch pieces: no item stage, no tabs', () => {
     const el = mount(weaponCtx());
-    expect(el.querySelector('sc-codex-item-stage, .it-tabs, .it-panel')).toBeNull();
+    expect(el.querySelector('sc-codex-item-stage, sc-codex-detail-shell, .dt-tabs')).toBeNull();
   });
 });

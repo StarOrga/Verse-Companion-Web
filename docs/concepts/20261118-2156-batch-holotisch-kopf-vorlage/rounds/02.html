@@ -1,0 +1,126 @@
+<section data-iteration="2" data-iteration-template="free" data-final-report>
+  <p class="fr-sentence">Ein leichtes Glasband als Kopf, gleich für Schiff und Gegenstand, klebt am Subheader; Lücke zu, HQ-Pfad da, Sterne im Hintergrund.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">📌</span><span><b>Kopf klebt am Subheader</b> und schrumpft beim Scrollen auf eine Zeile, ohne Sprung.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🧩</span><span><b>Eine Vorlage</b>: P4-AR und Rucksack teilen Kopf, Reiter und Panel mit dem Schiff.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🧭</span><span><b>Lücke zu, HQ-Pfad da, Sterne im Hintergrund</b>.</span></li>
+      </ul>
+      <a class="fr-try" href="http://127.0.0.1:4200/codex/ship/ANVL_Liberator" target="_blank" rel="noopener noreferrer">▶ {{final.try_it}}</a>
+      <p class="fr-try-auth">🔑 Lokaler Stand dieses Branches (<code>npm start</code>), Beta-Shell an; anmelden wie gewohnt.</p>
+    </div>
+    <div class="fr-ba" data-label-before="{{final.before}}" data-label-after="{{final.after}}">
+      <figure class="fr-shot"><img src="20261118-2156-batch-holotisch-kopf-vorlage/shots/before-head.webp" alt=""><figcaption>Kopf schwebt lose über der Bühne</figcaption></figure>
+      <figure class="fr-shot"><img src="20261118-2156-batch-holotisch-kopf-vorlage/shots/fix-ship-1920-scrolled.png" alt=""><figcaption>Gescrollt: schmales Band direkt unter dem Subheader</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Alle 885 Tests der berührten Bereiche (Codex-Detail, Holotisch, Shell, HQ, Wünsche) laufen durch, Typprüfung und Build grün; die volle Suite läuft erst beim Ship (geschätzt).">
+        <span class="fr-meter-name">🧱 Stabilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">885 grün</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 80%" data-tip="Unabhängige Prüfung in der Beta-Shell nach der Nacharbeit: Kopf, Lücke, Vorlage und HQ belegt; der leere Wunsch-Zustand ließ sich live nicht zeigen, weil das Testkonto Wünsche hat (geschätzt).">
+        <span class="fr-meter-name">👁 Live geprüft</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">4 / 5 Notizen</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Telefon 375 px: Band unter der Routenzeile, Knöpfe nur als Symbol, nichts unter dem Feedback-Knopf (geschätzt).">
+        <span class="fr-meter-name">📱 Telefon</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">geprüft</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="4 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ✓ {{final.level_interplay}} · ✓ {{final.level_local}} · ○ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_local}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_prod}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 3 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-wish-empty" data-routed="now"
+          data-issue-title="[TEST] Verify the empty wish panel with the sky backdrop on an account without wishes"
+          data-issue-type="task"
+          data-issue-body="Batch note #6 moved the wish sky behind the empty state (wish-empty.component.ts, wish-sky variant backdrop) and behind the top of the wish window (wish-cart-dialog.component.ts). Specs pass, but the empty popout could not be seen live: the test account has wishes. Check on an account with an empty wish list: the sky sits behind title, hint and button, no framed box, the empty popout is shorter than before (old box 136 px + gap), and reduced motion stops the shooting star."
+          data-issue-module="shell"
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="im Repo">
+        <span class="oq-label">Leeres Wunschpanel ungesehen</span>
+        <span class="oq-done">umgesetzt: Spec misst den leeren Zustand – Sterne hinter dem Inhalt, kein Rahmen, keine Zusatzhöhe</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Sterne als Hintergrund sind gebaut und getestet, aber der leere Zustand ließ sich mit dem Testkonto nicht zeigen.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Wünsche-Popout und Wunschfenster, leer</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — einmal mit leerer Wunschliste ansehen.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-item-changes" data-routed="now"
+          data-issue-title="[FEATURE] Patch changes tab for non-ship detail pages"
+          data-issue-type="feature"
+          data-issue-body="The shared detail shell (src/app/codex/detail/codex-detail-shell.component.ts, codex-detail-profile.ts) hides a tab without data. The approved tab set for items includes Änderungen (patch differences, as on the ship), but items have no patch history on the detail page, so the tab never shows. Needs a data source per item and patch before it can appear."
+          data-issue-module="codex"
+          data-oq-origin="shortfall"
+          data-route-default="later"
+          data-route-reason="braucht Daten">
+        <span class="oq-label">Änderungen-Reiter für Items</span>
+        <span class="oq-done">umgesetzt: vergleicht mit dem letzten Patch, schlechtere Werte in Warnfarbe</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Werte, Bezug und Verbaut in sind da; Änderungen bleibt versteckt, weil es für Gegenstände noch keine Patch-Daten gibt.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Detailseiten von Waffen, Ausrüstung, Bauteilen</dd>
+          <dt>{{final.fund_why}}</dt><dd>🕒 Später — braucht erst eine Datenquelle.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-ship-body" data-routed="now"
+          data-issue-title="[REFACTOR] Move the ship holotable body into the shared detail shell"
+          data-issue-type="refactor"
+          data-issue-body="Batch note #3 asked for one template for all detail pages. Built: one shared head band, tab pill and panel (codex-detail-shell + kind profile) used by ship and item pages. The ship's holotable body (codex-holo-stage.component.ts, ~2950 lines) still renders inside its own component and its panel tabs do not yet use the shared tab pill. Follow-up: render the holotable as the ship profile's stage inside the shell so panel and strip are fully shared."
+          data-issue-module="codex"
+          data-oq-origin="shortfall"
+          data-route-default="later"
+          data-route-reason="großer Umbau">
+        <span class="oq-label">Holotisch-Körper separat</span>
+        <span class="oq-done">umgesetzt: Schiff in der Vorlage, Reiter über die geteilte Pille; Panel bleibt im Holotisch</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Kopf, Reiter und Panel sind geteilt; der Schiffs-Holotisch selbst und seine Panel-Reiter laufen noch neben der Vorlage.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Schiffsseite im Beta-Holotisch</dd>
+          <dt>{{final.fund_why}}</dt><dd>🕒 Später — eigener Umbau von rund 3.000 Zeilen.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Branch <code>claude/batch-0c7514</code> · Bereiche: codex (Detailseiten, Holotisch), shell (Subheader-Pfad), hq, Wünsche, analytics</li>
+      <li>Neu: <code>codex/detail/codex-detail-head.component.ts</code>, <code>codex-detail-shell.component.ts</code>, <code>codex-detail-profile.ts</code>; geändert u. a. <code>codex-holo-stage</code>, <code>codex-holo-einsatz</code>, <code>codex-holo-hangar-menu</code>, <code>hq-pages</code>, <code>fusion-bar.model</code>, <code>wish-sky</code></li>
+      <li>Maße Beta, 1920 px: Subheader 60 px (Radius 20) · Band voll 75 px Schiff / 98 px Gegenstand, schmal 56 px (Radius 14) · Kennzahlen-Leiste 79 px; Band oben auf 84 px bei allen Arten</li>
+      <li>Lücke: Ursache war ein veralteter Messwert der Bühnenoberkante (217 statt 201 px), Leiste jetzt bündig bei 1001 px</li>
+      <li>Analytik: <code>codex:detail_tab_select { kind, tab }</code>, Kachel „Codex-Detailseite: gewählte Reiter je Art“ in „Wird es genutzt?“</li>
+      <li>Merge mit main: PR #1184 verlangt umbrechenden Hangar-Knopf — volles Band bricht um, schmales Band kürzt mit „…“ und Tooltip; beide Specs grün</li>
+      <li>Nachträge: Wunschpanel-Spec, Reiterpille für alle Arten (ship tabs in sc-codex-detail-tabs, Event kind ship), Änderungen-Reiter für Gegenstände aus Patch-Vergleich (codex-item-changes.ts)</li>
+      <li>Nachträge: Wunschpanel-Spec (9672365f0) · Schiffs-Reiter über <code>sc-codex-detail-tabs</code>, Event auch für <code>kind: ship</code> (a95a4c83b) · Änderungen-Reiter für Gegenstände aus dem Patch-Vergleich, <code>codex-item-changes.ts</code> (e78c150dc)</li>
+      <li>Tests: 885 grün in den berührten Bereichen · Typprüfung, Build grün · Checkliste und Belege: <code>briefs/implement.md</code>, Bilder <code>shots/fix-*</code>, <code>shots/qa-*</code></li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-scroll" data-crit="high" data-guide="">Liberator scrollen: Band ruhig am Subheader?</li>
+      <li data-todo-id="t-item" data-crit="mid" data-guide="">P4-AR, Rucksack: Kopf wie beim Schiff?</li>
+      <li data-todo-id="t-hq" data-crit="mid" data-guide="">HQ › Lager: steht der Pfad im Subheader?</li>
+      <li data-todo-id="t-wish" data-crit="low" data-guide="">Leere Wunschliste öffnen: Sterne im Hintergrund?</li>
+    </ul>
+  </section>
+</section>
