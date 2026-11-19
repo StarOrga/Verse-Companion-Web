@@ -1,0 +1,103 @@
+[
+  {
+    "iteration": 1,
+    "action": "implement",
+    "submitted": true,
+    "decisions": [
+      {
+        "id": "d-codex",
+        "label": "Codex-Ablage",
+        "mode": "single",
+        "value": "keep",
+        "rec": "keep",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Codex-Schritt (Extract → Upload)",
+        "finding": "f-codex",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 48323,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-mirror",
+        "label": "Konverter-Eingang",
+        "mode": "single",
+        "value": "keep",
+        "rec": "keep",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Silhouetten- und 3D-Schritt",
+        "finding": "f-mirror",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 292013,
+          "noteWords": 0,
+          "revisits": 11,
+          "flagged": true
+        }
+      },
+      {
+        "id": "d-budget",
+        "label": "RAM-Grenze",
+        "mode": "single",
+        "value": "floor",
+        "rec": "floor",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Ressourcen-Grenzen, vor allem Voreinstellung „Gaming“",
+        "finding": "f-budget",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 33569,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-index",
+        "label": "Schlanker P4K-Index",
+        "mode": "yesnoalt",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "jeder Prozess, der die P4K öffnet",
+        "finding": "f-index",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 13637,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      }
+    ],
+    "comments": {
+      "general": {
+        "text": "",
+        "attachments": []
+      },
+      "items": []
+    }
+  }
+]

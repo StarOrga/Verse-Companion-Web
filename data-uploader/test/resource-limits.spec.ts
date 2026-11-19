@@ -13,6 +13,7 @@ import {
   maxLiveWorkers,
   presetFromLegacyProfile,
   presetLimits,
+  RAM_RUN_FLOOR_MB,
   ramThrottled,
   rangesFor,
   ramOthersMb,
@@ -64,8 +65,23 @@ describe('resource limits', () => {
   it('clamps garbage back into range', () => {
     const l = clampLimits({ cpuPct: 'x', ramMb: -1, readMBs: 1e9, iops: Number.NaN }, pc);
     expect(l.cpuPct).toBe(presetLimits('balanced', pc).cpuPct);
-    expect(l.ramMb).toBe(1024);
+    expect(l.ramMb).toBe(RAM_RUN_FLOOR_MB);
     expect(l.readMBs).toBe(1600);
+  });
+
+  it('never offers less RAM than one run measurably needs', () => {
+    // Measured 2026-11-19: a single codex extract peaks at 4.48 GB; "gaming" used to offer 3.75 GB.
+    expect(RAM_RUN_FLOOR_MB).toBeGreaterThanOrEqual(4600);
+    expect(rangesFor(pc).ramMb.min).toBe(RAM_RUN_FLOOR_MB);
+    expect(presetLimits('gaming', pc).ramMb).toBe(RAM_RUN_FLOOR_MB);
+    // A stored value from before the floor is raised to it.
+    expect(clampLimits({ ramMb: 3840 }, pc).ramMb).toBe(RAM_RUN_FLOOR_MB);
+    // A box whose whole scale is below the floor gets one honest value, never min > max.
+    const tiny: MachineInfo = { cores: 4, totalRamMb: 6144, disk: DISK_CAPS.hdd };
+    const r = rangesFor(tiny).ramMb;
+    expect(r.min).toBe(r.max);
+    expect(presetLimits('gaming', tiny).ramMb).toBe(r.max);
+    expect(presetLimits('full', tiny).ramMb).toBe(r.max);
   });
 
   it('sizes workers by CPU share and RAM', () => {

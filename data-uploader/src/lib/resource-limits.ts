@@ -111,6 +111,17 @@ export const CPU_MAX_PCT = PERF_MAX_SHARE * 100;
 export const CPU_MIN_PCT = 5;
 /** Below this a stage cannot even hold the parsed DataCore. */
 export const RAM_MIN_MB = 1024;
+/**
+ * The least a single run actually takes, so the RAM limit never promises
+ * less than the uploader can keep to. Measured 2026-11-19 against the LIVE
+ * 4.10.3 Data.p4k (concept 20261119-0040-uploader-entpacken-ram): one serial
+ * codex extract peaked at 4,476 MB working set (4,829 MB private), of which
+ * ≈ 2.5 GB is the P4K index alone; "gaming" used to offer 3.75 GB on a 32 GB
+ * machine. 5 GB = that peak plus a margin. The RAM budget is not a hard cap
+ * (it only sizes the worker count), so this floor is what keeps the slider
+ * honest. Lower it here once a leaner P4K index lands and is re-measured.
+ */
+export const RAM_RUN_FLOOR_MB = 5120;
 /** Kept free for Windows itself at the least (it decides on small machines, where 20 % is less). */
 export const RAM_OS_RESERVE_MB = 2048;
 export const READ_MIN_MBS = 5;
@@ -152,7 +163,8 @@ export function rangesFor(machine: MachineInfo): Record<LimitKey, Range> {
   const top = (cap: number, min: number): number => Math.max(min, Math.floor(cap * PERF_MAX_SHARE));
   return {
     cpuPct: { min: CPU_MIN_PCT, max: CPU_MAX_PCT, step: 1 },
-    ramMb: { min: RAM_MIN_MB, max: ramScaleMb(machine), step: 256 },
+    // The floor, unless the machine's whole scale is smaller: then min = max (one honest value, never min > max).
+    ramMb: { min: Math.min(RAM_RUN_FLOOR_MB, ramScaleMb(machine)), max: ramScaleMb(machine), step: 256 },
     readMBs: { min: READ_MIN_MBS, max: top(d.readMBs, READ_MIN_MBS), step: 5 },
     writeMBs: { min: WRITE_MIN_MBS, max: top(d.writeMBs, WRITE_MIN_MBS), step: 5 },
     iops: { min: IOPS_MIN, max: top(d.iops, IOPS_MIN), step: d.iops > 1000 ? 100 : 5 },
@@ -174,7 +186,7 @@ export function presetLimits(id: PresetId, machine: MachineInfo): ResourceLimits
   const oneCore = Math.ceil(100 / Math.max(1, machine.cores));
   return {
     cpuPct: snap(Math.max(share.cpuPct, Math.min(oneCore, CPU_MAX_PCT)), r.cpuPct),
-    ramMb: snap(Math.max(1536, ramScaleMb(machine) * share.ram), r.ramMb),
+    ramMb: snap(Math.max(RAM_RUN_FLOOR_MB, ramScaleMb(machine) * share.ram), r.ramMb),
     readMBs: snap(r.readMBs.max * share.disk, r.readMBs),
     writeMBs: snap(r.writeMBs.max * share.disk, r.writeMBs),
     iops: snap(r.iops.max * share.disk, r.iops),
