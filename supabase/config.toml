@@ -250,6 +250,13 @@ verify_jwt = false
 # Same reason as ingest-bundle: the gateway cannot verify asymmetric session tokens.
 verify_jwt = false
 
+[functions.nachschub-names]
+# JWT verification OFF — the handler resolves the caller itself: getUser(<bearer token>) against the Auth server
+# (401 without a real user) plus is_approved() (403). Without this block the function deployed with the default
+# verify_jwt = true and answered every call of a signed-in web session with 401 (17 of 17 on 2026-11-17), so the
+# name proposal always fell back to the rule-based name. Same reason as ingest-bundle / translation-overlay.
+verify_jwt = false
+
 [functions.patch-teaser]
 # JWT verification OFF: pg_cron (patch-teaser-sweep) calls it with the publishable key, so `{ sweep: true }` is open to
 # any caller by design - it only fills MISSING patch_teasers rows, cannot pick a version or force, and is bounded by
