@@ -16,6 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Codex weapon rank comparison no longer stops at the first 1,000 weapons when the list files are available.
 
+## [0.282.3] - 2026-11-19
+
+### Changed
+- Classic ship view: the Analyse cards carry the loadout's area colours and symbols — Offensive in the offensive red, Defensive in the defensive blue, and each group of the Schiff card (flight, mass, systems, signature, hull) in its area.
+
+## [0.282.2] - 2026-11-19
+
+### Fixed
+- Loading screen: the glow behind the logo fades out softly on every side instead of ending in a hard edge on the left.
+
 ## [0.282.1] - 2026-11-19
 
 ### Changed

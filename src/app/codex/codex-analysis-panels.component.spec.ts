@@ -210,6 +210,13 @@ describe('analysis panels', () => {
       expect(root(fixture).querySelector('h3.section-title')).not.toBeNull();
     });
 
+    it('wears the defensive area colour and symbol like its loadout blocks (#377)', () => {
+      const fixture = mount(CodexDefensivePanelComponent, { panel: DEFENSIVE });
+      const el = root(fixture);
+      expect(el.querySelector('details')!.getAttribute('data-area')).toBe('defensive');
+      expect(el.querySelector('.panel-head sc-area-symbol svg')).not.toBeNull();
+    });
+
     it('a hull without shield generators says so', () => {
       const fixture = mount(CodexDefensivePanelComponent, { panel: { ...DEFENSIVE, shieldGeneratorCount: 0 } });
       expect(root(fixture).querySelector('.gap-row')!.textContent).toContain('codex.summary.gap.noShields');
@@ -236,6 +243,15 @@ describe('analysis panels', () => {
       expect(dds[0].textContent!.trim()).toBe('210 m/s');
       expect(dds[1].querySelector('.gap-dash')!.getAttribute('aria-label')).toBe('codex.gap.noBoost');
       expect(el.querySelector('p.note')!.textContent).toBe('Numbers are stock.');
+    });
+
+    it('a group carries the loadout area and symbol it belongs to (#377)', () => {
+      const fixture = mount(CodexShipPanelComponent, {
+        groups: [{ titleKey: 'codex.analysis.ship.signature', rows: [{ labelKey: 'codex.kpi.ir', value: '1' }] }],
+      });
+      const h3 = root(fixture).querySelector('h3.section-title')!;
+      expect(h3.getAttribute('data-area')).toBe('signature');
+      expect(h3.querySelector('sc-area-symbol svg')).not.toBeNull();
     });
 
     it('startCollapsed folds the body away', () => {
