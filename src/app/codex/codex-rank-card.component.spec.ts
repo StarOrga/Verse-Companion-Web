@@ -219,7 +219,8 @@ describe('CodexRankCardComponent', () => {
     expect(el.querySelector('.profile-row')).toBeTruthy();
     // Holotable content: cohort label, group names, rim note, "Besser als n %".
     expect(el.querySelector('.cohort-line')?.textContent?.trim()).toBe('codex.holo.strip.shipCount');
-    expect(el.querySelector('.rim-note')?.textContent?.trim()).toBe('codex.rank.rimNote');
+    expect(el.querySelector('.rim-tip .tip')?.textContent).toContain('codex.rank.rimNote');
+    expect(el.querySelector('.rim-tip .lbl')?.textContent?.trim()).toBe('codex.rank.rimLabel');
     expect(el.querySelector('.bar-pct')?.textContent?.trim()).toBe('codex.rank.betterThan');
     expect(fixture.componentInstance.compareInfoKey()).toBe('codex.rank.compare.infoHolo');
     const segs = Array.from(el.querySelectorAll('.compare-head .seg-btn')).map((b) => b.textContent?.trim());
