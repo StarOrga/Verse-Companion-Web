@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.282.0",
+  "current": "0.282.1",
   "releases": [
+    {
+      "version": "0.282.1",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Loading screen: the glow behind the logo fades out softly on every side instead of ending in a hard edge on the left."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.282.0",
       "date": "2026-11-19",
@@ -35,6 +51,32 @@
             {
               "title": "",
               "text": "Gap between the holotable views bar and the KPI strip."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.281.9",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Nachschub name proposals work again for signed-in web sessions: the nachschub-names function no longer sits behind the gateway JWT gate that rejected every web call with 401."
+            }
+          ]
+        },
+        {
+          "category": "Docs",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "PostHog audit concept: final report (round 3) with live screenshot."
             }
           ]
         }
