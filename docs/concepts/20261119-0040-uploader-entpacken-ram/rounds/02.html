@@ -1,0 +1,86 @@
+<section data-iteration="2" data-iteration-template="free" data-final-report>
+  <p class="fr-sentence">Der Uploader öffnet die P4K jetzt über einen schlanken Index, und die RAM-Grenze bietet nie weniger an, als ein Lauf wirklich braucht.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🧠</span><span>P4K öffnen braucht <b>404 MB statt 2,7 GB</b> RAM.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">📉</span><span>Codex-Lauf: Spitze <b>2,65 statt 4,48 GB</b>, Ausgabe byte-gleich.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🎮</span><span>„Gaming“ bietet <b>nie weniger als 3,5 GB</b> an.</span></li>
+      </ul>
+    </div>
+    <ol class="fr-flow">
+      <li>P4K öffnen: kompakter Index statt 1,4 Mio. Python-Objekten</li>
+      <li>Codex: Dateien auf der Platte bleiben (Resume)</li>
+      <li>3D: Konverter-Spiegel bleibt, jeder Worker spart ≈ 2,3 GB</li>
+      <li>RAM-Regler beginnt beim gemessenen Bedarf</li>
+    </ol>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="29.572 von 29.572 Codex-Dateien mit gleichem sha256 wie vor der Änderung; Anforderung: alle (geschätzt).">
+        <span class="fr-meter-name">🧾 Gleiche Ausgabe</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">29.572 / 29.572</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="404 MB nach dem Öffnen; Anforderung unter 1 GB (Gate aus dem Brief).">
+        <span class="fr-meter-name">🧠 RAM nach Öffnen</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">404 MB</b>
+      </div>
+      <div class="fr-meter" data-grade="open" style="--fr-fill: 0%" data-tip="Codex-Lauf dauerte 4.146 s statt 1.409 s, aber mit laufendem Spiel; ohne Spiel nicht nachgemessen. Anforderung: nicht langsamer als vorher (geschätzt).">
+        <span class="fr-meter-name">⏱ Laufzeit</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">ungeprüft</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="4 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ✓ {{final.level_interplay}} · ✓ {{final.level_local}} · ○ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_local}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_prod}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 1 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-skin-worker"
+          data-issue-title="[CHORE] Lower SKIN_WORKER_MB to the measured 3D worker need with the compact P4K index"
+          data-issue-type="chore"
+          data-issue-body="Concept 20261119-0040-uploader-entpacken-ram, round 1, decision d-index (approved): after the compact P4K index lands, SKIN_WORKER_MB (data-uploader/src/lib/resource-limits.ts, 3072) should drop to the measured per-worker need. Not done: no 3D worker was measured end to end with the new index. The builder's estimate is about 1 GB after open + DataCore read, plus converter and optimizer. Measure one skin_export_app worker on the real P4K (peak working set of the whole process tree), then set the constant."
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="messbar">
+        <span class="oq-label">3D-Worker-RAM nicht gesenkt</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Nicht umgesetzt, weil kein 3D-Worker mit dem neuen Index gemessen wurde; er ist weiter mit 3 GB eingeplant.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Uploader, Worker-Zahl im 3D-Schritt</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — eine Messung eines Schiffs reicht.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Commits <code>82932bbb0</code> · <code>5d53c502c</code> · <code>29d643957</code> · <code>c0351d1d2</code> (Branch <code>claude/data-uploader-extraction-spike-be3dcb</code>, gepusht)</li>
+      <li><code>python/sc_extract/p4k_index.py</code>, <code>src/lib/resource-limits.ts</code>, 6 Öffnungsstellen + <code>hull3d.py</code>/<code>ship_discovery.py</code></li>
+      <li>Tests: vitest 662 grün · pytest 154 grün (unabhängig, inkl. 39 Index-Tests)</li>
+      <li>Voller Codex-Lauf alt/neu: 29.572 Dateien sha256-gleich; <code>dataforge_extract.py</code> unberührt (kein Subtheme-Bump)</li>
+      <li>Typecheck (tsc) vom Governor zurückgestellt, nicht gelaufen</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-wall" data-crit="mid" data-guide="">Codex-Laufzeit ohne laufendes Spiel nachmessen</li>
+      <li data-todo-id="t-hull" data-crit="mid" data-guide="">Eine Hülle alt/neu end-to-end vergleichen</li>
+    </ul>
+  </section>
+</section>

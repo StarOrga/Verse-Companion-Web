@@ -3,7 +3,7 @@
      It MUST be written at generation time with the active iteration's
      data-iteration-template value (normalised), otherwise the page paints the
      wrong layout for one frame before showIteration() runs. -->
-<html lang="de" data-theme="dark" data-page-version="2026-11-18T23:53:52" data-template="decision">
+<html lang="de" data-theme="dark" data-page-version="2026-11-18T23:53:52" data-template="free">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -234,10 +234,13 @@ html:not([data-theme="dark"]) .theme-toggle-btn [data-glyph="moon"] { display: i
   display: none;
   position: fixed;
   inset: 0;
-  /* Light dim only: the ☰ menu is navigation the user clicks through while
-     watching the page change behind it (the user's call) — the page must
-     stay readable, the dim only says "a click here closes the menu". */
-  background: rgba(0,0,0,0.16);
+  /* THE one veil while the ☰ menu is open (the content dimmer paints
+     nothing then, § Content dimmer): same look as that dimmer — dark dim plus
+     a soft blur, a tick below the strongest blur, so the page behind the
+     menu stays recognisable while the user navigates (the user's call). */
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(1.2px);
+  -webkit-backdrop-filter: blur(1.2px);
   z-index: 150;
 }
 .panel-backdrop.visible { display: block; }
@@ -678,7 +681,7 @@ html .feedback-dock .feedback-section textarea {
 .feedback-dock .attach-slot { position: relative; }
 /* right: 14px keeps it clear of the field's scrollbar; the field reserves a
    matching right gutter (§ Attachments CSS) so typed text never runs under it. */
-.feedback-dock .attach-slot .attach-btn { position: absolute; right: 14px; top: -34px; opacity: 0.7; }
+.feedback-dock .attach-slot .attach-btn { position: absolute; right: 14px; top: -40px; opacity: 0.7; }
 .feedback-dock .attach-slot .attach-btn:hover { opacity: 1; }
 /* "Wusstest du schon?" — ONE line, always (the pool's texts are kept short,
    ellipsis is only the safety net for a narrow phone sheet), in the calm
@@ -3246,8 +3249,8 @@ body.viewing-final .panel-status { display: none; }
   /* Theme-neutral grey overlay — works on dark and light backgrounds without
      a CSS variable dependency. Same opacity range as .panel-backdrop. */
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(1.5px);
-  -webkit-backdrop-filter: blur(1.5px);
+  backdrop-filter: blur(1.2px);
+  -webkit-backdrop-filter: blur(1.2px);
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.25s ease;
@@ -3259,7 +3262,9 @@ body.content-dimmed .content-dimmer:not([hidden]) {
 }
 .content-dimmer[hidden] { display: none; }
 /* One dimmer for the content area, in EVERY template (decision, free, design; it lived in the design CSS only before). While the ☰ menu is open the panel
-   backdrop is the only veil on screen: the content dimmer (past iteration,
+   backdrop is the only veil on screen — it paints the SAME veil (rgba(0,0,0,.4) +
+   blur(1.2px), § Panel Chrome), so the page behind stays recognisable but dimmed
+   with or without the menu, also when no content dimmer is armed: the content dimmer (past iteration,
    sent round) stays armed underneath but paints nothing, so the two never
    stack — it is back, still armed, the moment the menu closes. */
 body.panel-open #content-dimmer { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
@@ -5797,7 +5802,9 @@ body.viewing-final .concept-content > header[data-stage-pill]::before { content:
 .an-comp-b.voice-btn-an.is-listening { width: auto; min-width: 36px; padding: 0 12px; border-radius: 18px; background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
 .an-comp-ed.voice-field-listening { outline: 1px solid color-mix(in srgb, var(--accent-color) 55%, var(--border-color)); outline-offset: -1px; }
 /* In the notes dock the buttons sit inside the field, bottom right: mic left of the 📎. */
-.feedback-dock .attach-slot .voice-btn { position: absolute; right: 52px; top: -34px; opacity: .7; }
+/* Same 30px height and centre line as the 📎, 8px apart: never overlapping. */
+.feedback-dock .attach-slot .attach-btn { box-sizing: border-box; min-width: 30px; height: 30px; padding: 0 7px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; }
+.feedback-dock .attach-slot .voice-btn { position: absolute; right: 52px; top: -40px; opacity: .7; }
 .feedback-dock .attach-slot .voice-btn:hover, .feedback-dock .attach-slot .voice-btn.is-listening { opacity: 1; }
 html .feedback-dock .feedback-section textarea[data-attachable] { padding-right: 5.6rem; }
 .voice-mode-btn[aria-pressed="true"] { color: var(--danger-color, #f85149); }
@@ -5844,7 +5851,8 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
       </header>
 
       <main>
-<section data-iteration="1" data-iteration-template="decision" data-analysis="full" id="iter-1" data-active>
+<section data-iteration="1" data-iteration-template="decision" data-analysis="full" data-baked id="iter-1" hidden>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]}}</script>
 
   <div class="iteration-intro">
     <h2>Wohin entpackt der Uploader – und muss das auf die Platte?</h2>
@@ -5886,27 +5894,27 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
       <p data-stakes>Resume nach Pause oder Absturz, ohne 23 min neu zu extrahieren.</p>
       <div data-options>
         <label data-opt="keep" data-recommended>
-          <input type="radio" name="dm-d-codex" value="keep" checked>
+          <input type="radio" name="dm-d-codex" value="keep" checked disabled>
           <span data-opt-label>Weiter als Dateien auf der Platte</span>
           <span data-opt-consequence>Resume bleibt, kein Umbau.</span>
         </label>
         <label data-opt="table">
-          <input type="radio" name="dm-d-codex" value="table">
+          <input type="radio" name="dm-d-codex" value="table" disabled>
           <span data-opt-label>Eine Datei je Tabelle schreiben</span>
           <span data-opt-consequence>Rund 15 statt 29.572 Dateien, Resume bleibt. Umbau in Extractor und Upload.</span>
         </label>
         <label data-opt="ram">
-          <input type="radio" name="dm-d-codex" value="ram">
+          <input type="radio" name="dm-d-codex" value="ram" disabled>
           <span data-opt-label>Direkt aus dem RAM hochladen</span>
           <span data-opt-consequence>Keine Dateien mehr, aber jeder Abbruch kostet einen neuen Extract.</span>
         </label>
       </div>
-      <textarea data-comment="d-codex-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-d-codex-none" value="">
-      <input type="hidden" name="dm-d-codex-hes" value="">
-      <input type="hidden" name="dm-d-codex-touched" value="">
-      <input type="hidden" name="dm-d-codex-issue" value="">
-      <input type="hidden" name="dm-d-codex-epic" value="">
+      <textarea data-comment="d-codex-note" placeholder="Notiz (optional)" readonly disabled></textarea>
+      <input type="hidden" name="dm-d-codex-none" value="" disabled>
+      <input type="hidden" name="dm-d-codex-hes" value="{&quot;ms&quot;:48323,&quot;revisits&quot;:0,&quot;median&quot;:40946}" disabled>
+      <input type="hidden" name="dm-d-codex-touched" value="1" disabled>
+      <input type="hidden" name="dm-d-codex-issue" value="" disabled>
+      <input type="hidden" name="dm-d-codex-epic" value="" disabled>
       <div data-alevel="3" data-title="Codex-Ablage">
         <div data-slot="short"><p>Gelesen 4,6 GB, geschrieben 191 MB in 23 min.</p></div>
         <div data-slot="long">
@@ -5935,27 +5943,27 @@ Upload: readJsonDir() liest jeden Ordner komplett ein,
       <p data-stakes>Ob der 3D-Schritt beim Nutzer Treiber oder Adminrechte braucht.</p>
       <div data-options>
         <label data-opt="keep" data-recommended>
-          <input type="radio" name="dm-d-mirror" value="keep" checked>
+          <input type="radio" name="dm-d-mirror" value="keep" checked disabled>
           <span data-opt-label>Weiter über einen kurzen Spiegel-Ordner</span>
           <span data-opt-consequence>0,6 s Schreiben je Hülle, gleich danach gelöscht.</span>
         </label>
         <label data-opt="ramdisk">
-          <input type="radio" name="dm-d-mirror" value="ramdisk">
+          <input type="radio" name="dm-d-mirror" value="ramdisk" disabled>
           <span data-opt-label>Über eine RAM-Disk einspeisen</span>
           <span data-opt-consequence>Braucht bei jedem Nutzer Treiber und Adminrechte, spart unter 1 s je Hülle.</span>
         </label>
         <label data-opt="fork">
-          <input type="radio" name="dm-d-mirror" value="fork">
+          <input type="radio" name="dm-d-mirror" value="fork" disabled>
           <span data-opt-label>Konverter so patchen, dass er aus dem Speicher liest</span>
           <span data-opt-consequence>Eigener C#-Patch, der bei jedem Upstream-Update neu gepflegt werden muss.</span>
         </label>
       </div>
-      <textarea data-comment="d-mirror-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-d-mirror-none" value="">
-      <input type="hidden" name="dm-d-mirror-hes" value="">
-      <input type="hidden" name="dm-d-mirror-touched" value="">
-      <input type="hidden" name="dm-d-mirror-issue" value="">
-      <input type="hidden" name="dm-d-mirror-epic" value="">
+      <textarea data-comment="d-mirror-note" placeholder="Notiz (optional)" readonly disabled></textarea>
+      <input type="hidden" name="dm-d-mirror-none" value="" disabled>
+      <input type="hidden" name="dm-d-mirror-hes" value="{&quot;ms&quot;:292013,&quot;revisits&quot;:11,&quot;median&quot;:40946}" disabled>
+      <input type="hidden" name="dm-d-mirror-touched" value="1" disabled>
+      <input type="hidden" name="dm-d-mirror-issue" value="" disabled>
+      <input type="hidden" name="dm-d-mirror-epic" value="" disabled>
       <div data-alevel="3" data-title="Konverter-Eingang">
         <div data-slot="short"><p>Carrack: 0,6 s Spiegel, 3,4 s Konvertieren, 20,8 MB Raw-GLB.</p></div>
         <div data-slot="long">
@@ -5983,27 +5991,27 @@ rsi_polaris.cga + .cgam  78,9 + 82,8 MB</pre></div>
       <p data-stakes>Ob „Gaming“ das Spiel wirklich vor Speicherdruck schützt.</p>
       <div data-options>
         <label data-opt="floor" data-recommended>
-          <input type="radio" name="dm-d-budget" value="floor" checked>
+          <input type="radio" name="dm-d-budget" value="floor" checked disabled>
           <span data-opt-label>Untergrenze auf den Mindestbedarf heben</span>
           <span data-opt-consequence>Der Regler beginnt bei rund 5 GB und zeigt ehrlich, was ein Lauf braucht.</span>
         </label>
         <label data-opt="warn">
-          <input type="radio" name="dm-d-budget" value="warn">
+          <input type="radio" name="dm-d-budget" value="warn" disabled>
           <span data-opt-label>Grenze lassen, Überschreitung im Dock melden</span>
           <span data-opt-consequence>Der Wert bleibt, das Ressourcen-Dock warnt, sobald der Lauf darüber liegt.</span>
         </label>
         <label data-opt="keep">
-          <input type="radio" name="dm-d-budget" value="keep">
+          <input type="radio" name="dm-d-budget" value="keep" disabled>
           <span data-opt-label>Regler wirkt weiter nur auf die Worker-Zahl</span>
           <span data-opt-consequence>Kein Umbau, die Überschreitung bleibt unsichtbar.</span>
         </label>
       </div>
-      <textarea data-comment="d-budget-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-d-budget-none" value="">
-      <input type="hidden" name="dm-d-budget-hes" value="">
-      <input type="hidden" name="dm-d-budget-touched" value="">
-      <input type="hidden" name="dm-d-budget-issue" value="">
-      <input type="hidden" name="dm-d-budget-epic" value="">
+      <textarea data-comment="d-budget-note" placeholder="Notiz (optional)" readonly disabled></textarea>
+      <input type="hidden" name="dm-d-budget-none" value="" disabled>
+      <input type="hidden" name="dm-d-budget-hes" value="{&quot;ms&quot;:33569,&quot;revisits&quot;:0,&quot;median&quot;:40946}" disabled>
+      <input type="hidden" name="dm-d-budget-touched" value="1" disabled>
+      <input type="hidden" name="dm-d-budget-issue" value="" disabled>
+      <input type="hidden" name="dm-d-budget-epic" value="" disabled>
       <div data-alevel="3" data-title="RAM-Grenze">
         <div data-slot="short"><p>Budget „Gaming“ 3,75 GB, gemessene Spitze 4,5 GB.</p></div>
         <div data-slot="long">
@@ -6031,28 +6039,28 @@ Gemessen (Working Set, Spitze):
       <p data-stakes>Wie viele Worker in dasselbe RAM-Budget passen.</p>
       <div data-options>
         <label data-opt="yes" data-recommended>
-          <input type="radio" name="dm-d-index" value="yes" checked>
+          <input type="radio" name="dm-d-index" value="yes" checked disabled>
           <span data-opt-label>Ja, kompakten Index bauen</span>
           <span data-opt-consequence>Geschätzt unter 0,5 GB statt rund 2,5 GB je Prozess. Vorher mit einem Prototyp messen.</span>
         </label>
         <label data-opt="no">
-          <input type="radio" name="dm-d-index" value="no">
+          <input type="radio" name="dm-d-index" value="no" disabled>
           <span data-opt-label>Nein, scdatatools-Index bleibt</span>
           <span data-opt-consequence>Jeder Worker braucht weiter rund 3 GB.</span>
         </label>
         <label data-opt="alt">
-          <input type="radio" name="dm-d-index" value="alt">
+          <input type="radio" name="dm-d-index" value="alt" disabled>
           <span data-opt-label>Anders …</span>
           <span data-opt-consequence>Was stattdessen?</span>
         </label>
-        <input type="text" name="dm-d-index-alt" placeholder="Was stattdessen?">
+        <input type="text" name="dm-d-index-alt" placeholder="Was stattdessen?" value="" readonly disabled>
       </div>
-      <textarea data-comment="d-index-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-d-index-none" value="">
-      <input type="hidden" name="dm-d-index-hes" value="">
-      <input type="hidden" name="dm-d-index-touched" value="">
-      <input type="hidden" name="dm-d-index-issue" value="">
-      <input type="hidden" name="dm-d-index-epic" value="">
+      <textarea data-comment="d-index-note" placeholder="Notiz (optional)" readonly disabled></textarea>
+      <input type="hidden" name="dm-d-index-none" value="" disabled>
+      <input type="hidden" name="dm-d-index-hes" value="{&quot;ms&quot;:13637,&quot;revisits&quot;:0,&quot;median&quot;:40946}" disabled>
+      <input type="hidden" name="dm-d-index-touched" value="1" disabled>
+      <input type="hidden" name="dm-d-index-issue" value="" disabled>
+      <input type="hidden" name="dm-d-index-epic" value="" disabled>
       <div data-alevel="3" data-title="Schlanker P4K-Index">
         <div data-slot="short"><p>Allein das Öffnen der P4K braucht ≈ 2,5 GB.</p></div>
         <div data-slot="long">
@@ -6068,6 +6076,93 @@ skin_export_app: jeder Worker öffnet die P4K selbst
   → SKIN_WORKER_MB = 3072 je Worker</pre></div>
       </div>
     </section>
+  </section>
+</section>
+
+<section data-iteration="2" data-iteration-template="free" data-final-report id="iter-2" data-active>
+  <p class="fr-sentence">Der Uploader öffnet die P4K jetzt über einen schlanken Index, und die RAM-Grenze bietet nie weniger an, als ein Lauf wirklich braucht.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">Was kam raus</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🧠</span><span>P4K öffnen braucht <b>404 MB statt 2,7 GB</b> RAM.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">📉</span><span>Codex-Lauf: Spitze <b>2,65 statt 4,48 GB</b>, Ausgabe byte-gleich.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🎮</span><span>„Gaming“ bietet <b>nie weniger als 3,5 GB</b> an.</span></li>
+      </ul>
+    </div>
+    <ol class="fr-flow">
+      <li>P4K öffnen: kompakter Index statt 1,4 Mio. Python-Objekten</li>
+      <li>Codex: Dateien auf der Platte bleiben (Resume)</li>
+      <li>3D: Konverter-Spiegel bleibt, jeder Worker spart ≈ 2,3 GB</li>
+      <li>RAM-Regler beginnt beim gemessenen Bedarf</li>
+    </ol>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">Was es aushält<small>Balken = wie weit die Anforderung erfüllt ist</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="29.572 von 29.572 Codex-Dateien mit gleichem sha256 wie vor der Änderung; Anforderung: alle (geschätzt).">
+        <span class="fr-meter-name">🧾 Gleiche Ausgabe</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">29.572 / 29.572</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="404 MB nach dem Öffnen; Anforderung unter 1 GB (Gate aus dem Brief).">
+        <span class="fr-meter-name">🧠 RAM nach Öffnen</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">404 MB</b>
+      </div>
+      <div class="fr-meter" data-grade="open" style="--fr-fill: 0%" data-tip="Codex-Lauf dauerte 4.146 s statt 1.409 s, aber mit laufendem Spiel; ohne Spiel nicht nachgemessen. Anforderung: nicht langsamer als vorher (geschätzt).">
+        <span class="fr-meter-name">⏱ Laufzeit</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">ungeprüft</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="4 / 7 · ✓ Code-Check · ✓ Trockentest · ✓ Zusammenspiel · ✓ Lokal durchgespielt · ○ Prod-Build geprüft · ○ Live vertestet · ◌ Von dir abgenommen">
+    <span class="fr-depth-done">✓ Zuletzt bestanden: <b>Lokal durchgespielt</b></span>
+    <span class="fr-depth-next">○ Noch nicht gemacht: <b>Prod-Build geprüft</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 1 Funde unterwegs</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-skin-worker"
+          data-issue-title="[CHORE] Lower SKIN_WORKER_MB to the measured 3D worker need with the compact P4K index"
+          data-issue-type="chore"
+          data-issue-body="Concept 20261119-0040-uploader-entpacken-ram, round 1, decision d-index (approved): after the compact P4K index lands, SKIN_WORKER_MB (data-uploader/src/lib/resource-limits.ts, 3072) should drop to the measured per-worker need. Not done: no 3D worker was measured end to end with the new index. The builder's estimate is about 1 GB after open + DataCore read, plus converter and optimizer. Measure one skin_export_app worker on the real P4K (peak working set of the whole process tree), then set the constant."
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="messbar">
+        <span class="oq-label">3D-Worker-RAM nicht gesenkt</span>
+        <dl class="fr-fkv">
+          <dt>Was</dt><dd>Nicht umgesetzt, weil kein 3D-Worker mit dem neuen Index gemessen wurde; er ist weiter mit 3 GB eingeplant.</dd>
+          <dt>Wo</dt><dd>Uploader, Worker-Zahl im 3D-Schritt</dd>
+          <dt>Warum vorbelegt</dt><dd>⚡ Jetzt — eine Messung eines Schiffs reicht.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 Für Entwickler</summary>
+    <ul class="fr-dev">
+      <li>Commits <code>82932bbb0</code> · <code>5d53c502c</code> · <code>29d643957</code> · <code>c0351d1d2</code> (Branch <code>claude/data-uploader-extraction-spike-be3dcb</code>, gepusht)</li>
+      <li><code>python/sc_extract/p4k_index.py</code>, <code>src/lib/resource-limits.ts</code>, 6 Öffnungsstellen + <code>hull3d.py</code>/<code>ship_discovery.py</code></li>
+      <li>Tests: vitest 662 grün · pytest 154 grün (unabhängig, inkl. 39 Index-Tests)</li>
+      <li>Voller Codex-Lauf alt/neu: 29.572 Dateien sha256-gleich; <code>dataforge_extract.py</code> unberührt (kein Subtheme-Bump)</li>
+      <li>Typecheck (tsc) vom Governor zurückgestellt, nicht gelaufen</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="Du testest">
+    <ul>
+      <li data-todo-id="t-wall" data-crit="mid" data-guide="">Codex-Laufzeit ohne laufendes Spiel nachmessen</li>
+      <li data-todo-id="t-hull" data-crit="mid" data-guide="">Eine Hülle alt/neu end-to-end vergleichen</li>
+    </ul>
   </section>
 </section>
 </main>
@@ -6158,7 +6253,8 @@ skin_export_app: jeder Worker öffnet die P4K selbst
              <section data-iteration="N">, appended by string edit
              (iteration-rules.md § Iteration append checklist). -->
         <nav class="iteration-tabs" role="tablist" aria-label="Runden">
-<button class="iteration-tab" role="tab" data-iteration="1" aria-selected="true" aria-controls="iter-1">Runde 1</button>
+<button class="iteration-tab" role="tab" data-iteration="1" aria-selected="false" aria-controls="iter-1">Runde 1</button>
+<button class="iteration-tab" role="tab" data-final-report data-iteration="2" aria-selected="true" aria-controls="iter-2">Abschlussbericht</button>
 </nav>
 
         <!-- Section TOC — auto-populated from EVERY top-level <section id="..."
@@ -10425,6 +10521,12 @@ function collectDesignDecisions() {
       try { const t = d.querySelector(demoSel); demoScreen = t && t.closest('section[data-screen]'); } catch (_) { demoScreen = null; }
       if (demoScreen) { preview.dataset.demo = demoSel; shown = demoScreen; }
     }
+    // Zoom class (#1): the author's `data-ov-fit="component|view"` wins; a
+    // phone / tablet device view is never a component (fitPreviews() measures
+    // the rest).
+    const ovFit = String(d.dataset.ovFit || '').trim().toLowerCase();
+    if (ovFit === 'component' || ovFit === 'view') preview.dataset.ovFit = ovFit;
+    if (/phone|tablet|mobile/i.test(String(d.dataset.viewports || '')) || d.querySelector('[data-device]')) preview.dataset.ovDevice = 'true';
     preview.appendChild(cloneScreen(shown, 'ov' + m.n + '-'));
     // The design's own background (colour + image) paints the card behind
     // the scaled clone (.design-ov-preview reads the two variables).
@@ -11335,13 +11437,21 @@ function collectDesignDecisions() {
       // at the bottom. A narrower widget / phone mock is CONTAINED (whole,
       // up to 2.5×). The card's own background (the design's) fills what
       // the content does not reach. The info card sits bottom-left on top.
-      const full = content >= 700;
+      const authorFit = p.dataset.ovFit;
+      const full = authorFit ? authorFit === 'view' : content >= 700;
+      // Component vs full view (#1): a COMPONENT (not a whole app view) is
+      // shown at most 1.5x, centred, and may stay smaller than the card; a
+      // full view fills the card as before. The author's `data-ov-fit`
+      // wins; without it, tight content narrower than a full view (< 700px) that
+      // is not a phone / tablet device view counts as a component.
+      const component = authorFit ? authorFit === 'component'
+        : !full && !p.dataset.ovDevice;
       p.dataset.fit = full ? 'cover' : 'contain';
       // Contain (component / element): the whole mock, as large as the card
       // allows - cap 4x, so a small widget still fills >= 2/3 of the card
       // instead of sitting small in a sea of empty tile. Cover (full app)
       // stays capped at 2.5x.
-      let scale = Math.min(full ? 2.5 : 4, tall ? (full ? Math.max(w / content, h / tall) : Math.min(w / content, h / tall)) : w / content);
+      let scale = Math.min(full ? 2.5 : component ? 1.5 : 4, tall ? (full ? Math.max(w / content, h / tall) : Math.min(w / content, h / tall)) : w / content);
       let cx = from, cy = fromY, cw = content, ch = tall || h / Math.max(scale, 0.01);
       let topAnchor = full && tall * scale > h + 0.5;
       // `data-ov-demo`: zoom onto the differing element instead — fitted
@@ -23081,6 +23191,17 @@ function createConceptVoice(env) {
   }
   /** Every field gets one mic: attach bars (static markup), plain fields, the analysis composer. */
   function scan() {
+    // Exactly ONE mic per note field (#6): a second one in the same attach bar
+    // (static markup + the injected bar) or a solo mic beside a field that
+    // already has a bar is dropped, so two mics never sit on top of each other.
+    doc.querySelectorAll('.attach-bar').forEach(bar => {
+      bar.querySelectorAll('.voice-btn').forEach((b, i) => { if (i > 0) b.remove(); });
+    });
+    doc.querySelectorAll('.voice-btn-solo').forEach(b => {
+      const f = b.previousElementSibling;
+      const slot = f && f.matches && f.matches('textarea[data-attachable]') ? (f.dataset.comment || f.id || '') : '';
+      if (slot && [...doc.querySelectorAll('.attach-bar')].some(bar => bar.dataset.attachFor === slot && bar.querySelector('.voice-btn'))) b.remove();
+    });
     doc.querySelectorAll('.attach-bar .voice-btn:not([data-voice-wired])').forEach(b => {
       const key = b.closest('.attach-bar').dataset.attachFor;
       wireButton(b, () => fieldFor(key));
