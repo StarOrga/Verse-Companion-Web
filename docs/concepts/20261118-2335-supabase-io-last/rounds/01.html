@@ -1,0 +1,175 @@
+<section data-iteration="1" data-iteration-template="decision" data-analysis="full" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]}}</script>
+  <div class="iteration-intro">
+    <h2>Supabase-Warnung: Ursache und Richtung</h2>
+    <p>Gemessen statt vermutet: woher die Last kommt und drei Entscheidungen, die sie senken.</p>
+  </div>
+
+  <section id="briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>Die Datenbank-Instanz hat 453 MB RAM und lagert bei jeder Aktivität auf die Platte aus; das Budget dafür verbraucht unsere eigene Automation, nicht die Nutzer.</p>
+    <p data-briefing-why>Am 15.11. kamen 201 137 Anfragen an, 142 871 davon aus Headless-Browsern der Agenten-Läufe.</p>
+    <div data-briefing-potential data-viz="kpi"
+         data-viz-spec='{"value":"71 %","unit":"der Anfragen","label":"am 15.11. aus automatischen Browser-Läufen"}'>71 %</div>
+    <a data-briefing-topic="t-load" data-share="100">Last der Datenbank senken</a>
+    <p data-briefing-duration>≈ 4 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"201 137","unit":"Anfragen","label":"am 15.11., ein ruhiger Tag hat etwa 5 000"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"14.11.","value":12747},{"label":"15.11.","value":201137},{"label":"16.11.","value":51819},{"label":"17.11.","value":94633},{"label":"18.11.","value":4961}],"unit":"Anfragen","hl":"15.11."}'></div>
+        <p>Die Warnung ist echt, aber kein Datenproblem: Die Datenbank ist 331 MB groß und gesund. Ist das Budget leer, wird die App träge, es geht nichts verloren. Die Vercel-Mail ist folgenlos: Die Redis-Datenbank benutzt niemand, sie wird archiviert und bleibt wiederherstellbar.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="t-load" data-topic data-nav-label="Last der Datenbank senken">
+    <div data-alevel="2" data-title="Last der Datenbank senken">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"92 %","unit":"der gelesenen Bytes","label":"kamen von der Swap-Platte, nicht aus der Datenbank"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="table" data-viz-spec='{"columns":["Gesamt","Headless-Browser","Edge Functions"],"rows":[{"label":"14.11.","cells":["12 747","7 085","2 719"]},{"label":"15.11.","cells":["201 137","142 871","10 297"]},{"label":"16.11.","cells":["51 819","7 166","30 797"]},{"label":"17.11.","cells":["94 633","53 629","16 232"]}],"text":"An den beiden Spitzentagen kam mehr als die Hälfte aus Headless-Browsern."}'></div>
+        <p>Geprüft und verworfen: Der 10-Sekunden-Cron und der 2-Minuten-Cron ändern die Last nicht, mit und ohne sie gab es 6 Lastspitzen in 6 Minuten. Meine erste Antwort nannte den Cron und die Schiffsliste als Ursache; das war falsch, der dafür entworfene Umbau ist verworfen. Die teuersten Abfragen hat eine andere Session am 17.11. schon behoben.</p>
+      </div>
+    </div>
+
+    <section id="d-agents" data-nav-label="Agenten-Läufe" data-decision="d-agents" data-decision-mode="single"
+             data-label="Automatische Browser-Läufe" data-rec="warm"
+             data-rec-why="Das ist der größte gemessene Lastanteil und der kleinste Eingriff; ob eine eigene Prüfumgebung nötig ist, zeigt die Messung danach."
+             data-applies-to="Prüf- und Nachtläufe der Agenten gegen die Live-Datenbank" data-finding="f-agents"><input type="hidden" name="dm-d-agents-hes" value="{&quot;ms&quot;:16533,&quot;revisits&quot;:0,&quot;median&quot;:16533}">
+      <p data-applies>Gilt für: Prüf- und Nachtläufe der Agenten gegen die Live-Datenbank</p>
+      <p data-situation>Jeder Prüflauf eines Agenten ist ein Lasttest der 0,5-GB-Instanz: An den Spitzentagen kamen 57 bis 71 % aller Anfragen aus Headless-Browsern.</p>
+      <h3 data-question>Wohin gehen die automatischen Browser-Läufe künftig?</h3>
+      <p data-stakes>Ob das IO-Budget an Arbeitstagen reicht und was Agenten noch prüfen können</p>
+      <div data-options>
+        <label data-opt="warm" data-recommended>
+          <input type="radio" name="dm-d-agents" value="warm" checked>
+          <span data-opt-label>Bei der Live-Datenbank bleiben, gedrosselt und mit warmem Cache</span>
+          <span data-opt-consequence>Kleinster Umbau: Läufe nacheinander statt parallel, das Browser-Profil mit geladenem Katalog wird wiederverwendet. Die Last sinkt, verschwindet aber nicht.</span>
+        </label>
+        <label data-opt="staging">
+          <input type="radio" name="dm-d-agents" value="staging">
+          <span data-opt-label>Zweites Gratis-Projekt als Prüfumgebung</span>
+          <span data-opt-consequence>Sauberste Trennung: Agenten treffen die Live-Datenbank nicht mehr. Kostet Pflege, weil Migrationen und ein kleiner Codex-Build dort mitlaufen müssen.</span>
+        </label>
+        <label data-opt="local">
+          <input type="radio" name="dm-d-agents" value="local">
+          <span data-opt-label>Lokale Datenbank für Prüfläufe</span>
+          <span data-opt-consequence>Keine Cloud-Last, aber Docker und Datenbank laufen auf deinem Rechner neben Spiel und Builds.</span>
+        </label>
+        <label data-opt="keep">
+          <input type="radio" name="dm-d-agents" value="keep">
+          <span data-opt-label>So lassen</span>
+          <span data-opt-consequence>Kein Aufwand; an Tagen mit vielen Läufen ist das Budget wieder leer und die App wird träge.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-agents-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Agenten-Läufe">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"142 871","unit":"Anfragen","label":"aus Headless-Browsern am 15.11."}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"15.11.","value":142871},{"label":"17.11.","value":53629},{"label":"16.11.","value":7166},{"label":"14.11.","value":7085}],"unit":"Anfragen aus Headless-Browsern","hl":"15.11."}'></div>
+          <p>Die Läufe treffen alle App-Seiten, am stärksten nachts.</p>
+        </div>
+        <div data-example><pre>API-Protokoll, 15.11., nur Headless-Browser
+  13 802   patch_stability_patches     (Startseite)
+  10 892   codex_facet_values          (Codex-Filter)
+  10 358   patch_teasers               (Startseite)
+   8 037   search_missions             (Suche)
+   7 997   search_gallery              (Suche)
+
+Stunde 04 UTC:  18 717 von 19 212 Anfragen aus Headless-Browsern
+Stunde 15 UTC:  16 573 von 21 042</pre></div>
+      </div>
+    </section>
+
+    <section id="d-ram" data-nav-label="Arbeitsspeicher" data-decision="d-ram" data-decision-mode="single"
+             data-label="Arbeitsspeicher der Instanz" data-rec="buffers"
+             data-rec-why="Der Versuch kostet nichts, ist umkehrbar und zeigt innerhalb eines Tages, ob die Gratis-Instanz reicht."
+             data-applies-to="Supabase-Instanz (Free, 0,5 GB RAM)" data-finding="f-ram"><input type="hidden" name="dm-d-ram-hes" value="{&quot;ms&quot;:7090,&quot;revisits&quot;:0,&quot;median&quot;:16533}">
+      <p data-applies>Gilt für: Supabase-Instanz (Free, 0,5 GB RAM)</p>
+      <p data-situation>Jede Lastspitze wird zu Platten-Zugriffen: Vier Katalog-Anfragen lösten 9 600 Lesezugriffe auf der Swap-Platte in fünf Sekunden aus.</p>
+      <h3 data-question>Wie bekommt die Instanz genug Arbeitsspeicher?</h3>
+      <p data-stakes>Ob jede Aktivität weiter das IO-Budget verbraucht</p>
+      <div data-options>
+        <label data-opt="buffers" data-recommended>
+          <input type="radio" name="dm-d-ram" value="buffers" checked>
+          <span data-opt-label>Postgres-Puffer von 224 auf 128 MB senken und messen</span>
+          <span data-opt-consequence>Kostenlos und umkehrbar, braucht einen Neustart von etwa einer Minute. Wirkung ungewiss: Ich messe vorher und nachher und drehe es zurück, wenn es nichts bringt.</span>
+        </label>
+        <label data-opt="pro">
+          <input type="radio" name="dm-d-ram" value="pro">
+          <span data-opt-label>Pro-Plan mit 1 GB RAM buchen</span>
+          <span data-opt-consequence>25 $ im Monat; löst die Ursache sicher und bringt 8 GB Datenbank und Backups. Bricht die Regel, nur Gratis-Stufen zu nutzen.</span>
+        </label>
+        <label data-opt="none">
+          <input type="radio" name="dm-d-ram" value="none">
+          <span data-opt-label>Nichts ändern</span>
+          <span data-opt-consequence>Die Mail kommt an lastreichen Tagen wieder; ein leeres Budget heißt träge App, kein Datenverlust.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-ram-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Arbeitsspeicher">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"590 MB","unit":"im Swap","label":"bei 453 MB Arbeitsspeicher"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"System- und Swap-Platte","value":1280},{"label":"Datenbank-Platte","value":110}],"unit":"GB gelesen","hl":"System- und Swap-Platte"}'></div>
+          <p>Postgres belegt 224 der 453 MB als Puffer.</p>
+        </div>
+        <div data-example><pre>Maschinen-Metriken, 18.11.
+  Arbeitsspeicher gesamt    453 MB
+  Postgres-Puffer           224 MB   (Plattform-Vorgabe)
+  ausgelagert (Swap)        590 MB
+
+5-Sekunden-Spur, Leerlauf, dann 4 Katalog-Anfragen
+  vorher        0 Lesezugriffe/s
+  danach    1 924 Lesezugriffe/s   2 388 Seitenfehler/s</pre></div>
+      </div>
+    </section>
+
+    <section id="d-cache" data-nav-label="Cache für Listen" data-decision="d-cache" data-decision-mode="single"
+             data-label="Cache für Katalog-Listen" data-rec="slim"
+             data-rec-why="Der kleine Schritt wirkt sofort; feste Dateien pro Build sind die richtige Richtung, aber ein eigenes Konzept wert."
+             data-applies-to="Codex-Listen im Frontend und ihre Datenbank-Abfragen" data-finding="f-cache"><input type="hidden" name="dm-d-cache-hes" value="{&quot;ms&quot;:27696,&quot;revisits&quot;:0,&quot;median&quot;:16533}">
+      <p data-applies>Gilt für: Codex-Listen im Frontend und ihre Datenbank-Abfragen</p>
+      <p data-situation>Die Schiffsliste braucht 1,0 bis 1,3 Sekunden, weil die Datenbank für jedes der 332 Schiffe die 55 kB große Beschreibung siebenmal entpackt.</p>
+      <h3 data-question>Wie werden Katalog-Listen schnell, ohne die Datenbank zu belasten?</h3>
+      <p data-context>Fest steht: Redis sitzt an der falschen Stelle. Der Browser spricht direkt mit der Datenbank-API, ein Redis bräuchte eine eigene Zwischenschicht davor.</p>
+      <p data-stakes>Ladezeit der Codex-Seiten und wie viel Lesearbeit bei der Datenbank bleibt</p>
+      <div data-options>
+        <label data-opt="slim" data-recommended>
+          <input type="radio" name="dm-d-cache" value="slim">
+          <span data-opt-label>Erst die Schiffsliste in der Datenbank schlank machen</span>
+          <span data-opt-consequence>Kleiner Eingriff mit sofortigem Effekt: einmal entpacken, erst sortieren, dann Details. Die Liste bleibt eine Datenbank-Abfrage.</span>
+        </label>
+        <label data-opt="snapshot">
+          <input type="radio" name="dm-d-cache" value="snapshot" checked>
+          <span data-opt-label>Katalog-Listen als feste Dateien pro Build ausliefern</span>
+          <span data-opt-consequence>Größter Gewinn: Listen kommen aus dem Datei-Speicher mit Dauer-Cache, die Datenbank sieht sie nicht mehr. Mittlerer bis großer Umbau an Upload und Lesepfad.</span>
+        </label>
+        <label data-opt="redis">
+          <input type="radio" name="dm-d-cache" value="redis">
+          <span data-opt-label>Trotzdem einen Redis-Cache einbauen</span>
+          <span data-opt-consequence>Braucht eine Zwischenschicht vor der Datenbank, hilft nur bei Wiederholungen und ändert nichts am Speicherproblem.</span>
+        </label>
+        <label data-opt="none">
+          <input type="radio" name="dm-d-cache" value="none">
+          <span data-opt-label>Nichts ändern</span>
+          <span data-opt-consequence>Die Listen bleiben bei einer Sekunde, und jeder Prüflauf lädt sie neu.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-cache-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Cache für Listen">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"1,0 s","unit":"im Schnitt","label":"für die Schiffsliste, 684 Aufrufe in 7 Tagen"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Schiffsliste","value":1028},{"label":"Suche","value":319},{"label":"Item-Liste","value":171},{"label":"Komponenten-Liste","value":120}],"unit":"ms im Schnitt","hl":"Schiffsliste"}'></div>
+          <p>Katalogdaten ändern sich nur mit einem Patch.</p>
+        </div>
+        <div data-example><pre>Schiffsliste, Ausführungsplan vom 18.11.
+  Sortieren          auf der Platte, 4 024 kB Zwischendatei
+  332 Schiffe        je 7 Felder aus der Beschreibung
+  angefasst          11 485 Puffer (90 MB)
+  Dauer              1 310 ms
+
+Nach dem kleinen Schritt (Ziel)
+  Beschreibung       einmal je Schiff entpackt
+  Sortieren          im Speicher, vor den Details</pre></div>
+      </div>
+    </section>
+  </section>
+</section>

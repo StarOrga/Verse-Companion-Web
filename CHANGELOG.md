@@ -4,11 +4,23 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.282.4] - 2026-11-20
+## [0.283.1] - 2026-11-20
 
 ### Changed
 - Data Uploader 0.84.0: the sidecar opens the Data.p4k through a compact index. Opening the archive takes 404 MB instead of 2.7 GB, a codex run peaks at 2.65 GB instead of 4.48 GB, with byte-identical output.
 - Data Uploader: the RAM limit never goes below what one run needs (3.5 GB), and 3D workers are planned with 2 GB instead of 3 GB each.
+
+## [0.283.0] - 2026-11-20
+
+### Added
+- Codex: list data (browse lists, counts, filters, rank comparisons, missiles, German-name search) can be served as fixed files per game build instead of from the database; the database stays the fallback. Takes effect once the files are published for a build.
+
+### Changed
+- Automated browser checks and the mobile gate share a catalog cache and queue their database requests, so they no longer load the live database like a stress test.
+- Codex search by German name returns every match instead of at most 100 when the list files are available.
+
+### Fixed
+- Codex weapon rank comparison no longer stops at the first 1,000 weapons when the list files are available.
 
 ## [0.282.3] - 2026-11-19
 

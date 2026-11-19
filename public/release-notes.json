@@ -1,9 +1,9 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.282.4",
+  "current": "0.283.1",
   "releases": [
     {
-      "version": "0.282.4",
+      "version": "0.283.1",
       "date": "2026-11-20",
       "sections": [
         {
@@ -17,6 +17,46 @@
             {
               "title": "",
               "text": "Data Uploader: the RAM limit never goes below what one run needs (3.5 GB), and 3D workers are planned with 2 GB instead of 3 GB each."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.283.0",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex: list data (browse lists, counts, filters, rank comparisons, missiles, German-name search) can be served as fixed files per game build instead of from the database; the database stays the fallback. Takes effect once the files are published for a build."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Automated browser checks and the mobile gate share a catalog cache and queue their database requests, so they no longer load the live database like a stress test."
+            },
+            {
+              "title": "",
+              "text": "Codex search by German name returns every match instead of at most 100 when the list files are available."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex weapon rank comparison no longer stops at the first 1,000 weapons when the list files are available."
             }
           ]
         }

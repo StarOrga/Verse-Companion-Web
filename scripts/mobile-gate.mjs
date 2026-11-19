@@ -48,6 +48,7 @@ import { extname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import testAccount from './lib/test-account.cjs';
+import supabaseGuard from './lib/agent-supabase-guard.cjs';
 import { findPlaywrightChromium } from './lib/playwright-chromium.mjs';
 
 const REPO_ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
@@ -908,6 +909,15 @@ async function runDevice(cdp, device, routes, baseUrl, cfg, screenshotDir, auth 
   await cdp.send('Runtime.enable', {}, sessionId);
   await cdp.send('Log.enable', {}, sessionId);
   await cdp.send('Network.enable', {}, sessionId);
+  // Every device loads the same catalog from the live database, signed in and
+  // out, and several gates run at once on a busy day: one --auth run is ~5 000
+  // database requests (measured 2026-11-18, it pushed anonymous reads into
+  // their 3 s timeout). The guard answers catalog reads from the cache all of
+  // Claude's browsers share and queues the rest. It never fails a request.
+  const supabase = testAccount.readSupabaseConfig(REPO_ROOT);
+  const guard = supabase
+    ? await supabaseGuard.installSupabaseGuardCdp(cdp, sessionId, { supabaseUrl: supabase.url, cwd: REPO_ROOT }).catch(() => null)
+    : null;
   await cdp.send('Emulation.setDeviceMetricsOverride', {
     width: device.width, height: device.height, deviceScaleFactor: device.dpr, mobile: true,
     screenWidth: device.width, screenHeight: device.height,
@@ -1044,6 +1054,10 @@ async function runDevice(cdp, device, routes, baseUrl, cfg, screenshotDir, auth 
     }
   }
 
+  if (guard) {
+    guard.dispose();
+    console.log(`  load  ${device.id.padEnd(14)} ${guard.summary()}`);
+  }
   await cdp.send('Target.closeTarget', { targetId }).catch(() => {});
   await cdp.send('Target.disposeBrowserContext', { browserContextId }).catch(() => {});
   return results;
