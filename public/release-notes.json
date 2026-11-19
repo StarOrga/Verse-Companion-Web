@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.281.2",
+  "current": "0.281.3",
   "releases": [
+    {
+      "version": "0.281.3",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Holotable: switching to 3D no longer freezes the page; a loading animation shows where the model will appear and the page stays scrollable while it loads."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.281.2",
       "date": "2026-11-18",
