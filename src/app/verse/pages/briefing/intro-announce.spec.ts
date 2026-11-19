@@ -67,3 +67,19 @@ describe('Entrance hold in the shell chrome', () => {
     expect(chrome.heroIntro(), 'no hub took it over').toBeNull();
   }));
 });
+
+describe('Reload hold for the scene outpost (#371)', () => {
+  it('keeps the HQ outpost waiting for the hub, and drops a wait nobody took over', fakeAsync(() => {
+    const chrome = TestBed.inject(ShellChromeService);
+    chrome.holdHubCalm();
+    expect(chrome.hubCalm()).toBe('wait');
+    chrome.hubCalm.set('in');
+    tick(HERO_INTRO_HOLD_MAX_MS);
+    expect(chrome.hubCalm(), 'a running fade-in is not dropped').toBe('in');
+
+    chrome.hubCalm.set(null);
+    chrome.holdHubCalm();
+    tick(HERO_INTRO_HOLD_MAX_MS);
+    expect(chrome.hubCalm(), 'no hub took it over').toBeNull();
+  }));
+});

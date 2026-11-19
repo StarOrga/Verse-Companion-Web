@@ -4,6 +4,16 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.281.8] - 2026-11-19
+
+### Fixed
+- /verse: the HQ outpost now joins the staged entrance with the planets and texts (with 'Patches') on a menu switch and on reload, instead of showing up with the globe.
+
+## [0.281.7] - 2026-11-19
+
+### Changed
+- Storage concept (admin-only): round 4 folds in the round-3 decisions and asks the last open questions before the build.
+
 ## [0.281.6] - 2026-11-19
 
 ### Changed

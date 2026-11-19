@@ -1,7 +1,39 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.281.6",
+  "current": "0.281.8",
   "releases": [
+    {
+      "version": "0.281.8",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "/verse: the HQ outpost now joins the staged entrance with the planets and texts (with 'Patches') on a menu switch and on reload, instead of showing up with the globe."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.281.7",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Storage concept (admin-only): round 4 folds in the round-3 decisions and asks the last open questions before the build."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.281.6",
       "date": "2026-11-19",
