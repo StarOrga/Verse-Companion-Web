@@ -1,7 +1,11 @@
 # sc-assets — R2 read Worker
 
 Public read path for the Cloudflare R2 bucket `sc-companion-assets`. Today it
-serves the ship hulls and livery icons (`ship-skins/<ship>/<skin>.glb|webp`).
+serves the ship hulls and livery icons (`ship-skins/<ship>/<skin>.glb|webp`),
+the codex localization shards (`codex-locale/<build>/...`) and the codex catalog
+lists (`codex-lists/<build>/index.json`, `codex-lists/<build>/<gen>/<name>.json` with name one of ship, ship-rank, weapon,
+component, item, ammunition, manufacturer, blueprint, facets, missile, weapon-rank, component-rank, names-de;
+R2 only, a miss is a plain 404).
 Why R2 behind a Worker, and what else is planned there, is in
 [`.claude/deep-knowledge/storage.md`](../../.claude/deep-knowledge/storage.md).
 

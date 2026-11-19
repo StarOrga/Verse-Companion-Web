@@ -190,6 +190,42 @@ describe('fetch', () => {
     assert.equal(keyFor('/codex-locale/a3fb1249-9115-4035-9039-2ffc6043d832/en/gen/ui-0.json'), null);
   });
 
+  it('serves codex list files immutable and the index short-cached, 404s a miss without Supabase', async () => {
+    const dir = 'codex-lists/a3fb1249-9115-4035-9039-2ffc6043d832';
+    const file = `${dir}/mgaq1z2k/ship.json`;
+    const index = `${dir}/index.json`;
+    const e = env({ [file]: '{}', [index]: '{}' });
+    const f = await worker.fetch(new Request(`https://w.dev/${file}`), e);
+    assert.equal(f.status, 200);
+    assert.equal(f.headers.get('content-type'), 'application/json');
+    assert.equal(f.headers.get('cache-control'), 'public, max-age=31536000, immutable');
+    const i = await worker.fetch(new Request(`https://w.dev/${index}?verify=1`), e);
+    assert.equal(i.status, 200);
+    assert.equal(i.headers.get('cache-control'), 'public, max-age=300');
+    globalThis.fetch = async () => {
+      throw new Error('must not proxy list keys');
+    };
+    const miss = await worker.fetch(new Request(`https://w.dev/${dir}/mgaq1z2k/facets.json`), env());
+    assert.equal(miss.status, 404);
+    for (const name of ['ship', 'ship-rank', 'weapon', 'component', 'item', 'ammunition', 'manufacturer', 'blueprint', 'facets', 'missile', 'weapon-rank', 'component-rank', 'names-de']) {
+      assert.equal(keyFor(`/${dir}/mgaq1z2k/${name}.json`), `${dir}/mgaq1z2k/${name}.json`);
+    }
+  });
+
+  it('rejects foreign codex list shapes', () => {
+    const dir = 'codex-lists/a3fb1249-9115-4035-9039-2ffc6043d832';
+    assert.equal(keyFor('/codex-lists/not-a-uuid/index.json'), null);
+    assert.equal(keyFor(`/${dir}/gen12345/silhouettes.json`), null);
+    assert.equal(keyFor(`/${dir}/mgaq1z2k/../ship.json`), null);
+    assert.equal(keyFor(`/${dir}/ship.json`), null);
+    assert.equal(keyFor(`/${dir}/mgaq1z2k/ship-rankx.json`), null);
+    assert.equal(keyFor(`/${dir}/mgaq1z2k/ship-.json`), null);
+    for (const bad of ['missilex', 'xmissile', 'names-en', 'names-de-x', 'names', 'weapon-rankx', 'component-ranks', 'weapon-ranks', 'rank']) {
+      assert.equal(keyFor(`/${dir}/mgaq1z2k/${bad}.json`), null, bad);
+    }
+    assert.equal(keyFor(`/${dir}/mgaq1z2k/ship.json.bak`), null);
+  });
+
   it('falls back to the Supabase bucket for a key R2 does not hold yet', async () => {
     let asked = '';
     globalThis.fetch = async (url) => {

@@ -59,6 +59,7 @@
 //         and deletes the rows once the public Worker serves them — see below)
 //   POST { op: "locale_publish",   build_id, lang?, delete_source? }   -> { ok, results }
 //        (service role or the gates below; one language per call keeps it short)
+//   POST { op: "lists_publish",     build_id }                          -> { ok, result }  (codex-lists/ files)
 //   POST { op: "locale_gc",        dry_run? (default true) }           -> { ok, ...GcResult }
 //        (SERVICE ROLE ONLY. Deletes codex-locale/<build>/ prefixes in R2 whose
 //         build id is no longer in codex_builds, i.e. pruned builds. Send
@@ -92,10 +93,12 @@
 //   the caller should halve the batch and retry, see catalog-bridge.ts).
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
-import { bucketBytes, deleteObject, listObjects, putObject, r2FromEnv, readUsage } from '../ingest-skins/_r2.ts';
+import { bucketBytes, deleteObject, getObject, listObjects, putObject, r2FromEnv, readUsage } from '../ingest-skins/_r2.ts';
 import { usageGate } from '../ingest-skins/_r2-usage.ts';
 import { BUILD_ID_RE, LANG_RE } from './_locale-shards.ts';
 import { publishLocale } from './_locale-publish.ts';
+import { type ListPublishDeps, publishLists } from './_list-publish.ts';
+import { LIST_FILTERS, LIST_TABLES, LISTS_ROOT, selectFor } from './_list-snapshots.ts';
 import { enqueueTranslationJobs } from './_translation-enqueue.ts';
 import { gcLocalePrefixes } from './_locale-gc.ts';
 import {
@@ -279,6 +282,56 @@ function publishDeps(admin: Admin, r2: R2): PublishDeps {
         if (n < LOCALE_PAGE) return total;
       }
     },
+  };
+}
+
+/** Deps of the catalog-list publish (_list-publish.ts): reads the tables, writes R2. */
+function listPublishDeps(admin: Admin, r2: R2): ListPublishDeps {
+  const base = publishDeps(admin, r2);
+  return {
+    async readRows(buildId, kind, from, limit) {
+      // The database's list order (codex.service.ts): name asc, nulls last, then class_name.
+      // weapon-rank / component-rank stop at name + is_variant; the client's third filter
+      // (name_localized not like '!*', getItemRankCohort) is applied on the file by the client.
+      let q = admin.from(LIST_TABLES[kind]).select(selectFor(kind)).eq('build_id', buildId);
+      const filter = LIST_FILTERS[kind];
+      for (const [col, val] of Object.entries(filter?.eq ?? {})) q = q.eq(col, val);
+      for (const col of filter?.notNull ?? []) q = q.not(col, 'is', null);
+      const { data, error } = await q
+        .order('name_localized', { ascending: true, nullsFirst: false })
+        .order('class_name', { ascending: true })
+        .range(from, from + limit - 1);
+      if (error) throw error;
+      return (data ?? []) as unknown as Record<string, unknown>[];
+    },
+    async readNames(buildId, kind, from, limit) {
+      // German name = payload->name->>de (codex_search_text); ammunition has none and yields nulls.
+      const { data, error } = await admin
+        .from(LIST_TABLES[kind])
+        .select('class_name, name_localized, de:payload->name->>de')
+        .eq('build_id', buildId)
+        .order('class_name', { ascending: true })
+        .range(from, from + limit - 1);
+      if (error) throw error;
+      return (data ?? []) as unknown as { class_name: string; name_localized: string | null; de: string | null }[];
+    },
+    async facetValues(buildId, kind) {
+      const { data, error } = await admin.rpc('codex_facet_values', { p_build_id: buildId, p_kind: kind });
+      if (error) throw error;
+      return data;
+    },
+    gate: () => r2WriteBlocked(r2),
+    async readBucket(key) {
+      try {
+        return JSON.parse(new TextDecoder().decode(await getObject(r2, key, 1_000_000)));
+      } catch {
+        return null;
+      }
+    },
+    putJson: base.putJson,
+    readPublic: base.readPublic,
+    listKeys: base.listKeys,
+    deleteKey: base.deleteKey,
   };
 }
 
@@ -978,14 +1031,24 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       // After the response: the uploader's finalize must not wait ~30 s for
       // 11 languages. A failure only leaves the rows in place (clients keep
       // reading them); locale_publish or the backfill script can redo it.
-      afterResponse(
-        publishBuildLocales(admin, r2, buildId, null, true)
-          .then(async (results) => {
-            console.log(`ingest-catalog: locale publish ${buildId}: ${JSON.stringify(results)}`);
-            await translationAfterPublish(admin, supabaseUrl, serviceKey, buildId, results);
-          })
-          .catch((e) => console.error(`ingest-catalog: locale publish ${buildId} failed: ${(e as Error).message}`)),
-      );
+      // One after the other in the same isolate (memory: 546 before); each
+      // failure is logged on its own and never skips the next step. The catalog
+      // lists as files per build come last; a failure only leaves the tables as the source.
+      afterResponse((async () => {
+        try {
+          const results = await publishBuildLocales(admin, r2, buildId, null, true);
+          console.log(`ingest-catalog: locale publish ${buildId}: ${JSON.stringify(results)}`);
+          await translationAfterPublish(admin, supabaseUrl, serviceKey, buildId, results);
+        } catch (e) {
+          console.error(`ingest-catalog: locale publish ${buildId} failed: ${(e as Error).message}`);
+        }
+        try {
+          const r = await publishLists(buildId, listPublishDeps(admin, r2));
+          console.log(`ingest-catalog: lists publish ${buildId}: ${JSON.stringify(r)}`);
+        } catch (e) {
+          console.error(`ingest-catalog: lists publish ${buildId} failed: ${(e as Error).message}`);
+        }
+      })());
       return json({ ok: true, current: true, ...replaced, locale_publish: 'started' });
     }
 
@@ -1005,12 +1068,23 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       return json({ ok: true, results });
     }
 
+    if (op === 'lists_publish') {
+      const buildId = String(body.build_id ?? '');
+      if (!BUILD_ID_RE.test(buildId)) return json({ error: 'invalid_body', message: 'build_id (uuid) required' }, 400);
+      const r2 = r2FromEnv((k) => Deno.env.get(k));
+      if (!r2) return json({ error: 'r2_not_configured' }, 503);
+      const result = await publishLists(buildId, listPublishDeps(admin, r2));
+      if (result.blocked) return json({ error: result.blocked.code, message: result.blocked.message }, result.blocked.status);
+      console.log(`ingest-catalog: lists_publish ${buildId}: ${JSON.stringify(result)}`);
+      return json({ ok: true, result });
+    }
+
     if (op === 'locale_gc') {
       // Destructive and operator-only: the uploader gates must not reach it.
       if (!(authHeader && authHeader === `Bearer ${serviceKey}`)) return json({ error: 'forbidden', message: 'service role only' }, 403);
       const r2 = r2FromEnv((k) => Deno.env.get(k));
       if (!r2) return json({ error: 'r2_not_configured' }, 503);
-      const result = await gcLocalePrefixes({
+      const gcDeps = {
         async liveBuildIds() {
           const { data, error } = await admin.from('codex_builds').select('id').limit(10_000);
           if (error) throw error;
@@ -1018,11 +1092,15 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
           if (ids.length >= 10_000) throw new Error('locale_gc: codex_builds read looks truncated');
           return ids;
         },
-        listKeys: async (prefix) => (await listObjects(r2, prefix)).map((o) => o.key),
-        deleteKey: (key) => deleteObject(r2, key),
-      }, { dryRun: body.dry_run !== false });
-      console.log(`ingest-catalog: locale_gc ${JSON.stringify(result)}`);
-      return json({ ok: true, ...result });
+        listKeys: async (prefix: string) => (await listObjects(r2, prefix)).map((o) => o.key),
+        deleteKey: (key: string) => deleteObject(r2, key),
+      };
+      const dryRun = body.dry_run !== false;
+      const result = await gcLocalePrefixes(gcDeps, { dryRun });
+      // codex-lists/ follows the same rule (live ids first, dry run default).
+      const lists = await gcLocalePrefixes(gcDeps, { dryRun, root: LISTS_ROOT });
+      console.log(`ingest-catalog: locale_gc ${JSON.stringify(result)} lists ${JSON.stringify(lists)}`);
+      return json({ ok: true, ...result, lists });
     }
 
     return json({ error: 'invalid_body', message: `unknown op '${op}'` }, 400);

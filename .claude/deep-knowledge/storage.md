@@ -88,6 +88,92 @@ copies the existing objects (dry run unless `--apply`); a change to
 - `codex_locale_strings` moved to R2 (2026-10-03, § Localization strings).
   The table is now only an ingest's staging area.
 
+## Catalog lists (R2 per build)
+
+Every list read of the catalog costs the instance swap IO, so each build's lists
+are published once as files and served by the Worker with a permanent cache. The
+tables stay the source and the client's fallback; nothing is deleted from them.
+
+| Key | Cache |
+|---|---|
+| `codex-lists/<build uuid>/index.json` | `max-age=300` (names the current gen) |
+| `codex-lists/<build uuid>/<gen>/<name>.json` | immutable (a new gen per publish) |
+
+`<name>` is `ship`, `ship-rank`, `weapon`, `component`, `item`, `ammunition`, `manufacturer`,
+`blueprint`, `facets`, `missile`, `weapon-rank`, `component-rank` or `names-de`. A kind file holds ALL rows of the build (variants
+included) in the database list order (`name_localized asc nulls last, class_name asc`),
+columnar: `{ v, kind, columns, payloadKeys, rows: [[...columns, ...payload slices]] }`.
+`facets.json` stores the `codex_facet_values` result per kind (ship, weapon,
+component, item) unchanged. The ship payload slice is `SHIP_PAYLOAD_KEYS` in
+`_list-snapshots.ts` (card keys + `sizeClass`, `career`, `dimensions`; the rank-cohort
+keys hold the loadout tree and stats and live in their own file, `ship-rank.json`:
+the same ship columns, `payloadKeys` = `SHIP_RANK_PAYLOAD_KEYS` (equal to
+`RANK_PAYLOAD_KEYS` in `codex.service.ts`), all ships in `ship.json` order, read in
+pages of 200 because each row carries several kB; a browser reads it once per build
+for the rank cohort).
+
+Four more files (concept supabase-io-last; the client reads them instead of the database):
+`missile.json` (`getMissileCohort`: items, `attach_type = 'Missile'`, named; columns `class_name,
+name_localized, sub_type, size, attach_type, payload`, the LAST column is the whole payload,
+`payloadKeys` empty; pages of 200), `weapon-rank.json` (weapons, named, `is_variant = false`;
+columns `class_name, name_localized, sub_type, size`, payloadKeys `weaponParams`),
+`component-rank.json` (components, same filters, ALL kinds; payloadKeys `kind`, `stats`; pages of
+200). The client still applies `getItemRankCohort`'s `name_localized not like '!*'` and the
+component kind filter. `names-de.json` = `{ v: 1, lang: "de", kinds: { <kind>: [[class_name,
+german name]] } }` for all seven kinds, class_name order, one entry per record whose
+`payload->name->>de` the `codex_search` text includes (not empty, not `@...`, not `TRANSLATION NOT
+FOUND`, not equal to the English name ignoring case); the name is raw, the client folds case and
+accents. `codex_search` matches `lower(unaccent(en || ' ' || de))` (or `class_name ilike`) against
+EVERY token (LIKE, `*` = wildcard), ranks by `word_similarity` - that rank is not mirrored.
+A failure of one of these four is logged, the name stays out of `index.json` and the publish result
+lists it in `failed`; the client treats a name missing from the index as not published.
+
+Publish (`_list-publish.ts`; put order ship, ship-rank, the other kinds, facets, missile, weapon-rank,
+component-rank, names-de, index): one file at a time (pages of 1000, one file, then
+dropped), facets, one file of the new generation read back through the public Worker, then the
+index (last), the index read back from the bucket, then only generations older than
+this publish and not named by that index are deleted (a failed read-back puts no
+index and deletes nothing). It runs after `finalize` (after the
+response, a failure is only logged), behind the same R2 usage gate as the locale
+publish; `lists_publish` (`{ "op": "lists_publish", "build_id": "<uuid>" }`)
+redoes it for one build. `locale_gc` also removes the `codex-lists/` prefixes of
+builds gone from `codex_builds` (report under `lists`).
+
+**Client read path** (`src/app/codex/`): `CodexListSnapshots` (`codex-list-snapshots.ts`)
+fetches the index and the files through the Worker, keeps the parsed files of the
+current build in memory (they are the list cache) and answers `null` for anything
+it cannot use: index 404 (not published yet — remembered 5 min, not logged), a
+failed download (HTTP error, network, or the 30 s fetch abort; logged once, not
+retried for 60 s), an unexpected shape (logged once, never fetched again for that
+gen — files are immutable), or a file still downloading after 3 s (that call uses
+the database; later calls skip the wait until the same download lands). Any throw
+while answering from a file is logged once and falls back to the database. The pure
+`codex-list-engine.ts` answers a read from the rows with PostgREST semantics (default
+browse filters, every `filteredListQuery` filter incl. NULL handling, the ILIKE
+token groups plus `searchMatcher`, paging, exact counts) and declines (`null`) on
+`payload: 'full'`, a payload key the file lacks, a regex outside its POSIX subset,
+an unknown filter key or a column the table lacks. `CodexService` tries the file
+first in `listByKind`, `countByKind`, `countSearchMatches`, `countItemsByAttachType`,
+`facetValues` (+ ship sizes), `weaponFacets`, `listFpsCatalog`, `backfillCohortNames`
+`allShipRows` (whole cohort from `ship-rank.json`) and `listSkinSiblings` /
+`listEditionSiblings` (ILIKE prefix; above 200 matches the database answers, its
+collation decides the cut); on `null` the old query runs unchanged. From the files,
+`countSearchMatches` counts like `listByKind` (token groups + matcher), so "also
+found in …" equals the list's count. `getMissileCohort` reads `missile.json`,
+`getItemRankCohort` reads `weapon-rank.json` / `component-rank.json` (the client
+applies the `'!'` name filter and the component kind; the silhouettes for the
+missile measurements still come from `codex_silhouettes`). The German-name
+fallback of `listByKind` matches locally when `names-de.json` and the kind's list
+file are both there (`germanListFromSnapshot`: `codex_search`'s row test — every
+token against the folded `en de` text or ILIKE the class name, `*` wildcard,
+`%`/`_`/`\` literal — then the list's own filters); it does not rank by
+`word_similarity` nor cut at 100 names, so a broad German term lists all its
+matches. Without either file the `codex_search` RPC + `in` list read run as before.
+Still on the database: `listBlueprints` (full payload, no file; no caller today),
+the `codex_search_suggest` "did you mean" RPC, detail pages and every other
+non-list read. `searchAll` pages through `listByKind`, so it reads the files too. Specs never reach the Worker: `vitest-setup.ts` answers
+`/codex-lists/` with 404.
+
 ## Localization strings (R2 since 2026-10-03)
 
 Measured 2026-10-03 before the move: database 496 MB, `codex_locale_strings`

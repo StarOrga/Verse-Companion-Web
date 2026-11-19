@@ -14,6 +14,13 @@ import { USABLE_ITEM_ATTACH_TYPES } from './codex-area-taxonomy';
 import { SupabaseClientProvider } from '../core/supabase.client';
 import { environment } from '../../environments/environment';
 import { LOCALE_SHARD_BASE, LOCALE_SHARD_FETCH } from './codex-locale-shards';
+import { CodexListSnapshots } from './codex-list-snapshots';
+
+/** No list snapshot for any build (the state before the first publish): every list read runs the mocked query. */
+const NO_LIST_SNAPSHOTS = {
+  provide: CodexListSnapshots,
+  useValue: { rows: async () => null, facets: async () => null } as unknown as CodexListSnapshots,
+};
 
 /** No R2 index for any build: resolveLocaleKeys reads the database table. */
 const noR2 = (async () => new Response('not found', { status: 404 })) as unknown as typeof fetch;
@@ -80,7 +87,7 @@ function makeService(
 ): CodexService {
   TestBed.configureTestingModule({
     providers: [
-      CodexService,
+      CodexService, NO_LIST_SNAPSHOTS,
       { provide: SupabaseClientProvider, useValue: mockProvider(cap, respond) },
       { provide: LOCALE_SHARD_FETCH, useValue: r2Fetch },
       { provide: LOCALE_SHARD_BASE, useValue: 'https://assets.test' },
@@ -266,7 +273,7 @@ function makeKeybindService(
   error: { message: string } | null = null,
 ): CodexService {
   TestBed.configureTestingModule({
-    providers: [CodexService, { provide: SupabaseClientProvider, useValue: keybindProvider(rows, cap, error) }],
+    providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: keybindProvider(rows, cap, error) }],
   });
   return TestBed.inject(CodexService);
 }
@@ -494,7 +501,7 @@ describe('CodexService archive readers and the build lookup', () => {
 
   function make(calls: Calls, buildFailsFirst = false): CodexService {
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: provider(calls, buildFailsFirst) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: provider(calls, buildFailsFirst) }],
     });
     return TestBed.inject(CodexService);
   }
@@ -656,7 +663,7 @@ describe('CodexService.listFpsCatalog and countSearchMatches', () => {
 
   function make(rows: unknown[], cap: Cap, opts: { failReads?: number; count?: number } = {}): CodexService {
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: provider(rows, cap, opts) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: provider(rows, cap, opts) }],
     });
     return TestBed.inject(CodexService);
   }
@@ -842,7 +849,7 @@ describe('CodexService.facetValues', () => {
     respond: () => { data: unknown; error: unknown },
   ): CodexService {
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: provider(calls, respond) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: provider(calls, respond) }],
     });
     return TestBed.inject(CodexService);
   }
@@ -944,7 +951,7 @@ describe('CodexService.resolveEntities', () => {
 
   function make(rows: Record<string, unknown>[]): CodexService {
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: provider(rows) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: provider(rows) }],
     });
     return TestBed.inject(CodexService);
   }
@@ -1045,7 +1052,7 @@ describe('CodexService.getEntityPayloads', () => {
       return chain;
     };
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: { client: { from } } }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: { client: { from } } }],
     });
     return { svc: TestBed.inject(CodexService), pending };
   }
@@ -1138,7 +1145,7 @@ describe('CodexService.getDetail', () => {
 
   function make(failing: 'codex_item_ports' | 'codex_entity_strings' | null, rpcMissing = false): CodexService {
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: provider(failing, rpcMissing) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: provider(failing, rpcMissing) }],
     });
     return TestBed.inject(CodexService);
   }
@@ -1204,7 +1211,7 @@ describe('CodexService.revalidateLiveBuild', () => {
 
   async function make(world: World): Promise<CodexService> {
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: provider(world) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: provider(world) }],
     });
     const svc = TestBed.inject(CodexService);
     await svc.loadCurrentBuild();
@@ -1332,7 +1339,7 @@ describe('CodexService.armorRating', () => {
       return Promise.resolve({ status: 200, ...a });
     };
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: { client: { from, rpc } } }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: { client: { from, rpc } } }],
     });
     return { svc: TestBed.inject(CodexService), rpcCalls: () => calls, rpcLog };
   }
@@ -1447,7 +1454,7 @@ describe('CodexService.searchAll', () => {
   function make(upcoming: Partial<UpcomingShipsService> = {}): CodexService {
     TestBed.configureTestingModule({
       providers: [
-        CodexService,
+        CodexService, NO_LIST_SNAPSHOTS,
         { provide: SupabaseClientProvider, useValue: { client: { from: () => ({}) } } },
         {
           provide: UpcomingShipsService,
@@ -1653,7 +1660,7 @@ describe('CodexService.listByKind search post-filter', () => {
       return chain;
     };
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: { client: { from } } }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: { client: { from } } }],
     });
     return TestBed.inject(CodexService);
   }
@@ -1745,7 +1752,7 @@ describe('CodexService German-name search and suggestions', () => {
       };
     }
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: { client } }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: { client } }],
     });
     return TestBed.inject(CodexService);
   }
@@ -1898,7 +1905,7 @@ describe('listSelect and slim list rows', () => {
       return chain;
     };
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: { client: { from } } }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: { client: { from } } }],
     });
     const res = await TestBed.inject(CodexService).listByKind('ship');
     expect(res.rows[0].payload).toEqual({ name: { en: 'Alpha', de: 'Alpha' }, manufacturer: { name: { en: 'ACME' } } });
@@ -1956,7 +1963,7 @@ describe('CodexService silhouettes before the edges column exists', () => {
   it('retries without edges once, keeps the outline and stops asking for the column', async () => {
     const selects: string[] = [];
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: edgesProvider(selects) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: edgesProvider(selects) }],
     });
     const svc = TestBed.inject(CodexService);
     svc.build.set({ id: BUILD_ID, channel: 'LIVE', patch_version: '4.9.0', build_number: 'desktop', is_current: true } as never);

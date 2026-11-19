@@ -239,13 +239,21 @@ describe('createTestSession (the init page)', () => {
   const config = { url: 'https://proj.supabase.co', publishableKey: 'k' };
   const account = { email: 'claude-test@example.test', password: 'p', source: 'fake' };
 
-  function setup({ readAccount = () => account, mint } = {}) {
+  function setup({ readAccount = () => account, mint, installGuard } = {}) {
     const lines = [];
     let mints = 0;
+    const guards = [];
     const init = initPage.createTestSession({
       cwd: 'x',
       readConfig: () => config,
       readAccount,
+      // The guard has its own tests (agent-supabase-guard.test.mjs); here only the wiring.
+      installGuard:
+        installGuard ??
+        (async (_context, options) => {
+          guards.push(options);
+          return true;
+        }),
       mint:
         mint ??
         (async () => {
@@ -257,7 +265,7 @@ describe('createTestSession (the init page)', () => {
     });
     const context = fakeContext();
     const page = { context: () => context };
-    return { init, context, page, lines, mints: () => mints };
+    return { init, context, page, lines, guards, mints: () => mints };
   }
 
   it('is a no-op without an account', async () => {
@@ -269,11 +277,47 @@ describe('createTestSession (the init page)', () => {
   });
 
   it('prepares each browser context once', async () => {
-    const { init, context, page } = setup();
+    const { init, context, page, guards } = setup();
     await init({ page });
     await init({ page });
     assert.equal(context.routes.length, 1);
     assert.equal(context.initScripts.length, 1);
+    assert.equal(guards.length, 1);
+  });
+
+  it('guards the database of this checkout, signed in or not', async () => {
+    const signedOut = setup({ readAccount: () => null });
+    await signedOut.init({ page: signedOut.page });
+    assert.deepEqual(
+      signedOut.guards.map((g) => [g.supabaseUrl, g.cwd]),
+      [[config.url, 'x']],
+    );
+  });
+
+  it('still signs in when the guard cannot be installed', async () => {
+    const { init, context, page, lines } = setup({
+      installGuard: async () => {
+        throw new Error('no temp dir');
+      },
+    });
+    await init({ page });
+    assert.equal(context.routes.length, 1);
+    assert.match(lines[0], /guard not installed: no temp dir/);
+  });
+
+  it('registers the real guard on the REST API next to the session route', async () => {
+    const context = fakeContext();
+    const init = initPage.createTestSession({
+      cwd: 'x',
+      readConfig: () => config,
+      readAccount: () => account,
+      mint: async () => ({ access_token: 'at', refresh_token: 'rt' }),
+      logLine: () => {},
+    });
+    await init({ page: { context: () => context } });
+    assert.equal(context.routes.length, 2);
+    assert.equal(context.routes[0].predicate(new URL(`${config.url}/rest/v1/codex_ships`)), true);
+    assert.equal(context.routes[1].predicate(new URL(`http://127.0.0.1:4200${initPage.SESSION_PATH}`)), true);
   });
 
   it('answers only the session path on app origins', async () => {
