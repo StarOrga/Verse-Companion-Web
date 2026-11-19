@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.281.4",
+  "current": "0.281.5",
   "releases": [
+    {
+      "version": "0.281.5",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Classic ship view: the header no longer carries a factory-loadout button; the factory fit lives in the loadout."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.281.4",
       "date": "2026-11-19",
