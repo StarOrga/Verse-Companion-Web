@@ -340,6 +340,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›file-counts›value": [
+      {
+        "ship": "claude/data-uploader-extraction-spike-be3dcb",
+        "by": "JerryT2T",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-19T23:01:38.564Z",
+        "hunks": [
+          "d49afe7cb729"
+        ]
+      }
+    ],
     ".claude/project-map.md›generated counts›value": [
       {
         "ship": "batch/backlog-20261118",
