@@ -159,9 +159,18 @@ first in `listByKind`, `countByKind`, `countSearchMatches`, `countItemsByAttachT
 `listEditionSiblings` (ILIKE prefix; above 200 matches the database answers, its
 collation decides the cut); on `null` the old query runs unchanged. From the files,
 `countSearchMatches` counts like `listByKind` (token groups + matcher), so "also
-found in …" equals the list's count. Still on the database: the German-name fallback (`codex_search` RPC +
-an `in` list read), `getMissileCohort` / `getItemRankCohort` (full payload /
-`weaponParams` / `stats` are not in the files), detail pages and every other
+found in …" equals the list's count. `getMissileCohort` reads `missile.json`,
+`getItemRankCohort` reads `weapon-rank.json` / `component-rank.json` (the client
+applies the `'!'` name filter and the component kind; the silhouettes for the
+missile measurements still come from `codex_silhouettes`). The German-name
+fallback of `listByKind` matches locally when `names-de.json` and the kind's list
+file are both there (`germanListFromSnapshot`: `codex_search`'s row test — every
+token against the folded `en de` text or ILIKE the class name, `*` wildcard,
+`%`/`_`/`\` literal — then the list's own filters); it does not rank by
+`word_similarity` nor cut at 100 names, so a broad German term lists all its
+matches. Without either file the `codex_search` RPC + `in` list read run as before.
+Still on the database: `listBlueprints` (full payload, no file; no caller today),
+the `codex_search_suggest` "did you mean" RPC, detail pages and every other
 non-list read. `searchAll` pages through `listByKind`, so it reads the files too. Specs never reach the Worker: `vitest-setup.ts` answers
 `/codex-lists/` with 404.
 

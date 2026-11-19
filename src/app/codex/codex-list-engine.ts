@@ -48,8 +48,8 @@ export const INTERNAL_ITEM_ATTACH_TYPES: readonly string[] = [
   'WheeledController',
 ];
 
-/** A list file name: a kind, or the ship rank slice. */
-export type ListSnapshotName = CodexKind | 'ship-rank';
+/** A list file name: a kind, or one of the slice files (ship rank, missile and item rank cohorts). */
+export type ListSnapshotName = CodexKind | 'ship-rank' | 'missile' | 'weapon-rank' | 'component-rank';
 
 const SHIP_COLUMNS = ['class_name', 'guid', 'name_localized', 'manufacturer_code', 'role', 'crew_size', 'is_variant'] as const;
 /**
@@ -66,6 +66,10 @@ export const SNAPSHOT_COLUMNS: Record<ListSnapshotName, readonly string[]> = {
   ammunition: ['class_name', 'name_localized', 'speed', 'lifetime', 'size'],
   manufacturer: ['class_name', 'name_localized', 'manufacturer_code'],
   blueprint: ['class_name', 'name_localized', 'category', 'tier', 'craft_time_seconds', 'dismantle_time_seconds'],
+  // The cohort slices (LIST_COLUMNS of the publisher): missile carries the whole payload as its last column.
+  missile: ['class_name', 'name_localized', 'sub_type', 'size', 'attach_type', 'payload'],
+  'weapon-rank': ['class_name', 'name_localized', 'sub_type', 'size'],
+  'component-rank': ['class_name', 'name_localized', 'sub_type', 'size'],
 };
 
 /** Payload keys of the ship card file (must match SHIP_PAYLOAD_KEYS of the publisher). */
@@ -392,4 +396,156 @@ export function countFromSnapshot(
 ): number | null {
   const rows = matchRows(snap, kind, filters, mode);
   return rows ? rows.length : null;
+}
+
+// ── cohort slices ────────────────────────────────────────────────────────────
+
+/** True when `snap` is the file `name` with every column (and payload key) a cohort read needs. */
+function hasLayout(snap: ListSnapshot, name: ListSnapshotName, keys: readonly string[]): boolean {
+  return snap.name === name && SNAPSHOT_COLUMNS[name].every((c) => snap.col.has(c)) && keys.every((k) => snap.key.has(k));
+}
+
+/**
+ * getMissileCohort's rows from `missile.json`: the records of
+ * `select class_name, name_localized, sub_type, size, attach_type, payload`
+ * with `attach_type = 'Missile'` and a name (the publisher's filter, checked
+ * again here), in the file's list order. `null` (decline) for another layout.
+ */
+export function missileRowsFromSnapshot(snap: ListSnapshot): Record<string, unknown>[] | null {
+  if (!hasLayout(snap, 'missile', [])) return null;
+  const at = snap.col.get('attach_type')!;
+  const n = snap.col.get('name_localized')!;
+  return snap.rows
+    .filter((r) => r[at] === 'Missile' && r[n] !== null && r[n] !== undefined)
+    .map((r) => toRecord(snap, r, []));
+}
+
+/**
+ * getItemRankCohort's rows from `weapon-rank.json` / `component-rank.json`,
+ * shaped like its select (`wp` = payload->weaponParams; `ck` = payload->>kind
+ * as text, `stats` = payload->stats). The publisher already keeps only named,
+ * un-varianted records; this applies the rest of the query:
+ * `name_localized not like '!%'` and, for components, `payload->>kind = kind`.
+ * `null` (decline) when the file is not the expected one.
+ */
+export function itemRankRowsFromSnapshot(snap: ListSnapshot, kind: string): Record<string, unknown>[] | null {
+  const weapon = kind === 'weapon';
+  const name: ListSnapshotName = weapon ? 'weapon-rank' : 'component-rank';
+  if (!hasLayout(snap, name, weapon ? ['weaponParams'] : ['kind', 'stats'])) return null;
+  const n = snap.col.get('name_localized')!;
+  const named = (r: readonly unknown[]) => typeof r[n] === 'string' && !(r[n] as string).startsWith('!');
+  const base = (r: readonly unknown[]) => ({
+    class_name: r[snap.col.get('class_name')!] ?? null,
+    name_localized: r[n] ?? null,
+    sub_type: r[snap.col.get('sub_type')!] ?? null,
+    size: r[snap.col.get('size')!] ?? null,
+  });
+  if (weapon) {
+    const wp = snap.key.get('weaponParams')!;
+    return snap.rows.filter(named).map((r) => ({ ...base(r), wp: r[wp] ?? null }));
+  }
+  const ck = snap.key.get('kind')!;
+  const st = snap.key.get('stats')!;
+  return snap.rows
+    .filter((r) => named(r) && jsonTextOf(r[ck]) === kind)
+    .map((r) => ({ ...base(r), ck: jsonTextOf(r[ck]), stats: r[st] ?? null }));
+}
+
+// ── German-name search (mirror of the codex_search RPC) ──────────────────────
+
+/**
+ * Postgres `lower(extensions.unaccent(s))` as far as the catalog needs it:
+ * lower-case, strip combining marks (NFD), ß → ss, and the letters unaccent
+ * maps that do not decompose (ø, æ, œ, ł, đ). Other unaccent.rules entries
+ * (ligatures like ﬁ, typographic quotes/dashes, symbols like ½) are not
+ * mirrored.
+ */
+export function foldSearchText(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .replace(/ß/g, 'ss')
+    .replace(/ø/g, 'o')
+    .replace(/æ/g, 'ae')
+    .replace(/œ/g, 'oe')
+    .replace(/ł/g, 'l')
+    .replace(/đ/g, 'd');
+}
+
+/** Postgres `btrim(s)`: spaces only, not other whitespace. */
+const btrim = (s: string) => s.replace(/^ +| +$/g, '');
+
+/** `%token%` with `\`, `%`, `_` literal and `*` as the wildcard, unanchored. */
+function containsRegExp(token: string, caseInsensitive: boolean): RegExp {
+  let body = '';
+  for (const ch of token) body += ch === '*' ? '[\\s\\S]*' : ch.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+  return new RegExp(body, caseInsensitive ? 'iu' : 'u');
+}
+
+/**
+ * The row test of `codex_search(p_kind, p_build, p_tokens)`
+ * (migration 20261102100000): at most 8 tokens, each folded like the stored
+ * `search_text`, space-trimmed and cut to 60 characters; a token of nothing
+ * but `*`/spaces is skipped. A row matches when EVERY token's `%token%` hits
+ * the search text (LIKE) or the class name (ILIKE). `null` = the RPC returns
+ * nothing (no token left, or none with 3+ characters besides `*`).
+ *
+ * The test takes the English name, the German name as stored in names-de
+ * (already filtered like `codex_search_text`: absent = null) and the class name.
+ */
+export function germanSearchMatcher(
+  tokens: readonly string[],
+): ((en: string | null, de: string | null, className: string) => boolean) | null {
+  const tests: { text: RegExp; cls: RegExp }[] = [];
+  let indexable = false;
+  for (const raw of tokens.slice(0, 8)) {
+    const tok = Array.from(btrim(foldSearchText(`${raw} `))).slice(0, 60).join('');
+    if (tok.replace(/[* ]/g, '') === '') continue;
+    if (Array.from(tok.replace(/\*/g, '')).length >= 3) indexable = true;
+    tests.push({ text: containsRegExp(tok, false), cls: containsRegExp(tok, true) });
+  }
+  if (tests.length === 0 || !indexable) return null;
+  return (en, de, className) => {
+    const text = foldSearchText(`${en ?? ''} ${de ?? ''}`);
+    return tests.every((t) => t.text.test(text) || t.cls.test(className));
+  };
+}
+
+/**
+ * listByKind's German-name fallback from the kind file plus `names-de`
+ * (class name → German name of this kind): the rows that pass every
+ * non-search filter of the list (like `filteredListQuery`) AND match the
+ * tokens per {@link germanSearchMatcher}, paged, with their exact count.
+ * `null` (decline) on the same grounds as {@link listFromSnapshot}.
+ *
+ * Unlike the RPC this does not rank by `word_similarity` and cut at 100 class
+ * names (that cut only kept the `class_name=in.(…)` URL short): a term with
+ * more than 100 German matches now returns all of them, in list order.
+ */
+export function germanListFromSnapshot(
+  snap: ListSnapshot,
+  kind: CodexKind,
+  filters: CodexListFilters,
+  namesDe: ReadonlyMap<string, string>,
+  tokens: readonly string[],
+  limit: number,
+  offset: number,
+): SnapshotListResult | null {
+  const keys = payloadKeysOf(filters.payload);
+  if (!keys || !keys.every((k) => snap.key.has(k))) return null;
+  const c = snap.col.get('class_name');
+  const n = snap.col.get('name_localized');
+  if (c === undefined || n === undefined) return null;
+  const rows = matchRows(snap, kind, filters, 'ignore');
+  if (!rows) return null;
+  const matches = germanSearchMatcher(tokens);
+  const hits = matches
+    ? rows.filter((r) => {
+        const cn = r[c];
+        if (typeof cn !== 'string') return false;
+        return matches(typeof r[n] === 'string' ? (r[n] as string) : null, namesDe.get(cn) ?? null, cn);
+      })
+    : [];
+  return { records: hits.slice(offset, offset + limit).map((r) => toRecord(snap, r, keys)), count: hits.length };
 }

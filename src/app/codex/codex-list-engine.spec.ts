@@ -3,10 +3,15 @@ import {
   ListSnapshotName,
   SNAPSHOT_COLUMNS,
   countFromSnapshot,
+  foldSearchText,
+  germanListFromSnapshot,
+  germanSearchMatcher,
+  itemRankRowsFromSnapshot,
   likeRegExp,
   listFromSnapshot,
   makeSnapshot,
   matchRows,
+  missileRowsFromSnapshot,
   posixRegExp,
   prefixRowsFromSnapshot,
   snapshotNameFor,
@@ -218,6 +223,146 @@ describe('codex-list-engine', () => {
     expect(likeRegExp('*a-b/c*', true).test('aXb/c')).toBe(false);
     const s = snap('weapon', [item('P4-AR/Rifle', { name_localized: 'P4-AR / Rifle' }), item('Other')]);
     expect(names(s, 'weapon', { search: 'p4-ar/rifle' })).toEqual(['P4-AR/Rifle']);
+  });
+
+  describe('cohort slices', () => {
+    it('missile: the DB select shape (whole payload as a column), list order, publisher filter re-checked', () => {
+      const s = snap(
+        'missile',
+        [
+          { class_name: 'MSL_A', name_localized: 'Arrester', sub_type: 'Missile', size: 3, attach_type: 'Missile', payload: { a: 1 } },
+          { class_name: 'MSL_Nameless', name_localized: null, attach_type: 'Missile' },
+          { class_name: 'MSL_Other', name_localized: 'x', attach_type: 'Torpedo' },
+          { class_name: 'MSL_B', name_localized: 'Bolt', sub_type: 'Rocket', size: 1, attach_type: 'Missile', payload: null },
+        ],
+        [],
+      );
+      expect(missileRowsFromSnapshot(s)).toEqual([
+        { class_name: 'MSL_A', name_localized: 'Arrester', sub_type: 'Missile', size: 3, attach_type: 'Missile', payload: { a: 1 } },
+        { class_name: 'MSL_B', name_localized: 'Bolt', sub_type: 'Rocket', size: 1, attach_type: 'Missile', payload: null },
+      ]);
+      expect(missileRowsFromSnapshot(snap('weapon', []))).toBeNull();
+    });
+
+    it('weapon-rank: wp = weaponParams, "!" names dropped', () => {
+      const s = snap(
+        'weapon-rank',
+        [
+          { class_name: 'W1', name_localized: 'Gun', sub_type: 'Gun', size: 2, p_weaponParams: { rpm: 600 } },
+          { class_name: 'W2', name_localized: '!Placeholder', sub_type: 'Gun', size: 2, p_weaponParams: {} },
+          { class_name: 'W3', name_localized: 'Gun ! late', sub_type: null, size: null },
+        ],
+        ['weaponParams'],
+      );
+      expect(itemRankRowsFromSnapshot(s, 'weapon')).toEqual([
+        { class_name: 'W1', name_localized: 'Gun', sub_type: 'Gun', size: 2, wp: { rpm: 600 } },
+        { class_name: 'W3', name_localized: 'Gun ! late', sub_type: null, size: null, wp: null },
+      ]);
+      expect(itemRankRowsFromSnapshot(s, 'Shield')).toBeNull();
+    });
+
+    it('component-rank: only the asked kind (payload->>kind as text), "!" names dropped', () => {
+      const s = snap(
+        'component-rank',
+        [
+          { class_name: 'C1', name_localized: 'Shield A', sub_type: 'x', size: 1, p_kind: 'Shield', p_stats: { hp: 1 } },
+          { class_name: 'C2', name_localized: 'Cooler A', size: 1, p_kind: 'Cooler', p_stats: {} },
+          { class_name: 'C3', name_localized: '!Shield', size: 1, p_kind: 'Shield' },
+          { class_name: 'C4', name_localized: 'No kind', size: 1, p_kind: null },
+        ],
+        ['kind', 'stats'],
+      );
+      expect(itemRankRowsFromSnapshot(s, 'Shield')).toEqual([
+        { class_name: 'C1', name_localized: 'Shield A', sub_type: 'x', size: 1, ck: 'Shield', stats: { hp: 1 } },
+      ]);
+      expect(itemRankRowsFromSnapshot(s, 'Cooler')?.map((r) => r['class_name'])).toEqual(['C2']);
+      expect(itemRankRowsFromSnapshot(snap('component-rank', [], ['kind']), 'Shield')).toBeNull();
+    });
+  });
+
+  describe('German-name search (codex_search mirror)', () => {
+    it('folds like lower(unaccent()): umlauts, ß, ø/æ/œ/ł/đ, upper case', () => {
+      expect(foldSearchText('Größe ÄÖÜ')).toBe('grosse aou');
+      expect(foldSearchText('ẞ Øre Æther Œuvre Łódź Đak Café')).toBe('ss ore aether oeuvre lodz dak cafe');
+      expect(foldSearchText('  two  spaces ')).toBe('  two  spaces ');
+    });
+
+    const m = (tokens: string[]) => germanSearchMatcher(tokens);
+
+    it('ANDs the tokens; each hits the search text OR the class name', () => {
+      const t = m(['schild', 'gross'])!;
+      expect(t('Shield', 'Großer Schild', 'X')).toBe(true);
+      expect(t('Shield', 'Schild', 'X')).toBe(false);
+      expect(t('Shield', 'Schild', 'GROSS_01')).toBe(true);
+      // The search text is "en de": a token may span the boundary, like in SQL.
+      expect(m(['ld sch'])!('Shield', 'Schild', 'X')).toBe(true);
+    });
+
+    it('`*` is the wildcard; `%`, `_` and `\\` are literal', () => {
+      expect(m(['sch*ld'])!('', 'Schutzschild', 'X')).toBe(true);
+      expect(m(['abc%'])!('', 'abcd', 'X')).toBe(false);
+      expect(m(['abc%'])!('', 'abc% rabatt', 'X')).toBe(true);
+      expect(m(['abc_d'])!('', 'abcxd', 'X')).toBe(false);
+      expect(m(['abc_d'])!('', 'x', 'ABC_D_1')).toBe(true);
+      expect(m(['a\\bc'])!('', 'a\\bc', 'X')).toBe(true);
+    });
+
+    it('folds the tokens and the German name (ß, umlauts, accents)', () => {
+      expect(m(['GRÖSSE'])!('', 'Größe', 'X')).toBe(true);
+      expect(m(['grosse'])!('', 'GRÖẞE', 'X')).toBe(true);
+      expect(m(['kuhler'])!('Cooler', 'Kühler', 'X')).toBe(true);
+    });
+
+    it('skips wildcard-only tokens, takes 8 tokens, needs one of 3+ characters', () => {
+      expect(m([])).toBeNull();
+      expect(m(['**', 'ab'])).toBeNull();
+      expect(m(['ab', 'c*d'])).toBeNull();
+      expect(m(['**', 'abc'])!('abc', null, 'X')).toBe(true);
+      const nine = ['abc', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'zzz'];
+      expect(m(nine)!('abc b c d e f g h', null, 'X')).toBe(true);
+    });
+
+    it('cuts a token at 60 characters', () => {
+      const long = 'a'.repeat(60) + 'zzz';
+      expect(m([long])!('a'.repeat(60), null, 'X')).toBe(true);
+    });
+
+    const ws = snap('weapon', [
+      item('BEHR_Rifle', { name_localized: 'Rifle', p_name: 'r' }),
+      item('BEHR_Rifle_Var', { name_localized: 'Rifle', is_variant: true }),
+      item('KLWE_Pistol', { name_localized: 'Pistol', weapon_class: 'FPS' }),
+      item('Other', { name_localized: 'Other' }),
+    ]);
+    const de = new Map([
+      ['BEHR_Rifle', 'Gewehr'],
+      ['BEHR_Rifle_Var', 'Gewehr'],
+      ['KLWE_Pistol', 'Pistole Gewehrartig'],
+    ]);
+
+    it('lists the German hits through every non-search filter, list order, exact count', () => {
+      const out = germanListFromSnapshot(ws, 'weapon', { search: 'gewehr' }, de, ['gewehr'], 10, 0)!;
+      expect(out.records.map((r) => r['class_name'])).toEqual(['BEHR_Rifle', 'KLWE_Pistol']);
+      expect(out.count).toBe(2);
+      expect(out.records[0]['p_name']).toBe('r');
+      const fps = germanListFromSnapshot(ws, 'weapon', { search: 'gewehr', weaponClass: 'FPS' }, de, ['gewehr'], 10, 0)!;
+      expect(fps.records.map((r) => r['class_name'])).toEqual(['KLWE_Pistol']);
+      const page = germanListFromSnapshot(ws, 'weapon', { search: 'gewehr', includeVariants: true }, de, ['gewehr'], 1, 1)!;
+      expect(page.count).toBe(3);
+      expect(page.records.map((r) => r['class_name'])).toEqual(['BEHR_Rifle_Var']);
+    });
+
+    it('returns every match above 100 (no RPC cut)', () => {
+      const many = snap('weapon', Array.from({ length: 150 }, (_, i) => item(`W_${String(i).padStart(3, '0')}`, { name_localized: `Gun ${i}` })));
+      const names = new Map(Array.from({ length: 150 }, (_, i) => [`W_${String(i).padStart(3, '0')}`, `Kanone ${i}`] as [string, string]));
+      const out = germanListFromSnapshot(many, 'weapon', { search: 'kanone' }, names, ['kanone'], 25, 0)!;
+      expect(out.count).toBe(150);
+      expect(out.records.length).toBe(25);
+    });
+
+    it('declines like listFromSnapshot (full payload, missing payload key)', () => {
+      expect(germanListFromSnapshot(ws, 'weapon', { payload: 'full' }, de, ['gewehr'], 10, 0)).toBeNull();
+      expect(germanListFromSnapshot(ws, 'weapon', { payload: ['stats'] }, de, ['gewehr'], 10, 0)).toBeNull();
+    });
   });
 
   describe('prefixRowsFromSnapshot (sibling reads)', () => {

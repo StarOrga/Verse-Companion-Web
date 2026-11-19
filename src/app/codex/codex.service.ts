@@ -58,17 +58,21 @@ export interface SearchAllFilters {
 import { ilikeTokenGroups, ilikeTokenPatterns, normalizeSearch, searchMatcher, searchTokens } from './codex-search';
 import { UpcomingShipsService } from './upcoming-ships.service';
 import { CodexLocaleShards } from './codex-locale-shards';
-import { CodexListSnapshots } from './codex-list-snapshots';
+import { CodexListSnapshots, NamesDe } from './codex-list-snapshots';
 import {
   CARD_PAYLOAD_KEYS,
   INTERNAL_ITEM_ATTACH_TYPES,
   ListSnapshot,
+  ListSnapshotName,
   NON_SHIP_VEHICLE_PREFIXES,
   SearchMode,
   countFromSnapshot,
+  germanListFromSnapshot,
+  itemRankRowsFromSnapshot,
   jsonTextOf,
   listFromSnapshot,
   matchRows,
+  missileRowsFromSnapshot,
   prefixRowsFromSnapshot,
   snapshotNameFor,
 } from './codex-list-engine';
@@ -953,7 +957,11 @@ export class CodexService {
    */
   private async snapshotOf(buildId: string, kind: CodexKind, payload: ListPayload | undefined): Promise<ListSnapshot | null> {
     const name = snapshotNameFor(kind, payload);
-    if (!name) return null;
+    return name ? this.snapshotFile(buildId, name) : null;
+  }
+
+  /** One list file of the build by name, or `null` (not published, outage, still loading). Never throws. */
+  private async snapshotFile(buildId: string, name: ListSnapshotName): Promise<ListSnapshot | null> {
     try {
       return await this.listSnapshots.rows(buildId, name);
     } catch {
@@ -1121,6 +1129,10 @@ export class CodexService {
    * Calling the RPC first for every search would turn a broad term ("a",
    * "helm") into an id list too long for a URL.
    *
+   * With `names-de.json` and the kind's list file both at hand the same
+   * match runs locally ({@link snapshotGermanList}); otherwise the RPC path
+   * below runs unchanged.
+   *
    * @returns null when the fallback cannot answer (RPC not deployed yet, an
    *   error, no German match) — the caller keeps its empty result.
    */
@@ -1131,6 +1143,8 @@ export class CodexService {
     limit: number,
     offset: number,
   ): Promise<CodexListResult | null> {
+    const fromFile = await this.snapshotGermanList(kind, buildId, filters, limit, offset);
+    if (fromFile) return fromFile.count > 0 ? fromFile : null;
     const ids = await this.searchClassNames(kind, buildId, filters.search ?? '');
     if (ids.length === 0) return null;
     try {
@@ -1145,6 +1159,38 @@ export class CodexService {
     } catch {
       return null;
     }
+  }
+
+  /**
+   * The German-name fallback from `names-de.json` + the kind's list file
+   * (germanListFromSnapshot mirrors the RPC's row test, without its 100-name
+   * cut), or `null` when either file is missing or the engine declines — the
+   * RPC path then answers.
+   */
+  private snapshotGermanList(
+    kind: CodexKind,
+    buildId: string,
+    filters: CodexListFilters,
+    limit: number,
+    offset: number,
+  ): Promise<CodexListResult | null> {
+    return this.fromSnapshot('german search', async () => {
+      const tokens = searchTokens(filters.search ?? '');
+      // searchClassNames' guard: without a 3-character token there is no German search.
+      if (!tokens.some((t) => t.replace(/\*/g, '').length >= 3)) return { rows: [], count: 0 };
+      let names: NamesDe | null;
+      try {
+        names = await this.listSnapshots.namesDe(buildId);
+      } catch {
+        return null;
+      }
+      const forKind = names?.get(kind);
+      if (!forKind) return null;
+      const snap = await this.snapshotOf(buildId, kind, filters.payload);
+      const hit = snap && germanListFromSnapshot(snap, kind, filters, forKind, tokens, limit, offset);
+      if (!hit) return null;
+      return { rows: hit.records.map((r) => mapListRow(kind, r)), count: hit.count };
+    });
   }
 
   /**
@@ -2418,20 +2464,29 @@ export class CodexService {
     const build = await this.loadCurrentBuild();
     if (!build) return [];
     if (this.missileCohort?.buildId === build.id) return this.missileCohort.records;
-    const { data, error } = await this.sb.client
-      .from(CODEX_ENTITY_TABLES.item)
-      .select('class_name, name_localized, sub_type, size, attach_type, payload')
-      .eq('build_id', build.id)
-      .eq('attach_type', 'Missile')
-      .not('name_localized', 'is', null);
-    if (error) throw error;
-    const rows = (data ?? []) as unknown as Record<string, unknown>[];
+    const rows =
+      (await this.fromSnapshot('missile cohort', async () => {
+        const snap = await this.snapshotFile(build.id, 'missile');
+        return snap && missileRowsFromSnapshot(snap);
+      })) ?? (await this.missileRowsFromDb(build.id));
     const silhouettes = await this.silhouettes('item', rows.map((row) => String(row['class_name'])));
     const records = rows.map((row) =>
       missileRecordOf(row, row['payload'], silhouettes.get(String(row['class_name']))),
     );
     this.missileCohort = { buildId: build.id, records };
     return records;
+  }
+
+  /** The database path of {@link getMissileCohort}'s rows, unchanged. */
+  private async missileRowsFromDb(buildId: string): Promise<Record<string, unknown>[]> {
+    const { data, error } = await this.sb.client
+      .from(CODEX_ENTITY_TABLES.item)
+      .select('class_name, name_localized, sub_type, size, attach_type, payload')
+      .eq('build_id', buildId)
+      .eq('attach_type', 'Missile')
+      .not('name_localized', 'is', null);
+    if (error) throw error;
+    return (data ?? []) as unknown as Record<string, unknown>[];
   }
 
   /** {@link getItemRankCohort}'s answers, per build and comparison kind. A failed read is not kept. */
@@ -2449,20 +2504,11 @@ export class CodexService {
     const cached = this.itemRankCohorts.get(key);
     if (cached) return cached;
     const entity = kind === 'weapon' ? 'weapon' : 'component';
-    const columns =
-      kind === 'weapon'
-        ? 'class_name, name_localized, sub_type, size, wp:payload->weaponParams'
-        : 'class_name, name_localized, sub_type, size, ck:payload->>kind, stats:payload->stats';
-    const query = this.sb.client
-      .from(CODEX_ENTITY_TABLES[entity])
-      .select(columns)
-      .eq('build_id', build.id)
-      .not('name_localized', 'is', null)
-      .eq('is_variant', false)
-      .not('name_localized', 'like', '!*');
-    const { data, error } = await (kind === 'weapon' ? query : query.eq('payload->>kind', kind));
-    if (error) throw error;
-    const rows = (data ?? []) as unknown as Record<string, unknown>[];
+    const rows =
+      (await this.fromSnapshot('item rank cohort', async () => {
+        const snap = await this.snapshotFile(build.id, kind === 'weapon' ? 'weapon-rank' : 'component-rank');
+        return snap && itemRankRowsFromSnapshot(snap, kind);
+      })) ?? (await this.itemRankRowsFromDb(build.id, kind));
     const records = rows
       .map((row) =>
         itemRankRecordOf(entity, row, kind === 'weapon' ? { weaponParams: row['wp'] } : { kind: row['ck'], stats: row['stats'] }),
@@ -2470,6 +2516,25 @@ export class CodexService {
       .filter((r): r is ItemRankRecord => r !== null);
     this.itemRankCohorts.set(key, records);
     return records;
+  }
+
+  /** The database path of {@link getItemRankCohort}'s rows, unchanged. */
+  private async itemRankRowsFromDb(buildId: string, kind: ItemRankKind): Promise<Record<string, unknown>[]> {
+    const entity = kind === 'weapon' ? 'weapon' : 'component';
+    const columns =
+      kind === 'weapon'
+        ? 'class_name, name_localized, sub_type, size, wp:payload->weaponParams'
+        : 'class_name, name_localized, sub_type, size, ck:payload->>kind, stats:payload->stats';
+    const query = this.sb.client
+      .from(CODEX_ENTITY_TABLES[entity])
+      .select(columns)
+      .eq('build_id', buildId)
+      .not('name_localized', 'is', null)
+      .eq('is_variant', false)
+      .not('name_localized', 'like', '!*');
+    const { data, error } = await (kind === 'weapon' ? query : query.eq('payload->>kind', kind));
+    if (error) throw error;
+    return (data ?? []) as unknown as Record<string, unknown>[];
   }
 
   /**

@@ -9,7 +9,7 @@ import { ListSnapshot, ListSnapshotName, SNAPSHOT_COLUMNS, makeSnapshot } from '
  * supabase/functions/ingest-catalog/_list-snapshots.ts is the source of truth.
  *
  *   codex-lists/<build>/index.json          which files exist, their gen (5 min cache)
- *   codex-lists/<build>/<gen>/<name>.json   one kind's rows, or `facets` (immutable)
+ *   codex-lists/<build>/<gen>/<name>.json   one kind's rows, a slice, `facets` or `names-de` (immutable)
  *
  * The parsed files stay in memory for the current build — they are the list
  * cache. Every answer is "a snapshot" or `null`; `null` means the caller reads
@@ -45,6 +45,26 @@ export function isListsIndex(v: unknown, buildId: string): v is ListsIndex {
     !!i.files && typeof i.files === 'object' && !Array.isArray(i.files);
 }
 
+/** names-de.json: per kind, class name → raw German name (only names `codex_search` would include). */
+export type NamesDe = ReadonlyMap<string, ReadonlyMap<string, string>>;
+
+/** names-de.json → {@link NamesDe}, or `null` when its shape is not what this client reads. */
+export function parseNamesDe(body: unknown): NamesDe | null {
+  const f = body as { v?: unknown; lang?: unknown; kinds?: unknown } | null;
+  if (!f || f.v !== 1 || f.lang !== 'de' || !f.kinds || typeof f.kinds !== 'object' || Array.isArray(f.kinds)) return null;
+  const out = new Map<string, ReadonlyMap<string, string>>();
+  for (const [kind, list] of Object.entries(f.kinds as Record<string, unknown>)) {
+    if (!Array.isArray(list)) return null;
+    const names = new Map<string, string>();
+    for (const e of list) {
+      if (!Array.isArray(e) || e.length !== 2 || typeof e[0] !== 'string' || typeof e[1] !== 'string') return null;
+      names.set(e[0], e[1]);
+    }
+    out.set(kind, names);
+  }
+  return out;
+}
+
 /** A kind file → snapshot, or `null` when its shape is not what this client reads. */
 export function parseListFile(body: unknown, name: ListSnapshotName): ListSnapshot | null {
   const f = body as { v?: unknown; kind?: unknown; columns?: unknown; payloadKeys?: unknown; rows?: unknown } | null;
@@ -74,7 +94,7 @@ export const LIST_SNAPSHOT_BASE = new InjectionToken<string>('LIST_SNAPSHOT_BASE
 
 class NotPublished extends Error {}
 
-type FileName = ListSnapshotName | 'facets';
+type FileName = ListSnapshotName | 'facets' | 'names-de';
 
 @Injectable({ providedIn: 'root' })
 export class CodexListSnapshots {
@@ -110,6 +130,11 @@ export class CodexListSnapshots {
   /** facets.json of `buildId` (`kinds` map), or `null` — same rules as {@link rows}. */
   async facets(buildId: string, waitMs = LIST_SNAPSHOT_WAIT_MS): Promise<ListFacets | null> {
     return (await this.file(buildId, 'facets', waitMs)) as ListFacets | null;
+  }
+
+  /** names-de.json of `buildId`, or `null` — same rules as {@link rows}. */
+  async namesDe(buildId: string, waitMs = LIST_SNAPSHOT_WAIT_MS): Promise<NamesDe | null> {
+    return (await this.file(buildId, 'names-de', waitMs)) as NamesDe | null;
   }
 
   private async file(buildId: string, name: FileName, waitMs: number): Promise<unknown> {
@@ -229,6 +254,9 @@ export class CodexListSnapshots {
     if (name === 'facets') {
       const f = res.body as { v?: unknown; kinds?: unknown } | null;
       if (f && f.v === 1 && f.kinds && typeof f.kinds === 'object' && !Array.isArray(f.kinds)) return f.kinds;
+    } else if (name === 'names-de') {
+      const names = parseNamesDe(res.body);
+      if (names) return names;
     } else {
       const snap = parseListFile(res.body, name);
       if (snap) return snap;
