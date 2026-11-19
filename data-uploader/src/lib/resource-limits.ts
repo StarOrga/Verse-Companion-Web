@@ -261,8 +261,16 @@ export function dumpWorkers(limits: ResourceLimits, cores: number): number {
   return Math.max(1, Math.min(total - 1 || 1, Math.floor((total * limits.cpuPct) / 100)));
 }
 
-/** Rough resident size of one 3D-export worker (own P4K index + DataCore). */
-export const SKIN_WORKER_MB = 3072;
+/**
+ * Resident size of one 3D-export worker (own compact P4K index + DataCore, plus
+ * its converter and optimizer children). Measured 2026-11-19, one worker
+ * (`--workers 1 --package --interior`) building ANVL_Carrack from the real LIVE
+ * Data.p4k: Python root peak working set 1375 MB, whole-tree peak sum 1327 MB
+ * (sampled every 0.5 s; root 1232 + cgf-converter 277 + node gltf-transform 212
+ * at their individual peaks = 1.7 GB worst case), tree private commit 1780 MB.
+ * 2048 covers the worst case; it was 3072 with the full P4K index.
+ */
+export const SKIN_WORKER_MB = 2048;
 
 /**
  * Cores the CPU share covers, rounded UP. Rounding down would leave the run

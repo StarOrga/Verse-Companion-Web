@@ -87,8 +87,8 @@ describe('resource limits', () => {
   it('sizes workers by CPU share and RAM', () => {
     expect(dumpWorkers({ ...presetLimits('full', pc), cpuPct: 50 }, 16)).toBe(8);
     expect(dumpWorkers({ ...presetLimits('full', pc), cpuPct: 90 }, 16)).toBe(14);
-    expect(skinWorkers({ ...presetLimits('full', pc), cpuPct: 90, ramMb: 4096 }, 16)).toBe(1);
-    expect(skinWorkers({ ...presetLimits('full', pc), cpuPct: 90, ramMb: 20000 }, 16)).toBe(6);
+    expect(skinWorkers({ ...presetLimits('full', pc), cpuPct: 90, ramMb: 3072 }, 16)).toBe(1);
+    expect(skinWorkers({ ...presetLimits('full', pc), cpuPct: 90, ramMb: 20000 }, 16)).toBe(7);
     expect(skinWorkers({ ...presetLimits('full', pc), cpuPct: 80, ramMb: 15616 }, 12)).toBe(5);
   });
 
