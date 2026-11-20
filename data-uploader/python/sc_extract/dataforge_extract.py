@@ -591,6 +591,7 @@ class CodexExtractor:
         self.extract_ammunition()
         self.extract_blueprints()     # crafting blueprints (CraftingBlueprintRecord)
         self.extract_missions()       # contracts (MissionBrokerEntry), see missions.py
+        self.extract_locations()      # Verse places (StarMapObject + system socpaks), see starmap.py
         self.extract_entities()       # ships / weapons / components / items
         self._dump_room_strings()     # scc_room_* labels for the translation pipeline (E14)
         self._write_skin_build_manifest()
@@ -775,6 +776,20 @@ class CodexExtractor:
         self._bump("missions", extract_missions(self.df, self._localized, self.out,
                                                 self.source, self.on_log,
                                                 contracts=self._blueprint_sources().missions))
+
+    # ── Verse locations ─────────────────────────────────────────────────────────
+    def extract_locations(self) -> None:
+        """A failure here (unexpected real data) costs the locations, never the run."""
+        if self.p4k is None:
+            self.on_log("info", "locations: no open P4K — skipped")
+            return
+        try:
+            from .starmap import extract_locations
+
+            self._bump("locations", extract_locations(self.df, self._localized, self.p4k,
+                                                      self.out, self.on_log))
+        except Exception as exc:  # noqa: BLE001
+            self.on_log("warn", f"locations skipped: {type(exc).__name__}: {exc}")
 
     def _blueprint_sources(self):
         """Contracts that award blueprints, once per run; a failure costs the link, never the run."""

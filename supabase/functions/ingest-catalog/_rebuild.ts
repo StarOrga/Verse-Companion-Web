@@ -29,6 +29,7 @@ export const CLONE_TABLES: readonly string[] = [
 export const CLEAR_OP_TABLES: Readonly<Record<string, string>> = {
   clear_ports: 'codex_item_ports',
   clear_ingredients: 'codex_blueprint_ingredients',
+  clear_locations: 'codex_locations',
   clear_silhouettes: 'codex_silhouettes_rows',
   silhouette_skips: 'codex_silhouette_skips',
 };

@@ -148,12 +148,14 @@ export const SUBTHEMES: readonly Subtheme[] = [
     //    career/list contracts that award a blueprint (blueprint_sources.py).
     // 7: codex_blueprints gains dismantle_yield / dismantlable (HQ Bestand, #1058).
     // 8: codex_entity_strings — names behind a `,P`-marked loc key resolve.
-    revision: 8,
+    // 9: codex_locations — Verse places from the game data (starmap.py, #1194).
+    revision: 9,
     phases: [
       'codex_manufacturers',
       'codex_blueprints',
       'codex_blueprint_ingredients',
       'codex_missions',
+      'codex_locations',
       'codex_entity_strings',
       'codex_item_ports',
       'codex_previews',
@@ -166,6 +168,7 @@ export const SUBTHEMES: readonly Subtheme[] = [
       'data-uploader/python/sc_extract/images.py',
       'data-uploader/python/sc_extract/blueprint_sources.py',
       'data-uploader/python/sc_extract/missions.py',
+      'data-uploader/python/sc_extract/starmap.py',
       'data-uploader/python/sc_extract/keybinds.py',
     ],
   },

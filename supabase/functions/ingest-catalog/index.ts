@@ -33,6 +33,12 @@
 //        (rows: the extractor's missions/<class>.json bodies; mapped to the
 //         pinned codex_missions columns by _missions.ts, upserted on
 //         (build_id, class_name) so a resumed run is idempotent)
+//   POST { op: "clear_locations",  build_id }                          -> { ok }
+//   POST { op: "locations",        build_id, rows: [...] }             -> { upserted }
+//        (rows: the extractor's locations/<id>.json bodies — codex_locations
+//         columns, pinned by _locations.ts, upserted on (build_id, id). The
+//         uploader clears the build's rows first on a fresh phase, so a
+//         re-ingest of the same build replaces its rows and never duplicates.)
 //   POST { op: "carry",            build_id, table, rows: [{k, h}], set? } -> { kept, copied, missing: [i] }
 //        (per-object incremental upload, migration 20261102000000: rows whose
 //         content hash h is already in this build are kept, rows found with h
@@ -59,7 +65,9 @@
 //         and deletes the rows once the public Worker serves them — see below)
 //   POST { op: "locale_publish",   build_id, lang?, delete_source? }   -> { ok, results }
 //        (service role or the gates below; one language per call keeps it short)
-//   POST { op: "lists_publish",     build_id }                          -> { ok, result }  (codex-lists/ files)
+//   POST { op: "lists_publish",     build_id, detach? }                 -> { ok, result }  (codex-lists/ files)
+//        (detach:true, service role only: -> 202 { ok, started } at once, the publish
+//         runs after the response and only logs - how finalize starts it, _self-call.ts)
 //   POST { op: "silhouettes_publish", build_id, gen?, cursor?, chain? } -> { ok, result }
 //        (codex-silhouettes/ shards, ONE small step per call: no gen = plan, a
 //         cursor = that slice, "commit" = index + collection. Repeat with the
@@ -107,6 +115,7 @@ import { LIST_FILTERS, LIST_TABLES, LISTS_ROOT, selectFor } from './_list-snapsh
 import { GEN_RE as SILHOUETTE_GEN_RE, SILHOUETTE_SELECT, SILHOUETTE_TABLES, SILHOUETTES_ROOT } from './_silhouette-shards.ts';
 import { type SilhouettePublishDeps, type StepResult, parseCursor, publishSilhouetteStep } from './_silhouette-publish.ts';
 import { PART_SELECT } from './_rank-parts.ts';
+import { WORKER_ID, callOwnOp } from './_self-call.ts';
 import { enqueueTranslationJobs } from './_translation-enqueue.ts';
 import { gcLocalePrefixes } from './_locale-gc.ts';
 import {
@@ -125,6 +134,7 @@ import { isCarryUnavailable, isRpcMissing, parseCarry, parsePrune } from './_car
 import { sanitizeSilhouetteRow } from './_silhouette-row.ts';
 import { parseSkips } from './_silhouette-skips.ts';
 import { MAX_MISSION_ROWS, parseMissions } from './_missions.ts';
+import { MAX_LOCATION_ROWS, parseLocations } from './_locations.ts';
 import type { PublishDeps, PublishResult } from './_locale-publish.ts';
 import { CLEAR_OP_TABLES, isLegacyNatkeyConflict, isRebuildUnavailable, prepareRebuild, refusedSwitchStatus } from './_rebuild.ts';
 import type { RebuildPlan } from './_rebuild.ts';
@@ -420,28 +430,35 @@ function silhouettePublishDeps(admin: Admin, r2: R2): SilhouettePublishDeps {
 const SILHOUETTE_CHAIN_MAX_HOPS = 400;
 
 /**
- * One call of this function to itself (service key in both headers, storage.md):
- * the next step of a chained silhouette publish runs as its own request, so no
- * worker carries more than one step's CPU. One retry; a failure only ends the
- * chain - no index is written and clients keep reading the table.
+ * The next step of a chained silhouette publish as a request of its own
+ * (_self-call.ts), so no worker carries more than one step's CPU. A failure only
+ * ends the chain - no index is written and clients keep reading the table.
  */
 async function callSilhouetteStep(supabaseUrl: string, serviceKey: string, body: Record<string, unknown>): Promise<void> {
-  for (let attempt = 0; attempt < 2; attempt++) {
-    try {
-      const res = await fetch(`${supabaseUrl}/functions/v1/ingest-catalog`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', authorization: `Bearer ${serviceKey}`, apikey: serviceKey },
-        body: JSON.stringify({ ...body, op: 'silhouettes_publish', chain: true }),
-      });
-      if (res.ok) {
-        await res.body?.cancel();
-        return;
-      }
-      console.error(`ingest-catalog: silhouettes step ${JSON.stringify(body)}: HTTP ${res.status} ${(await res.text()).slice(0, 160)}`);
-    } catch (e) {
-      console.error(`ingest-catalog: silhouettes step ${JSON.stringify(body)} failed: ${(e as Error).message}`);
-    }
-    if (attempt === 0) await new Promise((r) => setTimeout(r, 2000));
+  // A step may run twice (slices are repeatable, two plans end in one index: commit), so a lost answer is retried.
+  await callOwnOp(supabaseUrl, serviceKey, { ...body, op: 'silhouettes_publish', chain: true }, { retryThrown: true });
+}
+
+/**
+ * The catalog lists of a build as a request of its own (_self-call.ts): `detach`
+ * makes that request answer at once and publish on its own worker, so this one
+ * neither pays the publish's CPU nor waits its ~70 s. A request that threw is not
+ * sent again: it may have arrived, and two publishes of one build at once can leave
+ * the index naming a generation the other one collected. A failure only leaves the
+ * tables as the source; `lists_publish` redoes it.
+ */
+async function callListsPublish(supabaseUrl: string, serviceKey: string, buildId: string): Promise<void> {
+  await callOwnOp(supabaseUrl, serviceKey, { op: 'lists_publish', build_id: buildId, detach: true }, { retryThrown: false });
+}
+
+/** One lists publish that only logs: its caller has already answered. */
+async function publishListsLogged(admin: Admin, r2: R2, buildId: string): Promise<void> {
+  try {
+    const r = await publishLists(buildId, listPublishDeps(admin, r2));
+    if (r.blocked) console.error(`ingest-catalog: lists publish ${buildId} (worker ${WORKER_ID}) blocked: ${r.blocked.code} ${r.blocked.message}`);
+    else console.log(`ingest-catalog: lists publish ${buildId} (worker ${WORKER_ID}): ${JSON.stringify(r)}`);
+  } catch (e) {
+    console.error(`ingest-catalog: lists publish ${buildId} (worker ${WORKER_ID}) failed: ${(e as Error).message}`);
   }
 }
 
@@ -851,6 +868,28 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       return json({ ok: true, upserted: rows.length });
     }
 
+    if (op === 'clear_locations') {
+      const buildId = String(body.build_id ?? '');
+      if (!buildId) return json({ error: 'invalid_body' }, 400);
+      const { error } = await admin.from('codex_locations').delete().eq('build_id', buildId);
+      if (error) throw error;
+      await markCleared(admin, op, buildId);
+      return json({ ok: true });
+    }
+
+    if (op === 'locations') {
+      const buildId = String(body.build_id ?? '');
+      const list = body.rows as unknown[];
+      if (!buildId || !Array.isArray(list) || list.length === 0 || list.length > MAX_LOCATION_ROWS) {
+        return json({ error: 'invalid_body', message: 'build_id + 1..' + MAX_LOCATION_ROWS + ' rows required' }, 400);
+      }
+      const rows = parseLocations(list, buildId);
+      if (rows.length === 0) return json({ ok: true, upserted: 0 });
+      const { error } = await admin.from('codex_locations').upsert(rows, { onConflict: 'build_id,id' });
+      if (error) throw error;
+      return json({ ok: true, upserted: rows.length });
+    }
+
     if (op === 'clear_ports') {
       const buildId = String(body.build_id ?? '');
       if (!buildId) return json({ error: 'invalid_body' }, 400);
@@ -1142,12 +1181,16 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       // worker has little CPU left after an ingest), started first so it is out
       // before the heavier work below begins. A failure only leaves the table as the source.
       afterResponse(callSilhouetteStep(supabaseUrl, serviceKey, { build_id: buildId, hop: 0 }));
+      // The catalog lists as files per build: one request of their own for the same
+      // reason, also started before the locale publish below, so a worker killed over
+      // that one no longer takes the lists with it. The two do not meet: the lists read the
+      // catalog tables and the facet RPC, never the locale rows the publish below deletes.
+      // A failure only leaves the tables as the source.
+      console.log(`ingest-catalog: finalize ${buildId} answered on worker ${WORKER_ID}`);
+      afterResponse(callListsPublish(supabaseUrl, serviceKey, buildId));
       // After the response: the uploader's finalize must not wait ~30 s for
       // 11 languages. A failure only leaves the rows in place (clients keep
       // reading them); locale_publish or the backfill script can redo it.
-      // One after the other in the same isolate (memory: 546 before); each
-      // failure is logged on its own and never skips the next step. The catalog
-      // lists as files per build come last; a failure only leaves the tables as the source.
       afterResponse((async () => {
         try {
           const results = await publishBuildLocales(admin, r2, buildId, null, true);
@@ -1155,12 +1198,6 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
           await translationAfterPublish(admin, supabaseUrl, serviceKey, buildId, results);
         } catch (e) {
           console.error(`ingest-catalog: locale publish ${buildId} failed: ${(e as Error).message}`);
-        }
-        try {
-          const r = await publishLists(buildId, listPublishDeps(admin, r2));
-          console.log(`ingest-catalog: lists publish ${buildId}: ${JSON.stringify(r)}`);
-        } catch (e) {
-          console.error(`ingest-catalog: lists publish ${buildId} failed: ${(e as Error).message}`);
         }
       })());
       return json({ ok: true, current: true, ...replaced, locale_publish: 'started' });
@@ -1187,6 +1224,12 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       if (!BUILD_ID_RE.test(buildId)) return json({ error: 'invalid_body', message: 'build_id (uuid) required' }, 400);
       const r2 = r2FromEnv((k) => Deno.env.get(k));
       if (!r2) return json({ error: 'r2_not_configured' }, 503);
+      // detach (the function's own call after finalize, service key only): answer now
+      // and publish after the response, on this worker's own CPU budget.
+      if (body.detach === true && !!authHeader && safeEqual(authHeader, `Bearer ${serviceKey}`)) {
+        afterResponse(publishListsLogged(admin, r2, buildId));
+        return json({ ok: true, started: true }, 202);
+      }
       const result = await publishLists(buildId, listPublishDeps(admin, r2));
       if (result.blocked) return json({ error: result.blocked.code, message: result.blocked.message }, result.blocked.status);
       console.log(`ingest-catalog: lists_publish ${buildId}: ${JSON.stringify(result)}`);

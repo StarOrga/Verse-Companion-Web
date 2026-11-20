@@ -38,7 +38,8 @@ describe('catalogPhaseIndex', () => {
     expect(catalogPhaseIndex('codex_locale_strings')).toBe(2);
     expect(catalogPhaseIndex('codex_ships')).toBe(4);
     expect(catalogPhaseIndex('codex_missions')).toBe(11);
-    expect(catalogPhaseIndex('codex_item_ports')).toBe(13);
+    expect(catalogPhaseIndex('codex_locations')).toBe(12);
+    expect(catalogPhaseIndex('codex_item_ports')).toBe(14);
   });
 
   it('returns null for an unknown phase rather than a bogus 0', () => {
