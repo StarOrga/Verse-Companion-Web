@@ -592,7 +592,12 @@ const SAFE_SVG = new Map<string, SafeHtml>();
       background: var(--sc-bg-1); color: inherit; overflow: hidden; min-height: 200px;
       transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     }
-    .card-link { color: inherit; text-decoration: none; }
+    /* The title anchor is a real 48px target (the stretched ::before-span below makes the whole card one). */
+    .card-link { display: block; min-height: var(--sc-tap-min, 48px); padding-block: 4px; box-sizing: border-box; color: inherit; text-decoration: none; }
+    /* Touch: off-screen cards cost no layout/paint until they scroll near; the lift/glow (hover only) needs no extra paint room. */
+    @media (hover: none) {
+      .card { content-visibility: auto; contain-intrinsic-size: auto 300px; }
+    }
     .card-link-touch-target { position: absolute; inset: 0; z-index: 5; }
     .card-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: 3px; }
     .card:hover {

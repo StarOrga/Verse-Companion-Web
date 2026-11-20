@@ -1,5 +1,17 @@
 import { DestroyRef, Injectable, Signal, signal } from '@angular/core';
 
+/** One entry of the phone's Tools dial that a page registers (ship page: share, QR hand-off ...). */
+export interface CornerAction {
+  readonly id: string;
+  /** Inline SVG path data (24x24 viewBox, stroked). */
+  readonly icon: string;
+  /** i18n key of the label (chip beside the button, aria-label). */
+  readonly labelKey: string;
+  readonly run: () => void;
+  /** Lower first; the view switch is 0, β is 100. */
+  readonly order?: number;
+}
+
 /** What a page hands the view FAB: which view is on and how to switch. */
 export interface PageViewToggle {
   /** true = Holotisch, false = Klassisch. */
@@ -26,7 +38,10 @@ export interface PageShare {
 export class PageCornerService {
   private readonly viewReg = signal<PageViewToggle | null>(null);
   private readonly shareReg = signal<PageShare | null>(null);
+  private readonly actionList = signal<readonly CornerAction[]>([]);
   readonly view = this.viewReg.asReadonly();
+  /** Extra dial actions of the page on screen, sorted by `order`. */
+  readonly actions = this.actionList.asReadonly();
   readonly share = this.shareReg.asReadonly();
 
   /** Registers (or with `null` withdraws) the page's view switch; withdrawn with `owner` too. */
@@ -38,6 +53,13 @@ export class PageCornerService {
   setShare(reg: PageShare | null, owner?: DestroyRef): void {
     this.shareReg.set(reg);
     if (reg && owner) owner.onDestroy(() => this.shareReg() === reg && this.shareReg.set(null));
+  }
+
+  /** Adds (or replaces, same id) a dial action; returns the unregister function. Pages register on phone / compact instead of drawing their own FAB. */
+  register(id: string, action: Omit<CornerAction, 'id'>): () => void {
+    const entry: CornerAction = { id, ...action };
+    this.actionList.update((l) => [...l.filter((a) => a.id !== id), entry].sort((a, b) => (a.order ?? 50) - (b.order ?? 50)));
+    return () => this.actionList.update((l) => (l.includes(entry) ? l.filter((a) => a !== entry) : l));
   }
 
   /** Withdraws only what this page registered (a newer page may already own the corner). */

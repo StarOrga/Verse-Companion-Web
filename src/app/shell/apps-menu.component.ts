@@ -24,6 +24,7 @@ import { logWarn } from '../core/log';
 import { isPlainLeftClick } from '../core/modified-click.util';
 import { DesktopProduct, ringsForRole } from '../desktop/desktop-access';
 import { DesktopReleaseService, RingRelease } from '../desktop/desktop-release.service';
+import { PwaInstallService } from '../core/pwa/pwa-install.service';
 import { SCC_INSTALLER_URL } from '../news/verse-status-chip.component';
 
 /** Edge proxy for the scc-app-latest alias release: {version, sizeBytes}, nulls when unknown. */
@@ -67,7 +68,7 @@ export interface AppEntry {
   imports: [NgTemplateOutlet, RouterLink, TranslatePipe, ScTooltipDirective, ScPopupMotionDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (offered()) {
+    @if (offered() || pwa.manualAvailable()) {
       <div class="apps">
         <button #trigger type="button" class="trigger" [class.on]="open()" (click)="toggle($event)"
                 aria-haspopup="true" [attr.aria-expanded]="open()" [attr.aria-controls]="open() ? panelId : null"
@@ -83,6 +84,7 @@ export interface AppEntry {
           <sc-popup kind="menu" [backdrop]="false" [title]="'appsMenu.aria' | translate" (closed)="onPopupClosed()">
             <!-- No rail icon: at its trigger the menu carries only the accent edge, like the account menu. -->
             <div class="pbody">
+            @if (offered()) {
             @for (app of apps(); track app.id) {
               @if (app.href) {
                 <a class="entry" [class.elevated]="app.elevated" [href]="app.href" rel="noopener noreferrer" download (click)="onPick($event)">
@@ -94,8 +96,20 @@ export interface AppEntry {
                 </a>
               }
             }
+            }
+            @if (pwa.manualAvailable()) {
+              <button type="button" class="entry pwa-entry" (click)="installPwa()">
+                <span class="ico" aria-hidden="true"><img src="icons/brand/vc-mark.svg" alt="" width="22" height="22" /></span>
+                <span class="txt">
+                  <strong>{{ 'pwa.menu' | translate }}</strong>
+                  <span class="desc">{{ 'pwa.card.benefit' | translate }}</span>
+                </span>
+              </button>
+            }
+            @if (offered()) {
             <!-- Stable only: beta/alpha are picked inside each app after sign-in. -->
             <p class="hint">{{ 'appsMenu.footer' | translate }}</p>
+            }
             </div>
           </sc-popup>
           </div>
@@ -133,6 +147,7 @@ export interface AppEntry {
     .pop { position: absolute; top: calc(100% + 8px); right: 0; z-index: 60; }
     .pop sc-popup { display: block; }
     .pbody { display: flex; flex-direction: column; gap: 2px; }
+    .pwa-entry { width: 100%; border: 0; background: transparent; font: inherit; text-align: start; cursor: pointer; }
     .entry {
       display: flex; gap: 12px; align-items: flex-start; padding: 10px; border-radius: 8px;
       color: var(--sc-fg-0); text-decoration: none; min-height: 48px;
@@ -171,6 +186,7 @@ export class AppsMenuComponent {
   private readonly releases = inject(DesktopReleaseService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly popouts = inject(HeaderPopoutService);
+  readonly pwa = inject(PwaInstallService);
 
   readonly panelId = `apps-menu-${++uid}`;
   readonly open = signal(false);
@@ -249,6 +265,12 @@ export class AppsMenuComponent {
     } else {
       this.popouts.release('apps');
     }
+  }
+
+  /** "Install app" (PWA): no back-off, straight to the native prompt / iOS sheet. */
+  installPwa(): void {
+    this.closeMenu();
+    this.pwa.manualInstall();
   }
 
   /** Only a plain left click folds the menu away (modified clicks open a new tab). */

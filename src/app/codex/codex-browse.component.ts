@@ -618,7 +618,7 @@ export function blueprintCategoriesForGroup(
       max-height: max(160px, calc(100dvh - var(--_side-vis-top, var(--_side-top)) - var(--_side-bottom)));
       overflow-y: auto;
     }
-    .side-h { margin: 0 0 6px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--sc-fg-2); }
+    .side-h { margin: 0 0 6px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--sc-fg-2); }
     .nodes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
     .nodes.nested { padding-left: 12px; margin: 2px 0 4px 6px; border-left: 1px solid var(--sc-border); }
     .node {
@@ -642,7 +642,7 @@ export function blueprintCategoriesForGroup(
     .node:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .node.on { color: var(--sc-fg-0); }
     .node.current { background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-accent); }
-    .node-ct { font-size: 11px; color: var(--sc-fg-2); font-variant-numeric: tabular-nums; }
+    .node-ct { font-size: 12px; color: var(--sc-fg-2); font-variant-numeric: tabular-nums; }
     .facet { display: flex; flex-direction: column; gap: 2px; }
     .facet.check { flex-direction: row; align-items: center; gap: 8px; font-size: 13px; color: var(--sc-fg-1); cursor: pointer; }
     .facet.check input { accent-color: var(--sc-accent); }
@@ -709,6 +709,8 @@ export function blueprintCategoriesForGroup(
     .rows { list-style: none; margin: 0; padding: 0; }
     .row { position: relative; display: flex; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--sc-border); }
     .row:last-child { border-bottom: 0; }
+    /* Long lists: rows off screen are skipped by layout/paint until they scroll near. */
+    .row { content-visibility: auto; contain-intrinsic-size: auto 72px; }
     .row.skel { height: 64px; }
     /* One bar per row, all the same height (#314): the link starts from a zero basis so the HQ icons
        always share its line (only the buy panel wraps below), and two-line names fit inside it. */
@@ -740,10 +742,10 @@ export function blueprintCategoriesForGroup(
     .meta { display: flex; flex-wrap: nowrap; align-items: center; gap: 4px 8px; font-size: 12px; line-height: 16px; color: var(--sc-fg-2); min-width: 0; overflow: hidden; }
     .meta > * { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .meta > .wc { flex: none; }
-    .wc { flex: none; padding: 0 6px; border: 1px solid var(--sc-border); border-radius: 4px; font-size: 11px; color: var(--sc-fg-1); }
+    .wc { flex: none; padding: 0 6px; border: 1px solid var(--sc-border); border-radius: 4px; font-size: 12px; color: var(--sc-fg-1); }
     .spec { display: flex; align-items: baseline; gap: 12px; font-size: 12px; color: var(--sc-fg-1); font-variant-numeric: tabular-nums; white-space: nowrap; }
     .size { color: var(--sc-fg-0); font-weight: 600; }
-    .soon { color: var(--sc-accent); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .soon { display: inline-flex; align-items: center; min-height: 28px; color: var(--sc-accent); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
     .acts { flex: none; display: flex; align-items: center; gap: 4px; padding-right: 10px; }
     /* The path shows its state at all times; only the compare toggle waits for the row. */
     .acts .act { opacity: 0; transition: opacity 120ms ease; }
@@ -822,7 +824,7 @@ export function blueprintCategoriesForGroup(
     .also-link:hover { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }
     .also-link:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .upcoming-hint { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--sc-fg-1); }
-    .soon-badge { padding: 1px 6px; border-radius: 4px; border: 1px solid var(--sc-accent); color: var(--sc-accent); font-size: 11px; }
+    .soon-badge { padding: 1px 6px; border-radius: 4px; border: 1px solid var(--sc-accent); color: var(--sc-accent); font-size: 12px; }
     .upcoming-link { color: var(--sc-accent); }
     .err { color: var(--sc-danger); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font: inherit; }

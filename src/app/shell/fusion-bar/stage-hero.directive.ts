@@ -19,6 +19,20 @@ const MAX_LIFT_PX = 280;
 /** Settling passes per change: a hero centred by its parent moves by a fraction of its margin. */
 const MAX_PASSES = 6;
 
+/**
+ * Lowest shift (px) that keeps `el` below the header, or null where the slot target rules (desktop).
+ * Only phones and compact landscape: there the 30 % target would climb into the nav.
+ */
+function headerFloor(el: HTMLElement, cur: number): number | null {
+  const root = document.documentElement;
+  if (!root.hasAttribute('data-sc-compact') && !root.hasAttribute('data-sc-phone')) return null;
+  const header = document.querySelector('sc-main-header');
+  if (!header) return null;
+  const headerBottom = header.getBoundingClientRect().bottom;
+  const top = el.getBoundingClientRect().top + window.scrollY;
+  return Math.ceil(cur + headerBottom + 6 - top);
+}
+
 /** Document y the stage slot's top aims at, the same on every main page. */
 export function stageSlotTarget(viewportHeight: number, top: number = STAGE_FIELD_TOP): number {
   return Math.round(viewportHeight * top);
@@ -70,7 +84,11 @@ export class StageHeroDirective {
       for (let pass = 0; pass < MAX_PASSES; pass++) {
         const cur = parseFloat(el.style.getPropertyValue('--_hero-shift')) || 0;
         const slotTop = slot.getBoundingClientRect().top + window.scrollY;
-        const next = Math.max(-MAX_LIFT_PX, Math.round(cur + stageSlotTarget(window.innerHeight, this.top() ?? STAGE_FIELD_TOP) - slotTop));
+        let next = Math.max(-MAX_LIFT_PX, Math.round(cur + stageSlotTarget(window.innerHeight, this.top() ?? STAGE_FIELD_TOP) - slotTop));
+        // A short viewport (phone on its side) must not lift the block under the header: it keeps
+        // its top at or below the header's bottom edge, the slot then stands lower than the target.
+        const floor = headerFloor(el, cur);
+        if (floor !== null) next = Math.max(next, floor);
         if (Math.abs(next - cur) < 1) break;
         el.style.setProperty('--_hero-shift', `${next}px`);
         moved = true;

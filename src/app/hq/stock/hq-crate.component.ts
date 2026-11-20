@@ -69,14 +69,14 @@ export function qualityTone(q: number | null): 'unknown' | 'low' | 'mid' | 'high
       .q { position: absolute; left: 8px; top: 8px; padding: 1px 7px; border-radius: 4px; background: var(--qc); color: var(--sc-bg-0); font: 700 0.69rem / 1.4 var(--sc-font-display, inherit); }
       .crate[data-tone='unknown'] .q { color: var(--sc-fg-1); font-weight: 500; }
       .rh { position: absolute; left: 0; top: 4px; bottom: 0; width: var(--rf); background: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in srgb, var(--sc-accent) 22%, transparent) 6px 9px); border-right: 1px dashed color-mix(in srgb, var(--sc-accent) 60%, transparent); pointer-events: none; }
-      em { position: absolute; right: 7px; top: 9px; display: inline-flex; align-items: center; gap: 3px; color: var(--sc-accent); font-style: normal; font-size: 0.66rem; }
+      em { position: absolute; right: 7px; top: 9px; display: inline-flex; align-items: center; gap: 3px; color: var(--sc-accent); font-style: normal; font-size: 0.75rem; }
       em svg, .scr svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
       .box em { top: auto; bottom: 7px; }
-      .k { color: var(--sc-fg-2); font-size: 0.6rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(100% - 16px); letter-spacing: .12em; text-transform: uppercase; }
+      .k { color: var(--sc-fg-2); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(100% - 16px); letter-spacing: .12em; text-transform: uppercase; }
       .nm { font-size: 0.78rem; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; padding-right: 16px; position: relative; }
-      .s { color: var(--sc-fg-1); font-size: 0.69rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; }
+      .s { color: var(--sc-fg-1); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; }
       .box .s { color: var(--sc-accent); font-weight: 700; }
-      .pl { color: var(--sc-fg-2); font-size: 0.66rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; }
+      .pl { color: var(--sc-fg-2); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; }
       .scr { position: absolute; right: 8px; top: 8px; }
       .scr[data-scrap='yes'] { color: var(--sc-success, var(--sc-accent)); }
       .scr[data-scrap='no'] { color: var(--sc-warning); }
