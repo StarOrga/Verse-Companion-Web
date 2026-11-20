@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ingest-catalog` op `silhouettes_publish` and `scripts/codex-silhouettes-to-r2.mjs`: publish a build's silhouettes as shard files to R2 in small steps; runs by itself after `finalize`.
 - Assets Worker serves `codex-silhouettes/` (index short-cached, shards immutable).
 
+## [0.284.1] - 2026-11-20
+
+### Fixed
+- Codex holotable: switching between two ships keeps the stage up and dimmed instead of showing the first-visit skeleton; the dim lifts once the next ship's head and values are in, and the head band no longer grows after the stage settles.
+
 ## [0.284.0] - 2026-11-20
 
 ### Added
