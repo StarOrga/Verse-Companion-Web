@@ -295,8 +295,12 @@ async function installSupabaseGuard(
         const hit = readEntry(cacheDir, key);
         if (hit) {
           stats.cached++;
+          // The stored answer was given to some page of ours, maybe on another origin (a dev server,
+          // the gate's static server): PostgREST echoes the asking origin, so this page needs its own
+          // allowed or the browser blocks the cached answer (seen on live, 2026-11-20).
+          const headers = { ...hit.headers, 'access-control-allow-origin': request.headers().origin ?? '*' };
           // The page may be gone by now; a rejection here would be unhandled in the MCP server's process.
-          return route.fulfill({ status: hit.status, headers: hit.headers, body: hit.body }).catch(() => {});
+          return route.fulfill({ status: hit.status, headers, body: hit.body }).catch(() => {});
         }
       }
       const slot = await acquireSlot({ dir: slotDir, ...slotOptions });
