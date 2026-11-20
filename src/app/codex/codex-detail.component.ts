@@ -828,8 +828,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
         } @else {
           <!-- The ship page sits in the same detail shell as every item page: the ship profile projects the
                holotable as the shell's stage (head band and tab pill are the shared components inside it). -->
-          <sc-codex-detail-shell class="ship-shell" [profile]="shipProfile" activeTab="einordnung">
-          <sc-codex-holo-stage shellStage animate.enter="view-in" (viewChange)="onStageViewChange()"
+          <sc-codex-detail-shell class="ship-shell" animate.enter="view-in" [profile]="shipProfile" activeTab="einordnung">
+          <sc-codex-holo-stage shellStage (viewChange)="onStageViewChange()"
             [detail]="detail()!"
             [displayName]="displayName()"
             [manufacturerName]="manufacturerName()"

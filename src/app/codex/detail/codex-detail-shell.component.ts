@@ -1,11 +1,16 @@
 // The one beta detail shell (concept batch-holotisch-kopf-vorlage, T1/T2): head band, stage slot, the
 // right panel with its tab pill, an optional strip — switched by a per-kind profile (codex-detail-profile.ts).
 // Every beta detail page renders through this shell. Item pages (weapon, component, FPS gear, iron,
-// water …) fill head, stage, panel and strip; the ship profile (`stage: 'holo'`) projects the holotable
-// as its stage across the full width — the holotable carries the same head band (sc-codex-detail-head)
-// and its panel is the same panel component (sc-codex-detail-panel: frame, tab pill, pane), its strip stays its own.
-import { ChangeDetectionStrategy, Component, ElementRef, computed, input, output, viewChildren } from '@angular/core';
+// water …) fill head, stage, panel and strip by projection. The ship profile (`stage: 'holo'`) fills the same
+// slots from the holotable stage, which keeps all of its state: the stage holds the table (stage slot) and hands
+// its other regions — head band, panel head/pane/foot, views row, below, KPI strip — to the shell as templates
+// (CodexDetailSlots, provided here); the shell draws the ship's tab pill from the profile and lays out the grid.
+import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input, output, viewChildren } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
+
+import { FeedbackSpotDirective } from '../../feedback/feedback-spot.directive';
+import { CodexDetailSlots } from './codex-detail-slots';
 
 import type { DetailProfile, DetailTabId } from './codex-detail-profile';
 
@@ -178,12 +183,15 @@ export class CodexDetailPanelComponent<T extends string = DetailTabId> {
 @Component({
   selector: 'sc-codex-detail-shell',
   standalone: true,
-  imports: [TranslatePipe, CodexDetailPanelComponent],
+  imports: [TranslatePipe, NgTemplateOutlet, CodexDetailPanelComponent, FeedbackSpotDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '[attr.data-stage]': 'profile().stage' },
+  providers: [CodexDetailSlots],
+  host: { '[attr.data-stage]': 'profile().stage', '[attr.data-holo-root]': "holo() ? '' : null" },
   template: `
+    <!-- The ship: the holotable stage hands its regions over (CodexDetailSlots); the shell places them here. -->
+    @if (holoSlots(); as s) { <ng-container [ngTemplateOutlet]="s.head" /> }
     <ng-content select="sc-codex-detail-head" />
-    <div class="sh-grid">
+    <div class="sh-grid" [class.push]="holoState()?.push" [class.still]="holoState()?.still">
       <div class="sh-stage"><ng-content select="[shellStage]" /></div>
       @if (!holo()) {
         <sc-codex-detail-panel class="sh-panel" [attr.aria-label]="'codex.detailShell.panelAria' | translate" [tabs]="profile().tabs" [active]="activeTab()"
@@ -191,8 +199,25 @@ export class CodexDetailPanelComponent<T extends string = DetailTabId> {
           <div panelHead class="sh-path"><ng-content select="[shellPath]" /></div>
           <div class="sh-pane"><ng-content /></div>
         </sc-codex-detail-panel>
+      } @else if (holoSlots(); as s) {
+        <!-- The ship's panel: the profile's tabs, the stage's open tab, counts and pane. -->
+        @let st = holoState();
+        <sc-codex-detail-panel class="holo-panel mobile-data" [class.mobile-off]="st?.hideData" [class.docking]="st?.docking" [class.reveal]="st?.reveal"
+          [class.dim]="st?.dim" [class.still]="st?.still" [scFeedbackSpot]="'codex.holo.stage.inspector'" [fit]="true"
+          [tabs]="holoTabs()" [active]="holoSource()!.panelTab()" idPrefix="holo-tab-" panelId="holo-tabpanel"
+          ariaLabelKey="codex.holo.stage.inspector" (tabSelect)="holoSource()!.selectPanelTab($event)">
+          <div panelHead><ng-container [ngTemplateOutlet]="s.panelHead" /></div>
+          <ng-container [ngTemplateOutlet]="s.panelBody" />
+          <div panelFoot class="pfoot"><ng-container [ngTemplateOutlet]="s.panelFoot" /></div>
+        </sc-codex-detail-panel>
+        <!-- The stage slot's foot: the views row under table and panel (after the panel: the tab order stays table, panel, views). -->
+        <ng-container [ngTemplateOutlet]="s.views" />
       }
     </div>
+    @if (holoSlots(); as s) {
+      <ng-container [ngTemplateOutlet]="s.below" />
+      @if (profile().strip) { <ng-container [ngTemplateOutlet]="s.strip" /> }
+    }
     @if (profile().strip) { <ng-content select="[shellStrip]" /> }
   `,
   styles: [
@@ -208,14 +233,57 @@ export class CodexDetailPanelComponent<T extends string = DetailTabId> {
       :host([data-stage='compact']) .sh-grid { grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.3fr); }
       :host([data-stage='compact']) .sh-stage { height: auto; min-height: 0; aspect-ratio: 4 / 3; max-height: 420px; }
       :host([data-stage='compact']) .sh-grid { min-height: 0; }
-      /* The ship: the holotable is the whole body (its own panel and strip inside), so the stage spans the frame. */
-      :host([data-stage='holo']) .sh-grid { display: block; min-height: 0; }
-      :host([data-stage='holo']) .sh-stage { position: static; height: auto; min-height: 0; }
-      :host([data-stage='holo']) .sh-stage > ::ng-deep * { height: auto; }
       @media (max-width: 900px) {
         .sh-grid, :host([data-stage='compact']) .sh-grid { grid-template-columns: minmax(0, 1fr); min-height: 0; }
         .sh-stage { position: static; height: auto; min-height: 320px; }
         :host([data-stage='compact']) .sh-stage { min-height: 220px; aspect-ratio: auto; }
+      }
+
+      /* ── The ship (stage 'holo'). One column of head band, body, below and strip, 6 px apart. The body is the
+         first screen: the table (stage slot) | the panel, as high as the card (540 px at most), and the views row
+         over both, docked on the strip; its height is what the screen has left between where the body starts
+         (--holo-top) and the strip (--holo-strip-h) — both measured by the stage and set on this host. ── */
+      :host([data-stage='holo']) { gap: 6px; }
+      :host([data-stage='holo']) .sh-grid { display: grid; grid-template-columns: minmax(0, 1fr) clamp(320px, 22.2vw, 360px); grid-template-rows: minmax(0, 1fr) auto;
+        column-gap: 16px; row-gap: 8px; align-items: stretch; height: calc(100dvh - var(--holo-top, 170px) - var(--holo-strip-h, 82px) - 8px); min-height: 460px; }
+      /* The stage slot has no box: the table it holds is the grid's first cell. */
+      :host([data-stage='holo']) .sh-stage { display: contents; }
+      .holo-panel { z-index: 1; align-self: start; height: min(100%, 540px); }
+      .pfoot { flex: none; display: flex; flex-direction: column; }
+      /* Arrival (the stage's phases): the body pushes in, the panel docks with an overshoot and a light edge, the pane
+         rises; while the next ship loads the pane dims. */
+      .sh-grid.push { transform-origin: 40% 50%; animation: sh-push 700ms cubic-bezier(0.16, 0.84, 0.24, 1) backwards; }
+      @keyframes sh-push { from { transform: scale(0.965); } }
+      .holo-panel ::ng-deep .dp-pane { animation: sh-rise var(--rise-dur, 300ms) var(--holo-e-out) var(--rise-delay, 60ms) backwards;
+        transition: opacity var(--holo-t-fast) var(--holo-e-io); }
+      @keyframes sh-rise { from { opacity: 0; transform: translateY(var(--holo-rise)); } }
+      .holo-panel.reveal ::ng-deep .dp-pane { --rise-dur: 560ms; --rise-delay: 260ms; }
+      .holo-panel.dim ::ng-deep .dp-pane { opacity: 0.35; }
+      .holo-panel.docking { animation: sh-dock 900ms cubic-bezier(0.16, 0.84, 0.24, 1) 560ms backwards; }
+      @keyframes sh-dock {
+        0% { opacity: 0; transform: translateX(46px); filter: brightness(1.7); }
+        52% { opacity: 1; transform: translateX(-6px); filter: brightness(1.4); }
+        76% { transform: translateX(1.5px); }
+        100% { transform: none; filter: none; }
+      }
+      .holo-panel.docking::after { content: ''; position: absolute; z-index: 2; inset-block: 8% 8%; inset-inline-start: 0; width: 2px; pointer-events: none;
+        background: linear-gradient(to bottom, transparent, var(--sc-accent), transparent); box-shadow: 0 0 12px var(--sc-accent); animation: sh-edge 1100ms ease-out 560ms both; }
+      @keyframes sh-edge { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
+      :is(.sh-grid, .holo-panel).still, .holo-panel.still::after { animation: none !important; transition: none !important; }
+      @media (prefers-reduced-motion: reduce) {
+        .sh-grid, .holo-panel, .holo-panel::after { animation: none !important; transition: none !important; }
+      }
+      /* Tablet and phone: the panel goes under the model, its full width, and grows with its content. */
+      @media (max-width: 1000px) {
+        :host([data-stage='holo']) .sh-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; height: auto; min-height: 0; }
+        .holo-panel { height: auto; align-self: stretch; }
+      }
+      @media (max-width: 640px) {
+        :host([data-stage='holo']) { padding-bottom: calc(72px + var(--holo-strip-lift, 0px)); }
+        /* Beta shell: the search capsule floats at the bottom edge, the strip rides above it. */
+        :host-context([data-layout]) { --holo-strip-lift: calc(var(--sc-float-bottom) + var(--sc-bar-h)); }
+        :host([data-stage='holo']) .sh-grid { gap: 10px; }
+        .mobile-off { display: none; }
       }
     `,
   ],
@@ -224,6 +292,15 @@ export class CodexDetailShellComponent {
   readonly profile = input.required<DetailProfile>();
   readonly activeTab = input.required<DetailTabId>();
   readonly tabChange = output<DetailTabId>();
-  /** The ship profile: the projected holotable brings its own panel, so the shell's aside stays out. */
+  /** The ship profile: the holotable stage fills the slots through the registry instead of projecting. */
   protected readonly holo = computed(() => this.profile().stage === 'holo');
+  private readonly slots = inject(CodexDetailSlots);
+  protected readonly holoSource = computed(() => (this.holo() ? this.slots.source() : null));
+  protected readonly holoSlots = computed(() => this.holoSource()?.slotTemplates() ?? null);
+  protected readonly holoState = computed(() => this.holoSource()?.slotState() ?? null);
+  /** The profile's ship tabs with the stage's counts. */
+  protected readonly holoTabs = computed<DetailTabItem<string>[]>(() => {
+    const counts = this.holoSource()?.panelTabCounts() ?? {};
+    return (this.profile().shipTabs ?? []).map((t) => ({ ...t, count: counts[t.id] ?? 0 }));
+  });
 }
