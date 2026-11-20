@@ -177,9 +177,17 @@ component-rank, names-de, index, then rank-parts and the index again): one file 
 dropped), facets, one file of the new generation read back through the public Worker, then the
 index (last), the index read back from the bucket, then only generations older than
 this publish and not named by that index are deleted (a failed read-back puts no
-index and deletes nothing). It runs after `finalize` (after the
-response, a failure is only logged), behind the same R2 usage gate as the locale
-publish; `lists_publish` (`{ "op": "lists_publish", "build_id": "<uuid>" }`)
+index and deletes nothing). It runs after `finalize` as a request of its own, behind the
+same R2 usage gate as the locale publish: `finalize` calls the function itself with
+`{ "op": "lists_publish", "build_id": "<uuid>", "detach": true }` (`_self-call.ts`, service
+key in both headers, one retry), that request answers `202 { ok, started }` at once and
+publishes after its response, where a failure is only logged. The worker that answers
+`finalize` has spent most of its 2 s of CPU on the ingest (1 756 ms on 2026-11-19) and
+still carries the locale publish; on it the lists publish (624 ms by itself) could be the
+step that gets the worker killed, and a kill over the locale publish took the lists with
+it. The call is started before the locale publish. `detach` is honoured for the service
+key only; without it `lists_publish` (`{ "op": "lists_publish", "build_id": "<uuid>" }`)
+answers with the result and
 redoes it for one build. `locale_gc` also removes the `codex-lists/` prefixes of
 builds gone from `codex_builds` (report under `lists`).
 
