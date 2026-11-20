@@ -156,7 +156,7 @@ export function cometStrip(median: string | null, mine: string | null): CometStr
     }
   `,
   styles: [`
-    :host { display: block; }
+    :host { display: block; min-height: 100vh; min-height: 100dvh; }
     /* Inside the next-patch card: two plain columns, no boxes of their own. */
     .ng {
       display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 16px 30px;

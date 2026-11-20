@@ -178,6 +178,8 @@ emit(resolve(ROOT, 'public/favicon.ico'), await pngToIco(WEB_ICO_SIZES.map((s) =
 // the retired mark for an unbounded time.
 emit(resolve(BRAND, 'vc-192.png'), png(appMark.scc, 192));
 emit(resolve(BRAND, 'vc-512.png'), png(appMark.scc, 512));
+// Shortcut icons (manifest `shortcuts`) are shown at ~96 px.
+emit(resolve(BRAND, 'vc-96.png'), png(appMark.scc, 96));
 
 // Maskable: Android crops to a circle of ~80% diameter, so the artwork is
 // inset and the canvas colour is painted edge to edge behind it.
@@ -189,10 +191,24 @@ const embed = (buf, x, y, w, h) =>
   `<image href="data:image/png;base64,${buf.toString('base64')}" x="${x}" y="${y}" width="${w}" height="${h}"/>`;
 
 const maskable = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="fade" cx="256" cy="256" r="205" gradientUnits="userSpaceOnUse">
+      <stop offset="0.8" stop-color="#fff"/><stop offset="1" stop-color="#000"/>
+    </radialGradient>
+    <mask id="m"><rect width="512" height="512" fill="url(#fade)"/></mask>
+  </defs>
   <rect width="512" height="512" fill="${C.canvas}"/>
-  ${embed(png(appMark.scc, 410), 51, 51, 410, 410)}
+  <g mask="url(#m)">${embed(png(appMark.scc, 410), 51, 51, 410, 410)}</g>
 </svg>`;
 emit(resolve(BRAND, 'vc-maskable-512.png'), png(maskable, 512, { background: C.canvas }));
+
+// Monochrome (Android 13+ themed icons): a white glyph on transparency; the OS tints it. The glyph
+// sits in the inner ~70% so the system mask never clips it.
+const monoGlyph = monoMark().replace(/fill="black"/g, 'fill="white"');
+const monochrome = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  ${embed(png(monoGlyph, 360), 76, 76, 360, 360)}
+</svg>`;
+emit(resolve(BRAND, 'vc-monochrome-512.png'), png(monochrome, 512));
 
 // iOS Add-to-Home-Screen needs an opaque raster; it ignores SVG entirely, which
 // is why `apple-touch-icon` pointed at an SVG and silently did nothing.

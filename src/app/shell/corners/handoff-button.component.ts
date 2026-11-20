@@ -122,6 +122,8 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
       font-size: max(0.78rem, var(--sc-fs-floor)); }
     /* Phones (the bar's breakpoint): the bar sits at the bottom, the QR hand-off is for the desk. */
     @media (max-width: 720px) { .wrap { display: none; } }
+    /* A touch screen has no use for "continue on your phone" (it covered the first ship metric, H5): a phone on its side and every tablet drop it too. */
+    @media (pointer: coarse), (orientation: landscape) and (max-height: 500px) { .wrap { display: none; } }
   `],
 })
 export class HandoffButtonComponent implements OnDestroy {

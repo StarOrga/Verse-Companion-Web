@@ -21,7 +21,7 @@ import { CodexBrowseComponent } from './codex-browse.component';
     }
     <router-outlet />
   `,
-  styles: [`:host { display: block; }`],
+  styles: [`:host { display: block; min-height: 100vh; min-height: 100dvh; }`],
 })
 export class UpcomingRouteComponent {
   readonly origin = inject(OverlayOriginService);

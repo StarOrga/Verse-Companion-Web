@@ -28,7 +28,9 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
       </div>
       <span class="ig-tag" [scTooltip]="('codex.holo.interior.presetTag' | translate) + ' ' + presetLabel()">{{ 'codex.holo.interior.presetTag' | translate }} <b>{{ presetLabel() }}</b></span>
       <button type="button" scAction tier="secondary" class="ig-reset" [attr.aria-disabled]="untouched() ? true : null"
-              (click)="presetReset.emit()">{{ 'codex.holo.interior.presetReset' | translate }}</button>
+              [scTooltip]="('codex.holo.interior.presetTag' | translate) + ' ' + presetLabel()" (click)="presetReset.emit()">
+        <svg class="ig-ri" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg>
+        <span class="ig-rl">{{ 'codex.holo.interior.presetReset' | translate }}</span></button>
     </div>
   `,
   styles: [`
@@ -37,7 +39,16 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
   .ig-row { display: flex; gap: 5px; min-width: 0; flex: 0 1 auto; overflow-x: auto; overscroll-behavior-x: contain; padding: 2px 24px 4px 0;
   mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); }
   .ig-tag, .ig-reset { flex: none; }
+  .ig-ri { display: none; }
+  /* Phone: preset tag and reset fold into one 44px icon button at the row end (the preset name is its tooltip, the word stays for screen readers). */
+  @media (max-width: 640px), (orientation: landscape) and (max-height: 500px) {
+    .ig-tag { display: none; }
+    .ig-reset { inline-size: 44px; min-inline-size: 44px; block-size: 44px; min-block-size: 44px; padding: 0; border-radius: 50%; justify-content: center; }
+    .ig-ri { display: block; }
+    .ig-rl { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  }
   .ig-reset { min-height: 26px; padding-block: 0; font-size: max(11.5px, var(--f)); }
+  @media (pointer: coarse) { .ig-reset { min-height: var(--sc-tap-min, 44px); min-inline-size: var(--sc-tap-min, 44px); } }
   .ig-chip { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px 0 4px; border: 1px solid var(--l1); border-radius: 13px;
   background: none; color: var(--sc-fg-2); font: inherit; font-size: max(11.5px, var(--f)); white-space: nowrap; cursor: pointer;
   transition: color 160ms ease, border-color 160ms ease, background 160ms ease; --g: var(--sc-accent); }
@@ -61,6 +72,8 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
   .ig-tag { font-size: max(11px, var(--f)); color: var(--sc-fg-2); white-space: nowrap; }
   .ig-tag b { color: var(--sc-fg-0); font-weight: 600; }
   @media (pointer: coarse) { .ig-chip { height: var(--sc-tap-min, 44px); } }
+  /* A phone on its side: the chips row is exactly one tap high (44 px) with 3 px above and below, the hull gets the rest. */
+  @media (orientation: landscape) and (max-height: 500px) { .ig-chip { height: 44px; min-height: 44px; } .ig-row { padding-block: 3px; } }
   /* Narrow: the chips take their own line and scroll; the preset and its reset sit under them. */
   /* Narrow screens keep ONE line: the chips scroll sideways and the preset tag shortens with an ellipsis. A wrapped
      second line changed the row height with every view/deck switch and moved the stage (v0.282.0 report). */

@@ -311,15 +311,18 @@ describe('CodexDetailComponent — ship load skeleton', () => {
     expect(el.querySelector('.skel-stage .skel-ring')).not.toBeNull();
   });
 
-  it('keeps the plain skeleton card for non-ship kinds', async () => {
+  it('shows the reserved item skeleton (no ship stage) for non-ship kinds', async () => {
     const stub = makeCodexServiceStub(NOMAD_PAYLOAD);
     configureSetup('weapon', [], NOMAD_PAYLOAD, { getDetail: () => new Promise(() => undefined) });
     await TestBed.compileComponents();
     const fixture = TestBed.createComponent(CodexDetailComponent);
     fixture.detectChanges();
     expect(stub).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('.skel-stage')).toBeNull();
-    expect(fixture.nativeElement.querySelector('.skel-card')).not.toBeNull();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.skel-stage')).toBeNull();
+    // Item pages hold the final panel heights while loading, so the late shell does not shift the page (mobile CLS).
+    expect(el.querySelector('sc-skeleton.item-skel')).not.toBeNull();
+    expect(el.querySelector('.detail-page.reserve')).not.toBeNull();
   });
 });
 

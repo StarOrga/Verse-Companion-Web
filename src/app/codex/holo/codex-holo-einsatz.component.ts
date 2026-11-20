@@ -87,6 +87,8 @@ export interface StripMission {
       .mp.dis { opacity: 0.4; cursor: not-allowed; }
       .mp:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       @media (max-width: 640px) {
+        /* The word "Einsatz" stays for screen readers; the value gets the pill's width ("Frachter" not "Fracht…"). */
+        .lab { position: absolute; inline-size: 1px; block-size: 1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
         .mission-pop { inset-inline-start: 0; translate: none; }
       }
     `,

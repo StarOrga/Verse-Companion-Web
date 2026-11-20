@@ -365,7 +365,8 @@ export class FusionBarComponent {
   readonly accountPending = computed(() => this.mainPage() && this.mode() === 'docked' && !this.chrome.dockFull());
   /** The staged field stands on its slot (position measured). */
   readonly placed = signal(false);
-  readonly phone = signal(matches('(max-width: 720px)'));
+  /** A phone in portrait (the bar stands at the bottom). A phone on its side is compact: the bar is a top overlay then, like the desktop's. */
+  readonly phone = signal(isBottomBar());
 
   readonly mainPage = computed(() => this.variant() === 'app' && isMainHeaderPage(this.url()));
   readonly mode = computed<BarMode>(() => {
@@ -621,7 +622,7 @@ export class FusionBarComponent {
   private listen(): void {
     if (typeof window === 'undefined') return;
     const onResize = () => {
-      const phone = matches('(max-width: 720px)');
+      const phone = isBottomBar();
       if (phone !== this.phone()) this.zone.run(() => this.phone.set(phone));
       this.barH = readBarHeight();
       this.condenseGeo = null;
@@ -647,6 +648,9 @@ export class FusionBarComponent {
       this.schedulePlace();
     };
     window.addEventListener(STAGE_SLOT_MOVED, onSlotMoved);
+    // A page took the bottom of the phone (or gave it back): the bar changes sides.
+    const mo = typeof MutationObserver === 'function' ? new MutationObserver(onResize) : null;
+    mo?.observe(document.documentElement, { attributes: true, attributeFilter: ['data-sc-bar-off'] });
     this.publishHeight();
     this.onScroll(pageScrollY());
     this.injector.get(DestroyRef).onDestroy(() => {
@@ -654,6 +658,7 @@ export class FusionBarComponent {
       window.removeEventListener('resize', onResize);
       window.removeEventListener(STAGE_SLOT_MOVED, onSlotMoved);
       ro?.disconnect();
+      mo?.disconnect();
     });
   }
 
@@ -964,10 +969,12 @@ export class FusionBarComponent {
     // Layout height, not the rect: the morph scales the bar, and every in-between value
     // written on <html> restyled the whole document in that frame.
     const h = el.offsetHeight;
-    const px = this.phone() || this.hidden() || staged ? 0 : Math.round(h + lift);
+    // Compact: the bar is gone from the layout (it only overlays while the search is open).
+    const compact = matches(COMPACT_MQ);
+    const px = compact || this.phone() || this.hidden() || staged ? 0 : Math.round(h + lift);
     setRootVar('--sc-topbar-h', `${px}px`);
     // Phone: the whole bottom stack (bar + panel) the page must keep free.
-    const stack = this.phone() && !staged ? Math.round(h) : 0;
+    const stack = this.phone() && !staged && !compact ? Math.round(h) : 0;
     setRootVar('--sc-bar-stack-h', `${stack}px`);
     // Phone: the route line is fixed at the top (the bar itself sits at the bottom); a page's own
     // sticky head parks below it (--sc-route-h), not under it.
@@ -1150,6 +1157,14 @@ function readBarHeight(): number {
   if (typeof document === 'undefined') return 64;
   const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sc-bar-h'));
   return Number.isFinite(v) && v > 0 ? v : 64;
+}
+
+/** A phone on its side (core/viewport-mode.ts COMPACT_QUERY): the bar leaves the bottom, the header carries search. */
+const COMPACT_MQ = '(orientation: landscape) and (max-height: 500px)';
+/** The bar stands at the bottom: a phone in portrait, unless the page took the bottom (`html[data-sc-bar-off]`, ship sheet) — then it is a top overlay like in compact. */
+function isBottomBar(): boolean {
+  const off = typeof document !== 'undefined' && document.documentElement.hasAttribute('data-sc-bar-off');
+  return matches('(max-width: 720px)') && !matches(COMPACT_MQ) && !off;
 }
 
 function matches(query: string): boolean {

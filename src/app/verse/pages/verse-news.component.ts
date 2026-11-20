@@ -31,7 +31,7 @@ import { DOCK_HOST_CLASS, DOCK_WIDTH_STYLE } from '../shared/dock-width';
     }
     <router-outlet />
   `,
-  styles: [`:host { display: block; }`, DOCK_WIDTH_STYLE],
+  styles: [`:host { display: block; min-height: 100vh; min-height: 100dvh; }`, DOCK_WIDTH_STYLE],
 })
 export class VerseNewsComponent {
   readonly enabled = inject(BetaService).isEnabled('verse');
