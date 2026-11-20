@@ -48,6 +48,10 @@ export type BetaArea = 'verse' | 'codex' | 'shell';
 export const EVENTS = {
   // --- app ---------------------------------------------------------------
   'app:error_show': ev<{ key: string; scope: string }>('app', 'Ein Fehlerzustand wurde angezeigt (errors.*-Schlüssel und Bereich, nie der Fehlertext).'),
+  'app:install_prompt_show': ev<{ trigger: 'success' | 'idle' | 'manual'; platform: 'android-native' | 'ios' | 'other' }>('app', 'Die Karte zum Installieren der App wurde angezeigt (Auslöser: nach einer gelungenen Aktion, im Leerlauf oder von Hand).'),
+  'app:install_prompt_accept': ev<{ platform: 'android-native' | 'ios' | 'other' }>('app', 'Auf der Installieren-Karte wurde Installieren gewählt (öffnet den System-Dialog bzw. die iOS-Anleitung).'),
+  'app:install_prompt_close': ev<{ platform: 'android-native' | 'ios' | 'other'; dismissals: number }>('app', 'Die Installieren-Karte oder der System-Dialog wurde abgelehnt (Anzahl bisheriger Ablehnungen steuert die Pause).'),
+  'app:install_finish': ev<{ platform: 'android-native' | 'ios' | 'other' }>('app', 'Die App wurde installiert (appinstalled).'),
 
   // --- auth --------------------------------------------------------------
   'auth:user_sign_in': ev<{ provider: 'email' | 'google' | 'discord' }>('auth', 'Anmeldung erfolgreich (Anbieter).'),

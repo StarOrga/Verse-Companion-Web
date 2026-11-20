@@ -9270,5 +9270,23 @@
   },
   "notFound": {
     "backTo": "Back to {{target}}"
+  },
+  "pwa": {
+    "card": {
+      "title": "Get the app",
+      "benefit": "Full screen, faster start, right from your home screen.",
+      "install": "Install",
+      "later": "Later"
+    },
+    "menu": "Install app",
+    "ios": {
+      "title": "Add to Home Screen",
+      "step1Iphone": "Tap Share at the bottom of Safari.",
+      "step1Ipad": "Tap Share at the top right of Safari.",
+      "step2": "Choose “Add to Home Screen”.",
+      "step3": "Tap “Add” at the top right.",
+      "addLabel": "Add",
+      "done": "Got it"
+    }
   }
 }

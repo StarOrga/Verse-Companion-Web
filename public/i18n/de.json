@@ -9270,5 +9270,23 @@
   },
   "notFound": {
     "backTo": "Zurück zu {{target}}"
+  },
+  "pwa": {
+    "card": {
+      "title": "Verse Companion als App",
+      "benefit": "Vollbild, schneller Start, direkt vom Homescreen.",
+      "install": "Installieren",
+      "later": "Später"
+    },
+    "menu": "App installieren",
+    "ios": {
+      "title": "Zum Home-Bildschirm",
+      "step1Iphone": "Tippe unten in Safari auf „Teilen“.",
+      "step1Ipad": "Tippe oben rechts in Safari auf „Teilen“.",
+      "step2": "Wähle „Zum Home-Bildschirm“.",
+      "step3": "Tippe oben rechts auf „Hinzufügen“.",
+      "addLabel": "Hinzufügen",
+      "done": "Verstanden"
+    }
   }
 }
