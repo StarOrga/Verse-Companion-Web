@@ -33,6 +33,22 @@
       ]
     },
     {
+      "version": "0.284.2",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex: the \"Einordnung\" ranking on a ship page reads the parts of the fleet's stock loadouts from one file per build instead of the database. The first ship page of a build sends 112 fewer database reads (26 MB); the ranking shows the same values."
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.284.1",
       "date": "2026-11-20",
       "sections": [
