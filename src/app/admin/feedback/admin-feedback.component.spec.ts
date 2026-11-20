@@ -337,6 +337,44 @@ describe('AdminFeedbackComponent — the stream', () => {
     expect(posted[0].row).toEqual(expect.objectContaining({ feedback_id: 'q1', is_system: false, body: 'Unten' }));
   });
 
+  /*
+   * Feedback #382: the PostHog watcher posted "Erneut aufgetreten …" after the
+   * routine's question. That newer notice carries no [[A|B]] line, and the
+   * panel took the options only from the newest routine message — so the
+   * Umsetzen/Verwerfen buttons vanished and the admin had nothing to tap.
+   */
+  it('keeps one-tap options when a later routine notice without options follows the question', async () => {
+    const tables = fixtureTables();
+    tables['admin_feedback_messages'] = [
+      msg('m1', 'q1', true, T('10'), QUESTION),
+      msg('m1b', 'q1', true, T('11'), 'Erneut aufgetreten (2×)'),
+    ];
+    const { fixture, cmp, el } = await mount(tables);
+    const q1 = cmp.messages().find((m) => m.id === 'q1')!;
+    expect(cmp.answerOptionsFor(q1)?.options).toEqual(['Oben', 'Unten']);
+
+    cmp.openTopic('q1');
+    fixture.detectChanges();
+    const buttons = Array.from(el.querySelectorAll('.sheet.topic .answer-options .option'));
+    expect(buttons.map((b) => b.textContent?.trim())).toEqual(['Oben', 'Unten']);
+    // The question the buttons answer stays in view, not folded behind "…".
+    expect(cmp.threadView('q1').shown.map((m) => m.id)).toEqual(['m1', 'm1b']);
+  });
+
+  it('drops one-tap options once a human replied after the question', async () => {
+    const tables = fixtureTables();
+    tables['admin_feedback_messages'] = [
+      msg('m1', 'q1', true, T('10'), QUESTION),
+      msg('m1h', 'q1', false, T('11'), 'Unten'),
+      msg('m1c', 'q1', true, T('12'), 'Noch eine Frage ohne Optionen?'),
+    ];
+    const { cmp } = await mount(tables);
+    const q1 = cmp.messages().find((m) => m.id === 'q1')!;
+    expect(cmp.askOf(q1)).toBe('question');
+    expect(cmp.answerOptionsFor(q1)).toBeNull();
+    expect(cmp.threadView('q1').shown.map((m) => m.id)).toEqual(['m1c']);
+  });
+
   it('folds the thread to the newest message and reveals one more per tap', async () => {
     const tables = fixtureTables();
     tables['admin_feedback_messages'] = [

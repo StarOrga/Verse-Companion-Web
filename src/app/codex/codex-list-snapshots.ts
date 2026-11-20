@@ -2,6 +2,7 @@ import { Injectable, InjectionToken, inject } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { logWarn } from '../core/log';
 import { ListSnapshot, ListSnapshotName, SNAPSHOT_COLUMNS, makeSnapshot } from './codex-list-engine';
+import { RankParts, parseRankParts } from './codex-rank-parts';
 
 /**
  * Codex catalog lists of a build, read from R2 through the assets Worker
@@ -9,7 +10,7 @@ import { ListSnapshot, ListSnapshotName, SNAPSHOT_COLUMNS, makeSnapshot } from '
  * supabase/functions/ingest-catalog/_list-snapshots.ts is the source of truth.
  *
  *   codex-lists/<build>/index.json          which files exist, their gen (5 min cache)
- *   codex-lists/<build>/<gen>/<name>.json   one kind's rows, a slice, `facets` or `names-de` (immutable)
+ *   codex-lists/<build>/<gen>/<name>.json   one kind's rows, a slice, `facets`, `names-de` or `rank-parts` (immutable)
  *
  * The parsed files stay in memory for the current build — they are the list
  * cache. Every answer is "a snapshot" or `null`; `null` means the caller reads
@@ -94,7 +95,7 @@ export const LIST_SNAPSHOT_BASE = new InjectionToken<string>('LIST_SNAPSHOT_BASE
 
 class NotPublished extends Error {}
 
-type FileName = ListSnapshotName | 'facets' | 'names-de';
+type FileName = ListSnapshotName | 'facets' | 'names-de' | 'rank-parts';
 
 @Injectable({ providedIn: 'root' })
 export class CodexListSnapshots {
@@ -135,6 +136,11 @@ export class CodexListSnapshots {
   /** names-de.json of `buildId`, or `null` — same rules as {@link rows}. */
   async namesDe(buildId: string, waitMs = LIST_SNAPSHOT_WAIT_MS): Promise<NamesDe | null> {
     return (await this.file(buildId, 'names-de', waitMs)) as NamesDe | null;
+  }
+
+  /** rank-parts.json of `buildId` (the rank cohort's part payload slices), or `null` — same rules as {@link rows}. */
+  async rankParts(buildId: string, waitMs = LIST_SNAPSHOT_WAIT_MS): Promise<RankParts | null> {
+    return (await this.file(buildId, 'rank-parts', waitMs)) as RankParts | null;
   }
 
   private async file(buildId: string, name: FileName, waitMs: number): Promise<unknown> {
@@ -260,6 +266,9 @@ export class CodexListSnapshots {
     } else if (name === 'names-de') {
       const names = parseNamesDe(res.body);
       if (names) return names;
+    } else if (name === 'rank-parts') {
+      const parts = parseRankParts(res.body);
+      if (parts) return parts;
     } else {
       const snap = parseListFile(res.body, name);
       if (snap) return snap;

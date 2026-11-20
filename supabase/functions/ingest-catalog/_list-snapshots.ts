@@ -7,7 +7,7 @@
 //   codex-lists/<build_id>/index.json                  (short cache, names the gen)
 //   codex-lists/<build_id>/<gen>/<name>.json           (immutable)
 // `<name>` is a kind (one file with ALL rows of the kind in the build, in the
-// database list order) or `facets`. The client never sorts, so file order IS
+// database list order), a slice, `facets`, `names-de` or `rank-parts` (_rank-parts.ts). The client never sorts, so file order IS
 // list order. Columnar: one array per row - the kind's list columns in the
 // order of LIST_COLUMNS, then one entry per `payloadKeys` (the JSON value of
 // that top-level payload key, null when absent).
@@ -15,8 +15,9 @@
 // Plain, erasable TypeScript: the edge function and the node tests import it as is.
 
 import { BUILD_ID_RE, newGen } from './_locale-shards.ts';
+import { RANK_PARTS } from './_rank-parts.ts';
 
-export { BUILD_ID_RE, newGen };
+export { BUILD_ID_RE, newGen, RANK_PARTS };
 
 export const LISTS_ROOT = 'codex-lists';
 
@@ -32,10 +33,10 @@ export const LIST_FILES: readonly ListName[] = ['ship', 'ship-rank', 'weapon', '
 export const EXTRA_ROW_FILES: readonly ListName[] = ['missile', 'weapon-rank', 'component-rank'];
 /** The German-name file for the search fallback (`codex_search`); not table rows, see namesDeFileJson. */
 export const NAMES_DE = 'names-de';
-export const FILE_NAMES = [...LIST_FILES, 'facets', ...EXTRA_ROW_FILES, NAMES_DE] as const;
+export const FILE_NAMES = [...LIST_FILES, 'facets', ...EXTRA_ROW_FILES, NAMES_DE, RANK_PARTS] as const;
 export type FileName = (typeof FILE_NAMES)[number];
 
-export const NAME_RE = /^(ship-rank|ship|weapon-rank|weapon|component-rank|component|item|ammunition|manufacturer|blueprint|facets|missile|names-de)$/;
+export const NAME_RE = /^(ship-rank|ship|weapon-rank|weapon|component-rank|component|item|ammunition|manufacturer|blueprint|facets|missile|names-de|rank-parts)$/;
 export const GEN_RE = /^[0-9a-z]{6,16}$/;
 
 export const LIST_TABLES: Record<ListName, string> = {

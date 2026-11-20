@@ -19,6 +19,11 @@
 //   6. GC: delete only generations OLDER than this publish's own that the index
 //      read back does not name. newGen() is base-36 milliseconds, so numeric order
 //      is time order; a concurrent publish's newer generation is never touched.
+//   7. rank-parts (_rank-parts.ts) into the publish that is now live: the parts named by
+//      the stock loadouts that passed through while ship-rank was built (no second read
+//      of the ships), the file, then the index once more with its entry. It is by far
+//      the heaviest read, so it comes after everything else: a failure, or a worker
+//      killed over it, costs only this file (`failed`, or simply not in the index).
 // A failure before step 4 leaves the old index and the old generation alone.
 
 import {
@@ -47,7 +52,18 @@ import {
   rowToArray,
 } from './_list-snapshots.ts';
 
-import { RANK_PAGE } from './_list-snapshots.ts';
+import { PAYLOAD_ALIAS, RANK_PAGE } from './_list-snapshots.ts';
+import {
+  AMMO_PAGE,
+  PART_NAMES_PER_READ,
+  PART_TABLES,
+  RANK_PARTS,
+  type PartTable,
+  ammoRowJson,
+  loadoutClassNames,
+  partRowJson,
+  rankPartsFileJson,
+} from './_rank-parts.ts';
 
 /** Rows per page of names-de (two short strings a row). */
 export const NAMES_PAGE = 1000;
@@ -68,6 +84,13 @@ export interface ListPublishDeps {
    * name_localized and the raw payload->name->>de (null when absent). Unfiltered.
    */
   readNames(buildId: string, kind: ListKind, from: number, limit: number): Promise<{ class_name: string; name_localized: string | null; de: string | null }[]>;
+  /**
+   * rank-parts: the rows of one part table whose class_name is in `classNames`
+   * (at most PART_NAMES_PER_READ), PART_SELECT shape (class_name + the whole payload), any order.
+   */
+  readParts(buildId: string, table: PartTable, classNames: string[]): Promise<ListRow[]>;
+  /** rank-parts: one page of ALL ammunition rows, PART_SELECT shape, class_name order. */
+  readAmmoParts(buildId: string, from: number, limit: number): Promise<ListRow[]>;
   /** Verbatim result of rpc codex_facet_values(p_build_id, p_kind). */
   facetValues(buildId: string, kind: string): Promise<unknown>;
   /** Fails closed while R2 usage is unknown or over budget; null = writes may go ahead. */
@@ -105,8 +128,12 @@ export async function publishLists(buildId: string, deps: ListPublishDeps): Prom
   const failed: string[] = [];
   let sample: { key: string; body: string } | null = null;
 
+  // Every class name of every ship's stock loadout, noted while ship-rank passes through.
+  const partNames = new Set<string>();
+  const noteLoadout = (row: ListRow) => loadoutClassNames(row[`${PAYLOAD_ALIAS}defaultLoadout`], partNames);
+
   for (const kind of LIST_FILES) {
-    const built = await buildRowFile(buildId, kind, deps);
+    const built = await buildRowFile(buildId, kind, deps, kind === 'ship-rank' ? noteLoadout : undefined);
     await deps.putJson(listsFileKey(buildId, gen, kind), built.body);
     files[kind] = { rows: built.count, bytes: built.body.length };
     // Keep one small file for the read-back comparison; never a big one.
@@ -161,7 +188,40 @@ export async function publishLists(buildId: string, deps: ListPublishDeps): Prom
   await Promise.all(Array.from({ length: Math.min(8, stale.length) }, async () => {
     while (next < stale.length) await deps.deleteKey(stale[next++]);
   }));
+
+  // rank-parts last, into a publish that is already complete and live.
+  if (live.gen === gen) await addRankParts(buildId, gen, partNames, files, failed, deps);
   return { build: buildId, gen, files, verified, index_put: true, removed_objects: stale.length, failed };
+}
+
+/**
+ * Builds rank-parts.json, puts it and puts the index again with its entry. It reads
+ * the whole payload of every part of the fleet's stock loadouts (about 26 MB through
+ * this function for LIVE 4.10.3), far more than any other file: a worker killed here
+ * (CPU time, memory) leaves the publish above as it is, only without this file.
+ * The index is rewritten only while the bucket's index still names this generation.
+ */
+async function addRankParts(
+  buildId: string,
+  gen: string,
+  names: ReadonlySet<string>,
+  files: ListsIndex['files'],
+  failed: string[],
+  deps: ListPublishDeps,
+): Promise<void> {
+  try {
+    const built = await buildRankParts(buildId, names, deps);
+    await deps.putJson(listsFileKey(buildId, gen, RANK_PARTS), built.body);
+    const idxKey = listsIndexKey(buildId);
+    const now = await deps.readBucket(idxKey);
+    if (!isListsIndex(now, buildId) || now.gen !== gen) throw new Error('the index no longer names this generation');
+    files[RANK_PARTS] = { rows: built.count, bytes: built.body.length };
+    await deps.putJson(idxKey, indexJson(buildId, gen, files));
+  } catch (e) {
+    delete files[RANK_PARTS];
+    failed.push(RANK_PARTS);
+    console.error(`[ingest-catalog] list file ${RANK_PARTS} of build ${buildId} not published: ${e instanceof Error ? e.message : String(e)}`);
+  }
 }
 
 /** Time order of a generation (base-36 milliseconds). */
@@ -170,15 +230,53 @@ function genOrder(gen: string): number {
 }
 
 /** Reads one row file's pages and builds its body; the rows live only inside this call. */
-async function buildRowFile(buildId: string, kind: ListName, deps: ListPublishDeps): Promise<{ body: string; count: number }> {
+async function buildRowFile(
+  buildId: string,
+  kind: ListName,
+  deps: ListPublishDeps,
+  onRow?: (row: ListRow) => void,
+): Promise<{ body: string; count: number }> {
   const pageSize = RANK_PAGED.includes(kind) ? RANK_PAGE : LIST_PAGE;
   const rows: unknown[][] = [];
   for (let from = 0;; from += pageSize) {
     const page = await deps.readRows(buildId, kind, from, pageSize);
-    for (const r of page) rows.push(rowToArray(kind, r));
+    for (const r of page) {
+      onRow?.(r);
+      rows.push(rowToArray(kind, r));
+    }
     if (page.length < pageSize) break;
   }
   return { body: kindFileJson(kind, rows), count: rows.length };
+}
+
+/**
+ * rank-parts: the part tables in lookup order, each asked only for the names no
+ * earlier table held (the first table that owns a class name wins), then all
+ * ammunition. Each row is kept as its JSON text, never as an object: a page of
+ * full payloads is several hundred kB, its kept slices a fraction of that.
+ */
+async function buildRankParts(buildId: string, names: ReadonlySet<string>, deps: ListPublishDeps): Promise<{ body: string; count: number }> {
+  const rows: string[] = [];
+  let left = [...names].sort();
+  for (const table of PART_TABLES) {
+    const found = new Set<string>();
+    for (let i = 0; i < left.length; i += PART_NAMES_PER_READ) {
+      for (const r of await deps.readParts(buildId, table, left.slice(i, i + PART_NAMES_PER_READ))) {
+        const name = r['class_name'] as string;
+        if (found.has(name)) continue;
+        found.add(name);
+        rows.push(partRowJson(table, r));
+      }
+    }
+    left = left.filter((n) => !found.has(n));
+  }
+  const ammo: string[] = [];
+  for (let from = 0;; from += AMMO_PAGE) {
+    const page = await deps.readAmmoParts(buildId, from, AMMO_PAGE);
+    for (const r of page) ammo.push(ammoRowJson(r));
+    if (page.length < AMMO_PAGE) break;
+  }
+  return { body: rankPartsFileJson(rows, left, ammo), count: rows.length };
 }
 
 /** names-de: one kind at a time (pages of NAMES_PAGE, class_name order), only records with a searchable German name. */

@@ -89,6 +89,10 @@ word for word by `parseAnswerOptions` in `feedback.types.ts`:
   post-ship review reply or a review-hold escalation (nothing resumes those);
 - the free-text box stays under the buttons, so an option is never the only
   way to answer. Without the marker nothing changes.
+- a later system message without a marker (e.g. a PostHog watcher repeat
+  notice "Erneut aufgetreten …") does not hide the pending options: the panel
+  takes them from the newest marker-carrying system message that no human
+  reply follows, and keeps that question in view above the newer notice (#382).
 
 **Resuming a `needs_input` topic.** Each run, after the `open` queue, also pick
 up `needs_input` topics whose **latest thread message is human** (the admin
