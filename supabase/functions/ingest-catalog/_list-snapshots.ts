@@ -95,11 +95,16 @@ export const CARD_PAYLOAD_KEYS: readonly string[] = ['name', 'previewImage', 'ma
 export const SHIP_PAYLOAD_KEYS: readonly string[] = [...CARD_PAYLOAD_KEYS, 'sizeClass', 'career', 'dimensions'];
 
 /**
- * Payload keys of the rank cohort file. Must equal RANK_PAYLOAD_KEYS in
- * src/app/codex/codex.service.ts (same keys, same order): the client reads this
- * file instead of `allShipRows`.
+ * Payload keys of the rank cohort file. Starts with RANK_PAYLOAD_KEYS of
+ * src/app/codex/codex.service.ts (the client reads this file instead of
+ * `allShipRows`); `crew` and `dimensions` are what the landing's class
+ * comparison reads on top (COHORT_SHIP_KEYS, codex-landing-data.service.ts),
+ * so `getPayloadKeys` answers from this file too. Readers look keys up by
+ * name: a key added at the end never breaks an older client.
  */
-export const SHIP_RANK_PAYLOAD_KEYS: readonly string[] = ['career', 'defaultLoadout', 'flight', 'hull', 'armorHp', 'cargoScu', 'stats'];
+export const SHIP_RANK_PAYLOAD_KEYS: readonly string[] = [
+  'career', 'defaultLoadout', 'flight', 'hull', 'armorHp', 'cargoScu', 'stats', 'crew', 'dimensions',
+];
 
 /** Rows per page of the heavy files (ship-rank, missile, component-rank): several kB a row (allShipRows pages by 200). */
 export const RANK_PAGE = 200;
@@ -116,9 +121,11 @@ export const PAYLOAD_KEYS: Record<ListName, readonly string[]> = {
   manufacturer: CARD_PAYLOAD_KEYS,
   blueprint: CARD_PAYLOAD_KEYS,
   missile: [],
-  'weapon-rank': ['weaponParams'],
+  // `stats` (weapons) and `weaponParams` (components, null there) complete COHORT_STAT_KEYS of
+  // codex-landing-data.service.ts, so the landing's class comparison reads these files.
+  'weapon-rank': ['weaponParams', 'stats'],
   // `kind` is payload->kind (the JSON value, what payload->>kind yields as text), `stats` payload->stats.
-  'component-rank': ['kind', 'stats'],
+  'component-rank': ['kind', 'stats', 'weaponParams'],
 };
 
 export const PAYLOAD_ALIAS = 'p_';

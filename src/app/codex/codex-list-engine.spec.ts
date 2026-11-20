@@ -3,9 +3,11 @@ import {
   ListSnapshotName,
   SNAPSHOT_COLUMNS,
   countFromSnapshot,
+  distinctColumn,
   foldSearchText,
   germanListFromSnapshot,
   germanSearchMatcher,
+  isWholeTable,
   itemRankRowsFromSnapshot,
   likeRegExp,
   listFromSnapshot,
@@ -14,6 +16,8 @@ import {
   missileRowsFromSnapshot,
   posixRegExp,
   prefixRowsFromSnapshot,
+  recordsByClassName,
+  sliceNameFor,
   snapshotNameFor,
 } from './codex-list-engine';
 
@@ -392,6 +396,75 @@ describe('codex-list-engine', () => {
     it('declines above the limit (the database would cut by its own collation)', () => {
       expect(prefixRowsFromSnapshot(s, 'gmni', 3)).toBeNull();
       expect(prefixRowsFromSnapshot(s, 'gmni', 4)?.length).toBe(4);
+    });
+  });
+
+  describe('reads by class name', () => {
+    const rank = makeSnapshot('weapon-rank', SNAPSHOT_COLUMNS['weapon-rank'], ['weaponParams', 'stats'], [
+      ['GUN_A', 'Gun A', 'Gun', 2, { rpm: 600 }, null],
+      ['GUN_B', 'Gun B', 'Gun', 3, null, { dmg: 2 }],
+    ]);
+    const all = snap('weapon', [item('GUN_A'), item('GUN_B'), item('GUN_VAR', { is_variant: true })]);
+
+    it('names the file that holds the keys', () => {
+      expect(sliceNameFor('weapon', CARD)).toBe('weapon');
+      expect(sliceNameFor('weapon', ['weaponParams', 'stats'])).toBe('weapon-rank');
+      expect(sliceNameFor('component', ['stats'])).toBe('component-rank');
+      expect(sliceNameFor('ship', ['name', 'dimensions'])).toBe('ship');
+      expect(sliceNameFor('ship', ['flight', 'crew'])).toBe('ship-rank');
+      expect(sliceNameFor('item', ['stats'])).toBe('item');
+    });
+
+    it('knows which files hold their whole table', () => {
+      expect(isWholeTable(all)).toBe(true);
+      expect(isWholeTable(snap('ship-rank', [ship('A')], ['career']))).toBe(true);
+      expect(isWholeTable(rank)).toBe(false);
+    });
+
+    it('a whole-table file answers every name: an unknown one is absent, nothing is left for the database', () => {
+      const out = recordsByClassName(all, null, ['GUN_VAR', 'NOPE', 'GUN_VAR'], ['name']);
+      expect([...out!.records.keys()]).toEqual(['GUN_VAR']);
+      expect(out!.records.get('GUN_VAR')).toEqual({
+        ...Object.fromEntries(SNAPSHOT_COLUMNS.weapon.map((c) => [c, null])),
+        class_name: 'GUN_VAR',
+        name_localized: 'GUN_VAR',
+        is_variant: true,
+        p_name: null,
+      });
+      expect(out!.rest).toEqual([]);
+    });
+
+    it('a filtered file leaves what it filtered out to the database, and only that', () => {
+      const out = recordsByClassName(rank, all, ['GUN_B', 'GUN_VAR', 'NOPE'], ['weaponParams', 'stats']);
+      expect(out!.records.get('GUN_B')).toEqual({
+        class_name: 'GUN_B',
+        name_localized: 'Gun B',
+        sub_type: 'Gun',
+        size: 3,
+        p_weaponParams: null,
+        p_stats: { dmg: 2 },
+      });
+      expect(out!.rest).toEqual(['GUN_VAR']);
+    });
+
+    it('without the kind file every name the filtered file lacks goes to the database', () => {
+      expect(recordsByClassName(rank, null, ['GUN_A', 'NOPE'], ['stats'])!.rest).toEqual(['NOPE']);
+    });
+
+    it('declines for a key the file does not carry', () => {
+      expect(recordsByClassName(all, null, ['GUN_A'], ['stats'])).toBeNull();
+    });
+
+    it('lists the distinct non-empty values of a column, in file order', () => {
+      const bp = snap('blueprint', [
+        { class_name: 'A', category: 'Weapons' },
+        { class_name: 'B', category: 'Armor' },
+        { class_name: 'C', category: 'Weapons' },
+        { class_name: 'D' },
+        { class_name: 'E', category: '' },
+      ]);
+      expect(distinctColumn(bp, 'category')).toEqual(['Weapons', 'Armor']);
+      expect(distinctColumn(bp, 'nope')).toBeNull();
     });
   });
 });

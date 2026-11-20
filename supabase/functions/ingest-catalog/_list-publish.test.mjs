@@ -44,11 +44,22 @@ describe('list snapshot builders', () => {
 
   it('ship-rank mirrors the ship columns and the client rank keys', () => {
     assert.deepEqual(LIST_COLUMNS['ship-rank'], LIST_COLUMNS.ship);
-    assert.deepEqual(SHIP_RANK_PAYLOAD_KEYS, ['career', 'defaultLoadout', 'flight', 'hull', 'armorHp', 'cargoScu', 'stats']);
+    // RANK_PAYLOAD_KEYS of the client first, then what the landing's class comparison adds (COHORT_SHIP_KEYS).
+    assert.deepEqual(SHIP_RANK_PAYLOAD_KEYS, ['career', 'defaultLoadout', 'flight', 'hull', 'armorHp', 'cargoScu', 'stats', 'crew', 'dimensions']);
     const file = JSON.parse(kindFileJson('ship-rank', []));
     assert.equal(file.kind, 'ship-rank');
     assert.deepEqual(file.payloadKeys, SHIP_RANK_PAYLOAD_KEYS);
-    assert.match(selectFor('ship-rank'), /p_stats:payload->stats$/);
+    assert.match(selectFor('ship-rank'), /p_stats:payload->stats, p_crew:payload->crew, p_dimensions:payload->dimensions$/);
+  });
+
+  it('the rank files carry every key the landing class comparison reads by class name', () => {
+    // COHORT_SHIP_KEYS / COHORT_STAT_KEYS of src/app/codex/landing/codex-landing-data.service.ts
+    for (const k of ['flight', 'hull', 'armorHp', 'cargoScu', 'crew', 'dimensions', 'defaultLoadout']) {
+      assert.ok(PAYLOAD_KEYS['ship-rank'].includes(k), k);
+    }
+    for (const name of ['weapon-rank', 'component-rank']) {
+      for (const k of ['weaponParams', 'stats']) assert.ok(PAYLOAD_KEYS[name].includes(k), `${name} ${k}`);
+    }
   });
 
   it('selects payload slices server-side, never the whole payload', () => {
@@ -276,9 +287,15 @@ describe('added files', () => {
   });
 
   it('weapon-rank and component-rank select their payload slices', () => {
-    assert.equal(selectFor('weapon-rank'), 'class_name, name_localized, sub_type, size, p_weaponParams:payload->weaponParams');
-    assert.equal(selectFor('component-rank'), 'class_name, name_localized, sub_type, size, p_kind:payload->kind, p_stats:payload->stats');
-    assert.deepEqual(PAYLOAD_KEYS['component-rank'], ['kind', 'stats']);
+    assert.equal(
+      selectFor('weapon-rank'),
+      'class_name, name_localized, sub_type, size, p_weaponParams:payload->weaponParams, p_stats:payload->stats',
+    );
+    assert.equal(
+      selectFor('component-rank'),
+      'class_name, name_localized, sub_type, size, p_kind:payload->kind, p_stats:payload->stats, p_weaponParams:payload->weaponParams',
+    );
+    assert.deepEqual(PAYLOAD_KEYS['component-rank'], ['kind', 'stats', 'weaponParams']);
   });
 
   it('names-de keeps only German names codex_search would search, in kind order', async () => {

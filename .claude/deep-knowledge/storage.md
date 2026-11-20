@@ -107,8 +107,10 @@ columnar: `{ v, kind, columns, payloadKeys, rows: [[...columns, ...payload slice
 component, item) unchanged. The ship payload slice is `SHIP_PAYLOAD_KEYS` in
 `_list-snapshots.ts` (card keys + `sizeClass`, `career`, `dimensions`; the rank-cohort
 keys hold the loadout tree and stats and live in their own file, `ship-rank.json`:
-the same ship columns, `payloadKeys` = `SHIP_RANK_PAYLOAD_KEYS` (equal to
-`RANK_PAYLOAD_KEYS` in `codex.service.ts`), all ships in `ship.json` order, read in
+the same ship columns, `payloadKeys` = `SHIP_RANK_PAYLOAD_KEYS` (`RANK_PAYLOAD_KEYS`
+of `codex.service.ts`, then `crew` and `dimensions` for the landing's class
+comparison; readers look keys up by name, so a key added at the end never breaks an
+older client), all ships in `ship.json` order, read in
 pages of 200 because each row carries several kB; a browser reads it once per build
 for the rank cohort).
 
@@ -116,9 +118,9 @@ Four more files (concept supabase-io-last; the client reads them instead of the 
 `missile.json` (`getMissileCohort`: items, `attach_type = 'Missile'`, named; columns `class_name,
 name_localized, sub_type, size, attach_type, payload`, the LAST column is the whole payload,
 `payloadKeys` empty; pages of 200), `weapon-rank.json` (weapons, named, `is_variant = false`;
-columns `class_name, name_localized, sub_type, size`, payloadKeys `weaponParams`),
-`component-rank.json` (components, same filters, ALL kinds; payloadKeys `kind`, `stats`; pages of
-200). The client still applies `getItemRankCohort`'s `name_localized not like '!*'` and the
+columns `class_name, name_localized, sub_type, size`, payloadKeys `weaponParams`, `stats`),
+`component-rank.json` (components, same filters, ALL kinds; payloadKeys `kind`, `stats`,
+`weaponParams`; pages of 200). The client still applies `getItemRankCohort`'s `name_localized not like '!*'` and the
 component kind filter. `names-de.json` = `{ v: 1, lang: "de", kinds: { <kind>: [[class_name,
 german name]] } }` for all seven kinds, class_name order, one entry per record whose
 `payload->name->>de` the `codex_search` text includes (not empty, not `@...`, not `TRANSLATION NOT
@@ -169,9 +171,23 @@ token against the folded `en de` text or ILIKE the class name, `*` wildcard,
 `%`/`_`/`\` literal — then the list's own filters); it does not rank by
 `word_similarity` nor cut at 100 names, so a broad German term lists all its
 matches. Without either file the `codex_search` RPC + `in` list read run as before.
+Reads by class name (`.in('class_name', …)`) go through `snapshotByName` →
+`recordsByClassName`: `resolveEntities` (the five kind files, merged in table
+order), `getShipsByClassNames` (`ship.json`, or `ship-rank.json` for rank keys),
+`getPayloadKeys` (card keys from the kind file, everything else from the rank
+slice of ships / weapons / components), `getComponentKeyStats` (the four values
+picked out of `component-rank.json`'s `stats`) and `blueprintCategories` (distinct
+`category` of `blueprint.json`). A kind file holds the whole table, so a name it
+lacks is simply absent; `weapon-rank` / `component-rank` are filtered, so a name
+they lack is looked up in the kind file: absent there = not in the build, present
+there (a variant, an unnamed record) = the one name the old query still reads. A
+file published before a key existed declines, and the old query runs for every name.
 Still on the database: `listBlueprints` (full payload, no file; no caller today),
-the `codex_search_suggest` "did you mean" RPC, detail pages and every other
-non-list read. `searchAll` pages through `listByKind`, so it reads the files too. Specs never reach the Worker: `vitest-setup.ts` answers
+the `codex_search_suggest` "did you mean" RPC, detail pages, the silhouettes
+(`codex_silhouettes`: 7.5 MB ships, 11 MB components, 32 MB items per build — too
+big for one file per kind, they would need shards), the patch tables
+(`codex_patch_*`, `codex_added_class_names`, `codex_patch_news`: across builds, not
+per build) and every other non-list read. `searchAll` pages through `listByKind`, so it reads the files too. Specs never reach the Worker: `vitest-setup.ts` answers
 `/codex-lists/` with 404.
 
 ## Localization strings (R2 since 2026-10-03)

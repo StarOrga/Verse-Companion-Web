@@ -60,6 +60,7 @@ import { UpcomingShipsService } from './upcoming-ships.service';
 import { CodexLocaleShards } from './codex-locale-shards';
 import { CodexListSnapshots, NamesDe } from './codex-list-snapshots';
 import {
+  ByClassName,
   CARD_PAYLOAD_KEYS,
   INTERNAL_ITEM_ATTACH_TYPES,
   ListSnapshot,
@@ -67,13 +68,18 @@ import {
   NON_SHIP_VEHICLE_PREFIXES,
   SearchMode,
   countFromSnapshot,
+  distinctColumn,
   germanListFromSnapshot,
+  isWholeTable,
   itemRankRowsFromSnapshot,
   jsonTextOf,
   listFromSnapshot,
   matchRows,
   missileRowsFromSnapshot,
+  payloadKeysOf,
   prefixRowsFromSnapshot,
+  recordsByClassName,
+  sliceNameFor,
   snapshotNameFor,
 } from './codex-list-engine';
 
@@ -1024,6 +1030,28 @@ export class CodexService {
     });
   }
 
+  /**
+   * A read of `kind` rows by class name with the payload `keys`, answered from
+   * the build's list files: the records found, and the names only the database
+   * can answer (`rest`). `null` = no file can (not published, an older file
+   * without a key, outage): the caller runs its query for every name.
+   */
+  private snapshotByName(
+    buildId: string,
+    kind: CodexKind,
+    names: readonly string[],
+    keys: readonly string[],
+  ): Promise<ByClassName | null> {
+    return this.fromSnapshot('by class name', async () => {
+      const name = sliceNameFor(kind, keys);
+      const slice = await this.snapshotFile(buildId, name);
+      if (!slice) return null;
+      // A filtered slice cannot tell "not in the build" from "filtered out": the kind file can.
+      const all = isWholeTable(slice) ? null : await this.snapshotFile(buildId, kind);
+      return recordsByClassName(slice, all, names, keys);
+    });
+  }
+
   /** The database path of {@link listByKind} (before the German-name fallback), unchanged. */
   private async listByKindFromDb(
     kind: CodexKind,
@@ -1742,8 +1770,12 @@ export class CodexService {
     const build = await this.loadCurrentBuild();
     const names = Array.from(new Set(classNames.filter(Boolean)));
     if (!build || names.length === 0 || keys.length === 0) return out;
+    const fromFile = await this.snapshotByName(build.id, kind, names, keys);
+    if (fromFile) for (const [cn, r] of fromFile.records) out.set(cn, payloadFromAliases(r));
+    const rest = fromFile ? fromFile.rest : names;
+    if (rest.length === 0) return out;
     const select = ['class_name', ...keys.map((k) => `${PAYLOAD_ALIAS}${k}:payload->${k}`)].join(', ');
-    await forEachLimited(chunk(names, 100), PAYLOAD_READS_IN_FLIGHT, async (slice) => {
+    await forEachLimited(chunk(rest, 100), PAYLOAD_READS_IN_FLIGHT, async (slice) => {
       const { data, error } = await this.sb.client
         .from(CODEX_ENTITY_TABLES[kind])
         .select(select)
@@ -2123,29 +2155,39 @@ export class CodexService {
       ammunition: 'class_name, name_localized, size, name:payload->name',
     };
 
-    await Promise.all(
-      (Object.keys(selects) as CodexKind[]).map(async (kind) => {
+    // Each table from its kind file (all rows of the build, so a name it lacks
+    // is not in the table); a kind without a file asks the database as before.
+    const kinds = Object.keys(selects) as CodexKind[];
+    const perKind = await Promise.all(
+      kinds.map(async (kind): Promise<Record<string, unknown>[]> => {
+        const fromFile = await this.snapshotByName(build.id, kind, names, ['name']);
+        if (fromFile && fromFile.rest.length === 0) {
+          return [...fromFile.records.values()].map((r) => ({ ...r, name: r[`${PAYLOAD_ALIAS}name`] ?? null }));
+        }
         const { data, error } = await this.sb.client
           .from(CODEX_ENTITY_TABLES[kind])
           .select(selects[kind]!)
           .eq('build_id', build.id)
           .in('class_name', names);
-        if (error || !data) return;
-        for (const r of data as unknown as Record<string, unknown>[]) {
-          const cn = r['class_name'] as string;
-          if (out.has(cn)) continue; // first owner wins
-          out.set(cn, {
-            kind,
-            className: cn,
-            nameLocalized: (r['name_localized'] as string | null) ?? null,
-            name: (r['name'] as LocalizedText | null) ?? null,
-            manufacturerCode: (r['manufacturer_code'] as string | null) ?? null,
-            size: (r['size'] as number | null) ?? null,
-            grade: (r['grade'] as string | null) ?? null,
-          });
-        }
+        return error || !data ? [] : (data as unknown as Record<string, unknown>[]);
       }),
     );
+    // Merged in table order, so "first owner wins" does not depend on which answer lands first.
+    kinds.forEach((kind, i) => {
+      for (const r of perKind[i]) {
+        const cn = r['class_name'] as string;
+        if (out.has(cn)) continue;
+        out.set(cn, {
+          kind,
+          className: cn,
+          nameLocalized: (r['name_localized'] as string | null) ?? null,
+          name: (r['name'] as LocalizedText | null) ?? null,
+          manufacturerCode: (r['manufacturer_code'] as string | null) ?? null,
+          size: (r['size'] as number | null) ?? null,
+          grade: (r['grade'] as string | null) ?? null,
+        });
+      }
+    });
     return out;
   }
 
@@ -2247,7 +2289,24 @@ export class CodexService {
       'power:payload->stats->ItemResourceComponentParams->"online.power.generateSegments",' +
       'cooling:payload->stats->ItemResourceComponentParams->"online.coolant.generate"';
     const num = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null);
-    await forEachLimited(chunk(names, 200), PAYLOAD_READS_IN_FLIGHT, async (slice) => {
+    // component-rank.json carries payload->stats: the same four values, picked here instead of by PostgREST.
+    const fromFile = await this.snapshotByName(build.id, 'component', names, ['stats']);
+    if (fromFile) {
+      const at = (o: unknown, k: string): unknown =>
+        o && typeof o === 'object' && !Array.isArray(o) ? (o as Record<string, unknown>)[k] : null;
+      for (const [cn, r] of fromFile.records) {
+        const stats = r[`${PAYLOAD_ALIAS}stats`];
+        const resource = at(stats, 'ItemResourceComponentParams');
+        out.set(cn, {
+          shield: num(at(at(stats, 'SCItemShieldGeneratorParams'), 'MaxShieldHealth')),
+          quantum: num(at(at(stats, 'SCItemQuantumDriveParams'), 'params.driveSpeed')),
+          power: num(at(resource, 'online.power.generateSegments')),
+          cooling: num(at(resource, 'online.coolant.generate')),
+        });
+      }
+    }
+    const rest = fromFile ? fromFile.rest : names;
+    await forEachLimited(chunk(rest, 200), PAYLOAD_READS_IN_FLIGHT, async (slice) => {
       const { data, error } = await this.sb.client
         .from('codex_components')
         .select(select)
@@ -2281,6 +2340,12 @@ export class CodexService {
     const build = await this.loadCurrentBuild();
     const names = Array.from(new Set(classNames.filter(Boolean)));
     if (!build || names.length === 0) return out;
+    const keys = payloadKeysOf(payload);
+    const fromFile = keys ? await this.snapshotByName(build.id, 'ship', names, keys) : null;
+    if (fromFile && fromFile.rest.length === 0) {
+      for (const [cn, r] of fromFile.records) out.set(cn, mapListRow('ship', r));
+      return out;
+    }
     const { data, error } = await this.sb.client
       .from('codex_ships')
       .select(listSelect('ship', payload))
@@ -3003,6 +3068,15 @@ export class CodexService {
   }
 
   private async fetchBlueprintCategories(buildId: string): Promise<string[]> {
+    const fromFile = await this.fromSnapshot('blueprint categories', async () => {
+      const snap = await this.snapshotFile(buildId, 'blueprint');
+      return snap && distinctColumn(snap, 'category');
+    });
+    if (fromFile) {
+      const values = fromFile.sort((a, b) => a.localeCompare(b));
+      this.blueprintCategoryCache = { buildId, values };
+      return values;
+    }
     const seen = new Set<string>();
     for (let page = 0; page < CATEGORY_MAX_PAGES; page++) {
       const from = page * CATEGORY_PAGE_SIZE;

@@ -459,6 +459,86 @@ export function itemRankRowsFromSnapshot(snap: ListSnapshot, kind: string): Reco
     .map((r) => ({ ...base(r), ck: jsonTextOf(r[ck]), stats: r[st] ?? null }));
 }
 
+// ── reads by class name ──────────────────────────────────────────────────────
+
+/** Files that hold only part of their table (the publisher's LIST_FILTERS); every other file holds all rows. */
+const FILTERED_FILES: ReadonlySet<ListSnapshotName> = new Set<ListSnapshotName>(['missile', 'weapon-rank', 'component-rank']);
+
+/** True when `snap` holds every row of its table in the build: a class name it lacks does not exist there. */
+export function isWholeTable(snap: ListSnapshot): boolean {
+  return !FILTERED_FILES.has(snap.name);
+}
+
+const classIndex = new WeakMap<ListSnapshot, ReadonlyMap<string, readonly unknown[]>>();
+
+/** `snap`'s rows keyed by class name; built once per snapshot. */
+export function rowsByClassName(snap: ListSnapshot): ReadonlyMap<string, readonly unknown[]> {
+  let index = classIndex.get(snap);
+  if (!index) {
+    const c = snap.col.get('class_name');
+    const built = new Map<string, readonly unknown[]>();
+    if (c !== undefined) for (const r of snap.rows) if (typeof r[c] === 'string') built.set(r[c] as string, r);
+    index = built;
+    classIndex.set(snap, index);
+  }
+  return index;
+}
+
+/**
+ * Which file holds the payload `keys` of a kind's rows: the kind file for what
+ * a card reads, else the rank slice of ships, weapons and components (the only
+ * files with stats and loadout data). The caller still checks the file for the keys.
+ */
+export function sliceNameFor(kind: CodexKind, keys: readonly string[]): ListSnapshotName {
+  if (kind === 'ship') return snapshotNameFor('ship', [...keys]) ?? 'ship';
+  if ((kind === 'weapon' || kind === 'component') && !keys.every((k) => CARD_PAYLOAD_KEYS.includes(k))) return `${kind}-rank`;
+  return kind;
+}
+
+export interface ByClassName {
+  /** Class name → the record PostgREST returns for the file's list columns plus one `p_<key>` per key. */
+  records: Map<string, Record<string, unknown>>;
+  /** Class names only the database can answer (the table has them, the filtered file does not). */
+  rest: string[];
+}
+
+/**
+ * A `.in('class_name', names)` read answered from a file. `all` is the kind
+ * file of the same table, given when `slice` is a filtered one: a name neither
+ * holds does not exist in the build and is simply absent, as in the query's
+ * answer; a name only `all` holds (a variant, an unnamed record) goes to `rest`.
+ * Without `all`, every name a filtered slice lacks goes to `rest`.
+ * `null` (decline) when the file lacks a key or the class-name column.
+ */
+export function recordsByClassName(
+  slice: ListSnapshot,
+  all: ListSnapshot | null,
+  names: readonly string[],
+  keys: readonly string[],
+): ByClassName | null {
+  if (!slice.col.has('class_name') || !keys.every((k) => slice.key.has(k))) return null;
+  const whole = isWholeTable(slice);
+  const rows = rowsByClassName(slice);
+  const known = !whole && all && isWholeTable(all) ? rowsByClassName(all) : null;
+  const records = new Map<string, Record<string, unknown>>();
+  const rest: string[] = [];
+  for (const name of new Set(names)) {
+    const row = rows.get(name);
+    if (row) records.set(name, toRecord(slice, row, keys));
+    else if (!whole && (!known || known.has(name))) rest.push(name);
+  }
+  return { records, rest };
+}
+
+/** The distinct non-empty text values of one list column, in file order, or `null` when the file lacks it. */
+export function distinctColumn(snap: ListSnapshot, column: string): string[] | null {
+  const c = snap.col.get(column);
+  if (c === undefined) return null;
+  const seen = new Set<string>();
+  for (const r of snap.rows) if (typeof r[c] === 'string' && r[c]) seen.add(r[c] as string);
+  return [...seen];
+}
+
 // ── German-name search (mirror of the codex_search RPC) ──────────────────────
 
 /**

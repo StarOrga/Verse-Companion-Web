@@ -350,6 +350,171 @@ describe('CodexService list reads: snapshot first, database as the exact fallbac
     });
   });
 
+  describe('reads by class name (cohort payloads, component stats, entities, ship cards, blueprint categories)', () => {
+    const files = (...snaps: ListSnapshot[]) => ({
+      rows: vi.fn(async (_b: string, name: ListSnapshotName) => snaps.find((s) => s.name === name) ?? null),
+      facets: vi.fn(async () => null),
+    });
+    const SHIP_KEYS = [...CARD, 'sizeClass', 'career', 'dimensions'];
+    /** A kind file from row objects (absent column / key = null). */
+    const kindFile = (name: ListSnapshotName, rows: Record<string, unknown>[], keys: string[] = CARD) =>
+      makeSnapshot(
+        name,
+        SNAPSHOT_COLUMNS[name],
+        keys,
+        rows.map((r) => [...SNAPSHOT_COLUMNS[name].map((c) => r[c] ?? null), ...keys.map((k) => r[`p_${k}`] ?? null)]),
+      );
+    const only = (table: string, data: unknown[]) => (t: string) => ({ data: t === table ? data : [], error: null });
+
+    it('getPayloadKeys answers a ship cohort from ship-rank: no table read, null keys left out', async () => {
+      const rank = kindFile(
+        'ship-rank',
+        [
+          { class_name: 'SHIP_A', p_flight: { scm: 200 } },
+          { class_name: 'SHIP_B', p_flight: { scm: 100 }, p_crew: 2 },
+        ],
+        ['flight', 'crew'],
+      );
+      const { svc, calls } = setup(files(rank));
+      const out = await svc.getPayloadKeys('ship', ['SHIP_B', 'SHIP_A', 'GONE'], ['flight', 'crew']);
+      expect([...out]).toEqual([
+        ['SHIP_B', { flight: { scm: 100 }, crew: 2 }],
+        ['SHIP_A', { flight: { scm: 200 } }],
+      ]);
+      expect(entityCalls(calls)).toEqual([]);
+    });
+
+    it('getPayloadKeys asks the database only for names the filtered rank file leaves out', async () => {
+      const rank = kindFile('weapon-rank', [{ class_name: 'GUN_A', p_weaponParams: { rpm: 600 }, p_stats: { dmg: 1 } }], ['weaponParams', 'stats']);
+      const all = kindFile('weapon', [{ class_name: 'GUN_A' }, { class_name: 'GUN_VAR', is_variant: true }]);
+      const { svc, calls } = setup(
+        files(rank, all),
+        only('codex_weapons', [{ class_name: 'GUN_VAR', p_weaponParams: { rpm: 1 }, p_stats: null }]),
+      );
+      const out = await svc.getPayloadKeys('weapon', ['GUN_A', 'GUN_VAR', 'NOT_A_WEAPON'], ['weaponParams', 'stats']);
+      expect(out.get('GUN_A')).toEqual({ weaponParams: { rpm: 600 }, stats: { dmg: 1 } });
+      expect(out.get('GUN_VAR')).toEqual({ weaponParams: { rpm: 1 } });
+      expect(out.has('NOT_A_WEAPON')).toBe(false);
+      const reads = entityCalls(calls);
+      expect(reads.map((c) => c.table)).toEqual(['codex_weapons']);
+      expect(reads[0].ops.filter((op) => op.startsWith('in('))).toEqual(['in("class_name",["GUN_VAR"])']);
+    });
+
+    it('getPayloadKeys runs the old query for every name when the file lacks a key (published before it had one)', async () => {
+      const old = kindFile('weapon-rank', [{ class_name: 'GUN_A', p_weaponParams: { rpm: 600 } }], ['weaponParams']);
+      const { svc, calls } = setup(
+        files(old),
+        only('codex_weapons', [{ class_name: 'GUN_A', p_weaponParams: { rpm: 600 }, p_stats: { dmg: 1 } }]),
+      );
+      const out = await svc.getPayloadKeys('weapon', ['GUN_A'], ['weaponParams', 'stats']);
+      expect(out.get('GUN_A')).toEqual({ weaponParams: { rpm: 600 }, stats: { dmg: 1 } });
+      expect(entityCalls(calls)[0].ops.filter((op) => op.startsWith('in('))).toEqual(['in("class_name",["GUN_A"])']);
+    });
+
+    it('getComponentKeyStats picks the four values out of component-rank stats', async () => {
+      const rank = kindFile(
+        'component-rank',
+        [
+          {
+            class_name: 'SHLD_A',
+            p_kind: 'Shield',
+            p_stats: {
+              SCItemShieldGeneratorParams: { MaxShieldHealth: 5000 },
+              ItemResourceComponentParams: { 'online.power.generateSegments': 4, 'online.coolant.generate': '7' },
+            },
+          },
+          { class_name: 'QDRV_A', p_kind: 'QuantumDrive', p_stats: { SCItemQuantumDriveParams: { 'params.driveSpeed': 1e8 } } },
+          { class_name: 'BARE', p_kind: 'Cooler' },
+        ],
+        ['kind', 'stats', 'weaponParams'],
+      );
+      const all = kindFile('component', [{ class_name: 'SHLD_A' }, { class_name: 'QDRV_A' }, { class_name: 'BARE' }]);
+      const { svc, calls } = setup(files(rank, all));
+      const out = await svc.getComponentKeyStats(['SHLD_A', 'QDRV_A', 'BARE', 'GUN_A']);
+      expect(out.get('SHLD_A')).toEqual({ shield: 5000, quantum: null, power: 4, cooling: null });
+      expect(out.get('QDRV_A')).toEqual({ shield: null, quantum: 1e8, power: null, cooling: null });
+      expect(out.get('BARE')).toEqual({ shield: null, quantum: null, power: null, cooling: null });
+      expect(out.has('GUN_A')).toBe(false);
+      expect(entityCalls(calls)).toEqual([]);
+    });
+
+    it('resolveEntities reads the kind files, first table wins; a kind without a file asks its table', async () => {
+      const weapons = kindFile('weapon', [
+        { class_name: 'GUN_A', name_localized: 'Gun A', manufacturer_code: 'BEHR', size: 2, grade: 'A', p_name: { en: 'Gun A' } },
+        { class_name: 'BOTH', name_localized: 'As weapon' },
+      ]);
+      const components = kindFile('component', [{ class_name: 'BOTH', name_localized: 'As component' }]);
+      const items = kindFile('item', []);
+      const ships = kindFile('ship', [{ class_name: 'SHIP_A', name_localized: 'Ship A', manufacturer_code: 'AEGS' }], SHIP_KEYS);
+      const { svc, calls } = setup(
+        files(weapons, components, items, ships),
+        only('codex_ammunition', [{ class_name: 'AMMO_A', name_localized: 'Ammo A', size: 1, name: null }]),
+      );
+      const out = await svc.resolveEntities(['GUN_A', 'BOTH', 'SHIP_A', 'AMMO_A', 'NOPE']);
+      expect(out.get('GUN_A')).toEqual({
+        kind: 'weapon',
+        className: 'GUN_A',
+        nameLocalized: 'Gun A',
+        name: { en: 'Gun A' },
+        manufacturerCode: 'BEHR',
+        size: 2,
+        grade: 'A',
+      });
+      expect(out.get('BOTH')?.kind).toBe('weapon');
+      expect(out.get('BOTH')?.nameLocalized).toBe('As weapon');
+      expect(out.get('SHIP_A')).toEqual({
+        kind: 'ship',
+        className: 'SHIP_A',
+        nameLocalized: 'Ship A',
+        name: null,
+        manufacturerCode: 'AEGS',
+        size: null,
+        grade: null,
+      });
+      expect(out.get('AMMO_A')?.kind).toBe('ammunition');
+      expect(out.has('NOPE')).toBe(false);
+      expect(entityCalls(calls).map((c) => c.table)).toEqual(['codex_ammunition']);
+    });
+
+    it('getShipsByClassNames maps ship cards from the ship file; the full payload stays a table read', async () => {
+      const ships = kindFile(
+        'ship',
+        [
+          { class_name: 'SHIP_A', name_localized: 'Ship A', role: 'Fighter', crew_size: 1, is_variant: false, p_name: { en: 'Ship A' }, p_dimensions: { length: 20 } },
+          { class_name: 'SHIP_B', name_localized: 'Ship B', is_variant: false },
+        ],
+        SHIP_KEYS,
+      );
+      const { svc, calls } = setup(files(ships));
+      const out = await svc.getShipsByClassNames(['SHIP_B', 'SHIP_A', 'GONE'], [...CARD, 'dimensions']);
+      expect([...out.keys()]).toEqual(['SHIP_B', 'SHIP_A']);
+      expect(out.get('SHIP_A')?.payload).toEqual({ name: { en: 'Ship A' }, dimensions: { length: 20 } });
+      expect(out.get('SHIP_A')?.role).toBe('Fighter');
+      expect(out.get('SHIP_A')?.crewSize).toBe(1);
+      expect(entityCalls(calls)).toEqual([]);
+
+      expect([...(await svc.getShipsByClassNames(['SHIP_A'], 'full')).keys()]).toEqual(['FROM_DB']);
+      expect(entityCalls(calls).map((c) => c.table)).toEqual(['codex_ships']);
+    });
+
+    it('blueprintCategories lists the distinct categories of the blueprint file, sorted', async () => {
+      const blueprints = kindFile('blueprint', [
+        { class_name: 'BP1', category: 'Weapons' },
+        { class_name: 'BP2', category: 'Armor' },
+        { class_name: 'BP3', category: 'Weapons' },
+        { class_name: 'BP4' },
+      ]);
+      const { svc, calls } = setup(files(blueprints));
+      expect(await svc.blueprintCategories()).toEqual(['Armor', 'Weapons']);
+      expect(entityCalls(calls)).toEqual([]);
+      TestBed.resetTestingModule();
+
+      const db = setup(files(), only('codex_blueprints', [{ category: 'From table' }]));
+      expect(await db.svc.blueprintCategories()).toEqual(['From table']);
+      expect(entityCalls(db.calls).map((c) => c.table)).toEqual(['codex_blueprints']);
+    });
+  });
+
   it('answers the skin siblings from the kind file, the database above the limit', async () => {
     const row = (cn: string) => [...SNAPSHOT_COLUMNS.weapon.map((c) => ({ class_name: cn, is_variant: true })[c] ?? null), null, null, null];
     const family = makeSnapshot('weapon', SNAPSHOT_COLUMNS.weapon, CARD, [
