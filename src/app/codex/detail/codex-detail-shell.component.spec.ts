@@ -1,10 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component, TemplateRef, computed, inject, signal, viewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TranslateService, provideTranslateService } from '@ngx-translate/core';
 
 import { CodexDetailHeadComponent, attachPull, naturalTop, nextSlim } from './codex-detail-head.component';
 import { CodexDetailShellComponent, CodexDetailTabsComponent } from './codex-detail-shell.component';
-import { detailProfileFor, detailTabs, type DetailTabData, type DetailTabId } from './codex-detail-profile';
+import { CodexDetailSlots, type DetailSlotSource, type DetailSlotState } from './codex-detail-slots';
+import { SHIP_PANEL_TABS, detailProfileFor, detailTabs, type DetailTabData, type DetailTabId } from './codex-detail-profile';
 
 const NONE: DetailTabData = { einordnung: false, werte: 1, bezug: 0, verbaut: 0, aenderungen: 0, richStage: false };
 
@@ -20,7 +21,7 @@ describe('detail profile (T1/T3/T4)', () => {
 
   it('gives a weapon with a comparison the item stage, and a ship the holotable with its strip', () => {
     expect(detailProfileFor('weapon', { ...NONE, einordnung: true }).stage).toBe('item');
-    expect(detailProfileFor('ship', NONE)).toEqual({ stage: 'holo', tabs: [], strip: true });
+    expect(detailProfileFor('ship', NONE)).toEqual({ stage: 'holo', tabs: [], shipTabs: SHIP_PANEL_TABS, strip: true });
   });
 });
 
@@ -54,6 +55,23 @@ describe('head band attaches to the subheader (H1/H3)', () => {
       // Not the first child: no parent edge to measure against.
       parent.prepend(document.createElement('span'));
       expect(naturalTop(host)).toBeNull();
+    } finally {
+      parent.remove();
+    }
+  });
+
+  it('measures through a display:contents wrapper (the ship head slotted into the shell) on the box it stands in', () => {
+    const parent = document.createElement('div');
+    parent.style.cssText = 'position: absolute; top: 120px; left: 0; width: 400px; height: 600px; display: flex; flex-direction: column; padding-top: 4px';
+    const scope = document.createElement('div');
+    scope.style.display = 'contents';
+    const host = document.createElement('div');
+    host.style.cssText = 'height: 75px';
+    scope.append(host);
+    parent.append(scope, document.createElement('div'));
+    document.body.append(parent);
+    try {
+      expect(naturalTop(host)! + window.scrollY).toBe(124);
     } finally {
       parent.remove();
     }
@@ -170,5 +188,70 @@ describe('CodexDetailShellComponent', () => {
     expect(el.querySelector('.sh-stage .holo')).not.toBeNull();
     expect(el.querySelector('.sh-panel')).toBeNull();
     expect(el.querySelector('[role="tab"]')).toBeNull();
+  });
+  it('places the regions of a slotted stage in its own slots: head, table | panel with the ship tabs of the profile, views, below, strip', async () => {
+    @Component({
+      selector: 'sc-fake-holo-stage',
+      standalone: true,
+      template: `
+        <div class="table">t</div>
+        <ng-template #head><div class="r-head">h</div></ng-template>
+        <ng-template #panelHead><div class="r-ph">ph</div></ng-template>
+        <ng-template #panelBody><div class="r-body">b</div></ng-template>
+        <ng-template #panelFoot><div class="r-foot">f</div></ng-template>
+        <ng-template #views><div class="r-views">v</div></ng-template>
+        <ng-template #below><div class="r-below">bl</div></ng-template>
+        <ng-template #strip><div class="r-strip">s</div></ng-template>
+      `,
+    })
+    class FakeStage implements DetailSlotSource {
+      private readonly head = viewChild<TemplateRef<unknown>>('head');
+      private readonly panelHead = viewChild<TemplateRef<unknown>>('panelHead');
+      private readonly panelBody = viewChild<TemplateRef<unknown>>('panelBody');
+      private readonly panelFoot = viewChild<TemplateRef<unknown>>('panelFoot');
+      private readonly views = viewChild<TemplateRef<unknown>>('views');
+      private readonly below = viewChild<TemplateRef<unknown>>('below');
+      private readonly strip = viewChild<TemplateRef<unknown>>('strip');
+      readonly slotTemplates = computed(() => {
+        const [head, panelHead, panelBody, panelFoot, views, below, strip] = [this.head(), this.panelHead(), this.panelBody(), this.panelFoot(), this.views(), this.below(), this.strip()];
+        return head && panelHead && panelBody && panelFoot && views && below && strip ? { head, panelHead, panelBody, panelFoot, views, below, strip } : null;
+      });
+      readonly slotState = signal<DetailSlotState>({ push: false, docking: false, reveal: false, dim: false, still: true, hideData: false });
+      readonly panelTab = signal('rank');
+      readonly panelTabCounts = signal<Record<string, number>>({ changes: 2 });
+      readonly picked: string[] = [];
+      constructor() { inject(CodexDetailSlots).source.set(this); }
+      selectPanelTab(id: string): void { this.picked.push(id); this.panelTab.set(id); }
+    }
+    @Component({
+      standalone: true,
+      imports: [CodexDetailShellComponent, FakeStage],
+      template: `<sc-codex-detail-shell [profile]="profile" activeTab="einordnung"><sc-fake-holo-stage shellStage /></sc-codex-detail-shell>`,
+    })
+    class SlottedHost {
+      readonly profile = detailProfileFor('ship', NONE);
+      readonly stage = viewChild.required(FakeStage);
+    }
+    TestBed.configureTestingModule({ imports: [SlottedHost], providers: [provideTranslateService({})] });
+    const fixture = TestBed.createComponent(SlottedHost);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const shell = el.querySelector('sc-codex-detail-shell')!;
+    expect(shell.hasAttribute('data-holo-root')).toBe(true);
+    // Order: head, grid (table, panel, views), below, strip.
+    const order = ['.r-head', '.sh-grid .table', '.sh-grid sc-codex-detail-panel.holo-panel', '.sh-grid .r-views', '.r-below', '.r-strip'].map((q) => shell.querySelector(q));
+    expect(order.every(Boolean)).toBe(true);
+    for (let i = 1; i < order.length; i++) expect(order[i - 1]!.compareDocumentPosition(order[i]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(shell.querySelector('.holo-panel [panelHead] .r-ph')).not.toBeNull();
+    expect(shell.querySelector('.holo-panel #holo-tabpanel[role="tabpanel"] .r-body')).not.toBeNull();
+    expect(shell.querySelector('.holo-panel .pfoot .r-foot')).not.toBeNull();
+    expect([...shell.querySelectorAll('[role="tab"]')].map((t) => t.id)).toEqual(['holo-tab-rank', 'holo-tab-parts', 'holo-tab-changes']);
+    expect(shell.querySelector('#holo-tab-changes small')?.textContent).toBe('2');
+    (shell.querySelector('#holo-tab-parts') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.stage().picked).toEqual(['parts']);
+    expect(shell.querySelector('#holo-tabpanel')!.getAttribute('aria-labelledby')).toBe('holo-tab-parts');
   });
 });

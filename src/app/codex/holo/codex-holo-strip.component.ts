@@ -708,7 +708,7 @@ export class CodexHoloStripComponent {
     el.style.setProperty('--fab-clear', `${clear}px`);
     // The stage's shared columns end with the same lane, so the parts and the
     // perspectives above stay on the bar's columns (concept r1 d2).
-    (el.closest('.holo-stage') as HTMLElement | null)?.style.setProperty('--holo-fab-clear', `${clear}px`);
+    (el.closest('.holo-stage, [data-holo-root]') as HTMLElement | null)?.style.setProperty('--holo-fab-clear', `${clear}px`);
   }
 
   /** Last ship class the local power state (`cutGroups`/`levels`/`mode`/

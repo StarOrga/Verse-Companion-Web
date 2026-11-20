@@ -1944,6 +1944,16 @@
         "hunks": [
           "e500e2a4cd6d"
         ]
+      },
+      {
+        "ship": "claude/emails-umbau-decision-6cd563",
+        "by": "JerryT2T",
+        "value": "0.283.4 (generated from CHANGELOG.md after merging main)",
+        "decided": true,
+        "at": "2026-11-20T17:40:42.462Z",
+        "hunks": [
+          "92a46eea60d1"
+        ]
       }
     ],
     "public/release-notes.json›root›current": [

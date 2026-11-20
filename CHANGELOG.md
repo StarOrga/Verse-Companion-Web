@@ -22,6 +22,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - On a phone on its side the patch ticker on the Verse page no longer prints under the navigation.
 - Pinching the 3D model no longer zooms or scrolls the whole page.
 
+## [0.283.5] - 2026-11-20
+
+### Changed
+- Codex: item names, ship cards, class comparisons and blueprint categories on the Codex pages come from the build's list files instead of the database. A Codex page sends ten fewer database reads, three more once a build is published again.
+
+## [0.283.4] - 2026-11-20
+
+### Changed
+- Ship detail pages now use the same page template slots as item pages (head, stage, panel, strip); the layout looks the same.
+
 ## [0.283.3] - 2026-11-20
 
 ### Fixed
