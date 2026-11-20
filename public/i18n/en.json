@@ -7106,13 +7106,26 @@
           "sub": "Newly received",
           "hint": "Newly received blueprints.",
           "col": "Blueprints"
+        },
+        "fines": {
+          "name": "Fines",
+          "sub": "{{amount}} aUEC paid",
+          "subNoAmount": "Fines paid",
+          "hint": "Fines you paid in the game.",
+          "col": "Fines"
+        },
+        "fuel": {
+          "name": "Fuel low",
+          "sub": "Warnings",
+          "hint": "How often your hydrogen or quantum fuel ran low.",
+          "col": "Warnings"
         }
       },
       "preview": {
         "stamp": "Preview",
         "title": "Your stats grow here",
-        "text": "This is what it looks like once the app reads along while you play: aUEC, missions, completion rate, deaths, crimestat, refinery and blueprints. The tiles behind it are sample data.",
-        "textLinked": "The app is connected. Once you play, aUEC, missions, deaths, crimestat, refinery and blueprints fill up. The tiles behind it are sample data."
+        "text": "This is what it looks like once the app reads along while you play: aUEC, missions, completion rate, deaths, crimestat, refinery, blueprints, fines and fuel warnings. The tiles behind it are sample data.",
+        "textLinked": "The app is connected. Once you play, aUEC, missions, deaths, crimestat, refinery, blueprints, fines and fuel warnings fill up. The tiles behind it are sample data."
       },
       "events": {
         "title": "Completed events",

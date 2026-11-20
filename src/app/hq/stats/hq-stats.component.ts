@@ -12,7 +12,7 @@ import { HqLogbookComponent } from './hq-logbook.component';
 import { HqSparkComponent } from './hq-spark.component';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 
-export type HqTileId = 'auec' | 'missions' | 'contracts' | 'deaths' | 'crimestat' | 'refinery' | 'blueprints';
+export type HqTileId = 'auec' | 'missions' | 'contracts' | 'deaths' | 'crimestat' | 'refinery' | 'blueprints' | 'fines' | 'fuel';
 
 export interface HqTile {
   id: HqTileId;
@@ -30,7 +30,7 @@ export interface HqTile {
 }
 
 /**
- * HQ page "Statistik" (D40): seven tiles with a mini preview each, a 7/30/90 day switch and a
+ * HQ page "Statistik" (D40): nine tiles with a mini preview each, a 7/30/90 day switch and a
  * detail dialog per tile. Nothing recorded in the range shows PREVIEW tiles (sample curves, marked
  * as such) under an overlay that leads to the SCC-App - never a wall of zeros (feedback
  * 2026-11-02). A failed load is an error state with retry. Last page: the footer follows it.
@@ -284,6 +284,8 @@ export class HqStatsComponent implements OnInit {
       t('crimestat', this.fmt(1), this.i18n.instant('hq.stats.tile.crimestat.sub'), wave(14, 0, 1, 4)),
       t('refinery', this.fmt(3), this.i18n.instant('hq.stats.tile.refinery.sub'), wave(14, 1, 1, 2)),
       t('blueprints', this.fmt(7), this.i18n.instant('hq.stats.tile.blueprints.sub'), wave(14, 1, 1.5, 5)),
+      t('fines', this.fmt(2), this.i18n.instant('hq.stats.tile.fines.sub', { amount: this.fmt(4500) }), wave(14, 0, 1, 2)),
+      t('fuel', this.fmt(5), this.i18n.instant('hq.stats.tile.fuel.sub'), wave(14, 0, 1.2, 6)),
     ];
   }
 
@@ -309,6 +311,8 @@ export class HqStatsComponent implements OnInit {
       t('crimestat', this.fmt(s.crimestat.total), this.i18n.instant('hq.stats.tile.crimestat.sub'), s.crimestat.series, vals(s.crimestat.series), s.crimestat.total === 0),
       t('refinery', this.fmt(s.refinery.total), this.i18n.instant('hq.stats.tile.refinery.sub'), s.refinery.series, vals(s.refinery.series), s.refinery.total === 0),
       t('blueprints', this.fmt(s.blueprints.total), this.i18n.instant('hq.stats.tile.blueprints.sub'), s.blueprints.series, vals(s.blueprints.series), s.blueprints.total === 0),
+      t('fines', this.fmt(s.fines.total), s.fines.amount > 0 ? this.i18n.instant('hq.stats.tile.fines.sub', { amount: this.fmt(s.fines.amount) }) : this.i18n.instant('hq.stats.tile.fines.subNoAmount'), s.fines.series, vals(s.fines.series), s.fines.total === 0),
+      t('fuel', this.fmt(s.fuel.total), this.i18n.instant('hq.stats.tile.fuel.sub'), s.fuel.series, vals(s.fuel.series), s.fuel.total === 0),
     ];
   }
 }
