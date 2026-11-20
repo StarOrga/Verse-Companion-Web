@@ -33,6 +33,12 @@
 //        (rows: the extractor's missions/<class>.json bodies; mapped to the
 //         pinned codex_missions columns by _missions.ts, upserted on
 //         (build_id, class_name) so a resumed run is idempotent)
+//   POST { op: "clear_locations",  build_id }                          -> { ok }
+//   POST { op: "locations",        build_id, rows: [...] }             -> { upserted }
+//        (rows: the extractor's locations/<id>.json bodies — codex_locations
+//         columns, pinned by _locations.ts, upserted on (build_id, id). The
+//         uploader clears the build's rows first on a fresh phase, so a
+//         re-ingest of the same build replaces its rows and never duplicates.)
 //   POST { op: "carry",            build_id, table, rows: [{k, h}], set? } -> { kept, copied, missing: [i] }
 //        (per-object incremental upload, migration 20261102000000: rows whose
 //         content hash h is already in this build are kept, rows found with h
@@ -128,6 +134,7 @@ import { isCarryUnavailable, isRpcMissing, parseCarry, parsePrune } from './_car
 import { sanitizeSilhouetteRow } from './_silhouette-row.ts';
 import { parseSkips } from './_silhouette-skips.ts';
 import { MAX_MISSION_ROWS, parseMissions } from './_missions.ts';
+import { MAX_LOCATION_ROWS, parseLocations } from './_locations.ts';
 import type { PublishDeps, PublishResult } from './_locale-publish.ts';
 import { CLEAR_OP_TABLES, isLegacyNatkeyConflict, isRebuildUnavailable, prepareRebuild, refusedSwitchStatus } from './_rebuild.ts';
 import type { RebuildPlan } from './_rebuild.ts';
@@ -857,6 +864,28 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       const rows = parseMissions(list, { build_id: buildId, ...nat });
       if (rows.length === 0) return json({ ok: true, upserted: 0 });
       const { error } = await admin.from('codex_missions').upsert(rows, { onConflict: 'build_id,class_name' });
+      if (error) throw error;
+      return json({ ok: true, upserted: rows.length });
+    }
+
+    if (op === 'clear_locations') {
+      const buildId = String(body.build_id ?? '');
+      if (!buildId) return json({ error: 'invalid_body' }, 400);
+      const { error } = await admin.from('codex_locations').delete().eq('build_id', buildId);
+      if (error) throw error;
+      await markCleared(admin, op, buildId);
+      return json({ ok: true });
+    }
+
+    if (op === 'locations') {
+      const buildId = String(body.build_id ?? '');
+      const list = body.rows as unknown[];
+      if (!buildId || !Array.isArray(list) || list.length === 0 || list.length > MAX_LOCATION_ROWS) {
+        return json({ error: 'invalid_body', message: 'build_id + 1..' + MAX_LOCATION_ROWS + ' rows required' }, 400);
+      }
+      const rows = parseLocations(list, buildId);
+      if (rows.length === 0) return json({ ok: true, upserted: 0 });
+      const { error } = await admin.from('codex_locations').upsert(rows, { onConflict: 'build_id,id' });
       if (error) throw error;
       return json({ ok: true, upserted: rows.length });
     }

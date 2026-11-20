@@ -166,7 +166,7 @@ type SearchTarget =
     </ng-template>
   `,
   styles: [`
-    :host { display: grid; gap: var(--sc-space-2); align-content: start; min-width: 0; --f: var(--sc-fs-floor); }
+    :host { display: grid; gap: 8px; align-content: start; min-width: 0; --f: var(--sc-fs-floor); }
     .srch { position: relative; display: flex; align-items: center; }
     .srch svg { position: absolute; inset-inline-start: 10px; width: 15px; height: 15px; fill: none; stroke: var(--sc-fg-2); stroke-width: 1.8; pointer-events: none; }
     .srch input { width: 100%; box-sizing: border-box; min-height: 32px; padding: 0 12px 0 32px; border: 1px solid var(--sc-border); border-radius: 16px;
@@ -174,12 +174,12 @@ type SearchTarget =
     .srch input::-webkit-search-cancel-button { appearance: none; }
     .srch input:focus { border-color: color-mix(in srgb, var(--sc-accent) 60%, var(--sc-border)); }
     .srch input:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
-    h4 { margin: var(--sc-space-2) 0 0; font-size: max(10.5px, var(--f)); letter-spacing: 0.12em; text-transform: uppercase; color: var(--sc-fg-2); font-weight: 600; }
+    h4 { margin: 6px 0 2px; font-size: max(10.5px, var(--f)); letter-spacing: 0.12em; text-transform: uppercase; color: var(--sc-fg-2); font-weight: 600; }
     .note { margin: 0; font-size: max(11.5px, var(--f)); color: var(--sc-fg-2); }
     .gap { margin: 0; justify-self: start; font-size: max(11.5px, var(--f)); color: var(--sc-warning);
       border: 1px solid color-mix(in srgb, var(--sc-warning) 45%, transparent); border-radius: 999px; padding: 2px 10px; }
     .gap:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
-    .grp { display: grid; gap: var(--sc-space-1); }
+    .grp { display: grid; gap: 2px; }
     .grp.dim .row { opacity: 0.62; }
     .row { display: flex; align-items: center; gap: 8px; min-height: max(32px, var(--sc-tap-min, 0px)); padding: 3px 8px; border: 1px solid transparent; border-radius: 7px;
       background: none; color: var(--sc-fg-1); font: inherit; font-size: max(12.5px, var(--f)); text-align: start; cursor: pointer; min-width: 0; }

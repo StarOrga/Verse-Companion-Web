@@ -164,12 +164,12 @@ export const AKTE_TAB_PREF_KEY = 'sc.codex.holo.akteTab';
     .ak-img { display: block; width: 100%; height: 100%; object-fit: cover; }
     /* ONE size for every tab (B2.4): smaller than the old card so the ship stays visible; the body scrolls inside. */
     .ak-card { position: relative; z-index: 1; box-sizing: border-box; width: min(400px, 100%); height: min(100%, 420px);
-      display: flex; flex-direction: column; gap: var(--sc-space-3); padding: var(--sc-space-3);
+      display: flex; flex-direction: column; gap: 10px; padding: 10px 14px 12px;
       border: 1px solid color-mix(in srgb, var(--sc-accent) 38%, transparent); border-radius: 14px;
       background: color-mix(in srgb, var(--sc-bg-0) 82%, transparent); backdrop-filter: blur(6px); }
     /* "Nur Bild": the card shrinks to its head, the image is free. */
-    .ak-card.shut { width: auto; height: auto; padding: var(--sc-space-1); border-radius: 22px; }
-    .ak-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sc-space-2); flex: 0 0 auto; }
+    .ak-card.shut { width: auto; height: auto; padding: 6px; border-radius: 22px; }
+    .ak-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: 0 0 auto; }
     /* The minimise control: no frame, no glow, quieter than the tabs beside it. */
     .ak-card .ak-tg.sc-action { width: 24px; height: 24px; border: 0; background: none; box-shadow: none; color: var(--sc-fg-2); opacity: 0.8; }
     .ak-card .ak-tg.sc-action .sc-action-icon { width: 13px; height: 13px; stroke-width: 1.6; }
@@ -177,26 +177,26 @@ export const AKTE_TAB_PREF_KEY = 'sc.codex.holo.akteTab';
     .ak-card .ak-tg.sc-action:focus-visible { box-shadow: var(--sc-focus-ring); opacity: 1; }
     @media (pointer: coarse) { .ak-card .ak-tg.sc-action { width: 44px; height: 44px; } }
     .ak-tabs { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--sc-border); border-radius: 16px; background: color-mix(in srgb, var(--sc-bg-0) 60%, transparent); min-width: 0; }
-    .ak-tab { min-height: 28px; padding: 0 var(--sc-space-3); border: 0; border-radius: 14px; background: none; color: var(--sc-fg-1); font: inherit; font-size: max(12px, var(--sc-fs-floor)); white-space: nowrap; cursor: pointer; }
+    .ak-tab { min-height: 28px; padding: 0 11px; border: 0; border-radius: 14px; background: none; color: var(--sc-fg-1); font: inherit; font-size: max(12px, var(--sc-fs-floor)); white-space: nowrap; cursor: pointer; }
     .ak-tab:hover { color: var(--sc-fg-0); }
     .ak-tab.on { background: color-mix(in srgb, var(--sc-accent) 20%, transparent); color: var(--sc-accent); }
     .ak-tab:focus-visible, .ak-sw:focus-visible, .ak-rsi:focus-visible, .ak-txt:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-    .ak-panel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: var(--sc-space-3); }
-    .ak-body { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: var(--sc-space-4); }
+    .ak-panel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+    .ak-body { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 12px; }
     .ak-txt { display: block; }
     .ak-txt p { margin: 0; color: var(--sc-fg-0); font-size: max(13.5px, var(--sc-fs-floor)); line-height: 1.55; max-width: var(--sc-measure, 68ch); }
     .ak-txt p.muted { color: var(--sc-fg-2); }
     /* Label above value, two to a row: every value keeps one line ("Aegis Dynamics", "19,69 × 17,4 × 5,14 m"). */
-    .ak-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sc-space-2) var(--sc-space-3); margin: 0; }
-    .ak-facts div { display: flex; flex-direction: column; gap: var(--sc-space-1); min-width: 0; }
+    .ak-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; margin: 0; }
+    .ak-facts div { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
     .ak-facts dt { color: var(--sc-fg-2); font-size: max(10.5px, var(--sc-fs-floor)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .ak-facts dd { margin: 0; min-width: 0; color: var(--sc-fg-0); font-family: var(--sc-font-mono, monospace); font-weight: 600; font-size: max(12px, var(--sc-fs-floor)); white-space: nowrap; }
     /* Vergleichen + Bei RSI ansehen: one row at the bottom of the Datenblatt. */
-    .ak-foot { flex: 0 0 auto; display: flex; align-items: center; flex-wrap: nowrap; gap: var(--sc-space-2); padding-top: var(--sc-space-3); border-top: 1px solid var(--sc-border); }
-    .ak-sws { display: flex; align-items: flex-start; flex-wrap: wrap; gap: var(--sc-space-2); min-width: 0; }
+    .ak-foot { flex: 0 0 auto; display: flex; align-items: center; flex-wrap: nowrap; gap: 8px; padding-top: 8px; border-top: 1px solid var(--sc-border); }
+    .ak-sws { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 6px; min-width: 0; }
     .gl { width: 100%; font-size: max(9px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); }
     /* Image tiles, not chips: a small picture with the name under it (the filters are pills). */
-    .ak-sw { display: flex; flex-direction: column; align-items: center; gap: var(--sc-space-1); width: 64px; padding: 0; border: 0; background: none; font: inherit; cursor: pointer; text-decoration: none; }
+    .ak-sw { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 64px; padding: 0; border: 0; background: none; font: inherit; cursor: pointer; text-decoration: none; }
     .ak-sw .t { position: relative; display: block; width: 58px; height: 34px; border-radius: 5px; overflow: hidden;
       border: 1px solid var(--sc-border); background: linear-gradient(170deg, var(--sc-bg-1), color-mix(in srgb, var(--sc-accent) 18%, var(--sc-bg-1))); }
     .ak-sw .t img { display: block; width: 100%; height: 100%; object-fit: contain; background: var(--sc-bg-0); }
@@ -208,7 +208,7 @@ export const AKTE_TAB_PREF_KEY = 'sc.codex.holo.akteTab';
     .ak-sw:hover .t { border-color: color-mix(in srgb, var(--sc-accent) 60%, var(--sc-border)); }
     .ak-sw.on .t { border-color: var(--sc-accent); box-shadow: 0 0 0 1.5px var(--sc-accent); }
     .ak-sw.on small { color: var(--sc-fg-0); }
-    .ak-rsi { margin-inline-start: auto; display: inline-flex; align-items: center; gap: var(--sc-space-1); min-height: 28px; padding: 0 var(--sc-space-3); border-radius: 14px;
+    .ak-rsi { margin-inline-start: auto; display: inline-flex; align-items: center; gap: 4px; min-height: 28px; padding: 0 12px; border-radius: 14px;
       border: 1px solid var(--sc-border); color: var(--sc-fg-1); text-decoration: none; font-size: max(12px, var(--sc-fs-floor)); white-space: nowrap; }
     .ak-rsi:hover { color: var(--sc-fg-0); border-color: var(--sc-accent); }
     .ak-buy { flex: 1 1 auto; min-height: 0; }

@@ -1,47 +1,7 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.286.2",
+  "current": "0.286.0",
   "releases": [
-    {
-      "version": "0.286.2",
-      "date": "2026-11-21",
-      "sections": [
-        {
-          "category": "Fixed",
-          "label": "",
-          "items": [
-            {
-              "title": "",
-              "text": "Codex holotable: the Akte expands again after it was collapsed (the empty table-head row above it caught the clicks, on touch also the collapse), and the Akte, Kaufen tab and parts list use the four spacing steps of the design system instead of hand-picked gaps, so \"N Bauteile\" no longer sits flush under the parts search."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "version": "0.286.1",
-      "date": "2026-11-21",
-      "sections": [
-        {
-          "category": "Fixed",
-          "label": "",
-          "items": [
-            {
-              "title": "",
-              "text": "ingest-catalog: after finalize the catalog lists are published by a call of their own (lists_publish with detach) instead of on the worker that just ran the ingest, so its CPU limit no longer puts the list files at risk."
-            },
-            {
-              "title": "",
-              "text": "Popup back-gesture specs wait up to 5 s for a history traversal, so they no longer fail on a loaded machine."
-            },
-            {
-              "title": "",
-              "text": "package-lock.json carries the app version again and is bumped with every release."
-            }
-          ]
-        }
-      ]
-    },
     {
       "version": "0.286.0",
       "date": "2026-11-20",

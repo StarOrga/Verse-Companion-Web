@@ -117,20 +117,20 @@ type WishState = 'idle' | 'busy' | 'error';
     </ng-template>
   `,
   styles: [`
-    :host { display: flex; flex-direction: column; gap: var(--sc-space-3); min-height: 0; flex: 1 1 auto; }
+    :host { display: flex; flex-direction: column; gap: 8px; min-height: 0; flex: 1 1 auto; }
     .muted { margin: 0; color: var(--sc-fg-2); font-size: max(13px, var(--sc-fs-floor)); }
-    .err { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sc-space-2); color: var(--sc-danger); font-size: max(13px, var(--sc-fs-floor)); }
+    .err { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; color: var(--sc-danger); font-size: max(13px, var(--sc-fs-floor)); }
     .err p { margin: 0; }
     .srch { position: relative; display: flex; align-items: center; flex: 0 0 auto; }
     .srch svg { position: absolute; inset-inline-start: 10px; width: 15px; height: 15px; fill: none; stroke: var(--sc-fg-2); stroke-width: 1.8; pointer-events: none; }
     .srch input { width: 100%; box-sizing: border-box; min-height: 32px; padding: 0 12px 0 32px; border: 1px solid var(--sc-border); border-radius: 16px;
       background: color-mix(in srgb, var(--sc-bg-0) 60%, transparent); color: var(--sc-fg-0); font: inherit; font-size: max(12.5px, var(--sc-fs-floor)); }
     .srch input:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
-    .list { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: var(--sc-space-2); padding-inline-end: 2px; }
+    .list { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 6px; padding-inline-end: 2px; }
     .list:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
-    .gh { font-size: max(9.5px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); margin-top: var(--sc-space-2); }
+    .gh { font-size: max(9.5px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); margin-top: 2px; }
     .gh.sub { color: var(--sc-accent); letter-spacing: 0.1em; }
-    .row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: var(--sc-space-1) var(--sc-space-2); padding: var(--sc-space-2);
+    .row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 4px 10px; padding: 7px 10px;
       border: 1px solid var(--sc-border); border-radius: 10px; background: color-mix(in srgb, var(--sc-bg-0) 50%, transparent); }
     .row.done { border-color: color-mix(in srgb, var(--sc-accent) 55%, var(--sc-border)); }
     .row.wk { grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
@@ -140,9 +140,9 @@ type WishState = 'idle' | 'busy' | 'error';
     .price { font-family: var(--sc-font-mono, monospace); font-weight: 600; font-size: max(12.5px, var(--sc-fs-floor)); color: var(--sc-fg-0); white-space: nowrap; }
     .price small { color: var(--sc-fg-2); font-weight: 400; }
     .ok { color: var(--sc-accent); font-size: max(12px, var(--sc-fs-floor)); white-space: nowrap; }
-    .need { list-style: none; margin: var(--sc-space-1) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-space-1); font-size: max(11.5px, var(--sc-fs-floor)); color: var(--sc-fg-1); }
+    .need { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; font-size: max(11.5px, var(--sc-fs-floor)); color: var(--sc-fg-1); }
     .need li.ok { color: var(--sc-accent); }
-    .need em { font-style: normal; color: var(--sc-fg-2); margin-inline-start: var(--sc-space-2); }
+    .need em { font-style: normal; color: var(--sc-fg-2); margin-inline-start: 6px; }
     .more, .undo { align-self: flex-start; min-height: 28px; padding: 0 4px; border: 0; background: none; color: var(--sc-accent); font: inherit; font-size: max(12px, var(--sc-fs-floor)); cursor: pointer; text-decoration: underline; }
     .more:focus-visible, .undo:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
     .note, .attr { flex: 0 0 auto; margin: 0; font-size: max(11px, var(--sc-fs-floor)); color: var(--sc-fg-2); }

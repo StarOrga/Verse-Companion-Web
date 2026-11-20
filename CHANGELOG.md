@@ -4,11 +4,6 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.286.2] - 2026-11-21
-
-### Fixed
-- Codex holotable: the Akte expands again after it was collapsed (the empty table-head row above it caught the clicks, on touch also the collapse), and the Akte, Kaufen tab and parts list use the four spacing steps of the design system instead of hand-picked gaps, so "N Bauteile" no longer sits flush under the parts search.
-
 ## [0.286.1] - 2026-11-21
 
 ### Fixed

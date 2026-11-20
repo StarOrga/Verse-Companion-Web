@@ -853,6 +853,23 @@ export async function uploadCatalog(
       );
     }
 
+    // 9c. Verse locations (sc_extract/starmap.py) ---------------------------
+    // One row per visible starmap place. The build's rows are replaced: the
+    // first chunk of a fresh phase clears them, every chunk upserts on
+    // (build_id, id). An empty list (step skipped or failed in the extractor)
+    // clears nothing, so the finalize copies the predecessor's rows instead.
+    {
+      const list = await readJsonDir(outDir, 'locations');
+      counts.locations = await sendChunks('codex_locations', list, CHUNK, (slice) =>
+        post('locations', { build_id: buildId, rows: slice }),
+        {
+          onFirstChunk: list.length > 0
+            ? () => post('clear_locations', { build_id: buildId }).then(() => undefined)
+            : undefined,
+        },
+      );
+    }
+
     // 10. entity strings (deduped) + ports ----------------------------------
     {
       const deduped = dedupeStrings(strings);

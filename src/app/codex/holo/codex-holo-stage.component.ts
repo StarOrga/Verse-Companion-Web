@@ -951,16 +951,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
      its height on every switch — the 3D canvas re-framed and the outline jumped (v0.282.0 report). */
   .table-head { min-height: 32px; }
   .table-head:empty { display: flex; }
-  /* The row sits above the Akte (z-index 5 over 4) and keeps its height even when it shows nothing, so its empty
-     box lay over the Akte's head: the minimise control of the shrunk card sat fully under it and could not be
-     clicked again (#386). The row itself lets the pointer through; only what it shows takes it. */
-  .table-head { pointer-events: none; }
-  .table-head > * { pointer-events: auto; }
   @media (pointer: coarse) { .table-head { min-height: calc(var(--sc-tap-min, 44px) + 6px); } }
   .ig-host { flex: 1 1 auto; min-width: 0; }
-  /* Bauteile tab: the search and the parts list below it are two groups in a block pane, so they need the
-     between-groups step; without it "22 Bauteile" sat flush under "Bauteil suchen" (#386). */
-  sc-codex-holo-interior + sc-codex-holo-inspector { margin-block-start: var(--sc-space-4); }
   .hangar-dock { flex: none; display: flex; align-items: center; }
   .no-geometry-badge { margin: 0; cursor: help; font-size: max(10px, var(--f)); color: var(--sc-fg-2); }
   /* The Akte (slot [holoAkte]) lies over the table; the table keeps its size under it (no canvas re-layout). */

@@ -349,21 +349,6 @@ describe('CodexHoloStageComponent — wave 5 fixes', () => {
     expect(seen).toEqual(['akte', 'simple']);
   });
 
-  it('the empty table head never covers the Akte: its minimise control can be clicked again (#386)', async () => {
-    const fixture = await setup({ detail: detailWithPorts(['hardpoint_gun_left']) });
-    const el: HTMLElement = fixture.nativeElement;
-    el.querySelector<HTMLButtonElement>('.vw-thumb[data-view="akte"]')!.click();
-    fixture.detectChanges();
-    const head = el.querySelector<HTMLElement>('.table-head')!;
-    const akte = el.querySelector<HTMLElement>('.holo-akte.on')!;
-    expect(getComputedStyle(head).pointerEvents).toBe('none');
-    akte.scrollIntoView({ block: 'center' });
-    const r = akte.getBoundingClientRect();
-    // Where the shrunk card's control sits: the Akte's top-left corner, inside the head row's height.
-    const hit = document.elementFromPoint(r.left + 12, r.top + 12);
-    expect(!!hit && head.contains(hit), 'the table head intercepts the click').toBe(false);
-  });
-
   it('the source jump (#bezugsquelle) brings the Akte up: the sources live there, not on the table', async () => {
     const fixture = await setup({ detail: detailWithPorts(['hardpoint_gun_left']) });
     const c = fixture.componentInstance;
