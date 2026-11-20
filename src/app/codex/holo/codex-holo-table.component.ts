@@ -353,10 +353,10 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
               }
             </div>
           }
-          @if (pins().length === 0) {
+          @if (pins().length === 0 && viewMode() !== '3d') {
             <p class="table-empty">{{ 'codex.holo.stage.noPorts' | translate }}</p>
           }
-          @for (pin of pins(); track pin.portName) {
+          @for (pin of outlinePins(); track pin.portName) {
             <button
               type="button"
               class="pin"
@@ -392,14 +392,14 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
               </span>
             </button>
           }
-          @if (!leader() && selectedPin(); as sp) {
+          @if (!leader() && viewMode() !== '3d' && selectedPin(); as sp) {
             <!-- The selected part is the full callout, beside its dot (the tag steps aside). -->
             <sc-holo-callout class="pin-card" [class.to-left]="sp.x > 50" [style.left.%]="sp.x" [style.top]="'clamp(48px, ' + sp.y + '%, calc(100% - 48px))'"
               [type]="tagOf(sp).type" [name]="calloutModel()?.title ?? sp.label" [values]="calloutModel()?.values ?? []"
               [swappable]="calloutModel()?.swappable ?? false" [diff]="diffPorts().has(sp.portName)" (swap)="portSwap.emit(sp.portName)" />
           }
         </div>
-        @if (leader(); as lay) {
+        @if (viewMode() !== '3d' ? leader() : null; as lay) {
           <!-- Leader lines (#642): each anchored dot's label sits in the
                nearest free slot of a column beside the hull, joined by a thin
                line. Geometry from layoutLeaderLabels() in frame px. -->
@@ -1027,6 +1027,11 @@ export class CodexHoloTableComponent {
    * Reset whenever 3D is left or the ship changes; {@link VIEWER_HOLD_MAX_MS} caps the wait.
    */
   readonly viewerDrawn = signal(false);
+  /**
+   * Part dots on the 2D hull. While the 3D model loads the hull is only a placeholder: dots placed on it would
+   * sit in other spots than on the model and jump once it draws, so they wait for the model (its own markers).
+   */
+  readonly outlinePins = computed(() => (this.viewMode() === '3d' ? [] : this.pins()));
   /** The hull model is on its way: the loading ring sits in its spot (#378). */
   readonly loading3d = computed(() => this.viewMode() === '3d' && !this.interior3d() && !this.viewerDrawn());
   /** The hull viewer is the 3D layer (3D without a deck turned inward). */
