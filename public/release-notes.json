@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.283.1",
+  "current": "0.283.2",
   "releases": [
+    {
+      "version": "0.283.2",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Automated browser checks no longer lose Codex list rows to a CORS block when the shared catalog cache was filled from another address (local dev server vs. the live site)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.283.1",
       "date": "2026-11-20",
