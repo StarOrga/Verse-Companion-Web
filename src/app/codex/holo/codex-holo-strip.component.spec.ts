@@ -11,6 +11,7 @@ import { KpiStripCell } from '../codex-kpi-sets';
 import { rankShip, RankShipInput } from '../codex-rank';
 import { dockPositionStorageKey, powerStorageKey, serializeLocalPowerDraft } from '../codex-loadout-draft';
 import { setNumberLocale } from '../codex-format';
+import { useViewport } from '../../testing/viewport';
 
 const SHIP = 'CNOU_Nomad';
 const SHIP_B = 'AEGS_Avenger';
@@ -223,5 +224,64 @@ describe('CodexHoloStripComponent - the box ends before the corner (concept code
     } finally {
       host.remove();
     }
+  });
+});
+
+describe('CodexHoloStripComponent as a phone sheet', () => {
+  useViewport(390, 844);
+  beforeEach(() => localStorage.clear());
+  afterEach(() => { document.documentElement.removeAttribute('data-sc-sheet'); document.documentElement.style.removeProperty('--sc-sheet-peek-h'); });
+
+  const bar = (f: ComponentFixture<CodexHoloStripComponent>) => (f.nativeElement as HTMLElement).querySelector<HTMLElement>('.holo-strip')!;
+  const handle = (f: ComponentFixture<CodexHoloStripComponent>) => (f.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.hs-toggle')!;
+
+  it('starts at peek: the panel is inert and no snap attribute reaches the shell', async () => {
+    const f = await setup();
+    expect(bar(f).dataset['snap']).toBe('peek');
+    expect(bar(f).querySelector('.hs-panel')?.hasAttribute('inert')).toBe(true);
+    expect(document.documentElement.hasAttribute('data-sc-sheet')).toBe(false);
+  });
+
+  it('a tap on the handle opens to half and publishes html[data-sc-sheet], a second tap folds to peek', async () => {
+    const f = await setup();
+    handle(f).click();
+    f.detectChanges();
+    expect(bar(f).dataset['snap']).toBe('half');
+    expect(handle(f).getAttribute('aria-expanded')).toBe('true');
+    expect(document.documentElement.getAttribute('data-sc-sheet')).toBe('half');
+    handle(f).click();
+    f.detectChanges();
+    expect(bar(f).dataset['snap']).toBe('peek');
+    expect(document.documentElement.hasAttribute('data-sc-sheet')).toBe(false);
+  });
+
+  it('Escape folds an open sheet back to peek', async () => {
+    const f = await setup();
+    handle(f).click();
+    f.detectChanges();
+    bar(f).dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    f.detectChanges();
+    expect(bar(f).dataset['snap']).toBe('peek');
+  });
+
+  it('a fast upward drag on the handle flings past half to full', async () => {
+    const f = await setup();
+    const h = handle(f);
+    const ev = (type: string, y: number, t: number) => h.dispatchEvent(new PointerEvent(type, { pointerId: 7, clientY: y, button: 0, bubbles: true, timeStamp: t } as PointerEventInit));
+    ev('pointerdown', 700, 0);
+    ev('pointermove', 600, 40);
+    ev('pointermove', 400, 80);
+    ev('pointerup', 300, 100);
+    f.detectChanges();
+    expect(['half', 'full']).toContain(bar(f).dataset['snap']);
+    expect(bar(f).dataset['snap']).not.toBe('peek');
+  });
+
+  it('the panel never leaves the bar clip: translate only, clip-path stops it at the bar edge', async () => {
+    const f = await setup();
+    const cs = getComputedStyle(bar(f));
+    expect(cs.position).toBe('fixed');
+    expect(cs.clipPath).not.toBe('none');
+    expect(getComputedStyle(bar(f).querySelector('.hs-panel')!).transitionProperty).toContain('translate');
   });
 });

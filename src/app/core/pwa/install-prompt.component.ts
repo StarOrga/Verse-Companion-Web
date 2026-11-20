@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
-import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
+import { ScDialogDirective } from '../../shared/dialog/sc-dialog.directive';
 import { ScPopupMotionDirective } from '../../shared/popup-motion/sc-popup-motion.directive';
 import { PwaInstallService } from './pwa-install.service';
 
@@ -17,7 +17,7 @@ const SWIPE_DISMISS_PX = 64;
 @Component({
   selector: 'sc-install-prompt',
   standalone: true,
-  imports: [TranslatePipe, ScActionDirective, ScPopupComponent, ScPopupMotionDirective],
+  imports: [TranslatePipe, ScActionDirective, ScDialogDirective, ScPopupMotionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (pwa.prompt()) {
@@ -46,7 +46,13 @@ const SWIPE_DISMISS_PX = 64;
       </section>
     }
     @if (pwa.iosSheetOpen()) {
-      <sc-popup kind="dialog" size="s" [title]="'pwa.ios.title' | translate" (closed)="pwa.closeIosSheet()">
+      <!-- A compact bottom sheet sized to its three steps (phones), a centred card from tablet up.
+           Modal: it closes through "Got it" or Escape, never on a click on the scrim. -->
+      <div class="sheet-scrim">
+      <section class="sheet" scDialog role="dialog" aria-modal="true" [attr.aria-label]="'pwa.ios.title' | translate"
+               (scDialogEscape)="pwa.closeIosSheet()">
+        <span class="grab" aria-hidden="true"></span>
+        <h2 class="sheet-title">{{ 'pwa.ios.title' | translate }}</h2>
         <ol class="steps">
           <li>
             <span class="glyph" aria-hidden="true">
@@ -69,10 +75,11 @@ const SWIPE_DISMISS_PX = 64;
             <span class="step">{{ 'pwa.ios.step3' | translate }}</span>
           </li>
         </ol>
-        <ng-container popupActions>
+        <div class="sheet-actions">
           <button type="button" scAction tier="primary" (click)="pwa.closeIosSheet()">{{ 'pwa.ios.done' | translate }}</button>
-        </ng-container>
-      </sc-popup>
+        </div>
+      </section>
+      </div>
     }
   `,
   styles: [`
@@ -100,6 +107,32 @@ const SWIPE_DISMISS_PX = 64;
     @media (min-width: 721px) {
       .card { inset-inline-end: auto; margin-inline-end: 0; inset-inline-start: var(--sc-space-6, 24px); width: min(400px, calc(100vw - 48px)); }
     }
+    /* Sized to content: the scrim fills the screen, the sheet only as tall as its steps (dvh cap as a safety net). */
+    .sheet-scrim {
+      position: fixed; inset: 0; z-index: 1500; display: flex; align-items: flex-end; justify-content: center;
+      background: color-mix(in srgb, var(--sc-bg-0) 55%, transparent);
+    }
+    .sheet {
+      box-sizing: border-box; width: 100%; max-width: 32rem; max-height: 90vh; max-height: 90dvh; overflow-y: auto;
+      overscroll-behavior: contain;
+      display: flex; flex-direction: column; gap: var(--sc-space-3, 12px);
+      padding: var(--sc-space-2, 8px) var(--sc-space-4, 16px) calc(var(--sc-space-4, 16px) + env(safe-area-inset-bottom, 0px));
+      padding-inline: max(var(--sc-space-4, 16px), env(safe-area-inset-left, 0px)) max(var(--sc-space-4, 16px), env(safe-area-inset-right, 0px));
+      background: var(--sc-bg-1); color: var(--sc-fg-0);
+      border: 1px solid var(--sc-border); border-bottom: 0; border-radius: 16px 16px 0 0;
+      box-shadow: 0 -8px 28px rgb(0 0 0 / 0.45);
+      animation: sheet-up var(--sc-t-base, 280ms) var(--sc-e-out, ease-out);
+    }
+    @keyframes sheet-up { from { opacity: 0; translate: 0 24px; } to { opacity: 1; translate: 0 0; } }
+    .grab { align-self: center; width: 36px; height: 4px; border-radius: 2px; background: var(--sc-fg-2); opacity: 0.6; }
+    .sheet-title { margin: 0; font-family: var(--sc-font-display); font-size: 1rem; font-weight: 600; }
+    .sheet-actions { display: flex; justify-content: flex-end; }
+    .sheet-actions button { min-height: var(--sc-tap-primary, 52px); }
+    @media (min-width: 721px) {
+      .sheet-scrim { align-items: center; }
+      .sheet { border-radius: 16px; border-bottom: 1px solid var(--sc-border); padding-bottom: var(--sc-space-4, 16px); }
+    }
+    @media (prefers-reduced-motion: reduce) { .sheet { animation: none; } }
     .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-space-3, 12px); }
     .steps li { display: flex; align-items: center; gap: var(--sc-space-3, 12px); min-height: 48px; }
     .glyph {

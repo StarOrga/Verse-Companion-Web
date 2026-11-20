@@ -320,6 +320,13 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
       min-height: 0;
     }
 
+    /* A phone on its side: the disc is 44px (--sc-fab-size, styles.scss), hugs the corner inside the safe areas. */
+    @media (orientation: landscape) and (max-height: 500px) {
+      .fab-root {
+        right: max(var(--sc-fab-inset), env(safe-area-inset-right, 0px));
+        bottom: calc(var(--sc-fab-inset) + env(safe-area-inset-bottom, 0px));
+      }
+    }
     @media (max-width: 720px) {
       .fab-root {
         /* The 16px phone inset now lives on --sc-fab-inset (styles.scss), so

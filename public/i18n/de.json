@@ -1023,6 +1023,18 @@
         "previewTitle": "Vorschau der Detailseite",
         "previewMaker": "Hersteller",
         "fullscreenExit": "Vollbild schließen",
+        "immersive": "Immersiv",
+        "immersiveTip": "Modell im Vollbild öffnen",
+        "immersiveHint": "Tippe auf Immersiv für eine größere Ansicht des Modells",
+        "rotateHint": "Drehen für eine größere Ansicht",
+        "resetView": "Ansicht zurücksetzen",
+        "viewHull": "Hülle",
+        "viewSchema": "Schema",
+        "view3d": "3D",
+        "statsAria": "Schiffswerte",
+        "statsClose": "Werte schließen",
+        "sheetHandle": "Wertblatt",
+        "sheetHandleAria": "Wertblatt, ziehen oder tippen zum Ändern der Höhe",
         "previewFitted": "Verbaut in",
         "previewBuy": "Wo zu kaufen",
         "previewAlternatives": "Passende Alternativen",
@@ -5615,6 +5627,9 @@
       "search": "Suche"
     }
   },
+  "skeleton": {
+    "loading": "Lädt"
+  },
   "releaseNotes": {
     "title": "Was ist neu",
     "subtitle": "Neuigkeiten und Verbesserungen aus jedem Release.",
@@ -9259,7 +9274,16 @@
     "pick": "Wähle links ein Event.",
     "badJson": "Der Wert ist kein gültiges JSON."
   },
+  "chrome": {
+    "search": "Suche"
+  },
   "corner": {
+    "dial": {
+      "open": "Werkzeuge",
+      "close": "Werkzeuge schließen",
+      "group": "Seitenwerkzeuge",
+      "beta": "Beta-Funktionen"
+    },
     "view": {
       "toHolo": "Zum Holotisch wechseln",
       "toClassic": "Zur klassischen Ansicht wechseln"

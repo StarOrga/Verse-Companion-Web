@@ -41,7 +41,8 @@ describe('InstallPromptComponent', () => {
     pwa.iosSheetOpen.set(true);
     fixture.detectChanges();
     expect(document.querySelectorAll('.steps li').length).toBe(3);
-    (document.querySelector('sc-popup button[scAction]') as HTMLButtonElement).click();
+    expect(document.querySelector('.sheet')?.getAttribute('aria-modal')).toBe('true');
+    (document.querySelector('.sheet .sheet-actions button[scAction]') as HTMLButtonElement).click();
     expect(close).toHaveBeenCalled();
   });
 });

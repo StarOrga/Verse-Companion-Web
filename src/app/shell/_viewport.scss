@@ -1,0 +1,8 @@
+// The one place the "compact" viewport string lives (a phone on its side). Mirrors
+// core/viewport-mode.ts (`data-sc-compact` on <html>); use the mixin in a stylesheet, the
+// attribute only where a rule crosses components.
+@mixin sc-compact {
+  @media (orientation: landscape) and (max-height: 500px) {
+    @content;
+  }
+}

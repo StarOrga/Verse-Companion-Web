@@ -99,6 +99,15 @@ import { ShellChromeService } from '../../shell/fusion-bar/shell-chrome.service'
       .ph-main { flex-direction: column; align-items: stretch; }
       .crumb { max-width: 22ch; }
     }
+    /* Touch: a long path scrolls sideways in one row instead of wrapping into two rows of thin targets;
+       every crumb is >= 44px wide and as tall as the touch floor (separators are decoration). */
+    @media (pointer: coarse) {
+      .crumbs { overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+      .crumbs ol { flex-wrap: nowrap; white-space: nowrap; }
+      .crumbs li { flex: none; scroll-snap-align: start; }
+      .crumb { min-width: 44px; justify-content: center; padding-inline: 10px; }
+      .crumbs li + li::before { margin: 0 2px; }
+    }
     /* Beta "shell": the trail lives in the Fusion bar from tablet up (phones keep it here). */
     @media (min-width: 721px) {
       :host-context([data-layout]) .crumbs { display: none; }

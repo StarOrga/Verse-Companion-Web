@@ -1,0 +1,48 @@
+import { DOCUMENT } from '@angular/common';
+import { Injectable, inject, signal } from '@angular/core';
+
+/** The three viewport modes (spec §1.1). Written once; stylesheets use the `sc-compact` mixin (shell/_viewport.scss). */
+export const PHONE_QUERY = '(max-width: 720px)';
+export const COMPACT_QUERY = '(orientation: landscape) and (max-height: 500px)';
+export const TABLET_QUERY = '(min-width: 721px) and (pointer: coarse) and (min-height: 501px)';
+
+/**
+ * One source for "what kind of screen is this": sets `data-sc-phone` (portrait phone / narrow window),
+ * `data-sc-compact` (a phone on its side) and `data-sc-tablet` on <html> and exposes the same as signals.
+ * One `matchMedia` listener per mode. `start()` is called once by the shell; the service also starts
+ * itself on first injection, so a consumer never reads a stale value.
+ */
+@Injectable({ providedIn: 'root' })
+export class ViewportModeService {
+  private readonly doc = inject(DOCUMENT);
+  readonly phone = signal(false);
+  readonly compact = signal(false);
+  readonly tablet = signal(false);
+  private started = false;
+
+  constructor() {
+    this.start();
+  }
+
+  start(): void {
+    if (this.started) return;
+    this.started = true;
+    const win = this.doc.defaultView;
+    if (!win || typeof win.matchMedia !== 'function') return;
+    this.bind(win, PHONE_QUERY, 'data-sc-phone', this.phone);
+    this.bind(win, COMPACT_QUERY, 'data-sc-compact', this.compact);
+    this.bind(win, TABLET_QUERY, 'data-sc-tablet', this.tablet);
+  }
+
+  private bind(win: Window, query: string, attr: string, state: ReturnType<typeof signal<boolean>>): void {
+    const mql = win.matchMedia(query);
+    const root = this.doc.documentElement;
+    const apply = (on: boolean) => {
+      state.set(on);
+      if (on) root.setAttribute(attr, '');
+      else root.removeAttribute(attr);
+    };
+    apply(mql.matches);
+    mql.addEventListener('change', (e) => apply(e.matches));
+  }
+}

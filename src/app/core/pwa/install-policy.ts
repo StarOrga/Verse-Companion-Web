@@ -81,3 +81,23 @@ export function isEligible(i: EligibilityInput): boolean {
   if (backoffActive(i.state, i.now)) return false;
   return i.state.sessions >= (i.trigger === 'idle' ? IDLE_MIN_SESSIONS : MIN_SESSIONS);
 }
+
+/** What the view in front of the reader says about a calm moment (the DOM checks live in `PwaEnv.calmDom`). */
+export interface CalmViewInput {
+  /** `html.sc-immersive`: a stage owns the screen. */
+  immersive: boolean;
+  /** A phone on its side (`data-sc-compact`). */
+  compact: boolean;
+  fullscreen: boolean;
+  url: string;
+}
+
+/** The ship page is the place people study; a card over it is never calm. */
+export function isShipDetailUrl(url: string): boolean {
+  return /^\/codex\/ship(\/|\?|#|$)/.test(url);
+}
+
+/** No automatic card while an immersive view, a landscape phone, fullscreen or a ship detail page is up. */
+export function calmView(i: CalmViewInput): boolean {
+  return !(i.immersive || i.compact || i.fullscreen || isShipDetailUrl(i.url));
+}

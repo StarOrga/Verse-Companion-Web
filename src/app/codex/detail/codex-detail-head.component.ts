@@ -176,6 +176,13 @@ export function naturalTop(host: HTMLElement): number | null {
       :host(.slim) .ht-extra { display: none; }
       :host(.slim) .ht-centre { justify-self: start; }
 
+      /* Phone on its side: one slim row (no maker kicker, smaller name) so the stage below keeps the height. */
+      @media (orientation: landscape) and (max-height: 500px) {
+        :host(:not(.slim)) { padding-block: 4px; align-items: center; }
+        :host(:not(.slim)) .ht-kicker { display: none; }
+        :host(:not(.slim)) .ht-name { font-size: max(16px, var(--sc-fs-floor)); letter-spacing: 0.14em; }
+        :host(:not(.slim)) .ht-extra { display: none; }
+      }
       @media (max-width: 640px) {
         :host { grid-template-columns: minmax(0, 1fr) auto; margin-inline: 0; padding: 10px 12px; }
         .ht-left { grid-column: 1 / -1; }

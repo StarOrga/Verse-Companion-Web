@@ -103,26 +103,78 @@ describe('CodexHoloTableComponent', () => {
     expect(el.querySelector('.viewer-hold')?.classList).not.toContain('held');
   });
 
-  describe('phone on its side', () => {
-    function withLandscape(matches: boolean): void {
+  describe('immersive stage (button entry only)', () => {
+    function withTouch(coarse: boolean, landscape = false): MediaQueryList[] {
       const real = window.matchMedia.bind(window);
-      vi.spyOn(window, 'matchMedia').mockImplementation((q: string) =>
-        q.includes('max-height: 500px') ? ({ matches, addEventListener() {}, removeEventListener() {} } as unknown as MediaQueryList) : real(q));
+      const lists: MediaQueryList[] = [];
+      vi.spyOn(window, 'matchMedia').mockImplementation((q: string) => {
+        if (q.includes('pointer: coarse')) return { matches: coarse, media: q, addEventListener() {}, removeEventListener() {} } as unknown as MediaQueryList;
+        if (q.includes('max-height: 500px')) return { matches: landscape, media: q, addEventListener() {}, removeEventListener() {} } as unknown as MediaQueryList;
+        return real(q);
+      });
+      return lists;
     }
     const frame = (f: ComponentFixture<CodexHoloTableComponent>) => (f.nativeElement as HTMLElement).querySelector('.silhouette-frame')!;
+    const q = <T extends HTMLElement>(f: ComponentFixture<CodexHoloTableComponent>, sel: string) => (f.nativeElement as HTMLElement).querySelector<T>(sel);
 
-    it('3D takes the whole screen and the close button ends it', () => {
-      withLandscape(true);
+    afterEach(() => document.documentElement.classList.remove('sc-immersive'));
+
+    it('a phone on its side does NOT enter by itself - the button does', () => {
+      withTouch(true, true);
       const f = setup({ viewMode: '3d' });
+      expect(frame(f).classList).not.toContain('phone-full');
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
       expect(frame(f).classList).toContain('phone-full');
-      (f.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.full-close')!.click();
+      expect(document.documentElement.classList).toContain('sc-immersive');
+    });
+
+    it('has no immersive button on a mouse desktop', () => {
+      withTouch(false);
+      expect(q(setup({ viewMode: '3d' }), '.imm-btn')).toBeNull();
+    });
+
+    it('the close button leaves it and drops html.sc-immersive and the inert rest', () => {
+      withTouch(true);
+      const f = setup({ viewMode: 'holo' });
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
+      expect(q(f, 'sc-holo-immersive-hud')).toBeTruthy();
+      q<HTMLButtonElement>(f, 'sc-holo-immersive-hud .close')!.click();
+      f.detectChanges();
+      expect(frame(f).classList).not.toContain('phone-full');
+      expect(document.documentElement.classList).not.toContain('sc-immersive');
+    });
+
+    it('Escape leaves it', () => {
+      withTouch(true);
+      const f = setup({ viewMode: 'holo' });
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
       f.detectChanges();
       expect(frame(f).classList).not.toContain('phone-full');
     });
 
-    it('stays in the page when the phone is upright', () => {
-      withLandscape(false);
-      expect(frame(setup({ viewMode: '3d' })).classList).not.toContain('phone-full');
+    it('the back gesture (popstate) leaves it without navigating again', () => {
+      withTouch(true);
+      const f = setup({ viewMode: 'holo' });
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
+      const back = vi.spyOn(history, 'back');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      f.detectChanges();
+      expect(frame(f).classList).not.toContain('phone-full');
+      expect(back).not.toHaveBeenCalled();
+    });
+
+    it('turns touch-action to none only while immersive', () => {
+      withTouch(true);
+      const f = setup({ viewMode: 'holo' });
+      expect(getComputedStyle(frame(f)).touchAction).toBe('pan-y');
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
+      expect(getComputedStyle(frame(f)).touchAction).toBe('none');
     });
   });
 

@@ -695,15 +695,29 @@ export class NewsThumbComponent implements OnDestroy {
   });
 
   private timer: ReturnType<typeof setInterval> | null = null;
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  /** False while the tile is off screen: its slideshow stands still (no re-render of 40 hidden cards per tick during a scroll). */
+  private inView = true;
+  private io: IntersectionObserver | null = null;
 
   constructor() {
+    afterNextRender(() => {
+      if (typeof IntersectionObserver === 'undefined') return;
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) this.inView = e.isIntersecting;
+      }, { rootMargin: '120px' });
+      io.observe(this.host.nativeElement);
+      this.io = io;
+    });
     // Run/stop the slideshow timer in reaction to mode + slide count.
     effect(() => {
       const running = this.mode() === 'carousel';
       const n = this.display().length;
       this.stop();
       if (running && n > 1 && !prefersReducedMotion()) {
-        this.timer = setInterval(() => this.index.update((i) => (i + 1) % n), SLIDE_DWELL_MS);
+        this.timer = setInterval(() => {
+          if (this.inView && !document.hidden) this.index.update((i) => (i + 1) % n);
+        }, SLIDE_DWELL_MS);
       }
     });
   }
@@ -794,7 +808,7 @@ export class NewsThumbComponent implements OnDestroy {
     this.insets.update((m) => (url in m ? m : { ...m, [url]: found }));
   }
 
-  ngOnDestroy(): void { this.stop(); }
+  ngOnDestroy(): void { this.stop(); this.io?.disconnect(); }
 
   private stop(): void {
     if (this.timer) { clearInterval(this.timer); this.timer = null; }

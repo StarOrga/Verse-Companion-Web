@@ -16,6 +16,7 @@ import {
   InstallTrigger,
   TRIGGER_WINDOW_MS,
   backoffActive,
+  calmView,
   isEligible,
   isSuccessEvent,
   withSessionTick,
@@ -59,9 +60,12 @@ export const PWA_ENV = new InjectionToken<PwaEnv>('PWA_ENV', {
         if (document.querySelector('[aria-modal="true"], [scDialog], [scToastSlot]')) return false;
         const a = document.activeElement as HTMLElement | null;
         if (a && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable)) return false;
-        if (document.fullscreenElement) return false;
-        if (mq('(orientation: landscape) and (max-height: 500px)')) return false;
-        return true;
+        return calmView({
+          immersive: document.documentElement.classList.contains('sc-immersive'),
+          compact: mq('(orientation: landscape) and (max-height: 500px)'),
+          fullscreen: !!document.fullscreenElement,
+          url: router.url,
+        });
       },
       platform: (hasEvent) => (hasEvent ? 'android-native' : iosDevice() && /Safari/.test(navigator.userAgent) ? 'ios' : 'other'),
       isIpad: () => /iPad/.test(navigator.userAgent) || touchMac(),

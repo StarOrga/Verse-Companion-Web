@@ -5,6 +5,8 @@ import {
   EligibilityInput,
   SESSION_GAP_MS,
   backoffActive,
+  calmView,
+  isShipDetailUrl,
   isEligible,
   isSuccessEvent,
   withSessionTick,
@@ -72,5 +74,22 @@ describe('isEligible', () => {
     expect(isEligible(base({ trigger: 'idle' }))).toBe(false);
     expect(isEligible(base({ trigger: 'idle', state: { ...EMPTY_INSTALL_STATE, sessions: 4 } }))).toBe(true);
     expect(isEligible(base({ trigger: 'manual', standalone: true, coarsePointer: false }))).toBe(true);
+  });
+});
+
+describe('calmView', () => {
+  const base = { immersive: false, compact: false, fullscreen: false, url: '/verse/news' };
+  it('is calm on an ordinary page', () => expect(calmView(base)).toBe(true));
+  it('is not calm in immersive, compact landscape or fullscreen', () => {
+    expect(calmView({ ...base, immersive: true })).toBe(false);
+    expect(calmView({ ...base, compact: true })).toBe(false);
+    expect(calmView({ ...base, fullscreen: true })).toBe(false);
+  });
+  it('is not calm on a ship detail route, but is on the ship index and other kinds', () => {
+    expect(isShipDetailUrl('/codex/ship/CNOU_Nomad')).toBe(true);
+    expect(isShipDetailUrl('/codex/ship/CNOU_Nomad?view=holo')).toBe(true);
+    expect(isShipDetailUrl('/codex/ships')).toBe(false);
+    expect(isShipDetailUrl('/codex/weapon/x')).toBe(false);
+    expect(calmView({ ...base, url: '/codex/ship/CNOU_Nomad' })).toBe(false);
   });
 });

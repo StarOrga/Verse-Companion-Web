@@ -102,6 +102,24 @@ export const PAGE_BAR_SLACK_PX = 12;
         :host(:not(.above-bar)) .tab[aria-current='page'] { flex: 2.4 1 0; }
         :host(:not(.above-bar)) .tab[aria-current='page'] span { display: inline; }
       }
+      /* Compact landscape (a phone on its side): the bar leaves the bottom, where it stacked under the
+         header's second layer, and sits top-sticky right under the header (contract of the shell:
+         --sc-header-h, html[data-sc-chrome='hidden']) as one 44px row, icon and label inline. It hides
+         together with the header (translate only), so at rest the chrome is header + 44px and while
+         reading down it is nothing. */
+      @media (orientation: landscape) and (max-height: 500px) {
+        :host, :host(.above-bar) {
+          display: block; position: sticky; top: var(--sc-header-h, 48px); bottom: auto; z-index: 4;
+          margin-inline-end: 0; translate: 0 0;
+          transition: translate var(--sc-t-base, 280ms) var(--sc-e-out, ease-out);
+        }
+        :host(.hidden), :host(.above-bar.hidden) { translate: 0 0; }
+        :host-context(html[data-sc-chrome='hidden']) { translate: 0 calc(-1 * var(--sc-header-h, 48px)); }
+        .bar { display: flex; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; border-radius: 12px; min-height: 44px; }
+        .bar::-webkit-scrollbar { display: none; }
+        .tab { flex: 1 0 auto; flex-direction: row; gap: 6px; min-height: 44px; padding-inline: 12px; scroll-snap-align: center; }
+        .tab span { display: inline !important; }
+      }
       @media (prefers-reduced-motion: reduce) { :host { transition: none; } }
     `,
   ],

@@ -32,6 +32,7 @@ import {
   output,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -75,6 +76,8 @@ import type { SummaryOccupant } from '../ship-summary-panels';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { AreaSymbolComponent } from '../../shared/area-symbol/area-symbol.component';
 import { CountUp } from './count-up';
+import { AnalyticsService } from '../../core/analytics.service';
+import { SheetSnap, SnapHeights, cycleSnap, dragVisible, releaseVelocity, settleSnap } from './holo-sheet-snap';
 
 const GROUP_ICON: Readonly<Record<PowerGroup, string>> = {
   weapons: 'weapon',
@@ -114,9 +117,15 @@ let uidSeq = 0;
   imports: [TranslatePipe, ScTooltipDirective, AreaSymbolComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="holo-strip" [class.open]="expanded()">
-      @if (expanded()) {
+    <div class="holo-strip" [class.open]="expanded()" [class.sheet]="phone" [class.dragging]="dragging()" [attr.data-snap]="phone ? snap() : null"
+         (keydown.escape)="phone && snap() !== 'peek' && setSnap('peek', true)">
+      @if (phone) {
+        <!-- Half / full: the page behind is dimmed; a tap on it folds the sheet back to peek. -->
+        <div class="sheet-scrim" aria-hidden="true" (click)="setSnap('peek', true)"></div>
+      }
+      @if (expanded() || phone) {
         <div class="hs-panel" [id]="panelId" role="region" [attr.aria-label]="'codex.holo.strip.dockAria' | translate"
+             [attr.inert]="phone && snap() === 'peek' ? '' : null"
              animate.enter="hp-enter" animate.leave="hp-leave"
              (keydown.escape)="dismissTooltips()" (focusin)="reopenTooltips()" (pointerenter)="reopenTooltips()">
           <div class="hp-energy">
@@ -277,12 +286,17 @@ let uidSeq = 0;
       <button
         type="button"
         class="hs-toggle"
+        #handle
         [attr.aria-expanded]="expanded()"
         [attr.aria-controls]="panelId"
         [attr.aria-label]="(expanded() ? 'codex.holo.strip.collapse' : 'codex.holo.strip.expand') | translate"
         [scTooltip]="(expanded() ? 'codex.holo.strip.collapse' : 'codex.holo.strip.expand') | translate"
         scTooltipTier="label"
-        (click)="toggleExpanded()"
+        (click)="onHandleClick()"
+        (pointerdown)="onHandleDown($event)"
+        (pointermove)="onHandleMove($event)"
+        (pointerup)="onHandleUp($event)"
+        (pointercancel)="onHandleUp($event)"
       >
         <span class="bar" [class.open]="expanded()" aria-hidden="true"></span>
       </button>
@@ -478,8 +492,21 @@ let uidSeq = 0;
         .sig .lab { max-inline-size: 64px; white-space: normal; line-height: 1.15; }
       }
       @media (max-width: 640px) {
-        .holo-strip { position: fixed; inset-inline: 0 var(--sc-fab-clear-inline); /* ends before the launcher lane */ inset-block-end: var(--holo-strip-lift, 0px); border-radius: 12px 12px 0 0; }
-        .hs-row { min-block-size: 52px; }
+        /* The phone sheet (concept mobile spec 3.4): full width, standing on the search bar (--holo-strip-lift), three snap points.
+           The bar itself is the peek (handle + the three values); the panel is the part that rises, moved by transform only
+           and clipped at the bar's bottom edge so it never shows over the search capsule. */
+        .holo-strip { position: fixed; inset-inline: 0; inset-block-end: var(--holo-strip-lift, 0px); border-radius: 16px 16px 0 0; display: flex; flex-direction: column;
+          clip-path: inset(-100vh 0 0 0); }
+        .hs-toggle { order: -1; touch-action: none; block-size: 44px; min-block-size: 44px; }
+        .hs-row { min-block-size: 52px; position: relative; z-index: 1; background: color-mix(in srgb, var(--sc-accent) 6%, var(--sc-bg-0)); }
+        .hs-toggle { position: relative; z-index: 1; background: color-mix(in srgb, var(--sc-accent) 6%, var(--sc-bg-0)); border-radius: 16px 16px 0 0; }
+        .hs-panel { inset-block-end: 100%; block-size: var(--_pfull, 0px); max-block-size: none; translate: 0 calc(100% - var(--_v, 0px)); will-change: auto; animation: none !important; border-radius: 16px 16px 0 0; z-index: 0; }
+        .holo-strip.dragging .hs-panel { will-change: translate; }
+        .holo-strip:not(.dragging) .hs-panel { transition: translate var(--sc-t-base, var(--holo-t-base)) var(--sc-e-out, var(--holo-e-out)), visibility 0s; }
+        .holo-strip[data-snap='peek'] .hs-panel { visibility: hidden; box-shadow: none; transition: translate var(--sc-t-base, var(--holo-t-base)) var(--sc-e-out, var(--holo-e-out)), visibility 0s linear var(--sc-t-base, var(--holo-t-base)); }
+        .sheet-scrim { position: absolute; inset-inline: 0; inset-block: -100vh 0; z-index: -1; background: color-mix(in srgb, var(--sc-bg-0) 40%, transparent); opacity: 0; pointer-events: none;
+          transition: opacity var(--sc-t-base, var(--holo-t-base)) var(--sc-e-out, var(--holo-e-out)); }
+        .holo-strip:is([data-snap='half'], [data-snap='full']) .sheet-scrim { opacity: 1; pointer-events: auto; }
         /* The narrowest phones: symbol + class + the three perspectives; the page's Signatur tile keeps those values. */
         @media (max-width: 430px) { .sig { display: none; } }
         .seg { padding: 5px 7px; flex: 1 1 0; }
@@ -493,8 +520,13 @@ let uidSeq = 0;
         .tip-trigger { display: none; }
         /* Phone: the dock rides on the fixed bar, which already ends before
            the feedback launcher's lane — nothing of it sits under the FAB. */
-        .hs-panel { max-block-size: 70vh; max-block-size: calc(100dvh - var(--holo-strip-h, 52px) - var(--holo-strip-lift, 0px) - 56px);
-          border-radius: 12px 12px 0 0; }
+        .hs-panel { border-radius: 16px 16px 0 0; }
+      }
+      /* A phone on its side (two-pane page): the bar rides in the flow at the page's end instead of eating a third of the screen. */
+      @media (orientation: landscape) and (max-height: 500px) {
+        :host { position: static; }
+        .holo-strip { position: relative; inset: auto; clip-path: none; margin-inline-end: 0; }
+        .hs-panel { translate: none; inset-block-end: 100%; block-size: auto; max-block-size: 70dvh; visibility: visible; }
       }
       @media (prefers-reduced-motion: reduce) {
         * { transition: none !important; animation: none !important; }
@@ -533,6 +565,15 @@ export class CodexHoloStripComponent {
   protected readonly mode = signal<FlightMode>('scm');
   protected readonly preset = signal<PowerPreset>('auto');
   protected readonly expanded = signal<boolean>(false);
+  /** Phone sheet: where the panel rests (peek = closed, only the bar shows). */
+  protected readonly snap = signal<SheetSnap>('peek');
+  protected readonly dragging = signal(false);
+  private readonly analytics = inject(AnalyticsService);
+  private readonly handleRef = viewChild<ElementRef<HTMLElement>>('handle');
+  private drag: { startY: number; startVisible: number; moved: boolean; samples: { t: number; y: number }[]; id: number } | null = null;
+  private suppressClick = false;
+  private dragRaf = 0;
+  private dragVisiblePx = 0;
   /** A phone (≤ 640 px at load): the strip is one slim, fixed row. */
   protected readonly phone = typeof matchMedia === 'function' && matchMedia('(max-width: 640px)').matches;
   protected readonly tipsHidden = signal(false);
@@ -709,6 +750,18 @@ export class CodexHoloStripComponent {
         window.removeEventListener('resize', onResize);
         ro?.disconnect();
         cancelAnimationFrame(raf);
+      });
+    });
+    afterNextRender(() => {
+      if (!this.phone) return;
+      this.paint(0);
+      this.publishSheet();
+      const onRot = () => { this.paint(this.snapHeights()[this.snap()]); this.publishSheet(); };
+      window.addEventListener('resize', onRot, { passive: true });
+      this.destroyRef.onDestroy(() => {
+        window.removeEventListener('resize', onRot);
+        document.documentElement.removeAttribute('data-sc-sheet');
+        document.documentElement.style.removeProperty('--sc-sheet-peek-h');
       });
     });
     this.destroyRef.onDestroy(() => {
@@ -930,5 +983,83 @@ export class CodexHoloStripComponent {
 
   protected toggleExpanded(): void {
     this.expanded.set(!this.expanded());
+  }
+
+  // ── Phone sheet ──────────────────────────────────────────────────────
+  /** The three visible heights of the PANEL in px (above the bar): half = 50 dvh in all, full = under the header. */
+  private snapHeights(): SnapHeights {
+    const bar = this.handleRef()?.nativeElement.parentElement?.getBoundingClientRect().height ?? 100;
+    const css = getComputedStyle(document.documentElement);
+    const head = parseFloat(css.getPropertyValue('--sc-header-h')) || 108;
+    const lift = parseFloat(getComputedStyle(this.host.nativeElement.parentElement ?? document.body).getPropertyValue('--holo-strip-lift')) || 0;
+    const vh = window.innerHeight;
+    const full = Math.max(0, vh - head - lift - bar - 8);
+    return { peek: 0, half: Math.min(full, Math.max(0, vh * 0.5 - lift - bar)), full };
+  }
+
+  private paint(visible: number): void {
+    const bar = this.handleRef()?.nativeElement.parentElement;
+    if (!bar) return;
+    bar.style.setProperty('--_pfull', `${Math.round(this.snapHeights().full)}px`);
+    bar.style.setProperty('--_v', `${Math.round(visible)}px`);
+  }
+
+  /** Move the sheet to a snap point (focus: handle on collapse, region heading on open). */
+  protected setSnap(next: SheetSnap, focusHandle = false): void {
+    const prev = this.snap();
+    this.snap.set(next);
+    this.expanded.set(next !== 'peek');
+    this.paint(this.snapHeights()[next]);
+    this.publishSheet();
+    if (prev !== next) this.analytics.track('codex:stats_sheet_change', { snap: next });
+    if (focusHandle) this.handleRef()?.nativeElement.focus({ preventScroll: true });
+  }
+
+  /** `html[data-sc-sheet]` + `--sc-sheet-peek-h` are what the shell reads (dial hide, lane height). */
+  private publishSheet(): void {
+    const html = document.documentElement;
+    const s = this.snap();
+    if (s === 'peek') html.removeAttribute('data-sc-sheet'); else html.setAttribute('data-sc-sheet', s);
+    const bar = this.handleRef()?.nativeElement.parentElement;
+    html.style.setProperty('--sc-sheet-peek-h', `${Math.round(bar?.getBoundingClientRect().height ?? 0)}px`);
+  }
+
+  protected onHandleClick(): void {
+    if (!this.phone) { this.toggleExpanded(); return; }
+    if (this.suppressClick) { this.suppressClick = false; return; }
+    this.setSnap(cycleSnap(this.snap()));
+  }
+
+  protected onHandleDown(ev: PointerEvent): void {
+    if (!this.phone || ev.button > 0) return;
+    this.drag = { startY: ev.clientY, startVisible: this.snapHeights()[this.snap()], moved: false, samples: [{ t: ev.timeStamp, y: ev.clientY }], id: ev.pointerId };
+  }
+
+  protected onHandleMove(ev: PointerEvent): void {
+    const d = this.drag;
+    if (!d || ev.pointerId !== d.id) return;
+    if (!d.moved) {
+      if (Math.abs(ev.clientY - d.startY) < 8) return;
+      d.moved = true;
+      this.dragging.set(true);
+      try { (ev.currentTarget as HTMLElement).setPointerCapture(ev.pointerId); } catch { /* the pointer ended already */ }
+    }
+    d.samples.push({ t: ev.timeStamp, y: ev.clientY });
+    if (d.samples.length > 12) d.samples.shift();
+    this.dragVisiblePx = dragVisible(d.startVisible, d.startY - ev.clientY, this.snapHeights());
+    this.dragRaf ||= requestAnimationFrame(() => { this.dragRaf = 0; this.paint(this.dragVisiblePx); });
+  }
+
+  protected onHandleUp(ev: PointerEvent): void {
+    const d = this.drag;
+    if (!d || ev.pointerId !== d.id) return;
+    this.drag = null;
+    if (!d.moved) return;
+    cancelAnimationFrame(this.dragRaf);
+    this.dragRaf = 0;
+    this.dragging.set(false);
+    this.suppressClick = true;
+    setTimeout(() => (this.suppressClick = false), 0);
+    this.setSnap(ev.type === 'pointercancel' ? this.snap() : settleSnap(this.dragVisiblePx, releaseVelocity(d.samples), this.snapHeights()));
   }
 }

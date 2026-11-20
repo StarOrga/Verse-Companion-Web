@@ -22,6 +22,7 @@ import { ProfileService } from '../auth/profile.service';
 import { RoleService } from '../auth/role.service';
 import { ComposerPrefsService } from '../core/composer-prefs.service';
 import { ConsentService } from '../core/consent.service';
+import { PwaInstallService } from '../core/pwa/pwa-install.service';
 import { FeedbackFabPrefsService } from '../core/feedback-fab-prefs.service';
 import { RoutineTintPrefsService } from '../admin/feedback/routine-tint-prefs.service';
 import { CodexPrefsService } from '../codex/codex-prefs.service';
@@ -229,6 +230,14 @@ const DELETE_ACCOUNT_ERROR_KEYS: Readonly<Record<string, string>> = {
           <section class="group" id="settings-preferences" tabindex="-1">
             <h2 class="group-title">{{ 'settings.groups.preferences.title' | translate }}</h2>
             <div class="grid">
+              @if (pwa.manualAvailable()) {
+                <!-- Manual "install the app": phones have no apps menu on every screen, so settings carries it too. -->
+                <div class="sc-card section">
+                  <h3>{{ 'pwa.menu' | translate }}</h3>
+                  <p class="hint">{{ 'pwa.card.benefit' | translate }}</p>
+                  <button type="button" scAction tier="secondary" (click)="pwa.manualInstall()">{{ 'pwa.card.install' | translate }}</button>
+                </div>
+              }
               <div class="sc-card section">
                 <h3>{{ 'settings.locale.title' | translate }}</h3>
                 <p class="hint">{{ 'settings.locale.hint' | translate }}</p>
@@ -814,6 +823,7 @@ export class SettingsComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly dialog = inject(ScConfirmService);
   readonly profile = inject(ProfileService);
   readonly consent = inject(ConsentService);
+  protected readonly pwa = inject(PwaInstallService);
   readonly composerPrefs = inject(ComposerPrefsService);
   readonly feedbackFabPrefs = inject(FeedbackFabPrefsService);
   readonly routineTintPrefs = inject(RoutineTintPrefsService);

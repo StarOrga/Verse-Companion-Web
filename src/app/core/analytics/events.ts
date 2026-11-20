@@ -52,6 +52,7 @@ export const EVENTS = {
   'app:install_prompt_accept': ev<{ platform: 'android-native' | 'ios' | 'other' }>('app', 'Auf der Installieren-Karte wurde Installieren gewählt (öffnet den System-Dialog bzw. die iOS-Anleitung).'),
   'app:install_prompt_close': ev<{ platform: 'android-native' | 'ios' | 'other'; dismissals: number }>('app', 'Die Installieren-Karte oder der System-Dialog wurde abgelehnt (Anzahl bisheriger Ablehnungen steuert die Pause).'),
   'app:install_finish': ev<{ platform: 'android-native' | 'ios' | 'other' }>('app', 'Die App wurde installiert (appinstalled).'),
+  'app:tools_dial_open': ev<{ mode: 'phone' | 'compact'; actions: number }>('app', 'Der Werkzeug-Knopf (Fächer aus Ansicht, Beta, Teilen) wurde auf einem Handy geöffnet.'),
 
   // --- auth --------------------------------------------------------------
   'auth:user_sign_in': ev<{ provider: 'email' | 'google' | 'discord' }>('auth', 'Anmeldung erfolgreich (Anbieter).'),
@@ -74,6 +75,9 @@ export const EVENTS = {
   'codex:wish_add': ev<{ kind: string; source: 'shop' | 'wikelo' }>('codex', 'Ein Eintrag wurde aus dem Reiter Kaufen auf die Wunschliste gesetzt (Quelle: Laden oder Wikelo-Tausch).'),
   'codex:deck_select': ev<{ ship: string; deck: string; view: '2d' | '3d' }>('codex', 'Im Holotisch wurde im Deck-Filter ein Deck gewählt (Schiff, Deck-Schlüssel oder hull/all, Ansicht 2D oder 3D).'),
   'codex:interior_filter_toggle': ev<{ group: string; on: boolean }>('codex', 'Im Holotisch wurde eine Innen-Elementgruppe (Fracht, Wege, Medizin …) ein- oder ausgeschaltet.'),
+  'codex:immersive_open': ev<{ surface: 'holo' | '3d' | 'schema'; orientation: 'landscape' | 'portrait' }>('codex', 'Die Vollbild-Ansicht des Holotisch-Modells wurde per Knopf geöffnet (Ansicht, Ausrichtung des Geräts).'),
+  'codex:immersive_close': ev<{ via: 'button' | 'escape' | 'back' }>('codex', 'Die Vollbild-Ansicht des Holotisch-Modells wurde verlassen (Schließen-Knopf, Escape oder Zurück-Geste).'),
+  'codex:stats_sheet_change': ev<{ snap: 'peek' | 'half' | 'full' }>('codex', 'Das Werteblatt am unteren Rand des Holotisch-Handys rastete auf einer Höhe ein (Einrastpunkt).'),
   'codex:interior_element_select': ev<{ ship: string; kind: string; deck: string }>('codex', 'Im Holotisch wurde ein Innen-Element gewählt (Schiff, Art des Elements, Deck).'),
   'codex:parts_search': ev<{ scope: 'outer' | 'inner' | 'both'; hits: number }>('codex', 'Die Bauteile-Suche des Holotischs lieferte ein Ergebnis (Außen-, Innen- oder beide Treffer, Anzahl; nie der Suchtext).'),
   'codex:filter_change': ev<{ kind: string; filter_count: number }>('codex', 'Im Codex-Index wurden Filter angewendet (Art, Anzahl aktiver Filter, nie die Werte).'),

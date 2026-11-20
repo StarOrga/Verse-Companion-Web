@@ -423,6 +423,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
             (partSelected)="onPartSelected($event)"
             (partSwap)="onPartSwap($event)"
             (previewError)="previewFailed.set(true)"
+            [hudStats]="perspectiveViews()"
+            (surfacePick)="pickSurface($event)"
             (locatable)="onModelLocatable($event)" />
         </section>
 
@@ -1081,13 +1083,26 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .holo-table ::ng-deep .silhouette-frame { min-height: calc(100dvh - 52px); }
   }
   @media (max-width: 640px) {
-  .holo-stage { padding-bottom: calc(72px + var(--holo-strip-lift, 0px)); }
+  /* Room for the sheet's peek (the strip publishes its height; 96 px until it has). */
+  .holo-stage { padding-bottom: calc(var(--sc-sheet-peek-h, 96px) + var(--holo-strip-lift, 0px) + 16px); }
   /* Beta shell: the search capsule floats at the bottom edge, the strip rides above it. */
   :host-context([data-layout]) .holo-stage { --holo-strip-lift: calc(var(--sc-float-bottom) + var(--sc-bar-h)); }
   .mobile-tabs { display: flex; }
   /* The floating button column (β, view switch, share, feedback) stands at the inline end:
      the hull and its pins keep that lane free instead of lying under it (QA Q4). */
-  .holo-table { padding-inline-end: var(--sc-fab-clear-inline); }
+  /* Mission and hangar share one row, half each (the head's own rule stacks them). */
+  .holo-topbar:not(.slim) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  .holo-topbar:not(.slim) ::ng-deep .ht-centre { grid-column: 1; justify-self: stretch; min-width: 0; }
+  .holo-topbar:not(.slim) ::ng-deep .ht-right { grid-column: 2; min-width: 0; }
+  .holo-topbar:not(.slim) ::ng-deep :is(.ht-centre, .ht-right) > * { max-inline-size: 100%; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
+  .holo-topbar:not(.slim) ::ng-deep :is(sc-codex-holo-einsatz, sc-codex-holo-hangar-menu) { min-block-size: 44px; box-sizing: border-box; }
+  .holo-topbar:not(.slim) ::ng-deep sc-codex-holo-einsatz { display: block; }
+  /* The side lane is free again: the share action sits in the dial (or its own FAB), not in a reserved column. */
+  .vw-gl { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .vw-grp { gap: 0; }
+  .vw, .vf-row { scroll-snap-type: x proximity; }
+  .vw-thumb, .vf-chip { scroll-snap-align: start; }
+  .vf-row { mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 18px), transparent 100%); padding-inline: 6px 18px; }
   .switch.mobile-only { display: inline-flex; }
   .holo-body { gap: 10px; }
   .table-head { flex-wrap: wrap; gap: 6px; padding: 0; }
@@ -1096,6 +1111,28 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .holo-body.mobile-hide-data .mobile-data { display: none; }
   .toasts { width: calc(100% - 32px); }
   .undo-toast { width: 100%; justify-content: space-between; }
+  }
+  /* A phone on its side: two panes. The model with its controls takes the left ~60 %, the values the right ~40 % as their own scroller. */
+  @media (orientation: landscape) and (max-height: 500px) {
+  /* The shell's fixed compact header does not push a stage page down: start under it (padding, not animated). */
+  .holo-stage { padding-bottom: 16px; padding-top: max(var(--sc-header-h, 0px), calc(48px + env(safe-area-inset-top, 0px))); }
+  :host-context(html[data-sc-chrome='hidden']) .holo-stage { padding-top: 0; }
+  .holo-topbar { top: max(var(--sc-header-h, 0px), calc(48px + env(safe-area-inset-top, 0px))); }
+  :host-context(html[data-sc-chrome='hidden']) .holo-topbar { top: 0; }
+  .holo-body { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); grid-template-rows: minmax(0, 1fr) auto; column-gap: 12px; row-gap: 6px;
+    height: 100vh; height: calc(100dvh - 56px); min-height: 0; align-items: stretch; }
+  .holo-table { grid-column: 1; grid-row: 1; min-height: 0; padding-inline-end: 0; }
+  .holo-table sc-codex-holo-table { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .holo-table ::ng-deep .silhouette-frame { min-height: 0; flex: 1; }
+  .holo-views { grid-column: 1; grid-row: 2; flex-wrap: nowrap; overflow-x: auto; gap: 8px; scrollbar-width: none; padding-block: 2px; }
+  .vw { overflow-x: visible; }
+  .vw-thumb { width: 48px; min-block-size: 44px; }
+  .vw-ic { height: 30px; }
+  .vw-l { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+  .vw-gl { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .vf { flex-basis: auto; }
+  .holo-panel { grid-column: 2; grid-row: 1 / span 2; height: 100%; max-height: 100%; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; align-self: stretch; }
+  .holo-below { display: none; }
   }
   .reduced-motion *, .reduced-motion *::before, .reduced-motion *::after { animation: none !important; transition: none !important; }
   @media (prefers-reduced-motion: reduce) {
