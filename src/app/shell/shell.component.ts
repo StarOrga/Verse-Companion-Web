@@ -390,7 +390,7 @@ import { avatarUrlOf } from './avatar-url';
                   <span class="sc-sr-only">{{ 'nav.adminOnly' | translate }}</span>
                 </a>
               }
-              @if (roles.role() === 'collaborator') {
+              @if (roles.isCollaborator() && !roles.isAdmin()) {
                 <!-- The collaborator space (admin feedback #387): only the AI translation
                      cards for now. Copper = admin + collaborator surface; admins reach the
                      cards through their own Admin space. -->
