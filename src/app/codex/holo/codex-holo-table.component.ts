@@ -252,9 +252,12 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
              layer stays transparent over the table, which keeps its hull: no "loading" frame between
              the schema and the 3D hologram (D11). -->
         <div class="viewer-hold" [class.held]="!viewerDrawn()">
+        <!-- One viewer per mount (epoch): a late "drawn" of a viewer that already left (deck → hull, a hull
+             switch) carries its old epoch and cannot unhold the new one before it has drawn. -->
+        @for (ep of [viewerEpoch()]; track ep) {
         @defer (on immediate) {
           @if (packageRow(); as row) {
-            <sc-asset-package-viewer class="mode-viewer" animate.leave="surface-leave" (drawn)="markDrawn()" [row]="row" [still]="still()"
+            <sc-asset-package-viewer class="mode-viewer" animate.leave="surface-leave" (drawn)="markDrawn(ep)" [row]="row" [still]="still()"
               interaction="table" [safeArea]="safeArea()" [selectedPort]="selectedPart()" [swappablePorts]="swappablePorts()"
               [relevantPorts]="relevantPorts()" [calloutValues]="calloutModel()?.values ?? calloutValues()" [calloutTitle]="calloutModel()?.title ?? calloutTitle()"
               [calloutType]="calloutModel()?.type ?? null" [calloutDiff]="calloutModel()?.diff ?? false" [groupFilter]="viewerGroups()" [(hotspotScope)]="hotspotScope"
@@ -262,7 +265,7 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
               (selectionIntent)="partIntent.emit($event)" (selectionChange)="partSelected.emit($event)" (swapRequested)="partSwap.emit($event)" />
           } @else if (packageRow() === null) {
             <!-- Legacy path (hulls uploaded before asset packages): model-viewer + browser-side port/node join. -->
-            <sc-ship-skin-viewer class="mode-viewer" animate.leave="surface-leave" (drawn)="markDrawn()" [shipId]="shipClassName()" [embedded]="true" [holo]="true" [still]="still()"
+            <sc-ship-skin-viewer class="mode-viewer" animate.leave="surface-leave" (drawn)="markDrawn(ep)" [shipId]="shipClassName()" [embedded]="true" [holo]="true" [still]="still()"
               [hardpointPorts]="hardpointPortRefs()" [activePorts]="activePorts()"
               (hovered)="hovered.emit($event)" (locatable)="locatable.emit($event)" />
           } @else {
@@ -271,7 +274,8 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
         } @placeholder {
           <div class="mode-viewer is-placeholder" aria-hidden="true"></div>
         } @error {
-          <sc-defer-error class="mode-viewer" source="codex.holoTable" (failed)="markDrawn()" />
+          <sc-defer-error class="mode-viewer" source="codex.holoTable" (failed)="markDrawn(ep)" />
+        }
         }
         </div>
         @if (loading3d()) {
@@ -349,10 +353,10 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
               }
             </div>
           }
-          @if (pins().length === 0) {
+          @if (pins().length === 0 && viewMode() !== '3d') {
             <p class="table-empty">{{ 'codex.holo.stage.noPorts' | translate }}</p>
           }
-          @for (pin of pins(); track pin.portName) {
+          @for (pin of outlinePins(); track pin.portName) {
             <button
               type="button"
               class="pin"
@@ -388,14 +392,14 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
               </span>
             </button>
           }
-          @if (!leader() && selectedPin(); as sp) {
+          @if (!leader() && viewMode() !== '3d' && selectedPin(); as sp) {
             <!-- The selected part is the full callout, beside its dot (the tag steps aside). -->
             <sc-holo-callout class="pin-card" [class.to-left]="sp.x > 50" [style.left.%]="sp.x" [style.top]="'clamp(48px, ' + sp.y + '%, calc(100% - 48px))'"
               [type]="tagOf(sp).type" [name]="calloutModel()?.title ?? sp.label" [values]="calloutModel()?.values ?? []"
               [swappable]="calloutModel()?.swappable ?? false" [diff]="diffPorts().has(sp.portName)" (swap)="portSwap.emit(sp.portName)" />
           }
         </div>
-        @if (leader(); as lay) {
+        @if (viewMode() !== '3d' ? leader() : null; as lay) {
           <!-- Leader lines (#642): each anchored dot's label sits in the
                nearest free slot of a column beside the hull, joined by a thin
                line. Geometry from layoutLeaderLabels() in frame px. -->
@@ -1023,11 +1027,27 @@ export class CodexHoloTableComponent {
    * Reset whenever 3D is left or the ship changes; {@link VIEWER_HOLD_MAX_MS} caps the wait.
    */
   readonly viewerDrawn = signal(false);
+  /**
+   * Part dots on the 2D hull. While the 3D model loads the hull is only a placeholder: dots placed on it would
+   * sit in other spots than on the model and jump once it draws, so they wait for the model (its own markers).
+   */
+  readonly outlinePins = computed(() => (this.viewMode() === '3d' ? [] : this.pins()));
   /** The hull model is on its way: the loading ring sits in its spot (#378). */
   readonly loading3d = computed(() => this.viewMode() === '3d' && !this.interior3d() && !this.viewerDrawn());
+  /** The hull viewer is the 3D layer (3D without a deck turned inward). */
+  readonly hullViewerOn = computed(() => this.viewMode() === '3d' && !this.interior3d());
+  /** Counts the hull viewer's mounts: each 3D entry, each way back from a deck, each hull switch. */
+  readonly viewerEpoch = signal(0);
   private viewerHoldTimer: ReturnType<typeof setTimeout> | null = null;
 
-  markDrawn(): void {
+  /**
+   * The hull viewer drew (or gave up). `epoch` = the mount that says so: a stale one (a viewer that already
+   * left, a hold timer of an earlier mount) is ignored, as is any call while no hull viewer is up — else the
+   * hull would be taken off the table before the new model is there (empty frame, "3D-Modell wird geladen").
+   */
+  markDrawn(epoch?: number): void {
+    if (epoch !== undefined && epoch !== this.viewerEpoch()) return;
+    if (!this.hullViewerOn()) return;
     if (this.viewerHoldTimer) clearTimeout(this.viewerHoldTimer);
     this.viewerHoldTimer = null;
     this.viewerDrawn.set(true);
@@ -1046,11 +1066,17 @@ export class CodexHoloTableComponent {
 
   constructor() {
     effect((onCleanup) => {
-      const in3d = this.viewMode() === '3d';
+      // Keyed on the hull viewer itself, not on "3D": coming back from a deck mounts a new viewer, which
+      // must hold the table's hull again until it has drawn (before, the 3D-entry hold had long run out).
+      const on = this.hullViewerOn();
       this.shipClassName();
-      untracked(() => this.viewerDrawn.set(false));
-      if (!in3d) return;
-      const t = setTimeout(() => this.markDrawn(), VIEWER_HOLD_MAX_MS);
+      const epoch = untracked(() => {
+        this.viewerDrawn.set(false);
+        if (on) this.viewerEpoch.update((n) => n + 1);
+        return this.viewerEpoch();
+      });
+      if (!on) return;
+      const t = setTimeout(() => this.markDrawn(epoch), VIEWER_HOLD_MAX_MS);
       this.viewerHoldTimer = t;
       onCleanup(() => clearTimeout(t));
     });

@@ -4,6 +4,17 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.283.3] - 2026-11-20
+
+### Fixed
+- Holotable: the glass head band no longer covers the interior chips or the tabs; the tab pill fits the panel at every width.
+- Holotable: the stage keeps its frame when switching views and decks, the outline stays until the new 3D model is drawn, and part dots wait for the model.
+- Phones: the interior chips stay on one line, so the stage no longer jumps.
+- Item Änderungen tab shows curated stat names with a fixed better/worse direction.
+
+### Changed
+- Ship and item detail pages share one panel component.
+
 ## [0.283.2] - 2026-11-20
 
 ### Fixed

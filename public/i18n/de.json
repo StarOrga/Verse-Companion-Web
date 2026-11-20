@@ -1800,7 +1800,48 @@
       "compatNone": "Keine passenden Items in diesem Build.",
       "changes": {
         "title": "Änderungen seit Patch {{patch}}",
-        "worse": "Schlechter"
+        "worse": "Schlechter",
+        "stat": {
+          "ammoCapacity": "Magazingröße",
+          "reloadTime": "Nachladezeit",
+          "heatPerShot": "Hitze pro Schuss",
+          "spread": "Streuung",
+          "recoil": "Rückstoß",
+          "energyPool": "Energiepool",
+          "energyRegen": "Energie-Regeneration",
+          "regenCooldown": "Regenerationsverzögerung",
+          "shotCost": "Energie pro Schuss",
+          "overheatFix": "Überhitzungs-Erholung",
+          "mass": "Masse",
+          "capacity": "Kapazität",
+          "temperatureMin": "Min. Temperatur",
+          "temperatureMax": "Max. Temperatur",
+          "damage": {
+            "physical": "Physischer Schaden",
+            "energy": "Energieschaden",
+            "distortion": "Störschaden",
+            "thermal": "Thermischer Schaden",
+            "biochemical": "Biochemischer Schaden",
+            "stun": "Betäubungsschaden"
+          },
+          "taken": {
+            "physical": "Erlittener physischer Schaden",
+            "energy": "Erlittener Energieschaden",
+            "distortion": "Erlittener Störschaden",
+            "thermal": "Erlittener thermischer Schaden",
+            "biochemical": "Erlittener biochemischer Schaden",
+            "stun": "Erlittener Betäubungsschaden"
+          },
+          "coolingPerSecond": "Abkühlung",
+          "overheatTemperature": "Überhitzungsgrenze",
+          "coolingDelay": "Abkühlverzögerung",
+          "coldResistance": "Kälteschutz bis",
+          "heatResistance": "Hitzeschutz bis",
+          "gForceResistance": "G-Kraft-Widerstand",
+          "radiationCapacity": "Strahlungsaufnahme",
+          "radiationDissipation": "Strahlungsabbau",
+          "atmosphereCapacity": "Atemluftvorrat"
+        }
       },
       "usedInBlueprints": "Verwendet in Blueprints",
       "usedInBlueprintsHint": "Crafting-Rezepte, die diesen Gegenstand als Zutat benötigen.",
