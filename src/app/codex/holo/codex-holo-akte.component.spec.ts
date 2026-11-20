@@ -78,6 +78,23 @@ describe('CodexHoloAkteComponent tabs', () => {
     }
   });
 
+  it('collapses to "Nur Bild" and expands again with the same control (#386)', () => {
+    const f = setup();
+    const el: HTMLElement = f.nativeElement;
+    const tg = () => el.querySelector<HTMLButtonElement>('.ak-head .ak-tg')!;
+    tg().click();
+    f.detectChanges();
+    expect(el.querySelector('.ak-card.shut')).not.toBeNull();
+    expect(el.querySelector('.ak-panel')).toBeNull();
+    expect(tg().getAttribute('aria-pressed')).toBe('true');
+    tg().click();
+    f.detectChanges();
+    expect(el.querySelector('.ak-card.shut')).toBeNull();
+    expect(el.querySelector('.ak-panel')).not.toBeNull();
+    expect(tg().getAttribute('aria-pressed')).toBe('false');
+    expect(tabs(f).length).toBe(3);
+  });
+
   it('keeps the card one fixed size on every tab, with "Nur Bild" in the head', () => {
     const f = setup();
     (f.nativeElement as HTMLElement).style.cssText = 'display:block;height:700px;width:900px';
