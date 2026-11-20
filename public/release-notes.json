@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.284.0",
+  "current": "0.284.1",
   "releases": [
+    {
+      "version": "0.284.1",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex holotable: switching between two ships keeps the stage up and dimmed instead of showing the first-visit skeleton; the dim lifts once the next ship's head and values are in, and the head band no longer grows after the stage settles."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.284.0",
       "date": "2026-11-20",
