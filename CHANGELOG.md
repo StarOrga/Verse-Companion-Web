@@ -4,10 +4,15 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.284.1] - 2026-11-20
+## [0.284.2] - 2026-11-20
 
 ### Changed
 - Codex: the "Einordnung" ranking on a ship page reads the parts of the fleet's stock loadouts from one file per build instead of the database. The first ship page of a build sends 112 fewer database reads (26 MB); the ranking shows the same values.
+
+## [0.284.1] - 2026-11-20
+
+### Fixed
+- Codex holotable: switching between two ships keeps the stage up and dimmed instead of showing the first-visit skeleton; the dim lifts once the next ship's head and values are in, and the head band no longer grows after the stage settles.
 
 ## [0.284.0] - 2026-11-20
 

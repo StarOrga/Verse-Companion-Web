@@ -279,6 +279,60 @@ describe('CodexDetailComponent — ship load skeleton', () => {
     expect(el.querySelector('sc-codex-holo-stage')).not.toBeNull();
   });
 
+  it('keeps the stage up and dims it while the next ship loads (no skeleton on a ship switch)', async () => {
+    let release!: () => void;
+    let calls = 0;
+    const stub = makeCodexServiceStub(NOMAD_PAYLOAD);
+    const getDetail: CodexService['getDetail'] = (kind, className) =>
+      ++calls === 1
+        ? stub.getDetail!(kind, className)
+        : new Promise((r) => { release = () => r(stub.getDetail!(kind, className)); });
+    configureSetup('ship', [], NOMAD_PAYLOAD, { getDetail });
+    await TestBed.compileComponents();
+    const fixture = TestBed.createComponent(CodexDetailComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('sc-codex-holo-stage')).not.toBeNull();
+    const stageBefore = el.querySelector('sc-codex-holo-stage');
+
+    void (fixture.componentInstance as unknown as { load(k: string, c: string): Promise<void> }).load('ship', 'OTHER_SHIP');
+    fixture.detectChanges();
+    expect(el.querySelector('.skel-stage')).toBeNull();
+    expect(el.querySelector('sc-codex-holo-stage')).toBe(stageBefore);
+    expect(fixture.componentInstance.holdStage()).toBe(true);
+    expect(fixture.componentInstance.holoStageOn()).toBe(true);
+
+    release();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.holdStage()).toBe(false);
+    expect(el.querySelector('.skel-stage')).toBeNull();
+  });
+
+  it('lifts the dim once the next ship is in, before the best-effort silhouette wait ends', async () => {
+    let release!: () => void;
+    let calls = 0;
+    const stub = makeCodexServiceStub(NOMAD_PAYLOAD);
+    const getDetail: CodexService['getDetail'] = (kind, className) =>
+      ++calls === 1
+        ? stub.getDetail!(kind, className)
+        : new Promise((r) => { release = () => r(stub.getDetail!(kind, className)); });
+    configureSetup('ship', [], NOMAD_PAYLOAD, { getDetail, silhouette: () => new Promise(() => undefined) } as Partial<CodexService>);
+    await TestBed.compileComponents();
+    const fixture = TestBed.createComponent(CodexDetailComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const c = fixture.componentInstance;
+    void (c as unknown as { load(k: string, c: string): Promise<void> }).load('ship', 'OTHER_SHIP');
+    expect(c.holdDim()).toBe(true);
+    release();
+    await vi.waitFor(() => expect(c.holdDim()).toBe(false));
+    expect(c.holdStage()).toBe(true);
+    expect(c.holoStageOn()).toBe(true);
+  });
+
   it('draws only the real silhouette (no backdrop) while a ship with a silhouette loads', async () => {
     configureSetup('ship', [], NOMAD_PAYLOAD, { getDetail: () => new Promise(() => undefined) });
     TestBed.overrideProvider(SilThumbsService, {

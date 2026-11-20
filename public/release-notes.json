@@ -1,7 +1,39 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.284.0",
+  "current": "0.284.2",
   "releases": [
+    {
+      "version": "0.284.2",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex: the \"Einordnung\" ranking on a ship page reads the parts of the fleet's stock loadouts from one file per build instead of the database. The first ship page of a build sends 112 fewer database reads (26 MB); the ranking shows the same values."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.284.1",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex holotable: switching between two ships keeps the stage up and dimmed instead of showing the first-visit skeleton; the dim lifts once the next ship's head and values are in, and the head band no longer grows after the stage settles."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.284.0",
       "date": "2026-11-20",
