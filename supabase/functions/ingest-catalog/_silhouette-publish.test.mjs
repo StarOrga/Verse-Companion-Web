@@ -332,6 +332,57 @@ describe('commitSilhouettes', () => {
   });
 });
 
+describe('commitSilhouettes against a table or bucket that moved', () => {
+  it('writes no index when a class got its outline after the plan', async () => {
+    const have = { ship: [...SHIPS] };
+    const { deps, store } = fixture({ have, catalog: { ship: SHIPS } });
+    const plan = await planSilhouettes(BUILD, deps);
+    await publishSilhouetteSlice(BUILD, plan.gen, { kind: 'ship', from: 0 }, deps);
+    have.ship.push('ship_late');
+    const commit = await commitSilhouettes(BUILD, plan.gen, deps);
+    assert.equal(commit.changed, 'ship');
+    assert.equal(commit.index_put, false);
+    assert.ok(!store.has(silhouettesIndexKey(BUILD)));
+  });
+
+  it('writes no index when a kind without a plan entry got rows, or a planned class lost its row', async () => {
+    const have = { ship: [...SHIPS] };
+    const { deps, store } = fixture({ have, catalog: { ship: SHIPS } });
+    const plan = await planSilhouettes(BUILD, deps);
+    await publishSilhouetteSlice(BUILD, plan.gen, { kind: 'ship', from: 0 }, deps);
+    have.weapon = ['new_gun'];
+    assert.equal((await commitSilhouettes(BUILD, plan.gen, deps)).changed, 'weapon');
+    delete have.weapon;
+    have.ship.pop();
+    assert.equal((await commitSilhouettes(BUILD, plan.gen, deps)).changed, 'ship');
+    assert.ok(!store.has(silhouettesIndexKey(BUILD)));
+  });
+
+  it('puts a newer publish back in charge when it finished while this index was being written', async () => {
+    const { deps, store } = fixture({ have: { ship: SHIPS }, catalog: { ship: SHIPS } });
+    const plan = await planSilhouettes(BUILD, deps);
+    await publishSilhouetteSlice(BUILD, plan.gen, { kind: 'ship', from: 0 }, deps);
+    const newerGen = (NOW + 5000).toString(36);
+    const idxKey = silhouettesIndexKey(BUILD);
+    const put = deps.putJson;
+    deps.putJson = async (key, body) => {
+      await put(key, body);
+      if (key !== idxKey || JSON.parse(body).gen !== plan.gen) return;
+      // The newer publish committed between this commit's index read and its put: its
+      // collection removed this generation, and this put has just overwritten its index.
+      for (const k of [...store.keys()]) if (k.includes(`/${plan.gen}/`)) store.delete(k);
+      store.set(silhouettesPlanKey(BUILD, newerGen), silhouettesIndexJson(BUILD, newerGen, plan.kinds));
+      store.set(silhouetteShardKey(BUILD, newerGen, 'ship', 0), '{}');
+    };
+    const commit = await commitSilhouettes(BUILD, plan.gen, deps);
+    assert.equal(commit.superseded, true);
+    assert.equal(commit.index_put, false);
+    assert.equal(commit.removed_objects, 0);
+    assert.equal(JSON.parse(store.get(idxKey)).gen, newerGen);
+    assert.ok(store.has(silhouetteShardKey(BUILD, newerGen, 'ship', 0)), 'the newer generation is untouched');
+  });
+});
+
 describe('publishSilhouetteStep / parseCursor', () => {
   it('reads a cursor from a request body', () => {
     assert.equal(parseCursor('commit'), 'commit');

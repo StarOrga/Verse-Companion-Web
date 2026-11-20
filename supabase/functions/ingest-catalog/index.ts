@@ -1187,8 +1187,10 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
         return json({ error: result.blocked.code, message: result.blocked.message }, result.blocked.status);
       }
       console.log(`ingest-catalog: silhouettes_publish ${buildId}: ${JSON.stringify(result)}`);
-      const hop = Number.isInteger(body.hop) ? (body.hop as number) : 0;
-      if (body.chain === true && result.next && result.gen && hop < SILHOUETTE_CHAIN_MAX_HOPS) {
+      // Only the function itself (and an operator) may make it call itself with the service key.
+      const mayChain = !!authHeader && safeEqual(authHeader, `Bearer ${serviceKey}`);
+      const hop = Number.isInteger(body.hop) ? Math.max(0, body.hop as number) : 0;
+      if (mayChain && body.chain === true && result.next && result.gen && hop < SILHOUETTE_CHAIN_MAX_HOPS) {
         afterResponse(callSilhouetteStep(supabaseUrl, serviceKey, { build_id: buildId, gen: result.gen, cursor: result.next, hop: hop + 1 }));
       }
       return json({ ok: true, result });

@@ -55,10 +55,12 @@ function worker(over: Record<string, () => Response> = {}, index: unknown = INDE
   };
 }
 
-function setup(handler: Handler, base = BASE): { svc: CodexSilhouetteShards; calls: string[] } {
+function setup(handler: Handler, base = BASE): { svc: CodexSilhouetteShards; calls: string[]; revalidated: string[] } {
   const calls: string[] = [];
-  const fetchFn = (async (url: string) => {
+  const revalidated: string[] = [];
+  const fetchFn = (async (url: string, init?: RequestInit) => {
     calls.push(url);
+    if (init?.cache === 'no-cache') revalidated.push(url);
     return handler(url);
   }) as unknown as typeof fetch;
   TestBed.configureTestingModule({
@@ -67,7 +69,7 @@ function setup(handler: Handler, base = BASE): { svc: CodexSilhouetteShards; cal
       { provide: SILHOUETTE_SHARD_BASE, useValue: base },
     ],
   });
-  return { svc: TestBed.inject(CodexSilhouetteShards), calls };
+  return { svc: TestBed.inject(CodexSilhouetteShards), calls, revalidated };
 }
 
 const short = (calls: string[]) => calls.map((c) => c.slice(ROOT.length));
@@ -193,10 +195,13 @@ describe('CodexSilhouetteShards', () => {
   });
 
   it('a shard the index names but the bucket lacks: open now, the index is read again next time', async () => {
-    const { svc, calls } = setup(worker({ [`${ROOT}${GEN}/ship/0.json`]: () => new Response('not found', { status: 404 }) }));
+    const { svc, calls, revalidated } = setup(worker({ [`${ROOT}${GEN}/ship/0.json`]: () => new Response('not found', { status: 404 }) }));
     expect((await svc.resolve(BUILD, 'ship', ['A']))!.open).toEqual(['A']);
+    expect(revalidated).toEqual([]);
     await svc.resolve(BUILD, 'ship', ['C']);
     expect(short(calls).filter((c) => c === 'index.json').length).toBe(2);
+    // the second index read goes past the browser's cached copy, once
+    expect(short(revalidated)).toEqual(['index.json']);
   });
 
   it('a shard with an unexpected shape stays open and is never fetched again', async () => {

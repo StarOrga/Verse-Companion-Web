@@ -143,6 +143,8 @@ export class CodexSilhouetteShards {
   private index: Promise<SilhouetteShardIndex> | null = null;
   /** Until when this build counts as unpublished (index 404). */
   private absentUntil = 0;
+  /** The next index read must revalidate: the one in the HTTP cache named files that are gone. */
+  private staleIndex = false;
   /** Per path: the names map of a kind, in flight or settled. */
   private readonly names = new Map<string, Promise<Map<string, number>>>();
   /** Per path: a shard, in flight or settled; the oldest leave past {@link SHARDS_KEPT}. */
@@ -212,6 +214,7 @@ export class CodexSilhouetteShards {
     this.buildId = buildId;
     this.index = null;
     this.absentUntil = 0;
+    this.staleIndex = false;
     this.names.clear();
     this.shards.clear();
     this.failedUntil.clear();
@@ -222,8 +225,10 @@ export class CodexSilhouetteShards {
   private failed(buildId: string, what: string, err: unknown): void {
     if (this.buildId !== buildId) return;
     if (err instanceof Gone) {
-      // Published again and the old generation collected: read the new index next time.
+      // Published again and the old generation collected: read the new index next time,
+      // past the browser's copy of the old one (it may be cached for another 5 minutes).
       this.index = null;
+      this.staleIndex = true;
       return;
     }
     if (err instanceof NotPublished || err instanceof Backoff) return;
@@ -246,7 +251,9 @@ export class CodexSilhouetteShards {
   }
 
   private async fetchIndex(buildId: string): Promise<SilhouetteShardIndex> {
-    const res = await this.getJson(`${this.base}/codex-silhouettes/${buildId}/index.json`);
+    const revalidate = this.staleIndex;
+    this.staleIndex = false;
+    const res = await this.getJson(`${this.base}/codex-silhouettes/${buildId}/index.json`, revalidate ? 'no-cache' : undefined);
     if (res.status === 404) {
       if (this.buildId === buildId) this.absentUntil = Date.now() + ABSENT_RETRY_MS;
       throw new NotPublished();
@@ -315,11 +322,11 @@ export class CodexSilhouetteShards {
   }
 
   /** GET + JSON body with a {@link FETCH_TIMEOUT_MS} abort; `body` is null for a non-2xx answer. */
-  private async getJson(url: string): Promise<{ status: number; ok: boolean; body: unknown }> {
+  private async getJson(url: string, cache?: RequestCache): Promise<{ status: number; ok: boolean; body: unknown }> {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
     try {
-      const res = await this.fetchFn(url, { signal: ctrl.signal });
+      const res = await this.fetchFn(url, { signal: ctrl.signal, ...(cache ? { cache } : {}) });
       const body: unknown = res.ok ? await res.json() : null;
       return { status: res.status, ok: res.ok, body };
     } finally {

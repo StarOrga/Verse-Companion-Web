@@ -12,11 +12,16 @@
 //   slice   SLICE_SHARDS shards of one kind: read their rows in batches of
 //           READ_BATCH names, build one shard, PUT it, drop it. Idempotent - a
 //           repeated slice writes the same keys again
-//   commit  every key the plan names must be in the bucket; one shard read back
-//           through the PUBLIC Worker; a newer generation in the bucket's index
-//           stops here (`superseded`); index.json LAST; the index read back from
-//           the bucket; then only generations OLDER than this one that the index
-//           does not name are deleted
+//   commit  every key the plan names must be in the bucket; the table must still
+//           hold exactly the planned class names (`changed` otherwise - a name
+//           missing from names.json would read as "no outline"); one shard read
+//           back through the PUBLIC Worker; a newer generation in the bucket's
+//           index stops here (`superseded`); index.json LAST; the index read back
+//           from the bucket; then only generations OLDER than this one that the
+//           index does not name are deleted. Two commits of one build can still
+//           interleave (no conditional put): when this generation's files are gone
+//           right after its index went in, a newer publish finished in between -
+//           its index is put back from its plan (`superseded`)
 //
 // Each answer carries `next` (a cursor, 'commit' or null). The caller drives:
 // scripts/codex-silhouettes-to-r2.mjs one call at a time, or - after finalize -
@@ -209,6 +214,8 @@ export interface CommitResult {
   /** Keys the plan names that the bucket lacks; the index is not written while there are any. */
   missing: number;
   first_missing?: string;
+  /** A kind whose class names in the table are no longer the planned ones; no index is written. */
+  changed?: SilhouetteKind;
   verified: boolean;
   index_put: boolean;
   removed_objects: number;
@@ -239,6 +246,19 @@ export async function commitSilhouettes(buildId: string, gen: string, deps: Silh
     return { ...base, missing: missing.length, first_missing: missing[0], verified: false, index_put: false, removed_objects: 0 };
   }
 
+  // The files must say what the table says NOW: a class that got its row after the plan is
+  // not in names.json, and the client would answer "no outline" for it.
+  for (const kind of SILHOUETTE_KINDS) {
+    const have = await allPages((from, limit) => deps.readSilhouetteNames(buildId, kind, from, limit));
+    const planned = plan.kinds[kind].shards === 0
+      ? []
+      : (parseNamesFile(await deps.readBucket(silhouetteNamesKey(buildId, gen, kind)), kind) ?? []).flat();
+    const want = new Set(planned);
+    if (have.length !== want.size || have.some((name) => !want.has(name))) {
+      return { ...base, missing: 0, changed: kind, verified: false, index_put: false, removed_objects: 0 };
+    }
+  }
+
   // The new generation must be readable through the public path BEFORE the index points at it.
   // A build without any outline has nothing to read back.
   let verified = true;
@@ -262,7 +282,24 @@ export async function commitSilhouettes(buildId: string, gen: string, deps: Silh
   const live = await deps.readBucket(idxKey);
   if (!isSilhouettesIndex(live, buildId)) return { ...base, missing: 0, verified, index_put: true, removed_objects: 0 };
   const mine = genOrder(gen);
-  const stale = (await deps.listKeys(dir)).filter((k) => {
+  const all = await deps.listKeys(dir);
+  if (sampleKey && !all.includes(sampleKey)) {
+    // This generation's files went while its index was being written: a newer publish
+    // committed in between and collected them. Its index is the right one - put it back.
+    const newer = all
+      .map((k) => k.slice(dir.length).split('/'))
+      .filter((p) => p.length === 2 && p[1] === 'plan.json' && GEN_RE.test(p[0]) && genOrder(p[0]) > mine)
+      .map((p) => p[0])
+      .sort((a, b) => genOrder(b) - genOrder(a));
+    for (const g of newer) {
+      const theirs = await deps.readBucket(silhouettesPlanKey(buildId, g));
+      if (!isPlan(theirs, buildId, g)) continue;
+      await deps.putJson(idxKey, silhouettesIndexJson(buildId, g, theirs.kinds));
+      break;
+    }
+    return { ...base, missing: 0, verified, index_put: false, removed_objects: 0, superseded: true };
+  }
+  const stale = all.filter((k) => {
     if (k === idxKey) return false;
     const g = k.slice(dir.length).split('/', 1)[0];
     return GEN_RE.test(g) && g !== live.gen && genOrder(g) < mine;

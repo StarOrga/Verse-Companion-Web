@@ -235,10 +235,15 @@ calls, each one request, with no state outside R2:
    and the catalog's list order (pages of 1 000, names only) → `names.json`; `plan.json` last.
 2. **slice** (`cursor: { kind, from }`): 16 shards (at most 256 rows, ~1.8 MB), rows read
    50 names at a time, one shard built, put and dropped. Repeatable.
-3. **commit** (`cursor: "commit"`): every key the plan names must be in the bucket, one
-   shard is read back through the public Worker, a newer generation in the bucket's index
-   stops it (`superseded`), then `index.json`, the index read back from the bucket, and
-   only generations **older** than this one that the index does not name are deleted.
+3. **commit** (`cursor: "commit"`): every key the plan names must be in the bucket, the
+   table must still hold exactly the planned class names (`changed: <kind>` otherwise: a
+   class missing from `names.json` would read as "no outline"), one shard is read back
+   through the public Worker, a newer generation in the bucket's index stops it
+   (`superseded`), then `index.json`, the index read back from the bucket, and only
+   generations **older** than this one that the index does not name are deleted. Two
+   commits of one build can still interleave (the put is not conditional): when this
+   generation's files are gone right after its index went in, the newer publish's index
+   is put back from its `plan.json`. `chain` is honoured for the service key only.
 
 Each answer carries `gen` and `next`. After `finalize` the function calls itself for the
 next step (`chain: true`, service key in both headers, one retry, at most 400 hops), started
@@ -260,7 +265,8 @@ not asked again for 60 s, a malformed file never) or `null` (no index, a kind th
 not name, `names.json` unreadable). `null` and `open` run the unchanged
 `codex_silhouettes` query, for the open names only. A shard the index names but the bucket
 lacks (published again, old generation collected) drops the index, so the next call reads
-the new one. Callers are unchanged: the browse tiles, `SilThumbsService`, the fusion search,
+the new one with `cache: 'no-cache'` (the browser may hold the old index for five more
+minutes). Callers are unchanged: the browse tiles, `SilThumbsService`, the fusion search,
 `getMissileCohort`, the holotable and the item stage all go through the two methods.
 
 **Measured 2026-11-20 on LIVE 4.10.3** (build `eaec8352`, 7 271 rows). Publish: 493 shards
