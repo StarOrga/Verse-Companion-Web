@@ -1,6 +1,18 @@
 {
   "version": 1,
   "aspects": {
+    ".claude/project-map.md›.claude/›count": [
+      {
+        "ship": "claude/friendly-mcclintock-50ea3e",
+        "by": "JerryT2T",
+        "value": "regenerated: 29 (matches git ls-tree of main)",
+        "decided": true,
+        "at": "2026-11-20T21:08:04.687Z",
+        "hunks": [
+          "2bf0f3f9ebed"
+        ]
+      }
+    ],
     ".claude/project-map.md›auth›file count": [
       {
         "ship": "claude/batch-b25f1b",
@@ -32,6 +44,16 @@
         "at": "2026-11-19T21:59:44.932Z",
         "hunks": [
           "209f12e61f6e"
+        ]
+      },
+      {
+        "ship": "claude/friendly-mcclintock-50ea3e",
+        "by": "JerryT2T",
+        "value": "regenerated: 427 (main + 2 new files)",
+        "decided": true,
+        "at": "2026-11-20T21:08:04.687Z",
+        "hunks": [
+          "42a89617387d"
         ]
       }
     ],
@@ -928,6 +950,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›src/ and app/›count": [
+      {
+        "ship": "claude/friendly-mcclintock-50ea3e",
+        "by": "JerryT2T",
+        "value": "regenerated: src 1471, app 1464 (main + 2 new files)",
+        "decided": true,
+        "at": "2026-11-20T21:08:04.687Z",
+        "hunks": [
+          "8023ca1c6dce"
+        ]
+      }
+    ],
     ".claude/project-map.md›src/ app/›count": [
       {
         "ship": "claude/batch-0c7514",
@@ -1325,6 +1359,16 @@
         "at": "2026-11-19T22:42:13.751Z",
         "hunks": [
           "25ef54c3aec2"
+        ]
+      },
+      {
+        "ship": "claude/friendly-mcclintock-50ea3e",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree: 3676 files (main really has 3670, its map line was stale)",
+        "decided": true,
+        "at": "2026-11-20T21:08:04.687Z",
+        "hunks": [
+          "174b1d502a7d"
         ]
       }
     ],
