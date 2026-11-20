@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { Injectable, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, inject, signal } from '@angular/core';
 
 /** The three viewport modes (spec §1.1). Written once; stylesheets use the `sc-compact` mixin (shell/_viewport.scss). */
 export const PHONE_QUERY = '(max-width: 720px)';
@@ -24,8 +24,15 @@ export class ViewportModeService {
    */
   readonly barOff = signal(false);
   private started = false;
+  /** Listener / observer teardown: a destroyed injector (tests, an app re-bootstrap) must not keep writing <html>. */
+  private readonly teardown: (() => void)[] = [];
 
   constructor() {
+    inject(DestroyRef).onDestroy(() => {
+      for (const off of this.teardown.splice(0)) off();
+      const root = this.doc.documentElement;
+      for (const attr of ['data-sc-phone', 'data-sc-compact', 'data-sc-tablet']) root.removeAttribute(attr);
+    });
     this.start();
   }
 
@@ -41,7 +48,9 @@ export class ViewportModeService {
     const readBarOff = () => this.barOff.set(root.hasAttribute('data-sc-bar-off') && this.phone() && !this.compact());
     readBarOff();
     if (typeof MutationObserver === 'function') {
-      new MutationObserver(readBarOff).observe(root, { attributes: true, attributeFilter: ['data-sc-bar-off', 'data-sc-phone', 'data-sc-compact'] });
+      const mo = new MutationObserver(readBarOff);
+      mo.observe(root, { attributes: true, attributeFilter: ['data-sc-bar-off', 'data-sc-phone', 'data-sc-compact'] });
+      this.teardown.push(() => mo.disconnect());
     }
   }
 
@@ -54,6 +63,8 @@ export class ViewportModeService {
       else root.removeAttribute(attr);
     };
     apply(mql.matches);
-    mql.addEventListener('change', (e) => apply(e.matches));
+    const onChange = (e: MediaQueryListEvent) => apply(e.matches);
+    mql.addEventListener('change', onChange);
+    this.teardown.push(() => mql.removeEventListener('change', onChange));
   }
 }

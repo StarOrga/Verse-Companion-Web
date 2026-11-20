@@ -8,6 +8,9 @@ describe('ShellChromeService.startChromeAutoHide', () => {
   let header: HTMLElement;
   let stop: () => void;
   const root = document.documentElement;
+  // window.scrollY is an own property of window in Chromium: restore the real one, never delete it
+  // (a deleted scrollY reads undefined and breaks every later spec that measures the page).
+  const realScrollY = Object.getOwnPropertyDescriptor(window, 'scrollY');
 
   const scrollTo = async (next: number): Promise<void> => {
     y = next;
@@ -33,7 +36,9 @@ describe('ShellChromeService.startChromeAutoHide', () => {
     document.body.style.minHeight = '';
     root.removeAttribute('data-sc-compact');
     root.classList.remove('sc-immersive');
-    delete (window as unknown as { scrollY?: number }).scrollY;
+    root.removeAttribute('data-sc-chrome');
+    if (realScrollY) Object.defineProperty(window, 'scrollY', realScrollY);
+    else delete (window as unknown as { scrollY?: number }).scrollY;
   });
 
   it('hides after travelling down past the header and reveals on a small scroll up', async () => {
