@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.286.0] - 2026-11-20
+
+### Added
+- Type to search: on a page whose only search is the bar's search (Verse, HQ, Codex, also scrolled down), typing a letter with nothing focused goes straight into that search. It stays off while a text field, a dialog or a menu has focus, after Tab moved focus to a control, on pages with a search or filter field of their own, and for shortcuts, digits, Space and `/`.
+
 ## [0.285.1] - 2026-11-20
 
 ### Fixed
