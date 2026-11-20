@@ -138,9 +138,12 @@ index as not published.
 rank cohort (`getRankCohort`) reads of the parts in the ships' stock loadouts. Measured 2026-11-20 on
 LIVE 4.10.3: a cold ship detail page read the FULL payload of 5 553 parts (and asked for 5 600
 ammunition names) in 116 requests, 26.5 MB, 20 MB of it `stats`; the cohort reads nine top-level
-keys and six `stats` structs. The file: 7.9 MB, about 0.1 MB over the wire (brotli).
-`{ v: 1, kind: "rank-parts", payloadKeys, ammoKeys, absent, rows: [[class_name, table,
-...payloadKeys]], ammo: [[class_name, ...ammoKeys]] }`. `rows` = every class name anywhere in a
+keys and six `stats` structs. The file: 8.1 MB, about 0.1 MB over the wire (brotli).
+`{ v: 1, kind: "rank-parts", payloadKeys, ammoKeys, absent, rows: [[class_name, table, slice]],
+ammo: [[class_name, slice]] }`. A `slice` is an object with exactly those of `payloadKeys`
+(`ammoKeys`) the payload HAS: an absent key is not in it, a JSON null is there as null (`subType`
+is null on 3 120 of the 5 553 parts; `in` and `=== null` tell the two apart, a `payload->key`
+select does not, which is why the publisher reads the whole payload). `rows` = every class name anywhere in a
 ship's `defaultLoadout` tree (collected while `ship-rank` is built, no second read of the ships),
 from the first of weapons / components / items that holds it (`table`, the lookup order of
 `getEntityPayloads`); `absent` = the names no table holds; `ammo` = ALL ammunition rows, so the
@@ -151,19 +154,25 @@ reads) / `RAW_KEEP` (`projectileparams`) is replaced in place by the string `"\u
 hold U+0000, so it is never data; key order stays, `findStat` scans in it). Scalars and arrays are
 never cut. **The file can only answer what the database would have answered:** the client turns
 every cut into an object that throws `SnapshotCut` on any read and wraps each payload so that a
-read of a top-level key outside `payloadKeys` (or an enumeration of the payload) throws too.
-`getRankCohort` then drops the file as a whole (logged once) and scores from the database as before.
+read of a top-level key outside `payloadKeys` (or an enumeration of the payload) throws too. Every
+such read is also counted (`RankParts.cutReads()`), so a `try/catch` somewhere on the scoring path
+that swallows the throw changes nothing: `getRankCohort` drops the file as a whole when scoring
+threw anything or the count moved (logged once) and scores from the database as before.
 So a change to the KPI code that reads something new costs speed until the keep lists follow, never
 correctness. A class name the client asks for and the file neither holds nor lists as absent is read
 from the database alone. The publisher reads the three tables in chunks of 200 names (each table only
-the names no earlier one held, 71 requests for LIVE) with `payload->key` slices, prunes `stats` in
-the function and keeps each row as JSON text, never as an object. Why not the finished cohort
+the names no earlier one held, 71 requests for LIVE), slices and cuts each payload in the function and
+keeps each row as JSON text, never as an object. It is by far the heaviest read of the publish (about
+26 MB through the function), so it runs LAST, after the index is live and the old generations are
+collected: the file is put, then the index is put once more with its entry (only while the bucket's
+index still names this generation). A failure, or a worker killed over it (CPU time, memory), costs
+this one file and never the publish. Why not the finished cohort
 instead: scoring the fleet takes 5.7 s of CPU on a desktop (the function has 2 s) and runs through
 `codex-loadout-stats`, `codex-power`, `codex-em-model` and more of the Angular source, which the
 function cannot import.
 
 Publish (`_list-publish.ts`; put order ship, ship-rank, the other kinds, facets, missile, weapon-rank,
-component-rank, names-de, rank-parts, index): one file at a time (pages of 1000, one file, then
+component-rank, names-de, index, then rank-parts and the index again): one file at a time (pages of 1000, one file, then
 dropped), facets, one file of the new generation read back through the public Worker, then the
 index (last), the index read back from the bucket, then only generations older than
 this publish and not named by that index are deleted (a failed read-back puts no

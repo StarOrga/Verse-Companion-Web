@@ -9,9 +9,11 @@ import type { CodexKind } from './codex.service';
  *
  * The file holds a slice of each payload, so every payload handed out here is
  * guarded: reading a top-level key the file does not carry, or anything inside
- * a `stats` / `raw` child the publisher cut, throws {@link SnapshotCut}. The
- * cohort then declines the file and reads the database — a file never answers
- * with a value the full payload would not have given.
+ * a `stats` / `raw` child the publisher cut, throws {@link SnapshotCut} AND is
+ * counted ({@link RankParts.cutReads}) — the count still tells when some
+ * `try/catch` on the way swallowed the throw. The cohort then declines the
+ * file and reads the database: a file never answers with a value the full
+ * payload would not have given.
  */
 
 /** A read reached something the file left out: decline, use the database. */
@@ -43,51 +45,15 @@ export interface RankParts {
   absent: ReadonlySet<string>;
   /** Every ammunition row of the build: class name → guarded payload slice. */
   ammo: ReadonlyMap<string, unknown>;
+  /**
+   * How many reads have reached something the file left out since it was
+   * parsed. An answer computed over these payloads is the database's only if
+   * this did not move while it was computed.
+   */
+  cutReads(): number;
 }
 
-const fail = (what: string): never => {
-  throw new SnapshotCut(what);
-};
-
-/** Stands in for a cut object: any look inside it declines the file. */
-const CUT_OBJECT: object = new Proxy(Object.freeze({}), {
-  get: (_t, k) => fail(`a cut object (.${String(k)})`),
-  has: (_t, k) => fail(`a cut object (${String(k)} in)`),
-  ownKeys: () => fail('a cut object (keys)'),
-  getOwnPropertyDescriptor: (_t, k) => fail(`a cut object (.${String(k)})`),
-});
-
-/** Puts {@link CUT_OBJECT} where the publisher cut; the keys keep their order. */
-function reviveCuts(parent: unknown): void {
-  if (!parent || typeof parent !== 'object' || Array.isArray(parent)) return;
-  const o = parent as Record<string, unknown>;
-  for (const k of Object.keys(o)) if (o[k] === CUT) o[k] = CUT_OBJECT;
-}
-
-/** A payload slice that declines every read outside the keys the file carries. */
-function guarded(slice: Record<string, unknown>, carried: ReadonlySet<string>): unknown {
-  // `then`: a promise resolving to a payload probes it; no payload has that key.
-  const known = (k: string | symbol): boolean =>
-    typeof k !== 'string' || carried.has(k) || k === 'then' || k in Object.prototype;
-  return new Proxy(slice, {
-    get: (t, k, r) => (known(k) ? Reflect.get(t, k, r) : fail(String(k))),
-    has: (t, k) => (known(k) ? Reflect.has(t, k) : fail(String(k))),
-    getOwnPropertyDescriptor: (t, k) => (known(k) ? Reflect.getOwnPropertyDescriptor(t, k) : fail(String(k))),
-    ownKeys: () => fail('the payload keys'),
-  });
-}
-
-function payloadOf(keys: readonly string[], carried: ReadonlySet<string>, row: readonly unknown[], offset: number): unknown {
-  const slice: Record<string, unknown> = {};
-  keys.forEach((k, i) => {
-    const v = row[offset + i];
-    // Like a `payload->key` read of the database: an absent key and JSON null are both "no value".
-    if (v != null) slice[k] = v;
-  });
-  for (const k of CUT_PARENTS) reviveCuts(slice[k]);
-  return guarded(slice, carried);
-}
-
+const isPlain = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 const isStrings = (v: unknown): v is string[] => Array.isArray(v) && v.every((s) => typeof s === 'string');
 
 /**
@@ -105,20 +71,54 @@ export function parseRankParts(body: unknown): RankParts | null {
   if (!RANK_PART_KEYS.every((k) => payloadKeys.includes(k)) || !RANK_AMMO_KEYS.every((k) => ammoKeys.includes(k))) return null;
   if (!Array.isArray(rows) || !Array.isArray(ammo)) return null;
 
+  let cuts = 0;
+  const fail = (what: string): never => {
+    cuts++;
+    throw new SnapshotCut(what);
+  };
+  /** Stands in for a cut object: any look inside it declines the file. */
+  const cutObject: object = new Proxy(Object.freeze({}), {
+    get: (_t, k) => fail(`a cut object (.${String(k)})`),
+    has: (_t, k) => fail(`a cut object (${String(k)} in)`),
+    ownKeys: () => fail('a cut object (keys)'),
+    getOwnPropertyDescriptor: (_t, k) => fail(`a cut object (.${String(k)})`),
+  });
+  /**
+   * The slice as the payload it stands for: the keys the file carries read as
+   * in the full payload (absent stays absent, null stays null), every other
+   * read declines.
+   */
+  const guarded = (slice: Record<string, unknown>, carried: ReadonlySet<string>): unknown => {
+    for (const parent of CUT_PARENTS) {
+      const o = slice[parent];
+      // The cut keys keep their place: a scan sees the same struct names in the same order.
+      if (isPlain(o)) for (const k of Object.keys(o)) if (o[k] === CUT) o[k] = cutObject;
+    }
+    // `then`: a promise resolving to a payload probes it; no payload has that key.
+    const known = (k: string | symbol): boolean =>
+      typeof k !== 'string' || carried.has(k) || k === 'then' || k in Object.prototype;
+    return new Proxy(slice, {
+      get: (t, k, r) => (known(k) ? Reflect.get(t, k, r) : fail(String(k))),
+      has: (t, k) => (known(k) ? Reflect.has(t, k) : fail(String(k))),
+      getOwnPropertyDescriptor: (t, k) => (known(k) ? Reflect.getOwnPropertyDescriptor(t, k) : fail(String(k))),
+      ownKeys: () => fail('the payload keys'),
+    });
+  };
+
   const partKeys = new Set(payloadKeys);
   const entities = new Map<string, { kind: CodexKind; payload: unknown }>();
   for (const r of rows as unknown[]) {
-    if (!Array.isArray(r) || r.length !== 2 + payloadKeys.length) return null;
-    const [className, table] = r as [unknown, unknown];
-    if (typeof className !== 'string' || typeof table !== 'string' || !PART_TABLES.has(table)) return null;
+    if (!Array.isArray(r) || r.length !== 3) return null;
+    const [className, table, slice] = r as [unknown, unknown, unknown];
+    if (typeof className !== 'string' || typeof table !== 'string' || !PART_TABLES.has(table) || !isPlain(slice)) return null;
     // The publisher writes each class name once, from the first table that holds it.
-    if (!entities.has(className)) entities.set(className, { kind: table as CodexKind, payload: payloadOf(payloadKeys, partKeys, r, 2) });
+    if (!entities.has(className)) entities.set(className, { kind: table as CodexKind, payload: guarded(slice, partKeys) });
   }
   const shotKeys = new Set(ammoKeys);
   const shots = new Map<string, unknown>();
   for (const r of ammo as unknown[]) {
-    if (!Array.isArray(r) || r.length !== 1 + ammoKeys.length || typeof r[0] !== 'string') return null;
-    shots.set(r[0], payloadOf(ammoKeys, shotKeys, r, 1));
+    if (!Array.isArray(r) || r.length !== 2 || typeof r[0] !== 'string' || !isPlain(r[1])) return null;
+    shots.set(r[0], guarded(r[1], shotKeys));
   }
-  return { entities, absent: new Set(absent), ammo: shots };
+  return { entities, absent: new Set(absent), ammo: shots, cutReads: () => cuts };
 }

@@ -111,7 +111,7 @@ import {
 import { ammoClassNameFor } from './codex-equipped-stats';
 import { classifyShipModule, ShipModuleSection } from './ship-module-sections';
 import { carriedByPort, stockLoadoutClassNames } from './stock-loadout';
-import { SnapshotCut } from './codex-rank-parts';
+import { RankParts, SnapshotCut } from './codex-rank-parts';
 import { computeKpiSheet, KpiShipInput } from './codex-loadout-stats';
 import { SummaryOccupant } from './ship-summary-panels';
 import { HoloSilhouette, parseHoloSilhouette, SilhouetteKind } from './holo-silhouette';
@@ -2656,15 +2656,20 @@ export class CodexService {
     // The parts from the build's rank-parts file when it is published: the
     // database path below reads the FULL payload of every part (116 requests,
     // 26.5 MB on a cold browser, LIVE 4.10.3). The file carries slices, and
-    // its payloads throw SnapshotCut on any read outside them — then the file
-    // is declined as a whole and the database answers, exactly as before.
+    // its payloads throw SnapshotCut on any read outside them and count it —
+    // then the file is declined as a whole and the database answers, exactly
+    // as before. The count covers a throw some try/catch on the way swallowed;
+    // any other error of the file path leaves the decision to the database
+    // path too, which reports its own.
     let ships: RankShipInput[] | null = null;
     const fromFile = await this.cohortPartsFromFile(build.id, names);
     if (fromFile) {
+      const cutsBefore = fromFile.cutReads();
       try {
-        ships = await this.scoreCohort(rows, fromFile, build.schemaVersion);
+        const scored = await this.scoreCohort(rows, fromFile, build.schemaVersion);
+        if (fromFile.cutReads() !== cutsBefore) throw new SnapshotCut('a read that was caught on the way');
+        ships = scored;
       } catch (err) {
-        if (!(err instanceof SnapshotCut)) throw err;
         if (!this.snapshotFailures.has('rank parts cut')) {
           this.snapshotFailures.add('rank parts cut');
           logWarn('codex', 'rank parts file does not cover a read, using the database', { err });
@@ -2684,7 +2689,7 @@ export class CodexService {
    * the stock loadouts held when it was published — is the one read the
    * database still answers.
    */
-  private cohortPartsFromFile(buildId: string, names: readonly string[]): Promise<CohortParts | null> {
+  private cohortPartsFromFile(buildId: string, names: readonly string[]): Promise<(CohortParts & Pick<RankParts, 'cutReads'>) | null> {
     return this.fromSnapshot('rank parts', async () => {
       const file = await this.listSnapshots.rankParts(buildId);
       if (!file) return null;
@@ -2709,7 +2714,7 @@ export class CodexService {
         const hit = shot ? file.ammo.get(shot) : undefined;
         if (shot && hit !== undefined) ammo.set(shot, hit);
       }
-      return { payloads, ammo };
+      return { payloads, ammo, cutReads: file.cutReads };
     });
   }
 

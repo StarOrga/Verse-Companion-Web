@@ -5,15 +5,20 @@
 // top-level payload keys and, of `stats` (20 of those 26.5 MB), six structs.
 //
 //   { v: 1, kind: 'rank-parts',
-//     payloadKeys: [...],   rows: [[class_name, table, ...payloadKeys]],
+//     payloadKeys: [...],   rows: [[class_name, table, slice]],
 //     absent: [class names of the loadouts that no table holds],
-//     ammoKeys: [...],      ammo: [[class_name, ...ammoKeys]] }
+//     ammoKeys: [...],      ammo: [[class_name, slice]] }
 //
 // `rows`: one row per class name found anywhere in a ship's stock loadout, from the
 // first of codex_weapons / codex_components / codex_items that holds it (the lookup
 // order of getEntityPayloads); `table` is 'weapon' | 'component' | 'item'.
 // `ammo`: ALL rows of codex_ammunition, so the publisher never has to derive which
-// ammunition a weapon names. A payload key that is absent or JSON null is null.
+// ammunition a weapon names.
+// `slice`: an object with exactly those of `payloadKeys` (`ammoKeys`) the payload
+// HAS, with their values. A key the payload lacks is not in the slice and a key that
+// is JSON null is there as null - the two read differently (`in`, `=== null`), which
+// is why the publisher reads the whole payload and slices here: a `payload->key`
+// select answers null for both.
 //
 // Cut values: inside `stats` and `raw` a child that is a plain object and whose
 // lower-cased key contains none of the keep hints is replaced IN PLACE (key order
@@ -59,12 +64,8 @@ export const PART_NAMES_PER_READ = 200;
 /** Ammunition rows per page (about 4 kB a row). */
 export const AMMO_PAGE = 200;
 
-const ALIAS = 'p_';
-
-/** PostgREST select: class_name plus one server-side slice per payload key. */
-export function partSelect(keys: readonly string[]): string {
-  return ['class_name', ...keys.map((k) => `${ALIAS}${k}:payload->${k}`)].join(', ');
-}
+/** PostgREST select of a part or ammunition read: the whole payload, sliced here (see `slice` above). */
+export const PART_SELECT = 'class_name, payload';
 
 /**
  * Adds every class name of a stock loadout tree (`payload.defaultLoadout`) to `into`:
@@ -99,21 +100,26 @@ export function cutChildren(obj: unknown, keep: readonly string[]): unknown {
 
 type Row = Record<string, unknown>;
 
-function sliced(row: Row, keys: readonly string[]): unknown[] {
-  return keys.map((k) => {
-    const v = row[`${ALIAS}${k}`] ?? null;
-    return k === 'stats' ? cutChildren(v, STAT_KEEP) : k === 'raw' ? cutChildren(v, RAW_KEEP) : v;
-  });
+/** The keys of `keys` the payload has, with their values (`stats` and `raw` cut). */
+export function payloadSlice(payload: unknown, keys: readonly string[]): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  if (!isPlainObject(payload)) return out;
+  for (const k of keys) {
+    if (!Object.hasOwn(payload, k)) continue;
+    const v = payload[k];
+    out[k] = k === 'stats' ? cutChildren(v, STAT_KEEP) : k === 'raw' ? cutChildren(v, RAW_KEEP) : v;
+  }
+  return out;
 }
 
-/** JSON text of one part row (partSelect(PART_PAYLOAD_KEYS) shape). Text, so no row object outlives its page. */
+/** JSON text of one part row (PART_SELECT shape). Text, so no payload outlives its page. */
 export function partRowJson(table: PartTable, row: Row): string {
-  return JSON.stringify([row['class_name'], table, ...sliced(row, PART_PAYLOAD_KEYS)]);
+  return JSON.stringify([row['class_name'], table, payloadSlice(row['payload'], PART_PAYLOAD_KEYS)]);
 }
 
-/** JSON text of one ammunition row (partSelect(AMMO_PAYLOAD_KEYS) shape). */
+/** JSON text of one ammunition row (PART_SELECT shape). */
 export function ammoRowJson(row: Row): string {
-  return JSON.stringify([row['class_name'], ...sliced(row, AMMO_PAYLOAD_KEYS)]);
+  return JSON.stringify([row['class_name'], payloadSlice(row['payload'], AMMO_PAYLOAD_KEYS)]);
 }
 
 /** The file body from row texts (partRowJson / ammoRowJson). */

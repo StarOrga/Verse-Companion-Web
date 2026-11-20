@@ -121,20 +121,21 @@ describe('CodexService.getRankCohort — parts from the build file', () => {
     const payloadKeys = [...RANK_PART_KEYS];
     const cut = (stats: Record<string, unknown>, keep: string[]) =>
       Object.fromEntries(Object.entries(stats).map(([k, v]) => [k, keep.some((h) => k.toLowerCase().includes(h)) ? v : CUT]));
+    // The slice of a payload: the carried keys it has, `stats` cut to the kept structs.
+    const slice = (payload: Record<string, unknown>) =>
+      Object.fromEntries(
+        payloadKeys
+          .filter((k) => k in payload)
+          .map((k) => [k, k === 'stats' ? cut(payload[k] as Record<string, unknown>, ['physics', 'shield']) : payload[k]]),
+      );
     const f = {
       v: 1,
       kind: 'rank-parts',
       payloadKeys,
       ammoKeys: [...RANK_AMMO_KEYS],
       absent: ['GHOST'],
-      rows: Object.entries(FULL).map(([cn, hit]) => [
-        cn,
-        hit.kind,
-        ...payloadKeys.map((k) =>
-          k === 'stats' ? cut(hit.payload['stats'] as Record<string, unknown>, ['physics', 'shield']) : (hit.payload[k] ?? null),
-        ),
-      ]),
-      ammo: [['GUN_AMMO', { physical: 10 }, null, { projectileParams: { damage: { DamagePhysical: 10 } }, lightPoolParams: CUT }]],
+      rows: Object.entries(FULL).map(([cn, hit]) => [cn, hit.kind, slice(hit.payload)]),
+      ammo: [['GUN_AMMO', { impactDamage: { physical: 10 }, raw: { projectileParams: { damage: { DamagePhysical: 10 } }, lightPoolParams: CUT } }]],
     };
     change(f);
     return f;
@@ -218,9 +219,8 @@ describe('CodexService.getRankCohort — parts from the build file', () => {
   it('reads the database for a file published before a key the cohort reads existed', async () => {
     const expected = await databaseCohort();
     const older = partsFile((f) => {
-      const at = f.payloadKeys.indexOf('stats');
-      f.payloadKeys.splice(at, 1);
-      for (const r of f.rows) r.splice(2 + at, 1);
+      f.payloadKeys.splice(f.payloadKeys.indexOf('stats'), 1);
+      for (const r of f.rows) delete (r[2] as Record<string, unknown>)['stats'];
     });
     const { svc, entityReads } = serviceWith({ 'rank-parts': older });
     expect(await svc.getRankCohort()).toEqual(expected);
@@ -231,7 +231,7 @@ describe('CodexService.getRankCohort — parts from the build file', () => {
     const expected = await databaseCohort();
     // As if a publisher had kept fewer structs: the shield generator's own struct is cut.
     const thin = partsFile((f) => {
-      const stats = f.rows[1][2 + f.payloadKeys.indexOf('stats')] as Record<string, unknown>;
+      const stats = (f.rows[1][2] as { stats: Record<string, unknown> }).stats;
       stats['SCItemShieldGeneratorParams'] = CUT;
     });
     const { svc, entityReads, ammoReads } = serviceWith({ 'rank-parts': thin });
@@ -240,6 +240,43 @@ describe('CodexService.getRankCohort — parts from the build file', () => {
     expect(cohort[0].sheet.shieldHp).toBe(4000);
     expect(entityReads).toHaveBeenCalledWith(['GUN', 'SHLD', 'GHOST'], expect.anything());
     expect(ammoReads).toHaveBeenCalledTimes(1);
+  });
+
+  it('declines the file when a read outside it was caught on the way and never reached the cohort', async () => {
+    const expected = await databaseCohort();
+    const { svc, entityReads, ammoReads } = serviceWith({ 'rank-parts': partsFile() });
+    // A helper on the scoring path that reads a key the file does not carry and swallows the
+    // failure: its default would be scored and cached as if the database had answered.
+    type Occupants = { payload: Record<string, unknown> }[];
+    const inner = svc as unknown as { cohortOccupantsFor: (...a: unknown[]) => Occupants };
+    const occupantsFor = inner.cohortOccupantsFor.bind(svc);
+    vi.spyOn(inner, 'cohortOccupantsFor').mockImplementation((...a: unknown[]) => {
+      const occupants = occupantsFor(...a);
+      try {
+        void occupants[0]?.payload['description'];
+      } catch {
+        /* swallowed, as a defensive helper would */
+      }
+      return occupants;
+    });
+    expect(await svc.getRankCohort()).toEqual(expected);
+    expect(entityReads).toHaveBeenCalledWith(['GUN', 'SHLD', 'GHOST'], expect.anything());
+    expect(ammoReads).toHaveBeenCalledTimes(1);
+  });
+
+  it('reads the database when scoring from the file fails for any other reason', async () => {
+    const expected = await databaseCohort();
+    const { svc, entityReads } = serviceWith({ 'rank-parts': partsFile() });
+    const inner = svc as unknown as { scoreCohort: (...a: unknown[]) => Promise<unknown> };
+    const score = inner.scoreCohort.bind(svc);
+    let call = 0;
+    vi.spyOn(inner, 'scoreCohort').mockImplementation((...a: unknown[]) =>
+      ++call === 1 ? Promise.reject(new TypeError('a proxy this code cannot handle')) : score(...a),
+    );
+    expect(await svc.getRankCohort()).toEqual(expected);
+    expect(call).toBe(2);
+    expect(entityReads).toHaveBeenCalledWith(['GUN', 'SHLD', 'GHOST'], expect.anything());
+    expect(readCohortCache(key)).toEqual(expected);
   });
 
   it('reads from the database only the class name the file does not know', async () => {
