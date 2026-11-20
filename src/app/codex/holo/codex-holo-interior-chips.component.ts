@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import type { ShipInteriorGroup } from '../codex.types';
 import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
 
@@ -12,7 +13,7 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
 @Component({
   selector: 'sc-codex-holo-interior-chips',
   standalone: true,
-  imports: [TranslatePipe, ScActionDirective],
+  imports: [TranslatePipe, ScActionDirective, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="ig" role="group" [attr.aria-label]="'codex.holo.interior.groupsAria' | translate">
@@ -25,7 +26,7 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
           </button>
         }
       </div>
-      <span class="ig-tag">{{ 'codex.holo.interior.presetTag' | translate }} <b>{{ presetLabel() }}</b></span>
+      <span class="ig-tag" [scTooltip]="('codex.holo.interior.presetTag' | translate) + ' ' + presetLabel()">{{ 'codex.holo.interior.presetTag' | translate }} <b>{{ presetLabel() }}</b></span>
       <button type="button" scAction tier="secondary" class="ig-reset" [attr.aria-disabled]="untouched() ? true : null"
               (click)="presetReset.emit()">{{ 'codex.holo.interior.presetReset' | translate }}</button>
     </div>
@@ -61,7 +62,12 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
   .ig-tag b { color: var(--sc-fg-0); font-weight: 600; }
   @media (pointer: coarse) { .ig-chip { height: var(--sc-tap-min, 44px); } }
   /* Narrow: the chips take their own line and scroll; the preset and its reset sit under them. */
-  @media (max-width: 1000px) { .ig { flex-wrap: wrap; } .ig-row { flex: 1 1 100%; } }
+  /* Narrow screens keep ONE line: the chips scroll sideways and the preset tag shortens with an ellipsis. A wrapped
+     second line changed the row height with every view/deck switch and moved the stage (v0.282.0 report). */
+  @media (max-width: 1000px) {
+    .ig-row { flex: 1 1 auto; }
+    .ig-tag { flex: 0 1 auto; min-width: 0; max-width: 34%; overflow: hidden; text-overflow: ellipsis; }
+  }
   `],
 })
 export class CodexHoloInteriorChipsComponent {
