@@ -117,33 +117,37 @@ describe('callOwnOp', () => {
 });
 
 // index.ts is the Deno entry and cannot be imported here; its wiring is read as text.
+// The Deno parity run has no read permission (_rebuild.test.mjs does the same); Node covers it.
+const noRead = typeof Deno !== 'undefined' && (await Deno.permissions.query({ name: 'read' })).state !== 'granted';
+const skip = noRead && 'Deno run without --allow-read';
+
 describe('finalize wiring (index.ts)', () => {
-  const src = readFileSync(new URL('./index.ts', import.meta.url), 'utf8');
+  const src = noRead ? '' : readFileSync(new URL('./index.ts', import.meta.url), 'utf8');
   const start = src.indexOf("if (op === 'finalize') {");
   const end = src.indexOf("if (op === 'locale_publish') {");
   const finalize = src.slice(start, end);
 
-  it('finds the finalize branch', () => {
+  it('finds the finalize branch', { skip }, () => {
     assert.ok(start > 0 && end > start);
   });
 
-  it('starts the lists publish as a call of its own, before the locale publish', () => {
+  it('starts the lists publish as a call of its own, before the locale publish', { skip }, () => {
     const lists = finalize.indexOf('callListsPublish(supabaseUrl, serviceKey, buildId)');
     const locale = finalize.indexOf('publishBuildLocales(');
     assert.ok(lists > 0, 'finalize calls callListsPublish');
     assert.ok(locale > lists, 'the lists call is started first');
   });
 
-  it('no longer publishes the lists on the finalize worker', () => {
+  it('no longer publishes the lists on the finalize worker', { skip }, () => {
     assert.ok(!finalize.includes('publishLists('), 'publishLists runs only in lists_publish');
   });
 
-  it('sends the lists call once, the silhouette step again after a lost answer', () => {
+  it('sends the lists call once, the silhouette step again after a lost answer', { skip }, () => {
     assert.ok(src.includes("{ op: 'lists_publish', build_id: buildId, detach: true }, { retryThrown: false })"));
     assert.ok(src.includes("op: 'silhouettes_publish', chain: true }, { retryThrown: true })"));
   });
 
-  it('lets only the service key detach a lists publish', () => {
+  it('lets only the service key detach a lists publish', { skip }, () => {
     const op = src.slice(src.indexOf("if (op === 'lists_publish') {"), src.indexOf("if (op === 'silhouettes_publish') {"));
     assert.match(op, /body\.detach === true && !!authHeader && safeEqual\(authHeader, `Bearer \$\{serviceKey\}`\)/);
     assert.match(op, /started: true \}, 202\)/);
