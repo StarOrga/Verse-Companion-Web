@@ -39,6 +39,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional
 
 from . import stage_timing
+from .p4k_index import P4KEntry, P4KNames
 
 LogFn = Callable[[str, str], None]
 
@@ -245,15 +246,10 @@ class Hull3DExporter:
         cfg.work_dir = cfg.work_dir.resolve()
         self.cfg = cfg
         self.log = cfg.on_log
-        self._byname = {i.filename.replace("\\", "/"): i for i in p4k.infolist()}
-        # Case-insensitive fallback as one dict, built on first miss — it used
-        # to be a linear scan of every archive entry per miss.
-        self._lower: Optional[Dict[str, object]] = None
-        self._ddsidx: Dict[str, object] = {}
-        for i in p4k.infolist():
-            fn = i.filename.lower().replace("\\", "/")
-            if ".dds" in fn:
-                self._ddsidx.setdefault(fn.split(".dds")[0] + ".dds", i)
+        # Exact / case-insensitive / mip-split lookups. Over a compact P4K index
+        # (p4k_index.open_p4k) they are answered from its packed arrays; building
+        # three 1.4 M-entry dicts per process was ~1 GB of the per-worker RAM.
+        self._names = P4KNames(p4k)
         cfg.out_dir.mkdir(parents=True, exist_ok=True)
         cfg.work_dir.mkdir(parents=True, exist_ok=True)
         # Called with (spec, raw_glb) once the raw hull is un-rigged and before
@@ -264,13 +260,9 @@ class Hull3DExporter:
     # ---- P4K helpers -------------------------------------------------------
     def _info(self, p4k_path: str):
         key = p4k_path.replace("\\", "/")
-        info = self._byname.get(key)
+        info = self._names.exact(key)
         if info is None:
-            if self._lower is None:
-                self._lower = {}
-                for fn, i in self._byname.items():
-                    self._lower.setdefault(fn.lower(), i)
-            info = self._lower.get(key.lower())
+            info = self._names.lower_first(key)
         return info
 
     def _exists(self, p4k_path: str) -> bool:
@@ -738,7 +730,7 @@ class Hull3DExporter:
         # extracted: the output is geometry only.
         cga_disk = self._mirror_save(spec.hull_cga, mirror)
         cgam = spec.hull_cga[:-4] + ".cgam"
-        if (self._byname.get(cgam) or self._ddsidx.get(cgam.lower())):
+        if (self._names.exact(cgam) or self._names.dds(cgam.lower())):
             try:
                 self._mirror_save(cgam, mirror)
             except FileNotFoundError:
@@ -843,11 +835,15 @@ class Hull3DExporter:
     def _export_icon(self, paint: Paint, ship_out: Path) -> Optional[str]:
         from scdatatools.engine.textures import dds as ddsmod
         from PIL import Image
-        info = self._ddsidx.get(paint.icon_dds.lower().split(".dds")[0] + ".dds")
+        info = self._names.dds(paint.icon_dds.lower().split(".dds")[0] + ".dds")
         if not info:
             return None
         try:
-            raw = ddsmod.collect_and_unsplit(info)
+            if isinstance(info, P4KEntry):
+                parts = self.p4k.dds_parts(info)
+                raw = ddsmod.unsplit_dds({n: self.p4k.open(e).read() for n, e in parts.items()})
+            else:
+                raw = ddsmod.collect_and_unsplit(info)
             img = Image.open(io.BytesIO(raw)).convert("RGBA")
             bg = Image.new("RGBA", img.size, (16, 17, 20, 255))
             bg.alpha_composite(img)
