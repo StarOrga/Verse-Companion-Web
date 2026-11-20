@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.283.3",
+  "current": "0.283.4",
   "releases": [
+    {
+      "version": "0.283.4",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Ship detail pages now use the same page template slots as item pages (head, stage, panel, strip); the layout looks the same."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.283.3",
       "date": "2026-11-20",
