@@ -255,6 +255,25 @@ describe('CodexHoloStripComponent as a phone sheet', () => {
     expect(document.documentElement.hasAttribute('data-sc-sheet')).toBe(false);
   });
 
+  it('claims html[data-sc-bar-off] on a phone (the shell drops its bottom search bar) and releases it on destroy', async () => {
+    document.documentElement.setAttribute('data-sc-phone', '');
+    try {
+      const f = await setup();
+      expect(document.documentElement.hasAttribute('data-sc-bar-off')).toBe(true);
+      f.destroy();
+      expect(document.documentElement.hasAttribute('data-sc-bar-off')).toBe(false);
+    } finally {
+      document.documentElement.removeAttribute('data-sc-phone');
+      document.documentElement.removeAttribute('data-sc-bar-off');
+    }
+  });
+
+  it('does not claim the bottom without html[data-sc-phone]', async () => {
+    document.documentElement.removeAttribute('data-sc-phone');
+    await setup();
+    expect(document.documentElement.hasAttribute('data-sc-bar-off')).toBe(false);
+  });
+
   it('Escape folds an open sheet back to peek', async () => {
     const f = await setup();
     handle(f).click();

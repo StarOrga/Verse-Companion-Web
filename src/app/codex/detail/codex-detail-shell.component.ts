@@ -78,6 +78,14 @@ export interface DetailTabItem<T extends string = string> {
       @container dt-tabs (max-width: 340px) {
         .dt-tab { letter-spacing: 0.02em; font-size: 0.68rem; }
       }
+      /* Under 300 px (a phone on its side, the panel is ~250 px) the three labels cannot share equal columns without ellipsis:
+         the tabs become a snap row at their own width, 12 px floor, the active one filled (the same as on a phone). */
+      @container dt-tabs (max-width: 299px) {
+        .dt-tabs { grid-auto-columns: max-content; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+        .dt-pill { display: none; }
+        .dt-tab { letter-spacing: 0.04em; font-size: max(12px, var(--sc-fs-floor, 12px)); padding: 0 12px; scroll-snap-align: center; min-height: max(36px, var(--sc-tap-min, 0px)); }
+        .dt-tab.on { background: color-mix(in srgb, var(--sc-accent) 22%, transparent); }
+      }
       /* Narrow: the tabs scroll at their own width, so the pill gives way to a fill on the active tab. */
       @media (max-width: 640px) {
         .dt-tabs { grid-auto-columns: max-content; overflow-x: auto; scrollbar-width: none; }

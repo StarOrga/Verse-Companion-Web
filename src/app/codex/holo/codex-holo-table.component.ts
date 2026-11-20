@@ -816,16 +816,24 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
       border-radius: 24px; cursor: pointer; color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-bg-0) 72%, transparent);
       border: 1px solid color-mix(in srgb, var(--sc-accent) 40%, transparent); font-family: var(--sc-font-display); font-size: max(12px, var(--sc-fs-floor, 12px)); letter-spacing: 0.1em; text-transform: uppercase; }
     .imm-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    /* Portrait phone: the shell's Tools dial and launcher own the bottom-end lane - the button moves to the start corner. */
+    @media (max-width: 720px) { .imm-btn { inset-inline-end: auto; inset-inline-start: 8px; } .imm-hint { inset-inline-end: auto; inset-inline-start: 8px; } }
     .imm-hint { position: absolute; z-index: 5; inset-inline-end: 8px; inset-block-end: 64px; margin: 0; max-inline-size: min(280px, 70%); padding: 10px 14px; border-radius: 14px; font-size: 13px; color: var(--sc-fg-0);
       background: color-mix(in srgb, var(--sc-bg-0) 85%, transparent); border: 1px solid var(--sc-accent); pointer-events: none; animation: imm-hint 6s var(--sc-e-out, var(--holo-e-out)) forwards; }
     @keyframes imm-hint { 0% { opacity: 0; } 8%, 88% { opacity: 1; } 100% { opacity: 0; } }
     /* Immersive: a fixed overlay (iPhone Safari has no Fullscreen API for this). Above the feedback launcher (1400), below dialogs (1500). */
     .silhouette-frame.phone-full { position: fixed; inset: 0; z-index: 1450; min-height: 0; width: auto; height: 100vh; height: 100dvh; box-sizing: border-box; background: var(--sc-bg-0);
       touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; overscroll-behavior: none;
-      padding-inline-start: calc(64px + env(safe-area-inset-left, 0px)); padding-inline-end: env(safe-area-inset-right, 0px);
-      padding-block: calc(56px + env(safe-area-inset-top, 0px)) env(safe-area-inset-bottom, 0px); }
+      /* clip, not hidden: a hidden box still scrolls programmatically (focus / scrollIntoView on the Immersive tap), which slid hull and HUD off screen in portrait. */
+      overflow: clip;
+      --imm-pt: calc(56px + env(safe-area-inset-top, 0px)); --imm-pb: env(safe-area-inset-bottom, 0px);
+      --imm-pl: calc(64px + env(safe-area-inset-left, 0px)); --imm-pr: env(safe-area-inset-right, 0px);
+      padding: var(--imm-pt) var(--imm-pr) var(--imm-pb) var(--imm-pl); }
+    /* The stage area = the frame minus the HUD bands: surfaces fill it, the hull is centred in it (it contains inside it: cq units follow the content box). */
+    .silhouette-frame.phone-full > :is(.mode-viewer, sc-ship-hardpoint-map, sc-ship-interior-3d) { inset: var(--imm-pt) var(--imm-pr) var(--imm-pb) var(--imm-pl); min-height: 0; }
+    .silhouette-frame.phone-full .shipwrap { left: calc(50% + (var(--imm-pl) - var(--imm-pr)) / 2); top: calc(50% + (var(--imm-pt) - var(--imm-pb)) / 2); }
     @media (orientation: portrait) {
-      .silhouette-frame.phone-full { padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px); padding-block-end: calc(64px + env(safe-area-inset-bottom, 0px)); }
+      .silhouette-frame.phone-full { --imm-pl: env(safe-area-inset-left, 0px); --imm-pb: calc(64px + env(safe-area-inset-bottom, 0px)); }
     }
     @media (max-width: 640px) {
       /* The model takes what the screen leaves under the header and above the sheet (clamped); never the old 320 px slab. */

@@ -182,6 +182,10 @@ export function naturalTop(host: HTMLElement): number | null {
         :host(:not(.slim)) .ht-kicker { display: none; }
         :host(:not(.slim)) .ht-name { font-size: max(16px, var(--sc-fs-floor)); letter-spacing: 0.14em; }
         :host(:not(.slim)) .ht-extra { display: none; }
+        /* The name keeps its full width, the mission pill takes what is left and shrinks first, the hangar pill keeps its own. */
+        :host(:not(.slim)) { grid-template-columns: minmax(0, max-content) minmax(0, 1fr) minmax(0, max-content); gap: 6px 12px; }
+        :host(:not(.slim)) .ht-centre { justify-self: stretch; }
+        :host(:not(.slim)) .ht-centre > * { max-inline-size: 100%; min-inline-size: 0; }
       }
       @media (max-width: 640px) {
         :host { grid-template-columns: minmax(0, 1fr) auto; margin-inline: 0; padding: 10px 12px; }

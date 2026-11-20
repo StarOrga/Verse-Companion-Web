@@ -176,6 +176,33 @@ describe('CodexHoloTableComponent', () => {
       f.detectChanges();
       expect(getComputedStyle(frame(f)).touchAction).toBe('none');
     });
+
+    it('portrait: the overlay clips (never scrolls) and its stage area leaves the bottom rail band', () => {
+      withTouch(true);
+      const f = setup({ viewMode: 'holo' });
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
+      const el = frame(f) as HTMLElement;
+      // overflow: hidden still scrolls programmatically; the tap's focus / scrollIntoView slid hull and HUD off screen (QA iphone14 portrait).
+      expect(getComputedStyle(el).overflow).toBe('clip');
+      el.scrollTop = 120; el.scrollLeft = 80;
+      expect([el.scrollTop, el.scrollLeft]).toEqual([0, 0]);
+      const portrait = window.matchMedia('(orientation: portrait)').matches;
+      const pb = parseFloat(getComputedStyle(el).paddingBottom);
+      if (portrait) expect(pb).toBeGreaterThanOrEqual(64);
+      expect(parseFloat(getComputedStyle(el).paddingTop)).toBeGreaterThanOrEqual(56);
+    });
+
+    it('the stats rail chips carry a visible short label and the full name as aria-label', () => {
+      withTouch(true);
+      const f = setup({ viewMode: 'holo' });
+      f.componentRef.setInput('hudStats', [{ id: 'offensive', titleKey: 'codex.holo.strip.offensive', leadText: '228', leadShortKey: 'codex.kpi.short.alpha', leadLabelKey: null, pct: null, deltaText: null, deltaTone: null, ghost: null, say: '', subs: [] }]);
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
+      const btn = q<HTMLButtonElement>(f, 'sc-holo-immersive-hud .rail-btn')!;
+      expect(btn.querySelector('.rl')?.textContent?.trim()).toBeTruthy();
+      expect(btn.getAttribute('aria-label')).toContain('228');
+    });
   });
 
   describe('tags and callout (C9/C10/C19)', () => {

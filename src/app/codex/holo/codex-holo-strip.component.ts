@@ -77,6 +77,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { AreaSymbolComponent } from '../../shared/area-symbol/area-symbol.component';
 import { CountUp } from './count-up';
 import { AnalyticsService } from '../../core/analytics.service';
+import { claimRootAttr } from '../../core/root-var';
 import { SheetSnap, SnapHeights, cycleSnap, dragVisible, releaseVelocity, settleSnap } from './holo-sheet-snap';
 
 const GROUP_ICON: Readonly<Record<PowerGroup, string>> = {
@@ -755,10 +756,17 @@ export class CodexHoloStripComponent {
     afterNextRender(() => {
       if (!this.phone) return;
       this.paint(0);
+      this.claimBottom();
       this.publishSheet();
-      const onRot = () => { this.paint(this.snapHeights()[this.snap()]); this.publishSheet(); };
+      const onRot = () => { this.claimBottom(); this.paint(this.snapHeights()[this.snap()]); this.publishSheet(); };
       window.addEventListener('resize', onRot, { passive: true });
+      // The peek's own height settles after fonts and the roll-up: republish so the page's bottom padding follows.
+      const bar = this.handleRef()?.nativeElement.parentElement;
+      const peekRo = bar && typeof ResizeObserver === 'function' ? new ResizeObserver(() => this.publishSheet()) : null;
+      if (bar) peekRo?.observe(bar);
       this.destroyRef.onDestroy(() => {
+        peekRo?.disconnect();
+        claimRootAttr('data-sc-bar-off', this, null);
         window.removeEventListener('resize', onRot);
         document.documentElement.removeAttribute('data-sc-sheet');
         document.documentElement.style.removeProperty('--sc-sheet-peek-h');
@@ -1013,6 +1021,11 @@ export class CodexHoloStripComponent {
     this.publishSheet();
     if (prev !== next) this.analytics.track('codex:stats_sheet_change', { snap: next });
     if (focusHandle) this.handleRef()?.nativeElement.focus({ preventScroll: true });
+  }
+
+  /** On a phone the sheet owns the bottom edge: the shell drops its bottom search bar (header magnifier instead) while this page shows. */
+  private claimBottom(): void {
+    claimRootAttr('data-sc-bar-off', this, document.documentElement.hasAttribute('data-sc-phone') ? '' : null);
   }
 
   /** `html[data-sc-sheet]` + `--sc-sheet-peek-h` are what the shell reads (dial hide, lane height). */

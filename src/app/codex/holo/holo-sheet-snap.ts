@@ -11,6 +11,10 @@ const ORDER: readonly SheetSnap[] = ['peek', 'half', 'full'];
 
 /** px/ms over the last 80 ms above which a release flings to the next snap. */
 export const FLING_VELOCITY = 0.5;
+/** A flick this fast skips the middle snap: straight to full / peek. */
+export const HARD_FLING_VELOCITY = 1.6;
+/** How long a released fling is assumed to keep coasting (ms): the projected landing is visible + velocity * this. */
+export const COAST_MS = 220;
 /** Past `full` the sheet gives 30 % of the finger's travel (rubber band). */
 export const RUBBER_DAMPING = 0.3;
 
@@ -29,11 +33,17 @@ export function dragVisible(startVisible: number, deltaUp: number, h: SnapHeight
 /** Where a release settles. `velocityUp` is px/ms, positive = the finger moved up. */
 export function settleSnap(visible: number, velocityUp: number, h: SnapHeights): SheetSnap {
   const v = Math.min(visible, h.full);
+  const nearest = (at: number) => ORDER.reduce((best, s) => (Math.abs(h[s] - at) < Math.abs(h[best] - at) ? s : best), 'peek' as SheetSnap);
   if (Math.abs(velocityUp) > FLING_VELOCITY) {
-    if (velocityUp > 0) return ORDER.find((s) => h[s] > v + 1) ?? 'full';
-    return [...ORDER].reverse().find((s) => h[s] < v - 1) ?? 'peek';
+    if (Math.abs(velocityUp) > HARD_FLING_VELOCITY) return velocityUp > 0 ? 'full' : 'peek';
+    // A fling goes at least one snap on, and as far as its momentum would carry the sheet (a hard pull down from full ends at peek).
+    const step = velocityUp > 0
+      ? (ORDER.find((s) => h[s] > v + 1) ?? 'full')
+      : ([...ORDER].reverse().find((s) => h[s] < v - 1) ?? 'peek');
+    const carried = nearest(v + velocityUp * COAST_MS);
+    return Math.abs(h[carried] - v) > Math.abs(h[step] - v) && Math.sign(h[carried] - v) === Math.sign(velocityUp) ? carried : step;
   }
-  return ORDER.reduce((best, s) => (Math.abs(h[s] - v) < Math.abs(h[best] - v) ? s : best), 'peek' as SheetSnap);
+  return nearest(v);
 }
 
 /** px/ms from the last pointer samples (only those within 80 ms of the newest). */

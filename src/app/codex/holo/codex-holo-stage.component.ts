@@ -1087,6 +1087,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .holo-stage { padding-bottom: calc(var(--sc-sheet-peek-h, 96px) + var(--holo-strip-lift, 0px) + 16px); }
   /* Beta shell: the search capsule floats at the bottom edge, the strip rides above it. */
   :host-context([data-layout]) .holo-stage { --holo-strip-lift: calc(var(--sc-float-bottom) + var(--sc-bar-h)); }
+  /* The sheet claimed the bottom (html[data-sc-bar-off]): no search bar below it, the peek sits on the safe area. */
+  :host-context(html[data-sc-bar-off][data-sc-phone]) .holo-stage { --holo-strip-lift: var(--sc-safe-bottom, env(safe-area-inset-bottom, 0px)); }
   .mobile-tabs { display: flex; }
   /* The floating button column (β, view switch, share, feedback) stands at the inline end:
      the hull and its pins keep that lane free instead of lying under it (QA Q4). */
@@ -1120,19 +1122,31 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .holo-topbar { top: max(var(--sc-header-h, 0px), calc(48px + env(safe-area-inset-top, 0px))); }
   :host-context(html[data-sc-chrome='hidden']) .holo-topbar { top: 0; }
   .holo-body { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); grid-template-rows: minmax(0, 1fr) auto; column-gap: 12px; row-gap: 6px;
-    height: 100vh; height: calc(100dvh - 56px); min-height: 0; align-items: stretch; }
+    height: 100vh; height: calc(100dvh - 56px); height: calc(100dvh - var(--holo-top, 113px) + var(--holo-views-h, 58px) + 6px); min-height: 0; align-items: stretch; }
   .holo-table { grid-column: 1; grid-row: 1; min-height: 0; padding-inline-end: 0; }
   .holo-table sc-codex-holo-table { flex: 1; display: flex; flex-direction: column; min-height: 0; }
   .holo-table ::ng-deep .silhouette-frame { min-height: 0; flex: 1; }
   .holo-views { grid-column: 1; grid-row: 2; flex-wrap: nowrap; overflow-x: auto; gap: 8px; scrollbar-width: none; padding-block: 2px; }
   .vw { overflow-x: visible; }
-  .vw-thumb { width: 48px; min-block-size: 44px; }
+  .vw-thumb { width: 48px; min-block-size: 44px; block-size: 44px; }
   .vw-ic { height: 30px; }
   .vw-l { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
   .vw-gl { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .vf { flex-basis: auto; }
   .holo-panel { grid-column: 2; grid-row: 1 / span 2; height: 100%; max-height: 100%; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; align-self: stretch; }
   .holo-below { display: none; }
+  /* The hull gets the height: the chips row shrinks to the tap size, the deck plan's "Nose · deck" caption stays for assistive tech only. */
+  .table-head { min-height: 44px; padding-block: 0; }
+  .holo-table ::ng-deep .bare-nose { position: absolute; inline-size: 1px; block-size: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  /* The mission pill gives way first (the head band lets the name keep its width). */
+  .holo-topbar:not(.slim) ::ng-deep :is(.ht-centre, .ht-right) > * { max-inline-size: 100%; min-inline-size: 0; }
+  }
+  /* A tablet on its side: the hull gets the height the first screen leaves above the strip (the views row sits under the fold, one scroll away),
+     the panel stays beside it as its own sticky scroller. */
+  @media (min-width: 1001px) and (pointer: coarse) and (orientation: landscape) {
+  .holo-body { grid-template-rows: calc(100dvh - var(--holo-top, 170px) - var(--holo-strip-h, 82px) + 12px) auto; height: auto; min-height: 0; }
+  .holo-panel { grid-column: 2; grid-row: 1 / span 2; position: sticky; top: calc(var(--sc-header-h, 56px) + 8px); align-self: start; height: auto;
+    max-height: calc(100dvh - var(--sc-header-h, 56px) - var(--holo-strip-h, 82px) - 16px); overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
   }
   .reduced-motion *, .reduced-motion *::before, .reduced-motion *::after { animation: none !important; transition: none !important; }
   @media (prefers-reduced-motion: reduce) {

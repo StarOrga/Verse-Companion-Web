@@ -51,6 +51,7 @@ const SURFACES: readonly { id: ImmersiveSurface; mode: HudMode; labelKey: string
                 [attr.aria-label]="(t.titleKey | translate) + ': ' + (t.leadText ?? '–')" (click)="toggleTile(t.id)">
           <i class="dot" aria-hidden="true"></i>
           <span class="rv">{{ t.leadText ?? '–' }}</span>
+          @if (t.leadShortKey) { <span class="rl" aria-hidden="true">{{ t.leadShortKey | translate }}</span> }
         </button>
       }
     </div>
@@ -99,11 +100,12 @@ const SURFACES: readonly { id: ImmersiveSurface; mode: HudMode; labelKey: string
     .rail { position: absolute; display: flex; flex-direction: column; gap: 8px; pointer-events: none; opacity: 1; transition: opacity var(--t) var(--e);
       inset-inline-start: calc(8px + env(safe-area-inset-left, 0px)); inset-block-start: 50%; translate: 0 -50%; }
     :host(.hud-off) .rail { opacity: 0.6; }
-    .rail-btn { pointer-events: auto; inline-size: 56px; min-block-size: var(--tap); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    .rail-btn { pointer-events: auto; inline-size: 72px; min-block-size: var(--tap); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
       padding: 4px 2px; border-radius: 12px; color: var(--sc-fg-0); cursor: pointer; font-variant-numeric: tabular-nums; }
     .rail-btn .dot { inline-size: 8px; block-size: 8px; border-radius: 50%; background: var(--pc, var(--sc-accent)); }
     .rail-btn[data-p='offensive'] { --pc: var(--p-offensive); } .rail-btn[data-p='defensive'] { --pc: var(--p-defensive); }
     .rail-btn[data-p='movement'] { --pc: var(--p-movement); } .rail-btn[data-p='signature'] { --pc: var(--p-signature); }
+    .rail-btn .rl { max-inline-size: 100%; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; text-align: center; overflow-wrap: anywhere; color: var(--sc-fg-1); font-size: max(12px, var(--sc-fs-floor, 12px)); line-height: 1.1; }
     .rail-btn .rv { font-family: var(--font-monospace, 'Share Tech Mono', monospace); font-size: max(12px, var(--sc-fs-floor, 12px)); }
     .rail-btn.on { border-color: var(--pc); background: color-mix(in srgb, var(--pc) 16%, var(--sc-bg-0)); }
     .panel { position: absolute; pointer-events: auto; box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; border-radius: 14px;

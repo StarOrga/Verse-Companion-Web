@@ -72,6 +72,8 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
   .ig-tag { font-size: max(11px, var(--f)); color: var(--sc-fg-2); white-space: nowrap; }
   .ig-tag b { color: var(--sc-fg-0); font-weight: 600; }
   @media (pointer: coarse) { .ig-chip { height: var(--sc-tap-min, 44px); } }
+  /* A phone on its side: the chips row is exactly one tap high (44 px) with 3 px above and below, the hull gets the rest. */
+  @media (orientation: landscape) and (max-height: 500px) { .ig-chip { height: 44px; min-height: 44px; } .ig-row { padding-block: 3px; } }
   /* Narrow: the chips take their own line and scroll; the preset and its reset sit under them. */
   /* Narrow screens keep ONE line: the chips scroll sideways and the preset tag shortens with an ellipsis. A wrapped
      second line changed the row height with every view/deck switch and moved the stage (v0.282.0 report). */

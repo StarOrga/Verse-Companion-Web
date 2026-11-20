@@ -27,6 +27,10 @@ describe('holo sheet snap', () => {
     expect(settleSnap(420, 0.9, H)).toBe('full');
     expect(settleSnap(650, -0.9, H)).toBe('half');
     expect(settleSnap(390, -0.9, H)).toBe('peek');
+    // One hard pull down from full reaches peek (QA: it used to need two drags), a hard flick up from peek reaches full.
+    expect(settleSnap(H.full, -1.8, H)).toBe('peek');
+    expect(settleSnap(H.full - 60, -1.0, H)).not.toBe('full');
+    expect(settleSnap(0, 1.8, H)).toBe('full');
   });
 
   it('measures the release velocity over the last 80 ms only', () => {
