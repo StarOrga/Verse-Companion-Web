@@ -21,10 +21,40 @@ import {
   selectFor,
 } from './_list-snapshots.ts';
 import { LIST_PAGE, publishLists } from './_list-publish.ts';
+import {
+  AMMO_PAGE,
+  AMMO_PAYLOAD_KEYS,
+  CUT,
+  PART_NAMES_PER_READ,
+  PART_PAYLOAD_KEYS,
+  STAT_KEEP,
+  ammoRowJson,
+  cutChildren,
+  loadoutClassNames,
+  PART_SELECT,
+  partRowJson,
+  payloadSlice,
+  rankPartsFileJson,
+} from './_rank-parts.ts';
 import { gcLocalePrefixes } from './_locale-gc.ts';
 
 const BUILD = 'a3fb1249-9115-4035-9039-2ffc6043d832';
 const OTHER = '11111111-2222-4333-8444-555555555555';
+
+const LOADOUT = [
+  { itemPortName: 'hardpoint_gun', entityClassName: 'MOUNT', entries: [{ itemPortName: 'gun', entityClassName: ' GUN ' }] },
+  { itemPortName: 'hardpoint_shield', entityClassName: 'SHIELD' },
+  { itemPortName: 'hardpoint_seat', entityClassName: 'GHOST' },
+];
+/** Rows of the part tables (PART_SELECT shape). GUN sits in two tables: the weapon one wins. */
+const PARTS = {
+  weapon: [{ class_name: 'GUN', payload: { entityKind: 'weapon', subType: null, description: 'never published', weaponParams: { fireRate: 600 }, stats: { SEntityPhysicsControllerParams: { 'PhysType.Mass': 50 }, SHealthComponentParams: { Health: 9 } } } }],
+  component: [
+    { class_name: 'GUN', payload: { kind: 'never read' } },
+    { class_name: 'SHIELD', payload: { kind: 'Shield', stats: { SCItemShieldGeneratorParams: { MaxShieldHealth: 4000 }, SDistortionParams: { Maximum: 1 }, flag: 1 } } },
+  ],
+  item: [{ class_name: 'MOUNT', payload: { attachType: 'Turret', guid: 'x' } }],
+};
 
 describe('list snapshot builders', () => {
   it('keeps the key shapes of the contract', () => {
@@ -96,7 +126,21 @@ function fixture({ failReadOn, failOn, usageBlocked, existing = [], hideFiles = 
       if (failReadOn === kind) throw new Error('read failed');
       const total = kind === 'item' ? LIST_PAGE + 5 : kind === 'ship-rank' ? RANK_PAGE + 1 : kind === 'weapon' ? 0 : 2;
       const n = Math.max(0, Math.min(limit, total - from));
-      return Array.from({ length: n }, (_, i) => ({ class_name: `${kind}_${from + i}`, name_localized: `N${from + i}` }));
+      return Array.from({ length: n }, (_, i) => ({
+        class_name: `${kind}_${from + i}`,
+        name_localized: `N${from + i}`,
+        // The first ship's stock loadout: a mount with a gun in it, a shield, and a class no table holds.
+        ...(kind === 'ship-rank' && from + i === 0 ? { p_defaultLoadout: LOADOUT } : {}),
+      }));
+    },
+    async readParts(build, table, names) {
+      reads.push(['parts:' + table, names]);
+      if (failReadOn === 'rank-parts') throw new Error('parts read failed');
+      return (PARTS[table] ?? []).filter((r) => names.includes(r.class_name));
+    },
+    async readAmmoParts(build, from, limit) {
+      reads.push(['parts:ammunition', from, limit]);
+      return [{ class_name: 'GUN_AMMO', payload: { speed: 700, impactDamage: { physical: 5 }, raw: { size: 1, projectileParams: { damage: {} }, lightPoolParams: { a: 1 } } } }].slice(from, from + limit);
     },
     async readNames(build, kind, from, limit) {
       reads.push(['names:' + kind, from, limit]);
@@ -139,9 +183,12 @@ describe('publishLists', () => {
       ...LIST_FILES.map((k) => listsFileKey(BUILD, gen, k)),
       ...['facets', 'missile', 'weapon-rank', 'component-rank', 'names-de'].map((k) => listsFileKey(BUILD, gen, k)),
       listsIndexKey(BUILD),
+      // rank-parts comes after the publish is live, then the index once more with its entry.
+      listsFileKey(BUILD, gen, 'rank-parts'),
+      listsIndexKey(BUILD),
     ]);
     assert.deepEqual(res.failed, []);
-    assert.deepEqual(Object.keys(res.files).slice(-5), ['facets', 'missile', 'weapon-rank', 'component-rank', 'names-de']);
+    assert.deepEqual(Object.keys(res.files).slice(-6), ['facets', 'missile', 'weapon-rank', 'component-rank', 'names-de', 'rank-parts']);
     assert.equal(res.files['names-de'].rows, 2);
     // missile and component-rank page by RANK_PAGE, weapon-rank by LIST_PAGE
     assert.deepEqual(reads.filter(([k]) => k === 'missile'), [['missile', 0, RANK_PAGE]]);
@@ -256,7 +303,7 @@ describe('publishLists', () => {
 
 describe('added files', () => {
   it('a failure of one new file keeps the other files and the index, names it in failed', async () => {
-    for (const bad of ['missile', 'component-rank', 'names-de']) {
+    for (const bad of ['missile', 'component-rank', 'names-de', 'rank-parts']) {
       const { deps, store, log } = fixture({ failReadOn: bad });
       const res = await publishLists(BUILD, deps);
       assert.deepEqual(res.failed, [bad]);
@@ -310,6 +357,148 @@ describe('added files', () => {
     assert.equal(germanNameOf('Alpha', 'ALPHA'), null);
     assert.equal(germanNameOf('Alpha', ''), null);
     assert.equal(namesDeFileJson({ ship: [['A', 'B']] }), '{"v":1,"lang":"de","kinds":{"ship":[["A","B"]]}}');
+  });
+});
+
+describe('rank-parts', () => {
+  it('holds the parts of the stock loadouts, each from the first table that owns it', async () => {
+    const { deps, store, reads } = fixture();
+    const res = await publishLists(BUILD, deps);
+    const f = JSON.parse(store.get(listsFileKey(BUILD, res.gen, 'rank-parts')));
+    assert.equal(f.v, 1);
+    assert.equal(f.kind, 'rank-parts');
+    assert.deepEqual(f.payloadKeys, PART_PAYLOAD_KEYS);
+    assert.deepEqual(f.ammoKeys, AMMO_PAYLOAD_KEYS);
+    assert.deepEqual(f.rows.map((r) => [r[0], r[1]]), [['GUN', 'weapon'], ['SHIELD', 'component'], ['MOUNT', 'item']]);
+    assert.ok(f.rows.every((r) => r.length === 3));
+    assert.deepEqual(f.absent, ['GHOST']);
+    assert.equal(res.files['rank-parts'].rows, 3);
+    // Every name of the tree, trimmed and sorted; a table is only asked for what no earlier one held.
+    assert.deepEqual(reads.filter(([k]) => String(k).startsWith('parts:')), [
+      ['parts:weapon', ['GHOST', 'GUN', 'MOUNT', 'SHIELD']],
+      ['parts:component', ['GHOST', 'MOUNT', 'SHIELD']],
+      ['parts:item', ['GHOST', 'MOUNT']],
+      ['parts:ammunition', 0, AMMO_PAGE],
+    ]);
+    // stats: kept structs whole, the others cut in place, scalars untouched.
+    // The slice: the carried keys the payload HAS (a JSON null stays, an absent key stays absent), nothing else.
+    assert.deepEqual(f.rows[0][2], {
+      entityKind: 'weapon',
+      subType: null,
+      weaponParams: { fireRate: 600 },
+      stats: { SEntityPhysicsControllerParams: { 'PhysType.Mass': 50 }, SHealthComponentParams: CUT },
+    });
+    assert.deepEqual(f.rows[2][2], { attachType: 'Turret' });
+    assert.deepEqual(Object.entries(f.rows[1][2].stats), [
+      ['SCItemShieldGeneratorParams', { MaxShieldHealth: 4000 }],
+      ['SDistortionParams', CUT],
+      ['flag', 1],
+    ]);
+    // ammunition: every row; of raw only the projectile survives.
+    assert.deepEqual(f.ammo, [['GUN_AMMO', { impactDamage: { physical: 5 }, raw: { size: 1, projectileParams: { damage: {} }, lightPoolParams: CUT } }]]);
+    // The index names the file only after it is in the bucket.
+    assert.ok('rank-parts' in JSON.parse(store.get(listsIndexKey(BUILD))).files);
+  });
+
+  it('a newer publish that took the index meanwhile keeps it: no second index, the file is listed as failed', async () => {
+    const { deps, store, log } = fixture();
+    const readBucket = deps.readBucket;
+    let indexReads = 0;
+    // The third index read is the one before the second put.
+    deps.readBucket = async (key) => (++indexReads === 3 ? { v: 1, build: BUILD, gen: 'zzzzzzzz', files: {} } : readBucket(key));
+    const res = await publishLists(BUILD, deps);
+    assert.deepEqual(res.failed, ['rank-parts']);
+    assert.ok(!('rank-parts' in res.files));
+    assert.equal(res.index_put, true);
+    assert.equal(log.filter((k) => k === listsIndexKey(BUILD)).length, 1);
+    assert.ok(!('rank-parts' in JSON.parse(store.get(listsIndexKey(BUILD))).files));
+  });
+
+  it('is not built when the publish itself did not go live', async () => {
+    const { deps, reads, log } = fixture({ hideFiles: true });
+    const res = await publishLists(BUILD, deps);
+    assert.equal(res.index_put, false);
+    assert.equal(reads.filter(([k]) => String(k).startsWith('parts:')).length, 0);
+    assert.ok(!log.some((k) => k.endsWith('/rank-parts.json')));
+  });
+
+  it('reads the names in chunks of PART_NAMES_PER_READ', async () => {
+    const { deps, reads } = fixture();
+    const many = Array.from({ length: PART_NAMES_PER_READ + 1 }, (_, i) => ({ entityClassName: `N${String(i).padStart(4, '0')}` }));
+    const readRows = deps.readRows;
+    deps.readRows = async (build, kind, from, limit) =>
+      (await readRows(build, kind, from, limit)).map((r) => (r.p_defaultLoadout ? { ...r, p_defaultLoadout: many } : r));
+    await publishLists(BUILD, deps);
+    assert.deepEqual(reads.filter(([k]) => k === 'parts:weapon').map(([, names]) => names.length), [PART_NAMES_PER_READ, 1]);
+  });
+
+  it('a build without stock loadouts still publishes the (empty) file', async () => {
+    const { deps, store, reads } = fixture();
+    const readRows = deps.readRows;
+    deps.readRows = async (...a) => (await readRows(...a)).map(({ p_defaultLoadout: _drop, ...r }) => r);
+    const res = await publishLists(BUILD, deps);
+    const f = JSON.parse(store.get(listsFileKey(BUILD, res.gen, 'rank-parts')));
+    assert.deepEqual(f.rows, []);
+    assert.deepEqual(f.absent, []);
+    assert.equal(f.ammo.length, 1);
+    assert.equal(reads.filter(([k]) => /^parts:(weapon|component|item)$/.test(k)).length, 0);
+  });
+});
+
+describe('rank-parts builders', () => {
+  it('collects every class name of a loadout tree, trimmed', () => {
+    const names = new Set();
+    loadoutClassNames([{ entityClassName: 'A', entries: [{ entityClassName: ' B ', entries: [{ entityClassName: 'C' }] }, { entries: [{ entityClassName: 'D' }] }] }, null, { entityClassName: '' }], names);
+    assert.deepEqual([...names], ['A', 'B', 'C', 'D']);
+    loadoutClassNames(null, names);
+    loadoutClassNames({ entityClassName: 'X' }, names);
+    assert.equal(names.size, 4);
+  });
+
+  it('cuts only plain objects outside the keep hints and keeps the key order', () => {
+    const stats = { B_Health: { a: 1 }, ItemResourceComponentParams: { b: 2 }, list: [{ c: 3 }], n: 5, z: null, SCItemShieldEmitterParams: {} };
+    assert.deepEqual(Object.entries(cutChildren(stats, STAT_KEEP)), [
+      ['B_Health', CUT],
+      ['ItemResourceComponentParams', { b: 2 }],
+      ['list', [{ c: 3 }]],
+      ['n', 5],
+      ['z', null],
+      ['SCItemShieldEmitterParams', {}],
+    ]);
+    assert.equal(cutChildren(null, STAT_KEEP), null);
+    assert.deepEqual(cutChildren([1], STAT_KEEP), [1]);
+    assert.equal(CUT, '\u0000');
+  });
+
+  it('keeps the structs the cohort reads by findStat hint or by name', () => {
+    for (const struct of [
+      'ItemResourceComponentParams', 'SEntityPhysicsControllerParams', 'SCItemShieldGeneratorParams',
+      'SCItemQuantumDriveParams', 'SCItemVehicleArmorParams', 'SCItemMissileParams',
+    ]) {
+      assert.deepEqual(cutChildren({ [struct]: { x: 1 } }, STAT_KEEP), { [struct]: { x: 1 } }, struct);
+    }
+  });
+
+  it('slices the whole payload: a JSON null stays, an absent key stays absent', () => {
+    // A `payload->key` select answers null for both, and the full payload the client used to read tells them apart.
+    assert.equal(PART_SELECT, 'class_name, payload');
+    assert.deepEqual(payloadSlice({ kind: null, subType: 'x', guid: 'g' }, ['kind', 'subType', 'grade']), { kind: null, subType: 'x' });
+    assert.deepEqual(payloadSlice(null, ['kind']), {});
+    assert.deepEqual(payloadSlice({ stats: { A: { x: 1 } }, raw: { projectileParams: {}, other: {} } }, ['stats', 'raw']), {
+      stats: { A: CUT },
+      raw: { projectileParams: {}, other: CUT },
+    });
+  });
+
+  it('builds a parseable file from row texts', () => {
+    const row = partRowJson('item', { class_name: 'A', payload: { kind: 'x' } });
+    const f = JSON.parse(rankPartsFileJson([row, row], ['G'], [ammoRowJson({ class_name: 'AM' })]));
+    assert.deepEqual(Object.keys(f), ['v', 'kind', 'payloadKeys', 'ammoKeys', 'absent', 'rows', 'ammo']);
+    assert.equal(f.rows.length, 2);
+    assert.deepEqual(f.rows[0], ['A', 'item', { kind: 'x' }]);
+    assert.deepEqual(f.ammo, [['AM', {}]]);
+    assert.deepEqual(JSON.parse(rankPartsFileJson([], [], [])).rows, []);
+    assert.ok(NAME_RE.test('rank-parts') && !NAME_RE.test('rank-partsx') && !NAME_RE.test('rank'));
   });
 });
 

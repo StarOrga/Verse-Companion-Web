@@ -99,6 +99,7 @@ import { BUILD_ID_RE, LANG_RE } from './_locale-shards.ts';
 import { publishLocale } from './_locale-publish.ts';
 import { type ListPublishDeps, publishLists } from './_list-publish.ts';
 import { LIST_FILTERS, LIST_TABLES, LISTS_ROOT, selectFor } from './_list-snapshots.ts';
+import { PART_SELECT } from './_rank-parts.ts';
 import { enqueueTranslationJobs } from './_translation-enqueue.ts';
 import { gcLocalePrefixes } from './_locale-gc.ts';
 import {
@@ -314,6 +315,26 @@ function listPublishDeps(admin: Admin, r2: R2): ListPublishDeps {
         .range(from, from + limit - 1);
       if (error) throw error;
       return (data ?? []) as unknown as { class_name: string; name_localized: string | null; de: string | null }[];
+    },
+    async readParts(buildId, table, classNames) {
+      // The client's own cohort read (getEntityPayloads); _rank-parts.ts slices the payloads.
+      const { data, error } = await admin
+        .from(LIST_TABLES[table])
+        .select(PART_SELECT)
+        .eq('build_id', buildId)
+        .in('class_name', classNames);
+      if (error) throw error;
+      return (data ?? []) as unknown as Record<string, unknown>[];
+    },
+    async readAmmoParts(buildId, from, limit) {
+      const { data, error } = await admin
+        .from(LIST_TABLES.ammunition)
+        .select(PART_SELECT)
+        .eq('build_id', buildId)
+        .order('class_name', { ascending: true })
+        .range(from, from + limit - 1);
+      if (error) throw error;
+      return (data ?? []) as unknown as Record<string, unknown>[];
     },
     async facetValues(buildId, kind) {
       const { data, error } = await admin.rpc('codex_facet_values', { p_build_id: buildId, p_kind: kind });
