@@ -245,3 +245,56 @@ export function passProgress(p: { status: string; phase: string; pos: number; to
 export function isRightsError(e: unknown): boolean {
   return (e as { code?: string } | null)?.code === '42501';
 }
+
+// ── Karteikarten: language overview + multi-select filter ────────────────────
+
+/** localStorage key of the languages a reviewer picked for the card queue. */
+export const CARD_LANGS_KEY = 'sc.translations.cardLangs';
+
+/** Saved selection → a clean, sorted, de-duplicated list of language codes (garbage → []). */
+export function parseLangSelection(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  try {
+    const v: unknown = JSON.parse(raw);
+    if (!Array.isArray(v)) return [];
+    return [...new Set(v.filter((x): x is string => typeof x === 'string' && x.trim().length > 0).map((x) => x.trim()))].sort();
+  } catch {
+    return [];
+  }
+}
+
+/** Adds or removes one language; the result stays sorted. */
+export function toggleLang(selected: readonly string[], lang: string): string[] {
+  return selected.includes(lang) ? selected.filter((l) => l !== lang) : [...selected, lang].sort();
+}
+
+/**
+ * Drops languages that no longer exist. While the language list is still
+ * unknown (empty) the selection is kept as it is, so a slow load never wipes it.
+ */
+export function sanitizeLangSelection(selected: readonly string[], available: readonly string[]): string[] {
+  if (available.length === 0) return [...selected];
+  return selected.filter((l) => available.includes(l));
+}
+
+export interface LangNeed {
+  lang: string;
+  /** Pending cards (open + skipped); null = count not known (load failed). */
+  open: number | null;
+}
+
+/** The overview: every language with its pending count, the ones that need help most first. */
+export function langNeeds(languages: readonly string[], counts: ReadonlyMap<string, number>): LangNeed[] {
+  return [...new Set(languages)]
+    .map((lang) => ({ lang, open: counts.has(lang) ? counts.get(lang)! : null }))
+    .sort((a, b) => (b.open ?? -1) - (a.open ?? -1) || a.lang.localeCompare(b.lang));
+}
+
+/** Header numbers over several languages: counts add up, the streak is per person, not per language. */
+export function sumCardStats(list: readonly { open_count: number; answered_today: number; streak_days: number }[]) {
+  return {
+    open_count: list.reduce((s, x) => s + x.open_count, 0),
+    answered_today: list.reduce((s, x) => s + x.answered_today, 0),
+    streak_days: list.reduce((m, x) => Math.max(m, x.streak_days), 0),
+  };
+}

@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { toErrorKey } from '../../core/describe-error';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
-import { ScSelectComponent, ScSelectOption } from '../../shared/sc-select.component';
 import {
   AdminPerson,
   CardAnswer,
@@ -12,7 +11,17 @@ import {
   TranslationLanguage,
   TranslationsService,
 } from './translations.service';
-import { DAILY_CARD_GOAL, contextLines, goalPercent } from './translations.logic';
+import {
+  CARD_LANGS_KEY,
+  DAILY_CARD_GOAL,
+  contextLines,
+  goalPercent,
+  langNeeds,
+  parseLangSelection,
+  sanitizeLangSelection,
+  sumCardStats,
+  toggleLang,
+} from './translations.logic';
 import { TRANSLATIONS_TAB_STYLES } from './translations-shared.styles';
 
 /**
@@ -23,19 +32,36 @@ import { TRANSLATIONS_TAB_STYLES } from './translations-shared.styles';
 @Component({
   selector: 'sc-translation-cards',
   standalone: true,
-  imports: [TranslatePipe, ScActionDirective, ScSelectComponent],
+  imports: [TranslatePipe, ScActionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="sc-card block">
       <div class="block-head">
         <h2>{{ 'admin.translations.cards.title' | translate }}</h2>
-        <div class="field">
-          <span>{{ 'admin.translations.cards.lang' | translate }}</span>
-          <sc-select [options]="langOptions()" [value]="lang()" [ariaLabel]="'admin.translations.cards.lang' | translate"
-                     placeholderKey="admin.translations.glossary.all" (valueChange)="setLang($event)" />
-        </div>
       </div>
       <p class="hint">{{ 'admin.translations.cards.intro' | translate }}</p>
+      <div class="needs" data-test="lang-needs">
+        <h3 id="sc-cards-langs">{{ 'admin.translations.cards.needsTitle' | translate }}</h3>
+        <div class="chips" role="group" aria-labelledby="sc-cards-langs">
+          <button type="button" class="chip" data-test="lang-all" [class.on]="selected().length === 0"
+                  [attr.aria-pressed]="selected().length === 0" (click)="clearLangs()">
+            {{ 'admin.translations.cards.allLangs' | translate }}
+          </button>
+          @for (n of needs(); track n.lang) {
+            <button type="button" class="chip" data-test="lang-chip" [class.on]="selected().includes(n.lang)"
+                    [class.quiet]="n.open === 0" [attr.aria-pressed]="selected().includes(n.lang)"
+                    [attr.aria-label]="(n.open === null ? 'admin.translations.cards.langChipUnknown' : 'admin.translations.cards.langChip')
+                      | translate: { lang: n.lang, count: n.open ?? 0 }"
+                    (click)="toggle(n.lang)">
+              <span class="code">{{ n.lang }}</span>
+              @if (n.open !== null) {
+                <span class="count" [class.hot]="n.open > 0">{{ n.open }}</span>
+              }
+            </button>
+          }
+        </div>
+        <p class="hint">{{ (selected().length ? 'admin.translations.cards.needsFiltered' : 'admin.translations.cards.needsHint') | translate }}</p>
+      </div>
       <div class="goal" data-test="goal">
         <div class="row">
           <strong>{{ 'admin.translations.cards.goal' | translate: { done: stats().answered_today, goal: goal } }}</strong>
@@ -186,6 +212,20 @@ import { TRANSLATIONS_TAB_STYLES } from './translations-shared.styles';
     TRANSLATIONS_TAB_STYLES,
     `
       .goal { display: grid; gap: var(--sc-space-2); }
+      .needs { display: grid; gap: var(--sc-space-2); }
+      .chips { display: flex; flex-wrap: wrap; gap: var(--sc-space-2); }
+      .chip {
+        display: inline-flex; align-items: center; gap: var(--sc-space-2); min-height: 44px; cursor: pointer; font: inherit;
+        padding: 0 var(--sc-space-3); border-radius: 999px; border: 1px solid var(--sc-border);
+        background: var(--sc-bg-0); color: var(--sc-fg-1); font-size: 0.86rem;
+      }
+      .chip.quiet { color: var(--sc-fg-2); }
+      .chip.on { border-color: var(--sc-accent); color: var(--sc-fg-0);
+        background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
+      .chip .code { font-family: var(--sc-font-mono, ui-monospace, monospace); text-transform: uppercase; }
+      .chip .count { min-width: 1.6em; padding: 0 6px; border-radius: 999px; text-align: center;
+        font-variant-numeric: tabular-nums; background: var(--sc-bg-1, var(--sc-bg-0)); color: var(--sc-fg-2); }
+      .chip .count.hot { color: var(--sc-accent); font-weight: 600; }
       .q { font-size: 1.15rem; overflow-wrap: anywhere; }
       .choices { display: grid; gap: var(--sc-space-3); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
       .choice {
@@ -217,11 +257,13 @@ export class TranslationCardsComponent implements OnInit {
   readonly languages = input<readonly TranslationLanguage[]>([]);
   readonly goal = DAILY_CARD_GOAL;
 
-  readonly langOptions = computed<ScSelectOption[]>(() =>
-    this.languages().map((l) => ({ value: l.lang, labelKey: 'admin.translations.glossary.langLabel', labelParams: { lang: l.lang }, label: l.lang })),
+  /** The languages the reviewer can review; only cards of these are served ([] = all). Saved per browser. */
+  readonly selected = signal<string[]>(readSavedLangs());
+  /** Pending cards (open + skipped) per language, for the overview. */
+  readonly counts = signal<Map<string, number>>(new Map());
+  readonly needs = computed(() =>
+    langNeeds([...this.languages().map((l) => l.lang), ...this.selected()], this.counts()),
   );
-
-  readonly lang = signal<string | null>(null);
   readonly queue = signal<TranslationCard[]>([]);
   readonly stats = signal<CardStats>({ open_count: 0, answered_today: 0, streak_days: 0 });
   readonly board = signal<LeaderboardRow[]>([]);
@@ -246,6 +288,20 @@ export class TranslationCardsComponent implements OnInit {
   });
 
   private seq = 0;
+  private countSeq = 0;
+
+  constructor() {
+    // The language list arrives from the parent after its own load: count per language
+    // then, and drop saved languages that no longer exist.
+    effect(() => {
+      const codes = this.languages().map((l) => l.lang);
+      untracked(() => {
+        const clean = sanitizeLangSelection(this.selected(), codes);
+        if (clean.length !== this.selected().length) this.setSelection(clean);
+        void this.loadCounts();
+      });
+    });
+  }
 
   ngOnInit(): void {
     void this.load();
@@ -257,7 +313,7 @@ export class TranslationCardsComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
     try {
-      const [queue, stats] = await Promise.all([this.svc.cardQueue(this.lang()), this.svc.cardStats(this.lang())]);
+      const [queue, stats] = await Promise.all([this.svc.cardQueue(this.selected()), this.statsFor(this.selected())]);
       if (mine !== this.seq) return;
       this.queue.set(queue);
       this.stats.set(stats);
@@ -304,10 +360,46 @@ export class TranslationCardsComponent implements OnInit {
     };
   }
 
-  setLang(v: string | null): void {
-    this.lang.set(v);
+  toggle(lang: string): void {
+    this.setSelection(toggleLang(this.selected(), lang));
+  }
+
+  clearLangs(): void {
+    if (this.selected().length) this.setSelection([]);
+  }
+
+  private setSelection(langs: string[]): void {
+    this.selected.set(langs);
+    try {
+      localStorage.setItem(CARD_LANGS_KEY, JSON.stringify(langs));
+    } catch {
+      /* private mode / quota: the choice just lasts for this visit */
+    }
     this.result.set(null);
     void this.load();
+  }
+
+  /** Header numbers: all languages in one call, else the sum over the chosen ones. */
+  private async statsFor(langs: readonly string[]): Promise<CardStats> {
+    if (langs.length === 0) return this.svc.cardStats(null);
+    if (langs.length === 1) return this.svc.cardStats(langs[0]);
+    return sumCardStats(await Promise.all(langs.map((l) => this.svc.cardStats(l))));
+  }
+
+  /** Pending count per language; a failed count leaves the chip without a number (it stays usable). */
+  async loadCounts(): Promise<void> {
+    const mine = ++this.countSeq;
+    const codes = [...new Set(this.languages().map((l) => l.lang))];
+    const rows = await Promise.all(
+      codes.map((l) =>
+        this.svc.cardStats(l).then(
+          (s) => [l, s.open_count] as const,
+          () => null,
+        ),
+      ),
+    );
+    if (mine !== this.countSeq) return;
+    this.counts.set(new Map(rows.filter((r): r is readonly [string, number] => r !== null)));
   }
 
   choose(a: CardAnswer): void {
@@ -323,7 +415,7 @@ export class TranslationCardsComponent implements OnInit {
 
   private async refreshStats(): Promise<void> {
     try {
-      this.stats.set(await this.svc.cardStats(this.lang()));
+      this.stats.set(await this.statsFor(this.selected()));
     } catch {
       /* the header keeps its last numbers; the next load refreshes them */
     }
@@ -340,7 +432,7 @@ export class TranslationCardsComponent implements OnInit {
       this.queue.update((q) => q.filter((x) => x.id !== c.id));
       this.result.set(done);
       this.resetForm();
-      await Promise.all([this.refreshStats(), this.loadBoard()]);
+      await Promise.all([this.refreshStats(), this.loadBoard(), this.loadCounts()]);
     } catch (e) {
       this.flash.set({ key: toErrorKey('admin-translations', 'card-answer', e), err: true });
     } finally {
@@ -364,5 +456,13 @@ export class TranslationCardsComponent implements OnInit {
     } finally {
       this.busy.set(false);
     }
+  }
+}
+
+function readSavedLangs(): string[] {
+  try {
+    return parseLangSelection(localStorage.getItem(CARD_LANGS_KEY));
+  } catch {
+    return [];
   }
 }
