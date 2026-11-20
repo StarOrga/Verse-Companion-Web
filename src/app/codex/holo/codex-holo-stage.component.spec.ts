@@ -582,6 +582,8 @@ describe('CodexHoloStageComponent one panel (concept glas3)', () => {
     const c = f.componentInstance;
     const el: HTMLElement = f.nativeElement;
     expect(el.querySelectorAll('.holo-panel').length).toBe(1);
+    // The same panel component as every item page's shell panel, with a bounded (scrolling) pane.
+    expect(el.querySelector('sc-codex-detail-panel.holo-panel[data-fit] #holo-tabpanel[role="tabpanel"]')).not.toBeNull();
     const tabs = [...el.querySelectorAll('[role="tab"]')].map((t) => t.id);
     expect(tabs).toEqual(['holo-tab-rank', 'holo-tab-parts', 'holo-tab-changes']);
     expect(c.panelTab()).toBe('rank');

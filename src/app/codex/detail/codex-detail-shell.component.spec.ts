@@ -147,6 +147,10 @@ describe('CodexDetailShellComponent', () => {
     fixture.detectChanges();
     expect(el.querySelector('.pane')!.textContent).toContain('werte');
     expect(el.querySelector('#dt-tab-werte')!.getAttribute('aria-selected')).toBe('true');
+    // The panel is the shared detail panel (the holotable places the same component): frame, pill, tabpanel.
+    const pane = el.querySelector('sc-codex-detail-panel.sh-panel #dt-pane[role="tabpanel"]');
+    expect(pane).not.toBeNull();
+    expect(pane!.getAttribute('aria-labelledby')).toBe('dt-tab-werte');
   });
 
   it('projects the ship holotable as a full-width stage without its own aside', async () => {
