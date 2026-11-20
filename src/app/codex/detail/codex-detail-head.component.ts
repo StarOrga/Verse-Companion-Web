@@ -45,8 +45,15 @@ export function attachPull(top: number, pull: number, stickTop: number): number 
  * holotable's first row and the panel's tab pill (v0.282.0 report).
  */
 export function naturalTop(host: HTMLElement): number | null {
-  const parent = host.parentElement;
-  if (!parent || parent.firstElementChild !== host) return null;
+  let child: HTMLElement = host;
+  let parent = host.parentElement;
+  // A display:contents wrapper (the ship's head region, slotted into the detail shell) has no box of its own:
+  // the box it stands in is the parent that counts.
+  while (parent && parent.firstElementChild === child && getComputedStyle(parent).display === 'contents') {
+    child = parent;
+    parent = parent.parentElement;
+  }
+  if (!parent || parent.firstElementChild !== child) return null;
   const cs = getComputedStyle(parent);
   return parent.getBoundingClientRect().top + (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.paddingTop) || 0);
 }

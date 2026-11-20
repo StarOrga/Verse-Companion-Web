@@ -883,7 +883,9 @@ describe('CodexHoloStageComponent lower part (concept holotisch-unten r1, d2)', 
     const below = el.querySelector('.holo-below')!;
     const persp = el.querySelector('sc-codex-holo-perspectives.below-persp')!;
     expect(below.compareDocumentPosition(persp) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(persp.nextElementSibling?.tagName.toLowerCase()).toBe('sc-codex-holo-strip');
+    // Each region stands in its own display:contents scope: the perspectives close theirs, the strip opens the next one.
+    expect(persp.nextElementSibling).toBeNull();
+    expect(persp.parentElement!.nextElementSibling?.firstElementChild?.tagName.toLowerCase()).toBe('sc-codex-holo-strip');
     expect(persp.classList).toContain('row');
   });
 

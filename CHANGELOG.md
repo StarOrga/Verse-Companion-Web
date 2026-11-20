@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.283.4] - 2026-11-20
+
+### Changed
+- Ship detail pages now use the same page template slots as item pages (head, stage, panel, strip); the layout looks the same.
+
 ## [0.283.3] - 2026-11-20
 
 ### Fixed
