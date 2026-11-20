@@ -16,9 +16,25 @@ export interface DetailTab {
   readonly count: number;
 }
 
+/** The ship holotable's panel tabs (Einordnung | Bauteile | Änderungen): their own ids, label keys and icons. */
+export type HoloPanelTab = 'parts' | 'rank' | 'changes';
+export interface ShipPanelTab {
+  readonly id: HoloPanelTab;
+  readonly labelKey: string;
+  /** An SVG path (24 × 24 viewBox). */
+  readonly icon: string;
+}
+export const SHIP_PANEL_TABS: readonly ShipPanelTab[] = [
+  { id: 'rank', labelKey: 'codex.holo.stage.einordnung', icon: 'M12 3l8 4.5v9L12 21l-8-4.5v-9z' },
+  { id: 'parts', labelKey: 'codex.holo.stage.tab.parts', icon: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z' },
+  { id: 'changes', labelKey: 'codex.holo.stage.tab.changes', icon: 'M4 12a8 8 0 1 0 3-6.2M4 4v5h5M12 8v4l3 2' },
+];
+
 export interface DetailProfile {
   readonly stage: DetailStageKind;
   readonly tabs: readonly DetailTab[];
+  /** The ship's panel tabs: the shell draws their pill, the holotable stage fills the pane and counts them. */
+  readonly shipTabs?: readonly ShipPanelTab[];
   /** A KPI strip under the body (the ship's four topics); simple items have none. */
   readonly strip: boolean;
 }
@@ -61,7 +77,7 @@ export function detailTabs(data: DetailTabData): DetailTab[] {
  */
 export function detailProfileFor(kind: CodexKind | null | undefined, data: DetailTabData): DetailProfile {
   if (kind === 'ship') {
-    return { stage: 'holo', tabs: [], strip: true };
+    return { stage: 'holo', tabs: [], shipTabs: SHIP_PANEL_TABS, strip: true };
   }
   const simple = !data.einordnung && !data.richStage;
   return { stage: simple ? 'compact' : 'item', tabs: detailTabs(data), strip: false };
