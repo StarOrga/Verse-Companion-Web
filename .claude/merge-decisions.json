@@ -1,6 +1,18 @@
 {
   "version": 1,
   "aspects": {
+    ".claude/project-map.md›.claude/›count": [
+      {
+        "ship": "claude/nervous-yonath-8d416e",
+        "by": "JerryT2T",
+        "value": ".claude/ (29) (regenerated on the merged tree, equals git ls-files)",
+        "decided": true,
+        "at": "2026-11-20T21:29:56.348Z",
+        "hunks": [
+          "2bf0f3f9ebed"
+        ]
+      }
+    ],
     ".claude/project-map.md›auth›file count": [
       {
         "ship": "claude/batch-b25f1b",
@@ -585,6 +597,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›header›tracked files": [
+      {
+        "ship": "claude/nervous-yonath-8d416e",
+        "by": "JerryT2T",
+        "value": "3673 tracked files (regenerated on the merged tree, equals git ls-files)",
+        "decided": true,
+        "at": "2026-11-20T21:29:56.348Z",
+        "hunks": [
+          "174b1d502a7d"
+        ]
+      }
+    ],
     ".claude/project-map.md›header›tracked-count": [
       {
         "ship": "#1096",
@@ -940,6 +964,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›src/app/codex/›count": [
+      {
+        "ship": "claude/nervous-yonath-8d416e",
+        "by": "JerryT2T",
+        "value": "codex/ (427) (regenerated on the merged tree)",
+        "decided": true,
+        "at": "2026-11-20T21:29:56.348Z",
+        "hunks": [
+          "42a89617387d"
+        ]
+      }
+    ],
     ".claude/project-map.md›src/app/codex›count": [
       {
         "ship": "claude/emails-umbau-decision-6cd563",
@@ -995,6 +1031,16 @@
         "at": "2026-11-18T23:06:11.660Z",
         "hunks": [
           "f685c2f94ea9"
+        ]
+      },
+      {
+        "ship": "claude/nervous-yonath-8d416e",
+        "by": "JerryT2T",
+        "value": "src/ (1471), app/ (1464) (regenerated on the merged tree)",
+        "decided": true,
+        "at": "2026-11-20T21:29:56.348Z",
+        "hunks": [
+          "8023ca1c6dce"
         ]
       }
     ],
