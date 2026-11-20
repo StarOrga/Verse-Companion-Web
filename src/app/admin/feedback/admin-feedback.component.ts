@@ -1512,17 +1512,6 @@ export class AdminFeedbackComponent implements OnInit {
     return isContinuedAfterShip(m, this.threads().get(m.id));
   }
 
-  /** The routine's newest reply — the open question the sheet answers. */
-  lastSystemMessage(m: FeedbackRow): FeedbackMessage | null {
-    const replies = this.messagesFor(m.id);
-    for (let i = replies.length - 1; i >= 0; i--) {
-      if (replies[i].is_system) return replies[i];
-      // A human reply after the routine's means the question was answered.
-      return null;
-    }
-    return null;
-  }
-
   /** ISO time the "Du bist dran" card has been waiting since. */
   waitingSinceIso(m: FeedbackRow): string {
     return new Date(waitingSince(m, this.threads().get(m.id))).toISOString();
@@ -2028,15 +2017,24 @@ export class AdminFeedbackComponent implements OnInit {
    */
   private readonly _revealed = signal<ReadonlyMap<string, number>>(new Map());
 
-  private foldView<T>(key: string, all: readonly T[]): { key: string; shown: T[]; hiddenCount: number; revealed: number; total: number } {
+  private foldView<T>(
+    key: string,
+    all: readonly T[],
+    keepFrom = all.length - 1,
+  ): { key: string; shown: T[]; hiddenCount: number; revealed: number; total: number } {
     if (all.length === 0) return { key, shown: [], hiddenCount: 0, revealed: 0, total: 0 };
-    const revealed = Math.min(this._revealed().get(key) ?? 0, all.length - 1);
-    const shownFrom = all.length - 1 - revealed;
+    // `keepFrom` widens the always-visible tail back to a message that must
+    // stay in view — the open question whose one-tap answers the composer offers.
+    const tailFrom = Math.max(0, Math.min(keepFrom, all.length - 1));
+    const revealed = Math.min(this._revealed().get(key) ?? 0, tailFrom);
+    const shownFrom = tailFrom - revealed;
     return { key, shown: all.slice(shownFrom), hiddenCount: shownFrom, revealed, total: all.length };
   }
 
   threadView(id: string) {
-    return this.foldView(`thread:${id}`, this.messagesFor(id));
+    const replies = this.messagesFor(id);
+    const pending = this.pendingOptionsIndex(replies);
+    return this.foldView(`thread:${id}`, replies, pending >= 0 ? pending : replies.length - 1);
   }
 
   authorView(id: string) {
@@ -2105,11 +2103,28 @@ export class AdminFeedbackComponent implements OnInit {
     return parseAnswerOptions(body)?.text ?? body;
   }
 
-  /** One-tap answers the routine offered in its newest question, if any. */
+  /**
+   * One-tap answers the routine offered in its newest question, if any. They
+   * come from the newest routine message that carries a `[[A|B]]` line, not
+   * simply the newest routine message: a later notice without options (the
+   * PostHog watcher's "Erneut aufgetreten" repeat, feedback #382) must not hide
+   * the question still waiting for its answer. A human reply after the question
+   * answers it, so the options go.
+   */
   answerOptionsFor(m: FeedbackRow): AnswerOptions | null {
     if (this.askOf(m) !== 'question') return null;
-    const q = this.lastSystemMessage(m);
-    return q ? parseAnswerOptions(q.body) : null;
+    const replies = this.messagesFor(m.id);
+    const i = this.pendingOptionsIndex(replies);
+    return i >= 0 ? parseAnswerOptions(replies[i].body) : null;
+  }
+
+  /** Index of the newest routine message with options that no human reply follows, else -1. */
+  private pendingOptionsIndex(replies: readonly FeedbackMessage[]): number {
+    for (let i = replies.length - 1; i >= 0; i--) {
+      if (!replies[i].is_system) return -1;
+      if (parseAnswerOptions(replies[i].body)) return i;
+    }
+    return -1;
   }
 
   /** True while a one-tap answer is being posted — a double tap must not post twice. */
