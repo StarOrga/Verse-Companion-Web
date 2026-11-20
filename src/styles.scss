@@ -652,7 +652,8 @@ html[data-sc-layout] { scroll-padding-top: var(--sc-bar-h); }
   :root {
     /* First paint before the header measured itself: brand row + nav row. */
     --sc-header-h: calc(var(--sc-chrome-top) + 2 * var(--sc-head-item-h) + var(--sc-space-2));
-    --sc-dial-bottom: calc(var(--sc-lane-bottom) + var(--sc-fab-mini) / 4 + var(--sc-space-3));
+    /* Never lower than the feedback launcher's lane: on a page with no bottom bar (--sc-bar-stack-h 0) the dial used to sit on the launcher. */
+    --sc-dial-bottom: max(calc(var(--sc-lane-bottom) + var(--sc-fab-mini) / 4 + var(--sc-space-3)), calc(var(--sc-float-bottom) + var(--sc-launcher-lift, 0px) + var(--sc-fab-size) + var(--sc-space-2)));
     --sc-toast-bottom: calc(var(--sc-dial-bottom) + var(--sc-fab-mini) + var(--sc-space-2));
   }
 }
@@ -668,11 +669,28 @@ html[data-sc-layout] { scroll-padding-top: var(--sc-bar-h); }
     --sc-toast-bottom: calc(var(--sc-dial-bottom) + var(--sc-fab-mini) + var(--sc-space-2));
   }
 }
-/* On a phone or a phone on its side the β / view FABs live in the Tools dial, the QR hand-off is gone. */
+/* BAR OFF (html[data-sc-bar-off], set by a phone page that needs the whole bottom, the ship sheet): no bottom search capsule
+   (the fusion bar publishes --sc-bar-stack-h 0 and turns into the compact top overlay, search icon in the header), and the
+   feedback launcher + the dial stand above the sheet's peek instead of on it. */
+html[data-sc-bar-off][data-sc-phone]:not([data-sc-compact]) { --sc-launcher-lift: var(--sc-sheet-peek-h, 0px); }
+html[data-sc-bar-off][data-sc-phone]:not([data-sc-compact]) sc-fusion-bar:not([data-mode='stage']) {
+  position: fixed; top: var(--sc-chrome-top); left: 0; right: 0; bottom: auto; margin-top: 0; z-index: 30;
+  translate: 0 -200%; opacity: 0; transition: none;
+}
+html[data-sc-bar-off][data-sc-phone]:not([data-sc-compact]) sc-fusion-bar:not([data-mode='stage']):is(.searching, :focus-within) { translate: 0 0; opacity: 1; }
+
+/* A coarse tablet (iPad, Galaxy Tab) takes the dial too: 3 extra FABs over a sheet are 3 too many. Same lane maths as the phone. */
+html[data-sc-tablet] {
+  --sc-dial-bottom: max(calc(var(--sc-lane-bottom) + var(--sc-fab-mini) / 4 + var(--sc-space-3)), calc(var(--sc-float-bottom) + var(--sc-launcher-lift, 0px) + var(--sc-fab-size) + var(--sc-space-2)));
+  --sc-toast-bottom: calc(var(--sc-dial-bottom) + var(--sc-fab-mini) + var(--sc-space-2));
+}
+/* On a phone, a phone on its side or a coarse tablet the β / view FABs live in the Tools dial, the QR hand-off is gone. */
 html[data-sc-phone] sc-beta-fab,
 html[data-sc-compact] sc-beta-fab,
+html[data-sc-tablet] sc-beta-fab,
 html[data-sc-phone] sc-view-toggle-fab,
-html[data-sc-compact] sc-view-toggle-fab { display: none !important; }
+html[data-sc-compact] sc-view-toggle-fab,
+html[data-sc-tablet] sc-view-toggle-fab { display: none !important; }
 
 /* Compact: the header hides on scroll-down and comes back on scroll-up (ShellChromeService, transform only);
    the Tools dial follows it away. A bottom sheet above its peek, a large popup or an immersive stage hides the dial too. */

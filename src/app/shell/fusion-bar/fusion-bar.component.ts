@@ -366,7 +366,7 @@ export class FusionBarComponent {
   /** The staged field stands on its slot (position measured). */
   readonly placed = signal(false);
   /** A phone in portrait (the bar stands at the bottom). A phone on its side is compact: the bar is a top overlay then, like the desktop's. */
-  readonly phone = signal(matches('(max-width: 720px)') && !matches(COMPACT_MQ));
+  readonly phone = signal(isBottomBar());
 
   readonly mainPage = computed(() => this.variant() === 'app' && isMainHeaderPage(this.url()));
   readonly mode = computed<BarMode>(() => {
@@ -622,7 +622,7 @@ export class FusionBarComponent {
   private listen(): void {
     if (typeof window === 'undefined') return;
     const onResize = () => {
-      const phone = matches('(max-width: 720px)') && !matches(COMPACT_MQ);
+      const phone = isBottomBar();
       if (phone !== this.phone()) this.zone.run(() => this.phone.set(phone));
       this.barH = readBarHeight();
       this.condenseGeo = null;
@@ -648,6 +648,9 @@ export class FusionBarComponent {
       this.schedulePlace();
     };
     window.addEventListener(STAGE_SLOT_MOVED, onSlotMoved);
+    // A page took the bottom of the phone (or gave it back): the bar changes sides.
+    const mo = typeof MutationObserver === 'function' ? new MutationObserver(onResize) : null;
+    mo?.observe(document.documentElement, { attributes: true, attributeFilter: ['data-sc-bar-off'] });
     this.publishHeight();
     this.onScroll(pageScrollY());
     this.injector.get(DestroyRef).onDestroy(() => {
@@ -655,6 +658,7 @@ export class FusionBarComponent {
       window.removeEventListener('resize', onResize);
       window.removeEventListener(STAGE_SLOT_MOVED, onSlotMoved);
       ro?.disconnect();
+      mo?.disconnect();
     });
   }
 
@@ -1157,6 +1161,11 @@ function readBarHeight(): number {
 
 /** A phone on its side (core/viewport-mode.ts COMPACT_QUERY): the bar leaves the bottom, the header carries search. */
 const COMPACT_MQ = '(orientation: landscape) and (max-height: 500px)';
+/** The bar stands at the bottom: a phone in portrait, unless the page took the bottom (`html[data-sc-bar-off]`, ship sheet) — then it is a top overlay like in compact. */
+function isBottomBar(): boolean {
+  const off = typeof document !== 'undefined' && document.documentElement.hasAttribute('data-sc-bar-off');
+  return matches('(max-width: 720px)') && !matches(COMPACT_MQ) && !off;
+}
 
 function matches(query: string): boolean {
   return typeof matchMedia === 'function' && matchMedia(query).matches;

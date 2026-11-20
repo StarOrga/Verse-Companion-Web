@@ -116,7 +116,7 @@ export class ShareButtonComponent {
   readonly enabled = computed(() => this.shell() || !!this.page());
   private readonly viewport = inject(ViewportModeService);
   /** Phone or landscape phone: the share action is an entry of the shell's Tools dial, not an own FAB. */
-  protected readonly inDial = computed(() => this.enabled() && (this.viewport.phone() || this.viewport.compact()));
+  protected readonly inDial = computed(() => this.enabled() && (this.viewport.phone() || this.viewport.compact() || this.viewport.tablet()));
 
   /** Title handed to the native share sheet. */
   readonly shareTitle = input<string>('');

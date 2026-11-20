@@ -27,7 +27,7 @@ const VIEW_TO_CLASSIC = 'M4 5h7v14H4zM14 5h6v6h-6zM14 14h6v5h-6z';
 const VIEW_TO_HOLO = 'M12 4l7 4-7 4-7-4 7-4zM5 8v6l7 4 7-4V8M3 20h18';
 
 /**
- * The Tools dial (phone and compact landscape): the β switch, the page's view switch and whatever else a
+ * The Tools dial (phone, compact landscape and coarse tablet): the β switch, the page's view switch and whatever else a
  * page registered through `PageCornerService.register()` (share ...) folded into ONE 44px button above the
  * feedback launcher, instead of three more floating discs. Closed it is a single quiet circle; open, up to
  * three items fan upward with a label chip each. On tablet and desktop it is not drawn: there the β FAB and
@@ -163,7 +163,7 @@ export class FabDialComponent {
   });
 
   /** Drawn on a phone and on a phone on its side, and only with something to offer. */
-  protected readonly shown = computed(() => (this.mode.phone() || this.mode.compact()) && this.items().length > 0);
+  protected readonly shown = computed(() => (this.mode.phone() || this.mode.compact() || this.mode.tablet()) && this.items().length > 0);
 
   private scrollStart = 0;
 
@@ -189,7 +189,7 @@ export class FabDialComponent {
     this.open.set(next);
     if (next) {
       this.scrollStart = typeof window === 'undefined' ? 0 : window.scrollY;
-      this.analytics.track('app:tools_dial_open', { mode: this.mode.compact() ? 'compact' : 'phone', actions: this.items().length });
+      this.analytics.track('app:tools_dial_open', { mode: this.mode.compact() ? 'compact' : this.mode.tablet() ? 'tablet' : 'phone', actions: this.items().length });
     }
   }
 

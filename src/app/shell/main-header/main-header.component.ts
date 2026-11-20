@@ -85,8 +85,8 @@ export const MAIN_NAV_SLOT_PX = 112;
 
     <!-- Top-right corner: apps + profile. Admin is not here: it lives in the account menu. -->
     <div class="account">
-      @if (compact()) {
-        <!-- A phone on its side has no bottom search bar: the magnifier opens the same search (palette). -->
+      @if (compact() || barOff()) {
+        <!-- A phone on its side (or a phone page that took the bottom for itself, html[data-sc-bar-off]) has no bottom search bar: the magnifier opens the same search. -->
         <button type="button" scAction tier="tertiary" class="mh-search" [attr.aria-label]="'chrome.search' | translate"
                 [scTooltip]="'chrome.search' | translate" scTooltipTier="label" (click)="openSearch()">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
@@ -373,6 +373,10 @@ export const MAIN_NAV_SLOT_PX = 112;
         .nav {
           transform: none;
         }
+        /* html[data-sc-bar-off]: the magnifier stands left of apps + avatar. */
+        .account { flex-direction: row; align-items: center; gap: var(--sc-space-1); }
+        .mh-search { width: 44px; height: 44px; min-width: 44px; min-height: 44px; pointer-events: auto; }
+        .mh-search svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
       }
       /* Narrow phones: five equal slots cannot hold "Starscape" (a slot is ~58px
          under the beta chip lane) and the wordmark ran under the account buttons.
@@ -505,12 +509,14 @@ export class MainHeaderComponent {
   private readonly chrome = inject(ShellChromeService);
   private readonly injector = inject(Injector);
   /** Condensed into the bar (progress 1, or not a main page at all): inert and invisible. */
-  readonly compressed = computed(() => !this.viewport.compact() && (this.chrome.stageSearch() === 'none' || this.chrome.dockFull()));
+  readonly compressed = computed(() => !this.viewport.compact() && !this.viewport.barOff() && (this.chrome.stageSearch() === 'none' || this.chrome.dockFull()));
   private readonly viewport = inject(ViewportModeService);
   private readonly searchOpen = inject(SearchOpenService);
   private readonly analytics = inject(AnalyticsService);
   /** A phone on its side: the bar is gone, the header carries the search and is always there. */
   protected readonly compact = this.viewport.compact;
+  /** A phone page that keeps the bottom free (ship sheet): the bar is a top overlay, this magnifier opens it. */
+  protected readonly barOff = this.viewport.barOff;
   /** A silent state jump (route change / scroll reset): transitions off for it. */
   readonly snap = this.chrome.snap;
   private readonly router = inject(Router);

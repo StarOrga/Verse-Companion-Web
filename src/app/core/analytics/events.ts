@@ -52,7 +52,7 @@ export const EVENTS = {
   'app:install_prompt_accept': ev<{ platform: 'android-native' | 'ios' | 'other' }>('app', 'Auf der Installieren-Karte wurde Installieren gewählt (öffnet den System-Dialog bzw. die iOS-Anleitung).'),
   'app:install_prompt_close': ev<{ platform: 'android-native' | 'ios' | 'other'; dismissals: number }>('app', 'Die Installieren-Karte oder der System-Dialog wurde abgelehnt (Anzahl bisheriger Ablehnungen steuert die Pause).'),
   'app:install_finish': ev<{ platform: 'android-native' | 'ios' | 'other' }>('app', 'Die App wurde installiert (appinstalled).'),
-  'app:tools_dial_open': ev<{ mode: 'phone' | 'compact'; actions: number }>('app', 'Der Werkzeug-Knopf (Fächer aus Ansicht, Beta, Teilen) wurde auf einem Handy geöffnet.'),
+  'app:tools_dial_open': ev<{ mode: 'phone' | 'compact' | 'tablet'; actions: number }>('app', 'Der Werkzeug-Knopf (Fächer aus Ansicht, Beta, Teilen) wurde auf einem Handy oder Tablet geöffnet.'),
 
   // --- auth --------------------------------------------------------------
   'auth:user_sign_in': ev<{ provider: 'email' | 'google' | 'discord' }>('auth', 'Anmeldung erfolgreich (Anbieter).'),

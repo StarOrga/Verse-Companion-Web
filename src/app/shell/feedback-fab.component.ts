@@ -332,7 +332,7 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
         /* The 16px phone inset now lives on --sc-fab-inset (styles.scss), so
            the lane a neighbour clears shrinks with the launcher. */
         /* Clear of the home indicator / gesture bar on a phone. */
-        bottom: calc(var(--sc-fab-inset) + env(safe-area-inset-bottom, 0px));
+        bottom: calc(var(--sc-fab-inset) + env(safe-area-inset-bottom, 0px) + var(--sc-launcher-lift, 0px));
         gap: 10px;
       }
       /* The sheet fills the screen (see .sc-sheet), so its head IS the app bar

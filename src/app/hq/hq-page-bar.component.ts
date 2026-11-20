@@ -86,6 +86,9 @@ export const PAGE_BAR_SLACK_PX = 12;
           bottom: calc(var(--sc-float-bottom, 12px) + var(--sc-bar-h, 56px) + var(--sc-space-2, 8px));
           margin-inline-end: 0;
         }
+        /* The bar stands one row above the launcher's (the fusion bar's row), so the panel itself needs no launcher lane:
+           it takes the full width (the global .sc-dock-phone margin kept 160px of dead space beside it, ending at ~615 of 780). */
+        :host(.above-bar) .bar { margin-inline-end: 0; }
         /* Hidden: it must travel its own raise as well, else it peeks out under the fusion bar. */
         :host(.above-bar.hidden) {
           translate: 0 calc(100% + var(--sc-float-bottom, 12px) + var(--sc-bar-h, 56px) + var(--sc-space-2, 8px) + 12px);

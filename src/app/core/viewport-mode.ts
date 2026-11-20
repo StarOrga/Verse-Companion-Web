@@ -18,6 +18,11 @@ export class ViewportModeService {
   readonly phone = signal(false);
   readonly compact = signal(false);
   readonly tablet = signal(false);
+  /**
+   * `html[data-sc-bar-off]`, set by a page that needs the whole bottom of a phone (the Holotable's ship sheet):
+   * the bottom search capsule steps aside and the header carries the search. Only a phone in portrait honours it.
+   */
+  readonly barOff = signal(false);
   private started = false;
 
   constructor() {
@@ -32,6 +37,12 @@ export class ViewportModeService {
     this.bind(win, PHONE_QUERY, 'data-sc-phone', this.phone);
     this.bind(win, COMPACT_QUERY, 'data-sc-compact', this.compact);
     this.bind(win, TABLET_QUERY, 'data-sc-tablet', this.tablet);
+    const root = this.doc.documentElement;
+    const readBarOff = () => this.barOff.set(root.hasAttribute('data-sc-bar-off') && this.phone() && !this.compact());
+    readBarOff();
+    if (typeof MutationObserver === 'function') {
+      new MutationObserver(readBarOff).observe(root, { attributes: true, attributeFilter: ['data-sc-bar-off', 'data-sc-phone', 'data-sc-compact'] });
+    }
   }
 
   private bind(win: Window, query: string, attr: string, state: ReturnType<typeof signal<boolean>>): void {
