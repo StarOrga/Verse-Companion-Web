@@ -109,7 +109,7 @@ import { LIST_FILTERS, LIST_TABLES, LISTS_ROOT, selectFor } from './_list-snapsh
 import { GEN_RE as SILHOUETTE_GEN_RE, SILHOUETTE_SELECT, SILHOUETTE_TABLES, SILHOUETTES_ROOT } from './_silhouette-shards.ts';
 import { type SilhouettePublishDeps, type StepResult, parseCursor, publishSilhouetteStep } from './_silhouette-publish.ts';
 import { PART_SELECT } from './_rank-parts.ts';
-import { callOwnOp } from './_self-call.ts';
+import { WORKER_ID, callOwnOp } from './_self-call.ts';
 import { enqueueTranslationJobs } from './_translation-enqueue.ts';
 import { gcLocalePrefixes } from './_locale-gc.ts';
 import {
@@ -428,27 +428,30 @@ const SILHOUETTE_CHAIN_MAX_HOPS = 400;
  * ends the chain - no index is written and clients keep reading the table.
  */
 async function callSilhouetteStep(supabaseUrl: string, serviceKey: string, body: Record<string, unknown>): Promise<void> {
-  await callOwnOp(supabaseUrl, serviceKey, { ...body, op: 'silhouettes_publish', chain: true });
+  // A step may run twice (slices are repeatable, two plans end in one index: commit), so a lost answer is retried.
+  await callOwnOp(supabaseUrl, serviceKey, { ...body, op: 'silhouettes_publish', chain: true }, { retryThrown: true });
 }
 
 /**
  * The catalog lists of a build as a request of its own (_self-call.ts): `detach`
  * makes that request answer at once and publish on its own worker, so this one
- * neither pays the publish's CPU nor waits its ~70 s. A failure only leaves the
+ * neither pays the publish's CPU nor waits its ~70 s. A request that threw is not
+ * sent again: it may have arrived, and two publishes of one build at once can leave
+ * the index naming a generation the other one collected. A failure only leaves the
  * tables as the source; `lists_publish` redoes it.
  */
 async function callListsPublish(supabaseUrl: string, serviceKey: string, buildId: string): Promise<void> {
-  await callOwnOp(supabaseUrl, serviceKey, { op: 'lists_publish', build_id: buildId, detach: true });
+  await callOwnOp(supabaseUrl, serviceKey, { op: 'lists_publish', build_id: buildId, detach: true }, { retryThrown: false });
 }
 
 /** One lists publish that only logs: its caller has already answered. */
 async function publishListsLogged(admin: Admin, r2: R2, buildId: string): Promise<void> {
   try {
     const r = await publishLists(buildId, listPublishDeps(admin, r2));
-    if (r.blocked) console.error(`ingest-catalog: lists publish ${buildId} blocked: ${r.blocked.code} ${r.blocked.message}`);
-    else console.log(`ingest-catalog: lists publish ${buildId}: ${JSON.stringify(r)}`);
+    if (r.blocked) console.error(`ingest-catalog: lists publish ${buildId} (worker ${WORKER_ID}) blocked: ${r.blocked.code} ${r.blocked.message}`);
+    else console.log(`ingest-catalog: lists publish ${buildId} (worker ${WORKER_ID}): ${JSON.stringify(r)}`);
   } catch (e) {
-    console.error(`ingest-catalog: lists publish ${buildId} failed: ${(e as Error).message}`);
+    console.error(`ingest-catalog: lists publish ${buildId} (worker ${WORKER_ID}) failed: ${(e as Error).message}`);
   }
 }
 
@@ -1151,7 +1154,10 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       afterResponse(callSilhouetteStep(supabaseUrl, serviceKey, { build_id: buildId, hop: 0 }));
       // The catalog lists as files per build: one request of their own for the same
       // reason, also started before the locale publish below, so a worker killed over
-      // that one no longer takes the lists with it. A failure only leaves the tables as the source.
+      // that one no longer takes the lists with it. The two do not meet: the lists read the
+      // catalog tables and the facet RPC, never the locale rows the publish below deletes.
+      // A failure only leaves the tables as the source.
+      console.log(`ingest-catalog: finalize ${buildId} answered on worker ${WORKER_ID}`);
       afterResponse(callListsPublish(supabaseUrl, serviceKey, buildId));
       // After the response: the uploader's finalize must not wait ~30 s for
       // 11 languages. A failure only leaves the rows in place (clients keep
