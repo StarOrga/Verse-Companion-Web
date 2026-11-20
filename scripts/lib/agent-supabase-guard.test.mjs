@@ -263,6 +263,23 @@ describe('installSupabaseGuard', () => {
     assert.equal(predicate(new URL('https://other.supabase.co/rest/v1/codex_ships')), false);
   });
 
+  it('allows the asking page its own origin on a cached answer stored from another origin', async () => {
+    // PostgREST echoes the origin that asked. A dev server stored this answer; the live page reads it.
+    const { handle } = await install();
+    const stored = { ...ok, headers: { ...ok.headers, 'access-control-allow-origin': 'http://127.0.0.1:4317' } };
+    await handle(fakeRoute({ url: shipList(), headers: { origin: 'http://127.0.0.1:4317' }, answer: stored }));
+
+    const live = fakeRoute({ url: shipList(), headers: { origin: 'https://app.example.test' }, answer: stored });
+    await handle(live);
+    assert.equal(live.fetched, 0);
+    assert.equal(live.fulfilled.headers['access-control-allow-origin'], 'https://app.example.test');
+    assert.equal(live.fulfilled.headers['content-type'], 'application/json');
+
+    const noOrigin = fakeRoute({ url: shipList(), answer: stored });
+    await handle(noOrigin);
+    assert.equal(noOrigin.fulfilled.headers['access-control-allow-origin'], '*');
+  });
+
   it('asks the database once, then answers a catalog read from the cache', async () => {
     const { handle, cacheDir, slotDir } = await install();
     const first = fakeRoute({ url: shipList(), answer: ok });
