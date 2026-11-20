@@ -4,6 +4,24 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.284.0] - 2026-11-20
+
+### Added
+- Install as an app: an install card in a calm moment after a successful action (from the second visit, touch devices only). On Android it opens the native one-tap install, on iPhone/iPad a short guide. After "Later" it rests 14, 45 and then 120 days, after that only the "Install app" entry in the apps menu and settings offers it.
+- App icon: monochrome icon for Android themed icons, a cleaner maskable icon, store screenshots for the install sheet and iOS web-app tags.
+- Holotable immersive mode: one button puts the hull, schema or 3D view on the whole screen, with a labelled stats rail, a side panel, pinch and pan on the model and a double tap to reset; Esc, back or ✕ leave it.
+- Phones and tablets: one Tools dial holds the view switch, beta and share instead of separate floating buttons.
+
+### Changed
+- Phone on its side: the header is one 48 px row that hides when scrolling down and returns when scrolling up; search sits in the header.
+- Holotable on phones: the values are a bottom sheet (peek, half, full) and the hull takes more of the screen (portrait 38 % → 56 %); on its side the page shows hull and values next to each other. On iPad the hull grows from 43 % to 56 % of the height.
+- Touch targets are at least 48 px (52 px for the main action), the breadcrumbs stay on one row and text never goes below 12 px.
+
+### Fixed
+- Pages no longer jump while loading: placeholders hold the final heights (item page, gallery, release notes, patches, upcoming ships).
+- On a phone on its side the patch ticker on the Verse page no longer prints under the navigation.
+- Pinching the 3D model no longer zooms or scrolls the whole page.
+
 ## [0.283.3] - 2026-11-20
 
 ### Fixed
