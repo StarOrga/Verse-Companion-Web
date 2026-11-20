@@ -7466,6 +7466,14 @@
       "auec": "aUEC-Bilanz",
       "losses": "Verluste",
       "lossesSub": "{{deaths}} Tode · {{ships}} Schiffe zerstört · {{claims}} Versicherungsfälle",
+      "costs": {
+        "label": "Kosten",
+        "fines": { "one": "{{n}} Strafe", "other": "{{n}} Strafen" },
+        "fineAmount": "{{fines}} ({{amount}} aUEC)",
+        "injuries": { "one": "{{n}} Verletzung", "other": "{{n}} Verletzungen" },
+        "medbeds": { "one": "{{n}} Medbed-Behandlung", "other": "{{n}} Medbed-Behandlungen" },
+        "claimRequests": { "one": "{{n}} Versicherungsanfrage", "other": "{{n}} Versicherungsanfragen" }
+      },
       "end": {
         "noQuit": "Ohne Beenden zu Ende (Absturz oder App geschlossen)",
         "live": "Läuft gerade"

@@ -11,6 +11,10 @@ export const LOGBOOK_EVENT_TYPES = [
   'incapacitated',
   'vehicle.destroyed',
   'insurance.claim_complete',
+  'crime.fined',
+  'injury',
+  'medbed.healed',
+  'insurance.claim_requested',
 ] as const;
 
 /** How a session ended: by a quit/disconnect, without one (crash, app closed), or not yet (the live one). */
@@ -34,6 +38,13 @@ export interface LogbookSession {
   deaths: number;
   shipsLost: number;
   claims: number;
+  /** What the session cost besides losses (#1192): fines (with their aUEC sum), injuries, medbed heals, claim requests. */
+  fines: number;
+  /** Sum of the `crime.fined` `amount` values; a missing or garbage amount counts the fine but adds nothing. */
+  fineAmount: number;
+  injuries: number;
+  medbeds: number;
+  claimRequests: number;
 }
 
 type Ev = Pick<HqLiveEventRow, 'type' | 'at' | 'data'>;
@@ -57,6 +68,11 @@ function emptySession(startedAt: string, startUnknown: boolean): LogbookSession 
     deaths: 0,
     shipsLost: 0,
     claims: 0,
+    fines: 0,
+    fineAmount: 0,
+    injuries: 0,
+    medbeds: 0,
+    claimRequests: 0,
   };
 }
 
@@ -114,6 +130,19 @@ export function groupSessions(events: readonly Ev[], gameLive: boolean): Logbook
         break;
       case 'insurance.claim_complete':
         cur.claims++;
+        break;
+      case 'crime.fined':
+        cur.fines++;
+        cur.fineAmount += Math.max(0, num(d['amount']));
+        break;
+      case 'injury':
+        cur.injuries++;
+        break;
+      case 'medbed.healed':
+        cur.medbeds++;
+        break;
+      case 'insurance.claim_requested':
+        cur.claimRequests++;
         break;
     }
   }
