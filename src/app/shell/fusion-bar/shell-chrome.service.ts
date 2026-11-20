@@ -409,4 +409,65 @@ export class ShellChromeService {
   setBarHidden(hidden: boolean): void {
     this.hiddenState.set(hidden);
   }
+
+  // ---- compact chrome: hide on scroll-down, reveal on scroll-up --------------------------------
+
+  private readonly chromeHiddenState = signal(false);
+  /** The header is scrolled away (compact only). Mirrored on <html> as `data-sc-chrome='hidden'`. */
+  readonly chromeHidden = this.chromeHiddenState.asReadonly();
+
+  setChromeHidden(hidden: boolean): void {
+    if (this.chromeHiddenState() === hidden) return;
+    this.chromeHiddenState.set(hidden);
+    if (typeof document === 'undefined') return;
+    if (hidden) document.documentElement.setAttribute('data-sc-chrome', 'hidden');
+    else document.documentElement.removeAttribute('data-sc-chrome');
+  }
+
+  /**
+   * One passive scroll listener (a frame per update, no layout read besides the cached header height).
+   * Down: after 24px of travel past the header's height the chrome goes; up: 8px bring it back. Always
+   * shown at the top, at the page end, while a menu / large popup is open or focus is inside the header.
+   * Only active in compact (`html[data-sc-compact]`) and never while a stage is immersive.
+   */
+  startChromeAutoHide(header: HTMLElement): () => void {
+    if (typeof window === 'undefined') return () => undefined;
+    const root = document.documentElement;
+    let lastY = window.scrollY;
+    let acc = 0;
+    let frame = 0;
+    const active = (): boolean => root.hasAttribute('data-sc-compact') && !root.classList.contains('sc-immersive');
+    const pinned = (): boolean =>
+      root.classList.contains('sc-popup-large-open') || header.classList.contains('menu-open') || header.contains(document.activeElement);
+    const update = (): void => {
+      frame = 0;
+      const y = window.scrollY;
+      const dy = y - lastY;
+      lastY = y;
+      if (!active() || pinned() || y <= 8 || y + window.innerHeight >= document.documentElement.scrollHeight - 4) {
+        acc = 0;
+        this.setChromeHidden(false);
+        return;
+      }
+      if (dy > 0) {
+        acc = Math.max(0, acc) + dy;
+        if (acc > 24 && y > header.offsetHeight) this.setChromeHidden(true);
+      } else if (dy < 0) {
+        acc = Math.min(0, acc) + dy;
+        if (-acc > 8) this.setChromeHidden(false);
+      }
+    };
+    const onScroll = (): void => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const onFocusIn = (): void => this.setChromeHidden(false);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    header.addEventListener('focusin', onFocusIn);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      header.removeEventListener('focusin', onFocusIn);
+      if (frame) cancelAnimationFrame(frame);
+      this.setChromeHidden(false);
+    };
+  }
 }

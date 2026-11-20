@@ -3,7 +3,12 @@ import { setRootVar } from '../../core/root-var';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
+import { AnalyticsService } from '../../core/analytics.service';
 import { BetaService } from '../../core/beta.service';
+import { ViewportModeService } from '../../core/viewport-mode';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
+import { SearchOpenService } from '../search-open.service';
 import { isPlainLeftClick } from '../../core/modified-click.util';
 import { SameRouteRefreshService } from '../../core/same-route-refresh.service';
 import { BrandLogoComponent, BrandNameComponent } from '../brand/brand.component';
@@ -40,7 +45,7 @@ export const MAIN_NAV_SLOT_PX = 112;
 @Component({
   selector: 'sc-main-header',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, BrandLogoComponent, BrandNameComponent],
+  imports: [RouterLink, TranslatePipe, BrandLogoComponent, BrandNameComponent, ScActionDirective, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     role: 'banner',
@@ -80,6 +85,13 @@ export const MAIN_NAV_SLOT_PX = 112;
 
     <!-- Top-right corner: apps + profile. Admin is not here: it lives in the account menu. -->
     <div class="account">
+      @if (compact() || barOff()) {
+        <!-- A phone on its side (or a phone page that took the bottom for itself, html[data-sc-bar-off]) has no bottom search bar: the magnifier opens the same search. -->
+        <button type="button" scAction tier="tertiary" class="mh-search" [attr.aria-label]="'chrome.search' | translate"
+                [scTooltip]="'chrome.search' | translate" scTooltipTier="label" (click)="openSearch()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
+        </button>
+      }
       <div class="acc-main"><ng-content select="[mhAccount]" /></div>
     </div>
   `,
@@ -283,13 +295,14 @@ export const MAIN_NAV_SLOT_PX = 112;
       .ind {
         position: absolute;
         bottom: 2px;
-        left: calc(var(--mh-i) * var(--mh-slot) + (var(--mh-slot) - 40px) / 2);
+        left: 0;
+        translate: calc(var(--mh-i) * var(--mh-slot) + (var(--mh-slot) - 40px) / 2) 0;
         width: 40px;
         height: 2px;
         border-radius: 2px;
         background: var(--sc-accent);
         box-shadow: 0 0 12px var(--sc-accent);
-        transition: left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s ease;
+        transition: translate var(--sc-t-base) var(--sc-e-out), background 0.2s ease;
       }
       /* Tablet: the wordmark yields to the nav. */
       @media (max-width: 1099px) {
@@ -347,10 +360,10 @@ export const MAIN_NAV_SLOT_PX = 112;
           transform: none;
         }
         .slot {
-          font-size: 12px;
+          font-size: 13px;
           letter-spacing: 0.14em;
           text-indent: 0.14em;
-          min-height: var(--sc-tap-min, 44px);
+          min-height: 48px;
           box-sizing: border-box;
         }
         /* Phone: logo and account stay on top (the route line joins them, the search flies to
@@ -360,6 +373,10 @@ export const MAIN_NAV_SLOT_PX = 112;
         .nav {
           transform: none;
         }
+        /* html[data-sc-bar-off]: the magnifier stands left of apps + avatar. */
+        .account { flex-direction: row; align-items: center; gap: var(--sc-space-1); }
+        .mh-search { width: 44px; height: 44px; min-width: 44px; min-height: 44px; pointer-events: auto; }
+        .mh-search svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
       }
       /* Narrow phones: five equal slots cannot hold "Starscape" (a slot is ~58px
          under the beta chip lane) and the wordmark ran under the account buttons.
@@ -382,7 +399,7 @@ export const MAIN_NAV_SLOT_PX = 112;
           width: auto;
           flex: 0 1 auto;
           padding-inline: 4px;
-          font-size: 11px;
+          font-size: 13px;
           letter-spacing: 0.08em;
           white-space: nowrap;
         }
@@ -393,7 +410,7 @@ export const MAIN_NAV_SLOT_PX = 112;
           content: "";
           position: absolute;
           left: 50%;
-          bottom: 2px;
+          bottom: 4px;
           width: 28px;
           height: 2px;
           border-radius: 2px;
@@ -409,10 +426,69 @@ export const MAIN_NAV_SLOT_PX = 112;
           white-space: normal;
         }
         .title {
-          font-size: 11px;
+          font-size: 12px;
           letter-spacing: 0.1em;
           line-height: 1.15;
         }
+      }
+      /* COMPACT (a phone on its side, any width): ONE row, 48px + safe area. Logo, the three areas inline,
+         search + apps + avatar at the end. The wordmark and Alpha badge are gone (the logo is the brand), the
+         header is never condensed here (the bottom bar is gone, so nothing takes over), a soft top scrim keeps
+         the areas legible over the scene. Hide on scroll-down is global (styles.scss, html[data-sc-chrome]). */
+      @media (orientation: landscape) and (max-height: 500px) {
+        :host {
+          --_p: 0;
+          box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          gap: var(--sc-space-2);
+          height: calc(48px + var(--sc-chrome-top));
+          padding-top: var(--sc-chrome-top);
+          padding-bottom: 0;
+          padding-inline: max(var(--sc-space-3), env(safe-area-inset-left, 0px)) max(var(--sc-space-3), env(safe-area-inset-right, 0px));
+          background: linear-gradient(to bottom, color-mix(in srgb, var(--sc-bg-0) 88%, transparent), transparent);
+          translate: 0 0;
+          transition: translate var(--sc-t-base) var(--sc-e-out);
+          will-change: translate;
+        }
+        :host([data-ease]) { transition: translate var(--sc-t-base) var(--sc-e-out); }
+        :host::before { display: none; }
+        .brand, .account { position: static; transform: none; flex: none; }
+        .wordmark { display: none; }
+        .logo { width: 32px; height: 32px; }
+        .row { flex: 1 1 auto; grid-column: auto; grid-row: auto; margin: 0; height: auto; min-width: 0; justify-content: center; }
+        .nav { width: auto; transform: none; justify-content: center; --mh-slot: 0px; }
+        .slot {
+          position: relative;
+          flex: 1 1 56px;
+          width: auto;
+          min-width: 56px;
+          min-height: 44px;
+          padding-inline: 14px;
+          font-size: 13px;
+          letter-spacing: 0.14em;
+          text-indent: 0.14em;
+          white-space: nowrap;
+        }
+        .slot:not(.active), .slot.active { opacity: 1; }
+        .ind { display: none !important; }
+        .slot.active::after {
+          content: '';
+          position: absolute;
+          left: 50%;
+          bottom: 4px;
+          width: 28px;
+          height: 2px;
+          border-radius: 2px;
+          translate: -50% 0;
+          background: var(--sc-accent);
+          box-shadow: 0 0 12px var(--sc-accent);
+        }
+        .brand { min-width: 44px; min-height: 44px; justify-content: center; }
+        .account { display: flex; flex-direction: row; align-items: center; gap: var(--sc-space-1); }
+        .mh-search { width: 44px; height: 44px; min-width: 44px; min-height: 44px; pointer-events: auto; }
+        .mh-search svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+        .acc-main { height: auto; }
       }
       @media (prefers-reduced-motion: reduce) {
         :host([data-ease]) {
@@ -433,7 +509,14 @@ export class MainHeaderComponent {
   private readonly chrome = inject(ShellChromeService);
   private readonly injector = inject(Injector);
   /** Condensed into the bar (progress 1, or not a main page at all): inert and invisible. */
-  readonly compressed = computed(() => this.chrome.stageSearch() === 'none' || this.chrome.dockFull());
+  readonly compressed = computed(() => !this.viewport.compact() && !this.viewport.barOff() && (this.chrome.stageSearch() === 'none' || this.chrome.dockFull()));
+  private readonly viewport = inject(ViewportModeService);
+  private readonly searchOpen = inject(SearchOpenService);
+  private readonly analytics = inject(AnalyticsService);
+  /** A phone on its side: the bar is gone, the header carries the search and is always there. */
+  protected readonly compact = this.viewport.compact;
+  /** A phone page that keeps the bottom free (ship sheet): the bar is a top overlay, this magnifier opens it. */
+  protected readonly barOff = this.viewport.barOff;
   /** A silent state jump (route change / scroll reset): transitions off for it. */
   readonly snap = this.chrome.snap;
   private readonly router = inject(Router);
@@ -497,12 +580,25 @@ export class MainHeaderComponent {
         if (frame) cancelAnimationFrame(frame);
       });
     });
+    // Compact: hide on scroll-down / reveal on scroll-up (transform only; the state is html[data-sc-chrome]).
+    afterNextRender(() => {
+      destroyRef.onDestroy(this.chrome.startChromeAutoHide(host));
+    });
+    this.router.events.pipe(takeUntilDestroyed()).subscribe((e) => {
+      if (e instanceof NavigationEnd) this.chrome.setChromeHidden(false);
+    });
     // The pinned header is out of flow: publish its height for the shell's spacer.
     afterNextRender(() => {
       if (typeof document === 'undefined') return;
-      const publish = () =>
-        setRootVar('--sc-mainhead-h', `${Math.round(host.offsetHeight)}px`);
+      const publish = () => {
+        const h = `${Math.round(host.offsetHeight)}px`;
+        setRootVar('--sc-mainhead-h', h);
+        // The visible top chrome of the page: the whole header while it stands, 0 once the bar carries it.
+        setRootVar('--sc-header-h', this.compressed() ? '0px' : h);
+      };
       publish();
+      const stopPublish = effect(() => (this.compressed(), this.compact(), publish()), { injector: this.injector });
+      destroyRef.onDestroy(() => stopPublish.destroy());
       // One frame later: the published height resizes the spacer (and the body), which a
       // write inside this callback would report again in the same frame (RO loop error).
       let frame = 0;
@@ -514,8 +610,14 @@ export class MainHeaderComponent {
       destroyRef.onDestroy(() => {
         ro?.disconnect();
         document.documentElement.style.removeProperty('--sc-mainhead-h');
+        document.documentElement.style.removeProperty('--sc-header-h');
       });
     });
+  }
+
+  openSearch(): void {
+    this.analytics.track('search:palette_open', { surface: 'palette' });
+    this.searchOpen.open();
   }
 
   onNav(ev: MouseEvent, path: string): void {

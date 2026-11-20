@@ -89,8 +89,8 @@ export const LOG_VISIBLE = 3;
       .d { grid-area: d; color: var(--sc-warning); }
       .nm { grid-area: n; min-width: 0; overflow-wrap: anywhere; }
       .meta { grid-area: m; display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 8px; min-width: 0; }
-      .pl { min-width: 0; color: var(--sc-fg-2); font-size: 0.68rem; overflow-wrap: anywhere; }
-      .at { margin-inline-start: auto; color: var(--sc-fg-2); font-size: 0.68rem; white-space: nowrap; }
+      .pl { min-width: 0; color: var(--sc-fg-2); font-size: 0.75rem; overflow-wrap: anywhere; }
+      .at { margin-inline-start: auto; color: var(--sc-fg-2); font-size: 0.75rem; white-space: nowrap; }
       .again { grid-area: b; }
       .again svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
       .foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }

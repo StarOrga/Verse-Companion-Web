@@ -11,6 +11,8 @@
  */
 
 export const STORAGE_PREFIX = 'verse-companion.';
+/** PWA install prompt state: sessions, dismissals, installed flag (short `sc.*` key, see header). */
+export const PWA_INSTALL_KEY = 'sc.pwa.install';
 /** The pre-rename prefix. Only the migration and the consent purge may name it. */
 export const LEGACY_STORAGE_PREFIX = 'sc-companion.';
 

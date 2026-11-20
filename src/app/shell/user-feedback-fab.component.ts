@@ -286,7 +286,7 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
       .fab-root {
         /* Phone inset lives on --sc-fab-inset (styles.scss) — see the admin
            launcher for why the lane has to shrink with it. */
-        bottom: calc(var(--sc-fab-inset) + env(safe-area-inset-bottom, 0px));
+        bottom: calc(var(--sc-fab-inset) + env(safe-area-inset-bottom, 0px) + var(--sc-launcher-lift, 0px));
         gap: 10px;
       }
       .panel-head { padding: 10px 14px; }

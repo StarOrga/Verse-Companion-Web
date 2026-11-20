@@ -4,6 +4,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { ReleaseNotesService } from './release-notes.service';
 import { ScDatePipe } from '../core/locale/sc-date.pipe';
 import { BetaService } from '../core/beta.service';
+import { ScSkeletonComponent } from '../shared/skeleton/skeleton.component';
 
 /** Releases rendered per batch; the next batch loads when the end scrolls near. */
 const BATCH = 5;
@@ -25,7 +26,7 @@ type KnownCategory = (typeof KNOWN_CATEGORIES)[number];
 @Component({
   selector: 'sc-release-notes',
   standalone: true,
-  imports: [ScDatePipe, TranslatePipe],
+  imports: [ScDatePipe, TranslatePipe, ScSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
@@ -38,7 +39,7 @@ type KnownCategory = (typeof KNOWN_CATEGORIES)[number];
       </header>
 
       @if (loading()) {
-        <div class="sc-card empty">{{ 'releaseNotes.loading' | translate }}</div>
+        <sc-skeleton class="rn-skel" h="112px" [lines]="4" />
       } @else if (releases().length) {
         <ol class="timeline">
           @for (r of visibleReleases(); track r.version; let i = $index) {
@@ -107,7 +108,11 @@ type KnownCategory = (typeof KNOWN_CATEGORIES)[number];
   styles: [`
     /* No .page sizing: the page runs the full frame like every other page
        (styles.scss, "PAGE FRAME"). */
-    .head { margin-bottom: 1.5rem; }
+    /* Reserved height until the list is in: the footer starts below the fold, so the late list
+       cannot push it (layout shift). */
+    :host { display: block; min-height: 100vh; min-height: 100dvh; }
+    .head { margin-bottom: 1.5rem; min-height: 4.5rem; }
+    .release { content-visibility: auto; contain-intrinsic-size: auto 160px; }
     .head h1 {
       font-family: var(--sc-font-display); letter-spacing: 0.06em;
       text-transform: uppercase; margin: 0 0 0.35rem;

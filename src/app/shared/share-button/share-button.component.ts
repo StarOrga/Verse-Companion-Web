@@ -3,8 +3,12 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, injec
 import { TranslatePipe } from '@ngx-translate/core';
 import { BetaService } from '../../core/beta.service';
 import { claimRootAttr } from '../../core/root-var';
+import { ViewportModeService } from '../../core/viewport-mode';
 import { PageCornerService } from '../../shell/corners/page-corner.service';
 import { ScTooltipDirective } from '../tooltip/sc-tooltip.directive';
+
+/** The share glyph as stroked path data (24x24), for the Tools dial entry. */
+const SHARE_ICON = 'M18 2a3 3 0 1 1 0 6a3 3 0 1 1 0-6M6 9a3 3 0 1 1 0 6a3 3 0 1 1 0-6M18 16a3 3 0 1 1 0 6a3 3 0 1 1 0-6M8.6 13.5l6.8 4M15.4 6.5l-6.8 4';
 
 /** The reading line: headings above it count as "the section the reader is in". */
 const READING_LINE_PX = 140;
@@ -44,10 +48,11 @@ export function shareUrl(loc: Pick<Location, 'origin' | 'pathname' | 'search'>, 
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (enabled()) {
-      <div class="dock" [class.beside]="!shell()">
+      <div class="dock" [class.beside]="!shell()" [class.in-dial]="inDial()">
         @if (toast(); as t) {
           <span class="toast" role="status">{{ t | translate }}</span>
         }
+        @if (!inDial()) {
         <button type="button" class="fab" (click)="share($event)" [attr.aria-label]="'share.label' | translate"
                 [attr.aria-haspopup]="page()?.open ? 'dialog' : null" [attr.aria-expanded]="page()?.open ? !!page()?.expanded?.() : null"
                 [scTooltip]="'share.label' | translate" scTooltipTier="label">
@@ -57,6 +62,7 @@ export function shareUrl(loc: Pick<Location, 'origin' | 'pathname' | 'search'>, 
             <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" />
           </svg>
         </button>
+        }
       </div>
     }
   `,
@@ -81,6 +87,13 @@ export function shareUrl(loc: Pick<Location, 'origin' | 'pathname' | 'search'>, 
         bottom: calc(var(--sc-bar-stack-h, 0px) + var(--sc-float-bottom, 16px) + var(--sc-space-3));
       }
     }
+    /* Phone / landscape phone: the button lives in the shell's Tools dial; only the status toast
+       still shows here, above the dial's lane. */
+    .dock.in-dial {
+      inset-inline-end: var(--sc-fab-inset, 16px);
+      bottom: calc(var(--sc-dial-bottom, var(--sc-float-bottom, 16px)) + var(--sc-fab-mini, 44px) + var(--sc-space-2, 8px));
+      pointer-events: none;
+    }
     .fab {
       display: inline-grid; place-items: center; width: max(44px, var(--sc-tap-min)); height: max(44px, var(--sc-tap-min));
       border-radius: 50%; border: 1px solid var(--sc-border); background: var(--sc-bg-1); color: var(--sc-fg-1);
@@ -101,6 +114,9 @@ export class ShareButtonComponent {
   protected readonly page = this.corner.share;
   /** Beta shell everywhere; without it wherever a page registered its share (ship pages, C9/F5). */
   readonly enabled = computed(() => this.shell() || !!this.page());
+  private readonly viewport = inject(ViewportModeService);
+  /** Phone or landscape phone: the share action is an entry of the shell's Tools dial, not an own FAB. */
+  protected readonly inDial = computed(() => this.enabled() && (this.viewport.phone() || this.viewport.compact() || this.viewport.tablet()));
 
   /** Title handed to the native share sheet. */
   readonly shareTitle = input<string>('');
@@ -109,8 +125,16 @@ export class ShareButtonComponent {
 
   constructor() {
     // The footer makes room for the dock: html[data-sc-share-dock], never html:has(sc-share-button .dock).
-    effect(() => claimRootAttr('data-sc-share-dock', this, this.enabled() ? '' : null));
+    effect(() => claimRootAttr('data-sc-share-dock', this, this.enabled() && !this.inDial() ? '' : null));
+    let unregister: (() => void) | null = null;
+    effect(() => {
+      unregister?.();
+      unregister = this.inDial()
+        ? this.corner.register('share', { icon: SHARE_ICON, labelKey: 'share.label', run: () => void this.share(), order: 60 })
+        : null;
+    });
     this.destroyRef.onDestroy(() => {
+      unregister?.();
       claimRootAttr('data-sc-share-dock', this, null);
       if (this.timer) clearTimeout(this.timer);
     });
@@ -119,7 +143,10 @@ export class ShareButtonComponent {
   async share(ev?: Event): Promise<void> {
     const page = this.corner.share();
     if (page?.open) {
-      page.open((ev?.currentTarget as HTMLElement | null) ?? (this.doc.querySelector('sc-share-button .fab') as HTMLElement));
+      // From the dial there is no event: the dial entry that was just pressed holds the focus.
+      const trigger = (ev?.currentTarget as HTMLElement | null) ?? (this.doc.querySelector('sc-share-button .fab') as HTMLElement | null)
+        ?? (this.doc.activeElement as HTMLElement | null) ?? this.doc.body;
+      page.open(trigger);
       return;
     }
     const url = page ? page.url() : shareUrl(this.doc.location, currentAnchor(this.doc));

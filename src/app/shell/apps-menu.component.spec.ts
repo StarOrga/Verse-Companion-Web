@@ -6,6 +6,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { RoleService } from '../auth/role.service';
 import { DesktopCapabilityService } from '../core/desktop-capability.service';
 import { DesktopReleaseService } from '../desktop/desktop-release.service';
+import { PwaInstallService } from '../core/pwa/pwa-install.service';
 import { HeaderPopoutService } from './header-popout.service';
 import { AppsMenuComponent, formatAppSize } from './apps-menu.component';
 
@@ -70,6 +71,21 @@ describe('AppsMenuComponent', () => {
     canInstall.set(false);
     fixture.detectChanges();
     expect(el().querySelector('.trigger')).toBeNull();
+  });
+
+  it('offers "install app" without desktop apps once the browser can install the PWA, and routes it to the service', async () => {
+    setup('viewer');
+    canInstall.set(false);
+    const pwa = TestBed.inject(PwaInstallService);
+    const spy = vi.spyOn(pwa, 'manualInstall').mockImplementation(() => undefined);
+    pwa.canInstall.set(true);
+    fixture.detectChanges();
+    await openMenu();
+    expect(el().querySelectorAll('.pop a.entry').length).toBe(0);
+    const btn = el().querySelector<HTMLButtonElement>('.pop button.pwa-entry');
+    expect(btn).not.toBeNull();
+    btn!.click();
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 
   for (const r of ['viewer', 'anon']) {

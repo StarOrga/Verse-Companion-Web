@@ -86,7 +86,20 @@ sc-verse-header {
   .vh-actions > :last-child { padding-inline-end: 0; }
   .vh-actions > * + * { border-left: 1px solid color-mix(in srgb, var(--sc-accent) 16%, transparent); }
 
+  // Phones: the head copy sits on a scrim, not bare on the planet art behind it (contrast >= 4.5:1).
+  // The scrim is a pseudo element (paints only, no layout) bleeding to the page gutter.
+  @media (max-width: 720px), (orientation: landscape) and (max-height: 500px) {
+    .vh-row { position: relative; isolation: isolate; }
+    .vh-row::before {
+      content: ''; position: absolute; z-index: -1; pointer-events: none;
+      inset: 0 calc(-1 * var(--sc-page-gutter, 16px));
+      background: linear-gradient(to top, color-mix(in srgb, var(--sc-bg-0) 90%, transparent), color-mix(in srgb, var(--sc-bg-0) 62%, transparent));
+    }
+    .vh-sub { color: var(--sc-fg-0); text-shadow: none; }
+  }
   @media (max-width: 720px) {
+    // The head starts a step below the header's edge: the h1 never prints under the nav.
+    padding-top: var(--sc-space-3, 12px);
     .vh-row { flex-wrap: wrap; padding-top: 12px; }
     .vh-line { flex-basis: calc(100% - var(--vh-emblem) - 18px); flex-direction: column; align-items: flex-start; }
     .vh-actions { flex-basis: 100%; }

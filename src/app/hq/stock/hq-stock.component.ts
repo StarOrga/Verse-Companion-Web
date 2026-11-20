@@ -569,7 +569,7 @@ type Cell = { kind: 'add' } | { kind: 'ship'; ship: HangarShip } | { kind: 'bp';
       .bay { flex: 1 1 0; min-width: calc(3ch + 22px); display: flex; flex-direction: column; justify-content: center; padding: 4px 10px; border: 1px solid var(--sc-border); border-radius: 6px; color: var(--sc-fg); font: inherit; text-align: start; cursor: pointer;
         background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--sc-accent) 4%, transparent) 0 10px, transparent 10px 20px), var(--sc-bg-0); }
       .bay b { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .bay small { color: var(--sc-fg-2); font-size: 0.66rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .bay small { color: var(--sc-fg-2); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .bay[aria-pressed='true'] { border-color: var(--sc-accent); box-shadow: inset 0 0 0 1px var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
       .deck { display: flex; flex-direction: column; gap: 8px; }
       .lane { display: flex; gap: 10px; padding: 8px 10px; border: 1px solid var(--sc-border); border-radius: 10px; background: linear-gradient(180deg, color-mix(in srgb, var(--sc-bg-0) 40%, transparent), color-mix(in srgb, var(--sc-bg-0) 80%, transparent)); }
@@ -579,7 +579,7 @@ type Cell = { kind: 'add' } | { kind: 'ship'; ship: HangarShip } | { kind: 'bp';
       /* #337: every container is one size (CRATE_W × CRATE_H − GAP), long content clamps inside it instead of growing it. */
       sc-hq-crate { flex: 0 0 auto; width: 150px; height: 104px; }
       .set, .pad, .lock { display: flex; flex-direction: column; gap: 2px; width: 150px; min-height: 56px; padding: 8px 10px; border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-bg-1); color: var(--sc-fg); font: inherit; font-size: 0.75rem; text-align: start; text-decoration: none; }
-      .set small, .pad small, .lock small { color: var(--sc-fg-2); font-size: 0.66rem; }
+      .set small, .pad small, .lock small { color: var(--sc-fg-2); font-size: 0.75rem; }
       .set:hover, .pad:hover, .lock:hover { border-color: var(--sc-accent); }
       .set.add { justify-content: center; border-style: dashed; color: var(--sc-accent); cursor: pointer; }
       .pad { background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--sc-warning) 5%, transparent) 0 8px, transparent 8px 16px), var(--sc-bg-1); }
@@ -594,7 +594,7 @@ type Cell = { kind: 'add' } | { kind: 'ship'; ship: HangarShip } | { kind: 'bp';
       .band .bar.hit { background: var(--sc-accent); }
       .band .rh { position: absolute; inset: auto 0 0; height: var(--r); background: repeating-linear-gradient(135deg, transparent 0 5px, rgb(0 0 0 / .45) 5px 8px); border-top: 1.5px dashed var(--sc-bg-0); }
       .band.unk .bar { background: var(--sc-border); }
-      .band small { color: var(--sc-fg-2); font-size: 0.62rem; white-space: nowrap; }
+      .band small { color: var(--sc-fg-2); font-size: 0.75rem; white-space: nowrap; }
       .stacks { display: flex; flex-wrap: wrap; gap: 8px; }
       .ghost, .tiers { display: grid; gap: 6px; padding: 10px; border: 1px dashed var(--sc-border); border-radius: 10px; }
       .ghost h3, .tiers h3 { margin: 0; font-size: 0.85rem; }
