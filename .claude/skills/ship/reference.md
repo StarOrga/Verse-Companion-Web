@@ -54,3 +54,25 @@ Notes:
 - This marker covers the **web app only**. Starscape/data-uploader versions are
   DB-driven (`desktop_releases`/`desktop_channels`); uploader ships follow
   rule 6 of the project ship SKILL extension instead.
+
+## Version files
+
+The bump writes `package.json`, `README.md` and `CHANGELOG.md` by itself, but not
+`package-lock.json`: its two version fields (the file's own and the root package's
+under `packages[""]`) only moved when someone ran `npm install`, and stood at
+0.279.2 while the app was at 0.285.1. Pass this list to `ship_run` as
+`versionFiles` on every ship: the bump then writes both fields and the preflight's
+`version-consistent` check fails when they lag. Patterns, not `key`: a key entry
+rewrites the whole lockfile through `JSON.stringify`.
+
+```yaml
+versionFiles:
+  - path: package-lock.json
+    pattern: '^\{\s*"name": "verse-companion",\s*"version": "([^"]+)"'
+  - path: package-lock.json
+    pattern: '"": \{\s*"name": "verse-companion",\s*"version": "([^"]+)"'
+```
+
+A preflight that reports `Version mismatch: package-lock.json` means a ship went out
+without this list: set both fields to `package.json`'s version in the work commit
+(no `npm install` needed, nothing else in the lockfile depends on it) and ship again.
