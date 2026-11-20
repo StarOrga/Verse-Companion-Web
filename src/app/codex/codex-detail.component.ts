@@ -830,7 +830,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                holotable as the shell's stage (head band and tab pill are the shared components inside it). -->
           <sc-codex-detail-shell class="ship-shell" animate.enter="view-in" [profile]="shipProfile" activeTab="einordnung">
           <sc-codex-holo-stage shellStage (viewChange)="onStageViewChange()"
-            [holding]="holdStage()"
+            [holding]="holdDim()"
             [detail]="detail()!"
             [displayName]="displayName()"
             [manufacturerName]="manufacturerName()"
@@ -2039,6 +2039,8 @@ export class CodexDetailComponent implements OnInit {
   /** A ship-to-ship switch inside the Holotable: the stage that is up stays mounted (dimmed) while the next ship loads, instead of
    * the whole page falling back to the first-visit skeleton. Cleared when that load ends. */
   readonly holdStage = signal(false);
+  /** The held stage is dimmed until the next ship's head and values are in (lifted before the late, best-effort reads finish). */
+  readonly holdDim = signal(false);
   /** Where the energy dock says it sits (null until it restored its state). */
   readonly dockPlacement = signal<{ position: DockPosition; slot: number } | null>(null);
   /** The dock lives in the Analyse column — at `slot`, or at any slot when omitted. */
@@ -3315,6 +3317,7 @@ export class CodexDetailComponent implements OnInit {
     this.closeHero3d();
     const hold = kind === 'ship' && this.holoStageOn() && this.detail()?.kind === 'ship';
     this.holdStage.set(hold);
+    this.holdDim.set(hold);
     this.loading.set(true);
     this.error.set(null);
     // A switch keeps the shown ship's values (dimmed) until the next one arrives; a first visit starts empty.
@@ -3341,12 +3344,17 @@ export class CodexDetailComponent implements OnInit {
       if (d) {
         // D7: every opened page counts as "Zuletzt geoeffnet", not only those opened from the search.
         noteOpenedPage({ kind: d.kind, className: d.classNameSlug, title: this.displayName(), manufacturerCode: (d.row['manufacturer_code'] as string | null) ?? null });
+        // The variant tabs belong to the head band: read alongside the rest so they are in when the dim lifts,
+        // not a band's height later (the stage would sit low and clip its bottom row for a moment).
+        const groups = [this.loadSkinGroup(kind, d.classNameSlug), kind === 'ship' ? this.loadEditionGroup(kind, d.classNameSlug) : undefined];
         await Promise.all([
           this.resolveLoadoutEntities(d, seq),
           this.resolveLocale(d, seq),
           this.resolveShipTech(d, seq),
+          ...groups.map((g) => Promise.resolve(g).catch(() => undefined)),
         ]);
         if (seq !== this.loadSeq) return;
+        this.holdDim.set(false);
         // The stage waits (briefly) for its hull rather than entering on an empty table.
         if (kind === 'ship') await Promise.race([silEarly, new Promise<void>((r) => setTimeout(r, SILHOUETTE_HOLD_MS))]);
         if (seq !== this.loadSeq) return;
@@ -3358,8 +3366,6 @@ export class CodexDetailComponent implements OnInit {
           void this.applyLoadoutSource(d.classNameSlug, seq);
         }
         if (kind === 'item' || kind === 'weapon' || kind === 'ship') void this.loadWhereToBuy(d);
-        void this.loadSkinGroup(kind, d.classNameSlug);
-        if (kind === 'ship') void this.loadEditionGroup(kind, d.classNameSlug);
         // Ships are not crafting ingredients; skip the reverse lookup for them.
         if (kind !== 'ship') void this.loadUsedInBlueprints(d.classNameSlug, seq);
         if (kind !== 'ship') void this.loadItemChanges(d, seq);
@@ -3402,6 +3408,7 @@ export class CodexDetailComponent implements OnInit {
     } finally {
       if (seq === this.loadSeq) {
         this.holdStage.set(false);
+        this.holdDim.set(false);
         this.loading.set(false);
       }
     }
