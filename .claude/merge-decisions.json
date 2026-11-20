@@ -1929,6 +1929,21 @@
         "hunks": [
           "b413000b5dfb"
         ]
+      },
+      {
+        "ship": "#1209",
+        "by": "Jerry",
+        "value": "0.283.1"
+      },
+      {
+        "ship": "claude/batch-0c7514",
+        "by": "JerryT2T",
+        "value": "0.283.3 (this release supersedes 0.283.1)",
+        "decided": true,
+        "at": "2026-11-20T10:13:31.112Z",
+        "hunks": [
+          "e500e2a4cd6d"
+        ]
       }
     ],
     "public/release-notes.json›root›current": [
