@@ -5,6 +5,11 @@ import {
   canCancel,
   glossarySearchFilter,
   jobErrorKey,
+  langNeeds,
+  parseLangSelection,
+  sanitizeLangSelection,
+  sumCardStats,
+  toggleLang,
   jobNotes,
   jobProgress,
   judgeScore,
@@ -127,5 +132,41 @@ describe('translations.logic', () => {
       .toEqual({ target_term: 'Alt', category: 'term', origin: 'ai', locked: false, needs_retranslate: true });
     expect(revertPatch(null)).toBeNull();
     expect(revertPatch({ id: 'x' })).toBeNull();
+  });
+
+  it('parses a saved card language choice and rejects garbage', () => {
+    expect(parseLangSelection(null)).toEqual([]);
+    expect(parseLangSelection('not json')).toEqual([]);
+    expect(parseLangSelection('{"de":1}')).toEqual([]);
+    expect(parseLangSelection('["fr"," de ","fr",3,""]')).toEqual(['de', 'fr']);
+  });
+
+  it('toggles card languages and keeps them sorted', () => {
+    expect(toggleLang([], 'fr')).toEqual(['fr']);
+    expect(toggleLang(['fr'], 'de')).toEqual(['de', 'fr']);
+    expect(toggleLang(['de', 'fr'], 'de')).toEqual(['fr']);
+  });
+
+  it('drops unknown languages only once the language list is known', () => {
+    expect(sanitizeLangSelection(['de', 'xx'], [])).toEqual(['de', 'xx']);
+    expect(sanitizeLangSelection(['de', 'xx'], ['de', 'fr'])).toEqual(['de']);
+  });
+
+  it('orders the language overview by pending cards, unknown counts last', () => {
+    const counts = new Map([['de', 2], ['fr', 7], ['es', 0]]);
+    expect(langNeeds(['de', 'es', 'fr', 'it', 'de'], counts)).toEqual([
+      { lang: 'fr', open: 7 },
+      { lang: 'de', open: 2 },
+      { lang: 'es', open: 0 },
+      { lang: 'it', open: null },
+    ]);
+  });
+
+  it('sums the card header over several languages, the streak stays per person', () => {
+    expect(sumCardStats([])).toEqual({ open_count: 0, answered_today: 0, streak_days: 0 });
+    expect(sumCardStats([
+      { open_count: 3, answered_today: 1, streak_days: 5 },
+      { open_count: 4, answered_today: 2, streak_days: 5 },
+    ])).toEqual({ open_count: 7, answered_today: 3, streak_days: 5 });
   });
 });

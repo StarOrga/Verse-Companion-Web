@@ -390,6 +390,20 @@ import { avatarUrlOf } from './avatar-url';
                   <span class="sc-sr-only">{{ 'nav.adminOnly' | translate }}</span>
                 </a>
               }
+              @if (roles.role() === 'collaborator') {
+                <!-- The collaborator space (admin feedback #387): only the AI translation
+                     cards for now. Copper = admin + collaborator surface; admins reach the
+                     cards through their own Admin space. -->
+                <hr class="menu-sep" role="separator" />
+                <a
+                  class="dropdown-item collab"
+                  role="menuitem"
+                  routerLink="/collab/translations"
+                  (click)="onMenuNavigate($event)">
+                  <span class="di-label">{{ 'nav.collabMenu' | translate }}</span>
+                  <span class="sc-sr-only">{{ 'nav.viewAs.restricted' | translate }}</span>
+                </a>
+              }
 
               @if (imp.targets().length > 0 && !imp.active()) {
                 <!-- "View as" (client-side, downgrade-only preview — see

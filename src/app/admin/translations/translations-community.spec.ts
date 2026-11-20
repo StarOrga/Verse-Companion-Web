@@ -9,7 +9,7 @@ import { TranslationCardsComponent } from './translation-cards.component';
 import { TranslationOutreachComponent } from './translation-outreach.component';
 import { TranslationSourcesComponent } from './translation-sources.component';
 import { TranslationsService } from './translations.service';
-import { canImportSource, contextLines, goalPercent, passProgress } from './translations.logic';
+import { CARD_LANGS_KEY, canImportSource, contextLines, goalPercent, passProgress } from './translations.logic';
 
 type Answer = (c: FakeCall) => FakeResult | Promise<FakeResult>;
 
@@ -157,6 +157,71 @@ describe('TranslationCardsComponent', () => {
     await fixture.componentInstance.skip();
     expect(fake.calls.some((c) => c.target === 'skip_translation_card')).toBe(true);
     expect(fixture.componentInstance.queue().map((x) => x.id)).toEqual(['c2', 'c1']);
+  });
+
+  it('shows the pending count per language and serves only cards of the chosen languages', async () => {
+    localStorage.removeItem(CARD_LANGS_KEY);
+    try {
+      const { fake } = setup((c) => {
+        if (c.target === 'translation_card_stats') {
+          const lang = (c.args as { p_lang: string | null } | undefined)?.p_lang;
+          const open = lang === 'fr' ? 7 : lang === 'de' ? 2 : lang === 'es' ? 0 : 9;
+          return { data: [{ open_count: open, answered_today: lang ? 1 : 3, streak_days: 4 }] };
+        }
+        return base([card('c1')])(c);
+      });
+      const fixture = TestBed.createComponent(TranslationCardsComponent);
+      fixture.componentRef.setInput('languages', [
+        { lang: 'de', cig_folder: 'german_(germany)', approved: true },
+        { lang: 'es', cig_folder: 'spanish_(spain)', approved: true },
+        { lang: 'fr', cig_folder: 'french_(france)', approved: true },
+      ]);
+      fixture.detectChanges();
+      await settle(fixture);
+      const cmp = fixture.componentInstance;
+      const el: HTMLElement = fixture.nativeElement;
+
+      expect(cmp.needs()).toEqual([
+        { lang: 'fr', open: 7 },
+        { lang: 'de', open: 2 },
+        { lang: 'es', open: 0 },
+      ]);
+      expect(el.querySelectorAll('[data-test=lang-chip]').length).toBe(3);
+
+      fake.calls.length = 0;
+      cmp.toggle('fr');
+      cmp.toggle('de');
+      await settle(fixture);
+      const lists = fake.calls.filter((c) => c.target === 'translation_cards');
+      const last = lists[lists.length - 1];
+      expect(last.chain).toContainEqual(['in', ['lang', ['de', 'fr']]]);
+      expect(cmp.stats()).toEqual({ open_count: 9, answered_today: 2, streak_days: 4 });
+      expect(JSON.parse(localStorage.getItem(CARD_LANGS_KEY)!)).toEqual(['de', 'fr']);
+
+      cmp.clearLangs();
+      await settle(fixture);
+      const all = fake.calls.filter((c) => c.target === 'translation_cards');
+      expect(all[all.length - 1].chain.some(([m, a]) => m === 'in' && (a as unknown[])[0] === 'lang')).toBe(false);
+      expect(JSON.parse(localStorage.getItem(CARD_LANGS_KEY)!)).toEqual([]);
+    } finally {
+      localStorage.removeItem(CARD_LANGS_KEY);
+    }
+  });
+
+  it('starts with the saved language choice and drops languages that no longer exist', async () => {
+    localStorage.setItem(CARD_LANGS_KEY, JSON.stringify(['de', 'xx']));
+    try {
+      const { fake } = setup(base([card('c1')]));
+      const fixture = TestBed.createComponent(TranslationCardsComponent);
+      fixture.componentRef.setInput('languages', [{ lang: 'de', cig_folder: 'german_(germany)', approved: true }]);
+      fixture.detectChanges();
+      await settle(fixture);
+      expect(fixture.componentInstance.selected()).toEqual(['de']);
+      const lists = fake.calls.filter((c) => c.target === 'translation_cards');
+      expect(lists[lists.length - 1].chain).toContainEqual(['in', ['lang', ['de']]]);
+    } finally {
+      localStorage.removeItem(CARD_LANGS_KEY);
+    }
   });
 
   it('shows the positive empty state for an empty queue and an error state with retry on failure', async () => {
