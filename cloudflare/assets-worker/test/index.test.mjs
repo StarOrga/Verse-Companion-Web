@@ -207,7 +207,7 @@ describe('fetch', () => {
     };
     const miss = await worker.fetch(new Request(`https://w.dev/${dir}/mgaq1z2k/facets.json`), env());
     assert.equal(miss.status, 404);
-    for (const name of ['ship', 'ship-rank', 'weapon', 'component', 'item', 'ammunition', 'manufacturer', 'blueprint', 'facets', 'missile', 'weapon-rank', 'component-rank', 'names-de']) {
+    for (const name of ['ship', 'ship-rank', 'weapon', 'component', 'item', 'ammunition', 'manufacturer', 'blueprint', 'facets', 'missile', 'weapon-rank', 'component-rank', 'names-de', 'rank-parts']) {
       assert.equal(keyFor(`/${dir}/mgaq1z2k/${name}.json`), `${dir}/mgaq1z2k/${name}.json`);
     }
   });
@@ -220,7 +220,7 @@ describe('fetch', () => {
     assert.equal(keyFor(`/${dir}/ship.json`), null);
     assert.equal(keyFor(`/${dir}/mgaq1z2k/ship-rankx.json`), null);
     assert.equal(keyFor(`/${dir}/mgaq1z2k/ship-.json`), null);
-    for (const bad of ['missilex', 'xmissile', 'names-en', 'names-de-x', 'names', 'weapon-rankx', 'component-ranks', 'weapon-ranks', 'rank']) {
+    for (const bad of ['missilex', 'xmissile', 'names-en', 'names-de-x', 'names', 'weapon-rankx', 'component-ranks', 'weapon-ranks', 'rank', 'rank-partsx', 'rank-part', 'xrank-parts']) {
       assert.equal(keyFor(`/${dir}/mgaq1z2k/${bad}.json`), null, bad);
     }
     assert.equal(keyFor(`/${dir}/mgaq1z2k/ship.json.bak`), null);

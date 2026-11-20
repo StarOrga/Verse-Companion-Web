@@ -4,7 +4,7 @@ Public read path for the Cloudflare R2 bucket `sc-companion-assets`. Today it
 serves the ship hulls and livery icons (`ship-skins/<ship>/<skin>.glb|webp`),
 the codex localization shards (`codex-locale/<build>/...`) and the codex catalog
 lists (`codex-lists/<build>/index.json`, `codex-lists/<build>/<gen>/<name>.json` with name one of ship, ship-rank, weapon,
-component, item, ammunition, manufacturer, blueprint, facets, missile, weapon-rank, component-rank, names-de;
+component, item, ammunition, manufacturer, blueprint, facets, missile, weapon-rank, component-rank, names-de, rank-parts;
 R2 only, a miss is a plain 404) and the codex silhouette shards (`codex-silhouettes/<build>/index.json`,
 `codex-silhouettes/<build>/<gen>/<kind>/names.json` and `.../<kind>/<n>.json` with kind one of ship, weapon,
 component, item, armor; R2 only, the publisher's `<gen>/plan.json` is not served).

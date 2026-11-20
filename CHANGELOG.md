@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ingest-catalog` op `silhouettes_publish` and `scripts/codex-silhouettes-to-r2.mjs`: publish a build's silhouettes as shard files to R2 in small steps; runs by itself after `finalize`.
 - Assets Worker serves `codex-silhouettes/` (index short-cached, shards immutable).
 
+## [0.284.2] - 2026-11-20
+
+### Changed
+- Codex: the "Einordnung" ranking on a ship page reads the parts of the fleet's stock loadouts from one file per build instead of the database. The first ship page of a build sends 112 fewer database reads (26 MB); the ranking shows the same values.
+
 ## [0.284.1] - 2026-11-20
 
 ### Fixed
