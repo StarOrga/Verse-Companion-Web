@@ -332,13 +332,17 @@ export class TranslationsService {
 
   // ── community seed: cards, sources, outreach, alerts ───────────────────────
 
-  /** Contract queue order; `status` ascending puts 'open' before 'skipped'. */
-  async cardQueue(lang: string | null, limit = 50): Promise<TranslationCard[]> {
+  /**
+   * Contract queue order; `status` ascending puts 'open' before 'skipped'.
+   * `lang`: one code, a list of codes (only cards of those languages) or null / [] for all.
+   */
+  async cardQueue(lang: string | readonly string[] | null, limit = 50): Promise<TranslationCard[]> {
     let b = this.sb.client
       .from('translation_cards')
       .select('id,lang,kind,question,option_a,option_b,context,spread,reach,doubt,fresh,status,answer,impact,points')
       .in('status', ['open', 'skipped']);
-    if (lang) b = b.eq('lang', lang);
+    if (typeof lang === 'string') b = b.eq('lang', lang);
+    else if (lang && lang.length > 0) b = b.in('lang', [...lang]);
     const data = await this.rows<TranslationCard[]>(
       b
         .order('status', { ascending: true })

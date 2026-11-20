@@ -230,7 +230,8 @@
     "translations": "KI-Übersetzung",
     "social": "Social",
     "accountMenuRequests": "Konto-Menü, {{count}} offene Freundschaftsanfragen",
-    "socialRequests": "Social, {{count}} offene Freundschaftsanfragen"
+    "socialRequests": "Social, {{count}} offene Freundschaftsanfragen",
+    "collabMenu": "Collaborator"
   },
   "impersonation": {
     "banner": {
@@ -1030,7 +1031,6 @@
         "resetView": "Ansicht zurücksetzen",
         "viewHull": "Hülle",
         "viewSchema": "Schema",
-        "view3d": "3D",
         "statsAria": "Schiffswerte",
         "statsClose": "Werte schließen",
         "sheetHandle": "Wertblatt",
@@ -4513,7 +4513,12 @@
       "cards": {
         "title": "Karteikarten",
         "intro": "Nur wenn die KI nicht weiterkommt: eine Frage, eine Antwort. Die wichtigsten Karten stehen vorn.",
-        "lang": "Sprache",
+        "needsTitle": "Wo Hilfe gebraucht wird",
+        "allLangs": "Alle Sprachen",
+        "langChip": "{{lang}}: {{count}} offene Karten",
+        "langChipUnknown": "{{lang}}: Anzahl nicht verfügbar",
+        "needsHint": "Wähle die Sprachen, die du sprichst – dann kommen nur Karten in diesen Sprachen.",
+        "needsFiltered": "Nur Karten der gewählten Sprachen. Ein weiterer Klick nimmt eine Sprache wieder heraus.",
         "goal": "Tagesziel: {{done}} von {{goal}} Karten",
         "goalLabel": "Fortschritt zum Tagesziel",
         "streak": "Serie: {{days}} Tage",
@@ -9311,6 +9316,12 @@
       "step3": "Tippe oben rechts auf „Hinzufügen“.",
       "addLabel": "Hinzufügen",
       "done": "Verstanden"
+    }
+  },
+  "collab": {
+    "eyebrow": "Collaborator",
+    "translations": {
+      "subtitle": "Hilf der KI-Übersetzung: Karteikarten in den Sprachen, die du sprichst."
     }
   }
 }
