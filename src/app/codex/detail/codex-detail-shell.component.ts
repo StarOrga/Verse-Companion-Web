@@ -83,6 +83,14 @@ export interface DetailTabItem<T extends string = string> {
       @container dt-tabs (max-width: 340px) {
         .dt-tab { letter-spacing: 0.02em; font-size: 0.68rem; }
       }
+      /* Under 300 px (a phone on its side, the panel is ~250 px) the three labels cannot share equal columns without ellipsis:
+         the tabs become a snap row at their own width, 12 px floor, the active one filled (the same as on a phone). */
+      @container dt-tabs (max-width: 299px) {
+        .dt-tabs { grid-auto-columns: max-content; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+        .dt-pill { display: none; }
+        .dt-tab { letter-spacing: 0.04em; font-size: max(12px, var(--sc-fs-floor, 12px)); padding: 0 12px; scroll-snap-align: center; min-height: max(36px, var(--sc-tap-min, 0px)); }
+        .dt-tab.on { background: color-mix(in srgb, var(--sc-accent) 22%, transparent); }
+      }
       /* Narrow: the tabs scroll at their own width, so the pill gives way to a fill on the active tab. */
       @media (max-width: 640px) {
         .dt-tabs { grid-auto-columns: max-content; overflow-x: auto; scrollbar-width: none; }
@@ -284,6 +292,22 @@ export class CodexDetailPanelComponent<T extends string = DetailTabId> {
         :host-context([data-layout]) { --holo-strip-lift: calc(var(--sc-float-bottom) + var(--sc-bar-h)); }
         :host([data-stage='holo']) .sh-grid { gap: 10px; }
         .mobile-off { display: none; }
+      }
+      /* A phone on its side: two panes. The table (stage slot) with the views row under it takes the left ~60 %,
+         the panel the right ~40 % as its own scroller; the body ends at the screen's bottom edge. */
+      @media (orientation: landscape) and (max-height: 500px) {
+        :host([data-stage='holo']) .sh-grid { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); grid-template-rows: minmax(0, 1fr) auto;
+          column-gap: 12px; row-gap: 6px; align-items: stretch; min-height: 0;
+          height: calc(100dvh - 56px); height: calc(100dvh - var(--holo-top, 113px) + var(--holo-views-h, 58px) + 6px); }
+        :host([data-stage='holo']) .holo-panel { grid-column: 2; grid-row: 1 / span 2; height: 100%; max-height: 100%; min-height: 0;
+          overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; align-self: stretch; }
+      }
+      /* A tablet on its side: the table gets the height the first screen leaves above the strip (the views row one
+         scroll away), the panel stays beside it as its own sticky scroller. */
+      @media (min-width: 1001px) and (pointer: coarse) and (orientation: landscape) {
+        :host([data-stage='holo']) .sh-grid { grid-template-rows: calc(100dvh - var(--holo-top, 170px) - var(--holo-strip-h, 82px) + 12px) auto; height: auto; min-height: 0; }
+        :host([data-stage='holo']) .holo-panel { grid-column: 2; grid-row: 1 / span 2; position: sticky; top: calc(var(--sc-header-h, 56px) + 8px); align-self: start; height: auto;
+          max-height: calc(100dvh - var(--sc-header-h, 56px) - var(--holo-strip-h, 82px) - 16px); overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
       }
     `,
   ],

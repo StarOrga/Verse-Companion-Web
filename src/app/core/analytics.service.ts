@@ -54,6 +54,28 @@ export function remoteConfigHasNoFlags(result: unknown): boolean {
   return !!r && r.ok !== false && r.config?.hasFeatureFlags === false;
 }
 
+const trackedListeners = new Set<(event: string) => void>();
+
+/**
+ * Local-only tap on `track()` (runs before the consent check, sends nothing anywhere): lets a feature
+ * react to "the user just did something" - e.g. the PWA install prompt waiting for a calm moment after
+ * a success. Returns the unsubscribe function.
+ */
+export function onTrackedEvent(listener: (event: string) => void): () => void {
+  trackedListeners.add(listener);
+  return () => trackedListeners.delete(listener);
+}
+
+function notifyTracked(event: string): void {
+  for (const l of trackedListeners) {
+    try {
+      l(event);
+    } catch {
+      /* a listener never breaks tracking */
+    }
+  }
+}
+
 @Injectable({ providedIn: 'root' })
 export class AnalyticsService {
   private readonly consent = inject(ConsentService);
@@ -123,6 +145,8 @@ export class AnalyticsService {
    */
   track<E extends EventName>(event: E, ...args: TrackArgs<E>): void {
     const props = args[0] as EventProps[E] | undefined;
+    // Local listeners first: they work without statistics consent and nothing leaves the device.
+    notifyTracked(event);
     this.capture(event, props as Record<string, unknown> | undefined);
   }
 

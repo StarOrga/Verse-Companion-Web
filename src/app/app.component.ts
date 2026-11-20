@@ -18,11 +18,13 @@ import { SupabaseClientProvider } from './core/supabase.client';
 import { SwUpdateService } from './core/sw-update.service';
 import { ImpersonationBannerComponent } from './shell/impersonation-banner.component';
 import { UpdateToastComponent } from './core/update-toast.component';
+import { InstallPromptComponent } from './core/pwa/install-prompt.component';
+import { PwaInstallService } from './core/pwa/pwa-install.service';
 
 @Component({
   selector: 'sc-root',
   standalone: true,
-  imports: [RouterOutlet, ConsentBannerComponent, ImpersonationBannerComponent, UpdateToastComponent],
+  imports: [RouterOutlet, ConsentBannerComponent, ImpersonationBannerComponent, UpdateToastComponent, InstallPromptComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- Mounted here (not inside sc-shell) because a signed-out preview bounces
@@ -42,6 +44,9 @@ import { UpdateToastComponent } from './core/update-toast.component';
 
     <!-- "New version ready": a toast in the bottom-right stack, up until the reader reloads. -->
     <sc-update-toast />
+
+    <!-- "Get the app" card: appears only at a calm moment (PwaInstallService decides). -->
+    <sc-install-prompt />
   `,
   styles: [
     `
@@ -72,6 +77,7 @@ export class AppComponent implements OnInit {
   private readonly locale = inject(LocaleService);
   readonly swUpdate = inject(SwUpdateService);
   private readonly routeRecovery = inject(RouteLoadRecoveryService);
+  private readonly pwaInstall = inject(PwaInstallService);
 
   /**
    * Guards the preference race: the profile's locale columns are applied only
@@ -171,6 +177,8 @@ export class AppComponent implements OnInit {
     // this nobody is ever online.
     this.socialPresence.init();
     this.swUpdate.init();
+    // Install-prompt bookkeeping: the one beforeinstallprompt listener, sessions, calm-moment scheduler.
+    this.pwaInstall.init();
     // Turns a route whose lazy chunk will not load back into a working
     // navigation instead of a menu entry that silently does nothing (admin
     // feedback cdb16d63). Wired here, not in the shell, so it also covers the

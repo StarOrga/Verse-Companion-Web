@@ -69,7 +69,7 @@ import type { DeckCrate } from './hq-stock-deck';
       th, td { padding: 6px 10px; border-bottom: 1px solid var(--sc-border); text-align: start; vertical-align: middle; }
       thead th { color: var(--sc-fg-2); font: 600 0.62rem / 1 var(--sc-font-display, inherit); letter-spacing: .14em; text-transform: uppercase; }
       tbody th { font-weight: 400; }
-      tbody th small { display: block; color: var(--sc-fg-2); font-size: 0.68rem; }
+      tbody th small { display: block; color: var(--sc-fg-2); font-size: 0.75rem; }
       .num { text-align: end; white-space: nowrap; }
       tbody tr { cursor: pointer; }
       tbody tr:hover { background: color-mix(in srgb, var(--sc-accent) 6%, transparent); }

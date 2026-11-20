@@ -295,6 +295,7 @@ import type { BuildRef, PortOccupantMap } from './codex-build-compare';
 import type { HoloPatchComparisonSide } from './holo/codex-holo-patch.component';
 import { NotFoundComponent } from '../shared/not-found/not-found.component';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { ScSkeletonComponent } from '../shared/skeleton/skeleton.component';
 import { HANGAR_ROOT_CRUMB, NavOriginService, PageCrumb, originTrail } from '../shared/page-header/nav-origin.service';
 import { ClassChipComponent } from '../shared/class-chip/class-chip.component';
 import { FeedbackSpotDirective } from '../feedback/feedback-spot.directive';
@@ -318,11 +319,11 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
 @Component({
   selector: 'sc-codex-detail',
   standalone: true,
-  imports: [DeferErrorComponent, ShipArrivalComponent, CompareIconComponent, FeedbackSpotDirective, PageHeaderComponent, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexHardpointLayoutComponent, CodexComponentModalComponent, CodexSwapPickerComponent, CodexWeaponDetailComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, CodexLoadoutSaveBarComponent, CodexSavedLoadoutsComponent, CodexKpiBandComponent, ScTooltipDirective, ScActionDirective, CodexMissionBarComponent, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, CodexRankCardComponent, CodexEnergyDockComponent, InfoNoteComponent, CodexHoloStageComponent, CodexShipStageComponent, CodexHeroHoloOverlayComponent, CodexHeroPartPopupComponent, CodexVariantPickerComponent, CodexShipActionsComponent, CodexShipLinkFormComponent, CodexPortListComponent, CodexSpecSheetComponent, CodexRecipeCardComponent, AssetPackageViewerComponent, NgTemplateOutlet, AddToSetComponent, ClassChipComponent, CodexModeSwitchComponent, CodexPersonalUsesComponent, HangarPickerComponent, CodexHoloShareComponent, ScDialogDirective, NotFoundComponent, CodexOwnSegmentComponent, CodexOwnStationsComponent, ShareButtonComponent, HeightVarDirective, ScEntryDirective, CodexItemStageComponent, CodexDetailClassicComponent, CodexHoloAkteComponent, CodexHoloHangarMenuComponent, CodexDetailHeadComponent, CodexDetailShellComponent, HintTipComponent],
+  imports: [ScSkeletonComponent, DeferErrorComponent, ShipArrivalComponent, CompareIconComponent, FeedbackSpotDirective, PageHeaderComponent, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexHardpointLayoutComponent, CodexComponentModalComponent, CodexSwapPickerComponent, CodexWeaponDetailComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, CodexLoadoutSaveBarComponent, CodexSavedLoadoutsComponent, CodexKpiBandComponent, ScTooltipDirective, ScActionDirective, CodexMissionBarComponent, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, CodexRankCardComponent, CodexEnergyDockComponent, InfoNoteComponent, CodexHoloStageComponent, CodexShipStageComponent, CodexHeroHoloOverlayComponent, CodexHeroPartPopupComponent, CodexVariantPickerComponent, CodexShipActionsComponent, CodexShipLinkFormComponent, CodexPortListComponent, CodexSpecSheetComponent, CodexRecipeCardComponent, AssetPackageViewerComponent, NgTemplateOutlet, AddToSetComponent, ClassChipComponent, CodexModeSwitchComponent, CodexPersonalUsesComponent, HangarPickerComponent, CodexHoloShareComponent, ScDialogDirective, NotFoundComponent, CodexOwnSegmentComponent, CodexOwnStationsComponent, ShareButtonComponent, HeightVarDirective, ScEntryDirective, CodexItemStageComponent, CodexDetailClassicComponent, CodexHoloAkteComponent, CodexHoloHangarMenuComponent, CodexDetailHeadComponent, CodexDetailShellComponent, HintTipComponent],
   providers: [ShipLinkFormStore, CodexLoadoutDraftStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="detail-page">
+    <section class="detail-page" [class.reserve]="kind() !== 'ship'">
       <sc-page-header class="crumbrow" [class.holo-on]="holoStageOn()" [class.ship-classic]="kind() === 'ship' && !holoStageOn()" [crumbs]="crumbs()" [rememberAs]="detail() ? displayName() : null">
         <!-- The head strip [Patch | Besitz] (concept codex-kopf-besitz C1) sits on the title's line: the
              Holotable's title row, the classic ship head row (.c-head), the item name. Items keep the
@@ -357,6 +358,9 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
           <i class="skel-ring" aria-hidden="true"></i>
           <i class="skel-scan" aria-hidden="true"></i>
         </div>
+      } @else if (loading() && requestKind() !== 'ship') {
+        <!-- Item page: reserved boxes of the final panel heights, so the late shell does not push what follows. -->
+        <sc-skeleton class="item-skel" h="168px" [lines]="4" />
       } @else if (loading() && !holdStage()) {
         <div class="sc-card skel-card sc-skel-field" scNeuroField></div>
       } @else if (error() === invalidRouteKey) {
@@ -1700,6 +1704,9 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
        sc-codex-spec-sheet. */
 
     .skel-card { height: 260px; }
+    /* Item path only: the page holds one viewport while its shell loads, so the footer starts below the fold (layout shift). */
+    .detail-page.reserve { min-height: 100vh; min-height: 100dvh; }
+    .item-skel { display: block; }
     .skel-stage { position: relative; min-height: 520px; overflow: hidden; }
     .skel-stage > i { position: absolute; pointer-events: none; }
     /* β shell: the scene behind is the stage while the ship loads - no card slab before the hologram (QA D11). */

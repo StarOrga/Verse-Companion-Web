@@ -1023,6 +1023,18 @@
         "previewTitle": "Detail page preview",
         "previewMaker": "Manufacturer",
         "fullscreenExit": "Close fullscreen",
+        "immersive": "Immersive",
+        "immersiveTip": "Open the model full screen",
+        "immersiveHint": "Tap Immersive for a bigger view of the model",
+        "rotateHint": "Rotate for a larger view",
+        "resetView": "Reset view",
+        "viewHull": "Hull",
+        "viewSchema": "Schema",
+        "view3d": "3D",
+        "statsAria": "Ship values",
+        "statsClose": "Close values",
+        "sheetHandle": "Values sheet",
+        "sheetHandleAria": "Values sheet, drag or tap to resize",
         "previewFitted": "Fitted to",
         "previewBuy": "Where to buy",
         "previewAlternatives": "Alternatives",
@@ -5615,6 +5627,9 @@
       "search": "Search"
     }
   },
+  "skeleton": {
+    "loading": "Loading"
+  },
   "releaseNotes": {
     "title": "What's New",
     "subtitle": "News and improvements from every release.",
@@ -9259,7 +9274,16 @@
     "pick": "Pick an event on the left.",
     "badJson": "The value is not valid JSON."
   },
+  "chrome": {
+    "search": "Search"
+  },
   "corner": {
+    "dial": {
+      "open": "Tools",
+      "close": "Close tools",
+      "group": "Page tools",
+      "beta": "Beta features"
+    },
     "view": {
       "toHolo": "Switch to the Holotable",
       "toClassic": "Switch to the classic view"
@@ -9270,5 +9294,23 @@
   },
   "notFound": {
     "backTo": "Back to {{target}}"
+  },
+  "pwa": {
+    "card": {
+      "title": "Get the app",
+      "benefit": "Full screen, faster start, right from your home screen.",
+      "install": "Install",
+      "later": "Later"
+    },
+    "menu": "Install app",
+    "ios": {
+      "title": "Add to Home Screen",
+      "step1Iphone": "Tap Share at the bottom of Safari.",
+      "step1Ipad": "Tap Share at the top right of Safari.",
+      "step2": "Choose “Add to Home Screen”.",
+      "step3": "Tap “Add” at the top right.",
+      "addLabel": "Add",
+      "done": "Got it"
+    }
   }
 }
