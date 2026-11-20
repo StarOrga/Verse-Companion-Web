@@ -1174,6 +1174,8 @@ export class CodexHoloStageComponent implements DetailSlotSource {
   // ── Identity / chrome ────────────────────────────────────────────
   readonly detail = input.required<CodexDetail>();
   readonly displayName = input.required<string>();
+  /** The next ship is loading while this one stays up: the panel dims until it arrives (the shell's dim state). */
+  readonly holding = input(false);
   readonly manufacturerName = input<string | null>(null);
   readonly stageCounts = input<readonly StageCountChip[]>([]);
   readonly heroChips = input<readonly { key: string; text: string; accent?: boolean; ghost?: boolean; gap?: boolean }[]>([]);
@@ -1798,7 +1800,7 @@ export class CodexHoloStageComponent implements DetailSlotSource {
     const p = this.phase();
     const first = !this.hadBody();
     const dock = this.shellBeta() && !this.reducedMotion();
-    return { push: dock && !first, docking: dock && (!first || p === 'reveal'), reveal: p === 'reveal', dim: !first && (p === 'wait' || p === 'hero'),
+    return { push: dock && !first, docking: dock && (!first || p === 'reveal'), reveal: p === 'reveal', dim: this.holding() || (!first && (p === 'wait' || p === 'hero')),
       still: this.reducedMotion(), hideData: this.mobileHide() === 'data' };
   });
   /** The save error, when the inspector's save bar (rail open, arrival done,

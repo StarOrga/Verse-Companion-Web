@@ -344,12 +344,12 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
         <sc-codex-personal-uses class="personal-uses" [ownership]="myOwnership()" [personal]="personalMode()" />
       }
 
-      @if (loading() && skeletonStage() && arrivalThumb(); as arrival) {
+      @if (loading() && !holdStage() && skeletonStage() && arrivalThumb(); as arrival) {
         <!-- The loading ship's real silhouette (silhouette only, no backdrop) when the build has it. -->
         <div class="sc-card skel-stage arrival" [class.bare]="shellBeta()" animate.leave="skel-leave" role="status" [attr.aria-label]="'codex.detail.loadingStage' | translate">
           <sc-ship-arrival [thumb]="arrival" />
         </div>
-      } @else if (loading() && skeletonStage()) {
+      } @else if (loading() && !holdStage() && skeletonStage()) {
         <!-- Holodeck skeleton: the page frame + header are already up; the
              stage's own lock ring and scan line run until the ship arrives and
              the real stage replaces this box in place (same min-height). -->
@@ -357,7 +357,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
           <i class="skel-ring" aria-hidden="true"></i>
           <i class="skel-scan" aria-hidden="true"></i>
         </div>
-      } @else if (loading()) {
+      } @else if (loading() && !holdStage()) {
         <div class="sc-card skel-card sc-skel-field" scNeuroField></div>
       } @else if (error() === invalidRouteKey) {
         <sc-not-found titleKey="codex.detail.notFoundPage.title" bodyKey="codex.detail.invalidRoute" [back]="notFoundBack()" />
@@ -830,6 +830,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                holotable as the shell's stage (head band and tab pill are the shared components inside it). -->
           <sc-codex-detail-shell class="ship-shell" animate.enter="view-in" [profile]="shipProfile" activeTab="einordnung">
           <sc-codex-holo-stage shellStage (viewChange)="onStageViewChange()"
+            [holding]="holdStage()"
             [detail]="detail()!"
             [displayName]="displayName()"
             [manufacturerName]="manufacturerName()"
@@ -2034,7 +2035,10 @@ export class CodexDetailComponent implements OnInit {
    */
   readonly holoView = signal(true);
   /** The Holotable is on screen, its title row carries the page's aside. */
-  readonly holoStageOn = computed(() => this.kind() === 'ship' && this.holoView() && !this.loading() && !this.error() && !!this.detail());
+  readonly holoStageOn = computed(() => this.kind() === 'ship' && this.holoView() && (!this.loading() || this.holdStage()) && !this.error() && !!this.detail());
+  /** A ship-to-ship switch inside the Holotable: the stage that is up stays mounted (dimmed) while the next ship loads, instead of
+   * the whole page falling back to the first-visit skeleton. Cleared when that load ends. */
+  readonly holdStage = signal(false);
   /** Where the energy dock says it sits (null until it restored its state). */
   readonly dockPlacement = signal<{ position: DockPosition; slot: number } | null>(null);
   /** The dock lives in the Analyse column — at `slot`, or at any slot when omitted. */
@@ -3309,39 +3313,15 @@ export class CodexDetailComponent implements OnInit {
     // A new ship is a new answer to "is there a model?" — see onArtAvailable.
     this.has3dView.set(false);
     this.closeHero3d();
+    const hold = kind === 'ship' && this.holoStageOn() && this.detail()?.kind === 'ship';
+    this.holdStage.set(hold);
     this.loading.set(true);
     this.error.set(null);
-    this.expandedPort.set(null);
-    this.compatMap.set(new Map());
-    this.localeMap.set(new Map());
-    this.techStats.set(null);
-    this.loadoutPayloads.set(new Map());
-    this.ammoPayloads.set(new Map());
-    this.showEmptyLoadout.set(false);
-    this.usedInBlueprints.set([]);
-    this.itemChanges.set([]);
-    this.itemChangesFrom.set(null);
-    this.recipe.set(null);
-    this.swapTarget.set(null);
-    this.shipLinkForm.reset();
-    this.buyOptions.set([]);
-    this.buyLoading.set(false);
-    this.buyError.set(false);
-    this.draftStore.reset();
-    this.activeMissionId.set('all');
-    this.skinOptions.set([]);
-    this.editionOptions.set([]);
-    this.modelOptions.set([]);
-    this.akteLiveries.set([]);
-    this.noModelSlug.set(null);
-    this.viewPicked.set(false);
-    this.rankCohort.set(null);
-    this.rankCohortLoading.set(false);
-    this.rankCohortFailed.set(false);
-    this.shipSilhouette.set(null);
-    this.foreignVariant.set(false);
-    this.activeVariantId.set(null);
-    this.mineFlag.set(!this.shellBeta() && (this.route.snapshot.queryParamMap?.has?.(HQ_MINE_PARAM) ?? false));
+    // A switch keeps the shown ship's values (dimmed) until the next one arrives; a first visit starts empty.
+    if (!hold) {
+      this.shipSilhouette.set(null);
+      this.resetShipDerived();
+    }
     // Ships: the hull silhouette is read alongside the detail, not after it, so the
     // skeleton can draw it and the Holotable enters with its hull (D11: no dark,
     // empty table between the skeleton and the hologram). Memoised in the service.
@@ -3349,13 +3329,14 @@ export class CodexDetailComponent implements OnInit {
       kind === 'ship'
         ? (this.svc.silhouette?.('ship', className) ?? Promise.resolve(null))
             .then((sil) => {
-              if (seq === this.loadSeq && sil) this.shipSilhouette.set(sil);
+              if (seq === this.loadSeq && (sil || hold)) this.shipSilhouette.set(sil ?? null);
             })
             .catch(() => undefined)
         : Promise.resolve();
     try {
       const d = await this.svc.getDetail(kind, className);
       if (seq !== this.loadSeq) return;
+      if (hold) this.resetShipDerived();
       this.detail.set(d);
       if (d) {
         // D7: every opened page counts as "Zuletzt geoeffnet", not only those opened from the search.
@@ -3419,8 +3400,44 @@ export class CodexDetailComponent implements OnInit {
     } catch (err) {
       if (seq === this.loadSeq) this.error.set(toErrorKey('codex', 'detail', err, { ...this.lastRequest }));
     } finally {
-      if (seq === this.loadSeq) this.loading.set(false);
+      if (seq === this.loadSeq) {
+        this.holdStage.set(false);
+        this.loading.set(false);
+      }
     }
+  }
+
+  /** Everything a loaded entity fills in beside its row, back to empty (the silhouette is the caller's: it is read early). */
+  private resetShipDerived(): void {
+    this.compatMap.set(new Map());
+    this.localeMap.set(new Map());
+    this.techStats.set(null);
+    this.loadoutPayloads.set(new Map());
+    this.ammoPayloads.set(new Map());
+    this.showEmptyLoadout.set(false);
+    this.usedInBlueprints.set([]);
+    this.itemChanges.set([]);
+    this.itemChangesFrom.set(null);
+    this.recipe.set(null);
+    this.swapTarget.set(null);
+    this.shipLinkForm.reset();
+    this.buyOptions.set([]);
+    this.buyLoading.set(false);
+    this.buyError.set(false);
+    this.draftStore.reset();
+    this.activeMissionId.set('all');
+    this.skinOptions.set([]);
+    this.editionOptions.set([]);
+    this.modelOptions.set([]);
+    this.akteLiveries.set([]);
+    this.noModelSlug.set(null);
+    this.viewPicked.set(false);
+    this.rankCohort.set(null);
+    this.rankCohortLoading.set(false);
+    this.rankCohortFailed.set(false);
+    this.foreignVariant.set(false);
+    this.activeVariantId.set(null);
+    this.mineFlag.set(!this.shellBeta() && (this.route.snapshot.queryParamMap?.has?.(HQ_MINE_PARAM) ?? false));
   }
 
   /**
