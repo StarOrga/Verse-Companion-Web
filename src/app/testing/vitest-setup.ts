@@ -76,7 +76,8 @@ if (!fetchHost[FETCH_GUARD]) {
     //    assets Worker in a spec: every CodexService a spec builds sees "not
     //    published" (404), the state before the first publish, and reads the
     //    database double as before. Specs of the reader inject their own fetch.
-    if (url.includes('/codex-lists/')) {
+    //    The silhouette shards (CodexSilhouetteShards) follow the same rule.
+    if (url.includes('/codex-lists/') || url.includes('/codex-silhouettes/')) {
       return Promise.resolve(new Response('not found', { status: 404 }));
     }
     return realFetch(input, init);
