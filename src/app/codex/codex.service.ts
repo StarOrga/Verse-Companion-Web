@@ -111,6 +111,7 @@ import {
 import { ammoClassNameFor } from './codex-equipped-stats';
 import { classifyShipModule, ShipModuleSection } from './ship-module-sections';
 import { carriedByPort, stockLoadoutClassNames } from './stock-loadout';
+import { SnapshotCut } from './codex-rank-parts';
 import { computeKpiSheet, KpiShipInput } from './codex-loadout-stats';
 import { SummaryOccupant } from './ship-summary-panels';
 import { HoloSilhouette, parseHoloSilhouette, SilhouetteKind } from './holo-silhouette';
@@ -566,6 +567,12 @@ export function listSelect(kind: CodexKind, payload: ListPayload = 'card'): stri
  * pathological build can never turn the loop into an endless request storm.
  */
 const WEAPON_FACET_HARD_CAP = 20000;
+
+/** What the rank cohort scores the stock loadouts over: the parts by class name and the ammunition they fire. */
+interface CohortParts {
+  payloads: Map<string, { kind: CodexKind; payload: unknown }>;
+  ammo: Map<string, unknown>;
+}
 
 /** Main-thread time one cohort step may take before it hands the event loop back. */
 const COHORT_SLICE_MS = 6;
@@ -2645,9 +2652,72 @@ export class CodexService {
       for (const cn of stockLoadoutClassNames(payload?.defaultLoadout ?? [])) allClassNames.add(cn);
     }
     const names = [...allClassNames];
+
+    // The parts from the build's rank-parts file when it is published: the
+    // database path below reads the FULL payload of every part (116 requests,
+    // 26.5 MB on a cold browser, LIVE 4.10.3). The file carries slices, and
+    // its payloads throw SnapshotCut on any read outside them — then the file
+    // is declined as a whole and the database answers, exactly as before.
+    let ships: RankShipInput[] | null = null;
+    const fromFile = await this.cohortPartsFromFile(build.id, names);
+    if (fromFile) {
+      try {
+        ships = await this.scoreCohort(rows, fromFile, build.schemaVersion);
+      } catch (err) {
+        if (!(err instanceof SnapshotCut)) throw err;
+        if (!this.snapshotFailures.has('rank parts cut')) {
+          this.snapshotFailures.add('rank parts cut');
+          logWarn('codex', 'rank parts file does not cover a read, using the database', { err });
+        }
+      }
+    }
+    ships ??= await this.scoreCohort(rows, await this.cohortPartsFromDb(names), build.schemaVersion);
+
+    writeCohortCache(key, ships);
+    return ships;
+  }
+
+  /**
+   * The cohort's parts from `rank-parts.json`, or `null` to read the database
+   * (not published, an older file without a key the cohort reads, outage). A
+   * class name the file neither holds nor lists as absent — it knows the names
+   * the stock loadouts held when it was published — is the one read the
+   * database still answers.
+   */
+  private cohortPartsFromFile(buildId: string, names: readonly string[]): Promise<CohortParts | null> {
+    return this.fromSnapshot('rank parts', async () => {
+      const file = await this.listSnapshots.rankParts(buildId);
+      if (!file) return null;
+      const payloads = new Map<string, { kind: CodexKind; payload: unknown }>();
+      const rest: string[] = [];
+      for (const cn of names) {
+        const hit = file.entities.get(cn);
+        if (hit) payloads.set(cn, hit);
+        else if (!file.absent.has(cn)) rest.push(cn);
+      }
+      if (rest.length > 0) {
+        const report: FetchReport = { failed: 0 };
+        const extra = await this.getEntityPayloads(rest, report);
+        // The database path retries and reports an incomplete read.
+        if (report.failed > 0) return null;
+        for (const [cn, hit] of extra) payloads.set(cn, hit);
+      }
+      // The file holds every ammunition row of the build: a name it lacks does not exist.
+      const ammo = new Map<string, unknown>();
+      for (const cn of names) {
+        const shot = ammoClassNameFor(cn, payloads.get(cn)?.payload);
+        const hit = shot ? file.ammo.get(shot) : undefined;
+        if (shot && hit !== undefined) ammo.set(shot, hit);
+      }
+      return { payloads, ammo };
+    });
+  }
+
+  /** The database path of the cohort's parts, unchanged: the full payload of every part. */
+  private async cohortPartsFromDb(names: string[]): Promise<CohortParts> {
     // A failed chunk (a statement timeout under the fleet-wide read) leaves a
     // HOLE in the cohort: its ships score with empty sheets and every
-    // percentile is quietly wrong — and the cache below used to keep that
+    // percentile is quietly wrong — and the cache used to keep that
     // hole for the whole build ("Einordnung" empty on every later load).
     // One retry; still incomplete = an error the page can offer a retry for,
     // never a cached half-fleet.
@@ -2662,7 +2732,15 @@ export class CodexService {
       .filter((cn): cn is string => !!cn);
     const ammo = await this.getAmmoPayloads(ammoNames, report);
     if (report.failed > 0) throw new Error(`rank cohort incomplete: ${report.failed} payload chunk(s) failed`);
+    return { payloads, ammo };
+  }
 
+  /** Every ship row scored from its stock loadout over `parts`. */
+  private async scoreCohort(
+    rows: readonly CodexListRow[],
+    { payloads, ammo }: CohortParts,
+    schemaVersion: number | null | undefined,
+  ): Promise<RankShipInput[]> {
     // Resolving + scoring the WHOLE fleet is far too much work for one tick:
     // measured live on 2026-09-05, 353 ships wedged the renderer for ~45 s and
     // the tab stopped answering at all. So we hand the event loop back every
@@ -2687,7 +2765,7 @@ export class CodexService {
               computeKpiSheet(occ, this.cohortShipInput(payload)),
               occ,
               payload?.stats as Record<string, Record<string, unknown>> | null | undefined,
-              build.schemaVersion,
+              schemaVersion,
             ))(this.cohortOccupantsFor(payload?.defaultLoadout ?? [], payloads, ammo)),
         });
       }
@@ -2696,8 +2774,6 @@ export class CodexService {
         sliceStart = performance.now();
       }
     }
-
-    writeCohortCache(key, ships);
     return ships;
   }
 
