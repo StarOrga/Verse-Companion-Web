@@ -59,6 +59,7 @@ import { ilikeTokenGroups, ilikeTokenPatterns, normalizeSearch, searchMatcher, s
 import { UpcomingShipsService } from './upcoming-ships.service';
 import { CodexLocaleShards } from './codex-locale-shards';
 import { CodexListSnapshots, NamesDe } from './codex-list-snapshots';
+import { CodexSilhouetteShards, SilhouetteShardAnswer } from './codex-silhouette-shards';
 import {
   ByClassName,
   CARD_PAYLOAD_KEYS,
@@ -595,6 +596,8 @@ export class CodexService {
   private readonly localeShards = inject(CodexLocaleShards);
   /** Catalog lists as files per build (R2); every read falls back to the database on `null`. */
   private readonly listSnapshots = inject(CodexListSnapshots);
+  /** Silhouettes as shard files per build (R2); every read falls back to the database on `null` / `open`. */
+  private readonly silhouetteShards = inject(CodexSilhouetteShards);
   /** Snapshot reads whose answer threw once already (logged once each). */
   private readonly snapshotFailures = new Set<string>();
   /**
@@ -2030,11 +2033,29 @@ export class CodexService {
     return true;
   }
 
+  /**
+   * The rows of `classNames` from the build's shard files, or `null` when the
+   * files cannot answer (the caller then runs its unchanged query). Never throws.
+   */
+  private async silhouetteRowsFromShards(
+    buildId: string,
+    kind: SilhouetteKind,
+    classNames: readonly string[],
+  ): Promise<SilhouetteShardAnswer | null> {
+    return this.fromSnapshot('silhouettes', () => this.silhouetteShards.resolve(buildId, kind, classNames));
+  }
+
   async silhouette(kind: SilhouetteKind, className: string): Promise<HoloSilhouette | null> {
     const build = await this.loadCurrentBuild();
     if (!build) return null;
     const cacheKey = `${build.id}:${kind}:${className}`;
     if (this.silhouetteCache.has(cacheKey)) return this.silhouetteCache.get(cacheKey)!;
+    const filed = await this.silhouetteRowsFromShards(build.id, kind, [className]);
+    if (filed && filed.open.length === 0) {
+      const parsed = parseHoloSilhouette(filed.rows.get(className));
+      this.silhouetteCache.set(cacheKey, parsed);
+      return parsed;
+    }
     const read = () =>
       this.sb.client
         .from('codex_silhouettes')
@@ -2087,6 +2108,20 @@ export class CodexService {
       }
     }
     if (toFetch.length === 0) return result;
+
+    // The build's shard files first; what they cannot answer (not published, an outage) stays in toFetch.
+    const filed = await this.silhouetteRowsFromShards(build.id, kind, toFetch);
+    if (filed) {
+      for (const [className, row] of filed.rows) {
+        const parsed = parseHoloSilhouette(row);
+        this.silhouetteCache.set(`${build.id}:${kind}:${className}`, parsed);
+        if (parsed) result.set(className, parsed);
+      }
+      for (const className of filed.absent) this.silhouetteCache.set(`${build.id}:${kind}:${className}`, null);
+      toFetch.length = 0;
+      toFetch.push(...filed.open);
+      if (toFetch.length === 0) return result;
+    }
 
     const CHUNK = 200;
     for (let i = 0; i < toFetch.length; i += CHUNK) {

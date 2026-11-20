@@ -4,10 +4,19 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.284.3] - 2026-11-20
+## [0.285.1] - 2026-11-20
 
 ### Fixed
 - Admin feedback: the one-tap answer buttons (e.g. Umsetzen / Verwerfen) stay under their question when a later notice without options arrives, and the question stays in view; a human reply still clears them.
+
+## [0.285.0] - 2026-11-20
+
+### Changed
+- Codex: outlines in the lists, thumbnails and on the holotable load from files per build instead of the database, so list pages no longer send a silhouette query.
+
+### Added
+- `ingest-catalog` op `silhouettes_publish` and `scripts/codex-silhouettes-to-r2.mjs`: publish a build's silhouettes as shard files to R2 in small steps; runs by itself after `finalize`.
+- Assets Worker serves `codex-silhouettes/` (index short-cached, shards immutable).
 
 ## [0.284.2] - 2026-11-20
 

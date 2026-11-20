@@ -10,6 +10,7 @@ built in by design.
 | Relational: users, social, hangar, feedback, telemetry, codex catalog | Supabase Postgres (Free, 500 MB) | RLS, RPCs, Realtime. Blocks (402) at its limit, never bills |
 | RLS-gated files (feedback attachments — private since `20260928211217`, shown via signed URLs, 1 h), codex previews | Supabase Storage (Free, 1 GB) | RLS per owner cannot be rebuilt elsewhere |
 | Codex localization strings (`codex-locale/`, since 2026-10-03) | R2, same bucket and Worker | ~31 MB per build, immutable per build; see § Localization strings |
+| Codex catalog lists (`codex-lists/`) and silhouettes (`codex-silhouettes/`) as files per build | R2, same bucket and Worker | Every list read cost the instance swap IO; the tables stay the source and the fallback; see § Catalog lists, § Silhouettes |
 | Ship hulls + livery icons (`ship-skins`) | Cloudflare R2 `sc-companion-assets` (WEUR, account `115d75098864fcf13d36dc1aec1d874a`), read via `cloudflare/assets-worker` at `https://sc-assets.sc-assets-worker.workers.dev` (live 2026-09-25) | 0 € egress, 10 GB. A key the bucket lacks is streamed from Supabase by the Worker |
 | News thumbnails (`news-images`, written by `fetch-verse-news`) | Same R2 bucket under `news-images/<hash>/w<N>.<ext>`, read via the same Worker at `/news-images/…` (code 2026-10-03, `feat/news-images-r2`) | Every thumbnail view used to count against the 5 GB/month Supabase egress. Legacy objects stay in Supabase and are streamed by the Worker |
 | App bundle, icons, meshopt decoder | Vercel Hobby | Static hosting |
@@ -227,12 +228,112 @@ The rank cohort's part payloads (`getEntityPayloads` / `getAmmoPayloads` inside 
 come from `rank-parts.json` (above); every other caller of those two still reads the database,
 a handful of names at a time.
 Still on the database: `listBlueprints` (full payload, no file; no caller today),
-the `codex_search_suggest` "did you mean" RPC, detail pages, the silhouettes
-(`codex_silhouettes`: 7.5 MB ships, 11 MB components, 32 MB items per build — too
-big for one file per kind, they would need shards), the patch tables
+the `codex_search_suggest` "did you mean" RPC, detail pages, the patch tables
 (`codex_patch_*`, `codex_added_class_names`, `codex_patch_news`: across builds, not
-per build) and every other non-list read. `searchAll` pages through `listByKind`, so it reads the files too. Specs never reach the Worker: `vitest-setup.ts` answers
-`/codex-lists/` with 404.
+per build) and every other non-list read. The silhouettes have their own files
+(§ Silhouettes). `searchAll` pages through `listByKind`, so it reads the files too. Specs never reach the Worker: `vitest-setup.ts` answers
+`/codex-lists/` and `/codex-silhouettes/` with 404.
+
+## Silhouettes (R2 per build, shards)
+
+Every list view read its rows' outlines from `codex_silhouettes` (measured 2026-11-20:
+869 kB for a ship page, 436 kB components, 118 kB weapons) and only memory kept them,
+so every session read them again. One build holds ~53 MB of them as JSON (355 ships
+6.5 MB, 775 weapons 5.3 MB, 1 581 components 10.3 MB, 4 560 items 31 MB), so they are
+published once per build as shard files. The table stays the source and the client's
+fallback; nothing is deleted from it.
+
+| Key | Cache |
+|---|---|
+| `codex-silhouettes/<build uuid>/index.json` | `max-age=300` (names the gen and, per kind, `count` and `shards`) |
+| `codex-silhouettes/<build uuid>/<gen>/<kind>/names.json` | immutable: `{ v, kind, shards: [[class names]] }` |
+| `codex-silhouettes/<build uuid>/<gen>/<kind>/<n>.json` | immutable: one shard |
+| `codex-silhouettes/<build uuid>/<gen>/plan.json` | publisher only, the Worker does not serve it |
+
+`<kind>` is `ship`, `weapon`, `component`, `item` or `armor` (the table's `kind`); the
+index names all five, `count: 0` for a kind the build has no outline of.
+
+**Why not hashed shards like the locale strings.** A list page asks for its 60 rows
+(`PAGE_SIZE`), a detail page for one. A hash spreads 60 names over 60 shards, and four
+of five item rows have no outline at all yet would still cost a shard each. So the
+shards follow the **list order** of the kind's catalog table (name asc nulls last, then
+class name, the order of `codex-lists/<kind>.json`; classes the table lacks come last by
+class name): a page's rows are neighbours. `names.json` lists every class that has an
+outline, shard by shard, so the client knows a name's shard without a hash and answers
+"no outline" without any request. A shard holds a fixed number of **rows** (ship 6,
+every other kind 16: ~110 kB before folding, `ROWS_PER_SHARD`), not a byte target, so
+the split is known from the names alone and the publish can run in independent slices.
+Rows that share one shape (a ship and its variants, one door mesh on many ships: 4 201
+shapes for 7 271 rows) are stored once per shard: `{ v, kind, shard, columns,
+shapeColumns, shapes: [[view_box, path, edges, bbox, anchors, unresolved]], rows:
+[[class_name, shape index, meta, generated_at, channel, patch_version, build_number]] }`.
+The client rebuilds the table's row from it and hands it to the same
+`parseHoloSilhouette`, so a file answer is the database answer.
+
+**Publish** (`_silhouette-shards.ts`, `_silhouette-publish.ts`; op `silhouettes_publish`).
+An edge worker has 2 s of CPU for its whole life and 256 MB; the worker that answered
+`finalize` on 2026-11-19 was at 1 756 ms before any of this. So the publish is small
+calls, each one request, with no state outside R2:
+
+1. **plan** (no `gen`): usage gate, a new generation, per kind the class names with a row
+   and the catalog's list order (pages of 1 000, names only) → `names.json`; `plan.json` last.
+2. **slice** (`cursor: { kind, from }`): 16 shards (at most 256 rows, ~1.8 MB), rows read
+   50 names at a time, one shard built, put and dropped. Repeatable.
+3. **commit** (`cursor: "commit"`): every key the plan names must be in the bucket, the
+   table must still hold exactly the planned class names (`changed: <kind>` otherwise: a
+   class missing from `names.json` would read as "no outline"), one shard is read back
+   through the public Worker, a newer generation in the bucket's index stops it
+   (`superseded`), then `index.json`, the index read back from the bucket, and only
+   generations **older** than this one that the index does not name are deleted. Two
+   commits of one build can still interleave (the put is not conditional): when this
+   generation's files are gone right after its index went in, the newer publish's index
+   is put back from its `plan.json`. `chain` is honoured for the service key only.
+
+Each answer carries `gen` and `next`. After `finalize` the function calls itself for the
+next step (`chain: true`, service key in both headers, one retry, at most 400 hops), started
+before the locale and list publish. A broken chain writes no index, clients keep reading
+the table, and the next publish's commit collects the unfinished generation. Redo or
+backfill: `node scripts/codex-silhouettes-to-r2.mjs` (dry run) → `--apply` (`--build <uuid>`,
+`--pause <ms>`); it needs only `SUPABASE_ACCESS_TOKEN` and drives the same steps one call
+at a time. `locale_gc` also removes the `codex-silhouettes/` prefixes of builds gone from
+`codex_builds` (report under `silhouettes`).
+
+**Client read path.** `CodexService.silhouette()` / `silhouettes()` →
+`CodexSilhouetteShards.resolve` (`src/app/codex/codex-silhouette-shards.ts`): index
+(404 = not published, remembered 5 min, not logged), the kind's `names.json`, then one
+request per needed shard, all kept as promises (the last 64 parsed shards; the browser's
+HTTP cache holds the rest for good). It answers rows, `absent` names (not in `names.json`,
+or a kind with `count: 0`: remembered as "no outline", like an empty table answer) and
+`open` names (their shard failed: HTTP error, network, the 10 s abort, an unexpected shape;
+not asked again for 60 s, a malformed file never) or `null` (no index, a kind the index does
+not name, `names.json` unreadable). `null` and `open` run the unchanged
+`codex_silhouettes` query, for the open names only. A shard the index names but the bucket
+lacks (published again, old generation collected) drops the index, so the next call reads
+the new one with `cache: 'no-cache'` (the browser may hold the old index for five more
+minutes). Callers are unchanged: the browse tiles, `SilThumbsService`, the fusion search,
+`getMissileCohort`, the holotable and the item stage all go through the two methods.
+
+**Measured 2026-11-20 on LIVE 4.10.3** (build `eaec8352`, 7 271 rows). Publish: 493 shards
+(ship 60, weapon 49, component 99, item 285) + 4 names files, 38.5 MB written for 53 MB of
+rows; the script took 164 s, the self-calling chain 120 s for its 34 slices. The workers'
+`Shutdown` rows: at most 648 ms CPU per worker (several slices each, limit 2 000) and
+15-16 MB, every reason `EarlyDrop`. A shard is 47-70 kB of JSON and 4-20 kB on the wire
+(brotli by the Worker), `item/names.json` 171 kB / 31 kB. Page loads counted with Playwright
+(requests to `/rest/v1/codex_silhouettes` → requests to `/codex-silhouettes/`, index and
+names included): ship list 2 → 0 database, 15 files; weapons 2 → 0, 6; components 2 → 0, 8;
+items 2 → 0, 5; a ship detail 2 → 0, 3. The same number of outlines is drawn before and
+after, and 167 sampled rows rebuilt from the shards are deep-equal to the table's rows.
+Cost guard: one publish is ~500 Class A writes and ~38 MB per build (three builds kept:
+~115 MB of the 8 GB gate); a page costs the Worker 3-15 requests once per browser and build
+against its 100k a day.
+
+**A Worker deploy replaces the whole script.** On the same day a second session deployed
+`cloudflare/assets-worker` from its own tree 19 minutes after this change's deploy; every
+`codex-silhouettes/` URL answered 404 until the next deploy. Nothing broke (clients fell
+back to the table, a commit running meanwhile refused with `verified: false` and deleted
+nothing), but: deploy the Worker - and `ingest-catalog` - only from a tree that has every
+key shape and op that is already live, and check `npx wrangler@4 deployments list` when a
+published file suddenly answers 404.
 
 ## Localization strings (R2 since 2026-10-03)
 
