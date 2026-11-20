@@ -185,7 +185,10 @@ export const SUBTHEMES: readonly Subtheme[] = [
     //    existing blob is byte-identical, only the missing ones are built.
     // 9: item outlines — largest view, relative tolerance, proxy nodes dropped,
     //    inner `edges` path (stored in meta.edges); every item blob is rebuilt.
-    revision: 9,
+    // 10: #1004 — every kind without a traceable mesh records a `no_mesh` skip
+    //    (before: ships only), naming the .skin/.chr/.cdf format where the record
+    //    has one, so the coverage tile explains every missing silhouette.
+    revision: 10,
     phases: ['codex_silhouettes'],
     sources: [
       'data-uploader/python/sc_extract/silhouette',

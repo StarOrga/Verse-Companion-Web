@@ -11,8 +11,12 @@ export type SkipReason = (typeof SKIP_REASONS)[number];
 const KINDS = new Set(['ship', 'weapon', 'component', 'item', 'ammo']);
 /** The same keep-set the extractor's class names use; anything else is junk. */
 const CLASS_RE = /^[A-Za-z0-9_.\-]{1,200}$/;
-/** One whole build stays far below this; more is a broken or hostile caller. */
-export const MAX_SKIPS = 20_000;
+/**
+ * One whole build stays below this; more is a broken or hostile caller. Since every
+ * kind records its meshless entities (#1004) a build carries ~19 000 skips (most items
+ * are paints, seat props and other meshless records), so the cap leaves room to grow.
+ */
+export const MAX_SKIPS = 60_000;
 const DETAIL_MAX = 300;
 
 export interface SkipRow {
