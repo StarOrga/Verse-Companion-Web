@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, NgZone, computed, effect, inject, input, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -149,13 +149,27 @@ export class EventsTeaserComponent {
 
   readonly auth = inject(AuthService);
 
+  private readonly zone = inject(NgZone);
+  private clockTimer: ReturnType<typeof setInterval> | undefined;
+
   constructor() {
     // The timeline is readable for signed-in readers only (RLS); signed out there is nothing to ask for.
     effect(() => {
-      if (this.auth.user()) void this.svc.load();
+      if (!this.auth.user()) return;
+      void this.svc.load();
+      this.startClock();
     });
-    const t = setInterval(() => this.clock.set(Date.now()), 10 * 60 * 1000);
-    inject(DestroyRef).onDestroy(() => clearInterval(t));
+    inject(DestroyRef).onDestroy(() => clearInterval(this.clockTimer));
+  }
+
+  /**
+   * Outside the zone: a repeating timer would keep the app from ever turning
+   * stable (fixture.whenStable(), the service worker's registration); the
+   * signal write still schedules change detection. Signed-in readers only.
+   */
+  private startClock(): void {
+    if (this.clockTimer) return;
+    this.clockTimer = this.zone.runOutsideAngular(() => setInterval(() => this.clock.set(Date.now()), 10 * 60 * 1000));
   }
 
   readonly rows = computed<readonly TeaserRow[]>(() => {
