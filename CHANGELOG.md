@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.288.6] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.2: Verse locations read from the real game data get readable types, real system positions for the Lagrange rest stops, gateways and Nyx stations, system rows and cities; a star is no longer a fallback position (#1195). The microTech moons were already right — the bundled catalog has them mirrored.
+
 ## [0.288.5] - 2026-11-21
 
 ### Fixed
