@@ -550,6 +550,11 @@ function scrollBehavior(): ScrollBehavior {
     .fc { scroll-margin-top: 110px; scroll-margin-bottom: 24px; }
     .fc.flash { animation: pd-flash 1.25s ease-out; border-color: var(--sc-accent); }
     .fc.noimg, .fc.noimg.open { grid-template-columns: minmax(0, 1fr); }
+    /* Picture and text keep their cells even when something else lands in the
+       card (a browser extension injects an <img> next to links — QA wave 3). */
+    .fc > .img { grid-column: 1; grid-row: 1; }
+    .fc > .bd { grid-column: 2; grid-row: 1; }
+    .fc.noimg > .bd { grid-column: 1; }
     .st-line { font-size: max(0.56rem, var(--sc-fs-floor)); letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-fg-2); }
     .st-line[data-status='released'] { color: var(--sc-success); }
     .st-line[data-status='committed'] { color: var(--sc-accent); }

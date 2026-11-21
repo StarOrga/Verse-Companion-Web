@@ -32,5 +32,18 @@
       ]
     },
     "outcome": "iterate: round 4 with smaller type, PTU timeline, bigger planet with the same right edge"
+  },
+  {
+    "iteration": 4,
+    "template": "design",
+    "action": "iterate",
+    "submitted_at": "2026-11-21T10:24:51.651Z",
+    "comments": {
+      "general": "Patches have images and the rows have room: add them. One proposal (not too much) for how images could lead the eye on the board, or generated images that fit in.",
+      "annotations": {
+        "r4-d1-s4-a1": "In the detail view the images should come back too, the ones the patch added, so there is something to look at."
+      }
+    },
+    "outcome": "iterate: round 5 with fading hero images, a picture per timeline card, a generated stand-in without image, the patch gallery in the dossier"
   }
 ]

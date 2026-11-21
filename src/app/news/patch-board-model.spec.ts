@@ -1,5 +1,5 @@
 import { groupPatchNotes } from './patch-notes';
-import { cardImage, channelTimes, headlineBullets, liveLineView, previewCards, ptuRows, roadmapChips } from './patch-board-model';
+import { cardImage, channelTimes, headlineBullets, liveLineView, previewCards, ptuRows, roadmapChips, waveOf } from './patch-board-model';
 import type { PatchOutline } from './patch-outline';
 import type { SubVersionRow } from './patch-timeline';
 import type { RoadmapCard } from './roadmap';
@@ -50,6 +50,25 @@ describe('patch board model', () => {
     expect(rows[0].newest).toBe(true);
     expect(rows[1].newest).toBe(false);
     expect(rows.every((r) => r.line === '5.0')).toBe(true);
+  });
+
+  it('the wave is the one RSI names in the title, never a build count', () => {
+    expect(waveOf('[Wave 3] Star Citizen Alpha 5.0 PTU Patch Notes 13228337')).toBe(3);
+    expect(waveOf('[All Waves] Star Citizen Alpha 4.10.3 PTU Patch Notes')).toBeNull();
+    expect(waveOf('Star Citizen Alpha 5.0 PTU Patch Notes')).toBeNull();
+  });
+
+  it('headline bullets skip the build facts (wipe, starting money)', () => {
+    const outline = {
+      nodes: [
+        { kind: 'heading', text: 'Important Build Info', depth: 0 },
+        { kind: 'bullet', text: 'Long Term Persistence: Preserved', depth: 0 },
+        { kind: 'bullet', text: 'Starting aUEC: 20,000', depth: 0 },
+        { kind: 'heading', text: 'New Features', depth: 0 },
+        { kind: 'bullet', text: 'LBCO Skarnov Rifle', depth: 0 },
+      ],
+    } as unknown as PatchOutline;
+    expect(headlineBullets(outline)).toEqual(['LBCO Skarnov Rifle']);
   });
 
   it('card image falls back from note image to roadmap thumbnail to null', () => {

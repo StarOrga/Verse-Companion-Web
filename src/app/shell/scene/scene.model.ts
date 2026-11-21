@@ -81,17 +81,26 @@ export function framedLikeNews(rect: readonly [number, number, number, number]):
  */
 export const PATCHES_PLANET_GROW = 1.3;
 
-/** Screen frame of a door planet: News-like, optionally grown leftwards (right edge + centre fixed). */
-function grownFrame(grow: number): { x: number; y: number; w: number } {
+/**
+ * How far the grown Patches planet steps OUT of the page, as a share of the News
+ * planet's width. On News the planet's inner edge already reaches the page's
+ * first letters; the bigger Patches planet must not sit under text (QA wave 3,
+ * 2026-11-21: it covered the first letters of the 4.10.3 bullets), so its inner
+ * edge moves outwards — never further in.
+ */
+export const PATCHES_PLANET_OUT = 0.06;
+
+/** Screen frame of a door planet: News-like, grown leftwards around its centre line, inner edge moved out by `out`. */
+function grownFrame(grow: number, out = 0): { x: number; y: number; w: number } {
   const w = NEWS.s * WORLD_RECTS.news[2];
   const x = NEWS.s * (WORLD_RECTS.news[0] + NEWS.x);
   const y = NEWS.s * (WORLD_RECTS.news[1] + NEWS.y);
-  return { x: x + w - w * grow, y: y + (w - w * grow) / 2, w: w * grow };
+  return { x: x + w - w * grow - w * out, y: y + (w - w * grow) / 2, w: w * grow };
 }
 
 /** Pose that frames `rect` like the News planet, scaled by `grow` around its right edge / centre. */
-export function framedLikeNewsGrown(rect: readonly [number, number, number, number], grow: number): CameraPose {
-  const f = grownFrame(grow);
+export function framedLikeNewsGrown(rect: readonly [number, number, number, number], grow: number, out = PATCHES_PLANET_OUT): CameraPose {
+  const f = grownFrame(grow, out);
   const s = f.w / rect[2];
   return { s, x: f.x / s - rect[0], y: f.y / s - rect[1] };
 }

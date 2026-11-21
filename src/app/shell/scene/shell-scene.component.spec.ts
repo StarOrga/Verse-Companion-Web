@@ -16,6 +16,7 @@ import {
   framedLikeNews,
   framedLikeNewsGrown,
   PATCHES_PLANET_GROW,
+  PATCHES_PLANET_OUT,
   poseAt,
   poseCam,
   poseTransform,
@@ -94,7 +95,7 @@ describe('Shell scene — model', () => {
     }
   });
 
-  it('Patches planet is bigger than News but its inner (right) edge and vertical centre stay put', () => {
+  it('Patches planet is bigger than News, its inner (right) edge steps out of the page, never further in', () => {
     const [nx, ny, nw] = WORLD_RECTS.news;
     const news = screen(POSES.news.cam, nx, ny);
     const newsW = POSES.news.cam.s * nw;
@@ -104,7 +105,8 @@ describe('Shell scene — model', () => {
     const at = screen(p, x, y);
     const w = p.s * size;
     expect(w).toBeGreaterThan(newsW);
-    expect(at[0] + w).toBeCloseTo(news[0] + newsW, 3);
+    expect(at[0] + w).toBeCloseTo(news[0] + newsW - newsW * PATCHES_PLANET_OUT, 3);
+    expect(at[0] + w).toBeLessThan(news[0] + newsW);
     expect(at[1] + w / 2).toBeCloseTo(news[1] + newsW / 2, 3);
   });
 

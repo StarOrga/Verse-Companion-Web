@@ -65,12 +65,12 @@ const DAY_MS = 86_400_000;
             <a [routerLink]="['/verse/patches']" [queryParams]="{ view: null }" queryParamsHandling="merge"
                [class.on]="view() === 'live'" [attr.aria-current]="view() === 'live' ? 'page' : null">
               {{ 'news.patchBoard.switch.live' | translate }}
-              @if (liveUnread()) { <i class="dot" aria-hidden="true"></i><span class="sc-sr-only">{{ 'news.patchBoard.unread' | translate }}</span> }
+              @if (liveUnread()) { <i class="dot" role="img" [attr.aria-label]="'news.patchBoard.unread' | translate"></i> }
             </a>
             <a [routerLink]="['/verse/patches']" [queryParams]="{ view: 'ptu' }" queryParamsHandling="merge"
                class="ptu" [class.on]="view() === 'ptu'" [attr.aria-current]="view() === 'ptu' ? 'page' : null">
               {{ 'news.patchBoard.switch.ptu' | translate }}
-              @if (ptuUnread()) { <i class="dot" aria-hidden="true"></i><span class="sc-sr-only">{{ 'news.patchBoard.unread' | translate }}</span> }
+              @if (ptuUnread()) { <i class="dot" role="img" [attr.aria-label]="'news.patchBoard.unread' | translate"></i> }
             </a>
           </nav>
           <p class="switch-hint">{{ (view() === 'live' ? 'news.patchBoard.switch.liveHint' : 'news.patchBoard.switch.ptuHint') | translate }}</p>
@@ -199,7 +199,7 @@ const DAY_MS = 86_400_000;
                         <a class="sv top" [routerLink]="['/verse/patches', card.line]" [queryParams]="{ note: top.id }">
                           <span class="sl">{{ top.version }}</span>
                           <span class="svt">{{ top.title }}</span>
-                          @if (isUnread(top)) { <i class="dot" aria-hidden="true"></i><span class="sc-sr-only">{{ 'news.patchBoard.unread' | translate }}</span> }
+                          @if (isUnread(top)) { <i class="dot" role="img" [attr.aria-label]="'news.patchBoard.unread' | translate"></i> }
                           <time>{{ dateShort(top.publishedAt) }}</time>
                         </a>
                         @if (view2.earlier.length) {
@@ -279,7 +279,7 @@ const DAY_MS = 86_400_000;
                       <span class="pill" data-status="ptu">{{ ptuPill(r) }}</span>
                       <span class="cver">{{ r.version || r.line }}</span>
                       <span class="sent">{{ r.title }}</span>
-                      @if (!read.isRead('ptu', ms(r.publishedAt))) { <i class="dot" aria-hidden="true"></i><span class="sc-sr-only">{{ 'news.patchBoard.unread' | translate }}</span> }
+                      @if (!read.isRead('ptu', ms(r.publishedAt))) { <i class="dot" role="img" [attr.aria-label]="'news.patchBoard.unread' | translate"></i> }
                     </button>
                     @if (ptuOpen(r)) {
                       <div class="subs open">
@@ -336,10 +336,10 @@ const DAY_MS = 86_400_000;
     .head.one { grid-template-columns: minmax(0, 1fr); }
     .box {
       position: relative; border: 1px solid var(--sc-border); border-radius: 12px;
-      background: color-mix(in srgb, var(--sc-bg-1) 72%, transparent);
+      background: color-mix(in srgb, var(--sc-bg-1) 94%, transparent);
     }
-    .box.now { border-color: color-mix(in srgb, var(--sc-success) 55%, var(--sc-border)); background: linear-gradient(135deg, color-mix(in srgb, var(--sc-success) 10%, transparent), color-mix(in srgb, var(--sc-bg-1) 60%, transparent) 60%); }
-    .box.next { border-color: color-mix(in srgb, var(--sc-accent) 45%, var(--sc-border)); background: linear-gradient(135deg, color-mix(in srgb, var(--sc-accent) 10%, transparent), color-mix(in srgb, var(--sc-bg-1) 60%, transparent) 60%); }
+    .box.now { border-color: color-mix(in srgb, var(--sc-success) 55%, var(--sc-border)); background: linear-gradient(135deg, color-mix(in srgb, var(--sc-success) 10%, transparent), color-mix(in srgb, var(--sc-bg-1) 60%, transparent) 60%), color-mix(in srgb, var(--sc-bg-1) 94%, transparent); }
+    .box.next { border-color: color-mix(in srgb, var(--sc-accent) 45%, var(--sc-border)); background: linear-gradient(135deg, color-mix(in srgb, var(--sc-accent) 10%, transparent), color-mix(in srgb, var(--sc-bg-1) 60%, transparent) 60%), color-mix(in srgb, var(--sc-bg-1) 94%, transparent); }
     .box.unread { box-shadow: inset 3px 0 0 var(--sc-accent), 0 0 24px -14px var(--sc-accent); }
     .box-in { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; }
     .bh { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -408,7 +408,7 @@ const DAY_MS = 86_400_000;
     /* Timeline: cards keep the frame width; rail + dates hang out to the left on wide screens */
     .tl { list-style: none; margin: 0; padding: 0; position: relative; display: flex; flex-direction: column; gap: 12px; }
     .row { position: relative; }
-    .card { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, var(--sc-accent) 20%, var(--sc-border)); border-radius: 12px; background: color-mix(in srgb, var(--sc-bg-1) 68%, transparent); }
+    .card { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, var(--sc-accent) 20%, var(--sc-border)); border-radius: 12px; background: color-mix(in srgb, var(--sc-bg-1) 92%, transparent); }
     .row[data-status='live'] .card { border-color: color-mix(in srgb, var(--sc-success) 55%, var(--sc-border)); background: linear-gradient(135deg, color-mix(in srgb, var(--sc-success) 10%, transparent), color-mix(in srgb, var(--sc-bg-1) 50%, transparent) 60%); }
     .row[data-status='next'] .card, .row[data-status='ptu'] .card { border-color: color-mix(in srgb, var(--sc-accent) 45%, var(--sc-border)); }
     .row[data-status='superseded'] .card, .row[data-status='other'] .card { opacity: 0.88; }
@@ -416,7 +416,7 @@ const DAY_MS = 86_400_000;
     .date { display: flex; flex-direction: column; gap: 1px; padding: 0 2px 4px; font-size: max(0.74rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     .date b { font-family: var(--sc-font-display); font-size: max(0.78rem, var(--sc-fs-floor)); font-weight: 600; color: var(--sc-fg-0); }
     .ch {
-      position: relative; z-index: 1; display: grid; grid-template-columns: 112px 140px minmax(0, 1fr); align-items: center; gap: 8px 16px;
+      position: relative; z-index: 1; display: grid; grid-template-columns: 150px 170px minmax(0, 1fr) auto; align-items: center; gap: 8px 16px;
       width: 100%; padding: 12px 16px; color: inherit; font: inherit; text-align: left; background: transparent; border: 0;
     }
     button.ch { cursor: pointer; }
@@ -426,12 +426,12 @@ const DAY_MS = 86_400_000;
     .ch:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .pill {
       display: inline-flex; justify-content: center; padding: 4px 8px; border-radius: 6px; font-family: var(--sc-font-display);
-      font-size: max(0.66rem, var(--sc-fs-floor)); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; text-align: center;
+      font-size: max(0.66rem, var(--sc-fs-floor)); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; text-align: center; white-space: nowrap;
       color: var(--sc-fg-2); background: color-mix(in srgb, var(--sc-fg-2) 16%, transparent);
     }
     .pill[data-status='live'] { color: var(--sc-bg-0); background: var(--sc-success); }
     .pill[data-status='next'], .pill[data-status='ptu'] { color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 20%, transparent); }
-    .cver { font-family: var(--sc-font-display); font-size: 1.15rem; font-weight: 600; color: var(--sc-fg-0); }
+    .cver { font-family: var(--sc-font-display); font-size: 1.15rem; font-weight: 600; color: var(--sc-fg-0); white-space: nowrap; }
     .row[data-status='live'] .cver { font-size: 1.7rem; }
     .sent { min-width: 0; color: var(--sc-fg-1); font-size: max(0.8rem, var(--sc-fs-floor)); padding-right: 30%; }
     .subs { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 2px; margin: 0 16px 12px 16px; padding-top: 6px; border-top: 1px solid color-mix(in srgb, var(--sc-accent) 14%, transparent); }
@@ -683,7 +683,8 @@ export class PatchBoardV2Component implements OnInit, OnDestroy {
     return this.isNext(card) ? this.t.instant('news.patchBoard.status.next') : this.t.instant('news.patch.status.' + card.status);
   }
   ptuPill(r: PtuRow): string {
-    return this.t.instant('news.patchBoard.ptu.wave', { stage: this.t.instant('news.patch.stage.' + r.stage), n: r.wave });
+    const stage = this.t.instant('news.patch.stage.' + r.stage);
+    return r.wave === null ? stage : this.t.instant('news.patchBoard.ptu.wave', { stage, n: r.wave });
   }
   nextStatus(card: StackCard): string {
     if (!card.group || card.status === 'next') return this.t.instant('news.patch.stack.noBuild');

@@ -77,8 +77,8 @@ export interface PtuRow {
   stage: 'ptu' | 'evocati';
   publishedAt: string;
   url: string;
-  /** 1-based wave within its line (oldest = 1). */
-  wave: number;
+  /** The wave RSI names in the note title, null when the title names none. */
+  wave: number | null;
   newest: boolean;
   image: string | null;
 }
@@ -88,6 +88,16 @@ export interface PtuRow {
  * of the tab; with none in testing the newest builds overall are listed so the
  * tab is never empty for no reason.
  */
+/**
+ * The wave RSI names in a note title (`[Wave 3] Star Citizen Alpha 5.0 PTU …`),
+ * or null. Counting builds would contradict the title — several builds share a
+ * wave (QA wave 3, 2026-11-21).
+ */
+export function waveOf(title: string): number | null {
+  const m = /\bwave\s*(\d+)/i.exec(title);
+  return m ? Number(m[1]) : null;
+}
+
 export function ptuRows(groups: readonly PatchLineGroup[], fallbackCount = 6): PtuRow[] {
   const testing = linesInTesting(groups);
   const pool = testing.length > 0 ? testing : groups.filter((g) => g.line);
@@ -105,7 +115,7 @@ export function ptuRows(groups: readonly PatchLineGroup[], fallbackCount = 6): P
         stage: e.facet === 'evocati' ? 'evocati' : 'ptu',
         publishedAt: e.item.publishedAt,
         url: e.item.url,
-        wave: i + 1,
+        wave: waveOf(e.item.title),
         newest: false,
         image: entryImage(e),
       });
@@ -159,6 +169,9 @@ export function previewCards(cards: readonly RoadmapCard[], n = 4): RoadmapCard[
 // ---- headline bullets -------------------------------------------------------
 
 const MAINTENANCE = /bug|fix|known|technical|behoben|bekannt/i;
+/** Build facts (wipe, starting money) are no headline: they belong to "Erste Schritte". */
+const BUILD_INFO_HEADING = /build info|important/i;
+const BUILD_INFO_BULLET = /^(important build info|long term persistence|starting auec|database reset|pledge items)/i;
 
 /**
  * 3–4 headline bullets of a note: top-level bullets of the first sections that
@@ -172,7 +185,9 @@ export function headlineBullets(outline: PatchOutline | null, n = 4): string[] {
   for (const node of outline.nodes) {
     if (node.kind === 'heading') heading = node.text;
     else if (node.kind === 'bullet' && node.depth === 0 && node.text.trim()) {
-      (MAINTENANCE.test(heading) ? maintenance : content).push(node.text.trim());
+      const text = node.text.trim();
+      if (BUILD_INFO_HEADING.test(heading) || BUILD_INFO_BULLET.test(text)) continue;
+      (MAINTENANCE.test(heading) ? maintenance : content).push(text);
     }
   }
   return [...content, ...maintenance].slice(0, n);
