@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.290.0] - 2026-11-21
+
+### Added
+- Admin translations: every language row shows its coverage as a bar with a percentage; "Start full run" appears only for an approved language that still has gaps.
+
 ## [0.289.4] - 2026-11-21
 
 ### Fixed
