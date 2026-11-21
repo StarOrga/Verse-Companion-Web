@@ -4,6 +4,16 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.289.3] - 2026-11-21
+
+### Fixed
+- Codex holotable: a tall hull is no longer cut off at the bottom of the hologram; the zoom is capped per ship so the turning hull keeps its full height, flat hulls keep the bigger size (admin feedback #392).
+
+## [0.289.2] - 2026-11-21
+
+### Removed
+- Typing without focus no longer opens or fills the main search (Verse, HQ, Codex); it collided with page hotkeys and element focus. Ctrl+K and `/` still open the search (admin feedback #385).
+
 ## [0.289.1] - 2026-11-21
 
 ### Fixed
