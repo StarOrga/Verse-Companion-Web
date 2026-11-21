@@ -213,7 +213,7 @@ import { HeightVarDirective } from '../shared/height-var.directive';
 import type { DockPosition } from './codex-power';
 import { CodexMissionBarComponent } from './codex-mission-bar.component';
 import { buildKpiStrip, buildKpiStripForKeys, KpiStripCell } from './codex-kpi-sets';
-import { applyPowerToOccupants } from './codex-power-effects';
+import { applyPowerToOccupants, poweredPayloadQueues } from './codex-power-effects';
 import { isPassiveShield, withPowerSignature } from './codex-power';
 import { groupOccupants } from './codex-fold-preview';
 import type { PowerSheet } from './codex-power';
@@ -4488,6 +4488,39 @@ export class CodexDetailComponent implements OnInit {
     applyPowerToOccupants(this.draftSummaryOccupants(), this.powerSheet()),
   );
 
+  /** The loadout cards' view of the same allocation: the powered payload per
+   * top-level hardpoint (a shield bay with one generator below its floor shows
+   * that one at 0), and per class for carried items (the guns in a gimbal all
+   * share the weapon pips). Empty while the dock has not run. */
+  private readonly cardPower = computed(() => {
+    const queues = poweredPayloadQueues(this.draftSummaryOccupants(), this.powerSheet());
+    const byPort = new Map<string, unknown>();
+    const byClass = new Map<string, unknown>();
+    if (queues.size === 0) return { byPort, byClass };
+    const taken = new Map<string, number>();
+    const draft = this.draft();
+    for (const r of this.resolvedLoadout()) {
+      // A draft value is the swapped-in class name (null = emptied).
+      const entry = draft.get(r.item.port);
+      const cls = entry === undefined ? r.item.className : entry;
+      if (!cls) continue;
+      const q = queues.get(cls);
+      if (!q || q.length === 0) continue;
+      const k = taken.get(cls) ?? 0;
+      byPort.set(r.item.port, q[Math.min(k, q.length - 1)]);
+      taken.set(cls, k + 1);
+    }
+    for (const [cls, q] of queues) if (q.length > 0) byClass.set(cls, q[0]);
+    return { byPort, byClass };
+  });
+
+  /** `item` with the payload the current pips leave it (cards only). */
+  private poweredCardItem<T extends { payload: unknown }>(item: T, port: string | null, className: string | null): T {
+    const power = this.cardPower();
+    const payload = (port !== null ? power.byPort.get(port) : undefined) ?? (className ? power.byClass.get(className) : undefined);
+    return payload === undefined ? item : { ...item, payload };
+  }
+
   /** The energy dock's current allocation state — null until the dock has run
    * once (or on ships too old to compute one, R3/MASTER §8a). */
   readonly powerSheet = signal<PowerSheet | null>(null);
@@ -4993,7 +5026,7 @@ export class CodexDetailComponent implements OnInit {
           grade: o.grade,
           manufacturerCode: o.manufacturerCode,
           damageChannels: damageChannelsOf(o.item.payload, o.item.ammoPayload),
-          stats: pending ? [] : equippedStats(o.item),
+          stats: pending ? [] : equippedStats(this.poweredCardItem(o.item, null, o.className)),
           statsMissing: pending ? false : weaponStatsUnavailable(o.item),
           statsNoteKey: pending ? null : equippedStatsNoteKey(o.item),
           draftState: o.state,
@@ -5008,7 +5041,7 @@ export class CodexDetailComponent implements OnInit {
         grade: hit?.grade ?? null,
         manufacturerCode: hit?.manufacturerCode ?? null,
         damageChannels: damageChannelsOf(item.payload, item.ammoPayload),
-        stats: equippedStats(item),
+        stats: equippedStats(this.poweredCardItem(item, null, slot.className)),
         statsMissing: weaponStatsUnavailable(item),
         statsNoteKey: equippedStatsNoteKey(item),
       };
@@ -5177,7 +5210,7 @@ export class CodexDetailComponent implements OnInit {
         statChip: qdChip && l.className === tech!.quantumDriveClassName ? qdChip : null,
         typeLabel: equippedTypeLabel(overlay.item),
         damageChannels: damageChannelsOf(overlay.item.payload, overlay.item.ammoPayload),
-        stats: overlay.state === 'pending' ? [] : equippedStats(overlay.item),
+        stats: overlay.state === 'pending' ? [] : equippedStats(this.poweredCardItem(overlay.item, l.port, overlay.className)),
         statsMissing: overlay.state === 'pending' ? false : weaponStatsUnavailable(overlay.item),
         statsNoteKey: overlay.state === 'pending' ? null : equippedStatsNoteKey(overlay.item),
         children,

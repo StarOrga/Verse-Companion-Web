@@ -1,6 +1,6 @@
 import { computeKpiSheet, buildDefensivePanel, buildOffensivePanel } from './codex-loadout-stats';
 import { computePowerSheet, PowerLevels } from './codex-power';
-import { applyPowerToOccupants, bandModifier, computePowerEffects, distributeColumn, powerBands } from './codex-power-effects';
+import { applyPowerToOccupants, poweredPayloadQueues, bandModifier, computePowerEffects, distributeColumn, powerBands } from './codex-power-effects';
 import { RESOURCE_STATS_GROUP } from './codex.types';
 import type { SummaryOccupant } from './ship-summary-panels';
 
@@ -140,6 +140,13 @@ describe('applyPowerToOccupants', () => {
     const off = applyPowerToOccupants(guns, sheetFor(guns, { weapons: 0 }));
     const panel = buildOffensivePanel(off);
     expect(panel.footerDps ?? 0).toBe(0);
+  });
+
+  it('queues one powered payload per hardpoint for the loadout cards', () => {
+    const q = poweredPayloadQueues(occ, sheetFor(occ, { shields: 2 })).get('SHLD_SECO_S01_WEB_SCItem')!;
+    const hp = (p: unknown) =>
+      (p as { stats: Record<string, Record<string, number>> }).stats['SCItemShieldGeneratorParams']['MaxShieldHealth'];
+    expect(q.map(hp)).toEqual([2160, 2160, 0]);
   });
 
   it('without a power sheet the occupants come back untouched', () => {

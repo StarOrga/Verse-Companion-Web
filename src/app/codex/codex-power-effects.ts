@@ -331,6 +331,38 @@ export function applyPowerToOccupants(
   return out;
 }
 
+/**
+ * The powered payload of every installed UNIT, queued per class name in
+ * hardpoint order — what a loadout card reads, one hardpoint at a time. A
+ * card takes the next entry for its class; a class the dock does not touch has
+ * no queue and the card keeps its stock payload.
+ */
+export function poweredPayloadQueues(
+  occupants: readonly SummaryOccupant[],
+  sheet: PowerSheet | null | undefined,
+): Map<string, unknown[]> {
+  const queues = new Map<string, unknown[]>();
+  const effects = computePowerEffects(occupants, sheet);
+  if (!effects) return queues;
+  occupants.forEach((o, i) => {
+    const power = effects.occupants[i];
+    const group = power ? classifyPowerGroup(o) : null;
+    const className = (o.payload as { className?: string } | null)?.className;
+    if (!power || !group || !className) return;
+    const list = queues.get(className) ?? [];
+    for (const unit of power.units) {
+      if (group === 'weapons') {
+        const offline = effects.weaponsOffline && drawsWeaponPower(o);
+        list.push(poweredWeapon(o.payload, offline ? null : effects.weaponRatio, offline));
+      } else if (group === 'shields') list.push(poweredShield(o.payload, unit));
+      else if (group === 'radar') list.push(poweredRadar(o.payload, unit));
+      else list.push(o.payload);
+    }
+    queues.set(className, list);
+  });
+  return queues;
+}
+
 /** Shield generators online / installed under the allocation (for the "2 von 3" line). */
 export function shieldGeneratorsOnline(effects: PowerEffects | null, occupants: readonly SummaryOccupant[]): { online: number; total: number } | null {
   if (!effects) return null;
