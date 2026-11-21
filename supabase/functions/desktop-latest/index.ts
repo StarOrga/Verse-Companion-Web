@@ -229,14 +229,9 @@ Deno.serve(withPosthog('desktop-latest', async (req: Request): Promise<Response>
   } = await userClient.auth.getUser();
   if (authErr || !user) return jsonResp({ error: 'unauthorized' }, 401);
 
-  const { data: profile } = await userClient
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!profile || !['admin', 'collaborator'].includes((profile as { role?: string }).role ?? '')) {
-    return jsonResp({ error: 'forbidden' }, 403);
-  }
+  // is_collaborator(): approved + not suspended admin/collaborator (the raw profiles.role ignores both).
+  const { data: isCollaborator } = await userClient.rpc('is_collaborator');
+  if (isCollaborator !== true) return jsonResp({ error: 'forbidden' }, 403);
 
   // Role known here → clamp the requested channel to the caller's tier.
   return await respondForChannel(userClient, req, resolveChannel(req), true, product);
