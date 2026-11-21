@@ -1,7 +1,39 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.288.5",
+  "current": "0.288.7",
   "releases": [
+    {
+      "version": "0.288.7",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Admin feedback: the \"Wer?\" filter no longer shows an \"Unbekannt\" chip. Topics without an account used to share one bucket labelled after whichever row came first; each sender now has its own chip — the PostHog-Wächter, the Dienst-Wächter (hourly service check, with its own avatar tooltip) and \"Ohne Konto\" for a topic whose author is gone or that the routine filed itself. The thread uses the same names (admin feedback #390)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.288.6",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader 0.84.2: Verse locations read from the real game data get readable types, real system positions for the Lagrange rest stops, gateways and Nyx stations, system rows and cities; a star is no longer a fallback position (#1195). The microTech moons were already right — the bundled catalog has them mirrored."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.288.5",
       "date": "2026-11-21",
