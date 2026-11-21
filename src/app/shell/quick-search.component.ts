@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   HostListener,
   TemplateRef,
   ViewContainerRef,
@@ -21,6 +22,7 @@ import { CodexSearchEngine } from '../codex/search/codex-search-engine';
 import { CodexSearchResultsComponent } from '../codex/search/codex-search-results.component';
 import { CodexSearchHub, isEditableTarget, isTypeToSearchKey } from '../codex/search/codex-search-hub.service';
 import { SearchOpenService } from './search-open.service';
+import { typeToSearchHere } from './fusion-bar/type-to-search';
 
 /**
  * Ctrl+K / "/" and the header's search button.
@@ -184,6 +186,7 @@ export class QuickSearchComponent {
   private readonly analytics = inject(AnalyticsService);
   private readonly overlay = inject(Overlay);
   private readonly viewContainer = inject(ViewContainerRef);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   private readonly overlayTpl = viewChild.required<TemplateRef<unknown>>('overlayTpl');
   private overlayRef: OverlayRef | null = null;
@@ -222,7 +225,23 @@ export class QuickSearchComponent {
     if (this.hub.hasBar() && isTypeToSearchKey(ev)) {
       ev.preventDefault();
       this.hub.activate(ev.key);
+      return;
     }
+    // Type-to-search (#385) under this header - the one live readers get by default: on every other
+    // page where this search is the only one, a letter typed while nothing takes text opens it with
+    // that letter. Same rules as the Fusion bar (type-to-search.ts).
+    if (typeToSearchHere(ev, this.host.nativeElement)) {
+      ev.preventDefault();
+      this.openWith(ev.key);
+    }
+  }
+
+  /** Open the overlay with `seed` already typed, the caret after it. */
+  openWith(seed: string): void {
+    this.analytics.track('search:palette_open', { surface: 'palette' });
+    this.open();
+    this.engine.setInput(seed);
+    this.focusField();
   }
 
   /** Ctrl+K, "/" and the header button: the Codex bar on a Codex page, else the overlay. */
@@ -263,7 +282,13 @@ export class QuickSearchComponent {
   }
 
   focusField(): void {
-    setTimeout(() => this.overlayRef?.overlayElement.querySelector<HTMLInputElement>('.qs-input')?.focus());
+    setTimeout(() => {
+      const field = this.overlayRef?.overlayElement.querySelector<HTMLInputElement>('.qs-input');
+      if (!field) return;
+      field.focus();
+      const end = field.value.length;
+      field.setSelectionRange(end, end);
+    });
   }
 
   onKeydown(ev: KeyboardEvent): void {
