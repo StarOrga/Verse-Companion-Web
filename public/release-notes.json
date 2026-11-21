@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.289.0",
+  "current": "0.289.1",
   "releases": [
+    {
+      "version": "0.289.1",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Admin feedback: topics the routine creates read \"KI\" (EN \"AI\") with the bot icon instead of \"Ohne Konto\"; \"Ohne Konto\" stays for a user topic whose account is gone (admin feedback #390)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.289.0",
       "date": "2026-11-21",
