@@ -619,7 +619,7 @@ async function translationAfterPublish(
         if (!c?.channel || !c.finalized_at) return null;
         const { data, error } = await admin
           .from('codex_builds').select('id')
-          .eq('channel', c.channel).neq('id', id).not('finalized_at', 'is', null)
+          .eq('channel', c.channel).neq('id', id).not('finalized_at', 'is', null).is('superseded_at', null)
           .lt('finalized_at', c.finalized_at)
           .order('finalized_at', { ascending: false }).limit(1);
         if (error) throw error;
