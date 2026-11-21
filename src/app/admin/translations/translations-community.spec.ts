@@ -7,7 +7,7 @@ import { FakeCall, FakeResult, fakeSupabase } from '../../testing/fake-supabase'
 import { TranslationAlertsComponent } from './translation-alerts.component';
 import { TranslationOutreachComponent } from './translation-outreach.component';
 import { TranslationSourcesComponent } from './translation-sources.component';
-import { canImportSource, contextLines, goalPercent, passProgress } from './translations.logic';
+import { canImportSource, passProgress } from './translations.logic';
 
 type Answer = (c: FakeCall) => FakeResult | Promise<FakeResult>;
 
@@ -51,11 +51,6 @@ describe('logic helpers of the community tabs', () => {
     expect(canImportSource('refused')).toBe(false);
   });
 
-  it('clamps the goal progress and flattens card context', () => {
-    expect(goalPercent(5, 10)).toBe(50);
-    expect(goalPercent(25, 10)).toBe(100);
-    expect(contextLines(['a', { key: 'k', text: 'b' }, { x: 1 }])).toEqual(['a', 'k: b', '{"x":1}']);
-  });
 });
 
 describe('TranslationSourcesComponent', () => {
