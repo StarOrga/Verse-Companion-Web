@@ -16,8 +16,13 @@ pipeline pair ──P2/P1/P4/P3──► resolved ──────────
              │                 real question, language nobody judges ──────────────► 'ai' (KI decided, P6)
 'open' ──answer──► 'answered' ──(next learn pass)──► applied (applied_at set, undo gone)
 'open' ──not mine──► 'ai' (undecided) ──(next learn pass)──► 'ai' decided
+                     a convention card (lang null) is decided once for all its languages (`conventionDecide`:
+                     members with a community text per side, unsure) — it shows in the veto list of every member language
 'ai' decided ──„Sieht falsch aus“──► 'ai' undecided, the vetoed option never wins again ──► next pass decides anew
                                     (both options vetoed → 'parked': nothing is applied)
+                                    in a language an admin judges (`translation_judged_langs`; a convention: any member
+                                    language) it instead REOPENS as a normal deck card ('open', the vetoed option stays
+                                    remembered, no points) — automatic decisions in a judged language are reversible (P3)
 'ai' decided ──„Passt“ / back-translation present / 3 days──► taken over at the next learn pass
 'folded' = an old single card that became a member of a convention card (P14). Never shown.
 ```
@@ -105,8 +110,8 @@ export interface ActionResult { card: Card; points: number; bonus: number; goal:
 | `answer_translation_card` | `p_card_id uuid`, `p_answer 'a'\|'b'\|'own'`, `p_own_text text = null`, `p_exceptions jsonb = null` | `ActionResult` | P8, P11, G3, U3, U4 |
 | `not_mine_translation_card` | `p_card_id uuid` | `{ card: Card; goal: Goal }` | P12 |
 | `undo_translation_card` | `p_card_id uuid` | `{ card: Card; goal: Goal }` | P13, U6 |
-| `translation_veto_list` | `p_lang text`, `p_limit int = 50` (1..200) | `VetoList` | P6, U11 |
-| `veto_translation_decision` | `p_card_id uuid` | `ActionResult` | P6 „Sieht falsch aus“ |
+| `translation_veto_list` | `p_lang text`, `p_limit int = 50` (1..200) | `VetoList` (also for a judged language: its automatic decisions; convention cards of the language included) | P3, P6, U11 |
+| `veto_translation_decision` | `p_card_id uuid` | `ActionResult` (`card.status` is `'open'` and `points`/`bonus` are 0 when the card reopened in a judged language) | P3, P6 „Sieht falsch aus“ |
 | `accept_translation_decision` | `p_card_id uuid` | `ActionResult` | P6 „Passt“ |
 | `accept_translation_decisions` | `p_lang text` | `number` (rows) | P6 „Rest übernehmen“ |
 | `translation_my_langs` | — | `string[]` | P7 |
@@ -120,6 +125,7 @@ export interface Deck {
   affected_total: number;  // texts all of them affect
   deck_affected: number;   // texts the returned cards affect („Deutsch · 10 Karten · betrifft 74 Texte“)
   cards: Card[];           // deck order: convention → term → wording, then spread, reach, doubt, fresh
+                           // (a pre-v2 row without `params` is never returned until the P14 cleanup ran)
 }
 
 export interface VetoList {
@@ -144,12 +150,12 @@ export interface Board {
     lang: string;
     judged: boolean;       // in my_langs → row „dein Stapel · N offen“; else „N von KI · M unsicher“
     deck_open: number;
-    ai_decided: number;    // KI decisions of the language (status ai, decided)
-    ai_review: number;     // of those still waiting for a veto (not applied, not accepted)
+    ai_decided: number;    // KI decisions of the language (status ai, decided; a convention counts in every member language)
+    ai_review: number;     // of those still waiting for a veto (not applied, not accepted); judged language: the „N automatisch“ link
     ai_unsure: number;     // of those unsure
     ai_pending: number;    // sent to the KI path, decision due at the next learn pass
   }[];                     // judged first, then by lang
-  ai_summary: { decided: number; review: number; unsure: number }; // over the not-judged languages — U9 special row
+  ai_summary: { decided: number; review: number; unsure: number }; // over the not-judged languages, each card once — U9 special row
   leaderboard: { user_id: string; name: string | null; points: number; rank: number; is_me: boolean }[];
 }
 ```
@@ -230,7 +236,7 @@ Reason codes of the KI card (`translations.cards.reason.<code>`, numbers from `a
 | P11 | application in `applyAnsweredCards` at the learn-pass start |
 | P12 | `not_mine_translation_card` → KI path, `routeCards` decides; Skip and `skipped` removed |
 | P13 | `undo` snapshot + `undo_translation_card` until `applied_at` |
-| P14 | `cleanupOpenCards` — runs once at the first learn pass after deploy (marker `translation-work/cards/cleanup-v2.json`) |
+| P14 | `cleanupOpenCards` — runs once at the first learn pass after deploy (marker `translation-work/cards/cleanup-v2.json`); crash-safe: plans first, writes the convention cards, only then folds/updates the old rows |
 | G1–G4 | `translation_card_board`, `translation_card_rules`, scoring in the action RPCs |
 
 ## Removed (the current UI still calls these — Wave 2 replaces them)

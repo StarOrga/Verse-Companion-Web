@@ -5,6 +5,8 @@ import { TranslateService, provideTranslateService } from '@ngx-translate/core';
 import { AnalyticsService } from '../../../core/analytics.service';
 import { ScConfirmService } from '../../../shared/dialog/sc-confirm.service';
 import { UndoToastService } from '../../../shared/undo-toast/undo-toast.service';
+import de from '../../../../../public/i18n/de.json';
+import { useViewport } from '../../../testing/viewport';
 import { FakeCall, FakeResult, fakeSupabase } from '../../../testing/fake-supabase';
 import { TranslationCardsComponent } from '../translation-cards.component';
 import type { TranslationCard } from '../translations.service';
@@ -328,4 +330,44 @@ describe('TranslationCardsComponent (Karteikarten v2)', () => {
     await vi.waitFor(() => expect(r.cmp.flash()).toBe('errors.translation.cards.gone'));
     expect(r.rpc('translation_deck').length).toBe(2);
   });
+});
+
+describe('TranslationCardsComponent: no text overflow with long option labels (U14)', () => {
+  const LONG = 'Hochgeschwindigkeitsantriebssteuerungseinheitenwartungsprotokollselbstzerstörungssequenz';
+  afterEach(() => TestBed.inject(UndoToastService).current.set(null));
+
+  for (const width of [375, 768]) {
+    describe(`at ${width}px`, () => {
+      useViewport(width, 800);
+
+      it('the swipe hint wraps inside the stage and never widens the page', async () => {
+        const long = termCard('long1', { option_a: { text: LONG, source: 'mined', votes: 5, count: 9 }, option_b: { text: `${LONG}zwei`, source: 'mined', votes: 2, count: 9 } });
+        const { harness, el, cmp } = await mount(backend([long]));
+        // The real German strings: a missing key would render as one very long unbreakable word.
+        TestBed.inject(TranslateService).setTranslation('xx', de, false);
+        // The hint is a touch-only line; show it on this desktop test browser to measure it.
+        const style = document.createElement('style');
+        style.textContent = 'p.swipe.touch { display: flex !important; }';
+        document.head.append(style);
+        try {
+          cmp.turn();
+          harness.detectChanges();
+          const swipe = q(el, 'p.swipe')!;
+          const box = swipe.getBoundingClientRect();
+          expect(swipe.textContent).toContain(LONG);
+          expect(swipe.scrollWidth).toBeLessThanOrEqual(swipe.clientWidth);
+          for (const span of Array.from(swipe.querySelectorAll('span'))) {
+            const r = span.getBoundingClientRect();
+            expect(r.right).toBeLessThanOrEqual(box.right + 0.5);
+            expect(r.left).toBeGreaterThanOrEqual(box.left - 0.5);
+          }
+          const table = q(el, '.table')!;
+          expect(table.getBoundingClientRect().width).toBeLessThanOrEqual(window.innerWidth);
+          expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(window.innerWidth);
+        } finally {
+          style.remove();
+        }
+      });
+    });
+  }
 });
