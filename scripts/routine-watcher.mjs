@@ -49,7 +49,7 @@ const RUNNER = join(WORKTREES, RUNNER_NAME);
 const DISALLOWED = 'AskUserQuestion,EnterPlanMode,ExitPlanMode,ScheduleWakeup,CronCreate,CronDelete,RemoteTrigger,Monitor,Workflow,EnterWorktree,ExitWorktree';
 /**
  * Pinned, never inherited: without these the run took whatever the CLI default was that day
- * (Opus until 2026-11-06, then Sonnet). `complex` topics raise the effort per worker inside the run
+ * (Opus until 2026-11-06, then Sonnet). `complex` topics raise the effort per worker to `high` inside the run
  * (SKILL.md STEP 3), not here. Overridable for a one-off experiment via env.
  */
 const RUN_MODEL = process.env.SCC_ROUTINE_MODEL || 'opus';
