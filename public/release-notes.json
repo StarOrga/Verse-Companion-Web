@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.288.2",
+  "current": "0.288.3",
   "releases": [
+    {
+      "version": "0.288.3",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader 0.84.2: 3D skins of the Retaliator, the Constellation Taurus / Phoenix, the Avenger variants and the Syulen variants upload again. Two liveries of one ship could share one skin id, so the server refused the whole ship on every upload; each livery now keeps an id of its own, and the server names a duplicate id (400 duplicate_skin_id) instead of failing with a bare error (admin feedback #383). Needs a new uploader run."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.288.2",
       "date": "2026-11-21",

@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.288.3] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.2: 3D skins of the Retaliator, the Constellation Taurus / Phoenix, the Avenger variants and the Syulen variants upload again. Two liveries of one ship could share one skin id, so the server refused the whole ship on every upload; each livery now keeps an id of its own, and the server names a duplicate id (400 `duplicate_skin_id`) instead of failing with a bare error (admin feedback #383). Needs a new uploader run.
+
 ## [0.288.2] - 2026-11-21
 
 ### Fixed
