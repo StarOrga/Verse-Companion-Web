@@ -195,5 +195,118 @@
         "text": "das sieht mir viel zu anders aus! ALs der ander eworkflow :/"
       }
     ]
+  },
+  {
+    "iteration": 3,
+    "action": "iterate",
+    "fidelity": "live",
+    "favorite": "d1",
+    "annotations": [
+      {
+        "id": "anno-r3-d1-s1-a2",
+        "text": "Das ist doch viel besser!"
+      },
+      {
+        "id": "anno-r3-d1-s1-a3",
+        "text": "passt"
+      },
+      {
+        "id": "anno-r3-d1-s2-a3",
+        "text": "drei beispiele reichen, aber irgendwie sind da viele formen, viel weiße text zeiel n usw. edas macht alles unruhig in dieser riesen karte  un d nciht light weiehhgt obwohl  ich die inhalte alle super finde"
+      },
+      {
+        "id": "anno-r3-d1-s4-a2",
+        "text": "sehr gut, genau. Wobei, was wollen wir eigtnlich mit kombo? Ist das nicht einfach das was wir in tageszeil schon haben, naja...."
+      }
+    ],
+    "userPins": [
+      {
+        "design": "d1",
+        "screen": "r3-d1-s1",
+        "x": 72.9,
+        "y": 75.1,
+        "target": "a.mk-act.mk-act--s \"Ansehen\"",
+        "text": "finde ich sehr gut"
+      },
+      {
+        "design": "d1",
+        "screen": "r3-d1-s1",
+        "x": 70.7,
+        "y": 95.5,
+        "target": "button.mk-act.mk-act--p \"Stapel aufdecken Enter\"",
+        "text": "brauchen wir den button hier?! haben doch obenb schon alles"
+      },
+      {
+        "design": "d1",
+        "screen": "r3-d1-s2",
+        "x": 41.1,
+        "y": 92.2,
+        "target": "div.mk-gamebar \"Karte1 von 10 Combonoch keine Als Nächst\"",
+        "text": "ich weiß gar nicht ob wir das hier unten als balken überhaput brauchen... haben doch schon alles sichtbar darüber"
+      },
+      {
+        "design": "d1",
+        "screen": "r3-d1-s6",
+        "x": 37.7,
+        "y": 23.6,
+        "target": "a.mk-backl \"Zurück zum Stapel\"",
+        "text": "das zurück ist doof hier, wir haben doch rechts eh die auswahl..."
+      },
+      {
+        "design": "d1",
+        "screen": "r3-d1-s6",
+        "x": 73.6,
+        "y": 21.2,
+        "target": "div.mk-frame \"Kommandozentrale Admin KI-Übersetzung Cl\"",
+        "text": "sollte das hier rechts nicht eher links stehen und rechts das was links steht"
+      },
+      {
+        "design": "d1",
+        "screen": "r3-d1-s6",
+        "x": 73.7,
+        "y": 30.3,
+        "target": "i",
+        "text": "Diese woche würde ich auch in dem kasten integrtieren, dafür mit tagesziel tauschen! \nSo haben wir einen kasten mit statstitim diese woche, punkte usw. und eine mit tagesziel und Sprachne"
+      }
+    ]
+  },
+  {
+    "iteration": 4,
+    "action": "iterate",
+    "fidelity": "live",
+    "general": "schau mal, 11 Zeilen! und das was am wichtigsten ist nicht klar groß :/",
+    "attachments": [
+      ".claude/concepts/20261121-1151-karteikarten-neu/attachments/9dbe2c2664fe72bc299d3dc7e8cde10e153bec99b688fbf36af9ae7e048cd28c.png"
+    ],
+    "annotations": [],
+    "userPins": []
+  },
+  {
+    "iteration": 5,
+    "action": "implement",
+    "fidelity": "live",
+    "general": "devops learn warum live treue nicht wirklich echt ist im sinne von z. BV. ist das seitenlogo nicht das originale unangefasste, auch der setien name... die buttons rechts oben usw... das haben wir aj alles nicht angetastet und doch ist es nicht original, auch der background nicht..",
+    "userPins": [
+      {
+        "screen": "r5-d1-s1",
+        "target": "a.d5-act.d5-act--s \"Ansehen\"",
+        "text": "den button bruachen wir hier nicht, es sollte reichen wenn ich darüber die entsprehcenden anklicke und für ki hat ... gib dem einfach auch gern eine sonderzeile amende ähnlicher style wie die sprachen!"
+      },
+      {
+        "screen": "r5-d1-s2",
+        "target": "span.d5-keys.d5-desk \"Alle Tasten ?\"",
+        "text": "Alle tasten brauchen wir da nicht textuell stehen!"
+      },
+      {
+        "screen": "r5-d1-s2",
+        "target": "button.d5-act.d5-act--s \"Ausnahme für eine Sprache\"",
+        "text": "hotkey fehlt hierfür"
+      },
+      {
+        "screen": "r5-d1-s3",
+        "target": "a \"Kommandozentrale\"",
+        "text": "steht da wirklich kommandozentrale?! Wi rhaben doch schon admin als label der gesamtgroßseite"
+      }
+    ]
   }
 ]
