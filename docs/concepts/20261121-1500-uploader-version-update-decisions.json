@@ -16,5 +16,31 @@
       }
     ],
     "implemented": "aec76336e"
+  },
+  {
+    "iteration": 2,
+    "stage": "A",
+    "action": "finalize",
+    "final": false,
+    "next": "B",
+    "tests": {
+      "t-chip": "self",
+      "t-suite": "skip"
+    },
+    "handoffs": {
+      "h-reinstall": "self"
+    }
+  },
+  {
+    "iteration": 3,
+    "stage": "B",
+    "action": "implement",
+    "decisions": {
+      "d-recover": "register",
+      "d-dispatch": "refuse-existing",
+      "d-register": "yes"
+    },
+    "implemented": "071401c85",
+    "data": "desktop_releases 0.84.3-dispatch (token alias)"
   }
 ]

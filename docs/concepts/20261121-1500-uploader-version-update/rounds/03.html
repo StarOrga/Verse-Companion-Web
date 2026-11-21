@@ -1,4 +1,5 @@
-<section data-iteration="3" data-iteration-template="decision" data-analysis="full" data-stage="B">
+<section data-iteration="3" data-iteration-template="decision" data-analysis="full" data-stage="B" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]},"fidelity":"off"}</script>
 
   <section id="briefing" data-analysis-briefing data-nav-label="Briefing">
     <p data-briefing-what>v0.84.3 wurde zweimal gebaut, jeder Lauf mit eigenem Release-Token. Registriert ist nur der Token des Tag-Laufs. Wer das Setup aus dem Dispatch-Lauf erwischt hat, ist dem Update-Server unbekannt und bekommt nie wieder ein Update.</p>
@@ -43,8 +44,8 @@
       </div>
       <textarea data-comment="d-recover-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-d-recover-none" value="">
-      <input type="hidden" name="dm-d-recover-hes" value="">
-      <input type="hidden" name="dm-d-recover-touched" value="">
+      <input type="hidden" name="dm-d-recover-hes" value="{&quot;ms&quot;:10176,&quot;revisits&quot;:0,&quot;median&quot;:10176}">
+      <input type="hidden" name="dm-d-recover-touched" value="1">
       <input type="hidden" name="dm-d-recover-issue" value="">
       <input type="hidden" name="dm-d-recover-epic" value="">
       <div data-alevel="3" data-title="Rettung hängender Builds">
@@ -67,12 +68,12 @@ desktop_releases   0.84.3 → dbef63fc-…</pre></div>
       <p data-stakes>Ob je wieder zwei Builds derselben Version mit verschiedenen Tokens erscheinen können.</p>
       <div data-options>
         <label data-opt="build-only" data-recommended>
-          <input type="radio" name="dm-d-dispatch" value="build-only" checked>
+          <input type="radio" name="dm-d-dispatch" value="build-only">
           <span data-opt-label>Nur bauen, Artefakte behalten, nichts veröffentlichen</span>
           <span data-opt-consequence>Veröffentlicht wird nur noch vom Tag-Lauf; ein Dispatch kann keine Version belegen.</span>
         </label>
         <label data-opt="refuse-existing">
-          <input type="radio" name="dm-d-dispatch" value="refuse-existing">
+          <input type="radio" name="dm-d-dispatch" value="refuse-existing" checked>
           <span data-opt-label>Veröffentlichen, aber abbrechen, wenn die Version schon existiert</span>
           <span data-opt-consequence>Dispatch bleibt ein Release-Weg; der Tag-Lauf danach bricht ab statt neu zu bauen.</span>
         </label>
@@ -84,8 +85,8 @@ desktop_releases   0.84.3 → dbef63fc-…</pre></div>
       </div>
       <textarea data-comment="d-dispatch-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-d-dispatch-none" value="">
-      <input type="hidden" name="dm-d-dispatch-hes" value="">
-      <input type="hidden" name="dm-d-dispatch-touched" value="">
+      <input type="hidden" name="dm-d-dispatch-hes" value="{&quot;ms&quot;:56043,&quot;revisits&quot;:4,&quot;median&quot;:10176}">
+      <input type="hidden" name="dm-d-dispatch-touched" value="1">
       <input type="hidden" name="dm-d-dispatch-issue" value="">
       <input type="hidden" name="dm-d-dispatch-epic" value="">
       <div data-alevel="3" data-title="Was ein manueller Lauf darf">
@@ -125,8 +126,8 @@ Run 44907381433  push (Tag)         13:08  token dbef63fc  → Mirror überschri
       </div>
       <textarea data-comment="d-register-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-d-register-none" value="">
-      <input type="hidden" name="dm-d-register-hes" value="">
-      <input type="hidden" name="dm-d-register-touched" value="">
+      <input type="hidden" name="dm-d-register-hes" value="{&quot;ms&quot;:7259,&quot;revisits&quot;:0,&quot;median&quot;:10176}">
+      <input type="hidden" name="dm-d-register-touched" value="1">
       <input type="hidden" name="dm-d-register-issue" value="">
       <input type="hidden" name="dm-d-register-epic" value="">
       <div data-alevel="3" data-title="Registrieren nach Upload">
