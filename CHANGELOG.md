@@ -4,6 +4,13 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.291.0] - 2026-11-22
+
+### Changed
+- Data Uploader sign-in: after "Verbinden" the browser tab returns to the connect stage and shows "Verbunden" (or what went wrong) there, instead of the uploader's bare loopback page (uploader 0.85.0).
+- The connect screen reads as title + one line of info + one button; the Cancel button is gone (closing the tab sends nothing).
+- The installed app is now called "Verse Companion" on Android, iOS and desktop.
+
 ## [0.290.1] - 2026-11-21
 
 ### Fixed
