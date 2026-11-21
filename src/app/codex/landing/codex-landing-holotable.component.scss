@@ -12,10 +12,14 @@
   --ry: calc(var(--tw) * 0.087);
   --t0: 0s;
   // Hologram box in % of the air, centred on the emitter (the TS BOX mirrors it).
-  --hx: 30%;
-  --hw: 40%;
-  --ht: 14%;
-  --hh: 72%;
+  // The hull dominates the stage (admin feedback #392): the box takes the air
+  // between the callout column and the Kennung, the TS zoom fills it.
+  --hx: 21%;
+  --hw: 58%;
+  --ht: 6%;
+  --hh: 82%;
+  // Callout value size; the Kennung's bracket span reads it too.
+  --call-v: clamp(15px, 1.1vw, 21px);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -125,6 +129,9 @@
 // at the bottom. Width and height are reset here, and model-viewer's own
 // 320 px minimum is lifted so it never outgrows the box.
 .viewer { position: absolute; inset: 0; width: auto; height: auto; display: block; pointer-events: none; }
+// The 3D canvas reaches a little past the box sideways (inside the build clip's
+// -25 %), so the nose and tail of a broadside hull never meet a hard edge.
+sc-ship-skin-viewer.viewer { left: -6%; right: -6%; }
 .viewer ::ng-deep .stage { height: 100%; min-height: 0; background: transparent; }
 .viewer ::ng-deep model-viewer { width: 100%; height: 100%; min-height: 0; }
 .sil {
@@ -214,7 +221,7 @@
 @keyframes dot-lock { from { transform: scale(2.6); opacity: 0; } 60% { opacity: 1; } }
 .callouts { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; pointer-events: none; z-index: 4; }
 .call {
-  position: absolute; right: 79%; width: 21%; transform: translateY(-50%);
+  position: absolute; right: 80%; width: 20%; transform: translateY(-50%);
   display: flex; flex-direction: column; align-items: flex-end; gap: 2px; text-align: right;
   pointer-events: auto;
   animation: call-in 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--at) + 0.22s) both;
@@ -226,7 +233,7 @@
 }
 .c-value {
   position: relative; display: inline-flex; align-items: baseline; gap: 6px;
-  font: 600 clamp(17px, 1.45vw, 26px) / 1.08 var(--cx-mono); font-variant-numeric: tabular-nums;
+  font: 600 var(--call-v) / 1.08 var(--cx-mono); font-variant-numeric: tabular-nums;
   color: #eefbff; white-space: nowrap;
   text-shadow: 0 0 12px rgba(130, 220, 255, 0.55);
 }
@@ -240,7 +247,7 @@
 .c-zone { margin-left: 6px; font-style: normal; letter-spacing: 0.04em; text-transform: none; color: var(--sc-fg-1); }
 /* Flug / Loadout (#884): the switch heads the callout column it swaps. */
 .set {
-  position: absolute; right: 79%; top: 15%; z-index: 5; transform: translateY(-50%);
+  position: absolute; right: 80%; top: 15%; z-index: 5; transform: translateY(-50%);
   animation: call-in 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) var(--at) both;
 }
 .leaving .set { animation: call-out 0.3s ease-in both; }
@@ -251,8 +258,8 @@
 // the counterpart of the callouts on the left.
 .kennung {
   position: absolute; left: calc(var(--hx) + var(--hw)); right: 0; top: var(--ht); height: var(--hh); z-index: 5;
-  display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
-  padding-left: 18px;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
+  padding-left: 16px;
 }
 // With the callout column on screen the bracket spans it exactly: from the
 // first callout's label to the last callout's value. A callout is centred on
@@ -260,7 +267,7 @@
 // A comparison line under a value adds half its height on that end.
 @media (min-width: 1100px) {
   .kennung.k-calls {
-    --call-half: calc(7px + clamp(17px, 1.45vw, 26px) * 0.54);
+    --call-half: calc(7px + var(--call-v) * 0.54);
     --k-top-pad: calc(var(--call-half) + var(--k-top-cmp, 0) * 7.5px);
     --k-bot-pad: calc(var(--call-half) + var(--k-bot-cmp, 0) * 7.5px);
     top: calc(var(--k-top) - var(--k-top-pad));
@@ -299,7 +306,7 @@
 .k-sep { color: rgba(159, 179, 200, 0.5); }
 .k-name {
   position: relative; display: inline-block; max-width: 100%; margin: 0;
-  font: 500 clamp(20px, 1.65vw, 32px) / 1.06 var(--sc-font-display); letter-spacing: 0.012em;
+  font: 500 clamp(17px, 1.2vw, 24px) / 1.06 var(--sc-font-display); letter-spacing: 0.012em;
   color: #f2fcff; text-wrap: balance;
   text-shadow: 0 0 18px rgba(130, 220, 255, 0.45), 0 1px 0 rgba(0, 0, 0, 0.6);
 }
@@ -309,24 +316,24 @@
   animation: type 0.8s steps(var(--chars, 12)) calc(var(--at) + 0.12s) both;
 }
 .k-facts {
-  display: flex; flex-direction: column; gap: 10px; margin: 0;
+  display: flex; flex-direction: column; gap: 8px; margin: 0;
   animation: rise-in 0.45s ease-out calc(var(--at) + 0.75s) both;
 }
 // Each fact hangs off the dimension edge by a short tick.
 .k-facts div { position: relative; display: flex; flex-direction: column; gap: 4px; }
 .k-facts div::before {
-  content: ''; position: absolute; left: -18px; top: 0.3em; width: 12px; height: 1px;
+  content: ''; position: absolute; left: -16px; top: 0.3em; width: 11px; height: 1px;
   background: rgba(170, 238, 255, 0.7); box-shadow: 0 0 4px rgba(130, 220, 255, 0.7);
 }
 .k-facts dt { font: 600 max(9px, 0.56rem) / 1 var(--sc-font-display); letter-spacing: 0.18em; text-transform: uppercase; color: var(--sc-fg-2); }
-.k-facts dd { margin: 0; font: 600 max(13px, 0.9rem) / 1 var(--cx-mono); font-variant-numeric: tabular-nums; color: var(--sc-fg-0); white-space: nowrap; }
+.k-facts dd { margin: 0; font: 600 max(12px, 0.8rem) / 1 var(--cx-mono); font-variant-numeric: tabular-nums; color: var(--sc-fg-0); white-space: nowrap; }
 .k-paints {
   display: flex; flex-direction: column; gap: 6px; margin-top: 12px;
   animation: rise-in 0.45s ease-out calc(var(--at) + 0.9s) both;
 }
 .k-plabel { font: 600 max(9px, 0.56rem) / 1 var(--sc-font-display); letter-spacing: 0.18em; text-transform: uppercase; color: var(--sc-fg-2); }
 .k-plabel b { margin-left: 4px; color: var(--sc-accent); font-weight: 600; letter-spacing: 0.06em; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; max-width: 240px; max-height: 120px; overflow-y: auto; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; max-width: 200px; max-height: 120px; overflow-y: auto; }
 .chip {
   position: relative; width: 36px; height: 24px; padding: 0; border-radius: 3px; overflow: hidden; cursor: pointer;
   border: 1px solid rgba(143, 227, 255, 0.35); background: rgba(8, 22, 32, 0.8);
@@ -391,12 +398,13 @@
 // Narrow stage: the callouts give way (their values go to the bars pane).
 @media (max-width: 1099px) {
   .leaders, .dot, .callouts, .set { display: none; }
-  :host { --hx: 6%; --hw: 62%; }
+  :host { --hx: 3%; --hw: 68%; }
 }
 @media (max-width: 720px) {
   .air { min-height: 220px; }
-  :host { --hx: 10%; --hw: 80%; --ht: 55%; --hh: 44%; }
-  .beam { top: 52%; }
+  // The hull takes the whole width under the Kennung (admin feedback #392).
+  :host { --hx: 2%; --hw: 96%; --ht: 50%; --hh: 50%; }
+  .beam { top: 48%; }
   .kennung { left: 0; right: 0; top: 0; height: auto; padding-left: 0; justify-content: flex-start; align-items: center; text-align: center; }
   .k-dim, .k-facts div::before { display: none; }
   .k-head, .k-foot { align-items: center; }

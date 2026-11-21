@@ -5269,7 +5269,7 @@
     "empty": "Noch kein Feedback. Sei der Erste.",
     "errorTitle": "Fehler",
     "you": "Du",
-    "unknownUser": "Unbekannt",
+    "noAccount": "Ohne Konto",
     "shipRef": "Änderung ansehen",
     "issueRef": "Issue ansehen",
     "topicNumber": "Thema #{{n}} — feste Nummer, auf die du dich beziehen kannst",
@@ -5582,7 +5582,9 @@
     "threadsStale": "Antworten konnten nicht geladen werden — die Einordnung einzelner Karten kann veraltet sein.",
     "guard": {
       "name": "PostHog-Wächter",
-      "title": "PostHog-Wächter (automatisch erstellt)"
+      "title": "PostHog-Wächter (automatisch erstellt)",
+      "serviceName": "Dienst-Wächter",
+      "serviceTitle": "Dienst-Wächter (automatisch erstellt, stündliche Dienstprüfung)"
     }
   },
   "feedbackFab": {

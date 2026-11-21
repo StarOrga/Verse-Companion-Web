@@ -5269,7 +5269,7 @@
     "empty": "No feedback yet. Be the first to post.",
     "errorTitle": "Error",
     "you": "You",
-    "unknownUser": "Unknown",
+    "noAccount": "No account",
     "shipRef": "View change",
     "issueRef": "View issue",
     "topicNumber": "Topic #{{n}} — a fixed number you can refer to",
@@ -5581,8 +5581,10 @@
     "deleteTitle": "Delete message?",
     "threadsStale": "Replies could not be loaded — some cards may be filed under an outdated state.",
     "guard": {
-      "name": "PostHog-Wächter",
-      "title": "PostHog guard (created automatically)"
+      "name": "PostHog guard",
+      "title": "PostHog guard (created automatically)",
+      "serviceName": "Service guard",
+      "serviceTitle": "Service guard (created automatically, hourly service check)"
     }
   },
   "feedbackFab": {
