@@ -4802,24 +4802,30 @@
     "handedOverHint": "Die App übernimmt deine Anmeldung, du kannst dieses Fenster schließen. Ist sie nicht verbunden, starte die Verbindung in der App neu."
   },
   "desktopAuth": {
-    "title": "Verse Data Uploader autorisieren",
+    "titleConnect": "Verse Data Uploader verbinden",
+    "titleConfirm": "Verse Data Uploader verbinden?",
+    "titleConnecting": "Verbinde…",
+    "titleConnected": "Verbunden",
+    "titleDenied": "Kein Zugriff",
+    "titleFailed": "Verbindung fehlgeschlagen",
     "authorizing": "Prüfe deine Session…",
-    "loginRequired": "Bitte erst einloggen, danach bestätigst du die Verbindung.",
-    "redirecting": "Autorisiert. Schicke Token zur App…",
-    "redirectingHint": "Dieses Fenster kann gleich geschlossen werden.",
-    "unauthorized": "Dein Account darf den Verse Data Uploader nicht nutzen.",
-    "unauthorizedHint": "Du brauchst Collaborator- oder Admin-Rolle. Frag einen Admin.",
+    "loginRequired": "Melde dich an, danach bestätigst du die Verbindung.",
+    "confirmInfo": "Nur bestätigen, wenn du die Anmeldung selbst im Uploader gestartet hast (Port {{port}}).",
+    "confirm": "Verbinden",
+    "redirecting": "Übergebe deine Anmeldung an den Uploader.",
+    "handedOverHint": "Die App übernimmt deine Anmeldung, du kannst dieses Fenster schließen. Ist sie nicht verbunden, starte die Verbindung in der App neu.",
+    "connected": "Der Uploader ist mit deinem Konto verbunden. Du kannst dieses Fenster schließen.",
+    "start": "Starte die Anmeldung im Verse Data Uploader – er öffnet diese Seite dann selbst.",
+    "unauthorized": "Dein Konto darf den Verse Data Uploader nicht nutzen. Frag einen Admin nach der Collaborator-Rolle.",
     "errorMissingParams": "Callback- oder State-Parameter fehlt.",
     "errorBadCallback": "Callback-URL ist kein 127.0.0.1-Loopback im erwarteten Portbereich.",
     "errorNoToken": "Kein Access-Token in der Session.",
-    "confirmPrompt": "Verse Data Uploader auf Port {{port}} mit deinem Konto verbinden?",
-    "confirmHint": "Bestätige nur, wenn du die Anmeldung gerade selbst im Verse Data Uploader gestartet hast.",
-    "confirm": "Verbinden",
-    "cancel": "Abbrechen",
-    "cancelled": "Abgebrochen – es wurde nichts übertragen. Du kannst dieses Fenster schließen.",
     "retry": "Erneut versuchen",
-    "handedOver": "Zurück zur App",
-    "handedOverHint": "Die App übernimmt deine Anmeldung, du kannst dieses Fenster schließen. Ist sie nicht verbunden, starte die Verbindung in der App neu."
+    "done": {
+      "csrf": "Die Anmeldung gehörte nicht zu dieser Uploader-Sitzung. Starte sie im Uploader neu.",
+      "noToken": "Der Uploader hat keine Anmeldung erhalten. Starte sie im Uploader neu.",
+      "failed": "Die Übergabe an den Uploader ist fehlgeschlagen. Starte die Anmeldung im Uploader neu."
+    }
   },
   "footer": {
     "madeByCommunity": "Made by the Community",

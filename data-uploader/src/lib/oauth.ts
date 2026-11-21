@@ -16,9 +16,12 @@
  *     `Access-Control-Allow-Private-Network` header. A top-level navigation
  *     is exempt, so the form-POST gets through. The token rides in the body,
  *     so it still never lands in the URL or browser history.
- *  4. The loopback validates `state`, renders its "you can close this
- *     window" page straight into the navigated tab, and resolves with the
- *     token. (A JSON body is still accepted for backward compatibility.)
+ *  4. The loopback validates `state`, answers the navigation with a 303 back
+ *     to the web app's `/apps/uploader/auth?done=<outcome>` — so the tab ends
+ *     on the same connect stage the user just clicked, not on a bare loopback
+ *     page — and resolves with the token. (A JSON body is still accepted for
+ *     backward compatibility; a `webBase` that is no URL falls back to the
+ *     plain loopback page.)
  *
  * The web app additionally posts the `refresh_token` + `expires_at` (web build
  * ≥ the one that ships this change). The caller persists them encrypted via
@@ -39,6 +42,29 @@ export interface AuthResult {
   expiresAt?: number;
   userEmail?: string;
   error?: string;
+}
+
+/**
+ * How the hand-off ended, as the web app's connect page reads it from
+ * `?done=` — the contract with `desktop-auth.component.ts` in the web app.
+ */
+export type HandoffOutcome = 'ok' | 'csrf' | 'no_token' | 'too_large' | 'request' | 'transfer' | 'start';
+
+/**
+ * Where the loopback sends the browser tab after a hand-off: the web app's own
+ * connect page, which renders the outcome in its stage. `null` when `webBase`
+ * is no http(s) URL — the caller then renders its plain page instead.
+ */
+export function handoffRedirectUrl(webBase: string, outcome: HandoffOutcome): string | null {
+  let base: URL;
+  try {
+    base = new URL(webBase);
+  } catch {
+    return null;
+  }
+  if (base.protocol !== 'https:' && base.protocol !== 'http:') return null;
+  const path = `${base.pathname.replace(/\/+$/, '')}/apps/uploader/auth`;
+  return `${base.origin}${path}?done=${outcome}`;
 }
 
 const PORT_MIN = 46800;
@@ -103,6 +129,28 @@ export async function runOAuthFlow(webBase: string): Promise<AuthResult> {
       'cache-control': 'no-store',
     });
 
+    /**
+     * End a browser navigation on the web app's connect page (303, the
+     * outcome in `?done=`), so success and failure look like the page the user
+     * just clicked. Without a usable `webBase` the plain loopback page with the
+     * given status stays the fallback.
+     */
+    const answer = (
+      res: ServerResponse,
+      status: number,
+      outcome: HandoffOutcome,
+      fallback: { title: string; body: string; ok: boolean },
+    ): void => {
+      const location = handoffRedirectUrl(webBase, outcome);
+      if (location) {
+        res.writeHead(303, { location, ...corsHeaders() });
+        res.end();
+        return;
+      }
+      res.writeHead(status, { 'content-type': 'text/html; charset=utf-8', ...corsHeaders() });
+      res.end(renderPage(fallback.title, fallback.body, fallback.ok));
+    };
+
     const server = createServer((req: IncomingMessage, res: ServerResponse) => {
       const url = new URL(req.url ?? '/', `http://127.0.0.1:${port}`);
       if (url.pathname !== '/cb') {
@@ -139,8 +187,7 @@ export async function runOAuthFlow(webBase: string): Promise<AuthResult> {
         });
         req.on('end', () => {
           if (total > MAX_BODY_BYTES) {
-            res.writeHead(413, { 'content-type': 'text/html; charset=utf-8', ...corsHeaders() });
-            res.end(renderPage('Verse Data Uploader · Fehler', 'Anfrage zu groß.', false));
+            answer(res, 413, 'too_large', { title: 'Verse Data Uploader · Fehler', body: 'Anfrage zu groß.', ok: false });
             return;
           }
           const raw = Buffer.concat(chunks).toString('utf-8');
@@ -157,8 +204,7 @@ export async function runOAuthFlow(webBase: string): Promise<AuthResult> {
             try {
               body = JSON.parse(raw);
             } catch {
-              res.writeHead(400, { 'content-type': 'text/html; charset=utf-8', ...corsHeaders() });
-              res.end(renderPage('Verse Data Uploader · Fehler', 'Ungültige Anfrage.', false));
+              answer(res, 400, 'request', { title: 'Verse Data Uploader · Fehler', body: 'Ungültige Anfrage.', ok: false });
               return;
             }
           } else {
@@ -174,21 +220,23 @@ export async function runOAuthFlow(webBase: string): Promise<AuthResult> {
             };
           }
           if (body.state !== state) {
-            res.writeHead(400, { 'content-type': 'text/html; charset=utf-8', ...corsHeaders() });
-            res.end(renderPage('Verse Data Uploader · Fehler', 'CSRF-Mismatch — versuch es erneut.', false));
+            answer(res, 400, 'csrf', { title: 'Verse Data Uploader · Fehler', body: 'CSRF-Mismatch — versuch es erneut.', ok: false });
             finish({ ok: false, error: 'state mismatch' });
             return;
           }
           if (body.error || !body.token) {
-            res.writeHead(400, { 'content-type': 'text/html; charset=utf-8', ...corsHeaders() });
-            res.end(renderPage('Verse Data Uploader · Fehler', body.error ?? 'Kein Token erhalten.', false));
+            answer(res, 400, 'no_token', {
+              title: 'Verse Data Uploader · Fehler',
+              body: body.error ?? 'Kein Token erhalten.',
+              ok: false,
+            });
             finish({ ok: false, error: body.error ?? 'no token' });
             return;
           }
-          // Success: render the "you can close this window" page directly
-          // into the navigated tab and resolve. No separate ack round-trip.
-          res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', ...corsHeaders() });
-          res.end(renderPage('Verse Data Uploader · Verbunden', 'Du kannst dieses Fenster schließen.', true));
+          // Success: send the tab back to the web app's connect page, which
+          // shows the finished link in its own stage, and resolve. No
+          // separate ack round-trip.
+          answer(res, 200, 'ok', { title: 'Verse Data Uploader · Verbunden', body: 'Du kannst dieses Fenster schließen.', ok: true });
           const expiresAt =
             body.expires_at !== undefined && body.expires_at !== ''
               ? Number(body.expires_at)
@@ -202,24 +250,20 @@ export async function runOAuthFlow(webBase: string): Promise<AuthResult> {
           });
         });
         req.on('error', () => {
-          res.writeHead(400, { 'content-type': 'text/html; charset=utf-8', ...corsHeaders() });
-          res.end(renderPage('Verse Data Uploader · Fehler', 'Übertragungsfehler.', false));
+          answer(res, 400, 'transfer', { title: 'Verse Data Uploader · Fehler', body: 'Übertragungsfehler.', ok: false });
         });
         return;
       }
 
       // GET = a direct browser hit (e.g. user reloaded or opened the URL by
-      // hand). The real handoff is the POST above, so just render a neutral
-      // info page; don't resolve the flow.
+      // hand). The real handoff is the POST above, so just point at the app
+      // on the web app's connect page; don't resolve the flow.
       if (req.method === 'GET') {
-        res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', ...corsHeaders() });
-        res.end(
-          renderPage(
-            'Verse Data Uploader',
-            'Bitte den Login im Verse Data Uploader Fenster starten.',
-            true,
-          ),
-        );
+        answer(res, 200, 'start', {
+          title: 'Verse Data Uploader',
+          body: 'Bitte den Login im Verse Data Uploader Fenster starten.',
+          ok: true,
+        });
         return;
       }
 
