@@ -226,6 +226,26 @@ export function buildHttpException(fn: string, status: number, code: string | nu
 
 export const CRON_RUN_EVENT = 'server:cron_run_finish';
 
+/**
+ * A 5xx the caller heals by itself (the uploader halves the batch and retries):
+ * reported as `server:ingest_timeout`, never as `$exception`. Only the final
+ * failure of a run is an error, and the uploader reports that one.
+ */
+export const INGEST_TIMEOUT_EVENT = 'server:ingest_timeout';
+
+/** Responses a handler marked as expected: the event `withPosthog` sends instead of an HttpError. */
+const expected = new WeakMap<Response, { event: string; props: Record<string, unknown> }>();
+
+/**
+ * Marks a 5xx response as an expected, self-healing outcome: `withPosthog`
+ * sends `event` with `props` instead of an `$exception`. Nothing travels on the
+ * response itself (no header, no body field), so nothing leaks to the client.
+ */
+export function reportAs(res: Response, event: string, props: Record<string, unknown> = {}): Response {
+  expected.set(res, { event, props });
+  return res;
+}
+
 /** The cron-run outcome event: a 5xx or a throw is a failure, everything else (incl. 429 throttle) is a healthy run. */
 export function buildCronRun(fn: string, status: number | null, durationMs: number, error?: unknown): BatchEvent {
   const ok = error === undefined && status != null && status < 500;
@@ -237,6 +257,7 @@ export function buildCronRun(fn: string, status: number | null, durationMs: numb
 /**
  * Reports thrown errors and 5xx responses as `$exception` (a 5xx as `HttpError`, fingerprinted by
  * function, status and the body's `error` code); the outcome reaches the caller unchanged.
+ * A 5xx marked with `reportAs` goes out as its own event instead.
  * `opts.cron` (pg_cron driven functions) additionally reports every run's outcome as `server:cron_run_finish`.
  */
 export function withPosthog(
@@ -259,7 +280,12 @@ export function withPosthog(
     }
     const status = res.status;
     const cronRun = opts.cron ? buildCronRun(fn, status, Date.now() - started) : null;
-    if (status >= 500) {
+    const marked = status >= 500 ? expected.get(res) : undefined;
+    if (marked) {
+      const events = [buildCapture(marked.event, { ...marked.props, http_status: status, http_method: req.method }, { fn })];
+      if (cronRun) events.push(cronRun);
+      keepAlive(captureBatch(events));
+    } else if (status >= 500) {
       // The body is read from a clone in the background: the response leaves unchanged and undelayed.
       const p = readErrorCode(res)
         .catch(() => null)

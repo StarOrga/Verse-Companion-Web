@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.288.3] - 2026-11-21
+
+### Fixed
+- Catalog uploads: a batch that runs into the database statement timeout and is retried smaller no longer opens an error issue in PostHog — it is counted as its own `server:ingest_timeout` event with the op, table and batch size; only a run's final failure is an error. Copying the unchanged tables at the end of a re-upload now retries a slow chunk with half the rows (2000 → 1000 → 500) instead of failing the finalize step (admin feedback #380).
+
 ## [0.288.2] - 2026-11-21
 
 ### Fixed

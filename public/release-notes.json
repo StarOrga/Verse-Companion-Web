@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.288.2",
+  "current": "0.288.3",
   "releases": [
+    {
+      "version": "0.288.3",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Catalog uploads: a batch that runs into the database statement timeout and is retried smaller no longer opens an error issue in PostHog — it is counted as its own server:ingest_timeout event with the op, table and batch size; only a run's final failure is an error. Copying the unchanged tables at the end of a re-upload now retries a slow chunk with half the rows (2000 → 1000 → 500) instead of failing the finalize step (admin feedback #380)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.288.2",
       "date": "2026-11-21",
