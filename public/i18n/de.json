@@ -6968,6 +6968,16 @@
         "monitored": "Überwacht",
         "unmonitored": "Nicht überwacht"
       },
+      "hint": {
+        "fuel": {
+          "any": "Treibstoff knapp",
+          "hydrogen": "Wasserstoff knapp",
+          "quantum": "Quantum-Treibstoff knapp"
+        },
+        "hangar": "Hangar: Platz {{position}}",
+        "hangarWait": "Hangar: Platz {{position}} · ca. {{min}} min",
+        "hangarQueued": "Hangar: in der Warteschlange"
+      },
       "path": {
         "title": "Deine Route",
         "empty": "Kein aktiver Einsatz. Plane einen unter Planen."

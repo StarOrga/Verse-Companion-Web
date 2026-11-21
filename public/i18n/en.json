@@ -6968,6 +6968,16 @@
         "monitored": "Monitored",
         "unmonitored": "Unmonitored"
       },
+      "hint": {
+        "fuel": {
+          "any": "Fuel low",
+          "hydrogen": "Hydrogen low",
+          "quantum": "Quantum fuel low"
+        },
+        "hangar": "Hangar: position {{position}}",
+        "hangarWait": "Hangar: position {{position}} · about {{min}} min",
+        "hangarQueued": "Hangar: queued"
+      },
       "path": {
         "title": "Your route",
         "empty": "No active operation. Plan one under Plan."

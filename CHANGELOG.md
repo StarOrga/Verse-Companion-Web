@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Type to search now works in the header every reader gets by default: on Verse, HQ and every other page whose only search is the header search, a letter typed with nothing focused opens the search with that letter. The 0.286.0 version only reached the beta header, so it did nothing for readers without the shell beta. Codex pages keep starting their own search bar.
 
+## [0.288.0] - 2026-11-21
+
+### Added
+- HQ Jetzt: warning chips in the live strip for low fuel (10 minutes from the event, hydrogen or quantum named) and a queued hangar request with its position and remaining wait (#1193)
+
+### Changed
+- Shared contracts with the desktop app: the web copy is now the master, the app mirrors it with a sync script
+
 ## [0.287.0] - 2026-11-21
 
 ### Added
