@@ -228,6 +228,12 @@ learning step and the arbiter) with
   (build, language, status with a percentage while it estimates or publishes, strings,
   estimate, spent, QA/judge stats) with approve / cancel for `awaiting_approval`. A full
   run is ordered per language (free: it estimates itself); approving one asks with its cost.
+  Each language row shows its coverage (bar + whole percent, rounded down) from its newest job
+  that measured one: `(counts.cig + TM-filled) / (counts.keys - counts.blank)`, where TM-filled is
+  `stats.overlay_count` of a published job and `counts.tm` of any other (an overlay pass after a
+  seed import is not counted until the next job). "Start full run" appears only for an approved
+  language that still has a gap (or no figure yet) and no unfinished full run: a full run only ever
+  translates what CIG and the TM lack, so at partial coverage it is the way to fill the gap.
 - **Glossary editor:** search over source and target, filter by language, origin
   (CIG · KI · Admin) and category (term · label · unit · dnt), edit and lock an entry
   (admin entry wins), mark for retranslation (next job re-translates the strings that
