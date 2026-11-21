@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AnalyticsService } from '../core/analytics.service';
+import { AuthService } from '../auth/auth.service';
 import { ScActionDirective } from '../shared/action/sc-action.directive';
 import { daysUntil, eventPhase, type VerseEvent } from './news-events';
 import { VerseEventsService } from './verse-events.service';
@@ -40,7 +41,7 @@ interface TeaserRow {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[attr.data-variant]': 'variant()', '[class.empty]': '!visible()' },
   template: `
-    @if (svc.error() && !svc.loaded()) {
+    @if (svc.error() && !svc.loaded() && auth.user()) {
       <div class="ev-state" role="alert">
         <span>{{ 'news.events.error' | translate }}</span>
         <button type="button" scAction tier="secondary" [busy]="svc.loading()" (click)="retry()">{{ 'errors.retry' | translate }}</button>
@@ -146,8 +147,13 @@ export class EventsTeaserComponent {
   /** Ticks every ten minutes so "läuft" / "in n Tagen" stay honest on an open tab. */
   private readonly clock = signal(Date.now());
 
+  readonly auth = inject(AuthService);
+
   constructor() {
-    void this.svc.load();
+    // The timeline is readable for signed-in readers only (RLS); signed out there is nothing to ask for.
+    effect(() => {
+      if (this.auth.user()) void this.svc.load();
+    });
     const t = setInterval(() => this.clock.set(Date.now()), 10 * 60 * 1000);
     inject(DestroyRef).onDestroy(() => clearInterval(t));
   }
@@ -161,7 +167,7 @@ export class EventsTeaserComponent {
     return picked.map((e) => this.row(e, now));
   });
 
-  readonly visible = computed(() => this.rows().length > 0 || (!!this.svc.error() && !this.svc.loaded()));
+  readonly visible = computed(() => this.rows().length > 0 || (!!this.svc.error() && !this.svc.loaded() && !!this.auth.user()));
 
   retry(): void {
     void this.svc.load(true);

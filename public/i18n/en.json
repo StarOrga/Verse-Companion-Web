@@ -3373,7 +3373,27 @@
       "comm-link": "Comm-Link",
       "spectrum": "Spectrum",
       "youtube": "YouTube",
-      "patch": "Patch notes"
+      "patch": "Patch notes",
+      "events": "Events"
+    },
+    "events": {
+      "title": "In-game events",
+      "upcomingTitle": "Coming up in the 'verse",
+      "aria": "Running and upcoming in-game events",
+      "allPosts": "All event posts",
+      "runningUntil": "Running · until {{date}}",
+      "endsToday": "Running · ends today",
+      "startsTomorrow": "From tomorrow, {{date}}",
+      "startsIn": "From {{date}} · in {{n}} days",
+      "estimated": "date estimated",
+      "error": "The events could not be loaded.",
+      "kind": {
+        "expo": "Expo",
+        "showcase": "Showcase",
+        "seasonal": "Festival",
+        "community": "Community event",
+        "free-fly": "Free Fly"
+      }
     },
     "favorite": {
       "save": "Collect",
