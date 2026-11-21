@@ -318,7 +318,23 @@ export async function uploadSkins(
       const cat = JSON.parse(readFileSync(catPath, 'utf-8')) as SkinCatalog;
       // The hull glb hangs off one entry; every other paint ships its store
       // icon only. An entry with neither has nothing to show.
-      const built = cat.skins.filter((s) => s.model || s.icon);
+      // One skin id twice in a commit is refused by ingest-skins (an upsert
+      // cannot touch one row twice) — an older extractor wrote such catalogs
+      // (#383). The first entry wins; the rest are named in the log.
+      const seenIds = new Set<string>();
+      const dropped: string[] = [];
+      const built = cat.skins.filter((s) => {
+        if (!(s.model || s.icon)) return false;
+        if (seenIds.has(s.id)) {
+          dropped.push(`${s.id} ("${s.name}")`);
+          return false;
+        }
+        seenIds.add(s.id);
+        return true;
+      });
+      if (dropped.length) {
+        onLog(`${shipId}: skin id listed twice in skins.json, skipped ${dropped.join(', ')}`, 'warn');
+      }
 
       // A ship whose every skin failed to produce a glb has nothing to ship.
       // Asking `ingest-skins` to sign an empty object list is a 400, which used
