@@ -213,6 +213,7 @@ import { HeightVarDirective } from '../shared/height-var.directive';
 import type { DockPosition } from './codex-power';
 import { CodexMissionBarComponent } from './codex-mission-bar.component';
 import { buildKpiStrip, buildKpiStripForKeys, KpiStripCell } from './codex-kpi-sets';
+import { applyPowerToOccupants } from './codex-power-effects';
 import { isPassiveShield, withPowerSignature } from './codex-power';
 import { groupOccupants } from './codex-fold-preview';
 import type { PowerSheet } from './codex-power';
@@ -4474,7 +4475,17 @@ export class CodexDetailComponent implements OnInit {
     computeKpiSheet(this.summaryOccupants(), this.kpiShipInput()),
   );
   private readonly currentKpiSheet = computed(() =>
-    computeKpiSheet(this.draftSummaryOccupants(), this.kpiShipInput()),
+    computeKpiSheet(this.poweredOccupants(), this.kpiShipInput()),
+  );
+
+  /** The draft loadout as the energy dock's pips leave it (codex-power-effects):
+   * shield generators below their floor drop out, regen follows the power band,
+   * energy guns carry the capacitor their pips fund. Every analysis surface reads
+   * this list, so one pip change reaches the KPI band, the Offensive/Defensive
+   * panels and the Schiff facts alike. The dock itself keeps reading the raw
+   * draft — it is what decides the allocation. */
+  readonly poweredOccupants = computed(() =>
+    applyPowerToOccupants(this.draftSummaryOccupants(), this.powerSheet()),
   );
 
   /** The energy dock's current allocation state — null until the dock has run
@@ -4621,7 +4632,7 @@ export class CodexDetailComponent implements OnInit {
     const payload = this.kind() === 'ship' ? (this.detail()?.payload as ShipPayload | undefined) : undefined;
     const occ = this.draftSummaryOccupants();
     return withPowerSignature(
-      computeKpiSheet(occ, rankTargetShipInput(payload)),
+      computeKpiSheet(this.poweredOccupants(), rankTargetShipInput(payload)),
       occ,
       (payload?.stats ?? null) as Record<string, Record<string, unknown>> | null,
       this.build()?.schemaVersion ?? null,
@@ -4804,13 +4815,13 @@ export class CodexDetailComponent implements OnInit {
 
   readonly offensivePanel = computed(() => {
     if (this.kind() !== 'ship') return null;
-    return buildOffensivePanel(this.draftSummaryOccupants());
+    return buildOffensivePanel(this.poweredOccupants());
   });
 
   readonly defensivePanel = computed(() => {
     if (this.kind() !== 'ship') return null;
     const hull = (this.detail()?.payload as ShipPayload | undefined)?.hull;
-    return buildDefensivePanel(this.draftSummaryOccupants(), this.armorPayload(), hull?.hp ?? null);
+    return buildDefensivePanel(this.poweredOccupants(), this.armorPayload(), hull?.hp ?? null);
   });
 
   /** Sections the active mission folds away — feeds both the loadout layout
@@ -4840,7 +4851,7 @@ export class CodexDetailComponent implements OnInit {
         dimensions: this.dimensions(),
         techStats: this.techStats(),
         kpiSheet: this.currentKpiSheet(),
-        occupants: this.draftSummaryOccupants(),
+        occupants: this.poweredOccupants(),
         decks: shipDeckNames(d.payload as ShipPayload | undefined, this.lang()),
         decksDerived: shipDecksDerived(d.payload as ShipPayload | undefined),
       },

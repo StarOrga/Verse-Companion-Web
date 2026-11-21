@@ -1774,6 +1774,16 @@ class CodexExtractor:
     # at a time, as new ship-level stat needs arise (PR A: signature only).
     _SHIP_STATS_WHITELIST = {"SSCSignatureSystemParams"}
 
+    # The ship's own energy-weapon ammo pool (4.x resource network): the
+    # weapons' power pips fill a SHIP-level regen pool that every energy gun
+    # draws its `regen.requestedAmmoLoad` / `requestedRegenPerSec` from. The
+    # struct lives on the vehicle entity, not on an item, and its exact name
+    # was not verifiable without a local Data.p4k when this was written — so
+    # every vehicle component whose type names a weapon regen pool or the
+    # capacitor assignment is kept (both are small scalar structs). Check
+    # `payload.stats` of the Nomad after the next upload.
+    _SHIP_STATS_PATTERN = re.compile(r"RegenPool|CapacitorAssignment", re.IGNORECASE)
+
     def _ship_stats(self, comps) -> Dict[str, Any]:
         """Whitelist-only stats block for ships, same struct-keyed shape as
         `_component_stats()` (one level of nested-struct flattening as
@@ -1782,7 +1792,9 @@ class CodexExtractor:
         stats: Dict[str, Any] = {}
         for c in comps:
             t = c.get("_Type_")
-            if t not in self._SHIP_STATS_WHITELIST:
+            if t not in self._SHIP_STATS_WHITELIST and not (
+                isinstance(t, str) and self._SHIP_STATS_PATTERN.search(t)
+            ):
                 continue
             flat = _flatten_depth2(c)
             if t == "SSCSignatureSystemParams":
