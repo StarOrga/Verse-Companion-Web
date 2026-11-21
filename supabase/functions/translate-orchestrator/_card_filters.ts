@@ -287,6 +287,25 @@ export function kiDecide(c: { a: Candidate; b: Candidate; doubt: number; vetoed?
   return { choice: s, text: opt(s).text, basis: 'votes', unsure: true, reason: { code: 'votes', a: av ?? 0, b: bv ?? 0 } };
 }
 
+/**
+ * KI decision for a convention card ("Nicht meine Entscheidung" on a pattern question): the members carry the
+ * candidates the pairs came from, so the evidence is how many members have a community text on each side.
+ * Same order as `kiDecide` (clear majority, else the higher count, unsure); a tie with no evidence picks a, unsure.
+ */
+export function conventionDecide(
+  members: ConventionMember[], vetoed: ('a' | 'b' | 'own')[], aText: string, bText: string,
+): KiDecision | null {
+  const side = (s: 'a' | 'b') => members.filter((m) => {
+    const e = m.entries?.[s] as { o?: string } | null | undefined;
+    return e?.o === 'community';
+  }).length;
+  return kiDecide({
+    a: { text: aText, source: 'pattern', votes: side('a') },
+    b: { text: bText, source: 'pattern', votes: side('b') },
+    doubt: 1, vetoed,
+  });
+}
+
 // ── P10 examples ─────────────────────────────────────────────────────────────
 
 export interface CardExample {

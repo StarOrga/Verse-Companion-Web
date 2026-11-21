@@ -14,7 +14,7 @@
 //   * `cleanupOpenCards` runs the existing open cards through all of that once (P14)
 
 import {
-  classifyPair, conventionExamples, conventionPick, EXAMPLES_PER_OPTION, kiDecide, mergeMembers, recomputeDoubt, termExamples,
+  classifyPair, conventionDecide, conventionExamples, conventionPick, EXAMPLES_PER_OPTION, kiDecide, mergeMembers, recomputeDoubt, termExamples,
 } from './_card_filters.ts';
 import type { Candidate, CardExample, ConventionMember, KiDecision, PatternId } from './_card_filters.ts';
 import type { TmEntry } from './_diff.ts';
@@ -308,8 +308,15 @@ export async function routeCards(deps: { learn?: LearnDb; now(): Date }, lang: s
   const judged = await judgedLangs(learn);
   const pending = await learn.listCards({ lang, status: ['ai'], undecided: true, limit: 500 });
   const stale = judged.has(lang) ? [] : await learn.listCards({ lang, status: ['open'], kinds: ['meta', 'wording'], limit: 500 });
-  for (const c of [...pending, ...stale]) {
-    const d = kiDecide({ a: optCand(c.option_a), b: optCand(c.option_b), doubt: Number(c.doubt ?? 0.5), vetoed: c.vetoed ?? [] });
+  // A convention card has lang null: "Nicht meine Entscheidung" sends it here too, and the KI decides it once for
+  // every member language (the first pass of any member language gets it; the others find it decided).
+  const pendingConv = (await learn.listCards({ status: ['ai'], kinds: ['convention'], undecided: true, limit: 200 }))
+    .filter((c) => (c.langs ?? []).includes(lang));
+  for (const c of [...pending, ...stale, ...pendingConv]) {
+    const isConv = c.kind === 'convention';
+    const d = isConv
+      ? conventionDecide(((c.context as { members?: ConventionMember[] }).members ?? []), c.vetoed ?? [], c.option_a.text, c.option_b.text)
+      : kiDecide({ a: optCand(c.option_a), b: optCand(c.option_b), doubt: Number(c.doubt ?? 0.5), vetoed: c.vetoed ?? [] });
     if (!d) {
       await learn.updateCard(c.id!, { status: 'parked' });
       sum.parked++;
@@ -379,27 +386,32 @@ export async function cleanupOpenCards(deps: { store: Store; learn?: LearnDb; no
   const at = deps.now().toISOString();
   const rows = (await learn.listCards({ status: ['open'], kinds: ['meta', 'wording', 'style'], limit: 5000 }))
     .filter((c) => !(c.context as { v2?: unknown })?.v2);
+  // Crash safety: plan everything first, write the convention cards (merge is idempotent), and only then change
+  // the old rows. A crash before the row updates leaves them open and v2-less, so the next run plans them again;
+  // a convention member is never only in a row that was already folded.
   const conv = new Map<PatternId, ConventionMember[]>();
+  const plan: [string, Partial<CardRow>][] = [];
   for (const old of rows) {
     sum.seen++;
     const c = upgradeLegacyCard(old);
     const r = routePair(c, judged, rules, at);
     if (r.to === 'convention') {
       conv.set(r.pattern, [...(conv.get(r.pattern) ?? []), r.member]);
-      await learn.updateCard(c.id!, { status: 'folded', context: { ...c.context, folded_into: conventionKey(r.pattern) } });
+      plan.push([c.id!, { status: 'folded', context: { ...c.context, folded_into: conventionKey(r.pattern) } }]);
       sum.folded++;
       continue;
     }
     const row = r.row;
-    await learn.updateCard(c.id!, {
+    plan.push([c.id!, {
       kind: row.kind, params: row.params, option_a: row.option_a, option_b: row.option_b, doubt: row.doubt, context: row.context,
       status: row.status, ai_choice: row.ai_choice ?? null, ai_text: row.ai_text ?? null, ai_basis: row.ai_basis ?? null,
       ai_reason: row.ai_reason ?? null, ai_unsure: row.ai_unsure ?? false, ai_decided_at: row.ai_decided_at ?? null,
-    });
+    }]);
     if (row.status === 'open') sum.open++;
     else sum.decided++;
   }
   for (const [p, members] of conv) await upsertConvention(learn, p, members);
+  for (const [id, patch] of plan) await learn.updateCard(id, patch);
   await deps.store.putJson(cleanupMarkerKey, { at, ...sum });
   return sum;
 }

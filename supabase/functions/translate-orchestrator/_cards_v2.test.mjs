@@ -143,6 +143,38 @@ describe('KI path (P12 not-mine, P6 veto)', () => {
     assert.equal(c.status, 'parked');
   });
 
+  it('a convention card sent with "Nicht meine Entscheidung" is decided for every member language, not stranded (P12)', async () => {
+    const w = world({ judged: ['de'] });
+    await createCards(w.learn, [tm('de', 30, 'Lounge', ai('Lounge'), com('LOUNGE')), tm('it', 31, 'Medium', ai('Medio'), com('MEDIO')), tm('it', 32, 'Cargo', ai('Carico'), com('CARICO'))], 40, w.store, w.deps.now);
+    const conv = w.rows.find((c) => c.kind === 'convention');
+    assert.equal(conv.lang, null);
+    // not_mine_translation_card on it: status ai without a decision (lang stays null)
+    Object.assign(conv, { status: 'ai', ai_choice: null, not_mine_by: 'u1' });
+    // the dedupe index still covers 'ai': the pattern is blocked until the card is decided
+    assert.equal(await w.learn.insertCard({ ...conv, id: undefined, status: 'open' }), false);
+    const s = await routeCards(w.deps, 'de');
+    assert.equal(s.decided, 1, 'the convention is picked up although lang is null');
+    assert.equal(conv.status, 'ai');
+    assert.ok(conv.ai_choice && conv.ai_text, 'decided: choice and text');
+    assert.equal(conv.ai_unsure, true, 'no evidence in the options, so an admin looks (veto list)');
+    // the other member language finds it decided already
+    assert.deepEqual({ ...(await routeCards(w.deps, 'it')) }, { decided: 0, parked: 0, rerouted: 0 });
+    // „Sieht falsch aus“ on both sides parks it, never strands it
+    Object.assign(conv, { ai_choice: null, vetoed: ['a', 'b'] });
+    assert.equal((await routeCards(w.deps, 'it')).parked, 1);
+    assert.equal(conv.status, 'parked');
+  });
+
+  it('a convention with more community members on one side is decided for that side', async () => {
+    const w = world({ judged: ['de'] });
+    await createCards(w.learn, [tm('de', 33, 'Lounge', ai('Lounge'), com('LOUNGE')), tm('de', 34, 'Cargo', ai('Fracht'), com('FRACHT'))], 40, w.store, w.deps.now);
+    const conv = w.rows.find((c) => c.kind === 'convention');
+    Object.assign(conv, { status: 'ai', ai_choice: null });
+    await routeCards(w.deps, 'de');
+    assert.equal(conv.ai_choice, 'b');
+    assert.equal(conv.ai_reason.code, 'votes');
+  });
+
   it('open cards of a language nobody judges any more are rerouted', async () => {
     const w = world({ judged: ['de'] });
     w.rows.push({ ...tm('it', 9, 'Cancel', ai('Annullare il'), com('Cancella')), id: 'x', status: 'open', vetoed: [] });
@@ -235,6 +267,44 @@ describe('P14 cleanup of the existing open cards', () => {
     assert.ok(w.files.get(cleanupMarkerKey));
     const again = await cleanupOpenCards(w.deps);
     assert.equal(again.skipped, 'done');
+  });
+  describe('an interrupted run loses no convention member', () => {
+    const rows = () => [
+      legacy('de', 20, 'Lounge', ai('Lounge'), com('LOUNGE')),
+      legacy('de', 21, 'Passenger Quarters', ai('Passagierquartiere'), com('PASSAGIER-QUARTIERE')),
+      legacy('it', 24, 'Medium', ai('Medio'), com('MEDIO')),
+    ];
+    const members = (w) => w.rows.filter((r) => r.kind === 'convention').flatMap((r) => r.context.members.map((m) => m.h)).sort();
+    it('crash while folding: the convention already holds every member, the rerun finishes without duplicates', async () => {
+      const w = world({ judged: ['de'], cards: rows() });
+      const real = w.learn.updateCard;
+      let calls = 0;
+      w.learn.updateCard = async (id, patch) => {
+        // the convention is created by insertCard, so the first updateCard is a fold: die on the second one
+        if (++calls === 2) throw new Error('boom');
+        return real(id, patch);
+      };
+      await assert.rejects(cleanupOpenCards(w.deps), /boom/);
+      assert.equal(w.files.get(cleanupMarkerKey), undefined, 'no marker after a crash');
+      assert.deepEqual(members(w), [H(20), H(21), H(24)].sort(), 'no member only lives in an already folded row');
+      w.learn.updateCard = real;
+      const s = await cleanupOpenCards(w.deps);
+      assert.ok(!s.skipped);
+      assert.deepEqual(members(w), [H(20), H(21), H(24)].sort());
+      assert.equal(w.rows.filter((r) => r.kind === 'convention').length, 1);
+      assert.ok(w.rows.filter((r) => r.id.startsWith('old')).every((r) => r.status === 'folded' || r.context.v2));
+      assert.ok(w.files.get(cleanupMarkerKey));
+    });
+    it('crash while writing the convention: every old row is untouched and the rerun does it all', async () => {
+      const w = world({ judged: ['de'], cards: rows() });
+      const real = w.learn.insertCard;
+      w.learn.insertCard = async () => { throw new Error('boom'); };
+      await assert.rejects(cleanupOpenCards(w.deps), /boom/);
+      assert.ok(w.rows.every((r) => r.status === 'open' && !r.context.v2), 'nothing was folded');
+      w.learn.insertCard = real;
+      await cleanupOpenCards(w.deps);
+      assert.deepEqual(members(w), [H(20), H(21), H(24)].sort());
+    });
   });
   it('legacy votes move out of the source text', () => {
     const c = upgradeLegacyCard({ lang: 'de', kind: 'meta', option_a: { text: 'A', source: 'mined (13×)' }, option_b: { text: 'B', source: 'glossary (3×)' }, context: { type: 'term', term: 'X' }, spread: 4 });

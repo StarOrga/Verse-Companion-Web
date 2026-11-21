@@ -275,6 +275,8 @@ begin
   with scope as (
     select c.* from public.translation_cards c
      where c.status = 'open' and (c.lang = p_lang or (c.kind = 'convention' and p_lang = any(c.langs)))
+       -- A pre-v2 row has no params until the P14 cleanup ran: it would render empty term quotes, so it stays out.
+       and c.params <> '{}'::jsonb
   ), top as (
     select s.* from scope s order by s.kind_rank, s.spread desc, s.reach desc, s.doubt desc, s.fresh desc, s.created_at limit n
   )
@@ -296,7 +298,8 @@ begin
   if not public.is_admin() then raise exception 'admin only' using errcode = '42501'; end if;
   with scope as (
     select c.* from public.translation_cards c
-     where c.status = 'ai' and c.lang = p_lang and c.ai_choice is not null
+     where c.status = 'ai' and c.ai_choice is not null
+       and (c.lang = p_lang or (c.kind = 'convention' and p_lang = any(c.langs)))
        and c.applied_at is null and c.ai_accepted_at is null
   ), top as (
     select s.* from scope s order by s.ai_unsure desc, s.spread desc, s.ai_decided_at limit n
@@ -365,14 +368,28 @@ begin
 end $$;
 
 -- P6 „Sieht falsch aus“: the KI pick is withdrawn and never wins again; the next learn pass decides anew.
+-- A language an admin judges (P3: an automatic decision there must be reversible) does not go back to the KI:
+-- the card reopens as a normal deck card (the vetoed option stays remembered); that is no scored decision.
 create or replace function public.veto_translation_decision(p_card_id uuid)
 returns jsonb language plpgsql security definer set search_path = '' as $$
-declare me uuid := (select auth.uid()); c public.translation_cards; s record;
+declare me uuid := (select auth.uid()); c public.translation_cards; s record; judged text[] := public.translation_judged_langs();
+        reopen boolean;
 begin
   if not public.is_admin() then raise exception 'admin only' using errcode = '42501'; end if;
   select * into c from public.translation_cards
    where id = p_card_id and status = 'ai' and ai_choice is not null and applied_at is null and ai_accepted_at is null for update;
   if not found then raise exception 'decision not found or already taken over' using errcode = 'P0002'; end if;
+  reopen := case when c.kind = 'convention' then c.langs && judged else c.lang = any(judged) end;
+  if reopen then
+    update public.translation_cards set
+      undo = public.translation_card_snapshot(c, me), status = 'open',
+      vetoed = (select array_agg(distinct v) from unnest(c.vetoed || c.ai_choice) v),
+      ai_choice = null, ai_text = null, ai_basis = null, ai_reason = null, ai_unsure = false, ai_back = null, ai_decided_at = null,
+      ai_accepted_by = null, ai_accepted_at = null
+     where id = c.id returning * into c;
+    return jsonb_build_object('card', public.translation_card_json(c, me), 'points', 0, 'bonus', 0,
+      'goal', public.translation_card_goal(me));
+  end if;
   select * into s from public.translation_card_score(me);
   update public.translation_cards set
     undo = public.translation_card_snapshot(c, me),
@@ -409,7 +426,8 @@ declare me uuid := (select auth.uid()); n int;
 begin
   if not public.is_admin() then raise exception 'admin only' using errcode = '42501'; end if;
   update public.translation_cards set ai_accepted_by = me, ai_accepted_at = now(), undo = null
-   where status = 'ai' and lang = p_lang and ai_choice is not null and applied_at is null and ai_accepted_at is null;
+   where status = 'ai' and (lang = p_lang or (kind = 'convention' and p_lang = any(langs)))
+     and ai_choice is not null and applied_at is null and ai_accepted_at is null;
   get diagnostics n = row_count;
   return n;
 end $$;
@@ -458,13 +476,16 @@ begin
     select l.lang, l.lang = any(mine) as judged,
       (select count(*) from public.translation_cards c where c.status = 'open'
          and (c.lang = l.lang or (c.kind = 'convention' and l.lang = any(c.langs))))::int as deck_open,
-      (select count(*) from public.translation_cards c where c.lang = l.lang and c.ai_choice is not null
-         and c.status = 'ai')::int as ai_decided,
-      (select count(*) from public.translation_cards c where c.lang = l.lang and c.status = 'ai' and c.ai_choice is not null
+      (select count(*) from public.translation_cards c where c.status = 'ai' and c.ai_choice is not null
+         and (c.lang = l.lang or (c.kind = 'convention' and l.lang = any(c.langs))))::int as ai_decided,
+      (select count(*) from public.translation_cards c where c.status = 'ai' and c.ai_choice is not null
+         and (c.lang = l.lang or (c.kind = 'convention' and l.lang = any(c.langs)))
          and c.applied_at is null and c.ai_accepted_at is null)::int as ai_review,
-      (select count(*) from public.translation_cards c where c.lang = l.lang and c.status = 'ai' and c.ai_choice is not null
-         and c.ai_unsure and c.applied_at is null and c.ai_accepted_at is null)::int as ai_unsure,
-      (select count(*) from public.translation_cards c where c.lang = l.lang and c.status = 'ai' and c.ai_choice is null)::int as ai_pending
+      (select count(*) from public.translation_cards c where c.status = 'ai' and c.ai_choice is not null and c.ai_unsure
+         and (c.lang = l.lang or (c.kind = 'convention' and l.lang = any(c.langs)))
+         and c.applied_at is null and c.ai_accepted_at is null)::int as ai_unsure,
+      (select count(*) from public.translation_cards c where c.status = 'ai' and c.ai_choice is null
+         and (c.lang = l.lang or (c.kind = 'convention' and l.lang = any(c.langs))))::int as ai_pending
     from langs l
   ), week as (
     select c.answered_by as uid, sum(c.points + c.bonus)::int as pts
@@ -497,8 +518,12 @@ begin
     'langs', (select coalesce(jsonb_agg(jsonb_build_object('lang', p.lang, 'judged', p.judged, 'deck_open', p.deck_open,
         'ai_decided', p.ai_decided, 'ai_review', p.ai_review, 'ai_unsure', p.ai_unsure, 'ai_pending', p.ai_pending)
         order by p.judged desc, p.lang), '[]'::jsonb) from per p),
-    'ai_summary', (select jsonb_build_object('decided', coalesce(sum(ai_decided), 0), 'review', coalesce(sum(ai_review), 0),
-        'unsure', coalesce(sum(ai_unsure), 0)) from per where not judged),
+    -- Over the cards themselves, not the per-language rows: a convention card counts once, not once per language.
+    'ai_summary', (select jsonb_build_object('decided', count(*), 'review', count(*) filter (where c.applied_at is null and c.ai_accepted_at is null),
+        'unsure', count(*) filter (where c.ai_unsure and c.applied_at is null and c.ai_accepted_at is null))
+        from public.translation_cards c
+       where c.status = 'ai' and c.ai_choice is not null
+         and (c.lang <> all(mine) or (c.kind = 'convention' and exists (select 1 from unnest(c.langs) x where x <> all(mine))))),
     'leaderboard', (select coalesce(jsonb_agg(jsonb_build_object('user_id', r.uid, 'name', r.name, 'points', r.pts,
         'rank', r.rk, 'is_me', r.uid = me) order by r.rk, r.name nulls last), '[]'::jsonb) from ranked r)
   ) into out;
