@@ -144,7 +144,9 @@ describe('uploadSkins', () => {
     ]);
   });
 
-  it('commits a skin id listed twice in skins.json once and warns (#383)', async () => {
+  it('leaves both entries of a skin id listed twice out of the commit and warns (#383)', async () => {
+    // Both took the same icon row in an older extract, so neither name is known
+    // to own that icon — committing the first would show the wrong livery.
     const bodies: Record<string, unknown>[] = [];
     fetchMock.mockImplementation(async (url: string | URL, init?: { body?: unknown }) => {
       const href = String(url);
@@ -177,14 +179,8 @@ describe('uploadSkins', () => {
 
     expect(res[0]).toMatchObject({ ok: true, committed: 2 });
     const rows = bodies[1]!['skins'] as { skin_id: string; name: string }[];
-    expect(rows.map((r) => [r.skin_id, r.name])).toEqual([
-      ['standard', 'Standard'],
-      ['retaliator_invictus_grey', 'Invictus Blue and Gold'],
-    ]);
-    expect(logs).toContainEqual({
-      message: 'SHIP_A: skin id listed twice in skins.json, skipped retaliator_invictus_grey ("Grey")',
-      level: 'warn',
-    });
+    expect(rows.map((r) => [r.skin_id, r.name])).toEqual([['standard', 'Standard']]);
+    expect(logs.some((l) => l.level === 'warn' && l.message.includes('retaliator_invictus_grey ×2'))).toBe(true);
   });
 
   it('logs a failing ship instead of dropping the reason on the floor', async () => {
@@ -201,6 +197,72 @@ describe('uploadSkins', () => {
     expect(res[0]).toMatchObject({ ok: false, ship_id: 'SHIP_A', error: 'forbidden' });
     expect(logs).toContainEqual({ message: 'SHIP_A: sign failed — forbidden', level: 'error' });
     expect(await exists(join(dir, '.uploaded'))).toBe(false);
+  });
+
+  it('names the server message next to the code when a commit is refused', async () => {
+    fetchMock.mockImplementation(async (url: string | URL, init?: { body?: unknown }) => {
+      if (!String(url).includes('ingest-skins')) return { ok: true, json: async () => ({}) };
+      const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      if (body['action'] === 'commit') {
+        return {
+          ok: false,
+          status: 500,
+          json: async () => ({ error: 'commit_failed', message: 'ON CONFLICT DO UPDATE command cannot affect row a second time' }),
+        };
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ uploads: [{ path: 'SHIP_A/standard.glb', token: 't', signedUrl: 'http://x/upload' }] }),
+      };
+    });
+    const dir = await makeShip('SHIP_A', [{ id: 'standard', name: 'Standard', model: 'models/standard.glb' }]);
+    const logs: { message: string; level?: string }[] = [];
+
+    const res = await uploadSkins('jwt', [{ shipId: 'SHIP_A', dir }], (message, level) => logs.push({ message, level }));
+
+    // The tally keeps the bare code; the log line carries the cause.
+    expect(res[0]).toMatchObject({ ok: false, error: 'commit_failed' });
+    expect(logs).toContainEqual({
+      message: 'SHIP_A: commit failed after 1 object(s) — commit_failed: ON CONFLICT DO UPDATE command cannot affect row a second time',
+      level: 'error',
+    });
+  });
+
+  it('leaves a skin id listed twice out of the commit instead of failing the ship (LIVE 4.10.3)', async () => {
+    const bodies: Record<string, unknown>[] = [];
+    fetchMock.mockImplementation(async (url: string | URL, init?: { body?: unknown }) => {
+      if (!String(url).includes('ingest-skins')) return { ok: true, json: async () => ({}) };
+      const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      bodies.push(body);
+      const objects = (body['objects'] as { skin_id: string; ext: string }[] | undefined) ?? [];
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          uploads: objects.map((o) => ({ path: `SHIP_A/${o.skin_id}.${o.ext}`, token: 't', signedUrl: 'http://x/upload' })),
+          count: 2,
+        }),
+      };
+    });
+    const dir = await makeShip('SHIP_A', [
+      { id: 'standard', name: 'Standard', model: 'models/standard.glb' },
+      { id: 'invictus_grey', name: 'Invictus Blue and Gold', model: null, icon: 'icons/invictus_grey.webp' },
+      { id: 'camo', name: 'Twilight', model: null, icon: 'icons/camo.webp' },
+      { id: 'invictus_grey', name: 'Grey', model: null, icon: 'icons/invictus_grey.webp' },
+    ]);
+    await mkdir(join(dir, 'icons'), { recursive: true });
+    await writeFile(join(dir, 'icons', 'invictus_grey.webp'), 'webp-bytes');
+    await writeFile(join(dir, 'icons', 'camo.webp'), 'webp-bytes');
+    const logs: { message: string; level?: string }[] = [];
+
+    const res = await uploadSkins('jwt', [{ shipId: 'SHIP_A', dir }], (message, level) => logs.push({ message, level }));
+
+    expect(res[0]).toMatchObject({ ok: true, ship_id: 'SHIP_A' });
+    const rows = bodies.find((b) => b['action'] === 'commit')!['skins'] as { skin_id: string }[];
+    expect(rows.map((r) => r.skin_id)).toEqual(['standard', 'camo']);
+    expect(logs.some((l) => l.level === 'warn' && l.message.includes('invictus_grey ×2'))).toBe(true);
+    expect(await exists(join(dir, '.uploaded'))).toBe(true);
   });
 
   it('retries a commit the function refused as transient (R2 hiccup) and ships the ship', async () => {

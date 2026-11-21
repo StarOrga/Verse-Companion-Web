@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.288.7",
+  "current": "0.288.8",
   "releases": [
+    {
+      "version": "0.288.8",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Admin feedback: the \"Wer?\" filter no longer shows an \"Unbekannt\" chip. Topics without an account used to share one bucket labelled after whichever row came first; each sender now has its own chip — the PostHog-Wächter, the Dienst-Wächter (hourly service check, with its own avatar tooltip) and \"Ohne Konto\" for a topic whose author is gone or that the routine filed itself. The thread uses the same names (admin feedback #390)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.288.7",
       "date": "2026-11-21",
@@ -12,7 +28,15 @@
           "items": [
             {
               "title": "",
-              "text": "Admin feedback: the \"Wer?\" filter no longer shows an \"Unbekannt\" chip. Topics without an account used to share one bucket labelled after whichever row came first; each sender now has its own chip — the PostHog-Wächter, the Dienst-Wächter (hourly service check, with its own avatar tooltip) and \"Ohne Konto\" for a topic whose author is gone or that the routine filed itself. The thread uses the same names (admin feedback #390)."
+              "text": "Data Uploader 0.84.4: two liveries that shared an icon are paired by id, so \"Invictus Blue and Gold\" no longer shows the Grey icon (Retaliator, Constellations, Avengers, Syulen)"
+            },
+            {
+              "title": "",
+              "text": "Data Uploader: a crashed 3D or silhouette build and a refused upload now name their cause in the log"
+            },
+            {
+              "title": "",
+              "text": "Data Uploader: an extract the 3D models still need is no longer swept the next day, so no full P4K re-read"
             }
           ]
         }

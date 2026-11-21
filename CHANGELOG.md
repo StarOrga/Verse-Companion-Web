@@ -4,10 +4,17 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.288.7] - 2026-11-21
+## [0.288.8] - 2026-11-21
 
 ### Fixed
 - Admin feedback: the "Wer?" filter no longer shows an "Unbekannt" chip. Topics without an account used to share one bucket labelled after whichever row came first; each sender now has its own chip — the PostHog-Wächter, the Dienst-Wächter (hourly service check, with its own avatar tooltip) and "Ohne Konto" for a topic whose author is gone or that the routine filed itself. The thread uses the same names (admin feedback #390).
+
+## [0.288.7] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.4: two liveries that shared an icon are paired by id, so "Invictus Blue and Gold" no longer shows the Grey icon (Retaliator, Constellations, Avengers, Syulen)
+- Data Uploader: a crashed 3D or silhouette build and a refused upload now name their cause in the log
+- Data Uploader: an extract the 3D models still need is no longer swept the next day, so no full P4K re-read
 
 ## [0.288.6] - 2026-11-21
 
