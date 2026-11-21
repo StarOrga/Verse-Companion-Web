@@ -7,6 +7,11 @@
 //   2. If count >= LIMIT → return 429 with Retry-After
 //   3. Otherwise run handler, then INSERT a log row post-response
 //
+// Preferred path: the atomic SQL function api_rate_limit_hit (migration
+// 20261121120000) counts and records under a per-token lock, so parallel requests
+// cannot all slip under the limit. While that migration is not applied the RPC
+// errors and the legacy count-then-log path below runs unchanged.
+//
 // Tradeoffs:
 //   - Sliding window without a Redis SET means the count can race slightly
 //     under burst load — acceptable while we target <100 req/s.
@@ -32,6 +37,26 @@ export const rateLimitMiddleware: Middleware = async (ctx: Context, next) => {
   const now = Date.now();
   const windowStart = new Date(now - WINDOW_SECONDS * 1000).toISOString();
   const resetEpochSec = Math.ceil((now + WINDOW_SECONDS * 1000) / 1000);
+
+  const hit = await ctx.supabase.rpc('api_rate_limit_hit', {
+    p_token_hash: ctx.token.token_hash,
+    p_endpoint: ctx.endpoint,
+    p_limit: DEFAULT_LIMIT,
+    p_window_s: WINDOW_SECONDS,
+  });
+  const row = Array.isArray(hit.data) ? hit.data[0] : hit.data;
+  if (!hit.error && row && typeof row.allowed === 'boolean') {
+    setRateHeaders(ctx, DEFAULT_LIMIT, DEFAULT_LIMIT - Number(row.used), resetEpochSec);
+    if (!row.allowed) {
+      ctx.responseHeaders.set('Retry-After', String(WINDOW_SECONDS));
+      return json(
+        { error: { code: 'rate_limited', message: 'Too many requests. Try again shortly.' } },
+        429,
+        ctx.responseHeaders,
+      );
+    }
+    return next();
+  }
 
   const { count, error } = await ctx.supabase
     .from('api_request_log')
@@ -71,7 +96,9 @@ export const rateLimitMiddleware: Middleware = async (ctx: Context, next) => {
       endpoint: ctx.endpoint,
       status: response.status,
     })
-    .then(() => null);
+    .then(({ error: logErr }) => {
+      if (logErr) console.error('rate_limit_log_failed', { err: logErr.message });
+    });
 
   return response;
 };
