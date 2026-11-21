@@ -87,6 +87,76 @@ export function readZones(eventsNewestFirst: readonly Pick<HqLiveEventRow, 'type
   return zones.length ? zones : null;
 }
 
+const isSessionBoundary = (type: string): boolean =>
+  type === 'session.joined' || type === 'session.quit' || type === 'disconnect';
+
+/** How long a fuel warning stays on Jetzt: the game sends no "refuelled" event, so the hint expires on its own. */
+export const FUEL_LOW_MAX_AGE_MS = 10 * 60 * 1000;
+
+export type FuelKind = 'hydrogen' | 'quantum' | 'any';
+export interface FuelLowHint {
+  kind: FuelKind;
+  at: string;
+}
+
+/**
+ * The fuel warning of the current session, or null: the newest `fuel.low` after the latest session start,
+ * shown for {@link FUEL_LOW_MAX_AGE_MS} from the event.
+ */
+export function readFuelLow(
+  eventsNewestFirst: readonly Pick<HqLiveEventRow, 'type' | 'data' | 'at'>[],
+  now: number,
+): FuelLowHint | null {
+  for (const e of eventsNewestFirst) {
+    if (isSessionBoundary(e.type)) return null;
+    if (e.type !== 'fuel.low') continue;
+    const age = now - Date.parse(e.at);
+    if (!(age >= 0 && age <= FUEL_LOW_MAX_AGE_MS)) return null;
+    const fuel = str(e.data?.['fuel'])?.toLowerCase();
+    return { kind: fuel === 'hydrogen' || fuel === 'quantum' ? fuel : 'any', at: e.at };
+  }
+  return null;
+}
+
+export interface HangarQueueHint {
+  position: number | null;
+  /** The game's wait estimate counted down from the event; null when unknown or used up. */
+  waitSec: number | null;
+}
+
+const posInt = (v: unknown): number | null => {
+  const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() ? Number(v) : NaN;
+  return Number.isFinite(n) && n >= 0 ? Math.round(n) : null;
+};
+
+/**
+ * The hangar request of the current session that is still queued, or null. A `hangar.queue` is answered by a
+ * newer `hangar.ready` with the same `key` (or by any newer `hangar.ready` when either side has no key).
+ */
+export function readHangarQueue(
+  eventsNewestFirst: readonly Pick<HqLiveEventRow, 'type' | 'data' | 'at'>[],
+  now: number,
+): HangarQueueHint | null {
+  const readyKeys = new Set<string>();
+  let readyWithoutKey = false;
+  for (const e of eventsNewestFirst) {
+    if (isSessionBoundary(e.type)) return null;
+    const key = str(e.data?.['key']);
+    if (e.type === 'hangar.ready') {
+      if (key) readyKeys.add(key);
+      else readyWithoutKey = true;
+      continue;
+    }
+    if (e.type !== 'hangar.queue') continue;
+    if (readyWithoutKey || (key ? readyKeys.has(key) : readyKeys.size > 0)) return null;
+    const estimate = posInt(e.data?.['estimatedWaitSec']);
+    const elapsed = Math.max(0, Math.floor((now - Date.parse(e.at)) / 1000));
+    const left = estimate === null || Number.isNaN(elapsed) ? null : estimate - elapsed;
+    return { position: posInt(e.data?.['position']), waitSec: left !== null && left > 0 ? left : null };
+  }
+  return null;
+}
+
 /** How long a destroyed ship stays marked: there is no event that says the ship is back. */
 export const SHIP_DESTROYED_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
