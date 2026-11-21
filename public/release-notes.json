@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.288.9",
+  "current": "0.288.10",
   "releases": [
+    {
+      "version": "0.288.10",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex holotable: the 3D model is much bigger (hologram area 58 × 82 % of the stage, zooming with its width) and the stat panels left and right are narrower with smaller text; tablets and phones give the model more room too (admin feedback #392)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.288.9",
       "date": "2026-11-21",
