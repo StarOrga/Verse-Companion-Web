@@ -4,6 +4,16 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.289.1] - 2026-11-21
+
+### Fixed
+- Admin feedback: topics the routine creates read "KI" (EN "AI") with the bot icon instead of "Ohne Konto"; "Ohne Konto" stays for a user topic whose account is gone (admin feedback #390).
+
+## [0.289.0] - 2026-11-21
+
+### Added
+- Verse News: in-game events are their own category ("Ingame-Events" chip, /verse/news?filter=events), fed by the event timeline and event posts in the feed; running and upcoming events are teased above and below the stream and in the Verse hub (admin feedback #389).
+
 ## [0.288.10] - 2026-11-21
 
 ### Changed

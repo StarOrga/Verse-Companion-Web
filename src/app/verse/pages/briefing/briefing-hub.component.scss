@@ -26,6 +26,8 @@
   padding-bottom: var(--sc-space-6, 32px);
 }
 .col { display: flex; flex-direction: column; gap: max(8px, var(--u)); min-width: 0; }
+// The events band spans the three columns below their common bottom line (feedback #389).
+.hub-events { grid-column: 1 / -1; min-width: 0; }
 
 // ── Column head: mini planet + area word + chevron, the whole head is the link ──
 .colh-w { margin: 0; font: inherit; }
