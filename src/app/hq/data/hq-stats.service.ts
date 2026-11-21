@@ -80,6 +80,8 @@ export function normalizeStats(raw: Partial<HqStats> | null | undefined, range: 
     crimestat: { total: n(raw?.crimestat?.total), series: fill(raw?.crimestat?.series) },
     refinery: { total: n(raw?.refinery?.total), series: fill(raw?.refinery?.series) },
     blueprints: { total: n(raw?.blueprints?.total), series: fill(raw?.blueprints?.series) },
+    fines: { total: n(raw?.fines?.total), amount: n(raw?.fines?.amount), series: fill(raw?.fines?.series) },
+    fuel: { total: n(raw?.fuel?.total), series: fill(raw?.fuel?.series) },
   };
 }
 

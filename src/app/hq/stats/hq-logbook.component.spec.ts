@@ -43,6 +43,27 @@ describe('HqLogbookComponent (#896)', () => {
     expect(cards[0].querySelector('.c-sub')).toBeTruthy();
   });
 
+  it('shows a costs line only on a session with fines, injuries or medbed heals (#1192)', async () => {
+    const el = await mount(async () => [
+      ev('session.joined', 300),
+      ev('crime.fined', 295, { amount: 4500 }),
+      ev('injury', 290),
+      ev('medbed.healed', 285),
+      ev('session.quit', 240),
+      ev('session.joined', 200),
+      ev('qt.arrived', 190),
+      ev('session.quit', 180),
+    ]);
+    const cards = el.querySelectorAll('.card');
+    expect(cards.length).toBe(2);
+    expect(cards[0].querySelector('.c-costs')).toBeNull();
+    const costs = cards[1].querySelector('.c-costs')?.textContent ?? '';
+    expect(costs).toContain('hq.logbook.costs.label');
+    expect(costs).toContain('hq.logbook.costs.fineAmount');
+    expect(costs).toContain('hq.logbook.costs.injuries.one');
+    expect(costs).toContain('hq.logbook.costs.medbeds.one');
+  });
+
   it('without live sync and without sessions it shows the SCC-App prompt', async () => {
     const el = await mount(async () => [], null);
     expect(el.querySelector('.card')).toBeNull();

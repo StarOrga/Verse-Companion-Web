@@ -4,6 +4,16 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.287.0] - 2026-11-21
+
+### Added
+- HQ session logbook: a costs line per session — fines with the paid aUEC, injuries, medbed treatments and insurance requests (#1192)
+- HQ Statistik: fines and fuel-warning tiles from the events the desktop app already uploads (#1191)
+- Data Uploader: extracts the Verse locations from the game data (starmap records + socpak positions) and can ingest them per build; the upload stays off until the switch-over (#1194)
+
+### Fixed
+- Codex silhouettes: every item, weapon, component and ammo without a traceable mesh now records why, naming skinned meshes (.skin/.chr/.cdf), so the coverage tile explains every missing silhouette (#1004)
+
 ## [0.286.2] - 2026-11-21
 
 ### Fixed

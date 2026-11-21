@@ -79,6 +79,14 @@ describe('stats zero-fill', () => {
     expect(s.auec.series.length).toBe(30);
     expect(s.missions.total).toBe(0);
     expect(s.deaths_claims.series.every((p) => p.deaths === 0 && p.claims === 0)).toBe(true);
+    expect([s.fines.total, s.fines.amount, s.fuel.total]).toEqual([0, 0, 0]);
+    expect(s.fines.series.length).toBe(30);
+  });
+
+  it('reads fines with their amount and fuel warnings, garbage as zero (#1191)', () => {
+    const s = normalizeStats({ fines: { total: 2, amount: 'x' as unknown as number, series: [] }, fuel: { total: 4, series: [] } } as never, '7d', NOW);
+    expect([s.fines.total, s.fines.amount, s.fuel.total]).toEqual([2, 0, 4]);
+    expect(s.fuel.series.length).toBe(7);
   });
 });
 

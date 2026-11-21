@@ -591,6 +591,7 @@ class CodexExtractor:
         self.extract_ammunition()
         self.extract_blueprints()     # crafting blueprints (CraftingBlueprintRecord)
         self.extract_missions()       # contracts (MissionBrokerEntry), see missions.py
+        self.extract_locations()      # Verse places (StarMapObject + system socpaks), see starmap.py
         self.extract_entities()       # ships / weapons / components / items
         self._dump_room_strings()     # scc_room_* labels for the translation pipeline (E14)
         self._write_skin_build_manifest()
@@ -775,6 +776,20 @@ class CodexExtractor:
         self._bump("missions", extract_missions(self.df, self._localized, self.out,
                                                 self.source, self.on_log,
                                                 contracts=self._blueprint_sources().missions))
+
+    # ── Verse locations ─────────────────────────────────────────────────────────
+    def extract_locations(self) -> None:
+        """A failure here (unexpected real data) costs the locations, never the run."""
+        if self.p4k is None:
+            self.on_log("info", "locations: no open P4K — skipped")
+            return
+        try:
+            from .starmap import extract_locations
+
+            self._bump("locations", extract_locations(self.df, self._localized, self.p4k,
+                                                      self.out, self.on_log))
+        except Exception as exc:  # noqa: BLE001
+            self.on_log("warn", f"locations skipped: {type(exc).__name__}: {exc}")
 
     def _blueprint_sources(self):
         """Contracts that award blueprints, once per run; a failure costs the link, never the run."""
@@ -1646,7 +1661,13 @@ class CodexExtractor:
         build step (`silhouette_export.py`) — mirrors `_write_skin_build_manifest`
         for the 3D-hull build. An entity without a mesh path is simply not
         listed; the build step never invents a silhouette for one that has no
-        geometry to trace."""
+        geometry to trace.
+
+        Every kind without a traceable mesh gets a `no_mesh` skip (#1004) — before,
+        only ships did, so thousands of items and weapons had neither a silhouette
+        nor a reason. The detail names the mesh format when the record carries a
+        geometry path the tracer does not read yet (`.skin` / `.chr` / `.cdf`, the
+        usual case for armour, helmets and many FPS weapons)."""
         mesh = self._hull_path(comps)
         if mesh:
             entry = {"kind": kind, "class_name": class_name, "mesh": mesh}
@@ -1655,11 +1676,20 @@ class CodexExtractor:
             if ground:
                 entry["ground"] = True
             self._silhouette_candidates.append(entry)
-        elif kind == "ship":
-            self._silhouette_skips.append({
-                "kind": kind, "className": class_name, "reason": "no_mesh",
-                "detail": "no .cga/.cgf geometry path on the entity record",
-            })
+            return
+        other = None
+        for c in comps:
+            other = _find_untraced_mesh_path(c)
+            if other:
+                break
+        if other:
+            ext = other.rsplit(".", 1)[-1].lower()
+            detail = f".{ext} mesh is not traced yet: {other}"
+        else:
+            detail = "no .cga/.cgf geometry path on the entity record"
+        self._silhouette_skips.append({
+            "kind": kind, "className": class_name, "reason": "no_mesh", "detail": detail[:300],
+        })
 
     def _write_silhouette_manifest(self) -> None:
         """Drop silhouettes/_build_manifest.json listing every ship / weapon /
@@ -4103,6 +4133,32 @@ def _find_geometry_path(node: Any, _depth: int = 0, _max_depth: int = 12) -> Opt
     elif isinstance(node, list):
         for item in node:
             found = _find_geometry_path(item, _depth + 1, _max_depth)
+            if found:
+                return found
+    return None
+
+
+#: Mesh formats a record can point at that the silhouette tracer does not read (#1004).
+_UNTRACED_MESH_EXTS = (".skin", ".chr", ".cdf")
+
+
+def _find_untraced_mesh_path(node: Any, _depth: int = 0, _max_depth: int = 12) -> Optional[str]:
+    """DFS for the first ``.skin``/``.chr``/``.cdf`` path string anywhere in ``node`` —
+    only used to name the format in a ``no_mesh`` silhouette skip."""
+    if _depth > _max_depth:
+        return None
+    if isinstance(node, str):
+        return node if node.lower().endswith(_UNTRACED_MESH_EXTS) else None
+    if isinstance(node, dict):
+        for k, v in node.items():
+            if isinstance(k, str) and k.startswith("_") and k.endswith("_"):
+                continue
+            found = _find_untraced_mesh_path(v, _depth + 1, _max_depth)
+            if found:
+                return found
+    elif isinstance(node, list):
+        for item in node:
+            found = _find_untraced_mesh_path(item, _depth + 1, _max_depth)
             if found:
                 return found
     return None
