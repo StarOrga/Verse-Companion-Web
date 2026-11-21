@@ -1,0 +1,36 @@
+[
+  {
+    "iteration": 1,
+    "template": "design",
+    "action": "iterate (via chat, page not submitted)",
+    "submitted_at": "2026-11-19T13:10:00Z",
+    "comments": {
+      "general": "Owner's chat feedback 2026-11-19, sorted in briefs/02.md: three intents (just live / next on live with confirmed-possible-delayed / PTU optional); 1.5 pages of scrolling before 4.10.3; Live/PTU switch on top, current live left, next right; timeline date + days instead of 'Live seit 85 Tagen' in the pill; patch planet smaller and further left; keep read confirmation; dossier order content -> stability -> community -> vote -> next -> prepare for every dossier; stability blind vote contradicts the number shown everywhere; own content layout with image left, text right; keep RSI original link."
+    },
+    "outcome": "iterate: one design 'Live zuerst' with Live/PTU tabs, header boxes, dated timeline and reordered dossier"
+  },
+  {
+    "iteration": 2,
+    "template": "design",
+    "action": "iterate (via chat, page not submitted)",
+    "submitted_at": "2026-11-19T13:30:00Z",
+    "comments": {
+      "general": "Owner liked 'Patches Live'. Planet bigger; keep the app's full page width (cards same width as today, timeline dates may hang out to the left as a one-off exception); roadmap counts quieter in one line, room for a 4th item line, counts clickable to a popup list; 'Alles zu 5.0' and the 5.0 row lead into the PTU tab; PTU tab lists every single build with its contents; read state subtle, content stays visible, 'read again'; dossier: image left only if present, else text only; known issues wanted; minor-patch 'Vorbereiten' becomes 'Erste Schritte in diesem Patch', preparation belongs to the next major patch."
+    },
+    "outcome": "iterate: round 3 with frame width, dated rail outside, clickable counts, detailed PTU builds, calm read state, first-steps section"
+  },
+  {
+    "iteration": 3,
+    "template": "design",
+    "action": "iterate",
+    "submitted_at": "2026-11-19T13:28:25.718Z",
+    "comments": {
+      "general": "Very happy with the concept. Check the text size (feels too big in places). Build the next round, then show it to Jerre.",
+      "userPins": [
+        "PTU tab: add the timeline too, so both tabs are uniform",
+        "Planet: bigger so it is clearly visible, but not moved further in, never in the way of text"
+      ]
+    },
+    "outcome": "iterate: round 4 with smaller type, PTU timeline, bigger planet with the same right edge"
+  }
+]

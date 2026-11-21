@@ -234,8 +234,8 @@ const liveHead = (verHtml = '<span class="mock-ver">Alpha 4.10</span>') =>
     <span class="mock-sent"><b>Seit 7. Okt. live</b><span>2 Hotfixes, letzter 29. Okt. · nächster Live-Patch in ~5 Wochen (Schätzung)</span></span><span class="mock-chip">78 % stabil</span></div>`;
 
 const bullets = {
-  feat: ['Frachtaufzüge: Warteschlange zeigt jetzt die Position', 'Neue Hangar-Dekor-Sets im Shop auf Area18'],
-  fix: ['Schiffe verschwinden nicht mehr beim Einlagern', 'Quantum-Sprung bricht in Gruppen nicht mehr ab', 'Medbett-Respawn in Orison repariert'],
+  feat: ['Neue Waffe: LBCO Skarnov Rifle', 'Neue Missionen: Vanduul Incursion'],
+  fix: ['Performance und Feinschliff für IAE und Vanduul Incursion', '4-GB-Grenze des Vulkan-Pipeline-Caches entfernt'],
   known: ['mobiGlas-Karte ruckelt in Pyro', 'ASOP-Terminal braucht teils zwei Versuche'],
 };
 const li = (arr, cls = '') => arr.map((t) => `<li${cls ? ` class="${cls}"` : ''}>${t}</li>`).join('');
@@ -251,7 +251,7 @@ const d1s1 = `<div class="mock-pb d1">${top}<div class="mock-page">
     <div class="d1-inbox-h"><h2>NEU FÜR DICH</h2><span class="d1-count">2 ungelesen seit deinem letzten Besuch (3. Nov.)</span><a class="mock-btn" data-screen-link="next" data-m="all-read">✓ Alles gelesen</a></div>
     <div class="d1-hero">
       <div class="d1-hero-v"><span class="mock-tags">${T_PTU}<span class="mock-new">Neu</span></span><strong>4.10.3</strong><small>PTU Patch Notes · vor 2 Std.</small></div>
-      <ul class="mock-list">${li(bullets.feat.slice(0, 1))}${li(bullets.fix.slice(0, 2), 'mock-fix')}${li(bullets.known.slice(0, 1), 'mock-known')}<li style="color:var(--mut)">+ 3 weitere Änderungen</li></ul>
+      <ul class="mock-list">${li(bullets.feat.slice(0, 1))}${li(bullets.fix.slice(0, 2), 'mock-fix')}${li(bullets.known.slice(0, 1), 'mock-known')}<li style="color:var(--mut)">+ 2 weitere Änderungen</li></ul>
       <div class="d1-hero-act"><a class="mock-btn mock-primary">Ganz lesen →</a><a class="mock-btn" data-screen-link="next">✓ Gelesen</a></div>
     </div>
     <div class="d1-item"><span class="mock-dot mock-unread"></span><b>4.11</b><span>2 neue Roadmap-Einträge: „Engineering Tier 0“, „Genesis-Wolken auf Hurston“</span><time>gestern</time><a class="mock-btn mock-quiet">✓</a></div>
@@ -298,7 +298,7 @@ const d2s1 = `<div class="mock-pb d2">${top}<div class="mock-page">
         <div class="d2-delta-h"><span class="mock-new">Neu für dich</span><h3>Das ändert 4.10.3</h3>${T_PTU}<time>vor 2 Std.</time></div>
         <div class="d2-cols">
           <div><h4>Neu · 2</h4><ul class="mock-list">${li(bullets.feat)}</ul></div>
-          <div><h4>Behoben · 3</h4><ul class="mock-list">${li(bullets.fix, 'mock-fix')}</ul></div>
+          <div><h4>Behoben · 2</h4><ul class="mock-list">${li(bullets.fix, 'mock-fix')}</ul></div>
           <div><h4>Bekannte Probleme · 2</h4><ul class="mock-list">${li(bullets.known, 'mock-known')}</ul></div>
         </div>
         <div class="d2-act"><a class="mock-btn mock-primary" data-screen-link="next" data-m="read">✓ Gelesen</a><a class="mock-btn">Im Dossier lesen →</a><span>Lesezeit ~1 Min.</span></div>
@@ -353,7 +353,7 @@ const d3s1 = `<div class="mock-pb d3">${top}<div class="mock-page"><div class="d
     <div class="d3-pane-h"><h2>Alpha 4.10.3</h2>${T_PTU}<span class="mock-chip mock-early">Stabilität: noch früh</span><time>veröffentlicht vor 2 Std.</time></div>
     <div class="d3-body">
       <div><h3>Neu · 2</h3><ul class="mock-list">${li(bullets.feat)}</ul></div>
-      <div><h3>Behoben · 3</h3><ul class="mock-list">${li(bullets.fix, 'mock-fix')}</ul></div>
+      <div><h3>Behoben · 2</h3><ul class="mock-list">${li(bullets.fix, 'mock-fix')}</ul></div>
       <div><h3>Bekannte Probleme · 2</h3><ul class="mock-list">${li(bullets.known, 'mock-known')}</ul></div>
       <div><a class="mock-btn mock-quiet">Original auf Spectrum ↗</a><a class="mock-btn mock-quiet">Ganzes Dossier zu 4.10 →</a></div>
     </div>
@@ -386,8 +386,8 @@ const I1 = icon('&lt;rect x=&quot;3&quot; y=&quot;3&quot; width=&quot;18&quot; h
 const I2 = icon('&lt;rect x=&quot;3&quot; y=&quot;5&quot; width=&quot;18&quot; height=&quot;14&quot; rx=&quot;2&quot;/&gt;&lt;path d=&quot;M7 10h10M7 14h6&quot;/&gt;');
 const I3 = icon('&lt;rect x=&quot;3&quot; y=&quot;4&quot; width=&quot;18&quot; height=&quot;16&quot; rx=&quot;2&quot;/&gt;&lt;path d=&quot;M9 4v16M12 9h6M12 13h6&quot;/&gt;');
 
-const design = (id, label, motto, traits, ic, color, active, s1, s2) => `
-<section data-design="${id}" data-nav-label="${label}"${active ? ' data-design-active="true"' : ' hidden'} data-screen-fit="full" data-design-motto="${motto}" data-design-traits="${traits}" data-design-icon="${ic}" data-design-color="${color}">
+const design = (id, label, motto, traits, ic, color, active, s1, s2, demo) => `
+<section data-design="${id}" data-nav-label="${label}"${active ? ' data-design-active="true"' : ' hidden'} data-screen-fit="full" data-design-motto="${motto}" data-design-traits="${traits}" data-design-icon="${ic}" data-design-color="${color}" data-ov-fit="component" data-ov-demo="${demo}">
 <section id="${id}-s1" data-nav-label="Neues ungelesen" data-screen data-screen-active="true">${s1}</section>
 <section id="${id}-s2" data-nav-label="Alles gelesen" data-screen hidden>${s2}</section>
 </section>`;
@@ -395,9 +395,9 @@ const design = (id, label, motto, traits, ic, color, active, s1, s2) => `
 const html = `<section data-iteration="1" data-iteration-template="design" data-tab-label="Runde 1" data-design-set="alternatives" data-viewports="desktop phone">
 <style>${css}</style>
 <header class="iteration-intro"><h2>{{iteration.tab}} 1 · Wo steht das Neue, und was passiert nach dem Lesen?</h2><p>Drei Wege für dieselbe Lage: 4.10 ist live und gelesen, 4.10.3 ist neu. Fest steht in allen dreien: der Lesestand hängt am Konto (alle Geräte, ohne Anmeldung nur in diesem Browser), gelesen wird je Patch-Note, und die kleinen Patches unter dem neuesten sind gebündelt.</p></header>
-${design('d1', 'Neu-Leiste oben', 'Leiste „Neu für dich“ über dem Zeitstrahl', 'Eigene Leiste ganz oben sammelt alles Ungelesene, der Zeitstrahl darunter bleibt wie heute|Ein Knopf „Alles gelesen“ für die ganze Leiste, danach schrumpft sie auf eine Zeile|Neueste Note groß mit 4 Stichpunkten, weitere Neuigkeiten als kurze Zeilen darunter', I1, '#e2b04a', true, d1s1, d1s2)}
-${design('d2', 'Live-Karte mit neuestem Stand', 'Die Live-Karte zeigt, was 4.10.3 ändert', 'Keine Extra-Leiste: die Änderungen stehen in drei Spalten direkt auf der Live-Karte|Nach „Gelesen“ fällt die Karte auf zwei Zeilen zusammen|Frühere kleine Patches als eine Zeile aus Marken mit Haken statt als Tabelle', I2, '#3fd08a', false, d2s1, d2s2)}
-${design('d3', 'Liste links, Lesen rechts', 'Zwei Spalten wie ein Postfach', 'Links alle Versionen als schmale Liste mit Ungelesen-Punkten, rechts der volle Text|„Gelesen &amp; weiter“ springt zur nächsten ungelesenen Note, Tasten J / K blättern|Filter Ungelesen / Alle, kleine Patches als Spanne 4.10.0 – 4.10.2', I3, '#c58af9', false, d3s1, d3s2)}
+${design('d1', 'Neu-Leiste oben', 'Leiste „Neu für dich“ über dem Zeitstrahl', 'Eigene Leiste ganz oben sammelt alles Ungelesene, der Zeitstrahl darunter bleibt wie heute|Ein Knopf „Alles gelesen“ für die ganze Leiste, danach schrumpft sie auf eine Zeile|Neueste Note groß mit 4 Stichpunkten, weitere Neuigkeiten als kurze Zeilen darunter', I1, '#e2b04a', true, d1s1, d1s2, '.d1-inbox')}
+${design('d2', 'Live-Karte mit neuestem Stand', 'Die Live-Karte zeigt, was 4.10.3 ändert', 'Keine Extra-Leiste: die Änderungen stehen in drei Spalten direkt auf der Live-Karte|Nach „Gelesen“ fällt die Karte auf zwei Zeilen zusammen|Frühere kleine Patches als eine Zeile aus Marken mit Haken statt als Tabelle', I2, '#3fd08a', false, d2s1, d2s2, '.d2-card')}
+${design('d3', 'Liste links, Lesen rechts', 'Zwei Spalten wie ein Postfach', 'Links alle Versionen als schmale Liste mit Ungelesen-Punkten, rechts der volle Text|„Gelesen &amp; weiter“ springt zur nächsten ungelesenen Note, Tasten J / K blättern|Filter Ungelesen / Alle, kleine Patches als Spanne 4.10.0 – 4.10.2', I3, '#c58af9', false, d3s1, d3s2, '.d3-split')}
 </section>
 `;
 
