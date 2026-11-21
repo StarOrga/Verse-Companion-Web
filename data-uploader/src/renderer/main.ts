@@ -2691,7 +2691,12 @@ async function doUploadAfterAuth(): Promise<void> {
   // Upload confirmed — reclaim the run's extracted files so they don't fill
   // the disk. Best-effort: the main process guards + swallows failures.
   const outDir = hullsSettled ? state.lastResult?.output_dir : undefined;
-  if (!hullsSettled) drawerAppendLog(t('subthemes.contOpen'));
+  if (!hullsSettled) {
+    drawerAppendLog(t('subthemes.contOpen'));
+    // Without the flag the startup sweep eats this extract once it is a day old.
+    const kept = state.lastResult?.output_dir;
+    if (kept) void window.sc.cleanup.keepForContinuation(kept);
+  }
   if (outDir) {
     const cleaned = await window.sc.cleanup.extractDir(outDir, {
       bundleId: r.bundleId,
@@ -2782,9 +2787,11 @@ async function runContinuation(
     // Everything open is on the server: the extract has served its purpose.
     await window.sc.cleanup.extractDir(result.output_dir, { channel: result.channel, version: result.patch_version });
     setAuthStatus(t('subthemes.contDone'), 'ok');
-  } else if (!state.skinUploadStatus) {
-    // Kept on disk: the next start continues from it.
-    setAuthStatus(t('subthemes.contOpen'), 'warn');
+  } else {
+    // Kept on disk: the next start continues from it — flagged, so the startup
+    // sweep does not take it once it is a day old.
+    void window.sc.cleanup.keepForContinuation(result.output_dir);
+    if (!state.skinUploadStatus) setAuthStatus(t('subthemes.contOpen'), 'warn');
   }
 }
 

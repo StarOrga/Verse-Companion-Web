@@ -568,6 +568,16 @@
         "hunks": [
           "0de295251c78"
         ]
+      },
+      {
+        "ship": "claude/die-data-uploader-logs-fa6b9e",
+        "by": "Jerry",
+        "value": "regenerated from the merged tree (auto-generated file)",
+        "decided": true,
+        "at": "2026-11-21T12:42:28.790Z",
+        "hunks": [
+          "2f147d1433a6"
+        ]
       }
     ],
     ".claude/project-map.md›header›file-count": [
@@ -1205,6 +1215,18 @@
         "at": "2026-11-15T15:58:54.978Z",
         "hunks": [
           "c0342f654b62"
+        ]
+      }
+    ],
+    ".claude/project-map.md›structure›data-uploader count": [
+      {
+        "ship": "claude/die-data-uploader-logs-fa6b9e",
+        "by": "Jerry",
+        "value": "regenerated from the merged tree (auto-generated file)",
+        "decided": true,
+        "at": "2026-11-21T12:42:28.790Z",
+        "hunks": [
+          "150b4ba6998a"
         ]
       }
     ],

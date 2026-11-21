@@ -3555,7 +3555,17 @@ def _merge_paint_catalog(cat: List[Dict[str, Any]],
     store name lends its icon and keeps its id (so the 3D rows already on the
     server keep their skin ids). Heuristic rows the DataCore does not list are
     dropped — they were another variant's paint or a file-name guess. The
-    factory finish always leads."""
+    factory finish always leads.
+
+    A heuristic row lends itself to ONE paint only: two DataCore paints can
+    hit the same row (one by store name, one by id — the Retaliator's
+    "Invictus Blue and Gold" and "Grey"), and two rows with one skin id make
+    the server's upsert fail (#383). The id match claims first: the icon token
+    is the paint class itself (`Paint_Retaliator_Invictus_Grey_Icon`), while
+    the heuristic NAME is a localization guess that can belong to a sibling
+    paint — name-first gave "Invictus Blue and Gold" the Grey icon and left
+    "Grey" iconless as `_2`. A paint whose row is taken gets its own id and no
+    borrowed icon, and an id still taken gains `_2`, `_3` …"""
     by_name = {str(c.get("name") or "").strip().lower(): c
                for c in cat if c.get("id") != "standard"}
     # An icon row the heuristics could not name ("starlancer Starlancer Grey
@@ -3565,10 +3575,35 @@ def _merge_paint_catalog(cat: List[Dict[str, Any]],
     rows: List[Dict[str, Any]] = [std] if std else []
     build: List[Dict[str, Any]] = []
     base_ok = bool(std and std.get("has_material"))
-    for p in paints:
-        old = by_name.get(p["name"].lower()) or by_id.get(p["id"])
+    claimed: set = set()
+    olds: List[Optional[Dict[str, Any]]] = [None] * len(paints)
+    for lookup in (lambda p: by_id.get(p["id"]),
+                   lambda p: by_name.get(p["name"].lower())):
+        for i, p in enumerate(paints):
+            if olds[i] is not None:
+                continue
+            hit = lookup(p)
+            if hit is not None and id(hit) not in claimed:
+                claimed.add(id(hit))
+                olds[i] = hit
+    # Ids of the claimed rows are reserved first, whatever the paint order,
+    # so a fresh paint id never pushes a server id onto `_2`.
+    used = {"standard"} if std else set()
+    sids: List[str] = [""] * len(paints)
+    for pass_old in (True, False):
+        for i, (p, old) in enumerate(zip(paints, olds)):
+            if (old is not None) != pass_old:
+                continue
+            base_id = (old or {}).get("id") or p["id"]
+            sid, n = base_id, 1
+            while sid in used:
+                n += 1
+                sid = f"{base_id}_{n}"
+            used.add(sid)
+            sids[i] = sid
+    for p, old, sid in zip(paints, olds, sids):
         row = {
-            "id": (old or {}).get("id") or p["id"],
+            "id": sid,
             "name": p["name"],
             "description": p["description"] or (old or {}).get("description") or "",
             "source": "store",

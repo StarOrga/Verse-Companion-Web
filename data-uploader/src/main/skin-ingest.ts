@@ -226,6 +226,36 @@ async function putSigned(u: SignedUpload | undefined, file: string, contentType:
   if (!res.ok) throw new Error(`PUT ${file} failed: HTTP ${res.status}`);
 }
 
+/**
+ * A skin id listed twice in one skins.json. `ingest-skins` upserts on
+ * (ship_id, skin_id), and Postgres refuses an upsert that touches one row
+ * twice — the whole ship failed with `commit_failed` (LIVE 4.10.3: 11 ships,
+ * every run, so the hulls part never settled). Extracts made before the
+ * paint-merge fix carry such pairs: two liveries that took one icon row, so
+ * neither name is known to belong to that icon. Both are left out; an entry
+ * that carries the hull model is kept (the first such), since dropping it
+ * would take the ship's 3D model with it.
+ */
+export function dropDuplicateSkins<T extends { id: string; model?: string | null }>(
+  skins: T[],
+): { skins: T[]; dropped: { id: string; count: number }[] } {
+  const count = new Map<string, number>();
+  for (const s of skins) count.set(s.id, (count.get(s.id) ?? 0) + 1);
+  const keep = new Map<string, T>();
+  for (const s of skins) {
+    if ((count.get(s.id) ?? 0) > 1 && s.model && !keep.has(s.id)) keep.set(s.id, s);
+  }
+  const out = skins.filter((s) => (count.get(s.id) ?? 0) === 1 || keep.get(s.id) === s);
+  const dropped = [...count].filter(([, n]) => n > 1).map(([id, n]) => ({ id, count: n }));
+  return { skins: out, dropped };
+}
+
+/** `code: server message`, so main.log names the cause and not only the code. */
+function describeReply(r: IngestReply): string {
+  const message = r.json['message'];
+  return typeof message === 'string' && message ? `${r.error}: ${message}` : String(r.error);
+}
+
 /** Upload every exported ship (one <out>/<ship_id> dir each) to Supabase. */
 export async function uploadSkins(
   accessToken: SkinToken,
@@ -318,7 +348,14 @@ export async function uploadSkins(
       const cat = JSON.parse(readFileSync(catPath, 'utf-8')) as SkinCatalog;
       // The hull glb hangs off one entry; every other paint ships its store
       // icon only. An entry with neither has nothing to show.
-      const built = cat.skins.filter((s) => s.model || s.icon);
+      const { skins: built, dropped } = dropDuplicateSkins(cat.skins.filter((s) => s.model || s.icon));
+      if (dropped.length) {
+        onLog(
+          `${shipId}: skins.json lists ${dropped.map((d) => `${d.id} ×${d.count}`).join(', ')} — ` +
+            'duplicate entries left out (two liveries under one id; the next extract names them apart)',
+          'warn',
+        );
+      }
 
       // A ship whose every skin failed to produce a glb has nothing to ship.
       // Asking `ingest-skins` to sign an empty object list is a 400, which used
@@ -355,7 +392,7 @@ export async function uploadSkins(
         break;
       }
       if (!signed.ok) {
-        onLog(`${shipId}: sign failed — ${signed.error}`, 'error');
+        onLog(`${shipId}: sign failed — ${describeReply(signed)}`, 'error');
         out.push({ ok: false, ship_id: shipId, error: signed.error });
         continue;
       }
@@ -400,7 +437,7 @@ export async function uploadSkins(
       }));
       const committed = await callIngestRetrying(getToken, { action: 'commit', ship_id: cat.ship, skins }, hooks.sleep);
       if (!committed.ok) {
-        onLog(`${shipId}: commit failed after ${n} object(s) — ${committed.error}`, 'error');
+        onLog(`${shipId}: commit failed after ${n} object(s) — ${describeReply(committed)}`, 'error');
         out.push({ ok: false, ship_id: shipId, uploaded: n, error: committed.error });
         continue;
       }

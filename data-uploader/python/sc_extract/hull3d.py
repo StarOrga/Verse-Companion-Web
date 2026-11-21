@@ -596,10 +596,17 @@ class Hull3DExporter:
                     self.log("warn", f"hull via '{base.id}' failed: {type(exc).__name__}: {exc}")
                     hull = {"model": None, "error": str(exc)}
             for paint in spec.paints:
+                icon = None
+                if paint.icon_dds:
+                    # Same as the converter: a sign of life before each icon.
+                    # Under heavy throttling 15 icons took 21 min, silent, and
+                    # tripped the host's stall watchdog (#382).
+                    self.log("info", f"  icon {paint.id}")
+                    icon = self._export_icon(paint, ship_out)
                 entry = {"id": paint.id, "name": paint.name,
                          "description": paint.description, "source": paint.source,
                          "name_verified": paint.name_verified, "model": None,
-                         "icon": self._export_icon(paint, ship_out) if paint.icon_dds else None}
+                         "icon": icon}
                 if paint is base:
                     entry.update(hull)
                 catalog.append(entry)

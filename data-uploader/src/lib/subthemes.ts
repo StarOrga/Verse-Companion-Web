@@ -114,7 +114,11 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // 16: mission-objective props (EAObjective*, e.g. the Satellite) are no ships.
     // 17: concept 20261117-1810 — payload.interior (elements, doors, cargo grids, lifts, cargo
     // gaps), decks merged by lift stops, rooms carry `poweredBy`, catch-all rooms land on their deck.
-    revision: 17,
+    // 18: #383 — payload.skins never lists one skin id twice: a heuristic icon row
+    // lends itself to one DataCore paint only (Retaliator, Avenger, Constellation, Syulen).
+    // 19: the id match claims a shared heuristic icon row before the name match,
+    // so "Invictus Blue and Gold" no longer keeps the Grey icon and "Grey" its id.
+    revision: 19,
     phases: ['codex_ships'],
     sources: [
       ...CATALOG_SHARED,
@@ -152,7 +156,10 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // 10: codex_blueprints.dismantle_yield / dismantlable filled for real —
     //     derived from the recipe + GlobalGenericDismantle, no per-item field
     //     exists in the game data (#1058).
-    revision: 10,
+    // 11: #1195 — codex_locations on real data: readable types (GUID-named type
+    //     records), Lagrange rest stops / gateways from the containers their
+    //     L-point opens, no star-origin hosts, system rows, cities.
+    revision: 11,
     phases: [
       'codex_manufacturers',
       'codex_blueprints',
@@ -227,7 +234,12 @@ export const SUBTHEMES: readonly Subtheme[] = [
     //    instead of staying unsimplified (Polaris, Galaxy, Constellations …).
     //    Only hulls left over the size budget are built again (FIT_REVISION);
     //    every hull within it is reused byte-identical.
-    revision: 8,
+    // 9: #383 — a ship's liveries carry unique skin ids, so the 11 ships whose
+    //    commit failed on a duplicate (ingest-skins 21000) upload. Cached models
+    //    are reused; ingest-skins answers 400 duplicate_skin_id instead of 500.
+    // 10: liveries that shared an icon row are paired by id (ships 19), so the
+    //    Retaliator / Avenger / Constellation / Syulen rows are committed again.
+    revision: 10,
     phases: [],
     sources: [
       'data-uploader/python/sc_extract/assets3d/',
