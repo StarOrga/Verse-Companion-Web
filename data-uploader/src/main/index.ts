@@ -48,6 +48,7 @@ import {
 } from './python-bridge.js';
 import {
   cleanupAfterUpload,
+  markPartsPending,
   scanAndCleanupDiscovered,
   purgeAllExtracts,
   type UploadMarkerInfo,
@@ -1511,6 +1512,9 @@ ipcMain.handle('sc:catalog:silhouettesSkipped', () => {
 });
 
 // ============= Cleanup IPC =============
+
+// The codex landed, the hulls or silhouettes did not: the startup sweep must leave this extract.
+ipcMain.handle('sc:cleanup:keepForContinuation', (_e, outDir: string): Promise<CleanupResult> => markPartsPending(outDir));
 
 ipcMain.handle(
   'sc:cleanup:extractDir',

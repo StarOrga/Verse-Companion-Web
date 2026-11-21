@@ -116,7 +116,9 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // gaps), decks merged by lift stops, rooms carry `poweredBy`, catch-all rooms land on their deck.
     // 18: #383 — payload.skins never lists one skin id twice: a heuristic icon row
     // lends itself to one DataCore paint only (Retaliator, Avenger, Constellation, Syulen).
-    revision: 18,
+    // 19: the id match claims a shared heuristic icon row before the name match,
+    // so "Invictus Blue and Gold" no longer keeps the Grey icon and "Grey" its id.
+    revision: 19,
     phases: ['codex_ships'],
     sources: [
       ...CATALOG_SHARED,
@@ -235,7 +237,9 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // 9: #383 — a ship's liveries carry unique skin ids, so the 11 ships whose
     //    commit failed on a duplicate (ingest-skins 21000) upload. Cached models
     //    are reused; ingest-skins answers 400 duplicate_skin_id instead of 500.
-    revision: 9,
+    // 10: liveries that shared an icon row are paired by id (ships 19), so the
+    //    Retaliator / Avenger / Constellation / Syulen rows are committed again.
+    revision: 10,
     phases: [],
     sources: [
       'data-uploader/python/sc_extract/assets3d/',
