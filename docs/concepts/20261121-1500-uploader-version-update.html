@@ -2,7 +2,7 @@
      rewrites it on every tab switch. body overflow is set by that function,
      the inline style below is only the first-paint value. -->
 <!DOCTYPE html>
-<html lang="de" data-theme="dark" data-page-version="2026-11-21T13:57:36" data-template="free">
+<html lang="de" data-theme="dark" data-page-version="2026-11-21T13:57:36" data-template="decision">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -6306,7 +6306,8 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
 
 </section>
 
-<section data-iteration="2" data-iteration-template="free" data-final-report data-stage="A" data-tab-label="Abschluss Etappe A" id="iter-2" data-active>
+<section data-iteration="2" data-iteration-template="free" data-final-report data-stage="A" data-tab-label="Abschluss Etappe A" data-baked id="iter-2" hidden>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]}}</script>
   <p class="fr-sentence">Die Kopfzeile des Uploaders zeigt nur noch eine Kanal-Ampel. Spielstand, Server-Stand und Update-Fehler stehen verständlich im Popover.</p>
 
   <div class="fr-main">
@@ -6368,6 +6369,147 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
     <ul>
       <li data-todo-id="h-reinstall" data-crit="high" data-guide="">v0.84.4 einmal von Hand installieren</li>
     </ul>
+  </section>
+</section>
+
+<section data-iteration="3" data-iteration-template="decision" data-analysis="full" data-stage="B" id="iter-3" data-active>
+
+  <section id="briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>v0.84.3 wurde zweimal gebaut, jeder Lauf mit eigenem Release-Token. Registriert ist nur der Token des Tag-Laufs. Wer das Setup aus dem Dispatch-Lauf erwischt hat, ist dem Update-Server unbekannt und bekommt nie wieder ein Update.</p>
+    <p data-briefing-why>Ohne Rettung bleiben diese Installationen für immer auf v0.84.3, und ohne Schutz passiert dasselbe beim nächsten Dispatch wieder.</p>
+    <div data-briefing-potential data-viz="kpi" data-viz-spec='{"value":"2 Builds","unit":"","label":"für dieselbe Version v0.84.3"}'>2 Builds</div>
+    <a data-briefing-topic="t-pipeline" data-share="100">Update-Pipeline</a>
+    <p data-briefing-duration>≈ 3 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"8 min","unit":"","label":"Fenster mit dem falschen Setup auf dem Mirror"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="timeline" data-viz-spec='{"items":[{"label":"12:53 Dispatch-Lauf baut v0.84.3 (Token 268abf3e) und veröffentlicht","value":0},{"label":"13:08 Tag-Lauf baut v0.84.3 neu (Token dbef63fc)","value":15},{"label":"13:11 Registrierung mit dbef63fc","value":18},{"label":"13:16 dein Updater lädt das Dispatch-Setup","value":23},{"label":"13:21 Tag-Lauf ersetzt die Mirror-Dateien","value":28}]}'></div>
+        <p>Die registrierte Zeile passt zu den Dateien, die jetzt auf dem Mirror liegen (sha512 geprüft). Verwaist sind nur Installationen, die zwischen 13:11 und 13:21 UTC das Dispatch-Setup geladen haben, darunter deine.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="t-pipeline" data-topic data-nav-label="Update-Pipeline">
+    <div data-alevel="2" data-title="Update-Pipeline">
+      <div data-slot="short"><p>Eine Rettung für die hängenden Installationen und zwei Sperren, damit eine Version nie zweimal mit verschiedenen Tokens erscheint.</p></div>
+      <div data-slot="long"><p>Der Update-Server prüft nur, ob der eingebaute Token bekannt und nicht widerrufen ist (<code>desktop-latest/index.ts:203-214</code>). Der Workflow verhindert nur einen zweiten Tag (<code>git tag -l</code>), nicht einen zweiten Build derselben Version über <code>workflow_dispatch</code>.</p></div>
+    </div>
+
+    <section id="d-recover" data-nav-label="Rettung" data-decision="d-recover" data-decision-mode="single"
+             data-label="Rettung hängender Builds" data-rec="register"
+             data-rec-why="Eine Datenzeile heilt alle betroffenen Installationen still beim nächsten Check; niemand muss etwas tun."
+             data-applies-to="v0.84.3-Installationen aus dem Dispatch-Lauf" data-finding="f-recover">
+      <p data-applies>Gilt für: v0.84.3-Installationen aus dem Dispatch-Lauf</p>
+      <p data-situation>Deine installierte App trägt den Token 268abf3e…, der in desktop_releases fehlt; jeder Update-Check endet mit 401.</p>
+      <h3 data-question>Wie kommen die hängenden v0.84.3-Installationen wieder an Updates?</h3>
+      <p data-stakes>Ob Betroffene von selbst auf v0.84.4 kommen oder von Hand neu installieren müssen.</p>
+      <div data-options>
+        <label data-opt="register" data-recommended>
+          <input type="radio" name="dm-d-recover" value="register" checked>
+          <span data-opt-label>Verwaisten Token einmalig als bekannten Build eintragen</span>
+          <span data-opt-consequence>Eine Datenzeile, alle Betroffenen updaten beim nächsten Check still auf v0.84.4.</span>
+        </label>
+        <label data-opt="manual">
+          <input type="radio" name="dm-d-recover" value="manual">
+          <span data-opt-label>Nur den neuen Hinweis im Popover nutzen</span>
+          <span data-opt-consequence>Kein Eingriff am Server, jeder Betroffene installiert v0.84.4 von Hand.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-recover-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-recover-none" value="">
+      <input type="hidden" name="dm-d-recover-hes" value="">
+      <input type="hidden" name="dm-d-recover-touched" value="">
+      <input type="hidden" name="dm-d-recover-issue" value="">
+      <input type="hidden" name="dm-d-recover-epic" value="">
+      <div data-alevel="3" data-title="Rettung hängender Builds">
+        <div data-slot="short"><p>Der Server kennt 268abf3e nicht, also beantwortet er jeden Check mit 401.</p></div>
+        <div data-slot="long"><p>Die neue Zeile ist nur ein Token-Eintrag. Der Server liefert danach den aktuellen Stand aus und kann den Token jederzeit wieder sperren.</p></div>
+        <div data-example><pre>main.log, 14:35:19  [updater] checking channel alpha (running v0.84.3)
+main.log, 14:35:19  [error] Error: HttpError: 401
+app.asar           const RELEASE_TOKEN = "268abf3e-…"
+desktop_releases   0.84.3 → dbef63fc-…</pre></div>
+      </div>
+    </section>
+
+    <section id="d-dispatch" data-nav-label="Manueller Lauf" data-decision="d-dispatch" data-decision-mode="single"
+             data-label="Was ein manueller Lauf darf" data-rec="build-only"
+             data-rec-why="Ein Dispatch-Build ist zum Testen da; veröffentlichen soll nur der Tag-Lauf, der auch registriert."
+             data-applies-to="data-uploader-build.yml" data-finding="f-dispatch">
+      <p data-applies>Gilt für: data-uploader-build.yml</p>
+      <p data-situation>Ein workflow_dispatch auf main hat v0.84.3 gebaut, den Tag angelegt und auf den öffentlichen Mirror geladen. Danach hat der Tag-Lauf dieselbe Version neu gebaut.</p>
+      <h3 data-question>Was darf ein manuell gestarteter Uploader-Build künftig?</h3>
+      <p data-stakes>Ob je wieder zwei Builds derselben Version mit verschiedenen Tokens erscheinen können.</p>
+      <div data-options>
+        <label data-opt="build-only" data-recommended>
+          <input type="radio" name="dm-d-dispatch" value="build-only" checked>
+          <span data-opt-label>Nur bauen, Artefakte behalten, nichts veröffentlichen</span>
+          <span data-opt-consequence>Veröffentlicht wird nur noch vom Tag-Lauf; ein Dispatch kann keine Version belegen.</span>
+        </label>
+        <label data-opt="refuse-existing">
+          <input type="radio" name="dm-d-dispatch" value="refuse-existing">
+          <span data-opt-label>Veröffentlichen, aber abbrechen, wenn die Version schon existiert</span>
+          <span data-opt-consequence>Dispatch bleibt ein Release-Weg; der Tag-Lauf danach bricht ab statt neu zu bauen.</span>
+        </label>
+        <label data-opt="remove">
+          <input type="radio" name="dm-d-dispatch" value="remove">
+          <span data-opt-label>Manuellen Start ganz entfernen</span>
+          <span data-opt-consequence>Kein Testbuild ohne Tag mehr möglich.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-dispatch-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-dispatch-none" value="">
+      <input type="hidden" name="dm-d-dispatch-hes" value="">
+      <input type="hidden" name="dm-d-dispatch-touched" value="">
+      <input type="hidden" name="dm-d-dispatch-issue" value="">
+      <input type="hidden" name="dm-d-dispatch-epic" value="">
+      <div data-alevel="3" data-title="Was ein manueller Lauf darf">
+        <div data-slot="short"><p>Der Schritt „Resolve release tag“ prüft nur, ob der Tag schon existiert.</p></div>
+        <div data-slot="long"><div data-viz="bars" data-viz-spec='{"items":[{"label":"Dispatch-Lauf","value":1},{"label":"Tag-Lauf","value":1}],"unit":"Build"}'></div><p>Beim Dispatch gab es den Tag noch nicht, also lief alles durch. Der Tag-Lauf danach baute mit neuem Token neu und überschrieb den Mirror.</p></div>
+        <div data-example><pre>Run 44906122737  workflow_dispatch  12:53  token 268abf3e  → Mirror data-uploader-v0.84.3
+Run 44907381433  push (Tag)         13:08  token dbef63fc  → Mirror überschrieben 13:21:51</pre></div>
+      </div>
+    </section>
+
+    <section id="d-register" data-nav-label="Registrierung" data-decision="d-register" data-decision-mode="yesnoalt"
+             data-label="Registrieren nach Upload" data-rec="yes"
+             data-rec-why="Dann zeigt die Zeile in desktop_releases immer auf genau die Dateien, die Nutzer laden."
+             data-applies-to="Release-Schritt nach dem Mirror-Upload" data-finding="f-register">
+      <p data-applies>Gilt für: Release-Schritt nach dem Mirror-Upload</p>
+      <p data-situation>v0.84.3 wurde um 13:11 registriert, zehn Minuten bevor der Tag-Lauf die Mirror-Dateien ersetzt hatte.</p>
+      <h3 data-question>Soll die Registrierung erst nach dem Mirror-Upload laufen und sich selbst prüfen?</h3>
+      <p data-context>„Prüfen“ heißt: ein Abruf von desktop-latest mit dem neuen Token muss 200 liefern, und der sha512 muss zur Datei auf dem Mirror passen.</p>
+      <p data-stakes>Ob ein Release zwischen Registrierung und Upload die falsche Datei ausliefern kann.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-d-register" value="yes" checked>
+          <span data-opt-label>Ja, erst nach dem Upload registrieren und mit Abruf prüfen</span>
+          <span data-opt-consequence>Token und sha512 stammen immer aus genau dem Lauf, der die Dateien hochgeladen hat.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-d-register" value="no">
+          <span data-opt-label>Nein, Registrierung bleibt wie heute</span>
+          <span data-opt-consequence>Ein Rennen zwischen Registrierung und Upload bleibt möglich.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-register" value="alt">
+          <span data-opt-label>Anders</span>
+          <span data-opt-consequence>Deine Variante im Feld.</span>
+        </label>
+        <input type="text" name="dm-d-register-alt" value="">
+      </div>
+      <textarea data-comment="d-register-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-register-none" value="">
+      <input type="hidden" name="dm-d-register-hes" value="">
+      <input type="hidden" name="dm-d-register-touched" value="">
+      <input type="hidden" name="dm-d-register-issue" value="">
+      <input type="hidden" name="dm-d-register-epic" value="">
+      <div data-alevel="3" data-title="Registrieren nach Upload">
+        <div data-slot="short"><p>Registrierung um 13:11, Mirror-Dateien erst um 13:21 final.</p></div>
+        <div data-slot="long"><div data-viz="bars" data-viz-spec='{"items":[{"label":"Registrierung","value":11},{"label":"Mirror final","value":21}],"unit":"min nach 13:00"}'></div><p>Der Token liegt schon zu Beginn des Laufs bereit. Registriert man früh, zeigt die Zeile bis zum eigenen Upload auf fremde Dateien.</p></div>
+        <div data-example><pre>desktop_releases 0.84.3  created_at 13:11:51  token dbef63fc
+Mirror upload    0.84.3  13:21:51  (Tag-Lauf, überschreibt Dispatch-Dateien)</pre></div>
+      </div>
+    </section>
   </section>
 </section>
 </main>
@@ -6582,7 +6724,8 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
       <div class="panel-nav-scroll">
       <nav class="iteration-tabs" role="tablist" aria-label="Runden">
 <button class="iteration-tab" role="tab" data-iteration="1" aria-selected="false" aria-controls="iter-1">Runde 1</button>
-<button class="iteration-tab" role="tab" data-final-report data-iteration="2" aria-selected="true" aria-controls="iter-2">Abschluss Etappe A</button>
+<button class="iteration-tab" role="tab" data-final-report data-iteration="2" aria-selected="false" aria-controls="iter-2">Abschluss Etappe A</button>
+<button class="iteration-tab" role="tab" data-iteration="3" aria-selected="true" aria-controls="iter-3">Runde 3</button>
 </nav>
       <!-- #section-nav also lives on the design skeleton: a free/decision round
            on a design concept (the final report is always free) renders its TOC
@@ -6986,7 +7129,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
     <button type="button" id="frozen-bar-back">Zur aktuellen Runde</button>
   </div>
 <script type="application/json" id="concept-stages">
-{"stages":[{"id":"A","name":"Versionsanzeige","state":"built"},{"id":"B","name":"Update-Pipeline","state":"open"}],"current":"A","icon":"🧭","title":"Uploader: Version & Update"}
+{"stages":[{"id":"A","name":"Versionsanzeige","state":"built"},{"id":"B","name":"Update-Pipeline","state":"open"}],"current":"B","icon":"🧭","title":"Uploader: Version & Update"}
 </script>
 <script type="application/json" id="concept-decisions">
 {"submitted": false, "decisions": [], "comments": {"general": {"text": "", "attachments": []}, "items": []}}
