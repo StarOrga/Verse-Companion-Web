@@ -1,7 +1,7 @@
 import { LandingCodexCategory, LandingValue } from './codex-landing-data.types';
 import { MAX_CALLOUTS, compareValue, shipAnchorPorts, shipAnchorPositions, splitCallouts } from './codex-landing-values';
 import { CLAIMS_PER_CATEGORY, ClaimCursor, buildClaims } from './codex-landing-claims';
-import { HOLO_TIMING, anchorPoint, leaderPath, scanPassAt } from './codex-landing-holotable.component';
+import { HOLO_TIMING, HOLO_ZOOM_MAX, anchorPoint, holoZoomFor, leaderPath, scanPassAt } from './codex-landing-holotable.component';
 
 const v = (key: string, value: number, extra: Partial<LandingValue> = {}): LandingValue => ({ key, value, unit: null, ...extra });
 
@@ -168,7 +168,14 @@ describe('real hardpoint anchors (cx-anchors)', () => {
   });
 
   it('the leader line never bends back into the callout column', () => {
-    expect(leaderPath(48, 50, 40)).toBe('M 21.8 48 H 24 L 50.00 40.00');
-    expect(leaderPath(48, 10, 40)).toBe('M 21.8 48 H 24 L 25.00 40.00');
+    expect(leaderPath(48, 50, 40)).toBe('M 20.8 48 H 23 L 50.00 40.00');
+    expect(leaderPath(48, 10, 40)).toBe('M 20.8 48 H 23 L 24.00 40.00');
+  });
+
+  it('zooms the hull with the hologram box aspect, between 1 and the maximum (#392)', () => {
+    expect(holoZoomFor(600, 300)).toBe(1.9);
+    expect(holoZoomFor(300, 300)).toBe(1);
+    expect(holoZoomFor(1200, 300)).toBe(HOLO_ZOOM_MAX);
+    expect(holoZoomFor(0, 300)).toBe(1);
   });
 });

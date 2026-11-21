@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.288.10] - 2026-11-21
+
+### Changed
+- Codex holotable: the 3D model is much bigger (hologram area 58 × 82 % of the stage, zooming with its width) and the stat panels left and right are narrower with smaller text; tablets and phones give the model more room too (admin feedback #392).
+
 ## [0.288.9] - 2026-11-21
 
 ### Fixed

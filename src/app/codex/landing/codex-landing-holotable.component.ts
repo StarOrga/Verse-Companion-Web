@@ -45,7 +45,7 @@ export const CATEGORY_GLYPH: Record<LandingCategory, string> = {
  */
 export const FIGURE_AREA = { width: 52, height: 58 } as const;
 /** Box of the hologram in % of the air (mirrors BOX below, which is declared after use). */
-const AIR_BOX = { width: 40, height: 72 } as const;
+const AIR_BOX = { width: 58, height: 82 } as const;
 
 /** Silhouette table slice per rotation category. */
 export const SILHOUETTE_KIND: Record<LandingCategory, SilhouetteKind> = {
@@ -108,9 +108,9 @@ export function scanPassAt(start: number, y: number, build = HOLO_TIMING.build):
 }
 
 /** Hologram box inside the air (in % of the air, centred on the emitter): anchors convert through it. Mirrors --hx/--hw/--ht/--hh. */
-const BOX = { left: 30, width: 40, top: 14, height: 72 } as const;
+const BOX = { left: 21, width: 58, top: 6, height: 82 } as const;
 /** Callout column: right edge of the text (in % of the air width). */
-const CALL_RIGHT = 21;
+const CALL_RIGHT = 20;
 
 interface CalloutView {
   key: string;
@@ -184,6 +184,19 @@ export class CodexLandingHolotableComponent {
   protected readonly silhouette = signal<{ key: string; s: HoloSilhouette } | null>(null);
   /** Pixel size of the air, for the figure's fit. */
   protected readonly airSize = signal({ w: 900, h: 520 });
+  /** The hologram box's share of the air (its --hw / --hh, which the breakpoints change), as fractions. */
+  private readonly boxShare = signal({ w: AIR_BOX.width / 100, h: AIR_BOX.height / 100 });
+  /**
+   * Zoom of the 3D hull (admin feedback #392): the viewer frames the hull's
+   * bounding sphere into the box height, so a long, flat ship filled barely
+   * two thirds of a box that is twice as wide as tall. The zoom follows the
+   * box's aspect, so the turning hull spans the box width at its longest.
+   */
+  readonly holoZoom = computed(() => {
+    const a = this.airSize();
+    const b = this.boxShare();
+    return holoZoomFor(a.w * b.w, a.h * b.h);
+  });
   /** The item stands as a flat figure (silhouette / icon) instead of the 3D hull. */
   readonly flat = computed(() => {
     const it = this.item();
@@ -340,6 +353,10 @@ export class CodexLandingHolotableComponent {
       const measure = () => {
         const r = air.getBoundingClientRect();
         if (r.width > 0 && r.height > 0) this.airSize.set({ w: r.width, h: r.height });
+        const cs = getComputedStyle(this.host);
+        const w = parseFloat(cs.getPropertyValue('--hw'));
+        const h = parseFloat(cs.getPropertyValue('--hh'));
+        if (w > 0 && h > 0) this.boxShare.set({ w: w / 100, h: h / 100 });
       };
       measure();
       const ro = new ResizeObserver(measure);
@@ -449,6 +466,18 @@ export class CodexLandingHolotableComponent {
       }, NO_HULL_GRACE_MS),
     );
   }
+}
+
+/** Largest hologram zoom: beyond it the near end of a turning hull bulges out of the box. */
+export const HOLO_ZOOM_MAX = 2.2;
+
+/**
+ * Zoom of the 3D hull for a hologram box of `w` × `h` px: its aspect (a little
+ * less, so the hull keeps air at its ends), between 1 and {@link HOLO_ZOOM_MAX}.
+ */
+export function holoZoomFor(w: number, h: number): number {
+  if (!(w > 0) || !(h > 0)) return 1;
+  return Math.round(Math.min(HOLO_ZOOM_MAX, Math.max(1, (0.95 * w) / h)) * 100) / 100;
 }
 
 /** Leader line from the callout column (slot `y`) to an anchor, all in air %. */
