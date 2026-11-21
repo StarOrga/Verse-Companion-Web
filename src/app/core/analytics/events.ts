@@ -139,6 +139,8 @@ export const EVENTS = {
 
   // --- news --------------------------------------------------------------
   'news:article_open': ev('news', 'Ein News-Artikel wurde geöffnet (kein Titel, keine ID).'),
+  'news:filter_select': ev<{ filter: 'all' | 'comm-link' | 'youtube' | 'spectrum' | 'patch' | 'events' | 'saved' }>('news', 'In Verse News wurde eine Kategorie gewählt (Quelle, Events oder Gesammelt).'),
+  'news:event_open': ev<{ surface: 'news_top' | 'news_bottom' | 'hub'; phase: 'running' | 'upcoming' }>('news', 'Ein Ingame-Event aus einem Event-Teaser wurde geöffnet (Verse News oben/unten oder Verse-Hub).'),
 
   // --- social ------------------------------------------------------------
   'social:invite_create': ev('social', 'Ein persönlicher Freundes-Einladungslink wurde erzeugt (nie der Token).'),

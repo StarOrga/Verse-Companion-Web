@@ -118,17 +118,17 @@ describe('Verse News — harmonised controls', () => {
   // ── The stream toggle ────────────────────────────────────────────────────
 
   const chips = () => all('.stream-head .chip');
-  const SAVED = 5;
+  const SAVED = 6;
 
-  it('renders the six source chips as toggle buttons', () => {
-    expect(chips().length).toBe(6);
+  it('renders the seven category chips as toggle buttons', () => {
+    expect(chips().length).toBe(7);
     expect(chips().every((c) => c.tagName === 'BUTTON' && c.hasAttribute('aria-pressed'))).toBe(true);
     expect(el('.stream-head h2'), 'feed has no own heading').toBeNull();
   });
 
   it('states its numbers without brackets', () => {
     const nums = all('.stream-head .chip .chip-num').map((n) => n.textContent!.trim());
-    expect(nums.length).toBe(6);
+    expect(nums.length).toBe(7);
     for (const n of nums) expect(n, n).toMatch(/^\d+$/);
   });
 

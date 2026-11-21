@@ -324,3 +324,26 @@ Star Citizen Wiki comm-links against the known event families and upserts throug
 `sc_events_upsert_scraped()` (never touches locked rows, never downgrades confirmed, never deletes). The desktop
 app reads `rpc/sc_events_feed` (authenticated only) and `sc_events_health()`. Migration `20261016120000` is
 older than `20261016125100`: on an environment that already applied the later one, `db push` needs `--include-all`.
+
+## In-game events in Verse News and the hub (feedback #389)
+
+No new upstream: both halves come from data the app already has.
+
+- **The "Events" chip** in the stream is a topic, not a source: a comm-link,
+  video or Spectrum post counts when its title names an event
+  (`isEventNews`, `src/app/news/news-events.ts`). The family patterns mirror
+  `FAMILIES` in `supabase/functions/sc-events-sync/matcher.ts` — keep the two
+  in sync — plus the dynamic scenarios the timeline carries no family for
+  (XenoThreat, Siege of Orison, …), the plain word "event", and every name in
+  the timeline with its year stripped (so a hand-curated event finds its
+  posts). Roadmap Roundups, Monthly Reports and patch notes never count.
+- **The teasers** (`sc-events-teaser`) read `public.sc_events` directly
+  (`VerseEventsService`, hidden and cancelled rows excluded): `news_top` above
+  the stream (running now + the next one), `news_bottom` under it (the
+  upcoming calendar, 120-day horizon), `hub` under the three hub columns.
+  The table is readable for signed-in users only (RLS), so the teaser loads
+  only with a user and renders nothing signed out. A row links to its RSI
+  comm-link when the timeline knows one; the head links to
+  `/verse/news?filter=events`, which selects the chip.
+- Dates are UTC days (`start_date` / `end_date`), end day inclusive; an
+  `estimated` row says so next to its date.

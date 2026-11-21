@@ -10,7 +10,7 @@
           <span class="form">
             @if (!flat()) {
               @defer (on immediate) {
-                <sc-ship-skin-viewer class="viewer" [shipId]="it.className" [embedded]="true" [holo]="true"
+                <sc-ship-skin-viewer class="viewer" [shipId]="it.className" [embedded]="true" [holo]="true" [holoZoom]="holoZoom()"
                                      [still]="still()" [hardpointPorts]="anchorRefs()" [anchorsOnly]="true" [fallbackPositions]="it.anchorPositions ?? null"
                                      (locatable)="onLocated($event)"
                                      (available)="onAvailable(it.className, $event)" />

@@ -752,6 +752,7 @@ describe('AdminFeedbackComponent — the flight path reads as four steps', () =>
       admin_feedback: [
         ...(fixtureTables().admin_feedback as FeedbackRow[]),
         row('h0', 'open', T('14'), { author_id: null, author: null, origin: 'human' }),
+        row('d0', 'open', T('14'), { author_id: null, author: null, origin: 'human', source: 'user' }),
         row('p1', 'open', T('12'), { author_id: null, author: null, origin: 'posthog' }),
         row('p2', 'open', T('13'), { author_id: null, author: null, origin: 'posthog' }),
         row('s1', 'open', T('13'), { author_id: null, author: null, origin: 'service' }),
@@ -760,6 +761,7 @@ describe('AdminFeedbackComponent — the flight path reads as four steps', () =>
     const labels = c.authorOptions().map((o) => [c.authorLabel(o.row), o.count]);
     expect(labels).toContainEqual(['adminFeedback.guard.name', 2]);
     expect(labels).toContainEqual(['adminFeedback.guard.serviceName', 1]);
+    expect(labels).toContainEqual(['adminFeedback.kind.ai', 1]);
     expect(labels).toContainEqual(['adminFeedback.noAccount', 1]);
     expect(labels.map(([l]) => l)).not.toContain('adminFeedback.unknownUser');
 
@@ -771,11 +773,14 @@ describe('AdminFeedbackComponent — the flight path reads as four steps', () =>
   it('names the guard profile as the sender of a thread reply', async () => {
     const { cmp: c } = await mount(fixtureTables());
     expect(c.isMachine('posthog', null)).toBe(true);
-    expect(c.isMachine('human', null)).toBe(false);
+    expect(c.isMachine('human', 'u1')).toBe(false);
     expect(c.isMachine(null, POSTHOG_GUARD_PROFILE_ID)).toBe(true);
     expect(c.authorLabel(row('p3', 'open', T('12'), { author_id: null, author: null, origin: 'service' }))).toBe('adminFeedback.guard.serviceName');
     expect(c.authorLabel(row('p4', 'open', T('12'), { author_id: null, author: null, origin: 'posthog' }))).toBe('adminFeedback.guard.name');
-    expect(c.authorLabel(row('p5', 'open', T('12'), { author_id: null, author: null, origin: 'human' }))).toBe('adminFeedback.noAccount');
+    expect(c.authorLabel(row('p5', 'open', T('12'), { author_id: null, author: null, origin: 'human' }))).toBe('adminFeedback.kind.ai');
+    expect(c.authorLabel(row('p6', 'open', T('12'), { author_id: null, author: null, origin: 'human', source: 'user' }))).toBe('adminFeedback.noAccount');
+    expect(c.isMachine('human', null)).toBe(true);
+    expect(c.isMachine('human', null, 'user')).toBe(false);
     expect(c.authorLabelFor({ ...msg('m9', 'p3', false, T('12')), author_id: POSTHOG_GUARD_PROFILE_ID, author: null })).toBe('adminFeedback.guard.name');
   });
 
