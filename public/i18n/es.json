@@ -149,7 +149,7 @@
     },
     "landing": {
       "appName": "Verse Companion",
-      "join": "Join the Club.",
+      "join": "Únete al club.",
       "pitch": "Companion es un círculo privado: el acceso es solo por invitación. ¿Ya vuelas por el verse y quieres entrar? Solicítalo y un admin le echará un vistazo.",
       "perks": {
         "hangar": "Tu hangar con loadouts y roles en un solo lugar",
@@ -212,10 +212,10 @@
     "viewAs": {
       "title": "Ver como",
       "collaborator": "Colaborador",
-      "viewer": "Viewer",
+      "viewer": "Lector",
       "anon": "Visitante sin sesión",
       "exit": "Volver a mi rol",
-      "restricted": "Solo admin y colaborador"
+      "restricted": "Solo administradores y colaboradores"
     },
     "loading": {
       "weak": "Señal débil · resintonizando"
@@ -3426,7 +3426,7 @@
       "kpi": {
         "title": "Rendimiento de parches",
         "sub": "Último frente a la mediana histórica",
-        "samplesLabel": "Base",
+        "samplesLabel": "Basado en",
         "samples": "{{n}} mediciones",
         "goto": "Mostrar {{title}}",
         "pause": "Pausar rotación",
@@ -3523,7 +3523,7 @@
         "openCard": "Abrir la entrada de la hoja de ruta «{{name}}» en RSI"
       },
       "detail": {
-        "loading": "Cargando el contenido del parche …",
+        "loading": "Cargando el contenido del parche…",
         "unavailable": "No hay contenido disponible para esta nota: léela en RSI.",
         "noMatch": "No hay coincidencias en esta nota.",
         "fullNotes": "Notas completas ↗",
@@ -3594,7 +3594,7 @@
           "prep": "¿Cómo me preparo?",
           "prepPast": "Qué había que tener en cuenta",
           "contents": "¿Qué incluye?",
-          "fixed": "¿Han arreglado …?",
+          "fixed": "¿Han arreglado…?",
           "next": "¿Cuándo llega el próximo?",
           "nextThis": "¿Cuándo llega este parche?",
           "nextPast": "¿Qué vino después?"
@@ -3606,10 +3606,10 @@
       "prep": {
         "source": "según la publicación de Spectrum («Important Build Info»)",
         "known": "Problemas conocidos",
-        "focus": "Testing Focus",
+        "focus": "Enfoque de las pruebas",
         "wipe": "Wipe",
-        "noBuildInfo": "RSI no ha publicado «Important Build Info» para este build.",
-        "generalTitle": "Válido para cada parche",
+        "noBuildInfo": "RSI no ha publicado «Important Build Info» para esta build.",
+        "generalTitle": "Válido para todos los parches",
         "generalItem": {
           "launcher": "Abre el launcher y espera a que termine de descargar; la versión que muestra debe coincidir con el parche.",
           "shaders": "Vacía la carpeta de shaders (%LOCALAPPDATA%\\\\Star Citizen\\\\) si los gráficos parpadean o los FPS bajan tras el parche.",
@@ -3627,24 +3627,24 @@
         "ofNote": "Los cambios de «{{title}}»:"
       },
       "fixed": {
-        "placeholder": "Buscar en este parche … p. ej. quantum drive",
+        "placeholder": "Buscar en este parche… p. ej. quantum drive",
         "hits": "{{n}} resultados en {{notes}} notas",
         "coverage": "{{loaded}} de {{total}} notas buscadas a fondo",
         "loadRest": "Cargar y buscar en las notas restantes",
-        "loading": "Cargando {{n}} notas …",
+        "loading": "Cargando {{n}} notas…",
         "noHits": "Sin resultados en las notas cargadas; los títulos siempre se buscan.",
         "allNotes": "Todas las notas ({{n}})"
       },
       "next": {
-        "sentenceLive": "Próximo parche Live previsto sobre el {{date}} — {{when}}.",
+        "sentenceLive": "Próximo parche Live previsto hacia el {{date}}: {{when}}.",
         "sentenceHistory": "Alpha {{line}} fue sustituido por Alpha {{next}} el {{date}} tras {{days}} días; lo habitual son {{median}} días.",
-        "sentencePlanned": "Alpha {{line}} previsto en Live sobre el {{date}} según el ritmo — {{when}}.",
+        "sentencePlanned": "Alpha {{line}} previsto en Live hacia el {{date}} según el ritmo: {{when}}.",
         "disclaimer": "Estimaciones de mediana a partir del ritmo de parches, no fechas oficiales.",
         "markers": "Marcadores en el eje: parche Live anterior, inicio de PTU, fin habitual de pruebas, Live, hotfixes, hoy y la próxima fecha habitual. Inicio, Live y objetivo están etiquetados; el tooltip nombra el resto.",
         "planned": {
           "sentence": "Alpha {{line}} está previsto para {{quarter}}.",
           "unknown": "Aún no hay fecha para Alpha {{line}}.",
-          "status": "Aún no hay build de prueba; según el ritmo habitual, la próxima fecha Live sería sobre el {{date}}.",
+          "status": "Aún no hay build de prueba; según el ritmo habitual, la próxima fecha Live sería hacia el {{date}}.",
           "basisCadence": "ritmo habitual · mediana de n = {{n}}",
           "basisLead": "fase de pruebas habitual · mediana de n = {{n}}"
         },
@@ -3667,12 +3667,12 @@
           "live": "Alpha {{line}} lleva {{days}} días en Live; lo habitual son {{median}} días hasta el siguiente.",
           "testing": "Alpha {{line}} lleva {{days}} días en pruebas; lo habitual son {{median}} días hasta Live.",
           "onTrack": "CIG va al ritmo habitual.",
-          "over": "CIG va {{n}} días por encima del ritmo habitual."
+          "over": "CIG lleva {{n}} días de retraso respecto al ritmo habitual."
         },
         "legend": {
           "real": "ciclo Live (documentado)",
           "usual": "ritmo habitual (mediana)",
-          "over": "por encima del ritmo",
+          "over": "retraso sobre el ritmo",
           "lead": "fase de pruebas (PTU)"
         },
         "fact": {
@@ -3701,7 +3701,7 @@
           "next": "Siguiente",
           "goLive": "Salida a Live",
           "nextUnknown": "Próximo parche",
-          "nextEta": "est. {{date}}",
+          "nextEta": "prev. {{date}}",
           "hotfixOne": "1 hotfix · {{date}}",
           "hotfixMany": "{{n}} hotfixes · el último {{date}}"
         }
@@ -3711,7 +3711,7 @@
         "groupCount": "{{roadmap}} entradas de la hoja de ruta · {{notes}} puntos",
         "moreInDossier": "{{n}} resultados más en el dosier",
         "loadRest": "Cargar y buscar en las {{n}} notas restantes",
-        "loading": "Cargando notas …"
+        "loading": "Cargando notas…"
       },
       "timeline": {
         "versionsOf": "Versiones de {{line}}",
@@ -3735,12 +3735,12 @@
       "weeks": "hace {{n}} semanas"
     },
     "upcomingShips": {
-      "title": "Naves próximas",
+      "title": "Próximas naves",
       "addedOne": "1 nave nueva en la matriz de naves",
       "addedMany": "{{count}} naves nuevas en la matriz de naves",
-      "wishedUpdated": "{{count}} naves de tus deseos han cambiado de estado",
+      "wishedUpdated": "{{count}} naves de tu lista de deseos han cambiado de estado",
       "more": "+{{count}} más",
-      "open": "Abrir naves próximas",
+      "open": "Abrir próximas naves",
       "dismiss": "Descartar aviso"
     },
     "stage": {
@@ -3929,7 +3929,7 @@
     "roles": {
       "admin": "Admin",
       "collaborator": "Colaborador",
-      "viewer": "Viewer"
+      "viewer": "Observador"
     },
     "username": "Nombre de usuario",
     "usernameUnset": "Sin definir",
@@ -4102,7 +4102,7 @@
       "warning": "Elimina tu cuenta de forma definitiva. Tus subidas y bundles también desaparecen. No se puede deshacer.",
       "deleteBtn": "Eliminar mi cuenta",
       "deleting": "Eliminando…",
-      "confirm": "Tu cuenta ({{email}}) se eliminará definitivamente. Tus subidas y bundles también desaparecen. Después se cerrará tu sesión. ¿Seguro?",
+      "confirm": "Tu cuenta ({{email}}) se eliminará definitivamente. Tus subidas y bundles también se eliminarán. Después se cerrará tu sesión. ¿Seguro?",
       "failed": "Error al eliminar",
       "viaAdmin": "La eliminación de cuentas la realiza actualmente un administrador. Escríbenos por los medios de contacto del aviso legal; eliminaremos tu cuenta junto con el perfil, el hangar, los loadouts y las subidas.",
       "imprintLink": "Ir al aviso legal",
@@ -4825,8 +4825,8 @@
     "badgeAlt": "Star Citizen — Made By The Community",
     "disclaimer": "Este es un sitio de fans no oficial de Star Citizen, sin ninguna afiliación con el grupo de empresas Cloud Imperium. Todo el contenido de este sitio que no sea obra de su anfitrión o de sus usuarios es propiedad de sus respectivos dueños.",
     "trademarks": "Star Citizen®, Roberts Space Industries® y Cloud Imperium® son marcas registradas de Cloud Imperium Rights LLC",
-    "disclaimerExpand": "Mostrar el aviso legal completo",
-    "disclaimerCollapse": "Contraer el aviso legal",
+    "disclaimerExpand": "Mostrar el descargo de responsabilidad completo",
+    "disclaimerCollapse": "Contraer el descargo de responsabilidad",
     "legalNav": "Información legal y del proyecto",
     "areaNav": "Cambiar de área",
     "links": {
@@ -4838,9 +4838,9 @@
     },
     "disclaimerTitle": "Aviso sobre el sitio de fans",
     "rsiLink": "Sitio oficial de Star Citizen: robertsspaceindustries.com",
-    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
+    "noticeOriginal": "Este es un sitio de fans no oficial de Star Citizen, sin afiliación con el grupo de empresas Cloud Imperium. Todo el contenido de este sitio que no haya sido creado por su responsable o sus usuarios es propiedad de sus respectivos dueños.",
     "noticeOriginalLabel": "Texto original (inglés)",
-    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® and Cloud Imperium® are registered trademarks of Cloud Imperium Rights LLC"
+    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® y Cloud Imperium® son marcas registradas de Cloud Imperium Rights LLC"
   },
   "legal": {
     "about": {
@@ -5039,7 +5039,7 @@
       "save": "Guardar",
       "rename": "Renombrar",
       "pinLabel": "Fijar",
-      "openCodex": "Entrada del códice",
+      "openCodex": "Entrada del Codex",
       "remove": "Quitar",
       "notes": "Notas",
       "notesPlaceholder": "Notas sobre esta nave…",
@@ -5067,7 +5067,7 @@
     },
     "standard": {
       "title": "Componentes de serie",
-      "subtitle": "El equipamiento de fábrica de esta nave según los datos del juego en vivo (P4K): los componentes con los que sale por defecto.",
+      "subtitle": "El equipamiento de fábrica de esta nave según los datos del juego en LIVE (P4K): los componentes con los que sale por defecto.",
       "count": "{{count}} componentes",
       "empty": "No hay componentes de serie registrados para esta nave en la versión actual del catálogo."
     },
@@ -5106,7 +5106,7 @@
       },
       "overview": {
         "title": "Resumen de la flota",
-        "text": "Buques insignia fijados, contadores y acceso rápido a la página de detalles de cada nave."
+        "text": "Naves insignia fijadas, contadores y acceso rápido a la página de detalles de cada nave."
       },
       "loadouts": {
         "title": "Prueba loadouts",
@@ -5121,7 +5121,7 @@
     "import": {
       "open": "Importar…",
       "title": "Importar desde archivo de exportación",
-      "hint": "Suelta aquí una exportación JSON en formato Hangar Transfer (p. ej., de la extensión de navegador HangarXPLOR: la exportación la haces tú, nunca pedimos credenciales de RSI). Las entradas se comparan con el códice y solo se añaden las filas que confirmes.",
+      "hint": "Suelta aquí una exportación JSON en formato Hangar Transfer (p. ej., de la extensión de navegador HangarXPLOR: la exportación la haces tú, nunca pedimos credenciales de RSI). Las entradas se comparan con el Codex y solo se añaden las filas que confirmes.",
       "pickFile": "Elegir archivo",
       "parsing": "Leyendo…",
       "dropHint": "o suelta aquí el archivo .json",
@@ -5974,8 +5974,8 @@
       "since": "· visto por última vez hace {{days}} días",
       "today": "· visto por última vez hoy"
     },
-    "fallback": "Descargar (última)",
-    "prerelease": "Esta es siempre la versión estable. Beta y alpha se eligen dentro de la app cuando inicias sesión con tu cuenta de Verse Companion; los canales disponibles dependen de tu rol."
+    "fallback": "Descargar (última versión)",
+    "prerelease": "Esta es siempre la versión estable. Las versiones beta y alfa se eligen dentro de la app cuando inicias sesión con tu cuenta de Verse Companion; los canales disponibles dependen de tu rol."
   },
   "appPanel": {
     "version": "Versión publicada actualmente",
@@ -6188,7 +6188,7 @@
     "guessUnavailable": "No hay ningún mapa estelar que reconocer para este parche.",
     "sessionExpired": "Tu sesión ha caducado. Vuelve a iniciar sesión.",
     "forbidden": "No tienes permiso para hacer esto.",
-    "notFound": "Esto no existe (ya).",
+    "notFound": "Esto no existe o ya no existe.",
     "rateLimit": "Demasiadas solicitudes: espera un momento.",
     "server": "El servidor ha notificado un error.",
     "generic": "Algo ha salido mal.",
@@ -7613,8 +7613,8 @@
         "hotfix": "Hotfix",
         "planned": "Planificado"
       },
-      "topAria": "Las historias más recientes",
-      "storyAria": "Historia {{n}}: {{title}}",
+      "topAria": "Las noticias más recientes",
+      "storyAria": "Noticia {{n}}: {{title}}",
       "status": {
         "live": "{{line}} en LIVE desde hace {{n}} días",
         "liveOne": "{{line}} en LIVE desde hace 1 día",
@@ -7690,7 +7690,7 @@
           "value": "{{n}} días"
         },
         "stable": {
-          "label": "aterrizó hace poco en estable",
+          "label": "llegó hace poco a estable",
           "value": "{{n}}"
         }
       },
@@ -7754,7 +7754,7 @@
       "hqEventOpen": "{{name}} en curso",
       "hqSupplies": "{{n}} operaciones abiertas",
       "hqSuppliesOne": "1 operación abierta",
-      "hqCalm": "Todo tranquilo en el HQ",
+      "hqCalm": "Todo tranquilo en el cuartel general",
       "admin": "Estación de administración",
       "adminValue": "Directo al centro de administración",
       "adminHint": "visible solo para administradores",
@@ -9080,7 +9080,7 @@
     }
   },
   "quick": {
-    "toNachschub": "A una Operation: {{name}}",
+    "toNachschub": "A una operación: {{name}}",
     "wish": "Deseos",
     "allWish": "Todos los deseos",
     "allWishCount": "{{n}} deseos",
@@ -9372,7 +9372,7 @@
   },
   "pwa": {
     "card": {
-      "title": "Verse Companion como app",
+      "title": "Consigue la app",
       "benefit": "Pantalla completa, inicio más rápido, directamente desde tu pantalla de inicio.",
       "install": "Instalar",
       "later": "Más tarde"

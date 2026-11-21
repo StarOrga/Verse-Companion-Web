@@ -101,7 +101,7 @@
   },
   "auth": {
     "previewLocked": {
-      "body": "L'accesso qui non funzionerà: l'anteprima sovrascrive ciò che l'app ti mostra, anche dopo un accesso riuscito. Esci prima dall'anteprima dal banner in alto."
+      "body": "L'accesso qui non funzionerà: l'anteprima sovrascrive ciò che l'app ti mostra, anche dopo un accesso riuscito. Esci prima dall'anteprima tramite il banner in alto."
     },
     "tagline": "Il tuo terminale per il verse",
     "email": "E-mail",
@@ -128,7 +128,7 @@
       "saving": "Salvataggio in corso…",
       "saved": "Password salvata.",
       "savedLead": "Password salvata. D'ora in poi accedi con il tuo indirizzo e-mail e questa password.",
-      "continue": "Continua verso l'app",
+      "continue": "Vai all'app",
       "expired": "Questo link è scaduto o è già stato usato. Inserisci il tuo indirizzo e-mail e te ne invieremo uno nuovo.",
       "sendLink": "Invia un nuovo link",
       "sending": "Invio in corso…",
@@ -149,7 +149,7 @@
     },
     "landing": {
       "appName": "Verse Companion",
-      "join": "Join the Club.",
+      "join": "Unisciti al club.",
       "pitch": "Il Companion è una cerchia privata: l'accesso è solo su invito. Voli già nel verse e vuoi entrare? Candidati e un admin darà un'occhiata.",
       "perks": {
         "hangar": "Il tuo hangar con loadout e ruoli in un unico posto",
@@ -172,7 +172,7 @@
       "handle": "Handle RSI (facoltativo)",
       "handlePlaceholder": "es. CitizenKane",
       "message": "Messaggio (facoltativo)",
-      "messagePlaceholder": "Come ci conosci, cosa voli?",
+      "messagePlaceholder": "Come ci hai conosciuto? Cosa piloti?",
       "send": "Invia candidatura",
       "sending": "Invio in corso…",
       "sent": "Grazie! La tua richiesta è arrivata. Se un admin la accetta, riceverai un'e-mail di invito a questo indirizzo.",
@@ -212,7 +212,7 @@
     "viewAs": {
       "title": "Visualizza come",
       "collaborator": "Collaboratore",
-      "viewer": "Viewer",
+      "viewer": "Visualizzatore",
       "anon": "Visitatore non connesso",
       "exit": "Torna al mio ruolo",
       "restricted": "Solo admin e collaboratori"
@@ -229,8 +229,8 @@
     "verse": "Verse",
     "translations": "Traduzione IA",
     "social": "Social",
-    "accountMenuRequests": "Menu account, {{count}} richieste di amicizia aperte",
-    "socialRequests": "Social, {{count}} richieste di amicizia aperte"
+    "accountMenuRequests": "Menu account, {{count}} richieste di amicizia in sospeso",
+    "socialRequests": "Social, {{count}} richieste di amicizia in sospeso"
   },
   "impersonation": {
     "banner": {
@@ -3389,7 +3389,7 @@
       "kind": {
         "expo": "Fiera",
         "showcase": "Showcase",
-        "seasonal": "Festa",
+        "seasonal": "Festival",
         "community": "Evento della community",
         "free-fly": "Free Fly"
       }
@@ -3458,8 +3458,8 @@
         "window": {
           "aria": "Intervallo di tempo dei grafici",
           "6m": "6 mesi",
-          "all": "Sempre",
-          "empty": "Nessun dato in questo intervallo — passa a «Sempre»."
+          "all": "Tutto il periodo",
+          "empty": "Nessun dato in questo intervallo — passa a «Tutto il periodo»."
         }
       },
       "ptuRelease": {
@@ -3469,7 +3469,7 @@
         "infoOfficial": "Data ufficiale: il deployment LIVE che RSI pianifica sul suo sito di stato, non appena ne è previsto uno. Nelle note di patch stesse RSI non indica alcuna data.",
         "estimate": "La nostra stima",
         "estimateBasis": "da {{days}} giorni in test · mediana {{median}} giorni PTU → LIVE (n = {{n}})",
-        "noEstimate": "Ancora troppi pochi dati per una stima",
+        "noEstimate": "Dati ancora insufficienti per una stima",
         "official": "Ufficiale (RSI)",
         "source": "Fonte: stato RSI, {{title}}",
         "noOfficial": "Ancora nessuna data ufficiale",
@@ -3506,7 +3506,7 @@
         "label": "Cerca nei contenuti delle patch",
         "placeholder": "es. Orison, hotfix, quantum drive",
         "clear": "Cancella ricerca",
-        "noHits": "Nessun risultato – nemmeno con altre grafie."
+        "noHits": "Nessun risultato — nemmeno con altre grafie."
       },
       "roadmap": {
         "expandAll": "Mostra tutte le descrizioni",
@@ -3535,16 +3535,16 @@
         "points": "{{count}} punti"
       },
       "stability": {
-        "insufficient": "Ancora troppi pochi dati per una valutazione.",
+        "insufficient": "Ancora troppo pochi dati per una valutazione.",
         "component": {
           "none": "nessun dato"
         },
         "componentHint": {
           "community": "Nuove risposte al giorno nei thread delle note e degli hotfix, quota e peso degli upvote delle risposte con un ticket Issue Council",
-          "service": "Minuti di disservizio non pianificati al giorno secondo lo stato RSI (7 giorni), più eventuali disservizi aperti",
+          "service": "Minuti di disservizio non pianificati al giorno secondo RSI Status (7 giorni), più eventuali incidenti aperti",
           "cig": "Voci aperte nell'articolo Known Issues di CIG e relativa crescita in 7 giorni"
         },
-        "timeline": "Andamento da LIVE",
+        "timeline": "Da LIVE",
         "timelineAria": "Stabilità al giorno da LIVE, {{days}} rilevazioni",
         "hotfixMark": "Hotfix {{build}} del {{date}}",
         "tickets": {
@@ -3569,7 +3569,7 @@
         "replaced": "il {{date}}",
         "liveSince": "Live dal {{date}}",
         "liveSpan": "Live {{from}} – {{to}}",
-        "neverLive": "Mai andata live",
+        "neverLive": "Mai arrivata su Live",
         "ptuExpected": "PTU prevista {{when}}",
         "noBuild": "Ancora nessuna build",
         "plannedFor": "Prevista per {{quarter}}",
@@ -3606,7 +3606,7 @@
       "prep": {
         "source": "secondo il post su Spectrum (\"Important Build Info\")",
         "known": "Problemi noti",
-        "focus": "Testing Focus",
+        "focus": "Focus dei test",
         "wipe": "Wipe",
         "noBuildInfo": "RSI non ha pubblicato nessuna \"Important Build Info\" per questa build.",
         "generalTitle": "Vale per ogni patch",
@@ -3623,7 +3623,7 @@
         "more": "Testo completo",
         "less": "Comprimi",
         "leftover": "Altri punti della nota senza scheda roadmap ({{n}})",
-        "noRoadmap": "Nessun dato roadmap per questa patch – ecco la nota \"{{title}}\":",
+        "noRoadmap": "Nessun dato roadmap per questa patch — ecco la nota \"{{title}}\":",
         "ofNote": "Le modifiche da “{{title}}”:"
       },
       "fixed": {
@@ -3632,13 +3632,13 @@
         "coverage": "{{loaded}} note su {{total}} analizzate per intero",
         "loadRest": "Carica e cerca nelle note rimanenti",
         "loading": "Caricamento di {{n}} note …",
-        "noHits": "Nessun risultato nelle note caricate – i titoli vengono sempre cercati.",
+        "noHits": "Nessun risultato nelle note caricate — i titoli vengono sempre cercati.",
         "allNotes": "Tutte le note ({{n}})"
       },
       "next": {
         "sentenceLive": "Prossima patch Live prevista intorno al {{date}} — {{when}}.",
         "sentenceHistory": "Alpha {{line}} è stata sostituita da Alpha {{next}} il {{date}} dopo {{days}} giorni — di solito ne passano {{median}}.",
-        "sentencePlanned": "Alpha {{line}} prevista live intorno al {{date}} secondo il ritmo — {{when}}.",
+        "sentencePlanned": "Alpha {{line}} prevista su Live intorno al {{date}} secondo il ritmo — {{when}}.",
         "disclaimer": "Stime basate sulla mediana del ritmo delle patch, non date ufficiali.",
         "markers": "Indicatori sull'asse: patch Live precedente, inizio PTU, fine abituale dei test, Live, hotfix, oggi e la prossima data abituale. Inizio, Live e obiettivo hanno un'etichetta — il tooltip nomina gli altri.",
         "planned": {
@@ -3666,8 +3666,8 @@
         "status": {
           "live": "Alpha {{line}} è live da {{days}} giorni — di solito passano {{median}} giorni fino alla successiva.",
           "testing": "Alpha {{line}} è in test da {{days}} giorni — di solito ne servono {{median}} fino alla Live.",
-          "onTrack": "CIG è in linea con il ritmo.",
-          "over": "CIG è {{n}} giorni oltre il ritmo abituale."
+          "onTrack": "CIG è in linea con il ritmo abituale.",
+          "over": "CIG è in ritardo di {{n}} giorni sul ritmo abituale."
         },
         "legend": {
           "real": "ciclo Live (documentato)",
@@ -3711,7 +3711,7 @@
         "groupCount": "{{roadmap}} voci della roadmap · {{notes}} punti elenco",
         "moreInDossier": "Altri {{n}} risultati nel dossier",
         "loadRest": "Carica e cerca nelle restanti {{n}} note",
-        "loading": "Caricamento delle note …"
+        "loading": "Caricamento delle note…"
       },
       "timeline": {
         "versionsOf": "Versioni di {{line}}",
@@ -3775,7 +3775,7 @@
       "sinceToday": "Da oggi",
       "sinceYesterday": "Da ieri",
       "sinceDays": "Da {{days}} giorni",
-      "toBoard": "Centro patch",
+      "toBoard": "Patch Central",
       "toNotes": "Leggi le patch notes"
     }
   },
@@ -3928,8 +3928,8 @@
     "role": "Ruolo",
     "roles": {
       "admin": "Admin",
-      "collaborator": "Collaborator",
-      "viewer": "Viewer"
+      "collaborator": "Collaboratore",
+      "viewer": "Visualizzatore"
     },
     "username": "Nome utente",
     "usernameUnset": "Non impostato",
@@ -4039,7 +4039,7 @@
         "HU": "Ungheria",
         "RO": "Romania",
         "GR": "Grecia",
-        "TR": "Türkiye",
+        "TR": "Turchia",
         "RU": "Russia",
         "UA": "Ucraina",
         "BR": "Brasile",
@@ -4060,7 +4060,7 @@
       "title": "Input",
       "hint": "Vale per ogni campo messaggio — nuovo argomento, risposta nel thread e campo di risposta nella modalità di elaborazione.",
       "sendOnEnter": {
-        "label": "Invio invia",
+        "label": "Invio per inviare",
         "descOn": "Invio invia il messaggio, Maiusc+Invio inserisce una nuova riga. Anche Ctrl/Cmd+Invio invia.",
         "descOff": "Invio inserisce una nuova riga. Il messaggio si invia solo con Ctrl/Cmd+Invio o con il pulsante di invio."
       }
@@ -4086,7 +4086,7 @@
         "title": "Pulsanti feedback e beta",
         "hint": "I pulsanti nell'angolo: invia feedback e vedi le risposte del team, con l'interruttore beta sopra.",
         "label": "Mostra i pulsanti feedback e beta",
-        "audience": "(solo per admin e collaborator)",
+        "audience": "(solo per admin e collaboratori)",
         "descOn": "I pulsanti feedback e beta si trovano in basso a destra in ogni pagina.",
         "descOff": "I pulsanti feedback e beta sono nascosti — così non vedi nemmeno le risposte e le domande del team. Riattivali qui per aprire il tuo feedback o gli interruttori beta."
       },
@@ -4094,15 +4094,15 @@
         "label": "Titolo feedback solo verde / rosso",
         "audience": "(solo per admin)",
         "descOn": "Il titolo “Feedback” si illumina di verde finché la routine è attiva o al lavoro, e di rosso finché non si sta lavorando a nulla. Vale solo per il tuo account.",
-        "descOff": "Il titolo “Feedback” mostra quattro stati: verde pronto, blu in lavorazione ora, giallo in pausa, rosso irraggiungibile."
+        "descOff": "Il titolo “Feedback” mostra quattro stati: verde pronto, blu in lavorazione, ambra in pausa, rosso irraggiungibile."
       }
     },
     "danger": {
       "title": "Elimina account",
-      "warning": "Elimina definitivamente il tuo account. Spariscono anche i tuoi caricamenti + bundle. Non si può annullare.",
+      "warning": "Elimina definitivamente il tuo account. Verranno eliminati anche i tuoi caricamenti e bundle. L'operazione non può essere annullata.",
       "deleteBtn": "Elimina il mio account",
       "deleting": "Eliminazione…",
-      "confirm": "Il tuo account ({{email}}) verrà eliminato definitivamente. Spariscono anche i tuoi caricamenti + bundle. Dopo verrai disconnesso. Sicuro?",
+      "confirm": "Il tuo account ({{email}}) verrà eliminato definitivamente. Verranno eliminati anche i tuoi caricamenti e bundle. Dopo verrai disconnesso. Confermi?",
       "failed": "Eliminazione non riuscita",
       "viaAdmin": "L'eliminazione dell'account viene attualmente eseguita da un amministratore. Contattaci tramite i recapiti indicati nelle note legali; elimineremo il tuo account insieme a profilo, hangar, loadout e caricamenti.",
       "imprintLink": "Vai alle note legali",
@@ -4838,9 +4838,9 @@
     },
     "disclaimerTitle": "Avviso sul sito fan",
     "rsiLink": "Sito ufficiale di Star Citizen: robertsspaceindustries.com",
-    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
+    "noticeOriginal": "Questo è un sito fan non ufficiale di Star Citizen, non affiliato al gruppo di società Cloud Imperium. Tutti i contenuti di questo sito non creati dal gestore o dagli utenti sono di proprietà dei rispettivi titolari.",
     "noticeOriginalLabel": "Testo originale (inglese)",
-    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® and Cloud Imperium® are registered trademarks of Cloud Imperium Rights LLC"
+    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® e Cloud Imperium® sono marchi registrati di Cloud Imperium Rights LLC"
   },
   "legal": {
     "about": {
@@ -4977,7 +4977,7 @@
     "title": "Il mio hangar",
     "subtitle": "La tua flotta personale: configurazioni delle navi, loadout dei componenti e set di ruolo — basati sui dati di gioco live del Codex.",
     "counts": {
-      "owned": "Posseduto",
+      "owned": "Possedute",
       "wishlist": "Desideri"
     },
     "flagship": {
@@ -4995,7 +4995,7 @@
       "openVariant": "Vedi variante"
     },
     "status": {
-      "owned": "Posseduto",
+      "owned": "Possedute",
       "wishlist": "Desideri"
     },
     "add": {
@@ -5077,7 +5077,7 @@
       "shieldHp": "Riserva scudi",
       "quantumRange": "Raggio quantum",
       "assigned": "Oggetti",
-      "ofPorts": "di {{count}} porte",
+      "ofPorts": "di {{count}} slot",
       "note": "Calcolato dai dati dei componenti estratti da questa build del catalogo; mancano i valori degli oggetti non inseriti: i dati sono approssimativi."
     },
     "compStat": {
@@ -5143,7 +5143,7 @@
       "sidearm": "Pistola",
       "melee": "Arma da mischia",
       "throwable": "Oggetto lanciabile",
-      "helmet": "Elmo",
+      "helmet": "Casco",
       "core": "Torso",
       "arms": "Braccia",
       "legs": "Gambe",
@@ -5971,8 +5971,8 @@
       "connected": "App desktop connessa",
       "expired": "Connessione scaduta: nessun contatto da oltre 30 giorni",
       "never": "App desktop non ancora connessa",
-      "since": "· visto l'ultima volta {{days}} giorni fa",
-      "today": "· visto l'ultima volta oggi"
+      "since": "· vista l'ultima volta {{days}} giorni fa",
+      "today": "· vista l'ultima volta oggi"
     },
     "fallback": "Scarica (ultima versione)",
     "prerelease": "Questa è sempre la versione stabile. Beta e alpha si scelgono nell'app dopo aver effettuato l'accesso con il tuo account Verse Companion: i canali disponibili dipendono dal tuo ruolo."
@@ -6177,13 +6177,13 @@
     "error": "Impossibile caricare la pagina del concept. Riprova più tardi."
   },
   "errors": {
-    "offline": "Sei offline. Quando la connessione torna, «Riprova» funzionerà.",
+    "offline": "Sembra che tu sia offline. Riprova quando la connessione sarà tornata.",
     "network": "Il server al momento non è raggiungibile.",
-    "timeout": "Ci ha messo troppo tempo.",
+    "timeout": "L'operazione ha richiesto troppo tempo.",
     "cometLocked": "La data ufficiale di LIVE è stata annunciata: i pronostici sono chiusi.",
-    "cometTipped": "Hai già pronosticato questa patch.",
+    "cometTipped": "Hai già fatto un pronostico per questa patch.",
     "cometDatePast": "Questa data è nel passato.",
-    "guessMade": "Hai già indovinato questa mappa stellare: c'è un solo tentativo.",
+    "guessMade": "Hai già tentato di indovinare questa mappa stellare: c'è un solo tentativo.",
     "guessInvalid": "Questa scelta non appartiene a questa mappa stellare.",
     "guessUnavailable": "Per questa patch non c'è nessuna mappa stellare da riconoscere.",
     "sessionExpired": "La tua sessione è scaduta. Accedi di nuovo.",
@@ -7556,7 +7556,7 @@
     "toast": {
       "lit": "Stella accesa: {{task}}",
       "count": "{{lit}} di {{total}}",
-      "remaining": "ancora {{n}} al wallpaper 4K",
+      "remaining": "ancora {{n}} per il wallpaper 4K",
       "close": "Chiudi",
       "genericTask": "Nuova stella",
       "unlock": {
@@ -7566,7 +7566,7 @@
         "kartograph": "Cartografo sbloccato",
         "road": "Strada stellare sbloccata",
         "nebula": "Nebulosa sbloccata",
-        "live": "Live wallpaper sbloccato",
+        "live": "Wallpaper animato sbloccato",
         "reserve": "Riserva di carburante sbloccata",
         "meteor": "Pioggia di meteore sbloccata",
         "supernova": "Supernova sbloccata",
@@ -7598,7 +7598,7 @@
       "stageAria": "Briefing del Verse",
       "cta": "Dai un'occhiata",
       "headlineQuiet": "Tutto calmo nel Verse: nulla di nuovo dalla tua ultima visita",
-      "headlineError": "Il briefing al momento non è raggiungibile",
+      "headlineError": "Il briefing al momento non è disponibile",
       "loading": "Caricamento del briefing …",
       "allSeen": "Sei aggiornato",
       "newSince": "novità dalla tua ultima visita",
@@ -7613,8 +7613,8 @@
         "hotfix": "Hotfix",
         "planned": "Pianificato"
       },
-      "topAria": "Le storie più recenti",
-      "storyAria": "Storia {{n}}: {{title}}",
+      "topAria": "Le notizie più recenti",
+      "storyAria": "Notizia {{n}}: {{title}}",
       "status": {
         "live": "{{line}} live da {{n}} giorni",
         "liveOne": "{{line}} live da 1 giorno",
@@ -7640,8 +7640,8 @@
         "gallery": "nella galleria",
         "link": "sul sito originale"
       },
-      "pause": "Ferma il movimento",
-      "resume": "Riprendi il movimento"
+      "pause": "Metti in pausa le animazioni",
+      "resume": "Riprendi le animazioni"
     },
     "gates": {
       "aria": "Aree del Verse",
@@ -7702,7 +7702,7 @@
           "notes": "Patch notes lette",
           "keybinds": "Assegnazione tasti controllata",
           "loadout": "Loadout controllato",
-          "shaders": "Shader cache svuotata"
+          "shaders": "Cache degli shader svuotata"
         }
       },
       "comet": {
@@ -7754,7 +7754,7 @@
       "hqEventOpen": "{{name}} è in corso",
       "hqSupplies": "{{n}} operazioni aperte",
       "hqSuppliesOne": "1 operazione aperta",
-      "hqCalm": "Tutto tranquillo al HQ",
+      "hqCalm": "Tutto tranquillo al quartier generale",
       "admin": "Stazione admin",
       "adminValue": "Direttamente all'hub admin",
       "adminHint": "visibile solo agli admin",
@@ -8363,7 +8363,7 @@
     "aria": "Scarica le app",
     "scc": {
       "name": "Verse Companion App",
-      "desc": "Il tuo compagno accanto al gioco: info live, overlay e assegnazione dei tasti, senza alt-tab."
+      "desc": "Direttamente accanto al gioco: info live, overlay e assegnazione dei tasti, senza alt-tab."
     },
     "starscape": {
       "name": "Starscape",
@@ -9080,7 +9080,7 @@
     }
   },
   "quick": {
-    "toNachschub": "In un'Operation: {{name}}",
+    "toNachschub": "In un'operazione: {{name}}",
     "wish": "Desideri",
     "allWish": "Tutti i desideri",
     "allWishCount": "{{n}} desideri",

@@ -2,12 +2,12 @@
   "notFoundPage": {
     "srTitle": "404 – 找不到頁面",
     "title": "目的地超出地圖範圍",
-    "lead": "這個網址沒有通往任何地方:",
+    "lead": "這個網址沒有通往任何地方：",
     "didYouMean": "你是指",
     "home": "返回首頁"
   },
   "slowLoad": {
-    "title": "這比平常花更久的時間",
+    "title": "所需時間比平常更久",
     "retry": "再試一次",
     "home": "前往首頁"
   },
@@ -101,38 +101,38 @@
   },
   "auth": {
     "previewLocked": {
-      "body": "在此處無法登入——預覽會覆蓋應用程式向你顯示的內容,即使登入成功也一樣。請先透過頂部橫幅結束預覽。"
+      "body": "在此處無法登入——預覽會覆蓋應用程式向你顯示的內容，即使登入成功也一樣。請先透過頂部橫幅結束預覽。"
     },
     "tagline": "通往 Verse 的終端機",
     "email": "電子郵件",
     "password": "密碼",
     "signIn": "登入",
-    "forgotPassword": "忘記密碼?",
+    "forgotPassword": "忘記密碼？",
     "reset": {
       "title": "重設密碼",
-      "hint": "請輸入你的電子郵件地址。我們會寄給你一個連結,讓你設定新密碼——我們絕不會替你決定密碼。",
+      "hint": "請輸入你的電子郵件地址。我們會寄給你一個連結，讓你設定新密碼——我們絕不會替你決定密碼。",
       "send": "傳送連結",
       "sending": "傳送中…",
-      "sent": "如果此地址有對應的帳號,一封附有連結的電子郵件正在寄出。該連結會直接前往設定密碼的頁面。"
+      "sent": "如果此地址有對應的帳號，附有連結的電子郵件正在寄出。該連結會直接前往設定密碼的頁面。"
     },
     "setPassword": {
       "title": "設定你的密碼",
       "inviteTitle": "歡迎登艦",
       "checking": "請稍候…",
       "lead": "請在此設定你的新密碼。之後你將使用電子郵件地址和此密碼登入。",
-      "inviteLead": "你的申請已通過——你的存取權限已啟用。你還沒有密碼:現在就自己設定一個,之後隨時都能再進來。",
+      "inviteLead": "你的申請已通過——你的存取權限已啟用。你還沒有密碼：現在就設定一個，之後隨時都能再登入。",
       "newPassword": "新密碼",
       "repeatPassword": "再次輸入密碼",
       "rule": "至少 {{min}} 個字元。只有你知道——我們不會發放密碼。",
       "submit": "儲存密碼",
       "saving": "儲存中…",
       "saved": "密碼已儲存。",
-      "savedLead": "密碼已儲存。從現在起,你可以使用電子郵件地址和此密碼登入。",
+      "savedLead": "密碼已儲存。從現在起，你可以使用電子郵件地址和此密碼登入。",
       "continue": "繼續前往應用程式",
-      "expired": "此連結已過期或已被使用過。請輸入你的電子郵件地址,我們會寄給你新的連結。",
+      "expired": "此連結已過期或已被使用過。請輸入你的電子郵件地址，我們會寄給你新的連結。",
       "sendLink": "傳送新連結",
       "sending": "傳送中…",
-      "resent": "如果此地址有對應的帳號,一封附有新連結的電子郵件正在寄出。"
+      "resent": "如果此地址有對應的帳號，附有新連結的電子郵件正在寄出。"
     },
     "or": "或",
     "continueGoogle": "使用 Google 繼續",
@@ -149,10 +149,10 @@
     },
     "landing": {
       "appName": "Verse Companion",
-      "join": "Join the Club.",
-      "pitch": "Companion 是一個私人圈子——僅限受邀者存取。你已經在 Verse 裡飛行,想加入嗎?提出申請,管理員會審核。",
+      "join": "加入俱樂部。",
+      "pitch": "Companion 是一個私人圈子——僅限受邀者存取。你已經在 Verse 裡飛行，想加入嗎？提出申請，管理員會審核。",
       "perks": {
-        "hangar": "你的機庫,載具配置與角色集中一處",
+        "hangar": "你的機庫，配裝與角色集中一處",
         "codex": "Codex:艦船、元件與遊戲內實際數值",
         "verse": "新聞、Starscape 桌布與 Verse 實用工具"
       },
@@ -168,14 +168,14 @@
     },
     "apply": {
       "title": "申請存取權限",
-      "hint": "簡單介紹一下你自己——你的申請會直接送到管理員手上。無需帳號、無需密碼。",
-      "handle": "RSI 代號(選填)",
+      "hint": "簡單介紹一下你自己——你的申請會直接送到管理員手上。無需帳號，無需密碼。",
+      "handle": "RSI 代號（選填）",
       "handlePlaceholder": "例如 CitizenKane",
-      "message": "訊息(選填)",
-      "messagePlaceholder": "你是怎麼認識我們的?你駕駛什麼?",
+      "message": "訊息（選填）",
+      "messagePlaceholder": "你是怎麼認識我們的？你駕駛什麼船？",
       "send": "送出申請",
       "sending": "傳送中…",
-      "sent": "謝謝!你的申請已送達。如果管理員通過,你會在此地址收到邀請郵件。",
+      "sent": "謝謝！你的申請已送達。如果管理員通過，你會在此地址收到邀請郵件。",
       "rateLimited": "目前申請量很大。請一小時後再試。"
     },
     "suspended": {
@@ -200,7 +200,7 @@
     "signOut": "登出",
     "backToHome": "返回首頁",
     "skipToContent": "跳到內容",
-    "brandAria": "Verse Companion — 前往首頁(Verse News)",
+    "brandAria": "Verse Companion — 前往首頁（Verse News）",
     "phaseBadge": "Alpha",
     "badge": "製圖師徽章",
     "accountMenu": "帳號選單",
@@ -210,7 +210,7 @@
     "telemetry": "遙測",
     "starscape": "Starscape",
     "viewAs": {
-      "title": "檢視身分",
+      "title": "以此身分檢視",
       "collaborator": "協作者",
       "viewer": "檢視者",
       "anon": "未登入的訪客",
@@ -3377,7 +3377,7 @@
     },
     "events": {
       "title": "遊戲內活動",
-      "upcomingTitle": "即將登場於 'verse",
+      "upcomingTitle": "即將在 'verse 登場",
       "aria": "進行中與即將舉行的遊戲內活動",
       "allPosts": "所有活動貼文",
       "runningUntil": "進行中 · 至 {{date}}",
@@ -3412,7 +3412,7 @@
       "otherLine": "無版本資訊",
       "hotfix": "Hotfix",
       "stage": {
-        "live": "LIVE",
+        "live": "Live",
         "ptu": "PTU",
         "evocati": "Evocati"
       },
@@ -3470,7 +3470,7 @@
         "estimate": "我們的預估",
         "estimateBasis": "已測試 {{days}} 天 · PTU → LIVE 中位數 {{median}} 天(n = {{n}})",
         "noEstimate": "目前數據不足,無法預估",
-        "official": "官方 (RSI)",
+        "official": "官方(RSI)",
         "source": "來源:RSI 狀態,{{title}}",
         "noOfficial": "尚無官方日期",
         "statusLink": "請查看 RSI 狀態頁面",
@@ -3480,12 +3480,12 @@
       "forecast": {
         "title": "預估時程",
         "short": "時程",
-        "sub": "根據修補頻率推估的中位數,非官方日期",
+        "sub": "根據更新週期推估的中位數,非官方日期",
         "row": {
           "ptu": "下一個 PTU",
-          "live": "下一個 Live 修補",
-          "subPatch": "下一個子修補(Live)",
-          "ptuSubPatch": "下一個 PTU 子修補"
+          "live": "下一個 Live 更新",
+          "subPatch": "下一個小型更新(Live)",
+          "ptuSubPatch": "下一個 PTU 小型更新"
         },
         "today": "今天到期",
         "inDays": "約 {{n}} 天後",
@@ -3511,7 +3511,7 @@
       "roadmap": {
         "expandAll": "顯示所有說明",
         "collapseAll": "收合所有說明",
-        "source": "RSI 上的 Roadmap ↗",
+        "source": "RSI 上的路線圖 ↗",
         "uncategorized": "未分類",
         "noDetail": "RSI 未提供此項目的說明。",
         "status": {
@@ -3520,7 +3520,7 @@
           "tentative": "暫定",
           "unknown": "未完成"
         },
-        "openCard": "在 RSI 上開啟 Roadmap 項目「{{name}}」"
+        "openCard": "在 RSI 上開啟路線圖項目「{{name}}」"
       },
       "detail": {
         "loading": "正在載入修補內容 …",
@@ -3544,9 +3544,9 @@
           "service": "依 RSI Status 統計,每日非計畫性服務異常的分鐘數(7 天),另加目前未解決的異常",
           "cig": "CIG 已知問題文章中尚未解決的項目,以及其 7 天內的增加量"
         },
-        "timeline": "自 LIVE 以來",
-        "timelineAria": "自 LIVE 以來每日的穩定度,共 {{days}} 個取樣點",
-        "hotfixMark": "Hotfix {{build}},{{date}}",
+        "timeline": "自上線以來",
+        "timelineAria": "自上線以來每日的穩定度,共 {{days}} 個取樣點",
+        "hotfixMark": "熱修復 {{build}},{{date}}",
         "tickets": {
           "title": "社群回報的內容",
           "empty": "熱門回覆中沒有工單。"
@@ -3565,7 +3565,7 @@
       },
       "stack": {
         "aria": "修補檔,最新在前",
-        "sinceDays": "已 {{n}} 天",
+        "sinceDays": "持續 {{n}} 天",
         "replaced": "於 {{date}}",
         "liveSince": "自 {{date}} 起上線",
         "liveSpan": "上線 {{from}} – {{to}}",
@@ -3592,7 +3592,7 @@
           "stabilitaet": "穩定度",
           "builds": "進行中的測試建置",
           "prep": "我該如何準備?",
-          "prepPast": "需要注意什麼?",
+          "prepPast": "你需要知道的事",
           "contents": "內容有什麼?",
           "fixed": "他們修好了……嗎?",
           "next": "下一個何時推出?",
@@ -3651,10 +3651,10 @@
         "point": {
           "prevLive": "上線 {{version}}",
           "firstTest": "PTU 開始 {{version}}",
-          "live": "上線 {{version}}",
+          "live": "正式服 {{version}}",
           "hotfix": "熱修復 ×{{n}}",
           "now": "今天",
-          "nextLive": "上線 {{version}}",
+          "nextLive": "正式服 {{version}}",
           "usual": "下次上線 · 一般",
           "leadUsual": "一般應為"
         },
@@ -3761,7 +3761,7 @@
       "liveOnly": "{{line}} 已上線",
       "due": "{{line}} 已上線 · 下一個主要修補檔 {{days}} 天後",
       "dueWeeks": "{{line}} 已上線 · 下一個主要修補檔約 {{weeks}} 週後",
-      "today": "{{line}} 已上線 · 下一個主要修補檔今天到期",
+      "today": "{{line}} 已上線 · 下一個主要修補檔預計今天推出",
       "overdue": "{{line}} 已上線 · 下一個主要修補檔已逾期 {{days}} 天",
       "overdueWeeks": "{{line}} 已上線 · 下一個主要修補檔已逾期約 {{weeks}} 週",
       "basis": "依目前修補檔週期估算",
@@ -4823,7 +4823,7 @@
   "footer": {
     "madeByCommunity": "Made by the Community",
     "badgeAlt": "Star Citizen — Made By The Community",
-    "disclaimer": "這是非官方的 Star Citizen 粉絲網站,與 Cloud Imperium 集團旗下公司無任何關聯。本網站上非由其主機或使用者撰寫的所有內容,均屬於其各自擁有者的財產。",
+    "disclaimer": "這是非官方的 Star Citizen 粉絲網站，與 Cloud Imperium 集團旗下公司無任何關聯。本網站上非由站方或使用者撰寫的所有內容，均屬於其各自擁有者的財產。",
     "trademarks": "Star Citizen®、Roberts Space Industries® 與 Cloud Imperium® 為 Cloud Imperium Rights LLC 的註冊商標",
     "disclaimerExpand": "顯示完整免責聲明",
     "disclaimerCollapse": "收合免責聲明",
@@ -4838,9 +4838,9 @@
     },
     "disclaimerTitle": "粉絲網站聲明",
     "rsiLink": "官方 Star Citizen 網站:robertsspaceindustries.com",
-    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
+    "noticeOriginal": "本網站為非官方 Star Citizen 粉絲網站,與 Cloud Imperium 集團旗下公司並無關聯。本網站上所有非由網站主或使用者創作的內容,均為其各自所有者的財產。",
     "noticeOriginalLabel": "原文(英文)",
-    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® and Cloud Imperium® are registered trademarks of Cloud Imperium Rights LLC"
+    "trademarksOriginal": "Star Citizen®、Roberts Space Industries® 與 Cloud Imperium® 為 Cloud Imperium Rights LLC 的註冊商標"
   },
   "legal": {
     "about": {
@@ -4975,10 +4975,10 @@
   },
   "hangar": {
     "title": "我的機庫",
-    "subtitle": "你的個人艦隊:艦船配置、零件 Loadout 與角色組合 — 建立於 Codex 中的即時遊戲資料之上。",
+    "subtitle": "你的個人艦隊:艦船配置、元件 Loadout 與角色組合 — 建立於 Codex 中的即時遊戲資料之上。",
     "counts": {
       "owned": "已擁有",
-      "wishlist": "願望"
+      "wishlist": "願望清單"
     },
     "flagship": {
       "set": "設為旗艦",
@@ -4996,7 +4996,7 @@
     },
     "status": {
       "owned": "已擁有",
-      "wishlist": "願望"
+      "wishlist": "願望清單"
     },
     "add": {
       "title": "新增艦船",
@@ -5055,7 +5055,7 @@
       "namePlaceholder": "例如:PvP 配裝…",
       "create": "建立",
       "empty": "尚無配置 — 為配置命名並選擇角色,即可開始自訂 Loadout。",
-      "activate": "設為使用中",
+      "activate": "設為啟用",
       "saveLoadout": "儲存 Loadout",
       "discard": "捨棄",
       "delete": "刪除",
@@ -5161,7 +5161,7 @@
     "shared": {
       "eyebrow": "已分享的 Loadout",
       "loading": "載入中 …",
-      "by": "來自 {{name}}",
+      "by": "作者:{{name}}",
       "emptyLoadout": "這個 Loadout 尚未設定任何內容。",
       "adopt": "建立副本",
       "adopting": "正在建立副本 …",
@@ -7576,13 +7576,13 @@
     "area": {
       "briefing": "簡報",
       "news": "Verse News",
-      "patches": "Patch News",
+      "patches": "版本新聞",
       "gallery": "圖庫",
       "starmap": "星圖"
     },
     "kind": {
       "news": "新聞",
-      "patch": "Patch",
+      "patch": "版本",
       "gallery": "圖庫",
       "link": "連結"
     },
@@ -7613,19 +7613,19 @@
         "hotfix": "Hotfix",
         "planned": "計畫中"
       },
-      "topAria": "最新的故事",
-      "storyAria": "第 {{n}} 篇故事:{{title}}",
+      "topAria": "最新消息",
+      "storyAria": "第 {{n}} 則消息:{{title}}",
       "status": {
         "live": "{{line}} 已上線 {{n}} 天",
         "liveOne": "{{line}} 已上線 1 天",
         "liveToday": "{{line}} 今天上線",
         "liveNow": "{{line}} 已上線",
-        "dueToday": "{{line}} 今天到期",
+        "dueToday": "{{line}} 預計今天推出",
         "due": {
-          "days": "{{line}} 將於 {{n}} 天後到期",
-          "daysOne": "{{line}} 明天到期",
-          "weeks": "{{line}} 將於約 {{n}} 週後到期",
-          "weeksOne": "{{line}} 將於約 1 週後到期"
+          "days": "{{line}} 預計 {{n}} 天後推出",
+          "daysOne": "{{line}} 預計明天推出",
+          "weeks": "{{line}} 預計約 {{n}} 週後推出",
+          "weeksOne": "{{line}} 預計約 1 週後推出"
         },
         "overdue": {
           "days": "{{line}} 已逾期 {{n}} 天",
@@ -7706,7 +7706,7 @@
         }
       },
       "comet": {
-        "title": "Patch 預測投票:{{line}} 何時上線 LIVE?",
+        "title": "Patch 預測投票:{{line}} 何時登上 LIVE?",
         "hint": "投下你的預測——投票後可看到社群中位數。",
         "label": "你預測的 LIVE 日期",
         "submit": "送出預測",
@@ -7740,7 +7740,7 @@
       "next": "下一則消息",
       "area": {
         "news": "新聞",
-        "patch": "Patches",
+        "patch": "更新檔",
         "gallery": "圖庫",
         "link": "Verse"
       },
@@ -7754,15 +7754,15 @@
       "hqEventOpen": "{{name}} 進行中",
       "hqSupplies": "{{n}} 個進行中的行動",
       "hqSuppliesOne": "1 個進行中的行動",
-      "hqCalm": "HQ 一切平靜",
+      "hqCalm": "總部一切平靜",
       "admin": "管理站",
       "adminValue": "直接前往管理中心",
       "adminHint": "僅管理員可見",
       "newsEmpty": "目前沒有新聞。",
-      "patchesEmpty": "尚無 Patch Notes。",
+      "patchesEmpty": "尚無更新說明。",
       "patchTitle": "Star Citizen Alpha {{v}}",
-      "liveSince": "已 {{n}} 天",
-      "liveSinceOne": "已 1 天",
+      "liveSince": "已持續 {{n}} 天",
+      "liveSinceOne": "已持續 1 天",
       "liveSinceToday": "自今天起",
       "channel": {
         "live": "Live",
@@ -7771,7 +7771,7 @@
         "evocati": "Evocati"
       },
       "wave": "第 {{n}} 波",
-      "channelOff": "目前沒有進行中的"
+      "channelOff": "目前沒有進行中"
     },
     "frame": {
       "newsSub": "Comm-Link、影片與 Spectrum——Verse 的最新消息"
@@ -8371,7 +8371,7 @@
     },
     "uploader": {
       "name": "Verse Data Uploader",
-      "desc": "讀取你的 Star Citizen 安裝內容,並將艦船、數值與 3D 模型填入 Codex。"
+      "desc": "讀取你的 Star Citizen 安裝檔案,並將艦船、數值與 3D 模型填入 Codex。"
     },
     "footer": "這是穩定版。登入後可在應用程式中選擇 Beta 與 Alpha——你能看到哪些頻道取決於你的角色。"
   },
@@ -8397,7 +8397,7 @@
       "breadcrumbAria": "應用程式",
       "uploader": {
         "name": "Verse Data Uploader",
-        "desc": "讀取你的 Star Citizen 遊戲內容,並將資料上傳至 Codex。"
+        "desc": "讀取你的 Star Citizen 安裝檔案,並將資料上傳至 Codex。"
       },
       "starscape": {
         "name": "Starscape",
@@ -9080,7 +9080,7 @@
     }
   },
   "quick": {
-    "toNachschub": "加入 Operation:{{name}}",
+    "toNachschub": "加入行動:{{name}}",
     "wish": "願望",
     "allWish": "所有願望",
     "allWishCount": "{{n}} 個願望",

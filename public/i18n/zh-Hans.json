@@ -194,7 +194,7 @@
     }
   },
   "nav": {
-    "codex": "图鉴",
+    "codex": "Codex",
     "settings": "设置",
     "admin": "用户",
     "signOut": "退出登录",
@@ -210,7 +210,7 @@
     "telemetry": "遥测",
     "starscape": "Starscape",
     "viewAs": {
-      "title": "查看身份",
+      "title": "以此身份查看",
       "collaborator": "协作者",
       "viewer": "查看者",
       "anon": "未登录访客",
@@ -229,8 +229,8 @@
     "verse": "Verse",
     "translations": "AI 翻译",
     "social": "社交",
-    "accountMenuRequests": "账号菜单,{{count}} 个待处理的好友请求",
-    "socialRequests": "社交,{{count}} 个待处理的好友请求"
+    "accountMenuRequests": "账号菜单，{{count}} 个待处理的好友请求",
+    "socialRequests": "社交，{{count}} 个待处理的好友请求"
   },
   "impersonation": {
     "banner": {
@@ -3347,7 +3347,7 @@
   "news": {
     "loading": "加载中…",
     "empty": "暂无新闻。",
-    "emptyFavorites": "还没有收藏内容——点击收藏图标收藏帖子,它就会显示在这里。",
+    "emptyFavorites": "还没有收藏内容——点击收藏图标收藏帖子，它就会显示在这里。",
     "errorTitle": "无法加载新闻",
     "lastUpdated": "{{rel}}更新",
     "refreshing": "正在刷新…",
@@ -3382,7 +3382,7 @@
       "allPosts": "所有活动帖子",
       "runningUntil": "进行中 · 截至 {{date}}",
       "endsToday": "进行中 · 今天结束",
-      "startsTomorrow": "明天起,{{date}}",
+      "startsTomorrow": "明天起，{{date}}",
       "startsIn": "自 {{date}} 起 · {{n}} 天后",
       "estimated": "日期为预估",
       "error": "无法加载活动。",
@@ -3418,7 +3418,7 @@
       },
       "facet": {
         "live": "LIVE",
-        "hotfix": "Hotfix",
+        "hotfix": "热修复",
         "ptu": "PTU",
         "evocati": "Evocati",
         "other": "其他"
@@ -3441,19 +3441,19 @@
         },
         "leadTime": {
           "title": "PTU → LIVE",
-          "short": "PTU → Live",
+          "short": "PTU → LIVE",
           "sub": "从首个测试版本到正式上线的天数"
         },
         "cadence": {
           "title": "更新节奏(主线版本)",
           "short": "节奏",
-          "sub": "两次 Live 正式发布之间的天数"
+          "sub": "两次 LIVE 正式发布之间的天数"
         },
         "median": "历史中位数",
         "subCadence": {
           "title": "更新节奏(子补丁)",
           "short": "子补丁",
-          "sub": "PTU 或 Live 中两次子补丁之间的天数"
+          "sub": "PTU 或 LIVE 中两次子补丁之间的天数"
         },
         "window": {
           "aria": "图表时间范围",
@@ -3466,7 +3466,7 @@
         "title": "{{version}} 何时登陆 LIVE?",
         "infoLabel": "日期是如何得出的",
         "infoEstimate": "我们的估算:该版本的首个测试版本时间,加上以往版本从首个 PTU 版本到 LIVE 所用时间的中位数。这是推算结果,并非承诺。",
-        "infoOfficial": "官方日期:RSI 在其状态页面上安排的 LIVE 部署时间,一旦那里有计划就会显示。RSI 不会在更新说明中给出具体日期。",
+        "infoOfficial": "官方日期：RSI 在其状态页面上安排的 LIVE 部署时间，一旦那里有计划就会显示。RSI 不会在补丁说明中给出具体日期。",
         "estimate": "我们的估算",
         "estimateBasis": "已测试 {{days}} 天 · PTU → LIVE 中位数 {{median}} 天(n = {{n}})",
         "noEstimate": "数据不足,暂时无法估算",
@@ -3483,8 +3483,8 @@
         "sub": "根据更新节奏得出的中位数估算,并非官方日期",
         "row": {
           "ptu": "下一个 PTU",
-          "live": "下一个 Live 补丁",
-          "subPatch": "下一个子补丁(Live)",
+          "live": "下一个 LIVE 补丁",
+          "subPatch": "下一个子补丁（LIVE）",
           "ptuSubPatch": "下一个 PTU 子补丁"
         },
         "today": "今天到期",
@@ -3496,7 +3496,7 @@
       },
       "board": {
         "title": "补丁中心",
-        "sub": "未来在上，现在居中，过去在下——补丁在此展开它的档案",
+        "sub": "未来在上，现在居中，过去在下——点击补丁可打开其档案",
         "back": "返回 Verse News"
       },
       "waves": {
@@ -3564,7 +3564,7 @@
         "other": "无版本"
       },
       "stack": {
-        "aria": "补丁,最新在前",
+        "aria": "补丁，最新在前",
         "sinceDays": "已持续 {{n}} 天",
         "replaced": "于 {{date}}",
         "liveSince": "自 {{date}} 起正式上线",
@@ -3573,10 +3573,10 @@
         "ptuExpected": "预计 {{when}} 进入 PTU",
         "noBuild": "尚无构建版本",
         "plannedFor": "计划于 {{quarter}}",
-        "inRing": "处于 {{ring}} · {{n}} 轮 · {{ago}}",
-        "hotfixOne": "1 次热修复,{{date}}",
-        "hotfixes": "{{n}} 次热修复,最近一次 {{date}}",
-        "nextLive": "下一个正式服补丁 {{when}}(预估)",
+        "inRing": "处于 {{ring}} · {{n}} 个批次 · {{ago}}",
+        "hotfixOne": "1 次热修复，{{date}}",
+        "hotfixes": "{{n}} 次热修复，最近一次 {{date}}",
+        "nextLive": "下一个正式服补丁 {{when}}（预估）",
         "notes": "{{n}} 条说明",
         "planned": "{{n}} 个路线图条目",
         "openDossier": "打开 {{name}} 的档案",
@@ -3591,30 +3591,30 @@
         "section": {
           "stabilitaet": "稳定性",
           "builds": "正在进行的测试构建",
-          "prep": "我该如何准备?",
+          "prep": "我该如何准备？",
           "prepPast": "需要了解什么",
-          "contents": "里面有什么?",
-          "fixed": "他们修复了……吗?",
-          "next": "下一个什么时候来?",
-          "nextThis": "这个补丁什么时候上线?",
-          "nextPast": "之后发生了什么?"
+          "contents": "里面有什么？",
+          "fixed": "他们修复了……吗？",
+          "next": "下一个什么时候来？",
+          "nextThis": "这个补丁什么时候上线？",
+          "nextPast": "之后发生了什么？"
         },
         "noteOf": "{{version}} 中的变更 · Alpha {{line}} 的一部分",
         "wholeLine": "查看完整的 {{line}} 补丁",
         "eyebrow": "补丁"
       },
       "prep": {
-        "source": "根据 Spectrum 帖子(\"Important Build Info\")",
+        "source": "根据 Spectrum 帖子（“Important Build Info”）",
         "known": "已知问题",
         "focus": "测试重点",
         "wipe": "清档",
-        "noBuildInfo": "RSI 没有为此构建发布 \"Important Build Info\"。",
+        "noBuildInfo": "RSI 没有为此构建发布“Important Build Info”。",
         "generalTitle": "适用于每个补丁",
         "generalItem": {
           "launcher": "打开启动器并等待下载完成——启动器显示的版本必须与补丁一致。",
-          "shaders": "如果补丁后画面闪烁或帧率下降,请清空着色器文件夹(%LOCALAPPDATA%\\\\Star Citizen\\\\)。",
-          "verify": "补丁后立即崩溃:报告 Bug 前,请先在启动器中运行 \"Verify\"。",
-          "repair": "角色卡住或装备丢失:请在 RSI 账号中运行 Character Repair,然后重新登录。",
+          "shaders": "如果补丁后画面闪烁或帧率下降，请清空着色器文件夹（%LOCALAPPDATA%\\\\Star Citizen\\\\）。",
+          "verify": "补丁后立即崩溃：报告 Bug 前，请先在启动器中运行“Verify”。",
+          "repair": "角色卡住或装备丢失：请在 RSI 账号中运行 Character Repair，然后重新登录。",
           "known": "报告前先浏览一下已知问题——大多数新 Bug 已经列在那里。"
         }
       },
@@ -3622,9 +3622,9 @@
         "inNotes": "在发行说明中",
         "more": "全文",
         "less": "收起",
-        "leftover": "说明中没有路线图卡片的其他要点({{n}})",
-        "noRoadmap": "此补丁没有路线图数据——这是说明 \"{{title}}\":",
-        "ofNote": "来自“{{title}}”的变更:"
+        "leftover": "说明中没有路线图卡片的其他要点（{{n}}）",
+        "noRoadmap": "此补丁没有路线图数据——这是说明“{{title}}”：",
+        "ofNote": "来自“{{title}}”的变更："
       },
       "fixed": {
         "placeholder": "在此补丁中搜索……例如 quantum drive",
@@ -3633,20 +3633,20 @@
         "loadRest": "加载并搜索其余说明",
         "loading": "正在加载 {{n}} 条说明……",
         "noHits": "已加载的说明中没有结果——标题始终会被搜索。",
-        "allNotes": "全部说明({{n}})"
+        "allNotes": "全部说明（{{n}}）"
       },
       "next": {
         "sentenceLive": "下一个正式服补丁预计在 {{date}} 前后——{{when}}。",
         "sentenceHistory": "Alpha {{line}} 于 {{date}} 在 {{days}} 天后被 Alpha {{next}} 取代——通常为 {{median}} 天。",
-        "sentencePlanned": "按节奏推算,Alpha {{line}} 预计在 {{date}} 前后上线正式服——{{when}}。",
-        "disclaimer": "基于补丁节奏的中位数估算,并非官方日期。",
-        "markers": "时间轴上的标记:上一个正式服补丁、PTU 开始、通常的测试结束、正式上线、热修复、今天以及通常的下一个日期。开始、上线和目标有标注——其余标记见提示框。",
+        "sentencePlanned": "按节奏推算，Alpha {{line}} 预计在 {{date}} 前后上线正式服——{{when}}。",
+        "disclaimer": "基于补丁节奏的中位数估算，并非官方日期。",
+        "markers": "时间轴上的标记：上一个正式服补丁、PTU 开始、通常的测试结束、正式上线、热修复、今天以及通常的下一个日期。开始、上线和目标有标注——其余标记见提示框。",
         "planned": {
-          "sentence": "Alpha {{line}} 计划于 {{quarter}}。",
+          "sentence": "Alpha {{line}} 计划于 {{quarter}} 推出。",
           "unknown": "Alpha {{line}} 暂无日期。",
-          "status": "尚无测试构建——按通常节奏,下一个正式服日期约在 {{date}}。",
-          "basisCadence": "通常节奏 · 中位数,n = {{n}}",
-          "basisLead": "通常测试阶段 · 中位数,n = {{n}}"
+          "status": "尚无测试构建——按通常节奏，下一个正式服日期约在 {{date}}。",
+          "basisCadence": "通常节奏 · 中位数，n = {{n}}",
+          "basisLead": "通常测试阶段 · 中位数，n = {{n}}"
         },
         "point": {
           "prevLive": "正式服 {{version}}",
@@ -3655,14 +3655,14 @@
           "hotfix": "热修复 ×{{n}}",
           "now": "今天",
           "nextLive": "正式服 {{version}}",
-          "usual": "下次正式服 · 通常",
+          "usual": "下次正式服 · 常规",
           "leadUsual": "通常会是"
         },
         "span": {
           "leadTime": "测试 → 正式服:{{days}} 天",
           "cadence": "正式服 → 正式服:{{days}} 天"
         },
-        "charts": "详细图表(PTU → 正式服 · 节奏 · 子补丁 · 日程)",
+        "charts": "详细图表(PTU → 正式服 · 节奏 · 子补丁 · 时间表)",
         "status": {
           "live": "Alpha {{line}} 已上线 {{days}} 天——通常 {{median}} 天后会有下一个。",
           "testing": "Alpha {{line}} 已测试 {{days}} 天——通常 {{median}} 天后上线正式服。",
@@ -3677,7 +3677,7 @@
         },
         "fact": {
           "lead": "测试 → 正式服:{{days}} 天",
-          "cadence": "上一周期 正式服 → 正式服:{{days}} 天",
+          "cadence": "上一周期正式服 → 正式服:{{days}} 天",
           "usual": "通常 {{median}} 天(n = {{n}})",
           "later": "比通常晚 {{n}} 天",
           "earlier": "比通常早 {{n}} 天",
@@ -3739,7 +3739,7 @@
       "addedOne": "舰船矩阵中新增 1 艘舰船",
       "addedMany": "舰船矩阵中新增 {{count}} 艘舰船",
       "wishedUpdated": "你愿望清单中有 {{count}} 艘舰船状态已变更",
-      "more": "另外 +{{count}}",
+      "more": "还有 {{count}} 个",
       "open": "打开即将推出的舰船",
       "dismiss": "忽略通知"
     },
@@ -3757,11 +3757,11 @@
       "sourceFacet": "来源"
     },
     "verdict": {
-      "label": "Verse 当前动态",
+      "label": "Verse 实况",
       "liveOnly": "{{line}} 已上线",
       "due": "{{line}} 已上线 · 下一个主要补丁还有 {{days}} 天",
       "dueWeeks": "{{line}} 已上线 · 下一个主要补丁还有约 {{weeks}} 周",
-      "today": "{{line}} 已上线 · 下一个主要补丁今天到期",
+      "today": "{{line}} 已上线 · 下一个主要补丁预计今天推出",
       "overdue": "{{line}} 已上线 · 下一个主要补丁已逾期 {{days}} 天",
       "overdueWeeks": "{{line}} 已上线 · 下一个主要补丁已逾期约 {{weeks}} 周",
       "basis": "根据迄今的补丁节奏估算",
@@ -3774,7 +3774,7 @@
       "freshPtuSub": "{{since}} · {{live}} 仍为正式服",
       "sinceToday": "自今天起",
       "sinceYesterday": "自昨天起",
-      "sinceDays": "已 {{days}} 天",
+      "sinceDays": "已持续 {{days}} 天",
       "toBoard": "补丁中心",
       "toNotes": "阅读补丁说明"
     }
@@ -3985,25 +3985,25 @@
     },
     "password": {
       "title": "密码",
-      "hint": "设置新密码。立即生效,你仍保持登录状态。"
+      "hint": "设置新密码。立即生效，你仍保持登录状态。"
     },
     "username": {
       "title": "用户名",
       "label": "用户名",
-      "hint": "3–20 个字符:小写字母 a–z、数字 0–9 和下划线 (_)。",
+      "hint": "3–20 个字符：小写字母 a–z、数字 0–9 和下划线 (_)。",
       "placeholder": "your_callsign",
       "save": "保存",
       "saving": "正在保存…",
       "saved": "用户名已保存。",
-      "errInvalid": "用户名无效。请使用 3–20 个字符:a–z、0–9、_。",
+      "errInvalid": "用户名无效。请使用 3–20 个字符：a–z、0–9、_。",
       "errTaken": "该用户名已被占用。",
-      "errGeneric": "无法保存用户名,请重试。"
+      "errGeneric": "无法保存用户名，请重试。"
     },
     "locale": {
       "title": "语言与地区",
       "hint": "语言决定翻译和完整的月份名称;地区决定日期字段的顺序和时间制式。“自动”会沿用浏览器报告的设置。",
       "auto": "自动",
-      "detected": "自动检测到:{{value}}",
+      "detected": "自动检测到：{{value}}",
       "preview": "示例",
       "language": {
         "label": "语言"
@@ -4058,10 +4058,10 @@
     },
     "composer": {
       "title": "输入",
-      "hint": "适用于所有消息输入框:新主题、主题回复,以及处理模式中的回答框。",
+      "hint": "适用于所有消息输入框：新主题、主题回复，以及处理模式中的回答框。",
       "sendOnEnter": {
         "label": "Enter 发送",
-        "descOn": "按 Enter 发送消息,Shift+Enter 换行。Ctrl/Cmd+Enter 同样可以发送。",
+        "descOn": "按 Enter 发送消息，Shift+Enter 换行。Ctrl/Cmd+Enter 同样可以发送。",
         "descOff": "按 Enter 换行。只有按 Ctrl/Cmd+Enter 或发送按钮才会发送。"
       }
     },
@@ -4070,31 +4070,31 @@
       "hint": "Codex 索引和搜索中显示的内容。",
       "showNonUsable": {
         "label": "显示无法使用的物品",
-        "descOn": "门、座椅、显示屏和其他游戏对象归入“不可用”,并在搜索中排在所有可用结果之后。",
-        "descOff": "你无法使用的门、座椅、显示屏和其他游戏对象会被隐藏,包括区域树、列表和搜索中。"
+        "descOn": "门、座椅、显示屏和其他游戏对象归入“不可用”，并在搜索中排在所有可用结果之后。",
+        "descOff": "你无法使用的门、座椅、显示屏和其他游戏对象会被隐藏，包括区域树、列表和搜索中。"
       }
     },
     "feedbackFab": {
       "title": "反馈按钮",
-      "hint": "位于角落的按钮,用于发送反馈,并显示团队的回复。",
+      "hint": "位于角落的按钮，用于发送反馈，并显示团队的回复。",
       "show": {
         "label": "显示反馈按钮",
         "descOn": "反馈按钮位于每个页面的右下角。",
-        "descOff": "反馈按钮已隐藏,团队的回复和提问也将不可见。在此重新开启即可查看你的反馈。"
+        "descOff": "反馈按钮已隐藏，团队的回复和提问也将不可见。在此重新开启即可查看你的反馈。"
       },
       "staff": {
         "title": "反馈和 Beta 按钮",
-        "hint": "角落按钮:发送反馈并查看团队回复,上方是 Beta 开关。",
+        "hint": "角落按钮：发送反馈并查看团队回复，上方是 Beta 开关。",
         "label": "显示反馈和 Beta 按钮",
-        "audience": "(仅限管理员和协作者)",
+        "audience": "（仅限管理员和协作者）",
         "descOn": "反馈按钮和 Beta 按钮位于每个页面的右下角。",
-        "descOff": "反馈按钮和 Beta 按钮已隐藏,团队的回复和提问也将不可见。在此重新开启即可查看你的反馈或 Beta 开关。"
+        "descOff": "反馈按钮和 Beta 按钮已隐藏，团队的回复和提问也将不可见。在此重新开启即可查看你的反馈或 Beta 开关。"
       },
       "routineTint": {
         "label": "反馈标题仅显示绿/红",
-        "audience": "(仅限管理员)",
-        "descOn": "“反馈”标题在例程运行或工作时亮绿灯,在没有任何处理时亮红灯。仅适用于你的账号。",
-        "descOff": "“反馈”标题显示四种状态:绿色表示就绪,蓝色表示正在处理,琥珀色表示已暂停,红色表示无法连接。"
+        "audience": "（仅限管理员）",
+        "descOn": "“反馈”标题在例程运行或处理中时亮绿灯，在没有任何处理时亮红灯。仅适用于你的账号。",
+        "descOff": "“反馈”标题显示四种状态：绿色表示就绪，蓝色表示正在处理，琥珀色表示已暂停，红色表示无法连接。"
       }
     },
     "danger": {
@@ -4102,17 +4102,17 @@
       "warning": "永久删除你的账号。你的上传和数据包也会一并删除。此操作无法撤销。",
       "deleteBtn": "删除我的账号",
       "deleting": "正在删除…",
-      "confirm": "你的账号({{email}})将被永久删除。你的上传和数据包也会一并删除。之后你将被登出。确定吗?",
+      "confirm": "你的账号（{{email}}）将被永久删除。你的上传和数据包也会一并删除。之后你将被登出。确定吗？",
       "failed": "删除失败",
-      "viaAdmin": "账号删除目前由管理员执行。请通过网站声明中的联系方式联系我们;我们会删除你的账号及其资料、机库、配装和上传内容。",
+      "viaAdmin": "账号删除目前由管理员执行。请通过网站声明中的联系方式联系我们；我们会删除你的账号及其资料、机库、配装和上传内容。",
       "imprintLink": "前往网站声明",
       "errors": {
         "forbidden": "只有管理员可以在此删除账号。",
-        "unauthorized": "你的会话已过期,请重新登录。",
-        "protectedAdmin": "此账号受保护,无法删除。",
+        "unauthorized": "你的会话已过期，请重新登录。",
+        "protectedAdmin": "此账号受保护，无法删除。",
         "lastAdmin": "最后一名管理员无法删除。请先提升另一名管理员。",
         "notFound": "此账号已不存在。",
-        "invalidBody": "请求无效,请刷新页面。"
+        "invalidBody": "请求无效，请刷新页面。"
       }
     }
   },
@@ -4823,7 +4823,7 @@
   "footer": {
     "madeByCommunity": "社区出品",
     "badgeAlt": "Star Citizen — 社区出品",
-    "disclaimer": "这是一个非官方的 Star Citizen 粉丝网站,与 Cloud Imperium 集团旗下公司无任何关联。本网站上非由其运营者或用户创作的所有内容均归其各自所有者所有。",
+    "disclaimer": "这是一个非官方的 Star Citizen 粉丝网站，与 Cloud Imperium 集团旗下公司无任何关联。本网站上非由其运营者或用户创作的所有内容均归其各自所有者所有。",
     "trademarks": "Star Citizen®、Roberts Space Industries® 和 Cloud Imperium® 是 Cloud Imperium Rights LLC 的注册商标",
     "disclaimerExpand": "显示完整免责声明",
     "disclaimerCollapse": "收起免责声明",
@@ -4975,7 +4975,7 @@
   },
   "hangar": {
     "title": "我的机库",
-    "subtitle": "你的个人舰队:舰船配置、组件配置和角色套装——基于 Codex 中的实时游戏数据构建。",
+    "subtitle": "你的个人舰队:舰船配置、组件装配和角色套装——基于 Codex 中的实时游戏数据构建。",
     "counts": {
       "owned": "已拥有",
       "wishlist": "愿望单"
@@ -5042,12 +5042,12 @@
       "openCodex": "Codex 条目",
       "remove": "移除",
       "notes": "备注",
-      "notesPlaceholder": "关于这艘飞船的备注…",
+      "notesPlaceholder": "关于这艘舰船的备注…",
       "removeConfirm": {
         "title": "要将 {{name}} 从机库中移除吗?",
         "bodyNone": "此操作无法撤销。",
-        "bodyOne": "这艘飞船的配置也会一并删除。此操作无法撤销。",
-        "bodyMany": "这艘飞船的 {{count}} 个配置也会一并删除。此操作无法撤销。"
+        "bodyOne": "这艘舰船的配置也会一并删除。此操作无法撤销。",
+        "bodyMany": "这艘舰船的 {{count}} 个配置也会一并删除。此操作无法撤销。"
       }
     },
     "configs": {
@@ -5067,9 +5067,9 @@
     },
     "standard": {
       "title": "标准组件",
-      "subtitle": "来自实时游戏数据 (P4K) 的这艘飞船的出厂配置——即默认随船附带的组件。",
+      "subtitle": "来自实时游戏数据 (P4K) 的这艘舰船的出厂配置——即默认随船附带的组件。",
       "count": "{{count}} 个组件",
-      "empty": "在当前目录版本中,没有记录这艘飞船的标准组件。"
+      "empty": "在当前目录版本中,没有记录这艘舰船的标准组件。"
     },
     "stats": {
       "title": "装配统计",
@@ -5088,7 +5088,7 @@
     },
     "loadout": {
       "title": "挂点与装配",
-      "noPorts": "暂无这艘飞船的挂点数据。",
+      "noPorts": "暂无这艘舰船的挂点数据。",
       "empty": "空",
       "change": "更换",
       "reset": "原装",
@@ -5101,22 +5101,22 @@
       "title": "你的个人机库",
       "subtitle": "请登录以构建你的舰队——免费,Alpha 期间需邀请。",
       "save": {
-        "title": "保存你的飞船",
-        "text": "把整支舰队集中在一处:已拥有的飞船和心愿单,可自定义名称和备注。"
+        "title": "保存你的舰船",
+        "text": "把整支舰队集中在一处:已拥有的舰船和愿望单,可自定义名称和备注。"
       },
       "overview": {
         "title": "舰队概览",
-        "text": "置顶旗舰、数量统计,并可快速进入每艘飞船的详情页。"
+        "text": "置顶旗舰、数量统计,并可快速进入每艘舰船的详情页。"
       },
       "loadouts": {
         "title": "测试装配",
-        "text": "更换飞船上的组件和武器,在花费任何 aUEC 之前先查看属性变化。"
+        "text": "更换舰船上的组件和武器,在花费任何 aUEC 之前先查看属性变化。"
       },
       "compare": {
         "title": "对比",
-        "text": "将飞船和组件并排置顶,对比最关键的数据。"
+        "text": "将舰船和组件并排置顶,对比最关键的数据。"
       },
-      "cta": "登录并打开机库"
+      "cta": "登录以打开你的机库"
     },
     "import": {
       "open": "导入…",
@@ -5126,7 +5126,7 @@
       "parsing": "读取中…",
       "dropHint": "或将 .json 文件拖放到这里",
       "errParse": "无法读取此文件——需要 JSON 导出文件。",
-      "errNoShips": "此文件中未找到飞船条目。",
+      "errNoShips": "此文件中未找到舰船条目。",
       "matched": "{{total}} 个条目中有 {{matched}} 个已匹配到目录",
       "chooseOther": "选择其他文件",
       "exact": "匹配",
@@ -5804,7 +5804,7 @@
       },
       "statistics": {
         "label": "统计",
-        "desc": "匿名使用统计和匿名错误报告(PostHog,欧盟服务器),用于了解哪些区域被使用以及哪里出了问题。默认关闭。登录后,你将以带有角色的假名 ID 出现——绝不会包含姓名或电子邮件;发生错误的会话可能会被录制,且所有输入内容均已遮蔽。关闭后,已存储的值将被删除。"
+        "desc": "匿名使用统计和匿名错误报告(PostHog,欧盟服务器),用于了解哪些区域被使用以及哪里出了问题。默认关闭。登录后,你仅以假名 ID 及你的角色出现——绝不会包含姓名或电子邮件;发生错误的会话可能会被录制,且所有输入内容均已遮蔽。关闭后,已存储的值将被删除。"
       }
     }
   },
@@ -5971,7 +5971,7 @@
       "connected": "桌面应用已连接",
       "expired": "连接已过期——超过 30 天未联系",
       "never": "桌面应用尚未连接",
-      "since": "· 上次在线 {{days}} 天前",
+      "since": "· 上次在线:{{days}} 天前",
       "today": "· 上次在线:今天"
     },
     "fallback": "下载(最新版)",
@@ -6188,7 +6188,7 @@
     "guessUnavailable": "此补丁没有需要识别的星图。",
     "sessionExpired": "你的会话已过期,请重新登录。",
     "forbidden": "你没有权限执行此操作。",
-    "notFound": "这不存在(或已不存在)。",
+    "notFound": "此内容不存在或已被删除。",
     "rateLimit": "请求过多——请稍等片刻。",
     "server": "服务器报告了错误。",
     "generic": "出了点问题。",
@@ -6201,7 +6201,7 @@
   "pageHeader": {
     "crumbsAria": "路径导航",
     "crumb": {
-      "codex": "代码库",
+      "codex": "资料库",
       "index": "索引",
       "fps": "FPS 装备",
       "keybinds": "按键绑定",
@@ -7554,7 +7554,7 @@
   "verse": {
     "crumb": "Verse",
     "toast": {
-      "lit": "点亮星星:{{task}}",
+      "lit": "星星已点亮:{{task}}",
       "count": "{{lit}} / {{total}}",
       "remaining": "再点亮 {{n}} 颗即可获得 4K 壁纸",
       "close": "关闭",
@@ -7613,8 +7613,8 @@
         "hotfix": "热修复",
         "planned": "计划中"
       },
-      "topAria": "最新故事",
-      "storyAria": "故事 {{n}}:{{title}}",
+      "topAria": "最新动态",
+      "storyAria": "动态 {{n}}:{{title}}",
       "status": {
         "live": "{{line}} 已上线 {{n}} 天",
         "liveOne": "{{line}} 已上线 1 天",
@@ -7644,7 +7644,7 @@
       "resume": "恢复动效"
     },
     "gates": {
-      "aria": "宇宙(Verse)各区域",
+      "aria": "Verse 各区域",
       "neu": "新",
       "total": "共 {{n}} 项",
       "news": {
@@ -7690,7 +7690,7 @@
           "value": "{{n}} 天"
         },
         "stable": {
-          "label": "最近稳定上线",
+          "label": "最近上线的稳定版",
           "value": "{{n}}"
         }
       },
@@ -7733,11 +7733,11 @@
     },
     "hub": {
       "brand": "Verse Companion",
-      "search": "搜索 …",
+      "search": "搜索…",
       "searchKey": "Ctrl K",
       "more": "Verse 更多内容",
-      "prev": "上一条消息",
-      "next": "下一条消息",
+      "prev": "上一条动态",
+      "next": "下一条动态",
       "area": {
         "news": "新闻",
         "patch": "补丁",
@@ -7753,7 +7753,7 @@
       "hqEventToday": "{{name}} 进行中 · 今天结束",
       "hqEventOpen": "{{name}} 进行中",
       "hqSupplies": "{{n}} 个待处理行动",
-      "hqSuppliesOne": "1 个待处理行动",
+      "hqSuppliesOne": "1 个进行中的 Operation",
       "hqCalm": "总部一切平静",
       "admin": "管理站",
       "adminValue": "直达管理中心",
@@ -8371,7 +8371,7 @@
     },
     "uploader": {
       "name": "Verse Data Uploader",
-      "desc": "读取你的 Star Citizen 安装,用飞船、数值和 3D 模型填充 Codex。"
+      "desc": "读取你的 Star Citizen 安装目录,用飞船、数值和 3D 模型填充 Codex。"
     },
     "footer": "这里下载的是稳定版。登录后在应用中选择 Beta 和 Alpha——你能看到哪些渠道取决于你的角色。"
   },
@@ -8393,11 +8393,11 @@
     "hub": {
       "eyebrow": "应用",
       "title": "应用",
-      "subtitle": "网站之外运行的所有工具:Verse Data Uploader、Starscape 和浏览器扩展。",
+      "subtitle": "在网站之外运行的所有工具:Verse Data Uploader、Starscape 和浏览器扩展。",
       "breadcrumbAria": "应用",
       "uploader": {
         "name": "Verse Data Uploader",
-        "desc": "读取你的 Star Citizen 游戏,并将数据上传到 Codex。"
+        "desc": "读取你的 Star Citizen 安装目录,并将数据上传到 Codex。"
       },
       "starscape": {
         "name": "Starscape",
@@ -9096,7 +9096,7 @@
       "sammlung": "全部收藏"
     },
     "type": {
-      "ship": "舰船",
+      "ship": "飞船",
       "weapon": "武器",
       "component": "组件",
       "item": "物品",

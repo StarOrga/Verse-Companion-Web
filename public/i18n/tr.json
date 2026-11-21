@@ -63,14 +63,14 @@
       "save": "Kaydet",
       "apply": "Uygula",
       "done": "Bitti",
-      "previous": "Geri",
-      "next": "İleri"
+      "previous": "Önceki",
+      "next": "Sonraki"
     },
     "undo": "Geri al",
     "popup": {
       "access": {
         "admin": "Yalnızca adminlere görünür",
-        "collab": "Yalnızca adminlere ve collaborator'lara görünür"
+        "collab": "Yalnızca adminlere ve katkıda bulunanlara görünür"
       }
     },
     "deferError": {
@@ -101,7 +101,7 @@
   },
   "auth": {
     "previewLocked": {
-      "body": "Burada giriş yapmak işe yaramaz — önizleme, başarılı girişten sonra bile uygulamanın sana gösterdiklerini geçersiz kılar. Önce üstteki bannerdan önizlemeden çık."
+      "body": "Burada giriş yapmak işe yaramaz — önizleme, başarılı girişten sonra bile uygulamanın sana gösterdiklerini geçersiz kılar. Önce üstteki banner'dan önizlemeden çık."
     },
     "tagline": "Verse'e giden terminalin",
     "email": "E-posta",
@@ -149,7 +149,7 @@
     },
     "landing": {
       "appName": "Verse Companion",
-      "join": "Join the Club.",
+      "join": "Kulübe katıl.",
       "pitch": "Companion özel bir çevre — erişim yalnızca davetle. Zaten Verse'te uçuyor ve katılmak mı istiyorsun? Başvur, bir admin göz atacak.",
       "perks": {
         "hangar": "Loadout'lar ve rollerle hangarın tek bir yerde",
@@ -172,7 +172,7 @@
       "handle": "RSI handle (isteğe bağlı)",
       "handlePlaceholder": "örn. CitizenKane",
       "message": "Mesaj (isteğe bağlı)",
-      "messagePlaceholder": "Bizi nereden biliyorsun, ne uçuruyorsun?",
+      "messagePlaceholder": "Bizi nereden biliyorsun, neyle uçuyorsun?",
       "send": "Başvuruyu gönder",
       "sending": "Gönderiliyor…",
       "sent": "Teşekkürler! Talebin ulaştı. Bir admin kabul ederse bu adrese davet e-postası alırsın.",
@@ -211,11 +211,11 @@
     "starscape": "Starscape",
     "viewAs": {
       "title": "Şu rolle görüntüle",
-      "collaborator": "Collaborator",
-      "viewer": "Viewer",
+      "collaborator": "Ortak çalışan",
+      "viewer": "İzleyici",
       "anon": "Oturumu kapalı ziyaretçi",
       "exit": "Rolüme geri dön",
-      "restricted": "Yalnızca admin ve collaborator"
+      "restricted": "Yalnızca admin ve ortak çalışanlar"
     },
     "loading": {
       "weak": "Zayıf sinyal · yeniden ayarlanıyor"
@@ -228,9 +228,9 @@
     "hq": "HQ",
     "verse": "Verse",
     "translations": "Yapay zekâ çevirisi",
-    "social": "Social",
+    "social": "Sosyal",
     "accountMenuRequests": "Hesap menüsü, {{count}} açık arkadaşlık isteği",
-    "socialRequests": "Social, {{count}} açık arkadaşlık isteği"
+    "socialRequests": "Sosyal, {{count}} açık arkadaşlık isteği"
   },
   "impersonation": {
     "banner": {
@@ -3347,9 +3347,9 @@
   "news": {
     "loading": "Yükleniyor…",
     "empty": "Henüz haber yok.",
-    "emptyFavorites": "Henüz hiçbir şey koleksiyonlamadın – bir gönderiyi koleksiyon simgesiyle kaydet, burada görünsün.",
+    "emptyFavorites": "Henüz koleksiyonuna bir şey eklemedin – bir gönderiyi koleksiyon simgesiyle kaydet, burada görünsün.",
     "errorTitle": "Haberler yüklenemedi",
-    "lastUpdated": "Güncellendi {{rel}}",
+    "lastUpdated": "{{rel}} güncellendi",
     "refreshing": "Yenileniyor…",
     "status": {
       "title": "Star Citizen Live",
@@ -3475,7 +3475,7 @@
         "noOfficial": "Henüz resmi tarih yok",
         "statusLink": "RSI durum sayfasına bak",
         "openNotes": "{{version}} içindeki değişiklikleri gör",
-        "partOf": "Alpha {{line}} parçası"
+        "partOf": "Alpha {{line}} serisinin parçası"
       },
       "forecast": {
         "title": "Tahmini takvim",
@@ -3484,10 +3484,10 @@
         "row": {
           "ptu": "Sonraki PTU",
           "live": "Sonraki live patch",
-          "subPatch": "Sonraki alt patch (Live)",
+          "subPatch": "Sonraki alt patch (live)",
           "ptuSubPatch": "Sonraki PTU alt patch'i"
         },
-        "today": "bugün bekleniyor",
+        "today": "bugün",
         "inDays": "~{{n}} gün içinde",
         "inWeeks": "~{{n}} hafta içinde",
         "overdueDays": "{{n}} gün gecikti",
@@ -3495,23 +3495,23 @@
         "basis": "Medyan {{median}} gün · {{version}} sürümünden itibaren"
       },
       "board": {
-        "title": "Patch Merkezi",
-        "sub": "Gelecek üstte, şimdi ortada, geçmiş altta — bir patch dosyasını açar",
+        "title": "Yama Merkezi",
+        "sub": "Gelecek üstte, şimdi ortada, geçmiş altta — bir yamaya tıklayınca dosyası açılır",
         "back": "Verse News'e dön"
       },
       "waves": {
         "title": "Aynı duyurunun {{count}} build dalgası"
       },
       "search": {
-        "label": "Patch içeriklerinde ara",
+        "label": "Yama içeriklerinde ara",
         "placeholder": "ör. Orison, hotfix, quantum drive",
         "clear": "Aramayı temizle",
-        "noHits": "Hiçbir şey bulunamadı – başka yazımlarda da yok."
+        "noHits": "Hiçbir şey bulunamadı — başka yazımlarda da yok."
       },
       "roadmap": {
         "expandAll": "Tüm açıklamaları göster",
         "collapseAll": "Açıklamaları daralt",
-        "source": "RSI'da roadmap ↗",
+        "source": "RSI'da yol haritası ↗",
         "uncategorized": "Kategorisiz",
         "noDetail": "RSI bu giriş için açıklama yayınlamadı.",
         "status": {
@@ -3520,18 +3520,18 @@
           "tentative": "Geçici",
           "unknown": "Açık"
         },
-        "openCard": "RSI'da \"{{name}}\" roadmap girişini aç"
+        "openCard": "RSI'da \"{{name}}\" yol haritası girişini aç"
       },
       "detail": {
-        "loading": "Patch içerikleri yükleniyor …",
-        "unavailable": "Bu not için içerik yok – RSI'da oku.",
+        "loading": "Yama içerikleri yükleniyor …",
+        "unavailable": "Bu not için içerik yok — RSI'da oku.",
         "noMatch": "Bu not içinde eşleşme yok.",
         "fullNotes": "Notun tamamı ↗",
         "linkOut": "Bağlantı ↗",
         "openOnRsi": "RSI'da aç ↗",
         "openOnRsiAria": "{{title}} sayfasını RSI'da aç (yeni sekme)",
         "truncated": "Çok uzun not — devamı RSI'da.",
-        "hits": "{{count}} eşleşme",
+        "hits": "{{count}} sonuç",
         "points": "{{count}} madde"
       },
       "stability": {
@@ -3540,7 +3540,7 @@
           "none": "veri yok"
         },
         "componentHint": {
-          "community": "Notes ve hotfix thread'lerinde günlük yeni yanıtlar; Issue Council ticket'ı taşıyan yanıtların oranı ve upvote ağırlığı",
+          "community": "Notes ve hotfix başlıklarında günlük yeni yanıtlar; Issue Council ticket'ı içeren yanıtların oranı ve upvote ağırlığı",
           "service": "RSI Status'a göre günlük planlanmamış kesinti dakikaları (7 gün), artı varsa açık arıza",
           "cig": "CIG'in Known Issues makalesindeki açık girişler ve 7 günlük artışları"
         },
@@ -3548,8 +3548,8 @@
         "timelineAria": "LIVE'dan beri günlük kararlılık, {{days}} ölçüm noktası",
         "hotfixMark": "Hotfix {{build}}, {{date}}",
         "tickets": {
-          "title": "Topluluk neyi bildiriyor",
-          "empty": "En çok yanıt alanlarda ticket yok."
+          "title": "Topluluğun bildirdikleri",
+          "empty": "En çok oy alan yanıtlarda ticket yok."
         },
         "meter": {
           "early": "henüz erken"
@@ -3559,7 +3559,7 @@
         "next": "Sonraki",
         "evocati": "Evocati",
         "ptu": "PTU",
-        "live": "Canlı",
+        "live": "Live",
         "superseded": "Yerini yenisine bıraktı",
         "other": "Sürüm yok"
       },
@@ -3567,16 +3567,16 @@
         "aria": "Yamalar, en yeniden eskiye",
         "sinceDays": "{{n}} gündür",
         "replaced": "{{date}} tarihinde",
-        "liveSince": "{{date}} tarihinden beri canlı",
-        "liveSpan": "Canlı {{from}} – {{to}}",
-        "neverLive": "Hiç canlıya geçmedi",
+        "liveSince": "{{date}} tarihinden beri Live",
+        "liveSpan": "Live {{from}} – {{to}}",
+        "neverLive": "Hiç Live'a geçmedi",
         "ptuExpected": "PTU beklenen tarih: {{when}}",
         "noBuild": "Henüz build yok",
         "plannedFor": "{{quarter}} için planlandı",
         "inRing": "{{ring}} içinde · {{n}} dalga · {{ago}}",
         "hotfixOne": "{{date}} tarihinde 1 hotfix",
         "hotfixes": "{{n}} hotfix, sonuncusu {{date}}",
-        "nextLive": "sonraki canlı yama {{when}} (tahmin)",
+        "nextLive": "sonraki Live yaması {{when}} (tahmin)",
         "notes": "{{n}} not",
         "planned": "{{n}} yol haritası öğesi",
         "openDossier": "{{name}} için dosyayı aç",
@@ -3592,7 +3592,7 @@
           "stabilitaet": "Kararlılık",
           "builds": "Çalışan test build'leri",
           "prep": "Nasıl hazırlanırım?",
-          "prepPast": "Nelere dikkat etmek gerekiyordu?",
+          "prepPast": "Bilmeniz gerekenler",
           "contents": "İçinde neler var?",
           "fixed": "… düzeltildi mi?",
           "next": "Bir sonrakisi ne zaman?",
@@ -3623,28 +3623,28 @@
         "more": "Tam metin",
         "less": "Daralt",
         "leftover": "Yol haritası kartı olmayan diğer not maddeleri ({{n}})",
-        "noRoadmap": "Bu yama için yol haritası verisi yok – işte \"{{title}}\" notu:",
+        "noRoadmap": "Bu yama için yol haritası verisi yok — işte \"{{title}}\" notu:",
         "ofNote": "“{{title}}” notundaki değişiklikler:"
       },
       "fixed": {
-        "placeholder": "Bu yamada ara … örn. quantum drive",
+        "placeholder": "Bu yamada ara … ör. quantum drive",
         "hits": "{{notes}} notta {{n}} sonuç",
         "coverage": "{{total}} notun {{loaded}} tanesi tamamen arandı",
         "loadRest": "Kalan notları yükle ve ara",
         "loading": "{{n}} not yükleniyor …",
-        "noHits": "Yüklenen notlarda sonuç yok – başlıklar her zaman aranır.",
+        "noHits": "Yüklenen notlarda sonuç yok — başlıklar her zaman aranır.",
         "allNotes": "Tüm notlar ({{n}})"
       },
       "next": {
-        "sentenceLive": "Sonraki canlı yamanın {{date}} civarında gelmesi bekleniyor — {{when}}.",
+        "sentenceLive": "Sonraki Live yamasının {{date}} civarında gelmesi bekleniyor — {{when}}.",
         "sentenceHistory": "Alpha {{line}}, {{days}} gün sonra {{date}} tarihinde Alpha {{next}} ile değiştirildi — olağan süre {{median}} gün.",
-        "sentencePlanned": "Alpha {{line}}, yama temposuna göre {{date}} civarında canlıya çıkacak — {{when}}.",
+        "sentencePlanned": "Alpha {{line}}, yama temposuna göre {{date}} civarında Live'a çıkacak — {{when}}.",
         "disclaimer": "Yama temposundan medyan tahminler, resmi tarih değil.",
-        "markers": "Eksendeki işaretler: önceki canlı yama, PTU başlangıcı, olağan test bitişi, Live, hotfix'ler, bugün ve olağan sonraki tarih. Başlangıç, Live ve hedef etiketli — kalanları ipucu kutusu söyler.",
+        "markers": "Eksendeki işaretler: önceki Live yaması, PTU başlangıcı, olağan test bitişi, Live, hotfix'ler, bugün ve olağan sonraki tarih. Başlangıç, Live ve hedef etiketli — kalanları ipucu kutusu gösterir.",
         "planned": {
           "sentence": "Alpha {{line}} için {{quarter}} planlandı.",
           "unknown": "Alpha {{line}} için henüz tarih yok.",
-          "status": "Henüz test build'i yok — olağan tempoya göre sonraki canlı tarih {{date}} civarı olurdu.",
+          "status": "Henüz test build'i yok — olağan tempoya göre sonraki Live tarihi {{date}} civarı olur.",
           "basisCadence": "olağan tempo · n = {{n}} değerinden medyan",
           "basisLead": "olağan test aşaması · n = {{n}} değerinden medyan"
         },
@@ -3769,7 +3769,7 @@
       "freshLiveLabel": "Yeni yama canlı",
       "freshPtuLabel": "PTU'da yeni",
       "freshLive": "{{line}} artık canlı",
-      "freshPtu": "{{line}} PTU'ya ulaştı",
+      "freshPtu": "{{line}} PTU'ya girdi",
       "freshLiveSub": "{{since}} · {{test}} testte",
       "freshPtuSub": "{{since}} · {{live}} canlı kalıyor",
       "sinceToday": "Bugünden beri",
@@ -3927,9 +3927,9 @@
     "created": "Üyelik tarihi",
     "role": "Rol",
     "roles": {
-      "admin": "Admin",
-      "collaborator": "Collaborator",
-      "viewer": "Viewer"
+      "admin": "Yönetici",
+      "collaborator": "Katkıda bulunan",
+      "viewer": "Görüntüleyici"
     },
     "username": "Kullanıcı adı",
     "usernameUnset": "Ayarlanmadı",
@@ -3991,7 +3991,7 @@
       "title": "Kullanıcı adı",
       "label": "Kullanıcı adı",
       "hint": "3–20 karakter: a–z küçük harfler, 0–9 rakamlar ve alt çizgi (_).",
-      "placeholder": "senin_callsign'in",
+      "placeholder": "kullanici_adin",
       "save": "Kaydet",
       "saving": "Kaydediliyor…",
       "saved": "Kullanıcı adı kaydedildi.",
@@ -4080,19 +4080,19 @@
       "show": {
         "label": "Geri bildirim düğmesini göster",
         "descOn": "Geri bildirim düğmesi her sayfanın sağ alt köşesinde yer alır.",
-        "descOff": "Geri bildirim düğmesi gizli — ekibin yanıtları ve soruları da bununla birlikte görünmez olur. Geri bildirimini açmak için buradan tekrar aç."
+        "descOff": "Geri bildirim düğmesi gizli — ekibin yanıtları ve soruları da bununla birlikte görünmez olur. Geri bildirimini açmak için düğmeyi buradan tekrar etkinleştir."
       },
       "staff": {
         "title": "Geri bildirim ve beta düğmeleri",
         "hint": "Köşe düğmeleri: geri bildirim gönder ve ekibin yanıtlarını gör, üstünde beta anahtarı bulunur.",
         "label": "Geri bildirim ve beta düğmelerini göster",
-        "audience": "(yalnızca admin ve collaborator'lar için)",
+        "audience": "(yalnızca yöneticiler ve katkıda bulunanlar için)",
         "descOn": "Geri bildirim ve beta düğmeleri her sayfanın sağ alt köşesinde yer alır.",
-        "descOff": "Geri bildirim ve beta düğmeleri gizli — ekibin yanıtları ve soruları da bunlarla birlikte görünmez olur. Geri bildirimini veya beta anahtarlarını açmak için buradan tekrar aç."
+        "descOff": "Geri bildirim ve beta düğmeleri gizli — ekibin yanıtları ve soruları da bunlarla birlikte görünmez olur. Geri bildirimini veya beta anahtarlarını açmak için düğmeleri buradan tekrar etkinleştir."
       },
       "routineTint": {
         "label": "Geri bildirim başlığı yalnızca yeşil / kırmızı",
-        "audience": "(yalnızca adminler için)",
+        "audience": "(yalnızca yöneticiler için)",
         "descOn": "“Geri bildirim” başlığı, rutin çalışırken veya iş yaparken yeşil, hiçbir şey işlenmezken kırmızı yanar. Yalnızca senin hesabın için geçerlidir.",
         "descOff": "“Geri bildirim” başlığı dört durum gösterir: yeşil hazır, mavi şu an çalışıyor, sarı duraklatıldı, kırmızı ulaşılamıyor."
       }
@@ -4110,7 +4110,7 @@
         "forbidden": "Hesapları burada yalnızca yöneticiler silebilir.",
         "unauthorized": "Oturumun sona erdi. Lütfen tekrar giriş yap.",
         "protectedAdmin": "Bu hesap korumalıdır ve silinemez.",
-        "lastAdmin": "Son admin silinemez. Önce başka bir admin ata.",
+        "lastAdmin": "Son yönetici silinemez. Önce başka birini yönetici yap.",
         "notFound": "Bu hesap artık mevcut değil.",
         "invalidBody": "İstek geçersizdi. Lütfen sayfayı yeniden yükle."
       }
@@ -4825,7 +4825,7 @@
     "badgeAlt": "Star Citizen — Made By The Community",
     "disclaimer": "Bu, Cloud Imperium şirketler grubuyla bağlantısı olmayan resmî olmayan bir Star Citizen hayran sitesidir. Bu sitedeki, site sahibi veya kullanıcıları tarafından oluşturulmamış tüm içerikler ilgili sahiplerinin malıdır.",
     "trademarks": "Star Citizen®, Roberts Space Industries® ve Cloud Imperium®, Cloud Imperium Rights LLC'nin tescilli ticari markalarıdır",
-    "disclaimerExpand": "Tüm sorumluluk reddini göster",
+    "disclaimerExpand": "Sorumluluk reddinin tamamını göster",
     "disclaimerCollapse": "Sorumluluk reddini daralt",
     "legalNav": "Yasal ve proje bilgileri",
     "areaNav": "Alan değiştir",
@@ -4834,13 +4834,13 @@
       "privacy": "Gizlilik",
       "imprint": "Künye",
       "aboutNew": "yeni",
-      "news": "Neler yeni"
+      "news": "Yenilikler"
     },
     "disclaimerTitle": "Hayran sitesi bildirimi",
     "rsiLink": "Resmî Star Citizen sitesi: robertsspaceindustries.com",
-    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
-    "noticeOriginalLabel": "Orijinal ifade (İngilizce)",
-    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® and Cloud Imperium® are registered trademarks of Cloud Imperium Rights LLC"
+    "noticeOriginal": "Bu, resmî olmayan bir Star Citizen hayran sitesidir ve Cloud Imperium şirketler grubuyla bağlantılı değildir. Bu sitede, site sahibi veya kullanıcıları tarafından oluşturulmamış tüm içerikler ilgili sahiplerinin mülkiyetindedir.",
+    "noticeOriginalLabel": "Orijinal ifade",
+    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® ve Cloud Imperium®, Cloud Imperium Rights LLC'nin tescilli ticari markalarıdır"
   },
   "legal": {
     "about": {
@@ -4978,7 +4978,7 @@
     "subtitle": "Kişisel filon: gemi yapılandırmaları, bileşen loadout'ları ve rol setleri — Codex'teki canlı oyun verileri üzerine kurulu.",
     "counts": {
       "owned": "Sahip olunan",
-      "wishlist": "İstekler"
+      "wishlist": "İstek listesi"
     },
     "flagship": {
       "set": "Amiral gemisi yap",
@@ -4996,7 +4996,7 @@
     },
     "status": {
       "owned": "Sahip olunan",
-      "wishlist": "İstekler"
+      "wishlist": "İstek listesi"
     },
     "add": {
       "title": "Gemi ekle",
@@ -5008,11 +5008,11 @@
     "fleet": {
       "title": "Filo",
       "emptyTitle": "Hangarın boş",
-      "emptyHint": "İlk geminı eklemek için yukarıdan ara — ya da Codex'e göz at ve gemileri oradan ekle."
+      "emptyHint": "İlk gemini eklemek için yukarıdan ara — ya da Codex'e göz at ve gemileri oradan ekle."
     },
     "roles": {
       "fps": "FPS",
-      "mining": "Bergbau",
+      "mining": "Madencilik",
       "salvage": "Kurtarma",
       "medical": "Tıbbi",
       "engineering": "Mühendislik",
@@ -5055,7 +5055,7 @@
       "namePlaceholder": "örn. PvP donanımı…",
       "create": "Oluştur",
       "empty": "Henüz yapılandırma yok — bir ad ver ve loadout'u özelleştirmeye başlamak için bir rol seç.",
-      "activate": "Aktif yap",
+      "activate": "Etkin yap",
       "saveLoadout": "Loadout'u kaydet",
       "discard": "Vazgeç",
       "delete": "Sil",
@@ -5082,7 +5082,7 @@
     },
     "compStat": {
       "jumpRange": "Sıçrama menzili",
-      "driveSpeed": "Sürüş hızı",
+      "driveSpeed": "Quantum hızı",
       "shieldHp": "Kalkan HP",
       "shieldRegen": "Kalkan yenilenmesi"
     },
@@ -5091,7 +5091,7 @@
       "noPorts": "Bu gemi için hardpoint verisi yok.",
       "empty": "boş",
       "change": "Değiştir",
-      "reset": "Stock",
+      "reset": "Standart",
       "createConfigFirst": "Loadout'u düzenlemeye başlamak için yukarıdan bir yapılandırma oluştur."
     },
     "picker": {
@@ -5102,7 +5102,7 @@
       "subtitle": "Filonu oluşturmak için giriş yap — ücretsiz, alfa sırasında davetle.",
       "save": {
         "title": "Gemilerini kaydet",
-        "text": "Tüm filonu tek yerde tut: sahip olduğun gemiler ve istekler, özel adlar ve notlarla."
+        "text": "Tüm filonu tek yerde tut: sahip olduğun ve istediğin gemiler, özel adlar ve notlarla."
       },
       "overview": {
         "title": "Filo özeti",
@@ -5121,7 +5121,7 @@
     "import": {
       "open": "İçe aktar…",
       "title": "Dışa aktarma dosyasından içe aktar",
-      "hint": "Buraya bir Hangar Transfer Format JSON dışa aktarımı bırak (örn. HangarXPLOR tarayıcı eklentisinden — dışa aktarmayı sen yaparsın, RSI kimlik bilgilerini asla istemeyiz). Girdiler codex ile eşleştirilir ve yalnızca onayladığın satırlar eklenir.",
+      "hint": "Buraya bir Hangar Transfer Format JSON dışa aktarımı bırak (örn. HangarXPLOR tarayıcı eklentisinden — dışa aktarmayı sen yaparsın, RSI kimlik bilgilerini asla istemeyiz). Girdiler Codex ile eşleştirilir ve yalnızca onayladığın satırlar eklenir.",
       "pickFile": "Dosya seç",
       "parsing": "Okunuyor…",
       "dropHint": "veya .json dosyasını buraya bırak",
@@ -5784,7 +5784,7 @@
   "consent": {
     "banner": {
       "title": "Tarayıcı depolaması",
-      "text": "Bu uygulama çerez kullanmaz. Oturum açma bilgini ve dilini bu tarayıcıda saklar (gerekli) ve — yalnızca izin verirsen — haber filtreleri ve koleksiyonların gibi kolaylık tercihlerini ile anonim kullanım istatistiklerini saklar. Bunu istediğin zaman Ayarlar'dan değiştirebilirsin.",
+      "text": "Bu uygulama çerez kullanmaz. Oturum açma bilgini ve dilini bu tarayıcıda saklar (gerekli) ve — yalnızca izin verirsen — haber filtreleri ve koleksiyonların gibi kolaylık tercihlerinle birlikte anonim kullanım istatistiklerini de saklar. Bunu istediğin zaman Ayarlar'dan değiştirebilirsin.",
       "acceptAll": "Tümüne izin ver",
       "essentialOnly": "Yalnızca gerekli olanlar"
     },
@@ -6188,7 +6188,7 @@
     "guessUnavailable": "Bu yama için tanınacak bir yıldız haritası yok.",
     "sessionExpired": "Oturumun sona erdi. Lütfen yeniden oturum aç.",
     "forbidden": "Bunun için yetkin yok.",
-    "notFound": "Bu mevcut değil (artık).",
+    "notFound": "Bu mevcut değil ya da artık yok.",
     "rateLimit": "Çok fazla istek — lütfen biraz bekle.",
     "server": "Sunucu bir hata bildirdi.",
     "generic": "Bir şeyler ters gitti.",
@@ -7555,7 +7555,7 @@
     "crumb": "Verse",
     "toast": {
       "lit": "Yıldız yandı: {{task}}",
-      "count": "{{total}} içinden {{lit}}",
+      "count": "{{lit}}/{{total}}",
       "remaining": "4K duvar kağıdına {{n}} kaldı",
       "close": "Kapat",
       "genericTask": "Yeni yıldız",
@@ -7590,15 +7590,15 @@
       "aria": "Yama durumu: {{line}}",
       "live": "Live",
       "ptu": "PTU {{line}}",
-      "since": "{{n}} gündür live",
+      "since": "{{n}} gündür yayında",
       "next": "sonraki ~ {{n}} gün içinde",
-      "overdue": "sonraki {{n}} gündür gecikti"
+      "overdue": "sonraki {{n}} gün gecikti"
     },
     "briefing": {
       "stageAria": "Verse brifingi",
       "cta": "Hemen bak",
-      "headlineQuiet": "Verse'te sakin — son ziyaretinden beri yeni bir şey yok",
-      "headlineError": "Brifing şu an ulaşılamıyor",
+      "headlineQuiet": "Verse'te ortalık sakin — son ziyaretinden beri yeni bir şey yok",
+      "headlineError": "Brifing şu an kullanılamıyor",
       "loading": "Brifing yükleniyor …",
       "allSeen": "Güncelsin",
       "newSince": "son ziyaretinden beri yeni",
@@ -7616,10 +7616,10 @@
       "topAria": "En yeni hikâyeler",
       "storyAria": "Hikâye {{n}}: {{title}}",
       "status": {
-        "live": "{{line}} {{n}} gündür live",
-        "liveOne": "{{line}} 1 gündür live",
-        "liveToday": "{{line}} bugünden beri live",
-        "liveNow": "{{line}} live",
+        "live": "{{line}} {{n}} gündür yayında",
+        "liveOne": "{{line}} 1 gündür yayında",
+        "liveToday": "{{line}} bugün yayına girdi",
+        "liveNow": "{{line}} yayında",
         "dueToday": "{{line}} bugün çıkıyor",
         "due": {
           "days": "{{line}} {{n}} gün içinde çıkıyor",
@@ -7628,10 +7628,10 @@
           "weeksOne": "{{line}} ~1 hafta içinde çıkıyor"
         },
         "overdue": {
-          "days": "{{line}} {{n}} gündür gecikti",
-          "daysOne": "{{line}} 1 gündür gecikti",
-          "weeks": "{{line}} ~{{n}} haftadır gecikti",
-          "weeksOne": "{{line}} ~1 haftadır gecikti"
+          "days": "{{line}} {{n}} gün gecikti",
+          "daysOne": "{{line}} 1 gün gecikti",
+          "weeks": "{{line}} ~{{n}} hafta gecikti",
+          "weeksOne": "{{line}} ~1 hafta gecikti"
         }
       },
       "ctaWhere": {
@@ -7729,15 +7729,15 @@
       "connected": "Starscape bağlandı",
       "share": "Galeriyi paylaş",
       "heroTitle": "Starscape galeriyi masaüstüne getiriyor",
-      "heroBody": "Masaüstü uygulaması duvar kağıdını galeride otomatik değiştirir ve kazandığın yıldız haritalarını gösterir."
+      "heroBody": "Masaüstü uygulaması duvar kağıdını galerideki görseller arasında otomatik değiştirir ve kazandığın yıldız haritalarını gösterir."
     },
     "hub": {
       "brand": "Verse Companion",
       "search": "Ara …",
       "searchKey": "Ctrl K",
       "more": "Verse'te daha fazlası",
-      "prev": "Önceki haber",
-      "next": "Sonraki haber",
+      "prev": "Önceki hikâye",
+      "next": "Sonraki hikâye",
       "area": {
         "news": "Haberler",
         "patch": "Yamalar",
@@ -8386,7 +8386,7 @@
     },
     "starscape": {
       "line": "Duvar kâğıdı uygulaması olarak Starscape",
-      "desc": "Duvar kâğıdını Starscape galerisinde döndürür."
+      "desc": "Duvar kâğıdını Starscape galerisindeki görseller arasında döndürür."
     }
   },
   "apps": {
@@ -9080,7 +9080,7 @@
     }
   },
   "quick": {
-    "toNachschub": "Bir Operation'a: {{name}}",
+    "toNachschub": "Bir Operasyona: {{name}}",
     "wish": "İstekler",
     "allWish": "Tüm istekler",
     "allWishCount": "{{n}} istek",
@@ -9372,7 +9372,7 @@
   },
   "pwa": {
     "card": {
-      "title": "Verse Companion uygulaması",
+      "title": "Uygulamayı edin",
       "benefit": "Tam ekran, daha hızlı açılış, doğrudan ana ekranından.",
       "install": "Yükle",
       "later": "Sonra"

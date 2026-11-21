@@ -85,7 +85,7 @@
       "yesterday": "어제",
       "lastWeek": "지난주",
       "lastMonth": "지난달",
-      "earlier": "이전"
+      "earlier": "더 이전"
     },
     "relativeSince": {
       "today": "오늘부터",
@@ -210,7 +210,7 @@
     "telemetry": "텔레메트리",
     "starscape": "Starscape",
     "viewAs": {
-      "title": "다음 권한으로 보기",
+      "title": "다음 역할로 보기",
       "collaborator": "협력자",
       "viewer": "뷰어",
       "anon": "로그아웃한 방문자",
@@ -3377,14 +3377,14 @@
     },
     "events": {
       "title": "인게임 이벤트",
-      "upcomingTitle": "곧 Verse에서",
+      "upcomingTitle": "Verse에서 곧 열리는 이벤트",
       "aria": "진행 중이거나 예정된 인게임 이벤트",
       "allPosts": "모든 이벤트 게시물",
       "runningUntil": "진행 중 · {{date}}까지",
       "endsToday": "진행 중 · 오늘 종료",
       "startsTomorrow": "내일부터, {{date}}",
       "startsIn": "{{date}}부터 · {{n}}일 후",
-      "estimated": "날짜 추정",
+      "estimated": "추정 날짜",
       "error": "이벤트를 불러올 수 없어요.",
       "kind": {
         "expo": "박람회",
@@ -3396,7 +3396,7 @@
     },
     "favorite": {
       "save": "모으기",
-      "saved": "모음"
+      "saved": "모음 완료"
     },
     "share": {
       "label": "공유",
@@ -3518,7 +3518,7 @@
           "released": "출시됨",
           "committed": "확정",
           "tentative": "잠정",
-          "unknown": "미정"
+          "unknown": "공개"
         },
         "openCard": "RSI에서 로드맵 항목 \"{{name}}\" 열기"
       },
@@ -3565,15 +3565,15 @@
       },
       "stack": {
         "aria": "패치, 최신순",
-        "sinceDays": "{{n}}일째",
-        "replaced": "{{date}}",
+        "sinceDays": "{{n}}일간",
+        "replaced": "{{date}}에",
         "liveSince": "{{date}}부터 Live",
         "liveSpan": "Live {{from}} – {{to}}",
         "neverLive": "Live로 전환된 적 없음",
         "ptuExpected": "PTU 예정 {{when}}",
         "noBuild": "아직 빌드 없음",
         "plannedFor": "{{quarter}} 예정",
-        "inRing": "{{ring}} · {{n}}개 웨이브 · {{ago}}",
+        "inRing": "{{ring}} 단계 · {{n}}개 웨이브 · {{ago}}",
         "hotfixOne": "{{date}} 핫픽스 1건",
         "hotfixes": "핫픽스 {{n}}건, 최근 {{date}}",
         "nextLive": "다음 Live 패치 {{when}} (추정)",
@@ -3592,7 +3592,7 @@
           "stabilitaet": "안정성",
           "builds": "진행 중인 테스트 빌드",
           "prep": "어떻게 준비하나요?",
-          "prepPast": "알아야 했던 점",
+          "prepPast": "알아 둘 점",
           "contents": "무엇이 들어 있나요?",
           "fixed": "…이(가) 수정됐나요?",
           "next": "다음은 언제 나오나요?",
@@ -3623,7 +3623,7 @@
         "more": "전체 텍스트",
         "less": "접기",
         "leftover": "로드맵 카드가 없는 노트의 추가 항목 ({{n}})",
-        "noRoadmap": "이 패치의 로드맵 데이터가 없어요. 노트 \"{{title}}\"입니다:",
+        "noRoadmap": "이 패치의 로드맵 데이터가 없어요. 노트 \"{{title}}\"의 내용이에요:",
         "ofNote": "“{{title}}”의 변경 사항:"
       },
       "fixed": {
@@ -3637,7 +3637,7 @@
       },
       "next": {
         "sentenceLive": "다음 Live 패치는 {{date}}경 예상 — {{when}}.",
-        "sentenceHistory": "Alpha {{line}}은(는) {{days}}일 만에 {{date}}에 Alpha {{next}}(으)로 대체됐어요. 보통은 {{median}}일이에요.",
+        "sentenceHistory": "Alpha {{line}}은(는) {{days}}일 만인 {{date}}에 Alpha {{next}}(으)로 대체됐어요. 보통은 {{median}}일이에요.",
         "sentencePlanned": "주기상 Alpha {{line}}은(는) {{date}}경 Live 예상 — {{when}}.",
         "disclaimer": "패치 주기에서 구한 중앙값 추정이며 공식 일정이 아니에요.",
         "markers": "축의 표시: 이전 Live 패치, PTU 시작, 통상 테스트 종료, Live, 핫픽스, 오늘, 통상 다음 일정. 시작, Live, 목표에는 라벨이 있고 나머지는 툴팁에 표시돼요.",
@@ -3697,7 +3697,7 @@
           "testing": "테스트 중",
           "cadence": "주기",
           "hotfixNone": "핫픽스 없음",
-          "cadenceStateFoot": "{{median}}일 중 약 {{days}}일 · 중앙값 · n = {{n}}",
+          "cadenceStateFoot": "약 {{median}}일 중 {{days}}일 · 중앙값 · n = {{n}}",
           "next": "다음",
           "goLive": "Live 전환",
           "nextUnknown": "다음 패치",
@@ -3708,7 +3708,7 @@
       },
       "find": {
         "summary": "패치 {{patches}}개에서 {{hits}}건 일치 · 노트 {{total}}개 중 {{loaded}}개 검색됨",
-        "groupCount": "로드맵 항목 {{roadmap}}개 · 항목 {{notes}}개",
+        "groupCount": "로드맵 항목 {{roadmap}}개 · 노트 항목 {{notes}}개",
         "moreInDossier": "자료에 {{n}}건 더 일치",
         "loadRest": "나머지 노트 {{n}}개 불러와 검색",
         "loading": "노트 불러오는 중 …"
@@ -4094,7 +4094,7 @@
         "label": "피드백 제목을 초록/빨강으로만 표시",
         "audience": "(관리자 전용)",
         "descOn": "루틴이 실행 중이거나 작업 중일 때는 “피드백” 제목이 초록색으로, 아무것도 처리하지 않을 때는 빨간색으로 빛나요. 내 계정에만 적용돼요.",
-        "descOff": "“피드백” 제목은 네 가지 상태를 보여줘요: 초록은 준비됨, 파랑은 지금 작업 중, 노랑은 일시 중지, 빨강은 연결 불가."
+        "descOff": "“피드백” 제목은 네 가지 상태를 보여줘요: 초록은 준비됨, 파랑은 작업 중, 주황은 일시 중지, 빨강은 연결 불가."
       }
     },
     "danger": {
@@ -4823,8 +4823,8 @@
   "footer": {
     "madeByCommunity": "Made by the Community",
     "badgeAlt": "Star Citizen — Made By The Community",
-    "disclaimer": "이 사이트는 Cloud Imperium 그룹과 무관한 비공식 Star Citizen 팬 사이트예요. 이 사이트의 운영자나 사용자가 작성하지 않은 모든 콘텐츠는 각 소유자의 자산이에요.",
-    "trademarks": "Star Citizen®, Roberts Space Industries® 및 Cloud Imperium®은 Cloud Imperium Rights LLC의 등록 상표예요",
+    "disclaimer": "이 사이트는 Cloud Imperium 그룹 계열사와 무관한 비공식 Star Citizen 팬 사이트예요. 이 사이트의 운영자나 사용자가 작성하지 않은 모든 콘텐츠는 각 소유자의 자산이에요.",
+    "trademarks": "Star Citizen®, Roberts Space Industries® 및 Cloud Imperium®은 Cloud Imperium Rights LLC의 등록 상표예요.",
     "disclaimerExpand": "전체 면책 조항 보기",
     "disclaimerCollapse": "면책 조항 접기",
     "legalNav": "법적 고지 및 프로젝트 정보",
@@ -4833,14 +4833,14 @@
       "about": "소개",
       "privacy": "개인정보 처리방침",
       "imprint": "사이트 고지",
-      "aboutNew": "새로운",
+      "aboutNew": "신규",
       "news": "새 소식"
     },
     "disclaimerTitle": "팬 사이트 안내",
     "rsiLink": "공식 Star Citizen 사이트: robertsspaceindustries.com",
-    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
+    "noticeOriginal": "이 사이트는 비공식 Star Citizen 팬 사이트이며, Cloud Imperium 계열 회사와 관련이 없어요. 이 사이트의 운영자나 사용자가 작성하지 않은 모든 콘텐츠는 각 소유자의 재산이에요.",
     "noticeOriginalLabel": "원문(영어)",
-    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® and Cloud Imperium® are registered trademarks of Cloud Imperium Rights LLC"
+    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® 및 Cloud Imperium®은 Cloud Imperium Rights LLC의 등록 상표예요."
   },
   "legal": {
     "about": {
@@ -4975,7 +4975,7 @@
   },
   "hangar": {
     "title": "내 격납고",
-    "subtitle": "나만의 함대: 함선 구성, 컴포넌트 로드아웃, 역할 세트를 Codex의 라이브 게임 데이터를 기반으로 만들어요.",
+    "subtitle": "나만의 함대: Codex의 라이브 게임 데이터를 기반으로 함선 구성, 구성품 로드아웃, 역할 세트를 만들어요.",
     "counts": {
       "owned": "보유",
       "wishlist": "위시리스트"
@@ -5008,7 +5008,7 @@
     "fleet": {
       "title": "함대",
       "emptyTitle": "격납고가 비어 있어요",
-      "emptyHint": "위에서 검색해 첫 함선을 추가하세요. 또는 Codex를 둘러보며 거기서 함선을 추가할 수도 있어요."
+      "emptyHint": "위에서 검색해 첫 함선을 추가하거나, Codex를 둘러보며 함선을 추가할 수도 있어요."
     },
     "roles": {
       "fps": "FPS",
@@ -5039,7 +5039,7 @@
       "save": "저장",
       "rename": "이름 바꾸기",
       "pinLabel": "고정",
-      "openCodex": "코덱스 항목",
+      "openCodex": "Codex 항목",
       "remove": "제거",
       "notes": "메모",
       "notesPlaceholder": "이 함선에 대한 메모…",
@@ -5054,7 +5054,7 @@
       "title": "구성",
       "namePlaceholder": "예: PvP 세팅…",
       "create": "만들기",
-      "empty": "아직 구성이 없어요 — 이름을 정하고 역할을 선택해 로드아웃 커스터마이징을 시작하세요.",
+      "empty": "아직 구성이 없어요. 이름을 정하고 역할을 선택해 로드아웃 커스터마이징을 시작하세요.",
       "activate": "활성으로 설정",
       "saveLoadout": "로드아웃 저장",
       "discard": "취소",
@@ -5099,7 +5099,7 @@
     },
     "teaser": {
       "title": "나만의 격납고",
-      "subtitle": "로그인하고 함대를 만들어 보세요 — 무료이며, 알파 기간에는 초대制로 운영돼요.",
+      "subtitle": "로그인하고 함대를 만들어 보세요. 무료이며, 알파 기간에는 초대제로 운영돼요.",
       "save": {
         "title": "함선 저장",
         "text": "보유 함선과 위시리스트를 사용자 지정 이름과 메모와 함께 한곳에서 관리하세요."
@@ -5121,11 +5121,11 @@
     "import": {
       "open": "가져오기…",
       "title": "내보내기 파일에서 가져오기",
-      "hint": "Hangar Transfer Format JSON 내보내기 파일을 여기에 끌어다 놓으세요(예: HangarXPLOR 브라우저 확장 프로그램 — 내보내기는 직접 실행하며, RSI 로그인 정보는 절대 요구하지 않아요). 항목은 코덱스와 대조되며, 확인한 행만 추가돼요.",
+      "hint": "Hangar Transfer Format JSON 내보내기 파일을 여기에 끌어다 놓으세요(예: HangarXPLOR 브라우저 확장 프로그램. 내보내기는 직접 실행하며, RSI 로그인 정보는 절대 요구하지 않아요). 항목은 Codex와 대조되며, 확인한 행만 추가돼요.",
       "pickFile": "파일 선택",
       "parsing": "읽는 중…",
       "dropHint": "또는 .json 파일을 여기에 놓으세요",
-      "errParse": "이 파일을 읽을 수 없어요 — JSON 내보내기 파일이 필요해요.",
+      "errParse": "이 파일을 읽을 수 없어요. JSON 내보내기 파일이 필요해요.",
       "errNoShips": "이 파일에서 함선 항목을 찾지 못했어요.",
       "matched": "{{total}}개 항목 중 {{matched}}개가 카탈로그와 일치했어요",
       "chooseOther": "다른 파일 선택",
@@ -6188,14 +6188,14 @@
     "guessUnavailable": "이 패치에는 맞힐 성도가 없어요.",
     "sessionExpired": "세션이 만료됐어요. 다시 로그인해 주세요.",
     "forbidden": "이 작업을 할 권한이 없어요.",
-    "notFound": "존재하지 않아요(더 이상).",
+    "notFound": "존재하지 않거나 삭제됐어요.",
     "rateLimit": "요청이 너무 많아요. 잠시만 기다려 주세요.",
     "server": "서버에서 오류가 발생했어요.",
     "generic": "문제가 발생했어요.",
     "retry": "다시 시도",
     "rankTierTooLow": "5단계부터 가능해요.",
     "rankIdeaInvalid": "아이디어는 3~280자여야 해요.",
-    "rankIdeaLimit": "이미 열린 아이디어가 3개 있어요.",
+    "rankIdeaLimit": "이미 진행 중인 아이디어가 3개 있어요.",
     "rankIdeaGone": "이 아이디어는 더 이상 없거나 보관됐어요."
   },
   "pageHeader": {
@@ -7561,7 +7561,7 @@
       "genericTask": "새 별",
       "unlock": {
         "logEntry": "로그 항목 잠금 해제",
-        "community": "커뮤니티 별자리 지도 잠금 해제",
+        "community": "커뮤니티 성도 잠금 해제",
         "wallpaper": "4K 배경화면 잠금 해제",
         "kartograph": "지도 제작자 잠금 해제",
         "road": "별의 길 잠금 해제",
@@ -7578,7 +7578,7 @@
       "news": "Verse News",
       "patches": "Patch News",
       "gallery": "갤러리",
-      "starmap": "별자리 지도"
+      "starmap": "성도"
     },
     "kind": {
       "news": "뉴스",
@@ -7591,7 +7591,7 @@
       "live": "Live",
       "ptu": "PTU {{line}}",
       "since": "{{n}}일째 Live",
-      "next": "다음 패치 ~ {{n}}일 후",
+      "next": "다음 패치 약 {{n}}일 후",
       "overdue": "다음 패치 {{n}}일 지연"
     },
     "briefing": {
@@ -7690,7 +7690,7 @@
           "value": "{{n}}일"
         },
         "stable": {
-          "label": "최근 안정화된 패치",
+          "label": "최근 출시된 안정 버전",
           "value": "{{n}}"
         }
       },
@@ -7706,7 +7706,7 @@
         }
       },
       "comet": {
-        "title": "패치 예측 투표: {{line}}은(는) 언제 라이브될까요?",
+        "title": "패치 예측 투표: {{line}}은(는) 언제 Live에 출시될까요?",
         "hint": "투표해 보세요. 투표 후 커뮤니티 중앙값을 볼 수 있어요.",
         "label": "LIVE 날짜 예측",
         "submit": "투표하기",
@@ -9080,7 +9080,7 @@
     }
   },
   "quick": {
-    "toNachschub": "Operation에 추가: {{name}}",
+    "toNachschub": "작전에 추가: {{name}}",
     "wish": "위시",
     "allWish": "모든 위시",
     "allWishCount": "위시 {{n}}개",

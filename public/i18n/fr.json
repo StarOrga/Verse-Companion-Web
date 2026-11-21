@@ -85,7 +85,7 @@
       "yesterday": "Hier",
       "lastWeek": "La semaine dernière",
       "lastMonth": "Le mois dernier",
-      "earlier": "Plus tôt"
+      "earlier": "Plus ancien"
     },
     "relativeSince": {
       "today": "depuis aujourd'hui",
@@ -116,7 +116,7 @@
       "sent": "Si un compte existe pour cette adresse, un e-mail avec un lien est en route. Le lien mène directement à la page où tu définis ton mot de passe."
     },
     "setPassword": {
-      "title": "Définir ton mot de passe",
+      "title": "Définis ton mot de passe",
       "inviteTitle": "Bienvenue à bord",
       "checking": "Un instant…",
       "lead": "Définis ici ton nouveau mot de passe. Ensuite, tu te connectes avec ton adresse e-mail et ce mot de passe.",
@@ -139,7 +139,7 @@
     "continueDiscord": "Continuer avec Discord",
     "inviteOnly": "L'accès se fait uniquement sur invitation. Demande à un admin de t'inviter.",
     "deniedInvite": "Ce compte n'a pas encore été invité. Le site est accessible uniquement sur invitation — demande à un admin de t'envoyer une invitation.",
-    "deniedSignup": "Ce compte n'est pas encore activé. L'accès se fait uniquement sur invitation — demande d'abord l'accès, puis reconnecte-toi.",
+    "deniedSignup": "Ce compte n'est pas encore approuvé. L'accès se fait uniquement sur invitation — demande d'abord l'accès, puis reconnecte-toi.",
     "unavailable": {
       "title": "Impossible de vérifier ton accès",
       "body": "Ton profil n'a pas pu être chargé à l'instant — en général un bref raté juste après la connexion. Tu es toujours connecté.",
@@ -149,8 +149,8 @@
     },
     "landing": {
       "appName": "Verse Companion",
-      "join": "Join the Club.",
-      "pitch": "Le Companion est un cercle privé — l'accès se fait uniquement sur invitation. Tu voles déjà dans le verse et tu veux en être ? Candidate, un admin y jettera un œil.",
+      "join": "Rejoins le club.",
+      "pitch": "Le Companion est un cercle privé — l'accès se fait uniquement sur invitation. Tu voles déjà dans le verse et tu veux en être ? Postule, un admin y jettera un œil.",
       "perks": {
         "hangar": "Ton hangar avec loadouts et rôles au même endroit",
         "codex": "Codex : vaisseaux, composants et valeurs issues du jeu",
@@ -212,7 +212,7 @@
     "viewAs": {
       "title": "Voir en tant que",
       "collaborator": "Collaborateur",
-      "viewer": "Viewer",
+      "viewer": "Lecteur",
       "anon": "Visiteur déconnecté",
       "exit": "Retour à mon rôle",
       "restricted": "Admins et collaborateurs uniquement"
@@ -3347,7 +3347,7 @@
   "news": {
     "loading": "Chargement…",
     "empty": "Pas encore d'actualités.",
-    "emptyFavorites": "Rien collecté pour l'instant – collecte un article avec l'icône de collecte et il apparaîtra ici.",
+    "emptyFavorites": "Rien de collecté pour l'instant – collecte un article avec l'icône de collecte et il apparaîtra ici.",
     "errorTitle": "Impossible de charger les actualités",
     "lastUpdated": "Mis à jour {{rel}}",
     "refreshing": "Actualisation…",
@@ -3362,7 +3362,7 @@
       "services": "Services",
       "noComponents": "Aucun détail de service disponible.",
       "appDownload": {
-        "label": "Télécharger l'appli",
+        "label": "Télécharger l'app",
         "hint": "Installateur Windows · toujours la dernière version"
       },
       "checkExternal": "Page de statut RSI ↗"
@@ -3487,7 +3487,7 @@
           "subPatch": "Prochain sous-patch (live)",
           "ptuSubPatch": "Prochain sous-patch PTU"
         },
-        "today": "dû aujourd'hui",
+        "today": "prévu aujourd'hui",
         "inDays": "dans ~{{n}} jours",
         "inWeeks": "dans ~{{n}} semaines",
         "overdueDays": "en retard de {{n}} j",
@@ -3506,7 +3506,7 @@
         "label": "Rechercher dans le contenu des patchs",
         "placeholder": "p. ex. Orison, hotfix, quantum drive",
         "clear": "Effacer la recherche",
-        "noHits": "Rien trouvé — même avec une autre orthographe."
+        "noHits": "Aucun résultat — même avec une autre orthographe."
       },
       "roadmap": {
         "expandAll": "Afficher toutes les descriptions",
@@ -3552,7 +3552,7 @@
           "empty": "Aucun ticket dans les réponses les plus populaires."
         },
         "meter": {
-          "early": "encore tôt"
+          "early": "trop tôt"
         }
       },
       "status": {
@@ -3606,7 +3606,7 @@
       "prep": {
         "source": "d'après le post Spectrum (« Important Build Info »)",
         "known": "Problèmes connus",
-        "focus": "Testing Focus",
+        "focus": "Axes de test",
         "wipe": "Wipe",
         "noBuildInfo": "RSI n'a publié aucune « Important Build Info » pour ce build.",
         "generalTitle": "Valable pour chaque patch",
@@ -3627,7 +3627,7 @@
         "ofNote": "Les changements de « {{title}} » :"
       },
       "fixed": {
-        "placeholder": "Rechercher dans ce patch … ex. quantum drive",
+        "placeholder": "Rechercher dans ce patch … p. ex. quantum drive",
         "hits": "{{n}} résultats dans {{notes}} notes",
         "coverage": "{{loaded}} notes sur {{total}} entièrement parcourues",
         "loadRest": "Charger et parcourir les notes restantes",
@@ -3655,8 +3655,8 @@
           "hotfix": "Hotfix ×{{n}}",
           "now": "aujourd'hui",
           "nextLive": "Live {{version}}",
-          "usual": "Prochain Live · habituel",
-          "leadUsual": "l'habituel serait"
+          "usual": "Prochain Live · habituellement",
+          "leadUsual": "la durée habituelle serait"
         },
         "span": {
           "leadTime": "Test → Live : {{days}} jours",
@@ -3682,7 +3682,7 @@
           "later": "{{n}} j plus tard que d'habitude",
           "earlier": "{{n}} j plus tôt que d'habitude",
           "onTrack": "dans le rythme",
-          "hotfix": "{{n}} hotfix depuis le Live",
+          "hotfix": "{{n}} hotfix(es) depuis le Live",
           "hotfixLast": "dernier le {{date}}"
         },
         "infoLabel": "D'où viennent ces chiffres ?"
@@ -3711,7 +3711,7 @@
         "groupCount": "{{roadmap}} entrées de roadmap · {{notes}} points",
         "moreInDossier": "{{n}} autres résultats dans le dossier",
         "loadRest": "Charger et parcourir les {{n}} notes restantes",
-        "loading": "Chargement des notes …"
+        "loading": "Chargement des notes…"
       },
       "timeline": {
         "versionsOf": "Versions de {{line}}",
@@ -3758,24 +3758,24 @@
     },
     "verdict": {
       "label": "En direct dans le Verse",
-      "liveOnly": "{{line}} est live",
-      "due": "{{line}} est live · prochain patch majeur dans {{days}} jours",
-      "dueWeeks": "{{line}} est live · prochain patch majeur dans ~{{weeks}} semaines",
-      "today": "{{line}} est live · prochain patch majeur attendu aujourd'hui",
-      "overdue": "{{line}} est live · prochain patch majeur en retard de {{days}} jours",
-      "overdueWeeks": "{{line}} est live · prochain patch majeur en retard de ~{{weeks}} semaines",
+      "liveOnly": "{{line}} est en live",
+      "due": "{{line}} est en live · prochain patch majeur dans {{days}} jours",
+      "dueWeeks": "{{line}} est en live · prochain patch majeur dans ~{{weeks}} semaines",
+      "today": "{{line}} est en live · prochain patch majeur attendu aujourd'hui",
+      "overdue": "{{line}} est en live · prochain patch majeur en retard de {{days}} jours",
+      "overdueWeeks": "{{line}} est en live · prochain patch majeur en retard de ~{{weeks}} semaines",
       "basis": "Estimation d'après le rythme des patchs jusqu'ici",
       "basisTesting": "{{test}} en test · estimation d'après la durée de test habituelle",
-      "freshLiveLabel": "Nouveau patch live",
+      "freshLiveLabel": "Nouveau patch en live",
       "freshPtuLabel": "Nouveau dans le PTU",
-      "freshLive": "{{line}} est maintenant live",
+      "freshLive": "{{line}} est maintenant en live",
       "freshPtu": "{{line}} est arrivé dans le PTU",
       "freshLiveSub": "{{since}} · {{test}} en test",
-      "freshPtuSub": "{{since}} · {{live}} reste live",
+      "freshPtuSub": "{{since}} · {{live}} reste en live",
       "sinceToday": "Depuis aujourd'hui",
       "sinceYesterday": "Depuis hier",
       "sinceDays": "Depuis {{days}} jours",
-      "toBoard": "Centre des patchs",
+      "toBoard": "Patch Central",
       "toNotes": "Lire les patch notes"
     }
   },
@@ -3928,8 +3928,8 @@
     "role": "Rôle",
     "roles": {
       "admin": "Admin",
-      "collaborator": "Collaborator",
-      "viewer": "Viewer"
+      "collaborator": "Collaborateur",
+      "viewer": "Lecteur"
     },
     "username": "Nom d'utilisateur",
     "usernameUnset": "Non défini",
@@ -3991,7 +3991,7 @@
       "title": "Nom d'utilisateur",
       "label": "Nom d'utilisateur",
       "hint": "3 à 20 caractères : lettres minuscules a–z, chiffres 0–9 et tiret bas (_).",
-      "placeholder": "ton_callsign",
+      "placeholder": "ton_indicatif",
       "save": "Enregistrer",
       "saving": "Enregistrement…",
       "saved": "Nom d'utilisateur enregistré.",
@@ -4076,7 +4076,7 @@
     },
     "feedbackFab": {
       "title": "Bouton de feedback",
-      "hint": "Le bouton en bas à droite pour envoyer un feedback et où s'affichent les réponses de l'équipe.",
+      "hint": "Le bouton en bas à droite pour envoyer un feedback, et où s'affichent les réponses de l'équipe.",
       "show": {
         "label": "Afficher le bouton de feedback",
         "descOn": "Le bouton de feedback se trouve en bas à droite de chaque page.",
@@ -4086,7 +4086,7 @@
         "title": "Boutons de feedback et de bêta",
         "hint": "Les boutons en bas à droite : envoyer un feedback et voir les réponses de l'équipe, avec l'interrupteur bêta au-dessus.",
         "label": "Afficher les boutons de feedback et de bêta",
-        "audience": "(réservé aux admins et collaborators)",
+        "audience": "(réservé aux admins et collaborateurs)",
         "descOn": "Le bouton de feedback et le bouton bêta se trouvent en bas à droite de chaque page.",
         "descOff": "Le bouton de feedback et le bouton bêta sont masqués — tu ne vois donc plus non plus les réponses et questions de l'équipe. Réactive-les ici pour ouvrir ton feedback ou les interrupteurs bêta."
       },
@@ -4102,7 +4102,7 @@
       "warning": "Supprimer définitivement ton compte. Tes uploads et bundles disparaissent aussi. Action irréversible.",
       "deleteBtn": "Supprimer mon compte",
       "deleting": "Suppression…",
-      "confirm": "Ton compte ({{email}}) sera définitivement supprimé. Tes uploads et bundles disparaissent aussi. Tu seras déconnecté ensuite. Sûr ?",
+      "confirm": "Ton compte ({{email}}) sera définitivement supprimé. Tes uploads et bundles disparaissent aussi. Tu seras déconnecté ensuite. Tu confirmes ?",
       "failed": "Échec de la suppression",
       "viaAdmin": "La suppression de compte est actuellement effectuée par un administrateur. Contacte-nous via les moyens indiqués dans les mentions légales ; nous supprimons ton compte avec profil, hangar, loadouts et uploads.",
       "imprintLink": "Aller aux mentions légales",
@@ -4836,11 +4836,11 @@
       "aboutNew": "nouveau",
       "news": "Nouveautés"
     },
-    "disclaimerTitle": "Avis sur le site de fans",
+    "disclaimerTitle": "Avis de site de fans",
     "rsiLink": "Site officiel de Star Citizen : robertsspaceindustries.com",
-    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
+    "noticeOriginal": "Ceci est un site de fans non officiel de Star Citizen, non affilié au groupe de sociétés Cloud Imperium. Tout contenu de ce site qui n'a pas été créé par son hébergeur ou ses utilisateurs est la propriété de ses détenteurs respectifs.",
     "noticeOriginalLabel": "Texte original",
-    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® and Cloud Imperium® are registered trademarks of Cloud Imperium Rights LLC"
+    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® et Cloud Imperium® sont des marques déposées de Cloud Imperium Rights LLC"
   },
   "legal": {
     "about": {
@@ -4975,7 +4975,7 @@
   },
   "hangar": {
     "title": "Mon hangar",
-    "subtitle": "Ta flotte personnelle : configurations de vaisseaux, loadouts de composants et sets de rôles — basés sur les données de jeu en production du Codex.",
+    "subtitle": "Ta flotte personnelle : configurations de vaisseaux, loadouts de composants et sets de rôles — basés sur les données du jeu live du Codex.",
     "counts": {
       "owned": "Possédés",
       "wishlist": "Souhaits"
@@ -5039,7 +5039,7 @@
       "save": "Enregistrer",
       "rename": "Renommer",
       "pinLabel": "Épingler",
-      "openCodex": "Entrée du codex",
+      "openCodex": "Entrée du Codex",
       "remove": "Retirer",
       "notes": "Notes",
       "notesPlaceholder": "Notes sur ce vaisseau…",
@@ -5121,7 +5121,7 @@
     "import": {
       "open": "Importer…",
       "title": "Importer depuis un fichier d'export",
-      "hint": "Dépose ici un export JSON au format Hangar Transfer (p. ex. depuis l'extension de navigateur HangarXPLOR — tu lances l'export toi-même, nous ne demandons jamais tes identifiants RSI). Les entrées sont comparées au codex et seules les lignes que tu confirmes sont ajoutées.",
+      "hint": "Dépose ici un export JSON au format Hangar Transfer (p. ex. depuis l'extension de navigateur HangarXPLOR — tu lances l'export toi-même, nous ne demandons jamais tes identifiants RSI). Les entrées sont comparées au Codex et seules les lignes que tu confirmes sont ajoutées.",
       "pickFile": "Choisir un fichier",
       "parsing": "Lecture…",
       "dropHint": "ou dépose le fichier .json ici",
@@ -6177,7 +6177,7 @@
     "error": "La page de concept n'a pas pu être chargée. Réessaie plus tard."
   },
   "errors": {
-    "offline": "Tu es hors ligne. Réessaie dès que la connexion est rétablie.",
+    "offline": "Tu sembles être hors ligne. Réessaie dès que la connexion est rétablie.",
     "network": "Le serveur est actuellement injoignable.",
     "timeout": "Cela a pris trop de temps.",
     "cometLocked": "La date officielle de sortie LIVE est annoncée – les pronostics sont fermés.",
@@ -7613,8 +7613,8 @@
         "hotfix": "Hotfix",
         "planned": "Prévu"
       },
-      "topAria": "Les dernières histoires",
-      "storyAria": "Histoire {{n}} : {{title}}",
+      "topAria": "Les dernières actus",
+      "storyAria": "Actu {{n}} : {{title}}",
       "status": {
         "live": "{{line}} en live depuis {{n}} jours",
         "liveOne": "{{line}} en live depuis 1 jour",
@@ -7667,7 +7667,7 @@
         "topic": "Galerie",
         "hook": "Lequel devient ton nouveau bureau ?",
         "stat": "{{n}} nouveaux fonds d'écran",
-        "teaser": "Parcourez, partagez et votez pour les fonds d'écran Starscape"
+        "teaser": "Parcours, partage et vote pour les fonds d'écran Starscape"
       }
     },
     "patches": {
@@ -7729,7 +7729,7 @@
       "connected": "Starscape connecté",
       "share": "Partager la galerie",
       "heroTitle": "Starscape amène la galerie sur ton bureau",
-      "heroBody": "L'application de bureau fait défiler tes fonds d'écran de la galerie et affiche les cartes stellaires que tu as méritées."
+      "heroBody": "L'application de bureau fait défiler les fonds d'écran de la galerie sur ton bureau et affiche les cartes stellaires que tu as débloquées."
     },
     "hub": {
       "brand": "Verse Companion",
@@ -8363,7 +8363,7 @@
     "aria": "Télécharger les apps",
     "scc": {
       "name": "Verse Companion App",
-      "desc": "Ton compagnon à côté du jeu : infos en direct, overlays et configuration des touches, sans Alt-Tab."
+      "desc": "Juste à côté du jeu : infos en direct, overlays et configuration des touches, sans Alt-Tab."
     },
     "starscape": {
       "name": "Starscape",
@@ -8386,7 +8386,7 @@
     },
     "starscape": {
       "line": "Starscape en app de fond d'écran",
-      "desc": "Change ton fond d'écran à travers la galerie Starscape."
+      "desc": "Fait défiler les images de la galerie Starscape en fond d'écran."
     }
   },
   "apps": {
@@ -9080,7 +9080,7 @@
     }
   },
   "quick": {
-    "toNachschub": "Dans une Operation : {{name}}",
+    "toNachschub": "Dans une opération : {{name}}",
     "wish": "Souhaits",
     "allWish": "Tous les souhaits",
     "allWishCount": "{{n}} souhaits",
@@ -9372,12 +9372,12 @@
   },
   "pwa": {
     "card": {
-      "title": "Verse Companion en appli",
+      "title": "Obtenir l'app",
       "benefit": "Plein écran, démarrage plus rapide, directement depuis ton écran d'accueil.",
       "install": "Installer",
       "later": "Plus tard"
     },
-    "menu": "Installer l'appli",
+    "menu": "Installer l'app",
     "ios": {
       "title": "Sur l'écran d'accueil",
       "step1Iphone": "Appuie sur Partager en bas de Safari.",

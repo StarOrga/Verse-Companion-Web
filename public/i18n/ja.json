@@ -117,7 +117,7 @@
     },
     "setPassword": {
       "title": "パスワードを設定",
-      "inviteTitle": "ご搭乗ありがとうございます",
+      "inviteTitle": "ようこそ",
       "checking": "少々お待ちください…",
       "lead": "ここで新しいパスワードを設定してください。以降は、メールアドレスとこのパスワードでサインインします。",
       "inviteLead": "申請が承認され、アクセスが有効になりました。まだパスワードがありません。今すぐ設定すれば、いつでも再びサインインできます。",
@@ -137,7 +137,7 @@
     "or": "または",
     "continueGoogle": "Googleで続行",
     "continueDiscord": "Discordで続行",
-    "inviteOnly": "アクセスは招待制です。管理者に招待をお願いしてください。",
+    "inviteOnly": "アクセスは招待制です。管理者に招待を依頼してください。",
     "deniedInvite": "このアカウントはまだ招待されていません。このサイトは招待制です。管理者に招待を依頼してください。",
     "deniedSignup": "このアカウントはまだ承認されていません。アクセスは招待制です。先にアクセスを申請してから、もう一度サインインしてください。",
     "unavailable": {
@@ -149,7 +149,7 @@
     },
     "landing": {
       "appName": "Verse Companion",
-      "join": "Join the Club.",
+      "join": "クラブに参加しよう。",
       "pitch": "Companionは招待制のプライベートなサークルです。すでにVerseを飛んでいて参加したい方は、申請してください。管理者が確認します。",
       "perks": {
         "hangar": "ロードアウトやロールをまとめて管理できるあなたのハンガー",
@@ -210,7 +210,7 @@
     "telemetry": "テレメトリ",
     "starscape": "Starscape",
     "viewAs": {
-      "title": "表示するロール",
+      "title": "表示ロール",
       "collaborator": "コラボレーター",
       "viewer": "ビューアー",
       "anon": "サインアウト中の訪問者",
@@ -3377,7 +3377,7 @@
     },
     "events": {
       "title": "ゲーム内イベント",
-      "upcomingTitle": "まもなく 'verse で",
+      "upcomingTitle": "まもなく'verseで",
       "aria": "開催中および開催予定のゲーム内イベント",
       "allPosts": "すべてのイベント投稿",
       "runningUntil": "開催中 · {{date}}まで",
@@ -3412,13 +3412,13 @@
       "otherLine": "バージョン情報なし",
       "hotfix": "ホットフィックス",
       "stage": {
-        "live": "LIVE",
+        "live": "Live",
         "ptu": "PTU",
         "evocati": "Evocati"
       },
       "facet": {
         "live": "Live",
-        "hotfix": "Hotfix",
+        "hotfix": "ホットフィックス",
         "ptu": "PTU",
         "evocati": "Evocati",
         "other": "その他"
@@ -3463,15 +3463,15 @@
         }
       },
       "ptuRelease": {
-        "title": "{{version}}はいつLIVEに来る?",
+        "title": "{{version}}はいつLIVEになる?",
         "infoLabel": "日付の算出方法",
-        "infoEstimate": "当サイトの予測:このバージョンの最初のテストビルドに、これまでのバージョンが最初のPTUビルドからLIVEまでにかかった日数の中央値を加えたものです。予測であり、確約ではありません。",
+        "infoEstimate": "当サイトの予測:このバージョンの最初のテストビルドに、これまでのバージョンが最初のPTUビルドからLIVEまでにかかった日数の中央値を加えたものです。推計であり、確約ではありません。",
         "infoOfficial": "公式日付:RSIがステータスサイトで予定しているLIVEデプロイの日付です(予定された時点で表示されます)。RSIはパッチノート自体には日付を記載しません。",
         "estimate": "当サイトの予測",
         "estimateBasis": "テスト開始から{{days}}日 · PTU → LIVE の中央値 {{median}}日(n = {{n}})",
         "noEstimate": "予測に必要なデータがまだ足りません",
-        "official": "公式 (RSI)",
-        "source": "ソース: RSIステータス、{{title}}",
+        "official": "公式(RSI)",
+        "source": "ソース:RSIステータス、{{title}}",
         "noOfficial": "公式の日付はまだありません",
         "statusLink": "RSIステータスページを確認",
         "openNotes": "{{version}} の変更点を見る",
@@ -3484,14 +3484,14 @@
         "row": {
           "ptu": "次のPTU",
           "live": "次のLIVEパッチ",
-          "subPatch": "次のサブパッチ (LIVE)",
+          "subPatch": "次のサブパッチ(LIVE)",
           "ptuSubPatch": "次のPTUサブパッチ"
         },
-        "today": "本日予定",
+        "today": "本日予定日",
         "inDays": "約{{n}}日後",
         "inWeeks": "約{{n}}週間後",
-        "overdueDays": "{{n}}日超過",
-        "overdueWeeks": "{{n}}週間超過",
+        "overdueDays": "{{n}}日遅延",
+        "overdueWeeks": "{{n}}週間遅延",
         "basis": "中央値 {{median}}日 · {{version}} から"
       },
       "board": {
@@ -3552,7 +3552,7 @@
           "empty": "上位の返信にチケットはありません。"
         },
         "meter": {
-          "early": "まだ早い"
+          "early": "判断には早すぎます"
         }
       },
       "status": {
@@ -3566,7 +3566,7 @@
       "stack": {
         "aria": "パッチ(新しい順)",
         "sinceDays": "{{n}}日間",
-        "replaced": "{{date}}",
+        "replaced": "{{date}}に",
         "liveSince": "{{date}}からLive",
         "liveSpan": "Live {{from}} – {{to}}",
         "neverLive": "Liveになったことはありません",
@@ -3627,7 +3627,7 @@
         "ofNote": "「{{title}}」の変更点:"
       },
       "fixed": {
-        "placeholder": "このパッチ内を検索 … 例:quantum drive",
+        "placeholder": "このパッチ内を検索 … 例: quantum drive",
         "hits": "{{notes}}件のノート内で{{n}}件ヒット",
         "coverage": "{{total}}件中{{loaded}}件のノートを全文検索済み",
         "loadRest": "残りのノートを読み込んで検索",
@@ -3664,7 +3664,7 @@
         },
         "charts": "詳細グラフ(PTU → Live · 周期 · サブパッチ · 日程)",
         "status": {
-          "live": "Alpha {{line}}はLiveになって{{days}}日です。次まで通常{{median}}日です。",
+          "live": "Alpha {{line}}はLiveになって{{days}}日です。次のパッチまでは通常{{median}}日です。",
           "testing": "Alpha {{line}}はテスト開始から{{days}}日です。Liveまで通常{{median}}日です。",
           "onTrack": "CIGは周期どおりです。",
           "over": "CIGは通常の周期を{{n}}日超過しています。"
@@ -3697,7 +3697,7 @@
           "testing": "テスト中",
           "cadence": "周期",
           "hotfixNone": "ホットフィックスなし",
-          "cadenceStateFoot": "{{median}}日中の約{{days}}日 · 中央値 · n = {{n}}",
+          "cadenceStateFoot": "{{days}}日 / 約{{median}}日 · 中央値 · n = {{n}}",
           "next": "次",
           "goLive": "Live開始",
           "nextUnknown": "次のパッチ",
@@ -3922,14 +3922,14 @@
   },
   "profile": {
     "email": "メールアドレス",
-    "id": "ユーザー ID",
+    "id": "ユーザーID",
     "provider": "プロバイダー",
     "created": "登録日",
     "role": "ロール",
     "roles": {
-      "admin": "Admin",
-      "collaborator": "Collaborator",
-      "viewer": "Viewer"
+      "admin": "管理者",
+      "collaborator": "共同編集者",
+      "viewer": "閲覧者"
     },
     "username": "ユーザー名",
     "usernameUnset": "未設定",
@@ -3942,18 +3942,18 @@
     "memberSince": {
       "today": "今日",
       "unknown": "不明",
-      "exact": "{{date}} に登録",
+      "exact": "{{date}}に登録",
       "days": {
-        "one": "{{count}} 日",
-        "other": "{{count}} 日"
+        "one": "{{count}}日",
+        "other": "{{count}}日"
       },
       "months": {
-        "one": "{{count}} か月",
-        "other": "{{count}} か月"
+        "one": "{{count}}か月",
+        "other": "{{count}}か月"
       },
       "years": {
-        "one": "{{count}} 年",
-        "other": "{{count}} 年"
+        "one": "{{count}}年",
+        "other": "{{count}}年"
       }
     }
   },
@@ -4076,7 +4076,7 @@
     },
     "feedbackFab": {
       "title": "フィードバックボタン",
-      "hint": "フィードバックを送信したり、チームからの返信を確認したりするための右下のボタンです。",
+      "hint": "フィードバックの送信や、チームからの返信の確認に使う右下のボタンです。",
       "show": {
         "label": "フィードバックボタンを表示",
         "descOn": "フィードバックボタンは各ページの右下に表示されます。",
@@ -4084,7 +4084,7 @@
       },
       "staff": {
         "title": "フィードバックとベータのボタン",
-        "hint": "右下のボタン: フィードバックの送信とチームからの返信の確認、その上にベータの切り替えがあります。",
+        "hint": "右下のボタンです。フィードバックの送信とチームからの返信の確認ができ、その上にベータの切り替えがあります。",
         "label": "フィードバックとベータのボタンを表示",
         "audience": "(Admin と Collaborator のみ)",
         "descOn": "フィードバックボタンとベータボタンは各ページの右下に表示されます。",
@@ -4093,8 +4093,8 @@
       "routineTint": {
         "label": "フィードバックのタイトルを緑/赤のみにする",
         "audience": "(Admin のみ)",
-        "descOn": "「フィードバック」のタイトルは、ルーチンが稼働中または作業中は緑、何も処理されていない間は赤に光ります。あなたのアカウントにのみ適用されます。",
-        "descOff": "「フィードバック」のタイトルは4つの状態を示します: 緑は準備完了、青は作業中、黄色は一時停止、赤は接続不可。"
+        "descOn": "「フィードバック」のタイトルは、ルーチンが稼働中または作業中のときは緑、何も処理されていないときは赤に光ります。あなたのアカウントにのみ適用されます。",
+        "descOff": "「フィードバック」のタイトルは4つの状態を示します: 緑は準備完了、青は作業中、黄は一時停止、赤は接続不可。"
       }
     },
     "danger": {
@@ -4111,7 +4111,7 @@
         "unauthorized": "セッションの有効期限が切れました。もう一度サインインしてください。",
         "protectedAdmin": "このアカウントは保護されているため、削除できません。",
         "lastAdmin": "最後の Admin は削除できません。先に別の Admin を昇格させてください。",
-        "notFound": "このアカウントは存在しません。",
+        "notFound": "このアカウントはもう存在しません。",
         "invalidBody": "リクエストが無効でした。ページを再読み込みしてください。"
       }
     }
@@ -4838,9 +4838,9 @@
     },
     "disclaimerTitle": "ファンサイトに関するお知らせ",
     "rsiLink": "Star Citizen公式サイト: robertsspaceindustries.com",
-    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
+    "noticeOriginal": "これは非公式のStar Citizenファンサイトであり、Cloud Imperiumグループ各社とは提携していません。本サイト上のコンテンツのうち、運営者またはユーザーが作成したもの以外は、それぞれの所有者に帰属します。",
     "noticeOriginalLabel": "原文(英語)",
-    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® and Cloud Imperium® are registered trademarks of Cloud Imperium Rights LLC"
+    "trademarksOriginal": "Star Citizen®、Roberts Space Industries®、Cloud Imperium®はCloud Imperium Rights LLCの登録商標です。"
   },
   "legal": {
     "about": {
@@ -5042,12 +5042,12 @@
       "openCodex": "Codexエントリ",
       "remove": "削除",
       "notes": "メモ",
-      "notesPlaceholder": "この船に関するメモ…",
+      "notesPlaceholder": "この艦船に関するメモ…",
       "removeConfirm": {
         "title": "{{name}} をハンガーから削除しますか?",
         "bodyNone": "この操作は元に戻せません。",
-        "bodyOne": "この船の構成も一緒に削除されます。この操作は元に戻せません。",
-        "bodyMany": "この船の {{count}} 件の構成も一緒に削除されます。この操作は元に戻せません。"
+        "bodyOne": "この艦船の構成も一緒に削除されます。この操作は元に戻せません。",
+        "bodyMany": "この艦船の {{count}} 件の構成も一緒に削除されます。この操作は元に戻せません。"
       }
     },
     "configs": {
@@ -5067,9 +5067,9 @@
     },
     "standard": {
       "title": "標準コンポーネント",
-      "subtitle": "ライブのゲームデータ(P4K)に基づく、この船の工場出荷時の装備です。デフォルトで搭載されているコンポーネントを表示します。",
+      "subtitle": "ライブのゲームデータ(P4K)に基づく、この艦船の工場出荷時の装備です。デフォルトで搭載されているコンポーネントを表示します。",
       "count": "{{count}} 個のコンポーネント",
-      "empty": "現在のカタログビルドには、この船の標準コンポーネントが記録されていません。"
+      "empty": "現在のカタログビルドには、この艦船の標準コンポーネントが記録されていません。"
     },
     "stats": {
       "title": "ロードアウトのステータス",
@@ -5088,7 +5088,7 @@
     },
     "loadout": {
       "title": "ハードポイントとロードアウト",
-      "noPorts": "この船のハードポイントデータはありません。",
+      "noPorts": "この艦船のハードポイントデータはありません。",
       "empty": "空き",
       "change": "変更",
       "reset": "標準",
@@ -5101,20 +5101,20 @@
       "title": "あなた専用のハンガー",
       "subtitle": "ログインして艦隊を作りましょう。無料で、アルファ期間中は招待制です。",
       "save": {
-        "title": "船を保存",
-        "text": "所有している船もウィッシュも、カスタム名とメモ付きで艦隊をひとつの場所にまとめて管理できます。"
+        "title": "艦船を保存",
+        "text": "所有している艦船もウィッシュも、カスタム名とメモ付きで艦隊をひとつの場所にまとめて管理できます。"
       },
       "overview": {
         "title": "艦隊の概要",
-        "text": "ピン留めした旗艦、各種カウント、各船の詳細ページへのクイックアクセス。"
+        "text": "ピン留めしたフラッグシップ、各種カウント、各艦船の詳細ページへのクイックアクセス。"
       },
       "loadouts": {
         "title": "ロードアウトを試す",
-        "text": "船のコンポーネントや武器を入れ替えて、aUECを1つも使わずにステータスへの影響を確認できます。"
+        "text": "艦船のコンポーネントや武器を入れ替えて、aUECを1つも使わずにステータスへの影響を確認できます。"
       },
       "compare": {
         "title": "比較",
-        "text": "船やコンポーネントをピン留めして並べ、重要な数値を比較できます。"
+        "text": "艦船やコンポーネントをピン留めして並べ、重要な数値を比較できます。"
       },
       "cta": "ログインしてハンガーを開く"
     },
@@ -5126,7 +5126,7 @@
       "parsing": "読み取り中…",
       "dropHint": "または .json ファイルをここにドロップ",
       "errParse": "このファイルを読み取れませんでした。JSONエクスポートが必要です。",
-      "errNoShips": "このファイルに船のエントリが見つかりません。",
+      "errNoShips": "このファイルに艦船のエントリが見つかりません。",
       "matched": "{{total}} 件中 {{matched}} 件のエントリがカタログと一致しました",
       "chooseOther": "別のファイルを選択",
       "exact": "一致",
@@ -6183,9 +6183,9 @@
     "cometLocked": "公式のLIVE日程が発表されたため、予想は締め切られました。",
     "cometTipped": "このパッチはすでに予想済みです。",
     "cometDatePast": "その日付はすでに過ぎています。",
-    "guessMade": "このスターマップはすでに予想済みです。挑戦できるのは1回だけです。",
-    "guessInvalid": "その選択はこのスターマップのものではありません。",
-    "guessUnavailable": "このパッチには、当てるスターマップがありません。",
+    "guessMade": "この星図はすでに予想済みです。挑戦できるのは1回だけです。",
+    "guessInvalid": "その選択はこの星図のものではありません。",
+    "guessUnavailable": "このパッチには、当てる星図がありません。",
     "sessionExpired": "セッションの有効期限が切れました。もう一度サインインしてください。",
     "forbidden": "この操作を行う権限がありません。",
     "notFound": "これは(もう)存在しません。",
@@ -7560,7 +7560,7 @@
       "close": "閉じる",
       "genericTask": "新しい星",
       "unlock": {
-        "logEntry": "ログブックのエントリーが解放されました",
+        "logEntry": "ログエントリーが解放されました",
         "community": "コミュニティ星図が解放されました",
         "wallpaper": "4K壁紙が解放されました",
         "kartograph": "Cartographerが解放されました",
@@ -7638,7 +7638,7 @@
         "news": "ニュース内",
         "patch": "パッチ内",
         "gallery": "ギャラリー内",
-        "link": "元のサイト"
+        "link": "元のサイトで"
       },
       "pause": "動きを停止",
       "resume": "動きを再開"
@@ -7671,7 +7671,7 @@
       }
     },
     "patches": {
-      "sub": "パッチの状況、ファクト、あなたのプリフライト",
+      "sub": "パッチの状況、データ、あなたのプリフライト",
       "kpi": {
         "lines": {
           "label": "アーカイブ内のパッチライン",
@@ -7690,7 +7690,7 @@
           "value": "{{n}}日"
         },
         "stable": {
-          "label": "最近安定版に着地",
+          "label": "最近安定版としてリリース",
           "value": "{{n}}"
         }
       },
@@ -7728,7 +7728,7 @@
     "gallery": {
       "connected": "Starscape連携済み",
       "share": "ギャラリーを共有",
-      "heroTitle": "StarscapeでギャラリーをデスクトップへDesktop",
+      "heroTitle": "Starscapeでギャラリーをデスクトップへ",
       "heroBody": "デスクトップアプリがギャラリーからウォールペーパーを自動で切り替え、獲得した星図を表示します。"
     },
     "hub": {
@@ -7736,8 +7736,8 @@
       "search": "検索 …",
       "searchKey": "Ctrl K",
       "more": "Verseのその他の情報",
-      "prev": "前の記事",
-      "next": "次の記事",
+      "prev": "前のストーリー",
+      "next": "次のストーリー",
       "area": {
         "news": "ニュース",
         "patch": "パッチ",
@@ -8393,7 +8393,7 @@
     "hub": {
       "eyebrow": "アプリ",
       "title": "アプリ",
-      "subtitle": "ウェブサイトの隣で動くものすべて:Verse Data Uploader、Starscape、ブラウザ拡張機能。",
+      "subtitle": "ウェブサイトと併用するアプリ一式:Verse Data Uploader、Starscape、ブラウザ拡張機能。",
       "breadcrumbAria": "アプリ",
       "uploader": {
         "name": "Verse Data Uploader",
@@ -9080,7 +9080,7 @@
     }
   },
   "quick": {
-    "toNachschub": "Operationへ: {{name}}",
+    "toNachschub": "オペレーションへ: {{name}}",
     "wish": "ウィッシュ",
     "allWish": "すべてのウィッシュ",
     "allWishCount": "ウィッシュ{{n}}件",
@@ -9096,7 +9096,7 @@
       "sammlung": "コレクション全体"
     },
     "type": {
-      "ship": "シップ",
+      "ship": "機体",
       "weapon": "武器",
       "component": "コンポーネント",
       "item": "アイテム",
@@ -9375,7 +9375,7 @@
       "title": "Verse Companionをアプリで",
       "benefit": "フルスクリーンで素早く起動。ホーム画面からすぐに使えます。",
       "install": "インストール",
-      "later": "あとで"
+      "later": "後で"
     },
     "menu": "アプリをインストール",
     "ios": {

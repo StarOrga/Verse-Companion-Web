@@ -70,7 +70,7 @@
     "popup": {
       "access": {
         "admin": "Widoczne tylko dla adminów",
-        "collab": "Widoczne tylko dla adminów i collaboratorów"
+        "collab": "Widoczne tylko dla adminów i współpracowników"
       }
     },
     "deferError": {
@@ -120,10 +120,10 @@
       "inviteTitle": "Witaj na pokładzie",
       "checking": "Chwileczkę…",
       "lead": "Ustaw tutaj nowe hasło. Od tej pory logujesz się adresem e-mail i tym hasłem.",
-      "inviteLead": "Twoje zgłoszenie zostało przyjęte — dostęp jest aktywny. Nie masz jeszcze hasła: ustaw je teraz, a będziesz mógł wrócić w każdej chwili.",
+      "inviteLead": "Twoje zgłoszenie zostało przyjęte — dostęp jest aktywny. Nie masz jeszcze hasła: ustaw je teraz, a w każdej chwili wrócisz do aplikacji.",
       "newPassword": "Nowe hasło",
       "repeatPassword": "Powtórz hasło",
-      "rule": "Co najmniej {{min}} znaków. Znasz je tylko ty — nie przydzielamy haseł.",
+      "rule": "Co najmniej {{min}} znaków. Znasz je tylko ty — nigdy nie przydzielamy haseł.",
       "submit": "Zapisz hasło",
       "saving": "Zapisywanie…",
       "saved": "Hasło zapisane.",
@@ -149,25 +149,25 @@
     },
     "landing": {
       "appName": "Verse Companion",
-      "join": "Join the Club.",
+      "join": "Dołącz do klubu.",
       "pitch": "Companion to prywatny krąg — dostęp tylko na zaproszenie. Już latasz w Verse i chcesz dołączyć? Złóż zgłoszenie, a admin się nim zajmie.",
       "perks": {
         "hangar": "Twój hangar z loadoutami i rolami w jednym miejscu",
         "codex": "Codex: statki, komponenty i prawdziwe wartości z gry",
         "verse": "Newsy, tapety Starscape i narzędzia do Verse"
       },
-      "applyCta": "Poproś o dostęp",
+      "applyCta": "Złóż zgłoszenie o dostęp",
       "applyInline": "Złóż zgłoszenie",
       "backToSignIn": "Wróć do logowania",
       "headerNav": "Nawigacja po stronie",
       "consoleAria": "Konsola logowania",
       "scene": {
-        "approach": "Podejście",
+        "approach": "Podejście do lądowania",
         "target": "microTech · Stanton"
       }
     },
     "apply": {
-      "title": "Poproś o dostęp",
+      "title": "Złóż zgłoszenie o dostęp",
       "hint": "Napisz krótko, kim jesteś — twoje zgłoszenie trafi prosto do adminów. Bez konta, bez hasła.",
       "handle": "Handle RSI (opcjonalnie)",
       "handlePlaceholder": "np. CitizenKane",
@@ -200,22 +200,22 @@
     "signOut": "Wyloguj się",
     "backToHome": "Wróć na stronę główną",
     "skipToContent": "Przejdź do treści",
-    "brandAria": "Verse Companion — do strony głównej (Verse News)",
+    "brandAria": "Verse Companion — przejdź do strony głównej (Verse News)",
     "phaseBadge": "Alpha",
     "badge": "Odznaka kartografa",
     "accountMenu": "Menu konta",
     "profilePicture": "Zdjęcie profilowe (menu konta)",
-    "adminOnly": "Tylko admin",
+    "adminOnly": "Tylko dla adminów",
     "adminMenu": "Admin",
     "telemetry": "Telemetria",
     "starscape": "Starscape",
     "viewAs": {
       "title": "Wyświetl jako",
-      "collaborator": "Collaborator",
-      "viewer": "Viewer",
+      "collaborator": "Współpracownik",
+      "viewer": "Przeglądający",
       "anon": "Wylogowany odwiedzający",
       "exit": "Wróć do mojej roli",
-      "restricted": "Tylko admin i collaborator"
+      "restricted": "Tylko administrator i współpracownicy"
     },
     "loading": {
       "weak": "Słaby sygnał · dostrajanie"
@@ -228,9 +228,9 @@
     "hq": "HQ",
     "verse": "Verse",
     "translations": "Tłumaczenie AI",
-    "social": "Social",
+    "social": "Społeczność",
     "accountMenuRequests": "Menu konta, otwarte zaproszenia do znajomych: {{count}}",
-    "socialRequests": "Social, otwarte zaproszenia do znajomych: {{count}}"
+    "socialRequests": "Społeczność, otwarte zaproszenia do znajomych: {{count}}"
   },
   "impersonation": {
     "banner": {
@@ -3426,7 +3426,7 @@
       "kpi": {
         "title": "Wydajność patchy",
         "sub": "Najnowszy na tle mediany wszech czasów",
-        "samplesLabel": "Podstawa",
+        "samplesLabel": "Na podstawie",
         "samples": "{{n}} punktów danych",
         "goto": "Pokaż {{title}}",
         "pause": "Wstrzymaj rotację",
@@ -3469,7 +3469,7 @@
         "infoOfficial": "Data oficjalna: wdrożenie na LIVE, które RSI zapowiada na swojej stronie statusu, gdy tylko zostanie tam zaplanowane. W samych patch notes RSI nie podaje daty.",
         "estimate": "Nasze szacunki",
         "estimateBasis": "{{days}} dni w testach · mediana {{median}} dni PTU → LIVE (n = {{n}})",
-        "noEstimate": "Za mało danych na szacunek",
+        "noEstimate": "Za mało danych do oszacowania",
         "official": "Oficjalnie (RSI)",
         "source": "Źródło: status RSI, {{title}}",
         "noOfficial": "Brak oficjalnej daty",
@@ -3500,7 +3500,7 @@
         "back": "Wróć do Verse News"
       },
       "waves": {
-        "title": "{{count}} fal buildów tego samego ogłoszenia"
+        "title": "Fale buildów tego samego ogłoszenia: {{count}}"
       },
       "search": {
         "label": "Przeszukaj zawartość patchy",
@@ -3516,7 +3516,7 @@
         "noDetail": "RSI nie opublikowało opisu tego wpisu.",
         "status": {
           "released": "Wydano",
-          "committed": "Zapewnione",
+          "committed": "Zatwierdzone",
           "tentative": "Wstępne",
           "unknown": "Otwarte"
         },
@@ -3524,15 +3524,15 @@
       },
       "detail": {
         "loading": "Wczytywanie zawartości patcha …",
-        "unavailable": "Brak zawartości tej notki — przeczytaj ją na RSI.",
-        "noMatch": "Brak trafień w tej notce.",
-        "fullNotes": "Pełne notki ↗",
+        "unavailable": "Brak zawartości tej notatki — przeczytaj ją na RSI.",
+        "noMatch": "Brak trafień w tej notatce.",
+        "fullNotes": "Pełne notatki ↗",
         "linkOut": "Link ↗",
         "openOnRsi": "Otwórz na RSI ↗",
         "openOnRsiAria": "Otwórz {{title}} na RSI (nowa karta)",
-        "truncated": "Bardzo długa notka — reszta jest na RSI.",
-        "hits": "{{count}} trafień",
-        "points": "{{count}} punktów"
+        "truncated": "Bardzo długa notatka — reszta jest na RSI.",
+        "hits": "Trafienia: {{count}}",
+        "points": "Punkty: {{count}}"
       },
       "stability": {
         "insufficient": "Za mało danych na ocenę.",
@@ -3540,12 +3540,12 @@
           "none": "brak danych"
         },
         "componentHint": {
-          "community": "Nowe odpowiedzi dziennie w wątkach notek i hotfixów, udział i waga upvote'ów odpowiedzi z ticketem Issue Council",
+          "community": "Nowe odpowiedzi dziennie w wątkach notatek i hotfixów, udział i waga upvote'ów odpowiedzi z ticketem Issue Council",
           "service": "Nieplanowane minuty zakłóceń dziennie wg statusu RSI (7 dni), plus ewentualna otwarta awaria",
           "cig": "Otwarte wpisy w artykule Known Issues od CIG i ich przyrost w ciągu 7 dni"
         },
         "timeline": "Od LIVE",
-        "timelineAria": "Stabilność dziennie od LIVE, {{days}} punktów pomiarowych",
+        "timelineAria": "Stabilność dziennie od LIVE, punkty pomiarowe: {{days}}",
         "hotfixMark": "Hotfix {{build}} dnia {{date}}",
         "tickets": {
           "title": "Co zgłasza społeczność",
@@ -3606,7 +3606,7 @@
       "prep": {
         "source": "według wpisu na Spectrum („Important Build Info”)",
         "known": "Znane problemy",
-        "focus": "Testing Focus",
+        "focus": "Priorytety testów",
         "wipe": "Wipe",
         "noBuildInfo": "RSI nie opublikowało „Important Build Info” dla tego builda.",
         "generalTitle": "Dotyczy każdego patcha",
@@ -3632,7 +3632,7 @@
         "coverage": "W pełni przeszukano {{loaded}} z {{total}} notatek",
         "loadRest": "Wczytaj i przeszukaj pozostałe notatki",
         "loading": "Wczytywanie notatek: {{n}} …",
-        "noHits": "Brak trafień w wczytanych notatkach – tytuły są zawsze przeszukiwane.",
+        "noHits": "Brak trafień we wczytanych notatkach – tytuły są zawsze przeszukiwane.",
         "allNotes": "Wszystkie notatki ({{n}})"
       },
       "next": {
@@ -3667,7 +3667,7 @@
           "live": "Alpha {{line}} jest na Live od {{days}} dni — zwykle do następnej mija {{median}} dni.",
           "testing": "Alpha {{line}} jest w testach od {{days}} dni — zwykle do Live mija {{median}} dni.",
           "onTrack": "CIG trzyma rytm.",
-          "over": "CIG jest {{n}} dni poza zwykłym rytmem."
+          "over": "CIG ma {{n}} dni opóźnienia względem zwykłego rytmu."
         },
         "legend": {
           "real": "cykl Live (udokumentowany)",
@@ -3691,7 +3691,7 @@
         "title": "Kiedy następny patch?",
         "infoLabel": "Skąd to oszacowanie?",
         "infoBasis": "Podstawa: mediana {{median}} dni z n = {{n}} zmierzonych cykli.",
-        "over": "{{n}} d ponad",
+        "over": "{{n}} d ponad normę",
         "tile": {
           "live": "Live",
           "testing": "W testach",
@@ -3731,14 +3731,14 @@
       "hours": "{{n}} godz. temu",
       "yesterday": "wczoraj",
       "days": "{{n}} dni temu",
-      "week": "1 tydzień temu",
+      "week": "tydzień temu",
       "weeks": "{{n}} tyg. temu"
     },
     "upcomingShips": {
       "title": "Nadchodzące statki",
       "addedOne": "1 nowy statek w ship matrix",
       "addedMany": "Nowe statki w ship matrix: {{count}}",
-      "wishedUpdated": "Statki z twoich życzeń ze zmienionym statusem: {{count}}",
+      "wishedUpdated": "Statki z twojej listy życzeń ze zmienionym statusem: {{count}}",
       "more": "+{{count}} więcej",
       "open": "Otwórz nadchodzące statki",
       "dismiss": "Ukryj powiadomienie"
@@ -3928,8 +3928,8 @@
     "role": "Rola",
     "roles": {
       "admin": "Admin",
-      "collaborator": "Collaborator",
-      "viewer": "Viewer"
+      "collaborator": "Współpracownik",
+      "viewer": "Obserwator"
     },
     "username": "Nazwa użytkownika",
     "usernameUnset": "Nie ustawiono",
@@ -3991,7 +3991,7 @@
       "title": "Nazwa użytkownika",
       "label": "Nazwa użytkownika",
       "hint": "3–20 znaków: małe litery a–z, cyfry 0–9 i podkreślenie (_).",
-      "placeholder": "twój_callsign",
+      "placeholder": "twoj_callsign",
       "save": "Zapisz",
       "saving": "Zapisywanie…",
       "saved": "Nazwa użytkownika zapisana.",
@@ -4076,7 +4076,7 @@
     },
     "feedbackFab": {
       "title": "Przycisk opinii",
-      "hint": "Przycisk w rogu, przez który wysyłasz opinie i widzisz odpowiedzi zespołu.",
+      "hint": "Przycisk w rogu, przez który wysyłasz opinie i gdzie pojawiają się odpowiedzi zespołu.",
       "show": {
         "label": "Pokaż przycisk opinii",
         "descOn": "Przycisk opinii znajduje się w prawym dolnym rogu każdej strony.",
@@ -4084,16 +4084,16 @@
       },
       "staff": {
         "title": "Przyciski opinii i bety",
-        "hint": "Przyciski w rogu: wyślij opinię i zobacz odpowiedzi zespołu, nad nim przełącznik bety.",
+        "hint": "Przyciski w rogu: wysyłanie opinii i odpowiedzi zespołu, a nad nimi przełącznik bety.",
         "label": "Pokaż przyciski opinii i bety",
-        "audience": "(tylko dla adminów i collaboratorów)",
+        "audience": "(tylko dla adminów i współpracowników)",
         "descOn": "Przycisk opinii i przycisk bety znajdują się w prawym dolnym rogu każdej strony.",
         "descOff": "Przyciski opinii i bety są ukryte — razem z nimi nie zobaczysz też odpowiedzi ani pytań zespołu. Włącz je tutaj ponownie, aby otworzyć swoje opinie lub przełączniki bety."
       },
       "routineTint": {
         "label": "Tytuł opinii tylko zielony / czerwony",
         "audience": "(tylko dla adminów)",
-        "descOn": "Tytuł „Opinie” świeci na zielono, gdy rutyna działa lub pracuje, i na czerwono, gdy nic nie jest opracowywane. Dotyczy tylko twojego konta.",
+        "descOn": "Tytuł „Opinie” świeci na zielono, gdy rutyna jest aktywna lub pracuje, i na czerwono, gdy nic nie jest przetwarzane. Dotyczy tylko twojego konta.",
         "descOff": "Tytuł „Opinie” pokazuje cztery stany: zielony gotowy, niebieski w trakcie pracy, bursztynowy wstrzymany, czerwony niedostępny."
       }
     },
@@ -4774,7 +4774,7 @@
     "title": "Pobierz",
     "extension": {
       "title": "Rozszerzenie przeglądarki",
-      "text": "Importuje Twój hangar RSI do HQ - dla Chrome i Edge.",
+      "text": "Importuje twój hangar RSI do HQ — dla Chrome i Edge.",
       "open": "Zainstaluj rozszerzenie"
     },
     "subtitle": "Pobierz Verse Data Uploader dla swojej lokalnej instalacji Star Citizen."
@@ -4838,9 +4838,9 @@
     },
     "disclaimerTitle": "Informacja o stronie fanowskiej",
     "rsiLink": "Oficjalna strona Star Citizen: robertsspaceindustries.com",
-    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
+    "noticeOriginal": "To nieoficjalna strona fanowska Star Citizen, niepowiązana z grupą spółek Cloud Imperium. Wszelkie treści na tej stronie, których autorami nie są jej właściciel ani użytkownicy, są własnością ich prawowitych właścicieli.",
     "noticeOriginalLabel": "Oryginalne brzmienie",
-    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® and Cloud Imperium® are registered trademarks of Cloud Imperium Rights LLC"
+    "trademarksOriginal": "Star Citizen®, Roberts Space Industries® i Cloud Imperium® są zastrzeżonymi znakami towarowymi Cloud Imperium Rights LLC"
   },
   "legal": {
     "about": {
@@ -4975,7 +4975,7 @@
   },
   "hangar": {
     "title": "Mój hangar",
-    "subtitle": "Twoja osobista flota: konfiguracje statków, loadouty komponentów i zestawy ról — oparte na żywych danych gry z kodeksu.",
+    "subtitle": "Twoja osobista flota: konfiguracje statków, loadouty komponentów i zestawy ról — oparte na aktualnych danych gry z Codex.",
     "counts": {
       "owned": "W posiadaniu",
       "wishlist": "Życzenia"
@@ -4990,7 +4990,7 @@
     "manage": {
       "toggle": "Zarządzaj",
       "variants": "Warianty",
-      "noVariants": "Brak wariantów. Utwórz go na stronie statku w kodeksie.",
+      "noVariants": "Brak wariantów. Utwórz go na stronie statku w Codex.",
       "active": "Aktywny",
       "openVariant": "Zobacz wariant"
     },
@@ -5008,7 +5008,7 @@
     "fleet": {
       "title": "Flota",
       "emptyTitle": "Twój hangar jest pusty",
-      "emptyHint": "Wyszukaj powyżej, aby dodać pierwszy statek — albo przeglądaj kodeks i dodawaj statki stamtąd."
+      "emptyHint": "Wyszukaj powyżej, aby dodać pierwszy statek — albo przeglądaj Codex i dodawaj statki stamtąd."
     },
     "roles": {
       "fps": "FPS",
@@ -5027,7 +5027,7 @@
       "namePlaceholder": "Nazwa zestawu…",
       "create": "Utwórz",
       "empty": "Brak zestawów ról — utwórz powyżej zestaw FPS, górniczy lub odzysku.",
-      "itemCount": "{{count}} wyposażonych przedmiotów",
+      "itemCount": "Wyposażone przedmioty: {{count}}",
       "rename": "Zmień nazwę",
       "cancel": "Anuluj",
       "share": "Udostępnij",
@@ -5039,7 +5039,7 @@
       "save": "Zapisz",
       "rename": "Zmień nazwę",
       "pinLabel": "Przypnij",
-      "openCodex": "Wpis w kodeksie",
+      "openCodex": "Wpis w Codex",
       "remove": "Usuń",
       "notes": "Notatki",
       "notesPlaceholder": "Notatki o tym statku…",
@@ -5068,7 +5068,7 @@
     "standard": {
       "title": "Komponenty standardowe",
       "subtitle": "Fabryczny zestaw tego statku z danych gry LIVE (P4K) — komponenty, z którymi statek jest domyślnie dostarczany.",
-      "count": "{{count}} komponentów",
+      "count": "Komponenty: {{count}}",
       "empty": "Dla tego statku w bieżącej wersji katalogu nie zapisano komponentów standardowych."
     },
     "stats": {
@@ -5116,12 +5116,12 @@
         "title": "Porównaj",
         "text": "Przypinaj statki i komponenty obok siebie i porównuj liczby, które się liczą."
       },
-      "cta": "Zaloguj się i otwórz hangar"
+      "cta": "Zaloguj się, aby otworzyć hangar"
     },
     "import": {
       "open": "Importuj…",
       "title": "Import z pliku eksportu",
-      "hint": "Upuść tutaj eksport JSON w formacie Hangar Transfer Format (np. z rozszerzenia przeglądarki HangarXPLOR — eksport wykonujesz sam, nigdy nie prosimy o dane logowania do RSI). Wpisy są dopasowywane do kodeksu i dodawane są tylko te wiersze, które potwierdzisz.",
+      "hint": "Upuść tutaj eksport JSON w formacie Hangar Transfer Format (np. z rozszerzenia przeglądarki HangarXPLOR — eksport wykonujesz sam, nigdy nie prosimy o dane logowania do RSI). Wpisy są dopasowywane do Codex i dodawane są tylko te wiersze, które potwierdzisz.",
       "pickFile": "Wybierz plik",
       "parsing": "Wczytywanie…",
       "dropHint": "lub upuść tutaj plik .json",
@@ -5130,7 +5130,7 @@
       "matched": "Dopasowano {{matched}} z {{total}} wpisów do katalogu",
       "chooseOther": "Wybierz inny plik",
       "exact": "Dopasowanie",
-      "fuzzy": "Najlepsze przypuszczenie: {{name}}",
+      "fuzzy": "Najbardziej prawdopodobne: {{name}}",
       "noMatch": "Brak dopasowania w katalogu",
       "confirm": "Importuj statki: {{count}}",
       "importing": "Importowanie…",
@@ -5161,7 +5161,7 @@
     "shared": {
       "eyebrow": "Udostępniony loadout",
       "loading": "Ładowanie …",
-      "by": "od {{name}}",
+      "by": "autor: {{name}}",
       "emptyLoadout": "W tym loadoucie nic jeszcze nie ustawiono.",
       "adopt": "Utwórz kopię",
       "adopting": "Tworzenie kopii …",
@@ -5784,7 +5784,7 @@
   "consent": {
     "banner": {
       "title": "Pamięć przeglądarki",
-      "text": "Ta aplikacja nie ustawia plików cookie. Przechowuje w tej przeglądarce twoją sesję logowania i język (wymagane) oraz — tylko jeśli na to pozwolisz — ustawienia wygody, takie jak filtry newsów i twoje kolekcje, a także anonimowe statystyki użycia. Możesz to zmienić w każdej chwili w Ustawieniach.",
+      "text": "Ta aplikacja nie ustawia plików cookie. Przechowuje w tej przeglądarce twoją sesję logowania i język (wymagane) oraz — tylko jeśli na to pozwolisz — ustawienia ułatwiające korzystanie, takie jak filtry newsów i twoje kolekcje, a także anonimowe statystyki użycia. Możesz to zmienić w każdej chwili w Ustawieniach.",
       "acceptAll": "Zezwól na wszystko",
       "essentialOnly": "Tylko niezbędne"
     },
@@ -5800,7 +5800,7 @@
       },
       "preferences": {
         "label": "Preferencje",
-        "desc": "Filtr kanałów newsów, kolekcje i podobne ustawienia wygody. Wyłączenie usuwa zapisane wartości."
+        "desc": "Filtr kanałów newsów, kolekcje i podobne ustawienia ułatwiające korzystanie. Wyłączenie usuwa zapisane wartości."
       },
       "statistics": {
         "label": "Statystyki",
@@ -5975,7 +5975,7 @@
       "today": "· ostatnio widziana dziś"
     },
     "fallback": "Pobierz (najnowsza)",
-    "prerelease": "To zawsze jest wersja stabilna. Beta i alfa wybierasz w aplikacji po zalogowaniu się kontem Verse Companion — dostępne kanały zależą od Twojej roli."
+    "prerelease": "To zawsze jest wersja stabilna. Betę i alfę wybierasz w aplikacji po zalogowaniu się kontem Verse Companion — dostępne kanały zależą od twojej roli."
   },
   "appPanel": {
     "version": "Aktualnie opublikowana wersja",
@@ -6188,7 +6188,7 @@
     "guessUnavailable": "Dla tego patcha nie ma mapy gwiazd do rozpoznania.",
     "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
     "forbidden": "Nie masz do tego uprawnień.",
-    "notFound": "To nie istnieje (już).",
+    "notFound": "To już nie istnieje (lub nigdy nie istniało).",
     "rateLimit": "Zbyt wiele żądań — poczekaj chwilę.",
     "server": "Serwer zgłosił błąd.",
     "generic": "Coś poszło nie tak.",
@@ -7628,10 +7628,10 @@
           "weeksOne": "{{line}} do wydania za ~1 tydzień"
         },
         "overdue": {
-          "days": "{{line}} spóźniony od {{n}} dni",
-          "daysOne": "{{line}} spóźniony od 1 dnia",
-          "weeks": "{{line}} spóźniony od ~{{n}} tygodni",
-          "weeksOne": "{{line}} spóźniony od ~1 tygodnia"
+          "days": "{{line}} spóźniony o {{n}} dni",
+          "daysOne": "{{line}} spóźniony o 1 dzień",
+          "weeks": "{{line}} spóźniony o ~{{n}} tygodni",
+          "weeksOne": "{{line}} spóźniony o ~1 tydzień"
         }
       },
       "ctaWhere": {
@@ -7649,7 +7649,7 @@
       "total": "łącznie {{n}}",
       "news": {
         "title": "Verse News",
-        "topic": "News",
+        "topic": "Newsy",
         "hook": "Co CIG ujawniło w tym tygodniu",
         "stat": "{{n}} w tym tygodniu",
         "teaser": "Odpowiedzi deweloperów, filmy i Comm-Linki w jednym miejscu"
@@ -7659,19 +7659,19 @@
         "topic": "Patche",
         "hook": "Kiedy pojawi się {{next}} i co zmienia",
         "hookNoLine": "Kiedy pojawi się następny patch i co zmienia",
-        "stat": "{{n}} nowych notatek",
+        "stat": "Nowe notatki: {{n}}",
         "teaser": "Kiedy pojawi się następny patch i co zmienia"
       },
       "gallery": {
         "title": "Galeria",
         "topic": "Galeria",
         "hook": "Które zostanie Twoim nowym pulpitem?",
-        "stat": "{{n}} nowe tapety",
+        "stat": "Nowe tapety: {{n}}",
         "teaser": "Przeglądaj, udostępniaj tapety Starscape i głosuj na nie"
       }
     },
     "patches": {
-      "sub": "Stan patchy, fakty i twój pre-flight",
+      "sub": "Stan patchy, fakty i Twój pre-flight",
       "kpi": {
         "lines": {
           "label": "linii patchy w archiwum",
@@ -7700,7 +7700,7 @@
         "progress": "Ukończono {{done}} z {{total}}",
         "step": {
           "notes": "Patch notes przeczytane",
-          "keybinds": "Przypisanie klawiszy sprawdzone",
+          "keybinds": "Przypisania klawiszy sprawdzone",
           "loadout": "Loadout sprawdzony",
           "shaders": "Pamięć podręczna shaderów wyczyszczona"
         }
@@ -7711,14 +7711,14 @@
         "label": "Twój typ na dzień LIVE",
         "submit": "Oddaj typ",
         "yours": "Twój typ: {{date}}",
-        "median": "Mediana społeczności: {{date}} ({{n}} typów)",
+        "median": "Mediana społeczności: {{date}} (typy: {{n}})",
         "heading": "Typ patcha",
         "crowd": "Jak typuje społeczność",
         "cta": "Oddaj swój typ",
         "mine": "twój typ: {{date}}",
-        "count": "{{n}} typów",
+        "count": "Typy: {{n}}",
         "release": "Premiera: {{date}}",
-        "stripAria": "Mediana społeczności {{date}}, {{n}} typów",
+        "stripAria": "Mediana społeczności {{date}}, typy: {{n}}",
         "you": "twój typ",
         "medianShort": "Mediana {{date}}",
         "yourShort": "twój typ {{date}}",
@@ -7726,25 +7726,25 @@
       }
     },
     "gallery": {
-      "connected": "Starscape połączone",
+      "connected": "Połączono ze Starscape",
       "share": "Udostępnij galerię",
-      "heroTitle": "Starscape przenosi galerię na twój pulpit",
-      "heroBody": "Aplikacja desktopowa automatycznie zmienia twoją tapetę z galerii i pokazuje zdobyte mapy gwiazd."
+      "heroTitle": "Starscape przenosi galerię na Twój pulpit",
+      "heroBody": "Aplikacja desktopowa automatycznie zmienia Twoją tapetę na kolejne z galerii i pokazuje zdobyte mapy gwiazd."
     },
     "hub": {
       "brand": "Verse Companion",
       "search": "Szukaj …",
       "searchKey": "Ctrl K",
       "more": "Więcej w Verse",
-      "prev": "Poprzednia wiadomość",
-      "next": "Następna wiadomość",
+      "prev": "Poprzednia historia",
+      "next": "Następna historia",
       "area": {
         "news": "Newsy",
         "patch": "Patche",
         "gallery": "Galeria",
         "link": "Verse"
       },
-      "sun": "Status patcha",
+      "sun": "Stan patcha",
       "sunValue": "LIVE {{v}} ·",
       "sunValueNoScore": "LIVE {{v}}",
       "hq": "HQ",
@@ -7752,14 +7752,14 @@
       "hqEventOne": "{{name}} trwa · jeszcze 1 dzień",
       "hqEventToday": "{{name}} trwa · kończy się dziś",
       "hqEventOpen": "{{name}} trwa",
-      "hqSupplies": "{{n}} otwartych operacji",
+      "hqSupplies": "Otwarte operacje: {{n}}",
       "hqSuppliesOne": "1 otwarta operacja",
       "hqCalm": "W HQ spokojnie",
       "admin": "Stacja admina",
       "adminValue": "Prosto do centrum admina",
       "adminHint": "widoczne tylko dla adminów",
-      "newsEmpty": "Obecnie brak newsów.",
-      "patchesEmpty": "Brak patch notes.",
+      "newsEmpty": "Obecnie brak wiadomości.",
+      "patchesEmpty": "Brak jeszcze informacji o aktualizacjach.",
       "patchTitle": "Star Citizen Alpha {{v}}",
       "liveSince": "od {{n}} dni",
       "liveSinceOne": "od 1 dnia",
@@ -8363,7 +8363,7 @@
     "aria": "Pobierz aplikacje",
     "scc": {
       "name": "Aplikacja Verse Companion",
-      "desc": "Twój towarzysz obok gry: informacje na żywo, nakładki i przypisanie klawiszy, bez Alt-Tab."
+      "desc": "Twój towarzysz obok gry: informacje na żywo, nakładki i przypisania klawiszy, bez Alt-Tab."
     },
     "starscape": {
       "name": "Starscape",
@@ -8386,7 +8386,7 @@
     },
     "starscape": {
       "line": "Starscape jako aplikacja z tapetami",
-      "desc": "Zmienia twoją tapetę, przechodząc przez galerię Starscape."
+      "desc": "Zmienia tapetę, korzystając z galerii Starscape."
     }
   },
   "apps": {
@@ -9081,27 +9081,27 @@
   },
   "quick": {
     "toNachschub": "Do Operacji: {{name}}",
-    "wish": "Е»yczenia",
-    "allWish": "Wszystkie Ејyczenia",
-    "allWishCount": "Е»yczeс„: {{n}}",
-    "allWishCountOne": "1 Ејyczenie",
+    "wish": "Życzenia",
+    "allWish": "Wszystkie życzenia",
+    "allWishCount": "Życzeń: {{n}}",
+    "allWishCountOne": "1 życzenie",
     "section": {
       "inventar": "Ekwipunek",
       "hangar": "Hangar",
       "sammlung": "Kolekcje"
     },
     "all": {
-      "inventar": "CaЕ‚y ekwipunek",
-      "hangar": "CaЕ‚y hangar",
-      "sammlung": "CaЕ‚a kolekcja"
+      "inventar": "Cały ekwipunek",
+      "hangar": "Cały hangar",
+      "sammlung": "Cała kolekcja"
     },
     "type": {
-      "ship": "OkrД™ty",
-      "weapon": "BroЕ„",
+      "ship": "Statki",
+      "weapon": "Broń",
       "component": "Komponenty",
       "item": "Przedmioty",
       "blueprint": "Schematy",
-      "news": "AktualnoЕ›ci"
+      "news": "Aktualności"
     }
   },
   "wishRemoval": {
@@ -9372,7 +9372,7 @@
   },
   "pwa": {
     "card": {
-      "title": "Verse Companion jako aplikacja",
+      "title": "Pobierz aplikację",
       "benefit": "Pełny ekran, szybszy start, prosto z ekranu głównego.",
       "install": "Zainstaluj",
       "later": "Później"

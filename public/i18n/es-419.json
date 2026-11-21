@@ -119,7 +119,7 @@
       "title": "Establece tu contraseña",
       "inviteTitle": "Bienvenido a bordo",
       "checking": "Un momento…",
-      "lead": "Establece aquí tu nueva contraseña. Desde entonces iniciarás sesión con tu correo electrónico y esta contraseña.",
+      "lead": "Establece aquí tu nueva contraseña. A partir de ese momento iniciarás sesión con tu correo electrónico y esta contraseña.",
       "inviteLead": "Tu solicitud fue aceptada y tu acceso ya está activo. Todavía no tienes contraseña: elige una ahora y podrás volver a entrar cuando quieras.",
       "newPassword": "Contraseña nueva",
       "repeatPassword": "Repite la contraseña",
@@ -149,7 +149,7 @@
     },
     "landing": {
       "appName": "Verse Companion",
-      "join": "Join the Club.",
+      "join": "Únete al club.",
       "pitch": "Companion es un círculo privado: el acceso es solo por invitación. ¿Ya vuelas en el verse y quieres entrar? Postúlate y un admin le echará un vistazo.",
       "perks": {
         "hangar": "Tu hangar con loadouts y roles en un solo lugar",
@@ -172,7 +172,7 @@
       "handle": "Handle de RSI (opcional)",
       "handlePlaceholder": "p. ej., CitizenKane",
       "message": "Mensaje (opcional)",
-      "messagePlaceholder": "¿Cómo nos conoces, qué vuelas?",
+      "messagePlaceholder": "¿Cómo nos conociste y qué naves vuelas?",
       "send": "Enviar solicitud",
       "sending": "Enviando…",
       "sent": "¡Gracias! Tu solicitud llegó. Si un admin la acepta, recibirás un correo de invitación en esta dirección.",
@@ -205,14 +205,14 @@
     "badge": "Insignia de Cartógrafo",
     "accountMenu": "Menú de la cuenta",
     "profilePicture": "Foto de perfil (menú de la cuenta)",
-    "adminOnly": "Solo admin",
+    "adminOnly": "Solo admins",
     "adminMenu": "Admin",
     "telemetry": "Telemetría",
     "starscape": "Starscape",
     "viewAs": {
       "title": "Ver como",
       "collaborator": "Colaborador",
-      "viewer": "Viewer",
+      "viewer": "Espectador",
       "anon": "Visitante sin sesión",
       "exit": "Volver a mi rol",
       "restricted": "Solo admin y colaborador"
@@ -3347,7 +3347,7 @@
   "news": {
     "loading": "Cargando…",
     "empty": "Aún no hay noticias.",
-    "emptyFavorites": "Aún no has guardado nada – guarda una publicación con el ícono de guardar y aparecerá aquí.",
+    "emptyFavorites": "Aún no has guardado nada: guarda una publicación con el ícono de guardar y aparecerá aquí.",
     "errorTitle": "No se pudieron cargar las noticias",
     "lastUpdated": "Actualizado {{rel}}",
     "refreshing": "Actualizando…",
@@ -3426,7 +3426,7 @@
       "kpi": {
         "title": "Rendimiento de parches",
         "sub": "Último frente a la mediana histórica",
-        "samplesLabel": "Base",
+        "samplesLabel": "Basado en",
         "samples": "{{n}} mediciones",
         "goto": "Mostrar {{title}}",
         "pause": "Pausar rotación",
@@ -3459,7 +3459,7 @@
           "aria": "Rango de tiempo de los gráficos",
           "6m": "6 meses",
           "all": "Todo el tiempo",
-          "empty": "No hay datos en este rango — cambia a «Todo el tiempo»."
+          "empty": "No hay datos en este rango; cambia a «Todo el tiempo»."
         }
       },
       "ptuRelease": {
@@ -3515,7 +3515,7 @@
         "uncategorized": "Sin categoría",
         "noDetail": "RSI no publicó una descripción para esta entrada.",
         "status": {
-          "released": "Entregado",
+          "released": "Publicado",
           "committed": "Comprometido",
           "tentative": "Provisional",
           "unknown": "Abierto"
@@ -3552,7 +3552,7 @@
           "empty": "No hay tickets en las respuestas principales."
         },
         "meter": {
-          "early": "muy pronto"
+          "early": "demasiado pronto"
         }
       },
       "status": {
@@ -3579,8 +3579,8 @@
         "nextLive": "próximo parche Live {{when}} (estimación)",
         "notes": "{{n}} notas",
         "planned": "{{n}} elementos del roadmap",
-        "openDossier": "Abrir el dossier de {{name}}",
-        "openItem": "Abrir {{name}} en el dossier",
+        "openDossier": "Abrir el expediente de {{name}}",
+        "openItem": "Abrir {{name}} en el expediente",
         "moreItems": "Ver {{n}} elementos más del roadmap",
         "older": "Parches anteriores · {{lines}}",
         "olderHide": "Contraer parches anteriores"
@@ -3662,17 +3662,17 @@
           "leadTime": "Prueba → Live: {{days}} días",
           "cadence": "Live → Live: {{days}} días"
         },
-        "charts": "Gráficos de detalle (PTU → Live · ritmo · subparches · fechas)",
+        "charts": "Gráficos de detalle (PTU → Live · cadencia · subparches · fechas)",
         "status": {
           "live": "Alpha {{line}} lleva {{days}} días en Live — lo habitual son {{median}} días hasta el siguiente.",
           "testing": "Alpha {{line}} lleva {{days}} días en pruebas — lo habitual son {{median}} días hasta Live.",
-          "onTrack": "CIG va en ritmo.",
+          "onTrack": "CIG va al ritmo.",
           "over": "CIG lleva {{n}} días de retraso sobre el ritmo habitual."
         },
         "legend": {
           "real": "ciclo Live (comprobado)",
           "usual": "ritmo habitual (mediana)",
-          "over": "pasado del ritmo",
+          "over": "fuera del ritmo",
           "lead": "fase de pruebas (PTU)"
         },
         "fact": {
@@ -3681,8 +3681,8 @@
           "usual": "habitual {{median}} d (n = {{n}})",
           "later": "{{n}} d más tarde de lo habitual",
           "earlier": "{{n}} d antes de lo habitual",
-          "onTrack": "en ritmo",
-          "hotfix": "{{n}} hotfix desde Live",
+          "onTrack": "al ritmo",
+          "hotfix": "{{n}} hotfix(es) desde Live",
           "hotfixLast": "el último el {{date}}"
         },
         "infoLabel": "¿De dónde salen estos números?"
@@ -3695,7 +3695,7 @@
         "tile": {
           "live": "Live",
           "testing": "En pruebas",
-          "cadence": "Ritmo",
+          "cadence": "Cadencia",
           "hotfixNone": "sin hotfixes",
           "cadenceStateFoot": "{{days}} de ~{{median}} d · mediana · n = {{n}}",
           "next": "Siguiente",
@@ -3711,7 +3711,7 @@
         "groupCount": "{{roadmap}} entradas del roadmap · {{notes}} puntos",
         "moreInDossier": "{{n}} resultados más en el dossier",
         "loadRest": "Cargar y buscar en las {{n}} notas restantes",
-        "loading": "Cargando notas …"
+        "loading": "Cargando notas…"
       },
       "timeline": {
         "versionsOf": "Versiones de {{line}}",
@@ -3726,7 +3726,7 @@
     },
     "openExternal": "Abre {{host}}",
     "relative": {
-      "now": "justo ahora",
+      "now": "hace un momento",
       "minutes": "hace {{n}} min",
       "hours": "hace {{n}} h",
       "yesterday": "ayer",
@@ -3748,10 +3748,10 @@
       "watch": "Ver"
     },
     "stream": {
-      "title": "News Feed",
+      "title": "Feed de noticias",
       "more": "Mostrar {{count}} más",
       "all": "Publicaciones",
-      "filterAria": "Filtrar el news feed",
+      "filterAria": "Filtrar el feed de noticias",
       "onStage": "En escena",
       "noMatch": "Ninguna publicación coincide con esta búsqueda.",
       "sourceFacet": "Fuente"
@@ -3928,8 +3928,8 @@
     "role": "Rol",
     "roles": {
       "admin": "Admin",
-      "collaborator": "Collaborator",
-      "viewer": "Viewer"
+      "collaborator": "Colaborador",
+      "viewer": "Lector"
     },
     "username": "Nombre de usuario",
     "usernameUnset": "Sin definir",
@@ -3991,7 +3991,7 @@
       "title": "Nombre de usuario",
       "label": "Nombre de usuario",
       "hint": "De 3 a 20 caracteres: letras minúsculas a–z, dígitos 0–9 y guion bajo (_).",
-      "placeholder": "tu_callsign",
+      "placeholder": "tu_alias",
       "save": "Guardar",
       "saving": "Guardando…",
       "saved": "Nombre de usuario guardado.",
@@ -4086,7 +4086,7 @@
         "title": "Botones de feedback y beta",
         "hint": "Los botones de la esquina: enviar feedback y ver las respuestas del equipo, con el interruptor beta encima.",
         "label": "Mostrar los botones de feedback y beta",
-        "audience": "(solo para admins y collaborators)",
+        "audience": "(solo para admins y colaboradores)",
         "descOn": "Los botones de feedback y beta están en la esquina inferior derecha de cada página.",
         "descOff": "Los botones de feedback y beta están ocultos; con ellos tampoco verás las respuestas ni las preguntas del equipo. Vuelve a activarlos aquí para abrir tu feedback o los interruptores beta."
       },
@@ -4823,10 +4823,10 @@
   "footer": {
     "madeByCommunity": "Made by the Community",
     "badgeAlt": "Star Citizen — Made By The Community",
-    "disclaimer": "Este es un sitio de fans no oficial de Star Citizen, sin afiliación con el grupo de empresas Cloud Imperium. Todo el contenido de este sitio que no haya sido creado por su anfitrión o sus usuarios es propiedad de sus respectivos dueños.",
+    "disclaimer": "Este es un sitio de fans no oficial de Star Citizen, sin afiliación con el grupo de empresas Cloud Imperium. Todo el contenido de este sitio que no haya sido creado por sus responsables o sus usuarios es propiedad de sus respectivos dueños.",
     "trademarks": "Star Citizen®, Roberts Space Industries® y Cloud Imperium® son marcas registradas de Cloud Imperium Rights LLC",
-    "disclaimerExpand": "Mostrar el aviso legal completo",
-    "disclaimerCollapse": "Contraer el aviso legal",
+    "disclaimerExpand": "Mostrar el descargo de responsabilidad completo",
+    "disclaimerCollapse": "Contraer el descargo de responsabilidad",
     "legalNav": "Información legal y del proyecto",
     "areaNav": "Cambiar de área",
     "links": {
@@ -4981,7 +4981,7 @@
       "wishlist": "Deseos"
     },
     "flagship": {
-      "set": "Establecer como insignia",
+      "set": "Establecer como nave insignia",
       "unset": "Quitar insignia",
       "pinned": "Insignia",
       "badge": "Tu nave insignia",
@@ -5039,7 +5039,7 @@
       "save": "Guardar",
       "rename": "Renombrar",
       "pinLabel": "Fijar",
-      "openCodex": "Entrada del códice",
+      "openCodex": "Entrada del Codex",
       "remove": "Quitar",
       "notes": "Notas",
       "notesPlaceholder": "Notas sobre esta nave…",
@@ -5052,7 +5052,7 @@
     },
     "configs": {
       "title": "Configuraciones",
-      "namePlaceholder": "p. ej., build PvP…",
+      "namePlaceholder": "p. ej., configuración PvP…",
       "create": "Crear",
       "empty": "Aún no hay configuraciones: ponle un nombre y elige un rol para empezar a personalizar el loadout.",
       "activate": "Establecer como activa",
@@ -5091,7 +5091,7 @@
       "noPorts": "No hay datos de hardpoints disponibles para esta nave.",
       "empty": "vacío",
       "change": "Cambiar",
-      "reset": "Stock",
+      "reset": "De fábrica",
       "createConfigFirst": "Crea una configuración arriba para empezar a editar el loadout."
     },
     "picker": {
@@ -5121,7 +5121,7 @@
     "import": {
       "open": "Importar…",
       "title": "Importar desde archivo de exportación",
-      "hint": "Suelta aquí una exportación JSON en Hangar Transfer Format (p. ej., de la extensión de navegador HangarXPLOR: tú mismo haces la exportación y nunca te pedimos credenciales de RSI). Las entradas se comparan con el códice y solo se agregan las filas que confirmes.",
+      "hint": "Suelta aquí una exportación JSON en Hangar Transfer Format (p. ej., de la extensión de navegador HangarXPLOR: tú mismo haces la exportación y nunca te pedimos credenciales de RSI). Las entradas se comparan con el Codex y solo se agregan las filas que confirmes.",
       "pickFile": "Elegir archivo",
       "parsing": "Leyendo…",
       "dropHint": "o suelta aquí el archivo .json",
@@ -5796,7 +5796,7 @@
       "off": "Desactivado",
       "essential": {
         "label": "Esencial",
-        "desc": "Sesión de inicio de sesión, idioma y esta decisión de consentimiento. Necesario para que la app funcione; no se puede desactivar."
+        "desc": "Sesión iniciada, idioma y esta decisión de consentimiento. Necesario para que la app funcione; no se puede desactivar."
       },
       "preferences": {
         "label": "Preferencias",
@@ -5974,7 +5974,7 @@
       "since": "· visto por última vez hace {{days}} días",
       "today": "· visto por última vez hoy"
     },
-    "fallback": "Descargar (última)",
+    "fallback": "Descargar (última versión)",
     "prerelease": "Esta es siempre la versión estable. Beta y alfa se eligen dentro de la app una vez que inicies sesión con tu cuenta de Verse Companion; los canales disponibles dependen de tu rol."
   },
   "appPanel": {
@@ -6180,10 +6180,10 @@
     "offline": "Parece que no tienes conexión. Reintenta cuando se restablezca.",
     "network": "No se puede acceder al servidor en este momento.",
     "timeout": "Esto tardó demasiado.",
-    "cometLocked": "Ya se anunció la fecha oficial de LIVE: las apuestas están cerradas.",
-    "cometTipped": "Ya apostaste por este parche.",
+    "cometLocked": "Ya se anunció la fecha oficial de LIVE: los pronósticos están cerrados.",
+    "cometTipped": "Ya hiciste tu pronóstico para este parche.",
     "cometDatePast": "Esa fecha ya pasó.",
-    "guessMade": "Ya adivinaste este mapa estelar: solo hay un intento.",
+    "guessMade": "Ya intentaste adivinar este mapa estelar: solo hay un intento.",
     "guessInvalid": "Esa opción no pertenece a este mapa estelar.",
     "guessUnavailable": "No hay ningún mapa estelar que reconocer para este parche.",
     "sessionExpired": "Tu sesión expiró. Inicia sesión de nuevo.",
@@ -7556,7 +7556,7 @@
     "toast": {
       "lit": "Estrella encendida: {{task}}",
       "count": "{{lit}} de {{total}}",
-      "remaining": "faltan {{n}} para el fondo de pantalla 4K",
+      "remaining": "Faltan {{n}} para el fondo de pantalla 4K",
       "close": "Cerrar",
       "genericTask": "Nueva estrella",
       "unlock": {
@@ -7581,7 +7581,7 @@
       "starmap": "Mapa estelar"
     },
     "kind": {
-      "news": "Noticia",
+      "news": "Noticias",
       "patch": "Parche",
       "gallery": "Galería",
       "link": "Enlace"
@@ -7590,7 +7590,7 @@
       "aria": "Estado del parche: {{line}}",
       "live": "Live",
       "ptu": "PTU {{line}}",
-      "since": "en live hace {{n}} d",
+      "since": "en live desde hace {{n}} d",
       "next": "próximo ~ en {{n}} d",
       "overdue": "próximo con {{n}} d de retraso"
     },
@@ -7666,8 +7666,8 @@
         "title": "Galería",
         "topic": "Galería",
         "hook": "¿Cuál será tu nuevo escritorio?",
-        "stat": "{{n}} nuevos wallpapers",
-        "teaser": "Explora, comparte y vota wallpapers de Starscape"
+        "stat": "{{n}} wallpapers nuevos",
+        "teaser": "Explora, comparte y vota por wallpapers de Starscape"
       }
     },
     "patches": {
@@ -7729,15 +7729,15 @@
       "connected": "Starscape conectado",
       "share": "Compartir galería",
       "heroTitle": "Starscape lleva la galería a tu escritorio",
-      "heroBody": "La app de escritorio cambia tu wallpaper automáticamente por la galería y muestra los mapas estelares que has ganado."
+      "heroBody": "La app de escritorio va rotando tu wallpaper con imágenes de la galería y muestra los mapas estelares que has ganado."
     },
     "hub": {
       "brand": "Verse Companion",
       "search": "Buscar …",
       "searchKey": "Ctrl K",
       "more": "Más del Verse",
-      "prev": "Noticia anterior",
-      "next": "Noticia siguiente",
+      "prev": "Historia anterior",
+      "next": "Historia siguiente",
       "area": {
         "news": "Noticias",
         "patch": "Parches",
@@ -9372,19 +9372,19 @@
   },
   "pwa": {
     "card": {
-      "title": "Verse Companion como app",
+      "title": "Obtén la app",
       "benefit": "Pantalla completa, inicio más rápido, directo desde tu pantalla de inicio.",
       "install": "Instalar",
       "later": "Más tarde"
     },
     "menu": "Instalar app",
     "ios": {
-      "title": "Añadir a pantalla de inicio",
+      "title": "Agregar a pantalla de inicio",
       "step1Iphone": "Toca Compartir en la parte inferior de Safari.",
       "step1Ipad": "Toca Compartir en la parte superior derecha de Safari.",
-      "step2": "Elige «Añadir a pantalla de inicio».",
-      "step3": "Toca «Añadir» en la parte superior derecha.",
-      "addLabel": "Añadir",
+      "step2": "Elige “Agregar a pantalla de inicio”.",
+      "step3": "Toca “Agregar” en la parte superior derecha.",
+      "addLabel": "Agregar",
       "done": "Entendido"
     }
   }

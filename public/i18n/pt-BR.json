@@ -149,7 +149,7 @@
     },
     "landing": {
       "appName": "Verse Companion",
-      "join": "Join the Club.",
+      "join": "Entre para o clube.",
       "pitch": "O Companion é um círculo privado — o acesso é somente por convite. Já voa no verse e quer entrar? Candidate-se e um admin vai dar uma olhada.",
       "perks": {
         "hangar": "Seu hangar com loadouts e funções em um só lugar",
@@ -213,12 +213,12 @@
       "title": "Ver como",
       "collaborator": "Colaborador",
       "viewer": "Visualizador",
-      "anon": "Visitante desconectado",
+      "anon": "Visitante sem login",
       "exit": "Voltar à minha função",
       "restricted": "Somente admin e colaborador"
     },
     "loading": {
-      "weak": "Sinal fraco · sintonizando de novo"
+      "weak": "Sinal fraco · ressintonizando"
     },
     "loadFailed": {
       "message": "Não foi possível carregar esta página — seu navegador provavelmente ainda está rodando uma versão antiga do app.",
@@ -3368,7 +3368,7 @@
       "checkExternal": "Página de status da RSI ↗"
     },
     "channels": {
-      "all": "Tudo",
+      "all": "Todos",
       "comm-link": "Comm-Link",
       "spectrum": "Spectrum",
       "youtube": "YouTube",
@@ -3387,7 +3387,7 @@
       "estimated": "data estimada",
       "error": "Não foi possível carregar os eventos.",
       "kind": {
-        "expo": "Feira",
+        "expo": "Expo",
         "showcase": "Showcase",
         "seasonal": "Festival",
         "community": "Evento da comunidade",
@@ -3426,7 +3426,7 @@
       "kpi": {
         "title": "Desempenho dos patches",
         "sub": "Mais recente em comparação com a mediana de todos os tempos",
-        "samplesLabel": "Base",
+        "samplesLabel": "Com base em",
         "samples": "{{n}} medições",
         "goto": "Mostrar {{title}}",
         "pause": "Pausar rotação",
@@ -3490,13 +3490,13 @@
         "today": "previsto para hoje",
         "inDays": "em ~{{n}} dias",
         "inWeeks": "em ~{{n}} semanas",
-        "overdueDays": "atrasado {{n}} d",
-        "overdueWeeks": "atrasado {{n}} sem.",
+        "overdueDays": "{{n}} d de atraso",
+        "overdueWeeks": "{{n}} sem. de atraso",
         "basis": "Mediana {{median}} d · a partir da {{version}}"
       },
       "board": {
         "title": "Central de Patches",
-        "sub": "Futuro no topo, agora no meio, passado embaixo — um patch abre seu dossiê",
+        "sub": "Futuro no topo, agora no meio, passado embaixo — clique em um patch para abrir o dossiê",
         "back": "Voltar para Verse News"
       },
       "waves": {
@@ -3515,7 +3515,7 @@
         "uncategorized": "Sem categoria",
         "noDetail": "A RSI não publicou descrição para esta entrada.",
         "status": {
-          "released": "Entregue",
+          "released": "Lançado",
           "committed": "Confirmado",
           "tentative": "Provisório",
           "unknown": "Aberto"
@@ -3569,7 +3569,7 @@
         "replaced": "em {{date}}",
         "liveSince": "Live desde {{date}}",
         "liveSpan": "Live {{from}} – {{to}}",
-        "neverLive": "Nunca foi para o ar",
+        "neverLive": "Nunca chegou ao Live",
         "ptuExpected": "PTU esperado {{when}}",
         "noBuild": "Ainda sem build",
         "plannedFor": "Planejado para {{quarter}}",
@@ -3667,12 +3667,12 @@
           "live": "O Alpha {{line}} está no Live há {{days}} dias — o usual são {{median}} dias até o próximo.",
           "testing": "O Alpha {{line}} está em teste há {{days}} dias — o usual são {{median}} dias até o Live.",
           "onTrack": "A CIG está no ritmo.",
-          "over": "A CIG está {{n}} dias acima do ritmo usual."
+          "over": "A CIG está {{n}} dias além do ritmo usual."
         },
         "legend": {
           "real": "ciclo Live (comprovado)",
           "usual": "ritmo usual (mediana)",
-          "over": "acima do ritmo",
+          "over": "além do ritmo",
           "lead": "fase de testes (PTU)"
         },
         "fact": {
@@ -3691,7 +3691,7 @@
         "title": "Quando sai o próximo patch?",
         "infoLabel": "De onde vem esta estimativa?",
         "infoBasis": "Base: mediana de {{median}} dias de n = {{n}} ciclos medidos.",
-        "over": "{{n}} d acima",
+        "over": "{{n}} d além",
         "tile": {
           "live": "Live",
           "testing": "Em teste",
@@ -3711,7 +3711,7 @@
         "groupCount": "{{roadmap}} entradas do roadmap · {{notes}} tópicos",
         "moreInDossier": "Mais {{n}} resultados no dossiê",
         "loadRest": "Carregar e pesquisar as {{n}} notas restantes",
-        "loading": "Carregando notas …"
+        "loading": "Carregando notas…"
       },
       "timeline": {
         "versionsOf": "Versões de {{line}}",
@@ -3739,7 +3739,7 @@
       "addedOne": "1 nova nave na ship matrix",
       "addedMany": "{{count}} novas naves na ship matrix",
       "wishedUpdated": "{{count}} naves da sua lista de desejos mudaram de status",
-      "more": "+{{count}} mais",
+      "more": "+{{count}} outras",
       "open": "Abrir naves em breve",
       "dismiss": "Dispensar aviso"
     },
@@ -3758,12 +3758,12 @@
     },
     "verdict": {
       "label": "Ao vivo no Verse",
-      "liveOnly": "{{line}} está no ar",
-      "due": "{{line}} está no ar · próximo patch principal em {{days}} dias",
-      "dueWeeks": "{{line}} está no ar · próximo patch principal em ~{{weeks}} semanas",
-      "today": "{{line}} está no ar · próximo patch principal previsto para hoje",
-      "overdue": "{{line}} está no ar · próximo patch principal atrasado {{days}} dias",
-      "overdueWeeks": "{{line}} está no ar · próximo patch principal atrasado ~{{weeks}} semanas",
+      "liveOnly": "{{line}} está no Live",
+      "due": "{{line}} está no Live · próximo patch principal em {{days}} dias",
+      "dueWeeks": "{{line}} está no Live · próximo patch principal em ~{{weeks}} semanas",
+      "today": "{{line}} está no Live · próximo patch principal previsto para hoje",
+      "overdue": "{{line}} está no Live · próximo patch principal atrasado {{days}} dias",
+      "overdueWeeks": "{{line}} está no Live · próximo patch principal atrasado ~{{weeks}} semanas",
       "basis": "Estimativa a partir do ritmo de patches até agora",
       "basisTesting": "{{test}} em teste · estimativa pela duração usual dos testes",
       "freshLiveLabel": "Novo patch no Live",
@@ -3928,8 +3928,8 @@
     "role": "Função",
     "roles": {
       "admin": "Admin",
-      "collaborator": "Collaborator",
-      "viewer": "Viewer"
+      "collaborator": "Colaborador",
+      "viewer": "Visualizador"
     },
     "username": "Nome de usuário",
     "usernameUnset": "Não definido",
@@ -3991,7 +3991,7 @@
       "title": "Nome de usuário",
       "label": "Nome de usuário",
       "hint": "3–20 caracteres: letras minúsculas a–z, dígitos 0–9 e sublinhado (_).",
-      "placeholder": "seu_callsign",
+      "placeholder": "seu_indicativo",
       "save": "Salvar",
       "saving": "Salvando…",
       "saved": "Nome de usuário salvo.",
@@ -4058,7 +4058,7 @@
     },
     "composer": {
       "title": "Entrada",
-      "hint": "Vale para todo campo de mensagem — novo tópico, resposta no thread e campo de resposta no modo de processamento.",
+      "hint": "Vale para todo campo de mensagem — novo tópico, resposta na conversa e campo de resposta no modo de processamento.",
       "sendOnEnter": {
         "label": "Enter envia",
         "descOn": "Enter envia a mensagem, Shift+Enter insere uma nova linha. Ctrl/Cmd+Enter também envia.",
@@ -4086,7 +4086,7 @@
         "title": "Botões de feedback e beta",
         "hint": "Os botões no canto: enviar feedback e ver as respostas da equipe, com o botão de beta acima.",
         "label": "Mostrar os botões de feedback e beta",
-        "audience": "(somente admins e collaborators)",
+        "audience": "(somente admins e colaboradores)",
         "descOn": "Os botões de feedback e beta ficam no canto inferior direito de todas as páginas.",
         "descOff": "Os botões de feedback e beta estão ocultos — com isso, as respostas e perguntas da equipe também ficam fora de vista. Ative-os aqui de novo para abrir o seu feedback ou as opções de beta."
       },
@@ -4823,7 +4823,7 @@
   "footer": {
     "madeByCommunity": "Made by the Community",
     "badgeAlt": "Star Citizen — Made By The Community",
-    "disclaimer": "Este é um site de fãs não oficial de Star Citizen, sem afiliação com o grupo de empresas Cloud Imperium. Todo conteúdo deste site que não seja de autoria do anfitrião ou dos usuários é propriedade dos respectivos donos.",
+    "disclaimer": "Este é um site de fãs não oficial de Star Citizen, sem afiliação com o grupo de empresas Cloud Imperium. Todo conteúdo deste site que não seja de autoria do administrador ou dos usuários é propriedade dos respectivos donos.",
     "trademarks": "Star Citizen®, Roberts Space Industries® e Cloud Imperium® são marcas registradas da Cloud Imperium Rights LLC",
     "disclaimerExpand": "Mostrar aviso legal completo",
     "disclaimerCollapse": "Recolher aviso legal",
@@ -5039,7 +5039,7 @@
       "save": "Salvar",
       "rename": "Renomear",
       "pinLabel": "Fixar",
-      "openCodex": "Entrada do codex",
+      "openCodex": "Entrada no Codex",
       "remove": "Remover",
       "notes": "Notas",
       "notesPlaceholder": "Notas sobre esta nave…",
@@ -5106,7 +5106,7 @@
       },
       "overview": {
         "title": "Visão geral da frota",
-        "text": "Naves principais fixadas, contadores e acesso rápido à página de detalhes de cada nave."
+        "text": "Naves-capitânias fixadas, contadores e acesso rápido à página de detalhes de cada nave."
       },
       "loadouts": {
         "title": "Teste loadouts",
@@ -5121,7 +5121,7 @@
     "import": {
       "open": "Importar…",
       "title": "Importar de arquivo de exportação",
-      "hint": "Solte aqui uma exportação JSON no Hangar Transfer Format (ex.: da extensão de navegador HangarXPLOR — você mesmo faz a exportação, nunca pedimos credenciais da RSI). As entradas são comparadas com o codex e só as linhas que você confirmar são adicionadas.",
+      "hint": "Solte aqui uma exportação JSON no Hangar Transfer Format (ex.: da extensão de navegador HangarXPLOR — você mesmo faz a exportação, nunca pedimos credenciais da RSI). As entradas são comparadas com o Codex e só as linhas que você confirmar são adicionadas.",
       "pickFile": "Escolher arquivo",
       "parsing": "Lendo…",
       "dropHint": "ou solte o arquivo .json aqui",
@@ -5975,7 +5975,7 @@
       "today": "· visto pela última vez hoje"
     },
     "fallback": "Baixar (mais recente)",
-    "prerelease": "Esta é sempre a versão estável. Beta e alpha são escolhidos dentro do app depois que você entra com sua conta do Verse Companion — quais canais você recebe depende do seu papel."
+    "prerelease": "Esta é sempre a versão estável. Beta e alpha são escolhidos dentro do app depois que você entra com sua conta do Verse Companion — quais canais você recebe depende da sua função."
   },
   "appPanel": {
     "version": "Versão publicada atualmente",
@@ -7587,7 +7587,7 @@
       "link": "Link"
     },
     "status": {
-      "aria": "Estado do patch: {{line}}",
+      "aria": "Status do patch: {{line}}",
       "live": "Live",
       "ptu": "PTU {{line}}",
       "since": "no ar há {{n}} d",
@@ -7603,7 +7603,7 @@
       "allSeen": "Você está em dia",
       "newSince": "novo desde sua última visita",
       "patchNew": "{{channel}} · Novidades em {{version}}",
-      "patchNewPlanned": "{{channel}} · Novidades sobre {{version}}",
+      "patchNewPlanned": "{{channel}} · Novidades em {{version}}",
       "patchTeaser": "{{channel}} · {{teaser}}",
       "patchChannel": {
         "live": "LIVE",
@@ -7613,8 +7613,8 @@
         "hotfix": "Hotfix",
         "planned": "Planejado"
       },
-      "topAria": "As histórias mais recentes",
-      "storyAria": "História {{n}}: {{title}}",
+      "topAria": "As notícias mais recentes",
+      "storyAria": "Notícia {{n}}: {{title}}",
       "status": {
         "live": "{{line}} no ar há {{n}} dias",
         "liveOne": "{{line}} no ar há 1 dia",
@@ -7690,7 +7690,7 @@
           "value": "{{n}} dias"
         },
         "stable": {
-          "label": "último a chegar ao stable",
+          "label": "última versão estável lançada",
           "value": "{{n}}"
         }
       },
@@ -8382,7 +8382,7 @@
     "download": "Baixar",
     "scc": {
       "line": "Verse Companion App para o seu desktop",
-      "desc": "A Verse Companion App para o seu desktop."
+      "desc": "O Verse Companion App para o seu desktop."
     },
     "starscape": {
       "line": "Starscape como app de papel de parede",
@@ -9086,12 +9086,12 @@
     "allWishCount": "{{n}} desejos",
     "allWishCountOne": "1 desejo",
     "section": {
-      "inventar": "InventĂĄrio",
+      "inventar": "Inventário",
       "hangar": "Hangar",
       "sammlung": "Coleções"
     },
     "all": {
-      "inventar": "InventĂĄrio completo",
+      "inventar": "Inventário completo",
       "hangar": "Hangar completo",
       "sammlung": "Coleção completa"
     },
@@ -9100,8 +9100,8 @@
       "weapon": "Armas",
       "component": "Componentes",
       "item": "Itens",
-      "blueprint": "Plantas",
-      "news": "NotĂ­cias"
+      "blueprint": "Blueprints",
+      "news": "Notícias"
     }
   },
   "wishRemoval": {
@@ -9372,7 +9372,7 @@
   },
   "pwa": {
     "card": {
-      "title": "Verse Companion como app",
+      "title": "Instale o app",
       "benefit": "Tela cheia, início mais rápido, direto da tela inicial.",
       "install": "Instalar",
       "later": "Depois"
