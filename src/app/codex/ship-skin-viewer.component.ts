@@ -181,10 +181,10 @@ const GLB_HEAD_TIMEOUT_MS = 10_000;
                   [attr.exposure]="holo() ? 1.15 : 1.0"
                   environment-image="neutral"
                   [attr.tone-mapping]="holo() ? 'neutral' : null"
-                  [attr.min-camera-orbit]="holo() ? 'auto 15deg 70%' : null"
+                  [attr.min-camera-orbit]="holo() ? holoMinOrbit() : null"
                   [attr.max-camera-orbit]="holo() ? 'auto 115deg 180%' : null"
                   [attr.disable-pan]="holo() ? '' : null"
-                  [attr.camera-orbit]="holo() ? HOLO_START_ORBIT : DEFAULT_ORBIT"
+                  [attr.camera-orbit]="holo() ? holoStartOrbit() : DEFAULT_ORBIT"
                   interaction-prompt="none"
                   (load)="onModelLoad($event)"
                   (error)="onModelError()"
@@ -848,8 +848,11 @@ export class ShipSkinViewerComponent {
   /**
    * Start view of the landing hologram: half a turn further, so the ship
    * faces the reader when the page opens and the turntable starts from there.
+   * The distance is the bounding-sphere fit (105 %) divided by holoZoom, so the
+   * hull's on-screen size scales with it; the closest user zoom (70 %) along.
    */
-  protected readonly HOLO_START_ORBIT = '215deg 75deg 105%';
+  protected readonly holoStartOrbit = computed(() => `215deg 75deg ${orbitRadius(105, this.holoZoom())}%`);
+  protected readonly holoMinOrbit = computed(() => `auto 15deg ${orbitRadius(70, this.holoZoom())}%`);
 
   readonly shipId = input.required<string>();
 
@@ -899,6 +902,12 @@ export class ShipSkinViewerComponent {
   readonly holo = input(false);
   /** Reduced motion: no turntable, no scan loops, the model simply appears. */
   readonly still = input(false);
+  /**
+   * Hologram size factor (holo only): 1 frames the hull's bounding sphere; the
+   * landing holotable passes more, because a flat, long hull fills only a
+   * slice of that sphere and its box is wider than tall (admin feedback #392).
+   */
+  readonly holoZoom = input(1);
   /**
    * Whether this ship has an interactive model at all. The hero switch is only
    * offered when the answer is yes, and only this component can answer it: the
@@ -1227,4 +1236,10 @@ export class ShipSkinViewerComponent {
     this.mode.set(has3d ? '3d' : 'paint');
     this.modelLoading.set(has3d);
   }
+}
+
+/** Orbit radius in % for a base radius and a zoom factor (zoom ≤ 0 or NaN counts as 1). */
+export function orbitRadius(base: number, zoom: number): number {
+  const z = Number.isFinite(zoom) && zoom > 0 ? zoom : 1;
+  return Math.round((base / z) * 10) / 10;
 }

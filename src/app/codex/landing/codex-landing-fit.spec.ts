@@ -106,7 +106,7 @@ describe('Codex landing: category bar fit (B2.5) and figure fit (B2.6, B2.8)', (
         expect(r.w).toBeLessThanOrEqual(FIGURE_AREA.width + 0.01);
         expect(r.h).toBeLessThanOrEqual(FIGURE_AREA.height + 0.01);
         // Real aspect of the rect in pixels equals the figure's own.
-        expect((r.w * air.w * 0.4) / (r.h * air.h * 0.72)).toBeCloseTo(aspect, 1);
+        expect((r.w * air.w * 0.58) / (r.h * air.h * 0.82)).toBeCloseTo(aspect, 1);
       }
     }
   });

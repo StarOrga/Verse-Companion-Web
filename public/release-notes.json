@@ -1,7 +1,55 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.288.7",
+  "current": "0.288.10",
   "releases": [
+    {
+      "version": "0.288.10",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex holotable: the 3D model is much bigger (hologram area 58 × 82 % of the stage, zooming with its width) and the stat panels left and right are narrower with smaller text; tablets and phones give the model more room too (admin feedback #392)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.288.9",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Verse map: hovering the HQ outpost no longer draws corner brackets, only a faint glow; the HQ label sits upright above the outpost instead of running into the planet and the news card, and the hover area follows the page scroll (admin feedback #388)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.288.8",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Admin feedback: the \"Wer?\" filter no longer shows an \"Unbekannt\" chip. Topics without an account used to share one bucket labelled after whichever row came first; each sender now has its own chip — the PostHog-Wächter, the Dienst-Wächter (hourly service check, with its own avatar tooltip) and \"Ohne Konto\" for a topic whose author is gone or that the routine filed itself. The thread uses the same names (admin feedback #390)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.288.7",
       "date": "2026-11-21",
