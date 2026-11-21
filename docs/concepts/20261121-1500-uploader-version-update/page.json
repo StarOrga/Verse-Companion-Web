@@ -1,0 +1,18 @@
+{
+  "title": "Uploader: Version & Update",
+  "subtitle": "Patch-Anzeige in Kopf, Popover und Statuszeile · Update-Fehler und Release-Pipeline",
+  "locale": "de",
+  "mode": "mixed",
+  "pageVersion": "2026-11-21T13:57:36",
+  "stages": [
+    {
+      "id": "A",
+      "name": "Versionsanzeige"
+    },
+    {
+      "id": "B",
+      "name": "Update-Pipeline"
+    }
+  ],
+  "lastBuild": "350c2023ad4eed4f9d6a5e5e4b5fa6c9a90224c865e6fe3bdf91cd48e8eae34d"
+}

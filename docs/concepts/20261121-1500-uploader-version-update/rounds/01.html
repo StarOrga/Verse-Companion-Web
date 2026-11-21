@@ -1,0 +1,409 @@
+<section data-iteration="1" data-iteration-template="design" data-stage="A" data-design-set="alternatives">
+  <style>
+    .mock-app { --m-bg:#0a1a27; --m-panel:#123246; --m-panel2:#16405a; --m-well:#08161f; --m-fg:#e6f1f8; --m-fg1:#b4c8d8; --m-fg2:#8da6bd; --m-accent:#4cc3e8; --m-ok:#3ccf8e; --m-warn:#f0b54a; --m-line:rgba(76,195,232,.22);
+      position:relative; width:100%; max-width:1180px; height:640px; margin:0 auto; background:linear-gradient(180deg,#0d2232,#0a1a27 40%); color:var(--m-fg); font:13px/1.4 "Inter","Segoe UI",system-ui,sans-serif; border:1px solid var(--m-line); display:flex; flex-direction:column; overflow:hidden; }
+    .mock-top { display:flex; align-items:center; gap:14px; height:48px; padding:0 12px; border-bottom:1px solid var(--m-line); background:#0c2131; }
+    .mock-logo { width:22px; height:22px; border-radius:4px; background:var(--m-accent); color:#062234; display:grid; place-items:center; font-weight:700; font-size:12px; }
+    .mock-ver { font-family:"Share Tech Mono",Consolas,monospace; color:var(--m-fg2); font-size:12px; }
+    .mock-rail { display:flex; align-items:center; gap:10px; margin:0 auto; font-size:12.5px; color:var(--m-fg2); }
+    .mock-rail b { color:var(--m-ok); font-weight:500; } .mock-rail i { font-style:normal; color:var(--m-accent); } .mock-rail span.mock-sep { width:34px; height:2px; background:#1d4660; }
+    .mock-chip { display:flex; align-items:center; gap:7px; min-width:0; max-width:420px; padding:5px 10px; border-radius:999px; border:1px solid transparent; cursor:pointer; white-space:nowrap; }
+    .mock-chip:hover { border-color:var(--m-line); }
+    .mock-chip .mock-mail { overflow:hidden; text-overflow:ellipsis; min-width:0; color:var(--m-fg1); }
+    .mock-dot { width:9px; height:9px; border-radius:50%; background:var(--m-ok); flex:none; }
+    .mock-tag { font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--m-accent); }
+    .mock-id { font-variant-numeric:tabular-nums; color:var(--m-fg); }
+    .mock-id small { color:var(--m-fg2); font-size:11.5px; }
+    .mock-gear { width:34px; height:34px; border:1px solid var(--m-line); border-radius:4px; display:grid; place-items:center; color:var(--m-fg1); position:relative; flex:none; }
+    .mock-badge { position:absolute; top:-4px; right:-4px; width:10px; height:10px; border-radius:50%; background:var(--m-warn); box-shadow:0 0 0 2px #0c2131; }
+    .mock-banner { display:flex; align-items:center; gap:12px; padding:9px 16px; background:rgba(76,195,232,.08); border-bottom:1px solid var(--m-line); color:var(--m-fg1); }
+    .mock-banner.mock-warn { background:rgba(240,181,74,.10); border-color:rgba(240,181,74,.45); color:var(--m-fg); }
+    .mock-banner .mock-grow { flex:1; min-width:0; }
+    .mock-banner strong { color:var(--m-warn); font-weight:600; }
+    .mock-btn { padding:6px 14px; border-radius:999px; border:1px solid var(--m-accent); background:var(--m-accent); color:#062234; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; cursor:pointer; white-space:nowrap; }
+    .mock-btn.mock-ghost { background:transparent; color:var(--m-accent); }
+    .mock-link { color:var(--m-accent); text-decoration:underline; cursor:pointer; white-space:nowrap; font-size:12px; }
+    .mock-stage { flex:1; display:flex; align-items:center; justify-content:center; padding:18px; min-height:0; }
+    .mock-card { width:min(820px,100%); background:linear-gradient(180deg,#143a52,#102d40); border:1px solid var(--m-line); border-radius:4px; padding:20px 24px; }
+    .mock-kicker { color:var(--m-accent); font-size:11px; letter-spacing:.12em; text-transform:uppercase; font-weight:600; }
+    .mock-h { font-family:"Orbitron","Segoe UI",sans-serif; font-size:21px; margin:4px 0 10px; letter-spacing:.03em; }
+    .mock-row { display:flex; justify-content:space-between; color:var(--m-fg1); padding:3px 0; }
+    .mock-bar { height:20px; margin:16px 0 12px; background:var(--m-well); border:1px solid var(--m-line); border-radius:2px; overflow:hidden; }
+    .mock-bar > div { height:100%; width:96%; background:linear-gradient(90deg,#2a8db3,#7fd6f2); }
+    .mock-res { border:1px solid rgba(240,181,74,.6); color:var(--m-warn); padding:10px 14px; font-weight:600; background:rgba(240,181,74,.06); }
+    .mock-dock { display:flex; gap:10px; padding:6px 12px; border-top:1px solid var(--m-line); font-size:11.5px; color:var(--m-fg2); }
+    .mock-dock span { border:1px solid var(--m-line); padding:4px 10px; border-radius:3px; }
+    .mock-status { padding:6px 14px; font-size:12px; color:var(--m-fg1); border-top:1px solid var(--m-line); background:#09182a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .mock-status em { font-style:normal; color:var(--m-fg2); }
+    .mock-pop { position:absolute; top:52px; right:56px; width:440px; background:#0f2b3e; border:1px solid var(--m-line); border-radius:4px; box-shadow:0 18px 40px rgba(0,0,0,.45); padding:14px 16px; z-index:3; }
+    .mock-pop-id { display:flex; align-items:center; gap:8px; }
+    .mock-pop-id .mock-mail { flex:1; font-weight:600; color:var(--m-fg); }
+    .mock-ico { width:32px; height:32px; border:1px solid var(--m-line); border-radius:4px; display:grid; place-items:center; color:var(--m-fg1); }
+    .mock-pop-srv { margin-top:12px; padding-top:10px; border-top:1px solid var(--m-line); display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; color:var(--m-fg1); font-size:12px; }
+    .mock-pill { padding:3px 10px; border-radius:999px; border:1px solid var(--m-line); background:var(--m-well); font-variant-numeric:tabular-nums; }
+    .mock-ok { color:var(--m-ok); }
+    .mock-muted { color:var(--m-fg2); }
+    .mock-tbl { width:100%; border-collapse:collapse; margin-top:12px; font-size:12px; }
+    .mock-tbl td { padding:6px 4px; border-top:1px solid var(--m-line); color:var(--m-fg1); font-variant-numeric:tabular-nums; }
+    .mock-tbl td:first-child { color:var(--m-fg2); width:110px; }
+    .mock-pop-upd { margin-top:12px; padding:10px 12px; border:1px solid rgba(240,181,74,.45); background:rgba(240,181,74,.08); border-radius:3px; color:var(--m-fg); }
+    .mock-pop-upd strong { color:var(--m-warn); }
+    .mock-pop-upd .mock-acts { display:flex; gap:10px; align-items:center; margin-top:8px; }
+    .mock-label { color:var(--m-fg2); font-size:11px; text-transform:uppercase; letter-spacing:.06em; margin-right:4px; }
+    .mock-notes { padding:22px; max-width:820px; margin:0 auto; color:var(--m-fg); line-height:1.55; }
+    .mock-notes h3 { margin:18px 0 6px; } .mock-notes code { font-size:12px; }
+    .mock-notes li { margin:3px 0; }
+  </style>
+
+  <header class="iteration-intro">
+    <h2>Runde 1 · Etappe A · Wo steht der Patch – und wie sieht ein Update-Fehler aus?</h2>
+    <p>Drei Richtungen für Kopfzeile, Konto-Popover, Statuszeile und Update-Banner des Data Uploaders. Jede Richtung zeigt dieselben drei Zustände: Hauptfenster, offenes Popover, Update-Fehler.</p>
+    <details class="mock-notes-wrap"><summary>Abdeckung &amp; Bündel</summary><div class="mock-notes">
+      <h3>Abdeckung (aus dem Sammelmodus)</h3>
+      <ul>
+        <li><b>#1 übernommen + Frage beantwortet</b>: „warum an drei stellen patch numemrn etc. Polishe das ui nochmal in diesen titelzeilen und popup etc....“ Die drei Stellen zeigen drei verschiedene Dinge: die <b>Kopfzeile</b> deinen lokal installierten Spielstand („LIVE v4.10.3 (13165946)“, rechts abgeschnitten), das <b>Popover</b> den Stand auf dem Server („LIVE v4.10.3 · 454.632“, wobei 454.632 die Anzahl der Einträge ist, keine Build-Nummer) und die <b>Statuszeile</b> die Meldung des Autoruns („LIVE 4.10.3 (13165946) ist auf dem Server …“, ohne „v“). Sie sehen aber alle gleich aus.</li>
+        <li><b>#2 übernommen</b>: „udpate fehler /“. Der 401 <code>invalid_or_revoked_release_token</code> kommt nicht vom Login. Am 21.11. haben zwei CI-Läufe v0.84.3 gebaut: ein <code>workflow_dispatch</code> um 12:53 UTC mit Token <code>268abf3e…</code> und der Tag-Lauf um 13:08 UTC mit <code>dbef63fc…</code>. Registriert wurde nur <code>dbef63fc</code>. Dein Updater hat um 13:16 UTC das Setup aus dem Dispatch-Lauf geladen, die Mirror-Dateien wurden erst um 13:21 UTC ersetzt. Deshalb ist deine installierte v0.84.3 dem Update-Server unbekannt. Außerdem zeigt das Banner den rohen HttpError samt Response-Headern.</li>
+      </ul>
+      <h3>Bündel</h3>
+      <ul>
+        <li><b>B1 · Renderer (Etappe A, diese Runde)</b>: Kopf-Chip <code>main.ts:990-1004</code>, Popover-Chip <code>main.ts:1038</code>, Statuszeile <code>main.ts:645-655</code> + <code>patch-countdown.ts:73</code>, <code>formatIdentity</code> in <code>src/lib/auto-run.ts:111</code>, Update-Banner <code>main.ts:1219-1235</code> + i18n <code>update.error</code>. Bekommt von B2 nur noch einen Fehlercode (<code>unknown-build | offline | server | other</code>) und zeigt dazu einen übersetzten Text. Nebenbefund: <code>main.ts:2111</code> enthält hart kodierten deutschen Text.</li>
+        <li><b>B2 · Updater, CI und Server (Etappe B, nächste Runde)</b>: Fehlerklassen in <code>updater.ts</code>, Schutz in <code>data-uploader-build.yml</code> gegen zwei Builds derselben Version, Rettung der hängenden v0.84.3-Installationen.</li>
+      </ul>
+    </div></details>
+  </header>
+
+  <!-- ============ Design 1 ============ -->
+  <section data-design="d1" data-nav-label="Patch nur im Kopf" data-design-active="true" data-screen-fit="full"
+           data-design-motto="Eine Stelle, voll lesbar" data-design-traits="Patch nur in der Kopfzeile, nie abgeschnitten|Popover zeigt Einträge, Patch nur bei Abweichung|Fehler als gelbes Banner mit Download-Knopf"
+           data-design-icon="gauge" data-design-color="#3ccf8e">
+    <section id="d1-s1" data-nav-label="Hauptfenster" data-screen data-screen-active="true">
+      <div class="mock-app">
+        <div class="mock-top">
+          <div class="mock-logo">↑</div><span class="mock-ver">v0.84.3</span>
+          <div class="mock-rail"><b>● Installation</b><span class="mock-sep"></span><b>● Metadaten</b><span class="mock-sep"></span><b>● Silhouetten</b><span class="mock-sep"></span><i>● 3D-Modelle</i><span class="mock-sep"></span><span>○ Fertig</span></div>
+          <div class="mock-chip mock-d1-chip" data-screen-link="d1-s2"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-muted">·</span><span class="mock-tag">Live</span><span class="mock-id">4.10.3 <small>· Build 13165946</small></span></div>
+          <div class="mock-gear">⚙</div>
+        </div>
+        <div class="mock-banner"><span class="mock-grow">Update v0.84.4 ist geladen und kann installiert werden.</span><button class="mock-btn">Installieren</button></div>
+        <div class="mock-stage"><div class="mock-card">
+          <div class="mock-kicker">Schritt 3 von 3</div><div class="mock-h">3D-Modelle</div>
+          <div class="mock-row"><span>✓ Modelle bauen</span><span>335</span></div>
+          <div class="mock-row"><span>! Modelle hochladen</span><span>324 / 335</span></div>
+          <div class="mock-bar"><div></div></div>
+          <div class="mock-res">324 / 335 Schiffe hochgeladen — 11 fehlgeschlagen (siehe Protokoll)</div>
+        </div></div>
+        <div class="mock-dock"><span>Volle Leistung · ca. 2 h 50 min</span><span>CPU 15 %</span><span>RAM 1 %</span><span>Laufwerk C: 0 %</span><span>GPU 16 %</span></div>
+        <div class="mock-status mock-d1-status">Noch offen: 3D-Hüllen. Setze automatisch fort.</div>
+      </div>
+      <div class="anno-layer" data-anno-layer>
+        <div class="anno" data-anno="d1-s1-a1" data-anno-side="bottom" data-anno-target=".mock-d1-chip" style="--anno-x:72%;--anno-y:5%">
+          <button class="anno-pin" type="button" data-anno-pin="d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+          <div class="anno-bubble" id="anno-bubble-d1-s1-a1" data-anno-bubble="d1-s1-a1" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a1"><span class="anno-bubble-question">Wird es eng, kürzt sich die Mail-Adresse und der Patch bleibt ganz stehen. Passt diese Reihenfolge?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s1-a1" data-annotation="d1-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d1-s1-a1"></div></div>
+          </div>
+        </div>
+        <div class="anno" data-anno="d1-s1-a2" data-anno-side="top" data-anno-target=".mock-d1-status" style="--anno-x:30%;--anno-y:96%">
+          <button class="anno-pin" type="button" data-anno-pin="d1-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a2" aria-label="{{anno.pin_label}}">2</button>
+          <div class="anno-bubble" id="anno-bubble-d1-s1-a2" data-anno-bubble="d1-s1-a2" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a2"><span class="anno-bubble-question">Die Statuszeile wiederholt den Patch nicht mehr, außer der Server hat einen anderen Stand als dein Spiel. Reicht dir das?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s1-a2" data-annotation="d1-s1-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d1-s1-a2"></div></div>
+          </div>
+        </div>
+        <div class="anno" data-anno="d1-s1-a3" data-anno-side="bottom" data-anno-target=".mock-ver" style="--anno-x:6%;--anno-y:5%">
+          <button class="anno-pin" type="button" data-anno-pin="d1-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a3" aria-label="{{anno.pin_label}}">3</button>
+          <div class="anno-bubble" id="anno-bubble-d1-s1-a3" data-anno-bubble="d1-s1-a3" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a3"><span class="anno-bubble-question">Links steht die Uploader-Version (v0.84.3), rechts der Spiel-Patch ohne „v“. Ist das Unterscheidung genug?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s1-a3" data-annotation="d1-s1-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d1-s1-a3"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="d1-s2" data-nav-label="Konto-Popover" data-screen hidden>
+      <div class="mock-app">
+        <div class="mock-top">
+          <div class="mock-logo">↑</div><span class="mock-ver">v0.84.3</span>
+          <div class="mock-rail"><b>● Installation</b><span class="mock-sep"></span><b>● Metadaten</b><span class="mock-sep"></span><b>● Silhouetten</b><span class="mock-sep"></span><i>● 3D-Modelle</i><span class="mock-sep"></span><span>○ Fertig</span></div>
+          <div class="mock-chip" data-screen-link="d1-s1"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-muted">·</span><span class="mock-tag">Live</span><span class="mock-id">4.10.3 <small>· Build 13165946</small></span></div>
+          <div class="mock-gear">⚙</div>
+        </div>
+        <div class="mock-stage"><div class="mock-card">
+          <div class="mock-kicker">Schritt 3 von 3</div><div class="mock-h">3D-Modelle</div>
+          <div class="mock-row"><span>✓ Modelle bauen</span><span>335</span></div>
+          <div class="mock-row"><span>! Modelle hochladen</span><span>324 / 335</span></div>
+          <div class="mock-bar"><div></div></div>
+        </div></div>
+        <div class="mock-status">Noch offen: 3D-Hüllen. Setze automatisch fort.</div>
+        <div class="mock-pop">
+          <div class="mock-pop-id"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-ico">⟳</span><span class="mock-ico">⇥</span></div>
+          <div class="mock-pop-srv mock-d1-srv"><span>☁ Server-Codex</span><span class="mock-pill">454.632 Einträge</span><span class="mock-ok">✓ gleicher Patch wie dein Spiel</span><span class="mock-muted">aktualisiert gerade eben</span></div>
+        </div>
+      </div>
+      <div class="anno-layer" data-anno-layer>
+        <div class="anno" data-anno="d1-s2-a1" data-anno-side="left" data-anno-target=".mock-d1-srv" style="--anno-x:70%;--anno-y:22%">
+          <button class="anno-pin" type="button" data-anno-pin="d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s2-a1" aria-label="{{anno.pin_label}}">1</button>
+          <div class="anno-bubble" id="anno-bubble-d1-s2-a1" data-anno-bubble="d1-s2-a1" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s2-a1"><span class="anno-bubble-question">Der LIVE-Chip erscheint hier nur, wenn der Server einen anderen Patch hat (dann z. B. „Server: LIVE 4.10.2“). Sonst nur „✓ gleicher Patch“. Gut so?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s2-a1" data-annotation="d1-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d1-s2-a1"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="d1-s3" data-nav-label="Update-Fehler" data-screen hidden>
+      <div class="mock-app">
+        <div class="mock-top">
+          <div class="mock-logo">↑</div><span class="mock-ver">v0.84.3</span>
+          <div class="mock-rail"><b>● Installation</b><span class="mock-sep"></span><i>● Metadaten</i><span class="mock-sep"></span><span>○ Silhouetten</span><span class="mock-sep"></span><span>○ 3D-Modelle</span><span class="mock-sep"></span><span>○ Fertig</span></div>
+          <div class="mock-chip"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-muted">·</span><span class="mock-tag">Live</span><span class="mock-id">4.10.3 <small>· Build 13165946</small></span></div>
+          <div class="mock-gear">⚙</div>
+        </div>
+        <div class="mock-banner mock-warn mock-d1-err"><span class="mock-grow"><strong>Update nicht möglich.</strong> Dieser Uploader-Build ist dem Update-Server unbekannt. Installiere v0.84.4 einmal von Hand, danach läuft das Update wieder automatisch.</span><button class="mock-btn">v0.84.4 laden</button><span class="mock-link">Protokoll</span></div>
+        <div class="mock-stage"><div class="mock-card">
+          <div class="mock-kicker">Schritt 1 von 3</div><div class="mock-h">Metadaten</div>
+          <div class="mock-row"><span>● Daten extrahieren</span><span>Auslesen</span></div>
+          <div class="mock-row"><span>○ Bundle hochladen</span><span></span></div>
+          <div class="mock-row"><span>○ Einträge hochladen</span><span></span></div>
+          <div class="mock-bar"><div style="width:15%"></div></div>
+        </div></div>
+        <div class="mock-status">Noch offen: Schiffe, Silhouetten, 3D-Hüllen. Setze automatisch fort.</div>
+      </div>
+      <div class="anno-layer" data-anno-layer>
+        <div class="anno" data-anno="d1-s3-a1" data-anno-side="bottom" data-anno-target=".mock-d1-err .mock-btn" style="--anno-x:84%;--anno-y:12%">
+          <button class="anno-pin" type="button" data-anno-pin="d1-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s3-a1" aria-label="{{anno.pin_label}}">1</button>
+          <div class="anno-bubble" id="anno-bubble-d1-s3-a1" data-anno-bubble="d1-s3-a1" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s3-a1"><span class="anno-bubble-question">Statt des rohen HttpError mit Headern: ein Satz, was los ist, und ein Knopf zum Download. Die Details stehen nur im Protokoll. Fehlt dir etwas?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s3-a1" data-annotation="d1-s3-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d1-s3-a1"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ Design 2 ============ -->
+  <section data-design="d2" data-nav-label="Jede Stelle beschriftet" hidden data-screen-fit="full"
+           data-design-motto="Drei Stellen, drei Namen" data-design-traits="Patch bleibt an allen drei Stellen|Jede Stelle sagt dazu, wessen Stand sie zeigt|Fehler als einzeilige Leiste mit aufklappbaren Details"
+           data-design-icon="list" data-design-color="#f0b54a">
+    <section id="d2-s1" data-nav-label="Hauptfenster" data-screen data-screen-active="true">
+      <div class="mock-app">
+        <div class="mock-top">
+          <div class="mock-logo">↑</div><span class="mock-ver">v0.84.3</span>
+          <div class="mock-rail"><b>● Installation</b><span class="mock-sep"></span><b>● Metadaten</b><span class="mock-sep"></span><b>● Silhouetten</b><span class="mock-sep"></span><i>● 3D-Modelle</i><span class="mock-sep"></span><span>○ Fertig</span></div>
+          <div class="mock-chip mock-d2-chip" data-screen-link="d2-s2"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-muted">·</span><span class="mock-label">Spiel</span><span class="mock-tag">Live</span><span class="mock-id">4.10.3</span></div>
+          <div class="mock-gear">⚙</div>
+        </div>
+        <div class="mock-banner"><span class="mock-grow">Update v0.84.4 ist geladen und kann installiert werden.</span><button class="mock-btn">Installieren</button></div>
+        <div class="mock-stage"><div class="mock-card">
+          <div class="mock-kicker">Schritt 3 von 3</div><div class="mock-h">3D-Modelle</div>
+          <div class="mock-row"><span>✓ Modelle bauen</span><span>335</span></div>
+          <div class="mock-row"><span>! Modelle hochladen</span><span>324 / 335</span></div>
+          <div class="mock-bar"><div></div></div>
+          <div class="mock-res">324 / 335 Schiffe hochgeladen — 11 fehlgeschlagen (siehe Protokoll)</div>
+        </div></div>
+        <div class="mock-dock"><span>Volle Leistung · ca. 2 h 50 min</span><span>CPU 15 %</span><span>RAM 1 %</span><span>Laufwerk C: 0 %</span><span>GPU 16 %</span></div>
+        <div class="mock-status mock-d2-status"><span class="mock-label">Lauf</span>LIVE 4.10.3 · Build 13165946 — noch offen: 3D-Hüllen. Setze automatisch fort.</div>
+      </div>
+      <div class="anno-layer" data-anno-layer>
+        <div class="anno" data-anno="d2-s1-a1" data-anno-side="bottom" data-anno-target=".mock-d2-chip" style="--anno-x:72%;--anno-y:5%">
+          <button class="anno-pin" type="button" data-anno-pin="d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+          <div class="anno-bubble" id="anno-bubble-d2-s1-a1" data-anno-bubble="d2-s1-a1" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a1"><span class="anno-bubble-question">Die Kopfzeile nennt nur „Spiel LIVE 4.10.3“, die Build-Nummer steht im Tooltip. Ist das kurz genug?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s1-a1" data-annotation="d2-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d2-s1-a1"></div></div>
+          </div>
+        </div>
+        <div class="anno" data-anno="d2-s1-a2" data-anno-side="top" data-anno-target=".mock-d2-status" style="--anno-x:30%;--anno-y:96%">
+          <button class="anno-pin" type="button" data-anno-pin="d2-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a2" aria-label="{{anno.pin_label}}">2</button>
+          <div class="anno-bubble" id="anno-bubble-d2-s1-a2" data-anno-bubble="d2-s1-a2" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a2"><span class="anno-bubble-question">Die Statuszeile nennt den Build, an dem der Lauf gerade arbeitet. Hilft dir das, oder ist es eine Wiederholung?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s1-a2" data-annotation="d2-s1-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d2-s1-a2"></div></div>
+          </div>
+        </div>
+        <div class="anno" data-anno="d2-s1-a3" data-anno-side="bottom" data-anno-target=".mock-d2-chip .mock-label" style="--anno-x:80%;--anno-y:5%">
+          <button class="anno-pin" type="button" data-anno-pin="d2-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a3" aria-label="{{anno.pin_label}}">3</button>
+          <div class="anno-bubble" id="anno-bubble-d2-s1-a3" data-anno-bubble="d2-s1-a3" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a3"><span class="anno-bubble-question">Passen die Beschriftungen „Spiel“, „Server“ und „Lauf“, oder sollen sie anders heißen?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s1-a3" data-annotation="d2-s1-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d2-s1-a3"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="d2-s2" data-nav-label="Konto-Popover" data-screen hidden>
+      <div class="mock-app">
+        <div class="mock-top">
+          <div class="mock-logo">↑</div><span class="mock-ver">v0.84.3</span>
+          <div class="mock-rail"><b>● Installation</b><span class="mock-sep"></span><b>● Metadaten</b><span class="mock-sep"></span><b>● Silhouetten</b><span class="mock-sep"></span><i>● 3D-Modelle</i><span class="mock-sep"></span><span>○ Fertig</span></div>
+          <div class="mock-chip" data-screen-link="d2-s1"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-muted">·</span><span class="mock-label">Spiel</span><span class="mock-tag">Live</span><span class="mock-id">4.10.3</span></div>
+          <div class="mock-gear">⚙</div>
+        </div>
+        <div class="mock-stage"><div class="mock-card">
+          <div class="mock-kicker">Schritt 3 von 3</div><div class="mock-h">3D-Modelle</div>
+          <div class="mock-row"><span>✓ Modelle bauen</span><span>335</span></div>
+          <div class="mock-row"><span>! Modelle hochladen</span><span>324 / 335</span></div>
+          <div class="mock-bar"><div></div></div>
+        </div></div>
+        <div class="mock-status"><span class="mock-label">Lauf</span>LIVE 4.10.3 · Build 13165946 — noch offen: 3D-Hüllen. Setze automatisch fort.</div>
+        <div class="mock-pop">
+          <div class="mock-pop-id"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-ico">⟳</span><span class="mock-ico">⇥</span></div>
+          <div class="mock-pop-srv mock-d2-srv"><span class="mock-label">Server</span><span class="mock-pill"><span class="mock-tag">Live</span> 4.10.3 · Build 13165946</span><span class="mock-pill">454.632 Einträge</span><span class="mock-muted">aktualisiert gerade eben</span></div>
+        </div>
+      </div>
+      <div class="anno-layer" data-anno-layer>
+        <div class="anno" data-anno="d2-s2-a1" data-anno-side="left" data-anno-target=".mock-d2-srv" style="--anno-x:70%;--anno-y:22%">
+          <button class="anno-pin" type="button" data-anno-pin="d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s2-a1" aria-label="{{anno.pin_label}}">1</button>
+          <div class="anno-bubble" id="anno-bubble-d2-s2-a1" data-anno-bubble="d2-s2-a1" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s2-a1"><span class="anno-bubble-question">Patch und Eintragszahl stehen jetzt in zwei getrennten Pillen, damit „454.632“ nicht mehr wie eine Build-Nummer aussieht. Klar genug?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s2-a1" data-annotation="d2-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d2-s2-a1"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="d2-s3" data-nav-label="Update-Fehler" data-screen hidden>
+      <div class="mock-app">
+        <div class="mock-top">
+          <div class="mock-logo">↑</div><span class="mock-ver">v0.84.3</span>
+          <div class="mock-rail"><b>● Installation</b><span class="mock-sep"></span><i>● Metadaten</i><span class="mock-sep"></span><span>○ Silhouetten</span><span class="mock-sep"></span><span>○ 3D-Modelle</span><span class="mock-sep"></span><span>○ Fertig</span></div>
+          <div class="mock-chip"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-muted">·</span><span class="mock-label">Spiel</span><span class="mock-tag">Live</span><span class="mock-id">4.10.3</span></div>
+          <div class="mock-gear">⚙</div>
+        </div>
+        <div class="mock-banner mock-warn mock-d2-err"><strong>⚠ Update nicht möglich: Build unbekannt</strong><span class="mock-grow mock-muted">Fehler 401 · Details ▸</span><span class="mock-link">Neu installieren</span></div>
+        <div class="mock-stage"><div class="mock-card">
+          <div class="mock-kicker">Schritt 1 von 3</div><div class="mock-h">Metadaten</div>
+          <div class="mock-row"><span>● Daten extrahieren</span><span>Auslesen</span></div>
+          <div class="mock-row"><span>○ Bundle hochladen</span><span></span></div>
+          <div class="mock-row"><span>○ Einträge hochladen</span><span></span></div>
+          <div class="mock-bar"><div style="width:15%"></div></div>
+        </div></div>
+        <div class="mock-status"><span class="mock-label">Lauf</span>LIVE 4.10.3 · Build 13165946 — noch offen: Schiffe, Silhouetten, 3D-Hüllen. Setze automatisch fort.</div>
+      </div>
+      <div class="anno-layer" data-anno-layer>
+        <div class="anno" data-anno="d2-s3-a1" data-anno-side="bottom" data-anno-target=".mock-d2-err .mock-muted" style="--anno-x:50%;--anno-y:12%">
+          <button class="anno-pin" type="button" data-anno-pin="d2-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s3-a1" aria-label="{{anno.pin_label}}">1</button>
+          <div class="anno-bubble" id="anno-bubble-d2-s3-a1" data-anno-bubble="d2-s3-a1" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s3-a1"><span class="anno-bubble-question">„Details ▸“ klappt Fehlercode und Uhrzeit auf, nie die Response-Header. Willst du das aufklappbar oder gar nicht im Fenster?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s3-a1" data-annotation="d2-s3-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d2-s3-a1"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ Design 3 ============ -->
+  <section data-design="d3" data-nav-label="Vergleich im Popover" hidden data-screen-fit="full"
+           data-design-motto="Kopf schlank, Popover vergleicht" data-design-traits="Kopfzeile zeigt nur Kanal und Ampel|Popover stellt lokalen und Server-Stand nebeneinander|Fehler als Punkt am Zahnrad, Text im Popover"
+           data-design-icon="layers" data-design-color="#b48cf0">
+    <section id="d3-s1" data-nav-label="Hauptfenster" data-screen data-screen-active="true">
+      <div class="mock-app">
+        <div class="mock-top">
+          <div class="mock-logo">↑</div><span class="mock-ver">v0.84.3</span>
+          <div class="mock-rail"><b>● Installation</b><span class="mock-sep"></span><b>● Metadaten</b><span class="mock-sep"></span><b>● Silhouetten</b><span class="mock-sep"></span><i>● 3D-Modelle</i><span class="mock-sep"></span><span>○ Fertig</span></div>
+          <div class="mock-chip mock-d3-chip" data-screen-link="d3-s2"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-tag mock-ok">● Live</span></div>
+          <div class="mock-gear">⚙</div>
+        </div>
+        <div class="mock-banner"><span class="mock-grow">Update v0.84.4 ist geladen und kann installiert werden.</span><button class="mock-btn">Installieren</button></div>
+        <div class="mock-stage"><div class="mock-card">
+          <div class="mock-kicker">Schritt 3 von 3</div><div class="mock-h">3D-Modelle</div>
+          <div class="mock-row"><span>✓ Modelle bauen</span><span>335</span></div>
+          <div class="mock-row"><span>! Modelle hochladen</span><span>324 / 335</span></div>
+          <div class="mock-bar"><div></div></div>
+          <div class="mock-res">324 / 335 Schiffe hochgeladen — 11 fehlgeschlagen (siehe Protokoll)</div>
+        </div></div>
+        <div class="mock-dock"><span>Volle Leistung · ca. 2 h 50 min</span><span>CPU 15 %</span><span>RAM 1 %</span><span>Laufwerk C: 0 %</span><span>GPU 16 %</span></div>
+        <div class="mock-status mock-d3-status">Noch offen: 3D-Hüllen. Setze automatisch fort.</div>
+      </div>
+      <div class="anno-layer" data-anno-layer>
+        <div class="anno" data-anno="d3-s1-a1" data-anno-side="bottom" data-anno-target=".mock-d3-chip .mock-tag" style="--anno-x:80%;--anno-y:5%">
+          <button class="anno-pin" type="button" data-anno-pin="d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+          <div class="anno-bubble" id="anno-bubble-d3-s1-a1" data-anno-bubble="d3-s1-a1" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a1"><span class="anno-bubble-question">Die Kopfzeile nennt nur den Kanal. Grün heißt: Server und Spiel haben denselben Stand, gelb heißt: der Server hinkt hinterher. Reicht dir die Ampel ohne Nummer?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s1-a1" data-annotation="d3-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d3-s1-a1"></div></div>
+          </div>
+        </div>
+        <div class="anno" data-anno="d3-s1-a2" data-anno-side="top" data-anno-target=".mock-d3-status" style="--anno-x:30%;--anno-y:96%">
+          <button class="anno-pin" type="button" data-anno-pin="d3-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a2" aria-label="{{anno.pin_label}}">2</button>
+          <div class="anno-bubble" id="anno-bubble-d3-s1-a2" data-anno-bubble="d3-s1-a2" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a2"><span class="anno-bubble-question">In der Statuszeile steht nur noch, was offen ist, kein Patch mehr. Einverstanden?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s1-a2" data-annotation="d3-s1-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d3-s1-a2"></div></div>
+          </div>
+        </div>
+        <div class="anno" data-anno="d3-s1-a3" data-anno-side="bottom" data-anno-target=".mock-d3-chip .mock-mail" style="--anno-x:70%;--anno-y:5%">
+          <button class="anno-pin" type="button" data-anno-pin="d3-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a3" aria-label="{{anno.pin_label}}">3</button>
+          <div class="anno-bubble" id="anno-bubble-d3-s1-a3" data-anno-bubble="d3-s1-a3" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a3"><span class="anno-bubble-question">Soll die Mail-Adresse in der Kopfzeile bleiben, oder reicht sie im Popover?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s1-a3" data-annotation="d3-s1-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d3-s1-a3"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="d3-s2" data-nav-label="Konto-Popover" data-screen hidden>
+      <div class="mock-app">
+        <div class="mock-top">
+          <div class="mock-logo">↑</div><span class="mock-ver">v0.84.3</span>
+          <div class="mock-rail"><b>● Installation</b><span class="mock-sep"></span><b>● Metadaten</b><span class="mock-sep"></span><b>● Silhouetten</b><span class="mock-sep"></span><i>● 3D-Modelle</i><span class="mock-sep"></span><span>○ Fertig</span></div>
+          <div class="mock-chip" data-screen-link="d3-s1"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-tag mock-ok">● Live</span></div>
+          <div class="mock-gear">⚙</div>
+        </div>
+        <div class="mock-stage"><div class="mock-card">
+          <div class="mock-kicker">Schritt 3 von 3</div><div class="mock-h">3D-Modelle</div>
+          <div class="mock-row"><span>✓ Modelle bauen</span><span>335</span></div>
+          <div class="mock-row"><span>! Modelle hochladen</span><span>324 / 335</span></div>
+          <div class="mock-bar"><div></div></div>
+        </div></div>
+        <div class="mock-status">Noch offen: 3D-Hüllen. Setze automatisch fort.</div>
+        <div class="mock-pop">
+          <div class="mock-pop-id"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-ico">⟳</span><span class="mock-ico">⇥</span></div>
+          <table class="mock-tbl mock-d3-tbl">
+            <tr><td>Dein Spiel</td><td><span class="mock-tag">Live</span> 4.10.3 · Build 13165946</td><td></td></tr>
+            <tr><td>Server-Codex</td><td><span class="mock-tag">Live</span> 4.10.3 · Build 13165946</td><td class="mock-ok">✓ gleich</td></tr>
+            <tr><td>Einträge</td><td>454.632</td><td class="mock-muted">gerade eben</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="anno-layer" data-anno-layer>
+        <div class="anno" data-anno="d3-s2-a1" data-anno-side="left" data-anno-target=".mock-d3-tbl" style="--anno-x:70%;--anno-y:25%">
+          <button class="anno-pin" type="button" data-anno-pin="d3-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s2-a1" aria-label="{{anno.pin_label}}">1</button>
+          <div class="anno-bubble" id="anno-bubble-d3-s2-a1" data-anno-bubble="d3-s2-a1" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s2-a1"><span class="anno-bubble-question">Lokaler und Server-Stand stehen untereinander mit „✓ gleich“ oder „⚠ Server älter“. Ist dieser Vergleich das, was du hier suchst?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s2-a1" data-annotation="d3-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d3-s2-a1"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="d3-s3" data-nav-label="Update-Fehler" data-screen hidden>
+      <div class="mock-app">
+        <div class="mock-top">
+          <div class="mock-logo">↑</div><span class="mock-ver">v0.84.3</span>
+          <div class="mock-rail"><b>● Installation</b><span class="mock-sep"></span><i>● Metadaten</i><span class="mock-sep"></span><span>○ Silhouetten</span><span class="mock-sep"></span><span>○ 3D-Modelle</span><span class="mock-sep"></span><span>○ Fertig</span></div>
+          <div class="mock-chip"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-tag mock-ok">● Live</span></div>
+          <div class="mock-gear mock-d3-gear">⚙<span class="mock-badge"></span></div>
+        </div>
+        <div class="mock-stage"><div class="mock-card">
+          <div class="mock-kicker">Schritt 1 von 3</div><div class="mock-h">Metadaten</div>
+          <div class="mock-row"><span>● Daten extrahieren</span><span>Auslesen</span></div>
+          <div class="mock-row"><span>○ Bundle hochladen</span><span></span></div>
+          <div class="mock-row"><span>○ Einträge hochladen</span><span></span></div>
+          <div class="mock-bar"><div style="width:15%"></div></div>
+        </div></div>
+        <div class="mock-status">Noch offen: Schiffe, Silhouetten, 3D-Hüllen. Setze automatisch fort.</div>
+        <div class="mock-pop" style="right:12px">
+          <div class="mock-pop-id"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-ico">⟳</span><span class="mock-ico">⇥</span></div>
+          <div class="mock-pop-upd mock-d3-upd"><strong>Update nicht möglich.</strong> Dieser Build ist dem Update-Server unbekannt.<div class="mock-acts"><button class="mock-btn">v0.84.4 laden</button><span class="mock-link">Protokoll</span></div></div>
+        </div>
+      </div>
+      <div class="anno-layer" data-anno-layer>
+        <div class="anno" data-anno="d3-s3-a1" data-anno-side="left" data-anno-target=".mock-d3-gear" style="--anno-x:96%;--anno-y:5%">
+          <button class="anno-pin" type="button" data-anno-pin="d3-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s3-a1" aria-label="{{anno.pin_label}}">1</button>
+          <div class="anno-bubble" id="anno-bubble-d3-s3-a1" data-anno-bubble="d3-s3-a1" data-open="false">
+            <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s3-a1"><span class="anno-bubble-question">Der Fehler erscheint nur als gelber Punkt am Zahnrad, der Text steht im Popover. Zu leise für einen Updater, der nie wieder updaten kann?</span></button>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s3-a1" data-annotation="d3-s3-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-d3-s3-a1"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+</section>
