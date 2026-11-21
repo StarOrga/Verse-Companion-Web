@@ -1,4 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../auth/auth.service';
@@ -168,6 +170,8 @@ export class HqSpotStageComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly rsi = inject(UpcomingShipsService);
   private readonly t = inject(TranslateService);
+  /** Re-derives the translated labels below on a language switch (translate.instant alone is not reactive). */
+  private readonly langTick = toSignal(this.t.onLangChange.pipe(map((e) => e.lang)), { initialValue: this.t.getCurrentLang() ?? '' });
 
   readonly hangarLink = hqHangar;
   readonly lockerLink = hqLocker;
@@ -233,10 +237,11 @@ export class HqSpotStageComponent implements OnInit {
   );
 
   readonly stagePersonTitle = computed(
-    () => this.activeLoadout()?.name ?? this.t.instant('codex.landing.me.uncommissioned'),
+    () => (this.langTick(), this.activeLoadout()?.name ?? this.t.instant('codex.landing.me.uncommissioned')),
   );
 
   readonly stagePersonRoleLabel = computed(() => {
+    this.langTick();
     const loadout = this.activeLoadout();
     return loadout
       ? this.t.instant('hangar.roles.' + loadout.role)
@@ -244,7 +249,7 @@ export class HqSpotStageComponent implements OnInit {
   });
 
   readonly stagePersonEquipSuffix = computed(
-    () => '· ' + this.t.instant('codex.stage.armorEquipped', { filled: this.boardHero().size, total: 6 }),
+    () => (this.langTick(), '· ' + this.t.instant('codex.stage.armorEquipped', { filled: this.boardHero().size, total: 6 })),
   );
 
   private archiveCount(plural: 'ships' | 'components'): number | null {

@@ -941,6 +941,10 @@ export async function uploadCatalog(
     // yielded no ships AND no manufacturers, the out_dir was corrupt or its
     // layout changed — leave the build row written but is_current untouched so
     // the codex keeps showing the last good build.
+    if ((manifest as { stub?: unknown }).stub === true) {
+      log.warn(`[catalog] not finalizing build ${buildId}: the extract ran in scaffold-stub mode (synthetic data)`);
+      return { ok: false, buildId, counts, error: 'stub_extract', errorCode: 'empty_catalog' };
+    }
     if (!hasViableCatalog(counts)) {
       log.warn(`[catalog] not finalizing empty/partial build ${buildId} (counts: ${JSON.stringify(counts)})`);
       return { ok: false, buildId, counts, error: 'empty_catalog', errorCode: 'empty_catalog' };

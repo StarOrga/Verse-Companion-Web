@@ -159,7 +159,8 @@ def run_extract(cfg: ExtractConfig) -> ExtractResult:
         f"scope: icons={cfg.scope_hd_icons} renders={cfg.scope_render_pngs} components={cfg.scope_component_tree}",
     )
 
-    if scdatatools_available and cfg.p4k_path.exists():
+    is_stub = not (scdatatools_available and cfg.p4k_path.exists())
+    if not is_stub:
         result = _real_extract(cfg)
     else:
         if not cfg.p4k_path.exists():
@@ -188,6 +189,8 @@ def run_extract(cfg: ExtractConfig) -> ExtractResult:
         "languages": result.languages,
         "warnings": result.warnings,
         "tool_version": cfg.tool_version,
+        # Synthetic scaffold data (8 fake ships): the uploader refuses to promote a stub build.
+        "stub": is_stub,
         "scope": {
             "hd_icons": cfg.scope_hd_icons,
             "render_pngs": cfg.scope_render_pngs,
