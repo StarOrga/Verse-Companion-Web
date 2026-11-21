@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.288.8",
+  "current": "0.288.9",
   "releases": [
+    {
+      "version": "0.288.9",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Verse map: hovering the HQ outpost no longer draws corner brackets, only a faint glow; the HQ label sits upright above the outpost instead of running into the planet and the news card, and the hover area follows the page scroll (admin feedback #388)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.288.8",
       "date": "2026-11-21",

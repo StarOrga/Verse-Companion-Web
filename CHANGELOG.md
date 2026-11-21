@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.288.9] - 2026-11-21
+
+### Fixed
+- Verse map: hovering the HQ outpost no longer draws corner brackets, only a faint glow; the HQ label sits upright above the outpost instead of running into the planet and the news card, and the hover area follows the page scroll (admin feedback #388).
+
 ## [0.288.8] - 2026-11-21
 
 ### Fixed
