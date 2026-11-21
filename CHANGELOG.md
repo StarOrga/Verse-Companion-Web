@@ -4,7 +4,7 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.289.3] - 2026-11-21
+## [0.289.4] - 2026-11-21
 
 ### Fixed
 - Data Uploader 0.84.5: the header shows the channel as a traffic light instead of three different version strings; the account popover compares your game build with the server and names what is still open.
