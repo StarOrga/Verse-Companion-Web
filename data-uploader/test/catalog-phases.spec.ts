@@ -14,7 +14,7 @@ describe('CATALOG_PHASE_ORDER', () => {
 
   it('exposes its own length as the phase total', () => {
     expect(CATALOG_PHASE_TOTAL).toBe(CATALOG_PHASE_ORDER.length);
-    expect(CATALOG_PHASE_TOTAL).toBe(17);
+    expect(CATALOG_PHASE_TOTAL).toBe(18);
   });
 
   it('has no duplicate phases (a repeat would break index math)', () => {

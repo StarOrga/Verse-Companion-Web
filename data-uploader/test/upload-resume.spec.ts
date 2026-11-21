@@ -175,6 +175,7 @@ describe('catalog upload — resume after a kill', () => {
         'codex_blueprints',
         'codex_blueprint_ingredients',
         'codex_missions',
+        'codex_locations',
         'codex_entity_strings',
       ],
       cursor: { phase: 'codex_item_ports', sent: 1 },
