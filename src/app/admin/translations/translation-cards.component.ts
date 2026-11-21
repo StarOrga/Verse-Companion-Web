@@ -159,7 +159,7 @@ export interface CardMoment {
                     {{ 'admin.translations.cards.cover.sub' | translate: { min: minutes(d.cards.length), count: d.deck_affected } }}
                   </span>
                   <span class="cover-go">
-                    <span class="desk">{{ 'admin.translations.cards.cover.goKeys' | translate }} <kbd class="kbd">{{ keys.turn }}</kbd></span>
+                    <span class="desk">{{ 'admin.translations.cards.cover.goKeys' | translate }} <kbd class="kbd">{{ keys.turn }}</kbd> {{ 'admin.translations.cards.cover.goKeysAfter' | translate }}</span>
                     <span class="touch">{{ 'admin.translations.cards.cover.goTouch' | translate }}</span>
                   </span>
                 </span>

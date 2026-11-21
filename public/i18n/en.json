@@ -4597,6 +4597,7 @@
           "sub": "≈ {{min}} min · affects {{count}} texts",
           "hint": "Pre-sorted from {{open}} open cards, the deck has an end. Every card: one option on the left, the other on the right.",
           "goKeys": "Tap or",
+          "goKeysAfter": "to turn",
           "goTouch": "Tap to turn"
         },
         "q": {

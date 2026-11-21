@@ -4597,6 +4597,7 @@
           "sub": "≈ {{min}} min · betrifft {{count}} Texte",
           "hint": "Vorsortiert aus {{open}} offenen Karten, der Stapel hat ein Ende. Jede Karte: links eine Möglichkeit, rechts die andere.",
           "goKeys": "Antippen oder",
+          "goKeysAfter": "deckt auf",
           "goTouch": "Antippen deckt auf"
         },
         "q": {

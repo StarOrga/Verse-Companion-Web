@@ -144,8 +144,8 @@ const BAR_SLACK_PX = 12;
         .bar { display: flex; }
         .tab { flex: 1 1 0; padding-inline: 2px; }
         .tab span { display: none; }
-        .tab[aria-current='page'] { flex: 3.4 1 0; }
-        .tab[aria-current='page'] span { display: inline; }
+        .tab[aria-current='page'] { flex: 0 0 auto; padding-inline: 8px; }
+        .tab[aria-current='page'] span { display: inline; overflow: visible; }
       }
       @media (orientation: landscape) and (max-height: 500px) {
         :host, :host(.above-bar) { position: static; translate: 0 0; margin-inline-end: 0; }
