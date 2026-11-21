@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { provideTranslateService } from '@ngx-translate/core';
+import { TranslateService, provideTranslateService } from '@ngx-translate/core';
 import { AnalyticsService } from '../../../core/analytics.service';
 import { ScConfirmService } from '../../../shared/dialog/sc-confirm.service';
 import { UndoToastService } from '../../../shared/undo-toast/undo-toast.service';
@@ -56,6 +56,10 @@ async function mount(answer: Answer, url = '/admin/translations?tab=cards') {
       { provide: ScConfirmService, useValue: { prompt, confirm } },
     ],
   });
+  // Only the quote frame is a real string: the KI text and the moment's hero live inside it.
+  const t = TestBed.inject(TranslateService);
+  t.setTranslation('xx', { admin: { translations: { cards: { quoted: '„{{text}}“' } } } });
+  t.use('xx');
   const harness = await RouterTestingHarness.create();
   const cmp = await harness.navigateByUrl(url, TranslationCardsComponent);
   await vi.waitFor(() => expect(cmp.loading()).toBe(false));
@@ -148,7 +152,7 @@ describe('TranslationCardsComponent (Karteikarten v2)', () => {
     expect(cmp.moment()).toBeNull();
     expect(cmp.session()).toEqual([]);
     expect(cmp.goal().done).toBe(0);
-    expect(track).toHaveBeenCalledWith('admin:translation_answer_remove', { via: 'toast' });
+    await vi.waitFor(() => expect(track).toHaveBeenCalledWith('admin:translation_answer_remove', { via: 'toast' }));
   });
 
   it('Ctrl+Z undoes the last answer too', async () => {
@@ -157,7 +161,7 @@ describe('TranslationCardsComponent (Karteikarten v2)', () => {
     await cmp.answer('b', 'key');
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, bubbles: true }));
     await vi.waitFor(() => expect(rpc('undo_translation_card').length).toBe(1));
-    expect(track).toHaveBeenCalledWith('admin:translation_answer_remove', { via: 'key' });
+    await vi.waitFor(() => expect(track).toHaveBeenCalledWith('admin:translation_answer_remove', { via: 'key' }));
   });
 
   it('an exception for one language is sent with the answer (P8, hotkey A)', async () => {
@@ -214,11 +218,11 @@ describe('TranslationCardsComponent (Karteikarten v2)', () => {
     expect(card.textContent).toContain('Haupttriebwerk');
     expect(card.textContent).toContain('admin.translations.cards.reason.bracket');
     // Five lines: head, hero, meaning + reason (both in the hero block), the two answers, foot.
-    expect(card.querySelector('article')!.children.length).toBe(4);
+    expect(card.children.length).toBe(4);
     expect(card.querySelectorAll('.hero > p').length).toBe(2);
     q<HTMLButtonElement>(el, '[data-test=veto-ok]')!.click();
     await vi.waitFor(() => expect(rpc('accept_translation_decision').length).toBe(1));
-    expect(track).toHaveBeenCalledWith('admin:translation_veto_submit', { verdict: 'ok', unsure: true, input: 'tap' });
+    await vi.waitFor(() => expect(track).toHaveBeenCalledWith('admin:translation_veto_submit', { verdict: 'ok', unsure: true, input: 'tap' }));
     cmp.endMoment();
     harness.detectChanges();
     expect(q(el, '[data-test=veto-empty]')).not.toBeNull();
@@ -239,7 +243,10 @@ describe('TranslationCardsComponent (Karteikarten v2)', () => {
     expect(q(el, '[data-test=goal-box] button')).toBeNull();
     rows[2].click();
     await vi.waitFor(() => expect(cmp.lang()).toBe('ja'));
-    await vi.waitFor(() => expect(rpc('translation_veto_list').at(-1)?.args).toEqual({ p_lang: 'ja', p_limit: 50 }));
+    await vi.waitFor(() => {
+      harness.detectChanges();
+      expect(rpc('translation_veto_list').at(-1)?.args).toEqual({ p_lang: 'ja', p_limit: 50 });
+    });
     harness.detectChanges();
     expect(rows[2].getAttribute('aria-current')).toBe('true');
   });
