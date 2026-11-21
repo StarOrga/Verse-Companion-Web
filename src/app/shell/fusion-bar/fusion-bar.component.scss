@@ -1,3 +1,5 @@
+@use '../viewport' as vp;
+
 // The field's breath. Animating box-shadow repainted on the main thread at the monitor's
 // refresh (about 48 % of a core on /verse at 179 Hz); the same light on its own layer only
 // changes opacity, which the compositor does alone.
@@ -999,3 +1001,26 @@ $dock-ease: cubic-bezier(0.55, 0, 0.2, 1);
   }
 }
 
+
+// ---- compact (a phone on its side): no bar at the bottom, no bar in the layout ----
+// The docked subheader leaves the layout (fixed, parked above the screen, publishes 0 height); the header's
+// magnifier or "/" brings it back as a top overlay while the search is open or has focus. On a hub's stage
+// (mode 'stage') the search field stands in the scene as always.
+@include vp.sc-compact {
+  :host(:not([data-mode='stage'])) {
+    position: fixed;
+    top: var(--sc-chrome-top);
+    left: 0;
+    right: 0;
+    margin-top: 0;
+    z-index: 30;
+    translate: 0 -200%;
+    opacity: 0;
+    transition: none;
+  }
+  :host(:not([data-mode='stage']).searching),
+  :host(:not([data-mode='stage']):focus-within) {
+    translate: 0 0;
+    opacity: 1;
+  }
+}

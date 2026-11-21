@@ -349,6 +349,21 @@ describe('CodexHoloStageComponent — wave 5 fixes', () => {
     expect(seen).toEqual(['akte', 'simple']);
   });
 
+  it('the empty table head never covers the Akte: its minimise control can be clicked again (#386)', async () => {
+    const fixture = await setup({ detail: detailWithPorts(['hardpoint_gun_left']) });
+    const el: HTMLElement = fixture.nativeElement;
+    el.querySelector<HTMLButtonElement>('.vw-thumb[data-view="akte"]')!.click();
+    fixture.detectChanges();
+    const head = el.querySelector<HTMLElement>('.table-head')!;
+    const akte = el.querySelector<HTMLElement>('.holo-akte.on')!;
+    expect(getComputedStyle(head).pointerEvents).toBe('none');
+    akte.scrollIntoView({ block: 'center' });
+    const r = akte.getBoundingClientRect();
+    // Where the shrunk card's control sits: the Akte's top-left corner, inside the head row's height.
+    const hit = document.elementFromPoint(r.left + 12, r.top + 12);
+    expect(!!hit && head.contains(hit), 'the table head intercepts the click').toBe(false);
+  });
+
   it('the source jump (#bezugsquelle) brings the Akte up: the sources live there, not on the table', async () => {
     const fixture = await setup({ detail: detailWithPorts(['hardpoint_gun_left']) });
     const c = fixture.componentInstance;
@@ -582,6 +597,8 @@ describe('CodexHoloStageComponent one panel (concept glas3)', () => {
     const c = f.componentInstance;
     const el: HTMLElement = f.nativeElement;
     expect(el.querySelectorAll('.holo-panel').length).toBe(1);
+    // The same panel component as every item page's shell panel, with a bounded (scrolling) pane.
+    expect(el.querySelector('sc-codex-detail-panel.holo-panel[data-fit] #holo-tabpanel[role="tabpanel"]')).not.toBeNull();
     const tabs = [...el.querySelectorAll('[role="tab"]')].map((t) => t.id);
     expect(tabs).toEqual(['holo-tab-rank', 'holo-tab-parts', 'holo-tab-changes']);
     expect(c.panelTab()).toBe('rank');
@@ -614,17 +631,27 @@ describe('CodexHoloStageComponent one panel (concept glas3)', () => {
     expect(f.componentInstance.changeView()).toBe('patch');
   });
 
-  it('the tabs are one control for the keyboard', async () => {
+  it('the tabs are the shared pill, one control for the keyboard, and report the pick', async () => {
     const f = await setup({ primaryModuleSections: sections });
     const c = f.componentInstance;
-    c.onTabKey(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+    const el: HTMLElement = f.nativeElement;
+    const track = vi.spyOn(TestBed.inject(AnalyticsService), 'track');
+    expect(el.querySelector('sc-codex-detail-tabs [role="tablist"]')).not.toBeNull();
+    const key = (k: string) => {
+      el.querySelector('sc-codex-detail-tabs [role="tablist"]')!.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
+      f.detectChanges();
+    };
+    key('ArrowRight');
     expect(c.panelTab()).toBe('parts');
-    c.onTabKey(new KeyboardEvent('keydown', { key: 'End' }));
+    expect(track).toHaveBeenCalledWith('codex:detail_tab_select', { kind: 'ship', tab: 'bauteile' });
+    key('End');
     expect(c.panelTab()).toBe('changes');
-    c.onTabKey(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+    key('ArrowRight');
     expect(c.panelTab()).toBe('rank');
-    c.onTabKey(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+    expect(track).toHaveBeenCalledWith('codex:detail_tab_select', { kind: 'ship', tab: 'einordnung' });
+    key('ArrowLeft');
     expect(c.panelTab()).toBe('changes');
+    expect(track).toHaveBeenCalledWith('codex:detail_tab_select', { kind: 'ship', tab: 'aenderungen' });
   });
 
   it('selecting a part brings the Bauteile tab forward', async () => {
@@ -871,7 +898,9 @@ describe('CodexHoloStageComponent lower part (concept holotisch-unten r1, d2)', 
     const below = el.querySelector('.holo-below')!;
     const persp = el.querySelector('sc-codex-holo-perspectives.below-persp')!;
     expect(below.compareDocumentPosition(persp) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(persp.nextElementSibling?.tagName.toLowerCase()).toBe('sc-codex-holo-strip');
+    // Each region stands in its own display:contents scope: the perspectives close theirs, the strip opens the next one.
+    expect(persp.nextElementSibling).toBeNull();
+    expect(persp.parentElement!.nextElementSibling?.firstElementChild?.tagName.toLowerCase()).toBe('sc-codex-holo-strip');
     expect(persp.classList).toContain('row');
   });
 

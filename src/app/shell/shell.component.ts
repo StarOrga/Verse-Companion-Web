@@ -67,6 +67,8 @@ import { FeedbackSpotsComponent } from '../feedback/feedback-spots.component';
 import { BetaService, betaAreaOf } from '../core/beta.service';
 import { BetaFabComponent } from './corners/beta-fab.component';
 import { ViewToggleFabComponent } from './corners/view-toggle-fab.component';
+import { FabDialComponent } from './corners/fab-dial.component';
+import { ViewportModeService } from '../core/viewport-mode';
 import { LayoutService } from '../core/layout/layout.service';
 import { NgTemplateOutlet } from '@angular/common';
 import { FusionBarComponent } from './fusion-bar/fusion-bar.component';
@@ -80,7 +82,7 @@ import { avatarUrlOf } from './avatar-url';
 @Component({
   selector: 'sc-shell',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe, FooterComponent, QuickSearchComponent, VerseStatusChipComponent, FeedbackFabComponent, UserFeedbackFabComponent, StarToastComponent, UndoToastComponent, AccountNoticeComponent, CodexSearchBarComponent, FeedbackSpotsComponent, FeedbackCaptureComponent, BetaFabComponent, ViewToggleFabComponent, NgTemplateOutlet, FusionBarComponent, ShellSceneComponent, MainHeaderComponent, ScTooltipDirective, KartographCrestComponent, AppsMenuComponent, MerklisteComponent, ScActionDirective, WishCartDialogComponent, SlowNavigationComponent, ScPopupMotionDirective, ScPopupComponent],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe, FooterComponent, QuickSearchComponent, VerseStatusChipComponent, FeedbackFabComponent, UserFeedbackFabComponent, StarToastComponent, UndoToastComponent, AccountNoticeComponent, CodexSearchBarComponent, FeedbackSpotsComponent, FeedbackCaptureComponent, BetaFabComponent, ViewToggleFabComponent, FabDialComponent, NgTemplateOutlet, FusionBarComponent, ShellSceneComponent, MainHeaderComponent, ScTooltipDirective, KartographCrestComponent, AppsMenuComponent, MerklisteComponent, ScActionDirective, WishCartDialogComponent, SlowNavigationComponent, ScPopupMotionDirective, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[class.verse-overlay]': 'verseOverlay()',
@@ -499,7 +501,7 @@ import { avatarUrlOf } from './avatar-url';
          be standing. Renders nothing when there is nothing to say. -->
     <sc-account-notice />
 
-    <main id="sc-main" tabindex="-1" [class.content]="!shellOn()" [class.sc-frame]="shellOn()" [class.switch-out]="switchingOut()" [class.switch-in]="switchingIn()" [@.disabled]="reducedMotion" [@routeReveal]="{ value: reveal(), params: revealParams() }">
+    <main id="sc-main" tabindex="-1" [class.below-header]="shellOn() && !cineHeader()" [class.content]="!shellOn()" [class.sc-frame]="shellOn()" [class.switch-out]="switchingOut()" [class.switch-in]="switchingIn()" [@.disabled]="reducedMotion" [@routeReveal]="{ value: reveal(), params: revealParams() }">
       <!-- The Codex search on every Codex page below the landing (whose own
            terminal row is the same bar). Ctrl+K, "/", the header button and
            typing on the page bring it forward instead of the overlay. -->
@@ -519,6 +521,8 @@ import { avatarUrlOf } from './avatar-url';
     <sc-beta-fab [area]="betaArea()" />
     <!-- Ship pages: Klassisch | Holotisch, the lane between the launcher and the β FAB. -->
     <sc-view-toggle-fab />
+    <!-- Phone / compact: β, the view switch and the page's actions fold into one Tools dial (the FABs above are hidden there). -->
+    <sc-fab-dial [area]="betaArea()" />
 
     <sc-feedback-fab />
     <sc-user-feedback-fab />
@@ -958,6 +962,12 @@ import { avatarUrlOf } from './avatar-url';
       flex: none;
       height: var(--sc-mainhead-h, 72px);
     }
+    /* A phone on its side: the header is a visible 48px row on EVERY page (the bottom bar is gone), so a page
+       that is not a stage under it starts below it. Stage pages keep the spacer above and place their first
+       text block with var(--sc-header-h) themselves. */
+    @media (orientation: landscape) and (max-height: 500px) {
+      main.below-header { margin-top: var(--sc-header-h); }
+    }
     /* Menu switch, part one: the old main page sinks away while the camera moves. */
     /* Menu switch out/in: global styles.scss ("MENU SWITCH") — it reaches into the routed page. */
     @media (max-width: 720px) {
@@ -1124,6 +1134,8 @@ export class ShellComponent implements AfterViewInit {
   /** On /admin or /admin/telemetry - the folded menu's button carries the active mark. */
   readonly adminRoute = signal(isAdminNavRoute(this.router.url));
   private readonly beta = inject(BetaService);
+  /** Sets html[data-sc-phone|compact|tablet] (one source for the mobile chrome). */
+  private readonly viewport = inject(ViewportModeService);
   protected readonly chrome = inject(ShellChromeService);
   protected readonly cart = inject(WishCartService);
   protected readonly layout = inject(LayoutService);
@@ -1174,6 +1186,7 @@ export class ShellComponent implements AfterViewInit {
   private topbarHeightPx: number | null = null;
 
   constructor() {
+    this.viewport.start();
     // The layout on <html> too: global rules read html[data-sc-layout], never html:has([data-layout]).
     effect(() => claimRootAttr('data-sc-layout', this, this.shellOn() ? this.layout.layout() : null));
     inject(DestroyRef).onDestroy(() => claimRootAttr('data-sc-layout', this, null));
@@ -1201,7 +1214,10 @@ export class ShellComponent implements AfterViewInit {
     // so the entrance is announced now — header and search field stand hidden from
     // the first frame instead of showing, vanishing and fading in again (owner
     // feedback 2026-11-04). The hub takes it over (or it is dropped after 8 s).
-    if (this.cinemaAhead()) inject(ShellChromeService).holdHeroIntro();
+    const ahead = this.cinemaAhead();
+    if (ahead === 'full') inject(ShellChromeService).holdHeroIntro();
+    // A reload of the hub: it fades in after the stars, and the scene's HQ outpost waits for it (#371).
+    else if (ahead === 'short') inject(ShellChromeService).holdHubCalm();
     this.router.events.pipe(takeUntilDestroyed()).subscribe((e) => {
       if (e instanceof NavigationEnd) {
         this.onCodexSubpage.set(isCodexSubpage(e.urlAfterRedirects));
@@ -1235,11 +1251,12 @@ export class ShellComponent implements AfterViewInit {
   }
 
   /** The page opens on the Verse hub with the β stage, motion allowed, and the hub will play its full entrance. */
-  private cinemaAhead(): boolean {
-    if (typeof window === 'undefined' || !isVerseHome(location.pathname)) return false;
-    if (!this.beta.isEnabled('verse')() || !this.beta.isEnabled('shell')()) return false;
-    if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
-    return peekIntro() === 'full';
+  /** The hub's opening ahead at boot: its full entrance, a reload's calm fade-in, or none. */
+  private cinemaAhead(): 'full' | 'short' | null {
+    if (typeof window === 'undefined' || !isVerseHome(location.pathname)) return null;
+    if (!this.beta.isEnabled('verse')() || !this.beta.isEnabled('shell')()) return null;
+    if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+    return peekIntro();
   }
 
   ngAfterViewInit(): void {

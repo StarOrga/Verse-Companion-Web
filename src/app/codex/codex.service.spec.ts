@@ -14,6 +14,14 @@ import { USABLE_ITEM_ATTACH_TYPES } from './codex-area-taxonomy';
 import { SupabaseClientProvider } from '../core/supabase.client';
 import { environment } from '../../environments/environment';
 import { LOCALE_SHARD_BASE, LOCALE_SHARD_FETCH } from './codex-locale-shards';
+import { CodexListSnapshots } from './codex-list-snapshots';
+import { CodexSilhouetteShards, SilhouetteShardAnswer } from './codex-silhouette-shards';
+
+/** No list snapshot for any build (the state before the first publish): every list read runs the mocked query. */
+const NO_LIST_SNAPSHOTS = {
+  provide: CodexListSnapshots,
+  useValue: { rows: async () => null, facets: async () => null } as unknown as CodexListSnapshots,
+};
 
 /** No R2 index for any build: resolveLocaleKeys reads the database table. */
 const noR2 = (async () => new Response('not found', { status: 404 })) as unknown as typeof fetch;
@@ -80,7 +88,7 @@ function makeService(
 ): CodexService {
   TestBed.configureTestingModule({
     providers: [
-      CodexService,
+      CodexService, NO_LIST_SNAPSHOTS,
       { provide: SupabaseClientProvider, useValue: mockProvider(cap, respond) },
       { provide: LOCALE_SHARD_FETCH, useValue: r2Fetch },
       { provide: LOCALE_SHARD_BASE, useValue: 'https://assets.test' },
@@ -266,7 +274,7 @@ function makeKeybindService(
   error: { message: string } | null = null,
 ): CodexService {
   TestBed.configureTestingModule({
-    providers: [CodexService, { provide: SupabaseClientProvider, useValue: keybindProvider(rows, cap, error) }],
+    providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: keybindProvider(rows, cap, error) }],
   });
   return TestBed.inject(CodexService);
 }
@@ -494,7 +502,7 @@ describe('CodexService archive readers and the build lookup', () => {
 
   function make(calls: Calls, buildFailsFirst = false): CodexService {
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: provider(calls, buildFailsFirst) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: provider(calls, buildFailsFirst) }],
     });
     return TestBed.inject(CodexService);
   }
@@ -656,7 +664,7 @@ describe('CodexService.listFpsCatalog and countSearchMatches', () => {
 
   function make(rows: unknown[], cap: Cap, opts: { failReads?: number; count?: number } = {}): CodexService {
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: provider(rows, cap, opts) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: provider(rows, cap, opts) }],
     });
     return TestBed.inject(CodexService);
   }
@@ -842,7 +850,7 @@ describe('CodexService.facetValues', () => {
     respond: () => { data: unknown; error: unknown },
   ): CodexService {
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: provider(calls, respond) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: provider(calls, respond) }],
     });
     return TestBed.inject(CodexService);
   }
@@ -944,7 +952,7 @@ describe('CodexService.resolveEntities', () => {
 
   function make(rows: Record<string, unknown>[]): CodexService {
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: provider(rows) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: provider(rows) }],
     });
     return TestBed.inject(CodexService);
   }
@@ -1045,7 +1053,7 @@ describe('CodexService.getEntityPayloads', () => {
       return chain;
     };
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: { client: { from } } }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: { client: { from } } }],
     });
     return { svc: TestBed.inject(CodexService), pending };
   }
@@ -1138,7 +1146,7 @@ describe('CodexService.getDetail', () => {
 
   function make(failing: 'codex_item_ports' | 'codex_entity_strings' | null, rpcMissing = false): CodexService {
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: provider(failing, rpcMissing) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: provider(failing, rpcMissing) }],
     });
     return TestBed.inject(CodexService);
   }
@@ -1204,7 +1212,7 @@ describe('CodexService.revalidateLiveBuild', () => {
 
   async function make(world: World): Promise<CodexService> {
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: provider(world) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: provider(world) }],
     });
     const svc = TestBed.inject(CodexService);
     await svc.loadCurrentBuild();
@@ -1332,7 +1340,7 @@ describe('CodexService.armorRating', () => {
       return Promise.resolve({ status: 200, ...a });
     };
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: { client: { from, rpc } } }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: { client: { from, rpc } } }],
     });
     return { svc: TestBed.inject(CodexService), rpcCalls: () => calls, rpcLog };
   }
@@ -1447,7 +1455,7 @@ describe('CodexService.searchAll', () => {
   function make(upcoming: Partial<UpcomingShipsService> = {}): CodexService {
     TestBed.configureTestingModule({
       providers: [
-        CodexService,
+        CodexService, NO_LIST_SNAPSHOTS,
         { provide: SupabaseClientProvider, useValue: { client: { from: () => ({}) } } },
         {
           provide: UpcomingShipsService,
@@ -1653,7 +1661,7 @@ describe('CodexService.listByKind search post-filter', () => {
       return chain;
     };
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: { client: { from } } }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: { client: { from } } }],
     });
     return TestBed.inject(CodexService);
   }
@@ -1745,7 +1753,7 @@ describe('CodexService German-name search and suggestions', () => {
       };
     }
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: { client } }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: { client } }],
     });
     return TestBed.inject(CodexService);
   }
@@ -1898,7 +1906,7 @@ describe('listSelect and slim list rows', () => {
       return chain;
     };
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: { client: { from } } }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: { client: { from } } }],
     });
     const res = await TestBed.inject(CodexService).listByKind('ship');
     expect(res.rows[0].payload).toEqual({ name: { en: 'Alpha', de: 'Alpha' }, manufacturer: { name: { en: 'ACME' } } });
@@ -1956,7 +1964,7 @@ describe('CodexService silhouettes before the edges column exists', () => {
   it('retries without edges once, keeps the outline and stops asking for the column', async () => {
     const selects: string[] = [];
     TestBed.configureTestingModule({
-      providers: [CodexService, { provide: SupabaseClientProvider, useValue: edgesProvider(selects) }],
+      providers: [CodexService, NO_LIST_SNAPSHOTS, { provide: SupabaseClientProvider, useValue: edgesProvider(selects) }],
     });
     const svc = TestBed.inject(CodexService);
     svc.build.set({ id: BUILD_ID, channel: 'LIVE', patch_version: '4.9.0', build_number: 'desktop', is_current: true } as never);
@@ -1971,5 +1979,148 @@ describe('CodexService silhouettes before the edges column exists', () => {
     await svc.silhouettes('component', ['COOL_B']);
     expect(selects.length).toBe(3);
     expect(selects[2]).not.toContain('edges');
+  });
+});
+
+/**
+ * Silhouettes come from the build's shard files (CodexSilhouetteShards) when
+ * they are published; whatever the files cannot answer runs the unchanged
+ * `codex_silhouettes` query.
+ */
+describe('CodexService silhouettes from the shard files', () => {
+  afterEach(() => TestBed.resetTestingModule());
+
+  const rowOf = (className: string) => ({
+    kind: 'ship', class_name: className, channel: 'LIVE', patch_version: '4.9.0', build_number: 'desktop',
+    view_box: '0 0 1000 1000', path: 'M 0 0 L 10 0 L 10 10 Z', edges: null, bbox: { x: 0, y: 0, w: 10, h: 10 },
+    anchors: [{ portId: 'hardpoint_a', x: 10, y: 20 }], unresolved: [], meta: { schema: 1 }, generated_at: null,
+  });
+
+  /** A database double that records every `codex_silhouettes` read and answers `dbRows`. */
+  function setup(
+    resolve: (kind: string, names: readonly string[]) => Promise<SilhouetteShardAnswer | null>,
+    dbRows: Record<string, unknown>[] = [],
+  ): { svc: CodexService; dbReads: string[][]; shardCalls: string[][] } {
+    const dbReads: string[][] = [];
+    const shardCalls: string[][] = [];
+    const from = (table: string) => {
+      let asked: string[] = [];
+      const answer = () => {
+        if (table !== 'codex_silhouettes') return { data: [], error: null };
+        dbReads.push(asked);
+        return { data: dbRows.filter((r) => asked.includes(String(r['class_name']))), error: null };
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const chain: any = {
+        select: () => chain,
+        eq: (col: string, value: string) => {
+          if (col === 'class_name') asked = [value];
+          return chain;
+        },
+        in: (_col: string, values: string[]) => {
+          asked = values;
+          return chain;
+        },
+        maybeSingle: () => {
+          const a = answer();
+          return Promise.resolve({ data: a.data[0] ?? null, error: a.error });
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        then: (onOk: any, onErr: any) => Promise.resolve(answer()).then(onOk, onErr),
+      };
+      return chain;
+    };
+    const shards = {
+      resolve: (_build: string, kind: string, names: readonly string[]) => {
+        shardCalls.push([...names]);
+        return resolve(kind, names);
+      },
+    };
+    TestBed.configureTestingModule({
+      providers: [
+        CodexService, NO_LIST_SNAPSHOTS,
+        { provide: CodexSilhouetteShards, useValue: shards as unknown as CodexSilhouetteShards },
+        { provide: SupabaseClientProvider, useValue: { client: { from } } },
+      ],
+    });
+    const svc = TestBed.inject(CodexService);
+    svc.build.set({ id: BUILD_ID, channel: 'LIVE', patch_version: '4.9.0', build_number: 'desktop', is_current: true } as never);
+    return { svc, dbReads, shardCalls };
+  }
+
+  const filedAnswer = (rows: Record<string, unknown>[], absent: string[] = [], open: string[] = []): SilhouetteShardAnswer => ({
+    rows: new Map(rows.map((r) => [String(r['class_name']), r])),
+    absent,
+    open,
+  });
+
+  it('answers a list page from the shards without a database read, exactly as the table would', async () => {
+    const filed = setup(async (_k, names) => filedAnswer(names.map(rowOf)));
+    const fromFiles = await filed.svc.silhouettes('ship', ['AEGS_Gladius', 'RSI_Aurora_MR']);
+    expect(filed.dbReads).toEqual([]);
+    expect([...fromFiles.keys()]).toEqual(['AEGS_Gladius', 'RSI_Aurora_MR']);
+
+    TestBed.resetTestingModule();
+    const db = setup(async () => null, [rowOf('AEGS_Gladius'), rowOf('RSI_Aurora_MR')]);
+    const fromDb = await db.svc.silhouettes('ship', ['AEGS_Gladius', 'RSI_Aurora_MR']);
+    expect(db.dbReads.length).toBe(1);
+    expect([...fromFiles]).toEqual([...fromDb]);
+  });
+
+  it('falls back to the unchanged query when the shards are not published', async () => {
+    const { svc, dbReads } = setup(async () => null, [rowOf('AEGS_Gladius')]);
+    const map = await svc.silhouettes('ship', ['AEGS_Gladius', 'NOPE']);
+    expect(dbReads).toEqual([['AEGS_Gladius', 'NOPE']]);
+    expect([...map.keys()]).toEqual(['AEGS_Gladius']);
+    expect((await svc.silhouette('ship', 'AEGS_Gladius'))?.classNameSlug).toBe('AEGS_Gladius');
+  });
+
+  it('falls back to the query when the reader throws', async () => {
+    const { svc, dbReads } = setup(async () => {
+      throw new Error('reader bug');
+    }, [rowOf('AEGS_Gladius')]);
+    expect((await svc.silhouettes('ship', ['AEGS_Gladius'])).size).toBe(1);
+    expect(dbReads.length).toBe(1);
+  });
+
+  it('a class the build has no outline for is absent, remembered, and never asked of the database', async () => {
+    const { svc, dbReads, shardCalls } = setup(async (_k, names) =>
+      filedAnswer(names.filter((n) => n !== 'NOPE').map(rowOf), names.filter((n) => n === 'NOPE')));
+    const map = await svc.silhouettes('ship', ['AEGS_Gladius', 'NOPE']);
+    expect([...map.keys()]).toEqual(['AEGS_Gladius']);
+    expect(await svc.silhouette('ship', 'NOPE')).toBeNull();
+    expect(await svc.silhouettes('ship', ['NOPE'])).toEqual(new Map());
+    expect(dbReads).toEqual([]);
+    // both later reads were answered from the service's own memo
+    expect(shardCalls).toEqual([['AEGS_Gladius', 'NOPE']]);
+  });
+
+  it('asks the database only for the names whose shard could not be read', async () => {
+    const { svc, dbReads } = setup(
+      async () => filedAnswer([rowOf('AEGS_Gladius')], ['NOPE'], ['RSI_Aurora_MR']),
+      [rowOf('RSI_Aurora_MR'), rowOf('AEGS_Gladius')],
+    );
+    const map = await svc.silhouettes('ship', ['AEGS_Gladius', 'NOPE', 'RSI_Aurora_MR']);
+    expect(dbReads).toEqual([['RSI_Aurora_MR']]);
+    expect([...map.keys()].sort()).toEqual(['AEGS_Gladius', 'RSI_Aurora_MR']);
+  });
+
+  it('a single read comes from the shards too, and from the database when its shard is open', async () => {
+    const filed = setup(async (_k, names) => filedAnswer(names.map(rowOf)));
+    const one = await filed.svc.silhouette('ship', 'AEGS_Gladius');
+    expect(one?.anchors.length).toBe(1);
+    expect(filed.dbReads).toEqual([]);
+
+    TestBed.resetTestingModule();
+    const open = setup(async (_k, names) => filedAnswer([], [], [...names]), [rowOf('AEGS_Gladius')]);
+    expect((await open.svc.silhouette('ship', 'AEGS_Gladius'))?.classNameSlug).toBe('AEGS_Gladius');
+    expect(open.dbReads).toEqual([['AEGS_Gladius']]);
+  });
+
+  it('a row the parser refuses is no outline, from the shards as from the table', async () => {
+    const { svc, dbReads } = setup(async () => filedAnswer([{ ...rowOf('BROKEN'), path: '' }]));
+    expect((await svc.silhouettes('ship', ['BROKEN'])).size).toBe(0);
+    expect(await svc.silhouette('ship', 'BROKEN')).toBeNull();
+    expect(dbReads).toEqual([]);
   });
 });

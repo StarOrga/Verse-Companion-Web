@@ -1,0 +1,227 @@
+<section data-iteration="1" data-iteration-template="decision" data-analysis="full" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]}}</script>
+
+  <div class="iteration-intro">
+    <h2>Wohin entpackt der Uploader – und muss das auf die Platte?</h2>
+    <p>Gemessen gegen die echte Data.p4k (LIVE 4.10.3, 1,4 Mio. Einträge) auf diesem PC (12 Kerne, 32 GB).</p>
+  </div>
+
+  <section id="briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>Der Uploader entpackt nichts in einen Temp-Ordner: Jeder P4K-Eintrag wird einzeln in den RAM gelesen. Auf das Spiel-Laufwerk gehen nur die Codex-Dateien und kurze Spiegel für den Konverter.</p>
+    <p data-briefing-why>Der Engpass ist der RAM, nicht die Platte, und die RAM-Grenze kann der Uploader heute nicht einhalten.</p>
+    <div data-briefing-potential data-viz="kpi"
+         data-viz-spec='{"value":"≈ 2 GB","unit":"RAM je Prozess","label":"geschätzt einsparbar mit schlankem P4K-Index"}'>≈ 2 GB RAM je Prozess</div>
+    <a data-briefing-topic="t-ram" data-share="100">Platte &amp; RAM</a>
+    <p data-briefing-duration>≈ 4 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"4,5 GB","unit":"RAM-Spitze","label":"ein Codex-Extract, 23 min"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="flow" data-viz-spec='{"steps":[{"label":"P4K öffnen","value":"Index ≈ 2,5 GB RAM · 60 s"},{"label":"DataCore lesen","value":"341 MB am Stück in den RAM"},{"label":"Codex projizieren","value":"29.572 JSON · 191 MB Platte"},{"label":"Codex hochladen","value":"Ordner zurück in RAM · je 500 Zeilen"},{"label":"Silhouetten / 3D","value":"Spiegel 35–160 MB je Hülle · sofort gelöscht"},{"label":"Aufräumen","value":"Extrakt weg · Caches bleiben"}]}'></div>
+        <p>Alles liegt unter <code>…\StarCitizen\LIVE\.sc-companion-extracts\</code>, nicht im System-Temp. Gelesen wurden 4,6 GB, geschrieben nur 191 MB. Den Speicher belegt vor allem das Inhaltsverzeichnis der P4K, nicht der entpackte Inhalt.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="t-ram" data-topic data-nav-label="Platte &amp; RAM">
+    <div data-alevel="2" data-title="Platte &amp; RAM">
+      <div data-slot="short"><p>Platte ist billig (0,14 MB/s), der RAM sprengt das Budget schon mit einem Prozess.</p></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"P4K-Index (RAM)","value":2.5},{"label":"DataCore + Projektion (RAM)","value":1.7},{"label":"Codex-Dateien (Platte)","value":0.19},{"label":"größter Hüllen-Spiegel (Platte)","value":0.16}],"unit":"GB","hl":"P4K-Index (RAM)"}'></div>
+        <p>Die Plattenanteile sind klein und kurzlebig. Der größte Posten ist der Index, den jeder Prozess beim Öffnen der P4K neu aufbaut.</p>
+      </div>
+    </div>
+
+    <section id="d-codex" data-nav-label="Codex-Ablage" data-decision="d-codex" data-decision-mode="single"
+             data-label="Codex-Ablage" data-rec="keep"
+             data-rec-why="Die Platte ist nicht der Engpass: 191 MB in 23 min, die Zeit geht in die Projektion."
+             data-applies-to="Codex-Schritt (Extract → Upload)" data-finding="f-codex">
+      <p data-applies>Gilt für: Codex-Schritt (Extract → Upload)</p>
+      <p data-situation>Ein Extract schreibt 29.572 Einzeldateien (191 MB), die der Upload danach wieder komplett einliest.</p>
+      <h3 data-question>Wo liegen die Codex-Daten zwischen Extract und Upload?</h3>
+      <p data-stakes>Resume nach Pause oder Absturz, ohne 23 min neu zu extrahieren.</p>
+      <div data-options>
+        <label data-opt="keep" data-recommended>
+          <input type="radio" name="dm-d-codex" value="keep" checked>
+          <span data-opt-label>Weiter als Dateien auf der Platte</span>
+          <span data-opt-consequence>Resume bleibt, kein Umbau.</span>
+        </label>
+        <label data-opt="table">
+          <input type="radio" name="dm-d-codex" value="table">
+          <span data-opt-label>Eine Datei je Tabelle schreiben</span>
+          <span data-opt-consequence>Rund 15 statt 29.572 Dateien, Resume bleibt. Umbau in Extractor und Upload.</span>
+        </label>
+        <label data-opt="ram">
+          <input type="radio" name="dm-d-codex" value="ram">
+          <span data-opt-label>Direkt aus dem RAM hochladen</span>
+          <span data-opt-consequence>Keine Dateien mehr, aber jeder Abbruch kostet einen neuen Extract.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-codex-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-codex-none" value="">
+      <input type="hidden" name="dm-d-codex-hes" value="{&quot;ms&quot;:48323,&quot;revisits&quot;:0,&quot;median&quot;:40946}">
+      <input type="hidden" name="dm-d-codex-touched" value="1">
+      <input type="hidden" name="dm-d-codex-issue" value="">
+      <input type="hidden" name="dm-d-codex-epic" value="">
+      <div data-alevel="3" data-title="Codex-Ablage">
+        <div data-slot="short"><p>Gelesen 4,6 GB, geschrieben 191 MB in 23 min.</p></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"aus der P4K gelesen","value":4590},{"label":"auf Platte geschrieben","value":191}],"unit":"MB","hl":"auf Platte geschrieben"}'></div>
+          <p>Geschrieben wird mit 0,14 MB/s. Die Laufzeit hängt an der CPU.</p>
+        </div>
+        <div data-example><pre>LIVE-cat/  29.572 Dateien · 191 MB
+  items/         20.575 Dateien   60,7 MB
+  localization/      11 Dateien   33,6 MB
+  ships/            355 Dateien   27,8 MB
+  blueprints/     1.632 Dateien   22,6 MB
+  components/     2.397 Dateien   16,7 MB
+  …
+Upload: readJsonDir() liest jeden Ordner komplett ein,
+        dann je 500 Zeilen ein POST an ingest-catalog</pre></div>
+      </div>
+    </section>
+
+    <section id="d-mirror" data-nav-label="Konverter-Eingang" data-decision="d-mirror" data-decision-mode="single"
+             data-label="Konverter-Eingang" data-rec="keep"
+             data-rec-why="Der Spiegel kostet 0,6 s gegen 3,4 s Konvertieren, und die exe nimmt nur Dateipfade an."
+             data-applies-to="Silhouetten- und 3D-Schritt" data-finding="f-mirror">
+      <p data-applies>Gilt für: Silhouetten- und 3D-Schritt</p>
+      <p data-situation>Jede Hülle muss für den Konverter kurz auf die Platte: bei der Carrack 34,5 MB, bei der Polaris rund 160 MB.</p>
+      <h3 data-question>Wie bekommt der cgf-converter seine Hülle?</h3>
+      <p data-stakes>Ob der 3D-Schritt beim Nutzer Treiber oder Adminrechte braucht.</p>
+      <div data-options>
+        <label data-opt="keep" data-recommended>
+          <input type="radio" name="dm-d-mirror" value="keep" checked>
+          <span data-opt-label>Weiter über einen kurzen Spiegel-Ordner</span>
+          <span data-opt-consequence>0,6 s Schreiben je Hülle, gleich danach gelöscht.</span>
+        </label>
+        <label data-opt="ramdisk">
+          <input type="radio" name="dm-d-mirror" value="ramdisk">
+          <span data-opt-label>Über eine RAM-Disk einspeisen</span>
+          <span data-opt-consequence>Braucht bei jedem Nutzer Treiber und Adminrechte, spart unter 1 s je Hülle.</span>
+        </label>
+        <label data-opt="fork">
+          <input type="radio" name="dm-d-mirror" value="fork">
+          <span data-opt-label>Konverter so patchen, dass er aus dem Speicher liest</span>
+          <span data-opt-consequence>Eigener C#-Patch, der bei jedem Upstream-Update neu gepflegt werden muss.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-mirror-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-mirror-none" value="">
+      <input type="hidden" name="dm-d-mirror-hes" value="{&quot;ms&quot;:292013,&quot;revisits&quot;:11,&quot;median&quot;:40946}">
+      <input type="hidden" name="dm-d-mirror-touched" value="1">
+      <input type="hidden" name="dm-d-mirror-issue" value="">
+      <input type="hidden" name="dm-d-mirror-epic" value="">
+      <div data-alevel="3" data-title="Konverter-Eingang">
+        <div data-slot="short"><p>Carrack: 0,6 s Spiegel, 3,4 s Konvertieren, 20,8 MB Raw-GLB.</p></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Spiegel schreiben","value":0.6},{"label":"Konvertieren","value":3.4}],"unit":"s","hl":"Spiegel schreiben"}'></div>
+          <p>Danach optimiert gltf-transform ebenfalls über Dateien, das kostet zusätzlich Zeit.</p>
+        </div>
+        <div data-example><pre>$ cgf-converter-2.0.0-sc.1.exe -help
+No corresponding input file exist: -help
+
+Hüllen-Probe ANVL_Carrack (gemessen):
+  ANVL_Carrack.cga    22,7 MB  gespiegelt in 0,4 s
+  ANVL_Carrack.cgam   11,9 MB  gespiegelt in 0,2 s
+  Konverter           3,4 s  → Raw-GLB 20,8 MB
+rsi_polaris.cga + .cgam  78,9 + 82,8 MB</pre></div>
+      </div>
+    </section>
+
+    <section id="d-budget" data-nav-label="RAM-Grenze" data-decision="d-budget" data-decision-mode="single"
+             data-label="RAM-Grenze" data-rec="floor"
+             data-rec-why="Ein Regler, dessen Wert die App selbst nie einhalten kann, verspricht dem Nutzer etwas Falsches."
+             data-applies-to="Ressourcen-Grenzen, vor allem Voreinstellung „Gaming“" data-finding="f-budget">
+      <p data-applies>Gilt für: Ressourcen-Grenzen, vor allem Voreinstellung „Gaming“</p>
+      <p data-situation>Auf diesem PC erlaubt „Gaming“ 3,75 GB, doch schon ein einzelner Codex-Extract braucht 4,5 GB. </p>
+      <h3 data-question>Wie geht die RAM-Grenze mit dem gemessenen Mindestbedarf um?</h3>
+      <p data-stakes>Ob „Gaming“ das Spiel wirklich vor Speicherdruck schützt.</p>
+      <div data-options>
+        <label data-opt="floor" data-recommended>
+          <input type="radio" name="dm-d-budget" value="floor" checked>
+          <span data-opt-label>Untergrenze auf den Mindestbedarf heben</span>
+          <span data-opt-consequence>Der Regler beginnt bei rund 5 GB und zeigt ehrlich, was ein Lauf braucht.</span>
+        </label>
+        <label data-opt="warn">
+          <input type="radio" name="dm-d-budget" value="warn">
+          <span data-opt-label>Grenze lassen, Überschreitung im Dock melden</span>
+          <span data-opt-consequence>Der Wert bleibt, das Ressourcen-Dock warnt, sobald der Lauf darüber liegt.</span>
+        </label>
+        <label data-opt="keep">
+          <input type="radio" name="dm-d-budget" value="keep">
+          <span data-opt-label>Regler wirkt weiter nur auf die Worker-Zahl</span>
+          <span data-opt-consequence>Kein Umbau, die Überschreitung bleibt unsichtbar.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-budget-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-budget-none" value="">
+      <input type="hidden" name="dm-d-budget-hes" value="{&quot;ms&quot;:33569,&quot;revisits&quot;:0,&quot;median&quot;:40946}">
+      <input type="hidden" name="dm-d-budget-touched" value="1">
+      <input type="hidden" name="dm-d-budget-issue" value="">
+      <input type="hidden" name="dm-d-budget-epic" value="">
+      <div data-alevel="3" data-title="RAM-Grenze">
+        <div data-slot="short"><p>Budget „Gaming“ 3,75 GB, gemessene Spitze 4,5 GB.</p></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Budget „Gaming“","value":3.75},{"label":"Codex-Extract, Spitze","value":4.48},{"label":"Hüllen-Probe, Spitze","value":2.74}],"unit":"GB","hl":"Codex-Extract, Spitze"}'></div>
+          <p>Das Budget legt nur fest, wie viele Worker starten; niemand bemerkt die Überschreitung.</p>
+        </div>
+        <div data-example><pre>resource-limits.ts
+  gaming: { ram: 0.15 }        → 25,5 GB Skala × 0,15 ≈ 3,75 GB
+  SKIN_WORKER_MB = 3072        → 1 Worker (min. 1, egal wie klein)
+  ramMb "Sizes how many workers a stage starts"
+
+Gemessen (Working Set, Spitze):
+  Codex-Extract seriell     4.476 MB
+  Hüllen-Probe              2.738 MB</pre></div>
+      </div>
+    </section>
+
+    <section id="d-index" data-nav-label="P4K-Index" data-decision="d-index" data-decision-mode="yesnoalt"
+             data-label="Schlanker P4K-Index" data-rec="yes"
+             data-rec-why="Der Index ist der größte RAM-Posten, größer als alle entpackten Daten zusammen."
+             data-applies-to="jeder Prozess, der die P4K öffnet" data-finding="f-index">
+      <p data-applies>Gilt für: jeder Prozess, der die P4K öffnet</p>
+      <p data-situation>Jeder Prozess, der die P4K öffnet, belegt allein für ihr Inhaltsverzeichnis rund 2,5 GB RAM, jeder 3D-Worker erneut.</p>
+      <h3 data-question>Bauen wir einen schlanken P4K-Index statt des scdatatools-Index?</h3>
+      <p data-stakes>Wie viele Worker in dasselbe RAM-Budget passen.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-d-index" value="yes" checked>
+          <span data-opt-label>Ja, kompakten Index bauen</span>
+          <span data-opt-consequence>Geschätzt unter 0,5 GB statt rund 2,5 GB je Prozess. Vorher mit einem Prototyp messen.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-d-index" value="no">
+          <span data-opt-label>Nein, scdatatools-Index bleibt</span>
+          <span data-opt-consequence>Jeder Worker braucht weiter rund 3 GB.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-index" value="alt">
+          <span data-opt-label>Anders …</span>
+          <span data-opt-consequence>Was stattdessen?</span>
+        </label>
+        <input type="text" name="dm-d-index-alt" placeholder="Was stattdessen?" value="">
+      </div>
+      <textarea data-comment="d-index-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-index-none" value="">
+      <input type="hidden" name="dm-d-index-hes" value="{&quot;ms&quot;:13637,&quot;revisits&quot;:0,&quot;median&quot;:40946}">
+      <input type="hidden" name="dm-d-index-touched" value="1">
+      <input type="hidden" name="dm-d-index-issue" value="">
+      <input type="hidden" name="dm-d-index-epic" value="">
+      <div data-alevel="3" data-title="Schlanker P4K-Index">
+        <div data-slot="short"><p>Allein das Öffnen der P4K braucht ≈ 2,5 GB.</p></div>
+        <div data-slot="long">
+          <div data-viz="spark" data-viz-spec='{"points":[0,1283,2356,2870,3115],"label":"RAM des Extracts in den ersten 80 s (MB, alle 20 s)"}'></div>
+          <p>Der Speicher wächst, während nur das Verzeichnis eingelesen wird.</p>
+        </div>
+        <div data-example><pre>Hüllen-Probe (öffnet nur + liest 2 Dateien):
+  open 59.8s, 1,399,137 entries
+  peak working set   2.738 MB
+  aus der P4K gelesen  482 MB   (das Verzeichnis)
+
+skin_export_app: jeder Worker öffnet die P4K selbst
+  → SKIN_WORKER_MB = 3072 je Worker</pre></div>
+      </div>
+    </section>
+  </section>
+</section>

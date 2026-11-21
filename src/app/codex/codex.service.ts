@@ -58,6 +58,33 @@ export interface SearchAllFilters {
 import { ilikeTokenGroups, ilikeTokenPatterns, normalizeSearch, searchMatcher, searchTokens } from './codex-search';
 import { UpcomingShipsService } from './upcoming-ships.service';
 import { CodexLocaleShards } from './codex-locale-shards';
+import { CodexListSnapshots, NamesDe } from './codex-list-snapshots';
+import { CodexSilhouetteShards, SilhouetteShardAnswer } from './codex-silhouette-shards';
+import {
+  ByClassName,
+  CARD_PAYLOAD_KEYS,
+  INTERNAL_ITEM_ATTACH_TYPES,
+  ListSnapshot,
+  ListSnapshotName,
+  NON_SHIP_VEHICLE_PREFIXES,
+  SearchMode,
+  countFromSnapshot,
+  distinctColumn,
+  germanListFromSnapshot,
+  isWholeTable,
+  itemRankRowsFromSnapshot,
+  jsonTextOf,
+  listFromSnapshot,
+  matchRows,
+  missileRowsFromSnapshot,
+  payloadKeysOf,
+  prefixRowsFromSnapshot,
+  recordsByClassName,
+  sliceNameFor,
+  snapshotNameFor,
+} from './codex-list-engine';
+
+export { CARD_PAYLOAD_KEYS, INTERNAL_ITEM_ATTACH_TYPES };
 import { ShipStatDelta, computeShipRowDeltas } from './codex-build-diff';
 import { PatchTimelineEntry, buildPatchTimeline } from './codex-patch-timeline';
 import { skinQueryPrefix } from './codex-skin-group';
@@ -85,6 +112,7 @@ import {
 import { ammoClassNameFor } from './codex-equipped-stats';
 import { classifyShipModule, ShipModuleSection } from './ship-module-sections';
 import { carriedByPort, stockLoadoutClassNames } from './stock-loadout';
+import { RankParts, SnapshotCut } from './codex-rank-parts';
 import { computeKpiSheet, KpiShipInput } from './codex-loadout-stats';
 import { SummaryOccupant } from './ship-summary-panels';
 import { HoloSilhouette, parseHoloSilhouette, SilhouetteKind } from './holo-silhouette';
@@ -364,9 +392,9 @@ const RANK_PAYLOAD_KEYS: readonly string[] = ['career', 'defaultLoadout', 'fligh
  * Avenger Titan" card), orbital sentry turrets and comm probes. The extractor
  * files them as vehicles without the variant flag, so the default browse drops
  * them by class name; "include variants" still lists them. 16 records in the
- * 4.10 LIVE build (audit 2026-09-25).
+ * 4.10 LIVE build (audit 2026-09-25). The list lives in codex-list-engine.ts
+ * (NON_SHIP_VEHICLE_PREFIXES), shared with the snapshot reads.
  */
-const NON_SHIP_VEHICLE_PREFIXES = ['SalvageableDebris', 'Orbital_Sentry', 'probe_'] as const;
 
 /** Guard for listFpsCatalog's paging loop — ~5× today's largest on-foot category. */
 const FPS_CATALOG_HARD_CAP = 12000;
@@ -521,8 +549,7 @@ const LIST_SELECT: Record<CodexKind, string> = {
  */
 export type ListPayload = 'full' | 'card' | 'none' | readonly string[];
 
-/** Payload keys a list card reads (browse, search hits, hangar/HQ ship cards). */
-export const CARD_PAYLOAD_KEYS: readonly string[] = ['name', 'previewImage', 'manufacturer'];
+// CARD_PAYLOAD_KEYS (what a list card reads) lives in codex-list-engine.ts and is re-exported above.
 
 const PAYLOAD_ALIAS = 'p_';
 
@@ -541,6 +568,12 @@ export function listSelect(kind: CodexKind, payload: ListPayload = 'card'): stri
  * pathological build can never turn the loop into an endless request storm.
  */
 const WEAPON_FACET_HARD_CAP = 20000;
+
+/** What the rank cohort scores the stock loadouts over: the parts by class name and the ammunition they fire. */
+interface CohortParts {
+  payloads: Map<string, { kind: CodexKind; payload: unknown }>;
+  ammo: Map<string, unknown>;
+}
 
 /** Main-thread time one cohort step may take before it hands the event loop back. */
 const COHORT_SLICE_MS = 6;
@@ -561,6 +594,12 @@ function yieldToEventLoop(): Promise<void> {
 export class CodexService {
   private readonly sb = inject(SupabaseClientProvider);
   private readonly localeShards = inject(CodexLocaleShards);
+  /** Catalog lists as files per build (R2); every read falls back to the database on `null`. */
+  private readonly listSnapshots = inject(CodexListSnapshots);
+  /** Silhouettes as shard files per build (R2); every read falls back to the database on `null` / `open`. */
+  private readonly silhouetteShards = inject(CodexSilhouetteShards);
+  /** Snapshot reads whose answer threw once already (logged once each). */
+  private readonly snapshotFailures = new Set<string>();
   /**
    * The RSI announcement feed, read-only from here. Injected purely so
    * {@link searchAll} can cover ships that exist on a concept page but not in
@@ -915,7 +954,123 @@ export class CodexService {
     const limit = filters.limit ?? PAGE_SIZE;
     const offset = filters.offset ?? 0;
 
-    let query = this.filteredListQuery(kind, build.id, filters);
+    const result = (await this.snapshotList(kind, build.id, filters, limit, offset)) ??
+      (await this.listByKindFromDb(kind, build.id, filters, limit, offset));
+
+    // `name_localized` is English only. When the English/class-name search
+    // finds nothing at all, ask the German names (codex_search RPC) — see
+    // listByGermanName for why this is a fallback and not the primary path.
+    if (filters.search && result.count === 0) {
+      return (await this.listByGermanName(kind, build.id, filters, limit, offset)) ?? result;
+    }
+    return result;
+  }
+
+  /**
+   * The snapshot file that answers a read of `kind` with this payload, or
+   * `null` (no file can, not published, outage, still loading after the wait).
+   * Never throws.
+   */
+  private async snapshotOf(buildId: string, kind: CodexKind, payload: ListPayload | undefined): Promise<ListSnapshot | null> {
+    const name = snapshotNameFor(kind, payload);
+    return name ? this.snapshotFile(buildId, name) : null;
+  }
+
+  /** One list file of the build by name, or `null` (not published, outage, still loading). Never throws. */
+  private async snapshotFile(buildId: string, name: ListSnapshotName): Promise<ListSnapshot | null> {
+    try {
+      return await this.listSnapshots.rows(buildId, name);
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Runs one snapshot answer. ANY throw (an engine bug, a file shape the
+   * reader let through) is logged once per read and answers `null`, so the
+   * caller goes on with its unchanged database path.
+   */
+  private async fromSnapshot<T>(read: string, answer: () => Promise<T | null> | T | null): Promise<T | null> {
+    try {
+      return await answer();
+    } catch (err) {
+      if (!this.snapshotFailures.has(read)) {
+        this.snapshotFailures.add(read);
+        logWarn('codex', 'list snapshot answer failed, using the database', { read, err });
+      }
+      return null;
+    }
+  }
+
+  /** listByKind answered from the build's list file, or `null` to use the database. */
+  private snapshotList(
+    kind: CodexKind,
+    buildId: string,
+    filters: CodexListFilters,
+    limit: number,
+    offset: number,
+  ): Promise<CodexListResult | null> {
+    return this.fromSnapshot('list', async () => {
+      const snap = await this.snapshotOf(buildId, kind, filters.payload);
+      const hit = snap && listFromSnapshot(snap, kind, filters, limit, offset);
+      if (!hit) return null;
+      return { rows: hit.records.map((r) => mapListRow(kind, r)), count: hit.count };
+    });
+  }
+
+  /** A head-only count answered from the build's list file, or `null` to use the database. */
+  private snapshotCount(
+    kind: CodexKind,
+    buildId: string,
+    filters: CodexListFilters,
+    mode: SearchMode,
+  ): Promise<number | null> {
+    return this.fromSnapshot('count', async () => {
+      const snap = await this.snapshotOf(buildId, kind, 'none');
+      return snap && countFromSnapshot(snap, kind, filters, mode);
+    });
+  }
+
+  /** A sibling read (class-name prefix, no filters) answered from the kind file, or `null`. */
+  private snapshotSiblings(kind: CodexKind, buildId: string, prefix: string): Promise<CodexListRow[] | null> {
+    return this.fromSnapshot('siblings', async () => {
+      const snap = await this.snapshotOf(buildId, kind, 'none');
+      const records = snap && prefixRowsFromSnapshot(snap, escapeIlike(prefix), SKIN_SIBLING_LIMIT);
+      return records ? records.map((r) => mapListRow(kind, r)) : null;
+    });
+  }
+
+  /**
+   * A read of `kind` rows by class name with the payload `keys`, answered from
+   * the build's list files: the records found, and the names only the database
+   * can answer (`rest`). `null` = no file can (not published, an older file
+   * without a key, outage): the caller runs its query for every name.
+   */
+  private snapshotByName(
+    buildId: string,
+    kind: CodexKind,
+    names: readonly string[],
+    keys: readonly string[],
+  ): Promise<ByClassName | null> {
+    return this.fromSnapshot('by class name', async () => {
+      const name = sliceNameFor(kind, keys);
+      const slice = await this.snapshotFile(buildId, name);
+      if (!slice) return null;
+      // A filtered slice cannot tell "not in the build" from "filtered out": the kind file can.
+      const all = isWholeTable(slice) ? null : await this.snapshotFile(buildId, kind);
+      return recordsByClassName(slice, all, names, keys);
+    });
+  }
+
+  /** The database path of {@link listByKind} (before the German-name fallback), unchanged. */
+  private async listByKindFromDb(
+    kind: CodexKind,
+    buildId: string,
+    filters: CodexListFilters,
+    limit: number,
+    offset: number,
+  ): Promise<CodexListResult> {
+    let query = this.filteredListQuery(kind, buildId, filters);
 
     // manufacturer/ammunition still have name_localized + class_name.
     if (filters.search) query = applySearchTokens(query, filters.search);
@@ -933,15 +1088,8 @@ export class CodexService {
     // "Caterpillar BIS 2949"); the shared matcher drops those false hits.
     const matches = filters.search ? searchMatcher(filters.search) : null;
     const rows = matches ? mapped.filter((r) => matches(r.nameLocalized, r.classNameSlug)) : mapped;
-    const result = { rows, count: Math.max(rows.length, (count ?? mapped.length) - (mapped.length - rows.length)) };
-
-    // `name_localized` is English only. When the English/class-name search
-    // finds nothing at all, ask the German names (codex_search RPC) — see
-    // listByGermanName for why this is a fallback and not the primary path.
-    if (filters.search && result.count === 0) {
-      return (await this.listByGermanName(kind, build.id, filters, limit, offset)) ?? result;
-    }
-    return result;
+    // A per-page estimate of the matcher's drops; the snapshot path counts exactly.
+    return { rows, count: Math.max(rows.length, (count ?? mapped.length) - (mapped.length - rows.length)) };
   }
 
   /**
@@ -951,6 +1099,8 @@ export class CodexService {
   async countByKind(kind: CodexKind, filters: CodexListFilters = {}): Promise<number | null> {
     const build = await this.buildOrThrow();
     if (!build) return null;
+    const fromFile = await this.snapshotCount(kind, build.id, filters, 'ignore');
+    if (fromFile !== null) return fromFile;
     try {
       const { count, error } = await this.filteredListQuery(kind, build.id, filters, true);
       return error ? null : (count ?? 0);
@@ -1017,6 +1167,10 @@ export class CodexService {
    * Calling the RPC first for every search would turn a broad term ("a",
    * "helm") into an id list too long for a URL.
    *
+   * With `names-de.json` and the kind's list file both at hand the same
+   * match runs locally ({@link snapshotGermanList}); otherwise the RPC path
+   * below runs unchanged.
+   *
    * @returns null when the fallback cannot answer (RPC not deployed yet, an
    *   error, no German match) — the caller keeps its empty result.
    */
@@ -1027,6 +1181,8 @@ export class CodexService {
     limit: number,
     offset: number,
   ): Promise<CodexListResult | null> {
+    const fromFile = await this.snapshotGermanList(kind, buildId, filters, limit, offset);
+    if (fromFile) return fromFile.count > 0 ? fromFile : null;
     const ids = await this.searchClassNames(kind, buildId, filters.search ?? '');
     if (ids.length === 0) return null;
     try {
@@ -1041,6 +1197,38 @@ export class CodexService {
     } catch {
       return null;
     }
+  }
+
+  /**
+   * The German-name fallback from `names-de.json` + the kind's list file
+   * (germanListFromSnapshot mirrors the RPC's row test, without its 100-name
+   * cut), or `null` when either file is missing or the engine declines — the
+   * RPC path then answers.
+   */
+  private snapshotGermanList(
+    kind: CodexKind,
+    buildId: string,
+    filters: CodexListFilters,
+    limit: number,
+    offset: number,
+  ): Promise<CodexListResult | null> {
+    return this.fromSnapshot('german search', async () => {
+      const tokens = searchTokens(filters.search ?? '');
+      // searchClassNames' guard: without a 3-character token there is no German search.
+      if (!tokens.some((t) => t.replace(/\*/g, '').length >= 3)) return { rows: [], count: 0 };
+      let names: NamesDe | null;
+      try {
+        names = await this.listSnapshots.namesDe(buildId);
+      } catch {
+        return null;
+      }
+      const forKind = names?.get(kind);
+      if (!forKind) return null;
+      const snap = await this.snapshotOf(buildId, kind, filters.payload);
+      const hit = snap && germanListFromSnapshot(snap, kind, filters, forKind, tokens, limit, offset);
+      if (!hit) return null;
+      return { rows: hit.records.map((r) => mapListRow(kind, r)), count: hit.count };
+    });
   }
 
   /**
@@ -1162,6 +1350,11 @@ export class CodexService {
 
   /** One head-only count for `countSearchMatches`; null when the query failed. */
   private async countOneKind(buildId: string, kind: CodexKind, term: string): Promise<number | null> {
+    // From the file: the same definition as listByKind's count (token groups AND the
+    // shared matcher), so "also found in …" matches the list it points at. The
+    // database path below cannot run the matcher and stays the token-only superset.
+    const fromFile = await this.snapshotCount(kind, buildId, { search: term }, 'list');
+    if (fromFile !== null) return fromFile;
     const query = applyDefaultBrowseFilters(
       this.sb.client
         .from(CODEX_ENTITY_TABLES[kind])
@@ -1185,6 +1378,20 @@ export class CodexService {
     if (!build || attachTypes.length === 0) return out;
     if (this.attachTypeCounts?.buildId !== build.id) this.attachTypeCounts = { buildId: build.id, counts: new Map() };
     const cache = this.attachTypeCounts.counts;
+    const missing = attachTypes.filter((t) => !cache.has(t));
+    if (missing.length) {
+      const fromFile = await this.fromSnapshot('attach counts', async () => {
+        const snap = await this.snapshotOf(build.id, 'item', 'none');
+        if (!snap) return null;
+        const counts = new Map<string, number>();
+        for (const attachType of missing) {
+          const count = countFromSnapshot(snap, 'item', { attachType }, 'ignore');
+          if (count !== null) counts.set(attachType, count);
+        }
+        return counts;
+      });
+      for (const [t, n] of fromFile ?? []) cache.set(t, n);
+    }
     await Promise.all(
       attachTypes
         .filter((t) => !cache.has(t))
@@ -1260,7 +1467,38 @@ export class CodexService {
     }
   }
 
+  /**
+   * facetValues from the build's facets.json (the RPC answer stored verbatim)
+   * plus, for ships, the size classes of the ship file; `null` = use the database.
+   */
+  private async facetValuesFromSnapshot(buildId: string, kind: CodexKind): Promise<CodexFacetValues | null> {
+    let facets: Record<string, unknown> | null;
+    try {
+      facets = await this.listSnapshots.facets(buildId);
+    } catch {
+      return null;
+    }
+    const d = facets?.[kind];
+    if (!d || typeof d !== 'object' || Array.isArray(d)) return null;
+    const r = d as Record<string, unknown>;
+    let sizes: number[];
+    if (kind === 'ship') {
+      const ships = await this.snapshotOf(buildId, 'ship', ['sizeClass']);
+      sizes = ships ? shipSizeClassesOf(ships) : await this.shipSizeClasses(buildId);
+    } else {
+      sizes = ((r['sizes'] as unknown[]) ?? []) as number[];
+    }
+    return {
+      manufacturers: ((r['manufacturers'] as unknown[]) ?? []) as CodexFacetValues['manufacturers'],
+      sizes,
+      grades: ((r['grades'] as unknown[]) ?? []) as string[],
+      componentKinds: ((r['componentKinds'] as unknown[]) ?? []) as string[],
+    };
+  }
+
   private async fetchFacetValues(buildId: string, kind: CodexKind): Promise<CodexFacetValues | null> {
+    const fromFile = await this.fromSnapshot('facets', () => this.facetValuesFromSnapshot(buildId, kind));
+    if (fromFile) return fromFile;
     try {
       const { data, error } = await this.sb.client.rpc('codex_facet_values', {
         p_build_id: buildId,
@@ -1351,6 +1589,24 @@ export class CodexService {
     if (!build) return [];
     if (this.weaponFacetCache?.buildId === build.id) return this.weaponFacetCache.rows;
 
+    // Every weapon row of the build, variants included. The file is in list
+    // order, not class_name order: the taxonomy only counts these rows.
+    const fromFile = await this.fromSnapshot('weapon facets', async () => {
+      const snap = await this.snapshotOf(build.id, 'weapon', 'none');
+      if (!snap) return null;
+      const at = (r: readonly unknown[], c: string) => (r[snap.col.get(c)!] as string | null) ?? null;
+      return snap.rows.map((r) => ({
+        weaponClass: at(r, 'weapon_class'),
+        attachType: at(r, 'attach_type'),
+        subType: at(r, 'sub_type'),
+        isVariant: r[snap.col.get('is_variant')!] === true,
+      }));
+    });
+    if (fromFile) {
+      this.weaponFacetCache = { buildId: build.id, rows: fromFile };
+      return fromFile;
+    }
+
     const page = 1000; // PostgREST caps a response at 1000 rows
     const out: WeaponFacetRow[] = [];
     for (let offset = 0; offset < WEAPON_FACET_HARD_CAP; offset += page) {
@@ -1409,6 +1665,36 @@ export class CodexService {
     if (!build) return [];
     const run = async (): Promise<CodexListRow[]> => {
       const kind: CodexKind = category === 'weapon' ? 'weapon' : 'item';
+      const fromFileRows = await this.fromSnapshot('fps catalog', async () => {
+      const snap = await this.snapshotOf(build.id, kind, 'card');
+      const fromFile = snap && CARD_PAYLOAD_KEYS.every((k) => snap.key.has(k))
+        ? matchRows(
+            snap,
+            kind,
+            category === 'weapon'
+              ? { weaponClass: 'FPS', includeVariants }
+              : { attachTypeIn: [...FPS_ARMOR_ATTACH_TYPES], includeVariants },
+            'ignore',
+          )
+        : null;
+      if (snap && fromFile) {
+        const col = (r: readonly unknown[], c: string) => r[snap.col.get(c)!] ?? null;
+        const key = (r: readonly unknown[], k: string) => r[snap.key.get(k)!] ?? null;
+        return fromFile.slice(0, FPS_CATALOG_HARD_CAP).map((r) => {
+          const record: Record<string, unknown> = {};
+          for (const c of ['class_name', 'name_localized', 'manufacturer_code', 'attach_type', 'sub_type', 'size', 'grade', 'is_variant']) {
+            record[c] = col(r, c);
+          }
+          if (category === 'weapon') record['weapon_class'] = col(r, 'weapon_class');
+          record['payload'] = lean
+            ? {}
+            : { name: key(r, 'name'), previewImage: key(r, 'previewImage'), manufacturer: key(r, 'manufacturer') };
+          return mapListRow(kind, record);
+        });
+      }
+      return null;
+      });
+      if (fromFileRows) return fromFileRows;
       const select = [
         'class_name, name_localized, manufacturer_code, attach_type, sub_type, size, grade, is_variant',
         ...(category === 'weapon' ? ['weapon_class'] : []),
@@ -1494,8 +1780,12 @@ export class CodexService {
     const build = await this.loadCurrentBuild();
     const names = Array.from(new Set(classNames.filter(Boolean)));
     if (!build || names.length === 0 || keys.length === 0) return out;
+    const fromFile = await this.snapshotByName(build.id, kind, names, keys);
+    if (fromFile) for (const [cn, r] of fromFile.records) out.set(cn, payloadFromAliases(r));
+    const rest = fromFile ? fromFile.rest : names;
+    if (rest.length === 0) return out;
     const select = ['class_name', ...keys.map((k) => `${PAYLOAD_ALIAS}${k}:payload->${k}`)].join(', ');
-    await forEachLimited(chunk(names, 100), PAYLOAD_READS_IN_FLIGHT, async (slice) => {
+    await forEachLimited(chunk(rest, 100), PAYLOAD_READS_IN_FLIGHT, async (slice) => {
       const { data, error } = await this.sb.client
         .from(CODEX_ENTITY_TABLES[kind])
         .select(select)
@@ -1526,6 +1816,8 @@ export class CodexService {
     if (kind !== 'weapon' && kind !== 'item' && kind !== 'component') return [];
     const build = await this.loadCurrentBuild();
     if (!build) return [];
+    const fromFile = await this.snapshotSiblings(kind, build.id, skinQueryPrefix(classNameSlug));
+    if (fromFile) return fromFile;
 
     const { data, error } = await this.sb.client
       .from(CODEX_ENTITY_TABLES[kind])
@@ -1552,6 +1844,8 @@ export class CodexService {
     if (kind !== 'ship') return [];
     const build = await this.loadCurrentBuild();
     if (!build) return [];
+    const fromFile = await this.snapshotSiblings(kind, build.id, editionQueryPrefix(classNameSlug));
+    if (fromFile) return fromFile;
 
     const { data, error } = await this.sb.client
       .from(CODEX_ENTITY_TABLES[kind])
@@ -1635,6 +1929,16 @@ export class CodexService {
    */
   async shipDetailForBuild(className: string, buildId: string): Promise<CodexDetail | null> {
     return this.fetchDetailForBuild('ship', className, buildId);
+  }
+
+  /** The same build-scoped read for any kind — the item page's Änderungen tab diffs two builds' payloads. */
+  async detailForBuild(kind: CodexKind, className: string, buildId: string): Promise<CodexDetail | null> {
+    return this.fetchDetailForBuild(kind, className, buildId);
+  }
+
+  /** The builds a patch comparison can use (newest first), failing loudly — see {@link recentLiveBuildsOrThrow}. */
+  async comparisonBuilds(limit = 6): Promise<CodexBuild[]> {
+    return this.recentLiveBuildsOrThrow(limit);
   }
 
   private async fetchDetailForBuild(
@@ -1729,11 +2033,29 @@ export class CodexService {
     return true;
   }
 
+  /**
+   * The rows of `classNames` from the build's shard files, or `null` when the
+   * files cannot answer (the caller then runs its unchanged query). Never throws.
+   */
+  private async silhouetteRowsFromShards(
+    buildId: string,
+    kind: SilhouetteKind,
+    classNames: readonly string[],
+  ): Promise<SilhouetteShardAnswer | null> {
+    return this.fromSnapshot('silhouettes', () => this.silhouetteShards.resolve(buildId, kind, classNames));
+  }
+
   async silhouette(kind: SilhouetteKind, className: string): Promise<HoloSilhouette | null> {
     const build = await this.loadCurrentBuild();
     if (!build) return null;
     const cacheKey = `${build.id}:${kind}:${className}`;
     if (this.silhouetteCache.has(cacheKey)) return this.silhouetteCache.get(cacheKey)!;
+    const filed = await this.silhouetteRowsFromShards(build.id, kind, [className]);
+    if (filed && filed.open.length === 0) {
+      const parsed = parseHoloSilhouette(filed.rows.get(className));
+      this.silhouetteCache.set(cacheKey, parsed);
+      return parsed;
+    }
     const read = () =>
       this.sb.client
         .from('codex_silhouettes')
@@ -1786,6 +2108,20 @@ export class CodexService {
       }
     }
     if (toFetch.length === 0) return result;
+
+    // The build's shard files first; what they cannot answer (not published, an outage) stays in toFetch.
+    const filed = await this.silhouetteRowsFromShards(build.id, kind, toFetch);
+    if (filed) {
+      for (const [className, row] of filed.rows) {
+        const parsed = parseHoloSilhouette(row);
+        this.silhouetteCache.set(`${build.id}:${kind}:${className}`, parsed);
+        if (parsed) result.set(className, parsed);
+      }
+      for (const className of filed.absent) this.silhouetteCache.set(`${build.id}:${kind}:${className}`, null);
+      toFetch.length = 0;
+      toFetch.push(...filed.open);
+      if (toFetch.length === 0) return result;
+    }
 
     const CHUNK = 200;
     for (let i = 0; i < toFetch.length; i += CHUNK) {
@@ -1861,29 +2197,39 @@ export class CodexService {
       ammunition: 'class_name, name_localized, size, name:payload->name',
     };
 
-    await Promise.all(
-      (Object.keys(selects) as CodexKind[]).map(async (kind) => {
+    // Each table from its kind file (all rows of the build, so a name it lacks
+    // is not in the table); a kind without a file asks the database as before.
+    const kinds = Object.keys(selects) as CodexKind[];
+    const perKind = await Promise.all(
+      kinds.map(async (kind): Promise<Record<string, unknown>[]> => {
+        const fromFile = await this.snapshotByName(build.id, kind, names, ['name']);
+        if (fromFile && fromFile.rest.length === 0) {
+          return [...fromFile.records.values()].map((r) => ({ ...r, name: r[`${PAYLOAD_ALIAS}name`] ?? null }));
+        }
         const { data, error } = await this.sb.client
           .from(CODEX_ENTITY_TABLES[kind])
           .select(selects[kind]!)
           .eq('build_id', build.id)
           .in('class_name', names);
-        if (error || !data) return;
-        for (const r of data as unknown as Record<string, unknown>[]) {
-          const cn = r['class_name'] as string;
-          if (out.has(cn)) continue; // first owner wins
-          out.set(cn, {
-            kind,
-            className: cn,
-            nameLocalized: (r['name_localized'] as string | null) ?? null,
-            name: (r['name'] as LocalizedText | null) ?? null,
-            manufacturerCode: (r['manufacturer_code'] as string | null) ?? null,
-            size: (r['size'] as number | null) ?? null,
-            grade: (r['grade'] as string | null) ?? null,
-          });
-        }
+        return error || !data ? [] : (data as unknown as Record<string, unknown>[]);
       }),
     );
+    // Merged in table order, so "first owner wins" does not depend on which answer lands first.
+    kinds.forEach((kind, i) => {
+      for (const r of perKind[i]) {
+        const cn = r['class_name'] as string;
+        if (out.has(cn)) continue;
+        out.set(cn, {
+          kind,
+          className: cn,
+          nameLocalized: (r['name_localized'] as string | null) ?? null,
+          name: (r['name'] as LocalizedText | null) ?? null,
+          manufacturerCode: (r['manufacturer_code'] as string | null) ?? null,
+          size: (r['size'] as number | null) ?? null,
+          grade: (r['grade'] as string | null) ?? null,
+        });
+      }
+    });
     return out;
   }
 
@@ -1985,7 +2331,24 @@ export class CodexService {
       'power:payload->stats->ItemResourceComponentParams->"online.power.generateSegments",' +
       'cooling:payload->stats->ItemResourceComponentParams->"online.coolant.generate"';
     const num = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null);
-    await forEachLimited(chunk(names, 200), PAYLOAD_READS_IN_FLIGHT, async (slice) => {
+    // component-rank.json carries payload->stats: the same four values, picked here instead of by PostgREST.
+    const fromFile = await this.snapshotByName(build.id, 'component', names, ['stats']);
+    if (fromFile) {
+      const at = (o: unknown, k: string): unknown =>
+        o && typeof o === 'object' && !Array.isArray(o) ? (o as Record<string, unknown>)[k] : null;
+      for (const [cn, r] of fromFile.records) {
+        const stats = r[`${PAYLOAD_ALIAS}stats`];
+        const resource = at(stats, 'ItemResourceComponentParams');
+        out.set(cn, {
+          shield: num(at(at(stats, 'SCItemShieldGeneratorParams'), 'MaxShieldHealth')),
+          quantum: num(at(at(stats, 'SCItemQuantumDriveParams'), 'params.driveSpeed')),
+          power: num(at(resource, 'online.power.generateSegments')),
+          cooling: num(at(resource, 'online.coolant.generate')),
+        });
+      }
+    }
+    const rest = fromFile ? fromFile.rest : names;
+    await forEachLimited(chunk(rest, 200), PAYLOAD_READS_IN_FLIGHT, async (slice) => {
       const { data, error } = await this.sb.client
         .from('codex_components')
         .select(select)
@@ -2019,6 +2382,12 @@ export class CodexService {
     const build = await this.loadCurrentBuild();
     const names = Array.from(new Set(classNames.filter(Boolean)));
     if (!build || names.length === 0) return out;
+    const keys = payloadKeysOf(payload);
+    const fromFile = keys ? await this.snapshotByName(build.id, 'ship', names, keys) : null;
+    if (fromFile && fromFile.rest.length === 0) {
+      for (const [cn, r] of fromFile.records) out.set(cn, mapListRow('ship', r));
+      return out;
+    }
     const { data, error } = await this.sb.client
       .from('codex_ships')
       .select(listSelect('ship', payload))
@@ -2212,20 +2581,29 @@ export class CodexService {
     const build = await this.loadCurrentBuild();
     if (!build) return [];
     if (this.missileCohort?.buildId === build.id) return this.missileCohort.records;
-    const { data, error } = await this.sb.client
-      .from(CODEX_ENTITY_TABLES.item)
-      .select('class_name, name_localized, sub_type, size, attach_type, payload')
-      .eq('build_id', build.id)
-      .eq('attach_type', 'Missile')
-      .not('name_localized', 'is', null);
-    if (error) throw error;
-    const rows = (data ?? []) as unknown as Record<string, unknown>[];
+    const rows =
+      (await this.fromSnapshot('missile cohort', async () => {
+        const snap = await this.snapshotFile(build.id, 'missile');
+        return snap && missileRowsFromSnapshot(snap);
+      })) ?? (await this.missileRowsFromDb(build.id));
     const silhouettes = await this.silhouettes('item', rows.map((row) => String(row['class_name'])));
     const records = rows.map((row) =>
       missileRecordOf(row, row['payload'], silhouettes.get(String(row['class_name']))),
     );
     this.missileCohort = { buildId: build.id, records };
     return records;
+  }
+
+  /** The database path of {@link getMissileCohort}'s rows, unchanged. */
+  private async missileRowsFromDb(buildId: string): Promise<Record<string, unknown>[]> {
+    const { data, error } = await this.sb.client
+      .from(CODEX_ENTITY_TABLES.item)
+      .select('class_name, name_localized, sub_type, size, attach_type, payload')
+      .eq('build_id', buildId)
+      .eq('attach_type', 'Missile')
+      .not('name_localized', 'is', null);
+    if (error) throw error;
+    return (data ?? []) as unknown as Record<string, unknown>[];
   }
 
   /** {@link getItemRankCohort}'s answers, per build and comparison kind. A failed read is not kept. */
@@ -2243,20 +2621,11 @@ export class CodexService {
     const cached = this.itemRankCohorts.get(key);
     if (cached) return cached;
     const entity = kind === 'weapon' ? 'weapon' : 'component';
-    const columns =
-      kind === 'weapon'
-        ? 'class_name, name_localized, sub_type, size, wp:payload->weaponParams'
-        : 'class_name, name_localized, sub_type, size, ck:payload->>kind, stats:payload->stats';
-    const query = this.sb.client
-      .from(CODEX_ENTITY_TABLES[entity])
-      .select(columns)
-      .eq('build_id', build.id)
-      .not('name_localized', 'is', null)
-      .eq('is_variant', false)
-      .not('name_localized', 'like', '!*');
-    const { data, error } = await (kind === 'weapon' ? query : query.eq('payload->>kind', kind));
-    if (error) throw error;
-    const rows = (data ?? []) as unknown as Record<string, unknown>[];
+    const rows =
+      (await this.fromSnapshot('item rank cohort', async () => {
+        const snap = await this.snapshotFile(build.id, kind === 'weapon' ? 'weapon-rank' : 'component-rank');
+        return snap && itemRankRowsFromSnapshot(snap, kind);
+      })) ?? (await this.itemRankRowsFromDb(build.id, kind));
     const records = rows
       .map((row) =>
         itemRankRecordOf(entity, row, kind === 'weapon' ? { weaponParams: row['wp'] } : { kind: row['ck'], stats: row['stats'] }),
@@ -2264,6 +2633,25 @@ export class CodexService {
       .filter((r): r is ItemRankRecord => r !== null);
     this.itemRankCohorts.set(key, records);
     return records;
+  }
+
+  /** The database path of {@link getItemRankCohort}'s rows, unchanged. */
+  private async itemRankRowsFromDb(buildId: string, kind: ItemRankKind): Promise<Record<string, unknown>[]> {
+    const entity = kind === 'weapon' ? 'weapon' : 'component';
+    const columns =
+      kind === 'weapon'
+        ? 'class_name, name_localized, sub_type, size, wp:payload->weaponParams'
+        : 'class_name, name_localized, sub_type, size, ck:payload->>kind, stats:payload->stats';
+    const query = this.sb.client
+      .from(CODEX_ENTITY_TABLES[entity])
+      .select(columns)
+      .eq('build_id', buildId)
+      .not('name_localized', 'is', null)
+      .eq('is_variant', false)
+      .not('name_localized', 'like', '!*');
+    const { data, error } = await (kind === 'weapon' ? query : query.eq('payload->>kind', kind));
+    if (error) throw error;
+    return (data ?? []) as unknown as Record<string, unknown>[];
   }
 
   /**
@@ -2299,9 +2687,77 @@ export class CodexService {
       for (const cn of stockLoadoutClassNames(payload?.defaultLoadout ?? [])) allClassNames.add(cn);
     }
     const names = [...allClassNames];
+
+    // The parts from the build's rank-parts file when it is published: the
+    // database path below reads the FULL payload of every part (116 requests,
+    // 26.5 MB on a cold browser, LIVE 4.10.3). The file carries slices, and
+    // its payloads throw SnapshotCut on any read outside them and count it —
+    // then the file is declined as a whole and the database answers, exactly
+    // as before. The count covers a throw some try/catch on the way swallowed;
+    // any other error of the file path leaves the decision to the database
+    // path too, which reports its own.
+    let ships: RankShipInput[] | null = null;
+    const fromFile = await this.cohortPartsFromFile(build.id, names);
+    if (fromFile) {
+      const cutsBefore = fromFile.cutReads();
+      try {
+        const scored = await this.scoreCohort(rows, fromFile, build.schemaVersion);
+        if (fromFile.cutReads() !== cutsBefore) throw new SnapshotCut('a read that was caught on the way');
+        ships = scored;
+      } catch (err) {
+        if (!this.snapshotFailures.has('rank parts cut')) {
+          this.snapshotFailures.add('rank parts cut');
+          logWarn('codex', 'rank parts file does not cover a read, using the database', { err });
+        }
+      }
+    }
+    ships ??= await this.scoreCohort(rows, await this.cohortPartsFromDb(names), build.schemaVersion);
+
+    writeCohortCache(key, ships);
+    return ships;
+  }
+
+  /**
+   * The cohort's parts from `rank-parts.json`, or `null` to read the database
+   * (not published, an older file without a key the cohort reads, outage). A
+   * class name the file neither holds nor lists as absent — it knows the names
+   * the stock loadouts held when it was published — is the one read the
+   * database still answers.
+   */
+  private cohortPartsFromFile(buildId: string, names: readonly string[]): Promise<(CohortParts & Pick<RankParts, 'cutReads'>) | null> {
+    return this.fromSnapshot('rank parts', async () => {
+      const file = await this.listSnapshots.rankParts(buildId);
+      if (!file) return null;
+      const payloads = new Map<string, { kind: CodexKind; payload: unknown }>();
+      const rest: string[] = [];
+      for (const cn of names) {
+        const hit = file.entities.get(cn);
+        if (hit) payloads.set(cn, hit);
+        else if (!file.absent.has(cn)) rest.push(cn);
+      }
+      if (rest.length > 0) {
+        const report: FetchReport = { failed: 0 };
+        const extra = await this.getEntityPayloads(rest, report);
+        // The database path retries and reports an incomplete read.
+        if (report.failed > 0) return null;
+        for (const [cn, hit] of extra) payloads.set(cn, hit);
+      }
+      // The file holds every ammunition row of the build: a name it lacks does not exist.
+      const ammo = new Map<string, unknown>();
+      for (const cn of names) {
+        const shot = ammoClassNameFor(cn, payloads.get(cn)?.payload);
+        const hit = shot ? file.ammo.get(shot) : undefined;
+        if (shot && hit !== undefined) ammo.set(shot, hit);
+      }
+      return { payloads, ammo, cutReads: file.cutReads };
+    });
+  }
+
+  /** The database path of the cohort's parts, unchanged: the full payload of every part. */
+  private async cohortPartsFromDb(names: string[]): Promise<CohortParts> {
     // A failed chunk (a statement timeout under the fleet-wide read) leaves a
     // HOLE in the cohort: its ships score with empty sheets and every
-    // percentile is quietly wrong — and the cache below used to keep that
+    // percentile is quietly wrong — and the cache used to keep that
     // hole for the whole build ("Einordnung" empty on every later load).
     // One retry; still incomplete = an error the page can offer a retry for,
     // never a cached half-fleet.
@@ -2316,7 +2772,15 @@ export class CodexService {
       .filter((cn): cn is string => !!cn);
     const ammo = await this.getAmmoPayloads(ammoNames, report);
     if (report.failed > 0) throw new Error(`rank cohort incomplete: ${report.failed} payload chunk(s) failed`);
+    return { payloads, ammo };
+  }
 
+  /** Every ship row scored from its stock loadout over `parts`. */
+  private async scoreCohort(
+    rows: readonly CodexListRow[],
+    { payloads, ammo }: CohortParts,
+    schemaVersion: number | null | undefined,
+  ): Promise<RankShipInput[]> {
     // Resolving + scoring the WHOLE fleet is far too much work for one tick:
     // measured live on 2026-09-05, 353 ships wedged the renderer for ~45 s and
     // the tab stopped answering at all. So we hand the event loop back every
@@ -2341,7 +2805,7 @@ export class CodexService {
               computeKpiSheet(occ, this.cohortShipInput(payload)),
               occ,
               payload?.stats as Record<string, Record<string, unknown>> | null | undefined,
-              build.schemaVersion,
+              schemaVersion,
             ))(this.cohortOccupantsFor(payload?.defaultLoadout ?? [], payloads, ammo)),
         });
       }
@@ -2350,8 +2814,6 @@ export class CodexService {
         sliceStart = performance.now();
       }
     }
-
-    writeCohortCache(key, ships);
     return ships;
   }
 
@@ -2359,6 +2821,18 @@ export class CodexService {
    * read (class name + name only) instead of a full re-score; a failed read
    * simply keeps the cached cohort as it was. */
   private async backfillCohortNames(key: string, buildId: string, cached: RankShipInput[]): Promise<RankShipInput[]> {
+    const fromFile = await this.fromSnapshot('cohort names', async () => {
+      const snap = await this.snapshotOf(buildId, 'ship', 'none');
+      if (!snap) return null;
+      const cn = snap.col.get('class_name')!;
+      const nl = snap.col.get('name_localized')!;
+      const names = new Map(snap.rows.map((r) => [r[cn] as string, cleanLocaleValue((r[nl] as string | null) ?? null) || null] as const));
+      return cached.map((s) => ({ ...s, name: names.get(s.className) ?? null }));
+    });
+    if (fromFile) {
+      writeCohortCache(key, fromFile);
+      return fromFile;
+    }
     try {
       const { data, error } = await this.sb.client
         .from('codex_ships')
@@ -2379,6 +2853,12 @@ export class CodexService {
   /** Every buyable ship row of the current build, unpaginated (the cohort
    * needs the whole fleet, not a browse page). */
   private async allShipRows(): Promise<CodexListRow[]> {
+    // The whole cohort from the one ship-rank file when the build has it.
+    const build = await this.loadCurrentBuild();
+    if (build) {
+      const whole = await this.snapshotList('ship', build.id, { payload: RANK_PAYLOAD_KEYS }, Number.MAX_SAFE_INTEGER, 0);
+      if (whole) return whole.rows;
+    }
     const out: CodexListRow[] = [];
     let offset = 0;
     const limit = 200;
@@ -2704,6 +3184,15 @@ export class CodexService {
   }
 
   private async fetchBlueprintCategories(buildId: string): Promise<string[]> {
+    const fromFile = await this.fromSnapshot('blueprint categories', async () => {
+      const snap = await this.snapshotFile(buildId, 'blueprint');
+      return snap && distinctColumn(snap, 'category');
+    });
+    if (fromFile) {
+      const values = fromFile.sort((a, b) => a.localeCompare(b));
+      this.blueprintCategoryCache = { buildId, values };
+      return values;
+    }
     const seen = new Set<string>();
     for (let page = 0; page < CATEGORY_MAX_PAGES; page++) {
       const from = page * CATEGORY_PAGE_SIZE;
@@ -2908,6 +3397,23 @@ function mapBuild(r: Record<string, unknown>): CodexBuild {
   };
 }
 
+/**
+ * The ship size classes (S1-S6) of a ship list file, ascending — what
+ * `shipSizeClasses` reads from the table (`payload->>sizeClass` of every row of the build).
+ */
+function shipSizeClassesOf(snap: ListSnapshot): number[] {
+  const i = snap.key.get('sizeClass');
+  if (i === undefined) return [];
+  const sizes = new Set<number>();
+  for (const row of snap.rows) {
+    const text = jsonTextOf(row[i]);
+    if (text === null) continue;
+    const n = Number(text);
+    if (Number.isInteger(n) && n >= 1 && n <= 6) sizes.add(n);
+  }
+  return [...sizes].sort((a, b) => a - b);
+}
+
 function mapListRow(kind: CodexKind, r: Record<string, unknown>): CodexListRow {
   return {
     classNameSlug: r['class_name'] as string,
@@ -3051,27 +3557,8 @@ function applyDefaultBrowseFilters<T extends BrowseFilterable>(query: T, kind: C
   return out;
 }
 
-/**
- * `codex_items.attach_type` values that are engine plumbing, never a player
- * item (measured on LIVE 4.10.0, 2026-10-07: ~6 000 of 23 600 item rows).
- * Hidden from every list, count and search; a detail page reached through a
- * ship's port list still opens.
- */
-export const INTERNAL_ITEM_ATTACH_TYPES: readonly string[] = [
-  'AIModule', 'AirTrafficController', 'AmmoBox', 'AttachedPart', 'Audio', 'Button',
-  'CapacitorAssignmentController', 'Char_Accessory_Head', 'Char_Body', 'Char_Flair', 'Char_Hair_Color',
-  'Char_Hair_Prop', 'Char_Head', 'Char_Head_Beard', 'Char_Head_Eyebrow', 'Char_Head_Eyelash',
-  'Char_Head_Eyes', 'Char_Head_Hair', 'Char_Head_Piercings', 'Char_Head_Stubble', 'Char_Lens',
-  'Char_Skin_Color', 'CommsController', 'Container', 'ControlPanel', 'CoolerController', 'Debris',
-  'Decal', 'DockingAnimator', 'DockingCollar', 'Door', 'DoorController', 'Display', 'Elevator',
-  'EnergyController', 'FPS_Radar', 'FuelController', 'Hangar', 'LandingGear', 'LandingSystem',
-  'LifeSupportVent', 'Light', 'LightController', 'Lightgroup', 'MiningController', 'MissileController',
-  'NOITEM_Player', 'NOITEM_Vehicle', 'PersistentHab', 'Player', 'Relay', 'RemoteConnection', 'Room',
-  'SalvageController', 'SalvageFieldEmitter', 'SalvageFieldSupporter', 'SalvageFillerStation',
-  'SalvageInternalStorage', 'Seat', 'SeatAccess', 'SeatDashboard', 'Sensor', 'ShieldController',
-  'ShopDisplay', 'StatusScreen', 'TargetSelector', 'Thumbnail', 'Visor', 'WeaponController',
-  'WheeledController',
-];
+// INTERNAL_ITEM_ATTACH_TYPES (engine plumbing hidden from every list) lives in
+// codex-list-engine.ts and is re-exported above.
 
 /**
  * PostgREST `or` clause for "column is none of these values" that ALSO keeps

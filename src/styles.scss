@@ -2,6 +2,8 @@
 
 // The scene's star fields, reused for the boot sky below (same seeds, same tiles).
 @use 'app/shell/scene/starfield' as boot-stars;
+// The compact (phone on its side) media query, once (core/viewport-mode.ts mirrors it).
+@use 'app/shell/viewport' as vp;
 
 // The two shared star fields as custom properties (_starfield.scss): one copy for the boot sky and the scene.
 :root { @include boot-stars.shared-fields; }
@@ -218,6 +220,16 @@ html[data-sc-layout] body { font-size: 0.9375rem; }
    public layout set only with the β on.
 
    Spacing scale: an 8px grid with a 4px half step.
+   Which step for which gap (between elements, not inside a control):
+     --sc-space-1  tight pair: label over its value, chip to chip,
+                   icon to its text
+     --sc-space-2  items of one group (rows, tiles, buttons in a row)
+                   and a group head to its items
+     --sc-space-3  blocks inside a card + the card's own padding
+     --sc-space-4  between two groups (a search and the list under it,
+                   facts and the livery tiles)
+   A gap takes one of these tokens, never a hand-picked 6/7/9/10px;
+   the holotable (Akte, Bauteile, Kaufen) follows this since #386.
    Bars: --sc-bar-h (the capsule), --sc-footer-h (compact footer).
    --sc-gap-head: bar -> first content line, ONE value per page
    type (set on the layout host: [data-layout]).
@@ -322,7 +334,11 @@ html[data-sc-layout] body { font-size: 0.9375rem; }
    on desktop and at the bottom on phones. */
 html[data-sc-layout] { scroll-padding-top: var(--sc-bar-h); }
 @media (max-width: 720px) {
-  html[data-sc-layout] { scroll-padding-top: 0; scroll-padding-bottom: var(--sc-bar-h); }
+  html[data-sc-layout] { scroll-padding-top: calc(var(--sc-header-h, 0px) + var(--sc-route-h, 0px) + var(--sc-space-2)); scroll-padding-bottom: var(--sc-bar-h); }
+}
+/* Compact (a phone on its side): the header is a 48px row, the bottom bar is gone. */
+@include vp.sc-compact {
+  html[data-sc-layout] { scroll-padding-top: calc(var(--sc-header-h, 0px) + var(--sc-space-2)); scroll-padding-bottom: 0; }
 }
 
 /* The frame (β only: the shell's <main> and the public layout's carry
@@ -618,6 +634,108 @@ html[data-sc-layout] { scroll-padding-top: var(--sc-bar-h); }
   }
 }
 
+
+/* ---- MOBILE CHROME (bundle A, docs/mobile) ----
+   One set of tokens for the phone / compact chrome; the contract B and C build against.
+   - --sc-header-h        height of the visible main header (published by <sc-main-header>, 0 while it is condensed)
+   - --sc-lane-bottom     bottom of the first floating surface above the launcher row
+   - --sc-dial-bottom     bottom of the Tools dial (shell/corners/fab-dial)
+   - --sc-fab-mini        diameter of a secondary FAB
+   - --sc-tap-*           touch sizes; --sc-t-* / --sc-e-*  motion (aliases of the holo tokens)
+   <html> carries data-sc-phone / data-sc-compact / data-sc-tablet (core/viewport-mode.ts),
+   data-sc-chrome='hidden' while the header is scrolled away, .sc-immersive while a stage owns the screen. */
+:root {
+  --sc-header-h: 0px;
+  --sc-tap-primary: 52px;
+  --sc-tap-gap: 8px;
+  --sc-fab-mini: 44px;
+  --sc-lane-bottom: calc(var(--sc-bar-stack-h, 0px) + var(--sc-float-bottom) + var(--sc-sheet-peek-h, 0px));
+  --sc-lane-right: max(var(--sc-fab-inset), env(safe-area-inset-right, 0px));
+  --sc-dial-bottom: calc(var(--sc-fab-clear-block) + var(--sc-beta-fab-lane) - var(--sc-fab-mini));
+  --sc-t-fast: var(--holo-t-fast);
+  --sc-t-base: var(--holo-t-base);
+  --sc-t-slow: 420ms;
+  --sc-e-out: var(--holo-e-out);
+  --sc-e-io: var(--holo-e-io);
+}
+@media (max-width: 720px) {
+  :root {
+    /* First paint before the header measured itself: brand row + nav row. */
+    --sc-header-h: calc(var(--sc-chrome-top) + 2 * var(--sc-head-item-h) + var(--sc-space-2));
+    /* Never lower than the feedback launcher's lane: on a page with no bottom bar (--sc-bar-stack-h 0) the dial used to sit on the launcher. */
+    --sc-dial-bottom: max(calc(var(--sc-lane-bottom) + var(--sc-fab-mini) / 4 + var(--sc-space-3)), calc(var(--sc-float-bottom) + var(--sc-launcher-lift, 0px) + var(--sc-fab-size) + var(--sc-space-2)));
+    --sc-toast-bottom: calc(var(--sc-dial-bottom) + var(--sc-fab-mini) + var(--sc-space-2));
+  }
+}
+@include vp.sc-compact {
+  :root {
+    /* The launcher and the dial shrink to 44px and hug the corner; the bar is gone. */
+    --sc-fab-size: 44px;
+    --sc-fab-inset: 12px;
+    --sc-fab-gutter: 8px;
+    --sc-chrome-top: calc(var(--sc-imp-banner-h, 0px) + env(safe-area-inset-top, 0px));
+    --sc-header-h: calc(48px + env(safe-area-inset-top, 0px));
+    --sc-dial-bottom: calc(var(--sc-float-bottom) + var(--sc-fab-size) + var(--sc-space-2));
+    --sc-toast-bottom: calc(var(--sc-dial-bottom) + var(--sc-fab-mini) + var(--sc-space-2));
+  }
+}
+/* BAR OFF (html[data-sc-bar-off], set by a phone page that needs the whole bottom, the ship sheet): no bottom search capsule
+   (the fusion bar publishes --sc-bar-stack-h 0 and turns into the compact top overlay, search icon in the header), and the
+   feedback launcher + the dial stand above the sheet's peek instead of on it. */
+html[data-sc-bar-off][data-sc-phone]:not([data-sc-compact]) { --sc-launcher-lift: var(--sc-sheet-peek-h, 0px); }
+html[data-sc-bar-off][data-sc-phone]:not([data-sc-compact]) sc-fusion-bar:not([data-mode='stage']) {
+  position: fixed; top: var(--sc-chrome-top); left: 0; right: 0; bottom: auto; margin-top: 0; z-index: 30;
+  translate: 0 -200%; opacity: 0; transition: none;
+}
+html[data-sc-bar-off][data-sc-phone]:not([data-sc-compact]) sc-fusion-bar:not([data-mode='stage']):is(.searching, :focus-within) { translate: 0 0; opacity: 1; }
+
+/* A coarse tablet (iPad, Galaxy Tab) takes the dial too: 3 extra FABs over a sheet are 3 too many. Same lane maths as the phone. */
+html[data-sc-tablet] {
+  --sc-dial-bottom: max(calc(var(--sc-lane-bottom) + var(--sc-fab-mini) / 4 + var(--sc-space-3)), calc(var(--sc-float-bottom) + var(--sc-launcher-lift, 0px) + var(--sc-fab-size) + var(--sc-space-2)));
+  --sc-toast-bottom: calc(var(--sc-dial-bottom) + var(--sc-fab-mini) + var(--sc-space-2));
+}
+/* On a phone, a phone on its side or a coarse tablet the β / view FABs live in the Tools dial, the QR hand-off is gone. */
+html[data-sc-phone] sc-beta-fab,
+html[data-sc-compact] sc-beta-fab,
+html[data-sc-tablet] sc-beta-fab,
+html[data-sc-phone] sc-view-toggle-fab,
+html[data-sc-compact] sc-view-toggle-fab,
+html[data-sc-tablet] sc-view-toggle-fab { display: none !important; }
+
+/* Compact: the header hides on scroll-down and comes back on scroll-up (ShellChromeService, transform only);
+   the Tools dial follows it away. A bottom sheet above its peek, a large popup or an immersive stage hides the dial too. */
+html[data-sc-compact][data-sc-chrome='hidden'] sc-main-header { translate: 0 -100%; pointer-events: none; }
+html[data-sc-compact][data-sc-chrome='hidden'] sc-main-header * { pointer-events: none; }
+html[data-sc-compact][data-sc-chrome='hidden'] sc-fab-dial .dial:not(.open),
+html[data-sc-sheet='half'] sc-fab-dial .dial,
+html[data-sc-sheet='full'] sc-fab-dial .dial,
+html.sc-popup-large-open sc-fab-dial .dial { opacity: 0; pointer-events: none; translate: 0 8px; }
+/* An immersive stage (html.sc-immersive, set by the stage) owns the screen: the shell's chrome is out of
+   sight and out of reach (visibility also takes it out of the tab order and the accessibility tree). */
+html.sc-immersive :is(sc-main-header, sc-fusion-bar, sc-footer, sc-fab-dial, sc-feedback-fab, sc-user-feedback-fab, sc-beta-fab, sc-view-toggle-fab, sc-share-button, sc-handoff-button) { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  html[data-sc-compact] sc-main-header, sc-fab-dial .dial { transition: none !important; }
+}
+
+/* ---- MOBILE BASE: scroll + touch behaviour ---- */
+html { overscroll-behavior-y: contain; }
+html.sc-immersive { overflow: hidden; overscroll-behavior: none; }
+.sc-hit { position: relative; }
+.sc-hit::after { content: ''; position: absolute; inset: -12px -8px; }
+.sc-actions { display: flex; flex-wrap: wrap; gap: var(--sc-tap-gap); }
+@media (pointer: coarse) {
+  a, button, [role='button'], [role='link'], [role='tab'], [role='switch'], [role='menuitem'], summary, label[for], select, input, textarea {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sc-table-scroll, .sc-scroll-y, [data-sc-scroller] { overscroll-behavior: contain; }
+  :where(.sc-snap-x) { overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; overscroll-behavior-x: contain; }
+  :where(.sc-snap-x) > * { scroll-snap-align: start; }
+  /* Footer / card link rows: the whole line is the target, not the 15px of text. */
+  :where(footer a, .sc-footer a, .sc-link-row a, .card-link) { display: inline-flex; align-items: center; min-height: var(--sc-tap-min); padding-block: 2px; }
+}
+@media (pointer: coarse) and (min-width: 721px) { :where(.sc-snap-x) { scrollbar-width: none; } }
+
 /* ---- POPUP FIELD (in-field label) ----
    Concept popup-aufbau a2: inside a popup the label sits in the empty field and shrinks to the
    field's top edge once a value is in or the field has focus. Still a real <label>, so assistive
@@ -835,6 +953,7 @@ html[data-sc-layout] { scroll-padding-top: var(--sc-bar-h); }
        control sized at exactly 44px measures 43.5px mid-flight — below its own
        minimum. The extra 4px keeps the affordance true at every frame. */
     --sc-tap-min: 48px;
+    --sc-tap-primary: 52px;
     --sc-fs-input: 16px;
   }
 
@@ -1726,36 +1845,12 @@ button {
 }
 [data-entry='still'] .ce { animation: sc-ce-fade 200ms ease-out backwards; animation-delay: 0ms; }
 
-/* ITEM PAGE (concept nachschub-hq r4-d1-s9 / s9h): the stage and one panel of glass with three tabs, like the ship
-   Holotable. The page fits the viewport (the panel scrolls inside), under 1000 px it stacks. */
-.item-page { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.item-page .it-title { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; }
-.item-page .it-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; min-width: 0; }
-.item-page .it-name h1 { margin: 0; font: 600 clamp(1.4rem, 2vw, 1.9rem) / 1.1 var(--sc-font-display, inherit); overflow-wrap: anywhere; }
+/* ITEM PAGE: layout, panel and tab pill live in the detail shell (src/app/codex/detail/codex-detail-shell.component.ts);
+   these rules style the page's own projected parts (the head band's extra row, the stage tools). */
+.item-page .it-name { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-width: 0; }
 .item-page .kind-tag { font: 500 0.72rem var(--sc-font-display, inherit); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-accent); }
-.item-page .mfr { margin: 0; color: var(--sc-fg-1); }
 .item-page .hq-note { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 0.82rem; color: var(--sc-fg-2); }
 .item-page .hq-note svg { width: 15px; height: 15px; fill: none; stroke: var(--sc-accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.item-page .it-grid {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 470px); gap: 12px; align-items: stretch;
-  height: calc(100vh - var(--it-top, 300px)); height: calc(100dvh - var(--it-top, 300px)); min-height: 440px;
-}
-.item-page .it-stage { min-height: 0; }
-.item-page .it-panel {
-  position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden;
-  border: 1px solid var(--sc-border); border-radius: 16px; background: color-mix(in srgb, var(--sc-bg-0) 73%, transparent);
-}
-.item-page .it-path { flex: none; padding: 12px 12px 0; }
-.item-page .it-tabs { flex: none; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); margin: 10px 12px 0; border: 1px solid color-mix(in srgb, var(--sc-accent) 24%, transparent); border-radius: 19px; overflow: hidden; }
-.item-page .it-tab {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: max(38px, var(--sc-tap-min, 0px)); padding: 0 10px; border: 0; background: transparent;
-  font: 500 0.74rem var(--sc-font-display, inherit); letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-fg-1); cursor: pointer;
-}
-.item-page .it-tab small { font: 500 0.72rem var(--sc-font-body, inherit); color: var(--sc-fg-2); }
-.item-page .it-tab:hover { color: var(--sc-fg-0); }
-.item-page .it-tab.on { color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 14%, transparent); text-shadow: 0 0 8px color-mix(in srgb, var(--sc-accent) 40%, transparent); }
-.item-page .it-tab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
-.item-page .it-pane { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px 12px 12px; }
 .item-page .it-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .item-page .tt-share {
   position: relative; background: none; border: 0; padding: 4px 2px; cursor: pointer; min-height: var(--sc-tap-min, 24px);
@@ -1763,16 +1858,6 @@ button {
 }
 .item-page .tt-share:hover { color: var(--sc-fg-0); }
 .item-page .tt-share:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-/* Holotisch: the values panel grows with its content — nothing scrolls inside the small box; the stage stays in view beside it. */
-.item-page.flow .it-grid { height: auto; min-height: 440px; align-items: start; }
-.item-page.flow .it-stage { position: sticky; top: calc(var(--sc-header-h, 64px) + 12px); height: calc(100dvh - var(--it-top, 300px)); min-height: 440px; }
-.item-page.flow .it-panel, .item-page.flow .it-pane { overflow: visible; }
-@media (max-width: 1000px) {
-  .item-page.flow .it-stage { position: static; height: auto; }
-  .item-page .it-grid { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; }
-  .item-page .it-stage { min-height: 320px; }
-  .item-page .it-panel, .item-page .it-pane { overflow: visible; }
-}
 
 /* Camera moves (concept 2026-10-29 startseite-animationen §B). `html[data-verse-aim]`
    names the world whose tile the camera aims at: it stands highlighted, the other
@@ -2232,9 +2317,11 @@ html.sc-unfocused {
   .sc-action { transition: none; }
 }
 @media (pointer: coarse) {
-  .sc-action.sc-action--primary,
-  .sc-action.sc-action--secondary { min-height: 48px; }
+  .sc-action.sc-action--secondary { min-height: var(--sc-tap-min); }
+  .sc-action.sc-action--primary { min-height: var(--sc-tap-primary); padding-inline: 20px; }
   .sc-action.sc-action--tertiary { width: 48px; height: 48px; }
+  /* Pressed feedback replaces the tap highlight: transform only. */
+  .sc-action:active:not(:disabled, [aria-disabled='true']) { transform: scale(0.97); transition: transform var(--sc-t-fast) var(--sc-e-out); }
 }
 /* ===== /ACTION ===== */
 

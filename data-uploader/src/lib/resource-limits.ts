@@ -111,6 +111,18 @@ export const CPU_MAX_PCT = PERF_MAX_SHARE * 100;
 export const CPU_MIN_PCT = 5;
 /** Below this a stage cannot even hold the parsed DataCore. */
 export const RAM_MIN_MB = 1024;
+/**
+ * The least a single run actually takes, so the RAM limit never promises
+ * less than the uploader can keep to (concept 20261119-0040-uploader-entpacken-ram).
+ * Measured against the LIVE 4.10.3 Data.p4k with one serial codex extract:
+ * 4,476 MB working set / 4,829 MB private with scdatatools' P4K index, then
+ * 2,654 MB / 3,150 MB with the compact index (sc_extract/p4k_index.py). The
+ * remaining peak is the codex path's own name maps in dataforge_extract.py.
+ * 3.5 GB = the private peak plus a margin. The RAM budget is not a hard cap (it
+ * only sizes the worker count), so this floor is what keeps the slider honest.
+ * Re-measure before lowering it again.
+ */
+export const RAM_RUN_FLOOR_MB = 3584;
 /** Kept free for Windows itself at the least (it decides on small machines, where 20 % is less). */
 export const RAM_OS_RESERVE_MB = 2048;
 export const READ_MIN_MBS = 5;
@@ -152,7 +164,8 @@ export function rangesFor(machine: MachineInfo): Record<LimitKey, Range> {
   const top = (cap: number, min: number): number => Math.max(min, Math.floor(cap * PERF_MAX_SHARE));
   return {
     cpuPct: { min: CPU_MIN_PCT, max: CPU_MAX_PCT, step: 1 },
-    ramMb: { min: RAM_MIN_MB, max: ramScaleMb(machine), step: 256 },
+    // The floor, unless the machine's whole scale is smaller: then min = max (one honest value, never min > max).
+    ramMb: { min: Math.min(RAM_RUN_FLOOR_MB, ramScaleMb(machine)), max: ramScaleMb(machine), step: 256 },
     readMBs: { min: READ_MIN_MBS, max: top(d.readMBs, READ_MIN_MBS), step: 5 },
     writeMBs: { min: WRITE_MIN_MBS, max: top(d.writeMBs, WRITE_MIN_MBS), step: 5 },
     iops: { min: IOPS_MIN, max: top(d.iops, IOPS_MIN), step: d.iops > 1000 ? 100 : 5 },
@@ -174,7 +187,7 @@ export function presetLimits(id: PresetId, machine: MachineInfo): ResourceLimits
   const oneCore = Math.ceil(100 / Math.max(1, machine.cores));
   return {
     cpuPct: snap(Math.max(share.cpuPct, Math.min(oneCore, CPU_MAX_PCT)), r.cpuPct),
-    ramMb: snap(Math.max(1536, ramScaleMb(machine) * share.ram), r.ramMb),
+    ramMb: snap(Math.max(RAM_RUN_FLOOR_MB, ramScaleMb(machine) * share.ram), r.ramMb),
     readMBs: snap(r.readMBs.max * share.disk, r.readMBs),
     writeMBs: snap(r.writeMBs.max * share.disk, r.writeMBs),
     iops: snap(r.iops.max * share.disk, r.iops),
@@ -248,8 +261,16 @@ export function dumpWorkers(limits: ResourceLimits, cores: number): number {
   return Math.max(1, Math.min(total - 1 || 1, Math.floor((total * limits.cpuPct) / 100)));
 }
 
-/** Rough resident size of one 3D-export worker (own P4K index + DataCore). */
-export const SKIN_WORKER_MB = 3072;
+/**
+ * Resident size of one 3D-export worker (own compact P4K index + DataCore, plus
+ * its converter and optimizer children). Measured 2026-11-19, one worker
+ * (`--workers 1 --package --interior`) building ANVL_Carrack from the real LIVE
+ * Data.p4k: Python root peak working set 1375 MB, whole-tree peak sum 1327 MB
+ * (sampled every 0.5 s; root 1232 + cgf-converter 277 + node gltf-transform 212
+ * at their individual peaks = 1.7 GB worst case), tree private commit 1780 MB.
+ * 2048 covers the worst case; it was 3072 with the full P4K index.
+ */
+export const SKIN_WORKER_MB = 2048;
 
 /**
  * Cores the CPU share covers, rounded UP. Rounding down would leave the run

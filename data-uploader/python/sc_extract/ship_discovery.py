@@ -22,6 +22,7 @@ from dataclasses import field
 from typing import Any, Dict, List, Optional
 
 from .hull3d import Paint, ShipSpec
+from .p4k_index import P4KNames
 
 SHIPS_ROOT = "Data/Objects/Spaceships/Ships"
 # Mesh roots a vehicle hull can live under, same <root>/<MFR>/<Folder>/ shape.
@@ -66,7 +67,7 @@ class ShipDiscovery:
     def __init__(self, p4k) -> None:
         self.p4k = p4k
         self.infos = p4k.infolist()
-        self._lower = {i.filename.lower().replace("\\", "/"): i for i in self.infos}
+        self._names = P4KNames(p4k)
         self._loc_names: Dict[str, str] = {}
         self._loc_descs: Dict[str, str] = {}
         self._loc_loaded = False
@@ -106,7 +107,7 @@ class ShipDiscovery:
         if self._loc_loaded:
             return
         self._loc_loaded = True
-        info = self._lower.get("data/localization/english/global.ini")
+        info = self._names.lower_last("data/localization/english/global.ini")
         if not info:
             return
         text = self.p4k.open(info).read().decode("utf-8-sig", errors="replace")
@@ -125,7 +126,7 @@ class ShipDiscovery:
     def find_hull(self, ref: ShipRef) -> Optional[str]:
         """The whole-ship render mesh: exact <ShipId>.cga, else largest ship .cga."""
         base = f"{ref.root}/{ref.mfr}/{ref.ship}".lower()
-        exact = self._lower.get(f"{base}/{ref.ship_id}.cga".lower())
+        exact = self._names.lower_last(f"{base}/{ref.ship_id}.cga".lower())
         if exact:
             return exact.filename
         cands = [i for i in self.infos
@@ -264,7 +265,7 @@ class ShipDiscovery:
             # sub-parts, so the Starlancer had NO material and no 3D hull.
             parent = norm.rsplit("/", 1)[0].lower() if "/" in norm else ""
             for stem in (f"{mesh_stem}_ext", mesh_stem):
-                info = self._lower.get(f"{parent}/{stem}.mtl")
+                info = self._names.lower_last(f"{parent}/{stem}.mtl")
                 if info is not None:
                     return info.filename
         if not mtls:

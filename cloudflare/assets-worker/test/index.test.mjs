@@ -190,6 +190,79 @@ describe('fetch', () => {
     assert.equal(keyFor('/codex-locale/a3fb1249-9115-4035-9039-2ffc6043d832/en/gen/ui-0.json'), null);
   });
 
+  it('serves codex list files immutable and the index short-cached, 404s a miss without Supabase', async () => {
+    const dir = 'codex-lists/a3fb1249-9115-4035-9039-2ffc6043d832';
+    const file = `${dir}/mgaq1z2k/ship.json`;
+    const index = `${dir}/index.json`;
+    const e = env({ [file]: '{}', [index]: '{}' });
+    const f = await worker.fetch(new Request(`https://w.dev/${file}`), e);
+    assert.equal(f.status, 200);
+    assert.equal(f.headers.get('content-type'), 'application/json');
+    assert.equal(f.headers.get('cache-control'), 'public, max-age=31536000, immutable');
+    const i = await worker.fetch(new Request(`https://w.dev/${index}?verify=1`), e);
+    assert.equal(i.status, 200);
+    assert.equal(i.headers.get('cache-control'), 'public, max-age=300');
+    globalThis.fetch = async () => {
+      throw new Error('must not proxy list keys');
+    };
+    const miss = await worker.fetch(new Request(`https://w.dev/${dir}/mgaq1z2k/facets.json`), env());
+    assert.equal(miss.status, 404);
+    for (const name of ['ship', 'ship-rank', 'weapon', 'component', 'item', 'ammunition', 'manufacturer', 'blueprint', 'facets', 'missile', 'weapon-rank', 'component-rank', 'names-de', 'rank-parts']) {
+      assert.equal(keyFor(`/${dir}/mgaq1z2k/${name}.json`), `${dir}/mgaq1z2k/${name}.json`);
+    }
+  });
+
+  it('rejects foreign codex list shapes', () => {
+    const dir = 'codex-lists/a3fb1249-9115-4035-9039-2ffc6043d832';
+    assert.equal(keyFor('/codex-lists/not-a-uuid/index.json'), null);
+    assert.equal(keyFor(`/${dir}/gen12345/silhouettes.json`), null);
+    assert.equal(keyFor(`/${dir}/mgaq1z2k/../ship.json`), null);
+    assert.equal(keyFor(`/${dir}/ship.json`), null);
+    assert.equal(keyFor(`/${dir}/mgaq1z2k/ship-rankx.json`), null);
+    assert.equal(keyFor(`/${dir}/mgaq1z2k/ship-.json`), null);
+    for (const bad of ['missilex', 'xmissile', 'names-en', 'names-de-x', 'names', 'weapon-rankx', 'component-ranks', 'weapon-ranks', 'rank', 'rank-partsx', 'rank-part', 'xrank-parts']) {
+      assert.equal(keyFor(`/${dir}/mgaq1z2k/${bad}.json`), null, bad);
+    }
+    assert.equal(keyFor(`/${dir}/mgaq1z2k/ship.json.bak`), null);
+  });
+
+  it('serves codex silhouette shards immutable and the index short-cached, 404s a miss without Supabase', async () => {
+    const dir = 'codex-silhouettes/a3fb1249-9115-4035-9039-2ffc6043d832';
+    const shard = `${dir}/mgaq1z2k/ship/12.json`;
+    const names = `${dir}/mgaq1z2k/item/names.json`;
+    const index = `${dir}/index.json`;
+    const e = env({ [shard]: '{}', [names]: '{}', [index]: '{}' });
+    for (const key of [shard, names]) {
+      const res = await worker.fetch(new Request(`https://w.dev/${key}`), e);
+      assert.equal(res.status, 200, key);
+      assert.equal(res.headers.get('content-type'), 'application/json');
+      assert.equal(res.headers.get('cache-control'), 'public, max-age=31536000, immutable');
+    }
+    const i = await worker.fetch(new Request(`https://w.dev/${index}?verify=1`), e);
+    assert.equal(i.status, 200);
+    assert.equal(i.headers.get('cache-control'), 'public, max-age=300');
+    globalThis.fetch = async () => {
+      throw new Error('must not proxy silhouette keys');
+    };
+    const miss = await worker.fetch(new Request(`https://w.dev/${dir}/mgaq1z2k/weapon/0.json`), env());
+    assert.equal(miss.status, 404);
+    for (const kind of ['ship', 'weapon', 'component', 'item', 'armor']) {
+      assert.equal(keyFor(`/${dir}/mgaq1z2k/${kind}/0.json`), `${dir}/mgaq1z2k/${kind}/0.json`);
+    }
+  });
+
+  it('rejects foreign codex silhouette shapes, the publisher plan included', () => {
+    const dir = 'codex-silhouettes/a3fb1249-9115-4035-9039-2ffc6043d832';
+    assert.equal(keyFor('/codex-silhouettes/not-a-uuid/index.json'), null);
+    assert.equal(keyFor(`/${dir}/mgaq1z2k/plan.json`), null);
+    assert.equal(keyFor(`/${dir}/mgaq1z2k/ship.json`), null);
+    assert.equal(keyFor(`/${dir}/ship/0.json`), null);
+    assert.equal(keyFor(`/${dir}/mgaq1z2k/ship/../item/0.json`), null);
+    for (const bad of ['blueprint/0', 'ship/01', 'ship/-1', 'ship/123456', 'ship/index', 'ship/names.bak', 'ship/0x']) {
+      assert.equal(keyFor(`/${dir}/mgaq1z2k/${bad}.json`), null, bad);
+    }
+  });
+
   it('falls back to the Supabase bucket for a key R2 does not hold yet', async () => {
     let asked = '';
     globalThis.fetch = async (url) => {

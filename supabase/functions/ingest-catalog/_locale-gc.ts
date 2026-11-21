@@ -24,13 +24,13 @@ export interface OrphanSelection {
   ignored: number;
 }
 
-export function selectOrphanLocaleKeys(keys: string[], liveIds: Iterable<string>): OrphanSelection {
+export function selectOrphanLocaleKeys(keys: string[], liveIds: Iterable<string>, root: string = LOCALE_ROOT): OrphanSelection {
   const live = new Set<string>();
   for (const id of liveIds) live.add(String(id).toLowerCase());
   const orphans = new Map<string, string[]>();
   const kept = new Set<string>();
   let ignored = 0;
-  const head = `${LOCALE_ROOT}/`;
+  const head = `${root}/`;
   for (const key of keys) {
     const rest = key.startsWith(head) ? key.slice(head.length) : '';
     const slash = rest.indexOf('/');
@@ -73,12 +73,14 @@ export interface GcResult {
 
 const DELETE_CONCURRENCY = 8;
 
-export async function gcLocalePrefixes(deps: GcDeps, opts: { dryRun: boolean }): Promise<GcResult> {
+/** `root` defaults to codex-locale; the same selection serves codex-lists. */
+export async function gcLocalePrefixes(deps: GcDeps, opts: { dryRun: boolean; root?: string }): Promise<GcResult> {
+  const root = opts.root ?? LOCALE_ROOT;
   // Live ids first, listing second: a build created in between is then at worst
   // missing from the list, never present in the list but missing from liveIds.
   const live = await deps.liveBuildIds();
-  const keys = await deps.listKeys(`${LOCALE_ROOT}/`);
-  const sel = selectOrphanLocaleKeys(keys, live);
+  const keys = await deps.listKeys(`${root}/`);
+  const sel = selectOrphanLocaleKeys(keys, live, root);
 
   let deleted = 0;
   if (!opts.dryRun) {

@@ -49,7 +49,8 @@ import { DOCK_HOST_CLASS, DOCK_WIDTH_STYLE } from '../shared/dock-width';
     <router-outlet />
   `,
   styles: [`
-    :host { display: block; }
+    /* Reserved height: the late grid cannot push the footer up into view (layout shift). */
+    :host { display: block; min-height: 100vh; min-height: 100dvh; }
     .sub-link {
       display: inline-flex; align-items: center; min-height: var(--sc-tap-min); padding: 0 12px;
       border-radius: 999px; border: 1px solid var(--sc-border); color: var(--sc-fg-1); text-decoration: none;

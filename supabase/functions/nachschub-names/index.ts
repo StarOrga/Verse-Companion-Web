@@ -5,9 +5,9 @@
 //
 // Graceful: every failure is a 200 with a status and no name; the client then uses its rule-based fallback, so the
 // feature never depends on this function. The key lives only here (ANTHROPIC_API_KEY secret); model override via
-// NACHSCHUB_NAMES_MODEL. verify_jwt stays ON (default) - the platform rejects calls without a session; the handler
-// additionally requires a real, approved user (getUser with the bearer token + is_approved), not the bare publishable
-// key. Output is never labelled as AI.
+// NACHSCHUB_NAMES_MODEL. verify_jwt is OFF (supabase/config.toml) - the gateway cannot verify asymmetric session
+// tokens, so the handler resolves the caller itself: a real, approved user (getUser with the bearer token +
+// is_approved), never the bare publishable key. Output is never labelled as AI.
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';

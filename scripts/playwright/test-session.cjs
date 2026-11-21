@@ -23,6 +23,13 @@
  * Also seeded where nothing is stored yet: `sc.consent` = essential only, so the
  * banner never covers the page under test and the test account sends no analytics.
  *
+ * Also installed, with or without an account: the Supabase guard
+ * (scripts/lib/agent-supabase-guard.cjs). Every browser here starts with an
+ * empty profile, so it answers catalog reads from a cache all of Claude's
+ * browsers on this machine share and lets the remaining database requests
+ * through a few at a time - these browsers were the largest load on the live
+ * instance. `SC_AGENT_SUPABASE_GUARD=off` for a session that needs the cold path.
+ *
  * No account configured → a logged no-op: the browser simply stays signed out.
  * The token never reaches the model — never read `sc.auth` via browser_evaluate.
  * Diagnostics: %TEMP%/sc-test-session.log. Rules: .claude/deep-knowledge/test-account.md
@@ -38,6 +45,7 @@ const {
   readSupabaseConfig,
   readTestAccount,
 } = require('../lib/test-account.cjs');
+const { installSupabaseGuard } = require('../lib/agent-supabase-guard.cjs');
 
 const SESSION_PATH = '/__sc-test-session';
 const SEEDED_FLAG = 'sc.test-session.seeded';
@@ -87,6 +95,7 @@ function createTestSession({
   readAccount = readTestAccount,
   readConfig = readSupabaseConfig,
   mint = mintSession,
+  installGuard = installSupabaseGuard,
   logLine = log,
 } = {}) {
   const prepared = new WeakMap();
@@ -97,6 +106,10 @@ function createTestSession({
       logLine(`skip: ${cwd} is not an Verse Companion checkout`);
       return;
     }
+    // Before the account check: a signed-out browser loads the catalog just the same.
+    await Promise.resolve(installGuard(context, { supabaseUrl: config.url, cwd, logLine })).catch((e) =>
+      logLine(`guard not installed: ${e.message}`),
+    );
     const account = readAccount();
     if (!account) {
       logLine('skip: no test account configured — browser stays signed out');

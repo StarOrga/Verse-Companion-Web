@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, effect, input, untracked, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { HintTipComponent } from '../shared/hint-tip/hint-tip.component';
+import { AreaSymbolComponent, type AreaSymbolKey } from '../shared/area-symbol/area-symbol.component';
 import { modelHintKey } from './codex-em-model';
 import { displayItemName, formatNumber } from './codex-format';
 import { DefensivePanel, OffensivePanel } from './codex-loadout-stats';
@@ -27,6 +29,25 @@ const DAMAGE_CHANNEL_COLORS: Readonly<Record<string, string>> = {
 const PANEL_STYLES = `
   :host { display: block; }
 
+  /* Area colours and symbols (feedback #377, after #330): the Analyse cards
+     carry the same area as the loadout blocks beside them — a 2px line on
+     top at --sc-area-line strength, the heading and its symbol in the area
+     colour. Offensive is the offensive area, Defensive the defensive one;
+     the ship card spans several areas, so it stays neutral outside like the
+     loadout's merged "Antrieb & Systeme" block and each of its groups carries
+     its own area instead. */
+  details.block { --p: var(--sc-accent); --pb: color-mix(in srgb, var(--p) var(--sc-area-line), transparent);
+    box-shadow: inset 0 2px 0 var(--pb), var(--sc-glow); }
+  details.block[data-area="offensive"] { --p: var(--sc-area-offensive); }
+  details.block[data-area="defensive"] { --p: var(--sc-area-defensive); }
+  details.block[data-area="ship"] { --pb: var(--sc-border); }
+  .panel-head > .area-sym { font-size: max(14px, var(--sc-fs-floor)); }
+  h3.section-title[data-area="offensive"] { --s: var(--sc-area-offensive); }
+  h3.section-title[data-area="defensive"] { --s: var(--sc-area-defensive); }
+  h3.section-title[data-area="movement"] { --s: var(--sc-area-movement); }
+  h3.section-title[data-area="signature"] { --s: var(--sc-area-signature); }
+  h3.section-title > .area-sym { font-size: max(12px, var(--sc-fs-floor)); color: var(--s, var(--p, var(--sc-accent))); }
+
   /* Card head — concept .m-h2 (part-02:141). This is a micro-label, not a
      heading: 10.5px at .14em tracking in the accent, weight 600. It used to be
      15px at .04em, which read as a section title and dwarfed the values it
@@ -35,7 +56,7 @@ const PANEL_STYLES = `
      while the panel is open (concept part-01:674-675). */
   .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 7px; cursor: pointer; margin: 0;
     font-size: max(10.5px, var(--sc-fs-floor)); font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--sc-accent); list-style: none; }
+    color: var(--p, var(--sc-accent)); list-style: none; }
   .panel-head::-webkit-details-marker { display: none; }
   details[open] > .panel-head { padding: 0 var(--sc-pad-1) 8px; margin: 0 calc(var(--sc-pad-1) * -1) 10px;
     border-bottom: 1px solid var(--sc-border); }
@@ -99,10 +120,14 @@ const PANEL_STYLES = `
     background: color-mix(in srgb, var(--sc-accent) 6%, transparent);
     padding: 6px 8px; margin: 6px 0; font-size: max(11px, var(--sc-fs-floor)); color: var(--sc-fg-2); }
 
+  /* #375: the explanation beside a label, as a tooltip. */
+  sc-hint-tip { margin-inline-start: 5px; text-transform: none; letter-spacing: normal; }
+
   /* Sub-head — concept .m-sub (part-02:229): a 9.5px dim-accent micro-label at
      .15em, sitting tight above its grid. It used to be a 13px muted heading. */
   h3.section-title { font-size: max(9.5px, var(--sc-fs-floor)); font-weight: 400; text-transform: uppercase;
-    letter-spacing: 0.15em; color: color-mix(in srgb, var(--sc-accent) 62%, var(--sc-fg-2)); margin: 7px 0 4px; }
+    letter-spacing: 0.15em; color: color-mix(in srgb, var(--s, var(--p, var(--sc-accent))) 62%, var(--sc-fg-2)); margin: 7px 0 4px;
+    display: flex; align-items: center; gap: 6px; }
 
   /* Fact grid — concept .m-g3 / .m-f (part-02:230-232): three equal columns,
      each one a 9.5px uppercase key stacked ABOVE a 15px value. This was a
@@ -140,12 +165,13 @@ const PANEL_STYLES = `
 @Component({
   selector: 'sc-codex-offensive-panel',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, HintTipComponent, AreaSymbolComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <details class="sc-card block" [open]="open()" (toggle)="open.set($any($event.target).open)">
+    <details class="sc-card block" data-area="offensive" [open]="open()" (toggle)="open.set($any($event.target).open)">
       <summary class="panel-head">
-        {{ 'codex.analysis.offensive.title' | translate }}
+        <sc-area-symbol class="area-sym" area="offensive" />
+        <span class="head-label">{{ 'codex.analysis.offensive.title' | translate }}</span>
         <!-- The totals line used to sit UNDER the head, inside the open panel,
              quoting exactly the two figures the table's own total row quotes a
              few pixels further down (feedback dbdb2ffe: *"Wofür steht 1,636.88
@@ -169,7 +195,7 @@ const PANEL_STYLES = `
           @if (p.gapKeys.includes('codex.summary.gap.noStockGuns')) {
             <p class="gap-row">{{ 'codex.summary.gap.noStockGuns' | translate }}</p>
           } @else {
-            <h3 class="section-title">{{ 'codex.analysis.offensive.weapons' | translate: { count: p.weaponCount } }}</h3>
+            <h3 class="section-title" data-area="offensive"><sc-area-symbol class="area-sym" area="weapons" />{{ 'codex.analysis.offensive.weapons' | translate: { count: p.weaponCount } }}</h3>
             <div class="table-wrap">
             <table class="analysis-table">
               <thead>
@@ -220,7 +246,7 @@ const PANEL_STYLES = `
 
             <dl class="fact-grid">
               @if (p.effectiveRange != null) {
-                <dt>{{ 'codex.analysis.offensive.effectiveRange' | translate }}</dt>
+                <dt>{{ 'codex.analysis.offensive.effectiveRange' | translate }}@if (p.longestRangeGun) { <sc-hint-tip [text]="'codex.analysis.offensive.longestGunNote' | translate: { name: p.longestRangeGun }" /> }</dt>
                 <dd>{{ num(p.effectiveRange) }} m</dd>
               }
               @if (p.projectileSpeed != null) {
@@ -228,16 +254,13 @@ const PANEL_STYLES = `
                 <dd>{{ num(p.projectileSpeed) }} m/s</dd>
               }
             </dl>
-            @if (p.longestRangeGun) {
-              <p class="note">{{ 'codex.analysis.offensive.longestGunNote' | translate: { name: p.longestRangeGun } }}</p>
-            }
             @if (p.mixedRangeWarning) {
               <p class="warn-note">{{ 'codex.analysis.offensive.mixedRangeWarning' | translate }}</p>
             }
           }
 
           @if (p.missileCount > 0) {
-            <h3 class="section-title">{{ 'codex.analysis.offensive.missiles' | translate: { count: p.missileCount } }}</h3>
+            <h3 class="section-title" data-area="offensive"><sc-area-symbol class="area-sym" area="missiles" />{{ 'codex.analysis.offensive.missiles' | translate: { count: p.missileCount } }}</h3>
             <!-- Missiles are their own table (feedback #350): one row per missile
                  kind, its warhead and the whole salvo. A salvo is a one-off
                  burst, so it never joins the guns' DPS total above. -->
@@ -272,7 +295,7 @@ const PANEL_STYLES = `
               @if (p.missileSalvoDamage != null) {
                 <tfoot>
                   <tr>
-                    <td>{{ 'codex.analysis.offensive.salvoDamage' | translate }}</td>
+                    <td>{{ 'codex.analysis.offensive.salvoDamage' | translate }} <sc-hint-tip [text]="'codex.analysis.offensive.salvoNote' | translate" /></td>
                     <td></td>
                     <td></td>
                     <td>{{ p.missileCount }}×</td>
@@ -283,9 +306,7 @@ const PANEL_STYLES = `
               }
             </table>
             </div>
-            @if (p.missileSalvoDamage != null) {
-              <p class="note">{{ 'codex.analysis.offensive.salvoNote' | translate }}</p>
-            } @else {
+            @if (p.missileSalvoDamage == null) {
               <p class="gap-row">{{ 'codex.analysis.offensive.noWarheadData' | translate }}</p>
             }
             @if (p.missileSalvoPartial) {
@@ -294,7 +315,7 @@ const PANEL_STYLES = `
             @if (p.missileLockTime != null || p.missileRange != null) {
               <dl class="fact-grid">
                 @if (p.missileLockTime != null) {
-                  <dt>{{ 'codex.analysis.offensive.lockTime' | translate }}</dt>
+                  <dt>{{ 'codex.analysis.offensive.lockTime' | translate }}@if (p.missileLockNoteSlowest) { <sc-hint-tip [text]="'codex.analysis.offensive.slowestMissileNote' | translate" /> }</dt>
                   <dd>{{ num(p.missileLockTime) }} s</dd>
                 }
                 @if (p.missileRange != null) {
@@ -302,9 +323,6 @@ const PANEL_STYLES = `
                   <dd>{{ num(p.missileRange) }} m</dd>
                 }
               </dl>
-            }
-            @if (p.missileLockNoteSlowest) {
-              <p class="note">{{ 'codex.analysis.offensive.slowestMissileNote' | translate }}</p>
             }
           }
         }
@@ -354,17 +372,18 @@ export class CodexOffensivePanelComponent {
 @Component({
   selector: 'sc-codex-defensive-panel',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, AreaSymbolComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <details class="sc-card block" [open]="open()" (toggle)="open.set($any($event.target).open)">
+    <details class="sc-card block" data-area="defensive" [open]="open()" (toggle)="open.set($any($event.target).open)">
       <summary class="panel-head">
-        {{ 'codex.analysis.defensive.title' | translate }}
+        <sc-area-symbol class="area-sym" area="defensive" />
+        <span class="head-label">{{ 'codex.analysis.defensive.title' | translate }}</span>
         <span class="fold-hint">{{ 'codex.analysis.readHint' | translate }}</span>
         <span class="chev" [class.open]="open()" aria-hidden="true">›</span>
       </summary>
       @if (open() && panel(); as p) {
-        <h3 class="section-title">{{ 'codex.analysis.defensive.shield' | translate }}</h3>
+        <h3 class="section-title" data-area="defensive"><sc-area-symbol class="area-sym" area="shields" />{{ 'codex.analysis.defensive.shield' | translate }}</h3>
         @if (p.shieldGeneratorCount === 0) {
           <p class="gap-row">{{ 'codex.summary.gap.noShields' | translate }}</p>
         } @else {
@@ -376,7 +395,7 @@ export class CodexOffensivePanelComponent {
             @if (p.downedDelay != null) { <dt>{{ 'codex.analysis.defensive.downedDelay' | translate }}</dt><dd>{{ num(p.downedDelay) }} s</dd> }
           </dl>
           @if (p.mixedGeneratorNote) { <p class="warn-note">{{ 'codex.analysis.defensive.mixedGeneratorNote' | translate }}</p> }
-          <h3 class="section-title">{{ 'codex.analysis.defensive.resistance' | translate }}</h3>
+          <h3 class="section-title" data-area="defensive"><sc-area-symbol class="area-sym" area="shields" />{{ 'codex.analysis.defensive.resistance' | translate }}</h3>
           @if (p.resistances.length > 0) {
             <div class="dmg-bars">
               @for (r of p.resistances; track r.channel) {
@@ -392,7 +411,7 @@ export class CodexOffensivePanelComponent {
           }
         }
 
-        <h3 class="section-title">{{ 'codex.analysis.defensive.hull' | translate }}</h3>
+        <h3 class="section-title" data-area="defensive"><sc-area-symbol class="area-sym" area="structure" />{{ 'codex.analysis.defensive.hull' | translate }}</h3>
         <p class="gap-row">{{ 'codex.summary.gap.noHullMass' | translate }}</p>
         @if (p.armor; as a) {
           <dl class="fact-grid">
@@ -409,7 +428,7 @@ export class CodexOffensivePanelComponent {
         }
 
         @if (p.effectiveHp == null) {
-          <h3 class="section-title">{{ 'codex.analysis.defensive.effectiveHp' | translate }}</h3>
+          <h3 class="section-title" data-area="defensive"><sc-area-symbol class="area-sym" area="defensive" />{{ 'codex.analysis.defensive.effectiveHp' | translate }}</h3>
           <p class="gap-row">{{ 'codex.analysis.defensive.effectiveHpGap' | translate }}</p>
         }
       }
@@ -437,24 +456,42 @@ export interface ShipFactRow {
 export interface ShipFactGroup {
   titleKey: string;
   rows: ShipFactRow[];
+  /** A visible line: a data gap or status the reader must see. */
   note?: string | null;
+  /** An explanation, shown as a tooltip beside the group title (#375). */
+  tip?: string | null;
 }
+
+/**
+ * Ship fact group → loadout area (#377). The same pairing the loadout blocks
+ * use (ship-module-sections, #330): quantum sits in Bewegung, the hull in
+ * Verteidigung (structure), the signature in Signatur & Kühlung. Flight and
+ * mass are how the ship moves, so they take the movement area.
+ */
+const SHIP_GROUP_AREA: Readonly<Record<string, { area: string; symbol: AreaSymbolKey }>> = {
+  'codex.analysis.ship.flightPerformance': { area: 'movement', symbol: 'movement' },
+  'codex.analysis.ship.mass': { area: 'movement', symbol: 'movement' },
+  'codex.analysis.ship.systems': { area: 'movement', symbol: 'quantum' },
+  'codex.analysis.ship.signature': { area: 'signature', symbol: 'signature' },
+  'codex.analysis.ship.hull': { area: 'defensive', symbol: 'structure' },
+};
 
 @Component({
   selector: 'sc-codex-ship-panel',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective],
+  imports: [TranslatePipe, ScTooltipDirective, HintTipComponent, AreaSymbolComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <details class="sc-card block" [open]="open()" (toggle)="open.set($any($event.target).open)">
+    <details class="sc-card block" data-area="ship" [open]="open()" (toggle)="open.set($any($event.target).open)">
       <summary class="panel-head">
-        {{ 'codex.analysis.ship.title' | translate }}
+        <sc-area-symbol class="area-sym" area="systems" />
+        <span class="head-label">{{ 'codex.analysis.ship.title' | translate }}</span>
         <span class="fold-hint">{{ 'codex.analysis.readHint' | translate }}</span>
         <span class="chev" [class.open]="open()" aria-hidden="true">›</span>
       </summary>
       @if (open()) {
         @for (g of groups(); track g.titleKey) {
-          <h3 class="section-title">{{ g.titleKey | translate }}</h3>
+          <h3 class="section-title" [attr.data-area]="groupArea(g.titleKey)?.area">@if (groupArea(g.titleKey); as ga) { <sc-area-symbol class="area-sym" [area]="ga.symbol" /> }{{ g.titleKey | translate }}@if (g.tip) { <sc-hint-tip class="title-tip" [text]="g.tip" /> }</h3>
           <dl class="fact-grid">
             @for (r of g.rows; track r.labelKey) {
               <dt [scTooltip]="modelHint(r.labelKey) ? (modelHint(r.labelKey)! | translate) : null">{{ r.labelKey | translate }}</dt>
@@ -478,6 +515,10 @@ export interface ShipFactGroup {
   styles: [PANEL_STYLES],
 })
 export class CodexShipPanelComponent {
+  /** #377: each fact group in the loadout area and symbol it belongs to. */
+  protected groupArea(titleKey: string): { area: string; symbol: AreaSymbolKey } | null {
+    return SHIP_GROUP_AREA[titleKey] ?? null;
+  }
   /** #967: IR / EM rows are our model — their label carries the formula. */
   protected readonly modelHint = modelHintKey;
   readonly groups = input.required<readonly ShipFactGroup[]>();

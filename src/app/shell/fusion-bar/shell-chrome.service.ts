@@ -33,13 +33,18 @@ export interface HeroIntro {
   searchAtMs?: number;
   /** Start of the main header's entrance in ms; default 1.9 s * k. */
   headerAtMs?: number;
+  /**
+   * Menu switch: start of the scene's HQ outpost fade in ms, with the hub's beacons and
+   * Patches (#371). Unset = the outpost does not wait (the full entrance times it in CSS).
+   */
+  outpostAtMs?: number;
 }
 
 /**
  * The two start beats of an entrance, set apart instead of one shared factor: the full
  * entrance (rounds/05 d5-pb-main) puts the search at 3.5 s and the header after it at 4.3 s.
  */
-export type HeroIntroBeats = Pick<HeroIntro, 'searchAtMs' | 'headerAtMs'>;
+export type HeroIntroBeats = Pick<HeroIntro, 'searchAtMs' | 'headerAtMs' | 'outpostAtMs'>;
 
 /** CSS value of a beat, or null when the stylesheet's `k`-scaled default applies. */
 export function introBeatCss(ms: number | undefined): string | null {
@@ -186,6 +191,21 @@ export class ShellChromeService {
 
   /** The hub's running title sequence, or null (set by the hub, read by the bar and the main header). */
   readonly heroIntro = this.introState.asReadonly();
+
+  /**
+   * A reload of the hub (#371): it shows the stars first and fades in as one ('wait', then 'in').
+   * The scene's HQ outpost waits for it instead of standing there with the world. Announced by
+   * the shell at boot (the hub's chunk is still loading), mirrored by the hub once it runs.
+   */
+  readonly hubCalm = signal<'wait' | 'in' | null>(null);
+
+  /** A hub reload is ahead: the outpost waits; dropped by itself if no hub takes it over. */
+  holdHubCalm(): void {
+    this.hubCalm.set('wait');
+    setTimeout(() => {
+      if (this.hubCalm() === 'wait') this.hubCalm.set(null);
+    }, HERO_INTRO_HOLD_MAX_MS);
+  }
 
   /** The newest page header's crumbs + title, or null. */
   readonly crumbs = computed<ChromeCrumbs | null>(() => {
@@ -388,5 +408,66 @@ export class ShellChromeService {
   /** Bar-internal: the hide/reveal state, published for pages with their own sticky bars. */
   setBarHidden(hidden: boolean): void {
     this.hiddenState.set(hidden);
+  }
+
+  // ---- compact chrome: hide on scroll-down, reveal on scroll-up --------------------------------
+
+  private readonly chromeHiddenState = signal(false);
+  /** The header is scrolled away (compact only). Mirrored on <html> as `data-sc-chrome='hidden'`. */
+  readonly chromeHidden = this.chromeHiddenState.asReadonly();
+
+  setChromeHidden(hidden: boolean): void {
+    if (this.chromeHiddenState() === hidden) return;
+    this.chromeHiddenState.set(hidden);
+    if (typeof document === 'undefined') return;
+    if (hidden) document.documentElement.setAttribute('data-sc-chrome', 'hidden');
+    else document.documentElement.removeAttribute('data-sc-chrome');
+  }
+
+  /**
+   * One passive scroll listener (a frame per update, no layout read besides the cached header height).
+   * Down: after 24px of travel past the header's height the chrome goes; up: 8px bring it back. Always
+   * shown at the top, at the page end, while a menu / large popup is open or focus is inside the header.
+   * Only active in compact (`html[data-sc-compact]`) and never while a stage is immersive.
+   */
+  startChromeAutoHide(header: HTMLElement): () => void {
+    if (typeof window === 'undefined') return () => undefined;
+    const root = document.documentElement;
+    let lastY = window.scrollY;
+    let acc = 0;
+    let frame = 0;
+    const active = (): boolean => root.hasAttribute('data-sc-compact') && !root.classList.contains('sc-immersive');
+    const pinned = (): boolean =>
+      root.classList.contains('sc-popup-large-open') || header.classList.contains('menu-open') || header.contains(document.activeElement);
+    const update = (): void => {
+      frame = 0;
+      const y = window.scrollY;
+      const dy = y - lastY;
+      lastY = y;
+      if (!active() || pinned() || y <= 8 || y + window.innerHeight >= document.documentElement.scrollHeight - 4) {
+        acc = 0;
+        this.setChromeHidden(false);
+        return;
+      }
+      if (dy > 0) {
+        acc = Math.max(0, acc) + dy;
+        if (acc > 24 && y > header.offsetHeight) this.setChromeHidden(true);
+      } else if (dy < 0) {
+        acc = Math.min(0, acc) + dy;
+        if (-acc > 8) this.setChromeHidden(false);
+      }
+    };
+    const onScroll = (): void => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const onFocusIn = (): void => this.setChromeHidden(false);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    header.addEventListener('focusin', onFocusIn);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      header.removeEventListener('focusin', onFocusIn);
+      if (frame) cancelAnimationFrame(frame);
+      this.setChromeHidden(false);
+    };
   }
 }

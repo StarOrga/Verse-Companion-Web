@@ -63,26 +63,145 @@ describe('CodexHoloTableComponent', () => {
     expect(f.componentInstance.viewerDrawn()).toBe(false);
   });
 
-  describe('phone on its side', () => {
-    function withLandscape(matches: boolean): void {
+  it('draws no part dots on the held hull while the 3D model loads — they come back with the 2D view', () => {
+    const f = setup({ viewMode: 'holo', phase: 'done', shipClassName: 'AEGS_Gladius' });
+    expect(pinButtons(f).length).toBe(PINS.length);
+    f.componentRef.setInput('viewMode', '3d');
+    f.detectChanges();
+    expect((f.nativeElement as HTMLElement).querySelector('.shipwrap'), 'the hull is held').toBeTruthy();
+    expect(pinButtons(f).length, 'no dots on the placeholder hull').toBe(0);
+    expect((f.nativeElement as HTMLElement).querySelector('.table-empty'), 'no "no parts" note either').toBeNull();
+    f.componentRef.setInput('viewMode', 'holo');
+    f.detectChanges();
+    expect(pinButtons(f).length).toBe(PINS.length);
+  });
+
+  it('ignores a stale "drawn" and holds the hull again when 3D comes back from a deck', () => {
+    const f = setup({ viewMode: '3d', phase: 'done', shipClassName: 'ANVL_Liberator' });
+    const c = f.componentInstance;
+    const el = f.nativeElement as HTMLElement;
+    const first = c.viewerEpoch();
+    c.markDrawn(first);
+    f.detectChanges();
+    expect(c.viewerDrawn()).toBe(true);
+    // A deck turns 3D inward: the hull viewer leaves; its late "drawn" changes nothing.
+    f.componentRef.setInput('interior3d', { decks: [], interior: null, focus: null, focusLabel: null, groups: [], pick: null } as never);
+    f.detectChanges();
+    c.markDrawn(first);
+    expect(c.viewerDrawn()).toBe(false);
+    // Back to the hull: a new mount — held, the outline stays on the table, the old mount cannot unhold it.
+    f.componentRef.setInput('interior3d', null);
+    f.detectChanges();
+    expect(c.viewerEpoch()).toBeGreaterThan(first);
+    c.markDrawn(first);
+    f.detectChanges();
+    expect(c.viewerDrawn()).toBe(false);
+    expect(el.querySelector('.viewer-hold')?.classList).toContain('held');
+    expect(el.querySelector('.shipwrap')).toBeTruthy();
+    c.markDrawn(c.viewerEpoch());
+    f.detectChanges();
+    expect(el.querySelector('.viewer-hold')?.classList).not.toContain('held');
+  });
+
+  describe('immersive stage (button entry only)', () => {
+    function withTouch(coarse: boolean, landscape = false): MediaQueryList[] {
       const real = window.matchMedia.bind(window);
-      vi.spyOn(window, 'matchMedia').mockImplementation((q: string) =>
-        q.includes('max-height: 500px') ? ({ matches, addEventListener() {}, removeEventListener() {} } as unknown as MediaQueryList) : real(q));
+      const lists: MediaQueryList[] = [];
+      vi.spyOn(window, 'matchMedia').mockImplementation((q: string) => {
+        if (q.includes('pointer: coarse')) return { matches: coarse, media: q, addEventListener() {}, removeEventListener() {} } as unknown as MediaQueryList;
+        if (q.includes('max-height: 500px')) return { matches: landscape, media: q, addEventListener() {}, removeEventListener() {} } as unknown as MediaQueryList;
+        return real(q);
+      });
+      return lists;
     }
     const frame = (f: ComponentFixture<CodexHoloTableComponent>) => (f.nativeElement as HTMLElement).querySelector('.silhouette-frame')!;
+    const q = <T extends HTMLElement>(f: ComponentFixture<CodexHoloTableComponent>, sel: string) => (f.nativeElement as HTMLElement).querySelector<T>(sel);
 
-    it('3D takes the whole screen and the close button ends it', () => {
-      withLandscape(true);
+    afterEach(() => document.documentElement.classList.remove('sc-immersive'));
+
+    it('a phone on its side does NOT enter by itself - the button does', () => {
+      withTouch(true, true);
       const f = setup({ viewMode: '3d' });
+      expect(frame(f).classList).not.toContain('phone-full');
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
       expect(frame(f).classList).toContain('phone-full');
-      (f.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.full-close')!.click();
+      expect(document.documentElement.classList).toContain('sc-immersive');
+    });
+
+    it('has no immersive button on a mouse desktop', () => {
+      withTouch(false);
+      expect(q(setup({ viewMode: '3d' }), '.imm-btn')).toBeNull();
+    });
+
+    it('the close button leaves it and drops html.sc-immersive and the inert rest', () => {
+      withTouch(true);
+      const f = setup({ viewMode: 'holo' });
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
+      expect(q(f, 'sc-holo-immersive-hud')).toBeTruthy();
+      q<HTMLButtonElement>(f, 'sc-holo-immersive-hud .close')!.click();
+      f.detectChanges();
+      expect(frame(f).classList).not.toContain('phone-full');
+      expect(document.documentElement.classList).not.toContain('sc-immersive');
+    });
+
+    it('Escape leaves it', () => {
+      withTouch(true);
+      const f = setup({ viewMode: 'holo' });
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
       f.detectChanges();
       expect(frame(f).classList).not.toContain('phone-full');
     });
 
-    it('stays in the page when the phone is upright', () => {
-      withLandscape(false);
-      expect(frame(setup({ viewMode: '3d' })).classList).not.toContain('phone-full');
+    it('the back gesture (popstate) leaves it without navigating again', () => {
+      withTouch(true);
+      const f = setup({ viewMode: 'holo' });
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
+      const back = vi.spyOn(history, 'back');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      f.detectChanges();
+      expect(frame(f).classList).not.toContain('phone-full');
+      expect(back).not.toHaveBeenCalled();
+    });
+
+    it('turns touch-action to none only while immersive', () => {
+      withTouch(true);
+      const f = setup({ viewMode: 'holo' });
+      expect(getComputedStyle(frame(f)).touchAction).toBe('pan-y');
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
+      expect(getComputedStyle(frame(f)).touchAction).toBe('none');
+    });
+
+    it('portrait: the overlay clips (never scrolls) and its stage area leaves the bottom rail band', () => {
+      withTouch(true);
+      const f = setup({ viewMode: 'holo' });
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
+      const el = frame(f) as HTMLElement;
+      // overflow: hidden still scrolls programmatically; the tap's focus / scrollIntoView slid hull and HUD off screen (QA iphone14 portrait).
+      expect(getComputedStyle(el).overflow).toBe('clip');
+      el.scrollTop = 120; el.scrollLeft = 80;
+      expect([el.scrollTop, el.scrollLeft]).toEqual([0, 0]);
+      const portrait = window.matchMedia('(orientation: portrait)').matches;
+      const pb = parseFloat(getComputedStyle(el).paddingBottom);
+      if (portrait) expect(pb).toBeGreaterThanOrEqual(64);
+      expect(parseFloat(getComputedStyle(el).paddingTop)).toBeGreaterThanOrEqual(56);
+    });
+
+    it('the stats rail chips carry a visible short label and the full name as aria-label', () => {
+      withTouch(true);
+      const f = setup({ viewMode: 'holo' });
+      f.componentRef.setInput('hudStats', [{ id: 'offensive', titleKey: 'codex.holo.strip.offensive', leadText: '228', leadShortKey: 'codex.kpi.short.alpha', leadLabelKey: null, pct: null, deltaText: null, deltaTone: null, ghost: null, say: '', subs: [] }]);
+      q<HTMLButtonElement>(f, '.imm-btn')!.click();
+      f.detectChanges();
+      const btn = q<HTMLButtonElement>(f, 'sc-holo-immersive-hud .rail-btn')!;
+      expect(btn.querySelector('.rl')?.textContent?.trim()).toBeTruthy();
+      expect(btn.getAttribute('aria-label')).toContain('228');
     });
   });
 

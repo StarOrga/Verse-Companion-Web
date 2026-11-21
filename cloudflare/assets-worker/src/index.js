@@ -72,6 +72,36 @@ const LOCALE_SHARD_RE = new RegExp(String.raw`^${LOCALE_DIR}\/[0-9a-z]{6,16}\/[a
 /** A republish points the index at a new generation, so it must not stick for long. */
 const LOCALE_INDEX_CACHE_CONTROL = 'public, max-age=300';
 
+/**
+ * Codex catalog lists (ingest-catalog _list-snapshots.ts): `codex-lists/<build uuid>/index.json`
+ * names the current generation, `codex-lists/<build uuid>/<gen>/<name>.json` never changes.
+ * R2 only, a miss is a plain 404.
+ */
+const LISTS_DIR = String.raw`codex-lists\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`;
+const LISTS_INDEX_RE = new RegExp(String.raw`^${LISTS_DIR}\/index\.json$`);
+const LISTS_FILE_RE = new RegExp(
+  String.raw`^${LISTS_DIR}\/[0-9a-z]{6,16}\/(ship-rank|ship|weapon-rank|weapon|component-rank|component|item|ammunition|manufacturer|blueprint|facets|missile|names-de|rank-parts)\.json$`,
+);
+
+function isListsKey(key) {
+  return LISTS_INDEX_RE.test(key) || LISTS_FILE_RE.test(key);
+}
+
+/**
+ * Codex silhouette shards (ingest-catalog _silhouette-shards.ts): `codex-silhouettes/<build uuid>/index.json`
+ * names the current generation, `<gen>/<kind>/names.json` and `<gen>/<kind>/<n>.json` never change.
+ * R2 only, a miss is a plain 404. The publisher's `<gen>/plan.json` is not served.
+ */
+const SILHOUETTES_DIR = String.raw`codex-silhouettes\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`;
+const SILHOUETTES_INDEX_RE = new RegExp(String.raw`^${SILHOUETTES_DIR}\/index\.json$`);
+const SILHOUETTES_FILE_RE = new RegExp(
+  String.raw`^${SILHOUETTES_DIR}\/[0-9a-z]{6,16}\/(ship|weapon|component|item|armor)\/(names|0|[1-9]\d{0,4})\.json$`,
+);
+
+function isSilhouettesKey(key) {
+  return SILHOUETTES_INDEX_RE.test(key) || SILHOUETTES_FILE_RE.test(key);
+}
+
 function isLocaleKey(key) {
   return LOCALE_INDEX_RE.test(key) || LOCALE_SHARD_RE.test(key);
 }
@@ -85,8 +115,8 @@ const CACHE_CONTROL = 'public, max-age=3600, stale-while-revalidate=86400';
 const IMMUTABLE_CACHE_CONTROL = 'public, max-age=31536000, immutable';
 
 function cacheControlFor(key) {
-  if (LOCALE_INDEX_RE.test(key)) return LOCALE_INDEX_CACHE_CONTROL;
-  if (LOCALE_SHARD_RE.test(key)) return IMMUTABLE_CACHE_CONTROL;
+  if (LOCALE_INDEX_RE.test(key) || LISTS_INDEX_RE.test(key) || SILHOUETTES_INDEX_RE.test(key)) return LOCALE_INDEX_CACHE_CONTROL;
+  if (LOCALE_SHARD_RE.test(key) || LISTS_FILE_RE.test(key) || SILHOUETTES_FILE_RE.test(key)) return IMMUTABLE_CACHE_CONTROL;
   return IMMUTABLE_RE.test(key) ? IMMUTABLE_CACHE_CONTROL : CACHE_CONTROL;
 }
 
@@ -106,7 +136,7 @@ export function keyFor(pathname) {
   } catch {
     return null;
   }
-  return KEY_RE.test(key) || MANIFEST_RE.test(key) || BLUEPRINT_RE.test(key) || isLocaleKey(key) || NEWS_RE.test(key)
+  return KEY_RE.test(key) || MANIFEST_RE.test(key) || BLUEPRINT_RE.test(key) || isLocaleKey(key) || isListsKey(key) || isSilhouettesKey(key) || NEWS_RE.test(key)
     ? key
     : null;
 }

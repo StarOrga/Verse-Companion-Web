@@ -320,12 +320,19 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
       min-height: 0;
     }
 
+    /* A phone on its side: the disc is 44px (--sc-fab-size, styles.scss), hugs the corner inside the safe areas. */
+    @media (orientation: landscape) and (max-height: 500px) {
+      .fab-root {
+        right: max(var(--sc-fab-inset), env(safe-area-inset-right, 0px));
+        bottom: calc(var(--sc-fab-inset) + env(safe-area-inset-bottom, 0px));
+      }
+    }
     @media (max-width: 720px) {
       .fab-root {
         /* The 16px phone inset now lives on --sc-fab-inset (styles.scss), so
            the lane a neighbour clears shrinks with the launcher. */
         /* Clear of the home indicator / gesture bar on a phone. */
-        bottom: calc(var(--sc-fab-inset) + env(safe-area-inset-bottom, 0px));
+        bottom: calc(var(--sc-fab-inset) + env(safe-area-inset-bottom, 0px) + var(--sc-launcher-lift, 0px));
         gap: 10px;
       }
       /* The sheet fills the screen (see .sc-sheet), so its head IS the app bar

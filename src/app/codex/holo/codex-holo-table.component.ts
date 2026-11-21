@@ -19,6 +19,9 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { CodexHoloCalloutComponent } from './codex-holo-callout.component';
 import { HoloDiffMarkerComponent } from './holo-diff-marker';
+import { HoloImmersiveHudComponent, type ImmersiveSurface } from './holo-immersive-hud.component';
+import { StageGesturesDirective } from './stage-gestures.directive';
+import type { HoloPerspectiveView } from './codex-holo-perspectives.component';
 import { calloutValuesOf, partTypeKey, shortStatKey } from './holo-callout-values';
 import { partFocusOf } from './codex-holo-inspector.component';
 import { displayItemName } from '../codex-format';
@@ -50,6 +53,7 @@ import { calloutGutter, calloutSize } from '../asset-package/holo-overlay';
 import { AssetPackageService } from '../asset-package/asset-package.service';
 import type { AssetPackageRow } from '../asset-package/asset-package.model';
 import { logWarn } from '../../core/log';
+import { AnalyticsService } from '../../core/analytics.service';
 
 /** Longest the table keeps its hull under a 3D layer that has not drawn yet; then the viewer's own loader shows. */
 export const VIEWER_HOLD_MAX_MS = 6000;
@@ -207,7 +211,7 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
 @Component({
   selector: 'sc-codex-holo-table',
   standalone: true,
-  imports: [DeferErrorComponent, TranslatePipe, ShipHardpointMapComponent, ShipBlueprintSchemaComponent, ShipDeckPlanComponent, ShipInterior3dComponent, ShipSkinViewerComponent, AssetPackageViewerComponent, FallbackImageComponent, ScTooltipDirective, CodexHoloCalloutComponent, HoloDiffMarkerComponent],
+  imports: [DeferErrorComponent, TranslatePipe, ShipHardpointMapComponent, ShipBlueprintSchemaComponent, ShipDeckPlanComponent, ShipInterior3dComponent, ShipSkinViewerComponent, AssetPackageViewerComponent, FallbackImageComponent, ScTooltipDirective, CodexHoloCalloutComponent, HoloDiffMarkerComponent, HoloImmersiveHudComponent, StageGesturesDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[class.ph-wait]': "phase() === 'wait'",
@@ -217,11 +221,18 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
     '[class.offscreen]': 'offscreen()',
   },
   template: `
-    <div class="silhouette-frame" #frame [class.mode-3d]="viewMode() === '3d'" [class.mode-schema]="viewMode() === 'schema'" [class.phone-full]="phoneFull()" [class.loading-3d]="loading3d()">
+    <div class="silhouette-frame" #frame #g="scStageGestures" [scStageGestures]="gesturesOn()" [scStageGesturesStill]="still()" (zoomChange)="zoom.set($event)"
+         [class.mode-3d]="viewMode() === '3d'" [class.mode-schema]="viewMode() === 'schema'" [class.phone-full]="phoneFull()" [class.loading-3d]="loading3d()"
+         (pointerdown)="hud()?.poke()" (click)="onFrameClick($event)">
       @if (phoneFull()) {
-        <button type="button" class="full-close" [attr.aria-label]="'codex.holo.stage.fullscreenExit' | translate" [scTooltip]="'codex.holo.stage.fullscreenExit' | translate" (click)="fullDismissed.set(true)">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        <sc-holo-immersive-hud [caption]="displayName()" [mode]="viewMode()" [stats]="hudStats()" [zoomed]="zoom() > 1.01" [showReset]="viewMode() !== '3d'" [still]="still()"
+          (exit)="exitImmersive('button')" (resetView)="g.reset()" (surfacePick)="surfacePick.emit($event)" />
+      } @else if (canImmerse()) {
+        <button type="button" class="imm-btn" (click)="enterImmersive()" [attr.aria-label]="'codex.holo.stage.immersiveTip' | translate">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          <span>{{ 'codex.holo.stage.immersive' | translate }}</span>
         </button>
+        @if (hint()) { <p class="imm-hint" role="status">{{ 'codex.holo.stage.immersiveHint' | translate }}</p> }
       }
       <div class="rings" aria-hidden="true"><i class="sweep"></i></div>
       <!-- Projection layer over everything on the surface: scanlines and a
@@ -252,9 +263,12 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
              layer stays transparent over the table, which keeps its hull: no "loading" frame between
              the schema and the 3D hologram (D11). -->
         <div class="viewer-hold" [class.held]="!viewerDrawn()">
+        <!-- One viewer per mount (epoch): a late "drawn" of a viewer that already left (deck → hull, a hull
+             switch) carries its old epoch and cannot unhold the new one before it has drawn. -->
+        @for (ep of [viewerEpoch()]; track ep) {
         @defer (on immediate) {
           @if (packageRow(); as row) {
-            <sc-asset-package-viewer class="mode-viewer" animate.leave="surface-leave" (drawn)="markDrawn()" [row]="row" [still]="still()"
+            <sc-asset-package-viewer class="mode-viewer" animate.leave="surface-leave" (drawn)="markDrawn(ep)" [row]="row" [still]="still()"
               interaction="table" [safeArea]="safeArea()" [selectedPort]="selectedPart()" [swappablePorts]="swappablePorts()"
               [relevantPorts]="relevantPorts()" [calloutValues]="calloutModel()?.values ?? calloutValues()" [calloutTitle]="calloutModel()?.title ?? calloutTitle()"
               [calloutType]="calloutModel()?.type ?? null" [calloutDiff]="calloutModel()?.diff ?? false" [groupFilter]="viewerGroups()" [(hotspotScope)]="hotspotScope"
@@ -262,7 +276,7 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
               (selectionIntent)="partIntent.emit($event)" (selectionChange)="partSelected.emit($event)" (swapRequested)="partSwap.emit($event)" />
           } @else if (packageRow() === null) {
             <!-- Legacy path (hulls uploaded before asset packages): model-viewer + browser-side port/node join. -->
-            <sc-ship-skin-viewer class="mode-viewer" animate.leave="surface-leave" (drawn)="markDrawn()" [shipId]="shipClassName()" [embedded]="true" [holo]="true" [still]="still()"
+            <sc-ship-skin-viewer class="mode-viewer" animate.leave="surface-leave" (drawn)="markDrawn(ep)" [shipId]="shipClassName()" [embedded]="true" [holo]="true" [still]="still()"
               [hardpointPorts]="hardpointPortRefs()" [activePorts]="activePorts()"
               (hovered)="hovered.emit($event)" (locatable)="locatable.emit($event)" />
           } @else {
@@ -271,7 +285,8 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
         } @placeholder {
           <div class="mode-viewer is-placeholder" aria-hidden="true"></div>
         } @error {
-          <sc-defer-error class="mode-viewer" source="codex.holoTable" (failed)="markDrawn()" />
+          <sc-defer-error class="mode-viewer" source="codex.holoTable" (failed)="markDrawn(ep)" />
+        }
         }
         </div>
         @if (loading3d()) {
@@ -349,10 +364,10 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
               }
             </div>
           }
-          @if (pins().length === 0) {
+          @if (pins().length === 0 && viewMode() !== '3d') {
             <p class="table-empty">{{ 'codex.holo.stage.noPorts' | translate }}</p>
           }
-          @for (pin of pins(); track pin.portName) {
+          @for (pin of outlinePins(); track pin.portName) {
             <button
               type="button"
               class="pin"
@@ -388,14 +403,14 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
               </span>
             </button>
           }
-          @if (!leader() && selectedPin(); as sp) {
+          @if (!leader() && viewMode() !== '3d' && selectedPin(); as sp) {
             <!-- The selected part is the full callout, beside its dot (the tag steps aside). -->
             <sc-holo-callout class="pin-card" [class.to-left]="sp.x > 50" [style.left.%]="sp.x" [style.top]="'clamp(48px, ' + sp.y + '%, calc(100% - 48px))'"
               [type]="tagOf(sp).type" [name]="calloutModel()?.title ?? sp.label" [values]="calloutModel()?.values ?? []"
               [swappable]="calloutModel()?.swappable ?? false" [diff]="diffPorts().has(sp.portName)" (swap)="portSwap.emit(sp.portName)" />
           }
         </div>
-        @if (leader(); as lay) {
+        @if (viewMode() !== '3d' ? leader() : null; as lay) {
           <!-- Leader lines (#642): each anchored dot's label sits in the
                nearest free slot of a column beside the hull, joined by a thin
                line. Geometry from layoutLeaderLabels() in frame px. -->
@@ -788,18 +803,41 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
     .legend i.u { border-style: dashed; border-color: var(--sc-fg-2); }
     .legend-hint { margin-inline-start: auto; }
 
-    @media (orientation: landscape) and (max-width: 1000px) and (max-height: 600px) {
-      .silhouette-frame { min-height: 320px; }
+    /* Touch: a vertical swipe still scrolls the page, a horizontal drag and a pinch belong to the stage (stage-gestures.directive.ts). */
+    .silhouette-frame { touch-action: pan-y; --z: 1; --zx: 0px; --zy: 0px; }
+    /* One wrapper carries the zoom: individual properties, so the arrival animations and the parallax keep their transform. */
+    .silhouette-frame .shipwrap { translate: calc(var(--px) * 9px + var(--zx)) calc(var(--py) * 9px + var(--zy)); scale: var(--z); }
+    .silhouette-frame :is(.schema-sheet, .deck-sheet, sc-ship-hardpoint-map.mode-viewer) { translate: var(--zx) var(--zy); scale: var(--z); }
+    .silhouette-frame .shipwrap .pin { scale: calc(1 / var(--z)); }
+    :host(.still) .silhouette-frame .shipwrap { translate: var(--zx) var(--zy); }
+    .silhouette-frame.gesturing :is(.shipwrap, .schema-sheet, .deck-sheet, sc-ship-hardpoint-map.mode-viewer) { will-change: translate, scale; transition: none; }
+    .silhouette-frame.zoom-anim :is(.shipwrap, .schema-sheet, .deck-sheet, sc-ship-hardpoint-map.mode-viewer) { transition: translate var(--sc-t-base, var(--holo-t-base)) var(--sc-e-out, var(--holo-e-out)), scale var(--sc-t-base, var(--holo-t-base)) var(--sc-e-out, var(--holo-e-out)); }
+    .imm-btn { position: absolute; z-index: 5; inset-inline-end: 8px; inset-block-end: 8px; display: inline-flex; align-items: center; gap: 8px; min-block-size: 48px; padding: 0 16px;
+      border-radius: 24px; cursor: pointer; color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-bg-0) 72%, transparent);
+      border: 1px solid color-mix(in srgb, var(--sc-accent) 40%, transparent); font-family: var(--sc-font-display); font-size: max(12px, var(--sc-fs-floor, 12px)); letter-spacing: 0.1em; text-transform: uppercase; }
+    .imm-btn:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    /* Portrait phone: the shell's Tools dial and launcher own the bottom-end lane - the button moves to the start corner. */
+    @media (max-width: 720px) { .imm-btn { inset-inline-end: auto; inset-inline-start: 8px; } .imm-hint { inset-inline-end: auto; inset-inline-start: 8px; } }
+    .imm-hint { position: absolute; z-index: 5; inset-inline-end: 8px; inset-block-end: 64px; margin: 0; max-inline-size: min(280px, 70%); padding: 10px 14px; border-radius: 14px; font-size: 13px; color: var(--sc-fg-0);
+      background: color-mix(in srgb, var(--sc-bg-0) 85%, transparent); border: 1px solid var(--sc-accent); pointer-events: none; animation: imm-hint 6s var(--sc-e-out, var(--holo-e-out)) forwards; }
+    @keyframes imm-hint { 0% { opacity: 0; } 8%, 88% { opacity: 1; } 100% { opacity: 0; } }
+    /* Immersive: a fixed overlay (iPhone Safari has no Fullscreen API for this). Above the feedback launcher (1400), below dialogs (1500). */
+    .silhouette-frame.phone-full { position: fixed; inset: 0; z-index: 1450; min-height: 0; width: auto; height: 100vh; height: 100dvh; box-sizing: border-box; background: var(--sc-bg-0);
+      touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; overscroll-behavior: none;
+      /* clip, not hidden: a hidden box still scrolls programmatically (focus / scrollIntoView on the Immersive tap), which slid hull and HUD off screen in portrait. */
+      overflow: clip;
+      --imm-pt: calc(56px + env(safe-area-inset-top, 0px)); --imm-pb: env(safe-area-inset-bottom, 0px);
+      --imm-pl: calc(64px + env(safe-area-inset-left, 0px)); --imm-pr: env(safe-area-inset-right, 0px);
+      padding: var(--imm-pt) var(--imm-pr) var(--imm-pb) var(--imm-pl); }
+    /* The stage area = the frame minus the HUD bands: surfaces fill it, the hull is centred in it (it contains inside it: cq units follow the content box). */
+    .silhouette-frame.phone-full > :is(.mode-viewer, sc-ship-hardpoint-map, sc-ship-interior-3d) { inset: var(--imm-pt) var(--imm-pr) var(--imm-pb) var(--imm-pl); min-height: 0; }
+    .silhouette-frame.phone-full .shipwrap { left: calc(50% + (var(--imm-pl) - var(--imm-pr)) / 2); top: calc(50% + (var(--imm-pt) - var(--imm-pb)) / 2); }
+    @media (orientation: portrait) {
+      .silhouette-frame.phone-full { --imm-pl: env(safe-area-inset-left, 0px); --imm-pb: calc(64px + env(safe-area-inset-bottom, 0px)); }
     }
-    /* A phone on its side: a fixed overlay, because iPhone Safari has no Fullscreen API.
-       Above the feedback launcher (1400), below dialogs and overlays (1500). */
-    .silhouette-frame.phone-full { position: fixed; inset: 0; z-index: 1450; min-height: 0; width: auto; background: var(--sc-bg-0); }
-    .full-close { position: absolute; z-index: 5; top: calc(8px + env(safe-area-inset-top, 0px)); right: calc(8px + env(safe-area-inset-right, 0px));
-      width: 48px; height: 48px; display: grid; place-items: center; padding: 0; cursor: pointer; border-radius: 50%; color: var(--sc-fg);
-      background: color-mix(in srgb, var(--sc-bg-0) 70%, transparent); border: 1px solid color-mix(in srgb, var(--sc-accent) 40%, transparent); }
-    .full-close:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     @media (max-width: 640px) {
-      .silhouette-frame, .mode-viewer { min-height: 320px; }
+      /* The model takes what the screen leaves under the header and above the sheet (clamped); never the old 320 px slab. */
+      .silhouette-frame, .mode-viewer { min-height: clamp(280px, calc(100dvh - var(--sc-header-h, 108px) - 220px - var(--sc-bar-stack-h, 0px) - var(--sc-sheet-peek-h, 96px)), 520px); }
       .silhouette-frame { --pin-inset: 36px; }
       .pin-label { display: none; }
       .pin:is(.sel, .active) .pin-label { display: inline; }
@@ -976,11 +1014,22 @@ export class CodexHoloTableComponent {
   /** The projection surface's size in CSS px (0 until measured). */
   readonly frameW = signal(0);
   readonly frameH = signal(0);
-  /** A phone on its side: the 3D view takes the whole screen until it is closed. */
-  private readonly phoneLandscape = signal(false);
-  /** Closed by the reader; turning the phone again brings it back. */
-  readonly fullDismissed = signal(false);
-  readonly phoneFull = computed(() => this.viewMode() === '3d' && this.phoneLandscape() && !this.fullDismissed());
+  /** The immersive overlay (entered with the stage's button only, left with the close button, Escape or the back gesture). */
+  readonly immersive = signal(false);
+  readonly phoneFull = computed(() => this.immersive());
+  /** Current zoom factor of the stage gestures (1 = identity). */
+  readonly zoom = signal(1);
+  /** The one-time chip that points at the Immersive button after a phone is turned on its side. */
+  readonly hint = signal(false);
+  /** The four perspective tiles for the immersive rail and side panel (the stage resolves them). */
+  readonly hudStats = input<readonly HoloPerspectiveView[]>([]);
+  readonly surfacePick = output<ImmersiveSurface>();
+  protected readonly hud = viewChild(HoloImmersiveHudComponent);
+  /** The 3D camera brings its own gestures; the hull SVG, schema and deck plan get pinch / pan / double tap. */
+  protected readonly gesturesOn = computed(() => this.viewMode() !== '3d');
+  protected readonly canImmerse = computed(() => this.coarse());
+  private readonly analytics = inject(AnalyticsService);
+  private immersiveUndo: ((via?: string) => void) | null = null;
   /** Touch pointer: leader labels are full tap targets, fewer fit a column. */
   private readonly coarse = signal(typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches);
   /** The port under the pointer / focus HERE — lights its pin and its label
@@ -1023,11 +1072,27 @@ export class CodexHoloTableComponent {
    * Reset whenever 3D is left or the ship changes; {@link VIEWER_HOLD_MAX_MS} caps the wait.
    */
   readonly viewerDrawn = signal(false);
+  /**
+   * Part dots on the 2D hull. While the 3D model loads the hull is only a placeholder: dots placed on it would
+   * sit in other spots than on the model and jump once it draws, so they wait for the model (its own markers).
+   */
+  readonly outlinePins = computed(() => (this.viewMode() === '3d' ? [] : this.pins()));
   /** The hull model is on its way: the loading ring sits in its spot (#378). */
   readonly loading3d = computed(() => this.viewMode() === '3d' && !this.interior3d() && !this.viewerDrawn());
+  /** The hull viewer is the 3D layer (3D without a deck turned inward). */
+  readonly hullViewerOn = computed(() => this.viewMode() === '3d' && !this.interior3d());
+  /** Counts the hull viewer's mounts: each 3D entry, each way back from a deck, each hull switch. */
+  readonly viewerEpoch = signal(0);
   private viewerHoldTimer: ReturnType<typeof setTimeout> | null = null;
 
-  markDrawn(): void {
+  /**
+   * The hull viewer drew (or gave up). `epoch` = the mount that says so: a stale one (a viewer that already
+   * left, a hold timer of an earlier mount) is ignored, as is any call while no hull viewer is up — else the
+   * hull would be taken off the table before the new model is there (empty frame, "3D-Modell wird geladen").
+   */
+  markDrawn(epoch?: number): void {
+    if (epoch !== undefined && epoch !== this.viewerEpoch()) return;
+    if (!this.hullViewerOn()) return;
     if (this.viewerHoldTimer) clearTimeout(this.viewerHoldTimer);
     this.viewerHoldTimer = null;
     this.viewerDrawn.set(true);
@@ -1046,23 +1111,36 @@ export class CodexHoloTableComponent {
 
   constructor() {
     effect((onCleanup) => {
-      const in3d = this.viewMode() === '3d';
+      // Keyed on the hull viewer itself, not on "3D": coming back from a deck mounts a new viewer, which
+      // must hold the table's hull again until it has drawn (before, the 3D-entry hold had long run out).
+      const on = this.hullViewerOn();
       this.shipClassName();
-      untracked(() => this.viewerDrawn.set(false));
-      if (!in3d) return;
-      const t = setTimeout(() => this.markDrawn(), VIEWER_HOLD_MAX_MS);
+      const epoch = untracked(() => {
+        this.viewerDrawn.set(false);
+        if (on) this.viewerEpoch.update((n) => n + 1);
+        return this.viewerEpoch();
+      });
+      if (!on) return;
+      const t = setTimeout(() => this.markDrawn(epoch), VIEWER_HOLD_MAX_MS);
       this.viewerHoldTimer = t;
       onCleanup(() => clearTimeout(t));
     });
     const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
     const destroyRef = inject(DestroyRef);
     if (typeof matchMedia === 'function') {
-      const landscape = matchMedia('(orientation: landscape) and (max-width: 1000px) and (max-height: 500px)');
-      const syncLandscape = () => { this.phoneLandscape.set(landscape.matches); this.fullDismissed.set(false); };
-      syncLandscape();
-      landscape.addEventListener('change', syncLandscape);
-      destroyRef.onDestroy(() => landscape.removeEventListener('change', syncLandscape));
+      // A phone turned on its side: no automatic entry, only a one-time chip that points at the button.
+      const landscape = matchMedia('(orientation: landscape) and (max-height: 500px)');
+      let hintTimer: ReturnType<typeof setTimeout> | undefined;
+      const onTurn = () => {
+        if (!landscape.matches || !this.coarse() || this.immersive() || !takeImmersiveHint()) return;
+        this.hint.set(true);
+        clearTimeout(hintTimer);
+        hintTimer = setTimeout(() => this.hint.set(false), 6000);
+      };
+      landscape.addEventListener('change', onTurn);
+      destroyRef.onDestroy(() => { landscape.removeEventListener('change', onTurn); clearTimeout(hintTimer); });
     }
+    destroyRef.onDestroy(() => this.leaveImmersive());
     afterNextRender(() => {
       const frame = this.frameRef()?.nativeElement;
       if (!frame) return;
@@ -1236,4 +1314,72 @@ export class CodexHoloTableComponent {
     // The tags the full callout still lies over step aside (C10): they hide while it is open.
     return { pin, left, top, covered };
   });
+
+  /** Enter the immersive overlay: fixed stage, rest of the page inert, history entry for Android back, Fullscreen API + landscape lock where the browser has them. */
+  enterImmersive(): void {
+    const frame = this.frameRef()?.nativeElement;
+    if (this.immersive() || !frame || typeof document === 'undefined') return;
+    this.hint.set(false);
+    this.immersive.set(true);
+    const html = document.documentElement;
+    html.classList.add('sc-immersive');
+    const touched: HTMLElement[] = [];
+    for (let node: HTMLElement | null = frame; node && node !== document.body; node = node.parentElement) {
+      for (const sib of Array.from(node.parentElement?.children ?? []) as HTMLElement[]) {
+        if (sib !== node && !sib.hasAttribute('inert')) { sib.setAttribute('inert', ''); touched.push(sib); }
+      }
+    }
+    let pushed = false;
+    try { history.pushState({ ...(history.state ?? {}), scImmersive: 1 }, ''); pushed = true; } catch { /* sandboxed frame: no back entry */ }
+    const onPop = () => this.exitImmersive('back');
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') this.exitImmersive('escape'); };
+    window.addEventListener('popstate', onPop);
+    window.addEventListener('keydown', onKey);
+    const noop = () => undefined;
+    if (document.fullscreenEnabled && frame.requestFullscreen) {
+      void Promise.resolve(frame.requestFullscreen({ navigationUI: 'hide' })).then(() => (screen.orientation as { lock?: (o: string) => Promise<void> } | undefined)?.lock?.('landscape')).catch(noop);
+    }
+    this.immersiveUndo = (via?: string) => {
+      window.removeEventListener('popstate', onPop);
+      window.removeEventListener('keydown', onKey);
+      html.classList.remove('sc-immersive');
+      touched.forEach((e) => e.removeAttribute('inert'));
+      try { (screen.orientation as { unlock?: () => void } | undefined)?.unlock?.(); } catch { /* not locked */ }
+      if (document.fullscreenElement) void document.exitFullscreen().catch(noop);
+      if (pushed && via && via !== 'back') { try { history.back(); } catch { /* ignore */ } }
+    };
+    this.analytics.track('codex:immersive_open', { surface: this.viewMode(), orientation: window.innerWidth > window.innerHeight ? 'landscape' : 'portrait' });
+  }
+
+  exitImmersive(via: 'button' | 'escape' | 'back'): void {
+    if (!this.immersive()) return;
+    this.immersive.set(false);
+    this.leaveImmersive(via);
+    this.analytics.track('codex:immersive_close', { via });
+    // Focus back on the button that opened it, once it is in the DOM again.
+    setTimeout(() => (this.frameRef()?.nativeElement.querySelector('.imm-btn') as HTMLElement | null)?.focus({ preventScroll: true }), 0);
+  }
+
+  private leaveImmersive(via?: string): void {
+    const undo = this.immersiveUndo;
+    this.immersiveUndo = null;
+    undo?.(via);
+  }
+
+  protected onFrameClick(ev: MouseEvent): void {
+    if (!this.immersive()) return;
+    // A tap on empty stage flips the HUD; pins, buttons and the HUD's own controls keep their job.
+    if (!(ev.target as Element).closest('button, a, sc-holo-immersive-hud, [data-no-gesture]')) this.hud()?.toggle();
+  }
+
+}
+
+const HINT_KEY = 'sc.immersive.hint';
+/** True once per browser: the chip that points at the Immersive button is shown a single time. */
+function takeImmersiveHint(): boolean {
+  try {
+    if (localStorage.getItem(HINT_KEY)) return false;
+    localStorage.setItem(HINT_KEY, '1');
+  } catch { /* storage blocked: show it, the auto-dismiss keeps it harmless */ }
+  return true;
 }

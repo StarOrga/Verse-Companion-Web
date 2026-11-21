@@ -1,7 +1,543 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.281.3",
+  "current": "0.286.2",
   "releases": [
+    {
+      "version": "0.286.2",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex holotable: the Akte expands again after it was collapsed (the empty table-head row above it caught the clicks, on touch also the collapse), and the Akte, Kaufen tab and parts list use the four spacing steps of the design system instead of hand-picked gaps, so \"N Bauteile\" no longer sits flush under the parts search."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.286.1",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "ingest-catalog: after finalize the catalog lists are published by a call of their own (lists_publish with detach) instead of on the worker that just ran the ingest, so its CPU limit no longer puts the list files at risk."
+            },
+            {
+              "title": "",
+              "text": "Popup back-gesture specs wait up to 5 s for a history traversal, so they no longer fail on a loaded machine."
+            },
+            {
+              "title": "",
+              "text": "package-lock.json carries the app version again and is bumped with every release."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.286.0",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Type to search: on a page whose only search is the bar's search (Verse, HQ, Codex, also scrolled down), typing a letter with nothing focused goes straight into that search. It stays off while a text field, a dialog or a menu has focus, after Tab moved focus to a control, on pages with a search or filter field of their own, and for shortcuts, digits, Space and /."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.285.1",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Admin feedback: the one-tap answer buttons (e.g. Umsetzen / Verwerfen) stay under their question when a later notice without options arrives, and the question stays in view; a human reply still clears them."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.285.0",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex: outlines in the lists, thumbnails and on the holotable load from files per build instead of the database, so list pages no longer send a silhouette query."
+            }
+          ]
+        },
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "ingest-catalog op silhouettes_publish and scripts/codex-silhouettes-to-r2.mjs: publish a build's silhouettes as shard files to R2 in small steps; runs by itself after finalize."
+            },
+            {
+              "title": "",
+              "text": "Assets Worker serves codex-silhouettes/ (index short-cached, shards immutable)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.284.2",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex: the \"Einordnung\" ranking on a ship page reads the parts of the fleet's stock loadouts from one file per build instead of the database. The first ship page of a build sends 112 fewer database reads (26 MB); the ranking shows the same values."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.284.1",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex holotable: switching between two ships keeps the stage up and dimmed instead of showing the first-visit skeleton; the dim lifts once the next ship's head and values are in, and the head band no longer grows after the stage settles."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.284.0",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Install as an app: an install card in a calm moment after a successful action (from the second visit, touch devices only). On Android it opens the native one-tap install, on iPhone/iPad a short guide. After \"Later\" it rests 14, 45 and then 120 days, after that only the \"Install app\" entry in the apps menu and settings offers it."
+            },
+            {
+              "title": "",
+              "text": "App icon: monochrome icon for Android themed icons, a cleaner maskable icon, store screenshots for the install sheet and iOS web-app tags."
+            },
+            {
+              "title": "",
+              "text": "Holotable immersive mode: one button puts the hull, schema or 3D view on the whole screen, with a labelled stats rail, a side panel, pinch and pan on the model and a double tap to reset; Esc, back or ✕ leave it."
+            },
+            {
+              "title": "",
+              "text": "Phones and tablets: one Tools dial holds the view switch, beta and share instead of separate floating buttons."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Phone on its side: the header is one 48 px row that hides when scrolling down and returns when scrolling up; search sits in the header."
+            },
+            {
+              "title": "",
+              "text": "Holotable on phones: the values are a bottom sheet (peek, half, full) and the hull takes more of the screen (portrait 38 % → 56 %); on its side the page shows hull and values next to each other. On iPad the hull grows from 43 % to 56 % of the height."
+            },
+            {
+              "title": "",
+              "text": "Touch targets are at least 48 px (52 px for the main action), the breadcrumbs stay on one row and text never goes below 12 px."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Pages no longer jump while loading: placeholders hold the final heights (item page, gallery, release notes, patches, upcoming ships)."
+            },
+            {
+              "title": "",
+              "text": "On a phone on its side the patch ticker on the Verse page no longer prints under the navigation."
+            },
+            {
+              "title": "",
+              "text": "Pinching the 3D model no longer zooms or scrolls the whole page."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.283.5",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex: item names, ship cards, class comparisons and blueprint categories on the Codex pages come from the build's list files instead of the database. A Codex page sends ten fewer database reads, three more once a build is published again."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.283.4",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Ship detail pages now use the same page template slots as item pages (head, stage, panel, strip); the layout looks the same."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.283.3",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Holotable: the glass head band no longer covers the interior chips or the tabs; the tab pill fits the panel at every width."
+            },
+            {
+              "title": "",
+              "text": "Holotable: the stage keeps its frame when switching views and decks, the outline stays until the new 3D model is drawn, and part dots wait for the model."
+            },
+            {
+              "title": "",
+              "text": "Phones: the interior chips stay on one line, so the stage no longer jumps."
+            },
+            {
+              "title": "",
+              "text": "Item Änderungen tab shows curated stat names with a fixed better/worse direction."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Ship and item detail pages share one panel component."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.283.2",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Automated browser checks no longer lose Codex list rows to a CORS block when the shared catalog cache was filled from another address (local dev server vs. the live site)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.283.1",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader 0.84.0: the sidecar opens the Data.p4k through a compact index. Opening the archive takes 404 MB instead of 2.7 GB, a codex run peaks at 2.65 GB instead of 4.48 GB, with byte-identical output."
+            },
+            {
+              "title": "",
+              "text": "Data Uploader: the RAM limit never goes below what one run needs (3.5 GB), and 3D workers are planned with 2 GB instead of 3 GB each."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.283.0",
+      "date": "2026-11-20",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex: list data (browse lists, counts, filters, rank comparisons, missiles, German-name search) can be served as fixed files per game build instead of from the database; the database stays the fallback. Takes effect once the files are published for a build."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Automated browser checks and the mobile gate share a catalog cache and queue their database requests, so they no longer load the live database like a stress test."
+            },
+            {
+              "title": "",
+              "text": "Codex search by German name returns every match instead of at most 100 when the list files are available."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex weapon rank comparison no longer stops at the first 1,000 weapons when the list files are available."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.282.3",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Classic ship view: the Analyse cards carry the loadout's area colours and symbols — Offensive in the offensive red, Defensive in the defensive blue, and each group of the Schiff card (flight, mass, systems, signature, hull) in its area."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.282.2",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Loading screen: the glow behind the logo fades out softly on every side instead of ending in a hard edge on the left."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.282.1",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Classic ship view: 'Bei RSI ansehen' and 'Pledge-Link hinzufügen' now sit in the header action row next to 'Vergleichen' and 'Schiff wechseln'."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.282.0",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex detail pages share one template: a glass head band that sticks under the subheader and slims on scroll, one tab pill and one panel for ships, weapons and items."
+            },
+            {
+              "title": "",
+              "text": "Item pages show an Änderungen tab with the stats that changed since the previous patch."
+            },
+            {
+              "title": "",
+              "text": "HQ storage shows its path (HQ › Lager › Inventar) in the subheader."
+            },
+            {
+              "title": "",
+              "text": "The wish sky now sits behind the empty wish list and the top of the wish window."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Gap between the holotable views bar and the KPI strip."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.281.9",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Nachschub name proposals work again for signed-in web sessions: the nachschub-names function no longer sits behind the gateway JWT gate that rejected every web call with 401."
+            }
+          ]
+        },
+        {
+          "category": "Docs",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "PostHog audit concept: final report (round 3) with live screenshot."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.281.8",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "/verse: the HQ outpost now joins the staged entrance with the planets and texts (with 'Patches') on a menu switch and on reload, instead of showing up with the globe."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.281.7",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Storage concept (admin-only): round 4 folds in the round-3 decisions and asks the last open questions before the build."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.281.6",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Classic ship view: explanatory notes such as the scale legend show as tooltips instead of written-out text."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.281.5",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Classic ship view: the header no longer carries a factory-loadout button; the factory fit lives in the loadout."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.281.4",
+      "date": "2026-11-19",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Holotable 3D: a focused part shows no dashed rings beneath it any more, only its green highlight and its label."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.281.3",
       "date": "2026-11-19",

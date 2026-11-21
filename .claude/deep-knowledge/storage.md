@@ -10,6 +10,7 @@ built in by design.
 | Relational: users, social, hangar, feedback, telemetry, codex catalog | Supabase Postgres (Free, 500 MB) | RLS, RPCs, Realtime. Blocks (402) at its limit, never bills |
 | RLS-gated files (feedback attachments — private since `20260928211217`, shown via signed URLs, 1 h), codex previews | Supabase Storage (Free, 1 GB) | RLS per owner cannot be rebuilt elsewhere |
 | Codex localization strings (`codex-locale/`, since 2026-10-03) | R2, same bucket and Worker | ~31 MB per build, immutable per build; see § Localization strings |
+| Codex catalog lists (`codex-lists/`) and silhouettes (`codex-silhouettes/`) as files per build | R2, same bucket and Worker | Every list read cost the instance swap IO; the tables stay the source and the fallback; see § Catalog lists, § Silhouettes |
 | Ship hulls + livery icons (`ship-skins`) | Cloudflare R2 `sc-companion-assets` (WEUR, account `115d75098864fcf13d36dc1aec1d874a`), read via `cloudflare/assets-worker` at `https://sc-assets.sc-assets-worker.workers.dev` (live 2026-09-25) | 0 € egress, 10 GB. A key the bucket lacks is streamed from Supabase by the Worker |
 | News thumbnails (`news-images`, written by `fetch-verse-news`) | Same R2 bucket under `news-images/<hash>/w<N>.<ext>`, read via the same Worker at `/news-images/…` (code 2026-10-03, `feat/news-images-r2`) | Every thumbnail view used to count against the 5 GB/month Supabase egress. Legacy objects stay in Supabase and are streamed by the Worker |
 | App bundle, icons, meshopt decoder | Vercel Hobby | Static hosting |
@@ -87,6 +88,266 @@ copies the existing objects (dry run unless `--apply`); a change to
   259 MB with 2 builds (105 MB payload, 75 MB of it distinct; strings 47 MB).
 - `codex_locale_strings` moved to R2 (2026-10-03, § Localization strings).
   The table is now only an ingest's staging area.
+
+## Catalog lists (R2 per build)
+
+Every list read of the catalog costs the instance swap IO, so each build's lists
+are published once as files and served by the Worker with a permanent cache. The
+tables stay the source and the client's fallback; nothing is deleted from them.
+
+| Key | Cache |
+|---|---|
+| `codex-lists/<build uuid>/index.json` | `max-age=300` (names the current gen) |
+| `codex-lists/<build uuid>/<gen>/<name>.json` | immutable (a new gen per publish) |
+
+`<name>` is `ship`, `ship-rank`, `weapon`, `component`, `item`, `ammunition`, `manufacturer`,
+`blueprint`, `facets`, `missile`, `weapon-rank`, `component-rank`, `names-de` or `rank-parts`. The Worker
+serves only these names (`LISTS_FILE_RE` in `cloudflare/assets-worker/src/index.js`): **a new name needs
+`npx wrangler@4 deploy` there BEFORE the first publish that lists it**, or clients get a 404 for a file
+the index names. A kind file holds ALL rows of the build (variants
+included) in the database list order (`name_localized asc nulls last, class_name asc`),
+columnar: `{ v, kind, columns, payloadKeys, rows: [[...columns, ...payload slices]] }`.
+`facets.json` stores the `codex_facet_values` result per kind (ship, weapon,
+component, item) unchanged. The ship payload slice is `SHIP_PAYLOAD_KEYS` in
+`_list-snapshots.ts` (card keys + `sizeClass`, `career`, `dimensions`; the rank-cohort
+keys hold the loadout tree and stats and live in their own file, `ship-rank.json`:
+the same ship columns, `payloadKeys` = `SHIP_RANK_PAYLOAD_KEYS` (`RANK_PAYLOAD_KEYS`
+of `codex.service.ts`, then `crew` and `dimensions` for the landing's class
+comparison; readers look keys up by name, so a key added at the end never breaks an
+older client), all ships in `ship.json` order, read in
+pages of 200 because each row carries several kB; a browser reads it once per build
+for the rank cohort).
+
+Four more files (concept supabase-io-last; the client reads them instead of the database):
+`missile.json` (`getMissileCohort`: items, `attach_type = 'Missile'`, named; columns `class_name,
+name_localized, sub_type, size, attach_type, payload`, the LAST column is the whole payload,
+`payloadKeys` empty; pages of 200), `weapon-rank.json` (weapons, named, `is_variant = false`;
+columns `class_name, name_localized, sub_type, size`, payloadKeys `weaponParams`, `stats`),
+`component-rank.json` (components, same filters, ALL kinds; payloadKeys `kind`, `stats`,
+`weaponParams`; pages of 200). The client still applies `getItemRankCohort`'s `name_localized not like '!*'` and the
+component kind filter. `names-de.json` = `{ v: 1, lang: "de", kinds: { <kind>: [[class_name,
+german name]] } }` for all seven kinds, class_name order, one entry per record whose
+`payload->name->>de` the `codex_search` text includes (not empty, not `@...`, not `TRANSLATION NOT
+FOUND`, not equal to the English name ignoring case); the name is raw, the client folds case and
+accents. `codex_search` matches `lower(unaccent(en || ' ' || de))` (or `class_name ilike`) against
+EVERY token (LIKE, `*` = wildcard), ranks by `word_similarity` - that rank is not mirrored.
+A failure of one of these four (or of `rank-parts.json`, below) is logged, the name stays out of
+`index.json` and the publish result lists it in `failed`; the client treats a name missing from the
+index as not published.
+
+**`rank-parts.json`** (`_rank-parts.ts`; client `codex-rank-parts.ts`) carries what the "Einordnung"
+rank cohort (`getRankCohort`) reads of the parts in the ships' stock loadouts. Measured 2026-11-20 on
+LIVE 4.10.3: a cold ship detail page read the FULL payload of 5 553 parts (and asked for 5 600
+ammunition names) in 116 requests, 26.5 MB, 20 MB of it `stats`; the cohort reads nine top-level
+keys and six `stats` structs. The file: 8.1 MB, about 0.1 MB over the wire (brotli).
+`{ v: 1, kind: "rank-parts", payloadKeys, ammoKeys, absent, rows: [[class_name, table, slice]],
+ammo: [[class_name, slice]] }`. A `slice` is an object with exactly those of `payloadKeys`
+(`ammoKeys`) the payload HAS: an absent key is not in it, a JSON null is there as null (`subType`
+is null on 3 120 of the 5 553 parts; `in` and `=== null` tell the two apart, a `payload->key`
+select does not, which is why the publisher reads the whole payload). `rows` = every class name anywhere in a
+ship's `defaultLoadout` tree (collected while `ship-rank` is built, no second read of the ships),
+from the first of weapons / components / items that holds it (`table`, the lookup order of
+`getEntityPayloads`); `absent` = the names no table holds; `ammo` = ALL ammunition rows, so the
+publisher never derives which ammunition a weapon names. Inside `stats` and `raw` a child that is a
+plain object and whose lower-cased key contains none of `STAT_KEEP` (`itemresourcecomponentparams`,
+`physics`, `shield`, `quantum`, `armor`, `missile`: the struct hints of the cohort's `findStat`
+reads) / `RAW_KEEP` (`projectileparams`) is replaced in place by the string `"\u0000"` (jsonb cannot
+hold U+0000, so it is never data; key order stays, `findStat` scans in it). Scalars and arrays are
+never cut. **The file can only answer what the database would have answered:** the client turns
+every cut into an object that throws `SnapshotCut` on any read and wraps each payload so that a
+read of a top-level key outside `payloadKeys` (or an enumeration of the payload) throws too. Every
+such read is also counted (`RankParts.cutReads()`), so a `try/catch` somewhere on the scoring path
+that swallows the throw changes nothing: `getRankCohort` drops the file as a whole when scoring
+threw anything or the count moved (logged once) and scores from the database as before.
+So a change to the KPI code that reads something new costs speed until the keep lists follow, never
+correctness. A class name the client asks for and the file neither holds nor lists as absent is read
+from the database alone. The publisher reads the three tables in chunks of 200 names (each table only
+the names no earlier one held, 71 requests for LIVE), slices and cuts each payload in the function and
+keeps each row as JSON text, never as an object. It is by far the heaviest read of the publish (about
+26 MB through the function), so it runs LAST, after the index is live and the old generations are
+collected: the file is put, then the index is put once more with its entry (only while the bucket's
+index still names this generation). A failure, or a worker killed over it (CPU time, memory), costs
+this one file and never the publish. Why not the finished cohort
+instead: scoring the fleet takes 5.7 s of CPU on a desktop (the function has 2 s) and runs through
+`codex-loadout-stats`, `codex-power`, `codex-em-model` and more of the Angular source, which the
+function cannot import.
+
+Publish (`_list-publish.ts`; put order ship, ship-rank, the other kinds, facets, missile, weapon-rank,
+component-rank, names-de, index, then rank-parts and the index again): one file at a time (pages of 1000, one file, then
+dropped), facets, one file of the new generation read back through the public Worker, then the
+index (last), the index read back from the bucket, then only generations older than
+this publish and not named by that index are deleted (a failed read-back puts no
+index and deletes nothing). It runs after `finalize` as a request of its own, behind the
+same R2 usage gate as the locale publish: `finalize` calls the function itself with
+`{ "op": "lists_publish", "build_id": "<uuid>", "detach": true }` (`_self-call.ts`, service
+key in both headers), that request answers `202 { ok, started }` at once and
+publishes after its response, where a failure is only logged. A refusal (error status:
+nothing ran) is retried once; a request that threw is not, because it may have arrived
+and two publishes of one build at once can leave the index naming a generation the other
+one collected. Both sides log a worker id (`finalize <build> answered on worker <id>`,
+`lists publish <build> (worker <id>)`): a worker past its soft CPU limit takes no new
+request, one below it still does, so a different worker is likely and not promised. The
+lists read only the catalog tables and the facet RPC, never the locale rows. The worker that answers
+`finalize` has spent most of its 2 s of CPU on the ingest (1 756 ms on 2026-11-19) and
+still carries the locale publish; on it the lists publish (624 ms by itself) could be the
+step that gets the worker killed, and a kill over the locale publish took the lists with
+it. The call is started before the locale publish. `detach` is honoured for the service
+key only; without it `lists_publish` (`{ "op": "lists_publish", "build_id": "<uuid>" }`)
+answers with the result and
+redoes it for one build. `locale_gc` also removes the `codex-lists/` prefixes of
+builds gone from `codex_builds` (report under `lists`).
+
+**Client read path** (`src/app/codex/`): `CodexListSnapshots` (`codex-list-snapshots.ts`)
+fetches the index and the files through the Worker, keeps the parsed files of the
+current build in memory (they are the list cache) and answers `null` for anything
+it cannot use: index 404 (not published yet — remembered 5 min, not logged), a
+failed download (HTTP error, network, or the 30 s fetch abort; logged once, not
+retried for 60 s), an unexpected shape (logged once, never fetched again for that
+gen — files are immutable), or a file still downloading after 3 s (that call uses
+the database; later calls skip the wait until the same download lands). Any throw
+while answering from a file is logged once and falls back to the database. The pure
+`codex-list-engine.ts` answers a read from the rows with PostgREST semantics (default
+browse filters, every `filteredListQuery` filter incl. NULL handling, the ILIKE
+token groups plus `searchMatcher`, paging, exact counts) and declines (`null`) on
+`payload: 'full'`, a payload key the file lacks, a regex outside its POSIX subset,
+an unknown filter key or a column the table lacks. `CodexService` tries the file
+first in `listByKind`, `countByKind`, `countSearchMatches`, `countItemsByAttachType`,
+`facetValues` (+ ship sizes), `weaponFacets`, `listFpsCatalog`, `backfillCohortNames`
+`allShipRows` (whole cohort from `ship-rank.json`) and `listSkinSiblings` /
+`listEditionSiblings` (ILIKE prefix; above 200 matches the database answers, its
+collation decides the cut); on `null` the old query runs unchanged. From the files,
+`countSearchMatches` counts like `listByKind` (token groups + matcher), so "also
+found in …" equals the list's count. `getMissileCohort` reads `missile.json`,
+`getItemRankCohort` reads `weapon-rank.json` / `component-rank.json` (the client
+applies the `'!'` name filter and the component kind; the silhouettes for the
+missile measurements still come from `codex_silhouettes`). The German-name
+fallback of `listByKind` matches locally when `names-de.json` and the kind's list
+file are both there (`germanListFromSnapshot`: `codex_search`'s row test — every
+token against the folded `en de` text or ILIKE the class name, `*` wildcard,
+`%`/`_`/`\` literal — then the list's own filters); it does not rank by
+`word_similarity` nor cut at 100 names, so a broad German term lists all its
+matches. Without either file the `codex_search` RPC + `in` list read run as before.
+Reads by class name (`.in('class_name', …)`) go through `snapshotByName` →
+`recordsByClassName`: `resolveEntities` (the five kind files, merged in table
+order), `getShipsByClassNames` (`ship.json`, or `ship-rank.json` for rank keys),
+`getPayloadKeys` (card keys from the kind file, everything else from the rank
+slice of ships / weapons / components), `getComponentKeyStats` (the four values
+picked out of `component-rank.json`'s `stats`) and `blueprintCategories` (distinct
+`category` of `blueprint.json`). A kind file holds the whole table, so a name it
+lacks is simply absent; `weapon-rank` / `component-rank` are filtered, so a name
+they lack is looked up in the kind file: absent there = not in the build, present
+there (a variant, an unnamed record) = the one name the old query still reads. A
+file published before a key existed declines, and the old query runs for every name.
+The rank cohort's part payloads (`getEntityPayloads` / `getAmmoPayloads` inside `getRankCohort`)
+come from `rank-parts.json` (above); every other caller of those two still reads the database,
+a handful of names at a time.
+Still on the database: `listBlueprints` (full payload, no file; no caller today),
+the `codex_search_suggest` "did you mean" RPC, detail pages, the patch tables
+(`codex_patch_*`, `codex_added_class_names`, `codex_patch_news`: across builds, not
+per build) and every other non-list read. The silhouettes have their own files
+(§ Silhouettes). `searchAll` pages through `listByKind`, so it reads the files too. Specs never reach the Worker: `vitest-setup.ts` answers
+`/codex-lists/` and `/codex-silhouettes/` with 404.
+
+## Silhouettes (R2 per build, shards)
+
+Every list view read its rows' outlines from `codex_silhouettes` (measured 2026-11-20:
+869 kB for a ship page, 436 kB components, 118 kB weapons) and only memory kept them,
+so every session read them again. One build holds ~53 MB of them as JSON (355 ships
+6.5 MB, 775 weapons 5.3 MB, 1 581 components 10.3 MB, 4 560 items 31 MB), so they are
+published once per build as shard files. The table stays the source and the client's
+fallback; nothing is deleted from it.
+
+| Key | Cache |
+|---|---|
+| `codex-silhouettes/<build uuid>/index.json` | `max-age=300` (names the gen and, per kind, `count` and `shards`) |
+| `codex-silhouettes/<build uuid>/<gen>/<kind>/names.json` | immutable: `{ v, kind, shards: [[class names]] }` |
+| `codex-silhouettes/<build uuid>/<gen>/<kind>/<n>.json` | immutable: one shard |
+| `codex-silhouettes/<build uuid>/<gen>/plan.json` | publisher only, the Worker does not serve it |
+
+`<kind>` is `ship`, `weapon`, `component`, `item` or `armor` (the table's `kind`); the
+index names all five, `count: 0` for a kind the build has no outline of.
+
+**Why not hashed shards like the locale strings.** A list page asks for its 60 rows
+(`PAGE_SIZE`), a detail page for one. A hash spreads 60 names over 60 shards, and four
+of five item rows have no outline at all yet would still cost a shard each. So the
+shards follow the **list order** of the kind's catalog table (name asc nulls last, then
+class name, the order of `codex-lists/<kind>.json`; classes the table lacks come last by
+class name): a page's rows are neighbours. `names.json` lists every class that has an
+outline, shard by shard, so the client knows a name's shard without a hash and answers
+"no outline" without any request. A shard holds a fixed number of **rows** (ship 6,
+every other kind 16: ~110 kB before folding, `ROWS_PER_SHARD`), not a byte target, so
+the split is known from the names alone and the publish can run in independent slices.
+Rows that share one shape (a ship and its variants, one door mesh on many ships: 4 201
+shapes for 7 271 rows) are stored once per shard: `{ v, kind, shard, columns,
+shapeColumns, shapes: [[view_box, path, edges, bbox, anchors, unresolved]], rows:
+[[class_name, shape index, meta, generated_at, channel, patch_version, build_number]] }`.
+The client rebuilds the table's row from it and hands it to the same
+`parseHoloSilhouette`, so a file answer is the database answer.
+
+**Publish** (`_silhouette-shards.ts`, `_silhouette-publish.ts`; op `silhouettes_publish`).
+An edge worker has 2 s of CPU for its whole life and 256 MB; the worker that answered
+`finalize` on 2026-11-19 was at 1 756 ms before any of this. So the publish is small
+calls, each one request, with no state outside R2:
+
+1. **plan** (no `gen`): usage gate, a new generation, per kind the class names with a row
+   and the catalog's list order (pages of 1 000, names only) → `names.json`; `plan.json` last.
+2. **slice** (`cursor: { kind, from }`): 16 shards (at most 256 rows, ~1.8 MB), rows read
+   50 names at a time, one shard built, put and dropped. Repeatable.
+3. **commit** (`cursor: "commit"`): every key the plan names must be in the bucket, the
+   table must still hold exactly the planned class names (`changed: <kind>` otherwise: a
+   class missing from `names.json` would read as "no outline"), one shard is read back
+   through the public Worker, a newer generation in the bucket's index stops it
+   (`superseded`), then `index.json`, the index read back from the bucket, and only
+   generations **older** than this one that the index does not name are deleted. Two
+   commits of one build can still interleave (the put is not conditional): when this
+   generation's files are gone right after its index went in, the newer publish's index
+   is put back from its `plan.json`. `chain` is honoured for the service key only.
+
+Each answer carries `gen` and `next`. After `finalize` the function calls itself for the
+next step (`chain: true`, service key in both headers, one retry, at most 400 hops), started
+before the locale and list publish. A broken chain writes no index, clients keep reading
+the table, and the next publish's commit collects the unfinished generation. Redo or
+backfill: `node scripts/codex-silhouettes-to-r2.mjs` (dry run) → `--apply` (`--build <uuid>`,
+`--pause <ms>`); it needs only `SUPABASE_ACCESS_TOKEN` and drives the same steps one call
+at a time. `locale_gc` also removes the `codex-silhouettes/` prefixes of builds gone from
+`codex_builds` (report under `silhouettes`).
+
+**Client read path.** `CodexService.silhouette()` / `silhouettes()` →
+`CodexSilhouetteShards.resolve` (`src/app/codex/codex-silhouette-shards.ts`): index
+(404 = not published, remembered 5 min, not logged), the kind's `names.json`, then one
+request per needed shard, all kept as promises (the last 64 parsed shards; the browser's
+HTTP cache holds the rest for good). It answers rows, `absent` names (not in `names.json`,
+or a kind with `count: 0`: remembered as "no outline", like an empty table answer) and
+`open` names (their shard failed: HTTP error, network, the 10 s abort, an unexpected shape;
+not asked again for 60 s, a malformed file never) or `null` (no index, a kind the index does
+not name, `names.json` unreadable). `null` and `open` run the unchanged
+`codex_silhouettes` query, for the open names only. A shard the index names but the bucket
+lacks (published again, old generation collected) drops the index, so the next call reads
+the new one with `cache: 'no-cache'` (the browser may hold the old index for five more
+minutes). Callers are unchanged: the browse tiles, `SilThumbsService`, the fusion search,
+`getMissileCohort`, the holotable and the item stage all go through the two methods.
+
+**Measured 2026-11-20 on LIVE 4.10.3** (build `eaec8352`, 7 271 rows). Publish: 493 shards
+(ship 60, weapon 49, component 99, item 285) + 4 names files, 38.5 MB written for 53 MB of
+rows; the script took 164 s, the self-calling chain 120 s for its 34 slices. The workers'
+`Shutdown` rows: at most 648 ms CPU per worker (several slices each, limit 2 000) and
+15-16 MB, every reason `EarlyDrop`. A shard is 47-70 kB of JSON and 4-20 kB on the wire
+(brotli by the Worker), `item/names.json` 171 kB / 31 kB. Page loads counted with Playwright
+(requests to `/rest/v1/codex_silhouettes` → requests to `/codex-silhouettes/`, index and
+names included): ship list 2 → 0 database, 15 files; weapons 2 → 0, 6; components 2 → 0, 8;
+items 2 → 0, 5; a ship detail 2 → 0, 3. The same number of outlines is drawn before and
+after, and 167 sampled rows rebuilt from the shards are deep-equal to the table's rows.
+Cost guard: one publish is ~500 Class A writes and ~38 MB per build (three builds kept:
+~115 MB of the 8 GB gate); a page costs the Worker 3-15 requests once per browser and build
+against its 100k a day.
+
+**A Worker deploy replaces the whole script.** On the same day a second session deployed
+`cloudflare/assets-worker` from its own tree 19 minutes after this change's deploy; every
+`codex-silhouettes/` URL answered 404 until the next deploy. Nothing broke (clients fell
+back to the table, a commit running meanwhile refused with `verified: false` and deleted
+nothing), but: deploy the Worker - and `ingest-catalog` - only from a tree that has every
+key shape and op that is already live, and check `npx wrangler@4 deployments list` when a
+published file suddenly answers 404.
 
 ## Localization strings (R2 since 2026-10-03)
 

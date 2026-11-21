@@ -3,6 +3,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { RoleService } from '../../auth/role.service';
 import { BETA_AREAS, BetaArea, BetaService } from '../../core/beta.service';
 import { FeedbackFabPrefsService } from '../../core/feedback-fab-prefs.service';
+import { BetaPanelComponent } from './beta-panel.component';
 import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 
@@ -24,7 +25,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 @Component({
   selector: 'sc-beta-fab',
   standalone: true,
-  imports: [TranslatePipe, ScPopupComponent, ScTooltipDirective],
+  imports: [TranslatePipe, BetaPanelComponent, ScPopupComponent, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (areas().length) {
@@ -39,20 +40,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
           <div class="panel">
             <sc-popup kind="panel" size="menu" [title]="'beta.chip.title' | translate" [access]="staff() ? 'collab' : null"
                       [backClose]="false" (closed)="open.set(false)">
-            <div class="pbody">
-            @for (a of areas(); track a) {
-              <button type="button" role="switch" class="sw"
-                      [attr.aria-checked]="beta.state()[a]"
-                      [disabled]="beta.locked()[a]"
-                      (click)="beta.toggle(a)">
-                <span class="label">{{ ('beta.area.' + a) | translate }}
-                  @if (staff() && a === 'shell') { <span class="sc-sr-only">{{ 'beta.staffOnly' | translate }}</span> }
-                </span>
-                <span class="knob-track" aria-hidden="true"><span class="knob"></span></span>
-              </button>
-            }
-            @if (staff()) { <p class="sc-sr-only">{{ 'beta.chip.note' | translate }}</p> }
-            </div>
+            <sc-beta-panel [areas]="areas()" [staff]="staff()" />
             </sc-popup>
           </div>
         }
@@ -83,26 +71,10 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
     .staff .fab { color: var(--sc-accent-collab); border-color: color-mix(in srgb, var(--sc-accent-collab) 55%, var(--sc-border)); }
     .fab:hover, .fab[aria-expanded='true'] { background: color-mix(in srgb, var(--sc-accent) 14%, var(--sc-bg-1)); border-color: var(--sc-accent); }
     .staff .fab:hover, .staff .fab[aria-expanded='true'] { background: color-mix(in srgb, var(--sc-accent-collab) 14%, var(--sc-bg-1)); border-color: var(--sc-accent-collab); }
-    .fab:focus-visible, .sw:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    .fab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .mark { font-family: var(--sc-font-display); font-weight: 700; font-size: 1.1rem; }
     /* Position only (opens upward from the FAB); frame, width, head and ✕ come from <sc-popup kind="panel">. */
     .panel { display: block; }
-    .pbody { display: flex; flex-direction: column; gap: var(--sc-space-1); }
-    .sw {
-      display: flex; align-items: center; justify-content: space-between; gap: var(--sc-space-3);
-      min-height: var(--sc-tap-min); padding: 0 var(--sc-space-2); border: 0; border-radius: 8px;
-      background: none; color: var(--sc-fg-1); font: inherit; cursor: pointer; text-align: start;
-    }
-    .sw:hover { background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
-    .sw:disabled { opacity: 0.45; cursor: not-allowed; }
-    .label { font-size: max(0.82rem, var(--sc-fs-floor)); }
-    .knob-track { position: relative; flex: none; width: 38px; height: 22px; border-radius: 999px;
-      background: var(--sc-bg-2); border: 1px solid var(--sc-border); transition: background 0.16s; }
-    .knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
-      background: var(--sc-fg-2); transition: transform 0.16s, background 0.16s; }
-    .sw[aria-checked='true'] .knob-track { background: color-mix(in srgb, var(--sc-accent) 35%, transparent); border-color: var(--sc-accent); }
-    .sw[aria-checked='true'] .knob { transform: translateX(16px); background: var(--sc-accent); }
-    @media (prefers-reduced-motion: reduce) { .knob, .knob-track { transition: none; } }
   `],
 })
 export class BetaFabComponent {

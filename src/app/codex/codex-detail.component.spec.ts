@@ -279,6 +279,60 @@ describe('CodexDetailComponent — ship load skeleton', () => {
     expect(el.querySelector('sc-codex-holo-stage')).not.toBeNull();
   });
 
+  it('keeps the stage up and dims it while the next ship loads (no skeleton on a ship switch)', async () => {
+    let release!: () => void;
+    let calls = 0;
+    const stub = makeCodexServiceStub(NOMAD_PAYLOAD);
+    const getDetail: CodexService['getDetail'] = (kind, className) =>
+      ++calls === 1
+        ? stub.getDetail!(kind, className)
+        : new Promise((r) => { release = () => r(stub.getDetail!(kind, className)); });
+    configureSetup('ship', [], NOMAD_PAYLOAD, { getDetail });
+    await TestBed.compileComponents();
+    const fixture = TestBed.createComponent(CodexDetailComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('sc-codex-holo-stage')).not.toBeNull();
+    const stageBefore = el.querySelector('sc-codex-holo-stage');
+
+    void (fixture.componentInstance as unknown as { load(k: string, c: string): Promise<void> }).load('ship', 'OTHER_SHIP');
+    fixture.detectChanges();
+    expect(el.querySelector('.skel-stage')).toBeNull();
+    expect(el.querySelector('sc-codex-holo-stage')).toBe(stageBefore);
+    expect(fixture.componentInstance.holdStage()).toBe(true);
+    expect(fixture.componentInstance.holoStageOn()).toBe(true);
+
+    release();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.holdStage()).toBe(false);
+    expect(el.querySelector('.skel-stage')).toBeNull();
+  });
+
+  it('lifts the dim once the next ship is in, before the best-effort silhouette wait ends', async () => {
+    let release!: () => void;
+    let calls = 0;
+    const stub = makeCodexServiceStub(NOMAD_PAYLOAD);
+    const getDetail: CodexService['getDetail'] = (kind, className) =>
+      ++calls === 1
+        ? stub.getDetail!(kind, className)
+        : new Promise((r) => { release = () => r(stub.getDetail!(kind, className)); });
+    configureSetup('ship', [], NOMAD_PAYLOAD, { getDetail, silhouette: () => new Promise(() => undefined) } as Partial<CodexService>);
+    await TestBed.compileComponents();
+    const fixture = TestBed.createComponent(CodexDetailComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const c = fixture.componentInstance;
+    void (c as unknown as { load(k: string, c: string): Promise<void> }).load('ship', 'OTHER_SHIP');
+    expect(c.holdDim()).toBe(true);
+    release();
+    await vi.waitFor(() => expect(c.holdDim()).toBe(false));
+    expect(c.holdStage()).toBe(true);
+    expect(c.holoStageOn()).toBe(true);
+  });
+
   it('draws only the real silhouette (no backdrop) while a ship with a silhouette loads', async () => {
     configureSetup('ship', [], NOMAD_PAYLOAD, { getDetail: () => new Promise(() => undefined) });
     TestBed.overrideProvider(SilThumbsService, {
@@ -311,15 +365,18 @@ describe('CodexDetailComponent — ship load skeleton', () => {
     expect(el.querySelector('.skel-stage .skel-ring')).not.toBeNull();
   });
 
-  it('keeps the plain skeleton card for non-ship kinds', async () => {
+  it('shows the reserved item skeleton (no ship stage) for non-ship kinds', async () => {
     const stub = makeCodexServiceStub(NOMAD_PAYLOAD);
     configureSetup('weapon', [], NOMAD_PAYLOAD, { getDetail: () => new Promise(() => undefined) });
     await TestBed.compileComponents();
     const fixture = TestBed.createComponent(CodexDetailComponent);
     fixture.detectChanges();
     expect(stub).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('.skel-stage')).toBeNull();
-    expect(fixture.nativeElement.querySelector('.skel-card')).not.toBeNull();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.skel-stage')).toBeNull();
+    // Item pages hold the final panel heights while loading, so the late shell does not shift the page (mobile CLS).
+    expect(el.querySelector('sc-skeleton.item-skel')).not.toBeNull();
+    expect(el.querySelector('.detail-page.reserve')).not.toBeNull();
   });
 });
 
@@ -613,9 +670,9 @@ describe('CodexDetailComponent — missile on the item stage', () => {
     const el: HTMLElement = fixture.nativeElement;
     expect(el.querySelector('.item-page sc-codex-item-stage')).not.toBeNull();
     expect(el.querySelector('header.hero')).toBeNull();
-    expect(el.querySelector('.it-pane sc-codex-rank-card')).not.toBeNull();
+    expect(el.querySelector('.sh-pane sc-codex-rank-card')).not.toBeNull();
     // R5 (G1): the panel carries the two stations, one under the other, in place of the former ownership card.
-    const stations = el.querySelector('aside.it-panel > .it-path sc-codex-own-stations sc-item-path.ip-primary');
+    const stations = el.querySelector('.it-path sc-codex-own-stations sc-item-path.ip-primary');
     expect(stations, 'the two stations at the top of the item panel').not.toBeNull();
     expect(stations!.classList).toContain('ip-stacked');
     expect(Array.from(stations!.querySelectorAll('[data-station]')).map((x) => x.getAttribute('data-station'))).toEqual(['wish', 'own']);
@@ -649,8 +706,8 @@ describe('CodexDetailComponent — crafting recipe (#187)', () => {
 
   it('prints each material amount in SCU without the float noise', async () => {
     const fixture = await setup('weapon', [], NOMAD_PAYLOAD, { getCraftingRecipe: async () => RECIPE });
-    // The recipe lives behind the "Herstellung" tab of the item page.
-    (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('.it-tab')[1].click();
+    // The recipe lives behind the "Bezug" tab of the item page.
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('#dt-tab-bezug')!.click();
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
     const section = Array.from(el.querySelectorAll('section')).find((s) =>
@@ -673,8 +730,8 @@ describe('CodexDetailComponent — crafting recipe (#187)', () => {
       ],
     };
     const fixture = await setup('weapon', [], NOMAD_PAYLOAD, { getCraftingRecipe: async () => recipe });
-    // The recipe lives behind the "Herstellung" tab of the item page.
-    (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('.it-tab')[1].click();
+    // The recipe lives behind the "Bezug" tab of the item page.
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('#dt-tab-bezug')!.click();
     fixture.detectChanges();
     const translate = TestBed.inject(TranslateService);
     translate.setTranslation('en', { codex: { detail: { minQuality: 'min. quality {{value}}' } } });

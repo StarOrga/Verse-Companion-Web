@@ -59,6 +59,14 @@
 //         and deletes the rows once the public Worker serves them — see below)
 //   POST { op: "locale_publish",   build_id, lang?, delete_source? }   -> { ok, results }
 //        (service role or the gates below; one language per call keeps it short)
+//   POST { op: "lists_publish",     build_id, detach? }                 -> { ok, result }  (codex-lists/ files)
+//        (detach:true, service role only: -> 202 { ok, started } at once, the publish
+//         runs after the response and only logs - how finalize starts it, _self-call.ts)
+//   POST { op: "silhouettes_publish", build_id, gen?, cursor?, chain? } -> { ok, result }
+//        (codex-silhouettes/ shards, ONE small step per call: no gen = plan, a
+//         cursor = that slice, "commit" = index + collection. Repeat with the
+//         answer's gen and next until next is null; chain:true makes the function
+//         call itself for the next step - _silhouette-publish.ts.)
 //   POST { op: "locale_gc",        dry_run? (default true) }           -> { ok, ...GcResult }
 //        (SERVICE ROLE ONLY. Deletes codex-locale/<build>/ prefixes in R2 whose
 //         build id is no longer in codex_builds, i.e. pruned builds. Send
@@ -92,10 +100,16 @@
 //   the caller should halve the batch and retry, see catalog-bridge.ts).
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
-import { bucketBytes, deleteObject, listObjects, putObject, r2FromEnv, readUsage } from '../ingest-skins/_r2.ts';
+import { bucketBytes, deleteObject, getObject, listObjects, putObject, r2FromEnv, readUsage } from '../ingest-skins/_r2.ts';
 import { usageGate } from '../ingest-skins/_r2-usage.ts';
 import { BUILD_ID_RE, LANG_RE } from './_locale-shards.ts';
 import { publishLocale } from './_locale-publish.ts';
+import { type ListPublishDeps, publishLists } from './_list-publish.ts';
+import { LIST_FILTERS, LIST_TABLES, LISTS_ROOT, selectFor } from './_list-snapshots.ts';
+import { GEN_RE as SILHOUETTE_GEN_RE, SILHOUETTE_SELECT, SILHOUETTE_TABLES, SILHOUETTES_ROOT } from './_silhouette-shards.ts';
+import { type SilhouettePublishDeps, type StepResult, parseCursor, publishSilhouetteStep } from './_silhouette-publish.ts';
+import { PART_SELECT } from './_rank-parts.ts';
+import { WORKER_ID, callOwnOp } from './_self-call.ts';
 import { enqueueTranslationJobs } from './_translation-enqueue.ts';
 import { gcLocalePrefixes } from './_locale-gc.ts';
 import {
@@ -280,6 +294,165 @@ function publishDeps(admin: Admin, r2: R2): PublishDeps {
       }
     },
   };
+}
+
+/** Deps of the catalog-list publish (_list-publish.ts): reads the tables, writes R2. */
+function listPublishDeps(admin: Admin, r2: R2): ListPublishDeps {
+  const base = publishDeps(admin, r2);
+  return {
+    async readRows(buildId, kind, from, limit) {
+      // The database's list order (codex.service.ts): name asc, nulls last, then class_name.
+      // weapon-rank / component-rank stop at name + is_variant; the client's third filter
+      // (name_localized not like '!*', getItemRankCohort) is applied on the file by the client.
+      let q = admin.from(LIST_TABLES[kind]).select(selectFor(kind)).eq('build_id', buildId);
+      const filter = LIST_FILTERS[kind];
+      for (const [col, val] of Object.entries(filter?.eq ?? {})) q = q.eq(col, val);
+      for (const col of filter?.notNull ?? []) q = q.not(col, 'is', null);
+      const { data, error } = await q
+        .order('name_localized', { ascending: true, nullsFirst: false })
+        .order('class_name', { ascending: true })
+        .range(from, from + limit - 1);
+      if (error) throw error;
+      return (data ?? []) as unknown as Record<string, unknown>[];
+    },
+    async readNames(buildId, kind, from, limit) {
+      // German name = payload->name->>de (codex_search_text); ammunition has none and yields nulls.
+      const { data, error } = await admin
+        .from(LIST_TABLES[kind])
+        .select('class_name, name_localized, de:payload->name->>de')
+        .eq('build_id', buildId)
+        .order('class_name', { ascending: true })
+        .range(from, from + limit - 1);
+      if (error) throw error;
+      return (data ?? []) as unknown as { class_name: string; name_localized: string | null; de: string | null }[];
+    },
+    async readParts(buildId, table, classNames) {
+      // The client's own cohort read (getEntityPayloads); _rank-parts.ts slices the payloads.
+      const { data, error } = await admin
+        .from(LIST_TABLES[table])
+        .select(PART_SELECT)
+        .eq('build_id', buildId)
+        .in('class_name', classNames);
+      if (error) throw error;
+      return (data ?? []) as unknown as Record<string, unknown>[];
+    },
+    async readAmmoParts(buildId, from, limit) {
+      const { data, error } = await admin
+        .from(LIST_TABLES.ammunition)
+        .select(PART_SELECT)
+        .eq('build_id', buildId)
+        .order('class_name', { ascending: true })
+        .range(from, from + limit - 1);
+      if (error) throw error;
+      return (data ?? []) as unknown as Record<string, unknown>[];
+    },
+    async facetValues(buildId, kind) {
+      const { data, error } = await admin.rpc('codex_facet_values', { p_build_id: buildId, p_kind: kind });
+      if (error) throw error;
+      return data;
+    },
+    gate: () => r2WriteBlocked(r2),
+    async readBucket(key) {
+      try {
+        return JSON.parse(new TextDecoder().decode(await getObject(r2, key, 1_000_000)));
+      } catch {
+        return null;
+      }
+    },
+    putJson: base.putJson,
+    readPublic: base.readPublic,
+    listKeys: base.listKeys,
+    deleteKey: base.deleteKey,
+  };
+}
+
+/** Deps of the silhouette publish (_silhouette-publish.ts): names and rows from the tables, files to R2. */
+function silhouettePublishDeps(admin: Admin, r2: R2): SilhouettePublishDeps {
+  const base = publishDeps(admin, r2);
+  const names = (rows: unknown) => ((rows ?? []) as { class_name: string }[]).map((r) => r.class_name);
+  return {
+    gate: () => r2WriteBlocked(r2),
+    async readSilhouetteNames(buildId, kind, from, limit) {
+      const { data, error } = await admin
+        .from('codex_silhouettes')
+        .select('class_name')
+        .eq('build_id', buildId)
+        .eq('kind', kind)
+        .order('class_name', { ascending: true })
+        .range(from, from + limit - 1);
+      if (error) throw error;
+      return names(data);
+    },
+    async readCatalogNames(buildId, kind, from, limit) {
+      // The database's list order (codex.service.ts), the order of codex-lists/<kind>.json.
+      const { data, error } = await admin
+        .from(SILHOUETTE_TABLES[kind])
+        .select('class_name')
+        .eq('build_id', buildId)
+        .order('name_localized', { ascending: true, nullsFirst: false })
+        .order('class_name', { ascending: true })
+        .range(from, from + limit - 1);
+      if (error) throw error;
+      return names(data);
+    },
+    async readRows(buildId, kind, classNames) {
+      const { data, error } = await admin
+        .from('codex_silhouettes')
+        .select(SILHOUETTE_SELECT)
+        .eq('build_id', buildId)
+        .eq('kind', kind)
+        .in('class_name', classNames);
+      if (error) throw error;
+      return (data ?? []) as unknown as Record<string, unknown>[];
+    },
+    async readBucket(key) {
+      try {
+        return JSON.parse(new TextDecoder().decode(await getObject(r2, key, 4_000_000)));
+      } catch {
+        return null;
+      }
+    },
+    putJson: base.putJson,
+    readPublic: base.readPublic,
+    listKeys: base.listKeys,
+    deleteKey: base.deleteKey,
+  };
+}
+
+/** A chained silhouette publish stops after this many calls (a build needs about 35). */
+const SILHOUETTE_CHAIN_MAX_HOPS = 400;
+
+/**
+ * The next step of a chained silhouette publish as a request of its own
+ * (_self-call.ts), so no worker carries more than one step's CPU. A failure only
+ * ends the chain - no index is written and clients keep reading the table.
+ */
+async function callSilhouetteStep(supabaseUrl: string, serviceKey: string, body: Record<string, unknown>): Promise<void> {
+  // A step may run twice (slices are repeatable, two plans end in one index: commit), so a lost answer is retried.
+  await callOwnOp(supabaseUrl, serviceKey, { ...body, op: 'silhouettes_publish', chain: true }, { retryThrown: true });
+}
+
+/**
+ * The catalog lists of a build as a request of its own (_self-call.ts): `detach`
+ * makes that request answer at once and publish on its own worker, so this one
+ * neither pays the publish's CPU nor waits its ~70 s. A request that threw is not
+ * sent again: it may have arrived, and two publishes of one build at once can leave
+ * the index naming a generation the other one collected. A failure only leaves the
+ * tables as the source; `lists_publish` redoes it.
+ */
+async function callListsPublish(supabaseUrl: string, serviceKey: string, buildId: string): Promise<void> {
+  await callOwnOp(supabaseUrl, serviceKey, { op: 'lists_publish', build_id: buildId, detach: true }, { retryThrown: false });
+}
+
+/** One lists publish that only logs: its caller has already answered. */
+async function publishListsLogged(admin: Admin, r2: R2, buildId: string): Promise<void> {
+  try {
+    const r = await publishLists(buildId, listPublishDeps(admin, r2));
+    if (r.blocked) console.error(`ingest-catalog: lists publish ${buildId} (worker ${WORKER_ID}) blocked: ${r.blocked.code} ${r.blocked.message}`);
+    else console.log(`ingest-catalog: lists publish ${buildId} (worker ${WORKER_ID}): ${JSON.stringify(r)}`);
+  } catch (e) {
+    console.error(`ingest-catalog: lists publish ${buildId} (worker ${WORKER_ID}) failed: ${(e as Error).message}`);
+  }
 }
 
 type Nat = { channel: string; patch_version: string; build_number: string };
@@ -975,17 +1148,29 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       );
       const r2 = r2FromEnv((k) => Deno.env.get(k));
       if (!r2) return json({ ok: true, current: true, ...replaced, locale_publish: 'r2_not_configured' });
+      // The silhouettes as shard files: a chain of small calls of their own (this
+      // worker has little CPU left after an ingest), started first so it is out
+      // before the heavier work below begins. A failure only leaves the table as the source.
+      afterResponse(callSilhouetteStep(supabaseUrl, serviceKey, { build_id: buildId, hop: 0 }));
+      // The catalog lists as files per build: one request of their own for the same
+      // reason, also started before the locale publish below, so a worker killed over
+      // that one no longer takes the lists with it. The two do not meet: the lists read the
+      // catalog tables and the facet RPC, never the locale rows the publish below deletes.
+      // A failure only leaves the tables as the source.
+      console.log(`ingest-catalog: finalize ${buildId} answered on worker ${WORKER_ID}`);
+      afterResponse(callListsPublish(supabaseUrl, serviceKey, buildId));
       // After the response: the uploader's finalize must not wait ~30 s for
       // 11 languages. A failure only leaves the rows in place (clients keep
       // reading them); locale_publish or the backfill script can redo it.
-      afterResponse(
-        publishBuildLocales(admin, r2, buildId, null, true)
-          .then(async (results) => {
-            console.log(`ingest-catalog: locale publish ${buildId}: ${JSON.stringify(results)}`);
-            await translationAfterPublish(admin, supabaseUrl, serviceKey, buildId, results);
-          })
-          .catch((e) => console.error(`ingest-catalog: locale publish ${buildId} failed: ${(e as Error).message}`)),
-      );
+      afterResponse((async () => {
+        try {
+          const results = await publishBuildLocales(admin, r2, buildId, null, true);
+          console.log(`ingest-catalog: locale publish ${buildId}: ${JSON.stringify(results)}`);
+          await translationAfterPublish(admin, supabaseUrl, serviceKey, buildId, results);
+        } catch (e) {
+          console.error(`ingest-catalog: locale publish ${buildId} failed: ${(e as Error).message}`);
+        }
+      })());
       return json({ ok: true, current: true, ...replaced, locale_publish: 'started' });
     }
 
@@ -1005,12 +1190,53 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       return json({ ok: true, results });
     }
 
+    if (op === 'lists_publish') {
+      const buildId = String(body.build_id ?? '');
+      if (!BUILD_ID_RE.test(buildId)) return json({ error: 'invalid_body', message: 'build_id (uuid) required' }, 400);
+      const r2 = r2FromEnv((k) => Deno.env.get(k));
+      if (!r2) return json({ error: 'r2_not_configured' }, 503);
+      // detach (the function's own call after finalize, service key only): answer now
+      // and publish after the response, on this worker's own CPU budget.
+      if (body.detach === true && !!authHeader && safeEqual(authHeader, `Bearer ${serviceKey}`)) {
+        afterResponse(publishListsLogged(admin, r2, buildId));
+        return json({ ok: true, started: true }, 202);
+      }
+      const result = await publishLists(buildId, listPublishDeps(admin, r2));
+      if (result.blocked) return json({ error: result.blocked.code, message: result.blocked.message }, result.blocked.status);
+      console.log(`ingest-catalog: lists_publish ${buildId}: ${JSON.stringify(result)}`);
+      return json({ ok: true, result });
+    }
+
+    if (op === 'silhouettes_publish') {
+      const buildId = String(body.build_id ?? '');
+      const gen = body.gen === undefined || body.gen === null ? null : String(body.gen);
+      const cursor = gen === null ? null : parseCursor(body.cursor);
+      if (!BUILD_ID_RE.test(buildId) || (gen !== null && (!SILHOUETTE_GEN_RE.test(gen) || !cursor))) {
+        return json({ error: 'invalid_body', message: 'build_id (uuid) required; gen needs a cursor ({kind, from} or "commit")' }, 400);
+      }
+      const r2 = r2FromEnv((k) => Deno.env.get(k));
+      if (!r2) return json({ error: 'r2_not_configured' }, 503);
+      const result: StepResult = await publishSilhouetteStep(buildId, gen, cursor, silhouettePublishDeps(admin, r2));
+      if ('blocked' in result && result.blocked) {
+        console.error(`ingest-catalog: silhouettes_publish ${buildId} blocked: ${result.blocked.code}`);
+        return json({ error: result.blocked.code, message: result.blocked.message }, result.blocked.status);
+      }
+      console.log(`ingest-catalog: silhouettes_publish ${buildId}: ${JSON.stringify(result)}`);
+      // Only the function itself (and an operator) may make it call itself with the service key.
+      const mayChain = !!authHeader && safeEqual(authHeader, `Bearer ${serviceKey}`);
+      const hop = Number.isInteger(body.hop) ? Math.max(0, body.hop as number) : 0;
+      if (mayChain && body.chain === true && result.next && result.gen && hop < SILHOUETTE_CHAIN_MAX_HOPS) {
+        afterResponse(callSilhouetteStep(supabaseUrl, serviceKey, { build_id: buildId, gen: result.gen, cursor: result.next, hop: hop + 1 }));
+      }
+      return json({ ok: true, result });
+    }
+
     if (op === 'locale_gc') {
       // Destructive and operator-only: the uploader gates must not reach it.
       if (!(authHeader && authHeader === `Bearer ${serviceKey}`)) return json({ error: 'forbidden', message: 'service role only' }, 403);
       const r2 = r2FromEnv((k) => Deno.env.get(k));
       if (!r2) return json({ error: 'r2_not_configured' }, 503);
-      const result = await gcLocalePrefixes({
+      const gcDeps = {
         async liveBuildIds() {
           const { data, error } = await admin.from('codex_builds').select('id').limit(10_000);
           if (error) throw error;
@@ -1018,11 +1244,16 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
           if (ids.length >= 10_000) throw new Error('locale_gc: codex_builds read looks truncated');
           return ids;
         },
-        listKeys: async (prefix) => (await listObjects(r2, prefix)).map((o) => o.key),
-        deleteKey: (key) => deleteObject(r2, key),
-      }, { dryRun: body.dry_run !== false });
-      console.log(`ingest-catalog: locale_gc ${JSON.stringify(result)}`);
-      return json({ ok: true, ...result });
+        listKeys: async (prefix: string) => (await listObjects(r2, prefix)).map((o) => o.key),
+        deleteKey: (key: string) => deleteObject(r2, key),
+      };
+      const dryRun = body.dry_run !== false;
+      const result = await gcLocalePrefixes(gcDeps, { dryRun });
+      // codex-lists/ follows the same rule (live ids first, dry run default).
+      const lists = await gcLocalePrefixes(gcDeps, { dryRun, root: LISTS_ROOT });
+      const silhouettes = await gcLocalePrefixes(gcDeps, { dryRun, root: SILHOUETTES_ROOT });
+      console.log(`ingest-catalog: locale_gc ${JSON.stringify(result)} lists ${JSON.stringify(lists)} silhouettes ${JSON.stringify(silhouettes)}`);
+      return json({ ok: true, ...result, lists, silhouettes });
     }
 
     return json({ error: 'invalid_body', message: `unknown op '${op}'` }, 400);

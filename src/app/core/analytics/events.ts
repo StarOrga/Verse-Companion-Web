@@ -48,6 +48,11 @@ export type BetaArea = 'verse' | 'codex' | 'shell';
 export const EVENTS = {
   // --- app ---------------------------------------------------------------
   'app:error_show': ev<{ key: string; scope: string }>('app', 'Ein Fehlerzustand wurde angezeigt (errors.*-Schlüssel und Bereich, nie der Fehlertext).'),
+  'app:install_prompt_show': ev<{ trigger: 'success' | 'idle' | 'manual'; platform: 'android-native' | 'ios' | 'other' }>('app', 'Die Karte zum Installieren der App wurde angezeigt (Auslöser: nach einer gelungenen Aktion, im Leerlauf oder von Hand).'),
+  'app:install_prompt_accept': ev<{ platform: 'android-native' | 'ios' | 'other' }>('app', 'Auf der Installieren-Karte wurde Installieren gewählt (öffnet den System-Dialog bzw. die iOS-Anleitung).'),
+  'app:install_prompt_close': ev<{ platform: 'android-native' | 'ios' | 'other'; dismissals: number }>('app', 'Die Installieren-Karte oder der System-Dialog wurde abgelehnt (Anzahl bisheriger Ablehnungen steuert die Pause).'),
+  'app:install_finish': ev<{ platform: 'android-native' | 'ios' | 'other' }>('app', 'Die App wurde installiert (appinstalled).'),
+  'app:tools_dial_open': ev<{ mode: 'phone' | 'compact' | 'tablet'; actions: number }>('app', 'Der Werkzeug-Knopf (Fächer aus Ansicht, Beta, Teilen) wurde auf einem Handy oder Tablet geöffnet.'),
 
   // --- auth --------------------------------------------------------------
   'auth:user_sign_in': ev<{ provider: 'email' | 'google' | 'discord' }>('auth', 'Anmeldung erfolgreich (Anbieter).'),
@@ -65,10 +70,14 @@ export const EVENTS = {
   'codex:holotable_open': ev<{ kind: string }>('codex', 'Der Holotisch einer Detailseite wurde bewusst eingeschaltet.'),
   'codex:part_select': ev<{ source: 'model' | 'list' | 'keyboard' }>('codex', 'Ein Bauteil wurde auf dem Holotisch gewählt (Quelle: Klick aufs 3D-Modell, Liste im Seitenpanel oder Tastatur).'),
   'codex:part_deselect': ev<{ via: 'empty' | 'again' | 'panel' | 'escape' }>('codex', 'Die Bauteil-Auswahl auf dem Holotisch wurde aufgehoben (Klick ins Leere, zweiter Klick aufs Bauteil, Zurück im Seitenpanel oder Escape).'),
+  'codex:detail_tab_select': ev<{ kind: string; tab: 'einordnung' | 'werte' | 'bezug' | 'verbaut' | 'aenderungen' | 'bauteile' }>('codex', 'Im Seitenpanel einer Detailseite (Holotisch-Beta, Gegenstand oder Schiff) wurde ein Reiter gewählt (Art, Reiter; bauteile nur beim Schiff).'),
   'codex:buy_open': ev<{ kind: string; tab_remembered: boolean }>('codex', 'Der Reiter Kaufen der Holotisch-Akte wurde geöffnet (Art; ob er die gemerkte Wahl war).'),
   'codex:wish_add': ev<{ kind: string; source: 'shop' | 'wikelo' }>('codex', 'Ein Eintrag wurde aus dem Reiter Kaufen auf die Wunschliste gesetzt (Quelle: Laden oder Wikelo-Tausch).'),
   'codex:deck_select': ev<{ ship: string; deck: string; view: '2d' | '3d' }>('codex', 'Im Holotisch wurde im Deck-Filter ein Deck gewählt (Schiff, Deck-Schlüssel oder hull/all, Ansicht 2D oder 3D).'),
   'codex:interior_filter_toggle': ev<{ group: string; on: boolean }>('codex', 'Im Holotisch wurde eine Innen-Elementgruppe (Fracht, Wege, Medizin …) ein- oder ausgeschaltet.'),
+  'codex:immersive_open': ev<{ surface: 'holo' | '3d' | 'schema'; orientation: 'landscape' | 'portrait' }>('codex', 'Die Vollbild-Ansicht des Holotisch-Modells wurde per Knopf geöffnet (Ansicht, Ausrichtung des Geräts).'),
+  'codex:immersive_close': ev<{ via: 'button' | 'escape' | 'back' }>('codex', 'Die Vollbild-Ansicht des Holotisch-Modells wurde verlassen (Schließen-Knopf, Escape oder Zurück-Geste).'),
+  'codex:stats_sheet_change': ev<{ snap: 'peek' | 'half' | 'full' }>('codex', 'Das Werteblatt am unteren Rand des Holotisch-Handys rastete auf einer Höhe ein (Einrastpunkt).'),
   'codex:interior_element_select': ev<{ ship: string; kind: string; deck: string }>('codex', 'Im Holotisch wurde ein Innen-Element gewählt (Schiff, Art des Elements, Deck).'),
   'codex:parts_search': ev<{ scope: 'outer' | 'inner' | 'both'; hits: number }>('codex', 'Die Bauteile-Suche des Holotischs lieferte ein Ergebnis (Außen-, Innen- oder beide Treffer, Anzahl; nie der Suchtext).'),
   'codex:filter_change': ev<{ kind: string; filter_count: number }>('codex', 'Im Codex-Index wurden Filter angewendet (Art, Anzahl aktiver Filter, nie die Werte).'),
