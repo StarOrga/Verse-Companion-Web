@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.288.1] - 2026-11-21
+
+### Fixed
+- Data Uploader: dismantle yield and the "dismantlable" flag now come from the game data — the item's recipe × the global dismantle efficiency (0.5), minus the blacklisted resources. Before, every blueprint came out "unknown" (#1058). Needs a new catalog upload.
+
 ## [0.288.0] - 2026-11-21
 
 ### Added
