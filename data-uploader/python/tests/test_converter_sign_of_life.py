@@ -116,3 +116,24 @@ def test_describe_gltf_args_names_the_command_and_the_input_file():
     assert _describe_gltf_args(["weld", "C:/w/a/b.glb", "C:/w/a/c.glb"]) == "weld b.glb"
     assert _describe_gltf_args(["inspect"]) == "inspect"
     assert _describe_gltf_args([]) == "?"
+
+
+def test_the_parallel_build_enters_extract_before_the_first_ship_finishes(monkeypatch):
+    # #382: the parent set `extract` only on the first finished ship, so a stall
+    # during a long first ship was reported as `(discover)`.
+    from sc_extract import events, skin_export_app
+
+    seen = []
+
+    class _Sink:
+        def put(self, event):
+            seen.append(event)
+
+    events.set_event_sink(_Sink())
+    try:
+        skin_export_app._build_parallel(SimpleNamespace(), [], 0, total=10, done_before=4,
+                                        results={}, pkg_parts=[], timing={})
+    finally:
+        events.set_event_sink(None)
+    assert {"type": "phase", "phase": "extract", "pct": 40} in seen
+    assert {"type": "progress", "stage": "ships", "current": 4, "total": 10} in seen
