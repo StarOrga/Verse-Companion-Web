@@ -7,8 +7,11 @@ import {
   CLONE_TABLES,
   isLegacyNatkeyConflict,
   isRebuildUnavailable,
+  CLONE_CHUNK,
+  isStatementTimeout,
   LOCALE_TABLE,
   MAX_CLONE_CALLS,
+  MIN_CLONE_CHUNK,
   prepareRebuild,
   refusedSwitchStatus,
 } from './_rebuild.ts';
@@ -79,6 +82,48 @@ describe('prepareRebuild', () => {
   it('gives up on a copy that never finishes instead of hanging the request', async () => {
     const deps = { predecessor: async () => P, touched: async () => new Set(), clone: async () => ({ copied: 1, done: false }) };
     await assert.rejects(() => prepareRebuild(deps, N), new RegExp(`${MAX_CLONE_CALLS} calls`));
+  });
+
+  it('retries a chunk that hit the statement timeout with half the rows, down to the floor', async () => {
+    const limits = [];
+    let left = 2600;
+    const deps = {
+      predecessor: async () => P,
+      touched: async () => new Set(CLONE_TABLES.filter((t) => t !== 'codex_items_rows')),
+      clone: async (_id, _table, limit) => {
+        limits.push(limit);
+        if (limit > 1000) throw { code: '57014', message: 'canceling statement due to statement timeout' };
+        const copied = Math.min(limit, left);
+        left -= copied;
+        return { copied, done: copied < limit };
+      },
+    };
+    const plan = await prepareRebuild(deps, N);
+    assert.equal(plan.cloned.codex_items_rows, 2600);
+    // 2000 timed out once; 1000 stays for the rest of the table.
+    assert.deepEqual(limits, [CLONE_CHUNK, 1000, 1000, 1000]);
+  });
+
+  it('gives up when even the smallest chunk times out, and never retries other errors', async () => {
+    const limits = [];
+    const timeout = {
+      predecessor: async () => P,
+      touched: async () => new Set(),
+      clone: async (_id, _table, limit) => { limits.push(limit); throw { code: '57014', message: 'statement timeout' }; },
+    };
+    await assert.rejects(() => prepareRebuild(timeout, N), (e) => e.code === '57014');
+    assert.deepEqual(limits, [2000, 1000, MIN_CLONE_CHUNK]);
+    let calls = 0;
+    const broken = { ...timeout, clone: async () => { calls++; throw { code: '42501', message: 'permission denied' }; } };
+    await assert.rejects(() => prepareRebuild(broken, N), (e) => e.code === '42501');
+    assert.equal(calls, 1);
+  });
+
+  it('recognises a statement timeout by code or message', () => {
+    assert.equal(isStatementTimeout({ code: '57014' }), true);
+    assert.equal(isStatementTimeout({ message: 'canceling statement due to statement timeout' }), true);
+    assert.equal(isStatementTimeout({ code: '23505', message: 'duplicate key' }), false);
+    assert.equal(isStatementTimeout(null), false);
   });
 
   it('asks for the predecessor locale strings when the run sent none', async () => {
