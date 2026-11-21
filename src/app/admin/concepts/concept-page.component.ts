@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, InjectionToken, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, InjectionToken, DestroyRef, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
@@ -104,8 +104,10 @@ export class ConceptPageComponent {
 
   readonly state = signal<State>('loading');
   private id = '';
+  private destroyed = false;
 
   constructor() {
+    inject(DestroyRef).onDestroy(() => { this.destroyed = true; });
     this.route.paramMap.subscribe((params) => {
       this.id = params.get('id') ?? '';
       void this.load();
@@ -125,8 +127,12 @@ export class ConceptPageComponent {
     }
     try {
       const ticket = await this.tickets.mintTicket(id);
+      // The admin may have left (or switched concept) while the ticket was minting: a late answer
+      // must neither replace the tab nor overwrite the newer state.
+      if (this.destroyed || id !== this.id) return;
       this.navigate(conceptFrameUrl(id, ticket.url));
     } catch (err) {
+      if (this.destroyed || id !== this.id) return;
       this.state.set(err instanceof ConceptTicketFailure ? err.kind : 'error');
     }
   }
