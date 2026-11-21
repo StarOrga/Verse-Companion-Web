@@ -1,0 +1,91 @@
+<section data-iteration="2" data-iteration-template="free" data-final-report>
+  <p class="fr-sentence">Alle 12 Entscheidungen sind umgesetzt: 5 Issues geschlossen oder geteilt, #1193 gebaut, die Contracts haben Web als Master, zwei Proben warten als Session.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">⛽</span><span>HQ › Jetzt zeigt <b>Treibstoff knapp</b> und den <b>Hangar-Platz</b> als Warn-Chip.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🧹</span><span><b>Backlog aufgeräumt</b>: #997, #1037, #832, #1033 zu, #1059 im App-Repo.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🔗</span><span>Contracts: <b>Web ist Master</b>, die App spiegelt per Sync-Skript.</span></li>
+      </ul>
+    </div>
+    <ol class="fr-flow">
+      <li>#1033 in drei Issues geteilt: #1223 Daten, #1224 Pickup-Signal, App #1517 Overlay</li>
+      <li>#1058: Shop/Loot-Items als #1225 abgespalten</li>
+      <li>#900 und #1196: nächster Schritt und Entscheidungen im Issue notiert</li>
+      <li>#1058 und #1195: je eine Session als Karte vorgeschlagen</li>
+    </ol>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="12 von 12 Entscheidungen umgesetzt oder als Session vorgeschlagen; Anforderung 12 (geschätzt).">
+        <span class="fr-meter-name">✅ Entscheidungen</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">12 / 12</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 80%" data-tip="Chips mit Specs und echten Payload-Formen geprüft, nicht mit einem echten Spiel-Event (geschätzt).">
+        <span class="fr-meter-name">⛽ Jetzt-Hinweise</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">89 Tests</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 70%" data-tip="App-Kopien sind blob-gleich und gepusht; der PR im App-Repo ist noch nicht offen (geschätzt).">
+        <span class="fr-meter-name">🔗 Contract-Kopie</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">2 / 2 gleich</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="2 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ○ {{final.level_interplay}} · ○ {{final.level_local}} · ○ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_dry}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_interplay}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 1 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-app-pr"
+          data-issue-title="[CHORE] Land the contracts sync from the web repo in the App"
+          data-issue-type="chore"
+          data-issue-body="Approved in round 1 (open a PR in the App repo). Branch feat/contracts-sync-from-web in StarOrga/Verse-Companion-App is pushed (commit cfa60e63: npm run contracts:sync / contracts:check, both contract copies blob-identical to web). The PR was not opened: the ship guard blocks a manual gh pr create. Land it with /do-ship in the App repo after the web ship."
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="nach-Web-Ship">
+        <span class="oq-label">App-PR noch nicht offen</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Der Branch ist gepusht, der PR fehlt, weil der Ship-Guard ein manuelles Anlegen blockt.</dd>
+          <dt>{{final.fund_where}}</dt><dd>App-Repo, Branch <code>feat/contracts-sync-from-web</code></dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — nach dem Web-Ship über den Ship-Ablauf im App-Repo.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Commits <code>1459c73e0</code> (#1193), <code>f7bc602de</code> (Contracts) · App <code>cfa60e63</code></li>
+      <li><code>src/app/hq/now/hq-live.util.ts</code>, <code>hq-now.component.ts</code>, <code>docs/contracts/hq-live.md</code></li>
+      <li>Tests: HQ › Jetzt 89 grün; App-Precommit grün</li>
+      <li>Neue Issues: #1223, #1224, #1225, App #1517; verschoben: #1059 → App #1518</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-chips" data-crit="mid" data-guide="">Treibstoff-Chip im echten Spiel ansehen</li>
+    </ul>
+  </section>
+  <section data-handoffs hidden aria-label="{{final.group_handoffs}}">
+    <ul>
+      <li data-todo-id="h-trade" data-crit="mid" data-guide="">#900: einmal mit App handeln (Menge &gt; 1)</li>
+      <li data-todo-id="h-upload" data-crit="mid" data-guide="">#1004: nächsten Katalog-Upload per GUI starten</li>
+      <li data-todo-id="h-consoles" data-crit="low" data-guide="web">#1017–#1020: Umbenennungen in den Konsolen</li>
+    </ul>
+  </section>
+</section>
