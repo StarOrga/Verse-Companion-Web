@@ -321,7 +321,9 @@ describe('Verse hub — Funkfeuer 2 stage (beta shell)', () => {
     expect(el.querySelectorAll('a.hq-l .lab-v').length).toBe(1);
     // HQ is the ground station on the planet (Kamera-Welt C6): the space station is the Admin place and never stands here.
     expect(el.querySelector('sc-briefing-beacons sc-briefing-station'), 'no space station labelled HQ on the hub').toBeNull();
-    expect(el.querySelector('a.hq-l .lock')).not.toBeNull();
+    // Hover lights the outpost with a soft glow, no corner-bracket frame (#388).
+    expect(el.querySelector('a.hq-l .scan')).not.toBeNull();
+    expect(el.querySelector('a.hq-l .lock')).toBeNull();
     expect(el.querySelector('a.adm-l'), 'no admin satellite for a viewer').toBeNull();
     expect(el.querySelector<HTMLAnchorElement>('.hrow h1 a.tl')?.getAttribute('href')).toBe('/verse/news?item=n1');
     expect(el.querySelector('.kick')?.textContent).toContain('verse.hub.area.news');
