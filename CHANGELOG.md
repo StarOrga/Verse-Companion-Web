@@ -4,6 +4,56 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.288.8] - 2026-11-21
+
+### Fixed
+- Admin feedback: the "Wer?" filter no longer shows an "Unbekannt" chip. Topics without an account used to share one bucket labelled after whichever row came first; each sender now has its own chip — the PostHog-Wächter, the Dienst-Wächter (hourly service check, with its own avatar tooltip) and "Ohne Konto" for a topic whose author is gone or that the routine filed itself. The thread uses the same names (admin feedback #390).
+
+## [0.288.7] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.4: two liveries that shared an icon are paired by id, so "Invictus Blue and Gold" no longer shows the Grey icon (Retaliator, Constellations, Avengers, Syulen)
+- Data Uploader: a crashed 3D or silhouette build and a refused upload now name their cause in the log
+- Data Uploader: an extract the 3D models still need is no longer swept the next day, so no full P4K re-read
+
+## [0.288.6] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.2: Verse locations read from the real game data get readable types, real system positions for the Lagrange rest stops, gateways and Nyx stations, system rows and cities; a star is no longer a fallback position (#1195). The microTech moons were already right — the bundled catalog has them mirrored.
+
+## [0.288.5] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.3: 3D skins of the Retaliator, the Constellation Taurus / Phoenix, the Avenger variants and the Syulen variants upload again. Two liveries of one ship could share one skin id, so the server refused the whole ship on every upload; each livery now keeps an id of its own, and the server names a duplicate id (400 `duplicate_skin_id`) instead of failing with a bare error (admin feedback #383). Needs a new uploader run.
+
+## [0.288.4] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.2: the 3D step reports a sign of life before every paint icon it renders, so a slow icon run under load no longer trips the 20-minute stall watchdog, and a stall during the first ship is reported as `ships` instead of `discover` (admin feedback #382).
+
+## [0.288.3] - 2026-11-21
+
+### Fixed
+- Catalog uploads: a batch that runs into the database statement timeout and is retried smaller no longer opens an error issue in PostHog — it is counted as its own `server:ingest_timeout` event with the op, table and batch size; only a run's final failure is an error. Copying the unchanged tables at the end of a re-upload now retries a slow chunk with half the rows (2000 → 1000 → 500) instead of failing the finalize step (admin feedback #380).
+
+## [0.288.2] - 2026-11-21
+
+### Fixed
+- Type to search now works in the header every reader gets by default: on Verse, HQ and every other page whose only search is the header search, a letter typed with nothing focused opens the search with that letter. The 0.286.0 version only reached the beta header, so it did nothing for readers without the shell beta. Codex pages keep starting their own search bar.
+
+## [0.288.1] - 2026-11-21
+
+### Fixed
+- Data Uploader: dismantle yield and the "dismantlable" flag now come from the game data — the item's recipe × the global dismantle efficiency (0.5), minus the blacklisted resources. Before, every blueprint came out "unknown" (#1058). Needs a new catalog upload.
+
+## [0.288.0] - 2026-11-21
+
+### Added
+- HQ Jetzt: warning chips in the live strip for low fuel (10 minutes from the event, hydrogen or quantum named) and a queued hangar request with its position and remaining wait (#1193)
+
+### Changed
+- Shared contracts with the desktop app: the web copy is now the master, the app mirrors it with a sync script
+
 ## [0.287.0] - 2026-11-21
 
 ### Added

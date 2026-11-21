@@ -1,0 +1,526 @@
+<section data-iteration="1" data-iteration-template="decision" data-analysis="full" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]},"fidelity":"off"}</script>
+
+  <section id="briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>Der Backlog-Run hat 4 von 14 Issues in v0.287.0 geliefert (#1192, #1191, #1004, #1194). Die übrigen 10 hängen an einer Entscheidung, an echten Spieldaten oder am separaten App-Repo.</p>
+    <p data-briefing-why>Ohne deine Antwort bleiben sie offen und blockieren den Location-Umstieg (#1196) und die Overlay-Arbeit (#1033).</p>
+    <div data-briefing-potential data-viz="kpi"
+         data-viz-spec='{"value":"10","unit":"Issues","label":"warten auf eine Entscheidung"}'>10 Issues</div>
+    <a data-briefing-topic="t-close" data-share="50">Aufräumen</a>
+    <a data-briefing-topic="t-owner" data-share="25">Spieldaten</a>
+    <a data-briefing-topic="t-build" data-share="25">Bauen</a>
+    <p data-briefing-duration>≈ 6 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"4 / 14","unit":"Issues","label":"geliefert in v0.287.0"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Aufräumen","value":6},{"label":"Spieldaten","value":3},{"label":"Bauen","value":3}],"unit":"Fragen"}'></div>
+        <p>Sechs Fragen betreffen Issues, die schon geliefert, überholt oder im falschen Repo sind. Drei brauchen echte Spieldaten, drei sind Bau-Entscheidungen. Ohne Frage offen: #1017–#1020 (Umbenennungen in den Konsolen, nur du) und der nächste Katalog-Upload per GUI für #1004.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="t-close" data-topic data-nav-label="Aufräumen">
+    <div data-alevel="2" data-title="Aufräumen">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"6","unit":"Fragen","label":"Schließen, verschieben, teilen"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"schon geliefert","value":2},{"label":"überholt","value":1},{"label":"falsches Repo","value":2},{"label":"Doku-Kopie","value":1}],"unit":"Issues"}'></div>
+        <p>Diese Issues brauchen keinen Code im Web-Repo, sondern einen sauberen Abschluss.</p>
+      </div>
+    </div>
+
+    <section id="d-997" data-nav-label="#997 Blueprints" data-decision="d-997" data-decision-mode="single"
+             data-label="#997 Blueprints auslesen" data-rec="close-followup"
+             data-rec-why="Die App-Seite ist geliefert; offen ist nur der Erst-Sync, dessen Quelle noch unbekannt ist."
+             data-applies-to="Issue #997" data-finding="f-997"
+             data-no-example="Reiner Issue-Status, nichts Sichtbares">
+      <p data-applies>Gilt für: Issue #997</p>
+      <p data-situation>Das Journal aus den Received-Blueprint-Logzeilen ist geliefert (App #1510, Web #1045).</p>
+      <h3 data-question>Wie soll #997 weitergehen?</h3>
+      <p data-stakes>Ob der Backlog ein schon geliefertes Issue weiter mitschleppt.</p>
+      <div data-options>
+        <label data-opt="close-followup" data-recommended>
+          <input type="radio" name="dm-d-997" value="close-followup">
+          <span data-opt-label>Schließen und ein schmales Folge-Issue anlegen</span>
+          <span data-opt-consequence>Das Folge-Issue fragt nur: woher kommt der vollständige Erst-Sync des Kontos?</span>
+        </label>
+        <label data-opt="close">
+          <input type="radio" name="dm-d-997" value="close" checked>
+          <span data-opt-label>Schließen ohne Folge-Issue</span>
+          <span data-opt-consequence>Der Erst-Sync ist dann bewusst kein Ziel.</span>
+        </label>
+        <label data-opt="keep">
+          <input type="radio" name="dm-d-997" value="keep">
+          <span data-opt-label>Offen lassen, bis der Erst-Sync gelöst ist</span>
+          <span data-opt-consequence>Das Issue bleibt groß und unscharf im Backlog.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-997-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-997-none" value="">
+      <input type="hidden" name="dm-d-997-hes" value="{&quot;ms&quot;:36685,&quot;revisits&quot;:0,&quot;median&quot;:21271}">
+      <input type="hidden" name="dm-d-997-touched" value="1">
+      <input type="hidden" name="dm-d-997-issue" value="">
+      <input type="hidden" name="dm-d-997-epic" value="">
+      <div data-alevel="3" data-title="#997 Blueprints">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"2","unit":"PRs","label":"App #1510 + Web #1045"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Journal aus Logzeilen","value":1},{"label":"Erst-Sync","value":0}],"unit":"geliefert"}'></div>
+          <p>Der Launcher speichert seine Daten verschlüsselt, eine Quelle für den Erst-Sync ist nicht bekannt.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-1037" data-nav-label="#1037 Name" data-decision="d-1037" data-decision-mode="single"
+             data-label="#1037 Name „Nachschub“" data-rec="close"
+             data-rec-why="Der Name ist mit „Operation“ schon entschieden und geshippt."
+             data-applies-to="Issue #1037" data-finding="f-1037"
+             data-no-example="Reiner Issue-Status, der neue Name ist schon live">
+      <p data-applies>Gilt für: Issue #1037</p>
+      <p data-situation>Das Konzept „Pfad-Stationen“ wählte „Operation“, geshippt mit #1184.</p>
+      <h3 data-question>Was passiert mit #1037?</h3>
+      <div data-options>
+        <label data-opt="close" data-recommended>
+          <input type="radio" name="dm-d-1037" value="close" checked>
+          <span data-opt-label>Als überholt schließen</span>
+          <span data-opt-consequence>Verweis auf #1184 im Abschlusskommentar.</span>
+        </label>
+        <label data-opt="close-concept">
+          <input type="radio" name="dm-d-1037" value="close-concept">
+          <span data-opt-label>Schließen und ein kleines Konzept zum Art-Label anlegen</span>
+          <span data-opt-consequence>„Operation“ bekommt ein Art-Label: Besorgung, Abholroute oder Verkaufsrunde.</span>
+        </label>
+        <label data-opt="keep">
+          <input type="radio" name="dm-d-1037" value="keep">
+          <span data-opt-label>Offen lassen, der Name ist noch nicht gut</span>
+          <span data-opt-consequence>Dann bitte in der Notiz sagen, was an „Operation“ stört.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-1037-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-1037-none" value="">
+      <input type="hidden" name="dm-d-1037-hes" value="{&quot;ms&quot;:23484,&quot;revisits&quot;:0,&quot;median&quot;:21271}">
+      <input type="hidden" name="dm-d-1037-touched" value="1">
+      <input type="hidden" name="dm-d-1037-issue" value="">
+      <input type="hidden" name="dm-d-1037-epic" value="">
+      <div data-alevel="3" data-title="#1037 Name">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"19.11.","unit":"","label":"„Operation“ geshippt (#1184)"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="kpi" data-viz-spec='{"value":"2","unit":"Tage","label":"seit dem Ship"}'></div>
+          <p>Das Issue fragt nach einem Namen, den dieses Konzept schon festgelegt hat.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-832" data-nav-label="#832 Shell-Beta" data-decision="d-832" data-decision-mode="single"
+             data-label="#832 Shell-Beta-Follow-ups" data-rec="check-close"
+             data-rec-why="Zwei von drei Punkten sind erledigt; der dritte ist eine Lesefrage hinter dem RSI-Login."
+             data-applies-to="Issue #832" data-finding="f-832"
+             data-no-example="Tracker-Status, nichts Sichtbares">
+      <p data-applies>Gilt für: Issue #832</p>
+      <p data-situation>Die Galerie- und Hangar-Suche ist geliefert (#905, #972, #980, #1172), die E-Mail-Übergabe hast du am 02.11. verworfen.</p>
+      <h3 data-question>Wie schließen wir #832 ab?</h3>
+      <p data-context>Offen ist nur (b): die Fankit-FAQ-Regel zur Disclaimer-Sprechblase, lesbar nur mit RSI-Login.</p>
+      <div data-options>
+        <label data-opt="check-close" data-recommended>
+          <input type="radio" name="dm-d-832" value="check-close">
+          <span data-opt-label>Du liest die Fankit-Regel, danach schließe ich</span>
+          <span data-opt-consequence>Verstößt die Sprechblase gegen die Regel, wird daraus ein eigenes kleines Issue.</span>
+        </label>
+        <label data-opt="close-now">
+          <input type="radio" name="dm-d-832" value="close-now" checked>
+          <span data-opt-label>Sofort schließen, die Regel ist egal</span>
+          <span data-opt-consequence>Die Sprechblase bleibt wie sie ist.</span>
+        </label>
+        <label data-opt="keep">
+          <input type="radio" name="dm-d-832" value="keep">
+          <span data-opt-label>Offen lassen als Sammel-Tracker</span>
+          <span data-opt-consequence>Neue Shell-Beta-Punkte landen weiter hier.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-832-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-832-none" value="">
+      <input type="hidden" name="dm-d-832-hes" value="{&quot;ms&quot;:19615,&quot;revisits&quot;:0,&quot;median&quot;:21271}">
+      <input type="hidden" name="dm-d-832-touched" value="1">
+      <input type="hidden" name="dm-d-832-issue" value="">
+      <input type="hidden" name="dm-d-832-epic" value="">
+      <div data-alevel="3" data-title="#832 Shell-Beta">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"2 / 3","unit":"Punkte","label":"erledigt oder verworfen"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"(a) Suche","value":1},{"label":"(b) Fankit-FAQ","value":0},{"label":"(c) E-Mail","value":1}],"unit":"erledigt"}'></div>
+          <p>Die FAQ liegt hinter dem RSI-Login und ist für Claude nicht lesbar.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-1059" data-nav-label="#1059 Qualität" data-decision="d-1059" data-decision-mode="single"
+             data-label="#1059 Qualitäts-Stacks" data-rec="move"
+             data-rec-why="Die Arbeit liegt vollständig in der Desktop-App und braucht das laufende Spiel."
+             data-applies-to="Issue #1059" data-finding="f-1059"
+             data-no-example="Repo-Zuordnung, nichts Sichtbares">
+      <p data-applies>Gilt für: Issue #1059</p>
+      <p data-situation>Die Qualitäts-Stacks schreibt die Desktop-App, deren Code im separaten SCC-App-Repo liegt.</p>
+      <h3 data-question>Wohin gehört #1059?</h3>
+      <div data-options>
+        <label data-opt="move" data-recommended>
+          <input type="radio" name="dm-d-1059" value="move" checked>
+          <span data-opt-label>Ins App-Repo verschieben</span>
+          <span data-opt-consequence>Dort wird zuerst im Spiel geprüft, ob die OCR die Qualität lesen kann.</span>
+        </label>
+        <label data-opt="keep-web">
+          <input type="radio" name="dm-d-1059" value="keep-web">
+          <span data-opt-label>Hier lassen, Web-Seite vorbereiten</span>
+          <span data-opt-consequence>Die Web-Anzeige entsteht, bevor klar ist, ob Daten kommen.</span>
+        </label>
+        <label data-opt="close">
+          <input type="radio" name="dm-d-1059" value="close">
+          <span data-opt-label>Schließen, Qualität ist kein Ziel</span>
+          <span data-opt-consequence>Crafting zeigt weiter nur Mengen.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-1059-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-1059-none" value="">
+      <input type="hidden" name="dm-d-1059-hes" value="{&quot;ms&quot;:15346,&quot;revisits&quot;:0,&quot;median&quot;:21271}">
+      <input type="hidden" name="dm-d-1059-touched" value="1">
+      <input type="hidden" name="dm-d-1059-issue" value="">
+      <input type="hidden" name="dm-d-1059-epic" value="">
+      <div data-alevel="3" data-title="#1059 Qualität">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"0","unit":"Dateien","label":"im Web-Repo betroffen"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="kpi" data-viz-spec='{"value":"1","unit":"Repo","label":"SCC-App"}'></div>
+          <p>Ob die OCR die Qualität überhaupt erkennt, zeigt nur ein Test im laufenden Spiel.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-1033" data-nav-label="#1033 Schrottwert" data-decision="d-1033" data-decision-mode="single"
+             data-label="#1033 Schrottwert-Overlay" data-rec="split3"
+             data-rec-why="Drei unabhängige Teile mit verschiedenen Abhängigkeiten; als ein Issue ist es nicht planbar."
+             data-applies-to="Issue #1033" data-finding="f-1033"
+             data-no-example="Issue-Zuschnitt, nichts Sichtbares">
+      <p data-applies>Gilt für: Issue #1033</p>
+      <p data-situation>Das Issue mischt Dismantle-Daten, ein Pickup-Signal und eine Overlay-Karte in zwei Repos.</p>
+      <h3 data-question>Wie schneiden wir #1033 zu?</h3>
+      <p data-stakes>Ob ein Teil starten kann, ohne auf die anderen zu warten.</p>
+      <div data-options>
+        <label data-opt="split3" data-recommended>
+          <input type="radio" name="dm-d-1033" value="split3" checked>
+          <span data-opt-label>In drei Issues teilen, nur Log lesen</span>
+          <span data-opt-consequence>(a) Dismantle-Daten nach #1058, (b) Research Pickup-Signal, (c) Overlay-Karte im App-Repo; kein Speicherzugriff.</span>
+        </label>
+        <label data-opt="move-whole">
+          <input type="radio" name="dm-d-1033" value="move-whole">
+          <span data-opt-label>Als Ganzes ins App-Repo verschieben</span>
+          <span data-opt-consequence>Die Daten-Seite im Web wartet, bis das Overlay steht.</span>
+        </label>
+        <label data-opt="close">
+          <input type="radio" name="dm-d-1033" value="close">
+          <span data-opt-label>Schließen, zu riskant wegen Anti-Cheat</span>
+          <span data-opt-consequence>Kein Overlay-Wert für Pickups.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-1033-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-1033-none" value="">
+      <input type="hidden" name="dm-d-1033-hes" value="{&quot;ms&quot;:40956,&quot;revisits&quot;:1,&quot;median&quot;:21271}">
+      <input type="hidden" name="dm-d-1033-touched" value="1">
+      <input type="hidden" name="dm-d-1033-issue" value="">
+      <input type="hidden" name="dm-d-1033-epic" value="">
+      <div data-alevel="3" data-title="#1033 Schrottwert">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"3","unit":"Teile","label":"in 2 Repos"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Dismantle-Daten (Web)","value":1},{"label":"Pickup-Signal (Research)","value":1},{"label":"Overlay-Karte (App)","value":1}],"unit":"Issue"}'></div>
+          <p>Die Dismantle-Daten hängen an #1058, das Overlay am Spiel und an der Anti-Cheat-Frage.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-contract" data-nav-label="Contract-Kopie" data-decision="d-contract" data-decision-mode="yesnoalt"
+             data-label="hq-live.md im App-Repo" data-rec="yes"
+             data-rec-why="Die Byte-Gleichheitsregel verlangt identische Kopien in beiden Repos."
+             data-applies-to="docs/contracts/hq-live.md im App-Repo" data-finding="f-contract"
+             data-no-example="Doku-Abgleich, nichts Sichtbares">
+      <p data-applies>Gilt für: docs/contracts/hq-live.md im App-Repo</p>
+      <p data-situation>Die Web-Kopie des HQ-Contracts hat mit v0.287.0 eine Tabelle „genutzt / nicht genutzt“ bekommen, die App-Kopie nicht.</p>
+      <h3 data-question>Soll ich die App-Kopie per PR im App-Repo angleichen?</h3>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-d-contract" value="yes" checked>
+          <span data-opt-label>Ja, PR im App-Repo öffnen</span>
+          <span data-opt-consequence>Beide Kopien sind wieder byte-gleich.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-d-contract" value="no">
+          <span data-opt-label>Nein, ich gleiche selbst ab</span>
+          <span data-opt-consequence>Die Kopien bleiben bis dahin verschieden.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-contract" value="alt">
+          <span data-opt-label>Anders</span>
+          <span data-opt-consequence>Deine Antwort steht im Textfeld.</span>
+          <input type="text" name="dm-d-contract-alt" value="">
+        </label>
+      </div>
+      <textarea data-comment="d-contract-note" placeholder="Notiz (optional)">btw, kann die app sich das nicht uach von web ziehen, web ist immer master wenn es um allg. infos geht die nicht spielerspezifisch sind</textarea>
+      <input type="hidden" name="dm-d-contract-none" value="">
+      <input type="hidden" name="dm-d-contract-hes" value="{&quot;ms&quot;:34843,&quot;revisits&quot;:1,&quot;median&quot;:21271}">
+      <input type="hidden" name="dm-d-contract-touched" value="1">
+      <input type="hidden" name="dm-d-contract-issue" value="">
+      <input type="hidden" name="dm-d-contract-epic" value="">
+      <div data-alevel="3" data-title="Contract-Kopie">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"1","unit":"Tabelle","label":"fehlt in der App-Kopie"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="kpi" data-viz-spec='{"value":"2","unit":"Kopien","label":"Web + App"}'></div>
+          <p>Die App liest dieselben Event-Typen und braucht dieselbe Liste.</p>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section id="t-owner" data-topic data-nav-label="Spieldaten">
+    <div data-alevel="2" data-title="Spieldaten">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"3","unit":"Fragen","label":"brauchen echte Spieldaten"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Data.p4k-Lauf","value":2},{"label":"Handel im Spiel","value":1}],"unit":"Issues"}'></div>
+        <p>Die Data.p4k liegt lokal, ein Extraktor-Lauf geht ohne dich. Den Abgleich im Spiel und den GUI-Upload kannst nur du machen.</p>
+      </div>
+    </div>
+
+    <section id="d-1195" data-nav-label="#1195 microTech" data-decision="d-1195" data-decision-mode="single"
+             data-label="#1195 microTech-Monde prüfen" data-rec="session-now"
+             data-rec-why="Der Lauf ist headless möglich und #1196 wartet darauf."
+             data-applies-to="Issue #1195, blockiert #1196" data-finding="f-1195"
+             data-no-example="Prüfauftrag, nichts Sichtbares">
+      <p data-applies>Gilt für: Issue #1195 (blockiert #1196)</p>
+      <p data-situation>Die Positionen der microTech-Monde aus dem neuen Starmap-Extraktor sind nur gegen Testdaten geprüft.</p>
+      <h3 data-question>Wie prüfen wir die microTech-Positionen?</h3>
+      <div data-options>
+        <label data-opt="session-now" data-recommended>
+          <input type="radio" name="dm-d-1195" value="session-now" checked>
+          <span data-opt-label>Eigene Session mit echtem Data.p4k-Lauf</span>
+          <span data-opt-consequence>Claude vergleicht die Werte; du schaust im Spiel nur die Abweichungen an.</span>
+        </label>
+        <label data-opt="next-patch">
+          <input type="radio" name="dm-d-1195" value="next-patch">
+          <span data-opt-label>Auf den nächsten Patch warten</span>
+          <span data-opt-consequence>#1196 bleibt so lange gesperrt.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-1195-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-1195-none" value="">
+      <input type="hidden" name="dm-d-1195-hes" value="{&quot;ms&quot;:14614,&quot;revisits&quot;:0,&quot;median&quot;:21271}">
+      <input type="hidden" name="dm-d-1195-touched" value="">
+      <input type="hidden" name="dm-d-1195-issue" value="">
+      <input type="hidden" name="dm-d-1195-epic" value="">
+      <div data-alevel="3" data-title="#1195 microTech">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"≈ 36","unit":"s","label":"Archiv öffnen"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Extraktor-Lauf (Claude)","value":1},{"label":"Abgleich im Spiel (du)","value":1}],"unit":"Schritt"}'></div>
+          <p>Der Lauf selbst dauert Minuten, der menschliche Teil ist der Blick ins Spiel.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-1058" data-nav-label="#1058 Dismantle" data-decision="d-1058" data-decision-mode="single"
+             data-label="#1058 Dismantle-Keys" data-rec="probe-split"
+             data-rec-why="Die Probe dauert etwa 15 min; Shop- und Loot-Items sind ein anderes Problem."
+             data-applies-to="Issue #1058" data-finding="f-1058"
+             data-no-example="Prüfauftrag, nichts Sichtbares">
+      <p data-applies>Gilt für: Issue #1058</p>
+      <p data-situation>Die Dismantle-Keys sind aus der Struktur abgeleitet, nicht gegen echte Data.p4k-Einträge bestätigt.</p>
+      <h3 data-question>Wie bestätigen wir die Dismantle-Keys?</h3>
+      <div data-options>
+        <label data-opt="probe-split" data-recommended>
+          <input type="radio" name="dm-d-1058" value="probe-split" checked>
+          <span data-opt-label>Probe in eigener Session, Shop/Loot abspalten</span>
+          <span data-opt-consequence>Items ohne Blueprint-Zeile bekommen ein eigenes Issue; du lädst danach per GUI neu hoch.</span>
+        </label>
+        <label data-opt="probe">
+          <input type="radio" name="dm-d-1058" value="probe">
+          <span data-opt-label>Probe in eigener Session, alles in #1058</span>
+          <span data-opt-consequence>Das Issue wächst um die Shop/Loot-Items.</span>
+        </label>
+        <label data-opt="ingame">
+          <input type="radio" name="dm-d-1058" value="ingame">
+          <span data-opt-label>Du prüfst Stichproben im Spiel</span>
+          <span data-opt-consequence>Kein Data.p4k-Lauf, dafür Spielzeit.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-1058-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-1058-none" value="">
+      <input type="hidden" name="dm-d-1058-hes" value="{&quot;ms&quot;:22927,&quot;revisits&quot;:0,&quot;median&quot;:21271}">
+      <input type="hidden" name="dm-d-1058-touched" value="1">
+      <input type="hidden" name="dm-d-1058-issue" value="">
+      <input type="hidden" name="dm-d-1058-epic" value="">
+      <div data-alevel="3" data-title="#1058 Dismantle">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"≈ 15","unit":"min","label":"Probe gegen Data.p4k"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="kpi" data-viz-spec='{"value":"1","unit":"GUI-Upload","label":"danach durch dich"}'></div>
+          <p>Die Daten landen erst mit einem neuen Katalog-Upload live, und den startet nur die GUI.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-900" data-nav-label="#900 Trade-Runs" data-decision="d-900" data-decision-mode="single"
+             data-label="#900 Trade-Runs in HQ" data-rec="trade-first"
+             data-rec-why="Ohne einen echten Handel ist unklar, ob und wie die App Commodity-Trades meldet."
+             data-applies-to="Issue #900" data-finding="f-900">
+      <p data-applies>Gilt für: Issue #900</p>
+      <p data-situation>Ob Commodity-Käufe und -Verkäufe in den HQ-Live-Events ankommen, ist unbestätigt; das Shop-Muster der App deckt Item-Shops ab.</p>
+      <h3 data-question>Womit starten wir die Trade-Runs?</h3>
+      <p data-context>Unklar ist auch, ob der Preis der Gesamtpreis oder der Stückpreis ist.</p>
+      <div data-options>
+        <label data-opt="trade-first" data-recommended>
+          <input type="radio" name="dm-d-900" value="trade-first" checked>
+          <span data-opt-label>Du handelst einmal mit laufender App, dann baue ich</span>
+          <span data-opt-consequence>Ein Kauf und ein Verkauf mit Menge über 1 klären Event und Preis.</span>
+        </label>
+        <label data-opt="pattern-first">
+          <input type="radio" name="dm-d-900" value="pattern-first">
+          <span data-opt-label>Erst das App-Muster für Commodity-Terminals erweitern</span>
+          <span data-opt-consequence>Arbeit im App-Repo, ohne echte Logzeile als Vorlage.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-900-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-900-none" value="">
+      <input type="hidden" name="dm-d-900-hes" value="{&quot;ms&quot;:8686,&quot;revisits&quot;:0,&quot;median&quot;:21271}">
+      <input type="hidden" name="dm-d-900-touched" value="1">
+      <input type="hidden" name="dm-d-900-issue" value="">
+      <input type="hidden" name="dm-d-900-epic" value="">
+      <div data-alevel="3" data-title="#900 Trade-Runs">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"0","unit":"Trades","label":"bisher in den Live-Events gesehen"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="kpi" data-viz-spec='{"value":"2","unit":"Fragen","label":"Event? Preis gesamt oder je Stück?"}'></div>
+          <p>Ein einziger Handel mit laufender App beantwortet beide Fragen.</p>
+        </div>
+        <div data-example><pre>shop.purchase  { item, price, quantity }   ← Item-Shop
+commodity.buy  ?                             ← unbekannt</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <section id="t-build" data-topic data-nav-label="Bauen">
+    <div data-alevel="2" data-title="Bauen">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"3","unit":"Fragen","label":"vor dem Bauen"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"HQ-Hinweis (#1193)","value":1},{"label":"Location-Umstieg (#1196)","value":2}],"unit":"Fragen"}'></div>
+        <p>#1193 ist klein und sofort baubar. #1196 wartet zusätzlich auf #1195 und ein Uploader-Release.</p>
+      </div>
+    </div>
+
+    <section id="d-1193" data-nav-label="#1193 Hinweis" data-decision="d-1193" data-decision-mode="single"
+             data-label="#1193 Treibstoff + Hangar" data-rec="chip"
+             data-rec-why="Der Live-Streifen ist schon der Ort für Zustände der laufenden Sitzung; ein Toast verschwindet zu früh."
+             data-applies-to="HQ › Jetzt" data-finding="f-1193" data-ui-ok="Decision-Runde ohne Design-Varianten">
+      <p data-applies>Gilt für: HQ › Jetzt</p>
+      <p data-situation>Die App meldet knappen Treibstoff und die Hangar-Warteschlange mit Position und Wartezeit; HQ zeigt beides noch nicht.</p>
+      <h3 data-question>Wie und wie lange zeigt HQ › Jetzt die beiden Hinweise?</h3>
+      <div data-options>
+        <label data-opt="chip" data-recommended>
+          <input type="radio" name="dm-d-1193" value="chip" checked>
+          <span data-opt-label>Als Warn-Chip im Live-Streifen, beide parallel</span>
+          <span data-opt-consequence>Treibstoff 10 min ab dem Event; Hangar bis „bereit“ in derselben Sitzung.</span>
+        </label>
+        <label data-opt="toast">
+          <input type="radio" name="dm-d-1193" value="toast">
+          <span data-opt-label>Als Toast beim Eintreffen</span>
+          <span data-opt-consequence>Wer später auf die Seite kommt, sieht nichts mehr.</span>
+        </label>
+        <label data-opt="latest">
+          <input type="radio" name="dm-d-1193" value="latest">
+          <span data-opt-label>Nur das neueste Event, ohne Zeitfenster</span>
+          <span data-opt-consequence>Ein alter Hinweis bleibt stehen, bis ein neuer kommt.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-1193-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-1193-none" value="">
+      <input type="hidden" name="dm-d-1193-hes" value="{&quot;ms&quot;:34867,&quot;revisits&quot;:0,&quot;median&quot;:21271}">
+      <input type="hidden" name="dm-d-1193-touched" value="1">
+      <input type="hidden" name="dm-d-1193-issue" value="">
+      <input type="hidden" name="dm-d-1193-epic" value="">
+      <div data-alevel="3" data-title="#1193 Hinweis">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"S","unit":"","label":"Größe"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Treibstoff knapp","value":10},{"label":"Hangar-Warteschlange","value":0}],"unit":"min sichtbar (0 = bis bereit)"}'></div>
+          <p>Die Payloads sind gegen echte App-Events geprüft.</p>
+        </div>
+        <div data-example><pre>fuel.low      { fuel, key }
+hangar.queue  { position, estimatedWaitSec, key }
+hangar.ready  { key }</pre></div>
+      </div>
+    </section>
+
+    <section id="d-1196a" data-nav-label="#1196 Drittwerte" data-decision="d-1196a" data-decision-mode="single"
+             data-label="#1196 Drittwerte" data-rec="attributes"
+             data-rec-why="Eigene Felder halten Spieldaten und Fremdwerte auseinander, die Lizenz steht an jeder Zeile."
+             data-applies-to="Location-Katalog (codex_locations)" data-finding="f-1196a"
+             data-no-example="Datenmodell-Frage, nichts Sichtbares">
+      <p data-applies>Gilt für: Location-Katalog</p>
+      <p data-situation>Orbitalradius und Rotation kommen von Valalol (MIT), Galaxiekoordinaten vom SC Wiki (CC BY-SA); die Spieldaten haben sie nicht.</p>
+      <h3 data-question>Wo leben die Fremdwerte nach dem Umstieg?</h3>
+      <div data-options>
+        <label data-opt="attributes" data-recommended>
+          <input type="radio" name="dm-d-1196a" value="attributes" checked>
+          <span data-opt-label>Eigene Felder in attributes, Quelle und Lizenz je Zeile</span>
+          <span data-opt-consequence>Kein Schema-Umbau; ein kombinierter source/license-String nennt alle Herkünfte.</span>
+        </label>
+        <label data-opt="columns">
+          <input type="radio" name="dm-d-1196a" value="columns">
+          <span data-opt-label>Eigene Spalten mit Lizenz-Spalte</span>
+          <span data-opt-consequence>Migration nötig, dafür abfragbar und typisiert.</span>
+        </label>
+        <label data-opt="game-only">
+          <input type="radio" name="dm-d-1196a" value="game-only">
+          <span data-opt-label>Fremdwerte weglassen, nur Spieldaten</span>
+          <span data-opt-consequence>Orbit und Galaxiekarte verlieren Werte.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-1196a-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-1196a-none" value="">
+      <input type="hidden" name="dm-d-1196a-hes" value="{&quot;ms&quot;:4596,&quot;revisits&quot;:0,&quot;median&quot;:21271}">
+      <input type="hidden" name="dm-d-1196a-touched" value="1">
+      <input type="hidden" name="dm-d-1196a-issue" value="">
+      <input type="hidden" name="dm-d-1196a-epic" value="">
+      <div data-alevel="3" data-title="#1196 Drittwerte">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"2","unit":"Quellen","label":"Valalol (MIT), SC Wiki (CC BY-SA)"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Spieldaten","value":1},{"label":"Valalol","value":1},{"label":"SC Wiki","value":1}],"unit":"Quelle"}'></div>
+          <p>CC BY-SA verlangt die Namensnennung bei jedem Wert, der aus dem Wiki stammt.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="d-1196b" data-nav-label="#1196 IDs" data-decision="d-1196b" data-decision-mode="single"
+             data-label="#1196 ID-Mapping" data-rec="mapdoc"
+             data-rec-why="Eine dokumentierte Map ist eindeutig; alte Slugs kollidieren bei sieben Namen."
+             data-applies-to="Location-IDs, Desktop-App" data-finding="f-1196b">
+      <p data-applies>Gilt für: Location-IDs und die Desktop-App</p>
+      <p data-situation>Die Katalog-IDs sind Slugs der Anzeigenamen, die Spieldaten liefern Record-Namen; die Desktop-App findet gespeicherte Orte über die ID.</p>
+      <h3 data-question>Wie kommen gespeicherte Orte der App auf die neuen IDs?</h3>
+      <p data-context>Der Upload der neuen Orte bleibt bis dahin gesperrt (SC_UPLOAD_LOCATIONS).</p>
+      <div data-options>
+        <label data-opt="mapdoc" data-recommended>
+          <input type="radio" name="dm-d-1196b" value="mapdoc" checked>
+          <span data-opt-label>Dokumentierte Slug→Record-Map, die App übernimmt sie</span>
+          <span data-opt-consequence>Map in docs/contracts; die App rechnet gespeicherte Orte einmal um.</span>
+        </label>
+        <label data-opt="keep-slugs">
+          <input type="radio" name="dm-d-1196b" value="keep-slugs">
+          <span data-opt-label>Alte Slugs als neue IDs behalten, wo eindeutig</span>
+          <span data-opt-consequence>Die App muss nichts tun, außer bei den 52 Zeilen mit geteilten Namen.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-1196b-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-1196b-none" value="">
+      <input type="hidden" name="dm-d-1196b-hes" value="{&quot;ms&quot;:5203,&quot;revisits&quot;:0,&quot;median&quot;:21271}">
+      <input type="hidden" name="dm-d-1196b-touched" value="1">
+      <input type="hidden" name="dm-d-1196b-issue" value="">
+      <input type="hidden" name="dm-d-1196b-epic" value="">
+      <div data-alevel="3" data-title="#1196 IDs">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"52","unit":"Zeilen","label":"teilen sich 7 Namen"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bar" data-viz-spec='{"value":52,"max":52,"label":"Zeilen mit geteiltem Anzeigenamen","unit":"Zeilen"}'></div>
+          <p>Bei geteilten Namen trägt der Slug eine Nummer, die von der Reihenfolge abhängt.</p>
+        </div>
+        <div data-example><pre>alt:  port-olisar      → neu: StarMapObject_Stanton2_PortOlisar
+alt:  outpost-3        → neu: ?  (7 Namen, 52 Zeilen)</pre></div>
+      </div>
+    </section>
+  </section>
+</section>
