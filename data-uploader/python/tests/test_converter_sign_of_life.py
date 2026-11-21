@@ -17,7 +17,7 @@ from sc_extract import hull3d as hull3d_mod
 from sc_extract.assets3d import parts as parts_mod
 from sc_extract.assets3d.parts import PartStore
 from sc_extract.glb_materials import write_glb
-from sc_extract.hull3d import Hull3DExporter, HullExportConfig, _describe_gltf_args
+from sc_extract.hull3d import Hull3DExporter, HullExportConfig, Paint, ShipSpec, _describe_gltf_args
 
 MESH = "Data/Objects/Ships/AEGS/part.cgf"
 FILES = {MESH: b"mesh"}
@@ -85,7 +85,55 @@ def test_an_optimizer_call_logs_its_command_and_input_first(tmp_path, monkeypatc
     assert logs == [("info", "  gltf-transform simplify in.glb")]
 
 
+def test_every_paint_icon_logs_its_paint_before_the_export_runs(tmp_path, monkeypatch):
+    # #382: 15 icons under heavy throttling took 21 min without a line and
+    # tripped the 20-min stall watchdog right before the ship finished.
+    logs = []
+    cfg = HullExportConfig(cgf_converter=tmp_path / "cgf-converter.exe",
+                           out_dir=tmp_path / "out", work_dir=tmp_path / "work",
+                           on_log=lambda lvl, m: logs.append((lvl, m)))
+    exp = Hull3DExporter(_P4K(), cfg)
+    seen = []
+
+    def fake_icon(paint, ship_out):
+        # The paint's line is out before its (possibly slow) icon export starts.
+        assert logs[-1] == ("info", f"  icon {paint.id}")
+        seen.append(paint.id)
+        return f"icons/{paint.id}.webp"
+
+    monkeypatch.setattr(exp, "_export_icon", fake_icon)
+    paints = [Paint(mtl="", id="pirate", icon_dds="a.dds"),
+              Paint(mtl="", id="no_icon"),
+              Paint(mtl="", id="gold", icon_dds="b.dds")]
+    out = exp.export_ship(ShipSpec("TEST_Ship", "hull.cga", "Data", paints))
+    assert seen == ["pirate", "gold"]
+    icon_lines = [m for _, m in logs if m.startswith("  icon ")]
+    assert icon_lines == ["  icon pirate", "  icon gold"]  # none for a paint without icon
+    assert [s["icon"] for s in out["skins"]] == ["icons/pirate.webp", None, "icons/gold.webp"]
+
+
 def test_describe_gltf_args_names_the_command_and_the_input_file():
     assert _describe_gltf_args(["weld", "C:/w/a/b.glb", "C:/w/a/c.glb"]) == "weld b.glb"
     assert _describe_gltf_args(["inspect"]) == "inspect"
     assert _describe_gltf_args([]) == "?"
+
+
+def test_the_parallel_build_enters_extract_before_the_first_ship_finishes(monkeypatch):
+    # #382: the parent set `extract` only on the first finished ship, so a stall
+    # during a long first ship was reported as `(discover)`.
+    from sc_extract import events, skin_export_app
+
+    seen = []
+
+    class _Sink:
+        def put(self, event):
+            seen.append(event)
+
+    events.set_event_sink(_Sink())
+    try:
+        skin_export_app._build_parallel(SimpleNamespace(), [], 0, total=10, done_before=4,
+                                        results={}, pkg_parts=[], timing={})
+    finally:
+        events.set_event_sink(None)
+    assert {"type": "phase", "phase": "extract", "pct": 40} in seen
+    assert {"type": "progress", "stage": "ships", "current": 4, "total": 10} in seen
