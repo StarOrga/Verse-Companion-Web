@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Data Uploader update errors show a translated sentence with a download button instead of the raw HTTP error with response headers.
 - Uploader releases: one build per version; a release is registered only after its run is green and the mirror serves that build. Installs stuck on the second 0.84.3 build update again.
 
+## [0.289.3] - 2026-11-21
+
+### Fixed
+- Codex holotable: a tall hull is no longer cut off at the bottom of the hologram; the zoom is capped per ship so the turning hull keeps its full height, flat hulls keep the bigger size (admin feedback #392).
+
 ## [0.289.2] - 2026-11-21
 
 ### Removed
