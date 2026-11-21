@@ -1269,7 +1269,7 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
 
     if (op === 'locale_gc') {
       // Destructive and operator-only: the uploader gates must not reach it.
-      if (!(authHeader && authHeader === `Bearer ${serviceKey}`)) return json({ error: 'forbidden', message: 'service role only' }, 403);
+      if (!(authHeader && safeEqual(authHeader, `Bearer ${serviceKey}`))) return json({ error: 'forbidden', message: 'service role only' }, 403);
       const r2 = r2FromEnv((k) => Deno.env.get(k));
       if (!r2) return json({ error: 'r2_not_configured' }, 503);
       const gcDeps = {

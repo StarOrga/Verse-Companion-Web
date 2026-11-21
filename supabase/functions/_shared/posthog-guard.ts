@@ -4,6 +4,8 @@
 /** Fixed identity of the machine author "PostHog-Wächter" (contract §4). A profiles row needs an auth.users row,
  *  so machine items are stored with author_id = null + origin <> 'human'; the id below is the display identity
  *  the frontend maps to the Wächter label (src/app/feedback/feedback.types.ts POSTHOG_GUARD_PROFILE_ID). */
+import { safeEqual } from './safe-equal.ts';
+
 export const POSTHOG_GUARD_PROFILE_ID = '00000000-0000-4000-8000-0000706f7374';
 export const POSTHOG_GUARD_NAME = 'PostHog-Wächter';
 export const MAX_MACHINE_ITEMS_PER_DAY = 3;
@@ -21,16 +23,8 @@ export type ServiceName = (typeof SERVICES)[number];
 
 // ---------------------------------------------------------------- auth
 
-/** Constant-time string compare (no early exit on the first differing byte; length leak only). */
-export function constantTimeEqual(a: string, b: string): boolean {
-  const enc = new TextEncoder();
-  const x = enc.encode(a);
-  const y = enc.encode(b);
-  let diff = x.length ^ y.length;
-  const n = Math.max(x.length, y.length);
-  for (let i = 0; i < n; i++) diff |= (x[i] ?? 0) ^ (y[i] ?? 0);
-  return diff === 0;
-}
+/** Constant-time string compare (see safe-equal.ts). */
+export const constantTimeEqual = safeEqual;
 
 /** 'ok' | 'unauthorized' | 'no_key' (secret not configured - the caller answers 200 skipped, never 500). */
 export function checkSignalSecret(header: string | null, secret: string | undefined): 'ok' | 'unauthorized' | 'no_key' {

@@ -75,6 +75,7 @@ import { buildShim } from './shim.ts';
 import { upgradeEngine } from './upgrade.ts';
 import { buildEchoBody, isReplayOf, type ConceptSubmission } from './echo.ts';
 import { withPosthog } from '../_shared/posthog.ts';
+import { safeEqualBytes } from '../_shared/safe-equal.ts';
 
 const TICKET_TTL_SEC = 12 * 60 * 60;
 const MAX_BODY_BYTES = 1_000_000;
@@ -140,13 +141,6 @@ async function hmac(secret: string, message: string): Promise<Uint8Array> {
   return new Uint8Array(await crypto.subtle.sign('HMAC', key, enc.encode(message)));
 }
 
-function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
-  return diff === 0;
-}
-
 async function mintTicket(
   secret: string,
   id: string,
@@ -179,7 +173,7 @@ async function verifyTicket(
   const given = b64urlDecode(sigStr);
   if (!given) return null;
   const expected = await hmac(secret, `${tid}.${uid}.${exp}`);
-  return timingSafeEqual(given, expected) ? { uid } : null;
+  return safeEqualBytes(given, expected) ? { uid } : null;
 }
 
 // ── helpers ──────────────────────────────────────────────────────────────────
