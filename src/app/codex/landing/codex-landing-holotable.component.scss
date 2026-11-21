@@ -398,12 +398,13 @@ sc-ship-skin-viewer.viewer { left: -6%; right: -6%; }
 // Narrow stage: the callouts give way (their values go to the bars pane).
 @media (max-width: 1099px) {
   .leaders, .dot, .callouts, .set { display: none; }
-  :host { --hx: 6%; --hw: 62%; }
+  :host { --hx: 3%; --hw: 68%; }
 }
 @media (max-width: 720px) {
   .air { min-height: 220px; }
-  :host { --hx: 10%; --hw: 80%; --ht: 55%; --hh: 44%; }
-  .beam { top: 52%; }
+  // The hull takes the whole width under the Kennung (admin feedback #392).
+  :host { --hx: 2%; --hw: 96%; --ht: 46%; --hh: 54%; }
+  .beam { top: 44%; }
   .kennung { left: 0; right: 0; top: 0; height: auto; padding-left: 0; justify-content: flex-start; align-items: center; text-align: center; }
   .k-dim, .k-facts div::before { display: none; }
   .k-head, .k-foot { align-items: center; }

@@ -198,7 +198,7 @@
   // Phone order (d-landing table-first): title, holotable, list, values, news mark.
   .news { order: 3; align-self: flex-end; }
   .stage { order: 1; flex: 0 0 auto; gap: var(--sc-space-3); margin-top: 0; }
-  .holotable { order: 1; flex: 0 0 auto; height: 460px; }
+  .holotable { order: 1; flex: 0 0 auto; height: 500px; }
   .codex { order: 2; }
   .values { order: 3; }
   .floor { display: none; }
