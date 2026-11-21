@@ -1,3 +1,5 @@
+import de from '../../../../../public/i18n/de.json';
+import en from '../../../../../public/i18n/en.json';
 import {
   barPct,
   boardName,
@@ -186,5 +188,33 @@ describe('Karteikarten logic: finish and errors', () => {
     expect(cardErrorKey('board', new TypeError('Failed to fetch'))).toMatch(/^errors\./);
     expect(needsReload('errors.translation.cards.gone')).toBe(true);
     expect(needsReload('errors.translation.cards.invalid')).toBe(false);
+  });
+});
+
+describe('Karteikarten i18n (X1)', () => {
+  const leaves = (o: unknown, p = ''): string[] =>
+    o && typeof o === 'object' ? Object.entries(o as Record<string, unknown>).flatMap(([k, v]) => leaves(v, p ? `${p}.${k}` : k)) : [p];
+  const has = (cat: unknown, k: string) => typeof k.split('.').reduce<unknown>((n, part) => (n as Record<string, unknown> | undefined)?.[part], cat) === 'string';
+
+  it('de and en carry the same card keys', () => {
+    expect(leaves(de.admin.translations.cards).sort()).toEqual(leaves(en.admin.translations.cards).sort());
+  });
+
+  it('every template, option, reason and error key the cards produce exists in both catalogues', () => {
+    const patterns = ['case.upper', 'case.title', 'compound', 'verb.form', 'abbr'] as const;
+    const keys: string[] = [];
+    for (const p of patterns) {
+      const c = conventionCard('c', { params: { pattern: p, langs: ['de'] } });
+      keys.push(cardQuestion(c).key!, optionLabel(c, 'a').key!, optionLabel(c, 'b').key!);
+    }
+    keys.push(cardQuestion(termCard()).key!, cardQuestion(termCard('w', { kind: 'wording', params: { en: 'x', key: 'k', where: null } })).key!);
+    for (const code of ['majority', 'community', 'ai', 'votes', 'bracket', 'whitespace', 'casing_source', 'convention', 'only_left'] as const) {
+      keys.push(reasonText({ ...kiCard().ai!, reason: { code } }).key!);
+    }
+    for (const code of ['22023', 'P0002', '55000', '42501']) keys.push(cardErrorKey('x', { code }));
+    for (const k of keys) {
+      expect(has(de, k), `de: ${k}`).toBe(true);
+      expect(has(en, k), `en: ${k}`).toBe(true);
+    }
   });
 });

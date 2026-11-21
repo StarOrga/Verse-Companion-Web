@@ -2,8 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   HostListener,
+  Injector,
   NgZone,
+  afterNextRender,
   computed,
   effect,
   inject,
@@ -120,7 +123,7 @@ export interface CardMoment {
             · {{ 'admin.translations.cards.veto.headNote' | translate }}
           </p>
         }
-        <div class="stage" data-test="stage"
+        <div class="stage" data-test="stage" [class.veto]="vetoMode()"
              (pointerdown)="onDown($event)" (pointermove)="onMove($event)" (pointerup)="onUp($event)" (pointercancel)="onCancel()">
           @if (error(); as e) {
             <div class="state err" role="alert" data-test="error">
@@ -360,6 +363,7 @@ export interface CardMoment {
       .vhead { margin: 2px 0 8px; font-size: 0.8125rem; line-height: 1.4; color: var(--sc-fg-2); text-align: center; overflow-wrap: anywhere; }
       .vhead b { font: 600 0.85rem/1.4 var(--sc-font-display, inherit); letter-spacing: 0.04em; color: var(--sc-fg-0); }
       .stage { position: relative; min-height: 380px; display: grid; place-items: center; padding: 6px 0 18px; }
+      .stage.veto { min-height: 300px; }
       .state { display: grid; gap: var(--sc-space-3, 12px); justify-items: center; text-align: center; color: var(--sc-fg-1); }
       .state.err p { margin: 0; color: var(--sc-fg-0); }
 
@@ -492,6 +496,8 @@ export class TranslationCardsComponent {
   private readonly analytics = inject(AnalyticsService);
   private readonly translate = inject(TranslateService);
   private readonly zone = inject(NgZone);
+  private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+  private readonly injector = inject(Injector);
 
   protected readonly keys = CARD_KEYS;
   protected readonly optionLabel = optionLabel;
@@ -714,6 +720,7 @@ export class TranslationCardsComponent {
     const d = this.deck();
     if (!d?.cards.length) return;
     this.turned.set(true);
+    this.focusStage();
     this.analytics.track('admin:translation_deck_start', { lang: this.lang(), cards: d.cards.length });
   }
 
@@ -875,6 +882,7 @@ export class TranslationCardsComponent {
     if (!this.moment()) return;
     this.moment.set(null);
     this.checkFinished();
+    this.focusStage();
   }
 
   private checkFinished(): void {
@@ -882,6 +890,23 @@ export class TranslationCardsComponent {
     if (this.vetoMode() || !d || this.pos() < d.cards.length || this.moment() || this.finishTracked) return;
     this.finishTracked = true;
     this.analytics.track('admin:translation_deck_finish', { lang: this.lang(), cards: this.session().length, points: this.summary().points });
+  }
+
+  /**
+   * The control that had focus (the cover, a half) is gone once the stage changes: hand focus to the new card's
+   * first answer so the keyboard path continues. Focus that sits elsewhere on the page stays where it is.
+   */
+  private focusStage(): void {
+    afterNextRender(
+      () => {
+        const root = this.host.nativeElement;
+        const active = document.activeElement;
+        const stage = root.querySelector<HTMLElement>('.stage');
+        if (active && active !== document.body && !stage?.contains(active)) return;
+        stage?.querySelector<HTMLElement>('.half, .vbtn, button.back')?.focus({ preventScroll: true });
+      },
+      { injector: this.injector },
+    );
   }
 
   private clearTimer(): void {

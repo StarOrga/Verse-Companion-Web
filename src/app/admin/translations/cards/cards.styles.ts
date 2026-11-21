@@ -31,11 +31,12 @@ export const CARD_STYLES = `
   .half.r .opt .kbd { order: 3; margin-inline-start: auto; }
   .name { min-width: 0; font: 700 1.375rem/1.2 var(--sc-font-body, inherit); color: var(--sc-fg-0); overflow-wrap: anywhere; }
   .cnt { flex: none; align-self: baseline; margin-top: 6px; font-size: 0.75rem; color: var(--sc-fg-2); white-space: nowrap; }
-  .ex { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
-  .ex li { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: baseline; gap: 6px; font-size: 0.8125rem; line-height: 1.45; color: var(--sc-fg-1); }
-  .ex small { font: 600 0.6rem/1.4 var(--sc-font-display, inherit); letter-spacing: 0.05em; color: var(--sc-fg-2); }
+  /* One grid for the three examples, so the code column takes the widest code („PT-BR“) and the texts line up. */
+  .ex { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: baseline; gap: 2px 6px; font-size: 0.8125rem; line-height: 1.45; color: var(--sc-fg-1); }
+  .ex li { display: contents; }
+  .ex small { font: 600 0.6rem/1.4 var(--sc-font-display, inherit); letter-spacing: 0.05em; color: var(--sc-fg-2); white-space: nowrap; }
   .ex span { min-width: 0; overflow-wrap: anywhere; }
-  .ex.ctx li { grid-template-columns: minmax(0, max-content) minmax(0, 1fr); gap: 8px; }
+  .ex.ctx { grid-template-columns: minmax(0, max-content) minmax(0, 1fr); column-gap: 8px; }
   .ex.ctx small.where { max-width: 9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 0.75rem/1.45 var(--sc-font-body, inherit); letter-spacing: 0; }
   .cfoot { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 14px; font-size: 0.75rem; line-height: 1.5; color: var(--sc-fg-2); }
   .cmeta { display: flex; flex-wrap: wrap; min-width: 0; }
@@ -56,8 +57,8 @@ export const CARD_STYLES = `
     .duel { column-gap: 6px; }
     .half { padding: 6px 6px 8px; gap: 8px; }
     .name { font-size: 1.125rem; }
-    .ex li { grid-template-columns: 18px minmax(0, 1fr); gap: 4px; font-size: 0.75rem; }
-    .ex.ctx li { gap: 5px; }
+    .ex { column-gap: 4px; font-size: 0.75rem; }
+    .ex.ctx { column-gap: 5px; }
     .ex.ctx small.where { max-width: 6.5em; font-size: 0.6875rem; }
     .cfoot { font-size: 0.72rem; }
   }

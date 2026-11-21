@@ -210,6 +210,8 @@ import { canApprove, canCancel, jobErrorKey, jobNotes, jobProgress, judgeScore, 
   styles: [
     `
       :host { display: block; padding-block: var(--sc-space-5) var(--sc-space-7); }
+      /* Past 1024px the section rail hangs at the screen edge: keep clear of its lane the way HQ and Settings do. */
+      @media (min-width: 1024px) { :host { padding-inline-start: max(0px, calc(var(--hq-rail-clear, 72px) - var(--sc-page-gutter))); } }
       .block { display: grid; gap: var(--sc-space-4); margin-bottom: var(--sc-space-4); }
       .block-head { display: flex; justify-content: space-between; align-items: center; gap: var(--sc-space-3); }
       h2 { margin: 0; font-size: 1.05rem; }

@@ -33,7 +33,7 @@ const BOX_STYLES = `
   /* One column (phone, below 900 px): the HUD strip carries ring, place and streak, the boxes keep only their lists. */
   @media (max-width: 899px) { .wide { display: none; } }
   @media (max-width: 899px) { .narrow { display: inline; } }
-  @media (max-width: 899px) { .hud-dup { display: none; } }
+  @media (max-width: 899px) { .box .hud-dup { display: none; } }
 `;
 
 /**
