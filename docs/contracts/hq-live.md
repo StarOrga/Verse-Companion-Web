@@ -1,8 +1,8 @@
 # HQ live contract (desktop <-> SCC-Web)
 
-Contract version: 3 (2026-11-08). This file exists in BOTH repos (SCC-App
-`docs/contracts/hq-live.md`, SCC-Web copy); a change needs both repos. The web repo holds an
-identical copy at `docs/contracts/hq-live.md` - keep the two byte-identical.
+Contract version: 3 (2026-11-08). This file exists in BOTH repos at
+`docs/contracts/hq-live.md`. The SCC-Web file is the master: edit it there, then mirror it into the
+SCC-App repo with `npm run contracts:sync` (byte-identical; `npm run contracts:check` reports drift).
 
 Writer: SCC-App `modules/desktop/src/hq-live-sync-service.js` with the user's SCC
 session token (PostgREST, RLS self-only). Reader: the web HQ (Jetzt, Bestand, Statistik).
@@ -174,5 +174,4 @@ web migration.)
 
 - `docs/contracts/scc-app-event-progress.md` (event progress, location / Arena Commander mode, received rewards) extends
   this contract: same opt-in, same session token, same RLS-self-only rule, no new live table. It follows the same copy
-  rule - it exists in BOTH repos and the SCC-App copy must stay byte-identical to the web file. A change to either
-  contract file is a change in both repos; whoever edits one of the two cross-references updates the other copy too.
+  rule: the SCC-Web file is the master and the SCC-App copy is mirrored from it with `npm run contracts:sync`.
