@@ -510,6 +510,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›generated›content": [
+      {
+        "ship": "claude/karteikarten-seite-rethink-59abdb",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map.mjs up-to-date)",
+        "decided": true,
+        "at": "2026-11-21T23:50:17.836Z",
+        "hunks": [
+          "7dda1e63d901"
+        ]
+      }
+    ],
     ".claude/project-map.md›generated›file counts": [
       {
         "ship": "claude/focus-borders-starmap-4c0ef0",
