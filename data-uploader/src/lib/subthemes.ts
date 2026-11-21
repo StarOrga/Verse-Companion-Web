@@ -149,7 +149,10 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // 7: codex_blueprints gains dismantle_yield / dismantlable (HQ Bestand, #1058).
     // 8: codex_entity_strings — names behind a `,P`-marked loc key resolve.
     // 9: codex_locations — Verse places from the game data (starmap.py, #1194).
-    revision: 9,
+    // 10: #1195 — codex_locations on real data: readable types (GUID-named type
+    //     records), Lagrange rest stops / gateways from the containers their
+    //     L-point opens, no star-origin hosts, system rows, cities.
+    revision: 10,
     phases: [
       'codex_manufacturers',
       'codex_blueprints',
