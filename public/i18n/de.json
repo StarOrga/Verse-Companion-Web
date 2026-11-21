@@ -3408,6 +3408,56 @@
       "badge": "Video",
       "play": "Video abspielen"
     },
+    "patchBoard": {
+      "switch": {
+        "aria": "Kanal wählen",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Was für Live-Spieler zählt",
+        "ptuHint": "Test-Builds: jeder einzelne Stand"
+      },
+      "unread": "Ungelesen",
+      "newForYou": "Neu für dich",
+      "readFull": "Ganz lesen",
+      "markRead": "Gelesen",
+      "readOn": "gelesen am {{date}}",
+      "readEarlier": "früher gelesen",
+      "readAgain": "Nochmal lesen",
+      "now": {
+        "title": "Gerade auf Live gekommen",
+        "since": "Seit {{date}}",
+        "none": "Noch kein Live-Patch im Feed."
+      },
+      "next": {
+        "title": "Als Nächstes auf Live",
+        "none": "Noch kein nächster Patch bekannt.",
+        "testing": "Im {{ring}}-Test",
+        "noDate": "Kein offizielles Datum",
+        "announced": "Angekündigt für {{date}}",
+        "estimate": "Schätzung {{when}}"
+      },
+      "allAbout": "Alles zu {{line}}",
+      "close": "Schließen",
+      "noDate": "Ohne Datum",
+      "roadmap": {
+        "aria": "Roadmap-Stand",
+        "committed": "Bestätigt",
+        "tentative": "Möglich",
+        "released": "Ausgeliefert"
+      },
+      "status": {
+        "next": "Als Nächstes"
+      },
+      "daysLive": "{{n}} Tage live",
+      "earlier": "{{n}} frühere Updates",
+      "earlierHide": "Frühere Updates ausblenden",
+      "ptu": {
+        "newest": "Neuester Test-Build",
+        "aria": "Test-Builds, neueste zuerst",
+        "empty": "Gerade keine Test-Builds im Feed.",
+        "wave": "{{stage}} · Welle {{n}}"
+      }
+    },
     "patch": {
       "line": "Alpha {{version}}",
       "otherLine": "Ohne Versionsangabe",

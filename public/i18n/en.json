@@ -3408,6 +3408,56 @@
       "badge": "Video",
       "play": "Play video"
     },
+    "patchBoard": {
+      "switch": {
+        "aria": "Choose channel",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "What matters to Live players",
+        "ptuHint": "Test builds: every single build"
+      },
+      "unread": "Unread",
+      "newForYou": "New for you",
+      "readFull": "Read in full",
+      "markRead": "Read",
+      "readOn": "read on {{date}}",
+      "readEarlier": "read earlier",
+      "readAgain": "Read again",
+      "now": {
+        "title": "Just arrived on Live",
+        "since": "Since {{date}}",
+        "none": "No Live patch in the feed yet."
+      },
+      "next": {
+        "title": "Next on Live",
+        "none": "No next patch known yet.",
+        "testing": "In {{ring}} testing",
+        "noDate": "No official date",
+        "announced": "Announced for {{date}}",
+        "estimate": "Estimate {{when}}"
+      },
+      "allAbout": "Everything about {{line}}",
+      "close": "Close",
+      "noDate": "No date",
+      "roadmap": {
+        "aria": "Roadmap status",
+        "committed": "Confirmed",
+        "tentative": "Possible",
+        "released": "Delivered"
+      },
+      "status": {
+        "next": "Up next"
+      },
+      "daysLive": "{{n}} days live",
+      "earlier": "{{n}} earlier updates",
+      "earlierHide": "Hide earlier updates",
+      "ptu": {
+        "newest": "Newest test build",
+        "aria": "Test builds, newest first",
+        "empty": "No test builds in the feed right now.",
+        "wave": "{{stage}} · wave {{n}}"
+      }
+    },
     "patch": {
       "line": "Alpha {{version}}",
       "otherLine": "Without a version",
