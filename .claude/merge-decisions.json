@@ -422,6 +422,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›file counts›value": [
+      {
+        "ship": "claude/backlgo-a9602a",
+        "by": "claude",
+        "value": "regenerated from the batch tree",
+        "decided": true,
+        "at": "2026-11-21T00:40:37.960Z",
+        "hunks": [
+          "f8d4d2f34051"
+        ]
+      }
+    ],
     ".claude/project-map.md›file-counts›value": [
       {
         "ship": "claude/data-uploader-extraction-spike-be3dcb",
@@ -762,6 +774,18 @@
         "at": "2026-11-15T14:09:55.079Z",
         "hunks": [
           "1ac2ea1f3954"
+        ]
+      }
+    ],
+    ".claude/project-map.md›ingest-catalog count›value": [
+      {
+        "ship": "claude/backlgo-a9602a",
+        "by": "claude",
+        "value": "regenerated from the batch tree",
+        "decided": true,
+        "at": "2026-11-21T00:40:37.960Z",
+        "hunks": [
+          "f4ea4b75c10d"
         ]
       }
     ],
@@ -1166,6 +1190,18 @@
         "at": "2026-11-15T15:58:54.978Z",
         "hunks": [
           "c0342f654b62"
+        ]
+      }
+    ],
+    ".claude/project-map.md›supabase counts›value": [
+      {
+        "ship": "claude/backlgo-a9602a",
+        "by": "claude",
+        "value": "regenerated from the batch tree",
+        "decided": true,
+        "at": "2026-11-21T00:40:37.960Z",
+        "hunks": [
+          "659959a4df7b"
         ]
       }
     ],
