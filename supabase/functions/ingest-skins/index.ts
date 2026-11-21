@@ -41,7 +41,8 @@
 // For the same reason a glb is only signed for an uploader of that version or
 // newer: an older binary would publish textured hulls again.
 //
-//   400 invalid_json | invalid_body | unsafe_id
+//   400 invalid_json | invalid_body | unsafe_id | duplicate_skin_id (a commit
+//       lists one skin id twice; `skin_ids` names them)
 //   409 hull_missing | hull_hash_mismatch | hull_too_large (shared hull not
 //       committable; a fresh object that failed the check is deleted)
 //   401 unauthorized
@@ -79,6 +80,7 @@ import {
   MAX_HULL_BYTES,
   checkHull,
   droppedHulls,
+  duplicateSkinIds,
   hullSha,
   isHullPath,
   isReservedShipId,
@@ -628,6 +630,16 @@ Deno.serve(withPosthog('ingest-skins', async (req: Request): Promise<Response> =
         model_bytes: typeof s.model_bytes === 'number' ? Math.round(s.model_bytes) : null,
         sort: typeof s.sort === 'number' ? s.sort : skinId === 'standard' ? 10 : 100,
       });
+    }
+    // One upsert cannot affect a (ship_id, skin_id) row twice (21000) — name
+    // the ids instead of failing as an anonymous commit_failed 500 (#383).
+    const dupIds = duplicateSkinIds(rows.map((r) => r.skin_id as string));
+    if (dupIds.length) {
+      return json({
+        error: 'duplicate_skin_id',
+        message: `skin_id listed more than once: ${dupIds.join(', ')}`,
+        skin_ids: dupIds,
+      }, 400);
     }
 
     // A shared hull must exist before a row points at it — otherwise a variant
