@@ -248,7 +248,7 @@ export interface CardMoment {
             @if (c) {
               @let la = optionLabel(c, 'a');
               @let lb = optionLabel(c, 'b');
-              <p class="swipe touch">
+              <p class="swipe touch" [class.hold]="m === 'moment'">
                 <span>{{ 'admin.translations.cards.swipe.left' | translate: { label: la.key ? (la.key | translate) : la.text } }}</span>
                 <span>{{ 'admin.translations.cards.swipe.right' | translate: { label: lb.key ? (lb.key | translate) : lb.text } }}</span>
                 <span>{{ 'admin.translations.cards.swipe.up' | translate }}</span>
@@ -420,7 +420,7 @@ export interface CardMoment {
       @keyframes step-in { from { transform: scale(0.6); opacity: 0; } to { transform: none; opacity: 1; } }
 
       .acts { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 10px; margin-top: 6px; }
-      .acts.hold { visibility: hidden; }
+      .acts.hold, .swipe.hold { visibility: hidden; }
       .acts button svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .acts button.quiet { border-color: var(--sc-border); color: var(--sc-fg-1); background: transparent; }
       .acts button { max-width: 100%; white-space: normal; text-align: center; }

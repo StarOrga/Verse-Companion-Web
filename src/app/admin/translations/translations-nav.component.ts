@@ -144,7 +144,7 @@ const BAR_SLACK_PX = 12;
         .bar { display: flex; }
         .tab { flex: 1 1 0; padding-inline: 2px; }
         .tab span { display: none; }
-        .tab[aria-current='page'] { flex: 2.4 1 0; }
+        .tab[aria-current='page'] { flex: 3.4 1 0; }
         .tab[aria-current='page'] span { display: inline; }
       }
       @media (orientation: landscape) and (max-height: 500px) {
