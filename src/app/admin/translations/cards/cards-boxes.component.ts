@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import type { CardBoard, CardGoal } from '../translations.service';
-import { barPct, boardName, kiTargetLang, langRows, rankLine } from './cards.logic';
+import { barPct, boardName, countKey, kiTargetLang, langRows, rankLine } from './cards.logic';
+import { ScTooltipDirective } from '../../../shared/tooltip/sc-tooltip.directive';
 import { GoalRingComponent } from './goal-ring.component';
 
 /** The quiet instrument frame both side boxes share (corner ticks in the game violet). */
@@ -44,7 +45,7 @@ const BOX_STYLES = `
 @Component({
   selector: 'sc-cards-goal-box',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, GoalRingComponent],
+  imports: [TranslatePipe, RouterLink, GoalRingComponent, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <aside class="box" data-test="goal-box" [attr.aria-label]="'admin.translations.cards.box.goalAria' | translate">
@@ -62,12 +63,19 @@ const BOX_STYLES = `
           <li>
             <a class="lrow" [routerLink]="[]" [queryParams]="{ tab: 'cards', lang: r.lang }" [attr.data-test]="'lang-' + r.lang"
                [class.done]="r.judged && r.line.key?.endsWith('.clear')"
-               [attr.aria-current]="r.lang === active() ? 'true' : null">
+               [attr.aria-current]="r.lang === active() && !review() ? 'true' : null">
               <span class="lc">{{ r.lang.toUpperCase() }}</span>
               <span class="ln">{{ langName(r.lang) }}
                 <small>{{ r.line.key! | translate: r.line.params }}@if (r.unsure > 0) { · <em>{{ 'admin.translations.cards.row.unsure' | translate: { count: r.unsure } }}</em> }</small>
               </span>
             </a>
+            @if (r.auto > 0) {
+              <a class="lauto" [routerLink]="[]" [queryParams]="{ tab: 'cards', lang: r.lang, review: 1 }" [attr.data-test]="'auto-' + r.lang"
+                 [scTooltip]="'admin.translations.cards.row.autoHint' | translate"
+                 [attr.aria-current]="r.lang === active() && review() ? 'true' : null">
+                {{ 'admin.translations.cards.row.auto' | translate: { count: r.auto } }}
+              </a>
+            }
           </li>
         }
         @if (kiLang(); as k) {
@@ -77,7 +85,7 @@ const BOX_STYLES = `
                 <svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z" /><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z" /></svg>
               </span>
               <span class="ln">{{ 'admin.translations.cards.row.kiSummary' | translate: { count: summary().decided } }}
-                <small>@if (summary().unsure > 0) { <em>{{ 'admin.translations.cards.row.unsure' | translate: { count: summary().unsure } }}</em> · }{{ 'admin.translations.cards.row.waiting' | translate: { count: summary().review } }}</small>
+                <small>@if (summary().unsure > 0) { <em>{{ 'admin.translations.cards.row.unsure' | translate: { count: summary().unsure } }}</em> · }{{ cn('admin.translations.cards.row.waiting', summary().review) | translate: { count: summary().review } }}</small>
               </span>
             </a>
           </li>
@@ -105,12 +113,19 @@ const BOX_STYLES = `
       .lc { font: 600 0.65rem/1 var(--sc-font-display, inherit); letter-spacing: 0.04em; color: var(--sc-fg-2); white-space: nowrap; }
       .lrow[aria-current] .lc { color: var(--sc-accent); }
       .lrow.done .lc { color: var(--sc-success); }
+      .lauto {
+        display: flex; align-items: center; min-height: 28px; margin: -2px 8px 4px 56px; padding: 2px 8px; box-sizing: border-box; border-radius: 8px;
+        font-size: 0.72rem; line-height: 1.3; color: var(--sc-fg-2); text-decoration: none; overflow-wrap: anywhere;
+      }
+      .lauto:hover { background: color-mix(in srgb, var(--sc-accent) 6%, transparent); color: var(--sc-fg-1); }
+      .lauto:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
+      .lauto[aria-current] { background: color-mix(in srgb, var(--sc-accent) 10%, transparent); color: var(--sc-accent); }
       .lrow.ki .lc { color: var(--tc-pu-hi); }
       .lrow.ki svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
       .lrow.ki { margin-top: 4px; border-top: 1px dashed color-mix(in srgb, var(--tc-pu) 22%, transparent); border-radius: 0 0 10px 10px; }
       .ln { min-width: 0; overflow-wrap: anywhere; }
       .ln small { display: block; font-size: 0.72rem; color: var(--sc-fg-2); }
-      @media (pointer: coarse) { .lrow { min-height: 48px; } }
+      @media (pointer: coarse) { .lrow { min-height: 48px; } .lauto { min-height: 44px; } }
     `,
   ],
 })
@@ -119,8 +134,11 @@ export class CardsGoalBoxComponent {
   readonly board = input<CardBoard | null>(null);
   readonly goal = input<CardGoal>({ done: 0, target: 10, full: false, bonus_taken: false });
   readonly active = input('');
+  /** The open list is the language's automatic decisions (`?review=1`), not its deck. */
+  readonly review = input(false);
   readonly hot = input(false);
 
+  protected readonly cn = countKey;
   protected readonly rows = computed(() => langRows(this.board()));
   protected readonly kiLang = computed(() => kiTargetLang(this.board()));
   protected readonly summary = computed(() => this.board()?.ai_summary ?? { decided: 0, review: 0, unsure: 0 });
@@ -179,7 +197,7 @@ export class CardsGoalBoxComponent {
         <div class="streak hud-dup">
           <div class="streak-h">
             <span class="cap">{{ 'admin.translations.cards.stats.streak' | translate }}</span>
-            <b>{{ 'admin.translations.cards.stats.days' | translate: { days: b.streak_days } }}</b>
+            <b>{{ cn('admin.translations.cards.stats.days', b.streak_days) | translate: { days: b.streak_days } }}</b>
           </div>
           <span class="days">
             @for (d of b.week.days; track d.date; let i = $index) {
@@ -239,6 +257,7 @@ export class CardsStatsBoxComponent {
     const me = all.find((r) => r.is_me);
     return me && !top.includes(me) ? [...top, me] : top;
   });
+  protected readonly cn = countKey;
   protected readonly rank = computed(() => rankLine(this.board()));
   protected readonly name = boardName;
   protected pct(points: number): number {

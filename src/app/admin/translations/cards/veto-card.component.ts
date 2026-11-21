@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScTooltipDirective } from '../../../shared/tooltip/sc-tooltip.directive';
 import type { TranslationCard } from '../translations.service';
-import { CARD_KEYS, reasonText, subjectOf } from './cards.logic';
+import { CARD_KEYS, countKey, reasonText, subjectOf } from './cards.logic';
 import { CARD_STYLES } from './cards.styles';
 
 /**
@@ -44,7 +44,7 @@ import { CARD_STYLES } from './cards.styles';
       </div>
       <div class="vans">
         <button type="button" class="vbtn warn" data-test="veto-wrong" [disabled]="busy()" aria-keyshortcuts="ArrowLeft 1"
-                [scTooltip]="'admin.translations.cards.veto.wrongHint' | translate" (click)="wrong.emit()">
+                [scTooltip]="(review() ? 'admin.translations.cards.veto.reviewWrongHint' : 'admin.translations.cards.veto.wrongHint') | translate" (click)="wrong.emit()">
           <kbd class="kbd desk" aria-hidden="true">{{ keys.left }}</kbd>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H5" /></svg>{{ 'admin.translations.cards.veto.wrong' | translate }}
         </button>
@@ -57,7 +57,7 @@ import { CARD_STYLES } from './cards.styles';
       </div>
       <footer class="cfoot">
         <span class="cmeta">
-          <span>{{ 'admin.translations.cards.affects' | translate: { count: c.spread } }}</span>
+          <span>{{ cn('admin.translations.cards.affects', c.spread) | translate: { count: c.spread } }}</span>
           <span>{{ 'admin.translations.cards.when' | translate }}</span>
         </span>
       </footer>
@@ -99,6 +99,8 @@ import { CARD_STYLES } from './cards.styles';
 export class VetoCardComponent {
   readonly card = input.required<TranslationCard>();
   readonly lang = input('');
+  /** A judged language's automatic decision: „Sieht falsch aus“ reopens it as a deck card instead of re-asking the KI. */
+  readonly review = input(false);
   readonly index = input(1);
   readonly total = input(1);
   readonly busy = input(false);
@@ -106,6 +108,7 @@ export class VetoCardComponent {
   readonly ok = output<void>();
 
   protected readonly keys = CARD_KEYS;
+  protected readonly cn = countKey;
   protected readonly subject = computed(() => subjectOf(this.card()));
   protected readonly reason = computed(() => reasonText(this.card().ai!));
 }

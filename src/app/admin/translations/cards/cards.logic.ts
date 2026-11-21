@@ -69,6 +69,18 @@ export function isTypingTarget(t: EventTarget | null | undefined): boolean {
   return (t as { isContentEditable?: boolean } | null)?.isContentEditable === true;
 }
 
+/**
+ * The shell's search field takes the caret on load (op-hybrid autofocus) and is still empty: nobody is typing in it,
+ * so Enter on the closed deck must turn the deck instead of being swallowed there. A field the reader typed in
+ * (or any other input) keeps every key.
+ */
+export function isIdleShellSearch(t: EventTarget | null | undefined): boolean {
+  if (tagOf(t) !== 'INPUT') return false;
+  const el = t as { value?: unknown; closest?: (sel: string) => unknown };
+  if (String(el.value ?? '').trim() !== '' || typeof el.closest !== 'function') return false;
+  return !!el.closest('sc-fusion-search');
+}
+
 /** A button or link has focus: Enter / Space belong to it, never to the deck. */
 function isControlTarget(t: EventTarget | null | undefined): boolean {
   const tag = tagOf(t);
@@ -81,7 +93,8 @@ function isControlTarget(t: EventTarget | null | undefined): boolean {
  * Ctrl/⌘+Z undoes. On a KI card ← is „Sieht falsch aus“ and → „Passt“. Nothing while typing or under a dialog.
  */
 export function cardKeyAction(e: KeyLike, mode: StageMode, underDialog: boolean): CardAction | null {
-  if (e.defaultPrevented || e.repeat || isTypingTarget(e.target) || underDialog) return null;
+  const idleSearch = e.key === 'Enter' && mode === 'cover' && isIdleShellSearch(e.target);
+  if (e.defaultPrevented || e.repeat || (isTypingTarget(e.target) && !idleSearch) || underDialog) return null;
   const k = e.key;
   if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && k.toLowerCase() === 'z') return { kind: 'undo' };
   if (e.ctrlKey || e.metaKey || e.altKey) return null;
@@ -227,6 +240,8 @@ export interface LangRow {
   line: Text;
   /** Unsure count in the warning colour (KI rows only). */
   unsure: number;
+  /** Judged language: automatic decisions (bracket cut, clear majority, spelling) an admin can still review (P3). */
+  auto: number;
 }
 
 export function langRows(board: CardBoard | null): LangRow[] {
@@ -239,6 +254,7 @@ export function langRows(board: CardBoard | null): LangRow[] {
         : { key: `${I18N}.row.clear` }
       : { key: `${I18N}.row.ki`, params: { count: l.ai_decided } },
     unsure: l.judged ? 0 : l.ai_unsure,
+    auto: l.judged ? l.ai_review : 0,
   }));
 }
 
@@ -257,6 +273,19 @@ export function kiTargetLang(board: CardBoard | null): string | null {
 export function defaultLang(board: CardBoard | null, requested: string | null): string {
   if (requested) return requested;
   return board?.my_langs?.[0] ?? 'de';
+}
+
+/** `?review=1` on a judged language: its automatic decisions as a veto list (P3 „logged and reversible“). */
+export function isReview(board: CardBoard | null, lang: string, requested: string | null): boolean {
+  return requested === '1' && isJudged(board, lang);
+}
+
+/**
+ * Singular/plural of a counted string: `key` is the plural („betrifft {{count}} Texte“), `keyOne` the singular
+ * („betrifft 1 Text“) — one pair of i18n keys, never an inline plural rule.
+ */
+export function countKey(key: string, count: number): string {
+  return count === 1 ? `${key}One` : key;
 }
 
 export function isJudged(board: CardBoard | null, lang: string): boolean {
@@ -281,11 +310,13 @@ export function rankLine(board: CardBoard | null): Text | null {
   if (rank === 1) {
     const second = rows.find((r) => !r.is_me);
     if (!second) return { key: `${I18N}.stats.alone` };
-    return { key: `${I18N}.stats.lead`, params: { points: Math.max(0, board.week.points - second.points) } };
+    const lead = Math.max(0, board.week.points - second.points);
+    return { key: countKey(`${I18N}.stats.lead`, lead), params: { points: lead } };
   }
   const above = rows.find((r) => r.rank === rank - 1) ?? rows[rank - 2];
   if (!above) return null;
-  return { key: `${I18N}.stats.gap`, params: { points: Math.max(0, above.points - board.week.points), place: rank - 1 } };
+  const gap = Math.max(0, above.points - board.week.points);
+  return { key: countKey(`${I18N}.stats.gap`, gap), params: { points: gap, place: rank - 1 } };
 }
 
 /** Bar width (percent) of a leaderboard row against the leader. */

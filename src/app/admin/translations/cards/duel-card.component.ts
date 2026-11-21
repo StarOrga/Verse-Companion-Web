@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScTooltipDirective } from '../../../shared/tooltip/sc-tooltip.directive';
 import type { TranslationCard } from '../translations.service';
-import { CARD_KEYS, cardQuestion, examplesOf, optionCount, optionLabel, optionOf } from './cards.logic';
+import { CARD_KEYS, cardQuestion, countKey, examplesOf, optionCount, optionLabel, optionOf } from './cards.logic';
 import { CARD_STYLES } from './cards.styles';
 
 /**
@@ -30,7 +30,7 @@ import { CARD_STYLES } from './cards.styles';
           <button type="button" class="half" [class.r]="side === 'b'" [class.pick]="picked() === side"
                   [attr.data-test]="'half-' + side" [disabled]="busy()"
                   [attr.aria-keyshortcuts]="side === 'a' ? 'ArrowLeft 1' : 'ArrowRight 2'"
-                  [scTooltip]="'admin.translations.cards.affects' | translate: { count: count(side) }"
+                  [scTooltip]="cn('admin.translations.cards.affects', count(side)) | translate: { count: count(side) }"
                   (click)="pick.emit(side)">
             <span class="opt">
               <kbd class="kbd desk" aria-hidden="true">{{ side === 'a' ? keys.left : keys.right }}</kbd>
@@ -63,7 +63,7 @@ import { CARD_STYLES } from './cards.styles';
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></svg>{{ 'admin.translations.cards.allLangs' | translate: { n: c.langs.length } }}
             </span>
           }
-          <span>{{ 'admin.translations.cards.affects' | translate: { count: c.spread } }}</span>
+          <span>{{ cn('admin.translations.cards.affects', c.spread) | translate: { count: c.spread } }}</span>
           <span>{{ 'admin.translations.cards.when' | translate }}</span>
           @if (exceptionLang(); as x) {
             <span class="exc" data-test="exception">{{ 'admin.translations.cards.exception.chip' | translate: { lang: exceptionName() } }}</span>
@@ -89,6 +89,7 @@ export class DuelCardComponent {
   protected readonly sides = ['a', 'b'] as const;
   protected readonly keys = CARD_KEYS;
   protected readonly optionLabel = optionLabel;
+  protected readonly cn = countKey;
   protected readonly question = computed(() => cardQuestion(this.card()));
   protected count(side: 'a' | 'b'): number {
     return optionCount(this.card(), side);

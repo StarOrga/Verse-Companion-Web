@@ -34,9 +34,12 @@ import {
   cardErrorKey,
   cardKeyAction,
   chosenText,
+  countKey,
   defaultLang,
   finishSummary,
+  isIdleShellSearch,
   isJudged,
+  isReview,
   needsReload,
   optionCount,
   optionLabel,
@@ -111,15 +114,15 @@ export interface CardMoment {
           <b>{{ fmt(b?.week?.points ?? 0) }}@if (plus() > 0) { <em class="plus">+{{ plus() }}</em> }</b></span>
         <span class="cell"><small>{{ 'admin.translations.cards.hud.place' | translate }}</small><b>{{ b?.week?.rank ?? '–' }}</b></span>
         <span class="cell"><small>{{ 'admin.translations.cards.hud.streak' | translate }}</small>
-          <b>{{ 'admin.translations.cards.stats.days' | translate: { days: b?.streak_days ?? 0 } }}</b></span>
+          <b>{{ cn('admin.translations.cards.stats.days', b?.streak_days ?? 0) | translate: { days: b?.streak_days ?? 0 } }}</b></span>
       </div>
 
-      <sc-cards-goal-box class="goalbox" [board]="b" [goal]="g" [active]="lang()" [hot]="!!moment()" />
+      <sc-cards-goal-box class="goalbox" [board]="b" [goal]="g" [active]="lang()" [review]="reviewMode()" [hot]="!!moment()" />
 
       <div class="centre">
         @if (vetoMode() && veto(); as v) {
           <p class="vhead" data-test="veto-head">
-            <b>{{ langName(lang()) }} · {{ (v.unsure > 0 ? 'admin.translations.cards.veto.headUnsure' : 'admin.translations.cards.veto.headAll') | translate: { count: v.total } }}</b>
+            <b>{{ langName(lang()) }} · @if (reviewMode()) { {{ 'admin.translations.cards.veto.headAuto' | translate: { count: v.total } }} } @else { {{ (v.unsure > 0 ? 'admin.translations.cards.veto.headUnsure' : cn('admin.translations.cards.veto.headAll', v.total)) | translate: { count: v.total } }} }</b>
             · {{ 'admin.translations.cards.veto.headNote' | translate }}
           </p>
         }
@@ -138,7 +141,7 @@ export interface CardMoment {
               <ng-container *ngTemplateOutlet="burst; context: { $implicit: m }" />
             } @else if (currentVeto(); as c) {
               <div class="deck" [style.--drag.px]="drag()" [class.dragging]="drag() !== 0">
-                <sc-veto-card [card]="c" [lang]="lang()" [index]="pos() + 1" [total]="veto()?.items?.length ?? 1" [busy]="busy()"
+                <sc-veto-card [card]="c" [lang]="lang()" [review]="reviewMode()" [index]="pos() + 1" [total]="veto()?.items?.length ?? 1" [busy]="busy()"
                               (wrong)="act({ kind: 'wrong' }, 'tap')" (ok)="act({ kind: 'ok' }, 'tap')" />
               </div>
             } @else {
@@ -154,9 +157,9 @@ export interface CardMoment {
                 <span class="bh l" aria-hidden="true"></span><span class="bh r" aria-hidden="true"></span>
                 <span class="cover">
                   <span class="mono" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h10a2 2 0 0 1 2 2v11" /><path d="M5 8h10a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 15 20H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 8z" /></svg></span>
-                  <b>{{ 'admin.translations.cards.cover.title' | translate: { lang: langName(lang()), count: d.cards.length } }}</b>
+                  <b>{{ cn('admin.translations.cards.cover.title', d.cards.length) | translate: { lang: langName(lang()), count: d.cards.length } }}</b>
                   <span class="cover-s" [scTooltip]="'admin.translations.cards.cover.hint' | translate: { open: d.open_total }">
-                    {{ 'admin.translations.cards.cover.sub' | translate: { min: minutes(d.cards.length), count: d.deck_affected } }}
+                    {{ cn('admin.translations.cards.cover.sub', d.deck_affected) | translate: { min: minutes(d.cards.length), count: d.deck_affected } }}
                   </span>
                   <span class="cover-go">
                     <span class="desk">{{ 'admin.translations.cards.cover.goKeys' | translate }} <kbd class="kbd">{{ keys.turn }}</kbd> {{ 'admin.translations.cards.cover.goKeysAfter' | translate }}</span>
@@ -200,16 +203,16 @@ export interface CardMoment {
               </div>
               <h2 class="finish-h">{{ 'admin.translations.cards.finish.title' | translate: { lang: langName(lang()) } }}</h2>
               @if (s.cards > 0) {
-                <p class="finish-s">{{ 'admin.translations.cards.finish.sum' | translate: { cards: s.cards, texts: s.texts } }} · <b>+{{ fmt(s.points) }} {{ 'admin.translations.cards.finish.points' | translate }}</b></p>
+                <p class="finish-s">{{ 'admin.translations.cards.finish.sum' | translate: { cards: nTxt('cardsN', s.cards), texts: nTxt('textsN', s.texts) } }} · <b>+{{ fmt(s.points) }} {{ 'admin.translations.cards.finish.points' | translate }}</b></p>
                 @if (s.bonus > 0) {
-                  <p class="finish-p">{{ 'admin.translations.cards.finish.split' | translate: { base: s.base, cards: s.cards, bonus: s.bonus } }}</p>
+                  <p class="finish-p">{{ 'admin.translations.cards.finish.split' | translate: { base: s.base, cards: nTxt('cardsN', s.cards), bonus: s.bonus } }}</p>
                 }
                 <ul class="res" role="list">
                   @for (a of session(); track a.card.id) {
                     <li>
                       <span class="mini" aria-hidden="true"><i [class.on]="a.choice === 'a'"></i><i [class.on]="a.choice !== 'a'"></i></span>
                       <b>{{ resultLabel(a) }}</b>
-                      <small>{{ 'admin.translations.cards.textsN' | translate: { count: resultTexts(a) } }}</small>
+                      <small>{{ nTxt('textsN', resultTexts(a)) }}</small>
                     </li>
                   }
                 </ul>
@@ -217,7 +220,7 @@ export interface CardMoment {
                 <p class="finish-s">{{ 'admin.translations.cards.finish.none' | translate }}</p>
               }
               <p class="finish-w">{{ 'admin.translations.cards.finish.when' | translate }}
-                @if (rest() > 0) { {{ 'admin.translations.cards.finish.rest' | translate: { count: rest() } }} }
+                @if (rest() > 0) { {{ cn('admin.translations.cards.finish.rest', rest()) | translate: { count: rest() } }} }
               </p>
             </div>
           }
@@ -290,9 +293,10 @@ export interface CardMoment {
           </svg>
           <b><span class="pip" aria-hidden="true"></span>{{ 'admin.translations.cards.goalStep' | translate: { done: m.goal.done, target: m.goal.target } }}</b>
         </span>
-        <span class="burst-meta"><b>{{ 'admin.translations.cards.plusPoints' | translate: { points: m.points } }}</b>
+        <span class="burst-meta">
+          @if (m.points > 0) { <b>{{ 'admin.translations.cards.plusPoints' | translate: { points: m.points } }}</b> }
           @if (m.bonus > 0) { · <b>{{ 'admin.translations.cards.plusBonus' | translate: { points: m.bonus } }}</b> }
-          @if (m.texts > 0) { · {{ 'admin.translations.cards.unified' | translate: { count: m.texts } }} }</span>
+          @if (m.texts > 0) { · {{ cn('admin.translations.cards.unified', m.texts) | translate: { count: m.texts } }} }</span>
       </div>
     </ng-template>
 
@@ -424,7 +428,8 @@ export interface CardMoment {
       .acts button svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .acts button.quiet { border-color: var(--sc-border); color: var(--sc-fg-1); background: transparent; }
       .acts button { max-width: 100%; white-space: normal; text-align: center; }
-      .swipe { display: none; flex-wrap: wrap; justify-content: center; gap: 4px 14px; margin: 10px 0 0; color: var(--sc-fg-2); font-size: 0.75rem; text-align: center; }
+      .swipe { display: none; flex-wrap: wrap; justify-content: center; gap: 4px 14px; max-width: 100%; margin: 10px 0 0; color: var(--sc-fg-2); font-size: 0.75rem; text-align: center; }
+      .swipe span { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
       .flash { margin: var(--sc-space-3, 12px) 0 0; color: var(--sc-danger); text-align: center; }
 
       .finish { display: grid; justify-items: center; gap: 8px; width: 100%; text-align: center; }
@@ -519,7 +524,10 @@ export class TranslationCardsComponent {
   readonly plus = signal(0);
   private readonly queryLang = toSignal(this.route.queryParamMap.pipe(map((p) => p.get('lang'))), { initialValue: null });
   readonly lang = computed(() => defaultLang(this.board(), this.queryLang()));
-  readonly vetoMode = computed(() => !isJudged(this.board(), this.lang()));
+  private readonly queryReview = toSignal(this.route.queryParamMap.pipe(map((p) => p.get('review'))), { initialValue: null });
+  /** A judged language's automatic decisions as a veto list (`?review=1`, reached from the „N automatisch“ link). */
+  readonly reviewMode = computed(() => isReview(this.board(), this.lang(), this.queryReview()));
+  readonly vetoMode = computed(() => !isJudged(this.board(), this.lang()) || this.reviewMode());
 
   readonly deck = signal<CardDeck | null>(null);
   readonly veto = signal<VetoList | null>(null);
@@ -803,7 +811,7 @@ export class TranslationCardsComponent {
     const left = Math.max(0, v.items.length - this.pos());
     const ok = await this.confirmSvc.confirm({
       titleKey: `${I18N}.veto.acceptAllTitle`,
-      messageKey: `${I18N}.veto.acceptAllText`,
+      messageKey: countKey(`${I18N}.veto.acceptAllText`, left),
       params: { count: left, lang: this.langName(this.lang()) },
       confirmKey: `${I18N}.veto.acceptAll`,
     });
@@ -902,7 +910,7 @@ export class TranslationCardsComponent {
         const root = this.host.nativeElement;
         const active = document.activeElement;
         const stage = root.querySelector<HTMLElement>('.stage');
-        if (active && active !== document.body && !stage?.contains(active)) return;
+        if (active && active !== document.body && !stage?.contains(active) && !isIdleShellSearch(active)) return;
         stage?.querySelector<HTMLElement>('.half, .vbtn, button.back')?.focus({ preventScroll: true });
       },
       { injector: this.injector },
@@ -922,7 +930,7 @@ export class TranslationCardsComponent {
       messageKey,
       messageParams: params,
       // „auch mit Strg+Z“ only where there is a keyboard to press it on.
-      detailKey: texts !== null ? `${I18N}.undo.${TOUCH ? 'detailTouch' : 'detail'}` : TOUCH ? undefined : `${I18N}.undo.detailShort`,
+      detailKey: texts !== null ? countKey(`${I18N}.undo.${TOUCH ? 'detailTouch' : 'detail'}`, texts) : TOUCH ? undefined : `${I18N}.undo.detailShort`,
       detailParams: { count: texts ?? 0 },
       // The write already happened (the server scores it at once); undo is the server's undo RPC (P13).
       commit: () => undefined,
@@ -992,6 +1000,16 @@ export class TranslationCardsComponent {
     const key = `${I18N}.langNames.${code}`;
     const t = this.translate.instant(key) as string;
     return t && t !== key ? t : code.toUpperCase();
+  }
+
+  /** Singular/plural key of a counted string (`…` plural, `…One` singular). */
+  cn(key: string, count: number): string {
+    return countKey(key, count);
+  }
+
+  /** „1 Text“ / „5 Texte“: the counted string of `${I18N}.<key>` in the current language. */
+  nTxt(key: string, count: number): string {
+    return this.translate.instant(countKey(`${I18N}.${key}`, count), { count }) as string;
   }
 
   minutes(cards: number): number {

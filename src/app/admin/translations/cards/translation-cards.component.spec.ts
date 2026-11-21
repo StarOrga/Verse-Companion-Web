@@ -251,6 +251,63 @@ describe('TranslationCardsComponent (Karteikarten v2)', () => {
     expect(rows[2].getAttribute('aria-current')).toBe('true');
   });
 
+  it('a judged language with automatic decisions has a „N automatisch“ link; it opens them as a veto list, „Sieht falsch aus“ reopens the card (P3)', async () => {
+    const withAuto = () => board({ langs: board().langs.map((l) => (l.lang === 'de' ? { ...l, ai_review: 12 } : l)) });
+    const answer: Answer = (c) => {
+      if (c.target === 'translation_card_board') return { data: withAuto() };
+      if (c.target === 'translation_veto_list') return { data: vetoOf([kiCard('auto1', { lang: 'de' })], { lang: 'de' }) };
+      if (c.target === 'veto_translation_decision') {
+        return { data: { card: { ...kiCard('auto1', { lang: 'de' }), status: 'open', ai: null, can_undo: true }, points: 0, bonus: 0, goal: goal(0) } };
+      }
+      return backend()(c);
+    };
+    const { harness, el, cmp, rpc } = await mount(answer);
+    const link = q<HTMLAnchorElement>(el, '[data-test=auto-de]')!;
+    expect(link.getAttribute('href')).toBe('/admin/translations?tab=cards&lang=de&review=1');
+    expect(q(el, '[data-test=auto-it]')).toBeNull();
+    expect(q(el, '[data-test=goal-box] button')).toBeNull();
+    expect(cmp.vetoMode()).toBe(false);
+
+    link.click();
+    await vi.waitFor(() => expect(cmp.reviewMode()).toBe(true));
+    await vi.waitFor(() => { harness.detectChanges(); expect(rpc('translation_veto_list').at(-1)?.args).toEqual({ p_lang: 'de', p_limit: 50 }); });
+    await vi.waitFor(() => expect(cmp.loading()).toBe(false));
+    harness.detectChanges();
+    expect(cmp.vetoMode()).toBe(true);
+    expect(q(el, '[data-test=veto-head]')!.textContent).toContain('admin.translations.cards.veto.headAuto');
+    expect(q(el, '[data-test=auto-de]')!.getAttribute('aria-current')).toBe('true');
+    expect(q(el, '[data-test=lang-de]')!.getAttribute('aria-current')).toBeNull();
+
+    q<HTMLButtonElement>(el, '[data-test=veto-wrong]')!.click();
+    await vi.waitFor(() => expect(rpc('veto_translation_decision').length).toBe(1));
+    expect(rpc('veto_translation_decision')[0].args).toEqual({ p_card_id: 'auto1' });
+    await vi.waitFor(() => expect(cmp.moment()).not.toBeNull());
+    // A reopened card scores nothing: no „+0 Punkte“.
+    harness.detectChanges();
+    expect(q(el, '[data-test=moment]')!.textContent).not.toContain('plusPoints');
+  });
+
+  it('Enter turns the deck on first load although the shell search field holds the caret', async () => {
+    const { harness, cmp } = await mount(backend());
+    const host = document.createElement('sc-fusion-search');
+    const input = document.createElement('input');
+    host.append(input);
+    document.body.append(host);
+    try {
+      input.focus();
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      harness.detectChanges();
+      expect(cmp.mode()).toBe('card');
+      // …and a field with typed text keeps its keys.
+      input.value = 'rsi';
+      cmp.turned.set(false);
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      expect(cmp.turned()).toBe(false);
+    } finally {
+      host.remove();
+    }
+  });
+
   it('the leaderboard shows names, „Du“ for the own row and a fallback for a missing name', async () => {
     const { el } = await mount(backend());
     const names = Array.from(el.querySelectorAll('[data-test=leaderboard] .n')).map((n) => n.textContent!.trim());

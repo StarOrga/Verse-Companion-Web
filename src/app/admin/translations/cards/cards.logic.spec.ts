@@ -7,11 +7,14 @@ import {
   canOwnText,
   cardErrorKey,
   cardKeyAction,
+  countKey,
   cardQuestion,
   defaultLang,
   examplesOf,
   finishSummary,
+  isIdleShellSearch,
   isJudged,
+  isReview,
   kiTargetLang,
   langRows,
   needsReload,
@@ -43,6 +46,17 @@ describe('Karteikarten logic: hotkeys', () => {
     expect(cardKeyAction(key('Enter'), 'moment', false)).toEqual({ kind: 'turn' });
     expect(cardKeyAction(key('Enter', { target: { tagName: 'BUTTON' } }), 'cover', false)).toBeNull();
     expect(cardKeyAction(key('ArrowLeft'), 'cover', false)).toBeNull();
+  });
+
+  it('Enter on the closed deck is not swallowed by the shell search field that took the caret on load, but a typed-in field keeps its keys', () => {
+    const search = (value: string) => ({ tagName: 'INPUT', value, closest: (s: string) => (s === 'sc-fusion-search' ? {} : null) });
+    expect(isIdleShellSearch(search('') as unknown as EventTarget)).toBe(true);
+    expect(isIdleShellSearch(search('rsi') as unknown as EventTarget)).toBe(false);
+    expect(isIdleShellSearch({ tagName: 'INPUT', value: '', closest: () => null } as unknown as EventTarget)).toBe(false);
+    expect(cardKeyAction(key('Enter', { target: search('') }), 'cover', false)).toEqual({ kind: 'turn' });
+    expect(cardKeyAction(key('Enter', { target: search('rsi') }), 'cover', false)).toBeNull();
+    expect(cardKeyAction(key('e', { target: search('') }), 'card', false)).toBeNull();
+    expect(cardKeyAction(key('Enter', { target: { tagName: 'INPUT', value: '', closest: () => null } }), 'cover', false)).toBeNull();
   });
 
   it('on a KI card ← is „Sieht falsch aus“, → „Passt“, E own text', () => {
@@ -124,10 +138,28 @@ describe('Karteikarten logic: questions from templates (P9)', () => {
 describe('Karteikarten logic: boxes', () => {
   it('one row per language: own deck with open count, KI languages with decided and unsure counts', () => {
     const rows = langRows(board());
-    expect(rows[0]).toEqual({ lang: 'de', judged: true, line: { key: 'admin.translations.cards.row.deck', params: { count: 10 } }, unsure: 0 });
-    expect(rows[1]).toEqual({ lang: 'it', judged: false, line: { key: 'admin.translations.cards.row.ki', params: { count: 67 } }, unsure: 3 });
+    expect(rows[0]).toEqual({ lang: 'de', judged: true, line: { key: 'admin.translations.cards.row.deck', params: { count: 10 } }, unsure: 0, auto: 0 });
+    expect(rows[1]).toEqual({ lang: 'it', judged: false, line: { key: 'admin.translations.cards.row.ki', params: { count: 67 } }, unsure: 3, auto: 0 });
     const clear = langRows(board({ langs: [{ lang: 'de', judged: true, deck_open: 0, ai_decided: 0, ai_review: 0, ai_unsure: 0, ai_pending: 0 }] }));
     expect(clear[0].line).toEqual({ key: 'admin.translations.cards.row.clear' });
+  });
+
+  it('a judged language links its automatic decisions („12 automatisch“, P3); KI languages never do', () => {
+    const rows = langRows(board({ langs: board().langs.map((l) => (l.lang === 'de' ? { ...l, ai_review: 12 } : l)) }));
+    expect(rows.map((r) => r.auto)).toEqual([12, 0, 0, 0, 0]);
+  });
+
+  it('review mode is only for a judged language and only with ?review=1', () => {
+    expect(isReview(board(), 'de', '1')).toBe(true);
+    expect(isReview(board(), 'de', null)).toBe(false);
+    expect(isReview(board(), 'it', '1')).toBe(false);
+  });
+
+  it('counted strings pick the singular key for exactly one', () => {
+    expect(countKey('admin.translations.cards.affects', 1)).toBe('admin.translations.cards.affectsOne');
+    expect(countKey('admin.translations.cards.affects', 0)).toBe('admin.translations.cards.affects');
+    expect(countKey('admin.translations.cards.affects', 2)).toBe('admin.translations.cards.affects');
+    expect(rankLine(board({ week: { ...board().week, points: 1479 } }))?.key).toBe('admin.translations.cards.stats.gapOne');
   });
 
   it('the KI row leads to the language with the most unsure decisions; none when every language is judged', () => {
