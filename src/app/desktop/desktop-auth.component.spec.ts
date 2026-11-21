@@ -83,8 +83,11 @@ describe('DesktopAuthComponent', () => {
     expect(invoke).not.toHaveBeenCalled();
     expect(touch).not.toHaveBeenCalled();
     expect(submit).not.toHaveBeenCalled();
+    // Call to action + one line of info + one button — closing the tab is the way out.
     const buttons = Array.from(fixture.nativeElement.querySelectorAll('button')) as HTMLButtonElement[];
-    expect(buttons.map((b) => b.type)).toEqual(['button', 'button']);
+    expect(buttons.map((b) => b.type)).toEqual(['button']);
+    expect(fixture.nativeElement.querySelectorAll('h1').length).toBe(1);
+    expect(fixture.nativeElement.querySelectorAll('p').length).toBe(1);
   });
 
   it('hands off after Connect: one POST with state, token and refresh token', async () => {
@@ -104,16 +107,6 @@ describe('DesktopAuthComponent', () => {
     expect(cmp.status()).toBe('redirecting');
   });
 
-  it('Cancel sends nothing', async () => {
-    const { cmp } = setup();
-    await cmp.ngOnInit();
-    cmp.cancel();
-    expect(cmp.status()).toBe('cancelled');
-    await cmp.confirm();
-    expect(invoke).not.toHaveBeenCalled();
-    expect(submit).not.toHaveBeenCalled();
-  });
-
   it('a double click posts once', async () => {
     const { cmp } = setup();
     await cmp.ngOnInit();
@@ -123,11 +116,17 @@ describe('DesktopAuthComponent', () => {
   });
 
   describe('i18n keys', () => {
-    const KEYS = ['confirmPrompt', 'confirmHint', 'confirm', 'cancel', 'cancelled', 'loginRequired'];
+    const KEYS = [
+      'titleConnect', 'titleConfirm', 'titleConnecting', 'titleConnected', 'titleDenied', 'titleFailed',
+      'authorizing', 'loginRequired', 'confirmInfo', 'confirm', 'redirecting', 'handedOverHint',
+      'connected', 'start', 'unauthorized', 'retry', 'done.csrf', 'done.noToken', 'done.failed',
+    ];
     for (const [lang, cat] of [['de', de], ['en', en]] as const) {
       for (const key of KEYS) {
         it(`${lang}: desktopAuth.${key} is a non-empty string`, () => {
-          const value = (cat as { desktopAuth: Record<string, unknown> }).desktopAuth[key];
+          const value = key
+            .split('.')
+            .reduce<unknown>((node, part) => (node as Record<string, unknown> | undefined)?.[part], (cat as { desktopAuth: unknown }).desktopAuth);
           expect(typeof value).toBe('string');
           expect((value as string).length).toBeGreaterThan(0);
         });
@@ -189,6 +188,38 @@ describe('DesktopAuthComponent — callback hardening', () => {
     expect(submit).not.toHaveBeenCalled();
     expect(invoke).not.toHaveBeenCalled();
     expect(fixture.nativeElement.querySelector('button')).toBeNull();
+  });
+
+  it('back from the uploader with done=ok shows the connected stage without a session check', async () => {
+    const { fixture, cmp } = setup({ done: 'ok' });
+    await cmp.ngOnInit();
+    fixture.detectChanges();
+    expect(cmp.status()).toBe('connected');
+    expect(fixture.nativeElement.querySelector('h1')?.textContent).toContain('desktopAuth.titleConnected');
+    expect(fixture.nativeElement.querySelector('button, a')).toBeNull();
+    expect(submit).not.toHaveBeenCalled();
+    expect(invoke).not.toHaveBeenCalled();
+  });
+
+  it('a failed hand-off names its cause and offers no retry link', async () => {
+    const { fixture, cmp } = setup({ done: 'csrf' });
+    await cmp.ngOnInit();
+    fixture.detectChanges();
+    expect(cmp.status()).toBe('error');
+    expect(cmp.errorMsg()).toBe('desktopAuth.done.csrf');
+    expect(fixture.nativeElement.querySelector('a')).toBeNull();
+  });
+
+  it('an unknown done code falls back to the generic failure', async () => {
+    const { cmp } = setup({ done: 'transfer' });
+    await cmp.ngOnInit();
+    expect(cmp.errorMsg()).toBe('desktopAuth.done.failed');
+  });
+
+  it('done=start asks to start the sign-in in the app', async () => {
+    const { cmp } = setup({ done: 'start' });
+    await cmp.ngOnInit();
+    expect(cmp.status()).toBe('start');
   });
 
   it('missing cb/state ends in the missing-params error', async () => {
