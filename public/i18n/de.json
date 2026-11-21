@@ -4370,7 +4370,6 @@
       "retry": "Erneut versuchen"
     },
     "translations": {
-      "eyebrow": "Admin",
       "title": "KI-Übersetzung",
       "subtitle": "Claude-Übersetzung der Spieltexte: Schalter, Limits, Sprachen, Aufträge und Glossar.",
       "tabs": {
@@ -4532,50 +4531,199 @@
       },
       "cards": {
         "title": "Karteikarten",
-        "intro": "Nur wenn die KI nicht weiterkommt: eine Frage, eine Antwort. Die wichtigsten Karten stehen vorn.",
-        "lang": "Sprache",
-        "goal": "Tagesziel: {{done}} von {{goal}} Karten",
-        "goalLabel": "Fortschritt zum Tagesziel",
-        "streak": "Serie: {{days}} Tage",
-        "open": "{{count}} offen",
-        "skippedBefore": "Übersprungen",
-        "fresh": "Aktueller Patch",
-        "spread": "betrifft {{count}} Strings",
-        "choose": "Welche Übersetzung ist besser?",
-        "option": {
-          "a": "Option A",
-          "b": "Option B"
+        "cardAria": "Karte {{n}} von {{total}}",
+        "count": "{{n}} von {{total}}",
+        "affects": "betrifft {{count}} Texte",
+        "textsN": "{{count}} Texte",
+        "when": "ab nächstem Lernlauf",
+        "allLangs": "alle {{n}} Sprachen",
+        "votes": "{{votes}}×",
+        "quoted": "„{{text}}“",
+        "forSubject": "für „{{en}}“",
+        "next": "Nächste Karte aufdecken",
+        "notMine": "Nicht meine Entscheidung",
+        "goalCap": "Tagesziel",
+        "goalOf": "{{done}} / {{target}}",
+        "goalShort": "{{done}}/{{target}}",
+        "goalToday": "Karten heute",
+        "goalDone": "geschafft",
+        "goalStep": "Tagesziel {{done}} / {{target}}",
+        "plusPoints": "+{{points}} Punkte",
+        "plusBonus": "+{{points}} Bonus",
+        "unified": "{{count}} Texte vereinheitlicht",
+        "hud": {
+          "aria": "Dein Stand",
+          "points": "Punkte",
+          "place": "Platz",
+          "streak": "Serie"
         },
-        "bothWrong": "Beides falsch – eigener Text",
-        "ownText": "Dein Text (wird als Admin-Korrektur übernommen)",
-        "note": "Notiz als Hinweis für die KI (optional)",
-        "saveRule": "Als Regel speichern (gilt überall)",
-        "submit": "Antwort speichern",
-        "skip": "Überspringen",
-        "kinds": {
-          "meta": "Meta",
-          "wording": "Wortwahl",
-          "style": "Stil"
+        "box": {
+          "goal": "Tagesziel & Sprachen",
+          "goalAria": "Tagesziel und Sprachen",
+          "langs": "Sprachen",
+          "stats": "Statistik",
+          "statsAria": "Statistik",
+          "board": "Rangliste",
+          "week": "diese Woche"
         },
-        "context": {
-          "title": "Kontext",
-          "key": "Schlüssel",
-          "en": "Englisches Original",
-          "where": "Wo im Spiel",
-          "neighbours": "Nachbarzeilen",
-          "research": "Recherche"
+        "row": {
+          "deck": "dein Stapel · {{count}} offen",
+          "clear": "dein Stapel · alles geklärt",
+          "ki": "{{count}} von KI",
+          "unsure": "{{count}} unsicher",
+          "kiSummary": "KI hat {{count}} entschieden",
+          "waiting": "{{count}} warten auf dich"
         },
-        "thanks": "Danke, gespeichert.",
-        "impact": "Diese Antwort hat {{count}} Strings vereinheitlicht.",
-        "points": "+{{points}} Punkte",
-        "next": "Nächste Karte",
-        "done": "Fertig",
-        "emptyTitle": "Nichts zu entscheiden",
-        "empty": "Die KI kommt gerade allein zurecht – es gibt keine offenen Karten.",
-        "leaderboard": "Rangliste",
-        "leaderboardEmpty": "Noch keine Antworten – die erste Karte bringt dich nach vorn.",
-        "boardAnswers": "{{count}} Antworten",
-        "boardPoints": "{{points}} Punkte"
+        "stats": {
+          "place": "Platz {{place}}",
+          "gap": "noch {{points}} Punkte bis Platz {{place}}",
+          "lead": "{{points}} Punkte vor Platz 2",
+          "alone": "noch niemand sonst diese Woche",
+          "you": "Du",
+          "unnamed": "Admin ohne Namen",
+          "weekNote": "Punkte dieser Woche, Montag beginnt neu",
+          "streak": "Serie",
+          "days": "{{days}} Tage",
+          "day0": "Mo",
+          "day1": "Di",
+          "day2": "Mi",
+          "day3": "Do",
+          "day4": "Fr",
+          "day5": "Sa",
+          "day6": "So"
+        },
+        "cover": {
+          "title": "{{lang}} · {{count}} Karten",
+          "sub": "≈ {{min}} min · betrifft {{count}} Texte",
+          "hint": "Vorsortiert aus {{open}} offenen Karten, der Stapel hat ein Ende. Jede Karte: links eine Möglichkeit, rechts die andere.",
+          "goKeys": "Antippen oder",
+          "goTouch": "Antippen deckt auf"
+        },
+        "q": {
+          "case_upper": "Groß oder normal, wo Englisch normal schreibt?",
+          "case_title": "Groß- oder Kleinschreibung nach dem ersten Wort?",
+          "compound": "Zusammen oder getrennt schreiben?",
+          "verb_form": "Befehlsform oder Grundform auf Knöpfen?",
+          "abbr": "Abkürzung oder ausgeschrieben?",
+          "term": "Wie soll „{{term}}“ überall heißen?",
+          "wording": "Welche Übersetzung passt zu „{{en}}“?",
+          "short": "Schreibweisen-Regel"
+        },
+        "opt": {
+          "case_upper": {
+            "a": "Normal",
+            "b": "GROSS"
+          },
+          "case_title": {
+            "a": "Satzschreibung",
+            "b": "Jedes Wort groß"
+          },
+          "compound": {
+            "a": "Zusammen",
+            "b": "Getrennt / mit Bindestrich"
+          },
+          "verb_form": {
+            "a": "Befehlsform (Annulla)",
+            "b": "Grundform (Annullare)"
+          },
+          "abbr": {
+            "a": "Abkürzung",
+            "b": "Ausgeschrieben"
+          }
+        },
+        "reason": {
+          "majority": "Mehrheit {{a}} : {{b}}",
+          "community": "Text aus dem Community-Paket",
+          "ai": "KI-Text, kein Community-Text vorhanden",
+          "votes": "Mehr Stimmen ({{a}} : {{b}}), keine klare Mehrheit",
+          "bracket": "Fremder Klammerzusatz entfernt",
+          "whitespace": "Nur Leerzeichen bereinigt",
+          "casing_source": "Schreibweise wie im Englischen",
+          "convention": "Nach eurer Schreibweisen-Regel",
+          "only_left": "Die andere Variante wurde als falsch markiert"
+        },
+        "own": {
+          "both": "Beides falsch, selbst schreiben",
+          "short": "Eigener Text",
+          "title": "Eigener Text",
+          "text": "Dein Text für „{{en}}“ – er gilt ab dem nächsten Lernlauf.",
+          "label": "Dein Text",
+          "confirm": "Übernehmen"
+        },
+        "exception": {
+          "action": "Ausnahme für eine Sprache",
+          "title": "Ausnahme für eine Sprache",
+          "text": "Welche Sprache nimmt die andere Variante? Danach wählst du die Variante für alle übrigen.",
+          "none": "Keine Ausnahme",
+          "chip": "Ausnahme: {{lang}} nimmt die andere"
+        },
+        "swipe": {
+          "left": "← links: {{label}}",
+          "right": "→ rechts: {{label}}",
+          "up": "↑ hoch: Nicht meine Entscheidung"
+        },
+        "keys": {
+          "title": "Tasten",
+          "pick": "linke / rechte Antwort (auch 1 / 2)",
+          "own": "eigener Text",
+          "notMine": "Nicht meine Entscheidung",
+          "exception": "Ausnahme für eine Sprache",
+          "turn": "Stapel aufdecken, nächste Karte",
+          "undo": "Rückgängig",
+          "sheet": "diese Übersicht"
+        },
+        "undo": {
+          "answered": "„{{text}}“ für „{{en}}“ gewählt",
+          "answeredRule": "„{{text}}“ als Regel gewählt",
+          "notMine": "„{{text}}“ an die KI abgegeben",
+          "wrong": "„{{text}}“ als falsch markiert",
+          "ok": "„{{text}}“ übernommen",
+          "detail": "{{count}} Texte · auch mit Strg+Z",
+          "detailTouch": "{{count}} Texte",
+          "detailShort": "auch mit Strg+Z"
+        },
+        "veto": {
+          "headUnsure": "unsichere zuerst",
+          "headAll": "{{count}} warten",
+          "headNote": "nichts tun heißt übernehmen",
+          "source": "Englisch „{{en}}“",
+          "unsure": "unsicher",
+          "meaning": "auf Deutsch",
+          "meaningPending": "Deutsche Bedeutung folgt",
+          "wrong": "Sieht falsch aus",
+          "ok": "Passt",
+          "wrongHint": "Die KI entscheidet beim nächsten Lernlauf neu, diese Variante gewinnt nicht mehr",
+          "okHint": "Der KI-Text bleibt, danach kommt die nächste KI-Karte",
+          "acceptAll": "Rest übernehmen",
+          "acceptAllTitle": "Den Rest übernehmen?",
+          "acceptAllText": "Die {{count}} übrigen KI-Entscheidungen für {{lang}} gelten ab dem nächsten Lernlauf. Das gibt keine Punkte und lässt sich nicht rückgängig machen.",
+          "emptyTitle": "Nichts zu prüfen für {{lang}}",
+          "empty": "Alle KI-Entscheidungen dieser Sprache sind geprüft oder übernommen. Neue kommen mit dem nächsten Lernlauf."
+        },
+        "finish": {
+          "title": "Alles geklärt für {{lang}}",
+          "sum": "{{cards}} Karten · {{texts}} Texte vereinheitlicht",
+          "points": "Punkte",
+          "split": "{{base}} für {{cards}} Karten, {{bonus}} Bonus fürs volle Tagesziel",
+          "none": "Gerade keine offenen Karten für diese Sprache.",
+          "when": "Wirkt beim nächsten Lernlauf (nächster Data-Upload oder „Lernen“ im Quellen-Tab).",
+          "rest": "Die übrigen ≈ {{count}} Karten prüft er mit deinen Antworten neu.",
+          "pair": "„{{en}}“ → {{text}}",
+          "rule": "Schreibweise: {{label}}"
+        },
+        "langNames": {
+          "de": "Deutsch",
+          "es": "Spanisch",
+          "fr": "Französisch",
+          "it": "Italienisch",
+          "ja": "Japanisch",
+          "ko": "Koreanisch",
+          "pl": "Polnisch",
+          "pt-BR": "Portugiesisch",
+          "ru": "Russisch",
+          "zh-Hans": "Chinesisch (vereinfacht)",
+          "zh-Hant": "Chinesisch (traditionell)"
+        }
       },
       "sources": {
         "title": "Quellen",
@@ -4717,6 +4865,11 @@
         "editLabel": "Neuer Text",
         "saveEdit": "Text speichern",
         "resolved": "Hinweis erledigt."
+      },
+      "crumb": "Admin",
+      "rail": {
+        "label": "KI-Übersetzung: Bereiche",
+        "goto": "Zu {{page}}"
       }
     }
   },
@@ -6187,7 +6340,15 @@
     "rankTierTooLow": "Das geht erst ab Stufe 5.",
     "rankIdeaInvalid": "Die Idee braucht 3 bis 280 Zeichen.",
     "rankIdeaLimit": "Du hast schon 3 offene Ideen.",
-    "rankIdeaGone": "Diese Idee gibt es nicht mehr oder sie ist archiviert."
+    "rankIdeaGone": "Diese Idee gibt es nicht mehr oder sie ist archiviert.",
+    "translation": {
+      "cards": {
+        "forbidden": "Nur Admins können Karteikarten beantworten.",
+        "invalid": "Diese Antwort passt nicht zur Karte. Bitte prüfe deine Eingabe.",
+        "gone": "Diese Karte ist schon erledigt. Der Stapel wurde neu geladen.",
+        "applied": "Der Lernlauf hat diese Antwort schon übernommen, Rückgängig geht nicht mehr."
+      }
+    }
   },
   "pageHeader": {
     "crumbsAria": "Seitenpfad",
@@ -7514,11 +7675,23 @@
       "lossesSub": "{{deaths}} Tode · {{ships}} Schiffe zerstört · {{claims}} Versicherungsfälle",
       "costs": {
         "label": "Kosten",
-        "fines": { "one": "{{n}} Strafe", "other": "{{n}} Strafen" },
+        "fines": {
+          "one": "{{n}} Strafe",
+          "other": "{{n}} Strafen"
+        },
         "fineAmount": "{{fines}} ({{amount}} aUEC)",
-        "injuries": { "one": "{{n}} Verletzung", "other": "{{n}} Verletzungen" },
-        "medbeds": { "one": "{{n}} Medbed-Behandlung", "other": "{{n}} Medbed-Behandlungen" },
-        "claimRequests": { "one": "{{n}} Versicherungsanfrage", "other": "{{n}} Versicherungsanfragen" }
+        "injuries": {
+          "one": "{{n}} Verletzung",
+          "other": "{{n}} Verletzungen"
+        },
+        "medbeds": {
+          "one": "{{n}} Medbed-Behandlung",
+          "other": "{{n}} Medbed-Behandlungen"
+        },
+        "claimRequests": {
+          "one": "{{n}} Versicherungsanfrage",
+          "other": "{{n}} Versicherungsanfragen"
+        }
       },
       "end": {
         "noQuit": "Ohne Beenden zu Ende (Absturz oder App geschlossen)",

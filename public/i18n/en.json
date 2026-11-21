@@ -4370,7 +4370,6 @@
       "retry": "Try again"
     },
     "translations": {
-      "eyebrow": "Admin",
       "title": "AI translation",
       "subtitle": "Claude translation of the game strings: switch, caps, languages, jobs and glossary.",
       "tabs": {
@@ -4532,50 +4531,199 @@
       },
       "cards": {
         "title": "Flashcards",
-        "intro": "Only when the AI is stuck: one question, one answer. The most important cards come first.",
-        "lang": "Language",
-        "goal": "Daily goal: {{done}} of {{goal}} cards",
-        "goalLabel": "Progress towards the daily goal",
-        "streak": "Streak: {{days}} days",
-        "open": "{{count}} open",
-        "skippedBefore": "Skipped",
-        "fresh": "Current patch",
-        "spread": "affects {{count}} strings",
-        "choose": "Which translation is better?",
-        "option": {
-          "a": "Option A",
-          "b": "Option B"
+        "cardAria": "Card {{n}} of {{total}}",
+        "count": "{{n}} of {{total}}",
+        "affects": "affects {{count}} texts",
+        "textsN": "{{count}} texts",
+        "when": "from the next learning pass",
+        "allLangs": "all {{n}} languages",
+        "votes": "{{votes}}×",
+        "quoted": "“{{text}}”",
+        "forSubject": "for “{{en}}”",
+        "next": "Turn the next card",
+        "notMine": "Not my call",
+        "goalCap": "Daily goal",
+        "goalOf": "{{done}} / {{target}}",
+        "goalShort": "{{done}}/{{target}}",
+        "goalToday": "cards today",
+        "goalDone": "done",
+        "goalStep": "Daily goal {{done}} / {{target}}",
+        "plusPoints": "+{{points}} points",
+        "plusBonus": "+{{points}} bonus",
+        "unified": "{{count}} texts unified",
+        "hud": {
+          "aria": "Your standing",
+          "points": "Points",
+          "place": "Place",
+          "streak": "Streak"
         },
-        "bothWrong": "Both wrong – own text",
-        "ownText": "Your text (becomes an admin correction)",
-        "note": "Note as a hint for the AI (optional)",
-        "saveRule": "Save as a rule (applies everywhere)",
-        "submit": "Save answer",
-        "skip": "Skip",
-        "kinds": {
-          "meta": "Meta",
-          "wording": "Wording",
-          "style": "Style"
+        "box": {
+          "goal": "Daily goal & languages",
+          "goalAria": "Daily goal and languages",
+          "langs": "Languages",
+          "stats": "Statistics",
+          "statsAria": "Statistics",
+          "board": "Leaderboard",
+          "week": "this week"
         },
-        "context": {
-          "title": "Context",
-          "key": "Key",
-          "en": "English original",
-          "where": "Where in the game",
-          "neighbours": "Neighbouring lines",
-          "research": "Research"
+        "row": {
+          "deck": "your deck · {{count}} open",
+          "clear": "your deck · all settled",
+          "ki": "{{count}} by AI",
+          "unsure": "{{count}} unsure",
+          "kiSummary": "AI decided {{count}}",
+          "waiting": "{{count}} waiting for you"
         },
-        "thanks": "Thanks, saved.",
-        "impact": "This answer unified {{count}} strings.",
-        "points": "+{{points}} points",
-        "next": "Next card",
-        "done": "Done",
-        "emptyTitle": "Nothing to decide",
-        "empty": "The AI is coping on its own right now – there are no open cards.",
-        "leaderboard": "Leaderboard",
-        "leaderboardEmpty": "No answers yet – the first card puts you in front.",
-        "boardAnswers": "{{count}} answers",
-        "boardPoints": "{{points}} points"
+        "stats": {
+          "place": "Place {{place}}",
+          "gap": "{{points}} points to place {{place}}",
+          "lead": "{{points}} points ahead of place 2",
+          "alone": "nobody else yet this week",
+          "you": "You",
+          "unnamed": "Unnamed admin",
+          "weekNote": "Points this week, Monday starts afresh",
+          "streak": "Streak",
+          "days": "{{days}} days",
+          "day0": "Mo",
+          "day1": "Tu",
+          "day2": "We",
+          "day3": "Th",
+          "day4": "Fr",
+          "day5": "Sa",
+          "day6": "Su"
+        },
+        "cover": {
+          "title": "{{lang}} · {{count}} cards",
+          "sub": "≈ {{min}} min · affects {{count}} texts",
+          "hint": "Pre-sorted from {{open}} open cards, the deck has an end. Every card: one option on the left, the other on the right.",
+          "goKeys": "Tap or",
+          "goTouch": "Tap to turn"
+        },
+        "q": {
+          "case_upper": "Capitals or normal where English writes normally?",
+          "case_title": "Capitalise every word after the first, or not?",
+          "compound": "Write it as one word or separately?",
+          "verb_form": "Imperative or infinitive on buttons?",
+          "abbr": "Abbreviation or spelled out?",
+          "term": "What should “{{term}}” be called everywhere?",
+          "wording": "Which translation fits “{{en}}”?",
+          "short": "Spelling rule"
+        },
+        "opt": {
+          "case_upper": {
+            "a": "Normal",
+            "b": "CAPITALS"
+          },
+          "case_title": {
+            "a": "Sentence case",
+            "b": "Every Word Capitalised"
+          },
+          "compound": {
+            "a": "One word",
+            "b": "Separate / hyphenated"
+          },
+          "verb_form": {
+            "a": "Imperative (Annulla)",
+            "b": "Infinitive (Annullare)"
+          },
+          "abbr": {
+            "a": "Abbreviation",
+            "b": "Spelled out"
+          }
+        },
+        "reason": {
+          "majority": "Majority {{a}} : {{b}}",
+          "community": "Text from the community pack",
+          "ai": "AI text, no community text available",
+          "votes": "More votes ({{a}} : {{b}}), no clear majority",
+          "bracket": "Foreign bracket note removed",
+          "whitespace": "Only whitespace cleaned up",
+          "casing_source": "Spelling as in English",
+          "convention": "Following your spelling rule",
+          "only_left": "The other option was marked wrong"
+        },
+        "own": {
+          "both": "Both wrong, write my own",
+          "short": "Own text",
+          "title": "Own text",
+          "text": "Your text for “{{en}}” – it applies from the next learning pass.",
+          "label": "Your text",
+          "confirm": "Apply"
+        },
+        "exception": {
+          "action": "Exception for one language",
+          "title": "Exception for one language",
+          "text": "Which language takes the other option? Then pick the option for all the others.",
+          "none": "No exception",
+          "chip": "Exception: {{lang}} takes the other"
+        },
+        "swipe": {
+          "left": "← left: {{label}}",
+          "right": "→ right: {{label}}",
+          "up": "↑ up: Not my call"
+        },
+        "keys": {
+          "title": "Keys",
+          "pick": "left / right answer (also 1 / 2)",
+          "own": "own text",
+          "notMine": "Not my call",
+          "exception": "Exception for one language",
+          "turn": "Turn the deck, next card",
+          "undo": "Undo",
+          "sheet": "this overview"
+        },
+        "undo": {
+          "answered": "Chose “{{text}}” for “{{en}}”",
+          "answeredRule": "Chose “{{text}}” as the rule",
+          "notMine": "Handed “{{text}}” to the AI",
+          "wrong": "Marked “{{text}}” as wrong",
+          "ok": "Kept “{{text}}”",
+          "detail": "{{count}} texts · also with Ctrl+Z",
+          "detailTouch": "{{count}} texts",
+          "detailShort": "also with Ctrl+Z"
+        },
+        "veto": {
+          "headUnsure": "unsure first",
+          "headAll": "{{count}} waiting",
+          "headNote": "doing nothing accepts",
+          "source": "English “{{en}}”",
+          "unsure": "unsure",
+          "meaning": "in German",
+          "meaningPending": "German meaning coming",
+          "wrong": "Looks wrong",
+          "ok": "Fine",
+          "wrongHint": "The AI decides again at the next learning pass; this option no longer wins",
+          "okHint": "The AI text stays, then the next AI card comes",
+          "acceptAll": "Accept the rest",
+          "acceptAllTitle": "Accept the rest?",
+          "acceptAllText": "The {{count}} remaining AI decisions for {{lang}} apply from the next learning pass. This earns no points and cannot be undone.",
+          "emptyTitle": "Nothing to check for {{lang}}",
+          "empty": "Every AI decision of this language is checked or accepted. New ones come with the next learning pass."
+        },
+        "finish": {
+          "title": "All settled for {{lang}}",
+          "sum": "{{cards}} cards · {{texts}} texts unified",
+          "points": "points",
+          "split": "{{base}} for {{cards}} cards, {{bonus}} bonus for the full daily goal",
+          "none": "No open cards for this language right now.",
+          "when": "Takes effect at the next learning pass (next data upload or “Learn” in the Sources tab).",
+          "rest": "It re-checks the remaining ≈ {{count}} cards with your answers.",
+          "pair": "“{{en}}” → {{text}}",
+          "rule": "Spelling: {{label}}"
+        },
+        "langNames": {
+          "de": "German",
+          "es": "Spanish",
+          "fr": "French",
+          "it": "Italian",
+          "ja": "Japanese",
+          "ko": "Korean",
+          "pl": "Polish",
+          "pt-BR": "Portuguese",
+          "ru": "Russian",
+          "zh-Hans": "Chinese (simplified)",
+          "zh-Hant": "Chinese (traditional)"
+        }
       },
       "sources": {
         "title": "Sources",
@@ -4717,6 +4865,11 @@
         "editLabel": "New text",
         "saveEdit": "Save text",
         "resolved": "Alert resolved."
+      },
+      "crumb": "Admin",
+      "rail": {
+        "label": "AI translation: sections",
+        "goto": "Go to {{page}}"
       }
     }
   },
@@ -6187,7 +6340,15 @@
     "rankTierTooLow": "This opens at tier 5.",
     "rankIdeaInvalid": "An idea needs 3 to 280 characters.",
     "rankIdeaLimit": "You already have 3 open ideas.",
-    "rankIdeaGone": "This idea is gone or archived."
+    "rankIdeaGone": "This idea is gone or archived.",
+    "translation": {
+      "cards": {
+        "forbidden": "Only admins can answer flashcards.",
+        "invalid": "This answer does not fit the card. Please check your input.",
+        "gone": "This card is already settled. The deck was reloaded.",
+        "applied": "The learning pass already applied this answer; it can no longer be undone."
+      }
+    }
   },
   "pageHeader": {
     "crumbsAria": "Breadcrumb",
@@ -7514,11 +7675,23 @@
       "lossesSub": "{{deaths}} deaths · {{ships}} ships destroyed · {{claims}} insurance claims",
       "costs": {
         "label": "Costs",
-        "fines": { "one": "{{n}} fine", "other": "{{n}} fines" },
+        "fines": {
+          "one": "{{n}} fine",
+          "other": "{{n}} fines"
+        },
         "fineAmount": "{{fines}} ({{amount}} aUEC)",
-        "injuries": { "one": "{{n}} injury", "other": "{{n}} injuries" },
-        "medbeds": { "one": "{{n}} medbed treatment", "other": "{{n}} medbed treatments" },
-        "claimRequests": { "one": "{{n}} insurance request", "other": "{{n}} insurance requests" }
+        "injuries": {
+          "one": "{{n}} injury",
+          "other": "{{n}} injuries"
+        },
+        "medbeds": {
+          "one": "{{n}} medbed treatment",
+          "other": "{{n}} medbed treatments"
+        },
+        "claimRequests": {
+          "one": "{{n}} insurance request",
+          "other": "{{n}} insurance requests"
+        }
       },
       "end": {
         "noQuit": "Ended without a quit (crash or app closed)",
