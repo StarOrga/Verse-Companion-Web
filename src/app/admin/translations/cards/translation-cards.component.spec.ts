@@ -242,7 +242,7 @@ describe('TranslationCardsComponent (Karteikarten v2)', () => {
       '/admin/translations?tab=cards&lang=it',
     ]);
     expect(rows.at(-1)!.dataset['test']).toBe('ki-row');
-    expect(q(el, '[data-test=goal-box] button')).toBeNull();
+    expect(q(el, '[data-test=goal-box] .langs button')).toBeNull();
     rows[2].click();
     await vi.waitFor(() => expect(cmp.lang()).toBe('ja'));
     await vi.waitFor(() => {
@@ -267,7 +267,7 @@ describe('TranslationCardsComponent (Karteikarten v2)', () => {
     const link = q<HTMLAnchorElement>(el, '[data-test=auto-de]')!;
     expect(link.getAttribute('href')).toBe('/admin/translations?tab=cards&lang=de&review=1');
     expect(q(el, '[data-test=auto-it]')).toBeNull();
-    expect(q(el, '[data-test=goal-box] button')).toBeNull();
+    expect(q(el, '[data-test=goal-box] .langs button')).toBeNull();
     expect(cmp.vetoMode()).toBe(false);
 
     link.click();
@@ -370,4 +370,95 @@ describe('TranslationCardsComponent: no text overflow with long option labels (U
       });
     });
   }
+
+  describe('Sprachen-Auswahl („Dein Stapel“ / „KI + Veto“)', () => {
+    const click = (el: HTMLElement, sel: string) => q<HTMLButtonElement>(el, sel)!.click();
+
+    it('opens the sheet from the box header with the current judgement of every language', async () => {
+      const { harness, el } = await mount(backend());
+      expect(q(el, '[data-test=langs-sheet]')).toBeNull();
+      expect(q(el, '[data-test=langs-open]')!.getAttribute('aria-label')).toBe('admin.translations.cards.langs.open');
+      click(el, '[data-test=langs-open]');
+      harness.detectChanges();
+      expect(q(el, '[data-test=langs-sheet]')).not.toBeNull();
+      expect(q(el, '[data-test=judge-de]')!.getAttribute('aria-checked')).toBe('true');
+      expect(q(el, '[data-test=ki-de]')!.getAttribute('aria-checked')).toBe('false');
+      expect(q(el, '[data-test=ki-it]')!.getAttribute('aria-checked')).toBe('true');
+      expect(el.querySelectorAll('[data-test^=judge-]').length).toBe(5);
+    });
+
+    it('toggling a language switches its segment without saving', async () => {
+      const { harness, el, rpc } = await mount(backend());
+      click(el, '[data-test=langs-open]');
+      harness.detectChanges();
+      click(el, '[data-test=judge-it]');
+      harness.detectChanges();
+      expect(q(el, '[data-test=judge-it]')!.getAttribute('aria-checked')).toBe('true');
+      expect(q(el, '[data-test=ki-it]')!.getAttribute('aria-checked')).toBe('false');
+      click(el, '[data-test=ki-de]');
+      harness.detectChanges();
+      expect(q(el, '[data-test=judge-de]')!.getAttribute('aria-checked')).toBe('false');
+      expect(rpc('set_translation_my_langs').length).toBe(0);
+    });
+
+    it('save calls set_translation_my_langs with the judged list, reloads board and deck and reports the change', async () => {
+      const { harness, el, rpc, track } = await mount(backend([conventionCard()], (c) => (c.target === 'set_translation_my_langs' ? { data: ['de', 'it'] } : { data: null })));
+      const boards = rpc('translation_card_board').length;
+      const decks = rpc('translation_deck').length;
+      click(el, '[data-test=langs-open]');
+      harness.detectChanges();
+      click(el, '[data-test=judge-it]');
+      harness.detectChanges();
+      click(el, '[data-test=langs-save]');
+      await vi.waitFor(() => expect(rpc('set_translation_my_langs').length).toBe(1));
+      expect(rpc('set_translation_my_langs')[0].args).toEqual({ p_langs: ['de', 'it'] });
+      await vi.waitFor(() => expect(rpc('translation_card_board').length).toBe(boards + 1));
+      await vi.waitFor(() => expect(rpc('translation_deck').length).toBe(decks + 1));
+      harness.detectChanges();
+      expect(q(el, '[data-test=langs-sheet]')).toBeNull();
+      expect(track).toHaveBeenCalledWith('admin:translation_langs_change', { judged: 2, ki: 3 });
+    });
+
+    it('saves an empty list when every language goes to the KI', async () => {
+      const { harness, el, rpc } = await mount(backend([conventionCard()], (c) => (c.target === 'set_translation_my_langs' ? { data: [] } : { data: null })));
+      click(el, '[data-test=langs-open]');
+      harness.detectChanges();
+      click(el, '[data-test=ki-de]');
+      harness.detectChanges();
+      click(el, '[data-test=langs-save]');
+      await vi.waitFor(() => expect(rpc('set_translation_my_langs').length).toBe(1));
+      expect(rpc('set_translation_my_langs')[0].args).toEqual({ p_langs: [] });
+    });
+
+    it('a refused save keeps the sheet open with a translated error and no reload', async () => {
+      const { harness, el, rpc, track } = await mount(
+        backend([conventionCard()], (c) => (c.target === 'set_translation_my_langs' ? { data: null, error: { code: '22023', message: 'unknown language' } } : { data: null })),
+      );
+      const boards = rpc('translation_card_board').length;
+      click(el, '[data-test=langs-open]');
+      harness.detectChanges();
+      click(el, '[data-test=judge-it]');
+      click(el, '[data-test=langs-save]');
+      await vi.waitFor(() => expect(rpc('set_translation_my_langs').length).toBe(1));
+      await vi.waitFor(() => {
+        harness.detectChanges();
+        expect(q(el, '[data-test=langs-error]')).not.toBeNull();
+      });
+      expect(q(el, '[data-test=langs-error]')!.textContent).toContain('errors.translation.cards.invalid');
+      expect(q(el, '[data-test=langs-sheet]')).not.toBeNull();
+      expect(rpc('translation_card_board').length).toBe(boards);
+      expect(track).not.toHaveBeenCalledWith('admin:translation_langs_change', expect.anything());
+    });
+
+    it('Escape closes the sheet without saving', async () => {
+      const { harness, el, rpc } = await mount(backend());
+      click(el, '[data-test=langs-open]');
+      harness.detectChanges();
+      q(el, '[data-test=langs-sheet]')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      harness.detectChanges();
+      expect(q(el, '[data-test=langs-sheet]')).toBeNull();
+      expect(rpc('set_translation_my_langs').length).toBe(0);
+    });
+  });
+
 });

@@ -117,7 +117,7 @@ export interface CardMoment {
           <b>{{ cn('admin.translations.cards.stats.days', b?.streak_days ?? 0) | translate: { days: b?.streak_days ?? 0 } }}</b></span>
       </div>
 
-      <sc-cards-goal-box class="goalbox" [board]="b" [goal]="g" [active]="lang()" [review]="reviewMode()" [hot]="!!moment()" />
+      <sc-cards-goal-box class="goalbox" [board]="b" [goal]="g" [active]="lang()" [review]="reviewMode()" [hot]="!!moment()" (langsSaved)="reload()" />
 
       <div class="centre">
         @if (vetoMode() && veto(); as v) {

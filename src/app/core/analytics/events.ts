@@ -169,6 +169,7 @@ export const EVENTS = {
   'admin:translation_card_release': ev<{ kind: 'convention' | 'term' | 'wording'; input: 'tap' | 'key' | 'swipe' }>('admin', 'Eine Karte wurde mit „Nicht meine Entscheidung“ an die KI abgegeben.'),
   'admin:translation_answer_remove': ev<{ via: 'toast' | 'key' }>('admin', 'Eine Karten-Antwort wurde rückgängig gemacht (Rückgängig-Hinweis oder Strg+Z).'),
   'admin:translation_veto_submit': ev<{ verdict: 'wrong' | 'ok' | 'own' | 'all'; unsure: boolean; input: 'tap' | 'key' | 'swipe' }>('admin', 'Eine KI-Entscheidung wurde geprüft: „Sieht falsch aus“, „Passt“, eigener Text oder „Rest übernehmen“.'),
+  'admin:translation_langs_change': ev<{ judged: number; ki: number }>('admin', 'Ein Admin hat gespeichert, welche Sprachen er selbst als Karten beurteilt (Anzahl „Dein Stapel“ und „KI + Veto“).'),
   'admin:translation_deck_finish': ev<{ lang: string; cards: number; points: number }>('admin', 'Ein Karteikarten-Stapel wurde bis zur letzten Karte durchgespielt (beantwortete Karten, Punkte).'),
 } as const;
 

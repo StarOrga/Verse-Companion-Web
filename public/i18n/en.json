@@ -1030,7 +1030,6 @@
         "resetView": "Reset view",
         "viewHull": "Hull",
         "viewSchema": "Schema",
-        "view3d": "3D",
         "statsAria": "Ship values",
         "statsClose": "Close values",
         "sheetHandle": "Values sheet",
@@ -4753,6 +4752,15 @@
           "ru": "Russian",
           "zh-Hans": "Chinese (simplified)",
           "zh-Hant": "Chinese (traditional)"
+        },
+        "langs": {
+          "open": "Languages: your deck or AI",
+          "title": "Who judges which language?",
+          "text": "“Your deck”: you decide the language as cards. “AI + veto”: the AI decides, you review and object.",
+          "mine": "Your deck",
+          "ki": "AI + veto",
+          "save": "Save",
+          "cancel": "Cancel"
         }
       },
       "sources": {

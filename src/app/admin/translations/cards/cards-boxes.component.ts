@@ -1,8 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import type { CardBoard, CardGoal } from '../translations.service';
-import { barPct, boardName, countKey, kiTargetLang, langRows, rankLine } from './cards.logic';
+import { TranslationsService, type CardBoard, type CardGoal } from '../translations.service';
+import { barPct, boardName, cardErrorKey, countKey, kiTargetLang, langRows, rankLine } from './cards.logic';
+import { AnalyticsService } from '../../../core/analytics.service';
+import { ScActionDirective } from '../../../shared/action/sc-action.directive';
+import { ScDialogDirective } from '../../../shared/dialog/sc-dialog.directive';
 import { ScTooltipDirective } from '../../../shared/tooltip/sc-tooltip.directive';
 import { GoalRingComponent } from './goal-ring.component';
 
@@ -45,14 +48,20 @@ const BOX_STYLES = `
 @Component({
   selector: 'sc-cards-goal-box',
   standalone: true,
-  imports: [TranslatePipe, RouterLink, GoalRingComponent, ScTooltipDirective],
+  imports: [TranslatePipe, RouterLink, GoalRingComponent, ScTooltipDirective, ScActionDirective, ScDialogDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <aside class="box" data-test="goal-box" [attr.aria-label]="'admin.translations.cards.box.goalAria' | translate">
-      <h3 class="boxh">
-        <span class="wide">{{ 'admin.translations.cards.box.goal' | translate }}</span>
-        <span class="narrow">{{ 'admin.translations.cards.box.langs' | translate }}</span>
-      </h3>
+      <div class="boxhead">
+        <h3 class="boxh">
+          <span class="wide">{{ 'admin.translations.cards.box.goal' | translate }}</span>
+          <span class="narrow">{{ 'admin.translations.cards.box.langs' | translate }}</span>
+        </h3>
+        <button type="button" scAction tier="tertiary" data-test="langs-open" [attr.aria-label]="'admin.translations.cards.langs.open' | translate"
+                [scTooltip]="'admin.translations.cards.langs.open' | translate" (click)="openSheet()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9" /><circle cx="15" cy="7" r="2" /><circle cx="9" cy="17" r="2" /></svg>
+        </button>
+      </div>
       <sc-goal-ring class="ring hud-dup" [done]="goal().done" [target]="goal().target" [hot]="hot()">
         <small>{{ 'admin.translations.cards.goalCap' | translate }}</small>
         <b>{{ 'admin.translations.cards.goalOf' | translate: { done: goal().done, target: goal().target } }}</b>
@@ -92,10 +101,60 @@ const BOX_STYLES = `
         }
       </ul>
     </aside>
+    @if (sheetOpen()) {
+      <div class="scrim" aria-hidden="true"></div>
+      <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="cards-langs-h" scDialog (scDialogEscape)="closeSheet()" data-test="langs-sheet">
+        <header class="sheet-h">
+          <h2 id="cards-langs-h">{{ 'admin.translations.cards.langs.title' | translate }}</h2>
+          <button type="button" scAction tier="tertiary" [attr.aria-label]="'common.dialog.close' | translate" [scTooltip]="'common.dialog.close' | translate" (click)="closeSheet()">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+          </button>
+        </header>
+        <p class="sheet-p">{{ 'admin.translations.cards.langs.text' | translate }}</p>
+        <ul class="sl" role="list">
+          @for (l of sheetLangs(); track l) {
+            <li>
+              <span class="sn">{{ langName(l) }}</span>
+              <span class="seg" role="radiogroup" [attr.aria-label]="langName(l)">
+                <button type="button" role="radio" [attr.data-test]="'judge-' + l" [attr.aria-checked]="isJudged(l)" [class.on]="isJudged(l)" (click)="setJudged(l, true)">{{ 'admin.translations.cards.langs.mine' | translate }}</button>
+                <button type="button" role="radio" [attr.data-test]="'ki-' + l" [attr.aria-checked]="!isJudged(l)" [class.on]="!isJudged(l)" (click)="setJudged(l, false)">{{ 'admin.translations.cards.langs.ki' | translate }}</button>
+              </span>
+            </li>
+          }
+        </ul>
+        @if (saveError(); as e) { <p class="serr" role="alert" data-test="langs-error">{{ e | translate }}</p> }
+        <footer class="sheet-f">
+          <button type="button" scAction tier="secondary" (click)="closeSheet()">{{ 'admin.translations.cards.langs.cancel' | translate }}</button>
+          <button type="button" scAction tier="primary" data-test="langs-save" [busy]="saving()" (click)="save()">{{ 'admin.translations.cards.langs.save' | translate }}</button>
+        </footer>
+      </section>
+    }
   `,
   styles: [
     BOX_STYLES,
     `
+      .boxhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+      .boxhead svg, .sheet-h svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+      .scrim { position: fixed; inset: 0; z-index: 40; background: color-mix(in srgb, var(--sc-bg-0) 70%, transparent); }
+      .sheet {
+        position: fixed; z-index: 41; left: 50%; top: 50%; translate: -50% -50%; width: min(440px, calc(100vw - 32px));
+        max-height: 80vh; max-height: min(80dvh, calc(100dvh - var(--sc-float-bottom, 0px) - 24px)); overflow: auto;
+        box-sizing: border-box; padding: 16px 18px 18px; border: 1px solid var(--sc-border); border-radius: 14px; background: var(--sc-bg-1); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+      }
+      @media (max-width: 599px) { .sheet { top: auto; bottom: var(--sc-float-bottom, 16px); translate: -50% 0; } }
+      .sheet-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+      .sheet-h h2 { margin: 0; font-size: 1rem; }
+      .sheet-p { margin: 0 0 12px; color: var(--sc-fg-1); font-size: 0.875rem; }
+      .sl { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 8px; }
+      .sl li { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+      .sn { font-size: 0.875rem; color: var(--sc-fg-0); min-width: 0; overflow-wrap: anywhere; }
+      .seg { display: inline-flex; border: 1px solid var(--sc-border); border-radius: 999px; overflow: hidden; }
+      .seg button { min-height: 36px; padding: 4px 12px; border: 0; background: transparent; color: var(--sc-fg-2); font: inherit; font-size: 0.8125rem; cursor: pointer; }
+      .seg button.on { background: color-mix(in srgb, var(--sc-accent) 16%, transparent); color: var(--sc-accent); font-weight: 600; }
+      .seg button:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
+      @media (pointer: coarse) { .seg button { min-height: 44px; } }
+      .serr { margin: 0 0 12px; font-size: 0.8125rem; color: var(--sc-danger); }
+      .sheet-f { display: flex; justify-content: flex-end; gap: 8px; }
       .ring { margin: 0 auto; }
       .ring small { font-size: 0.625rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-fg-2); }
       .ring b { font: 700 1.5rem/1 var(--sc-font-display, inherit); color: var(--sc-fg-0); white-space: nowrap; }
@@ -131,7 +190,11 @@ const BOX_STYLES = `
 })
 export class CardsGoalBoxComponent {
   private readonly translate = inject(TranslateService);
+  private readonly svc = inject(TranslationsService);
+  private readonly analytics = inject(AnalyticsService);
   readonly board = input<CardBoard | null>(null);
+  /** Emitted after the judged languages were saved: the host reloads board and deck. */
+  readonly langsSaved = output<string[]>();
   readonly goal = input<CardGoal>({ done: 0, target: 10, full: false, bonus_taken: false });
   readonly active = input('');
   /** The open list is the language's automatic decisions (`?review=1`), not its deck. */
@@ -142,6 +205,50 @@ export class CardsGoalBoxComponent {
   protected readonly rows = computed(() => langRows(this.board()));
   protected readonly kiLang = computed(() => kiTargetLang(this.board()));
   protected readonly summary = computed(() => this.board()?.ai_summary ?? { decided: 0, review: 0, unsure: 0 });
+
+  protected readonly sheetOpen = signal(false);
+  protected readonly saving = signal(false);
+  protected readonly saveError = signal<string | null>(null);
+  private readonly draft = signal<ReadonlySet<string>>(new Set());
+  protected readonly sheetLangs = computed(() => (this.board()?.langs ?? []).map((l) => l.lang));
+
+  protected openSheet(): void {
+    this.draft.set(new Set((this.board()?.langs ?? []).filter((l) => l.judged).map((l) => l.lang)));
+    this.saveError.set(null);
+    this.sheetOpen.set(true);
+  }
+
+  protected closeSheet(): void {
+    if (!this.saving()) this.sheetOpen.set(false);
+  }
+
+  protected isJudged(lang: string): boolean {
+    return this.draft().has(lang);
+  }
+
+  protected setJudged(lang: string, judged: boolean): void {
+    const next = new Set(this.draft());
+    if (judged) next.add(lang);
+    else next.delete(lang);
+    this.draft.set(next);
+  }
+
+  protected async save(): Promise<void> {
+    if (this.saving()) return;
+    const langs = this.sheetLangs().filter((l) => this.draft().has(l));
+    this.saving.set(true);
+    this.saveError.set(null);
+    try {
+      const saved = await this.svc.setMyLangs(langs);
+      this.analytics.track('admin:translation_langs_change', { judged: saved.length, ki: Math.max(0, this.sheetLangs().length - saved.length) });
+      this.sheetOpen.set(false);
+      this.langsSaved.emit(saved);
+    } catch (e) {
+      this.saveError.set(cardErrorKey('langs-save', e));
+    } finally {
+      this.saving.set(false);
+    }
+  }
 
   protected langName(code: string): string {
     const key = `admin.translations.cards.langNames.${code}`;

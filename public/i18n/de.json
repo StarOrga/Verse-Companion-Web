@@ -1030,7 +1030,6 @@
         "resetView": "Ansicht zurücksetzen",
         "viewHull": "Hülle",
         "viewSchema": "Schema",
-        "view3d": "3D",
         "statsAria": "Schiffswerte",
         "statsClose": "Werte schließen",
         "sheetHandle": "Wertblatt",
@@ -4753,6 +4752,15 @@
           "ru": "Russisch",
           "zh-Hans": "Chinesisch (vereinfacht)",
           "zh-Hant": "Chinesisch (traditionell)"
+        },
+        "langs": {
+          "open": "Sprachen: Stapel oder KI",
+          "title": "Wer beurteilt welche Sprache?",
+          "text": "„Dein Stapel“: du entscheidest die Sprache als Karten. „KI + Veto“: die KI entscheidet, du prüfst und widersprichst.",
+          "mine": "Dein Stapel",
+          "ki": "KI + Veto",
+          "save": "Speichern",
+          "cancel": "Abbrechen"
         }
       },
       "sources": {
