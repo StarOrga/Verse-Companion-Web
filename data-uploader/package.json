@@ -1,6 +1,6 @@
 {
   "name": "@sc-companion/data-uploader",
-  "version": "0.84.1",
+  "version": "0.84.3",
   "description": "Verse Companion - Data Uploader — P4K local extraction & upload tool.",
   "private": true,
   "main": "out/main/index.js",

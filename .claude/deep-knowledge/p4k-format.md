@@ -337,6 +337,32 @@ against a LIVE archive** as of the ship — the first real run is a hand-off.
   `aimAssist.distanceMaxAssignment` (exported as `aimAssistRangeM`, shown as
   "Range (aim assist)").
 
+## Verse locations — StarMapObject + system socpaks (#1194, verified 2026-11-21 on LIVE 4.10, #1195)
+
+- `StarMapObjectType` records are **named by a GUID** (`StarMapObjectType.73efbf7b-…`);
+  the readable type (`Planet`, `Outpost`, `Manmade_VisibleOnInteraction` …) is their
+  `name` field. Reading the ref's record name gives the GUID (`sc_extract/starmap.py`
+  `type_names`).
+- The system nodes (`StantonSolarSystem` …) sit at `starmap/pu/<x>solarsystem.xml`, are
+  `hideInStarmap`, and the stars have **no** parent. 18 of the 20 Stanton L-point records
+  (`Stanton1_L1` …) are `hideInStarmap` on 4.10; most Pyro ones are visible.
+- `Data/ObjectContainers/PU/system/<sys>/*.socpak`: `<sys>system.socpak` = system frame,
+  `stanton1.socpak` … = body frame. Entity `Pos` agrees with its own
+  `EntityComponentOrbit` (`OrbitalRadius` + `OrbitalAngle` around `parentGUID`).
+- Lagrange rest stops, gateways and the Nyx stations are **not** in those socpaks: they
+  sit in the container their opener entity names (`…/system/stanton/lagrangepoints/stanton1_l1.socpak`,
+  `…/jumppoints/…`, Nyx ring segments), in the opener's frame — system pos = opener `Pos`
+  + opener `Rotate` (w,x,y,z) × inner `Pos`. Pyro rest stops land within 7 cm of
+  scunpacked that way. A container opened by several entities (`commarray.socpak`,
+  derelict sets) is a template.
+- The desktop catalog (scunpacked) has Calliope, Clio, Euterpe and Comm Array ST4-22
+  **point-mirrored through microTech**; the socpak values match the in-game measurements
+  (Valalol Star-Citizen-Navigation) to < 1 m. Its Stanton L-point stations are 1–13 Mm
+  away from the socpak values (in-game check pending, see the #1195 PR).
+- How to re-run: the extractor's own `extract_locations` headless with the Data
+  Uploader's embedded Python (`resources/python/python.exe -I`, `sys.path` = the
+  worktree's `data-uploader/python`), ~75 s including the 36 s archive open.
+
 ## References
 
 - CryEngine PAK overview: <https://wiki.starcitizenbase.com/wiki/Data.p4k>

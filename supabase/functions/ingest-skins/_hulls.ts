@@ -94,3 +94,18 @@ export async function checkHull(
   if (bytes.byteLength > MAX_HULL_BYTES) return 'too_large';
   return (await sha256Hex(bytes)) === shaOfHullPath(path) ? 'ok' : 'hash_mismatch';
 }
+
+/**
+ * Skin ids a commit lists more than once, in first-seen order. One upsert
+ * cannot touch a `(ship_id, skin_id)` row twice (Postgres 21000), so a
+ * commit with a duplicate is refused up front with the ids named (#383).
+ */
+export function duplicateSkinIds(skinIds: readonly string[]): string[] {
+  const seen = new Set<string>();
+  const dup = new Set<string>();
+  for (const id of skinIds) {
+    if (seen.has(id)) dup.add(id);
+    else seen.add(id);
+  }
+  return [...dup];
+}

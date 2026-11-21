@@ -130,3 +130,39 @@ def test_envelope_maps_cryengine_axes() -> None:
     assert _envelope({"x": 127.0, "y": 243.0, "z": 57.5}) == {"length": 243.0, "width": 127.0, "height": 57.5}
     assert _envelope({"x": 0, "y": 1, "z": 1}) is None
     assert _envelope(None) is None
+
+
+def test_merge_never_lends_one_heuristic_row_to_two_paints() -> None:
+    # Retaliator, LIVE-4.10.3 (#383): the heuristic row named "Invictus Blue
+    # and Gold" carries the id `retaliator_invictus_grey`, so the Grey paint
+    # matched it by id as well — two rows with one skin id broke the commit.
+    cat = [{"id": "standard", "name": "x", "has_material": True},
+           {"id": "retaliator_invictus_grey", "name": "Invictus Blue and Gold",
+            "icon": "i.dds", "has_material": False}]
+    paints = [{"id": "retaliator_invictus_grey", "name": "Grey", "description": "",
+               "mtl": None, "paintClass": "Paint_Retaliator_Invictus_Grey"},
+              {"id": "retaliator_invictus_blue_gold", "name": "Invictus Blue and Gold",
+               "description": "", "mtl": None, "paintClass": "Paint_Retaliator_Invictus_Blue_Gold"}]
+    rows, build = _merge_paint_catalog(cat, paints)
+    ids = [r["id"] for r in rows]
+    assert len(ids) == len(set(ids))
+    # the name match keeps the server's id and the icon …
+    gold = next(r for r in rows if r["name"] == "Invictus Blue and Gold")
+    assert gold["id"] == "retaliator_invictus_grey" and gold["icon"] == "i.dds"
+    # … the other paint gets its own id (suffixed, since that is taken) and no icon
+    grey = next(r for r in rows if r["name"] == "Grey")
+    assert grey["id"] == "retaliator_invictus_grey_2" and grey["icon"] is None
+    assert [b["id"] for b in build] == ids[1:]
+
+
+def test_merge_gives_a_paint_its_own_id_when_its_row_is_claimed() -> None:
+    cat = [{"id": "standard", "name": "x", "has_material": True},
+           {"id": "avenger_invictus_olive_green", "name": "Invictus Olive", "icon": "o.dds"}]
+    paints = [{"id": "avenger_invictus_olive_green", "name": "Invictus Olive", "description": "",
+               "mtl": None, "paintClass": "Paint_Avenger_Invictus_Olive_Green"},
+              {"id": "avenger_invictus_olive_green", "name": "Invictus Olive", "description": "",
+               "mtl": None, "paintClass": "Paint_Avenger_Invictus_Olive_Green_Warlock"}]
+    rows, _ = _merge_paint_catalog(cat, paints)
+    assert [r["id"] for r in rows] == ["standard", "avenger_invictus_olive_green",
+                                       "avenger_invictus_olive_green_2"]
+    assert rows[2]["icon"] is None
