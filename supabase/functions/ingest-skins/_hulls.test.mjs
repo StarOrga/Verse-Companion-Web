@@ -4,6 +4,7 @@ import { describe, it } from 'node:test';
 import {
   HULLS_DIR,
   droppedHulls,
+  duplicateSkinIds,
   hullPath,
   hullSha,
   isHullPath,
@@ -96,5 +97,14 @@ describe('commit-time hull verification', () => {
     assert.equal(r, 'too_large');
     assert.equal(read, false);
     assert.equal(await checkHull(path, 10, async () => new Uint8Array(MAX_HULL_BYTES + 1)), 'too_large');
+  });
+});
+
+describe('duplicateSkinIds', () => {
+  it('names every id listed more than once, once, in first-seen order', () => {
+    assert.deepEqual(duplicateSkinIds(['standard', 'a', 'b', 'a', 'b', 'a']), ['a', 'b']);
+  });
+  it('is empty for unique ids', () => {
+    assert.deepEqual(duplicateSkinIds(['standard', 'retaliator_invictus_grey']), []);
   });
 });

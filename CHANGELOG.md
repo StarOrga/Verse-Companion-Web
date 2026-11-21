@@ -4,6 +4,120 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.290.1] - 2026-11-21
+
+### Fixed
+- Data.p4k uploads are recognised as ZIP again and no longer load the whole file into memory to read its header.
+- Telemetry and API rate limits can no longer be dodged with a forged client IP; request limits are counted atomically.
+- The translation spend ledger keeps its history when old builds are cleaned up.
+- Concept pages, the codex holo/set stages and the HQ spots stage follow a language switch immediately and no longer act on stale answers.
+- The data uploader also uploads skin packages for ships that were already marked, and refuses incomplete extracts instead of publishing an empty catalog.
+
+### Changed
+- Desktop app language packs (10 languages) are complete and reviewed.
+
+## [0.290.0] - 2026-11-21
+
+### Added
+- Admin translations: every language row shows its coverage as a bar with a percentage; "Start full run" appears only for an approved language that still has gaps.
+
+## [0.289.4] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.5: the header shows the channel as a traffic light instead of three different version strings; the account popover compares your game build with the server and names what is still open.
+- Data Uploader update errors show a translated sentence with a download button instead of the raw HTTP error with response headers.
+- Uploader releases: one build per version; a release is registered only after its run is green and the mirror serves that build. Installs stuck on the second 0.84.3 build update again.
+
+## [0.289.3] - 2026-11-21
+
+### Fixed
+- Codex holotable: a tall hull is no longer cut off at the bottom of the hologram; the zoom is capped per ship so the turning hull keeps its full height, flat hulls keep the bigger size (admin feedback #392).
+
+## [0.289.2] - 2026-11-21
+
+### Removed
+- Typing without focus no longer opens or fills the main search (Verse, HQ, Codex); it collided with page hotkeys and element focus. Ctrl+K and `/` still open the search (admin feedback #385).
+
+## [0.289.1] - 2026-11-21
+
+### Fixed
+- Admin feedback: topics the routine creates read "KI" (EN "AI") with the bot icon instead of "Ohne Konto"; "Ohne Konto" stays for a user topic whose account is gone (admin feedback #390).
+
+## [0.289.0] - 2026-11-21
+
+### Added
+- Verse News: in-game events are their own category ("Ingame-Events" chip, /verse/news?filter=events), fed by the event timeline and event posts in the feed; running and upcoming events are teased above and below the stream and in the Verse hub (admin feedback #389).
+
+## [0.288.10] - 2026-11-21
+
+### Changed
+- Codex holotable: the 3D model is much bigger (hologram area 58 × 82 % of the stage, zooming with its width) and the stat panels left and right are narrower with smaller text; tablets and phones give the model more room too (admin feedback #392).
+
+## [0.288.9] - 2026-11-21
+
+### Fixed
+- Verse map: hovering the HQ outpost no longer draws corner brackets, only a faint glow; the HQ label sits upright above the outpost instead of running into the planet and the news card, and the hover area follows the page scroll (admin feedback #388).
+
+## [0.288.8] - 2026-11-21
+
+### Fixed
+- Admin feedback: the "Wer?" filter no longer shows an "Unbekannt" chip. Topics without an account used to share one bucket labelled after whichever row came first; each sender now has its own chip — the PostHog-Wächter, the Dienst-Wächter (hourly service check, with its own avatar tooltip) and "Ohne Konto" for a topic whose author is gone or that the routine filed itself. The thread uses the same names (admin feedback #390).
+
+## [0.288.7] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.4: two liveries that shared an icon are paired by id, so "Invictus Blue and Gold" no longer shows the Grey icon (Retaliator, Constellations, Avengers, Syulen)
+- Data Uploader: a crashed 3D or silhouette build and a refused upload now name their cause in the log
+- Data Uploader: an extract the 3D models still need is no longer swept the next day, so no full P4K re-read
+
+## [0.288.6] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.2: Verse locations read from the real game data get readable types, real system positions for the Lagrange rest stops, gateways and Nyx stations, system rows and cities; a star is no longer a fallback position (#1195). The microTech moons were already right — the bundled catalog has them mirrored.
+
+## [0.288.5] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.3: 3D skins of the Retaliator, the Constellation Taurus / Phoenix, the Avenger variants and the Syulen variants upload again. Two liveries of one ship could share one skin id, so the server refused the whole ship on every upload; each livery now keeps an id of its own, and the server names a duplicate id (400 `duplicate_skin_id`) instead of failing with a bare error (admin feedback #383). Needs a new uploader run.
+
+## [0.288.4] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.2: the 3D step reports a sign of life before every paint icon it renders, so a slow icon run under load no longer trips the 20-minute stall watchdog, and a stall during the first ship is reported as `ships` instead of `discover` (admin feedback #382).
+
+## [0.288.3] - 2026-11-21
+
+### Fixed
+- Catalog uploads: a batch that runs into the database statement timeout and is retried smaller no longer opens an error issue in PostHog — it is counted as its own `server:ingest_timeout` event with the op, table and batch size; only a run's final failure is an error. Copying the unchanged tables at the end of a re-upload now retries a slow chunk with half the rows (2000 → 1000 → 500) instead of failing the finalize step (admin feedback #380).
+
+## [0.288.2] - 2026-11-21
+
+### Fixed
+- Type to search now works in the header every reader gets by default: on Verse, HQ and every other page whose only search is the header search, a letter typed with nothing focused opens the search with that letter. The 0.286.0 version only reached the beta header, so it did nothing for readers without the shell beta. Codex pages keep starting their own search bar.
+
+## [0.288.1] - 2026-11-21
+
+### Fixed
+- Data Uploader: dismantle yield and the "dismantlable" flag now come from the game data — the item's recipe × the global dismantle efficiency (0.5), minus the blacklisted resources. Before, every blueprint came out "unknown" (#1058). Needs a new catalog upload.
+
+## [0.288.0] - 2026-11-21
+
+### Added
+- HQ Jetzt: warning chips in the live strip for low fuel (10 minutes from the event, hydrogen or quantum named) and a queued hangar request with its position and remaining wait (#1193)
+
+### Changed
+- Shared contracts with the desktop app: the web copy is now the master, the app mirrors it with a sync script
+
+## [0.287.0] - 2026-11-21
+
+### Added
+- HQ session logbook: a costs line per session — fines with the paid aUEC, injuries, medbed treatments and insurance requests (#1192)
+- HQ Statistik: fines and fuel-warning tiles from the events the desktop app already uploads (#1191)
+- Data Uploader: extracts the Verse locations from the game data (starmap records + socpak positions) and can ingest them per build; the upload stays off until the switch-over (#1194)
+
+### Fixed
+- Codex silhouettes: every item, weapon, component and ammo without a traceable mesh now records why, naming skinned meshes (.skin/.chr/.cdf), so the coverage tile explains every missing silhouette (#1004)
+
 ## [0.286.2] - 2026-11-21
 
 ### Fixed

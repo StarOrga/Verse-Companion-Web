@@ -69,6 +69,32 @@ describe('HqStatsComponent', () => {
     });
   });
 
+  describe('fines and fuel tiles (#1191)', () => {
+    async function tiles(data: Record<string, unknown>): Promise<HTMLElement[]> {
+      const fixture = mount(vi.fn().mockName('rpc').mockResolvedValue({ data, error: null }));
+      await fixture.whenStable();
+      fixture.detectChanges();
+      return Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button.tile'));
+    }
+    const pick = (ts: HTMLElement[], id: string) => ts.find((t) => t.textContent?.includes(`hq.stats.tile.${id}.name`)) as HTMLElement;
+
+    it('shows the fine count with the paid aUEC and the fuel warnings', async () => {
+      const ts = await tiles({ fines: { total: 2, amount: 4500, series: [] }, fuel: { total: 3, series: [] } });
+      const fines = pick(ts, 'fines');
+      expect(fines.querySelector('.t-value')?.textContent).toBe('2');
+      expect(fines.textContent).toContain('hq.stats.tile.fines.sub');
+      expect(pick(ts, 'fuel').querySelector('.t-value')?.textContent).toBe('3');
+    });
+
+    it('a fine without an amount says so instead of 0 aUEC; no events show zero, never an error', async () => {
+      const ts = await tiles({ fines: { total: 1, amount: 0, series: [] }, missions: { total: 1, series: [] } });
+      expect(pick(ts, 'fines').textContent).toContain('hq.stats.tile.fines.subNoAmount');
+      const fuel = pick(ts, 'fuel');
+      expect(fuel.querySelector('.t-value')?.textContent).toBe('0');
+      expect(fuel.classList.contains('zero')).toBe(true);
+    });
+  });
+
   it('shows marked, inert preview tiles under an app overlay for empty data - no wall of zeros, no error', async () => {
     const fixture = mount(vi.fn().mockName('rpc').mockResolvedValue({ data: {}, error: null }));
     await fixture.whenStable();
@@ -78,8 +104,8 @@ describe('HqStatsComponent', () => {
     expect(ghost).toBeTruthy();
     expect(ghost.hasAttribute('inert')).toBe(true);
     expect(ghost.getAttribute('aria-hidden')).toBe('true');
-    expect(ghost.querySelectorAll('.tile').length).toBe(7);
-    expect(ghost.querySelectorAll('.stamp').length).toBe(7);
+    expect(ghost.querySelectorAll('.tile').length).toBe(9);
+    expect(ghost.querySelectorAll('.stamp').length).toBe(9);
     expect(el.querySelectorAll('button.tile').length).toBe(0);
     expect(el.querySelector('.overlay sc-hq-app-launch')).toBeTruthy();
     expect(el.querySelector('.overlay a[href="/apps"]')).toBeNull();

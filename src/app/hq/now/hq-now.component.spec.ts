@@ -164,6 +164,27 @@ describe('HqNowComponent', () => {
       ]);
       expect((mount(live).nativeElement as HTMLElement).querySelector('.zones')).toBeNull();
     });
+
+    it('adds the fuel and hangar hints of this session as warning chips (#1193)', () => {
+      const live = fakeLive({ location: { name: 'Lorville', system: null }, presence: presence(1000) }, [
+        { ...ev(0), type: 'fuel.low', data: { fuel: 'quantum', key: 'fuel:quantum' } },
+        { ...ev(1), type: 'hangar.queue', data: { position: 3, estimatedWaitSec: 600, key: 'hangar:1' } },
+        { ...ev(2), type: 'session.joined' },
+      ]);
+      const el = mount(live).nativeElement as HTMLElement;
+      expect(zoneTexts(el)).toEqual(['hq.now.zone.unknown', 'hq.now.hint.fuel.quantum', 'hq.now.hint.hangarWait']);
+      expect(el.querySelector('.hint-fuel')?.classList.contains('warn')).toBe(true);
+      expect(el.querySelector('.hint-hangar')?.classList.contains('warn')).toBe(true);
+    });
+
+    it('drops the hangar hint once the request is ready', () => {
+      const live = fakeLive({ location: { name: 'Lorville', system: null }, presence: presence(1000) }, [
+        { ...ev(0), type: 'hangar.ready', data: { key: 'hangar:1' } },
+        { ...ev(1), type: 'hangar.queue', data: { position: 3, estimatedWaitSec: 600, key: 'hangar:1' } },
+        { ...ev(2), type: 'session.joined' },
+      ]);
+      expect((mount(live).nativeElement as HTMLElement).querySelector('.hint-hangar')).toBeNull();
+    });
   });
 
   it('renders the location anchor as system > place with the ship and the mission count', () => {

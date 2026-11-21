@@ -12,6 +12,7 @@
 
 import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
 import { createSidecarLogger } from './bridge-log.js';
+import { sidecarExitError, stderrLevel, StderrTail } from '../lib/sidecar-exit.js';
 import { createInterface } from 'node:readline';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
@@ -341,11 +342,17 @@ export function startSkinExport(
     onEvent(ev);
   });
 
+  // stderr reached only the renderer, so a crash left no trace in main.log.
+  // Crash signatures are logged as errors; the tail rides on the exit error.
+  const stderrTail = new StderrTail();
   child.stderr.on('data', (chunk: Buffer) => {
     const text = chunk.toString('utf-8').trim();
     if (!text) return;
     for (const line of text.split('\n')) {
-      onEvent({ type: 'log', level: 'warn', message: `[py.stderr] ${line}` });
+      stderrTail.push(line.trim());
+      const ev: PythonExtractEvent = { type: 'log', level: stderrLevel(line), message: `[py.stderr] ${line}` };
+      logEvent(ev);
+      onEvent(ev);
     }
   });
 
@@ -362,11 +369,9 @@ export function startSkinExport(
     child.on('exit', (code, signal) => {
       if (cancelled) return resolveP({ ok: false, error: 'cancelled' });
       if (code === 0 && ships) return resolveP({ ok: true, ships });
-      return resolveP({
-        ok: false,
-        error:
-          lastError ?? (signal ? `killed by signal ${signal}` : `python exited with code ${code}`),
-      });
+      const error = sidecarExitError({ lastError, code, signal, tail: stderrTail });
+      log.error(`[skin-bridge] skin export ended without a result: ${error}`);
+      return resolveP({ ok: false, error });
     });
   });
 

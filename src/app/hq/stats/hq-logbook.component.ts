@@ -19,7 +19,7 @@ const FIRST_CARDS = 6;
 
 /**
  * HQ Statistik "Logbuch" (#896): one card per game session from the SCC-App live events —
- * duration, quantum jumps, contracts, aUEC balance and losses. A session without a quit is
+ * duration, quantum jumps, contracts, aUEC balance, losses and costs (#1192). A session without a quit is
  * shown as ended without one; the running one as live. Without live sync: the SCC-App prompt.
  */
 @Component({
@@ -70,6 +70,10 @@ const FIRST_CARDS = 6;
               @if (losses(s) > 0) {
                 <p class="c-sub">{{ 'hq.logbook.lossesSub' | translate: { deaths: fmt(s.deaths), ships: fmt(s.shipsLost), claims: fmt(s.claims) } }}</p>
               }
+              @let costs = costParts(s);
+              @if (costs.length > 0) {
+                <p class="c-sub c-costs"><span class="c-costs-label">{{ 'hq.logbook.costs.label' | translate }}</span> {{ costs.join(' · ') }}</p>
+              }
             </li>
           }
         </ul>
@@ -103,6 +107,7 @@ const FIRST_CARDS = 6;
       dd { margin: 0; font: 600 1.15rem / 1.2 var(--sc-font-display); font-variant-numeric: tabular-nums; }
       dd.warn { color: var(--sc-warning); }
       .c-sub { margin: 0; color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor)); }
+      .c-costs-label { color: var(--sc-fg-1); font-weight: 600; }
       .note { margin: var(--sc-space-2, 8px) 0 0; font-size: max(0.8rem, var(--sc-fs-floor)); }
     `,
   ],
@@ -148,6 +153,20 @@ export class HqLogbookComponent implements OnInit {
 
   losses(s: LogbookSession): number {
     return s.deaths + s.shipsLost + s.claims;
+  }
+
+  /** The "Kosten" line (#1192): one part per non-zero cost, fines with their aUEC sum when the payload carried one. */
+  costParts(s: LogbookSession): string[] {
+    const part = (key: string, n: number) => this.i18n.instant(`hq.logbook.costs.${key}.${n === 1 ? 'one' : 'other'}`, { n: this.fmt(n) });
+    const out: string[] = [];
+    if (s.fines > 0) {
+      const fines = part('fines', s.fines);
+      out.push(s.fineAmount > 0 ? this.i18n.instant('hq.logbook.costs.fineAmount', { fines, amount: this.fmt(s.fineAmount) }) : fines);
+    }
+    if (s.injuries > 0) out.push(part('injuries', s.injuries));
+    if (s.medbeds > 0) out.push(part('medbeds', s.medbeds));
+    if (s.claimRequests > 0) out.push(part('claimRequests', s.claimRequests));
+    return out;
   }
 
   fmt(n: number): string {

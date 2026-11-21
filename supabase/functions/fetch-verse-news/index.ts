@@ -46,6 +46,7 @@ import { edgeCodecs } from './image-codecs.ts';
 import { createFeedMemo } from './feed-memo.ts';
 import { pickScheduledDeployment, type ScheduledDeployment } from './scheduled-deployment.ts';
 import { withPosthog } from '../_shared/posthog.ts';
+import { cleanXml } from './xml-text.ts';
 
 type Channel = 'comm-link' | 'spectrum' | 'status' | 'patch' | 'youtube';
 
@@ -93,10 +94,6 @@ const RSI_YT_CHANNEL_ID = Deno.env.get('RSI_YOUTUBE_CHANNEL_ID') ?? 'UCTeLqJq1mX
 const YT_FEED_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${RSI_YT_CHANNEL_ID}`;
 
 const RSI_BASE = 'https://robertsspaceindustries.com';
-
-function cleanXml(s: string): string {
-  return s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
-}
 
 const RSI_HOST_ALLOWLIST = new Set([
   'robertsspaceindustries.com',

@@ -422,6 +422,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›file counts›value": [
+      {
+        "ship": "claude/backlgo-a9602a",
+        "by": "claude",
+        "value": "regenerated from the batch tree",
+        "decided": true,
+        "at": "2026-11-21T00:40:37.960Z",
+        "hunks": [
+          "f8d4d2f34051"
+        ]
+      }
+    ],
     ".claude/project-map.md›file-counts›value": [
       {
         "ship": "claude/data-uploader-extraction-spike-be3dcb",
@@ -555,6 +567,16 @@
         "at": "2026-11-16T21:00:36.879Z",
         "hunks": [
           "0de295251c78"
+        ]
+      },
+      {
+        "ship": "claude/die-data-uploader-logs-fa6b9e",
+        "by": "Jerry",
+        "value": "regenerated from the merged tree (auto-generated file)",
+        "decided": true,
+        "at": "2026-11-21T12:42:28.790Z",
+        "hunks": [
+          "2f147d1433a6"
         ]
       }
     ],
@@ -731,6 +753,46 @@
         "hunks": [
           "bf1e7bff654c"
         ]
+      },
+      {
+        "ship": "#1228",
+        "by": "Jerry",
+        "value": "3693 tracked files."
+      },
+      {
+        "ship": "fix/1058-dismantle-yield",
+        "by": "JerryT2T",
+        "value": "3694 tracked files (regenerated from the merged tree)",
+        "decided": true,
+        "at": "2026-11-21T11:51:58.519Z",
+        "hunks": [
+          "c4aa3a00a229"
+        ]
+      },
+      {
+        "ship": "#1234",
+        "by": "Jerry",
+        "value": "3696 tracked files."
+      },
+      {
+        "ship": "chore/routine-agent-rules",
+        "by": "JerryT2T",
+        "value": "regenerated count of the merged tree (generated file)",
+        "decided": true,
+        "at": "2026-11-21T14:24:15.830Z",
+        "hunks": [
+          "69918f0fab30"
+        ]
+      },
+      {
+        "ship": "fix/audit-2026-11-21",
+        "by": "JerryT2T",
+        "value": "3716 tracked files (generated, newer than upstream 3708)",
+        "decided": true,
+        "at": "2026-11-21T17:31:25.797Z",
+        "hunks": [
+          "b3f5a9300359"
+        ]
       }
     ],
     ".claude/project-map.md›header›tracked-files": [
@@ -762,6 +824,18 @@
         "at": "2026-11-15T14:09:55.079Z",
         "hunks": [
           "1ac2ea1f3954"
+        ]
+      }
+    ],
+    ".claude/project-map.md›ingest-catalog count›value": [
+      {
+        "ship": "claude/backlgo-a9602a",
+        "by": "claude",
+        "value": "regenerated from the batch tree",
+        "decided": true,
+        "at": "2026-11-21T00:40:37.960Z",
+        "hunks": [
+          "f4ea4b75c10d"
         ]
       }
     ],
@@ -1166,6 +1240,30 @@
         "at": "2026-11-15T15:58:54.978Z",
         "hunks": [
           "c0342f654b62"
+        ]
+      }
+    ],
+    ".claude/project-map.md›structure›data-uploader count": [
+      {
+        "ship": "claude/die-data-uploader-logs-fa6b9e",
+        "by": "Jerry",
+        "value": "regenerated from the merged tree (auto-generated file)",
+        "decided": true,
+        "at": "2026-11-21T12:42:28.790Z",
+        "hunks": [
+          "150b4ba6998a"
+        ]
+      }
+    ],
+    ".claude/project-map.md›supabase counts›value": [
+      {
+        "ship": "claude/backlgo-a9602a",
+        "by": "claude",
+        "value": "regenerated from the batch tree",
+        "decided": true,
+        "at": "2026-11-21T00:40:37.960Z",
+        "hunks": [
+          "659959a4df7b"
         ]
       }
     ],
@@ -1860,6 +1958,16 @@
         "hunks": [
           "83cf0eba4627"
         ]
+      },
+      {
+        "ship": "claude/backlgo-a9602a",
+        "by": "claude",
+        "value": "0.287.0 (this ship bumps past 0.286.2)",
+        "decided": true,
+        "at": "2026-11-21T10:35:53.985Z",
+        "hunks": [
+          "d0c85bbf06b5"
+        ]
       }
     ],
     "public/release-notes.json›current›version": [
@@ -2083,6 +2191,16 @@
         "at": "2026-11-11T23:19:52.365Z",
         "hunks": [
           "65f4d0fd9795"
+        ]
+      },
+      {
+        "ship": "fix/audit-2026-11-21",
+        "by": "JerryT2T",
+        "value": "0.290.0 (generated from CHANGELOG by prebuild, newer than upstream 0.289.4)",
+        "decided": true,
+        "at": "2026-11-21T17:31:25.797Z",
+        "hunks": [
+          "1c7153c93e6a"
         ]
       }
     ],

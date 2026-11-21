@@ -63,6 +63,32 @@ export const INSTALL_REPLY_TIMEOUT_MS = 20_000;
 
 export type InstallNoticeState = 'preparing' | 'waiting' | 'closing' | 'failed';
 
+/**
+ * What went wrong with an update check, as the renderer is told. The raw
+ * electron-updater message (status line + response headers + body) only goes
+ * to main.log and telemetry; the window shows a translated sentence per code.
+ *   unknown-build  the feed refused this build's release token (401/403): only
+ *                  a manual install of a current release gets updates again
+ *   offline        no connection to the feed
+ *   server         the feed answered with a server error (5xx)
+ *   not-installed  a staged update did not install on the last quit
+ *   other          anything else
+ */
+export type UpdateErrorCode = 'unknown-build' | 'offline' | 'server' | 'not-installed' | 'other';
+
+export function classifyUpdateError(message: string): UpdateErrorCode {
+  const m = message ?? '';
+  if (/invalid_or_revoked_release_token/.test(m) || /HttpError:\s*40[13]\b/.test(m) || /^\s*40[13]\b/.test(m)) {
+    return 'unknown-build';
+  }
+  if (/HttpError:\s*5\d\d\b/.test(m) || /^\s*5\d\d\b/.test(m)) return 'server';
+  if (/did not install/.test(m)) return 'not-installed';
+  if (/ENOTFOUND|EAI_AGAIN|ECONNREFUSED|ECONNRESET|ETIMEDOUT|ENETUNREACH|net::ERR_|getaddrinfo|socket hang up|timed? ?out/i.test(m)) {
+    return 'offline';
+  }
+  return 'other';
+}
+
 export interface BannerInput {
   /** The raw update event type, or the install notice. */
   type:
@@ -125,7 +151,9 @@ export function bannerModel(ev: BannerInput): BannerModel {
         button: installBtn,
       };
     case 'error':
-      return { visible: true, textKey: 'update.error', params: { message: ev.message ?? '' }, tone: 'error', button: null };
+      // An update failure is no banner: the connection chip carries a warning dot
+      // and its popover explains the error (renderer `paintConnection`).
+      return HIDDEN;
     case 'install-state': {
       const params = { version: ev.version ?? '' };
       switch (ev.state) {

@@ -34,6 +34,10 @@ import { manufacturerAccent } from './holo-manufacturer';
 interface ModelViewerScene {
   readonly target: THREE.Object3D;
   queueRender(): void;
+  /** model-viewer's framing (set before its load event): the hull's box, the orbit target and its sphere, the framed field of view. */
+  readonly boundingBox?: THREE.Box3;
+  readonly boundingSphere?: THREE.Sphere;
+  readonly framedFoVDeg?: number;
 }
 
 /** model-viewer's three scene, or null when this model-viewer build hides it differently. */
@@ -181,10 +185,10 @@ const GLB_HEAD_TIMEOUT_MS = 10_000;
                   [attr.exposure]="holo() ? 1.15 : 1.0"
                   environment-image="neutral"
                   [attr.tone-mapping]="holo() ? 'neutral' : null"
-                  [attr.min-camera-orbit]="holo() ? 'auto 15deg 70%' : null"
+                  [attr.min-camera-orbit]="holo() ? holoMinOrbit() : null"
                   [attr.max-camera-orbit]="holo() ? 'auto 115deg 180%' : null"
                   [attr.disable-pan]="holo() ? '' : null"
-                  [attr.camera-orbit]="holo() ? HOLO_START_ORBIT : DEFAULT_ORBIT"
+                  [attr.camera-orbit]="holo() ? holoStartOrbit() : DEFAULT_ORBIT"
                   interaction-prompt="none"
                   (load)="onModelLoad($event)"
                   (error)="onModelError()"
@@ -848,8 +852,16 @@ export class ShipSkinViewerComponent {
   /**
    * Start view of the landing hologram: half a turn further, so the ship
    * faces the reader when the page opens and the turntable starts from there.
+   * The distance is the bounding-sphere fit (105 %) divided by holoZoom, so the
+   * hull's on-screen size scales with it; the closest user zoom (70 %) along.
+   * The zoom never exceeds what the loaded hull allows (holoFit), so a tall hull
+   * is never cut at the canvas edge (admin feedback #392).
    */
-  protected readonly HOLO_START_ORBIT = '215deg 75deg 105%';
+  protected readonly holoStartOrbit = computed(() => `215deg ${HOLO_POLAR_DEG}deg ${orbitRadius(105, this.zoom())}%`);
+  protected readonly holoMinOrbit = computed(() => `auto 15deg ${orbitRadius(70, this.zoom())}%`);
+  /** Largest zoom at which the loaded, turning hull keeps its full height on the canvas (Infinity until it loaded). */
+  private readonly holoFit = signal(Number.POSITIVE_INFINITY);
+  private readonly zoom = computed(() => Math.min(this.holoZoom(), this.holoFit()));
 
   readonly shipId = input.required<string>();
 
@@ -899,6 +911,12 @@ export class ShipSkinViewerComponent {
   readonly holo = input(false);
   /** Reduced motion: no turntable, no scan loops, the model simply appears. */
   readonly still = input(false);
+  /**
+   * Hologram size factor (holo only): 1 frames the hull's bounding sphere; the
+   * landing holotable passes more, because a flat, long hull fills only a
+   * slice of that sphere and its box is wider than tall (admin feedback #392).
+   */
+  readonly holoZoom = input(1);
   /**
    * Whether this ship has an interactive model at all. The hero switch is only
    * offered when the answer is yes, and only this component can answer it: the
@@ -1109,6 +1127,7 @@ export class ShipSkinViewerComponent {
     this.modelLoading.set(false);
     this.modelError.set(false);
     const target = event?.target ?? null;
+    if (this.holo()) this.holoFit.set(holoFitFromScene(modelViewerScene(target)));
     // Holo stage: the concept-hologram look on model-viewer's own three scene.
     // Anywhere else, or when the scene is not reachable, the PBR hologram tint.
     if (this.holo() && this.dressModel(target)) {
@@ -1227,4 +1246,82 @@ export class ShipSkinViewerComponent {
     this.mode.set(has3d ? '3d' : 'paint');
     this.modelLoading.set(has3d);
   }
+}
+
+/** Orbit radius in % for a base radius and a zoom factor (zoom ≤ 0 or NaN counts as 1). */
+export function orbitRadius(base: number, zoom: number): number {
+  const z = Number.isFinite(zoom) && zoom > 0 ? zoom : 1;
+  return Math.round((base / z) * 10) / 10;
+}
+
+/** Camera polar angle of the landing hologram's start view (15 deg above the horizon). */
+const HOLO_POLAR_DEG = 75;
+
+/** The hologram zoom cap for the loaded hull in model-viewer's framing; Infinity when the framing is unreadable. */
+function holoFitFromScene(scene: ModelViewerScene | null): number {
+  const sphere = scene?.boundingSphere;
+  const fov = scene?.framedFoVDeg;
+  if (!scene || !sphere || !(sphere.radius > 0) || !(fov && fov > 0)) return Number.POSITIVE_INFINITY;
+  // Vertices in the target's own frame, the one model-viewer measured the sphere in.
+  scene.target.updateWorldMatrix(true, true);
+  const toTarget = new THREE.Matrix4().copy(scene.target.matrixWorld).invert();
+  const m = new THREE.Matrix4();
+  const v = new THREE.Vector3();
+  const c = sphere.center;
+  return holoFitZoom(
+    (visit) => {
+      scene.target.traverse((o) => {
+        const pos = (o as THREE.Mesh).isMesh ? (o as THREE.Mesh).geometry?.getAttribute('position') : undefined;
+        if (!pos) return;
+        m.multiplyMatrices(toTarget, o.matrixWorld);
+        for (let i = 0; i < pos.count; i++) {
+          v.fromBufferAttribute(pos, i).applyMatrix4(m).sub(c);
+          visit(Math.hypot(v.x, v.z), v.y);
+        }
+      });
+    },
+    sphere.radius,
+    fov,
+  );
+}
+
+/**
+ * Largest hologram zoom at which a hull keeps its full height on the canvas
+ * while the turntable turns it once (admin feedback #392): the landing zooms
+ * by the box's aspect, which suits a long, flat hull, but cut a tall one at the
+ * canvas bottom. `points` hands every vertex over as its distance from the
+ * turn axis (`rho`) and its height (`y`), both relative to the orbit target;
+ * `radius` is model-viewer's framing sphere, `fovDeg` its framed vertical field
+ * of view (a narrow canvas only widens it, so the cap stays safe). Perspective
+ * counts: a vertex nearer the camera stands taller. `margin` is the share of
+ * the canvas half-height the hull may take. Never below 1: model-viewer's own
+ * framing already holds the whole hull.
+ */
+export function holoFitZoom(
+  points: (visit: (rho: number, y: number) => void) => void,
+  radius: number,
+  fovDeg: number,
+  polarDeg = HOLO_POLAR_DEG,
+  base = 105,
+  margin = 0.94,
+): number {
+  const half = (fovDeg / 2) * (Math.PI / 180);
+  if (!(radius > 0) || !(half > 0) || !(margin > 0)) return Number.POSITIVE_INFINITY;
+  const k = 1 / (margin * Math.tan(half));
+  const phi = polarDeg * (Math.PI / 180);
+  const sp = Math.sin(phi);
+  const cp = Math.cos(phi);
+  // A vertex turning at radius rho: its depth towards the camera is sp·rho·cos + cp·y and its
+  // screen height -cp·rho·cos + sp·y; the camera distance it needs is depth + |height| / (margin·tan),
+  // piecewise linear in cos, so the turn's extremes (cos = ±1) bound it.
+  let need = 0;
+  points((rho, y) => {
+    for (const r of [rho, -rho]) {
+      const n = sp * r + cp * y + Math.abs(sp * y - cp * r) * k;
+      if (n > need) need = n;
+    }
+  });
+  if (!(need > 0)) return Number.POSITIVE_INFINITY;
+  const distance = ((base / 100) * radius) / Math.sin(half);
+  return Math.max(1, Math.floor((distance / need) * 100) / 100);
 }

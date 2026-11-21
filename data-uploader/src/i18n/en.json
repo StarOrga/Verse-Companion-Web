@@ -242,9 +242,10 @@
     "closing": "Update v{{version}}: the app closes in a moment and restarts by itself after about 2-3 minutes. No window appears in between.",
     "installFailed": "The installation of v{{version}} could not be started. Please try again.",
     "supersedes": "A newer version v{{version}} is being downloaded and replaces the staged v{{old}}…",
-    "error": "Update error: {{message}}",
     "manual": "New version v{{version}} available — the portable build can't self-update, please download it manually.",
-    "openDownload": "Open download page"
+    "openDownload": "Open download page",
+    "errorTitle": "Update not possible.",
+    "downloadLatest": "Get the latest version"
   },
   "session": {
     "title": "Web connection",
@@ -455,9 +456,9 @@
       "text": "New game patch {{patch}} — upload starts automatically in",
       "now": "Upload now",
       "cancel": "Cancel",
-      "partsText": "{{patch}} is on the server — still open: {{parts}}. Continuing automatically in"
+      "partsText": "Still open: {{parts}}. Continuing automatically in"
     },
-    "continuingParts": "{{channel}} {{version}} is on the server — still open: {{parts}}. Continuing automatically."
+    "continuingParts": "Still open: {{parts}}. Continuing automatically."
   },
   "subthemes": {
     "allCurrent": "The server already holds this build in full — nothing changed, extraction and upload are skipped. \"Force everything\" runs anyway.",
@@ -645,5 +646,24 @@
       "skinsUpload": "Upload models"
     },
     "silUploadFailed": "Silhouettes could not be uploaded — the Codex stays without outlines"
+  },
+  "conn": {
+    "local": "Your game",
+    "server": "Server codex",
+    "entries": "Entries",
+    "entryCount": "{{n}} entries",
+    "same": "same",
+    "differs": "different build",
+    "open": "Still open",
+    "build": "Build {{n}}",
+    "stateOk": "The server has your game build complete",
+    "stateWarn": "The server does not have your game build complete yet"
+  },
+  "updateErrors": {
+    "unknown-build": "The update server does not know this uploader build. Install the latest version once by hand; updates run automatically again after that.",
+    "offline": "The update server cannot be reached right now. The next attempt runs automatically.",
+    "server": "The update server reported an error. The next attempt runs automatically.",
+    "not-installed": "The last update was not installed. Get the latest version and install it by hand.",
+    "other": "The update check failed. Details are in the log."
   }
 }

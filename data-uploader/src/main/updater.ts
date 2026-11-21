@@ -31,9 +31,11 @@ import { isStagedSuperseded, shouldReplaceStaged } from '../lib/update-staleness
 import {
   CLOSING_NOTICE_MS,
   effectiveUpdateEventType,
+  classifyUpdateError,
   nextInstallStep,
   type InstallPhase,
   type InstallReply,
+  type UpdateErrorCode,
 } from '../lib/update-install.js';
 import { safeSend } from '../lib/safe-send.js';
 import { fetchWithTimeout } from '../lib/fetch-timeout.js';
@@ -52,7 +54,8 @@ export type UpdateEventPayload =
   // renderer shows a dismissible "download vX manually" hint on the first screen
   // only — never an error, and never when already up to date.
   | { type: 'manual'; currentVersion: string; latestVersion: string }
-  | { type: 'error'; message: string }
+  // The raw message stays in main.log / telemetry; the renderer gets the code only.
+  | { type: 'error'; code: UpdateErrorCode }
   // The install click's visible state (preparing / waiting for work / closing /
   // could not start). Takes precedence over the background-check states below.
   | { type: 'install-state'; state: 'preparing' | 'waiting' | 'closing' | 'failed'; version: string };
@@ -325,7 +328,7 @@ export function initAutoUpdater(channel: ReleaseChannel = 'stable'): void {
     // A failed re-check (or a failed download of a newer release) must not take
     // away the install button of the update that is already staged.
     if (stagedUpdate) broadcast({ type: 'downloaded', version: stagedUpdate });
-    else broadcast({ type: 'error', message: err?.message ?? String(err) });
+    else broadcast({ type: 'error', code: classifyUpdateError(err?.message ?? String(err)) });
   });
 
   // Defer first check so the UI is interactive before any network call.
@@ -333,7 +336,7 @@ export function initAutoUpdater(channel: ReleaseChannel = 'stable'): void {
     log.info(`[updater] start-up check on channel ${currentChannel} (running v${TOOL_VERSION})`);
     autoUpdater.checkForUpdates().catch((err) => {
       log.warn('[updater] checkForUpdates failed:', err);
-      broadcast({ type: 'error', message: err?.message ?? String(err) });
+      broadcast({ type: 'error', code: classifyUpdateError(err?.message ?? String(err)) });
       // Some failures (e.g. a missing app-update.yml) only reject the promise
       // and never fire the 'error' event, so report here too — reportUpdateError
       // de-dupes so the 'error' handler firing as well is harmless.
@@ -471,7 +474,7 @@ function checkPendingUpdate(): void {
   reportUpdateError(new Error(message));
   // Shown once the renderer asks for the last event; the next successful check
   // replaces it with the normal "update available" flow.
-  lastEvent = { type: 'error', message };
+  lastEvent = { type: 'error', code: 'not-installed' };
 }
 
 /**

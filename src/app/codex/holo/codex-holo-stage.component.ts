@@ -1672,8 +1672,8 @@ export class CodexHoloStageComponent implements DetailSlotSource {
     if (!this.interior()) return null;
     return startDeckOf(this.interior(), this.rolePreset(), this.filterDecks().filter((d) => !d.fallback || this.filterDecks().length === 1).map((d) => d.key));
   });
-  readonly presetLabel = computed(() => this.roleName() ?? this.t.instant(`codex.holo.interior.preset.${this.rolePreset()}`));
-  readonly presetTitle = computed(() => this.t.instant('codex.holo.interior.presetTitle', { role: this.presetLabel() }));
+  readonly presetLabel = computed(() => (this.deckLang(), this.roleName() ?? this.t.instant(`codex.holo.interior.preset.${this.rolePreset()}`)));
+  readonly presetTitle = computed(() => (this.deckLang(), this.t.instant('codex.holo.interior.presetTitle', { role: this.presetLabel() })));
   readonly presetUntouched = computed(() => {
     const on = this.interiorGroups();
     const preset = PRESET_GROUPS[this.rolePreset()];

@@ -33,6 +33,12 @@
 //        (rows: the extractor's missions/<class>.json bodies; mapped to the
 //         pinned codex_missions columns by _missions.ts, upserted on
 //         (build_id, class_name) so a resumed run is idempotent)
+//   POST { op: "clear_locations",  build_id }                          -> { ok }
+//   POST { op: "locations",        build_id, rows: [...] }             -> { upserted }
+//        (rows: the extractor's locations/<id>.json bodies — codex_locations
+//         columns, pinned by _locations.ts, upserted on (build_id, id). The
+//         uploader clears the build's rows first on a fresh phase, so a
+//         re-ingest of the same build replaces its rows and never duplicates.)
 //   POST { op: "carry",            build_id, table, rows: [{k, h}], set? } -> { kept, copied, missing: [i] }
 //        (per-object incremental upload, migration 20261102000000: rows whose
 //         content hash h is already in this build are kept, rows found with h
@@ -97,7 +103,8 @@
 //
 // Response codes: 200 ok; 400 invalid_body; 401 unauthorized; 403 forbidden;
 //   500 ingest_failed; 503 ingest_timeout (Postgres cancelled the statement —
-//   the caller should halve the batch and retry, see catalog-bridge.ts).
+//   the caller should halve the batch and retry, see catalog-bridge.ts; reported
+//   to PostHog as server:ingest_timeout, not as an $exception).
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 import { bucketBytes, deleteObject, getObject, listObjects, putObject, r2FromEnv, readUsage } from '../ingest-skins/_r2.ts';
@@ -128,11 +135,12 @@ import { isCarryUnavailable, isRpcMissing, parseCarry, parsePrune } from './_car
 import { sanitizeSilhouetteRow } from './_silhouette-row.ts';
 import { parseSkips } from './_silhouette-skips.ts';
 import { MAX_MISSION_ROWS, parseMissions } from './_missions.ts';
+import { MAX_LOCATION_ROWS, parseLocations } from './_locations.ts';
 import type { PublishDeps, PublishResult } from './_locale-publish.ts';
 import { CLEAR_OP_TABLES, isLegacyNatkeyConflict, isRebuildUnavailable, prepareRebuild, refusedSwitchStatus } from './_rebuild.ts';
 import type { RebuildPlan } from './_rebuild.ts';
 import { copyBuildLocales } from './_locale-copy.ts';
-import { withPosthog } from '../_shared/posthog.ts';
+import { INGEST_TIMEOUT_EVENT, reportAs, withPosthog } from '../_shared/posthog.ts';
 import { safeEqual } from '../_shared/safe-equal.ts';
 
 const CORS = {
@@ -517,8 +525,8 @@ async function prepareSwitch(
         if (error) throw error;
         return new Set(((data ?? []) as { table_name: string }[]).map((r) => r.table_name));
       },
-      async clone(id, table) {
-        const { data, error } = await admin.rpc('codex_clone_untouched', { p_build_id: id, p_table: table });
+      async clone(id, table, limit) {
+        const { data, error } = await admin.rpc('codex_clone_untouched', { p_build_id: id, p_table: table, p_limit: limit });
         if (error) throw error;
         const r = (data ?? {}) as { copied?: number; done?: boolean };
         return { copied: Number(r.copied ?? 0), done: r.done === true };
@@ -611,7 +619,7 @@ async function translationAfterPublish(
         if (!c?.channel || !c.finalized_at) return null;
         const { data, error } = await admin
           .from('codex_builds').select('id')
-          .eq('channel', c.channel).neq('id', id).not('finalized_at', 'is', null)
+          .eq('channel', c.channel).neq('id', id).not('finalized_at', 'is', null).is('superseded_at', null)
           .lt('finalized_at', c.finalized_at)
           .order('finalized_at', { ascending: false }).limit(1);
         if (error) throw error;
@@ -636,6 +644,12 @@ async function translationAfterPublish(
     },
   );
   console.log(`ingest-catalog: translation ${buildId}: ${JSON.stringify(r)}`);
+}
+
+/** What `server:ingest_timeout` carries: the op, the table and the batch size, never row content. */
+function timeoutProps(op: string, body: Record<string, unknown>): Record<string, unknown> {
+  const table = typeof body.table === 'string' && /^[a-z0-9_]{1,64}$/.test(body.table) ? body.table : null;
+  return { op: op.slice(0, 40), table, rows: Array.isArray(body.rows) ? body.rows.length : null };
 }
 
 Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response> => {
@@ -857,6 +871,28 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       const rows = parseMissions(list, { build_id: buildId, ...nat });
       if (rows.length === 0) return json({ ok: true, upserted: 0 });
       const { error } = await admin.from('codex_missions').upsert(rows, { onConflict: 'build_id,class_name' });
+      if (error) throw error;
+      return json({ ok: true, upserted: rows.length });
+    }
+
+    if (op === 'clear_locations') {
+      const buildId = String(body.build_id ?? '');
+      if (!buildId) return json({ error: 'invalid_body' }, 400);
+      const { error } = await admin.from('codex_locations').delete().eq('build_id', buildId);
+      if (error) throw error;
+      await markCleared(admin, op, buildId);
+      return json({ ok: true });
+    }
+
+    if (op === 'locations') {
+      const buildId = String(body.build_id ?? '');
+      const list = body.rows as unknown[];
+      if (!buildId || !Array.isArray(list) || list.length === 0 || list.length > MAX_LOCATION_ROWS) {
+        return json({ error: 'invalid_body', message: 'build_id + 1..' + MAX_LOCATION_ROWS + ' rows required' }, 400);
+      }
+      const rows = parseLocations(list, buildId);
+      if (rows.length === 0) return json({ ok: true, upserted: 0 });
+      const { error } = await admin.from('codex_locations').upsert(rows, { onConflict: 'build_id,id' });
       if (error) throw error;
       return json({ ok: true, upserted: rows.length });
     }
@@ -1233,7 +1269,7 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
 
     if (op === 'locale_gc') {
       // Destructive and operator-only: the uploader gates must not reach it.
-      if (!(authHeader && authHeader === `Bearer ${serviceKey}`)) return json({ error: 'forbidden', message: 'service role only' }, 403);
+      if (!(authHeader && safeEqual(authHeader, `Bearer ${serviceKey}`))) return json({ error: 'forbidden', message: 'service role only' }, 403);
       const r2 = r2FromEnv((k) => Deno.env.get(k));
       if (!r2) return json({ error: 'r2_not_configured' }, 503);
       const gcDeps = {
@@ -1271,10 +1307,11 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       : rawMsg.slice(0, 500);
     const timedOut = err?.code === '57014' || /statement timeout|canceling statement/i.test(msg);
     if (timedOut) {
-      return new Response(
+      // Expected and self-healing: an event of its own, not an $exception.
+      return reportAs(new Response(
         JSON.stringify({ error: 'ingest_timeout', code: err?.code ?? '57014', message: msg }),
         { status: 503, headers: { 'content-type': 'application/json', 'retry-after': '2', ...CORS } },
-      );
+      ), INGEST_TIMEOUT_EVENT, timeoutProps(op, body));
     }
     return json({ error: 'ingest_failed', code: err?.code ?? null, message: msg }, 500);
   }

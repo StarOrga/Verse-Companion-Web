@@ -1,0 +1,57 @@
+<section data-iteration="4" data-iteration-template="free" data-final-report data-stage="B" data-tab-label="Abschluss Etappe B">
+  <p class="fr-sentence">Hängende v0.84.3-Installationen updaten wieder, und die Release-Pipeline baut jede Version nur noch einmal.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🛟</span><span><b>Dein Uploader updatet wieder</b>: Der Feed nimmt Token 268abf3e an und liefert v0.84.4.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🔒</span><span><b>Ein Build pro Version</b>: Kein zweiter Lauf überschreibt den Mirror mehr.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">✅</span><span><b>Registrieren erst nach Grün</b>, mit Prüfskript für Token, Version und Prüfsumme.</span></li>
+      </ul>
+    </div>
+    <div class="fr-flow">
+      <p>Manueller Lauf: baut, legt Tag an, veröffentlicht. Bricht ab, wenn die Version schon auf dem Mirror liegt.</p>
+      <p>Tag-Lauf danach: wird übersprungen, weil das Release schon Dateien hat.</p>
+      <p>Nach dem Upload: Mirror muss diesen Build ausliefern → erst dann registrieren → verify-uploader-release.mjs.</p>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Feed-Abruf mit Token 268abf3e liefert 200 und v0.84.4; ein unbekannter Token weiterhin 401 (geschätzt).">
+        <span class="fr-meter-name">🛟 Rettung</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">200</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 70%" data-tip="Workflow-YAML gültig, Prüfskript gegen echte Releases grün; die neuen Workflow-Schritte laufen erst beim nächsten Uploader-Release (geschätzt).">
+        <span class="fr-meter-name">🔒 Pipeline</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">ungelaufen</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="4 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ✓ {{final.level_interplay}} · ○ {{final.level_local}} · ✓ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_prod}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_live}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Commit <code>071401c85</code> · Daten: desktop_releases-Zeile <code>0.84.3-dispatch</code> (nur Token, nie promoten)</li>
+      <li><code>.github/workflows/data-uploader-build.yml</code>, <code>scripts/verify-uploader-release.mjs</code>, Ship-Regel 6</li>
+      <li>Prüfung: Feed 200 für 4db25e56 und 268abf3e, 401 für Null-Token; YAML-Lint grün</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-next-release" data-crit="mid" data-guide="">Beim nächsten Uploader-Release die neuen Schritte prüfen</li>
+    </ul>
+  </section>
+</section>

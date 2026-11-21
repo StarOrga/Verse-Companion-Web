@@ -121,7 +121,7 @@ type UpdateEvent =
   | { type: 'progress'; pct: number; bytesPerSecond?: number; transferred?: number; total?: number }
   | { type: 'downloaded'; version: string }
   | { type: 'manual'; currentVersion: string; latestVersion: string }
-  | { type: 'error'; message: string }
+  | { type: 'error'; code: 'unknown-build' | 'offline' | 'server' | 'not-installed' | 'other' }
   | { type: 'install-state'; state: 'preparing' | 'waiting' | 'closing' | 'failed'; version: string };
 
 interface ExtractRequest {
@@ -426,6 +426,9 @@ export const api = {
       info: { bundleId?: string; channel?: string; version?: string },
     ): Promise<{ ok: boolean; error?: string }> =>
       ipcRenderer.invoke('sc:cleanup:extractDir', outDir, info),
+    /** Open parts (hulls, silhouettes) continue from this extract — the startup sweep keeps it. */
+    keepForContinuation: (outDir: string): Promise<{ ok: boolean; error?: string }> =>
+      ipcRenderer.invoke('sc:cleanup:keepForContinuation', outDir),
   },
   catalog: {
     // Promote a just-uploaded extract into the public Codex (codex_* tables).

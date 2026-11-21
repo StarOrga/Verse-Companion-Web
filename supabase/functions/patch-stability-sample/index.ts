@@ -46,6 +46,7 @@ import {
 } from './parsers.ts';
 import { ChannelBuild, groupChannelBuilds, newestHotfixDate, patchVersionPlan } from './channels.ts';
 import { withPosthog } from '../_shared/posthog.ts';
+import { safeEqual } from '../_shared/safe-equal.ts';
 
 const RSI_BASE = 'https://robertsspaceindustries.com';
 const SPECTRUM_LIST_URL = `${RSI_BASE}/api/spectrum/forum/channel/threads`;
@@ -467,7 +468,7 @@ Deno.serve(withPosthog('patch-stability-sample', async (req) => {
   const wantsForce = url.searchParams.get('force') === '1';
   if (wantsBackfill || wantsForce) {
     const authHeader = req.headers.get('authorization');
-    if (authHeader !== `Bearer ${SERVICE_KEY}`) {
+    if (!safeEqual(authHeader ?? '', `Bearer ${SERVICE_KEY}`)) {
       return json({ ok: false, error: 'operator paths require the service role' }, 401);
     }
   }

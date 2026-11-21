@@ -333,6 +333,10 @@ export interface HqStats {
   crimestat: { total: number; series: HqStatsPoint[] };
   refinery: { total: number; series: HqStatsPoint[] };
   blueprints: { total: number; series: HqStatsPoint[] };
+  /** #1191: paid fines (`crime.fined`); `amount` sums the payload's aUEC. */
+  fines: { total: number; amount: number; series: HqStatsPoint[] };
+  /** #1191: `fuel.low` warnings (hydrogen or quantum). */
+  fuel: { total: number; series: HqStatsPoint[] };
 }
 
 /** hq_supply_packages - a Nachschub. Sync table like hq_supplies. */

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, computed, effect, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, NgZone, computed, effect, inject, input, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationStart, Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RoleService } from '../../auth/role.service';
@@ -130,6 +131,7 @@ export class FabDialComponent {
   private readonly analytics = inject(AnalyticsService);
   private readonly mode = inject(ViewportModeService);
   private readonly router = inject(Router);
+  private readonly zone = inject(NgZone);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   /** The area the reader is in (`betaArea()` of the shell); viewers get only that switch. */
@@ -168,7 +170,7 @@ export class FabDialComponent {
   private scrollStart = 0;
 
   constructor() {
-    this.router.events.subscribe((e) => {
+    this.router.events.pipe(takeUntilDestroyed()).subscribe((e) => {
       if (e instanceof NavigationStart) this.fold();
     });
     // Nothing left to show: fold, so it does not come back open.
@@ -179,7 +181,8 @@ export class FabDialComponent {
       const onScroll = () => {
         if (this.open() && Math.abs(window.scrollY - this.scrollStart) > SCROLL_CLOSE_PX) this.fold();
       };
-      window.addEventListener('scroll', onScroll, { passive: true });
+      // Outside the zone: a scroll frame must not run change detection for the whole app while the dial is shut.
+      this.zone.runOutsideAngular(() => window.addEventListener('scroll', onScroll, { passive: true }));
       inject(DestroyRef).onDestroy(() => window.removeEventListener('scroll', onScroll));
     }
   }

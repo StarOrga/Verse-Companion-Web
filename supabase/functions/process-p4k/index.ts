@@ -7,20 +7,11 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { withPosthog } from '../_shared/posthog.ts';
+import { parseHeader } from './_parse.ts';
+
+const HEAD_BYTES = 64 * 1024;
 
 interface RequestBody { upload_id: string }
-
-interface ParseResult {
-  magicOk: boolean;
-  magic: string | null;
-  headerVersion: number | null;
-  estimatedEntries: number | null;
-  fileSizeBytes: number;
-  channelHint: string;
-  versionHint: string | null;
-  notes: string[];
-  parsedAt: string;
-}
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -49,7 +40,8 @@ Deno.serve(withPosthog('process-p4k', async (req: Request) => {
   // Service client for full access.
   const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
 
-  const body: RequestBody = await req.json();
+  let body: RequestBody;
+  try { body = await req.json(); } catch { return json({ error: 'invalid_json' }, 400); }
   if (!body.upload_id) return json({ error: 'upload_id required' }, 400);
 
   const { data: row, error: rowErr } = await admin
@@ -61,70 +53,40 @@ Deno.serve(withPosthog('process-p4k', async (req: Request) => {
   if (row.user_id !== userData.user.id) return json({ error: 'forbidden' }, 403);
 
   // Mark processing.
-  await admin.from('p4k_uploads').update({ status: 'processing' }).eq('id', row.id);
+  const { error: procErr } = await admin.from('p4k_uploads').update({ status: 'processing' }).eq('id', row.id);
+  if (procErr) return json({ error: 'status_update_failed', message: procErr.message }, 500);
 
   try {
-    const { data: head, error: dlErr } = await admin.storage
+    // Fetch only the header via a signed URL + Range request, never the whole (multi-GB) file.
+    const { data: signed, error: signErr } = await admin.storage
       .from('p4k-uploads')
-      .download(row.storage_path);
-    if (dlErr || !head) throw dlErr ?? new Error('download failed');
-
-    const buf = new Uint8Array(await head.slice(0, 64 * 1024).arrayBuffer());
+      .createSignedUrl(row.storage_path, 60);
+    if (signErr || !signed?.signedUrl) throw signErr ?? new Error('sign failed');
+    const res = await fetch(signed.signedUrl, { headers: { Range: `bytes=0-${HEAD_BYTES - 1}` } });
+    if (!res.ok) throw new Error(`header fetch failed: ${res.status}`);
+    // A server that ignores Range answers 200 with the full body: cap what we keep in memory.
+    const buf = new Uint8Array(await res.arrayBuffer()).subarray(0, HEAD_BYTES);
     const result = parseHeader(buf, row);
 
-    await admin.from('p4k_uploads').update({
+    const { error: doneErr } = await admin.from('p4k_uploads').update({
       status: 'done',
       result,
       processed_at: new Date().toISOString(),
     }).eq('id', row.id);
+    if (doneErr) throw new Error(`result not saved: ${doneErr.message}`);
 
     return json({ ok: true, result });
   } catch (err) {
     const msg = (err as Error)?.message ?? String(err);
-    await admin.from('p4k_uploads').update({
+    const { error: failErr } = await admin.from('p4k_uploads').update({
       status: 'failed',
       error: msg,
       processed_at: new Date().toISOString(),
     }).eq('id', row.id);
+    if (failErr) console.error('[process-p4k] could not mark upload failed', failErr.message);
     return json({ ok: false, error: msg }, 500);
   }
 }));
-
-function parseHeader(buf: Uint8Array, row: Record<string, unknown>): ParseResult {
-  const notes: string[] = [];
-  const magic = buf.length >= 4 ? new TextDecoder().decode(buf.subarray(0, 4)) : null;
-  const magicOk = magic === 'PK' || magic === 'CrCh' || magic === 'CrPk';
-  if (!magicOk) notes.push('Unknown magic — file may not be a CryEngine PAK / ZIP.');
-
-  // ZIP central-directory hint (last 64KB usually contains EOCD record).
-  let estimatedEntries: number | null = null;
-  let headerVersion: number | null = null;
-  if (magicOk) {
-    const view = new DataView(buf.buffer);
-    if (magic === 'PK') {
-      headerVersion = view.getUint16(4, true);
-      notes.push(`ZIP local-file-header version = ${headerVersion}`);
-      // Naive count: matches of local-file-header signature in the 64KB head.
-      let count = 0;
-      for (let i = 0; i < buf.length - 3; i++) {
-        if (buf[i] === 0x50 && buf[i+1] === 0x4b && buf[i+2] === 0x03 && buf[i+3] === 0x04) count++;
-      }
-      estimatedEntries = count;
-    }
-  }
-
-  return {
-    magicOk,
-    magic,
-    headerVersion,
-    estimatedEntries,
-    fileSizeBytes: Number(row['size_bytes'] ?? 0),
-    channelHint: String(row['detected_channel'] ?? 'unknown'),
-    versionHint: row['detected_version'] != null ? String(row['detected_version']) : null,
-    notes,
-    parsedAt: new Date().toISOString(),
-  };
-}
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
