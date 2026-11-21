@@ -4013,7 +4013,19 @@
       },
       "languages": {
         "de": "Almanca",
-        "en": "İngilizce"
+        "en": "İngilizce",
+        "es": "İspanyolca",
+        "es-419": "Latin Amerika İspanyolcası",
+        "fr": "Fransızca",
+        "it": "İtalyanca",
+        "ja": "Japonca",
+        "ko": "Korece",
+        "pl": "Lehçe",
+        "pt-BR": "Brezilya Portekizcesi",
+        "ru": "Rusça",
+        "tr": "Türkçe",
+        "zh-Hans": "Basitleştirilmiş Çince",
+        "zh-Hant": "Geleneksel Çince"
       },
       "regions": {
         "DE": "Almanya",

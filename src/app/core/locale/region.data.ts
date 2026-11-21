@@ -46,6 +46,18 @@ export const FALLBACK_REGION: RegionCode = 'GB';
 const REGION_FOR_LANGUAGE: Readonly<Record<AppLanguage, RegionCode>> = {
   de: 'DE',
   en: FALLBACK_REGION,
+  es: 'ES',
+  'es-419': 'MX',
+  fr: 'FR',
+  it: 'IT',
+  ja: 'JP',
+  ko: 'KR',
+  pl: 'PL',
+  'pt-BR': 'BR',
+  ru: 'RU',
+  tr: 'TR',
+  'zh-Hans': 'CN',
+  'zh-Hant': 'TW',
 };
 
 /**
@@ -182,14 +194,46 @@ export function normalizeRegion(raw: string | null | undefined): RegionCode | nu
   return /^[A-Z]{2}$/.test(s) ? s : null;
 }
 
-/** The supported UI language a raw BCP-47 tag maps onto, or `null`. */
+/** Spanish-speaking regions outside Spain: `es-MX`, `es-AR`, … read Latin American Spanish. */
+const LATAM_SPANISH_REGIONS: ReadonlySet<string> = new Set([
+  '419', 'MX', 'AR', 'BO', 'CL', 'CO', 'CR', 'CU', 'DO', 'EC', 'GT', 'HN', 'NI', 'PA', 'PE', 'PR', 'PY', 'SV',
+  'US', 'UY', 'VE',
+]);
+
+/** Chinese tags that mean Traditional script (`zh-Hant`, `zh-TW`, `zh-HK`, `zh-MO`). */
+const TRADITIONAL_CHINESE_SUBTAGS: ReadonlySet<string> = new Set(['HANT', 'TW', 'HK', 'MO']);
+
+/** Languages whose primary subtag alone picks the file. */
+const PLAIN_LANGUAGES: ReadonlySet<string> = new Set(['de', 'en', 'fr', 'it', 'ja', 'ko', 'pl', 'ru', 'tr']);
+
+/**
+ * The supported UI language a raw BCP-47 tag maps onto, or `null`. Accepts the
+ * codes the app stores (`pt-BR`, `zh-Hans`) as well as what browsers report
+ * (`pt-PT`, `zh-TW`, `es-MX`) and the legacy profile values `pt` / `zh`.
+ * Mirrored by `public/i18n-boot.js`.
+ */
 export function normalizeLanguage(raw: string | null | undefined): AppLanguage | null {
-  const s = (raw ?? '').trim().toLowerCase();
+  const s = (raw ?? '').trim();
   if (!s) return null;
-  const primary = s.split(/[-_]/)[0];
-  if (primary === 'de') return 'de';
-  if (primary === 'en') return 'en';
+  const parts = s.split(/[-_]/);
+  const primary = parts[0].toLowerCase();
+  const subtags = parts.slice(1).map((p) => p.toUpperCase());
+  if (PLAIN_LANGUAGES.has(primary)) return primary as AppLanguage;
+  if (primary === 'es') return subtags.some((t) => LATAM_SPANISH_REGIONS.has(t)) ? 'es-419' : 'es';
+  if (primary === 'pt') return 'pt-BR';
+  if (primary === 'zh') return subtags.some((t) => TRADITIONAL_CHINESE_SUBTAGS.has(t)) ? 'zh-Hant' : 'zh-Hans';
   return null;
+}
+
+/**
+ * The language part of the BCP-47 tag handed to `Intl`: `es-419` and `pt-BR`
+ * carry a region of their own, so only their primary subtag goes in front of
+ * the resolved region (`es-419` + `MX` → `es-MX`); a script stays (`zh-Hant-TW`).
+ */
+export function intlLanguageTag(language: AppLanguage): string {
+  if (language === 'es-419') return 'es';
+  if (language === 'pt-BR') return 'pt';
+  return language;
 }
 
 /** The region subtag of a BCP-47 tag (`de-AT` → `AT`), or `null`. */

@@ -4013,7 +4013,19 @@
       },
       "languages": {
         "de": "Allemand",
-        "en": "Anglais"
+        "en": "Anglais",
+        "es": "Espagnol",
+        "es-419": "Espagnol d’Amérique latine",
+        "fr": "Français",
+        "it": "Italien",
+        "ja": "Japonais",
+        "ko": "Coréen",
+        "pl": "Polonais",
+        "pt-BR": "Portugais brésilien",
+        "ru": "Russe",
+        "tr": "Turc",
+        "zh-Hans": "Chinois simplifié",
+        "zh-Hant": "Chinois traditionnel"
       },
       "regions": {
         "DE": "Allemagne",

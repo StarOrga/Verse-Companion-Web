@@ -6,6 +6,8 @@ import { Observable, Subject, filter, first, from, of, race, shareReplay, switch
 import { LocaleService } from './locale.service';
 
 const EN = 'en';
+/** The one non-English table written by hand alongside en.json, key for key. */
+const HAND_WRITTEN = 'de';
 
 /** What `public/i18n-boot.js` left on the window: the table it already requested. */
 export interface I18nBoot {
@@ -30,12 +32,12 @@ export const FALLBACK_DELAY_MS = 4000;
  *
  *  - The active language reuses the request `public/i18n-boot.js` started next
  *    to the bundle.
- *  - English, while it is only the fallback, waits until the page is up. `de`
- *    and `en` carry the same keys, so a German page does not read it during
- *    startup, and ngx-translate waits per language, so nothing blocks on it.
- *    It loads at once when English becomes the active language (a profile
- *    setting can do that) or someone asks a second time
- *    (`EnglishStringsService.ensureLoaded`).
+ *  - English, while it is only the fallback of a German page, waits until the
+ *    page is up. `de` and `en` carry the same keys, so a German page does not
+ *    read it during startup, and ngx-translate waits per language, so nothing
+ *    blocks on it. It loads at once when any other language is active (English
+ *    itself, or a machine-translated table that may lack newer keys), or
+ *    someone asks a second time (`EnglishStringsService.ensureLoaded`).
  */
 @Injectable()
 export class AppTranslateLoader extends TranslateLoader {
@@ -76,6 +78,11 @@ export class AppTranslateLoader extends TranslateLoader {
       );
       return () => clearTimeout(handle);
     });
-    return race(delay, this.fallbackWanted, this.language$.pipe(filter((lang) => lang === EN))).pipe(first());
+    // Only German carries every key English has: the machine-translated tables
+    // may lack keys added since their last refresh, and those read English, so
+    // with any other active language the fallback is needed from the first paint.
+    return race(delay, this.fallbackWanted, this.language$.pipe(filter((lang) => lang !== HAND_WRITTEN))).pipe(
+      first(),
+    );
   }
 }
