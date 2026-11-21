@@ -14,7 +14,7 @@ describe('CATALOG_PHASE_ORDER', () => {
 
   it('exposes its own length as the phase total', () => {
     expect(CATALOG_PHASE_TOTAL).toBe(CATALOG_PHASE_ORDER.length);
-    expect(CATALOG_PHASE_TOTAL).toBe(17);
+    expect(CATALOG_PHASE_TOTAL).toBe(18);
   });
 
   it('has no duplicate phases (a repeat would break index math)', () => {
@@ -38,7 +38,8 @@ describe('catalogPhaseIndex', () => {
     expect(catalogPhaseIndex('codex_locale_strings')).toBe(2);
     expect(catalogPhaseIndex('codex_ships')).toBe(4);
     expect(catalogPhaseIndex('codex_missions')).toBe(11);
-    expect(catalogPhaseIndex('codex_item_ports')).toBe(13);
+    expect(catalogPhaseIndex('codex_locations')).toBe(12);
+    expect(catalogPhaseIndex('codex_item_ports')).toBe(14);
   });
 
   it('returns null for an unknown phase rather than a bogus 0', () => {

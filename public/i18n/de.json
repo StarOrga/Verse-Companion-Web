@@ -7106,13 +7106,26 @@
           "sub": "Neu erhalten",
           "hint": "Neu erhaltene Blueprints.",
           "col": "Blueprints"
+        },
+        "fines": {
+          "name": "Strafen",
+          "sub": "{{amount}} aUEC gezahlt",
+          "subNoAmount": "Bezahlte Strafen",
+          "hint": "Strafen, die du im Spiel bezahlt hast.",
+          "col": "Strafen"
+        },
+        "fuel": {
+          "name": "Treibstoff knapp",
+          "sub": "Warnungen",
+          "hint": "Wie oft der Wasserstoff- oder Quantum-Treibstoff knapp wurde.",
+          "col": "Warnungen"
         }
       },
       "preview": {
         "stamp": "Vorschau",
         "title": "Hier wächst deine Statistik",
-        "text": "So sieht es aus, sobald die App beim Spielen mitliest: aUEC, Missionen, Abschlussquote, Tode, Crimestat, Raffinerie und Blueprints. Die Kacheln dahinter sind Beispieldaten.",
-        "textLinked": "Die App ist verbunden. Sobald du spielst, füllen sich aUEC, Missionen, Tode, Crimestat, Raffinerie und Blueprints. Die Kacheln dahinter sind Beispieldaten."
+        "text": "So sieht es aus, sobald die App beim Spielen mitliest: aUEC, Missionen, Abschlussquote, Tode, Crimestat, Raffinerie, Blueprints, Strafen und Treibstoff-Warnungen. Die Kacheln dahinter sind Beispieldaten.",
+        "textLinked": "Die App ist verbunden. Sobald du spielst, füllen sich aUEC, Missionen, Tode, Crimestat, Raffinerie, Blueprints, Strafen und Treibstoff-Warnungen. Die Kacheln dahinter sind Beispieldaten."
       },
       "events": {
         "title": "Erledigte Events",
@@ -7466,6 +7479,14 @@
       "auec": "aUEC-Bilanz",
       "losses": "Verluste",
       "lossesSub": "{{deaths}} Tode · {{ships}} Schiffe zerstört · {{claims}} Versicherungsfälle",
+      "costs": {
+        "label": "Kosten",
+        "fines": { "one": "{{n}} Strafe", "other": "{{n}} Strafen" },
+        "fineAmount": "{{fines}} ({{amount}} aUEC)",
+        "injuries": { "one": "{{n}} Verletzung", "other": "{{n}} Verletzungen" },
+        "medbeds": { "one": "{{n}} Medbed-Behandlung", "other": "{{n}} Medbed-Behandlungen" },
+        "claimRequests": { "one": "{{n}} Versicherungsanfrage", "other": "{{n}} Versicherungsanfragen" }
+      },
       "end": {
         "noQuit": "Ohne Beenden zu Ende (Absturz oder App geschlossen)",
         "live": "Läuft gerade"

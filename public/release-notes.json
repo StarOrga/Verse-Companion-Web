@@ -1,7 +1,41 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.286.2",
+  "current": "0.287.0",
   "releases": [
+    {
+      "version": "0.287.0",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "HQ session logbook: a costs line per session — fines with the paid aUEC, injuries, medbed treatments and insurance requests (#1192)"
+            },
+            {
+              "title": "",
+              "text": "HQ Statistik: fines and fuel-warning tiles from the events the desktop app already uploads (#1191)"
+            },
+            {
+              "title": "",
+              "text": "Data Uploader: extracts the Verse locations from the game data (starmap records + socpak positions) and can ingest them per build; the upload stays off until the switch-over (#1194)"
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Codex silhouettes: every item, weapon, component and ammo without a traceable mesh now records why, naming skinned meshes (.skin/.chr/.cdf), so the coverage tile explains every missing silhouette (#1004)"
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.286.2",
       "date": "2026-11-21",

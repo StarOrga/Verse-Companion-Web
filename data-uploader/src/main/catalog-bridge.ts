@@ -316,6 +316,14 @@ export async function readGameBuildManifest(p4kPath: string | null | undefined):
  * Drive the full ingest-catalog protocol for one extractor out_dir.
  * Best-effort per op with a hard failure surfaced as { ok:false, error }.
  */
+/**
+ * Whether the catalog upload sends the extractor's Verse locations (#1194). Off
+ * until the switch-over issue #1196 turns it on — see step 9c.
+ */
+export function uploadLocationsEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.SC_UPLOAD_LOCATIONS === '1';
+}
+
 export async function uploadCatalog(
   accessToken: CatalogToken,
   outDir: string,
@@ -850,6 +858,28 @@ export async function uploadCatalog(
       const list = await readJsonDir(outDir, 'missions');
       counts.missions = await sendChunks('codex_missions', list, CHUNK, (slice) =>
         post('missions', { build_id: buildId, rows: slice }),
+      );
+    }
+
+    // 9c. Verse locations (sc_extract/starmap.py) ---------------------------
+    // One row per visible starmap place. The build's rows are replaced: the
+    // first chunk of a fresh phase clears them, every chunk upserts on
+    // (build_id, id). An empty list (step skipped or failed in the extractor)
+    // clears nothing, so the finalize copies the predecessor's rows instead.
+    // Held back until the switch-over (#1196): replacing the catalog's rows
+    // changes the place ids the desktop app resolves saved places by, and the
+    // microTech moon positions still need their real-data check (#1195). Until
+    // then the extractor writes locations/ but the upload keeps the
+    // predecessor's rows; SC_UPLOAD_LOCATIONS=1 sends them for a test build.
+    {
+      const list = uploadLocationsEnabled() ? await readJsonDir(outDir, 'locations') : [];
+      counts.locations = await sendChunks('codex_locations', list, CHUNK, (slice) =>
+        post('locations', { build_id: buildId, rows: slice }),
+        {
+          onFirstChunk: list.length > 0
+            ? () => post('clear_locations', { build_id: buildId }).then(() => undefined)
+            : undefined,
+        },
       );
     }
 

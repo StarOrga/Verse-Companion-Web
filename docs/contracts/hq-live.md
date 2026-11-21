@@ -61,6 +61,33 @@ No chat. Strings <= 200 chars.
 | `contract.completed` | `name`, `missionId` |
 | `incapacitated`, `crime.crimestat_increased`, `insurance.claim_complete`, `blueprint.received` | event existence (+ data as in gamelog.md) |
 | `refinery.complete` | `count`, `location` |
+| `crime.fined` | `amount` (aUEC, summed by Statistik and the logbook; a missing amount counts the fine, adds 0) |
+| `fuel.low` | event existence (`fuel` hydrogen/quantum is not shown yet) |
+| `injury`, `medbed.healed`, `insurance.claim_requested` | event existence (logbook costs line) |
+
+**Used by the web / not used** (every allowed type; keep this list in step with the code):
+
+| type | used by | not used - why |
+|------|---------|----------------|
+| `session.joined`, `session.quit`, `disconnect` | logbook session bounds, Jetzt "game live" | |
+| `shop.purchase` | Statistik aUEC, logbook aUEC balance, Jetzt ticker | |
+| `contract.completed` | Statistik missions, logbook, Jetzt ticker | |
+| `contract.failed`, `contract.abandoned` | Statistik completion rate | |
+| `contract.accepted`, `qt.target`, `restricted.*`, `armistice.*`, `monitored.*`, `jurisdiction.changed`, `hangar.ready`, `mobiglas.app`, `inventory.opened` | Jetzt live strip / ticker | |
+| `qt.arrived` | logbook jumps, Jetzt ticker | |
+| `incapacitated`, `vehicle.destroyed`, `insurance.claim_complete` | Statistik deaths/claims, logbook losses | |
+| `crime.crimestat_increased` | Statistik crimestat | |
+| `crime.fined` | Statistik fines, logbook costs | |
+| `fuel.low` | Statistik fuel warnings | Jetzt hint pending (#1193) |
+| `injury`, `medbed.healed`, `insurance.claim_requested` | logbook costs | |
+| `refinery.complete` | Statistik refinery, Jetzt ticker | |
+| `blueprint.received` | Statistik blueprints, Jetzt | |
+| `inventory.snapshot` | Bestand (snapshot + undo), Jetzt ticker | |
+| `hangar.queue` | | Jetzt hint pending (#1193) |
+| `crime.committed`, `crime.impounded` | | no surface yet; crimestat and fines cover the player-facing part |
+| `contract.objective` | | too fine-grained for a tile; completion is what counts |
+| `party.*` | | carries only `{ key }` after the privacy filter - nothing to show |
+| `shop.purchase_failed` | | a failed buy changes no balance |
 
 Price: the log's `client_price[...]` is sent as `price` and treated as the **total** of
 the request (it is the amount the client displays and the server validates for the whole
