@@ -1,4 +1,5 @@
 import {
+  FUEL_LOW_MAX_AGE_MS,
   LIVE_PRESENCE_MAX_AGE_MS,
   SHIP_DESTROYED_MAX_AGE_MS,
   disconnectedInSession,
@@ -7,6 +8,8 @@ import {
   isGameLive,
   lastDestroyedAt,
   presenceAt,
+  readFuelLow,
+  readHangarQueue,
   readZones,
   sessionEndedSince,
 } from './hq-live.util';
@@ -152,5 +155,62 @@ describe('eventLabel', () => {
     const l = eventLabel({ type: 'something.new', data: {} });
     expect(l.key).toBe('hq.log.event.other');
     expect(l.params['type']).toBe('something.new');
+  });
+});
+
+describe('readFuelLow', () => {
+  const now = Date.parse('2026-11-21T12:00:00Z');
+  const at = (minAgo: number) => new Date(now - minAgo * 60_000).toISOString();
+  const e = (type: string, minAgo: number, data: Record<string, unknown> = {}) => ({ type, at: at(minAgo), data });
+
+  it('shows the newest fuel warning of the session for ten minutes', () => {
+    expect(readFuelLow([e('fuel.low', 2, { fuel: 'hydrogen' }), e('session.joined', 30)], now)).toEqual({
+      kind: 'hydrogen',
+      at: at(2),
+    });
+    expect(readFuelLow([e('fuel.low', 11), e('session.joined', 30)], now)).toBeNull();
+    expect(FUEL_LOW_MAX_AGE_MS).toBe(10 * 60_000);
+  });
+
+  it('names an unknown fuel kind as plain fuel', () => {
+    expect(readFuelLow([e('fuel.low', 1, { fuel: 'Wasser' })], now)?.kind).toBe('any');
+    expect(readFuelLow([e('fuel.low', 1)], now)?.kind).toBe('any');
+  });
+
+  it('never shows a warning from before the session start', () => {
+    expect(readFuelLow([e('session.joined', 1), e('fuel.low', 2)], now)).toBeNull();
+    expect(readFuelLow([e('disconnect', 1), e('fuel.low', 2)], now)).toBeNull();
+  });
+});
+
+describe('readHangarQueue', () => {
+  const now = Date.parse('2026-11-21T12:00:00Z');
+  const e = (type: string, minAgo: number, data: Record<string, unknown> = {}) => ({
+    type,
+    at: new Date(now - minAgo * 60_000).toISOString(),
+    data,
+  });
+
+  it('shows the queued request with its position and the wait estimate counted down', () => {
+    expect(readHangarQueue([e('hangar.queue', 1, { position: 3, estimatedWaitSec: 300, key: 'k1' })], now)).toEqual({
+      position: 3,
+      waitSec: 240,
+    });
+  });
+
+  it('keeps the position once the estimate is used up or missing', () => {
+    expect(readHangarQueue([e('hangar.queue', 10, { position: 2, estimatedWaitSec: 60 })], now)).toEqual({ position: 2, waitSec: null });
+    expect(readHangarQueue([e('hangar.queue', 1, {})], now)).toEqual({ position: null, waitSec: null });
+  });
+
+  it('ends with the ready event of the same request', () => {
+    const queued = e('hangar.queue', 3, { position: 1, key: 'k1' });
+    expect(readHangarQueue([e('hangar.ready', 1, { key: 'k1' }), queued], now)).toBeNull();
+    expect(readHangarQueue([e('hangar.ready', 1, { key: 'k2' }), queued], now)?.position).toBe(1);
+    expect(readHangarQueue([e('hangar.ready', 1), queued], now)).toBeNull();
+  });
+
+  it('never shows a request from before the session start', () => {
+    expect(readHangarQueue([e('session.joined', 1), e('hangar.queue', 2, { position: 1 })], now)).toBeNull();
   });
 });

@@ -1,0 +1,282 @@
+{
+  "round1": {
+    "submitted": true,
+    "template": "decision",
+    "decisions": [
+      {
+        "id": "d-997",
+        "label": "#997 Blueprints auslesen",
+        "mode": "single",
+        "value": "close",
+        "rec": "close-followup",
+        "deviates": true,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Issue #997",
+        "finding": "f-997",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 36685,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-1037",
+        "label": "#1037 Name „Nachschub“",
+        "mode": "single",
+        "value": "close",
+        "rec": "close",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Issue #1037",
+        "finding": "f-1037",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 23484,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-832",
+        "label": "#832 Shell-Beta-Follow-ups",
+        "mode": "single",
+        "value": "close-now",
+        "rec": "check-close",
+        "deviates": true,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Issue #832",
+        "finding": "f-832",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 19615,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-1059",
+        "label": "#1059 Qualitäts-Stacks",
+        "mode": "single",
+        "value": "move",
+        "rec": "move",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Issue #1059",
+        "finding": "f-1059",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 15346,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-1033",
+        "label": "#1033 Schrottwert-Overlay",
+        "mode": "single",
+        "value": "split3",
+        "rec": "split3",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Issue #1033",
+        "finding": "f-1033",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 40956,
+          "noteWords": 0,
+          "revisits": 1,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-contract",
+        "label": "hq-live.md im App-Repo",
+        "mode": "yesnoalt",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "btw, kann die app sich das nicht uach von web ziehen, web ist immer master wenn es um allg. infos geht die nicht spielerspezifisch sind",
+        "appliesTo": "docs/contracts/hq-live.md im App-Repo",
+        "finding": "f-contract",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 34843,
+          "noteWords": 25,
+          "revisits": 1,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-1195",
+        "label": "#1195 microTech-Monde prüfen",
+        "mode": "single",
+        "value": "session-now",
+        "rec": "session-now",
+        "deviates": false,
+        "none": false,
+        "untouched": true,
+        "note": "",
+        "appliesTo": "Issue #1195, blockiert #1196",
+        "finding": "f-1195",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 14614,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-1058",
+        "label": "#1058 Dismantle-Keys",
+        "mode": "single",
+        "value": "probe-split",
+        "rec": "probe-split",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Issue #1058",
+        "finding": "f-1058",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 22927,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-900",
+        "label": "#900 Trade-Runs in HQ",
+        "mode": "single",
+        "value": "trade-first",
+        "rec": "trade-first",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Issue #900",
+        "finding": "f-900",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 8686,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-1193",
+        "label": "#1193 Treibstoff + Hangar",
+        "mode": "single",
+        "value": "chip",
+        "rec": "chip",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "HQ › Jetzt",
+        "finding": "f-1193",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 34867,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-1196a",
+        "label": "#1196 Drittwerte",
+        "mode": "single",
+        "value": "attributes",
+        "rec": "attributes",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Location-Katalog (codex_locations)",
+        "finding": "f-1196a",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 4596,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      },
+      {
+        "id": "d-1196b",
+        "label": "#1196 ID-Mapping",
+        "mode": "single",
+        "value": "mapdoc",
+        "rec": "mapdoc",
+        "deviates": false,
+        "none": false,
+        "untouched": false,
+        "note": "",
+        "appliesTo": "Location-IDs, Desktop-App",
+        "finding": "f-1196b",
+        "issue": false,
+        "epic": "",
+        "hesitation": {
+          "ms": 5203,
+          "noteWords": 0,
+          "revisits": 0,
+          "flagged": false
+        }
+      }
+    ],
+    "comments": {
+      "general": {
+        "text": "",
+        "attachments": []
+      },
+      "items": [
+        {
+          "id": "d-contract-note",
+          "text": "btw, kann die app sich das nicht uach von web ziehen, web ist immer master wenn es um allg. infos geht die nicht spielerspezifisch sind",
+          "attachments": []
+        }
+      ]
+    },
+    "mappings": [],
+    "userPins": [],
+    "action": "implement",
+    "iteration": "1",
+    "fidelity": "off",
+    "submission_id": "sub-mwqavsrx-90yumrdr"
+  }
+}

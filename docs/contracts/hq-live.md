@@ -1,8 +1,8 @@
 # HQ live contract (desktop <-> SCC-Web)
 
-Contract version: 3 (2026-11-08). This file exists in BOTH repos (SCC-App
-`docs/contracts/hq-live.md`, SCC-Web copy); a change needs both repos. The web repo holds an
-identical copy at `docs/contracts/hq-live.md` - keep the two byte-identical.
+Contract version: 3 (2026-11-08). This file exists in BOTH repos at
+`docs/contracts/hq-live.md`. The SCC-Web file is the master: edit it there, then mirror it into the
+SCC-App repo with `npm run contracts:sync` (byte-identical; `npm run contracts:check` reports drift).
 
 Writer: SCC-App `modules/desktop/src/hq-live-sync-service.js` with the user's SCC
 session token (PostgREST, RLS self-only). Reader: the web HQ (Jetzt, Bestand, Statistik).
@@ -62,7 +62,8 @@ No chat. Strings <= 200 chars.
 | `incapacitated`, `crime.crimestat_increased`, `insurance.claim_complete`, `blueprint.received` | event existence (+ data as in gamelog.md) |
 | `refinery.complete` | `count`, `location` |
 | `crime.fined` | `amount` (aUEC, summed by Statistik and the logbook; a missing amount counts the fine, adds 0) |
-| `fuel.low` | event existence (`fuel` hydrogen/quantum is not shown yet) |
+| `fuel.low` | `fuel` hydrogen/quantum (Jetzt names the kind; any other value reads as plain fuel) |
+| `hangar.queue` | `position`, `estimatedWaitSec` (Jetzt counts it down from the event), `key` (matched by `hangar.ready`) |
 | `injury`, `medbed.healed`, `insurance.claim_requested` | event existence (logbook costs line) |
 
 **Used by the web / not used** (every allowed type; keep this list in step with the code):
@@ -78,12 +79,12 @@ No chat. Strings <= 200 chars.
 | `incapacitated`, `vehicle.destroyed`, `insurance.claim_complete` | Statistik deaths/claims, logbook losses | |
 | `crime.crimestat_increased` | Statistik crimestat | |
 | `crime.fined` | Statistik fines, logbook costs | |
-| `fuel.low` | Statistik fuel warnings | Jetzt hint pending (#1193) |
+| `fuel.low` | Statistik fuel warnings, Jetzt hint (10 min from the event, current session only) | |
 | `injury`, `medbed.healed`, `insurance.claim_requested` | logbook costs | |
 | `refinery.complete` | Statistik refinery, Jetzt ticker | |
 | `blueprint.received` | Statistik blueprints, Jetzt | |
 | `inventory.snapshot` | Bestand (snapshot + undo), Jetzt ticker | |
-| `hangar.queue` | | Jetzt hint pending (#1193) |
+| `hangar.queue` | Jetzt hint until the `hangar.ready` with the same `key` (current session only) | |
 | `crime.committed`, `crime.impounded` | | no surface yet; crimestat and fines cover the player-facing part |
 | `contract.objective` | | too fine-grained for a tile; completion is what counts |
 | `party.*` | | carries only `{ key }` after the privacy filter - nothing to show |
@@ -173,5 +174,4 @@ web migration.)
 
 - `docs/contracts/scc-app-event-progress.md` (event progress, location / Arena Commander mode, received rewards) extends
   this contract: same opt-in, same session token, same RLS-self-only rule, no new live table. It follows the same copy
-  rule - it exists in BOTH repos and the SCC-App copy must stay byte-identical to the web file. A change to either
-  contract file is a change in both repos; whoever edits one of the two cross-references updates the other copy too.
+  rule: the SCC-Web file is the master and the SCC-App copy is mirrored from it with `npm run contracts:sync`.
