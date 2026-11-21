@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.289.4",
+  "current": "0.290.0",
   "releases": [
+    {
+      "version": "0.290.0",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Admin translations: every language row shows its coverage as a bar with a percentage; \"Start full run\" appears only for an approved language that still has gaps."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.289.4",
       "date": "2026-11-21",
