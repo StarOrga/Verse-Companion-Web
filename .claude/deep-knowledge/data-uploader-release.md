@@ -58,7 +58,7 @@ were unknown to the feed (`401 invalid_or_revoked_release_token`) and could neve
 update again; the uploader showed the raw HttpError.
 
 Fixes now in place:
-- `release-guard` job: a tag whose source release already carries assets is not
+- `release-guard` job: a tag whose source release already exists is not
   built again. A dispatch also refuses a version that is already on the mirror.
 - "Verify the public mirror serves THIS build": the run fails when the mirror's
   `latest.yml` is not its own build — such a run must not be registered.

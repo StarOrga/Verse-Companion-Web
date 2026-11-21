@@ -96,8 +96,8 @@ jobs:
   # tag then also triggers a tag-push run, a second build would bake a NEW
   # release token into the same version and overwrite the mirror files — installs
   # that fetched the first build are then unknown to the update server (0.84.3,
-  # 2026-11-21). So a tag whose source release already carries assets is not
-  # built again.
+  # 2026-11-21). So a tag whose source release already exists is not
+  # built again (first attempt; a manual re-run still builds).
   release-guard:
     if: startsWith(github.ref, 'refs/tags/data-uploader-v') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
@@ -109,11 +109,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           skip=false
-          if [[ "$GITHUB_REF" == refs/tags/data-uploader-v* ]]; then
-            assets=$(gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json assets -q '.assets | length' 2>/dev/null || echo 0)
-            if [ "${assets:-0}" -gt 0 ]; then
+          # A normal tag push finds no release yet (this run creates it). One that
+          # already exists was made by the dispatch run that created the tag — its
+          # assets may still be uploading, so existence decides, not the asset
+          # count. A manual re-run (attempt > 1) is a deliberate retry and builds.
+          if [[ "$GITHUB_REF" == refs/tags/data-uploader-v* && "$GITHUB_RUN_ATTEMPT" == "1" ]]; then
+            if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json tagName >/dev/null 2>&1; then
               skip=true
-              echo "::notice::$GITHUB_REF_NAME was already built and published ($assets assets) - not building it a second time (a rebuild would carry a different release token)."
+              echo "::notice::$GITHUB_REF_NAME already has a release (built by a manual run) - not building it a second time (a rebuild would carry a different release token)."
             fi
           fi
           echo "skip=$skip" >> "$GITHUB_OUTPUT"
