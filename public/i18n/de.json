@@ -4403,6 +4403,16 @@
         "approve": "Freigeben",
         "revoke": "Entziehen",
         "fullRun": "Voll-Lauf starten",
+        "fullRunOpen": "Voll-Lauf in Arbeit – siehe Aufträge",
+        "fullRunGap": "Übersetzt nur die fehlenden {{missing}} Texte (rund {{pct}} %). Was CIG oder der Übersetzungsspeicher schon hat, kostet nichts.",
+        "fullRunUnmeasured": "Übersetzt alles, was CIG und der Übersetzungsspeicher noch nicht haben. Die Schätzung vorher kostet nichts und misst die Abdeckung.",
+        "coverage": {
+          "label": "Abdeckung {{lang}}",
+          "value": "{{pct}} %",
+          "detail": "{{covered}} von {{total}} Texten übersetzt (von CIG oder aus dem Übersetzungsspeicher). Stand des letzten Auftrags: {{at}}",
+          "unknown": "Abdeckung unbekannt",
+          "unknownHint": "Gemessen wird sie mit dem ersten Auftrag dieser Sprache."
+        },
         "approveTitle": "Sprache {{lang}} freigeben?",
         "approveText": "Neue Uploads werden ab jetzt auch nach {{lang}} übersetzt (nur Deltas).",
         "revokeTitle": "Freigabe für {{lang}} entziehen?",
