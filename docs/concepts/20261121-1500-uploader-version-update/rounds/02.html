@@ -1,0 +1,64 @@
+<section data-iteration="2" data-iteration-template="free" data-final-report data-stage="A" data-tab-label="Abschluss Etappe A">
+  <p class="fr-sentence">Die Kopfzeile des Uploaders zeigt nur noch eine Kanal-Ampel. Spielstand, Server-Stand und Update-Fehler stehen verständlich im Popover.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🚦</span><span><b>Ampel statt Nummern</b>: grün, wenn der Server dein Spiel komplett hat.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">⚖️</span><span>Popover zeigt <b>Dein Spiel gegen Server-Codex</b>, dazu, was noch offen ist.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🧯</span><span>Update-Fehler als <b>verständlicher Satz</b> mit Download-Knopf.</span></li>
+      </ul>
+    </div>
+    <div class="fr-flow">
+      <p>Kopfzeile: ● <b>LIVE</b> (grün/gelb) · Warnpunkt bei Update-Fehler</p>
+      <p>Popover: Dein Spiel · Server-Codex ✓ gleich / ⚠ anderer Stand · Einträge · Noch offen</p>
+      <p>Statuszeile: „Noch offen: 3D-Hüllen. Setze automatisch fort.“</p>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Alle 7 Punkte aus Design 3, deinen Antworten und deinem Pin sind gebaut (geschätzt).">
+        <span class="fr-meter-name">🎯 Umfang</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">7 / 7</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 60%" data-tip="Typprüfung und betroffene Specs grün; volle Suite und Sichtprüfung im echten Fenster stehen aus, weil dein Uploader gerade lief (geschätzt).">
+        <span class="fr-meter-name">🧪 Geprüft</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">46 Tests</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="2 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ○ {{final.level_interplay}} · ○ {{final.level_local}} · ○ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_dry}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_interplay}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Commit <code>aec76336e</code> · Bereich: data-uploader (Renderer, Updater)</li>
+      <li><code>src/renderer/main.ts</code>, <code>src/lib/update-install.ts</code>, <code>src/main/updater.ts</code></li>
+      <li>Tests: typecheck grün, update-install + auto-run 46/46 grün; volle Suite vom Load-Governor zurückgestellt</li>
+      <li>Abweichung: Warnpunkt am Verbindungs-Chip statt am Zahnrad, weil das Zahnrad die Einstellungen öffnet und nicht das Popover</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-chip" data-crit="mid" data-guide="">Ampel und Popover im Uploader ansehen</li>
+      <li data-todo-id="t-suite" data-crit="low" data-guide="">Volle Uploader-Testsuite nachholen</li>
+    </ul>
+  </section>
+  <section data-handoffs hidden aria-label="{{final.group_handoffs}}">
+    <ul>
+      <li data-todo-id="h-reinstall" data-crit="high" data-guide="">v0.84.4 einmal von Hand installieren</li>
+    </ul>
+  </section>
+</section>

@@ -1,0 +1,20 @@
+[
+  {
+    "iteration": 1,
+    "stage": "A",
+    "action": "implement",
+    "favorite": "d3",
+    "answers": {
+      "d3-s1-a1": "Perfekt",
+      "d3-s1-a3": "reicht im popover"
+    },
+    "userPins": [
+      {
+        "screen": "d3-s1",
+        "target": "status line",
+        "text": "Das hier unten weiß nicht, gern das auch oben in das popout rein, ist ja wie ein hinweis warum das gelb ist dann im popout"
+      }
+    ],
+    "implemented": "aec76336e"
+  }
+]

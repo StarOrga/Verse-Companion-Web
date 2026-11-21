@@ -2,7 +2,7 @@
      rewrites it on every tab switch. body overflow is set by that function,
      the inline style below is only the first-paint value. -->
 <!DOCTYPE html>
-<html lang="de" data-theme="dark" data-page-version="2026-11-21T13:57:36" data-template="design">
+<html lang="de" data-theme="dark" data-page-version="2026-11-21T13:57:36" data-template="free">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -5886,7 +5886,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
 }
 </style>
 </head>
-<body style="overflow: hidden">
+<body>
   <div class="concept-layout design fullscreen">
     <div class="concept-content">
       <header class="page-header" data-page-header>
@@ -5895,7 +5895,8 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
       </header>
       <style>html[data-template="design"] [data-page-header] { display: none; }</style>
       <main>
-<section data-iteration="1" data-iteration-template="design" data-stage="A" data-design-set="alternatives" id="iter-1" data-active>
+<section data-iteration="1" data-iteration-template="design" data-stage="A" data-design-set="alternatives" data-baked id="iter-1" hidden>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"","attachments":[]},"designs":{},"screens":{},"views":{},"favorite":"d3","userPins":[{"id":"up-mwqkqmb6fwrj","design":"d3","screen":"d3-s1","x":15,"y":97.9,"target":"div.mock-status.mock-d3-status \"Noch offen: 3D-Hüllen. Setze automatisch\"","text":"Das hier unten weiß nicht, gern das auch oben in das popout rein, ist ja wie ein hinweis warum das gelb ist dann im popout","attachments":[]}],"fidelity":"off"}</script>
   <style>
     .mock-app { --m-bg:#0a1a27; --m-panel:#123246; --m-panel2:#16405a; --m-well:#08161f; --m-fg:#e6f1f8; --m-fg1:#b4c8d8; --m-fg2:#8da6bd; --m-accent:#4cc3e8; --m-ok:#3ccf8e; --m-warn:#f0b54a; --m-line:rgba(76,195,232,.22);
       position:relative; width:100%; max-width:1180px; height:640px; margin:0 auto; background:linear-gradient(180deg,#0d2232,#0a1a27 40%); color:var(--m-fg); font:13px/1.4 "Inter","Segoe UI",system-ui,sans-serif; border:1px solid var(--m-line); display:flex; flex-direction:column; overflow:hidden; }
@@ -5981,7 +5982,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
           <div class="mock-chip mock-d1-chip" data-screen-link="d1-s2"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-muted">·</span><span class="mock-tag">Live</span><span class="mock-id">4.10.3 <small>· Build 13165946</small></span></div>
           <div class="mock-gear">⚙</div>
         </div>
-        <div class="mock-banner"><span class="mock-grow">Update v0.84.4 ist geladen und kann installiert werden.</span><button class="mock-btn">Installieren</button></div>
+        <div class="mock-banner"><span class="mock-grow">Update v0.84.4 ist geladen und kann installiert werden.</span><button class="mock-btn" disabled>Installieren</button></div>
         <div class="mock-stage"><div class="mock-card">
           <div class="mock-kicker">Schritt 3 von 3</div><div class="mock-h">3D-Modelle</div>
           <div class="mock-row"><span>✓ Modelle bauen</span><span>335</span></div>
@@ -5997,21 +5998,21 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
           <button class="anno-pin" type="button" data-anno-pin="d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a1" aria-label="Frage {n}">1</button>
           <div class="anno-bubble" id="anno-bubble-d1-s1-a1" data-anno-bubble="d1-s1-a1" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a1"><span class="anno-bubble-question">Wird es eng, kürzt sich die Mail-Adresse und der Patch bleibt ganz stehen. Passt diese Reihenfolge?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s1-a1" data-annotation="d1-s1-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d1-s1-a1"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s1-a1" data-annotation="d1-s1-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-d1-s1-a1"></div></div>
           </div>
         </div>
         <div class="anno" data-anno="d1-s1-a2" data-anno-side="top" data-anno-target=".mock-d1-status" style="--anno-x:30%;--anno-y:96%">
           <button class="anno-pin" type="button" data-anno-pin="d1-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a2" aria-label="Frage {n}">2</button>
           <div class="anno-bubble" id="anno-bubble-d1-s1-a2" data-anno-bubble="d1-s1-a2" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a2"><span class="anno-bubble-question">Die Statuszeile wiederholt den Patch nicht mehr, außer der Server hat einen anderen Stand als dein Spiel. Reicht dir das?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s1-a2" data-annotation="d1-s1-a2" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d1-s1-a2"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s1-a2" data-annotation="d1-s1-a2" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-d1-s1-a2"></div></div>
           </div>
         </div>
         <div class="anno" data-anno="d1-s1-a3" data-anno-side="bottom" data-anno-target=".mock-ver" style="--anno-x:6%;--anno-y:5%">
           <button class="anno-pin" type="button" data-anno-pin="d1-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a3" aria-label="Frage {n}">3</button>
           <div class="anno-bubble" id="anno-bubble-d1-s1-a3" data-anno-bubble="d1-s1-a3" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a3"><span class="anno-bubble-question">Links steht die Uploader-Version (v0.84.3), rechts der Spiel-Patch ohne „v“. Ist das Unterscheidung genug?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s1-a3" data-annotation="d1-s1-a3" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d1-s1-a3"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s1-a3" data-annotation="d1-s1-a3" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-d1-s1-a3"></div></div>
           </div>
         </div>
       </div>
@@ -6042,7 +6043,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
           <button class="anno-pin" type="button" data-anno-pin="d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s2-a1" aria-label="Frage {n}">1</button>
           <div class="anno-bubble" id="anno-bubble-d1-s2-a1" data-anno-bubble="d1-s2-a1" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s2-a1"><span class="anno-bubble-question">Der LIVE-Chip erscheint hier nur, wenn der Server einen anderen Patch hat (dann z. B. „Server: LIVE 4.10.2“). Sonst nur „✓ gleicher Patch“. Gut so?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s2-a1" data-annotation="d1-s2-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d1-s2-a1"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s2-a1" data-annotation="d1-s2-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-d1-s2-a1"></div></div>
           </div>
         </div>
       </div>
@@ -6056,7 +6057,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
           <div class="mock-chip"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-muted">·</span><span class="mock-tag">Live</span><span class="mock-id">4.10.3 <small>· Build 13165946</small></span></div>
           <div class="mock-gear">⚙</div>
         </div>
-        <div class="mock-banner mock-warn mock-d1-err"><span class="mock-grow"><strong>Update nicht möglich.</strong> Dieser Uploader-Build ist dem Update-Server unbekannt. Installiere v0.84.4 einmal von Hand, danach läuft das Update wieder automatisch.</span><button class="mock-btn">v0.84.4 laden</button><span class="mock-link">Protokoll</span></div>
+        <div class="mock-banner mock-warn mock-d1-err"><span class="mock-grow"><strong>Update nicht möglich.</strong> Dieser Uploader-Build ist dem Update-Server unbekannt. Installiere v0.84.4 einmal von Hand, danach läuft das Update wieder automatisch.</span><button class="mock-btn" disabled>v0.84.4 laden</button><span class="mock-link">Protokoll</span></div>
         <div class="mock-stage"><div class="mock-card">
           <div class="mock-kicker">Schritt 1 von 3</div><div class="mock-h">Metadaten</div>
           <div class="mock-row"><span>● Daten extrahieren</span><span>Auslesen</span></div>
@@ -6071,7 +6072,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
           <button class="anno-pin" type="button" data-anno-pin="d1-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s3-a1" aria-label="Frage {n}">1</button>
           <div class="anno-bubble" id="anno-bubble-d1-s3-a1" data-anno-bubble="d1-s3-a1" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s3-a1"><span class="anno-bubble-question">Statt des rohen HttpError mit Headern: ein Satz, was los ist, und ein Knopf zum Download. Die Details stehen nur im Protokoll. Fehlt dir etwas?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s3-a1" data-annotation="d1-s3-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d1-s3-a1"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d1-s3-a1" data-annotation="d1-s3-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-d1-s3-a1"></div></div>
           </div>
         </div>
       </div>
@@ -6090,7 +6091,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
           <div class="mock-chip mock-d2-chip" data-screen-link="d2-s2"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-muted">·</span><span class="mock-label">Spiel</span><span class="mock-tag">Live</span><span class="mock-id">4.10.3</span></div>
           <div class="mock-gear">⚙</div>
         </div>
-        <div class="mock-banner"><span class="mock-grow">Update v0.84.4 ist geladen und kann installiert werden.</span><button class="mock-btn">Installieren</button></div>
+        <div class="mock-banner"><span class="mock-grow">Update v0.84.4 ist geladen und kann installiert werden.</span><button class="mock-btn" disabled>Installieren</button></div>
         <div class="mock-stage"><div class="mock-card">
           <div class="mock-kicker">Schritt 3 von 3</div><div class="mock-h">3D-Modelle</div>
           <div class="mock-row"><span>✓ Modelle bauen</span><span>335</span></div>
@@ -6106,21 +6107,21 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
           <button class="anno-pin" type="button" data-anno-pin="d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a1" aria-label="Frage {n}">1</button>
           <div class="anno-bubble" id="anno-bubble-d2-s1-a1" data-anno-bubble="d2-s1-a1" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a1"><span class="anno-bubble-question">Die Kopfzeile nennt nur „Spiel LIVE 4.10.3“, die Build-Nummer steht im Tooltip. Ist das kurz genug?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s1-a1" data-annotation="d2-s1-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d2-s1-a1"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s1-a1" data-annotation="d2-s1-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-d2-s1-a1"></div></div>
           </div>
         </div>
         <div class="anno" data-anno="d2-s1-a2" data-anno-side="top" data-anno-target=".mock-d2-status" style="--anno-x:30%;--anno-y:96%">
           <button class="anno-pin" type="button" data-anno-pin="d2-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a2" aria-label="Frage {n}">2</button>
           <div class="anno-bubble" id="anno-bubble-d2-s1-a2" data-anno-bubble="d2-s1-a2" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a2"><span class="anno-bubble-question">Die Statuszeile nennt den Build, an dem der Lauf gerade arbeitet. Hilft dir das, oder ist es eine Wiederholung?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s1-a2" data-annotation="d2-s1-a2" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d2-s1-a2"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s1-a2" data-annotation="d2-s1-a2" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-d2-s1-a2"></div></div>
           </div>
         </div>
         <div class="anno" data-anno="d2-s1-a3" data-anno-side="bottom" data-anno-target=".mock-d2-chip .mock-label" style="--anno-x:80%;--anno-y:5%">
           <button class="anno-pin" type="button" data-anno-pin="d2-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a3" aria-label="Frage {n}">3</button>
           <div class="anno-bubble" id="anno-bubble-d2-s1-a3" data-anno-bubble="d2-s1-a3" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a3"><span class="anno-bubble-question">Passen die Beschriftungen „Spiel“, „Server“ und „Lauf“, oder sollen sie anders heißen?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s1-a3" data-annotation="d2-s1-a3" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d2-s1-a3"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s1-a3" data-annotation="d2-s1-a3" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-d2-s1-a3"></div></div>
           </div>
         </div>
       </div>
@@ -6151,7 +6152,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
           <button class="anno-pin" type="button" data-anno-pin="d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s2-a1" aria-label="Frage {n}">1</button>
           <div class="anno-bubble" id="anno-bubble-d2-s2-a1" data-anno-bubble="d2-s2-a1" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s2-a1"><span class="anno-bubble-question">Patch und Eintragszahl stehen jetzt in zwei getrennten Pillen, damit „454.632“ nicht mehr wie eine Build-Nummer aussieht. Klar genug?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s2-a1" data-annotation="d2-s2-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d2-s2-a1"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s2-a1" data-annotation="d2-s2-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-d2-s2-a1"></div></div>
           </div>
         </div>
       </div>
@@ -6180,7 +6181,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
           <button class="anno-pin" type="button" data-anno-pin="d2-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s3-a1" aria-label="Frage {n}">1</button>
           <div class="anno-bubble" id="anno-bubble-d2-s3-a1" data-anno-bubble="d2-s3-a1" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s3-a1"><span class="anno-bubble-question">„Details ▸“ klappt Fehlercode und Uhrzeit auf, nie die Response-Header. Willst du das aufklappbar oder gar nicht im Fenster?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s3-a1" data-annotation="d2-s3-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d2-s3-a1"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d2-s3-a1" data-annotation="d2-s3-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-d2-s3-a1"></div></div>
           </div>
         </div>
       </div>
@@ -6199,7 +6200,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
           <div class="mock-chip mock-d3-chip" data-screen-link="d3-s2"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-tag mock-ok">● Live</span></div>
           <div class="mock-gear">⚙</div>
         </div>
-        <div class="mock-banner"><span class="mock-grow">Update v0.84.4 ist geladen und kann installiert werden.</span><button class="mock-btn">Installieren</button></div>
+        <div class="mock-banner"><span class="mock-grow">Update v0.84.4 ist geladen und kann installiert werden.</span><button class="mock-btn" disabled>Installieren</button></div>
         <div class="mock-stage"><div class="mock-card">
           <div class="mock-kicker">Schritt 3 von 3</div><div class="mock-h">3D-Modelle</div>
           <div class="mock-row"><span>✓ Modelle bauen</span><span>335</span></div>
@@ -6215,21 +6216,21 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
           <button class="anno-pin" type="button" data-anno-pin="d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a1" aria-label="Frage {n}">1</button>
           <div class="anno-bubble" id="anno-bubble-d3-s1-a1" data-anno-bubble="d3-s1-a1" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a1"><span class="anno-bubble-question">Die Kopfzeile nennt nur den Kanal. Grün heißt: Server und Spiel haben denselben Stand, gelb heißt: der Server hinkt hinterher. Reicht dir die Ampel ohne Nummer?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s1-a1" data-annotation="d3-s1-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d3-s1-a1"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s1-a1" data-annotation="d3-s1-a1" data-attachable placeholder="Deine Antwort…" readonly>Perfekt</textarea><div class="attach-slot" data-attach-slot="anno-d3-s1-a1"></div></div>
           </div>
         </div>
         <div class="anno" data-anno="d3-s1-a2" data-anno-side="top" data-anno-target=".mock-d3-status" style="--anno-x:30%;--anno-y:96%">
           <button class="anno-pin" type="button" data-anno-pin="d3-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a2" aria-label="Frage {n}">2</button>
           <div class="anno-bubble" id="anno-bubble-d3-s1-a2" data-anno-bubble="d3-s1-a2" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a2"><span class="anno-bubble-question">In der Statuszeile steht nur noch, was offen ist, kein Patch mehr. Einverstanden?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s1-a2" data-annotation="d3-s1-a2" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d3-s1-a2"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s1-a2" data-annotation="d3-s1-a2" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-d3-s1-a2"></div></div>
           </div>
         </div>
         <div class="anno" data-anno="d3-s1-a3" data-anno-side="bottom" data-anno-target=".mock-d3-chip .mock-mail" style="--anno-x:70%;--anno-y:5%">
           <button class="anno-pin" type="button" data-anno-pin="d3-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a3" aria-label="Frage {n}">3</button>
           <div class="anno-bubble" id="anno-bubble-d3-s1-a3" data-anno-bubble="d3-s1-a3" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a3"><span class="anno-bubble-question">Soll die Mail-Adresse in der Kopfzeile bleiben, oder reicht sie im Popover?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s1-a3" data-annotation="d3-s1-a3" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d3-s1-a3"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s1-a3" data-annotation="d3-s1-a3" data-attachable placeholder="Deine Antwort…" readonly>reicht im popover</textarea><div class="attach-slot" data-attach-slot="anno-d3-s1-a3"></div></div>
           </div>
         </div>
       </div>
@@ -6264,7 +6265,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
           <button class="anno-pin" type="button" data-anno-pin="d3-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s2-a1" aria-label="Frage {n}">1</button>
           <div class="anno-bubble" id="anno-bubble-d3-s2-a1" data-anno-bubble="d3-s2-a1" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s2-a1"><span class="anno-bubble-question">Lokaler und Server-Stand stehen untereinander mit „✓ gleich“ oder „⚠ Server älter“. Ist dieser Vergleich das, was du hier suchst?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s2-a1" data-annotation="d3-s2-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d3-s2-a1"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s2-a1" data-annotation="d3-s2-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-d3-s2-a1"></div></div>
           </div>
         </div>
       </div>
@@ -6288,7 +6289,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
         <div class="mock-status">Noch offen: Schiffe, Silhouetten, 3D-Hüllen. Setze automatisch fort.</div>
         <div class="mock-pop" style="right:12px">
           <div class="mock-pop-id"><span class="mock-dot"></span><span class="mock-mail">pilot@example.com</span><span class="mock-ico">⟳</span><span class="mock-ico">⇥</span></div>
-          <div class="mock-pop-upd mock-d3-upd"><strong>Update nicht möglich.</strong> Dieser Build ist dem Update-Server unbekannt.<div class="mock-acts"><button class="mock-btn">v0.84.4 laden</button><span class="mock-link">Protokoll</span></div></div>
+          <div class="mock-pop-upd mock-d3-upd"><strong>Update nicht möglich.</strong> Dieser Build ist dem Update-Server unbekannt.<div class="mock-acts"><button class="mock-btn" disabled>v0.84.4 laden</button><span class="mock-link">Protokoll</span></div></div>
         </div>
       </div>
       <div class="anno-layer" data-anno-layer>
@@ -6296,13 +6297,78 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
           <button class="anno-pin" type="button" data-anno-pin="d3-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s3-a1" aria-label="Frage {n}">1</button>
           <div class="anno-bubble" id="anno-bubble-d3-s3-a1" data-anno-bubble="d3-s3-a1" data-open="false">
             <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s3-a1"><span class="anno-bubble-question">Der Fehler erscheint nur als gelber Punkt am Zahnrad, der Text steht im Popover. Zu leise für einen Updater, der nie wieder updaten kann?</span></button>
-            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s3-a1" data-annotation="d3-s3-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-d3-s3-a1"></div></div>
+            <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-d3-s3-a1" data-annotation="d3-s3-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-d3-s3-a1"></div></div>
           </div>
         </div>
       </div>
     </section>
   </section>
 
+</section>
+
+<section data-iteration="2" data-iteration-template="free" data-final-report data-stage="A" data-tab-label="Abschluss Etappe A" id="iter-2" data-active>
+  <p class="fr-sentence">Die Kopfzeile des Uploaders zeigt nur noch eine Kanal-Ampel. Spielstand, Server-Stand und Update-Fehler stehen verständlich im Popover.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">Was kam raus</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🚦</span><span><b>Ampel statt Nummern</b>: grün, wenn der Server dein Spiel komplett hat.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">⚖️</span><span>Popover zeigt <b>Dein Spiel gegen Server-Codex</b>, dazu, was noch offen ist.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🧯</span><span>Update-Fehler als <b>verständlicher Satz</b> mit Download-Knopf.</span></li>
+      </ul>
+    </div>
+    <div class="fr-flow">
+      <p>Kopfzeile: ● <b>LIVE</b> (grün/gelb) · Warnpunkt bei Update-Fehler</p>
+      <p>Popover: Dein Spiel · Server-Codex ✓ gleich / ⚠ anderer Stand · Einträge · Noch offen</p>
+      <p>Statuszeile: „Noch offen: 3D-Hüllen. Setze automatisch fort.“</p>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">Was es aushält<small>Balken = wie weit die Anforderung erfüllt ist</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Alle 7 Punkte aus Design 3, deinen Antworten und deinem Pin sind gebaut (geschätzt).">
+        <span class="fr-meter-name">🎯 Umfang</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">7 / 7</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 60%" data-tip="Typprüfung und betroffene Specs grün; volle Suite und Sichtprüfung im echten Fenster stehen aus, weil dein Uploader gerade lief (geschätzt).">
+        <span class="fr-meter-name">🧪 Geprüft</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">46 Tests</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="2 / 7 · ✓ Code-Check · ✓ Trockentest · ○ Zusammenspiel · ○ Lokal durchgespielt · ○ Prod-Build geprüft · ○ Live vertestet · ◌ Von dir abgenommen">
+    <span class="fr-depth-done">✓ Zuletzt bestanden: <b>Trockentest</b></span>
+    <span class="fr-depth-next">○ Noch nicht gemacht: <b>Zusammenspiel</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold">
+    <summary>🛠 Für Entwickler</summary>
+    <ul class="fr-dev">
+      <li>Commit <code>aec76336e</code> · Bereich: data-uploader (Renderer, Updater)</li>
+      <li><code>src/renderer/main.ts</code>, <code>src/lib/update-install.ts</code>, <code>src/main/updater.ts</code></li>
+      <li>Tests: typecheck grün, update-install + auto-run 46/46 grün; volle Suite vom Load-Governor zurückgestellt</li>
+      <li>Abweichung: Warnpunkt am Verbindungs-Chip statt am Zahnrad, weil das Zahnrad die Einstellungen öffnet und nicht das Popover</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="Du testest">
+    <ul>
+      <li data-todo-id="t-chip" data-crit="mid" data-guide="">Ampel und Popover im Uploader ansehen</li>
+      <li data-todo-id="t-suite" data-crit="low" data-guide="">Volle Uploader-Testsuite nachholen</li>
+    </ul>
+  </section>
+  <section data-handoffs hidden aria-label="Du machst danach">
+    <ul>
+      <li data-todo-id="h-reinstall" data-crit="high" data-guide="">v0.84.4 einmal von Hand installieren</li>
+    </ul>
+  </section>
 </section>
 </main>
     </div>
@@ -6515,7 +6581,8 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
       </div>
       <div class="panel-nav-scroll">
       <nav class="iteration-tabs" role="tablist" aria-label="Runden">
-<button class="iteration-tab" role="tab" data-iteration="1" aria-selected="true" aria-controls="iter-1">Runde 1</button>
+<button class="iteration-tab" role="tab" data-iteration="1" aria-selected="false" aria-controls="iter-1">Runde 1</button>
+<button class="iteration-tab" role="tab" data-final-report data-iteration="2" aria-selected="true" aria-controls="iter-2">Abschluss Etappe A</button>
 </nav>
       <!-- #section-nav also lives on the design skeleton: a free/decision round
            on a design concept (the final report is always free) renders its TOC
@@ -6919,7 +6986,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
     <button type="button" id="frozen-bar-back">Zur aktuellen Runde</button>
   </div>
 <script type="application/json" id="concept-stages">
-{"stages":[{"id":"A","name":"Versionsanzeige","state":"open"},{"id":"B","name":"Update-Pipeline","state":"open"}],"current":"A","icon":"🧭","title":"Uploader: Version & Update"}
+{"stages":[{"id":"A","name":"Versionsanzeige","state":"built"},{"id":"B","name":"Update-Pipeline","state":"open"}],"current":"A","icon":"🧭","title":"Uploader: Version & Update"}
 </script>
 <script type="application/json" id="concept-decisions">
 {"submitted": false, "decisions": [], "comments": {"general": {"text": "", "attachments": []}, "items": []}}
