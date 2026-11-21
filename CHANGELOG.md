@@ -4,6 +4,14 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.288.0] - 2026-11-21
+
+### Added
+- HQ Jetzt: warning chips in the live strip for low fuel (10 minutes from the event, hydrogen or quantum named) and a queued hangar request with its position and remaining wait (#1193)
+
+### Changed
+- Shared contracts with the desktop app: the web copy is now the master, the app mirrors it with a sync script
+
 ## [0.287.0] - 2026-11-21
 
 ### Added
