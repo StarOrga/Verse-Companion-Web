@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, NgZone, afterNextRender, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, NgZone, afterNextRender, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import type { VersePoint } from '../../data/verse.models';
@@ -11,6 +11,11 @@ import { BriefingHqLineService } from './briefing-hq-line';
 import { TX_ART_MS } from './briefing-transmit.component';
 import { BriefingStationComponent } from './briefing-station.component';
 import { RoleService } from '../../../auth/role.service';
+import { onScrollTick } from '../../../core/scroll-tick';
+import { pageScrollY } from '../../../core/page-scroll-y';
+
+/** Past this share of the viewport the page shows the hub: the HQ anchor leaves the outpost to the scene. */
+export const HQ_FOLLOW_MAX = 0.35;
 
 /** Quiet time (no scroll, no pointer movement, window focused) before the idle hint. */
 export const IDLE_HINT_MS = 8000;
@@ -76,7 +81,7 @@ export const IDLE_SHOW_MS = 5000;
     @let hqName = 'verse.hub.hq' | translate;
     @let hqValue = hqLine().key | translate: hqLine().params;
     <a class="hq-l" routerLink="/hq" [class.idle]="idle()" [attr.aria-label]="hqName + ' · ' + hqValue">
-      <span class="lock" aria-hidden="true"><i></i></span>
+      <span class="scan" aria-hidden="true"></span>
       <span class="lab" aria-hidden="true">
         <span class="lab-n">@for (ch of chars(hqName); track ch.i) {<i [style.--n]="ch.i">{{ ch.c }}</i>}</span>
         <span class="lab-v">{{ hqValue }}</span>
@@ -162,6 +167,24 @@ export class BriefingBeaconsComponent {
     const artTimer = inject(NgZone).runOutsideAngular(() => setTimeout(() => this.art.set(true), TX_ART_MS));
     destroyRef.onDestroy(() => clearTimeout(artTimer));
     afterNextRender(() => hq.watch(destroyRef));
+    // The outpost is drawn by the fixed background scene, which never scrolls; the stage does. The HQ
+    // anchor follows the page scroll so its hit area and label stay on the outpost (#388), and steps
+    // out once the hub has taken the viewport, so it never lies over the hub's columns.
+    const host = inject(ElementRef<HTMLElement>).nativeElement as HTMLElement;
+    afterNextRender(() => {
+      let y = 0;
+      const off = onScrollTick({
+        read: () => { y = pageScrollY(); },
+        write: () => {
+          host.style.setProperty('--hq-follow', `${Math.round(y)}px`);
+          host.classList.toggle('hq-away', y > window.innerHeight * HQ_FOLLOW_MAX);
+        },
+      });
+      y = pageScrollY();
+      host.style.setProperty('--hq-follow', `${Math.round(y)}px`);
+      host.classList.toggle('hq-away', y > window.innerHeight * HQ_FOLLOW_MAX);
+      destroyRef.onDestroy(off);
+    });
     if (reduced) return;
     afterNextRender(() => {
       let timer: ReturnType<typeof setTimeout> | null = null;
