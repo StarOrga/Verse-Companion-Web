@@ -4983,24 +4983,30 @@
     "handedOverHint": "The app is taking over your session, you can close this window. If it did not connect, start the connection again in the app."
   },
   "desktopAuth": {
-    "title": "Authorize Verse Data Uploader",
+    "titleConnect": "Connect Verse Data Uploader",
+    "titleConfirm": "Connect Verse Data Uploader?",
+    "titleConnecting": "Connecting…",
+    "titleConnected": "Connected",
+    "titleDenied": "No access",
+    "titleFailed": "Connection failed",
     "authorizing": "Checking your session…",
-    "loginRequired": "Sign in first, then confirm the connection.",
-    "redirecting": "Authorized. Sending token to the app…",
-    "redirectingHint": "You can close this window in a moment.",
-    "unauthorized": "Your account can't use the Verse Data Uploader.",
-    "unauthorizedHint": "You need collaborator or admin role. Ask an admin.",
+    "loginRequired": "Sign in, then confirm the connection.",
+    "confirmInfo": "Only confirm if you started the sign-in in the uploader yourself (port {{port}}).",
+    "confirm": "Connect",
+    "redirecting": "Handing your sign-in to the uploader.",
+    "handedOverHint": "The app is taking over your session, you can close this window. If it did not connect, start the connection again in the app.",
+    "connected": "The uploader is connected to your account. You can close this window.",
+    "start": "Start the sign-in from the Verse Data Uploader – it opens this page itself.",
+    "unauthorized": "Your account can't use the Verse Data Uploader. Ask an admin for the collaborator role.",
     "errorMissingParams": "Missing callback or state parameter.",
     "errorBadCallback": "Callback URL is not a 127.0.0.1 loopback in the expected port range.",
     "errorNoToken": "No access token in session.",
-    "confirmPrompt": "Connect the Verse Data Uploader on port {{port}} to your account?",
-    "confirmHint": "Only confirm if you just started the sign-in from the Verse Data Uploader yourself.",
-    "confirm": "Connect",
-    "cancel": "Cancel",
-    "cancelled": "Cancelled — nothing was sent. You can close this window.",
     "retry": "Try again",
-    "handedOver": "Back to the app",
-    "handedOverHint": "The app is taking over your session, you can close this window. If it did not connect, start the connection again in the app."
+    "done": {
+      "csrf": "The sign-in did not belong to this uploader session. Start it again in the uploader.",
+      "noToken": "The uploader received no sign-in. Start it again in the uploader.",
+      "failed": "Handing the sign-in to the uploader failed. Start it again in the uploader."
+    }
   },
   "footer": {
     "madeByCommunity": "Made by the Community",
