@@ -6,7 +6,8 @@
   // Side columns in % of the page frame (1280 px up to full HD, wider beyond). In cqw (=
   // the landing's width, as 22% of the stage was), so the value means the same in a
   // vertical property too (--cx-table-h below feeds the data sheet's bottom).
-  --cx-side: clamp(250px, 22cqw, 350px);
+  // Narrow since admin feedback #392: the hologram between them is the stage's subject.
+  --cx-side: clamp(230px, 17cqw, 290px);
   --cx-gut: var(--sc-page-gutter);
   --cx-pane: calc(var(--cx-side) - var(--cx-gut) - 22px);
   --cx-pb: max(var(--sc-space-2), calc(var(--sc-footer-h) - var(--sc-space-6) + var(--sc-space-1)));
@@ -15,8 +16,8 @@
   // The holotable's --tw is 94cqw of the holotable itself (its own container): the
   // landing's width minus both side columns.
   --cx-table-h: calc(min(620px, (100cqw - 2 * var(--cx-side)) * 0.94) * 0.23);
-  --cx-holo-t: 0.14;
-  --cx-holo-b: 0.14;
+  --cx-holo-t: 0.06;
+  --cx-holo-b: 0.12;
   // From a pane's outer edge to the screen edge: one gutter plus whatever the
   // page frame leaves beside the landing (cqw = the landing, its container).
   --cx-bleed: calc(var(--cx-gut) + max(0px, (100vw - 100cqw) / 2));
