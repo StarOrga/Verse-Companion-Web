@@ -1027,6 +1027,8 @@ class CodexExtractor:
 
         n = 0
         total_dangling = 0
+        # Dismantle yield is derived, not read: see _dismantle_global.
+        dglobal = _dismantle_global(self.df)
         # Ignore Legacy* record types (they are covered by the generic dump)
         for r in self.df.records_by_type_name("CraftingBlueprintRecord"):
             if not _is_catalog_entity(_strip_type_prefix(r.name)):
@@ -1103,8 +1105,6 @@ class CodexExtractor:
             craft_time: Optional[float] = None
             dismantle_time: Optional[float] = None
             dismantle_eff: Optional[float] = None
-            dismantle_yield: Optional[list] = None
-            dismantlable: Optional[bool] = None
             proc_data = (bp_node.get("processSpecificData")
                          or rv.get("processSpecificData")
                          or rv.get("processData") or [])
@@ -1118,10 +1118,6 @@ class CodexExtractor:
                         dismantle_time = t
                     if dismantle_eff is None:
                         dismantle_eff = _to_float(_pick(proc, ("@efficiency", "efficiency")))
-                    if dismantle_yield is None:
-                        dismantle_yield = _dismantle_yield(proc, _ref_stub)
-                    if dismantlable is None:
-                        dismantlable = _dismantlable_flag(proc)
                 elif craft_time is None and t is not None:
                     craft_time = t
             # Fallback: any TimeValue_Partitioned anywhere on the record
@@ -1176,9 +1172,13 @@ class CodexExtractor:
                 "craftTimeSeconds": craft_time,
                 "dismantleTimeSeconds": dismantle_time,
                 "dismantleEfficiency": dismantle_eff,
-                # null = unknown (no recognised record field); see _dismantle_yield.
-                "dismantleYield": dismantle_yield,
-                "dismantlable": dismantlable,
+                # Derived from the recipe + GlobalGenericDismantle; null = unknown.
+                "dismantleYield": _dismantle_yield(
+                    bp_node, dglobal["efficiency"], dglobal["resources"],
+                    _ref_stub, _cost_quantity),
+                "dismantlable": _dismantlable(
+                    outputs[0]["className"] if len(outputs) == 1 else None,
+                    dglobal["efficiency"], dglobal["entities"]),
                 "ingredients": ingredients,
                 "outputs": outputs,
                 "qualityRefs": quality_refs,
@@ -3703,66 +3703,125 @@ def _as_list(v: Any) -> List[str]:
 
 # ── generic deep helpers (no per-ship special-casing) ──────────────────────────
 # Dismantle yield (material class + amount handed back per item) and the
-# dismantlable flag. UNCONFIRMED hook (D7): no real GenericCraftingProcess_Dismantle
-# record with a yield has been inspected yet -- the key names below are hypotheses
-# and an absent/unrecognised field yields None (= unknown), never [] and never
-# False. Confirm against a real Data.p4k and narrow these tuples.
-_DISMANTLE_YIELD_LISTS = ("outputs", "yield", "dismantleOutputs",
-                          "returnedMaterials", "materials", "results")
-_DISMANTLE_YIELD_MATERIAL = ("material", "resource", "entity", "entityClass",
-                             "item", "ingredient")
-_DISMANTLE_YIELD_AMOUNT = ("quantity", "amount", "@quantity", "@amount", "count")
-_DISMANTLABLE_FLAGS = ("dismantlable", "isDismantlable", "canDismantle",
-                       "allowDismantle", "@dismantlable")
+# dismantlable flag. VERIFIED against LIVE Data/Game2.dcb (4.x, probe 2026-11-21,
+# #1058): no record carries a per-item yield. The schema has exactly two
+# dismantle structs, GenericCraftingProcess_Dismantle {efficiency, dismantleTime}
+# and CraftingProcess_Dismantle {entityClass, efficiency}; only the first is used,
+# by the single record CraftingBlueprintRecord.GlobalGenericDismantle
+# (efficiency 0.5, 15 s). The item-specific part comes from the item's OWN
+# fabrication blueprint, plus CraftingGlobalParams:
+#
+#   CraftingGlobalParams
+#     dismantleBlacklistResources[]     ResourceType.<X>  -> never handed back
+#     dismantleBlacklistEntityClasses[] EntityClassDefinition.<X> -> not dismantlable
+#   CraftingBlueprintRecord.blueprint.tiers[].recipe.costs.mandatoryCost
+#     CraftingCost_Select "ASPECTS" {count, options[], context[
+#         CraftingCostContext_ResultCompositionInclusion {option: Include|Exclude}]}
+#       CraftingCost_Select <slot> {count: 1, options: [one leaf]}
+#         CraftingCost_Resource {resource, quantity (SCU), minQuality,
+#                                context[CraftingCostContext_QuantityMultiplier]}
+#         CraftingCost_Item     {entityClass, quantity (pieces), minQuality}
+#
+# The included costs are the item's resource composition; dismantling hands back
+# composition x efficiency minus the blacklisted resources. Anything the data
+# cannot settle stays None (= unknown), never a guess: an excluded composition
+# (37 magazines), a choice of N out of more slots (3 armour legs) and an item-type
+# cost (259 blueprints, an item has no resource composition of its own here).
 
 
-def _dismantle_yield(proc: Any, ref_stub: Any) -> Optional[list]:
-    """[{material, amount}] from one dismantle process struct, or None (unknown).
+def _dismantle_global(df: Any) -> Dict[str, Any]:
+    """Efficiency + blacklists from GlobalGenericDismantle / CraftingGlobalParams.
 
-    `ref_stub` resolves a DataForge GUID stub to {className, guid}. Entries
-    without a resolvable material class or a numeric amount are skipped; if
-    nothing survives the result is None, not an empty list.
+    ``efficiency`` is None when no generic dismantle process exists, which
+    makes every derived yield unknown.
     """
-    if not isinstance(proc, dict):
-        return None
-    for key in _DISMANTLE_YIELD_LISTS:
-        lst = proc.get(key)
-        if not isinstance(lst, list):
+    out: Dict[str, Any] = {"efficiency": None, "resources": set(), "entities": set()}
+    for r in df.records_by_type_name("CraftingBlueprintRecord"):
+        if "dismantle" not in r.name.lower():
             continue
-        out: list = []
-        for e in lst:
-            if not isinstance(e, dict):
-                continue
-            material = None
-            for mk in _DISMANTLE_YIELD_MATERIAL:
-                mv = e.get(mk)
-                if isinstance(mv, dict):
-                    material = ref_stub(mv).get("className")
-                elif isinstance(mv, str) and mv:
-                    material = _strip_type_prefix(mv)
-                if material:
-                    break
-            amount = None
-            for ak in _DISMANTLE_YIELD_AMOUNT:
-                amount = _to_float(e.get(ak))
-                if amount is not None:
-                    break
-            if material and amount is not None:
-                out.append({"material": material, "amount": amount})
-        if out:
-            return out
+        bp = (df.record_to_dict(r, max_depth=6).get("_RecordValue_") or {}).get("blueprint")
+        proc = bp.get("processSpecificData") if isinstance(bp, dict) else None
+        if isinstance(proc, dict) and proc.get("_Type_") == "GenericCraftingProcess_Dismantle":
+            out["efficiency"] = _to_float(proc.get("efficiency"))
+            break
+    for r in df.records_by_type_name("CraftingGlobalParams"):
+        rv = df.record_to_dict(r, max_depth=3).get("_RecordValue_") or {}
+        for key, bucket in (("dismantleBlacklistResources", "resources"),
+                            ("dismantleBlacklistEntityClasses", "entities")):
+            for stub in rv.get(key) or []:
+                name = stub.get("_RecordName_") if isinstance(stub, dict) else None
+                if isinstance(name, str) and name:
+                    out[bucket].add(_strip_type_prefix(name))
+    return out
+
+
+def _context(node: Dict[str, Any], type_name: str) -> Optional[Dict[str, Any]]:
+    for c in node.get("context") or []:
+        if isinstance(c, dict) and c.get("_Type_") == type_name:
+            return c
     return None
 
 
-def _dismantlable_flag(proc: Any) -> Optional[bool]:
-    """Explicit boolean on the dismantle process, else None (unknown)."""
-    if not isinstance(proc, dict):
+def _dismantle_yield(bp_node: Any, efficiency: Optional[float],
+                     blacklist: set, ref_stub: Any, cost_quantity: Any) -> Optional[list]:
+    """[{material, amount}] handed back when this blueprint's item is dismantled.
+
+    None = unknown (see the module comment above for when); [] = the item is
+    made only of blacklisted resources. Amounts are SCU, summed per material,
+    in first-seen order.
+    """
+    if efficiency is None or not isinstance(bp_node, dict):
         return None
-    for key in _DISMANTLABLE_FLAGS:
-        v = proc.get(key)
-        if isinstance(v, bool):
-            return v
-    return None
+    tiers = bp_node.get("tiers")
+    if not isinstance(tiers, list) or len(tiers) != 1:
+        return None
+    costs = ((tiers[0] or {}).get("recipe") or {}).get("costs") or {}
+    if costs.get("optionalCosts"):
+        return None
+    top = costs.get("mandatoryCost")
+    if not isinstance(top, dict) or top.get("_Type_") != "CraftingCost_Select":
+        return None
+    incl = _context(top, "CraftingCostContext_ResultCompositionInclusion")
+    if incl is not None and incl.get("option") != "Include":
+        return None
+    totals: Dict[str, float] = {}
+
+    def walk(node: Any, depth: int) -> bool:
+        if depth > 8 or not isinstance(node, dict):
+            return False
+        t = node.get("_Type_")
+        if t == "CraftingCost_Select":
+            opts = node.get("options") or []
+            if not opts or node.get("count") != len(opts):
+                return False
+            return all(walk(o, depth + 1) for o in opts)
+        if t != "CraftingCost_Resource":
+            return False
+        material = ref_stub(node.get("resource")).get("className")
+        qty = cost_quantity(node.get("quantity"))
+        if not material or qty is None:
+            return False
+        mul = _context(node, "CraftingCostContext_QuantityMultiplier")
+        if mul is not None:
+            m = _to_float(mul.get("multiplier"))
+            if m is None:
+                return False
+            qty *= m
+        if material not in blacklist:
+            totals[material] = totals.get(material, 0.0) + qty
+        return True
+
+    if not walk(top, 0):
+        return None
+    return [{"material": m, "amount": round(q * efficiency, 6)} for m, q in totals.items()]
+
+
+def _dismantlable(output_class: Optional[str], efficiency: Optional[float],
+                  blacklist: set) -> Optional[bool]:
+    """False for a blacklisted item, True for any other fabricated item."""
+    if not output_class or efficiency is None:
+        return None
+    return output_class not in blacklist
 
 
 def _to_float(v: Any) -> Optional[float]:

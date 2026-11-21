@@ -743,6 +743,21 @@
         "hunks": [
           "bf1e7bff654c"
         ]
+      },
+      {
+        "ship": "#1228",
+        "by": "Jerry",
+        "value": "3693 tracked files."
+      },
+      {
+        "ship": "fix/1058-dismantle-yield",
+        "by": "JerryT2T",
+        "value": "3694 tracked files (regenerated from the merged tree)",
+        "decided": true,
+        "at": "2026-11-21T11:51:58.519Z",
+        "hunks": [
+          "c4aa3a00a229"
+        ]
       }
     ],
     ".claude/project-map.md›header›tracked-files": [
