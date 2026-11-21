@@ -27,6 +27,16 @@ import { discoverAll } from '../lib/discovery.js';
 
 export const EXTRACTS_DIR_NAME = '.sc-companion-extracts';
 export const UPLOAD_MARKER = '_uploaded.json';
+/**
+ * Written into an extract whose codex landed but whose 3D hulls or silhouettes did not: the
+ * next start continues the models from it (models-only run) instead of
+ * reading the P4K again. The startup sweep keeps such a dir past the 24 h age
+ * gate; only an upload (which deletes the dir) or a new extraction's purge
+ * reclaims it. Before this, a daily auto-run found its extract one day old,
+ * swept it seconds before it needed it, and re-extracted the whole build
+ * (LIVE 4.10.3, 2026-11-21: P4K read, catalog transfer and silhouettes again).
+ */
+export const PARTS_PENDING_MARKER = '_parts_pending.json';
 /** Dir-name prefix of a 3D-livery build cache (`skins-<patch version>`). */
 export const SKINS_CACHE_PREFIX = 'skins-';
 /**
@@ -170,6 +180,30 @@ export async function markUploaded(
   }
 }
 
+/** Flag an extract a continuation (hulls, silhouettes) still needs (see `PARTS_PENDING_MARKER`). Best-effort. */
+export async function markPartsPending(outDir: string): Promise<CleanupResult> {
+  try {
+    assertSafeExtractTarget(outDir);
+  } catch (err) {
+    const error = err instanceof Error ? err.message : String(err);
+    log.warn('[cleanup] guard rejected parts-pending target', { outDir, error });
+    return { ok: false, error };
+  }
+  try {
+    await fs.writeFile(
+      join(outDir, PARTS_PENDING_MARKER),
+      JSON.stringify({ timestamp: new Date().toISOString() }, null, 2),
+      'utf-8',
+    );
+    log.info(`[cleanup] extract kept for the open parts (hulls/silhouettes): ${outDir}`);
+    return { ok: true };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : String(err);
+    log.warn('[cleanup] failed to write parts-pending marker', { outDir, error });
+    return { ok: false, error };
+  }
+}
+
 /**
  * Post-upload cleanup: drop the marker (audit trail in case rm is interrupted)
  * then delete the dir. Best-effort — logs and returns, never throws.
@@ -197,6 +231,8 @@ export async function cleanupAfterUpload(
  *   (b) a `skins-<version>` cache   → hours of glb work, KEEP (see
  *                                     `skinsCacheVersion`).
  *   (c) has `_uploaded.json`        → already uploaded, reclaim it.
+ *   (c') `_parts_pending.json`, no upload marker → the 3D hulls continue from
+ *                                     it, KEEP regardless of age.
  *   (d) no marker AND mtime > 24h   → stale failed run, reclaim it.
  *   (e) no marker AND mtime <= 24h  → possibly in-progress, KEEP.
  * Best-effort; logs a one-line summary. Never throws.
@@ -242,6 +278,14 @@ export async function scanAndCleanupOrphans(
           hasMarker = false;
         }
         if (!hasMarker) {
+          // A continuation (hulls, silhouettes) still runs from this extract — keep it, whatever its age.
+          try {
+            await fs.access(join(dir, PARTS_PENDING_MARKER));
+            kept.push(dir);
+            continue;
+          } catch {
+            /* no open hulls */
+          }
           // Keep recently-touched marker-less dirs — could be a live run.
           let ageMs = 0;
           try {

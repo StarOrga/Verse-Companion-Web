@@ -125,6 +125,37 @@ def test_merge_lends_the_icon_of_an_unnamed_heuristic_row_by_id() -> None:
     assert rows[1]["icon"] == "g.dds" and rows[1]["name"] == "Starlancer Updraft Livery"
 
 
+def test_merge_never_lends_one_heuristic_row_to_two_paints() -> None:
+    # LIVE 4.10.3 Retaliator: the localization guess named the Grey icon row
+    # after the Blue-and-Gold paint, so both paints took `retaliator_invictus_grey`
+    # and ingest-skins refused the duplicate commit.
+    cat = [{"id": "standard", "name": "Retaliator (Standard)", "has_material": True},
+           {"id": "retaliator_invictus_grey", "name": "Retaliator Invictus Blue and Gold Livery",
+            "icon": "Paint_Retaliator_Invictus_Grey_Icon.dds", "has_material": False}]
+    paints = [{"id": "retaliator_invictus_blue_gold", "name": "Retaliator Invictus Blue and Gold Livery",
+               "description": "", "mtl": None, "paintClass": "Paint_Retaliator_Invictus_Blue_Gold"},
+              {"id": "retaliator_invictus_grey", "name": "Retaliator Grey Livery",
+               "description": "", "mtl": None, "paintClass": "Paint_Retaliator_Invictus_Grey"}]
+    rows, build = _merge_paint_catalog(cat, paints)
+    by_class = {r["paintClass"]: r for r in rows[1:]}
+    grey = by_class["Paint_Retaliator_Invictus_Grey"]
+    gold = by_class["Paint_Retaliator_Invictus_Blue_Gold"]
+    assert grey["id"] == "retaliator_invictus_grey"
+    assert grey["icon"] == "Paint_Retaliator_Invictus_Grey_Icon.dds"
+    assert gold["id"] == "retaliator_invictus_blue_gold" and gold["icon"] is None
+    ids = [b["id"] for b in build]
+    assert len(ids) == len(set(ids))
+
+
+def test_merge_keeps_ids_unique_when_classes_slug_alike() -> None:
+    cat = [{"id": "standard", "name": "x", "has_material": True}]
+    paints = [{"id": "x_red", "name": "A", "description": "", "mtl": None, "paintClass": "Paint_X_Red"},
+              {"id": "x_red", "name": "B", "description": "", "mtl": None, "paintClass": "Paint_X-Red"}]
+    rows, build = _merge_paint_catalog(cat, paints)
+    assert [r["id"] for r in rows] == ["standard", "x_red", "x_red_2"]
+    assert [b["id"] for b in build] == ["x_red", "x_red_2"]
+
+
 def test_envelope_maps_cryengine_axes() -> None:
     from sc_extract.dataforge_extract import _envelope
     assert _envelope({"x": 127.0, "y": 243.0, "z": 57.5}) == {"length": 243.0, "width": 127.0, "height": 57.5}
@@ -132,10 +163,12 @@ def test_envelope_maps_cryengine_axes() -> None:
     assert _envelope(None) is None
 
 
-def test_merge_never_lends_one_heuristic_row_to_two_paints() -> None:
+def test_merge_pairs_a_shared_row_by_id_before_name() -> None:
     # Retaliator, LIVE-4.10.3 (#383): the heuristic row named "Invictus Blue
     # and Gold" carries the id `retaliator_invictus_grey`, so the Grey paint
     # matched it by id as well — two rows with one skin id broke the commit.
+    # The icon file is the Grey paint's own (`Paint_Retaliator_Invictus_Grey_Icon`),
+    # so the id match wins it; the name was a localization guess.
     cat = [{"id": "standard", "name": "x", "has_material": True},
            {"id": "retaliator_invictus_grey", "name": "Invictus Blue and Gold",
             "icon": "i.dds", "has_material": False}]
@@ -146,12 +179,12 @@ def test_merge_never_lends_one_heuristic_row_to_two_paints() -> None:
     rows, build = _merge_paint_catalog(cat, paints)
     ids = [r["id"] for r in rows]
     assert len(ids) == len(set(ids))
-    # the name match keeps the server's id and the icon …
-    gold = next(r for r in rows if r["name"] == "Invictus Blue and Gold")
-    assert gold["id"] == "retaliator_invictus_grey" and gold["icon"] == "i.dds"
-    # … the other paint gets its own id (suffixed, since that is taken) and no icon
+    # the id match keeps the id and the icon …
     grey = next(r for r in rows if r["name"] == "Grey")
-    assert grey["id"] == "retaliator_invictus_grey_2" and grey["icon"] is None
+    assert grey["id"] == "retaliator_invictus_grey" and grey["icon"] == "i.dds"
+    # … the name-only paint gets its own id and no borrowed icon
+    gold = next(r for r in rows if r["name"] == "Invictus Blue and Gold")
+    assert gold["id"] == "retaliator_invictus_blue_gold" and gold["icon"] is None
     assert [b["id"] for b in build] == ids[1:]
 
 
