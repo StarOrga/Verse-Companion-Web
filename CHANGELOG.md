@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.287.1] - 2026-11-21
+
+### Fixed
+- Type to search now works in the header every reader gets by default: on Verse, HQ and every other page whose only search is the header search, a letter typed with nothing focused opens the search with that letter. The 0.286.0 version only reached the beta header, so it did nothing for readers without the shell beta. Codex pages keep starting their own search bar.
+
 ## [0.287.0] - 2026-11-21
 
 ### Added
