@@ -8,8 +8,9 @@ import type { LearnState, LearnSummary } from './_learn.ts';
 import { jsonParams, resultJson, spendBlock, submitLearnBatch } from './_learn_batch.ts';
 import type { LearnDeps } from './_learn_batch.ts';
 import type { LearnSettings } from './_learn_db.ts';
-import type { BatchParams, BatchResult } from './_job.ts';
+import type { BatchResult } from './_job.ts';
 import { LANG_NAMES } from './_prompt.ts';
+import type { BatchParams } from './_prompt.ts';
 
 export const BACK_ITEMS = 100;
 const BACK_PER_REQUEST = 50;
@@ -46,9 +47,10 @@ export function parseBack(items: BackItem[], results: Map<string, BatchResult>):
   for (let g = 0; g * BACK_PER_REQUEST < items.length; g++) {
     const part = items.slice(g * BACK_PER_REQUEST, (g + 1) * BACK_PER_REQUEST);
     const o = resultJson(results.get(`b${g}`)) as { t?: unknown } | null;
-    if (!o || !Array.isArray(o.t) || o.t.length !== part.length) continue;
+    const list = o && Array.isArray(o.t) ? (o.t as unknown[]) : null;
+    if (!list || list.length !== part.length) continue;
     part.forEach((x, j) => {
-      const t = String(o.t[j] ?? '').trim();
+      const t = String(list[j] ?? '').trim();
       if (t) out.set(x.card_id, t.slice(0, 500));
     });
   }
