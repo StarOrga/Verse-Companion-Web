@@ -114,7 +114,9 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // 16: mission-objective props (EAObjective*, e.g. the Satellite) are no ships.
     // 17: concept 20261117-1810 — payload.interior (elements, doors, cargo grids, lifts, cargo
     // gaps), decks merged by lift stops, rooms carry `poweredBy`, catch-all rooms land on their deck.
-    revision: 17,
+    // 18: payload.skins ids are unique per ship — two DataCore paints no longer
+    // share one heuristic icon row (Retaliator, Constellations, Avengers, Syulen).
+    revision: 18,
     phases: ['codex_ships'],
     sources: [
       ...CATALOG_SHARED,

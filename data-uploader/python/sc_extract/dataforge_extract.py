@@ -3555,7 +3555,16 @@ def _merge_paint_catalog(cat: List[Dict[str, Any]],
     store name lends its icon and keeps its id (so the 3D rows already on the
     server keep their skin ids). Heuristic rows the DataCore does not list are
     dropped — they were another variant's paint or a file-name guess. The
-    factory finish always leads."""
+    factory finish always leads.
+
+    Every heuristic row lends itself to ONE paint, and every id comes out once.
+    The id match goes first: the icon token is the paint class itself
+    (`Paint_Retaliator_Invictus_Grey_Icon`), while the heuristic NAME is a
+    localization guess that can belong to a sibling paint — on LIVE 4.10.3 the
+    Retaliator's "Invictus Blue and Gold" and "Grey" paints both took the
+    `retaliator_invictus_grey` row, so the ship's skins.json listed that id
+    twice and `ingest-skins` refused the commit (ON CONFLICT DO UPDATE cannot
+    affect a row twice) for 11 ships, every run."""
     by_name = {str(c.get("name") or "").strip().lower(): c
                for c in cat if c.get("id") != "standard"}
     # An icon row the heuristics could not name ("starlancer Starlancer Grey
@@ -3565,10 +3574,33 @@ def _merge_paint_catalog(cat: List[Dict[str, Any]],
     rows: List[Dict[str, Any]] = [std] if std else []
     build: List[Dict[str, Any]] = []
     base_ok = bool(std and std.get("has_material"))
-    for p in paints:
-        old = by_name.get(p["name"].lower()) or by_id.get(p["id"])
+    claimed: Dict[int, Dict[str, Any]] = {}  # paint index -> heuristic row
+    taken: set = set()  # id() of heuristic rows already lent
+    for i, p in enumerate(paints):
+        old = by_id.get(p["id"])
+        if old is not None and id(old) not in taken:
+            claimed[i] = old
+            taken.add(id(old))
+    for i, p in enumerate(paints):
+        if i in claimed:
+            continue
+        old = by_name.get(p["name"].lower())
+        if old is not None and id(old) not in taken:
+            claimed[i] = old
+            taken.add(id(old))
+    used_ids = {std.get("id")} if std else set()
+    for i, p in enumerate(paints):
+        old = claimed.get(i)
+        pid = (old or {}).get("id") or p["id"]
+        if pid in used_ids:
+            # Two DataCore classes that slug alike: keep both, apart.
+            n = 2
+            while f"{pid}_{n}" in used_ids:
+                n += 1
+            pid = f"{pid}_{n}"
+        used_ids.add(pid)
         row = {
-            "id": (old or {}).get("id") or p["id"],
+            "id": pid,
             "name": p["name"],
             "description": p["description"] or (old or {}).get("description") or "",
             "source": "store",
