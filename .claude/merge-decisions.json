@@ -1896,6 +1896,16 @@
         "hunks": [
           "83cf0eba4627"
         ]
+      },
+      {
+        "ship": "claude/backlgo-a9602a",
+        "by": "claude",
+        "value": "0.287.0 (this ship bumps past 0.286.2)",
+        "decided": true,
+        "at": "2026-11-21T10:35:53.985Z",
+        "hunks": [
+          "d0c85bbf06b5"
+        ]
       }
     ],
     "public/release-notes.json›current›version": [
