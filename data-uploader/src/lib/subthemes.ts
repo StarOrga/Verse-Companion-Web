@@ -149,7 +149,10 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // 7: codex_blueprints gains dismantle_yield / dismantlable (HQ Bestand, #1058).
     // 8: codex_entity_strings — names behind a `,P`-marked loc key resolve.
     // 9: codex_locations — Verse places from the game data (starmap.py, #1194).
-    revision: 9,
+    // 10: codex_blueprints.dismantle_yield / dismantlable filled for real —
+    //     derived from the recipe + GlobalGenericDismantle, no per-item field
+    //     exists in the game data (#1058).
+    revision: 10,
     phases: [
       'codex_manufacturers',
       'codex_blueprints',
