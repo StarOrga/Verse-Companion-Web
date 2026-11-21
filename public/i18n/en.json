@@ -4403,6 +4403,16 @@
         "approve": "Approve",
         "revoke": "Revoke",
         "fullRun": "Start full run",
+        "fullRunOpen": "Full run in progress – see jobs",
+        "fullRunGap": "Translates only the {{missing}} missing texts (about {{pct}} %). Whatever CIG or the translation memory already has costs nothing.",
+        "fullRunUnmeasured": "Translates everything CIG and the translation memory do not have yet. The estimate first is free and measures the coverage.",
+        "coverage": {
+          "label": "Coverage {{lang}}",
+          "value": "{{pct}} %",
+          "detail": "{{covered}} of {{total}} texts translated (by CIG or from the translation memory). As of the latest job: {{at}}",
+          "unknown": "Coverage unknown",
+          "unknownHint": "It is measured with the first job of this language."
+        },
         "approveTitle": "Approve {{lang}}?",
         "approveText": "New uploads will also be translated into {{lang}} from now on (deltas only).",
         "revokeTitle": "Revoke approval for {{lang}}?",
