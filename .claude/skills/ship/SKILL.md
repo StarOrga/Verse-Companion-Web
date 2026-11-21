@@ -160,6 +160,9 @@ below is canonical — external docs cite it.)
       channel)` — never auto-promote on ship. The CI "Print catalog-register SQL"
       step prints this ready CTE (URLs/sha512/sizes filled in); the
       `release_token` UUID comes from `gh run download -n release-token`.
+      **Register only after that run is green, with THAT run's token, then run
+      `node scripts/verify-uploader-release.mjs --version <v> --run <id>`** —
+      why: `.claude/deep-knowledge/data-uploader-release.md` § One build per version.
       `/desktop` + the in-app updater resolve the release through the channel
       pointer (role-clamped: admin→alpha, collaborator→beta, viewer→stable) —
       without the row + alpha pointer the page stays on the old version.

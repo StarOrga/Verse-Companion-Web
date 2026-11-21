@@ -1687,6 +1687,49 @@ td.error, span.error { background: none; border: none; padding: 0; margin: 0; }
   padding: 6px 10px;
 }
 
+/* Header chip: the channel as a traffic light (green = the server has this game
+   build complete, yellow = it differs or parts are open); the popover says why. */
+.conn-chip-state { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.conn-chip-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--sc-font-label); font-weight: 600; font-size: var(--fs-xs);
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--sc-fg-1);
+}
+.conn-chip-tag::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+.conn-chip-tag--ok { color: var(--sc-success); }
+.conn-chip-tag--warn { color: var(--sc-warning); }
+.conn-chip-tag--none { color: var(--sc-fg-2); }
+.conn-chip-badge {
+  width: 8px; height: 8px; border-radius: 50%; flex: none;
+  background: var(--sc-warning); box-shadow: 0 0 6px rgba(var(--accent-warning-rgb), 0.6);
+}
+
+/* Popover: local build vs. server codex, one row each. */
+.conn-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+.conn-table th, .conn-table td { padding: 5px 4px; border-top: 1px solid var(--sc-border); text-align: left; vertical-align: baseline; }
+.conn-table th { width: 7.5em; font-weight: 400; color: var(--sc-fg-2); white-space: nowrap; }
+.conn-table td { color: var(--sc-fg-1); }
+.conn-table td:last-child { text-align: right; white-space: nowrap; }
+.conn-chtag { font-family: var(--sc-font-label); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--sc-accent); margin-right: 4px; }
+.conn-chtag--ptu { color: var(--sc-success); }
+.conn-chtag--eptu { color: var(--sc-warning); }
+.conn-chtag--tech-preview { color: var(--sc-accent-hot); }
+.conn-cmp--ok { color: var(--sc-success); }
+.conn-cmp--warn { color: var(--sc-warning); }
+.conn-row-open th, .conn-row-open td { color: var(--sc-warning); }
+.conn-row-open td:last-child { text-align: left; white-space: normal; }
+
+/* The uploader cannot update itself: sentence + way out, never the raw error. */
+.conn-update-err {
+  font-size: var(--fs-sm); color: var(--sc-fg-0);
+  background: rgba(var(--accent-warning-rgb), 0.08);
+  border: 1px solid rgba(var(--accent-warning-rgb), 0.45);
+  border-radius: var(--sc-radius); padding: 8px 10px;
+}
+.conn-update-err p { margin: 0; }
+.conn-update-err strong { color: var(--sc-warning); font-weight: 600; }
+.conn-update-acts { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+
 /* ===================================================================
    Toggles, segmented controls, dialogs
    =================================================================== */

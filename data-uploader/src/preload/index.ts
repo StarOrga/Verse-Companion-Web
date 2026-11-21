@@ -121,7 +121,7 @@ type UpdateEvent =
   | { type: 'progress'; pct: number; bytesPerSecond?: number; transferred?: number; total?: number }
   | { type: 'downloaded'; version: string }
   | { type: 'manual'; currentVersion: string; latestVersion: string }
-  | { type: 'error'; message: string }
+  | { type: 'error'; code: 'unknown-build' | 'offline' | 'server' | 'not-installed' | 'other' }
   | { type: 'install-state'; state: 'preparing' | 'waiting' | 'closing' | 'failed'; version: string };
 
 interface ExtractRequest {
