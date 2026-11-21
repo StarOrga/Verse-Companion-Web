@@ -287,7 +287,7 @@ export async function arbitrate(deps: Deps, lang: string, conflicts: Conflict[])
         else {
           cards.push(tmCard({
             lang, key: c.key, keys: c.keys ?? [c.key], h: c.h, en: c.en, a: c.incumbent, b: c.challenger, doubt: v.doubt,
-            fresh: true, why: 'arbiter_disagreement',
+            fresh: true, why: 'arbiter_disagreement', judge: fwd[i] && rev[i] ? { f: fwd[i]!.c, r: rev[i]!.c } : null,
           }));
         }
       });
@@ -298,7 +298,7 @@ export async function arbitrate(deps: Deps, lang: string, conflicts: Conflict[])
   // What steps 1 and 2 decided is written before anything else can fail. A request that dies after this
   // point repeats the same decisions (idempotent); one that died before lost nothing, the batch is still there.
   if (Object.keys(writes).length) await saveTm(d.store, lang, writes);
-  if (cards.length) sum.cards = await createCards(d.learn, cards);
+  if (cards.length) sum.cards = await createCards(d.learn, cards, undefined, d.store, d.now);
   await d.store.putJson(reviseKey(lang), revise);
 
   // 3. submit the next batch; its id is saved at once, so only a kill inside that one write can orphan it.

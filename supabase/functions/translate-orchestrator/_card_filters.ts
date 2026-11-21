@@ -234,7 +234,7 @@ export function recomputeDoubt(c: { a: Candidate; b: Candidate; judge?: { f?: nu
 
 // ── P6 ───────────────────────────────────────────────────────────────────────
 
-export type KiBasis = 'majority' | 'community' | 'ai' | 'votes' | ResolvedBasis | 'only_left';
+export type KiBasis = 'majority' | 'community' | 'ai' | 'votes' | ResolvedBasis | 'only_left' | 'convention';
 
 export interface KiDecision {
   choice: 'a' | 'b' | 'own';
