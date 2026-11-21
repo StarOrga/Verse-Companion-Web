@@ -38,8 +38,12 @@ import { SameRouteRefreshService } from '../core/same-route-refresh.service';
 import { NeuroFieldDirective } from '../core/neuro-field.directive';
 import { PATH_ICONS } from '../shared/item-path/path-icons';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
+import { AnalyticsService } from '../core/analytics.service';
+import { EventsTeaserComponent } from './events-teaser.component';
+import { isEventNews } from './news-events';
+import { VerseEventsService } from './verse-events.service';
 
-type FeedFilter = 'all' | 'comm-link' | 'youtube' | 'spectrum' | 'patch' | 'saved';
+type FeedFilter = 'all' | 'comm-link' | 'youtube' | 'spectrum' | 'patch' | 'events' | 'saved';
 const FEED_CHANNELS: readonly VerseNewsItem['channel'][] = [...STREAM_CHANNELS, 'patch'];
 
 /** How many stream tiles the first serving holds, and how many each "more" adds. */
@@ -95,6 +99,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
     ScPopupComponent,
     ScActionDirective,
     SammlungStripComponent,
+    EventsTeaserComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -202,6 +207,10 @@ const SAFE_SVG = new Map<string, SafeHtml>();
            there is nothing new since the user last looked. -->
       <sc-upcoming-ships-notice />
 
+      <!-- In-game events (feedback #389): what runs now and the next one, from
+           the event timeline. Self-hides when nothing runs or is due. -->
+      <sc-events-teaser class="sc-enter" style="--sc-enter-i: 2" variant="news_top" />
+
       <!-- ══ 3 · THE STREAM ════════════════════════════════════════════════
            One flat, reverse-chronological grid. No Heute/Diese Woche/Älter
            bands: those are what bound the hero to a bucket that is empty on
@@ -218,7 +227,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
             @for (f of filters; track f) {
               <button type="button" class="chip" [class.on]="activeFilter() === f" [class.saved]="f === 'saved'"
                       [attr.aria-pressed]="activeFilter() === f"
-                      (click)="selectFilter(f)">
+                      (click)="pickFilter(f)">
                 @if (f === 'saved') { <span class="ic" [innerHTML]="favIcon(true)"></span> }
                 <span class="chip-lbl">{{ filterLabel(f) | translate }}</span>
                 <span class="chip-num">{{ filterCount(f) }}</span>
@@ -327,6 +336,9 @@ const SAFE_SVG = new Map<string, SafeHtml>();
           }
         }
       </section>
+
+      <!-- The upcoming event calendar under the stream (feedback #389). -->
+      <sc-events-teaser class="events-bottom" variant="news_bottom" />
     </section>
 
     <!-- Enlarged in-app detail (CDK overlay, portaled to <body>). -->
@@ -967,6 +979,8 @@ const SAFE_SVG = new Map<string, SafeHtml>();
 })
 export class NewsListComponent implements OnInit, OnDestroy {
   readonly svc = inject(NewsService);
+  private readonly events = inject(VerseEventsService);
+  private readonly analytics = inject(AnalyticsService);
 
   /** The feed error card's retry — the service's own refresh. */
   retry(): void {
@@ -999,7 +1013,7 @@ export class NewsListComponent implements OnInit, OnDestroy {
   private shareHintTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** Chips of the feed, in display order. `saved` rides on the service's favourites flag. */
-  readonly filters: readonly FeedFilter[] = ['all', 'comm-link', 'youtube', 'spectrum', 'patch', 'saved'];
+  readonly filters: readonly FeedFilter[] = ['all', 'comm-link', 'youtube', 'spectrum', 'patch', 'events', 'saved'];
   private readonly channel = signal<Exclude<FeedFilter, 'saved'>>('all');
   readonly activeFilter = computed<FeedFilter>(() => (this.svc.favoritesOnly() ? 'saved' : this.channel()));
 
@@ -1010,6 +1024,8 @@ export class NewsListComponent implements OnInit, OnDestroy {
   private readonly queryParams = toSignal(inject(ActivatedRoute).queryParamMap);
   private readonly barTerm = signal('');
   readonly term = computed(() => (this.barTerm() || (this.queryParams()?.get('q') ?? '')).trim().toLowerCase());
+  /** `?filter=` — a computed, so the deep-link effect re-runs only when that value changes. */
+  private readonly filterParam = computed(() => this.queryParams()?.get('filter') ?? null);
 
   /** Everything the feed can show, newest first (patch notes included - they have a chip). */
   private readonly pool = computed(() =>
@@ -1029,6 +1045,7 @@ export class NewsListComponent implements OnInit, OnDestroy {
       case 'all': return n.channel !== 'patch' && n.id !== this.heroId();
       case 'saved': return this.svc.isFavorite(n.id);
       case 'patch': return n.channel === 'patch';
+      case 'events': return n.id !== this.heroId() && isEventNews(n, this.events.stems());
       default: return n.channel === filter && n.id !== this.heroId();
     }
   }
@@ -1045,6 +1062,11 @@ export class NewsListComponent implements OnInit, OnDestroy {
     if (f === 'all') return 'news.channels.all';
     if (f === 'saved') return 'news.favorite.saved';
     return `news.channels.${f}`;
+  }
+  /** A chip pressed by the reader (not a deep link): tracked, then applied. */
+  pickFilter(f: FeedFilter): void {
+    if (f !== this.activeFilter()) this.analytics.track('news:filter_select', { filter: f });
+    this.selectFilter(f);
   }
   selectFilter(f: FeedFilter): void {
     if (f === 'saved') { this.svc.setFavoritesOnly(true); return; }
@@ -1231,6 +1253,16 @@ export class NewsListComponent implements OnInit, OnDestroy {
       if (!wanted || untracked(() => this.selected())) return;
       const hit = feed.news.find((n) => n.id === wanted);
       if (hit) this.openDetail(hit);
+    });
+
+    // Deep link into a category: /verse/news?filter=events (the event teasers'
+    // heads link here). Read on every change, so a head clicked on this very
+    // page switches the chip too.
+    effect(() => {
+      const wanted = this.filterParam();
+      if (wanted && (this.filters as readonly string[]).includes(wanted)) {
+        untracked(() => this.selectFilter(wanted as FeedFilter));
+      }
     });
 
     // A fresh serving whenever the filter flips, so "Gemerkt" never opens
