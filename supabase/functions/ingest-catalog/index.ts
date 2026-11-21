@@ -103,7 +103,8 @@
 //
 // Response codes: 200 ok; 400 invalid_body; 401 unauthorized; 403 forbidden;
 //   500 ingest_failed; 503 ingest_timeout (Postgres cancelled the statement —
-//   the caller should halve the batch and retry, see catalog-bridge.ts).
+//   the caller should halve the batch and retry, see catalog-bridge.ts; reported
+//   to PostHog as server:ingest_timeout, not as an $exception).
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 import { bucketBytes, deleteObject, getObject, listObjects, putObject, r2FromEnv, readUsage } from '../ingest-skins/_r2.ts';
@@ -139,7 +140,7 @@ import type { PublishDeps, PublishResult } from './_locale-publish.ts';
 import { CLEAR_OP_TABLES, isLegacyNatkeyConflict, isRebuildUnavailable, prepareRebuild, refusedSwitchStatus } from './_rebuild.ts';
 import type { RebuildPlan } from './_rebuild.ts';
 import { copyBuildLocales } from './_locale-copy.ts';
-import { withPosthog } from '../_shared/posthog.ts';
+import { INGEST_TIMEOUT_EVENT, reportAs, withPosthog } from '../_shared/posthog.ts';
 import { safeEqual } from '../_shared/safe-equal.ts';
 
 const CORS = {
@@ -524,8 +525,8 @@ async function prepareSwitch(
         if (error) throw error;
         return new Set(((data ?? []) as { table_name: string }[]).map((r) => r.table_name));
       },
-      async clone(id, table) {
-        const { data, error } = await admin.rpc('codex_clone_untouched', { p_build_id: id, p_table: table });
+      async clone(id, table, limit) {
+        const { data, error } = await admin.rpc('codex_clone_untouched', { p_build_id: id, p_table: table, p_limit: limit });
         if (error) throw error;
         const r = (data ?? {}) as { copied?: number; done?: boolean };
         return { copied: Number(r.copied ?? 0), done: r.done === true };
@@ -643,6 +644,12 @@ async function translationAfterPublish(
     },
   );
   console.log(`ingest-catalog: translation ${buildId}: ${JSON.stringify(r)}`);
+}
+
+/** What `server:ingest_timeout` carries: the op, the table and the batch size, never row content. */
+function timeoutProps(op: string, body: Record<string, unknown>): Record<string, unknown> {
+  const table = typeof body.table === 'string' && /^[a-z0-9_]{1,64}$/.test(body.table) ? body.table : null;
+  return { op: op.slice(0, 40), table, rows: Array.isArray(body.rows) ? body.rows.length : null };
 }
 
 Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response> => {
@@ -1300,10 +1307,11 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       : rawMsg.slice(0, 500);
     const timedOut = err?.code === '57014' || /statement timeout|canceling statement/i.test(msg);
     if (timedOut) {
-      return new Response(
+      // Expected and self-healing: an event of its own, not an $exception.
+      return reportAs(new Response(
         JSON.stringify({ error: 'ingest_timeout', code: err?.code ?? '57014', message: msg }),
         { status: 503, headers: { 'content-type': 'application/json', 'retry-after': '2', ...CORS } },
-      );
+      ), INGEST_TIMEOUT_EVENT, timeoutProps(op, body));
     }
     return json({ error: 'ingest_failed', code: err?.code ?? null, message: msg }, 500);
   }

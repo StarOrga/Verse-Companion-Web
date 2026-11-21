@@ -4,10 +4,20 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.288.5] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.3: 3D skins of the Retaliator, the Constellation Taurus / Phoenix, the Avenger variants and the Syulen variants upload again. Two liveries of one ship could share one skin id, so the server refused the whole ship on every upload; each livery now keeps an id of its own, and the server names a duplicate id (400 `duplicate_skin_id`) instead of failing with a bare error (admin feedback #383). Needs a new uploader run.
+
+## [0.288.4] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.2: the 3D step reports a sign of life before every paint icon it renders, so a slow icon run under load no longer trips the 20-minute stall watchdog, and a stall during the first ship is reported as `ships` instead of `discover` (admin feedback #382).
+
 ## [0.288.3] - 2026-11-21
 
 ### Fixed
-- Data Uploader 0.84.2: 3D skins of the Retaliator, the Constellation Taurus / Phoenix, the Avenger variants and the Syulen variants upload again. Two liveries of one ship could share one skin id, so the server refused the whole ship on every upload; each livery now keeps an id of its own, and the server names a duplicate id (400 `duplicate_skin_id`) instead of failing with a bare error (admin feedback #383). Needs a new uploader run.
+- Catalog uploads: a batch that runs into the database statement timeout and is retried smaller no longer opens an error issue in PostHog — it is counted as its own `server:ingest_timeout` event with the op, table and batch size; only a run's final failure is an error. Copying the unchanged tables at the end of a re-upload now retries a slow chunk with half the rows (2000 → 1000 → 500) instead of failing the finalize step (admin feedback #380).
 
 ## [0.288.2] - 2026-11-21
 
