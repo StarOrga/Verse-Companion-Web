@@ -6,7 +6,7 @@
 > Built with Angular 22 PWA · Supabase (Auth + Postgres + Storage + Edge Functions) · Vercel.
 
 [![Live](https://img.shields.io/badge/live-versecompanion--alpha.vercel.app-00d4ff)](https://versecompanion-alpha.vercel.app)
-[![Stack](https://img.shields.io/badge/stack-Angular%2021%20%C2%B7%20Supabase%20%C2%B7%20Vercel-00d4ff)](#)
+[![Stack](https://img.shields.io/badge/stack-Angular%2022%20%C2%B7%20Supabase%20%C2%B7%20Vercel-00d4ff)](#)
 [![Phase](https://img.shields.io/badge/phase-alpha-fbbf24)](#)
 [![License](https://img.shields.io/badge/license-MIT-4ade80)](LICENSE)
 
@@ -27,7 +27,7 @@ npm install
 npm start             # http://127.0.0.1:4200 — talks to the cloud Supabase project
 npm run build         # production build into dist/verse-companion/browser
 npm run typecheck     # tsc --noEmit
-npm test              # Karma + Jasmine (ChromeHeadless)
+npm test              # Vitest in headless Chromium (Playwright)
 npm run lint          # ESLint via angular-eslint (ng lint)
 ```
 
@@ -35,7 +35,7 @@ npm run lint          # ESLint via angular-eslint (ng lint)
 
 - **Cloud project:** `hcnqhvzlavdycidqyaai.supabase.co` (region `eu-central-1`, free tier).
 - **Schema:** `supabase/migrations/` — applied via the Supabase MCP / `npm run db:push`.
-- **Edge Functions:** `supabase/functions/` — `fetch-verse-news` (RSI news proxy), `process-p4k` (upload analyzer).
+- **Edge Functions:** `supabase/functions/` — about 35 functions, e.g. `fetch-verse-news` (RSI news proxy), `process-p4k` (upload analyzer), `ingest-*` (catalog / telemetry / skins), `translate-orchestrator`, `api` (public API). List the directory for the full set.
 - **Storage:** bucket `p4k-uploads` — per-user folder layout, RLS scoped to `auth.uid()`.
 
 Local stack (optional, Docker required):
@@ -65,8 +65,8 @@ src/app/
   profile/         Account metadata
 public/i18n/       en.json, de.json — ngx-translate
 supabase/
-  migrations/      00001_init_schema.sql, 00002_storage_bucket_p4k.sql
-  functions/       fetch-verse-news/, process-p4k/
+  migrations/      timestamped SQL files, 190+ and growing (`npm run db:push` applies them)
+  functions/       one directory per function plus `_shared/` (see Supabase section)
 browser-extension/ Chrome MV3 hangar import (no bundler, no npm deps)
 ```
 
@@ -87,7 +87,7 @@ live in-app at `/apps/extension`.
 - All user-facing strings are in `public/i18n/{de,en}.json`. Never hardcode UI text.
 - Third-party APIs go through Edge Functions (`fetch-verse-news` proxies `api.star-citizen.wiki`). Keys never enter the client bundle.
 - `authGuard` waits for `auth.ready()` before deciding, to avoid a flash-of-login on hard refresh.
-- Service worker: network-first for JS/CSS, lazy assets, 15-min data cache on `fetch-verse-news`.
+- Service worker (`ngsw-config.json`): app shell JS/CSS prefetched and served cache-first, `chunk-*.js` lazy with prefetched updates, `freshness` data group (15 min cache, 4 s timeout) on `fetch-verse-news`.
 
 ## Documentation
 
