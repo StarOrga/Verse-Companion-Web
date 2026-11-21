@@ -222,3 +222,75 @@ export function passProgress(p: { status: string; phase: string; pos: number; to
 export function isRightsError(e: unknown): boolean {
   return (e as { code?: string } | null)?.code === '42501';
 }
+
+/** Share of a language's game strings that have a translation, as a job last measured it. */
+export interface LanguageCoverage {
+  /** Whole percent, rounded down: 100 only when no string is missing. */
+  pct: number;
+  covered: number;
+  total: number;
+  missing: number;
+  /** When it was measured: the publish of the job, else its creation. */
+  at: string;
+}
+
+interface CoverageJob {
+  lang: string;
+  status: string;
+  stats: unknown;
+  created_at: string;
+}
+
+/**
+ * Coverage read from one job's `stats`. Every estimate counts the whole English table of its build
+ * (`counts`: keys, blank, CIG's own valid translations, TM hits), deltas included. A published job
+ * also knows its overlay (`overlay_count`: every key the TM fills, its new translations included),
+ * which replaces the TM hits of the estimate. Blank English is no text to translate and counts for
+ * neither side. Null while the job still counts (`estimating`) or when it never reached the diff.
+ */
+export function jobCoverage(j: CoverageJob): LanguageCoverage | null {
+  if (j.status === 'estimating') return null;
+  const s = (j.stats ?? {}) as {
+    counts?: { keys?: number; blank?: number; cig?: number; tm?: number } | null;
+    overlay_count?: number; published_at?: string;
+  };
+  const c = s.counts;
+  if (!c) return null;
+  const total = Math.max(0, Math.round((Number(c.keys) || 0) - (Number(c.blank) || 0)));
+  if (!(total > 0)) return null;
+  const filled = j.status === 'published' && typeof s.overlay_count === 'number' ? s.overlay_count : Number(c.tm) || 0;
+  const covered = Math.max(0, Math.min(total, Math.round((Number(c.cig) || 0) + filled)));
+  return {
+    pct: Math.floor((covered / total) * 100),
+    covered,
+    total,
+    missing: total - covered,
+    at: typeof s.published_at === 'string' ? s.published_at : j.created_at,
+  };
+}
+
+/** Coverage of `lang` from its newest job that measured one (`jobs` newest first, as listed). */
+export function languageCoverage(jobs: readonly CoverageJob[], lang: string): LanguageCoverage | null {
+  for (const j of jobs) {
+    if (j.lang !== lang) continue;
+    const c = jobCoverage(j);
+    if (c) return c;
+  }
+  return null;
+}
+
+/** A full run of `lang` that has not ended yet (ordering another one would only return it). */
+export function hasOpenFullRun(jobs: readonly { lang: string; mode: string; status: string }[], lang: string): boolean {
+  return jobs.some((j) => j.lang === lang && j.mode === 'full' && !(TERMINAL_STATUSES as readonly string[]).includes(j.status));
+}
+
+/**
+ * Whether ordering a full run makes sense: only approved languages are translated at all, a running
+ * one is in the job list already, and a language without a missing string has nothing to fill. At a
+ * partial coverage it is the way to fill the gap: a full run only ever translates what CIG and the TM
+ * lack. Unmeasured coverage keeps the button: its free estimate is what measures it.
+ */
+export function canStartFullRun(approved: boolean, coverage: LanguageCoverage | null, openFullRun: boolean): boolean {
+  if (!approved || openFullRun) return false;
+  return coverage === null || coverage.missing > 0;
+}

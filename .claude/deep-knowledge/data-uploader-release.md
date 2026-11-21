@@ -46,6 +46,29 @@ A data-uploader release is not visible to users until ALL of:
    NOT GitHub directly — without the row + pointer the page shows the previous
    version even when the GitHub release is correct.
 
+## One build per version — register after the run is green
+
+2026-11-21: `0.84.3` was built twice. A `workflow_dispatch` on main (run
+44906122737, token `268abf3e…`) built, tagged and mirrored it; the tag it created
+then also ran as a tag push (run 44907381433, token `dbef63fc…`), rebuilt the same
+version with a NEW token and overwrote the mirror files at 13:21 UTC. The row was
+registered at 13:11 from the second run's token artefact, which exists minutes
+before that run's own upload. Installs that fetched the dispatch setup in between
+were unknown to the feed (`401 invalid_or_revoked_release_token`) and could never
+update again; the uploader showed the raw HttpError.
+
+Fixes now in place:
+- `release-guard` job: a tag whose source release already exists is not
+  built again. A dispatch also refuses a version that is already on the mirror.
+- "Verify the public mirror serves THIS build": the run fails when the mirror's
+  `latest.yml` is not its own build — such a run must not be registered.
+- Register only after the run is green, with that run's token, then
+  `node scripts/verify-uploader-release.mjs --version <v> --run <run id>` proves
+  token accepted, ring serves the version, sha512 = mirror.
+- A stuck build is rescued with a token-alias row (no platforms, never promoted):
+  `0.84.3-dispatch` carries `268abf3e…`. The feed then serves the ring's current
+  release to it.
+
 ## A CI-retry tag is not a new version — and "Error saving asset" is not the PAT
 
 2026-09-17: `data-uploader-v0.30.0` failed at the public-mirror publish step

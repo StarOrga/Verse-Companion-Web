@@ -75,6 +75,38 @@ describe('AdminTranslationsComponent', () => {
     expect(el.querySelectorAll('.lang').length).toBe(2);
   });
 
+  it('shows each language with its coverage and offers a full run only where there is a gap', async () => {
+    const counts = { keys: 1000, blank: 0, cig: 100, tm: 100, forced: 0, todo: 10, unchanged: 790 };
+    const fixture = create((c) => {
+      if (c.target === 'translation_languages') {
+        return { data: [
+          { lang: 'de', cig_folder: 'german_(germany)', approved: true },
+          { lang: 'es', cig_folder: 'spanish_(spain)', approved: true },
+          { lang: 'fr', cig_folder: 'french_(france)', approved: true },
+          { lang: 'it', cig_folder: 'italian_(italy)', approved: false },
+        ] };
+      }
+      if (c.target === 'translation_jobs') {
+        return { data: [
+          { ...job('j1', 'published'), stats: { counts, overlay_count: 900 } },
+          { ...job('j2', 'queued'), lang: 'es', stats: { counts } },
+          { ...job('j3', 'estimating'), lang: 'fr', mode: 'full', stats: {} },
+        ] };
+      }
+      return ok(c);
+    });
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.lang'));
+    const meter = (r: Element) => r.querySelector('[role="meter"]')?.getAttribute('aria-valuenow') ?? null;
+    const fullRun = (r: Element) =>
+      Array.from(r.querySelectorAll('button')).some((b) => b.textContent?.includes('admin.translations.languages.fullRun'));
+    expect(rows.map(meter)).toEqual(['100', '20', null, null]);
+    expect(rows.map(fullRun)).toEqual([false, true, false, false]);
+    expect(rows[2].querySelector('.run-note')).not.toBeNull();
+    expect(rows[3].querySelector('.cov-unknown')).not.toBeNull();
+  });
+
   it('a full run is ordered with one call: it estimates itself, no cost is asked for yet', async () => {
     const fixture = create((c) => (c.target === 'codex_builds' ? { data: [{ id: 'b1', patch_version: '4.4', channel: 'LIVE', build_number: '1' }] } : c.op === 'invoke' ? { data: { ok: true } } : ok(c)));
     await fixture.whenStable();

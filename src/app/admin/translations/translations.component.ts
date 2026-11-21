@@ -8,6 +8,7 @@ import { toErrorKey } from '../../core/describe-error';
 import { ScDatePipe } from '../../core/locale/sc-date.pipe';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
+import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import type { PageCrumb } from '../../shared/page-header/nav-origin.service';
 import { TranslationAlertsComponent } from './translation-alerts.component';
 import { TranslationCardsComponent } from './translation-cards.component';
@@ -22,7 +23,27 @@ import {
   TranslationSettings,
   TranslationsService,
 } from './translations.service';
-import { canApprove, canCancel, jobErrorKey, jobNotes, jobProgress, judgeScore, spendPercent } from './translations.logic';
+import {
+  LanguageCoverage,
+  canApprove,
+  canCancel,
+  canStartFullRun,
+  hasOpenFullRun,
+  jobErrorKey,
+  jobNotes,
+  jobProgress,
+  judgeScore,
+  languageCoverage,
+  spendPercent,
+} from './translations.logic';
+
+/** A language row with what its jobs say about it. */
+interface LanguageRow {
+  lang: TranslationLanguage;
+  coverage: LanguageCoverage | null;
+  fullRunOpen: boolean;
+  canStartFull: boolean;
+}
 
 
 /**
@@ -45,6 +66,7 @@ import { canApprove, canCancel, jobErrorKey, jobNotes, jobProgress, judgeScore, 
     ScActionDirective,
     TranslationsRailComponent,
     TranslationsPageBarComponent,
+    ScTooltipDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -113,16 +135,36 @@ import { canApprove, canCancel, jobErrorKey, jobNotes, jobProgress, judgeScore, 
       <section class="sc-card block">
         <h2>{{ 'admin.translations.languages.title' | translate }}</h2>
         <ul class="langs" role="list">
-          @for (l of languages(); track l.lang) {
+          @for (row of languageRows(); track row.lang.lang) {
+            @let l = row.lang;
             <li class="lang">
               <span class="code">{{ l.lang }}</span>
               <span class="folder">{{ l.cig_folder }}</span>
               <span class="pill" [class.ok]="l.approved">
                 {{ (l.approved ? 'admin.translations.languages.approved' : 'admin.translations.languages.notApproved') | translate }}
               </span>
+              @if (row.coverage; as c) {
+                <span class="cov" tabindex="0"
+                      [scTooltip]="'admin.translations.languages.coverage.detail' | translate: { covered: c.covered, total: c.total, at: (c.at | scDate: 'datetime') }">
+                  <span class="cov-bar" role="meter" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="c.pct"
+                        [attr.aria-valuetext]="'admin.translations.languages.coverage.value' | translate: { pct: c.pct }"
+                        [attr.aria-label]="'admin.translations.languages.coverage.label' | translate: { lang: l.lang }">
+                    <i [style.width.%]="c.pct" [class.full]="c.missing === 0"></i>
+                  </span>
+                  <span class="cov-pct">{{ 'admin.translations.languages.coverage.value' | translate: { pct: c.pct } }}</span>
+                </span>
+              } @else {
+                <span class="cov cov-unknown" tabindex="0" [scTooltip]="'admin.translations.languages.coverage.unknownHint' | translate">
+                  {{ 'admin.translations.languages.coverage.unknown' | translate }}
+                </span>
+              }
               <span class="grow"></span>
-              @if (l.approved) {
-                <button type="button" scAction tier="secondary" [disabled]="busy()" (click)="startFull(l)">
+              @if (row.fullRunOpen) {
+                <span class="run-note">{{ 'admin.translations.languages.fullRunOpen' | translate }}</span>
+              } @else if (row.canStartFull) {
+                <button type="button" scAction tier="secondary" [disabled]="busy()" (click)="startFull(l)"
+                        [scTooltip]="(row.coverage ? 'admin.translations.languages.fullRunGap' : 'admin.translations.languages.fullRunUnmeasured') | translate: { missing: row.coverage?.missing ?? 0, pct: 100 - (row.coverage?.pct ?? 0) }"
+                        scTooltipTier="label">
                   {{ 'admin.translations.languages.fullRun' | translate }}
                 </button>
               }
@@ -243,6 +285,15 @@ import { canApprove, canCancel, jobErrorKey, jobNotes, jobProgress, judgeScore, 
       .lang .code { font-weight: 600; min-width: 4.5em; }
       .lang .folder { color: var(--sc-fg-2); font-size: 0.85rem; }
       .grow { flex: 1 1 auto; }
+      .cov { display: inline-flex; align-items: center; gap: var(--sc-space-2); min-width: 9rem; flex: 0 1 14rem;
+        border-radius: 4px; }
+      .cov-bar { flex: 1 1 auto; height: 6px; border-radius: 3px; background: var(--sc-bg-0); overflow: hidden;
+        border: 1px solid var(--sc-border); }
+      .cov-bar i { display: block; height: 100%; background: var(--sc-accent); }
+      .cov-bar i.full { background: var(--sc-success, var(--sc-accent)); }
+      .cov-pct { font-size: 0.85rem; color: var(--sc-fg-1); font-variant-numeric: tabular-nums; min-width: 4.5ch; text-align: end; }
+      .cov-unknown { color: var(--sc-fg-2); font-size: 0.85rem; }
+      .run-note { color: var(--sc-fg-2); font-size: 0.85rem; }
       .pill { padding: 2px 10px; border-radius: 999px; font-size: 0.78rem; border: 1px solid var(--sc-border); color: var(--sc-fg-1); }
       .pill.ok { border-color: var(--sc-accent); color: var(--sc-accent); }
       .pill.bad { border-color: var(--sc-danger); color: var(--sc-danger); }
@@ -276,6 +327,15 @@ export class AdminTranslationsComponent implements OnInit {
   readonly builds = signal<CurrentBuild[]>([]);
   readonly spend = signal(0);
   readonly spendPct = computed(() => spendPercent(this.spend(), this.settings().monthly_cap_usd));
+  /** Coverage and the full-run choice per language, from the job list (newest first). */
+  readonly languageRows = computed<LanguageRow[]>(() => {
+    const jobs = this.jobs();
+    return this.languages().map((lang) => {
+      const coverage = languageCoverage(jobs, lang.lang);
+      const fullRunOpen = hasOpenFullRun(jobs, lang.lang);
+      return { lang, coverage, fullRunOpen, canStartFull: canStartFullRun(lang.approved, coverage, fullRunOpen) };
+    });
+  });
 
   readonly canApprove = canApprove;
   readonly canCancel = canCancel;

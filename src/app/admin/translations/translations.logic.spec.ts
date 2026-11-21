@@ -3,6 +3,10 @@ import {
   buildGlossaryQuery,
   canApprove,
   canCancel,
+  canStartFullRun,
+  hasOpenFullRun,
+  jobCoverage,
+  languageCoverage,
   glossarySearchFilter,
   jobErrorKey,
   jobNotes,
@@ -127,5 +131,64 @@ describe('translations.logic', () => {
       .toEqual({ target_term: 'Alt', category: 'term', origin: 'ai', locked: false, needs_retranslate: true });
     expect(revertPatch(null)).toBeNull();
     expect(revertPatch({ id: 'x' })).toBeNull();
+  });
+
+  describe('language coverage', () => {
+    const counts = { keys: 1010, blank: 10, cig: 200, tm: 300, forced: 0, todo: 40, unchanged: 460 };
+    const at = '2026-11-20T10:00:00Z';
+
+    it('counts CIG translations and TM hits over the non-blank keys of an estimate', () => {
+      expect(jobCoverage({ lang: 'de', status: 'awaiting_approval', stats: { counts }, created_at: at }))
+        .toEqual({ pct: 50, covered: 500, total: 1000, missing: 500, at });
+    });
+
+    it('uses the overlay of a published job instead of the TM hits, dated at its publish', () => {
+      const pub = '2026-11-21T08:00:00Z';
+      const c = jobCoverage({ lang: 'de', status: 'published', stats: { counts, overlay_count: 799, published_at: pub }, created_at: at });
+      expect(c).toEqual({ pct: 99, covered: 999, total: 1000, missing: 1, at: pub });
+    });
+
+    it('rounds down, so 100 % means nothing is missing, and never exceeds the table', () => {
+      const c = jobCoverage({ lang: 'de', status: 'published', stats: { counts, overlay_count: 5000 }, created_at: at });
+      expect(c).toEqual({ pct: 100, covered: 1000, total: 1000, missing: 0, at });
+    });
+
+    it('has no figure while a job still counts, without counts, or for an empty table', () => {
+      expect(jobCoverage({ lang: 'de', status: 'estimating', stats: { counts }, created_at: at })).toBeNull();
+      expect(jobCoverage({ lang: 'de', status: 'skipped', stats: null, created_at: at })).toBeNull();
+      expect(jobCoverage({ lang: 'de', status: 'queued', stats: { counts: { keys: 5, blank: 5 } }, created_at: at })).toBeNull();
+    });
+
+    it('takes the newest job of the language that measured one', () => {
+      const jobs = [
+        { lang: 'fr', status: 'queued', stats: { counts: { ...counts, cig: 0, tm: 0 } }, created_at: at },
+        { lang: 'de', status: 'estimating', stats: {}, created_at: at },
+        { lang: 'de', status: 'queued', stats: { counts }, created_at: at },
+        { lang: 'de', status: 'published', stats: { counts, overlay_count: 800 }, created_at: at },
+      ];
+      expect(languageCoverage(jobs, 'de')?.pct).toBe(50);
+      expect(languageCoverage(jobs, 'fr')?.pct).toBe(0);
+      expect(languageCoverage(jobs, 'it')).toBeNull();
+    });
+
+    it('knows an unfinished full run of a language', () => {
+      const jobs = [
+        { lang: 'de', mode: 'full', status: 'published' },
+        { lang: 'de', mode: 'delta', status: 'queued' },
+        { lang: 'fr', mode: 'full', status: 'awaiting_approval' },
+      ];
+      expect(hasOpenFullRun(jobs, 'de')).toBe(false);
+      expect(hasOpenFullRun(jobs, 'fr')).toBe(true);
+    });
+
+    it('offers a full run only to approved languages with a gap or no figure yet, and none while one runs', () => {
+      const gap = { pct: 40, covered: 400, total: 1000, missing: 600, at };
+      const full = { pct: 100, covered: 1000, total: 1000, missing: 0, at };
+      expect(canStartFullRun(true, gap, false)).toBe(true);
+      expect(canStartFullRun(true, null, false)).toBe(true);
+      expect(canStartFullRun(true, full, false)).toBe(false);
+      expect(canStartFullRun(true, gap, true)).toBe(false);
+      expect(canStartFullRun(false, gap, false)).toBe(false);
+    });
   });
 });
