@@ -31,8 +31,8 @@ import {
   CodexSearchHub,
   CodexSearchBarHandle,
   isEditableTarget,
+  isTypeToSearchKey,
 } from '../../codex/search/codex-search-hub.service';
-import { typeToSearchHere } from './type-to-search';
 import {
   SearchTarget,
   SearchVariantLink,
@@ -123,6 +123,9 @@ function storage(): Storage | null {
 
 /** Ships a fitted-on meta line names before it counts the rest. */
 const FITTED_SHOWN = 2;
+
+/** The Verse hub (bare domain or /verse): its stage search takes typed letters. */
+const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
 
 /**
  * The Fusion bar's search (concept 2026-11-02 "Suche: Kontext & Aktionen").
@@ -1414,13 +1417,16 @@ export class FusionSearchComponent {
       this.focus();
       return;
     }
-    // Type-to-search (#385): on every page where this field is the only search, a letter typed
-    // while nothing takes text starts it — on a Codex page through the hub (its newest bar), else
-    // here. On the Verse hub it is also the key that skips the entrance (not consumed there), so
-    // the first letter already lands in the field (QA D4). The rules: type-to-search.ts.
-    if (typeToSearchHere(ev, this.host.nativeElement.closest('sc-fusion-bar') ?? this.host.nativeElement)) {
+    if (this.hub.hasBar() && isTypeToSearchKey(ev)) {
       ev.preventDefault();
-      if (!this.hub.activate(ev.key)) this.focus(ev.key);
+      this.hub.activate(ev.key);
+      return;
+    }
+    // The Verse hub's stage field takes typed letters too - also the key that skips the
+    // entrance (it is not consumed there), so the first letter already lands in it (QA D4).
+    if (this.chrome.stageSearch() === 'stage' && VERSE_HOME.test(this.url()) && isTypeToSearchKey(ev)) {
+      ev.preventDefault();
+      this.focus(ev.key);
     }
   }
 
