@@ -69,4 +69,36 @@ describe('TranslationsService', () => {
     expect(calls.length).toBe(1);
     expect((calls[0].args as { body: unknown }).body).toEqual({ op: 'start_full', build_id: 'b1', lang: 'de' });
   });
+
+  it('Karteikarten v2: every card call is an RPC with the contract args; old answer/skip/stats/leaderboard calls are gone', async () => {
+    const svc = setup((c) => ({ data: c.target === 'accept_translation_decisions' ? '7' : {} }));
+    await svc.deck('de');
+    await svc.answerCard('c1', { answer: 'a', exceptions: { it: 'b' } });
+    await svc.answerCard('c2', { answer: 'own', own_text: '  Eigen  ', exceptions: { it: 'b' } });
+    await svc.answerCard('c3', { answer: 'b', exceptions: {} });
+    await svc.notMineCard('c4');
+    await svc.undoCard('c4');
+    await svc.vetoList('it');
+    await svc.vetoDecision('k1');
+    await svc.acceptDecision('k2');
+    expect(await svc.acceptDecisions('it')).toBe(7);
+    await svc.cardBoard();
+    await svc.setMyLangs(['de', 'it']);
+    expect(calls.map((c) => [c.op, c.target, c.args])).toEqual([
+      ['rpc', 'translation_deck', { p_lang: 'de', p_limit: 10 }],
+      ['rpc', 'answer_translation_card', { p_card_id: 'c1', p_answer: 'a', p_own_text: null, p_exceptions: { it: 'b' } }],
+      ['rpc', 'answer_translation_card', { p_card_id: 'c2', p_answer: 'own', p_own_text: 'Eigen', p_exceptions: null }],
+      ['rpc', 'answer_translation_card', { p_card_id: 'c3', p_answer: 'b', p_own_text: null, p_exceptions: null }],
+      ['rpc', 'not_mine_translation_card', { p_card_id: 'c4' }],
+      ['rpc', 'undo_translation_card', { p_card_id: 'c4' }],
+      ['rpc', 'translation_veto_list', { p_lang: 'it', p_limit: 50 }],
+      ['rpc', 'veto_translation_decision', { p_card_id: 'k1' }],
+      ['rpc', 'accept_translation_decision', { p_card_id: 'k2' }],
+      ['rpc', 'accept_translation_decisions', { p_lang: 'it' }],
+      ['rpc', 'translation_card_board', undefined],
+      ['rpc', 'set_translation_my_langs', { p_langs: ['de', 'it'] }],
+    ]);
+    const svcAny = svc as unknown as Record<string, unknown>;
+    for (const gone of ['cardQueue', 'skipCard', 'cardStats', 'leaderboard']) expect(svcAny[gone]).toBeUndefined();
+  });
 });

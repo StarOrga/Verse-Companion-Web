@@ -131,4 +131,29 @@ describe('AdminTranslationsComponent', () => {
     expect(el.querySelector('.state.error')).not.toBeNull();
     expect(el.querySelector('table.jobs')).toBeNull();
   });
+
+  it('the header leads back with an „Admin“ crumb and no repeated eyebrow; the six sections are real anchors', async () => {
+    const fixture = create(ok);
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const crumb = el.querySelector<HTMLAnchorElement>('sc-page-header nav a')!;
+    expect(crumb.textContent!.trim()).toBe('admin.translations.crumb');
+    expect(crumb.getAttribute('href')).toBe('/admin/hub');
+    expect(el.querySelector('sc-page-header .eyebrow')).toBeNull();
+    expect(el.textContent).not.toContain('adminHub.title');
+    expect(el.querySelector('[role=tablist]')).toBeNull();
+    const bar = Array.from(el.querySelectorAll<HTMLAnchorElement>('sc-translations-page-bar a'));
+    expect(bar.map((a) => a.getAttribute('href'))).toEqual([
+      '/admin/translations',
+      '/admin/translations?tab=cards',
+      '/admin/translations?tab=sources',
+      '/admin/translations?tab=outreach',
+      '/admin/translations?tab=alerts',
+      '/admin/translations?tab=glossary',
+    ]);
+    const rail = Array.from(el.querySelectorAll<HTMLAnchorElement>('sc-translations-rail a'));
+    expect(rail.length).toBe(6);
+    expect(rail[0].getAttribute('aria-current')).toBe('page');
+  });
 });

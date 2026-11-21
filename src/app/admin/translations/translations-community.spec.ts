@@ -5,32 +5,11 @@ import { AuthService } from '../../auth/auth.service';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
 import { FakeCall, FakeResult, fakeSupabase } from '../../testing/fake-supabase';
 import { TranslationAlertsComponent } from './translation-alerts.component';
-import { TranslationCardsComponent } from './translation-cards.component';
 import { TranslationOutreachComponent } from './translation-outreach.component';
 import { TranslationSourcesComponent } from './translation-sources.component';
-import { TranslationsService } from './translations.service';
 import { canImportSource, contextLines, goalPercent, passProgress } from './translations.logic';
 
 type Answer = (c: FakeCall) => FakeResult | Promise<FakeResult>;
-
-const card = (id: string, extra: Record<string, unknown> = {}) => ({
-  id,
-  lang: 'de',
-  kind: 'meta',
-  question: `Frage ${id}`,
-  option_a: { text: 'Rumpf', source: 'CIG' },
-  option_b: { text: 'Hülle', source: 'rjcncpt' },
-  context: { key: 'ui_hull', en: 'Hull', where: 'HUD', neighbours: ['a', { key: 'k', text: 'b' }], research: 'Fund' },
-  spread: 40,
-  reach: 2,
-  doubt: 0.5,
-  fresh: false,
-  status: 'open',
-  answer: null,
-  impact: null,
-  points: null,
-  ...extra,
-});
 
 function setup(answer: Answer, userId = 'me') {
   const fake = fakeSupabase({ answer });
@@ -76,103 +55,6 @@ describe('logic helpers of the community tabs', () => {
     expect(goalPercent(5, 10)).toBe(50);
     expect(goalPercent(25, 10)).toBe(100);
     expect(contextLines(['a', { key: 'k', text: 'b' }, { x: 1 }])).toEqual(['a', 'k: b', '{"x":1}']);
-  });
-});
-
-describe('TranslationCardsComponent', () => {
-  const base = (queue: unknown[]): Answer => (c) => {
-    if (c.op === 'from' && c.target === 'translation_cards') return { data: queue };
-    if (c.target === 'translation_card_stats') return { data: [{ open_count: queue.length, answered_today: 3, streak_days: 2 }] };
-    if (c.target === 'translation_card_leaderboard') return { data: [{ answered_by: 'me', points: 120, answers: 9, streak_days: 2 }] };
-    if (c.target === 'list_users_for_admin') return { data: [{ id: 'me', display_name: 'Jerry', email: 'j@example.test', protected: true }] };
-    return { data: null };
-  };
-
-  it('asks the queue in the contract order and shows card, goal, streak and leaderboard', async () => {
-    const { fake } = setup(base([card('c1'), card('c2')]));
-    const fixture = TestBed.createComponent(TranslationCardsComponent);
-    fixture.detectChanges();
-    await settle(fixture);
-    const el: HTMLElement = fixture.nativeElement;
-
-    const list = fake.calls.find((c) => c.target === 'translation_cards')!;
-    const orders = list.chain.filter(([m]) => m === 'order').map(([, a]) => (a as unknown[])[0]);
-    expect(orders).toEqual(['status', 'spread', 'reach', 'kind_rank', 'doubt', 'fresh']);
-    expect(q(el, '[data-test=card]')).not.toBeNull();
-    expect(el.textContent).toContain('Frage c1');
-    expect(el.textContent).toContain('ui_hull');
-    expect(el.textContent).toContain('Fund');
-    expect(q(el, '[data-test=goal]')).not.toBeNull();
-    expect(fixture.componentInstance.goalPct()).toBe(30);
-    expect(q(el, '[data-test=leaderboard]')!.textContent).toContain('Jerry');
-  });
-
-  it('answers with an option, sends the p_ args and shows impact and points', async () => {
-    const answered = card('c1', { status: 'answered', answer: 'a', impact: 42, points: 14 });
-    const { fake } = setup((c) => (c.target === 'answer_translation_card' ? { data: answered } : base([card('c1'), card('c2')])(c)));
-    const fixture = TestBed.createComponent(TranslationCardsComponent);
-    fixture.detectChanges();
-    await settle(fixture);
-    const cmp = fixture.componentInstance;
-
-    expect(cmp.canSubmit()).toBe(false);
-    cmp.choose('a');
-    cmp.note.set('  Hinweis ');
-    cmp.saveRule.set(true);
-    await cmp.submit();
-    fixture.detectChanges();
-
-    const call = fake.calls.find((c) => c.target === 'answer_translation_card')!;
-    expect(call.args).toEqual({ p_card_id: 'c1', p_answer: 'a', p_own_text: null, p_note: 'Hinweis', p_save_as_rule: true });
-    const res = q<HTMLElement>(fixture.nativeElement, '[data-test=result]')!;
-    expect(res).not.toBeNull();
-    expect(cmp.result()?.impact).toBe(42);
-    expect(cmp.result()?.points).toBe(14);
-    expect(cmp.current()?.id).toBe('c2');
-  });
-
-  it('needs own text for "both wrong" and sends it', async () => {
-    const { fake } = setup((c) => (c.target === 'answer_translation_card' ? { data: card('c1', { status: 'answered', impact: 0, points: 10 }) } : base([card('c1')])(c)));
-    const fixture = TestBed.createComponent(TranslationCardsComponent);
-    fixture.detectChanges();
-    await settle(fixture);
-    const cmp = fixture.componentInstance;
-
-    cmp.choose('own');
-    expect(cmp.canSubmit()).toBe(false);
-    cmp.ownText.set('  Schiffsrumpf ');
-    expect(cmp.canSubmit()).toBe(true);
-    await cmp.submit();
-
-    const call = fake.calls.find((c) => c.target === 'answer_translation_card')!;
-    expect(call.args).toEqual(expect.objectContaining({ p_answer: 'own', p_own_text: 'Schiffsrumpf', p_save_as_rule: false }));
-    expect(cmp.queue().length).toBe(0);
-  });
-
-  it('skips a card to the end of the list', async () => {
-    const { fake } = setup((c) => (c.target === 'skip_translation_card' ? { data: card('c1', { status: 'skipped' }) } : base([card('c1'), card('c2')])(c)));
-    const fixture = TestBed.createComponent(TranslationCardsComponent);
-    fixture.detectChanges();
-    await settle(fixture);
-    await fixture.componentInstance.skip();
-    expect(fake.calls.some((c) => c.target === 'skip_translation_card')).toBe(true);
-    expect(fixture.componentInstance.queue().map((x) => x.id)).toEqual(['c2', 'c1']);
-  });
-
-  it('shows the positive empty state for an empty queue and an error state with retry on failure', async () => {
-    setup(base([]));
-    const empty = TestBed.createComponent(TranslationCardsComponent);
-    empty.detectChanges();
-    await settle(empty);
-    expect(q(empty.nativeElement, '[data-test=empty]')).not.toBeNull();
-    TestBed.resetTestingModule();
-
-    setup((c) => (c.target === 'translation_cards' ? { error: { message: 'down' } } : base([])(c)));
-    const failed = TestBed.createComponent(TranslationCardsComponent);
-    failed.detectChanges();
-    await settle(failed);
-    expect(q(failed.nativeElement, '.state.error')).not.toBeNull();
-    expect(q(failed.nativeElement, '[data-test=empty]')).toBeNull();
   });
 });
 
@@ -489,13 +371,5 @@ describe('TranslationAlertsComponent', () => {
     await settle(failed);
     expect(q(failed.nativeElement, '.state.error')).not.toBeNull();
     expect(q(failed.nativeElement, '[data-test=empty]')).toBeNull();
-  });
-});
-
-describe('TranslationsService (community seed)', () => {
-  it('reads the stats row whether it arrives as array or object', async () => {
-    setup((c) => ({ data: c.target === 'translation_card_stats' ? { open_count: '4', answered_today: 1, streak_days: 0 } : null }));
-    const svc = TestBed.inject(TranslationsService);
-    expect(await svc.cardStats('de')).toEqual({ open_count: 4, answered_today: 1, streak_days: 0 });
   });
 });
