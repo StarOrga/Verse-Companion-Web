@@ -156,7 +156,10 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // 10: codex_blueprints.dismantle_yield / dismantlable filled for real —
     //     derived from the recipe + GlobalGenericDismantle, no per-item field
     //     exists in the game data (#1058).
-    revision: 10,
+    // 11: #1195 — codex_locations on real data: readable types (GUID-named type
+    //     records), Lagrange rest stops / gateways from the containers their
+    //     L-point opens, no star-origin hosts, system rows, cities.
+    revision: 11,
     phases: [
       'codex_manufacturers',
       'codex_blueprints',
