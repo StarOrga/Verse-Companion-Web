@@ -242,9 +242,10 @@
     "closing": "Update v{{version}}: Die App schließt sich gleich und startet nach ca. 2–3 Minuten von selbst neu. Währenddessen erscheint kein Fenster.",
     "installFailed": "Die Installation von v{{version}} konnte nicht gestartet werden. Bitte erneut versuchen.",
     "supersedes": "Neuere Version v{{version}} wird geladen und ersetzt das bereitgestellte v{{old}}…",
-    "error": "Update-Fehler: {{message}}",
     "manual": "Neue Version v{{version}} verfügbar — der Portable-Build kann sich nicht selbst updaten, bitte manuell laden.",
-    "openDownload": "Download-Seite öffnen"
+    "openDownload": "Download-Seite öffnen",
+    "errorTitle": "Update nicht möglich.",
+    "downloadLatest": "Neueste Version laden"
   },
   "session": {
     "title": "Web-Verbindung",
@@ -455,9 +456,9 @@
       "text": "Neuer Spiel-Patch {{patch}} — Upload startet automatisch in",
       "now": "Jetzt hochladen",
       "cancel": "Abbrechen",
-      "partsText": "{{patch}} ist auf dem Server — noch offen: {{parts}}. Automatische Fortsetzung in"
+      "partsText": "Noch offen: {{parts}}. Automatische Fortsetzung in"
     },
-    "continuingParts": "{{channel}} {{version}} ist auf dem Server — noch offen: {{parts}}. Setze automatisch fort."
+    "continuingParts": "Noch offen: {{parts}}. Setze automatisch fort."
   },
   "subthemes": {
     "allCurrent": "Der Server hat diesen Build bereits vollständig – nichts hat sich geändert, Extraktion und Upload entfallen. „Alles neu erzwingen“ startet trotzdem.",
@@ -645,5 +646,24 @@
       "skinsUpload": "Modelle hochladen"
     },
     "silUploadFailed": "Silhouetten konnten nicht hochgeladen werden — der Codex bleibt ohne Umrisse"
+  },
+  "conn": {
+    "local": "Dein Spiel",
+    "server": "Server-Codex",
+    "entries": "Einträge",
+    "entryCount": "{{n}} Einträge",
+    "same": "gleich",
+    "differs": "anderer Stand",
+    "open": "Noch offen",
+    "build": "Build {{n}}",
+    "stateOk": "Server hat deinen Spielstand vollständig",
+    "stateWarn": "Server hat deinen Spielstand noch nicht vollständig"
+  },
+  "updateErrors": {
+    "unknown-build": "Dieser Uploader-Build ist dem Update-Server unbekannt. Installiere die neueste Version einmal von Hand, danach läuft das Update wieder automatisch.",
+    "offline": "Der Update-Server ist gerade nicht erreichbar. Der nächste Versuch läuft automatisch.",
+    "server": "Der Update-Server hat einen Fehler gemeldet. Der nächste Versuch läuft automatisch.",
+    "not-installed": "Das letzte Update wurde nicht installiert. Lade die neueste Version und installiere sie von Hand.",
+    "other": "Die Update-Prüfung ist fehlgeschlagen. Details stehen im Protokoll."
   }
 }

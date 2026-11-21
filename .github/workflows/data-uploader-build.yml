@@ -92,9 +92,38 @@ jobs:
       - name: Run pytest
         run: python -m pytest tests/ -v
 
-  build-windows:
+  # One version, one build. A manual dispatch creates the tag itself; when that
+  # tag then also triggers a tag-push run, a second build would bake a NEW
+  # release token into the same version and overwrite the mirror files — installs
+  # that fetched the first build are then unknown to the update server (0.84.3,
+  # 2026-11-21). So a tag whose source release already exists is not
+  # built again (first attempt; a manual re-run still builds).
+  release-guard:
     if: startsWith(github.ref, 'refs/tags/data-uploader-v') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
-    needs: [typecheck-and-test, python-sidecar-test]
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.guard.outputs.skip }}
+    steps:
+      - id: guard
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          skip=false
+          # A normal tag push finds no release yet (this run creates it). One that
+          # already exists was made by the dispatch run that created the tag — its
+          # assets may still be uploading, so existence decides, not the asset
+          # count. A manual re-run (attempt > 1) is a deliberate retry and builds.
+          if [[ "$GITHUB_REF" == refs/tags/data-uploader-v* && "$GITHUB_RUN_ATTEMPT" == "1" ]]; then
+            if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json tagName >/dev/null 2>&1; then
+              skip=true
+              echo "::notice::$GITHUB_REF_NAME already has a release (built by a manual run) - not building it a second time (a rebuild would carry a different release token)."
+            fi
+          fi
+          echo "skip=$skip" >> "$GITHUB_OUTPUT"
+
+  build-windows:
+    if: needs.release-guard.outputs.skip != 'true' && (startsWith(github.ref, 'refs/tags/data-uploader-v') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'))
+    needs: [release-guard, typecheck-and-test, python-sidecar-test]
     runs-on: windows-latest
     defaults:
       run:
@@ -128,6 +157,8 @@ jobs:
         # in package.json as `data-uploader-v<version>` and refuses one that
         # already exists — tags are monotonic, never re-used (ship rule 4).
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if ($env:GITHUB_REF -like 'refs/tags/data-uploader-v*') {
             $tag = $env:GITHUB_REF_NAME
@@ -135,6 +166,11 @@ jobs:
             $ver = (Get-Content package.json -Raw | ConvertFrom-Json).version
             $tag = "data-uploader-v$ver"
             if (git tag -l $tag) { Write-Error "$tag already exists - bump data-uploader/package.json first"; exit 1 }
+            # The public mirror is what installs download: a release there means
+            # this version is out, even when the source tag is missing.
+            gh release view $tag --repo StarOrga/Star-Citizen-Companion-Binaries --json tagName 2>$null | Out-Null
+            if ($LASTEXITCODE -eq 0) { Write-Error "$tag is already on the public mirror - bump data-uploader/package.json first"; exit 1 }
+            $global:LASTEXITCODE = 0
           }
           "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           Write-Host "release tag: $tag"
@@ -251,6 +287,29 @@ jobs:
 
             Source code: [Star-Citizen-Companion-Web](https://github.com/StarOrga/Star-Citizen-Companion-Web) (private).
 
+      - name: Verify the public mirror serves THIS build
+        # The catalog row must describe the files installs actually download.
+        # Another run of the same version (0.84.3, 2026-11-21) once overwrote
+        # the mirror after the row had been registered, so the row pointed at
+        # foreign files. Compare the mirror's latest.yml with this run's own.
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ steps.rel.outputs.tag }}"
+          $local = (Select-String -Path release-builds/latest.yml -Pattern '^sha512:\s*(\S+)').Matches[0].Groups[1].Value
+          $remote = ''
+          for ($i = 0; $i -lt 5 -and -not $remote; $i++) {
+            try {
+              $yml = (Invoke-WebRequest -UseBasicParsing "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/$tag/latest.yml").Content
+              if ($yml -is [byte[]]) { $yml = [Text.Encoding]::UTF8.GetString($yml) }
+              $remote = ([regex]::Match($yml, '(?m)^sha512:\s*(\S+)')).Groups[1].Value
+            } catch { Start-Sleep -Seconds 10 }
+          }
+          if (-not $remote) { Write-Error "mirror latest.yml for $tag not readable"; exit 1 }
+          if ($remote -ne $local) { Write-Error "mirror latest.yml for $tag is not this build (mirror $remote, this run $local) - do NOT register this run"; exit 1 }
+          Write-Host "mirror serves this build ($tag)"
+
       - name: Print catalog-register SQL — alpha default + all-rings fast-track (desktop_releases + desktop_channels)
         # Surfaces every field the admin needs into the action log so the
         # `desktop_releases` INSERT can be copy-pasted without local
@@ -333,7 +392,9 @@ jobs:
           Write-Host ""
           Emit-Block "DEFAULT — register + point ALPHA only (ring model; promote to beta/stable later):" 'alpha'
           Emit-Block "FAST-TRACK — first release / hotfix: point ALL rings (skips the ring soak):" 'all'
-          Write-Host "Run exactly ONE of the two blocks in the Supabase SQL editor."
+          Write-Host "Run exactly ONE of the two blocks in the Supabase SQL editor - only once THIS run is green"
+          Write-Host "(the mirror check above passed), with THIS run's token. Then prove it end to end:"
+          Write-Host "  node scripts/verify-uploader-release.mjs --version $binVersion --run ${{ github.run_id }}"
           Write-Host "/desktop + the in-app updater read this row; without it the page stays on the old version."
           Write-Host "================================================================"
           Write-Host ""
