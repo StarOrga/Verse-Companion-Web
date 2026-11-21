@@ -335,6 +335,9 @@ export async function uploadSkins(
         onLog(`${shipId}: already uploaded — skipping`, 'info');
         out.push({
           ok: true, ship_id: shipId, uploaded: 0, committed: 0, cached: true,
+          // The marker is written before the package upload: a package that failed once is retried here
+          // (uploadShipPackage has its own marker check).
+          package: await uploadShipPackage(shipId, dir),
           blueprint: await uploadShipBlueprint(shipId, dir, false),
         });
         continue;

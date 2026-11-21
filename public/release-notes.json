@@ -1,7 +1,65 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.289.4",
+  "current": "0.290.1",
   "releases": [
+    {
+      "version": "0.290.1",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data.p4k uploads are recognised as ZIP again and no longer load the whole file into memory to read its header."
+            },
+            {
+              "title": "",
+              "text": "Telemetry and API rate limits can no longer be dodged with a forged client IP; request limits are counted atomically."
+            },
+            {
+              "title": "",
+              "text": "The translation spend ledger keeps its history when old builds are cleaned up."
+            },
+            {
+              "title": "",
+              "text": "Concept pages, the codex holo/set stages and the HQ spots stage follow a language switch immediately and no longer act on stale answers."
+            },
+            {
+              "title": "",
+              "text": "The data uploader also uploads skin packages for ships that were already marked, and refuses incomplete extracts instead of publishing an empty catalog."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Desktop app language packs (10 languages) are complete and reviewed."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.290.0",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Admin translations: every language row shows its coverage as a bar with a percentage; \"Start full run\" appears only for an approved language that still has gaps."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.289.4",
       "date": "2026-11-21",

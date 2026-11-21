@@ -17,6 +17,7 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { buildPrompt, digestIsEmpty, parseSummary, type DiffDigest } from './_summary.ts';
 import { callClaude } from '../_shared/ai-ledger.ts';
 import { withPosthog } from '../_shared/posthog.ts';
+import { safeEqual } from '../_shared/safe-equal.ts';
 
 const MODEL = Deno.env.get('CODEX_SUMMARY_MODEL') ?? 'claude-sonnet-5-5';
 const AI_TIMEOUT_MS = 45_000;
@@ -33,7 +34,7 @@ async function askClaude(prompt: string, key: string): Promise<string> {
 Deno.serve(withPosthog('codex-patch-summary', async (req) => {
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-  if (!serviceKey || req.headers.get('authorization') !== `Bearer ${serviceKey}`) return json({ error: 'forbidden' }, 403);
+  if (!serviceKey || !safeEqual(req.headers.get('authorization') ?? '', `Bearer ${serviceKey}`)) return json({ error: 'forbidden' }, 403);
 
   let body: { build_id?: string; force?: boolean };
   try { body = await req.json(); } catch { return json({ error: 'invalid_body' }, 400); }

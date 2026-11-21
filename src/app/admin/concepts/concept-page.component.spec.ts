@@ -64,6 +64,17 @@ describe('ConceptPageComponent', () => {
     expect(el.querySelector('a.open')).toBeNull();
   });
 
+  it('does not replace the tab when the component is gone before the ticket arrives', async () => {
+    let resolve!: (t: ConceptTicket) => void;
+    const mint = () => new Promise<ConceptTicket>((r) => { resolve = r; });
+    const { fixture, navigate } = await mount(mint);
+    fixture.destroy();
+    resolve(TICKET);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
   it('shows the admin-only copy, a real back anchor and never leaves when the function refuses', async () => {
     const { cmp, el, navigate } = await mount(() => Promise.reject(new ConceptTicketFailure('forbidden')));
     expect(cmp.state()).toBe('forbidden');

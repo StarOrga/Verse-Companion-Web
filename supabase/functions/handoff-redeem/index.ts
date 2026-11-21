@@ -49,6 +49,7 @@ import {
   touch,
 } from './_hash.ts';
 import { withPosthog } from '../_shared/posthog.ts';
+import { clientIp } from '../_shared/client-ip.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -65,18 +66,6 @@ function json(body: unknown, status = 200): Response {
 
 const throttles = new Map<string, Throttle>();
 
-// Throttle key. Supabase's edge sits behind Cloudflare, which sets
-// `cf-connecting-ip` to the real client address; prefer it. Fallback: the LAST
-// `x-forwarded-for` hop (appended by the trusted proxy), not the first, which the
-// client can forge. Not verified against Supabase docs (no network check made
-// here); if neither header exists all callers share the 'unknown' bucket.
-function ipOf(req: Request): string {
-  const cf = req.headers.get('cf-connecting-ip')?.trim();
-  if (cf) return cf;
-  const hops = (req.headers.get('x-forwarded-for') ?? '').split(',').map((s) => s.trim()).filter(Boolean);
-  return hops[hops.length - 1] ?? 'unknown';
-}
-
 Deno.serve(withPosthog('handoff-redeem', async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
@@ -86,7 +75,7 @@ Deno.serve(withPosthog('handoff-redeem', async (req: Request): Promise<Response>
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
   if (!url || !anonKey || !serviceKey) return json({ error: 'server_error' }, 500);
 
-  const throttle = touch(throttles, ipOf(req), Date.now());
+  const throttle = touch(throttles, clientIp(req), Date.now());
   if (isThrottled(throttle)) return json({ error: 'rate_limited' }, 429);
   const fail = (): Response => {
     throttle.failures += 1;

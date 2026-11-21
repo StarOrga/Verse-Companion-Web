@@ -4,6 +4,18 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.290.1] - 2026-11-21
+
+### Fixed
+- Data.p4k uploads are recognised as ZIP again and no longer load the whole file into memory to read its header.
+- Telemetry and API rate limits can no longer be dodged with a forged client IP; request limits are counted atomically.
+- The translation spend ledger keeps its history when old builds are cleaned up.
+- Concept pages, the codex holo/set stages and the HQ spots stage follow a language switch immediately and no longer act on stale answers.
+- The data uploader also uploads skin packages for ships that were already marked, and refuses incomplete extracts instead of publishing an empty catalog.
+
+### Changed
+- Desktop app language packs (10 languages) are complete and reviewed.
+
 ## [0.290.0] - 2026-11-21
 
 ### Added

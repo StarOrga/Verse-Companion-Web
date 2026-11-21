@@ -488,9 +488,9 @@ export class CodexSetStageComponent {
   /** The one slot lit on figure, line, dot and tile — the tile wins over the figure. */
   readonly lit = computed(() => this.hoveredTile() ?? this.partHovered());
 
-  readonly roleLabel = computed(() => this.t.instant('hangar.roles.' + this.set().role));
+  readonly roleLabel = computed(() => (this.lang(), this.t.instant('hangar.roles.' + this.set().role)));
   readonly equipSuffix = computed(
-    () => '· ' + this.t.instant('codex.stage.armorEquipped', { filled: this.filled().size, total: 6 }),
+    () => (this.lang(), '· ' + this.t.instant('codex.stage.armorEquipped', { filled: this.filled().size, total: 6 })),
   );
 
   readonly tiles = computed<SetStageTile[]>(() => {

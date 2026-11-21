@@ -37,6 +37,8 @@
 
 import { resolveTelemetrySecrets } from './_config.ts';
 import { RateLimiter, clamp, isJobDiagnostics, logTextOf, mapEvent, type StoredLogRef, type WireContext } from './_forward.ts';
+import { clientIp } from '../_shared/client-ip.ts';
+import { safeEqual } from '../_shared/safe-equal.ts';
 import { captureBatch, withPosthog, type BatchEvent } from '../_shared/posthog.ts';
 import { diagR2, purgeExpiredDiagLogs, uploadDiagLog } from '../_shared/diag-log.ts';
 import type { R2Config } from '../ingest-skins/_r2.ts';
@@ -80,14 +82,6 @@ async function sha256Hex(s: string): Promise<string> {
   return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Constant-time-ish hex comparison.
-function safeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
-}
-
 const ROLES = new Set(['host', 'daemon', 'overlay', 'desktop', 'renderer']);
 // 'alpha' exists because Starscape ships stable/beta/ALPHA rings. Without it an
 // alpha install would be normalised to 'dev' below and the ring signal lost.
@@ -109,8 +103,10 @@ Deno.serve(withPosthog('ingest-telemetry', async (req: Request): Promise<Respons
   if (!SECRETS.ok) return json({ error: 'server_misconfigured' }, 503);
 
   // --- read RAW body first (HMAC must cover the exact bytes the client signed) ---
+  const declaredLen = Number(req.headers.get('content-length'));
+  if (Number.isFinite(declaredLen) && declaredLen > MAX_BODY_BYTES) return json({ error: 'payload_too_large' }, 413);
   const rawBody = await req.text();
-  if (rawBody.length > MAX_BODY_BYTES) return json({ error: 'payload_too_large' }, 413);
+  if (enc.encode(rawBody).byteLength > MAX_BODY_BYTES) return json({ error: 'payload_too_large' }, 413);
   const ts = req.headers.get('x-scc-timestamp') ?? '';
   const sig = req.headers.get('x-scc-signature') ?? '';
 
@@ -143,7 +139,7 @@ Deno.serve(withPosthog('ingest-telemetry', async (req: Request): Promise<Respons
   }
 
   // --- anonymous, salted identifiers ---
-  const ipRaw = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
+  const ipRaw = clientIp(req);
   const ipHash = await sha256Hex(`${SECRETS.hashSalt}:ip:${ipRaw}`);
   const sessionHash = body.sessionId ? await sha256Hex(`${SECRETS.hashSalt}:s:${body.sessionId}`) : null;
   const installHash = body.installId ? await sha256Hex(`${SECRETS.hashSalt}:i:${body.installId}`) : null;
