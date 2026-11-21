@@ -783,6 +783,16 @@
         "hunks": [
           "69918f0fab30"
         ]
+      },
+      {
+        "ship": "fix/audit-2026-11-21",
+        "by": "JerryT2T",
+        "value": "3716 tracked files (generated, newer than upstream 3708)",
+        "decided": true,
+        "at": "2026-11-21T17:31:25.797Z",
+        "hunks": [
+          "b3f5a9300359"
+        ]
       }
     ],
     ".claude/project-map.md›header›tracked-files": [
@@ -2181,6 +2191,16 @@
         "at": "2026-11-11T23:19:52.365Z",
         "hunks": [
           "65f4d0fd9795"
+        ]
+      },
+      {
+        "ship": "fix/audit-2026-11-21",
+        "by": "JerryT2T",
+        "value": "0.290.0 (generated from CHANGELOG by prebuild, newer than upstream 0.289.4)",
+        "decided": true,
+        "at": "2026-11-21T17:31:25.797Z",
+        "hunks": [
+          "1c7153c93e6a"
         ]
       }
     ],

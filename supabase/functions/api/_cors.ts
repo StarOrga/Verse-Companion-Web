@@ -7,8 +7,6 @@ import type { Context, Middleware } from './_router.ts';
 import { json } from './_router.ts';
 
 const TRUSTED_ORIGINS = new Set([
-  'https://sc-companion.vercel.app',
-  'https://star-citizen-companion-website.vercel.app',
   // Public host since the Verse Companion rename (src/brand.json `host`).
   'https://versecompanion-alpha.vercel.app',
   'http://127.0.0.1:4200',
