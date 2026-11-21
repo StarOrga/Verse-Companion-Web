@@ -5270,6 +5270,7 @@
     "errorTitle": "Fehler",
     "you": "Du",
     "noAccount": "Ohne Konto",
+    "aiSenderTitle": "KI (automatisch erstellt von der Feedback-Routine)",
     "shipRef": "Änderung ansehen",
     "issueRef": "Issue ansehen",
     "topicNumber": "Thema #{{n}} — feste Nummer, auf die du dich beziehen kannst",
@@ -5543,7 +5544,7 @@
       "answered": "Beantwortet · wartet auf die Routine"
     },
     "kind": {
-      "ai": "AI"
+      "ai": "KI"
     },
     "role": {
       "admin": "Admin",

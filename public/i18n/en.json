@@ -5270,6 +5270,7 @@
     "errorTitle": "Error",
     "you": "You",
     "noAccount": "No account",
+    "aiSenderTitle": "AI (created automatically by the feedback routine)",
     "shipRef": "View change",
     "issueRef": "View issue",
     "topicNumber": "Topic #{{n}} — a fixed number you can refer to",

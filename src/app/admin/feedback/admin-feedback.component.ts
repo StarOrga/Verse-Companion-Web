@@ -105,7 +105,7 @@ import { ScDatePipe } from '../../core/locale/sc-date.pipe';
 import { ScDateRelativePipe } from '../../core/locale/sc-relative-date.pipe';
 import { formatScDate } from '../../core/locale/date-format';
 import { LocaleService } from '../../core/locale/locale.service';
-import { type FeedbackSender, senderFilterKey, senderNameKey, senderOf, senderTitleKey } from './feedback-sender';
+import { type FeedbackSender, isAutomatic, replySenderOf, senderFilterKey, senderNameKey, senderOf, senderTitleKey } from './feedback-sender';
 import {
   BoardDelta,
   BoardState,
@@ -546,7 +546,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
             class="card-head"
             (click)="openTopic(m.id)"
             [scTooltip]="'adminFeedback.stream.openTopic' | translate">
-            <ng-container [ngTemplateOutlet]="avatar" [ngTemplateOutletContext]="{ $implicit: m.author, self: m.author_id === selfId(), machine: isMachine(m.origin, m.author_id), sender: sender(m.origin, m.author_id) }"></ng-container>
+            <ng-container [ngTemplateOutlet]="avatar" [ngTemplateOutletContext]="{ $implicit: m.author, self: m.author_id === selfId(), machine: isMachine(m.origin, m.author_id, m.source), sender: sender(m.origin, m.author_id, m.source) }"></ng-container>
             <span class="ch-body">
               <span class="ch-title-line">
                 @if (topicNo(m); as no) {
@@ -631,7 +631,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
       <ng-template #avatar let-a let-self="self" let-focusable="focusable" let-machine="machine" let-sender="sender">
         <!-- Own Tab stop only outside the card-head button (no nested interaction);
              inside it the aria-label already joins the button's name.
-             A machine sender (PostHog-Wächter) draws a chip glyph, never initials. -->
+             An automatic sender (a guard or the AI) draws a chip glyph, never initials. -->
         @if (machine) {
           <span class="av bot" role="img" data-sender="guard" [attr.tabindex]="focusable ? 0 : null" [scTooltip]="senderTitle(sender) | translate" scTooltipTier="label" [attr.aria-label]="senderTitle(sender) | translate">
             <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="10" height="8" rx="2"/><path d="M8 2v2.5M5.5 8h.01M10.5 8h.01M6 10.5h4"/></svg>
@@ -695,7 +695,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
               <span class="who">{{ (msg.from_admin ? 'adminFeedback.userTopic.fromTeam' : 'adminFeedback.userTopic.fromAuthor') | translate }}</span>
               @if (msg.is_question) { <span class="chip">{{ 'adminFeedback.userTopic.questionBadge' | translate }}</span> }
             } @else {
-              <ng-container [ngTemplateOutlet]="avatar" [ngTemplateOutletContext]="{ $implicit: msg.author, self: msg.author_id === selfId(), focusable: true, machine: isMachine(null, msg.author_id), sender: sender(null, msg.author_id) }"></ng-container>
+              <ng-container [ngTemplateOutlet]="avatar" [ngTemplateOutletContext]="{ $implicit: msg.author, self: msg.author_id === selfId(), focusable: true, machine: isAutomaticReply(msg.author_id), sender: replySender(msg.author_id) }"></ng-container>
               <span class="who">{{ authorLabelFor(msg) }}</span>
             }
             <span class="msg-ts">{{ msg.created_at | scDate: 'datetime' }}</span>
@@ -1741,7 +1741,7 @@ export class AdminFeedbackComponent implements OnInit {
     // 89925995): it shows under "Meine" and "Andere" alike.
     if (w === 'mine') return awaitsTriage(m) || (!isUserSubmitted(m) && !!m.author_id && m.author_id === this.selfId());
     if (w === 'others') return awaitsTriage(m) || (!isUserSubmitted(m) && m.author_id !== this.selfId());
-    return senderFilterKey(m.origin, m.author_id) === w.authorId;
+    return senderFilterKey(m.origin, m.author_id, m.source) === w.authorId;
   }
 
   private matchesWhere(m: FeedbackRow): boolean {
@@ -1762,7 +1762,7 @@ export class AdminFeedbackComponent implements OnInit {
   readonly authorOptions = computed(() => {
     const seen = new Map<string, { id: string; row: FeedbackRow; count: number }>();
     for (const m of this.messages()) {
-      const id = senderFilterKey(m.origin, m.author_id);
+      const id = senderFilterKey(m.origin, m.author_id, m.source);
       const existing = seen.get(id);
       if (existing) existing.count++;
       else seen.set(id, { id, row: m, count: 1 });
@@ -2180,14 +2180,23 @@ export class AdminFeedbackComponent implements OnInit {
     return applySignedUrls(renderFeedbackBody(body), this.signer.signed());
   }
 
-  /** True for the PostHog-Wächter: a machine-origin item (no author) or a reply from the guard profile. */
-  isMachine(origin: string | null | undefined, authorId: string | null): boolean {
-    return (!!origin && origin !== 'human') || authorId === POSTHOG_GUARD_PROFILE_ID;
+  /** True for an automatic sender — a guard item, a reply from the guard profile, or a topic the AI filed. */
+  isMachine(origin: string | null | undefined, authorId: string | null, source?: string | null): boolean {
+    return isAutomatic(senderOf(origin, authorId, source));
   }
 
   /** Who sent a topic or reply — see feedback-sender.ts. */
-  sender(origin: string | null | undefined, authorId: string | null): FeedbackSender {
-    return senderOf(origin, authorId);
+  sender(origin: string | null | undefined, authorId: string | null, source?: string | null): FeedbackSender {
+    return senderOf(origin, authorId, source);
+  }
+
+  /** The sender of a non-system thread reply — see replySenderOf. */
+  replySender(authorId: string | null): FeedbackSender {
+    return replySenderOf(authorId);
+  }
+
+  isAutomaticReply(authorId: string | null): boolean {
+    return isAutomatic(replySenderOf(authorId));
   }
 
   senderTitle(s: FeedbackSender | undefined): string {
@@ -2196,12 +2205,12 @@ export class AdminFeedbackComponent implements OnInit {
 
   /** One name per sender, in the filter chip and the thread alike — never "Unbekannt" (feedback #390). */
   authorLabel(m: FeedbackRow): string {
-    return this.nameOf(senderOf(m.origin, m.author_id), m.author_id, m.author);
+    return this.nameOf(senderOf(m.origin, m.author_id, m.source), m.author_id, m.author);
   }
 
   authorLabelFor(msg: FeedbackMessage): string {
     if (msg.author_id !== POSTHOG_GUARD_PROFILE_ID && msg.is_system) return this.translate.instant('adminFeedback.kind.ai');
-    return this.nameOf(senderOf(null, msg.author_id), msg.author_id, msg.author);
+    return this.nameOf(replySenderOf(msg.author_id), msg.author_id, msg.author);
   }
 
   private nameOf(s: FeedbackSender, authorId: string | null, author: { display_name?: string | null; username?: string | null } | null | undefined): string {
