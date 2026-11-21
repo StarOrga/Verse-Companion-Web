@@ -15,6 +15,7 @@ vi.mock('../src/lib/discovery.js', () => ({
 const {
   EXTRACTS_DIR_NAME,
   isSafeExtractTarget,
+  markPartsPending,
   purgeExtracts,
   purgeAllExtracts,
   scanAndCleanupOrphans,
@@ -155,6 +156,28 @@ describe('scanAndCleanupOrphans', () => {
     const res = await scanAndCleanupOrphans([root], [keep]);
     expect(res.ok).toBe(true);
     expect(await extractDirs(root)).toEqual(['LIVE-4.9.0', 'skins-4.9.0']);
+  });
+
+  it('keeps an extract the open 3D hulls continue from, however stale it is', async () => {
+    // LIVE 4.10.3: the daily auto-run found its extract a day old, swept it,
+    // and re-read the whole P4K for a models-only continuation.
+    const root = await makeInstall(['LIVE-4.10.2', 'LIVE-4.10.3']);
+    const res0 = await markPartsPending(join(root, EXTRACTS_DIR_NAME, 'LIVE-4.10.3'));
+    expect(res0.ok).toBe(true);
+    await makeStale(root, ['LIVE-4.10.2', 'LIVE-4.10.3']);
+    const res = await scanAndCleanupOrphans([root]);
+    expect(res.ok).toBe(true);
+    expect(await extractDirs(root)).toEqual(['LIVE-4.10.3']);
+  });
+
+  it('still reclaims an uploaded extract that once had open hulls', async () => {
+    const root = await makeInstall(['LIVE-4.10.3']);
+    const dir = join(root, EXTRACTS_DIR_NAME, 'LIVE-4.10.3');
+    await markPartsPending(dir);
+    await writeFile(join(dir, '_uploaded.json'), '{}');
+    const res = await scanAndCleanupOrphans([root]);
+    expect(res.ok).toBe(true);
+    expect(await extractDirs(root)).toEqual([]);
   });
 
   it('never sweeps a livery build cache, however stale', async () => {

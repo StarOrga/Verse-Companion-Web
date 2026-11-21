@@ -1,7 +1,47 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.288.5",
+  "current": "0.288.7",
   "releases": [
+    {
+      "version": "0.288.7",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader 0.84.4: two liveries that shared an icon are paired by id, so \"Invictus Blue and Gold\" no longer shows the Grey icon (Retaliator, Constellations, Avengers, Syulen)"
+            },
+            {
+              "title": "",
+              "text": "Data Uploader: a crashed 3D or silhouette build and a refused upload now name their cause in the log"
+            },
+            {
+              "title": "",
+              "text": "Data Uploader: an extract the 3D models still need is no longer swept the next day, so no full P4K re-read"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.288.6",
+      "date": "2026-11-21",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader 0.84.2: Verse locations read from the real game data get readable types, real system positions for the Lagrange rest stops, gateways and Nyx stations, system rows and cities; a star is no longer a fallback position (#1195). The microTech moons were already right — the bundled catalog has them mirrored."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.288.5",
       "date": "2026-11-21",
