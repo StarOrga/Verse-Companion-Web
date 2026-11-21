@@ -1,0 +1,199 @@
+[
+  {
+    "iteration": 1,
+    "action": "iterate",
+    "fidelity": "live",
+    "decisions": [
+      {
+        "id": "d-finding",
+        "label": "Befund zu den offenen Karten",
+        "value": "ok",
+        "rec": "ok",
+        "deviates": false,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "d-filter",
+        "label": "Vorfilter vor jeder Karte",
+        "value": [
+          "casing",
+          "bracket",
+          "majority",
+          "patterns",
+          "doubt"
+        ],
+        "rec": "casing bracket majority patterns",
+        "deviates": true,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "d-foreign",
+        "label": "Karten in fremden Sprachen",
+        "value": "veto",
+        "rec": "veto",
+        "deviates": false,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "d-xlang",
+        "label": "Konvention für alle Sprachen",
+        "value": {
+          "answer": "yes",
+          "alt": ""
+        },
+        "rec": "yes",
+        "deviates": false,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "d-session",
+        "label": "Was beim Öffnen erscheint",
+        "value": "deck",
+        "rec": "deck",
+        "deviates": false,
+        "untouched": true,
+        "note": ""
+      },
+      {
+        "id": "d-answer",
+        "label": "Art der Antwort",
+        "value": "tap",
+        "rec": "tap",
+        "deviates": false,
+        "untouched": false,
+        "note": "Ja plus bitte tasten auch verwenden hotkeys, aber auch auf dem handy swipen!"
+      },
+      {
+        "id": "d-preview",
+        "label": "Zu jeder Entscheidung",
+        "value": [
+          "count",
+          "when",
+          "lang",
+          "notmine"
+        ],
+        "rec": "count when lang notmine",
+        "deviates": false,
+        "untouched": false,
+        "note": ""
+      },
+      {
+        "id": "d-game",
+        "label": "Punkte und Rangliste",
+        "value": "keep",
+        "rec": "none",
+        "deviates": true,
+        "untouched": false,
+        "note": "Gern neu gedacht und schön integriert, aufgemacht. Das ganze view soll eher wie ein spiel wirken !"
+      }
+    ],
+    "general": "das nächste bitte\n\nund anbei devopos learn, lvie treue sollte bei hover over die hinweise einblenden. Außerdem der grüne punkt auf dem notiz fab ist unnötig und hässlich, den einfach weg"
+  },
+  {
+    "iteration": 2,
+    "action": "iterate",
+    "fidelity": "live",
+    "favorite": "d2",
+    "annotations": [
+      {
+        "id": "anno-r2-d2-s3-a1",
+        "text": "k"
+      },
+      {
+        "id": "anno-r2-d2-s4-a1",
+        "text": "sehr gut, gern noch ein ticken mehr highlighten"
+      },
+      {
+        "id": "anno-r2-d2-s5-a1",
+        "text": "namen"
+      }
+    ],
+    "screens": {
+      "d3-s6": "diese Veto Liste hmm, fühlt sich unintegriert an ggü. dem rest. Gtu weil es was anderes ist, aber hmmm\nAUßerdem finde ich gut, dass man es per sprache sehr gut im überblick sieht"
+    },
+    "userPins": [
+      {
+        "design": "d1",
+        "screen": "d1-s1",
+        "target": "button.mock-tab \"Übersicht\"",
+        "text": "mach dieses menü genau links am seitenrand wie in hq etc. wollen das gleich haben"
+      },
+      {
+        "design": "d2",
+        "screen": "d2-s1",
+        "target": "span \"Collaborator\"",
+        "text": "genua hier unten die anderne namen der anderen leite. Du bleibt bei du ist ok!"
+      },
+      {
+        "design": "d2",
+        "screen": "d2-s1",
+        "target": "div.d2-stat \"Punkte1 240\"",
+        "text": "Die drei kästen hier links naja, etwas langweilig"
+      },
+      {
+        "design": "d2",
+        "screen": "d2-s1",
+        "target": "div.d2-stage \"Tagesziel 0 / 10 DEDeutsch · 10 Karten≈ \"",
+        "text": "Tagesziel finde ich gut,"
+      },
+      {
+        "design": "d2",
+        "screen": "d2-s2",
+        "target": "h3 \"Normale Schreibweise\"",
+        "text": "hier sollte bitte etwas mit abständen aufräumen etc. man kann es schlecht erfassen"
+      },
+      {
+        "design": "d2",
+        "screen": "d2-s2",
+        "target": "button.d2-sbtn.d2-sbtn--r \"GROSSBUCHSTABEN →\"",
+        "text": "Kann nicht sein, dass es textuell übersteht"
+      },
+      {
+        "design": "d2",
+        "screen": "d2-s2",
+        "target": "div.d2-podium \"21 24011 4803310\"",
+        "text": "ich weiß gar nicht ob wir hier rechts so \"dicke kästen brauchen hmm"
+      },
+      {
+        "design": "d2",
+        "screen": "d2-s3",
+        "target": "div.d2-ctop \"BegriffEnglisch: Open2 / 10\"",
+        "text": "gern nochmal varianten der karten hier, denke gut drüber nach"
+      },
+      {
+        "design": "d2",
+        "screen": "d2-s4",
+        "target": "text \"5\"",
+        "text": "was soll hier die 5?!"
+      },
+      {
+        "design": "d2",
+        "screen": "d2-s4",
+        "target": "span \"Nächste Karte in 3 s\"",
+        "text": "Die leiste hier unten finde ich super inhaltlich, aber da springt viel etc. wenig wiederkennungswert, welche buttons wofür etc..."
+      },
+      {
+        "design": "d2",
+        "screen": "d2-s4",
+        "target": "div.d2-undo.mock-desk \"5Rückgängig Strg+ZNächste Karte in 3 sWe\"",
+        "text": "rückgängig haben wir doch eine reguläre darstelujn!?"
+      },
+      {
+        "design": "d2",
+        "screen": "d2-s5",
+        "target": "div.d2-empty \"Alles geklärt für Deutsch10 Karten · 74 \"",
+        "text": "die idee mit dem ring gut, aber irgendwie doof, mit dem überlappten zum quadrat karteikarten..."
+      },
+      {
+        "design": "d2",
+        "screen": "d2-s6",
+        "target": "div.d2-vhead \"Fremde Sprachen: KI hat 199 entschieden,\"",
+        "text": "das sieht mir viel zu anders aus! ALs der ander eworkflow :/"
+      }
+    ]
+  }
+]

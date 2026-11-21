@@ -1,0 +1,419 @@
+<section data-iteration="1" data-iteration-template="decision" data-analysis="full" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"text":"das nächste bitte\n\nund anbei devopos learn, lvie treue sollte bei hover over die hinweise einblenden. Außerdem der grüne punkt auf dem notiz fab ist unnötig und hässlich, den einfach weg","attachments":[{"id":"7813b727ce480053d896a5a0a6c4872d4f00b730573f5fbb45923d3cae96537e.png","name":"image.png","mime":"image/png","size":30272,"path":".claude/concepts/20261121-1151-karteikarten-neu/attachments/7813b727ce480053d896a5a0a6c4872d4f00b730573f5fbb45923d3cae96537e.png"}]},"fidelity":"live"}</script>
+  <div class="iteration-intro">
+    <h2>Karteikarten neu gedacht</h2>
+    <p>Drei Agents haben die Seite ohne Blick in den Code neu gedacht, aus Produkt-, UX- und Nutzersicht. Alle drei kommen auf dieselbe Richtung. Hier entscheidest du, welche Teile davon gebaut werden.</p>
+  </div>
+
+  <section id="briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>In 4 Tagen sind 254 Karten entstanden, eine davon ist beantwortet. Die meisten fragen nach Schreibweisen, klaren Mehrheiten oder Sprachen, die keiner von euch liest.</p>
+    <p data-briefing-why>Solange das so ist, lernt die Übersetzung aus den Karten nichts, und der Stapel wächst mit jedem Lernlauf um bis zu 40 Karten pro Sprache.</p>
+    <div data-briefing-potential data-viz="kpi"
+         data-viz-spec='{"value":"≈ 20 statt 253","unit":"Entscheidungen","label":"für dich auf Deutsch, die vier anderen Sprachen erledigt die KI mit Veto-Liste"}'>≈ 20 statt 253</div>
+    <a data-briefing-topic="t-filter" data-share="70">Was beim Menschen landet</a>
+    <a data-briefing-topic="t-session" data-share="30">Wie eine Sitzung läuft</a>
+    <p data-briefing-duration>≈ 6 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"1 von 254","unit":"Karten","label":"beantwortet seit dem 17.11."}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Italienisch","value":67},{"label":"Deutsch","value":54},{"label":"Portugiesisch (BR)","value":52},{"label":"Japanisch","value":45},{"label":"Russisch","value":35}],"unit":"offene Karten","hl":"Deutsch"}'></div>
+        <p>Die drei Ansätze unterscheiden sich in Details, der Kern ist gleich: Die Pipeline räumt auf, bevor sie fragt. Fremde Sprachen landen nicht mehr als A/B-Karte bei dir. Du bekommst einen Stapel mit Ende statt einer Warteschlange ohne Ende. Punkte und Rangliste fallen weg.</p>
+        <p>Wie die Seite danach aussieht, zeigt die nächste Runde als Entwurf. Diese Runde klärt, was die Seite und die Pipeline können sollen.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="t-filter" data-topic data-nav-label="Was beim Menschen landet">
+    <div data-alevel="2" data-title="Was beim Menschen landet">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"199 von 253","unit":"Karten","label":"sind in Sprachen, die keiner von euch sicher liest"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="table" data-viz-spec='{"columns":["Offen","Nur Schreibweise","Klare Mehrheit"],"rows":[{"label":"Deutsch","cells":["54","17","8"]},{"label":"Italienisch","cells":["67","1","16"]},{"label":"Portugiesisch (BR)","cells":["52","15","6"]},{"label":"Japanisch","cells":["45","2","13"]},{"label":"Russisch","cells":["35","0","22"]}],"text":"Klare Mehrheit: mindestens 5 Stimmen und mindestens 4 : 1. Dazu kommen Muster wie die Verbform auf Knöpfen, die sich nicht so einfach zählen lassen."}'></div>
+        <p>Karten entstehen heute an zwei Stellen: wenn der Schiedsrichter zwischen KI- und Community-Text keinen Sieger findet, und wenn der Lernschritt zwei gesammelte Übersetzungen eines Begriffs nicht trennen kann. In beiden Fällen geht die Karte ungefiltert in den Stapel.</p>
+      </div>
+    </div>
+
+    <section id="d-finding" data-nav-label="Befund" data-decision="d-finding" data-decision-mode="verify"
+             data-label="Befund zu den offenen Karten" data-rec="ok"
+             data-rec-why="Die Zahlen stammen aus der Live-Tabelle vom 21.11., die Beispiele sind echte offene Karten."
+             data-applies-to="alle 253 offenen Karten" data-finding="f-finding"><input type="hidden" name="dm-d-finding-hes" value="{&quot;ms&quot;:26501,&quot;revisits&quot;:0,&quot;median&quot;:32446}">
+      <p data-applies>Gilt für: alle 253 offenen Karten</p>
+      <p data-situation>Von 54 deutschen Karten unterscheiden sich 17 nur in der Schreibweise, 8 haben eine klare Mehrheit. 199 Karten liegen in Sprachen, die keiner von euch sicher liest.</p>
+      <h3 data-question>Stimmt der Befund: Die meisten Karten braucht gar kein Mensch?</h3>
+      <p data-stakes>Ob die Vorfilter unten das Hauptproblem treffen oder nur den Rand</p>
+      <div data-options>
+        <label data-opt="ok" data-recommended>
+          <input type="radio" name="dm-d-finding" value="ok" checked>
+          <span data-opt-label>Stimmt</span>
+          <span data-opt-consequence>Die Vorfilter und die KI-Entscheidung für fremde Sprachen sind der wichtigste Teil des Umbaus.</span>
+        </label>
+        <label data-opt="partial">
+          <input type="radio" name="dm-d-finding" value="partial">
+          <span data-opt-label>Teilweise</span>
+          <span data-opt-consequence>Schreib dazu, welche Kartenart du doch selbst sehen willst.</span>
+        </label>
+        <label data-opt="wrong">
+          <input type="radio" name="dm-d-finding" value="wrong">
+          <span data-opt-label>Stimmt nicht</span>
+          <span data-opt-consequence>Dann liegt das Problem woanders, zum Beispiel an fehlender Zeit, und die nächste Runde fragt danach.</span>
+        </label>
+      </div>
+      <input type="text" name="dm-d-finding-fix" placeholder="Was stimmt nicht?" value="">
+      <textarea data-comment="d-finding-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Befund">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"65","unit":"Karten","label":"mit klarer Mehrheit, über alle Sprachen"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Fremde Sprachen","value":199},{"label":"Klare Mehrheit","value":65},{"label":"Nur Schreibweise","value":35},{"label":"Schiffsname im Begriff","value":5}],"unit":"Karten (überlappend)","hl":"Fremde Sprachen"}'></div>
+          <p>Der Zweifelswert, nach dem sortiert werden soll, steht fast überall auf 1,0. Die einzige beantwortete Karte war eine klare Mehrheit: „Waffen“ 6× gegen 1×.</p>
+        </div>
+        <div data-example><pre>Echte offene Karten, 21.11.
+
+de  Lounge                  → „Lounge“        oder  „LOUNGE“
+de  Passenger Quarters      → „Passagierquartiere“  oder  „PASSAGIER-QUARTIERE“
+de  XO Quarters             → „XO-Quartiere“  oder  „QUARTIERE DES ERSTEN OFFIZIERS“
+it  Main Thruster           → „Propulsore principale (Aegis Idris)“
+                              oder  „Propulsore principale (Aegis)“
+it  Cancel                  → „Annulla“ (13×)  oder  „Annullare“ (3×)
+ru  Offline                 → „НЕ В СЕТИ“ (14×)  oder  „НЕ АКТИВНО“ (2×)</pre></div>
+      </div>
+    </section>
+
+    <section id="d-filter" data-nav-label="Vorfilter" data-decision="d-filter" data-decision-mode="multi"
+             data-label="Vorfilter vor jeder Karte" data-rec="casing bracket majority patterns"
+             data-rec-why="Die vier Filter sind billig, laufen ohne KI-Kosten und nehmen zusammen den größten Teil der deutschen Karten weg. Der Zweifelswert hilft erst, wenn das Rauschen weg ist."
+             data-applies-to="Lernschritt und Schiedsrichter, bevor sie eine Karte anlegen" data-finding="f-filter"><input type="hidden" name="dm-d-filter-hes" value="{&quot;ms&quot;:36282,&quot;revisits&quot;:0,&quot;median&quot;:32446}">
+      <p data-applies>Gilt für: Lernschritt und Schiedsrichter, bevor sie eine Karte anlegen</p>
+      <p data-situation>Jeder unentschiedene Fall kostet dich eine Karte, auch wenn sich die Vorschläge nur in einem Großbuchstaben unterscheiden.</p>
+      <h3 data-question>Welche Vorfilter laufen, bevor eine Karte entsteht?</h3>
+      <p data-context>Die bestehenden 253 Karten laufen einmal durch dieselben Filter.</p>
+      <p data-stakes>Wie viele Karten überhaupt noch bei dir ankommen</p>
+      <div data-options>
+        <label data-opt="casing" data-recommended>
+          <input type="checkbox" name="dm-d-filter.casing" checked>
+          <span data-opt-label>Schreibweisen bündeln statt einzeln fragen</span>
+          <span data-opt-consequence>Karten, die sich nur in Groß-/Kleinschreibung oder Bindestrich unterscheiden, werden eine Konventionsfrage pro Sprache. Auf Deutsch betrifft das 17 Karten.</span>
+        </label>
+        <label data-opt="bracket" data-recommended>
+          <input type="checkbox" name="dm-d-filter.bracket" checked>
+          <span data-opt-label>Fremde Klammerzusätze abschneiden</span>
+          <span data-opt-consequence>Steht „(Aegis Idris)“ nicht im englischen Text, fällt der Zusatz weg. Bleibt danach nur eine Variante übrig, entsteht keine Karte.</span>
+        </label>
+        <label data-opt="majority" data-recommended>
+          <input type="checkbox" name="dm-d-filter.majority" checked>
+          <span data-opt-label>Klare Mehrheit gewinnt ohne Frage</span>
+          <span data-opt-consequence>Ab 5 Stimmen und 4 : 1 entscheidet die Mehrheit. Das betrifft 65 Karten; jede steht im Protokoll und lässt sich umdrehen.</span>
+        </label>
+        <label data-opt="patterns" data-recommended>
+          <input type="checkbox" name="dm-d-filter.patterns" checked>
+          <span data-opt-label>Weitere Muster als eine Frage bündeln</span>
+          <span data-opt-consequence>Verbform auf Knöpfen (Annulla / Annullare) und Abkürzung gegen ausgeschrieben (XO / Erster Offizier) werden je eine Frage pro Muster statt eine pro Text.</span>
+        </label>
+        <label data-opt="doubt">
+          <input type="checkbox" name="dm-d-filter.doubt" checked>
+          <span data-opt-label>Zweifelswert neu berechnen</span>
+          <span data-opt-consequence>Er misst heute nur, dass die KI in beiden Reihenfolgen anders geurteilt hat, und steht deshalb fast immer auf 1,0. Neu berechnet sortiert er wieder; nach den Filtern bleibt aber wenig zu sortieren.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-filter-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Vorfilter">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"54 → ≈ 20","unit":"deutsche Karten","label":"nach Schreibweise, Klammerzusatz und Mehrheit"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Heute","value":54},{"label":"nach Schreibweise","value":37},{"label":"nach Mehrheit","value":29},{"label":"nach weiteren Mustern","value":20}],"unit":"deutsche Karten (Schätzung)","hl":"nach weiteren Mustern"}'></div>
+          <p>Die Filter laufen ohne KI-Aufruf. Eine Konventionsfrage ersetzt mehrere Karten und zählt als eine Entscheidung.</p>
+        </div>
+        <div data-example><pre>Vorher: 3 Karten
+  Lounge              „Lounge“              oder „LOUNGE“
+  Passenger Quarters  „Passagierquartiere“  oder „PASSAGIER-QUARTIERE“
+  Owner's Quarters    …
+
+Nachher: 1 Frage
+  Raumnamen auf Deutsch: normale Schreibweise oder GROSS
+  wie im Community-Paket?            betrifft 26 Texte</pre></div>
+      </div>
+    </section>
+
+    <section id="d-foreign" data-nav-label="Fremde Sprachen" data-decision="d-foreign" data-decision-mode="single"
+             data-label="Karten in fremden Sprachen" data-rec="veto"
+             data-rec-why="Alle drei Ansätze nehmen dir die fremden Sprachen ab. Die Rückübersetzung hält Fehlgriffe sichtbar, ohne dass du Italienisch lesen musst, und kostet nur einen kleinen Haiku-Lauf."
+             data-applies-to="Italienisch, Japanisch, Russisch, Portugiesisch (BR)" data-finding="f-foreign"><input type="hidden" name="dm-d-foreign-hes" value="{&quot;ms&quot;:31703,&quot;revisits&quot;:0,&quot;median&quot;:32446}">
+      <p data-applies>Gilt für: Italienisch, Japanisch, Russisch, Portugiesisch (BR)</p>
+      <p data-situation>199 der 253 Karten fragen nach Wortwahl in Sprachen, die keiner von euch sicher liest. Eine Antwort darauf ist geraten.</p>
+      <h3 data-question>Was passiert mit Karten in Sprachen, die keiner von euch liest?</h3>
+      <p data-context>Annahme: Du beurteilst Deutsch sicher, die anderen vier nicht. Jeder Admin legt das einmal fest; ist die Annahme falsch, schreib es in die Notiz.</p>
+      <p data-stakes>Ob fremde Sprachen weiter deinen Stapel füllen</p>
+      <div data-options>
+        <label data-opt="veto" data-recommended>
+          <input type="radio" name="dm-d-foreign" value="veto" checked>
+          <span data-opt-label>KI entscheidet, du bekommst eine Liste mit Rückübersetzung und Veto</span>
+          <span data-opt-consequence>Keine A/B-Karten mehr. Jede Wahl zeigt eine deutsche Rückübersetzung und den Grund, unsichere stehen oben. Wer nichts tut, nimmt sie an.</span>
+        </label>
+        <label data-opt="silent">
+          <input type="radio" name="dm-d-foreign" value="silent">
+          <span data-opt-label>KI entscheidet still, nur mit Protokoll</span>
+          <span data-opt-consequence>Kein Zusatzaufwand und keine Kosten. Ob eine Wahl falsch war, merkt erst ein Muttersprachler, der das Protokoll liest.</span>
+        </label>
+        <label data-opt="assist">
+          <input type="radio" name="dm-d-foreign" value="assist">
+          <span data-opt-label>Karten bleiben, mit Rückübersetzung und KI-Erklärung</span>
+          <span data-opt-consequence>Du entscheidest weiter selbst, mit Hilfe. Der Stapel bleibt fast so groß wie heute.</span>
+        </label>
+        <label data-opt="park">
+          <input type="radio" name="dm-d-foreign" value="park">
+          <span data-opt-label>Parken, bis ein Muttersprachler hilft</span>
+          <span data-opt-consequence>Nichts wird geraten. Diese Sprachen bleiben auf dem Stand der Community-Pakete, bis jemand kommt.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-foreign-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Fremde Sprachen">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"199","unit":"Karten","label":"in it, ja, ru und pt-BR"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Italienisch","value":67},{"label":"Portugiesisch (BR)","value":52},{"label":"Japanisch","value":45},{"label":"Russisch","value":35}],"unit":"offene Karten","hl":"Italienisch"}'></div>
+          <p>Ohne Sieger entscheidet eine feste Reihenfolge: klare Mehrheit, dann Community-Text, dann KI-Text.</p>
+        </div>
+        <div data-example><pre>KI-Entscheidungen · Italienisch · 3 unsicher oben
+
+  So könnte die Liste aussehen
+
+  ⚠ Main Thruster   „Propulsore principale“
+     zurück: „Haupttriebwerk“ · Schiffsname entfernt, beide Vorschläge hatten einen
+  ✓ Cancel          „Annulla“
+     zurück: „Abbrechen“ · Mehrheit 13 : 3, Imperativ wie auf Knöpfen üblich
+  ✓ Offline         „disconnesso“
+     zurück: „Getrennt“ · Mehrheit 6 : 1
+                                                   [ Sieht falsch aus ]</pre></div>
+      </div>
+    </section>
+
+    <section id="d-xlang" data-nav-label="Für alle Sprachen" data-decision="d-xlang" data-decision-mode="yesnoalt"
+             data-label="Konvention für alle Sprachen" data-rec="yes"
+             data-rec-why="Das Großbuchstaben-Muster taucht in drei Sprachen auf; eine Stilfrage kannst du auf Deutsch beantworten, ohne die anderen Sprachen zu lesen."
+             data-applies-to="Konventionsfragen wie Schreibweise der Raumnamen oder Verbform auf Knöpfen" data-finding="f-xlang"><input type="hidden" name="dm-d-xlang-hes" value="{&quot;ms&quot;:21969,&quot;revisits&quot;:1,&quot;median&quot;:32446}">
+      <p data-applies>Gilt für: Konventionsfragen wie Schreibweise der Raumnamen oder Verbform auf Knöpfen</p>
+      <p data-situation>Bei 102 Karten in Deutsch, Portugiesisch und Russisch ist eine Seite komplett in Großbuchstaben, meist aus dem Community-Paket.</p>
+      <h3 data-question>Gilt eine Konventionsfrage auf einmal für alle Sprachen?</h3>
+      <p data-stakes>Ob du Stilfragen einmal oder fünfmal beantwortest</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended>
+          <input type="radio" name="dm-d-xlang" value="yes" checked>
+          <span data-opt-label>Ja, eine Antwort gilt für alle Sprachen</span>
+          <span data-opt-consequence>Du beantwortest „Großbuchstaben oder normale Schreibweise?“ einmal auf Deutsch. Einzelne Sprachen können eine Ausnahme bekommen.</span>
+        </label>
+        <label data-opt="no">
+          <input type="radio" name="dm-d-xlang" value="no">
+          <span data-opt-label>Nein, jede Sprache bekommt ihre eigene Frage</span>
+          <span data-opt-consequence>Dieselbe Frage kommt bis zu fünfmal, dafür folgt jede Sprache ihrer eigenen Community.</span>
+        </label>
+        <label data-opt="alt">
+          <input type="radio" name="dm-d-xlang" value="alt">
+          <span data-opt-label>Anders …</span>
+          <span data-opt-consequence>Schreib, wie es stattdessen laufen soll.</span>
+        </label>
+      </div>
+      <input type="text" name="dm-d-xlang-alt" placeholder="Was stattdessen?" value="">
+      <textarea data-comment="d-xlang-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Für alle Sprachen">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"117","unit":"Karten","label":"mit einer Seite komplett in Großbuchstaben, über alle Sprachen"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Deutsch","value":37},{"label":"Portugiesisch (BR)","value":36},{"label":"Russisch","value":29},{"label":"Italienisch","value":10},{"label":"Japanisch","value":5}],"unit":"Karten mit einer Seite in Großbuchstaben","hl":"Deutsch"}'></div>
+          <p>Unterscheidet sich auch das Wort („ANTERIOR“ oder „Voltar“), bleibt die Wortwahl eine eigene, kleinere Frage. Die Antwort ist eine Glossar-Regel, pro Sprache überschreibbar.</p>
+        </div>
+        <div data-example><pre>Konvention · alle Sprachen
+  Großbuchstaben oder normale Schreibweise, wo das Englische normal schreibt?
+
+  de   Schließen        SCHLIESSEN         11 Texte
+  de   Passagierquartiere   PASSAGIER-QUARTIERE   1 Text
+  pt   Médio            MÉDIA               9 Texte
+  pt   Trancado         BLOQUEADO           9 Texte   (auch das Wort unterscheidet sich)</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <section id="t-session" data-topic data-nav-label="Wie eine Sitzung läuft">
+    <div data-alevel="2" data-title="Wie eine Sitzung läuft">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"≤ 10 min","unit":"pro Sitzung","label":"Ziel: der Stapel deiner Sprache ist danach leer"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="table" data-viz-spec='{"columns":["Heute","Neu"],"rows":[{"label":"Beim Öffnen","cells":["253 offen, alle Sprachen","Dein Stapel mit Zeit und Wirkung"]},{"label":"Frage","cells":["Englischer Satz","In deiner Sprache"]},{"label":"Wirkung","cells":["„+12 Punkte“","Welche Strings sich wann ändern"]},{"label":"Ende","cells":["Keins","„Alles geklärt“"]}],"text":"Die Antwort wirkt wie heute beim nächsten Lernlauf, nicht sofort."}'></div>
+        <p>Neue Katalog-Events für Stapel-Start, Antwort, Veto und „Alles geklärt“ zeigen in einer Kachel des Admin-Dashboards, ob der Stapel wirklich leer wird.</p>
+      </div>
+    </div>
+
+    <section id="d-session" data-nav-label="Beim Öffnen" data-decision="d-session" data-decision-mode="single"
+             data-label="Was beim Öffnen erscheint" data-rec="deck"
+             data-rec-why="Ein Stapel mit Ende ist das, was alle drei Ansätze gegen das Wegklicken setzen; er funktioniert gleich gut auf dem Handy."
+             data-applies-to="Tab „Karteikarten“" data-finding="f-session"><input type="hidden" name="dm-d-session-hes" value="{&quot;ms&quot;:70644,&quot;revisits&quot;:0,&quot;median&quot;:32446}">
+      <p data-applies>Gilt für: Tab „Karteikarten“</p>
+      <p data-situation>Wer den Tab öffnet, sieht „253 offen“, ein Tagesziel und eine Karte aus irgendeiner Sprache.</p>
+      <h3 data-question>Was siehst du, wenn du die Karteikarten öffnest?</h3>
+      <p data-stakes>Ob du eine Sitzung anfängst oder den Tab gleich wieder schließt</p>
+      <div data-options>
+        <label data-opt="deck" data-recommended>
+          <input type="radio" name="dm-d-session" value="deck" checked>
+          <span data-opt-label>Einen Stapel deiner Sprache mit Ende</span>
+          <span data-opt-consequence>Zum Beispiel „Deutsch: 9 Entscheidungen · ≈ 5 min · 312 Texte“. Erst Konventionen, dann Begriffe, dann Einzeltexte, höchstens 10 pro Sitzung, am Ende „Alles geklärt“.</span>
+        </label>
+        <label data-opt="desk">
+          <input type="radio" name="dm-d-session" value="desk">
+          <span data-opt-label>Einen Arbeitsplatz mit drei Bahnen</span>
+          <span data-opt-consequence>Konventionen, Begriffe und Einzeltexte nebeneinander, daneben alle betroffenen Texte. Mehr Überblick am Desktop, auf dem Handy nur als Liste.</span>
+        </label>
+        <label data-opt="queue">
+          <input type="radio" name="dm-d-session" value="queue">
+          <span data-opt-label>Die Warteschlange wie heute, nur gefiltert</span>
+          <span data-opt-consequence>Kleinster Umbau: eine Karte nach der anderen, ohne Ende. Die Vorfilter machen sie kürzer.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-session-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Beim Öffnen">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"1","unit":"Antwort","label":"in 4 Tagen mit der heutigen Warteschlange"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Konventionen","value":4},{"label":"Begriffe","value":3},{"label":"Einzeltexte","value":2}],"unit":"Entscheidungen im ersten deutschen Stapel (Schätzung)","hl":"Konventionen"}'></div>
+          <p>Eine Konvention ändert Dutzende Texte, ein Begriff 8 bis 25, ein Einzeltext einen. Was über 10 hinausgeht, kommt in den nächsten Stapel.</p>
+        </div>
+        <div data-example><pre>Karteikarten
+
+  Deutsch · 9 Entscheidungen · ≈ 5 min · betrifft 312 Texte
+                                               [ Los geht's ]
+
+  Italienisch, Japanisch, Russisch, Portugiesisch:
+  KI hat 199 entschieden, 9 davon unsicher  ›  ansehen</pre></div>
+      </div>
+    </section>
+
+    <section id="d-answer" data-nav-label="Antworten" data-decision="d-answer" data-decision-mode="single"
+             data-label="Art der Antwort" data-rec="tap"
+             data-rec-why="Die Antwort wirkt ohnehin erst beim nächsten Lernlauf; bis dahin ist Rücknehmen billig, also braucht es keinen Bestätigungsschritt."
+             data-applies-to="jede Entscheidung im Stapel" data-finding="f-answer"><input type="hidden" name="dm-d-answer-hes" value="{&quot;ms&quot;:24706,&quot;revisits&quot;:0,&quot;median&quot;:32446}">
+      <p data-applies>Gilt für: jede Entscheidung im Stapel</p>
+      <p data-situation>Jede Karte kostet drei Schritte: Option wählen, „Antwort speichern“, „Nächste Karte“.</p>
+      <h3 data-question>Wie gibst du eine Antwort ab?</h3>
+      <p data-stakes>Wie viele Schritte jede der ≈ 10 Entscheidungen kostet</p>
+      <div data-options>
+        <label data-opt="tap" data-recommended>
+          <input type="radio" name="dm-d-answer" value="tap" checked>
+          <span data-opt-label>Antippen ist die Antwort, mit Rückgängig</span>
+          <span data-opt-consequence>Ein Tipp entscheidet und blättert weiter, ein Hinweis bietet „Rückgängig“. Bis zum nächsten Lernlauf bleibt jede Antwort zurücknehmbar.</span>
+        </label>
+        <label data-opt="confirm">
+          <input type="radio" name="dm-d-answer" value="confirm">
+          <span data-opt-label>Erst wählen, dann bestätigen</span>
+          <span data-opt-consequence>Ein Schritt mehr pro Entscheidung, dafür kein versehentlicher Treffer auf dem Handy.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-answer-note" placeholder="Notiz (optional)">Ja plus bitte tasten auch verwenden hotkeys, aber auch auf dem handy swipen!</textarea>
+      <div data-alevel="3" data-title="Antworten">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"3 → 1","unit":"Schritte","label":"pro Entscheidung"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="table" data-viz-spec='{"columns":["Heute","Neu"],"rows":[{"label":"Antwort","cells":["Wählen + Speichern","Antippen"]},{"label":"Weiter","cells":["„Nächste Karte“","automatisch"]},{"label":"Als Regel","cells":["Haken pro Karte","ergibt sich aus der Kartenart"]},{"label":"Notiz","cells":["immer offen","hinter einem Link"]}],"text":"„Eigener Text“ bleibt, vorbefüllt mit dem näheren Vorschlag."}'></div>
+          <p>Der Haken „Als Regel speichern“ entfällt: Eine Konventions- oder Begriffsfrage ist immer eine Regel, ein Einzeltext nie.</p>
+        </div>
+        <div data-example><pre>Wie soll „Open“ überall heißen?                  betrifft 10 Texte
+
+  ┌ Öffnen ────────────────────┐  ┌ Offen ─────────────────────┐
+  │ 5× gesammelt               │  │ 2× gesammelt               │
+  │ „Tür öffnen“, „Öffnen“     │  │ „Status: Offen“            │
+  └────────────────────────────┘  └────────────────────────────┘
+  Beides falsch, selbst schreiben       Nicht meine Entscheidung
+
+  ✓ Gespeichert · Öffnen                          Rückgängig</pre></div>
+      </div>
+    </section>
+
+    <section id="d-preview" data-nav-label="Zu jeder Entscheidung" data-decision="d-preview" data-decision-mode="multi"
+             data-label="Zu jeder Entscheidung" data-rec="count when lang notmine"
+             data-rec-why="Diese vier beantworten „was ändert sich, wann, und darf ich das abgeben“; die Spielbild-Vorschau und das Sofort-Anwenden sind nett, aber ohne Längendaten bzw. mit Kosten verbunden."
+             data-applies-to="jede Entscheidung im Stapel" data-finding="f-preview"><input type="hidden" name="dm-d-preview-hes" value="{&quot;ms&quot;:33189,&quot;revisits&quot;:0,&quot;median&quot;:32446}">
+      <p data-applies>Gilt für: jede Entscheidung im Stapel</p>
+      <p data-situation>Was eine Antwort ändert, erfährst du erst danach, und wann sie im Spieltext ankommt, steht nirgends.</p>
+      <h3 data-question>Was gehört zu jeder Entscheidung dazu?</h3>
+      <p data-stakes>Ob du vor dem Antippen weißt, was du auslöst</p>
+      <div data-options>
+        <label data-opt="count" data-recommended>
+          <input type="checkbox" name="dm-d-preview.count" checked>
+          <span data-opt-label>Wie viele Texte sie ändert, mit 2–3 echten Beispielen</span>
+          <span data-opt-consequence>Jede Option zeigt „betrifft 23 Texte“ und Beispiele, in denen sie schon eingesetzt ist.</span>
+        </label>
+        <label data-opt="when" data-recommended>
+          <input type="checkbox" name="dm-d-preview.when" checked>
+          <span data-opt-label>Wann sie wirkt</span>
+          <span data-opt-consequence>„Wirkt beim nächsten Lernlauf, also nach dem nächsten Data-Upload oder mit „Lernen“ im Quellen-Tab.“</span>
+        </label>
+        <label data-opt="lang" data-recommended>
+          <input type="checkbox" name="dm-d-preview.lang" checked>
+          <span data-opt-label>Die Frage in deiner Sprache</span>
+          <span data-opt-consequence>Die Pipeline speichert Kartenart und Begriff, die Frage entsteht aus einer übersetzten Vorlage statt aus einem englischen Satz.</span>
+        </label>
+        <label data-opt="notmine" data-recommended>
+          <input type="checkbox" name="dm-d-preview.notmine" checked>
+          <span data-opt-label>„Nicht meine Entscheidung“ statt Überspringen</span>
+          <span data-opt-consequence>Die Karte verlässt deinen Stapel und geht den KI-Weg, statt am Ende wieder aufzutauchen.</span>
+        </label>
+        <label data-opt="specimen">
+          <input type="checkbox" name="dm-d-preview.specimen">
+          <span data-opt-label>Die Option als Mini-Vorschau im Spiel</span>
+          <span data-opt-consequence>Knopf, Türschild, HUD-Zeile oder Itemtitel als kleine Skizze. Längengrenzen gibt es in den Daten nicht, die Vorschau ist eine Näherung.</span>
+        </label>
+        <label data-opt="applynow">
+          <input type="checkbox" name="dm-d-preview.applynow">
+          <span data-opt-label>Nach der Sitzung sofort anwenden</span>
+          <span data-opt-consequence>Startet am Ende den Lernlauf der Sprache, damit nichts bis zum nächsten Upload wartet. Kostet ein paar Cent pro Lauf.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-preview-note" placeholder="Notiz (optional)"></textarea>
+      <div data-alevel="3" data-title="Zu jeder Entscheidung">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"vorher","unit":"statt nachher","label":"sehen, welche Texte sich ändern"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="table" data-viz-spec='{"columns":["Daten vorhanden?","Aufwand"],"rows":[{"label":"Betroffene Texte + Beispiele","cells":["ja, bis 50 Schlüssel je Karte","mittel"]},{"label":"Wann es wirkt","cells":["ja, Lernlauf liest Antworten","klein"]},{"label":"Frage in deiner Sprache","cells":["ja, Kartenart + Begriff","klein"]},{"label":"Spielbild-Vorschau","cells":["nur grobe Bereiche","mittel"]}],"text":"Die Spielbild-Vorschau kennt nur „UI“, „Item“, „Mission/Lore“ und „Sonstiges“."}'></div>
+          <p>Rücknehmen ist einfach, solange der Lernlauf eine Antwort noch nicht übernommen hat; danach wird es eine neue Entscheidung über denselben Begriff.</p>
+        </div>
+        <div data-example><pre>Raumnamen: normale Schreibweise oder GROSS?          betrifft 26 Texte
+
+  Normal                         GROSS
+  Passagierquartiere             PASSAGIER-QUARTIERE
+  Lounge                         LOUNGE
+  XO-Quartiere                   XO-QUARTIERE
+
+  Wirkt beim nächsten Lernlauf (nächster Data-Upload oder „Lernen“)</pre></div>
+      </div>
+    </section>
+
+    <section id="d-game" data-nav-label="Punkte und Rangliste" data-decision="d-game" data-decision-mode="single"
+             data-label="Punkte und Rangliste" data-rec="none"
+             data-rec-why="Es gibt kein Team, gegen das man antritt, und ein Tagesziel passt nicht zu einem Stapel, der leer werden soll. Der leere Stapel ist die bessere Belohnung."
+             data-applies-to="Tab „Karteikarten“" data-finding="f-game"><input type="hidden" name="dm-d-game-hes" value="{&quot;ms&quot;:33260,&quot;revisits&quot;:0,&quot;median&quot;:32446}">
+      <p data-applies>Gilt für: Tab „Karteikarten“</p>
+      <p data-situation>Punkte, Serie, Tagesziel und Rangliste werben um ein Team, das es nicht gibt: Antworten kommen von zwei, drei Leuten.</p>
+      <h3 data-question>Was bleibt von Punkten, Serie, Tagesziel und Rangliste?</h3>
+      <p data-stakes>Ob die Seite zum Leeren des Stapels motiviert oder zum Punktesammeln</p>
+      <div data-options>
+        <label data-opt="none" data-recommended>
+          <input type="radio" name="dm-d-game" value="none">
+          <span data-opt-label>Alles fällt weg, das Ziel heißt „Alles geklärt“</span>
+          <span data-opt-consequence>Statt Punkten zeigt jede Sprache, wie viel geklärt ist, zum Beispiel „Deutsch: 97 % geklärt“.</span>
+        </label>
+        <label data-opt="goal">
+          <input type="radio" name="dm-d-game" value="goal">
+          <span data-opt-label>Nur die Rangliste fällt weg</span>
+          <span data-opt-consequence>Tagesziel und Serie bleiben als persönlicher Anreiz. An Tagen ohne neue Karten reißt die Serie ohne dein Zutun.</span>
+        </label>
+        <label data-opt="keep">
+          <input type="radio" name="dm-d-game" value="keep" checked>
+          <span data-opt-label>Alles bleibt</span>
+          <span data-opt-consequence>Kein Umbau. Für ein, zwei Leute bleibt die Rangliste ein Wettbewerb ohne Gegner.</span>
+        </label>
+      </div>
+      <textarea data-comment="d-game-note" placeholder="Notiz (optional)">Gern neu gedacht und schön integriert, aufgemacht. Das ganze view soll eher wie ein spiel wirken !</textarea>
+      <div data-alevel="3" data-title="Punkte und Rangliste">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"1","unit":"Person","label":"hat bisher geantwortet"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="table" data-viz-spec='{"columns":["Heute","Neu"],"rows":[{"label":"Fortschritt","cells":["Tagesziel 0 von 10","Deutsch 97 % geklärt"]},{"label":"Belohnung","cells":["+12 Punkte","Alles geklärt"]},{"label":"Vergleich","cells":["Rangliste","keiner"]}],"text":"Die Tabellen für Punkte und Serie können in der Alpha wegfallen."}'></div>
+          <p>Die Rangliste braucht heute eine eigene Datenbankabfrage und die Namen aller Admins. Beides entfällt mit ihr.</p>
+        </div>
+        <div data-example><pre>Heute, Kopf des Tabs
+  Tagesziel: 0 von 10 Karten   ▱▱▱▱▱▱▱▱▱▱   Serie: 0 Tage   253 offen
+
+Neu, nach einer Sitzung
+  Alles geklärt für Deutsch · 9 Entscheidungen · 312 Texte
+  Wirkt beim nächsten Lernlauf          Deutsch 97 % geklärt</pre></div>
+      </div>
+    </section>
+  </section>
+</section>
