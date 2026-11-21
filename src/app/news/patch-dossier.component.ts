@@ -27,13 +27,14 @@ import { matchNotesToCards } from './patch-match';
 import { PatchNoteDetailComponent } from './patch-note-detail.component';
 import { groupWaves, type PatchNoteEntry, type PatchWaveGroup } from './patch-notes';
 import { filterSections, outlineMatchCount, outlineSections } from './patch-outline';
-import { GENERAL_PREP_KEYS, extractPrep } from './patch-prep';
+import { GENERAL_PREP_KEYS, extractFixed, extractImages, extractPrep } from './patch-prep';
 import { PatchStabilityService } from './patch-stability.service';
 import { HighlightSegment, fuzzyTokens, highlightSegments, matchesFuzzy, tokenizeQuery } from './patch-search';
 import { stackCardFor, type StackCard } from './patch-stack';
 import { StabilityChipComponent, chipFromVerdict } from './stability-chip.component';
 import { StabilityLongComponent } from './stability-long.component';
 import { BuildVerdictComponent } from './build-verdict.component';
+import { CommunityVerdictComponent } from './community-verdict.component';
 import { ChannelBuildVotesService } from './channel-build-votes.service';
 import { groupCardsByCategory, roadmapCardUrl, type RoadmapCard } from './roadmap';
 import { RoadmapService, threadSlugOf } from './roadmap.service';
@@ -43,7 +44,7 @@ import { ShareButtonComponent } from '../shared/share-button/share-button.compon
 import { SectionRailComponent, SectionRailGo, SectionRailItem } from '../shared/section-rail/section-rail.component';
 import { translateTick } from '../shared/section-rail/translate-tick';
 
-type SectionId = 'stabilitaet' | 'builds' | 'prep' | 'contents' | 'fixed' | 'next';
+type SectionId = 'stabilitaet' | 'community' | 'urteil' | 'builds' | 'first' | 'contents' | 'fixed' | 'next';
 
 /** DOM id of a section: the stability long form is the deep-link target `#stabilitaet`. */
 function anchorId(id: SectionId): string {
@@ -51,23 +52,15 @@ function anchorId(id: SectionId): string {
 }
 
 /**
- * A patch has exactly two reading orders, and the line between them is whether
- * it is out yet.
- *
- * As long as the patch has not arrived (`next`, `evocati`, `ptu`), the
- * forward-looking questions lead: when does it come, and how do I get ready.
- * Once it has landed, what is in it and whether one's own bug is gone lead;
- * the preparation is done and slides to the end.
+ * One reading order for every dossier, main line and point release alike
+ * (owner, 2026-11-19: "Was steckt drin, Stabilität, Community, Dein Urteil, erste
+ * Schritte, wann kommt der nächste"). Stability no longer leads; the running test
+ * builds (their votes) follow the verdict, the search through every note of the
+ * line is the reference part at the end. Sections without data are dropped by
+ * `sections()`, never shown empty.
  */
-export function sectionOrder(status: StackCard['status']): Exclude<SectionId, 'stabilitaet' | 'builds'>[] {
-  switch (status) {
-    case 'next':
-    case 'evocati':
-    case 'ptu':
-      return ['next', 'prep', 'contents', 'fixed'];
-    default:
-      return ['contents', 'fixed', 'next', 'prep'];
-  }
+export function sectionOrder(): SectionId[] {
+  return ['contents', 'stabilitaet', 'community', 'urteil', 'builds', 'first', 'next', 'fixed'];
 }
 
 /** One bullet hit inside a note, with the headings it sits under. */
@@ -89,8 +82,8 @@ const SPY_CLEARANCE_PX = 24;
  * stack showed about a patch lives here, arranged by the QUESTION the reader
  * came with, not by data source:
  *
- *   prep       what the note's "Important Build Info" says is kept or wiped,
- *              plus known issues / testing focus
+ *   first      "Erste Schritte in diesem Patch": what the note's "Important Build
+ *              Info" says is kept or wiped (only when it says something)
  *   contents   RSI's roadmap items as picture cards, with the release note's
  *              matching bullets ON the card and the unmatched ones in a line
  *              below (or, without roadmap data, the note itself)
@@ -99,10 +92,7 @@ const SPY_CLEARANCE_PX = 24;
  *              reachable underneath
  *   next       the cycle axis (sc-patch-cycle)
  *
- * Their ORDER follows `sectionOrder()` and has two shapes only: a patch that
- * is not out yet leads with `next, prep` (when does it come, how do I get
- * ready), a patch that has landed leads with `contents, fixed` (what is in it,
- * is my bug gone). Two of the headings also read differently per status —
+ * Their ORDER follows `sectionOrder()` — one order for every patch. Two of the headings read differently per status —
  * see `sectionKey()`, which feeds the TOC link AND the `<h3>` so the two can
  * never drift apart.
  *
@@ -126,7 +116,7 @@ function scrollBehavior(): ScrollBehavior {
   standalone: true,
   imports: [
     TranslatePipe, RouterLink, PatchCycleComponent, PatchEntryRowComponent,
-    PatchNoteDetailComponent, StabilityChipComponent, StabilityLongComponent, BuildVerdictComponent, ScPopupComponent,
+    PatchNoteDetailComponent, StabilityChipComponent, StabilityLongComponent, CommunityVerdictComponent, BuildVerdictComponent, ScPopupComponent,
     ScTooltipDirective, ShareButtonComponent, SectionRailComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -168,13 +158,27 @@ function scrollBehavior(): ScrollBehavior {
             <div class="col">
               @for (s of sections(); track s) { @switch (s) {
               @case ('stabilitaet') {
-              <!-- ── Stabilität: the long form, first section once the patch is out. ── -->
+              <!-- ── Stabilität: the number, shown openly. ── -->
               @if (verdict(); as v) {
                 <section id="stabilitaet" class="sec" [class.flash]="flash() === 'stabilitaet'">
                   <h3>{{ sectionKey('stabilitaet') | translate }}</h3>
-                  <sc-stability-long [verdict]="v" [live]="c.status === 'live'" [previous]="previous()" />
+                  <sc-stability-long [verdict]="v" [live]="c.status === 'live'" [previous]="previous()" [withVote]="false" />
                 </section>
               }
+              }
+
+              @case ('community') {
+              <section id="pd-community" class="sec" [class.flash]="flash() === 'community'">
+                <h3>{{ sectionKey('community') | translate }}</h3>
+                <sc-community-verdict [line]="line()" [stability]="verdict()?.stability ?? null" part="result" />
+              </section>
+              }
+
+              @case ('urteil') {
+              <section id="pd-urteil" class="sec" [class.flash]="flash() === 'urteil'">
+                <h3>{{ sectionKey('urteil') | translate }}</h3>
+                <sc-community-verdict [line]="line()" [stability]="verdict()?.stability ?? null" part="vote" />
+              </section>
               }
 
               @case ('builds') {
@@ -187,21 +191,16 @@ function scrollBehavior(): ScrollBehavior {
               </section>
               }
 
-              @case ('prep') {
-              <!-- ── How do I prepare? / on a superseded patch: what was
-                   there to watch out for? (heading via sectionKey)
-                   Unconditional since 2026-09-05: what RSI wrote about THIS
-                   build when it wrote anything, and under it the advice that
-                   holds for every patch — so the question is answered even on
-                   the notes that carry no build-info block at all. ─────── -->
-              <section id="pd-prep" class="sec" [class.flash]="flash() === 'prep'" [class.wipe]="prep()?.wipe">
-                <h3>{{ sectionKey('prep') | translate }}
-                  @if (prep(); as p) {
+              @case ('first') {
+              <!-- ── First steps in THIS patch: only when the note says there is
+                   something to do (a wipe, what is kept). The advice that holds
+                   for every patch lives under "Wann kommt der nächste". ── -->
+              @if (prep(); as p) {
+                <section id="pd-first" class="sec" [class.flash]="flash() === 'first'" [class.wipe]="p.wipe">
+                  <h3>{{ sectionKey('first') | translate }}
                     <small>{{ 'news.patch.prep.source' | translate }}</small>
                     @if (p.wipe) { <span class="wipe-tag">{{ 'news.patch.prep.wipe' | translate }}</span> }
-                  }
-                </h3>
-                @if (prep(); as p) {
+                  </h3>
                   @if (p.items.length > 0) {
                     <ul class="prep">
                       @for (item of p.items; track item.label) {
@@ -216,20 +215,8 @@ function scrollBehavior(): ScrollBehavior {
                     <h4>{{ 'news.patch.prep.focus' | translate }}</h4>
                     <ul class="lines">@for (l of p.testingFocus; track $index) { <li>{{ l }}</li> }</ul>
                   }
-                  @if (p.knownIssues.length > 0) {
-                    <h4>{{ 'news.patch.prep.known' | translate }} <span class="ct">{{ p.knownIssues.length }}</span></h4>
-                    <ul class="lines">@for (l of p.knownIssues; track $index) { <li>{{ l }}</li> }</ul>
-                  }
-                } @else {
-                  <p class="muted">{{ 'news.patch.prep.noBuildInfo' | translate }}</p>
-                }
-                <h4>{{ 'news.patch.prep.generalTitle' | translate }}</h4>
-                <ul class="lines">
-                  @for (key of generalKeys; track key) {
-                    <li>{{ ('news.patch.prep.generalItem.' + key) | translate }}</li>
-                  }
-                </ul>
-              </section>
+                </section>
+              }
               }
 
               @case ('contents') {
@@ -255,7 +242,7 @@ function scrollBehavior(): ScrollBehavior {
                           <!-- data-card is how a click on the board's teaser
                                strip finds its way back to exactly this entry
                                (?focus=id, feedback fdaad6b7). -->
-                          <li class="fc" [attr.data-card]="item.id" [class.open]="isLong(item.id)"
+                          <li class="fc" [attr.data-card]="item.id" [class.open]="isLong(item.id)" [class.noimg]="!item.thumbnail"
                               [class.flash]="flashCard() === item.id" [style.--in-delay]="ci * 45 + 'ms'">
                             <!-- The picture goes to RSI's Release View entry
                                  for exactly this card, which opens with its
@@ -263,16 +250,21 @@ function scrollBehavior(): ScrollBehavior {
                                  A real anchor, so middle click and "open in
                                  new tab" work; without a usable id it stays an
                                  <a> with no href, i.e. a plain picture. -->
-                            <a class="img" [class.ph]="!item.thumbnail"
+                            @if (item.thumbnail) {
+                            <a class="img"
                                [attr.href]="cardUrl(item) || null"
                                [attr.target]="cardUrl(item) ? '_blank' : null"
                                [attr.rel]="cardUrl(item) ? 'noopener noreferrer' : null"
                                [attr.aria-label]="cardUrl(item) ? ('news.patch.roadmap.openCard' | translate:{ name: item.name }) : null">
-                              @if (item.thumbnail) { <img [src]="item.thumbnail" alt="" loading="lazy" decoding="async" /> }
+                              <img [src]="item.thumbnail" alt="" loading="lazy" decoding="async" />
                               <span class="st" [attr.data-status]="item.status">{{ ('news.patch.roadmap.status.' + item.status) | translate }}</span>
                               @if (cardUrl(item)) { <span class="go" aria-hidden="true">↗</span> }
                             </a>
+                            }
                             <div class="bd">
+                              @if (!item.thumbnail) {
+                                <span class="st-line" [attr.data-status]="item.status">{{ ('news.patch.roadmap.status.' + item.status) | translate }}</span>
+                              }
                               <span class="nm">
                                 @for (seg of mark(item.name); track $index) { @if (seg.hit) { <mark>{{ seg.text }}</mark> } @else { <span>{{ seg.text }}</span> } }
                               </span>
@@ -311,6 +303,39 @@ function scrollBehavior(): ScrollBehavior {
                     <!-- A picked note (feedback #317), or no roadmap for this line: the note itself is what it holds. -->
                     <p class="muted">{{ (selectedEntry() ? 'news.patch.contents.ofNote' : 'news.patch.contents.noRoadmap') | translate:{ title: entry.item.title } }}</p>
                     <sc-patch-note-detail [slug]="slugOf(entry)" [url]="entry.item.url" [tokens]="tokens()" />
+                  }
+                  @if (shownRelease() && (fixedLines().length > 0 || knownLines().length > 0)) {
+                    <div class="fk">
+                      @if (fixedLines().length > 0) {
+                        <div class="fk-col" id="pd-fixed-list">
+                          <h4>{{ 'news.patch.contents.fixedTitle' | translate }} <span class="ct">{{ fixedLines().length }}</span></h4>
+                          <ul class="lines">@for (l of fixedLines().slice(0, 8); track $index) { <li>{{ l }}</li> }</ul>
+                          @if (fixedLines().length > 8) {
+                            <details>
+                              <summary>{{ 'news.patch.contents.moreLines' | translate:{ n: fixedLines().length - 8 } }}</summary>
+                              <ul class="lines">@for (l of fixedLines().slice(8); track $index) { <li>{{ l }}</li> }</ul>
+                            </details>
+                          }
+                        </div>
+                      }
+                      @if (knownLines().length > 0) {
+                        <div class="fk-col" id="pd-known-list">
+                          <h4>{{ 'news.patch.contents.knownTitle' | translate }} <span class="ct">{{ knownLines().length }}</span></h4>
+                          <ul class="lines">@for (l of knownLines(); track $index) { <li>{{ l }}</li> }</ul>
+                        </div>
+                      }
+                    </div>
+                  }
+                  @if (gallery().length > 0) {
+                    <h4>{{ 'news.patch.contents.gallery' | translate }} <span class="ct">{{ gallery().length }}</span></h4>
+                    <ul class="gallery">
+                      @for (g of gallery(); track g.url) {
+                        <li><a [href]="g.url" target="_blank" rel="noopener noreferrer" [attr.aria-label]="g.name || ('news.patch.contents.gallery' | translate)"><img [src]="g.url" alt="" loading="lazy" decoding="async" /></a></li>
+                      }
+                    </ul>
+                  }
+                  @if (sourceUrl(); as url) {
+                    <a class="src src-line" [href]="url" target="_blank" rel="noopener noreferrer">{{ 'news.patch.detail.openOnRsi' | translate }}</a>
                   }
                 </section>
               }
@@ -397,6 +422,12 @@ function scrollBehavior(): ScrollBehavior {
                 <section id="pd-next" class="sec" [class.flash]="flash() === 'next'">
                   <h3>{{ sectionKey('next') | translate }}</h3>
                   <sc-patch-cycle [card]="c" [groups]="svc.patchLines()" [now]="now()" />
+                  <h4>{{ 'news.patch.prep.nextTitle' | translate }}</h4>
+                  <ul class="lines">
+                    @for (key of generalKeys; track key) {
+                      <li>{{ ('news.patch.prep.generalItem.' + key) | translate }}</li>
+                    }
+                  </ul>
                 </section>
               }
               }
@@ -518,6 +549,18 @@ function scrollBehavior(): ScrollBehavior {
        same way a section picked from the table of contents does. */
     .fc { scroll-margin-top: 110px; scroll-margin-bottom: 24px; }
     .fc.flash { animation: pd-flash 1.25s ease-out; border-color: var(--sc-accent); }
+    .fc.noimg, .fc.noimg.open { grid-template-columns: minmax(0, 1fr); }
+    .st-line { font-size: max(0.56rem, var(--sc-fs-floor)); letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-fg-2); }
+    .st-line[data-status='released'] { color: var(--sc-success); }
+    .st-line[data-status='committed'] { color: var(--sc-accent); }
+    .fk { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 4px 24px; margin-top: 8px; }
+    .fk-col { min-width: 0; }
+    .gallery { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); }
+    .gallery a { display: block; aspect-ratio: 16 / 10; border: 1px solid var(--sc-border); border-radius: 6px; overflow: hidden; background: var(--sc-bg-3); }
+    .gallery a:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
+    .gallery img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease; }
+    .gallery a:hover img { transform: scale(1.04); }
+    .src-line { display: inline-block; margin: 12px 0 0; }
     .fc.open { grid-column: 1 / -1; grid-template-columns: minmax(200px, 34%) minmax(0, 1fr); border-color: color-mix(in srgb, var(--sc-accent) 50%, var(--sc-border)); }
     .fc .img { position: relative; display: block; min-height: 150px; height: 100%; background: linear-gradient(135deg, var(--sc-bg-3), var(--sc-bg-0)); }
     .fc .img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease; }
@@ -648,7 +691,7 @@ export class PatchDossierComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly active = computed<SectionId>(() => {
     const secs = this.sections();
     const c = this.chosen();
-    return c && secs.includes(c) ? c : (secs[0] ?? 'prep');
+    return c && secs.includes(c) ? c : (secs[0] ?? 'contents');
   });
   readonly allLong = signal(false);
   readonly notesOpen = signal(false);
@@ -714,7 +757,28 @@ export class PatchDossierComponent implements OnInit, AfterViewInit, OnDestroy {
   });
   readonly sourceUrl = computed(() => this.currentEntry()?.item.url ?? null);
 
-  readonly prep = computed(() => extractPrep(this.currentOutline()));
+  /** The note's "Important Build Info" block, raw. */
+  private readonly prepRaw = computed(() => extractPrep(this.currentOutline()));
+  /** First steps: only when the note says something to do or know. */
+  readonly prep = computed(() => {
+    const p = this.prepRaw();
+    return p && (p.items.length > 0 || p.testingFocus.length > 0) ? p : null;
+  });
+  readonly fixedLines = computed(() => extractFixed(this.currentOutline()));
+  readonly knownLines = computed(() => this.prepRaw()?.knownIssues ?? []);
+  /** "Bilder aus diesem Patch": roadmap card pictures plus image links of the note, from data already loaded. */
+  readonly gallery = computed<{ url: string; name: string }[]>(() => {
+    const seen = new Set<string>();
+    const out: { url: string; name: string }[] = [];
+    const add = (url: string | null | undefined, name: string) => {
+      if (!url || seen.has(url)) return;
+      seen.add(url);
+      out.push({ url, name });
+    };
+    for (const c of this.shownRelease()?.cards ?? []) add(c.thumbnail, c.name);
+    for (const u of extractImages(this.currentOutline())) add(u, '');
+    return out.slice(0, 12);
+  });
   readonly previous = computed(() => {
     const c = this.card();
     return c && c.line ? this.stability.previousOf(c.line) : null;
@@ -754,20 +818,19 @@ export class PatchDossierComponent implements OnInit, AfterViewInit, OnDestroy {
 
   readonly sections = computed<SectionId[]>(() => {
     const c = this.card();
+    const votable = c?.status === 'live' && !!this.verdict() && !this.verdict()?.insufficient;
     const has: Record<SectionId, boolean> = {
-      // Always: the general advice below the patch-specific facts holds for
-      // every build, so this question is never unanswerable (2026-09-05).
       stabilitaet: !!this.verdict(),
+      community: votable,
+      urteil: votable,
       builds: this.builds().length > 0,
-      prep: true,
+      first: !!this.prep(),
       contents: this.hasContents(),
       fixed: !!c?.group,
       next: this.hasCycle(),
     };
-    const out = (['stabilitaet', 'builds', ...sectionOrder(c?.status ?? 'other')] as SectionId[]).filter((id) => has[id]);
+    const out = sectionOrder().filter((id) => has[id]);
     if (this.openedWithQuery() && out.includes('fixed')) return ['fixed', ...out.filter((id) => id !== 'fixed')];
-    // A picked note (4.10.3 from the board) came for its changes: they lead.
-    if (this.selectedEntry() && out.includes('contents')) return ['contents', ...out.filter((id) => id !== 'contents')];
     return out;
   });
 
@@ -920,7 +983,7 @@ export class PatchDossierComponent implements OnInit, AfterViewInit, OnDestroy {
     const unreleased = status === 'next' || status === 'evocati' || status === 'ptu';
     if (id === 'next' && unreleased) return 'news.patch.dossier.section.nextThis';
     if (id === 'next' && status === 'superseded') return 'news.patch.dossier.section.nextPast';
-    if (id === 'prep' && status === 'superseded') return 'news.patch.dossier.section.prepPast';
+    if (id === 'first' && status === 'superseded') return 'news.patch.dossier.section.prepPast';
     return 'news.patch.dossier.section.' + id;
   }
 
@@ -928,7 +991,9 @@ export class PatchDossierComponent implements OnInit, AfterViewInit, OnDestroy {
   private static readonly ICONS: Readonly<Record<SectionId, string>> = {
     stabilitaet: 'M3 12h4l2-6 4 12 2-6h6',
     builds: 'M4 8l8-4 8 4-8 4zM4 12l8 4 8-4M4 16l8 4 8-4',
-    prep: 'M5 7l2 2 3-3M13 7h7M5 15l2 2 3-3M13 15h7',
+    community: 'M4 19V9M10 19V5M16 19v-7M22 19H2',
+    urteil: 'M5 12l4 4 10-10',
+    first: 'M5 7l2 2 3-3M13 7h7M5 15l2 2 3-3M13 15h7',
     contents: 'M4 6h16M4 12h16M4 18h10',
     fixed: 'M14 6l4 4-9 9H5v-4zM12 8l4 4',
     next: 'M5 12h14M13 6l6 6-6 6',
@@ -979,7 +1044,7 @@ export class PatchDossierComponent implements OnInit, AfterViewInit, OnDestroy {
   /** Last section whose heading passed the reading line is the one being read. */
   private syncActive(panel: HTMLElement): void {
     const line = panel.getBoundingClientRect().top + (panel.querySelector<HTMLElement>('.hero')?.offsetHeight ?? 0) + SPY_CLEARANCE_PX;
-    let next: SectionId = this.sections()[0] ?? 'prep';
+    let next: SectionId = this.sections()[0] ?? 'contents';
     for (const id of this.sections()) {
       const el = panel.querySelector<HTMLElement>(`#${anchorId(id)}`);
       if (el && el.getBoundingClientRect().top <= line) next = id;

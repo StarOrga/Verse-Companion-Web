@@ -120,3 +120,40 @@ export function extractPrep(outline: PatchOutline | null): PatchPrep | null {
     testingFocus,
   };
 }
+
+const BUG_FIXES = /\b(bug\s*fix(es)?|fixed)\b/i;
+
+/**
+ * The lines of the note's "Bug Fixes" block (the dossier's "Behoben" list): every
+ * content line from that heading to the next top-level heading. Sub-headings are
+ * RSI's area labels and are skipped, the bullets under them are kept.
+ * Empty when the note has no such block.
+ */
+export function extractFixed(outline: PatchOutline | null | undefined): string[] {
+  if (!outline) return [];
+  const out: string[] = [];
+  let inside = false;
+  for (const node of outline.nodes) {
+    if (node.kind === 'heading') {
+      if (inside) break;
+      inside = BUG_FIXES.test(node.text);
+      continue;
+    }
+    if (!inside || node.kind === 'subheading') continue;
+    const text = node.text.trim();
+    if (text) out.push(text);
+  }
+  return out;
+}
+
+const IMAGE_URL = /^https?:\/\/\S+\.(png|jpe?g|webp|gif)(\?\S*)?$/i;
+
+/** Image links a note's lines carry, in reading order and without repeats. */
+export function extractImages(outline: PatchOutline | null | undefined): string[] {
+  if (!outline) return [];
+  const seen = new Set<string>();
+  for (const node of outline.nodes) {
+    for (const link of node.links ?? []) if (IMAGE_URL.test(link)) seen.add(link);
+  }
+  return [...seen];
+}
