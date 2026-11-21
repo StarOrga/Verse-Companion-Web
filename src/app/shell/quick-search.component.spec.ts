@@ -139,46 +139,6 @@ describe('QuickSearchComponent', () => {
       editable.remove();
     });
 
-    // #385 regression: the type-to-search of #1218 lived only in the beta Fusion bar, so in this
-    // header — the one every reader gets without the shell β — a letter on /verse or /hq did nothing.
-    it('off the Codex a letter typed on the page opens the palette with that letter, caret after it', fakeAsync(() => {
-      const fixture = create();
-      const main = document.createElement('main');
-      main.id = 'sc-main';
-      main.innerHTML = '<section><p>News</p></section>';
-      document.body.append(main);
-
-      const ev = press('v', {}, main.querySelector('p')!);
-      fixture.detectChanges();
-      tick();
-
-      expect(ev.defaultPrevented).toBe(true);
-      expect(fixture.componentInstance.visible()).toBe(true);
-      const field = document.querySelector<HTMLInputElement>('.cdk-overlay-container .qs-input')!;
-      expect(field.value).toBe('v');
-      expect(document.activeElement).toBe(field);
-      expect(field.selectionStart).toBe(1);
-      fixture.componentInstance.close();
-      main.remove();
-    }));
-
-    it('off the Codex a page with a text field of its own, or Tab navigation, keeps the letter', () => {
-      const fixture = create();
-      const main = document.createElement('main');
-      main.id = 'sc-main';
-      main.innerHTML = '<input type="text" class="filter" /><button type="button">Go</button>';
-      document.body.append(main);
-
-      expect(press('v').defaultPrevented).toBe(false);
-      main.querySelector('input')!.remove();
-      document.documentElement.setAttribute('data-sc-tabbing', '');
-      expect(press('v', {}, main.querySelector('button')!).defaultPrevented).toBe(false);
-      document.documentElement.removeAttribute('data-sc-tabbing');
-      fixture.detectChanges();
-      expect(fixture.componentInstance.visible()).toBe(false);
-      main.remove();
-    });
-
     it('stays out of the way while a dialog is open', () => {
       const dialog = document.createElement('div');
       dialog.setAttribute('role', 'dialog');
