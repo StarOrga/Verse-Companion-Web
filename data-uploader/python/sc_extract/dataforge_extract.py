@@ -3560,9 +3560,12 @@ def _merge_paint_catalog(cat: List[Dict[str, Any]],
     A heuristic row lends itself to ONE paint only: two DataCore paints can
     hit the same row (one by store name, one by id — the Retaliator's
     "Invictus Blue and Gold" and "Grey"), and two rows with one skin id make
-    the server's upsert fail (#383). Name matches claim first, so the ids
-    already on the server stay; a paint whose row is taken gets its own id
-    and no borrowed icon, and an id still taken gains `_2`, `_3` …"""
+    the server's upsert fail (#383). The id match claims first: the icon token
+    is the paint class itself (`Paint_Retaliator_Invictus_Grey_Icon`), while
+    the heuristic NAME is a localization guess that can belong to a sibling
+    paint — name-first gave "Invictus Blue and Gold" the Grey icon and left
+    "Grey" iconless as `_2`. A paint whose row is taken gets its own id and no
+    borrowed icon, and an id still taken gains `_2`, `_3` …"""
     by_name = {str(c.get("name") or "").strip().lower(): c
                for c in cat if c.get("id") != "standard"}
     # An icon row the heuristics could not name ("starlancer Starlancer Grey
@@ -3574,8 +3577,8 @@ def _merge_paint_catalog(cat: List[Dict[str, Any]],
     base_ok = bool(std and std.get("has_material"))
     claimed: set = set()
     olds: List[Optional[Dict[str, Any]]] = [None] * len(paints)
-    for lookup in (lambda p: by_name.get(p["name"].lower()),
-                   lambda p: by_id.get(p["id"])):
+    for lookup in (lambda p: by_id.get(p["id"]),
+                   lambda p: by_name.get(p["name"].lower())):
         for i, p in enumerate(paints):
             if olds[i] is not None:
                 continue
