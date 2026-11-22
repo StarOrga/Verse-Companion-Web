@@ -14,6 +14,9 @@ import {
   easeInOutCubic,
   framedInto,
   framedLikeNews,
+  framedLikeNewsGrown,
+  PATCHES_PLANET_GROW,
+  PATCHES_PLANET_OUT,
   poseAt,
   poseCam,
   poseTransform,
@@ -90,6 +93,21 @@ describe('Shell scene — model', () => {
       expect(at[1]).toBeCloseTo(news[1], 3);
       expect(p.s * size).toBeCloseTo(POSES.news.cam.s * nw, 3);
     }
+  });
+
+  it('Patches planet is bigger than News, its inner (right) edge steps out of the page, never further in', () => {
+    const [nx, ny, nw] = WORLD_RECTS.news;
+    const news = screen(POSES.news.cam, nx, ny);
+    const newsW = POSES.news.cam.s * nw;
+    const [x, y, size] = WORLD_RECTS.patches;
+    const p = POSES.patches.cam;
+    expect(p).toEqual(framedLikeNewsGrown(WORLD_RECTS.patches, PATCHES_PLANET_GROW));
+    const at = screen(p, x, y);
+    const w = p.s * size;
+    expect(w).toBeGreaterThan(newsW);
+    expect(at[0] + w).toBeCloseTo(news[0] + newsW - newsW * PATCHES_PLANET_OUT, 3);
+    expect(at[0] + w).toBeLessThan(news[0] + newsW);
+    expect(at[1] + w / 2).toBeCloseTo(news[1] + newsW / 2, 3);
   });
 
   it('isolates the objects per pose (C5): News only its planet, Admin only the station, Sternkarte faint planet without Galerie', () => {

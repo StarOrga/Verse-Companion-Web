@@ -1,0 +1,98 @@
+<section data-iteration="6" data-iteration-template="free" data-final-report>
+  <p class="fr-sentence">Patches öffnet jetzt mit dem, was gerade live ist, und dem, was als Nächstes kommt. PTU steht im eigenen Reiter, Gelesenes merkt sich die Seite.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🟢</span><span><b>4.10.3 ganz oben</b>, ohne Scrollen, daneben 5.0 mit Roadmap.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🧪</span><span><b>PTU-Reiter</b> mit jedem einzelnen Build auf der Zeitleiste.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">✓</span><span><b>Lesestand am Konto</b>, auf allen Geräten gleich.</span></li>
+      </ul>
+      <p class="fr-try-auth">🔑 Erst nach dem Ship online, auf /verse/patches mit eingeschaltetem Verse-Beta.</p>
+    </div>
+    <div class="fr-ba" data-label-before="Live" data-label-after="PTU">
+      <figure class="fr-shot"><img src="20261110-1749-patch-lesestand/shots/live-1895.png" alt=""><figcaption>Live-Reiter bei 1895 px</figcaption></figure>
+      <figure class="fr-shot"><img src="20261110-1749-patch-lesestand/shots/ptu-1895.png" alt=""><figcaption>PTU-Reiter mit jedem Build</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Altes Board per Schalter PATCH_BOARD_V2 sofort zurück; Anforderung: Rückweg in einer Zeile (geschätzt).">
+        <span class="fr-meter-name">🧰 Wartbarkeit</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">1 Zeile</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 80%" data-tip="Board geprüft bei 1895, 1280 und 375 px; Dossier-Abschnitte mit Abstimmung nur in Tests gesehen (geschätzt).">
+        <span class="fr-meter-name">🧩 Kompatibilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">3 Größen</b>
+      </div>
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="Lesestand am Konto, ohne Anmeldung im Browser; keine Datenbankänderung nötig.">
+        <span class="fr-meter-name">🗄 Datenintegrität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">0 Migrationen</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="5 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ○ {{final.level_interplay}} · ✓ {{final.level_local}} · ✓ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_prod}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_live}}</b></span>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold" data-open-questions>
+    <summary>🔍 2 {{final.funde_fold}}</summary>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-verschoben"
+          data-issue-title="[FEATURE] Patch board: show roadmap items RSI moved to a later patch"
+          data-issue-type="feature"
+          data-issue-body="The concept showed bestätigt / möglich / verschoben. RSI's roadmap data only carries committed, tentative and released, so 'verschoben' is not shown. It could be derived by comparing an item's patch across roadmap snapshots."
+          data-oq-origin="shortfall"
+          data-route-default="issue"
+          data-route-reason="keine-daten">
+        <span class="oq-label">„Verschoben“ fehlt</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>RSI liefert nur bestätigt, möglich und ausgeliefert, kein „verschoben“.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Box „Als Nächstes auf Live“</dd>
+          <dt>{{final.fund_why}}</dt><dd>📌 Issue: bräuchte einen Abgleich alter Roadmap-Stände.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-heute"
+          data-issue-title="[BUG] Patch board says 'seit 0 Tagen' for a build from today"
+          data-issue-type="bug"
+          data-issue-body="A PTU build published today shows 'seit 0 Tagen' under its date on the timeline. It should read 'heute'."
+          data-oq-origin="found"
+          data-route-default="now"
+          data-route-reason="klein">
+        <span class="oq-label">„seit 0 Tagen“ statt heute</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Ein Build von heute zeigt „seit 0 Tagen“.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Zeitleiste, PTU-Reiter</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt: eine Zeile.</dd>
+        </dl>
+      </li>
+    </ul>
+  </details>
+
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Commits <code>4b379029</code> Board · <code>30ccde95</code> Dossier · Prüf-Fixes danach</li>
+      <li>Schalter <code>src/app/news/patch-board-flag.ts:10</code> (<code>PATCH_BOARD_V2</code>)</li>
+      <li><code>patch-board-v2.component.ts</code>, <code>patch-read.service.ts</code>, <code>patch-dossier.component.ts</code></li>
+      <li>Tests: 602 grün im Bereich News/Szene; ganze Suite 7690 grün, 1 wackliger Test aus main</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-dossier" data-crit="mid" data-guide="">Dossier ansehen: Stabilität, Urteil, Galerie</li>
+      <li data-todo-id="t-phone" data-crit="low" data-guide="">Patches auf dem Handy ansehen</li>
+    </ul>
+  </section>
+</section>
