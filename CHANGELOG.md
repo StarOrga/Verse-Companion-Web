@@ -4,6 +4,12 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.294.0] - 2026-11-22
+
+### Changed
+- Search: groups are ordered by their best match (exact name > word > partial > typo), equal groups go ships > components > weapons > items; the page context only breaks ties and never buries an exact hit; own hangar hits lead when they match as well.
+- Search: typo tolerance per word (e.g. "libertor" finds the Liberator), always ranked below real matches; class-name-only hits rank below name hits.
+
 ## [0.293.1] - 2026-11-22
 
 ### Changed
