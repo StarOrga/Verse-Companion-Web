@@ -117,3 +117,24 @@ refined), roles stay unset (role chips 0). No error state for missing columns.
 
 The capture form of the stock popup starts with the last known location (`HqInventoryService.lastKnownLocation()`),
 editable, never overwriting typed text. The sub-kind of a manual entry follows from the Codex class it is picked from.
+
+## Lager search (#354, concept `2026-11-15-lager-suche-mengen.html`, id d83b72d8)
+
+Changes are marked `#354` in the code so they can be found (and reverted) quickly.
+
+- **Stable head**: the title block has a fixed width (`.ttl`, 10rem, the tab name ellipsised), so "Alles · Inventar ·
+  Hangar · Sammlungen" stands at the same x on every tab. Right of it the **Standort** button
+  (`hq-here-button.component.ts`, `HqHereService`): green dot = live from the app (always wins), accent dot = set by hand
+  (held until changed, `profiles.ui_prefs` key `hq.here` + a local copy), empty ring = none. Booking never moves it.
+- **Search** (`hq-stock-search.component.ts`, pure part `hq-stock-search.model.ts`): fields Gegenstand, Ort (separate
+  from the Standort), Menge, with suggestions (arrows, Enter/Tab take one, Escape closes). One row per item, its places as
+  chips (nearest first, without a reference point the largest amount); a chip opens the in-row panel with
+  "Hier einlagern" / "Rausnehmen".
+- **Einlagern / Rausnehmen** book at once (item = a known name only, place = a single place in Ort, else the Standort,
+  amount = Menge or 1); the undo toast offers the counter-booking. A greyed button says why in its tooltip.
+- **Quantity search** (`hq-stock-route.ts`): one ranked list of ways (top four, rest behind "weitere"), at most
+  1–3 stops, balance Kürzester Weg (+0) / Ausgewogen (+3 min per further stop) / Lieber ein Stopp (+15); a combination
+  with a superfluous stop never shows. Minutes = flight legs + approach per stop (station 2, outpost 4, city 6). Measured
+  from a single place in Ort when an amount is set, else from the Standort. Filter kept in `ui_prefs` key `hq.stockFilter`.
+- **Open**: flight legs still come from the tier fallback (same planet 3, ring step 5 + 3, other system 30), not yet
+  from the codex coordinates (`codex_locations`); the Ladeprotokoll table for all movements (build step 4) is not built.
