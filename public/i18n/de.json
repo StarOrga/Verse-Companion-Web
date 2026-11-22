@@ -4543,6 +4543,7 @@
       },
       "jobErrors": {
         "unknown": "Unbekannter Fehler im Übersetzungsauftrag.",
+        "manual": "Von Hand beendet, außerhalb der Pipeline.",
         "base_build_missing": "Der Vergleichs-Build fehlt.",
         "conflict": "Der Auftrag wurde parallel geändert. Bitte neu laden.",
         "english_missing": "Die englischen Quelltexte fehlen.",

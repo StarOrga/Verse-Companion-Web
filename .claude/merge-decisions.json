@@ -994,6 +994,16 @@
         "hunks": [
           "94535f4dc155"
         ]
+      },
+      {
+        "ship": "claude/project-thread-upmpbb",
+        "by": "Claude",
+        "value": "3798 tracked files. (regenerated, includes the 2 new files)",
+        "decided": true,
+        "at": "2026-11-22T10:53:08.931Z",
+        "hunks": [
+          "40814965035e"
+        ]
       }
     ],
     ".claude/project-map.md›ingest-catalog count›value": [

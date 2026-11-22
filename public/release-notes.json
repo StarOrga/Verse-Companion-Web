@@ -19,6 +19,26 @@
       ]
     },
     {
+      "version": "0.297.2",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Game strings of a new build reach the server one language at a time. For 4.10.3 the step had died after the upload, so no language arrived and every AI translation of that build failed with \"English source texts missing\"."
+            },
+            {
+              "title": "",
+              "text": "AI translation: a full run on a build without English texts is refused at once instead of creating a job that fails. Jobs ended by hand show \"Ended by hand\" instead of \"Unknown error\"."
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.297.1",
       "date": "2026-11-22",
       "sections": [
