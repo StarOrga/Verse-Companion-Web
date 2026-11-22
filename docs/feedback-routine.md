@@ -236,6 +236,26 @@ When torn between asking and defaulting, prefer the default and keep the change
 easy to revert. A reversible wrong guess costs one follow-up PR; an unnecessary
 question costs a day.
 
+**A ship answers the ask — it never asks a new one.** A topic is `shipped` only
+when the change the admin asked for is done. No message of a ship (the PR
+summary posted to the thread, a follow-up note, the review reply) ends in an
+open question or an offer of an alternative ("Soll … auch …? Antworte hier."):
+the board offers **✓ Abgenommen** on every shipped topic, so a question there
+asks the admin to sign off work that reads as unfinished. A fork that remains
+is handled before the close, one of two ways:
+
+- **Decide it on the sensible default** and state the choice as a fact ("Nicht
+  freigegebene Sprachen bekommen bewusst keinen Button."). The admin can still
+  disagree — any reply reopens the topic as a continuation.
+- **No sensible default** (the park list above) → don't ship-close: park
+  `needs_input` with the question. The board shows it as a question, not as a
+  sign-off.
+
+The standing invite of the review reply ("Passt etwas nicht …? Antworte einfach
+hier") is not such a question. (#394, 2026-11-21: the ship note ended in "Soll
+eine Erstübersetzung schon vor der Freigabe möglich sein, antworte hier." while
+the board offered Abgenommen; the admin had to send the topic round again.)
+
 ## STEP 1 — the six queue reads (a)–(f)
 
 Run all six every working run. **(f) comes first, before anything new is
