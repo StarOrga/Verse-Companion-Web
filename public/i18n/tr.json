@@ -260,7 +260,7 @@
       }
     },
     "own": {
-      "group": "Senin geminin",
+      "group": "Gemin",
       "rename": "Yeniden adlandır",
       "renameTitle": "Bu gemiyi yeniden adlandır",
       "note": "Not",
@@ -270,12 +270,12 @@
       "remove": "Hangardan kaldır"
     },
     "title": "Codex",
-    "subtitle": "Her gemi, silah, bileşen, eşya, mühimmat ve üretici — aranabilir, live build'den çıkarılmış veriler.",
+    "subtitle": "Her gemi, silah, bileşen, eşya, mühimmat ve üretici — aranabilir, LIVE sürümünden çıkarılmış veriler.",
     "landing": {
       "hero": {
         "eyebrow": "{{category}} · {{patch}} ile geldi",
         "eyebrowPatch": "{{category}} · {{patch}}",
-        "title": "Her geminin her şeyi.",
+        "title": "Her gemi hakkında her şey.",
         "eyebrowIdle": "Codex"
       },
       "teaser": {
@@ -289,7 +289,7 @@
         "label": "Araçlar",
         "keybinds": {
           "title": "Tuş atamaları",
-          "text": "Live build'in tüm varsayılan atamaları, aranabilir."
+          "text": "LIVE sürümünün tüm varsayılan tuş atamaları, aranabilir."
         }
       },
       "terminal": {
@@ -303,12 +303,12 @@
         "components": "Bileşenler"
       },
       "status": {
-        "patch": "Patch {{patch}}",
+        "patch": "Yama {{patch}}",
         "stale": "Veri yüklemesi gerekli"
       },
       "patchSwitch": {
-        "title": "Patch değiştir",
-        "trigger": "Patch {{patch}} — başka bir patch seç",
+        "title": "Yama değiştir",
+        "trigger": "Yama {{patch}} — başka bir yama seç",
         "past": "eski",
         "hasData": "veri mevcut",
         "hasDataCount": "{{count}} kayıt",
@@ -322,8 +322,8 @@
       },
       "patch": {
         "archive": "Arsenal'de {{count}} kayıt",
-        "extracted": "{{date}} tarihinde alındı",
-        "build": "Build \"{{build}}\" (yer tutucu)"
+        "extracted": "{{date}} tarihinde çıkarıldı",
+        "build": "Sürüm \"{{build}}\" (yer tutucu)"
       },
       "me": {
         "eyebrow": "Gemide",
@@ -355,7 +355,7 @@
           "primary": "Birincil silah",
           "secondary": "Yan silah",
           "melee": "Yakın dövüş",
-          "throwable": "Fırlatılabilirler",
+          "throwable": "Atılabilir silahlar",
           "gadget": "Gadget",
           "medical": "Tıbbi"
         }
@@ -370,15 +370,15 @@
         "open": "{{patch}} yama özetini aç",
         "unread": "Yeni özet",
         "title": "{{patch}} neyi değiştiriyor",
-        "notes": "CIG'de yama notları",
+        "notes": "CIG'deki yama notları",
         "notesOverview": "CIG'deki tüm yama notları"
       },
       "holo": {
-        "label": "Holotable",
+        "label": "Holo masa",
         "rotation": "Bir kategori seç",
         "next": "Tıkla: devam et",
         "hold": "Tıkla: sabitle",
-        "loading": "Holotable yükleniyor …",
+        "loading": "Holo masa yükleniyor …",
         "empty": "Bu yama için henüz kayıt yok.",
         "newIn": "Yeni",
         "newest": "En yeni",
@@ -408,7 +408,7 @@
         "loadout": {
           "weapons": "Silahlar",
           "shield": "Kalkan",
-          "quantum": "Quantum drive",
+          "quantum": "Kuantum sürücüsü",
           "power": "Güç (segment)",
           "cooler": "Soğutma (sn başına)"
         }
@@ -457,7 +457,7 @@
           "s1": "Her görev için zırh.",
           "s2": "Koruma, ağırlık, depolama karşılaştırması.",
           "s3": "Loadout'unu oluştur.",
-          "s4": "Alt giysiden kaskına kadar."
+          "s4": "Alt giysiden kaska kadar."
         },
         "component": {
           "count": "{{patch}} yamasında {{count}} yeni bileşen.",
@@ -473,7 +473,7 @@
           "name": "{{name}}, {{patch}} yamasında yeni.",
           "announced": "{{announced}} alet duyuruldu.",
           "s1": "Her vardiya için aletler.",
-          "s2": "Tractor beam, salvage head, scraper.",
+          "s2": "Çekici ışın, kurtarma başlığı, kazıyıcı.",
           "s3": "Verse'te daha akıllı çalış.",
           "s4": "Her alet, her değer."
         }
@@ -491,13 +491,13 @@
         "fewer": "Daha az",
         "isNew": "yeni",
         "rsi": "RSI mağazasında",
-        "rsiRender": "RSI render",
+        "rsiRender": "RSI görseli",
         "close": "Önizlemeyi kapat"
       },
       "values": {
         "key": "Temel değerler",
         "more": "Veri sayfası",
-        "view": "{{name}} görüntüle"
+        "view": "Görüntüle: {{name}}"
       },
       "set": {
         "label": "Değerler",
@@ -533,7 +533,7 @@
       "title": "Codex — Dizin modu"
     },
     "upcoming": {
-      "subtitle": "RSI ship-matrix'te duyurulan ama henüz datamine ettiğimiz oyun verilerinde bulunmayan gemiler — RSI'nin listelediği ile canlı build'in içerdiği arasındaki fark.",
+      "subtitle": "RSI Ship Matrix'te duyurulan ama henüz datamine ettiğimiz oyun verilerinde bulunmayan gemiler — RSI'nin listelediği ile LIVE sürümünün içerdiği arasındaki fark.",
       "conceptTitle": "Konsept aşamasında",
       "conceptSub": "RSI bunları hâlâ geliştiriyor — henüz uçulamaz",
       "flightReadyTitle": "RSI'de uçuşa hazır",
@@ -567,7 +567,7 @@
         "mining": "Madencilik",
         "mining_refining": "Madencilik / Rafineri",
         "refining": "Rafineri",
-        "salvage": "Salvage",
+        "salvage": "Kurtarma",
         "medical": "Tıbbi",
         "refueling": "Yakıt ikmali",
         "repair": "Onarım",
@@ -578,14 +578,14 @@
         "medium_fighter": "Orta avcı",
         "light_fighter": "Hafif avcı",
         "bomber": "Bombardıman",
-        "gunship": "Gunship",
+        "gunship": "Saldırı gemisi",
         "racing": "Yarış",
         "starter": "Başlangıç",
         "luxury": "Lüks",
         "interdiction": "Önleme",
         "data_running": "Veri taşıma",
         "pathfinder": "Kâşif",
-        "expedition": "Seferi",
+        "expedition": "Sefer",
         "touring": "Tur",
         "construction": "İnşaat",
         "military_transport": "Askeri taşımacılık",
@@ -593,7 +593,7 @@
       }
     },
     "upcomingDetail": {
-      "facts": "RSI ship-matrix'ten",
+      "facts": "RSI Ship Matrix'ten",
       "fact": {
         "manufacturer": "Üretici",
         "type": "Tür",
@@ -602,17 +602,17 @@
       },
       "notice": {
         "concept": "RSI bu gemiyi duyurdu ama hâlâ geliştiriyor — oyunda uçulamaz. Bu yüzden burada hardpoint, bileşen veya değer yok.",
-        "flightReady": "RSI bu gemiyi uçuşa hazır olarak listeliyor, ama datamine ettiğimiz oyun verilerinde henüz karşılığı yok — değerler sonraki build yüklemelerinden biriyle gelecek."
+        "flightReady": "RSI bu gemiyi uçuşa hazır olarak listeliyor, ama datamine ettiğimiz oyun verilerinde henüz karşılığı yok — değerler sonraki sürüm yüklemelerinden biriyle gelecek."
       },
       "rsiLink": "robertsspaceindustries.com'da görüntüle",
       "noData": {
         "title": "Neden burada değer yok?",
-        "body": "Codex'imiz canlı build'in verilerinden oluşturuluyor. Bu gemi oyunda olmadığı sürece çıkarılacak bir şey yok — oyuna geldiğinde tam Codex kaydını otomatik olarak alır.",
+        "body": "Codex'imiz LIVE sürümünün verilerinden oluşturuluyor. Bu gemi oyunda olmadığı sürece çıkarılacak bir şey yok — oyuna geldiğinde tam Codex kaydını otomatik olarak alır.",
         "browse": "Tüm duyurulan gemiler"
       },
       "notFound": {
         "title": "Duyurulan gemi bulunamadı",
-        "body": "Bu gemi artık RSI ship-matrix'te yok — ya oyuna girip gerçek bir Codex kaydına kavuştu ya da RSI kaydı kaldırdı."
+        "body": "Bu gemi artık RSI Ship Matrix'te yok — ya oyuna girip gerçek bir Codex kaydına kavuştu ya da RSI kaydı kaldırdı."
       }
     },
     "categoriesAria": "Codex kategorileri",
@@ -623,7 +623,7 @@
       "tool": "Çıkarıcı",
       "coverage": "Kapsam",
       "qualityHint": "Kalite puanı gerçekten hesaplanana kadar geçicidir.",
-      "stale": "Veri yüklemesi gerekiyor — canlıda bu katalogun yansıttığından daha yeni bir oyun sürümü var.",
+      "stale": "Veri yüklemesi gerekiyor — LIVE'da bu kataloğun yansıttığından daha yeni bir oyun sürümü var.",
       "staleUploadLink": "Verse Data Uploader'ı aç"
     },
     "search": {
@@ -655,10 +655,10 @@
         "foldedAtLeast": "en az {{n}} varyant birleştirildi",
         "foldedOne": "1 varyant birleştirildi",
         "foldedAtLeastOne": "en az 1 varyant birleştirildi",
-        "grade": "Sınıf {{grade}}",
-        "livery": "Kaplama",
+        "grade": "Derece {{grade}}",
+        "livery": "Boya",
         "upcomingBadge": "Henüz oyunda yok",
-        "pinAria": "{{name}} karşılaştır",
+        "pinAria": "Karşılaştır: {{name}}",
         "keys": {
           "navigate": "gezin",
           "open": "aç",
@@ -686,9 +686,9 @@
       "weapon": "Silahlar",
       "component": "Bileşenler",
       "item": "Eşyalar",
-      "ammunition": "Cephane",
+      "ammunition": "Mühimmat",
       "manufacturer": "Üreticiler",
-      "blueprint": "Planlar",
+      "blueprint": "Şemalar",
       "upcoming": "Yaklaşan",
       "armor": "Zırh"
     },
@@ -697,36 +697,36 @@
       "weapon": "Silah",
       "component": "Bileşen",
       "item": "Eşya",
-      "ammunition": "Cephane",
+      "ammunition": "Mühimmat",
       "manufacturer": "Üretici",
-      "blueprint": "Plan",
-      "upcoming": "Duyuruldu"
+      "blueprint": "Şema",
+      "upcoming": "Duyurulan"
     },
     "filters": {
       "manufacturer": "Üretici",
       "size": "Boyut",
-      "grade": "Grade",
+      "grade": "Derece",
       "componentKind": "Bileşen türü",
       "all": "Tümü",
-      "includeVariants": "KI / şablon varyantlarını göster",
+      "includeVariants": "YZ / şablon varyantlarını göster",
       "reset": "Filtreleri sıfırla",
       "anySize": "Herhangi bir boyut",
-      "anyGrade": "Herhangi bir grade",
-      "blueprintGroup": "Plan grubu",
+      "anyGrade": "Herhangi bir derece",
+      "blueprintGroup": "Şema grubu",
       "fits": "Uyumlu",
-      "ammo": "Ateşler",
+      "ammo": "Ateşlediği",
       "role": "Rol",
       "crew": "Mürettebat"
     },
     "buy": {
-      "open": "Oyunda satın alınabileceği yerler",
-      "title": "{{name}} satın alınabileceği yerler",
+      "open": "Oyun içi satış noktaları",
+      "title": "{{name}} için satış noktaları",
       "loading": "Mağazalar yükleniyor …",
       "none": "Bilinen oyun içi mağaza yok.",
-      "from": "{{price}} aUEC'den başlayan",
+      "from": "{{price}} aUEC'den itibaren",
       "placeOne": "1 yer",
       "places": "{{count}} yer",
-      "more": "+{{count}} daha",
+      "more": "+{{count}} tane daha",
       "price": "{{price}} aUEC",
       "openPlan": "Planı aç"
     },
@@ -744,12 +744,12 @@
       "modules": "Modüller ve cevher kapsülleri"
     },
     "shipRole": {
-      "combat": "Muharebe",
-      "transport": "Nakliye",
+      "combat": "Savaş",
+      "transport": "Taşımacılık",
       "exploration": "Keşif",
-      "industrial": "Endüstriyel",
+      "industrial": "Endüstri",
       "support": "Destek",
-      "competition": "Yarışma",
+      "competition": "Yarış",
       "ground": "Kara",
       "multirole": "Çok amaçlı"
     },
@@ -778,7 +778,7 @@
         "primary": "Birincil silahlar",
         "heavy": "Ağır silahlar",
         "melee": "Yakın dövüş",
-        "throwable": "Fırlatılabilirler",
+        "throwable": "Atılabilir silahlar",
         "gadget": "Aletler ve gadget'lar",
         "other": "Diğer"
       },
@@ -805,37 +805,37 @@
         "attachments": "Ekler",
         "aiming": "Nişan yardımı",
         "missing": "Mevcut değil",
-        "cmDecoy": "Başlatma başına yem",
-        "cmNoise": "Başlatma başına parazit",
+        "cmDecoy": "Atım başına yem",
+        "cmNoise": "Atım başına parazit",
         "cmRecommend": "Bu gemi için öneri"
       },
       "row": {
         "physical": "Fiziksel",
         "energy": "Enerji",
-        "distortion": "Distortion",
+        "distortion": "Distorsiyon",
         "thermal": "Termal",
         "biochemical": "Biyokimyasal",
-        "stun": "Stun",
+        "stun": "Sersemletme",
         "fireRate": "Atış hızı",
         "projectilesPerShot": "Atış başına mermi",
         "projectileSpeed": "Mermi hızı",
         "lifetime": "Ömür",
         "range": "Menzil",
-        "alpha": "Alpha",
+        "alpha": "Alfa",
         "burstDps": "Burst DPS",
         "sustainedDps": "Sürekli DPS",
-        "penetration": "Delme",
+        "penetration": "Delme gücü",
         "powerDraw": "Güç tüketimi",
         "emOnline": "EM (açık)",
         "irOnline": "IR (açık)",
         "hp": "HP",
-        "distortionPool": "Distortion havuzu",
-        "distortionRegen": "Distortion yenilenmesi",
+        "distortionPool": "Distorsiyon havuzu",
+        "distortionRegen": "Distorsiyon yenilenmesi",
         "mass": "Kütle",
         "size": "Boyut",
-        "grade": "Grade",
+        "grade": "Derece",
         "itemClass": "Sınıf",
-        "itemPorts": "Item portları",
+        "itemPorts": "Eşya portları",
         "factoryFit": "Fabrika donanımı",
         "aimYaw": "Dönüş açısı",
         "aimRate": "Takip hızı",
@@ -869,7 +869,7 @@
         "aiming": "SCItemAimableComponentParams",
         "missing": "yalnızca overclock çarpanları, hepsi 1.0",
         "countermeasure": "AmmoParams.projectileParams.typeParams · weaponParams.ammoCapacity",
-        "cmRecommend": "Pratik kural: gemi imzası ÷ başlatma başına imza, aşağı yuvarlanıp +1 — ancak o zaman başlatmalar gemiyi net biçimde bastırır. Gemi değerleri canlı hesaplanır: mevcut donanım ve güç ayarındaki her çalışan bileşenin (soğutucular, güç santrali, kalkanlar, quantum drive …) IR / EM emisyonları, zırhın sinyal faktörüyle çarpılır."
+        "cmRecommend": "Pratik kural: gemi imzası ÷ atım başına imza, aşağı yuvarlanıp +1 — ancak o zaman atımlar gemiyi net biçimde bastırır. Gemi değerleri canlı hesaplanır: mevcut donanım ve güç ayarındaki her çalışan bileşenin (soğutucular, güç santrali, kalkanlar, kuantum sürücüsü …) IR / EM emisyonları, zırhın sinyal faktörüyle çarpılır."
       },
       "value": {
         "none": "0 = yok",
@@ -890,7 +890,7 @@
       "PowerPlant": "Güç santrali",
       "Shield": "Kalkan jeneratörü",
       "Cooler": "Soğutucu",
-      "QuantumDrive": "Quantum drive",
+      "QuantumDrive": "Kuantum sürücüsü",
       "Thruster": "İtici",
       "FuelTank": "Yakıt tankı",
       "FuelIntake": "Yakıt girişi",
@@ -907,15 +907,15 @@
     },
     "card": {
       "size": "S{{size}}",
-      "grade": "Grade {{grade}}",
+      "grade": "Derece {{grade}}",
       "crew": "Mürettebat {{count}}",
       "variant": "Varyant",
       "inHangar": "Hangarında",
       "foldedOne": "+1 dosya varyantı",
       "foldedMany": "+{{count}} dosya varyantı",
       "foldedTitle": "Oyun dosyaları bu girdi için birbirine çok benzeyen birkaç kayıt içeriyor, bu yüzden tek kart olarak gösteriliyor: {{names}}",
-      "skinsOne": "+1 skin",
-      "skinsMany": "+{{count}} skin",
+      "skinsOne": "+1 kaplama",
+      "skinsMany": "+{{count}} kaplama",
       "skinsTitle": "Bu silahın tüm kaplamaları tek kartta toplanır. Girdinin içinde aralarından seçim yapabilirsin: {{names}}",
       "editionsOne": "+1 varyant",
       "editionsMany": "+{{count}} varyant",
@@ -924,7 +924,7 @@
       "addToHangarFailed": "Hangara eklenemedi. Lütfen tekrar dene."
     },
     "skinPicker": {
-      "label": "Skin",
+      "label": "Kaplama",
       "standard": "Standart",
       "count": "{{count}} seçenek"
     },
@@ -935,13 +935,13 @@
     },
     "holo": {
       "noGeometry": "Siluet yok",
-      "pinUnresolved": "Konum tahmini",
+      "pinUnresolved": "Tahmini konum",
       "toggle": {
         "group": "Görünüm",
         "classic": "Klasik",
         "classicHint": "Klasik görünüm",
-        "holo": "Holotable",
-        "holoHint": "Holotable görünümü"
+        "holo": "Holo masa",
+        "holoHint": "Holo masa görünümü"
       },
       "stage": {
         "einordnung": "Sıralama",
@@ -954,7 +954,7 @@
         "surfaceFrontPending": "Ön görünüm, bu geminin bir sonraki veri yüklemesiyle gelecek.",
         "silhouetteAria": "{{name}} silueti",
         "noGeometryReason": "Bu gemi için henüz siluet oluşturulmadı.",
-        "inspector": "Denetçi",
+        "inspector": "İnceleme",
         "detailShow": "Detay ▾",
         "detailHide": "Detay ▴",
         "allValues": "Tüm değerler ▾",
@@ -996,12 +996,12 @@
           "axes": "En güçlü eksen {{best}} (P{{bp}}), en zayıf {{worst}} (P{{wp}})."
         },
         "ghostTitle": "{{patch}} yamasındaki değer",
-        "viewSchemaUnavailable": "Bu derlemede hardpoint koordinatı yok",
+        "viewSchemaUnavailable": "Bu sürümde hardpoint koordinatı yok",
         "placeholderAria": "{{name}} yer tutucu silueti",
         "noPorts": "Oyun verilerinde hardpoint yok",
         "pinKey": "Pin açıklaması",
         "pinLabels": "Gövde üzerindeki pin etiketleri",
-        "legendUnresolved": "Konum tahmini",
+        "legendUnresolved": "Tahmini konum",
         "rawPortHint": "Oyun verilerinden ham port — değiştirilecek veya açılacak bir şey yok.",
         "pinListTitle": "Tüm hardpointler",
         "pinGroupOther": "Hardpointler",
@@ -1016,8 +1016,8 @@
         "backHint": "Modeldeki seçimi kaldırır (Esc)",
         "partsTotal": "{{n}} parça",
         "partSize": "Boyut",
-        "partGrade": "Grade",
-        "iconWishlist": "Dilekler",
+        "partGrade": "Derece",
+        "iconWishlist": "İstekler",
         "iconSupply": "Operasyon",
         "iconStock": "Envanter",
         "previewTitle": "Detay sayfası önizlemesi",
@@ -1067,12 +1067,12 @@
         "stealthPreset": "Gizlilik",
         "expand": "Enerjiyi ve perspektifleri göster",
         "collapse": "Enerjiyi ve perspektifleri kapat",
-        "presetTag": "preset",
+        "presetTag": "ön ayar",
         "cohortRole": "{{n}} × {{role}}",
         "dockAria": "Enerji ve perspektifler"
       },
       "below": {
-        "parts": "Bileşenlerin detayı",
+        "parts": "Bileşen ayrıntıları",
         "partsCount": "{{n}} takılı",
         "areaEmpty": "Bu alanda bileşen yok."
       },
@@ -1087,7 +1087,7 @@
         },
         "loading": "Yükleniyor …",
         "empty": "Başka yama yok.",
-        "notFinalised": "Tamamlanmadı",
+        "notFinalised": "Kesinleşmedi",
         "reset": "Varsayılan karşılaştırmaya sıfırla",
         "comparing": "Karşılaştırma yükleniyor …",
         "perspective": {
@@ -1119,9 +1119,9 @@
         "deltaShow": "Değişiklikleri göster",
         "deltaHide": "Değişiklikleri gizle",
         "current": "güncel",
-        "hint": "Soldan daha eski bir yama seç, bu geminin neleri değiştiği burada görünsün.",
-        "fromAria": "{{patch}} sürümünden — yama seç",
-        "toAria": "{{patch}} sürümüne — yama seç",
+        "hint": "Soldan daha eski bir yama seç; bu gemide nelerin değiştiği burada görünür.",
+        "fromAria": "{{patch}} yamasından — yama seç",
+        "toAria": "{{patch}} yamasına — yama seç",
         "fromTitle": "Başlangıç yaması",
         "toTitle": "Bitiş yaması",
         "pickFrom": "Yama seç",
@@ -1146,23 +1146,23 @@
         "copied": "Kopyalandı",
         "revoke": "Paylaşımı durdur",
         "revokeNote": "Bu bağlantıyı zaten takip edenler, yapılandırma silinene kadar bağlı kalır.",
-        "errorGeneric": "Olmadı. Lütfen tekrar dene.",
-        "copyLinkHint": "Bu görünümün adresini kopyalar — Holotable ve kaydedilmemiş hardpoint değişiklikleri dahil.",
+        "errorGeneric": "Bu işlem başarısız oldu. Lütfen tekrar dene.",
+        "copyLinkHint": "Bu görünümün adresini kopyalar — holo masa ve kaydedilmemiş hardpoint değişiklikleri dahil.",
         "unsavedHint": "{{n}} kaydedilmemiş değişiklik yalnızca kopyalanan bağlantıda var, hangar bağlantısında yok.",
         "signInHint": "Bir hangar yapılandırmasını ayrı bir bağlantı olarak paylaşmak için giriş yap.",
-        "notInHangarHint": "Bu gemi henüz hangarında değil. Önce ekle, sonra bir konfigürasyon paylaşabilirsin.",
-        "noConfigHint": "Hangarında bu gemi için henüz bir konfigürasyon yok — önce bir loadout kaydet.",
+        "notInHangarHint": "Bu gemi henüz hangarında değil. Önce ekle, sonra bir yapılandırma paylaşabilirsin.",
+        "noConfigHint": "Hangarında bu gemi için henüz bir yapılandırma yok — önce bir loadout kaydet.",
         "copyFailed": "Burada kopyalamaya izin verilmiyor — bağlantıyı seçip elle kopyala.",
         "saveAndShare": "Kaydet ve paylaş",
         "shareLink": "Bağlantıyı paylaş",
         "sharing": "Paylaşılıyor …",
-        "followedShareHint": "Paylaşmak bu konfigürasyonu senin kendi konfigürasyonun yapar — artık sahibini takip etmez.",
+        "followedShareHint": "Paylaşmak bu yapılandırmayı senin kendi yapılandırman yapar — artık sahibini takip etmez.",
         "linksLoading": "Bağlantıların yükleniyor …",
         "linksError": "Bağlantıların yüklenemedi.",
         "activeLinks": "Aktif bağlantılar ({{n}})",
         "readOnlyHint": "Bu, paylaşılmış bir loadout. Kendi bağlantını paylaşmak için bir kopya oluştur.",
         "revokeConfirm": {
-          "title": "Bu bağlantı paylaşımı durdurulsun mu?",
+          "title": "Bu bağlantının paylaşımı durdurulsun mu?",
           "body": "Bu bağlantı üzerinden artık kimse loadout'un kopyasını oluşturamaz. Bağlantıyı zaten takip edenlerin bağlantısı sürer."
         }
       },
@@ -1173,7 +1173,7 @@
         "loading": "Paylaşılan loadout yükleniyor …",
         "banner": "{{owner}} paylaştı — “{{name}}”. Düzenlemek için bir kopya oluştur.",
         "adopt": "Düzenlemek için kopya oluştur",
-        "unavailable": "Bu paylaşılan loadout kullanılamıyor — bağlantı geçersiz, süresi dolmuş, geri çekilmiş veya başka bir gemiye ait. Tabloda stok loadout gösteriliyor.",
+        "unavailable": "Bu paylaşılan loadout kullanılamıyor — bağlantı geçersiz, süresi dolmuş, geri çekilmiş veya başka bir gemiye ait. Masada stok loadout gösteriliyor.",
         "loadError": "Paylaşılan loadout yüklenemedi.",
         "exit": "Loadout'uma geri dön",
         "readOnlyHint": "Paylaşılan loadout — salt okunur. Değiştirmek veya kaydetmek için bir kopya oluştur."
@@ -1189,7 +1189,7 @@
         "legendHint": "Tıkla = parça seç"
       },
       "card": {
-        "rank": "{{m}} içinde {{n}}. sıra",
+        "rank": "Sıra {{n}} / {{m}}",
         "overallTip": "Genel: grubun %{{pct}} kadarından daha iyi",
         "compareWith": "Şununla karşılaştır",
         "scopeOff": "{{name}} · veri yok",
@@ -1210,7 +1210,7 @@
         "showText": "Dosyayı genişlet",
         "descriptionAria": "Açıklama",
         "noDescription": "Bu gemi için açıklama yok.",
-        "liveries": "Kaplama",
+        "liveries": "Boya",
         "standard": "Standart",
         "maker": "Üretici",
         "modelsAria": "Model",
@@ -1279,22 +1279,22 @@
         "gatling": "Gatling",
         "remoteTurret": "Uzaktan taret",
         "mannedTurret": "Mürettebatlı taret",
-        "scattergun": "Scattergun",
-        "massDriver": "Mass driver",
+        "scattergun": "Saçmalı top",
+        "massDriver": "Kütle sürücü",
         "railgun": "Railgun",
-        "laserRepeater": "Lazer repeater",
-        "ballisticRepeater": "Balistik repeater",
-        "distortionRepeater": "Distortion repeater",
-        "repeater": "Repeater",
-        "laserCannon": "Lazer cannon",
-        "ballisticCannon": "Balistik cannon",
-        "distortionCannon": "Distortion cannon",
-        "cannon": "Cannon",
-        "tractorBeam": "Tractor beam",
+        "laserRepeater": "Lazer tekrarlayıcı",
+        "ballisticRepeater": "Balistik tekrarlayıcı",
+        "distortionRepeater": "Distorsiyon tekrarlayıcı",
+        "repeater": "Tekrarlayıcı",
+        "laserCannon": "Lazer topu",
+        "ballisticCannon": "Balistik top",
+        "distortionCannon": "Distorsiyon topu",
+        "cannon": "Top",
+        "tractorBeam": "Çekici ışın",
         "shield": "Kalkan",
         "powerPlant": "Güç santrali",
         "cooler": "Soğutucu",
-        "quantumDrive": "Quantum drive",
+        "quantumDrive": "Kuantum sürücüsü",
         "radar": "Radar",
         "lifeSupport": "Yaşam desteği",
         "missileRack": "Füze rafı",
@@ -1302,7 +1302,7 @@
       },
       "statShort": {
         "dps": "DPS",
-        "alphaDamage": "Alpha",
+        "alphaDamage": "Alfa",
         "fireRate": "Atış hızı",
         "range": "Menzil",
         "projectileSpeed": "Hız",
@@ -1327,7 +1327,7 @@
         "pingCooldown": "Ping",
         "aimAssistRange": "Nişan yardımı",
         "coolingRate": "Soğutma",
-        "powerDraw": "Çekiş",
+        "powerDraw": "Tüketim",
         "coolantDraw": "Soğutucu akışkan",
         "cmCapacity": "Stok",
         "cmLifetime": "Süre",
@@ -1342,9 +1342,9 @@
         "deckEvery": "Tüm güverteler",
         "deckCount": "{{n}} güverte",
         "deckEveryOnly3d": "Tüm güvertelerin aynı anda gösterilmesi yalnızca 3D görünümde var — Basit görünümde her zaman tek güverte gösterilir.",
-        "gap": "{{total}} SCU'nun {{located}} kadarının konumu belli",
-        "gapHint": "Bu geminin her kargo gridinin konumu oyun verilerinde belli değil. Boşluk, toplam sessizce tamamlanmasın diye görünür bırakılıyor.",
-        "groupsAria": "İç mekân öğelerini tabloda göster",
+        "gap": "{{total}} SCU'dan {{located}} SCU'nun konumu belli",
+        "gapHint": "Bu geminin her kargo ızgarasının konumu oyun verilerinde belli değil. Boşluk, toplam sessizce tamamlanmasın diye görünür bırakılıyor.",
+        "groupsAria": "İç mekân öğelerini masada göster",
         "groupsOn": "Gösterilenler",
         "presetTag": "Ön ayar",
         "presetTitle": "{{role}} · ön ayar",
@@ -1353,7 +1353,7 @@
           "combat": "Savaş gemisi",
           "cargo": "Yük gemisi",
           "medical": "Sağlık gemisi",
-          "industry": "Sanayi ve kurtarma",
+          "industry": "Endüstri ve kurtarma",
           "other": "Diğer"
         },
         "group": {
@@ -1368,15 +1368,15 @@
           "doors": "Kapılar"
         },
         "cat": {
-          "grid": "Kargo gridleri",
+          "grid": "Kargo ızgaraları",
           "lift": "Asansörler",
           "stairs": "Merdivenler",
-          "ladder": "Yatay merdivenler",
+          "ladder": "Dikey merdivenler",
           "ramp": "Rampalar",
           "airlock": "Hava kilitleri",
-          "dockingTube": "Kenetlenme tünelleri",
+          "dockingTube": "Kenetlenme tüpleri",
           "escapePod": "Kurtarma kapsülleri",
-          "medBed": "Med bed'ler",
+          "medBed": "Tıbbi yataklar",
           "respawn": "Respawn noktaları",
           "weaponRack": "Silah rafları",
           "locker": "Dolaplar",
@@ -1385,13 +1385,13 @@
           "powerPlant": "Güç santralleri",
           "cooler": "Soğutucular",
           "shield": "Kalkan jeneratörleri",
-          "quantumDrive": "Quantum drive'lar",
+          "quantumDrive": "Kuantum sürücüleri",
           "jumpDrive": "Sıçrama modülleri",
           "lifeSupport": "Yaşam desteği",
           "radar": "Radar",
           "fuelTank": "Yakıt tankları",
           "maintenance": "Bakım noktaları",
-          "turret": "Tarety (erişim)",
+          "turret": "Taretler (erişim)",
           "computer": "Bilgisayarlar",
           "bed": "Yataklar",
           "head": "Tuvalet ve banyo",
@@ -1402,7 +1402,7 @@
           "inner": "İç kapılar ve kapaklar",
           "lift": "Asansör kapıları",
           "hangar": "Hangar kapıları",
-          "bow": "Burun kapıları",
+          "bow": "Pruva kapıları",
           "airlock": "Hava kilidi kapıları",
           "ramp": "Rampa kapıları",
           "cell": "Hücre kapıları"
@@ -1411,7 +1411,7 @@
           "scu": "Kapasite",
           "dims": "İç boyut",
           "breachable": "Kırılabilir",
-          "panel": "Yanındaki kontrol paneli",
+          "panel": "Yanında kontrol paneli",
           "connects": "Bağlar",
           "height": "Yükseklik"
         },
@@ -1432,7 +1432,7 @@
         "overview": "Genel bakış",
         "inRoom": "Odada",
         "roomEmpty": "Bu odada konumlandırılmış öğe yok.",
-        "inGrids": "{{n}} grid içinde",
+        "inGrids": "{{n}} ızgarada",
         "poweredBy": "Besleyen",
         "relay": "Röle {{name}}",
         "floorAt": "zemin {{z}} m",
@@ -1444,10 +1444,10 @@
         "zoomOut": "Uzaklaştır",
         "viewReset": "Görünümü sıfırla",
         "one": {
-          "grid": "Kargo grid",
+          "grid": "Kargo ızgarası",
           "lift": "Asansör",
           "stairs": "Merdiven",
-          "ladder": "Merdiven (dikey)",
+          "ladder": "Dikey merdiven",
           "ramp": "Rampa",
           "airlock": "Hava kilidi",
           "dockingTube": "Kenetlenme tüpü",
@@ -1461,9 +1461,9 @@
           "powerPlant": "Güç santrali",
           "cooler": "Soğutucu",
           "shield": "Kalkan jeneratörü",
-          "quantumDrive": "Quantum drive",
-          "jumpDrive": "Jump modülü",
-          "lifeSupport": "Yaşam destek",
+          "quantumDrive": "Kuantum sürücüsü",
+          "jumpDrive": "Sıçrama modülü",
+          "lifeSupport": "Yaşam desteği",
           "radar": "Radar",
           "fuelTank": "Yakıt tankı",
           "maintenance": "Bakım noktası",
@@ -1487,10 +1487,10 @@
     },
     "empty": {
       "title": "Burada henüz bir şey yok",
-      "filtered": "Aramanıza veya filtrelerinize uyan kayıt yok.",
-      "kind": "Bu build'de {{kind}} yok.",
-      "noBuild": "Henüz yayınlanmış bir katalog build'i yok.",
-      "partial": "Bu build, bu kategori için temsili bir alt küme içeriyor — gösterilen sayılar yüklenenleri yansıtır.",
+      "filtered": "Aramana veya filtrelerine uyan kayıt yok.",
+      "kind": "Bu sürümde {{kind}} yok.",
+      "noBuild": "Henüz yayınlanmış bir katalog sürümü yok.",
+      "partial": "Bu sürüm, bu kategori için temsili bir alt küme içeriyor — gösterilen sayılar yüklenenleri yansıtır.",
       "resetAll": "Aramayı ve filtreleri sıfırla",
       "foundElsewhere": "“{{term}}” için {{kind}} yok — şurada bulundu:"
     },
@@ -1500,7 +1500,7 @@
     },
     "keybinds": {
       "title": "Tuş atamaları",
-      "subtitle": "Güncel Star Citizen build'indeki varsayılan tuş atamaları.",
+      "subtitle": "Güncel Star Citizen sürümündeki varsayılan tuş atamaları.",
       "device": "Cihaz",
       "devices": {
         "keyboard": "Klavye",
@@ -1536,12 +1536,12 @@
         "turret": "Taret",
         "eva": "EVA",
         "hacking": "Hacking",
-        "remote": "Uzaktan",
-        "tractor": "Tractor beam",
+        "remote": "Uzaktan kumanda",
+        "tractor": "Çekici ışın",
         "melee": "Yakın dövüş",
         "hmd": "HMD",
         "visor": "Vizör",
-        "headtracking": "Head tracking",
+        "headtracking": "Kafa takibi",
         "shop": "Mağaza",
         "debug": "Debug"
       },
@@ -1554,7 +1554,7 @@
         "filter": "Filtre",
         "filters": {
           "all": "Tümü",
-          "unassigned": "Açık",
+          "unassigned": "Atanmamış",
           "assigned": "Atanmış"
         },
         "layers": {
@@ -1586,7 +1586,7 @@
           "in_vehicle": "Araçta",
           "spectator": "İzleyici",
           "mobiglas": "MobiGlas",
-          "starmap": "StarMap",
+          "starmap": "Yıldız haritası",
           "chat": "Sohbet",
           "console": "Konsol"
         },
@@ -1604,7 +1604,7 @@
           "mining": "Madencilik",
           "salvage": "Kurtarma",
           "exploring": "Keşif",
-          "medical": "Tıp",
+          "medical": "Tıbbi",
           "trading": "Ticaret",
           "racing": "Yarış",
           "engineering": "Mühendislik",
@@ -1676,11 +1676,11 @@
     },
     "provenance": {
       "label": "Kaynak",
-      "build": "{{channel}} · {{patch}} · build {{build}}",
+      "build": "{{channel}} · {{patch}} · sürüm {{build}}",
       "quality": "Kalite %{{score}}"
     },
     "rank": {
-      "header": "Konum",
+      "header": "Sıralama",
       "nShipsOfSizeClass": "{{k}} boyut sınıfında {{n}} gemi",
       "nShips": "{{n}} gemi",
       "nShipsOfCareer": "Aynı kariyerden {{n}} gemi",
@@ -1689,8 +1689,8 @@
       "verdict": "%{{pct}} — {{n}} gemiye kıyasla {{band}}.",
       "percentile": "Yüzdelik dilim",
       "percentileTooltip": "Tarif etmek, dayatmak değil: bu değer geminin karşılaştırma alanında nerede durduğunu söyler — iyi olup olmadığını değil. %50 tam ortadır.",
-      "lensNote": "Konum, görev profilini takip etmez — kendi üç profilini korur.",
-      "radarAria": "{{name}} geminin {{n}} gemiye kıyasla yüzdelik dilimlerini gösteren radar grafiği",
+      "lensNote": "Sıralama, görev profilini takip etmez — kendi üç profilini korur.",
+      "radarAria": "{{name}} gemisinin {{n}} gemiye kıyasla yüzdelik dilimlerini gösteren radar grafiği",
       "gapAxis": "Bu eksende değer yok",
       "band": {
         "low": "alt çeyrek",
@@ -1710,7 +1710,7 @@
         "exploration": "Keşif",
         "resources": "Kaynaklar",
         "support": "Destek",
-        "multirole": "Multirole",
+        "multirole": "Çok amaçlı",
         "competition": "Yarış",
         "travel": "Seyahat",
         "stealth": "Gizlilik"
@@ -1725,7 +1725,7 @@
       },
       "disabled": {
         "noCargo": "Bu geminin kargo bölmesi yok",
-        "noData": "Bu build'de bu profil için değer yok",
+        "noData": "Bu sürümde bu profil için değer yok",
         "noCareer": "Bu gemi için kayıtlı bir kariyer yok.",
         "noRole": "Bu gemi için kayıtlı bir rol yok.",
         "smallGroup": "Bu grup çok küçük, karşılaştırma genişletildi."
@@ -1743,17 +1743,17 @@
         "armor": "ZIRH",
         "crossSection": "KESİT ALANI",
         "cargo": "KARGO",
-        "quantumRange": "QUANTUM MENZİLİ",
+        "quantumRange": "KUANTUM MENZİLİ",
         "scm": "SCM",
         "mass": "KÜTLE",
         "maxSpeed": "MAKS. HIZ",
         "quantumSpeed": "QT HIZI",
-        "spool": "SPOOL",
+        "spool": "HAZIRLIK",
         "ir": "IR",
         "emIdle": "EM BOŞTA · MODEL",
         "emLoad": "EM MEVCUT · MODEL",
         "emMax": "EM MAKS. · MODEL",
-        "emQuantum": "EM QUANTUM · MODEL"
+        "emQuantum": "EM KUANTUM · MODEL"
       },
       "nShipsOfRole": "Aynı roldeki {{n}} gemi",
       "compare": {
@@ -1768,7 +1768,7 @@
         "exploration": "Keşif gemisi",
         "resources": "Kaynak gemisi",
         "support": "Destek gemisi",
-        "multirole": "Multirole gemi",
+        "multirole": "Çok amaçlı gemi",
         "competition": "Yarış gemisi"
       },
       "classPlural": {
@@ -1777,7 +1777,7 @@
         "exploration": "Keşif gemileri",
         "resources": "Kaynak gemileri",
         "support": "Destek gemileri",
-        "multirole": "Multirole gemiler",
+        "multirole": "Çok amaçlı gemiler",
         "competition": "Yarış gemileri"
       },
       "group": {
@@ -1787,7 +1787,7 @@
       },
       "noMiningData": "Madencilik ve kurtarma verimi: veri yok",
       "rimNote": "Dış kenar = grubun en iyi değerine yakın (%95), daha güçlü değerler orada biter. Karekök ölçeği: küçük değerler görünür kalır, halkalar %33 ve %67'yi gösterir.",
-      "betterThan": "%{{n}} oranından daha iyi",
+      "betterThan": "Grubun %{{n}} kadarından daha iyi",
       "rimLabel": "Ölçek"
     },
     "detail": {
@@ -1795,7 +1795,7 @@
       "description": "Açıklama",
       "crew": "Mürettebat",
       "size": "Boyut",
-      "grade": "Grade",
+      "grade": "Derece",
       "subType": "Alt tür",
       "attachType": "Bağlantı türü",
       "weaponClass": "Silah sınıfı",
@@ -1808,7 +1808,7 @@
       "hardpoints": "Hardpoint'ler",
       "hardpointsHint": "Hangi öğelerin uyduğunu görmek için bir hardpoint'e tıkla.",
       "compatLoading": "Uyumlu öğeler yükleniyor…",
-      "compatNone": "Bu build'de eşleşen öğe yok.",
+      "compatNone": "Bu sürümde eşleşen öğe yok.",
       "changes": {
         "title": "{{patch}} yamasından beri değişiklikler",
         "worse": "Daha kötü",
@@ -1830,7 +1830,7 @@
           "damage": {
             "physical": "Fiziksel hasar",
             "energy": "Enerji hasarı",
-            "distortion": "Distortion hasarı",
+            "distortion": "Distorsiyon hasarı",
             "thermal": "Termal hasar",
             "biochemical": "Biyokimyasal hasar",
             "stun": "Sersemletme hasarı"
@@ -1838,7 +1838,7 @@
           "taken": {
             "physical": "Alınan fiziksel hasar",
             "energy": "Alınan enerji hasarı",
-            "distortion": "Alınan distortion hasarı",
+            "distortion": "Alınan distorsiyon hasarı",
             "thermal": "Alınan termal hasar",
             "biochemical": "Alınan biyokimyasal hasar",
             "stun": "Alınan sersemletme hasarı"
@@ -1850,19 +1850,19 @@
           "heatResistance": "Isı koruması (en fazla)",
           "gForceResistance": "G kuvveti direnci",
           "radiationCapacity": "Radyasyon kapasitesi",
-          "radiationDissipation": "Radyasyon dağılımı",
-          "atmosphereCapacity": "Hava ikmali"
+          "radiationDissipation": "Radyasyon atımı",
+          "atmosphereCapacity": "Hava rezervi"
         }
       },
-      "usedInBlueprints": "Blueprint'lerde kullanılır",
-      "usedInBlueprintsHint": "Bu öğeyi malzeme olarak gerektiren crafting tarifleri.",
+      "usedInBlueprints": "Şemalarda kullanılır",
+      "usedInBlueprintsHint": "Bu öğeyi malzeme olarak gerektiren üretim tarifleri.",
       "compatCount": "{{count}} uyumlu öğe",
       "loadoutEmpty": "Boş (fabrika çıkışı)",
       "viewOnRsi": "RSI'da görüntüle",
-      "notFound": "Giriş mevcut build'de bulunamadı.",
+      "notFound": "Kayıt güncel sürümde bulunamadı.",
       "loadingStage": "Gemi holodeck'i yükleniyor",
-      "invalidRoute": "Bu adres bir Codex kategorisine çıkmıyor.",
-      "noArtwork": "Bu gemi için bu build'de henüz görsel yok.",
+      "invalidRoute": "Bu adres bir Codex kategorisine götürmüyor.",
+      "noArtwork": "Bu gemi için bu sürümde henüz görsel yok.",
       "showRaw": "Ham veriyi göster",
       "hideRaw": "Ham veriyi gizle",
       "naValue": "yok",
@@ -1873,16 +1873,16 @@
       "equipment": "Ekipman",
       "showFullSpec": "Tam özellik tablosunu göster",
       "hideFullSpec": "Tam özellik tablosunu gizle",
-      "quantumRange": "Quantum menzili",
-      "quantumSpeed": "Quantum hızı",
-      "quantumFuel": "Quantum yakıtı",
+      "quantumRange": "Kuantum menzili",
+      "quantumSpeed": "Kuantum hızı",
+      "quantumFuel": "Kuantum yakıtı",
       "fuelCapacity": "Hidrojen yakıtı",
-      "hardpointExplainer": "Hardpoint, gövdedeki bir montaj noktasıdır: her silah, kalkan, soğutucu, iticisi veya quantum drive bir tanesine oturur ve aynı tür ve boyuttaki başka bir öğeyle değiştirilebilir. Aşağıda geminin fabrika çıkışında taşıdıkları var.",
+      "hardpointExplainer": "Hardpoint, gövdedeki bir montaj noktasıdır: her silah, kalkan, soğutucu, itici veya kuantum sürücüsü bir tanesine oturur ve aynı tür ve boyuttaki başka bir öğeyle değiştirilebilir. Aşağıda geminin fabrika çıkışında taşıdıkları var.",
       "loadoutExplainerLabel": "Hardpoint nedir?",
       "craftedFrom": "Üretim malzemeleri",
-      "craftedFromHint": "Bu öğeyi üretmenin maliyeti — oyunun crafting verilerinden.",
-      "noIngredients": "Bu blueprint bu build'de hiç malzeme listelemiyor.",
-      "openBlueprint": "Blueprint'in tamamını aç",
+      "craftedFromHint": "Bu öğeyi üretmenin maliyeti — oyunun üretim verilerinden.",
+      "noIngredients": "Bu şema bu sürümde hiç malzeme listelemiyor.",
+      "openBlueprint": "Şemanın tamamını aç",
       "minQuality": "min. kalite {{value}}",
       "whereToBuy": "Nereden satın alınır",
       "whereToBuyLoading": "Satın alma konumları için UEX Corp kontrol ediliyor…",
@@ -1891,8 +1891,8 @@
       "whereToBuyPrice": "Fiyat",
       "whereToBuyTerminal": "Terminal",
       "whereToBuyLocation": "Konum",
-      "whereToBuyAttribution": "Fiyatlar UEX Corp'tan — topluluk tarafından tutulur, canlı sunucuları yansıtmayabilir. Cloud Imperium Games ile bağlantılı değildir.",
-      "moduleOrderHint": "Önce yapılandırılabilir modüller gelir — silahlar ve bağlantıları, taretler, mühimmat, podlar, kalkanlar, güç santrali, quantum drive, radar, soğutucular, yaşam desteği. Sabit olan her şey aşağıda yer alır. Tam özellik tablosu için herhangi bir modüle tıkla.",
+      "whereToBuyAttribution": "Fiyatlar UEX Corp'tan — topluluk tarafından tutulur, LIVE sunucularını yansıtmayabilir. Cloud Imperium Games ile bağlantılı değildir.",
+      "moduleOrderHint": "Önce yapılandırılabilir modüller gelir — silahlar ve bağlantıları, taretler, mühimmat, podlar, kalkanlar, güç santrali, kuantum sürücüsü, radar, soğutucular, yaşam desteği. Sabit olan her şey aşağıda yer alır. Tam özellik tablosu için herhangi bir modüle tıkla.",
       "loadoutEmptyWeaponMount": "Silah bağlantısı — bu çıktıda standart silah yok",
       "chipCrew": "{{n}} mürettebat",
       "chipNoCargo": "Kargo bölmesi yok",
@@ -1917,8 +1917,8 @@
       "stageMissileRacks": "Füze rafları",
       "stageRemoteTurret": "Uzaktan kontrollü taret",
       "stageMannedTurret": "Mürettebatlı taret",
-      "stageTractorBeam": "Tractor beam",
-      "stageTractorBeams": "Tractor beam'ler",
+      "stageTractorBeam": "Çekici ışın",
+      "stageTractorBeams": "Çekici ışınlar",
       "linkCopied": "Bağlantı kopyalandı",
       "columnLoadout": "Loadout",
       "columnAnalysis": "Analiz",
@@ -1941,11 +1941,11 @@
       "minimise": "küçült",
       "expand": "genişlet",
       "allocated": "{{n}} segment ayrıldı",
-      "minimum": "Minimum çekiş {{n}} segment",
+      "minimum": "Asgari tüketim {{n}} segment",
       "toggleOff": "{{group}} — gücü kes",
       "toggleOn": "{{group}} — gücü geri ver",
       "overBudget": "Reaktör aşırı yüklendi: {{total}} segmentten {{used}} tanesi kullanımda",
-      "demandLine": "İstek {{demand}} seg ({{items}} modülden) · ayrılan {{allocated}} seg",
+      "demandLine": "İhtiyaç {{demand}} seg ({{items}} modülden) · ayrılan {{allocated}} seg",
       "belowMinimum": "Minimum {{min}} seg'in altında — grup devre dışı kalır.",
       "pinned": "Senin tarafından ayarlandı — Otomatik, Gizlilik veya Sıfırla bunu kaldırır.",
       "pip": {
@@ -1974,8 +1974,8 @@
         "coolerUnit": "Soğutucu {{n}}",
         "radar": "Radar",
         "lifeSupport": "Yaşam desteği",
-        "quantum": "Quantum drive",
-        "tractor": "Tractor beam"
+        "quantum": "Kuantum sürücüsü",
+        "tractor": "Çekici ışın"
       },
       "state": {
         "off": "kapalı",
@@ -2021,15 +2021,15 @@
         "stealth": "Gizlilik",
         "auto": "Otomatik",
         "reset": "Sıfırla",
-        "stealthHint": "En düşük EM imzası: silahlar, kalkanlar, quantum, tractor, radar ve yaşam desteği kapalı, drive asgari düzeyde, soğutucular yalnızca soğutma %100'ün altında kalacak kadar."
+        "stealthHint": "En düşük EM imzası: silahlar, kalkanlar, kuantum, çekici ışın, radar ve yaşam desteği kapalı, itiş asgari düzeyde, soğutucular yalnızca soğutma %100'ün altında kalacak kadar."
       },
       "gap": {
-        "noReactorData": "Bu sürümde reaktör verisi yok — extract getirene kadar güç bütçesi boş kalır.",
-        "reExtractPending": "Bu katalog sürümü henüz güç değerleri içermiyor — ne modüller ne de bütçe için. Bir sonraki katalog yüklemesiyle gelecek (extract şema 3).",
+        "noReactorData": "Bu sürümde reaktör verisi yok — veri çıkarımı bunu içerene kadar güç bütçesi boş kalır.",
+        "reExtractPending": "Bu katalog sürümü henüz güç değerleri içermiyor — ne modüller ne de bütçe için. Bir sonraki katalog yüklemesiyle gelecek (çıkarım şeması 3).",
         "noChannelInMode": "Bu grubun bu uçuş modunda kanalı yok.",
         "noCoolingData": "Bu sürümde soğutucu verisi yok — soğutma yükü boş kalır.",
         "noCoolantDraw": "Oyun verileri bileşenlerin ne kadar soğutucu çektiğini belirtmiyor — soğutma yükü boş kalır.",
-        "noSignatureData": "Bu extract'ta imza verisi yok — yeniden extract bekleniyor."
+        "noSignatureData": "Bu çıkarımda imza verisi yok — yeniden çıkarım bekleniyor."
       },
       "unit": {
         "segments": "seg"
@@ -2092,7 +2092,7 @@
     "damage": {
       "physical": "Fiziksel",
       "energy": "Enerji",
-      "distortion": "Distortion",
+      "distortion": "Distorsiyon",
       "thermal": "Termal",
       "biochemical": "Biyokimyasal",
       "stun": "Sersemletme"
@@ -2138,7 +2138,7 @@
       "dashCellTitle": "Bu sınıf için geçerli değil",
       "dashNote": "Mühimmat ve saçılma „—“ görünür: enerji silahlarının şarjörü yoktur ve oyun saçılmayı yalnızca diğer değerlere bir ek olarak belirtir.",
       "footerMissing": "Oyun dosyalarında yok: {{fields}}",
-      "pickRow": "{{name}} tak",
+      "pickRow": "Tak: {{name}}",
       "openDetail": "{{name}} ayrıntılarını aç",
       "scope": {
         "sameClass": "Yalnızca {{class}}",
@@ -2173,7 +2173,7 @@
         "power": "Güç",
         "em": "EM",
         "mass": "Kütle",
-        "grade": "Sınıf",
+        "grade": "Derece",
         "manufacturer": "Üretici",
         "ammo": "Mühimmat",
         "spread": "Saçılma",
@@ -2187,7 +2187,7 @@
         "archetype": "Arketip",
         "heat": "Atış başına ısı",
         "minPower": "Min. güç",
-        "coolant": "Soğutma çekişi"
+        "coolant": "Soğutma tüketimi"
       },
       "unit": {
         "perMin": "/dk",
@@ -2208,34 +2208,34 @@
         "ballistic": "Balistik",
         "ballisticcannon": "Balistik Top",
         "ballisticgatling": "Balistik Gatling",
-        "ballisticrepeater": "Balistik Repeater",
-        "ballisticscattergun": "Balistik Scattergun",
+        "ballisticrepeater": "Balistik Tekrarlayıcı",
+        "ballisticscattergun": "Balistik Saçmalı Top",
         "bottom": "alt",
         "cannon": "Top",
         "center": "Orta",
         "centre": "Orta",
         "cooler": "Soğutucu",
         "countermeasure": "Karşı Önlem",
-        "distortion": "Distortion",
-        "distortioncannon": "Distortion Topu",
-        "distortionrepeater": "Distortion Repeater",
+        "distortion": "Distorsiyon",
+        "distortioncannon": "Distorsiyon Topu",
+        "distortionrepeater": "Distorsiyon Tekrarlayıcı",
         "emp": "EMP",
         "front": "ön",
         "fuelintake": "Yakıt Girişi",
         "fueltank": "Yakıt Tankı",
         "gatling": "Gatling",
         "gun": "Silah",
-        "gunturret": "Silah Taretı",
-        "jumpmodule": "Jump Module",
+        "gunturret": "Silah Tareti",
+        "jumpmodule": "Sıçrama Modülü",
         "laser": "Lazer",
         "lasercannon": "Lazer Topu",
         "lasergatling": "Lazer Gatling",
-        "laserrepeater": "Lazer Repeater",
+        "laserrepeater": "Lazer Tekrarlayıcı",
         "left": "sol",
-        "lifesupport": "Yaşam Destek",
+        "lifesupport": "Yaşam Desteği",
         "lower": "alt",
         "mainthruster": "Ana İtici",
-        "massdriver": "Mass Driver",
+        "massdriver": "Kütle Sürücü",
         "mid": "Orta",
         "middle": "Orta",
         "mininglaser": "Madencilik Lazeri",
@@ -2245,25 +2245,25 @@
         "nose": "Burun",
         "power": "Güç",
         "powerplant": "Güç Santrali",
-        "quantumdrive": "Quantum Drive",
-        "quantumfueltank": "Quantum Yakıt Tankı",
+        "quantumdrive": "Kuantum Sürücüsü",
+        "quantumfueltank": "Kuantum Yakıt Tankı",
         "radar": "Radar",
         "railgun": "Railgun",
         "rear": "arka",
-        "repeater": "Repeater",
+        "repeater": "Tekrarlayıcı",
         "right": "sağ",
         "rocketpod": "Roket Kapsülü",
-        "salvagebeam": "Salvage Beam",
+        "salvagebeam": "Kurtarma Işını",
         "scanner": "Tarayıcı",
-        "scattergun": "Scattergun",
+        "scattergun": "Saçmalı Top",
         "selfdestruct": "Kendini İmha",
         "shield": "Kalkan",
         "shieldgenerator": "Kalkan Jeneratörü",
         "tail": "Kuyruk",
         "thruster": "İtici",
         "top": "üst",
-        "tractorbeam": "Tractor Beam",
-        "turret": "Tareta",
+        "tractorbeam": "Çekici Işın",
+        "turret": "Taret",
         "upper": "üst",
         "utility": "Yardımcı",
         "weapon": "Silah",
@@ -2273,7 +2273,7 @@
     "hardpointMap": {
       "title": "Gövdedeki konum",
       "hint": "Aşağıdaki bir hardpoint'in üzerine gel — işaretçi, geminin neresinde olduğunu gösterir.",
-      "approximate": "kapsam tahmini",
+      "approximate": "boyutlar yaklaşık",
       "viewTop": "Üstten görünüm",
       "viewSide": "Yandan görünüm (sancak)",
       "viewTopAria": "Gövdenin üstten görünümü, {{count}} hardpoint işaretçisi",
@@ -2291,7 +2291,7 @@
       "roomsAria": "{{deck}} üzerindeki odalar",
       "derivedLabel": "Seviyeler türetildi",
       "derivedHint": "Oyun bu gemide güverte adı vermiyor: seviyeler zemin yüksekliğine göre türetildi. Merdivenler ve asansörler bağladıkları her seviyede görünür.",
-      "connects": "{{decks}} güvertesine çıkar"
+      "connects": "Bağlandığı yer: {{decks}}"
     },
     "shipBlueprint": {
       "schema": {
@@ -2313,8 +2313,8 @@
       }
     },
     "skins": {
-      "title": "Boyamalar",
-      "source": "Geminin şeklinin hologramı · boyamalar resmi mağaza render'ları olarak",
+      "title": "Boyalar",
+      "source": "Geminin şeklinin hologramı · boyalar resmi mağaza görselleri olarak",
       "sourceTag": {
         "store": "Mağaza",
         "event": "Etkinlik",
@@ -2324,38 +2324,38 @@
         "other": "Diğer"
       },
       "mode3d": "3D model",
-      "modePaint": "Boya render'ı",
+      "modePaint": "Boya görseli",
       "no3d": "3D model yok",
       "verified": "doğrulandı",
-      "loading": "Skin yükleniyor…",
+      "loading": "Boya yükleniyor…",
       "loadError": "3D model yüklenemedi",
-      "loadCatalogError": "Boyamalar yüklenemedi.",
+      "loadCatalogError": "Boyalar yüklenemedi.",
       "retry": "Tekrar dene",
       "collapse": "3D görünümü daralt",
       "expand": "3D görünümü genişlet",
       "hardpointHint": "Modelde {{count}} hardpoint işaretli — bir işaretçinin veya aşağıdaki bir satırın üzerine gel, ikisi birlikte parlar."
     },
     "equipped": {
-      "alphaDamage": "Alpha hasarı",
+      "alphaDamage": "Alfa hasarı",
       "dps": "DPS",
       "sustainedDps": "Sürekli DPS",
       "fireRate": "Atış hızı",
       "projectileSpeed": "Mermi hızı",
       "range": "Menzil",
-      "penetration": "Delme",
+      "penetration": "Delme gücü",
       "shieldHp": "Kalkan HP",
       "shieldRegen": "Yenilenme",
       "regenDelay": "Yenilenme gecikmesi",
       "downedDelay": "Devre dışı kalma gecikmesi",
-      "jumpRange": "Atlama menzili",
-      "driveSpeed": "Sürüş hızı",
-      "spoolTime": "Hazırlanma süresi",
+      "jumpRange": "Sıçrama menzili",
+      "driveSpeed": "Sürücü hızı",
+      "spoolTime": "Hazırlık süresi",
       "cooldown": "Bekleme süresi",
       "thrust": "İtki",
       "fuelCapacity": "Yakıt kapasitesi",
       "fuelRate": "Yakıt tüketimi",
       "health": "Dayanıklılık",
-      "distortion": "Distortion kapasitesi",
+      "distortion": "Distorsiyon kapasitesi",
       "powerDraw": "Güç tüketimi (seg)",
       "powerOutput": "Güç çıkışı (seg)",
       "minPower": "Min. güç",
@@ -2367,8 +2367,8 @@
       "emSignature": "EM imzası",
       "irSignature": "IR imzası",
       "derivedHint": "Türetilmiş değer, çıkarılan diğer değerlerden hesaplandı.",
-      "noStats": "Bu silah için mevcut extract'ta değer yok.",
-      "armamentMissing": "Bu extract'ta {{count}} silah yuvasında standart silah yok — oyun varsayılan silah donanımını ayrı bir kayıtta tutuyor ve P4K extractor'ümüz bunu henüz çözümlemiyor.",
+      "noStats": "Bu silah için mevcut çıkarımda değer yok.",
+      "armamentMissing": "Bu çıkarımda {{count}} silah yuvasında standart silah yok — oyun varsayılan silah donanımını ayrı bir kayıtta tutuyor ve P4K çıkarıcımız bunu henüz çözümlemiyor.",
       "missileCount": "Füzeler",
       "missileSize": "Füze boyutu",
       "cmCapacity": "Taşınan adet",
@@ -2380,13 +2380,13 @@
       "cmLifetime": "Etki süresi",
       "burstDps": "Burst DPS",
       "tractorRange": "Menzil",
-      "tractorFullStrengthRange": "Tam güç şuraya kadar",
+      "tractorFullStrengthRange": "Tam güç menzili",
       "tractorForce": "Maks. çekme",
-      "tractorForceHint": "Oyun dosyaları tractor beam'i kütleyle değil çekme gücüyle sınırlar: nesne ne kadar ağırsa o kadar yavaş hareket eder (F = m·a) ve gereken kuvvet sürekli çekme gücünü aşarsa ışın kopar.",
+      "tractorForceHint": "Oyun dosyaları çekici ışını kütleyle değil çekme gücüyle sınırlar: nesne ne kadar ağırsa o kadar yavaş hareket eder (F = m·a) ve gereken kuvvet sürekli çekme gücünü aşarsa ışın kopar.",
       "tractorAngle": "Maks. açı",
       "tractorTetherBreak": "Kopma süresi",
       "tractorSpeed": "Maks. hareket hızı",
-      "tractorNoStats": "Bu tractor beam'in menzili ve çekme gücü henüz bu extract'ta yok — bir sonraki yeniden extract ile gelecekler."
+      "tractorNoStats": "Bu çekici ışının menzili ve çekme gücü henüz bu çıkarımda yok — bir sonraki yeniden çıkarımla gelecekler."
     },
     "shipLink": {
       "add": "Pledge bağlantısı ekle",
@@ -2417,16 +2417,16 @@
       "pod": "Pod'lar",
       "shields": "Kalkan jeneratörleri",
       "powerPlants": "Güç santrali",
-      "quantum": "Quantum drive",
+      "quantum": "Kuantum sürücüsü",
       "radar": "Radar ve sensörler",
       "coolers": "Soğutucular",
-      "lifeSupport": "Yaşam destek",
+      "lifeSupport": "Yaşam desteği",
       "structure": "Gövde ve sabit sistemler",
       "systems": "İtki ve sistemler",
       "fixedTag": "yapılandırılamaz",
       "countermeasures": "Karşı önlemler",
       "shieldsNote": "Bu bloktaki her yuva, fabrikadan boş gelenler dahil değiştirilebilir bir kalkan jeneratörüdür. Kalkan kontrol modülü sabit sistemlerin yanında durur: kendi başına bir kalkan değildir ve oyunda değiştirilemez.",
-      "countermeasuresNote": "Fırlatıcılar oyunda değiştirilemez, bu yüzden bu blok yalnızca bilgi içindir. Decoy'lar ısı güdümlü füzeleri saptırır, noise (chaff) radar güdümlü olanları kör eder. Kaç tanesine ihtiyacın olduğunu fırlatıcının bilgi sayfasında (ⓘ) görürsün: atış başına imzayı geminin kendi imzasıyla karşılaştırır.",
+      "countermeasuresNote": "Fırlatıcılar oyunda değiştirilemez, bu yüzden bu blok yalnızca bilgi içindir. Yemler (decoy) ısı güdümlü füzeleri saptırır, parazit (noise/chaff) radar güdümlü olanları kör eder. Kaç tanesine ihtiyacın olduğunu fırlatıcının bilgi sayfasında (ⓘ) görürsün: atım başına imzayı geminin kendi imzasıyla karşılaştırır.",
       "infoLabel": "Bu blok hakkında",
       "splitRows": "Tek tek",
       "groupRows": "Grupla",
@@ -2469,31 +2469,31 @@
       "regenDelay": "Yenilenme gecikmesi",
       "downedDelay": "Devre dışı kalma gecikmesi",
       "hullHp": "Gövde HP",
-      "distortionPool": "Distortion havuzu",
+      "distortionPool": "Distorsiyon havuzu",
       "powerPlants": "Güç santralleri",
       "powerPlantSize": "Toplam santral boyutu",
       "powerDraw": "Güç tüketimi",
       "poweredItems": "Güç verilen bileşenler",
       "plantDurability": "Santral dayanıklılığı",
-      "plantDistortion": "Santral distortion havuzu",
+      "plantDistortion": "Santral distorsiyon havuzu",
       "gap": {
-        "noStockGuns": "Bu gövdenin standart silahları extract içinde yok — oyun varsayılan silah donanımını ayrı bir loadout kaydında tutuyor ve bunu henüz çözümlemiyoruz; bu yüzden aşağıdaki bağlantı noktaları silahı değil yuvayı gösteriyor.",
-        "noFireRate": "Bu extract{{patch}} içinde atış hızı yok, bu yüzden sürekli DPS henüz hesaplanamıyor.",
-        "noSustainedCycle": "Bu extract{{patch}} içinde silahlar için enerji yenilenmesi, yeniden doldurma süresi veya aşırı ısınma verisi yok, bu yüzden sürekli DPS henüz hesaplanamıyor. Burst DPS duraklamaları hesaba katmaz.",
+        "noStockGuns": "Bu gövdenin standart silahları çıkarımda yok — oyun varsayılan silah donanımını ayrı bir loadout kaydında tutuyor ve bunu henüz çözümlemiyoruz; bu yüzden aşağıdaki bağlantı noktaları silahı değil yuvayı gösteriyor.",
+        "noFireRate": "Bu çıkarımda{{patch}} atış hızı yok, bu yüzden sürekli DPS henüz hesaplanamıyor.",
+        "noSustainedCycle": "Bu çıkarımda{{patch}} silahlar için enerji yenilenmesi, yeniden doldurma süresi veya aşırı ısınma verisi yok, bu yüzden sürekli DPS henüz hesaplanamıyor. Burst DPS duraklamaları hesaba katmaz.",
         "noShields": "Bu geminin standart loadout'unda kalkan jeneratörü yok.",
-        "noHullHp": "Gövde HP henüz P4K extract'ın parçası değil.",
+        "noHullHp": "Gövde HP henüz P4K çıkarımının parçası değil.",
         "noResistances": "Kanal başına hasar dirençleri çıkarılmıyor — hiçbir gemi veya zırh varlığı bunları taşımıyor.",
         "noPowerPlant": "Bu geminin standart loadout'unda güç santrali yok.",
-        "noPowerDraw": "Bileşen başına güç tüketimi ve çıkışı henüz extract içinde yok, bu yüzden güç üçgeni hesaplanamıyor.",
-        "noHullMass": "Gövde kütlesi extract içinde yok — yalnızca takılı ekipmanın kütlesi hesaplanabiliyor.",
-        "noFlight": "Bu geminin extract'ı uçuş performansı değerleri içermiyor.",
-        "noCargoCapacity": "Kargo kapasitesi henüz extract içinde yok.",
-        "noSignature": "Radar kesit alanı henüz bu geminin extract'ında yok — bir sonraki katalog yüklemesi geldiğinde görünecek.",
+        "noPowerDraw": "Bileşen başına güç tüketimi ve çıkışı henüz çıkarımda yok, bu yüzden güç üçgeni hesaplanamıyor.",
+        "noHullMass": "Gövde kütlesi çıkarımda yok — yalnızca takılı ekipmanın kütlesi hesaplanabiliyor.",
+        "noFlight": "Bu geminin çıkarımı uçuş performansı değerleri içermiyor.",
+        "noCargoCapacity": "Kargo kapasitesi henüz çıkarımda yok.",
+        "noSignature": "Radar kesit alanı henüz bu geminin çıkarımında yok — bir sonraki katalog yüklemesi geldiğinde görünecek.",
         "noEmissionModel": "IR/EM imza değerleri oyun verisinde yok — temel güç modeli istemci tarafında dağıtılmıyor.",
-        "noQuantum": "Bu gemide quantum drive takılı değil.",
+        "noQuantum": "Bu gemide kuantum sürücüsü takılı değil.",
         "noEquipmentMass": "Bu yapılandırma için ekipman kütlesi hesaplanamıyor.",
         "noMissiles": "Bu yapılandırma füze taşımıyor.",
-        "noArmorStats": "Bu gemi için extract zırh değerleri içermiyor — burada yalnızca gövde yapısı gösteriliyor."
+        "noArmorStats": "Bu gemi için çıkarım zırh değerleri içermiyor — burada yalnızca gövde yapısı gösteriliyor."
       }
     },
     "mission": {
@@ -2528,16 +2528,16 @@
       "mass": "Ekipman kütlesi",
       "scm": "SCM hızı",
       "maxSpeed": "Maksimum hız",
-      "quantumSpeed": "Quantum hızı",
-      "quantumRange": "Quantum menzili",
-      "spool": "Spool süresi",
+      "quantumSpeed": "Kuantum hızı",
+      "quantumRange": "Kuantum menzili",
+      "spool": "Hazırlık süresi",
       "ir": "IR imzası",
       "emIdle": "EM imzası (boşta, model)",
       "emLoad": "EM imzası (mevcut dağılım, model)",
       "emMax": "EM imzası (maksimum, model)",
-      "emQuantum": "EM imzası (quantum, model)",
+      "emQuantum": "EM imzası (kuantum, model)",
       "modelHint": "Bizim modelimiz, oyun değeri değil: bileşen başına EM = nominal × atanan ÷ tam segmentler; reaktör EM'i tüketilen güce göre değişir; gövde zırh faktörüyle çarpılır. Kaynak: oyun verisindeki bileşen değerleri.",
-      "modelNote": "IR ve EM kendi modelimizdir, oyun değeri değildir: bileşen başına EM = nominal × atanan ÷ tam segmentler; reaktör EM'i tüketilen güce göre değişir; gövde zırh faktörüyle çarpılır. Boşta = her şey minimumda, kalkan ve quantum kapalı; maksimum = her şey tam, kalkan açık; quantum = kalkan kapalı, quantum drive açık. IR yalnızca soğutucuları kapsar, iticiler hariçtir (gaza bağlıdır). Kaynak: oyun verisindeki bileşen değerleri.",
+      "modelNote": "IR ve EM kendi modelimizdir, oyun değeri değildir: bileşen başına EM = nominal × atanan ÷ tam segmentler; reaktör EM'i tüketilen güce göre değişir; gövde zırh faktörüyle çarpılır. Boşta = her şey minimumda, kalkan ve kuantum kapalı; maksimum = her şey tam, kalkan açık; kuantum = kalkan kapalı, kuantum sürücüsü açık. IR yalnızca soğutucuları kapsar, iticiler hariçtir (gaza bağlıdır). Kaynak: oyun verisindeki bileşen değerleri.",
       "crossSection": "Kesit alanı",
       "boost": "Boost hızı",
       "armor": "Zırh",
@@ -2557,7 +2557,7 @@
         "shieldRegen": "Kalkan yenilenmesi",
         "hullHp": "Gövde HP",
         "cargo": "Kargo",
-        "quantumRange": "Quantum menzili",
+        "quantumRange": "Kuantum menzili",
         "quantumRangeTight": "Q menzili",
         "scm": "SCM",
         "maxSpeed": "Maks.",
@@ -2570,17 +2570,17 @@
         "agility": "Çeviklik",
         "armorHp": "Zırh",
         "quantumSpeed": "Q hızı",
-        "spool": "Spool",
+        "spool": "Hazırlık",
         "emIdle": "EM (boşta, model)",
         "emLoad": "EM (mevcut, model)",
         "emMax": "EM (maks., model)",
-        "emQuantum": "EM (quantum, model)"
+        "emQuantum": "EM (kuantum, model)"
       }
     },
     "damageChannel": {
       "physical": "Fiziksel",
       "energy": "Enerji",
-      "distortion": "Distortion",
+      "distortion": "Distorsiyon",
       "thermal": "Termal",
       "biochemical": "Biyokimyasal",
       "stun": "Sersemletme"
@@ -2631,13 +2631,13 @@
         "hull": "Gövde ve zırh",
         "armorPhysical": "Fiziksel azaltma",
         "armorEnergy": "Enerji azaltma",
-        "armorDistortion": "Distortion azaltma",
+        "armorDistortion": "Distorsiyon azaltma",
         "armorPenetration": "Temel delme azaltma",
         "armorDeflectionPhysical": "Saptırma (fiziksel)",
         "armorDeflectionEnergy": "Saptırma (enerji)",
-        "noArmorData": "Bu gemi için extract zırh değerleri içermiyor — burada yalnızca gövde yapısı gösteriliyor.",
+        "noArmorData": "Bu gemi için çıkarım zırh değerleri içermiyor — burada yalnızca gövde yapısı gösteriliyor.",
         "effectiveHp": "Toplam etkin HP",
-        "effectiveHpGap": "Yalnızca hem gövde hem kalkan HP extract içinde olduğunda hesaplanabilir."
+        "effectiveHpGap": "Yalnızca hem gövde hem kalkan HP çıkarımda olduğunda hesaplanabilir."
       },
       "ship": {
         "title": "Gemi",
@@ -2646,7 +2646,7 @@
         "systems": "Sistemler",
         "signature": "İmza (tam yük altında)",
         "hull": "Gövde",
-        "massEquipmentNote": "Gövde kütlesi extract içinde yok — yalnızca ekipman kütlesi hesaplanabilir.",
+        "massEquipmentNote": "Gövde kütlesi çıkarımda yok — yalnızca ekipman kütlesi hesaplanabilir.",
         "crossSectionNote": "Gövdeden gelir, değiştirilemez."
       }
     },
@@ -2664,18 +2664,18 @@
       "scmSpeed": "SCM hızı",
       "maxSpeed": "Maksimum hız",
       "boostSpeed": "Boost hızı",
-      "pitch": "Pitch hızı",
-      "yaw": "Yaw hızı",
-      "roll": "Roll hızı",
-      "flightMissing": "Uçuş özellikleri araç tanımında duruyor ve P4K extractor'ımız bunu henüz çözümlemiyor — satırlar burada kalıyor ve çözümlendiğinde kendiliğinden dolacak."
+      "pitch": "Yunuslama hızı",
+      "yaw": "Sapma hızı",
+      "roll": "Yuvarlanma hızı",
+      "flightMissing": "Uçuş özellikleri araç tanımında duruyor ve P4K çıkarıcımız bunu henüz çözümlemiyor — satırlar burada kalıyor ve çözümlendiğinde kendiliğinden dolacak."
     },
     "inspect": {
       "hardpoint": "Hardpoint",
       "parameters": "Parametreler",
       "general": "Genel",
       "projectile": "Mermi",
-      "noStats": "Mevcut extract bu parça için değer içermiyor.",
-      "openDetail": "Tam katalog girişini aç",
+      "noStats": "Mevcut çıkarım bu parça için değer içermiyor.",
+      "openDetail": "Tam katalog kaydını aç",
       "openStats": "Tüm değerleri göster"
     },
     "moduleRole": {
@@ -2697,7 +2697,7 @@
       "hangar": "Hangar",
       "sets": "Setler",
       "chain": "Son seçilenler",
-      "switchTo": "{{name}} setine geç"
+      "switchTo": "Geç: {{name}}"
     },
     "set": {
       "back": "← Codex'e dön",
@@ -2712,120 +2712,120 @@
       "gear": {
         "eyebrow": "Silahlar ve aletler",
         "choose": "Seç",
-        "change": "DeΔiΕtir",
-        "open": "aΓ§Δ±k",
+        "change": "Değiştir",
+        "open": "boş",
         "clear": "Temizle",
         "clearAria": "{{slot}} temizle",
         "clearing": "Temizleniyor …",
-        "clearFailed": "{{slot}} temizlenemedi. LΓΌtfen tekrar dene.",
-        "noSource": "Arsenal'de yok β tΓΌketim malzemesi",
-        "customSlot": "Kendi pozisyonun β Arsenal'den doldurulamaz",
+        "clearFailed": "{{slot}} temizlenemedi. Lütfen tekrar dene.",
+        "noSource": "Arsenal'de yok — tüketim malzemesi",
+        "customSlot": "Kendi konumun — Arsenal'den doldurulamaz",
         "cleared": "{{slot}} temizlendi.",
         "undo": "Geri al",
-        "undoFailed": "{{slot}} geri konulamadΔ±. LΓΌtfen tekrar kuΕan.",
-        "changedElsewhere": "{{slot}} bu sΓΌre iΓ§inde baΕka bir yerde deΔiΕtirildi β gΓΆsterilen gΓΌncel durum."
+        "undoFailed": "{{slot}} geri konulamadı. Lütfen tekrar kuşan.",
+        "changedElsewhere": "{{slot}} bu süre içinde başka bir yerde değiştirildi — gösterilen güncel durum."
       },
       "stage": {
-        "slotsAria": "ZΔ±rh parΓ§alarΔ±",
-        "readinessAria": "HazΔ±rlΔ±k",
-        "lensLimits": "bu gΓΆrevde seti sΔ±nΔ±rlΔ±yor"
+        "slotsAria": "Zırh parçaları",
+        "readinessAria": "Hazırlık",
+        "lensLimits": "bu görevde seti sınırlıyor"
       },
       "supplies": {
         "add": "Eksikleri Operasyona ekle ({{n}})",
-        "none": "Her Εey ya sende var ya da zaten bir Operasyonda.",
-        "added": "{{n}} parΓ§a Operasyona eklendi.",
+        "none": "Her şey ya sende var ya da zaten bir Operasyonda.",
+        "added": "{{n}} parça Operasyona eklendi.",
         "toPlan": "Plana git"
       },
       "notFoundPage": {
-        "title": "Set bulunamadΔ±",
-        "body": "Bu set mevcut deΔil ya da dolabΔ±nda deΔil."
+        "title": "Set bulunamadı",
+        "body": "Bu set mevcut değil ya da dolabında değil."
       }
     },
     "stat": {
       "health": "Can",
-      "distortionCapacity": "Bozulma kapasitesi",
-      "maxShieldHealth": "Maks. kalkan canΔ±",
+      "distortionCapacity": "Distorsiyon kapasitesi",
+      "maxShieldHealth": "Maks. kalkan canı",
       "maxShieldRegen": "Maks. kalkan yenilenmesi",
-      "scmSpeed": "SCM hΔ±zΔ±",
-      "maxSpeed": "Maks. hΔ±z",
-      "boostSpeed": "Boost hΔ±zΔ±",
-      "fireRate": "AteΕ hΔ±zΔ±",
-      "roundsPerMinute": "Dakikadaki mermi",
-      "muzzleVelocity": "Namlu Γ§Δ±kΔ±Ε hΔ±zΔ±",
-      "projectileSpeed": "Mermi hΔ±zΔ±",
-      "lifetime": "Γmr",
+      "scmSpeed": "SCM hızı",
+      "maxSpeed": "Maks. hız",
+      "boostSpeed": "Boost hızı",
+      "fireRate": "Atış hızı",
+      "roundsPerMinute": "Dakika başına atış",
+      "muzzleVelocity": "Namlu çıkış hızı",
+      "projectileSpeed": "Mermi hızı",
+      "lifetime": "Ömür",
       "radiationCapacityMax": "Maks. radyasyon kapasitesi",
       "radiationResistance": "Radyasyon direnci",
       "punctureResistance": "Delme direnci",
       "impactResistance": "Darbe direnci",
       "energyResistance": "Enerji direnci",
-      "explosiveResistance": "PatlayΔ±cΔ± direnci",
-      "coldResistance": "SoΔuk direnci",
-      "heatResistance": "IsΔ± direnci",
-      "biochemicalResistance": "Biyokimyasal direnΓ§",
-      "temperatureResistance": "SΔ±caklΔ±k direnci",
-      "weight": "AΔΔ±rlΔ±k",
-      "durability": "DayanΔ±klΔ±lΔ±k",
-      "cargoGrid": "Kargo Δ±zgarasΔ±",
+      "explosiveResistance": "Patlama direnci",
+      "coldResistance": "Soğuk direnci",
+      "heatResistance": "Isı direnci",
+      "biochemicalResistance": "Biyokimyasal direnç",
+      "temperatureResistance": "Sıcaklık direnci",
+      "weight": "Ağırlık",
+      "durability": "Dayanıklılık",
+      "cargoGrid": "Kargo ızgarası",
       "ammoCapacity": "Mermi kapasitesi",
-      "magazineSize": "ΕarjΓΆr boyutu",
+      "magazineSize": "Şarjör boyutu",
       "damage": "Hasar",
       "range": "Menzil",
-      "effectiveRange": "Etkili menzil",
+      "effectiveRange": "Etkin menzil",
       "gForceResistance": "G-kuvveti direnci",
-      "temperatureMax": "Maks. sΔ±caklΔ±k",
-      "temperatureMin": "Min. sΔ±caklΔ±k",
-      "emSignature": "EM izi",
-      "irSignature": "IR izi",
+      "temperatureMax": "Maks. sıcaklık",
+      "temperatureMin": "Min. sıcaklık",
+      "emSignature": "EM imzası",
+      "irSignature": "IR imzası",
       "atmosphereCapacity": "Atmosfer kapasitesi",
-      "radiationDissipationRate": "Radyasyon daΔΔ±lΔ±mΔ±",
-      "pressureMax": "Maks. basΔ±nΓ§",
-      "pressureMin": "Min. basΔ±nΓ§",
-      "heatPerShot": "AtΔ±Ε baΕΔ±na Δ±sΔ±",
-      "projectilesPerShot": "AtΔ±Ε baΕΔ±na mermi",
-      "downedRegenDelay": "Γ§ΓΆkmeden sonra yenilenme gecikmesi",
-      "damagedRegenDelay": "VuruΕtan sonra yenilenme gecikmesi",
-      "decayRatio": "Azalma oranΔ±",
-      "reserveDrainRate": "Yedek tΓΌkenme hΔ±zΔ±",
-      "stunMaxAlphaRatio": "Sersemletme: maks. alfa oranΔ±",
-      "stunMinAlphaRatio": "Sersemletme: min. alfa oranΔ±",
-      "stunMaxTime": "Sersemletme: maks. sΓΌre",
-      "stunMinTime": "Sersemletme: min. sΓΌre",
-      "splineDriveSpeed": "Rota atlayΔ±ΕΔ±: hΔ±z",
-      "driveSpeed": "Seyir hΔ±zΔ±",
-      "engageSpeed": "Devreye girme hΔ±zΔ±",
-      "spoolUpTime": "HazΔ±rlanma sΓΌresi",
-      "cooldownTime": "Bekleme sΓΌresi",
-      "calibrationRate": "Kalibrasyon hΔ±zΔ±",
+      "radiationDissipationRate": "Radyasyon atımı",
+      "pressureMax": "Maks. basınç",
+      "pressureMin": "Min. basınç",
+      "heatPerShot": "Atış başına ısı",
+      "projectilesPerShot": "Atış başına mermi",
+      "downedRegenDelay": "Çökmeden sonra yenilenme gecikmesi",
+      "damagedRegenDelay": "Vuruştan sonra yenilenme gecikmesi",
+      "decayRatio": "Azalma oranı",
+      "reserveDrainRate": "Yedek tükenme hızı",
+      "stunMaxAlphaRatio": "Sersemletme: maks. alfa oranı",
+      "stunMinAlphaRatio": "Sersemletme: min. alfa oranı",
+      "stunMaxTime": "Sersemletme: maks. süre",
+      "stunMinTime": "Sersemletme: min. süre",
+      "splineDriveSpeed": "Rota sıçraması: hız",
+      "driveSpeed": "Seyir hızı",
+      "engageSpeed": "Devreye girme hızı",
+      "spoolUpTime": "Hazırlık süresi",
+      "cooldownTime": "Bekleme süresi",
+      "calibrationRate": "Kalibrasyon hızı",
       "calibrationDelay": "Kalibrasyon gecikmesi",
-      "calibrationMax": "Maks. kalibrasyon ihtiyacΔ±",
-      "calibrationMin": "Min. kalibrasyon ihtiyacΔ±",
-      "accelStageOne": "Δ°vme aΕama 1",
-      "accelStageTwo": "Δ°vme aΕama 2",
-      "interdictionTime": "Engelleme sΓΌresi",
-      "rampUpHeat": "HΔ±zlanma Δ±sΔ±sΔ±",
-      "duration": "SΓΌre",
-      "splineEngageSpeed": "Rota atlayΔ±ΕΔ±: devreye girme hΔ±zΔ±",
-      "splineSpoolUpTime": "Rota atlayΔ±ΕΔ±: hazΔ±rlanma sΓΌresi",
-      "splineCooldownTime": "Rota atlayΔ±ΕΔ±: bekleme sΓΌresi",
-      "splineCalibrationRate": "Rota atlayΔ±ΕΔ±: kalibrasyon hΔ±zΔ±",
-      "splineAccelStageOne": "Rota atlayΔ±ΕΔ±: ivme aΕama 1",
-      "splineAccelStageTwo": "Rota atlayΔ±ΕΔ±: ivme aΕama 2",
-      "splineInterdictionTime": "Rota atlayΔ±ΕΔ±: engelleme sΓΌresi",
-      "splineCalibrationDelay": "Rota atlayΔ±ΕΔ±: kalibrasyon gecikmesi",
-      "splineCalibrationMax": "Rota atlayΔ±ΕΔ±: maks. kalibrasyon ihtiyacΔ±",
-      "splineCalibrationMin": "Rota atlayΔ±ΕΔ±: min. kalibrasyon ihtiyacΔ±",
-      "disconnectRange": "BaΔlantΔ± kesme menzili",
-      "quantumFuel": "Kuantum yakΔ±t ihtiyacΔ±",
-      "inFlightHeat": "UΓ§uΕta Δ±sΔ±",
-      "rampDownHeat": "YavaΕlama Δ±sΔ±sΔ±",
-      "preRampUpHeat": "HΔ±zlanma Γ¶ncesi Δ±sΔ±",
-      "postRampDownHeat": "YavaΕlama sonrasΔ± Δ±sΔ±"
+      "calibrationMax": "Maks. kalibrasyon ihtiyacı",
+      "calibrationMin": "Min. kalibrasyon ihtiyacı",
+      "accelStageOne": "İvme aşaması 1",
+      "accelStageTwo": "İvme aşaması 2",
+      "interdictionTime": "Engelleme süresi",
+      "rampUpHeat": "Hızlanma ısısı",
+      "duration": "Süre",
+      "splineEngageSpeed": "Rota sıçraması: devreye girme hızı",
+      "splineSpoolUpTime": "Rota sıçraması: hazırlık süresi",
+      "splineCooldownTime": "Rota sıçraması: bekleme süresi",
+      "splineCalibrationRate": "Rota sıçraması: kalibrasyon hızı",
+      "splineAccelStageOne": "Rota sıçraması: ivme aşaması 1",
+      "splineAccelStageTwo": "Rota sıçraması: ivme aşaması 2",
+      "splineInterdictionTime": "Rota sıçraması: engelleme süresi",
+      "splineCalibrationDelay": "Rota sıçraması: kalibrasyon gecikmesi",
+      "splineCalibrationMax": "Rota sıçraması: maks. kalibrasyon ihtiyacı",
+      "splineCalibrationMin": "Rota sıçraması: min. kalibrasyon ihtiyacı",
+      "disconnectRange": "Bağlantı kesme menzili",
+      "quantumFuel": "Kuantum yakıt ihtiyacı",
+      "inFlightHeat": "Uçuşta ısı",
+      "rampDownHeat": "Yavaşlama ısısı",
+      "preRampUpHeat": "Hızlanma öncesi ısı",
+      "postRampDownHeat": "Yavaşlama sonrası ısı"
     },
     "setRank": {
       "profile": {
-        "cig": "CIG Δ±zgarasΔ±",
-        "env": "Γevre ve taΕΔ±ma"
+        "cig": "CIG ızgarası",
+        "env": "Çevre ve taşıma"
       },
       "axis": {
         "protection": "Koruma",
@@ -2834,118 +2834,118 @@
         "activeScan": "Aktif tarama",
         "gForce": "G-kuvveti",
         "eva": "EVA",
-        "heat": "IsΔ±",
-        "cold": "SoΔuk",
+        "heat": "Isı",
+        "cold": "Soğuk",
         "radiation": "Radyasyon",
         "scrub": "Arındırma",
-        "carry": "TaΕΔ±ma"
+        "carry": "Taşıma"
       },
-      "cohort": "aynΔ± tΓΌrdeki tΓΌm zΔ±rh parΓ§alarΔ±na kΔ±yasla",
+      "cohort": "aynı türdeki tüm zırh parçalarına kıyasla",
       "gap": {
         "noData": "oyun verisinde yok"
       },
       "note": {
-        "limited": "IsΔ± ve soΔuk, {{item}} ile sΔ±nΔ±rlΔ± ({{range}})."
+        "limited": "Isı ve soğuk, {{item}} ile sınırlı ({{range}})."
       },
-      "header": "KonumlandΔ±rma",
+      "header": "Sıralama",
       "profileLabel": "Profil",
-      "verdict": "% {{pct}} β {{band}}",
-      "radarAria": "Setin yΓΌzdelik dilimlerinin radar grafiΔi, {{cohort}}",
+      "verdict": "%{{pct}} — {{band}}",
+      "radarAria": "Setin yüzdelik dilimlerinin radar grafiği, {{cohort}}",
       "legend": {
         "set": "Bu set",
         "median": "Medyan"
       },
-      "loading": "HesaplanΔ±yor β¦",
-      "unavailable": "Oyun iΓ§i deΔerler yΓΌklenince konumlandΔ±rma gΓΆrΓΌnΓΌr.",
-      "failed": "DeΔerlendirme yΓΌklenemedi.",
-      "empty": "HenΓΌz zΔ±rh kuΕanΔ±lmadΔ± β ilk parΓ§ayla birlikte deΔerlendirme gΓΆrΓΌnΓΌr."
+      "loading": "Hesaplanıyor …",
+      "unavailable": "Oyun içi değerler yüklenince sıralama görünür.",
+      "failed": "Sıralama yüklenemedi.",
+      "empty": "Henüz zırh kuşanılmadı — sıralama ilk parçayla birlikte görünür."
     },
     "setLens": {
-      "all": "Hepsi",
-      "combat": "SavaΕ",
-      "stealth": "SinsilΔ±k",
+      "all": "Tümü",
+      "combat": "Savaş",
+      "stealth": "Gizlilik",
       "pilot": "Pilot",
-      "env": "Γevre",
-      "transport": "TaΕΔ±ma",
+      "env": "Çevre",
+      "transport": "Taşıma",
       "eva": "EVA",
       "scan": "Tarama",
       "tip": {
-        "all": "TΓΌm deΔerler eΕit aΔΔ±rlΔ±kta, odak yok.",
-        "combat": "CIG'in \"Tank\" uzmanlΔ±ΔΔ± gibi: koruma ve zΔ±rh sΔ±nΔ±fΔ± ΓΆn planda.",
-        "stealth": "Setin bir tarayΔ±cΔ±da fark edilmesinin ne kadar zor olacaΔΔ±.",
-        "pilot": "CIG'in \"Pilot\" ve \"SΓΌrΓΌcΓΌ\" uzmanlΔ±klarΔ± gibi: G-kuvveti toleransΔ± ΓΆn planda.",
-        "env": "Setin Δ±sΔ±ya, soΔuΔa ve radyasyona karΕΔ± ne kadar iyi koruduΔu.",
-        "transport": "Setin ne kadar taΕΔ±ma kapasitesi sunduΔu.",
-        "eva": "Setin EVA iΕleri iΓ§in ne kadar uygun olacaΔΔ±.",
-        "scan": "CIG'in \"Tracker\" uzmanlΔ±ΔΔ± gibi: tespit ve iz sΓΌrme ΓΆn planda."
+        "all": "Tüm değerler eşit ağırlıkta, odak yok.",
+        "combat": "CIG'in \"Tank\" uzmanlığı gibi: koruma ve zırh sınıfı ön planda.",
+        "stealth": "Setin bir tarayıcıda fark edilmesinin ne kadar zor olacağı.",
+        "pilot": "CIG'in \"Pilot\" ve \"Sürücü\" uzmanlıkları gibi: G kuvveti toleransı ön planda.",
+        "env": "Setin ısıya, soğuğa ve radyasyona karşı ne kadar iyi koruduğu.",
+        "transport": "Setin ne kadar taşıma kapasitesi sunduğu.",
+        "eva": "Setin EVA işleri için ne kadar uygun olacağı.",
+        "scan": "CIG'in \"Tracker\" uzmanlığı gibi: tespit ve iz sürme ön planda."
       },
       "disabled": {
-        "noSignature": "Δ°z deΔerleri (EM/IR) henΓΌz oyun verisinde yok",
-        "noData": "Bu deΔer henΓΌz oyun verisinde yok"
+        "noSignature": "İmza değerleri (EM/IR) henüz oyun verisinde yok",
+        "noData": "Bu değer henüz oyun verisinde yok"
       }
     },
     "assetPackage": {
       "title": "3D model",
-      "loading": "3D model yΓΌkleniyor β¦",
+      "loading": "3D model yükleniyor …",
       "retry": "Tekrar dene",
-      "groupsAria": "ParΓ§a gruplarΔ±nΔ± gΓΆster veya gizle",
+      "groupsAria": "Parça gruplarını göster veya gizle",
       "groups": {
         "weapons": "Silahlar",
-        "missiles": "FΓΌzeler",
-        "components": "BileΕenler",
-        "attachments": "Eklentiler",
-        "interior": "Δ°Γ§ mekan",
-        "other": "DiΔer"
+        "missiles": "Füzeler",
+        "components": "Bileşenler",
+        "attachments": "Ekler",
+        "interior": "İç mekân",
+        "other": "Diğer"
       },
-      "resetView": "GΓΆrΓΌnΓΌmΓΌ sΔ±fΔ±rla",
-      "parts": "ParΓ§alar ({{count}})",
-      "show": "{{name}} gΓΆster",
-      "hide": "{{name}} gizle",
-      "hotspotTip": "{{name}} Β· {{type}} Β· boyut {{size}}",
-      "freeSlot": "BoΕ yuva, kabul eder: {{types}}",
+      "resetView": "Görünümü sıfırla",
+      "parts": "Parçalar ({{count}})",
+      "show": "Göster: {{name}}",
+      "hide": "Gizle: {{name}}",
+      "hotspotTip": "{{name}} · {{type}} · boyut {{size}}",
+      "freeSlot": "Boş yuva, uygun türler: {{types}}",
       "label": {
-        "aria": "SeΓ§ili yuva: {{name}}",
-        "open": "{{name}} Codex'te aΓ§",
-        "prev": "Γnceki yuva",
+        "aria": "Seçili yuva: {{name}}",
+        "open": "Codex'te aç: {{name}}",
+        "prev": "Önceki yuva",
         "next": "Sonraki yuva",
-        "emptySlot": "BoΕ yuva"
+        "emptySlot": "Boş yuva"
       },
-      "allParts": "TΓΌm parΓ§alar",
-      "zoomHint": "YakΔ±nlaΕtΔ±rmak iΓ§in Ctrl + tekerlek",
-      "swap": "BileΕeni deΔiΕtir"
+      "allParts": "Tüm parçalar",
+      "zoomHint": "Yakınlaştırmak için Ctrl + tekerlek",
+      "swap": "Bileşeni değiştir"
     },
     "attachType": {
-      "WeaponPersonal": "KiΕisel silah",
-      "WeaponGun": "Gemi silahΔ±",
+      "WeaponPersonal": "Kişisel silah",
+      "WeaponGun": "Gemi silahı",
       "WeaponMining": "Madencilik lazeri",
-      "Missile": "FΓΌze",
-      "MissileLauncher": "FΓΌze rampasΔ±",
+      "Missile": "Füze",
+      "MissileLauncher": "Füze rafı",
       "Turret": "Taret",
       "Char_Armor_Helmet": "Kask",
-      "Char_Armor_Torso": "GΓΆvde",
+      "Char_Armor_Torso": "Gövde",
       "Char_Armor_Arms": "Kollar",
       "Char_Armor_Legs": "Bacaklar",
-      "Char_Armor_Undersuit": "Alt giyim",
-      "Char_Armor_Backpack": "SΔ±rt Γ§antasΔ±",
-      "WeaponAttachment": "Silah eklentisi",
+      "Char_Armor_Undersuit": "Alt giysi",
+      "Char_Armor_Backpack": "Sırt çantası",
+      "WeaponAttachment": "Silah eki",
       "Gadget": "Gadget",
-      "FPS_Consumable": "TΓΌketim malzemesi"
+      "FPS_Consumable": "Tüketim malzemesi"
     },
     "personal": {
-      "switchGroup": "GΓΆrΓΌnΓΌm: standart veya senin varyantΔ±n",
+      "switchGroup": "Görünüm: standart veya senin varyantın",
       "codex": "Codex",
       "stock": "Standart",
       "mine": "Benimkiler",
       "mineVariant": "Varyantım",
       "yourVariant": "Varyantım: {{name}}",
-      "variantsMenu": "Bu geminin varyantlarΔ±n",
+      "variantsMenu": "Bu gemiye ait varyantların",
       "hqCrumb": "HQ",
-      "foreignVariant": "Bu varyant baΕkasΔ±na ait β varyantlar paylaΕΔ±m linkiyle paylaΕΔ±lΔ±r.",
-      "adopt": "Kopya oluΕtur",
-      "openVariant": "Varyantını aΓ§",
-      "inHqChip": "HQ'nda {{n}}Γ",
+      "foreignVariant": "Bu varyant başkasına ait — varyantlar paylaşım bağlantısıyla paylaşılır.",
+      "adopt": "Kopya oluştur",
+      "openVariant": "Varyantını aç",
+      "inHqChip": "HQ'nda {{n}}×",
       "usesTitle": "HQ'nda",
-      "equippedOn": "Takılı olduΔu yer: {{ship}} ({{variant}})",
+      "equippedOn": "Takılı olduğu yer: {{ship}} ({{variant}})",
       "inSet": "{{name}} setinde"
     },
     "browse": {
@@ -2953,34 +2953,34 @@
       "filtersAria": "Filtreler",
       "filtersTitle": "Filtreler",
       "filterButton": "Filtreler ({{count}})",
-      "showResults": "{{count}} sonucu gΓΆster",
+      "showResults": "{{count}} sonucu göster",
       "areaLabel": "Alan",
-      "collapseArea": "{{name}} daralt",
-      "expandArea": "{{name}} geniΕlet",
+      "collapseArea": "Daralt: {{name}}",
+      "expandArea": "Genişlet: {{name}}",
       "area": {
-        "armor": "ZΔ±rh",
-        "shipAmmo": "Gemi mГΌhimmatΔ±"
+        "armor": "Zırh",
+        "shipAmmo": "Gemi mühimmatı"
       },
       "sort": {
-        "label": "SΔ±ralama",
+        "label": "Sıralama",
         "name": "Ad A–Z",
-        "new": "Bu yamada yeni olanlar ΓΆnce"
+        "new": "Bu yamada yeni olanlar önce"
       },
-      "sizeAll": "Hepsi",
-      "alsoInOne": "AyrΔ±ca {{kind}} iΓ§inde Β· 1 sonucu gΓΆster βΊ",
-      "alsoInMany": "AyrΔ±ca {{kind}} iΓ§inde Β· {{count}} sonucu gΓΆster βΊ",
-      "subtitleOf": "{{total}} iΓ§inden {{shown}} Β· Yama {{patch}}",
-      "subtitleAll": "{{shown}} kayΔ±t Β· Yama {{patch}}",
-      "subtitleOfNoPatch": "{{total}} iΓ§inden {{shown}}",
-      "subtitleAllNoPatch": "{{shown}} kayΔ±t",
-      "listSearch": "{{area}} iΓ§inde ara",
-      "listSearchPh": "{{area}} iΓ§inde ara β¦",
+      "sizeAll": "Tümü",
+      "alsoInOne": "Ayrıca {{kind}} içinde · 1 sonucu göster ›",
+      "alsoInMany": "Ayrıca {{kind}} içinde · {{count}} sonucu göster ›",
+      "subtitleOf": "{{total}} içinden {{shown}} · Yama {{patch}}",
+      "subtitleAll": "{{shown}} kayıt · Yama {{patch}}",
+      "subtitleOfNoPatch": "{{total}} içinden {{shown}}",
+      "subtitleAllNoPatch": "{{shown}} kayıt",
+      "listSearch": "{{area}} içinde ara",
+      "listSearchPh": "{{area}} içinde ara …",
       "listSearchClear": "Aramayı temizle",
       "freshFilter": "Son yamada yeni/güncellenen"
     },
     "contract": {
       "eyebrow": "Görev",
-      "giver": "Müteahhit",
+      "giver": "İşveren",
       "location": "Konum",
       "reward": "Ödül",
       "rewardDynamic": "Sabit temel ödül yok",
@@ -2990,7 +2990,7 @@
       "variantsLabel": "Varyantlar",
       "variants": "{{n}} sözleşme bu başlığı paylaşıyor",
       "patch": "Yama",
-      "placeholderHint": "‹…› ifadesini oyun, görevi kabul ettiğinde doldurur (konum, müteahhit, hedef).",
+      "placeholderHint": "‹…› ifadesini oyun, görevi kabul ettiğinde doldurur (konum, işveren, hedef).",
       "notFound": "Bu görev mevcut LIVE sürümünde yok."
     },
     "missile": {
@@ -3044,7 +3044,7 @@
         "combatMissing": "Hasar, hız, çeviklik, menzil ve kilitlenme süresi henüz mevcut verilerde yok. Çıkarım bunları sağlar sağlamaz burada görünecek."
       },
       "group": {
-        "warhead": "Harp başlığı",
+        "warhead": "Savaş başlığı",
         "flight": "Uçuş",
         "guidance": "Güdüm",
         "build": "Yapı"
@@ -3062,7 +3062,7 @@
         "lifetime": "Uçuş süresi",
         "lockTime": "Kilitlenme süresi",
         "blastRadius": "Patlama yarıçapı",
-        "armTime": "Silahlanma süresi",
+        "armTime": "Kurulma süresi",
         "lockAngle": "Kilitlenme açısı"
       },
       "signal": {
@@ -3096,8 +3096,8 @@
         "quickLock": "Hızlı kilitlenen"
       },
       "keywordTip": {
-        "ir": "Hedefin kızılötesi izini takip eder.",
-        "em": "Hedefin elektromanyetik izini takip eder.",
+        "ir": "Hedefin kızılötesi imzasını takip eder.",
+        "em": "Hedefin elektromanyetik imzasını takip eder.",
         "cs": "Hedefin radar kesitini takip eder.",
         "missile": "Gemilerden ateşlenir.",
         "torpedo": "Büyük hedeflere karşı ağır güdümlü silah.",
@@ -3117,7 +3117,7 @@
     },
     "page": {
       "more": "Codex'te daha fazlası",
-      "moreAria": "Tüm girdilere genel bakış"
+      "moreAria": "Tüm kayıtlara genel bakış"
     },
     "head": {
       "stripAria": "Yama ve sahiplik",
@@ -3126,13 +3126,13 @@
       "variantAria": "Varyant seç, şu an: {{name}}",
       "shown": "Gösterilen:",
       "own": {
-        "hangar": "Hangar'da",
-        "hangarN": "Hangar'da {{n}}×",
+        "hangar": "Hangarda",
+        "hangarN": "Hangarda {{n}}×",
         "inventar": "Envanterde · {{n}}×",
         "sammlung": "Koleksiyonda"
       },
       "notOwn": {
-        "hangar": "Hangar'da değil",
+        "hangar": "Hangarda değil",
         "inventar": "Envanterde değil",
         "sammlung": "Koleksiyonda değil"
       }
@@ -3152,7 +3152,7 @@
     },
     "itemRank": {
       "nAll": "Bu türden {{n}} parça",
-      "nType": "Aynı tipte {{n}} parça",
+      "nType": "Aynı türde {{n}} parça",
       "nSize": "{{k}} boyutunda {{n}} parça",
       "verdict": "%{{pct}} — {{n}} parçaya kıyasla {{band}}.",
       "percentileTooltip": "Değer, bu parçanın karşılaştırma alanında nerede durduğunu gösterir. %50 tam ortadır. Gecikmelerde ve imzalarda daha küçük değer daha üst sırada yer alır.",
@@ -3167,18 +3167,18 @@
       "scope": {
         "all": "Tümü",
         "size": "Boyut",
-        "type": "Tip"
+        "type": "Tür"
       },
       "scopeOff": "Bu grupta karşılaştırılacak parça çok az.",
       "axis": {
         "dps": "DPS",
-        "alpha": "ALPHA",
-        "fireRate": "ATEŞ HIZI",
+        "alpha": "ALFA",
+        "fireRate": "ATIŞ HIZI",
         "projectileSpeed": "MERMİ HIZI",
         "shieldHp": "KALKAN HP",
         "shieldRegen": "YENİLENME",
         "damagedDelay": "VURUŞ SONRASI GECİKME",
-        "downedDelay": "DÜŞÜŞ SONRASI GECİKME",
+        "downedDelay": "ÇÖKME SONRASI GECİKME",
         "powerOutput": "ÇIKIŞ GÜCÜ",
         "coolingRate": "SOĞUTMA HIZI",
         "health": "HP",
@@ -3186,7 +3186,7 @@
         "irSignature": "IR",
         "driveSpeed": "HIZ",
         "jumpRange": "MENZİL",
-        "spoolTime": "ISINMA SÜRESİ"
+        "spoolTime": "HAZIRLIK SÜRESİ"
       }
     },
     "savedLoadouts": {
@@ -3239,12 +3239,12 @@
       "VehicleWeaponsS6": "Araç Silahları S6"
     },
     "card": {
-      "tier": "Tier {{tier}}"
+      "tier": "Seviye {{tier}}"
     },
-    "recipesMissing": "Bu sürüm için henüz tarif malzemeleri çıkarılmadı — planlar listeleniyor ama malzeme listeleri yok.",
+    "recipesMissing": "Bu sürüm için henüz tarif malzemeleri çıkarılmadı — şemalar listeleniyor ama malzeme listeleri yok.",
     "owned": {
       "filter": "Sadece benimkiler",
-      "mark": "Bu plana sahibim: {{name}}",
+      "mark": "Bu şemaya sahibim: {{name}}",
       "unmark": "Benim – işareti kaldır: {{name}}"
     },
     "role": {
@@ -3253,7 +3253,7 @@
       "catalyst": "Katalizör"
     },
     "detail": {
-      "tier": "Tier",
+      "tier": "Seviye",
       "craftTime": "Üretim süresi",
       "dismantleTime": "Demontaj süresi",
       "outputQty": "Çıktı miktarı",
@@ -3264,8 +3264,8 @@
       "output": "Çıktı",
       "qualitySummary": "Kalite özeti",
       "qualityNote": "Statik temel kalite değerleri — etkileşimli kalite simülasyonu ileriki bir güncellemede geliyor.",
-      "missions": "Bu blueprint için görevler",
-      "missionsNote": "Bu görevler bu blueprint'i ödül olarak verebilir.",
+      "missions": "Bu şema için görevler",
+      "missionsNote": "Bu görevler bu şemayı ödül olarak verebilir.",
       "missionsMore": "ve {{count}} tane daha",
       "toMission": "Göreve git",
       "primary": "Birincil",
@@ -3274,7 +3274,7 @@
   },
   "fps": {
     "title": "FPS Ekipmanı",
-    "subtitle": "Yaya ekipmanı — silahlar ve zırhlar, live build'den datamine edildi.",
+    "subtitle": "Yaya ekipmanı — silahlar ve zırhlar, LIVE sürümünden datamine edildi.",
     "bridgeLink": "FPS Ekipmanı",
     "categoriesAria": "FPS ekipman kategorileri",
     "searchPlaceholder": "Bu listeyi filtrele – ad veya sınıf (ör. Arclight, Morozov, klwe_*) …",
@@ -3288,11 +3288,11 @@
       "toggle": "Filtreler ({{count}})"
     },
     "weaponType": {
-      "sidearm": "Tabanca",
+      "sidearm": "Yan silah",
       "primary": "Birincil silah",
       "heavy": "Ağır silah",
       "melee": "Yakın dövüş",
-      "throwable": "Fırlatılabilir",
+      "throwable": "Atılabilir silah",
       "gadget": "Alet / gadget"
     },
     "weight": {
@@ -3300,10 +3300,10 @@
       "medium": "Orta",
       "heavy": "Ağır"
     },
-    "armorStatsHint": "Bu build'de zırhın henüz ayrıntılı istatistik bloğu yok — yalnızca ad, sınıf, boyut ve üretici.",
+    "armorStatsHint": "Bu sürümde zırhın henüz ayrıntılı istatistik bloğu yok — yalnızca ad, derece, boyut ve üretici.",
     "empty": {
-      "weapon": "Bu build'de FPS silahı yok.",
-      "armor": "Bu build'de zırh yok.",
+      "weapon": "Bu sürümde FPS silahı yok.",
+      "armor": "Bu sürümde zırh yok.",
       "nothingIn": "{{cat}} altında hiçbir şey yok —",
       "searchIn": "{{cat}} içinde ara"
     },
@@ -3320,8 +3320,8 @@
       "onlyFitting": "Yalnızca “{{slot}}” yuvasına uyanlar gösteriliyor.",
       "saving": "Kaydediliyor …",
       "changedElsewhere": "Bu arada başka bir sekmede değiştirildi — yuvada artık başka bir şey var.",
-      "pastPatch": "Kuşanma yalnızca güncel patch'te çalışır.",
-      "pastPatchBack": "Güncel patch'e git",
+      "pastPatch": "Kuşanma yalnızca güncel yamada çalışır.",
+      "pastPatchBack": "Güncel yamaya git",
       "band": {
         "eyebrow": "Arsenal",
         "eyebrowSlot": "Arsenal · {{slot}}",
@@ -3788,8 +3788,8 @@
     "noData": "Yeterli veri yok",
     "tip": {
       "noData": "Değerlendirme için henüz yeterli veri yok",
-      "better": "{{prev}} sürümünden {{d}} puan daha güçlü (%{{p}})",
-      "worse": "{{prev}} sürümünden {{d}} puan daha zayıf (%{{p}})",
+      "better": "{{prev}} yamasından {{d}} puan daha güçlü (%{{p}})",
+      "worse": "{{prev}} yamasından {{d}} puan daha zayıf (%{{p}})",
       "same": "{{prev}} ile yaklaşık aynı (%{{p}})",
       "community": "bunun {{c}} kadarı topluluk kararından",
       "early": "henüz geçici",
@@ -3815,7 +3815,7 @@
       "total": "Kararlılık",
       "final": "Nihai durum – günlük akış yok, bu yama günlük ölçüm başlamadan önce yayındaydı.",
       "asOf": "{{date}} itibarıyla",
-      "day": "{{threshold}} günün {{day}}. günü",
+      "day": "Gün {{day}} / {{threshold}}",
       "provisional": "değerlendirme henüz geçici",
       "sources": "Kaynaklar:",
       "src": {
@@ -3827,7 +3827,7 @@
       "hatched": "Taramalı: bir hotfix'in tabloyu hâlâ değiştirebileceği ilk {{n}} gün.",
       "dayTitle": "{{date}}: %{{score}} – {{word}}, günde {{velocity}} yeni yanıt",
       "ticketsHint": "herkese açık forum yanıtlarından",
-      "mentions": "{{count}} söz edilme"
+      "mentions": "{{count}} kez anıldı"
     },
     "vote": {
       "title": "Topluluk kararı",
@@ -3842,7 +3842,7 @@
       "sum": "{{n}} oy · düzeltme {{c}}",
       "yours": "senin kararın",
       "blindTitle": "Önce kararın, sonra sayı",
-      "ask": "{{line}} sende ne kadar stabil çalışıyor?",
+      "ask": "{{line}} sende ne kadar kararlı çalışıyor?",
       "mine": "Kararın:",
       "changeFrom": "{{time}} saatinden itibaren değiştirilebilir",
       "hint": {
@@ -3856,9 +3856,9 @@
       "rules": "Yalnızca en az {{days}} günlük hesaplar sayılır. Son oyundan en erken {{h}} sa. sonra değiştirilebilir. Kararın adınla birlikte asla gösterilmez.",
       "signedOut": "Karar vermek için giriş yap.",
       "signIn": "Giriş yap",
-      "dailyCap": "Bugün zaten {{n}} build kararı verdin veya değiştirdin – yarın tekrar dene.",
-      "buildClosed": "Bu build artık çalışmıyor – yalnızca çalışan build için oy verilebilir.",
-      "rulesBuild": "Yalnızca en az {{days}} günlük hesaplar sayılır. Oy verdikten en erken {{h}} sa. sonra değiştirilebilir, günde en fazla {{n}} build kararı, yalnızca build çalışırken. Kararın adınla birlikte asla gösterilmez."
+      "dailyCap": "Bugün zaten {{n}} sürüm kararı verdin veya değiştirdin – yarın tekrar dene.",
+      "buildClosed": "Bu sürüm artık yayında değil – yalnızca yayındaki sürüm için oy verilebilir.",
+      "rulesBuild": "Yalnızca en az {{days}} günlük hesaplar sayılır. Oy verdikten en erken {{h}} sa. sonra değiştirilebilir, günde en fazla {{n}} sürüm kararı, yalnızca sürüm yayındayken. Kararın adınla birlikte asla gösterilmez."
     }
   },
   "p4k": {
@@ -3875,7 +3875,7 @@
       "hint": "Biri Verse Data Uploader ile yükleme yaptığında veriler burada görünür."
     },
     "col": {
-      "entities": "Entity",
+      "entities": "Varlıklar",
       "diff": "Önceki sürümle fark",
       "tool": "Araç sürümü",
       "uploads": "Yüklemeler"
@@ -3884,13 +3884,13 @@
       "disable": "Devre dışı bırak",
       "reenable": "Yeniden etkinleştir",
       "delete": "Sil",
-      "disablePatch": "Patch'i devre dışı bırak",
-      "reenablePatch": "Patch'i yeniden etkinleştir",
+      "disablePatch": "Yamayı devre dışı bırak",
+      "reenablePatch": "Yamayı yeniden etkinleştir",
       "lead": "Öncü olarak kullan"
     },
     "diff": {
-      "title": "Fark ayrıntıları (önceki build'e göre)",
-      "entity": "Entity türü",
+      "title": "Fark ayrıntıları (önceki sürüme göre)",
+      "entity": "Varlık türü",
       "prev": "Önceki",
       "new": "Yeni",
       "delta": "Δ"
@@ -3905,10 +3905,10 @@
       "disableTitle": "“{{name}}” bundle'ı devre dışı bırakılsın mı?",
       "reasonLabel": "Neden (isteğe bağlı)",
       "deleteTitle": "Bundle silinsin mi?",
-      "disablePatchTitle": "{{name}} patch'i devre dışı bırakılsın mı ({{count}} aktif yükleme)?",
-      "reenablePatch": "{{name}} patch'i yeniden etkinleştirilsin mi? Her kanalda en yeni yükleme yeniden öncü olur.",
+      "disablePatchTitle": "{{name}} yaması devre dışı bırakılsın mı ({{count}} aktif yükleme)?",
+      "reenablePatch": "{{name}} yaması yeniden etkinleştirilsin mi? Her kanalda en yeni yükleme yeniden öncü olur.",
       "leadTitle": "“{{name}}” öncü olarak kullanılsın mı?",
-      "leadMessage": "Aynı patch ve kanaldaki diğer aktif yüklemeler (not düşülerek) devre dışı bırakılır ve geçmişte kalır."
+      "leadMessage": "Aynı yama ve kanaldaki diğer aktif yüklemeler (not düşülerek) devre dışı bırakılır ve geçmişte kalır."
     },
     "superseded": {
       "badge": "Değiştirildi",
@@ -3916,7 +3916,7 @@
     },
     "leading": {
       "badge": "Öncü",
-      "tip": "Codex bu bundle'ı ilgili patch ve kanal için kullanır.",
+      "tip": "Codex bu bundle'ı ilgili yama ve kanal için kullanır.",
       "reason": "Geri çekildi: {{name}} öncü olarak seçildi."
     }
   },
@@ -4742,11 +4742,11 @@
     }
   },
   "desktop": {
-    "title": "Data Upload",
+    "title": "Veri yükleme",
     "subtitle": "Yerel Star Citizen kurulumun için Verse Data Uploader'ı indir.",
-    "bundleHistory": "Paket geçmişi",
+    "bundleHistory": "Bundle geçmişi",
     "loading": "Sürüm yükleniyor…",
-    "released": "Yayınlanma",
+    "released": "Yayınlandı",
     "notes": "Sürüm notları",
     "noRelease": "Henüz yayınlanmış sürüm yok.",
     "channel": {
@@ -4760,18 +4760,18 @@
       "action": "Yükselt"
     },
     "appTitle": "Verse Data Uploader",
-    "appDesc": "Yerel Star Citizen kurulumunu okur ve Codex paketlerini oradan yükler.",
+    "appDesc": "Yerel Star Citizen kurulumunu okur ve Codex bundle'larını oradan yükler.",
     "close": "Kapat",
     "access": {
-      "fullPage": "Tam Data Upload sayfası",
+      "fullPage": "Tam veri yükleme sayfası",
       "note": "Yalnızca Windows · Verse Companion hesabınla giriş yapar · veri yükler, asla kod yüklemez."
     },
     "historyEyebrow": "Uploader",
     "build": {
-      "title": "En son paket",
+      "title": "En son bundle",
       "since": "{{date}} tarihinden beri",
       "quality": "Kalite {{q}}",
-      "none": "Henüz etkin paket yok."
+      "none": "Henüz etkin bundle yok."
     },
     "steps": {
       "title": "Kurulum",
@@ -4779,7 +4779,7 @@
       "doneSr": "tamam",
       "s1": "Uploader'ı indir ve başlat",
       "s2": "Verse Companion hesabınla giriş yap",
-      "s3": "Star Citizen klasörünü seç — uploader Data.p4k dosyasını okur ve paketleri yükler"
+      "s3": "Star Citizen klasörünü seç — uploader Data.p4k dosyasını okur ve bundle'ları yükler"
     }
   },
   "download": {
@@ -4813,24 +4813,30 @@
     "handedOverHint": "Uygulama oturumunu devralıyor, bu pencereyi kapatabilirsin. Bağlanmadıysa bağlantıyı uygulamada yeniden başlat."
   },
   "desktopAuth": {
-    "title": "Verse Data Uploader'ı yetkilendir",
     "authorizing": "Oturumun kontrol ediliyor…",
     "loginRequired": "Önce giriş yap, ardından bağlantıyı onayla.",
+    "confirm": "Bağlan",
     "redirecting": "Yetkilendirildi. Token uygulamaya gönderiliyor…",
-    "redirectingHint": "Birazdan bu pencereyi kapatabilirsin.",
+    "handedOverHint": "Uygulama oturumunu devralıyor, bu pencereyi kapatabilirsin. Bağlanmadıysa bağlantıyı uygulamada yeniden başlat.",
     "unauthorized": "Hesabın Verse Data Uploader'ı kullanamıyor.",
-    "unauthorizedHint": "Collaborator veya admin rolüne ihtiyacın var. Bir admine sor.",
     "errorMissingParams": "Callback veya state parametresi eksik.",
     "errorBadCallback": "Callback URL'si, beklenen port aralığında bir 127.0.0.1 loopback adresi değil.",
     "errorNoToken": "Oturumda erişim token'ı yok.",
-    "confirmPrompt": "{{port}} portundaki Verse Data Uploader hesabına bağlansın mı?",
-    "confirmHint": "Yalnızca girişi az önce kendin Verse Data Uploader'dan başlattıysan onayla.",
-    "confirm": "Bağlan",
-    "cancel": "İptal",
-    "cancelled": "İptal edildi — hiçbir şey gönderilmedi. Bu pencereyi kapatabilirsin.",
     "retry": "Tekrar dene",
-    "handedOver": "Uygulamaya dön",
-    "handedOverHint": "Uygulama oturumunu devralıyor, bu pencereyi kapatabilirsin. Bağlanmadıysa bağlantıyı uygulamada yeniden başlat."
+    "titleConnect": "Verse Data Uploader'ı bağla",
+    "titleConfirm": "Verse Data Uploader bağlansın mı?",
+    "titleConnecting": "Bağlanıyor…",
+    "titleConnected": "Bağlandı",
+    "titleDenied": "Erişim yok",
+    "titleFailed": "Bağlantı başarısız",
+    "confirmInfo": "Yalnızca girişi uploader'da kendin başlattıysan onayla (port {{port}}).",
+    "connected": "Uploader hesabına bağlandı. Bu pencereyi kapatabilirsin.",
+    "start": "Girişi Verse Data Uploader'dan başlat – bu sayfayı kendisi açar.",
+    "done": {
+      "csrf": "Giriş bu uploader oturumuna ait değildi. Uploader'da yeniden başlat.",
+      "noToken": "Uploader giriş bilgisi almadı. Uploader'da yeniden başlat.",
+      "failed": "Giriş uploader'a aktarılamadı. Uploader'da yeniden başlat."
+    }
   },
   "footer": {
     "madeByCommunity": "Made by the Community",
@@ -4860,7 +4866,7 @@
       "subtitle": "Bu siteyi kimin işlettiği, ne yaptığı ve kodun nerede durduğu.",
       "what": {
         "title": "Bu nedir?",
-        "p1": "Verse Companion, Star Citizen uzay simülasyonu için ücretsiz, ticari olmayan bir yardımcı uygulamadır: Verse haberleri, gemi ve ekipman kodeksi ile kişisel hangar ve loadout araçları.",
+        "p1": "Verse Companion, Star Citizen uzay simülasyonu için ücretsiz, ticari olmayan bir yardımcı uygulamadır: Verse haberleri, gemi ve ekipman Codex'i ile kişisel hangar ve loadout araçları.",
         "p2": "Haberler, codex ve sürüm notları hesap olmadan görüntülenebilir. Hesap yalnızca hangar gibi kişisel özellikler için gerekir ve kayıt şu anda yalnızca davetle yapılabiliyor."
       },
       "openSource": {
@@ -4943,23 +4949,23 @@
         "supabase": "Supabase (veritabanı, kimlik doğrulama, dosya depolama) — AB bölgesi eu-central-1 (Frankfurt); hesap ve uygulama verilerini bizim adımıza işler.",
         "vercel": "Vercel Inc. (barındırma, CDN) — statik uygulamanın sunulması.",
         "google": "Google Sign-In (Google Ireland Limited / Google LLC) — yalnızca bilerek Google ile giriş yaparsan; ayrıntılar \"Google ile giriş\" bölümünde.",
-        "posthog": "PostHog (ürün analitiği ve hata tanılama) — AB bulutu; istekler bu sitenin kendi adresi (/ingest) üzerinden geçer. Yalnızca onayından sonra kullanım olaylarını, sayfa yükleme sürelerini, ölü tıklamaları ve ısı haritalarını ile hataları kaydeder. Hata oluşan oturumlar, tüm girdiler maskelenmiş olarak yeniden oynatma için kaydedilir. Giriş yaptıysan PostHog takma adlı bir kimlik (hesap kimliğinin tuzlanmış karması) ve rolünü (viewer, collaborator veya admin) görür — asla e-posta adresini veya adını değil.",
+        "posthog": "PostHog (ürün analitiği ve hata tanılama) — AB bulutu; istekler bu sitenin kendi adresi (/ingest) üzerinden geçer. Yalnızca onayından sonra kullanım olaylarını, sayfa yükleme sürelerini, ölü tıklamaları, ısı haritalarını ve hataları kaydeder. Hata oluşan oturumlar, tüm girdiler maskelenmiş olarak yeniden oynatma için kaydedilir. Giriş yaptıysan PostHog takma adlı bir kimlik (hesap kimliğinin tuzlanmış karması) ve rolünü (viewer, collaborator veya admin) görür — asla e-posta adresini veya adını değil.",
         "posthogServer": "PostHog (sunucu tarafı) — kendi sunucu fonksiyonlarımız hatalarını ve çalışma sürelerini IP adresi, kullanıcı kimliği veya içerik olmadan PostHog'a (AB bulutu) bildirir. Kişisel veri söz konusu olmadığından bu, rızana bağlı değildir. Masaüstü uygulamaları çökme raporlarını (ve uygulamada izin verirsen kullanım sayılarını) aynı yoldan iletir — yalnızca önceden karması alınmış bir kurulum kimliğine bağlı, asla hesabına değil.",
         "fonts": "Google Fonts — yazı tipi dosyaları Google sunucularından yüklenir; Google bu sırada IP adresini görebilir.",
         "rsiMedia": "Verse haberlerindeki görseller kısmen doğrudan Roberts Space Industries sunucularından yüklenir (media.robertsspaceindustries.com, theverse.robertsspaceindustries.com) — yüklenirken RSI IP adresini görür.",
         "gameApis": "Herkese açık Star Citizen verileri: status.robertsspaceindustries.com ve api.star-citizen.wiki (yalnızca okuma, hesap verisi gönderilmez)."
       },
       "rights": {
-        "title": "Haklarınız",
+        "title": "Hakların",
         "p1": "GDPR kapsamında kişisel verilerine ilişkin erişim, düzeltme, silme, işlemenin kısıtlanması, veri taşınabilirliği ve itiraz haklarına sahipsin. Ayrıca bir veri koruma denetim otoritesine şikâyette bulunabilirsin.",
         "p2": "Hesabın tamamen silinebilir: auth kaydının kaldırılması, veritabanı kaskadı aracılığıyla profil, hangar, loadout'lar, taslaklar ve yüklemeleri de kaldırır. Silme şu anda bir yönetici tarafından yapılır — ayarlardaki silme düğmesi yalnızca admin rolündeki hesaplarda çalışır. Künyedeki iletişim yollarıyla talep et; talepler vakit kaybetmeden ele alınır.",
         "p3": "Tercih depolaması ve istatistik için rızanı istediğin zaman ayarlardan geri çekebilirsin; geri çekme etkilenen yerel girdileri hemen siler ve ileriye dönük etki eder — o âna kadarki işlemenin hukuka uygunluğu etkilenmez."
       },
       "social": {
         "title": "Arkadaşlar ve görünürlük",
-        "p1": "Arkadaşlar, bir istek veya kişisel davet bağlantısı aracılığıyla bağlandığın hesaplardır; davet bağlantısının süresi dolar ve onu iptal edebilirsin. Arkadaş olduğunuz sürece arkadaşların varsayılan olarak hangarını, amiral geminı, çevrimiçi olup olmadığını ve Social sayfasındaki karşılaştırma sayılarını (örneğin Verse Companion'ı ne sıklıkta kullandığını) görür. Bunların her birini Social sayfasındaki görünürlük penceresinde genel olarak veya tek bir arkadaş için kapatabilirsin.",
+        "p1": "Arkadaşlar, bir istek veya kişisel davet bağlantısı aracılığıyla bağlandığın hesaplardır; davet bağlantısının süresi dolar ve onu iptal edebilirsin. Arkadaş olduğunuz sürece arkadaşların varsayılan olarak hangarını, amiral gemini, çevrimiçi olup olmadığını ve Sosyal sayfasındaki karşılaştırma sayılarını (örneğin Verse Companion'ı ne sıklıkta kullandığını) görür. Bunların her birini Sosyal sayfasındaki görünürlük penceresinde genel olarak veya tek bir arkadaş için kapatabilirsin.",
         "p2": "Bunun için user_presence tablosu hesap başına son ziyaret zamanını ve son 30 günün etkinlik maskesini (gün başına etkin ya da değil) saklar — gezinme geçmişi yok. \"Çevrimiçi\", son birkaç dakika içinde görüldü anlamına gelir.",
-        "p3": "Gruplar (örneğin org'lar veya mangalar) sana ait özel bir listedir: üyeler ne grubu ne de adını görür. Görevler, loadout'lar ve gemi varyantlarını yalnızca açıkça paylaştığın kişiler görür. Bir arkadaşlığı bitirdiğinde her görünürlük hemen sona erer."
+        "p3": "Gruplar (örneğin org'lar veya mangalar) sana ait özel bir listedir: üyeler ne grubu ne de adını görür. Görevleri, loadout'ları ve gemi varyantlarını yalnızca açıkça paylaştığın kişiler görür. Bir arkadaşlığı bitirdiğinde her görünürlük hemen sona erer."
       }
     },
     "imprint": {
@@ -5668,7 +5674,7 @@
       "sidebar": "Kenar çubuğu",
       "dialog": "İletişim kutusu",
       "menu": "Menü",
-      "search": "Ara"
+      "search": "Arama"
     }
   },
   "skeleton": {
@@ -5683,7 +5689,7 @@
     "loadMore": "Daha fazla yükle ({{count}})",
     "cat": {
       "added": "Eklendi",
-      "changed": "Değişti",
+      "changed": "Değiştirildi",
       "fixed": "Düzeltildi",
       "removed": "Kaldırıldı",
       "deprecated": "Kullanımdan kalkıyor",
@@ -5727,7 +5733,7 @@
         },
         "confirm": {
           "title": "Burada onaylarsın",
-          "text": "Gemi listesi Verse Companion'da, her giriş görünür şekilde açılır. Yalnızca işaretlediğin satırlar hangarına yazılır."
+          "text": "Gemi listesi Verse Companion'da, her kayıt görünür şekilde açılır. Yalnızca işaretlediğin satırlar hangarına yazılır."
         }
       },
       "privacy": {
@@ -5825,7 +5831,7 @@
     "subtitle": "Cloud Imperium Games'in yüksek çözünürlüklü çizimleri, doğrudan orijinaline bağlantılı.",
     "subtitleAppPre": "",
     "subtitleAppLink": "Starscape uygulaması",
-    "subtitleAppPost": "ile bunu masaüstü arka planın yapabilirsin.",
+    "subtitleAppPost": " ile bunları masaüstü arka planı olarak ayarlayabilirsin.",
     "filterAll": "Tümü",
     "filter": {
       "label": "Galeri görünümü",
@@ -5847,7 +5853,7 @@
       "totalNone": "Henüz oy yok",
       "totalOne": "Toplam 1 oy (tüm kullanıcılar)",
       "total": "Toplam {{count}} oy (tüm kullanıcılar)",
-      "mine": "oyun dahil"
+      "mine": "senin verdiğin oy dahil"
     },
     "top": {
       "label": "Yalnızca ilk {{count}} öğeyi göster",
@@ -5896,7 +5902,7 @@
     "title": "Geri bildirim",
     "open": "Geri bildirim gönder",
     "intro": "Neyi eksik buluyorsun, seni ne rahatsız ediyor, neyi farklı yapardın? Buraya yaz — doğrudan ekibe ulaşır.",
-    "placeholder": "Geri bildirimin… (markdown ve ekran görüntüleri olur)",
+    "placeholder": "Geri bildirimin… (markdown ve ekran görüntüleri eklenebilir)",
     "send": "Geri bildirim gönder",
     "sent": "Teşekkürler! Geri bildirimin ulaştı.",
     "privacyHint": "Adın ekibe görünür. Sonradan ne olduğunu burada takip edebilirsin.",
@@ -5913,8 +5919,8 @@
     "newBadge": "Yeni",
     "answerPlaceholder": "Yanıtın…",
     "answer": "Yanıtla",
-    "declinedTitle": "Bunun neden uygulanmadığı",
-    "impersonationBlocked": "Başka bir rolü önizlerken gönderim devre dışıdır — gerçek geri bildirimi kendi hesabınla yönetici gelen kutusuna iletir.",
+    "declinedTitle": "Neden uygulanmıyor",
+    "impersonationBlocked": "Başka bir rolü önizlerken gönderim devre dışıdır — aksi halde gerçek bir geri bildirim kendi hesabınla yönetici gelen kutusuna düşerdi.",
     "withdraw": {
       "action": "Geri çek",
       "hint": "Henüz kimse üzerinde çalışmadıysa veya yanıtlamadıysa geri bildirimini yeniden silebilirsin.",
@@ -6125,7 +6131,7 @@
       "share": "Paylaş",
       "noFriends": "Henüz arkadaş eklemedin.",
       "allShared": "Tüm arkadaşlarında bu set zaten var.",
-      "toSocial": "Social sayfasında arkadaş ekle"
+      "toSocial": "Sosyal sayfasında arkadaş ekle"
     },
     "link": {
       "title": "Herkese açık bağlantı",
@@ -6236,7 +6242,7 @@
       "legend": "Gösterge",
       "legendAria": "Eylemleri göster ve gizle",
       "shared": "{{place}} aynı zamanda \"{{name}}\" Operasyonuna da hizmet ediyor",
-      "open": "Yer açık"
+      "open": "Yer henüz belli değil"
     },
     "slots": {
       "aria": "Operasyon slotları",
@@ -6283,7 +6289,7 @@
         "1": "Seç",
         "2": "Einsatz'lar"
       },
-      "emptyWish": "Bir dilek tut",
+      "emptyWish": "Bir istek ekle",
       "all": "Hepsini al",
       "none": "Hiçbirini alma",
       "picked": "{{n}} pozisyon · {{p}} adet",
@@ -6291,7 +6297,7 @@
         "ships": "Gemiler ve araçlar",
         "items": "Eşyalar",
         "materials": "Malzeme",
-        "blueprint": "Blueprint"
+        "blueprint": "Şema"
       },
       "qtyOf": "{{name}} miktarı",
       "less": "Daha az al",
@@ -6312,7 +6318,7 @@
       "splitHint": "Satın alma ve kazma bölünebilir: solda satın alınan, sağda kazılan miktar.",
       "itemsTitle": "Eşyaları nasıl temin edeceksin?",
       "modeOf": "{{name}} temini",
-      "modeHint": "Tüccarın bilindiği yerde satın al, blueprint'in bilindiği yerde craft et. Satır başına değiştirilebilir.",
+      "modeHint": "Tüccarın bilindiği yerde satın al, şemanın bilindiği yerde üret. Satır başına değiştirilebilir.",
       "leaveOut": "{{name}} Einsatz'dan çıkar",
       "leftOut": "Einsatz'dan çıkarıldı",
       "putBack": "Geri al",
@@ -6333,7 +6339,7 @@
       "close": "Kapat",
       "namePlaceholder": "Öneri almak için boş bırak",
       "wishTitle": "İstekler",
-      "emptyHintSearch": "Neye ihtiyacın olduğunu yukarıda ara ve istek yap.",
+      "emptyHintSearch": "Neye ihtiyacın olduğunu yukarıda ara ve isteklerine ekle.",
       "search": {
         "label": "İsteklerin için daha fazlası",
         "placeholder": "Bir eşya, gemi veya malzeme ara",
@@ -6346,14 +6352,14 @@
         "addFailed": "İsteklerine eklenemedi. Tekrar dene."
       },
       "craft": {
-        "aria": "{{name}} craft etmek için gerekenler",
+        "aria": "{{name}} üretmek için gerekenler",
         "forItem": "{{name}} için",
-        "bpOwned": "Blueprint {{name}}: koleksiyonunda",
-        "bpMissing": "Blueprint {{name}}: eksik, bir görev planlandı",
+        "bpOwned": "Şema {{name}}: koleksiyonunda",
+        "bpMissing": "Şema {{name}}: eksik, bir görev planlandı",
         "matOwned": "{{name}}: {{need}} gerekli, depoda {{have}}",
         "matMissing": "{{name}}: {{need}} gerekli, depoda {{have}}, {{missing}} temin edilecek",
         "noRecipe": "Tarif için henüz bilinen malzeme yok.",
-        "source": "Uygulama blueprint ve malzemeleri koleksiyonlarına ve envanterine kendiliğinden bildirir; o zamana kadar orada yazanlar geçerlidir.",
+        "source": "Uygulama şemaları ve malzemeleri koleksiyonlarına ve envanterine kendiliğinden bildirir; o zamana kadar orada yazanlar geçerlidir.",
         "loading": "Tarif yükleniyor …"
       }
     },
@@ -6370,8 +6376,8 @@
       "positions": "pozisyon",
       "edit": "Düzenle",
       "noEinsaetze": "Bu Operasyonun henüz Einsatz'ı yok.",
-      "noEinsaetzeHint": "Pozisyonlardan Einsatz'lar oluşur: satın alma, kazma, görevler, en sonda craft.",
-      "proposeEinsaetze": "Einsatz öner",
+      "noEinsaetzeHint": "Pozisyonlardan Einsatz'lar oluşur: satın alma, kazma, görevler, en sonda üretim.",
+      "proposeEinsaetze": "Einsatz'lar öner",
       "einsaetze": "Einsatz'lar",
       "stepsTotal": "{{n}} adım",
       "steps": "{{done}}/{{n}} adım",
@@ -6423,19 +6429,19 @@
       "all": "Tümü",
       "used": "Yakın zamanda tükendi",
       "used48": "son 48 sa",
-      "catchUp": "Telafi et",
-      "catchUpAll": "Hepsini telafi et",
-      "catchUpOne": "\"{{name}}\" isteklere",
-      "addItem": "Elle girdi ekle",
+      "catchUp": "Yeniden ekle",
+      "catchUpAll": "Hepsini yeniden ekle",
+      "catchUpOne": "\"{{name}}\" isteklerine ekle",
+      "addItem": "Elle kayıt ekle",
       "addShip": "Gemi ekle",
       "addShipLabel": "Geminin adı",
-      "addBlueprint": "Blueprint ekle",
+      "addBlueprint": "Şema ekle",
       "origin": {
         "pledge": "Pledge",
         "ingame": "Oyun içi",
-        "loan": "Loaner"
+        "loan": "Ödünç gemi"
       },
-      "blueprint": "Blueprint",
+      "blueprint": "Şema",
       "ruf": "İtibar",
       "rufEmptyTitle": "Henüz veri kaynağı yok",
       "rufEmptyText": "Uygulama itibarını bildirir bildirmez veya elle girdiğinde görünür.",
@@ -6447,11 +6453,11 @@
       "hintNachschub": "\"{{name}}\" Operasyonunda",
       "bpPick": {
         "hint": "Malzemeler ve Codex sayfası eşleşsin diye Codex'ten seç.",
-        "label": "Blueprint ara",
+        "label": "Şema ara",
         "placeholder": "ör. Arrowhead",
         "searching": "Aranıyor …",
-        "none": "Blueprint bulunamadı.",
-        "results": "Bulunan blueprint'ler",
+        "none": "Şema bulunamadı.",
+        "results": "Bulunan şemalar",
         "owned": "zaten koleksiyonda",
         "add": "Ekle",
         "addAria": "“{{name}}” öğesini koleksiyona ekle"
@@ -6481,13 +6487,13 @@
           "torso": "Gövde",
           "arms": "Kollar",
           "legs": "Bacaklar",
-          "undersuit": "İç giysi",
+          "undersuit": "Alt giysi",
           "backpack": "Sırt çantası",
           "sidearm": "Yan silah",
           "primary": "Birincil",
           "heavy": "Ağır",
           "melee": "Yakın dövüş",
-          "throwable": "Fırlatılabilir",
+          "throwable": "Atılabilir",
           "gadget": "Gadget",
           "other": "Diğer"
         },
@@ -6496,12 +6502,12 @@
         "placeSearch": "Yer ara …",
         "otherPlaces": "Diğer yerler",
         "reserved": "Rezerve",
-        "scrapOnly": "Parçalanabilir",
+        "scrapOnly": "Sökülebilir",
         "originAria": "Köken",
         "origin": {
           "pledge": "Pledge",
           "ingame": "Oyun içi",
-          "loan": "Geçici gemi"
+          "loan": "Ödünç gemi"
         },
         "roleAria": "Rol",
         "allRoles": "Tüm roller",
@@ -6518,7 +6524,7 @@
         "wishCount": "İstek listende {{n}} adet",
         "artAria": "Tür",
         "art": {
-          "blueprints": "Planlar",
+          "blueprints": "Şemalar",
           "ruf": "İtibar",
           "news": "Haberler",
           "gallery": "Galeri"
@@ -6535,9 +6541,9 @@
         "reservedN": "{{n}} rezerve",
         "reservedAny": "{{n}} rezerve (herhangi bir kalite)",
         "scrap": {
-          "yes": "parçalanabilir",
-          "no": "parçalanamaz",
-          "unknown": "Parçalama: bilinmiyor"
+          "yes": "sökülebilir",
+          "no": "sökülemez",
+          "unknown": "Sökme: bilinmiyor"
         },
         "noHits": "“{{q}}” için sonuç yok",
         "fewHits": "“{{q}}” için yalnızca {{n}} sonuç",
@@ -6547,7 +6553,7 @@
           "wish": "{{name}} iste ve planla",
           "wishQ": "{{name}} Q ≥ {{q}} iste ve planla",
           "wishGo": "İste ve planla",
-          "swap": "Yedek: {{place}} konumunda {{qty}} {{name}}",
+          "swap": "Alternatif: {{place}} konumunda {{qty}} {{name}}",
           "swapWhy": "aynı slot",
           "craft": "Kendin üret"
         },
@@ -6558,11 +6564,11 @@
         "addSet": "Set oluştur",
         "setName": "Set adı",
         "emptyInv": "Henüz hiçbir şey depolanmadı.",
-        "emptyInvSecond": "Uygulamayla oku",
+        "emptyInvSecond": "Uygulamayla içe aktar",
         "emptyFiltered": "Bu filtrede hiçbir şey yok.",
         "emptyHangar": "Hangarda henüz gemi yok.",
         "emptyHangarSecond": "RSI hangarını getir",
-        "emptySammlung": "Henüz hiç plan toplanmadı.",
+        "emptySammlung": "Henüz hiç şema toplanmadı.",
         "emptySammlungSecond": "Codex'e göz at",
         "emptyArt": {
           "news": "{{n}} kayıtlı haber.",
@@ -6580,7 +6586,7 @@
         "reorder": "Yeniden sipariş et ({{n}})",
         "logEmpty": "Henüz değişiklik yok.",
         "variants": "{{n}} varyant",
-        "inSpace": "Uzay",
+        "inSpace": "Uzayda",
         "selAria": "Seçim",
         "selected": "{{n}} seçili",
         "reserve": "Rezerve et",
@@ -6600,11 +6606,11 @@
           "friend": "Arkadaş",
           "noFriend": "Arkadaş yok",
           "allFriends": "Tüm arkadaşlar",
-          "byFriend": "Rezerve eden",
+          "byFriend": "Kimin için rezerve",
           "note": "Ya da bir metin",
           "notePlaceholder": "örn. Mürettebat uçuşu, satış",
           "amount": "Miktar",
-          "of": "{{free}} boştan",
+          "of": "boş {{free}} adetten",
           "amountBad": "0 ile {{free}} arasında olmalı.",
           "quality": "Kalite yığını",
           "anyQuality": "Herhangi bir kalite",
@@ -6616,7 +6622,7 @@
           "release": "Serbest bırak",
           "handout": "Teslim edildi",
           "handoutTitle": "Teslim edildi olarak işaretlensin mi?",
-          "handoutMessage": "{{n}} depodan çıkıyor.",
+          "handoutMessage": "{{n}} adet depodan çıkıyor.",
           "newOne": "Yeni rezervasyon",
           "saveEdit": "Kaydet",
           "editFor": "{{name}} rezervasyonları"
@@ -6631,13 +6637,13 @@
           "quality": "Kalite",
           "amount": "Miktar",
           "reserved": "Rezerve",
-          "scrap": "Parçala",
+          "scrap": "Sök",
           "actions": "İşlemler"
         }
       }
     },
     "nachschub": {
-      "slotsFull": "7 Operation yuvasının hepsi dolu. Yer açmak için birini bitir veya sil.",
+      "slotsFull": "7 Operasyon slotunun hepsi dolu. Yer açmak için birini bitir veya sil.",
       "nothingPicked": "İsteklerinden en az bir eşya seç.",
       "sellGoalInvalid": "En az 1 aUEC'lik bir hedef gir.",
       "target": {
@@ -6650,12 +6656,12 @@
         },
         "lead": "Depondan {{n}} eşya",
         "where": "Nereye",
-        "new": "Yeni Operation",
-        "newSell": "Yeni Operation: para kazan",
-        "append": "\"{{name}}\" operasyonuna ekle",
+        "new": "Yeni Operasyon",
+        "newSell": "Yeni Operasyon: para kazan",
+        "append": "\"{{name}}\" Operasyonuna ekle",
         "goal": "aUEC cinsinden hedef",
         "goalPlaceholder": "örn. 1.500.000",
-        "create": "Operation oluştur",
+        "create": "Operasyon oluştur",
         "add": "Ekle",
         "sellName": "Para kazan",
         "scu": "SCU",
@@ -6667,18 +6673,18 @@
         "einsatzMany": "Teslim al"
       },
       "sellForm": {
-        "kindAria": "Operation ne için?",
+        "kindAria": "Operasyon ne için?",
         "wish": "İsteklerinden",
         "sell": "Para kazan",
         "goal": "aUEC cinsinden hedef",
         "goalPlaceholder": "örn. 1.500.000",
         "pickHint": "Depondan neyi satacağını seç.",
-        "empty": "Deponuz boş, henüz satacak bir şey yok.",
+        "empty": "Depon boş, henüz satacak bir şey yok.",
         "pick": "{{place}} konumundaki {{name}} öğesini sat"
       },
       "sell": {
         "title": "Para kazan",
-        "progress": "{{goal}} aUEC'nin {{earned}} kadarı",
+        "progress": "{{earned}} / {{goal}} aUEC",
         "reached": "Hedefe ulaşıldı",
         "earned": "Şimdiye kadar kazanılan (aUEC)",
         "save": "Kaydet",
@@ -6703,16 +6709,16 @@
       "done": {
         "created": "\"{{name}}\" oluşturuldu.",
         "undone": "Geri alındı.",
-        "reactivated": "Operation yeniden aktif.",
+        "reactivated": "Operasyon yeniden aktif.",
         "plainAdopted": "{{count}} pozisyon artık istek listende istek olarak duruyor.",
         "plainKept": "{{count}} pozisyon olduğu gibi kalıyor.",
-        "emptied": "Operation boşaltıldı.",
-        "removed": "Operation silindi.",
-        "added": "Operation'a eklendi.",
+        "emptied": "Operasyon boşaltıldı.",
+        "removed": "Operasyon silindi.",
+        "added": "Operasyona eklendi.",
         "lineRemoved": "Pozisyon kaldırıldı.",
-        "edited": "Operation kaydedildi.",
+        "edited": "Operasyon kaydedildi.",
         "wishRemoved": "{{count}} × {{name}} istek listesinden kaldırıldı.",
-        "released": "{{name}} Operation'dan çıkarıldı."
+        "released": "{{name}} Operasyondan çıkarıldı."
       },
       "rec": {
         "reason": {
@@ -6737,14 +6743,14 @@
           "buy": "Satın al"
         }
       },
-      "linesFull": "Operation'ın dolu (100 pozisyon). Önce bazı pozisyonları kaldır, sonra daha fazlasını atayabilirsin.",
-      "partial": "{{count}} pozisyon geride kaldı: Operation'ın dolu.",
+      "linesFull": "Operasyonun dolu (100 pozisyon). Önce bazı pozisyonları kaldır, sonra daha fazlasını atayabilirsin.",
+      "partial": "{{count}} pozisyon geride kaldı: Operasyonun dolu.",
       "wishlistFailed": "İstekler değiştirilemedi. Hiçbir şey taşınmadı.",
       "plainGone": "Bu pozisyonlar başka bir cihazda zaten yanıtlanmış. Görünüm yenileniyor.",
-      "wishCapped": "{{count}} adet artık dilek listene sığmıyor (girdi başına en fazla 999) ve kaybolacak.",
+      "wishCapped": "{{count}} adet artık isteklerine sığmıyor (kayıt başına en fazla 999) ve kaybolacak.",
       "gone": "Bu Operasyon artık yok (başka bir cihazda silindi). Görünüm yenileniyor.",
       "capReached": "Kayıtlı Operasyon sınırına ulaştın. Arşivden eskileri sil, sonra tekrar çalışır.",
-      "nothingFree": "Bu dileğin tüm parçaları zaten bir Operasyona atanmış.",
+      "nothingFree": "Bu isteğin tüm parçaları zaten bir Operasyona atanmış.",
       "splitInvalid": "Operasyonlara dağılım tutmuyor.",
       "dissolveFailed": "Bir Operasyon dağıtılamadı ve yerinde duruyor."
     },
@@ -6755,8 +6761,8 @@
       "overview": "Genel bakış",
       "locker": "Setler",
       "hangar": "Hangar",
-      "ops": "Görevler",
-      "spots": "Spotlar"
+      "ops": "Einsatz'lar",
+      "spots": "Noktalar"
     },
     "supplies": {
       "button": "Operasyonlar",
@@ -6777,14 +6783,14 @@
       "emptyHint": "Bir eşya ara ve bir Operasyona ata: Plan sekmesinde nereden alacağını ve oraya nasıl gideceğini görürsün.",
       "tabsAria": "Listeler",
       "tabs": {
-        "wish": "Dilekler",
+        "wish": "İstekler",
         "nachschub": "Operasyonlar"
       },
       "wish": {
-        "empty": "Bir dilek tut",
-        "emptyHint": "Bir eşya ya da gemi ara ve dilek listene ekle. Buradan tek tıkla bir Operasyona atayabilirsin.",
+        "empty": "Bir istek ekle",
+        "emptyHint": "Bir eşya ya da gemi ara ve isteklerine ekle. Buradan tek tıkla bir Operasyona atayabilirsin.",
         "toNachschub": "Bir Operasyona ata",
-        "remove": "{{name}} öğesini dileklerinden çıkar",
+        "remove": "{{name}} öğesini isteklerinden çıkar",
         "notYet": "henüz oyunda değil"
       },
       "got": "Temin edildi",
@@ -6797,36 +6803,36 @@
       }
     },
     "spots": {
-      "title": "Spotlar",
+      "title": "Noktalar",
       "subtitle": "Masaüstü uygulamasından kayıtlı yerlerin. Burada yeniden adlandırabilir veya silebilirsin; uygulama değişikliği bir sonraki senkronizasyonda alır.",
-      "loading": "Spotların yükleniyor …",
-      "empty": "Henüz spot yok. Spotlar masaüstü uygulamasında oluşturulur (Verse Navigation); senkronizasyondan sonra burada görünürler.",
+      "loading": "Noktaların yükleniyor …",
+      "empty": "Henüz nokta yok. Noktalar masaüstü uygulamasında oluşturulur (Verse Navigation); senkronizasyondan sonra burada görünürler.",
       "retry": "Tekrar dene",
-      "nameLabel": "Spot adı",
+      "nameLabel": "Nokta adı",
       "save": "Kaydet",
       "cancel": "İptal",
       "rename": "Yeniden adlandır",
       "delete": "Sil",
       "created": "{{date}} tarihinde oluşturuldu",
-      "deleteTitle": "Bu spot silinsin mi?",
+      "deleteTitle": "Bu nokta silinsin mi?",
       "deleteMessage": "\"{{name}}\" tüm cihazlarından kaldırılacak."
     },
     "ops": {
-      "title": "Görevler",
+      "title": "Einsatz'lar",
       "subtitle": "Gemi ve setinle ne yapacağını planla.",
       "soon": "Yakında",
-      "empty": "Görev planlama üzerinde çalışılıyor. Yakında gemilerin ve setlerinle görevleri burada planlayacaksın."
+      "empty": "Einsatz planlama üzerinde çalışılıyor. Yakında gemilerin ve setlerinle görevleri burada planlayacaksın."
     },
     "overview": {
       "activeShip": "Aktif gemi",
       "activeVariant": "Aktif varyant",
       "noVariant": "Fabrika donanımı",
       "activeSet": "Aktif set",
-      "nextOps": "Sonraki görevler",
+      "nextOps": "Sonraki Einsatz'lar",
       "suppliesPreview": "Operasyonlar",
-      "opsOpen": "Görevleri aç",
+      "opsOpen": "Einsatz'ları aç",
       "suppliesOpen": "Operasyonları aç",
-      "opsEmpty": "Henüz planlanmış görev yok.",
+      "opsEmpty": "Henüz planlanmış Einsatz yok.",
       "suppliesEmpty": "Temin edilecek bir şey yok.",
       "noShip": "Hangarında henüz gemi yok.",
       "noSet": "Henüz set oluşturulmadı.",
@@ -6837,9 +6843,9 @@
       "recentSets": "Son seçilen setler",
       "loadFailed": "HQ'n yüklenemedi.",
       "fleetPatch": {
-        "title": "Yama'daki filon",
+        "title": "Bu yamada filon",
         "soon": "yakında",
-        "mock": "3 geminde 4.3.1'de değişiklik oldu",
+        "mock": "4.3.1 sürümünde 3 geminde değişiklik oldu",
         "hint": "Önizleme: yakında güncel yamanın hangi gemilerine dokunduğunu burada göreceksin."
       }
     },
@@ -6877,22 +6883,22 @@
       "bestand": {
         "empty": "Henüz gemi yok",
         "emptyHint": "Gemiler, setler ve envanter.",
-        "import": "RSI hangarını al",
+        "import": "RSI hangarını getir",
         "ships": "{{n}} gemi",
         "shipsOne": "1 gemi",
         "sets": "{{n}} set",
         "setsOne": "1 set",
-        "blueprints": "{{n}} blueprint",
-        "blueprintsOne": "1 blueprint",
+        "blueprints": "{{n}} şema",
+        "blueprintsOne": "1 şema",
         "stale": "Envanter sayımı {{n}} günlük",
         "open": "Depoyu görüntüle"
       },
       "now": {
         "live": "Canlı",
         "noneHint": "Oyundan canlı durum.",
-        "last": "Son görülen: {{place}}, {{ago}}.",
-        "lastTime": "Son görülen: {{ago}}.",
-        "nextTip": "İlk planlanmış görevinin sonraki adımı.",
+        "last": "Son görülme: {{place}}, {{ago}}.",
+        "lastTime": "Son görülme: {{ago}}.",
+        "nextTip": "İlk planlanmış Einsatz'ının sonraki adımı.",
         "step": {
           "buy": "{{label}} satın al",
           "mission": "Görev: {{label}}",
@@ -6906,7 +6912,7 @@
       },
       "planen": {
         "empty": "Henüz bir şey planlanmadı",
-        "emptyHint": "Bir Operasyon bir göreve dönüşür.",
+        "emptyHint": "Bir Operasyon bir Einsatz'a dönüşür.",
         "count": "{{n}} açık",
         "needs": "Operasyonlarda {{n}}",
         "open": "Planı aç"
@@ -6938,7 +6944,7 @@
     },
     "log": {
       "undo": "Geri al",
-      "title": "Kayıt",
+      "title": "Günlük",
       "empty": "Henüz olay yok.",
       "showAll": "Tümünü göster",
       "more": "Daha fazla yükle",
@@ -6955,8 +6961,8 @@
           "accepted": "Görev kabul edildi"
         },
         "qt": {
-          "arrived": "Quantum sıçraması bitti",
-          "target": "Quantum hedefi belirlendi"
+          "arrived": "Kuantum sıçraması bitti",
+          "target": "Kuantum hedefi belirlendi"
         },
         "hangar": {
           "ready": "Hangar hazır"
@@ -6979,7 +6985,7 @@
         },
         "disconnect": "Bağlantı kesildi",
         "blueprint": {
-          "received": "Blueprint alındı: {{name}}"
+          "received": "Şema alındı: {{name}}"
         }
       }
     },
@@ -7016,7 +7022,7 @@
         "fuel": {
           "any": "Yakıt azalıyor",
           "hydrogen": "Hidrojen azalıyor",
-          "quantum": "Quantum yakıtı azalıyor"
+          "quantum": "Kuantum yakıtı azalıyor"
         },
         "hangar": "Hangar: sıra {{position}}",
         "hangarWait": "Hangar: sıra {{position}} · yaklaşık {{min}} dk",
@@ -7024,7 +7030,7 @@
       },
       "path": {
         "title": "Rotan",
-        "empty": "Aktif görev yok. Plan sekmesinden bir tane planla."
+        "empty": "Aktif Einsatz yok. Plan sekmesinden bir tane planla."
       },
       "missions": {
         "tooltip": "Oyundaki aktif görevler",
@@ -7048,29 +7054,29 @@
       "pairAria": "{{left}} veya {{right}}"
     },
     "einsatz": {
-      "single": "Görev",
-      "multi": "Görev ×{{n}}",
+      "single": "Einsatz",
+      "multi": "Einsatz ×{{n}}",
       "stepsTooltip": "{{n}} adım",
       "pick": {
-        "title": "Hangi göreve?",
+        "title": "Hangi Einsatz'a?",
         "message": "\"{{name}}\" bir görev adımı olarak eklenecek.",
-        "none": "Henüz planlanmış ya da süren bir görevin yok.",
-        "new": "Yeni görev"
+        "none": "Henüz planlanmış ya da süren bir Einsatz'ın yok.",
+        "new": "Yeni Einsatz"
       },
       "add": {
-        "action": "Görev ekle",
-        "title": "Yeni görev",
+        "action": "Einsatz ekle",
+        "title": "Yeni Einsatz",
         "confirm": "Ekle",
         "kindAria": "Ne yapıyorsun",
         "what": {
           "buy": "Ne satın alıyorsun?",
           "mission": "Ne kazanmak istiyorsun?",
           "mine": "Ne çıkarıyorsun?",
-          "pickup": "Ne topluyorsun?"
+          "pickup": "Ne teslim alıyorsun?"
         },
         "whatPh": {
           "buy": "ör. Medpen",
-          "mission": "ör. P4-AR blueprint",
+          "mission": "ör. P4-AR şeması",
           "mine": "ör. Quantanium",
           "pickup": "ör. hangardan kargo"
         },
@@ -7080,19 +7086,19 @@
         "qty": "Miktar"
       },
       "rename": {
-        "action": "\"{{name}}\" görevini yeniden adlandır",
-        "aria": "Görevin yeni adı",
+        "action": "\"{{name}}\" Einsatz'ını yeniden adlandır",
+        "aria": "Einsatz'ın yeni adı",
         "empty": "Ad boş olamaz."
       },
       "noneYet": {
-        "title": "\"{{name}}\" için henüz görev yok",
-        "hint": "Planla bölümünde pozisyonlardan görev öner veya yeni bir tane ekle."
+        "title": "\"{{name}}\" için henüz Einsatz yok",
+        "hint": "Planen bölümünde pozisyonlardan Einsatz öner veya yeni bir tane ekle."
       }
     },
     "activity": {
       "kopfgeld": "Ödül avı",
       "bunker": "Bunker",
-      "medizin": "Medikal",
+      "medizin": "Tıbbi",
       "rennen": "Yarış",
       "bergbau": "Madencilik",
       "fracht": "Kargo",
@@ -7132,16 +7138,16 @@
         "contracts": {
           "name": "Tamamlama oranı",
           "sub": "{{failed}} başarısız · {{abandoned}} yarıda bırakıldı",
-          "hint": "Tamamlanan kontratların, biten tüm kontratlara oranı.",
+          "hint": "Tamamlanan sözleşmelerin, biten tüm sözleşmelere oranı.",
           "col": "Tamamlandı",
           "col2": "Başarısız veya yarıda bırakıldı"
         },
         "deaths": {
-          "name": "Ölümler / claim'ler",
-          "sub": "Ölümler / claim'ler",
-          "hint": "Kesikli çizgi: claim'ler, düz çizgi: ölümler.",
+          "name": "Ölümler / talepler",
+          "sub": "Ölümler / talepler",
+          "hint": "Kesikli çizgi: sigorta talepleri, düz çizgi: ölümler.",
           "col": "Ölümler",
-          "col2": "Claim'ler"
+          "col2": "Talepler"
         },
         "crimestat": {
           "name": "Crimestat",
@@ -7156,10 +7162,10 @@
           "col": "İşlemler"
         },
         "blueprints": {
-          "name": "Blueprint'ler",
+          "name": "Şemalar",
           "sub": "Yeni alınan",
-          "hint": "Yeni alınan blueprint'ler.",
-          "col": "Blueprint'ler"
+          "hint": "Yeni alınan şemalar.",
+          "col": "Şemalar"
         },
         "fines": {
           "name": "Cezalar",
@@ -7171,15 +7177,15 @@
         "fuel": {
           "name": "Yakıt azaldı",
           "sub": "Uyarılar",
-          "hint": "Hidrojen veya quantum yakıtının kaç kez azaldığı.",
+          "hint": "Hidrojen veya kuantum yakıtının kaç kez azaldığı.",
           "col": "Uyarılar"
         }
       },
       "preview": {
         "stamp": "Önizleme",
         "title": "İstatistiklerin burada büyür",
-        "text": "Uygulama sen oynarken okumaya başladığında böyle görünür: aUEC, görevler, tamamlama oranı, ölümler, crimestat, rafineri, blueprint'ler, cezalar ve yakıt uyarıları. Arkadaki kutucuklar örnek verilerdir.",
-        "textLinked": "Uygulama bağlandı. Oynamaya başladığında aUEC, görevler, ölümler, crimestat, rafineri, blueprint'ler, cezalar ve yakıt uyarıları dolacak. Arkadaki kutucuklar örnek verilerdir."
+        "text": "Uygulama sen oynarken okumaya başladığında böyle görünür: aUEC, görevler, tamamlama oranı, ölümler, crimestat, rafineri, şemalar, cezalar ve yakıt uyarıları. Arkadaki kutucuklar örnek verilerdir.",
+        "textLinked": "Uygulama bağlandı. Oynamaya başladığında aUEC, görevler, ölümler, crimestat, rafineri, şemalar, cezalar ve yakıt uyarıları dolacak. Arkadaki kutucuklar örnek verilerdir."
       },
       "events": {
         "title": "Tamamlanan etkinlikler",
@@ -7243,7 +7249,7 @@
         "noMatch": "Bu filtrelere uyan bir şey yok.",
         "empty": "Envanterde henüz bir şey yok.",
         "ships": "Terminaldeki gemiler",
-        "onWishlist": "İstek listesine ekle"
+        "onWishlist": "İsteklere ekle"
       },
       "retry": "Tekrar dene",
       "destroyed": "Son yok edilme: {{at}}",
@@ -7259,8 +7265,8 @@
       },
       "earned": {
         "title": "Kazanılanlar",
-        "blueprints": "{{n}} blueprint alındı",
-        "open": "Codex'teki blueprint'ler"
+        "blueprints": "{{n}} şema alındı",
+        "open": "Codex'teki şemalar"
       },
       "age": {
         "minutes": "en son {{n}} dk. önce açıldı",
@@ -7268,7 +7274,7 @@
         "days": "en son {{n}} gün önce açıldı"
       },
       "desk": {
-        "open": "Kaydet: {{name}}",
+        "open": "Hareket kaydet: {{name}}",
         "addOne": "1 depola: {{name}}",
         "takeOne": "1 çıkar: {{name}}",
         "availShort": "{{free}} boş · {{reserved}} rezerve",
@@ -7372,7 +7378,7 @@
         "audience": "Arkadaş veya grup",
         "choose": "Bir arkadaş veya grup seç",
         "send": "Paylaş",
-        "revoke": "Geri al",
+        "revoke": "Paylaşımı kaldır",
         "done": "Paylaşıldı.",
         "duplicate": "Zaten paylaşıldı.",
         "setDone": "{{n}} arkadaşla paylaşıldı."
@@ -7480,7 +7486,7 @@
         "byApp": "Uygulama yolu algıladı; değiştirebilirsin.",
         "store": "Depoya koy",
         "isShip": "Bir gemi",
-        "toHangar": "Hangar'a eklenir.",
+        "toHangar": "Hangara eklenir.",
         "toInventory": "Envantere eklenir (konum \"Event-Belohnungen\").",
         "complete": "Tüm etkinliği tamamlandı olarak işaretle",
         "confirm": "Al"
@@ -7501,7 +7507,7 @@
         "missing": "Uygulama yok",
         "off": "Uygulama kapalı",
         "ready": "Uygulama hazır",
-        "tracking": "Takip"
+        "tracking": "Takip ediliyor"
       },
       "waiting": "Star Citizen bekleniyor",
       "last": "son görülme",
@@ -7517,18 +7523,18 @@
         "statistik": "Uygulama sen oynarken sayar: oyun süresi, oturumlar, görevler ve kayıplar. Onsuz bu sayfa boş kalır.",
         "jetztList": {
           "e1": "Konumun ve geminin, örn. \"Stanton › New Babbage\".",
-          "e2": "Planlanmış bir seferdeki sonraki adımın, örn. bir satın alma veya yolculuk.",
-          "e3": "Son olaylar, örn. \"Görev tamamlandı\" veya \"Quantum sıçraması bitti\"."
+          "e2": "Planlanmış bir Einsatz'daki sonraki adımın, örn. bir satın alma veya yolculuk.",
+          "e3": "Son olaylar, örn. \"Görev tamamlandı\" veya \"Kuantum sıçraması bitti\"."
         }
       }
     },
     "logbook": {
-      "title": "Günlük",
-      "loading": "Günlük yükleniyor …",
+      "title": "Seyir defteri",
+      "loading": "Seyir defteri yükleniyor …",
       "retry": "Tekrar dene",
       "empty": "Henüz oyun oturumu yok. SCC uygulamasını bağla, her oturum burada kart olarak görünür.",
       "emptyLinked": "Son 30 günde kaydedilmiş oyun oturumu yok.",
-      "jumps": "Quantum sıçramaları",
+      "jumps": "Kuantum sıçramaları",
       "contracts": "Sözleşmeler",
       "auec": "aUEC bilançosu",
       "losses": "Kayıplar",
@@ -7545,8 +7551,8 @@
           "other": "{{n}} yaralanma"
         },
         "medbeds": {
-          "one": "{{n}} medbed tedavisi",
-          "other": "{{n}} medbed tedavisi"
+          "one": "{{n}} tıbbi yatak tedavisi",
+          "other": "{{n}} tıbbi yatak tedavisi"
         },
         "claimRequests": {
           "one": "{{n}} sigorta talebi",
@@ -7843,21 +7849,21 @@
       },
       "cxKeybinds": {
         "title": "Tuş atamaları kontrol edildi",
-        "how": "Codex'te güncel build'in tuş atamalarına bak.",
+        "how": "Codex'te güncel sürümün tuş atamalarına bak.",
         "link": "Tuş atamalarına git"
       },
       "cxChanged": {
         "title": "Değişiklik fark edildi",
-        "how": "Bir geminin holotable'ında iki yamayı karşılaştır.",
+        "how": "Bir geminin holo masasında iki yamayı karşılaştır.",
         "link": "Karşılaştırmaya git"
       },
       "cxBlueprint": {
-        "title": "Blueprint açıldı",
-        "how": "Codex'te bir blueprint aç.",
-        "link": "Blueprint'lere git"
+        "title": "Şema açıldı",
+        "how": "Codex'te bir şema aç.",
+        "link": "Şemalara git"
       },
       "cxFps": {
-        "title": "FPS teçhizatı incelendi",
+        "title": "FPS ekipmanı incelendi",
         "how": "Codex'teki FPS silahlarına ve zırhlarına göz at.",
         "link": "FPS'e git"
       },
@@ -7869,7 +7875,7 @@
       "cxGuess": {
         "title": "Yıldız haritası tanındı",
         "how": "Yıldız haritasının şeklinin hangi yeni gemiyi gösterdiğini tanı – tek deneme.",
-        "link": "Yıldız haritasına"
+        "link": "Yıldız haritasına git"
       }
     },
     "reward": {
@@ -8016,9 +8022,9 @@
       "noTip": "Şu an yama tahmini yok – CIG başka bir yama duyurmadı.",
       "state": {
         "none": "açık",
-        "tipped": "LIVE'ı bekliyor · ayarlandı",
+        "tipped": "ayarlandı · LIVE bekleniyor",
         "hit": "isabet",
-        "miss": "ıskaladı",
+        "miss": "ıskalandı",
         "locked": "kapandı",
         "missed": "kaçırıldı"
       },
@@ -8026,27 +8032,27 @@
         "closed": "{{patch}} için tahminler kapandı",
         "tipped": "{{patch}} için tahminin: {{date}}",
         "hit": "{{date}} tarihinde isabet etti",
-        "miss": "Patch tahminin: {{date}}",
+        "miss": "Yama tahminin: {{date}}",
         "open": "{{patch}} için tahminler açık",
         "missed": "{{patch}} için tahminini kaçırdın: {{date}}"
       },
       "formerly": "eski adı {{patch}}",
       "earlier": "Önceki günler",
       "later": "Sonraki günler",
-      "dayAria": "Patch tahminini {{date}} olarak ayarla",
-      "undoToast": "{{patch}} için patch tahmini ayarlandı: {{date}}",
+      "dayAria": "Yama tahminini {{date}} olarak ayarla",
+      "undoToast": "{{patch}} için yama tahmini ayarlandı: {{date}}",
       "source": {
         "ptu": "PTU'dan tanındı",
         "eptu": "EPTU'dan tanındı",
-        "evocati": "Evocati patch notlarından tanındı",
+        "evocati": "Evocati yama notlarından tanındı",
         "derived": "türetildi"
       },
-      "splinterNote": "Her isabet bir güneş kıymığı kazandırır."
+      "splinterNote": "Her isabet bir güneş parçası kazandırır."
     },
     "guess": {
       "kind": "Tanı",
       "ruleAria": "Tanıma kuralları",
-      "rule": "Yıldız haritasının şekli, patch'in en yeni gemisinden gelir. 7 gemiden biri doğrudur. Tek denemen var: bir gemiye tıklamak tahminini yerleştirir ve birkaç saniye boyunca geri alabilirsin. Doğru bilirsen bir yıldız yanar ve isim yıldız haritasında görünür.",
+      "rule": "Yıldız haritasının şekli, yamanın en yeni gemisinden gelir. 7 gemiden biri doğrudur. Tek denemen var: bir gemiye tıklamak tahminini yerleştirir ve birkaç saniye boyunca geri alabilirsin. Doğru bilirsen bir yıldız yanar ve isim yıldız haritasında görünür.",
       "optionAria": "Tahmin et: {{name}}",
       "state": {
         "open": "açık",
@@ -8063,7 +8069,7 @@
       "foot": {
         "open": "Doğru bilirsen isim yıldız haritasında görünür ve daire onay işareti alır.",
         "wrong": "Bu sefer yıldız yok – cevap yıldız haritasında kalır.",
-        "unavailable": "Bu yıldız haritası için şu an tanınacak bir gemi belirlenmedi. Codex patch'in oyun verilerini aldığında otomatik seçilir – sonra burada tahmin edebilirsin."
+        "unavailable": "Bu yıldız haritası için şu an tanınacak bir gemi belirlenmedi. Codex yamanın oyun verilerini aldığında otomatik seçilir – sonra burada tahmin edebilirsin."
       },
       "undoToast": "Tahmin yapıldı: {{name}}"
     },
@@ -8072,20 +8078,20 @@
       "count": "Üst üste {{n}} yıldız haritası yaktın",
       "countOne": "Üst üste 1 yıldız haritası yaktın",
       "helpAria": "Seri nasıl işler?",
-      "help": "Seri, yıldız haritanı üst üste kaç patch boyunca yaktığını sayar – en az bir yıldız ya da güneşin doğmuş olmalı. En yeni yıldız haritası hâlâ sürüyor ve seriyi asla bozmaz; daha eski biri karanlık kalırsa seri baştan başlar. Yoldaki her durak bu sayıdan itibaren bir ödülün kilidini açar ve açılan kilit açık kalır (en iyi serin: {{best}}).",
-      "helpReserve": "Seri, yıldız haritanı üst üste kaç patch boyunca yaktığını sayar – en az bir yıldız ya da güneşin doğmuş olmalı. En yeni yıldız haritası hâlâ sürüyor ve seriyi asla bozmaz. Yakıt rezervin hazır: bir karanlık yıldız haritası seriyi bu sefer bozmaz. Açılan kilit açık kalır (en iyi serin: {{best}}).",
+      "help": "Seri, yıldız haritanı üst üste kaç yama boyunca yaktığını sayar – en az bir yıldız ya da güneşin doğmuş olmalı. En yeni yıldız haritası hâlâ sürüyor ve seriyi asla bozmaz; daha eski biri karanlık kalırsa seri baştan başlar. Yoldaki her durak bu sayıdan itibaren bir ödülün kilidini açar ve açılan kilit açık kalır (en iyi serin: {{best}}).",
+      "helpReserve": "Seri, yıldız haritanı üst üste kaç yama boyunca yaktığını sayar – en az bir yıldız ya da güneşin doğmuş olmalı. En yeni yıldız haritası hâlâ sürüyor ve seriyi asla bozmaz. Yakıt rezervin hazır: bir karanlık yıldız haritası seriyi bu sefer bozmaz. Açılan kilit açık kalır (en iyi serin: {{best}}).",
       "roadAria": "Seri ödülleri",
       "stopOn": "{{title}} – {{desc}} ✓ açıldı · {{at}} yakılmış yıldız haritasından itibaren",
       "stopNext": "{{title}} – {{desc}} Sıradaki · üst üste {{at}} yakılmış yıldız haritasından itibaren",
       "stopLocked": "{{title}} – {{desc}} Üst üste {{at}} yakılmış yıldız haritasından itibaren",
-      "from": "{{at}}'dan itibaren"
+      "from": "{{at}} ve üzeri"
     },
     "ladder": {
-      "aria": "Kartograph rütbeleri",
+      "aria": "Kartograf rütbeleri",
       "here": "Buradasın",
-      "current": "Kartograph rütbesi {{rank}} - rozetini aç",
-      "earned": "Kartograph rütbesi {{rank}} - kazanıldı",
-      "next": "Kartograph rütbesi {{rank}} - henüz kilitli"
+      "current": "Kartograf rütbesi {{rank}} - rozetini aç",
+      "earned": "Kartograf rütbesi {{rank}} - kazanıldı",
+      "next": "Kartograf rütbesi {{rank}} - henüz kilitli"
     },
     "rank": {
       "link": "{{name}} · rütbe sayfanı aç",
@@ -8112,13 +8118,13 @@
       "top": "En yüksek kademeye ulaşıldı. Her yeni yıldız yine de gökyüzüne katılır.",
       "perks": "Rütben, beta özelliklerine erken erişimi, içerik önerilerini ve aşağıdaki rütbe ödüllerini açar.",
       "mapOpen": "Yıldız haritanı büyük aç",
-      "mapAlt": "Yıldız haritan: patch'lerinin takımyıldızları tek bir gece gökyüzünde",
+      "mapAlt": "Yıldız haritan: yamalarının takımyıldızları tek bir gece gökyüzünde",
       "mapNone": "Yıldız haritasında ilk yıldızını yak, gökyüzün burada belirsin.",
       "mapCaption": "Yıldız haritan",
       "mapUpdates": "Çıktığın her rütbeyle kendini günceller.",
-      "downloadPhone": "Telefon duvar kâğıdı",
+      "downloadPhone": "Telefon duvar kağıdı",
       "downloadUltrawide": "Ultrawide (5120 × 1440)",
-      "downloadLocked": "Gökyüzünü duvar kâğıdı olarak indirmek için ilk yıldızını yak.",
+      "downloadLocked": "Gökyüzünü duvar kağıdı olarak indirmek için ilk yıldızını yak.",
       "ladderTitle": "Yedi kademe",
       "at": "{{n}} yıldızdan itibaren",
       "atOne": "1 yıldızdan itibaren",
@@ -8129,32 +8135,32 @@
         "locked": "henüz ulaşılmadı"
       },
       "rewardsTitle": "Rütbe ödülleri",
-      "rewardsLead": "Her kademe gökyüzüne bir şey ekler. Tüm formatlar 1. kademeden itibaren açıktır; kademeler duvar kâğıdının neyi gösterdiğini ve nasıl göründüğünü değiştirir.",
+      "rewardsLead": "Her kademe gökyüzüne bir şey ekler. Tüm formatlar 1. kademeden itibaren açıktır; kademeler duvar kağıdının neyi gösterdiğini ve nasıl göründüğünü değiştirir.",
       "rewardFrom": "{{name}} rütbesinden itibaren",
       "reward": {
         "wallpaper": {
-          "title": "Tüm formatlarda duvar kâğıdı",
-          "desc": "Gökyüzün duvar kâğıdı olarak: 4K (3840 × 2160), telefon dikey ve ultrawide (5120 × 1440)."
+          "title": "Tüm formatlarda duvar kağıdı",
+          "desc": "Gökyüzün duvar kağıdı olarak: 4K (3840 × 2160), telefon dikey ve ultrawide (5120 × 1440)."
         },
         "badge": {
           "title": "Paylaşılabilir rozet",
-          "desc": "Armaların ve en yeni yıldız haritan, arkadaşların için herkese açık bir bağlantı olarak."
+          "desc": "Arman ve en yeni yıldız haritan, arkadaşların için herkese açık bir bağlantı olarak."
         },
         "companions": {
           "title": "Yoldaşlar",
-          "desc": "Eski patch'lerinin takımyıldızları gökyüzünde yoldaş olarak hafifçe parlar."
+          "desc": "Eski yamalarının takımyıldızları gökyüzünde yoldaş olarak hafifçe parlar."
         },
         "tint": {
           "title": "Kehribar tonu",
           "desc": "Kendi takımyıldızın, parıltısı ve arkasındaki peçe sıcak bir kehribar rengine bürünür."
         },
         "frame": {
-          "title": "Etüt halkası",
+          "title": "Ölçüm halkası",
           "desc": "Armanın etrafında, göründüğü her yerde ikinci, noktalı bir halka."
         },
         "deepfield": {
           "title": "Derin alan",
-          "desc": "İndirdiğin her duvar kâğıdının arkasında bir bulutsu parlar."
+          "desc": "İndirdiğin her duvar kağıdının arkasında bir nebula parlar."
         },
         "orbit": {
           "title": "Dönen gül",
@@ -8174,7 +8180,7 @@
         },
         "navigator": {
           "name": "Navigatör",
-          "meaning": "Birkaç patch boyunca yolunu buluyorsun."
+          "meaning": "Birkaç yama boyunca yolunu buluyorsun."
         },
         "cartographer": {
           "name": "Kartograf",
@@ -8182,7 +8188,7 @@
         },
         "astrographer": {
           "name": "Astrograf",
-          "meaning": "Yaklaşık üç patch'lik yıldız: geç ödüller açılıyor."
+          "meaning": "Yaklaşık üç yamalık yıldız: geç ödüller açılıyor."
         },
         "master": {
           "name": "Usta Kartograf",
@@ -8236,8 +8242,8 @@
     "hits": "{{count}} sonuç",
     "demo": {
       "ship": "Gladius",
-      "patch": "Patch 4.10.2",
-      "item": "Lazer repeater"
+      "patch": "Yama 4.10.2",
+      "item": "Lazer tekrarlayıcı"
     },
     "filter": {
       "variants": "Varyantlar",
@@ -8251,7 +8257,7 @@
     "sectionsAria": "Alanın alt sayfaları",
     "kinds": {
       "fps": "FPS",
-      "keybinds": "Keybinds"
+      "keybinds": "Tuş atamaları"
     },
     "ctx": {
       "all": "Her yerde",
@@ -8264,7 +8270,7 @@
       "codexDetail": "{{kind}}",
       "fps": "FPS",
       "hq": "HQ'm",
-      "hqPlan": "Planla",
+      "hqPlan": "Plan",
       "hqNow": "Şimdi",
       "hqStock": "Envanter",
       "hqStats": "İstatistik",
@@ -8274,7 +8280,7 @@
     },
     "placeholder": {
       "all": "Her yerde ara …",
-      "verse": "Gemilerde, patch'lerde, haberlerde ara …",
+      "verse": "Gemilerde, yamalarda, haberlerde ara …",
       "gallery": "Galeride veya Codex'te ara …",
       "codex": "Gemiler, silahlar, bileşenler …",
       "codexIndex": "Codex'te ara …",
@@ -8282,7 +8288,7 @@
       "codexDetail": "Codex'te ara …",
       "fps": "Silahlar, zırhlar, ekipman …",
       "hq": "Hangar, setler, gemiler …",
-      "hqPlan": "Operasyonun için bir set, parça veya yer …",
+      "hqPlan": "Einsatz'ın için bir set, parça veya yer …",
       "hqNow": "Gemi, yer veya parça …",
       "hqStock": "Deponda ara …",
       "hqStats": "Gemi veya set …"
@@ -8309,23 +8315,23 @@
       "action": {
         "add": "Hangar +",
         "hangar": "Hangarda",
-        "index": "İndekste",
+        "index": "Dizinde",
         "open": "Aç"
       }
     },
     "place": {
       "news": "Haberler",
-      "patches": "Patch'ler",
+      "patches": "Yamalar",
       "gallery": "Galeri",
       "hangar": "Hangar",
       "spind": "Setler",
       "hq": "HQ genel bakış",
-      "keybinds": "Keybinds",
+      "keybinds": "Tuş atamaları",
       "upcoming": "Duyurulan gemiler",
       "settings": "Ayarlar",
       "releaseNotes": "Yenilikler",
-      "badge": "Haritacı rozeti",
-      "ops": "Operasyonlar",
+      "badge": "Kartograf rozeti",
+      "ops": "Einsatz'lar",
       "extension": "Tarayıcı eklentisi",
       "download": "İndirmeler",
       "social": "Sosyal"
@@ -8425,13 +8431,13 @@
   "search": {
     "chip": {
       "size": "Boyut {{size}}",
-      "grade": "Sınıf {{grade}}",
+      "grade": "Derece {{grade}}",
       "kind": "{{kind}}",
       "page": {
         "gallery": "Galeri",
         "fps": "FPS"
       },
-      "wished": "Dilekler",
+      "wished": "İstekler",
       "needed": "Eksikler",
       "section": {
         "weapons": "Silahlar",
@@ -8462,13 +8468,13 @@
       "add": "Ekle",
       "whereStored": "Nerede?",
       "whereInstalled": "Nerede takılı?",
-      "planOps": "Operasyon planla",
+      "planOps": "Einsatz planla",
       "sourceOf": "Nereden alınır",
       "openSet": "Seti aç",
       "fittingShips": "Uyumlu gemiler",
       "fittingWeapons": "Uyumlu silahlar",
       "mount": "Tak",
-      "toEinsatz": "Operasyona ekle"
+      "toEinsatz": "Einsatz'a ekle"
     },
     "why": {
       "ownHq": "HQ'dasın, bu yüzden en üstte",
@@ -8498,7 +8504,7 @@
       "mission": "Görevler"
     },
     "own": {
-      "ship": "geminiz",
+      "ship": "gemin",
       "fitted": "geminde takılı",
       "lager": "envanterde",
       "sets": "{{n}} sette",
@@ -8525,7 +8531,7 @@
     },
     "abbr": {
       "alias": "\"{{word}}\" şu olarak okundu",
-      "chip": "\"{{word}}\" çipe dönüştü"
+      "chip": "\"{{word}}\" filtre etiketine dönüştü"
     },
     "newInPatch": "{{version}} yamasında yeni",
     "dym": {
@@ -8533,7 +8539,7 @@
     },
     "keys": {
       "expand": "genişlet",
-      "dropChip": "son çipi kaldır"
+      "dropChip": "son filtre etiketini kaldır"
     },
     "hint": {
       "lead": "İpucu:",
@@ -8541,16 +8547,16 @@
     },
     "signIn": {
       "title": "Giriş yapılsın mı?",
-      "message": "Dilekler, envanter ve Operasyonlar hesabına aittir. Bunu kaydetmek için giriş yap.",
+      "message": "İstekler, envanter ve Operasyonlar hesabına aittir. Bunu kaydetmek için giriş yap.",
       "confirm": "Girişe git"
     },
     "done": {
       "hangar": "\"{{name}}\" hangarında",
       "compare": "\"{{name}}\" karşılaştırmada",
-      "failed": "Olmadı, birazdan tekrar dene",
+      "failed": "Bu işlem başarısız oldu, birazdan tekrar dene",
       "einsatzAdded": "\"{{name}}\" artık \"{{op}}\" içinde bir adım",
-      "einsatzNew": "Yeni operasyon \"{{name}}\" oluşturuldu",
-      "einsatzFull": "\"{{op}}\" bir operasyonun alabileceği en fazla adıma zaten sahip"
+      "einsatzNew": "Yeni Einsatz \"{{name}}\" oluşturuldu",
+      "einsatzFull": "\"{{op}}\" bir Einsatz'ın alabileceği en fazla adıma zaten sahip"
     },
     "hints": {
       "0": {
@@ -8586,19 +8592,19 @@
         "q": "bmm"
       },
       "8": {
-        "t": "\"qt\" quantum drive'ları bulur",
+        "t": "\"qt\" kuantum sürücülerini bulur",
         "q": "qt"
       },
       "9": {
-        "t": "\"pp\" power plant'leri bulur",
+        "t": "\"pp\" güç santrallerini bulur",
         "q": "pp"
       },
       "10": {
-        "t": "\"rep\" repeater'ları bulur",
+        "t": "\"rep\" tekrarlayıcıları bulur",
         "q": "rep"
       },
       "11": {
-        "t": "\"dist\" distortion silahlarını bulur",
+        "t": "\"dist\" distorsiyon silahlarını bulur",
         "q": "dist"
       },
       "12": {
@@ -8622,15 +8628,15 @@
         "q": "size 3"
       },
       "17": {
-        "t": "\"s2 qd\" boyut 2 quantum drive'ları bulur",
+        "t": "\"s2 qd\" boyut 2 kuantum sürücülerini bulur",
         "q": "s2 qd"
       },
       "18": {
-        "t": "\"grade a\" yalnızca A sınıfı parçaları gösterir",
+        "t": "\"grade a\" yalnızca A derecesindeki parçaları gösterir",
         "q": "grade a"
       },
       "19": {
-        "t": "\"stealth cooler\" stealth cooler'ları bulur",
+        "t": "\"stealth cooler\" gizlilik soğutucularını bulur",
         "q": "stealth cooler"
       },
       "20": {
@@ -8666,7 +8672,7 @@
         "q": "energy pistol"
       },
       "28": {
-        "t": "Geminin adı geminini bulur"
+        "t": "Geminin adı gemini bulur"
       },
       "29": {
         "t": "\"nighthawk\" Gladius'unu bulur"
@@ -8689,7 +8695,7 @@
         "t": "Kelimenin önüne \"inventory\" yazarsan yalnızca envanterinde ararsın"
       },
       "35": {
-        "t": "Kelimenin önüne \"wishes\" (veya \"wishlist\") yazarsan yalnızca dileklerinde ararsın. Orada olanlar her zaman önce gelir"
+        "t": "Kelimenin önüne \"wishes\" (veya \"wishlist\") yazarsan yalnızca isteklerinde ararsın. Orada olanlar her zaman önce gelir"
       },
       "36": {
         "t": "Hangarda \"patrol\" loadout'unu bulur"
@@ -8702,7 +8708,7 @@
         "t": "Kendi sonuçların her zaman en üstte"
       },
       "39": {
-        "t": "Terimin önüne \"missing\" yazarsan yalnızca Operasyonlarında arar"
+        "t": "Kelimenin önüne \"missing\" yazarsan yalnızca Operasyonlarında ararsın"
       },
       "40": {
         "t": "Arama, onu nereden açtığını hatırlar"
@@ -8711,13 +8717,13 @@
         "t": "Bir gemi sayfasında nelerin uyduğunu gösterir"
       },
       "42": {
-        "t": "▾ olan çipler değiştirilebilir"
+        "t": "▾ olan filtre etiketleri değiştirilebilir"
       },
       "43": {
-        "t": "Alanın başındaki ⌫ son çipi kaldırır"
+        "t": "Alanın başındaki ⌫ son filtre etiketini kaldırır"
       },
       "44": {
-        "t": "Çipin dışındaki neredeyse tam eşleşmeler yine de görünür"
+        "t": "Filtre etiketinin dışındaki neredeyse tam eşleşmeler yine de görünür"
       },
       "45": {
         "t": "Bir silah sayfasında: \"s4\" alternatifleri gösterir",
@@ -8728,14 +8734,14 @@
         "q": "laser"
       },
       "47": {
-        "t": "Görev planlamada, şeylerin nereden alınacağını gösterir"
+        "t": "Einsatz planlamasında neyin nereden alınacağını gösterir"
       },
       "48": {
         "t": "\"fits\" yalnızca uyan parçaları gösterir",
         "q": "fits"
       },
       "49": {
-        "t": "Bir çip filtreler, sıralama sayfayı izler"
+        "t": "Bir filtre etiketi filtreler, sıralama sayfayı izler"
       },
       "50": {
         "t": "\"bounty mission\" ödül avı görevlerini bulur",
@@ -8782,7 +8788,7 @@
         "q": "medpen"
       },
       "61": {
-        "t": "\"keybind quantum\" quantum tuşunu gösterir",
+        "t": "\"keybind quantum\" kuantum tuşunu gösterir",
         "q": "keybind quantum"
       },
       "62": {
@@ -8830,12 +8836,12 @@
       "groupNotFound": "Bu grup artık yok.",
       "groupLimit": "En fazla 50 gruba ulaştın.",
       "groupFull": "Bu grup 100 arkadaşla dolu.",
-      "einsatzNotFound": "Bu görev artık mevcut değil.",
-      "einsatzClosed": "Bu görev tamamlandı ve artık yanıt almıyor.",
+      "einsatzNotFound": "Bu Einsatz artık mevcut değil.",
+      "einsatzClosed": "Bu Einsatz tamamlandı ve artık yanıt almıyor.",
       "configNotFound": "Bu gemi varyantı artık yok.",
       "loadoutNotFound": "Bu set artık yok.",
       "shareNotFound": "Bu paylaşım artık yok.",
-      "tooManySlots": "Bir görevde en fazla 12 mürettebat yeri olabilir.",
+      "tooManySlots": "Bir Einsatz'da en fazla 12 mürettebat yeri olabilir.",
       "invalidSlotLabel": "Bir yer etiketi 1 ile 40 karakter arasında olmalı.",
       "slotNotFound": "Bu mürettebat yeri artık yok.",
       "slotTaken": "Bu mürettebat yeri zaten dolu.",
@@ -8855,16 +8861,16 @@
     "compare": {
       "ships": "Gemiler",
       "sets": "Setler",
-      "einsaetze_planned": "Planlanan görevler",
-      "einsaetze_done": "Tamamlanan görevler",
+      "einsaetze_planned": "Planlanan Einsatz'lar",
+      "einsaetze_done": "Tamamlanan Einsatz'lar",
       "missions_30d": "Görevler (30 gün)",
-      "kartograph_rank": "Kartograph rütbesi",
+      "kartograph_rank": "Kartograf rütbesi",
       "active_days_30": "Aktif günler (30 gün)"
     },
     "group": {
       "kind": {
         "org": "Org",
-        "einsatzgruppe": "Görev grubu"
+        "einsatzgruppe": "Einsatz grubu"
       }
     },
     "visibility": {
@@ -8881,7 +8887,7 @@
         "hangar": "Gemilerin (istekler dahil), notlar ve yapılandırmalar olmadan.",
         "flagship": "Hangarının en üstüne sabitlediğin gemi.",
         "presence": "Şu an çevrimiçi olup olmadığın. Hiçbir zaman kesin bir zaman değil.",
-        "stats": "Gemi, set, görev, aktif gün ve Kartograph rütbesi gibi sayılar."
+        "stats": "Gemi, set, Einsatz, aktif gün ve Kartograf rütbesi gibi sayılar."
       },
       "perFriend": "Arkadaş başına",
       "perFriendHint": "Bir arkadaş seç ve diğerlerinden farklı bir şey görüp görmeyeceğine karar ver.",
@@ -8896,7 +8902,7 @@
     },
     "teams": {
       "title": "Gruplar",
-      "hint": "Gruba yukarıdaki özel arkadaş listelerinin aksine bir davet koduyla katılınır. Üyeler birbirlerinin adını, kullanıcı adını ve rolünü, ayrıca grupla paylaştığın görevleri (mürettebat yerleri ve sayılarıyla) görür. Başka hiçbir şey yok: hangar, çevrimiçi durumu ya da arkadaş listesi yok.",
+      "hint": "Gruba yukarıdaki özel arkadaş listelerinin aksine bir davet koduyla katılınır. Üyeler birbirlerinin adını, kullanıcı adını ve rolünü, ayrıca grupla paylaştığın Einsatz'ları (mürettebat yerleri ve sayılarıyla) görür. Başka hiçbir şey yok: hangar, çevrimiçi durumu ya da arkadaş listesi yok.",
       "namePlaceholder": "Yeni grubun adı",
       "create": "Grup oluştur",
       "codePlaceholder": "Davet kodu",
@@ -8914,13 +8920,13 @@
       "rotateMessage": "\"{{name}}\" için eski kod hemen çalışmaz hale gelir. Gruptakiler kalır.",
       "leave": "Ayrıl",
       "leaveTitle": "Bu gruptan ayrılınsın mı?",
-      "leaveMessage": "\"{{name}}\" grubundan ayrılırsın ve orada paylaşılan görevleri artık görmezsin. Kendi görevlerin silinmez.",
+      "leaveMessage": "\"{{name}}\" grubundan ayrılırsın ve orada paylaşılan Einsatz'ları artık görmezsin. Kendi Einsatz'ların silinmez.",
       "delete": "Grubu sil",
       "deleteTitle": "Bu grup silinsin mi?",
-      "deleteMessage": "\"{{name}}\" tüm üyeler için silinir. Görevler sahiplerinde kalır, yalnızca paylaşım sona erer.",
+      "deleteMessage": "\"{{name}}\" tüm üyeler için silinir. Einsatz'lar sahiplerinde kalır, yalnızca paylaşım sona erer.",
       "removeMember": "Kaldır",
       "removeTitle": "Bu üye kaldırılsın mı?",
-      "removeMessage": "{{name}}, \"{{group}}\" grubuna ve orada paylaşılan görevlere erişimini kaybeder.",
+      "removeMessage": "{{name}}, \"{{group}}\" grubuna ve orada paylaşılan Einsatz'lara erişimini kaybeder.",
       "makeAdmin": "Admin yap",
       "makeMember": "Üye yap",
       "makeOwner": "Sahip yap",
@@ -8931,22 +8937,22 @@
       }
     },
     "einsatz": {
-      "title": "Paylaşılan görev",
+      "title": "Paylaşılan Einsatz",
       "audienceFriend": "Bir arkadaş",
       "audienceGroup": "Bir grup",
       "pickAudience": "Bir arkadaşı ya da grubu davet et",
       "pickGroup": "Grup seç",
-      "hint": "Ortak hedefin olarak bir arkadaşını görevlerinden birine davet et. Adımları görür, yanıtlar ve bir mürettebat yeri alır. Ayrı bir hedef yok: görevin kendisi plandır.",
-      "mine": "Görevime davet et",
-      "withMe": "Benimle paylaşılan görevler",
-      "noneOwn": "Önce HQ'da bir görev planla, sonra burada bir arkadaşını davet edebilirsin.",
-      "noFriends": "Arkadaşların olunca onları burada bir göreve davet edebilirsin.",
-      "noneShared": "Henüz hiçbir arkadaş seninle görev paylaşmadı.",
-      "pickEinsatz": "Görev",
+      "hint": "Ortak hedefin olarak bir arkadaşını Einsatz'larından birine davet et. Adımları görür, yanıtlar ve bir mürettebat yeri alır. Ayrı bir hedef yok: Einsatz'ın kendisi plandır.",
+      "mine": "Einsatz'ıma davet et",
+      "withMe": "Benimle paylaşılan Einsatz'lar",
+      "noneOwn": "Önce HQ'da bir Einsatz planla, sonra burada bir arkadaşını davet edebilirsin.",
+      "noFriends": "Arkadaşların olunca onları burada bir Einsatz'a davet edebilirsin.",
+      "noneShared": "Henüz hiçbir arkadaş seninle Einsatz paylaşmadı.",
+      "pickEinsatz": "Einsatz",
       "pickFriend": "Arkadaş",
       "invite": "Davet et",
       "invited": "Arkadaş davet edildi.",
-      "already": "Bu arkadaş zaten bu görevin parçası.",
+      "already": "Bu arkadaş zaten bu Einsatz'ın parçası.",
       "slotsLabel": "Mürettebat yerleri, virgülle ayır (en fazla {{max}})",
       "slotsSave": "Yerleri kaydet",
       "crew": "Mürettebat",
@@ -8993,11 +8999,11 @@
     "groups": {
       "title": "Gruplar",
       "privateNote": "Gruplar özeldir. Arkadaşların ne grupları ne de hangisinde olduklarını görür. Bir arkadaş birden fazla grupta olabilir.",
-      "shareNote": "Bir gruba katılan, o grupla paylaştığını (görevler, gemi varyantları) alır. Kaldırılan ya da grup silindiğinde erişimini kaybeder. Bir grupla paylaştığın set yalnızca bugünkü üyelere gider.",
+      "shareNote": "Bir gruba katılan, o grupla paylaştığını (Einsatz'lar, gemi varyantları) alır. Kaldırılan ya da grup silindiğinde erişimini kaybeder. Bir grupla paylaştığın set yalnızca bugünkü üyelere gider.",
       "kindLabel": "Grup türü",
       "namePlaceholder": "Grubun adı",
       "create": "Grup oluştur",
-      "empty": "Henüz grup yok. Arkadaşları düzenlemek için bir Org ya da görev grubu oluştur.",
+      "empty": "Henüz grup yok. Arkadaşları düzenlemek için bir Org ya da Einsatz grubu oluştur.",
       "noFriends": "Ekleyebileceğin arkadaşın henüz yok.",
       "members": "Üyeler",
       "rename": "Yeniden adlandır",
@@ -9040,7 +9046,7 @@
       "wishlist": "İstekler",
       "kindSet": "Set",
       "kindVariant": "Varyant",
-      "kindEinsatz": "Görev",
+      "kindEinsatz": "Einsatz",
       "removeTitle": "{{name}} arkadaşlıktan çıkarılsın mı?",
       "removeMessage": "Birbirinizle paylaştığınız her şey bundan sonra görünmez olur.",
       "blockTitle": "{{name}} engellensin mi?",
@@ -9050,7 +9056,7 @@
       "title": "Davet",
       "loading": "Davet kontrol ediliyor …",
       "dead": "Bu davet bağlantısı artık geçerli değil. Yenisini iste.",
-      "toSocial": "Social'a git",
+      "toSocial": "Sosyal sayfasına git",
       "from": "{{name}} seni arkadaş olmaya davet ediyor.",
       "fromAnon": "Arkadaş olmaya davet edildin.",
       "hint": "Devam edersen bu kişiye arkadaşlık isteği gider ve kişinin yine de kabul etmesi gerekir.",
@@ -9074,18 +9080,18 @@
       "undone": "Geri alındı",
       "inventarOff": "\"{{name}}\" envanterinden çıktı",
       "inventarWithMe": "\"{{name}}\" artık sende",
-      "inventarBlueprint": "\"{{name}}\" planı toplandı",
+      "inventarBlueprint": "\"{{name}}\" şeması toplandı",
       "hangarOff": "\"{{name}}\" hangarından çıktı",
       "hangarCopy": "Hangarında artık {{n}}× \"{{name}}\" var",
       "ownWish": "“{{name}}” geldi",
-      "ownWishDetail": "Dileğin gerçek oldu",
+      "ownWishDetail": "İsteğin gerçekleşti",
       "ownWishLeft": "“{{name}}” geldi",
-      "ownWishLeftDetail": "Bir dilek gerçek oldu, {{left}} tane daha kaldı"
+      "ownWishLeftDetail": "Bir isteğin gerçekleşti, {{left}} tane daha kaldı"
     },
     "err": {
-      "failed": "İşe yaramadı. Tekrar dene.",
+      "failed": "Bu işlem başarısız oldu. Tekrar dene.",
       "unavailable": "Burada böyle bir adım yok.",
-      "wishAssigned": "Bu parçalar bir Operation'a atanmış. Onları diyalog üzerinden kaldır."
+      "wishAssigned": "Bu parçalar bir Operasyona atanmış. Onları diyalog üzerinden kaldır."
     },
     "hint": {
       "notYetInGame": "henüz oyunda değil"
@@ -9117,7 +9123,7 @@
     }
   },
   "wishRemoval": {
-    "title": "{{name}} kaldır",
+    "title": "Kaldır: {{name}}",
     "howMany": "Kaç tane kaldırılsın?",
     "caption": "Bu {{n}} parça gidiyor:",
     "captionOne": "Bu parça gidiyor:",
@@ -9129,16 +9135,16 @@
     "rowLabel": "“{{name}}” içindeki parçalar",
     "sum": "{{total}} içinden {{done}} dağıtıldı",
     "keeps": "“{{name}}” diğer isteklerini koruyor.",
-    "lastStays": "“{{name}}” sonrasında hiç istek kalmıyor. {{n}} Görevi duruyor.",
-    "lastStaysOne": "“{{name}}” sonrasında hiç istek kalmıyor. Görevi duruyor.",
-    "dissolves": "“{{name}}” içinde Görev yok ve onunla birlikte dağıtılıyor.",
-    "alsoDissolve": "Operation'ı da dağıt",
-    "alsoDissolveNamed": "“{{name}}” Operation'ını da dağıt",
+    "lastStays": "“{{name}}” için sonrasında hiç istek kalmıyor. {{n}} Einsatz'ı duruyor.",
+    "lastStaysOne": "“{{name}}” için sonrasında hiç istek kalmıyor. Einsatz'ı duruyor.",
+    "dissolves": "“{{name}}” içinde Einsatz yok ve onunla birlikte dağıtılıyor.",
+    "alsoDissolve": "Operasyonu da dağıt",
+    "alsoDissolveNamed": "“{{name}}” Operasyonunu da dağıt",
     "confirm": "{{n}} kaldır",
     "confirmDissolve": "Kaldır ve dağıt",
-    "toastDissolved": "Operation da onunla birlikte dağıtıldı.",
+    "toastDissolved": "Operasyon da onunla birlikte dağıtıldı.",
     "release": {
-      "title": "{{name}} Operation'dan çıkarılsın mı?",
+      "title": "{{name}} Operasyondan çıkarılsın mı?",
       "text": "{{n}} parça istek listende kalır ve yeniden boşta olur.",
       "textOne": "Parça istek listende kalır ve yeniden boşta olur.",
       "confirm": "Çıkar",
@@ -9151,9 +9157,9 @@
     "summaryOne": "1 istek · 1 grup",
     "summaryOneGroup": "{{n}} istek · 1 grup",
     "close": "Kapat",
-    "empty": "Bir dilek tut",
+    "empty": "Bir istek ekle",
     "emptyHint": "Her akan yıldız bir dilek. İlkini seç.",
-    "emptyAction": "Dilek bul",
+    "emptyAction": "İstek bul",
     "group": {
       "weapons": "Silahlar",
       "armor": "Zırh",
@@ -9175,7 +9181,7 @@
     "removedGroup": "{{name}} kaldırıldı ({{n}} istek)",
     "selected": "seçildi",
     "clear": "Tüm seçimi kaldır",
-    "toNachschub": "Bir Operation'a",
+    "toNachschub": "Bir Operasyona",
     "kind": {
       "ship": "Gemi",
       "vehicle": "Araç",
@@ -9183,18 +9189,18 @@
       "weapon": "Silah",
       "component": "Bileşen",
       "item": "Eşya",
-      "blueprint": "Plan",
+      "blueprint": "Şema",
       "material": "Hammadde",
       "ammunition": "Mühimmat"
     },
     "suggest": {
       "title": "Bununla uyumlu",
       "count": "{{n}} öneri",
-      "add": "isteklerine",
+      "add": "İsteklere ekle",
       "dismiss": "{{name}} önerilmesin"
     },
-    "slotsFullHint": "7 Operation yuvasının hepsi dolu. Seçim mevcut bir Operation'a gider.",
-    "toExisting": "Mevcut bir Operation'a",
+    "slotsFullHint": "7 Operasyon slotunun hepsi dolu. Seçim mevcut bir Operasyona gider.",
+    "toExisting": "Mevcut bir Operasyona",
     "open": "“{{name}}” Codex'te aç"
   },
   "pathCtl": {
@@ -9249,26 +9255,26 @@
     "otherPlace": "Başka yer …",
     "otherPlaceholder": "Bir yer gir",
     "store": "Bırak",
-    "wishAssigned": "Bunların {{n}} tanesi bir Operation'a atanmış",
+    "wishAssigned": "Bunların {{n}} tanesi bir Operasyona atanmış",
     "assign": {
       "go": "Ata",
-      "title": "Bir Operation'a ata",
+      "title": "Bir Operasyona ata",
       "howMany": "Kaç tane?",
       "ofWished": "istenen {{n}} içinden",
       "ofFree": "boştaki {{n}} içinden",
       "newest": "en son oluşturulan",
-      "new": "Yeni Operation",
+      "new": "Yeni Operasyon",
       "newHint": "Bir ad önerilir",
-      "loading": "Operation'lar yükleniyor …",
+      "loading": "Operasyonlar yükleniyor …",
       "working": "Atanıyor …",
-      "slots": "{{max}} yuvadan {{used}} tanesi dolu",
-      "planHint": "Görevleri planlayan sensin",
+      "slots": "{{max}} slottan {{used}} tanesi dolu",
+      "planHint": "Einsatz'ları sen planlarsın",
       "inHq": "HQ'da",
-      "progress": "{{total}} Görevden {{done}} tanesi",
-      "noEinsatz": "Henüz planlanmış Görev yok",
-      "line": "“{{name}}” Operation'ında {{n}}",
-      "moreOne": "+1 Operation daha",
-      "more": "+{{n}} Operation daha"
+      "progress": "{{total}} Einsatz'dan {{done}} tanesi",
+      "noEinsatz": "Henüz planlanmış Einsatz yok",
+      "line": "“{{name}}” Operasyonunda {{n}}",
+      "moreOne": "+1 Operasyon daha",
+      "more": "+{{n}} Operasyon daha"
     },
     "own": {
       "morePlacesOne": "+1 yer daha",
@@ -9285,7 +9291,7 @@
     "noSilhouette": "siluet yok",
     "noSilhouetteReason": "Bu sürümde bu eşya için siluet yok; yerine önizleme görseli gösteriliyor.",
     "no3dReason": "Bu sürümde bu eşyanın 3D modeli yok.",
-    "inNachschub": "“{{name}}” Operation'ının parçası",
+    "inNachschub": "“{{name}}” Operasyonunun parçası",
     "panelAria": "Değerler ve bilgiler",
     "tabsAria": "Bölümler",
     "tab": {
@@ -9295,16 +9301,16 @@
     }
   },
   "sammlungStrip": {
-    "title": "Toplandı",
+    "title": "Toplananlar",
     "all": "Tüm koleksiyon",
     "more": "Koleksiyonda {{n}} tane daha",
     "newsAria": "Toplanan haberler",
-    "galleryAria": "Toplanan duvar kâğıtları",
+    "galleryAria": "Toplanan duvar kağıtları",
     "votedHint": "Oylanan duvar kağıtları toplanmış sayılır."
   },
   "blueprintWish": {
     "craftTimes": "Kaç kez üretilecek",
-    "button": "Malzeme ×{{n}} isteklerine",
+    "button": "Malzeme ×{{n}} isteklere ekle",
     "done": "{{n}}× {{name}}: malzeme isteklerine eklendi"
   },
   "adminEvents": {
@@ -9372,7 +9378,7 @@
       "beta": "Beta özellikleri"
     },
     "view": {
-      "toHolo": "Holotable'a geç",
+      "toHolo": "Holo masaya geç",
       "toClassic": "Klasik görünüme geç"
     },
     "share": {

@@ -270,10 +270,10 @@
       "remove": "격납고에서 제거"
     },
     "title": "Codex",
-    "subtitle": "모든 함선, 무기, 부품, 아이템, 탄약, 제조사를 검색할 수 있어요. 라이브 빌드에서 추출한 데이터예요.",
+    "subtitle": "모든 함선, 무기, 컴포넌트, 아이템, 탄약, 제조사를 검색할 수 있어요. 라이브 빌드에서 추출한 데이터예요.",
     "landing": {
       "hero": {
-        "eyebrow": "{{category}} · {{patch}}에서 신규",
+        "eyebrow": "{{category}} · {{patch}} 신규",
         "eyebrowPatch": "{{category}} · {{patch}}",
         "title": "모든 함선의 모든 것.",
         "eyebrowIdle": "Codex"
@@ -300,7 +300,7 @@
         "armor": "방어구",
         "weapons": "무기",
         "ships": "함선",
-        "components": "부품"
+        "components": "컴포넌트"
       },
       "status": {
         "patch": "패치 {{patch}}",
@@ -315,8 +315,8 @@
         "noData": "데이터 없음",
         "backToCurrent": "현재 패치로 돌아가기",
         "loading": "패치 불러오는 중 …",
-        "empty": "더 이상 알려진 패치가 없습니다.",
-        "note": "데이터가 없는 패치는 열 수 없어요. 페이지를 새로고침하면 현재 패치로 돌아갑니다.",
+        "empty": "더 알려진 패치가 없어요.",
+        "note": "데이터가 없는 패치는 열 수 없어요. 페이지를 새로고침하면 현재 패치로 돌아가요.",
         "liveMoved": "카탈로그가 패치 {{patch}}(으)로 업데이트되었어요.",
         "liveMovedDismiss": "알림 닫기"
       },
@@ -330,7 +330,7 @@
         "uncommissioned": "미취역"
       },
       "fleet": {
-        "empty": "아직 소유한 기체가 없어요."
+        "empty": "아직 등록한 함선이 없어요."
       },
       "diff": {
         "scm": "SCM",
@@ -341,7 +341,7 @@
       "paperdoll": {
         "aria": "6개의 방어구 슬롯이 표시된 도식 인물",
         "helmet": "헬멧",
-        "torso": "상의",
+        "torso": "상체",
         "arms": "팔",
         "legs": "다리",
         "undersuit": "언더슈트",
@@ -362,12 +362,12 @@
       },
       "cta": {
         "setupHangar": "내 격납고 설정하기",
-        "searchShip": "Codex에서 기체 검색",
+        "searchShip": "Codex에서 함선 검색",
         "createSet": "FPS 세트 만들기"
       },
       "news": {
         "button": "뉴스",
-        "open": "패치 요약 {{patch}} 열기",
+        "open": "{{patch}} 패치 요약 열기",
         "unread": "새 요약",
         "title": "{{patch}}의 변경 사항",
         "notes": "CIG의 패치 노트",
@@ -385,7 +385,7 @@
         "announced": "발표됨"
       },
       "category": {
-        "ship": "기체",
+        "ship": "함선",
         "fpsWeapon": "FPS 무기",
         "armor": "방어구",
         "component": "컴포넌트",
@@ -408,7 +408,7 @@
         "loadout": {
           "weapons": "무기",
           "shield": "실드",
-          "quantum": "Quantum Drive",
+          "quantum": "퀀텀 드라이브",
           "power": "전력 (세그먼트)",
           "cooler": "냉각 (초당)"
         }
@@ -419,13 +419,13 @@
         "manufacturer": "제조사",
         "type": "유형",
         "part": "부위",
-        "class": "등급"
+        "class": "클래스"
       },
       "rail": {
         "keybinds": "키 설정"
       },
       "categories": {
-        "ship": "기체",
+        "ship": "함선",
         "fpsWeapon": "FPS 무기",
         "armor": "방어구",
         "component": "컴포넌트",
@@ -433,11 +433,11 @@
       },
       "claims": {
         "ship": {
-          "count": "{{patch}}의 신규 기체 {{count}}종",
+          "count": "{{patch}}의 신규 함선 {{count}}종",
           "name": "{{name}} 비행 준비 완료.",
-          "announced": "기체 {{announced}}종 발표, {{count}}종 비행 준비 완료.",
-          "s1": "모든 기체의 모든 것.",
-          "s2": "어떤 기체가 나에게 맞을까요?",
+          "announced": "함선 {{announced}}종 발표, {{count}}종 비행 준비 완료.",
+          "s1": "모든 함선의 모든 것.",
+          "s2": "어떤 함선이 나에게 맞을까요?",
           "s3": "모든 선체, 모든 수치, 모든 도색.",
           "s4": "먼저 비교하고, 그다음 비행하세요."
         },
@@ -466,7 +466,7 @@
           "s1": "모든 컴포넌트, 모든 크기.",
           "s2": "실드, 쿨러, 발전기를 비교하세요.",
           "s3": "더 나은 부품을 찾아보세요.",
-          "s4": "목적에 맞게 기체를 개조하세요."
+          "s4": "목적에 맞게 함선을 개조하세요."
         },
         "tool": {
           "count": "{{patch}}의 신규 도구 {{count}}종",
@@ -486,7 +486,7 @@
       },
       "paints": {
         "label": "도색",
-        "show": "도색 {{name}} 보기",
+        "show": "{{name}} 도색 보기",
         "all": "도색 {{count}}종 모두 보기",
         "fewer": "접기",
         "isNew": "신규",
@@ -506,9 +506,9 @@
         "zone": "≈ 구역"
       },
       "compare": {
-        "delta": "등급 대비 {{delta}} %",
-        "top": "등급 최상위",
-        "avg": "등급 평균 {{avg}}"
+        "delta": "동급 대비 {{delta}} %",
+        "top": "동급 최상위",
+        "avg": "동급 평균 {{avg}}"
       },
       "codex": {
         "label": "Codex: 이번 패치 신규",
@@ -533,27 +533,27 @@
       "title": "Codex — 인덱스 모드"
     },
     "upcoming": {
-      "subtitle": "RSI 기체 매트릭스에 발표되었지만 아직 데이터마이닝한 게임 데이터에는 없는 기체예요. RSI가 게시한 목록과 라이브 빌드에 있는 내용의 차이입니다.",
-      "conceptTitle": "개발 중",
-      "conceptSub": "RSI가 아직 제작 중이며 아직 비행할 수 없어요",
+      "subtitle": "RSI Ship Matrix에 발표되었지만 아직 데이터마이닝한 게임 데이터에는 없는 함선이에요. RSI가 게시한 목록과 라이브 빌드에 있는 내용의 차이예요.",
+      "conceptTitle": "콘셉트 단계",
+      "conceptSub": "RSI가 아직 제작 중이라 비행할 수 없어요",
       "flightReadyTitle": "RSI에서 비행 준비 완료",
       "flightReadySub": "RSI는 비행 준비 완료로 표시했지만 게임 데이터에는 아직 일치하는 항목이 없어요",
       "status": {
-        "concept": "개발 중",
+        "concept": "콘셉트 단계",
         "flightReady": "비행 준비 완료"
       },
       "empty": {
         "title": "예정된 항목 없음",
-        "body": "RSI에 게시된 모든 기체가 이미 게임 데이터에 있어요. 표시할 차이가 없습니다."
+        "body": "RSI에 게시된 모든 함선이 이미 게임 데이터에 있어요. 표시할 차이가 없어요."
       },
-      "searchPlaceholder": "기체, 제조사, 역할 검색…",
-      "searchAria": "예정 기체 검색",
+      "searchPlaceholder": "함선, 제조사, 역할 검색…",
+      "searchAria": "예정 함선 검색",
       "searchClear": "검색어 지우기",
       "newBadge": "신규",
       "badge": "발표됨",
       "noMatches": {
         "title": "일치하는 항목 없음",
-        "body": "검색어와 필터에 맞는 예정 기체가 없어요. 검색어를 줄이거나 필터를 해제해 보세요."
+        "body": "검색어와 필터에 맞는 예정 함선이 없어요. 검색어를 줄이거나 필터를 해제해 보세요."
       },
       "role": {
         "combat": "전투",
@@ -571,12 +571,12 @@
         "medical": "의료",
         "refueling": "급유",
         "repair": "수리",
-        "heavy_repair": "중형 수리",
+        "heavy_repair": "대형 수리",
         "passenger": "승객",
         "cargo": "화물",
-        "heavy_fighter": "중형 전투기",
+        "heavy_fighter": "대형 전투기",
         "medium_fighter": "중형 전투기",
-        "light_fighter": "경형 전투기",
+        "light_fighter": "소형 전투기",
         "bomber": "폭격기",
         "gunship": "건십",
         "racing": "레이싱",
@@ -593,7 +593,7 @@
       }
     },
     "upcomingDetail": {
-      "facts": "RSI 기체 매트릭스에서",
+      "facts": "RSI Ship Matrix 정보",
       "fact": {
         "manufacturer": "제조사",
         "type": "유형",
@@ -601,23 +601,23 @@
         "status": "상태"
       },
       "notice": {
-        "concept": "RSI가 이 기체를 발표했지만 아직 제작 중이며, 게임에서는 비행할 수 없어요. 그래서 하드포인트, 컴포넌트, 수치가 없습니다.",
-        "flightReady": "RSI는 이 기체를 비행 준비 완료로 표시하지만, 데이터마이닝한 게임 데이터에는 아직 없어요. 수치는 다음 빌드 업로드 중 하나와 함께 반영됩니다."
+        "concept": "RSI가 이 함선을 발표했지만 아직 제작 중이라 게임에서는 비행할 수 없어요. 그래서 하드포인트, 컴포넌트, 수치가 없어요.",
+        "flightReady": "RSI는 이 함선을 비행 준비 완료로 표시하지만, 데이터마이닝한 게임 데이터에는 아직 없어요. 수치는 다음 빌드 업로드 중 하나와 함께 반영돼요."
       },
       "rsiLink": "robertsspaceindustries.com에서 보기",
       "noData": {
         "title": "왜 수치가 없나요?",
-        "body": "Codex는 라이브 빌드의 데이터로 만들어져요. 이 기체가 게임에 없는 동안은 추출할 데이터가 없고, 추가되면 자동으로 전체 Codex 항목이 생성됩니다.",
-        "browse": "발표된 모든 기체"
+        "body": "Codex는 라이브 빌드의 데이터로 만들어져요. 이 함선이 게임에 없는 동안은 추출할 데이터가 없고, 추가되면 자동으로 전체 Codex 항목이 생성돼요.",
+        "browse": "발표된 모든 함선"
       },
       "notFound": {
-        "title": "발표된 기체를 찾을 수 없어요",
-        "body": "이 기체는 더 이상 RSI 기체 매트릭스에 없어요. 게임에 출시되어 정식 Codex 항목이 생겼거나, RSI가 목록에서 삭제했을 수 있습니다."
+        "title": "발표된 함선을 찾을 수 없어요",
+        "body": "이 함선은 더 이상 RSI Ship Matrix에 없어요. 게임에 출시되어 정식 Codex 항목이 생겼거나, RSI가 목록에서 삭제했을 수 있어요."
       }
     },
     "categoriesAria": "Codex 카테고리",
-    "soon": "곧 제공됩니다 — 아직 추출된 데이터가 없어요.",
-    "soonShort": "곧 출시",
+    "soon": "곧 제공돼요 — 아직 추출된 데이터가 없어요.",
+    "soonShort": "곧 제공",
     "status": {
       "extracted": "추출됨",
       "tool": "추출기",
@@ -635,8 +635,8 @@
       "alsoIn": "다른 곳에서도 발견됨:",
       "upcomingLink": "출시 예정 함선에서 보기",
       "bar": {
-        "label": "코덱스 검색",
-        "placeholder": "코덱스 검색 — 함선, 부품, 무기, 장비, 제조사 …",
+        "label": "Codex 검색",
+        "placeholder": "Codex 검색 — 함선, 컴포넌트, 무기, 장비, 제조사 …",
         "clear": "검색어 지우기",
         "shortcut": "Ctrl K",
         "suggestionsAria": "추천 검색어",
@@ -647,7 +647,7 @@
         "areas": "영역",
         "failed": "검색에 실패했어요",
         "partial": "일부 영역은 검색할 수 없었어요",
-        "searching": "코덱스 검색 중 …",
+        "searching": "Codex 검색 중 …",
         "empty": "“{{term}}”에 대한 결과가 없어요.",
         "allInIndex": "인덱스의 전체 {{n}}개",
         "allUpcoming": "출시 예정 함선의 전체 {{n}}개",
@@ -656,7 +656,7 @@
         "foldedOne": "변형 1개 통합됨",
         "foldedAtLeastOne": "변형 최소 1개 통합됨",
         "grade": "{{grade}}등급",
-        "livery": "리버리",
+        "livery": "도색",
         "upcomingBadge": "아직 게임에 없음",
         "pinAria": "{{name}} 비교",
         "keys": {
@@ -668,7 +668,7 @@
         },
         "category": {
           "ships": "함선",
-          "components": "부품",
+          "components": "컴포넌트",
           "shipWeapons": "함선 무기",
           "fps": "FPS 장비",
           "upcoming": "출시 예정 함선",
@@ -677,14 +677,14 @@
         "close": "검색 닫기"
       },
       "trigger": {
-        "label": "코덱스 전체 검색",
-        "tooltip": "코덱스 전체 검색 (Ctrl+K)"
+        "label": "Codex 전체 검색",
+        "tooltip": "Codex 전체 검색 (Ctrl+K)"
       }
     },
     "kinds": {
       "ship": "함선",
       "weapon": "무기",
-      "component": "부품",
+      "component": "컴포넌트",
       "item": "아이템",
       "ammunition": "탄약",
       "manufacturer": "제조사",
@@ -695,7 +695,7 @@
     "kindSingular": {
       "ship": "함선",
       "weapon": "무기",
-      "component": "부품",
+      "component": "컴포넌트",
       "item": "아이템",
       "ammunition": "탄약",
       "manufacturer": "제조사",
@@ -706,7 +706,7 @@
       "manufacturer": "제조사",
       "size": "크기",
       "grade": "등급",
-      "componentKind": "부품 유형",
+      "componentKind": "컴포넌트 유형",
       "all": "전체",
       "includeVariants": "AI / 템플릿 변형 표시",
       "reset": "필터 초기화",
@@ -736,7 +736,7 @@
       "medical": "의료 및 가젯",
       "attachments": "무기 부착물",
       "suits": "슈트 및 제트팩",
-      "paints": "페인트",
+      "paints": "도색",
       "decor": "장식",
       "misc": "기타",
       "nonUsable": "사용 불가",
@@ -749,7 +749,7 @@
       "exploration": "탐사",
       "industrial": "산업",
       "support": "지원",
-      "competition": "대회",
+      "competition": "경주",
       "ground": "지상",
       "multirole": "다목적"
     },
@@ -774,19 +774,19 @@
         "ship": "함선 무기"
       },
       "fps": {
-        "sidearm": "보조 무기",
+        "sidearm": "보조무기",
         "primary": "주무기",
         "heavy": "중화기",
-        "melee": "근접",
-        "throwable": "투척물",
+        "melee": "근접 무기",
+        "throwable": "투척 무기",
         "gadget": "도구 및 가젯",
         "other": "기타"
       },
       "ship": {
-        "gun": "건",
+        "gun": "화기",
         "turret": "터렛",
         "missile": "미사일 및 어뢰",
-        "countermeasure": "대응 수단",
+        "countermeasure": "기만체",
         "mining": "채굴 레이저",
         "utility": "트랙터 및 샐비지",
         "other": "기타"
@@ -798,7 +798,7 @@
       "card": {
         "damageChannels": "채널별 피해",
         "fireBallistics": "발사 및 탄도",
-        "derived": "파생",
+        "derived": "파생 수치",
         "powerSignature": "전력 및 시그니처",
         "durability": "내구도",
         "physical": "물리",
@@ -807,7 +807,7 @@
         "missing": "없음",
         "cmDecoy": "발사당 디코이",
         "cmNoise": "발사당 노이즈",
-        "cmRecommend": "이 함선 추천"
+        "cmRecommend": "이 함선 권장값"
       },
       "row": {
         "physical": "물리",
@@ -836,14 +836,14 @@
         "grade": "등급",
         "itemClass": "클래스",
         "itemPorts": "아이템 포트",
-        "factoryFit": "공장 장착",
-        "aimYaw": "회전 범위",
+        "factoryFit": "기본 장착",
+        "aimYaw": "선회 범위",
         "aimRate": "추적 속도",
-        "spread": "탄퍼짐",
+        "spread": "탄 퍼짐",
         "recoil": "반동",
         "magazine": "탄창",
         "overheat": "과열",
-        "cmCapacity": "보급량",
+        "cmCapacity": "탑재량",
         "cmIr": "IR 시그니처",
         "cmEm": "EM 시그니처",
         "cmCs": "단면적 시그니처",
@@ -853,10 +853,10 @@
         "shipIr": "함선: IR",
         "shipEm": "함선: EM",
         "shipCs": "함선: 단면적",
-        "cmNeedIr": "IR 대응 추천",
-        "cmNeedEm": "EM 대응 추천",
-        "cmNeedCs": "단면적 대응 추천",
-        "armorSignal": "방어구 신호 계수"
+        "cmNeedIr": "IR 대응 권장",
+        "cmNeedEm": "EM 대응 권장",
+        "cmNeedCs": "단면적 대응 권장",
+        "armorSignal": "장갑 신호 계수"
       },
       "src": {
         "damage": "AmmoParams.impactDamage",
@@ -869,7 +869,7 @@
         "aiming": "SCItemAimableComponentParams",
         "missing": "오버클럭 수정치만 있으며 전부 1.0이에요",
         "countermeasure": "AmmoParams.projectileParams.typeParams · weaponParams.ammoCapacity",
-        "cmRecommend": "경험칙: 함선 시그니처 ÷ 발사당 시그니처를 내림한 뒤 +1 — 그래야 발사가 함선보다 확실히 더 눈에 띄어요. 함선 값은 실시간으로 계산돼요: 현재 로드아웃과 전력 설정에서 전원이 켜진 모든 부품(쿨러, 발전기, 실드, 퀀텀 드라이브 …)의 IR / EM 방출량 합계에 방어구의 신호 계수를 곱한 값이에요."
+        "cmRecommend": "경험칙: 함선 시그니처 ÷ 발사당 시그니처를 내림한 뒤 +1 — 그래야 발사가 함선보다 확실히 더 눈에 띄어요. 함선 값은 실시간으로 계산돼요. 현재 로드아웃과 전력 설정에서 전원이 켜진 모든 컴포넌트(쿨러, 발전기, 실드, 퀀텀 드라이브 …)의 IR / EM 방출량 합계에 장갑의 신호 계수를 곱한 값이에요."
       },
       "value": {
         "none": "0 = 없음",
@@ -913,13 +913,13 @@
       "inHangar": "내 격납고에 있음",
       "foldedOne": "파일 변형 +1개",
       "foldedMany": "파일 변형 +{{count}}개",
-      "foldedTitle": "게임 파일에 이 항목과 거의 동일한 기록이 여러 개 있어 하나의 카드로 표시합니다: {{names}}",
+      "foldedTitle": "게임 파일에 이 항목과 거의 동일한 기록이 여러 개 있어 하나의 카드로 표시해요: {{names}}",
       "skinsOne": "스킨 +1개",
       "skinsMany": "스킨 +{{count}}개",
-      "skinsTitle": "이 무기의 모든 리버리는 하나의 카드에 모여 있습니다. 항목 안에서 선택할 수 있어요: {{names}}",
+      "skinsTitle": "이 무기의 모든 도색은 하나의 카드에 모여 있어요. 항목 안에서 선택할 수 있어요: {{names}}",
       "editionsOne": "변형 +1개",
       "editionsMany": "변형 +{{count}}개",
-      "editionsTitle": "게임 파일에 이 기체가 중복 기록과 마케팅 에디션 등으로 여러 번 들어 있습니다. 하나의 카드로 묶어 표시하며, 항목 안에서 선택할 수 있어요: {{names}}",
+      "editionsTitle": "게임 파일에 이 선체가 중복 기록과 마케팅 에디션 등으로 여러 번 들어 있어요. 하나의 카드로 묶어 표시하며, 항목 안에서 선택할 수 있어요: {{names}}",
       "addToHangar": "격납고에 추가",
       "addToHangarFailed": "격납고에 추가하지 못했어요. 다시 시도해 주세요."
     },
@@ -944,21 +944,21 @@
         "holoHint": "홀로테이블 보기"
       },
       "stage": {
-        "einordnung": "위상",
+        "einordnung": "순위",
         "cohortLink": "모든 함선 보기",
         "view3d": "3D",
-        "surfaceSimple": "간단히",
-        "surfaceTop": "상단",
+        "surfaceSimple": "간단",
+        "surfaceTop": "상면",
         "surfaceSide": "측면",
         "surfaceFront": "정면",
-        "surfaceFrontPending": "정면 보기는 이 함선의 다음 데이터 업로드와 함께 제공됩니다.",
+        "surfaceFrontPending": "정면 보기는 이 함선의 다음 데이터 업로드와 함께 제공돼요.",
         "silhouetteAria": "{{name}}의 실루엣",
-        "noGeometryReason": "이 함선의 실루엣은 아직 생성되지 않았습니다.",
+        "noGeometryReason": "이 함선의 실루엣은 아직 생성되지 않았어요.",
         "inspector": "인스펙터",
         "detailShow": "상세 ▾",
         "detailHide": "상세 ▴",
-        "allValues": "모든 값 ▾",
-        "allValuesHide": "모든 값 ▴",
+        "allValues": "모든 수치 ▾",
+        "allValuesHide": "모든 수치 ▴",
         "journalChanged": "변경됨: {{label}}",
         "undo": "실행 취소",
         "detailsShow": "상세 ▾",
@@ -982,43 +982,43 @@
         "legendMissiles": "미사일",
         "inspectorEmptyTitle": "선택한 하드포인트 없음",
         "emptyBay": "빈 슬롯",
-        "journalEmpty": "아직 없음 — 공장 출고 장비입니다.",
+        "journalEmpty": "아직 없음 — 기본 로드아웃이에요.",
         "allPorts": "전체 포트 {{n}}개",
         "perspectives": "관점",
         "deckInside": "내부",
         "percentileAria": "백분위 {{p}}",
         "say": {
-          "gap": "이 관점에 대한 비교군 순위가 없습니다.",
-          "top": "함선 {{n}}척 중 상위 25%입니다.",
-          "high": "함선 {{n}}척 중 중앙값 이상입니다.",
-          "mid": "함선 {{n}}척 중 중앙값 이하입니다.",
-          "low": "함선 {{n}}척 중 하위 25%입니다.",
+          "gap": "이 관점에 대한 비교군 순위가 없어요.",
+          "top": "함선 {{n}}척 중 상위 25%예요.",
+          "high": "함선 {{n}}척 중 중앙값 이상이에요.",
+          "mid": "함선 {{n}}척 중 중앙값 미만이에요.",
+          "low": "함선 {{n}}척 중 하위 25%예요.",
           "axes": "가장 강한 축 {{best}} (P{{bp}}), 가장 약한 축 {{worst}} (P{{wp}})."
         },
         "ghostTitle": "패치 {{patch}}의 값",
-        "viewSchemaUnavailable": "이 빌드에는 하드포인트 좌표가 없습니다",
+        "viewSchemaUnavailable": "이 빌드에는 하드포인트 좌표가 없어요",
         "placeholderAria": "{{name}}의 임시 실루엣",
-        "noPorts": "게임 데이터에 하드포인트가 없습니다",
+        "noPorts": "게임 데이터에 하드포인트가 없어요",
         "pinKey": "핀 범례",
         "pinLabels": "선체의 핀 라벨",
         "legendUnresolved": "위치 추정값",
-        "rawPortHint": "게임 데이터의 원시 포트입니다 — 교체하거나 열 수 있는 부품이 없습니다.",
+        "rawPortHint": "게임 데이터의 원시 포트예요 — 교체하거나 열 수 있는 부품이 없어요.",
         "pinListTitle": "모든 하드포인트",
         "pinGroupOther": "하드포인트",
-        "rankLoading": "전체 함대와 비교하는 중… 패치별 첫 방문은 시간이 조금 걸립니다.",
-        "rankFailed": "함대 비교를 불러오지 못했습니다.",
-        "rankEmpty": "이 함대에 대한 비교 값이 아직 없습니다.",
+        "rankLoading": "전체 함선과 비교하는 중… 패치별 첫 방문은 시간이 조금 걸려요.",
+        "rankFailed": "함선 비교를 불러오지 못했어요.",
+        "rankEmpty": "이 비교군에는 아직 비교 값이 없어요.",
         "tab": {
           "parts": "부품",
           "changes": "변경 사항"
         },
         "backToParts": "모든 부품",
-        "backHint": "모델의 선택을 해제합니다 (Esc)",
+        "backHint": "모델 선택 해제 (Esc)",
         "partsTotal": "부품 {{n}}개",
         "partSize": "크기",
         "partGrade": "등급",
         "iconWishlist": "희망 목록",
-        "iconSupply": "운용",
+        "iconSupply": "작전",
         "iconStock": "인벤토리",
         "previewTitle": "상세 페이지 미리보기",
         "previewMaker": "제조사",
@@ -1030,22 +1030,22 @@
         "resetView": "보기 초기화",
         "viewHull": "선체",
         "viewSchema": "스키마",
-        "statsAria": "함선 값",
-        "statsClose": "값 닫기",
-        "sheetHandle": "값 시트",
-        "sheetHandleAria": "값 시트, 드래그하거나 탭해서 높이 조절",
+        "statsAria": "함선 수치",
+        "statsClose": "수치 닫기",
+        "sheetHandle": "수치 시트",
+        "sheetHandleAria": "수치 시트, 드래그하거나 탭해서 높이 조절",
         "previewFitted": "장착된 함선",
         "previewBuy": "구매처",
         "previewAlternatives": "대체 부품",
         "previewOpen": "상세 페이지 열기",
-        "viewAkte": "파일",
-        "view3dUnavailable": "이 함선의 3D 모델은 아직 없습니다.",
+        "viewAkte": "자료",
+        "view3dUnavailable": "이 함선의 3D 모델은 아직 없어요.",
         "viewsAria": "보기",
         "filtersAria": "테이블에 부품 표시",
         "filterParts": "부품",
         "filterWeapons": "무기",
         "filterMissiles": "미사일",
-        "filterComponents": "구성품",
+        "filterComponents": "컴포넌트",
         "filterOther": "기타",
         "filterAll": "모든 부품",
         "deckRest": "기타",
@@ -1061,10 +1061,10 @@
         "defensive": "방어",
         "movement": "기동",
         "signature": "시그니처 및 냉각",
-        "signatureRank": "클래스 순위 5개 중 {{n}}개",
+        "signatureRank": "클래스 순위 5단계 중 {{n}}단계",
         "cooling": "냉각 부하",
         "coolingValue": "{{used}} / {{total}}",
-        "stealthPreset": "은신",
+        "stealthPreset": "스텔스",
         "expand": "에너지 및 관점 보기",
         "collapse": "에너지 및 관점 닫기",
         "presetTag": "프리셋",
@@ -1072,13 +1072,13 @@
         "dockAria": "에너지 및 관점"
       },
       "below": {
-        "parts": "구성품 상세",
+        "parts": "컴포넌트 상세",
         "partsCount": "{{n}}개 장착",
-        "areaEmpty": "이 영역에는 구성품이 없습니다."
+        "areaEmpty": "이 영역에는 컴포넌트가 없어요."
       },
       "persp": {
-        "allShow": "네 가지 모두의 전체 값 ▾",
-        "allHide": "전체 값 접기 ▴"
+        "allShow": "네 관점의 모든 수치 ▾",
+        "allHide": "모든 수치 접기 ▴"
       },
       "patch": {
         "trigger": {
@@ -1086,7 +1086,7 @@
           "hotkeyHint": "다른 패치와 비교"
         },
         "loading": "불러오는 중…",
-        "empty": "더 이상 사용할 수 있는 패치가 없습니다.",
+        "empty": "더 사용할 수 있는 패치가 없어요.",
         "notFinalised": "확정되지 않음",
         "reset": "기본 비교로 초기화",
         "comparing": "비교를 불러오는 중…",
@@ -1097,7 +1097,7 @@
           "signature": "시그니처 및 냉각"
         },
         "delta": {
-          "noChange": "이 카테고리에는 변경 사항이 없습니다.",
+          "noChange": "이 카테고리에는 변경 사항이 없어요.",
           "kpi": "항목",
           "from": "이전",
           "to": "이후",
@@ -1113,19 +1113,19 @@
         },
         "forkGuard": {
           "title": "소유자가 될까요?",
-          "body": "이 변경으로 로드아웃이 원본에서 분리됩니다. 되돌릴 수 없어요.",
+          "body": "이 변경으로 로드아웃이 원본에서 분리돼요. 되돌릴 수 없어요.",
           "confirm": "소유자 되기"
         },
         "deltaShow": "변경 사항 보기",
         "deltaHide": "변경 사항 숨기기",
         "current": "현재",
-        "hint": "왼쪽에서 이전 패치를 선택하면 이 함선에서 무엇이 바뀌었는지 여기에 표시됩니다.",
+        "hint": "왼쪽에서 이전 패치를 선택하면 이 함선에서 무엇이 바뀌었는지 여기에 표시돼요.",
         "fromAria": "{{patch}}부터 — 패치 선택",
         "toAria": "{{patch}}까지 — 패치 선택",
         "fromTitle": "시작 패치",
         "toTitle": "끝 패치",
         "pickFrom": "패치 선택",
-        "orderHint": "오른쪽은 항상 더 최신 패치입니다. 이전 패치는 왼쪽 \"시작\"에서 선택하세요.",
+        "orderHint": "오른쪽은 항상 더 최신 패치예요. 이전 패치는 왼쪽 “시작”에서 선택하세요.",
         "onOtherSide": "이미 반대쪽에 선택되어 있음",
         "newerThan": "{{patch}}보다 이전이 아님",
         "olderThan": "{{patch}}보다 최신이 아님",
@@ -1145,13 +1145,13 @@
         "copy": "복사",
         "copied": "복사됨",
         "revoke": "공유 중지",
-        "revokeNote": "이미 이 링크를 따르는 수신자는 구성을 삭제할 때까지 계속 연결됩니다.",
+        "revokeNote": "이미 이 링크를 따르는 수신자는 구성을 삭제할 때까지 계속 연결돼요.",
         "errorGeneric": "실패했어요. 다시 시도해 주세요.",
-        "copyLinkHint": "홀로테이블과 저장하지 않은 하드포인트 변경 사항을 포함해 이 보기의 주소를 복사합니다.",
-        "unsavedHint": "저장하지 않은 변경 {{n}}건은 복사된 링크에만 들어 있고 격납고 링크에는 없습니다.",
+        "copyLinkHint": "홀로테이블과 저장하지 않은 하드포인트 변경 사항을 포함해 이 보기의 주소를 복사해요.",
+        "unsavedHint": "저장하지 않은 변경 {{n}}건은 복사된 링크에만 들어 있고 격납고 링크에는 없어요.",
         "signInHint": "로그인하면 격납고 구성을 별도의 링크로 공유할 수 있어요.",
-        "notInHangarHint": "이 기체는 아직 내 격납고에 없어요. 먼저 추가한 다음 구성을 공유할 수 있어요.",
-        "noConfigHint": "내 격납고에 이 기체의 구성이 아직 없어요. 먼저 로드아웃을 저장해 주세요.",
+        "notInHangarHint": "이 함선은 아직 내 격납고에 없어요. 먼저 추가한 다음 구성을 공유할 수 있어요.",
+        "noConfigHint": "내 격납고에 이 함선의 구성이 아직 없어요. 먼저 로드아웃을 저장해 주세요.",
         "copyFailed": "여기서는 복사가 허용되지 않아요. 링크를 선택해서 직접 복사해 주세요.",
         "saveAndShare": "저장 및 공유",
         "shareLink": "링크 공유",
@@ -1173,7 +1173,7 @@
         "loading": "공유된 로드아웃을 불러오는 중 …",
         "banner": "{{owner}}님이 공유함 — “{{name}}”. 수정하려면 복사본을 만드세요.",
         "adopt": "복사본을 만들어 수정",
-        "unavailable": "이 공유 로드아웃을 사용할 수 없어요. 링크가 잘못되었거나, 만료되었거나, 회수되었거나, 다른 기체의 링크예요. 테이블에는 기본 로드아웃이 표시돼요.",
+        "unavailable": "이 공유 로드아웃을 사용할 수 없어요. 링크가 잘못되었거나, 만료되었거나, 회수되었거나, 다른 함선의 링크예요. 테이블에는 기본 로드아웃이 표시돼요.",
         "loadError": "공유된 로드아웃을 불러오지 못했어요.",
         "exit": "내 로드아웃으로 돌아가기",
         "readOnlyHint": "공유된 로드아웃 — 읽기 전용이에요. 변경하거나 저장하려면 복사본을 만드세요."
@@ -1189,7 +1189,7 @@
         "legendHint": "클릭하여 부품 선택"
       },
       "card": {
-        "rank": "{{m}}위 중 {{n}}위",
+        "rank": "{{m}}개 중 {{n}}위",
         "overallTip": "종합: 그룹의 {{pct}} %보다 우수",
         "compareWith": "비교 대상",
         "scopeOff": "{{name}} · 데이터 없음",
@@ -1206,15 +1206,15 @@
         "diffLegend": "기본 구성과 다름"
       },
       "akte": {
-        "imageOnly": "파일 접기",
-        "showText": "파일 펼치기",
+        "imageOnly": "자료 접기",
+        "showText": "자료 펼치기",
         "descriptionAria": "설명",
-        "noDescription": "이 기체에 대한 설명이 없어요.",
+        "noDescription": "이 함선에 대한 설명이 없어요.",
         "liveries": "도색",
         "standard": "기본",
         "maker": "제조사",
         "modelsAria": "모델",
-        "tabsAria": "파일 보기 방식",
+        "tabsAria": "자료 보기 방식",
         "tabSheet": "데이터 시트",
         "tabText": "설명",
         "tabBuy": "구매",
@@ -1222,7 +1222,7 @@
           "loading": "가격을 불러오는 중 …",
           "error": "가격을 불러오지 못했어요.",
           "retry": "다시 시도",
-          "empty": "이 기체를 구매할 수 있는 장소를 알 수 없어요.",
+          "empty": "이 함선의 구매처가 알려지지 않았어요.",
           "shops": "게임에서 구매",
           "nearest": "{{place}}에서 가까운 순",
           "cheapest": "저렴한 순",
@@ -1256,16 +1256,16 @@
         "diffMany": "부품 {{n}}개가 기본 구성과 달라요",
         "diffNone": "기본과 동일",
         "selectedAria": "{{name}} 작업",
-        "removeExemplar": "개체 제거",
+        "removeExemplar": "이 함선 제거",
         "removeTitle": "“{{name}}”을(를) 제거할까요?",
-        "removeBody": "로드아웃 “{{name}}”이(가) 삭제돼요. 기체는 격납고에 남아요.",
-        "copy": "이 개체 복사",
+        "removeBody": "로드아웃 “{{name}}”이(가) 삭제돼요. 함선은 격납고에 남아요.",
+        "copy": "이 함선 복제",
         "copyName": "{{name}} (복사본)",
-        "newFromWerk": "기본 구성으로 새 개체 만들기",
-        "saveWerk": "개체로 격납고에 추가",
-        "saveBuild": "개조를 개체로 저장",
+        "newFromWerk": "기본 구성으로 새 함선 추가",
+        "saveWerk": "격납고에 함선으로 추가",
+        "saveBuild": "개조 구성을 새 함선으로 저장",
         "anotherCopy": "{{name}} 한 대 더 격납고에 추가",
-        "nameTitle": "개체 이름",
+        "nameTitle": "함선 이름",
         "nameLabel": "이름",
         "nameSuggested": "추천: “{{name}}” — 그대로 쓰거나 원하는 이름을 입력하세요.",
         "autosavedOne": "저장됨 · 변경 1건",
@@ -1283,11 +1283,11 @@
         "massDriver": "매스 드라이버",
         "railgun": "레일건",
         "laserRepeater": "레이저 리피터",
-        "ballisticRepeater": "탄도 리피터",
+        "ballisticRepeater": "실탄 리피터",
         "distortionRepeater": "디스토션 리피터",
         "repeater": "리피터",
         "laserCannon": "레이저 캐논",
-        "ballisticCannon": "탄도 캐논",
+        "ballisticCannon": "실탄 캐논",
         "distortionCannon": "디스토션 캐논",
         "cannon": "캐논",
         "tractorBeam": "트랙터 빔",
@@ -1298,7 +1298,7 @@
         "radar": "레이더",
         "lifeSupport": "생명 유지 장치",
         "missileRack": "미사일 랙",
-        "countermeasure": "대응 장치"
+        "countermeasure": "기만체"
       },
       "statShort": {
         "dps": "DPS",
@@ -1329,31 +1329,31 @@
         "coolingRate": "냉각",
         "powerDraw": "소비",
         "coolantDraw": "냉각제",
-        "cmCapacity": "재고",
+        "cmCapacity": "탑재량",
         "cmLifetime": "지속",
         "cmRadius": "반경"
       },
       "interior": {
         "views": "보기",
-        "deckFilter": "데크 · 필터",
-        "deckFilterAria": "3D 및 간단 보기용 데크 필터",
+        "deckFilter": "덱 · 필터",
+        "deckFilterAria": "3D 및 간단 보기용 덱 필터",
         "deckAll": "전체",
         "deckAllSub": "선체",
-        "deckEvery": "모든 데크",
-        "deckCount": "데크 {{n}}개",
-        "deckEveryOnly3d": "모든 데크 동시 표시는 3D 보기에서만 가능해요. 간단 보기에서는 항상 데크 하나만 표시돼요.",
-        "gap": "SCU {{total}} 중 {{located}} 위치 확인됨",
-        "gapHint": "이 기체의 모든 화물 그리드가 게임 데이터에서 위치가 확인된 것은 아니에요. 합계를 몰래 채우지 않고 빈 부분을 그대로 보여 줘요.",
+        "deckEvery": "모든 덱",
+        "deckCount": "덱 {{n}}개",
+        "deckEveryOnly3d": "모든 덱 동시 표시는 3D 보기에서만 가능해요. 간단 보기에서는 항상 덱 하나만 표시돼요.",
+        "gap": "{{total}} SCU 중 {{located}} SCU 위치 확인됨",
+        "gapHint": "이 함선의 모든 화물 그리드가 게임 데이터에서 위치가 확인된 것은 아니에요. 합계를 몰래 채우지 않고 빈 부분을 그대로 보여 줘요.",
         "groupsAria": "내부 요소를 테이블에 표시",
         "groupsOn": "표시 중",
         "presetTag": "프리셋",
         "presetTitle": "{{role}} · 프리셋",
         "presetReset": "초기화",
         "preset": {
-          "combat": "전투기",
+          "combat": "전투함",
           "cargo": "화물선",
           "medical": "의료선",
-          "industry": "산업 및 인양",
+          "industry": "산업 및 샐비지",
           "other": "기타"
         },
         "group": {
@@ -1369,10 +1369,10 @@
         },
         "cat": {
           "grid": "화물 그리드",
-          "lift": "리프트",
+          "lift": "엘리베이터",
           "stairs": "계단",
           "ladder": "사다리",
-          "ramp": "경사로",
+          "ramp": "램프",
           "airlock": "에어록",
           "dockingTube": "도킹 튜브",
           "escapePod": "탈출 포드",
@@ -1391,27 +1391,27 @@
           "radar": "레이더",
           "fuelTank": "연료 탱크",
           "maintenance": "정비 지점",
-          "turret": "터렛(접근)",
+          "turret": "터렛 (접근)",
           "computer": "컴퓨터",
           "bed": "침대",
-          "head": "화장실 및 욕실",
+          "head": "화장실 및 샤워실",
           "door": "문"
         },
         "door": {
-          "room": "객실 문",
+          "room": "방 문",
           "inner": "내부 문 및 해치",
-          "lift": "리프트 문",
+          "lift": "엘리베이터 문",
           "hangar": "격납고 문",
           "bow": "선수 문",
-          "airlock": "에어락 문",
-          "ramp": "램프 도어",
+          "airlock": "에어록 문",
+          "ramp": "램프 문",
           "cell": "감방 문"
         },
         "fact": {
           "scu": "수용량",
           "dims": "내부 크기",
-          "breachable": "파괴 가능",
-          "panel": "옆에 있는 제어 패널",
+          "breachable": "강제 개방 가능",
+          "panel": "옆에 제어 패널 있음",
           "connects": "연결 대상",
           "height": "높이"
         },
@@ -1449,7 +1449,7 @@
           "stairs": "계단",
           "ladder": "사다리",
           "ramp": "램프",
-          "airlock": "에어락",
+          "airlock": "에어록",
           "dockingTube": "도킹 튜브",
           "escapePod": "탈출 포드",
           "medBed": "메드 베드",
@@ -1460,7 +1460,7 @@
           "relay": "릴레이",
           "powerPlant": "발전기",
           "cooler": "쿨러",
-          "shield": "실드 제너레이터",
+          "shield": "실드 발생기",
           "quantumDrive": "퀀텀 드라이브",
           "jumpDrive": "점프 모듈",
           "lifeSupport": "생명 유지 장치",
@@ -1479,8 +1479,8 @@
           "lift": "엘리베이터 문",
           "hangar": "격납고 문",
           "bow": "선수 문",
-          "airlock": "에어락 문",
-          "ramp": "램프 도어",
+          "airlock": "에어록 문",
+          "ramp": "램프 문",
           "cell": "감방 문"
         }
       }
@@ -1495,12 +1495,12 @@
       "foundElsewhere": "“{{term}}”에 해당하는 {{kind}}이(가) 없어요 — 다음에서 찾았어요:"
     },
     "error": {
-      "title": "코덱스를 불러올 수 없어요",
+      "title": "Codex를 불러올 수 없어요",
       "retry": "다시 시도"
     },
     "keybinds": {
-      "title": "키 바인딩",
-      "subtitle": "현재 Star Citizen 빌드의 기본 키 바인딩이에요.",
+      "title": "키 설정",
+      "subtitle": "현재 Star Citizen 빌드의 기본 키 설정이에요.",
       "device": "장치",
       "devices": {
         "keyboard": "키보드",
@@ -1508,7 +1508,7 @@
         "gamepad": "게임패드",
         "joystick": "조이스틱"
       },
-      "search": "키 바인딩 검색",
+      "search": "키 설정 검색",
       "searchPlaceholder": "동작 또는 키 검색…",
       "lang": {
         "aria": "동작 이름 언어",
@@ -1558,7 +1558,7 @@
           "assigned": "지정됨"
         },
         "layers": {
-          "scope": "스코프 (L1)",
+          "scope": "범위 (L1)",
           "environment": "환경 (L2)",
           "role": "역할 (L3)",
           "activity": "활동 (L4)",
@@ -1603,7 +1603,7 @@
           "combat": "전투",
           "mining": "채굴",
           "salvage": "샐비지",
-          "exploring": "탐험",
+          "exploring": "탐사",
           "medical": "의료",
           "trading": "거래",
           "racing": "레이싱",
@@ -1680,15 +1680,15 @@
       "quality": "품질 {{score}}%"
     },
     "rank": {
-      "header": "위치",
-      "nShipsOfSizeClass": "크기 등급 {{k}}의 함선 {{n}}척",
+      "header": "순위",
+      "nShipsOfSizeClass": "크기 클래스 {{k}}의 함선 {{n}}척",
       "nShips": "함선 {{n}}척",
       "nShipsOfCareer": "같은 커리어의 함선 {{n}}척",
       "profileLabel": "프로필",
       "scopeLabel": "비교 대상",
       "verdict": "{{pct}} % — 함선 {{n}}척 대비 {{band}}.",
       "percentile": "백분위",
-      "percentileTooltip": "평가가 아닌 설명입니다. 이 수치는 이 함선이 비교 대상 중 어디에 위치하는지를 보여줄 뿐, 좋고 나쁨을 뜻하지 않습니다. 50 %는 정확히 중간입니다.",
+      "percentileTooltip": "평가가 아닌 설명이에요. 이 수치는 이 함선이 비교 대상 중 어디에 있는지를 보여 줄 뿐, 좋고 나쁨을 뜻하지 않아요. 50 %는 정확히 중간이에요.",
       "lensNote": "순위는 임무 프로필을 따르지 않고 자체 프로필 3개를 유지해요.",
       "radarAria": "함선 {{n}}척 대비 {{name}}의 백분위 레이더 차트",
       "gapAxis": "이 축에는 값이 없음",
@@ -1706,21 +1706,21 @@
       "profile": {
         "combat": "전투",
         "defense": "방어",
-        "transport": "운송",
+        "transport": "수송",
         "exploration": "탐사",
         "resources": "자원",
         "support": "지원",
         "multirole": "다목적",
-        "competition": "경쟁",
+        "competition": "경주",
         "travel": "이동",
         "stealth": "스텔스"
       },
       "scope": {
-        "sizeClass": "같은 크기 등급",
+        "sizeClass": "같은 크기 클래스",
         "all": "모든 함선",
         "career": "커리어",
         "role": "역할",
-        "careerHolo": "같은 등급",
+        "careerHolo": "같은 클래스",
         "roleHolo": "같은 종류"
       },
       "disabled": {
@@ -1758,12 +1758,12 @@
       "nShipsOfRole": "같은 역할의 함선 {{n}}척",
       "compare": {
         "label": "비교 대상",
-        "info": "각 축은 0(중심)에서 선택한 비교 함선 중 최고값(가장자리)까지입니다. 링은 그 값의 33%, 67%, 100%를 나타냅니다. 파란색은 이 함선, 점선은 비교 함선의 중앙값입니다. 파란 선: 비교 대상보다 좋음, 노란 선: 더 약함.",
+        "info": "각 축은 0(중심)에서 선택한 비교 함선 중 최고값(가장자리)까지예요. 링은 그 값의 33%, 67%, 100%를 나타내요. 파란색은 이 함선, 점선은 비교 함선의 중앙값이에요. 파란 선: 비교 대상보다 좋음, 노란 선: 더 약함.",
         "axisDelta": "비교 대비 {{d}}점",
-        "infoHolo": "각 축은 0(중심)에서 선택한 그룹의 95번째 백분위(가장자리)까지입니다. 중앙값은 같은 척도에 놓이며, 더 강한 값은 가장자리에서 끝납니다."
+        "infoHolo": "각 축은 0(중심)에서 선택한 그룹의 95번째 백분위(가장자리)까지예요. 중앙값도 같은 척도에 표시되며, 더 강한 값은 가장자리에서 끝나요."
       },
       "class": {
-        "combat": "전투 함선",
+        "combat": "전투함",
         "transport": "화물선",
         "exploration": "탐사 함선",
         "resources": "자원 함선",
@@ -1772,7 +1772,7 @@
         "competition": "레이싱 함선"
       },
       "classPlural": {
-        "combat": "전투 함선",
+        "combat": "전투함",
         "transport": "화물선",
         "exploration": "탐사 함선",
         "resources": "자원 함선",
@@ -1786,7 +1786,7 @@
         "ofRole": "{{name}} 역할"
       },
       "noMiningData": "채굴 및 샐비지 성능: 데이터 없음",
-      "rimNote": "바깥쪽 = 그룹 최고값에 근접(95%)하며, 더 강한 값은 거기서 끝납니다. 제곱근 척도라 작은 값도 보이고, 링은 33%와 67%를 나타냅니다.",
+      "rimNote": "바깥쪽 = 그룹 최고값에 근접(95%)하며, 더 강한 값은 거기서 끝나요. 제곱근 척도라 작은 값도 보이고, 링은 33%와 67%를 나타내요.",
       "betterThan": "{{n}} %보다 우수",
       "rimLabel": "척도"
     },
@@ -1798,8 +1798,8 @@
       "grade": "등급",
       "subType": "하위 유형",
       "attachType": "장착 유형",
-      "weaponClass": "무기 등급",
-      "componentKind": "부품 유형",
+      "weaponClass": "무기 클래스",
+      "componentKind": "컴포넌트 유형",
       "dimensions": "치수",
       "speed": "속도",
       "range": "사거리",
@@ -1830,32 +1830,32 @@
           "damage": {
             "physical": "물리 피해",
             "energy": "에너지 피해",
-            "distortion": "왜곡 피해",
+            "distortion": "디스토션 피해",
             "thermal": "열 피해",
             "biochemical": "생화학 피해",
-            "stun": "기절 피해"
+            "stun": "스턴 피해"
           },
           "taken": {
             "physical": "받는 물리 피해",
             "energy": "받는 에너지 피해",
-            "distortion": "받는 왜곡 피해",
+            "distortion": "받는 디스토션 피해",
             "thermal": "받는 열 피해",
             "biochemical": "받는 생화학 피해",
-            "stun": "받는 기절 피해"
+            "stun": "받는 스턴 피해"
           },
           "coolingPerSecond": "냉각",
           "overheatTemperature": "과열 한계",
           "coolingDelay": "냉각 지연",
           "coldResistance": "내한 한계",
           "heatResistance": "내열 한계",
-          "gForceResistance": "G-force 저항",
+          "gForceResistance": "G 내성",
           "radiationCapacity": "방사선 용량",
-          "radiationDissipation": "방사선 방출",
+          "radiationDissipation": "방사선 해소",
           "atmosphereCapacity": "공기 공급량"
         }
       },
       "usedInBlueprints": "블루프린트에서 사용됨",
-      "usedInBlueprintsHint": "이 아이템을 재료로 요구하는 제작 레시피입니다.",
+      "usedInBlueprintsHint": "이 아이템을 재료로 요구하는 제작 레시피예요.",
       "compatCount": "호환 아이템 {{count}}개",
       "loadoutEmpty": "비어 있음 (기본)",
       "viewOnRsi": "RSI에서 보기",
@@ -1877,10 +1877,10 @@
       "quantumSpeed": "퀀텀 속도",
       "quantumFuel": "퀀텀 연료",
       "fuelCapacity": "수소 연료",
-      "hardpointExplainer": "하드포인트는 선체의 장착 지점입니다. 모든 무기, 실드, 쿨러, 스러스터, 퀀텀 드라이브가 하나씩 장착되며, 같은 유형과 크기의 다른 아이템으로 교체할 수 있어요. 아래는 이 함선의 출고 시 구성입니다.",
+      "hardpointExplainer": "하드포인트는 선체의 장착 지점이에요. 모든 무기, 실드, 쿨러, 스러스터, 퀀텀 드라이브가 하나씩 차지하며, 같은 유형과 크기의 다른 아이템으로 교체할 수 있어요. 아래는 이 함선의 출고 시 구성이에요.",
       "loadoutExplainerLabel": "하드포인트란?",
       "craftedFrom": "제작 재료",
-      "craftedFromHint": "게임의 제작 데이터 기준으로 이 아이템을 제작하는 데 필요한 비용입니다.",
+      "craftedFromHint": "게임의 제작 데이터 기준으로 이 아이템을 제작하는 데 필요한 비용이에요.",
       "noIngredients": "이 블루프린트에는 이 빌드에서 재료가 나열되어 있지 않아요.",
       "openBlueprint": "전체 블루프린트 열기",
       "minQuality": "최소 품질 {{value}}",
@@ -1891,8 +1891,8 @@
       "whereToBuyPrice": "가격",
       "whereToBuyTerminal": "터미널",
       "whereToBuyLocation": "위치",
-      "whereToBuyAttribution": "가격은 UEX Corp 제공이며 커뮤니티에서 관리하므로 라이브 서버와 다를 수 있습니다. Cloud Imperium Games와 무관합니다.",
-      "moduleOrderHint": "구성 가능한 모듈이 먼저 나옵니다. 무기와 마운트, 터렛, 병기, 포드, 실드, 발전기, 퀀텀 드라이브, 레이더, 쿨러, 생명 유지 장치 순입니다. 고정 장비는 아래에 있어요. 모듈을 클릭하면 전체 수치 표를 볼 수 있어요.",
+      "whereToBuyAttribution": "가격은 UEX Corp 제공이며 커뮤니티에서 관리하므로 라이브 서버와 다를 수 있어요. Cloud Imperium Games와 무관해요.",
+      "moduleOrderHint": "구성 가능한 모듈이 먼저 나와요. 무기와 마운트, 터렛, 병기, 포드, 실드, 발전기, 퀀텀 드라이브, 레이더, 쿨러, 생명 유지 장치 순이에요. 고정 장비는 아래에 있어요. 모듈을 클릭하면 전체 수치 표를 볼 수 있어요.",
       "loadoutEmptyWeaponMount": "무기 마운트 — 이 추출본에는 기본 무기 없음",
       "chipCrew": "승무원 {{n}}명",
       "chipNoCargo": "화물칸 없음",
@@ -1909,9 +1909,9 @@
         "exitFullscreen": "전체 화면 종료"
       },
       "partPopup": {
-        "label": "부품: {{name}}",
-        "eyebrow": "부품",
-        "noValues": "이 부품에 대해 알려진 값이 없어요."
+        "label": "컴포넌트: {{name}}",
+        "eyebrow": "컴포넌트",
+        "noValues": "이 컴포넌트에 대해 알려진 값이 없어요."
       },
       "stageLaunchers": "발사기 {{n}}개",
       "stageMissileRacks": "미사일 랙",
@@ -1926,7 +1926,7 @@
       "draftLabel": "초안",
       "draftChanged": "슬롯 {{n}}개 변경됨",
       "draftChangedPlural": "슬롯 {{n}}개 변경됨",
-      "draftNotice": "저장되지 않았어요. 이번 세션에만 유지됩니다.",
+      "draftNotice": "저장되지 않았어요. 이번 세션에만 유지돼요.",
       "draftDiscard": "버리기",
       "draftApplyAndSave": "적용하고 격납고에 저장",
       "chipCargoUnknown": "화물칸 · 용량은 게임 파일에 없음",
@@ -1986,16 +1986,16 @@
       "tooltip": {
         "weapons": "그룹 전체의 전력을 차단해요. 전력이 없으면 무기가 발사되지 않아 지속 DPS는 0이 되고 EM도 눈에 띄게 떨어져요. 다시 클릭하면 켜져요.",
         "shields": "금색은 활성 발생기에 필요한 최소량이에요. 그 아래로 내려가면 실드가 꺼지고 수동 보조도 함께 사라져요.",
-        "thrusters": "메인 및 기동 스러스터예요. 0이면 기체를 조종할 수는 있지만 추력이 없어요.",
+        "thrusters": "메인 및 기동 스러스터예요. 0이면 함선을 조종할 수는 있지만 추력이 없어요.",
         "coolers": "쿨러는 함선 전력 관리에서 각각 별도 항목이라 장착된 쿨러마다 열이 하나씩 있어요. 쿨러에 세그먼트를 많이 줄수록 냉각 부하와 IR 시그니처가 낮아져요. 냉각은 조용히 있기 위한 대가예요.",
         "radar": "시야 범위를 정해요. 전력이 많을수록 범위가 넓어지지만 EM도 늘어서 다른 사람에게 더 잘 보여요.",
         "lifeSupport": "산소와 기압이에요. 0이 되면 타이머가 작동하는데, 얼마나 걸리는지는 게임 파일에 없어요.",
         "quantum": "SCM에는 채널이 없어요. NAV에서만 전력을 쓰고, 그 대신 실드가 꺼져요.",
         "tractor": "꺼짐. 사용할 때만 전력을 소모해요.",
         "ir": "열 시그니처예요. 냉각 부하와 전력을 쓰는 모든 것에 따라 올라가요. IR이 낮으면 열 센서에 늦게 탐지돼요.",
-        "em": "전력을 쓰는 모든 부품의 합계예요. 실드와 쿨러가 가장 큰 항목이며, 그룹을 차단하면 해당 몫이 사라져요. 부품이 방출하는 양은 게임 파일에 있고, 에너지 무기는 거기서 0이에요.",
+        "em": "전력을 쓰는 모든 컴포넌트의 합계예요. 실드와 쿨러가 가장 큰 항목이며, 그룹을 차단하면 해당 몫이 사라져요. 컴포넌트가 방출하는 양은 게임 파일에 있고, 에너지 무기는 거기서 0이에요.",
         "crossSection": "레이더에 얼마나 크게 보이는지예요. 장비가 아닌 선체에서 결정되며 어떤 로드아웃으로도 바뀌지 않아요.",
-        "coolingLoad": "현재 냉각이 얼마나 쓰이는지 게임과 같은 방식으로 계산해요. 100%는 켜진 쿨러가 받는 전력으로 내는 정확한 냉각량이에요. 30%면 여유 70%, 130%면 30% 부족이라 기체가 과열되고 IR 시그니처가 급등해요. 100% 바로 아래가 가장 효율적이에요."
+        "coolingLoad": "현재 냉각이 얼마나 쓰이는지 게임과 같은 방식으로 계산해요. 100%는 켜진 쿨러가 받는 전력으로 내는 정확한 냉각량이에요. 30%면 여유 70%, 130%면 30% 부족이라 함선이 과열되고 IR 시그니처가 급등해요. 100% 바로 아래가 가장 효율적이에요."
       },
       "fact": {
         "ir": "IR",
@@ -2028,7 +2028,7 @@
         "reExtractPending": "이 카탈로그 빌드에는 아직 전력 수치가 없어요. 모듈별 수치도 예산도 마찬가지예요. 다음 카탈로그 업로드(추출 스키마 3)와 함께 제공돼요.",
         "noChannelInMode": "이 비행 모드에서는 이 그룹에 채널이 없어요.",
         "noCoolingData": "이 빌드에는 쿨러 데이터가 없어요. 냉각 부하는 비어 있어요.",
-        "noCoolantDraw": "게임 데이터에 부품이 냉각수를 얼마나 쓰는지 나와 있지 않아요. 냉각 부하는 비어 있어요.",
+        "noCoolantDraw": "게임 데이터에 컴포넌트가 냉각제를 얼마나 쓰는지 나와 있지 않아요. 냉각 부하는 비어 있어요.",
         "noSignatureData": "이 추출본에는 시그니처 데이터가 없어요. 재추출 대기 중이에요."
       },
       "unit": {
@@ -2043,7 +2043,7 @@
       "coolingDeficit": "{{pct}} % 부족"
     },
     "swap": {
-      "open": "부품 교체",
+      "open": "컴포넌트 교체",
       "equipped": "장착됨",
       "previewHint": "비교한 뒤 적용하거나 슬롯 비우기를 누르세요. 변경 사항은 아래에서 저장할 때까지 초안으로 남아요.",
       "loading": "호환 아이템을 검색하는 중…",
@@ -2072,7 +2072,7 @@
       "resetAllTitle": "전체 로드아웃을 초기화할까요?",
       "resetAllBody": "이 로드아웃의 변경 사항 {{n}}개가 모두 사라지고 모든 슬롯이 기본 부품으로 돌아가요.",
       "resetAllConfirm": "초기화",
-      "defaultConfigName": "코덱스 로드아웃",
+      "defaultConfigName": "Codex 로드아웃",
       "draftState": {
         "changed": "변경됨",
         "pending": "불러오는 중…",
@@ -2095,7 +2095,7 @@
       "distortion": "디스토션",
       "thermal": "열",
       "biochemical": "생화학",
-      "stun": "기절"
+      "stun": "스턴"
     },
     "compare": {
       "pin": "비교",
@@ -2122,10 +2122,10 @@
       "other": "기타"
     },
     "picker": {
-      "title": "부품 선택 — {{port}} · S{{size}}",
+      "title": "컴포넌트 선택 — {{port}} · S{{size}}",
       "installed": "장착됨: {{name}}",
       "searchPlaceholder": "검색 … 이름, 제조사, 피해 유형",
-      "searchLabel": "부품 검색",
+      "searchLabel": "컴포넌트 검색",
       "compareWith": "비교 대상",
       "deltaAgainst": "Δ 기준",
       "count": "{{total}}개 중 {{n}}개",
@@ -2136,12 +2136,12 @@
       "columnsUnavailable": "게임 파일에 없음",
       "dashCell": "—",
       "dashCellTitle": "이 클래스에는 해당 없음",
-      "dashNote": "탄약과 탄퍼짐은 \"—\"로 표시돼요. 에너지 무기는 탄창이 없고, 게임은 탄퍼짐을 다른 값에 대한 보정치로만 제공해요.",
+      "dashNote": "탄약과 탄 퍼짐은 \"—\"로 표시돼요. 에너지 무기는 탄창이 없고, 게임은 탄 퍼짐을 다른 값에 대한 보정치로만 제공해요.",
       "footerMissing": "게임 파일에 없음: {{fields}}",
       "pickRow": "{{name}} 장착",
       "openDetail": "{{name}} 상세 정보 열기",
       "scope": {
-        "sameClass": "{{class}} 전용",
+        "sameClass": "{{class}}만",
         "sameFamily": "모든 {{family}}",
         "sameSize": "모든 S{{size}}"
       },
@@ -2150,8 +2150,8 @@
         "factory": "기본"
       },
       "scrollCue": {
-        "horizontal": "옆으로 스크롤하면 {{columns}}",
-        "vertical": "항목이 더 있으면 아래로 스크롤하세요. 헤더 행과 부품 열은 고정돼 있어요"
+        "horizontal": "옆으로 스크롤해 {{columns}} 보기",
+        "vertical": "항목이 더 있으면 아래로 스크롤하세요. 헤더 행과 컴포넌트 열은 고정돼 있어요"
       },
       "menu": {
         "open": "{{column}} 열 정렬 및 필터",
@@ -2168,7 +2168,7 @@
       },
       "chipRemove": "{{label}} 필터 제거",
       "col": {
-        "name": "부품",
+        "name": "컴포넌트",
         "deltaSustained": "Δ 지속",
         "power": "전력",
         "em": "EM",
@@ -2176,7 +2176,7 @@
         "grade": "등급",
         "manufacturer": "제조사",
         "ammo": "탄약",
-        "spread": "탄퍼짐",
+        "spread": "탄 퍼짐",
         "ir": "IR",
         "size": "크기",
         "projectilesPerShot": "발당 투사체 수",
@@ -2201,21 +2201,21 @@
         "percent": "%"
       },
       "dashNoteAmmo": "에너지 무기는 탄창이 없어서 탄약이 \"—\"로 표시돼요.",
-      "dashNoteSpread": "게임이 탄퍼짐을 다른 값에 대한 보정치로만 제공하기 때문에 \"—\"로 표시돼요.",
+      "dashNoteSpread": "게임이 탄 퍼짐을 다른 값에 대한 보정치로만 제공하기 때문에 \"—\"로 표시돼요.",
       "term": {
-        "armor": "방어구",
+        "armor": "장갑",
         "back": "후방",
         "ballistic": "실탄",
         "ballisticcannon": "실탄 캐논",
         "ballisticgatling": "실탄 개틀링",
         "ballisticrepeater": "실탄 리피터",
-        "ballisticscattergun": "실탄 산탄포",
+        "ballisticscattergun": "실탄 스캐터건",
         "bottom": "하단",
         "cannon": "캐논",
         "center": "중앙",
         "centre": "중앙",
         "cooler": "쿨러",
-        "countermeasure": "대응 장치",
+        "countermeasure": "기만체",
         "distortion": "디스토션",
         "distortioncannon": "디스토션 캐논",
         "distortionrepeater": "디스토션 리피터",
@@ -2224,8 +2224,8 @@
         "fuelintake": "연료 흡입구",
         "fueltank": "연료 탱크",
         "gatling": "개틀링",
-        "gun": "건",
-        "gunturret": "건 터릿",
+        "gun": "화기",
+        "gunturret": "화기 터렛",
         "jumpmodule": "점프 모듈",
         "laser": "레이저",
         "lasercannon": "레이저 캐논",
@@ -2245,8 +2245,8 @@
         "nose": "기수",
         "power": "전력",
         "powerplant": "발전기",
-        "quantumdrive": "Quantum Drive",
-        "quantumfueltank": "Quantum 연료 탱크",
+        "quantumdrive": "퀀텀 드라이브",
+        "quantumfueltank": "퀀텀 연료 탱크",
         "radar": "레이더",
         "railgun": "레일건",
         "rear": "후방",
@@ -2255,15 +2255,15 @@
         "rocketpod": "로켓 포드",
         "salvagebeam": "샐비지 빔",
         "scanner": "스캐너",
-        "scattergun": "산탄포",
+        "scattergun": "스캐터건",
         "selfdestruct": "자폭",
         "shield": "실드",
-        "shieldgenerator": "실드 제너레이터",
-        "tail": "꼬리",
+        "shieldgenerator": "실드 발생기",
+        "tail": "후미",
         "thruster": "스러스터",
         "top": "상단",
         "tractorbeam": "트랙터 빔",
-        "turret": "터릿",
+        "turret": "터렛",
         "upper": "상단",
         "utility": "유틸리티",
         "weapon": "무기",
@@ -2272,7 +2272,7 @@
     },
     "hardpointMap": {
       "title": "선체 위 위치",
-      "hint": "아래의 하드포인트를 가리켜 보세요. 마커가 함선에서의 위치를 보여줍니다.",
+      "hint": "아래의 하드포인트를 가리켜 보세요. 마커가 함선에서의 위치를 보여 줘요.",
       "approximate": "범위 추정값",
       "viewTop": "상면도",
       "viewSide": "측면도(우현)",
@@ -2282,15 +2282,15 @@
       "readoutIdle": "선택된 하드포인트 없음"
     },
     "deckPlan": {
-      "title": "갑판 평면도",
-      "hint": "위에서 본 모습이며 기수가 위쪽입니다. 방을 가리키면 이름이 표시됩니다.",
-      "switchAria": "갑판 선택",
-      "aria": "{{deck}}: 갑판 평면도, 방 {{count}}개",
+      "title": "덱 평면도",
+      "hint": "위에서 본 모습이며 기수가 위쪽이에요. 방을 가리키면 이름이 표시돼요.",
+      "switchAria": "덱 선택",
+      "aria": "{{deck}}: 덱 평면도, 방 {{count}}개",
       "nose": "기수",
       "readoutIdle": "선택된 방 없음",
       "roomsAria": "{{deck}}의 방",
       "derivedLabel": "층 추정",
-      "derivedHint": "이 함선은 게임에서 갑판 이름을 지정하지 않아, 바닥 높이를 기준으로 층을 추정했습니다. 계단과 승강기는 연결되는 모든 층에 표시됩니다.",
+      "derivedHint": "이 함선은 게임에서 덱 이름을 지정하지 않아, 바닥 높이를 기준으로 층을 추정했어요. 계단과 엘리베이터는 연결되는 모든 층에 표시돼요.",
       "connects": "{{decks}}(으)로 연결"
     },
     "shipBlueprint": {
@@ -2298,10 +2298,10 @@
         "title": "하드포인트 도식",
         "topAria": "하드포인트 {{count}}개가 표시된 함선 상면도",
         "extent": "{{length}} × {{beam}} × {{height}} m",
-        "hint": "위에서 본 모습이며 기수가 오른쪽입니다. 마커를 가리키면 크기와 종류가, 클릭하면 컴포넌트가 표시됩니다.",
-        "hintSide": "옆에서 본 모습이며 기수가 오른쪽입니다. 마커를 가리키면 크기와 종류가, 클릭하면 컴포넌트가 표시됩니다.",
-        "hintFront": "앞에서 본 모습이며 기수가 보는 쪽을 향합니다. 마커를 가리키면 크기와 종류가, 클릭하면 컴포넌트가 표시됩니다.",
-        "noPositions": "이 선체의 하드포인트 위치는 아직 없습니다. 다음 3D 업로드와 함께 추가됩니다.",
+        "hint": "위에서 본 모습이며 기수가 오른쪽이에요. 마커를 가리키면 크기와 종류가, 클릭하면 컴포넌트가 표시돼요.",
+        "hintSide": "옆에서 본 모습이며 기수가 오른쪽이에요. 마커를 가리키면 크기와 종류가, 클릭하면 컴포넌트가 표시돼요.",
+        "hintFront": "앞에서 본 모습이며 기수가 보는 사람 쪽을 향해요. 마커를 가리키면 크기와 종류가, 클릭하면 컴포넌트가 표시돼요.",
+        "noPositions": "이 선체의 하드포인트 위치는 아직 없어요. 다음 3D 업로드와 함께 추가돼요.",
         "listLabel": "하드포인트",
         "size": "크기 {{size}}"
       },
@@ -2319,7 +2319,7 @@
         "store": "스토어",
         "event": "이벤트",
         "subscriber": "구독자",
-        "factory": "공장",
+        "factory": "기본",
         "pu_npc": "NPC (PU)",
         "other": "기타"
       },
@@ -2331,33 +2331,33 @@
       "loadError": "3D 모델을 불러오지 못했어요",
       "loadCatalogError": "도색을 불러오지 못했어요.",
       "retry": "다시 시도",
-      "collapse": "3D 뷰 접기",
-      "expand": "3D 뷰 펼치기",
-      "hardpointHint": "모델에 하드포인트 {{count}}개가 표시되어 있어요. 마커나 아래 행을 가리키면 둘 다 함께 강조됩니다."
+      "collapse": "3D 보기 접기",
+      "expand": "3D 보기 펼치기",
+      "hardpointHint": "모델에 하드포인트 {{count}}개가 표시되어 있어요. 마커나 아래 행을 가리키면 둘 다 함께 강조돼요."
     },
     "equipped": {
-      "alphaDamage": "알파 데미지",
+      "alphaDamage": "알파 피해",
       "dps": "DPS",
       "sustainedDps": "지속 DPS",
       "fireRate": "발사 속도",
-      "projectileSpeed": "발사체 속도",
+      "projectileSpeed": "투사체 속도",
       "range": "사거리",
       "penetration": "관통력",
       "shieldHp": "실드 HP",
       "shieldRegen": "재생",
       "regenDelay": "재생 지연",
       "downedDelay": "다운 지연",
-      "jumpRange": "점프 사거리",
+      "jumpRange": "점프 거리",
       "driveSpeed": "드라이브 속도",
-      "spoolTime": "충전 시간",
+      "spoolTime": "스풀 시간",
       "cooldown": "쿨다운",
       "thrust": "추력",
       "fuelCapacity": "연료 용량",
       "fuelRate": "연료 소모율",
       "health": "내구도",
       "distortion": "디스토션 용량",
-      "powerDraw": "전력 소모(세그)",
-      "powerOutput": "전력 출력(세그)",
+      "powerDraw": "전력 소모 (seg)",
+      "powerOutput": "전력 출력 (seg)",
       "minPower": "최소 전력",
       "coolantDraw": "냉각 소모",
       "coolingRate": "냉각 출력",
@@ -2366,9 +2366,9 @@
       "pingCooldown": "핑 쿨다운",
       "emSignature": "EM 시그니처",
       "irSignature": "IR 시그니처",
-      "derivedHint": "다른 추출 수치로 계산한 파생 값입니다.",
-      "noStats": "현재 추출본에는 이 무기의 수치가 없습니다.",
-      "armamentMissing": "이번 추출본에서 무기 마운트 {{count}}개에 기본 무기가 없습니다. 게임이 기본 무기 구성을 별도 레코드에 보관하는데, 저희 P4K 추출기가 아직 이를 해석하지 못합니다.",
+      "derivedHint": "다른 추출 수치로 계산한 파생 값이에요.",
+      "noStats": "현재 추출본에는 이 무기의 수치가 없어요.",
+      "armamentMissing": "이번 추출본에서 무기 마운트 {{count}}개에 기본 무기가 없어요. 게임이 기본 무기 구성을 별도 레코드에 보관하는데, P4K 추출기가 아직 이를 해석하지 못해요.",
       "missileCount": "미사일",
       "missileSize": "미사일 크기",
       "cmCapacity": "탑재 수량",
@@ -2382,17 +2382,17 @@
       "tractorRange": "사거리",
       "tractorFullStrengthRange": "최대 위력 유지 거리",
       "tractorForce": "최대 견인력",
-      "tractorForceHint": "게임 파일은 트랙터 빔을 질량이 아닌 견인력으로 제한합니다. 물체가 무거울수록 느리게 움직이며(F = m·a), 필요한 힘이 견인력을 계속 넘으면 빔이 끊어집니다.",
+      "tractorForceHint": "게임 파일은 트랙터 빔을 질량이 아닌 견인력으로 제한해요. 물체가 무거울수록 느리게 움직이며(F = m·a), 필요한 힘이 견인력을 계속 넘으면 빔이 끊어져요.",
       "tractorAngle": "최대 각도",
       "tractorTetherBreak": "빔 끊김 시간",
       "tractorSpeed": "최대 이동 속도",
-      "tractorNoStats": "이 트랙터 빔의 사거리와 견인력은 아직 추출본에 없습니다. 다음 재추출 때 반영됩니다."
+      "tractorNoStats": "이 트랙터 빔의 사거리와 견인력은 아직 추출본에 없어요. 다음 재추출 때 반영돼요."
     },
     "shipLink": {
       "add": "Pledge 링크 추가",
       "edit": "Pledge 링크 수정",
       "label": "공식 RSI Pledge 링크",
-      "hint": "저희 카탈로그에는 모든 함선의 정확한 RSI 스토어 슬러그가 있지는 않아요. 공식 Pledge 페이지를 붙여 넣으면 일반 RSI 링크 대신 사용됩니다. 본인에게만 적용돼요.",
+      "hint": "저희 카탈로그에는 모든 함선의 정확한 RSI 스토어 슬러그가 있지는 않아요. 공식 Pledge 페이지를 붙여 넣으면 일반 RSI 링크 대신 사용돼요. 본인에게만 적용돼요.",
       "placeholder": "https://robertsspaceindustries.com/en/pledge/ships/nomad/Nomad",
       "save": "링크 저장",
       "remove": "삭제",
@@ -2407,26 +2407,26 @@
       "adminTitle": "관리자",
       "promote": "모두에게 게시",
       "unpromote": "전체 링크 철회",
-      "adminHint": "게시하면 위의 링크가 모든 사용자에게 보입니다. 사용자 링크는 자동으로 게시되지 않아요."
+      "adminHint": "게시하면 위의 링크가 모든 사용자에게 보여요. 사용자 링크는 자동으로 게시되지 않아요."
     },
     "moduleSection": {
       "weapons": "무장",
-      "remoteTurrets": "원격 터릿",
-      "mannedTurrets": "유인 터릿",
+      "remoteTurrets": "원격 터렛",
+      "mannedTurrets": "유인 터렛",
       "missiles": "미사일",
       "pod": "포드",
-      "shields": "실드 제너레이터",
+      "shields": "실드 발생기",
       "powerPlants": "발전기",
-      "quantum": "Quantum Drive",
+      "quantum": "퀀텀 드라이브",
       "radar": "레이더 및 센서",
       "coolers": "쿨러",
       "lifeSupport": "생명 유지 장치",
       "structure": "기체 및 고정 시스템",
       "systems": "추진 및 시스템",
       "fixedTag": "구성 불가",
-      "countermeasures": "대응 장치",
-      "shieldsNote": "이 블록의 모든 베이는 교체 가능한 실드 제너레이터이며, 기본적으로 비어 있는 베이도 포함됩니다. 실드 제어 모듈은 고정 시스템에 있습니다. 별도의 실드가 아니며 게임에서 교체할 수 없어요.",
-      "countermeasuresNote": "런처는 게임에서 교체할 수 없어서 이 블록은 참고용입니다. 디코이는 열 추적 미사일을 유인하고, 노이즈(채프)는 레이더 유도 미사일을 교란합니다. 필요한 수량은 런처의 정보 시트(ⓘ)에서 확인할 수 있으며, 발사 1회당 시그니처를 함선 자체의 시그니처와 비교해 보여줍니다.",
+      "countermeasures": "기만체",
+      "shieldsNote": "이 블록의 모든 슬롯은 교체 가능한 실드 발생기이며, 기본적으로 비어 있는 슬롯도 포함돼요. 실드 제어 모듈은 고정 시스템에 있어요. 별도의 실드가 아니며 게임에서 교체할 수 없어요.",
+      "countermeasuresNote": "런처는 게임에서 교체할 수 없어서 이 블록은 참고용이에요. 디코이는 열 추적 미사일을 유인하고, 노이즈(채프)는 레이더 유도 미사일을 교란해요. 필요한 수량은 런처의 정보 시트(ⓘ)에서 확인할 수 있으며, 발사 1회당 시그니처를 함선 자체의 시그니처와 비교해 보여 줘요.",
       "infoLabel": "이 블록 설명",
       "splitRows": "개별",
       "groupRows": "묶기",
@@ -2449,8 +2449,8 @@
         "passive": "패시브 · 전력망 미연결",
         "pool": "풀"
       },
-      "shieldNote": "{{count}}개 모두 실드 제너레이터이며 각각 개별로 교체할 수 있어요. 동일한 것은 여기에 묶여 있고, \"개별\"을 누르면 베이별로 나열됩니다.",
-      "shieldPassiveNote": "패시브 제너레이터는 전력을 쓰지 않으면서도 풀에 온전히 합산됩니다. 다만 활성 제너레이터에 종속되어 있어서, 활성이 고장 나면 보조 효과도 함께 사라져요.",
+      "shieldNote": "{{count}}개 모두 실드 발생기이며 각각 개별로 교체할 수 있어요. 동일한 것은 여기에 묶여 있고, “개별”을 누르면 슬롯별로 나열돼요.",
+      "shieldPassiveNote": "패시브 발생기는 전력을 쓰지 않으면서도 풀에 온전히 합산돼요. 다만 활성 발생기에 종속되어 있어서, 활성 발생기가 꺼지면 보조 효과도 함께 사라져요.",
       "peek": {
         "sustainedDpsTotal": "총 지속 DPS",
         "burstDpsTotal": "총 버스트 DPS",
@@ -2460,10 +2460,10 @@
       }
     },
     "summary": {
-      "alphaDamage": "알파 대미지 (전체 무기)",
+      "alphaDamage": "알파 피해 (전체 무기)",
       "dps": "지속 DPS",
       "weaponMounts": "무기 마운트",
-      "ordnanceMounts": "무장 마운트",
+      "ordnanceMounts": "미사일 마운트",
       "shieldHp": "실드 풀",
       "shieldRegen": "실드 재생",
       "regenDelay": "재생 지연",
@@ -2473,18 +2473,18 @@
       "powerPlants": "발전기",
       "powerPlantSize": "발전기 총 크기",
       "powerDraw": "전력 소모",
-      "poweredItems": "전력 공급 부품",
+      "poweredItems": "전력 공급 컴포넌트",
       "plantDurability": "발전기 내구도",
       "plantDistortion": "발전기 디스토션 풀",
       "gap": {
-        "noStockGuns": "이 선체의 기본 무기는 추출 데이터에 없습니다. 게임이 기본 무기 구성을 별도의 로드아웃 레코드에 보관하는데, 아직 이를 해석하지 못해 아래 마운트에는 무기 대신 자리만 표시됩니다.",
+        "noStockGuns": "이 선체의 기본 무기는 추출 데이터에 없어요. 게임이 기본 무기 구성을 별도의 로드아웃 레코드에 보관하는데, 아직 이를 해석하지 못해 아래 마운트에는 무기 대신 자리만 표시돼요.",
         "noFireRate": "이 추출 데이터{{patch}}에는 발사 속도가 없어 아직 지속 DPS를 계산할 수 없어요.",
         "noSustainedCycle": "이 추출 데이터{{patch}}에는 무기의 에너지 재생, 재장전 시간, 과열 데이터가 없어 아직 지속 DPS를 계산할 수 없어요. 버스트 DPS는 휴지 시간을 계산하지 않아요.",
-        "noShields": "이 함선의 기본 로드아웃에는 실드 제너레이터가 없어요.",
+        "noShields": "이 함선의 기본 로드아웃에는 실드 발생기가 없어요.",
         "noHullHp": "선체 HP는 아직 P4K 추출 데이터에 포함되어 있지 않아요.",
-        "noResistances": "채널별 대미지 저항은 추출되지 않아요. 어떤 함선이나 방어구 엔티티에도 해당 값이 없어요.",
+        "noResistances": "채널별 피해 저항은 추출되지 않아요. 어떤 함선이나 장갑 엔티티에도 해당 값이 없어요.",
         "noPowerPlant": "이 함선의 기본 로드아웃에는 발전기가 없어요.",
-        "noPowerDraw": "부품별 전력 소모와 출력이 아직 추출 데이터에 없어 전력 삼각형을 계산할 수 없어요.",
+        "noPowerDraw": "컴포넌트별 전력 소모와 출력이 아직 추출 데이터에 없어 전력 삼각형을 계산할 수 없어요.",
         "noHullMass": "선체 질량은 추출 데이터에 없어요. 장착된 장비의 질량만 계산할 수 있어요.",
         "noFlight": "이 함선의 추출 데이터에는 비행 성능 수치가 없어요.",
         "noCargoCapacity": "화물 용량은 아직 추출 데이터에 없어요.",
@@ -2493,14 +2493,14 @@
         "noQuantum": "이 함선에는 퀀텀 드라이브가 장착되어 있지 않아요.",
         "noEquipmentMass": "이 구성의 장비 질량은 계산할 수 없어요.",
         "noMissiles": "이 구성에는 미사일이 없어요.",
-        "noArmorStats": "이 함선의 추출 데이터에는 방어구 수치가 없어요. 선체 구조만 표시돼요."
+        "noArmorStats": "이 함선의 추출 데이터에는 장갑 수치가 없어요. 선체 구조만 표시돼요."
       }
     },
     "mission": {
       "label": "임무",
       "all": "전체",
       "combat": "전투",
-      "transport": "운송",
+      "transport": "수송",
       "travel": "이동",
       "stealth": "스텔스",
       "mining": "채굴",
@@ -2516,7 +2516,7 @@
     },
     "kpi": {
       "bandLabel": "주요 수치",
-      "alpha": "알파 대미지",
+      "alpha": "알파 피해",
       "burstDps": "버스트 DPS",
       "sustainedDps": "지속 DPS",
       "missiles": "미사일 일제 사격",
@@ -2529,18 +2529,18 @@
       "scm": "SCM 속도",
       "maxSpeed": "최고 속도",
       "quantumSpeed": "퀀텀 속도",
-      "quantumRange": "퀀텀 사거리",
+      "quantumRange": "퀀텀 항속거리",
       "spool": "스풀 시간",
       "ir": "IR 시그니처",
       "emIdle": "EM 시그니처 (대기, 모델)",
       "emLoad": "EM 시그니처 (현재 배분, 모델)",
       "emMax": "EM 시그니처 (최대, 모델)",
       "emQuantum": "EM 시그니처 (퀀텀, 모델)",
-      "modelHint": "게임 수치가 아닌 자체 모델입니다. 부품별 EM = 정격값 × 할당 ÷ 전체 세그먼트이며, 리액터 EM은 소비 전력을 따르고 여기에 선체 장갑 계수를 곱합니다. 출처: 게임 데이터의 부품 값.",
-      "modelNote": "IR과 EM은 게임 수치가 아닌 자체 모델입니다. 부품별 EM = 정격값 × 할당 ÷ 전체 세그먼트이며, 리액터 EM은 소비 전력을 따르고 여기에 선체 장갑 계수를 곱합니다. 대기 = 모든 것이 최소, 실드와 퀀텀 꺼짐. 최대 = 모든 것이 최대, 실드 켜짐. 퀀텀 = 실드 꺼짐, 퀀텀 드라이브 켜짐. IR은 쿨러만 포함하며 스러스터는 제외됩니다(스로틀에 따라 변함). 출처: 게임 데이터의 부품 값.",
+      "modelHint": "게임 수치가 아닌 자체 모델이에요. 컴포넌트별 EM = 정격값 × 할당 ÷ 전체 세그먼트이며, 리액터 EM은 소비 전력을 따르고 여기에 선체 장갑 계수를 곱해요. 출처: 게임 데이터의 컴포넌트 값.",
+      "modelNote": "IR과 EM은 게임 수치가 아닌 자체 모델이에요. 컴포넌트별 EM = 정격값 × 할당 ÷ 전체 세그먼트이며, 리액터 EM은 소비 전력을 따르고 여기에 선체 장갑 계수를 곱해요. 대기 = 모든 것이 최소, 실드와 퀀텀 꺼짐. 최대 = 모든 것이 최대, 실드 켜짐. 퀀텀 = 실드 꺼짐, 퀀텀 드라이브 켜짐. IR은 쿨러만 포함하며 스러스터는 제외돼요(스로틀에 따라 변함). 출처: 게임 데이터의 컴포넌트 값.",
       "crossSection": "단면적",
       "boost": "부스트 속도",
-      "armor": "방어구",
+      "armor": "장갑",
       "agility": "기동성",
       "gap": "—",
       "gapHint": "이 빌드에는 값이 없어요.",
@@ -2557,8 +2557,8 @@
         "shieldRegen": "실드 재생",
         "hullHp": "선체 HP",
         "cargo": "화물",
-        "quantumRange": "퀀텀 사거리",
-        "quantumRangeTight": "Q 사거리",
+        "quantumRange": "퀀텀 항속거리",
+        "quantumRangeTight": "Q 항속거리",
         "scm": "SCM",
         "maxSpeed": "최고",
         "boost": "부스트",
@@ -2568,7 +2568,7 @@
         "crossSection": "단면적",
         "effectiveHp": "유효 HP",
         "agility": "기동성",
-        "armorHp": "방어구",
+        "armorHp": "장갑",
         "quantumSpeed": "Q 속도",
         "spool": "스풀",
         "emIdle": "EM (대기, 모델)",
@@ -2601,7 +2601,7 @@
         "longestGunNote": "사거리는 가장 짧은 무기에 의해 제한돼요. {{name}}의 사거리가 가장 길어요.",
         "mixedRangeWarning": "사거리 혼합: 적어도 하나의 무기가 나머지보다 눈에 띄게 멀리 나가요.",
         "missiles": "미사일 (탄두 {{count}}개)",
-        "salvoDamage": "일제 사격 대미지",
+        "salvoDamage": "일제 사격 피해",
         "lockTime": "락온 시간",
         "range": "사거리",
         "targeting": "타기팅",
@@ -2612,8 +2612,8 @@
         "colTracking": "추적 신호",
         "colCount": "수량",
         "colWarhead": "탄두",
-        "colMissileTotal": "총 대미지",
-        "salvoNote": "모든 미사일을 한 번에 일제 사격해요. 일회성 대미지이며 무기 DPS에는 포함되지 않아요.",
+        "colMissileTotal": "총 피해",
+        "salvoNote": "모든 미사일을 한 번에 일제 사격해요. 일회성 피해이며 무기 DPS에는 포함되지 않아요.",
         "salvoPartial": "모든 미사일에 탄두 수치가 있는 것은 아니며, 일제 사격에는 확인된 것만 포함돼요.",
         "noWarheadData": "현재 데이터에는 이 미사일들의 탄두 수치가 아직 없어요.",
         "hintMissiles": "{{value}} 미사일 일제 사격"
@@ -2626,16 +2626,16 @@
         "fullIn": "완충까지",
         "regenDelay": "지연",
         "downedDelay": "지연 (다운)",
-        "mixedGeneratorNote": "서로 다른 실드 제너레이터가 여러 개 장착되어 있어요. 위 합계는 집계된 값이며 지연은 가장 강한 것을 따라요.",
+        "mixedGeneratorNote": "서로 다른 실드 발생기가 여러 개 장착되어 있어요. 위 합계는 집계된 값이며 지연은 가장 강한 것을 따라요.",
         "resistance": "실드 저항",
-        "hull": "선체 및 방어구",
+        "hull": "선체 및 장갑",
         "armorPhysical": "물리 감소",
         "armorEnergy": "에너지 감소",
         "armorDistortion": "디스토션 감소",
         "armorPenetration": "기본 관통 감소",
         "armorDeflectionPhysical": "편향 (물리)",
         "armorDeflectionEnergy": "편향 (에너지)",
-        "noArmorData": "이 함선의 추출 데이터에는 방어구 수치가 없어요. 선체 구조만 표시돼요.",
+        "noArmorData": "이 함선의 추출 데이터에는 장갑 수치가 없어요. 선체 구조만 표시돼요.",
         "effectiveHp": "유효 총 HP",
         "effectiveHpGap": "추출 데이터에 선체 HP와 실드 HP가 모두 있어야 계산할 수 있어요."
       },
@@ -2654,9 +2654,9 @@
       "title": "선체 및 비행",
       "hullHp": "선체 HP",
       "hullMass": "선체 질량",
-      "armorHp": "방어구 HP",
+      "armorHp": "장갑 HP",
       "reverseSpeed": "후진 속도",
-      "dimensions": "크기 (L×W×H)",
+      "dimensions": "치수 (L×W×H)",
       "decks": "덱",
       "decksDerived": "바닥 높이로 추정",
       "crew": "승무원",
@@ -2679,7 +2679,7 @@
       "openStats": "모든 값 표시"
     },
     "moduleRole": {
-      "shieldGenerator": "제너레이터",
+      "shieldGenerator": "발생기",
       "shieldController": "제어 모듈"
     },
     "table": {
@@ -2700,9 +2700,9 @@
       "switchTo": "{{name}}(으)로 전환"
     },
     "set": {
-      "back": "← 코덱스로 돌아가기",
+      "back": "← Codex로 돌아가기",
       "backToHangar": "← 격납고로 돌아가기",
-      "flowHint": "슬롯을 탭하면 아스널에서 채울 수 있어요. 방어구는 캐릭터 주변, 무기는 아래 바에 있어요.",
+      "flowHint": "슬롯을 탭하면 Arsenal에서 채울 수 있어요. 방어구는 캐릭터 주변, 무기는 아래 바에 있어요.",
       "signInHint": "로그인하면 세트를 보고 편집할 수 있어요.",
       "noSets": "아직 제작한 세트가 없어요.",
       "createInHangar": "격납고에서 세트 만들기 →",
@@ -2713,7 +2713,7 @@
         "eyebrow": "무기 및 도구",
         "choose": "선택",
         "change": "변경",
-        "open": "열림",
+        "open": "비어 있음",
         "clear": "비우기",
         "clearAria": "{{slot}} 비우기",
         "clearing": "비우는 중 …",
@@ -2728,7 +2728,7 @@
       "stage": {
         "slotsAria": "방어구 부위",
         "readinessAria": "준비 상태",
-        "lensLimits": "이번 작전에서 세트를 제한해요"
+        "lensLimits": "이 임무에서 세트를 제한해요"
       },
       "supplies": {
         "add": "누락 항목을 작전에 추가 ({{n}})",
@@ -2738,12 +2738,12 @@
       },
       "notFoundPage": {
         "title": "세트를 찾을 수 없어요",
-        "body": "이 세트가 없거나 내 보관함에 없어요."
+        "body": "이 세트가 없거나 내 세트 목록에 없어요."
       }
     },
     "stat": {
       "health": "체력",
-      "distortionCapacity": "왜곡 수용량",
+      "distortionCapacity": "디스토션 용량",
       "maxShieldHealth": "최대 실드 체력",
       "maxShieldRegen": "최대 실드 재생",
       "scmSpeed": "SCM 속도",
@@ -2756,7 +2756,7 @@
       "lifetime": "지속 시간",
       "radiationCapacityMax": "최대 방사선 수용량",
       "radiationResistance": "방사선 저항",
-      "punctureResistance": "관통 저항",
+      "punctureResistance": "천공 저항",
       "impactResistance": "충격 저항",
       "energyResistance": "에너지 저항",
       "explosiveResistance": "폭발 저항",
@@ -2772,25 +2772,25 @@
       "damage": "피해량",
       "range": "사거리",
       "effectiveRange": "유효 사거리",
-      "gForceResistance": "G-force 저항",
+      "gForceResistance": "G 내성",
       "temperatureMax": "최대 온도",
       "temperatureMin": "최소 온도",
       "emSignature": "EM 시그니처",
       "irSignature": "IR 시그니처",
       "atmosphereCapacity": "대기 수용량",
-      "radiationDissipationRate": "방사선 소산",
+      "radiationDissipationRate": "방사선 해소",
       "pressureMax": "최대 압력",
       "pressureMin": "최소 압력",
       "heatPerShot": "발사당 열",
       "projectilesPerShot": "발사당 투사체 수",
-      "downedRegenDelay": "붕괴 후 재생 지연",
+      "downedRegenDelay": "다운 후 재생 지연",
       "damagedRegenDelay": "피격 후 재생 지연",
       "decayRatio": "감쇠 비율",
       "reserveDrainRate": "예비 소모 속도",
-      "stunMaxAlphaRatio": "기절: 최대 알파 비율",
-      "stunMinAlphaRatio": "기절: 최소 알파 비율",
-      "stunMaxTime": "기절: 최대 지속 시간",
-      "stunMinTime": "기절: 최소 지속 시간",
+      "stunMaxAlphaRatio": "스턴: 최대 알파 비율",
+      "stunMinAlphaRatio": "스턴: 최소 알파 비율",
+      "stunMaxTime": "스턴: 최대 지속 시간",
+      "stunMinTime": "스턴: 최소 지속 시간",
       "splineDriveSpeed": "루트 점프: 속도",
       "driveSpeed": "구동 속도",
       "engageSpeed": "작동 개시 속도",
@@ -2830,14 +2830,14 @@
       "axis": {
         "protection": "보호",
         "mobility": "기동성",
-        "stealth": "은신",
+        "stealth": "스텔스",
         "activeScan": "액티브 스캔",
-        "gForce": "G-Force",
+        "gForce": "G 내성",
         "eva": "EVA",
         "heat": "열",
         "cold": "냉기",
         "radiation": "방사선",
-        "scrub": "제거",
+        "scrub": "해소",
         "carry": "적재"
       },
       "cohort": "같은 종류의 모든 방어구 부위 대비",
@@ -2857,23 +2857,23 @@
       },
       "loading": "계산 중 …",
       "unavailable": "게임 내 수치를 불러오면 순위가 표시돼요.",
-      "failed": "평가를 불러오지 못했어요.",
-      "empty": "아직 장착한 방어구가 없어요 — 첫 부위를 장착하면 평가가 표시돼요."
+      "failed": "순위를 불러오지 못했어요.",
+      "empty": "아직 장착한 방어구가 없어요 — 첫 부위를 장착하면 순위가 표시돼요."
     },
     "setLens": {
       "all": "전체",
       "combat": "전투",
-      "stealth": "은신",
+      "stealth": "스텔스",
       "pilot": "파일럿",
       "env": "환경",
-      "transport": "운송",
+      "transport": "수송",
       "eva": "EVA",
       "scan": "스캔",
       "tip": {
         "all": "모든 수치를 동일하게 반영하며 특화 없음.",
-        "combat": "CIG의 \"Tank\" 특화처럼 보호 성능과 방어구 등급이 우선이에요.",
-        "stealth": "세트가 스캐너에 얼마나 잘 포착되는지 나타내요.",
-        "pilot": "CIG의 \"Pilot\", \"Driver\" 특화처럼 G-force 내성이 우선이에요.",
+        "combat": "CIG의 \"Tank\" 특화처럼 보호 성능과 방어구 클래스가 우선이에요.",
+        "stealth": "세트가 스캐너에 얼마나 덜 포착되는지 나타내요.",
+        "pilot": "CIG의 \"Pilot\", \"Driver\" 특화처럼 G 내성이 우선이에요.",
         "env": "세트가 열, 냉기, 방사선을 얼마나 잘 막는지 나타내요.",
         "transport": "세트가 제공하는 적재 용량이에요.",
         "eva": "세트가 EVA 작업에 얼마나 적합한지 나타내요.",
@@ -2892,7 +2892,7 @@
       "groups": {
         "weapons": "무기",
         "missiles": "미사일",
-        "components": "구성품",
+        "components": "컴포넌트",
         "attachments": "부착물",
         "interior": "내부",
         "other": "기타"
@@ -2905,14 +2905,14 @@
       "freeSlot": "빈 슬롯, {{types}} 장착 가능",
       "label": {
         "aria": "선택한 슬롯: {{name}}",
-        "open": "코덱스에서 {{name}} 열기",
+        "open": "Codex에서 {{name}} 열기",
         "prev": "이전 슬롯",
         "next": "다음 슬롯",
         "emptySlot": "빈 슬롯"
       },
       "allParts": "모든 부품",
       "zoomHint": "Ctrl + 휠로 확대/축소",
-      "swap": "구성품 교체"
+      "swap": "컴포넌트 교체"
     },
     "attachType": {
       "WeaponPersonal": "개인 무기",
@@ -2933,7 +2933,7 @@
     },
     "personal": {
       "switchGroup": "보기: 기본 사양 또는 내 변형",
-      "codex": "코덱스",
+      "codex": "Codex",
       "stock": "기본",
       "mine": "내 것",
       "mineVariant": "내 변형",
@@ -2949,7 +2949,7 @@
       "inSet": "{{name}} 세트에 포함"
     },
     "browse": {
-      "eyebrow": "코덱스 색인",
+      "eyebrow": "Codex 인덱스",
       "filtersAria": "필터",
       "filtersTitle": "필터",
       "filterButton": "필터 ({{count}})",
@@ -3031,7 +3031,7 @@
         "radarAria": "{{name}}의 백분위를 유도 무기 {{n}}개와 비교한 레이더 차트",
         "legendCompare": "중앙값 {{group}} · 유도 무기 {{n}}개",
         "legendAbove": "중앙값 이상",
-        "legendBelow": "중앙값 이하",
+        "legendBelow": "중앙값 미만",
         "compareInfo": "각 축은 0(중앙)부터 선택한 무기 중 최고값(가장자리)까지예요. 파란색은 이 무기, 점선은 그룹의 중앙값이에요.",
         "note": "이 무기에 대해 게임 데이터에 있는 항목만 비교해요.",
         "gapNoData": "현재 데이터에는 아직 피해량, 속도, 기동성, 사거리 값이 없어요. Verse Data Uploader 0.73.3 이상으로 빌드를 업로드하면 비교가 표시돼요.",
@@ -3084,11 +3084,11 @@
         "torpedo": "어뢰",
         "rocket": "로켓",
         "ground": "지상 차량",
-        "light": "경량",
-        "medium": "중형",
-        "heavy": "중량",
-        "compact": "소형",
-        "long": "장거리형",
+        "light": "경량급",
+        "medium": "중형급",
+        "heavy": "중량급",
+        "compact": "단형",
+        "long": "장형",
         "hardHitting": "강타형",
         "fast": "고속",
         "agile": "민첩",
@@ -3096,8 +3096,8 @@
         "quickLock": "빠른 락온"
       },
       "keywordTip": {
-        "ir": "대상의 적외선 신호를 추적해요.",
-        "em": "대상의 전자기 신호를 추적해요.",
+        "ir": "대상의 적외선 시그니처를 추적해요.",
+        "em": "대상의 전자기 시그니처를 추적해요.",
         "cs": "대상의 단면적을 추적해요.",
         "missile": "함선에서 발사해요.",
         "torpedo": "대형 목표를 겨냥한 중량급 유도 무기예요.",
@@ -3106,8 +3106,8 @@
         "light": "크기 1~3.",
         "medium": "크기 4~6.",
         "heavy": "크기 7 이상.",
-        "compact": "같은 종류·크기 중 가장 짧은 상위 25%예요.",
-        "long": "같은 종류·크기 중 가장 긴 상위 25%예요.",
+        "compact": "같은 종류·크기 중 가장 짧은 25%에 속해요.",
+        "long": "같은 종류·크기 중 가장 긴 25%에 속해요.",
         "hardHitting": "같은 종류 중 피해량 상위 25%예요.",
         "fast": "같은 종류 중 가장 빠른 상위 25%예요.",
         "agile": "같은 종류 중 가장 민첩한 상위 25%예요.",
@@ -3126,13 +3126,13 @@
       "variantAria": "변형 선택, 현재: {{name}}",
       "shown": "표시 중:",
       "own": {
-        "hangar": "하바에 있음",
-        "hangarN": "하바에 {{n}}개 있음",
+        "hangar": "격납고에 있음",
+        "hangarN": "격납고에 {{n}}개 있음",
         "inventar": "인벤토리에 있음 · {{n}}개",
         "sammlung": "컬렉션에 있음"
       },
       "notOwn": {
-        "hangar": "하바에 없음",
+        "hangar": "격납고에 없음",
         "inventar": "인벤토리에 없음",
         "sammlung": "컬렉션에 없음"
       }
@@ -3159,7 +3159,7 @@
       "radarAria": "{{name}}의 백분위를 부품 {{n}}개와 비교한 레이더 차트",
       "legendCompare": "중앙값 {{group}} · 부품 {{n}}개",
       "legendAbove": "중앙값 이상",
-      "legendBelow": "중앙값 이하",
+      "legendBelow": "중앙값 미만",
       "compareInfo": "각 축은 0(중앙)부터 선택한 부품 중 최고값(가장자리)까지예요. 파란색은 이 부품, 점선은 그룹의 중앙값이에요.",
       "note": "이 부품에 대해 게임 데이터에 있는 항목만 비교해요.",
       "gapTooFew": "여기서 비교하는 값이 서로 다른 부품이 너무 적어 이 부품의 순위를 매길 수 없어요.",
@@ -3185,7 +3185,7 @@
         "emSignature": "EM",
         "irSignature": "IR",
         "driveSpeed": "속도",
-        "jumpRange": "사거리",
+        "jumpRange": "항속거리",
         "spoolTime": "스풀 시간"
       }
     },
@@ -3248,27 +3248,27 @@
       "unmark": "내 것 – 표시 해제: {{name}}"
     },
     "role": {
-      "primary": "주",
-      "secondary": "보조",
+      "primary": "주 재료",
+      "secondary": "보조 재료",
       "catalyst": "촉매"
     },
     "detail": {
       "tier": "티어",
       "craftTime": "제작 시간",
       "dismantleTime": "분해 시간",
-      "outputQty": "출력 수량",
+      "outputQty": "생산 수량",
       "ingredients": "재료",
       "noIngredients": "기록된 재료가 없어요.",
       "unresolved": "확인되지 않은 재료",
       "minQuality": "최소 품질",
-      "output": "출력",
+      "output": "생산물",
       "qualitySummary": "품질 요약",
-      "qualityNote": "정적 기본 품질 값입니다 — 인터랙티브 품질 시뮬레이션은 향후 업데이트에서 제공될 예정이에요.",
+      "qualityNote": "정적 기본 품질 값이에요 — 인터랙티브 품질 시뮬레이션은 향후 업데이트에서 제공될 예정이에요.",
       "missions": "이 블루프린트의 미션",
       "missionsNote": "이 미션들은 보상으로 이 블루프린트를 줄 수 있어요.",
       "missionsMore": "외 {{count}}개",
       "toMission": "미션으로 이동",
-      "primary": "주요",
+      "primary": "주 재료",
       "unitScu": "SCU"
     }
   },
@@ -3288,17 +3288,17 @@
       "toggle": "필터 ({{count}})"
     },
     "weaponType": {
-      "sidearm": "보조 무기",
-      "primary": "주무장",
+      "sidearm": "보조무기",
+      "primary": "주무기",
       "heavy": "중화기",
-      "melee": "근접",
-      "throwable": "투척물",
+      "melee": "근접 무기",
+      "throwable": "투척 무기",
       "gadget": "도구 / 가젯"
     },
     "weight": {
       "light": "경량",
-      "medium": "중량",
-      "heavy": "중갑"
+      "medium": "중형",
+      "heavy": "중량"
     },
     "armorStatsHint": "이 빌드에는 방어구의 상세 스탯 정보가 아직 없어요 — 이름, 등급, 크기, 제조사만 표시돼요.",
     "empty": {
@@ -3327,8 +3327,8 @@
         "eyebrowSlot": "Arsenal · {{slot}}",
         "titleSlot": "{{name}}의 {{slot}}"
       },
-      "setLoadFailed": "링크의 세트를 불러올 수 없어요",
-      "equipAs": "{{slot}}로 장착"
+      "setLoadFailed": "링크의 세트를 불러오지 못했어요",
+      "equipAs": "{{slot}}(으)로 장착"
     },
     "addToSet": {
       "trigger": "세트에 추가",
@@ -3782,14 +3782,14 @@
   "stability": {
     "word": {
       "stabil": "안정",
-      "wackelig": "불안정 기미",
+      "wackelig": "다소 불안정",
       "instabil": "불안정"
     },
     "noData": "데이터 부족",
     "tip": {
       "noData": "아직 평가할 데이터가 부족해요",
-      "better": "{{prev}}보다 {{d}}포인트 높음 ({{p}} %)",
-      "worse": "{{prev}}보다 {{d}}포인트 낮음 ({{p}} %)",
+      "better": "{{prev}}보다 {{d}}점 높음 ({{p}} %)",
+      "worse": "{{prev}}보다 {{d}}점 낮음 ({{p}} %)",
       "same": "{{prev}}과(와) 비슷함 ({{p}} %)",
       "community": "그중 {{c}}는 커뮤니티 평가 반영",
       "early": "아직 잠정",
@@ -3800,7 +3800,7 @@
       "ghost": "{{prev}}: {{p}} %",
       "bandsRolling": "최근 완료된 패치로 계산한 기준선",
       "bandInstabil": "불안정 · {{n}} 미만",
-      "bandWackelig": "불안정 기미 · {{a}}–{{b}}",
+      "bandWackelig": "다소 불안정 · {{a}}–{{b}}",
       "bandStabil": "안정 · {{n}} 이상",
       "sumTitle": "{{n}} %가 나온 과정",
       "start": "모든 패치의 시작값",
@@ -3842,7 +3842,7 @@
       "sum": "{{n}}표 · 보정 {{c}}",
       "yours": "내 평가",
       "blindTitle": "먼저 의견을, 그다음 수치를",
-      "ask": "{{line}}은(는) 어느 정도 안정적으로 돌아가나요?",
+      "ask": "내 환경에서 {{line}}은(는) 얼마나 안정적으로 돌아가나요?",
       "mine": "내 의견:",
       "changeFrom": "{{time}}부터 변경 가능",
       "hint": {
@@ -3917,7 +3917,7 @@
     "leading": {
       "badge": "주 번들",
       "tip": "Codex가 해당 패치와 채널에 이 번들을 사용해요.",
-      "reason": "밀려남: {{name}}이(가) 주 번들로 선택되었어요."
+      "reason": "후순위로 변경: {{name}}이(가) 주 번들로 선택되었어요."
     }
   },
   "profile": {
@@ -4742,7 +4742,7 @@
     }
   },
   "desktop": {
-    "title": "Data Upload",
+    "title": "데이터 업로드",
     "subtitle": "로컬 Star Citizen 설치본용 Verse Data Uploader를 다운로드하세요.",
     "bundleHistory": "번들 기록",
     "loading": "릴리스 불러오는 중…",
@@ -4763,10 +4763,10 @@
     "appDesc": "로컬 Star Citizen 설치본을 읽어 Codex 번들을 업로드해요.",
     "close": "닫기",
     "access": {
-      "fullPage": "전체 Data Upload 페이지",
+      "fullPage": "전체 데이터 업로드 페이지",
       "note": "Windows 전용 · Verse Companion 계정으로 로그인 · 데이터만 업로드하며 코드는 업로드하지 않아요."
     },
-    "historyEyebrow": "Uploader",
+    "historyEyebrow": "업로더",
     "build": {
       "title": "최신 번들",
       "since": "{{date}}부터",
@@ -4777,9 +4777,9 @@
       "title": "설정",
       "done": "설정 완료 — 이전에 업로드한 적이 있어요.",
       "doneSr": "완료",
-      "s1": "Uploader를 다운로드하고 실행하세요",
+      "s1": "업로더를 다운로드하고 실행하세요",
       "s2": "Verse Companion 계정으로 로그인하세요",
-      "s3": "Star Citizen 폴더를 선택하세요 — Uploader가 Data.p4k를 읽고 번들을 업로드해요"
+      "s3": "Star Citizen 폴더를 선택하세요 — 업로더가 Data.p4k를 읽고 번들을 업로드해요"
     }
   },
   "download": {
@@ -4813,24 +4813,30 @@
     "handedOverHint": "앱이 세션을 가져가는 중이니 이 창을 닫아도 돼요. 연결되지 않았다면 앱에서 연결을 다시 시작하세요."
   },
   "desktopAuth": {
-    "title": "Verse Data Uploader 인증",
     "authorizing": "세션을 확인하는 중…",
     "loginRequired": "먼저 로그인한 다음 연결을 확인하세요.",
+    "confirm": "연결",
     "redirecting": "인증되었어요. 앱으로 토큰을 보내는 중…",
-    "redirectingHint": "잠시 후 이 창을 닫아도 돼요.",
+    "handedOverHint": "앱이 세션을 가져가는 중이니 이 창을 닫아도 돼요. 연결되지 않았다면 앱에서 연결을 다시 시작하세요.",
     "unauthorized": "이 계정으로는 Verse Data Uploader를 사용할 수 없어요.",
-    "unauthorizedHint": "Collaborator 또는 Admin 역할이 필요해요. 관리자에게 문의하세요.",
     "errorMissingParams": "콜백 또는 state 파라미터가 없어요.",
     "errorBadCallback": "콜백 URL이 예상 포트 범위의 127.0.0.1 루프백이 아니에요.",
     "errorNoToken": "세션에 액세스 토큰이 없어요.",
-    "confirmPrompt": "포트 {{port}}의 Verse Data Uploader를 내 계정에 연결할까요?",
-    "confirmHint": "Verse Data Uploader에서 직접 로그인을 시작한 경우에만 확인하세요.",
-    "confirm": "연결",
-    "cancel": "취소",
-    "cancelled": "취소되었어요 — 아무것도 전송되지 않았어요. 이 창을 닫아도 돼요.",
     "retry": "다시 시도",
-    "handedOver": "앱으로 돌아가기",
-    "handedOverHint": "앱이 세션을 가져가는 중이니 이 창을 닫아도 돼요. 연결되지 않았다면 앱에서 연결을 다시 시작하세요."
+    "titleConnect": "Verse Data Uploader 연결",
+    "titleConfirm": "Verse Data Uploader를 연결할까요?",
+    "titleConnecting": "연결하는 중…",
+    "titleConnected": "연결됨",
+    "titleDenied": "접근 권한 없음",
+    "titleFailed": "연결 실패",
+    "confirmInfo": "업로더에서 직접 로그인을 시작한 경우에만 확인하세요(포트 {{port}}).",
+    "connected": "업로더가 계정에 연결되었어요. 이 창을 닫아도 돼요.",
+    "start": "Verse Data Uploader에서 로그인을 시작하세요 – 이 페이지는 업로더가 직접 열어요.",
+    "done": {
+      "csrf": "이 로그인은 현재 업로더 세션의 것이 아니에요. 업로더에서 다시 시작하세요.",
+      "noToken": "업로더가 로그인 정보를 받지 못했어요. 업로더에서 다시 시작하세요.",
+      "failed": "업로더로 로그인을 넘기지 못했어요. 업로더에서 다시 시작하세요."
+    }
   },
   "footer": {
     "madeByCommunity": "Made by the Community",
@@ -4861,7 +4867,7 @@
       "what": {
         "title": "이곳은 무엇인가요?",
         "p1": "Verse Companion은 우주 시뮬레이션 게임 Star Citizen을 위한 무료 비영리 컴패니언 앱이에요. Verse 뉴스, 함선 및 장비 Codex, 개인 격납고와 로드아웃 도구를 제공해요.",
-        "p2": "뉴스, Codex, 릴리스 노트는 계정 없이도 볼 수 있어요. 계정은 격납고 같은 개인 기능에만 필요하며, 현재 가입은 초대制로만 가능해요."
+        "p2": "뉴스, Codex, 릴리스 노트는 계정 없이도 볼 수 있어요. 계정은 격납고 같은 개인 기능에만 필요하며, 현재 가입은 초대제로만 가능해요."
       },
       "openSource": {
         "title": "오픈 소스",
@@ -4911,7 +4917,7 @@
         "p2": "로그인을 위해 백엔드 제공업체 Supabase가 EU 리전 eu-central-1(프랑크푸르트)에 내 인증 레코드를 보관해요. 이메일 주소, 비밀번호 로그인 시 솔트가 적용된 비밀번호 해시(평문 비밀번호는 절대 저장하지 않아요), 연결된 로그인 방법, 초대·생성·마지막 로그인 같은 타임스탬프가 포함돼요.",
         "p3": "그 밖에 앱에 필요한 프로필 레코드가 있어요. 표시 이름(처음에는 이메일 주소의 @ 앞부분), 직접 정한 사용자 이름, 언어 및 게임 채널 설정, 선택적으로 RSI 핸들과 주력함, 그리고 역할(viewer, collaborator, admin)과 계정 승인 여부예요. 역할과 승인 여부에 따라 볼 수 있는 것과 할 수 있는 것이 결정돼요.",
         "p4": "직접 만든 기능 데이터(격납고 함선, 로드아웃, 함선 링크, 저장된 초안, 설정)는 내 계정에 저장되며 본인만 읽을 수 있어요. 데이터베이스의 행 수준 보안으로 보장돼요. 예외: 보낸 피드백은 메인테이너가 볼 수 있고 답장할 수 있도록 내 계정이 발신자로 표시돼요. 그리고 친구에게 보여주는 항목도 있어요(\"친구와 공개 범위\" 참조).",
-        "p5": "계정은 초대制로만 이용할 수 있어요. 승인되지 않은 가입은 로그인 페이지를 넘어갈 수 없으며 데이터와 함께 삭제될 수 있어요."
+        "p5": "계정은 초대제로만 이용할 수 있어요. 승인되지 않은 가입은 로그인 페이지를 넘어갈 수 없으며 데이터와 함께 삭제될 수 있어요."
       },
       "google": {
         "title": "Google로 로그인",
@@ -4959,7 +4965,7 @@
         "title": "친구와 공개 범위",
         "p1": "친구는 요청이나 개인 초대 링크를 통해 연결한 계정이에요. 초대 링크는 만료되며 직접 취소할 수 있어요. 친구인 동안 친구는 기본적으로 내 격납고, 주력함, 온라인 여부, Social 페이지의 비교 수치(예: Verse Companion 사용 빈도)를 볼 수 있어요. 이 항목들은 Social 페이지의 공개 범위 팝업에서 전체 또는 친구별로 끌 수 있어요.",
         "p2": "이를 위해 user_presence 테이블에 계정별로 마지막 방문 시각과 최근 30일의 활동 마스크(날짜별 활동 여부)를 저장해요. 탐색 기록은 저장하지 않아요. \"온라인\"은 최근 몇 분 이내에 접속했다는 뜻이에요.",
-        "p3": "그룹(예: 조직이나 분대)은 나만의 비공개 목록이에요. 구성원은 그룹도 그룹 이름도 볼 수 없어요. 작전(Einsatz), 로드아웃, 함선 변형은 내가 명시적으로 공유한 사람만 볼 수 있어요. 친구 관계를 끊으면 모든 공개가 즉시 종료돼요."
+        "p3": "그룹(예: 조직이나 분대)은 나만의 비공개 목록이에요. 구성원은 그룹도 그룹 이름도 볼 수 없어요. 작전, 로드아웃, 함선 변형은 내가 명시적으로 공유한 사람만 볼 수 있어요. 친구 관계를 끊으면 모든 공개가 즉시 종료돼요."
       }
     },
     "imprint": {
@@ -5825,7 +5831,7 @@
     "subtitle": "Cloud Imperium Games의 고해상도 아트워크이며 원본으로 바로 연결돼요.",
     "subtitleAppPre": "",
     "subtitleAppLink": "Starscape 앱",
-    "subtitleAppPost": "으로 바탕화면 배경으로 설정할 수 있어요.",
+    "subtitleAppPost": "을 사용하면 바탕화면 배경으로 설정할 수 있어요.",
     "filterAll": "전체",
     "filter": {
       "label": "갤러리 보기",
@@ -5888,7 +5894,7 @@
       "dismiss": "다시 표시 안 함"
     },
     "stage": {
-      "new": "새 항목",
+      "new": "신규",
       "sammlung": "컬렉션"
     }
   },
@@ -5910,7 +5916,7 @@
     "questionBadge": "질문",
     "questionsPending": "답변을 기다리는 질문이 있어요",
     "openWithNews": "피드백 열기 – 새 소식 {{count}}건",
-    "newBadge": "새 항목",
+    "newBadge": "신규",
     "answerPlaceholder": "내 답변…",
     "answer": "답장",
     "declinedTitle": "이 요청이 반영되지 않는 이유",
@@ -5929,7 +5935,7 @@
     },
     "status": {
       "in_progress": "진행 중",
-      "question": "당신에게 온 질문",
+      "question": "답변 필요",
       "done": "반영됨",
       "declined": "반영되지 않음"
     },
@@ -5940,7 +5946,7 @@
     "aria": "피드백 영역 선택",
     "label": "영역:",
     "news": "Verse News",
-    "codex": "코덱스",
+    "codex": "Codex",
     "hangar": "격납고",
     "starscape": "Starscape",
     "desktop": "데스크톱 앱",
@@ -6236,12 +6242,12 @@
       "legend": "범례",
       "legendAria": "동작 표시/숨기기",
       "shared": "{{place}}은(는) 작전 \"{{name}}\"에도 쓰여요",
-      "open": "장소 열림"
+      "open": "장소 미정"
     },
     "slots": {
       "aria": "작전 슬롯",
       "finished": "완료",
-      "einsaetze": "{{n}}개 출격",
+      "einsaetze": "출격 {{n}}개",
       "einsatzOne": "출격 1개",
       "delete": "\"{{name}}\" 삭제",
       "newAria": "슬롯 {{n}}에 새 작전",
@@ -6270,7 +6276,7 @@
       "remove": "삭제",
       "removeAria": "작전 \"{{name}}\" 삭제",
       "removeTitle": "\"{{name}}\"을(를) 삭제할까요?",
-      "removeMsg": "이 작전은 보관함에 있고 완료된 작업만 들어 있어요. 삭제됩니다. 위시리스트와 일곱 슬롯은 그대로예요.",
+      "removeMsg": "이 작전은 보관함에 있고 완료된 작업만 들어 있어요. 삭제돼요. 위시리스트와 일곱 슬롯은 그대로예요.",
       "removeConfirm": "삭제",
       "close": "닫기"
     },
@@ -6283,7 +6289,7 @@
         "1": "선택",
         "2": "출격"
       },
-      "emptyWish": "소원 빌기",
+      "emptyWish": "위시 담기",
       "all": "모두 가져오기",
       "none": "아무것도 가져오지 않기",
       "picked": "{{n}}개 항목 · {{p}}개",
@@ -6294,8 +6300,8 @@
         "blueprint": "블루프린트"
       },
       "qtyOf": "{{name}} 수량",
-      "less": "적게 가져가기",
-      "more": "많이 가져가기",
+      "less": "덜 가져가기",
+      "more": "더 가져가기",
       "nameLabel": "작전 이름",
       "alreadyIn": "이미 작전에 있음",
       "forBp": "{{name}}용",
@@ -6318,7 +6324,7 @@
       "putBack": "되돌리기",
       "placeIs": "장소: {{place}}",
       "noMerchant": "알려진 상인이 없어서 아직 구매 단계가 없어요.",
-      "openCodex": "코덱스에서 열기",
+      "openCodex": "Codex에서 열기",
       "setPlace": "장소 지정",
       "setPlaceOf": "{{name}}의 장소",
       "stepsCount": "{{n}}단계",
@@ -6431,7 +6437,7 @@
       "addShipLabel": "함선 이름",
       "addBlueprint": "블루프린트 추가",
       "origin": {
-        "pledge": "펀딩",
+        "pledge": "Pledge",
         "ingame": "인게임",
         "loan": "대여 함선"
       },
@@ -6446,7 +6452,7 @@
       "hintWish": "내 위시에 있음: {{n}}",
       "hintNachschub": "작전 \"{{name}}\"에 있음",
       "bpPick": {
-        "hint": "코덱스에서 고르면 재료와 코덱스 페이지가 일치해요.",
+        "hint": "Codex에서 고르면 재료와 Codex 페이지가 일치해요.",
         "label": "블루프린트 검색",
         "placeholder": "예: Arrowhead",
         "searching": "검색 중 …",
@@ -6478,15 +6484,15 @@
           "ore": "광석",
           "refined": "정제됨",
           "helmet": "헬멧",
-          "torso": "토르소",
+          "torso": "상체",
           "arms": "팔",
           "legs": "다리",
           "undersuit": "언더슈트",
           "backpack": "백팩",
-          "sidearm": "보조 무기",
+          "sidearm": "보조무기",
           "primary": "주무기",
           "heavy": "중화기",
-          "melee": "근접",
+          "melee": "근접 무기",
           "throwable": "투척 무기",
           "gadget": "가젯",
           "other": "기타"
@@ -6501,7 +6507,7 @@
         "origin": {
           "pledge": "Pledge",
           "ingame": "인게임",
-          "loan": "대여선"
+          "loan": "대여 함선"
         },
         "roleAria": "역할",
         "allRoles": "모든 역할",
@@ -6509,7 +6515,7 @@
           "combat": "전투",
           "transport": "화물",
           "exploration": "탐사",
-          "industrial": "채굴 및 인양",
+          "industrial": "채굴 및 샐비지",
           "support": "지원",
           "competition": "레이싱",
           "ground": "지상 차량",
@@ -6552,8 +6558,8 @@
           "craft": "직접 제작"
         },
         "pickup": "수령 계획",
-        "alsoIn": "보관함에도 있음",
-        "inCodex": "코덱스에서: “{{q}}” – 위시리스트에 추가",
+        "alsoIn": "보관소에도 있음",
+        "inCodex": "Codex에서: “{{q}}” – 위시리스트에 추가",
         "setItems": "{{n}}개",
         "addSet": "세트 만들기",
         "setName": "세트 이름",
@@ -6563,7 +6569,7 @@
         "emptyHangar": "아직 격납고에 함선이 없어요.",
         "emptyHangarSecond": "RSI 격납고 가져오기",
         "emptySammlung": "아직 수집한 블루프린트가 없어요.",
-        "emptySammlungSecond": "코덱스 둘러보기",
+        "emptySammlungSecond": "Codex 둘러보기",
         "emptyArt": {
           "news": "저장한 뉴스 {{n}}개",
           "gallery": "저장한 이미지 {{n}}개"
@@ -6572,7 +6578,7 @@
           "news": "뉴스로 이동",
           "gallery": "갤러리로 이동"
         },
-        "log": "로드 기록",
+        "log": "적재 기록",
         "changes": "최근 변경 사항",
         "everything": "전체",
         "more": "변경 사항 {{n}}개 모두 보기",
@@ -6588,9 +6594,9 @@
         "delete": "삭제",
         "clearSel": "선택 해제",
         "reserveTitle": "예약",
-        "reserveLabel": "누구를 위한 건가요, 아니면 무엇을 위한 건가요?",
+        "reserveLabel": "누구 또는 무엇을 위한 예약인가요?",
         "reserveNeedsNote": "예약에는 목적이 필요해요.",
-        "codexTier": "코덱스에도 있음",
+        "codexTier": "Codex에도 있음",
         "onWishlist": "위시리스트에 있음",
         "rsv": {
           "title": "예약",
@@ -6616,13 +6622,13 @@
           "release": "해제",
           "handout": "전달 완료",
           "handoutTitle": "전달 완료로 표시할까요?",
-          "handoutMessage": "{{n}}개가 보관함에서 나가요.",
+          "handoutMessage": "{{n}}개가 보관소에서 나가요.",
           "newOne": "새 예약",
           "saveEdit": "저장",
           "editFor": "{{name}}의 예약"
         },
         "deleteTitle": "항목을 삭제할까요?",
-        "deleteMessage": "{{n}}개 항목이 보관함에서 사라져요.",
+        "deleteMessage": "{{n}}개 항목이 보관소에서 사라져요.",
         "deleteOne": "{{name}} 삭제",
         "editAmount": "{{name}} 수량",
         "col": {
@@ -6637,25 +6643,25 @@
       }
     },
     "nachschub": {
-      "slotsFull": "Operation 슬롯 7개가 모두 사용 중이에요. 하나를 완료하거나 삭제해서 슬롯을 비워 주세요.",
+      "slotsFull": "작전 슬롯 7개가 모두 사용 중이에요. 하나를 완료하거나 삭제해서 슬롯을 비워 주세요.",
       "nothingPicked": "위시리스트에서 아이템을 하나 이상 선택해 주세요.",
       "sellGoalInvalid": "목표를 1 aUEC 이상으로 입력해 주세요.",
       "target": {
         "minQ": "최소 Q {{q}}",
-        "title": "보관함에서 계획",
+        "title": "보관소에서 계획",
         "intent": {
           "pickup": "수령",
           "sell": "판매",
           "buy": "구매"
         },
-        "lead": "보관함의 아이템 {{n}}개",
+        "lead": "보관소의 아이템 {{n}}개",
         "where": "목적지",
-        "new": "새 Operation",
-        "newSell": "새 Operation: 돈 벌기",
+        "new": "새 작전",
+        "newSell": "새 작전: 돈 벌기",
         "append": "\"{{name}}\"에 추가",
         "goal": "목표 금액(aUEC)",
         "goalPlaceholder": "예: 1,500,000",
-        "create": "Operation 만들기",
+        "create": "작전 만들기",
         "add": "추가",
         "sellName": "돈 벌기",
         "scu": "SCU",
@@ -6667,13 +6673,13 @@
         "einsatzMany": "수령"
       },
       "sellForm": {
-        "kindAria": "이 Operation의 목적은 무엇인가요?",
+        "kindAria": "이 작전의 목적은 무엇인가요?",
         "wish": "위시리스트에서",
         "sell": "돈 벌기",
         "goal": "목표 금액(aUEC)",
         "goalPlaceholder": "예: 1,500,000",
-        "pickHint": "보관함에서 판매할 것을 선택하세요.",
-        "empty": "보관함이 비어 있어서 아직 판매할 것이 없어요.",
+        "pickHint": "보관소에서 판매할 것을 선택하세요.",
+        "empty": "보관소가 비어 있어서 아직 판매할 것이 없어요.",
         "pick": "{{place}}의 {{name}} 판매"
       },
       "sell": {
@@ -6690,29 +6696,29 @@
         "tick": "{{place}} 수령 완료"
       },
       "dayName": "{{date}} 기준 비축량",
-      "newEinsatz": "새 Einsatz",
+      "newEinsatz": "새 출격",
       "act": {
         "buy": "{{label}} 구매",
         "mission": "미션: {{label}}",
         "mine": "{{label}} 채굴",
         "refine": "{{label}} 정제",
         "craft": "{{label}} 제작",
-        "transport": "{{label}} 운송",
+        "transport": "{{label}} 운반",
         "pickup": "{{label}} 수령"
       },
       "done": {
         "created": "\"{{name}}\"을(를) 만들었어요.",
         "undone": "되돌렸어요.",
-        "reactivated": "Operation이 다시 활성화되었어요.",
+        "reactivated": "작전이 다시 활성화되었어요.",
         "plainAdopted": "항목 {{count}}개가 이제 위시리스트에 위시로 올라 있어요.",
         "plainKept": "항목 {{count}}개는 그대로 유지돼요.",
-        "emptied": "Operation을 비웠어요.",
-        "removed": "Operation을 삭제했어요.",
-        "added": "Operation에 추가했어요.",
+        "emptied": "작전을 비웠어요.",
+        "removed": "작전을 삭제했어요.",
+        "added": "작전에 추가했어요.",
         "lineRemoved": "항목을 제거했어요.",
-        "edited": "Operation을 저장했어요.",
+        "edited": "작전을 저장했어요.",
         "wishRemoved": "위시리스트에서 {{name}} {{count}}개를 제거했어요.",
-        "released": "Operation에서 {{name}}을(를) 분리했어요."
+        "released": "작전에서 {{name}}을(를) 분리했어요."
       },
       "rec": {
         "reason": {
@@ -6737,16 +6743,16 @@
           "buy": "구매"
         }
       },
-      "linesFull": "Operation이 가득 찼어요(100개 항목). 먼저 일부 항목을 제거한 뒤 더 할당해 주세요.",
-      "partial": "Operation이 가득 차서 항목 {{count}}개가 남았어요.",
+      "linesFull": "작전이 가득 찼어요(100개 항목). 먼저 일부 항목을 제거한 뒤 더 배정해 주세요.",
+      "partial": "작전이 가득 차서 항목 {{count}}개가 남았어요.",
       "wishlistFailed": "위시리스트를 변경할 수 없었어요. 아무것도 이동되지 않았어요.",
       "plainGone": "이 항목들은 이미 다른 기기에서 처리되었어요. 화면을 새로 고치는 중이에요.",
       "wishCapped": "{{count}}개가 위시리스트에 더 이상 들어가지 않아(항목당 최대 999개) 사라져요.",
-      "gone": "이 Operation은 더 이상 존재하지 않아요(다른 기기에서 삭제됨). 화면을 새로고침하고 있어요.",
-      "capReached": "저장할 수 있는 Operation 한도에 도달했어요. 보관함에서 오래된 항목을 삭제하면 다시 돼요.",
-      "nothingFree": "이 위시의 모든 수량이 이미 Operation에 배정되어 있어요.",
-      "splitInvalid": "Operation별 분배가 맞지 않아요.",
-      "dissolveFailed": "Operation을 해제하지 못해 그대로 남아 있어요."
+      "gone": "이 작전은 더 이상 존재하지 않아요(다른 기기에서 삭제됨). 화면을 새로 고치는 중이에요.",
+      "capReached": "저장할 수 있는 작전 한도에 도달했어요. 보관함에서 오래된 작전을 삭제하면 다시 할 수 있어요.",
+      "nothingFree": "이 위시의 모든 수량이 이미 작전에 배정되어 있어요.",
+      "splitInvalid": "작전별 분배가 맞지 않아요.",
+      "dissolveFailed": "작전을 해제하지 못해 그대로 남아 있어요."
     },
     "title": "HQ",
     "eyebrow": "개인 공간",
@@ -6755,11 +6761,11 @@
       "overview": "개요",
       "locker": "세트",
       "hangar": "격납고",
-      "ops": "Ops",
+      "ops": "출격",
       "spots": "스팟"
     },
     "supplies": {
-      "button": "Operations",
+      "button": "작전",
       "add": {
         "search": "아이템 검색"
       },
@@ -6770,20 +6776,20 @@
       "remove": "{{name}} 제거",
       "sum": "{{open}}개 남음 ({{units}}개) · {{done}}개 확보",
       "clearDone": "체크한 항목 제거",
-      "buttonAria": "Operations 열기 (항목 {{count}}개)",
-      "title": "Operations",
-      "close": "Operations 닫기",
-      "empty": "아직 Operations에 아무것도 없어요.",
-      "emptyHint": "아이템을 검색해 Operation에 배정해 보세요. 그러면 계획 탭에서 구할 수 있는 곳과 가는 방법을 보여줘요.",
+      "buttonAria": "작전 열기 (항목 {{count}}개)",
+      "title": "작전",
+      "close": "작전 닫기",
+      "empty": "아직 작전에 아무것도 없어요.",
+      "emptyHint": "아이템을 검색해 작전에 배정해 보세요. 그러면 계획 탭에서 구할 수 있는 곳과 가는 방법을 보여 줘요.",
       "tabsAria": "목록",
       "tabs": {
         "wish": "위시",
-        "nachschub": "Operations"
+        "nachschub": "작전"
       },
       "wish": {
-        "empty": "소원 빌기",
-        "emptyHint": "아이템이나 기체를 검색해 위시에 추가해 보세요. 여기서 한 번의 클릭으로 Operation에 배정할 수 있어요.",
-        "toNachschub": "Operation에 배정",
+        "empty": "위시 담기",
+        "emptyHint": "아이템이나 함선을 검색해 위시에 추가해 보세요. 여기서 한 번의 클릭으로 작전에 배정할 수 있어요.",
+        "toNachschub": "작전에 배정",
         "remove": "{{name}}을(를) 위시에서 제거",
         "notYet": "아직 게임에 없음"
       },
@@ -6812,48 +6818,48 @@
       "deleteMessage": "\"{{name}}\"이(가) 모든 기기에서 삭제돼요."
     },
     "ops": {
-      "title": "Ops",
-      "subtitle": "기체와 세트로 무엇을 할지 계획해 보세요.",
-      "soon": "곧 출시",
-      "empty": "Ops 계획 기능을 준비 중이에요. 곧 여기서 기체와 세트로 미션을 계획할 수 있어요."
+      "title": "출격",
+      "subtitle": "함선과 세트로 무엇을 할지 계획해 보세요.",
+      "soon": "곧 제공",
+      "empty": "출격 계획 기능을 준비 중이에요. 곧 여기서 함선과 세트로 미션을 계획할 수 있어요."
     },
     "overview": {
-      "activeShip": "활성 기체",
+      "activeShip": "활성 함선",
       "activeVariant": "활성 변형",
       "noVariant": "기본 장비",
       "activeSet": "활성 세트",
-      "nextOps": "다음 Ops",
-      "suppliesPreview": "Operations",
-      "opsOpen": "Ops 열기",
-      "suppliesOpen": "Operations 열기",
-      "opsEmpty": "아직 계획된 Ops가 없어요.",
+      "nextOps": "다음 출격",
+      "suppliesPreview": "작전",
+      "opsOpen": "출격 열기",
+      "suppliesOpen": "작전 열기",
+      "opsEmpty": "아직 계획된 출격이 없어요.",
       "suppliesEmpty": "구할 것이 없어요.",
-      "noShip": "아직 격납고에 기체가 없어요.",
+      "noShip": "아직 격납고에 함선이 없어요.",
       "noSet": "아직 만든 세트가 없어요.",
       "setupHangar": "격납고 설정",
       "createSet": "세트 만들기",
-      "openCodex": "코덱스에서 보기",
-      "recentShips": "최근 선택한 기체",
+      "openCodex": "Codex에서 보기",
+      "recentShips": "최근 선택한 함선",
       "recentSets": "최근 선택한 세트",
       "loadFailed": "HQ를 불러오지 못했어요.",
       "fleetPatch": {
         "title": "패치 속 내 함대",
         "soon": "곧",
-        "mock": "내 기체 3대가 4.3.1에서 변경됐어요",
-        "hint": "미리보기: 곧 현재 패치가 어떤 기체에 영향을 줬는지 여기서 볼 수 있어요."
+        "mock": "내 함선 3척이 4.3.1에서 변경됐어요",
+        "hint": "미리보기: 곧 현재 패치가 어떤 함선에 영향을 줬는지 여기서 볼 수 있어요."
       }
     },
     "locker": {
       "title": "세트",
       "subtitle": "모든 역할을 위한 FPS 세트예요.",
       "details": "상세 정보",
-      "detailsAria": "코덱스의 {{name}} 상세 정보"
+      "detailsAria": "Codex의 {{name}} 상세 정보"
     },
     "pages": {
       "start": "시작",
       "planen": "계획",
       "jetzt": "지금",
-      "inventar": "보관함",
+      "inventar": "보관소",
       "statistik": "통계",
       "empty": "{{page}}: 새로운 기능을 만들고 있어요."
     },
@@ -6875,17 +6881,17 @@
         "stronger": "{{name}} {{pct}}% 강화."
       },
       "bestand": {
-        "empty": "아직 기체가 없어요",
-        "emptyHint": "기체, 세트, 인벤토리예요.",
+        "empty": "아직 함선이 없어요",
+        "emptyHint": "함선, 세트, 인벤토리예요.",
         "import": "RSI 격납고 가져오기",
-        "ships": "기체 {{n}}대",
-        "shipsOne": "기체 1대",
+        "ships": "함선 {{n}}척",
+        "shipsOne": "함선 1척",
         "sets": "세트 {{n}}개",
         "setsOne": "세트 1개",
         "blueprints": "블루프린트 {{n}}개",
         "blueprintsOne": "블루프린트 1개",
         "stale": "인벤토리 기준 {{n}}일 전",
-        "open": "보관함 보기"
+        "open": "보관소 보기"
       },
       "now": {
         "live": "라이브",
@@ -6899,16 +6905,16 @@
           "mine": "{{label}} 채굴",
           "refine": "{{label}} 정제",
           "craft": "{{label}} 제작",
-          "transport": "{{label}} 운송",
+          "transport": "{{label}} 운반",
           "pickup": "{{label}} 수령",
           "event": "이벤트: {{label}}"
         }
       },
       "planen": {
         "empty": "아직 계획된 것이 없어요",
-        "emptyHint": "Operation이 Einsatz가 돼요.",
+        "emptyHint": "작전이 출격으로 이어져요.",
         "count": "{{n}}개 남음",
-        "needs": "Operations에 {{n}}개",
+        "needs": "작전에 {{n}}개",
         "open": "계획 열기"
       },
       "stats": {
@@ -6927,7 +6933,7 @@
         "mine": "채굴",
         "refine": "정제",
         "craft": "제작",
-        "transport": "운송",
+        "transport": "운반",
         "pickup": "수령",
         "event": "이벤트"
       },
@@ -7001,7 +7007,7 @@
         "label": "현재 위치",
         "lastSeen": "마지막으로 있던 곳",
         "unknown": "위치 알 수 없음",
-        "ship": "기체:"
+        "ship": "함선:"
       },
       "zone": {
         "label": "구역:",
@@ -7024,7 +7030,7 @@
       },
       "path": {
         "title": "내 경로",
-        "empty": "활성 Operation이 없어요. 계획 탭에서 만들어 보세요."
+        "empty": "활성 출격이 없어요. 계획 탭에서 만들어 보세요."
       },
       "missions": {
         "tooltip": "게임 내 진행 중인 미션",
@@ -7042,24 +7048,24 @@
       "peaceful": "평화로움",
       "combat": "전투",
       "quick": "빠름 (30분 미만)",
-      "long": "시간 소요 큼",
+      "long": "오래 걸림",
       "solo": "솔로",
       "group": "그룹",
       "pairAria": "{{left}} 또는 {{right}}"
     },
     "einsatz": {
-      "single": "Op",
-      "multi": "Op ×{{n}}",
+      "single": "출격",
+      "multi": "출격 ×{{n}}",
       "stepsTooltip": "{{n}}단계",
       "pick": {
-        "title": "어느 Op인가요?",
+        "title": "어느 출격인가요?",
         "message": "\"{{name}}\"이(가) 미션 단계로 추가돼요.",
-        "none": "아직 계획 중이거나 진행 중인 Op가 없어요.",
-        "new": "새 Op"
+        "none": "아직 계획 중이거나 진행 중인 출격이 없어요.",
+        "new": "새 출격"
       },
       "add": {
-        "action": "Einsatz 추가",
-        "title": "새 Einsatz",
+        "action": "출격 추가",
+        "title": "새 출격",
         "confirm": "추가",
         "kindAria": "하는 일",
         "what": {
@@ -7080,13 +7086,13 @@
         "qty": "수량"
       },
       "rename": {
-        "action": "Einsatz \"{{name}}\" 이름 변경",
-        "aria": "Einsatz의 새 이름",
+        "action": "출격 \"{{name}}\" 이름 변경",
+        "aria": "출격의 새 이름",
         "empty": "이름은 비워 둘 수 없어요."
       },
       "noneYet": {
-        "title": "\"{{name}}\"에는 아직 Einsatz가 없어요",
-        "hint": "계획에서 포지션을 바탕으로 Einsatz를 제안받거나 직접 추가해 보세요."
+        "title": "\"{{name}}\"에는 아직 출격이 없어요",
+        "hint": "계획에서 항목을 바탕으로 출격을 제안받거나 직접 추가해 보세요."
       }
     },
     "activity": {
@@ -7187,7 +7193,7 @@
       }
     },
     "stock": {
-      "free": "내 것",
+      "free": "내 보유분",
       "sharedBtn": "친구가 공유함 ({{n}})",
       "captured": "인벤토리에 추가했어요.",
       "actions": {
@@ -7250,7 +7256,7 @@
       "ships": {
         "title": "함선",
         "count": "격납고에 {{n}}척",
-        "noFavourites": "아직 플래그십이 지정되지 않았어요."
+        "noFavourites": "아직 주력함이 지정되지 않았어요."
       },
       "sets": {
         "title": "세트",
@@ -7260,7 +7266,7 @@
       "earned": {
         "title": "획득한 것",
         "blueprints": "블루프린트 {{n}}개 획득",
-        "open": "코덱스의 블루프린트"
+        "open": "Codex의 블루프린트"
       },
       "age": {
         "minutes": "마지막 열람: {{n}}분 전",
@@ -7268,7 +7274,7 @@
         "days": "마지막 열람: {{n}}일 전"
       },
       "desk": {
-        "open": "예약: {{name}}",
+        "open": "입출고: {{name}}",
         "addOne": "1개 보관: {{name}}",
         "takeOne": "1개 꺼내기: {{name}}",
         "availShort": "{{free}} 여유 · {{reserved}} 예약됨",
@@ -7280,7 +7286,7 @@
         "forHint": "예: 플레이어 X 또는 판매",
         "reserve": "예약",
         "reservations": "예약 내역",
-        "handOut": "지급됨",
+        "handOut": "전달 완료",
         "release": "해제",
         "delete": "목록에서 삭제",
         "deleteTitle": "“{{name}}”을(를) 삭제할까요?",
@@ -7337,9 +7343,9 @@
         "pcs": "개",
         "location": "장소",
         "save": "등록",
-        "suggestions": "코덱스 추천 항목",
+        "suggestions": "Codex 추천 항목",
         "unknown": "찾을 수 없어요. 추천 항목에서 선택하세요.",
-        "linked": "코덱스와 연결되었어요.",
+        "linked": "Codex와 연결되었어요.",
         "kind": {
           "ship": "함선",
           "item": "아이템",
@@ -7388,7 +7394,7 @@
       },
       "shared": {
         "title": "친구가 공유한 항목",
-        "by": "by",
+        "by": "공유자",
         "readOnly": "보기 전용",
         "answer": "내 응답",
         "slot": "크루 슬롯",
@@ -7418,14 +7424,14 @@
       "pick": {
         "title": "이벤트",
         "hint": "아직 완료하지 않은 진행 중 이벤트예요. 받고 싶은 보상을 선택하세요.",
-        "sightseeing": "보상 없음 – 관광용 Operation으로 진행"
+        "sightseeing": "보상 없음 – 관광용 작전으로 진행"
       },
       "draft": {
         "area": "고정된 장소 대신 이벤트 지역 사용"
       },
-      "severalHint": "하나의 Operation에 여러 이벤트를 넣을 수는 있지만 권장하지 않아요.",
+      "severalHint": "하나의 작전에 여러 이벤트를 넣을 수는 있지만 권장하지 않아요.",
       "doneTag": "완료",
-      "abort": "취소",
+      "abort": "중단",
       "complete": "이벤트 완료",
       "gone": "이 이벤트는 더 이상 이용할 수 없어요.",
       "area": {
@@ -7443,7 +7449,7 @@
       },
       "gear": {
         "fps-combat-set": "FPS 전투 세트",
-        "combat-ship": "전투 함선",
+        "combat-ship": "전투함",
         "salvage-ship": "샐비지 함선",
         "cargo-ship": "화물 함선",
         "mining-ship": "채굴 함선",
@@ -7478,16 +7484,16 @@
         "title": "{{name}} 수령",
         "channel": "어떻게 얻었나요?",
         "byApp": "앱이 획득 경로를 감지했어요. 변경할 수 있어요.",
-        "store": "창고에 보관",
+        "store": "보관소에 보관",
         "isShip": "함선임",
-        "toHangar": "행어로 이동해요.",
+        "toHangar": "격납고로 이동해요.",
         "toInventory": "인벤토리로 이동해요 (위치 \"Event-Belohnungen\").",
         "complete": "이벤트 전체를 완료로 표시",
         "confirm": "수령"
       },
       "offer": {
-        "area": "{{event}} 지역에 있어요. 이 Operation으로 전환할까요?",
-        "ac": "Arena Commander가 실행 중이에요 – {{event}}와(과) 맞아요. 이 Operation으로 전환할까요?",
+        "area": "{{event}} 지역에 있어요. 이 작전으로 전환할까요?",
+        "ac": "Arena Commander가 실행 중이에요 – {{event}}와(과) 맞아요. 이 작전으로 전환할까요?",
         "switch": "전환",
         "notNow": "나중에"
       },
@@ -7501,7 +7507,7 @@
         "missing": "앱 없음",
         "off": "앱 꺼짐",
         "ready": "앱 준비됨",
-        "tracking": "트래킹"
+        "tracking": "추적 중"
       },
       "waiting": "Star Citizen을 기다리는 중",
       "last": "마지막 확인",
@@ -7510,13 +7516,13 @@
         "aria": "이 페이지에서 앱이 하는 일",
         "title": "앱 사용 시",
         "toggle": "이 페이지에서 앱이 하는 일",
-        "start": "앱을 사용하면 현재 위치, 조종 중인 기체, 다음 단계를 실시간으로 볼 수 있어요.",
-        "inventar": "앱이 게임에서 인벤토리와 기체를 읽어 와요. 직접 입력할 필요가 없어요.",
+        "start": "앱을 사용하면 현재 위치, 조종 중인 함선, 다음 단계를 실시간으로 볼 수 있어요.",
+        "inventar": "앱이 게임에서 인벤토리와 함선을 읽어 와요. 직접 입력할 필요가 없어요.",
         "jetzt": "앱이 현재 위치를 알려 주고 단계를 자동으로 체크해 줘요:",
-        "planen": "앱이 Operation의 항목이 도착하는 때를 감지해서 완료 처리해요.",
+        "planen": "작전의 항목이 도착하면 앱이 감지해서 완료 처리해요.",
         "statistik": "앱이 플레이하는 동안 플레이 시간, 세션, 미션, 손실을 함께 집계해요. 앱이 없으면 이 페이지는 비어 있어요.",
         "jetztList": {
-          "e1": "현재 위치와 기체, 예: \"Stanton › New Babbage\".",
+          "e1": "현재 위치와 함선, 예: \"Stanton › New Babbage\".",
           "e2": "계획한 출격의 다음 단계, 예: 구매나 이동.",
           "e3": "최근 이벤트, 예: \"미션 완료\" 또는 \"퀀텀 점프 종료\"."
         }
@@ -7532,7 +7538,7 @@
       "contracts": "계약",
       "auec": "aUEC 수지",
       "losses": "손실",
-      "lossesSub": "사망 {{deaths}}회 · 파괴된 기체 {{ships}}대 · 보험 청구 {{claims}}건",
+      "lossesSub": "사망 {{deaths}}회 · 파괴된 함선 {{ships}}척 · 보험 청구 {{claims}}건",
       "costs": {
         "label": "비용",
         "fines": {
@@ -7558,7 +7564,7 @@
         "live": "진행 중"
       },
       "showAll": "세션 {{n}}개 모두 보기",
-      "note": "SCC 앱에서 가져온 최근 {{days}}일간의 세션입니다. aUEC 잔액은 판매액에서 구매액을 뺀 값입니다.",
+      "note": "SCC 앱에서 가져온 최근 {{days}}일간의 세션이에요. aUEC 수지는 판매액에서 구매액을 뺀 값이에요.",
       "durH": "{{h}}시간 {{m}}분",
       "durM": "{{m}}분"
     }
@@ -7812,8 +7818,8 @@
       }
     },
     "export": {
-      "wallpaper": "월페이퍼 다운로드 (4K)",
-      "failed": "월페이퍼를 만들지 못했어요. 다시 시도해 주세요."
+      "wallpaper": "배경화면 다운로드 (4K)",
+      "failed": "배경화면을 만들지 못했어요. 다시 시도해 주세요."
     },
     "task": {
       "notes": {
@@ -7823,12 +7829,12 @@
       },
       "archive": {
         "title": "아카이브 발견",
-        "how": "코덱스에서 이전 패치로 전환해 그 당시 내용을 확인해 보세요.",
-        "link": "코덱스로 이동"
+        "how": "Codex에서 이전 패치로 전환해 그 당시 내용을 확인해 보세요.",
+        "link": "Codex로 이동"
       },
       "loadout": {
         "title": "격납고 로드아웃",
-        "how": "격납고에서 내 기체 중 하나를 열어 로드아웃을 살펴보세요.",
+        "how": "격납고에서 내 함선 중 하나를 열어 로드아웃을 살펴보세요.",
         "link": "격납고로 이동"
       },
       "comet": {
@@ -7837,38 +7843,38 @@
         "link": "패치 예측하기"
       },
       "cxNewship": {
-        "title": "새 기체 확인함",
-        "how": "코덱스에서 이번 패치의 최신 기체를 열어 보세요.",
-        "link": "기체로 이동"
+        "title": "새 함선 확인함",
+        "how": "Codex에서 이번 패치의 최신 함선을 열어 보세요.",
+        "link": "함선으로 이동"
       },
       "cxKeybinds": {
         "title": "키 설정 확인함",
-        "how": "코덱스에서 현재 빌드의 키 설정을 살펴보세요.",
+        "how": "Codex에서 현재 빌드의 키 설정을 살펴보세요.",
         "link": "키 설정으로 이동"
       },
       "cxChanged": {
         "title": "변경점 발견",
-        "how": "기체의 홀로테이블에서 두 패치를 비교해 보세요.",
+        "how": "함선의 홀로테이블에서 두 패치를 비교해 보세요.",
         "link": "비교로 이동"
       },
       "cxBlueprint": {
         "title": "블루프린트 열람",
-        "how": "코덱스에서 블루프린트를 열어 보세요.",
+        "how": "Codex에서 블루프린트를 열어 보세요.",
         "link": "블루프린트로 이동"
       },
       "cxFps": {
         "title": "FPS 장비 확인함",
-        "how": "코덱스의 FPS 무기와 방어구를 둘러보세요.",
+        "how": "Codex의 FPS 무기와 방어구를 둘러보세요.",
         "link": "FPS로 이동"
       },
       "cxLoadout": {
-        "title": "코덱스 로드아웃 저장함",
-        "how": "코덱스의 기체 페이지에서 커스터마이즈한 로드아웃을 저장해 보세요.",
+        "title": "Codex 로드아웃 저장함",
+        "how": "Codex의 함선 페이지에서 커스터마이즈한 로드아웃을 저장해 보세요.",
         "link": "로드아웃 만들기"
       },
       "cxGuess": {
         "title": "성도 알아맞힘",
-        "how": "성도의 모양이 어떤 새 기체인지 성도에서 맞혀 보세요. 기회는 한 번뿐이에요.",
+        "how": "성도의 모양이 어떤 새 함선인지 맞혀 보세요. 기회는 한 번뿐이에요.",
         "link": "성도로 이동"
       }
     },
@@ -7884,7 +7890,7 @@
         "desc": "내 성도 뒤에서 빛나는 성운이에요."
       },
       "live": {
-        "title": "라이브 월페이퍼",
+        "title": "라이브 배경화면",
         "desc": "반짝이는 별, 절제된 애니메이션.",
         "preview": "내 하늘 라이브 미리보기"
       },
@@ -7928,7 +7934,7 @@
       "toMap": "성도로 이동",
       "appHint": "최근 7개는 Starscape 앱에도 있어요.",
       "inApp": "Starscape에서",
-      "thumbAria": "패치 {{patch}}의 성도 월페이퍼",
+      "thumbAria": "패치 {{patch}}의 성도 배경화면",
       "download": "4K 다운로드",
       "share": "공유",
       "copied": "링크를 복사했어요."
@@ -7945,7 +7951,7 @@
     },
     "map": {
       "title": "성도 {{patch}}",
-      "subtitle": "별 {{total}}개 · 모양이 새 기체를 알려 줘요",
+      "subtitle": "별 {{total}}개 · 모양이 새 함선을 알려 줘요",
       "shape": "모양: {{name}}",
       "patchesAria": "패치 성도 선택",
       "chipTip": "성도 {{patch}} · 별 {{total}}개 중 {{lit}}개",
@@ -7956,10 +7962,10 @@
     "tour": {
       "open": "성도 사용법",
       "title": "성도 사용법",
-      "p1": "패치마다 별 7개로 이루어진 성도가 하나씩 있어요. 과제를 끝낼 때마다 별이 하나씩 빛나고, 7개가 모두 켜지면 모양이 기체를 보여 주며 지도가 내 컬렉션에 추가돼요.",
-      "p2": "돔 아래에는 두 가지 도전이 있어요. 다음 패치의 LIVE 날짜를 맞히는 혜성 예측과, 모양 속 기체를 알아맞히는 거예요.",
-      "p3": "밝힌 별이 늘면 지도 제작자 랭크가 올라가요. 오른쪽 위의 문장을 누르면 시리즈, 보상, 월페이퍼가 있는 랭크 페이지가 열려요.",
-      "start": "보여 줘요",
+      "p1": "패치마다 별 7개로 이루어진 성도가 하나씩 있어요. 과제를 끝낼 때마다 별이 하나씩 빛나고, 7개가 모두 켜지면 모양이 함선을 보여 주며 지도가 내 컬렉션에 추가돼요.",
+      "p2": "돔 아래에는 두 가지 도전이 있어요. 다음 패치의 LIVE 날짜를 맞히는 혜성 예측과, 모양 속 함선을 알아맞히는 거예요.",
+      "p3": "밝힌 별이 늘면 지도 제작자 랭크가 올라가요. 오른쪽 위의 문장을 누르면 연속 기록, 보상, 배경화면이 있는 랭크 페이지가 열려요.",
+      "start": "보여 주세요",
       "back": "뒤로",
       "next": "다음",
       "done": "완료",
@@ -7979,11 +7985,11 @@
         },
         "guess": {
           "title": "모양 맞히기",
-          "text": "성도가 보여 주는 기체를 맞혀 보세요. 맞히면 별을 얻고, 이후 모양의 이름이 돔 아래에 표시돼요."
+          "text": "성도가 보여 주는 함선을 맞혀 보세요. 맞히면 별을 얻고, 이후 모양의 이름이 돔 아래에 표시돼요."
         },
         "rank": {
           "title": "내 지도 제작자 랭크",
-          "text": "밝힌 별마다 랭크가 올라가요. 별 1, 3, 7, 12, 18, 26, 35개에서 단계가 오르며, 관찰자부터 아틀라스의 수호자까지 이어져요. 단계마다 공유 가능한 배지와 동료부터 5단계의 호박색 색조와 문장 디테일까지 무언가가 해금돼요. 시리즈, 보상, 모든 월페이퍼 형식은 랭크 페이지에서 볼 수 있어요."
+          "text": "밝힌 별마다 랭크가 올라가요. 별 1, 3, 7, 12, 18, 26, 35개에서 단계가 오르며, 관찰자부터 아틀라스의 수호자까지 이어져요. 단계마다 공유 가능한 배지와 동행자부터 5단계의 호박색 색조와 문장 디테일까지 무언가가 해금돼요. 연속 기록, 보상, 모든 배경화면 형식은 랭크 페이지에서 볼 수 있어요."
         }
       },
       "eyebrow": "성도"
@@ -7994,7 +8000,7 @@
     "card": {
       "eyebrowDone": "별 {{n}} · 빛나는 중",
       "eyebrowNext": "별 {{n}} · 추천 다음 과제",
-      "eyebrowOpen": "별 {{n}} · 열림",
+      "eyebrowOpen": "별 {{n}} · 미완료",
       "eyebrowLocked": "별 {{n}} · 닫힘",
       "doneOn": "{{date}}에 완료했어요.",
       "here": "아래 성도에서 바로 할 수 있어요.",
@@ -8006,7 +8012,7 @@
     "star": {
       "done": "별 {{n}}: {{task}} · 빛나는 중",
       "next": "별 {{n}}: {{task}} · 추천 다음 과제",
-      "open": "별 {{n}}: {{task}} · 열림"
+      "open": "별 {{n}}: {{task}} · 미완료"
     },
     "comet": {
       "kind": "패치 예측",
@@ -8015,8 +8021,8 @@
       "ruleVersion": "{{patch}}이(가) LIVE되는 날을 맞혀 보세요. 패치당 한 번만 예측할 수 있어요. 예측은 {{patch}}이(가) LIVE되거나 LIVE 날짜가 공식 발표되면 마감돼요. 패치 별은 라인 예측으로만 얻을 수 있어요.",
       "noTip": "현재 패치 예측은 없어요. CIG가 다른 패치를 발표하지 않았어요.",
       "state": {
-        "none": "열림",
-        "tipped": "세트됨 · LIVE 대기 중",
+        "none": "미설정",
+        "tipped": "설정됨 · LIVE 대기 중",
         "hit": "적중",
         "miss": "빗나감",
         "locked": "마감됨",
@@ -8025,7 +8031,7 @@
       "head": {
         "closed": "{{patch}} 예측이 마감되었어요",
         "tipped": "{{patch}}에 대한 내 예측: {{date}}",
-        "hit": "{{date}}에 적용",
+        "hit": "{{date}}에 적중",
         "miss": "내 패치 예측: {{date}}",
         "open": "{{patch}} 예측 진행 중",
         "missed": "{{patch}}에 대한 내 예측을 놓쳤어요: {{date}}"
@@ -8057,13 +8063,13 @@
       "head": {
         "open": "성도에서 알아본 함선을 탭하세요",
         "correct": "맞힘: {{name}}",
-        "wrong": "성도에 표시된 함선은 {{name}}이에요",
+        "wrong": "성도에 표시된 함선: {{name}}",
         "unavailable": "아직 추측할 수 없어요"
       },
       "foot": {
         "open": "맞히면 성도에 이름이 나타나고 원에 체크 표시가 생겨요.",
         "wrong": "이번엔 별이 없어요. 정답은 성도에 남아 있어요.",
-        "unavailable": "현재 이 성도에는 맞힐 함선이 정해져 있지 않아요. 코덱스에 패치의 게임 데이터가 들어오면 자동으로 선택되며, 그때 여기서 추측할 수 있어요."
+        "unavailable": "현재 이 성도에는 맞힐 함선이 정해져 있지 않아요. Codex에 패치의 게임 데이터가 들어오면 자동으로 선택되며, 그때 여기서 추측할 수 있어요."
       },
       "undoToast": "추측 등록됨: {{name}}"
     },
@@ -8072,7 +8078,7 @@
       "count": "성도 {{n}}개 연속 점등",
       "countOne": "성도 1개 연속 점등",
       "helpAria": "연속 기록은 어떻게 작동하나요?",
-      "help": "연속 기록은 성도를 밝힌 패치가 연속으로 몇 개인지 세요. 별을 하나 이상 켜거나 태양이 떠오르면 인정돼요. 가장 최근 성도는 아직 진행 중이라 연속 기록을 끊지 않아요. 이전 성도가 어두운 채로 남으면 처음부터 다시 시작해요. 로드의 각 단계는 해당 숫자부터 보상을 해금하며, 한 번 해금한 보상은 유지돼요 (내 최고 기록: {{best}}).",
+      "help": "연속 기록은 성도를 밝힌 패치가 연속으로 몇 개인지 세요. 별을 하나 이상 켜거나 태양이 떠오르면 인정돼요. 가장 최근 성도는 아직 진행 중이라 연속 기록을 끊지 않아요. 이전 성도가 어두운 채로 남으면 처음부터 다시 시작해요. 별의 길의 각 단계는 해당 숫자부터 보상을 해금하며, 한 번 해금한 보상은 유지돼요 (내 최고 기록: {{best}}).",
       "helpReserve": "연속 기록은 성도를 밝힌 패치가 연속으로 몇 개인지 세요. 별을 하나 이상 켜거나 태양이 떠오르면 인정돼요. 가장 최근 성도는 아직 진행 중이라 연속 기록을 끊지 않아요. 연료 예비분이 준비되어 있어요. 이번에는 어두운 성도 하나가 있어도 연속 기록이 끊기지 않아요. 한 번 해금한 보상은 유지돼요 (내 최고 기록: {{best}}).",
       "roadAria": "연속 기록 보상",
       "stopOn": "{{title}} – {{desc}} ✓ 해금됨 · 점등한 성도 {{at}}개부터",
@@ -8081,16 +8087,16 @@
       "from": "{{at}}부터"
     },
     "ladder": {
-      "aria": "Kartograph 등급",
+      "aria": "지도 제작자 랭크",
       "here": "현재 위치",
-      "current": "Kartograph {{rank}}등급 - 배지 열기",
-      "earned": "Kartograph {{rank}}등급 - 달성함",
-      "next": "Kartograph {{rank}}등급 - 아직 잠겨 있음"
+      "current": "지도 제작자 랭크 {{rank}} - 배지 열기",
+      "earned": "지도 제작자 랭크 {{rank}} - 달성함",
+      "next": "지도 제작자 랭크 {{rank}} - 아직 잠겨 있음"
     },
     "rank": {
-      "link": "{{name}} · 등급 페이지 열기",
-      "none": "아직 등급 없음 · 올리는 방법",
-      "news": "내 등급 페이지의 새 소식"
+      "link": "{{name}} · 랭크 페이지 열기",
+      "none": "아직 랭크 없음 · 올리는 방법",
+      "news": "내 랭크 페이지의 새 소식"
     },
     "celebrate": {
       "eyebrow": "별자리 완성",
@@ -8098,24 +8104,24 @@
       "done": "별 7개가 모두 빛나요"
     },
     "rankPage": {
-      "title": "등급",
+      "title": "랭크",
       "subtitle": "7개의 단계, 나와 함께 자라는 하나의 성도.",
-      "standingAria": "현재 등급과 성도",
-      "current": "내 등급",
-      "unranked": "아직 등급 없음",
-      "unrankedMeaning": "성도에서 첫 별을 켜면 Observer로 등급 사다리에 오르게 돼요.",
+      "standingAria": "현재 랭크와 성도",
+      "current": "내 랭크",
+      "unranked": "아직 랭크 없음",
+      "unrankedMeaning": "성도에서 첫 별을 켜면 관찰자로 랭크에 오르게 돼요.",
       "count": "별 {{n}}개 점등",
       "countOne": "별 1개 점등",
       "progressAria": "{{name}}까지의 진행도",
       "toNext": "{{name}}까지 별 {{n}}개 남음",
       "toNextOne": "{{name}}까지 별 1개 남음",
       "top": "최고 단계에 도달했어요. 이후의 별도 모두 내 하늘에 더해져요.",
-      "perks": "등급을 올리면 베타 기능, 아이템 제안, 아래의 등급 보상을 먼저 이용할 수 있어요.",
+      "perks": "랭크를 올리면 베타 기능, 아이템 제안, 아래의 랭크 보상을 먼저 이용할 수 있어요.",
       "mapOpen": "내 성도 크게 열기",
       "mapAlt": "내 성도: 내 패치들의 별자리가 담긴 하나의 밤하늘",
       "mapNone": "성도에서 첫 별을 켜면 내 하늘이 여기에 나타나요.",
       "mapCaption": "내 성도",
-      "mapUpdates": "등급을 올릴 때마다 자동으로 갱신돼요.",
+      "mapUpdates": "랭크를 올릴 때마다 자동으로 갱신돼요.",
       "downloadPhone": "휴대폰 배경화면",
       "downloadUltrawide": "울트라와이드 (5120 × 1440)",
       "downloadLocked": "첫 별을 켜면 내 하늘을 배경화면으로 내려받을 수 있어요.",
@@ -8128,7 +8134,7 @@
         "current": "현재 단계",
         "locked": "아직 달성하지 못함"
       },
-      "rewardsTitle": "등급 보상",
+      "rewardsTitle": "랭크 보상",
       "rewardsLead": "단계마다 내 하늘에 무언가가 더해져요. 모든 형식은 1단계부터 열려 있고, 단계에 따라 배경화면에 표시되는 내용과 모습이 달라져요.",
       "rewardFrom": "{{name}}부터",
       "reward": {
@@ -8157,7 +8163,7 @@
           "desc": "내려받는 모든 배경화면 뒤에서 성운이 빛나요."
         },
         "orbit": {
-          "title": "회전하는 로즈",
+          "title": "회전하는 나침반 장미",
           "desc": "내 문장의 별이 해도대 위의 나침반처럼 천천히 회전해요."
         }
       },
@@ -8165,42 +8171,42 @@
       "extrasTitle": "배지 및 보상 아이디어",
       "tier": {
         "observer": {
-          "name": "Observer",
+          "name": "관찰자",
           "meaning": "첫 별이 성도에서 빛나요."
         },
         "surveyor": {
-          "name": "Surveyor",
+          "name": "측량사",
           "meaning": "하늘을 별 하나하나씩 측량해요."
         },
         "navigator": {
-          "name": "Navigator",
+          "name": "항법사",
           "meaning": "여러 패치에 걸쳐 길을 찾아가요."
         },
         "cartographer": {
-          "name": "Cartographer",
+          "name": "지도 제작자",
           "meaning": "내 별들이 Verse의 상당한 영역을 덮어요."
         },
         "astrographer": {
-          "name": "Astrographer",
+          "name": "성도 제작자",
           "meaning": "약 세 패치 분량의 별: 후반 보상이 열려요."
         },
         "master": {
-          "name": "Master Cartographer",
+          "name": "지도 제작 명인",
           "meaning": "내 하늘만큼 빽빽하게 밝혀진 하늘은 드물어요."
         },
         "keeper": {
-          "name": "Keeper of the Atlas",
+          "name": "아틀라스의 수호자",
           "meaning": "내 아틀라스는 Verse의 수년에 걸쳐 있어요."
         }
       }
     },
     "ideas": {
       "title": "보상 아이디어",
-      "lead": "앞으로 등급이 어떤 보상을 주면 좋을까요? 팀이 가장 많은 표를 받은 아이디어부터 살펴봐요.",
-      "label": "새 등급 보상에 대한 내 아이디어",
+      "lead": "앞으로 랭크가 어떤 보상을 주면 좋을까요? 팀이 가장 많은 표를 받은 아이디어부터 살펴봐요.",
+      "label": "새 랭크 보상에 대한 내 아이디어",
       "submit": "아이디어 보내기",
       "sent": "고마워요! 내 아이디어가 목록에 올라갔어요.",
-      "locked": "{{name}}({{stars}}별)인 5단계부터 아이디어를 제출하고 투표할 수 있어요.",
+      "locked": "5단계({{name}}, 별 {{stars}}개)부터 아이디어를 제출하고 투표할 수 있어요.",
       "retry": "다시 시도",
       "empty": "아직 아이디어가 없어요.",
       "votes": "투표: {{count}}",
@@ -8251,7 +8257,7 @@
     "sectionsAria": "이 영역의 하위 페이지",
     "kinds": {
       "fps": "FPS",
-      "keybinds": "키 바인드"
+      "keybinds": "키 설정"
     },
     "ctx": {
       "all": "모든 곳",
@@ -8265,10 +8271,10 @@
       "fps": "FPS",
       "hq": "내 HQ",
       "hqPlan": "계획",
-      "hqNow": "현재",
+      "hqNow": "지금",
       "hqStock": "인벤토리",
       "hqStats": "통계",
-      "hqStockAll": "보관함",
+      "hqStockAll": "보관소",
       "hqStockHangar": "격납고",
       "hqStockSammlung": "컬렉션"
     },
@@ -8276,15 +8282,15 @@
       "all": "모든 곳에서 검색 …",
       "verse": "함선, 패치, 뉴스 검색 …",
       "gallery": "갤러리 또는 Codex 검색 …",
-      "codex": "함선, 무기, 부품 …",
+      "codex": "함선, 무기, 컴포넌트 …",
       "codexIndex": "Codex에서 검색 …",
-      "ship": "부품, 무기, 함선 …",
+      "ship": "컴포넌트, 무기, 함선 …",
       "codexDetail": "Codex에서 검색 …",
       "fps": "무기, 방어구, 장비 …",
       "hq": "격납고, 세트, 함선 …",
-      "hqPlan": "작전에 필요한 세트, 부품 또는 장소 …",
+      "hqPlan": "출격에 필요한 세트, 부품 또는 장소 …",
       "hqNow": "함선, 장소 또는 부품 …",
-      "hqStock": "보관함에서 검색 …",
+      "hqStock": "보관소에서 검색 …",
       "hqStats": "함선 또는 세트 …"
     },
     "search": {
@@ -8320,12 +8326,12 @@
       "hangar": "격납고",
       "spind": "세트",
       "hq": "HQ 개요",
-      "keybinds": "키 바인드",
+      "keybinds": "키 설정",
       "upcoming": "발표된 함선",
       "settings": "설정",
       "releaseNotes": "새로운 소식",
-      "badge": "Cartographer 배지",
-      "ops": "작전",
+      "badge": "지도 제작자 배지",
+      "ops": "출격",
       "extension": "브라우저 확장 프로그램",
       "download": "다운로드",
       "social": "소셜"
@@ -8425,7 +8431,7 @@
   "search": {
     "chip": {
       "size": "크기 {{size}}",
-      "grade": "등급 {{grade}}",
+      "grade": "{{grade}}등급",
       "kind": "{{kind}}",
       "page": {
         "gallery": "갤러리",
@@ -8435,7 +8441,7 @@
       "needed": "필요함",
       "section": {
         "weapons": "무장",
-        "components": "구성품",
+        "components": "컴포넌트",
         "stock": "인벤토리",
         "hangar": "격납고",
         "sets": "세트"
@@ -8456,19 +8462,19 @@
       "compareWith": "나란히 보기",
       "compare": "비교",
       "inSet": "세트에 있음",
-      "toMission": "임무로 이동",
+      "toMission": "미션으로 이동",
       "atRsi": "RSI에서",
       "allProducts": "모든 제품",
       "add": "추가",
       "whereStored": "어디에 있나요?",
       "whereInstalled": "어디에 장착됐나요?",
-      "planOps": "작전 계획",
+      "planOps": "출격 계획",
       "sourceOf": "입수처",
       "openSet": "세트 열기",
       "fittingShips": "장착 가능한 함선",
       "fittingWeapons": "맞는 무기",
       "mount": "장착",
-      "toEinsatz": "작전에 추가"
+      "toEinsatz": "출격에 추가"
     },
     "why": {
       "ownHq": "HQ에 있어서 맨 위에 있어요",
@@ -8495,7 +8501,7 @@
       "collapseKey": "← 뒤로",
       "allInIndex": "{{n}}개 모두 인덱스에서 열기",
       "allInHq": "{{n}}개 모두 HQ에서 열기",
-      "mission": "임무"
+      "mission": "미션"
     },
     "own": {
       "ship": "내 함선",
@@ -8520,7 +8526,7 @@
       "patch": "패치 {{line}}",
       "patchMeta": "패치 노트 · {{version}}",
       "galleryMeta": "갤러리",
-      "missionMeta": "임무",
+      "missionMeta": "미션",
       "missionVariants": "변형 {{n}}개"
     },
     "abbr": {
@@ -8549,8 +8555,8 @@
       "compare": "\"{{name}}\"이(가) 비교에 있어요",
       "failed": "실패했어요. 잠시 후 다시 시도해 주세요",
       "einsatzAdded": "\"{{name}}\"이(가) 이제 \"{{op}}\"의 단계예요",
-      "einsatzNew": "새 작전 \"{{name}}\"을(를) 만들었어요",
-      "einsatzFull": "\"{{op}}\"은(는) 이미 작전이 가질 수 있는 최대 단계 수예요"
+      "einsatzNew": "새 출격 \"{{name}}\"을(를) 만들었어요",
+      "einsatzFull": "\"{{op}}\"에는 이미 출격당 최대 단계 수가 들어 있어요"
     },
     "hints": {
       "0": {
@@ -8590,7 +8596,7 @@
         "q": "qt"
       },
       "9": {
-        "t": "\"pp\"로 파워 플랜트를 찾아요",
+        "t": "\"pp\"로 발전기를 찾아요",
         "q": "pp"
       },
       "10": {
@@ -8614,44 +8620,44 @@
         "q": "p4"
       },
       "15": {
-        "t": "\"mil\"로 군용 구성품을 찾아요",
+        "t": "\"mil\"로 군용 컴포넌트를 찾아요",
         "q": "mil"
       },
       "16": {
-        "t": "\"크기 3\"으로 크기 3만 필터링해요",
-        "q": "크기 3"
+        "t": "\"size 3\"으로 크기 3만 필터링해요",
+        "q": "size 3"
       },
       "17": {
         "t": "\"s2 qd\"로 크기 2 퀀텀 드라이브를 찾아요",
         "q": "s2 qd"
       },
       "18": {
-        "t": "\"등급 a\"는 A등급 부품만 보여 줘요",
-        "q": "등급 a"
+        "t": "\"grade a\"는 A등급 부품만 보여 줘요",
+        "q": "grade a"
       },
       "19": {
-        "t": "\"스텔스 쿨러\"로 스텔스 쿨러를 찾아요",
-        "q": "스텔스 쿨러"
+        "t": "\"stealth cooler\"로 스텔스 쿨러를 찾아요",
+        "q": "stealth cooler"
       },
       "20": {
-        "t": "\"실드 s1 mil\"은 필터 세 개를 조합해요",
-        "q": "실드 s1 mil"
+        "t": "\"shield s1 mil\"은 필터 세 개를 조합해요",
+        "q": "shield s1 mil"
       },
       "21": {
         "t": "\"1 crew\"로 1인승을 찾아요",
         "q": "1 crew"
       },
       "22": {
-        "t": "\"화물선 100 scu\"로 대형 화물선을 찾아요",
-        "q": "화물선 100 scu"
+        "t": "\"freighter 100 scu\"로 대형 화물선을 찾아요",
+        "q": "freighter 100 scu"
       },
       "23": {
-        "t": "\"샐비지\"로 샐비지 함선을 찾아요",
-        "q": "샐비지"
+        "t": "\"salvage\"로 샐비지 함선을 찾아요",
+        "q": "salvage"
       },
       "24": {
-        "t": "\"폭격기\"로 폭격기와 어뢰정을 찾아요",
-        "q": "폭격기"
+        "t": "\"bomber\"로 폭격기와 어뢰정을 찾아요",
+        "q": "bomber"
       },
       "25": {
         "t": "\"gimbal s3\"로 짐벌 마운트를 찾아요",
@@ -8662,8 +8668,8 @@
         "q": "torpedo s9"
       },
       "27": {
-        "t": "\"에너지 권총\"으로 레이저 권총을 찾아요",
-        "q": "에너지 권총"
+        "t": "\"energy pistol\"로 레이저 권총을 찾아요",
+        "q": "energy pistol"
       },
       "28": {
         "t": "함선 이름으로 내 함선을 찾을 수 있어요"
@@ -8678,31 +8684,31 @@
         "t": "로드아웃 이름으로 내 구성을 찾을 수 있어요"
       },
       "32": {
-        "t": "\"내 함선\"은 내 격납고를 보여 줘요",
-        "q": "내 함선"
+        "t": "\"my ships\"는 내 격납고를 보여 줘요",
+        "q": "my ships"
       },
       "33": {
-        "t": "\"격납고 aegis\"로 내 격납고를 필터링해요",
-        "q": "격납고 aegis"
+        "t": "\"in hangar aegis\"로 내 격납고를 필터링해요",
+        "q": "in hangar aegis"
       },
       "34": {
-        "t": "검색어 앞에 \"인벤토리\"를 붙이면 내 인벤토리에서만 검색해요"
+        "t": "검색어 앞에 \"inventory\"를 붙이면 내 인벤토리에서만 검색해요"
       },
       "35": {
-        "t": "검색어 앞에 \"위시리스트\"를 붙이면 내 위시리스트에서만 검색해요. 위시한 항목은 항상 먼저 나와요"
+        "t": "검색어 앞에 \"wishes\"나 \"wishlist\"를 붙이면 내 위시리스트에서만 검색해요. 위시한 항목은 항상 먼저 나와요"
       },
       "36": {
         "t": "격납고에서 \"순찰\"로 내 로드아웃을 찾아요"
       },
       "37": {
-        "t": "\"인벤토리 s3\"은 크기 3 보유 항목을 보여 줘요",
-        "q": "인벤토리 s3"
+        "t": "\"in inventory s3\"은 크기 3 보유 항목을 보여 줘요",
+        "q": "in inventory s3"
       },
       "38": {
         "t": "내 항목은 항상 맨 위에 나와요"
       },
       "39": {
-        "t": "검색어 앞에 \"missing\"을 붙이면 내 Operations에서만 검색해요"
+        "t": "검색어 앞에 \"missing\"을 붙이면 내 작전에서만 검색해요"
       },
       "40": {
         "t": "검색은 연 위치를 기억해요"
@@ -8728,7 +8734,7 @@
         "q": "laser"
       },
       "47": {
-        "t": "미션 계획에서는 구할 수 있는 곳을 보여줘요"
+        "t": "출격 계획에서는 구할 수 있는 곳을 보여 줘요"
       },
       "48": {
         "t": "\"fits\"를 입력하면 맞는 부품만 보여줘요",
@@ -8774,7 +8780,7 @@
         "q": "ammo s3"
       },
       "59": {
-        "t": "\"heavy armor\"로 중갑을 찾아요",
+        "t": "\"heavy armor\"로 중량 방어구를 찾아요",
         "q": "heavy armor"
       },
       "60": {
@@ -8808,7 +8814,7 @@
         "q": "qd s2"
       },
       "69": {
-        "t": "오타인가요? 검색이 \"혹시 … 말씀이세요?\"라고 물어봐요"
+        "t": "오타인가요? 검색이 \"혹시 이거였나요 …\"라고 물어봐요"
       }
     },
     "outside": {
@@ -8830,12 +8836,12 @@
       "groupNotFound": "이 그룹은 더 이상 존재하지 않아요.",
       "groupLimit": "그룹은 최대 50개까지 만들 수 있어요.",
       "groupFull": "이 그룹은 친구 100명으로 가득 찼어요.",
-      "einsatzNotFound": "이 미션은 더 이상 사용할 수 없어요.",
-      "einsatzClosed": "이 미션은 종료되어 더 이상 응답을 받지 않아요.",
+      "einsatzNotFound": "이 출격은 더 이상 이용할 수 없어요.",
+      "einsatzClosed": "이 출격은 종료되어 더 이상 응답을 받지 않아요.",
       "configNotFound": "이 함선 변형은 더 이상 존재하지 않아요.",
       "loadoutNotFound": "이 세트는 더 이상 존재하지 않아요.",
       "shareNotFound": "이 공유는 더 이상 존재하지 않아요.",
-      "tooManySlots": "미션의 크루 슬롯은 최대 12개예요.",
+      "tooManySlots": "출격의 크루 슬롯은 최대 12개예요.",
       "invalidSlotLabel": "슬롯 이름은 1~40자여야 해요.",
       "slotNotFound": "이 크루 슬롯은 더 이상 존재하지 않아요.",
       "slotTaken": "이 크루 슬롯은 이미 찼어요.",
@@ -8844,7 +8850,7 @@
       "invalidTarget": "이 사용자와는 할 수 없어요.",
       "teamFull": "이 그룹은 멤버 50명으로 가득 찼어요.",
       "teamLimit": "이미 최대 20개 그룹에 가입되어 있어요.",
-      "lastOwner": "당신이 마지막 소유자예요. 먼저 다른 사람을 소유자로 지정하거나 그룹을 삭제하세요.",
+      "lastOwner": "내가 마지막 소유자예요. 먼저 다른 사람을 소유자로 지정하거나 그룹을 삭제하세요.",
       "teamInvalidName": "이름은 1~40자여야 해요.",
       "teamInvalidRole": "존재하지 않는 역할이에요.",
       "teamForbidden": "이 그룹에서는 그렇게 할 수 없어요.",
@@ -8855,22 +8861,22 @@
     "compare": {
       "ships": "함선",
       "sets": "세트",
-      "einsaetze_planned": "계획된 미션",
-      "einsaetze_done": "완료한 미션",
+      "einsaetze_planned": "계획된 출격",
+      "einsaetze_done": "완료한 출격",
       "missions_30d": "미션 (30일)",
-      "kartograph_rank": "Kartograph 랭크",
+      "kartograph_rank": "지도 제작자 랭크",
       "active_days_30": "활동일 (30일)"
     },
     "group": {
       "kind": {
         "org": "Org",
-        "einsatzgruppe": "미션 그룹"
+        "einsatzgruppe": "출격 그룹"
       }
     },
     "visibility": {
       "facet": {
-        "hangar": "Hangar",
-        "flagship": "주력 함선",
+        "hangar": "격납고",
+        "flagship": "주력함",
         "presence": "온라인 상태",
         "stats": "비교 수치"
       },
@@ -8879,9 +8885,9 @@
       "generalHint": "아래에서 친구별로 따로 설정하지 않는 한 모든 친구에게 적용돼요. 변경 사항은 바로 저장돼요.",
       "facetHint": {
         "hangar": "내 함선(위시 포함)이 보여요. 메모와 구성은 제외돼요.",
-        "flagship": "Hangar 맨 위에 고정한 함선이에요.",
+        "flagship": "격납고 맨 위에 고정한 함선이에요.",
         "presence": "지금 온라인인지 여부예요. 정확한 시각은 절대 공개되지 않아요.",
-        "stats": "함선, 세트, 미션, 활동일, Kartograph 랭크 같은 수치예요."
+        "stats": "함선, 세트, 출격, 활동일, 지도 제작자 랭크 같은 수치예요."
       },
       "perFriend": "친구별",
       "perFriendHint": "친구를 선택해서 나머지와 다르게 보이게 할지 정하세요.",
@@ -8896,7 +8902,7 @@
     },
     "teams": {
       "title": "그룹",
-      "hint": "그룹은 위의 비공개 친구 목록과 달리 초대 코드로 가입하는 공간이에요. 멤버끼리는 서로의 이름, 핸들, 역할과 그룹에 공유한 미션(크루 슬롯과 인원 포함)을 볼 수 있어요. 그 외에는 아무것도 보이지 않아요. Hangar, 접속 상태, 친구 목록도 마찬가지예요.",
+      "hint": "그룹은 위의 비공개 친구 목록과 달리 초대 코드로 가입하는 공간이에요. 멤버끼리는 서로의 이름, 핸들, 역할과 그룹에 공유한 출격(크루 슬롯과 인원 포함)을 볼 수 있어요. 그 외에는 아무것도 보이지 않아요. 격납고, 접속 상태, 친구 목록도 마찬가지예요.",
       "namePlaceholder": "새 그룹 이름",
       "create": "그룹 만들기",
       "codePlaceholder": "초대 코드",
@@ -8914,13 +8920,13 @@
       "rotateMessage": "\"{{name}}\"의 이전 코드는 즉시 사용할 수 없게 돼요. 이미 그룹에 있는 사람은 그대로 남아요.",
       "leave": "나가기",
       "leaveTitle": "이 그룹에서 나갈까요?",
-      "leaveMessage": "\"{{name}}\"에서 나가면 그곳에 공유된 미션을 더 이상 볼 수 없어요. 내 미션은 삭제되지 않아요.",
+      "leaveMessage": "\"{{name}}\"에서 나가면 그곳에 공유된 출격을 더 이상 볼 수 없어요. 내 출격은 삭제되지 않아요.",
       "delete": "그룹 삭제",
       "deleteTitle": "이 그룹을 삭제할까요?",
-      "deleteMessage": "\"{{name}}\"이(가) 모든 멤버에게서 삭제돼요. 미션은 소유자에게 남고 공유만 끝나요.",
+      "deleteMessage": "\"{{name}}\"이(가) 모든 멤버에게서 삭제돼요. 출격은 소유자에게 남고 공유만 끝나요.",
       "removeMember": "제거",
       "removeTitle": "이 멤버를 제거할까요?",
-      "removeMessage": "{{name}}님은 \"{{group}}\"과 그곳에 공유된 미션에 접근할 수 없게 돼요.",
+      "removeMessage": "{{name}}님은 \"{{group}}\"과 그곳에 공유된 출격에 접근할 수 없게 돼요.",
       "makeAdmin": "관리자로 지정",
       "makeMember": "멤버로 변경",
       "makeOwner": "소유자로 지정",
@@ -8931,22 +8937,22 @@
       }
     },
     "einsatz": {
-      "title": "공유된 미션",
+      "title": "공유된 출격",
       "audienceFriend": "친구",
       "audienceGroup": "그룹",
       "pickAudience": "친구 또는 그룹 초대",
       "pickGroup": "그룹 선택",
-      "hint": "내 미션 중 하나에 친구를 공동 목표로 초대하세요. 친구는 단계를 보고, 응답하고, 크루 슬롯을 맡을 수 있어요. 별도의 목표는 없어요. 미션이 곧 계획이에요.",
-      "mine": "내 미션에 초대",
-      "withMe": "나와 공유된 미션",
-      "noneOwn": "먼저 HQ에서 미션을 계획하면 여기서 친구를 초대할 수 있어요.",
-      "noFriends": "친구가 생기면 여기서 미션에 초대할 수 있어요.",
-      "noneShared": "아직 나와 미션을 공유한 친구가 없어요.",
-      "pickEinsatz": "미션",
+      "hint": "내 출격 중 하나에 친구를 공동 목표로 초대하세요. 친구는 단계를 보고, 응답하고, 크루 슬롯을 맡을 수 있어요. 별도의 목표는 없어요. 출격이 곧 계획이에요.",
+      "mine": "내 출격에 초대",
+      "withMe": "나와 공유된 출격",
+      "noneOwn": "먼저 HQ에서 출격을 계획하면 여기서 친구를 초대할 수 있어요.",
+      "noFriends": "친구가 생기면 여기서 출격에 초대할 수 있어요.",
+      "noneShared": "아직 나와 출격을 공유한 친구가 없어요.",
+      "pickEinsatz": "출격",
       "pickFriend": "친구",
       "invite": "초대",
       "invited": "친구를 초대했어요.",
-      "already": "이 친구는 이미 이 미션에 참여 중이에요.",
+      "already": "이 친구는 이미 이 출격에 참여 중이에요.",
       "slotsLabel": "크루 슬롯, 쉼표로 구분 (최대 {{max}}개)",
       "slotsSave": "슬롯 저장",
       "crew": "크루",
@@ -8974,7 +8980,7 @@
       "openFriend": "페이지 열기"
     },
     "notice": {
-      "text": "기본적으로 친구는 내 Hangar, 주력 함선, 온라인 상태, 비교 수치를 볼 수 있어요. 일반 설정과 친구별 설정에서 끌 수 있어요.",
+      "text": "기본적으로 친구는 내 격납고, 주력함, 온라인 상태, 비교 수치를 볼 수 있어요. 일반 설정과 친구별 설정에서 끌 수 있어요.",
       "open": "설정",
       "dismiss": "확인"
     },
@@ -8993,11 +8999,11 @@
     "groups": {
       "title": "그룹",
       "privateNote": "그룹은 비공개예요. 친구는 그룹도, 누가 어느 그룹에 있는지도 볼 수 없어요. 친구 한 명이 여러 그룹에 속할 수 있어요.",
-      "shareNote": "그룹에 가입한 사람은 내가 그 그룹과 공유하는 것(미션, 함선 변형)을 받아요. 제거되거나 그룹이 삭제되면 접근 권한을 잃어요. 그룹과 공유한 세트는 현재 멤버에게만 전달돼요.",
+      "shareNote": "그룹에 가입한 사람은 내가 그 그룹과 공유하는 것(출격, 함선 변형)을 받아요. 제거되거나 그룹이 삭제되면 접근 권한을 잃어요. 그룹과 공유한 세트는 현재 멤버에게만 전달돼요.",
       "kindLabel": "그룹 종류",
       "namePlaceholder": "그룹 이름",
       "create": "그룹 만들기",
-      "empty": "아직 그룹이 없어요. Org나 미션 그룹을 만들어 친구를 정리해 보세요.",
+      "empty": "아직 그룹이 없어요. Org나 출격 그룹을 만들어 친구를 정리해 보세요.",
       "noFriends": "아직 추가할 수 있는 친구가 없어요.",
       "members": "멤버",
       "rename": "이름 변경",
@@ -9020,12 +9026,12 @@
       "yes": "예",
       "no": "아니요",
       "friendHides": "이 친구는 비교 수치를 공개하지 않아요.",
-      "webNote": "웹사이트를 얼마나 자주 사용하는지는 기록되지 않아요. \"활동한 날\"이 가장 근접한 실제 수치예요."
+      "webNote": "웹사이트를 얼마나 자주 사용하는지는 기록되지 않아요. \"활동일\"이 가장 근접한 실제 수치예요."
     },
     "friendPage": {
       "loading": "불러오는 중 …",
       "missingTitle": "찾을 수 없음",
-      "missing": "이 페이지는 존재하지 않거나 회원님에게 공개되지 않았어요. 친구 전용 페이지예요.",
+      "missing": "이 페이지는 존재하지 않거나 볼 수 없어요. 친구 전용 페이지예요.",
       "since": "{{date}}부터 친구",
       "share": "무언가 공유하기",
       "inGroups": "내 그룹:",
@@ -9034,13 +9040,13 @@
       "fromMe": "내가 공유함",
       "nothingSharedByMe": "아직 여기에 공유한 항목이 없어요.",
       "hangar": "격납고",
-      "flagship": "플래그십",
+      "flagship": "주력함",
       "hangarHidden": "이 친구는 격납고를 공개하지 않아요.",
       "hangarEmpty": "격납고가 비어 있어요.",
       "wishlist": "위시",
       "kindSet": "세트",
       "kindVariant": "변형",
-      "kindEinsatz": "임무",
+      "kindEinsatz": "출격",
       "removeTitle": "{{name}}님을 친구에서 삭제할까요?",
       "removeMessage": "서로 공유한 모든 항목이 이후에는 보이지 않게 돼요.",
       "blockTitle": "{{name}}님을 차단할까요?",
@@ -9085,7 +9091,7 @@
     "err": {
       "failed": "실패했어요. 다시 시도해 주세요.",
       "unavailable": "여기에는 이 단계가 없어요.",
-      "wishAssigned": "이 아이템들은 Operation에 배정되어 있어요. 대화상자에서 제거하세요."
+      "wishAssigned": "이 아이템들은 작전에 배정되어 있어요. 대화상자에서 제거하세요."
     },
     "hint": {
       "notYetInGame": "아직 게임에 없음"
@@ -9122,23 +9128,23 @@
     "caption": "이 {{n}}개가 제거돼요:",
     "captionOne": "이 아이템이 제거돼요:",
     "barLabel": "아이템이 갈 곳",
-    "free": "{{n}}개 남음",
+    "free": "{{n}}개 미배정",
     "fromOp": "“{{name}}”에서 {{n}}개",
     "latest": "마지막에 배정됨",
     "of": "/ {{n}}",
     "rowLabel": "“{{name}}”의 아이템",
     "sum": "{{done}}/{{total}} 분배됨",
     "keeps": "“{{name}}”에는 다른 위시가 남아 있어요.",
-    "lastStays": "이후 “{{name}}”에는 위시가 남지 않아요. {{n}}개의 임무는 유지돼요.",
-    "lastStaysOne": "이후 “{{name}}”에는 위시가 남지 않아요. 임무는 유지돼요.",
-    "dissolves": "“{{name}}”에는 임무가 없어서 함께 해산돼요.",
-    "alsoDissolve": "Operation도 함께 해산",
-    "alsoDissolveNamed": "Operation “{{name}}”도 함께 해산",
+    "lastStays": "이후 “{{name}}”에는 위시가 남지 않아요. 출격 {{n}}개는 유지돼요.",
+    "lastStaysOne": "이후 “{{name}}”에는 위시가 남지 않아요. 출격은 유지돼요.",
+    "dissolves": "“{{name}}”에는 출격이 없어서 함께 해산돼요.",
+    "alsoDissolve": "작전도 함께 해산",
+    "alsoDissolveNamed": "작전 “{{name}}”도 함께 해산",
     "confirm": "{{n}}개 제거",
     "confirmDissolve": "제거하고 해산",
-    "toastDissolved": "Operation도 함께 해산되었어요.",
+    "toastDissolved": "작전도 함께 해산되었어요.",
     "release": {
-      "title": "{{name}}을(를) Operation에서 해제할까요?",
+      "title": "{{name}}을(를) 작전에서 해제할까요?",
       "text": "{{n}}개의 아이템은 위시리스트에 남고 다시 미배정 상태가 돼요.",
       "textOne": "아이템은 위시리스트에 남고 다시 미배정 상태가 돼요.",
       "confirm": "해제",
@@ -9157,7 +9163,7 @@
     "group": {
       "weapons": "무기",
       "armor": "방어구",
-      "components": "부품",
+      "components": "컴포넌트",
       "ships": "함선 및 차량",
       "items": "아이템",
       "materials": "원자재"
@@ -9175,13 +9181,13 @@
     "removedGroup": "{{name}} 제거됨 (위시 {{n}}개)",
     "selected": "선택됨",
     "clear": "모두 선택 해제",
-    "toNachschub": "Operation에 추가",
+    "toNachschub": "작전에 추가",
     "kind": {
       "ship": "함선",
       "vehicle": "차량",
       "upcoming": "발표된 함선",
       "weapon": "무기",
-      "component": "부품",
+      "component": "컴포넌트",
       "item": "아이템",
       "blueprint": "블루프린트",
       "material": "원자재",
@@ -9193,8 +9199,8 @@
       "add": "위시에 추가",
       "dismiss": "{{name}} 추천 안 함"
     },
-    "slotsFullHint": "Operation 슬롯 7개가 모두 사용 중이에요. 선택한 항목은 기존 Operation에 추가돼요.",
-    "toExisting": "기존 Operation에 추가",
+    "slotsFullHint": "작전 슬롯 7개가 모두 사용 중이에요. 선택한 항목은 기존 작전에 추가돼요.",
+    "toExisting": "기존 작전에 추가",
     "open": "Codex에서 “{{name}}” 열기"
   },
   "pathCtl": {
@@ -9249,26 +9255,26 @@
     "otherPlace": "다른 장소 …",
     "otherPlaceholder": "장소 입력",
     "store": "내려놓기",
-    "wishAssigned": "그중 {{n}}개가 Operation에 배정됨",
+    "wishAssigned": "그중 {{n}}개가 작전에 배정됨",
     "assign": {
       "go": "배정",
-      "title": "Operation에 배정",
+      "title": "작전에 배정",
       "howMany": "몇 개인가요?",
       "ofWished": "희망 {{n}}개 중",
       "ofFree": "미배정 {{n}}개 중",
       "newest": "마지막에 생성됨",
-      "new": "새 Operation",
+      "new": "새 작전",
       "newHint": "이름이 자동으로 제안돼요",
-      "loading": "Operation을 불러오는 중 …",
+      "loading": "작전을 불러오는 중 …",
       "working": "배정하는 중 …",
       "slots": "슬롯 {{used}}/{{max}} 사용 중",
-      "planHint": "임무 계획은",
+      "planHint": "출격 계획은",
       "inHq": "HQ에서 해요",
-      "progress": "임무 {{done}}/{{total}}",
-      "noEinsatz": "아직 계획된 임무가 없어요",
-      "line": "Operation “{{name}}”에 {{n}}개",
-      "moreOne": "Operation 1개 더",
-      "more": "Operation {{n}}개 더"
+      "progress": "출격 {{done}}/{{total}}",
+      "noEinsatz": "아직 계획된 출격이 없어요",
+      "line": "작전 “{{name}}”에 {{n}}개",
+      "moreOne": "작전 1개 더",
+      "more": "작전 {{n}}개 더"
     },
     "own": {
       "morePlacesOne": "장소 1곳 더",
@@ -9285,7 +9291,7 @@
     "noSilhouette": "실루엣 없음",
     "noSilhouetteReason": "이 빌드에는 이 아이템의 실루엣이 없어서 미리보기 이미지로 대신해요.",
     "no3dReason": "이 빌드에는 이 아이템의 3D 모델이 없어요.",
-    "inNachschub": "Operation “{{name}}”에 포함됨",
+    "inNachschub": "작전 “{{name}}”에 포함됨",
     "panelAria": "수치 및 정보",
     "tabsAria": "섹션",
     "tab": {
@@ -9300,7 +9306,7 @@
     "more": "컬렉션에 {{n}}개 더",
     "newsAria": "수집한 뉴스",
     "galleryAria": "수집한 배경화면",
-    "votedHint": "업보트한 월페이퍼는 수집한 것으로 계산돼요."
+    "votedHint": "좋아요를 누른 배경화면은 수집한 것으로 계산돼요."
   },
   "blueprintWish": {
     "craftTimes": "제작 횟수",
@@ -9372,8 +9378,8 @@
       "beta": "베타 기능"
     },
     "view": {
-      "toHolo": "Holotable로 전환",
-      "toClassic": "기본 보기로 전환"
+      "toHolo": "홀로테이블로 전환",
+      "toClassic": "클래식 보기로 전환"
     },
     "share": {
       "popAria": "공유"

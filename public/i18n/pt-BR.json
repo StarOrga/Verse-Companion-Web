@@ -24,7 +24,7 @@
       "message": "Este dispositivo está conectado como {{current}}. Se continuar, ele será conectado como {{target}}.",
       "confirm": "Trocar de conta"
     },
-    "revoke": "Sair",
+    "revoke": "Desconectar",
     "revokeNote": "Um celular desconectado perde o acesso em no máximo uma hora.",
     "revokeDone": "Celular desconectado. Ele perde o acesso em no máximo uma hora.",
     "errors": {
@@ -234,9 +234,9 @@
   },
   "impersonation": {
     "banner": {
-      "aria": "Prévia de função ativa",
+      "aria": "Prévia de papel ativa",
       "viewingAs": "Visualizando como: {{role}}",
-      "realRole": "Sua função real: {{role}}",
+      "realRole": "Seu papel real: {{role}}",
       "exit": "Sair da prévia",
       "fidelity": {
         "anon": "Prévia fiel — o app está realmente desconectado aqui, então você vê exatamente o que um visitante vê.",
@@ -289,7 +289,7 @@
         "label": "Ferramentas",
         "keybinds": {
           "title": "Atalhos de teclado",
-          "text": "Todas as configurações padrão da build LIVE, pesquisáveis."
+          "text": "Todos os atalhos padrão da build LIVE, pesquisáveis."
         }
       },
       "terminal": {
@@ -323,7 +323,7 @@
       "patch": {
         "archive": "{{count}} registros no Arsenal",
         "extracted": "Extraído em {{date}}",
-        "build": "Build \"{{build}}\" (placeholder)"
+        "build": "Build \"{{build}}\" (provisório)"
       },
       "me": {
         "eyebrow": "A bordo",
@@ -374,11 +374,11 @@
         "notesOverview": "Todas as patch notes na CIG"
       },
       "holo": {
-        "label": "Holotable",
+        "label": "Mesa holográfica",
         "rotation": "Escolha uma categoria",
         "next": "Clique: continuar",
         "hold": "Clique: pausar",
-        "loading": "Carregando Holotable …",
+        "loading": "Carregando mesa holográfica …",
         "empty": "Ainda não há entradas para este patch.",
         "newIn": "Novo",
         "newest": "Mais recentes",
@@ -408,7 +408,7 @@
         "loadout": {
           "weapons": "Armas",
           "shield": "Escudo",
-          "quantum": "Quantum Drive",
+          "quantum": "Motor quântico",
           "power": "Energia (segmentos)",
           "cooler": "Resfriamento (por s)"
         }
@@ -473,8 +473,8 @@
           "name": "{{name}} é nova no {{patch}}.",
           "announced": "{{announced}} ferramentas anunciadas.",
           "s1": "Ferramentas para cada turno.",
-          "s2": "Raio trator, cabeça de salvamento, raspador.",
-          "s3": "Trabalhe com mais inteligência no verso.",
+          "s2": "Raio trator, cabeçote de salvamento, raspador.",
+          "s3": "Trabalhe com mais inteligência no Verse.",
           "s4": "Cada ferramenta, cada valor."
         }
       },
@@ -489,10 +489,10 @@
         "show": "Mostrar pintura {{name}}",
         "all": "Mostrar todas as {{count}} pinturas",
         "fewer": "Menos",
-        "isNew": "novo",
+        "isNew": "nova",
         "rsi": "Na loja da RSI",
         "rsiRender": "Render da RSI",
-        "close": "Fechar pré-visualização"
+        "close": "Fechar prévia"
       },
       "values": {
         "key": "Valores principais",
@@ -530,10 +530,10 @@
       }
     },
     "index": {
-      "title": "Codex — Modo Índice"
+      "title": "Codex — Modo índice"
     },
     "upcoming": {
-      "subtitle": "Naves anunciadas na ship-matrix da RSI que ainda não estão nos nossos dados do jogo extraídos — a diferença entre o que a RSI lista e o que a build live contém.",
+      "subtitle": "Naves anunciadas na ship-matrix da RSI que ainda não estão nos nossos dados do jogo extraídos — a diferença entre o que a RSI lista e o que a build LIVE contém.",
       "conceptTitle": "Em conceito",
       "conceptSub": "A RSI ainda está construindo estas — ainda não são pilotáveis",
       "flightReadyTitle": "Prontas para voar na RSI",
@@ -607,7 +607,7 @@
       "rsiLink": "Ver em robertsspaceindustries.com",
       "noData": {
         "title": "Por que não há valores aqui?",
-        "body": "Nosso Codex é construído a partir dos dados da build live. Enquanto esta nave não estiver no jogo, não há nada para extrair — assim que ela chegar, ganha automaticamente sua entrada completa no Codex.",
+        "body": "Nosso Codex é construído a partir dos dados da build LIVE. Enquanto esta nave não estiver no jogo, não há nada para extrair — assim que ela chegar, ganha automaticamente sua entrada completa no Codex.",
         "browse": "Todas as naves anunciadas"
       },
       "notFound": {
@@ -623,7 +623,7 @@
       "tool": "Extrator",
       "coverage": "Cobertura",
       "qualityHint": "A pontuação de qualidade é preliminar até ser calculada de verdade.",
-      "stale": "Requer um upload de dados — há uma versão do jogo mais recente no ar do que este catálogo reflete.",
+      "stale": "Requer um upload de dados — a versão do jogo no ar é mais recente do que a refletida neste catálogo.",
       "staleUploadLink": "Abrir Verse Data Uploader"
     },
     "search": {
@@ -631,7 +631,7 @@
       "placeholder": "Filtrar esta lista – nome ou classe (ex.: Gladius, AEGS_*) …",
       "listFilterLabel": "Filtrar esta lista",
       "clear": "Limpar busca",
-      "upcomingHint": "Não está nos dados do jogo, mas foi anunciado pela RSI: {{names}}",
+      "upcomingHint": "Não está nos dados do jogo, mas já foi anunciado pela RSI: {{names}}",
       "alsoIn": "Também encontrado em:",
       "upcomingLink": "Ver em Naves futuras",
       "bar": {
@@ -650,7 +650,7 @@
         "searching": "Pesquisando no Codex …",
         "empty": "Nenhum resultado para “{{term}}”.",
         "allInIndex": "Todos os {{n}} no índice",
-        "allUpcoming": "Todos os {{n}} em Naves futuras",
+        "allUpcoming": "Todas as {{n}} em Naves futuras",
         "folded": "{{n}} variantes agrupadas",
         "foldedAtLeast": "pelo menos {{n}} variantes agrupadas",
         "foldedOne": "1 variante agrupada",
@@ -722,13 +722,13 @@
       "open": "Onde comprar no jogo",
       "title": "Onde comprar {{name}}",
       "loading": "Carregando lojas …",
-      "none": "Nenhuma loja no jogo conhecida.",
+      "none": "Nenhuma loja conhecida no jogo.",
       "from": "a partir de {{price}} aUEC",
       "placeOne": "1 local",
       "places": "{{count}} locais",
       "more": "+{{count}} mais",
       "price": "{{price}} aUEC",
-      "openPlan": "Abrir o mapa"
+      "openPlan": "Abrir o plano"
     },
     "itemGroup": {
       "food": "Comidas e bebidas",
@@ -784,7 +784,7 @@
       },
       "ship": {
         "gun": "Canhões",
-        "turret": "Torres",
+        "turret": "Torretas",
         "missile": "Mísseis e torpedos",
         "countermeasure": "Contramedidas",
         "mining": "Lasers de mineração",
@@ -856,7 +856,7 @@
         "cmNeedIr": "Recomendado vs IR",
         "cmNeedEm": "Recomendado vs EM",
         "cmNeedCs": "Recomendado vs seção transversal",
-        "armorSignal": "Fator de sinal da armadura"
+        "armorSignal": "Fator de sinal da blindagem"
       },
       "src": {
         "damage": "AmmoParams.impactDamage",
@@ -869,7 +869,7 @@
         "aiming": "SCItemAimableComponentParams",
         "missing": "apenas modificadores de overclock, todos 1.0",
         "countermeasure": "AmmoParams.projectileParams.typeParams · weaponParams.ammoCapacity",
-        "cmRecommend": "Regra prática: assinatura da nave ÷ assinatura por lançamento, arredondado para baixo + 1 — só então os lançamentos ofuscam claramente a nave. Os valores da nave são calculados ao vivo: as emissões de IR / EM de cada componente ligado na configuração atual e na distribuição de energia (resfriadores, usina de energia, escudos, quantum drive …), vezes o fator de sinal da armadura."
+        "cmRecommend": "Regra prática: assinatura da nave ÷ assinatura por lançamento, arredondado para baixo + 1 — só então os lançamentos ofuscam claramente a nave. Os valores da nave são calculados ao vivo: as emissões de IR / EM de cada componente ligado na configuração atual e na distribuição de energia (resfriadores, gerador de energia, escudos, motor quântico …), vezes o fator de sinal da blindagem."
       },
       "value": {
         "none": "0 = nenhum",
@@ -890,7 +890,7 @@
       "PowerPlant": "Gerador de energia",
       "Shield": "Gerador de escudo",
       "Cooler": "Resfriador",
-      "QuantumDrive": "Quantum Drive",
+      "QuantumDrive": "Motor quântico",
       "Thruster": "Propulsor",
       "FuelTank": "Tanque de combustível",
       "FuelIntake": "Entrada de combustível",
@@ -940,8 +940,8 @@
         "group": "Visualização",
         "classic": "Clássica",
         "classicHint": "Visualização clássica",
-        "holo": "Holotable",
-        "holoHint": "Visualização Holotable"
+        "holo": "Mesa holográfica",
+        "holoHint": "Visualização de mesa holográfica"
       },
       "stage": {
         "einordnung": "Classificação",
@@ -951,7 +951,7 @@
         "surfaceTop": "Superior",
         "surfaceSide": "Lateral",
         "surfaceFront": "Frontal",
-        "surfaceFrontPending": "A vista frontal chega com o próximo envio de dados desta nave.",
+        "surfaceFrontPending": "A vista frontal chega com o próximo upload de dados desta nave.",
         "silhouetteAria": "Silhueta da {{name}}",
         "noGeometryReason": "Ainda não foi gerada uma silhueta para esta nave.",
         "inspector": "Inspetor",
@@ -1010,7 +1010,7 @@
         "rankEmpty": "Ainda não há valores de comparação para esta frota.",
         "tab": {
           "parts": "Componentes",
-          "changes": "Mudanças"
+          "changes": "Alterações"
         },
         "backToParts": "Todos os componentes",
         "backHint": "Limpa a seleção no modelo (Esc)",
@@ -1097,11 +1097,11 @@
           "signature": "Assinatura e resfriamento"
         },
         "delta": {
-          "noChange": "Nenhuma mudança nesta categoria.",
+          "noChange": "Nenhuma alteração nesta categoria.",
           "kpi": "Atributo",
           "from": "Antes",
           "to": "Depois",
-          "change": "Mudança"
+          "change": "Alteração"
         },
         "adminOnly": "Somente admin/colaborador",
         "schema": {
@@ -1112,12 +1112,12 @@
           "reExtractPendingYes": "Sim"
         },
         "forkGuard": {
-          "title": "Virar o proprietário?",
+          "title": "Tornar-se o proprietário?",
           "body": "Esta alteração separa o loadout do original. Não dá para desfazer.",
-          "confirm": "Virar proprietário"
+          "confirm": "Tornar-se proprietário"
         },
-        "deltaShow": "Mostrar mudanças",
-        "deltaHide": "Ocultar mudanças",
+        "deltaShow": "Mostrar alterações",
+        "deltaHide": "Ocultar alterações",
         "current": "atual",
         "hint": "Escolha um patch mais antigo à esquerda e aqui aparecerá o que mudou nesta nave.",
         "fromAria": "De {{patch}} — escolha um patch",
@@ -1139,7 +1139,7 @@
       "share": {
         "copyLink": "Copiar link",
         "followedBy": "gerenciado por {{owner}}",
-        "followedSince": "em {{date}}",
+        "followedSince": "atualizado em {{date}}",
         "refresh": "Atualizar",
         "refreshing": "Atualizando…",
         "copy": "Copiar",
@@ -1147,7 +1147,7 @@
         "revoke": "Parar de compartilhar",
         "revokeNote": "Quem já segue este link continua conectado até a configuração ser excluída.",
         "errorGeneric": "Não deu certo. Tente novamente.",
-        "copyLinkHint": "Copia o endereço desta visualização — incluindo a Holotable e alterações de hardpoints não salvas.",
+        "copyLinkHint": "Copia o endereço desta visualização — incluindo a mesa holográfica e alterações de hardpoints não salvas.",
         "unsavedHint": "{{n}} alteração(ões) não salva(s) existem só no link copiado, não no link do hangar.",
         "signInHint": "Entre para compartilhar uma configuração do hangar como um link próprio.",
         "notInHangarHint": "Esta nave ainda não está no seu hangar. Adicione-a primeiro, depois você poderá compartilhar uma configuração.",
@@ -1239,12 +1239,12 @@
           "undo": "Desfazer",
           "wishError": "Não foi possível adicionar a entrada.",
           "signIn": "Entre para salvar isto.",
-          "wikelo": "Troca na Wikelo",
-          "wikeloRow": "Troca na Wikelo",
+          "wikelo": "Troca com Wikelo",
+          "wikeloRow": "Troca com Wikelo",
           "wikeloPlace": "Wikelo Emporium · Kinga Station",
           "wikeloNoData": "As peças necessárias ainda não estão nos dados do Codex.",
           "wikeloHave": "{{have}} de {{need}} em estoque",
-          "wikeloSource": "Troca na Wikelo",
+          "wikeloSource": "Troca com Wikelo",
           "attribution": "Preços: UEX Corp · Wikelo: dados de troca do Codex"
         }
       },
@@ -1263,22 +1263,22 @@
         "copyName": "{{name}} (cópia)",
         "newFromWerk": "Novo exemplar de fábrica",
         "saveWerk": "Adicionar ao hangar como exemplar",
-        "saveBuild": "Salvar build como exemplar",
+        "saveBuild": "Salvar configuração como exemplar",
         "anotherCopy": "Mais uma {{name}} para o hangar",
         "nameTitle": "Nome do exemplar",
         "nameLabel": "Nome",
-        "nameSuggested": "Sugestão: “{{name}}” — aceite-a ou digite um nome próprio.",
+        "nameSuggested": "Sugestão: “{{name}}” — use-a ou digite outro nome.",
         "autosavedOne": "Salvo · 1 alteração",
         "autosavedMany": "Salvo · {{n}} alterações",
-        "wishWithOne": "Desejar esta build · 1 peça trocada",
-        "wishWithMany": "Desejar esta build · {{n}} peças trocadas",
+        "wishWithOne": "Desejar esta configuração · 1 peça trocada",
+        "wishWithMany": "Desejar esta configuração · {{n}} peças trocadas",
         "wishName": "Desejo: {{name}}",
-        "wishLoadoutUnavailable": "Está nos seus desejos — o loadout ainda não pode ser salvo lá."
+        "wishLoadoutUnavailable": "Está na sua lista de desejos — o loadout ainda não pode ser salvo lá."
       },
       "partType": {
         "gatling": "Gatling",
-        "remoteTurret": "Torre remota",
-        "mannedTurret": "Torre tripulada",
+        "remoteTurret": "Torreta remota",
+        "mannedTurret": "Torreta tripulada",
         "scattergun": "Scattergun",
         "massDriver": "Mass driver",
         "railgun": "Railgun",
@@ -1294,7 +1294,7 @@
         "shield": "Escudo",
         "powerPlant": "Gerador de energia",
         "cooler": "Resfriador",
-        "quantumDrive": "Quantum drive",
+        "quantumDrive": "Motor quântico",
         "radar": "Radar",
         "lifeSupport": "Suporte de vida",
         "missileRack": "Rack de mísseis",
@@ -1302,7 +1302,7 @@
       },
       "statShort": {
         "dps": "DPS",
-        "alphaDamage": "Alpha",
+        "alphaDamage": "Alfa",
         "fireRate": "Cadência",
         "range": "Alcance",
         "projectileSpeed": "Velocidade",
@@ -1325,7 +1325,7 @@
         "fuelRate": "Combustível",
         "radarSensitivity": "Sensor",
         "pingCooldown": "Ping",
-        "aimAssistRange": "Auxílio de mira",
+        "aimAssistRange": "Assistência de mira",
         "coolingRate": "Resfriamento",
         "powerDraw": "Consumo",
         "coolantDraw": "Refrigerante",
@@ -1376,7 +1376,7 @@
           "airlock": "Eclusas",
           "dockingTube": "Tubos de acoplamento",
           "escapePod": "Cápsulas de fuga",
-          "medBed": "Med beds",
+          "medBed": "Leitos médicos",
           "respawn": "Pontos de respawn",
           "weaponRack": "Suportes de armas",
           "locker": "Armários",
@@ -1385,13 +1385,13 @@
           "powerPlant": "Geradores de energia",
           "cooler": "Resfriadores",
           "shield": "Geradores de escudo",
-          "quantumDrive": "Quantum drives",
+          "quantumDrive": "Motores quânticos",
           "jumpDrive": "Módulos de salto",
           "lifeSupport": "Suporte de vida",
           "radar": "Radar",
           "fuelTank": "Tanques de combustível",
           "maintenance": "Pontos de manutenção",
-          "turret": "Torres (acesso)",
+          "turret": "Torretas (acesso)",
           "computer": "Computadores",
           "bed": "Camas",
           "head": "Banheiros e chuveiros",
@@ -1450,7 +1450,7 @@
           "ladder": "Escada de mão",
           "ramp": "Rampa",
           "airlock": "Eclusa",
-          "dockingTube": "Tubo de acoplagem",
+          "dockingTube": "Tubo de acoplamento",
           "escapePod": "Cápsula de fuga",
           "medBed": "Leito médico",
           "respawn": "Ponto de respawn",
@@ -1458,16 +1458,16 @@
           "locker": "Armário",
           "fireExt": "Extintor de incêndio",
           "relay": "Relé",
-          "powerPlant": "Usina de energia",
+          "powerPlant": "Gerador de energia",
           "cooler": "Resfriador",
           "shield": "Gerador de escudo",
-          "quantumDrive": "Quantum drive",
+          "quantumDrive": "Motor quântico",
           "jumpDrive": "Módulo de salto",
           "lifeSupport": "Suporte de vida",
           "radar": "Radar",
           "fuelTank": "Tanque de combustível",
           "maintenance": "Ponto de manutenção",
-          "turret": "Torre (acesso)",
+          "turret": "Torreta (acesso)",
           "computer": "Computador",
           "bed": "Cama",
           "head": "Vaso sanitário e chuveiro",
@@ -1488,19 +1488,19 @@
     "empty": {
       "title": "Nada aqui ainda",
       "filtered": "Nenhuma entrada corresponde à sua busca ou aos filtros.",
-      "kind": "Nenhum item de {{kind}} neste build.",
-      "noBuild": "Nenhum build do catálogo foi publicado ainda.",
-      "partial": "Este build contém um subconjunto representativo desta categoria — as contagens exibidas refletem o que está carregado.",
+      "kind": "Nenhum item de {{kind}} nesta build.",
+      "noBuild": "Nenhuma build do catálogo foi publicada ainda.",
+      "partial": "Esta build contém um subconjunto representativo desta categoria — as contagens exibidas refletem o que está carregado.",
       "resetAll": "Redefinir busca e filtros",
       "foundElsewhere": "Nenhum item de {{kind}} para “{{term}}” — encontrado em:"
     },
     "error": {
-      "title": "Não foi possível carregar o codex",
+      "title": "Não foi possível carregar o Codex",
       "retry": "Tentar novamente"
     },
     "keybinds": {
-      "title": "Atalhos de teclas",
-      "subtitle": "Atalhos padrão do build atual do Star Citizen.",
+      "title": "Atalhos de teclado",
+      "subtitle": "Atalhos padrão da build atual do Star Citizen.",
       "device": "Dispositivo",
       "devices": {
         "keyboard": "Teclado",
@@ -1512,7 +1512,7 @@
       "searchPlaceholder": "Buscar ação ou tecla…",
       "lang": {
         "aria": "Idioma dos nomes das ações",
-        "note": "Muitos jogadores usam o Star Citizen em inglês — mude para EN para ver as ações com os nomes do jogo.",
+        "note": "Muitos jogadores jogam Star Citizen em inglês — mude para EN para ver as ações com os nomes do jogo.",
         "short": {
           "ui": "PT",
           "en": "EN"
@@ -1533,7 +1533,7 @@
         "emote": "Emote",
         "camera": "Câmera",
         "character": "Personagem",
-        "turret": "Torre",
+        "turret": "Torreta",
         "eva": "EVA",
         "hacking": "Hacking",
         "remote": "Remoto",
@@ -1680,7 +1680,7 @@
       "quality": "Qualidade {{score}}%"
     },
     "rank": {
-      "header": "Posicionamento",
+      "header": "Classificação",
       "nShipsOfSizeClass": "{{n}} naves da classe de tamanho {{k}}",
       "nShips": "{{n}} naves",
       "nShipsOfCareer": "{{n}} naves da mesma carreira",
@@ -1689,7 +1689,7 @@
       "verdict": "{{pct}} % — {{band}} em relação a {{n}} naves.",
       "percentile": "Percentil",
       "percentileTooltip": "Descrever, não prescrever: o valor mostra onde esta nave está no campo de comparação — não se ela é boa. 50 % é exatamente o meio.",
-      "lensNote": "O posicionamento não segue o perfil de missão — ele mantém seus próprios três perfis.",
+      "lensNote": "A classificação não segue o perfil de missão — ela mantém seus próprios três perfis.",
       "radarAria": "Gráfico radar dos percentis de {{name}} em relação a {{n}} naves",
       "gapAxis": "Sem valor neste eixo",
       "band": {
@@ -1725,7 +1725,7 @@
       },
       "disabled": {
         "noCargo": "Esta nave não tem compartimento de carga",
-        "noData": "Este build não traz valores para este perfil",
+        "noData": "Esta build não traz valores para este perfil",
         "noCareer": "Nenhuma carreira registrada para esta nave.",
         "noRole": "Nenhuma função registrada para esta nave.",
         "smallGroup": "Este grupo é pequeno demais, a comparação foi ampliada."
@@ -1808,7 +1808,7 @@
       "hardpoints": "Hardpoints",
       "hardpointsHint": "Clique em um hardpoint para ver o que cabe nele.",
       "compatLoading": "Carregando itens compatíveis…",
-      "compatNone": "Nenhum item compatível neste build.",
+      "compatNone": "Nenhum item compatível nesta build.",
       "changes": {
         "title": "Alterações desde o patch {{patch}}",
         "worse": "Pior",
@@ -1859,10 +1859,10 @@
       "compatCount": "{{count}} itens compatíveis",
       "loadoutEmpty": "Vazio (de fábrica)",
       "viewOnRsi": "Ver na RSI",
-      "notFound": "Entrada não encontrada no build atual.",
+      "notFound": "Entrada não encontrada na build atual.",
       "loadingStage": "Carregando o holodeck de naves",
       "invalidRoute": "Este endereço não leva a nenhuma categoria do Codex.",
-      "noArtwork": "Ainda não há imagem desta nave neste build.",
+      "noArtwork": "Ainda não há imagem desta nave nesta build.",
       "showRaw": "Mostrar dados brutos",
       "hideRaw": "Ocultar dados brutos",
       "naValue": "n/d",
@@ -1877,11 +1877,11 @@
       "quantumSpeed": "Velocidade quantum",
       "quantumFuel": "Combustível quantum",
       "fuelCapacity": "Combustível de hidrogênio",
-      "hardpointExplainer": "Um hardpoint é um ponto de fixação no casco: toda arma, escudo, cooler, propulsor ou quantum drive fica em um deles e pode ser trocado por outro item do mesmo tipo e tamanho. Abaixo está o que a nave traz de fábrica.",
+      "hardpointExplainer": "Um hardpoint é um ponto de fixação no casco: toda arma, escudo, resfriador, propulsor ou motor quântico fica em um deles e pode ser trocado por outro item do mesmo tipo e tamanho. Abaixo está o que a nave traz de fábrica.",
       "loadoutExplainerLabel": "O que é um hardpoint?",
       "craftedFrom": "Materiais de fabricação",
       "craftedFromHint": "Quanto custa fabricar este item, segundo os dados de crafting do jogo.",
-      "noIngredients": "Este blueprint não lista materiais neste build.",
+      "noIngredients": "Este blueprint não lista materiais nesta build.",
       "openBlueprint": "Abrir o blueprint completo",
       "minQuality": "qualidade mín. {{value}}",
       "whereToBuy": "Onde comprar",
@@ -1892,9 +1892,9 @@
       "whereToBuyTerminal": "Terminal",
       "whereToBuyLocation": "Local",
       "whereToBuyAttribution": "Preços da UEX Corp — mantidos pela comunidade, podem não refletir os servidores live. Sem afiliação com a Cloud Imperium Games.",
-      "moduleOrderHint": "Os módulos configuráveis vêm primeiro — armas e seus suportes, torres, munição, pods, escudos, gerador de energia, quantum drive, radar, coolers, suporte de vida. Tudo o que é fixo fica abaixo. Clique em qualquer módulo para ver a tabela completa de valores.",
-      "loadoutEmptyWeaponMount": "Suporte de arma — sem arma padrão neste extract",
-      "chipCrew": "{{n}} de tripulação",
+      "moduleOrderHint": "Os módulos configuráveis vêm primeiro — armas e seus suportes, torretas, munição, pods, escudos, gerador de energia, motor quântico, radar, resfriadores, suporte de vida. Tudo o que é fixo fica abaixo. Clique em qualquer módulo para ver a tabela completa de valores.",
+      "loadoutEmptyWeaponMount": "Suporte de arma — sem arma padrão nesta extração",
+      "chipCrew": "{{n}} tripulantes",
       "chipNoCargo": "Sem compartimento de carga",
       "actionCompare": "Comparar",
       "actionCopyLink": "Copiar link",
@@ -1915,8 +1915,8 @@
       },
       "stageLaunchers": "{{n}} lançadores",
       "stageMissileRacks": "Lançadores de mísseis",
-      "stageRemoteTurret": "Torre remota",
-      "stageMannedTurret": "Torre tripulada",
+      "stageRemoteTurret": "Torreta remota",
+      "stageMannedTurret": "Torreta tripulada",
       "stageTractorBeam": "Raio trator",
       "stageTractorBeams": "Raios tratores",
       "linkCopied": "Link copiado",
@@ -1947,7 +1947,7 @@
       "overBudget": "Reator sobrecarregado: {{used}} de {{total}} segmentos em uso",
       "demandLine": "Demanda de {{demand}} seg. de {{items}} módulos · alocados {{allocated}} seg.",
       "belowMinimum": "Abaixo do mínimo de {{min}} seg. — o grupo falha.",
-      "pinned": "Definido por você — Auto, Stealth ou Redefinir desfaz.",
+      "pinned": "Definido por você — Auto, Furtividade ou Redefinir desfaz.",
       "pip": {
         "level": "{{group}}: nível {{n}} de {{m}}",
         "topOff": "{{group}}: nível {{n}} de {{m}} — clique para cortar o grupo"
@@ -1974,7 +1974,7 @@
         "coolerUnit": "Resfriador {{n}}",
         "radar": "Radar",
         "lifeSupport": "Suporte de vida",
-        "quantum": "Quantum Drive",
+        "quantum": "Motor quântico",
         "tractor": "Raio trator"
       },
       "state": {
@@ -1985,12 +1985,12 @@
       },
       "tooltip": {
         "weapons": "Corta a energia de todo o grupo. Sem energia, as armas não disparam — o DPS sustentado cai para 0 e o EM diminui bastante. Clique de novo para religar.",
-        "shields": "O dourado marca o mínimo que os geradores ativos precisam. Abaixo disso o escudo falha, e o reserva passivo vai junto.",
-        "thrusters": "Propulsores principais e de manobra. Em zero a nave ainda direciona, mas sem empuxo.",
+        "shields": "O dourado marca o mínimo que os geradores ativos precisam. Abaixo disso o escudo falha, e o backup passivo vai junto.",
+        "thrusters": "Propulsores principais e de manobra. Em zero a nave continua controlável, mas sem empuxo.",
         "coolers": "Cada resfriador é um item próprio no gerenciamento de energia da nave — por isso há uma coluna para cada resfriador instalado. Quanto mais segmentos um resfriador recebe, menor a carga de resfriamento — e menor sua assinatura IR. Resfriar é o preço de ficar silencioso.",
         "radar": "Define até onde você enxerga. Mais energia significa mais alcance — e mais EM, ou seja, mais visibilidade para os outros.",
         "lifeSupport": "Oxigênio e pressão. Em zero, um relógio começa a correr — os arquivos do jogo não dizem por quanto tempo.",
-        "quantum": "Não tem canal no SCM. Só consome energia no NAV — e lá o escudo apaga no lugar.",
+        "quantum": "Não tem canal no SCM. Só consome energia no NAV — e lá, em troca, o escudo se apaga.",
         "tractor": "Desligado. Só consome energia quando você o usa.",
         "ir": "Sua assinatura de calor. Sobe com a carga de resfriamento e com tudo que consome energia. IR baixo significa que sensores térmicos te detectam mais tarde.",
         "em": "A soma de todos os componentes ligados. Escudos e resfriadores são os maiores itens — corte um grupo e a parte dele some. O que cada peça emite vem dos arquivos do jogo; armas de energia têm 0 aí.",
@@ -2018,18 +2018,18 @@
         "nav": "NAV"
       },
       "preset": {
-        "stealth": "Stealth",
+        "stealth": "Furtividade",
         "auto": "Auto",
         "reset": "Redefinir",
         "stealthHint": "Menor assinatura EM: armas, escudos, quantum, trator, radar e suporte de vida desligados, propulsão no mínimo, resfriadores só até o resfriamento ficar abaixo de 100 %."
       },
       "gap": {
-        "noReactorData": "Sem dados de reator nesta build — o orçamento de energia fica vazio até o extract trazê-los.",
-        "reExtractPending": "Esta build do catálogo ainda não traz valores de energia — nem por módulo nem para o orçamento. Eles chegam com o próximo upload do catálogo (extract schema 3).",
+        "noReactorData": "Sem dados de reator nesta build — o orçamento de energia fica vazio até a extração trazê-los.",
+        "reExtractPending": "Esta build do catálogo ainda não traz valores de energia — nem por módulo nem para o orçamento. Eles chegam com o próximo upload do catálogo (esquema de extração 3).",
         "noChannelInMode": "Este grupo não tem canal neste modo de voo.",
         "noCoolingData": "Sem dados de resfriadores nesta build — a carga de resfriamento fica vazia.",
-        "noCoolantDraw": "Os dados do jogo não informam quanto líquido de arrefecimento os componentes consomem — a carga de resfriamento fica vazia.",
-        "noSignatureData": "Sem dados de assinatura neste extract — novo extract pendente."
+        "noCoolantDraw": "Os dados do jogo não informam quanto refrigerante os componentes consomem — a carga de resfriamento fica vazia.",
+        "noSignatureData": "Sem dados de assinatura nesta extração — nova extração pendente."
       },
       "unit": {
         "segments": "seg."
@@ -2056,7 +2056,7 @@
       "appliesToOne": "Vale só para este slot: {{port}}",
       "appliesToMany": "Vale para todos os {{count}} hardpoints idênticos",
       "sortHint": "Clique em uma coluna para ordenar, Ctrl+clique para adicionar uma segunda ordenação.",
-      "installedNone": "Compartimento vazio (original)",
+      "installedNone": "Compartimento vazio (de fábrica)",
       "pickHere": "Escolha um",
       "fitInferred": "Este compartimento vem vazio. A lista vem de um compartimento idêntico e equipado da mesma nave — não dos dados deste hardpoint.",
       "clearSlot": "Esvaziar slot"
@@ -2067,10 +2067,10 @@
       "saving": "Salvando…",
       "saveErrorHangar": "Não foi possível acessar seu hangar agora — o rascunho foi mantido, tente salvar de novo.",
       "saveErrorGeneric": "Não foi possível salvar o loadout agora — o rascunho foi mantido, tente de novo.",
-      "revert": "Voltar ao original",
-      "resetAll": "Redefinir todo o loadout para o original",
+      "revert": "Restaurar padrão de fábrica",
+      "resetAll": "Restaurar todo o loadout de fábrica",
       "resetAllTitle": "Redefinir todo o loadout?",
-      "resetAllBody": "Todas as {{n}} alterações neste loadout serão perdidas e cada slot volta à peça original.",
+      "resetAllBody": "Todas as {{n}} alterações neste loadout serão perdidas e cada slot volta à peça de fábrica.",
       "resetAllConfirm": "Redefinir",
       "defaultConfigName": "Loadout do Codex",
       "draftState": {
@@ -2147,7 +2147,7 @@
       },
       "baseline": {
         "equipped": "Equipado",
-        "factory": "Original"
+        "factory": "De fábrica"
       },
       "scrollCue": {
         "horizontal": "role para o lado para ver {{columns}}",
@@ -2173,15 +2173,15 @@
         "power": "Energia",
         "em": "EM",
         "mass": "Massa",
-        "grade": "Grau",
+        "grade": "Grade",
         "manufacturer": "Fabricante",
         "ammo": "Munição",
         "spread": "Dispersão",
         "ir": "IR",
         "size": "Tamanho",
         "projectilesPerShot": "Projéteis por disparo",
-        "lifetime": "Duração",
-        "aimYaw": "Alcance de giro",
+        "lifetime": "Tempo de vida",
+        "aimYaw": "Rotação",
         "aimRate": "Taxa de rastreamento",
         "damageType": "Tipo de dano",
         "archetype": "Arquétipo",
@@ -2208,29 +2208,29 @@
         "ballistic": "Balístico",
         "ballisticcannon": "Canhão balístico",
         "ballisticgatling": "Gatling balística",
-        "ballisticrepeater": "Repetidora balística",
-        "ballisticscattergun": "Escopeta balística",
+        "ballisticrepeater": "Repetidor balístico",
+        "ballisticscattergun": "Scattergun balística",
         "bottom": "Inferior",
         "cannon": "Canhão",
         "center": "Centro",
         "centre": "Centro",
         "cooler": "Resfriador",
         "countermeasure": "Contramedida",
-        "distortion": "Distortion",
-        "distortioncannon": "Canhão Distortion",
-        "distortionrepeater": "Repetidora Distortion",
+        "distortion": "Distorção",
+        "distortioncannon": "Canhão de distorção",
+        "distortionrepeater": "Repetidor de distorção",
         "emp": "EMP",
         "front": "Frontal",
         "fuelintake": "Entrada de combustível",
         "fueltank": "Tanque de combustível",
         "gatling": "Gatling",
         "gun": "Arma",
-        "gunturret": "Torre de armas",
+        "gunturret": "Torreta de armas",
         "jumpmodule": "Módulo de salto",
         "laser": "Laser",
         "lasercannon": "Canhão laser",
         "lasergatling": "Gatling laser",
-        "laserrepeater": "Repetidora laser",
+        "laserrepeater": "Repetidor laser",
         "left": "Esquerda",
         "lifesupport": "Suporte de vida",
         "lower": "Inferior",
@@ -2244,26 +2244,26 @@
         "missilerack": "Rack de mísseis",
         "nose": "Nariz",
         "power": "Energia",
-        "powerplant": "Usina de energia",
-        "quantumdrive": "Quantum Drive",
+        "powerplant": "Gerador de energia",
+        "quantumdrive": "Motor quântico",
         "quantumfueltank": "Tanque de combustível quântico",
         "radar": "Radar",
         "railgun": "Railgun",
         "rear": "Traseira",
-        "repeater": "Repetidora",
+        "repeater": "Repetidor",
         "right": "Direita",
         "rocketpod": "Rocket Pod",
         "salvagebeam": "Feixe de salvamento",
         "scanner": "Scanner",
-        "scattergun": "Escopeta",
+        "scattergun": "Scattergun",
         "selfdestruct": "Autodestruição",
         "shield": "Escudo",
         "shieldgenerator": "Gerador de escudo",
         "tail": "Cauda",
         "thruster": "Propulsor",
         "top": "Superior",
-        "tractorbeam": "Feixe trator",
-        "turret": "Torre",
+        "tractorbeam": "Raio trator",
+        "turret": "Torreta",
         "upper": "Superior",
         "utility": "Utilitário",
         "weapon": "Arma",
@@ -2348,14 +2348,14 @@
       "regenDelay": "Atraso de regeneração",
       "downedDelay": "Atraso após queda",
       "jumpRange": "Alcance de salto",
-      "driveSpeed": "Velocidade do drive",
+      "driveSpeed": "Velocidade do motor",
       "spoolTime": "Tempo de carga",
       "cooldown": "Recarga",
       "thrust": "Empuxo",
       "fuelCapacity": "Capacidade de combustível",
       "fuelRate": "Taxa de combustível",
       "health": "Durabilidade",
-      "distortion": "Capacidade de Distortion",
+      "distortion": "Capacidade de distorção",
       "powerDraw": "Consumo de energia (seg)",
       "powerOutput": "Geração de energia (seg)",
       "minPower": "Energia mín.",
@@ -2382,11 +2382,11 @@
       "tractorRange": "Alcance",
       "tractorFullStrengthRange": "Força total até",
       "tractorForce": "Tração máx.",
-      "tractorForceHint": "Os arquivos do jogo limitam um feixe trator pela força de tração, não por uma massa: quanto mais pesado o objeto, mais devagar ele se move (F = m·a), e o feixe se rompe quando a força necessária permanece acima da tração.",
+      "tractorForceHint": "Os arquivos do jogo limitam um raio trator pela força de tração, não por uma massa: quanto mais pesado o objeto, mais devagar ele se move (F = m·a), e o raio se rompe quando a força necessária permanece acima da tração.",
       "tractorAngle": "Ângulo máx.",
       "tractorTetherBreak": "Tempo de rompimento",
       "tractorSpeed": "Velocidade máx. de movimento",
-      "tractorNoStats": "O alcance e a tração deste feixe trator ainda não estão nesta extração — eles chegam com a próxima reextração."
+      "tractorNoStats": "O alcance e a tração deste raio trator ainda não estão nesta extração — eles chegam com a próxima reextração."
     },
     "shipLink": {
       "add": "Adicionar link de pledge",
@@ -2411,13 +2411,13 @@
     },
     "moduleSection": {
       "weapons": "Armamento",
-      "remoteTurrets": "Torres remotas",
-      "mannedTurrets": "Torres tripuladas",
+      "remoteTurrets": "Torretas remotas",
+      "mannedTurrets": "Torretas tripuladas",
       "missiles": "Mísseis",
       "pod": "Pods",
       "shields": "Geradores de escudo",
-      "powerPlants": "Usina de energia",
-      "quantum": "Quantum drive",
+      "powerPlants": "Gerador de energia",
+      "quantum": "Motor quântico",
       "radar": "Radar e sensores",
       "coolers": "Resfriadores",
       "lifeSupport": "Suporte de vida",
@@ -2426,7 +2426,7 @@
       "fixedTag": "não configurável",
       "countermeasures": "Contramedidas",
       "shieldsNote": "Todo compartimento deste bloco é um gerador de escudo substituível, inclusive os que vêm vazios. O módulo de controle de escudo fica com os sistemas fixos: ele não é um escudo por si só e não pode ser trocado no jogo.",
-      "countermeasuresNote": "Os lançadores não podem ser trocados no jogo, então este bloco serve só para consulta. Decoys desviam mísseis termoguiados, e noise (chaff) cega os guiados por radar. Quantos você precisa aparece na ficha de informações (ⓘ) do lançador: ela compara a assinatura por disparo com a da própria nave.",
+      "countermeasuresNote": "Os lançadores não podem ser trocados no jogo, então este bloco serve só para consulta. Iscas (decoys) desviam mísseis termoguiados, e o ruído (chaff) cega os guiados por radar. Quantos você precisa aparece na ficha de informações (ⓘ) do lançador: ela compara a assinatura por lançamento com a da própria nave.",
       "infoLabel": "Sobre este bloco",
       "splitRows": "Individual",
       "groupRows": "Agrupar",
@@ -2450,7 +2450,7 @@
         "pool": "Pool"
       },
       "shieldNote": "Todos os {{count}} são geradores de escudo e cada um pode ser trocado separadamente — os idênticos aparecem agrupados aqui, e \"Individual\" lista compartimento por compartimento.",
-      "shieldPassiveNote": "O passivo não consome energia e conta integralmente para o pool — mas depende dos ativos: se eles falharem, o reserva vai junto.",
+      "shieldPassiveNote": "O passivo não consome energia e conta integralmente para o pool — mas depende dos ativos: se eles falharem, o backup vai junto.",
       "peek": {
         "sustainedDpsTotal": "DPS sustentado total",
         "burstDpsTotal": "DPS de rajada total",
@@ -2463,7 +2463,7 @@
       "alphaDamage": "Dano alfa (todas as armas)",
       "dps": "DPS sustentado",
       "weaponMounts": "Suportes de armas",
-      "ordnanceMounts": "Suportes de munição",
+      "ordnanceMounts": "Suportes de mísseis",
       "shieldHp": "Pool de escudo",
       "shieldRegen": "Regeneração do escudo",
       "regenDelay": "Atraso de regeneração",
@@ -2477,23 +2477,23 @@
       "plantDurability": "Durabilidade dos geradores",
       "plantDistortion": "Pool de distorção dos geradores",
       "gap": {
-        "noStockGuns": "As armas de fábrica deste casco não estão no extract — o jogo guarda as armas padrão em um registro de loadout separado que ainda não resolvemos, então os suportes abaixo mostram o assento em vez da arma.",
-        "noFireRate": "Sem taxa de disparo neste extract{{patch}}, então o DPS sustentado ainda não pode ser calculado.",
-        "noSustainedCycle": "Sem dados de regeneração de energia, tempo de recarga ou superaquecimento das armas neste extract{{patch}}, então o DPS sustentado ainda não pode ser calculado. O DPS de rajada não conta pausas.",
+        "noStockGuns": "As armas de fábrica deste casco não estão na extração — o jogo guarda as armas padrão em um registro de loadout separado que ainda não resolvemos, então os suportes abaixo mostram o assento em vez da arma.",
+        "noFireRate": "Sem cadência de tiro nesta extração{{patch}}, então o DPS sustentado ainda não pode ser calculado.",
+        "noSustainedCycle": "Sem dados de regeneração de energia, tempo de recarga ou superaquecimento das armas nesta extração{{patch}}, então o DPS sustentado ainda não pode ser calculado. O DPS de rajada não conta pausas.",
         "noShields": "Nenhum gerador de escudo no loadout de fábrica desta nave.",
-        "noHullHp": "O HP do casco ainda não faz parte do extract do P4K.",
-        "noResistances": "As resistências a dano por canal não são extraídas — nenhuma nave ou armadura as contém.",
+        "noHullHp": "O HP do casco ainda não faz parte da extração do P4K.",
+        "noResistances": "As resistências a dano por canal não são extraídas — nenhuma nave ou blindagem as contém.",
         "noPowerPlant": "Nenhum gerador de energia no loadout de fábrica desta nave.",
-        "noPowerDraw": "O consumo e a geração de energia por item ainda não estão no extract, então o triângulo de energia não pode ser calculado.",
-        "noHullMass": "A massa do casco não está no extract — só é possível calcular a massa do equipamento instalado.",
-        "noFlight": "O extract desta nave não traz valores de desempenho de voo.",
-        "noCargoCapacity": "A capacidade de carga ainda não está no extract.",
-        "noSignature": "A seção transversal de radar ainda não está no extract desta nave — aparecerá após o próximo upload do catálogo.",
+        "noPowerDraw": "O consumo e a geração de energia por item ainda não estão na extração, então o triângulo de energia não pode ser calculado.",
+        "noHullMass": "A massa do casco não está na extração — só é possível calcular a massa do equipamento instalado.",
+        "noFlight": "A extração desta nave não traz valores de desempenho de voo.",
+        "noCargoCapacity": "A capacidade de carga ainda não está na extração.",
+        "noSignature": "A seção transversal de radar ainda não está na extração desta nave — aparecerá após o próximo upload do catálogo.",
         "noEmissionModel": "Os valores de assinatura IR/EM não estão nos dados do jogo — o modelo de energia subjacente não vem no cliente.",
-        "noQuantum": "Esta nave não tem quantum drive instalado.",
+        "noQuantum": "Esta nave não tem motor quântico instalado.",
         "noEquipmentMass": "Não é possível calcular a massa do equipamento para esta configuração.",
         "noMissiles": "Esta configuração não carrega mísseis.",
-        "noArmorStats": "O extract não traz valores de blindagem para esta nave — aqui só aparece a estrutura do casco."
+        "noArmorStats": "A extração não traz valores de blindagem para esta nave — aqui só aparece a estrutura do casco."
       }
     },
     "mission": {
@@ -2504,13 +2504,13 @@
       "travel": "Viagem",
       "stealth": "Furtividade",
       "mining": "Mineração",
-      "salvage": "Salvage",
+      "salvage": "Salvamento",
       "lensReset": "Voltar para “Tudo”",
       "lensResetTip": "Volta a missão para “Tudo”: todos os blocos de equipamento são expandidos de novo na ordem padrão, e os números-chave mostram a visão geral neutra. O loadout em si não muda.",
       "setLensResetTip": "Volta a missão para “Tudo”: todos os valores voltam a contar igualmente, e as peças na imagem deixam de mostrar um valor específico da missão. O set em si não muda.",
       "disabled": {
         "noMining": "Sem hardpoints de mineração",
-        "noSalvage": "Sem hardpoints de salvage",
+        "noSalvage": "Sem hardpoints de salvamento",
         "noCargo": "Sem grade de carga"
       }
     },
@@ -2537,13 +2537,13 @@
       "emMax": "Assinatura EM (máxima, modelo)",
       "emQuantum": "Assinatura EM (quantum, modelo)",
       "modelHint": "Nosso modelo, não um valor do jogo: EM por componente = nominal × alocado ÷ segmentos totais, o EM do reator segue a energia consumida, vezes o fator de blindagem do casco. Fonte: valores dos componentes nos dados do jogo.",
-      "modelNote": "IR e EM são nosso próprio modelo, não valores do jogo: EM por componente = nominal × alocado ÷ segmentos totais, o EM do reator segue a energia consumida, vezes o fator de blindagem do casco. Ocioso = tudo no mínimo, escudo e quantum desligados; máximo = tudo no máximo, escudo ligado; quantum = escudo desligado, quantum drive ligado. O IR cobre só os resfriadores, propulsores ficam de fora (seguem o acelerador). Fonte: valores dos componentes nos dados do jogo.",
+      "modelNote": "IR e EM são nosso próprio modelo, não valores do jogo: EM por componente = nominal × alocado ÷ segmentos totais, o EM do reator segue a energia consumida, vezes o fator de blindagem do casco. Ocioso = tudo no mínimo, escudo e quantum desligados; máximo = tudo no máximo, escudo ligado; quantum = escudo desligado, motor quântico ligado. O IR cobre só os resfriadores, propulsores ficam de fora (seguem o acelerador). Fonte: valores dos componentes nos dados do jogo.",
       "crossSection": "Seção transversal",
       "boost": "Velocidade de boost",
       "armor": "Blindagem",
       "agility": "Agilidade",
       "gap": "—",
-      "gapHint": "Sem valor neste build.",
+      "gapHint": "Sem valor nesta build.",
       "deltaUp": "{{value}} melhor que o de fábrica",
       "deltaDown": "{{value}} pior que o de fábrica",
       "tooltipBurstDps": "Fogo contínuo até o carregador esvaziar — recarga não contada.",
@@ -2588,7 +2588,7 @@
     "analysis": {
       "readHint": "expandir para ler",
       "offensive": {
-        "title": "Ofensivo",
+        "title": "Ofensiva",
         "weapons": "Armas ({{count}} montadas)",
         "colWeapon": "Arma",
         "colSize": "Tamanho",
@@ -2602,10 +2602,10 @@
         "mixedRangeWarning": "Alcances variados: pelo menos uma arma alcança bem mais longe que as demais.",
         "missiles": "Mísseis ({{count}} ogivas)",
         "salvoDamage": "Dano da salva",
-        "lockTime": "Tempo de lock",
+        "lockTime": "Tempo de trava",
         "range": "Alcance",
         "targeting": "Mira",
-        "slowestMissileNote": "Tempo de lock do míssil mais lento.",
+        "slowestMissileNote": "Tempo de trava do míssil mais lento.",
         "hintDps": "{{value}} DPS",
         "hintAlpha": "{{value}} Alfa",
         "colMissile": "Míssil",
@@ -2625,7 +2625,7 @@
         "regen": "Regen.",
         "fullIn": "Cheio em",
         "regenDelay": "Atraso",
-        "downedDelay": "Atraso (caído)",
+        "downedDelay": "Atraso (após queda)",
         "mixedGeneratorNote": "Vários geradores de escudo diferentes instalados — os totais acima são agregados, os atrasos vêm do mais forte.",
         "resistance": "Resistência do escudo",
         "hull": "Casco e blindagem",
@@ -2635,9 +2635,9 @@
         "armorPenetration": "Redução de penetração (base)",
         "armorDeflectionPhysical": "Deflexão (física)",
         "armorDeflectionEnergy": "Deflexão (energia)",
-        "noArmorData": "O extract não traz valores de blindagem para esta nave — aqui só aparece a estrutura do casco.",
+        "noArmorData": "A extração não traz valores de blindagem para esta nave — aqui só aparece a estrutura do casco.",
         "effectiveHp": "HP total efetivo",
-        "effectiveHpGap": "Só é calculável quando o HP do casco e do escudo estiverem no extract."
+        "effectiveHpGap": "Só é calculável quando o HP do casco e do escudo estiverem na extração."
       },
       "ship": {
         "title": "Nave",
@@ -2646,7 +2646,7 @@
         "systems": "Sistemas",
         "signature": "Assinatura (sob carga total)",
         "hull": "Casco",
-        "massEquipmentNote": "A massa do casco não está no extract — só a massa do equipamento pode ser calculada.",
+        "massEquipmentNote": "A massa do casco não está na extração — só a massa do equipamento pode ser calculada.",
         "crossSectionNote": "Vem do casco, imutável."
       }
     },
@@ -2657,7 +2657,7 @@
       "armorHp": "HP da blindagem",
       "reverseSpeed": "Velocidade de ré",
       "dimensions": "Dimensões (C×L×A)",
-      "decks": "Conveses",
+      "decks": "Decks",
       "decksDerived": "derivado da altura do piso",
       "crew": "Tripulação",
       "equippedMass": "Massa do equipamento",
@@ -2674,7 +2674,7 @@
       "parameters": "Parâmetros",
       "general": "Geral",
       "projectile": "Projétil",
-      "noStats": "O extract atual não traz valores para este item.",
+      "noStats": "A extração atual não traz valores para este item.",
       "openDetail": "Abrir entrada completa do catálogo",
       "openStats": "Mostrar todos os valores"
     },
@@ -2728,7 +2728,7 @@
       "stage": {
         "slotsAria": "Peças de armadura",
         "readinessAria": "Prontidão",
-        "lensLimits": "limita o conjunto nesta missão"
+        "lensLimits": "limita o set nesta missão"
       },
       "supplies": {
         "add": "Adicionar faltantes à Operação ({{n}})",
@@ -2737,8 +2737,8 @@
         "toPlan": "Ir para o planejamento"
       },
       "notFoundPage": {
-        "title": "Conjunto não encontrado",
-        "body": "Este conjunto não existe ou não está no seu armário."
+        "title": "Set não encontrado",
+        "body": "Este set não existe ou não está no seu armário."
       }
     },
     "stat": {
@@ -2776,7 +2776,7 @@
       "temperatureMax": "Temperatura máx.",
       "temperatureMin": "Temperatura mín.",
       "emSignature": "Assinatura EM",
-      "irSignature": "Assinatura IV",
+      "irSignature": "Assinatura IR",
       "atmosphereCapacity": "Capacidade de atmosfera",
       "radiationDissipationRate": "Dissipação de radiação",
       "pressureMax": "Pressão máx.",
@@ -2850,9 +2850,9 @@
       "header": "Classificação",
       "profileLabel": "Perfil",
       "verdict": "{{pct}} % — {{band}}",
-      "radarAria": "Gráfico radar dos percentis do conjunto, {{cohort}}",
+      "radarAria": "Gráfico radar dos percentis do set, {{cohort}}",
       "legend": {
-        "set": "Este conjunto",
+        "set": "Este set",
         "median": "Mediana"
       },
       "loading": "Calculando …",
@@ -2872,15 +2872,15 @@
       "tip": {
         "all": "Todos os valores com o mesmo peso, sem foco.",
         "combat": "Como a especialização \"Tank\" da CIG: proteção e classe de armadura vêm primeiro.",
-        "stealth": "Quão difícil seria detectar o conjunto em um scanner.",
+        "stealth": "Quão difícil seria detectar o set em um scanner.",
         "pilot": "Como as especializações \"Pilot\" e \"Driver\" da CIG: a tolerância à força G vem primeiro.",
-        "env": "Quão bem o conjunto protege contra calor, frio e radiação.",
-        "transport": "Quanta capacidade de carga o conjunto oferece.",
-        "eva": "Quão adequado o conjunto seria para trabalho em EVA.",
+        "env": "Quão bem o set protege contra calor, frio e radiação.",
+        "transport": "Quanta capacidade de carga o set oferece.",
+        "eva": "Quão adequado o set seria para trabalho em EVA.",
         "scan": "Como a especialização \"Tracker\" da CIG: detecção e rastreamento vêm primeiro."
       },
       "disabled": {
-        "noSignature": "Os valores de assinatura (EM/IV) ainda não estão nos dados do jogo",
+        "noSignature": "Os valores de assinatura (EM/IR) ainda não estão nos dados do jogo",
         "noData": "Este valor ainda não está nos dados do jogo"
       }
     },
@@ -2920,12 +2920,12 @@
       "WeaponMining": "Laser de mineração",
       "Missile": "Míssil",
       "MissileLauncher": "Lançador de mísseis",
-      "Turret": "Torre",
+      "Turret": "Torreta",
       "Char_Armor_Helmet": "Capacete",
       "Char_Armor_Torso": "Torso",
       "Char_Armor_Arms": "Braços",
       "Char_Armor_Legs": "Pernas",
-      "Char_Armor_Undersuit": "Roupa de baixo",
+      "Char_Armor_Undersuit": "Undersuit",
       "Char_Armor_Backpack": "Mochila",
       "WeaponAttachment": "Acessório de arma",
       "Gadget": "Gadget",
@@ -2946,7 +2946,7 @@
       "inHqChip": "{{n}}× no seu HQ",
       "usesTitle": "No seu HQ",
       "equippedOn": "Instalado em: {{ship}} ({{variant}})",
-      "inSet": "No conjunto {{name}}"
+      "inSet": "No set {{name}}"
     },
     "browse": {
       "eyebrow": "Índice do Codex",
@@ -3000,9 +3000,9 @@
         "all": "Todos",
         "size": "Tamanho",
         "signal": "Sinal",
-        "allOf": "Todos os {{kind}}",
-        "signalOf": "Todos os {{kind}} {{signal}}",
-        "sizeOf": "Todos os {{kind}} S{{size}}",
+        "allOf": "Todos: {{kind}}",
+        "signalOf": "Todos: {{kind}} {{signal}}",
+        "sizeOf": "Todos: {{kind}} S{{size}}",
         "plural": {
           "missile": "mísseis guiados",
           "torpedo": "torpedos",
@@ -3062,7 +3062,7 @@
         "lifetime": "Tempo de voo",
         "lockTime": "Tempo de trava",
         "blastRadius": "Raio de explosão",
-        "armTime": "Tempo de armação",
+        "armTime": "Tempo de armamento",
         "lockAngle": "Ângulo de trava"
       },
       "signal": {
@@ -3177,8 +3177,8 @@
         "projectileSpeed": "VELOCIDADE DO PROJÉTIL",
         "shieldHp": "HP DO ESCUDO",
         "shieldRegen": "REGEN",
-        "damagedDelay": "PAUSA APÓS ACERTO",
-        "downedDelay": "PAUSA APÓS QUEDA",
+        "damagedDelay": "ATRASO APÓS ACERTO",
+        "downedDelay": "ATRASO APÓS QUEDA",
         "powerOutput": "POTÊNCIA",
         "coolingRate": "TAXA DE RESFRIAMENTO",
         "health": "HP",
@@ -3274,7 +3274,7 @@
   },
   "fps": {
     "title": "Equipamento FPS",
-    "subtitle": "Equipamento a pé — armas e armaduras, extraídos (datamined) da build live.",
+    "subtitle": "Equipamento a pé — armas e armaduras, extraídos da build LIVE.",
     "bridgeLink": "Equipamento FPS",
     "categoriesAria": "Categorias de equipamento FPS",
     "searchPlaceholder": "Filtrar esta lista – nome ou classe (ex.: Arclight, Morozov, klwe_*) …",
@@ -3300,7 +3300,7 @@
       "medium": "Média",
       "heavy": "Pesada"
     },
-    "armorStatsHint": "A armadura ainda não tem um bloco de estatísticas detalhado nesta build — apenas nome, grau, tamanho e fabricante.",
+    "armorStatsHint": "A armadura ainda não tem um bloco de estatísticas detalhado nesta build — apenas nome, grade, tamanho e fabricante.",
     "empty": {
       "weapon": "Nenhuma arma FPS nesta build.",
       "armor": "Nenhuma armadura nesta build.",
@@ -3782,8 +3782,8 @@
   "stability": {
     "word": {
       "stabil": "Estável",
-      "wackelig": "Instável",
-      "instabil": "Muito instável"
+      "wackelig": "Oscilante",
+      "instabil": "Instável"
     },
     "noData": "Poucos dados",
     "tip": {
@@ -3799,8 +3799,8 @@
     "long": {
       "ghost": "{{prev}}: {{p}} %",
       "bandsRolling": "Limites calculados a partir dos últimos patches concluídos",
-      "bandInstabil": "Muito instável · abaixo de {{n}}",
-      "bandWackelig": "Instável · {{a}}–{{b}}",
+      "bandInstabil": "Instável · abaixo de {{n}}",
+      "bandWackelig": "Oscilante · {{a}}–{{b}}",
       "bandStabil": "Estável · a partir de {{n}}",
       "sumTitle": "Como chegamos a {{n}} %",
       "start": "Valor inicial de todo patch",
@@ -3814,13 +3814,13 @@
       "votesN": "{{n}} votos",
       "total": "Estabilidade",
       "final": "Estado final – sem linha do tempo diária, este patch foi antes de a medição diária começar.",
-      "asOf": "Em {{date}}",
+      "asOf": "Atualizado em {{date}}",
       "day": "Dia {{day}} de {{threshold}}",
       "provisional": "avaliação ainda provisória",
       "sources": "Fontes:",
       "src": {
         "replies": "{{n}} respostas no fórum em {{threads}} tópicos",
-        "outage": "{{n}} minutos de instabilidade (RSI Status)",
+        "outage": "{{n}} minutos de interrupção (RSI Status)",
         "kb": "{{n}} Known Issues (CIG)",
         "votes": "{{n}} votos da comunidade"
       },
@@ -3875,7 +3875,7 @@
       "hint": "Assim que alguém executar o Verse Data Uploader e enviar uma execução, os dados aparecerão aqui."
     },
     "col": {
-      "entities": "Entities",
+      "entities": "Entidades",
       "diff": "Diff vs. anterior",
       "tool": "Versão da ferramenta",
       "uploads": "Uploads"
@@ -3890,7 +3890,7 @@
     },
     "diff": {
       "title": "Detalhes do diff (vs. build anterior)",
-      "entity": "Tipo de entity",
+      "entity": "Tipo de entidade",
       "prev": "Antes",
       "new": "Novo",
       "delta": "Δ"
@@ -4171,30 +4171,30 @@
       "copyFailed": "Não foi possível copiar o link — copie manualmente."
     },
     "people": {
-      "unapproved": "NĂŁo aprovada",
-      "unapprovedTip": "Esta conta se cadastrou por conta prĂłpria, nunca foi aprovada e nĂŁo tem acesso ao app.",
+      "unapproved": "Não aprovada",
+      "unapprovedTip": "Esta conta se cadastrou por conta própria, nunca foi aprovada e não tem acesso ao app.",
       "approve": "Aprovar",
       "approveTitle": "Aprovar conta?",
-      "approveConfirm": "Aprovar {{email}}? A conta recebe acesso ao app como visualizador; atribua uma funĂ§ĂŁo superior depois.",
-      "unapprovedOne": "{{n}} conta nĂŁo aprovada",
-      "unapprovedMany": "{{n}} contas nĂŁo aprovadas",
+      "approveConfirm": "Aprovar {{email}}? A conta recebe acesso ao app como visualizador; atribua uma função superior depois.",
+      "unapprovedOne": "{{n}} conta não aprovada",
+      "unapprovedMany": "{{n}} contas não aprovadas",
       "title": "Pessoas",
-      "subtitle": "Contas e convites ainda abertos em uma Ăşnica lista. Um convite sai da lista assim que o endereço faz login.",
+      "subtitle": "Contas e convites ainda abertos em uma única lista. Um convite sai da lista assim que o endereço faz login.",
       "invitedPill": "Convidado",
-      "invitedTitle": "PrĂ©-cadastrado para login — nenhuma conta usou este endereço ainda.",
+      "invitedTitle": "Pré-cadastrado para login — nenhuma conta usou este endereço ainda.",
       "withdraw": "Cancelar convite",
-      "withdrawTitle": "SĂł desfaz o prĂ©-cadastro — uma conta que jĂˇ entrou nunca Ă© afetada.",
-      "withdrawConfirm": "Cancelar o convite de {{email}}? O endereço perde o acesso prĂ©-cadastrado e ninguĂ©m Ă© notificado.",
+      "withdrawTitle": "Só desfaz o pré-cadastro — uma conta que já entrou nunca é afetada.",
+      "withdrawConfirm": "Cancelar o convite de {{email}}? O endereço perde o acesso pré-cadastrado e ninguém é notificado.",
       "withdrawConfirmTitle": "Cancelar convite?"
     },
     "col": {
-      "user": "UsuĂˇrio",
+      "user": "Usuário",
       "email": "E-mail",
-      "role": "FunĂ§ĂŁo",
+      "role": "Função",
       "since": "Desde",
-      "lastSeen": "Visto por Ăşltimo",
+      "lastSeen": "Visto por último",
       "actions": "Ações",
-      "reports": "DenĂşncias"
+      "reports": "Denúncias"
     },
     "actions": {
       "promoteCollab": "→ Collaborator",
@@ -4742,7 +4742,7 @@
     }
   },
   "desktop": {
-    "title": "Data Upload",
+    "title": "Upload de dados",
     "subtitle": "Baixe o Verse Data Uploader para a sua instalação local do Star Citizen.",
     "bundleHistory": "Histórico de bundles",
     "loading": "Carregando release…",
@@ -4763,7 +4763,7 @@
     "appDesc": "Lê a sua instalação local do Star Citizen e envia os bundles do Codex a partir dela.",
     "close": "Fechar",
     "access": {
-      "fullPage": "Página completa do Data Upload",
+      "fullPage": "Página completa de upload de dados",
       "note": "Somente Windows · login com a sua conta do Verse Companion · envia dados, nunca código."
     },
     "historyEyebrow": "Uploader",
@@ -4813,24 +4813,30 @@
     "handedOverHint": "O app está assumindo a sua sessão, você pode fechar esta janela. Se ele não conectou, inicie a conexão novamente no app."
   },
   "desktopAuth": {
-    "title": "Autorizar o Verse Data Uploader",
     "authorizing": "Verificando a sua sessão…",
     "loginRequired": "Entre primeiro e depois confirme a conexão.",
+    "confirm": "Conectar",
     "redirecting": "Autorizado. Enviando o token para o app…",
-    "redirectingHint": "Você pode fechar esta janela em instantes.",
+    "handedOverHint": "O app está assumindo a sua sessão, você pode fechar esta janela. Se ele não conectou, inicie a conexão novamente no app.",
     "unauthorized": "Sua conta não pode usar o Verse Data Uploader.",
-    "unauthorizedHint": "Você precisa do papel de colaborador ou admin. Fale com um admin.",
     "errorMissingParams": "Parâmetro de callback ou state ausente.",
     "errorBadCallback": "A URL de callback não é um loopback 127.0.0.1 na faixa de portas esperada.",
     "errorNoToken": "Nenhum token de acesso na sessão.",
-    "confirmPrompt": "Conectar o Verse Data Uploader na porta {{port}} à sua conta?",
-    "confirmHint": "Só confirme se você mesmo acabou de iniciar o login pelo Verse Data Uploader.",
-    "confirm": "Conectar",
-    "cancel": "Cancelar",
-    "cancelled": "Cancelado — nada foi enviado. Você pode fechar esta janela.",
     "retry": "Tentar novamente",
-    "handedOver": "Voltar ao app",
-    "handedOverHint": "O app está assumindo a sua sessão, você pode fechar esta janela. Se ele não conectou, inicie a conexão novamente no app."
+    "titleConnect": "Conectar Verse Data Uploader",
+    "titleConfirm": "Conectar Verse Data Uploader?",
+    "titleConnecting": "Conectando…",
+    "titleConnected": "Conectado",
+    "titleDenied": "Sem acesso",
+    "titleFailed": "Falha na conexão",
+    "confirmInfo": "Só confirme se foi você que iniciou o login no uploader (porta {{port}}).",
+    "connected": "O uploader está conectado à sua conta. Você pode fechar esta janela.",
+    "start": "Inicie o login pelo Verse Data Uploader – ele mesmo abre esta página.",
+    "done": {
+      "csrf": "O login não pertencia a esta sessão do uploader. Inicie-o de novo no uploader.",
+      "noToken": "O uploader não recebeu nenhum login. Inicie-o de novo no uploader.",
+      "failed": "Falha ao repassar o login para o uploader. Inicie-o de novo no uploader."
+    }
   },
   "footer": {
     "madeByCommunity": "Made by the Community",
@@ -4909,7 +4915,7 @@
         "title": "Dados da conta e do aplicativo",
         "p1": "Você só precisa de uma conta para os recursos pessoais (hangar, loadouts, configurações, feedback). Notícias, codex e notas de versão funcionam sem ela. Há exatamente duas formas de entrar: e-mail mais senha, ou o botão \"Continuar com o Google\". O app não usa nenhum outro método — sem magic links, sem códigos por SMS, sem outros logins sociais — e não há formulário de cadastro: as contas são criadas por um convite que um administrador envia ao seu e-mail.",
         "p2": "Para o login, nosso provedor de backend Supabase mantém um registro de autenticação seu na região da UE eu-central-1 (Frankfurt): seu e-mail, um hash de senha com salt ao usar login com senha (nunca a senha em texto puro), os métodos de login vinculados e carimbos de data/hora como convite, criação e último login.",
-        "p3": "Além disso há um registro de perfil com o que o app precisa de você: um nome de exibição (inicialmente a parte do e-mail antes do @), o nome de usuário que você escolhe, sua preferência de idioma e de canal do jogo, opcionalmente seu handle RSI e sua nave-capitânia, além do seu papel (viewer, collaborator, admin) e se a sua conta está aprovada. Papel e aprovação definem o que você pode ver e fazer.",
+        "p3": "Além disso há um registro de perfil com o que o app precisa de você: um nome de exibição (inicialmente a parte do e-mail antes do @), o nome de usuário que você escolhe, sua preferência de idioma e de canal do jogo, opcionalmente seu handle RSI e sua nave-capitânia, além do seu papel (visualizador, colaborador, admin) e se a sua conta está aprovada. Papel e aprovação definem o que você pode ver e fazer.",
         "p4": "Os dados de recursos que você cria (naves do hangar, loadouts, links de naves, rascunhos salvos, configurações) ficam armazenados na sua conta e só você pode lê-los — garantido por row-level security no banco de dados. Exceções: o feedback que você envia fica visível para os mantenedores, com a sua conta como remetente para que possam responder; e o que você mostra a amigos (veja \"Amigos e visibilidade\").",
         "p5": "As contas são apenas por convite. Cadastros não aprovados nunca passam da página de login e podem ser removidos junto com seus dados."
       },
@@ -4943,7 +4949,7 @@
         "supabase": "Supabase (banco de dados, autenticação, armazenamento de arquivos) — região da UE eu-central-1 (Frankfurt); processa os dados da sua conta e do aplicativo em nosso nome.",
         "vercel": "Vercel Inc. (hospedagem, CDN) — entrega do app estático.",
         "google": "Google Sign-In (Google Ireland Limited / Google LLC) — só se você escolher entrar com o Google; detalhes na seção \"Login com o Google\".",
-        "posthog": "PostHog (análise de produto e diagnóstico de erros) — nuvem da UE; as requisições passam pelo endereço do próprio site (/ingest). Somente após o seu consentimento ele registra eventos de uso, tempos de carregamento de páginas, cliques mortos, heatmaps e erros. Sessões em que ocorre um erro são gravadas para reprodução com todas as entradas mascaradas. Se você estiver conectado, o PostHog vê um ID pseudônimo (um hash com salt do ID da sua conta) e o seu papel (viewer, collaborator ou admin) — nunca o seu e-mail ou nome.",
+        "posthog": "PostHog (análise de produto e diagnóstico de erros) — nuvem da UE; as requisições passam pelo endereço do próprio site (/ingest). Somente após o seu consentimento ele registra eventos de uso, tempos de carregamento de páginas, cliques mortos, heatmaps e erros. Sessões em que ocorre um erro são gravadas para reprodução com todas as entradas mascaradas. Se você estiver conectado, o PostHog vê um ID pseudônimo (um hash com salt do ID da sua conta) e o seu papel (visualizador, colaborador ou admin) — nunca o seu e-mail ou nome.",
         "posthogServer": "PostHog (lado do servidor) — nossas próprias funções de servidor reportam seus erros e tempos de execução ao PostHog (nuvem da UE), sem endereço IP, ID de usuário ou conteúdo. Isso não depende do seu consentimento, pois não envolve dados pessoais. Os apps de desktop repassam seus relatórios de falha (e contagens de uso, se você permitir no app) da mesma forma — vinculados apenas a um identificador de instalação já com hash, nunca à sua conta.",
         "fonts": "Google Fonts — os arquivos de fonte são carregados de servidores do Google; o Google pode ver o seu endereço IP.",
         "rsiMedia": "Parte das imagens das notícias do Verse é carregada diretamente de servidores da Roberts Space Industries (media.robertsspaceindustries.com, theverse.robertsspaceindustries.com) — a RSI vê o seu endereço IP enquanto elas carregam.",
@@ -4976,7 +4982,7 @@
       },
       "liability": {
         "title": "Responsabilidade por conteúdo e links",
-        "p1": "O conteúdo deste site é criado com cuidado; ainda assim, não há garantia de correção, completude ou atualidade. Os dados do jogo exibidos no codex são extraídos pela comunidade e podem divergir do jogo ao vivo.",
+        "p1": "O conteúdo deste site é criado com cuidado; ainda assim, não há garantia de correção, completude ou atualidade. Os dados do jogo exibidos no codex são extraídos pela comunidade e podem divergir da versão LIVE do jogo.",
         "p2": "Links externos levam a conteúdos de terceiros sobre os quais não temos controle; no momento da inclusão do link, não havia violações legais aparentes. Se tomarmos conhecimento de violações, os links afetados serão removidos."
       },
       "trademark": {
@@ -5881,7 +5887,7 @@
     "appAutoUpdate": "Atualiza-se sozinho em segundo plano; o estado da versão fica no menu da bandeja.",
     "promo": {
       "eyebrow": "Starscape para o desktop",
-      "title": "Sua área de trabalho, ao vivo do verse",
+      "title": "Sua área de trabalho, ao vivo do Verse",
       "desc": "O pequeno app de bandeja alterna exatamente estes papéis de parede na sua área de trabalho — com transição suave e inicialização automática incluídas.",
       "cta": "Baixar para Windows",
       "note": "Somente Windows · ~0,3 MB · feche a qualquer momento pelo menu da bandeja",
@@ -5943,7 +5949,7 @@
     "codex": "Codex",
     "hangar": "Hangar",
     "starscape": "Starscape",
-    "desktop": "Apps desktop",
+    "desktop": "Apps de desktop",
     "settings": "Configurações",
     "admin": "Admin",
     "other": "Outros"
@@ -6129,7 +6135,7 @@
     },
     "link": {
       "title": "Link público",
-      "warning": "Qualquer pessoa com este link pode ver o set — sem precisar de conta. O link mostra nome, papel e equipamento, e nada mais.",
+      "warning": "Qualquer pessoa com este link pode ver o set — sem precisar de conta. O link mostra nome, função e equipamento, e nada mais.",
       "create": "Criar link",
       "copy": "Copiar",
       "copied": "Copiado",
@@ -6249,7 +6255,7 @@
       "archive": "Arquivo",
       "archiveAria": "Arquivo, {{n}} Operações",
       "introTitle": "Nenhuma Operação ainda",
-      "introText": "Toque em um plus e crie uma Operação: um grupo de Einsätze com um objetivo. Você atribui seus desejos a ela e eles continuam sendo desejos. Você executa os Einsätze passo a passo em Agora.",
+      "introText": "Toque em um sinal de mais e crie uma Operação: um grupo de Einsätze com um objetivo. Você atribui seus desejos a ela e eles continuam sendo desejos. Você executa os Einsätze passo a passo em Agora.",
       "newAriaEvent": "Nova Operação no slot {{n}} – evento disponível"
     },
     "remove": {
@@ -6470,7 +6476,7 @@
           "weapons": "Armas",
           "armor": "Armadura",
           "other": "Outros",
-          "sets": "Conjuntos",
+          "sets": "Sets",
           "ships": "Naves",
           "sammlung": "Coleções"
         },
@@ -6481,7 +6487,7 @@
           "torso": "Torso",
           "arms": "Braços",
           "legs": "Pernas",
-          "undersuit": "Roupa de baixo",
+          "undersuit": "Undersuit",
           "backpack": "Mochila",
           "sidearm": "Arma secundária",
           "primary": "Arma primária",
@@ -6513,7 +6519,7 @@
           "support": "Suporte",
           "competition": "Corrida",
           "ground": "Veículo terrestre",
-          "multirole": "Multifuncional"
+          "multirole": "Multifunção"
         },
         "wishCount": "{{n}} nos seus desejos",
         "artAria": "Tipo",
@@ -6555,8 +6561,8 @@
         "alsoIn": "Também no seu estoque",
         "inCodex": "No Codex: “{{q}}” – para os seus desejos",
         "setItems": "{{n}} peças",
-        "addSet": "Criar conjunto",
-        "setName": "Nome do conjunto",
+        "addSet": "Criar set",
+        "setName": "Nome do set",
         "emptyInv": "Nada armazenado ainda.",
         "emptyInvSecond": "Importe com o app",
         "emptyFiltered": "Nada neste filtro.",
@@ -6660,7 +6666,7 @@
         "sellName": "Ganhar dinheiro",
         "scu": "SCU",
         "pcs": "un.",
-        "route": "{{n}} locais, os maiores primeiro",
+        "route": "{{n}} locais, os com mais itens primeiro",
         "up": "Mover {{place}} para cima",
         "down": "Mover {{place}} para baixo",
         "einsatzOne": "Retirar {{name}}",
@@ -6690,7 +6696,7 @@
         "tick": "{{place}} retirado"
       },
       "dayName": "Suprimentos de {{date}}",
-      "newEinsatz": "Nova missão",
+      "newEinsatz": "Novo Einsatz",
       "act": {
         "buy": "Comprar {{label}}",
         "mission": "Missão: {{label}}",
@@ -6711,12 +6717,12 @@
         "added": "Adicionado à Operação.",
         "lineRemoved": "Posição removida.",
         "edited": "Operação salva.",
-        "wishRemoved": "Removido {{count}} × {{name}} da lista de desejos.",
+        "wishRemoved": "{{count}} × {{name}} removido(s) da lista de desejos.",
         "released": "{{name}} desvinculado da Operação."
       },
       "rec": {
         "reason": {
-          "sameSet": "mesmo conjunto de {{item}}",
+          "sameSet": "mesmo set de {{item}}",
           "magazineFor": "carregador para {{item}}",
           "weaponFor": "arma para {{item}}",
           "fitsPort": "cabe no S{{size}} de {{item}}",
@@ -6742,11 +6748,11 @@
       "wishlistFailed": "Não foi possível alterar seus desejos. Nada foi movido.",
       "plainGone": "Essas posições já foram respondidas em outro dispositivo. A visualização está sendo atualizada.",
       "wishCapped": "{{count}} unidades não cabem mais nos seus desejos (máximo de 999 por entrada) e serão perdidas.",
-      "gone": "Esta Operation não existe mais (excluída em outro dispositivo). A visualização está sendo atualizada.",
-      "capReached": "Você atingiu o limite de Operations salvas. Exclua as antigas do arquivo e voltará a funcionar.",
-      "nothingFree": "Todas as peças deste desejo já foram atribuídas a uma Operation.",
-      "splitInvalid": "A divisão entre as Operations não fecha.",
-      "dissolveFailed": "Não foi possível desfazer uma Operation, e ela continua existindo."
+      "gone": "Esta Operação não existe mais (excluída em outro dispositivo). A visualização está sendo atualizada.",
+      "capReached": "Você atingiu o limite de Operações salvas. Exclua as antigas do arquivo e voltará a funcionar.",
+      "nothingFree": "Todas as peças deste desejo já foram atribuídas a uma Operação.",
+      "splitInvalid": "A divisão entre as Operações não fecha.",
+      "dissolveFailed": "Não foi possível desfazer uma Operação, e ela continua existindo."
     },
     "title": "HQ",
     "eyebrow": "Área pessoal",
@@ -6759,7 +6765,7 @@
       "spots": "Spots"
     },
     "supplies": {
-      "button": "Operations",
+      "button": "Operações",
       "add": {
         "search": "Buscar item"
       },
@@ -6770,20 +6776,20 @@
       "remove": "Remover {{name}}",
       "sum": "{{open}} em aberto ({{units}} un.) · {{done}} obtidos",
       "clearDone": "Remover marcados",
-      "buttonAria": "Abrir Operations ({{count}} entradas)",
-      "title": "Operations",
-      "close": "Fechar Operations",
-      "empty": "Ainda não há nada nas suas Operations.",
-      "emptyHint": "Busque um item e atribua a uma Operation: em Planejar você vê onde encontrá-lo e como chegar lá.",
+      "buttonAria": "Abrir Operações ({{count}} entradas)",
+      "title": "Operações",
+      "close": "Fechar Operações",
+      "empty": "Ainda não há nada nas suas Operações.",
+      "emptyHint": "Busque um item e atribua a uma Operação: em Planejar você vê onde encontrá-lo e como chegar lá.",
       "tabsAria": "Listas",
       "tabs": {
         "wish": "Desejos",
-        "nachschub": "Operations"
+        "nachschub": "Operações"
       },
       "wish": {
         "empty": "Faça um pedido",
-        "emptyHint": "Busque um item ou uma nave e adicione aos desejos. Daqui você atribui a uma Operation com um clique.",
-        "toNachschub": "Atribuir a uma Operation",
+        "emptyHint": "Busque um item ou uma nave e adicione aos desejos. Daqui você atribui a uma Operação com um clique.",
+        "toNachschub": "Atribuir a uma Operação",
         "remove": "Remover {{name}} dos seus desejos",
         "notYet": "ainda não está no jogo"
       },
@@ -6820,19 +6826,19 @@
     "overview": {
       "activeShip": "Nave ativa",
       "activeVariant": "Variante ativa",
-      "noVariant": "Equipamento de fábrica",
+      "noVariant": "Loadout de fábrica",
       "activeSet": "Set ativo",
       "nextOps": "Próximas ops",
-      "suppliesPreview": "Operations",
+      "suppliesPreview": "Operações",
       "opsOpen": "Abrir ops",
-      "suppliesOpen": "Abrir Operations",
+      "suppliesOpen": "Abrir Operações",
       "opsEmpty": "Nenhuma op planejada ainda.",
       "suppliesEmpty": "Nada para buscar.",
       "noShip": "Nenhuma nave no hangar ainda.",
       "noSet": "Nenhum set criado ainda.",
       "setupHangar": "Configurar hangar",
       "createSet": "Criar um set",
-      "openCodex": "Ver no codex",
+      "openCodex": "Ver no Codex",
       "recentShips": "Naves escolhidas recentemente",
       "recentSets": "Sets escolhidos recentemente",
       "loadFailed": "Não foi possível carregar seu HQ.",
@@ -6847,13 +6853,13 @@
       "title": "Sets",
       "subtitle": "Seus sets de FPS para cada função.",
       "details": "Detalhes",
-      "detailsAria": "Detalhes de {{name}} no codex"
+      "detailsAria": "Detalhes de {{name}} no Codex"
     },
     "pages": {
       "start": "Início",
       "planen": "Planejar",
       "jetzt": "Agora",
-      "inventar": "Armazém",
+      "inventar": "Estoque",
       "statistik": "Estatísticas",
       "empty": "{{page}}: algo novo está sendo criado aqui."
     },
@@ -6885,14 +6891,14 @@
         "blueprints": "{{n}} blueprints",
         "blueprintsOne": "1 blueprint",
         "stale": "Inventário atualizado há {{n}} dias",
-        "open": "Ver armazém"
+        "open": "Ver estoque"
       },
       "now": {
         "live": "Ao vivo",
         "noneHint": "Status ao vivo do jogo.",
         "last": "Visto por último: {{place}}, {{ago}}.",
         "lastTime": "Visto por último: {{ago}}.",
-        "nextTip": "Próximo passo do seu primeiro deployment planejado.",
+        "nextTip": "Próximo passo do seu primeiro Einsatz planejado.",
         "step": {
           "buy": "Comprar {{label}}",
           "mission": "Missão: {{label}}",
@@ -6906,9 +6912,9 @@
       },
       "planen": {
         "empty": "Nada planejado ainda",
-        "emptyHint": "De uma Operation nasce um Einsatz.",
+        "emptyHint": "De uma Operação nasce um Einsatz.",
         "count": "{{n}} em aberto",
-        "needs": "{{n}} em Operations",
+        "needs": "{{n}} em Operações",
         "open": "Abrir planejamento"
       },
       "stats": {
@@ -7024,7 +7030,7 @@
       },
       "path": {
         "title": "Sua rota",
-        "empty": "Nenhuma operation ativa. Planeje uma em Planejar."
+        "empty": "Nenhuma op ativa. Planeje uma em Planejar."
       },
       "missions": {
         "tooltip": "Missões ativas no jogo",
@@ -7053,7 +7059,7 @@
       "stepsTooltip": "{{n}} etapas",
       "pick": {
         "title": "Qual op?",
-        "message": "\"{{name}}\" entra como etapa da missão.",
+        "message": "\"{{name}}\" entra como etapa de missão.",
         "none": "Você ainda não tem nenhuma op planejada ou em andamento.",
         "new": "Nova op"
       },
@@ -7066,7 +7072,7 @@
           "buy": "O que você compra?",
           "mission": "O que você quer conquistar?",
           "mine": "O que você minera?",
-          "pickup": "O que você pega?"
+          "pickup": "O que você vai retirar?"
         },
         "whatPh": {
           "buy": "ex.: Medpen",
@@ -7086,11 +7092,11 @@
       },
       "noneYet": {
         "title": "\"{{name}}\" ainda não tem Einsätze",
-        "hint": "Em Planen, sugira Einsätze a partir das posições ou adicione um."
+        "hint": "Em Planejar, sugira Einsätze a partir das posições ou adicione um."
       }
     },
     "activity": {
-      "kopfgeld": "Recompensa",
+      "kopfgeld": "Caça a recompensas",
       "bunker": "Bunker",
       "medizin": "Médico",
       "rennen": "Corrida",
@@ -7131,10 +7137,10 @@
         },
         "contracts": {
           "name": "Taxa de conclusão",
-          "sub": "{{failed}} falharam · {{abandoned}} abandonadas",
+          "sub": "{{failed}} falharam · {{abandoned}} abandonados",
           "hint": "Contratos concluídos em relação a todos os contratos finalizados.",
-          "col": "Concluídas",
-          "col2": "Falhas ou abandonadas"
+          "col": "Concluídos",
+          "col2": "Falhos ou abandonados"
         },
         "deaths": {
           "name": "Mortes / claims",
@@ -7250,17 +7256,17 @@
       "ships": {
         "title": "Naves",
         "count": "{{n}} no hangar",
-        "noFavourites": "Nenhuma nave capitânia definida ainda."
+        "noFavourites": "Nenhuma nave-capitânia definida ainda."
       },
       "sets": {
-        "title": "Conjuntos",
+        "title": "Sets",
         "ship": "{{n}} loadouts de nave",
-        "fps": "{{n}} conjuntos FPS"
+        "fps": "{{n}} sets FPS"
       },
       "earned": {
         "title": "Conquistado",
         "blueprints": "{{n}} blueprints recebidos",
-        "open": "Blueprints no codex"
+        "open": "Blueprints no Codex"
       },
       "age": {
         "minutes": "aberto pela última vez há {{n}} min",
@@ -7478,7 +7484,7 @@
         "title": "Resgatar {{name}}",
         "channel": "Como você obteve?",
         "byApp": "O app detectou a forma; você pode alterá-la.",
-        "store": "Guardar no depósito",
+        "store": "Guardar no estoque",
         "isShip": "É uma nave",
         "toHangar": "Vai para o Hangar.",
         "toInventory": "Vai para o Inventário (local \"Event-Belohnungen\").",
@@ -7517,7 +7523,7 @@
         "statistik": "O app conta enquanto você joga: tempo de jogo, sessões, missões e perdas. Sem ele, esta página fica vazia.",
         "jetztList": {
           "e1": "Sua localização e nave, p. ex. \"Stanton › New Babbage\".",
-          "e2": "Seu próximo passo de uma execução planejada, p. ex. uma compra ou uma viagem.",
+          "e2": "Seu próximo passo de um Einsatz planejado, p. ex. uma compra ou uma viagem.",
           "e3": "Os últimos eventos, p. ex. \"Missão concluída\" ou \"Salto quântico concluído\"."
         }
       }
@@ -7812,12 +7818,12 @@
       }
     },
     "export": {
-      "wallpaper": "Baixar wallpaper (4K)",
-      "failed": "Não foi possível criar o wallpaper. Tente novamente."
+      "wallpaper": "Baixar papel de parede (4K)",
+      "failed": "Não foi possível criar o papel de parede. Tente novamente."
     },
     "task": {
       "notes": {
-        "title": "Destaques das notes lidos",
+        "title": "Destaques das patch notes lidos",
         "how": "Leia os destaques das patch notes em Patch News.",
         "link": "Ir para Patch News"
       },
@@ -7842,13 +7848,13 @@
         "link": "Ir para a nave"
       },
       "cxKeybinds": {
-        "title": "Keybinds conferidos",
-        "how": "Veja no Codex as teclas da build atual.",
-        "link": "Ir para os keybinds"
+        "title": "Atalhos conferidos",
+        "how": "Veja no Codex os atalhos de teclado da build atual.",
+        "link": "Ir para os atalhos"
       },
       "cxChanged": {
         "title": "Mudança descoberta",
-        "how": "Compare dois patches na holotable de uma nave.",
+        "how": "Compare dois patches na mesa holográfica de uma nave.",
         "link": "Ir para a comparação"
       },
       "cxBlueprint": {
@@ -7884,7 +7890,7 @@
         "desc": "Uma nebulosa brilhante atrás dos seus mapas estelares."
       },
       "live": {
-        "title": "Wallpaper animado",
+        "title": "Papel de parede animado",
         "desc": "Estrelas cintilantes, com animação discreta.",
         "preview": "Prévia ao vivo do seu céu"
       },
@@ -7905,7 +7911,7 @@
       }
     },
     "kartograph": {
-      "locked": "Colete estrelas para desbloquear o posto de cartógrafo."
+      "locked": "Colete estrelas para desbloquear o rank de cartógrafo."
     },
     "community": {
       "title": "Mapa estelar da comunidade",
@@ -7928,16 +7934,16 @@
       "toMap": "Ir para o mapa estelar",
       "appHint": "Os últimos 7 também estão no app Starscape.",
       "inApp": "no Starscape",
-      "thumbAria": "Wallpaper do mapa estelar do patch {{patch}}",
+      "thumbAria": "Papel de parede do mapa estelar do patch {{patch}}",
       "download": "Baixar 4K",
       "share": "Compartilhar",
       "copied": "Link copiado."
     },
     "badge": {
       "share": "Compartilhar emblema",
-      "caption": "Cartógrafo · Posto {{rank}}",
+      "caption": "Cartógrafo · Rank {{rank}}",
       "captionSub": "Patch {{patch}} · {{stars}} de {{total}} estrelas · Verse Companion",
-      "aria": "Emblema de cartógrafo posto {{rank}} com o mapa estelar do patch {{patch}}",
+      "aria": "Emblema de cartógrafo rank {{rank}} com o mapa estelar do patch {{patch}}",
       "explain": "Um cartógrafo concluiu mapas estelares inteiros no Verse Companion: cada tarefa de um patch é uma estrela.",
       "cta": "Comece seu próprio mapa estelar",
       "invalid": "Este link de emblema está incompleto.",
@@ -7958,7 +7964,7 @@
       "title": "Como funciona o mapa estelar",
       "p1": "Cada patch tem um mapa estelar de 7 estrelas. Cada tarefa concluída acende uma; quando as 7 brilham, a forma mostra uma nave e o mapa entra na sua coleção.",
       "p2": "Sob a cúpula há dois desafios: o palpite do cometa para o dia do LIVE do próximo patch e reconhecer a nave por trás da forma.",
-      "p3": "Estrelas acesas elevam seu posto de Cartógrafo. O brasão no canto superior direito abre sua página de posto com a série, as recompensas e os wallpapers.",
+      "p3": "Estrelas acesas elevam seu rank de Cartógrafo. O brasão no canto superior direito abre sua página de rank com a série, as recompensas e os papéis de parede.",
       "start": "Mostre-me",
       "back": "Voltar",
       "next": "Próximo",
@@ -7982,8 +7988,8 @@
           "text": "Adivinhe qual nave o mapa estelar mostra. Um acerto rende uma estrela; depois, o nome da forma aparece sob a cúpula."
         },
         "rank": {
-          "title": "Seu posto de Cartógrafo",
-          "text": "Cada estrela acesa avança seu posto: níveis com 1, 3, 7, 12, 18, 26 e 35 estrelas, de Observador a Guardião do Atlas. Cada um desbloqueia algo, do emblema compartilhável e companheiros ao tom âmbar e detalhes do brasão a partir do nível 5. Sua série, as recompensas e todos os formatos de wallpaper ficam na página de posto."
+          "title": "Seu rank de Cartógrafo",
+          "text": "Cada estrela acesa avança seu rank: níveis com 1, 3, 7, 12, 18, 26 e 35 estrelas, de Observador a Guardião do Atlas. Cada um desbloqueia algo, do emblema compartilhável e companheiros ao tom âmbar e detalhes do brasão a partir do nível 5. Sua série, as recompensas e todos os formatos de papel de parede ficam na página de rank."
         }
       },
       "eyebrow": "Mapa estelar"
@@ -8011,7 +8017,7 @@
     "comet": {
       "kind": "Palpite do patch",
       "ruleAria": "Regras do palpite do patch",
-      "rule": "Palpite o dia em que {{patch}} vai ao LIVE – um clique em um dia define seu palpite, um palpite por patch. Se acertar com margem de ±1 dia, o cometa acende um sol para sua coleção na página de posto. Os palpites fecham quando {{patch}} entra no LIVE ou a data do LIVE é anunciada oficialmente.",
+      "rule": "Palpite o dia em que {{patch}} vai ao LIVE – um clique em um dia define seu palpite, um palpite por patch. Se acertar com margem de ±1 dia, o cometa acende um sol para sua coleção na página de rank. Os palpites fecham quando {{patch}} entra no LIVE ou a data do LIVE é anunciada oficialmente.",
       "ruleVersion": "Palpite o dia em que {{patch}} vai ao LIVE – um palpite por patch. O palpite fecha quando {{patch}} entra no LIVE ou a data do LIVE é anunciada oficialmente. A estrela do patch só vem com o palpite da linha.",
       "noTip": "No momento não há palpite de patch – a CIG não anunciou outro patch.",
       "state": {
@@ -8030,7 +8036,7 @@
         "open": "Palpites para {{patch}} abertos",
         "missed": "Seu palpite para {{patch}} foi perdido: {{date}}"
       },
-      "formerly": "antes {{patch}}",
+      "formerly": "antigo {{patch}}",
       "earlier": "Dias anteriores",
       "later": "Dias posteriores",
       "dayAria": "Definir palpite de patch para {{date}}",
@@ -8063,7 +8069,7 @@
       "foot": {
         "open": "Acertando, o nome aparece no mapa estelar e o círculo ganha um check.",
         "wrong": "Sem estrela desta vez – a resposta permanece no mapa estelar.",
-        "unavailable": "No momento não há nenhuma nave definida para reconhecer neste mapa estelar. Ela é escolhida automaticamente assim que o codex tiver os dados de jogo do patch – aí você poderá palpitar aqui."
+        "unavailable": "No momento não há nenhuma nave definida para reconhecer neste mapa estelar. Ela é escolhida automaticamente assim que o Codex tiver os dados de jogo do patch – aí você poderá palpitar aqui."
       },
       "undoToast": "Palpite registrado: {{name}}"
     },
@@ -8081,11 +8087,11 @@
       "from": "a partir de {{at}}"
     },
     "ladder": {
-      "aria": "Ranks de Kartograph",
+      "aria": "Ranks de Cartógrafo",
       "here": "Você está aqui",
-      "current": "Rank de Kartograph {{rank}} - abrir seu emblema",
-      "earned": "Rank de Kartograph {{rank}} - conquistado",
-      "next": "Rank de Kartograph {{rank}} - ainda bloqueado"
+      "current": "Rank de Cartógrafo {{rank}} - abrir seu emblema",
+      "earned": "Rank de Cartógrafo {{rank}} - conquistado",
+      "next": "Rank de Cartógrafo {{rank}} - ainda bloqueado"
     },
     "rank": {
       "link": "{{name}} · abrir sua página de rank",
@@ -8237,7 +8243,7 @@
     "demo": {
       "ship": "Gladius",
       "patch": "Patch 4.10.2",
-      "item": "Laser repeater"
+      "item": "Repetidor laser"
     },
     "filter": {
       "variants": "Variantes",
@@ -8251,7 +8257,7 @@
     "sectionsAria": "Subpáginas da área",
     "kinds": {
       "fps": "FPS",
-      "keybinds": "Keybinds"
+      "keybinds": "Atalhos"
     },
     "ctx": {
       "all": "Em todo lugar",
@@ -8268,7 +8274,7 @@
       "hqNow": "Agora",
       "hqStock": "Inventário",
       "hqStats": "Estatísticas",
-      "hqStockAll": "Depósito",
+      "hqStockAll": "Estoque",
       "hqStockHangar": "Hangar",
       "hqStockSammlung": "Coleções"
     },
@@ -8282,9 +8288,9 @@
       "codexDetail": "Pesquisar no Codex …",
       "fps": "Armas, armaduras, equipamentos …",
       "hq": "Hangar, sets, naves …",
-      "hqPlan": "Um set, peça ou local para sua operação …",
+      "hqPlan": "Um set, peça ou local para sua op …",
       "hqNow": "Nave, local ou peça …",
-      "hqStock": "Pesquisar no seu depósito …",
+      "hqStock": "Pesquisar no seu estoque …",
       "hqStats": "Nave ou set …"
     },
     "search": {
@@ -8320,12 +8326,12 @@
       "hangar": "Hangar",
       "spind": "Sets",
       "hq": "Visão geral do HQ",
-      "keybinds": "Keybinds",
+      "keybinds": "Atalhos de teclado",
       "upcoming": "Naves anunciadas",
       "settings": "Configurações",
       "releaseNotes": "Novidades",
-      "badge": "Selo Cartographer",
-      "ops": "Operações",
+      "badge": "Emblema de cartógrafo",
+      "ops": "Ops",
       "extension": "Extensão de navegador",
       "download": "Downloads",
       "social": "Social"
@@ -8425,7 +8431,7 @@
   "search": {
     "chip": {
       "size": "Tamanho {{size}}",
-      "grade": "Classe {{grade}}",
+      "grade": "Grade {{grade}}",
       "kind": "{{kind}}",
       "page": {
         "gallery": "Galeria",
@@ -8462,13 +8468,13 @@
       "add": "Adicionar",
       "whereStored": "Onde está?",
       "whereInstalled": "Onde está instalado?",
-      "planOps": "Planejar operação",
+      "planOps": "Planejar op",
       "sourceOf": "Onde conseguir",
       "openSet": "Abrir set",
       "fittingShips": "Naves compatíveis",
       "fittingWeapons": "Armas compatíveis",
       "mount": "Montar",
-      "toEinsatz": "Adicionar à operação"
+      "toEinsatz": "Adicionar à op"
     },
     "why": {
       "ownHq": "aparece primeiro porque você está no seu HQ",
@@ -8506,8 +8512,8 @@
       "set": "seu set",
       "qty": "{{n}}× no inventário",
       "fittedOn": "{{n}} em \"{{name}}\"",
-      "fittedMoreOne": "+1 nave",
-      "fittedMore": "+{{n}} naves",
+      "fittedMoreOne": "+1 nave a mais",
+      "fittedMore": "+{{n}} naves a mais",
       "setsOne": "em 1 set"
     },
     "row": {
@@ -8549,8 +8555,8 @@
       "compare": "\"{{name}}\" está na comparação",
       "failed": "Não deu certo, tente de novo em instantes",
       "einsatzAdded": "\"{{name}}\" agora é uma etapa em \"{{op}}\"",
-      "einsatzNew": "Nova operação \"{{name}}\" criada",
-      "einsatzFull": "\"{{op}}\" já tem o máximo de etapas que uma operação comporta"
+      "einsatzNew": "Nova op \"{{name}}\" criada",
+      "einsatzFull": "\"{{op}}\" já tem o máximo de etapas que uma op comporta"
     },
     "hints": {
       "0": {
@@ -8586,19 +8592,19 @@
         "q": "bmm"
       },
       "8": {
-        "t": "\"qt\" encontra quantum drives",
+        "t": "\"qt\" encontra motores quânticos",
         "q": "qt"
       },
       "9": {
-        "t": "\"pp\" encontra power plants",
+        "t": "\"pp\" encontra geradores de energia",
         "q": "pp"
       },
       "10": {
-        "t": "\"rep\" encontra repeaters",
+        "t": "\"rep\" encontra repetidores",
         "q": "rep"
       },
       "11": {
-        "t": "\"dist\" encontra armas de distortion",
+        "t": "\"dist\" encontra armas de distorção",
         "q": "dist"
       },
       "12": {
@@ -8622,7 +8628,7 @@
         "q": "size 3"
       },
       "17": {
-        "t": "\"s2 qd\" encontra quantum drives tamanho 2",
+        "t": "\"s2 qd\" encontra motores quânticos de tamanho 2",
         "q": "s2 qd"
       },
       "18": {
@@ -8630,7 +8636,7 @@
         "q": "grade a"
       },
       "19": {
-        "t": "\"stealth cooler\" encontra stealth coolers",
+        "t": "\"stealth cooler\" encontra resfriadores furtivos",
         "q": "stealth cooler"
       },
       "20": {
@@ -8702,7 +8708,7 @@
         "t": "Seus próprios resultados sempre vêm primeiro"
       },
       "39": {
-        "t": "Com \"faltando\" antes do termo, você pesquisa só nas suas Operações"
+        "t": "Com \"missing\" antes do termo, você pesquisa só nas suas Operações"
       },
       "40": {
         "t": "A busca lembra de onde você a abre"
@@ -8728,18 +8734,18 @@
         "q": "laser"
       },
       "47": {
-        "t": "No planejamento de missões, ela mostra onde conseguir as coisas"
+        "t": "No planejamento de ops, ela mostra onde conseguir as coisas"
       },
       "48": {
-        "t": "\"encaixa\" mostra só as peças compatíveis",
-        "q": "encaixa"
+        "t": "\"fits\" mostra só as peças compatíveis",
+        "q": "fits"
       },
       "49": {
         "t": "Um chip filtra, a ordem segue a página"
       },
       "50": {
-        "t": "\"missão recompensa\" encontra missões de recompensa",
-        "q": "missão recompensa"
+        "t": "\"bounty mission\" encontra missões de caça a recompensas",
+        "q": "bounty mission"
       },
       "51": {
         "t": "\"blueprint p4\" mostra onde conseguir",
@@ -8762,28 +8768,28 @@
         "q": "4.3.2"
       },
       "56": {
-        "t": "\"novo\" mostra o que este patch trouxe",
-        "q": "novo"
+        "t": "\"new\" mostra o que este patch trouxe",
+        "q": "new"
       },
       "57": {
-        "t": "\"em breve\" mostra naves anunciadas",
-        "q": "em breve"
+        "t": "\"upcoming\" mostra naves anunciadas",
+        "q": "upcoming"
       },
       "58": {
-        "t": "\"munição s3\" encontra munição compatível",
-        "q": "munição s3"
+        "t": "\"ammo s3\" encontra munição compatível",
+        "q": "ammo s3"
       },
       "59": {
-        "t": "\"armadura pesada\" encontra armaduras pesadas",
-        "q": "armadura pesada"
+        "t": "\"heavy armor\" encontra armaduras pesadas",
+        "q": "heavy armor"
       },
       "60": {
         "t": "\"medpen\" encontra equipamento de cura",
         "q": "medpen"
       },
       "61": {
-        "t": "\"teclas quantum\" mostra a tecla de quantum",
-        "q": "teclas quantum"
+        "t": "\"keybind quantum\" mostra a tecla de quantum",
+        "q": "keybind quantum"
       },
       "62": {
         "t": "Ctrl K abre a busca de qualquer lugar"
@@ -8804,8 +8810,8 @@
         "t": "Esc fecha, seu texto permanece"
       },
       "68": {
-        "t": "Em inglês sempre funciona: \"quantum drive\"",
-        "q": "quantum drive"
+        "t": "Abreviações também funcionam: \"qd s2\"",
+        "q": "qd s2"
       },
       "69": {
         "t": "Erro de digitação? A busca pergunta \"Você quis dizer …\""
@@ -8833,7 +8839,7 @@
       "einsatzNotFound": "Esta missão não está mais disponível.",
       "einsatzClosed": "Esta missão foi concluída e não aceita mais respostas.",
       "configNotFound": "Esta variante de nave não existe mais.",
-      "loadoutNotFound": "Este conjunto não existe mais.",
+      "loadoutNotFound": "Este set não existe mais.",
       "shareNotFound": "Este compartilhamento não existe mais.",
       "tooManySlots": "Uma missão tem no máximo 12 vagas de tripulação.",
       "invalidSlotLabel": "O nome de uma vaga deve ter de 1 a 40 caracteres.",
@@ -8854,11 +8860,11 @@
     },
     "compare": {
       "ships": "Naves",
-      "sets": "Conjuntos",
+      "sets": "Sets",
       "einsaetze_planned": "Missões planejadas",
       "einsaetze_done": "Missões concluídas",
       "missions_30d": "Missões (30 dias)",
-      "kartograph_rank": "Rank Kartograph",
+      "kartograph_rank": "Rank de Cartógrafo",
       "active_days_30": "Dias ativos (30 dias)"
     },
     "group": {
@@ -8870,7 +8876,7 @@
     "visibility": {
       "facet": {
         "hangar": "Hangar",
-        "flagship": "Nave capitânia",
+        "flagship": "Nave-capitânia",
         "presence": "Status online",
         "stats": "Valores de comparação"
       },
@@ -8881,7 +8887,7 @@
         "hangar": "Suas naves (incluindo desejos), sem notas e sem configurações.",
         "flagship": "A nave que você fixou no topo do seu hangar.",
         "presence": "Se você está online agora. Nunca um horário exato.",
-        "stats": "Números como naves, conjuntos, missões, dias ativos e rank Kartograph."
+        "stats": "Números como naves, sets, missões, dias ativos e rank de Cartógrafo."
       },
       "perFriend": "Por amigo",
       "perFriendHint": "Escolha um amigo e decida se ele vê algo diferente do resto.",
@@ -8974,7 +8980,7 @@
       "openFriend": "Abrir página"
     },
     "notice": {
-      "text": "Por padrão, os amigos veem seu hangar, nave capitânia, status online e valores de comparação. Você pode desativar isso no geral e por amigo.",
+      "text": "Por padrão, os amigos veem seu hangar, nave-capitânia, status online e valores de comparação. Você pode desativar isso no geral e por amigo.",
       "open": "Ajustar",
       "dismiss": "Entendi"
     },
@@ -8993,7 +8999,7 @@
     "groups": {
       "title": "Grupos",
       "privateNote": "Os grupos são privados. Seus amigos não veem os grupos nem em qual deles estão. Um amigo pode estar em vários grupos.",
-      "shareNote": "Quem entra em um grupo recebe o que você compartilha com esse grupo (missões, variantes de nave). Quem é removido, ou quando o grupo é excluído, perde o acesso. Um conjunto que você compartilha com um grupo vai apenas para os membros atuais.",
+      "shareNote": "Quem entra em um grupo recebe o que você compartilha com esse grupo (missões, variantes de nave). Quem é removido, ou quando o grupo é excluído, perde o acesso. Um set que você compartilha com um grupo vai apenas para os membros atuais.",
       "kindLabel": "Tipo de grupo",
       "namePlaceholder": "Nome do grupo",
       "create": "Criar grupo",
@@ -9019,13 +9025,13 @@
       "desktop": "App desktop conectado",
       "yes": "Sim",
       "no": "Não",
-      "friendHides": "Este amigo nĂŁo mostra os valores de comparação para vocĂŞ.",
-      "webNote": "O quanto alguĂ©m usa o site nĂŁo Ă© registrado. \"Dias ativos\" Ă© o nĂşmero real mais prĂłximo."
+      "friendHides": "Este amigo não mostra os valores de comparação para você.",
+      "webNote": "O quanto alguém usa o site não é registrado. \"Dias ativos\" é o número real mais próximo."
     },
     "friendPage": {
       "loading": "Carregando …",
-      "missingTitle": "NĂŁo encontrado",
-      "missing": "Esta página não existe ou não estå visível para você. Ela é só para amigos.",
+      "missingTitle": "Não encontrado",
+      "missing": "Esta página não existe ou não está visível para você. Ela é só para amigos.",
       "since": "Amigos desde {{date}}",
       "share": "Compartilhar algo",
       "inGroups": "Nos seus grupos:",
@@ -9034,17 +9040,17 @@
       "fromMe": "Compartilhado por você",
       "nothingSharedByMe": "Você ainda não compartilhou nada aqui.",
       "hangar": "Hangar",
-      "flagship": "Nave principal",
+      "flagship": "Nave-capitânia",
       "hangarHidden": "Este amigo não mostra o hangar para você.",
-      "hangarEmpty": "O hangar estå vazio.",
+      "hangarEmpty": "O hangar está vazio.",
       "wishlist": "Desejos",
-      "kindSet": "Conjunto",
+      "kindSet": "Set",
       "kindVariant": "Variante",
-      "kindEinsatz": "MissĂŁo",
+      "kindEinsatz": "Missão",
       "removeTitle": "Remover {{name}} dos amigos?",
-      "removeMessage": "Tudo o que vocĂŞs compartilharam um com o outro deixarĂĄ de ser visĂ­vel depois disso.",
+      "removeMessage": "Tudo o que vocês compartilharam um com o outro deixará de ser visível depois disso.",
       "blockTitle": "Bloquear {{name}}?",
-      "blockMessage": "A amizade termina e esta pessoa não poderå mais enviar um pedido para você."
+      "blockMessage": "A amizade termina e esta pessoa não poderá mais enviar um pedido para você."
     },
     "inviteLanding": {
       "title": "Convite",
@@ -9053,28 +9059,28 @@
       "toSocial": "Ir para Social",
       "from": "{{name}} convida você para ser amigo.",
       "fromAnon": "Você foi convidado para ser amigo.",
-      "hint": "Se você continuar, esta pessoa receberå um pedido de amizade e ainda precisarå aceitå-lo.",
+      "hint": "Se você continuar, esta pessoa receberá um pedido de amizade e ainda precisará aceitá-lo.",
       "accept": "Enviar pedido",
-      "signInHint": "Entre para enviar o pedido. Depois você volta para cå.",
+      "signInHint": "Entre para enviar o pedido. Depois você volta para cá.",
       "signIn": "Entrar",
       "result": {
         "pending": "O pedido para {{name}} foi enviado. Assim que for aceito, vocês serão amigos.",
         "accepted": "Agora você e {{name}} são amigos.",
-        "already_friends": "Você e {{name}} jå são amigos."
+        "already_friends": "Você e {{name}} já são amigos."
       },
       "toFriend": "Página de {{name}}"
     }
   },
   "itemPath": {
     "done": {
-      "wishOn": "\"{{name}}\" estå nos seus desejos",
-      "wishOff": "\"{{name}}\" não estå mais nos seus desejos",
-      "inventar": "\"{{name}}\" agora estĂĄ em {{where}}",
-      "hangar": "\"{{name}}\" estå no seu hangar",
+      "wishOn": "\"{{name}}\" está nos seus desejos",
+      "wishOff": "\"{{name}}\" não está mais nos seus desejos",
+      "inventar": "\"{{name}}\" agora está em {{where}}",
+      "hangar": "\"{{name}}\" está no seu hangar",
       "undone": "Desfeito",
-      "inventarOff": "\"{{name}}\" saiu do seu inventĂĄrio",
-      "inventarWithMe": "\"{{name}}\" agora estĂĄ com vocĂŞ",
-      "inventarBlueprint": "Planta \"{{name}}\" coletada",
+      "inventarOff": "\"{{name}}\" saiu do seu inventário",
+      "inventarWithMe": "\"{{name}}\" agora está com você",
+      "inventarBlueprint": "Blueprint \"{{name}}\" coletado",
       "hangarOff": "\"{{name}}\" saiu do seu hangar",
       "hangarCopy": "Agora você tem {{n}}× \"{{name}}\" no seu hangar",
       "ownWish": "“{{name}}” chegou",
@@ -9083,12 +9089,12 @@
       "ownWishLeftDetail": "Um desejo foi realizado, faltam {{left}}"
     },
     "err": {
-      "failed": "Isso nĂŁo funcionou. Tente de novo.",
-      "unavailable": "Esta etapa nĂŁo existe aqui.",
-      "wishAssigned": "Estas peças estão atribuídas a uma Operação. Remova-as pelo diålogo."
+      "failed": "Isso não funcionou. Tente de novo.",
+      "unavailable": "Esta etapa não existe aqui.",
+      "wishAssigned": "Estas peças estão atribuídas a uma Operação. Remova-as pelo diálogo."
     },
     "hint": {
-      "notYetInGame": "ainda nĂŁo estĂĄ no jogo"
+      "notYetInGame": "ainda não está no jogo"
     }
   },
   "quick": {
@@ -9124,16 +9130,16 @@
     "barLabel": "Para onde vão as peças",
     "free": "{{n}} livres",
     "fromOp": "{{n}} de “{{name}}”",
-    "latest": "atribuĂ­do por Ăşltimo",
+    "latest": "atribuído por último",
     "of": "de {{n}}",
     "rowLabel": "Peças de “{{name}}”",
-    "sum": "{{done}} de {{total}} distribuĂ­dos",
-    "keeps": "“{{name}}” mantĂ©m outros desejos.",
+    "sum": "{{done}} de {{total}} distribuídos",
+    "keeps": "“{{name}}” mantém outros desejos.",
     "lastStays": "“{{name}}” fica sem desejos depois disso. Os {{n}} Einsätze permanecem.",
     "lastStaysOne": "“{{name}}” fica sem desejos depois disso. O Einsatz permanece.",
     "dissolves": "“{{name}}” não tem Einsatz e é dissolvida junto.",
-    "alsoDissolve": "Dissolver tambĂ©m a Operação",
-    "alsoDissolveNamed": "Dissolver tambĂ©m a Operação “{{name}}”",
+    "alsoDissolve": "Dissolver também a Operação",
+    "alsoDissolveNamed": "Dissolver também a Operação “{{name}}”",
     "confirm": "Remover {{n}}",
     "confirmDissolve": "Remover e dissolver",
     "toastDissolved": "A Operação foi dissolvida junto.",
@@ -9142,7 +9148,7 @@
       "text": "As {{n}} peças continuam na sua lista de desejos e ficam livres de novo.",
       "textOne": "A peça continua na sua lista de desejos e fica livre de novo.",
       "confirm": "Desvincular",
-      "deleteToo": "Excluir tambĂ©m da lista de desejos"
+      "deleteToo": "Excluir também da lista de desejos"
     }
   },
   "cart": {
@@ -9151,14 +9157,14 @@
     "summaryOne": "1 desejo · 1 grupo",
     "summaryOneGroup": "{{n}} desejos · 1 grupo",
     "close": "Fechar",
-    "empty": "FaĂ§a um desejo",
-    "emptyHint": "Cada estrela cadente Ă© um desejo. Escolha o seu primeiro.",
+    "empty": "Faça um desejo",
+    "emptyHint": "Cada estrela cadente é um desejo. Escolha o seu primeiro.",
     "emptyAction": "Encontrar um desejo",
     "group": {
       "weapons": "Armas",
       "armor": "Armaduras",
       "components": "Componentes",
-      "ships": "Naves e veĂ­culos",
+      "ships": "Naves e veículos",
       "items": "Itens",
       "materials": "Matérias-primas"
     },
@@ -9178,12 +9184,12 @@
     "toNachschub": "Para uma Operação",
     "kind": {
       "ship": "Nave",
-      "vehicle": "VeĂ­culo",
+      "vehicle": "Veículo",
       "upcoming": "Nave anunciada",
       "weapon": "Arma",
       "component": "Componente",
       "item": "Item",
-      "blueprint": "Planta",
+      "blueprint": "Blueprint",
       "material": "Matéria-prima",
       "ammunition": "Munição"
     },
@@ -9191,88 +9197,88 @@
       "title": "Combina com isto",
       "count": "{{n}} sugestões",
       "add": "para os desejos",
-      "dismiss": "NĂŁo sugerir {{name}}"
+      "dismiss": "Não sugerir {{name}}"
     },
-    "slotsFullHint": "Todos os 7 espaços de Operação estão em uso. A seleção vai para uma Operação existente.",
+    "slotsFullHint": "Todos os 7 slots de Operação estão em uso. A seleção vai para uma Operação existente.",
     "toExisting": "Para uma Operação existente",
     "open": "Abrir “{{name}}” no Codex"
   },
   "pathCtl": {
     "node": {
       "wish": "Desejos",
-      "inventar": "InventĂĄrio",
+      "inventar": "Inventário",
       "hangar": "Hangar",
       "sammlung": "Coleções"
     },
     "tip": {
       "wishOff": "Adicionar aos desejos",
       "wishOn": "{{qty}}× nos seus desejos · abrir desejos",
-      "inventarOff": "Colocar no inventĂĄrio",
-      "inventarOn": "{{qty}}× no inventĂĄrio · mostrar no HQ",
+      "inventarOff": "Colocar no inventário",
+      "inventarOn": "{{qty}}× no inventário · mostrar no HQ",
       "hangarOff": "Colocar no hangar",
       "hangarOn": "No hangar · mostrar no HQ",
-      "sammlungOff": "Adicionar Ă  coleção",
+      "sammlungOff": "Adicionar à coleção",
       "sammlungOn": "Na coleção · mostrar no HQ"
     },
     "go": {
       "wish": "Adicionar aos desejos",
-      "inventar": "No inventĂĄrio",
-      "hangar": "No hangar",
+      "inventar": "Para o inventário",
+      "hangar": "Para o hangar",
       "sammlung": "Para as coleções"
     },
     "wishQty": "Quantidade desejada",
     "ownQty": {
-      "inventar": "Quantidade no inventĂĄrio",
+      "inventar": "Quantidade no inventário",
       "hangar": "Quantidade no hangar",
       "sammlung": "Quantidade na coleção"
     },
     "less": "Menos",
     "more": "Mais",
     "openCart": "Abrir desejos",
-    "wishOff": "Ainda nĂŁo estĂĄ nos seus desejos.",
+    "wishOff": "Ainda não está nos seus desejos.",
     "ownOn": {
-      "inventar": "{{n}}× no inventĂĄrio",
+      "inventar": "{{n}}× no inventário",
       "hangar": "No hangar",
       "sammlung": "Na coleção"
     },
     "ownOff": {
-      "inventar": "NĂŁo estĂĄ no inventĂĄrio.",
-      "hangar": "NĂŁo estĂĄ no hangar.",
-      "sammlung": "NĂŁo estĂĄ na coleção."
+      "inventar": "Não está no inventário.",
+      "hangar": "Não está no hangar.",
+      "sammlung": "Não está na coleção."
     },
     "view": {
-      "inventar": "Ver no inventĂĄrio",
+      "inventar": "Ver no inventário",
       "hangar": "Ver no hangar",
       "sammlung": "Ver na coleção"
     },
-    "whereTitle": "Onde estĂĄ?",
+    "whereTitle": "Onde está?",
     "otherPlace": "Outro local …",
     "otherPlaceholder": "Digite um local",
     "store": "Guardar",
-    "wishAssigned": "{{n}} deles atribuĂ­dos a uma Operação",
+    "wishAssigned": "{{n}} deles atribuídos a uma Operação",
     "assign": {
       "go": "Atribuir",
       "title": "Atribuir a uma Operação",
       "howMany": "Quantos?",
       "ofWished": "de {{n}} desejados",
       "ofFree": "de {{n}} livres",
-      "newest": "criado por Ăşltimo",
+      "newest": "criado por último",
       "new": "Nova Operação",
-      "newHint": "Um nome serĂĄ sugerido",
+      "newHint": "Um nome será sugerido",
       "loading": "Carregando Operações …",
       "working": "Atribuindo …",
-      "slots": "{{used}} de {{max}} espaços em uso",
+      "slots": "{{used}} de {{max}} slots em uso",
       "planHint": "Você planeja os Einsätze",
       "inHq": "no HQ",
       "progress": "{{done}} de {{total}} Einsätze",
       "noEinsatz": "Nenhum Einsatz planejado ainda",
       "line": "{{n}} na Operação “{{name}}”",
-      "moreOne": "+1 Operação",
-      "more": "+{{n}} Operações"
+      "moreOne": "+1 Operação a mais",
+      "more": "+{{n}} Operações a mais"
     },
     "own": {
-      "morePlacesOne": "+1 local",
-      "morePlaces": "+{{n}} locais"
+      "morePlacesOne": "+1 local a mais",
+      "morePlaces": "+{{n}} locais a mais"
     }
   },
   "itemStage": {
@@ -9284,7 +9290,7 @@
     "view3d": "Modelo 3D",
     "noSilhouette": "sem silhueta",
     "noSilhouetteReason": "Esta build não tem silhueta para este item; a imagem de prévia entra no lugar.",
-    "no3dReason": "Esta build nĂŁo tem modelo 3D deste item.",
+    "no3dReason": "Esta build não tem modelo 3D deste item.",
     "inNachschub": "Faz parte da Operação “{{name}}”",
     "panelAria": "Valores e informações",
     "tabsAria": "Seções",
@@ -9298,9 +9304,9 @@
     "title": "Coletado",
     "all": "Coleção completa",
     "more": "Mais {{n}} na coleção",
-    "newsAria": "NotĂ­cias coletadas",
-    "galleryAria": "Wallpapers coletados",
-    "votedHint": "Wallpapers com voto positivo contam como coletados."
+    "newsAria": "Notícias coletadas",
+    "galleryAria": "Papéis de parede coletados",
+    "votedHint": "Papéis de parede com voto positivo contam como coletados."
   },
   "blueprintWish": {
     "craftTimes": "Quantas vezes fabricar",
@@ -9372,7 +9378,7 @@
       "beta": "Recursos beta"
     },
     "view": {
-      "toHolo": "Mudar para a Holotable",
+      "toHolo": "Mudar para a mesa holográfica",
       "toClassic": "Mudar para a visualização clássica"
     },
     "share": {

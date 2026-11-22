@@ -20,8 +20,8 @@
       "signInAs": "以 {{account}} 登入"
     },
     "switch": {
-      "title": "切換帳號?",
-      "message": "此裝置目前以 {{current}} 登入。繼續的話,將改以 {{target}} 登入。",
+      "title": "切換帳號？",
+      "message": "此裝置目前以 {{current}} 登入。繼續的話，將改以 {{target}} 登入。",
       "confirm": "切換帳號"
     },
     "revoke": "登出",
@@ -43,10 +43,10 @@
     "step3": "手機開啟此頁面",
     "qrAlt": "用於在手機上開啟此頁面的 QR 碼",
     "loading": "正在建立代碼…",
-    "expires": "代碼有效時間為一分鐘,且只能使用一次。",
+    "expires": "代碼有效時間為一分鐘，且只能使用一次。",
     "retry": "建立新代碼",
     "connected": "手機已連線",
-    "connectedDevice": "已連線:{{device}}",
+    "connectedDevice": "已連線：{{device}}",
     "devices": "已連線的手機",
     "noDevice": "未知裝置",
     "expired": "代碼已過期。",
@@ -235,17 +235,17 @@
   "impersonation": {
     "banner": {
       "aria": "角色預覽已啟用",
-      "viewingAs": "預覽身分:{{role}}",
-      "realRole": "你的實際角色:{{role}}",
+      "viewingAs": "預覽身分：{{role}}",
+      "realRole": "你的實際角色：{{role}}",
       "exit": "結束預覽",
       "fidelity": {
-        "anon": "忠實預覽——應用程式在此處確實為登出狀態,因此你看到的正是訪客所見。",
-        "viewer": "僅為介面與路由預覽。你仍以真實權限取得資料,因此僅檢視者才會遇到的資料限制(空白清單、RLS 拒絕)不會在此重現。",
-        "collaborator": "僅為介面與路由預覽。你仍以真實權限取得資料,因此僅協作者才會遇到的資料限制不會在此重現。"
+        "anon": "忠實預覽——應用程式在此處確實為登出狀態，因此你看到的正是訪客所見。",
+        "viewer": "僅為介面與路由預覽。你仍以真實權限取得資料，因此僅檢視者才會遇到的資料限制（空白清單、RLS 拒絕）不會在此重現。",
+        "collaborator": "僅為介面與路由預覽。你仍以真實權限取得資料，因此僅協作者才會遇到的資料限制不會在此重現。"
       }
     },
-    "enterFailed": "無法切換預覽——你的瀏覽器阻擋了此變更(無痕瀏覽或儲存空間已滿)。未重新載入任何內容。",
-    "enterFailedDismiss": "略過"
+    "enterFailed": "無法切換預覽——你的瀏覽器阻擋了此變更（無痕瀏覽或儲存空間已滿）。未重新載入任何內容。",
+    "enterFailedDismiss": "關閉"
   },
   "codex": {
     "detailShell": {
@@ -270,7 +270,7 @@
       "remove": "從機庫移除"
     },
     "title": "Codex",
-    "subtitle": "每一艘艦船、武器、元件、物品、彈藥與製造商——可搜尋,資料取自正式版本。",
+    "subtitle": "每一艘艦船、武器、元件、物品、彈藥與製造商——皆可搜尋，資料擷取自正式版本。",
     "landing": {
       "hero": {
         "eyebrow": "{{category}} · 新增於 {{patch}}",
@@ -282,18 +282,18 @@
         "eyebrow": "構想中",
         "title": "即將到來的艦船",
         "open": "查看艦船",
-        "all": "所有已公布的艦船({{count}})",
+        "all": "所有已公布的艦船（{{count}}）",
         "dots": "選擇已公布的艦船"
       },
       "tiles": {
         "label": "工具",
         "keybinds": {
-          "title": "按鍵綁定",
-          "text": "正式版本的所有預設綁定,可搜尋。"
+          "title": "按鍵設定",
+          "text": "正式版本的所有預設綁定，可搜尋。"
         }
       },
       "terminal": {
-        "keybinds": "按鍵綁定"
+        "keybinds": "按鍵設定"
       },
       "archive": {
         "label": "軍械庫",
@@ -303,12 +303,12 @@
         "components": "元件"
       },
       "status": {
-        "patch": "修補版本 {{patch}}",
+        "patch": "版本 {{patch}}",
         "stale": "需要上傳資料"
       },
       "patchSwitch": {
-        "title": "切換修補版本",
-        "trigger": "修補版本 {{patch}} — 選擇其他修補版本",
+        "title": "切換版本",
+        "trigger": "版本 {{patch}} — 選擇其他版本",
         "past": "較舊",
         "hasData": "有資料",
         "hasDataCount": "{{count}} 筆記錄",
@@ -323,7 +323,7 @@
       "patch": {
         "archive": "軍械庫中共 {{count}} 筆記錄",
         "extracted": "擷取於 {{date}}",
-        "build": "Build「{{build}}」(預留位置)"
+        "build": "Build「{{build}}」（預留位置）"
       },
       "me": {
         "eyebrow": "已登艦",
@@ -339,7 +339,7 @@
         "crew": "船員"
       },
       "paperdoll": {
-        "aria": "示意人形,標示六個護甲欄位",
+        "aria": "示意人形，標示六個護甲欄位",
         "helmet": "頭盔",
         "torso": "軀幹",
         "arms": "手臂",
@@ -376,8 +376,8 @@
       "holo": {
         "label": "全息桌",
         "rotation": "選擇分類",
-        "next": "點擊:繼續",
-        "hold": "點擊:暫停",
+        "next": "點擊：繼續",
+        "hold": "點擊：暫停",
         "loading": "全息桌載入中…",
         "empty": "此版本尚無條目。",
         "newIn": "新",
@@ -397,20 +397,20 @@
           "maxSpeed": "極速"
         },
         "hull": {
-          "hp": "艦體",
+          "hp": "機身",
           "mass": "質量"
         },
         "armorHp": "裝甲",
-        "cargoScu": "貨物",
+        "cargoScu": "貨艙",
         "crew": {
           "size": "船員"
         },
         "loadout": {
           "weapons": "武器",
           "shield": "護盾",
-          "quantum": "量子引擎",
-          "power": "電力(格數)",
-          "cooler": "冷卻(每秒)"
+          "quantum": "量子驅動器",
+          "power": "電力（格數）",
+          "cooler": "冷卻（每秒）"
         }
       },
       "overview": {
@@ -435,11 +435,11 @@
         "ship": {
           "count": "{{patch}} 新增 {{count}} 艘艦船。",
           "name": "{{name}} 已可飛行。",
-          "announced": "已公布 {{announced}} 艘艦船,其中 {{count}} 艘可飛行。",
+          "announced": "已公布 {{announced}} 艘艦船，其中 {{count}} 艘可飛行。",
           "s1": "每艘艦船的一切資訊。",
-          "s2": "哪艘艦船適合你?",
-          "s3": "每個艦體、每項數值、每種塗裝。",
-          "s4": "先比較,再飛行。"
+          "s2": "哪艘艦船適合你？",
+          "s3": "每種機身、每項數值、每種塗裝。",
+          "s4": "先比較，再飛行。"
         },
         "fpsWeapon": {
           "count": "{{patch}} 新增 {{count}} 把 FPS 武器。",
@@ -511,16 +511,16 @@
         "avg": "同級平均 {{avg}}"
       },
       "codex": {
-        "label": "Codex:本版本新增",
+        "label": "Codex：本版本新增",
         "title": "Codex · {{patch}} 新增",
         "titleNoPatch": "Codex · 新增",
         "titleDiscover": "Codex · {{patch}}",
         "titleRecent": "Codex · 近期新增",
         "patchGroup": "版本 {{patch}}",
         "announced": "已公布",
-        "onTable": "桌面上",
+        "onTable": "全息桌上",
         "categories": "分類",
-        "openPage": "開啟頁面:{{name}}",
+        "openPage": "開啟頁面：{{name}}",
         "more": "+ {{count}} 個新增與更新",
         "moreDiscover": "+ 另外 {{count}} 個",
         "all": "全部{{category}}",
@@ -533,11 +533,11 @@
       "title": "Codex — 索引模式"
     },
     "upcoming": {
-      "subtitle": "RSI 艦船矩陣中已公布、但尚未出現在我們資料探勘的遊戲資料中的艦船——即 RSI 列出的內容與正式版 Build 實際內容之間的差異。",
+      "subtitle": "RSI 艦船矩陣中已公布、但尚未出現在我們資料探勘所得遊戲資料中的艦船——即 RSI 列出的內容與正式版本實際內容之間的差異。",
       "conceptTitle": "概念階段",
       "conceptSub": "RSI 仍在製作這些艦船——尚無法飛行",
       "flightReadyTitle": "RSI 標示為可飛行",
-      "flightReadySub": "RSI 將這些艦船列為可飛行,但我們的遊戲資料中尚無對應項目",
+      "flightReadySub": "RSI 將這些艦船列為可飛行，但我們的遊戲資料中尚無對應項目",
       "status": {
         "concept": "概念階段",
         "flightReady": "可飛行"
@@ -601,42 +601,42 @@
         "status": "狀態"
       },
       "notice": {
-        "concept": "RSI 已公布這艘艦船,但仍在製作中——遊戲內尚無法飛行。因此這裡沒有武器座、元件或數值。",
-        "flightReady": "RSI 將這艘艦船列為可飛行,但我們資料探勘的遊戲資料中尚無對應項目——數值將隨後續 Build 上傳而加入。"
+        "concept": "RSI 已公布這艘艦船，但仍在製作中——遊戲內尚無法飛行。因此這裡沒有掛點、元件或數值。",
+        "flightReady": "RSI 將這艘艦船列為可飛行，但我們資料探勘所得的遊戲資料中尚無對應項目——數值將隨後續的版本資料上傳而加入。"
       },
       "rsiLink": "在 robertsspaceindustries.com 上查看",
       "noData": {
-        "title": "為什麼這裡沒有數值?",
-        "body": "我們的 Codex 是根據正式版 Build 的資料建立的。這艘艦船尚未進入遊戲時,沒有可擷取的內容——一旦登場,就會自動獲得完整的 Codex 條目。",
+        "title": "為什麼這裡沒有數值？",
+        "body": "我們的 Codex 是根據正式版本的資料建立的。這艘艦船尚未進入遊戲時，沒有可擷取的內容——一旦登場，就會自動獲得完整的 Codex 條目。",
         "browse": "所有已公布的艦船"
       },
       "notFound": {
         "title": "找不到已公布的艦船",
-        "body": "這艘艦船已不在 RSI 艦船矩陣中——可能已進入遊戲並有了正式的 Codex 條目,或是 RSI 移除了該項目。"
+        "body": "這艘艦船已不在 RSI 艦船矩陣中——可能已進入遊戲並有了正式的 Codex 條目，或是 RSI 移除了該項目。"
       }
     },
     "categoriesAria": "Codex 分類",
-    "soon": "即將推出 — 尚未提取任何資料。",
+    "soon": "即將推出——尚未擷取任何資料。",
     "soonShort": "即將推出",
     "status": {
-      "extracted": "已提取",
-      "tool": "提取器",
+      "extracted": "已擷取",
+      "tool": "擷取器",
       "coverage": "涵蓋率",
-      "qualityHint": "品質分數為暫定值,待實際計算後才會確定。",
+      "qualityHint": "品質分數為暫定值，待實際計算後才會確定。",
       "stale": "需要上傳資料 — 目前已上線的遊戲版本比此目錄所反映的更新。",
       "staleUploadLink": "開啟 Verse Data Uploader"
     },
     "search": {
-      "didYouMean": "你是不是想找:",
-      "placeholder": "篩選此清單 – 名稱或類別(例如 Gladius、AEGS_*)…",
+      "didYouMean": "你是不是想找：",
+      "placeholder": "篩選此清單 – 名稱或類別（例如 Gladius、AEGS_*）…",
       "listFilterLabel": "篩選此清單",
       "clear": "清除搜尋",
-      "upcomingHint": "不在遊戲資料中,但 RSI 已公布:{{names}}",
-      "alsoIn": "也可在以下位置找到:",
-      "upcomingLink": "在「即將推出的載具」中查看",
+      "upcomingHint": "不在遊戲資料中，但 RSI 已公布：{{names}}",
+      "alsoIn": "也可在以下位置找到：",
+      "upcomingLink": "在「即將推出的艦船」中查看",
       "bar": {
         "label": "搜尋 Codex",
-        "placeholder": "搜尋 Codex — 載具、元件、武器、裝備、製造商…",
+        "placeholder": "搜尋 Codex——艦船、元件、武器、裝備、製造商…",
         "clear": "清除搜尋",
         "shortcut": "Ctrl K",
         "suggestionsAria": "建議",
@@ -650,11 +650,11 @@
         "searching": "正在搜尋 Codex…",
         "empty": "找不到「{{term}}」的相符結果。",
         "allInIndex": "索引中的全部 {{n}} 項",
-        "allUpcoming": "「即將推出的載具」中的全部 {{n}} 項",
-        "folded": "已合併 {{n}} 個型號",
-        "foldedAtLeast": "已合併至少 {{n}} 個型號",
-        "foldedOne": "已合併 1 個型號",
-        "foldedAtLeastOne": "已合併至少 1 個型號",
+        "allUpcoming": "「即將推出的艦船」中的全部 {{n}} 項",
+        "folded": "已合併 {{n}} 個變體",
+        "foldedAtLeast": "已合併至少 {{n}} 個變體",
+        "foldedOne": "已合併 1 個變體",
+        "foldedAtLeastOne": "已合併至少 1 個變體",
         "grade": "等級 {{grade}}",
         "livery": "塗裝",
         "upcomingBadge": "尚未加入遊戲",
@@ -667,11 +667,11 @@
           "close": "關閉"
         },
         "category": {
-          "ships": "載具",
+          "ships": "艦船",
           "components": "元件",
-          "shipWeapons": "載具武器",
+          "shipWeapons": "艦船武器",
           "fps": "FPS 裝備",
-          "upcoming": "即將推出的載具",
+          "upcoming": "即將推出的艦船",
           "keybinds": "按鍵設定"
         },
         "close": "關閉搜尋"
@@ -682,7 +682,7 @@
       }
     },
     "kinds": {
-      "ship": "載具",
+      "ship": "艦船",
       "weapon": "武器",
       "component": "元件",
       "item": "物品",
@@ -693,7 +693,7 @@
       "armor": "護甲"
     },
     "kindSingular": {
-      "ship": "載具",
+      "ship": "艦船",
       "weapon": "武器",
       "component": "元件",
       "item": "物品",
@@ -708,21 +708,21 @@
       "grade": "等級",
       "componentKind": "元件類型",
       "all": "全部",
-      "includeVariants": "顯示 AI / 範本型號",
+      "includeVariants": "顯示 AI / 範本變體",
       "reset": "重設篩選",
       "anySize": "任意尺寸",
       "anyGrade": "任意等級",
       "blueprintGroup": "藍圖群組",
       "fits": "適用於",
       "ammo": "發射",
-      "role": "角色定位",
+      "role": "定位",
       "crew": "船員"
     },
     "buy": {
       "open": "遊戲內購買地點",
       "title": "購買 {{name}} 的地點",
       "loading": "正在載入商店…",
-      "none": "未知任何遊戲內商店。",
+      "none": "目前沒有已知的遊戲內商店。",
       "from": "{{price}} aUEC 起",
       "placeOne": "1 個地點",
       "places": "{{count}} 個地點",
@@ -735,7 +735,7 @@
       "clothing": "服飾與配件",
       "medical": "醫療與小工具",
       "attachments": "武器配件",
-      "suits": "護甲服與噴射背包",
+      "suits": "太空服與噴射背包",
       "paints": "塗裝",
       "decor": "裝飾",
       "misc": "其他",
@@ -761,7 +761,7 @@
       "large": "9+"
     },
     "weaponClass": {
-      "Ship": "載具",
+      "Ship": "艦船",
       "FPS": "FPS"
     },
     "weaponGroup": {
@@ -771,7 +771,7 @@
       "allOf": "全部{{group}}",
       "super": {
         "fps": "FPS 裝備",
-        "ship": "載具武器"
+        "ship": "艦船武器"
       },
       "fps": {
         "sidearm": "手槍",
@@ -794,12 +794,12 @@
     },
     "weaponDetail": {
       "eyebrow": "武器",
-      "intro": "選擇器中的 17 個欄位並非全部。這裡列出載具武器在 P4K 中實際具備的內容 — 依來源分組,並在旁標註對應的 struct。青色 = 存在,金色虛線 = 不在遊戲檔案中。",
+      "intro": "選擇器中的 17 個欄位並非全部。這裡列出艦船武器在 P4K 中實際具備的內容——依來源分組，並在旁標註對應的 struct。青色 = 存在，金色虛線 = 不在遊戲檔案中。",
       "card": {
         "damageChannels": "各通道傷害",
         "fireBallistics": "射擊與彈道",
         "derived": "推算值",
-        "powerSignature": "能量與訊號特徵",
+        "powerSignature": "電力與訊號",
         "durability": "耐久度",
         "physical": "物理",
         "attachments": "附件",
@@ -807,15 +807,15 @@
         "missing": "不存在",
         "cmDecoy": "每次發射的誘餌",
         "cmNoise": "每次發射的干擾訊號",
-        "cmRecommend": "對此載具的建議"
+        "cmRecommend": "對此艦船的建議"
       },
       "row": {
         "physical": "物理",
         "energy": "能量",
-        "distortion": "Distortion",
+        "distortion": "干擾",
         "thermal": "熱能",
         "biochemical": "生化",
-        "stun": "Stun",
+        "stun": "暈眩",
         "fireRate": "射速",
         "projectilesPerShot": "每發彈丸數",
         "projectileSpeed": "彈丸速度",
@@ -826,16 +826,16 @@
         "sustainedDps": "持續 DPS",
         "penetration": "穿透力",
         "powerDraw": "耗電量",
-        "emOnline": "EM(啟動時)",
-        "irOnline": "IR(啟動時)",
+        "emOnline": "EM（啟動時）",
+        "irOnline": "IR（啟動時）",
         "hp": "HP",
-        "distortionPool": "Distortion 容量",
-        "distortionRegen": "Distortion 回復",
+        "distortionPool": "干擾容量",
+        "distortionRegen": "干擾回復",
         "mass": "質量",
         "size": "尺寸",
         "grade": "等級",
         "itemClass": "類別",
-        "itemPorts": "物品插槽",
+        "itemPorts": "物品掛點",
         "factoryFit": "原廠配置",
         "aimYaw": "旋轉範圍",
         "aimRate": "追蹤速率",
@@ -843,20 +843,20 @@
         "recoil": "後座力",
         "magazine": "彈匣",
         "overheat": "過熱",
-        "cmCapacity": "備量",
+        "cmCapacity": "存量",
         "cmIr": "IR 訊號",
         "cmEm": "EM 訊號",
         "cmCs": "截面訊號",
         "cmRadius": "雲團半徑",
         "cmCloudLifetime": "雲團持續時間",
         "cmLifetime": "作用時間",
-        "shipIr": "載具:IR",
-        "shipEm": "載具:EM",
-        "shipCs": "載具:截面",
+        "shipIr": "艦船：IR",
+        "shipEm": "艦船：EM",
+        "shipCs": "艦船：截面",
         "cmNeedIr": "建議用於對抗 IR",
         "cmNeedEm": "建議用於對抗 EM",
         "cmNeedCs": "建議用於對抗截面",
-        "armorSignal": "護甲訊號係數"
+        "armorSignal": "裝甲訊號係數"
       },
       "src": {
         "damage": "AmmoParams.impactDamage",
@@ -867,9 +867,9 @@
         "physical": "SAttachableComponentParams.AttachDef",
         "attachments": "SItemPortContainerComponentParams — 超頻與槍管模組掛載於此",
         "aiming": "SCItemAimableComponentParams",
-        "missing": "僅有超頻修飾值,且全部為 1.0",
+        "missing": "僅有超頻修飾值，且全部為 1.0",
         "countermeasure": "AmmoParams.projectileParams.typeParams · weaponParams.ammoCapacity",
-        "cmRecommend": "經驗法則:載具訊號 ÷ 每次發射的訊號,無條件捨去後 +1 — 這樣發射的誘餌才會明顯蓋過載具。載具數值即時計算:目前配置與電力設定下所有通電元件(冷卻器、發電機、護盾、量子引擎…)的 IR / EM 輻射總和,再乘以護甲的訊號係數。"
+        "cmRecommend": "經驗法則：艦船訊號 ÷ 每次發射的訊號，無條件捨去後 +1——這樣發射的誘餌才會明顯蓋過艦船。艦船數值即時計算：目前配裝與電力設定下所有通電元件（冷卻器、發電機、護盾、量子驅動器…）的 IR / EM 輻射總和，再乘以裝甲的訊號係數。"
       },
       "value": {
         "none": "0 = 無",
@@ -894,7 +894,7 @@
       "Thruster": "推進器",
       "FuelTank": "燃料箱",
       "FuelIntake": "燃料進氣口",
-      "CargoGrid": "貨物網格",
+      "CargoGrid": "貨艙格",
       "Radar": "雷達",
       "Other": "其他"
     },
@@ -913,15 +913,15 @@
       "inHangar": "在你的機庫中",
       "foldedOne": "+1 個檔案變體",
       "foldedMany": "+{{count}} 個檔案變體",
-      "foldedTitle": "遊戲檔案中有多筆幾乎相同的紀錄,因此合併顯示為一張卡片:{{names}}",
+      "foldedTitle": "遊戲檔案中有多筆幾乎相同的紀錄，因此合併顯示為一張卡片：{{names}}",
       "skinsOne": "+1 個塗裝",
       "skinsMany": "+{{count}} 個塗裝",
-      "skinsTitle": "這把武器的所有塗裝共用一張卡片。請在條目內選擇:{{names}}",
+      "skinsTitle": "這把武器的所有塗裝共用一張卡片。請在條目內選擇：{{names}}",
       "editionsOne": "+1 個變體",
       "editionsMany": "+{{count}} 個變體",
-      "editionsTitle": "遊戲檔案中這個船體出現多次——包含重複紀錄與行銷版本。它們共用一張卡片,請在條目內選擇:{{names}}",
+      "editionsTitle": "遊戲檔案中這個機身出現多次——包含重複紀錄與行銷版本。它們共用一張卡片，請在條目內選擇：{{names}}",
       "addToHangar": "加入機庫",
-      "addToHangarFailed": "無法加入機庫,請再試一次。"
+      "addToHangarFailed": "無法加入機庫，請再試一次。"
     },
     "skinPicker": {
       "label": "塗裝",
@@ -931,7 +931,7 @@
     "editionPicker": {
       "label": "變體",
       "standard": "標準",
-      "count": "{{count}} 個版本"
+      "count": "{{count}} 個變體"
     },
     "holo": {
       "noGeometry": "無剪影",
@@ -940,32 +940,32 @@
         "group": "檢視",
         "classic": "經典",
         "classicHint": "經典檢視",
-        "holo": "Holotable",
-        "holoHint": "Holotable 檢視"
+        "holo": "全息桌",
+        "holoHint": "全息桌檢視"
       },
       "stage": {
-        "einordnung": "定位",
-        "cohortLink": "查看所有船艦",
+        "einordnung": "排名",
+        "cohortLink": "查看所有艦船",
         "view3d": "3D",
         "surfaceSimple": "簡易",
         "surfaceTop": "上視",
         "surfaceSide": "側視",
         "surfaceFront": "前視",
-        "surfaceFrontPending": "前視圖將隨這艘船的下次資料上傳提供。",
+        "surfaceFrontPending": "前視圖將隨這艘艦船的下次資料上傳提供。",
         "silhouetteAria": "{{name}} 的剪影",
-        "noGeometryReason": "這艘船尚未產生剪影。",
+        "noGeometryReason": "這艘艦船尚未產生剪影。",
         "inspector": "檢查器",
         "detailShow": "詳細 ▾",
         "detailHide": "詳細 ▴",
         "allValues": "所有數值 ▾",
         "allValuesHide": "所有數值 ▴",
-        "journalChanged": "已變更:{{label}}",
+        "journalChanged": "已變更：{{label}}",
         "undo": "復原",
         "detailsShow": "詳情 ▾",
         "detailsHide": "詳情 ▴",
         "sound": "介面音效",
-        "mobileTabsSetting": "桌面/資料分頁(行動版)",
-        "tabTable": "桌面",
+        "mobileTabsSetting": "全息桌／資料分頁（行動版）",
+        "tabTable": "全息桌",
         "tabData": "資料",
         "perspective": {
           "offensive": "攻擊",
@@ -977,35 +977,35 @@
         "staticMass": "質量",
         "staticCargo": "貨艙",
         "strengthsWeaknesses": "優勢 · 劣勢",
-        "portsCount": "{{n}} 個連接埠",
+        "portsCount": "{{n}} 個掛點",
         "legendConfigurable": "可配置",
         "legendMissiles": "飛彈",
         "inspectorEmptyTitle": "未選擇掛點",
         "emptyBay": "空艙位",
-        "journalEmpty": "目前沒有內容——原廠配置。",
-        "allPorts": "全部 {{n}} 個連接埠",
+        "journalEmpty": "尚無變更——原廠配裝。",
+        "allPorts": "全部 {{n}} 個掛點",
         "perspectives": "視角",
         "deckInside": "內部",
         "percentileAria": "百分位 {{p}}",
         "say": {
           "gap": "比較群組未提供此視角的排名。",
-          "top": "在 {{n}} 艘船中位居前四分之一。",
-          "high": "在 {{n}} 艘船中高於中位數。",
-          "mid": "在 {{n}} 艘船中低於中位數。",
-          "low": "在 {{n}} 艘船中位居後四分之一。",
-          "axes": "最強面向 {{best}}(P{{bp}}),最弱 {{worst}}(P{{wp}})。"
+          "top": "在 {{n}} 艘艦船中位居前四分之一。",
+          "high": "在 {{n}} 艘艦船中高於中位數。",
+          "mid": "在 {{n}} 艘艦船中低於中位數。",
+          "low": "在 {{n}} 艘艦船中位居後四分之一。",
+          "axes": "最強面向 {{best}}(P{{bp}})，最弱 {{worst}}（P{{wp}}）。"
         },
-        "ghostTitle": "補丁 {{patch}} 中的數值",
+        "ghostTitle": "版本 {{patch}} 中的數值",
         "viewSchemaUnavailable": "此版本沒有掛點座標",
         "placeholderAria": "{{name}} 的佔位剪影",
         "noPorts": "遊戲資料中沒有掛點",
         "pinKey": "圖釘圖例",
-        "pinLabels": "船體上的圖釘標籤",
+        "pinLabels": "機身上的圖釘標籤",
         "legendUnresolved": "位置為估計值",
-        "rawPortHint": "來自遊戲資料的原始連接埠——無法更換或開啟。",
+        "rawPortHint": "來自遊戲資料的原始掛點——無法更換或開啟。",
         "pinListTitle": "所有掛點",
         "pinGroupOther": "掛點",
-        "rankLoading": "正在與整個艦隊比較……每個補丁首次造訪需要一點時間。",
+        "rankLoading": "正在與整個艦隊比較…每個版本首次造訪需要一點時間。",
         "rankFailed": "無法載入艦隊比較。",
         "rankEmpty": "這個艦隊目前沒有可比較的數值。",
         "tab": {
@@ -1013,12 +1013,12 @@
           "changes": "變更"
         },
         "backToParts": "所有零件",
-        "backHint": "取消模型中的選取 (Esc)",
+        "backHint": "取消模型中的選取（Esc）",
         "partsTotal": "{{n}} 個零件",
         "partSize": "尺寸",
         "partGrade": "等級",
         "iconWishlist": "願望",
-        "iconSupply": "營運",
+        "iconSupply": "行動",
         "iconStock": "庫存",
         "previewTitle": "詳情頁預覽",
         "previewMaker": "製造商",
@@ -1028,20 +1028,20 @@
         "immersiveHint": "點選「沉浸式」以更大畫面檢視模型",
         "rotateHint": "旋轉以獲得更大的檢視",
         "resetView": "重設檢視",
-        "viewHull": "船體",
+        "viewHull": "機身",
         "viewSchema": "示意圖",
-        "statsAria": "船艦數值",
+        "statsAria": "艦船數值",
         "statsClose": "關閉數值",
         "sheetHandle": "數值表",
-        "sheetHandleAria": "數值表,拖曳或點選以調整高度",
+        "sheetHandleAria": "數值表，拖曳或點選以調整高度",
         "previewFitted": "安裝於",
         "previewBuy": "購買地點",
         "previewAlternatives": "替代品",
         "previewOpen": "開啟詳情頁",
         "viewAkte": "檔案",
-        "view3dUnavailable": "這艘船目前沒有 3D 模型。",
+        "view3dUnavailable": "這艘艦船目前沒有 3D 模型。",
         "viewsAria": "檢視",
-        "filtersAria": "在桌面上顯示零件",
+        "filtersAria": "在全息桌上顯示零件",
         "filterParts": "零件",
         "filterWeapons": "武器",
         "filterMissiles": "飛彈",
@@ -1056,12 +1056,12 @@
       "strip": {
         "einsatz": "任務",
         "einsatzPick": "選擇任務",
-        "shipCount": "{{n}} 艘船",
+        "shipCount": "{{n}} 艘艦船",
         "offensive": "攻擊",
         "defensive": "防禦",
         "movement": "機動",
         "signature": "訊號與冷卻",
-        "signatureRank": "5 個等級排名中的 {{n}} 個",
+        "signatureRank": "等級排名 {{n}} / 5",
         "cooling": "冷卻負載",
         "coolingValue": "{{used}} / {{total}}",
         "stealthPreset": "潛行",
@@ -1083,13 +1083,13 @@
       "patch": {
         "trigger": {
           "idle": "{{active}}-{{channel}}",
-          "hotkeyHint": "與其他補丁比較"
+          "hotkeyHint": "與其他版本比較"
         },
-        "loading": "載入中……",
-        "empty": "沒有其他可用的補丁。",
+        "loading": "載入中…",
+        "empty": "沒有其他可用的版本。",
         "notFinalised": "未完成",
         "reset": "重設為預設比較",
-        "comparing": "正在載入比較……",
+        "comparing": "正在載入比較…",
         "perspective": {
           "offensive": "攻擊",
           "defensive": "防禦",
@@ -1112,20 +1112,20 @@
           "reExtractPendingYes": "是"
         },
         "forkGuard": {
-          "title": "成為擁有者?",
-          "body": "此變更會使配置與原版分離,且無法復原。",
+          "title": "成為擁有者？",
+          "body": "此變更會使配裝與原版分離，且無法復原。",
           "confirm": "成為擁有者"
         },
         "deltaShow": "顯示變更",
         "deltaHide": "隱藏變更",
         "current": "目前",
-        "hint": "在左側選擇較舊的補丁,這裡就會顯示這艘船的變更內容。",
-        "fromAria": "從 {{patch}} — 選擇補丁",
-        "toAria": "到 {{patch}} — 選擇補丁",
-        "fromTitle": "起始補丁",
-        "toTitle": "目標補丁",
-        "pickFrom": "選擇補丁",
-        "orderHint": "右側永遠是較新的補丁。較舊的請在左側「從」中選擇。",
+        "hint": "在左側選擇較舊的版本，這裡就會顯示這艘艦船的變更內容。",
+        "fromAria": "從 {{patch}}——選擇版本",
+        "toAria": "到 {{patch}}——選擇版本",
+        "fromTitle": "起始版本",
+        "toTitle": "目標版本",
+        "pickFrom": "選擇版本",
+        "orderHint": "右側永遠是較新的版本。較舊的請在左側「從」中選擇。",
         "onOtherSide": "已在另一側",
         "newerThan": "不早於 {{patch}}",
         "olderThan": "不晚於 {{patch}}",
@@ -1141,17 +1141,17 @@
         "followedBy": "由 {{owner}} 管理",
         "followedSince": "截至 {{date}}",
         "refresh": "重新整理",
-        "refreshing": "重新整理中……",
+        "refreshing": "重新整理中…",
         "copy": "複製",
         "copied": "已複製",
         "revoke": "停止分享",
-        "revokeNote": "已在追蹤的接收者會保持連線,直到配置被刪除。",
-        "errorGeneric": "操作失敗,請再試一次。",
-        "copyLinkHint": "複製此檢視的網址——包含 Holotable 與尚未儲存的掛點變更。",
-        "unsavedHint": "{{n}} 項未儲存的變更只存在於複製的連結中,不在機庫連結內。",
+        "revokeNote": "已在追蹤的接收者會保持連線，直到配置被刪除。",
+        "errorGeneric": "操作失敗，請再試一次。",
+        "copyLinkHint": "複製此檢視的網址——包含全息桌與尚未儲存的掛點變更。",
+        "unsavedHint": "{{n}} 項未儲存的變更只存在於複製的連結中，不在機庫連結內。",
         "signInHint": "登入後即可將機庫配置分享為獨立連結。",
         "notInHangarHint": "這艘艦船還不在你的機庫裡。請先加入，之後就能分享配置。",
-        "noConfigHint": "你的機庫裡還沒有這艘艦船的配置——請先儲存一組裝備配置。",
+        "noConfigHint": "你的機庫裡還沒有這艘艦船的配置——請先儲存一組配裝。",
         "copyFailed": "此處不允許複製——請選取連結並手動複製。",
         "saveAndShare": "儲存並分享",
         "shareLink": "分享連結",
@@ -1160,23 +1160,23 @@
         "linksLoading": "正在載入你的連結…",
         "linksError": "無法載入你的連結。",
         "activeLinks": "有效連結（{{n}}）",
-        "readOnlyHint": "這是一組已分享的裝備配置。建立副本即可分享你自己的連結。",
+        "readOnlyHint": "這是一組已分享的配裝。建立副本即可分享你自己的連結。",
         "revokeConfirm": {
           "title": "停止分享此連結？",
-          "body": "任何人都無法再透過此連結建立這組裝備配置的副本。已經跟隨的人仍會保持連線。"
+          "body": "任何人都無法再透過此連結建立這組配裝的副本。已經跟隨的人仍會保持連線。"
         }
       },
       "components": {
         "unknownPosition": "在模型中的位置未知"
       },
       "shared": {
-        "loading": "正在載入已分享的裝備配置…",
+        "loading": "正在載入已分享的配裝…",
         "banner": "由 {{owner}} 分享——「{{name}}」。建立副本即可編輯。",
         "adopt": "建立副本以編輯",
-        "unavailable": "這組已分享的裝備配置無法使用——連結無效、已過期、已撤回，或屬於其他艦船。表格顯示的是原廠裝備配置。",
-        "loadError": "無法載入已分享的裝備配置。",
-        "exit": "返回我的裝備配置",
-        "readOnlyHint": "已分享的裝備配置——唯讀。建立副本即可修改或儲存。"
+        "unavailable": "這組已分享的配裝無法使用——連結無效、已過期、已撤回，或屬於其他艦船。全息桌顯示的是原廠配裝。",
+        "loadError": "無法載入已分享的配裝。",
+        "exit": "返回我的配裝",
+        "readOnlyHint": "已分享的配裝——唯讀。建立副本即可修改或儲存。"
       },
       "diffMarker": "與原廠不同",
       "callout": {
@@ -1190,7 +1190,7 @@
       },
       "card": {
         "rank": "第 {{n}} 名，共 {{m}} 名",
-        "overallTip": "整體：優於該組 {{pct}} % ",
+        "overallTip": "整體：優於該組 {{pct}} %",
         "compareWith": "比較對象",
         "scopeOff": "{{name}} · 無資料",
         "shapeAria": "排名呈現方式",
@@ -1198,8 +1198,8 @@
         "shapeBars": "長條圖",
         "changesAria": "變更類型",
         "changesMine": "你的調整",
-        "changesPatch": "修補版本比較",
-        "changesHead": "與原廠裝備配置相比的更換",
+        "changesPatch": "版本比較",
+        "changesHead": "與原廠配裝相比的更換",
         "backToWerk": "恢復為原廠"
       },
       "inspector": {
@@ -1222,7 +1222,7 @@
           "loading": "正在載入價格…",
           "error": "無法載入價格。",
           "retry": "重試",
-          "empty": "未知可購買這艘艦船的地點。",
+          "empty": "目前沒有已知可購買這艘艦船的地點。",
           "shops": "在遊戲中購買",
           "nearest": "最接近 {{place}}",
           "cheapest": "最便宜優先",
@@ -1249,7 +1249,7 @@
         }
       },
       "hangar": {
-        "loadouts": "裝備配置",
+        "loadouts": "配裝",
         "werk": "原廠",
         "werkChanged": "未儲存的更換：{{n}}",
         "diffOne": "1 個零件與原廠不同",
@@ -1258,7 +1258,7 @@
         "selectedAria": "{{name}} 的操作",
         "removeExemplar": "移除此艦船",
         "removeTitle": "要移除「{{name}}」嗎？",
-        "removeBody": "裝備配置「{{name}}」將被刪除。艦船仍會留在機庫中。",
+        "removeBody": "配裝「{{name}}」將被刪除。艦船仍會留在機庫中。",
         "copy": "複製此艦船",
         "copyName": "{{name}}（副本）",
         "newFromWerk": "以原廠配置新增艦船",
@@ -1273,23 +1273,23 @@
         "wishWithOne": "許願此改裝 · 1 個更換的零件",
         "wishWithMany": "許願此改裝 · {{n}} 個更換的零件",
         "wishName": "願望：{{name}}",
-        "wishLoadoutUnavailable": "在你的願望中——其裝備配置目前還無法儲存在那裡。"
+        "wishLoadoutUnavailable": "在你的願望中——其配裝目前還無法儲存在那裡。"
       },
       "partType": {
-        "gatling": "Gatling",
+        "gatling": "加特林",
         "remoteTurret": "遙控砲塔",
-        "mannedTurret": "有人操作砲塔",
-        "scattergun": "Scattergun",
-        "massDriver": "Mass driver",
-        "railgun": "Railgun",
-        "laserRepeater": "Laser repeater",
-        "ballisticRepeater": "Ballistic repeater",
-        "distortionRepeater": "Distortion repeater",
-        "repeater": "Repeater",
-        "laserCannon": "Laser cannon",
-        "ballisticCannon": "Ballistic cannon",
-        "distortionCannon": "Distortion cannon",
-        "cannon": "Cannon",
+        "mannedTurret": "載人砲塔",
+        "scattergun": "散彈砲",
+        "massDriver": "質量投射砲",
+        "railgun": "軌道砲",
+        "laserRepeater": "雷射連發砲",
+        "ballisticRepeater": "實彈連發砲",
+        "distortionRepeater": "干擾連發砲",
+        "repeater": "連發砲",
+        "laserCannon": "雷射加農砲",
+        "ballisticCannon": "實彈加農砲",
+        "distortionCannon": "干擾加農砲",
+        "cannon": "加農砲",
         "tractorBeam": "牽引光束",
         "shield": "護盾",
         "powerPlant": "發電機",
@@ -1309,7 +1309,7 @@
         "missileCount": "數量",
         "missileSize": "尺寸",
         "tractorForce": "力道",
-        "tractorRange": "射程",
+        "tractorRange": "範圍",
         "tractorSpeed": "速度",
         "shieldHp": "HP",
         "shieldRegen": "回復",
@@ -1321,7 +1321,7 @@
         "irSignature": "IR",
         "driveSpeed": "速度",
         "jumpRange": "躍遷",
-        "spoolTime": "啟動",
+        "spoolTime": "預熱",
         "fuelRate": "消耗",
         "radarSensitivity": "感測器",
         "pingCooldown": "Ping",
@@ -1338,13 +1338,13 @@
         "deckFilter": "甲板 · 篩選",
         "deckFilterAria": "3D 與簡易模式的甲板篩選",
         "deckAll": "全部",
-        "deckAllSub": "艦體",
+        "deckAllSub": "機身",
         "deckEvery": "所有甲板",
         "deckCount": "{{n}} 層甲板",
         "deckEveryOnly3d": "同時顯示所有甲板僅限 3D 檢視——簡易模式一次只顯示一層甲板。",
         "gap": "已定位 {{located}} / {{total}} SCU",
         "gapHint": "並非這艘艦船的每個貨艙格都在遊戲資料中有定位。缺口會保持可見，而不是悄悄補進總數。",
-        "groupsAria": "在表格上顯示內部元素",
+        "groupsAria": "在全息桌上顯示內部元素",
         "groupsOn": "已顯示",
         "presetTag": "預設",
         "presetTitle": "{{role}} · 預設",
@@ -1374,14 +1374,14 @@
           "ladder": "梯子",
           "ramp": "坡道",
           "airlock": "氣閘",
-          "dockingTube": "對接管道",
+          "dockingTube": "對接通道",
           "escapePod": "逃生艙",
           "medBed": "醫療床",
           "respawn": "重生點",
           "weaponRack": "武器架",
           "locker": "置物櫃",
           "fireExt": "滅火器",
-          "relay": "Relays",
+          "relay": "繼電器",
           "powerPlant": "發電機",
           "cooler": "冷卻器",
           "shield": "護盾產生器",
@@ -1389,9 +1389,9 @@
           "jumpDrive": "躍遷模組",
           "lifeSupport": "維生系統",
           "radar": "雷達",
-          "fuelTank": "燃料槽",
+          "fuelTank": "燃料箱",
           "maintenance": "維護點",
-          "turret": "砲塔（出入口）",
+          "turret": "砲塔（入口）",
           "computer": "電腦",
           "bed": "床",
           "head": "廁所與淋浴間",
@@ -1399,12 +1399,12 @@
         },
         "door": {
           "room": "房間門",
-          "inner": "內門與艙蓋",
+          "inner": "內門與艙口",
           "lift": "升降梯門",
           "hangar": "機庫門",
           "bow": "艦首門",
           "airlock": "氣閘門",
-          "ramp": "斜坡門",
+          "ramp": "坡道門",
           "cell": "牢房門"
         },
         "fact": {
@@ -1418,8 +1418,8 @@
         "yes": "是",
         "no": "否",
         "searchLabel": "搜尋零件、房間和門",
-        "searchPlaceholder": "搜尋零件、房間或門 …",
-        "searchPlaceholderOuter": "搜尋零件 …",
+        "searchPlaceholder": "搜尋零件、房間或門…",
+        "searchPlaceholderOuter": "搜尋零件…",
         "hitsAria": "搜尋結果",
         "hits": "結果「{{q}}」· {{n}}",
         "noHits": "找不到「{{q}}」的相關結果。",
@@ -1427,28 +1427,28 @@
         "sideInner": "內部",
         "scopeDeck": "{{deck}} · {{n}} 個元素",
         "scopeShip": "整艘艦船 · {{decks}} 個甲板上共 {{n}} 個元素",
-        "othersOff": "更多(已隱藏)",
+        "othersOff": "更多（已隱藏）",
         "roomsOfDeck": "房間 · {{n}}",
         "overview": "總覽",
         "inRoom": "房間內",
         "roomEmpty": "此房間內沒有已定位的元素。",
-        "inGrids": "在 {{n}} 個 Grid 中",
+        "inGrids": "在 {{n}} 個貨艙格中",
         "poweredBy": "供電來源",
         "relay": "繼電器 {{name}}",
         "floorAt": "地板 {{z}} m",
         "roomHeight": "房間高度 {{h}} m",
-        "view3dAria": "3D 內部視圖,甲板 {{deck}}。方向鍵可旋轉,加號和減號可縮放。",
-        "view3dAllAria": "3D 內部視圖,所有甲板。方向鍵可旋轉,加號和減號可縮放。",
+        "view3dAria": "3D 內部視圖，甲板 {{deck}}。方向鍵可旋轉，加號和減號可縮放。",
+        "view3dAllAria": "3D 內部視圖，所有甲板。方向鍵可旋轉，加號和減號可縮放。",
         "view3dHint": "拖曳 · 旋轉 · 滾輪 · 縮放",
         "zoomIn": "拉近",
         "zoomOut": "拉遠",
         "viewReset": "重設視角",
         "one": {
-          "grid": "貨物 Grid",
+          "grid": "貨艙格",
           "lift": "升降梯",
           "stairs": "樓梯",
           "ladder": "梯子",
-          "ramp": "斜坡",
+          "ramp": "坡道",
           "airlock": "氣閘",
           "dockingTube": "對接通道",
           "escapePod": "逃生艙",
@@ -1462,15 +1462,15 @@
           "cooler": "冷卻器",
           "shield": "護盾產生器",
           "quantumDrive": "量子驅動器",
-          "jumpDrive": "跳躍模組",
-          "lifeSupport": "生命維持系統",
+          "jumpDrive": "躍遷模組",
+          "lifeSupport": "維生系統",
           "radar": "雷達",
           "fuelTank": "燃料箱",
           "maintenance": "維護點",
-          "turret": "砲塔(入口)",
+          "turret": "砲塔（入口）",
           "computer": "電腦",
           "bed": "床",
-          "head": "廁所與淋浴",
+          "head": "廁所與淋浴間",
           "door": "門"
         },
         "oneDoor": {
@@ -1480,7 +1480,7 @@
           "hangar": "機庫門",
           "bow": "艦首門",
           "airlock": "氣閘門",
-          "ramp": "斜坡門",
+          "ramp": "坡道門",
           "cell": "牢房門"
         }
       }
@@ -1492,15 +1492,15 @@
       "noBuild": "尚未發布任何目錄版本。",
       "partial": "此版本僅包含此類別的代表性子集 — 顯示的數量反映已載入的內容。",
       "resetAll": "重設搜尋與篩選",
-      "foundElsewhere": "沒有符合「{{term}}」的{{kind}} — 可在以下位置找到:"
+      "foundElsewhere": "沒有符合「{{term}}」的{{kind}} — 可在以下位置找到："
     },
     "error": {
       "title": "無法載入 Codex",
       "retry": "重試"
     },
     "keybinds": {
-      "title": "按鍵配置",
-      "subtitle": "目前 Star Citizen 版本的預設按鍵配置。",
+      "title": "按鍵設定",
+      "subtitle": "目前 Star Citizen 版本的預設按鍵設定。",
       "device": "裝置",
       "devices": {
         "keyboard": "鍵盤",
@@ -1508,21 +1508,21 @@
         "gamepad": "遊戲手把",
         "joystick": "搖桿"
       },
-      "search": "搜尋按鍵配置",
+      "search": "搜尋按鍵設定",
       "searchPlaceholder": "搜尋動作或按鍵…",
       "lang": {
         "aria": "動作名稱的語言",
         "note": "許多玩家以英文遊玩 Star Citizen — 切換到 EN 即可看到遊戲中的動作名稱。",
         "short": {
-          "ui": "EN",
-          "en": "ZH"
+          "ui": "中文",
+          "en": "EN"
         },
         "hint": {
-          "ui": "你的語言的動作名稱",
+          "ui": "以中文顯示的動作名稱",
           "en": "英文原文的動作名稱 — 與遊戲中一致"
         }
       },
-      "count": "{{total}} 個動作中的 {{shown}} 個",
+      "count": "顯示 {{shown}} / {{total}} 個動作",
       "unbound": "—",
       "rawKey": "內部動作鍵",
       "contexts": {
@@ -1549,7 +1549,7 @@
         "enter": "指派類別",
         "exit": "離開指派模式",
         "active": "指派模式已啟用",
-        "help": "點擊一列即可選取(或點擊類別標題選取整個群組),然後在下方選擇層級並按「指派」。",
+        "help": "點擊一列即可選取（或點擊類別標題選取整個群組），然後在下方選擇層級並按「指派」。",
         "progress": "已指派 {{assigned}} / {{total}} 個動作",
         "filter": "篩選",
         "filters": {
@@ -1558,11 +1558,11 @@
           "assigned": "已指派"
         },
         "layers": {
-          "scope": "範圍 (L1)",
-          "environment": "環境 (L2)",
-          "role": "角色 (L3)",
-          "activity": "活動 (L4)",
-          "actionGroup": "動作群組 (L5)"
+          "scope": "範圍（L1）",
+          "environment": "環境（L2）",
+          "role": "角色（L3）",
+          "activity": "活動（L4）",
+          "actionGroup": "動作群組（L5）"
         },
         "none": "— 無 —",
         "selected": "已選取 {{count}} 個",
@@ -1578,7 +1578,7 @@
       "taxonomy": {
         "scope": {
           "verse": "Verse",
-          "in_game": "遊戲內 (UI)",
+          "in_game": "遊戲內（UI）",
           "out_of_game": "遊戲外"
         },
         "environment": {
@@ -1586,7 +1586,7 @@
           "in_vehicle": "載具內",
           "spectator": "旁觀者",
           "mobiglas": "MobiGlas",
-          "starmap": "StarMap",
+          "starmap": "星圖",
           "chat": "聊天",
           "console": "主控台"
         },
@@ -1676,20 +1676,20 @@
     },
     "provenance": {
       "label": "來源",
-      "build": "{{channel}} · {{patch}} · build {{build}}",
+      "build": "{{channel}} · {{patch}} · Build {{build}}",
       "quality": "品質 {{score}}%"
     },
     "rank": {
-      "header": "定位",
+      "header": "排名",
       "nShipsOfSizeClass": "尺寸等級 {{k}} 的 {{n}} 艘艦船",
       "nShips": "{{n}} 艘艦船",
       "nShipsOfCareer": "同職業的 {{n}} 艘艦船",
-      "profileLabel": "個人檔案",
+      "profileLabel": "評比設定",
       "scopeLabel": "比較範圍",
       "verdict": "{{pct}}% — 相較於 {{n}} 艘艦船{{band}}。",
       "percentile": "百分位",
-      "percentileTooltip": "僅作描述,不作建議:此數值顯示這艘艦船在比較範圍中的位置,而非好壞。50% 即正中間。",
-      "lensNote": "定位不隨任務檢視切換,仍維持自己的三種設定檔。",
+      "percentileTooltip": "僅作描述，不作建議：此數值顯示這艘艦船在比較範圍中的位置，而非好壞。50% 即正中間。",
+      "lensNote": "排名不隨任務檢視切換，仍維持自己的三種評比設定。",
       "radarAria": "{{name}} 相較於 {{n}} 艘艦船的百分位雷達圖",
       "gapAxis": "此軸無數值",
       "band": {
@@ -1719,16 +1719,16 @@
         "sizeClass": "相同尺寸等級",
         "all": "所有艦船",
         "career": "職業",
-        "role": "角色",
-        "careerHolo": "相同等級",
+        "role": "定位",
+        "careerHolo": "相同類別",
         "roleHolo": "相同類型"
       },
       "disabled": {
         "noCargo": "這艘艦船沒有貨艙",
-        "noData": "此建置缺少這個設定檔的數值",
+        "noData": "此版本缺少這個評比設定的數值",
         "noCareer": "此艦船沒有職業紀錄。",
-        "noRole": "此艦船沒有角色紀錄。",
-        "smallGroup": "此群組太小,已擴大比較範圍。"
+        "noRole": "此艦船沒有定位紀錄。",
+        "smallGroup": "此群組太小，已擴大比較範圍。"
       },
       "axis": {
         "alpha": "ALPHA",
@@ -1736,31 +1736,31 @@
         "missiles": "飛彈",
         "shield": "護盾",
         "agility": "靈活度",
-        "boost": "BOOST",
+        "boost": "加速",
         "shieldHp": "護盾 HP",
         "shieldRegen": "護盾回復",
         "hullHp": "機身 HP",
         "armor": "裝甲",
         "crossSection": "截面積",
-        "cargo": "貨物",
+        "cargo": "貨艙",
         "quantumRange": "量子航程",
         "scm": "SCM",
         "mass": "質量",
         "maxSpeed": "最高速度",
         "quantumSpeed": "QT 速度",
-        "spool": "SPOOL",
+        "spool": "預熱",
         "ir": "IR",
         "emIdle": "EM 待機 · 模型",
         "emLoad": "EM 目前 · 模型",
         "emMax": "EM 最大 · 模型",
         "emQuantum": "EM 量子 · 模型"
       },
-      "nShipsOfRole": "同角色的 {{n}} 艘艦船",
+      "nShipsOfRole": "同定位的 {{n}} 艘艦船",
       "compare": {
         "label": "比較對象",
-        "info": "每個軸從 0(中心)延伸到所選比較艦船中的最佳值(邊緣);圓環標示其 33%、67% 與 100%。藍色為此艦船,虛線為比較艦船的中位數。藍色線段:優於比較對象,黃色:較弱。",
+        "info": "每個軸從 0（中心）延伸到所選比較艦船中的最佳值（邊緣）；圓環標示其 33%、67% 與 100%。藍色為此艦船，虛線為比較艦船的中位數。藍色線段：優於比較對象，黃色：較弱。",
         "axisDelta": "與比較對象相差 {{d}} 點",
-        "infoHolo": "每個軸從 0(中心)延伸到所選群組的第 95 百分位(邊緣)。中位數使用相同刻度,較強的數值止於邊緣。"
+        "infoHolo": "每個軸從 0（中心）延伸到所選群組的第 95 百分位（邊緣）。中位數使用相同刻度，較強的數值止於邊緣。"
       },
       "class": {
         "combat": "戰鬥艦",
@@ -1782,11 +1782,11 @@
       },
       "group": {
         "of": "所有{{name}}",
-        "smallHint": "此群組僅有 {{n}} 艘艦船,因此比較較為粗略。",
-        "ofRole": "{{name}}角色"
+        "smallHint": "此群組僅有 {{n}} 艘艦船，因此比較較為粗略。",
+        "ofRole": "{{name}}定位"
       },
-      "noMiningData": "採礦與打撈產出:無資料",
-      "rimNote": "越靠外側 = 越接近群組最佳值(95%),更強的數值止於該處。平方根刻度:小數值仍清晰可見,圓環標示 33% 與 67%。",
+      "noMiningData": "採礦與打撈產出：無資料",
+      "rimNote": "越靠外側 = 越接近群組最佳值（95%），更強的數值止於該處。平方根刻度：小數值仍清晰可見，圓環標示 33% 與 67%。",
       "betterThan": "優於 {{n}}%",
       "rimLabel": "刻度"
     },
@@ -1795,20 +1795,20 @@
       "description": "描述",
       "crew": "船員",
       "size": "尺寸",
-      "grade": "Grade",
+      "grade": "等級",
       "subType": "子類型",
       "attachType": "安裝類型",
-      "weaponClass": "武器等級",
+      "weaponClass": "武器類別",
       "componentKind": "元件類型",
       "dimensions": "尺寸規格",
       "speed": "速度",
       "range": "射程",
       "weaponParams": "武器參數",
       "damage": "撞擊傷害",
-      "hardpoints": "Hardpoints",
-      "hardpointsHint": "點擊 hardpoint 即可查看適用的物品。",
+      "hardpoints": "掛點",
+      "hardpointsHint": "點擊掛點即可查看適用的物品。",
       "compatLoading": "正在載入相容物品…",
-      "compatNone": "此建置中沒有符合的物品。",
+      "compatNone": "此版本中沒有符合的物品。",
       "changes": {
         "title": "自 {{patch}} 版本以來的變更",
         "worse": "較差",
@@ -1857,19 +1857,19 @@
       "usedInBlueprints": "用於藍圖",
       "usedInBlueprintsHint": "需要此物品作為材料的製作配方。",
       "compatCount": "{{count}} 個相容物品",
-      "loadoutEmpty": "空(原廠)",
+      "loadoutEmpty": "空（原廠）",
       "viewOnRsi": "在 RSI 查看",
-      "notFound": "在目前建置中找不到此條目。",
-      "loadingStage": "正在載入艦船全像甲板",
+      "notFound": "在目前版本中找不到此條目。",
+      "loadingStage": "正在載入艦船全息甲板",
       "invalidRoute": "此網址未指向任何 Codex 分類。",
-      "noArtwork": "此建置尚無這艘艦船的圖片。",
+      "noArtwork": "此版本尚無這艘艦船的圖片。",
       "showRaw": "顯示原始資料",
       "hideRaw": "隱藏原始資料",
       "naValue": "無",
       "keyStats": "關鍵數值",
-      "armorStats": "裝甲數值",
-      "showEmptyPorts": "顯示 {{count}} 個空埠",
-      "hideEmptyPorts": "隱藏空埠",
+      "armorStats": "護甲數值",
+      "showEmptyPorts": "顯示 {{count}} 個空掛點",
+      "hideEmptyPorts": "隱藏空掛點",
       "equipment": "裝備",
       "showFullSpec": "顯示完整規格表",
       "hideFullSpec": "隱藏完整規格表",
@@ -1877,11 +1877,11 @@
       "quantumSpeed": "量子速度",
       "quantumFuel": "量子燃料",
       "fuelCapacity": "氫燃料",
-      "hardpointExplainer": "Hardpoint 是機體上的安裝點:每把武器、護盾、冷卻器、推進器或量子驅動器都安裝在其上,並可更換為相同類型與尺寸的其他物品。以下為艦船出廠時的配備。",
-      "loadoutExplainerLabel": "什麼是 hardpoint?",
+      "hardpointExplainer": "掛點是機身上的安裝點：每把武器、護盾、冷卻器、推進器或量子驅動器都安裝在其上，並可更換為相同類型與尺寸的其他物品。以下為艦船出廠時的配備。",
+      "loadoutExplainerLabel": "什麼是掛點？",
       "craftedFrom": "製作材料",
-      "craftedFromHint": "根據遊戲的製作資料,製造此物品所需的成本。",
-      "noIngredients": "此藍圖在此建置中未列出任何材料。",
+      "craftedFromHint": "根據遊戲的製作資料，製造此物品所需的成本。",
+      "noIngredients": "此藍圖在此版本中未列出任何材料。",
       "openBlueprint": "開啟完整藍圖",
       "minQuality": "最低品質 {{value}}",
       "whereToBuy": "購買地點",
@@ -1891,8 +1891,8 @@
       "whereToBuyPrice": "價格",
       "whereToBuyTerminal": "終端機",
       "whereToBuyLocation": "位置",
-      "whereToBuyAttribution": "價格來自 UEX Corp — 由社群維護,可能無法反映正式伺服器的即時狀況。與 Cloud Imperium Games 無關。",
-      "moduleOrderHint": "可設定的模組排在最前面 — 武器及其掛架、砲塔、彈藥、莢艙、護盾、發電機、量子驅動器、雷達、冷卻器、生命維持系統。所有固定部分則列在下方。點擊任一模組即可查看其完整數值表。",
+      "whereToBuyAttribution": "價格來自 UEX Corp — 由社群維護，可能無法反映正式伺服器的即時狀況。與 Cloud Imperium Games 無關。",
+      "moduleOrderHint": "可設定的模組排在最前面——武器及其掛架、砲塔、彈藥、莢艙、護盾、發電機、量子驅動器、雷達、冷卻器、維生系統。所有固定部分則列在下方。點擊任一模組即可查看其完整數值表。",
       "loadoutEmptyWeaponMount": "武器掛架 — 此擷取資料中沒有原廠武器",
       "chipCrew": "{{n}} 名船員",
       "chipNoCargo": "無貨艙",
@@ -1904,35 +1904,35 @@
       "heroSwitchTo3d": "切換到 3D 檢視",
       "heroSwitchTo2d": "切換回 2D 圖片",
       "holoOverlay": {
-        "label": "3D 檢視:{{name}}",
+        "label": "3D 檢視：{{name}}",
         "fullscreen": "全螢幕",
         "exitFullscreen": "結束全螢幕"
       },
       "partPopup": {
-        "label": "元件:{{name}}",
+        "label": "元件：{{name}}",
         "eyebrow": "元件",
         "noValues": "此元件沒有已知數值。"
       },
       "stageLaunchers": "{{n}} 個發射器",
       "stageMissileRacks": "飛彈架",
       "stageRemoteTurret": "遙控砲塔",
-      "stageMannedTurret": "有人操作砲塔",
+      "stageMannedTurret": "載人砲塔",
       "stageTractorBeam": "牽引光束",
       "stageTractorBeams": "牽引光束",
       "linkCopied": "連結已複製",
-      "columnLoadout": "Loadout",
+      "columnLoadout": "配裝",
       "columnAnalysis": "分析",
       "columnFixed": "機身與固定系統",
       "draftLabel": "草稿",
-      "draftChanged": "{{n}} 個槽位已變更",
-      "draftChangedPlural": "{{n}} 個槽位已變更",
+      "draftChanged": "{{n}} 個欄位已變更",
+      "draftChangedPlural": "{{n}} 個欄位已變更",
       "draftNotice": "未儲存。僅限本次工作階段。",
       "draftDiscard": "捨棄",
       "draftApplyAndSave": "套用並儲存至機庫",
       "chipCargoUnknown": "貨艙 · 遊戲檔案中無容量資料",
       "notFoundPage": {
         "title": "找不到項目",
-        "body": "此項目不在目前版本中,可能已被重新命名或移除。"
+        "body": "此項目不在目前版本中，可能已被重新命名或移除。"
       }
     },
     "energy": {
@@ -1944,23 +1944,23 @@
       "minimum": "最低需求 {{n}} 個區段",
       "toggleOff": "{{group}} — 切斷電力",
       "toggleOn": "{{group}} — 恢復電力",
-      "overBudget": "反應爐過載:使用中 {{used}} / {{total}} 個區段",
-      "demandLine": "需求 {{demand}} 區段(來自 {{items}} 個模組)· 已分配 {{allocated}} 區段",
+      "overBudget": "反應爐過載：使用中 {{used}} / {{total}} 個區段",
+      "demandLine": "需求 {{demand}} 區段（來自 {{items}} 個模組）· 已分配 {{allocated}} 區段",
       "belowMinimum": "低於最低需求 {{min}} 區段 — 該群組將失效。",
-      "pinned": "由你設定 — 自動、隱匿或重設可解除。",
+      "pinned": "由你設定——自動、潛行或重設可解除。",
       "pip": {
-        "level": "{{group}}:第 {{n}} / {{m}} 級",
-        "topOff": "{{group}}:第 {{n}} / {{m}} 級 — 點擊以切斷該群組"
+        "level": "{{group}}：第 {{n}} / {{m}} 級",
+        "topOff": "{{group}}：第 {{n}} / {{m}} 級 — 點擊以切斷該群組"
       },
       "draftNote": "已切斷的群組與固定的等級僅為草稿 — 不會寫入你的機庫。",
       "position": {
-        "title": "Dock 位置",
+        "title": "面板位置",
         "left": "左下",
         "center": "下方置中",
         "right": "右下",
-        "inline": "在頁面流程中",
-        "edgeLeft": "在畫面左緣,隨之捲動",
-        "edgeRight": "在畫面右緣,隨之捲動",
+        "inline": "隨頁面內容排列",
+        "edgeLeft": "在畫面左緣，隨之捲動",
+        "edgeRight": "在畫面右緣，隨之捲動",
         "analysis": "在分析欄中",
         "slotGroup": "放置於分析欄",
         "slotUp": "在分析欄中上移",
@@ -1985,17 +1985,17 @@
       },
       "tooltip": {
         "weapons": "切斷整個群組的電力。沒有電力時武器無法開火 — 持續 DPS 降為 0,EM 明顯下降。再次點擊即可重新開啟。",
-        "shields": "金色標示啟用中的產生器所需的最低值。低於此值護盾會失效,被動備援也會隨之消失。",
-        "thrusters": "主推進器與機動推進器。降為零時飛船仍可操控,但沒有推力。",
-        "coolers": "每個冷卻器在飛船電力管理中都是獨立項目 — 因此每個已安裝的冷卻器各有一欄。冷卻器獲得的區段越多,冷卻負載越低 — IR 訊號也越低。冷卻就是保持安靜的代價。",
-        "radar": "決定你能看多遠。電力越多,範圍越大 — EM 也越高,因此更容易被其他人發現。",
+        "shields": "金色標示啟用中的產生器所需的最低值。低於此值護盾會失效，被動備援也會隨之消失。",
+        "thrusters": "主推進器與機動推進器。降為零時艦船仍可操控，但沒有推力。",
+        "coolers": "每個冷卻器在艦船電力管理中都是獨立項目——因此每個已安裝的冷卻器各有一欄。冷卻器獲得的區段越多，冷卻負載越低——IR 訊號也越低。冷卻就是保持安靜的代價。",
+        "radar": "決定你能看多遠。電力越多，範圍越大 — EM 也越高，因此更容易被其他人發現。",
         "lifeSupport": "氧氣與壓力。降為零時會開始倒數 — 遊戲檔案未說明時間長度。",
         "quantum": "在 SCM 中沒有頻道。只有在 NAV 模式才會耗電 — 而此時護盾會關閉。",
         "tractor": "關閉。使用時才會耗電。",
         "ir": "你的熱訊號。隨冷卻負載與所有耗電裝置上升。IR 低代表熱感測器較晚偵測到你。",
-        "em": "所有通電元件的總和。護盾與冷卻器是最大的項目 — 切斷一個群組,其占比就會消失。元件的輻射值來自遊戲檔案;能量武器在此為 0。",
-        "crossSection": "你在雷達上顯得多大。來自機身而非裝備 — 任何 loadout 都無法改變。",
-        "coolingLoad": "目前使用了多少冷卻 — 計算方式與遊戲相同:100% 恰好是開啟的冷卻器在其獲得電力下的輸出。30% 代表有 70% 餘裕,130% 代表不足 30%:飛船過熱,IR 訊號飆升。最省電的是略低於 100%。"
+        "em": "所有通電元件的總和。護盾與冷卻器是最大的項目 — 切斷一個群組，其占比就會消失。元件的輻射值來自遊戲檔案；能量武器在此為 0。",
+        "crossSection": "你在雷達上顯得多大。來自機身而非裝備——任何配裝都無法改變。",
+        "coolingLoad": "目前使用了多少冷卻——計算方式與遊戲相同：100% 恰好是開啟的冷卻器在其獲得電力下的輸出。30% 代表有 70% 餘裕，130% 代表不足 30%：艦船過熱，IR 訊號飆升。最省電的是略低於 100%。"
       },
       "fact": {
         "ir": "IR",
@@ -2018,14 +2018,14 @@
         "nav": "NAV"
       },
       "preset": {
-        "stealth": "隱匿",
+        "stealth": "潛行",
         "auto": "自動",
         "reset": "重設",
-        "stealthHint": "最低 EM 訊號:武器、護盾、量子、牽引、雷達與維生系統關閉,驅動維持最低限度,冷卻器僅開到冷卻負載低於 100%。"
+        "stealthHint": "最低 EM 訊號：武器、護盾、量子、牽引、雷達與維生系統關閉，驅動維持最低限度，冷卻器僅開到冷卻負載低於 100%。"
       },
       "gap": {
-        "noReactorData": "此版本沒有反應爐資料 — 在擷取資料包含之前,電力預算會保持空白。",
-        "reExtractPending": "此目錄版本尚無電力數值 — 無論是各模組或預算皆無。它們將隨下次目錄上傳(擷取結構 3)提供。",
+        "noReactorData": "此版本沒有反應爐資料 — 在擷取資料包含之前，電力預算會保持空白。",
+        "reExtractPending": "此目錄版本尚無電力數值 — 無論是各模組或預算皆無。它們將隨下次目錄上傳（擷取結構 3）提供。",
         "noChannelInMode": "此群組在此飛行模式下沒有頻道。",
         "noCoolingData": "此版本沒有冷卻器資料 — 冷卻負載會保持空白。",
         "noCoolantDraw": "遊戲資料未說明元件消耗多少冷卻劑 — 冷卻負載會保持空白。",
@@ -2053,26 +2053,26 @@
       "close": "關閉",
       "typeFilter": "項目類型",
       "filterAll": "全部",
-      "appliesToOne": "僅適用於此欄位:{{port}}",
+      "appliesToOne": "僅適用於此欄位：{{port}}",
       "appliesToMany": "適用於全部 {{count}} 個相同的掛點",
-      "sortHint": "點擊欄位排序,Ctrl+點擊可加入次要排序。",
+      "sortHint": "點擊欄位排序，Ctrl+點擊可加入次要排序。",
       "installedNone": "欄位原廠為空",
       "pickHere": "請選擇",
-      "fitInferred": "此欄位原廠為空。清單來自同一艘飛船上相同且已裝備的欄位 — 而非此掛點本身的資料。",
+      "fitInferred": "此欄位原廠為空。清單來自同一艘艦船上相同且已裝備的欄位——而非此掛點本身的資料。",
       "clearSlot": "清空欄位"
     },
     "loadout": {
       "changesSummary": "{{changed}} 項變更 · 其中 {{saveable}} 項可儲存",
       "unsaveableHint": "巢狀與已清空的欄位目前僅為草稿 — 尚無法儲存。",
       "saving": "儲存中…",
-      "saveErrorHangar": "目前無法連線至你的機庫 — 草稿已保留,請再試一次儲存。",
-      "saveErrorGeneric": "目前無法儲存 loadout — 草稿已保留,請再試一次。",
+      "saveErrorHangar": "目前無法連線至你的機庫 — 草稿已保留，請再試一次儲存。",
+      "saveErrorGeneric": "目前無法儲存配裝——草稿已保留，請再試一次。",
       "revert": "還原為原廠設定",
-      "resetAll": "將整個 loadout 重設為原廠設定",
-      "resetAllTitle": "要重設整個 loadout 嗎?",
-      "resetAllBody": "此 loadout 的全部 {{n}} 項變更都將遺失,每個欄位都會恢復原廠零件。",
+      "resetAll": "將整個配裝重設為原廠設定",
+      "resetAllTitle": "要重設整個配裝嗎？",
+      "resetAllBody": "此配裝的全部 {{n}} 項變更都將遺失，每個欄位都會恢復原廠零件。",
       "resetAllConfirm": "重設",
-      "defaultConfigName": "Codex loadout",
+      "defaultConfigName": "Codex 配裝",
       "draftState": {
         "changed": "已變更",
         "pending": "載入中…",
@@ -2092,7 +2092,7 @@
     "damage": {
       "physical": "物理",
       "energy": "能量",
-      "distortion": "Distortion",
+      "distortion": "干擾",
       "thermal": "熱能",
       "biochemical": "生化",
       "stun": "暈眩"
@@ -2100,7 +2100,7 @@
     "compare": {
       "pin": "比較",
       "pinned": "比較中",
-      "tray": "比較({{count}})",
+      "tray": "比較（{{count}}）",
       "open": "開啟比較",
       "clear": "清空",
       "remove": "移除 {{name}}",
@@ -2108,7 +2108,7 @@
       "close": "關閉",
       "noCommon": "此組合的項目沒有可比較的數值。",
       "diffOnly": "僅顯示差異",
-      "mixedKind": "僅限同類比較:托盤中已有 {{kind}} 項目。請先清空才能比較其他項目。"
+      "mixedKind": "僅限同類比較：比較列中已有{{kind}}項目。請先清空才能比較其他項目。"
     },
     "portCategory": {
       "weapons": "武器",
@@ -2117,18 +2117,18 @@
       "power": "電力",
       "propulsion": "推進與燃料",
       "avionics": "航電與感測器",
-      "cargo": "貨物",
+      "cargo": "貨艙",
       "systems": "系統",
       "other": "其他"
     },
     "picker": {
       "title": "選擇元件 — {{port}} · S{{size}}",
-      "installed": "已安裝:{{name}}",
-      "searchPlaceholder": "搜尋 … 名稱、製造商、傷害類型",
+      "installed": "已安裝：{{name}}",
+      "searchPlaceholder": "搜尋…名稱、製造商、傷害類型",
       "searchLabel": "搜尋元件",
       "compareWith": "與之比較",
       "deltaAgainst": "Δ 對照",
-      "count": "第 {{n}} / {{total}} 項",
+      "count": "{{n}} / {{total}} 項",
       "noDelta": "±0",
       "baselineOutOfSet": "Δ 基準不在目前的選取範圍內 — Δ 值仍以其為基準計算。",
       "optimum": "比較範圍中的最佳值",
@@ -2136,8 +2136,8 @@
       "columnsUnavailable": "遊戲檔案中沒有",
       "dashCell": "—",
       "dashCellTitle": "此類別不適用",
-      "dashNote": "彈藥與散布顯示為「—」:能量武器沒有彈匣,且遊戲僅將散布作為其他數值的修正值提供。",
-      "footerMissing": "遊戲檔案中沒有:{{fields}}",
+      "dashNote": "彈藥與散布顯示為「—」：能量武器沒有彈匣，且遊戲僅將散布作為其他數值的修正值提供。",
+      "footerMissing": "遊戲檔案中沒有：{{fields}}",
       "pickRow": "安裝 {{name}}",
       "openDetail": "開啟 {{name}} 的詳細資料",
       "scope": {
@@ -2156,8 +2156,8 @@
       "menu": {
         "open": "排序並篩選 {{column}} 欄",
         "sort": "排序",
-        "asc": "升序",
-        "desc": "降序",
+        "asc": "遞增",
+        "desc": "遞減",
         "range": "範圍",
         "from": "從",
         "to": "到",
@@ -2180,7 +2180,7 @@
         "ir": "IR",
         "size": "尺寸",
         "projectilesPerShot": "每發彈丸數",
-        "lifetime": "存續時間",
+        "lifetime": "存活時間",
         "aimYaw": "旋轉範圍",
         "aimRate": "追蹤速率",
         "damageType": "傷害類型",
@@ -2200,42 +2200,42 @@
         "perSec": "/秒",
         "percent": "%"
       },
-      "dashNoteAmmo": "能量武器的彈藥顯示為「—」,因為它們沒有彈匣。",
-      "dashNoteSpread": "散布顯示為「—」,因為遊戲僅將其作為其他數值的修正值提供。",
+      "dashNoteAmmo": "能量武器的彈藥顯示為「—」，因為它們沒有彈匣。",
+      "dashNoteSpread": "散布顯示為「—」，因為遊戲僅將其作為其他數值的修正值提供。",
       "term": {
-        "armor": "護甲",
+        "armor": "裝甲",
         "back": "後方",
-        "ballistic": "彈道",
-        "ballisticcannon": "彈道加農炮",
-        "ballisticgatling": "彈道加特林",
-        "ballisticrepeater": "彈道連發炮",
-        "ballisticscattergun": "彈道霰彈炮",
+        "ballistic": "實彈",
+        "ballisticcannon": "實彈加農砲",
+        "ballisticgatling": "實彈加特林",
+        "ballisticrepeater": "實彈連發砲",
+        "ballisticscattergun": "實彈散彈砲",
         "bottom": "底部",
-        "cannon": "加農炮",
+        "cannon": "加農砲",
         "center": "中央",
         "centre": "中央",
         "cooler": "冷卻器",
         "countermeasure": "反制裝置",
-        "distortion": "Distortion",
-        "distortioncannon": "Distortion 加農炮",
-        "distortionrepeater": "Distortion 連發炮",
+        "distortion": "干擾",
+        "distortioncannon": "干擾加農砲",
+        "distortionrepeater": "干擾連發砲",
         "emp": "EMP",
         "front": "前方",
         "fuelintake": "燃料進氣口",
         "fueltank": "燃料箱",
         "gatling": "加特林",
-        "gun": "槍砲",
+        "gun": "機砲",
         "gunturret": "砲塔",
-        "jumpmodule": "跳躍模組",
+        "jumpmodule": "躍遷模組",
         "laser": "雷射",
-        "lasercannon": "雷射加農炮",
+        "lasercannon": "雷射加農砲",
         "lasergatling": "雷射加特林",
-        "laserrepeater": "雷射連發炮",
+        "laserrepeater": "雷射連發砲",
         "left": "左側",
         "lifesupport": "維生系統",
         "lower": "下方",
         "mainthruster": "主推進器",
-        "massdriver": "Mass Driver",
+        "massdriver": "質量投射砲",
         "mid": "中段",
         "middle": "中間",
         "mininglaser": "採礦雷射",
@@ -2245,17 +2245,17 @@
         "nose": "機首",
         "power": "電力",
         "powerplant": "發電機",
-        "quantumdrive": "Quantum Drive",
-        "quantumfueltank": "Quantum 燃料箱",
+        "quantumdrive": "量子驅動器",
+        "quantumfueltank": "量子燃料箱",
         "radar": "雷達",
-        "railgun": "Railgun",
+        "railgun": "軌道砲",
         "rear": "後方",
-        "repeater": "連發炮",
+        "repeater": "連發砲",
         "right": "右側",
         "rocketpod": "火箭莢艙",
         "salvagebeam": "打撈光束",
         "scanner": "掃描器",
-        "scattergun": "霰彈炮",
+        "scattergun": "散彈砲",
         "selfdestruct": "自毀",
         "shield": "護盾",
         "shieldgenerator": "護盾產生器",
@@ -2271,37 +2271,37 @@
       }
     },
     "hardpointMap": {
-      "title": "艙體上的位置",
+      "title": "機身上的位置",
       "hint": "指向下方的掛點——標記會顯示它在艦船上的位置。",
       "approximate": "範圍為近似值",
       "viewTop": "俯視圖",
-      "viewSide": "側視圖(右舷)",
-      "viewTopAria": "艙體俯視圖,含 {{count}} 個掛點標記",
-      "viewSideAria": "艙體側視圖,含 {{count}} 個掛點標記",
+      "viewSide": "側視圖（右舷）",
+      "viewTopAria": "機身俯視圖，含 {{count}} 個掛點標記",
+      "viewSideAria": "機身側視圖，含 {{count}} 個掛點標記",
       "nose": "機首",
       "readoutIdle": "未選擇掛點"
     },
     "deckPlan": {
       "title": "甲板平面圖",
-      "hint": "由上往下看,機首朝上。指向房間即可查看名稱。",
+      "hint": "由上往下看，機首朝上。指向房間即可查看名稱。",
       "switchAria": "選擇甲板",
-      "aria": "{{deck}}:甲板平面圖,房間數:{{count}}",
+      "aria": "{{deck}}：甲板平面圖，房間數：{{count}}",
       "nose": "機首",
       "readoutIdle": "未選擇房間",
       "roomsAria": "{{deck}} 上的房間",
       "derivedLabel": "樓層為推導",
-      "derivedHint": "遊戲中這艘艦船沒有甲板名稱:樓層是依地板高度推導而來。樓梯與升降梯會顯示在它們連接的每一層。",
+      "derivedHint": "遊戲中這艘艦船沒有甲板名稱：樓層是依地板高度推導而來。樓梯與升降梯會顯示在它們連接的每一層。",
       "connects": "通往 {{decks}}"
     },
     "shipBlueprint": {
       "schema": {
         "title": "掛點示意圖",
-        "topAria": "艦船俯視圖,已標記 {{count}} 個掛點",
+        "topAria": "艦船俯視圖，已標記 {{count}} 個掛點",
         "extent": "{{length}} × {{beam}} × {{height}} m",
-        "hint": "由上往下看,機首朝右。指向標記可查看尺寸與類型,點擊即可查看元件。",
-        "hintSide": "由側面看,機首朝右。指向標記可查看尺寸與類型,點擊即可查看元件。",
-        "hintFront": "由正面看,機首朝向你。指向標記可查看尺寸與類型,點擊即可查看元件。",
-        "noPositions": "這個艙體尚無掛點位置——將隨下一次 3D 上傳提供。",
+        "hint": "由上往下看，機首朝右。指向標記可查看尺寸與類型，點擊即可查看元件。",
+        "hintSide": "由側面看，機首朝右。指向標記可查看尺寸與類型，點擊即可查看元件。",
+        "hintFront": "由正面看，機首朝向你。指向標記可查看尺寸與類型，點擊即可查看元件。",
+        "noPositions": "這個機身尚無掛點位置——將隨下一次 3D 上傳提供。",
         "listLabel": "掛點",
         "size": "尺寸 {{size}}"
       },
@@ -2314,7 +2314,7 @@
     },
     "skins": {
       "title": "塗裝",
-      "source": "艦船外形全像投影 · 塗裝為官方商店渲染圖",
+      "source": "艦船外形全息投影 · 塗裝為官方商店渲染圖",
       "sourceTag": {
         "store": "商店",
         "event": "活動",
@@ -2333,42 +2333,42 @@
       "retry": "重試",
       "collapse": "收合 3D 檢視",
       "expand": "展開 3D 檢視",
-      "hardpointHint": "模型上已標記 {{count}} 個掛點——指向標記或下方的列,兩者會一同亮起。"
+      "hardpointHint": "模型上已標記 {{count}} 個掛點——指向標記或下方的列，兩者會一同亮起。"
     },
     "equipped": {
       "alphaDamage": "Alpha 傷害",
       "dps": "DPS",
       "sustainedDps": "持續 DPS",
       "fireRate": "射速",
-      "projectileSpeed": "彈體速度",
+      "projectileSpeed": "彈丸速度",
       "range": "射程",
       "penetration": "穿透力",
       "shieldHp": "護盾 HP",
-      "shieldRegen": "再生",
-      "regenDelay": "再生延遲",
-      "downedDelay": "倒下延遲",
-      "jumpRange": "跳躍距離",
+      "shieldRegen": "回復",
+      "regenDelay": "回復延遲",
+      "downedDelay": "失效延遲",
+      "jumpRange": "躍遷距離",
       "driveSpeed": "驅動速度",
-      "spoolTime": "充能時間",
+      "spoolTime": "預熱時間",
       "cooldown": "冷卻時間",
       "thrust": "推力",
       "fuelCapacity": "燃料容量",
       "fuelRate": "燃料消耗率",
       "health": "耐久度",
-      "distortion": "Distortion 容量",
-      "powerDraw": "電力需求(段)",
-      "powerOutput": "電力輸出(段)",
+      "distortion": "干擾容量",
+      "powerDraw": "電力需求（區段）",
+      "powerOutput": "電力輸出（區段）",
       "minPower": "最低電力",
       "coolantDraw": "冷卻需求",
       "coolingRate": "冷卻輸出",
-      "aimAssistRange": "射程(瞄準輔助)",
-      "radarSensitivity": "靈敏度(IR/EM/CS)",
+      "aimAssistRange": "射程（瞄準輔助）",
+      "radarSensitivity": "靈敏度（IR/EM/CS）",
       "pingCooldown": "Ping 冷卻時間",
       "emSignature": "EM 訊號",
       "irSignature": "IR 訊號",
-      "derivedHint": "衍生值,由其他已擷取的數據計算而得。",
-      "noStats": "目前的擷取資料中沒有這把武器的數據。",
-      "armamentMissing": "在此次擷取中,有 {{count}} 個武器掛載點沒有原廠武器——遊戲將預設武器配置存放在另一筆記錄中,我們的 P4K 擷取器尚無法解析。",
+      "derivedHint": "衍生值，由其他已擷取的數值計算而得。",
+      "noStats": "目前的擷取資料中沒有這把武器的數值。",
+      "armamentMissing": "在此次擷取中，有 {{count}} 個武器掛架沒有原廠武器——遊戲將預設武器配置存放在另一筆紀錄中，我們的 P4K 擷取器尚無法解析。",
       "missileCount": "飛彈",
       "missileSize": "飛彈尺寸",
       "cmCapacity": "攜帶數量",
@@ -2377,47 +2377,47 @@
       "cmCrossSection": "截面積",
       "cmRadius": "雲團半徑",
       "cmCloudLifetime": "雲團持續時間",
-      "cmLifetime": "彈體存續時間",
+      "cmLifetime": "作用時間",
       "burstDps": "爆發 DPS",
-      "tractorRange": "射程",
+      "tractorRange": "範圍",
       "tractorFullStrengthRange": "全力作用至",
       "tractorForce": "最大拉力",
-      "tractorForceHint": "遊戲檔案是以拉力而非質量來限制牽引光束:物體越重,移動越慢(F = m·a),當所需的力持續高於拉力時,光束就會斷裂。",
+      "tractorForceHint": "遊戲檔案是以拉力而非質量來限制牽引光束：物體越重，移動越慢（F = m·a），當所需的力持續高於拉力時，光束就會斷裂。",
       "tractorAngle": "最大角度",
       "tractorTetherBreak": "斷裂時間",
       "tractorSpeed": "最大移動速度",
-      "tractorNoStats": "這個牽引光束的射程與拉力尚未收錄在此次擷取中——將隨下一次重新擷取提供。"
+      "tractorNoStats": "這個牽引光束的範圍與拉力尚未收錄在此次擷取中——將隨下一次重新擷取提供。"
     },
     "shipLink": {
       "add": "新增 Pledge 連結",
       "edit": "編輯 Pledge 連結",
       "label": "官方 RSI Pledge 連結",
-      "hint": "我們的目錄並非每艘艦船都有可靠的 RSI 商店 slug。貼上官方 Pledge 頁面後,它會取代通用的 RSI 連結——僅對你有效。",
+      "hint": "我們的目錄並非每艘艦船都有可靠的 RSI 商店 slug。貼上官方 Pledge 頁面後，它會取代通用的 RSI 連結——僅對你有效。",
       "placeholder": "https://robertsspaceindustries.com/en/pledge/ships/nomad/Nomad",
       "save": "儲存連結",
       "remove": "移除",
       "cancel": "取消",
       "saved": "已儲存。只有你看得到這個連結。",
       "error": {
-        "invalidUrl": "僅接受官方 RSI Pledge 艦船連結,例如 https://robertsspaceindustries.com/en/pledge/ships/nomad/Nomad",
-        "rateLimited": "短時間內變更次數過多,請幾分鐘後再試。",
+        "invalidUrl": "僅接受官方 RSI Pledge 艦船連結，例如 https://robertsspaceindustries.com/en/pledge/ships/nomad/Nomad",
+        "rateLimited": "短時間內變更次數過多，請幾分鐘後再試。",
         "forbidden": "你沒有權限執行此操作。",
-        "saveFailed": "無法儲存連結,請再試一次。"
+        "saveFailed": "無法儲存連結，請再試一次。"
       },
       "adminTitle": "管理員",
       "promote": "公開給所有人",
       "unpromote": "撤回全域連結",
-      "adminHint": "公開後,上方的連結將對所有使用者可見。使用者的連結絕不會自動公開。"
+      "adminHint": "公開後，上方的連結將對所有使用者可見。使用者的連結絕不會自動公開。"
     },
     "moduleSection": {
       "weapons": "武裝",
-      "remoteTurrets": "遠端砲塔",
-      "mannedTurrets": "有人操作的砲塔",
+      "remoteTurrets": "遙控砲塔",
+      "mannedTurrets": "載人砲塔",
       "missiles": "飛彈",
       "pod": "莢艙",
       "shields": "護盾產生器",
       "powerPlants": "發電機",
-      "quantum": "Quantum Drive",
+      "quantum": "量子驅動器",
       "radar": "雷達與感測器",
       "coolers": "冷卻器",
       "lifeSupport": "維生系統",
@@ -2425,12 +2425,12 @@
       "systems": "推進與系統",
       "fixedTag": "無法配置",
       "countermeasures": "反制裝置",
-      "shieldsNote": "這個區塊中的每個位置都是可更換的護盾產生器,包括出廠時為空的位置。護盾控制模組屬於固定系統:它不是獨立的護盾,在遊戲中無法更換。",
-      "countermeasuresNote": "發射器在遊戲中無法更換,因此這個區塊僅供參考。誘餌(Decoy)會引開熱追蹤飛彈,雜訊(Chaff)則會干擾雷達導引飛彈。需要多少數量,可參考發射器的資訊頁(ⓘ):它會將每次發射的訊號與艦船本身的訊號做比較。",
+      "shieldsNote": "這個區塊中的每個位置都是可更換的護盾產生器，包括出廠時為空的位置。護盾控制模組屬於固定系統：它不是獨立的護盾，在遊戲中無法更換。",
+      "countermeasuresNote": "發射器在遊戲中無法更換，因此這個區塊僅供參考。誘餌（Decoy）會引開熱追蹤飛彈，雜訊（Chaff）則會干擾雷達導引飛彈。需要多少數量，可參考發射器的資訊頁（ⓘ）：它會將每次發射的訊號與艦船本身的訊號做比較。",
       "infoLabel": "此區塊說明",
       "splitRows": "逐一",
       "groupRows": "合併",
-      "splitRowsHint": "每個掛點各列一行,方便你逐一更改",
+      "splitRowsHint": "每個掛點各列一行，方便你逐一更改",
       "groupRowsHint": "將相同的掛點合併回一行",
       "unfold": "顯示",
       "foldAway": "隱藏"
@@ -2439,18 +2439,18 @@
       "peekChange": "展開以變更",
       "caretExpand": "展開",
       "caretCollapse": "收合",
-      "census": "{{slots}} 個插槽 · {{active}} 個啟用 · {{passive}} 個被動",
-      "censusSlots": "{{slots}} 個插槽",
-      "censusSlot": "{{slots}} 個插槽",
-      "censusOne": "{{slots}} 個插槽 · {{active}} 個啟用 · {{passive}} 個被動",
+      "census": "{{slots}} 個欄位 · {{active}} 個啟用 · {{passive}} 個被動",
+      "censusSlots": "{{slots}} 個欄位",
+      "censusSlot": "{{slots}} 個欄位",
+      "censusOne": "{{slots}} 個欄位 · {{active}} 個啟用 · {{passive}} 個被動",
       "total": "總計",
       "badge": {
         "active": "啟用",
         "passive": "被動 · 未接電網",
         "pool": "池"
       },
-      "shieldNote": "全部 {{count}} 個都是護盾產生器,且每個都能單獨更換——相同的在此合併顯示,「逐一」則會依位置逐一列出。",
-      "shieldPassiveNote": "被動的那個不消耗電力,仍完整計入護盾池——但它依附於啟用中的產生器:若它們失效,備援也會一併失效。",
+      "shieldNote": "全部 {{count}} 個都是護盾產生器，且每個都能單獨更換——相同的在此合併顯示，「逐一」則會依位置逐一列出。",
+      "shieldPassiveNote": "被動的那個不消耗電力，仍完整計入護盾池——但它依附於啟用中的產生器：若它們失效，備援也會一併失效。",
       "peek": {
         "sustainedDpsTotal": "總持續 DPS",
         "burstDpsTotal": "總爆發 DPS",
@@ -2460,40 +2460,40 @@
       }
     },
     "summary": {
-      "alphaDamage": "Alpha 傷害(所有武器)",
+      "alphaDamage": "Alpha 傷害（所有武器）",
       "dps": "持續 DPS",
-      "weaponMounts": "武器掛點",
-      "ordnanceMounts": "彈藥掛點",
+      "weaponMounts": "武器掛架",
+      "ordnanceMounts": "彈藥掛架",
       "shieldHp": "護盾池",
-      "shieldRegen": "護盾再生",
-      "regenDelay": "再生延遲",
-      "downedDelay": "癱瘓延遲",
+      "shieldRegen": "護盾回復",
+      "regenDelay": "回復延遲",
+      "downedDelay": "失效延遲",
       "hullHp": "機身 HP",
-      "distortionPool": "Distortion 池",
+      "distortionPool": "干擾容量",
       "powerPlants": "發電機",
       "powerPlantSize": "發電機總尺寸",
       "powerDraw": "耗電量",
-      "poweredItems": "供電組件",
+      "poweredItems": "供電元件",
       "plantDurability": "發電機耐久度",
-      "plantDistortion": "發電機 Distortion 池",
+      "plantDistortion": "發電機干擾容量",
       "gap": {
-        "noStockGuns": "此機身的原廠武器不在擷取資料中——遊戲將預設武器配置存放在獨立的 loadout 記錄中,我們目前尚無法解析,因此下方掛點顯示的是座位而非武器。",
-        "noFireRate": "此擷取資料{{patch}}缺少射速,因此尚無法推算持續 DPS。",
-        "noSustainedCycle": "此擷取資料{{patch}}缺少武器的能量再生、重新裝填時間與過熱資料,因此尚無法推算持續 DPS。爆發 DPS 不計入停頓。",
-        "noShields": "此艦船的原廠 loadout 中沒有護盾產生器。",
+        "noStockGuns": "此機身的原廠武器不在擷取資料中——遊戲將預設武器配置存放在獨立的配裝紀錄中，我們目前尚無法解析，因此下方掛點顯示的是座位而非武器。",
+        "noFireRate": "此擷取資料{{patch}}缺少射速，因此尚無法推算持續 DPS。",
+        "noSustainedCycle": "此擷取資料{{patch}}缺少武器的能量回復、重新裝填時間與過熱資料，因此尚無法推算持續 DPS。爆發 DPS 不計入停頓。",
+        "noShields": "此艦船的原廠配裝中沒有護盾產生器。",
         "noHullHp": "機身 HP 尚未包含在 P4K 擷取資料中。",
-        "noResistances": "各通道的傷害抗性未被擷取——沒有任何艦船或護甲實體帶有此資料。",
-        "noPowerPlant": "此艦船的原廠 loadout 中沒有發電機。",
-        "noPowerDraw": "每個組件的耗電與輸出尚未包含在擷取資料中,因此無法計算電力三角。",
+        "noResistances": "各通道的傷害抗性未被擷取——沒有任何艦船或裝甲實體帶有此資料。",
+        "noPowerPlant": "此艦船的原廠配裝中沒有發電機。",
+        "noPowerDraw": "每個元件的耗電與輸出尚未包含在擷取資料中，因此無法計算電力三角。",
         "noHullMass": "擷取資料中沒有機身質量——只能計算已安裝裝備的質量。",
         "noFlight": "此艦船的擷取資料沒有飛行性能數值。",
-        "noCargoCapacity": "貨物容量尚未包含在擷取資料中。",
+        "noCargoCapacity": "貨艙容量尚未包含在擷取資料中。",
         "noSignature": "此艦船的擷取資料中尚無雷達截面——下次目錄上傳後即會顯示。",
-        "noEmissionModel": "遊戲資料中沒有 IR/EM 特徵值——底層的電力模型並未隨客戶端提供。",
+        "noEmissionModel": "遊戲資料中沒有 IR/EM 訊號值——底層的電力模型並未隨客戶端提供。",
         "noQuantum": "此艦船未安裝量子驅動器。",
         "noEquipmentMass": "此配置無法計算裝備質量。",
         "noMissiles": "此配置未攜帶飛彈。",
-        "noArmorStats": "此艦船的擷取資料沒有護甲數值——這裡只顯示機身結構。"
+        "noArmorStats": "此艦船的擷取資料沒有裝甲數值——這裡只顯示機身結構。"
       }
     },
     "mission": {
@@ -2502,16 +2502,16 @@
       "combat": "戰鬥",
       "transport": "運輸",
       "travel": "旅行",
-      "stealth": "隱匿",
+      "stealth": "潛行",
       "mining": "採礦",
       "salvage": "打撈",
       "lensReset": "返回「全部」",
-      "lensResetTip": "將任務重設為「全部」:所有裝備區塊會依預設順序重新展開,關鍵數值顯示中性總覽。loadout 本身不會改變。",
-      "setLensResetTip": "將任務重設為「全部」:所有數值重新同等計算,圖中的部件不再顯示任務專屬數值。套裝本身不會改變。",
+      "lensResetTip": "將任務重設為「全部」：所有裝備區塊會依預設順序重新展開，關鍵數值顯示中性總覽。配裝本身不會改變。",
+      "setLensResetTip": "將任務重設為「全部」：所有數值重新同等計算，圖中的部件不再顯示任務專屬數值。套裝本身不會改變。",
       "disabled": {
         "noMining": "沒有採礦掛點",
         "noSalvage": "沒有打撈掛點",
-        "noCargo": "沒有貨物格"
+        "noCargo": "沒有貨艙格"
       }
     },
     "kpi": {
@@ -2521,42 +2521,42 @@
       "sustainedDps": "持續 DPS",
       "missiles": "飛彈齊射",
       "shieldHp": "護盾 HP",
-      "shieldRegen": "護盾再生",
+      "shieldRegen": "護盾回復",
       "hullHp": "機身 HP",
       "effectiveHp": "有效 HP",
-      "cargo": "貨物",
+      "cargo": "貨艙",
       "mass": "裝備質量",
       "scm": "SCM 速度",
       "maxSpeed": "最高速度",
       "quantumSpeed": "量子速度",
       "quantumRange": "量子航程",
-      "spool": "啟動時間",
-      "ir": "IR 特徵",
-      "emIdle": "EM 特徵(待機,模型)",
-      "emLoad": "EM 特徵(目前分配,模型)",
-      "emMax": "EM 特徵(最大,模型)",
-      "emQuantum": "EM 特徵(量子,模型)",
-      "modelHint": "這是我們的模型,並非遊戲數值:每個組件的 EM = 額定值 × 分配段數 ÷ 滿段數,反應爐 EM 隨消耗功率變化,再乘以機身護甲係數。來源:遊戲資料中的組件數值。",
-      "modelNote": "IR 與 EM 是我們自己的模型,並非遊戲數值:每個組件的 EM = 額定值 × 分配段數 ÷ 滿段數,反應爐 EM 隨消耗功率變化,再乘以機身護甲係數。待機 = 全部設為最低,護盾與量子關閉;最大 = 全部全開,護盾開啟;量子 = 護盾關閉,量子驅動器開啟。IR 僅計入冷卻器,不含推進器(隨油門變化)。來源:遊戲資料中的組件數值。",
+      "spool": "預熱時間",
+      "ir": "IR 訊號",
+      "emIdle": "EM 訊號（待機，模型）",
+      "emLoad": "EM 訊號（目前分配，模型）",
+      "emMax": "EM 訊號（最大，模型）",
+      "emQuantum": "EM 訊號（量子，模型）",
+      "modelHint": "這是我們的模型，並非遊戲數值：每個元件的 EM = 額定值 × 分配段數 ÷ 滿段數，反應爐 EM 隨消耗功率變化，再乘以機身裝甲係數。來源：遊戲資料中的元件數值。",
+      "modelNote": "IR 與 EM 是我們自己的模型，並非遊戲數值：每個元件的 EM = 額定值 × 分配段數 ÷ 滿段數，反應爐 EM 隨消耗功率變化，再乘以機身裝甲係數。待機 = 全部設為最低，護盾與量子關閉；最大 = 全部全開，護盾開啟；量子 = 護盾關閉，量子驅動器開啟。IR 僅計入冷卻器，不含推進器（隨油門變化）。來源：遊戲資料中的元件數值。",
       "crossSection": "截面",
       "boost": "加速速度",
-      "armor": "護甲",
-      "agility": "敏捷度",
+      "armor": "裝甲",
+      "agility": "靈活度",
       "gap": "—",
       "gapHint": "此版本沒有數值。",
       "deltaUp": "比原廠好 {{value}}",
       "deltaDown": "比原廠差 {{value}}",
       "tooltipBurstDps": "持續射擊直到彈匣打空——不計重新裝填。",
-      "tooltipSustainedDps": "以長時間戰鬥取平均——已計入能量再生、重新裝填與過熱的停頓。",
+      "tooltipSustainedDps": "以長時間戰鬥取平均——已計入能量回復、重新裝填與過熱的停頓。",
       "short": {
         "alpha": "Alpha",
         "burstDps": "爆發 DPS",
         "sustainedDps": "持續 DPS",
         "missiles": "飛彈",
         "shieldHp": "護盾 HP",
-        "shieldRegen": "護盾再生",
+        "shieldRegen": "護盾回復",
         "hullHp": "機身 HP",
-        "cargo": "貨物",
+        "cargo": "貨艙",
         "quantumRange": "量子航程",
         "quantumRangeTight": "Q 航程",
         "scm": "SCM",
@@ -2567,20 +2567,20 @@
         "em": "EM",
         "crossSection": "截面",
         "effectiveHp": "有效 HP",
-        "agility": "敏捷度",
-        "armorHp": "護甲",
+        "agility": "靈活度",
+        "armorHp": "裝甲",
         "quantumSpeed": "Q 速度",
-        "spool": "啟動",
-        "emIdle": "EM(待機,模型)",
-        "emLoad": "EM(目前,模型)",
-        "emMax": "EM(最大,模型)",
-        "emQuantum": "EM(量子,模型)"
+        "spool": "預熱",
+        "emIdle": "EM（待機，模型）",
+        "emLoad": "EM（目前，模型）",
+        "emMax": "EM（最大，模型）",
+        "emQuantum": "EM（量子，模型）"
       }
     },
     "damageChannel": {
       "physical": "物理",
       "energy": "能量",
-      "distortion": "Distortion",
+      "distortion": "干擾",
       "thermal": "熱能",
       "biochemical": "生化",
       "stun": "暈眩"
@@ -2589,7 +2589,7 @@
       "readHint": "展開閱讀",
       "offensive": {
         "title": "攻擊",
-        "weapons": "武器(已安裝 {{count}} 把)",
+        "weapons": "武器（已安裝 {{count}} 把）",
         "colWeapon": "武器",
         "colSize": "尺寸",
         "colAlpha": "Alpha",
@@ -2599,8 +2599,8 @@
         "effectiveRange": "有效射程",
         "projectileSpeed": "彈速 m/s",
         "longestGunNote": "射程受最短武器限制——{{name}} 射程最遠。",
-        "mixedRangeWarning": "射程混合:至少有一把武器的射程明顯比其他武器遠。",
-        "missiles": "飛彈({{count}} 枚彈頭)",
+        "mixedRangeWarning": "射程混合：至少有一把武器的射程明顯比其他武器遠。",
+        "missiles": "飛彈（{{count}} 枚彈頭）",
         "salvoDamage": "齊射傷害",
         "lockTime": "鎖定時間",
         "range": "射程",
@@ -2613,8 +2613,8 @@
         "colCount": "數量",
         "colWarhead": "彈頭",
         "colMissileTotal": "總傷害",
-        "salvoNote": "所有飛彈一次齊射——一次性傷害,不計入武器 DPS。",
-        "salvoPartial": "並非每枚飛彈都有彈頭數值;齊射只計入已知的部分。",
+        "salvoNote": "所有飛彈一次齊射——一次性傷害，不計入武器 DPS。",
+        "salvoPartial": "並非每枚飛彈都有彈頭數值；齊射只計入已知的部分。",
         "noWarheadData": "目前的資料尚無這些飛彈的彈頭數值。",
         "hintMissiles": "{{value}} 飛彈齊射"
       },
@@ -2622,20 +2622,20 @@
         "title": "防禦",
         "shield": "護盾",
         "hp": "HP",
-        "regen": "再生",
+        "regen": "回復",
         "fullIn": "充滿需時",
         "regenDelay": "延遲",
-        "downedDelay": "延遲(癱瘓)",
-        "mixedGeneratorNote": "安裝了多種不同的護盾產生器——上方數值為合計,延遲取自最強者。",
+        "downedDelay": "延遲（失效）",
+        "mixedGeneratorNote": "安裝了多種不同的護盾產生器——上方數值為合計，延遲取自最強者。",
         "resistance": "護盾抗性",
-        "hull": "機身與護甲",
+        "hull": "機身與裝甲",
         "armorPhysical": "物理減免",
         "armorEnergy": "能量減免",
-        "armorDistortion": "Distortion 減免",
+        "armorDistortion": "干擾減免",
         "armorPenetration": "基礎穿透減免",
-        "armorDeflectionPhysical": "偏轉(物理)",
-        "armorDeflectionEnergy": "偏轉(能量)",
-        "noArmorData": "此艦船的擷取資料沒有護甲數值——這裡只顯示機身結構。",
+        "armorDeflectionPhysical": "偏轉（物理）",
+        "armorDeflectionEnergy": "偏轉（能量）",
+        "noArmorData": "此艦船的擷取資料沒有裝甲數值——這裡只顯示機身結構。",
         "effectiveHp": "有效總 HP",
         "effectiveHpGap": "須擷取資料中同時有機身與護盾 HP 才能計算。"
       },
@@ -2644,22 +2644,22 @@
         "flightPerformance": "飛行性能",
         "mass": "質量",
         "systems": "系統",
-        "signature": "特徵(滿載下)",
+        "signature": "訊號（滿載下）",
         "hull": "機身",
         "massEquipmentNote": "擷取資料中沒有機身質量——只能計算裝備質量。",
-        "crossSectionNote": "來自機身,無法更改。"
+        "crossSectionNote": "來自機身，無法更改。"
       }
     },
     "hull": {
       "title": "機身與飛行",
       "hullHp": "機身 HP",
       "hullMass": "機身質量",
-      "armorHp": "護甲 HP",
+      "armorHp": "裝甲 HP",
       "reverseSpeed": "倒退速度",
-      "dimensions": "尺寸(長×寬×高)",
+      "dimensions": "尺寸（長×寬×高）",
       "decks": "甲板",
       "decksDerived": "依地板高度推算",
-      "crew": "乘員",
+      "crew": "船員",
       "equippedMass": "裝備質量",
       "scmSpeed": "SCM 速度",
       "maxSpeed": "最高速度",
@@ -2667,19 +2667,19 @@
       "pitch": "俯仰速率",
       "yaw": "偏航速率",
       "roll": "翻滾速率",
-      "flightMissing": "飛行特性存放於載具定義中,而我們的 P4K 擷取器尚無法解析——這些列會保留,待可解析後自動填入。"
+      "flightMissing": "飛行特性存放於載具定義中，而我們的 P4K 擷取器尚無法解析——這些列會保留，待可解析後自動填入。"
     },
     "inspect": {
       "hardpoint": "掛點",
       "parameters": "參數",
       "general": "一般",
-      "projectile": "彈體",
+      "projectile": "彈丸",
       "noStats": "目前的擷取資料沒有此物品的數值。",
       "openDetail": "開啟完整目錄條目",
       "openStats": "顯示所有數值"
     },
     "moduleRole": {
-      "shieldGenerator": "發電機",
+      "shieldGenerator": "產生器",
       "shieldController": "控制模組"
     },
     "table": {
@@ -2702,9 +2702,9 @@
     "set": {
       "back": "← 返回 Codex",
       "backToHangar": "← 返回機庫",
-      "flowHint": "點選一個欄位——人物周圍是護甲,下方列是武器——從 Arsenal 中裝填。",
+      "flowHint": "點選一個欄位——人物周圍是護甲，下方列是武器——從軍械庫中裝填。",
       "signInHint": "登入後即可查看並編輯你的套裝。",
-      "noSets": "尚未配置任何套裝。",
+      "noSets": "尚未建立任何套裝。",
       "createInHangar": "在機庫中建立套裝 →",
       "loading": "正在載入套裝…",
       "loadFailed": "無法載入你的套裝。",
@@ -2713,13 +2713,13 @@
         "eyebrow": "武器與工具",
         "choose": "選擇",
         "change": "變更",
-        "open": "開放",
+        "open": "空置",
         "clear": "清除",
         "clearAria": "清除 {{slot}}",
         "clearing": "清除中…",
         "clearFailed": "無法清除 {{slot}}，請再試一次。",
-        "noSource": "不在 Arsenal 中 — 消耗品",
-        "customSlot": "自訂位置 — 無法從 Arsenal 填入",
+        "noSource": "不在軍械庫中——消耗品",
+        "customSlot": "自訂位置——無法從軍械庫填入",
         "cleared": "已清除 {{slot}}。",
         "undo": "復原",
         "undoFailed": "無法放回 {{slot}}，請重新裝備。",
@@ -2731,9 +2731,9 @@
         "lensLimits": "限制此任務中的套裝"
       },
       "supplies": {
-        "add": "將缺少的項目加入 Operation（{{n}}）",
-        "none": "全部已擁有或已在 Operation 中。",
-        "added": "已將 {{n}} 個部件加入 Operation。",
+        "add": "將缺少的項目加入行動（{{n}}）",
+        "none": "全部已擁有或已在某個行動中。",
+        "added": "已將 {{n}} 個零件加入行動。",
         "toPlan": "前往規劃"
       },
       "notFoundPage": {
@@ -2747,13 +2747,13 @@
       "maxShieldHealth": "最大護盾值",
       "maxShieldRegen": "最大護盾回復",
       "scmSpeed": "SCM 速度",
-      "maxSpeed": "最大速度",
+      "maxSpeed": "最高速度",
       "boostSpeed": "加速速度",
       "fireRate": "射速",
       "roundsPerMinute": "每分鐘發射數",
       "muzzleVelocity": "槍口初速",
-      "projectileSpeed": "彈體速度",
-      "lifetime": "存續時間",
+      "projectileSpeed": "彈丸速度",
+      "lifetime": "存活時間",
       "radiationCapacityMax": "最大輻射容量",
       "radiationResistance": "輻射抗性",
       "punctureResistance": "穿刺抗性",
@@ -2766,7 +2766,7 @@
       "temperatureResistance": "溫度抗性",
       "weight": "重量",
       "durability": "耐久度",
-      "cargoGrid": "貨物格",
+      "cargoGrid": "貨艙格",
       "ammoCapacity": "彈藥容量",
       "magazineSize": "彈匣容量",
       "damage": "傷害",
@@ -2775,26 +2775,26 @@
       "gForceResistance": "G 力抗性",
       "temperatureMax": "最高溫度",
       "temperatureMin": "最低溫度",
-      "emSignature": "EM 特徵",
-      "irSignature": "IR 特徵",
+      "emSignature": "EM 訊號",
+      "irSignature": "IR 訊號",
       "atmosphereCapacity": "大氣容量",
       "radiationDissipationRate": "輻射消散",
       "pressureMax": "最高壓力",
       "pressureMin": "最低壓力",
       "heatPerShot": "每發熱量",
-      "projectilesPerShot": "每發彈體數",
-      "downedRegenDelay": "崩潰後回復延遲",
+      "projectilesPerShot": "每發彈丸數",
+      "downedRegenDelay": "失效後回復延遲",
       "damagedRegenDelay": "受擊後回復延遲",
       "decayRatio": "衰減比率",
       "reserveDrainRate": "儲備消耗率",
-      "stunMaxAlphaRatio": "擊暈：最大 Alpha 比例",
-      "stunMinAlphaRatio": "擊暈：最小 Alpha 比例",
-      "stunMaxTime": "擊暈：最長持續時間",
-      "stunMinTime": "擊暈：最短持續時間",
+      "stunMaxAlphaRatio": "暈眩：最大 Alpha 比例",
+      "stunMinAlphaRatio": "暈眩：最小 Alpha 比例",
+      "stunMaxTime": "暈眩：最長持續時間",
+      "stunMinTime": "暈眩：最短持續時間",
       "splineDriveSpeed": "航線躍遷：速度",
       "driveSpeed": "驅動速度",
       "engageSpeed": "接合速度",
-      "spoolUpTime": "蓄能時間",
+      "spoolUpTime": "預熱時間",
       "cooldownTime": "冷卻時間",
       "calibrationRate": "校準速率",
       "calibrationDelay": "校準延遲",
@@ -2806,7 +2806,7 @@
       "rampUpHeat": "啟動升溫熱量",
       "duration": "持續時間",
       "splineEngageSpeed": "航線躍遷：接合速度",
-      "splineSpoolUpTime": "航線躍遷：蓄能時間",
+      "splineSpoolUpTime": "航線躍遷：預熱時間",
       "splineCooldownTime": "航線躍遷：冷卻時間",
       "splineCalibrationRate": "航線躍遷：校準速率",
       "splineAccelStageOne": "航線躍遷：加速階段 1",
@@ -2830,7 +2830,7 @@
       "axis": {
         "protection": "防護",
         "mobility": "機動性",
-        "stealth": "隱蔽",
+        "stealth": "潛行",
         "activeScan": "主動掃描",
         "gForce": "G 力",
         "eva": "EVA",
@@ -2848,7 +2848,7 @@
         "limited": "高溫與寒冷受 {{item}}（{{range}}）限制。"
       },
       "header": "評比",
-      "profileLabel": "概況",
+      "profileLabel": "評比設定",
       "verdict": "{{pct}}% — {{band}}",
       "radarAria": "套裝百分位雷達圖，{{cohort}}",
       "legend": {
@@ -2863,7 +2863,7 @@
     "setLens": {
       "all": "全部",
       "combat": "戰鬥",
-      "stealth": "隱蔽",
+      "stealth": "潛行",
       "pilot": "駕駛",
       "env": "環境",
       "transport": "運輸",
@@ -2880,7 +2880,7 @@
         "scan": "類似 CIG 的「Tracker」專長：偵測與追蹤優先。"
       },
       "disabled": {
-        "noSignature": "遊戲資料中尚無特徵值（EM/IR）",
+        "noSignature": "遊戲資料中尚無訊號值（EM/IR）",
         "noData": "遊戲資料中尚無此數值"
       }
     },
@@ -2902,13 +2902,13 @@
       "show": "顯示 {{name}}",
       "hide": "隱藏 {{name}}",
       "hotspotTip": "{{name}} · {{type}} · 尺寸 {{size}}",
-      "freeSlot": "空閒插槽，可裝入 {{types}}",
+      "freeSlot": "空閒欄位，可裝入 {{types}}",
       "label": {
-        "aria": "已選插槽：{{name}}",
+        "aria": "已選欄位：{{name}}",
         "open": "在 Codex 中開啟 {{name}}",
-        "prev": "上一個插槽",
-        "next": "下一個插槽",
-        "emptySlot": "空閒插槽"
+        "prev": "上一個欄位",
+        "next": "下一個欄位",
+        "emptySlot": "空閒欄位"
       },
       "allParts": "所有部件",
       "zoomHint": "Ctrl + 滾輪縮放",
@@ -2916,10 +2916,10 @@
     },
     "attachType": {
       "WeaponPersonal": "個人武器",
-      "WeaponGun": "艦載武器",
+      "WeaponGun": "艦船武器",
       "WeaponMining": "採礦雷射",
       "Missile": "飛彈",
-      "MissileLauncher": "飛彈發射架",
+      "MissileLauncher": "飛彈架",
       "Turret": "砲塔",
       "Char_Armor_Helmet": "頭盔",
       "Char_Armor_Torso": "軀幹",
@@ -2928,7 +2928,7 @@
       "Char_Armor_Undersuit": "內襯服",
       "Char_Armor_Backpack": "背包",
       "WeaponAttachment": "武器配件",
-      "Gadget": "Gadget",
+      "Gadget": "小工具",
       "FPS_Consumable": "消耗品"
     },
     "personal": {
@@ -2938,7 +2938,7 @@
       "mine": "我的",
       "mineVariant": "我的變體",
       "yourVariant": "我的變體：{{name}}",
-      "variantsMenu": "你的此艦變體",
+      "variantsMenu": "你這艘艦船的變體",
       "hqCrumb": "HQ",
       "foreignVariant": "此變體屬於其他人 — 變體需透過分享連結分享。",
       "adopt": "建立副本",
@@ -2959,12 +2959,12 @@
       "expandArea": "展開 {{name}}",
       "area": {
         "armor": "護甲",
-        "shipAmmo": "艦載彈藥"
+        "shipAmmo": "艦船彈藥"
       },
       "sort": {
         "label": "排序",
         "name": "名稱 A–Z",
-        "new": "本次更新新增優先"
+        "new": "本版本新增優先"
       },
       "sizeAll": "全部",
       "alsoInOne": "另見於 {{kind}} · 顯示 1 筆結果 ›",
@@ -2976,7 +2976,7 @@
       "listSearch": "搜尋 {{area}}",
       "listSearchPh": "搜尋 {{area}}…",
       "listSearchClear": "清除搜尋",
-      "freshFilter": "上次修補中新增/更新"
+      "freshFilter": "上一版本中新增／更新"
     },
     "contract": {
       "eyebrow": "任務",
@@ -2989,8 +2989,8 @@
       "unlawful": "非法",
       "variantsLabel": "變體",
       "variants": "{{n}} 個合約使用此標題",
-      "patch": "修補版本",
-      "placeholderHint": "‹…› 會在你接受任務時由遊戲填入(地點、委託方、目標)。",
+      "patch": "版本",
+      "placeholderHint": "‹…› 會在你接受任務時由遊戲填入（地點、委託方、目標）。",
       "notFound": "此任務不在目前的 LIVE 版本中。"
     },
     "missile": {
@@ -3014,7 +3014,7 @@
       "axis": {
         "damage": "傷害",
         "speed": "速度",
-        "agility": "敏捷度",
+        "agility": "靈活度",
         "range": "射程",
         "lockTime": "鎖定",
         "lifetime": "飛行時間",
@@ -3027,21 +3027,21 @@
         "nSize": "{{n}} 件尺寸為 {{k}} 的導引武器",
         "nSignal": "{{n}} 件追蹤訊號相同的導引武器",
         "verdict": "{{pct}} % — 在 {{n}} 件導引武器中{{band}}。",
-        "percentileTooltip": "此數值顯示該武器在比較範圍中的位置。50 % 即正中間。尺寸與大小並非評價:較長只代表較長。",
+        "percentileTooltip": "此數值顯示該武器在比較範圍中的位置。50 % 即正中間。尺寸與大小並非評價：較長只代表較長。",
         "radarAria": "{{name}} 相對於 {{n}} 件導引武器的百分位雷達圖",
-        "legendCompare": "中位數 {{group}} · {{n}} 件導引武器",
+        "legendCompare": "{{group}} 中位數 · {{n}} 件導引武器",
         "legendAbove": "高於中位數",
         "legendBelow": "低於中位數",
-        "compareInfo": "每條軸從 0(中心)延伸到所選武器中的最高值(邊緣)。藍色為此武器,虛線為該組中位數。",
+        "compareInfo": "每條軸從 0（中心）延伸到所選武器中的最高值（邊緣）。藍色為此武器，虛線為該組中位數。",
         "note": "僅比較此武器在遊戲資料中擁有的內容。",
-        "gapNoData": "目前的資料尚未包含傷害、速度、敏捷度與射程。使用 Verse Data Uploader 0.73.3 或更新版本上傳版本後,即會顯示比較。",
-        "gapTooFew": "在傷害、速度、敏捷度與射程上有差異的飛彈太少,無法為此飛彈排名。",
-        "gapThinGroup": "比較數值不足:此組別中有差異的數值太少,無法排名。",
+        "gapNoData": "目前的資料尚未包含傷害、速度、靈活度與射程。使用 Verse Data Uploader 0.73.3 或更新版本上傳資料後，即會顯示比較。",
+        "gapTooFew": "在傷害、速度、靈活度與射程上有差異的飛彈太少，無法為此飛彈排名。",
+        "gapThinGroup": "比較數值不足：此組別中有差異的數值太少，無法排名。",
         "gapNoCohort": "無法載入比較組別。"
       },
       "data": {
         "title": "武器資料",
-        "combatMissing": "目前的資料尚無傷害、速度、敏捷度、射程與鎖定時間。擷取到後會立即顯示於此。"
+        "combatMissing": "目前的資料尚無傷害、速度、靈活度、射程與鎖定時間。擷取到後會立即顯示於此。"
       },
       "group": {
         "warhead": "彈頭",
@@ -3057,12 +3057,12 @@
         "width": "寬度",
         "damage": "傷害",
         "speed": "速度",
-        "agility": "敏捷度",
+        "agility": "靈活度",
         "range": "射程",
         "lifetime": "飛行時間",
         "lockTime": "鎖定時間",
         "blastRadius": "爆炸半徑",
-        "armTime": "武裝時間",
+        "armTime": "解除保險時間",
         "lockAngle": "鎖定角度"
       },
       "signal": {
@@ -3087,17 +3087,17 @@
         "light": "輕型",
         "medium": "中型",
         "heavy": "重型",
-        "compact": "小巧",
+        "compact": "短型",
         "long": "長型",
         "hardHitting": "重擊型",
         "fast": "高速",
-        "agile": "敏捷",
+        "agile": "靈活",
         "longRange": "遠程",
         "quickLock": "快速鎖定"
       },
       "keywordTip": {
-        "ir": "追蹤目標的紅外線特徵。",
-        "em": "追蹤目標的電磁特徵。",
+        "ir": "追蹤目標的紅外線訊號。",
+        "em": "追蹤目標的電磁訊號。",
         "cs": "追蹤目標的雷達截面。",
         "missile": "由艦船發射。",
         "torpedo": "針對大型目標的重型導引武器。",
@@ -3110,7 +3110,7 @@
         "long": "屬於同類型同尺寸中最長的四分之一。",
         "hardHitting": "傷害位居同類型前四分之一。",
         "fast": "屬於同類型中最快的四分之一。",
-        "agile": "屬於同類型中最敏捷的四分之一。",
+        "agile": "屬於同類型中最靈活的四分之一。",
         "longRange": "屬於同類型中射程最遠的四分之一。",
         "quickLock": "屬於同類型中鎖定最快的四分之一。"
       }
@@ -3120,11 +3120,11 @@
       "moreAria": "所有條目總覽"
     },
     "head": {
-      "stripAria": "修補版本與持有",
-      "patch": "修補版本",
+      "stripAria": "版本與持有",
+      "patch": "版本",
       "variant": "變體",
-      "variantAria": "選擇變體,目前:{{name}}",
-      "shown": "顯示:",
+      "variantAria": "選擇變體，目前：{{name}}",
+      "shown": "顯示：",
       "own": {
         "hangar": "在機庫中",
         "hangarN": "機庫中 {{n}} 件",
@@ -3139,12 +3139,12 @@
     },
     "ownCard": {
       "removeSammlung": "從收藏中移除",
-      "removeSammlungTitle": "從收藏中移除?",
+      "removeSammlungTitle": "從收藏中移除？",
       "removeSammlungBody": "{{name}} 將從你的收藏中移除。",
       "signedOut": "請登入以加入願望清單或標記為已擁有。",
       "signIn": "登入",
       "removeItem": "從庫存中移除",
-      "removeTitle": "從庫存中移除?",
+      "removeTitle": "從庫存中移除？",
       "removeBody": "{{n}} 件 {{name}} 將從你庫存中的所有位置移除。",
       "removeConfirm": "移除",
       "inNachschub": "在行動「{{name}}」中",
@@ -3155,14 +3155,14 @@
       "nType": "{{n}} 件同類型零件",
       "nSize": "{{n}} 件尺寸為 {{k}} 的零件",
       "verdict": "{{pct}} % — 在 {{n}} 件零件中{{band}}。",
-      "percentileTooltip": "此數值顯示該零件在比較範圍中的位置。50 % 即正中間。對於延遲與特徵值,數值越小排名越高。",
+      "percentileTooltip": "此數值顯示該零件在比較範圍中的位置。50 % 即正中間。對於延遲與訊號，數值越小排名越高。",
       "radarAria": "{{name}} 相對於 {{n}} 件零件的百分位雷達圖",
-      "legendCompare": "中位數 {{group}} · {{n}} 件零件",
+      "legendCompare": "{{group}} 中位數 · {{n}} 件零件",
       "legendAbove": "高於中位數",
       "legendBelow": "低於中位數",
-      "compareInfo": "每條軸從 0(中心)延伸到所選零件中的最佳值(邊緣)。藍色為此零件,虛線為該組中位數。",
+      "compareInfo": "每條軸從 0（中心）延伸到所選零件中的最佳值（邊緣）。藍色為此零件，虛線為該組中位數。",
       "note": "僅比較此零件在遊戲資料中擁有的內容。",
-      "gapTooFew": "此處比較的數值中有差異的零件太少,無法為此零件排名。",
+      "gapTooFew": "此處比較的數值中有差異的零件太少，無法為此零件排名。",
       "gapNoCohort": "無法載入比較組別。",
       "scope": {
         "all": "全部",
@@ -3174,39 +3174,39 @@
         "dps": "DPS",
         "alpha": "ALPHA",
         "fireRate": "射速",
-        "projectileSpeed": "彈體速度",
+        "projectileSpeed": "彈丸速度",
         "shieldHp": "護盾 HP",
         "shieldRegen": "回復",
         "damagedDelay": "受擊後延遲",
-        "downedDelay": "護盾失效後延遲",
+        "downedDelay": "失效後延遲",
         "powerOutput": "輸出",
         "coolingRate": "冷卻速率",
         "health": "HP",
         "emSignature": "EM",
         "irSignature": "IR",
         "driveSpeed": "速度",
-        "jumpRange": "射程",
-        "spoolTime": "充能時間"
+        "jumpRange": "航程",
+        "spoolTime": "預熱時間"
       }
     },
     "savedLoadouts": {
       "group": "此艦船的配置",
       "save": "儲存配置",
-      "saveNothing": "請先更改欄位,再儲存。",
+      "saveNothing": "請先更改欄位，再儲存。",
       "nameLabel": "名稱",
       "saveConfirm": "儲存",
       "remove": "刪除「{{name}}」",
-      "removeTitle": "刪除配置?",
+      "removeTitle": "刪除配置？",
       "removeMessage": "「{{name}}」將從此瀏覽器中移除。",
       "removeConfirm": "刪除",
-      "cart": "將零件加入購物車",
-      "cartSoon": "即將推出:將此配置的零件放入購物車。",
+      "cart": "將元件加入購物車",
+      "cartSoon": "即將推出：將此配裝的元件放入購物車。",
       "layouts": "選擇配置",
       "saveInto": "將變更儲存到「{{name}}」。",
       "pickNew": "新增",
       "saveAsNew": "另存為新配置",
       "newTitle": "新配置",
-      "newMessage": "儲存於此瀏覽器,僅限此艦船。未命名時會沿用建議名稱;相同名稱會覆寫。",
+      "newMessage": "儲存於此瀏覽器，僅限此艦船。未命名時會沿用建議名稱；相同名稱會覆寫。",
       "defaultName": "配置 {{n}}",
       "share": "複製「{{name}}」的連結",
       "shareCopied": "連結已複製 – 開啟者即可看到此配置。",
@@ -3239,13 +3239,13 @@
       "VehicleWeaponsS6": "載具武器 S6"
     },
     "card": {
-      "tier": "Tier {{tier}}"
+      "tier": "階級 {{tier}}"
     },
-    "recipesMissing": "此版本尚未擷取配方材料 — 已列出藍圖,但沒有材料清單。",
+    "recipesMissing": "此版本尚未擷取配方材料 — 已列出藍圖，但沒有材料清單。",
     "owned": {
       "filter": "僅顯示我的",
-      "mark": "我擁有此藍圖:{{name}}",
-      "unmark": "我的 – 取消標記:{{name}}"
+      "mark": "我擁有此藍圖：{{name}}",
+      "unmark": "我的 – 取消標記：{{name}}"
     },
     "role": {
       "primary": "主要",
@@ -3253,7 +3253,7 @@
       "catalyst": "催化劑"
     },
     "detail": {
-      "tier": "Tier",
+      "tier": "階級",
       "craftTime": "製作時間",
       "dismantleTime": "拆解時間",
       "outputQty": "輸出數量",
@@ -3274,10 +3274,10 @@
   },
   "fps": {
     "title": "FPS 裝備",
-    "subtitle": "徒步裝備——武器與護甲,資料來自正式版本的資料探勘。",
+    "subtitle": "徒步裝備——武器與護甲，資料來自正式版本的資料探勘。",
     "bridgeLink": "FPS 裝備",
     "categoriesAria": "FPS 裝備類別",
-    "searchPlaceholder": "篩選此清單——名稱或類別(例如 Arclight、Morozov、klwe_*)…",
+    "searchPlaceholder": "篩選此清單——名稱或類別（例如 Arclight、Morozov、klwe_*）…",
     "category": {
       "weapon": "武器",
       "armor": "護甲"
@@ -3285,7 +3285,7 @@
     "filters": {
       "weaponType": "武器類型",
       "armorSlot": "護甲部位",
-      "toggle": "篩選({{count}})"
+      "toggle": "篩選（{{count}}）"
     },
     "weaponType": {
       "sidearm": "手槍",
@@ -3308,23 +3308,23 @@
       "searchIn": "在 {{cat}} 中搜尋"
     },
     "equip": {
-      "targetSet": "正在裝備:{{name}}",
+      "targetSet": "正在裝備：{{name}}",
       "backToSet": "回到套裝",
       "removeFrom": "從 {{slot}} 移除",
       "confirmEquipped": "已將 {{item}} 裝備到 {{slot}}",
       "confirmRemoved": "已將 {{item}} 從 {{slot}} 移除",
-      "failed": "未儲存 — 套裝未接受這項變更,請再試一次。",
-      "setUnavailable": "連結中的套裝已不存在,或不屬於你 — 這裡僅供瀏覽,不會裝備任何東西。",
+      "failed": "未儲存 — 套裝未接受這項變更，請再試一次。",
+      "setUnavailable": "連結中的套裝已不存在，或不屬於你 — 這裡僅供瀏覽，不會裝備任何東西。",
       "mySets": "我的套裝",
-      "browseWithout": "不使用套裝,繼續瀏覽",
+      "browseWithout": "不使用套裝，繼續瀏覽",
       "onlyFitting": "僅顯示適用於「{{slot}}」的項目。",
       "saving": "儲存中…",
       "changedElsewhere": "已在其他分頁中變更 — 此欄位現在放的是別的東西。",
       "pastPatch": "只能在目前的版本中裝備。",
       "pastPatchBack": "前往目前版本",
       "band": {
-        "eyebrow": "Arsenal",
-        "eyebrowSlot": "Arsenal · {{slot}}",
+        "eyebrow": "軍械庫",
+        "eyebrowSlot": "軍械庫 · {{slot}}",
         "titleSlot": "{{name}} 的 {{slot}}"
       },
       "setLoadFailed": "無法載入連結中的套裝",
@@ -3337,7 +3337,7 @@
       "loading": "正在載入套裝…",
       "noSet": "你還沒有任何套裝。",
       "noFit": "你的套裝中沒有適合此部件的欄位。",
-      "pickSet": "要加入哪個套裝?",
+      "pickSet": "要加入哪個套裝？",
       "pickSlot": "{{set}} 中的欄位",
       "replaces": "將取代目前的部件",
       "done": "{{item}} 現在位於 {{set}} 的 {{slot}}",
@@ -3787,10 +3787,10 @@
     },
     "noData": "資料不足",
     "tip": {
-      "noData": "資料不足,尚無法評級",
-      "better": "比 {{prev}} 強 {{d}} 點({{p}}%)",
-      "worse": "比 {{prev}} 弱 {{d}} 點({{p}}%)",
-      "same": "與 {{prev}} 差不多({{p}}%)",
+      "noData": "資料不足，尚無法評級",
+      "better": "比 {{prev}} 強 {{d}} 點（{{p}}%）",
+      "worse": "比 {{prev}} 弱 {{d}} 點（{{p}}%）",
+      "same": "與 {{prev}} 差不多（{{p}}%）",
       "community": "其中 {{c}} 來自社群評價",
       "early": "仍為暫定",
       "open": "點擊開啟計算",
@@ -3798,81 +3798,81 @@
     },
     "long": {
       "ghost": "{{prev}}:{{p}}%",
-      "bandsRolling": "門檻依最近完成的修補檔計算",
+      "bandsRolling": "門檻依最近完成的版本計算",
       "bandInstabil": "不穩定 · 低於 {{n}}",
       "bandWackelig": "不穩 · {{a}}–{{b}}",
       "bandStabil": "穩定 · {{n}} 起",
       "sumTitle": "{{n}}% 是怎麼來的",
-      "start": "每個修補檔的起始值",
+      "start": "每個版本的起始值",
       "ded": {
         "community": "社群訊號",
         "service": "服務",
-        "cig": "CIG Known Issues",
+        "cig": "CIG 已知問題",
         "verdict": "社群評價"
       },
       "kbOpen": "{{n}} 個未解決",
       "votesN": "{{n}} 票",
       "total": "穩定度",
-      "final": "最終狀態——無每日時間線,此修補檔在開始每日取樣之前就已推出。",
+      "final": "最終狀態——無每日時間線，此版本在開始每日取樣之前就已推出。",
       "asOf": "截至 {{date}}",
       "day": "第 {{day}} 天 / {{threshold}}",
       "provisional": "評級仍為暫定",
-      "sources": "來源:",
+      "sources": "來源：",
       "src": {
         "replies": "{{threads}} 個討論串中的 {{n}} 則論壇回覆",
-        "outage": "{{n}} 分鐘服務中斷(RSI Status)",
-        "kb": "{{n}} 個 Known Issues(CIG)",
+        "outage": "{{n}} 分鐘服務中斷（RSI Status）",
+        "kb": "{{n}} 個已知問題（CIG）",
         "votes": "{{n}} 票社群投票"
       },
-      "hatched": "斜線區:前 {{n}} 天,熱修復仍可能改變局面。",
-      "dayTitle": "{{date}}:{{score}}% – {{word}},每天 {{velocity}} 則新回覆",
+      "hatched": "斜線區：前 {{n}} 天，熱修復仍可能改變局面。",
+      "dayTitle": "{{date}}:{{score}}% – {{word}}，每天 {{velocity}} 則新回覆",
       "ticketsHint": "來自公開論壇回覆",
       "mentions": "{{count}} 次提及"
     },
     "vote": {
       "title": "社群評價",
-      "loading": "正在載入評價……",
-      "tooFew": "票數尚不足({{n}} / {{min}})——不做修正",
-      "tooFewSub": "正在收集投票;達到最低數量前分布不會顯示。",
-      "applied": "社群評價:{{c}}({{n}} 票,範圍 ± {{hw}})",
-      "split": "意見分歧({{a}}% 穩定 · {{b}}% 不穩定)——修正一半",
+      "loading": "正在載入評價…",
+      "tooFew": "票數尚不足（{{n}} / {{min}}）——不做修正",
+      "tooFewSub": "正在收集投票；達到最低數量前分布不會顯示。",
+      "applied": "社群評價：{{c}}（{{n}} 票，範圍 ± {{hw}}）",
+      "split": "意見分歧（{{a}}% 穩定 · {{b}}% 不穩定）——修正一半",
       "splitSub": "大家的體驗不一。",
       "confirmed": "已確認——不做修正",
       "confirmedSub": "計算出的數字在社群評價範圍內。",
       "sum": "{{n}} 票 · 修正 {{c}}",
       "yours": "你的評價",
-      "blindTitle": "先給判斷,再看數字",
-      "ask": "{{line}} 在你這邊跑得穩不穩?",
-      "mine": "你的判斷:",
+      "blindTitle": "先給評價，再看數字",
+      "ask": "{{line}} 在你這邊跑得穩不穩？",
+      "mine": "你的評價：",
       "changeFrom": "{{time}} 起可更改",
       "hint": {
-        "stabil": "運作順暢,幾乎不斷線",
-        "wackelig": "可以玩,但很煩人",
+        "stabil": "運作順暢，幾乎不斷線",
+        "wackelig": "可以玩，但很煩人",
         "instabil": "一直斷線"
       },
       "cannotJudge": "我無法判斷",
-      "showNumber": "不帶判斷顯示數字",
+      "showNumber": "不帶評價顯示數字",
       "tooSoon": "最早要在你送出後 {{h}} 小時才能更改。",
-      "rules": "只計入註冊至少 {{days}} 天的帳號。最早要在你送出後 {{h}} 小時才能更改。你的判斷絕不會連同你的名字顯示。",
-      "signedOut": "登入後即可參與判斷。",
+      "rules": "只計入註冊至少 {{days}} 天的帳號。最早要在你送出後 {{h}} 小時才能更改。你的評價絕不會連同你的名字顯示。",
+      "signedOut": "登入後即可參與評價。",
       "signIn": "登入",
-      "dailyCap": "你今天已經送出或更改了 {{n}} 次版本判斷,請明天再試。",
-      "buildClosed": "這個版本已不在運行,只能對目前運行的版本進行判斷。",
-      "rulesBuild": "只計入註冊至少 {{days}} 天的帳號。最早要在你送出後 {{h}} 小時才能更改,每天最多 {{n}} 次版本判斷,且僅限版本運行期間。你的判斷絕不會連同你的名字顯示。"
+      "dailyCap": "你今天已經送出或更改了 {{n}} 次版本評價，請明天再試。",
+      "buildClosed": "這個版本已不在運行，只能對目前運行的版本進行評價。",
+      "rulesBuild": "只計入註冊至少 {{days}} 天的帳號。最早要在你送出後 {{h}} 小時才能更改，每天最多 {{n}} 次版本評價，且僅限版本運行期間。你的評價絕不會連同你的名字顯示。"
     }
   },
   "p4k": {
-    "title": "P4K Bundle 歷史",
-    "subtitle": "來自 Verse Data Uploader 的預處理 Bundle。上傳只能透過該工具進行,無法從網站上傳。",
-    "loading": "正在載入 Bundle…",
-    "errorTitle": "無法載入 Bundle",
-    "retentionHint": "保留規則:每個版本保留最近 3 個 Uploader 版本,Bundle 總數最多 20 個,較舊的會自動移除。",
+    "title": "P4K 資料包歷史",
+    "subtitle": "來自 Verse Data Uploader 的預處理資料包。上傳只能透過該工具進行，無法從網站上傳。",
+    "loading": "正在載入資料包…",
+    "errorTitle": "無法載入資料包",
+    "retentionHint": "保留規則：每個版本保留最近 3 個 Uploader 版本，資料包總數最多 20 個，較舊的會自動移除。",
     "toggle": {
       "disabled": "顯示已停用項目"
     },
     "empty": {
-      "title": "目前還沒有 Bundle",
-      "hint": "只要有人使用 Verse Data Uploader 上傳,資料就會出現在這裡。"
+      "title": "目前還沒有資料包",
+      "hint": "只要有人使用 Verse Data Uploader 上傳，資料就會出現在這裡。"
     },
     "col": {
       "entities": "實體",
@@ -3884,12 +3884,12 @@
       "disable": "停用",
       "reenable": "重新啟用",
       "delete": "刪除",
-      "disablePatch": "停用 Patch",
-      "reenablePatch": "重新啟用 Patch",
+      "disablePatch": "停用版本",
+      "reenablePatch": "重新啟用版本",
       "lead": "設為主要"
     },
     "diff": {
-      "title": "差異詳情(與上一個版本比較)",
+      "title": "差異詳情（與上一個版本比較）",
       "entity": "實體類型",
       "prev": "之前",
       "new": "新增",
@@ -3900,15 +3900,15 @@
       "noReason": "未提供原因"
     },
     "prompts": {
-      "reenable": "要重新啟用 Bundle「{{name}}」嗎?",
+      "reenable": "要重新啟用資料包「{{name}}」嗎？",
       "delete": "要永久刪除 Bundle「{{name}}」嗎?\n\n此操作無法復原。",
-      "disableTitle": "要停用 Bundle「{{name}}」嗎?",
-      "reasonLabel": "原因(選填)",
-      "deleteTitle": "要刪除 Bundle 嗎?",
-      "disablePatchTitle": "要停用 Patch {{name}}({{count}} 個有效上傳)嗎?",
-      "reenablePatch": "要重新啟用 Patch {{name}} 嗎?每個頻道將再次以最新的上傳為主。",
-      "leadTitle": "要將「{{name}}」設為主要嗎?",
-      "leadMessage": "同一 Patch 與頻道的其他有效上傳會被停用(附註記),並保留在歷史中。"
+      "disableTitle": "要停用資料包「{{name}}」嗎？",
+      "reasonLabel": "原因（選填）",
+      "deleteTitle": "要刪除資料包嗎？",
+      "disablePatchTitle": "要停用版本 {{name}}（{{count}} 個有效上傳）嗎？",
+      "reenablePatch": "要重新啟用版本 {{name}} 嗎？每個頻道將再次以最新的上傳為主。",
+      "leadTitle": "要將「{{name}}」設為主要嗎？",
+      "leadMessage": "同一版本與頻道的其他有效上傳會被停用（附註記），並保留在歷史中。"
     },
     "superseded": {
       "badge": "已被取代",
@@ -3916,8 +3916,8 @@
     },
     "leading": {
       "badge": "主要",
-      "tip": "Codex 會將此 Bundle 用於其 Patch 與頻道。",
-      "reason": "已退居次要:{{name}} 已被選為主要。"
+      "tip": "Codex 會將此資料包用於其版本與頻道。",
+      "reason": "已退居次要：{{name}} 已被選為主要。"
     }
   },
   "profile": {
@@ -4742,9 +4742,9 @@
     }
   },
   "desktop": {
-    "title": "Data Upload",
-    "subtitle": "下載 Verse Data Uploader,用於你本機安裝的 Star Citizen。",
-    "bundleHistory": "Bundle 歷史",
+    "title": "資料上傳",
+    "subtitle": "下載 Verse Data Uploader，用於你本機安裝的 Star Citizen。",
+    "bundleHistory": "資料包歷史",
     "loading": "正在載入版本…",
     "released": "發布時間",
     "notes": "版本說明",
@@ -4760,18 +4760,18 @@
       "action": "提升"
     },
     "appTitle": "Verse Data Uploader",
-    "appDesc": "讀取你本機安裝的 Star Citizen,並從中上傳 Codex bundle。",
+    "appDesc": "讀取你本機安裝的 Star Citizen，並從中上傳 Codex 資料包。",
     "close": "關閉",
     "access": {
-      "fullPage": "完整 Data Upload 頁面",
-      "note": "僅限 Windows · 使用你的 Verse Companion 帳號登入 · 只上傳資料,不上傳程式碼。"
+      "fullPage": "完整資料上傳頁面",
+      "note": "僅限 Windows · 使用你的 Verse Companion 帳號登入 · 只上傳資料，不上傳程式碼。"
     },
     "historyEyebrow": "Uploader",
     "build": {
-      "title": "最新 Bundle",
+      "title": "最新資料包",
       "since": "自 {{date}} 起",
       "quality": "品質 {{q}}",
-      "none": "尚無啟用中的 bundle。"
+      "none": "尚無啟用中的資料包。"
     },
     "steps": {
       "title": "設定",
@@ -4779,7 +4779,7 @@
       "doneSr": "完成",
       "s1": "下載並啟動 Uploader",
       "s2": "使用你的 Verse Companion 帳號登入",
-      "s3": "選擇你的 Star Citizen 資料夾 — Uploader 會讀取 Data.p4k 並上傳 bundle"
+      "s3": "選擇你的 Star Citizen 資料夾 — Uploader 會讀取 Data.p4k 並上傳資料包"
     }
   },
   "download": {
@@ -4803,34 +4803,40 @@
     "title": "連結 Verse Companion",
     "authorizing": "正在檢查你的工作階段…",
     "loginRequired": "請先登入 — 我們會自動帶你回到這裡。",
-    "redirecting": "已授權。正在將 token 傳送給應用程式…",
+    "redirecting": "已授權。正在將權杖傳送給應用程式…",
     "redirectingHint": "稍後即可關閉此視窗。",
     "errorMissingParams": "缺少 callback 或 state 參數。",
     "errorBadCallback": "Callback URL 不是預期連接埠範圍內的 127.0.0.1 loopback。",
-    "errorNoToken": "工作階段中沒有 access token。",
+    "errorNoToken": "工作階段中沒有 存取權杖。",
     "retry": "再試一次",
     "handedOver": "返回應用程式",
-    "handedOverHint": "應用程式正在接手你的工作階段,你可以關閉此視窗。若未連線成功,請在應用程式中重新開始連線。"
+    "handedOverHint": "應用程式正在接手你的工作階段，你可以關閉此視窗。若未連線成功，請在應用程式中重新開始連線。"
   },
   "desktopAuth": {
-    "title": "授權 Verse Data Uploader",
     "authorizing": "正在檢查你的工作階段…",
-    "loginRequired": "請先登入,然後確認連線。",
-    "redirecting": "已授權。正在將 token 傳送給應用程式…",
-    "redirectingHint": "稍後即可關閉此視窗。",
+    "loginRequired": "請先登入，然後確認連線。",
+    "confirm": "連結",
+    "redirecting": "已授權。正在將權杖傳送給應用程式…",
+    "handedOverHint": "應用程式正在接手你的工作階段，你可以關閉此視窗。若未連線成功，請在應用程式中重新開始連線。",
     "unauthorized": "你的帳號無法使用 Verse Data Uploader。",
-    "unauthorizedHint": "你需要 collaborator 或 admin 角色。請詢問管理員。",
     "errorMissingParams": "缺少 callback 或 state 參數。",
     "errorBadCallback": "Callback URL 不是預期連接埠範圍內的 127.0.0.1 loopback。",
-    "errorNoToken": "工作階段中沒有 access token。",
-    "confirmPrompt": "要將連接埠 {{port}} 上的 Verse Data Uploader 連結到你的帳號嗎?",
-    "confirmHint": "只有在你剛剛自己從 Verse Data Uploader 啟動登入時才確認。",
-    "confirm": "連結",
-    "cancel": "取消",
-    "cancelled": "已取消 — 未傳送任何內容。你可以關閉此視窗。",
+    "errorNoToken": "工作階段中沒有 存取權杖。",
     "retry": "再試一次",
-    "handedOver": "返回應用程式",
-    "handedOverHint": "應用程式正在接手你的工作階段,你可以關閉此視窗。若未連線成功,請在應用程式中重新開始連線。"
+    "titleConnect": "連結 Verse Data Uploader",
+    "titleConfirm": "要連結 Verse Data Uploader 嗎？",
+    "titleConnecting": "正在連線…",
+    "titleConnected": "已連線",
+    "titleDenied": "無存取權限",
+    "titleFailed": "連線失敗",
+    "confirmInfo": "僅在你本人於上傳器中發起登入時才確認（連接埠 {{port}}）。",
+    "connected": "上傳器已連結到你的帳號。你可以關閉此視窗。",
+    "start": "請從 Verse Data Uploader 發起登入——它會自行開啟此頁面。",
+    "done": {
+      "csrf": "此次登入不屬於目前的上傳器工作階段。請在上傳器中重新發起。",
+      "noToken": "上傳器未收到登入資訊。請在上傳器中重新發起。",
+      "failed": "無法將登入交給上傳器。請在上傳器中重新發起。"
+    }
   },
   "footer": {
     "madeByCommunity": "Made by the Community",
@@ -4857,31 +4863,31 @@
   "legal": {
     "about": {
       "title": "關於 Verse Companion",
-      "subtitle": "誰經營此網站、它的功能,以及程式碼在哪裡。",
+      "subtitle": "誰經營此網站、它的功能，以及程式碼在哪裡。",
       "what": {
-        "title": "這是什麼?",
-        "p1": "Verse Companion 是一款免費、非商業性的太空模擬遊戲 Star Citizen 輔助應用程式:提供 Verse 新聞、艦船與裝備 Codex,以及個人機庫與 Loadout 工具。",
-        "p2": "新聞、Codex 與版本說明無需帳號即可瀏覽。只有機庫等個人功能才需要帳號,目前僅限受邀註冊。"
+        "title": "這是什麼？",
+        "p1": "Verse Companion 是一款免費、非商業性的太空模擬遊戲 Star Citizen 輔助應用程式：提供 Verse 新聞、艦船與裝備 Codex，以及個人機庫與 配裝工具。",
+        "p2": "新聞、Codex 與版本說明無需帳號即可瀏覽。只有機庫等個人功能才需要帳號，目前僅限受邀註冊。"
       },
       "openSource": {
         "title": "開放原始碼",
         "p1": "整個應用程式皆公開開發。每項變更都可在 GitHub 上公開檢視 — 與本網站上運行的是同一份程式碼。",
-        "repoLink": "GitHub 上的原始碼(StarOrga/Star-Citizen-Companion-Web)"
+        "repoLink": "GitHub 上的原始碼（StarOrga/Star-Citizen-Companion-Web）"
       },
       "data": {
         "title": "你的資料",
-        "p1": "Verse Companion 不顯示廣告,只儲存功能所需的資料。產品分析透過位於歐盟伺服器的 PostHog 執行。詳情請見隱私權政策:",
+        "p1": "Verse Companion 不顯示廣告，只儲存功能所需的資料。產品分析透過位於歐盟伺服器的 PostHog 執行。詳情請見隱私權政策：",
         "privacyLink": "隱私權政策"
       },
       "affiliation": {
         "title": "粉絲專案 — 無從屬關係",
-        "p1": "Verse Companion – Star Citizen 的非官方粉絲工具。它由社群打造,與 Cloud Imperium 集團旗下公司或 Roberts Space Industries 無任何關聯,亦未獲其背書或贊助,且絕不會索取你的 RSI 帳號憑證。"
+        "p1": "Verse Companion – Star Citizen 的非官方粉絲工具。它由社群打造，與 Cloud Imperium 集團旗下公司或 Roberts Space Industries 無任何關聯，亦未獲其背書或贊助，且絕不會索取你的 RSI 帳號憑證。"
       },
       "contact": {
         "title": "聯絡方式",
-        "p1": "聯絡維護者最快的方式:",
-        "issuesLink": "GitHub Issues(錯誤回報、問題、意見回饋)",
-        "securityLink": "安全聯絡方式(security.txt,RFC 9116)"
+        "p1": "聯絡維護者最快的方式：",
+        "issuesLink": "GitHub Issues（錯誤回報、問題、意見回饋）",
+        "securityLink": "安全聯絡方式（security.txt,RFC 9116）"
       },
       "new": {
         "eyebrow": "Verse 新鮮事",
@@ -4891,83 +4897,83 @@
     },
     "privacy": {
       "title": "隱私權政策",
-      "updated": "最後更新:2026 年 11 月",
+      "updated": "最後更新：2026 年 11 月",
       "summary": {
         "title": "簡而言之",
-        "noAds": "沒有廣告,沒有廣告聯播網。",
-        "signIn": "登入方式恰好只有兩種:電子郵件地址加密碼,或你的 Google 帳號。Google 方式為選用,且確實會將資料傳送給 Google。",
-        "noTracking": "沒有廣告追蹤器。透過 PostHog(歐盟)的產品分析僅在你允許時才會執行 — 預設為關閉。我們自己的伺服器回報其錯誤與執行時間,且不含任何個人資料。",
-        "minimal": "只有功能所需的資料 — 不會出售,也不會為行銷目的而分享。",
-        "euHosting": "應用程式資料儲存於歐盟(Supabase,區域 eu-central-1 / 法蘭克福)。"
+        "noAds": "沒有廣告，沒有廣告聯播網。",
+        "signIn": "登入方式恰好只有兩種：電子郵件地址加密碼，或你的 Google 帳號。Google 方式為選用，且確實會將資料傳送給 Google。",
+        "noTracking": "沒有廣告追蹤器。透過 PostHog（歐盟）的產品分析僅在你允許時才會執行 — 預設為關閉。我們自己的伺服器回報其錯誤與執行時間，且不含任何個人資料。",
+        "minimal": "只有功能所需的資料 — 不會出售，也不會為行銷目的而分享。",
+        "euHosting": "應用程式資料儲存於歐盟（Supabase，區域 eu-central-1 / 法蘭克福）。"
       },
       "hosting": {
         "title": "主機代管與伺服器記錄",
-        "p1": "本網站由 Vercel Inc.(美國)提供。你造訪時,Vercel 會在技術上處理你的 IP 位址與瀏覽器資訊,以提供頁面並保護服務(正當利益,GDPR 第 6 條第 1 項 f 款)。",
-        "p2": "應用程式本身是靜態網頁應用程式;不會在伺服器端渲染包含個人資料的頁面。"
+        "p1": "本網站由 Vercel Inc.（美國）提供。你造訪時，Vercel 會在技術上處理你的 IP 位址與瀏覽器資訊，以提供頁面並保護服務（正當利益，GDPR 第 6 條第 1 項 f 款）。",
+        "p2": "應用程式本身是靜態網頁應用程式；不會在伺服器端渲染包含個人資料的頁面。"
       },
       "account": {
         "title": "帳號與應用程式資料",
-        "p1": "只有個人功能(機庫、Loadout、設定、意見回饋)才需要帳號。新聞、Codex 與版本說明無需帳號即可使用。登入方式恰好只有兩種:電子郵件地址加密碼,或「使用 Google 繼續」按鈕。應用程式不使用其他方式 — 沒有 magic link、沒有簡訊驗證碼、沒有其他社群登入 — 也沒有註冊表單:帳號是透過管理員寄到你電子郵件地址的邀請來建立。",
-        "p2": "為了登入,我們的後端供應商 Supabase 會在歐盟區域 eu-central-1(法蘭克福)保存一筆關於你的驗證紀錄:你的電子郵件地址、使用密碼登入時的加鹽密碼雜湊(絕不是明文密碼)、已連結的登入方式,以及邀請、建立與上次登入等時間戳記。",
-        "p3": "此外還有一筆個人資料紀錄,包含應用程式為你所需的內容:顯示名稱(一開始是你電子郵件地址 @ 之前的部分)、你自己選擇的使用者名稱、你的語言與遊戲頻道偏好、選填的 RSI handle 與你的旗艦,以及你的角色(viewer、collaborator、admin)和你的帳號是否已核准。角色與核准狀態決定你可以看到與執行什麼。",
-        "p4": "你建立的功能資料(機庫艦船、Loadout、艦船連結、已儲存的草稿、設定)儲存在你的帳號下,且只有你可以讀取 — 由資料庫的 row-level security 強制執行。例外:你送出的意見回饋維護者可以看到,並以你的帳號作為寄件者,以便他們回覆;以及你向朋友顯示的內容(請見「朋友與可見度」)。",
-        "p5": "帳號僅限受邀使用。未經核准的註冊無法越過登入頁面,且可連同其資料一併移除。"
+        "p1": "只有個人功能（機庫、配裝、設定、意見回饋）才需要帳號。新聞、Codex 與版本說明無需帳號即可使用。登入方式恰好只有兩種：電子郵件地址加密碼，或「使用 Google 繼續」按鈕。應用程式不使用其他方式 — 沒有 magic link、沒有簡訊驗證碼、沒有其他社群登入 — 也沒有註冊表單：帳號是透過管理員寄到你電子郵件地址的邀請來建立。",
+        "p2": "為了登入，我們的後端供應商 Supabase 會在歐盟區域 eu-central-1（法蘭克福）保存一筆關於你的驗證紀錄：你的電子郵件地址、使用密碼登入時的加鹽密碼雜湊（絕不是明文密碼）、已連結的登入方式，以及邀請、建立與上次登入等時間戳記。",
+        "p3": "此外還有一筆個人資料紀錄，包含應用程式為你所需的內容：顯示名稱（一開始是你電子郵件地址 @ 之前的部分）、你自己選擇的使用者名稱、你的語言與遊戲頻道偏好、選填的 RSI handle 與你的旗艦，以及你的角色（檢視者、協作者、管理員）和你的帳號是否已核准。角色與核准狀態決定你可以看到與執行什麼。",
+        "p4": "你建立的功能資料（機庫艦船、配裝、艦船連結、已儲存的草稿、設定）儲存在你的帳號下，且只有你可以讀取 — 由資料庫的 row-level security 強制執行。例外：你送出的意見回饋維護者可以看到，並以你的帳號作為寄件者，以便他們回覆；以及你向朋友顯示的內容（請見「朋友與可見度」）。",
+        "p5": "帳號僅限受邀使用。未經核准的註冊無法越過登入頁面，且可連同其資料一併移除。"
       },
       "google": {
         "title": "使用 Google 登入",
-        "p1": "Google 方式為選用 — 使用電子郵件與密碼不需要 Google 也能進入帳號。當你點選「使用 Google 繼續」時,應用程式會將你導向 Google 的登入頁面(accounts.google.com)。Google 因此得知你正在登入 Verse Companion,以及每次造訪頁面都會帶有的技術資料(IP 位址、瀏覽器、時間)。供應商為 Google Ireland Limited(愛爾蘭)或 Google LLC(美國)。",
-        "p2": "成功登入後,Google 會回傳資料給我們,由 Supabase 儲存在你帳號的驗證紀錄中:你的 Google 帳號識別碼、你的電子郵件地址、你在 Google 登記的姓名,以及你 Google 個人檔案圖片的網址。其中幾乎沒有任何內容會被顯示 — 你的姓名會出現在帳號選單中,而且僅在你尚未設定自己的使用者名稱時;應用程式從不載入你的個人檔案圖片,只會顯示第一個字母作為縮寫。",
-        "p3": "除了登入本身之外,沒有任何內容會回流給 Google — 沒有機庫、Codex 或使用資料。Google 在其端如何處理登入資料,依 Google 自己的隱私權政策而定:",
-        "policyLink": "Google 隱私權政策(policies.google.com/privacy)",
-        "p4": "此方式的法律依據是你的同意(GDPR 第 6 條第 1 項 a 款):你每次登入都會重新決定是否使用。若你想移除既有的 Google 連結,請透過網站聲明中的聯絡管道聯絡維護者。"
+        "p1": "Google 方式為選用 — 使用電子郵件與密碼不需要 Google 也能進入帳號。當你點選「使用 Google 繼續」時，應用程式會將你導向 Google 的登入頁面（accounts.google.com）。Google 因此得知你正在登入 Verse Companion，以及每次造訪頁面都會帶有的技術資料（IP 位址、瀏覽器、時間）。供應商為 Google Ireland Limited（愛爾蘭）或 Google LLC（美國）。",
+        "p2": "成功登入後，Google 會回傳資料給我們，由 Supabase 儲存在你帳號的驗證紀錄中：你的 Google 帳號識別碼、你的電子郵件地址、你在 Google 登記的姓名，以及你 Google 個人檔案圖片的網址。其中幾乎沒有任何內容會被顯示 — 你的姓名會出現在帳號選單中，而且僅在你尚未設定自己的使用者名稱時；應用程式從不載入你的個人檔案圖片，只會顯示第一個字母作為縮寫。",
+        "p3": "除了登入本身之外，沒有任何內容會回流給 Google — 沒有機庫、Codex 或使用資料。Google 在其端如何處理登入資料，依 Google 自己的隱私權政策而定：",
+        "policyLink": "Google 隱私權政策（policies.google.com/privacy）",
+        "p4": "此方式的法律依據是你的同意（GDPR 第 6 條第 1 項 a 款）：你每次登入都會重新決定是否使用。若你想移除既有的 Google 連結，請透過網站聲明中的聯絡管道聯絡維護者。"
       },
       "local": {
         "title": "Cookie、本機儲存空間與你的工作階段",
-        "p1": "Verse Companion 不設定任何 cookie — 無論是自己的還是來自廣告聯播網的。取而代之的是,應用程式使用你瀏覽器的本機儲存空間,包含以下項目:",
+        "p1": "Verse Companion 不設定任何 cookie — 無論是自己的還是來自廣告聯播網的。取而代之的是，應用程式使用你瀏覽器的本機儲存空間，包含以下項目：",
         "keys": {
-          "session": "sc.auth — 你的登入工作階段:來自 Supabase 的短效 access token 與 refresh token。只要你保持登入,應用程式會在背景自動更新 access token;登出會刪除此項目。清除瀏覽器的網站資料同樣會讓你登出。",
+          "session": "sc.auth — 你的登入工作階段：來自 Supabase 的短效存取權杖與更新權杖。只要你保持登入，應用程式會在背景自動更新存取權杖；登出會刪除此項目。清除瀏覽器的網站資料同樣會讓你登出。",
           "lang": "sc.lang — 你選擇的語言。",
-          "consent": "sc.consent — 你對儲存類別的決定,讓我們不必在每次造訪時重新詢問。",
-          "composer": "sc.composer.sendOnEnter — 在意見回饋輸入框中,Enter 鍵是送出還是換行。",
-          "verseBeta": "sc.beta — 你為哪些選單項目(Verse、Codex 與 HQ)開啟或關閉了新的 β 介面。純粹的顯示偏好,不用於追蹤。",
-          "preferences": "「偏好設定」類別 — 方便使用的狀態,例如新聞篩選、儲存的文章、收藏的艦船,以及最近開啟的搜尋頁面。僅在你允許時才會寫入;撤回同意會立即刪除這些項目。",
-          "statistics": "「統計」類別 — 匿名產品分析(PostHog)的狀態。僅在你允許時才會建立;撤回同意會立即將其刪除。"
+          "consent": "sc.consent — 你對儲存類別的決定，讓我們不必在每次造訪時重新詢問。",
+          "composer": "sc.composer.sendOnEnter — 在意見回饋輸入框中，Enter 鍵是送出還是換行。",
+          "verseBeta": "sc.beta — 你為哪些選單項目（Verse、Codex 與 HQ）開啟或關閉了新的 β 介面。純粹的顯示偏好，不用於追蹤。",
+          "preferences": "「偏好設定」類別 — 方便使用的狀態，例如新聞篩選、儲存的文章、收藏的艦船，以及最近開啟的搜尋頁面。僅在你允許時才會寫入；撤回同意會立即刪除這些項目。",
+          "statistics": "「統計」類別 — 匿名產品分析（PostHog）的狀態。僅在你允許時才會建立；撤回同意會立即將其刪除。"
         },
-        "p2": "在 Google 登入期間,工作階段儲存空間中會短暫多出一個項目(sc.oauth-redirect-qs),讓你在返回後回到原本來的頁面。最遲在關閉分頁時就會消失。",
-        "p3": "若你明確授權我們的桌面工具之一(Verse Data Uploader、Starscape),瀏覽器會將你工作階段的 access token 交給在你機器上本機執行的程式(127.0.0.1)— 不會交給第三方,也絕不會經由網址列。",
-        "p4": "作為可安裝的網頁應用程式(PWA),service worker 會在你的裝置上快取靜態檔案,以加快載入並支援離線使用 — 此快取不含個人資料,可透過解除安裝應用程式或清除網站資料來移除。"
+        "p2": "在 Google 登入期間，工作階段儲存空間中會短暫多出一個項目（sc.oauth-redirect-qs），讓你在返回後回到原本來的頁面。最遲在關閉分頁時就會消失。",
+        "p3": "若你明確授權我們的桌面工具之一（Verse Data Uploader、Starscape），瀏覽器會將你工作階段的 存取權杖 交給在你機器上本機執行的程式（127.0.0.1）— 不會交給第三方，也絕不會經由網址列。",
+        "p4": "作為可安裝的網頁應用程式（PWA），service worker 會在你的裝置上快取靜態檔案，以加快載入並支援離線使用 — 此快取不含個人資料，可透過解除安裝應用程式或清除網站資料來移除。"
       },
       "thirdParty": {
         "title": "第三方服務",
-        "p1": "應用程式只與一小組固定的服務通訊(另外也由我們的 Content-Security-Policy 在技術上強制執行):",
-        "supabase": "Supabase(資料庫、驗證、檔案儲存)— 歐盟區域 eu-central-1(法蘭克福);代表我們處理你的帳號與應用程式資料。",
-        "vercel": "Vercel Inc.(主機代管、CDN)— 提供靜態應用程式。",
-        "google": "Google 登入(Google Ireland Limited / Google LLC)— 僅在你選擇使用 Google 登入時;詳情請見「使用 Google 登入」一節。",
-        "posthog": "PostHog(產品分析與錯誤診斷)— 歐盟雲端;請求會經由本網站自己的位址(/ingest)。僅在你同意後才會擷取使用事件、頁面載入時間、無效點擊與熱點圖,以及錯誤。發生錯誤的工作階段會被錄製以供重播,且所有輸入內容皆已遮蔽。若你已登入,PostHog 會看到一個假名 ID(你帳號 ID 的加鹽雜湊)與你的角色(viewer、collaborator 或 admin)— 絕不會看到你的電子郵件地址或姓名。",
-        "posthogServer": "PostHog(伺服器端)— 我們自己的伺服器函式會將其錯誤與執行時間回報給 PostHog(歐盟雲端),不含 IP 位址、使用者 ID 或內容。這與你的同意無關,因為不涉及個人資料。桌面應用程式以相同方式轉送其當機報告(以及,若你在應用程式中允許,使用次數)— 僅綁定預先雜湊的安裝識別碼,絕不綁定你的帳號。",
-        "fonts": "Google Fonts — 字型檔案從 Google 伺服器載入;Google 可能會看到你的 IP 位址。",
-        "rsiMedia": "Verse 新聞中的圖片部分直接從 Roberts Space Industries 的伺服器載入(media.robertsspaceindustries.com、theverse.robertsspaceindustries.com)— 載入時 RSI 會看到你的 IP 位址。",
-        "gameApis": "公開的 Star Citizen 資料:status.robertsspaceindustries.com 與 api.star-citizen.wiki(僅供讀取,不會傳送任何帳號資料)。"
+        "p1": "應用程式只與一小組固定的服務通訊（另外也由我們的 Content-Security-Policy 在技術上強制執行）：",
+        "supabase": "Supabase（資料庫、驗證、檔案儲存）— 歐盟區域 eu-central-1（法蘭克福）；代表我們處理你的帳號與應用程式資料。",
+        "vercel": "Vercel Inc.（主機代管、CDN）— 提供靜態應用程式。",
+        "google": "Google 登入（Google Ireland Limited / Google LLC）— 僅在你選擇使用 Google 登入時；詳情請見「使用 Google 登入」一節。",
+        "posthog": "PostHog（產品分析與錯誤診斷）— 歐盟雲端；請求會經由本網站自己的位址（/ingest）。僅在你同意後才會擷取使用事件、頁面載入時間、無效點擊與熱點圖，以及錯誤。發生錯誤的工作階段會被錄製以供重播，且所有輸入內容皆已遮蔽。若你已登入，PostHog 會看到一個假名 ID（你帳號 ID 的加鹽雜湊）與你的角色（檢視者、協作者或管理員）— 絕不會看到你的電子郵件地址或姓名。",
+        "posthogServer": "PostHog（伺服器端）— 我們自己的伺服器函式會將其錯誤與執行時間回報給 PostHog（歐盟雲端），不含 IP 位址、使用者 ID 或內容。這與你的同意無關，因為不涉及個人資料。桌面應用程式以相同方式轉送其當機報告（以及，若你在應用程式中允許，使用次數）— 僅綁定預先雜湊的安裝識別碼，絕不綁定你的帳號。",
+        "fonts": "Google Fonts — 字型檔案從 Google 伺服器載入；Google 可能會看到你的 IP 位址。",
+        "rsiMedia": "Verse 新聞中的圖片部分直接從 Roberts Space Industries 的伺服器載入（media.robertsspaceindustries.com、theverse.robertsspaceindustries.com）— 載入時 RSI 會看到你的 IP 位址。",
+        "gameApis": "公開的 Star Citizen 資料：status.robertsspaceindustries.com 與 api.star-citizen.wiki（僅供讀取，不會傳送任何帳號資料）。"
       },
       "rights": {
         "title": "你的權利",
-        "p1": "依據 GDPR,你對自己的個人資料享有查閱、更正、刪除、限制處理、資料可攜與反對的權利。你也可以向資料保護主管機關提出申訴。",
-        "p2": "你的帳號可以被完全刪除:移除驗證紀錄時,個人資料、機庫、Loadout、草稿與上傳內容也會透過資料庫串聯一併移除。目前刪除由管理員執行 — 設定中的刪除按鈕僅對具有 admin 角色的帳號有效。請透過網站聲明中的聯絡管道提出申請;申請會儘速處理。",
-        "p3": "你可以隨時在設定中撤回對偏好設定儲存與統計的同意;撤回會立即刪除受影響的本機項目,並向後生效 — 在此之前處理的合法性不受影響。"
+        "p1": "依據 GDPR，你對自己的個人資料享有查閱、更正、刪除、限制處理、資料可攜與反對的權利。你也可以向資料保護主管機關提出申訴。",
+        "p2": "你的帳號可以被完全刪除：移除驗證紀錄時，個人資料、機庫、配裝、草稿與上傳內容也會透過資料庫串聯一併移除。目前刪除由管理員執行 — 設定中的刪除按鈕僅對具有 管理員角色的帳號有效。請透過網站聲明中的聯絡管道提出申請；申請會儘速處理。",
+        "p3": "你可以隨時在設定中撤回對偏好設定儲存與統計的同意；撤回會立即刪除受影響的本機項目，並向後生效 — 在此之前處理的合法性不受影響。"
       },
       "social": {
         "title": "朋友與可見度",
-        "p1": "朋友是你透過邀請或個人邀請連結而連結的帳號;邀請連結會過期,你也可以撤銷。在你們是朋友期間,他們預設可以看到你的機庫、你的旗艦、你是否在線上,以及 Social 頁面上的比較數字(例如你使用 Verse Companion 的頻率)。你可以在 Social 頁面的可見度彈出視窗中,針對全部或單一朋友關閉其中每一項。",
-        "p2": "為此,user_presence 資料表會為每個帳號儲存你上次造訪的時間,以及過去 30 天的活動遮罩(每天是否活躍)— 不包含瀏覽記錄。「線上」指的是在最近幾分鐘內被看到。",
-        "p3": "群組(例如 org 或小隊)是你自己的私人清單:成員看不到群組,也看不到其名稱。行動(Einsätze)、Loadout 與艦船變體只有你明確分享的對象才看得到。結束一段友誼會立即終止所有可見度。"
+        "p1": "朋友是你透過邀請或個人邀請連結而連結的帳號；邀請連結會過期，你也可以撤銷。在你們是朋友期間，他們預設可以看到你的機庫、你的旗艦、你是否在線上，以及社群頁面上的比較數字（例如你使用 Verse Companion 的頻率）。你可以在社群頁面的可見度彈出視窗中，針對全部或單一朋友關閉其中每一項。",
+        "p2": "為此，user_presence 資料表會為每個帳號儲存你上次造訪的時間，以及過去 30 天的活動遮罩（每天是否活躍）— 不包含瀏覽記錄。「線上」指的是在最近幾分鐘內被看到。",
+        "p3": "群組（例如 org 或小隊）是你自己的私人清單：成員看不到群組，也看不到其名稱。行動、配裝 與艦船變體只有你明確分享的對象才看得到。結束一段友誼會立即終止所有可見度。"
       }
     },
     "imprint": {
       "title": "網站聲明",
       "operator": {
         "title": "經營者",
-        "p1": "Verse Companion(versecompanion-alpha.vercel.app)是一個非商業性的開放原始碼社群專案。由 StarOrga 組織及其在 GitHub 上的貢獻者維護。",
-        "p2": "本專案沒有任何收入:沒有廣告、沒有付費功能、沒有贊助。"
+        "p1": "Verse Companion（versecompanion-alpha.vercel.app）是一個非商業性的開放原始碼社群專案。由 StarOrga 組織及其在 GitHub 上的貢獻者維護。",
+        "p2": "本專案沒有任何收入：沒有廣告、沒有付費功能、沒有贊助。"
       },
       "contact": {
         "title": "聯絡方式",
@@ -4976,8 +4982,8 @@
       },
       "liability": {
         "title": "內容與連結的責任",
-        "p1": "本網站的內容皆經審慎製作;然而,對於正確性、完整性或時效性不提供任何保證。Codex 中顯示的遊戲資料由社群擷取,可能與正式運行的遊戲有所出入。",
-        "p2": "外部連結指向我們無法控制的第三方內容;連結當時未發現任何違法情事。若我們得知有違規,將移除受影響的連結。"
+        "p1": "本網站的內容皆經審慎製作；然而，對於正確性、完整性或時效性不提供任何保證。Codex 中顯示的遊戲資料由社群擷取，可能與正式運行的遊戲有所出入。",
+        "p2": "外部連結指向我們無法控制的第三方內容；連結當時未發現任何違法情事。若我們得知有違規，將移除受影響的連結。"
       },
       "trademark": {
         "title": "商標",
@@ -5639,11 +5645,11 @@
   "feedbackSpot": {
     "headline": "標題",
     "titled": "{{label}}「{{text}}」",
-    "insert": "插入參照:{{line}}",
+    "insert": "插入參照：{{line}}",
     "details": "詳細資料"
   },
   "feedbackCapture": {
-    "hint": "管理員提示:Alt+點擊(或在連結以外處按 Ctrl+點擊)可將點擊的元素作為參照 — 即使面板已關閉。",
+    "hint": "管理員提示：Alt+點擊（或在連結以外處按 Ctrl+點擊）可將點擊的元素作為參照 — 即使面板已關閉。",
     "element": "{{role}}「{{name}}」",
     "role": {
       "link": "連結",
@@ -5676,11 +5682,11 @@
   },
   "releaseNotes": {
     "title": "新功能",
-    "subtitle": "每次發佈的新消息與改進。",
+    "subtitle": "每次發布的新消息與改進。",
     "current": "目前",
     "loading": "正在載入版本說明…",
     "empty": "尚無版本說明。",
-    "loadMore": "載入更多({{count}})",
+    "loadMore": "載入更多（{{count}}）",
     "cat": {
       "added": "新增",
       "changed": "變更",
@@ -5694,7 +5700,7 @@
   },
   "extension": {
     "promo": {
-      "text": "已經購買艦隊了嗎?瀏覽器擴充功能可以直接從你的 RSI 機庫匯入你的艦船。",
+      "text": "已經購買艦隊了嗎？瀏覽器擴充功能可以直接從你的 RSI 機庫匯入你的艦船。",
       "cta": "運作方式",
       "dismiss": "隱藏此提示"
     },
@@ -5702,46 +5708,46 @@
       "gameContentOnly": "此擴充功能僅讀取個人化的遊戲內容 — 也就是你自己 RSI 機庫頁面上的艦船名稱。不會收集任何個人資料。",
       "noCredentials": "不會讀取任何憑證、Cookie 或工作階段權杖。",
       "noPersonalData": "不會讀取帳號名稱、電子郵件地址、Pledge 價值或訂單資料。",
-      "noUpload": "不會向任何伺服器傳送資料。艦船清單會在你的瀏覽器內傳遞給此應用程式,並且只有在你確認後才會寫入你的帳號。",
+      "noUpload": "不會向任何伺服器傳送資料。艦船清單會在你的瀏覽器內傳遞給此應用程式，並且只有在你確認後才會寫入你的帳號。",
       "scopeLimited": "此擴充功能僅在你自己的 RSI 機庫頁面和 Verse Companion 上啟用 — 其他地方一律不啟用。",
       "localOnly": "僅會在你的瀏覽器本機儲存你艦隊的校驗碼和上次匯入的時間。"
     },
     "install": {
       "title": "機庫匯入 — 瀏覽器擴充功能",
-      "subtitle": "Verse Companion 無法自行讀取 robertsspaceindustries.com:瀏覽器禁止一個網站讀取另一個網站。小型瀏覽器擴充功能可以讀取你目前已開啟的機庫頁面 — 並將艦船清單傳遞到這裡的機庫。",
+      "subtitle": "Verse Companion 無法自行讀取 robertsspaceindustries.com：瀏覽器禁止一個網站讀取另一個網站。小型瀏覽器擴充功能可以讀取你目前已開啟的機庫頁面 — 並將艦船清單傳遞到這裡的機庫。",
       "detected": {
         "title": "已偵測到擴充功能",
-        "text": "此瀏覽器已安裝該擴充功能。登入後開啟你在 RSI 的機庫,當你的艦隊是新的或有變更時,它會提供匯入選項。",
+        "text": "此瀏覽器已安裝該擴充功能。登入後開啟你在 RSI 的機庫，當你的艦隊是新的或有變更時，它會提供匯入選項。",
         "openHangar": "開啟我的 RSI 機庫"
       },
       "what": {
         "title": "功能說明",
-        "text": "三個步驟,最後一步由你確認。",
+        "text": "三個步驟，最後一步由你確認。",
         "open": {
           "title": "你開啟自己在 RSI 的機庫",
-          "text": "已登入,並位於你的 Pledges 頁面。擴充功能在其他任何地方都不會執行任何動作。"
+          "text": "已登入，並位於你的 Pledges 頁面。擴充功能在其他任何地方都不會執行任何動作。"
         },
         "offer": {
           "title": "它會提供匯入 — 僅在有新內容時",
-          "text": "你的艦隊會被簡化為一個校驗碼。機庫沒有變動就不會有任何提示。購買了新艦船或收到贈送?提示會自動再次出現。"
+          "text": "你的艦隊會被簡化為一個校驗碼。機庫沒有變動就不會有任何提示。購買了新艦船或收到贈送？提示會自動再次出現。"
         },
         "confirm": {
           "title": "你在此確認",
-          "text": "艦船清單會在 Verse Companion 中開啟,每個項目都清楚可見。只有你勾選的列才會寫入你的機庫。"
+          "text": "艦船清單會在 Verse Companion 中開啟，每個項目都清楚可見。只有你勾選的列才會寫入你的機庫。"
         }
       },
       "privacy": {
         "title": "會讀取什麼 — 以及不會讀取什麼",
-        "openSource": "此擴充功能屬於本專案的開放儲存庫:你在安裝前就可以閱讀它執行的每一行程式碼。",
+        "openSource": "此擴充功能屬於本專案的開放儲存庫：你在安裝前就可以閱讀它執行的每一行程式碼。",
         "sourceLink": "GitHub 上的擴充功能原始碼",
         "appPrivacyLink": "本應用程式的隱私權政策"
       },
       "how": {
         "title": "安裝",
-        "storeNote": "Chrome 線上應用程式商店的上架項目仍在審核中,因此目前需要手動載入擴充功能。Chrome、Edge、Brave 和 Opera 都支援此方式。",
+        "storeNote": "Chrome 線上應用程式商店的上架項目仍在審核中，因此目前需要手動載入擴充功能。Chrome、Edge、Brave 和 Opera 都支援此方式。",
         "download": {
           "title": "下載擴充功能",
-          "text": "ZIP 檔只包含擴充功能,沒有其他內容 — 沒有儲存庫,也沒有應用程式。解壓縮後只會得到一個資料夾:sc-hangar-extension。"
+          "text": "ZIP 檔只包含擴充功能，沒有其他內容 — 沒有儲存庫，也沒有應用程式。解壓縮後只會得到一個資料夾：sc-hangar-extension。"
         },
         "devmode": {
           "title": "開啟 chrome://extensions 並啟用開發人員模式",
@@ -5749,49 +5755,49 @@
         },
         "load": {
           "title": "載入未封裝項目",
-          "text": "點擊「載入未封裝項目」,然後選取解壓縮後的 sc-hangar-extension 資料夾。"
+          "text": "點擊「載入未封裝項目」，然後選取解壓縮後的 sc-hangar-extension 資料夾。"
         },
         "use": {
           "title": "開啟你的 RSI 機庫",
           "text": "登入 RSI 並開啟你的 Pledges 頁面 — 匯入提示會顯示在右下角。"
         },
-        "downloadCta": "下載擴充功能(ZIP)",
+        "downloadCta": "下載擴充功能（ZIP）",
         "browseCta": "檢視原始碼",
-        "buildNote": "GitHub Actions 會在每次變更時,依據該原始碼自動重新建置此 ZIP — 檔案相同、資料夾相同 — 因此你可以將下載內容與開放原始碼進行比對。",
-        "browsers": "目前僅支援 Chromium 系瀏覽器(Chrome、Edge、Brave、Opera、Vivaldi)。之後可能會推出 Firefox 版本。"
+        "buildNote": "GitHub Actions 會在每次變更時，依據該原始碼自動重新建置此 ZIP — 檔案相同、資料夾相同 — 因此你可以將下載內容與開放原始碼進行比對。",
+        "browsers": "目前僅支援 Chromium 系瀏覽器（Chrome、Edge、Brave、Opera、Vivaldi）。之後可能會推出 Firefox 版本。"
       },
       "alt": {
-        "title": "沒有擴充功能?改用檔案匯入",
-        "text": "你的機庫頁面也接受以 Hangar Transfer Format 格式、由你自行產生的 JSON 匯出檔。相同的檢視畫面,相同的規則。",
+        "title": "沒有擴充功能？改用檔案匯入",
+        "text": "你的機庫頁面也接受以 Hangar Transfer Format 格式、由你自行產生的 JSON 匯出檔。相同的檢視畫面，相同的規則。",
         "cta": "前往我的機庫"
       },
-      "disclaimer": "Verse Companion 是非官方的粉絲專案,與 Cloud Imperium 集團旗下公司無任何關聯。此擴充功能未獲 RSI 認可。"
+      "disclaimer": "Verse Companion 是非官方的粉絲專案，與 Cloud Imperium 集團旗下公司無任何關聯。此擴充功能未獲 RSI 認可。"
     },
     "importPage": {
       "title": "從你的 RSI 機庫匯入艦船",
-      "subtitle": "瀏覽器擴充功能已讀取你機庫頁面上的艦船清單。請在下方檢查 — 在你確認之前,不會有任何內容寫入你的機庫。",
+      "subtitle": "瀏覽器擴充功能已讀取你機庫頁面上的艦船清單。請在下方檢查 — 在你確認之前，不會有任何內容寫入你的機庫。",
       "waiting": "正在等待瀏覽器擴充功能…",
       "review": "檢查並確認",
       "cancel": "取消並捨棄清單",
       "meta": {
         "source": "來源",
-        "sourceValue": "你的 RSI 機庫頁面(在你的瀏覽器中讀取)",
+        "sourceValue": "你的 RSI 機庫頁面（在你的瀏覽器中讀取）",
         "ships": "找到的艦船",
         "captured": "讀取時間"
       },
       "empty": {
         "title": "沒有待處理的艦船清單",
-        "text": "此頁面由機庫匯入瀏覽器擴充功能開啟。可能是尚未安裝該擴充功能,或是其清單已被使用或已過期。請重新開啟你的 RSI 機庫以開始新的匯入。",
+        "text": "此頁面由機庫匯入瀏覽器擴充功能開啟。可能是尚未安裝該擴充功能，或是其清單已被使用或已過期。請重新開啟你的 RSI 機庫以開始新的匯入。",
         "installLink": "關於擴充功能",
         "hangarLink": "前往我的機庫"
       },
       "done": {
         "title": "已匯入 {{count}} 艘艦船",
-        "text": "擴充功能已知道目前的狀態,因此在你的機庫再次真正變動之前,它都不會提示。",
+        "text": "擴充功能已知道目前的狀態，因此在你的機庫再次真正變動之前，它都不會提示。",
         "hangarLink": "開啟我的機庫"
       }
     },
-    "hangarHint": "不想處理檔案?瀏覽器擴充功能可直接從你的 RSI 機庫匯入 →"
+    "hangarHint": "不想處理檔案？瀏覽器擴充功能可直接從你的 RSI 機庫匯入 →"
   },
   "consent": {
     "banner": {
@@ -5822,7 +5828,7 @@
   },
   "starscape": {
     "title": "Starscape",
-    "subtitle": "來自 Cloud Imperium Games 的高解析度美術作品,直接連結至原始來源。",
+    "subtitle": "來自 Cloud Imperium Games 的高解析度美術作品，直接連結至原始來源。",
     "subtitleAppPre": "使用 ",
     "subtitleAppLink": "Starscape 應用程式",
     "subtitleAppPost": "即可將其設為你的桌面背景。",
@@ -5834,7 +5840,7 @@
       "top": "社群熱門",
       "sammlung": "收藏",
       "sammlungSignedOut": "登入以檢視你的收藏",
-      "emptySammlung": "你的收藏還是空的。給圖片按個讚,它就會出現在這裡。"
+      "emptySammlung": "你的收藏還是空的。給圖片按個讚，它就會出現在這裡。"
     },
     "lightboxAria": "桌布",
     "source": {
@@ -5843,15 +5849,15 @@
     "vote": {
       "add": "按讚",
       "remove": "收回讚",
-      "signedOut": "登入後才能評分",
+      "signedOut": "登入後即可投票",
       "totalNone": "尚無票數",
-      "totalOne": "共 1 票(所有使用者)",
-      "total": "共 {{count}} 票(所有使用者)",
+      "totalOne": "共 1 票（所有使用者）",
+      "total": "共 {{count}} 票（所有使用者）",
       "mine": "包含你的投票"
     },
     "top": {
       "label": "僅顯示前 {{count}} 名",
-      "hint": "所有使用者評價最高的前 {{count}} 張桌布。每個讚旁邊的數字是所有使用者的總票數。在評分較少時,最新的圖片會填補剩餘的位置。",
+      "hint": "所有使用者評價最高的前 {{count}} 張桌布。每個讚旁邊的數字是所有使用者的總票數。在評分較少時，最新的圖片會填補剩餘的位置。",
       "loading": "正在載入精選…"
     },
     "empty": "目前還沒有桌布。新的美術作品會自動顯示在這裡。",
@@ -5874,14 +5880,14 @@
       "failed": "無法複製連結"
     },
     "close": "關閉",
-    "attribution": "所有圖片 © Cloud Imperium Games — 直接由 RSI CDN 提供,並附上來源 Comm-Link 的連結。粉絲圖庫,不轉售,不重新代管。",
+    "attribution": "所有圖片 © Cloud Imperium Games — 直接由 RSI CDN 提供，並附上來源 Comm-Link 的連結。粉絲圖庫，不轉售，不重新代管。",
     "appTitle": "Starscape 應用程式",
-    "appDesc": "讓你的桌面輪播 Starscape — 小巧的系統匣應用程式,支援預先載入、淡入淡出轉場和一鍵開機自動啟動。",
-    "appNote": "僅支援 Windows · 約 0.3 MB · 未簽署(SmartScreen:更多資訊 → 仍要執行)",
-    "appAutoUpdate": "在背景自動靜默更新;版本狀態顯示在系統匣選單中。",
+    "appDesc": "讓你的桌面輪播 Starscape — 小巧的系統匣應用程式，支援預先載入、淡入淡出轉場和一鍵開機自動啟動。",
+    "appNote": "僅支援 Windows · 約 0.3 MB · 未簽署（SmartScreen：更多資訊 → 仍要執行）",
+    "appAutoUpdate": "在背景自動靜默更新；版本狀態顯示在系統匣選單中。",
     "promo": {
       "eyebrow": "桌面版 Starscape",
-      "title": "你的桌面,直播自 Verse",
+      "title": "來自 Verse 的即時桌面",
       "desc": "這個小巧的系統匣應用程式會在你的桌面上輪播這些桌布 — 包含柔和的淡入淡出轉場和開機自動啟動。",
       "cta": "下載 Windows 版",
       "note": "僅支援 Windows · 約 0.3 MB · 隨時可從系統匣選單結束",
@@ -5895,10 +5901,10 @@
   "userFeedback": {
     "title": "回饋",
     "open": "傳送回饋",
-    "intro": "你缺少什麼、什麼讓你困擾、你會怎麼改?在這裡寫下來 — 內容會直接送達團隊。",
-    "placeholder": "你的回饋…(支援 Markdown 和螢幕截圖)",
+    "intro": "你缺少什麼、什麼讓你困擾、你會怎麼改？在這裡寫下來 — 內容會直接送達團隊。",
+    "placeholder": "你的回饋…（支援 Markdown 和螢幕截圖）",
     "send": "傳送回饋",
-    "sent": "謝謝!你的回饋已送達。",
+    "sent": "謝謝！你的回饋已送達。",
     "privacyHint": "你的名字對團隊可見。稍後你可以在這裡看到後續處理結果。",
     "errorTitle": "錯誤",
     "uploadError": "無法上傳圖片。",
@@ -5917,11 +5923,11 @@
     "impersonationBlocked": "預覽其他角色時無法傳送——這會以你自己的帳號將真實回饋提交到管理員收件匣。",
     "withdraw": {
       "action": "撤回",
-      "hint": "在尚無人處理或回覆之前,你都可以再次刪除你的回饋。",
-      "question": "確定永久刪除?此操作無法復原。",
-      "confirm": "是,刪除",
+      "hint": "在尚無人處理或回覆之前，你都可以再次刪除你的回饋。",
+      "question": "確定永久刪除？此操作無法復原。",
+      "confirm": "是，刪除",
       "cancel": "取消",
-      "refused": "太遲了——此主題已在處理中,它會保留在你的清單中。"
+      "refused": "太遲了——此主題已在處理中，它會保留在你的清單中。"
     },
     "tab": {
       "compose": "傳送回饋",
@@ -5933,15 +5939,15 @@
       "done": "已實作",
       "declined": "未實作"
     },
-    "imageHint": "圖片僅作為參考資料:截圖中的文字只會用來了解你的問題,絕不會當作指令執行。這裡只能附加圖片。",
+    "imageHint": "圖片僅作為參考資料：截圖中的文字只會用來了解你的問題，絕不會當作指令執行。這裡只能附加圖片。",
     "viewInApp": "在應用程式中查看"
   },
   "feedbackArea": {
     "aria": "選擇回饋的範圍",
-    "label": "範圍:",
-    "news": "Verse News",
+    "label": "範圍：",
+    "news": "Verse 新聞",
     "codex": "Codex",
-    "hangar": "Hangar",
+    "hangar": "機庫",
     "starscape": "Starscape",
     "desktop": "桌面應用程式",
     "settings": "設定",
@@ -5952,12 +5958,12 @@
     "label": "附件",
     "image": "附件",
     "enlarge": "放大圖片",
-    "enlargeNamed": "放大圖片:{{name}}",
+    "enlargeNamed": "放大圖片：{{name}}",
     "remove": "移除圖片",
     "prev": "上一張圖片",
     "next": "下一張圖片",
-    "counter": "第 {{i}} 張,共 {{n}} 張",
-    "openFile": "開啟檔案:{{name}}",
+    "counter": "第 {{i}} 張，共 {{n}} 張",
+    "openFile": "開啟檔案：{{name}}",
     "addImage": "附加圖片",
     "addFile": "附加圖片或檔案",
     "capture": "擷取此頁面的螢幕截圖",
@@ -6021,7 +6027,7 @@
     },
     "blocked": {
       "title": "已封鎖",
-      "hint": "被封鎖的帳號無法看到你,也無法向你傳送邀請。"
+      "hint": "被封鎖的帳號無法看到你，也無法向你傳送邀請。"
     },
     "actions": {
       "accept": "接受",
@@ -6043,8 +6049,8 @@
         "inappropriate": "不當內容",
         "other": "其他"
       },
-      "reason": "說明(選填)",
-      "reasonPlaceholder": "發生了什麼事?",
+      "reason": "說明（選填）",
+      "reasonPlaceholder": "發生了什麼事？",
       "submit": "送出檢舉",
       "cancel": "取消"
     },
@@ -6061,7 +6067,7 @@
       "reportDuplicate": "你已經檢舉過此帳號。"
     },
     "error": {
-      "generic": "操作未成功,請再試一次。",
+      "generic": "操作未成功，請再試一次。",
       "blocked": "無法執行此操作。",
       "userNotFound": "找不到帳號。",
       "requestNotFound": "此邀請已不存在。",
@@ -6069,7 +6075,7 @@
       "invalidCategory": "無效的檢舉類別。",
       "reasonTooLong": "說明過長。",
       "noRelation": "你只能檢舉與你有過互動的帳號。",
-      "reportLimit": "你有太多未結案的檢舉,請等待審核完成。",
+      "reportLimit": "你有太多未結案的檢舉，請等待審核完成。",
       "notApproved": "你的帳號尚未通過審核。",
       "requestExpired": "此邀請已過期。",
       "accountSuspended": "你的帳號已被停權。"
@@ -6114,8 +6120,8 @@
     "label": "分享連結",
     "copied": "連結已複製",
     "failed": "不允許複製",
-    "title": "分享套組",
-    "hint": "與好友分享此套組,或透過連結分享。",
+    "title": "分享套裝",
+    "hint": "與好友分享此套裝，或透過連結分享。",
     "loading": "載入中…",
     "revoke": "取消分享",
     "friends": {
@@ -6124,12 +6130,12 @@
       "pick": "選擇好友…",
       "share": "分享",
       "noFriends": "你還沒有新增任何好友。",
-      "allShared": "你所有的好友都已擁有此套組。",
+      "allShared": "你所有的好友都已擁有此套裝。",
       "toSocial": "前往社群頁面新增好友"
     },
     "link": {
       "title": "公開連結",
-      "warning": "任何持有此連結的人都能查看此套組——不需要帳號。連結只會顯示名稱、角色與裝備,不含其他內容。",
+      "warning": "任何持有此連結的人都能查看此套裝——不需要帳號。連結只會顯示名稱、角色與裝備，不含其他內容。",
       "create": "建立連結",
       "copy": "複製",
       "copied": "已複製",
@@ -6140,43 +6146,43 @@
     },
     "sharedWithMe": {
       "title": "好友分享給我的",
-      "hint": "好友與你分享的套組,僅供檢視。",
+      "hint": "好友與你分享的套裝，僅供檢視。",
       "show": "顯示裝備",
       "hide": "隱藏"
     },
     "view": {
-      "eyebrow": "共享套組",
+      "eyebrow": "已分享的套裝",
       "loading": "載入中…",
       "by": "來自 {{name}}",
-      "updated": "上次更改:{{date}}",
-      "emptyLoadout": "此套組尚未加入任何內容。",
-      "footnote": "僅供檢視,只有擁有者可以更改。",
+      "updated": "上次更改：{{date}}",
+      "emptyLoadout": "此套裝尚未加入任何內容。",
+      "footnote": "僅供檢視，只有擁有者可以更改。",
       "aboutCta": "什麼是 Verse Companion?",
       "unavailable": {
-        "title": "此套組無法使用",
+        "title": "此套裝無法使用",
         "body": "連結無效或已被停用。"
       }
     },
     "flash": {
-      "shared": "已分享套組。",
-      "alreadyShared": "該好友已擁有此套組。",
+      "shared": "已分享套裝。",
+      "alreadyShared": "該好友已擁有此套裝。",
       "linkCreated": "已建立連結。",
       "revoked": "已取消分享。",
       "groupShared": "已與目前的群組成員分享。"
     },
     "error": {
       "notFriends": "你們已不再是好友。",
-      "loadoutNotFound": "找不到套組。",
+      "loadoutNotFound": "找不到套裝。",
       "shareNotFound": "此分享已不存在。",
       "suspended": "你的帳號已被停權。",
       "invalidTarget": "無效的選擇。",
       "notApproved": "你的帳號尚未通過審核。",
-      "generic": "操作未成功,請再試一次。"
+      "generic": "操作未成功，請再試一次。"
     },
     "groups": {
       "pick": "選擇群組…",
       "share": "與群組分享",
-      "hint": "套組會傳送給目前在群組中的成員,之後加入的人不會收到。"
+      "hint": "套裝會傳送給目前在群組中的成員，之後加入的人不會收到。"
     }
   },
   "conceptPage": {
@@ -6235,49 +6241,49 @@
       "fit": "適應地圖",
       "legend": "圖例",
       "legendAria": "顯示與隱藏操作",
-      "shared": "{{place}} 同時也服務於行動「{{name}}」",
-      "open": "地點開放"
+      "shared": "{{place}} 也用於行動「{{name}}」",
+      "open": "地點尚未完成"
     },
     "slots": {
       "aria": "行動欄位",
-      "finished": "完成",
+      "finished": "已完成",
       "einsaetze": "{{n}} 個任務",
       "einsatzOne": "1 個任務",
       "delete": "刪除「{{name}}」",
       "newAria": "在欄位 {{n}} 建立新行動",
       "free": "欄位 {{n}}",
       "archive": "封存",
-      "archiveAria": "封存,{{n}} 個行動",
+      "archiveAria": "封存，{{n}} 個行動",
       "introTitle": "尚無行動",
-      "introText": "點一下加號來建立行動:一組有目標的任務。你可以把願望指派給它,願望仍然是願望。任務則在「現在」中一步步完成。",
+      "introText": "點一下加號來建立行動：一組有目標的任務。你可以把願望指派給它，願望仍然是願望。任務則在「現在」中一步步完成。",
       "newAriaEvent": "在欄位 {{n}} 建立新行動 – 有活動可用"
     },
     "remove": {
-      "titleRemove": "要刪除「{{name}}」嗎?",
-      "titleEmpty": "要清空「{{name}}」嗎?",
-      "msgRemove": "此行動將被移除。未完成項目:{{n}}。",
-      "msgEmpty": "行動會保留,其未完成項目將被移出。未完成項目:{{n}}。",
+      "titleRemove": "要刪除「{{name}}」嗎？",
+      "titleEmpty": "要清空「{{name}}」嗎？",
+      "msgRemove": "此行動將被移除。未完成項目：{{n}}。",
+      "msgEmpty": "行動會保留，其未完成項目將被移出。未完成項目：{{n}}。",
       "back": "願望會保留在願望清單",
       "backOn": "行動中的願望會保留在你的願望清單中並恢復為未指派。其他未完成項目會加入為願望。",
-      "backOff": "行動中的願望也會從你的願望清單中刪除;其他未完成項目將被捨棄。",
+      "backOff": "行動中的願望也會從你的願望清單中刪除；其他未完成項目將被捨棄。",
       "confirmRemove": "刪除",
       "confirmEmpty": "清空"
     },
     "archive": {
-      "slotFree": "有空位,你可以把行動取回來。",
+      "slotFree": "有空位，你可以把行動取回來。",
       "empty": "封存中還沒有東西。完成的行動會自動移到這裡並釋出其欄位。",
       "reactivate": "重新啟用",
       "remove": "刪除",
       "removeAria": "刪除行動「{{name}}」",
-      "removeTitle": "要刪除「{{name}}」嗎?",
-      "removeMsg": "此行動位於封存中,只包含已完成的內容。它將被刪除。你的願望清單和七個欄位保持不變。",
+      "removeTitle": "要刪除「{{name}}」嗎？",
+      "removeMsg": "此行動位於封存中，只包含已完成的內容。它將被刪除。你的願望清單和七個欄位保持不變。",
       "removeConfirm": "刪除",
       "close": "關閉"
     },
     "flow": {
       "titleNew": "新行動",
       "titleEdit": "編輯行動",
-      "slotOf": "第 {{n}} 欄,共 {{max}} 欄",
+      "slotOf": "欄位 {{n}} / {{max}}",
       "stepsAria": "步驟",
       "step": {
         "1": "選擇",
@@ -6302,27 +6308,27 @@
       "removeLine": "將「{{name}}」移出行動",
       "einsaetze": "任務",
       "einsatzCount": "{{n}} 個任務 · {{s}} 個步驟",
-      "noNewLines": "沒有新項目,因此沒有新任務。",
+      "noNewLines": "沒有新項目，因此沒有新任務。",
       "noLines": "尚未選擇任何項目。",
-      "matsTitle": "你要如何取得材料?",
+      "matsTitle": "你要如何取得材料？",
       "methodOf": "取得 {{name}} 的方式",
       "splitOf": "{{name}} 的分配",
-      "lessBuy": "少買一點,多採一點",
-      "moreBuy": "多買一點,少採一點",
-      "splitHint": "購買和採集可以分開:左邊是購買的數量,右邊是採集的數量。",
-      "itemsTitle": "你要如何取得物品?",
+      "lessBuy": "少買一點，多採一點",
+      "moreBuy": "多買一點，少採一點",
+      "splitHint": "購買和採集可以分開：左邊是購買的數量，右邊是採集的數量。",
+      "itemsTitle": "你要如何取得物品？",
       "modeOf": "取得 {{name}} 的方式",
-      "modeHint": "在已知有商人的地方購買,在已知有藍圖的地方製作。可逐行更改。",
+      "modeHint": "在已知有商人的地方購買，在已知有藍圖的地方製作。可逐行更改。",
       "leaveOut": "將 {{name}} 移出任務",
       "leftOut": "已移出任務",
       "putBack": "放回",
-      "placeIs": "地點:{{place}}",
-      "noMerchant": "未知商人,因此尚無購買步驟。",
+      "placeIs": "地點：{{place}}",
+      "noMerchant": "未知商人，因此尚無購買步驟。",
       "openCodex": "在 Codex 中開啟",
       "setPlace": "設定地點",
       "setPlaceOf": "{{name}} 的地點",
       "stepsCount": "{{n}} 個步驟",
-      "craftLast": "最後進行,需要其他步驟的成果",
+      "craftLast": "最後進行，需要其他步驟的成果",
       "gets": "你會獲得",
       "purpose": "{{names}} 的材料",
       "haveEinsaetze": "已規劃",
@@ -6337,31 +6343,31 @@
       "search": {
         "label": "更多願望相關",
         "placeholder": "搜尋物品、艦船或材料",
-        "searching": "搜尋中 …",
+        "searching": "搜尋中…",
         "none": "找不到任何結果。",
         "results": "搜尋結果",
         "onList": "在你的願望中",
         "add": "加入願望",
         "addAria": "將「{{name}}」加入你的願望",
-        "addFailed": "無法加入你的願望,請再試一次。"
+        "addFailed": "無法加入你的願望，請再試一次。"
       },
       "craft": {
         "aria": "製作 {{name}} 所需的東西",
         "forItem": "用於 {{name}}",
-        "bpOwned": "藍圖 {{name}}:在你的收藏中",
-        "bpMissing": "藍圖 {{name}}:缺少,已規劃任務",
-        "matOwned": "{{name}}:需要 {{need}},倉庫中有 {{have}}",
-        "matMissing": "{{name}}:需要 {{need}},倉庫中有 {{have}},還需取得 {{missing}}",
+        "bpOwned": "藍圖 {{name}}：在你的收藏中",
+        "bpMissing": "藍圖 {{name}}：缺少，已規劃任務",
+        "matOwned": "{{name}}：需要 {{need}}，倉庫中有 {{have}}",
+        "matMissing": "{{name}}：需要 {{need}}，倉庫中有 {{have}}，還需取得 {{missing}}",
         "noRecipe": "此配方的材料尚屬未知。",
-        "source": "應用程式會自動將藍圖和材料回報到你的收藏與庫存;在此之前,以那裡列出的為準。",
-        "loading": "正在載入配方 …"
+        "source": "應用程式會自動將藍圖和材料回報到你的收藏與庫存；在此之前，以那裡列出的為準。",
+        "loading": "正在載入配方…"
       }
     },
     "panel": {
       "plain": {
         "one": "有 1 個項目還不是願望。",
         "other": "有 {{count}} 個項目還不是願望。",
-        "ask": "建立於改版之前。要將它們列為你願望清單中的願望嗎?",
+        "ask": "建立於改版之前。要將它們列為你願望清單中的願望嗎？",
         "adopt": "列為願望",
         "keep": "保持原樣"
       },
@@ -6370,7 +6376,7 @@
       "positions": "項目",
       "edit": "編輯",
       "noEinsaetze": "此行動還沒有任務。",
-      "noEinsaetzeHint": "項目會轉換為任務:購買、採集、任務,最後是製作。",
+      "noEinsaetzeHint": "項目會轉換為任務：購買、採集、任務，最後是製作。",
       "proposeEinsaetze": "建議任務",
       "einsaetze": "任務",
       "stepsTotal": "{{n}} 個步驟",
@@ -6382,17 +6388,17 @@
     "run": {
       "aria": "「現在」所執行的行動",
       "for": "用於",
-      "stepOf": "第 {{n}} 步,共 {{total}} 步",
+      "stepOf": "第 {{n}} 步，共 {{total}} 步",
       "switch": "切換行動",
       "emptyTitle": "沒有進行中的行動",
       "toPlanen": "前往規劃",
       "finish": "步驟完成",
-      "sharedStop": "此地點同時服務於「{{name}}」。",
+      "sharedStop": "此地點也用於「{{name}}」。",
       "doneKicker": "全部完成",
       "allDone": "此任務的所有步驟都已完成。",
-      "allDoneHint": "請選擇該行動的其他任務,或切換行動。",
+      "allDoneHint": "請選擇該行動的其他任務，或切換行動。",
       "einsaetze": "此行動的任務",
-      "archived": "已完成:此行動位於封存中,其任務仍會在這裡繼續執行。可在 規劃 › 封存 下重新啟用。"
+      "archived": "已完成：此行動位於封存中，其任務仍會在這裡繼續執行。可在「規劃 › 封存」下重新啟用。"
     },
     "ticker": {
       "none": "尚無事件",
@@ -6416,7 +6422,7 @@
       "search": "搜尋你的倉庫",
       "menu": "頁面選單",
       "reset": "重設遊戲內倉庫",
-      "resetTitle": "要重設遊戲內倉庫嗎?",
+      "resetTitle": "要重設遊戲內倉庫嗎？",
       "resetMessage": "遊戲或搜尋所寫入的所有地點都會被移除。你手動建立的項目會保留。此操作無法復原。",
       "resetConfirm": "重設",
       "filter": "篩選你的倉庫",
@@ -6433,23 +6439,23 @@
       "origin": {
         "pledge": "Pledge",
         "ingame": "遊戲內",
-        "loan": "借用艦"
+        "loan": "借用艦船"
       },
       "blueprint": "藍圖",
       "ruf": "聲望",
       "rufEmptyTitle": "尚無資料來源",
-      "rufEmptyText": "當應用程式回報你的聲望,或你手動輸入後就會顯示。",
+      "rufEmptyText": "當應用程式回報你的聲望，或你手動輸入後就會顯示。",
       "pager": "頁數",
-      "range": "第 {{from}}–{{to}} 項,共 {{total}} 項",
+      "range": "第 {{from}}–{{to}} 項，共 {{total}} 項",
       "prev": "上一頁",
       "next": "下一頁",
-      "hintWish": "在你的願望中:{{n}}",
+      "hintWish": "在你的願望中：{{n}}",
       "hintNachschub": "在行動「{{name}}」中",
       "bpPick": {
-        "hint": "請從 Codex 中選擇,這樣材料與 Codex 頁面才會相符。",
+        "hint": "請從 Codex 中選擇，這樣材料與 Codex 頁面才會相符。",
         "label": "搜尋藍圖",
         "placeholder": "例如 Arrowhead",
-        "searching": "搜尋中 …",
+        "searching": "搜尋中…",
         "none": "找不到藍圖。",
         "results": "找到的藍圖",
         "owned": "已在收藏中",
@@ -6462,11 +6468,11 @@
           "deck": "總覽",
           "table": "表格"
         },
-        "import": "匯入 …",
+        "import": "匯入…",
         "kindAria": "類型",
         "subAria": "{{kind}} 詳細",
         "kind": {
-          "materials": "原料",
+          "materials": "材料",
           "weapons": "武器",
           "armor": "護甲",
           "other": "其他",
@@ -6488,12 +6494,12 @@
           "heavy": "重型武器",
           "melee": "近戰",
           "throwable": "投擲物",
-          "gadget": "裝置",
+          "gadget": "小工具",
           "other": "其他"
         },
         "placeAria": "地點",
         "allPlaces": "所有地點",
-        "placeSearch": "尋找地點 …",
+        "placeSearch": "尋找地點…",
         "otherPlaces": "其他地點",
         "reserved": "已預留",
         "scrapOnly": "可拆解",
@@ -6501,9 +6507,9 @@
         "origin": {
           "pledge": "Pledge",
           "ingame": "遊戲內",
-          "loan": "借用船"
+          "loan": "借用艦船"
         },
-        "roleAria": "角色定位",
+        "roleAria": "定位",
         "allRoles": "所有定位",
         "role": {
           "combat": "戰鬥",
@@ -6526,44 +6532,44 @@
         "resetFilters": "重設篩選",
         "hits": "{{n}} 個結果",
         "baysAria": "依地點顯示裝卸區",
-        "byQuality": "{{name}}(依品質)",
+        "byQuality": "{{name}}（依品質）",
         "resSummary": "{{n}} 個地點共 {{qty}} 件",
         "toWishlist": "加入願望清單",
-        "bandTip": "Q {{from}}–{{to}}:{{qty}} 件,其中 {{res}} 件已預留",
+        "bandTip": "Q {{from}}–{{to}}:{{qty}} 件，其中 {{res}} 件已預留",
         "qUnknown": "Q ?",
         "qUnknownLong": "品質未知",
         "reservedN": "已預留 {{n}} 件",
-        "reservedAny": "已預留 {{n}} 件(任意品質)",
+        "reservedAny": "已預留 {{n}} 件（任意品質）",
         "scrap": {
           "yes": "可拆解",
           "no": "不可拆解",
-          "unknown": "拆解:未知"
+          "unknown": "拆解：未知"
         },
         "noHits": "找不到「{{q}}」的結果",
         "fewHits": "「{{q}}」只有 {{n}} 個結果",
         "alt": {
-          "elsewhere": "在別處:{{place}} 有 {{qty}} 件 {{name}}",
+          "elsewhere": "在別處：{{place}} 有 {{qty}} 件 {{name}}",
           "free": "{{n}} 件可用",
           "wish": "將 {{name}} 加入願望並規劃",
           "wishQ": "將 {{name}} Q ≥ {{q}} 加入願望並規劃",
           "wishGo": "加入願望並規劃",
-          "swap": "替代品:{{place}} 的 {{name}},{{qty}} 件",
+          "swap": "替代品：{{place}} 的 {{name}},{{qty}} 件",
           "swapWhy": "相同欄位",
           "craft": "自行製作"
         },
         "pickup": "規劃取貨",
         "alsoIn": "倉庫中也有",
-        "inCodex": "在圖鑑中:「{{q}}」– 加入願望清單",
+        "inCodex": "在 Codex 中：「{{q}}」– 加入願望清單",
         "setItems": "{{n}} 件",
-        "addSet": "建立套組",
-        "setName": "套組名稱",
+        "addSet": "建立套裝",
+        "setName": "套裝名稱",
         "emptyInv": "尚未存放任何物品。",
         "emptyInvSecond": "用應用程式讀取",
         "emptyFiltered": "此篩選條件下沒有任何物品。",
-        "emptyHangar": "機庫中還沒有船艦。",
+        "emptyHangar": "機庫中還沒有艦船。",
         "emptyHangarSecond": "取得 RSI 機庫",
         "emptySammlung": "尚未收集任何藍圖。",
-        "emptySammlungSecond": "瀏覽圖鑑",
+        "emptySammlungSecond": "瀏覽 Codex",
         "emptyArt": {
           "news": "已收藏 {{n}} 則新聞。",
           "gallery": "已收藏 {{n}} 張圖片。"
@@ -6572,14 +6578,14 @@
           "news": "前往新聞",
           "gallery": "前往圖庫"
         },
-        "log": "載入記錄",
+        "log": "裝載記錄",
         "changes": "最近的變更",
         "everything": "全部",
         "more": "全部 {{n}} 項變更",
         "less": "收合",
-        "reorder": "補訂購 ({{n}})",
+        "reorder": "補訂購（{{n}}）",
         "logEmpty": "尚無變更。",
-        "variants": "{{n}} 個版本",
+        "variants": "{{n}} 個變體",
         "inSpace": "太空中",
         "selAria": "選取",
         "selected": "已選取 {{n}} 項",
@@ -6588,21 +6594,21 @@
         "delete": "刪除",
         "clearSel": "取消選取",
         "reserveTitle": "預留",
-        "reserveLabel": "為誰或為了什麼?",
+        "reserveLabel": "為誰或為了什麼？",
         "reserveNeedsNote": "預留需要填寫用途。",
-        "codexTier": "圖鑑中也有",
+        "codexTier": "Codex 中也有",
         "onWishlist": "在你的願望清單中",
         "rsv": {
           "title": "預留",
           "titleEdit": "編輯預留",
           "existing": "此容器上的預留",
-          "for": "為誰?",
-          "friend": "朋友",
-          "noFriend": "沒有朋友",
-          "allFriends": "所有朋友",
+          "for": "為誰？",
+          "friend": "好友",
+          "noFriend": "沒有好友",
+          "allFriends": "所有好友",
           "byFriend": "預留給",
           "note": "或輸入文字",
-          "notePlaceholder": "例如:組隊行動、出售",
+          "notePlaceholder": "例如：組隊飛行、出售",
           "amount": "數量",
           "of": "共 {{free}} 件可用",
           "amountBad": "介於 0 到 {{free}} 之間。",
@@ -6611,17 +6617,17 @@
           "expiry": "自動釋放於",
           "until": "至 {{date}}",
           "multi": "預留 {{n}} 個容器中各自的可用數量。",
-          "notify": "你的朋友會在他那邊看到這筆預留。",
+          "notify": "你的好友會在他那邊看到這筆預留。",
           "edit": "編輯預留",
           "release": "釋放",
           "handout": "已交出",
-          "handoutTitle": "標記為已交出?",
+          "handoutTitle": "標記為已交出？",
           "handoutMessage": "{{n}} 件將離開你的倉庫。",
           "newOne": "新增預留",
           "saveEdit": "儲存",
           "editFor": "{{name}} 的預留"
         },
-        "deleteTitle": "刪除項目?",
+        "deleteTitle": "刪除項目？",
         "deleteMessage": "{{n}} 個項目將從倉庫中移除。",
         "deleteOne": "刪除 {{name}}",
         "editAmount": "{{name}} 的數量",
@@ -6637,7 +6643,7 @@
       }
     },
     "nachschub": {
-      "slotsFull": "7 個 Operation 欄位已全部使用。請完成或刪除一個以空出欄位。",
+      "slotsFull": "7 個行動欄位已全部使用。請完成或刪除一個以空出欄位。",
       "nothingPicked": "請至少從願望清單中選擇一件物品。",
       "sellGoalInvalid": "請輸入至少 1 aUEC 的目標。",
       "target": {
@@ -6650,37 +6656,37 @@
         },
         "lead": "來自倉庫的 {{n}} 件物品",
         "where": "目的地",
-        "new": "新增 Operation",
-        "newSell": "新增 Operation:賺錢",
+        "new": "新增行動",
+        "newSell": "新增行動：賺錢",
         "append": "加入「{{name}}」",
-        "goal": "目標(aUEC)",
+        "goal": "目標（aUEC）",
         "goalPlaceholder": "例如 1,500,000",
-        "create": "建立 Operation",
+        "create": "建立行動",
         "add": "新增",
         "sellName": "賺錢",
         "scu": "SCU",
         "pcs": "件",
-        "route": "{{n}} 個地點,數量多的優先",
+        "route": "{{n}} 個地點，數量多的優先",
         "up": "將 {{place}} 上移",
         "down": "將 {{place}} 下移",
         "einsatzOne": "取貨 {{name}}",
         "einsatzMany": "取貨"
       },
       "sellForm": {
-        "kindAria": "這個 Operation 的目的是什麼?",
+        "kindAria": "這個行動的目的是什麼？",
         "wish": "來自你的願望清單",
         "sell": "賺錢",
-        "goal": "目標(aUEC)",
+        "goal": "目標（aUEC）",
         "goalPlaceholder": "例如 1,500,000",
         "pickHint": "從倉庫選擇要出售的物品。",
-        "empty": "你的倉庫是空的,目前沒有可出售的物品。",
+        "empty": "你的倉庫是空的，目前沒有可出售的物品。",
         "pick": "出售 {{place}} 的 {{name}}"
       },
       "sell": {
         "title": "賺錢",
         "progress": "{{earned}} / {{goal}} aUEC",
         "reached": "目標已達成",
-        "earned": "目前已賺取(aUEC)",
+        "earned": "目前已賺取（aUEC）",
         "save": "儲存",
         "lines": "待出售"
       },
@@ -6689,11 +6695,11 @@
         "route": "已完成 {{done}} / {{n}} 站",
         "tick": "已從 {{place}} 取貨"
       },
-      "dayName": "庫存日期 {{date}}",
-      "newEinsatz": "新增行動",
+      "dayName": "{{date}} 的補給",
+      "newEinsatz": "新增任務",
       "act": {
         "buy": "購買 {{label}}",
-        "mission": "任務:{{label}}",
+        "mission": "任務：{{label}}",
         "mine": "採集 {{label}}",
         "refine": "精煉 {{label}}",
         "craft": "製作 {{label}}",
@@ -6703,43 +6709,43 @@
       "done": {
         "created": "已建立「{{name}}」。",
         "undone": "已復原。",
-        "reactivated": "Operation 已重新啟用。",
+        "reactivated": "行動已重新啟用。",
         "plainAdopted": "{{count}} 個項目現已加入你的願望清單。",
         "plainKept": "{{count}} 個項目維持原狀。",
-        "emptied": "Operation 已清空。",
-        "removed": "Operation 已刪除。",
-        "added": "已加入 Operation。",
+        "emptied": "行動已清空。",
+        "removed": "行動已刪除。",
+        "added": "已加入行動。",
         "lineRemoved": "項目已移除。",
-        "edited": "Operation 已儲存。",
+        "edited": "行動已儲存。",
         "wishRemoved": "已從願望清單移除 {{count}} × {{name}}。",
-        "released": "已將 {{name}} 從 Operation 中移除。"
+        "released": "已將 {{name}} 從行動中移除。"
       },
       "rec": {
         "reason": {
-          "sameSet": "與 {{item}} 同一套組",
+          "sameSet": "與 {{item}} 同一套裝",
           "magazineFor": "{{item}} 的彈匣",
           "weaponFor": "{{item}} 的武器",
           "fitsPort": "適用於 {{item}} 的 S{{size}} 欄位",
           "ingredientFor": "{{item}} 的材料",
           "usedIn": "{{item}} 所需",
-          "sameMaker": "同一製造商:{{maker}}",
+          "sameMaker": "同一製造商：{{maker}}",
           "sameSizeClass": "搭配 {{item}} 的 S{{size}}",
-          "otherSignal": "{{item}} 的 {{signal}} 對應品 (S{{size}})",
+          "otherSignal": "{{item}} 的 {{signal}} 對應品（S{{size}}）",
           "pairsWith": "補足 {{item}}",
           "paintFor": "{{item}} 的塗裝",
           "sameMaterial": "與 {{item}} 相同材質",
-          "sameShop": "同一商店:{{place}}",
-          "samePlace": "同一地點:{{place}}",
-          "sameActivity": "相同活動:{{activity}}"
+          "sameShop": "同一商店：{{place}}",
+          "samePlace": "同一地點：{{place}}",
+          "sameActivity": "相同活動：{{activity}}"
         },
         "via": {
           "craft": "製作",
           "buy": "購買"
         }
       },
-      "linesFull": "你的 Operation 已滿(100 個項目)。請先移除部分項目,才能再指派更多。",
-      "partial": "有 {{count}} 個項目未移動:你的 Operation 已滿。",
-      "wishlistFailed": "無法變更你的願望,未移動任何項目。",
+      "linesFull": "你的行動已滿（100 個項目）。請先移除部分項目，才能再指派更多。",
+      "partial": "有 {{count}} 個項目未移動：你的行動已滿。",
+      "wishlistFailed": "無法變更你的願望，未移動任何項目。",
       "plainGone": "這些項目已在另一台裝置上處理過。畫面正在更新。",
       "wishCapped": "{{count}} 件已無法再放進你的願望清單（每個項目最多 999 件），將會遺失。",
       "gone": "此行動已不存在（已在其他裝置上刪除）。檢視畫面正在重新整理。",
@@ -6790,7 +6796,7 @@
       "got": "已取得",
       "place": {
         "title": "現在放在哪裡？",
-        "other": "其他地點 …",
+        "other": "其他地點…",
         "otherPlaceholder": "輸入地點",
         "store": "放下",
         "tickOnly": "僅勾選"
@@ -6799,7 +6805,7 @@
     "spots": {
       "title": "據點",
       "subtitle": "你在桌面應用程式中儲存的地點。可在此重新命名或刪除；應用程式會在下次同步時套用變更。",
-      "loading": "正在載入你的據點 …",
+      "loading": "正在載入你的據點…",
       "empty": "目前還沒有據點。據點需在桌面應用程式中建立（Verse Navigation）；同步後就會顯示在這裡。",
       "retry": "重試",
       "nameLabel": "據點名稱",
@@ -6819,8 +6825,8 @@
     },
     "overview": {
       "activeShip": "使用中的艦船",
-      "activeVariant": "使用中的型號",
-      "noVariant": "原廠配置",
+      "activeVariant": "使用中的變體",
+      "noVariant": "原廠配裝",
       "activeSet": "使用中的套裝",
       "nextOps": "接下來的任務",
       "suppliesPreview": "行動",
@@ -6832,27 +6838,27 @@
       "noSet": "尚未建立任何套裝。",
       "setupHangar": "設定機庫",
       "createSet": "建立套裝",
-      "openCodex": "在圖鑑中檢視",
+      "openCodex": "在 Codex 中檢視",
       "recentShips": "最近選擇的艦船",
       "recentSets": "最近選擇的套裝",
       "loadFailed": "無法載入你的 HQ。",
       "fleetPatch": {
-        "title": "你的艦隊在此次更新中的變化",
+        "title": "本版本中你的艦隊",
         "soon": "即將推出",
         "mock": "你有 3 艘艦船在 4.3.1 中被調整",
-        "hint": "預覽：不久後你就能在這裡看到目前的更新動了你的哪些艦船。"
+        "hint": "預覽：不久後你就能在這裡看到目前的版本動了你的哪些艦船。"
       }
     },
     "locker": {
       "title": "套裝",
       "subtitle": "你為各種角色準備的 FPS 套裝。",
       "details": "詳細資料",
-      "detailsAria": "在圖鑑中查看 {{name}} 的詳細資料"
+      "detailsAria": "在 Codex 中查看 {{name}} 的詳細資料"
     },
     "pages": {
       "start": "首頁",
       "planen": "規劃",
-      "jetzt": "目前",
+      "jetzt": "現在",
       "inventar": "倉庫",
       "statistik": "統計",
       "empty": "{{page}}：這裡正在打造全新內容。"
@@ -6864,13 +6870,13 @@
     "start": {
       "kicker": "你的 HQ",
       "title": "總部",
-      "loading": "載入中 …",
+      "loading": "載入中…",
       "retry": "重試",
       "patch": {
         "eyebrow": "{{plan}} · {{build}} 新增",
-        "eyebrowPlan": "{{plan}} · 本次更新新增",
+        "eyebrowPlan": "{{plan}} · 本版本新增",
         "eyebrowBuild": "{{build}} 新增",
-        "eyebrowPlain": "本次更新新增",
+        "eyebrowPlain": "本版本新增",
         "weaker": "{{name}} 弱化 {{pct}}%。",
         "stronger": "{{name}} 強化 {{pct}}%。"
       },
@@ -6892,15 +6898,15 @@
         "noneHint": "遊戲中的即時狀態。",
         "last": "最後出現：{{place}}，{{ago}}。",
         "lastTime": "最後出現：{{ago}}。",
-        "nextTip": "你第一個已規劃部署的下一個步驟。",
+        "nextTip": "你第一個已規劃任務的下一個步驟。",
         "step": {
           "buy": "購買 {{label}}",
           "mission": "任務：{{label}}",
-          "mine": "開採 {{label}}",
+          "mine": "採集 {{label}}",
           "refine": "精煉 {{label}}",
           "craft": "製作 {{label}}",
           "transport": "運送 {{label}}",
-          "pickup": "領取 {{label}}",
+          "pickup": "取貨 {{label}}",
           "event": "活動：{{label}}"
         }
       },
@@ -6924,11 +6930,11 @@
       "kind": {
         "buy": "購買",
         "mission": "任務",
-        "mine": "開採",
+        "mine": "採集",
         "refine": "精煉",
         "craft": "製作",
         "transport": "運送",
-        "pickup": "領取",
+        "pickup": "取貨",
         "event": "活動"
       },
       "state": {
@@ -6984,7 +6990,7 @@
       }
     },
     "now": {
-      "loading": "正在載入你的遊戲狀態 …",
+      "loading": "正在載入你的遊戲狀態…",
       "retry": "重試",
       "connect": {
         "hint": "應用程式會將你的位置與動作即時回報到這裡。",
@@ -7024,7 +7030,7 @@
       },
       "path": {
         "title": "你的路線",
-        "empty": "目前沒有進行中的行動。請在「規劃」中安排一個。"
+        "empty": "目前沒有進行中的任務。請在「規劃」中安排一個。"
       },
       "missions": {
         "tooltip": "遊戲中進行中的任務",
@@ -7063,35 +7069,35 @@
         "confirm": "新增",
         "kindAria": "你要做什麼",
         "what": {
-          "buy": "你要買什麼?",
-          "mission": "你想獲得什麼?",
-          "mine": "你要開採什麼?",
-          "pickup": "你要取什麼?"
+          "buy": "你要買什麼？",
+          "mission": "你想獲得什麼？",
+          "mine": "你要採集什麼？",
+          "pickup": "你要取回什麼？"
         },
         "whatPh": {
-          "buy": "例如:Medpen",
-          "mission": "例如:P4-AR 藍圖",
-          "mine": "例如:Quantanium",
-          "pickup": "例如:從機庫取貨"
+          "buy": "例如：Medpen",
+          "mission": "例如：P4-AR 藍圖",
+          "mine": "例如：Quantanium",
+          "pickup": "例如：機庫中的貨物"
         },
-        "where": "在哪裡?",
-        "whereOptional": "在哪裡?(選填)",
+        "where": "在哪裡？",
+        "whereOptional": "在哪裡？（選填）",
         "wherePh": "選擇地點",
         "qty": "數量"
       },
       "rename": {
-        "action": "重新命名行動「{{name}}」",
-        "aria": "行動的新名稱",
+        "action": "重新命名任務「{{name}}」",
+        "aria": "任務的新名稱",
         "empty": "名稱不能為空。"
       },
       "noneYet": {
-        "title": "「{{name}}」還沒有任何行動",
-        "hint": "在「規劃」中根據項目建議行動,或自行新增一個。"
+        "title": "「{{name}}」還沒有任何任務",
+        "hint": "在「規劃」中根據項目建議任務，或自行新增一個。"
       }
     },
     "activity": {
       "kopfgeld": "懸賞",
-      "bunker": "Bunker",
+      "bunker": "地堡",
       "medizin": "醫療",
       "rennen": "競速",
       "bergbau": "採礦",
@@ -7137,23 +7143,23 @@
           "col2": "失敗或中止"
         },
         "deaths": {
-          "name": "死亡 / Claims",
-          "sub": "死亡 / Claims",
-          "hint": "虛線:Claims,實線:死亡。",
+          "name": "死亡／理賠",
+          "sub": "死亡／理賠",
+          "hint": "虛線：理賠，實線：死亡。",
           "col": "死亡",
-          "col2": "Claims"
+          "col2": "理賠"
         },
         "crimestat": {
-          "name": "Crimestat",
+          "name": "犯罪等級",
           "sub": "上升次數",
-          "hint": "你的 Crimestat 上升的次數。",
+          "hint": "你的犯罪等級上升的次數。",
           "col": "上升次數"
         },
         "refinery": {
           "name": "精煉廠",
-          "sub": "已完成的運行",
-          "hint": "已完成的精煉廠運行。",
-          "col": "運行"
+          "sub": "已完成的精煉作業",
+          "hint": "已完成的精煉作業。",
+          "col": "作業"
         },
         "blueprints": {
           "name": "藍圖",
@@ -7178,8 +7184,8 @@
       "preview": {
         "stamp": "預覽",
         "title": "你的統計資料會在這裡累積",
-        "text": "當應用程式在你遊玩時同步讀取,就會呈現如下畫面:aUEC、任務、完成率、死亡、Crimestat、精煉廠、藍圖、罰款與燃料警告。背景中的方塊為範例資料。",
-        "textLinked": "應用程式已連線。開始遊玩後,aUEC、任務、死亡、Crimestat、精煉廠、藍圖、罰款與燃料警告就會逐漸填入。背景中的方塊為範例資料。"
+        "text": "當應用程式在你遊玩時同步讀取，就會呈現如下畫面：aUEC、任務、完成率、死亡、犯罪等級、精煉廠、藍圖、罰款與燃料警告。背景中的方塊為範例資料。",
+        "textLinked": "應用程式已連線。開始遊玩後，aUEC、任務、死亡、犯罪等級、精煉廠、藍圖、罰款與燃料警告就會逐漸填入。背景中的方塊為範例資料。"
       },
       "events": {
         "title": "已完成的活動",
@@ -7188,11 +7194,11 @@
     },
     "stock": {
       "free": "在我這裡",
-      "sharedBtn": "朋友分享的({{n}})",
+      "sharedBtn": "好友分享的（{{n}}）",
       "captured": "已加入你的庫存。",
       "actions": {
         "browse": "瀏覽",
-        "find": "在哪裡有…?",
+        "find": "在哪裡有…？",
         "add": "新增"
       },
       "totals": {
@@ -7221,7 +7227,7 @@
         "modes": "你想做什麼",
         "mode": {
           "browse": "瀏覽",
-          "find": "在哪裡有…?",
+          "find": "在哪裡有…？",
           "add": "新增"
         },
         "search": "搜尋庫存",
@@ -7246,16 +7252,16 @@
         "onWishlist": "加入願望清單"
       },
       "retry": "重試",
-      "destroyed": "上次被摧毀:{{at}}",
+      "destroyed": "上次被摧毀：{{at}}",
       "ships": {
         "title": "艦船",
         "count": "機庫中有 {{n}} 艘",
         "noFavourites": "尚未設定旗艦。"
       },
       "sets": {
-        "title": "套組",
-        "ship": "{{n}} 個艦船 Loadout",
-        "fps": "{{n}} 個 FPS 套組"
+        "title": "套裝",
+        "ship": "{{n}} 個艦船配裝",
+        "fps": "{{n}} 個 FPS 套裝"
       },
       "earned": {
         "title": "已獲得",
@@ -7268,53 +7274,53 @@
         "days": "上次開啟於 {{n}} 天前"
       },
       "desk": {
-        "open": "登記:{{name}}",
-        "addOne": "存入 1 個:{{name}}",
-        "takeOne": "取出 1 個:{{name}}",
+        "open": "登記：{{name}}",
+        "addOne": "存入 1 個：{{name}}",
+        "takeOne": "取出 1 個：{{name}}",
         "availShort": "{{free}} 可用 · {{reserved}} 已預留",
         "amount": "數量",
         "in": "存入",
         "out": "取出",
         "set": "設定數量",
         "for": "預留給",
-        "forHint": "例如:玩家 X 或出售",
+        "forHint": "例如：玩家 X 或出售",
         "reserve": "預留",
         "reservations": "預留項目",
-        "handOut": "已發出",
+        "handOut": "已交出",
         "release": "釋放",
         "delete": "從清單中刪除",
-        "deleteTitle": "要刪除「{{name}}」嗎?",
+        "deleteTitle": "要刪除「{{name}}」嗎？",
         "deleteText": "此項目將連同其預留一併從這個地點移除。",
         "emptyTitle": "「{{name}}」將變為空",
-        "emptyText": "之後這裡不會再有任何此物品:該項目將從清單中移除。",
+        "emptyText": "之後這裡不會再有任何此物品：該項目將從清單中移除。",
         "emptyConfirm": "取出並刪除",
         "cutTitle": "少於已預留數量",
         "cutText": "{{reserved}} {{unit}} 已被預留。最新的預留將縮減至新的數量。"
       },
       "lager": {
-        "empty": "你的庫存目前還沒有任何東西。一旦有了,你就可以在這裡搜尋它放在哪裡。",
-        "emptyHow": "物品是這樣進來的:當你在遊戲中開啟庫存時,應用程式會讀取它。或者透過「新增」手動登記。",
+        "empty": "你的庫存目前還沒有任何東西。一旦有了，你就可以在這裡搜尋它放在哪裡。",
+        "emptyHow": "物品是這樣進來的：當你在遊戲中開啟庫存時，應用程式會讀取它。或者透過「新增」手動登記。",
         "storage": "機庫終端機中的艦船"
       },
       "find": {
-        "title": "在哪裡有…?",
+        "title": "在哪裡有…？",
         "item": "物品或原料",
-        "itemHint": "例如:Quantanium",
-        "want": "要多少?",
+        "itemHint": "例如：Quantanium",
+        "want": "要多少？",
         "unit": "單位",
         "sort": "排序方式",
         "nearest": "最近",
         "most": "最多",
         "yours": "你的庫存",
         "here": "你在 {{place}}",
-        "whereAmI": "你現在在哪裡?",
-        "unknownHere": "沒有你的位置資訊,我們會依數量排序。請啟動應用程式或選擇地點。",
-        "prompt": "輸入你要找的東西,下方會顯示它放在哪裡。",
-        "noHit": "你的庫存中沒有這些東西。也許在另一種單位裡?",
+        "whereAmI": "你現在在哪裡？",
+        "unknownHere": "沒有你的位置資訊，我們會依數量排序。請啟動應用程式或選擇地點。",
+        "prompt": "輸入你要找的東西，下方會顯示它放在哪裡。",
+        "noHit": "你的庫存中沒有這些東西。也許在另一種單位裡？",
         "take": "取 {{n}}",
-        "summaryOne": "足夠:同一地點就有 {{want}} {{unit}}。",
-        "summaryMany": "合計足夠:共 {{want}} {{unit}},來自 {{stops}} 個地點。",
-        "summaryShort": "不足:庫存中只有 {{total}},需要 {{want}} {{unit}}。",
+        "summaryOne": "足夠：同一地點就有 {{want}} {{unit}}。",
+        "summaryMany": "合計足夠：共 {{want}} {{unit}}，來自 {{stops}} 個地點。",
+        "summaryShort": "不足：庫存中只有 {{total}}，需要 {{want}} {{unit}}。",
         "summaryTotal": "庫存中有 {{total}} {{unit}}。",
         "pcsUnit": "個",
         "tier": {
@@ -7327,11 +7333,11 @@
       },
       "capture": {
         "subKind": "子類型",
-        "subNone": "其他(無子類型)",
+        "subNone": "其他（無子類型）",
         "title": "將物品放入庫存",
         "item": "物品或原料",
-        "itemHint": "例如:Quantanium",
-        "locationHint": "例如:Area 18",
+        "itemHint": "例如：Quantanium",
+        "locationHint": "例如：Area 18",
         "qty": "數量",
         "unit": "單位",
         "pcs": "件",
@@ -7353,22 +7359,22 @@
       "launch": "啟動應用程式",
       "launchNow": "立即啟動",
       "starting": "正在啟動應用程式…",
-      "started": "應用程式正在啟動。在那裡登入後,你的資料就會傳到這裡。",
-      "downloading": "找不到應用程式:下載已開始(約 500 MB)。完成後請執行安裝程式。",
+      "started": "應用程式正在啟動。在那裡登入後，你的資料就會傳到這裡。",
+      "downloading": "找不到應用程式：下載已開始（約 500 MB）。完成後請執行安裝程式。",
       "noResponse": "應用程式沒有回應。如果它已在執行就沒問題——否則請手動啟動或重新下載。",
-      "retry": "已經安裝了?再次啟動",
+      "retry": "已經安裝了？再次啟動",
       "download": "下載應用程式",
       "downloadCta": "下載應用程式",
-      "downloadStarted": "下載進行中(約 500 MB)。完成後請執行安裝程式。",
-      "tipDownload": "直接下載安裝程式。如果應用程式已安裝,請先啟動一次:一連線後,你就可以從這裡啟動它。你隨時可以在右上角的「應用程式」中再次找到它。",
-      "tipLaunch": "在你的電腦上開啟應用程式。如果它沒有回應,就會開始下載。你隨時可以在右上角的「應用程式」中再次找到它。",
+      "downloadStarted": "下載進行中（約 500 MB）。完成後請執行安裝程式。",
+      "tipDownload": "直接下載安裝程式。如果應用程式已安裝，請先啟動一次：一連線後，你就可以從這裡啟動它。你隨時可以在右上角的「應用程式」中再次找到它。",
+      "tipLaunch": "在你的電腦上開啟應用程式。如果它沒有回應，就會開始下載。你隨時可以在右上角的「應用程式」中再次找到它。",
       "close": "關閉"
     },
     "friends": {
       "share": {
-        "open": "與朋友分享",
-        "hint": "僅供檢視。若是群組,之後加入的成員也會獲得存取權限。",
-        "setHint": "這個組合會分享給目前群組中的好友,之後加入的成員不會收到。",
+        "open": "與好友分享",
+        "hint": "僅供檢視。若是群組，之後加入的成員也會獲得存取權限。",
+        "setHint": "這個套裝會分享給目前群組中的好友，之後加入的成員不會收到。",
         "audience": "好友或群組",
         "choose": "選擇好友或群組",
         "send": "分享",
@@ -7401,8 +7407,8 @@
         "kindVariant": "變體 · {{ship}}"
       },
       "now": {
-        "online": "目前在線:",
-        "active": "目前進行中:{{title}} · {{n}} 人確認參加"
+        "online": "目前在線：",
+        "active": "目前進行中：{{title}} · {{n}} 人確認參加"
       }
     },
     "events": {
@@ -7412,7 +7418,7 @@
       "dot": "活動進行中",
       "end": {
         "official": "至 {{date}}",
-        "estimate": "最晚於 {{date}}(預估)",
+        "estimate": "最晚於 {{date}}（預估）",
         "unknown": "結束時間未知"
       },
       "pick": {
@@ -7421,11 +7427,11 @@
         "sightseeing": "無獎勵——作為觀光行動。"
       },
       "draft": {
-        "area": "使用活動區域,而非固定地點"
+        "area": "使用活動區域，而非固定地點"
       },
-      "severalHint": "單一行動中可包含多個活動,但不建議這樣做。",
+      "severalHint": "單一行動中可包含多個活動，但不建議這樣做。",
       "doneTag": "已完成",
-      "abort": "取消",
+      "abort": "中止",
       "complete": "活動已完成",
       "gone": "此活動已不再開放。",
       "area": {
@@ -7436,7 +7442,7 @@
         "ac": "Arena Commander"
       },
       "prereq": {
-        "title": "前置條件(預估)",
+        "title": "前置條件（預估）",
         "none": "未說明",
         "and": "且",
         "or": "或"
@@ -7456,7 +7462,7 @@
         "none": "此活動沒有進度。",
         "live": "即時",
         "tiers": "階段",
-        "appHint": "應用程式已連線,一旦在遊戲中偵測到進度就會自動更新。"
+        "appHint": "應用程式已連線，一旦在遊戲中偵測到進度就會自動更新。"
       },
       "rewards": {
         "title": "獎勵",
@@ -7476,24 +7482,24 @@
       },
       "claim": {
         "title": "領取 {{name}}",
-        "channel": "你是如何取得的?",
-        "byApp": "應用程式已偵測到取得管道,你可以自行更改。",
+        "channel": "你是如何取得的？",
+        "byApp": "應用程式已偵測到取得管道，你可以自行更改。",
         "store": "放入倉庫",
         "isShip": "是艦船",
         "toHangar": "將放入機庫。",
-        "toInventory": "將放入物品庫存(地點「Event-Belohnungen」)。",
+        "toInventory": "將放入物品庫存（地點「Event-Belohnungen」）。",
         "complete": "將整個活動標記為已完成",
         "confirm": "領取"
       },
       "offer": {
-        "area": "你正位於 {{event}} 的區域。要切換到此行動嗎?",
-        "ac": "Arena Commander 正在執行——符合 {{event}}。要切換到此行動嗎?",
+        "area": "你正位於 {{event}} 的區域。要切換到此行動嗎？",
+        "ac": "Arena Commander 正在執行——符合 {{event}}。要切換到此行動嗎？",
         "switch": "切換",
         "notNow": "暫時不要"
       },
       "abortDialog": {
-        "title": "要中止 {{name}} 嗎?",
-        "message": "進度會保留,也不會有任何東西退回願望清單。你可以隨時從封存中繼續此活動。"
+        "title": "要中止 {{name}} 嗎？",
+        "message": "進度會保留，也不會有任何東西退回願望清單。你可以隨時從封存中繼續此活動。"
       }
     },
     "appStatus": {
@@ -7510,15 +7516,15 @@
         "aria": "應用程式在此頁面的作用",
         "title": "使用應用程式時",
         "toggle": "應用程式在此頁面的作用",
-        "start": "有了這款應用程式,你可以在這裡即時看到自己所在位置、駕駛的飛船,以及接下來的行程。",
-        "inventar": "應用程式會從遊戲中讀取你的庫存與飛船,你不用手動輸入任何內容。",
-        "jetzt": "應用程式會回報你目前所在位置,並自動勾選完成的步驟:",
-        "planen": "當你的 Operation 中有項目送達時,應用程式會自動偵測並將其完成。",
-        "statistik": "應用程式會在你遊玩時同步統計:遊玩時間、遊戲場次、任務與損失。沒有它,此頁面將保持空白。",
+        "start": "有了這款應用程式，你可以在這裡即時看到自己所在位置、駕駛的艦船，以及接下來的行程。",
+        "inventar": "應用程式會從遊戲中讀取你的庫存與艦船，你不用手動輸入任何內容。",
+        "jetzt": "應用程式會回報你目前所在位置，並自動勾選完成的步驟：",
+        "planen": "當你的行動中有項目送達時，應用程式會自動偵測並將其完成。",
+        "statistik": "應用程式會在你遊玩時同步統計：遊玩時間、遊戲場次、任務與損失。沒有它，此頁面將保持空白。",
         "jetztList": {
-          "e1": "你的位置與飛船,例如「Stanton › New Babbage」。",
-          "e2": "你已規劃行程中的下一步,例如購買或前往某處。",
-          "e3": "最近的事件,例如「任務完成」或「量子躍遷結束」。"
+          "e1": "你的位置與艦船，例如「Stanton › New Babbage」。",
+          "e2": "你已規劃任務中的下一步，例如購買或前往某處。",
+          "e3": "最近的事件，例如「任務完成」或「量子躍遷結束」。"
         }
       }
     },
@@ -7526,13 +7532,13 @@
       "title": "日誌",
       "loading": "正在載入日誌…",
       "retry": "重試",
-      "empty": "尚無遊戲場次。連接 SCC App 後,每個場次都會以卡片形式顯示在這裡。",
+      "empty": "尚無遊戲場次。連接 SCC App 後，每個場次都會以卡片形式顯示在這裡。",
       "emptyLinked": "過去 30 天內沒有記錄到任何遊戲場次。",
       "jumps": "量子躍遷",
       "contracts": "合約",
       "auec": "aUEC 收支",
       "losses": "損失",
-      "lossesSub": "{{deaths}} 次死亡 · {{ships}} 艘飛船被摧毀 · {{claims}} 次保險理賠",
+      "lossesSub": "{{deaths}} 次死亡 · {{ships}} 艘艦船被摧毀 · {{claims}} 次保險理賠",
       "costs": {
         "label": "花費",
         "fines": {
@@ -7545,8 +7551,8 @@
           "other": "{{n}} 次受傷"
         },
         "medbeds": {
-          "one": "{{n}} 次 Medbed 治療",
-          "other": "{{n}} 次 Medbed 治療"
+          "one": "{{n}} 次醫療床治療",
+          "other": "{{n}} 次醫療床治療"
         },
         "claimRequests": {
           "one": "{{n}} 次保險申請",
@@ -7554,7 +7560,7 @@
         }
       },
       "end": {
-        "noQuit": "未正常結束(當機或應用程式被關閉)",
+        "noQuit": "未正常結束（當機或應用程式被關閉）",
         "live": "進行中"
       },
       "showAll": "顯示全部 {{n}} 個場次",
@@ -7793,68 +7799,68 @@
     "title": "星圖",
     "signedOut": "登入以查看你的星圖。",
     "signIn": "登入",
-    "loading": "正在載入星圖 …",
-    "empty": "此 Patch 尚無星圖。",
-    "stageAria": "Patch {{patch}} 的星圖",
+    "loading": "正在載入星圖…",
+    "empty": "此版本尚無星圖。",
+    "stageAria": "版本 {{patch}} 的星圖",
     "progress": "{{lit}} / {{total}} 顆星",
     "sun": {
       "faded": {
-        "aria": "太陽:黯淡",
-        "tip": "太陽已黯淡。請在下方將你的 Patch 預測設在 {{patch}} 上線 LIVE 的那天——誤差在 ±1 天內,太陽就會亮起。"
+        "aria": "太陽：黯淡",
+        "tip": "太陽已黯淡。請在下方將你的版本預測設在 {{patch}} 上線 LIVE 的那天——誤差在 ±1 天內，太陽就會亮起。"
       },
       "tipped": {
-        "aria": "太陽:已送出 Patch 預測,等待 LIVE 日",
-        "tip": "你的 Patch 預測已送出:太陽會微微發光,直到 {{patch}} 上線 LIVE。誤差在 ±1 天內,它就會亮起。"
+        "aria": "太陽：已送出版本預測，等待 LIVE 日",
+        "tip": "你的版本預測已送出：太陽會微微發光，直到 {{patch}} 上線 LIVE。誤差在 ±1 天內，它就會亮起。"
       },
       "hit": {
-        "aria": "太陽:已亮起",
-        "tip": "命中:你的 Patch 預測與 LIVE 日相差不超過 1 天,太陽已亮起。"
+        "aria": "太陽：已亮起",
+        "tip": "命中：你的版本預測與 LIVE 日相差不超過 1 天，太陽已亮起。"
       }
     },
     "export": {
-      "wallpaper": "下載桌布(4K)",
+      "wallpaper": "下載桌布（4K）",
       "failed": "無法建立桌布。請再試一次。"
     },
     "task": {
       "notes": {
         "title": "已閱讀重點摘要",
-        "how": "在 Patch News 中閱讀 Patch Notes 的重點。",
-        "link": "前往 Patch News"
+        "how": "在版本新聞中閱讀版本說明的重點。",
+        "link": "前往版本新聞"
       },
       "archive": {
         "title": "檔案庫發現",
-        "how": "在 Codex 中切換到較舊的 Patch,看看當時的內容。",
+        "how": "在 Codex 中切換到較舊的版本，看看當時的內容。",
         "link": "前往 Codex"
       },
       "loadout": {
-        "title": "機庫 Loadout",
-        "how": "在機庫中開啟你的一艘飛船,查看它的 Loadout。",
+        "title": "機庫配裝",
+        "how": "在機庫中開啟你的一艘艦船，查看它的配裝。",
         "link": "前往機庫"
       },
       "comet": {
-        "title": "已送出 Patch 預測",
-        "how": "在 Patch News 中預測 Patch 何時上線 LIVE。",
-        "link": "送出你的 Patch 預測"
+        "title": "已送出版本預測",
+        "how": "在版本新聞中預測版本何時上線 LIVE。",
+        "link": "送出你的版本預測"
       },
       "cxNewship": {
-        "title": "已查看新飛船",
-        "how": "在 Codex 中開啟該 Patch 最新的飛船。",
-        "link": "前往該飛船"
+        "title": "已查看新艦船",
+        "how": "在 Codex 中開啟該版本最新的艦船。",
+        "link": "前往該艦船"
       },
       "cxKeybinds": {
-        "title": "已檢查按鍵",
+        "title": "已檢查按鍵設定",
         "how": "在 Codex 中查看目前版本的按鍵設定。",
         "link": "前往按鍵設定"
       },
       "cxChanged": {
         "title": "發現變更",
-        "how": "在飛船的 Holotable 中比較兩個 Patch。",
+        "how": "在艦船的全息桌中比較兩個版本。",
         "link": "前往比較"
       },
       "cxBlueprint": {
-        "title": "已開啟 Blueprint",
-        "how": "在 Codex 中開啟一個 Blueprint。",
-        "link": "前往 Blueprints"
+        "title": "已開啟藍圖",
+        "how": "在 Codex 中開啟一個藍圖。",
+        "link": "前往藍圖"
       },
       "cxFps": {
         "title": "已查看 FPS 裝備",
@@ -7862,13 +7868,13 @@
         "link": "前往 FPS"
       },
       "cxLoadout": {
-        "title": "已儲存 Codex Loadout",
-        "how": "在 Codex 的飛船頁面儲存一個自訂 Loadout。",
-        "link": "建立 Loadout"
+        "title": "已儲存 Codex 配裝",
+        "how": "在 Codex 的艦船頁面儲存一個自訂配裝。",
+        "link": "建立配裝"
       },
       "cxGuess": {
         "title": "已辨識星圖",
-        "how": "在星圖上辨識出星圖形狀代表哪艘新飛船——只有一次機會。",
+        "how": "在星圖上辨識出星圖形狀代表哪艘新艦船——只有一次機會。",
         "link": "前往星圖"
       }
     },
@@ -7877,31 +7883,31 @@
       "locked": "累積 {{at}} 張點亮的星圖",
       "road": {
         "title": "星途",
-        "desc": "串連你跨越各個 Patch 的星圖。"
+        "desc": "串連你跨越各個版本的星圖。"
       },
       "nebula": {
         "title": "星雲",
-        "desc": "在你的星圖後方,一片發光的星雲。"
+        "desc": "在你的星圖後方，一片發光的星雲。"
       },
       "live": {
         "title": "動態桌布",
-        "desc": "閃爍的星星,動畫簡約。",
+        "desc": "閃爍的星星，動畫簡約。",
         "preview": "你的星空即時預覽"
       },
       "reserve": {
         "title": "燃料儲備",
-        "desc": "錯過一個 Patch 不會中斷你的連續紀錄。"
+        "desc": "錯過一個版本不會中斷你的連續紀錄。"
       },
       "meteor": {
         "title": "流星雨",
-        "desc": "在 LIVE 日,流星會劃過你的星圖。",
-        "today": "今天是 LIVE 日:流星雨劃過你的星圖。",
-        "notToday": "流星雨只會在最新 Patch 的 LIVE 日出現。"
+        "desc": "在 LIVE 日，流星會劃過你的星圖。",
+        "today": "今天是 LIVE 日：流星雨劃過你的星圖。",
+        "notToday": "流星雨只會在最新版本的 LIVE 日出現。"
       },
       "supernova": {
         "title": "超新星",
         "desc": "專為你生成的超新星星圖。",
-        "download": "下載超新星(4K)"
+        "download": "下載超新星（4K）"
       }
     },
     "kartograph": {
@@ -7909,9 +7915,9 @@
     },
     "community": {
       "title": "社群星圖",
-      "on": "你的星星會在此 Patch 的社群星圖中閃耀。",
-      "off": "累積 3 顆星後,你就會在此 Patch 的社群星圖中閃耀。",
-      "count": "{{explorers}} 位探索者在此 Patch 中點亮了星星。越亮的星星 = 越多探索者。"
+      "on": "你的星星會在此版本的社群星圖中閃耀。",
+      "off": "累積 3 顆星後，你就會在此版本的社群星圖中閃耀。",
+      "count": "{{explorers}} 位探索者在此版本中點亮了星星。越亮的星星 = 越多探索者。"
     },
     "suns": {
       "title": "太陽收藏",
@@ -7920,7 +7926,7 @@
       "splinter": "碎片 {{n}} / {{per}}"
     },
     "glyph": {
-      "aria": "星圖:{{lit}} / {{total}} 顆星"
+      "aria": "星圖：{{lit}} / {{total}} 顆星"
     },
     "gallery": {
       "title": "我的星圖",
@@ -7928,7 +7934,7 @@
       "toMap": "前往星圖",
       "appHint": "最近 7 張也在 Starscape 應用程式中。",
       "inApp": "在 Starscape 中",
-      "thumbAria": "Patch {{patch}} 的星圖桌布",
+      "thumbAria": "版本 {{patch}} 的星圖桌布",
       "download": "下載 4K",
       "share": "分享",
       "copied": "連結已複製。"
@@ -7936,18 +7942,18 @@
     "badge": {
       "share": "分享徽章",
       "caption": "製圖師 · 等級 {{rank}}",
-      "captionSub": "Patch {{patch}} · {{stars}} / {{total}} 顆星 · Verse Companion",
-      "aria": "製圖師徽章等級 {{rank}},附 Patch {{patch}} 的星圖",
-      "explain": "一位製圖師在 Verse Companion 中完成了完整的星圖:每個 Patch 的每項任務就是一顆星。",
+      "captionSub": "版本 {{patch}} · {{stars}} / {{total}} 顆星 · Verse Companion",
+      "aria": "製圖師徽章等級 {{rank}}，附版本 {{patch}} 的星圖",
+      "explain": "一位製圖師在 Verse Companion 中完成了完整的星圖：每個版本的每項任務就是一顆星。",
       "cta": "開始你自己的星圖",
       "invalid": "此徽章連結不完整。",
       "toVerse": "前往 Verse"
     },
     "map": {
       "title": "星圖 {{patch}}",
-      "subtitle": "{{total}} 顆星 · 這個形狀透露了一艘新飛船",
-      "shape": "形狀:{{name}}",
-      "patchesAria": "選擇 Patch 星圖",
+      "subtitle": "{{total}} 顆星 · 這個形狀透露了一艘新艦船",
+      "shape": "形狀：{{name}}",
+      "patchesAria": "選擇版本星圖",
       "chipTip": "星圖 {{patch}} · {{lit}} / {{total}} 顆星",
       "mine": "我的星圖",
       "patchLive": "{{patch}} · Live",
@@ -7956,9 +7962,9 @@
     "tour": {
       "open": "星圖的運作方式",
       "title": "星圖的運作方式",
-      "p1": "每個 Patch 都有一張由 7 顆星組成的星圖。每完成一項任務就點亮一顆;7 顆全亮後,形狀會顯示一艘飛船,這張星圖也會加入你的收藏。",
-      "p2": "穹頂下有兩項挑戰:預測下個 Patch LIVE 日的彗星預測,以及辨識形狀背後的飛船。",
-      "p3": "點亮的星星會提升你的製圖師等級。右上角的徽章會開啟你的等級頁面,內有系列、獎勵與桌布。",
+      "p1": "每個版本都有一張由 7 顆星組成的星圖。每完成一項任務就點亮一顆；7 顆全亮後，形狀會顯示一艘艦船，這張星圖也會加入你的收藏。",
+      "p2": "穹頂下有兩項挑戰：針對下個版本 LIVE 日的彗星預測，以及辨識形狀背後的艦船。",
+      "p3": "點亮的星星會提升你的製圖師等級。右上角的徽章會開啟你的等級頁面，內有系列、獎勵與桌布。",
       "start": "帶我看看",
       "back": "返回",
       "next": "下一步",
@@ -7967,23 +7973,23 @@
       "step": {
         "stage": {
           "title": "穹頂",
-          "text": "所選 Patch 的星圖。發亮的星星是已完成的任務,閃動的是建議的下一項,空心圓環則尚未完成。點擊星星可查看其任務。累積 3 顆星後,你也會在此 Patch 的社群星空中閃耀:越亮的星星代表越多探索者點亮了它。"
+          "text": "所選版本的星圖。發亮的星星是已完成的任務，閃動的是建議的下一項，空心圓環則尚未完成。點擊星星可查看其任務。累積 3 顆星後，你也會在此版本的社群星空中閃耀：越亮的星星代表越多探索者點亮了它。"
         },
         "patch": {
-          "title": "選擇 Patch",
-          "text": "在左上角切換到較早 Patch 的星圖。每張星圖都會保留,即使其 Patch 早已上線 LIVE。"
+          "title": "選擇版本",
+          "text": "在左上角切換到較早版本的星圖。每張星圖都會保留，即使其版本早已上線 LIVE。"
         },
         "comet": {
           "title": "彗星",
-          "text": "預測下個 Patch 上線 LIVE 的日期。猜中的話,彗星會為你的太陽收藏點亮一顆太陽,並在星圖上點亮一顆星。"
+          "text": "預測下個版本上線 LIVE 的日期。猜中的話，彗星會為你的太陽收藏點亮一顆太陽，並在星圖上點亮一顆星。"
         },
         "guess": {
           "title": "猜出形狀",
-          "text": "猜猜星圖顯示的是哪艘飛船。猜中可獲得一顆星;之後形狀的名稱會顯示在穹頂下方。"
+          "text": "猜猜星圖顯示的是哪艘艦船。猜中可獲得一顆星；之後形狀的名稱會顯示在穹頂下方。"
         },
         "rank": {
           "title": "你的製圖師等級",
-          "text": "每顆點亮的星星都會推進你的等級:在 1、3、7、12、18、26 和 35 顆星時升級,從觀察者到星圖守護者。每個等級都會解鎖內容,從可分享的徽章與夥伴,到第 5 級起的琥珀色調與徽章細節。你的系列、獎勵與所有桌布格式都在等級頁面。"
+          "text": "每顆點亮的星星都會推進你的等級：在 1、3、7、12、18、26 和 35 顆星時升級，從觀測者到星圖守護者。每個等級都會解鎖內容，從可分享的徽章與夥伴，到第 5 級起的琥珀色調與徽章細節。你的系列、獎勵與所有桌布格式都在等級頁面。"
         }
       },
       "eyebrow": "星圖"
@@ -7998,9 +8004,9 @@
       "eyebrowLocked": "星 {{n}} · 已關閉",
       "doneOn": "完成於 {{date}}。",
       "here": "你可以直接在下方的星圖上完成這項。",
-      "empty": "此 Patch 中這顆星沒有任務。",
+      "empty": "此版本中這顆星沒有任務。",
       "emptyTitle": "休眠之星",
-      "lockedComet": "此 Patch 已無法再送出 Patch 預測。",
+      "lockedComet": "此版本已無法再送出版本預測。",
       "lockedGuess": "你對這張星圖的預測已送出。"
     },
     "star": {
@@ -8009,11 +8015,11 @@
       "open": "星 {{n}}:{{task}} · 未完成"
     },
     "comet": {
-      "kind": "Patch 預測",
-      "ruleAria": "Patch 預測規則",
-      "rule": "預測 {{patch}} 上線 LIVE 的日期——點選一天即可送出你的 Patch 預測,每個 Patch 限一次預測。誤差在 ±1 天內,彗星就會為你在等級頁面的收藏點亮一顆太陽。{{patch}} 上線 LIVE 或官方公布 LIVE 日期後,預測即截止。",
-      "ruleVersion": "預測 {{patch}} 上線 LIVE 的日期——每個 Patch 限一次預測。{{patch}} 上線 LIVE 或官方公布 LIVE 日期後,預測即截止。Patch 星只會隨系列預測取得。",
-      "noTip": "目前沒有 Patch 預測——CIG 尚未公布其他 Patch。",
+      "kind": "版本預測",
+      "ruleAria": "版本預測規則",
+      "rule": "預測 {{patch}} 上線 LIVE 的日期——點選一天即可送出你的版本預測，每個版本限一次預測。誤差在 ±1 天內，彗星就會為你在等級頁面的收藏點亮一顆太陽。{{patch}} 上線 LIVE 或官方公布 LIVE 日期後，預測即截止。",
+      "ruleVersion": "預測 {{patch}} 上線 LIVE 的日期——每個版本限一次預測。{{patch}} 上線 LIVE 或官方公布 LIVE 日期後，預測即截止。版本星只會隨系列預測取得。",
+      "noTip": "目前沒有版本預測——CIG 尚未公布其他版本。",
       "state": {
         "none": "未完成",
         "tipped": "已設定 · 等待 LIVE",
@@ -8024,21 +8030,21 @@
       },
       "head": {
         "closed": "{{patch}} 的預測已關閉",
-        "tipped": "你對 {{patch}} 的預測:{{date}}",
+        "tipped": "你對 {{patch}} 的預測：{{date}}",
         "hit": "於 {{date}} 命中",
-        "miss": "你的版本預測:{{date}}",
+        "miss": "你的版本預測：{{date}}",
         "open": "{{patch}} 的預測開放中",
-        "missed": "你對 {{patch}} 的預測已錯過:{{date}}"
+        "missed": "你對 {{patch}} 的預測已錯過：{{date}}"
       },
       "formerly": "前身為 {{patch}}",
       "earlier": "較早的日期",
       "later": "較晚的日期",
       "dayAria": "將版本預測設為 {{date}}",
-      "undoToast": "{{patch}} 的版本預測已設定:{{date}}",
+      "undoToast": "{{patch}} 的版本預測已設定：{{date}}",
       "source": {
         "ptu": "由 PTU 辨識",
         "eptu": "由 EPTU 辨識",
-        "evocati": "由 Evocati 更新說明辨識",
+        "evocati": "由 Evocati 版本說明辨識",
         "derived": "推算"
       },
       "splinterNote": "猜中可獲得一枚太陽碎片。"
@@ -8046,8 +8052,8 @@
     "guess": {
       "kind": "辨識",
       "ruleAria": "辨識規則",
-      "rule": "星圖的形狀來自該版本最新的船艦。7 艘船艦中有一艘是正確答案。你只有一次機會:點擊船艦即可送出猜測,數秒內仍可撤銷。猜對後會點亮一顆星,名稱也會顯示在星圖中。",
-      "optionAria": "猜測:{{name}}",
+      "rule": "星圖的形狀來自該版本最新的艦船。7 艘艦船中有一艘是正確答案。你只有一次機會：點擊艦船即可送出猜測，數秒內仍可撤銷。猜對後會點亮一顆星，名稱也會顯示在星圖中。",
+      "optionAria": "猜測：{{name}}",
       "state": {
         "open": "開放中",
         "correct": "已辨識",
@@ -8055,25 +8061,25 @@
         "unavailable": "無法使用"
       },
       "head": {
-        "open": "點選你在星圖中認出的船艦",
-        "correct": "已辨識:{{name}}",
+        "open": "點選你在星圖中認出的艦船",
+        "correct": "已辨識：{{name}}",
         "wrong": "星圖顯示的是 {{name}}",
         "unavailable": "目前還無法猜測"
       },
       "foot": {
-        "open": "猜對後名稱會顯示在星圖中,圓圈也會打上勾。",
-        "wrong": "這次沒有星星,答案會留在星圖中。",
-        "unavailable": "這張星圖目前尚未設定要辨識的船艦。待 Codex 取得該版本的遊戲數據後會自動選出,屆時就能在這裡猜測。"
+        "open": "猜對後名稱會顯示在星圖中，圓圈也會打上勾。",
+        "wrong": "這次沒有星星，答案會留在星圖中。",
+        "unavailable": "這張星圖目前尚未設定要辨識的艦船。待 Codex 取得該版本的遊戲資料後會自動選出，屆時就能在這裡猜測。"
       },
-      "undoToast": "已送出猜測:{{name}}"
+      "undoToast": "已送出猜測：{{name}}"
     },
     "series": {
       "kind": "連勝",
       "count": "連續點亮 {{n}} 張星圖",
       "countOne": "連續點亮 1 張星圖",
-      "helpAria": "連勝如何運作?",
-      "help": "連勝會計算你連續點亮星圖的版本數,至少一顆星,或你的太陽升起。最新的星圖仍在進行中,不會中斷連勝;若較舊的星圖仍是暗的,連勝就會重新開始。路上的每個階段達到該數字後會解鎖一項獎勵,解鎖後便永久保留(你的最佳連勝:{{best}})。",
-      "helpReserve": "連勝會計算你連續點亮星圖的版本數,至少一顆星,或你的太陽升起。最新的星圖仍在進行中,不會中斷連勝。你的燃料儲備已就緒:這次有一張暗的星圖也不會中斷連勝。解鎖後便永久保留(你的最佳連勝:{{best}})。",
+      "helpAria": "連勝如何運作？",
+      "help": "連勝會計算你連續點亮星圖的版本數，至少一顆星，或你的太陽升起。最新的星圖仍在進行中，不會中斷連勝；若較舊的星圖仍是暗的，連勝就會重新開始。路上的每個階段達到該數字後會解鎖一項獎勵，解鎖後便永久保留（你的最佳連勝：{{best}}）。",
+      "helpReserve": "連勝會計算你連續點亮星圖的版本數，至少一顆星，或你的太陽升起。最新的星圖仍在進行中，不會中斷連勝。你的燃料儲備已就緒：這次有一張暗的星圖也不會中斷連勝。解鎖後便永久保留（你的最佳連勝：{{best}}）。",
       "roadAria": "連勝獎勵",
       "stopOn": "{{title}} – {{desc}} ✓ 已解鎖 · 需點亮 {{at}} 張星圖",
       "stopNext": "{{title}} – {{desc}} 下一個 · 需連續點亮 {{at}} 張星圖",
@@ -8099,26 +8105,26 @@
     },
     "rankPage": {
       "title": "等級",
-      "subtitle": "七個階層,一張與你一同成長的星圖。",
+      "subtitle": "七個階層，一張與你一同成長的星圖。",
       "standingAria": "你目前的等級與星圖",
       "current": "你的等級",
       "unranked": "尚無等級",
-      "unrankedMeaning": "在星圖上點亮你的第一顆星,就會以觀測者的身分踏上階梯。",
+      "unrankedMeaning": "在星圖上點亮你的第一顆星，就會以觀測者的身分踏上階梯。",
       "count": "已點亮 {{n}} 顆星",
       "countOne": "已點亮 1 顆星",
       "progressAria": "距離 {{name}} 的進度",
       "toNext": "距離 {{name}} 還差 {{n}} 顆星",
       "toNextOne": "距離 {{name}} 還差 1 顆星",
       "top": "已達最高階層。之後每一顆星仍會加入你的天空。",
-      "perks": "你的等級可提前使用 Beta 功能、內容建議,以及下方的等級獎勵。",
+      "perks": "你的等級可提前使用 Beta 功能、內容建議，以及下方的等級獎勵。",
       "mapOpen": "放大開啟你的星圖",
-      "mapAlt": "你的星圖:你各個版本的星座匯聚於同一片夜空",
-      "mapNone": "在星圖上點亮你的第一顆星,你的天空就會出現在這裡。",
+      "mapAlt": "你的星圖：你各個版本的星座匯聚於同一片夜空",
+      "mapNone": "在星圖上點亮你的第一顆星，你的天空就會出現在這裡。",
       "mapCaption": "你的星圖",
       "mapUpdates": "每次升級都會自動更新。",
       "downloadPhone": "手機桌布",
-      "downloadUltrawide": "超寬螢幕 (5120 × 1440)",
-      "downloadLocked": "點亮你的第一顆星,即可下載你的天空作為桌布。",
+      "downloadUltrawide": "超寬螢幕（5120 × 1440）",
+      "downloadLocked": "點亮你的第一顆星，即可下載你的天空作為桌布。",
       "ladderTitle": "七個階層",
       "at": "需 {{n}} 顆星",
       "atOne": "需 1 顆星",
@@ -8129,28 +8135,28 @@
         "locked": "尚未達成"
       },
       "rewardsTitle": "等級獎勵",
-      "rewardsLead": "每個階層都會為你的天空增添新內容。所有格式從第 1 階層起皆可使用;階層改變的是桌布呈現的內容與外觀。",
+      "rewardsLead": "每個階層都會為你的天空增添新內容。所有格式從第 1 階層起皆可使用；階層改變的是桌布呈現的內容與外觀。",
       "rewardFrom": "自 {{name}} 起",
       "reward": {
         "wallpaper": {
           "title": "所有格式的桌布",
-          "desc": "你的天空化為桌布:4K (3840 × 2160)、手機直式與超寬螢幕 (5120 × 1440)。"
+          "desc": "你的天空化為桌布：4K （3840 × 2160）、手機直式與超寬螢幕（5120 × 1440）。"
         },
         "badge": {
           "title": "可分享的徽章",
-          "desc": "你的徽章與最新星圖,以公開連結分享給朋友。"
+          "desc": "你的徽章與最新星圖，以公開連結分享給好友。"
         },
         "companions": {
           "title": "夥伴",
-          "desc": "你較早版本的星座會以淡淡的光芒,作為夥伴出現在你的天空中。"
+          "desc": "你較早版本的星座會以淡淡的光芒，作為夥伴出現在你的天空中。"
         },
         "tint": {
           "title": "琥珀色調",
-          "desc": "你專屬的星座、它的光芒與後方的薄紗,都會染上溫暖的琥珀色。"
+          "desc": "你專屬的星座、它的光芒與後方的薄紗，都會染上溫暖的琥珀色。"
         },
         "frame": {
           "title": "測繪環",
-          "desc": "你的徽章周圍多一圈虛線環,無論出現在哪裡都會顯示。"
+          "desc": "你的徽章周圍多一圈虛線環，無論出現在哪裡都會顯示。"
         },
         "deepfield": {
           "title": "深空場",
@@ -8158,7 +8164,7 @@
         },
         "orbit": {
           "title": "旋轉羅盤",
-          "desc": "你徽章上的星星會緩緩旋轉,就像海圖桌上的羅盤。"
+          "desc": "你徽章上的星星會緩緩旋轉，就像海圖桌上的羅盤。"
         }
       },
       "seriesTitle": "連勝",
@@ -8182,7 +8188,7 @@
         },
         "astrographer": {
           "name": "天文製圖師",
-          "meaning": "大約三個版本的星星:後期獎勵開啟。"
+          "meaning": "大約三個版本的星星：後期獎勵開啟。"
         },
         "master": {
           "name": "大師製圖師",
@@ -8196,23 +8202,23 @@
     },
     "ideas": {
       "title": "獎勵構想",
-      "lead": "未來的等級應該送出什麼?團隊會優先閱讀得票最多的構想。",
+      "lead": "未來的等級應該送出什麼？團隊會優先閱讀得票最多的構想。",
       "label": "你對新等級獎勵的構想",
       "submit": "送出構想",
-      "sent": "謝謝!你的構想已加入清單。",
-      "locked": "從第 5 階層({{name}},{{stars}} 顆星)起,你可以提交構想並投票。",
+      "sent": "謝謝！你的構想已加入清單。",
+      "locked": "從第 5 階層（{{name}},{{stars}} 顆星）起，你可以提交構想並投票。",
       "retry": "再試一次",
       "empty": "目前還沒有構想。",
-      "votes": "票數:{{count}}",
-      "voteAria": "為這個構想投票,目前 {{votes}} 票",
+      "votes": "票數：{{count}}",
+      "voteAria": "為這個構想投票，目前 {{votes}} 票",
       "archived": "已封存",
       "archive": "封存",
-      "archiveTitle": "要封存這個構想嗎?",
+      "archiveTitle": "要封存這個構想嗎？",
       "archiveMessage": "「{{body}}」將從玩家的清單中消失。"
     }
   },
   "beta": {
-    "aria": "新檢視 (β)",
+    "aria": "新檢視（β）",
     "area": {
       "verse": "Verse",
       "codex": "Codex 與 HQ",
@@ -8220,8 +8226,8 @@
     },
     "staffOnly": "僅限團隊",
     "fab": {
-      "admin": "Beta 開關(管理員)",
-      "collaborator": "Beta 開關(協作者)"
+      "admin": "Beta 開關（管理員）",
+      "collaborator": "Beta 開關（協作者）"
     },
     "chip": {
       "title": "Beta 區域",
@@ -8230,8 +8236,8 @@
   },
   "fusionBar": {
     "backTo": "返回 {{name}}",
-    "kindSwitch": "切換類別(目前:{{kind}})",
-    "removeFilter": "移除篩選:{{name}}",
+    "kindSwitch": "切換類別（目前：{{kind}}）",
+    "removeFilter": "移除篩選：{{name}}",
     "moreFilters": "顯示另外 {{count}} 個篩選",
     "hits": "{{count}} 筆結果",
     "demo": {
@@ -8245,7 +8251,7 @@
       "weaponGroup": "武器群組"
     },
     "navAria": "主要區域",
-    "areaMenu": "切換區域 — 目前:{{area}}",
+    "areaMenu": "切換區域 — 目前：{{area}}",
     "home": "首頁",
     "filters": "篩選",
     "sectionsAria": "此區域的子頁面",
@@ -8260,7 +8266,7 @@
       "codex": "Codex",
       "codexIndex": "Codex · {{kind}}",
       "ship": "{{name}}",
-      "shipFallback": "這艘船艦",
+      "shipFallback": "這艘艦船",
       "codexDetail": "{{kind}}",
       "fps": "FPS",
       "hq": "我的 HQ",
@@ -8273,19 +8279,19 @@
       "hqStockSammlung": "收藏"
     },
     "placeholder": {
-      "all": "全站搜尋 …",
-      "verse": "搜尋船艦、版本、新聞 …",
-      "gallery": "搜尋圖庫或 Codex …",
-      "codex": "船艦、武器、元件 …",
-      "codexIndex": "搜尋 Codex …",
-      "ship": "元件、武器、船艦 …",
-      "codexDetail": "搜尋 Codex …",
-      "fps": "武器、護甲、裝備 …",
-      "hq": "機庫、套組、船艦 …",
-      "hqPlan": "為你的行動找一個套組、零件或地點 …",
-      "hqNow": "船艦、地點或零件 …",
-      "hqStock": "搜尋你的倉庫 …",
-      "hqStats": "船艦或套組 …"
+      "all": "全站搜尋…",
+      "verse": "搜尋艦船、版本、新聞…",
+      "gallery": "搜尋圖庫或 Codex…",
+      "codex": "艦船、武器、元件…",
+      "codexIndex": "搜尋 Codex…",
+      "ship": "元件、武器、艦船…",
+      "codexDetail": "搜尋 Codex…",
+      "fps": "武器、護甲、裝備…",
+      "hq": "機庫、套裝、艦船…",
+      "hqPlan": "為你的任務找一個套裝、零件或地點…",
+      "hqNow": "艦船、地點或零件…",
+      "hqStock": "搜尋你的倉庫…",
+      "hqStats": "艦船或套裝…"
     },
     "search": {
       "label": "搜尋",
@@ -8301,10 +8307,10 @@
       "copyLink": "複製 {{name}} 的連結",
       "copyLinkShort": "複製連結",
       "strip": "整個 Codex:{{n}} 筆結果",
-      "stripBusy": "整個 Codex:搜尋中 …",
+      "stripBusy": "整個 Codex：搜尋中…",
       "copied": "連結已複製",
       "keys": {
-        "dropContext": "位於欄位開頭:移除情境"
+        "dropContext": "位於欄位開頭：移除情境"
       },
       "action": {
         "add": "機庫 +",
@@ -8318,14 +8324,14 @@
       "patches": "版本",
       "gallery": "圖庫",
       "hangar": "機庫",
-      "spind": "套組",
+      "spind": "套裝",
       "hq": "HQ 總覽",
       "keybinds": "按鍵設定",
-      "upcoming": "已公布的船艦",
+      "upcoming": "已公布的艦船",
       "settings": "設定",
       "releaseNotes": "新功能",
       "badge": "製圖師徽章",
-      "ops": "行動",
+      "ops": "任務",
       "extension": "瀏覽器擴充功能",
       "download": "下載",
       "social": "社群"
@@ -8448,11 +8454,11 @@
       },
       "switchAria": "切換 {{name}}",
       "removeAria": "移除篩選「{{name}}」",
-      "miniSearch": "搜尋 {{name}} …",
+      "miniSearch": "搜尋 {{name}}…",
       "noValue": "沒有符合的值"
     },
     "cta": {
-      "myLoadout": "我的配置",
+      "myLoadout": "我的配裝",
       "compareWith": "並排比較",
       "compare": "比較",
       "inSet": "已在套裝中",
@@ -8460,33 +8466,33 @@
       "atRsi": "RSI 商店",
       "allProducts": "所有產品",
       "add": "新增",
-      "whereStored": "在哪裡?",
-      "whereInstalled": "裝在哪裡?",
-      "planOps": "規劃行動",
+      "whereStored": "在哪裡？",
+      "whereInstalled": "裝在哪裡？",
+      "planOps": "規劃任務",
       "sourceOf": "取得方式",
       "openSet": "開啟套裝",
       "fittingShips": "適用艦船",
       "fittingWeapons": "適用武器",
       "mount": "安裝",
-      "toEinsatz": "加入行動"
+      "toEinsatz": "加入任務"
     },
     "why": {
-      "ownHq": "置頂,因為你在 HQ",
+      "ownHq": "置頂，因為你在 HQ",
       "own": "你自己的結果優先",
-      "context": "置頂,符合 {{ctx}}",
-      "outside": "幾乎吻合,但不在「{{chip}}」範圍內"
+      "context": "置頂，符合 {{ctx}}",
+      "outside": "幾乎吻合，但不在「{{chip}}」範圍內"
     },
     "fit": {
       "fits": "適用於 {{name}}",
       "noFit": "不適用",
-      "unknown": "沒有 Hardpoint 資料",
+      "unknown": "沒有掛點資料",
       "unknownItem": "元件沒有附加類型",
-      "noType": "沒有符合的連接埠",
+      "noType": "沒有符合的掛點",
       "noSize": "尺寸 {{size}} 超出 S{{min}}–S{{max}}"
     },
     "group": {
       "own": "來自你的庫存",
-      "patch": "修補檔",
+      "patch": "版本",
       "gallery": "圖庫",
       "opened": "最近開啟",
       "expand": "▾ 在此多顯示 {{n}} 項",
@@ -8502,7 +8508,7 @@
       "fitted": "已裝在你的艦船上",
       "lager": "在庫存中",
       "sets": "在 {{n}} 個套裝中",
-      "config": "你在「{{ship}}」上的配置",
+      "config": "你在「{{ship}}」上的配裝",
       "set": "你的套裝",
       "qty": "庫存中有 {{n}} 個",
       "fittedOn": "在「{{name}}」上有 {{n}} 個",
@@ -8512,45 +8518,45 @@
     },
     "row": {
       "current": "你在這裡",
-      "variants": "型號",
+      "variants": "變體",
       "variantMine": "我的艦船",
       "variantsMore": "+{{n}}",
-      "variantsMoreAria": "艦船頁面上還有 {{n}} 個型號",
-      "variantCurrent": "此型號目前已開啟",
-      "patch": "修補檔 {{line}}",
-      "patchMeta": "修補檔說明 · {{version}}",
+      "variantsMoreAria": "艦船頁面上還有 {{n}} 個變體",
+      "variantCurrent": "此變體目前已開啟",
+      "patch": "版本 {{line}}",
+      "patchMeta": "版本說明 · {{version}}",
       "galleryMeta": "圖庫",
       "missionMeta": "任務",
-      "missionVariants": "{{n}} 個型號"
+      "missionVariants": "{{n}} 個變體"
     },
     "abbr": {
       "alias": "「{{word}}」被解讀為",
       "chip": "「{{word}}」變成了標籤"
     },
-    "newInPatch": "修補檔 {{version}} 新內容",
+    "newInPatch": "版本 {{version}} 新內容",
     "dym": {
-      "lead": "你是不是想找 …"
+      "lead": "你是不是想找…"
     },
     "keys": {
       "expand": "展開",
       "dropChip": "移除最後一個標籤"
     },
     "hint": {
-      "lead": "提示:",
-      "tryAria": "試試看:{{hint}}"
+      "lead": "提示：",
+      "tryAria": "試試看：{{hint}}"
     },
     "signIn": {
-      "title": "要登入嗎?",
+      "title": "要登入嗎？",
       "message": "願望、庫存與行動都屬於你的帳號。請登入以儲存。",
       "confirm": "前往登入"
     },
     "done": {
       "hangar": "「{{name}}」已在你的機庫中",
       "compare": "「{{name}}」已加入比較",
-      "failed": "操作失敗,請稍後再試",
+      "failed": "操作失敗，請稍後再試",
       "einsatzAdded": "「{{name}}」現在是「{{op}}」中的一個步驟",
-      "einsatzNew": "已建立新行動「{{name}}」",
-      "einsatzFull": "「{{op}}」的步驟數已達行動上限"
+      "einsatzNew": "已建立新任務「{{name}}」",
+      "einsatzFull": "「{{op}}」的步驟數已達任務上限"
     },
     "hints": {
       "0": {
@@ -8586,7 +8592,7 @@
         "q": "bmm"
       },
       "8": {
-        "t": "「qt」會找到量子引擎",
+        "t": "「qt」會找到量子驅動器",
         "q": "qt"
       },
       "9": {
@@ -8594,11 +8600,11 @@
         "q": "pp"
       },
       "10": {
-        "t": "「rep」會找到 Repeater",
+        "t": "「rep」會找到連發砲",
         "q": "rep"
       },
       "11": {
-        "t": "「dist」會找到 Distortion 武器",
+        "t": "「dist」會找到干擾武器",
         "q": "dist"
       },
       "12": {
@@ -8622,7 +8628,7 @@
         "q": "size 3"
       },
       "17": {
-        "t": "「s2 qd」會找到尺寸 2 的量子引擎",
+        "t": "「s2 qd」會找到尺寸 2 的量子驅動器",
         "q": "s2 qd"
       },
       "18": {
@@ -8630,7 +8636,7 @@
         "q": "grade a"
       },
       "19": {
-        "t": "「stealth cooler」會找到隱形冷卻器",
+        "t": "「stealth cooler」會找到潛行冷卻器",
         "q": "stealth cooler"
       },
       "20": {
@@ -8642,7 +8648,7 @@
         "q": "1 crew"
       },
       "22": {
-        "t": "「freighter 100 scu」會找到大型貨船",
+        "t": "「freighter 100 scu」會找到大型貨運艦",
         "q": "freighter 100 scu"
       },
       "23": {
@@ -8654,7 +8660,7 @@
         "q": "bomber"
       },
       "25": {
-        "t": "「gimbal s3」會找到 Gimbal 掛架",
+        "t": "「gimbal s3」會找到萬向掛架",
         "q": "gimbal s3"
       },
       "26": {
@@ -8675,7 +8681,7 @@
         "t": "輸入套裝名稱就能找到你的 FPS 套裝"
       },
       "31": {
-        "t": "輸入配置名稱就能找到你的配置"
+        "t": "輸入配裝名稱就能找到你的配裝"
       },
       "32": {
         "t": "「my ships」會顯示你的機庫",
@@ -8686,13 +8692,13 @@
         "q": "in hangar aegis"
       },
       "34": {
-        "t": "在詞彙前加上「inventory」,只會搜尋你的庫存"
+        "t": "在詞彙前加上「inventory」，只會搜尋你的庫存"
       },
       "35": {
-        "t": "在詞彙前加上「wishes」或「wishlist」,只會搜尋你的願望。列在願望中的項目永遠排在最前面"
+        "t": "在詞彙前加上「wishes」或「wishlist」，只會搜尋你的願望。列在願望中的項目永遠排在最前面"
       },
       "36": {
-        "t": "在機庫中,「patrol」會找到你的配置"
+        "t": "在機庫中，「patrol」會找到你的配裝"
       },
       "37": {
         "t": "「in inventory s3」會顯示你庫存中尺寸 3 的項目",
@@ -8702,7 +8708,7 @@
         "t": "你自己的結果永遠排在最前面"
       },
       "39": {
-        "t": "在詞前輸入「缺少」只會搜尋你的任務"
+        "t": "在詞彙前加上「missing」，只會搜尋你的行動"
       },
       "40": {
         "t": "搜尋會記住你開啟它的位置"
@@ -8731,19 +8737,19 @@
         "t": "在任務規劃中會顯示取得物品的來源"
       },
       "48": {
-        "t": "「適用」只顯示適合的零件",
-        "q": "適用"
+        "t": "「fits」只顯示適合的零件",
+        "q": "fits"
       },
       "49": {
-        "t": "標籤會篩選,排序則依頁面而定"
+        "t": "標籤會篩選，排序則依頁面而定"
       },
       "50": {
-        "t": "「賞金 任務」可找到賞金任務",
-        "q": "賞金 任務"
+        "t": "「bounty mission」可找到賞金任務",
+        "q": "bounty mission"
       },
       "51": {
-        "t": "「藍圖 p4」會顯示取得方式",
-        "q": "藍圖 p4"
+        "t": "「blueprint p4」會顯示取得方式",
+        "q": "blueprint p4"
       },
       "52": {
         "t": "「hurston」可找到地點、任務和商店",
@@ -8758,32 +8764,32 @@
         "q": "cru-l1"
       },
       "55": {
-        "t": "「4.3.2」會開啟更新說明",
+        "t": "「4.3.2」會開啟版本說明",
         "q": "4.3.2"
       },
       "56": {
-        "t": "「新」會顯示本次更新帶來的內容",
-        "q": "新"
+        "t": "「new」會顯示本次更新帶來的內容",
+        "q": "new"
       },
       "57": {
-        "t": "「即將推出」會顯示已公布的艦船",
-        "q": "即將推出"
+        "t": "「upcoming」會顯示已公布的艦船",
+        "q": "upcoming"
       },
       "58": {
-        "t": "「彈藥 s3」可找到相符的彈藥",
-        "q": "彈藥 s3"
+        "t": "「ammo s3」可找到相符的彈藥",
+        "q": "ammo s3"
       },
       "59": {
-        "t": "「重型 護甲」可找到重型護甲",
-        "q": "重型 護甲"
+        "t": "「heavy armor」可找到重型護甲",
+        "q": "heavy armor"
       },
       "60": {
         "t": "「medpen」可找到治療裝備",
         "q": "medpen"
       },
       "61": {
-        "t": "「按鍵 quantum」會顯示量子按鍵",
-        "q": "按鍵 quantum"
+        "t": "「keybind quantum」會顯示量子按鍵",
+        "q": "keybind quantum"
       },
       "62": {
         "t": "Ctrl K 可在任何地方開啟搜尋"
@@ -8792,7 +8798,7 @@
         "t": "「/」也可以開啟搜尋"
       },
       "64": {
-        "t": "↑ ↓ 選擇,↵ 開啟"
+        "t": "↑ ↓ 選擇，↵ 開啟"
       },
       "65": {
         "t": "Ctrl ↵ 在新分頁開啟"
@@ -8801,19 +8807,19 @@
         "t": "→ 展開群組"
       },
       "67": {
-        "t": "Esc 關閉,你輸入的文字會保留"
+        "t": "Esc 關閉，你輸入的文字會保留"
       },
       "68": {
-        "t": "英文縮寫也可以:「quantum drive」",
-        "q": "quantum drive"
+        "t": "縮寫也可以：「qd s2」",
+        "q": "qd s2"
       },
       "69": {
-        "t": "打錯字了嗎?搜尋會詢問「你是不是想找……」"
+        "t": "打錯字了嗎？搜尋會詢問「你是不是想找…」"
       }
     },
     "outside": {
       "none": "在「{{chip}}」中沒有名為「{{term}}」的項目。",
-      "drop": "不使用「{{chip}}」,改為全部搜尋 (⌫)"
+      "drop": "不使用「{{chip}}」，改為全部搜尋（⌫）"
     }
   },
   "social": {
@@ -8831,20 +8837,20 @@
       "groupLimit": "你已達到 50 個群組的上限。",
       "groupFull": "此群組已滿 100 位好友。",
       "einsatzNotFound": "此任務已無法使用。",
-      "einsatzClosed": "此任務已完成,不再接受回覆。",
+      "einsatzClosed": "此任務已完成，不再接受回覆。",
       "configNotFound": "此艦船變體已不存在。",
-      "loadoutNotFound": "此套組已不存在。",
+      "loadoutNotFound": "此套裝已不存在。",
       "shareNotFound": "此分享已不存在。",
-      "tooManySlots": "一個任務最多有 12 個機組位置。",
-      "invalidSlotLabel": "位置名稱長度必須為 1 到 40 個字元。",
-      "slotNotFound": "此機組位置已不存在。",
-      "slotTaken": "此機組位置已被佔用。",
+      "tooManySlots": "一個任務最多有 12 個組員席位。",
+      "invalidSlotLabel": "席位名稱長度必須為 1 到 40 個字元。",
+      "slotNotFound": "此組員席位已不存在。",
+      "slotTaken": "此組員席位已被佔用。",
       "invalidAnswer": "無法進行此回覆。",
       "notFriends": "此功能僅限好友使用。",
       "invalidTarget": "無法對這位使用者執行此操作。",
       "teamFull": "此群組已滿 50 位成員。",
-      "teamLimit": "你已加入 20 個群組,達到上限。",
-      "lastOwner": "你是最後一位擁有者。請先將其他人設為擁有者,或刪除群組。",
+      "teamLimit": "你已加入 20 個群組，達到上限。",
+      "lastOwner": "你是最後一位擁有者。請先將其他人設為擁有者，或刪除群組。",
       "teamInvalidName": "名稱長度必須為 1 到 40 個字元。",
       "teamInvalidRole": "沒有這個角色。",
       "teamForbidden": "你在此群組中沒有這項權限。",
@@ -8854,12 +8860,12 @@
     },
     "compare": {
       "ships": "艦船",
-      "sets": "套組",
+      "sets": "套裝",
       "einsaetze_planned": "已規劃的任務",
       "einsaetze_done": "已完成的任務",
-      "missions_30d": "任務(30 天)",
-      "kartograph_rank": "Kartograph 等級",
-      "active_days_30": "活躍天數(30 天)"
+      "missions_30d": "任務（30 天）",
+      "kartograph_rank": "製圖師等級",
+      "active_days_30": "活躍天數（30 天）"
     },
     "group": {
       "kind": {
@@ -8876,33 +8882,33 @@
       },
       "title": "好友可以看到的內容",
       "general": "一般",
-      "generalHint": "適用於所有好友,除非你在下方為某位好友另行設定。變更會立即儲存。",
+      "generalHint": "適用於所有好友，除非你在下方為某位好友另行設定。變更會立即儲存。",
       "facetHint": {
-        "hangar": "你的艦船(包含願望清單),不含備註與配置。",
+        "hangar": "你的艦船（包含願望清單），不含備註與配置。",
         "flagship": "你在機庫頂端置頂的艦船。",
         "presence": "你目前是否在線上。不會顯示確切時間。",
-        "stats": "艦船、套組、任務、活躍天數和 Kartograph 等級等數字。"
+        "stats": "艦船、套裝、任務、活躍天數和製圖師等級等數字。"
       },
       "perFriend": "依好友設定",
-      "perFriendHint": "選擇一位好友,並決定他看到的內容是否與其他人不同。",
-      "noFriends": "有好友之後,你就可以在這裡為每位好友分別設定。",
-      "loading": "載入中……",
+      "perFriendHint": "選擇一位好友，並決定他看到的內容是否與其他人不同。",
+      "noFriends": "有好友之後，你就可以在這裡為每位好友分別設定。",
+      "loading": "載入中…",
       "inherit": "與一般設定相同",
       "on": "開",
       "off": "關",
-      "result": "這位好友可以看到:",
+      "result": "這位好友可以看到：",
       "nothing": "以上皆不可見",
       "eyebrow": "社群"
     },
     "teams": {
       "title": "群組",
-      "hint": "加入群組需要邀請碼,這與上方的私人好友清單不同。成員之間可以看到彼此的名稱、代號和角色,以及你與群組分享的任務(含機組位置與人數)。僅此而已:看不到機庫、在線狀態或好友清單。",
+      "hint": "加入群組需要邀請碼，這與上方的私人好友清單不同。成員之間可以看到彼此的名稱、代號和角色，以及你與群組分享的任務（含組員席位與人數）。僅此而已：看不到機庫、在線狀態或好友清單。",
       "namePlaceholder": "新群組名稱",
       "create": "建立群組",
       "codePlaceholder": "邀請碼",
       "join": "加入",
       "invalidCode": "此代碼無效。可能已被取代或已過期。",
-      "empty": "你還沒有加入任何群組。建立一個,或使用代碼加入。",
+      "empty": "你還沒有加入任何群組。建立一個，或使用代碼加入。",
       "members": "{{count}} 位成員",
       "membersLabel": "成員",
       "showMembers": "成員",
@@ -8910,16 +8916,16 @@
       "inviteCode": "邀請碼",
       "expires": "有效期限至 {{date}}",
       "rotate": "新代碼",
-      "rotateTitle": "要更換邀請碼嗎?",
+      "rotateTitle": "要更換邀請碼嗎？",
       "rotateMessage": "「{{name}}」的舊代碼會立即失效。已在群組中的人不受影響。",
       "leave": "離開",
-      "leaveTitle": "要離開此群組嗎?",
-      "leaveMessage": "你將離開「{{name}}」,並且看不到該群組中分享的任務。你自己的任務不會被刪除。",
+      "leaveTitle": "要離開此群組嗎？",
+      "leaveMessage": "你將離開「{{name}}」，並且看不到該群組中分享的任務。你自己的任務不會被刪除。",
       "delete": "刪除群組",
-      "deleteTitle": "要刪除此群組嗎?",
-      "deleteMessage": "「{{name}}」將對所有成員刪除。任務仍歸原擁有者所有,只是不再分享。",
+      "deleteTitle": "要刪除此群組嗎？",
+      "deleteMessage": "「{{name}}」將對所有成員刪除。任務仍歸原擁有者所有，只是不再分享。",
       "removeMember": "移除",
-      "removeTitle": "要移除這位成員嗎?",
+      "removeTitle": "要移除這位成員嗎？",
       "removeMessage": "{{name}} 將無法再存取「{{group}}」及其中分享的任務。",
       "makeAdmin": "設為管理員",
       "makeMember": "設為成員",
@@ -8936,26 +8942,26 @@
       "audienceGroup": "一個群組",
       "pickAudience": "邀請好友或群組",
       "pickGroup": "選擇群組",
-      "hint": "邀請一位好友加入你的某個任務,作為你們的共同目標。他可以看到步驟、回覆並佔用一個機組位置。沒有獨立的目標:任務就是計畫。",
+      "hint": "邀請一位好友加入你的某個任務，作為你們的共同目標。他可以看到步驟、回覆並佔用一個組員席位。沒有獨立的目標：任務就是計畫。",
       "mine": "邀請加入我的任務",
       "withMe": "與我分享的任務",
-      "noneOwn": "請先在 HQ 規劃一個任務,之後就能在這裡邀請好友加入。",
-      "noFriends": "有好友之後,你就可以在這裡邀請他們加入任務。",
+      "noneOwn": "請先在 HQ 規劃一個任務，之後就能在這裡邀請好友加入。",
+      "noFriends": "有好友之後，你就可以在這裡邀請他們加入任務。",
       "noneShared": "還沒有好友與你分享任務。",
       "pickEinsatz": "任務",
       "pickFriend": "好友",
       "invite": "邀請",
       "invited": "已邀請好友。",
       "already": "這位好友已經是此任務的一員。",
-      "slotsLabel": "機組位置,以逗號分隔(最多 {{max}} 個)",
-      "slotsSave": "儲存位置",
-      "crew": "機組",
+      "slotsLabel": "組員席位，以逗號分隔（最多 {{max}} 個）",
+      "slotsSave": "儲存席位",
+      "crew": "組員",
       "counts": "{{yes}} 人接受、{{maybe}} 人可能、{{no}} 人婉拒",
       "noAnswers": "還沒有人回覆。",
       "open": "空缺",
       "taken": "已佔用",
       "you": "你",
-      "take": "佔用位置",
+      "take": "佔用席位",
       "answer": "你的回覆",
       "from": "來自 {{name}}"
     },
@@ -8966,21 +8972,21 @@
     },
     "page": {
       "title": "社群",
-      "subtitle": "好友、邀請、群組,以及與你的比較。",
+      "subtitle": "好友、邀請、群組，以及與你的比較。",
       "visibilityButton": "好友可以看到的內容",
       "online": "線上",
-      "emptyHint": "使用你的專屬連結邀請對方,或輸入確切的使用者名稱。",
+      "emptyHint": "使用你的專屬連結邀請對方，或輸入確切的使用者名稱。",
       "emptyCta": "前往邀請",
       "openFriend": "開啟頁面"
     },
     "notice": {
-      "text": "預設情況下,好友可以看到你的機庫、旗艦、線上狀態和比較數值。你可以整體關閉,也可以針對每位好友分別關閉。",
+      "text": "預設情況下，好友可以看到你的機庫、旗艦、線上狀態和比較數值。你可以整體關閉，也可以針對每位好友分別關閉。",
       "open": "調整",
       "dismiss": "知道了"
     },
     "invite": {
       "title": "邀請好友",
-      "hint": "傳送連結,例如透過 Discord。開啟連結並登入的人會向你發出好友請求,你仍需接受。",
+      "hint": "傳送連結，例如透過 Discord。開啟連結並登入的人會向你發出好友請求，你仍需接受。",
       "linkLabel": "你的邀請連結",
       "copy": "複製連結",
       "copied": "已複製",
@@ -8992,26 +8998,26 @@
     },
     "groups": {
       "title": "群組",
-      "privateNote": "群組是私人的。你的好友看不到群組,也看不到自己屬於哪個群組。一位好友可以加入多個群組。",
-      "shareNote": "加入群組的人會獲得你與該群組分享的內容(任務、艦船變體)。被移除的人,或群組被刪除時,會失去存取權。你與群組分享的套組只會分享給目前的成員。",
+      "privateNote": "群組是私人的。你的好友看不到群組，也看不到自己屬於哪個群組。一位好友可以加入多個群組。",
+      "shareNote": "加入群組的人會獲得你與該群組分享的內容（任務、艦船變體）。被移除的人，或群組被刪除時，會失去存取權。你與群組分享的套裝只會分享給目前的成員。",
       "kindLabel": "群組類型",
       "namePlaceholder": "群組名稱",
       "create": "建立群組",
-      "empty": "還沒有群組。建立組織或任務群組,來整理你的好友。",
+      "empty": "還沒有群組。建立組織或任務群組，來整理你的好友。",
       "noFriends": "你還沒有可以加入的好友。",
       "members": "成員",
       "rename": "重新命名",
       "delete": "刪除",
       "renameTitle": "重新命名群組「{{name}}」",
-      "deleteTitle": "要刪除群組「{{name}}」嗎?",
-      "deleteMessage": "好友仍然是好友。你與此群組分享的內容將不再對他們可見,除非另有其他方式分享。",
-      "friendPageHint": "好友的頁面會顯示他屬於你的哪些群組,例如"
+      "deleteTitle": "要刪除群組「{{name}}」嗎？",
+      "deleteMessage": "好友仍然是好友。你與此群組分享的內容將不再對他們可見，除非另有其他方式分享。",
+      "friendPageHint": "好友的頁面會顯示他屬於你的哪些群組，例如"
     },
     "comparePanel": {
       "title": "比較",
-      "hint": "你們如何使用 Verse Companion、各自在做什麼,並與你比較。只會顯示好友對你公開的內容。",
-      "loading": "載入中……",
-      "noFriends": "有好友之後,你就可以在這裡與他們比較。",
+      "hint": "你們如何使用 Verse Companion、各自在做什麼，並與你比較。只會顯示好友對你公開的內容。",
+      "loading": "載入中…",
+      "noFriends": "有好友之後，你就可以在這裡與他們比較。",
       "with": "比較對象",
       "metric": "數值",
       "me": "你",
@@ -9025,10 +9031,10 @@
     "friendPage": {
       "loading": "載入中…",
       "missingTitle": "找不到",
-      "missing": "此頁面不存在,或你無法查看。僅限好友。",
+      "missing": "此頁面不存在，或你無法查看。僅限好友。",
       "since": "自 {{date}} 起成為好友",
       "share": "分享點什麼",
-      "inGroups": "在你的群組中:",
+      "inGroups": "在你的群組中：",
       "fromFriend": "{{name}} 與你分享",
       "nothingShared": "尚未分享任何內容。",
       "fromMe": "你分享的",
@@ -9038,13 +9044,13 @@
       "hangarHidden": "這位好友不會向你顯示他的機庫。",
       "hangarEmpty": "機庫是空的。",
       "wishlist": "願望",
-      "kindSet": "套組",
+      "kindSet": "套裝",
       "kindVariant": "變體",
       "kindEinsatz": "任務",
-      "removeTitle": "要將 {{name}} 從好友中移除嗎?",
-      "removeMessage": "移除後,你們彼此分享的所有內容都將無法再查看。",
-      "blockTitle": "要封鎖 {{name}} 嗎?",
-      "blockMessage": "好友關係將會結束,對方也無法再向你發送請求。"
+      "removeTitle": "要將 {{name}} 從好友中移除嗎？",
+      "removeMessage": "移除後，你們彼此分享的所有內容都將無法再查看。",
+      "blockTitle": "要封鎖 {{name}} 嗎？",
+      "blockMessage": "好友關係將會結束，對方也無法再向你發送請求。"
     },
     "inviteLanding": {
       "title": "邀請",
@@ -9053,12 +9059,12 @@
       "toSocial": "前往社群",
       "from": "{{name}} 邀請你成為好友。",
       "fromAnon": "你收到了好友邀請。",
-      "hint": "若繼續,對方會收到好友請求,且仍需接受。",
+      "hint": "若繼續，對方會收到好友請求，且仍需接受。",
       "accept": "發送請求",
-      "signInHint": "請登入後發送請求,之後你會回到這裡。",
+      "signInHint": "請登入後發送請求，之後你會回到這裡。",
       "signIn": "登入",
       "result": {
-        "pending": "已向 {{name}} 發送請求。一旦接受,你們就是好友了。",
+        "pending": "已向 {{name}} 發送請求。一旦接受，你們就是好友了。",
         "accepted": "你現在與 {{name}} 成為好友了。",
         "already_friends": "你已經與 {{name}} 是好友了。"
       },
@@ -9080,12 +9086,12 @@
       "ownWish": "「{{name}}」到了",
       "ownWishDetail": "你的願望實現了",
       "ownWishLeft": "「{{name}}」到了",
-      "ownWishLeftDetail": "一個願望實現了,還剩 {{left}} 個"
+      "ownWishLeftDetail": "一個願望實現了，還剩 {{left}} 個"
     },
     "err": {
-      "failed": "操作失敗,請再試一次。",
+      "failed": "操作失敗，請再試一次。",
       "unavailable": "這裡沒有這個步驟。",
-      "wishAssigned": "這些物品已分配給某個 Operation。請透過對話框移除。"
+      "wishAssigned": "這些物品已分配給某個行動。請透過對話框移除。"
     },
     "hint": {
       "notYetInGame": "尚未加入遊戲"
@@ -9118,9 +9124,9 @@
   },
   "wishRemoval": {
     "title": "移除 {{name}}",
-    "howMany": "要移除多少個?",
-    "caption": "這 {{n}} 件將被移除:",
-    "captionOne": "這件將被移除:",
+    "howMany": "要移除多少個？",
+    "caption": "這 {{n}} 件將被移除：",
+    "captionOne": "這件將被移除：",
     "barLabel": "物品去向",
     "free": "{{n}} 個可用",
     "fromOp": "{{n}} 個來自「{{name}}」",
@@ -9129,18 +9135,18 @@
     "rowLabel": "來自「{{name}}」的物品",
     "sum": "已分配 {{done}} / {{total}}",
     "keeps": "「{{name}}」保留其他願望。",
-    "lastStays": "之後「{{name}}」將沒有任何願望,其 {{n}} 個 Einsatz 會保留。",
-    "lastStaysOne": "之後「{{name}}」將沒有任何願望,其 Einsatz 會保留。",
-    "dissolves": "「{{name}}」沒有 Einsatz,將一併解散。",
-    "alsoDissolve": "同時解散 Operation",
-    "alsoDissolveNamed": "同時解散 Operation「{{name}}」",
+    "lastStays": "之後「{{name}}」將沒有任何願望，其 {{n}} 個任務會保留。",
+    "lastStaysOne": "之後「{{name}}」將沒有任何願望，其任務會保留。",
+    "dissolves": "「{{name}}」沒有任務，將一併解散。",
+    "alsoDissolve": "同時解散行動",
+    "alsoDissolveNamed": "同時解散行動「{{name}}」",
     "confirm": "移除 {{n}} 個",
     "confirmDissolve": "移除並解散",
-    "toastDissolved": "Operation 已一併解散。",
+    "toastDissolved": "行動已一併解散。",
     "release": {
-      "title": "要將 {{name}} 從 Operation 中解除嗎?",
-      "text": "這 {{n}} 件會留在你的願望清單中,並恢復為可用狀態。",
-      "textOne": "此物品會留在你的願望清單中,並恢復為可用狀態。",
+      "title": "要將 {{name}} 從行動中解除嗎？",
+      "text": "這 {{n}} 件會留在你的願望清單中，並恢復為可用狀態。",
+      "textOne": "此物品會留在你的願望清單中，並恢復為可用狀態。",
       "confirm": "解除",
       "deleteToo": "同時從願望清單刪除"
     }
@@ -9172,10 +9178,10 @@
     "remove": "移除 {{name}}",
     "removeGroup": "移除群組 {{name}}",
     "removed": "已將 {{name}} 從你的願望中移除",
-    "removedGroup": "已移除 {{name}}({{n}} 個願望)",
+    "removedGroup": "已移除 {{name}}（{{n}} 個願望）",
     "selected": "已選取",
     "clear": "取消全選",
-    "toNachschub": "加入 Operation",
+    "toNachschub": "加入行動",
     "kind": {
       "ship": "艦船",
       "vehicle": "載具",
@@ -9193,8 +9199,8 @@
       "add": "加入願望",
       "dismiss": "不再建議 {{name}}"
     },
-    "slotsFullHint": "7 個 Operation 欄位已全部使用。所選內容將加入現有的 Operation。",
-    "toExisting": "加入現有的 Operation",
+    "slotsFullHint": "7 個行動欄位已全部使用。所選內容將加入現有的行動。",
+    "toExisting": "加入現有的行動",
     "open": "在 Codex 中開啟「{{name}}」"
   },
   "pathCtl": {
@@ -9245,30 +9251,30 @@
       "hangar": "在機庫中查看",
       "sammlung": "在收藏中查看"
     },
-    "whereTitle": "放在哪裡?",
+    "whereTitle": "放在哪裡？",
     "otherPlace": "其他地點…",
     "otherPlaceholder": "輸入地點",
     "store": "放下",
-    "wishAssigned": "其中 {{n}} 個已分配給 Operation",
+    "wishAssigned": "其中 {{n}} 個已分配給行動",
     "assign": {
       "go": "分配",
-      "title": "分配給 Operation",
-      "howMany": "多少個?",
+      "title": "分配給行動",
+      "howMany": "多少個？",
       "ofWished": "共 {{n}} 個願望",
       "ofFree": "共 {{n}} 個可用",
       "newest": "最近建立",
-      "new": "新 Operation",
+      "new": "新行動",
       "newHint": "將建議名稱",
-      "loading": "正在載入 Operation…",
+      "loading": "正在載入行動…",
       "working": "分配中…",
       "slots": "已使用 {{used}} / {{max}} 個欄位",
-      "planHint": "Einsatz 請在",
+      "planHint": "任務請在",
       "inHq": "HQ 中規劃",
-      "progress": "{{done}} / {{total}} 個 Einsatz",
-      "noEinsatz": "尚未規劃 Einsatz",
-      "line": "{{n}} 個在 Operation「{{name}}」中",
-      "moreOne": "另有 1 個 Operation",
-      "more": "另有 {{n}} 個 Operation"
+      "progress": "{{done}} / {{total}} 個任務",
+      "noEinsatz": "尚未規劃任務",
+      "line": "{{n}} 個在行動「{{name}}」中",
+      "moreOne": "另有 1 個行動",
+      "more": "另有 {{n}} 個行動"
     },
     "own": {
       "morePlacesOne": "另有 1 個地點",
@@ -9276,16 +9282,16 @@
     }
   },
   "itemStage": {
-    "aria": "舞台:{{name}}",
+    "aria": "舞台：{{name}}",
     "eyebrowSil": "剪影",
     "eyebrow3d": "3D 模型",
     "viewAria": "檢視",
     "viewSilhouette": "剪影",
     "view3d": "3D 模型",
     "noSilhouette": "無剪影",
-    "noSilhouetteReason": "此版本中沒有此物品的剪影,改以預覽圖代替。",
+    "noSilhouetteReason": "此版本中沒有此物品的剪影，改以預覽圖代替。",
     "no3dReason": "此版本中沒有此物品的 3D 模型。",
-    "inNachschub": "屬於 Operation「{{name}}」",
+    "inNachschub": "屬於行動「{{name}}」",
     "panelAria": "數值與資訊",
     "tabsAria": "區塊",
     "tab": {
@@ -9305,7 +9311,7 @@
   "blueprintWish": {
     "craftTimes": "製作次數",
     "button": "材料 ×{{n}} 加入願望清單",
-    "done": "{{n}}× {{name}}:材料已加入你的願望清單"
+    "done": "{{n}}× {{name}}：材料已加入你的願望清單"
   },
   "adminEvents": {
     "eyebrow": "管理員",
@@ -9372,7 +9378,7 @@
       "beta": "Beta 功能"
     },
     "view": {
-      "toHolo": "切換至 Holotable",
+      "toHolo": "切換至全息桌",
       "toClassic": "切換至經典檢視"
     },
     "share": {

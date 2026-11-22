@@ -20,7 +20,7 @@
       "signInAs": "以 {{account}} 登录"
     },
     "switch": {
-      "title": "切换账号?",
+      "title": "切换账号？",
       "message": "此设备当前以 {{current}} 登录。继续将改为以 {{target}} 登录。",
       "confirm": "切换账号"
     },
@@ -43,10 +43,10 @@
     "step3": "手机打开此页面",
     "qrAlt": "用于在手机上打开此页面的二维码",
     "loading": "正在生成二维码…",
-    "expires": "二维码有效期为一分钟,且只能使用一次。",
+    "expires": "二维码有效期为一分钟，且只能使用一次。",
     "retry": "生成新二维码",
     "connected": "手机已连接",
-    "connectedDevice": "已连接:{{device}}",
+    "connectedDevice": "已连接：{{device}}",
     "devices": "已连接的手机",
     "noDevice": "未知设备",
     "expired": "二维码已过期。",
@@ -235,17 +235,17 @@
   "impersonation": {
     "banner": {
       "aria": "角色预览已启用",
-      "viewingAs": "正在以此身份预览:{{role}}",
-      "realRole": "你的真实角色:{{role}}",
+      "viewingAs": "预览身份：{{role}}",
+      "realRole": "你的真实角色：{{role}}",
       "exit": "退出预览",
       "fidelity": {
-        "anon": "还原度高的预览——应用在此处确实处于未登录状态,因此你看到的与访客所见完全一致。",
-        "viewer": "仅为界面和路由预览。数据仍以你的真实权限获取,因此仅限查看者的数据限制(空列表、RLS 拒绝)不会在此重现。",
-        "collaborator": "仅为界面和路由预览。数据仍以你的真实权限获取,因此仅限协作者的数据限制不会在此重现。"
+        "anon": "真实预览——应用在此处确实处于未登录状态，因此你看到的与访客所见完全一致。",
+        "viewer": "仅为界面和路由预览。数据仍以你的真实权限获取，因此仅限查看者的数据限制（空列表、RLS 拒绝）不会在此重现。",
+        "collaborator": "仅为界面和路由预览。数据仍以你的真实权限获取，因此仅限协作者的数据限制不会在此重现。"
       }
     },
-    "enterFailed": "无法切换预览——浏览器阻止了此更改(隐私浏览或存储空间已满)。未重新加载任何内容。",
-    "enterFailedDismiss": "忽略"
+    "enterFailed": "无法切换预览——浏览器阻止了此更改（隐私浏览或存储空间已满）。未重新加载任何内容。",
+    "enterFailedDismiss": "关闭"
   },
   "codex": {
     "detailShell": {
@@ -269,27 +269,27 @@
       "unpin": "取消固定",
       "remove": "从机库移除"
     },
-    "title": "图鉴",
-    "subtitle": "每艘舰船、武器、组件、物品、弹药和制造商——可搜索,数据提取自 LIVE 版本。",
+    "title": "Codex",
+    "subtitle": "每艘舰船、武器、组件、物品、弹药和制造商——可搜索，数据提取自 LIVE 版本。",
     "landing": {
       "hero": {
         "eyebrow": "{{category}} · {{patch}} 新增",
         "eyebrowPatch": "{{category}} · {{patch}}",
         "title": "关于每艘舰船的一切。",
-        "eyebrowIdle": "图鉴"
+        "eyebrowIdle": "Codex"
       },
       "teaser": {
         "eyebrow": "设计中",
-        "title": "即将到来的舰船",
+        "title": "即将登场的舰船",
         "open": "查看舰船",
-        "all": "所有已公布的舰船({{count}})",
+        "all": "所有已公布的舰船（{{count}}）",
         "dots": "选择已公布的舰船"
       },
       "tiles": {
         "label": "工具",
         "keybinds": {
           "title": "按键绑定",
-          "text": "LIVE 版本的所有默认按键绑定,可搜索。"
+          "text": "LIVE 版本的所有默认按键绑定，可搜索。"
         }
       },
       "terminal": {
@@ -321,9 +321,9 @@
         "liveMovedDismiss": "关闭提示"
       },
       "patch": {
-        "archive": "Arsenal 中共 {{count}} 条记录",
+        "archive": "军械库中共 {{count}} 条记录",
         "extracted": "提取于 {{date}}",
-        "build": "构建版本“{{build}}”(占位符)"
+        "build": "构建版本“{{build}}”（占位符）"
       },
       "me": {
         "eyebrow": "在船上",
@@ -348,7 +348,7 @@
         "backpack": "背包"
       },
       "board": {
-        "archiveCount": "Arsenal 中有 {{count}} 件",
+        "archiveCount": "军械库中有 {{count}} 件",
         "readyOn": "已装备",
         "readyOff": "空置",
         "readiness": {
@@ -376,8 +376,8 @@
       "holo": {
         "label": "全息桌",
         "rotation": "选择分类",
-        "next": "点击:继续",
-        "hold": "点击:暂停",
+        "next": "点击：继续",
+        "hold": "点击：暂停",
         "loading": "全息桌加载中…",
         "empty": "此补丁暂无条目。",
         "newIn": "新",
@@ -401,7 +401,7 @@
           "mass": "质量"
         },
         "armorHp": "装甲",
-        "cargoScu": "货物",
+        "cargoScu": "货舱",
         "crew": {
           "size": "船员"
         },
@@ -409,8 +409,8 @@
           "weapons": "武器",
           "shield": "护盾",
           "quantum": "量子驱动器",
-          "power": "功率(分段)",
-          "cooler": "冷却(每秒)"
+          "power": "功率（分段）",
+          "cooler": "冷却（每秒）"
         }
       },
       "overview": {
@@ -419,7 +419,7 @@
         "manufacturer": "制造商",
         "type": "类型",
         "part": "部件",
-        "class": "等级"
+        "class": "类别"
       },
       "rail": {
         "keybinds": "按键绑定"
@@ -435,11 +435,11 @@
         "ship": {
           "count": "{{patch}} 中有 {{count}} 艘新舰船。",
           "name": "{{name}} 已可飞行。",
-          "announced": "已公布 {{announced}} 艘舰船,{{count}} 艘可飞行。",
+          "announced": "已公布 {{announced}} 艘舰船，{{count}} 艘可飞行。",
           "s1": "每艘舰船的一切信息。",
-          "s2": "哪艘舰船适合你?",
+          "s2": "哪艘舰船适合你？",
           "s3": "每个船体、每项数值、每款涂装。",
-          "s4": "先比较,再飞行。"
+          "s4": "先比较，再飞行。"
         },
         "fpsWeapon": {
           "count": "{{patch}} 中有 {{count}} 把新 FPS 武器。",
@@ -472,7 +472,7 @@
           "count": "{{patch}} 中有 {{count}} 件新工具。",
           "name": "{{name}} 是 {{patch}} 的新内容。",
           "announced": "已公布 {{announced}} 件工具。",
-          "s1": "适合每个班次的工具。",
+          "s1": "每份工作都有趁手的工具。",
           "s2": "牵引光束、打捞头、刮削器。",
           "s3": "在 Verse 中更高效地工作。",
           "s4": "每件工具、每项数值。"
@@ -502,7 +502,7 @@
       "set": {
         "label": "数值",
         "flight": "飞行",
-        "loadout": "装备方案",
+        "loadout": "装载配置",
         "zone": "≈ 区域"
       },
       "compare": {
@@ -511,16 +511,16 @@
         "avg": "同级平均 {{avg}}"
       },
       "codex": {
-        "label": "Codex:本补丁新增",
+        "label": "Codex：本补丁新增",
         "title": "Codex · {{patch}} 新增",
         "titleNoPatch": "Codex · 新增",
-        "titleDiscover": "图鉴 · {{patch}}",
+        "titleDiscover": "Codex · {{patch}}",
         "titleRecent": "Codex · 近期新增",
         "patchGroup": "补丁 {{patch}}",
         "announced": "已公布",
-        "onTable": "桌面上",
+        "onTable": "全息桌上",
         "categories": "分类",
-        "openPage": "打开页面:{{name}}",
+        "openPage": "打开页面：{{name}}",
         "more": "+ {{count}} 个新增和更新",
         "moreDiscover": "+ 另有 {{count}} 个",
         "all": "全部{{category}}",
@@ -530,14 +530,14 @@
       }
     },
     "index": {
-      "title": "Codex — 索引模式"
+      "title": "Codex——索引模式"
     },
     "upcoming": {
-      "subtitle": "RSI 舰船矩阵中已公布、但尚未出现在我们解包游戏数据中的舰船——即 RSI 列出的内容与正式版构建实际包含的内容之间的差异。",
+      "subtitle": "RSI 舰船矩阵中已公布、但尚未出现在我们解包游戏数据中的舰船——即 RSI 列出的内容与 LIVE 版本实际包含的内容之间的差异。",
       "conceptTitle": "概念阶段",
       "conceptSub": "RSI 仍在制作这些舰船——尚不可飞行",
       "flightReadyTitle": "RSI 标记为可飞行",
-      "flightReadySub": "RSI 将这些列为可飞行,但我们的游戏数据中尚无匹配项",
+      "flightReadySub": "RSI 将这些列为可飞行，但我们的游戏数据中尚无匹配项",
       "status": {
         "concept": "概念阶段",
         "flightReady": "可飞行"
@@ -586,7 +586,7 @@
         "data_running": "数据运输",
         "pathfinder": "探路者",
         "expedition": "远征",
-        "touring": "旅行",
+        "touring": "观光",
         "construction": "建造",
         "military_transport": "军事运输",
         "heavy_freight": "重型货运"
@@ -601,42 +601,42 @@
         "status": "状态"
       },
       "notice": {
-        "concept": "RSI 已公布这艘舰船,但仍在制作中——游戏内尚不可飞行。因此这里没有挂点、组件或数值。",
-        "flightReady": "RSI 将这艘舰船列为可飞行,但我们解包的游戏数据中尚无匹配项——数值将随后续某次构建上传到来。"
+        "concept": "RSI 已公布这艘舰船，但仍在制作中——游戏内尚不可飞行。因此这里没有挂点、组件或数值。",
+        "flightReady": "RSI 将这艘舰船列为可飞行，但我们解包的游戏数据中尚无匹配项——数值将随后续的某次版本数据上传一并提供。"
       },
       "rsiLink": "在 robertsspaceindustries.com 查看",
       "noData": {
-        "title": "为什么这里没有数值?",
-        "body": "我们的 Codex 基于正式版构建的数据生成。这艘舰船尚未进入游戏,因此无从提取——一旦上线,它将自动获得完整的 Codex 条目。",
+        "title": "为什么这里没有数值？",
+        "body": "我们的 Codex 基于 LIVE 版本的数据生成。这艘舰船尚未进入游戏，因此无从提取——一旦上线，它将自动获得完整的 Codex 条目。",
         "browse": "全部已公布舰船"
       },
       "notFound": {
         "title": "未找到已公布的舰船",
-        "body": "这艘舰船已不在 RSI 舰船矩阵中——可能已进入游戏并拥有正式的 Codex 条目,也可能是 RSI 移除了该条目。"
+        "body": "这艘舰船已不在 RSI 舰船矩阵中——可能已进入游戏并拥有正式的 Codex 条目，也可能是 RSI 移除了该条目。"
       }
     },
     "categoriesAria": "Codex 分类",
-    "soon": "即将推出 — 尚未提取数据。",
+    "soon": "即将推出——尚未提取数据。",
     "soonShort": "即将推出",
     "status": {
       "extracted": "已提取",
       "tool": "提取器",
       "coverage": "覆盖率",
       "qualityHint": "质量评分在正式计算之前仅供参考。",
-      "stale": "需要上传数据 — 当前游戏版本比此目录所反映的更新。",
+      "stale": "需要上传数据——当前游戏版本比此目录所反映的更新。",
       "staleUploadLink": "打开 Verse Data Uploader"
     },
     "search": {
-      "didYouMean": "你是不是想找:",
-      "placeholder": "筛选此列表 – 名称或类别(例如 Gladius、AEGS_*)…",
+      "didYouMean": "你是不是想找：",
+      "placeholder": "筛选此列表——名称或类别（例如 Gladius、AEGS_*）…",
       "listFilterLabel": "筛选此列表",
       "clear": "清除搜索",
-      "upcomingHint": "不在游戏数据中,但 RSI 已公布:{{names}}",
-      "alsoIn": "也出现在:",
+      "upcomingHint": "不在游戏数据中，但 RSI 已公布：{{names}}",
+      "alsoIn": "也出现在：",
       "upcomingLink": "在即将推出的舰船中查看",
       "bar": {
-        "label": "搜索图鉴",
-        "placeholder": "搜索图鉴 — 舰船、组件、武器、装备、制造商…",
+        "label": "搜索 Codex",
+        "placeholder": "搜索 Codex——舰船、组件、武器、装备、制造商…",
         "clear": "清除搜索",
         "shortcut": "Ctrl K",
         "suggestionsAria": "建议",
@@ -647,7 +647,7 @@
         "areas": "分类",
         "failed": "搜索失败",
         "partial": "部分分类无法搜索",
-        "searching": "正在搜索图鉴…",
+        "searching": "正在搜索 Codex…",
         "empty": "没有找到与“{{term}}”匹配的结果。",
         "allInIndex": "索引中的全部 {{n}} 项",
         "allUpcoming": "即将推出的舰船中的全部 {{n}} 项",
@@ -677,8 +677,8 @@
         "close": "关闭搜索"
       },
       "trigger": {
-        "label": "搜索整个图鉴",
-        "tooltip": "搜索整个图鉴(Ctrl+K)"
+        "label": "搜索整个 Codex",
+        "tooltip": "搜索整个 Codex（Ctrl+K）"
       }
     },
     "kinds": {
@@ -722,7 +722,7 @@
       "open": "游戏内购买地点",
       "title": "在哪里购买 {{name}}",
       "loading": "正在加载商店…",
-      "none": "未知游戏内商店。",
+      "none": "暂无已知的游戏内商店。",
       "from": "{{price}} aUEC 起",
       "placeOne": "1 个地点",
       "places": "{{count}} 个地点",
@@ -735,7 +735,7 @@
       "clothing": "服装与配饰",
       "medical": "医疗与小工具",
       "attachments": "武器配件",
-      "suits": "作战服与喷气背包",
+      "suits": "太空服与喷气背包",
       "paints": "涂装",
       "decor": "装饰",
       "misc": "杂项",
@@ -774,7 +774,7 @@
         "ship": "舰载武器"
       },
       "fps": {
-        "sidearm": "手枪",
+        "sidearm": "副武器",
         "primary": "主武器",
         "heavy": "重型武器",
         "melee": "近战",
@@ -786,7 +786,7 @@
         "gun": "机炮",
         "turret": "炮塔",
         "missile": "导弹与鱼雷",
-        "countermeasure": "对抗措施",
+        "countermeasure": "反制措施",
         "mining": "采矿激光",
         "utility": "牵引与打捞",
         "other": "其他"
@@ -794,7 +794,7 @@
     },
     "weaponDetail": {
       "eyebrow": "武器",
-      "intro": "选择器中的 17 列并不是全部。这里列出舰载武器在 P4K 中实际包含的内容 — 按来源分组,旁边标注对应的结构体。青色 = 存在,金色虚线 = 游戏文件中没有。",
+      "intro": "选择器中的 17 列并不是全部。这里列出舰载武器在 P4K 中实际包含的内容——按来源分组，旁边标注对应的结构体。青色 = 存在，金色虚线 = 游戏文件中没有。",
       "card": {
         "damageChannels": "各通道伤害",
         "fireBallistics": "射击与弹道",
@@ -804,7 +804,7 @@
         "physical": "物理",
         "attachments": "附件",
         "aiming": "辅助瞄准",
-        "missing": "不存在",
+        "missing": "缺失",
         "cmDecoy": "每次发射的诱饵",
         "cmNoise": "每次发射的干扰信号",
         "cmRecommend": "对此舰船的推荐"
@@ -821,16 +821,16 @@
         "projectileSpeed": "弹丸速度",
         "lifetime": "存续时间",
         "range": "射程",
-        "alpha": "Alpha",
+        "alpha": "单发伤害",
         "burstDps": "爆发 DPS",
         "sustainedDps": "持续 DPS",
         "penetration": "穿透",
         "powerDraw": "能耗",
-        "emOnline": "EM(在线)",
-        "irOnline": "IR(在线)",
+        "emOnline": "EM（开启时）",
+        "irOnline": "IR（开启时）",
         "hp": "HP",
-        "distortionPool": "Distortion 池",
-        "distortionRegen": "Distortion 恢复",
+        "distortionPool": "畸变池",
+        "distortionRegen": "畸变恢复",
         "mass": "质量",
         "size": "尺寸",
         "grade": "等级",
@@ -850,13 +850,13 @@
         "cmRadius": "云团半径",
         "cmCloudLifetime": "云团持续时间",
         "cmLifetime": "生效时间",
-        "shipIr": "舰船:IR",
-        "shipEm": "舰船:EM",
-        "shipCs": "舰船:截面",
+        "shipIr": "舰船：IR",
+        "shipEm": "舰船：EM",
+        "shipCs": "舰船：截面",
         "cmNeedIr": "针对 IR 的推荐",
         "cmNeedEm": "针对 EM 的推荐",
         "cmNeedCs": "针对截面的推荐",
-        "armorSignal": "护甲信号系数"
+        "armorSignal": "装甲信号系数"
       },
       "src": {
         "damage": "AmmoParams.impactDamage",
@@ -865,11 +865,11 @@
         "power": "ItemResourceComponentParams.states[].deltas[]",
         "durability": "SHealthComponentParams · SDistortionParams",
         "physical": "SAttachableComponentParams.AttachDef",
-        "attachments": "SItemPortContainerComponentParams — 超频和枪管模块挂载于此",
+        "attachments": "SItemPortContainerComponentParams——超频和枪管模块挂载于此",
         "aiming": "SCItemAimableComponentParams",
-        "missing": "仅超频修正值,全部为 1.0",
+        "missing": "仅超频修正值，全部为 1.0",
         "countermeasure": "AmmoParams.projectileParams.typeParams · weaponParams.ammoCapacity",
-        "cmRecommend": "经验法则:舰船信号 ÷ 每次发射的信号,向下取整后 + 1 — 只有这样,发射才能明显盖过舰船。舰船数值为实时计算:当前配置和能量设置下所有通电组件(冷却器、动力核心、护盾、量子驱动器…)的 IR / EM 辐射之和,再乘以护甲的信号系数。"
+        "cmRecommend": "经验法则：舰船信号 ÷ 每次发射的信号，向下取整后 + 1——只有这样，发射才能明显盖过舰船。舰船数值为实时计算：当前配置和能量设置下所有通电组件（冷却器、发电机、护盾、量子驱动器…）的 IR / EM 辐射之和，再乘以装甲的信号系数。"
       },
       "value": {
         "none": "0 = 无",
@@ -887,7 +887,7 @@
       }
     },
     "componentKind": {
-      "PowerPlant": "电源",
+      "PowerPlant": "发电机",
       "Shield": "护盾发生器",
       "Cooler": "冷却器",
       "QuantumDrive": "量子驱动器",
@@ -913,15 +913,15 @@
       "inHangar": "在你的机库中",
       "foldedOne": "+1 个文件变体",
       "foldedMany": "+{{count}} 个文件变体",
-      "foldedTitle": "游戏文件中有多条几乎相同的记录,因此合并显示为一张卡片:{{names}}",
+      "foldedTitle": "游戏文件中有多条几乎相同的记录，因此合并显示为一张卡片：{{names}}",
       "skinsOne": "+1 个涂装",
       "skinsMany": "+{{count}} 个涂装",
-      "skinsTitle": "这把武器的所有涂装共用一张卡片。可在条目内切换:{{names}}",
+      "skinsTitle": "这把武器的所有涂装共用一张卡片。可在条目内切换：{{names}}",
       "editionsOne": "+1 个变体",
       "editionsMany": "+{{count}} 个变体",
-      "editionsTitle": "游戏文件中这个船体出现了多次——包括重复记录和营销版本。它们共用一张卡片,可在条目内切换:{{names}}",
+      "editionsTitle": "游戏文件中这个船体出现了多次——包括重复记录和营销版本。它们共用一张卡片，可在条目内切换：{{names}}",
       "addToHangar": "添加到机库",
-      "addToHangarFailed": "无法添加到机库,请重试。"
+      "addToHangarFailed": "无法添加到机库，请重试。"
     },
     "skinPicker": {
       "label": "涂装",
@@ -944,7 +944,7 @@
         "holoHint": "全息桌视图"
       },
       "stage": {
-        "einordnung": "定位",
+        "einordnung": "排名",
         "cohortLink": "查看所有舰船",
         "view3d": "3D",
         "surfaceSimple": "简易",
@@ -959,19 +959,19 @@
         "detailHide": "详情 ▴",
         "allValues": "全部数值 ▾",
         "allValuesHide": "全部数值 ▴",
-        "journalChanged": "已更改:{{label}}",
+        "journalChanged": "已更改：{{label}}",
         "undo": "撤销",
         "detailsShow": "详情 ▾",
         "detailsHide": "详情 ▴",
         "sound": "界面音效",
-        "mobileTabsSetting": "桌面/数据标签页(移动端)",
-        "tabTable": "桌面",
+        "mobileTabsSetting": "全息桌/数据标签页（移动端）",
+        "tabTable": "全息桌",
         "tabData": "数据",
         "perspective": {
           "offensive": "进攻",
           "defensive": "防御",
           "movement": "机动",
-          "signature": "特征信号与冷却"
+          "signature": "信号与冷却"
         },
         "staticCrew": "船员",
         "staticMass": "质量",
@@ -993,14 +993,14 @@
           "high": "在 {{n}} 艘舰船中高于中位数。",
           "mid": "在 {{n}} 艘舰船中低于中位数。",
           "low": "在 {{n}} 艘舰船中位列后四分之一。",
-          "axes": "最强项 {{best}}(P{{bp}}),最弱项 {{worst}}(P{{wp}})。"
+          "axes": "最强项 {{best}}（P{{bp}}），最弱项 {{worst}}（P{{wp}}）。"
         },
         "ghostTitle": "补丁 {{patch}} 中的数值",
         "viewSchemaUnavailable": "此版本中没有挂点坐标",
         "placeholderAria": "{{name}} 的占位轮廓",
         "noPorts": "游戏数据中没有挂点",
-        "pinKey": "图钉图例",
-        "pinLabels": "船体上的图钉标注",
+        "pinKey": "标记图例",
+        "pinLabels": "船体上的标记标签",
         "legendUnresolved": "位置为估算",
         "rawPortHint": "游戏数据中的原始端口——无可更换或打开的部件。",
         "pinListTitle": "所有挂点",
@@ -1013,12 +1013,12 @@
           "changes": "更改"
         },
         "backToParts": "所有部件",
-        "backHint": "取消模型中的选择 (Esc)",
+        "backHint": "取消模型中的选择（Esc）",
         "partsTotal": "{{n}} 个部件",
         "partSize": "尺寸",
         "partGrade": "等级",
-        "iconWishlist": "愿望",
-        "iconSupply": "操作",
+        "iconWishlist": "愿望清单",
+        "iconSupply": "行动",
         "iconStock": "库存",
         "previewTitle": "详情页预览",
         "previewMaker": "制造商",
@@ -1026,14 +1026,14 @@
         "immersive": "沉浸式",
         "immersiveTip": "全屏打开模型",
         "immersiveHint": "点按“沉浸式”可更大视图查看模型",
-        "rotateHint": "旋转以获得更大视图",
+        "rotateHint": "旋转设备以获得更大视图",
         "resetView": "重置视图",
         "viewHull": "船体",
         "viewSchema": "示意图",
         "statsAria": "舰船数值",
         "statsClose": "关闭数值",
         "sheetHandle": "数值表",
-        "sheetHandleAria": "数值表,拖动或点按可调整高度",
+        "sheetHandleAria": "数值表，拖动或点按可调整高度",
         "previewFitted": "安装于",
         "previewBuy": "购买地点",
         "previewAlternatives": "替代方案",
@@ -1041,7 +1041,7 @@
         "viewAkte": "档案",
         "view3dUnavailable": "该舰船暂无 3D 模型。",
         "viewsAria": "视图",
-        "filtersAria": "在桌面上显示部件",
+        "filtersAria": "在全息桌上显示部件",
         "filterParts": "部件",
         "filterWeapons": "武器",
         "filterMissiles": "导弹",
@@ -1060,8 +1060,8 @@
         "offensive": "进攻",
         "defensive": "防御",
         "movement": "机动",
-        "signature": "特征信号与冷却",
-        "signatureRank": "5 个级别排名中的 {{n}} 个",
+        "signature": "信号与冷却",
+        "signatureRank": "{{n}} / 5 级",
         "cooling": "冷却负载",
         "coolingValue": "{{used}} / {{total}}",
         "stealthPreset": "潜行",
@@ -1094,7 +1094,7 @@
           "offensive": "进攻",
           "defensive": "防御",
           "movement": "机动",
-          "signature": "特征信号与冷却"
+          "signature": "信号与冷却"
         },
         "delta": {
           "noChange": "此类别没有更改。",
@@ -1105,23 +1105,23 @@
         },
         "adminOnly": "仅限管理员/协作者",
         "schema": {
-          "version": "架构版本",
+          "version": "数据结构版本",
           "extractedAt": "提取时间",
           "entityCount": "记录数",
           "reExtractPending": "等待重新提取",
           "reExtractPendingYes": "是"
         },
         "forkGuard": {
-          "title": "成为所有者?",
-          "body": "此更改会使该配置与原始配置分离,且无法撤销。",
+          "title": "成为所有者？",
+          "body": "此更改会使该配置与原始配置分离，且无法撤销。",
           "confirm": "成为所有者"
         },
         "deltaShow": "显示更改",
         "deltaHide": "隐藏更改",
         "current": "当前",
-        "hint": "在左侧选择一个较旧的补丁,这里将显示该舰船的变化。",
-        "fromAria": "从 {{patch}} — 选择补丁",
-        "toAria": "到 {{patch}} — 选择补丁",
+        "hint": "在左侧选择一个较旧的补丁，这里将显示该舰船的变化。",
+        "fromAria": "从 {{patch}}——选择补丁",
+        "toAria": "到 {{patch}}——选择补丁",
         "fromTitle": "起始补丁",
         "toTitle": "目标补丁",
         "pickFrom": "选择补丁",
@@ -1145,24 +1145,24 @@
         "copy": "复制",
         "copied": "已复制",
         "revoke": "停止分享",
-        "revokeNote": "已在关注此链接的接收者会保持连接,直到该配置被删除。",
-        "errorGeneric": "操作失败,请重试。",
+        "revokeNote": "已在关注此链接的接收者会保持连接，直到该配置被删除。",
+        "errorGeneric": "操作失败，请重试。",
         "copyLinkHint": "复制此视图的地址——包括全息桌和未保存的挂点更改。",
-        "unsavedHint": "{{n}} 项未保存的更改仅存在于复制的链接中,不在机库链接里。",
+        "unsavedHint": "{{n}} 项未保存的更改仅存在于复制的链接中，不在机库链接里。",
         "signInHint": "登录后即可将机库配置作为独立链接分享。",
-        "notInHangarHint": "这艘舰船还不在你的机库中。请先添加,然后才能分享配置。",
+        "notInHangarHint": "这艘舰船还不在你的机库中。请先添加，然后才能分享配置。",
         "noConfigHint": "你的机库中还没有这艘舰船的配置——请先保存一套装载配置。",
         "copyFailed": "此处不允许复制——请选中链接并手动复制。",
         "saveAndShare": "保存并分享",
         "shareLink": "分享链接",
         "sharing": "正在分享…",
-        "followedShareHint": "分享后,这套配置将成为你自己的配置,不再跟随其所有者。",
+        "followedShareHint": "分享后，这套配置将成为你自己的配置，不再跟随其所有者。",
         "linksLoading": "正在加载你的链接…",
         "linksError": "无法加载你的链接。",
-        "activeLinks": "有效链接({{n}})",
+        "activeLinks": "有效链接（{{n}}）",
         "readOnlyHint": "这是一套已分享的装载配置。创建副本即可分享你自己的链接。",
         "revokeConfirm": {
-          "title": "停止分享此链接?",
+          "title": "停止分享此链接？",
           "body": "任何人都无法再通过此链接创建该装载配置的副本。已经在跟随它的接收者仍保持连接。"
         }
       },
@@ -1173,7 +1173,7 @@
         "loading": "正在加载已分享的装载配置…",
         "banner": "由 {{owner}} 分享——“{{name}}”。创建副本即可编辑。",
         "adopt": "创建副本以编辑",
-        "unavailable": "此已分享的装载配置不可用——链接无效、已过期、已撤销,或属于另一艘舰船。表格显示的是出厂装载配置。",
+        "unavailable": "此已分享的装载配置不可用——链接无效、已过期、已撤销，或属于另一艘舰船。全息桌显示的是出厂装载配置。",
         "loadError": "无法加载已分享的装载配置。",
         "exit": "返回我的装载配置",
         "readOnlyHint": "已分享的装载配置——只读。创建副本即可更改或保存。"
@@ -1189,8 +1189,8 @@
         "legendHint": "点击 = 选择部件"
       },
       "card": {
-        "rank": "第 {{n}} 名,共 {{m}} 名",
-        "overallTip": "综合:优于该组 {{pct}}% 的对象",
+        "rank": "第 {{n}} 名，共 {{m}} 名",
+        "overallTip": "综合：优于该组 {{pct}}% 的对象",
         "compareWith": "对比对象",
         "scopeOff": "{{name}} · 无数据",
         "shapeAria": "排名的显示方式",
@@ -1235,50 +1235,50 @@
           "aUEC": "aUEC",
           "wish": "加入愿望清单",
           "wished": "已在愿望清单中",
-          "wishedFrom": "来源:{{source}}",
+          "wishedFrom": "来源：{{source}}",
           "undo": "撤销",
           "wishError": "无法添加该条目。",
           "signIn": "请登录后保存。",
           "wikelo": "在 Wikelo 兑换",
           "wikeloRow": "Wikelo 兑换",
           "wikeloPlace": "Wikelo Emporium · Kinga Station",
-          "wikeloNoData": "所需部件尚未收录在图鉴数据中。",
+          "wikeloNoData": "所需部件尚未收录在 Codex 数据中。",
           "wikeloHave": "库存 {{have}} / {{need}}",
           "wikeloSource": "Wikelo 兑换",
-          "attribution": "价格:UEX Corp · Wikelo:图鉴兑换数据"
+          "attribution": "价格：UEX Corp · Wikelo：Codex 兑换数据"
         }
       },
       "hangar": {
         "loadouts": "装载配置",
         "werk": "出厂",
-        "werkChanged": "未保存的更换:{{n}}",
+        "werkChanged": "未保存的更换：{{n}}",
         "diffOne": "1 个部件与出厂配置不同",
         "diffMany": "{{n}} 个部件与出厂配置不同",
         "diffNone": "与出厂相同",
         "selectedAria": "{{name}} 的操作",
         "removeExemplar": "移除该舰船实例",
-        "removeTitle": "移除“{{name}}”?",
+        "removeTitle": "移除“{{name}}”？",
         "removeBody": "装载配置“{{name}}”将被删除。舰船仍保留在机库中。",
         "copy": "复制此舰船实例",
-        "copyName": "{{name}}(副本)",
+        "copyName": "{{name}}（副本）",
         "newFromWerk": "基于出厂配置新建实例",
         "saveWerk": "作为实例添加到机库",
         "saveBuild": "将改装保存为实例",
         "anotherCopy": "再添加一艘 {{name}} 到机库",
         "nameTitle": "实例名称",
         "nameLabel": "名称",
-        "nameSuggested": "建议:“{{name}}”——可直接采用,也可输入你自己的名称。",
+        "nameSuggested": "建议：“{{name}}”——可直接采用，也可输入你自己的名称。",
         "autosavedOne": "已保存 · 1 项更改",
         "autosavedMany": "已保存 · {{n}} 项更改",
         "wishWithOne": "想要此改装 · 1 个已更换部件",
         "wishWithMany": "想要此改装 · {{n}} 个已更换部件",
-        "wishName": "愿望:{{name}}",
-        "wishLoadoutUnavailable": "已在你的愿望中——其装载配置暂时无法存放在那里。"
+        "wishName": "愿望：{{name}}",
+        "wishLoadoutUnavailable": "已在你的愿望清单中——其装载配置暂时无法存放在那里。"
       },
       "partType": {
         "gatling": "加特林",
         "remoteTurret": "遥控炮塔",
-        "mannedTurret": "有人炮塔",
+        "mannedTurret": "载人炮塔",
         "scattergun": "霰弹炮",
         "massDriver": "质量驱动炮",
         "railgun": "磁轨炮",
@@ -1298,36 +1298,36 @@
         "radar": "雷达",
         "lifeSupport": "生命维持",
         "missileRack": "导弹架",
-        "countermeasure": "对抗措施"
+        "countermeasure": "反制措施"
       },
       "statShort": {
         "dps": "DPS",
-        "alphaDamage": "Alpha",
+        "alphaDamage": "单发",
         "fireRate": "射速",
         "range": "射程",
         "projectileSpeed": "速度",
         "missileCount": "数量",
         "missileSize": "尺寸",
         "tractorForce": "力量",
-        "tractorRange": "射程",
+        "tractorRange": "距离",
         "tractorSpeed": "速度",
         "shieldHp": "HP",
         "shieldRegen": "回复",
         "regenDelay": "延迟",
-        "downedDelay": "失效",
+        "downedDelay": "击穿",
         "powerOutput": "功率",
         "health": "HP",
         "emSignature": "EM",
         "irSignature": "IR",
         "driveSpeed": "速度",
         "jumpRange": "跳跃",
-        "spoolTime": "启动",
-        "fuelRate": "燃料",
+        "spoolTime": "预热",
+        "fuelRate": "油耗",
         "radarSensitivity": "传感器",
         "pingCooldown": "Ping",
         "aimAssistRange": "瞄准辅助",
         "coolingRate": "冷却",
-        "powerDraw": "需求",
+        "powerDraw": "耗电",
         "coolantDraw": "冷却液",
         "cmCapacity": "储量",
         "cmLifetime": "持续时间",
@@ -1343,8 +1343,8 @@
         "deckCount": "{{n}} 层甲板",
         "deckEveryOnly3d": "同时显示所有甲板仅限 3D 视图——简易视图始终只显示一层甲板。",
         "gap": "已定位 {{located}} / {{total}} SCU",
-        "gapHint": "并非这艘舰船的每个货物网格在游戏数据中都有定位。缺口会保持可见,而不是悄悄补进总数。",
-        "groupsAria": "在桌面上显示内部元素",
+        "gapHint": "并非这艘舰船的每个货物网格在游戏数据中都有定位。缺口会保持可见，而不是悄悄补进总数。",
+        "groupsAria": "在全息桌上显示内部元素",
         "groupsOn": "已显示",
         "presetTag": "预设",
         "presetTitle": "{{role}} · 预设",
@@ -1369,7 +1369,7 @@
         },
         "cat": {
           "grid": "货物网格",
-          "lift": "升降机",
+          "lift": "电梯",
           "stairs": "楼梯",
           "ladder": "梯子",
           "ramp": "坡道",
@@ -1391,20 +1391,20 @@
           "radar": "雷达",
           "fuelTank": "燃料箱",
           "maintenance": "维护点",
-          "turret": "炮塔(通道)",
+          "turret": "炮塔（入口）",
           "computer": "计算机",
           "bed": "床",
-          "head": "厕所与淋浴",
+          "head": "卫生间与淋浴",
           "door": "门"
         },
         "door": {
           "room": "房间门",
-          "inner": "内门与舱口",
-          "lift": "升降机门",
+          "inner": "内门/舱口",
+          "lift": "电梯门",
           "hangar": "机库门",
           "bow": "船首门",
           "airlock": "气闸门",
-          "ramp": "货舱坡道门",
+          "ramp": "坡道门",
           "cell": "牢房门"
         },
         "fact": {
@@ -1418,33 +1418,33 @@
         "yes": "是",
         "no": "否",
         "searchLabel": "搜索部件、房间和门",
-        "searchPlaceholder": "搜索部件、房间或门 …",
-        "searchPlaceholderOuter": "搜索部件 …",
+        "searchPlaceholder": "搜索部件、房间或门…",
+        "searchPlaceholderOuter": "搜索部件…",
         "hitsAria": "搜索结果",
         "hits": "“{{q}}”的结果 · {{n}}",
         "noHits": "未找到与“{{q}}”相关的内容。",
         "sideOuter": "外部",
         "sideInner": "内部",
         "scopeDeck": "{{deck}} · {{n}} 个元素",
-        "scopeShip": "整艘飞船 · {{decks}} 层甲板共 {{n}} 个元素",
-        "othersOff": "更多(已隐藏)",
+        "scopeShip": "整艘舰船 · {{decks}} 层甲板共 {{n}} 个元素",
+        "othersOff": "更多（已隐藏）",
         "roomsOfDeck": "房间 · {{n}}",
         "overview": "概览",
         "inRoom": "房间内",
         "roomEmpty": "此房间内没有已定位的元素。",
-        "inGrids": "位于 {{n}} 个 Grid 中",
+        "inGrids": "位于 {{n}} 个网格中",
         "poweredBy": "供电来源",
         "relay": "继电器 {{name}}",
-        "floorAt": "地面 {{z}} 米",
+        "floorAt": "地板高度 {{z}} 米",
         "roomHeight": "房间高度 {{h}} 米",
-        "view3dAria": "甲板 {{deck}} 的 3D 内部视图。方向键旋转,加号和减号缩放。",
-        "view3dAllAria": "所有甲板的 3D 内部视图。方向键旋转,加号和减号缩放。",
+        "view3dAria": "甲板 {{deck}} 的 3D 内部视图。方向键旋转，加号和减号缩放。",
+        "view3dAllAria": "所有甲板的 3D 内部视图。方向键旋转，加号和减号缩放。",
         "view3dHint": "拖动 · 旋转 · 滚轮 · 缩放",
         "zoomIn": "放大",
         "zoomOut": "缩小",
         "viewReset": "重置视图",
         "one": {
-          "grid": "货物 Grid",
+          "grid": "货物网格",
           "lift": "电梯",
           "stairs": "楼梯",
           "ladder": "梯子",
@@ -1458,7 +1458,7 @@
           "locker": "储物柜",
           "fireExt": "灭火器",
           "relay": "继电器",
-          "powerPlant": "动力装置",
+          "powerPlant": "发电机",
           "cooler": "冷却器",
           "shield": "护盾发生器",
           "quantumDrive": "量子驱动器",
@@ -1467,18 +1467,18 @@
           "radar": "雷达",
           "fuelTank": "燃料箱",
           "maintenance": "维护点",
-          "turret": "炮塔(入口)",
+          "turret": "炮塔（入口）",
           "computer": "计算机",
           "bed": "床",
-          "head": "卫生间和淋浴",
+          "head": "卫生间与淋浴",
           "door": "门"
         },
         "oneDoor": {
           "room": "房门",
-          "inner": "内门/舱盖",
+          "inner": "内门/舱口",
           "lift": "电梯门",
           "hangar": "机库门",
-          "bow": "前舱门",
+          "bow": "船首门",
           "airlock": "气闸门",
           "ramp": "坡道门",
           "cell": "牢房门"
@@ -1492,10 +1492,10 @@
       "noBuild": "尚未发布任何目录版本。",
       "partial": "此版本仅包含该类别的代表性子集——显示的数量即为已加载的内容。",
       "resetAll": "重置搜索和筛选",
-      "foundElsewhere": "没有与“{{term}}”相关的{{kind}}——在以下类别中找到:"
+      "foundElsewhere": "没有与“{{term}}”相关的{{kind}}——在以下类别中找到："
     },
     "error": {
-      "title": "无法加载图鉴",
+      "title": "无法加载 Codex",
       "retry": "重试"
     },
     "keybinds": {
@@ -1512,17 +1512,17 @@
       "searchPlaceholder": "搜索操作或按键…",
       "lang": {
         "aria": "操作名称的语言",
-        "note": "许多玩家使用英文版 Star Citizen——切换到 EN,即可看到与游戏内一致的操作名称。",
+        "note": "许多玩家使用英文版 Star Citizen——切换到 EN，即可看到与游戏内一致的操作名称。",
         "short": {
           "ui": "中",
           "en": "EN"
         },
         "hint": {
-          "ui": "操作名称(中文)",
+          "ui": "操作名称（中文）",
           "en": "操作名称为英文原文——与游戏内一致"
         }
       },
-      "count": "共 {{total}} 个操作,显示 {{shown}} 个",
+      "count": "共 {{total}} 个操作，显示 {{shown}} 个",
       "unbound": "—",
       "rawKey": "内部操作键",
       "contexts": {
@@ -1540,7 +1540,7 @@
         "tractor": "牵引光束",
         "melee": "近战",
         "hmd": "HMD",
-        "visor": "面甲",
+        "visor": "面罩",
         "headtracking": "头部追踪",
         "shop": "商店",
         "debug": "调试"
@@ -1549,7 +1549,7 @@
         "enter": "分配类别",
         "exit": "退出分配模式",
         "active": "分配模式已启用",
-        "help": "点击某一行进行选择(或点击分类标题选择整个分组),然后在下方选择层级并按“分配”。",
+        "help": "点击某一行进行选择（或点击分类标题选择整个分组），然后在下方选择层级并按“分配”。",
         "progress": "已分配 {{assigned}} / {{total}} 个操作",
         "filter": "筛选",
         "filters": {
@@ -1558,11 +1558,11 @@
           "assigned": "已分配"
         },
         "layers": {
-          "scope": "范围 (L1)",
-          "environment": "环境 (L2)",
-          "role": "角色 (L3)",
-          "activity": "活动 (L4)",
-          "actionGroup": "操作组 (L5)"
+          "scope": "范围（L1）",
+          "environment": "环境（L2）",
+          "role": "角色（L3）",
+          "activity": "活动（L4）",
+          "actionGroup": "操作组（L5）"
         },
         "none": "— 无 —",
         "selected": "已选择 {{count}} 项",
@@ -1578,7 +1578,7 @@
       "taxonomy": {
         "scope": {
           "verse": "Verse",
-          "in_game": "游戏内 (UI)",
+          "in_game": "游戏内（UI）",
           "out_of_game": "游戏外"
         },
         "environment": {
@@ -1608,7 +1608,7 @@
           "trading": "贸易",
           "racing": "竞速",
           "engineering": "工程",
-          "hacking": "黑客"
+          "hacking": "入侵"
         },
         "actionGroup": {
           "flight_control": "飞行控制",
@@ -1618,7 +1618,7 @@
           "mfd_hud": "MFD / HUD",
           "mining_tools": "采矿工具",
           "movement": "移动",
-          "camera": "摄像机",
+          "camera": "镜头",
           "communication": "通讯",
           "interaction": "交互"
         }
@@ -1677,19 +1677,19 @@
     "provenance": {
       "label": "来源",
       "build": "{{channel}} · {{patch}} · 构建 {{build}}",
-      "quality": "品质 {{score}}%"
+      "quality": "质量 {{score}}%"
     },
     "rank": {
-      "header": "定位",
-      "nShipsOfSizeClass": "{{n}} 艘 {{k}} 级尺寸的舰船",
+      "header": "排名",
+      "nShipsOfSizeClass": "{{n}} 艘尺寸等级 {{k}} 的舰船",
       "nShips": "{{n}} 艘舰船",
       "nShipsOfCareer": "{{n}} 艘同职业舰船",
-      "profileLabel": "档案",
+      "profileLabel": "评估方案",
       "scopeLabel": "对比范围",
-      "verdict": "{{pct}}% — 相对 {{n}} 艘舰船{{band}}。",
+      "verdict": "{{pct}}%——相对 {{n}} 艘舰船{{band}}。",
       "percentile": "百分位",
-      "percentileTooltip": "仅作描述,不作评判:该数值表示这艘舰船在对比范围中的位置,而不是好坏。50% 即正中间。",
-      "lensNote": "定位不受任务视角影响,它保留自己的三种档案。",
+      "percentileTooltip": "仅作描述，不作评判：该数值表示这艘舰船在对比范围中的位置，而不是好坏。50% 即正中间。",
+      "lensNote": "排名不受任务视角影响——它保留自己的三种评估方案。",
       "radarAria": "{{name}} 相对 {{n}} 艘舰船的百分位雷达图",
       "gapAxis": "此维度无数值",
       "band": {
@@ -1719,19 +1719,19 @@
         "sizeClass": "同尺寸级别",
         "all": "所有舰船",
         "career": "职业",
-        "role": "角色",
+        "role": "定位",
         "careerHolo": "同级别",
         "roleHolo": "同类型"
       },
       "disabled": {
         "noCargo": "这艘舰船没有货舱",
-        "noData": "此构建中缺少该档案的数值",
+        "noData": "此构建中缺少该评估方案的数值",
         "noCareer": "该舰船未记录职业。",
-        "noRole": "该舰船未记录角色。",
-        "smallGroup": "该组规模过小,已扩大对比范围。"
+        "noRole": "该舰船未记录定位。",
+        "smallGroup": "该组规模过小，已扩大对比范围。"
       },
       "axis": {
-        "alpha": "ALPHA",
+        "alpha": "单发伤害",
         "sustainedDps": "持续 DPS",
         "missiles": "导弹",
         "shield": "护盾",
@@ -1742,7 +1742,7 @@
         "hullHp": "船体 HP",
         "armor": "装甲",
         "crossSection": "截面",
-        "cargo": "货物",
+        "cargo": "货舱",
         "quantumRange": "量子航程",
         "scm": "SCM",
         "mass": "质量",
@@ -1755,12 +1755,12 @@
         "emMax": "EM 最大 · 模型",
         "emQuantum": "EM 量子 · 模型"
       },
-      "nShipsOfRole": "{{n}} 艘同角色舰船",
+      "nShipsOfRole": "{{n}} 艘同定位舰船",
       "compare": {
         "label": "对比对象",
-        "info": "每个轴从 0(中心)延伸到所选对比舰船中的最佳值(边缘);圆环标示其 33%、67% 和 100%。蓝色为这艘舰船,虚线为对比舰船的中位数。蓝色线段:优于对比;黄色:弱于对比。",
-        "axisDelta": "比对比差 {{d}} 点",
-        "infoHolo": "每个轴从 0(中心)延伸到所选分组的第 95 百分位(边缘)。中位数使用同一刻度,更强的数值止于边缘。"
+        "info": "每个轴从 0（中心）延伸到所选对比舰船中的最佳值（边缘）；圆环标示其 33%、67% 和 100%。蓝色为这艘舰船，虚线为对比舰船的中位数。蓝色线段：优于对比；黄色：弱于对比。",
+        "axisDelta": "与对比相差 {{d}} 点",
+        "infoHolo": "每个轴从 0（中心）延伸到所选分组的第 95 百分位（边缘）。中位数使用同一刻度，更强的数值止于边缘。"
       },
       "class": {
         "combat": "战斗舰船",
@@ -1782,11 +1782,11 @@
       },
       "group": {
         "of": "全部{{name}}",
-        "smallHint": "该组仅有 {{n}} 艘舰船,因此对比较为粗略。",
-        "ofRole": "{{name}}角色"
+        "smallHint": "该组仅有 {{n}} 艘舰船，因此对比较为粗略。",
+        "ofRole": "定位：{{name}}"
       },
-      "noMiningData": "采矿与打捞产出:无数据",
-      "rimNote": "越靠外越接近组内最佳值(95%),更强的值止于此。平方根刻度:小数值仍可见,圆环标示 33% 和 67%。",
+      "noMiningData": "采矿与打捞产出：无数据",
+      "rimNote": "越靠外越接近组内最佳值（95%），更强的值止于此。平方根刻度：小数值仍可见，圆环标示 33% 和 67%。",
       "betterThan": "优于 {{n}}%",
       "rimLabel": "刻度"
     },
@@ -1806,7 +1806,7 @@
       "weaponParams": "武器参数",
       "damage": "撞击伤害",
       "hardpoints": "挂点",
-      "hardpointsHint": "点击挂点,查看可装配的物品。",
+      "hardpointsHint": "点击挂点，查看可装配的物品。",
       "compatLoading": "正在加载兼容物品…",
       "compatNone": "此构建中没有匹配的物品。",
       "changes": {
@@ -1830,7 +1830,7 @@
           "damage": {
             "physical": "物理伤害",
             "energy": "能量伤害",
-            "distortion": "干扰伤害",
+            "distortion": "畸变伤害",
             "thermal": "热能伤害",
             "biochemical": "生化伤害",
             "stun": "眩晕伤害"
@@ -1838,7 +1838,7 @@
           "taken": {
             "physical": "受到的物理伤害",
             "energy": "受到的能量伤害",
-            "distortion": "受到的干扰伤害",
+            "distortion": "受到的畸变伤害",
             "thermal": "受到的热能伤害",
             "biochemical": "受到的生化伤害",
             "stun": "受到的眩晕伤害"
@@ -1857,7 +1857,7 @@
       "usedInBlueprints": "用于蓝图",
       "usedInBlueprintsHint": "需要此物品作为材料的制作配方。",
       "compatCount": "{{count}} 个兼容物品",
-      "loadoutEmpty": "空(出厂)",
+      "loadoutEmpty": "空（出厂）",
       "viewOnRsi": "在 RSI 查看",
       "notFound": "在当前构建中未找到该条目。",
       "loadingStage": "正在加载舰船全息甲板",
@@ -1867,7 +1867,7 @@
       "hideRaw": "隐藏原始数据",
       "naValue": "暂无",
       "keyStats": "核心数值",
-      "armorStats": "装甲数值",
+      "armorStats": "护甲数值",
       "showEmptyPorts": "显示 {{count}} 个空端口",
       "hideEmptyPorts": "隐藏空端口",
       "equipment": "装备",
@@ -1877,10 +1877,10 @@
       "quantumSpeed": "量子速度",
       "quantumFuel": "量子燃料",
       "fuelCapacity": "氢燃料",
-      "hardpointExplainer": "挂点是船体上的安装点:每件武器、护盾、冷却器、推进器或量子驱动器都装在一个挂点上,可以换成同类型、同尺寸的其他物品。下方是舰船出厂时的配置。",
-      "loadoutExplainerLabel": "什么是挂点?",
+      "hardpointExplainer": "挂点是船体上的安装点：每件武器、护盾、冷却器、推进器或量子驱动器都装在一个挂点上，可以换成同类型、同尺寸的其他物品。下方是舰船出厂时的配置。",
+      "loadoutExplainerLabel": "什么是挂点？",
       "craftedFrom": "制造材料",
-      "craftedFromHint": "根据游戏的制作数据,制造此物品所需的成本。",
+      "craftedFromHint": "根据游戏的制作数据，制造此物品所需的成本。",
       "noIngredients": "此构建中该蓝图未列出材料。",
       "openBlueprint": "打开完整蓝图",
       "minQuality": "最低品质 {{value}}",
@@ -1891,7 +1891,7 @@
       "whereToBuyPrice": "价格",
       "whereToBuyTerminal": "终端",
       "whereToBuyLocation": "位置",
-      "whereToBuyAttribution": "价格来自 UEX Corp——由社区维护,可能与实时服务器不一致。与 Cloud Imperium Games 无关联。",
+      "whereToBuyAttribution": "价格来自 UEX Corp——由社区维护，可能与实时服务器不一致。与 Cloud Imperium Games 无关联。",
       "moduleOrderHint": "可配置模块排在最前——武器及其挂架、炮塔、弹药、吊舱、护盾、发电机、量子驱动器、雷达、冷却器、生命维持。所有固定部件排在下方。点击任意模块可查看完整数值表。",
       "loadoutEmptyWeaponMount": "武器挂架——此提取数据中无默认武器",
       "chipCrew": "{{n}} 名船员",
@@ -1904,23 +1904,23 @@
       "heroSwitchTo3d": "切换到 3D 视图",
       "heroSwitchTo2d": "切换回 2D 图像",
       "holoOverlay": {
-        "label": "3D 视图:{{name}}",
+        "label": "3D 视图：{{name}}",
         "fullscreen": "全屏",
         "exitFullscreen": "退出全屏"
       },
       "partPopup": {
-        "label": "组件:{{name}}",
+        "label": "组件：{{name}}",
         "eyebrow": "组件",
         "noValues": "该组件暂无数值。"
       },
       "stageLaunchers": "{{n}} 个发射器",
       "stageMissileRacks": "导弹架",
       "stageRemoteTurret": "遥控炮塔",
-      "stageMannedTurret": "有人炮塔",
+      "stageMannedTurret": "载人炮塔",
       "stageTractorBeam": "牵引光束",
       "stageTractorBeams": "牵引光束",
       "linkCopied": "链接已复制",
-      "columnLoadout": "配装",
+      "columnLoadout": "装载配置",
       "columnAnalysis": "分析",
       "columnFixed": "机体与固定系统",
       "draftLabel": "草稿",
@@ -1932,7 +1932,7 @@
       "chipCargoUnknown": "货舱 · 游戏文件中无容量数据",
       "notFoundPage": {
         "title": "未找到条目",
-        "body": "此条目不在当前版本中,可能已被重命名或移除。"
+        "body": "此条目不在当前版本中，可能已被重命名或移除。"
       }
     },
     "energy": {
@@ -1942,25 +1942,25 @@
       "expand": "展开",
       "allocated": "已分配 {{n}} 个分段",
       "minimum": "最低需求 {{n}} 个分段",
-      "toggleOff": "{{group}} — 切断电力",
-      "toggleOn": "{{group}} — 恢复电力",
-      "overBudget": "反应堆过载:{{total}} 个分段中已占用 {{used}} 个",
-      "demandLine": "需求 {{demand}} 段,来自 {{items}} 个模块 · 已分配 {{allocated}} 段",
-      "belowMinimum": "低于最低需求 {{min}} 段 — 该组将失效。",
-      "pinned": "由你设定 — 自动、潜行或重置可清除。",
+      "toggleOff": "{{group}}——切断电力",
+      "toggleOn": "{{group}}——恢复电力",
+      "overBudget": "反应堆过载：{{total}} 个分段中已占用 {{used}} 个",
+      "demandLine": "需求 {{demand}} 段，来自 {{items}} 个模块 · 已分配 {{allocated}} 段",
+      "belowMinimum": "低于最低需求 {{min}} 段——该组将失效。",
+      "pinned": "由你设定——自动、潜行或重置可清除。",
       "pip": {
-        "level": "{{group}}:第 {{n}} 级,共 {{m}} 级",
-        "topOff": "{{group}}:第 {{n}} 级,共 {{m}} 级 — 点击切断该组"
+        "level": "{{group}}：第 {{n}} 级，共 {{m}} 级",
+        "topOff": "{{group}}：第 {{n}} 级，共 {{m}} 级——点击切断该组"
       },
-      "draftNote": "已切断的组和固定的档位仅为草稿 — 不会写入你的机库。",
+      "draftNote": "已切断的组和固定的档位仅为草稿——不会写入你的机库。",
       "position": {
-        "title": "Dock 位置",
+        "title": "面板位置",
         "left": "左下",
         "center": "底部居中",
         "right": "右下",
-        "inline": "在页面流中",
-        "edgeLeft": "在屏幕左边缘,随页面滚动",
-        "edgeRight": "在屏幕右边缘,随页面滚动",
+        "inline": "嵌入页面中",
+        "edgeLeft": "在屏幕左边缘，随页面滚动",
+        "edgeRight": "在屏幕右边缘，随页面滚动",
         "analysis": "在分析栏中",
         "slotGroup": "放置在分析栏中",
         "slotUp": "在分析栏中上移",
@@ -1984,18 +1984,18 @@
         "absent": "—"
       },
       "tooltip": {
-        "weapons": "切断整个组的电力。没有电力武器无法开火 — 持续 DPS 降为 0,EM 明显下降。再次点击可重新开启。",
-        "shields": "金色标记表示已启用的发生器所需的最低值。低于该值护盾会失效,被动备用也随之失效。",
-        "thrusters": "主推进器和机动推进器。降为零时飞船仍可转向,但没有推力。",
-        "coolers": "每个冷却器在飞船电力管理中都是独立项目 — 因此每个已安装的冷却器对应一列。冷却器获得的分段越多,冷却负载越低 — IR 特征也越低。冷却是保持安静的代价。",
-        "radar": "决定你能看多远。电力越多,范围越大 — EM 也越高,因此对其他人更显眼。",
-        "lifeSupport": "氧气和气压。降为零时计时开始 — 游戏文件中未说明时长。",
-        "quantum": "在 SCM 中没有通道。仅在 NAV 中才会耗电 — 而此时护盾会失效。",
+        "weapons": "切断整个组的电力。没有电力武器无法开火——持续 DPS 降为 0，EM 明显下降。再次点击可重新开启。",
+        "shields": "金色标记表示已启用的发生器所需的最低值。低于该值护盾会失效，被动备用也随之失效。",
+        "thrusters": "主推进器和机动推进器。降为零时舰船仍可转向，但没有推力。",
+        "coolers": "每个冷却器在舰船电力管理中都是独立项目——因此每个已安装的冷却器对应一列。冷却器获得的分段越多，冷却负载越低——IR 信号也越低。冷却是保持安静的代价。",
+        "radar": "决定你能看多远。电力越多，范围越大——EM 也越高，因此对其他人更显眼。",
+        "lifeSupport": "氧气和气压。降为零时计时开始——游戏文件中未说明时长。",
+        "quantum": "在 SCM 中没有通道。仅在 NAV 中才会耗电——而此时护盾会失效。",
         "tractor": "关闭。仅在使用时才会耗电。",
-        "ir": "你的热特征。随冷却负载以及所有耗电设备而上升。IR 低意味着热传感器更晚发现你。",
-        "em": "所有通电部件的总和。护盾和冷却器是最大的项目 — 切断一个组,其占比随之消失。部件的辐射值来自游戏文件;能量武器在此为 0。",
-        "crossSection": "你在雷达上显得多大。由机身决定,而非装备 — 任何配置都无法改变。",
-        "coolingLoad": "当前使用了多少冷却能力 — 与游戏内算法一致:100% 恰好等于已开启冷却器在其获得电力下的输出。30% 表示有 70% 余量,130% 表示缺少 30%:飞船过热,IR 特征飙升。略低于 100% 最省。"
+        "ir": "你的热信号。随冷却负载以及所有耗电设备而上升。IR 低意味着热传感器更晚发现你。",
+        "em": "所有通电部件的总和。护盾和冷却器是最大的项目——切断一个组，其占比随之消失。部件的辐射值来自游戏文件；能量武器在此为 0。",
+        "crossSection": "你在雷达上显得多大。由船体决定，而非装备——任何装载配置都无法改变。",
+        "coolingLoad": "当前使用了多少冷却能力——与游戏内算法一致：100% 恰好等于已开启冷却器在其获得电力下的输出。30% 表示有 70% 余量，130% 表示缺少 30%：舰船过热，IR 信号飙升。略低于 100% 最省。"
       },
       "fact": {
         "ir": "IR",
@@ -2007,8 +2007,8 @@
       "coolingValue": "{{used}} / {{total}}",
       "coolingPercent": "{{pct}} %",
       "readiness": {
-        "ok": "可切换到战斗 — 反应堆和冷却器可按最低需求支撑所有系统",
-        "no": "无法切换到战斗 — 反应堆或冷却器无法按最低需求支撑所有系统",
+        "ok": "可切换到战斗——反应堆和冷却器可按最低需求支撑所有系统",
+        "no": "无法切换到战斗——反应堆或冷却器无法按最低需求支撑所有系统",
         "shortOk": "战斗就绪",
         "shortNo": "未就绪"
       },
@@ -2021,15 +2021,15 @@
         "stealth": "潜行",
         "auto": "自动",
         "reset": "重置",
-        "stealthHint": "最低 EM 特征:武器、护盾、量子、牵引、雷达和生命维持关闭,驱动器仅保持最低,冷却器仅开到冷却保持在 100% 以下。"
+        "stealthHint": "最低 EM 信号：武器、护盾、量子驱动器、牵引光束、雷达和生命维持关闭，推进器仅保持最低需求，冷却器只开到冷却负载保持在 100% 以下。"
       },
       "gap": {
-        "noReactorData": "此版本中没有反应堆数据 — 在数据提取包含它之前,电力预算保持为空。",
-        "reExtractPending": "此目录版本尚无电力数值 — 无论是各模块还是预算。它们将随下次目录上传(提取模式 3)提供。",
-        "noChannelInMode": "在此飞行模式下,该组没有通道。",
-        "noCoolingData": "此版本中没有冷却器数据 — 冷却负载保持为空。",
-        "noCoolantDraw": "游戏数据未说明部件消耗多少冷却剂 — 冷却负载保持为空。",
-        "noSignatureData": "此次提取中没有特征数据 — 等待重新提取。"
+        "noReactorData": "此版本中没有反应堆数据——在数据提取包含它之前，电力预算保持为空。",
+        "reExtractPending": "此目录版本尚无电力数值——无论是各模块还是预算。它们将随下次目录上传（提取数据结构版本 3）提供。",
+        "noChannelInMode": "在此飞行模式下，该组没有通道。",
+        "noCoolingData": "此版本中没有冷却器数据——冷却负载保持为空。",
+        "noCoolantDraw": "游戏数据未说明部件消耗多少冷却剂——冷却负载保持为空。",
+        "noSignatureData": "此次提取中没有信号数据——等待重新提取。"
       },
       "unit": {
         "segments": "段"
@@ -2045,7 +2045,7 @@
     "swap": {
       "open": "更换部件",
       "equipped": "已安装",
-      "previewHint": "先对比,再应用或清空插槽 — 更改在下方保存之前仅为草稿。",
+      "previewHint": "先对比，再应用或清空槽位——更改在下方保存之前仅为草稿。",
       "loading": "正在搜索兼容物品…",
       "failed": "无法加载兼容物品。",
       "none": "此版本中没有兼容的替代品。",
@@ -2053,24 +2053,24 @@
       "close": "关闭",
       "typeFilter": "物品类型",
       "filterAll": "全部",
-      "appliesToOne": "仅适用于此插槽:{{port}}",
+      "appliesToOne": "仅适用于此槽位：{{port}}",
       "appliesToMany": "适用于全部 {{count}} 个相同的挂点",
-      "sortHint": "点击列进行排序,按住 Ctrl 点击可添加次级排序。",
-      "installedNone": "插槽出厂为空",
+      "sortHint": "点击列进行排序，按住 Ctrl 点击可添加次级排序。",
+      "installedNone": "槽位出厂为空",
       "pickHere": "请选择",
-      "fitInferred": "此插槽出厂为空。列表来自同一飞船上相同且已装配的插槽,而非此挂点自身的数据。",
-      "clearSlot": "清空插槽"
+      "fitInferred": "此槽位出厂为空。列表来自同一舰船上相同且已装配的槽位，而非此挂点自身的数据。",
+      "clearSlot": "清空槽位"
     },
     "loadout": {
       "changesSummary": "{{changed}} 项更改 · 其中 {{saveable}} 项可保存",
-      "unsaveableHint": "嵌套和已清空的插槽暂时保持为草稿 — 尚无法保存。",
+      "unsaveableHint": "嵌套和已清空的槽位暂时保持为草稿——尚无法保存。",
       "saving": "正在保存…",
-      "saveErrorHangar": "暂时无法连接到你的机库 — 草稿已保留,请再次尝试保存。",
-      "saveErrorGeneric": "暂时无法保存配置 — 草稿已保留,请重试。",
+      "saveErrorHangar": "暂时无法连接到你的机库——草稿已保留，请再次尝试保存。",
+      "saveErrorGeneric": "暂时无法保存配置——草稿已保留，请重试。",
       "revert": "恢复为出厂配置",
       "resetAll": "将整个配置重置为出厂状态",
-      "resetAllTitle": "重置整个配置?",
-      "resetAllBody": "此配置的全部 {{n}} 项更改将丢失,每个插槽都会恢复为出厂部件。",
+      "resetAllTitle": "重置整个配置？",
+      "resetAllBody": "此配置的全部 {{n}} 项更改将丢失，每个槽位都会恢复为出厂部件。",
       "resetAllConfirm": "重置",
       "defaultConfigName": "Codex 配置",
       "draftState": {
@@ -2080,7 +2080,7 @@
       }
     },
     "statGroup": {
-      "identity": "标识",
+      "identity": "基本信息",
       "offense": "进攻",
       "defense": "防御与耐久",
       "mobility": "机动性",
@@ -2100,7 +2100,7 @@
     "compare": {
       "pin": "对比",
       "pinned": "对比中",
-      "tray": "对比({{count}})",
+      "tray": "对比（{{count}}）",
       "open": "打开对比",
       "clear": "清空",
       "remove": "移除 {{name}}",
@@ -2108,7 +2108,7 @@
       "close": "关闭",
       "noCommon": "此组合的条目没有可比较的数值。",
       "diffOnly": "仅显示差异",
-      "mixedKind": "仅限同类对比:托盘中已有 {{kind}} 条目。请清空后再对比其他内容。"
+      "mixedKind": "仅限同类对比：对比栏中已有 {{kind}} 条目。请清空后再对比其他内容。"
     },
     "portCategory": {
       "weapons": "武器",
@@ -2122,22 +2122,22 @@
       "other": "其他"
     },
     "picker": {
-      "title": "选择部件 — {{port}} · S{{size}}",
-      "installed": "已安装:{{name}}",
-      "searchPlaceholder": "搜索 … 名称、制造商、伤害类型",
+      "title": "选择部件——{{port}} · S{{size}}",
+      "installed": "已安装：{{name}}",
+      "searchPlaceholder": "搜索：名称、制造商、伤害类型…",
       "searchLabel": "搜索部件",
       "compareWith": "对比对象",
       "deltaAgainst": "Δ 基准",
-      "count": "{{total}} 中的第 {{n}} 个",
+      "count": "{{n}} / {{total}}",
       "noDelta": "±0",
-      "baselineOutOfSet": "Δ 基准不在当前选择范围内 — Δ 值仍以其为基准计算。",
+      "baselineOutOfSet": "Δ 基准不在当前选择范围内——Δ 值仍以其为基准计算。",
       "optimum": "对比范围内的最佳值",
       "columns": "列",
       "columnsUnavailable": "游戏文件中没有",
       "dashCell": "—",
       "dashCellTitle": "不适用于此类别",
-      "dashNote": "弹药和散布显示为“—”:能量武器没有弹匣,而游戏仅将散布作为对其他数值的修正给出。",
-      "footerMissing": "游戏文件中没有:{{fields}}",
+      "dashNote": "弹药和散布显示为“——”：能量武器没有弹匣，而游戏仅将散布作为对其他数值的修正给出。",
+      "footerMissing": "游戏文件中没有：{{fields}}",
       "pickRow": "安装 {{name}}",
       "openDetail": "打开 {{name}} 的详情",
       "scope": {
@@ -2151,7 +2151,7 @@
       },
       "scrollCue": {
         "horizontal": "横向滚动查看 {{columns}}",
-        "vertical": "条目较多时向下滚动 — 表头行和部件列保持固定"
+        "vertical": "条目较多时向下滚动——表头行和部件列保持固定"
       },
       "menu": {
         "open": "对 {{column}} 列排序和筛选",
@@ -2181,8 +2181,8 @@
         "size": "尺寸",
         "projectilesPerShot": "每发弹丸数",
         "lifetime": "存续时间",
-        "aimYaw": "回转范围",
-        "aimRate": "跟踪速率",
+        "aimYaw": "旋转范围",
+        "aimRate": "追踪速率",
         "damageType": "伤害类型",
         "archetype": "原型",
         "heat": "每发热量",
@@ -2200,43 +2200,43 @@
         "perSec": "/s",
         "percent": "%"
       },
-      "dashNoteAmmo": "能量武器没有弹匣,因此弹药显示为“—”。",
-      "dashNoteSpread": "游戏仅将散布作为对其他数值的修正给出,因此散布显示为“—”。",
+      "dashNoteAmmo": "能量武器没有弹匣，因此弹药显示为“——”。",
+      "dashNoteSpread": "游戏仅将散布作为对其他数值的修正给出，因此散布显示为“——”。",
       "term": {
         "armor": "装甲",
-        "back": "后",
-        "ballistic": "弹道",
-        "ballisticcannon": "弹道炮",
-        "ballisticgatling": "弹道加特林",
-        "ballisticrepeater": "弹道连发炮",
-        "ballisticscattergun": "弹道霰弹炮",
+        "back": "后部",
+        "ballistic": "实弹",
+        "ballisticcannon": "实弹加农炮",
+        "ballisticgatling": "实弹加特林",
+        "ballisticrepeater": "实弹连发炮",
+        "ballisticscattergun": "实弹霰弹炮",
         "bottom": "底部",
         "cannon": "加农炮",
-        "center": "中心",
+        "center": "中间",
         "centre": "中间",
         "cooler": "冷却器",
-        "countermeasure": "对抗措施",
+        "countermeasure": "反制措施",
         "distortion": "畸变",
-        "distortioncannon": "畸变炮",
+        "distortioncannon": "畸变加农炮",
         "distortionrepeater": "畸变连发炮",
         "emp": "EMP",
-        "front": "前",
+        "front": "前部",
         "fuelintake": "燃料进气口",
         "fueltank": "燃料箱",
         "gatling": "加特林",
-        "gun": "炮",
+        "gun": "机炮",
         "gunturret": "炮塔",
         "jumpmodule": "跳跃模块",
         "laser": "激光",
-        "lasercannon": "激光炮",
+        "lasercannon": "激光加农炮",
         "lasergatling": "激光加特林",
         "laserrepeater": "激光连发炮",
-        "left": "左",
+        "left": "左侧",
         "lifesupport": "生命维持",
-        "lower": "下",
+        "lower": "下部",
         "mainthruster": "主推进器",
-        "massdriver": "质量驱动器",
-        "mid": "中",
+        "massdriver": "质量驱动炮",
+        "mid": "中部",
         "middle": "中部",
         "mininglaser": "采矿激光",
         "missile": "导弹",
@@ -2248,10 +2248,10 @@
         "quantumdrive": "量子驱动器",
         "quantumfueltank": "量子燃料箱",
         "radar": "雷达",
-        "railgun": "轨道炮",
-        "rear": "后",
+        "railgun": "磁轨炮",
+        "rear": "后部",
         "repeater": "连发炮",
-        "right": "右",
+        "right": "右侧",
         "rocketpod": "火箭吊舱",
         "salvagebeam": "打捞光束",
         "scanner": "扫描仪",
@@ -2264,43 +2264,43 @@
         "top": "顶部",
         "tractorbeam": "牵引光束",
         "turret": "炮塔",
-        "upper": "上",
-        "utility": "工具",
+        "upper": "上部",
+        "utility": "通用",
         "weapon": "武器",
         "wing": "机翼"
       }
     },
     "hardpointMap": {
       "title": "船体上的位置",
-      "hint": "指向下方的挂点——标记会显示它在飞船上的位置。",
+      "hint": "指向下方的挂点——标记会显示它在舰船上的位置。",
       "approximate": "范围为近似值",
       "viewTop": "俯视图",
-      "viewSide": "侧视图(右舷)",
-      "viewTopAria": "船体俯视图,含 {{count}} 个挂点标记",
-      "viewSideAria": "船体侧视图,含 {{count}} 个挂点标记",
+      "viewSide": "侧视图（右舷）",
+      "viewTopAria": "船体俯视图，含 {{count}} 个挂点标记",
+      "viewSideAria": "船体侧视图，含 {{count}} 个挂点标记",
       "nose": "机头",
       "readoutIdle": "未选择挂点"
     },
     "deckPlan": {
       "title": "甲板平面图",
-      "hint": "从上方观察,机头朝上。指向房间可查看其名称。",
+      "hint": "从上方观察，机头朝上。指向房间可查看其名称。",
       "switchAria": "选择甲板",
-      "aria": "{{deck}}:甲板平面图,房间数:{{count}}",
+      "aria": "{{deck}}：甲板平面图，房间数：{{count}}",
       "nose": "机头",
       "readoutIdle": "未选择房间",
       "roomsAria": "{{deck}}上的房间",
       "derivedLabel": "层级为推算",
-      "derivedHint": "游戏中此飞船没有甲板名称:层级根据地板高度推算。楼梯和电梯会显示在它们连接的每一层。",
+      "derivedHint": "游戏中此舰船没有甲板名称：层级根据地板高度推算。楼梯和电梯会显示在它们连接的每一层。",
       "connects": "通往 {{decks}}"
     },
     "shipBlueprint": {
       "schema": {
         "title": "挂点示意图",
-        "topAria": "飞船俯视图,已标记 {{count}} 个挂点",
+        "topAria": "舰船俯视图，已标记 {{count}} 个挂点",
         "extent": "{{length}} × {{beam}} × {{height}} m",
-        "hint": "从上方观察,机头朝右。指向标记可查看尺寸和类型,点击可查看组件。",
-        "hintSide": "从侧面观察,机头朝右。指向标记可查看尺寸和类型,点击可查看组件。",
-        "hintFront": "从正面观察,机头朝向你。指向标记可查看尺寸和类型,点击可查看组件。",
+        "hint": "从上方观察，机头朝右。指向标记可查看尺寸和类型，点击可查看组件。",
+        "hintSide": "从侧面观察，机头朝右。指向标记可查看尺寸和类型，点击可查看组件。",
+        "hintFront": "从正面观察，机头朝向你。指向标记可查看尺寸和类型，点击可查看组件。",
         "noPositions": "此船体暂无挂点位置——将随下次 3D 上传提供。",
         "listLabel": "挂点",
         "size": "尺寸 {{size}}"
@@ -2314,7 +2314,7 @@
     },
     "skins": {
       "title": "涂装",
-      "source": "飞船外形全息图 · 涂装为官方商店渲染图",
+      "source": "舰船外形全息图 · 涂装为官方商店渲染图",
       "sourceTag": {
         "store": "商店",
         "event": "活动",
@@ -2333,10 +2333,10 @@
       "retry": "重试",
       "collapse": "收起 3D 视图",
       "expand": "展开 3D 视图",
-      "hardpointHint": "模型上已标记 {{count}} 个挂点——指向标记或下方的某一行,两者会同时高亮。"
+      "hardpointHint": "模型上已标记 {{count}} 个挂点——指向标记或下方的某一行，两者会同时高亮。"
     },
     "equipped": {
-      "alphaDamage": "Alpha 伤害",
+      "alphaDamage": "单发伤害",
       "dps": "DPS",
       "sustainedDps": "持续 DPS",
       "fireRate": "射速",
@@ -2346,60 +2346,60 @@
       "shieldHp": "护盾 HP",
       "shieldRegen": "回复",
       "regenDelay": "回复延迟",
-      "downedDelay": "击溃延迟",
+      "downedDelay": "击穿延迟",
       "jumpRange": "跳跃距离",
       "driveSpeed": "驱动速度",
-      "spoolTime": "充能时间",
+      "spoolTime": "预热时间",
       "cooldown": "冷却时间",
       "thrust": "推力",
       "fuelCapacity": "燃料容量",
       "fuelRate": "燃料消耗率",
       "health": "耐久度",
       "distortion": "畸变容量",
-      "powerDraw": "功率消耗(段)",
-      "powerOutput": "功率输出(段)",
+      "powerDraw": "功率消耗（段）",
+      "powerOutput": "功率输出（段）",
       "minPower": "最低功率",
       "coolantDraw": "冷却消耗",
       "coolingRate": "冷却输出",
-      "aimAssistRange": "射程(辅助瞄准)",
-      "radarSensitivity": "灵敏度(IR/EM/CS)",
+      "aimAssistRange": "射程（辅助瞄准）",
+      "radarSensitivity": "灵敏度（IR/EM/CS）",
       "pingCooldown": "Ping 冷却",
-      "emSignature": "EM 特征",
-      "irSignature": "IR 特征",
-      "derivedHint": "推导值,由其他已提取的数据计算得出。",
+      "emSignature": "EM 信号",
+      "irSignature": "IR 信号",
+      "derivedHint": "推导值，由其他已提取的数据计算得出。",
       "noStats": "当前提取数据中没有此武器的数值。",
-      "armamentMissing": "在此次提取中,{{count}} 个武器挂载点没有原装武器——游戏将默认武器配置存放在单独的记录中,我们的 P4K 提取器尚无法解析。",
+      "armamentMissing": "在此次提取中，{{count}} 个武器挂载点没有原装武器——游戏将默认武器配置存放在单独的记录中，我们的 P4K 提取器尚无法解析。",
       "missileCount": "导弹",
       "missileSize": "导弹尺寸",
       "cmCapacity": "携带数量",
-      "cmInfrared": "红外特征",
-      "cmElectromagnetic": "EM 特征",
-      "cmCrossSection": "横截面",
+      "cmInfrared": "红外信号",
+      "cmElectromagnetic": "EM 信号",
+      "cmCrossSection": "截面",
       "cmRadius": "云团半径",
       "cmCloudLifetime": "云团持续时间",
       "cmLifetime": "弹体存续时间",
       "burstDps": "爆发 DPS",
-      "tractorRange": "射程",
+      "tractorRange": "距离",
       "tractorFullStrengthRange": "全效范围",
       "tractorForce": "最大拉力",
-      "tractorForceHint": "游戏文件通过拉力而非质量来限制牵引光束:物体越重,移动越慢(F = m·a),当所需的力持续高于拉力时,牵引光束会断开。",
+      "tractorForceHint": "游戏文件通过拉力而非质量来限制牵引光束：物体越重，移动越慢（F = m·a），当所需的力持续高于拉力时，牵引光束会断开。",
       "tractorAngle": "最大角度",
       "tractorTetherBreak": "断开时间",
       "tractorSpeed": "最大移动速度",
-      "tractorNoStats": "此牵引光束的射程和拉力尚未包含在当前提取数据中——将随下次重新提取提供。"
+      "tractorNoStats": "此牵引光束的距离和拉力尚未包含在当前提取数据中——将随下次重新提取提供。"
     },
     "shipLink": {
       "add": "添加订购链接",
       "edit": "编辑订购链接",
       "label": "官方 RSI 订购链接",
-      "hint": "我们的目录并非对每艘飞船都有可靠的 RSI 商店 slug。粘贴官方订购页面后,它将替换通用的 RSI 链接——仅对你可见。",
+      "hint": "我们的目录并非对每艘舰船都有可靠的 RSI 商店链接标识。粘贴官方订购页面后，它将替换通用的 RSI 链接——仅对你可见。",
       "placeholder": "https://robertsspaceindustries.com/en/pledge/ships/nomad/Nomad",
       "save": "保存链接",
       "remove": "移除",
       "cancel": "取消",
       "saved": "已保存。只有你能看到此链接。",
       "error": {
-        "invalidUrl": "仅接受官方 RSI 订购飞船链接,例如 https://robertsspaceindustries.com/en/pledge/ships/nomad/Nomad",
+        "invalidUrl": "仅接受官方 RSI 订购舰船链接，例如 https://robertsspaceindustries.com/en/pledge/ships/nomad/Nomad",
         "rateLimited": "短时间内更改过多。请几分钟后再试。",
         "forbidden": "你没有执行此操作的权限。",
         "saveFailed": "无法保存链接。请重试。"
@@ -2407,7 +2407,7 @@
       "adminTitle": "管理员",
       "promote": "对所有人发布",
       "unpromote": "撤回全局链接",
-      "adminHint": "发布后,上方链接将对所有用户可见。用户链接绝不会自动发布。"
+      "adminHint": "发布后，上方链接将对所有用户可见。用户链接绝不会自动发布。"
     },
     "moduleSection": {
       "weapons": "武器装备",
@@ -2424,13 +2424,13 @@
       "structure": "机体与固定系统",
       "systems": "推进与系统",
       "fixedTag": "不可配置",
-      "countermeasures": "对抗措施",
-      "shieldsNote": "此区块中的每个舱位都是可更换的护盾发生器,包括出厂时为空的舱位。护盾控制模块属于固定系统:它不是独立的护盾,在游戏中无法更换。",
-      "countermeasuresNote": "发射器在游戏中无法更换,因此此区块仅供参考。诱饵会引开热追踪导弹,噪声(箔条)会干扰雷达制导导弹。所需数量请查看发射器的信息页(ⓘ):它会将每次发射的特征与飞船自身的特征进行对比。",
+      "countermeasures": "反制措施",
+      "shieldsNote": "此区块中的每个舱位都是可更换的护盾发生器，包括出厂时为空的舱位。护盾控制模块属于固定系统：它不是独立的护盾，在游戏中无法更换。",
+      "countermeasuresNote": "发射器在游戏中无法更换，因此此区块仅供参考。诱饵会引开热追踪导弹，噪声（箔条）会干扰雷达制导导弹。所需数量请查看发射器的信息页（ⓘ）：它会将每次发射的信号与舰船自身的信号进行对比。",
       "infoLabel": "关于此区块",
       "splitRows": "逐个",
       "groupRows": "合并",
-      "splitRowsHint": "将每个挂点单独列为一行,以便逐个更改",
+      "splitRowsHint": "将每个挂点单独列为一行，以便逐个更改",
       "groupRowsHint": "将相同的挂点重新合并为一行",
       "unfold": "显示",
       "foldAway": "隐藏"
@@ -2449,8 +2449,8 @@
         "passive": "被动 · 未接入电网",
         "pool": "池"
       },
-      "shieldNote": "全部 {{count}} 个都是护盾发生器,且每个都可单独更换——相同的在此合并显示,“逐个”则按舱位逐一列出。",
-      "shieldPassiveNote": "被动的不消耗电力,但仍完全计入护盾池——不过它依附于主动的:如果主动的失效,备用也随之失效。",
+      "shieldNote": "全部 {{count}} 个都是护盾发生器，且每个都可单独更换——相同的在此合并显示，“逐个”则按舱位逐一列出。",
+      "shieldPassiveNote": "被动的不消耗电力，但仍完全计入护盾池——不过它依附于主动的：如果主动的失效，备用也随之失效。",
       "peek": {
         "sustainedDpsTotal": "总持续 DPS",
         "burstDpsTotal": "总爆发 DPS",
@@ -2460,40 +2460,40 @@
       }
     },
     "summary": {
-      "alphaDamage": "Alpha 伤害(所有武器)",
+      "alphaDamage": "单发伤害（所有武器）",
       "dps": "持续 DPS",
       "weaponMounts": "武器挂点",
-      "ordnanceMounts": "弹药挂点",
+      "ordnanceMounts": "导弹挂点",
       "shieldHp": "护盾池",
       "shieldRegen": "护盾恢复",
       "regenDelay": "恢复延迟",
       "downedDelay": "击穿延迟",
-      "hullHp": "机体 HP",
-      "distortionPool": "Distortion 池",
+      "hullHp": "船体 HP",
+      "distortionPool": "畸变池",
       "powerPlants": "发电机",
       "powerPlantSize": "发电机总尺寸",
       "powerDraw": "功率需求",
       "poweredItems": "供电部件",
       "plantDurability": "发电机耐久",
-      "plantDistortion": "发电机 Distortion 池",
+      "plantDistortion": "发电机畸变池",
       "gap": {
-        "noStockGuns": "此机体的原厂武器不在提取数据中——游戏将默认武器配置存放在单独的 loadout 记录里,我们暂时还无法解析,因此下方挂点显示的是位置而非武器。",
-        "noFireRate": "此提取数据{{patch}}中没有射速,因此暂时无法推算持续 DPS。",
-        "noSustainedCycle": "此提取数据{{patch}}中缺少武器的能量恢复、装填时间和过热数据,因此暂时无法推算持续 DPS。爆发 DPS 不计停顿。",
-        "noShields": "此舰的原厂 loadout 中没有护盾发生器。",
-        "noHullHp": "机体 HP 尚未包含在 P4K 提取数据中。",
+        "noStockGuns": "此船体的出厂武器不在提取数据中——游戏将默认武器配置存放在单独的装载配置记录里，我们暂时还无法解析，因此下方挂点显示的是位置而非武器。",
+        "noFireRate": "此提取数据{{patch}}中没有射速，因此暂时无法推算持续 DPS。",
+        "noSustainedCycle": "此提取数据{{patch}}中缺少武器的能量恢复、装填时间和过热数据，因此暂时无法推算持续 DPS。爆发 DPS 不计停顿。",
+        "noShields": "此舰船的出厂装载配置中没有护盾发生器。",
+        "noHullHp": "船体 HP 尚未包含在 P4K 提取数据中。",
         "noResistances": "各通道的伤害抗性未被提取——没有任何舰船或装甲实体带有这些数据。",
-        "noPowerPlant": "此舰的原厂 loadout 中没有发电机。",
-        "noPowerDraw": "各部件的功率消耗和输出尚未包含在提取数据中,因此无法计算功率三角。",
-        "noHullMass": "提取数据中没有机体质量——只能计算已安装装备的质量。",
+        "noPowerPlant": "此舰船的出厂装载配置中没有发电机。",
+        "noPowerDraw": "各部件的功率消耗和输出尚未包含在提取数据中，因此无法计算功率三角。",
+        "noHullMass": "提取数据中没有船体质量——只能计算已安装装备的质量。",
         "noFlight": "此舰的提取数据不含飞行性能数值。",
-        "noCargoCapacity": "货物容量尚未包含在提取数据中。",
+        "noCargoCapacity": "货舱容量尚未包含在提取数据中。",
         "noSignature": "此舰的提取数据中还没有雷达截面——下次目录上传后即可显示。",
-        "noEmissionModel": "游戏数据中没有 IR/EM 特征值——底层功率模型并未随客户端发布。",
-        "noQuantum": "此舰未安装量子引擎。",
+        "noEmissionModel": "游戏数据中没有 IR/EM 信号值——底层功率模型并未随客户端发布。",
+        "noQuantum": "此舰船未安装量子驱动器。",
         "noEquipmentMass": "无法计算此配置的装备质量。",
         "noMissiles": "此配置未携带导弹。",
-        "noArmorStats": "此舰的提取数据不含装甲数值——这里只显示机体结构。"
+        "noArmorStats": "此舰船的提取数据不含装甲数值——这里只显示船体结构。"
       }
     },
     "mission": {
@@ -2506,8 +2506,8 @@
       "mining": "采矿",
       "salvage": "打捞",
       "lensReset": "返回“全部”",
-      "lensResetTip": "将任务恢复为“全部”:所有装备区块按默认顺序重新展开,关键数据显示中性概览。装备本身不会改变。",
-      "setLensResetTip": "将任务恢复为“全部”:所有数值重新同等计算,图中的部件不再显示与任务相关的数值。套装本身不会改变。",
+      "lensResetTip": "将任务恢复为“全部”：所有装备区块按默认顺序重新展开，关键数据显示中性概览。装备本身不会改变。",
+      "setLensResetTip": "将任务恢复为“全部”：所有数值重新同等计算，图中的部件不再显示与任务相关的数值。套装本身不会改变。",
       "disabled": {
         "noMining": "无采矿挂点",
         "noSalvage": "无打捞挂点",
@@ -2516,47 +2516,47 @@
     },
     "kpi": {
       "bandLabel": "关键数据",
-      "alpha": "Alpha 伤害",
+      "alpha": "单发伤害",
       "burstDps": "爆发 DPS",
       "sustainedDps": "持续 DPS",
       "missiles": "导弹齐射",
       "shieldHp": "护盾 HP",
       "shieldRegen": "护盾恢复",
-      "hullHp": "机体 HP",
+      "hullHp": "船体 HP",
       "effectiveHp": "有效 HP",
-      "cargo": "货物",
+      "cargo": "货舱",
       "mass": "装备质量",
       "scm": "SCM 速度",
       "maxSpeed": "最大速度",
       "quantumSpeed": "量子速度",
       "quantumRange": "量子航程",
       "spool": "预热时间",
-      "ir": "IR 特征",
-      "emIdle": "EM 特征(待机,模型)",
-      "emLoad": "EM 特征(当前分配,模型)",
-      "emMax": "EM 特征(最大,模型)",
-      "emQuantum": "EM 特征(量子,模型)",
-      "modelHint": "这是我们的模型,并非游戏数值:各部件 EM = 额定值 × 已分配 ÷ 满格段数,反应堆 EM 随消耗功率变化,再乘以机体装甲系数。来源:游戏数据中的部件数值。",
-      "modelNote": "IR 和 EM 是我们自己的模型,并非游戏数值:各部件 EM = 额定值 × 已分配 ÷ 满格段数,反应堆 EM 随消耗功率变化,再乘以机体装甲系数。待机 = 全部最低,护盾和量子关闭;最大 = 全部满载,护盾开启;量子 = 护盾关闭,量子引擎开启。IR 仅包含冷却器,不含推进器(随油门变化)。来源:游戏数据中的部件数值。",
+      "ir": "IR 信号",
+      "emIdle": "EM 信号（待机，模型）",
+      "emLoad": "EM 信号（当前分配，模型）",
+      "emMax": "EM 信号（最大，模型）",
+      "emQuantum": "EM 信号（量子，模型）",
+      "modelHint": "这是我们的模型，并非游戏数值：各部件 EM = 额定值 × 已分配 ÷ 满格段数，反应堆 EM 随消耗功率变化，再乘以船体装甲系数。来源：游戏数据中的部件数值。",
+      "modelNote": "IR 和 EM 是我们自己的模型，并非游戏数值：各部件 EM = 额定值 × 已分配 ÷ 满格段数，反应堆 EM 随消耗功率变化，再乘以船体装甲系数。待机 = 全部最低，护盾和量子驱动器关闭；最大 = 全部满载，护盾开启；量子 = 护盾关闭，量子驱动器开启。IR 仅包含冷却器，不含推进器（随油门变化）。来源：游戏数据中的部件数值。",
       "crossSection": "截面",
-      "boost": "加速速度",
+      "boost": "加速时速度",
       "armor": "装甲",
       "agility": "机动性",
       "gap": "—",
       "gapHint": "此版本中无数值。",
-      "deltaUp": "比原厂好 {{value}}",
-      "deltaDown": "比原厂差 {{value}}",
+      "deltaUp": "比出厂配置好 {{value}}",
+      "deltaDown": "比出厂配置差 {{value}}",
       "tooltipBurstDps": "持续射击直到弹匣打空——不计装填。",
       "tooltipSustainedDps": "按长时间战斗取平均——计入能量恢复、装填和过热造成的停顿。",
       "short": {
-        "alpha": "Alpha",
+        "alpha": "单发",
         "burstDps": "爆发 DPS",
         "sustainedDps": "持续 DPS",
         "missiles": "导弹",
         "shieldHp": "护盾 HP",
         "shieldRegen": "护盾恢复",
-        "hullHp": "机体 HP",
-        "cargo": "货物",
+        "hullHp": "船体 HP",
+        "cargo": "货舱",
         "quantumRange": "量子航程",
         "quantumRangeTight": "Q 航程",
         "scm": "SCM",
@@ -2571,16 +2571,16 @@
         "armorHp": "装甲",
         "quantumSpeed": "Q 速度",
         "spool": "预热",
-        "emIdle": "EM(待机,模型)",
-        "emLoad": "EM(当前,模型)",
-        "emMax": "EM(最大,模型)",
-        "emQuantum": "EM(量子,模型)"
+        "emIdle": "EM（待机，模型）",
+        "emLoad": "EM（当前，模型）",
+        "emMax": "EM（最大，模型）",
+        "emQuantum": "EM（量子，模型）"
       }
     },
     "damageChannel": {
       "physical": "物理",
       "energy": "能量",
-      "distortion": "Distortion",
+      "distortion": "畸变",
       "thermal": "热能",
       "biochemical": "生化",
       "stun": "眩晕"
@@ -2589,32 +2589,32 @@
       "readHint": "展开阅读",
       "offensive": {
         "title": "进攻",
-        "weapons": "武器(已安装 {{count}} 件)",
+        "weapons": "武器（已安装 {{count}} 件）",
         "colWeapon": "武器",
         "colSize": "尺寸",
-        "colAlpha": "Alpha",
+        "colAlpha": "单发",
         "colSustained": "持续 DPS",
         "colBurst": "爆发",
         "total": "总计",
         "effectiveRange": "有效射程",
         "projectileSpeed": "弹速 m/s",
         "longestGunNote": "射程受最短武器限制——{{name}} 射程最远。",
-        "mixedRangeWarning": "射程不一:至少有一件武器的射程明显比其余更远。",
-        "missiles": "导弹({{count}} 枚弹头)",
+        "mixedRangeWarning": "射程不一：至少有一件武器的射程明显比其余更远。",
+        "missiles": "导弹（{{count}} 枚弹头）",
         "salvoDamage": "齐射伤害",
         "lockTime": "锁定时间",
         "range": "射程",
         "targeting": "瞄准",
         "slowestMissileNote": "最慢导弹的锁定时间。",
         "hintDps": "{{value}} DPS",
-        "hintAlpha": "{{value}} Alpha",
+        "hintAlpha": "单发 {{value}}",
         "colMissile": "导弹",
         "colTracking": "追踪信号",
         "colCount": "数量",
         "colWarhead": "弹头",
         "colMissileTotal": "总伤害",
-        "salvoNote": "一次性齐射所有导弹——一次性伤害,不计入武器 DPS。",
-        "salvoPartial": "并非每枚导弹都有弹头数值;齐射只计入已知的。",
+        "salvoNote": "一次性齐射所有导弹——一次性伤害，不计入武器 DPS。",
+        "salvoPartial": "并非每枚导弹都有弹头数值；齐射只计入已知的。",
         "noWarheadData": "当前数据中暂无这些导弹的弹头数值。",
         "hintMissiles": "{{value}} 导弹齐射"
       },
@@ -2625,41 +2625,41 @@
         "regen": "恢复",
         "fullIn": "充满需时",
         "regenDelay": "延迟",
-        "downedDelay": "延迟(击穿)",
-        "mixedGeneratorNote": "安装了多种不同的护盾发生器——上方总数为汇总值,延迟取自最强的一个。",
+        "downedDelay": "延迟（击穿）",
+        "mixedGeneratorNote": "安装了多种不同的护盾发生器——上方总数为汇总值，延迟取自最强的一个。",
         "resistance": "护盾抗性",
-        "hull": "机体与装甲",
+        "hull": "船体与装甲",
         "armorPhysical": "物理减伤",
         "armorEnergy": "能量减伤",
-        "armorDistortion": "Distortion 减伤",
+        "armorDistortion": "畸变减伤",
         "armorPenetration": "基础穿透减伤",
-        "armorDeflectionPhysical": "偏转(物理)",
-        "armorDeflectionEnergy": "偏转(能量)",
-        "noArmorData": "此舰的提取数据不含装甲数值——这里只显示机体结构。",
+        "armorDeflectionPhysical": "偏转（物理）",
+        "armorDeflectionEnergy": "偏转（能量）",
+        "noArmorData": "此舰的提取数据不含装甲数值——这里只显示船体结构。",
         "effectiveHp": "有效总 HP",
-        "effectiveHpGap": "只有当提取数据中同时包含机体和护盾 HP 时才能计算。"
+        "effectiveHpGap": "只有当提取数据中同时包含船体和护盾 HP 时才能计算。"
       },
       "ship": {
         "title": "舰船",
         "flightPerformance": "飞行性能",
         "mass": "质量",
         "systems": "系统",
-        "signature": "特征(满载时)",
-        "hull": "机体",
-        "massEquipmentNote": "提取数据中没有机体质量——只能计算装备质量。",
-        "crossSectionNote": "来自机体,不可更改。"
+        "signature": "信号（满载时）",
+        "hull": "船体",
+        "massEquipmentNote": "提取数据中没有船体质量——只能计算装备质量。",
+        "crossSectionNote": "来自船体，不可更改。"
       }
     },
     "hull": {
-      "title": "机体与飞行",
-      "hullHp": "机体 HP",
-      "hullMass": "机体质量",
+      "title": "船体与飞行",
+      "hullHp": "船体 HP",
+      "hullMass": "船体质量",
       "armorHp": "装甲 HP",
       "reverseSpeed": "倒退速度",
-      "dimensions": "尺寸(长×宽×高)",
+      "dimensions": "尺寸（长×宽×高）",
       "decks": "甲板",
       "decksDerived": "根据地板高度推算",
-      "crew": "乘员",
+      "crew": "船员",
       "equippedMass": "装备质量",
       "scmSpeed": "SCM 速度",
       "maxSpeed": "最大速度",
@@ -2667,7 +2667,7 @@
       "pitch": "俯仰速率",
       "yaw": "偏航速率",
       "roll": "翻滚速率",
-      "flightMissing": "飞行特性存放在载具定义中,我们的 P4K 提取器暂时还无法解析——这些行会保留,待解析后自动填充。"
+      "flightMissing": "飞行特性存放在载具定义中，我们的 P4K 提取器暂时还无法解析——这些行会保留，待解析后自动填充。"
     },
     "inspect": {
       "hardpoint": "挂点",
@@ -2679,7 +2679,7 @@
       "openStats": "显示所有数值"
     },
     "moduleRole": {
-      "shieldGenerator": "发电机",
+      "shieldGenerator": "发生器",
       "shieldController": "控制模块"
     },
     "table": {
@@ -2691,7 +2691,7 @@
       }
     },
     "stage": {
-      "armorEquipped": "装甲 {{filled}} / {{total}}"
+      "armorEquipped": "护甲 {{filled}} / {{total}}"
     },
     "hangarPicker": {
       "hangar": "机库",
@@ -2702,7 +2702,7 @@
     "set": {
       "back": "← 返回 Codex",
       "backToHangar": "← 返回机库",
-      "flowHint": "点按一个槽位——人物周围是装甲,下方栏中是武器——即可从军械库中装配。",
+      "flowHint": "点按一个槽位——人物周围是护甲，下方栏中是武器——即可从军械库中装配。",
       "signInHint": "登录后即可查看和编辑你的套装。",
       "noSets": "尚未配置任何套装。",
       "createInHangar": "在机库中创建套装 →",
@@ -2713,17 +2713,17 @@
         "eyebrow": "武器与工具",
         "choose": "选择",
         "change": "更改",
-        "open": "开放",
+        "open": "空置",
         "clear": "清空",
         "clearAria": "清空{{slot}}",
         "clearing": "正在清空…",
-        "clearFailed": "无法清空{{slot}},请重试。",
-        "noSource": "不在 Arsenal 中 — 消耗品",
-        "customSlot": "你自己的位置 — 无法从 Arsenal 填充",
+        "clearFailed": "无法清空{{slot}}，请重试。",
+        "noSource": "不在军械库中——消耗品",
+        "customSlot": "自定义位置——无法从军械库装配",
         "cleared": "{{slot}}已清空。",
         "undo": "撤销",
-        "undoFailed": "无法放回{{slot}},请重新装备。",
-        "changedElsewhere": "{{slot}}在此期间已在别处被更改 — 这是它当前的状态。"
+        "undoFailed": "无法放回{{slot}}，请重新装备。",
+        "changedElsewhere": "{{slot}}在此期间已在别处被更改——这是它当前的状态。"
       },
       "stage": {
         "slotsAria": "护甲部件",
@@ -2731,19 +2731,19 @@
         "lensLimits": "限制本次任务可用的套装"
       },
       "supplies": {
-        "add": "将缺少的部件加入行动({{n}})",
+        "add": "将缺少的部件加入行动（{{n}}）",
         "none": "所有部件均已拥有或已在某个行动中。",
         "added": "已将 {{n}} 个部件加入行动。",
         "toPlan": "前往规划"
       },
       "notFoundPage": {
         "title": "未找到套装",
-        "body": "此套装不存在,或不在你的储物柜中。"
+        "body": "此套装不存在，或不在你的储物柜中。"
       }
     },
     "stat": {
       "health": "生命值",
-      "distortionCapacity": "干扰容量",
+      "distortionCapacity": "畸变容量",
       "maxShieldHealth": "最大护盾值",
       "maxShieldRegen": "最大护盾回复",
       "scmSpeed": "SCM 速度",
@@ -2775,26 +2775,26 @@
       "gForceResistance": "过载抗性",
       "temperatureMax": "最高温度",
       "temperatureMin": "最低温度",
-      "emSignature": "电磁特征",
-      "irSignature": "红外特征",
+      "emSignature": "EM 信号",
+      "irSignature": "IR 信号",
       "atmosphereCapacity": "大气容量",
       "radiationDissipationRate": "辐射消散",
       "pressureMax": "最大气压",
       "pressureMin": "最小气压",
       "heatPerShot": "每发热量",
       "projectilesPerShot": "每发弹丸数",
-      "downedRegenDelay": "护盾崩溃后回复延迟",
+      "downedRegenDelay": "护盾击穿后回复延迟",
       "damagedRegenDelay": "受击后回复延迟",
       "decayRatio": "衰减率",
       "reserveDrainRate": "储备消耗率",
-      "stunMaxAlphaRatio": "击晕:最大 Alpha 比例",
-      "stunMinAlphaRatio": "击晕:最小 Alpha 比例",
-      "stunMaxTime": "击晕:最长持续时间",
-      "stunMinTime": "击晕:最短持续时间",
-      "splineDriveSpeed": "路线跳跃:速度",
+      "stunMaxAlphaRatio": "眩晕：最大 Alpha 比例",
+      "stunMinAlphaRatio": "眩晕：最小 Alpha 比例",
+      "stunMaxTime": "眩晕：最长持续时间",
+      "stunMinTime": "眩晕：最短持续时间",
+      "splineDriveSpeed": "路线跳跃：速度",
       "driveSpeed": "航行速度",
       "engageSpeed": "启动速度",
-      "spoolUpTime": "充能时间",
+      "spoolUpTime": "预热时间",
       "cooldownTime": "冷却时间",
       "calibrationRate": "校准速率",
       "calibrationDelay": "校准延迟",
@@ -2803,22 +2803,22 @@
       "accelStageOne": "加速阶段 1",
       "accelStageTwo": "加速阶段 2",
       "interdictionTime": "拦截时间",
-      "rampUpHeat": "启动升温",
+      "rampUpHeat": "启动时热量",
       "duration": "持续时间",
-      "splineEngageSpeed": "路线跳跃:启动速度",
-      "splineSpoolUpTime": "路线跳跃:充能时间",
-      "splineCooldownTime": "路线跳跃:冷却时间",
-      "splineCalibrationRate": "路线跳跃:校准速率",
-      "splineAccelStageOne": "路线跳跃:加速阶段 1",
-      "splineAccelStageTwo": "路线跳跃:加速阶段 2",
-      "splineInterdictionTime": "路线跳跃:拦截时间",
-      "splineCalibrationDelay": "路线跳跃:校准延迟",
-      "splineCalibrationMax": "路线跳跃:最大校准需求",
-      "splineCalibrationMin": "路线跳跃:最小校准需求",
+      "splineEngageSpeed": "路线跳跃：启动速度",
+      "splineSpoolUpTime": "路线跳跃：预热时间",
+      "splineCooldownTime": "路线跳跃：冷却时间",
+      "splineCalibrationRate": "路线跳跃：校准速率",
+      "splineAccelStageOne": "路线跳跃：加速阶段 1",
+      "splineAccelStageTwo": "路线跳跃：加速阶段 2",
+      "splineInterdictionTime": "路线跳跃：拦截时间",
+      "splineCalibrationDelay": "路线跳跃：校准延迟",
+      "splineCalibrationMax": "路线跳跃：最大校准需求",
+      "splineCalibrationMin": "路线跳跃：最小校准需求",
       "disconnectRange": "断开范围",
       "quantumFuel": "量子燃料需求",
       "inFlightHeat": "飞行中热量",
-      "rampDownHeat": "关闭降温热量",
+      "rampDownHeat": "关闭时热量",
       "preRampUpHeat": "启动前热量",
       "postRampDownHeat": "关闭后热量"
     },
@@ -2830,7 +2830,7 @@
       "axis": {
         "protection": "防护",
         "mobility": "机动性",
-        "stealth": "隐匿",
+        "stealth": "潜行",
         "activeScan": "主动扫描",
         "gForce": "过载",
         "eva": "EVA",
@@ -2845,12 +2845,12 @@
         "noData": "游戏数据中暂无"
       },
       "note": {
-        "limited": "高温和寒冷受 {{item}}({{range}})限制。"
+        "limited": "高温和寒冷受 {{item}}（{{range}}）限制。"
       },
       "header": "评级",
-      "profileLabel": "概况",
+      "profileLabel": "评估方案",
       "verdict": "{{pct}}% — {{band}}",
-      "radarAria": "套装百分位雷达图,{{cohort}}",
+      "radarAria": "套装百分位雷达图，{{cohort}}",
       "legend": {
         "set": "此套装",
         "median": "中位数"
@@ -2858,7 +2858,7 @@
       "loading": "计算中…",
       "unavailable": "游戏内数值加载完成后将显示评级。",
       "failed": "无法加载评级。",
-      "empty": "尚未装备护甲 — 装备第一件后将显示评级。"
+      "empty": "尚未装备护甲——装备第一件后将显示评级。"
     },
     "setLens": {
       "all": "全部",
@@ -2870,17 +2870,17 @@
       "eva": "EVA",
       "scan": "扫描",
       "tip": {
-        "all": "所有数值权重相同,无侧重。",
-        "combat": "类似 CIG 的“坦克”专精:防护和护甲等级优先。",
+        "all": "所有数值权重相同，无侧重。",
+        "combat": "类似 CIG 的“坦克”专精：防护和护甲等级优先。",
         "stealth": "此套装在扫描仪上有多难被发现。",
-        "pilot": "类似 CIG 的“飞行员”和“驾驶员”专精:过载耐受优先。",
+        "pilot": "类似 CIG 的“飞行员”和“驾驶员”专精：过载耐受优先。",
         "env": "此套装对高温、寒冷和辐射的防护效果如何。",
         "transport": "此套装能提供多少负重能力。",
         "eva": "此套装有多适合 EVA 作业。",
-        "scan": "类似 CIG 的“追踪者”专精:探测与追踪优先。"
+        "scan": "类似 CIG 的“追踪者”专精：探测与追踪优先。"
       },
       "disabled": {
-        "noSignature": "特征值(电磁/红外)尚未收录在游戏数据中",
+        "noSignature": "信号值（EM/IR）尚未收录在游戏数据中",
         "noData": "此数值尚未收录在游戏数据中"
       }
     },
@@ -2897,14 +2897,14 @@
         "interior": "内部",
         "other": "其他"
       },
-      "resetView": "重置视角",
-      "parts": "部件({{count}})",
+      "resetView": "重置视图",
+      "parts": "部件（{{count}}）",
       "show": "显示{{name}}",
       "hide": "隐藏{{name}}",
       "hotspotTip": "{{name}} · {{type}} · 尺寸 {{size}}",
-      "freeSlot": "空位,可装 {{types}}",
+      "freeSlot": "空位，可装 {{types}}",
       "label": {
-        "aria": "已选位置:{{name}}",
+        "aria": "已选位置：{{name}}",
         "open": "在 Codex 中打开{{name}}",
         "prev": "上一个位置",
         "next": "下一个位置",
@@ -2912,14 +2912,14 @@
       },
       "allParts": "所有部件",
       "zoomHint": "按住 Ctrl 并滚动滚轮缩放",
-      "swap": "更换组件"
+      "swap": "更换部件"
     },
     "attachType": {
       "WeaponPersonal": "个人武器",
       "WeaponGun": "舰载武器",
       "WeaponMining": "采矿激光",
       "Missile": "导弹",
-      "MissileLauncher": "导弹挂架",
+      "MissileLauncher": "导弹架",
       "Turret": "炮塔",
       "Char_Armor_Helmet": "头盔",
       "Char_Armor_Torso": "躯干",
@@ -2932,29 +2932,29 @@
       "FPS_Consumable": "消耗品"
     },
     "personal": {
-      "switchGroup": "视图:原装或你的变体",
+      "switchGroup": "视图：原装或你的变体",
       "codex": "Codex",
       "stock": "原装",
       "mine": "我的",
       "mineVariant": "我的变体",
-      "yourVariant": "我的变体:{{name}}",
+      "yourVariant": "我的变体：{{name}}",
       "variantsMenu": "你的此舰变体",
       "hqCrumb": "HQ",
-      "foreignVariant": "此变体属于其他人 — 变体通过分享链接共享。",
+      "foreignVariant": "此变体属于其他人——变体通过分享链接共享。",
       "adopt": "创建副本",
       "openVariant": "打开你的变体",
       "inHqChip": "你的 HQ 中有 {{n}} 个",
       "usesTitle": "在你的 HQ 中",
-      "equippedOn": "装配于:{{ship}}({{variant}})",
-      "inSet": "在套装{{name}}中"
+      "equippedOn": "装配于：{{ship}}（{{variant}}）",
+      "inSet": "在套装 {{name}} 中"
     },
     "browse": {
       "eyebrow": "Codex 索引",
       "filtersAria": "筛选",
       "filtersTitle": "筛选",
-      "filterButton": "筛选({{count}})",
+      "filterButton": "筛选（{{count}}）",
       "showResults": "显示 {{count}} 个结果",
-      "areaLabel": "范围",
+      "areaLabel": "分类",
       "collapseArea": "收起{{name}}",
       "expandArea": "展开{{name}}",
       "area": {
@@ -2988,9 +2988,9 @@
       "lawful": "合法",
       "unlawful": "非法",
       "variantsLabel": "变体",
-      "variants": "{{n}} 个合同使用此标题",
+      "variants": "{{n}} 个合约使用此标题",
       "patch": "补丁",
-      "placeholderHint": "‹…› 会在你接受任务时由游戏填入(地点、委托方、目标)。",
+      "placeholderHint": "‹…› 会在你接受任务时由游戏填入（地点、委托方、目标）。",
       "notFound": "当前 LIVE 版本中没有此任务。"
     },
     "missile": {
@@ -3026,17 +3026,17 @@
         "nAll": "{{n}} 件制导武器",
         "nSize": "{{n}} 件尺寸为 {{k}} 的制导武器",
         "nSignal": "{{n}} 件追踪信号相同的制导武器",
-        "verdict": "{{pct}}% — {{band}},对比 {{n}} 件制导武器。",
-        "percentileTooltip": "该数值表示这件武器在对比范围中所处的位置。50% 正好是中间。尺寸和规格不代表优劣:更长只是更长。",
+        "verdict": "{{pct}}% — {{band}}，对比 {{n}} 件制导武器。",
+        "percentileTooltip": "该数值表示这件武器在对比范围中所处的位置。50% 正好是中间。尺寸和规格不代表优劣：更长只是更长。",
         "radarAria": "{{name}} 相对 {{n}} 件制导武器的百分位雷达图",
         "legendCompare": "中位数 {{group}} · {{n}} 件制导武器",
         "legendAbove": "高于中位数",
         "legendBelow": "低于中位数",
-        "compareInfo": "每个轴从 0(中心)延伸到所选武器中的最高值(边缘)。蓝色为这件武器,虚线为该组的中位数。",
+        "compareInfo": "每个轴从 0（中心）延伸到所选武器中的最高值（边缘）。蓝色为这件武器，虚线为该组的中位数。",
         "note": "仅比较游戏数据中包含的此武器的数据。",
-        "gapNoData": "当前数据尚未包含伤害、速度、机动性和射程。使用 Verse Data Uploader 0.73.3 或更高版本上传构建后,将显示对比。",
-        "gapTooFew": "伤害、速度、机动性和射程各不相同的导弹太少,无法对这件进行排名。",
-        "gapThinGroup": "可比数据不足:此组中数值各不相同的项目太少,无法排名。",
+        "gapNoData": "当前数据尚未包含伤害、速度、机动性和射程。使用 Verse Data Uploader 0.73.3 或更高版本上传构建后，将显示对比。",
+        "gapTooFew": "伤害、速度、机动性和射程存在差异的导弹太少，无法为其排名。",
+        "gapThinGroup": "可比数据不足：此组中数值各不相同的项目太少，无法排名。",
         "gapNoCohort": "无法加载对比组。"
       },
       "data": {
@@ -3062,7 +3062,7 @@
         "lifetime": "飞行时间",
         "lockTime": "锁定时间",
         "blastRadius": "爆炸半径",
-        "armTime": "引信解除时间",
+        "armTime": "解保时间",
         "lockAngle": "锁定角度"
       },
       "signal": {
@@ -3088,7 +3088,7 @@
         "medium": "中型",
         "heavy": "重型",
         "compact": "紧凑",
-        "long": "长",
+        "long": "长型",
         "hardHitting": "高威力",
         "fast": "快速",
         "agile": "灵活",
@@ -3096,10 +3096,10 @@
         "quickLock": "快速锁定"
       },
       "keywordTip": {
-        "ir": "追踪目标的红外特征。",
-        "em": "追踪目标的电磁特征。",
+        "ir": "追踪目标的红外信号。",
+        "em": "追踪目标的电磁信号。",
         "cs": "追踪目标的雷达截面。",
-        "missile": "由飞船发射。",
+        "missile": "由舰船发射。",
         "torpedo": "对付大型目标的重型制导武器。",
         "rocket": "归类为火箭弹。",
         "ground": "用于地面载具。",
@@ -3116,15 +3116,15 @@
       }
     },
     "page": {
-      "more": "更多图鉴内容",
+      "more": "Codex 中的更多内容",
       "moreAria": "所有条目概览"
     },
     "head": {
       "stripAria": "补丁与拥有情况",
       "patch": "补丁",
       "variant": "变体",
-      "variantAria": "选择变体,当前:{{name}}",
-      "shown": "显示:",
+      "variantAria": "选择变体，当前：{{name}}",
+      "shown": "显示：",
       "own": {
         "hangar": "在机库中",
         "hangarN": "机库中 {{n}} 件",
@@ -3139,12 +3139,12 @@
     },
     "ownCard": {
       "removeSammlung": "从收藏中移除",
-      "removeSammlungTitle": "从收藏中移除?",
+      "removeSammlungTitle": "从收藏中移除？",
       "removeSammlungBody": "{{name}} 将从你的收藏中移除。",
-      "signedOut": "登录后即可添加心愿或标记为已拥有。",
+      "signedOut": "登录后即可加入愿望清单或标记为已拥有。",
       "signIn": "登录",
       "removeItem": "从库存中移除",
-      "removeTitle": "从库存中移除?",
+      "removeTitle": "从库存中移除？",
       "removeBody": "{{n}} 件 {{name}} 将从你库存中的所有位置移除。",
       "removeConfirm": "移除",
       "inNachschub": "在行动“{{name}}”中",
@@ -3154,15 +3154,15 @@
       "nAll": "{{n}} 个同类部件",
       "nType": "{{n}} 个相同类型的部件",
       "nSize": "{{n}} 个尺寸为 {{k}} 的部件",
-      "verdict": "{{pct}}% — {{band}},对比 {{n}} 个部件。",
-      "percentileTooltip": "该数值表示这个部件在对比范围中所处的位置。50% 正好是中间。对于延迟和特征值,数值越小排名越靠前。",
+      "verdict": "{{pct}}% — {{band}}，对比 {{n}} 个部件。",
+      "percentileTooltip": "该数值表示这个部件在对比范围中所处的位置。50% 正好是中间。对于延迟和信号值，数值越小排名越靠前。",
       "radarAria": "{{name}} 相对 {{n}} 个部件的百分位雷达图",
       "legendCompare": "中位数 {{group}} · {{n}} 个部件",
       "legendAbove": "高于中位数",
       "legendBelow": "低于中位数",
-      "compareInfo": "每个轴从 0(中心)延伸到所选部件中的最佳值(边缘)。蓝色为这个部件,虚线为该组的中位数。",
+      "compareInfo": "每个轴从 0（中心）延伸到所选部件中的最佳值（边缘）。蓝色为这个部件，虚线为该组的中位数。",
       "note": "仅比较游戏数据中包含的此部件的数据。",
-      "gapTooFew": "此处所比较的数值各不相同的部件太少,无法对这个部件进行排名。",
+      "gapTooFew": "在此处所比较的数值上存在差异的部件太少，无法为其排名。",
       "gapNoCohort": "无法加载对比组。",
       "scope": {
         "all": "全部",
@@ -3172,7 +3172,7 @@
       "scopeOff": "此组中可供比较的部件太少。",
       "axis": {
         "dps": "DPS",
-        "alpha": "ALPHA",
+        "alpha": "单发",
         "fireRate": "射速",
         "projectileSpeed": "弹速",
         "shieldHp": "护盾 HP",
@@ -3185,31 +3185,31 @@
         "emSignature": "EM",
         "irSignature": "IR",
         "driveSpeed": "速度",
-        "jumpRange": "射程",
-        "spoolTime": "蓄能时间"
+        "jumpRange": "航程",
+        "spoolTime": "预热时间"
       }
     },
     "savedLoadouts": {
-      "group": "此飞船的配置方案",
+      "group": "此舰船的配置方案",
       "save": "保存方案",
-      "saveNothing": "请先更改一个槽位,然后再保存。",
+      "saveNothing": "请先更改一个槽位，然后再保存。",
       "nameLabel": "名称",
       "saveConfirm": "保存",
       "remove": "删除“{{name}}”",
-      "removeTitle": "删除方案?",
+      "removeTitle": "删除方案？",
       "removeMessage": "“{{name}}”将从此浏览器中移除。",
       "removeConfirm": "删除",
       "cart": "将组件加入购物车",
-      "cartSoon": "即将推出:将此配置的组件加入购物车。",
+      "cartSoon": "即将推出：将此配置的组件加入购物车。",
       "layouts": "选择方案",
       "saveInto": "将更改保存到“{{name}}”。",
       "pickNew": "新建",
       "saveAsNew": "另存为新方案",
       "newTitle": "新方案",
-      "newMessage": "保存在此浏览器中,仅适用于此飞船。未命名时使用建议的名称;同名将覆盖。",
+      "newMessage": "保存在此浏览器中，仅适用于此舰船。未命名时使用建议的名称；同名将覆盖。",
       "defaultName": "方案 {{n}}",
       "share": "复制“{{name}}”的链接",
-      "shareCopied": "链接已复制 – 打开它的人会看到此方案。",
+      "shareCopied": "链接已复制——打开它的人会看到此方案。",
       "shareFailed": "无法复制链接。"
     }
   },
@@ -3239,13 +3239,13 @@
       "VehicleWeaponsS6": "载具武器 S6"
     },
     "card": {
-      "tier": "Tier {{tier}}"
+      "tier": "层级 {{tier}}"
     },
-    "recipesMissing": "此构建尚未提取配方材料 — 已列出蓝图,但没有材料清单。",
+    "recipesMissing": "此构建尚未提取配方材料——已列出蓝图，但没有材料清单。",
     "owned": {
       "filter": "仅我的",
-      "mark": "我有此蓝图:{{name}}",
-      "unmark": "我的 – 取消标记:{{name}}"
+      "mark": "我有此蓝图：{{name}}",
+      "unmark": "我的——取消标记：{{name}}"
     },
     "role": {
       "primary": "主要",
@@ -3253,7 +3253,7 @@
       "catalyst": "催化剂"
     },
     "detail": {
-      "tier": "Tier",
+      "tier": "层级",
       "craftTime": "制作时间",
       "dismantleTime": "拆解时间",
       "outputQty": "产出数量",
@@ -3274,10 +3274,10 @@
   },
   "fps": {
     "title": "FPS 装备",
-    "subtitle": "徒步装备——武器与护甲,数据挖掘自正式服版本。",
+    "subtitle": "徒步装备——武器与护甲，数据提取自 LIVE 版本。",
     "bridgeLink": "FPS 装备",
     "categoriesAria": "FPS 装备分类",
-    "searchPlaceholder": "筛选此列表——名称或类名(例如 Arclight、Morozov、klwe_*)…",
+    "searchPlaceholder": "筛选此列表——名称或类名（例如 Arclight、Morozov、klwe_*）…",
     "category": {
       "weapon": "武器",
       "armor": "护甲"
@@ -3285,7 +3285,7 @@
     "filters": {
       "weaponType": "武器类型",
       "armorSlot": "护甲部位",
-      "toggle": "筛选({{count}})"
+      "toggle": "筛选（{{count}}）"
     },
     "weaponType": {
       "sidearm": "副武器",
@@ -3308,23 +3308,23 @@
       "searchIn": "在 {{cat}} 中搜索"
     },
     "equip": {
-      "targetSet": "正在为 {{name}} 配装",
+      "targetSet": "装备至：{{name}}",
       "backToSet": "返回套装",
       "removeFrom": "从 {{slot}} 中移除",
       "confirmEquipped": "已将 {{item}} 装备到 {{slot}}",
       "confirmRemoved": "已从 {{slot}} 中移除 {{item}}",
-      "failed": "未保存——套装未接受此更改,请重试。",
-      "setUnavailable": "链接中的套装已不存在或不属于你——你正在浏览,不会装备任何物品。",
+      "failed": "未保存——套装未接受此更改，请重试。",
+      "setUnavailable": "链接中的套装已不存在或不属于你——你正在浏览，不会装备任何物品。",
       "mySets": "我的套装",
-      "browseWithout": "不使用套装,继续浏览",
+      "browseWithout": "不使用套装，继续浏览",
       "onlyFitting": "仅显示适合“{{slot}}”的物品。",
       "saving": "正在保存…",
       "changedElsewhere": "在此期间已在其他标签页中更改——该槽位现在装有其他物品。",
       "pastPatch": "仅当前补丁支持装备。",
       "pastPatchBack": "前往当前补丁",
       "band": {
-        "eyebrow": "Arsenal",
-        "eyebrowSlot": "Arsenal · {{slot}}",
+        "eyebrow": "军械库",
+        "eyebrowSlot": "军械库 · {{slot}}",
         "titleSlot": "{{name}} 的 {{slot}}"
       },
       "setLoadFailed": "无法加载链接中的套装",
@@ -3337,7 +3337,7 @@
       "loading": "正在加载套装…",
       "noSet": "你还没有套装。",
       "noFit": "你的套装都没有适合这个部件的槽位。",
-      "pickSet": "放入哪个套装?",
+      "pickSet": "放入哪个套装？",
       "pickSlot": "放入 {{set}} 的槽位",
       "replaces": "将替换当前部件",
       "done": "{{item}} 现已放入 {{set}} 的 {{slot}}",
@@ -3782,15 +3782,15 @@
   "stability": {
     "word": {
       "stabil": "稳定",
-      "wackelig": "不稳",
+      "wackelig": "欠稳定",
       "instabil": "不稳定"
     },
     "noData": "数据不足",
     "tip": {
-      "noData": "数据不足,暂无法评级",
-      "better": "比 {{prev}} 强 {{d}} 分({{p}} %)",
-      "worse": "比 {{prev}} 弱 {{d}} 分({{p}} %)",
-      "same": "与 {{prev}} 大致相同({{p}} %)",
+      "noData": "数据不足，暂无法评级",
+      "better": "比 {{prev}} 强 {{d}} 分（{{p}} %）",
+      "worse": "比 {{prev}} 弱 {{d}} 分（{{p}} %）",
+      "same": "与 {{prev}} 大致相同（{{p}} %）",
       "community": "其中 {{c}} 来自社区评价",
       "early": "仍为初步结果",
       "open": "点击查看计算过程",
@@ -3800,79 +3800,79 @@
       "ghost": "{{prev}}:{{p}} %",
       "bandsRolling": "阈值根据最近已完成的补丁得出",
       "bandInstabil": "不稳定 · 低于 {{n}}",
-      "bandWackelig": "不稳 · {{a}}–{{b}}",
+      "bandWackelig": "欠稳定 · {{a}}–{{b}}",
       "bandStabil": "稳定 · 自 {{n}} 起",
       "sumTitle": "这 {{n}} % 是如何得出的",
       "start": "每个补丁的起始值",
       "ded": {
         "community": "社区信号",
         "service": "服务",
-        "cig": "CIG Known Issues",
+        "cig": "CIG 已知问题",
         "verdict": "社区评价"
       },
       "kbOpen": "{{n}} 个未解决",
       "votesN": "{{n}} 票",
       "total": "稳定性",
-      "final": "最终状态——没有每日时间线,此补丁发布于每日采样开始之前。",
+      "final": "最终状态——没有每日时间线，此补丁发布于每日采样开始之前。",
       "asOf": "截至 {{date}}",
       "day": "第 {{day}} 天 / 共 {{threshold}} 天",
       "provisional": "评级仍为初步结果",
-      "sources": "来源:",
+      "sources": "来源：",
       "src": {
         "replies": "{{threads}} 个主题中的 {{n}} 条论坛回复",
-        "outage": "{{n}} 分钟故障时间(RSI Status)",
-        "kb": "{{n}} 个 Known Issues(CIG)",
+        "outage": "{{n}} 分钟故障时间（RSI Status）",
+        "kb": "{{n}} 个已知问题（CIG）",
         "votes": "{{n}} 个社区投票"
       },
-      "hatched": "阴影部分:前 {{n}} 天,热修复仍可能扭转局面。",
-      "dayTitle": "{{date}}:{{score}} % – {{word}},每天 {{velocity}} 条新回复",
+      "hatched": "阴影部分：前 {{n}} 天，热修复仍可能扭转局面。",
+      "dayTitle": "{{date}}：{{score}} % – {{word}}，每天 {{velocity}} 条新回复",
       "ticketsHint": "来自公开论坛回复",
       "mentions": "{{count}} 次提及"
     },
     "vote": {
       "title": "社区评价",
       "loading": "正在加载评价……",
-      "tooFew": "票数尚不足({{n}} / {{min}})——不做修正",
-      "tooFewSub": "正在收集投票;达到最低数量前不会显示分布。",
-      "applied": "社区评价:{{c}}({{n}} 票,范围 ± {{hw}})",
-      "split": "意见分歧({{a}} % 稳定 · {{b}} % 不稳定)——半修正",
+      "tooFew": "票数尚不足（{{n}} / {{min}}）——不做修正",
+      "tooFewSub": "正在收集投票；达到最低数量前不会显示分布。",
+      "applied": "社区评价：{{c}}（{{n}} 票，范围 ± {{hw}}）",
+      "split": "意见分歧（{{a}} % 稳定 · {{b}} % 不稳定）——半修正",
       "splitSub": "体验各不相同。",
       "confirmed": "已确认——不做修正",
       "confirmedSub": "计算出的数值在社区评价范围内。",
       "sum": "{{n}} 票 · 修正 {{c}}",
       "yours": "你的评价",
-      "blindTitle": "先给出你的判断,再看数字",
-      "ask": "{{line}} 在你这里运行得有多稳定?",
-      "mine": "你的判断:",
+      "blindTitle": "先给出你的评价，再看数字",
+      "ask": "{{line}} 在你这里运行得有多稳定？",
+      "mine": "你的评价：",
       "changeFrom": "{{time}} 起可修改",
       "hint": {
-        "stabil": "运行流畅,几乎不掉线",
-        "wackelig": "可以玩,但很烦人",
+        "stabil": "运行流畅，几乎不掉线",
+        "wackelig": "可以玩，但很烦人",
         "instabil": "一直掉线"
       },
       "cannotJudge": "我无法判断",
-      "showNumber": "不带判断直接显示数字",
+      "showNumber": "不评价，直接显示数字",
       "tooSoon": "最早在你上次投票 {{h}} 小时后才能修改。",
-      "rules": "只统计注册满 {{days}} 天的账号。最早在你上次投票 {{h}} 小时后才能修改。你的判断绝不会与你的名字一同显示。",
-      "signedOut": "登录后即可发表你的判断。",
+      "rules": "只统计注册满 {{days}} 天的账号。最早在你上次投票 {{h}} 小时后才能修改。你的评价绝不会与你的名字一同显示。",
+      "signedOut": "登录后即可发表你的评价。",
       "signIn": "登录",
-      "dailyCap": "你今天已经提交或修改了 {{n}} 次构建判断,请明天再试。",
-      "buildClosed": "此构建已不再运行,只能对当前运行的构建进行评判。",
-      "rulesBuild": "只统计注册满 {{days}} 天的账号。最早在你投票 {{h}} 小时后才能修改,每天最多 {{n}} 次构建判断,且仅在构建运行期间有效。你的判断绝不会与你的名字一同显示。"
+      "dailyCap": "你今天已经提交或修改了 {{n}} 次构建评价，请明天再试。",
+      "buildClosed": "此构建已不再运行，只能对当前运行的构建进行评判。",
+      "rulesBuild": "只统计注册满 {{days}} 天的账号。最早在你投票 {{h}} 小时后才能修改，每天最多 {{n}} 次构建评价，且仅在构建运行期间有效。你的评价绝不会与你的名字一同显示。"
     }
   },
   "p4k": {
     "title": "P4K 数据包历史",
-    "subtitle": "来自 Verse Data Uploader 的预处理数据包。仅能通过该工具上传,不能从网站上传。",
+    "subtitle": "来自 Verse Data Uploader 的预处理数据包。仅能通过该工具上传，不能从网站上传。",
     "loading": "正在加载数据包…",
     "errorTitle": "无法加载数据包",
-    "retentionHint": "保留规则:每个构建保留最近 3 个上传工具版本,总共最多 20 个数据包,更早的会被自动删除。",
+    "retentionHint": "保留规则：每个构建保留最近 3 个上传工具版本，总共最多 20 个数据包，更早的会被自动删除。",
     "toggle": {
       "disabled": "显示已停用的"
     },
     "empty": {
       "title": "暂无数据包",
-      "hint": "有人使用 Verse Data Uploader 上传后,数据会显示在这里。"
+      "hint": "有人使用 Verse Data Uploader 上传后，数据会显示在这里。"
     },
     "col": {
       "entities": "实体",
@@ -3889,7 +3889,7 @@
       "lead": "设为主用"
     },
     "diff": {
-      "title": "差异详情(与上一构建对比)",
+      "title": "差异详情（与上一构建对比）",
       "entity": "实体类型",
       "prev": "之前",
       "new": "新增",
@@ -3900,15 +3900,15 @@
       "noReason": "未说明原因"
     },
     "prompts": {
-      "reenable": "要重新启用数据包“{{name}}”吗?",
+      "reenable": "要重新启用数据包“{{name}}”吗？",
       "delete": "要永久删除数据包“{{name}}”吗?\n\n此操作无法撤销。",
-      "disableTitle": "要停用数据包“{{name}}”吗?",
-      "reasonLabel": "原因(可选)",
-      "deleteTitle": "删除数据包?",
-      "disablePatchTitle": "要停用补丁 {{name}}(共 {{count}} 个有效上传)吗?",
-      "reenablePatch": "要重新启用补丁 {{name}} 吗?每个渠道将重新以其最新上传为主用。",
-      "leadTitle": "将“{{name}}”设为主用?",
-      "leadMessage": "同一补丁和渠道的其他有效上传将被停用(并附说明),但仍保留在历史记录中。"
+      "disableTitle": "要停用数据包“{{name}}”吗？",
+      "reasonLabel": "原因（可选）",
+      "deleteTitle": "删除数据包？",
+      "disablePatchTitle": "要停用补丁 {{name}}（共 {{count}} 个有效上传）吗？",
+      "reenablePatch": "要重新启用补丁 {{name}} 吗？每个渠道将重新以其最新上传为主用。",
+      "leadTitle": "将“{{name}}”设为主用？",
+      "leadMessage": "同一补丁和渠道的其他有效上传将被停用（并附说明），但仍保留在历史记录中。"
     },
     "superseded": {
       "badge": "已被取代",
@@ -3917,7 +3917,7 @@
     "leading": {
       "badge": "主用",
       "tip": "Codex 对其补丁和渠道使用此数据包。",
-      "reason": "已退为备用:已选择 {{name}} 作为主用。"
+      "reason": "已退为备用：已选择 {{name}} 作为主用。"
     }
   },
   "profile": {
@@ -4743,8 +4743,8 @@
   },
   "desktop": {
     "title": "数据上传",
-    "subtitle": "下载 Verse Data Uploader,用于你本地安装的 Star Citizen。",
-    "bundleHistory": "Bundle 历史",
+    "subtitle": "下载 Verse Data Uploader，用于你本地安装的 Star Citizen。",
+    "bundleHistory": "数据包历史",
     "loading": "正在加载版本…",
     "released": "发布于",
     "notes": "发布说明",
@@ -4755,31 +4755,31 @@
       "stable": "稳定版"
     },
     "promote": {
-      "from": "来自通道",
+      "from": "来源渠道",
       "label": "将此版本提升至",
       "action": "提升"
     },
     "appTitle": "Verse Data Uploader",
-    "appDesc": "读取你本地安装的 Star Citizen,并从中上传 Codex Bundle。",
+    "appDesc": "读取你本地安装的 Star Citizen，并从中上传 Codex 数据包。",
     "close": "关闭",
     "access": {
-      "fullPage": "完整 Data Upload 页面",
-      "note": "仅限 Windows · 使用你的 Verse Companion 账号登录 · 只上传数据,不上传代码。"
+      "fullPage": "完整的数据上传页面",
+      "note": "仅限 Windows · 使用你的 Verse Companion 账号登录 · 只上传数据，不上传代码。"
     },
     "historyEyebrow": "上传器",
     "build": {
-      "title": "最新 Bundle",
+      "title": "最新数据包",
       "since": "自 {{date}} 起",
       "quality": "质量 {{q}}",
-      "none": "暂无生效的 Bundle。"
+      "none": "暂无生效的数据包。"
     },
     "steps": {
       "title": "设置",
       "done": "已设置——你之前上传过。",
       "doneSr": "已完成",
-      "s1": "下载并启动 Uploader",
+      "s1": "下载并启动上传器",
       "s2": "使用你的 Verse Companion 账号登录",
-      "s3": "选择你的 Star Citizen 文件夹——Uploader 会读取 Data.p4k 并上传 Bundle"
+      "s3": "选择你的 Star Citizen 文件夹——上传器会读取 Data.p4k 并上传数据包"
     }
   },
   "download": {
@@ -4802,7 +4802,7 @@
   "desktopConnect": {
     "title": "连接 Verse Companion",
     "authorizing": "正在检查你的会话…",
-    "loginRequired": "请先登录,之后会自动返回此处。",
+    "loginRequired": "请先登录，之后会自动返回此处。",
     "redirecting": "已授权。正在向应用发送令牌…",
     "redirectingHint": "稍后即可关闭此窗口。",
     "errorMissingParams": "缺少回调或 state 参数。",
@@ -4810,27 +4810,33 @@
     "errorNoToken": "会话中没有访问令牌。",
     "retry": "重试",
     "handedOver": "返回应用",
-    "handedOverHint": "应用正在接管你的登录,你可以关闭此窗口。如果未能连接,请在应用中重新发起连接。"
+    "handedOverHint": "应用正在接管你的登录，你可以关闭此窗口。如果未能连接，请在应用中重新发起连接。"
   },
   "desktopAuth": {
-    "title": "授权 Verse Data Uploader",
     "authorizing": "正在检查你的会话…",
-    "loginRequired": "请先登录,然后确认连接。",
+    "loginRequired": "请先登录，然后确认连接。",
+    "confirm": "连接",
     "redirecting": "已授权。正在向应用发送令牌…",
-    "redirectingHint": "稍后即可关闭此窗口。",
+    "handedOverHint": "应用正在接管你的登录，你可以关闭此窗口。如果未能连接，请在应用中重新发起连接。",
     "unauthorized": "你的账号无权使用 Verse Data Uploader。",
-    "unauthorizedHint": "你需要 collaborator 或 admin 角色。请联系管理员。",
     "errorMissingParams": "缺少回调或 state 参数。",
     "errorBadCallback": "回调 URL 不是预期端口范围内的 127.0.0.1 回环地址。",
     "errorNoToken": "会话中没有访问令牌。",
-    "confirmPrompt": "要将端口 {{port}} 上的 Verse Data Uploader 连接到你的账号吗?",
-    "confirmHint": "仅当你刚刚亲自在 Verse Data Uploader 中发起了登录时才确认。",
-    "confirm": "连接",
-    "cancel": "取消",
-    "cancelled": "已取消——未发送任何内容。你可以关闭此窗口。",
     "retry": "重试",
-    "handedOver": "返回应用",
-    "handedOverHint": "应用正在接管你的登录,你可以关闭此窗口。如果未能连接,请在应用中重新发起连接。"
+    "titleConnect": "连接 Verse Data Uploader",
+    "titleConfirm": "要连接 Verse Data Uploader 吗？",
+    "titleConnecting": "正在连接…",
+    "titleConnected": "已连接",
+    "titleDenied": "无访问权限",
+    "titleFailed": "连接失败",
+    "confirmInfo": "仅当你本人在上传器中发起登录时才确认（端口 {{port}}）。",
+    "connected": "上传器已连接到你的账号。你可以关闭此窗口。",
+    "start": "请在 Verse Data Uploader 中发起登录——它会自动打开此页面。",
+    "done": {
+      "csrf": "此次登录不属于当前上传器会话。请在上传器中重新发起。",
+      "noToken": "上传器未收到登录信息。请在上传器中重新发起。",
+      "failed": "无法将登录交给上传器。请在上传器中重新发起。"
+    }
   },
   "footer": {
     "madeByCommunity": "社区出品",
@@ -4857,31 +4863,31 @@
   "legal": {
     "about": {
       "title": "关于 Verse Companion",
-      "subtitle": "谁运营本站、它能做什么,以及代码在哪里。",
+      "subtitle": "谁运营本站、它能做什么，以及代码在哪里。",
       "what": {
-        "title": "这是什么?",
-        "p1": "Verse Companion 是一款免费、非商业的太空模拟游戏 Star Citizen 配套应用:提供 Verse 新闻、舰船与装备 Codex,以及个人机库和配置工具。",
-        "p2": "无需账号即可浏览新闻、Codex 和发布说明。只有机库等个人功能才需要账号,目前仅限受邀注册。"
+        "title": "这是什么？",
+        "p1": "Verse Companion 是一款免费、非商业的太空模拟游戏 Star Citizen 配套应用：提供 Verse 新闻、舰船与装备 Codex，以及个人机库和配置工具。",
+        "p2": "无需账号即可浏览新闻、Codex 和发布说明。只有机库等个人功能才需要账号，目前仅限受邀注册。"
       },
       "openSource": {
         "title": "开源",
         "p1": "整个应用都是公开开发的。每一次改动都可以在 GitHub 上公开查看——这与运行在本站上的是同一份代码。",
-        "repoLink": "GitHub 上的源代码 (StarOrga/Star-Citizen-Companion-Web)"
+        "repoLink": "GitHub 上的源代码（StarOrga/Star-Citizen-Companion-Web）"
       },
       "data": {
         "title": "你的数据",
-        "p1": "Verse Companion 不展示广告,只存储功能所需的数据。产品分析通过位于欧盟服务器的 PostHog 运行。详情见隐私政策:",
+        "p1": "Verse Companion 不展示广告，只存储功能所需的数据。产品分析通过位于欧盟服务器的 PostHog 运行。详情见隐私政策：",
         "privacyLink": "隐私政策"
       },
       "affiliation": {
         "title": "粉丝项目——无官方关联",
-        "p1": "Verse Companion——非官方的 Star Citizen 粉丝工具。它由社区打造,与 Cloud Imperium 集团旗下公司或 Roberts Space Industries 无关联,也未获其认可或赞助,并且绝不会索取你的 RSI 账号凭据。"
+        "p1": "Verse Companion——非官方的 Star Citizen 粉丝工具。它由社区打造，与 Cloud Imperium 集团旗下公司或 Roberts Space Industries 无关联，也未获其认可或赞助，并且绝不会索取你的 RSI 账号凭据。"
       },
       "contact": {
         "title": "联系方式",
-        "p1": "联系维护者最快的方式:",
-        "issuesLink": "GitHub Issues(Bug、问题、反馈)",
-        "securityLink": "安全联系方式(security.txt,RFC 9116)"
+        "p1": "联系维护者最快的方式：",
+        "issuesLink": "GitHub Issues（Bug、问题、反馈）",
+        "securityLink": "安全联系方式（security.txt，RFC 9116）"
       },
       "new": {
         "eyebrow": "Verse 新动态",
@@ -4891,83 +4897,83 @@
     },
     "privacy": {
       "title": "隐私政策",
-      "updated": "更新日期:2026 年 11 月",
+      "updated": "更新日期：2026 年 11 月",
       "summary": {
         "title": "简要说明",
-        "noAds": "没有广告,没有广告网络。",
-        "signIn": "登录方式恰好有两种:邮箱地址加密码,或你的 Google 账号。Google 方式为可选,并且会向 Google 发送数据。",
-        "noTracking": "没有广告追踪器。通过 PostHog(欧盟)进行的产品分析仅在你允许时才运行——默认关闭。我们自己的服务器上报错误和运行时间,不含任何个人信息。",
-        "minimal": "仅收集功能所需的数据——不会出售,也不会用于营销共享。",
-        "euHosting": "应用数据存储在欧盟(Supabase,区域 eu-central-1 / 法兰克福)。"
+        "noAds": "没有广告，没有广告网络。",
+        "signIn": "登录方式恰好有两种：邮箱地址加密码，或你的 Google 账号。Google 方式为可选，并且会向 Google 发送数据。",
+        "noTracking": "没有广告追踪器。通过 PostHog（欧盟）进行的产品分析仅在你允许时才运行——默认关闭。我们自己的服务器上报错误和运行时间，不含任何个人信息。",
+        "minimal": "仅收集功能所需的数据——不会出售，也不会用于营销共享。",
+        "euHosting": "应用数据存储在欧盟（Supabase，区域 eu-central-1 / 法兰克福）。"
       },
       "hosting": {
         "title": "托管与服务器日志",
-        "p1": "本站由 Vercel Inc.(美国)提供。访问时,Vercel 会因技术原因处理你的 IP 地址和浏览器信息,以提供页面并保护服务(正当利益,GDPR 第 6 条第 1 款 f 项)。",
-        "p2": "应用本身是静态 Web 应用;不存在涉及个人数据的服务器端页面渲染。"
+        "p1": "本站由 Vercel Inc.（美国）提供。访问时，Vercel 会因技术原因处理你的 IP 地址和浏览器信息，以提供页面并保护服务（正当利益，GDPR 第 6 条第 1 款 f 项）。",
+        "p2": "应用本身是静态 Web 应用；不存在涉及个人数据的服务器端页面渲染。"
       },
       "account": {
         "title": "账号与应用数据",
-        "p1": "只有个人功能(机库、配置、设置、反馈)才需要账号。新闻、Codex 和发布说明无需账号即可使用。登录方式恰好有两种:邮箱地址加密码,或“使用 Google 继续”按钮。应用不使用其他方式——没有魔法链接、短信验证码或其他社交登录——也没有注册表单:账号通过管理员发送到你邮箱的邀请创建。",
-        "p2": "为了登录,我们的后端服务商 Supabase 会在欧盟区域 eu-central-1(法兰克福)保存一条关于你的认证记录:你的邮箱地址;使用密码登录时的加盐密码哈希(绝不保存明文密码);已关联的登录方式;以及邀请、创建和最近登录等时间戳。",
-        "p3": "此外还有一条个人资料记录,包含应用为你所需的内容:显示名称(创建时自动取邮箱地址 @ 之前的部分)、你自选的用户名、语言和游戏通道偏好、可选的 RSI 昵称和旗舰,以及你的角色(viewer、collaborator、admin)和账号是否已获批准。角色和批准状态决定你能看到和做什么。",
-        "p4": "你创建的功能数据(机库舰船、配置、舰船链接、已保存的草稿、设置)存储在你的账号下,仅你可读——由数据库中的行级安全强制执行。例外:你发送的反馈对维护者可见,发送者为你的账号,以便他们回复;以及你向好友展示的内容(见“好友与可见性”)。",
-        "p5": "账号仅限受邀使用。未获批准的注册无法越过登录页面,并且可连同其数据一起被删除。"
+        "p1": "只有个人功能（机库、配置、设置、反馈）才需要账号。新闻、Codex 和发布说明无需账号即可使用。登录方式恰好有两种：邮箱地址加密码，或“使用 Google 继续”按钮。应用不使用其他方式——没有魔法链接、短信验证码或其他社交登录——也没有注册表单：账号通过管理员发送到你邮箱的邀请创建。",
+        "p2": "为了登录，我们的后端服务商 Supabase 会在欧盟区域 eu-central-1（法兰克福）保存一条关于你的认证记录：你的邮箱地址；使用密码登录时的加盐密码哈希（绝不保存明文密码）；已关联的登录方式；以及邀请、创建和最近登录等时间戳。",
+        "p3": "此外还有一条个人资料记录，包含应用为你所需的内容：显示名称（创建时自动取邮箱地址 @ 之前的部分）、你自选的用户名、语言和游戏渠道偏好、可选的 RSI 昵称和旗舰，以及你的角色（查看者、协作者、管理员）和账号是否已获批准。角色和批准状态决定你能看到和做什么。",
+        "p4": "你创建的功能数据（机库舰船、配置、舰船链接、已保存的草稿、设置）存储在你的账号下，仅你可读——由数据库中的行级安全强制执行。例外：你发送的反馈对维护者可见，发送者为你的账号，以便他们回复；以及你向好友展示的内容（见“好友与可见性”）。",
+        "p5": "账号仅限受邀使用。未获批准的注册无法越过登录页面，并且可连同其数据一起被删除。"
       },
       "google": {
         "title": "使用 Google 登录",
-        "p1": "Google 方式为可选——使用邮箱和密码无需 Google 即可进入账号。点击“使用 Google 继续”时,应用会将你转到 Google 的登录页面 (accounts.google.com)。Google 由此得知你正在登录 Verse Companion,以及每次页面访问都会带有的技术数据(IP 地址、浏览器、时间)。服务提供方为 Google Ireland Limited(爱尔兰)或 Google LLC(美国)。",
-        "p2": "登录成功后,Google 会向我们返回数据,由 Supabase 存储在你账号的认证记录中:你的 Google 账号标识、邮箱地址、你在 Google 登记的姓名,以及你的 Google 头像 URL。其中几乎没有内容会被显示——你的姓名会出现在账号菜单中,且仅在你尚未设置自己的用户名时;应用根本不会加载你的头像,只显示首字母作为缩写。",
-        "p3": "除登录本身外,没有任何数据回流到 Google——没有机库、Codex 或使用数据。Google 自身如何处理登录数据,取决于 Google 自己的隐私政策:",
-        "policyLink": "Google 隐私政策 (policies.google.com/privacy)",
-        "p4": "此方式的法律依据是你的同意(GDPR 第 6 条第 1 款 a 项):每次登录时你都可以重新决定是否使用。如果你想解除现有的 Google 关联,请通过网站声明中的联系方式联系维护者。"
+        "p1": "Google 方式为可选——使用邮箱和密码无需 Google 即可进入账号。点击“使用 Google 继续”时，应用会将你转到 Google 的登录页面（accounts.google.com）。Google 由此得知你正在登录 Verse Companion，以及每次页面访问都会带有的技术数据（IP 地址、浏览器、时间）。服务提供方为 Google Ireland Limited（爱尔兰）或 Google LLC（美国）。",
+        "p2": "登录成功后，Google 会向我们返回数据，由 Supabase 存储在你账号的认证记录中：你的 Google 账号标识、邮箱地址、你在 Google 登记的姓名，以及你的 Google 头像 URL。其中几乎没有内容会被显示——你的姓名会出现在账号菜单中，且仅在你尚未设置自己的用户名时；应用根本不会加载你的头像，只显示首字母作为缩写。",
+        "p3": "除登录本身外，没有任何数据回流到 Google——没有机库、Codex 或使用数据。Google 自身如何处理登录数据，取决于 Google 自己的隐私政策：",
+        "policyLink": "Google 隐私政策（policies.google.com/privacy）",
+        "p4": "此方式的法律依据是你的同意（GDPR 第 6 条第 1 款 a 项）：每次登录时你都可以重新决定是否使用。如果你想解除现有的 Google 关联，请通过网站声明中的联系方式联系维护者。"
       },
       "local": {
         "title": "Cookie、本地存储与会话",
-        "p1": "Verse Companion 不设置任何 Cookie——既没有自己的,也没有广告网络的。取而代之,应用使用你浏览器的本地存储,包含以下条目:",
+        "p1": "Verse Companion 不设置任何 Cookie——既没有自己的，也没有广告网络的。取而代之，应用使用你浏览器的本地存储，包含以下条目：",
         "keys": {
-          "session": "sc.auth——你的登录会话:来自 Supabase 的短期访问令牌和刷新令牌。只要你保持登录,应用会在后台自动续期访问令牌;退出登录会删除该条目。清除浏览器的网站数据同样会使你退出登录。",
+          "session": "sc.auth——你的登录会话：来自 Supabase 的短期访问令牌和刷新令牌。只要你保持登录，应用会在后台自动续期访问令牌；退出登录会删除该条目。清除浏览器的网站数据同样会使你退出登录。",
           "lang": "sc.lang——你选择的语言。",
-          "consent": "sc.consent——你对存储类别的决定,这样我们就不必每次访问都重新询问。",
+          "consent": "sc.consent——你对存储类别的决定，这样我们就不必每次访问都重新询问。",
           "composer": "sc.composer.sendOnEnter——在反馈输入框中按 Enter 键是发送还是换行。",
-          "verseBeta": "sc.beta——你为哪些菜单项(Verse、Codex 和 HQ)开启或关闭了新的 β 界面。纯粹的显示偏好,不用于追踪。",
-          "preferences": "“偏好”类别——便利性状态,例如新闻筛选、已收藏文章、已收藏舰船以及最近打开的搜索页面。仅在你允许时写入;撤回同意会立即删除这些条目。",
-          "statistics": "“统计”类别——匿名产品分析 (PostHog) 的状态。仅在你允许时创建;撤回同意会立即删除。"
+          "verseBeta": "sc.beta——你为哪些菜单项（Verse、Codex 和 HQ）开启或关闭了新的 β 界面。纯粹的显示偏好，不用于追踪。",
+          "preferences": "“偏好”类别——便利性状态，例如新闻筛选、已收藏文章、已收藏舰船以及最近打开的搜索页面。仅在你允许时写入；撤回同意会立即删除这些条目。",
+          "statistics": "“统计”类别——匿名产品分析（PostHog）的状态。仅在你允许时创建；撤回同意会立即删除。"
         },
-        "p2": "在 Google 登录期间,会话存储中会短暂多出一个条目 (sc.oauth-redirect-qs),以便你返回后回到来源页面。它最迟会在标签页关闭时消失。",
-        "p3": "如果你明确授权我们的某个桌面工具(Verse Data Uploader、Starscape),浏览器会将你会话的访问令牌交给在你本机 (127.0.0.1) 上本地运行的程序——不会交给第三方,也绝不会通过地址栏传递。",
-        "p4": "作为可安装的 Web 应用 (PWA),Service Worker 会在你的设备上缓存静态资源,以加快加载并支持离线使用——此缓存不含个人数据,可通过卸载应用或清除网站数据来移除。"
+        "p2": "在 Google 登录期间，会话存储中会短暂多出一个条目（sc.oauth-redirect-qs），以便你返回后回到来源页面。它最迟会在标签页关闭时消失。",
+        "p3": "如果你明确授权我们的某个桌面工具（Verse Data Uploader、Starscape），浏览器会将你会话的访问令牌交给在你本机（127.0.0.1）上本地运行的程序——不会交给第三方，也绝不会通过地址栏传递。",
+        "p4": "作为可安装的 Web 应用（PWA），Service Worker 会在你的设备上缓存静态资源，以加快加载并支持离线使用——此缓存不含个人数据，可通过卸载应用或清除网站数据来移除。"
       },
       "thirdParty": {
         "title": "第三方服务",
-        "p1": "应用只与一小批固定的服务通信(同时由我们的 Content-Security-Policy 在技术上强制限制):",
-        "supabase": "Supabase(数据库、身份验证、文件存储)——欧盟区域 eu-central-1(法兰克福);受我们委托处理你的账号和应用数据。",
-        "vercel": "Vercel Inc.(托管、CDN)——提供静态应用的分发。",
-        "google": "Google 登录(Google Ireland Limited / Google LLC)——仅当你主动选择使用 Google 登录时;详情见“使用 Google 登录”一节。",
-        "posthog": "PostHog(产品分析和错误诊断)——欧盟云;请求经由本站自己的地址 (/ingest) 发送。仅在你同意后才会采集使用事件、页面加载时间、无效点击和热力图以及错误。发生错误的会话会被录制以供回放,所有输入均被遮盖。如果你已登录,PostHog 会看到一个化名 ID(你账号 ID 的加盐哈希)和你的角色(viewer、collaborator 或 admin)——绝不会看到你的邮箱地址或姓名。",
-        "posthogServer": "PostHog(服务器端)——我们自己的服务器函数向 PostHog(欧盟云)上报错误和运行时间,不含 IP 地址、用户 ID 或内容。这不取决于你的同意,因为不涉及个人数据。桌面应用以同样方式转发崩溃报告(以及在你于应用中允许时的使用次数)——仅关联一个预先哈希的安装标识符,绝不关联你的账号。",
-        "fonts": "Google Fonts——字体文件从 Google 服务器加载;Google 可能会看到你的 IP 地址。",
-        "rsiMedia": "Verse 新闻中的部分图片直接从 Roberts Space Industries 的服务器加载 (media.robertsspaceindustries.com、theverse.robertsspaceindustries.com)——加载时 RSI 会看到你的 IP 地址。",
-        "gameApis": "公开的 Star Citizen 数据:status.robertsspaceindustries.com 和 api.star-citizen.wiki(只读,不发送任何账号数据)。"
+        "p1": "应用只与一小批固定的服务通信（同时由我们的 Content-Security-Policy 在技术上强制限制）：",
+        "supabase": "Supabase（数据库、身份验证、文件存储）——欧盟区域 eu-central-1（法兰克福）；受我们委托处理你的账号和应用数据。",
+        "vercel": "Vercel Inc.（托管、CDN）——提供静态应用的分发。",
+        "google": "Google 登录（Google Ireland Limited / Google LLC）——仅当你主动选择使用 Google 登录时；详情见“使用 Google 登录”一节。",
+        "posthog": "PostHog（产品分析和错误诊断）——欧盟云；请求经由本站自己的地址（/ingest）发送。仅在你同意后才会采集使用事件、页面加载时间、无效点击和热力图以及错误。发生错误的会话会被录制以供回放，所有输入均被遮盖。如果你已登录，PostHog 会看到一个化名 ID（你账号 ID 的加盐哈希）和你的角色（查看者、协作者或管理员）——绝不会看到你的邮箱地址或姓名。",
+        "posthogServer": "PostHog（服务器端）——我们自己的服务器函数向 PostHog（欧盟云）上报错误和运行时间，不含 IP 地址、用户 ID 或内容。这不取决于你的同意，因为不涉及个人数据。桌面应用以同样方式转发崩溃报告（以及在你于应用中允许时的使用次数）——仅关联一个预先哈希的安装标识符，绝不关联你的账号。",
+        "fonts": "Google Fonts——字体文件从 Google 服务器加载；Google 可能会看到你的 IP 地址。",
+        "rsiMedia": "Verse 新闻中的部分图片直接从 Roberts Space Industries 的服务器加载（media.robertsspaceindustries.com、theverse.robertsspaceindustries.com）——加载时 RSI 会看到你的 IP 地址。",
+        "gameApis": "公开的 Star Citizen 数据：status.robertsspaceindustries.com 和 api.star-citizen.wiki（只读，不发送任何账号数据）。"
       },
       "rights": {
         "title": "你的权利",
-        "p1": "根据 GDPR,你对自己的个人数据享有访问、更正、删除、限制处理、数据可携带和反对的权利。你也可以向数据保护监管机构投诉。",
-        "p2": "你的账号可以被完全删除:删除认证记录时,个人资料、机库、配置、草稿和上传内容也会通过数据库级联一并删除。目前删除由管理员执行——设置中的删除按钮仅对具有 admin 角色的账号有效。请通过网站声明中的联系方式提出请求;请求会被及时处理。",
-        "p3": "你可以随时在设置中撤回对偏好存储和统计的同意;撤回会立即删除相关的本地条目并面向将来生效——此前处理的合法性不受影响。"
+        "p1": "根据 GDPR，你对自己的个人数据享有访问、更正、删除、限制处理、数据可携带和反对的权利。你也可以向数据保护监管机构投诉。",
+        "p2": "你的账号可以被完全删除：删除认证记录时，个人资料、机库、配置、草稿和上传内容也会通过数据库级联一并删除。目前删除由管理员执行——设置中的删除按钮仅对具有管理员角色的账号有效。请通过网站声明中的联系方式提出请求；请求会被及时处理。",
+        "p3": "你可以随时在设置中撤回对偏好存储和统计的同意；撤回会立即删除相关的本地条目并面向将来生效——此前处理的合法性不受影响。"
       },
       "social": {
         "title": "好友与可见性",
-        "p1": "好友是你通过请求或个人邀请链接建立联系的账号;邀请链接会过期,你也可以撤销它。成为好友期间,你的好友默认可以看到你的机库、你的旗舰、你是否在线,以及 Social 页面上的对比数据(例如你使用 Verse Companion 的频率)。你可以在 Social 页面的可见性弹窗中,对所有人或某一位好友单独关闭其中每一项。",
-        "p2": "为此,user_presence 表会为每个账号存储你最近一次访问的时间,以及最近 30 天的活跃掩码(每天是否活跃)——不包含浏览历史。“在线”指最近几分钟内被看到过。",
-        "p3": "分组(例如 org 或小队)是你自己的私有列表:成员既看不到该分组,也看不到其名称。行动、配置和舰船变体仅对你明确与之分享的人可见。结束好友关系后,所有可见性会立即终止。"
+        "p1": "好友是你通过请求或个人邀请链接建立联系的账号；邀请链接会过期，你也可以撤销它。成为好友期间，你的好友默认可以看到你的机库、你的旗舰、你是否在线，以及社交页面上的对比数据（例如你使用 Verse Companion 的频率）。你可以在社交页面的可见性弹窗中，对所有人或某一位好友单独关闭其中每一项。",
+        "p2": "为此，user_presence 表会为每个账号存储你最近一次访问的时间，以及最近 30 天的活跃掩码（每天是否活跃）——不包含浏览历史。“在线”指最近几分钟内被看到过。",
+        "p3": "分组（例如组织或小队）是你自己的私有列表：成员既看不到该分组，也看不到其名称。行动、配置和舰船变体仅对你明确与之分享的人可见。结束好友关系后，所有可见性会立即终止。"
       }
     },
     "imprint": {
       "title": "网站声明",
       "operator": {
         "title": "运营者",
-        "p1": "Verse Companion (versecompanion-alpha.vercel.app) 是一个非商业的开源社区项目。由 StarOrga 组织及其在 GitHub 上的贡献者维护。",
-        "p2": "本项目不产生任何收入:没有广告,没有付费功能,没有赞助。"
+        "p1": "Verse Companion （versecompanion-alpha.vercel.app）是一个非商业的开源社区项目。由 StarOrga 组织及其在 GitHub 上的贡献者维护。",
+        "p2": "本项目不产生任何收入：没有广告，没有付费功能，没有赞助。"
       },
       "contact": {
         "title": "联系方式",
@@ -4976,8 +4982,8 @@
       },
       "liability": {
         "title": "对内容和链接的责任",
-        "p1": "本站内容经过精心制作;但对其正确性、完整性和时效性不作保证。Codex 中展示的游戏数据由社区提取,可能与正式运行的游戏存在差异。",
-        "p2": "外部链接指向我们无法控制的第三方内容;在添加链接时未发现违法行为。如果我们得知存在违法行为,将移除相关链接。"
+        "p1": "本站内容经过精心制作；但对其正确性、完整性和时效性不作保证。Codex 中展示的游戏数据由社区提取，可能与正式运行的游戏存在差异。",
+        "p2": "外部链接指向我们无法控制的第三方内容；在添加链接时未发现违法行为。如果我们得知存在违法行为，将移除相关链接。"
       },
       "trademark": {
         "title": "商标",
@@ -5639,11 +5645,11 @@
   "feedbackSpot": {
     "headline": "标题",
     "titled": "{{label}}“{{text}}”",
-    "insert": "插入引用:{{line}}",
+    "insert": "插入引用：{{line}}",
     "details": "详情"
   },
   "feedbackCapture": {
-    "hint": "管理员提示:Alt+点击(或在链接之外使用 Ctrl+点击)可将点击的元素作为引用——即使面板已关闭。",
+    "hint": "管理员提示：Alt+点击（或在链接之外使用 Ctrl+点击）可将点击的元素作为引用——即使面板已关闭。",
     "element": "{{role}}“{{name}}”",
     "role": {
       "link": "链接",
@@ -5680,7 +5686,7 @@
     "current": "当前",
     "loading": "正在加载发布说明…",
     "empty": "暂无发布说明。",
-    "loadMore": "加载更多({{count}})",
+    "loadMore": "加载更多（{{count}}）",
     "cat": {
       "added": "新增",
       "changed": "变更",
@@ -5694,54 +5700,54 @@
   },
   "extension": {
     "promo": {
-      "text": "已经买了舰队?浏览器扩展可以直接从你的 RSI 机库导入舰船。",
+      "text": "已经拥有舰队？浏览器扩展可以直接从你的 RSI 机库导入舰船。",
       "cta": "工作原理",
       "dismiss": "隐藏此提示"
     },
     "privacy": {
       "gameContentOnly": "该扩展只读取个性化游戏内容——即你自己的 RSI 机库页面上的舰船名称。不会收集任何个人数据。",
       "noCredentials": "不会读取任何凭据、Cookie 或会话令牌。",
-      "noPersonalData": "不会读取账户名、电子邮件地址、Pledge 金额或订单数据。",
-      "noUpload": "不会向任何服务器发送数据。舰船列表在你的浏览器内部传递给本应用,只有在你确认后才会进入你的账户。",
+      "noPersonalData": "不会读取账号名、电子邮件地址、订购金额或订单数据。",
+      "noUpload": "不会向任何服务器发送数据。舰船列表在你的浏览器内部传递给本应用，只有在你确认后才会进入你的账号。",
       "scopeLimited": "该扩展仅在你自己的 RSI 机库页面和 Verse Companion 上运行——其他任何地方都不会运行。",
       "localOnly": "仅会在浏览器本地存储你舰队的校验和以及上次导入的时间。"
     },
     "install": {
       "title": "机库导入——浏览器扩展",
-      "subtitle": "Verse Companion 无法自行读取 robertsspaceindustries.com:浏览器禁止一个网站读取另一个网站。一个小型浏览器扩展可以读取你当前打开的机库页面,并将舰船列表传递到这里的机库。",
+      "subtitle": "Verse Companion 无法自行读取 robertsspaceindustries.com：浏览器禁止一个网站读取另一个网站。一个小型浏览器扩展可以读取你当前打开的机库页面，并将舰船列表传递到这里的机库。",
       "detected": {
         "title": "已检测到扩展",
-        "text": "该扩展已安装在此浏览器中。请在登录状态下打开你的 RSI 机库,当你的舰队有新增或变化时,它会提供导入。",
+        "text": "该扩展已安装在此浏览器中。请在登录状态下打开你的 RSI 机库，当你的舰队有新增或变化时，它会提供导入。",
         "openHangar": "打开我的 RSI 机库"
       },
       "what": {
         "title": "功能说明",
-        "text": "三个步骤,最后一步由你确认。",
+        "text": "三个步骤，最后一步由你确认。",
         "open": {
           "title": "你打开自己的 RSI 机库",
-          "text": "已登录,位于你的 Pledges 页面。扩展在其他任何地方都不会执行任何操作。"
+          "text": "已登录，位于你的 Pledges 页面。扩展在其他任何地方都不会执行任何操作。"
         },
         "offer": {
           "title": "仅在有新内容时提供导入",
-          "text": "你的舰队会被精简为一个校验和。机库没有变化,就不会有提示。购买或收到了新舰船?提示会自动再次出现。"
+          "text": "你的舰队会被精简为一个校验和。机库没有变化，就不会有提示。购买或收到了新舰船？提示会自动再次出现。"
         },
         "confirm": {
           "title": "你在此处确认",
-          "text": "舰船列表会在 Verse Companion 中打开,所有条目一目了然。只有你勾选的行才会写入你的机库。"
+          "text": "舰船列表会在 Verse Companion 中打开，所有条目一目了然。只有你勾选的行才会写入你的机库。"
         }
       },
       "privacy": {
         "title": "会读取什么——以及不会读取什么",
-        "openSource": "该扩展是本项目公开仓库的一部分:它运行的每一行代码,你在安装前都可以查阅。",
+        "openSource": "该扩展是本项目公开仓库的一部分：它运行的每一行代码，你在安装前都可以查阅。",
         "sourceLink": "GitHub 上的扩展源代码",
         "appPrivacyLink": "本应用的隐私政策"
       },
       "how": {
         "title": "安装",
-        "storeNote": "Chrome 应用商店的上架仍在审核中,因此目前需要手动加载扩展。Chrome、Edge、Brave 和 Opera 均支持。",
+        "storeNote": "Chrome 应用商店的上架仍在审核中，因此目前需要手动加载扩展。Chrome、Edge、Brave 和 Opera 均支持。",
         "download": {
           "title": "下载扩展",
-          "text": "该 ZIP 只包含扩展本身,没有仓库,也没有应用。解压后只会得到一个文件夹:sc-hangar-extension。"
+          "text": "该 ZIP 只包含扩展本身，没有仓库，也没有应用。解压后只会得到一个文件夹：sc-hangar-extension。"
         },
         "devmode": {
           "title": "打开 chrome://extensions 并启用开发者模式",
@@ -5749,49 +5755,49 @@
         },
         "load": {
           "title": "加载已解压的扩展程序",
-          "text": "点击“加载已解压的扩展程序”,然后选择解压出的 sc-hangar-extension 文件夹。"
+          "text": "点击“加载已解压的扩展程序”，然后选择解压出的 sc-hangar-extension 文件夹。"
         },
         "use": {
           "title": "打开你的 RSI 机库",
           "text": "登录 RSI 并打开你的 Pledges 页面——导入提示会出现在右下角。"
         },
-        "downloadCta": "下载扩展(ZIP)",
+        "downloadCta": "下载扩展（ZIP）",
         "browseCta": "查看源代码",
-        "buildNote": "每次有改动时,GitHub Actions 都会基于这份源代码自动重新构建该 ZIP——文件相同,文件夹相同——因此你可以将下载内容与公开源代码进行比对。",
-        "browsers": "目前仅支持基于 Chromium 的浏览器(Chrome、Edge、Brave、Opera、Vivaldi)。之后可能会推出 Firefox 版本。"
+        "buildNote": "每次有改动时，GitHub Actions 都会基于这份源代码自动重新构建该 ZIP——文件相同，文件夹相同——因此你可以将下载内容与公开源代码进行比对。",
+        "browsers": "目前仅支持基于 Chromium 的浏览器（Chrome、Edge、Brave、Opera、Vivaldi）。之后可能会推出 Firefox 版本。"
       },
       "alt": {
-        "title": "没有扩展?改用文件导入",
-        "text": "你的机库页面也接受 Hangar Transfer Format 格式的 JSON 导出文件,你可以自行生成。审核界面和规则都相同。",
+        "title": "没有扩展？改用文件导入",
+        "text": "你的机库页面也接受 Hangar Transfer Format 格式的 JSON 导出文件，你可以自行生成。审核界面和规则都相同。",
         "cta": "前往我的机库"
       },
-      "disclaimer": "Verse Companion 是非官方的粉丝项目,与 Cloud Imperium 集团旗下公司没有任何关联。该扩展未获得 RSI 的认可。"
+      "disclaimer": "Verse Companion 是非官方的粉丝项目，与 Cloud Imperium 集团旗下公司没有任何关联。该扩展未获得 RSI 的认可。"
     },
     "importPage": {
       "title": "从你的 RSI 机库导入舰船",
-      "subtitle": "浏览器扩展已读取你机库页面上的舰船列表。请在下方检查——在你确认之前,不会向你的机库写入任何内容。",
+      "subtitle": "浏览器扩展已读取你机库页面上的舰船列表。请在下方检查——在你确认之前，不会向你的机库写入任何内容。",
       "waiting": "正在等待浏览器扩展…",
       "review": "检查并确认",
       "cancel": "取消并丢弃列表",
       "meta": {
         "source": "来源",
-        "sourceValue": "你的 RSI 机库页面(在你的浏览器中读取)",
+        "sourceValue": "你的 RSI 机库页面（在你的浏览器中读取）",
         "ships": "找到的舰船",
         "captured": "读取时间"
       },
       "empty": {
         "title": "没有待处理的舰船列表",
-        "text": "此页面由机库导入浏览器扩展打开。可能是扩展未安装,或者它的列表已被使用或已过期。请重新打开你的 RSI 机库以开始新的导入。",
+        "text": "此页面由机库导入浏览器扩展打开。可能是扩展未安装，或者它的列表已被使用或已过期。请重新打开你的 RSI 机库以开始新的导入。",
         "installLink": "关于该扩展",
         "hangarLink": "前往我的机库"
       },
       "done": {
         "title": "已导入 {{count}} 艘舰船",
-        "text": "扩展已获知当前状态,因此在你的机库再次发生真正的变化之前,它不会再提示。",
+        "text": "扩展已获知当前状态，因此在你的机库再次发生真正的变化之前，它不会再提示。",
         "hangarLink": "打开我的机库"
       }
     },
-    "hangarHint": "不想折腾文件?浏览器扩展可以直接从你的 RSI 机库导入 →"
+    "hangarHint": "不想折腾文件？浏览器扩展可以直接从你的 RSI 机库导入 →"
   },
   "consent": {
     "banner": {
@@ -5822,7 +5828,7 @@
   },
   "starscape": {
     "title": "Starscape",
-    "subtitle": "Cloud Imperium Games 的高分辨率艺术作品,直接链接到原图。",
+    "subtitle": "Cloud Imperium Games 的高分辨率艺术作品，直接链接到原图。",
     "subtitleAppPre": "使用 ",
     "subtitleAppLink": "Starscape 应用",
     "subtitleAppPost": "即可把它设为你的桌面壁纸。",
@@ -5834,7 +5840,7 @@
       "top": "社区热门",
       "sammlung": "收藏",
       "sammlungSignedOut": "登录后查看你的收藏",
-      "emptySammlung": "你的收藏还是空的。给图片点个赞,它就会出现在这里。"
+      "emptySammlung": "你的收藏还是空的。给图片点个赞，它就会出现在这里。"
     },
     "lightboxAria": "壁纸",
     "source": {
@@ -5845,13 +5851,13 @@
       "remove": "取消点赞",
       "signedOut": "登录后即可投票",
       "totalNone": "暂无投票",
-      "totalOne": "总计 1 票(所有用户)",
-      "total": "总计 {{count}} 票(所有用户)",
+      "totalOne": "总计 1 票（所有用户）",
+      "total": "总计 {{count}} 票（所有用户）",
       "mine": "包含你的投票"
     },
     "top": {
       "label": "仅显示前 {{count}} 名",
-      "hint": "所有用户中得票最高的 {{count}} 张壁纸。每个赞旁边的数字是所有用户的总票数。在获得投票的图片还不多时,最新的图片会填补剩余的位置。",
+      "hint": "所有用户中得票最高的 {{count}} 张壁纸。每个赞旁边的数字是所有用户的总票数。在获得投票的图片还不多时，最新的图片会填补剩余的位置。",
       "loading": "正在加载热门精选…"
     },
     "empty": "暂无壁纸。新的艺术作品会自动出现在这里。",
@@ -5874,15 +5880,15 @@
       "failed": "无法复制链接"
     },
     "close": "关闭",
-    "attribution": "所有图片 © Cloud Imperium Games——直接由 RSI CDN 提供,并附带来源 Comm-Link 的链接。粉丝制作的画廊,不转售,不转存。",
+    "attribution": "所有图片 © Cloud Imperium Games——直接由 RSI CDN 提供，并附带来源 Comm-Link 的链接。粉丝制作的画廊，不转售，不转存。",
     "appTitle": "Starscape 应用",
-    "appDesc": "让你的桌面轮播 Starscape——一款小巧的托盘应用,支持预加载、淡入淡出过渡和一键开机自启。",
-    "appNote": "仅限 Windows · 约 0.3 MB · 未签名(SmartScreen:更多信息 → 仍要运行)",
-    "appAutoUpdate": "在后台静默自动更新;版本状态显示在托盘菜单中。",
+    "appDesc": "让你的桌面轮播 Starscape——一款小巧的托盘应用，支持预加载、淡入淡出过渡和一键开机自启。",
+    "appNote": "仅限 Windows · 约 0.3 MB · 未签名（SmartScreen：更多信息 → 仍要运行）",
+    "appAutoUpdate": "在后台静默自动更新；版本状态显示在托盘菜单中。",
     "promo": {
       "eyebrow": "桌面版 Starscape",
-      "title": "你的桌面,来自 Verse 的实时画面",
-      "desc": "这款小巧的托盘应用会在你的桌面上轮播的正是这些壁纸——包含柔和的淡入淡出和开机自启。",
+      "title": "你的桌面，来自 Verse 的实时画面",
+      "desc": "这款小巧的托盘应用会在你的桌面上轮播这些壁纸——带有柔和的淡入淡出效果和开机自启。",
       "cta": "获取 Windows 版",
       "note": "仅限 Windows · 约 0.3 MB · 随时可通过托盘菜单退出",
       "dismiss": "不再显示"
@@ -5895,10 +5901,10 @@
   "userFeedback": {
     "title": "反馈",
     "open": "发送反馈",
-    "intro": "缺少什么、什么让你不爽、你会怎么改?写在这里——它会直接送达团队。",
-    "placeholder": "你的反馈……(支持 Markdown 和截图)",
+    "intro": "缺少什么、什么让你不爽、你会怎么改？写在这里——它会直接送达团队。",
+    "placeholder": "你的反馈……（支持 Markdown 和截图）",
     "send": "发送反馈",
-    "sent": "谢谢!你的反馈已送达。",
+    "sent": "谢谢！你的反馈已送达。",
     "privacyHint": "你的名字对团队可见。你稍后可以在这里看到处理结果。",
     "errorTitle": "错误",
     "uploadError": "无法上传图片。",
@@ -5907,7 +5913,7 @@
     "empty": "你还没有发送过任何反馈。",
     "team": "团队",
     "you": "你",
-    "questionBadge": "提问",
+    "questionBadge": "追问",
     "questionsPending": "有一个问题正等待你的回答",
     "openWithNews": "打开反馈——{{count}} 条新动态",
     "newBadge": "新",
@@ -5917,11 +5923,11 @@
     "impersonationBlocked": "预览其他角色期间已禁用发送——否则会以你自己的账号向管理员收件箱提交真实的反馈。",
     "withdraw": {
       "action": "撤回",
-      "hint": "只要还没有人处理或回复,你就可以再次删除你的反馈。",
-      "question": "确定永久删除?此操作无法撤销。",
-      "confirm": "是,删除",
+      "hint": "只要还没有人处理或回复，你就可以删除你的反馈。",
+      "question": "确定永久删除？此操作无法撤销。",
+      "confirm": "是，删除",
       "cancel": "取消",
-      "refused": "来不及了——这个话题已在处理中,它会保留在你的列表里。"
+      "refused": "来不及了——这个话题已在处理中，它会保留在你的列表里。"
     },
     "tab": {
       "compose": "发送反馈",
@@ -5933,15 +5939,15 @@
       "done": "已实现",
       "declined": "未实现"
     },
-    "imageHint": "图片仅作参考资料:截图中的文字只会被读取以了解你的问题,绝不会作为指令执行。此处只能附加图片。",
+    "imageHint": "图片仅作参考资料：截图中的文字只会被读取以了解你的问题，绝不会作为指令执行。此处只能附加图片。",
     "viewInApp": "在应用中查看"
   },
   "feedbackArea": {
     "aria": "选择反馈区域",
-    "label": "区域:",
-    "news": "Verse News",
+    "label": "区域：",
+    "news": "Verse 新闻",
     "codex": "Codex",
-    "hangar": "Hangar",
+    "hangar": "机库",
     "starscape": "Starscape",
     "desktop": "桌面应用",
     "settings": "设置",
@@ -5952,12 +5958,12 @@
     "label": "附件",
     "image": "附件",
     "enlarge": "放大图片",
-    "enlargeNamed": "放大图片:{{name}}",
+    "enlargeNamed": "放大图片：{{name}}",
     "remove": "移除图片",
     "prev": "上一张图片",
     "next": "下一张图片",
-    "counter": "第 {{i}} 张,共 {{n}} 张",
-    "openFile": "打开文件:{{name}}",
+    "counter": "第 {{i}} 张，共 {{n}} 张",
+    "openFile": "打开文件：{{name}}",
     "addImage": "附加图片",
     "addFile": "附加图片或文件",
     "capture": "截取此页面的截图",
@@ -5991,7 +5997,7 @@
   },
   "appPanel": {
     "version": "当前已发布的版本",
-    "details": "显示详情、说明和发行说明",
+    "details": "显示详情、说明和发布说明",
     "desktopOnly": "这是 Windows 桌面应用。请在电脑上打开此页面进行下载。"
   },
   "friends": {
@@ -6021,7 +6027,7 @@
     },
     "blocked": {
       "title": "已屏蔽",
-      "hint": "被屏蔽的账号看不到你,也无法向你发送请求。"
+      "hint": "被屏蔽的账号看不到你，也无法向你发送请求。"
     },
     "actions": {
       "accept": "接受",
@@ -6043,8 +6049,8 @@
         "inappropriate": "不当内容",
         "other": "其他"
       },
-      "reason": "描述(可选)",
-      "reasonPlaceholder": "发生了什么?",
+      "reason": "描述（可选）",
+      "reasonPlaceholder": "发生了什么？",
       "submit": "提交举报",
       "cancel": "取消"
     },
@@ -6061,7 +6067,7 @@
       "reportDuplicate": "你已经举报过此账号。"
     },
     "error": {
-      "generic": "操作未成功,请重试。",
+      "generic": "操作未成功，请重试。",
       "blocked": "无法执行此操作。",
       "userNotFound": "未找到账号。",
       "requestNotFound": "该请求已不存在。",
@@ -6069,7 +6075,7 @@
       "invalidCategory": "无效的举报类别。",
       "reasonTooLong": "描述过长。",
       "noRelation": "你只能举报与你有过互动的账号。",
-      "reportLimit": "你有太多未处理的举报,请等待审核完成。",
+      "reportLimit": "你有太多未处理的举报，请等待审核完成。",
       "notApproved": "你的账号尚未通过审核。",
       "requestExpired": "此请求已过期。",
       "accountSuspended": "你的账号已被封禁。"
@@ -6114,8 +6120,8 @@
     "label": "分享链接",
     "copied": "链接已复制",
     "failed": "不允许复制",
-    "title": "分享配置",
-    "hint": "与好友分享此配置,或通过链接分享。",
+    "title": "分享套装",
+    "hint": "与好友分享此套装，或通过链接分享。",
     "loading": "正在加载…",
     "revoke": "撤销分享",
     "friends": {
@@ -6124,12 +6130,12 @@
       "pick": "选择好友…",
       "share": "分享",
       "noFriends": "你还没有添加任何好友。",
-      "allShared": "你的所有好友都已拥有此配置。",
-      "toSocial": "在 Social 页面添加好友"
+      "allShared": "你的所有好友都已拥有此套装。",
+      "toSocial": "在社交页面添加好友"
     },
     "link": {
       "title": "公开链接",
-      "warning": "任何拥有此链接的人都可以查看该配置——无需账号。链接只显示名称、角色和装备,不含其他内容。",
+      "warning": "任何拥有此链接的人都可以查看该套装——无需账号。链接只显示名称、角色和装备，不含其他内容。",
       "create": "创建链接",
       "copy": "复制",
       "copied": "已复制",
@@ -6140,43 +6146,43 @@
     },
     "sharedWithMe": {
       "title": "好友分享给我的",
-      "hint": "好友与你分享的配置。只读。",
+      "hint": "好友与你分享的套装。只读。",
       "show": "显示装备",
       "hide": "隐藏"
     },
     "view": {
-      "eyebrow": "共享配置",
+      "eyebrow": "共享套装",
       "loading": "正在加载…",
       "by": "来自 {{name}}",
       "updated": "上次更改于 {{date}}",
-      "emptyLoadout": "此配置中还没有添加任何内容。",
+      "emptyLoadout": "此套装中还没有添加任何内容。",
       "footnote": "只读。只有所有者可以修改。",
-      "aboutCta": "什么是 Verse Companion?",
+      "aboutCta": "什么是 Verse Companion？",
       "unavailable": {
-        "title": "此配置不可用",
+        "title": "此套装不可用",
         "body": "链接无效或已被停用。"
       }
     },
     "flash": {
-      "shared": "配置已分享。",
-      "alreadyShared": "该好友已拥有此配置。",
+      "shared": "套装已分享。",
+      "alreadyShared": "该好友已拥有此套装。",
       "linkCreated": "链接已创建。",
       "revoked": "分享已撤销。",
       "groupShared": "已与当前群组成员分享。"
     },
     "error": {
       "notFriends": "你们已不是好友。",
-      "loadoutNotFound": "未找到配置。",
+      "loadoutNotFound": "未找到套装。",
       "shareNotFound": "该分享已不存在。",
       "suspended": "你的账号已被封禁。",
       "invalidTarget": "选择无效。",
       "notApproved": "你的账号未通过审核。",
-      "generic": "操作未成功,请重试。"
+      "generic": "操作未成功，请重试。"
     },
     "groups": {
       "pick": "选择群组…",
       "share": "与群组分享",
-      "hint": "配置将发送给当前在群组中的成员,之后加入的人不会收到。"
+      "hint": "套装将发送给当前在群组中的成员，之后加入的人不会收到。"
     }
   },
   "conceptPage": {
@@ -6241,36 +6247,36 @@
     "slots": {
       "aria": "行动槽位",
       "finished": "已完成",
-      "einsaetze": "{{n}} 个任务",
-      "einsatzOne": "1 个任务",
+      "einsaetze": "{{n}} 次出动",
+      "einsatzOne": "1 次出动",
       "delete": "删除“{{name}}”",
       "newAria": "槽位 {{n}} 中的新行动",
       "free": "槽位 {{n}}",
       "archive": "存档",
-      "archiveAria": "存档,{{n}} 个行动",
+      "archiveAria": "存档，{{n}} 个行动",
       "introTitle": "还没有行动",
-      "introText": "点击加号创建一个行动:带有目标的一组任务。你可以把愿望分配给它,它们仍然是愿望。你将在“现在”中逐步完成这些任务。",
-      "newAriaEvent": "槽位 {{n}} 中的新行动 – 活动可用"
+      "introText": "点击加号创建一个行动：一组带有目标的出动。你可以把愿望分配给它，它们仍然是愿望。你将在“现在”中逐步完成这些出动。",
+      "newAriaEvent": "槽位 {{n}} 中的新行动——活动可用"
     },
     "remove": {
-      "titleRemove": "删除“{{name}}”?",
-      "titleEmpty": "清空“{{name}}”?",
-      "msgRemove": "该行动将被移除。未完成项目:{{n}}。",
-      "msgEmpty": "该行动保留,其未完成项目将被移出。未完成项目:{{n}}。",
+      "titleRemove": "删除“{{name}}”？",
+      "titleEmpty": "清空“{{name}}”？",
+      "msgRemove": "该行动将被移除。未完成项目：{{n}}。",
+      "msgEmpty": "该行动保留，其未完成项目将被移出。未完成项目：{{n}}。",
       "back": "愿望保留在愿望清单中",
       "backOn": "行动中的愿望会保留在你的愿望清单中并重新变为空闲。其他未完成项目将作为愿望添加。",
-      "backOff": "行动中的愿望也会从你的愿望清单中删除;其他未完成项目将被丢弃。",
+      "backOff": "行动中的愿望也会从你的愿望清单中删除；其他未完成项目将被丢弃。",
       "confirmRemove": "删除",
       "confirmEmpty": "清空"
     },
     "archive": {
-      "slotFree": "有一个空槽位,你可以恢复一个行动。",
+      "slotFree": "有一个空槽位，你可以恢复一个行动。",
       "empty": "存档中还没有内容。已完成的行动会自动移到这里并腾出槽位。",
       "reactivate": "重新激活",
       "remove": "删除",
       "removeAria": "删除行动“{{name}}”",
-      "removeTitle": "删除“{{name}}”?",
-      "removeMsg": "该行动位于存档中,只包含已完成的内容。它将被删除。你的愿望清单和七个槽位保持不变。",
+      "removeTitle": "删除“{{name}}”？",
+      "removeMsg": "该行动位于存档中，只包含已完成的内容。它将被删除。你的愿望清单和七个槽位保持不变。",
       "removeConfirm": "删除",
       "close": "关闭"
     },
@@ -6281,7 +6287,7 @@
       "stepsAria": "步骤",
       "step": {
         "1": "选择",
-        "2": "任务"
+        "2": "出动"
       },
       "emptyWish": "许个愿",
       "all": "全部采用",
@@ -6300,29 +6306,29 @@
       "alreadyIn": "已在行动中",
       "forBp": "用于 {{name}}",
       "removeLine": "将“{{name}}”移出行动",
-      "einsaetze": "任务",
-      "einsatzCount": "{{n}} 个任务 · {{s}} 个步骤",
-      "noNewLines": "没有新项目,因此没有新任务。",
+      "einsaetze": "出动",
+      "einsatzCount": "{{n}} 次出动 · {{s}} 个步骤",
+      "noNewLines": "没有新项目，因此没有新出动。",
       "noLines": "未选择任何内容。",
-      "matsTitle": "你打算如何获取材料?",
+      "matsTitle": "你打算如何获取材料？",
       "methodOf": "获取 {{name}} 的方式",
       "splitOf": "{{name}} 的分配",
       "lessBuy": "少买多采",
       "moreBuy": "多买少采",
-      "splitHint": "购买和采集可以拆分:左侧为购买数量,右侧为采集数量。",
-      "itemsTitle": "你打算如何获取这些物品?",
+      "splitHint": "购买和采集可以拆分：左侧为购买数量，右侧为采集数量。",
+      "itemsTitle": "你打算如何获取这些物品？",
       "modeOf": "获取 {{name}} 的方式",
-      "modeHint": "在已知商人处购买,在已知蓝图处制作。可按行更改。",
-      "leaveOut": "将 {{name}} 移出任务",
-      "leftOut": "已移出任务",
+      "modeHint": "在已知商人处购买，在已知蓝图处制作。可按行更改。",
+      "leaveOut": "将 {{name}} 从出动中移除",
+      "leftOut": "已从出动中移除",
       "putBack": "放回",
-      "placeIs": "地点:{{place}}",
-      "noMerchant": "未知商人,因此暂无购买步骤。",
-      "openCodex": "在代码库中打开",
+      "placeIs": "地点：{{place}}",
+      "noMerchant": "未知商人，因此暂无购买步骤。",
+      "openCodex": "在 Codex 中打开",
       "setPlace": "设置地点",
       "setPlaceOf": "{{name}} 的地点",
       "stepsCount": "{{n}} 个步骤",
-      "craftLast": "最后进行,依赖其他项目",
+      "craftLast": "最后进行，依赖其他项目",
       "gets": "你将获得",
       "purpose": "用于 {{names}} 的材料",
       "haveEinsaetze": "已计划",
@@ -6335,7 +6341,7 @@
       "wishTitle": "愿望",
       "emptyHintSearch": "在上方搜索你需要的东西并许愿。",
       "search": {
-        "label": "更多愿望相关",
+        "label": "为愿望添加更多",
         "placeholder": "搜索物品、舰船或材料",
         "searching": "搜索中……",
         "none": "未找到任何内容。",
@@ -6348,12 +6354,12 @@
       "craft": {
         "aria": "制作 {{name}} 需要什么",
         "forItem": "用于 {{name}}",
-        "bpOwned": "蓝图 {{name}}:在你的收藏中",
-        "bpMissing": "蓝图 {{name}}:缺失,已计划任务",
-        "matOwned": "{{name}}:需要 {{need}},仓库中有 {{have}}",
-        "matMissing": "{{name}}:需要 {{need}},仓库中有 {{have}},还需获取 {{missing}}",
+        "bpOwned": "蓝图 {{name}}：在你的收藏中",
+        "bpMissing": "蓝图 {{name}}：缺失，已计划任务",
+        "matOwned": "{{name}}：需要 {{need}}，仓库中有 {{have}}",
+        "matMissing": "{{name}}：需要 {{need}}，仓库中有 {{have}}，还需获取 {{missing}}",
         "noRecipe": "该配方的材料暂时未知。",
-        "source": "应用会自动将蓝图和材料同步到你的收藏和库存;在此之前,以那里列出的为准。",
+        "source": "应用会自动将蓝图和材料同步到你的收藏和库存；在此之前，以那里列出的为准。",
         "loading": "正在加载配方……"
       }
     },
@@ -6361,7 +6367,7 @@
       "plain": {
         "one": "有 1 个项目还不是愿望。",
         "other": "有 {{count}} 个项目还不是愿望。",
-        "ask": "创建于重构之前。要将它们作为愿望放入你的愿望清单吗?",
+        "ask": "创建于重构之前。要将它们作为愿望放入你的愿望清单吗？",
         "adopt": "作为愿望保留",
         "keep": "保持原样"
       },
@@ -6369,10 +6375,10 @@
       "rename": "更改名称",
       "positions": "项目",
       "edit": "编辑",
-      "noEinsaetze": "该行动还没有任务。",
-      "noEinsaetzeHint": "项目将转化为任务:购买、采集、任务,最后是制作。",
-      "proposeEinsaetze": "建议任务",
-      "einsaetze": "任务",
+      "noEinsaetze": "该行动还没有出动。",
+      "noEinsaetzeHint": "项目将转化为出动：购买、采集、任务，最后是制作。",
+      "proposeEinsaetze": "建议出动",
+      "einsaetze": "出动",
       "stepsTotal": "{{n}} 个步骤",
       "steps": "{{done}}/{{n}} 个步骤",
       "gets": "你将获得",
@@ -6385,14 +6391,14 @@
       "stepOf": "第 {{n}} / {{total}} 步",
       "switch": "切换行动",
       "emptyTitle": "没有进行中的行动",
-      "toPlanen": "前往“计划”",
+      "toPlanen": "前往“规划”",
       "finish": "步骤已完成",
       "sharedStop": "该地点也服务于“{{name}}”。",
       "doneKicker": "全部已勾选",
-      "allDone": "该任务的所有步骤均已完成。",
-      "allDoneHint": "选择该行动的另一个任务,或切换行动。",
-      "einsaetze": "该行动的任务",
-      "archived": "已完成:该行动位于存档中,其任务仍在此继续。可在 计划 › 存档 中重新激活。"
+      "allDone": "该出动的所有步骤均已完成。",
+      "allDoneHint": "选择该行动的另一次出动，或切换行动。",
+      "einsaetze": "该行动的出动",
+      "archived": "已完成：该行动位于存档中，其出动仍在此继续进行。可在“规划 › 存档”中重新激活。"
     },
     "ticker": {
       "none": "暂无事件",
@@ -6416,7 +6422,7 @@
       "search": "搜索你的仓库",
       "menu": "页面菜单",
       "reset": "重置游戏内仓库",
-      "resetTitle": "重置游戏内仓库?",
+      "resetTitle": "重置游戏内仓库？",
       "resetMessage": "游戏或搜索写入的所有地点都将被移除。你手动创建的条目会保留。此操作无法撤销。",
       "resetConfirm": "重置",
       "filter": "筛选仓库",
@@ -6440,13 +6446,13 @@
       "rufEmptyTitle": "暂无数据来源",
       "rufEmptyText": "应用报告你的声望或你手动输入后将显示在此。",
       "pager": "页",
-      "range": "第 {{from}}–{{to}} 项,共 {{total}} 项",
+      "range": "第 {{from}}–{{to}} 项，共 {{total}} 项",
       "prev": "上一页",
       "next": "下一页",
-      "hintWish": "在你的愿望中:{{n}}",
+      "hintWish": "在你的愿望中：{{n}}",
       "hintNachschub": "在行动“{{name}}”中",
       "bpPick": {
-        "hint": "请从代码库中选择,以使材料与代码库页面一致。",
+        "hint": "请从 Codex 中选择，以使材料与 Codex 页面一致。",
         "label": "搜索蓝图",
         "placeholder": "例如 Arrowhead",
         "searching": "搜索中……",
@@ -6466,7 +6472,7 @@
         "kindAria": "类型",
         "subAria": "{{kind}}详情",
         "kind": {
-          "materials": "原料",
+          "materials": "材料",
           "weapons": "武器",
           "armor": "护甲",
           "other": "其他",
@@ -6493,7 +6499,7 @@
         },
         "placeAria": "地点",
         "allPlaces": "所有地点",
-        "placeSearch": "查找地点 …",
+        "placeSearch": "查找地点…",
         "otherPlaces": "其他地点",
         "reserved": "已预留",
         "scrapOnly": "可拆解",
@@ -6503,7 +6509,7 @@
           "ingame": "游戏内",
           "loan": "借用舰"
         },
-        "roleAria": "角色定位",
+        "roleAria": "定位",
         "allRoles": "所有定位",
         "role": {
           "combat": "战斗",
@@ -6521,39 +6527,39 @@
           "blueprints": "蓝图",
           "ruf": "声望",
           "news": "新闻",
-          "gallery": "图库"
+          "gallery": "画廊"
         },
         "resetFilters": "重置筛选",
         "hits": "{{n}} 个结果",
         "baysAria": "按地点显示装卸舱",
-        "byQuality": "{{name}}(按品质)",
+        "byQuality": "{{name}}（按品质）",
         "resSummary": "{{n}} 个地点共 {{qty}}",
         "toWishlist": "加入愿望清单",
-        "bandTip": "Q {{from}}–{{to}}:{{qty}},其中 {{res}} 已预留",
+        "bandTip": "Q {{from}}–{{to}}：{{qty}}，其中 {{res}} 已预留",
         "qUnknown": "Q ?",
         "qUnknownLong": "品质未知",
-        "reservedN": "{{n}} 已预留",
-        "reservedAny": "{{n}} 已预留(任意品质)",
+        "reservedN": "已预留 {{n}}",
+        "reservedAny": "已预留 {{n}}（任意品质）",
         "scrap": {
           "yes": "可拆解",
           "no": "不可拆解",
-          "unknown": "拆解:未知"
+          "unknown": "拆解：未知"
         },
         "noHits": "没有找到“{{q}}”的结果",
         "fewHits": "“{{q}}”仅有 {{n}} 个结果",
         "alt": {
-          "elsewhere": "在别处:{{qty}} {{name}} 位于 {{place}}",
-          "free": "{{n}} 空闲",
+          "elsewhere": "在别处：{{qty}} {{name}} 位于 {{place}}",
+          "free": "空闲 {{n}}",
           "wish": "将 {{name}} 加入愿望并规划",
           "wishQ": "将 {{name}} Q ≥ {{q}} 加入愿望并规划",
           "wishGo": "加入愿望并规划",
-          "swap": "替代品:{{name}},{{qty}} 位于 {{place}}",
+          "swap": "替代品：{{name}}，{{qty}} 位于 {{place}}",
           "swapWhy": "相同槽位",
           "craft": "自行制作"
         },
         "pickup": "规划取货",
         "alsoIn": "仓库中也有",
-        "inCodex": "在图鉴中:“{{q}}” – 加入愿望清单",
+        "inCodex": "在 Codex 中：“{{q}}”——加入愿望清单",
         "setItems": "{{n}} 件",
         "addSet": "创建套装",
         "setName": "套装名称",
@@ -6563,21 +6569,21 @@
         "emptyHangar": "机库中还没有舰船。",
         "emptyHangarSecond": "获取 RSI 机库",
         "emptySammlung": "尚未收集任何蓝图。",
-        "emptySammlungSecond": "浏览图鉴",
+        "emptySammlungSecond": "浏览 Codex",
         "emptyArt": {
           "news": "{{n}} 条已收藏的新闻。",
           "gallery": "{{n}} 张已收藏的图片。"
         },
         "emptyArtGo": {
           "news": "前往新闻",
-          "gallery": "前往图库"
+          "gallery": "前往画廊"
         },
         "log": "加载日志",
         "changes": "最近的更改",
         "everything": "全部",
         "more": "全部 {{n}} 项更改",
         "less": "收起",
-        "reorder": "补货({{n}})",
+        "reorder": "补货（{{n}}）",
         "logEmpty": "暂无更改。",
         "variants": "{{n}} 个变体",
         "inSpace": "太空中",
@@ -6588,23 +6594,23 @@
         "delete": "删除",
         "clearSel": "取消选择",
         "reserveTitle": "预留",
-        "reserveLabel": "为谁或为何?",
+        "reserveLabel": "为谁或为何？",
         "reserveNeedsNote": "预留需要填写用途。",
-        "codexTier": "图鉴中也有",
+        "codexTier": "Codex 中也有",
         "onWishlist": "在你的愿望清单中",
         "rsv": {
           "title": "预留",
           "titleEdit": "编辑预留",
           "existing": "此容器上的预留",
-          "for": "为谁?",
+          "for": "为谁？",
           "friend": "好友",
           "noFriend": "无好友",
           "allFriends": "所有好友",
           "byFriend": "预留给",
           "note": "或输入文字",
-          "notePlaceholder": "例如:组队行动、出售",
+          "notePlaceholder": "例如：组队行动、出售",
           "amount": "数量",
-          "of": "共 {{free}} 空闲",
+          "of": "可用 {{free}}",
           "amountBad": "介于 0 和 {{free}} 之间。",
           "quality": "品质堆叠",
           "anyQuality": "任意品质",
@@ -6615,13 +6621,13 @@
           "edit": "编辑预留",
           "release": "释放",
           "handout": "已交付",
-          "handoutTitle": "标记为已交付?",
+          "handoutTitle": "标记为已交付？",
           "handoutMessage": "{{n}} 将离开你的仓库。",
           "newOne": "新建预留",
           "saveEdit": "保存",
           "editFor": "{{name}} 的预留"
         },
-        "deleteTitle": "删除条目?",
+        "deleteTitle": "删除条目？",
         "deleteMessage": "{{n}} 个条目将从仓库中移除。",
         "deleteOne": "删除 {{name}}",
         "editAmount": "{{name}} 的数量",
@@ -6637,7 +6643,7 @@
       }
     },
     "nachschub": {
-      "slotsFull": "7 个 Operation 栏位已全部占用。请完成或删除一个以腾出栏位。",
+      "slotsFull": "7 个行动槽位已全部占用。请完成或删除一个行动以腾出槽位。",
       "nothingPicked": "请至少从愿望清单中选择一件物品。",
       "sellGoalInvalid": "请输入至少 1 aUEC 的目标。",
       "target": {
@@ -6650,37 +6656,37 @@
         },
         "lead": "来自你仓库的 {{n}} 件物品",
         "where": "目的地",
-        "new": "新建 Operation",
-        "newSell": "新建 Operation:赚钱",
+        "new": "新建行动",
+        "newSell": "新建行动：赚钱",
         "append": "添加到“{{name}}”",
-        "goal": "目标(aUEC)",
+        "goal": "目标（aUEC）",
         "goalPlaceholder": "例如 1,500,000",
-        "create": "创建 Operation",
+        "create": "创建行动",
         "add": "添加",
         "sellName": "赚钱",
         "scu": "SCU",
         "pcs": "件",
-        "route": "{{n}} 个地点,数量最多的优先",
+        "route": "{{n}} 个地点，数量最多的优先",
         "up": "将 {{place}} 上移",
         "down": "将 {{place}} 下移",
         "einsatzOne": "取货 {{name}}",
         "einsatzMany": "取货"
       },
       "sellForm": {
-        "kindAria": "这个 Operation 是为了什么?",
+        "kindAria": "这个行动是为了什么？",
         "wish": "来自你的愿望清单",
         "sell": "赚钱",
-        "goal": "目标(aUEC)",
+        "goal": "目标（aUEC）",
         "goalPlaceholder": "例如 1,500,000",
         "pickHint": "从你的仓库中选择要出售的物品。",
-        "empty": "你的仓库是空的,暂时没有可出售的物品。",
+        "empty": "你的仓库是空的，暂时没有可出售的物品。",
         "pick": "出售 {{place}} 的 {{name}}"
       },
       "sell": {
         "title": "赚钱",
         "progress": "{{earned}} / {{goal}} aUEC",
         "reached": "目标已达成",
-        "earned": "目前已赚取(aUEC)",
+        "earned": "目前已赚取（aUEC）",
         "save": "保存",
         "lines": "待出售"
       },
@@ -6689,11 +6695,11 @@
         "route": "已完成 {{done}} / {{n}} 个站点",
         "tick": "已从 {{place}} 取货"
       },
-      "dayName": "库存截至 {{date}}",
-      "newEinsatz": "新建 Einsatz",
+      "dayName": "{{date}} 补给",
+      "newEinsatz": "新建出动",
       "act": {
         "buy": "购买 {{label}}",
-        "mission": "任务:{{label}}",
+        "mission": "任务：{{label}}",
         "mine": "开采 {{label}}",
         "refine": "精炼 {{label}}",
         "craft": "制作 {{label}}",
@@ -6703,16 +6709,16 @@
       "done": {
         "created": "“{{name}}”已创建。",
         "undone": "已撤销。",
-        "reactivated": "Operation 已重新激活。",
+        "reactivated": "行动已重新激活。",
         "plainAdopted": "{{count}} 个项目现已作为愿望加入你的愿望清单。",
         "plainKept": "{{count}} 个项目保持不变。",
-        "emptied": "Operation 已清空。",
-        "removed": "Operation 已删除。",
-        "added": "已添加到 Operation。",
+        "emptied": "行动已清空。",
+        "removed": "行动已删除。",
+        "added": "已添加到行动。",
         "lineRemoved": "项目已移除。",
-        "edited": "Operation 已保存。",
+        "edited": "行动已保存。",
         "wishRemoved": "已从愿望清单中移除 {{count}} × {{name}}。",
-        "released": "已将 {{name}} 从 Operation 中移除。"
+        "released": "已将 {{name}} 从行动中移除。"
       },
       "rec": {
         "reason": {
@@ -6722,31 +6728,31 @@
           "fitsPort": "适配 {{item}} 的 S{{size}}",
           "ingredientFor": "{{item}} 的材料",
           "usedIn": "{{item}} 所需",
-          "sameMaker": "同一制造商:{{maker}}",
+          "sameMaker": "同一制造商：{{maker}}",
           "sameSizeClass": "与 {{item}} 搭配的 S{{size}}",
-          "otherSignal": "{{item}} 的 {{signal}} 对应品 (S{{size}})",
+          "otherSignal": "{{item}} 的 {{signal}} 对应品（S{{size}}）",
           "pairsWith": "补全 {{item}}",
           "paintFor": "{{item}} 的涂装",
           "sameMaterial": "与 {{item}} 材质相同",
-          "sameShop": "同一商店:{{place}}",
-          "samePlace": "同一地点:{{place}}",
-          "sameActivity": "同一活动:{{activity}}"
+          "sameShop": "同一商店：{{place}}",
+          "samePlace": "同一地点：{{place}}",
+          "sameActivity": "同一活动：{{activity}}"
         },
         "via": {
           "craft": "制作",
           "buy": "购买"
         }
       },
-      "linesFull": "你的 Operation 已满(100 个项目)。请先移除一些项目,然后才能分配更多。",
-      "partial": "{{count}} 个项目未能移动:你的 Operation 已满。",
-      "wishlistFailed": "无法更改你的愿望,未移动任何内容。",
+      "linesFull": "你的行动已满（100 个项目）。请先移除一些项目，然后才能分配更多。",
+      "partial": "{{count}} 个项目未能移动：你的行动已满。",
+      "wishlistFailed": "无法更改你的愿望，未移动任何内容。",
       "plainGone": "这些项目已在另一台设备上处理过。视图正在刷新。",
-      "wishCapped": "有 {{count}} 件已超出愿望清单的容量(每项最多 999 件),将会丢失。",
-      "gone": "此行动已不存在(已在其他设备上删除)。视图正在刷新。",
-      "capReached": "你已达到行动存储上限。请从归档中删除旧行动,然后即可继续。",
+      "wishCapped": "有 {{count}} 件已超出愿望清单的容量（每项最多 999 件），将会丢失。",
+      "gone": "此行动已不存在（已在其他设备上删除）。视图正在刷新。",
+      "capReached": "你已达到行动存储上限。请从存档中删除旧行动，然后即可继续。",
       "nothingFree": "此愿望的所有物品都已分配给某个行动。",
       "splitInvalid": "在各行动之间的分配数量对不上。",
-      "dissolveFailed": "有一个行动无法解散,将予以保留。"
+      "dissolveFailed": "有一个行动无法解散，将予以保留。"
     },
     "title": "HQ",
     "eyebrow": "个人区域",
@@ -6768,13 +6774,13 @@
       "less": "减一",
       "more": "加一",
       "remove": "移除 {{name}}",
-      "sum": "{{open}} 项待办({{units}} 件)· {{done}} 项已备齐",
+      "sum": "{{open}} 项待办（{{units}} 件）· {{done}} 项已备齐",
       "clearDone": "移除已勾选项",
-      "buttonAria": "打开行动({{count}} 项)",
+      "buttonAria": "打开行动（{{count}} 项）",
       "title": "行动",
       "close": "关闭行动",
       "empty": "你的行动中还没有任何内容。",
-      "emptyHint": "搜索一件物品并分配给某个行动:之后在“规划”中会显示获取地点和前往方式。",
+      "emptyHint": "搜索一件物品并分配给某个行动：之后在“规划”中会显示获取地点和前往方式。",
       "tabsAria": "列表",
       "tabs": {
         "wish": "愿望",
@@ -6789,18 +6795,18 @@
       },
       "got": "已备齐",
       "place": {
-        "title": "现在放在哪里?",
+        "title": "现在放在哪里？",
         "other": "其他地点……",
         "otherPlaceholder": "输入地点",
-        "store": "放下",
+        "store": "存放",
         "tickOnly": "仅勾选"
       }
     },
     "spots": {
       "title": "地点",
-      "subtitle": "这里是你在桌面应用中保存的地点。可在此重命名或删除;应用会在下次同步时应用更改。",
+      "subtitle": "这里是你在桌面应用中保存的地点。可在此重命名或删除；应用会在下次同步时应用更改。",
       "loading": "正在加载你的地点……",
-      "empty": "还没有地点。地点需在桌面应用(Verse Navigation)中创建;同步后会显示在这里。",
+      "empty": "还没有地点。地点需在桌面应用（Verse Navigation）中创建；同步后会显示在这里。",
       "retry": "重试",
       "nameLabel": "地点名称",
       "save": "保存",
@@ -6808,7 +6814,7 @@
       "rename": "重命名",
       "delete": "删除",
       "created": "创建于 {{date}}",
-      "deleteTitle": "删除此地点?",
+      "deleteTitle": "删除此地点？",
       "deleteMessage": "“{{name}}”将从你的所有设备中移除。"
     },
     "ops": {
@@ -6819,7 +6825,7 @@
     },
     "overview": {
       "activeShip": "当前舰船",
-      "activeVariant": "当前型号",
+      "activeVariant": "当前变体",
       "noVariant": "出厂配置",
       "activeSet": "当前套装",
       "nextOps": "接下来的出动",
@@ -6840,7 +6846,7 @@
         "title": "你的舰队在补丁中的变化",
         "soon": "即将推出",
         "mock": "你的 3 艘舰船在 4.3.1 中有所调整",
-        "hint": "预览:很快你就能在这里看到当前补丁影响了你的哪些舰船。"
+        "hint": "预览：很快你就能在这里看到当前补丁影响了你的哪些舰船。"
       }
     },
     "locker": {
@@ -6852,10 +6858,10 @@
     "pages": {
       "start": "首页",
       "planen": "规划",
-      "jetzt": "当前",
+      "jetzt": "现在",
       "inventar": "仓库",
       "statistik": "统计",
-      "empty": "{{page}}:这里正在开发新内容。"
+      "empty": "{{page}}：这里正在开发新内容。"
     },
     "rail": {
       "label": "HQ 页面",
@@ -6880,8 +6886,8 @@
         "import": "获取 RSI 机库",
         "ships": "{{n}} 艘舰船",
         "shipsOne": "1 艘舰船",
-        "sets": "{{n}} 套装",
-        "setsOne": "1 套装",
+        "sets": "{{n}} 个套装",
+        "setsOne": "1 个套装",
         "blueprints": "{{n}} 个蓝图",
         "blueprintsOne": "1 个蓝图",
         "stale": "库存数据已过去 {{n}} 天",
@@ -6890,18 +6896,18 @@
       "now": {
         "live": "实时",
         "noneHint": "来自游戏的实时状态。",
-        "last": "最后位置:{{place}},{{ago}}。",
-        "lastTime": "最后在线:{{ago}}。",
+        "last": "最后位置：{{place}}，{{ago}}。",
+        "lastTime": "最后在线：{{ago}}。",
         "nextTip": "你首个已规划出动的下一步。",
         "step": {
           "buy": "购买 {{label}}",
-          "mission": "任务:{{label}}",
+          "mission": "任务：{{label}}",
           "mine": "开采 {{label}}",
           "refine": "精炼 {{label}}",
           "craft": "制作 {{label}}",
           "transport": "运输 {{label}}",
-          "pickup": "提取 {{label}}",
-          "event": "活动:{{label}}"
+          "pickup": "取货 {{label}}",
+          "event": "活动：{{label}}"
         }
       },
       "planen": {
@@ -6917,9 +6923,9 @@
         "week": "本周",
         "open": "统计"
       },
-      "tip": "{{action}} · 热键:{{key}}"
+      "tip": "{{action}} · 热键：{{key}}"
     },
-    "hotkey": "热键:{{key}}",
+    "hotkey": "热键：{{key}}",
     "step": {
       "kind": {
         "buy": "购买",
@@ -6928,7 +6934,7 @@
         "refine": "精炼",
         "craft": "制作",
         "transport": "运输",
-        "pickup": "提取",
+        "pickup": "取货",
         "event": "活动"
       },
       "state": {
@@ -6945,13 +6951,13 @@
       "undone": "已撤销",
       "event": {
         "shop": {
-          "purchase": "已购买 {{quantity}}× {{item}}({{shop}})"
+          "purchase": "已购买 {{quantity}}× {{item}}（{{shop}}）"
         },
         "refinery": {
-          "complete": "精炼完成:{{count}} 个订单({{location}})"
+          "complete": "精炼完成：{{count}} 个订单（{{location}}）"
         },
         "contract": {
-          "completed": "任务已完成:{{name}}",
+          "completed": "任务已完成：{{name}}",
           "accepted": "已接受任务"
         },
         "qt": {
@@ -6962,9 +6968,9 @@
           "ready": "机库就绪"
         },
         "inventory": {
-          "opened": "库存已打开({{location}})"
+          "opened": "库存已打开（{{location}}）"
         },
-        "other": "事件:{{type}}",
+        "other": "事件：{{type}}",
         "armistice": {
           "exited": "已离开停火区"
         },
@@ -6979,7 +6985,7 @@
         },
         "disconnect": "连接已断开",
         "blueprint": {
-          "received": "获得蓝图:{{name}}"
+          "received": "获得蓝图：{{name}}"
         }
       }
     },
@@ -6988,10 +6994,10 @@
       "retry": "重试",
       "connect": {
         "hint": "应用会将你的位置和操作实时报告到这里。",
-        "syncOffTitle": "应用已就绪,但暂无实时数据",
-        "syncOffHint": "请在应用的“设置 → 悬浮窗 → Verse Companion Web HQ”中开启实时同步,然后启动游戏。",
-        "titleMissing": "缺少应用:未检测到游戏",
-        "titleOff": "应用已关闭:未检测到游戏"
+        "syncOffTitle": "应用已就绪，但暂无实时数据",
+        "syncOffHint": "请在应用的“设置 → 悬浮窗 → Verse Companion Web HQ”中开启实时同步，然后启动游戏。",
+        "titleMissing": "缺少应用：未检测到游戏",
+        "titleOff": "应用已关闭：未检测到游戏"
       },
       "fresh": {
         "updated": "实时 · 更新于 {{at}}",
@@ -7001,10 +7007,10 @@
         "label": "你在这里",
         "lastSeen": "最后在此",
         "unknown": "位置未知",
-        "ship": "舰船:"
+        "ship": "舰船："
       },
       "zone": {
-        "label": "区域:",
+        "label": "区域：",
         "unknown": "未知",
         "restricted": "禁区",
         "commDown": "通讯阵列离线",
@@ -7018,9 +7024,9 @@
           "hydrogen": "氢气不足",
           "quantum": "量子燃料不足"
         },
-        "hangar": "机库:第 {{position}} 位",
-        "hangarWait": "机库:第 {{position}} 位 · 约 {{min}} 分钟",
-        "hangarQueued": "机库:排队中"
+        "hangar": "机库：第 {{position}} 位",
+        "hangarWait": "机库：第 {{position}} 位 · 约 {{min}} 分钟",
+        "hangarQueued": "机库：排队中"
       },
       "path": {
         "title": "你的路线",
@@ -7041,7 +7047,7 @@
     "mood": {
       "peaceful": "和平",
       "combat": "战斗",
-      "quick": "快速(< 30 分钟)",
+      "quick": "快速（< 30 分钟）",
       "long": "耗时较长",
       "solo": "单人",
       "group": "组队",
@@ -7052,7 +7058,7 @@
       "multi": "出动 ×{{n}}",
       "stepsTooltip": "{{n}} 个步骤",
       "pick": {
-        "title": "加入哪个出动?",
+        "title": "加入哪个出动？",
         "message": "“{{name}}”将作为任务步骤加入。",
         "none": "你还没有已规划或进行中的出动。",
         "new": "新建出动"
@@ -7063,35 +7069,35 @@
         "confirm": "添加",
         "kindAria": "你要做什么",
         "what": {
-          "buy": "你买什么?",
-          "mission": "你想赚取什么?",
-          "mine": "你开采什么?",
-          "pickup": "你去取什么?"
+          "buy": "你买什么？",
+          "mission": "你想赚取什么？",
+          "mine": "你开采什么？",
+          "pickup": "你去取什么？"
         },
         "whatPh": {
-          "buy": "例如:Medpen",
-          "mission": "例如:P4-AR 蓝图",
-          "mine": "例如:Quantanium",
-          "pickup": "例如:机库里的货物"
+          "buy": "例如：Medpen",
+          "mission": "例如：P4-AR 蓝图",
+          "mine": "例如：Quantanium",
+          "pickup": "例如：机库里的货物"
         },
-        "where": "在哪里?",
-        "whereOptional": "在哪里?(可选)",
+        "where": "在哪里？",
+        "whereOptional": "在哪里？（可选）",
         "wherePh": "选择地点",
         "qty": "数量"
       },
       "rename": {
-        "action": "重命名行动“{{name}}”",
-        "aria": "行动的新名称",
+        "action": "重命名出动“{{name}}”",
+        "aria": "出动的新名称",
         "empty": "名称不能为空。"
       },
       "noneYet": {
-        "title": "“{{name}}”还没有行动",
-        "hint": "在“规划”中根据条目提议行动,或手动添加一个。"
+        "title": "“{{name}}”还没有出动",
+        "hint": "在“规划”中根据条目建议出动，或手动添加一个。"
       }
     },
     "activity": {
       "kopfgeld": "悬赏",
-      "bunker": "Bunker",
+      "bunker": "地堡",
       "medizin": "医疗",
       "rennen": "竞速",
       "bergbau": "采矿",
@@ -7111,7 +7117,7 @@
         "90d": "90 天"
       },
       "retry": "重试",
-      "loading": "正在加载统计 …",
+      "loading": "正在加载统计…",
       "zero": "所选时间范围内没有记录。",
       "details": "详情",
       "day": "日",
@@ -7137,11 +7143,11 @@
           "col2": "失败或放弃"
         },
         "deaths": {
-          "name": "死亡 / Claim",
-          "sub": "死亡 / Claim",
-          "hint": "虚线:Claim,实线:死亡。",
+          "name": "死亡 / 理赔",
+          "sub": "死亡 / 理赔",
+          "hint": "虚线：理赔，实线：死亡。",
           "col": "死亡",
-          "col2": "Claim"
+          "col2": "理赔"
         },
         "crimestat": {
           "name": "Crimestat",
@@ -7177,9 +7183,9 @@
       },
       "preview": {
         "stamp": "预览",
-        "title": "你的统计数据将在这里增长",
-        "text": "当应用在你游戏时同步读取数据后,就会是这个样子:aUEC、任务、完成率、死亡、Crimestat、精炼厂、蓝图、罚款和燃料警告。后面的卡片是示例数据。",
-        "textLinked": "应用已连接。开始游戏后,aUEC、任务、死亡、Crimestat、精炼厂、蓝图、罚款和燃料警告就会逐渐填充。后面的卡片是示例数据。"
+        "title": "你的统计数据会在这里逐渐积累",
+        "text": "当应用在你游戏时同步读取数据后，就会是这个样子：aUEC、任务、完成率、死亡、Crimestat、精炼厂、蓝图、罚款和燃料警告。后面的卡片是示例数据。",
+        "textLinked": "应用已连接。开始游戏后，aUEC、任务、死亡、Crimestat、精炼厂、蓝图、罚款和燃料警告就会逐渐填充。后面的卡片是示例数据。"
       },
       "events": {
         "title": "已完成的活动",
@@ -7187,12 +7193,12 @@
       }
     },
     "stock": {
-      "free": "我这里",
-      "sharedBtn": "好友分享的({{n}})",
+      "free": "在我这里",
+      "sharedBtn": "好友分享的（{{n}}）",
       "captured": "已加入你的库存。",
       "actions": {
         "browse": "浏览",
-        "find": "在哪里有……?",
+        "find": "在哪里有……？",
         "add": "添加"
       },
       "totals": {
@@ -7221,7 +7227,7 @@
         "modes": "你想做什么",
         "mode": {
           "browse": "浏览",
-          "find": "在哪里有……?",
+          "find": "在哪里有……？",
           "add": "添加"
         },
         "search": "搜索库存",
@@ -7238,15 +7244,15 @@
         },
         "count": "{{n}} 条记录",
         "results": "库存记录",
-        "loading": "加载中 …",
-        "loadingMore": "正在加载更多 …",
+        "loading": "加载中…",
+        "loadingMore": "正在加载更多…",
         "noMatch": "没有符合这些筛选条件的内容。",
         "empty": "库存里还没有任何记录。",
         "ships": "终端中的舰船",
-        "onWishlist": "加入愿望单"
+        "onWishlist": "加入愿望清单"
       },
       "retry": "重试",
-      "destroyed": "上次被摧毁:{{at}}",
+      "destroyed": "上次被摧毁：{{at}}",
       "ships": {
         "title": "舰船",
         "count": "机库中有 {{n}} 艘",
@@ -7255,7 +7261,7 @@
       "sets": {
         "title": "套装",
         "ship": "{{n}} 个舰船配置",
-        "fps": "{{n}} 套 FPS 装备"
+        "fps": "{{n}} 个 FPS 套装"
       },
       "earned": {
         "title": "已获得",
@@ -7268,53 +7274,53 @@
         "days": "上次打开于 {{n}} 天前"
       },
       "desk": {
-        "open": "登记:{{name}}",
-        "addOne": "存入 1 个:{{name}}",
-        "takeOne": "取出 1 个:{{name}}",
-        "availShort": "{{free}} 可用 · {{reserved}} 已预留",
+        "open": "登记：{{name}}",
+        "addOne": "存入 1 个：{{name}}",
+        "takeOne": "取出 1 个：{{name}}",
+        "availShort": "可用 {{free}} · 已预留 {{reserved}}",
         "amount": "数量",
         "in": "存入",
         "out": "取出",
         "set": "设置数量",
         "for": "预留给",
-        "forHint": "例如:玩家 X 或出售",
+        "forHint": "例如：玩家 X 或出售",
         "reserve": "预留",
         "reservations": "预留记录",
-        "handOut": "已发出",
+        "handOut": "已交付",
         "release": "释放",
         "delete": "从列表中删除",
-        "deleteTitle": "删除“{{name}}”?",
+        "deleteTitle": "删除“{{name}}”？",
         "deleteText": "该记录及其预留将从此地点移除。",
         "emptyTitle": "“{{name}}”将变为空",
-        "emptyText": "之后这里不会再剩下任何该物品:该记录将从列表中移除。",
+        "emptyText": "之后这里不会再剩下任何该物品：该记录将从列表中移除。",
         "emptyConfirm": "取出并删除",
         "cutTitle": "少于已预留数量",
         "cutText": "已预留 {{reserved}} {{unit}}。最新的预留将被缩减至新的数量。"
       },
       "lager": {
-        "empty": "库存里还没有任何记录。一旦有了,你就可以在这里搜索它放在哪里。",
-        "emptyHow": "物品是这样进来的:当你在游戏中打开库存时,应用会读取它。或者通过“添加”手动录入。",
+        "empty": "库存里还没有任何记录。一旦有了，你就可以在这里搜索它放在哪里。",
+        "emptyHow": "物品是这样进来的：当你在游戏中打开库存时，应用会读取它。或者通过“添加”手动录入。",
         "storage": "机库终端中的舰船"
       },
       "find": {
-        "title": "在哪里有……?",
+        "title": "在哪里有……？",
         "item": "物品或原材料",
-        "itemHint": "例如:Quantanium",
-        "want": "多少?",
+        "itemHint": "例如：Quantanium",
+        "want": "多少？",
         "unit": "单位",
         "sort": "排序",
         "nearest": "最近",
         "most": "最多",
         "yours": "你的库存",
         "here": "你在 {{place}}",
-        "whereAmI": "你现在在哪里?",
-        "unknownHere": "没有你的位置信息,我们将按数量排序。请启动应用或选择一个地点。",
-        "prompt": "输入你要找的东西,下方会显示它放在哪里。",
-        "noHit": "库存里没有这些。也许在另一个单位下?",
+        "whereAmI": "你现在在哪里？",
+        "unknownHere": "没有你的位置信息，我们将按数量排序。请启动应用或选择一个地点。",
+        "prompt": "输入你要找的东西，下方会显示它放在哪里。",
+        "noHit": "库存里没有这些。也许在另一个单位下？",
         "take": "取 {{n}}",
-        "summaryOne": "足够:一个地点就有 {{want}} {{unit}}。",
-        "summaryMany": "合计足够:来自 {{stops}} 个地点,共 {{want}} {{unit}}。",
-        "summaryShort": "不够:库存中只有 {{total}},需要 {{want}} {{unit}}。",
+        "summaryOne": "足够：一个地点就有 {{want}} {{unit}}。",
+        "summaryMany": "合计足够：来自 {{stops}} 个地点，共 {{want}} {{unit}}。",
+        "summaryShort": "不够：库存中只有 {{total}}，需要 {{want}} {{unit}}。",
         "summaryTotal": "库存中有 {{total}} {{unit}}。",
         "pcsUnit": "件",
         "tier": {
@@ -7327,11 +7333,11 @@
       },
       "capture": {
         "subKind": "子类型",
-        "subNone": "其他(无子类型)",
+        "subNone": "其他（无子类型）",
         "title": "向库存中添加物品",
         "item": "物品或原材料",
-        "itemHint": "例如:Quantanium",
-        "locationHint": "例如:Area 18",
+        "itemHint": "例如：Quantanium",
+        "locationHint": "例如：Area 18",
         "qty": "数量",
         "unit": "单位",
         "pcs": "件",
@@ -7352,23 +7358,23 @@
     "app": {
       "launch": "启动应用",
       "launchNow": "立即启动",
-      "starting": "正在启动应用 …",
-      "started": "应用正在启动。在那里登录后,你的数据就会同步到这里。",
-      "downloading": "未找到应用:现在开始下载(约 500 MB)。下载完成后请运行安装程序。",
-      "noResponse": "应用没有响应。如果它已在运行,一切正常——否则请手动启动,或重新下载。",
-      "retry": "已经安装了?重新启动",
+      "starting": "正在启动应用…",
+      "started": "应用正在启动。在那里登录后，你的数据就会同步到这里。",
+      "downloading": "未找到应用：现在开始下载（约 500 MB）。下载完成后请运行安装程序。",
+      "noResponse": "应用没有响应。如果它已在运行，一切正常——否则请手动启动，或重新下载。",
+      "retry": "已经安装了？重新启动",
       "download": "下载应用",
       "downloadCta": "下载应用",
-      "downloadStarted": "正在下载(约 500 MB)。下载完成后请运行安装程序。",
-      "tipDownload": "直接下载安装程序。如果应用已安装,请先启动一次:一旦它连接上,你就可以从这里启动它。你随时可以在右上角的“应用”中再次找到它。",
-      "tipLaunch": "在你的电脑上打开应用。如果没有响应,则开始下载。你随时可以在右上角的“应用”中再次找到它。",
+      "downloadStarted": "正在下载（约 500 MB）。下载完成后请运行安装程序。",
+      "tipDownload": "直接下载安装程序。如果应用已安装，请先启动一次：一旦它连接上，你就可以从这里启动它。你随时可以在右上角的“应用”中再次找到它。",
+      "tipLaunch": "在你的电脑上打开应用。如果没有响应，则开始下载。你随时可以在右上角的“应用”中再次找到它。",
       "close": "关闭"
     },
     "friends": {
       "share": {
         "open": "与好友分享",
-        "hint": "仅供查看。对于群组,之后加入的成员也将获得访问权限。",
-        "setHint": "这套装备现在会分享给群组中的好友,之后加入的成员不会获得。",
+        "hint": "仅供查看。对于群组，之后加入的成员也将获得访问权限。",
+        "setHint": "该套装将分享给当前在群组中的好友，之后加入的成员不会获得。",
         "audience": "好友或群组",
         "choose": "选择好友或群组",
         "send": "分享",
@@ -7401,8 +7407,8 @@
         "kindVariant": "变体 · {{ship}}"
       },
       "now": {
-        "online": "当前在线:",
-        "active": "进行中:{{title}} · {{n}} 人已确认"
+        "online": "当前在线：",
+        "active": "进行中：{{title}} · {{n}} 人已确认"
       }
     },
     "events": {
@@ -7412,7 +7418,7 @@
       "dot": "活动进行中",
       "end": {
         "official": "截止 {{date}}",
-        "estimate": "最迟 {{date}} 结束(预估)",
+        "estimate": "最迟 {{date}} 结束（预估）",
         "unknown": "结束时间未知"
       },
       "pick": {
@@ -7421,11 +7427,11 @@
         "sightseeing": "无奖励——作为观光行动。"
       },
       "draft": {
-        "area": "使用活动区域,而非固定地点"
+        "area": "使用活动区域，而非固定地点"
       },
-      "severalHint": "一个行动中可包含多个活动,但不建议这样做。",
+      "severalHint": "一个行动中可包含多个活动，但不建议这样做。",
       "doneTag": "已完成",
-      "abort": "取消",
+      "abort": "中止",
       "complete": "活动已完成",
       "gone": "此活动已不可用。",
       "area": {
@@ -7436,7 +7442,7 @@
         "ac": "Arena Commander"
       },
       "prereq": {
-        "title": "前置条件(估算)",
+        "title": "前置条件（估算）",
         "none": "未说明",
         "and": "和",
         "or": "或"
@@ -7456,7 +7462,7 @@
         "none": "此活动没有进度。",
         "live": "实时",
         "tiers": "等级",
-        "appHint": "应用已连接,一旦在游戏中检测到进度便会自动更新。"
+        "appHint": "应用已连接，一旦在游戏中检测到进度便会自动更新。"
       },
       "rewards": {
         "title": "奖励",
@@ -7476,24 +7482,24 @@
       },
       "claim": {
         "title": "领取 {{name}}",
-        "channel": "你是如何获得的?",
-        "byApp": "应用已检测到获取途径,你可以修改。",
+        "channel": "你是如何获得的？",
+        "byApp": "应用已检测到获取途径，你可以修改。",
         "store": "放入仓库",
         "isShip": "是舰船",
         "toHangar": "会放入机库。",
-        "toInventory": "会放入库存(位置“活动奖励”)。",
+        "toInventory": "会放入库存（位置“活动奖励”）。",
         "complete": "将整个活动标记为已完成",
         "confirm": "领取"
       },
       "offer": {
-        "area": "你正位于{{event}}的区域。要切换到该行动吗?",
-        "ac": "Arena Commander 正在运行,与{{event}}相符。要切换到该行动吗?",
+        "area": "你正位于{{event}}的区域。要切换到该行动吗？",
+        "ac": "Arena Commander 正在运行，与{{event}}相符。要切换到该行动吗？",
         "switch": "切换",
         "notNow": "暂不"
       },
       "abortDialog": {
-        "title": "要中止{{name}}吗?",
-        "message": "进度会保留,也不会有任何内容退回心愿单。你可以随时从归档中恢复该活动。"
+        "title": "要中止{{name}}吗？",
+        "message": "进度会保留，也不会有任何内容退回愿望清单。你可以随时从存档中恢复该活动。"
       }
     },
     "appStatus": {
@@ -7510,15 +7516,15 @@
         "aria": "应用在此页面的作用",
         "title": "使用应用",
         "toggle": "应用在此页面的作用",
-        "start": "使用此应用，你可以在这里实时查看自己所在的位置、驾驶的飞船以及接下来要做什么。",
-        "inventar": "应用会从游戏中读取你的库存和飞船，无需手动输入。",
+        "start": "使用此应用，你可以在这里实时查看自己所在的位置、驾驶的舰船以及接下来要做什么。",
+        "inventar": "应用会从游戏中读取你的库存和舰船，无需手动输入。",
         "jetzt": "应用会报告你当前所在的位置，并自动勾选已完成的步骤：",
         "planen": "当你的行动中的某一项到达时，应用会自动识别并将其关闭。",
         "statistik": "应用会在你游玩时同步统计：游戏时长、会话、任务和损失。没有它，此页面将保持为空。",
         "jetztList": {
-          "e1": "你的位置和飞船，例如“Stanton › New Babbage”。",
-          "e2": "你计划行程中的下一步，例如一次购买或一次出行。",
-          "e3": "最近的事件，例如“任务完成”或“量子跳跃结束”。"
+          "e1": "你的位置和舰船，例如“Stanton › New Babbage”。",
+          "e2": "你计划的出动中的下一步，例如一次购买或一次出行。",
+          "e3": "最近的事件，例如“任务完成”或“量子跃迁结束”。"
         }
       }
     },
@@ -7528,16 +7534,16 @@
       "retry": "重试",
       "empty": "暂无游戏会话。连接 SCC 应用后，每次会话都会以卡片形式显示在这里。",
       "emptyLinked": "最近 30 天内没有记录到游戏会话。",
-      "jumps": "量子跳跃",
-      "contracts": "合同",
+      "jumps": "量子跃迁",
+      "contracts": "合约",
       "auec": "aUEC 收支",
       "losses": "损失",
-      "lossesSub": "{{deaths}} 次死亡 · {{ships}} 艘飞船被毁 · {{claims}} 次保险理赔",
+      "lossesSub": "{{deaths}} 次死亡 · {{ships}} 艘舰船被毁 · {{claims}} 次保险理赔",
       "costs": {
         "label": "成本",
         "fines": {
           "one": "{{n}} 笔罚款",
-          "other": "{{n}} 次罚款"
+          "other": "{{n}} 笔罚款"
         },
         "fineAmount": "{{fines}}({{amount}} aUEC)",
         "injuries": {
@@ -7554,11 +7560,11 @@
         }
       },
       "end": {
-        "noQuit": "未正常退出就结束(崩溃或应用被关闭)",
+        "noQuit": "未正常退出就结束（崩溃或应用被关闭）",
         "live": "正在进行"
       },
       "showAll": "显示全部 {{n}} 个会话",
-      "note": "来自 SCC App 的最近 {{days}} 天的会话。aUEC 结余为卖出减去买入。",
+      "note": "来自 SCC 应用的最近 {{days}} 天的会话。aUEC 结余为卖出减去买入。",
       "durH": "{{h}} 小时 {{m}} 分钟",
       "durM": "{{m}} 分钟"
     }
@@ -7793,27 +7799,27 @@
     "title": "星图",
     "signedOut": "登录后查看你的星图。",
     "signIn": "登录",
-    "loading": "正在加载星图 …",
+    "loading": "正在加载星图…",
     "empty": "此补丁还没有星图。",
     "stageAria": "补丁 {{patch}} 的星图",
     "progress": "{{lit}}/{{total}} 颗星",
     "sun": {
       "faded": {
-        "aria": "太阳:已黯淡",
-        "tip": "太阳已黯淡。请在下方将补丁预测设为 {{patch}} 正式上线的日期——误差在 ±1 天内,太阳就会亮起。"
+        "aria": "太阳：已黯淡",
+        "tip": "太阳已黯淡。请在下方将补丁预测设为 {{patch}} 正式上线的日期——误差在 ±1 天内，太阳就会亮起。"
       },
       "tipped": {
-        "aria": "太阳:已提交补丁预测,等待 LIVE 日",
-        "tip": "你的补丁预测已提交:太阳微微发光,直到 {{patch}} 正式上线。误差在 ±1 天内,它就会亮起。"
+        "aria": "太阳：已提交补丁预测，等待 LIVE 日",
+        "tip": "你的补丁预测已提交：太阳微微发光，直到 {{patch}} 正式上线。误差在 ±1 天内，它就会亮起。"
       },
       "hit": {
-        "aria": "太阳:已点亮",
-        "tip": "命中:你的补丁预测与 LIVE 日相差不超过 1 天,太阳已点亮。"
+        "aria": "太阳：已点亮",
+        "tip": "命中：你的补丁预测与 LIVE 日相差不超过 1 天，太阳已点亮。"
       }
     },
     "export": {
-      "wallpaper": "下载壁纸(4K)",
-      "failed": "无法生成壁纸,请再试一次。"
+      "wallpaper": "下载壁纸（4K）",
+      "failed": "无法生成壁纸，请再试一次。"
     },
     "task": {
       "notes": {
@@ -7823,12 +7829,12 @@
       },
       "archive": {
         "title": "档案发现",
-        "how": "将 Codex 切换到较早的补丁,看看当时的内容。",
+        "how": "将 Codex 切换到较早的补丁，看看当时的内容。",
         "link": "前往 Codex"
       },
       "loadout": {
-        "title": "机库装备配置",
-        "how": "在机库中打开你的一艘飞船,查看它的装备配置。",
+        "title": "机库装载配置",
+        "how": "在机库中打开你的一艘舰船，查看它的装载配置。",
         "link": "前往机库"
       },
       "comet": {
@@ -7837,9 +7843,9 @@
         "link": "提交你的补丁预测"
       },
       "cxNewship": {
-        "title": "已查看新飞船",
-        "how": "在 Codex 中打开该补丁最新的飞船。",
-        "link": "前往该飞船"
+        "title": "已查看新舰船",
+        "how": "在 Codex 中打开该补丁最新的舰船。",
+        "link": "前往该舰船"
       },
       "cxKeybinds": {
         "title": "已检查按键绑定",
@@ -7848,7 +7854,7 @@
       },
       "cxChanged": {
         "title": "发现变化",
-        "how": "在飞船的全息对比台中比较两个补丁。",
+        "how": "在舰船的全息桌中比较两个补丁。",
         "link": "前往对比"
       },
       "cxBlueprint": {
@@ -7862,19 +7868,19 @@
         "link": "前往 FPS"
       },
       "cxLoadout": {
-        "title": "已保存 Codex 装备配置",
-        "how": "在 Codex 的飞船页面保存一个自定义装备配置。",
-        "link": "构建装备配置"
+        "title": "已保存 Codex 装载配置",
+        "how": "在 Codex 的舰船页面保存一个自定义装载配置。",
+        "link": "构建装载配置"
       },
       "cxGuess": {
         "title": "已识别星图",
-        "how": "在星图上识别星图形状所展示的新飞船——仅限一次机会。",
+        "how": "在星图上识别星图形状所展示的新舰船——仅限一次机会。",
         "link": "前往星图"
       }
     },
     "reward": {
       "unlocked": "已解锁",
-      "locked": "达到 {{at}} 张已点亮星图",
+      "locked": "点亮 {{at}} 张星图后解锁",
       "road": {
         "title": "星路",
         "desc": "连接你跨补丁的星图。"
@@ -7885,7 +7891,7 @@
       },
       "live": {
         "title": "动态壁纸",
-        "desc": "闪烁的星星,动画克制。",
+        "desc": "闪烁的星星，动画克制。",
         "preview": "你的星空实时预览"
       },
       "reserve": {
@@ -7894,14 +7900,14 @@
       },
       "meteor": {
         "title": "流星雨",
-        "desc": "在 LIVE 日,流星会划过你的星图。",
-        "today": "今天是 LIVE 日:流星雨划过你的星图。",
+        "desc": "在 LIVE 日，流星会划过你的星图。",
+        "today": "今天是 LIVE 日：流星雨划过你的星图。",
         "notToday": "流星雨只会在最新补丁的 LIVE 日出现。"
       },
       "supernova": {
         "title": "超新星",
         "desc": "专为你生成的超新星星图。",
-        "download": "下载超新星(4K)"
+        "download": "下载超新星（4K）"
       }
     },
     "kartograph": {
@@ -7910,7 +7916,7 @@
     "community": {
       "title": "社区星图",
       "on": "你的星星会在此补丁的社区星图中闪耀。",
-      "off": "达到 3 颗星后,你将在此补丁的社区星图中闪耀。",
+      "off": "达到 3 颗星后，你将在此补丁的社区星图中闪耀。",
       "count": "{{explorers}} 位探索者在此补丁中点亮了星星。星星越亮 = 探索者越多。"
     },
     "suns": {
@@ -7920,7 +7926,7 @@
       "splinter": "碎片 {{n}}/{{per}}"
     },
     "glyph": {
-      "aria": "星图:{{lit}}/{{total}} 颗星"
+      "aria": "星图：{{lit}}/{{total}} 颗星"
     },
     "gallery": {
       "title": "我的星图",
@@ -7937,16 +7943,16 @@
       "share": "分享徽章",
       "caption": "制图师 · 第 {{rank}} 级",
       "captionSub": "补丁 {{patch}} · {{stars}}/{{total}} 颗星 · Verse Companion",
-      "aria": "第 {{rank}} 级制图师徽章,附补丁 {{patch}} 的星图",
-      "explain": "一位制图师在 Verse Companion 中完成了整张星图:补丁的每项任务就是一颗星。",
+      "aria": "第 {{rank}} 级制图师徽章，附补丁 {{patch}} 的星图",
+      "explain": "一位制图师在 Verse Companion 中完成了整张星图：补丁的每项任务就是一颗星。",
       "cta": "开始你自己的星图",
       "invalid": "此徽章链接不完整。",
       "toVerse": "前往 Verse"
     },
     "map": {
       "title": "星图 {{patch}}",
-      "subtitle": "{{total}} 颗星 · 形状暗示着一艘新飞船",
-      "shape": "形状:{{name}}",
+      "subtitle": "{{total}} 颗星 · 形状暗示着一艘新舰船",
+      "shape": "形状：{{name}}",
       "patchesAria": "选择补丁星图",
       "chipTip": "星图 {{patch}} · {{lit}}/{{total}} 颗星",
       "mine": "我的星图",
@@ -7956,9 +7962,9 @@
     "tour": {
       "open": "星图如何运作",
       "title": "星图如何运作",
-      "p1": "每个补丁都有一张由 7 颗星组成的星图。每完成一项任务就点亮一颗;7 颗全亮后,形状会显示一艘飞船,这张星图也会加入你的收藏。",
-      "p2": "穹顶下有两项挑战:预测下一个补丁 LIVE 日的彗星预测,以及识别形状背后的飞船。",
-      "p3": "点亮的星星会提升你的制图师等级。右上角的徽章会打开你的等级页面,查看系列、奖励和壁纸。",
+      "p1": "每个补丁都有一张由 7 颗星组成的星图。每完成一项任务就点亮一颗；7 颗全亮后，形状会显示一艘舰船，这张星图也会加入你的收藏。",
+      "p2": "穹顶下有两项挑战：预测下一个补丁 LIVE 日的彗星预测，以及识别形状背后的舰船。",
+      "p3": "点亮的星星会提升你的制图师等级。右上角的徽章会打开你的等级页面，查看连续记录、奖励和壁纸。",
       "start": "带我看看",
       "back": "返回",
       "next": "下一步",
@@ -7967,23 +7973,23 @@
       "step": {
         "stage": {
           "title": "穹顶",
-          "text": "所选补丁的星图。发光的星星是已完成的任务,闪动的是建议的下一项,空心圆环则尚未完成。点击星星可查看其任务。达到 3 颗星后,你也会在此补丁的社区星空中闪耀:星星越亮,说明点亮它的探索者越多。"
+          "text": "所选补丁的星图。发光的星星是已完成的任务，闪动的是建议的下一项，空心圆环则尚未完成。点击星星可查看其任务。达到 3 颗星后，你也会在此补丁的社区星空中闪耀：星星越亮，说明点亮它的探索者越多。"
         },
         "patch": {
           "title": "选择补丁",
-          "text": "左上角可切换到更早补丁的星图。每张星图都会保留,即使补丁早已正式上线。"
+          "text": "左上角可切换到更早补丁的星图。每张星图都会保留，即使补丁早已正式上线。"
         },
         "comet": {
           "title": "彗星",
-          "text": "预测下一个补丁正式上线的日期。猜中后,彗星会为你的太阳收藏点亮一颗太阳,并在星图上点亮一颗星。"
+          "text": "预测下一个补丁正式上线的日期。猜中后，彗星会为你的太阳收藏点亮一颗太阳，并在星图上点亮一颗星。"
         },
         "guess": {
           "title": "猜形状",
-          "text": "猜猜星图展示的是哪艘飞船。猜中可获得一颗星;之后形状的名称会显示在穹顶下方。"
+          "text": "猜猜星图展示的是哪艘舰船。猜中可获得一颗星；之后形状的名称会显示在穹顶下方。"
         },
         "rank": {
           "title": "你的制图师等级",
-          "text": "每点亮一颗星都会提升你的等级:在 1、3、7、12、18、26 和 35 颗星时晋级,从观察者到图集守护者。每一级都会解锁内容,从可分享的徽章和伙伴,到第 5 级起的琥珀色调和徽章细节。你的系列、奖励和所有壁纸格式都在等级页面中。"
+          "text": "每点亮一颗星都会提升你的等级：在 1、3、7、12、18、26 和 35 颗星时晋级，从观测者到星图集守护者。每一级都会解锁内容，从可分享的徽章和伙伴，到第 5 级起的琥珀色调和徽章细节。你的连续记录、奖励和所有壁纸格式都在等级页面中。"
         }
       },
       "eyebrow": "星图"
@@ -8004,15 +8010,15 @@
       "lockedGuess": "你对这张星图的预测已提交。"
     },
     "star": {
-      "done": "星 {{n}}:{{task}} · 已点亮",
-      "next": "星 {{n}}:{{task}} · 建议下一项",
-      "open": "星 {{n}}:{{task}} · 未完成"
+      "done": "星 {{n}}：{{task}} · 已点亮",
+      "next": "星 {{n}}：{{task}} · 建议下一项",
+      "open": "星 {{n}}：{{task}} · 未完成"
     },
     "comet": {
       "kind": "补丁预测",
       "ruleAria": "补丁预测规则",
-      "rule": "预测 {{patch}} 正式上线的日期——点击某一天即可设定你的补丁预测,每个补丁一次。误差在 ±1 天内,彗星就会为你在等级页面的收藏点亮一颗太阳。{{patch}} 正式上线或 LIVE 日期正式公布后,预测即关闭。",
-      "ruleVersion": "预测 {{patch}} 正式上线的日期——每个补丁一次预测。{{patch}} 正式上线或其 LIVE 日期正式公布后,预测即关闭。补丁之星只能通过补丁线预测获得。",
+      "rule": "预测 {{patch}} 正式上线的日期——点击某一天即可设定你的补丁预测，每个补丁一次。误差在 ±1 天内，彗星就会为你在等级页面的收藏点亮一颗太阳。{{patch}} 正式上线或 LIVE 日期正式公布后，预测即关闭。",
+      "ruleVersion": "预测 {{patch}} 正式上线的日期——每个补丁一次预测。{{patch}} 正式上线或其 LIVE 日期正式公布后，预测即关闭。补丁之星只能通过补丁线预测获得。",
       "noTip": "目前没有补丁预测——CIG 尚未公布其他补丁。",
       "state": {
         "none": "未完成",
@@ -8024,17 +8030,17 @@
       },
       "head": {
         "closed": "{{patch}} 的预测已关闭",
-        "tipped": "你对 {{patch}} 的预测:{{date}}",
+        "tipped": "你对 {{patch}} 的预测：{{date}}",
         "hit": "落地于 {{date}}",
-        "miss": "你的补丁预测:{{date}}",
+        "miss": "你的补丁预测：{{date}}",
         "open": "{{patch}} 的预测已开放",
-        "missed": "你对 {{patch}} 的预测已错过:{{date}}"
+        "missed": "你对 {{patch}} 的预测已错过：{{date}}"
       },
       "formerly": "原 {{patch}}",
       "earlier": "更早的日期",
       "later": "更晚的日期",
       "dayAria": "将补丁预测设为 {{date}}",
-      "undoToast": "{{patch}} 的补丁预测已设定:{{date}}",
+      "undoToast": "{{patch}} 的补丁预测已设定：{{date}}",
       "source": {
         "ptu": "根据 PTU 识别",
         "eptu": "根据 EPTU 识别",
@@ -8046,34 +8052,34 @@
     "guess": {
       "kind": "识别",
       "ruleAria": "识别规则",
-      "rule": "星图的形状来自该补丁最新的飞船。7 艘飞船中有一艘是正确答案。你只有一次机会:点击一艘飞船即可提交猜测,几秒内仍可撤销。猜对后会点亮一颗星,名称也会出现在星图中。",
-      "optionAria": "猜测:{{name}}",
+      "rule": "星图的形状来自该补丁最新的舰船。7 艘舰船中有一艘是正确答案。你只有一次机会：点击一艘舰船即可提交猜测，几秒内仍可撤销。猜对后会点亮一颗星，名称也会出现在星图中。",
+      "optionAria": "猜测：{{name}}",
       "state": {
-        "open": "开放",
+        "open": "未完成",
         "correct": "已识别",
         "wrong": "已揭晓",
         "unavailable": "不可用"
       },
       "head": {
-        "open": "在星图中点击你认出的飞船",
-        "correct": "已识别:{{name}}",
+        "open": "在星图中点击你认出的舰船",
+        "correct": "已识别：{{name}}",
         "wrong": "星图显示的是 {{name}}",
         "unavailable": "暂时还不能猜测"
       },
       "foot": {
-        "open": "猜对后,名称会出现在星图中,圆圈上会打勾。",
+        "open": "猜对后，名称会出现在星图中，圆圈上会打勾。",
         "wrong": "这次没有星星——答案会保留在星图中。",
-        "unavailable": "这张星图目前还没有设定要识别的飞船。待 Codex 获得该补丁的游戏数据后会自动选定,届时你就可以在这里猜测了。"
+        "unavailable": "这张星图目前还没有设定要识别的舰船。待 Codex 获得该补丁的游戏数据后会自动选定，届时你就可以在这里猜测了。"
       },
-      "undoToast": "已提交猜测:{{name}}"
+      "undoToast": "已提交猜测：{{name}}"
     },
     "series": {
-      "kind": "连续",
+      "kind": "连续记录",
       "count": "已连续点亮 {{n}} 张星图",
       "countOne": "已连续点亮 1 张星图",
-      "helpAria": "连续记录如何计算?",
-      "help": "连续记录统计你连续点亮星图的补丁数——至少一颗星,或者你的太阳升起。最新的星图仍在进行中,不会中断连续记录;如果更早的某张保持暗淡,则从头开始。路上的每个节点会在达到对应数字后解锁一项奖励,解锁后永久保留(你的最佳连续记录:{{best}})。",
-      "helpReserve": "连续记录统计你连续点亮星图的补丁数——至少一颗星,或者你的太阳升起。最新的星图仍在进行中,不会中断连续记录。你的燃料储备已就绪:这次有一张暗淡的星图也不会中断连续记录。解锁后永久保留(你的最佳连续记录:{{best}})。",
+      "helpAria": "连续记录如何计算？",
+      "help": "连续记录统计你连续点亮星图的补丁数——至少一颗星，或者你的太阳升起。最新的星图仍在进行中，不会中断连续记录；如果更早的某张保持暗淡，则从头开始。路上的每个节点会在达到对应数字后解锁一项奖励，解锁后永久保留（你的最佳连续记录：{{best}}）。",
+      "helpReserve": "连续记录统计你连续点亮星图的补丁数——至少一颗星，或者你的太阳升起。最新的星图仍在进行中，不会中断连续记录。你的燃料储备已就绪：这次有一张暗淡的星图也不会中断连续记录。解锁后永久保留（你的最佳连续记录：{{best}}）。",
       "roadAria": "连续奖励",
       "stopOn": "{{title}} – {{desc}} ✓ 已解锁 · 需点亮 {{at}} 张星图",
       "stopNext": "{{title}} – {{desc}} 下一个 · 需连续点亮 {{at}} 张星图",
@@ -8099,26 +8105,26 @@
     },
     "rankPage": {
       "title": "等级",
-      "subtitle": "七个阶段,一张与你一同成长的星图。",
+      "subtitle": "七个阶段，一张与你一同成长的星图。",
       "standingAria": "你当前的等级和星图",
       "current": "你的等级",
       "unranked": "暂无等级",
-      "unrankedMeaning": "在星图上点亮你的第一颗星,即可以观测者身份踏上晋升阶梯。",
+      "unrankedMeaning": "在星图上点亮你的第一颗星，即可以观测者身份踏上晋升阶梯。",
       "count": "已点亮 {{n}} 颗星",
       "countOne": "已点亮 1 颗星",
       "progressAria": "距离 {{name}} 的进度",
       "toNext": "距离 {{name}} 还差 {{n}} 颗星",
       "toNextOne": "距离 {{name}} 还差 1 颗星",
       "top": "已达到最高阶段。之后每一颗星仍会加入你的星空。",
-      "perks": "你的等级可提前体验测试版功能、提交物品建议,并获得下方的等级奖励。",
+      "perks": "你的等级可提前体验测试版功能、提交内容建议，并获得下方的等级奖励。",
       "mapOpen": "放大打开你的星图",
-      "mapAlt": "你的星图:你所有补丁的星座汇聚在同一片夜空",
-      "mapNone": "在星图上点亮你的第一颗星,你的星空就会出现在这里。",
+      "mapAlt": "你的星图：你所有补丁的星座汇聚在同一片夜空",
+      "mapNone": "在星图上点亮你的第一颗星，你的星空就会出现在这里。",
       "mapCaption": "你的星图",
       "mapUpdates": "每次晋升等级都会自动更新。",
       "downloadPhone": "手机壁纸",
-      "downloadUltrawide": "超宽屏(5120 × 1440)",
-      "downloadLocked": "点亮你的第一颗星,即可将你的星空下载为壁纸。",
+      "downloadUltrawide": "超宽屏（5120 × 1440）",
+      "downloadLocked": "点亮你的第一颗星，即可将你的星空下载为壁纸。",
       "ladderTitle": "七个阶段",
       "at": "需 {{n}} 颗星",
       "atOne": "需 1 颗星",
@@ -8129,16 +8135,16 @@
         "locked": "尚未达到"
       },
       "rewardsTitle": "等级奖励",
-      "rewardsLead": "每个阶段都会为你的星空增添一些东西。所有格式从第 1 阶段起均可使用;不同阶段会改变壁纸显示的内容和外观。",
+      "rewardsLead": "每个阶段都会为你的星空增添一些东西。所有格式从第 1 阶段起均可使用；不同阶段会改变壁纸显示的内容和外观。",
       "rewardFrom": "自 {{name}} 起",
       "reward": {
         "wallpaper": {
           "title": "全格式壁纸",
-          "desc": "将你的星空制成壁纸:4K(3840 × 2160)、手机竖屏和超宽屏(5120 × 1440)。"
+          "desc": "将你的星空制成壁纸：4K（3840 × 2160）、手机竖屏和超宽屏（5120 × 1440）。"
         },
         "badge": {
           "title": "可分享的徽章",
-          "desc": "你的徽章和最新星图,以公开链接形式分享给好友。"
+          "desc": "你的徽章和最新星图，以公开链接形式分享给好友。"
         },
         "companions": {
           "title": "伙伴",
@@ -8150,18 +8156,18 @@
         },
         "frame": {
           "title": "测绘环",
-          "desc": "在你的徽章周围添加第二道虚线圆环,所有显示徽章的地方都会出现。"
+          "desc": "在你的徽章周围添加第二道虚线圆环，所有显示徽章的地方都会出现。"
         },
         "deepfield": {
           "title": "深空",
           "desc": "你下载的每张壁纸背后都会有星云发光。"
         },
         "orbit": {
-          "title": "旋转罗盘玫瑰",
-          "desc": "你徽章上的星星会缓缓旋转,就像海图桌上的罗盘。"
+          "title": "旋转罗盘",
+          "desc": "你徽章上的星星会缓缓旋转，就像海图桌上的罗盘。"
         }
       },
-      "seriesTitle": "连续",
+      "seriesTitle": "连续记录",
       "extrasTitle": "徽章和奖励创意",
       "tier": {
         "observer": {
@@ -8182,7 +8188,7 @@
         },
         "astrographer": {
           "name": "天体制图师",
-          "meaning": "大约三个补丁的星星:后期奖励开启。"
+          "meaning": "大约三个补丁的星星：后期奖励开启。"
         },
         "master": {
           "name": "大师制图师",
@@ -8196,23 +8202,23 @@
     },
     "ideas": {
       "title": "奖励创意",
-      "lead": "未来等级应该赠送什么?团队会优先查看票数最高的创意。",
+      "lead": "未来等级应该赠送什么？团队会优先查看票数最高的创意。",
       "label": "你对新等级奖励的创意",
       "submit": "提交创意",
-      "sent": "谢谢!你的创意已加入列表。",
-      "locked": "从第 5 阶段起({{name}},{{stars}} 颗星)你可以提交创意并投票。",
+      "sent": "谢谢！你的创意已加入列表。",
+      "locked": "从第 5 阶段起（{{name}}，{{stars}} 颗星）你可以提交创意并投票。",
       "retry": "重试",
       "empty": "暂无创意。",
-      "votes": "票数:{{count}}",
-      "voteAria": "为这个创意投票,当前 {{votes}} 票",
+      "votes": "票数：{{count}}",
+      "voteAria": "为这个创意投票，当前 {{votes}} 票",
       "archived": "已归档",
       "archive": "归档",
-      "archiveTitle": "归档创意?",
+      "archiveTitle": "归档创意？",
       "archiveMessage": "“{{body}}”将从玩家列表中消失。"
     }
   },
   "beta": {
-    "aria": "新视图 (β)",
+    "aria": "新视图（β）",
     "area": {
       "verse": "Verse",
       "codex": "Codex 与 HQ",
@@ -8220,8 +8226,8 @@
     },
     "staffOnly": "仅限团队",
     "fab": {
-      "admin": "测试开关(管理员)",
-      "collaborator": "测试开关(协作者)"
+      "admin": "测试开关（管理员）",
+      "collaborator": "测试开关（协作者）"
     },
     "chip": {
       "title": "测试版区域",
@@ -8230,14 +8236,14 @@
   },
   "fusionBar": {
     "backTo": "返回 {{name}}",
-    "kindSwitch": "切换类别(当前:{{kind}})",
-    "removeFilter": "移除筛选:{{name}}",
+    "kindSwitch": "切换类别（当前：{{kind}}）",
+    "removeFilter": "移除筛选：{{name}}",
     "moreFilters": "再显示 {{count}} 个筛选",
     "hits": "{{count}} 个结果",
     "demo": {
       "ship": "Gladius",
       "patch": "补丁 4.10.2",
-      "item": "激光速射炮"
+      "item": "激光连发炮"
     },
     "filter": {
       "variants": "变体",
@@ -8245,27 +8251,27 @@
       "weaponGroup": "武器组"
     },
     "navAria": "主要区域",
-    "areaMenu": "切换区域 — 当前:{{area}}",
+    "areaMenu": "切换区域——当前：{{area}}",
     "home": "首页",
     "filters": "筛选",
     "sectionsAria": "本区域的子页面",
     "kinds": {
       "fps": "FPS",
-      "keybinds": "键位"
+      "keybinds": "按键绑定"
     },
     "ctx": {
       "all": "全部",
       "verse": "Verse",
-      "gallery": "图库",
+      "gallery": "画廊",
       "codex": "Codex",
       "codexIndex": "Codex · {{kind}}",
       "ship": "{{name}}",
-      "shipFallback": "这艘飞船",
+      "shipFallback": "这艘舰船",
       "codexDetail": "{{kind}}",
       "fps": "FPS",
       "hq": "我的 HQ",
       "hqPlan": "规划",
-      "hqNow": "当前",
+      "hqNow": "现在",
       "hqStock": "库存",
       "hqStats": "统计",
       "hqStockAll": "仓库",
@@ -8273,25 +8279,25 @@
       "hqStockSammlung": "收藏"
     },
     "placeholder": {
-      "all": "在所有内容中搜索 …",
-      "verse": "搜索飞船、补丁、新闻 …",
-      "gallery": "搜索图库或 Codex …",
-      "codex": "飞船、武器、组件 …",
-      "codexIndex": "在 Codex 中搜索 …",
-      "ship": "组件、武器、飞船 …",
-      "codexDetail": "在 Codex 中搜索 …",
-      "fps": "武器、护甲、装备 …",
-      "hq": "机库、套装、飞船 …",
-      "hqPlan": "为你的行动选择套装、部件或地点 …",
-      "hqNow": "飞船、地点或部件 …",
-      "hqStock": "在仓库中搜索 …",
-      "hqStats": "飞船或套装 …"
+      "all": "在所有内容中搜索…",
+      "verse": "搜索舰船、补丁、新闻…",
+      "gallery": "搜索画廊或 Codex …",
+      "codex": "舰船、武器、组件…",
+      "codexIndex": "在 Codex 中搜索…",
+      "ship": "组件、武器、舰船…",
+      "codexDetail": "在 Codex 中搜索…",
+      "fps": "武器、护甲、装备…",
+      "hq": "机库、套装、舰船…",
+      "hqPlan": "为你的出动选择套装、部件或地点…",
+      "hqNow": "舰船、地点或部件…",
+      "hqStock": "在仓库中搜索…",
+      "hqStats": "舰船或套装…"
     },
     "search": {
       "label": "搜索",
       "open": "打开搜索",
       "clear": "清除输入",
-      "dropContext": "移除上下文 — 在所有内容中搜索",
+      "dropContext": "移除上下文——在所有内容中搜索",
       "places": "页面",
       "here": "此处",
       "page": "页面",
@@ -8300,11 +8306,11 @@
       "newTabShort": "在新标签页中",
       "copyLink": "复制 {{name}} 的链接",
       "copyLinkShort": "复制链接",
-      "strip": "整个 Codex:{{n}} 个结果",
-      "stripBusy": "整个 Codex:搜索中 …",
+      "strip": "整个 Codex：{{n}} 个结果",
+      "stripBusy": "整个 Codex：搜索中…",
       "copied": "链接已复制",
       "keys": {
-        "dropContext": "位于输入起点:清除上下文"
+        "dropContext": "位于输入起点：清除上下文"
       },
       "action": {
         "add": "机库 +",
@@ -8316,16 +8322,16 @@
     "place": {
       "news": "新闻",
       "patches": "补丁",
-      "gallery": "图库",
+      "gallery": "画廊",
       "hangar": "机库",
       "spind": "套装",
       "hq": "HQ 概览",
-      "keybinds": "键位",
-      "upcoming": "已公布的飞船",
+      "keybinds": "按键绑定",
+      "upcoming": "已公布的舰船",
       "settings": "设置",
-      "releaseNotes": "新增内容",
+      "releaseNotes": "更新内容",
       "badge": "制图师徽章",
-      "ops": "行动",
+      "ops": "出动",
       "extension": "浏览器扩展",
       "download": "下载",
       "social": "社交"
@@ -8428,7 +8434,7 @@
       "grade": "等级 {{grade}}",
       "kind": "{{kind}}",
       "page": {
-        "gallery": "图库",
+        "gallery": "画廊",
         "fps": "FPS"
       },
       "wished": "愿望",
@@ -8452,7 +8458,7 @@
       "noValue": "没有匹配的值"
     },
     "cta": {
-      "myLoadout": "我的配置",
+      "myLoadout": "我的装载配置",
       "compareWith": "并排对比",
       "compare": "对比",
       "inSet": "已在套装中",
@@ -8460,21 +8466,21 @@
       "atRsi": "在 RSI",
       "allProducts": "所有产品",
       "add": "添加",
-      "whereStored": "在哪里?",
-      "whereInstalled": "安装在哪?",
-      "planOps": "规划行动",
+      "whereStored": "在哪里？",
+      "whereInstalled": "安装在哪？",
+      "planOps": "规划出动",
       "sourceOf": "获取途径",
       "openSet": "打开套装",
-      "fittingShips": "适配的飞船",
+      "fittingShips": "适配的舰船",
       "fittingWeapons": "匹配的武器",
       "mount": "安装",
-      "toEinsatz": "加入行动"
+      "toEinsatz": "加入出动"
     },
     "why": {
-      "ownHq": "排在最前,因为你在 HQ",
+      "ownHq": "排在最前，因为你在 HQ",
       "own": "你自己的结果优先",
-      "context": "排在最前,匹配 {{ctx}}",
-      "outside": "几乎完全匹配,但不在“{{chip}}”范围内"
+      "context": "排在最前，匹配 {{ctx}}",
+      "outside": "几乎完全匹配，但不在“{{chip}}”范围内"
     },
     "fit": {
       "fits": "适配 {{name}}",
@@ -8487,7 +8493,7 @@
     "group": {
       "own": "来自你的库存",
       "patch": "补丁",
-      "gallery": "图库",
+      "gallery": "画廊",
       "opened": "最近打开",
       "expand": "▾ 在此再显示 {{n}} 项",
       "collapse": "▴ 收起",
@@ -8498,28 +8504,28 @@
       "mission": "任务"
     },
     "own": {
-      "ship": "你的飞船",
-      "fitted": "已安装在你的飞船上",
+      "ship": "你的舰船",
+      "fitted": "已安装在你的舰船上",
       "lager": "在库存中",
       "sets": "在 {{n}} 个套装中",
-      "config": "你在“{{ship}}”上的配置",
+      "config": "你在“{{ship}}”上的装载配置",
       "set": "你的套装",
       "qty": "库存中有 {{n}} 件",
       "fittedOn": "在“{{name}}”上有 {{n}} 件",
-      "fittedMoreOne": "另有 1 艘飞船",
-      "fittedMore": "另有 {{n}} 艘飞船",
+      "fittedMoreOne": "另有 1 艘舰船",
+      "fittedMore": "另有 {{n}} 艘舰船",
       "setsOne": "在 1 个套装中"
     },
     "row": {
       "current": "你在这里",
       "variants": "变体",
-      "variantMine": "我的飞船",
+      "variantMine": "我的舰船",
       "variantsMore": "+{{n}}",
-      "variantsMoreAria": "飞船页面上还有 {{n}} 个变体",
+      "variantsMoreAria": "舰船页面上还有 {{n}} 个变体",
       "variantCurrent": "当前打开的是此变体",
       "patch": "补丁 {{line}}",
       "patchMeta": "补丁说明 · {{version}}",
-      "galleryMeta": "图库",
+      "galleryMeta": "画廊",
       "missionMeta": "任务",
       "missionVariants": "{{n}} 个变体"
     },
@@ -8529,28 +8535,28 @@
     },
     "newInPatch": "补丁 {{version}} 新增",
     "dym": {
-      "lead": "你是不是想找 …"
+      "lead": "你是不是想找…"
     },
     "keys": {
       "expand": "展开",
       "dropChip": "删除最后一个标签"
     },
     "hint": {
-      "lead": "提示:",
-      "tryAria": "试试看:{{hint}}"
+      "lead": "提示：",
+      "tryAria": "试试看：{{hint}}"
     },
     "signIn": {
-      "title": "要登录吗?",
+      "title": "要登录吗？",
       "message": "愿望、库存和行动都属于你的账号。请登录以保存。",
       "confirm": "前往登录"
     },
     "done": {
       "hangar": "“{{name}}”已在你的机库中",
       "compare": "“{{name}}”已加入对比",
-      "failed": "操作失败,请稍后再试",
+      "failed": "操作失败，请稍后再试",
       "einsatzAdded": "“{{name}}”现在是“{{op}}”中的一个步骤",
-      "einsatzNew": "已创建新行动“{{name}}”",
-      "einsatzFull": "“{{op}}”的步骤数已达行动上限"
+      "einsatzNew": "已创建新出动“{{name}}”",
+      "einsatzFull": "“{{op}}”的步骤数已达出动上限"
     },
     "hints": {
       "0": {
@@ -8590,11 +8596,11 @@
         "q": "qt"
       },
       "9": {
-        "t": "“pp”可找到电源",
+        "t": "“pp”可找到发电机",
         "q": "pp"
       },
       "10": {
-        "t": "“rep”可找到 Repeater 武器",
+        "t": "“rep”可找到连发炮",
         "q": "rep"
       },
       "11": {
@@ -8619,54 +8625,54 @@
       },
       "16": {
         "t": "“size 3”筛选尺寸 3",
-        "q": "3号"
+        "q": "size 3"
       },
       "17": {
         "t": "“s2 qd”可找到尺寸 2 的量子驱动器",
-        "q": "S2 量子驱动器"
+        "q": "s2 qd"
       },
       "18": {
         "t": "“grade a”只显示 A 级部件",
-        "q": "A级"
+        "q": "grade a"
       },
       "19": {
-        "t": "“stealth cooler”可找到隐形冷却器",
-        "q": "隐形冷却器"
+        "t": "“stealth cooler”可找到潜行冷却器",
+        "q": "stealth cooler"
       },
       "20": {
         "t": "“shield s1 mil”组合三个筛选条件",
-        "q": "S1 军用护盾"
+        "q": "shield s1 mil"
       },
       "21": {
-        "t": "“1 crew”可找到单座飞船",
-        "q": "1名船员"
+        "t": "“1 crew”可找到单座舰船",
+        "q": "1 crew"
       },
       "22": {
-        "t": "“freighter 100 scu”可找到大型货船",
-        "q": "货船 100 scu"
+        "t": "“freighter 100 scu”可找到大型货运舰",
+        "q": "freighter 100 scu"
       },
       "23": {
-        "t": "“salvage”可找到打捞飞船",
-        "q": "打捞"
+        "t": "“salvage”可找到打捞舰船",
+        "q": "salvage"
       },
       "24": {
         "t": "“bomber”可找到轰炸机和鱼雷艇",
-        "q": "轰炸机"
+        "q": "bomber"
       },
       "25": {
         "t": "“gimbal s3”可找到万向节挂载",
-        "q": "S3 云台"
+        "q": "gimbal s3"
       },
       "26": {
         "t": "“torpedo s9”可找到大型鱼雷",
-        "q": "S9 鱼雷"
+        "q": "torpedo s9"
       },
       "27": {
         "t": "“energy pistol”可找到激光手枪",
-        "q": "能量手枪"
+        "q": "energy pistol"
       },
       "28": {
-        "t": "输入你的飞船名称即可找到你的飞船"
+        "t": "输入你的舰船名称即可找到你的舰船"
       },
       "29": {
         "t": "“nighthawk”可找到你的 Gladius"
@@ -8679,11 +8685,11 @@
       },
       "32": {
         "t": "“my ships”显示你的机库",
-        "q": "我的舰船"
+        "q": "my ships"
       },
       "33": {
         "t": "“in hangar aegis”筛选你的机库",
-        "q": "在神盾机库中"
+        "q": "in hangar aegis"
       },
       "34": {
         "t": "在词前加“inventory”只搜索你的库存"
@@ -8692,23 +8698,23 @@
         "t": "在词前加“wishes”或“wishlist”只搜索你的愿望。愿望中的物品始终排在最前"
       },
       "36": {
-        "t": "在机库中,“patrol”可找到你的配置"
+        "t": "在机库中，“patrol”可找到你的配置"
       },
       "37": {
         "t": "“in inventory s3”显示你库存中尺寸 3 的物品",
-        "q": "在库存中 S3"
+        "q": "in inventory s3"
       },
       "38": {
         "t": "你自己的结果始终排在最前"
       },
       "39": {
-        "t": "在词前加“缺少”,只搜索你的行动"
+        "t": "在词前加“missing”，只搜索你的行动"
       },
       "40": {
         "t": "搜索会记住你从哪里打开它"
       },
       "41": {
-        "t": "在飞船页面,它会显示适配的内容"
+        "t": "在舰船页面，它会显示适配的内容"
       },
       "42": {
         "t": "带 ▾ 的标签可以切换"
@@ -8720,30 +8726,30 @@
         "t": "标签之外的近似精确匹配仍会显示"
       },
       "45": {
-        "t": "在武器页面:输入“s4”会显示替代品",
+        "t": "在武器页面：输入“s4”会显示替代品",
         "q": "s4"
       },
       "46": {
-        "t": "在库存中:输入“laser”会优先显示你的库存",
+        "t": "在库存中：输入“laser”会优先显示你的库存",
         "q": "laser"
       },
       "47": {
-        "t": "在任务规划中,它会显示获取途径"
+        "t": "在出动规划中，它会显示获取途径"
       },
       "48": {
-        "t": "“适配”只显示适配的部件",
-        "q": "适配"
+        "t": "“fits”只显示适配的部件",
+        "q": "fits"
       },
       "49": {
-        "t": "标签用于筛选,顺序则跟随页面"
+        "t": "标签用于筛选，顺序则跟随页面"
       },
       "50": {
-        "t": "“悬赏 任务”可找到悬赏任务",
-        "q": "悬赏 任务"
+        "t": "“bounty mission”可找到悬赏任务",
+        "q": "bounty mission"
       },
       "51": {
-        "t": "“蓝图 p4”会显示获取方式",
-        "q": "蓝图 p4"
+        "t": "“blueprint p4”会显示获取途径",
+        "q": "blueprint p4"
       },
       "52": {
         "t": "“hurston”可找到地点、任务和商店",
@@ -8762,28 +8768,28 @@
         "q": "4.3.2"
       },
       "56": {
-        "t": "“新增”会显示本次补丁带来的内容",
-        "q": "新增"
+        "t": "“new”会显示本次补丁带来的内容",
+        "q": "new"
       },
       "57": {
-        "t": "“即将推出”会显示已公布的飞船",
-        "q": "即将推出"
+        "t": "“upcoming”会显示已公布的舰船",
+        "q": "upcoming"
       },
       "58": {
-        "t": "“弹药 s3”可找到匹配的弹药",
-        "q": "弹药 s3"
+        "t": "“ammo s3”可找到匹配的弹药",
+        "q": "ammo s3"
       },
       "59": {
-        "t": "“重型 护甲”可找到重型护甲",
-        "q": "重型 护甲"
+        "t": "“heavy armor”可找到重型护甲",
+        "q": "heavy armor"
       },
       "60": {
         "t": "“medpen”可找到治疗装备",
         "q": "medpen"
       },
       "61": {
-        "t": "“按键 quantum”会显示量子按键",
-        "q": "按键 quantum"
+        "t": "“keybind quantum”会显示量子驱动器按键",
+        "q": "keybind quantum"
       },
       "62": {
         "t": "Ctrl K 可在任何地方打开搜索"
@@ -8792,7 +8798,7 @@
         "t": "“/”同样可以打开搜索"
       },
       "64": {
-        "t": "↑ ↓ 选择,↵ 打开"
+        "t": "↑ ↓ 选择，↵ 打开"
       },
       "65": {
         "t": "Ctrl ↵ 在新标签页中打开"
@@ -8801,70 +8807,70 @@
         "t": "→ 展开分组"
       },
       "67": {
-        "t": "Esc 关闭,你输入的文字会保留"
+        "t": "Esc 关闭，你输入的文字会保留"
       },
       "68": {
-        "t": "也可以使用英文:“quantum drive”",
-        "q": "quantum drive"
+        "t": "也支持简写：“qd s2”",
+        "q": "qd s2"
       },
       "69": {
-        "t": "拼写错误?搜索会询问“你是不是想找……”"
+        "t": "拼写错误？搜索会询问“你是不是想找……”"
       }
     },
     "outside": {
       "none": "“{{chip}}”中没有名为“{{term}}”的内容。",
-      "drop": "不使用“{{chip}}”,在全部范围内搜索 (⌫)"
+      "drop": "不使用“{{chip}}”，在全部范围内搜索（⌫）"
     }
   },
   "social": {
     "error": {
       "inviteNotFound": "此邀请链接已失效。",
-      "inviteExpired": "此邀请链接已过期,请重新索取一个。",
+      "inviteExpired": "此邀请链接已过期，请重新索取一个。",
       "inviteSelf": "这是你自己的邀请链接。",
-      "inviteRateLimited": "短时间内请求过多,请一小时后再试。",
-      "inviteLimit": "你今天创建的新邀请链接过多,请明天再试。",
-      "inviteFull": "这个人那里已有太多待处理的请求,请稍后再试。",
+      "inviteRateLimited": "短时间内请求过多，请一小时后再试。",
+      "inviteLimit": "你今天创建的新邀请链接过多，请明天再试。",
+      "inviteFull": "这个人那里已有太多待处理的请求，请稍后再试。",
       "invalidGroupKind": "不存在这种类型的群组。",
       "invalidGroupName": "名称长度必须为 1 到 60 个字符。",
       "groupNameTaken": "你已经有一个同名的群组了。",
       "groupNotFound": "该群组已不存在。",
       "groupLimit": "你已达到 50 个群组的上限。",
-      "groupFull": "该群组已满,共 100 位好友。",
-      "einsatzNotFound": "该行动已不可用。",
-      "einsatzClosed": "该行动已结束,不再接受回复。",
-      "configNotFound": "该飞船变体已不存在。",
+      "groupFull": "该群组已满，共 100 位好友。",
+      "einsatzNotFound": "该出动已不可用。",
+      "einsatzClosed": "该出动已结束，不再接受回复。",
+      "configNotFound": "该舰船变体已不存在。",
       "loadoutNotFound": "该套装已不存在。",
       "shareNotFound": "该分享已不存在。",
-      "tooManySlots": "一个行动最多有 12 个机组位置。",
-      "invalidSlotLabel": "位置名称长度必须为 1 到 40 个字符。",
-      "slotNotFound": "该机组位置已不存在。",
-      "slotTaken": "该机组位置已被占用。",
+      "tooManySlots": "一次出动最多有 12 个船员席位。",
+      "invalidSlotLabel": "席位名称长度必须为 1 到 40 个字符。",
+      "slotNotFound": "该船员席位已不存在。",
+      "slotTaken": "该船员席位已被占用。",
       "invalidAnswer": "无法进行此回复。",
       "notFriends": "此操作仅限好友。",
       "invalidTarget": "无法对此用户执行该操作。",
-      "teamFull": "该群组已满,共 50 名成员。",
-      "teamLimit": "你已加入 20 个群组,已达上限。",
-      "lastOwner": "你是最后一位所有者。请先将其他人设为所有者,或删除该群组。",
+      "teamFull": "该群组已满，共 50 名成员。",
+      "teamLimit": "你已加入 20 个群组，已达上限。",
+      "lastOwner": "你是最后一位所有者。请先将其他人设为所有者，或删除该群组。",
       "teamInvalidName": "名称长度必须为 1 到 40 个字符。",
       "teamInvalidRole": "该角色不存在。",
       "teamForbidden": "你在此群组中无权执行该操作。",
-      "teamRateLimited": "错误的验证码过多,请 15 分钟后再试。",
+      "teamRateLimited": "错误的验证码过多，请 15 分钟后再试。",
       "accountSuspended": "你的账号已被封禁。",
       "notApproved": "你的账号尚未通过审核。"
     },
     "compare": {
-      "ships": "飞船",
+      "ships": "舰船",
       "sets": "套装",
-      "einsaetze_planned": "计划中的行动",
-      "einsaetze_done": "已完成的行动",
-      "missions_30d": "行动(30 天)",
-      "kartograph_rank": "Kartograph 等级",
-      "active_days_30": "活跃天数(30 天)"
+      "einsaetze_planned": "计划中的出动",
+      "einsaetze_done": "已完成的出动",
+      "missions_30d": "任务（30 天）",
+      "kartograph_rank": "制图师等级",
+      "active_days_30": "活跃天数（30 天）"
     },
     "group": {
       "kind": {
         "org": "组织",
-        "einsatzgruppe": "行动群组"
+        "einsatzgruppe": "出动群组"
       }
     },
     "visibility": {
@@ -8876,33 +8882,33 @@
       },
       "title": "好友可见内容",
       "general": "通用",
-      "generalHint": "适用于所有好友,除非你在下方为某位好友另行设置。更改会立即保存。",
+      "generalHint": "适用于所有好友，除非你在下方为某位好友另行设置。更改会立即保存。",
       "facetHint": {
-        "hangar": "你的飞船(包括心愿单),不含备注和配置。",
-        "flagship": "你在机库顶部置顶的飞船。",
+        "hangar": "你的舰船（包括愿望清单），不含备注和配置。",
+        "flagship": "你在机库顶部置顶的舰船。",
         "presence": "你当前是否在线。绝不会显示具体时间。",
-        "stats": "飞船、套装、行动、活跃天数和 Kartograph 等级等数据。"
+        "stats": "舰船、套装、出动、活跃天数和制图师等级等数据。"
       },
       "perFriend": "按好友设置",
-      "perFriendHint": "选择一位好友,决定他看到的内容是否与其他人不同。",
-      "noFriends": "有了好友之后,你就可以在这里为每位好友单独设置。",
+      "perFriendHint": "选择一位好友，决定他看到的内容是否与其他人不同。",
+      "noFriends": "有了好友之后，你就可以在这里为每位好友单独设置。",
       "loading": "加载中……",
       "inherit": "与通用设置相同",
       "on": "开",
       "off": "关",
-      "result": "该好友可见:",
+      "result": "该好友可见：",
       "nothing": "以上均不可见",
       "eyebrow": "社交"
     },
     "teams": {
       "title": "群组",
-      "hint": "群组是通过邀请码加入的地方,与上面的私人好友列表不同。成员可以互相看到名称、昵称和角色,以及你与群组共享的行动(含机组位置和人数)。仅此而已:看不到机库、在线状态和好友列表。",
+      "hint": "群组是通过邀请码加入的地方，与上面的私人好友列表不同。成员可以互相看到名称、昵称和角色，以及你与群组共享的出动（含船员席位和人数）。仅此而已：看不到机库、在线状态和好友列表。",
       "namePlaceholder": "新群组名称",
       "create": "创建群组",
       "codePlaceholder": "邀请码",
       "join": "加入",
       "invalidCode": "此邀请码无效。它可能已被替换或已过期。",
-      "empty": "你还没有加入任何群组。创建一个,或使用邀请码加入。",
+      "empty": "你还没有加入任何群组。创建一个，或使用邀请码加入。",
       "members": "{{count}} 名成员",
       "membersLabel": "成员",
       "showMembers": "成员",
@@ -8910,17 +8916,17 @@
       "inviteCode": "邀请码",
       "expires": "有效期至 {{date}}",
       "rotate": "新邀请码",
-      "rotateTitle": "要替换邀请码吗?",
+      "rotateTitle": "要替换邀请码吗？",
       "rotateMessage": "“{{name}}”的旧邀请码将立即失效。已在群组中的人不受影响。",
       "leave": "退出",
-      "leaveTitle": "要退出此群组吗?",
-      "leaveMessage": "你将退出“{{name}}”,并且不再看到那里共享的行动。你自己的行动不会被删除。",
+      "leaveTitle": "要退出此群组吗？",
+      "leaveMessage": "你将退出“{{name}}”，并且不再看到那里共享的出动。你自己的出动不会被删除。",
       "delete": "删除群组",
-      "deleteTitle": "要删除此群组吗?",
-      "deleteMessage": "“{{name}}”将对所有成员删除。行动仍归其所有者所有,只是不再共享。",
+      "deleteTitle": "要删除此群组吗？",
+      "deleteMessage": "“{{name}}”将对所有成员删除。出动仍归其所有者所有，只是不再共享。",
       "removeMember": "移除",
-      "removeTitle": "要移除此成员吗?",
-      "removeMessage": "{{name}} 将失去对“{{group}}”及其中共享行动的访问权限。",
+      "removeTitle": "要移除此成员吗？",
+      "removeMessage": "{{name}} 将失去对“{{group}}”及其中共享出动的访问权限。",
       "makeAdmin": "设为管理员",
       "makeMember": "设为成员",
       "makeOwner": "设为所有者",
@@ -8931,31 +8937,31 @@
       }
     },
     "einsatz": {
-      "title": "共享的行动",
+      "title": "共享的出动",
       "audienceFriend": "一位好友",
       "audienceGroup": "一个群组",
       "pickAudience": "邀请好友或群组",
       "pickGroup": "选择群组",
-      "hint": "邀请一位好友加入你的某个行动,作为你们的共同目标。他可以查看各个步骤、回复并占用一个机组位置。没有单独的目标:行动本身就是计划。",
-      "mine": "邀请加入我的行动",
-      "withMe": "与我共享的行动",
-      "noneOwn": "请先在 HQ 中规划一个行动,然后就可以在这里邀请好友加入。",
-      "noFriends": "有了好友之后,你就可以在这里邀请他们加入行动。",
-      "noneShared": "还没有好友与你共享行动。",
-      "pickEinsatz": "行动",
+      "hint": "邀请一位好友加入你的某次出动，作为你们的共同目标。他可以查看各个步骤、回复并占用一个船员席位。没有单独的目标：出动本身就是计划。",
+      "mine": "邀请加入我的出动",
+      "withMe": "与我共享的出动",
+      "noneOwn": "请先在 HQ 中规划一次出动，然后就可以在这里邀请好友加入。",
+      "noFriends": "有了好友之后，你就可以在这里邀请他们加入出动。",
+      "noneShared": "还没有好友与你共享出动。",
+      "pickEinsatz": "出动",
       "pickFriend": "好友",
       "invite": "邀请",
       "invited": "已邀请好友。",
-      "already": "该好友已经是此行动的一员。",
-      "slotsLabel": "机组位置,用逗号分隔(最多 {{max}} 个)",
-      "slotsSave": "保存位置",
-      "crew": "机组",
-      "counts": "{{yes}} 人接受,{{maybe}} 人待定,{{no}} 人拒绝",
+      "already": "该好友已经是此次出动的一员。",
+      "slotsLabel": "船员席位，用逗号分隔（最多 {{max}} 个）",
+      "slotsSave": "保存席位",
+      "crew": "船员",
+      "counts": "{{yes}} 人接受，{{maybe}} 人待定，{{no}} 人拒绝",
       "noAnswers": "还没有人回复。",
       "open": "空缺",
       "taken": "已占用",
       "you": "你",
-      "take": "占用位置",
+      "take": "占用席位",
       "answer": "你的回复",
       "from": "来自 {{name}}"
     },
@@ -8969,18 +8975,18 @@
       "subtitle": "好友、邀请、群组以及与你的对比。",
       "visibilityButton": "好友可见内容",
       "online": "在线",
-      "emptyHint": "通过你的个人链接邀请他人,或输入准确的用户名。",
+      "emptyHint": "通过你的个人链接邀请他人，或输入准确的用户名。",
       "emptyCta": "前往邀请",
       "openFriend": "打开页面"
     },
     "notice": {
-      "text": "默认情况下,好友可以看到你的机库、旗舰、在线状态和对比数据。你可以在通用设置中以及按好友单独关闭。",
+      "text": "默认情况下，好友可以看到你的机库、旗舰、在线状态和对比数据。你可以在通用设置中以及按好友单独关闭。",
       "open": "设置",
       "dismiss": "知道了"
     },
     "invite": {
       "title": "邀请好友",
-      "hint": "发送链接,例如通过 Discord。打开链接并登录的人会向你发出好友请求,你仍需接受。",
+      "hint": "发送链接，例如通过 Discord。打开链接并登录的人会向你发出好友请求，你仍需接受。",
       "linkLabel": "你的邀请链接",
       "copy": "复制链接",
       "copied": "已复制",
@@ -8992,26 +8998,26 @@
     },
     "groups": {
       "title": "群组",
-      "privateNote": "群组是私密的。你的好友既看不到这些群组,也看不到自己在哪个群组中。一位好友可以加入多个群组。",
-      "shareNote": "加入群组的人会获得你与该群组共享的内容(行动、飞船变体)。被移除的人,或群组被删除时,将失去访问权限。你与群组共享的套装只会发给当前的成员。",
+      "privateNote": "群组是私密的。你的好友既看不到这些群组，也看不到自己在哪个群组中。一位好友可以加入多个群组。",
+      "shareNote": "加入群组的人会获得你与该群组共享的内容（出动、舰船变体）。被移除的人，或群组被删除时，将失去访问权限。你与群组共享的套装只会发给当前的成员。",
       "kindLabel": "群组类型",
       "namePlaceholder": "群组名称",
       "create": "创建群组",
-      "empty": "还没有群组。创建一个组织或行动群组来整理好友。",
+      "empty": "还没有群组。创建一个组织或出动群组来整理好友。",
       "noFriends": "你还没有可添加的好友。",
       "members": "成员",
       "rename": "重命名",
       "delete": "删除",
       "renameTitle": "重命名群组“{{name}}”",
-      "deleteTitle": "要删除群组“{{name}}”吗?",
-      "deleteMessage": "好友关系保持不变。你与该群组共享的内容,除非另有共享方式,否则他们将不再看到。",
-      "friendPageHint": "好友页面会显示他在你的哪些群组中,例如"
+      "deleteTitle": "要删除群组“{{name}}”吗？",
+      "deleteMessage": "好友关系保持不变。你与该群组共享的内容，除非另有共享方式，否则他们将不再看到。",
+      "friendPageHint": "好友页面会显示他在你的哪些群组中，例如"
     },
     "comparePanel": {
       "title": "对比",
-      "hint": "你们如何使用 Verse Companion,以及各自的游玩情况,与你对比。只会显示好友向你公开的内容。",
+      "hint": "你们如何使用 Verse Companion，以及各自的游玩情况，与你对比。只会显示好友向你公开的内容。",
       "loading": "加载中……",
-      "noFriends": "有了好友之后,你就可以在这里与他们对比。",
+      "noFriends": "有了好友之后，你就可以在这里与他们对比。",
       "with": "对比对象",
       "metric": "数值",
       "me": "你",
@@ -9023,12 +9029,12 @@
       "webNote": "网站的使用频率不会被记录。“活跃天数”是最接近的真实数据。"
     },
     "friendPage": {
-      "loading": "加载中 …",
+      "loading": "加载中…",
       "missingTitle": "未找到",
-      "missing": "此页面不存在,或对你不可见。仅限好友访问。",
+      "missing": "此页面不存在，或对你不可见。仅限好友访问。",
       "since": "自 {{date}} 起成为好友",
       "share": "分享内容",
-      "inGroups": "在你的群组中:",
+      "inGroups": "在你的群组中：",
       "fromFriend": "{{name}} 分享给你",
       "nothingShared": "暂无分享内容。",
       "fromMe": "由你分享",
@@ -9039,26 +9045,26 @@
       "hangarEmpty": "机库是空的。",
       "wishlist": "愿望",
       "kindSet": "套装",
-      "kindVariant": "型号",
-      "kindEinsatz": "任务",
-      "removeTitle": "要将 {{name}} 从好友中移除吗?",
-      "removeMessage": "移除后,你们互相分享的所有内容将不再可见。",
-      "blockTitle": "要屏蔽 {{name}} 吗?",
-      "blockMessage": "好友关系将结束,对方也无法再向你发送申请。"
+      "kindVariant": "变体",
+      "kindEinsatz": "出动",
+      "removeTitle": "要将 {{name}} 从好友中移除吗？",
+      "removeMessage": "移除后，你们互相分享的所有内容将不再可见。",
+      "blockTitle": "要屏蔽 {{name}} 吗？",
+      "blockMessage": "好友关系将结束，对方也无法再向你发送请求。"
     },
     "inviteLanding": {
       "title": "邀请",
-      "loading": "正在检查邀请 …",
+      "loading": "正在检查邀请…",
       "dead": "此邀请链接已失效。请重新索取一个。",
       "toSocial": "前往社交",
       "from": "{{name}} 邀请你成为好友。",
       "fromAnon": "你被邀请成为好友。",
-      "hint": "如果继续,对方将收到好友申请,并仍需接受。",
-      "accept": "发送申请",
-      "signInHint": "请登录后发送申请。之后你会回到这里。",
+      "hint": "如果继续，对方将收到好友请求，并仍需接受。",
+      "accept": "发送请求",
+      "signInHint": "请登录后发送请求。之后你会回到这里。",
       "signIn": "登录",
       "result": {
-        "pending": "已向 {{name}} 发送申请。对方接受后你们就是好友了。",
+        "pending": "已向 {{name}} 发送请求。对方接受后你们就是好友了。",
         "accepted": "你现在和 {{name}} 是好友了。",
         "already_friends": "你和 {{name}} 已经是好友了。"
       },
@@ -9080,12 +9086,12 @@
       "ownWish": "“{{name}}”到了",
       "ownWishDetail": "你的愿望实现了",
       "ownWishLeft": "“{{name}}”到了",
-      "ownWishLeftDetail": "一个愿望已实现,还剩 {{left}} 个"
+      "ownWishLeftDetail": "一个愿望已实现，还剩 {{left}} 个"
     },
     "err": {
       "failed": "操作失败。请重试。",
       "unavailable": "此处没有这个步骤。",
-      "wishAssigned": "这些物品已分配给某个 Operation。请通过对话框移除。"
+      "wishAssigned": "这些物品已分配给某个行动。请通过对话框移除。"
     },
     "hint": {
       "notYetInGame": "尚未加入游戏"
@@ -9118,9 +9124,9 @@
   },
   "wishRemoval": {
     "title": "移除 {{name}}",
-    "howMany": "要移除多少个?",
-    "caption": "这 {{n}} 件将被移除:",
-    "captionOne": "这件将被移除:",
+    "howMany": "要移除多少个？",
+    "caption": "这 {{n}} 件将被移除：",
+    "captionOne": "这件将被移除：",
     "barLabel": "这些物品的去向",
     "free": "{{n}} 个空闲",
     "fromOp": "{{n}} 个来自“{{name}}”",
@@ -9129,18 +9135,18 @@
     "rowLabel": "来自“{{name}}”的物品",
     "sum": "已分配 {{done}}/{{total}}",
     "keeps": "“{{name}}”还保留其他愿望。",
-    "lastStays": "此后“{{name}}”将没有愿望。其 {{n}} 个 Einsatz 会保留。",
-    "lastStaysOne": "此后“{{name}}”将没有愿望。其 Einsatz 会保留。",
-    "dissolves": "“{{name}}”没有 Einsatz,将随之一并解散。",
-    "alsoDissolve": "同时解散 Operation",
-    "alsoDissolveNamed": "同时解散 Operation“{{name}}”",
+    "lastStays": "此后“{{name}}”将没有愿望。其 {{n}} 次出动会保留。",
+    "lastStaysOne": "此后“{{name}}”将没有愿望。其出动会保留。",
+    "dissolves": "“{{name}}”没有出动，将随之一并解散。",
+    "alsoDissolve": "同时解散行动",
+    "alsoDissolveNamed": "同时解散行动“{{name}}”",
     "confirm": "移除 {{n}} 个",
     "confirmDissolve": "移除并解散",
-    "toastDissolved": "Operation 已随之解散。",
+    "toastDissolved": "行动已随之解散。",
     "release": {
-      "title": "要将 {{name}} 从 Operation 中解除吗?",
-      "text": "这 {{n}} 件物品会保留在你的愿望清单中,并重新变为空闲。",
-      "textOne": "该物品会保留在你的愿望清单中,并重新变为空闲。",
+      "title": "要将 {{name}} 从行动中解除吗？",
+      "text": "这 {{n}} 件物品会保留在你的愿望清单中，并重新变为空闲。",
+      "textOne": "该物品会保留在你的愿望清单中，并重新变为空闲。",
       "confirm": "解除",
       "deleteToo": "同时从愿望清单中删除"
     }
@@ -9172,10 +9178,10 @@
     "remove": "移除 {{name}}",
     "removeGroup": "移除分组 {{name}}",
     "removed": "已从你的愿望中移除 {{name}}",
-    "removedGroup": "已移除 {{name}}({{n}} 个愿望)",
+    "removedGroup": "已移除 {{name}}（{{n}} 个愿望）",
     "selected": "已选择",
     "clear": "取消全选",
-    "toNachschub": "加入 Operation",
+    "toNachschub": "加入行动",
     "kind": {
       "ship": "舰船",
       "vehicle": "载具",
@@ -9193,8 +9199,8 @@
       "add": "加入愿望",
       "dismiss": "不要推荐 {{name}}"
     },
-    "slotsFullHint": "7 个 Operation 位置已全部占用。所选内容将加入现有 Operation。",
-    "toExisting": "加入现有 Operation",
+    "slotsFullHint": "7 个行动槽位已全部占用。所选内容将加入现有行动。",
+    "toExisting": "加入现有行动",
     "open": "在 Codex 中打开“{{name}}”"
   },
   "pathCtl": {
@@ -9245,47 +9251,47 @@
       "hangar": "在机库中查看",
       "sammlung": "在收藏中查看"
     },
-    "whereTitle": "放在哪里?",
-    "otherPlace": "其他位置 …",
-    "otherPlaceholder": "输入位置",
-    "store": "放下",
-    "wishAssigned": "其中 {{n}} 个已分配给某个 Operation",
+    "whereTitle": "放在哪里？",
+    "otherPlace": "其他地点…",
+    "otherPlaceholder": "输入地点",
+    "store": "存放",
+    "wishAssigned": "其中 {{n}} 个已分配给某个行动",
     "assign": {
       "go": "分配",
-      "title": "分配给 Operation",
-      "howMany": "多少个?",
+      "title": "分配给行动",
+      "howMany": "多少个？",
       "ofWished": "共 {{n}} 个愿望",
       "ofFree": "共 {{n}} 个空闲",
       "newest": "最后创建",
-      "new": "新建 Operation",
+      "new": "新建行动",
       "newHint": "将自动建议名称",
-      "loading": "正在加载 Operation …",
-      "working": "正在分配 …",
-      "slots": "已占用 {{used}}/{{max}} 个位置",
-      "planHint": "你可以规划 Einsatz",
+      "loading": "正在加载行动…",
+      "working": "正在分配…",
+      "slots": "已占用 {{used}}/{{max}} 个槽位",
+      "planHint": "你可以规划出动",
       "inHq": "在 HQ 中",
-      "progress": "已完成 {{done}}/{{total}} 个 Einsatz",
-      "noEinsatz": "尚未规划 Einsatz",
-      "line": "Operation“{{name}}”中有 {{n}} 个",
-      "moreOne": "另有 1 个 Operation",
-      "more": "另有 {{n}} 个 Operation"
+      "progress": "已完成 {{done}}/{{total}} 次出动",
+      "noEinsatz": "尚未规划出动",
+      "line": "行动“{{name}}”中有 {{n}} 个",
+      "moreOne": "另有 1 个行动",
+      "more": "另有 {{n}} 个行动"
     },
     "own": {
-      "morePlacesOne": "另有 1 个位置",
-      "morePlaces": "另有 {{n}} 个位置"
+      "morePlacesOne": "另有 1 个地点",
+      "morePlaces": "另有 {{n}} 个地点"
     }
   },
   "itemStage": {
-    "aria": "展台:{{name}}",
+    "aria": "展台：{{name}}",
     "eyebrowSil": "剪影",
     "eyebrow3d": "3D 模型",
     "viewAria": "视图",
     "viewSilhouette": "剪影",
     "view3d": "3D 模型",
     "noSilhouette": "无剪影",
-    "noSilhouetteReason": "此版本中该物品没有剪影,以预览图代替。",
+    "noSilhouetteReason": "此版本中该物品没有剪影，以预览图代替。",
     "no3dReason": "此版本中没有该物品的 3D 模型。",
-    "inNachschub": "属于 Operation“{{name}}”",
+    "inNachschub": "属于行动“{{name}}”",
     "panelAria": "数值与信息",
     "tabsAria": "分区",
     "tab": {
@@ -9304,8 +9310,8 @@
   },
   "blueprintWish": {
     "craftTimes": "制作次数",
-    "button": "材料 ×{{n}} 加入心愿单",
-    "done": "{{n}}× {{name}}:材料已加入你的心愿单"
+    "button": "材料 ×{{n}} 加入愿望清单",
+    "done": "{{n}}× {{name}}：材料已加入你的愿望清单"
   },
   "adminEvents": {
     "eyebrow": "管理",
@@ -9369,10 +9375,10 @@
       "open": "工具",
       "close": "关闭工具",
       "group": "页面工具",
-      "beta": "Beta 功能"
+      "beta": "测试版功能"
     },
     "view": {
-      "toHolo": "切换到 Holotable",
+      "toHolo": "切换到全息桌",
       "toClassic": "切换到经典视图"
     },
     "share": {
