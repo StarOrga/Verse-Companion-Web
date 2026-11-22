@@ -5,6 +5,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { AuthService } from '../../auth/auth.service';
 import { SupabaseClientProvider } from '../../core/supabase.client';
+import { AccountPrefsService } from '../../core/account-prefs.service';
 import { SearchWishlistService } from '../../codex/search/search-wishlist.service';
 import { UndoToastService } from '../../shared/undo-toast/undo-toast.service';
 import { HangarService } from '../../hangar/hangar.service';
@@ -65,6 +66,7 @@ describe('HqStockComponent · Frachtdeck', () => {
         provideTranslateService({ fallbackLang: 'en' }),
         { provide: ActivatedRoute, useValue: { queryParamMap: qp, snapshot: {} } },
         { provide: SupabaseClientProvider, useValue: { client: {} } },
+        { provide: AccountPrefsService, useValue: { prefs: signal(null), set: () => undefined } },
         { provide: AuthService, useValue: { user: signal({ id: 'u1' }) } },
         { provide: HangarService, useValue: { ships: signal(ships), roleLoadouts: signal(opts.empty ? [] : [{ id: 'set1', name: 'Bergbau', role: 'mining', items: [] }]), isFlagship: () => false, error: signal(null) } },
         { provide: HqOwnershipService, useValue: { configs: signal([]), ensureLoaded: () => Promise.resolve(), configsForShip: (id: string) => (id === 'sh1' ? [{ id: 'c1' }, { id: 'c2' }] : []) } },
