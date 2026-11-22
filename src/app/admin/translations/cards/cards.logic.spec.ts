@@ -144,6 +144,14 @@ describe('Karteikarten logic: boxes', () => {
     expect(clear[0].line).toEqual({ key: 'admin.translations.cards.row.clear' });
   });
 
+  it('legacy cards waiting for the learn pass are named, never „alles geklärt“ (#396)', () => {
+    const row = (deck_open: number, deck_waiting: number) =>
+      langRows(board({ langs: [{ lang: 'de', judged: true, deck_open, deck_waiting, ai_decided: 0, ai_review: 0, ai_unsure: 0, ai_pending: 0 }] }))[0].line;
+    expect(row(0, 54)).toEqual({ key: 'admin.translations.cards.row.legacy', params: { count: 54 } });
+    expect(row(0, 1)).toEqual({ key: 'admin.translations.cards.row.legacyOne', params: { count: 1 } });
+    expect(row(3, 54)).toEqual({ key: 'admin.translations.cards.row.deck', params: { count: 3 } });
+  });
+
   it('a judged language links its automatic decisions („12 automatisch“, P3); KI languages never do', () => {
     const rows = langRows(board({ langs: board().langs.map((l) => (l.lang === 'de' ? { ...l, ai_review: 12 } : l)) }));
     expect(rows.map((r) => r.auto)).toEqual([12, 0, 0, 0, 0]);

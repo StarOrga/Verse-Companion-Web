@@ -157,6 +157,8 @@ export interface CardMoveResult {
 export interface CardDeck {
   lang: string;
   open_total: number;
+  /** Open cards from before karteikarten-neu: no params until the next learn pass (P14) upgrades them, so not in the deck. */
+  waiting_total?: number;
   affected_total: number;
   deck_affected: number;
   cards: TranslationCard[];
@@ -173,6 +175,8 @@ export interface BoardLang {
   lang: string;
   judged: boolean;
   deck_open: number;
+  /** Same as `CardDeck.waiting_total`: legacy open cards that wait for the next learn pass, never counted in `deck_open`. */
+  deck_waiting?: number;
   ai_decided: number;
   ai_review: number;
   ai_unsure: number;

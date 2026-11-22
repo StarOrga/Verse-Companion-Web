@@ -202,7 +202,7 @@ export interface CardMoment {
                   </g>
                 </svg>
               </div>
-              <h2 class="finish-h">{{ 'admin.translations.cards.finish.title' | translate: { lang: langName(lang()) } }}</h2>
+              <h2 class="finish-h">{{ (waiting() > 0 ? 'admin.translations.cards.finish.titleWaiting' : 'admin.translations.cards.finish.title') | translate: { lang: langName(lang()) } }}</h2>
               @if (s.cards > 0) {
                 <p class="finish-s">{{ 'admin.translations.cards.finish.sum' | translate: { cards: nTxt('cardsN', s.cards), texts: nTxt('textsN', s.texts) } }} · <b>+{{ fmt(s.points) }} {{ 'admin.translations.cards.finish.points' | translate }}</b></p>
                 @if (s.bonus > 0) {
@@ -219,6 +219,9 @@ export interface CardMoment {
                 </ul>
               } @else {
                 <p class="finish-s">{{ 'admin.translations.cards.finish.none' | translate }}</p>
+              }
+              @if (waiting() > 0) {
+                <p class="finish-s" data-test="finish-waiting">{{ cn('admin.translations.cards.finish.legacy', waiting()) | translate: { count: waiting() } }}</p>
               }
               <p class="finish-w">{{ 'admin.translations.cards.finish.when' | translate }}
                 @if (rest() > 0) { {{ cn('admin.translations.cards.finish.rest', rest()) | translate: { count: rest() } }} }
@@ -564,6 +567,8 @@ export class TranslationCardsComponent {
   });
   readonly summary = computed(() => finishSummary(this.session()));
   /** Open cards beyond this deck, re-checked by the next learn pass. */
+  /** Legacy open cards outside the deck until the next learn pass upgrades them (#396): the board counts them apart. */
+  readonly waiting = computed(() => (this.vetoMode() ? 0 : (this.deck()?.waiting_total ?? 0)));
   readonly rest = computed(() => Math.max(0, (this.deck()?.open_total ?? 0) - (this.deck()?.cards.length ?? 0)));
 
   private seq = 0;
