@@ -1,9 +1,9 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.294.0",
+  "current": "0.295.0",
   "releases": [
     {
-      "version": "0.294.0",
+      "version": "0.295.0",
       "date": "2026-11-22",
       "sections": [
         {
@@ -27,6 +27,26 @@
             {
               "title": "",
               "text": "Translation cost estimates in the game-string pipeline used list prices for batch jobs and showed twice the real cost."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.294.0",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Search: groups are ordered by their best match (exact name > word > partial > typo), equal groups go ships > components > weapons > items; the page context only breaks ties and never buries an exact hit; own hangar hits lead when they match as well."
+            },
+            {
+              "title": "",
+              "text": "Search: typo tolerance per word (e.g. \"libertor\" finds the Liberator), always ranked below real matches; class-name-only hits rank below name hits."
             }
           ]
         }
