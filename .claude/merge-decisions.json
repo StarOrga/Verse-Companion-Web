@@ -520,6 +520,26 @@
         "hunks": [
           "7dda1e63d901"
         ]
+      },
+      {
+        "ship": "claude/karteikarten-seite-rethink-59abdb",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map.mjs up-to-date)",
+        "decided": true,
+        "at": "2026-11-22T00:03:56.964Z",
+        "hunks": [
+          "0c29ba93cd75"
+        ]
+      },
+      {
+        "ship": "claude/karteikarten-seite-rethink-59abdb",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-22T00:03:56.964Z",
+        "hunks": [
+          "21a6e8a1588a"
+        ]
       }
     ],
     ".claude/project-map.md›generated›file counts": [
