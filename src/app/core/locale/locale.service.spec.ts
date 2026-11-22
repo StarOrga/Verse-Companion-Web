@@ -66,10 +66,10 @@ describe('LocaleService', () => {
     expect(svc.languageSetting()).toBe('de');
   });
 
-  it('ignores unusable profile values (legacy languages, missing column)', () => {
+  it('ignores unusable profile values (unknown languages, missing column)', () => {
     const svc = make();
     svc.setBrowserSignals({ languages: ['en-US'] });
-    svc.hydrateFromProfile('fr', null);
+    svc.hydrateFromProfile('xx', null);
     expect(svc.language()).toBe('en');
     expect(svc.region()).toBe('US');
     expect(svc.languageSetting()).toBe('auto');

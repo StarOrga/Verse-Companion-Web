@@ -14,6 +14,7 @@ import { AnalyticsService } from '../core/analytics.service';
 import { ComposerPrefsService } from '../core/composer-prefs.service';
 import { ConsentService } from '../core/consent.service';
 import { LocaleService } from '../core/locale/locale.service';
+import { APP_LANGUAGES } from '../core/locale/locale.types';
 import { SupabaseClientProvider } from '../core/supabase.client';
 import { BetaService } from '../core/beta.service';
 import { RoutineTintPrefsService } from '../admin/feedback/routine-tint-prefs.service';
@@ -232,8 +233,8 @@ describe('SettingsComponent layout', () => {
     trigger.click();
     fixture.detectChanges();
     const options = Array.from(el.querySelectorAll<HTMLElement>('.locale-field .option'));
-    // auto, de, en — no empty row on a required picker.
-    expect(options.length).toBe(3);
+    // auto plus every app language (de, en first) — no empty row on a required picker.
+    expect(options.length).toBe(1 + APP_LANGUAGES.length);
     options[2].click();
     fixture.detectChanges();
 

@@ -178,7 +178,8 @@ real figures are asked again wherever a decision is still open (`_job_run.ts`, t
 What this does not bound: the first attempts of a job of ONE group, and the first group of a larger
 job, are a batch that is paid when it is sent. `max_tokens` of a request is 2.5 times its estimated
 output (at least 2 048), which is the ceiling of what such a batch can cost; in the four delta jobs of
-2026-11-11 the bill was 0.78 to 1.05 times the estimate. The output estimate uses one measured ratio
+2026-11-11 the bill was 0.78 to 1.05 times the estimate (history: the table was 2x high then, see the note
+under "Rough cost"). The output estimate uses one measured ratio
 (German, `OUTPUT_TOK_PER_CHAR` in `_cost.ts`) for every language until others are measured - the
 probe is what catches a language whose tokens run longer.
 
@@ -291,12 +292,12 @@ German strings were translated again and shipped in the overlay. `cigTableFor` (
 one place that names the table; a language whose usable source says `use_cig_table = false` (ru in the
 korean slot) has none.
 
-## Rough cost (batch prices: Sonnet 5.5 $2/$10, Opus 5.5 $4/$20 per MTok)
+## Rough cost (batch prices: Sonnet 5.5 $1/$5, Opus 5.5 $2/$10, Haiku 5.5 $0.05/$0.25 per MTok)
 
 | Case | Order of magnitude |
 |---|---|
-| German full gap (`start_full`, tiered Opus for lore / Sonnet for the rest) | about 40 USD |
-| Delta of one upload | about 1–5 USD |
+| German full gap (`start_full`, tiered Opus for lore / Sonnet for the rest) | about 20 USD (the 40 USD of earlier versions of this page were the double-counted figure) |
+| Delta of one upload | about 0.5–2.5 USD |
 | 5 % judge sample + one post-edit pass | a few percent on top |
 
 The estimate stored on the job is a forecast (measured ratios: input ≈ 0.90 tokens/char, output
@@ -304,6 +305,16 @@ The estimate stored on the job is a forecast (measured ratios: input ≈ 0.90 to
 the real cost from each batch result's `usage` (cache read 0.1×, 1 h cache write 2×).
 Ledger rows are written before the status moves on, so a crash can only over-count a month, never
 under-count it.
+
+**Price table correction, 2026-11-22.** `PRICES` in `_cost.ts` held the list prices (Sonnet $2/$10,
+Opus $4/$20) under the heading "batch rate"; batches are 50 % of list (Sonnet $1/$5, Opus $2/$10, Haiku
+was already right). Until this fix every estimate, `estimate_usd`, `spent_usd`, job budget and ledger row
+was 2x the real cost (a German full job booked 33.85 USD and was billed about 17 USD on the Console on
+2026-11-21), and the monthly cap counted spend twice. **Ledger rows and `spent_usd` dated before
+2026-11-22 are double-counted**; read them halved (Haiku-only rows excepted), or compare with the
+Console. Figures in this page and in the history above that were measured before then (the 0.78 to 1.05
+ratio is bill/estimate, both from the same table, so it still holds) are in the old unit where they are
+dollar amounts. `shotsUsd` now takes its input price from the table (it had a hardcoded 3 USD/MTok).
 
 ## Room labels (`scc_room_*`)
 
@@ -359,7 +370,7 @@ All with an admin JWT or the service role (`sync_sources` also with the publisha
 | Case | Order of magnitude |
 |---|---|
 | `import_seed` / `sync_sources` | 0 USD (no model call) |
-| German with seed: the remaining AI gap (about 6 % uncovered text + ~2 400 placeholder rejects) | about 2–5 USD per language instead of about 40 USD |
+| German with seed: the remaining AI gap (about 6 % uncovered text + ~2 400 placeholder rejects) | about 1–2.5 USD per language instead of about 20 USD |
 | Arbiter pairwise comparison (Haiku class, batch, both orders) | cents per few thousand conflicts |
 
 ## Background passes (`translation_passes`)

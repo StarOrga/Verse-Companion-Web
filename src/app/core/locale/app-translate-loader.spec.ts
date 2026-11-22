@@ -4,6 +4,7 @@ import { signal } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { AppTranslateLoader, FALLBACK_DELAY_MS } from './app-translate-loader';
 import { LocaleService } from './locale.service';
+import type { AppLanguage } from './locale.types';
 
 /**
  * Guards the startup order: the active language never waits for the bundle's
@@ -11,7 +12,7 @@ import { LocaleService } from './locale.service';
  * off the wire until the page is up, unless English is really needed.
  */
 describe('AppTranslateLoader', () => {
-  const language = signal<'de' | 'en'>('de');
+  const language = signal<AppLanguage>('de');
   let http: HttpTestingController;
 
   const setup = (boot?: Window['__scI18nBoot']): AppTranslateLoader => {
@@ -89,6 +90,14 @@ describe('AppTranslateLoader', () => {
 
   it('does not delay English when it is active from the start', fakeAsync(() => {
     language.set('en');
+    const loader = setup();
+    loader.getTranslation('en').subscribe();
+    TestBed.tick();
+    http.expectOne('i18n/en.json').flush({});
+  }));
+
+  it('does not delay English under a machine-translated table that may lack keys', fakeAsync(() => {
+    language.set('ja');
     const loader = setup();
     loader.getTranslation('en').subscribe();
     TestBed.tick();
