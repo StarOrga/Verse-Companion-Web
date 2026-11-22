@@ -16,12 +16,18 @@
 }
 .sky { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
 .sky::before, .sky::after { content: ''; position: absolute; inset: 0; }
+/* Only the glow behind the hero. The stage runs under the footer (cinematic
+   layout: the footer sits on the stage's bottom edge), so a glow or a second
+   star layer at the bottom lay as a sheen over the footer and the scene's
+   planet, which no other page has. The extra stars fade out before the end. */
 .sky::before {
-  background:
-    radial-gradient(ellipse 50% 40% at 50% 38%, color-mix(in srgb, var(--sc-accent) 14%, transparent), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 50% 100%, color-mix(in srgb, var(--sc-accent) 8%, transparent), transparent 70%);
+  background: radial-gradient(ellipse 50% 40% at 50% 38%, color-mix(in srgb, var(--sc-accent) 14%, transparent), transparent 70%);
 }
-.sky::after { opacity: 0.45; @include stars.field(120, 1931, 1213, 29, (1px), (var(--sc-fg-0))); }
+.sky::after {
+  opacity: 0.45;
+  @include stars.field(120, 1931, 1213, 29, (1px), (var(--sc-fg-0)));
+  mask-image: linear-gradient(to bottom, #000 45%, transparent 75%);
+}
 
 .hero {
   position: relative;
@@ -30,10 +36,20 @@
   justify-content: center;
   gap: clamp(8px, 3vw, 24px);
   width: min(100%, 560px);
+  /* The labels hang below the orbs out of flow (see .node small), so the hero is
+     exactly one orb tall and its centre is the link's centre: the streak burst
+     and the badge sit on the same point. The margin keeps the labels' room
+     without moving that centre. */
+  margin-block-end: calc(8px + 1.4em);
 }
 .streaks { position: absolute; inset: 0; opacity: .7; pointer-events: none; }
-.node { position: relative; z-index: 1; display: grid; justify-items: center; gap: 8px; flex: none; }
+/* Both nodes are exactly one orb wide, whatever their label: a longer label
+   ("Data Uploader") no longer widens its node and shifts the link off the
+   midpoint between the two orbs. */
+.node { position: relative; z-index: 1; display: grid; justify-items: center; flex: none; }
 .node small {
+  position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  white-space: nowrap;
   font-family: var(--sc-font-display);
   font-size: max(.72rem, var(--sc-fs-floor));
   letter-spacing: .16em;
@@ -96,6 +112,8 @@
 .body ::ng-deep .err { color: var(--sc-danger); }
 .body ::ng-deep .actions { display: flex; flex-wrap: wrap; gap: var(--sc-space-2, 8px); justify-content: center; margin-top: var(--sc-space-1, 4px); }
 @media (max-width: 600px) {
+  /* Room for a label wider than its orb at the hero's outer edges. */
+  .hero { box-sizing: border-box; padding-inline: 28px; }
   .body ::ng-deep .actions { align-self: stretch; flex-direction: column; }
   .body ::ng-deep .actions > * { justify-content: center; }
 }

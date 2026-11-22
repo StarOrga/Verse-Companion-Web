@@ -18,6 +18,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NgTemplateOutlet } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { map } from 'rxjs';
+import { RoleService } from '../../auth/role.service';
 import { AnalyticsService } from '../../core/analytics.service';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
@@ -263,10 +264,12 @@ export interface CardMoment {
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z" /><path d="m13.5 6.5 4 4" /></svg>
                 {{ 'admin.translations.cards.own.short' | translate }} <kbd class="kbd desk" aria-hidden="true">{{ keys.own }}</kbd>
               </button>
-              <button type="button" scAction tier="secondary" data-test="act-accept-all" [disabled]="busy()" (click)="acceptAll()">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10" /></svg>
-                {{ 'admin.translations.cards.veto.acceptAll' | translate }}
-              </button>
+              @if (roles.isAdmin()) {
+                <button type="button" scAction tier="secondary" data-test="act-accept-all" [disabled]="busy()" (click)="acceptAll()">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10" /></svg>
+                  {{ 'admin.translations.cards.veto.acceptAll' | translate }}
+                </button>
+              }
             </div>
             <p class="swipe touch">
               <span>{{ 'admin.translations.cards.swipe.left' | translate: { label: ('admin.translations.cards.veto.wrong' | translate) } }}</span>
@@ -503,6 +506,8 @@ export class TranslationCardsComponent {
   private readonly zone = inject(NgZone);
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
   private readonly injector = inject(Injector);
+  /** Collaborators review cards too (/collab/translations); taking over a whole language at once stays an admin call. */
+  protected readonly roles = inject(RoleService);
 
   protected readonly keys = CARD_KEYS;
   protected readonly optionLabel = optionLabel;

@@ -230,7 +230,8 @@
     "translations": "AI translation",
     "social": "Social",
     "accountMenuRequests": "Account menu, {{count}} open friend requests",
-    "socialRequests": "Social, {{count}} open friend requests"
+    "socialRequests": "Social, {{count}} open friend requests",
+    "collabMenu": "Collaborator"
   },
   "impersonation": {
     "banner": {
@@ -3408,6 +3409,7 @@
       "play": "Play video"
     },
     "patchBoard": {
+      "today": "today",
       "switch": {
         "aria": "Choose channel",
         "live": "Live",
@@ -4542,6 +4544,7 @@
       },
       "jobErrors": {
         "unknown": "Unknown error in the translation job.",
+        "manual": "Ended by hand, outside the pipeline.",
         "base_build_missing": "The comparison build is missing.",
         "conflict": "The job was changed in parallel. Please reload.",
         "english_missing": "The English source strings are missing.",
@@ -9712,6 +9715,12 @@
       "step3": "Tap “Add” at the top right.",
       "addLabel": "Add",
       "done": "Got it"
+    }
+  },
+  "collab": {
+    "eyebrow": "Collaborator",
+    "translations": {
+      "subtitle": "Help the AI translation: flash cards in the languages you speak."
     }
   }
 }

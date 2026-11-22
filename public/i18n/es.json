@@ -3408,6 +3408,7 @@
       "play": "Reproducir vídeo"
     },
     "patchBoard": {
+      "today": "hoy",
       "switch": {
         "aria": "Elegir canal",
         "live": "Live",

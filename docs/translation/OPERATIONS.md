@@ -91,6 +91,13 @@ A transient error (network, R2) only bumps `stats.attempts`; the next tick retri
 count is of errors in a row: a slice that commits and a wait that is asked without an error both start
 it again, so a job that waits a day for a batch does not end on five network errors spread over it.
 
+`translate.english_missing` means the build has no English table in R2 (`codex-locale/<build>/en/index.json`).
+Since this fix the locale publish after a finalize runs as a chain of requests, one language each
+(`ingest-catalog/_locale-chain.ts`); before, it ran on the spent finalize worker and died for 4.10.3 LIVE
+(2026-11-21) without a trace but a log line. Remedy: `ingest-catalog` `{"op":"locale_publish","build_id":"<uuid>"}`
+(no `lang`: all languages, and it opens the delta jobs). `start_full` refuses such a build at once now.
+An `error` that is no `translate.*` key was written by hand (SQL); the admin list shows it as "ended by hand".
+
 A job that ends (published, failed, skipped, cancelled) carries `stats.sweep` until a later tick has
 deleted `translation-work/<job>/`, 150 objects per slice.
 

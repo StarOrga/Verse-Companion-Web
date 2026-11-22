@@ -230,7 +230,8 @@
     "translations": "KI-Übersetzung",
     "social": "Social",
     "accountMenuRequests": "Konto-Menü, {{count}} offene Freundschaftsanfragen",
-    "socialRequests": "Social, {{count}} offene Freundschaftsanfragen"
+    "socialRequests": "Social, {{count}} offene Freundschaftsanfragen",
+    "collabMenu": "Collaborator"
   },
   "impersonation": {
     "banner": {
@@ -3408,6 +3409,7 @@
       "play": "Video abspielen"
     },
     "patchBoard": {
+      "today": "heute",
       "switch": {
         "aria": "Kanal wählen",
         "live": "Live",
@@ -4542,6 +4544,7 @@
       },
       "jobErrors": {
         "unknown": "Unbekannter Fehler im Übersetzungsauftrag.",
+        "manual": "Von Hand beendet, außerhalb der Pipeline.",
         "base_build_missing": "Der Vergleichs-Build fehlt.",
         "conflict": "Der Auftrag wurde parallel geändert. Bitte neu laden.",
         "english_missing": "Die englischen Quelltexte fehlen.",
@@ -9712,6 +9715,12 @@
       "step3": "Tippe oben rechts auf „Hinzufügen“.",
       "addLabel": "Hinzufügen",
       "done": "Verstanden"
+    }
+  },
+  "collab": {
+    "eyebrow": "Collaborator",
+    "translations": {
+      "subtitle": "Hilf der KI-Übersetzung: Karteikarten in den Sprachen, die du sprichst."
     }
   }
 }
