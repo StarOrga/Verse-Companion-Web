@@ -1,7 +1,39 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.293.0",
+  "current": "0.294.0",
   "releases": [
+    {
+      "version": "0.294.0",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Starscape sign-in now ends on the website's connect screen: after connecting, the browser tab shows \"Verbunden\" in the same stage as the Data Uploader instead of a bare Starscape page. Failures name their cause there (wrong sign-in session, no sign-in received). Needs Starscape 0.12.0; older versions keep their own page."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.293.1",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Feedback routine: a topic is marked shipped only when the requested change is done; a ship reply never ends in an open question (decided default stated as fact, or the topic is parked as a question instead)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.293.0",
       "date": "2026-11-22",
