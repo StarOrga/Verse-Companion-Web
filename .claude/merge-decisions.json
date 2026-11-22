@@ -875,6 +875,21 @@
         "hunks": [
           "b3f5a9300359"
         ]
+      },
+      {
+        "ship": "#1246",
+        "by": "Jerry",
+        "value": "3767 tracked files."
+      },
+      {
+        "ship": "feat/starscape-connect-stage-handoff",
+        "by": "JerryT2T",
+        "value": "3771 tracked files. (regenerated count of the merged tree)",
+        "decided": true,
+        "at": "2026-11-22T01:23:53.079Z",
+        "hunks": [
+          "e8d13c3622d3"
+        ]
       }
     ],
     ".claude/project-map.md›header›tracked-files": [
