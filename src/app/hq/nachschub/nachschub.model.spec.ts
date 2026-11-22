@@ -147,7 +147,7 @@ describe('nachschub.model', () => {
       expect(part.rise).toBe(1);
     });
 
-    it('closes when the inventory rose by the need (manual or SCC-App, both raise the stock)', () => {
+    it('closes when the inventory rose by the need (manual or VC-App, both raise the stock)', () => {
       const s = lineStatus(line, { l1: 5 }, 7);
       expect(s.closed).toBe(true);
       expect(s.by).toBe('inventory');

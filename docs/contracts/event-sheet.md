@@ -35,7 +35,7 @@ mechanism is flexible** - nothing is locked to today's events. Every value may b
 - Ids (`venues`, `area.kind`, `progress.model`, gear, track/reward ids) are lowercase slugs
   (`[a-z0-9-]`); unknown slugs are **kept**, not rejected.
 - A venue is independent of the area: an event can list `["verse","arena-commander"]` with an area of its own. Arena
-  Commander is matched by the SCC-App mode, not by place (`isInEventArea`).
+  Commander is matched by the VC-App mode, not by place (`isInEventArea`).
 - `rewards[].channel`: `pledge | ingame | both | unknown`. `timing.kind`: `immediate | after-end | date | unknown`
   (`after-end` rewards show as "wartet auf Verteilung" until ticked). `className` is the exact Codex class_name of what
   is delivered; wishlist dedupe compares exactly this value (never the base item).

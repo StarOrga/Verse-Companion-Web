@@ -27,7 +27,7 @@ describe('HqAppConnectionService', () => {
     expect(s.connected()).toBe(false);
   });
 
-  it('SCC app reporting a fresh life sign: connected', () => {
+  it('VC app reporting a fresh life sign: connected', () => {
     const s = setup({ presence: { at: new Date().toISOString(), gameRunning: false } });
     expect(s.everConnected()).toBe(true);
     expect(s.connected()).toBe(true);

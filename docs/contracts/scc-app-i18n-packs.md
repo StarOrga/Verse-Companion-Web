@@ -1,4 +1,4 @@
-# SCC-App language packs on SCC-Web
+# VC-App language packs on VC-Web
 
 The desktop app's i18n pack service (`modules/desktop/src/i18n-pack-service.js` in
 StarOrga/Verse-Companion-App) downloads corrected UI language packs from the website, so a

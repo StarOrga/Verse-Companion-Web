@@ -1,4 +1,4 @@
-# HQ inventory quality contract (desktop <-> SCC-Web)
+# HQ inventory quality contract (desktop <-> VC-Web)
 
 Contract version: 1 (2026-11-09, migration `20261109000100_hq_inventory_quality_reservations.sql`).
 Companion of `hq-live.md`. The desktop app writes the field **`quality`** of the table **`hq_inventory_stacks`**.

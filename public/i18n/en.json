@@ -5125,7 +5125,7 @@
       "openSource": {
         "title": "Open source",
         "p1": "The entire application is developed in the open. Every change is publicly reviewable on GitHub — this is the same code that runs on this site.",
-        "repoLink": "Source code on GitHub (StarOrga/Star-Citizen-Companion-Web)"
+        "repoLink": "Source code on GitHub (StarOrga/Verse-Companion-Web)"
       },
       "data": {
         "title": "Your data",
@@ -7850,7 +7850,7 @@
       "title": "Logbook",
       "loading": "Loading the logbook …",
       "retry": "Try again",
-      "empty": "No game session yet. Connect the SCC App and every session shows up here as a card.",
+      "empty": "No game session yet. Connect the VC App and every session shows up here as a card.",
       "emptyLinked": "No game session recorded in the last 30 days.",
       "jumps": "Quantum jumps",
       "contracts": "Contracts",
@@ -7882,7 +7882,7 @@
         "live": "Running now"
       },
       "showAll": "Show all {{n}} sessions",
-      "note": "Sessions of the last {{days}} days from the SCC App. The aUEC balance is sells minus buys.",
+      "note": "Sessions of the last {{days}} days from the VC App. The aUEC balance is sells minus buys.",
       "durH": "{{h}} h {{m}} min",
       "durM": "{{m}} min"
     }

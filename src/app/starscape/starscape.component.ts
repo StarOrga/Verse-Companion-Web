@@ -682,7 +682,7 @@ export class StarscapeComponent implements OnInit {
    * (or the resolver fails), so the button always works.
    */
   readonly appDownloadUrl =
-    'https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/wallpaper-app-latest/starscape-wallpaper.exe';
+    'https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/wallpaper-app-latest/starscape-wallpaper.exe';
 
   /** Registered-build download URL when available, else the never-stale alias. */
   readonly downloadUrl = computed(() => this.svc.desktopRelease()?.downloadUrl ?? this.appDownloadUrl);

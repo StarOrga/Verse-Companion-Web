@@ -62,7 +62,7 @@ describe('HqNowComponent', () => {
   });
 
   it('tells a connected app without live data to enable the sync', () => {
-    // Only the SCC app counts (events from it, no live state yet).
+    // Only the VC app counts (events from it, no live state yet).
     const f = mount(fakeLive(null), 'connected');
     const el = f.nativeElement as HTMLElement;
     expect(el.querySelector('.connect .connect-title')?.textContent).toContain('hq.now.connect.syncOffTitle');

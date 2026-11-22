@@ -5107,7 +5107,7 @@
       "openSource": {
         "title": "Open source",
         "p1": "Toute l'application est développée en public. Chaque modification est consultable sur GitHub — c'est le même code que celui qui fait tourner ce site.",
-        "repoLink": "Code source sur GitHub (StarOrga/Star-Citizen-Companion-Web)"
+        "repoLink": "Code source sur GitHub (StarOrga/Verse-Companion-Web)"
       },
       "data": {
         "title": "Tes données",
@@ -7775,7 +7775,7 @@
       "title": "Journal de bord",
       "loading": "Chargement du journal de bord …",
       "retry": "Réessayer",
-      "empty": "Aucune session de jeu pour l'instant. Connecte l'app SCC et chaque session apparaîtra ici sous forme de carte.",
+      "empty": "Aucune session de jeu pour l'instant. Connecte l'app VC et chaque session apparaîtra ici sous forme de carte.",
       "emptyLinked": "Aucune session de jeu enregistrée ces 30 derniers jours.",
       "jumps": "Sauts quantiques",
       "contracts": "Contrats",
@@ -7807,7 +7807,7 @@
         "live": "En cours"
       },
       "showAll": "Afficher les {{n}} sessions",
-      "note": "Sessions des {{days}} derniers jours depuis l'app SCC. Le bilan aUEC correspond aux ventes moins les achats.",
+      "note": "Sessions des {{days}} derniers jours depuis l'app VC. Le bilan aUEC correspond aux ventes moins les achats.",
       "durH": "{{h}} h {{m}} min",
       "durM": "{{m}} min"
     }

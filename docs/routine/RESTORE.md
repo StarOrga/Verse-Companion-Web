@@ -20,10 +20,10 @@ Order matters. How it works: [`../feedback-routine/watcher.md`](../feedback-rout
 
 ## Steps
 
-1. **Clone and deps.** `git clone https://github.com/StarOrga/Star-Citizen-Companion-Web.git P:\Projects\Star-Citizen-Companion-Web`. The path matters: the prompt names it as REPO. On another path, edit the prompt and sync it.
+1. **Clone and deps.** `git clone https://github.com/StarOrga/Verse-Companion-Web.git P:\Projects\Verse-Companion-Web`. The path matters: the prompt names it as REPO. On another path, edit the prompt and sync it.
 2. **Claude CLI and plugin.** Install Claude Code (`claude` on PATH), `/login`, then `claude plugin marketplace add https://github.com/Jerry0022/dotclaude.git` and `claude plugin install devops@dotclaude`. Trust the folder once by running `claude` in the primary checkout.
 3. **Auth.** `gh auth login` (the account that can open PRs on StarOrga), `supabase login`, then `powershell -ExecutionPolicy Bypass -File scripts/set-supabase-env.ps1`. Verify: `node scripts/routine-gate.mjs check --dry-run` prints a JSON verdict.
-4. **Register.** From the primary checkout: `npm run watcher -- install`. It copies the prompt to `~/.claude/scheduled-tasks/scc-feedback-headless/SKILL.md` and registers "SCC Feedback Watcher" (every 3 min and at logon, hidden, for the logged-on user).
+4. **Register.** From the primary checkout: `npm run watcher -- install`. It copies the prompt to `~/.claude/scheduled-tasks/scc-feedback-headless/SKILL.md` and registers "VC Feedback Watcher" (every 3 min and at logon, hidden, for the logged-on user).
 5. **Verify.** `npm run verify:routine-prompts` prints OK, `npm run watcher -- status` shows the task, and `public.routine_heartbeat.last_seen_at` moves within 3 minutes.
 
 ## Keeping the backup fresh

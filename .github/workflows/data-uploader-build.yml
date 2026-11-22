@@ -168,7 +168,7 @@ jobs:
             if (git tag -l $tag) { Write-Error "$tag already exists - bump data-uploader/package.json first"; exit 1 }
             # The public mirror is what installs download: a release there means
             # this version is out, even when the source tag is missing.
-            gh release view $tag --repo StarOrga/Star-Citizen-Companion-Binaries --json tagName 2>$null | Out-Null
+            gh release view $tag --repo StarOrga/Verse-Companion-Binaries --json tagName 2>$null | Out-Null
             if ($LASTEXITCODE -eq 0) { Write-Error "$tag is already on the public mirror - bump data-uploader/package.json first"; exit 1 }
             $global:LASTEXITCODE = 0
           }
@@ -252,7 +252,7 @@ jobs:
             Automated build from tag ${{ steps.rel.outputs.tag }}.
 
             **Public download (end-users):** see the matching release in
-            [StarOrga/Star-Citizen-Companion-Binaries](https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/tag/${{ steps.rel.outputs.tag }})
+            [StarOrga/Verse-Companion-Binaries](https://github.com/StarOrga/Verse-Companion-Binaries/releases/tag/${{ steps.rel.outputs.tag }})
             — that's the URL `electron-updater` and the `desktop_releases`
             row should point at.
 
@@ -261,14 +261,14 @@ jobs:
       - name: Publish to PUBLIC binaries-mirror release (end-user download)
         # End-users with the installed Tool can't authenticate to GitHub, so
         # the auto-update download URL must be publicly accessible. We
-        # publish a mirror release in the public `Star-Citizen-Companion-Binaries`
+        # publish a mirror release in the public `Verse-Companion-Binaries`
         # repo via a fine-grained PAT (scope: Contents R/W on that repo
         # only) stored as `BINARIES_RELEASE_TOKEN`. See
         # https://github.com/StarOrga/Star-Citizen-Companion-Web/issues/7
         # for the full rationale.
         uses: softprops/action-gh-release@v3
         with:
-          repository: StarOrga/Star-Citizen-Companion-Binaries
+          repository: StarOrga/Verse-Companion-Binaries
           token: ${{ secrets.BINARIES_RELEASE_TOKEN }}
           tag_name: ${{ steps.rel.outputs.tag }}
           name: ${{ steps.rel.outputs.tag }}
@@ -301,7 +301,7 @@ jobs:
           $remote = ''
           for ($i = 0; $i -lt 5 -and -not $remote; $i++) {
             try {
-              $yml = (Invoke-WebRequest -UseBasicParsing "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/$tag/latest.yml").Content
+              $yml = (Invoke-WebRequest -UseBasicParsing "https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/$tag/latest.yml").Content
               if ($yml -is [byte[]]) { $yml = [Text.Encoding]::UTF8.GetString($yml) }
               $remote = ([regex]::Match($yml, '(?m)^sha512:\s*(\S+)')).Groups[1].Value
             } catch { Start-Sleep -Seconds 10 }
@@ -344,8 +344,8 @@ jobs:
           $setupSize = $setupFile.Length
           $portableSize = $portableFile.Length
 
-          $setupUrl = "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/$tag/$($setupFile.Name)"
-          $portableUrl = "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/$tag/$($portableFile.Name)"
+          $setupUrl = "https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/$tag/$($setupFile.Name)"
+          $portableUrl = "https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/$tag/$($portableFile.Name)"
 
           # The full release token is a masked secret and is NEVER printed here.
           # Fetch it from the workflow's private artefact and paste it for <UUID>:

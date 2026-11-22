@@ -34,7 +34,7 @@ must not do").
 | 2 | **Pushed, no PR, not in main** — an orphan branch | `gh pr list --state all --limit 200 --json headRefName --jq '.[].headRefName' \| sort -u` vs. `git for-each-ref --format='%(refname:short)' refs/remotes/origin`, minus branches already an ancestor of `origin/main` (`git merge-base --is-ancestor origin/<b> origin/main`) |
 | 3 | **Stale worktrees / stashes** — abandoned workbenches | `git worktree list` (branch merged or gone?) · `git stash list` |
 | 4 | **Pending promote** — alpha ahead of beta/stable | desktop: the join below · web: newest `alpha/v*` tag vs. newest `stable/v*` / `beta/v*` tag |
-| 5 | **Unregistered desktop release** — a tag/mirror release with no `desktop_releases` row | `gh release list --repo StarOrga/Star-Citizen-Companion-Binaries --limit 5` vs. the newest `desktop_releases.version` per product (query below); a CI-retry tag (`v0.30.1`) can carry a binary version (`0.30.0`) — compare the binary version |
+| 5 | **Unregistered desktop release** — a tag/mirror release with no `desktop_releases` row | `gh release list --repo StarOrga/Verse-Companion-Binaries --limit 5` vs. the newest `desktop_releases.version` per product (query below); a CI-retry tag (`v0.30.1`) can carry a binary version (`0.30.0`) — compare the binary version |
 
 ```sql
 -- pending promotes, desktop products (alpha ahead of beta/stable = a promote nobody ran)

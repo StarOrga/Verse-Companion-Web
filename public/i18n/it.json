@@ -5107,7 +5107,7 @@
       "openSource": {
         "title": "Open source",
         "p1": "L'intera applicazione è sviluppata in modo aperto. Ogni modifica è verificabile pubblicamente su GitHub: è lo stesso codice che gira su questo sito.",
-        "repoLink": "Codice sorgente su GitHub (StarOrga/Star-Citizen-Companion-Web)"
+        "repoLink": "Codice sorgente su GitHub (StarOrga/Verse-Companion-Web)"
       },
       "data": {
         "title": "I tuoi dati",
@@ -7775,7 +7775,7 @@
       "title": "Diario di bordo",
       "loading": "Caricamento del diario di bordo …",
       "retry": "Riprova",
-      "empty": "Ancora nessuna sessione di gioco. Collega la SCC App e ogni sessione apparirà qui come una scheda.",
+      "empty": "Ancora nessuna sessione di gioco. Collega la VC App e ogni sessione apparirà qui come una scheda.",
       "emptyLinked": "Nessuna sessione di gioco registrata negli ultimi 30 giorni.",
       "jumps": "Salti quantici",
       "contracts": "Contratti",
@@ -7807,7 +7807,7 @@
         "live": "In corso"
       },
       "showAll": "Mostra tutte le {{n}} sessioni",
-      "note": "Sessioni degli ultimi {{days}} giorni dalla SCC App. Il bilancio aUEC è vendite meno acquisti.",
+      "note": "Sessioni degli ultimi {{days}} giorni dalla VC App. Il bilancio aUEC è vendite meno acquisti.",
       "durH": "{{h}} h {{m}} min",
       "durM": "{{m}} min"
     }

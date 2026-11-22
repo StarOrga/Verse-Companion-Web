@@ -10,7 +10,7 @@ browsable Codex of ships and components datamined from the live build, gives you
 a personal Hangar, and hosts companion tools like the Starscape App.
 
 - **Web app:** <https://versecompanion-alpha.vercel.app>
-- **Source:** [StarOrga/Star-Citizen-Companion-Web](https://github.com/StarOrga/Star-Citizen-Companion-Web)
+- **Source:** [StarOrga/Verse-Companion-Web](https://github.com/StarOrga/Verse-Companion-Web)
 - **Stack:** Angular 22 PWA · Supabase (Auth, Postgres, Storage, Edge Functions) · Vercel
 - **Licence:** MIT
 - **Ads / tracking:** none

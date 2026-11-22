@@ -91,8 +91,8 @@ So step 5b runs as five rules, in this order:
 
    ```bash
    SHA=$(git rev-parse origin/main)   # the squash-merge commit
-   gh api "repos/StarOrga/Star-Citizen-Companion-Web/deployments?sha=$SHA&environment=Production" --jq '.[].id'
-   gh api "repos/StarOrga/Star-Citizen-Companion-Web/deployments/<id>/statuses" --jq '.[0].state'
+   gh api "repos/StarOrga/Verse-Companion-Web/deployments?sha=$SHA&environment=Production" --jq '.[].id'
+   gh api "repos/StarOrga/Verse-Companion-Web/deployments/<id>/statuses" --jq '.[0].state'
    # state: success | failure | in_progress
    ```
 

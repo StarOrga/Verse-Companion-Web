@@ -30,7 +30,7 @@ const RSI_STATUS_URL = 'https://status.robertsspaceindustries.com/';
  * and the website never has to know a version number.
  */
 export const SCC_INSTALLER_URL =
-  'https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/scc-app-latest/SCC-Standalone-Setup.exe';
+  'https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/scc-app-latest/SCC-Standalone-Setup.exe';
 
 /**
  * How often the header chip re-checks the verse status, and how old the feed

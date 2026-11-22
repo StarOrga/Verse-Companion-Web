@@ -131,7 +131,7 @@ jobs:
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v3
         with:
-          repository: StarOrga/Star-Citizen-Companion-Binaries
+          repository: StarOrga/Verse-Companion-Binaries
           token: ${{ secrets.BINARIES_RELEASE_TOKEN }}
           tag_name: browser-extension-latest
           name: Verse Companion Hangar Import (latest)

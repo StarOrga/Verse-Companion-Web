@@ -16,7 +16,7 @@ data-uploader's, so do not assume the Electron flow applies
    `.github/workflows/wallpaper-app-build.yml`. The tag (not the merge) is what
    publishes: it runs `cargo test`, generates + bakes a fresh `SC_RELEASE_TOKEN`,
    builds `--release`, publishes the versioned exe **plus one identically-byte
-   copy per ring** to the PUBLIC mirror `StarOrga/Star-Citizen-Companion-Binaries`
+   copy per ring** to the PUBLIC mirror `StarOrga/Verse-Companion-Binaries`
    via `BINARIES_RELEASE_TOKEN`, refreshes the `wallpaper-app-latest` alias (the
    fixed fallback URL), and prints the register SQL. A plain main-push only
    build-checks it (path-filtered) — no publish.
@@ -124,7 +124,7 @@ The differences that matter:
   the page's fallback when no ring pointer is registered.
 
 Register SQL (the CI prints this filled-in; or compute it — `gh release download
-wallpaper-app-v<ver> --repo StarOrga/Star-Citizen-Companion-Binaries`, then
+wallpaper-app-v<ver> --repo StarOrga/Verse-Companion-Binaries`, then
 `sha256sum` + byte size). All four platform keys share one sha256/size:
 
 ```sql
@@ -143,7 +143,7 @@ on conflict (product, channel) do update
   set release_id = excluded.release_id, updated_at = now();
 ```
 
-`<base>` = `https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/wallpaper-app-v<X.Y.Z>`.
+`<base>` = `https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/wallpaper-app-v<X.Y.Z>`.
 
 ## The updater, in one paragraph
 

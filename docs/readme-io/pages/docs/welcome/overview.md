@@ -11,7 +11,7 @@ public Verse together in one place â€” news, patch versions, ships, components â
 and adds the tools that sit around them.
 
 - **Web app:** <https://versecompanion-alpha.vercel.app>
-- **Source:** [StarOrga/Star-Citizen-Companion-Web](https://github.com/StarOrga/Star-Citizen-Companion-Web)
+- **Source:** [StarOrga/Verse-Companion-Web](https://github.com/StarOrga/Verse-Companion-Web)
 - **Licence:** MIT
 - **Phase:** alpha
 

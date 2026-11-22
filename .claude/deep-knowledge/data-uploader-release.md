@@ -11,7 +11,7 @@ A data-uploader release is not visible to users until ALL of:
    `build-windows` job in `.github/workflows/data-uploader-build.yml`. Bump
    `data-uploader/package.json` (NOT the root web version); see the `ship`
    extension rule 5 (`.claude/skills/ship/SKILL.md`).
-2. **Public mirror release** on `StarOrga/Star-Citizen-Companion-Binaries`
+2. **Public mirror release** on `StarOrga/Verse-Companion-Binaries`
    exists AND is a **full release, not a prerelease**. A prerelease leaves the
    prior `v*.*.0` as "Latest", and GitHub `/releases/latest` + the download page
    skip prereleases → users keep seeing the old version. `ship_release`'s
@@ -105,8 +105,8 @@ maintainers), so when the public mirror step fails, do NOT rebuild via CI —
 mirror the already-built assets directly with admin `gh` auth (no PAT, no
 ~15-min rebuild):
 
-    gh release download data-uploader-v<X.Y.Z> --repo StarOrga/Star-Citizen-Companion-Web --dir <tmp>
-    gh release create   data-uploader-v<X.Y.Z> --repo StarOrga/Star-Citizen-Companion-Binaries \
+    gh release download data-uploader-v<X.Y.Z> --repo StarOrga/Verse-Companion-Web --dir <tmp>
+    gh release create   data-uploader-v<X.Y.Z> --repo StarOrga/Verse-Companion-Binaries \
         --latest  <tmp>/*.exe <tmp>/*.blockmap        # NOT --prerelease (see point 2)
 
 Then register the release the same way as a normal ship — the `desktop_releases`

@@ -31,7 +31,7 @@ describe('HqStatsComponent', () => {
 
   beforeEach(() => liveState.set(null));
 
-  it('offers no app start in the overlay once the SCC app reports game data', async () => {
+  it('offers no app start in the overlay once the VC app reports game data', async () => {
     liveState.set({ location: 'Lorville' });
     const fixture = mount(vi.fn().mockName('rpc').mockResolvedValue({ data: {}, error: null }));
     await fixture.whenStable();

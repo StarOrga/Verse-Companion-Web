@@ -26,7 +26,7 @@ TOOLS = Path(__file__).resolve().parent
 
 # pinned: v2.0.0 + the cgf-converter/ patches (keep in sync with src/lib/cgf-converter.ts)
 CGF_CONVERTER_URL = (
-    "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/"
+    "https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/"
     "cgf-converter-v2.0.0-sc.1/cgf-converter.exe"
 )
 CGF_CONVERTER_SHA256 = "89d73dd2ff76070dea5fb4dd4e130b1dd1d02b1128874b0d80b0141d4d552abe"

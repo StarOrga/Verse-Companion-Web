@@ -5107,7 +5107,7 @@
       "openSource": {
         "title": "Açık kaynak",
         "p1": "Uygulamanın tamamı açık olarak geliştiriliyor. Her değişiklik GitHub'da herkese açık biçimde incelenebilir — bu sitede çalışan kodun aynısıdır.",
-        "repoLink": "GitHub'daki kaynak kod (StarOrga/Star-Citizen-Companion-Web)"
+        "repoLink": "GitHub'daki kaynak kod (StarOrga/Verse-Companion-Web)"
       },
       "data": {
         "title": "Verilerin",
@@ -7775,7 +7775,7 @@
       "title": "Seyir defteri",
       "loading": "Seyir defteri yükleniyor …",
       "retry": "Tekrar dene",
-      "empty": "Henüz oyun oturumu yok. SCC uygulamasını bağla, her oturum burada kart olarak görünür.",
+      "empty": "Henüz oyun oturumu yok. VC uygulamasını bağla, her oturum burada kart olarak görünür.",
       "emptyLinked": "Son 30 günde kaydedilmiş oyun oturumu yok.",
       "jumps": "Kuantum sıçramaları",
       "contracts": "Sözleşmeler",
@@ -7807,7 +7807,7 @@
         "live": "Şu an sürüyor"
       },
       "showAll": "Tüm {{n}} oturumu göster",
-      "note": "SCC uygulamasından son {{days}} günün oturumları. aUEC bilançosu satışlar eksi alışlardır.",
+      "note": "VC uygulamasından son {{days}} günün oturumları. aUEC bilançosu satışlar eksi alışlardır.",
       "durH": "{{h}} sa {{m}} dk",
       "durM": "{{m}} dk"
     }
