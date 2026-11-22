@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Starscape sign-in now ends on the website's connect screen: after connecting, the browser tab shows "Verbunden" in the same stage as the Data Uploader instead of a bare Starscape page. Failures name their cause there (wrong sign-in session, no sign-in received). Needs Starscape 0.12.0; older versions keep their own page.
 
+## [0.293.1] - 2026-11-22
+
+### Changed
+- Feedback routine: a topic is marked shipped only when the requested change is done; a ship reply never ends in an open question (decided default stated as fact, or the topic is parked as a question instead).
+
 ## [0.293.0] - 2026-11-22
 
 ### Added
