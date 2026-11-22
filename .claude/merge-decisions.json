@@ -694,6 +694,23 @@
         ]
       }
     ],
+    ".claude/project-map.md›header›project-name": [
+      {
+        "ship": "#1246",
+        "by": "Jerry",
+        "value": "# Project Map — verse-companion"
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "generated title (ship_build regenerates it from the stale main checkout's package.json name)",
+        "decided": true,
+        "at": "2026-11-22T11:30:59.149Z",
+        "hunks": [
+          "3b933ff375c9"
+        ]
+      }
+    ],
     ".claude/project-map.md›header›tracked file count": [
       {
         "ship": "#1158",
