@@ -562,25 +562,30 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                pickers stay one click away and the rarer actions sit at its end.
                Wraps on a phone. ── -->
           <div class="stage-actions">
-            <button type="button" scAction tier="secondary" [class.on]="isPinned()" [attr.aria-pressed]="isPinned()" (click)="togglePin()">
-              <sc-compare-icon [on]="isPinned()" />
-              {{ (isPinned() ? 'codex.compare.pinned' : 'codex.detail.actionCompare') | translate }}
-            </button>
-            @if (!shareFab()) {
-              <button type="button" scAction tier="secondary" class="copy" (click)="copyShareLink()">
-                {{ 'codex.detail.actionCopyLink' | translate }}
-                @if (linkCopied()) {
-                  <span class="copy-toast" role="status">{{ 'codex.detail.linkCopied' | translate }}</span>
-                }
+            <!-- The four buttons form one unit that keeps to one line on a desktop
+                 (#374: "Pledge-Link hinzufügen" at the right end, beside "Bei RSI ansehen");
+                 the pickers and the class name follow on the next line. -->
+            <div class="stage-main">
+              <button type="button" scAction tier="secondary" [class.on]="isPinned()" [attr.aria-pressed]="isPinned()" (click)="togglePin()">
+                <sc-compare-icon [on]="isPinned()" />
+                {{ (isPinned() ? 'codex.compare.pinned' : 'codex.detail.actionCompare') | translate }}
               </button>
-            }
-            <!-- Navigates, so it is an anchor and never a button (§2). -->
-            <a scAction tier="secondary" [routerLink]="['/codex']" [queryParams]="{ kind: 'ship' }">
-              {{ 'codex.detail.actionSwitchShip' | translate }} <span aria-hidden="true">⇄</span>
-            </a>
-            <!-- The RSI link and the pledge-link action sit with the other buttons, right after
-                 "Schiff wechseln" (#374: not beside the name, not pushed to the row's end). -->
-            <sc-codex-ship-actions [classNameSlug]="detail()!.classNameSlug" [showClass]="false" />
+              @if (!shareFab()) {
+                <button type="button" scAction tier="secondary" class="copy" (click)="copyShareLink()">
+                  {{ 'codex.detail.actionCopyLink' | translate }}
+                  @if (linkCopied()) {
+                    <span class="copy-toast" role="status">{{ 'codex.detail.linkCopied' | translate }}</span>
+                  }
+                </button>
+              }
+              <!-- Navigates, so it is an anchor and never a button (§2). -->
+              <a scAction tier="secondary" [routerLink]="['/codex']" [queryParams]="{ kind: 'ship' }">
+                {{ 'codex.detail.actionSwitchShip' | translate }} <span aria-hidden="true">⇄</span>
+              </a>
+              <!-- The RSI link and the pledge-link action sit with the other buttons, right after
+                   "Schiff wechseln" (#374: not beside the name, not pushed to the row's end). -->
+              <sc-codex-ship-actions [classNameSlug]="detail()!.classNameSlug" [showClass]="false" />
+            </div>
             @if (editionOptions().length > 1) {
               <sc-codex-variant-picker class="in-toolrow" variant="edition" [kind]="detail()!.kind" [currentSlug]="detail()!.classNameSlug"
                 [options]="editionPickerOptions()" [current]="currentEdition()" />
@@ -1524,6 +1529,19 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
        class name to the end lives in sc-codex-ship-actions; the RSI and pledge-link
        actions follow "Schiff wechseln" (#374). */
     .stage-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+    /* The four buttons (Vergleichen, Schiff wechseln, Bei RSI ansehen, Pledge-Link)
+       as one unit (#374). In the two-column layout the stage column is ~600px at
+       1280px: the pills take the tighter inline padding so the four fit with room
+       to spare (a browser extension may inject an icon after an external link),
+       and from 1280px they never wrap. Narrower screens wrap as before. */
+    .stage-main { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: 100%; }
+    @media (min-width: 1101px) {
+      /* ds-ok: 10px inline padding (scale step 12) — the four pills must share one line in the half-width stage column (#374). */
+      .stage-main .sc-action.sc-action--secondary { padding-inline: 10px; }
+    }
+    @media (min-width: 1280px) {
+      .stage-main { flex-wrap: nowrap; }
+    }
     /* The stage actions are scAction pills. A pinned compare keeps the accent
        state; .copy anchors its toast. */
     .stage-actions .sc-action.on { color: var(--sc-accent);
@@ -1747,6 +1765,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
       .hero.stage { display: flex; flex-direction: column; min-height: 0; padding: 0; gap: 0; }
       .hero.stage::before { inset: 0 0 auto 0; height: 190px; }
       .stage-actions .sc-action { flex: 1 1 auto; justify-content: center; }
+      .stage-main { flex: 1 1 100%; }
     }
     @media (max-width: 400px) {
       .hero-body { padding: 16px; }
