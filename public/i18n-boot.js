@@ -5,7 +5,7 @@
 // language it really needs. External file because the CSP forbids inline scripts.
 (function () {
   // Mirrors normalizeLanguage() in src/app/core/locale/region.data.ts.
-  var PLAIN = ['de', 'en', 'fr', 'it', 'ja', 'ko', 'pl', 'ru', 'tr'];
+  var PLAIN = ['de', 'en', 'fr', 'hi', 'it', 'ja', 'ko', 'pl', 'ru', 'tr'];
   var LATAM = ['419', 'MX', 'AR', 'BO', 'CL', 'CO', 'CR', 'CU', 'DO', 'EC', 'GT', 'HN', 'NI', 'PA', 'PE', 'PR', 'PY', 'SV', 'US', 'UY', 'VE'];
   var HANT = ['HANT', 'TW', 'HK', 'MO'];
 
