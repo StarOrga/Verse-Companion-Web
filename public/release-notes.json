@@ -27,6 +27,10 @@
             {
               "title": "",
               "text": "Translation cost estimates in the game-string pipeline used list prices for batch jobs and showed twice the real cost."
+            },
+            {
+              "title": "",
+              "text": "The AI cost ledger of all server functions priced Claude Sonnet 5.5 and Opus 5.5 at twice their list price."
             }
           ]
         }
