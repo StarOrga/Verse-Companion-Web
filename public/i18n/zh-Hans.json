@@ -3408,6 +3408,7 @@
       "play": "播放视频"
     },
     "patchBoard": {
+      "today": "今天",
       "switch": {
         "aria": "选择渠道",
         "live": "Live",

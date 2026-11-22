@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Collaborators can review the AI translation flash cards on their own page (/collab/translations): pick the languages they speak, answer cards, judge single KI decisions and see the weekly board. Taking over a whole language at once stays with admins.
 
+## [0.297.3] - 2026-11-22
+
+### Fixed
+- Patch board: a patch note from today reads "heute" / "today" instead of "seit 0 Tagen" / "for 0 days".
+- Verse: News and Patches show the door planet at the same, smaller size again (the round-4 concept size).
+
+### Removed
+- The patch-lesestand concept page (decided "discard" at its close-out; it stays in git history).
+
 ## [0.297.2] - 2026-11-22
 
 ### Fixed

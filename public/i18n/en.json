@@ -3409,6 +3409,7 @@
       "play": "Play video"
     },
     "patchBoard": {
+      "today": "today",
       "switch": {
         "aria": "Choose channel",
         "live": "Live",

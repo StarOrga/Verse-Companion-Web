@@ -3408,6 +3408,7 @@
       "play": "वीडियो चलाएँ"
     },
     "patchBoard": {
+      "today": "आज",
       "switch": {
         "aria": "चैनल चुनें",
         "live": "Live",
