@@ -19,6 +19,22 @@
       ]
     },
     {
+      "version": "0.297.4",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The Admin station on /verse opens the admin hub instead of user management."
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.297.3",
       "date": "2026-11-22",
       "sections": [
