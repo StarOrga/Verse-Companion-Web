@@ -59,6 +59,7 @@
     "check:emails": "node scripts/check-no-personal-emails.mjs",
     "check:native-ui": "node scripts/check-native-ui.mjs",
     "check:legacy-actions": "node scripts/check-legacy-actions.mjs",
+    "check:design": "node scripts/check-design-drift.mjs",
     "check:overlay-sizes": "node scripts/check-overlay-sizes.mjs",
     "check:analytics-events": "node scripts/check-analytics-events.mjs",
     "analytics:sync": "node scripts/analytics-sync.mjs",
