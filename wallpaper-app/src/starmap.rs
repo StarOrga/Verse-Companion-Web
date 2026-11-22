@@ -283,7 +283,7 @@ impl<'a> Canvas<'a> {
 }
 
 /// Angular stroke glyphs (x, y in 0..1 of the glyph box, y down). Only what
-/// the wallpaper writes: patch numbers and the "SCC" hint.
+/// the wallpaper writes: patch numbers and the "VC" hint.
 fn glyph(ch: char) -> (f64, &'static [&'static [(f64, f64)]]) {
     const ZERO: &[&[(f64, f64)]] = &[&[(0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0), (0.0, 0.0)]];
     const ONE: &[&[(f64, f64)]] = &[&[(0.25, 0.2), (0.6, 0.0), (0.6, 1.0)]];
@@ -586,7 +586,7 @@ pub fn render_into(px: &mut [u32], o: &RenderOptions) -> Layout {
         draw_constellation(&mut c, k, b, u, i == 0, FigureStyle { magic: magic && i == 0, line, glow_inner });
     }
 
-    // 6 — supernova burst + the subtle SCC hint.
+    // 6 — supernova burst + the subtle VC hint.
     if o.supernova && !list.is_empty() {
         let (cx, cy) = centroid(&list[0].points, &boxes[0]);
         c.glow(cx, cy, 340.0 * u, Rgba(255.0, 90.0, 200.0, 0.18), Rgba(255.0, 90.0, 200.0, 0.0), 1.0, Blend::Lighter);
@@ -597,7 +597,7 @@ pub fn render_into(px: &mut [u32], o: &RenderOptions) -> Layout {
             let len = lerp(90.0, 260.0, rnd.next()) * u;
             c.line(cx + a.cos() * 30.0 * u, cy + a.sin() * 30.0 * u, cx + a.cos() * len, cy + a.sin() * len, 0.9 * u, Rgba(255.0, 220.0, 240.0, 0.22), 1.0, 0.0, Blend::Lighter);
         }
-        c.text("SCC", cx + 120.0 * u, cy + 150.0 * u, 18.0 * u, hex(0xffffff, 1.0), 0.06);
+        c.text("VC", cx + 120.0 * u, cy + 150.0 * u, 18.0 * u, hex(0xffffff, 1.0), 0.06);
     }
 
     // 7 — watermark: the patch number beside the first lit star.

@@ -319,7 +319,7 @@ an `<img>` renders without firing `error`.
 
 ## Star Citizen events timeline: `sc-events-sync`
 
-SCC-Web owns the event timeline (`public.sc_events`). `sc-events-sync` (pg_cron, every 6 h at :17) matches
+VC-Web owns the event timeline (`public.sc_events`). `sc-events-sync` (pg_cron, every 6 h at :17) matches
 Star Citizen Wiki comm-links against the known event families and upserts through the service-role-only
 `sc_events_upsert_scraped()` (never touches locked rows, never downgrades confirmed, never deletes). The desktop
 app reads `rpc/sc_events_feed` (authenticated only) and `sc_events_health()`. Migration `20261016120000` is

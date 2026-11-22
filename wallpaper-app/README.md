@@ -144,7 +144,7 @@ those installs already did.
 
 ## Telemetry
 
-Starscape reports through the **same** signed ingest path as the SCC app and the
+Starscape reports through the **same** signed ingest path as the VC app and the
 Data Uploader — one endpoint, one table, one signature scheme (`src/telemetry.rs`,
 `supabase/functions/ingest-telemetry`). Rows are tagged `product='starscape'`,
 which is what the admin dashboard's per-product view filters on.

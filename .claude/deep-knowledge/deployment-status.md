@@ -24,8 +24,8 @@ surface flips between deployed / pending / broken.
 
   ```bash
   SHA=$(git rev-parse origin/main)
-  gh api "repos/StarOrga/Star-Citizen-Companion-Web/deployments?sha=$SHA&environment=Production" --jq '.[].id'
-  gh api "repos/StarOrga/Star-Citizen-Companion-Web/deployments/<id>/statuses" --jq '.[0].state'
+  gh api "repos/StarOrga/Verse-Companion-Web/deployments?sha=$SHA&environment=Production" --jq '.[].id'
+  gh api "repos/StarOrga/Verse-Companion-Web/deployments/<id>/statuses" --jq '.[0].state'
   ```
 
   An empty list means the build never started — that is a negative result, not
@@ -80,7 +80,7 @@ a public mirror exists:
 
 | Repo | Purpose |
 |---|---|
-| `Jerry0022/Star-Citizen-Companion-Web` (PRIVATE — this one) | Source code, releases include token-artefact + maintainer changelog |
+| `StarOrga/Verse-Companion-Web` (PRIVATE — this one) | Source code, releases include token-artefact + maintainer changelog |
 | `StarOrga/Verse-Companion-Binaries` (PUBLIC) | Release mirror — `.exe` + `.blockmap` + `latest.yml`, end-user download URL |
 
 When tagging `data-uploader-v*`, GH-Actions publishes the same assets to

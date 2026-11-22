@@ -1,7 +1,7 @@
 # Localization live test (≈ 10 min)
 
 Answers what no source documents: does Star Citizen pick up a changed
-`global.ini` or a language switch **without a restart**? The SCC app's "apply
+`global.ini` or a language switch **without a restart**? The VC app's "apply
 live" behaviour is built on the answer.
 
 Background: in stock CryEngine 5 the `g_language` cvar has a change callback

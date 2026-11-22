@@ -414,7 +414,7 @@ async function postflight(run, outcome) {
     claimedIds: claimed.map((c) => c.id), outcome, now,
   });
   next.lastSid = run.sid;
-  if (outcome.kind === 'auth') notify(next, 'auth', 'SCC Feedback', 'Claude-Login abgelaufen: Feedback wartet, bis du dich neu anmeldest.');
+  if (outcome.kind === 'auth') notify(next, 'auth', 'VC Feedback', 'Claude-Login abgelaufen: Feedback wartet, bis du dich neu anmeldest.');
   saveState(next);
   if (charged.length) log(`charged an attempt to: ${charged.map((c) => c.slice(0, 8)).join(', ')}`);
   await sweepBranches().catch((e) => log(`sweep failed: ${e.message}`));
@@ -496,7 +496,7 @@ async function tick() {
     const g = gate(['check']);
     if (g.verdict === 'error') {
       state.gateErrors = (state.gateErrors ?? 0) + 1;
-      if (state.gateErrors >= 10) notify(state, 'gate', 'SCC Feedback', `Feedback-Watcher erreicht das Board nicht: ${String(g.error).slice(0, 120)}`);
+      if (state.gateErrors >= 10) notify(state, 'gate', 'VC Feedback', `Feedback-Watcher erreicht das Board nicht: ${String(g.error).slice(0, 120)}`);
       saveState(state);
       log(`gate error: ${g.error}`);
       return;
@@ -535,7 +535,7 @@ async function tick() {
     for (const p of park) {
       await parkItem(p, prs);
       delete fresh.items[p.item.id];
-      notify(fresh, `park-${p.item.id}`, 'SCC Feedback', `Thema #${p.item.seq} ist ${p.attempts}× gescheitert und wartet auf dich.`);
+      notify(fresh, `park-${p.item.id}`, 'VC Feedback', `Thema #${p.item.seq} ist ${p.attempts}× gescheitert und wartet auf dich.`);
     }
     saveState(fresh);
     if (eligible.length) startSupervisor(eligible, fresh);

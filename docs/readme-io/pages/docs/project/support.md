@@ -18,7 +18,7 @@ report; if you genuinely need more, send a second message in the same thread.
 For bugs, data errors, documentation mistakes and feature requests, open an
 issue on the repository:
 
-**<https://github.com/StarOrga/Star-Citizen-Companion-Web/issues>**
+**<https://github.com/StarOrga/Verse-Companion-Web/issues>**
 
 Useful details to include:
 
@@ -40,7 +40,7 @@ with the correct contact.
 
 These guides are generated from markdown in the repository, so a documentation
 fix is a normal pull request against
-[`docs/readme-io/pages/`](https://github.com/StarOrga/Star-Citizen-Companion-Web/tree/main/docs/readme-io/pages).
+[`docs/readme-io/pages/`](https://github.com/StarOrga/Verse-Companion-Web/tree/main/docs/readme-io/pages).
 Editing a page in the ReadMe web editor is not the way — the repository is the
 source of truth and a sync overwrites remote edits.
 

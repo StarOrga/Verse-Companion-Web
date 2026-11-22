@@ -105,7 +105,7 @@ maintainers), so when the public mirror step fails, do NOT rebuild via CI —
 mirror the already-built assets directly with admin `gh` auth (no PAT, no
 ~15-min rebuild):
 
-    gh release download data-uploader-v<X.Y.Z> --repo StarOrga/Star-Citizen-Companion-Web --dir <tmp>
+    gh release download data-uploader-v<X.Y.Z> --repo StarOrga/Verse-Companion-Web --dir <tmp>
     gh release create   data-uploader-v<X.Y.Z> --repo StarOrga/Verse-Companion-Binaries \
         --latest  <tmp>/*.exe <tmp>/*.blockmap        # NOT --prerelease (see point 2)
 

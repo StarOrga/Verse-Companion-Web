@@ -5107,7 +5107,7 @@
       "openSource": {
         "title": "오픈 소스",
         "p1": "애플리케이션 전체가 공개적으로 개발돼요. 모든 변경 사항을 GitHub에서 누구나 확인할 수 있으며, 이 사이트에서 실행되는 것과 동일한 코드예요.",
-        "repoLink": "GitHub의 소스 코드 (StarOrga/Star-Citizen-Companion-Web)"
+        "repoLink": "GitHub의 소스 코드 (StarOrga/Verse-Companion-Web)"
       },
       "data": {
         "title": "내 데이터",
@@ -7775,7 +7775,7 @@
       "title": "로그북",
       "loading": "로그북을 불러오는 중 …",
       "retry": "다시 시도",
-      "empty": "아직 게임 세션이 없어요. SCC 앱을 연결하면 모든 세션이 여기에 카드로 표시돼요.",
+      "empty": "아직 게임 세션이 없어요. VC 앱을 연결하면 모든 세션이 여기에 카드로 표시돼요.",
       "emptyLinked": "최근 30일 동안 기록된 게임 세션이 없어요.",
       "jumps": "퀀텀 점프",
       "contracts": "계약",
@@ -7807,7 +7807,7 @@
         "live": "진행 중"
       },
       "showAll": "세션 {{n}}개 모두 보기",
-      "note": "SCC 앱에서 가져온 최근 {{days}}일간의 세션이에요. aUEC 수지는 판매액에서 구매액을 뺀 값이에요.",
+      "note": "VC 앱에서 가져온 최근 {{days}}일간의 세션이에요. aUEC 수지는 판매액에서 구매액을 뺀 값이에요.",
       "durH": "{{h}}시간 {{m}}분",
       "durM": "{{m}}분"
     }

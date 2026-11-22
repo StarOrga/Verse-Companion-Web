@@ -30,7 +30,7 @@ and flag drift. That file is the source-of-truth for "what should be live".
 
 ## GitHub-auth-wall note
 
-`curl https://github.com/Jerry0022/Star-Citizen-Companion-Web/releases/tag/data-uploader-v0.3.3`
+`curl https://github.com/StarOrga/Verse-Companion-Web/releases/tag/data-uploader-v0.3.3`
 returns `HTTP/1.1 404 Not Found`. The release EXISTS — GitHub returns 404
 instead of 403 for private-repo URLs without an auth header. This is a
 deliberate GitHub feature (avoids leaking the existence of private repos).
@@ -42,7 +42,7 @@ used (e.g. in a script that has its own GH_TOKEN), include
 
 ## Auto-update download probe
 
-Since 2026-05-24 (issue [#7](https://github.com/Jerry0022/Star-Citizen-Companion-Web/issues/7)
+Since 2026-05-24 (issue [#7](https://github.com/StarOrga/Verse-Companion-Web/issues/7)
 resolution), binaries are mirrored to the **public** repo
 [`StarOrga/Verse-Companion-Binaries`](https://github.com/StarOrga/Verse-Companion-Binaries).
 The `desktop-latest` Edge Function returns YAML pointing at that public mirror's

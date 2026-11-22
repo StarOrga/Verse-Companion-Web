@@ -5107,7 +5107,7 @@
       "openSource": {
         "title": "開放原始碼",
         "p1": "整個應用程式皆公開開發。每項變更都可在 GitHub 上公開檢視 — 與本網站上運行的是同一份程式碼。",
-        "repoLink": "GitHub 上的原始碼（StarOrga/Star-Citizen-Companion-Web）"
+        "repoLink": "GitHub 上的原始碼（StarOrga/Verse-Companion-Web）"
       },
       "data": {
         "title": "你的資料",
@@ -7775,7 +7775,7 @@
       "title": "日誌",
       "loading": "正在載入日誌…",
       "retry": "重試",
-      "empty": "尚無遊戲場次。連接 SCC App 後，每個場次都會以卡片形式顯示在這裡。",
+      "empty": "尚無遊戲場次。連接 VC App 後，每個場次都會以卡片形式顯示在這裡。",
       "emptyLinked": "過去 30 天內沒有記錄到任何遊戲場次。",
       "jumps": "量子躍遷",
       "contracts": "合約",
@@ -7807,7 +7807,7 @@
         "live": "進行中"
       },
       "showAll": "顯示全部 {{n}} 個場次",
-      "note": "來自 SCC App 的過去 {{days}} 天的場次。aUEC 收支為賣出減去買入。",
+      "note": "來自 VC App 的過去 {{days}} 天的場次。aUEC 收支為賣出減去買入。",
       "durH": "{{h}} 小時 {{m}} 分鐘",
       "durM": "{{m}} 分鐘"
     }

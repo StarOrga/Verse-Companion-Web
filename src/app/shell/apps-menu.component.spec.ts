@@ -89,7 +89,7 @@ describe('AppsMenuComponent', () => {
   });
 
   for (const r of ['viewer', 'anon']) {
-    it(`${r}: SCC App + Starscape as plain stable downloads, no picker, no uploader`, async () => {
+    it(`${r}: VC App + Starscape as plain stable downloads, no picker, no uploader`, async () => {
       setup(r);
       await openMenu();
       const entries = Array.from(el().querySelectorAll<HTMLAnchorElement>('.pop a.entry'));
@@ -113,7 +113,7 @@ describe('AppsMenuComponent', () => {
     });
   }
 
-  it('SCC App meta reads "Windows · vX · MB" from the alias release; no collaborator badge', async () => {
+  it('VC App meta reads "Windows · vX · MB" from the alias release; no collaborator badge', async () => {
     setup('collaborator');
     await openMenu();
     await new Promise((r) => setTimeout(r, 20)); // Response.json() settles on a macrotask
