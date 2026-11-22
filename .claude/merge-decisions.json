@@ -944,6 +944,23 @@
         ]
       }
     ],
+    ".claude/project-map.md›header›tracked-files-count": [
+      {
+        "ship": "#1256",
+        "by": "Jerry",
+        "value": "3796 tracked files"
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "3770 tracked files (upstream +1, minus the 26 discarded concept files)",
+        "decided": true,
+        "at": "2026-11-22T10:48:20.158Z",
+        "hunks": [
+          "2d02b7eeecb9"
+        ]
+      }
+    ],
     ".claude/project-map.md›ingest-catalog count›value": [
       {
         "ship": "claude/backlgo-a9602a",
