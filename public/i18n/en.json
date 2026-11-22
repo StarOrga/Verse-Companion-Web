@@ -230,7 +230,8 @@
     "translations": "AI translation",
     "social": "Social",
     "accountMenuRequests": "Account menu, {{count}} open friend requests",
-    "socialRequests": "Social, {{count}} open friend requests"
+    "socialRequests": "Social, {{count}} open friend requests",
+    "collabMenu": "Collaborator"
   },
   "impersonation": {
     "banner": {
@@ -9663,6 +9664,12 @@
       "step3": "Tap “Add” at the top right.",
       "addLabel": "Add",
       "done": "Got it"
+    }
+  },
+  "collab": {
+    "eyebrow": "Collaborator",
+    "translations": {
+      "subtitle": "Help the AI translation: flash cards in the languages you speak."
     }
   }
 }

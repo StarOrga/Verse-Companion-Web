@@ -192,6 +192,108 @@
         ]
       }
     ],
+    ".claude/project-map.md›counts›value": [
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map)",
+        "decided": true,
+        "at": "2026-11-22T09:59:12.074Z",
+        "hunks": [
+          "5c17599da85f"
+        ]
+      },
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map)",
+        "decided": true,
+        "at": "2026-11-22T10:10:15.069Z",
+        "hunks": [
+          "908f29aa78e4"
+        ]
+      },
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map)",
+        "decided": true,
+        "at": "2026-11-22T10:16:08.522Z",
+        "hunks": [
+          "1c6c7576e51c"
+        ]
+      },
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map)",
+        "decided": true,
+        "at": "2026-11-22T10:23:20.927Z",
+        "hunks": [
+          "8460af42182e"
+        ]
+      },
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree / CHANGELOG",
+        "decided": true,
+        "at": "2026-11-22T10:51:08.157Z",
+        "hunks": [
+          "eb87a70aa5dc"
+        ]
+      },
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree / CHANGELOG",
+        "decided": true,
+        "at": "2026-11-22T11:12:48.563Z",
+        "hunks": [
+          "9e2900b93f86"
+        ]
+      },
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree / CHANGELOG",
+        "decided": true,
+        "at": "2026-11-22T11:20:46.423Z",
+        "hunks": [
+          "d2d35c053452"
+        ]
+      },
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree / CHANGELOG",
+        "decided": true,
+        "at": "2026-11-22T11:40:28.827Z",
+        "hunks": [
+          "54c0498d48aa"
+        ]
+      },
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree / CHANGELOG",
+        "decided": true,
+        "at": "2026-11-22T12:22:13.734Z",
+        "hunks": [
+          "1510846ecbfe"
+        ]
+      },
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree / CHANGELOG",
+        "decided": true,
+        "at": "2026-11-22T12:50:47.219Z",
+        "hunks": [
+          "f536724a0fb9"
+        ]
+      }
+    ],
     ".claude/project-map.md›data-uploader/python/tests›count": [
       {
         "ship": "claude/ship-data-extraction-validation-8d0c76",
@@ -2214,6 +2316,36 @@
         "at": "2026-11-21T10:35:53.985Z",
         "hunks": [
           "d0c85bbf06b5"
+        ]
+      },
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree / CHANGELOG",
+        "decided": true,
+        "at": "2026-11-22T10:51:08.157Z",
+        "hunks": [
+          "71c094b9a2f0"
+        ]
+      },
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree / CHANGELOG",
+        "decided": true,
+        "at": "2026-11-22T11:12:48.563Z",
+        "hunks": [
+          "0cccdb624339"
+        ]
+      },
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree / CHANGELOG",
+        "decided": true,
+        "at": "2026-11-22T12:22:13.734Z",
+        "hunks": [
+          "24ca6dffc6f4"
         ]
       }
     ],
