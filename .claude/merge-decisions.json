@@ -969,6 +969,21 @@
         "hunks": [
           "2d02b7eeecb9"
         ]
+      },
+      {
+        "ship": "#1257",
+        "by": "Jerry",
+        "value": "3798 tracked files"
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "3772 tracked files (generated count of the merged tree)",
+        "decided": true,
+        "at": "2026-11-22T11:08:50.735Z",
+        "hunks": [
+          "a3b99cc5e02f"
+        ]
       }
     ],
     ".claude/project-map.md›ingest-catalog count›value": [
@@ -2409,6 +2424,21 @@
         "at": "2026-11-22T10:53:07.222Z",
         "hunks": [
           "3779207f60a9"
+        ]
+      },
+      {
+        "ship": "#1257",
+        "by": "Jerry",
+        "value": "0.297.1"
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "regenerated from CHANGELOG (main's 0.297.1 was stale)",
+        "decided": true,
+        "at": "2026-11-22T11:08:50.735Z",
+        "hunks": [
+          "4bb3306dc988"
         ]
       }
     ],
