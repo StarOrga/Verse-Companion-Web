@@ -90,7 +90,7 @@ const DAY_MS = 86_400_000;
                   <p class="ver"><b>{{ h.version || live()!.line }}</b> <span class="tag live">{{ 'news.patch.status.live' | translate }}</span></p>
                   <p class="when">
                     {{ 'news.patchBoard.now.since' | translate:{ date: dateLong(h.publishedAt) } }}
-                    · {{ 'news.patch.stack.sinceDays' | translate:{ n: daysSince(h.publishedAt) } }}
+                    · {{ since(h.publishedAt) }}
                   </p>
                   @if (liveBullets().length) {
                     <ul class="list">
@@ -248,7 +248,7 @@ const DAY_MS = 86_400_000;
                     @if (ptuUnread()) { <span class="newbadge">{{ 'news.patchBoard.newForYou' | translate }}</span> }
                   </div>
                   <p class="ver"><b>{{ top.version || top.line }}</b> <span class="tag ptu">{{ ptuPill(top) }}</span></p>
-                  <p class="when">{{ dateLong(top.publishedAt) }} · {{ 'news.patch.stack.sinceDays' | translate:{ n: daysSince(top.publishedAt) } }}</p>
+                  <p class="when">{{ dateLong(top.publishedAt) }} · {{ since(top.publishedAt) }}</p>
                   @if (ptuBullets().length) {
                     <ul class="list">@for (b of ptuBullets(); track b) { <li>{{ b }}</li> }</ul>
                   }
@@ -271,7 +271,7 @@ const DAY_MS = 86_400_000;
                 <li class="row" data-status="ptu">
                   <div class="date">
                     <b>{{ dateLong(r.publishedAt) }}</b>
-                    <small>{{ 'news.patch.stack.sinceDays' | translate:{ n: daysSince(r.publishedAt) } }}</small>
+                    <small>{{ since(r.publishedAt) }}</small>
                   </div>
                   <div class="card">
                     <ng-container [ngTemplateOutlet]="art" [ngTemplateOutletContext]="{ img: r.image, label: r.line, fade: true }" />
@@ -711,7 +711,7 @@ export class PatchBoardV2Component implements OnInit, OnDestroy {
     }
   }
   rowDays(card: StackCard): string {
-    if (card.status === 'live' && card.liveAt) return this.t.instant('news.patch.stack.sinceDays', { n: this.daysSinceMs(card.liveAt) });
+    if (card.status === 'live' && card.liveAt) return this.sinceN(this.daysSinceMs(card.liveAt));
     if (card.status === 'superseded' && card.liveAt && card.supersededAt) {
       return this.t.instant('news.patchBoard.daysLive', { n: Math.max(0, Math.round((card.supersededAt - card.liveAt) / DAY_MS)) });
     }
@@ -740,6 +740,13 @@ export class PatchBoardV2Component implements OnInit, OnDestroy {
   }
   private daysSinceMs(at: number): number {
     return daysBetween(at, this.now());
+  }
+  /** "heute" for a note from today, else "seit N Tagen" (concept finalize: no "seit 0 Tagen"). */
+  since(iso: string): string {
+    return this.sinceN(this.daysSince(iso));
+  }
+  private sinceN(n: number): string {
+    return n <= 0 ? this.t.instant('news.patchBoard.today') : this.t.instant('news.patch.stack.sinceDays', { n });
   }
   dateLong(iso: string): string {
     return this.dateLongMs(ms(iso));
