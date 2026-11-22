@@ -44,7 +44,7 @@ used (e.g. in a script that has its own GH_TOKEN), include
 
 Since 2026-05-24 (issue [#7](https://github.com/Jerry0022/Star-Citizen-Companion-Web/issues/7)
 resolution), binaries are mirrored to the **public** repo
-[`StarOrga/Star-Citizen-Companion-Binaries`](https://github.com/StarOrga/Star-Citizen-Companion-Binaries).
+[`StarOrga/Verse-Companion-Binaries`](https://github.com/StarOrga/Verse-Companion-Binaries).
 The `desktop-latest` Edge Function returns YAML pointing at that public mirror's
 URLs, so `electron-updater` can fetch without GitHub auth.
 
@@ -54,7 +54,7 @@ verify end-users can actually download:
 ```bash
 TAG=data-uploader-v$(gh release list --limit 1 --json tagName --jq '.[0].tagName' | sed 's/data-uploader-v//')
 VERSION=$(echo "$TAG" | sed 's/^data-uploader-v//')
-curl -sIL "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/$TAG/data-uploader-setup-$VERSION-x64.exe" \
+curl -sIL "https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/$TAG/data-uploader-setup-$VERSION-x64.exe" \
   | grep -E "^HTTP|^Content-Length" | head -4
 ```
 
@@ -62,7 +62,7 @@ curl -sIL "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/
 `Content-Length: ~132000000` (~126 MB installer).
 
 If 404: either the mirror release wasn't published (check
-`gh release list --repo StarOrga/Star-Citizen-Companion-Binaries` — the tag MUST
+`gh release list --repo StarOrga/Verse-Companion-Binaries` — the tag MUST
 match the source repo's `data-uploader-v*` tag), or the
 `secrets.BINARIES_RELEASE_TOKEN` PAT in the source repo's Actions
 secrets is missing/expired. See

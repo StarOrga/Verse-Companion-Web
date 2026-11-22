@@ -81,7 +81,7 @@ a public mirror exists:
 | Repo | Purpose |
 |---|---|
 | `Jerry0022/Star-Citizen-Companion-Web` (PRIVATE — this one) | Source code, releases include token-artefact + maintainer changelog |
-| `StarOrga/Star-Citizen-Companion-Binaries` (PUBLIC) | Release mirror — `.exe` + `.blockmap` + `latest.yml`, end-user download URL |
+| `StarOrga/Verse-Companion-Binaries` (PUBLIC) | Release mirror — `.exe` + `.blockmap` + `latest.yml`, end-user download URL |
 
 When tagging `data-uploader-v*`, GH-Actions publishes the same assets to
 **both** repos. The Edge Function `desktop-latest` returns YAML pointing
@@ -91,7 +91,7 @@ when admin registers a release).
 **PAT setup:** the workflow needs `secrets.BINARIES_RELEASE_TOKEN` —
 a fine-grained Personal Access Token whose **resource owner is the
 `StarOrga` organization** (the repo moved there 2026-05-30), scoped to
-`Contents: Read and write` on `StarOrga/Star-Citizen-Companion-Binaries`
+`Contents: Read and write` on `StarOrga/Verse-Companion-Binaries`
 only (no other repo, no other scope). A user-owned token cannot reach an
 org repo — after the move the old `Jerry0022`-owned token stops working
 and must be replaced. One-time setup at
@@ -103,5 +103,5 @@ repo Actions secrets.
 "PUBLIC ASSET URLS"):
 
 ```
-https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/data-uploader-v<X.Y.Z>/data-uploader-setup-<X.Y.Z>-x64.exe
+https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/data-uploader-v<X.Y.Z>/data-uploader-setup-<X.Y.Z>-x64.exe
 ```

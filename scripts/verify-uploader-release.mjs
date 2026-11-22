@@ -19,7 +19,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const API_BASE = 'https://hcnqhvzlavdycidqyaai.supabase.co';
-const MIRROR = 'https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download';
+const MIRROR = 'https://github.com/StarOrga/Verse-Companion-Binaries/releases/download';
 
 function arg(name) {
   const i = process.argv.indexOf(`--${name}`);

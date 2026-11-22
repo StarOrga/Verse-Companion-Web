@@ -10,7 +10,7 @@ import {
 describe('cgf-converter pin', () => {
   it('downloads one pinned build from the public binaries mirror', () => {
     expect(CGF_CONVERTER_URL).toMatch(
-      /^https:\/\/github\.com\/StarOrga\/Star-Citizen-Companion-Binaries\/releases\/download\/[^/]+\/cgf-converter\.exe$/,
+      /^https:\/\/github\.com\/StarOrga\/Verse-Companion-Binaries\/releases\/download\/[^/]+\/cgf-converter\.exe$/,
     );
     expect(CGF_CONVERTER_SHA256).toMatch(/^[0-9a-f]{64}$/);
   });

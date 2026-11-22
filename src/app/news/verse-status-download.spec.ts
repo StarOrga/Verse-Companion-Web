@@ -60,7 +60,7 @@ describe('VerseStatusChipComponent — Companion app download', () => {
     const link = openPanel().querySelector('a.app-dl') as HTMLAnchorElement | null;
     expect(link, 'download entry rendered').not.toBeNull();
     expect(link!.getAttribute('href')).toBe(
-      'https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/scc-app-latest/SCC-Standalone-Setup.exe',
+      'https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/scc-app-latest/SCC-Standalone-Setup.exe',
     );
     // No version anywhere in the URL — that is what "always the newest" means.
     expect(link!.getAttribute('href')).not.toMatch(/v\d+\.\d+\.\d+/);

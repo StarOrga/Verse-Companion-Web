@@ -25,7 +25,7 @@ import { ShellChromeService } from '../shell/fusion-bar/shell-chrome.service';
 const APP_NOTICE_REST_BEAT_MS = 4300;
 
 const STARSCAPE_FALLBACK_URL =
-  'https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/wallpaper-app-latest/starscape-wallpaper.exe';
+  'https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/wallpaper-app-latest/starscape-wallpaper.exe';
 
 /**
  * `<sc-app-notice app="scc|starscape">` - the app notification toast, bottom

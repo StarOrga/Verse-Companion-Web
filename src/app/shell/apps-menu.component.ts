@@ -31,7 +31,7 @@ import { SCC_INSTALLER_URL } from '../news/verse-status-chip.component';
 const SCC_RELEASE_META = `${environment.supabase.url}/functions/v1/scc-release-meta`;
 
 const STARSCAPE_FALLBACK_URL =
-  'https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/wallpaper-app-latest/starscape-wallpaper.exe';
+  'https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/wallpaper-app-latest/starscape-wallpaper.exe';
 
 /** "12.3 MB" - app-sized download, one decimal. */
 export function formatAppSize(bytes: number | null | undefined): string | null {

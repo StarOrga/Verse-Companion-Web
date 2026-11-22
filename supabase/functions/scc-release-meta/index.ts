@@ -20,7 +20,7 @@ const CORS = {
 };
 
 const RELEASE_API =
-  'https://api.github.com/repos/StarOrga/Star-Citizen-Companion-Binaries/releases/tags/scc-app-latest';
+  'https://api.github.com/repos/StarOrga/Verse-Companion-Binaries/releases/tags/scc-app-latest';
 const TTL_MS = 10 * 60 * 1000;
 const FAIL_TTL_MS = 60 * 1000;
 

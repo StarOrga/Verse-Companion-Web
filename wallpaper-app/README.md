@@ -195,7 +195,7 @@ Requires a Windows Rust toolchain (MSVC or GNU host). CI builds with
 
 Push a `wallpaper-app-v<version>` tag. The `wallpaper-app` GitHub Actions workflow
 builds the release binary and publishes it to the public
-[`StarOrga/Star-Citizen-Companion-Binaries`](https://github.com/StarOrga/Star-Citizen-Companion-Binaries)
+[`StarOrga/Verse-Companion-Binaries`](https://github.com/StarOrga/Verse-Companion-Binaries)
 mirror (via `BINARIES_RELEASE_TOKEN`), the same handoff the `data-uploader` uses.
 
 Two releases are published per tag: the versioned `wallpaper-app-v<version>`
