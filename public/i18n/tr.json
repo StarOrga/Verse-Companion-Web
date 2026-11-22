@@ -3407,6 +3407,56 @@
       "badge": "Video",
       "play": "Videoyu oynat"
     },
+    "patchBoard": {
+      "switch": {
+        "aria": "Kanal seç",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Live oyuncuları için önemli olanlar",
+        "ptuHint": "Test build'leri: her bir build ayrı ayrı"
+      },
+      "unread": "Okunmadı",
+      "newForYou": "Senin için yeni",
+      "readFull": "Tamamını oku",
+      "markRead": "Okundu",
+      "readOn": "{{date}} tarihinde okundu",
+      "readEarlier": "daha önce okundu",
+      "readAgain": "Yeniden oku",
+      "now": {
+        "title": "Live'a yeni geldi",
+        "since": "{{date}} tarihinden beri",
+        "none": "Akışta henüz Live yaması yok."
+      },
+      "next": {
+        "title": "Live'da sıradaki",
+        "none": "Sonraki yama henüz bilinmiyor.",
+        "testing": "{{ring}} testinde",
+        "noDate": "Resmi tarih yok",
+        "announced": "{{date}} için duyuruldu",
+        "estimate": "Tahmin: {{when}}"
+      },
+      "allAbout": "{{line}} hakkında her şey",
+      "close": "Kapat",
+      "noDate": "Tarihsiz",
+      "roadmap": {
+        "aria": "Yol haritası durumu",
+        "committed": "Onaylandı",
+        "tentative": "Olası",
+        "released": "Teslim edildi"
+      },
+      "status": {
+        "next": "Sırada"
+      },
+      "daysLive": "{{n}} gündür Live'da",
+      "earlier": "{{n}} önceki güncelleme",
+      "earlierHide": "Önceki güncellemeleri gizle",
+      "ptu": {
+        "newest": "En yeni test build'i",
+        "aria": "Test build'leri, en yenisi önce",
+        "empty": "Şu anda akışta test build'i yok.",
+        "wave": "{{stage}} · {{n}}. dalga"
+      }
+    },
     "patch": {
       "line": "Alpha {{version}}",
       "otherLine": "Sürüm belirtilmemiş",
@@ -3591,15 +3641,15 @@
         "section": {
           "stabilitaet": "Kararlılık",
           "builds": "Çalışan test build'leri",
+          "first": "Bu yamada ilk adımlar",
+          "community": "Topluluk",
+          "urteil": "Senin kararın",
           "prepPast": "Bilmeniz gerekenler",
           "contents": "İçinde neler var?",
           "fixed": "… düzeltildi mi?",
           "next": "Bir sonrakisi ne zaman?",
           "nextThis": "Bu yama ne zaman geliyor?",
-          "nextPast": "Sonra ne geldi?",
-          "first": "Bu yamada ilk adımlar",
-          "community": "Topluluk",
-          "urteil": "Senin kararın"
+          "nextPast": "Sonra ne geldi?"
         },
         "noteOf": "{{version}} sürümündeki değişiklikler · Alpha {{line}} kapsamında",
         "wholeLine": "{{line}} yamasının tamamını gör",
@@ -3612,26 +3662,26 @@
         "wipe": "Wipe",
         "noBuildInfo": "RSI bu build için \"Important Build Info\" yayımlamadı.",
         "generalTitle": "Her yama için geçerli",
+        "nextTitle": "Sonraki büyük yamaya hazırlık",
         "generalItem": {
           "launcher": "Başlatıcıyı aç ve indirmenin bitmesini bekle — gösterdiği sürüm yamayla eşleşmeli.",
           "shaders": "Yamadan sonra grafikler titriyor veya kare hızı düşüyorsa shader klasörünü temizle (%LOCALAPPDATA%\\\\Star Citizen\\\\).",
           "verify": "Yamadan hemen sonra çöküyorsa, hata bildirmeden önce başlatıcıda \"Verify\" çalıştır.",
           "repair": "Karakter takıldıysa veya ekipman eksikse RSI hesabında Character Repair çalıştır, sonra tekrar giriş yap.",
           "known": "Bildirmeden önce bilinen sorunlara göz at — yeni hataların çoğu zaten orada listelenmiştir."
-        },
-        "nextTitle": "Sonraki büyük yamaya hazırlık"
+        }
       },
       "contents": {
         "inNotes": "Sürüm notlarında",
+        "fixedTitle": "Düzeltildi",
+        "knownTitle": "Bilinen sorunlar",
+        "gallery": "Bu yamadan görseller",
+        "moreLines": "{{n}} tane daha göster",
         "more": "Tam metin",
         "less": "Daralt",
         "leftover": "Yol haritası kartı olmayan diğer not maddeleri ({{n}})",
         "noRoadmap": "Bu yama için yol haritası verisi yok — işte \"{{title}}\" notu:",
-        "ofNote": "“{{title}}” notundaki değişiklikler:",
-        "fixedTitle": "Düzeltildi",
-        "knownTitle": "Bilinen sorunlar",
-        "gallery": "Bu yamadan görseller",
-        "moreLines": "{{n}} tane daha göster"
+        "ofNote": "“{{title}}” notundaki değişiklikler:"
       },
       "fixed": {
         "placeholder": "Bu yamada ara … ör. quantum drive",
@@ -3784,56 +3834,6 @@
       "sinceDays": "{{days}} gündür",
       "toBoard": "Yama Merkezi",
       "toNotes": "Yama notlarını oku"
-    },
-    "patchBoard": {
-      "switch": {
-        "aria": "Kanal seç",
-        "live": "Live",
-        "ptu": "PTU",
-        "liveHint": "Live oyuncuları için önemli olanlar",
-        "ptuHint": "Test build'leri: her bir build ayrı ayrı"
-      },
-      "unread": "Okunmadı",
-      "newForYou": "Senin için yeni",
-      "readFull": "Tamamını oku",
-      "markRead": "Okundu",
-      "readOn": "{{date}} tarihinde okundu",
-      "readEarlier": "daha önce okundu",
-      "readAgain": "Yeniden oku",
-      "now": {
-        "title": "Live'a yeni geldi",
-        "since": "{{date}} tarihinden beri",
-        "none": "Akışta henüz Live yaması yok."
-      },
-      "next": {
-        "title": "Live'da sıradaki",
-        "none": "Sonraki yama henüz bilinmiyor.",
-        "testing": "{{ring}} testinde",
-        "noDate": "Resmi tarih yok",
-        "announced": "{{date}} için duyuruldu",
-        "estimate": "Tahmin: {{when}}"
-      },
-      "allAbout": "{{line}} hakkında her şey",
-      "close": "Kapat",
-      "noDate": "Tarihsiz",
-      "roadmap": {
-        "aria": "Yol haritası durumu",
-        "committed": "Onaylandı",
-        "tentative": "Olası",
-        "released": "Teslim edildi"
-      },
-      "status": {
-        "next": "Sırada"
-      },
-      "daysLive": "{{n}} gündür Live'da",
-      "earlier": "{{n}} önceki güncelleme",
-      "earlierHide": "Önceki güncellemeleri gizle",
-      "ptu": {
-        "newest": "En yeni test build'i",
-        "aria": "Test build'leri, en yenisi önce",
-        "empty": "Şu anda akışta test build'i yok.",
-        "wave": "{{stage}} · {{n}}. dalga"
-      }
     }
   },
   "stability": {
@@ -4435,7 +4435,6 @@
       "retry": "Tekrar dene"
     },
     "translations": {
-      "eyebrow": "Admin",
       "title": "Yapay zekâ çevirisi",
       "subtitle": "Oyun metinlerinin Claude çevirisi: anahtar, limitler, diller, işler ve sözlük.",
       "tabs": {
@@ -4607,50 +4606,7 @@
       },
       "cards": {
         "title": "Bilgi kartları",
-        "intro": "Yalnızca yapay zeka tıkandığında: bir soru, bir cevap. En önemli kartlar başta.",
-        "lang": "Dil",
-        "goal": "Günlük hedef: {{done}} / {{goal}} kart",
-        "goalLabel": "Günlük hedefe ilerleme",
-        "streak": "Seri: {{days}} gün",
-        "open": "{{count}} açık",
-        "skippedBefore": "Atlandı",
-        "fresh": "Güncel yama",
-        "spread": "{{count}} metni etkiliyor",
-        "choose": "Hangi çeviri daha iyi?",
-        "option": {
-          "a": "Seçenek A",
-          "b": "Seçenek B"
-        },
-        "bothWrong": "İkisi de yanlış – kendi metnim",
-        "ownText": "Metnin (yönetici düzeltmesi olarak alınır)",
-        "note": "Yapay zeka için ipucu notu (isteğe bağlı)",
-        "saveRule": "Kural olarak kaydet (her yerde geçerli)",
-        "submit": "Cevabı kaydet",
-        "skip": "Atla",
-        "kinds": {
-          "meta": "Meta",
-          "wording": "Kelime seçimi",
-          "style": "Üslup"
-        },
-        "context": {
-          "title": "Bağlam",
-          "key": "Anahtar",
-          "en": "İngilizce orijinal",
-          "where": "Oyunda nerede",
-          "neighbours": "Komşu satırlar",
-          "research": "Araştırma"
-        },
-        "thanks": "Teşekkürler, kaydedildi.",
-        "impact": "Bu cevap {{count}} metni tutarlı hale getirdi.",
-        "points": "+{{points}} puan",
-        "next": "Sonraki kart",
-        "done": "Bitti",
-        "emptyTitle": "Karar verilecek bir şey yok",
-        "empty": "Yapay zeka şu an tek başına idare ediyor – açık kart yok.",
-        "leaderboard": "Sıralama",
-        "leaderboardEmpty": "Henüz cevap yok – ilk kart seni öne geçirir.",
-        "boardAnswers": "{{count}} cevap",
-        "boardPoints": "{{points}} puan"
+        "next": "Sonraki kart"
       },
       "sources": {
         "title": "Kaynaklar",

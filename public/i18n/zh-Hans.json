@@ -3407,6 +3407,56 @@
       "badge": "视频",
       "play": "播放视频"
     },
+    "patchBoard": {
+      "switch": {
+        "aria": "选择渠道",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Live 玩家关心的内容",
+        "ptuHint": "测试构建：每一个构建都列出"
+      },
+      "unread": "未读",
+      "newForYou": "你的新内容",
+      "readFull": "阅读全文",
+      "markRead": "已读",
+      "readOn": "已于 {{date}} 阅读",
+      "readEarlier": "之前已读",
+      "readAgain": "再读一遍",
+      "now": {
+        "title": "刚刚登陆 Live",
+        "since": "自 {{date}} 起",
+        "none": "Feed 中还没有 Live 补丁。"
+      },
+      "next": {
+        "title": "Live 上的下一个",
+        "none": "尚不知道下一个补丁。",
+        "testing": "正在 {{ring}} 测试中",
+        "noDate": "无官方日期",
+        "announced": "已公布为 {{date}}",
+        "estimate": "估算：{{when}}"
+      },
+      "allAbout": "关于 {{line}} 的一切",
+      "close": "关闭",
+      "noDate": "无日期",
+      "roadmap": {
+        "aria": "路线图状态",
+        "committed": "已确认",
+        "tentative": "可能",
+        "released": "已交付"
+      },
+      "status": {
+        "next": "即将到来"
+      },
+      "daysLive": "已上线 {{n}} 天",
+      "earlier": "{{n}} 条更早的更新",
+      "earlierHide": "隐藏更早的更新",
+      "ptu": {
+        "newest": "最新测试构建",
+        "aria": "测试构建，最新的在前",
+        "empty": "目前 Feed 中没有测试构建。",
+        "wave": "{{stage}} · 第 {{n}} 批"
+      }
+    },
     "patch": {
       "line": "Alpha {{version}}",
       "otherLine": "无版本号",
@@ -3591,15 +3641,15 @@
         "section": {
           "stabilitaet": "稳定性",
           "builds": "正在进行的测试构建",
+          "first": "这个补丁的第一步",
+          "community": "社区",
+          "urteil": "你的评价",
           "prepPast": "需要了解什么",
           "contents": "里面有什么？",
           "fixed": "他们修复了……吗？",
           "next": "下一个什么时候来？",
           "nextThis": "这个补丁什么时候上线？",
-          "nextPast": "之后发生了什么？",
-          "first": "这个补丁的第一步",
-          "community": "社区",
-          "urteil": "你的评价"
+          "nextPast": "之后发生了什么？"
         },
         "noteOf": "{{version}} 中的变更 · Alpha {{line}} 的一部分",
         "wholeLine": "查看完整的 {{line}} 补丁",
@@ -3612,26 +3662,26 @@
         "wipe": "清档",
         "noBuildInfo": "RSI 没有为此构建发布“Important Build Info”。",
         "generalTitle": "适用于每个补丁",
+        "nextTitle": "为下一个大型补丁做准备",
         "generalItem": {
           "launcher": "打开启动器并等待下载完成——启动器显示的版本必须与补丁一致。",
           "shaders": "如果补丁后画面闪烁或帧率下降，请清空着色器文件夹（%LOCALAPPDATA%\\\\Star Citizen\\\\）。",
           "verify": "补丁后立即崩溃：报告 Bug 前，请先在启动器中运行“Verify”。",
           "repair": "角色卡住或装备丢失：请在 RSI 账号中运行 Character Repair，然后重新登录。",
           "known": "报告前先浏览一下已知问题——大多数新 Bug 已经列在那里。"
-        },
-        "nextTitle": "为下一个大型补丁做准备"
+        }
       },
       "contents": {
         "inNotes": "在发行说明中",
+        "fixedTitle": "已修复",
+        "knownTitle": "已知问题",
+        "gallery": "这个补丁的图片",
+        "moreLines": "再显示 {{n}} 条",
         "more": "全文",
         "less": "收起",
         "leftover": "说明中没有路线图卡片的其他要点（{{n}}）",
         "noRoadmap": "此补丁没有路线图数据——这是说明“{{title}}”：",
-        "ofNote": "来自“{{title}}”的变更：",
-        "fixedTitle": "已修复",
-        "knownTitle": "已知问题",
-        "gallery": "这个补丁的图片",
-        "moreLines": "再显示 {{n}} 条"
+        "ofNote": "来自“{{title}}”的变更："
       },
       "fixed": {
         "placeholder": "在此补丁中搜索……例如 quantum drive",
@@ -3784,56 +3834,6 @@
       "sinceDays": "已持续 {{days}} 天",
       "toBoard": "补丁中心",
       "toNotes": "阅读补丁说明"
-    },
-    "patchBoard": {
-      "switch": {
-        "aria": "选择渠道",
-        "live": "Live",
-        "ptu": "PTU",
-        "liveHint": "Live 玩家关心的内容",
-        "ptuHint": "测试构建：每一个构建都列出"
-      },
-      "unread": "未读",
-      "newForYou": "你的新内容",
-      "readFull": "阅读全文",
-      "markRead": "已读",
-      "readOn": "已于 {{date}} 阅读",
-      "readEarlier": "之前已读",
-      "readAgain": "再读一遍",
-      "now": {
-        "title": "刚刚登陆 Live",
-        "since": "自 {{date}} 起",
-        "none": "Feed 中还没有 Live 补丁。"
-      },
-      "next": {
-        "title": "Live 上的下一个",
-        "none": "尚不知道下一个补丁。",
-        "testing": "正在 {{ring}} 测试中",
-        "noDate": "无官方日期",
-        "announced": "已公布为 {{date}}",
-        "estimate": "估算：{{when}}"
-      },
-      "allAbout": "关于 {{line}} 的一切",
-      "close": "关闭",
-      "noDate": "无日期",
-      "roadmap": {
-        "aria": "路线图状态",
-        "committed": "已确认",
-        "tentative": "可能",
-        "released": "已交付"
-      },
-      "status": {
-        "next": "即将到来"
-      },
-      "daysLive": "已上线 {{n}} 天",
-      "earlier": "{{n}} 条更早的更新",
-      "earlierHide": "隐藏更早的更新",
-      "ptu": {
-        "newest": "最新测试构建",
-        "aria": "测试构建，最新的在前",
-        "empty": "目前 Feed 中没有测试构建。",
-        "wave": "{{stage}} · 第 {{n}} 批"
-      }
     }
   },
   "stability": {
@@ -4435,7 +4435,6 @@
       "retry": "重试"
     },
     "translations": {
-      "eyebrow": "管理员",
       "title": "AI 翻译",
       "subtitle": "由 Claude 翻译游戏文本：开关、上限、语言、任务和术语表。",
       "tabs": {
@@ -4607,50 +4606,7 @@
       },
       "cards": {
         "title": "闪卡",
-        "intro": "仅在 AI 无法判断时使用：一个问题，一个答案。最重要的卡片排在最前。",
-        "lang": "语言",
-        "goal": "每日目标：{{done}} / {{goal}} 张卡片",
-        "goalLabel": "每日目标进度",
-        "streak": "连续 {{days}} 天",
-        "open": "{{count}} 张待处理",
-        "skippedBefore": "已跳过",
-        "fresh": "当前补丁",
-        "spread": "影响 {{count}} 条字符串",
-        "choose": "哪个翻译更好？",
-        "option": {
-          "a": "选项 A",
-          "b": "选项 B"
-        },
-        "bothWrong": "两者都不对——自己填写",
-        "ownText": "你的文本（将作为管理员修正采用）",
-        "note": "给 AI 的备注提示（可选）",
-        "saveRule": "保存为规则（全局适用）",
-        "submit": "保存答案",
-        "skip": "跳过",
-        "kinds": {
-          "meta": "Meta",
-          "wording": "措辞",
-          "style": "风格"
-        },
-        "context": {
-          "title": "上下文",
-          "key": "键",
-          "en": "英文原文",
-          "where": "游戏中的位置",
-          "neighbours": "相邻行",
-          "research": "调研"
-        },
-        "thanks": "谢谢，已保存。",
-        "impact": "此答案统一了 {{count}} 条字符串。",
-        "points": "+{{points}} 分",
-        "next": "下一张卡片",
-        "done": "完成",
-        "emptyTitle": "无需决定",
-        "empty": "AI 目前可以自行处理——没有待处理的卡片。",
-        "leaderboard": "排行榜",
-        "leaderboardEmpty": "暂无答案——回答第一张卡片就能排到最前。",
-        "boardAnswers": "{{count}} 个答案",
-        "boardPoints": "{{points}} 分"
+        "next": "下一张卡片"
       },
       "sources": {
         "title": "来源",

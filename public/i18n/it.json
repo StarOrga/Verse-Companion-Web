@@ -3407,6 +3407,56 @@
       "badge": "Video",
       "play": "Riproduci video"
     },
+    "patchBoard": {
+      "switch": {
+        "aria": "Scegli il canale",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Ciò che conta per chi gioca su Live",
+        "ptuHint": "Build di test: ogni singola build"
+      },
+      "unread": "Non letto",
+      "newForYou": "Nuovo per te",
+      "readFull": "Leggi tutto",
+      "markRead": "Letto",
+      "readOn": "letto il {{date}}",
+      "readEarlier": "letto in precedenza",
+      "readAgain": "Rileggi",
+      "now": {
+        "title": "Appena arrivata su Live",
+        "since": "Dal {{date}}",
+        "none": "Ancora nessuna patch Live nel feed."
+      },
+      "next": {
+        "title": "Prossima su Live",
+        "none": "Nessuna prossima patch nota per ora.",
+        "testing": "In test su {{ring}}",
+        "noDate": "Nessuna data ufficiale",
+        "announced": "Annunciata per il {{date}}",
+        "estimate": "Stima: {{when}}"
+      },
+      "allAbout": "Tutto su {{line}}",
+      "close": "Chiudi",
+      "noDate": "Senza data",
+      "roadmap": {
+        "aria": "Stato della roadmap",
+        "committed": "Confermato",
+        "tentative": "Possibile",
+        "released": "Consegnato"
+      },
+      "status": {
+        "next": "In arrivo"
+      },
+      "daysLive": "{{n}} giorni su Live",
+      "earlier": "{{n}} aggiornamenti precedenti",
+      "earlierHide": "Nascondi aggiornamenti precedenti",
+      "ptu": {
+        "newest": "Build di test più recente",
+        "aria": "Build di test, dalla più recente",
+        "empty": "Al momento nessuna build di test nel feed.",
+        "wave": "{{stage}} · ondata {{n}}"
+      }
+    },
     "patch": {
       "line": "Alpha {{version}}",
       "otherLine": "Senza versione",
@@ -3591,15 +3641,15 @@
         "section": {
           "stabilitaet": "Stabilità",
           "builds": "Build di test in corso",
+          "first": "Primi passi in questa patch",
+          "community": "Community",
+          "urteil": "Il tuo verdetto",
           "prepPast": "Cosa c'era da sapere",
           "contents": "Cosa contiene?",
           "fixed": "Hanno sistemato …?",
           "next": "Quando arriva la prossima?",
           "nextThis": "Quando arriva questa patch?",
-          "nextPast": "Cosa è venuto dopo?",
-          "first": "Primi passi in questa patch",
-          "community": "Community",
-          "urteil": "Il tuo verdetto"
+          "nextPast": "Cosa è venuto dopo?"
         },
         "noteOf": "Modifiche in {{version}} · parte di Alpha {{line}}",
         "wholeLine": "Vedi l'intera patch {{line}}",
@@ -3612,26 +3662,26 @@
         "wipe": "Wipe",
         "noBuildInfo": "RSI non ha pubblicato nessuna \"Important Build Info\" per questa build.",
         "generalTitle": "Vale per ogni patch",
+        "nextTitle": "Prepararsi alla prossima patch principale",
         "generalItem": {
           "launcher": "Apri il launcher e lascia che finisca il download: la versione mostrata deve corrispondere alla patch.",
           "shaders": "Svuota la cartella degli shader (%LOCALAPPDATA%\\\\Star Citizen\\\\) se la grafica sfarfalla o il frame rate cala dopo la patch.",
           "verify": "Crash subito dopo una patch: esegui \"Verify\" nel launcher prima di segnalare un bug.",
           "repair": "Personaggio bloccato o equipaggiamento mancante: esegui Character Repair nel tuo account RSI, poi accedi di nuovo.",
           "known": "Dai un'occhiata ai problemi noti prima di segnalare: la maggior parte dei bug recenti è già elencata."
-        },
-        "nextTitle": "Prepararsi alla prossima patch principale"
+        }
       },
       "contents": {
         "inNotes": "Nelle note di rilascio",
+        "fixedTitle": "Risolti",
+        "knownTitle": "Problemi noti",
+        "gallery": "Immagini di questa patch",
+        "moreLines": "Mostra altri {{n}}",
         "more": "Testo completo",
         "less": "Comprimi",
         "leftover": "Altri punti della nota senza scheda roadmap ({{n}})",
         "noRoadmap": "Nessun dato roadmap per questa patch — ecco la nota \"{{title}}\":",
-        "ofNote": "Le modifiche da “{{title}}”:",
-        "fixedTitle": "Risolti",
-        "knownTitle": "Problemi noti",
-        "gallery": "Immagini di questa patch",
-        "moreLines": "Mostra altri {{n}}"
+        "ofNote": "Le modifiche da “{{title}}”:"
       },
       "fixed": {
         "placeholder": "Cerca in questa patch … es. quantum drive",
@@ -3784,56 +3834,6 @@
       "sinceDays": "Da {{days}} giorni",
       "toBoard": "Patch Central",
       "toNotes": "Leggi le patch notes"
-    },
-    "patchBoard": {
-      "switch": {
-        "aria": "Scegli il canale",
-        "live": "Live",
-        "ptu": "PTU",
-        "liveHint": "Ciò che conta per chi gioca su Live",
-        "ptuHint": "Build di test: ogni singola build"
-      },
-      "unread": "Non letto",
-      "newForYou": "Nuovo per te",
-      "readFull": "Leggi tutto",
-      "markRead": "Letto",
-      "readOn": "letto il {{date}}",
-      "readEarlier": "letto in precedenza",
-      "readAgain": "Rileggi",
-      "now": {
-        "title": "Appena arrivata su Live",
-        "since": "Dal {{date}}",
-        "none": "Ancora nessuna patch Live nel feed."
-      },
-      "next": {
-        "title": "Prossima su Live",
-        "none": "Nessuna prossima patch nota per ora.",
-        "testing": "In test su {{ring}}",
-        "noDate": "Nessuna data ufficiale",
-        "announced": "Annunciata per il {{date}}",
-        "estimate": "Stima: {{when}}"
-      },
-      "allAbout": "Tutto su {{line}}",
-      "close": "Chiudi",
-      "noDate": "Senza data",
-      "roadmap": {
-        "aria": "Stato della roadmap",
-        "committed": "Confermato",
-        "tentative": "Possibile",
-        "released": "Consegnato"
-      },
-      "status": {
-        "next": "In arrivo"
-      },
-      "daysLive": "{{n}} giorni su Live",
-      "earlier": "{{n}} aggiornamenti precedenti",
-      "earlierHide": "Nascondi aggiornamenti precedenti",
-      "ptu": {
-        "newest": "Build di test più recente",
-        "aria": "Build di test, dalla più recente",
-        "empty": "Al momento nessuna build di test nel feed.",
-        "wave": "{{stage}} · ondata {{n}}"
-      }
     }
   },
   "stability": {
@@ -4435,7 +4435,6 @@
       "retry": "Riprova"
     },
     "translations": {
-      "eyebrow": "Admin",
       "title": "Traduzione IA",
       "subtitle": "Traduzione dei testi di gioco con Claude: interruttore, limiti, lingue, job e glossario.",
       "tabs": {
@@ -4607,50 +4606,7 @@
       },
       "cards": {
         "title": "Flashcard",
-        "intro": "Solo quando l'IA è bloccata: una domanda, una risposta. Le carte più importanti vengono per prime.",
-        "lang": "Lingua",
-        "goal": "Obiettivo giornaliero: {{done}} di {{goal}} carte",
-        "goalLabel": "Progresso verso l'obiettivo giornaliero",
-        "streak": "Serie: {{days}} giorni",
-        "open": "{{count}} aperte",
-        "skippedBefore": "Saltate",
-        "fresh": "Patch attuale",
-        "spread": "riguarda {{count}} stringhe",
-        "choose": "Quale traduzione è migliore?",
-        "option": {
-          "a": "Opzione A",
-          "b": "Opzione B"
-        },
-        "bothWrong": "Entrambe sbagliate – testo personalizzato",
-        "ownText": "Il tuo testo (diventa una correzione admin)",
-        "note": "Nota come suggerimento per l'IA (facoltativa)",
-        "saveRule": "Salva come regola (vale ovunque)",
-        "submit": "Salva risposta",
-        "skip": "Salta",
-        "kinds": {
-          "meta": "Meta",
-          "wording": "Scelta delle parole",
-          "style": "Stile"
-        },
-        "context": {
-          "title": "Contesto",
-          "key": "Chiave",
-          "en": "Originale inglese",
-          "where": "Dove nel gioco",
-          "neighbours": "Righe vicine",
-          "research": "Ricerca"
-        },
-        "thanks": "Grazie, salvato.",
-        "impact": "Questa risposta ha uniformato {{count}} stringhe.",
-        "points": "+{{points}} punti",
-        "next": "Prossima carta",
-        "done": "Fatto",
-        "emptyTitle": "Niente da decidere",
-        "empty": "Al momento l'IA se la cava da sola: non ci sono carte aperte.",
-        "leaderboard": "Classifica",
-        "leaderboardEmpty": "Ancora nessuna risposta: la prima carta ti porta in testa.",
-        "boardAnswers": "{{count}} risposte",
-        "boardPoints": "{{points}} punti"
+        "next": "Prossima carta"
       },
       "sources": {
         "title": "Fonti",

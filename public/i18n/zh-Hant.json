@@ -3407,6 +3407,56 @@
       "badge": "影片",
       "play": "播放影片"
     },
+    "patchBoard": {
+      "switch": {
+        "aria": "選擇頻道",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Live 玩家在意的內容",
+        "ptuHint": "測試建置：每一個建置都列出"
+      },
+      "unread": "未讀",
+      "newForYou": "給你的新內容",
+      "readFull": "閱讀全文",
+      "markRead": "已讀",
+      "readOn": "已於 {{date}} 閱讀",
+      "readEarlier": "先前已讀",
+      "readAgain": "再讀一次",
+      "now": {
+        "title": "剛登上 Live",
+        "since": "自 {{date}} 起",
+        "none": "Feed 中還沒有 Live 版本。"
+      },
+      "next": {
+        "title": "Live 上的下一個",
+        "none": "尚不知道下一個版本。",
+        "testing": "正在 {{ring}} 測試中",
+        "noDate": "無官方日期",
+        "announced": "已公布為 {{date}}",
+        "estimate": "預估：{{when}}"
+      },
+      "allAbout": "關於 {{line}} 的一切",
+      "close": "關閉",
+      "noDate": "無日期",
+      "roadmap": {
+        "aria": "路線圖狀態",
+        "committed": "已確認",
+        "tentative": "可能",
+        "released": "已交付"
+      },
+      "status": {
+        "next": "即將到來"
+      },
+      "daysLive": "已上線 {{n}} 天",
+      "earlier": "{{n}} 則較早的更新",
+      "earlierHide": "隱藏較早的更新",
+      "ptu": {
+        "newest": "最新測試建置",
+        "aria": "測試建置，最新的在前",
+        "empty": "目前 Feed 中沒有測試建置。",
+        "wave": "{{stage}} · 第 {{n}} 批"
+      }
+    },
     "patch": {
       "line": "Alpha {{version}}",
       "otherLine": "無版本資訊",
@@ -3591,15 +3641,15 @@
         "section": {
           "stabilitaet": "穩定度",
           "builds": "進行中的測試建置",
+          "first": "這個版本的第一步",
+          "community": "社群",
+          "urteil": "你的評價",
           "prepPast": "你需要知道的事",
           "contents": "內容有什麼？",
           "fixed": "他們修好了……嗎？",
           "next": "下一個何時推出？",
           "nextThis": "這個版本何時推出？",
-          "nextPast": "之後發生了什麼？",
-          "first": "這個版本的第一步",
-          "community": "社群",
-          "urteil": "你的評價"
+          "nextPast": "之後發生了什麼？"
         },
         "noteOf": "{{version}} 的變更 · Alpha {{line}} 的一部分",
         "wholeLine": "查看完整的 {{line}} 版本",
@@ -3612,26 +3662,26 @@
         "wipe": "重置",
         "noBuildInfo": "RSI 未針對此建置發布「Important Build Info」。",
         "generalTitle": "適用於每個版本",
+        "nextTitle": "為下一個大型版本做準備",
         "generalItem": {
           "launcher": "開啟啟動器並等待下載完成——啟動器顯示的版本必須與版本相符。",
           "shaders": "若更新後畫面閃爍或幀率下降，請清空著色器資料夾(%LOCALAPPDATA%\\\\Star Citizen\\\\)。",
           "verify": "更新後立即當機：回報錯誤前，請先在啟動器中執行「Verify」。",
           "repair": "角色卡住或裝備遺失：請在 RSI 帳號中執行 Character Repair,然後重新登入。",
           "known": "回報前請先瀏覽已知問題——大多數新錯誤已列在那裡。"
-        },
-        "nextTitle": "為下一個大型版本做準備"
+        }
       },
       "contents": {
         "inNotes": "在版本說明中",
+        "fixedTitle": "已修正",
+        "knownTitle": "已知問題",
+        "gallery": "這個版本的圖片",
+        "moreLines": "再顯示 {{n}} 則",
         "more": "完整內容",
         "less": "收合",
         "leftover": "沒有路線圖卡片的其他說明要點({{n}})",
         "noRoadmap": "此版本沒有路線圖資料——以下是說明「{{title}}」：",
-        "ofNote": "「{{title}}」的變更：",
-        "fixedTitle": "已修正",
-        "knownTitle": "已知問題",
-        "gallery": "這個版本的圖片",
-        "moreLines": "再顯示 {{n}} 則"
+        "ofNote": "「{{title}}」的變更："
       },
       "fixed": {
         "placeholder": "搜尋此版本……例如 quantum drive",
@@ -3784,56 +3834,6 @@
       "sinceDays": "已 {{days}} 天",
       "toBoard": "版本中心",
       "toNotes": "閱讀版本說明"
-    },
-    "patchBoard": {
-      "switch": {
-        "aria": "選擇頻道",
-        "live": "Live",
-        "ptu": "PTU",
-        "liveHint": "Live 玩家在意的內容",
-        "ptuHint": "測試建置：每一個建置都列出"
-      },
-      "unread": "未讀",
-      "newForYou": "給你的新內容",
-      "readFull": "閱讀全文",
-      "markRead": "已讀",
-      "readOn": "已於 {{date}} 閱讀",
-      "readEarlier": "先前已讀",
-      "readAgain": "再讀一次",
-      "now": {
-        "title": "剛登上 Live",
-        "since": "自 {{date}} 起",
-        "none": "Feed 中還沒有 Live 版本。"
-      },
-      "next": {
-        "title": "Live 上的下一個",
-        "none": "尚不知道下一個版本。",
-        "testing": "正在 {{ring}} 測試中",
-        "noDate": "無官方日期",
-        "announced": "已公布為 {{date}}",
-        "estimate": "預估：{{when}}"
-      },
-      "allAbout": "關於 {{line}} 的一切",
-      "close": "關閉",
-      "noDate": "無日期",
-      "roadmap": {
-        "aria": "路線圖狀態",
-        "committed": "已確認",
-        "tentative": "可能",
-        "released": "已交付"
-      },
-      "status": {
-        "next": "即將到來"
-      },
-      "daysLive": "已上線 {{n}} 天",
-      "earlier": "{{n}} 則較早的更新",
-      "earlierHide": "隱藏較早的更新",
-      "ptu": {
-        "newest": "最新測試建置",
-        "aria": "測試建置，最新的在前",
-        "empty": "目前 Feed 中沒有測試建置。",
-        "wave": "{{stage}} · 第 {{n}} 批"
-      }
     }
   },
   "stability": {
@@ -4435,7 +4435,6 @@
       "retry": "重試"
     },
     "translations": {
-      "eyebrow": "Admin",
       "title": "AI 翻譯",
       "subtitle": "以 Claude 翻譯遊戲文字：開關、上限、語言、工作與詞彙表。",
       "tabs": {
@@ -4607,50 +4606,7 @@
       },
       "cards": {
         "title": "字卡",
-        "intro": "僅在 AI 卡關時使用：一個問題，一個答案。最重要的字卡排在最前面。",
-        "lang": "語言",
-        "goal": "每日目標：{{done}} / {{goal}} 張字卡",
-        "goalLabel": "每日目標進度",
-        "streak": "連續紀錄：{{days}} 天",
-        "open": "剩餘 {{count}} 張",
-        "skippedBefore": "已略過",
-        "fresh": "目前的 Patch",
-        "spread": "影響 {{count}} 個字串",
-        "choose": "哪個翻譯比較好？",
-        "option": {
-          "a": "選項 A",
-          "b": "選項 B"
-        },
-        "bothWrong": "兩者皆不對 – 自行輸入",
-        "ownText": "你的文字（將作為管理員修正採用）",
-        "note": "給 AI 的提示備註（選填）",
-        "saveRule": "儲存為規則（全域適用）",
-        "submit": "儲存答案",
-        "skip": "略過",
-        "kinds": {
-          "meta": "Meta",
-          "wording": "用詞",
-          "style": "風格"
-        },
-        "context": {
-          "title": "上下文",
-          "key": "鍵值",
-          "en": "英文原文",
-          "where": "遊戲中的位置",
-          "neighbours": "相鄰行",
-          "research": "研究"
-        },
-        "thanks": "謝謝，已儲存。",
-        "impact": "此答案統一了 {{count}} 個字串。",
-        "points": "+{{points}} 分",
-        "next": "下一張字卡",
-        "done": "完成",
-        "emptyTitle": "沒有需要決定的項目",
-        "empty": "AI 目前可以自行處理 – 沒有待處理的字卡。",
-        "leaderboard": "排行榜",
-        "leaderboardEmpty": "尚無回答 – 回答第一張字卡就能領先。",
-        "boardAnswers": "{{count}} 個回答",
-        "boardPoints": "{{points}} 分"
+        "next": "下一張字卡"
       },
       "sources": {
         "title": "來源",

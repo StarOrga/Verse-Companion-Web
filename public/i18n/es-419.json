@@ -3407,6 +3407,56 @@
       "badge": "Video",
       "play": "Reproducir video"
     },
+    "patchBoard": {
+      "switch": {
+        "aria": "Elegir canal",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Lo que importa a los jugadores de Live",
+        "ptuHint": "Builds de prueba: cada build por separado"
+      },
+      "unread": "No leído",
+      "newForYou": "Nuevo para ti",
+      "readFull": "Leer completo",
+      "markRead": "Leído",
+      "readOn": "leído el {{date}}",
+      "readEarlier": "leído antes",
+      "readAgain": "Leer de nuevo",
+      "now": {
+        "title": "Recién llegado a Live",
+        "since": "Desde el {{date}}",
+        "none": "Todavía no hay ningún parche Live en el feed."
+      },
+      "next": {
+        "title": "Lo próximo en Live",
+        "none": "Todavía no se conoce el próximo parche.",
+        "testing": "En pruebas de {{ring}}",
+        "noDate": "Sin fecha oficial",
+        "announced": "Anunciado para el {{date}}",
+        "estimate": "Estimación: {{when}}"
+      },
+      "allAbout": "Todo sobre {{line}}",
+      "close": "Cerrar",
+      "noDate": "Sin fecha",
+      "roadmap": {
+        "aria": "Estado en el roadmap",
+        "committed": "Confirmado",
+        "tentative": "Posible",
+        "released": "Entregado"
+      },
+      "status": {
+        "next": "A continuación"
+      },
+      "daysLive": "{{n}} días en Live",
+      "earlier": "{{n}} actualizaciones anteriores",
+      "earlierHide": "Ocultar actualizaciones anteriores",
+      "ptu": {
+        "newest": "Build de prueba más reciente",
+        "aria": "Builds de prueba, la más reciente primero",
+        "empty": "En este momento no hay builds de prueba en el feed.",
+        "wave": "{{stage}} · oleada {{n}}"
+      }
+    },
     "patch": {
       "line": "Alpha {{version}}",
       "otherLine": "Sin versión",
@@ -3591,15 +3641,15 @@
         "section": {
           "stabilitaet": "Estabilidad",
           "builds": "Builds de prueba en curso",
+          "first": "Primeros pasos en este parche",
+          "community": "Comunidad",
+          "urteil": "Tu veredicto",
           "prepPast": "Qué había que tener en cuenta",
           "contents": "¿Qué incluye?",
           "fixed": "¿Ya arreglaron …?",
           "next": "¿Cuándo sale el próximo?",
           "nextThis": "¿Cuándo sale este parche?",
-          "nextPast": "¿Qué vino después?",
-          "first": "Primeros pasos en este parche",
-          "community": "Comunidad",
-          "urteil": "Tu veredicto"
+          "nextPast": "¿Qué vino después?"
         },
         "noteOf": "Cambios en {{version}} · parte de Alpha {{line}}",
         "wholeLine": "Ver el parche {{line}} completo",
@@ -3612,26 +3662,26 @@
         "wipe": "Wipe",
         "noBuildInfo": "RSI no publicó \"Important Build Info\" para este build.",
         "generalTitle": "Válido para todos los parches",
+        "nextTitle": "Preparación para el próximo parche principal",
         "generalItem": {
           "launcher": "Abre el launcher y deja que termine de descargar: la versión que muestra debe coincidir con el parche.",
           "shaders": "Vacía la carpeta de shaders (%LOCALAPPDATA%\\\\Star Citizen\\\\) si los gráficos parpadean o los FPS bajan después del parche.",
           "verify": "Si hay cierres inesperados justo después de un parche: ejecuta \"Verify\" en el launcher antes de reportar un bug.",
           "repair": "Si el personaje se queda atascado o falta equipo: ejecuta Character Repair en tu cuenta de RSI y vuelve a iniciar sesión.",
           "known": "Revisa los problemas conocidos antes de reportar: la mayoría de los bugs nuevos ya están listados ahí."
-        },
-        "nextTitle": "Preparación para el próximo parche principal"
+        }
       },
       "contents": {
         "inNotes": "En las notas de versión",
+        "fixedTitle": "Corregido",
+        "knownTitle": "Problemas conocidos",
+        "gallery": "Imágenes de este parche",
+        "moreLines": "Mostrar {{n}} más",
         "more": "Texto completo",
         "less": "Contraer",
         "leftover": "Más puntos de la nota sin tarjeta de roadmap ({{n}})",
         "noRoadmap": "No hay datos de roadmap para este parche; aquí está la nota \"{{title}}\":",
-        "ofNote": "Los cambios de “{{title}}”:",
-        "fixedTitle": "Corregido",
-        "knownTitle": "Problemas conocidos",
-        "gallery": "Imágenes de este parche",
-        "moreLines": "Mostrar {{n}} más"
+        "ofNote": "Los cambios de “{{title}}”:"
       },
       "fixed": {
         "placeholder": "Buscar en este parche … p. ej. quantum drive",
@@ -3784,56 +3834,6 @@
       "sinceDays": "Desde hace {{days}} días",
       "toBoard": "Centro de parches",
       "toNotes": "Leer las notas del parche"
-    },
-    "patchBoard": {
-      "switch": {
-        "aria": "Elegir canal",
-        "live": "Live",
-        "ptu": "PTU",
-        "liveHint": "Lo que importa a los jugadores de Live",
-        "ptuHint": "Builds de prueba: cada build por separado"
-      },
-      "unread": "No leído",
-      "newForYou": "Nuevo para ti",
-      "readFull": "Leer completo",
-      "markRead": "Leído",
-      "readOn": "leído el {{date}}",
-      "readEarlier": "leído antes",
-      "readAgain": "Leer de nuevo",
-      "now": {
-        "title": "Recién llegado a Live",
-        "since": "Desde el {{date}}",
-        "none": "Todavía no hay ningún parche Live en el feed."
-      },
-      "next": {
-        "title": "Lo próximo en Live",
-        "none": "Todavía no se conoce el próximo parche.",
-        "testing": "En pruebas de {{ring}}",
-        "noDate": "Sin fecha oficial",
-        "announced": "Anunciado para el {{date}}",
-        "estimate": "Estimación: {{when}}"
-      },
-      "allAbout": "Todo sobre {{line}}",
-      "close": "Cerrar",
-      "noDate": "Sin fecha",
-      "roadmap": {
-        "aria": "Estado en el roadmap",
-        "committed": "Confirmado",
-        "tentative": "Posible",
-        "released": "Entregado"
-      },
-      "status": {
-        "next": "A continuación"
-      },
-      "daysLive": "{{n}} días en Live",
-      "earlier": "{{n}} actualizaciones anteriores",
-      "earlierHide": "Ocultar actualizaciones anteriores",
-      "ptu": {
-        "newest": "Build de prueba más reciente",
-        "aria": "Builds de prueba, la más reciente primero",
-        "empty": "En este momento no hay builds de prueba en el feed.",
-        "wave": "{{stage}} · oleada {{n}}"
-      }
     }
   },
   "stability": {
@@ -4435,7 +4435,6 @@
       "retry": "Reintentar"
     },
     "translations": {
-      "eyebrow": "Admin",
       "title": "Traducción con IA",
       "subtitle": "Traducción de los textos del juego con Claude: interruptor, límites, idiomas, trabajos y glosario.",
       "tabs": {
@@ -4607,50 +4606,7 @@
       },
       "cards": {
         "title": "Tarjetas de estudio",
-        "intro": "Solo cuando la IA no puede avanzar: una pregunta, una respuesta. Las tarjetas más importantes van primero.",
-        "lang": "Idioma",
-        "goal": "Meta diaria: {{done}} de {{goal}} tarjetas",
-        "goalLabel": "Progreso hacia la meta diaria",
-        "streak": "Racha: {{days}} días",
-        "open": "{{count}} pendientes",
-        "skippedBefore": "Omitidas",
-        "fresh": "Parche actual",
-        "spread": "afecta {{count}} cadenas",
-        "choose": "¿Qué traducción es mejor?",
-        "option": {
-          "a": "Opción A",
-          "b": "Opción B"
-        },
-        "bothWrong": "Ambas mal: texto propio",
-        "ownText": "Tu texto (se guarda como corrección de admin)",
-        "note": "Nota como pista para la IA (opcional)",
-        "saveRule": "Guardar como regla (aplica en todas partes)",
-        "submit": "Guardar respuesta",
-        "skip": "Omitir",
-        "kinds": {
-          "meta": "Meta",
-          "wording": "Elección de palabras",
-          "style": "Estilo"
-        },
-        "context": {
-          "title": "Contexto",
-          "key": "Clave",
-          "en": "Original en inglés",
-          "where": "Dónde aparece en el juego",
-          "neighbours": "Líneas vecinas",
-          "research": "Investigación"
-        },
-        "thanks": "Gracias, guardado.",
-        "impact": "Esta respuesta unificó {{count}} cadenas.",
-        "points": "+{{points}} puntos",
-        "next": "Siguiente tarjeta",
-        "done": "Listo",
-        "emptyTitle": "Nada que decidir",
-        "empty": "La IA se las arregla sola por ahora: no hay tarjetas pendientes.",
-        "leaderboard": "Clasificación",
-        "leaderboardEmpty": "Aún no hay respuestas: la primera tarjeta te pone al frente.",
-        "boardAnswers": "{{count}} respuestas",
-        "boardPoints": "{{points}} puntos"
+        "next": "Siguiente tarjeta"
       },
       "sources": {
         "title": "Fuentes",

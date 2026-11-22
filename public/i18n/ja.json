@@ -3407,6 +3407,56 @@
       "badge": "動画",
       "play": "動画を再生"
     },
+    "patchBoard": {
+      "switch": {
+        "aria": "チャンネルを選択",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Liveプレイヤーにとって大事なこと",
+        "ptuHint": "テストビルド：すべてのビルドを個別に"
+      },
+      "unread": "未読",
+      "newForYou": "あなたへの新着",
+      "readFull": "全文を読む",
+      "markRead": "既読",
+      "readOn": "{{date}}に既読",
+      "readEarlier": "以前に既読",
+      "readAgain": "もう一度読む",
+      "now": {
+        "title": "Liveに来たばかり",
+        "since": "{{date}}から",
+        "none": "フィードにはまだLiveパッチがありません。"
+      },
+      "next": {
+        "title": "次のLive",
+        "none": "次のパッチはまだわかっていません。",
+        "testing": "{{ring}}でテスト中",
+        "noDate": "公式の日付なし",
+        "announced": "{{date}}予定と告知済み",
+        "estimate": "予測：{{when}}"
+      },
+      "allAbout": "{{line}}のすべて",
+      "close": "閉じる",
+      "noDate": "日付なし",
+      "roadmap": {
+        "aria": "ロードマップの状況",
+        "committed": "確定",
+        "tentative": "可能性あり",
+        "released": "提供済み"
+      },
+      "status": {
+        "next": "次に予定"
+      },
+      "daysLive": "Live {{n}}日目",
+      "earlier": "以前のアップデート {{n}}件",
+      "earlierHide": "以前のアップデートを隠す",
+      "ptu": {
+        "newest": "最新のテストビルド",
+        "aria": "テストビルド（新しい順）",
+        "empty": "現在フィードにテストビルドはありません。",
+        "wave": "{{stage}}・ウェーブ{{n}}"
+      }
+    },
     "patch": {
       "line": "Alpha {{version}}",
       "otherLine": "バージョン情報なし",
@@ -3591,15 +3641,15 @@
         "section": {
           "stabilitaet": "安定性",
           "builds": "実施中のテストビルド",
+          "first": "このパッチの最初の一歩",
+          "community": "コミュニティ",
+          "urteil": "あなたの評価",
           "prepPast": "知っておくべきこと",
           "contents": "内容は？",
           "fixed": "…は修正された？",
           "next": "次はいつ？",
           "nextThis": "このパッチはいつ来る？",
-          "nextPast": "その後はどうなった？",
-          "first": "このパッチの最初の一歩",
-          "community": "コミュニティ",
-          "urteil": "あなたの評価"
+          "nextPast": "その後はどうなった？"
         },
         "noteOf": "{{version}}での変更 · Alpha {{line}}の一部",
         "wholeLine": "{{line}}パッチ全体を見る",
@@ -3612,26 +3662,26 @@
         "wipe": "ワイプ",
         "noBuildInfo": "RSIはこのビルドの「Important Build Info」を公開していません。",
         "generalTitle": "すべてのパッチに共通",
+        "nextTitle": "次の大型パッチへの準備",
         "generalItem": {
           "launcher": "ランチャーを開いてダウンロードの完了を待ちましょう。表示されるバージョンがパッチと一致している必要があります。",
           "shaders": "パッチ後に画面がちらつく、またはフレームレートが落ちる場合は、シェーダーフォルダ(%LOCALAPPDATA%\\\\Star Citizen\\\\)を空にしてください。",
           "verify": "パッチ直後にクラッシュする場合は、バグを報告する前にランチャーで「Verify」を実行してください。",
           "repair": "キャラクターが動かない、または装備が消えた場合は、RSIアカウントでCharacter Repairを実行し、再ログインしてください。",
           "known": "報告する前に既知の問題に目を通しましょう。新しい不具合の多くはすでに掲載されています。"
-        },
-        "nextTitle": "次の大型パッチへの準備"
+        }
       },
       "contents": {
         "inNotes": "リリースノートより",
+        "fixedTitle": "修正済み",
+        "knownTitle": "既知の問題",
+        "gallery": "このパッチの画像",
+        "moreLines": "さらに{{n}}件表示",
         "more": "全文",
         "less": "折りたたむ",
         "leftover": "ロードマップカードのないノートの追加項目({{n}})",
         "noRoadmap": "このパッチのロードマップデータはありません。ノート「{{title}}」はこちら：",
-        "ofNote": "「{{title}}」の変更点：",
-        "fixedTitle": "修正済み",
-        "knownTitle": "既知の問題",
-        "gallery": "このパッチの画像",
-        "moreLines": "さらに{{n}}件表示"
+        "ofNote": "「{{title}}」の変更点："
       },
       "fixed": {
         "placeholder": "このパッチ内を検索… 例：quantum drive",
@@ -3784,56 +3834,6 @@
       "sinceDays": "{{days}}日間",
       "toBoard": "パッチセンター",
       "toNotes": "パッチノートを読む"
-    },
-    "patchBoard": {
-      "switch": {
-        "aria": "チャンネルを選択",
-        "live": "Live",
-        "ptu": "PTU",
-        "liveHint": "Liveプレイヤーにとって大事なこと",
-        "ptuHint": "テストビルド：すべてのビルドを個別に"
-      },
-      "unread": "未読",
-      "newForYou": "あなたへの新着",
-      "readFull": "全文を読む",
-      "markRead": "既読",
-      "readOn": "{{date}}に既読",
-      "readEarlier": "以前に既読",
-      "readAgain": "もう一度読む",
-      "now": {
-        "title": "Liveに来たばかり",
-        "since": "{{date}}から",
-        "none": "フィードにはまだLiveパッチがありません。"
-      },
-      "next": {
-        "title": "次のLive",
-        "none": "次のパッチはまだわかっていません。",
-        "testing": "{{ring}}でテスト中",
-        "noDate": "公式の日付なし",
-        "announced": "{{date}}予定と告知済み",
-        "estimate": "予測：{{when}}"
-      },
-      "allAbout": "{{line}}のすべて",
-      "close": "閉じる",
-      "noDate": "日付なし",
-      "roadmap": {
-        "aria": "ロードマップの状況",
-        "committed": "確定",
-        "tentative": "可能性あり",
-        "released": "提供済み"
-      },
-      "status": {
-        "next": "次に予定"
-      },
-      "daysLive": "Live {{n}}日目",
-      "earlier": "以前のアップデート {{n}}件",
-      "earlierHide": "以前のアップデートを隠す",
-      "ptu": {
-        "newest": "最新のテストビルド",
-        "aria": "テストビルド（新しい順）",
-        "empty": "現在フィードにテストビルドはありません。",
-        "wave": "{{stage}}・ウェーブ{{n}}"
-      }
     }
   },
   "stability": {
@@ -4435,7 +4435,6 @@
       "retry": "再試行"
     },
     "translations": {
-      "eyebrow": "Admin",
       "title": "AI翻訳",
       "subtitle": "ゲーム内テキストのClaude翻訳：スイッチ、上限、言語、ジョブ、用語集。",
       "tabs": {
@@ -4607,50 +4606,7 @@
       },
       "cards": {
         "title": "フラッシュカード",
-        "intro": "AIが判断に迷うときだけ、質問1つ・答え1つ。重要なカードが先頭に並びます。",
-        "lang": "言語",
-        "goal": "1日の目標：{{done}} / {{goal}} カード",
-        "goalLabel": "1日の目標の進捗",
-        "streak": "連続記録：{{days}} 日",
-        "open": "残り {{count}} 件",
-        "skippedBefore": "スキップ",
-        "fresh": "現在のパッチ",
-        "spread": "{{count}} 件の文字列に影響",
-        "choose": "どちらの翻訳が良いですか？",
-        "option": {
-          "a": "選択肢A",
-          "b": "選択肢B"
-        },
-        "bothWrong": "どちらも違う – 自分で入力",
-        "ownText": "あなたのテキスト（管理者による修正として反映されます）",
-        "note": "AIへのヒントとしてメモ（任意）",
-        "saveRule": "ルールとして保存（すべてに適用）",
-        "submit": "回答を保存",
-        "skip": "スキップ",
-        "kinds": {
-          "meta": "メタ",
-          "wording": "言葉選び",
-          "style": "スタイル"
-        },
-        "context": {
-          "title": "コンテキスト",
-          "key": "キー",
-          "en": "英語の原文",
-          "where": "ゲーム内の場所",
-          "neighbours": "前後の行",
-          "research": "調査"
-        },
-        "thanks": "ありがとうございます。保存しました。",
-        "impact": "この回答で {{count}} 件の文字列が統一されました。",
-        "points": "+{{points}} ポイント",
-        "next": "次のカード",
-        "done": "完了",
-        "emptyTitle": "判断するものはありません",
-        "empty": "現在はAIだけで対応できています。未処理のカードはありません。",
-        "leaderboard": "ランキング",
-        "leaderboardEmpty": "まだ回答がありません。最初のカードであなたが先頭になります。",
-        "boardAnswers": "{{count}} 件の回答",
-        "boardPoints": "{{points}} ポイント"
+        "next": "次のカード"
       },
       "sources": {
         "title": "ソース",

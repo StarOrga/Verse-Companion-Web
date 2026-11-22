@@ -3407,6 +3407,56 @@
       "badge": "Wideo",
       "play": "Odtwórz wideo"
     },
+    "patchBoard": {
+      "switch": {
+        "aria": "Wybierz kanał",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Co liczy się dla graczy Live",
+        "ptuHint": "Buildy testowe: każdy build z osobna"
+      },
+      "unread": "Nieprzeczytane",
+      "newForYou": "Nowe dla ciebie",
+      "readFull": "Czytaj w całości",
+      "markRead": "Przeczytane",
+      "readOn": "przeczytano {{date}}",
+      "readEarlier": "przeczytano wcześniej",
+      "readAgain": "Przeczytaj ponownie",
+      "now": {
+        "title": "Właśnie trafił na Live",
+        "since": "Od {{date}}",
+        "none": "W feedzie nie ma jeszcze patcha Live."
+      },
+      "next": {
+        "title": "Następny na Live",
+        "none": "Następny patch nie jest jeszcze znany.",
+        "testing": "W testach {{ring}}",
+        "noDate": "Brak oficjalnej daty",
+        "announced": "Zapowiedziano na {{date}}",
+        "estimate": "Szacunek: {{when}}"
+      },
+      "allAbout": "Wszystko o {{line}}",
+      "close": "Zamknij",
+      "noDate": "Bez daty",
+      "roadmap": {
+        "aria": "Stan na roadmapie",
+        "committed": "Potwierdzone",
+        "tentative": "Możliwe",
+        "released": "Dostarczone"
+      },
+      "status": {
+        "next": "Następny w kolejce"
+      },
+      "daysLive": "Dni na Live: {{n}}",
+      "earlier": "Wcześniejsze aktualizacje: {{n}}",
+      "earlierHide": "Ukryj wcześniejsze aktualizacje",
+      "ptu": {
+        "newest": "Najnowszy build testowy",
+        "aria": "Buildy testowe, od najnowszego",
+        "empty": "Obecnie brak buildów testowych w feedzie.",
+        "wave": "{{stage}} · fala {{n}}"
+      }
+    },
     "patch": {
       "line": "Alpha {{version}}",
       "otherLine": "Bez numeru wersji",
@@ -3591,15 +3641,15 @@
         "section": {
           "stabilitaet": "Stabilność",
           "builds": "Trwające buildy testowe",
+          "first": "Pierwsze kroki w tym patchu",
+          "community": "Społeczność",
+          "urteil": "Twój werdykt",
           "prepPast": "Co warto było wiedzieć",
           "contents": "Co zawiera?",
           "fixed": "Czy naprawili …?",
           "next": "Kiedy następny?",
           "nextThis": "Kiedy trafi ten patch?",
-          "nextPast": "Co było dalej?",
-          "first": "Pierwsze kroki w tym patchu",
-          "community": "Społeczność",
-          "urteil": "Twój werdykt"
+          "nextPast": "Co było dalej?"
         },
         "noteOf": "Zmiany w {{version}} · część Alpha {{line}}",
         "wholeLine": "Zobacz cały patch {{line}}",
@@ -3612,26 +3662,26 @@
         "wipe": "Wipe",
         "noBuildInfo": "RSI nie opublikowało „Important Build Info” dla tego builda.",
         "generalTitle": "Dotyczy każdego patcha",
+        "nextTitle": "Przygotowanie do następnego dużego patcha",
         "generalItem": {
           "launcher": "Otwórz launcher i poczekaj, aż skończy pobieranie – wersja w launcherze musi zgadzać się z patchem.",
           "shaders": "Wyczyść folder shaderów (%LOCALAPPDATA%\\\\Star Citizen\\\\), jeśli grafika miga lub spada liczba klatek po patchu.",
           "verify": "Awarie zaraz po patchu: uruchom „Verify” w launcherze, zanim zgłosisz błąd.",
           "repair": "Postać utknęła lub brakuje ekwipunku: uruchom Character Repair na koncie RSI, potem zaloguj się ponownie.",
           "known": "Przejrzyj znane problemy przed zgłoszeniem – większość świeżych błędów już tam jest."
-        },
-        "nextTitle": "Przygotowanie do następnego dużego patcha"
+        }
       },
       "contents": {
         "inNotes": "W notatkach do wydania",
+        "fixedTitle": "Naprawione",
+        "knownTitle": "Znane problemy",
+        "gallery": "Obrazy z tego patcha",
+        "moreLines": "Pokaż jeszcze {{n}}",
         "more": "Pełny tekst",
         "less": "Zwiń",
         "leftover": "Pozostałe punkty notatki bez karty roadmapy ({{n}})",
         "noRoadmap": "Brak danych roadmapy dla tego patcha – oto notatka „{{title}}”:",
-        "ofNote": "Zmiany z „{{title}}”:",
-        "fixedTitle": "Naprawione",
-        "knownTitle": "Znane problemy",
-        "gallery": "Obrazy z tego patcha",
-        "moreLines": "Pokaż jeszcze {{n}}"
+        "ofNote": "Zmiany z „{{title}}”:"
       },
       "fixed": {
         "placeholder": "Szukaj w tym patchu … np. quantum drive",
@@ -3784,56 +3834,6 @@
       "sinceDays": "Od {{days}} dni",
       "toBoard": "Centrum patchy",
       "toNotes": "Czytaj patch notes"
-    },
-    "patchBoard": {
-      "switch": {
-        "aria": "Wybierz kanał",
-        "live": "Live",
-        "ptu": "PTU",
-        "liveHint": "Co liczy się dla graczy Live",
-        "ptuHint": "Buildy testowe: każdy build z osobna"
-      },
-      "unread": "Nieprzeczytane",
-      "newForYou": "Nowe dla ciebie",
-      "readFull": "Czytaj w całości",
-      "markRead": "Przeczytane",
-      "readOn": "przeczytano {{date}}",
-      "readEarlier": "przeczytano wcześniej",
-      "readAgain": "Przeczytaj ponownie",
-      "now": {
-        "title": "Właśnie trafił na Live",
-        "since": "Od {{date}}",
-        "none": "W feedzie nie ma jeszcze patcha Live."
-      },
-      "next": {
-        "title": "Następny na Live",
-        "none": "Następny patch nie jest jeszcze znany.",
-        "testing": "W testach {{ring}}",
-        "noDate": "Brak oficjalnej daty",
-        "announced": "Zapowiedziano na {{date}}",
-        "estimate": "Szacunek: {{when}}"
-      },
-      "allAbout": "Wszystko o {{line}}",
-      "close": "Zamknij",
-      "noDate": "Bez daty",
-      "roadmap": {
-        "aria": "Stan na roadmapie",
-        "committed": "Potwierdzone",
-        "tentative": "Możliwe",
-        "released": "Dostarczone"
-      },
-      "status": {
-        "next": "Następny w kolejce"
-      },
-      "daysLive": "Dni na Live: {{n}}",
-      "earlier": "Wcześniejsze aktualizacje: {{n}}",
-      "earlierHide": "Ukryj wcześniejsze aktualizacje",
-      "ptu": {
-        "newest": "Najnowszy build testowy",
-        "aria": "Buildy testowe, od najnowszego",
-        "empty": "Obecnie brak buildów testowych w feedzie.",
-        "wave": "{{stage}} · fala {{n}}"
-      }
     }
   },
   "stability": {
@@ -4435,7 +4435,6 @@
       "retry": "Spróbuj ponownie"
     },
     "translations": {
-      "eyebrow": "Admin",
       "title": "Tłumaczenie AI",
       "subtitle": "Tłumaczenie tekstów gry przez Claude: przełącznik, limity, języki, zadania i glosariusz.",
       "tabs": {
@@ -4607,50 +4606,7 @@
       },
       "cards": {
         "title": "Fiszki",
-        "intro": "Tylko gdy AI nie daje rady: jedno pytanie, jedna odpowiedź. Najważniejsze fiszki są na początku.",
-        "lang": "Język",
-        "goal": "Cel dzienny: {{done}} z {{goal}} fiszek",
-        "goalLabel": "Postęp do celu dziennego",
-        "streak": "Seria: {{days}} dni",
-        "open": "{{count}} otwartych",
-        "skippedBefore": "Pominięto",
-        "fresh": "Aktualny patch",
-        "spread": "dotyczy {{count}} tekstów",
-        "choose": "Które tłumaczenie jest lepsze?",
-        "option": {
-          "a": "Opcja A",
-          "b": "Opcja B"
-        },
-        "bothWrong": "Oba złe – własny tekst",
-        "ownText": "Twój tekst (zostanie zapisany jako poprawka admina)",
-        "note": "Notatka jako wskazówka dla AI (opcjonalnie)",
-        "saveRule": "Zapisz jako regułę (obowiązuje wszędzie)",
-        "submit": "Zapisz odpowiedź",
-        "skip": "Pomiń",
-        "kinds": {
-          "meta": "Meta",
-          "wording": "Dobór słów",
-          "style": "Styl"
-        },
-        "context": {
-          "title": "Kontekst",
-          "key": "Klucz",
-          "en": "Angielski oryginał",
-          "where": "Gdzie w grze",
-          "neighbours": "Sąsiednie linie",
-          "research": "Research"
-        },
-        "thanks": "Dzięki, zapisano.",
-        "impact": "Ta odpowiedź ujednoliciła {{count}} tekstów.",
-        "points": "+{{points}} pkt",
-        "next": "Następna fiszka",
-        "done": "Gotowe",
-        "emptyTitle": "Nic do rozstrzygnięcia",
-        "empty": "AI radzi sobie teraz samo – nie ma otwartych fiszek.",
-        "leaderboard": "Ranking",
-        "leaderboardEmpty": "Brak odpowiedzi – pierwsza fiszka wyprowadzi cię na prowadzenie.",
-        "boardAnswers": "{{count}} odpowiedzi",
-        "boardPoints": "{{points}} pkt"
+        "next": "Następna fiszka"
       },
       "sources": {
         "title": "Źródła",
