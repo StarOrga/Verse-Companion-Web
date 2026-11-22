@@ -1,3 +1,4 @@
+import { isPowerOffline } from './codex.types';
 // KPI band + offensive/defensive analysis math for the ship analysis page (PR C).
 // -----------------------------------------------------------------------------
 // Same hard rule as `ship-summary-panels.ts` and `codex-equipped-stats.ts`:
@@ -188,7 +189,9 @@ export function computeKpiSheet(
 
   for (const o of occupants) {
     if ((o.section === 'weapons' || o.section === 'remoteTurrets' || o.section === 'mannedTurrets') && entityKindOf(o) === 'weapon') {
-      const alpha = alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);
+      const rawAlpha = alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);
+      // A gun the dock left without power still counts, it just deals 0.
+      const alpha = rawAlpha !== null && isPowerOffline(o.payload) ? 0 : rawAlpha;
       if (alpha !== null) {
         gunCount += o.count;
         totalAlpha += alpha * o.count;
@@ -197,10 +200,10 @@ export function computeKpiSheet(
             'fireRate'
           ] ?? null,
         );
-        const dps = damagePerSecond(alpha, fireRate);
+        const dps = alpha === 0 ? 0 : damagePerSecond(alpha, fireRate);
         if (dps !== null) {
           totalDps += dps * o.count;
-          const sus = sustainedDps(dps, fireRate, weaponParamsOf(o.payload)).value;
+          const sus = dps === 0 ? 0 : sustainedDps(dps, fireRate, weaponParamsOf(o.payload)).value;
           if (sus === null) sustainedComplete = false;
           else totalSustained += sus * o.count;
         }
@@ -229,13 +232,13 @@ export function computeKpiSheet(
     }
   }
 
-  sheet.alpha = gunCount > 0 ? usable(totalAlpha) : null;
+  sheet.alpha = gunCount > 0 ? (totalAlpha === 0 ? 0 : usable(totalAlpha)) : null;
   // Burst = every gun firing without a pause. Sustained counts the pauses
   // (energy regen, reload, overheat — `codex-sustained-dps.ts`) and is only
   // shown when EVERY gun with a burst figure has a known cycle: a partial sum
   // would read as a weaker loadout, a copy of burst as no pauses at all (#343).
-  sheet.burstDps = totalDps > 0 ? usable(totalDps) : null;
-  sheet.sustainedDps = sheet.burstDps !== null && sustainedComplete ? usable(totalSustained) : null;
+  sheet.burstDps = totalDps > 0 ? usable(totalDps) : gunCount > 0 && totalDps === 0 && totalAlpha === 0 ? 0 : null;
+  sheet.sustainedDps = sheet.burstDps === 0 ? 0 : sheet.burstDps !== null && sustainedComplete ? usable(totalSustained) : null;
   sheet.missiles = missileCount > 0 ? usable(missileDamage) : null;
   sheet.shieldHp = shieldCount > 0 ? usable(shieldHp) : null;
   sheet.shieldRegen = shieldCount > 0 ? usable(shieldRegen) : null;
@@ -498,11 +501,13 @@ export function buildOffensivePanel(occupants: readonly SummaryOccupant[]): Offe
     if (o.section !== 'weapons' && o.section !== 'remoteTurrets' && o.section !== 'mannedTurrets') continue;
     if (entityKindOf(o) !== 'weapon') continue;
     const p = o.payload as { className?: string; size?: number | null; weaponParams?: Record<string, unknown> } | null;
-    const alpha = alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);
-    if (alpha === null) continue;
+    const rawAlpha = alphaDamage(o.ammoPayload) ?? alphaDamage(o.payload);
+    if (rawAlpha === null) continue;
+    const offline = isPowerOffline(o.payload);
+    const alpha = offline ? 0 : rawAlpha;
     const fireRate = toFiniteNumber(p?.weaponParams?.['fireRate'] ?? null);
-    const dps = damagePerSecond(alpha, fireRate);
-    const sustained = sustainedDps(dps, fireRate, p?.weaponParams).value;
+    const dps = offline ? 0 : damagePerSecond(alpha, fireRate);
+    const sustained = offline ? 0 : sustainedDps(dps, fireRate, p?.weaponParams).value;
     for (let i = 0; i < o.count; i++) {
       rows.push({
         className: classNameOf(p) || 'unknown',

@@ -629,6 +629,9 @@ const NO_CHANNEL: Readonly<Record<FlightMode, readonly PowerGroup[]>> = {
   nav: ['shields'],
 };
 
+/** Groups that take their whole demand or nothing (quantum drive). */
+export const ALL_OR_NOTHING: ReadonlySet<PowerGroup> = new Set<PowerGroup>(['quantum']);
+
 /** Groups that sit at 0 until the pilot actually uses them (mock: `0`, not `aus`). */
 const IDLE_GROUPS: ReadonlySet<PowerGroup> = new Set<PowerGroup>(['tractor']);
 
@@ -705,7 +708,7 @@ export function distributePower(
     for (const d of demands) {
       if (remaining <= 0) break;
       const head = Math.max(0, d.capacity - (out.get(d.key) ?? 0));
-      const give = Math.min(head, remaining);
+      const give = ALL_OR_NOTHING.has(d.group) && head > remaining ? 0 : Math.min(head, remaining);
       if (give > 0) {
         out.set(d.key, (out.get(d.key) ?? 0) + give);
         remaining -= give;
@@ -722,8 +725,10 @@ export function distributePower(
   // the budget.
   const pins: { d: GroupDemand; pin: number }[] = [];
   for (const d of demands) {
-    const pin = pinnedLevel(levels, d.key);
-    if (pin !== null) pins.push({ d, pin: Math.min(pin, d.capacity) });
+    const raw = pinnedLevel(levels, d.key);
+    if (raw === null) continue;
+    const pin = ALL_OR_NOTHING.has(d.group) ? (raw > 0 ? d.capacity : 0) : Math.min(raw, d.capacity);
+    pins.push({ d, pin });
   }
   for (const { d, pin } of pins) {
     if (pin <= (out.get(d.key) ?? 0)) out.set(d.key, pin);
@@ -735,7 +740,9 @@ export function distributePower(
       const now = out.get(d.key) ?? 0;
       if (pin <= now) continue;
       const free = cut.has(d.key) ? pin - now : Math.max(0, budget - used());
-      out.set(d.key, now + Math.min(pin - now, free));
+      const give = Math.min(pin - now, free);
+      if (ALL_OR_NOTHING.has(d.group) && give < pin - now) continue;
+      out.set(d.key, now + give);
     }
   }
   return out;
@@ -842,13 +849,18 @@ export function computePowerSheet(input: PowerSheetInput): PowerSheet {
     const demand = round(segments + units / STANDARD_UNITS_PER_SEGMENT);
     const capacity = demand > 0 ? ceilUnits(demand) : 0;
     exactDemand.set(key, demand);
-    const minimum = Math.min(
-      capacity,
-      ceilMinimum(
-        mine.reduce((s, d) => s + d.consumeSegments * d.minFraction, 0),
-        segments,
-      ),
-    );
+    // The quantum drive runs at full draw or not at all (the game spools it
+    // only on its whole demand): its floor IS its capacity, so the dock can
+    // never park it at 1 of 2 segments.
+    const minimum = ALL_OR_NOTHING.has(group)
+      ? capacity
+      : Math.min(
+          capacity,
+          ceilMinimum(
+            mine.reduce((s, d) => s + d.consumeSegments * d.minFraction, 0),
+            segments,
+          ),
+        );
     const hasChannel = powerGroupHasChannel(group, mode);
     const cut = cutGroups.has(key);
     const present = mine.length > 0;
@@ -1095,7 +1107,8 @@ export function clickPowerPip(
   row: Pick<PowerGroupRow, 'key' | 'allocated' | 'capacity' | 'cut'>,
   level: number,
 ): { cutGroups: ReadonlySet<PowerColumnKey>; levels: PowerLevels } {
-  const n = Math.max(0, Math.min(row.capacity, Math.floor(level)));
+  const lvl = Math.max(0, Math.min(row.capacity, Math.floor(level)));
+  const n = ALL_OR_NOTHING.has(row.key as PowerGroup) && lvl > 0 ? row.capacity : lvl;
   const nextCut = new Set(cutGroups);
   const nextLevels: Partial<Record<PowerColumnKey, number>> = { ...levels };
   if (!row.cut && n > 0 && n === row.capacity && row.allocated === row.capacity) {

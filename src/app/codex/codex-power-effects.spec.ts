@@ -84,6 +84,29 @@ describe('power bands (P3)', () => {
   });
 });
 
+describe('quantum drive: all or nothing', () => {
+  const qd = (): SummaryOccupant => ({
+    section: 'quantum',
+    kind: 'component',
+    count: 1,
+    payload: {
+      className: 'QDRV_TEST',
+      kind: 'QuantumDrive',
+      entityKind: 'component',
+      stats: { [RESOURCE_STATS_GROUP]: { stateNames: 'Online', 'online.power.consumeSegments': 2, 'online.power.minFraction': 0.5 } },
+    },
+  });
+  it('never runs at 1 of 2 segments in NAV, whatever the pin', () => {
+    const occ = [reactor(14), qd()];
+    for (const level of [1, 2]) {
+      const sheet = computePowerSheet({ occupants: occ, schemaVersion: 6, mode: 'nav', levels: { quantum: level } });
+      expect(sheet.groups.find((g) => g.key === 'quantum')!.allocated).toBe(2);
+    }
+    const tight = computePowerSheet({ occupants: [reactor(1), qd()], schemaVersion: 6, mode: 'nav' });
+    expect(tight.groups.find((g) => g.key === 'quantum')!.allocated).not.toBe(1);
+  });
+});
+
 describe('withReserveShields', () => {
   it('keeps two generators active, the rest reserve', () => {
     const marked = withReserveShields([shield(3)]);

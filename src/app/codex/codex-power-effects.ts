@@ -54,7 +54,7 @@ import {
   occupantDraw,
   withReserveShields,
 } from './codex-power';
-import { RESOURCE_STATS_GROUP, STANDARD_UNITS_PER_SEGMENT, resolveResourceState, resourceKey } from './codex.types';
+import { markPowerOffline, RESOURCE_STATS_GROUP, STANDARD_UNITS_PER_SEGMENT, resolveResourceState, resourceKey } from './codex.types';
 import type { SummaryOccupant } from './ship-summary-panels';
 
 /** One installed unit's power state. */
@@ -319,7 +319,7 @@ function poweredWeapon(payload: unknown, ratio: number | null, offline: boolean)
   const p = payload as { weaponParams?: Record<string, unknown> } | null;
   const wp = p?.weaponParams;
   if (!wp) return payload;
-  if (offline) return { ...p, weaponParams: { ...wp, fireRate: 0 } };
+  if (offline) return markPowerOffline(p as object);
   if (ratio === null || ratio >= 1) return payload;
   const next = { ...wp };
   for (const k of ['regen.maxAmmoLoad', 'regen.maxRegenPerSec', 'regen.requestedAmmoLoad', 'regen.requestedRegenPerSec']) {

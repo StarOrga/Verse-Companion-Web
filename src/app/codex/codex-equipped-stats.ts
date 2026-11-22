@@ -47,6 +47,7 @@ import {
 } from './codex.types';
 import { isMissileRow, readCombatMetrics } from './codex-missile';
 import { sustainedDps, weaponParamsOf } from './codex-sustained-dps';
+import { isPowerOffline } from './codex.types';
 
 /** How the UI renders a raw stat value (source units documented per case). */
 export type EquippedStatFormat =
@@ -74,6 +75,8 @@ export interface EquippedStat {
   format: EquippedStatFormat;
   /** True when the value was computed rather than read verbatim (UI marks it). */
   derived?: boolean;
+  /** The item has no power right now: the row stays, the value reads "—". */
+  offline?: boolean;
   /**
    * i18n key of a one-line reading aid the UI attaches to the row (hover
    * title on the card, spelled out on the stat sheet). Set only where the
@@ -784,6 +787,7 @@ export function equippedStats(item: EquippedItem, limit?: number): EquippedStat[
   let rows: EquippedStat[];
   if (entityKind === 'weapon') {
     rows = weaponStats(payload, ammoPayload);
+    if (isPowerOffline(payload)) rows = rows.map((r) => ({ ...r, offline: true }));
   } else if (entityKind === 'component') {
     rows = componentStats((payload as { kind?: string }).kind ?? '', payload);
   } else if (isMissileRow({ attach_type: (payload as { attachType?: unknown }).attachType })) {
@@ -864,6 +868,7 @@ export function isWeaponMountPort(portName: string | null | undefined): boolean 
  * out of the translation files while every LABEL is translated via `labelKey`.
  */
 export function formatEquippedStat(stat: EquippedStat): string {
+  if (stat.offline) return '—';
   const n = formatEquippedStatNumber(stat);
   switch (stat.format) {
     case 'int':

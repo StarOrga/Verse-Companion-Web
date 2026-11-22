@@ -422,6 +422,25 @@ export interface WeaponPayload extends BaseEntityPayload {
 //   online.powerRanges.{low,medium,high}.{start,modifier}
 export const RESOURCE_STATS_GROUP = 'ItemResourceComponentParams';
 
+/**
+ * Payloads the energy dock left without any power (codex-power-effects).
+ * Readers keep the item's rows but show 0 / "—" for what it delivers, so
+ * nothing jumps or disappears on a pip click. Kept OUTSIDE the payload: a
+ * rank-parts payload is a guarded proxy that declines any unknown key read.
+ */
+const POWER_OFFLINE = new WeakSet<object>();
+
+/** A copy of `payload` marked as having no power. */
+export function markPowerOffline<T extends object>(payload: T): T {
+  const copy = { ...payload };
+  POWER_OFFLINE.add(copy);
+  return copy;
+}
+
+export function isPowerOffline(payload: unknown): boolean {
+  return !!payload && typeof payload === 'object' && POWER_OFFLINE.has(payload);
+}
+
 /** The default resource state every consumer/generator carries. */
 export const RESOURCE_DEFAULT_STATE = 'online';
 
