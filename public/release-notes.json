@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.294.0",
+  "current": "0.295.0",
   "releases": [
+    {
+      "version": "0.295.0",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Starscape sign-in now ends on the website's connect screen: after connecting, the browser tab shows \"Verbunden\" in the same stage as the Data Uploader instead of a bare Starscape page. Failures name their cause there (wrong sign-in session, no sign-in received). Needs Starscape 0.12.0; older versions keep their own page."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.294.0",
       "date": "2026-11-22",
@@ -12,7 +28,11 @@
           "items": [
             {
               "title": "",
-              "text": "Starscape sign-in now ends on the website's connect screen: after connecting, the browser tab shows \"Verbunden\" in the same stage as the Data Uploader instead of a bare Starscape page. Failures name their cause there (wrong sign-in session, no sign-in received). Needs Starscape 0.12.0; older versions keep their own page."
+              "text": "Search: groups are ordered by their best match (exact name > word > partial > typo), equal groups go ships > components > weapons > items; the page context only breaks ties and never buries an exact hit; own hangar hits lead when they match as well."
+            },
+            {
+              "title": "",
+              "text": "Search: typo tolerance per word (e.g. \"libertor\" finds the Liberator), always ranked below real matches; class-name-only hits rank below name hits."
             }
           ]
         }
