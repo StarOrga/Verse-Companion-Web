@@ -136,5 +136,10 @@ Changes are marked `#354` in the code so they can be found (and reverted) quickl
   1–3 stops, balance Kürzester Weg (+0) / Ausgewogen (+3 min per further stop) / Lieber ein Stopp (+15); a combination
   with a superfluous stop never shows. Minutes = flight legs + approach per stop (station 2, outpost 4, city 6). Measured
   from a single place in Ort when an amount is set, else from the Standort. Filter kept in `ui_prefs` key `hq.stockFilter`.
-- **Open**: flight legs still come from the tier fallback (same planet 3, ring step 5 + 3, other system 30), not yet
-  from the codex coordinates (`codex_locations`); the Ladeprotokoll table for all movements (build step 4) is not built.
+- **Flight legs** come from the codex coordinates (`codex_locations` of the current build, `hq-location-coords.ts`,
+  loaded once a reference point exists): body-frame positions add onto their parent, minutes = 1 min align + distance
+  at 120 000 km/s, another system 30. A place the codex lacks falls back to the tiers (same planet 3, ring step 5 + 3).
+- **Ladeprotokoll** (`hq-stock-log.component.ts`, right of the search and the bays): Einlagern (+, `add`), amounts raised
+  (`raise`), removals (−) and reservations in one log. Additions share `hq_inventory_removals` (kinds `add` / `raise`,
+  migration `20261122160000_hq_inventory_log_additions.sql`); "zuletzt aufgebraucht" still counts removals only, and
+  an undone Einlagern drops its fresh `add` line.

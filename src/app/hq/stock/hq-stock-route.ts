@@ -2,6 +2,7 @@
 import type { MapPlace } from '../plan/map/hq-map.types';
 import { slug } from '../plan/map/hq-route';
 import { placeOfName } from '../plan/map/hq-places';
+import { type LocationCoords, pointOf } from './hq-location-coords';
 
 /** What a stop is, for its approach time (decision t-anflug = fixed values). */
 export type PlaceKind = 'station' | 'outpost' | 'city';
@@ -32,9 +33,27 @@ export function placeKind(location: string): PlaceKind {
 }
 
 /**
- * Estimated quantum-travel minutes between two places. Fallback tiers (the codex coordinates are not wired yet):
- * same place 0, same planet 3, another planet of the system 5 + 3 per ring step, another system 30.
- * Null when either end is unknown.
+ * Quantum leg from the codex coordinates (decision t-src = codex): align/spool time plus distance at an effective
+ * cruise speed. Estimates, not a drive model - drives differ; ~50 Gm (Hurston to microTech) gives about 8 minutes.
+ */
+const QT_ALIGN_MIN = 1;
+const QT_M_PER_MIN = 1.2e8 * 60;
+
+/** Minutes between two place names from the codex coordinates; null when either has none (the tiers take over). */
+export function codexMinutes(coords: LocationCoords | null | undefined, a: string, b: string): number | null {
+  const pa = pointOf(coords, a);
+  const pb = pointOf(coords, b);
+  if (!pa || !pb) return null;
+  if (pa.id === pb.id) return 0;
+  if (compact(pa.system) !== compact(pb.system)) return OTHER_SYSTEM_MIN;
+  const d = Math.hypot(pa.x - pb.x, pa.y - pb.y, pa.z - pb.z);
+  return Math.max(1, Math.round(QT_ALIGN_MIN + d / QT_M_PER_MIN));
+}
+
+/**
+ * Estimated quantum-travel minutes between two places by fixed tiers - the fallback when the codex has no
+ * coordinates for an end ({@link codexMinutes}): same place 0, same planet 3, another planet of the system
+ * 5 + 3 per ring step, another system 30. Null when either end is unknown.
  */
 export function flightMinutes(a: MapPlace | null, b: MapPlace | null): number | null {
   if (!a || !b) return null;
@@ -78,12 +97,19 @@ export interface RouteOptions {
   balance: StockBalance;
   /** Places the search reads at most (nearest first) before combining. */
   maxSources?: number;
+  /** Codex coordinates; without them (or for a place they lack) the fixed tiers count. */
+  coords?: LocationCoords | null;
+}
+
+/** One leg from a reference place to a place name: codex coordinates first, then the tiers. */
+function leg(from: MapPlace, location: string, coords: LocationCoords | null | undefined, fromName: string = from.location): number {
+  return codexMinutes(coords, fromName, location) ?? flightMinutes(from, placeOfName(location)) ?? UNKNOWN_LEG_MIN;
 }
 
 /** Minutes from `from` to one place, approach included; null without a reference point. */
-export function minutesTo(from: MapPlace | null, location: string): { fly: number; approach: number } | null {
+export function minutesTo(from: MapPlace | null, location: string, coords?: LocationCoords | null): { fly: number; approach: number } | null {
   if (!from) return null;
-  const fly = flightMinutes(from, placeOfName(location)) ?? UNKNOWN_LEG_MIN;
+  const fly = leg(from, location, coords);
   return { fly, approach: APPROACH_MIN[placeKind(location)] };
 }
 
@@ -95,7 +121,7 @@ export function minutesTo(from: MapPlace | null, location: string): { fly: numbe
 export function planRoutes(sources: readonly RouteSource[], want: number, from: MapPlace | null, opts: RouteOptions): RoutePlan[] {
   if (want <= 0) return [];
   const usable = sources.filter((s) => s.qty > 0);
-  const near = (s: RouteSource): number => (from ? (flightMinutes(from, placeOfName(s.location)) ?? UNKNOWN_LEG_MIN) : 0) + APPROACH_MIN[placeKind(s.location)];
+  const near = (s: RouteSource): number => (from ? leg(from, s.location, opts.coords) : 0) + APPROACH_MIN[placeKind(s.location)];
   const pool = [...usable].sort((a, b) => near(a) - near(b) || b.qty - a.qty).slice(0, opts.maxSources ?? 12);
   const plans: RoutePlan[] = [];
   const pick = (start: number, chosen: RouteSource[]): void => {
@@ -103,7 +129,7 @@ export function planRoutes(sources: readonly RouteSource[], want: number, from: 
       const sum = chosen.reduce((n, s) => n + s.qty, 0);
       if (sum >= want) {
         // Minimal only: dropping any stop must leave the amount short.
-        if (chosen.every((s) => sum - s.qty < want)) plans.push(toPlan(chosen, want, from, opts.balance));
+        if (chosen.every((s) => sum - s.qty < want)) plans.push(toPlan(chosen, want, from, opts.balance, opts.coords));
         return;
       }
     }
@@ -114,16 +140,17 @@ export function planRoutes(sources: readonly RouteSource[], want: number, from: 
   return plans.sort((a, b) => a.score - b.score || a.stops.length - b.stops.length || a.minutes - b.minutes);
 }
 
-function toPlan(chosen: readonly RouteSource[], want: number, from: MapPlace | null, balance: StockBalance): RoutePlan {
+function toPlan(chosen: readonly RouteSource[], want: number, from: MapPlace | null, balance: StockBalance, coords?: LocationCoords | null): RoutePlan {
   // Greedy nearest-next order from the reference point.
   const left = [...chosen];
   const ordered: { src: RouteSource; fly: number }[] = [];
   let at: MapPlace | null = from;
+  let atName = from?.location ?? '';
   while (left.length) {
     let best = 0;
     let bestFly = Infinity;
     left.forEach((s, i) => {
-      const f = at ? (flightMinutes(at, placeOfName(s.location)) ?? UNKNOWN_LEG_MIN) : 0;
+      const f = at ? leg(at, s.location, coords, atName) : 0;
       if (f < bestFly) {
         bestFly = f;
         best = i;
@@ -132,6 +159,7 @@ function toPlan(chosen: readonly RouteSource[], want: number, from: MapPlace | n
     const [src] = left.splice(best, 1);
     ordered.push({ src, fly: bestFly });
     at = placeOfName(src.location) ?? at;
+    atName = src.location;
   }
   let need = want;
   const stops = ordered.map(({ src, fly }) => {

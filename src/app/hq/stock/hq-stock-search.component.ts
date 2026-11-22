@@ -12,6 +12,7 @@ import { formatLocationName } from '../now/hq-live.util';
 import { placeOfName } from '../plan/map/hq-places';
 import type { MapPlace } from '../plan/map/hq-map.types';
 import { HqHereService } from './hq-here.service';
+import { HqLocationCoordsService } from './hq-location-coords';
 import { MAX_STOPS_CHOICES, type MaxStops, type RoutePlan, STOCK_BALANCES, type StockBalance, minutesTo, planRoutes } from './hq-stock-route';
 import { type SearchGroup, type SearchRow, itemSuggestions, knownItem, parseOrt, placeSuggestions, samePlace, searchStock } from './hq-stock-search.model';
 
@@ -206,6 +207,8 @@ type Field = 'item' | 'ort';
 export class HqStockSearchComponent {
   private readonly inv = inject(HqInventoryService);
   private readonly here = inject(HqHereService);
+  /** Codex coordinates for the flight minutes (t-src = codex); empty until loaded, then the tiers are the fallback. */
+  private readonly coords = inject(HqLocationCoordsService);
   private readonly prefs = inject(AccountPrefsService);
   private readonly tr = inject(TranslateService);
   private readonly toast = inject(UndoToastService);
@@ -287,6 +290,10 @@ export class HqStockSearchComponent {
       const f = parseFilter(v);
       if (f) untracked(() => this.filter.set(f));
     });
+    // Coordinates only once there is a point to measure from (no codex read on a plain Lager visit).
+    effect(() => {
+      if (this.ref()) untracked(() => this.coords.ensureLoaded());
+    });
   }
 
   private tipFor(block: string | null, okKey: string): string {
@@ -330,7 +337,7 @@ export class HqStockSearchComponent {
   }
 
   protected minutesOf(location: string): { fly: number; approach: number } | null {
-    return minutesTo(this.ref()?.place ?? null, location);
+    return minutesTo(this.ref()?.place ?? null, location, this.coords.coords());
   }
 
   /** Chips: nearest place first, without a reference point the largest amount (round 2). */
@@ -338,7 +345,7 @@ export class HqStockSearchComponent {
     const from = this.ref()?.place ?? null;
     if (!from) return [...g.rows].sort((a, b) => b.qty - a.qty);
     const m = (r: SearchRow): number => {
-      const x = minutesTo(from, r.location);
+      const x = minutesTo(from, r.location, this.coords.coords());
       return x ? x.fly + x.approach : Infinity;
     };
     return [...g.rows].sort((a, b) => m(a) - m(b) || b.qty - a.qty);
@@ -346,7 +353,7 @@ export class HqStockSearchComponent {
 
   protected plansOf(g: SearchGroup): RoutePlan[] {
     const f = this.filter();
-    return planRoutes(g.rows, this.want() ?? 0, this.ref()?.place ?? null, { maxStops: f.maxStops, balance: f.balance });
+    return planRoutes(g.rows, this.want() ?? 0, this.ref()?.place ?? null, { maxStops: f.maxStops, balance: f.balance, coords: this.coords.coords() });
   }
 
   protected more(name: string): void {
