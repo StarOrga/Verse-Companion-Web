@@ -2331,6 +2331,21 @@
         "hunks": [
           "1c7153c93e6a"
         ]
+      },
+      {
+        "ship": "#1246",
+        "by": "Jerry",
+        "value": "\"current\": \"0.293.0\""
+      },
+      {
+        "ship": "feat/starscape-connect-stage-handoff",
+        "by": "JerryT2T",
+        "value": "\"current\": \"0.294.0\" (generated from CHANGELOG after this ship's bump)",
+        "decided": true,
+        "at": "2026-11-22T01:35:07.541Z",
+        "hunks": [
+          "ad512080b880"
+        ]
       }
     ],
     "src/app/admin/admin.component.ts›.share-btn›tier": [
