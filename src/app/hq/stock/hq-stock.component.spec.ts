@@ -5,6 +5,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { AuthService } from '../../auth/auth.service';
 import { SupabaseClientProvider } from '../../core/supabase.client';
+import { AccountPrefsService } from '../../core/account-prefs.service';
 import { SearchWishlistService } from '../../codex/search/search-wishlist.service';
 import { UndoToastService } from '../../shared/undo-toast/undo-toast.service';
 import { HangarService } from '../../hangar/hangar.service';
@@ -43,6 +44,7 @@ describe('HqStockComponent · Frachtdeck', () => {
       items: signal(items),
       shipStorage: signal([{ ship_ref: 'sh1', location: 'Area18' }]),
       kinds: signal<ReadonlyMap<string, BestandKind>>(new Map([['cds_helmet_pembroke', { area: 'armor', sub: 'helmet', role: null }]])),
+      lastAdditions: () => [{ key: 'a:1', at: '2026-11-07T12:00:00Z', location: 'Lorville', name: 'Medpen', className: 'medpen', qty: 2, unit: 'pcs', kind: 'add' }],
       lastRemovals: () => [{ key: 'r1', at: '2026-11-08T12:00:00Z', location: 'Lorville', name: 'Medpen', className: 'medpen', qty: 4, unit: 'pcs', quality: null, kind: 'take' }],
       ensureKinds: vi.fn().mockName('ensureKinds').mockResolvedValue(undefined),
       load: vi.fn().mockName('load').mockResolvedValue(undefined),
@@ -65,6 +67,7 @@ describe('HqStockComponent · Frachtdeck', () => {
         provideTranslateService({ fallbackLang: 'en' }),
         { provide: ActivatedRoute, useValue: { queryParamMap: qp, snapshot: {} } },
         { provide: SupabaseClientProvider, useValue: { client: {} } },
+        { provide: AccountPrefsService, useValue: { prefs: signal(null), set: () => undefined } },
         { provide: AuthService, useValue: { user: signal({ id: 'u1' }) } },
         { provide: HangarService, useValue: { ships: signal(ships), roleLoadouts: signal(opts.empty ? [] : [{ id: 'set1', name: 'Bergbau', role: 'mining', items: [] }]), isFlagship: () => false, error: signal(null) } },
         { provide: HqOwnershipService, useValue: { configs: signal([]), ensureLoaded: () => Promise.resolve(), configsForShip: (id: string) => (id === 'sh1' ? [{ id: 'c1' }, { id: 'c2' }] : []) } },
@@ -172,14 +175,16 @@ describe('HqStockComponent · Frachtdeck', () => {
     expect(el.querySelectorAll('.res .band').length).toBe(3);
   });
 
-  it('the Ladeprotokoll sits beside the bays and lists removals and reservations as one log (I11, I12, I13)', () => {
+  it('the Ladeprotokoll sits beside the bays and lists additions, removals and reservations as one log (I11, I12, I13, #354)', () => {
     const { el } = mount();
     const log = el.querySelector('.main > sc-hq-stock-log')!;
     expect(log).not.toBeNull();
     const lines = [...log.querySelectorAll('.lines li')];
-    expect(lines.length).toBe(2);
+    expect(lines.length).toBe(3);
     expect(lines[0].textContent).toContain('Medpen');
     expect(lines[1].classList).toContain('res');
+    expect(lines[2].classList).toContain('in');
+    expect(lines[2].textContent).toContain('+2');
   });
 
   it('the subheader search is the page search, with alternatives at up to three hits (I14, I15)', () => {

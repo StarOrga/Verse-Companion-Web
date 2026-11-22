@@ -227,8 +227,11 @@ export interface HqFriendReservationRow {
 }
 
 export type HqRemovalKind = 'take' | 'delete' | 'reduce' | 'handout';
+/** #354: additions in the same log - `add` = stored (Einlagern), `raise` = amount corrected upwards. */
+export type HqAdditionKind = 'add' | 'raise';
+export const HQ_REMOVAL_KINDS: readonly HqRemovalKind[] = ['take', 'delete', 'reduce', 'handout'];
 
-/** hq_inventory_removals - one MANUAL removal from the Bestand (owner-only, newest 200 kept, 90 days). */
+/** hq_inventory_removals - one MANUAL change of the Bestand: a removal, or (#354) an addition (owner-only, newest 200 kept, 90 days). */
 export interface HqInventoryRemovalRow {
   user_id: string;
   id: string;
@@ -239,7 +242,7 @@ export interface HqInventoryRemovalRow {
   qty: number;
   unit: 'pcs' | 'scu';
   quality: number | null;
-  kind: HqRemovalKind;
+  kind: HqRemovalKind | HqAdditionKind;
 }
 
 /** One stop of a gather line (hq_supplies.gather): take `amount` of the line's item at `location`. */
