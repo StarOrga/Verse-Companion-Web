@@ -60,49 +60,155 @@ export interface GlossaryHistoryEntry {
   at: string;
 }
 
-export type CardKind = 'meta' | 'wording' | 'style';
-export type CardAnswer = 'a' | 'b' | 'own';
+// ── Karteikarten v2 (contract: docs/concepts/20261121-1151-karteikarten-neu/contract.md) ──
+
+export type CardKind = 'convention' | 'term' | 'wording';
+export type CardStatus = 'open' | 'answered' | 'ai' | 'parked' | 'folded';
+export type CardChoice = 'a' | 'b' | 'own';
+export type PatternId = 'case.upper' | 'case.title' | 'compound' | 'verb.form' | 'abbr';
+export type ReasonCode =
+  | 'majority'
+  | 'community'
+  | 'ai'
+  | 'votes'
+  | 'bracket'
+  | 'whitespace'
+  | 'casing_source'
+  | 'convention'
+  | 'only_left';
+export type Where = 'ui' | 'item' | 'mission_lore' | 'other';
+
+export interface CardExample {
+  lang: string;
+  key: string;
+  en: string;
+  text: string;
+}
+
 export interface CardOption {
   text: string;
   source: string;
+  votes?: number;
+  count?: number;
+  examples?: CardExample[];
+}
+
+export type CardParams =
+  | { pattern: PatternId; langs: string[] }
+  | { term: string; where: Where | null }
+  | { en: string; key: string; where: Where | null };
+
+export interface KiDecision {
+  choice: CardChoice;
+  text: string;
+  basis: ReasonCode;
+  reason: { code: ReasonCode; a?: number; b?: number };
+  unsure: boolean;
+  back_de: string | null;
+  decided_at: string;
+  accepted: boolean;
 }
 
 export interface TranslationCard {
   id: string;
-  lang: string;
   kind: CardKind;
-  question: string;
+  lang: string | null;
+  langs: string[];
+  params: CardParams;
   option_a: CardOption;
   option_b: CardOption;
-  context: Record<string, unknown> | null;
   spread: number;
   reach: number;
   doubt: number;
   fresh: boolean;
-  status: 'open' | 'answered' | 'skipped';
-  answer: CardAnswer | null;
-  impact: number | null;
-  points: number | null;
-}
-
-export interface CardStats {
-  open_count: number;
-  answered_today: number;
-  streak_days: number;
-}
-
-export interface LeaderboardRow {
-  answered_by: string;
+  status: CardStatus;
+  answer: CardChoice | null;
+  own_text: string | null;
+  exceptions: Record<string, 'a' | 'b'> | null;
   points: number;
-  answers: number;
+  bonus: number;
+  ai: KiDecision | null;
+  vetoed: CardChoice[];
+  can_undo: boolean;
+  created_at: string;
+}
+
+export interface CardGoal {
+  done: number;
+  target: number;
+  full: boolean;
+  bonus_taken: boolean;
+}
+
+/** Result of every action RPC that scores. */
+export interface CardActionResult {
+  card: TranslationCard;
+  points: number;
+  bonus: number;
+  goal: CardGoal;
+}
+
+/** `not_mine_translation_card` / `undo_translation_card`: no score of their own. */
+export interface CardMoveResult {
+  card: TranslationCard;
+  goal: CardGoal;
+}
+
+export interface CardDeck {
+  lang: string;
+  open_total: number;
+  affected_total: number;
+  deck_affected: number;
+  cards: TranslationCard[];
+}
+
+export interface VetoList {
+  lang: string;
+  total: number;
+  unsure: number;
+  items: TranslationCard[];
+}
+
+export interface BoardLang {
+  lang: string;
+  judged: boolean;
+  deck_open: number;
+  ai_decided: number;
+  ai_review: number;
+  ai_unsure: number;
+  ai_pending: number;
+}
+
+export interface BoardRow {
+  user_id: string;
+  name: string | null;
+  points: number;
+  rank: number;
+  is_me: boolean;
+}
+
+export interface CardBoard {
+  rules: { points: number; goal: number; bonus: number; tz: string };
+  my_langs: string[];
+  goal: CardGoal;
   streak_days: number;
+  week: {
+    start: string;
+    points: number;
+    rank: number;
+    days: { date: string; active: boolean; today: boolean }[];
+  };
+  langs: BoardLang[];
+  ai_summary: { decided: number; review: number; unsure: number };
+  leaderboard: BoardRow[];
 }
 
 export interface CardAnswerInput {
-  answer: CardAnswer;
+  answer: CardChoice;
+  /** Only with `answer: 'own'` (never on a convention card). */
   own_text?: string | null;
-  note?: string | null;
-  save_as_rule?: boolean;
+  /** Convention answers only: languages that take the other option (P8). */
+  exceptions?: Record<string, 'a' | 'b'> | null;
 }
 
 export interface TranslationSource {
@@ -332,59 +438,68 @@ export class TranslationsService {
 
   // ── community seed: cards, sources, outreach, alerts ───────────────────────
 
-  /** Contract queue order; `status` ascending puts 'open' before 'skipped'. */
-  async cardQueue(lang: string | null, limit = 50): Promise<TranslationCard[]> {
-    let b = this.sb.client
-      .from('translation_cards')
-      .select('id,lang,kind,question,option_a,option_b,context,spread,reach,doubt,fresh,status,answer,impact,points')
-      .in('status', ['open', 'skipped']);
-    if (lang) b = b.eq('lang', lang);
-    const data = await this.rows<TranslationCard[]>(
-      b
-        .order('status', { ascending: true })
-        .order('spread', { ascending: false })
-        .order('reach', { ascending: false })
-        .order('kind_rank', { ascending: true })
-        .order('doubt', { ascending: false })
-        .order('fresh', { ascending: false })
-        .limit(limit),
-    );
-    return data ?? [];
+  // ── Karteikarten v2: every read and write goes through the card RPCs (all security definer, admin only) ──
+
+  /** The admin's deck for one language: conventions first, then terms, then wordings (server order). */
+  deck(lang: string, limit = 10): Promise<CardDeck> {
+    return this.rows(this.sb.client.rpc('translation_deck', { p_lang: lang, p_limit: limit }));
   }
 
-  answerCard(id: string, a: CardAnswerInput): Promise<TranslationCard> {
+  answerCard(id: string, a: CardAnswerInput): Promise<CardActionResult> {
+    const own = a.answer === 'own' ? (a.own_text ?? '').trim() : null;
+    const exceptions = a.answer !== 'own' && a.exceptions && Object.keys(a.exceptions).length ? a.exceptions : null;
     return this.rows(
-      this.sb.client
-        .rpc('answer_translation_card', {
-          p_card_id: id,
-          p_answer: a.answer,
-          p_own_text: a.answer === 'own' ? (a.own_text ?? '').trim() : null,
-          p_note: a.note?.trim() ? a.note.trim() : null,
-          p_save_as_rule: !!a.save_as_rule,
-        })
-        .single(),
+      this.sb.client.rpc('answer_translation_card', {
+        p_card_id: id,
+        p_answer: a.answer,
+        p_own_text: own,
+        p_exceptions: exceptions,
+      }),
     );
   }
 
-  skipCard(id: string): Promise<TranslationCard> {
-    return this.rows(this.sb.client.rpc('skip_translation_card', { p_card_id: id }).single());
+  /** „Nicht meine Entscheidung“: the card leaves the deck for the KI path (P12). */
+  notMineCard(id: string): Promise<CardMoveResult> {
+    return this.rows(this.sb.client.rpc('not_mine_translation_card', { p_card_id: id }));
   }
 
-  async cardStats(lang: string | null): Promise<CardStats> {
-    const d = await this.rows<unknown>(this.sb.client.rpc('translation_card_stats', { p_lang: lang }));
-    const r = (Array.isArray(d) ? d[0] : d) as Record<string, unknown> | null;
-    return { open_count: num(r?.['open_count']), answered_today: num(r?.['answered_today']), streak_days: num(r?.['streak_days']) };
+  /** Undoes the caller's last action on the card until the next learn pass applies it (P13). */
+  undoCard(id: string): Promise<CardMoveResult> {
+    return this.rows(this.sb.client.rpc('undo_translation_card', { p_card_id: id }));
   }
 
-  async leaderboard(): Promise<LeaderboardRow[]> {
-    const d = await this.rows<Record<string, unknown>[]>(this.sb.client.rpc('translation_card_leaderboard'));
-    return (d ?? []).map((r) => ({
-      answered_by: String(r['answered_by']),
-      points: num(r['points']),
-      answers: num(r['answers']),
-      streak_days: num(r['streak_days']),
-    }));
+  vetoList(lang: string, limit = 50): Promise<VetoList> {
+    return this.rows(this.sb.client.rpc('translation_veto_list', { p_lang: lang, p_limit: limit }));
   }
+
+  /** „Sieht falsch aus“ on a KI decision. */
+  vetoDecision(id: string): Promise<CardActionResult> {
+    return this.rows(this.sb.client.rpc('veto_translation_decision', { p_card_id: id }));
+  }
+
+  /** „Passt“ on a KI decision. */
+  acceptDecision(id: string): Promise<CardActionResult> {
+    return this.rows(this.sb.client.rpc('accept_translation_decision', { p_card_id: id }));
+  }
+
+  /** „Rest übernehmen“: takes over every waiting KI decision of the language; no points, no undo. */
+  async acceptDecisions(lang: string): Promise<number> {
+    return num(await this.rows<unknown>(this.sb.client.rpc('accept_translation_decisions', { p_lang: lang })));
+  }
+
+  myLangs(): Promise<string[]> {
+    return this.rows(this.sb.client.rpc('translation_my_langs'));
+  }
+
+  setMyLangs(langs: readonly string[]): Promise<string[]> {
+    return this.rows(this.sb.client.rpc('set_translation_my_langs', { p_langs: [...langs] }));
+  }
+
+  /** Daily goal, streak, week points, place, the per-language rows and the named leaderboard (G1–G4). */
+  cardBoard(): Promise<CardBoard> {
+    return this.rows(this.sb.client.rpc('translation_card_board'));
+  }
+
 
   /** Admin accounts by id (display name + protected flag): names for the leaderboard, protected status for approvals. */
   async people(): Promise<Map<string, AdminPerson>> {

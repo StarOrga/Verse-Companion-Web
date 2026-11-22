@@ -1,6 +1,9 @@
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { map } from 'rxjs';
 import { toErrorKey } from '../../core/describe-error';
 import { ScDatePipe } from '../../core/locale/sc-date.pipe';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
@@ -9,6 +12,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import type { PageCrumb } from '../../shared/page-header/nav-origin.service';
 import { TranslationAlertsComponent } from './translation-alerts.component';
 import { TranslationCardsComponent } from './translation-cards.component';
+import { TranslationsPageBarComponent, TranslationsRailComponent, TranslationsTab, parseTranslationsTab } from './translations-nav.component';
 import { TranslationGlossaryComponent } from './translation-glossary.component';
 import { TranslationOutreachComponent } from './translation-outreach.component';
 import { TranslationSourcesComponent } from './translation-sources.component';
@@ -41,7 +45,6 @@ interface LanguageRow {
   canStartFull: boolean;
 }
 
-type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary';
 
 /**
  * `/admin/translations` — admin only (roleGuard on the route). Switch + caps of
@@ -61,24 +64,17 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
     TranslationOutreachComponent,
     TranslationAlertsComponent,
     ScActionDirective,
+    TranslationsRailComponent,
+    TranslationsPageBarComponent,
     ScTooltipDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+    <sc-translations-rail [active]="tab()" />
     <sc-page-header
       [crumbs]="crumbs"
-      [eyebrow]="'admin.translations.eyebrow' | translate"
       [title]="'admin.translations.title' | translate"
       [subtitle]="'admin.translations.subtitle' | translate" />
-
-    <div class="tabs" role="tablist" [attr.aria-label]="'admin.translations.title' | translate">
-      @for (t of tabs; track t) {
-        <button type="button" role="tab" class="tab" [class.active]="tab() === t"
-                [attr.aria-selected]="tab() === t" (click)="tab.set(t)">
-          {{ 'admin.translations.tabs.' + t | translate }}
-        </button>
-      }
-    </div>
 
     @if (flash(); as f) {
       <p class="flash" [class.err]="f.kind === 'error'" role="status">{{ f.key | translate }}</p>
@@ -87,7 +83,7 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
     @if (tab() === 'glossary') {
       <sc-translation-glossary [languages]="languages()" />
     } @else if (tab() === 'cards') {
-      <sc-translation-cards [languages]="languages()" />
+      <sc-translation-cards />
     } @else if (tab() === 'sources') {
       <sc-translation-sources />
     } @else if (tab() === 'outreach') {
@@ -250,17 +246,14 @@ type Tab = 'overview' | 'cards' | 'sources' | 'outreach' | 'alerts' | 'glossary'
         }
       </section>
     }
+
+    <sc-translations-page-bar [active]="tab()" />
   `,
   styles: [
     `
       :host { display: block; padding-block: var(--sc-space-5) var(--sc-space-7); }
-      .tabs { display: flex; gap: var(--sc-space-2); margin-block: var(--sc-space-4); flex-wrap: wrap; }
-      .tab {
-        min-height: 44px; padding: 0 var(--sc-space-4); border-radius: 999px; cursor: pointer;
-        border: 1px solid var(--sc-border); background: transparent; color: var(--sc-fg-1); font: inherit;
-      }
-      .tab.active { border-color: var(--sc-accent-hot); color: var(--sc-fg-0);
-        background: color-mix(in srgb, var(--sc-accent-hot) 14%, transparent); }
+      /* Past 1024px the section rail hangs at the screen edge: keep clear of its lane the way HQ and Settings do. */
+      @media (min-width: 1024px) { :host { padding-inline-start: max(0px, calc(var(--hq-rail-clear, 72px) - var(--sc-page-gutter))); } }
       .block { display: grid; gap: var(--sc-space-4); margin-bottom: var(--sc-space-4); }
       .block-head { display: flex; justify-content: space-between; align-items: center; gap: var(--sc-space-3); }
       h2 { margin: 0; font-size: 1.05rem; }
@@ -317,9 +310,12 @@ export class AdminTranslationsComponent implements OnInit {
   private readonly svc = inject(TranslationsService);
   private readonly confirmSvc = inject(ScConfirmService);
 
-  readonly tabs: readonly Tab[] = ['overview', 'cards', 'sources', 'outreach', 'alerts', 'glossary'];
-  readonly crumbs: PageCrumb[] = [{ labelKey: 'adminHub.title', link: '/admin/hub' }];
-  readonly tab = signal<Tab>('overview');
+  /** „Admin“ leads back to the admin hub; the page shows no eyebrow repeating it (concept karteikarten-neu r5 pin). */
+  readonly crumbs: PageCrumb[] = [{ labelKey: 'admin.translations.crumb', link: '/admin/hub' }];
+  /** The section in view comes from `?tab=` (real anchors in the rail and the phone bar, deep links keep working). */
+  readonly tab = toSignal(inject(ActivatedRoute).queryParamMap.pipe(map((p) => parseTranslationsTab(p.get('tab')))), {
+    initialValue: 'overview' as TranslationsTab,
+  });
   readonly loading = signal(true);
   readonly loadError = signal<string | null>(null);
   readonly busy = signal(false);
