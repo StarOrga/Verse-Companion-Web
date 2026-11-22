@@ -281,8 +281,11 @@ describe('one row per ship family (foldShipFamilies + compose)', () => {
     expect(rows.length).toBe(1);
     expect(rows[0].target.link).toEqual(['/codex', 'ship', 'AEGS_Gladius']);
     expect(rows[0].type === 'hit' && rows[0].variants!.map((v) => v.label)).toEqual(['Dunlevy', 'Pirate', 'Valiant', 'Meine Jagd']);
-    expect(r.groups.find((g) => g.id === 'own')).toBeUndefined(); // the own row folded in
-    expect(r.groups.find((g) => g.id === 'ship')!.total).toBe(9); // counters keep the index sums
+    // The own Gladius matches as well as the catalog one, so the own group leads (#395) and the
+    // family row takes the own row's place, as on HQ pages.
+    expect(r.groups[0].id).toBe('own');
+    expect(r.groups[0].rows.map((x) => x.id)).toEqual(['hit-ship-AEGS_Gladius']);
+    expect(r.groups.find((g) => g.id === 'ship')).toBeUndefined();
     expect(r.groups.find((g) => g.id === 'item')!.rows.length).toBe(1);
   });
 
