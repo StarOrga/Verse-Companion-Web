@@ -4,12 +4,13 @@
 -- "Alles geklärt". Both now count the same deck scope (`params <> '{}'`), and both name the legacy cards that
 -- wait for the cleanup separately (`deck_waiting` on the board row, `waiting_total` on the deck) so the page
 -- says they come back after the next learn pass instead of hiding them. Additive: create or replace only.
+-- Both functions keep the collaborator guard from 20261122120000 (is_collaborator(), 'collaborator only').
 
 create or replace function public.translation_deck(p_lang text, p_limit integer default 10)
 returns jsonb language plpgsql stable security definer set search_path = '' as $$
 declare me uuid := (select auth.uid()); n int := greatest(1, least(coalesce(p_limit, 10), 50)); out jsonb;
 begin
-  if not public.is_admin() then raise exception 'admin only' using errcode = '42501'; end if;
+  if not public.is_collaborator() then raise exception 'collaborator only' using errcode = '42501'; end if;
   if not exists (select 1 from public.translation_languages t where t.lang = p_lang) then
     raise exception 'unknown language' using errcode = '22023';
   end if;
@@ -45,7 +46,7 @@ declare
   wk timestamp := date_trunc('week', now() at time zone 'Europe/Berlin');
   out jsonb;
 begin
-  if not public.is_admin() then raise exception 'admin only' using errcode = '42501'; end if;
+  if not public.is_collaborator() then raise exception 'collaborator only' using errcode = '42501'; end if;
   mine := public.translation_my_langs_of(me);
   with langs as (
     select t.lang from public.translation_languages t where t.approved order by t.lang
@@ -109,3 +110,7 @@ begin
   ) into out;
   return out;
 end $$;
+
+-- ------------------------------------------------------------ grants (as in 20261121170000)
+revoke all on function public.translation_deck(text, integer), public.translation_card_board() from public, anon;
+grant execute on function public.translation_deck(text, integer), public.translation_card_board() to authenticated;
