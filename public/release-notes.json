@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.293.0",
+  "current": "0.293.1",
   "releases": [
+    {
+      "version": "0.293.1",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Feedback routine: a topic is marked shipped only when the requested change is done; a ship reply never ends in an open question (decided default stated as fact, or the topic is parked as a question instead)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.293.0",
       "date": "2026-11-22",
