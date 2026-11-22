@@ -8537,7 +8537,6 @@
     },
     "search": {
       "label": "搜索",
-      "open": "打开搜索",
       "clear": "清除输入",
       "dropContext": "移除上下文——在所有内容中搜索",
       "places": "页面",

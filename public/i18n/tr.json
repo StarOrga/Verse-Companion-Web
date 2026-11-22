@@ -8537,7 +8537,6 @@
     },
     "search": {
       "label": "Ara",
-      "open": "Aramayı aç",
       "clear": "Girdiyi temizle",
       "dropContext": "Bağlamı kaldır — her yerde ara",
       "places": "Sayfalar",

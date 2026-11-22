@@ -8537,7 +8537,6 @@
     },
     "search": {
       "label": "Recherche",
-      "open": "Ouvrir la recherche",
       "clear": "Effacer la saisie",
       "dropContext": "Retirer le contexte — rechercher partout",
       "places": "Pages",

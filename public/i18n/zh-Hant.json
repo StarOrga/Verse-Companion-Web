@@ -8537,7 +8537,6 @@
     },
     "search": {
       "label": "搜尋",
-      "open": "開啟搜尋",
       "clear": "清除輸入",
       "dropContext": "移除情境 — 全站搜尋",
       "places": "頁面",
