@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { nextInstallStep, effectiveUpdateEventType, bannerModel } from '../src/lib/update-install.js';
+import { nextInstallStep, effectiveUpdateEventType, bannerModel, classifyUpdateError } from '../src/lib/update-install.js';
 
 const base = { staged: '0.9.0', feedVersion: null, superseded: false, workBusy: false };
 
@@ -66,5 +66,28 @@ describe('bannerModel background checks', () => {
     expect(m.textKey).toBe('update.supersedes');
     expect(m.params).toEqual({ version: '0.10.0', old: '0.9.0' });
     expect(m.button).toBeNull();
+  });
+});
+
+describe('update errors reach the window as a code, never as the raw message', () => {
+  it('hides the banner for an error (the connection chip carries it)', () => {
+    expect(bannerModel({ type: 'error' }).visible).toBe(false);
+  });
+  it('maps the revoked/unknown release token 401 to unknown-build', () => {
+    const raw =
+      '401 "method: GET url: https://x.supabase.co/functions/v1/desktop-latest/alpha.yml?noCache=1\n\n Data:\n {\n  \\"error\\": \\"invalid_or_revoked_release_token\\"\n}\n " Headers: { "server": "cloudflare" }';
+    expect(classifyUpdateError(raw)).toBe('unknown-build');
+    expect(classifyUpdateError('HttpError: 403 Forbidden')).toBe('unknown-build');
+  });
+  it('maps 5xx to server and network failures to offline', () => {
+    expect(classifyUpdateError('HttpError: 503 Service Unavailable')).toBe('server');
+    expect(classifyUpdateError('net::ERR_INTERNET_DISCONNECTED')).toBe('offline');
+    expect(classifyUpdateError('getaddrinfo ENOTFOUND hcnqhvzlavdycidqyaai.supabase.co')).toBe('offline');
+  });
+  it('recognises a staged update that did not install', () => {
+    expect(classifyUpdateError('update to v0.84.4 did not install — still running v0.84.3')).toBe('not-installed');
+  });
+  it('falls back to other', () => {
+    expect(classifyUpdateError('sha512 checksum mismatch')).toBe('other');
   });
 });

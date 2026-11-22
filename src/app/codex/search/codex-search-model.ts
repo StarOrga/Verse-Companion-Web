@@ -17,9 +17,11 @@ import {
   isUpcomingHit,
   polyHitLink,
   polyHitQueryParams,
+  polyMatchQuality,
   polyMatchScore,
 } from '../codex-poly-search';
 import { normalizeSearch } from '../codex-search';
+import { orderGroups } from './search-rank';
 
 /** A route target: a routerLink array plus its query params. */
 export interface SearchTarget {
@@ -130,7 +132,7 @@ export function groupCounts(
   return { count: cards, countIsFloor: true, folded: Math.max(0, read - cards), foldedIsFloor: true };
 }
 
-/** Group ranked hits by kind in KIND_PRIORITY order, at most `cap` per group. */
+/** Group ranked hits by kind, at most `cap` per group; the groups ordered by their best match (search-rank). */
 export function groupHits(
   term: string,
   hits: readonly PolySearchHit[],
@@ -159,7 +161,15 @@ export function groupHits(
       more: total > shown.length ? indexTarget(kind, term) : null,
     });
   }
-  return groups;
+  // The group with the best match leads; equally good groups follow the size hierarchy (#395).
+  return orderGroups(groups, (g) => g.kind, (g) => bestQuality(term, g.hits));
+}
+
+/** The best match quality among a group's hits (search-quality MATCH scale). */
+export function bestQuality(term: string, hits: readonly PolySearchHit[]): number {
+  let best = 0;
+  for (const h of hits) best = Math.max(best, polyMatchQuality(term, h));
+  return best;
 }
 
 /**

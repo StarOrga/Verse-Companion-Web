@@ -175,6 +175,7 @@ describe('catalog upload — resume after a kill', () => {
         'codex_blueprints',
         'codex_blueprint_ingredients',
         'codex_missions',
+        'codex_locations',
         'codex_entity_strings',
       ],
       cursor: { phase: 'codex_item_ports', sent: 1 },
@@ -200,6 +201,29 @@ describe('catalog upload — resume after a kill', () => {
     await uploadCatalog('token', outDir, () => {}, catalogHooks(store, createPauseControl()));
 
     expect(sent.some((s) => s.op === 'clear_ports')).toBe(true);
+  });
+
+  it('holds the extracted Verse locations back until the switch-over (#1194 / #1196)', async () => {
+    mkdirSync(join(outDir, 'locations'));
+    writeFileSync(join(outDir, 'locations', 'Stanton1.json'), JSON.stringify({ id: 'Stanton1', name: 'Hurston' }));
+    const run = async (): Promise<Sent[]> => {
+      const store = new UploadJobStore(diskIO());
+      store.save(createJob('j1', outDir, { channel: 'LIVE', patchVersion: '4.0.0', buildNumber: '9999' }, 1));
+      const sent: Sent[] = [];
+      stubFetch(sent);
+      await uploadCatalog('token', outDir, () => {}, catalogHooks(store, createPauseControl()));
+      return sent;
+    };
+    const off = await run();
+    expect(off.some((s) => s.op === 'locations' || s.op === 'clear_locations')).toBe(false);
+    vi.stubEnv('SC_UPLOAD_LOCATIONS', '1');
+    try {
+      const on = await run();
+      expect(on.some((s) => s.op === 'clear_locations')).toBe(true);
+      expect(on.find((s) => s.op === 'locations')?.rows).toBe(1);
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   it('surfaces a real server failure as an error, not as a pause', async () => {

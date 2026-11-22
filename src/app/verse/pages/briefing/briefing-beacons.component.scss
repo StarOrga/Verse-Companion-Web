@@ -26,10 +26,13 @@
   top: calc(var(--rim, 60%) + 1.7vw);
   width: max(9vw, 76px);
   height: max(4.5vw, 44px);
-  translate: -50% -50%;
+  // --hq-follow: the page scroll (component): the scene, and the outpost with it, stays put while
+  // the stage scrolls, so the anchor moves back by the same amount (#388).
+  translate: -50% calc(-50% + var(--hq-follow, 0px));
   rotate: 17.5deg;
   border-radius: 6px;
 }
+:host(.hq-away) .hq-l { visibility: hidden; }
 // Admin (admins only): the scene's station as a mini satellite in the left sky, exactly where the scene
 // keeps it (WORLD_RECTS.station: centre 27.344 vw from the left, 10.06 vw above the rim), so the flight
 // to /admin is one camera move onto it. Its own colour: --sc-accent-hot (admin-only surface).
@@ -219,27 +222,15 @@
 .fig > * { width: 100%; height: 100%; }
 .const-l:hover .fig, .const-l:focus-visible .fig { filter: drop-shadow(0 0 6px color-mix(in srgb, var(--sc-accent) 45%, transparent)); }
 
-// ── HQ outpost: a HUD target lock closes on it on hover / focus ─────────
-// Four corner brackets in the instrument cyan slide in from outside, a faint
-// scan glow lights the outpost — the way a ship's HUD locks a landing zone.
-.lock { position: absolute; inset: -14% -8%; opacity: 0; scale: 1.18; transition: opacity 0.25s, scale 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
-.lock, .lock > i { display: block; }
-.lock::before, .lock::after, .lock > i::before, .lock > i::after {
-  content: '';
-  position: absolute;
-  width: 18%;
-  height: 34%;
-  border: 0 solid color-mix(in srgb, var(--sc-accent) 75%, #fff);
-  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--sc-accent) 70%, transparent));
-}
-.lock::before { left: 0; top: 0; border-width: 1.5px 0 0 1.5px; }
-.lock::after { right: 0; top: 0; border-width: 1.5px 1.5px 0 0; }
-.lock > i::before { left: 0; bottom: 0; border-width: 0 0 1.5px 1.5px; }
-.lock > i::after { right: 0; bottom: 0; border-width: 0 1.5px 1.5px 0; }
-.lock > i { position: absolute; inset: 0; background: radial-gradient(closest-side, color-mix(in srgb, var(--sc-accent) 16%, transparent), transparent); }
-.hq-l:is(:hover, :focus-visible) .lock { opacity: 1; scale: 1; }
-// The label reads upright although the anchor is tilted with the limb.
-.hq-l .lab { rotate: -17.5deg; transform-origin: 50% 0; }
+// ── HQ outpost: a faint scan glow lights it on hover / focus ────────
+// No frame or corner brackets (#388): the outpost itself is the target; keyboard focus adds the
+// focus ring (above).
+.scan { position: absolute; inset: -14% -8%; display: block; opacity: 0; transition: opacity 0.25s;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--sc-accent) 16%, transparent), transparent); }
+.hq-l:is(:hover, :focus-visible) .scan { opacity: 1; }
+// The label stands above the outpost in the open sky, upright although the anchor is tilted with
+// the limb — below it ran into the planet, the news card and the app card (#388).
+.hq-l .lab { top: auto; bottom: calc(100% + 6px); rotate: -17.5deg; transform-origin: 50% 100%; }
 
 // ── Admin satellite: the station small, drifting on its orbit ───────────
 .sat { position: absolute; inset: 0; display: block; animation: sat-drift 9s ease-in-out infinite; animation-play-state: var(--sc-brief-play, running);
@@ -325,7 +316,7 @@
 @keyframes bk-ignite { 0% { opacity: 0; filter: brightness(2.4) blur(4px); } 35% { opacity: 1; filter: brightness(2) drop-shadow(0 0 14px rgba(150, 225, 255, 0.8)); } 100% { opacity: 1; filter: none; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .sun, .flare, .lab, .lock, .sat, .sun-gl, .fig { transition: none; }
+  .sun, .flare, .lab, .scan, .sat, .sun-gl, .fig { transition: none; }
   .sat { animation: none; }
   .glow, .corona, .streamers, .disc::before, .disc::after, .flash { animation: none; }
   // Standing storms: the loops stay visible, mid-rise.

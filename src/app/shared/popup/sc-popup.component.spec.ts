@@ -324,10 +324,14 @@ describe('ScPopupComponent', () => {
       expect(typeof get(en, key), `en ${key}`).toBe('string');
     }
   });
-  describe('back gesture (r1-back: first the window, then the page)', () => {
+  // A history traversal goes through the browser process: on a loaded machine it takes longer than
+  // vi.waitFor's default second (this block failed that way at 86 % CPU), so every wait on one gets
+  // the 5 s popup-history.spec.ts uses, and the tests room for several such waits.
+  describe('back gesture (r1-back: first the window, then the page)', { timeout: 30_000 }, () => {
     const marker = () => (history.state as { scPopup?: string } | null)?.scPopup ?? null;
+    const landed = (check: () => void) => vi.waitFor(check, { timeout: 5000 });
     const idle = async () => {
-      await vi.waitFor(() => expect(marker()).toBeNull());
+      await landed(() => expect(marker()).toBeNull());
     };
 
     it('a large window pushes one entry; back closes it and the page stays', async () => {
@@ -338,7 +342,7 @@ describe('ScPopupComponent', () => {
       expect(popupEntryDepth()).toBe(1);
       expect(marker()).not.toBeNull();
       history.back();
-      await vi.waitFor(() => expect(f.componentInstance.reasons).toEqual(['back']));
+      await landed(() => expect(f.componentInstance.reasons).toEqual(['back']));
       f.detectChanges();
       await settle();
       expect(location.href).toBe(url);
@@ -352,12 +356,12 @@ describe('ScPopupComponent', () => {
       await settle();
       // The host ignores the first back (busy): no detectChanges, the popup stays.
       history.back();
-      await vi.waitFor(() => expect(f.componentInstance.reasons).toEqual(['back']));
-      await vi.waitFor(() => expect(popupEntryDepth()).toBe(1));
+      await landed(() => expect(f.componentInstance.reasons).toEqual(['back']));
+      await landed(() => expect(popupEntryDepth()).toBe(1));
       expect(marker()).not.toBeNull();
       f.componentInstance.reasons.length = 0;
       history.back();
-      await vi.waitFor(() => expect(f.componentInstance.reasons).toEqual(['back']));
+      await landed(() => expect(f.componentInstance.reasons).toEqual(['back']));
       f.detectChanges();
       await settle();
       expect(popupEntryDepth()).toBe(0);
@@ -402,13 +406,13 @@ describe('ScPopupComponent', () => {
       await settle();
       expect(popupEntryDepth()).toBe(2);
       history.back();
-      await vi.waitFor(() => expect(f.componentInstance.secondReasons).toEqual(['back']));
+      await landed(() => expect(f.componentInstance.secondReasons).toEqual(['back']));
       f.detectChanges();
       expect(f.componentInstance.reasons).toEqual([]);
       expect(f.nativeElement.querySelector('sc-popup:not(.second)')).not.toBeNull();
       expect(popupEntryDepth()).toBe(1);
       history.back();
-      await vi.waitFor(() => expect(f.componentInstance.reasons).toEqual(['back']));
+      await landed(() => expect(f.componentInstance.reasons).toEqual(['back']));
       f.destroy();
     });
   });

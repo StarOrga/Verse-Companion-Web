@@ -29,6 +29,7 @@ export const CLONE_TABLES: readonly string[] = [
 export const CLEAR_OP_TABLES: Readonly<Record<string, string>> = {
   clear_ports: 'codex_item_ports',
   clear_ingredients: 'codex_blueprint_ingredients',
+  clear_locations: 'codex_locations',
   clear_silhouettes: 'codex_silhouettes_rows',
   silhouette_skips: 'codex_silhouette_skips',
 };
@@ -51,8 +52,8 @@ export interface RebuildDeps {
   predecessor(buildId: string): Promise<string | null>;
   /** Tables the run (or an earlier clone) already wrote for this build. */
   touched(buildId: string): Promise<Set<string>>;
-  /** Copies the next chunk of one table from the predecessor. */
-  clone(buildId: string, table: string): Promise<{ copied: number; done: boolean }>;
+  /** Copies the next chunk (at most `limit` rows) of one table from the predecessor. */
+  clone(buildId: string, table: string, limit: number): Promise<{ copied: number; done: boolean }>;
 }
 
 export interface RebuildPlan {
@@ -66,10 +67,21 @@ export interface RebuildPlan {
 /** Upper bound of chunk calls per table (items: ~11 chunks of 2 000). */
 export const MAX_CLONE_CALLS = 200;
 
+/** Rows per clone call: the RPC's default, halved on a statement timeout down to the floor. */
+export const CLONE_CHUNK = 2000;
+export const MIN_CLONE_CHUNK = 500;
+
+/** True when Postgres cancelled the statement (57014) — the batch was too heavy, not broken. */
+export function isStatementTimeout(error: unknown): boolean {
+  const e = error as { code?: string; message?: string } | null;
+  return e?.code === '57014' || /statement timeout|canceling statement/i.test(String(e?.message ?? ''));
+}
+
 /**
  * Before the switch: fill every table the run skipped from the predecessor.
  * Chunked, because every RPC runs under the authenticator's 8 s statement
- * timeout and items alone took 24 s in the 2026-11-14 dry run. Idempotent: a
+ * timeout and items alone took 24 s in the 2026-11-14 dry run; a chunk that
+ * still overruns is retried smaller. Idempotent: a
  * retried finalize resumes where the copy stopped and copies nothing twice.
  */
 export async function prepareRebuild(deps: RebuildDeps, buildId: string): Promise<RebuildPlan> {
@@ -80,9 +92,20 @@ export async function prepareRebuild(deps: RebuildDeps, buildId: string): Promis
   for (const table of CLONE_TABLES) {
     if (touched.has(table)) continue;
     let copied = 0;
+    // A chunk that ran into the statement timeout is retried with half the
+    // rows (2000 -> 1000 -> 500) instead of failing finalize; the smaller size
+    // stays for the rest of the table. Only a timeout at the floor is thrown.
+    let limit = CLONE_CHUNK;
     for (let call = 0; ; call++) {
       if (call >= MAX_CLONE_CALLS) throw new Error(`clone of ${table} did not finish in ${MAX_CLONE_CALLS} calls`);
-      const r = await deps.clone(buildId, table);
+      let r: { copied: number; done: boolean };
+      try {
+        r = await deps.clone(buildId, table, limit);
+      } catch (e) {
+        if (!isStatementTimeout(e) || limit <= MIN_CLONE_CHUNK) throw e;
+        limit = Math.max(MIN_CLONE_CHUNK, Math.floor(limit / 2));
+        continue;
+      }
       copied += r.copied;
       if (r.done) break;
     }

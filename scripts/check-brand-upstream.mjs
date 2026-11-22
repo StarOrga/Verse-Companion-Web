@@ -9,11 +9,18 @@
  * only proves the rasters match the copy, not that the copy matches the app.
  *
  * The app lives in a separate repository, so this can only run where a checkout
- * of it sits next to this one (`Star-Citizen-Companion-App`, found by walking up
- * from this repo, or `VC_APP_REPO`). On CI and Vercel there is none and the check
+ * of it sits next to this one (`Verse-Companion-App`, or the pre-rename
+ * `Star-Citizen-Companion-App`, found by walking up from this repo, or
+ * `VC_APP_REPO`). Before 2026-11-22 it only looked for the old name, so after the
+ * rename it silently skipped everywhere. On CI and Vercel there is none and the check
  * skips. It compares against the checkout's `origin/main` when that ref exists,
  * so a stale local branch in the app repo does not hide a newer icon; without a
  * fetch it is as fresh as the last `git fetch` there.
+ *
+ * StarUI (`@starorga/star-ui`, assets/brand/app-icon-taskbar.svg) is the brand
+ * master by the design-system rules (.claude/deep-knowledge/design-system.md).
+ * As long as StarUI still carries an older mark this is only a notice; the app
+ * comparison above stays the hard check.
  *
  * Fix when it fails:
  *   git -C <app> show origin/main:modules/desktop/resources/app-icon-taskbar.svg > public/icons/brand/vc-mark.svg
@@ -30,15 +37,18 @@ import { execFileSync } from 'node:child_process';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const MASTER = join(ROOT, 'public/icons/brand/vc-mark.svg');
 const UPSTREAM_PATH = 'modules/desktop/resources/app-icon-taskbar.svg';
-const APP_DIR_NAME = 'Star-Citizen-Companion-App';
+const APP_DIR_NAMES = ['Verse-Companion-App', 'verse-companion-app', 'Star-Citizen-Companion-App'];
+const STARUI_MARK = join(ROOT, 'node_modules/@starorga/star-ui/assets/brand/app-icon-taskbar.svg');
 
 function findAppRepo() {
   if (process.env.VC_APP_REPO) return existsSync(process.env.VC_APP_REPO) ? process.env.VC_APP_REPO : null;
   // Worktrees sit several levels below the primary checkout, so walk up.
   let dir = ROOT;
   for (let i = 0; i < 8; i += 1) {
-    const candidate = join(dirname(dir), APP_DIR_NAME);
-    if (existsSync(join(candidate, UPSTREAM_PATH))) return candidate;
+    for (const name of APP_DIR_NAMES) {
+      const candidate = join(dirname(dir), name);
+      if (existsSync(join(candidate, UPSTREAM_PATH))) return candidate;
+    }
     const parent = dirname(dir);
     if (parent === dir) break;
     dir = parent;
@@ -67,7 +77,7 @@ if (!appRepo) {
   const theirs = lf(upstreamSvg(appRepo));
   if (ours !== theirs) {
     console.error(
-      `\nbrand upstream: public/icons/brand/vc-mark.svg differs from ${APP_DIR_NAME}/${UPSTREAM_PATH}.\n` +
+      `\nbrand upstream: public/icons/brand/vc-mark.svg differs from ${appRepo}/${UPSTREAM_PATH}.\n` +
         'The desktop app has a newer icon. Re-vendor it:\n' +
         `  git -C "${appRepo}" show origin/main:${UPSTREAM_PATH} > public/icons/brand/vc-mark.svg\n` +
         '  npm run gen:brand-icons\n' +
@@ -76,5 +86,17 @@ if (!appRepo) {
     process.exitCode = 1;
   } else {
     console.log('brand upstream: vc-mark.svg matches the desktop app.');
+  }
+}
+
+if (existsSync(STARUI_MARK)) {
+  const ours = lf(readFileSync(MASTER, 'utf8'));
+  if (ours === lf(readFileSync(STARUI_MARK, 'utf8'))) {
+    console.log('brand upstream: vc-mark.svg matches StarUI.');
+  } else {
+    console.log(
+      'brand upstream: notice — vc-mark.svg differs from @starorga/star-ui assets/brand/app-icon-taskbar.svg. ' +
+        'StarUI is the brand master: update the mark there and bump the StarUI pin (not a build failure yet).',
+    );
   }
 }

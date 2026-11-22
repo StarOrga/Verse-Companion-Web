@@ -31,8 +31,8 @@ import {
   CodexSearchHub,
   CodexSearchBarHandle,
   isEditableTarget,
+  isTypeToSearchKey,
 } from '../../codex/search/codex-search-hub.service';
-import { typeToSearchHere } from './type-to-search';
 import {
   SearchTarget,
   SearchVariantLink,
@@ -124,6 +124,9 @@ function storage(): Storage | null {
 /** Ships a fitted-on meta line names before it counts the rest. */
 const FITTED_SHOWN = 2;
 
+/** The Verse hub (bare domain or /verse): its stage search takes typed letters. */
+const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
+
 /**
  * The Fusion bar's search (concept 2026-11-02 "Suche: Kontext & Aktionen").
  *
@@ -152,14 +155,13 @@ const FITTED_SHOWN = 2;
     '(window:resize)': 'fitPanel()',
   },
   template: `
-    <!-- Phone (bottom placement): the closed search is a magnifier button; tapping opens the field. -->
-    <button #mag type="button" class="mag" (click)="openFromButton()"
-            [attr.aria-label]="'fusionBar.search.open' | translate"
-            [attr.aria-expanded]="open()"
-            [scTooltip]="'fusionBar.search.open' | translate" scTooltipTier="label">
+    <!-- Phone (bottom placement): the closed search looks like the field itself — magnifier and
+         placeholder across the bar's width; tapping opens the field. Its text is its name. -->
+    <button #mag type="button" class="mag" (click)="openFromButton()" [attr.aria-expanded]="open()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
         <circle cx="10.5" cy="10.5" r="6.5" /><line x1="15.5" y1="15.5" x2="21" y2="21" />
       </svg>
+      <span class="mag-ph">{{ ('fusionBar.placeholder.' + context().key) | translate }}</span>
     </button>
     <div class="field" [class.focused]="open()" [class.menu-open]="chipMenu()" (pointerdown)="onFieldPointer($event)">
       <svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
@@ -217,7 +219,8 @@ const FITTED_SHOWN = 2;
       }
       <ng-content select="[fsTrailing]" />
       <!-- The ✕ only clears the text (A9). Under the thumb an empty open sheet keeps a close ✕. -->
-      <span class="xslot">
+      <!-- Empty (no text, no open sheet): it takes no room, so no blank stands at the field's end. -->
+      <span class="xslot" [class.empty]="!engine.input() && !(open() && placement() === 'bottom')">
         @if (engine.input()) {
           <button type="button" class="close clear" (click)="clearInput()"
                   [attr.aria-label]="'fusionBar.search.clear' | translate"
@@ -551,6 +554,7 @@ const FITTED_SHOWN = 2;
     .strip-k { color: var(--sc-accent); }
     :host(.bottom) .strip { display: none; }
     .xslot { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; }
+    .xslot.empty { display: none; }
     .close {
       flex: none; display: inline-flex; align-items: center; justify-content: center;
       width: 36px; height: 36px; border: 0; border-radius: 10px; background: transparent; color: var(--sc-fg-2); cursor: pointer;
@@ -743,12 +747,17 @@ const FITTED_SHOWN = 2;
     .mag { display: none; }
     :host(.bottom:not(.open)) .field { display: none; }
     :host(.bottom:not(.open)) .mag {
-      display: inline-flex; align-items: center; justify-content: center; margin-left: auto;
-      width: 48px; height: 48px; padding: 0; border: 0; border-radius: var(--sc-radius-sm, 4px);
-      background: transparent; color: var(--sc-fg-1); cursor: pointer;
+      display: flex; align-items: center; gap: var(--sc-space-2); flex: 1 1 auto; min-width: 0;
+      height: 44px; padding: 0 var(--sc-space-3); border: 0; border-radius: 16px; /* ds-ok: the field's own 16px round, so the closed field looks like the open one */
+      background: color-mix(in srgb, var(--sc-bg-0) 88%, transparent); color: var(--sc-fg-2);
+      font: inherit; text-align: start; cursor: pointer;
     }
-    .mag svg { width: 22px; height: 22px; color: var(--sc-accent); }
-    .mag:hover { color: var(--sc-fg-0); background: var(--sc-bg-2); }
+    .mag svg { flex: none; width: 20px; height: 20px; color: var(--sc-accent); }
+    .mag-ph {
+      min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      font-size: max(0.92rem, var(--sc-fs-input, 1rem));
+    }
+    .mag:hover { color: var(--sc-fg-1); background: var(--sc-bg-2); }
     .mag:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     :host(.bottom:not(.open)) .fchip { display: none; }
     @media (pointer: coarse) {
@@ -1414,13 +1423,16 @@ export class FusionSearchComponent {
       this.focus();
       return;
     }
-    // Type-to-search (#385): on every page where this field is the only search, a letter typed
-    // while nothing takes text starts it — on a Codex page through the hub (its newest bar), else
-    // here. On the Verse hub it is also the key that skips the entrance (not consumed there), so
-    // the first letter already lands in the field (QA D4). The rules: type-to-search.ts.
-    if (typeToSearchHere(ev, this.host.nativeElement.closest('sc-fusion-bar') ?? this.host.nativeElement)) {
+    if (this.hub.hasBar() && isTypeToSearchKey(ev)) {
       ev.preventDefault();
-      if (!this.hub.activate(ev.key)) this.focus(ev.key);
+      this.hub.activate(ev.key);
+      return;
+    }
+    // The Verse hub's stage field takes typed letters too - also the key that skips the
+    // entrance (it is not consumed there), so the first letter already lands in it (QA D4).
+    if (this.chrome.stageSearch() === 'stage' && VERSE_HOME.test(this.url()) && isTypeToSearchKey(ev)) {
+      ev.preventDefault();
+      this.focus(ev.key);
     }
   }
 

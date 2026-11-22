@@ -1,7 +1,7 @@
 // node --test supabase/functions/_shared/posthog.test.ts
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CRON_RUN_EVENT, buildAiGeneration, buildCapture, buildCronRun, buildException, buildHttpException, fingerprintPart, readErrorCode, redactText, serverDistinctId, withPosthog } from './posthog.ts';
+import { CRON_RUN_EVENT, INGEST_TIMEOUT_EVENT, buildAiGeneration, buildCapture, buildCronRun, buildException, buildHttpException, fingerprintPart, readErrorCode, redactText, reportAs, serverDistinctId, withPosthog } from './posthog.ts';
 import { PRICES } from '../translate-orchestrator/_cost.ts';
 import { LIST_PRICES, costUsd, priceFor } from './ai-pricing.ts';
 
@@ -138,12 +138,12 @@ test('list prices are exactly twice the orchestrator batch prices', () => {
 });
 
 test('cost: tokens, cache, batch discount, dated model ids, unknown model', () => {
-  assert.equal(costUsd('claude-sonnet-5-5', { input_tokens: 1_000_000, output_tokens: 1_000_000 }), 24);
-  assert.equal(costUsd('claude-sonnet-5-5', { input_tokens: 1_000_000, output_tokens: 1_000_000 }, { batch: true }), 12);
+  assert.equal(costUsd('claude-sonnet-5-5', { input_tokens: 1_000_000, output_tokens: 1_000_000 }), 12);
+  assert.equal(costUsd('claude-sonnet-5-5', { input_tokens: 1_000_000, output_tokens: 1_000_000 }, { batch: true }), 6);
   assert.equal(costUsd('claude-haiku-4-5', { input_tokens: 2000, output_tokens: 200 }), 0.003);
   assert.equal(priceFor('claude-haiku-4-5-20251001').in, 1);
   assert.equal(priceFor('mystery').out, 40);
-  assert.equal(costUsd('claude-sonnet-5-5', { cache_read_input_tokens: 1_000_000 }), 0.4);
+  assert.equal(costUsd('claude-sonnet-5-5', { cache_read_input_tokens: 1_000_000 }), 0.2);
 });
 
 test('cron run outcome: 429 throttle is healthy, 5xx and a throw are failures', () => {
@@ -155,4 +155,39 @@ test('cron run outcome: 429 throttle is healthy, 5xx and a throw are failures', 
   const thrown = buildCronRun('x', null, 1, new Error('boom'));
   assert.equal(thrown.properties.ok, false);
   assert.equal(thrown.properties.error, 'boom');
+});
+
+test('a 5xx marked with reportAs goes out as its own event, not as $exception, and the response stays untouched', async () => {
+  const real = globalThis.fetch;
+  const sent: { batch: { event: string; properties: Record<string, unknown> }[] }[] = [];
+  let done!: () => void;
+  const arrived = new Promise<void>((r) => { done = r; });
+  globalThis.fetch = ((_u: string, init: RequestInit) => {
+    sent.push(JSON.parse(String(init.body)));
+    done();
+    return Promise.resolve(new Response(null, { status: 200 }));
+  }) as typeof fetch;
+  try {
+    const h = withPosthog('ingest-catalog', () => reportAs(new Response(JSON.stringify({ error: 'ingest_timeout' }), {
+      status: 503, headers: { 'content-type': 'application/json', 'retry-after': '2' },
+    }), INGEST_TIMEOUT_EVENT, { op: 'upsert', table: 'codex_items_rows', rows: 500 }));
+    const res = await h(new Request('http://x.test', { method: 'POST' }));
+    assert.equal(res.status, 503);
+    assert.deepEqual([...res.headers.keys()].sort(), ['content-type', 'retry-after']);
+    assert.deepEqual(await res.json(), { error: 'ingest_timeout' });
+    await arrived;
+    assert.equal(sent.length, 1);
+    const [e] = sent[0].batch;
+    assert.equal(sent[0].batch.length, 1);
+    assert.equal(e.event, 'server:ingest_timeout');
+    assert.equal(e.properties.op, 'upsert');
+    assert.equal(e.properties.table, 'codex_items_rows');
+    assert.equal(e.properties.rows, 500);
+    assert.equal(e.properties.http_status, 503);
+    assert.equal(e.properties.function, 'ingest-catalog');
+    assert.equal(e.properties.$process_person_profile, false);
+    assert.ok(!('$exception_list' in e.properties));
+  } finally {
+    globalThis.fetch = real;
+  }
 });

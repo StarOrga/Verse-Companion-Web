@@ -29,7 +29,7 @@ import { CodexPrefsService } from '../codex/codex-prefs.service';
 import { isPlainLeftClick } from '../core/modified-click.util';
 import { AnalyticsService } from '../core/analytics.service';
 import { LocaleService } from '../core/locale/locale.service';
-import type { AppLanguage, RegionCode } from '../core/locale/locale.types';
+import { APP_LANGUAGES, type AppLanguage, type RegionCode } from '../core/locale/locale.types';
 import { PICKER_REGIONS } from '../core/locale/region.data';
 import { ScDatePipe } from '../core/locale/sc-date.pipe';
 import { readEdgeErrorCode } from '../core/edge-error';
@@ -904,7 +904,7 @@ export class SettingsComponent implements OnInit, AfterViewInit, OnDestroy {
   private offScroll?: () => void;
   private spyFrame = 0;
 
-  readonly languages: readonly LangId[] = ['de', 'en'];
+  readonly languages: readonly LangId[] = APP_LANGUAGES;
   readonly regions: readonly RegionCode[] = PICKER_REGIONS;
   /** Declared below languages/regions: class fields initialise in order. */
   readonly languageOptions: readonly ScSelectOption[] = [

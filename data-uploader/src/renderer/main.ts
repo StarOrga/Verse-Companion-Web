@@ -10,7 +10,7 @@
 // build can strip their remote Google-Fonts @import — see electron.vite.config.ts.
 import '@starorga/star-ui/lib/design-tokens.css';
 import { load as loadI18n, t } from '../lib/i18n.js';
-import { shouldAutoResume, shouldQuitAfterAutoRun, launchAction, formatIdentity, planContinuation, type ContinuationPlan } from '../lib/auto-run.js';
+import { shouldAutoResume, shouldQuitAfterAutoRun, launchAction, planContinuation, type ContinuationPlan } from '../lib/auto-run.js';
 import { catalogAlreadyLanded } from '../lib/resume-compat.js';
 import { startPatchCountdown, repaintPatchCountdown } from './patch-countdown.js';
 import { initTooltips } from './tooltip.js';
@@ -44,7 +44,7 @@ import {
   type BannerInput,
   type InstallNoticeState,
 } from '../lib/update-install.js';
-import { resetLog, replayLog, appendLog as drawerAppendLog, wireLogDrawer, toggleLogDrawer } from './log-drawer.js';
+import { resetLog, replayLog, appendLog as drawerAppendLog, wireLogDrawer, toggleLogDrawer, isLogDrawerOpen } from './log-drawer.js';
 import {
   updateCategoryBars,
   categoryBarsHtml,
@@ -564,6 +564,8 @@ async function maybeAutoRun(): Promise<void> {
     return;
   }
   if (operatorHasMoved()) return;
+  // Same build with parts open → the popover names them as the reason for the yellow light.
+  setOpenParts(decision.kind === 'parts' ? decision.pending : null);
   if (!decision.run || !decision.channel) {
     // Nothing to upload and nobody watching → close again instead of leaving a
     // tray icon behind for the rest of the day (feedback 71b1e402), unless the
@@ -595,7 +597,7 @@ async function maybeAutoRun(): Promise<void> {
     const found = decision;
     startPatchCountdown({
       channel: found.channel?.channel ?? '',
-      version: formatIdentity(found.localVersion ?? found.channel?.version, found.localBuild ?? found.channel?.buildNumber),
+      version: identityText(found.localVersion ?? found.channel?.version, found.localBuild ?? found.channel?.buildNumber),
       // Same build, parts open: the banner names them instead of "new game patch".
       parts: found.kind === 'parts' && found.pending ? found.pending.map((k) => subthemeName(k)).join(', ') : null,
       isBusy: operatorHasMoved,
@@ -642,15 +644,15 @@ async function startAutoRun(decision: Awaited<ReturnType<typeof window.sc.autoRu
   // Say what is really happening: a same-build start names the open parts, a
   // new identity names both sides with their build numbers — never
   // "new version (4.10.0 vs 4.10.0)" when nothing is new.
-  const local = formatIdentity(decision.localVersion ?? decision.channel.version, decision.localBuild ?? decision.channel.buildNumber);
+  const local = identityText(decision.localVersion ?? decision.channel.version, decision.localBuild ?? decision.channel.buildNumber);
   const parts = decision.pending?.map((k) => subthemeName(k)).join(', ');
   setStatus(
     decision.kind === 'parts' && parts
-      ? t('autorun.continuingParts', { channel: decision.channel.channel, version: local, parts })
+      ? t('autorun.continuingParts', { parts })
       : t('autorun.starting', {
           channel: decision.channel.channel,
           local,
-          server: decision.serverVersion ? formatIdentity(decision.serverVersion, decision.serverBuild) : '—',
+          server: decision.serverVersion ? identityText(decision.serverVersion, decision.serverBuild) : '—',
         }),
   );
   // The self-started plan always rolls the extraction straight into the upload
@@ -958,6 +960,52 @@ const IC_LOGOUT =
 const IC_RING =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M7 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M7 8l0 8"/><path d="M9 18h6a2 2 0 0 0 2 -2v-5"/><path d="M14 14l3 -3l3 3"/></svg>';
 
+/** The uploader's last update failure (code only), null once a check succeeds. */
+let updateErrorCode: 'unknown-build' | 'offline' | 'server' | 'not-installed' | 'other' | null = null;
+/** Parts of the current game build the server still lacks (display names), null = none known. */
+let openPartsText: string | null = null;
+
+function setOpenParts(keys: readonly SubthemeKey[] | null | undefined): void {
+  openPartsText = keys && keys.length ? keys.map((k) => subthemeName(k)).join(', ') : null;
+  paintConnection();
+}
+
+/** "4.10.3 · Build 13165946" — the one way a game identity is shown. */
+function identityText(version: string | null | undefined, build: string | null | undefined): string {
+  const v = version || '?';
+  const b = String(build ?? '').trim();
+  return b ? `${v} · ${t('conn.build', { n: b })}` : v;
+}
+
+/**
+ * Local game build vs. the server's codex for the same channel. `ok` = same
+ * patch and build and nothing open; `warn` = the server differs, lacks the
+ * channel, or parts are still open; `none` = nothing to compare yet.
+ */
+function compareServerState(): {
+  tone: 'ok' | 'warn' | 'none';
+  channel: string | null;
+  local: { version: string; build: string | null } | null;
+  same: boolean;
+  openParts: string | null;
+} {
+  const snap = conn.snapshot;
+  const serverTag = snap?.channels[0]?.channel.toUpperCase();
+  const localCh = state.channels.find((c) => c.channel === serverTag && c.version) ?? state.channels.find((c) => c.version);
+  if (!localCh?.version) {
+    return { tone: 'none', channel: null, local: null, same: false, openParts: openPartsText };
+  }
+  const local = { version: localCh.version, build: localCh.buildNumber ?? null };
+  const server = snap?.channels.find((c) => c.channel.toLowerCase() === localCh.channel.toLowerCase());
+  if (!snap) return { tone: 'none', channel: localCh.channel, local, same: false, openParts: openPartsText };
+  const same =
+    !!server &&
+    server.patchVersion === local.version &&
+    (!local.build || !server.buildNumber || String(server.buildNumber) === String(local.build));
+  const tone = same && !openPartsText ? 'ok' : 'warn';
+  return { tone, channel: localCh.channel, local, same, openParts: openPartsText };
+}
+
 /**
  * Compact, single-row web-connection bar. One line carries everything:
  * a live status dot, the identity (email when signed in, a connect CTA
@@ -988,21 +1036,31 @@ function paintConnection(): void {
     pillText = t('session.retrying');
   }
 
-  // Compact top-strip chip: dot + short identity + first server chip. Always
-  // painted, independent of whether the detail popover is open.
+  // Compact top-strip chip: connection dot + the channel as a traffic light
+  // (green = the server has this game build complete, yellow = it differs or
+  // parts are still open) + a warning dot while the uploader cannot update.
+  // No email and no patch number here: both live in the popover, which explains
+  // the colour. Always painted, independent of whether the popover is open.
+  const cmp = compareServerState();
   const chip = $('#connection-chip');
   if (chip) {
-    const who = s?.connected ? escapeHtml(s.email ?? '') : pillText;
-    // The game identity comes from the local install (x.y.z + build, lib/discovery
-    // resolveGameIdentity); the server row only fills in when nothing is installed.
-    const serverTag = snap?.channels[0]?.channel.toUpperCase();
-    const localCh = state.channels.find((c) => c.channel === serverTag && c.version) ?? state.channels.find((c) => c.version);
-    const serverBit = localCh
-      ? ` · ${escapeHtml(localCh.channel)} v${escapeHtml(formatIdentity(localCh.version, localCh.buildNumber))}`
-      : snap?.channels[0]
-        ? ` · ${escapeHtml(snap.channels[0].channel.toUpperCase())} v${escapeHtml(snap.channels[0].patchVersion)}`
-        : '';
-    chip.innerHTML = `<span class="conn-dot conn-dot--${pillCls}"></span> ${who}${serverBit}`;
+    const tag = cmp.channel ?? snap?.channels[0]?.channel.toUpperCase() ?? null;
+    const label = s?.connected && tag ? '' : `<span class="conn-chip-state">${escapeHtml(pillText)}</span>`;
+    const tagHtml = tag
+      ? `<span class="conn-chip-tag conn-chip-tag--${cmp.tone}">${escapeHtml(tag.toUpperCase())}</span>`
+      : '';
+    const badge = updateErrorCode ? '<span class="conn-chip-badge" aria-hidden="true"></span>' : '';
+    const summary = [
+      s?.connected ? (s.email ?? '') : pillText,
+      cmp.local ? `${cmp.channel} ${identityText(cmp.local.version, cmp.local.build)}` : '',
+      cmp.tone === 'ok' ? t('conn.stateOk') : cmp.tone === 'warn' ? t('conn.stateWarn') : '',
+      updateErrorCode ? t('update.errorTitle') : '',
+    ]
+      .filter(Boolean)
+      .join(' · ');
+    chip.innerHTML = `<span class="conn-dot conn-dot--${pillCls}"></span>${label}${tagHtml}${badge}`;
+    chip.setAttribute('aria-label', summary);
+    chip.setAttribute('data-tip', summary);
   }
 
   // Detail body only exists while the popover is open (see connection-popover.ts).
@@ -1029,21 +1087,45 @@ function paintConnection(): void {
   // syncing). It used to share the identity row, where the narrow popover
   // pushed the nowrap chip over the freshness text — on its own row the chips
   // can wrap and the email + actions keep one clean line.
+  // Rows: the local game build, every server channel (the matching one with
+  // "✓ gleich" / "⚠ anderer Stand"), the entry count with its freshness, and —
+  // as the reason for a yellow light — the parts still open.
   let serverBlock = '';
   if (s?.connected && !conn.syncing) {
     if (snap) {
-      const chips = snap.channels
-        .map(
-          (c) =>
-            `<span class="conn-chip ${escapeHtml(c.channel)}"><strong>${escapeHtml(c.channel.toUpperCase())}</strong> v${escapeHtml(c.patchVersion)} · ${c.entityTotal.toLocaleString()}</span>`,
-        )
-        .join('');
-      serverBlock = `
-        <div class="conn-server">
-          <span class="conn-srv-ico" aria-hidden="true">${IC_CLOUD}</span>
-          <div class="conn-chips">${chips || `<span class="conn-empty">${t('sync.empty')}</span>`}</div>
-          <span class="conn-fresh">${t('sync.lastSynced', { when: relTime(snap.syncedAt) })}</span>
-        </div>`;
+      const tagCell = (ch: string): string =>
+        `<span class="conn-chtag conn-chtag--${escapeHtml(ch.toLowerCase())}">${escapeHtml(ch.toUpperCase())}</span>`;
+      const rows: string[] = [];
+      if (cmp.local && cmp.channel) {
+        rows.push(
+          `<tr><th scope="row">${t('conn.local')}</th><td>${tagCell(cmp.channel)} ${escapeHtml(identityText(cmp.local.version, cmp.local.build))}</td><td></td></tr>`,
+        );
+      }
+      for (const c of snap.channels) {
+        const isCompared = !!cmp.channel && c.channel.toLowerCase() === cmp.channel.toLowerCase() && !!cmp.local;
+        const verdict = isCompared
+          ? cmp.same
+            ? `<span class="conn-cmp conn-cmp--ok">✓ ${t('conn.same')}</span>`
+            : `<span class="conn-cmp conn-cmp--warn">⚠ ${t('conn.differs')}</span>`
+          : '';
+        rows.push(
+          `<tr><th scope="row">${t('conn.server')}</th><td>${tagCell(c.channel)} ${escapeHtml(identityText(c.patchVersion, c.buildNumber))}</td><td>${verdict}</td></tr>`,
+        );
+      }
+      const counted = (cmp.channel && snap.channels.find((c) => c.channel.toLowerCase() === cmp.channel!.toLowerCase())) ?? snap.channels[0];
+      if (counted) {
+        rows.push(
+          `<tr><th scope="row">${t('conn.entries')}</th><td>${t('conn.entryCount', { n: counted.entityTotal.toLocaleString() })}</td><td><span class="conn-fresh">${t('sync.lastSynced', { when: relTime(snap.syncedAt) })}</span></td></tr>`,
+        );
+      }
+      if (cmp.openParts) {
+        rows.push(
+          `<tr class="conn-row-open"><th scope="row">${t('conn.open')}</th><td colspan="2">${escapeHtml(cmp.openParts)}</td></tr>`,
+        );
+      }
+      serverBlock = snap.channels.length
+        ? `<table class="conn-table">${rows.join('')}</table>`
+        : `<div class="conn-server"><span class="conn-srv-ico" aria-hidden="true">${IC_CLOUD}</span><span class="conn-empty">${t('sync.empty')}</span></div>`;
     } else {
       serverBlock = `
         <div class="conn-server"><span class="conn-fresh">${t('sync.idle')}</span></div>`;
@@ -1072,6 +1154,17 @@ function paintConnection(): void {
       ? `<div class="conn-persist-note">${t('session.noPersist')}</div>`
       : '';
   const errorRow = conn.error ? `<div class="conn-error">${escapeHtml(connErrorText(conn.error))}</div>` : '';
+  // The uploader's own update failure: a translated sentence and the way out,
+  // never the raw HttpError (that stays in main.log).
+  const updateRow = updateErrorCode
+    ? `<div class="conn-update-err" role="status">
+        <p><strong>${t('update.errorTitle')}</strong> ${t(`updateErrors.${updateErrorCode}`)}</p>
+        <div class="conn-update-acts">
+          <button id="conn-upd-download" type="button" class="btn btn-primary btn-sm">${t('update.downloadLatest')}</button>
+          <button id="conn-upd-log" type="button" class="btn-link">${t('run.logTitle')}</button>
+        </div>
+      </div>`
+    : '';
 
   mount.innerHTML = `
     <div class="conn-card conn-card--${pillCls}">
@@ -1085,9 +1178,14 @@ function paintConnection(): void {
       ${syncBar}
       ${persistNote}
       ${errorRow}
+      ${updateRow}
     </div>
   `;
 
+  $('#conn-upd-download')?.addEventListener('click', () => void window.open(DOWNLOAD_PAGE_URL));
+  $('#conn-upd-log')?.addEventListener('click', () => {
+    if (!isLogDrawerOpen()) toggleLogDrawer();
+  });
   $('#conn-connect')?.addEventListener('click', () => void connectNow());
   $('#conn-signout')?.addEventListener('click', () => void signOutNow());
   $('#conn-sync')?.addEventListener('click', () => {
@@ -1106,7 +1204,7 @@ type UpdateEvent =
   | { type: 'progress'; pct: number; bytesPerSecond?: number; transferred?: number; total?: number }
   | { type: 'downloaded'; version: string }
   | { type: 'manual'; currentVersion: string; latestVersion: string }
-  | { type: 'error'; message: string }
+  | { type: 'error'; code: 'unknown-build' | 'offline' | 'server' | 'not-installed' | 'other' }
   | { type: 'install-state'; state: InstallNoticeState; version: string };
 
 // Public download page — opened for portable builds that can't self-update.
@@ -1141,6 +1239,13 @@ function isUpdateBusyType(type: UpdateEvent['type'] | null): boolean {
 // persistent shell banner.
 function onUpdateEvent(ev: UpdateEvent): void {
   lastUpdateType = ev.type;
+  // An update failure shows as the chip's warning dot + a note in its popover;
+  // any later answer from the feed clears it.
+  const nextError = ev.type === 'error' ? ev.code : ev.type === 'checking' || ev.type === 'install-state' ? updateErrorCode : null;
+  if (nextError !== updateErrorCode) {
+    updateErrorCode = nextError;
+    paintConnection();
+  }
   if (ev.type === 'manual') {
     state.manualUpdate = { currentVersion: ev.currentVersion, latestVersion: ev.latestVersion };
     state.manualUpdateDismissed = false; // a freshly-published newer version re-shows the hint
@@ -1809,6 +1914,7 @@ async function runRealExtract(): Promise<boolean> {
       state.forceAll,
     );
     state.subthemePlan = plan;
+    if (plan.reason === 'ledger') setOpenParts(plan.pending);
     refreshRunEta();
     if (plan.skip.length) {
       appendLog(t('subthemes.skipping', { list: plan.skip.map(subthemeName).join(', ') }));
@@ -2691,7 +2797,12 @@ async function doUploadAfterAuth(): Promise<void> {
   // Upload confirmed — reclaim the run's extracted files so they don't fill
   // the disk. Best-effort: the main process guards + swallows failures.
   const outDir = hullsSettled ? state.lastResult?.output_dir : undefined;
-  if (!hullsSettled) drawerAppendLog(t('subthemes.contOpen'));
+  if (!hullsSettled) {
+    drawerAppendLog(t('subthemes.contOpen'));
+    // Without the flag the startup sweep eats this extract once it is a day old.
+    const kept = state.lastResult?.output_dir;
+    if (kept) void window.sc.cleanup.keepForContinuation(kept);
+  }
   if (outDir) {
     const cleaned = await window.sc.cleanup.extractDir(outDir, {
       bundleId: r.bundleId,
@@ -2782,9 +2893,12 @@ async function runContinuation(
     // Everything open is on the server: the extract has served its purpose.
     await window.sc.cleanup.extractDir(result.output_dir, { channel: result.channel, version: result.patch_version });
     setAuthStatus(t('subthemes.contDone'), 'ok');
-  } else if (!state.skinUploadStatus) {
-    // Kept on disk: the next start continues from it.
-    setAuthStatus(t('subthemes.contOpen'), 'warn');
+    setOpenParts(null);
+  } else {
+    // Kept on disk: the next start continues from it — flagged, so the startup
+    // sweep does not take it once it is a day old.
+    void window.sc.cleanup.keepForContinuation(result.output_dir);
+    if (!state.skinUploadStatus) setAuthStatus(t('subthemes.contOpen'), 'warn');
   }
 }
 

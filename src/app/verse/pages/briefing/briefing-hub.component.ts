@@ -10,6 +10,7 @@ import { AccordionIntent } from './briefing-accordion';
 import { StabilityChipComponent } from '../../../news/stability-chip.component';
 import { HubChannel } from './briefing-hub';
 import { ScActionDirective } from '../../../shared/action/sc-action.directive';
+import { EventsTeaserComponent } from '../../../news/events-teaser.component';
 
 /** The mosaic's six slots under the gallery feature: one 2×2, one 2×1, four small; newer = bigger. */
 export const MOSAIC_SLOTS = ['m1', 'm2', 's1', 's2', 's3', 's4'] as const;
@@ -31,7 +32,7 @@ export const MOSAIC_SLOTS = ['m1', 'm2', 's1', 's2', 's3', 's4'] as const;
 @Component({
   selector: 'sc-briefing-hub',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, NgTemplateOutlet, StabilityChipComponent, ScActionDirective],
+  imports: [RouterLink, TranslatePipe, NgTemplateOutlet, StabilityChipComponent, ScActionDirective, EventsTeaserComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './briefing-hub.component.html',
   styleUrl: './briefing-hub.component.scss',

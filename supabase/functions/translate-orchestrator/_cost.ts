@@ -1,10 +1,14 @@
 // Cost model with measured ratios (pilot 2026-10-29, countTokens on real chunks).
 // Prices are USD per million tokens at the Message Batches rate (50 % of list).
+// Source: Anthropic pricing, list -> batch 50 %, checked 2026-11-22. List (prompts up to 100k tokens):
+// Sonnet 5.5 $2 / $10, Opus 5.5 $4 / $20, Haiku 5.5 $0.10 / $0.50. Until 2026-11-22 the Sonnet and
+// Opus rows held the list prices (every figure was 2x too high; a German full job booked 33.85 USD
+// that the Console billed at about 17 USD).
 
 export const PRICES = {
-  'claude-sonnet-5-5': { in: 2, out: 10 },
-  'claude-opus-5-5': { in: 4, out: 20 },
-  // Batch rate for prompts up to 100k tokens (the learning step never sends more); checked 2026-11-08.
+  'claude-sonnet-5-5': { in: 1, out: 5 },
+  'claude-opus-5-5': { in: 2, out: 10 },
+  // The learning step never sends more than 100k tokens per prompt, so the short-prompt rate applies.
   'claude-haiku-5-5': { in: 0.05, out: 0.25 },
 } as const;
 
@@ -95,8 +99,8 @@ export function usageCostUsd(model: string, u: Usage): number {
     searches * WEB_SEARCH_USD;
 }
 
-/** Few-shot pairs ride in the (uncached) user message: about 60 characters each. */
-export const shotsUsd = (pairs: number) => (pairs * 60 * INPUT_TOK_PER_CHAR * 3) / 1e6;
+/** Few-shot pairs ride in the (uncached) user message: about 60 characters each, priced as Sonnet input. */
+export const shotsUsd = (pairs: number) => (pairs * 60 * INPUT_TOK_PER_CHAR * PRICES['claude-sonnet-5-5'].in) / 1e6;
 
 export interface Estimate {
   usd: number;

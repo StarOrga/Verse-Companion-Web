@@ -32,7 +32,19 @@ import { HqAppLaunchComponent } from '../hq-app-launch.component';
 import { HqLogDialogComponent } from './hq-log-dialog.component';
 import { HqNowFriendsComponent } from './hq-now-friends.component';
 import { HqLiveService } from './hq-live.service';
-import { eventLabel, formatLocationName, isGameLive, presenceAt, readContracts, readLocation, readShip, readZones } from './hq-live.util';
+import {
+  eventLabel,
+  formatLocationName,
+  isGameLive,
+  presenceAt,
+  readContracts,
+  readFuelLow,
+  readHangarQueue,
+  readLocation,
+  readShip,
+  readZones,
+  type HangarQueueHint,
+} from './hq-live.util';
 import { HQ_NOW_PATH, currentEinsatz } from './hq-now-path';
 import { EventHqService } from '../events/event-hq.service';
 import { HqMissionsPopoverComponent } from './hq-missions-popover.component';
@@ -209,6 +221,12 @@ const UPCOMING = 4;
                   }
                 } @else {
                   <span class="zone unknown">{{ 'hq.now.zone.unknown' | translate }}</span>
+                }
+                @if (fuelLow(); as f) {
+                  <span class="zone warn hint-fuel">{{ 'hq.now.hint.fuel.' + f.kind | translate }}</span>
+                }
+                @if (hangarQueue(); as h) {
+                  <span class="zone warn hint-hangar">{{ hangarHintKey(h) | translate: { position: h.position, min: hangarMinutes(h) } }}</span>
                 }
               </p>
             }
@@ -471,6 +489,18 @@ export class HqNowComponent {
   private readonly clock = signal(Date.now());
   readonly gameLive = computed(() => isGameLive(this.live.state(), this.live.events(), this.clock()));
   readonly zones = computed(() => readZones(this.live.events()));
+  /** Fuel and hangar hints of the running session (#1193); the clock lets the fuel hint expire on its own. */
+  readonly fuelLow = computed(() => readFuelLow(this.live.events(), this.clock()));
+  readonly hangarQueue = computed(() => readHangarQueue(this.live.events(), this.clock()));
+
+  hangarHintKey(h: HangarQueueHint): string {
+    if (h.position === null) return 'hq.now.hint.hangarQueued';
+    return h.waitSec === null ? 'hq.now.hint.hangar' : 'hq.now.hint.hangarWait';
+  }
+
+  hangarMinutes(h: HangarQueueHint): number {
+    return h.waitSec === null ? 0 : Math.max(1, Math.round(h.waitSec / 60));
+  }
   readonly lastSignal = computed(() => presenceAt(this.live.state()) ?? this.live.stateUpdatedAt());
   /** Signed-in app without any live state yet: the app is there, only the opt-in sync or the game is missing. */
   /** The desktop app's state, shared with the status chip and the Start tile. */

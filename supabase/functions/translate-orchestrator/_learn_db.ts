@@ -35,13 +35,30 @@ export const LEARN_SETTING_DEFAULTS: LearnSettings = {
   promote_min_agreement: 0.9,
 };
 
+/** One side of a card (contract: docs/concepts/20261121-1151-karteikarten-neu/contract.md, P10). */
+export interface CardOption {
+  text: string;
+  source: string;
+  votes?: number;
+  /** Texts this option would set. */
+  count?: number;
+  /** Three example strings with this option applied (fewer only when fewer exist). */
+  examples?: { lang: string; key: string; en: string; text: string }[];
+}
+
+export type CardStatus = 'open' | 'answered' | 'ai' | 'parked' | 'folded';
+export type CardChoice = 'a' | 'b' | 'own';
+
 export interface CardRow {
   id?: string;
-  lang: string;
-  kind: 'meta' | 'wording' | 'style';
-  question: string;
-  option_a: { text: string; source: string };
-  option_b: { text: string; source: string };
+  /** null = a cross-language convention card (`langs` lists its languages). */
+  lang: string | null;
+  langs?: string[];
+  kind: 'meta' | 'wording' | 'convention' | 'style';
+  /** Kind parameters the UI renders the question from (P9): {term} | {en, key, where} | {pattern, langs}. */
+  params: Record<string, unknown>;
+  option_a: CardOption;
+  option_b: CardOption;
   context: Record<string, unknown>;
   spread: number;
   reach: number;
@@ -49,12 +66,36 @@ export interface CardRow {
   fresh: boolean;
   dedupe_key: string;
   impact: number;
-  status?: 'open' | 'answered' | 'skipped';
-  answer?: 'a' | 'b' | 'own' | null;
+  status?: CardStatus;
+  answer?: CardChoice | null;
   own_text?: string | null;
+  /** Convention answers: per-language exception {lang: 'a'|'b'} (P8). */
+  exceptions?: Record<string, 'a' | 'b'> | null;
   note?: string | null;
   save_as_rule?: boolean;
   answered_by?: string | null;
+  // KI path (P6): decision, reason code, unsure flag, German back-translation.
+  ai_choice?: CardChoice | null;
+  ai_text?: string | null;
+  ai_basis?: string | null;
+  ai_reason?: Record<string, unknown> | null;
+  ai_unsure?: boolean;
+  ai_back?: string | null;
+  ai_decided_at?: string | null;
+  /** Options an admin flagged with „Sieht falsch aus“; they never win again. */
+  vetoed?: CardChoice[];
+  applied_at?: string | null;
+}
+
+export interface CardQuery {
+  lang?: string;
+  status: CardStatus[];
+  kinds?: CardRow['kind'][];
+  /** status ai without a decision yet (not-mine, vetoed). */
+  undecided?: boolean;
+  /** KI decisions without a back-translation, not yet applied. */
+  needBack?: boolean;
+  limit: number;
 }
 
 export interface LearnGlossaryRow extends GlossaryRow {
@@ -80,6 +121,14 @@ export interface LearnDb {
   listAnsweredUnapplied(lang: string, limit: number): Promise<CardRow[]>;
   listOpenCards(lang: string, kinds: CardRow['kind'][], limit: number): Promise<CardRow[]>;
   updateCardContext(id: string, context: Record<string, unknown>): Promise<void>;
+  // Concept karteikarten-neu. Optional so older adapters/fakes keep working: without them every language
+  // counts as German-only judged, and the KI path, the cleanup and the convention merge are skipped.
+  /** Union of the languages admins answer as cards (P7, rpc translation_judged_langs). */
+  judgedLangs?(): Promise<string[]>;
+  listCards?(q: CardQuery): Promise<CardRow[]>;
+  updateCard?(id: string, patch: Partial<CardRow>): Promise<void>;
+  /** The convention card of a pattern that is not applied yet, or null. */
+  findConvention?(dedupeKey: string): Promise<CardRow | null>;
   /** Books learning spend as a job-less ledger row (see header). With `ref` (the batch id) a second booking of the same batch is ignored. */
   addLearnLedger(month: string, usd: number, kind: string, lang: string, ref?: string): Promise<void>;
   /** Ledger sum of one kind in a month (web-research cap). */
@@ -188,19 +237,47 @@ export function makeLearnDb(sb: Client, now: () => Date = () => new Date()): Lea
     },
     async insertCard(card) {
       const { error } = await sb.from('translation_cards').insert({
-        lang: card.lang, kind: card.kind, question: card.question, option_a: card.option_a, option_b: card.option_b,
+        lang: card.lang, langs: card.langs ?? (card.lang ? [card.lang] : []), kind: card.kind, params: card.params,
+        option_a: card.option_a, option_b: card.option_b,
         context: card.context, spread: card.spread, reach: card.reach, doubt: card.doubt, fresh: card.fresh,
-        dedupe_key: card.dedupe_key, impact: card.impact,
+        dedupe_key: card.dedupe_key, impact: card.impact, status: card.status ?? 'open',
+        ai_choice: card.ai_choice ?? null, ai_text: card.ai_text ?? null, ai_basis: card.ai_basis ?? null,
+        ai_reason: card.ai_reason ?? null, ai_unsure: card.ai_unsure ?? false, ai_decided_at: card.ai_decided_at ?? null,
       });
       if (error && error.code === '23505') return false;
       if (error) fail(error);
       return true;
     },
     async listAnsweredUnapplied(lang, limit) {
-      const { data, error } = await sb.from('translation_cards').select('*').eq('lang', lang).eq('status', 'answered')
-        .is('context->>applied_at', null).order('answered_at').limit(limit);
+      // Answers, KI decisions nobody vetoed in time and convention answers not yet applied to this language.
+      const { data, error } = await sb.rpc('translation_cards_to_apply', { p_lang: lang, p_limit: limit });
       if (error) fail(error);
       return (data ?? []) as CardRow[];
+    },
+    async judgedLangs() {
+      const { data, error } = await sb.rpc('translation_judged_langs');
+      if (error) fail(error);
+      return (data ?? []) as string[];
+    },
+    async listCards(q) {
+      let r = sb.from('translation_cards').select('*').in('status', q.status);
+      if (q.lang) r = r.eq('lang', q.lang);
+      if (q.kinds?.length) r = r.in('kind', q.kinds);
+      if (q.undecided) r = r.is('ai_choice', null);
+      if (q.needBack) r = r.not('ai_choice', 'is', null).is('ai_back', null).is('applied_at', null);
+      const { data, error } = await r.order('created_at').limit(q.limit);
+      if (error) fail(error);
+      return (data ?? []) as CardRow[];
+    },
+    async updateCard(id, patch) {
+      const { error } = await sb.from('translation_cards').update(patch).eq('id', id);
+      if (error) fail(error);
+    },
+    async findConvention(dedupeKey) {
+      const { data, error } = await sb.from('translation_cards').select('*').eq('kind', 'convention').eq('dedupe_key', dedupeKey)
+        .is('applied_at', null).in('status', ['open', 'answered', 'ai']).limit(1).maybeSingle();
+      if (error) fail(error);
+      return (data ?? null) as CardRow | null;
     },
     async listOpenCards(lang, kinds, limit) {
       const { data, error } = await sb.from('translation_cards').select('*').eq('lang', lang).eq('status', 'open').in('kind', kinds)

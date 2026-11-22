@@ -8,6 +8,7 @@ import {
   FALLBACK_LANGUAGE,
   FALLBACK_REGION,
   dateOrderForRegion,
+  intlLanguageTag,
   normalizeLanguage,
   normalizeRegion,
   regionForLanguage,
@@ -112,7 +113,7 @@ export function resolveLocale(input: LocaleResolutionInput): ResolvedLocale {
     language,
     region,
     dateOrder: dateOrderForRegion(region),
-    intlLocale: `${language}-${region}`,
+    intlLocale: `${intlLanguageTag(language)}-${region}`,
     languageSource,
     regionSource,
   };

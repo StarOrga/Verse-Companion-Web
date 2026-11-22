@@ -220,6 +220,16 @@ html[data-sc-layout] body { font-size: 0.9375rem; }
    public layout set only with the β on.
 
    Spacing scale: an 8px grid with a 4px half step.
+   Which step for which gap (between elements, not inside a control):
+     --sc-space-1  tight pair: label over its value, chip to chip,
+                   icon to its text
+     --sc-space-2  items of one group (rows, tiles, buttons in a row)
+                   and a group head to its items
+     --sc-space-3  blocks inside a card + the card's own padding
+     --sc-space-4  between two groups (a search and the list under it,
+                   facts and the livery tiles)
+   A gap takes one of these tokens, never a hand-picked 6/7/9/10px;
+   the holotable (Akte, Bauteile, Kaufen) follows this since #386.
    Bars: --sc-bar-h (the capsule), --sc-footer-h (compact footer).
    --sc-gap-head: bar -> first content line, ONE value per page
    type (set on the layout host: [data-layout]).

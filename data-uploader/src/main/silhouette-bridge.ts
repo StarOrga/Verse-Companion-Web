@@ -22,6 +22,7 @@ import { createInterface } from 'node:readline';
 import { app } from 'electron';
 import log from 'electron-log';
 import { createHeartbeat, createLogBudget } from '../lib/log-budget.js';
+import { sidecarExitError, stderrLevel, StderrTail } from '../lib/sidecar-exit.js';
 import { resolvePythonPaths, type PythonExtractEvent } from './python-bridge.js';
 import { packagedPythonMissing, pythonSpawnEnoentMessage } from '../lib/python-locate.js';
 import { sidecarEnv } from './sidecar-env.js';
@@ -119,11 +120,16 @@ export function startSilhouetteBuild(
     onEvent(ev);
   });
 
+  // Like skin-bridge: crash signatures reach main.log, the tail rides on the exit error.
+  const stderrTail = new StderrTail();
   child.stderr.on('data', (chunk: Buffer) => {
     const text = chunk.toString('utf-8').trim();
     if (!text) return;
     for (const line of text.split('\n')) {
-      onEvent({ type: 'log', level: 'warn', message: `[py.stderr] ${line}` });
+      stderrTail.push(line.trim());
+      const level = stderrLevel(line);
+      if (level === 'error') log.error(`[silhouette-py] [py.stderr] ${line}`);
+      onEvent({ type: 'log', level, message: `[py.stderr] ${line}` });
     }
   });
 
@@ -140,11 +146,9 @@ export function startSilhouetteBuild(
     child.on('exit', (code, signal) => {
       if (cancelled) return resolveP({ ok: false, error: 'cancelled' });
       if (code === 0 && result) return resolveP({ ok: true, result });
-      return resolveP({
-        ok: false,
-        error:
-          lastError ?? (signal ? `killed by signal ${signal}` : `python exited with code ${code}`),
-      });
+      const error = sidecarExitError({ lastError, code, signal, tail: stderrTail });
+      log.error(`[silhouette-bridge] silhouette build ended without a result: ${error}`);
+      return resolveP({ ok: false, error });
     });
   });
 

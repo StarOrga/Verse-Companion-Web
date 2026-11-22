@@ -9,8 +9,34 @@
  * most apps get this wrong, so the two are modelled separately throughout.
  */
 
-/** UI languages that have a real translation file (see issue #23). */
-export type AppLanguage = 'de' | 'en';
+/**
+ * UI languages that have a real translation file under `public/i18n/` (see
+ * issue #23). `de` and `en` are written by hand; the others are machine
+ * translations in the languages the game-string pipeline serves, so a player
+ * reads the companion in the same language as the game. Keep the order: it is
+ * the order of the settings picker. `public/i18n-boot.js` mirrors
+ * `normalizeLanguage()` and the `profiles_preferred_lang_check` constraint
+ * lists the same codes.
+ */
+export const APP_LANGUAGES = [
+  'de',
+  'en',
+  'es',
+  'es-419',
+  'fr',
+  'hi',
+  'it',
+  'ja',
+  'ko',
+  'pl',
+  'pt-BR',
+  'ru',
+  'tr',
+  'zh-Hans',
+  'zh-Hant',
+] as const;
+
+export type AppLanguage = (typeof APP_LANGUAGES)[number];
 
 /** ISO 3166-1 alpha-2, uppercase (e.g. `DE`, `AT`, `US`). */
 export type RegionCode = string;

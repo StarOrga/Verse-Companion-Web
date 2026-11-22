@@ -665,6 +665,11 @@ def _build_parallel(args, jobs: List[Tuple[int, ShipRef]], workers: int, total: 
     for w in range(workers):
         start(w)
     log("info", f"{len(jobs)} ship(s) on {workers} parallel worker(s)")
+    # The run is in `extract` from the moment the workers start, not only once
+    # the first ship finishes — a stall report during a long first ship named
+    # `discover` otherwise (#382).
+    phase("extract", pct=int(done_before / max(total, 1) * 100))
+    progress("ships", current=done_before, total=total)
     wanted, wanted_since, applied = workers, time.monotonic(), workers
     peak = workers
 

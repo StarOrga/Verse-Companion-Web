@@ -323,19 +323,20 @@
   border-radius: var(--sc-radius-sm, 4px);
 }
 .plate {
-  // Grows with the page frame (1280px → 1600px from full HD on), so a long trail folds only when it lacks room.
-  --_plate: clamp(310px, 25vw - 170px, 420px);
+  // Only the ceiling the docking transition grows towards; the plate itself is as wide as the brand.
+  --_plate: 310px;
   position: relative;
-  // Claims its full width (the trail measures its room against it) and gives way only
-  // when the bar is narrow; the search starts at the same spot on every page.
-  flex: 0 1 var(--_plate, 310px);
+  // As wide as the brand's name and no wider: the path below takes no width of its own
+  // (it folds into the brand's width), so the search starts at the same spot on every
+  // page and no empty room stands between the brand and the field.
+  flex: 0 1 auto;
+  width: max-content;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 2px;
   min-width: 0;
   max-width: var(--_plate, 310px);
-  padding-right: var(--sc-space-2);
 }
 // Brand name + logo: <sc-brand-name>/<sc-brand-logo> (shell/brand), the main header's own.
 // The phone route line names the page in the brand's type treatment.
@@ -351,8 +352,10 @@
   text-overflow: ellipsis;
 }
 // Brandcrumb: the path under the brand's name; a long one folds its middle to "…".
+// contain: inline-size — the path never widens the plate, it measures its room against it.
 .trail {
   min-width: 0;
+  contain: inline-size;
 }
 .trail ol,
 .trail-measure {
@@ -420,7 +423,7 @@
   flex: none;
   width: 1px;
   height: 34px;
-  margin: 0 var(--sc-space-4) 0 var(--sc-space-2);
+  margin: 0 var(--sc-space-4);
   background: linear-gradient(180deg, transparent, var(--sc-sub-divider), transparent);
 }
 // Ruhige Leiste: no divider line between brand and search, only the gap.
@@ -446,7 +449,7 @@ $dock-ease: cubic-bezier(0.55, 0, 0.2, 1);
   flex: none;
 }
 .plate {
-  transition: max-width 1.2s ease-out 0.8s, padding 1.2s ease-out 0.8s, opacity 0.8s ease-out 1.2s;
+  transition: max-width 1.2s ease-out 0.8s, opacity 0.8s ease-out 1.2s;
 }
 .div {
   transition: margin 1.2s ease-out 0.8s, opacity 0.8s ease-out 1.2s;
@@ -458,10 +461,9 @@ $dock-ease: cubic-bezier(0.55, 0, 0.2, 1);
 }
 :host([data-mode='stage']) .plate {
   max-width: 0;
-  padding-right: 0;
   opacity: 0;
   overflow: hidden;
-  transition: max-width 0.6s ease-out, padding 0.6s ease-out, opacity 0.4s ease-out;
+  transition: max-width 0.6s ease-out, opacity 0.4s ease-out;
 }
 :host([data-mode='stage']) .div {
   margin: 0;
@@ -546,14 +548,8 @@ $dock-ease: cubic-bezier(0.55, 0, 0.2, 1);
   flex: 1 1 auto;
   min-width: 0;
 }
-// Docked: with a toolbar (kind switch, filters) the field stops at ~520px so the count
-// and the Filter button keep their room; without one it uses the width up to Apps.
-:host(:not([data-mode='stage'])) .search {
-  margin-right: auto;
-}
-:host(.tools:not([data-mode='stage'])) .search {
-  max-width: 520px;
-}
+// Docked: the field takes all the room between the brand and the account, on every page
+// alike — the kind switch lives in the path, the hit count inside the field.
 :host ::ng-deep .search .field {
   height: 44px;
   padding-left: var(--sc-space-1);
@@ -651,12 +647,19 @@ $dock-ease: cubic-bezier(0.55, 0, 0.2, 1);
   color: var(--sc-fg-1);
   cursor: pointer;
 }
+// The path's last step: a small accent chip on the trail's own line.
 .kindsw {
-  margin-right: var(--sc-space-3);
-  padding-right: var(--sc-space-2);
+  gap: 2px; /* ds-ok: chevron hugs the label inside a one-line chip */
+  min-width: 0;
+  max-width: 100%;
+  height: 20px;
+  margin: -2px 0; /* ds-ok: the chip overhangs the path's 15px line by 2px each side */
+  padding: 0 2px 0 var(--sc-space-2); /* ds-ok: the chevron's own box is the right padding */
+  font-size: inherit;
   color: var(--sc-fg-0);
-  background: color-mix(in srgb, var(--sc-accent) 10%, transparent);
+  background: color-mix(in srgb, var(--sc-accent) 12%, transparent);
 }
+// .ks-label and the path's .ks step: fusion-bar.adapt.scss (style budget).
 .kindsw i,
 .fbtn i {
   font-style: normal;
@@ -668,6 +671,7 @@ $dock-ease: cubic-bezier(0.55, 0, 0.2, 1);
 }
 .kindsw svg,
 .fbtn svg {
+  flex: none;
   width: 16px;
   height: 16px;
   color: var(--sc-accent);
@@ -699,7 +703,6 @@ $dock-ease: cubic-bezier(0.55, 0, 0.2, 1);
 }
 .count {
   flex: none;
-  margin-left: var(--sc-space-3);
   font-family: var(--sc-font-display);
   font-size: max(0.72rem, var(--sc-fs-floor));
   letter-spacing: 0.12em;
@@ -994,10 +997,6 @@ $dock-ease: cubic-bezier(0.55, 0, 0.2, 1);
   .count,
   .fb-label {
     display: none;
-  }
-  .plate {
-    flex-basis: 230px;
-    max-width: 230px;
   }
 }
 

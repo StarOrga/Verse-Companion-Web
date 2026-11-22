@@ -4,6 +4,196 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.297.0] - 2026-11-22
+
+### Added
+- The web app speaks thirteen more languages: Spanish (Spain and Latin America), French, Hindi, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Turkish, Simplified and Traditional Chinese. The browser language is detected; the choice is saved to the profile.
+- Desktop app language packs: Latin American Spanish, Turkish and Traditional Chinese, all packs proofread. Web and desktop app now offer the same languages.
+
+### Fixed
+- Translation cost estimates in the game-string pipeline used list prices for batch jobs and showed twice the real cost.
+- The AI cost ledger of all server functions priced Claude Sonnet 5.5 and Opus 5.5 at twice their list price.
+
+## [0.296.0] - 2026-11-22
+
+### Changed
+- Subheader search: the field starts right after the brand and runs up to the icons, with the same width on every page. The Codex kind switch is now the last step of the path ("Codex › Kommend ▾"), and the hit count sits inside the field.
+- Phone: the closed search is a wide field with its placeholder instead of a lone magnifier.
+
+## [0.295.0] - 2026-11-22
+
+### Changed
+- Starscape sign-in now ends on the website's connect screen: after connecting, the browser tab shows "Verbunden" in the same stage as the Data Uploader instead of a bare Starscape page. Failures name their cause there (wrong sign-in session, no sign-in received). Needs Starscape 0.12.0; older versions keep their own page.
+
+## [0.294.0] - 2026-11-22
+
+### Changed
+- Search: groups are ordered by their best match (exact name > word > partial > typo), equal groups go ships > components > weapons > items; the page context only breaks ties and never buries an exact hit; own hangar hits lead when they match as well.
+- Search: typo tolerance per word (e.g. "libertor" finds the Liberator), always ranked below real matches; class-name-only hits rank below name hits.
+
+## [0.293.1] - 2026-11-22
+
+### Changed
+- Feedback routine: a topic is marked shipped only when the requested change is done; a ship reply never ends in an open question (decided default stated as fact, or the topic is parked as a question instead).
+
+## [0.293.0] - 2026-11-22
+
+### Added
+- Admin → KI-Übersetzung → Karteikarten is now a card game: the Duell-Karte answers by tap, arrow keys or swipe, with undo through the app toast.
+- Languages you don't judge are decided by the KI with a German back-translation; you only veto. A sheet in the „Tagesziel & Sprachen“ box picks which languages stay in your deck.
+- Weekly points (20 per decision plus a daily-goal bonus), a streak and a leaderboard with names.
+
+### Changed
+- Spelling-only pairs, foreign bracket text and clear majorities no longer become cards; spelling patterns become one convention question for all languages, with a per-language exception.
+- The translation page's tabs move to a section rail at the page edge, like HQ; the crumb reads „Admin“.
+- „Nicht meine Entscheidung“ replaces skipping a card.
+
+### Removed
+- The old card RPCs, the stored English card question and the `skipped` card status (database migration).
+
+## [0.292.0] - 2026-11-22
+
+### Added
+- Patch News: new "Live zuerst" board (Verse beta) with Live / PTU tabs, the newest live patch and the next live patch on top, a dated timeline with images, and every PTU build as its own row.
+- Patch News: read state per channel — new notes get a quiet badge, "Gelesen" keeps the content visible, "Nochmal lesen" brings it back. Stored in your account, or in the browser when signed out.
+
+### Changed
+- Patch dossier: one section order for every patch (contents, stability, community, your verdict, first steps, next patch), image-and-text tiles, a gallery, separate fixed / known-issue lists; the stability number is shown openly.
+- Backup: `PATCH_BOARD_V2` in `src/app/news/patch-board-flag.ts` set to `false` restores the previous board.
+
+## [0.291.0] - 2026-11-22
+
+### Changed
+- Data Uploader sign-in: after "Verbinden" the browser tab returns to the connect stage and shows "Verbunden" (or what went wrong) there, instead of the uploader's bare loopback page (uploader 0.85.0).
+- The connect screen reads as title + one line of info + one button; the Cancel button is gone (closing the tab sends nothing).
+- The installed app is now called "Verse Companion" on Android, iOS and desktop.
+
+## [0.290.1] - 2026-11-21
+
+### Fixed
+- Data.p4k uploads are recognised as ZIP again and no longer load the whole file into memory to read its header.
+- Telemetry and API rate limits can no longer be dodged with a forged client IP; request limits are counted atomically.
+- The translation spend ledger keeps its history when old builds are cleaned up.
+- Concept pages, the codex holo/set stages and the HQ spots stage follow a language switch immediately and no longer act on stale answers.
+- The data uploader also uploads skin packages for ships that were already marked, and refuses incomplete extracts instead of publishing an empty catalog.
+
+### Changed
+- Desktop app language packs (10 languages) are complete and reviewed.
+
+## [0.290.0] - 2026-11-21
+
+### Added
+- Admin translations: every language row shows its coverage as a bar with a percentage; "Start full run" appears only for an approved language that still has gaps.
+
+## [0.289.4] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.5: the header shows the channel as a traffic light instead of three different version strings; the account popover compares your game build with the server and names what is still open.
+- Data Uploader update errors show a translated sentence with a download button instead of the raw HTTP error with response headers.
+- Uploader releases: one build per version; a release is registered only after its run is green and the mirror serves that build. Installs stuck on the second 0.84.3 build update again.
+
+## [0.289.3] - 2026-11-21
+
+### Fixed
+- Codex holotable: a tall hull is no longer cut off at the bottom of the hologram; the zoom is capped per ship so the turning hull keeps its full height, flat hulls keep the bigger size (admin feedback #392).
+
+## [0.289.2] - 2026-11-21
+
+### Removed
+- Typing without focus no longer opens or fills the main search (Verse, HQ, Codex); it collided with page hotkeys and element focus. Ctrl+K and `/` still open the search (admin feedback #385).
+
+## [0.289.1] - 2026-11-21
+
+### Fixed
+- Admin feedback: topics the routine creates read "KI" (EN "AI") with the bot icon instead of "Ohne Konto"; "Ohne Konto" stays for a user topic whose account is gone (admin feedback #390).
+
+## [0.289.0] - 2026-11-21
+
+### Added
+- Verse News: in-game events are their own category ("Ingame-Events" chip, /verse/news?filter=events), fed by the event timeline and event posts in the feed; running and upcoming events are teased above and below the stream and in the Verse hub (admin feedback #389).
+
+## [0.288.10] - 2026-11-21
+
+### Changed
+- Codex holotable: the 3D model is much bigger (hologram area 58 × 82 % of the stage, zooming with its width) and the stat panels left and right are narrower with smaller text; tablets and phones give the model more room too (admin feedback #392).
+
+## [0.288.9] - 2026-11-21
+
+### Fixed
+- Verse map: hovering the HQ outpost no longer draws corner brackets, only a faint glow; the HQ label sits upright above the outpost instead of running into the planet and the news card, and the hover area follows the page scroll (admin feedback #388).
+
+## [0.288.8] - 2026-11-21
+
+### Fixed
+- Admin feedback: the "Wer?" filter no longer shows an "Unbekannt" chip. Topics without an account used to share one bucket labelled after whichever row came first; each sender now has its own chip — the PostHog-Wächter, the Dienst-Wächter (hourly service check, with its own avatar tooltip) and "Ohne Konto" for a topic whose author is gone or that the routine filed itself. The thread uses the same names (admin feedback #390).
+
+## [0.288.7] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.4: two liveries that shared an icon are paired by id, so "Invictus Blue and Gold" no longer shows the Grey icon (Retaliator, Constellations, Avengers, Syulen)
+- Data Uploader: a crashed 3D or silhouette build and a refused upload now name their cause in the log
+- Data Uploader: an extract the 3D models still need is no longer swept the next day, so no full P4K re-read
+
+## [0.288.6] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.2: Verse locations read from the real game data get readable types, real system positions for the Lagrange rest stops, gateways and Nyx stations, system rows and cities; a star is no longer a fallback position (#1195). The microTech moons were already right — the bundled catalog has them mirrored.
+
+## [0.288.5] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.3: 3D skins of the Retaliator, the Constellation Taurus / Phoenix, the Avenger variants and the Syulen variants upload again. Two liveries of one ship could share one skin id, so the server refused the whole ship on every upload; each livery now keeps an id of its own, and the server names a duplicate id (400 `duplicate_skin_id`) instead of failing with a bare error (admin feedback #383). Needs a new uploader run.
+
+## [0.288.4] - 2026-11-21
+
+### Fixed
+- Data Uploader 0.84.2: the 3D step reports a sign of life before every paint icon it renders, so a slow icon run under load no longer trips the 20-minute stall watchdog, and a stall during the first ship is reported as `ships` instead of `discover` (admin feedback #382).
+
+## [0.288.3] - 2026-11-21
+
+### Fixed
+- Catalog uploads: a batch that runs into the database statement timeout and is retried smaller no longer opens an error issue in PostHog — it is counted as its own `server:ingest_timeout` event with the op, table and batch size; only a run's final failure is an error. Copying the unchanged tables at the end of a re-upload now retries a slow chunk with half the rows (2000 → 1000 → 500) instead of failing the finalize step (admin feedback #380).
+
+## [0.288.2] - 2026-11-21
+
+### Fixed
+- Type to search now works in the header every reader gets by default: on Verse, HQ and every other page whose only search is the header search, a letter typed with nothing focused opens the search with that letter. The 0.286.0 version only reached the beta header, so it did nothing for readers without the shell beta. Codex pages keep starting their own search bar.
+
+## [0.288.1] - 2026-11-21
+
+### Fixed
+- Data Uploader: dismantle yield and the "dismantlable" flag now come from the game data — the item's recipe × the global dismantle efficiency (0.5), minus the blacklisted resources. Before, every blueprint came out "unknown" (#1058). Needs a new catalog upload.
+
+## [0.288.0] - 2026-11-21
+
+### Added
+- HQ Jetzt: warning chips in the live strip for low fuel (10 minutes from the event, hydrogen or quantum named) and a queued hangar request with its position and remaining wait (#1193)
+
+### Changed
+- Shared contracts with the desktop app: the web copy is now the master, the app mirrors it with a sync script
+
+## [0.287.0] - 2026-11-21
+
+### Added
+- HQ session logbook: a costs line per session — fines with the paid aUEC, injuries, medbed treatments and insurance requests (#1192)
+- HQ Statistik: fines and fuel-warning tiles from the events the desktop app already uploads (#1191)
+- Data Uploader: extracts the Verse locations from the game data (starmap records + socpak positions) and can ingest them per build; the upload stays off until the switch-over (#1194)
+
+### Fixed
+- Codex silhouettes: every item, weapon, component and ammo without a traceable mesh now records why, naming skinned meshes (.skin/.chr/.cdf), so the coverage tile explains every missing silhouette (#1004)
+
+## [0.286.2] - 2026-11-21
+
+### Fixed
+- Codex holotable: the Akte expands again after it was collapsed (the empty table-head row above it caught the clicks, on touch also the collapse), and the Akte, Kaufen tab and parts list use the four spacing steps of the design system instead of hand-picked gaps, so "N Bauteile" no longer sits flush under the parts search.
+
+## [0.286.1] - 2026-11-21
+
+### Fixed
+- `ingest-catalog`: after `finalize` the catalog lists are published by a call of their own (`lists_publish` with `detach`) instead of on the worker that just ran the ingest, so its CPU limit no longer puts the list files at risk.
+- Popup back-gesture specs wait up to 5 s for a history traversal, so they no longer fail on a loaded machine.
+- `package-lock.json` carries the app version again and is bumped with every release.
+
 ## [0.286.0] - 2026-11-20
 
 ### Added

@@ -1,7 +1,7 @@
 import type { Mock } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideTranslateService } from '@ngx-translate/core';
-import { ShipSkinViewerComponent } from './ship-skin-viewer.component';
+import { ShipSkinViewerComponent, holoFitZoom } from './ship-skin-viewer.component';
 import { ShipSkin, ShipSkinsService } from './ship-skins.service';
 
 function skin(over: Partial<ShipSkin>): ShipSkin {
@@ -195,5 +195,33 @@ describe('ShipSkinViewerComponent', () => {
       fixture.destroy();
       expect(signalOf(0).aborted).toBe(true);
     });
+  });
+});
+
+describe('holoFitZoom (#392)', () => {
+  // An ellipsoid hull of X × Y × Z, relative to its centre, as (rho, y) pairs.
+  function hull(x: number, y: number, z: number) {
+    return (visit: (rho: number, y: number) => void) => {
+      for (let a = 0; a < 64; a++) {
+        for (let b = 0; b < 32; b++) {
+          const t = (a / 64) * 2 * Math.PI;
+          const p = (b / 31) * Math.PI;
+          visit(Math.hypot((x / 2) * Math.sin(p) * Math.cos(t), (z / 2) * Math.sin(p) * Math.sin(t)), (y / 2) * Math.cos(p));
+        }
+      }
+    };
+  }
+
+  it('lets a flat hull zoom further than a tall one', () => {
+    const flat = holoFitZoom(hull(20, 6, 30), 15, 30);
+    const tall = holoFitZoom(hull(30, 25, 40), 20, 30);
+    expect(flat).toBeGreaterThan(1.8);
+    expect(tall).toBeLessThan(1.5);
+  });
+
+  it('never goes below 1 and is open-ended without a framing', () => {
+    expect(holoFitZoom(hull(10, 10, 10), 5, 30)).toBeGreaterThanOrEqual(1);
+    expect(holoFitZoom(hull(10, 10, 10), 0, 30)).toBe(Number.POSITIVE_INFINITY);
+    expect(holoFitZoom(() => undefined, 5, 30)).toBe(Number.POSITIVE_INFINITY);
   });
 });

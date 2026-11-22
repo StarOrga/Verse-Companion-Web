@@ -12,6 +12,7 @@
 import type { CodexKind, CodexListRow, LocalizedText } from './codex.service';
 import type { UpcomingShip } from './upcoming-ships.service';
 import { normalizeSearch, recordScore } from './codex-search';
+import { termQuality } from './search-quality';
 
 /**
  * Pseudo-kind for a ship RSI has ANNOUNCED but that the datamined game data
@@ -213,14 +214,31 @@ export function polyMatchScore(query: string, hit: PolySearchHit): number {
 }
 
 /**
+ * Fine match quality of a hit (0..100, see `MATCH` in search-quality): the
+ * English and German names, each with and without the maker, and the class
+ * name as an id. Splits what {@link polyMatchScore} lumps together (a word of
+ * the name vs. a class-name-only hit) and adds typo tolerance below every real
+ * match (admin feedback #395).
+ */
+export function polyMatchQuality(query: string, hit: PolySearchHit): number {
+  const ids = isUpcomingHit(hit) ? [] : [hit.classNameSlug];
+  const maker = hit.manufacturerName?.en ?? hit.manufacturerName?.de ?? null;
+  const names = [hit.nameLocalized, withoutMaker(hit.nameLocalized, maker)];
+  for (const n of [hit.name?.en, hit.name?.de]) {
+    if (n && n !== hit.nameLocalized) names.push(n, withoutMaker(n, maker));
+  }
+  return termQuality(query, names, ids);
+}
+
+/**
  * Rank cross-kind hits: match quality desc, then kind priority, then localized
  * name (className as the fallback). Pure + stable — the whole point is a
  * deterministic merge the component can render without re-sorting.
  */
 export function rankPolyHits(query: string, hits: PolySearchHit[]): PolySearchHit[] {
   return [...hits].sort((a, b) => {
-    const sa = polyMatchScore(query, a);
-    const sb = polyMatchScore(query, b);
+    const sa = polyMatchQuality(query, a);
+    const sb = polyMatchQuality(query, b);
     if (sa !== sb) return sb - sa;
     const ka = kindRank(a.kind);
     const kb = kindRank(b.kind);

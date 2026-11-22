@@ -1,0 +1,46 @@
+[
+  {
+    "iteration": 1,
+    "stage": "A",
+    "action": "implement",
+    "favorite": "d3",
+    "answers": {
+      "d3-s1-a1": "Perfekt",
+      "d3-s1-a3": "reicht im popover"
+    },
+    "userPins": [
+      {
+        "screen": "d3-s1",
+        "target": "status line",
+        "text": "Das hier unten weiß nicht, gern das auch oben in das popout rein, ist ja wie ein hinweis warum das gelb ist dann im popout"
+      }
+    ],
+    "implemented": "aec76336e"
+  },
+  {
+    "iteration": 2,
+    "stage": "A",
+    "action": "finalize",
+    "final": false,
+    "next": "B",
+    "tests": {
+      "t-chip": "self",
+      "t-suite": "skip"
+    },
+    "handoffs": {
+      "h-reinstall": "self"
+    }
+  },
+  {
+    "iteration": 3,
+    "stage": "B",
+    "action": "implement",
+    "decisions": {
+      "d-recover": "register",
+      "d-dispatch": "refuse-existing",
+      "d-register": "yes"
+    },
+    "implemented": "071401c85",
+    "data": "desktop_releases 0.84.3-dispatch (token alias)"
+  }
+]

@@ -42,7 +42,7 @@ const key = (k: string, mods: KeyboardEventInit = {}) =>
   new KeyboardEvent('keydown', { key: k, cancelable: true, ...mods });
 
 describe('codex-search-model', () => {
-  it('groups by kind in KIND_PRIORITY order, caps each group and keeps the totals', () => {
+  it('groups by kind (equal matches in the size order of search-rank), caps each group and keeps the totals', () => {
     const hits = [
       hit('weapon', 'w1'),
       hit('upcoming', 'u1'),
@@ -53,7 +53,7 @@ describe('codex-search-model', () => {
     ];
     const groups = groupHits('gladius', hits, { ship: 12, weapon: 1, upcoming: 1 }, 2);
 
-    expect(groups.map((g) => g.kind)).toEqual(['ship', 'weapon', 'component', 'upcoming']);
+    expect(groups.map((g) => g.kind)).toEqual(['ship', 'component', 'weapon', 'upcoming']);
     expect(groups[0].hits.map((h) => h.classNameSlug)).toEqual(['s1', 's2']);
     expect(groups[0].total).toBe(12);
     // A kind with no server total counts what it has; never below what is shown.

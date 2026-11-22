@@ -3373,7 +3373,27 @@
       "comm-link": "Comm-Link",
       "spectrum": "Spectrum",
       "youtube": "YouTube",
-      "patch": "Patch-Notes"
+      "patch": "Patch-Notes",
+      "events": "Ingame-Events"
+    },
+    "events": {
+      "title": "Ingame-Events",
+      "upcomingTitle": "Demnächst im Verse",
+      "aria": "Laufende und kommende Ingame-Events",
+      "allPosts": "Alle Event-Beiträge",
+      "runningUntil": "Läuft · bis {{date}}",
+      "endsToday": "Läuft · endet heute",
+      "startsTomorrow": "Ab morgen, {{date}}",
+      "startsIn": "Ab {{date}} · in {{n}} Tagen",
+      "estimated": "Termin geschätzt",
+      "error": "Die Events konnten nicht geladen werden.",
+      "kind": {
+        "expo": "Messe",
+        "showcase": "Showcase",
+        "seasonal": "Fest",
+        "community": "Community-Event",
+        "free-fly": "Free Fly"
+      }
     },
     "favorite": {
       "save": "Sammeln",
@@ -3387,6 +3407,56 @@
     "videos": {
       "badge": "Video",
       "play": "Video abspielen"
+    },
+    "patchBoard": {
+      "switch": {
+        "aria": "Kanal wählen",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Was für Live-Spieler zählt",
+        "ptuHint": "Test-Builds: jeder einzelne Stand"
+      },
+      "unread": "Ungelesen",
+      "newForYou": "Neu für dich",
+      "readFull": "Ganz lesen",
+      "markRead": "Gelesen",
+      "readOn": "gelesen am {{date}}",
+      "readEarlier": "früher gelesen",
+      "readAgain": "Nochmal lesen",
+      "now": {
+        "title": "Gerade auf Live gekommen",
+        "since": "Seit {{date}}",
+        "none": "Noch kein Live-Patch im Feed."
+      },
+      "next": {
+        "title": "Als Nächstes auf Live",
+        "none": "Noch kein nächster Patch bekannt.",
+        "testing": "Im {{ring}}-Test",
+        "noDate": "Kein offizielles Datum",
+        "announced": "Angekündigt für {{date}}",
+        "estimate": "Schätzung {{when}}"
+      },
+      "allAbout": "Alles zu {{line}}",
+      "close": "Schließen",
+      "noDate": "Ohne Datum",
+      "roadmap": {
+        "aria": "Roadmap-Stand",
+        "committed": "Bestätigt",
+        "tentative": "Möglich",
+        "released": "Ausgeliefert"
+      },
+      "status": {
+        "next": "Als Nächstes"
+      },
+      "daysLive": "{{n}} Tage live",
+      "earlier": "{{n}} frühere Updates",
+      "earlierHide": "Frühere Updates ausblenden",
+      "ptu": {
+        "newest": "Neuester Test-Build",
+        "aria": "Test-Builds, neueste zuerst",
+        "empty": "Gerade keine Test-Builds im Feed.",
+        "wave": "{{stage}} · Welle {{n}}"
+      }
     },
     "patch": {
       "line": "Alpha {{version}}",
@@ -3572,7 +3642,9 @@
         "section": {
           "stabilitaet": "Stabilität",
           "builds": "Laufende Test-Builds",
-          "prep": "Wie bereite ich mich vor?",
+          "first": "Erste Schritte in diesem Patch",
+          "community": "Community",
+          "urteil": "Dein Urteil",
           "prepPast": "Was war zu beachten?",
           "contents": "Was steckt drin?",
           "fixed": "Haben sie … gefixt?",
@@ -3591,6 +3663,7 @@
         "wipe": "Wipe",
         "noBuildInfo": "RSI hat zu diesem Build keine „Important Build Info“ veröffentlicht.",
         "generalTitle": "Gilt für jeden Patch",
+        "nextTitle": "Vorbereitung auf den nächsten Hauptpatch",
         "generalItem": {
           "launcher": "Launcher öffnen und warten, bis er die neue Version wirklich heruntergeladen hat – die Versionsnummer im Launcher muss zum Patch passen.",
           "shaders": "Shader-Ordner leeren (%LOCALAPPDATA%\\\\Star Citizen\\\\), wenn Grafik flackert oder die Bildrate nach dem Patch einbricht.",
@@ -3601,6 +3674,10 @@
       },
       "contents": {
         "inNotes": "In den Release-Notes",
+        "fixedTitle": "Behoben",
+        "knownTitle": "Bekannte Probleme",
+        "gallery": "Bilder aus diesem Patch",
+        "moreLines": "Weitere {{n}} anzeigen",
         "more": "Langtext",
         "less": "Einklappen",
         "leftover": "Weitere Stichpunkte der Note ohne Roadmap-Karte ({{n}})",
@@ -3822,8 +3899,7 @@
       "confirmedSub": "Die berechnete Zahl liegt im Rahmen des Community-Urteils.",
       "sum": "{{n}} Stimmen · Korrektur {{c}}",
       "yours": "dein Urteil",
-      "blindTitle": "Erst dein Urteil, dann die Zahl",
-      "ask": "Wie stabil läuft {{line}} bei dir?",
+      "ask": "Wie läuft {{line}} bei dir?",
       "mine": "Dein Urteil:",
       "changeFrom": "änderbar ab {{time}}",
       "hint": {
@@ -3831,8 +3907,6 @@
         "wackelig": "spielbar, aber nervig",
         "instabil": "ständig Abbrüche"
       },
-      "cannotJudge": "Kann ich nicht beurteilen",
-      "showNumber": "Zahl ohne Urteil anzeigen",
       "tooSoon": "Änderbar frühestens {{h}} h nach deiner Abgabe.",
       "rules": "Gezählt werden Accounts, die mindestens {{days}} Tage alt sind. Änderbar frühestens {{h}} h nach deiner Abgabe. Dein Urteil wird nie mit deinem Namen gezeigt.",
       "signedOut": "Melde dich an, um mitzuurteilen.",
@@ -3994,7 +4068,20 @@
       },
       "languages": {
         "de": "Deutsch",
-        "en": "Englisch"
+        "en": "Englisch",
+        "es": "Spanisch",
+        "es-419": "Spanisch (Lateinamerika)",
+        "fr": "Französisch",
+        "hi": "Hindi",
+        "it": "Italienisch",
+        "ja": "Japanisch",
+        "ko": "Koreanisch",
+        "pl": "Polnisch",
+        "pt-BR": "Portugiesisch (Brasilien)",
+        "ru": "Russisch",
+        "tr": "Türkisch",
+        "zh-Hans": "Chinesisch (vereinfacht)",
+        "zh-Hant": "Chinesisch (traditionell)"
       },
       "regions": {
         "DE": "Deutschland",
@@ -4350,7 +4437,6 @@
       "retry": "Erneut versuchen"
     },
     "translations": {
-      "eyebrow": "Admin",
       "title": "KI-Übersetzung",
       "subtitle": "Claude-Übersetzung der Spieltexte: Schalter, Limits, Sprachen, Aufträge und Glossar.",
       "tabs": {
@@ -4383,6 +4469,16 @@
         "approve": "Freigeben",
         "revoke": "Entziehen",
         "fullRun": "Voll-Lauf starten",
+        "fullRunOpen": "Voll-Lauf in Arbeit – siehe Aufträge",
+        "fullRunGap": "Übersetzt nur die fehlenden {{missing}} Texte (rund {{pct}} %). Was CIG oder der Übersetzungsspeicher schon hat, kostet nichts.",
+        "fullRunUnmeasured": "Übersetzt alles, was CIG und der Übersetzungsspeicher noch nicht haben. Die Schätzung vorher kostet nichts und misst die Abdeckung.",
+        "coverage": {
+          "label": "Abdeckung {{lang}}",
+          "value": "{{pct}} %",
+          "detail": "{{covered}} von {{total}} Texten übersetzt (von CIG oder aus dem Übersetzungsspeicher). Stand des letzten Auftrags: {{at}}",
+          "unknown": "Abdeckung unbekannt",
+          "unknownHint": "Gemessen wird sie mit dem ersten Auftrag dieser Sprache."
+        },
         "approveTitle": "Sprache {{lang}} freigeben?",
         "approveText": "Neue Uploads werden ab jetzt auch nach {{lang}} übersetzt (nur Deltas).",
         "revokeTitle": "Freigabe für {{lang}} entziehen?",
@@ -4512,55 +4608,228 @@
       },
       "cards": {
         "title": "Karteikarten",
-        "intro": "Nur wenn die KI nicht weiterkommt: eine Frage, eine Antwort. Die wichtigsten Karten stehen vorn.",
-        "needsTitle": "Wo Hilfe gebraucht wird",
-        "allLangs": "Alle Sprachen",
-        "langChip": "{{lang}}: {{count}} offene Karten",
-        "langChipUnknown": "{{lang}}: Anzahl nicht verfügbar",
-        "needsHint": "Wähle die Sprachen, die du sprichst – dann kommen nur Karten in diesen Sprachen.",
-        "needsFiltered": "Nur Karten der gewählten Sprachen. Ein weiterer Klick nimmt eine Sprache wieder heraus.",
-        "goal": "Tagesziel: {{done}} von {{goal}} Karten",
-        "goalLabel": "Fortschritt zum Tagesziel",
-        "streak": "Serie: {{days}} Tage",
-        "open": "{{count}} offen",
-        "skippedBefore": "Übersprungen",
-        "fresh": "Aktueller Patch",
-        "spread": "betrifft {{count}} Strings",
-        "choose": "Welche Übersetzung ist besser?",
-        "option": {
-          "a": "Option A",
-          "b": "Option B"
+        "cardAria": "Karte {{n}} von {{total}}",
+        "count": "{{n}} von {{total}}",
+        "affectsOne": "betrifft 1 Text",
+        "affects": "betrifft {{count}} Texte",
+        "cardsN": "{{count}} Karten",
+        "cardsNOne": "1 Karte",
+        "textsN": "{{count}} Texte",
+        "when": "ab nächstem Lernlauf",
+        "allLangs": "alle {{n}} Sprachen",
+        "votes": "{{votes}}×",
+        "quoted": "„{{text}}“",
+        "forSubject": "für „{{en}}“",
+        "next": "Nächste Karte aufdecken",
+        "notMine": "Nicht meine Entscheidung",
+        "goalCap": "Tagesziel",
+        "goalOf": "{{done}} / {{target}}",
+        "goalShort": "{{done}}/{{target}}",
+        "goalToday": "Karten heute",
+        "goalDone": "geschafft",
+        "goalStep": "Tagesziel {{done}} / {{target}}",
+        "plusPoints": "+{{points}} Punkte",
+        "plusBonus": "+{{points}} Bonus",
+        "unifiedOne": "1 Text vereinheitlicht",
+        "unified": "{{count}} Texte vereinheitlicht",
+        "hud": {
+          "aria": "Dein Stand",
+          "points": "Punkte",
+          "place": "Platz",
+          "streak": "Serie"
         },
-        "bothWrong": "Beides falsch – eigener Text",
-        "ownText": "Dein Text (wird als Admin-Korrektur übernommen)",
-        "note": "Notiz als Hinweis für die KI (optional)",
-        "saveRule": "Als Regel speichern (gilt überall)",
-        "submit": "Antwort speichern",
-        "skip": "Überspringen",
-        "kinds": {
-          "meta": "Meta",
-          "wording": "Wortwahl",
-          "style": "Stil"
+        "box": {
+          "goal": "Tagesziel & Sprachen",
+          "goalAria": "Tagesziel und Sprachen",
+          "langs": "Sprachen",
+          "stats": "Statistik",
+          "statsAria": "Statistik",
+          "board": "Rangliste",
+          "week": "diese Woche"
         },
-        "context": {
-          "title": "Kontext",
-          "key": "Schlüssel",
-          "en": "Englisches Original",
-          "where": "Wo im Spiel",
-          "neighbours": "Nachbarzeilen",
-          "research": "Recherche"
+        "row": {
+          "deck": "dein Stapel · {{count}} offen",
+          "clear": "dein Stapel · alles geklärt",
+          "ki": "{{count}} von KI",
+          "unsure": "{{count}} unsicher",
+          "kiSummary": "KI hat {{count}} entschieden",
+          "waitingOne": "1 wartet auf dich",
+          "auto": "{{count}} automatisch",
+          "autoHint": "Automatisch entschiedene Texte prüfen und zurücknehmen",
+          "waiting": "{{count}} warten auf dich"
         },
-        "thanks": "Danke, gespeichert.",
-        "impact": "Diese Antwort hat {{count}} Strings vereinheitlicht.",
-        "points": "+{{points}} Punkte",
-        "next": "Nächste Karte",
-        "done": "Fertig",
-        "emptyTitle": "Nichts zu entscheiden",
-        "empty": "Die KI kommt gerade allein zurecht – es gibt keine offenen Karten.",
-        "leaderboard": "Rangliste",
-        "leaderboardEmpty": "Noch keine Antworten – die erste Karte bringt dich nach vorn.",
-        "boardAnswers": "{{count}} Antworten",
-        "boardPoints": "{{points}} Punkte"
+        "stats": {
+          "place": "Platz {{place}}",
+          "gapOne": "noch 1 Punkt bis Platz {{place}}",
+          "gap": "noch {{points}} Punkte bis Platz {{place}}",
+          "leadOne": "1 Punkt vor Platz 2",
+          "lead": "{{points}} Punkte vor Platz 2",
+          "alone": "noch niemand sonst diese Woche",
+          "you": "Du",
+          "unnamed": "Admin ohne Namen",
+          "weekNote": "Punkte dieser Woche, Montag beginnt neu",
+          "streak": "Serie",
+          "daysOne": "1 Tag",
+          "days": "{{days}} Tage",
+          "day0": "Mo",
+          "day1": "Di",
+          "day2": "Mi",
+          "day3": "Do",
+          "day4": "Fr",
+          "day5": "Sa",
+          "day6": "So"
+        },
+        "cover": {
+          "titleOne": "{{lang}} · 1 Karte",
+          "title": "{{lang}} · {{count}} Karten",
+          "subOne": "≈ {{min}} min · betrifft 1 Text",
+          "sub": "≈ {{min}} min · betrifft {{count}} Texte",
+          "hint": "Vorsortiert aus {{open}} offenen Karten, der Stapel hat ein Ende. Jede Karte: links eine Möglichkeit, rechts die andere.",
+          "goKeys": "Antippen oder",
+          "goKeysAfter": "deckt auf",
+          "goTouch": "Antippen deckt auf"
+        },
+        "q": {
+          "case_upper": "Groß oder normal, wo Englisch normal schreibt?",
+          "case_title": "Groß- oder Kleinschreibung nach dem ersten Wort?",
+          "compound": "Zusammen oder getrennt schreiben?",
+          "verb_form": "Befehlsform oder Grundform auf Knöpfen?",
+          "abbr": "Abkürzung oder ausgeschrieben?",
+          "term": "Wie soll „{{term}}“ überall heißen?",
+          "wording": "Welche Übersetzung passt zu „{{en}}“?",
+          "short": "Schreibweisen-Regel"
+        },
+        "opt": {
+          "case_upper": {
+            "a": "Normal",
+            "b": "GROSS"
+          },
+          "case_title": {
+            "a": "Satzschreibung",
+            "b": "Jedes Wort groß"
+          },
+          "compound": {
+            "a": "Zusammen",
+            "b": "Getrennt / mit Bindestrich"
+          },
+          "verb_form": {
+            "a": "Befehlsform (Annulla)",
+            "b": "Grundform (Annullare)"
+          },
+          "abbr": {
+            "a": "Abkürzung",
+            "b": "Ausgeschrieben"
+          }
+        },
+        "reason": {
+          "majority": "Mehrheit {{a}} : {{b}}",
+          "community": "Text aus dem Community-Paket",
+          "ai": "KI-Text, kein Community-Text vorhanden",
+          "votes": "Mehr Stimmen ({{a}} : {{b}}), keine klare Mehrheit",
+          "bracket": "Fremder Klammerzusatz entfernt",
+          "whitespace": "Nur Leerzeichen bereinigt",
+          "casing_source": "Schreibweise wie im Englischen",
+          "convention": "Nach eurer Schreibweisen-Regel",
+          "only_left": "Die andere Variante wurde als falsch markiert"
+        },
+        "own": {
+          "both": "Beides falsch, selbst schreiben",
+          "short": "Eigener Text",
+          "title": "Eigener Text",
+          "text": "Dein Text für „{{en}}“ – er gilt ab dem nächsten Lernlauf.",
+          "label": "Dein Text",
+          "confirm": "Übernehmen"
+        },
+        "exception": {
+          "action": "Ausnahme für eine Sprache",
+          "title": "Ausnahme für eine Sprache",
+          "text": "Welche Sprache nimmt die andere Variante? Danach wählst du die Variante für alle übrigen.",
+          "none": "Keine Ausnahme",
+          "chip": "Ausnahme: {{lang}} nimmt die andere"
+        },
+        "swipe": {
+          "left": "← links: {{label}}",
+          "right": "→ rechts: {{label}}",
+          "up": "↑ hoch: Nicht meine Entscheidung"
+        },
+        "keys": {
+          "title": "Tasten",
+          "pick": "linke / rechte Antwort (auch 1 / 2)",
+          "own": "eigener Text",
+          "notMine": "Nicht meine Entscheidung",
+          "exception": "Ausnahme für eine Sprache",
+          "turn": "Stapel aufdecken, nächste Karte",
+          "undo": "Rückgängig",
+          "sheet": "diese Übersicht"
+        },
+        "undo": {
+          "answered": "„{{text}}“ für „{{en}}“ gewählt",
+          "answeredRule": "„{{text}}“ als Regel gewählt",
+          "notMine": "„{{text}}“ an die KI abgegeben",
+          "wrong": "„{{text}}“ als falsch markiert",
+          "ok": "„{{text}}“ übernommen",
+          "detailOne": "1 Text · auch mit Strg+Z",
+          "detail": "{{count}} Texte · auch mit Strg+Z",
+          "detailTouchOne": "1 Text",
+          "detailTouch": "{{count}} Texte",
+          "detailShort": "auch mit Strg+Z"
+        },
+        "veto": {
+          "headUnsure": "unsichere zuerst",
+          "headAllOne": "1 wartet",
+          "headAuto": "{{count}} automatisch entschieden",
+          "headAll": "{{count}} warten",
+          "headNote": "nichts tun heißt übernehmen",
+          "source": "Englisch „{{en}}“",
+          "unsure": "unsicher",
+          "meaning": "auf Deutsch",
+          "meaningPending": "Deutsche Bedeutung folgt",
+          "wrong": "Sieht falsch aus",
+          "ok": "Passt",
+          "reviewWrongHint": "Die Karte kommt zurück in deinen Stapel, du entscheidest",
+          "wrongHint": "Die KI entscheidet beim nächsten Lernlauf neu, diese Variante gewinnt nicht mehr",
+          "okHint": "Der KI-Text bleibt, danach kommt die nächste KI-Karte",
+          "acceptAll": "Rest übernehmen",
+          "acceptAllTitle": "Den Rest übernehmen?",
+          "acceptAllTextOne": "Die übrige KI-Entscheidung für {{lang}} gilt ab dem nächsten Lernlauf. Das gibt keine Punkte und lässt sich nicht rückgängig machen.",
+          "acceptAllText": "Die {{count}} übrigen KI-Entscheidungen für {{lang}} gelten ab dem nächsten Lernlauf. Das gibt keine Punkte und lässt sich nicht rückgängig machen.",
+          "emptyTitle": "Nichts zu prüfen für {{lang}}",
+          "empty": "Alle KI-Entscheidungen dieser Sprache sind geprüft oder übernommen. Neue kommen mit dem nächsten Lernlauf."
+        },
+        "finish": {
+          "title": "Alles geklärt für {{lang}}",
+          "sum": "{{cards}} · {{texts}} vereinheitlicht",
+          "points": "Punkte",
+          "split": "{{base}} für {{cards}}, {{bonus}} Bonus fürs volle Tagesziel",
+          "none": "Gerade keine offenen Karten für diese Sprache.",
+          "when": "Wirkt beim nächsten Lernlauf (nächster Data-Upload oder „Lernen“ im Quellen-Tab).",
+          "restOne": "Die übrige ≈ 1 Karte prüft er mit deinen Antworten neu.",
+          "rest": "Die übrigen ≈ {{count}} Karten prüft er mit deinen Antworten neu.",
+          "pair": "„{{en}}“ → {{text}}",
+          "rule": "Schreibweise: {{label}}"
+        },
+        "langNames": {
+          "de": "Deutsch",
+          "es": "Spanisch",
+          "fr": "Französisch",
+          "it": "Italienisch",
+          "ja": "Japanisch",
+          "ko": "Koreanisch",
+          "pl": "Polnisch",
+          "pt-BR": "Portugiesisch",
+          "ru": "Russisch",
+          "zh-Hans": "Chinesisch (vereinfacht)",
+          "zh-Hant": "Chinesisch (traditionell)"
+        },
+        "langs": {
+          "open": "Sprachen: Stapel oder KI",
+          "title": "Wer beurteilt welche Sprache?",
+          "text": "„Dein Stapel“: du entscheidest die Sprache als Karten. „KI + Veto“: die KI entscheidet, du prüfst und widersprichst.",
+          "mine": "Dein Stapel",
+          "ki": "KI + Veto",
+          "save": "Speichern",
+          "cancel": "Abbrechen"
+        }
       },
       "sources": {
         "title": "Quellen",
@@ -4702,6 +4971,11 @@
         "editLabel": "Neuer Text",
         "saveEdit": "Text speichern",
         "resolved": "Hinweis erledigt."
+      },
+      "crumb": "Admin",
+      "rail": {
+        "label": "KI-Übersetzung: Bereiche",
+        "goto": "Zu {{page}}"
       }
     }
   },
@@ -4764,37 +5038,51 @@
     }
   },
   "desktopConnect": {
-    "title": "Verse Companion verbinden",
+    "titleConnect": "Starscape verbinden",
+    "titleConnecting": "Verbinde…",
+    "titleConnected": "Verbunden",
+    "titleFailed": "Verbindung fehlgeschlagen",
     "authorizing": "Prüfe deine Session…",
-    "loginRequired": "Bitte erst einloggen, dann gehts automatisch zurück zur App.",
-    "redirecting": "Autorisiert. Schicke Token zur App…",
-    "redirectingHint": "Dieses Fenster kann gleich geschlossen werden.",
+    "loginRequired": "Melde dich an, danach geht die Anmeldung automatisch an Starscape.",
+    "redirecting": "Übergebe deine Anmeldung an Starscape.",
+    "handedOverHint": "Die App übernimmt deine Anmeldung, du kannst dieses Fenster schließen. Ist sie nicht verbunden, starte die Verbindung in der App neu.",
+    "connected": "Starscape ist mit deinem Konto verbunden. Du kannst dieses Fenster schließen.",
+    "start": "Starte die Anmeldung über das Starscape-Traymenü – die App öffnet diese Seite dann selbst.",
     "errorMissingParams": "Callback- oder State-Parameter fehlt.",
     "errorBadCallback": "Callback-URL ist kein 127.0.0.1-Loopback im erwarteten Portbereich.",
     "errorNoToken": "Kein Access-Token in der Session.",
     "retry": "Erneut versuchen",
-    "handedOver": "Zurück zur App",
-    "handedOverHint": "Die App übernimmt deine Anmeldung, du kannst dieses Fenster schließen. Ist sie nicht verbunden, starte die Verbindung in der App neu."
+    "done": {
+      "csrf": "Die Anmeldung gehörte nicht zu dieser Starscape-Sitzung. Starte sie im Traymenü neu.",
+      "noToken": "Starscape hat keine Anmeldung erhalten. Starte sie im Traymenü neu.",
+      "failed": "Die Übergabe an Starscape ist fehlgeschlagen. Starte die Anmeldung im Traymenü neu."
+    }
   },
   "desktopAuth": {
-    "title": "Verse Data Uploader autorisieren",
+    "titleConnect": "Verse Data Uploader verbinden",
+    "titleConfirm": "Verse Data Uploader verbinden?",
+    "titleConnecting": "Verbinde…",
+    "titleConnected": "Verbunden",
+    "titleDenied": "Kein Zugriff",
+    "titleFailed": "Verbindung fehlgeschlagen",
     "authorizing": "Prüfe deine Session…",
-    "loginRequired": "Bitte erst einloggen, danach bestätigst du die Verbindung.",
-    "redirecting": "Autorisiert. Schicke Token zur App…",
-    "redirectingHint": "Dieses Fenster kann gleich geschlossen werden.",
-    "unauthorized": "Dein Account darf den Verse Data Uploader nicht nutzen.",
-    "unauthorizedHint": "Du brauchst Collaborator- oder Admin-Rolle. Frag einen Admin.",
+    "loginRequired": "Melde dich an, danach bestätigst du die Verbindung.",
+    "confirmInfo": "Nur bestätigen, wenn du die Anmeldung selbst im Uploader gestartet hast (Port {{port}}).",
+    "confirm": "Verbinden",
+    "redirecting": "Übergebe deine Anmeldung an den Uploader.",
+    "handedOverHint": "Die App übernimmt deine Anmeldung, du kannst dieses Fenster schließen. Ist sie nicht verbunden, starte die Verbindung in der App neu.",
+    "connected": "Der Uploader ist mit deinem Konto verbunden. Du kannst dieses Fenster schließen.",
+    "start": "Starte die Anmeldung im Verse Data Uploader – er öffnet diese Seite dann selbst.",
+    "unauthorized": "Dein Konto darf den Verse Data Uploader nicht nutzen. Frag einen Admin nach der Collaborator-Rolle.",
     "errorMissingParams": "Callback- oder State-Parameter fehlt.",
     "errorBadCallback": "Callback-URL ist kein 127.0.0.1-Loopback im erwarteten Portbereich.",
     "errorNoToken": "Kein Access-Token in der Session.",
-    "confirmPrompt": "Verse Data Uploader auf Port {{port}} mit deinem Konto verbinden?",
-    "confirmHint": "Bestätige nur, wenn du die Anmeldung gerade selbst im Verse Data Uploader gestartet hast.",
-    "confirm": "Verbinden",
-    "cancel": "Abbrechen",
-    "cancelled": "Abgebrochen – es wurde nichts übertragen. Du kannst dieses Fenster schließen.",
     "retry": "Erneut versuchen",
-    "handedOver": "Zurück zur App",
-    "handedOverHint": "Die App übernimmt deine Anmeldung, du kannst dieses Fenster schließen. Ist sie nicht verbunden, starte die Verbindung in der App neu."
+    "done": {
+      "csrf": "Die Anmeldung gehörte nicht zu dieser Uploader-Sitzung. Starte sie im Uploader neu.",
+      "noToken": "Der Uploader hat keine Anmeldung erhalten. Starte sie im Uploader neu.",
+      "failed": "Die Übergabe an den Uploader ist fehlgeschlagen. Starte die Anmeldung im Uploader neu."
+    }
   },
   "footer": {
     "madeByCommunity": "Made by the Community",
@@ -5274,7 +5562,8 @@
     "empty": "Noch kein Feedback. Sei der Erste.",
     "errorTitle": "Fehler",
     "you": "Du",
-    "unknownUser": "Unbekannt",
+    "noAccount": "Ohne Konto",
+    "aiSenderTitle": "KI (automatisch erstellt von der Feedback-Routine)",
     "shipRef": "Änderung ansehen",
     "issueRef": "Issue ansehen",
     "topicNumber": "Thema #{{n}} — feste Nummer, auf die du dich beziehen kannst",
@@ -5548,7 +5837,7 @@
       "answered": "Beantwortet · wartet auf die Routine"
     },
     "kind": {
-      "ai": "AI"
+      "ai": "KI"
     },
     "role": {
       "admin": "Admin",
@@ -5587,7 +5876,9 @@
     "threadsStale": "Antworten konnten nicht geladen werden — die Einordnung einzelner Karten kann veraltet sein.",
     "guard": {
       "name": "PostHog-Wächter",
-      "title": "PostHog-Wächter (automatisch erstellt)"
+      "title": "PostHog-Wächter (automatisch erstellt)",
+      "serviceName": "Dienst-Wächter",
+      "serviceTitle": "Dienst-Wächter (automatisch erstellt, stündliche Dienstprüfung)"
     }
   },
   "feedbackFab": {
@@ -6169,7 +6460,15 @@
     "rankTierTooLow": "Das geht erst ab Stufe 5.",
     "rankIdeaInvalid": "Die Idee braucht 3 bis 280 Zeichen.",
     "rankIdeaLimit": "Du hast schon 3 offene Ideen.",
-    "rankIdeaGone": "Diese Idee gibt es nicht mehr oder sie ist archiviert."
+    "rankIdeaGone": "Diese Idee gibt es nicht mehr oder sie ist archiviert.",
+    "translation": {
+      "cards": {
+        "forbidden": "Nur Admins können Karteikarten beantworten.",
+        "invalid": "Diese Antwort passt nicht zur Karte. Bitte prüfe deine Eingabe.",
+        "gone": "Diese Karte ist schon erledigt. Der Stapel wurde neu geladen.",
+        "applied": "Der Lernlauf hat diese Antwort schon übernommen, Rückgängig geht nicht mehr."
+      }
+    }
   },
   "pageHeader": {
     "crumbsAria": "Seitenpfad",
@@ -6973,6 +7272,16 @@
         "monitored": "Überwacht",
         "unmonitored": "Nicht überwacht"
       },
+      "hint": {
+        "fuel": {
+          "any": "Treibstoff knapp",
+          "hydrogen": "Wasserstoff knapp",
+          "quantum": "Quantum-Treibstoff knapp"
+        },
+        "hangar": "Hangar: Platz {{position}}",
+        "hangarWait": "Hangar: Platz {{position}} · ca. {{min}} min",
+        "hangarQueued": "Hangar: in der Warteschlange"
+      },
       "path": {
         "title": "Deine Route",
         "empty": "Kein aktiver Einsatz. Plane einen unter Planen."
@@ -7111,13 +7420,26 @@
           "sub": "Neu erhalten",
           "hint": "Neu erhaltene Blueprints.",
           "col": "Blueprints"
+        },
+        "fines": {
+          "name": "Strafen",
+          "sub": "{{amount}} aUEC gezahlt",
+          "subNoAmount": "Bezahlte Strafen",
+          "hint": "Strafen, die du im Spiel bezahlt hast.",
+          "col": "Strafen"
+        },
+        "fuel": {
+          "name": "Treibstoff knapp",
+          "sub": "Warnungen",
+          "hint": "Wie oft der Wasserstoff- oder Quantum-Treibstoff knapp wurde.",
+          "col": "Warnungen"
         }
       },
       "preview": {
         "stamp": "Vorschau",
         "title": "Hier wächst deine Statistik",
-        "text": "So sieht es aus, sobald die App beim Spielen mitliest: aUEC, Missionen, Abschlussquote, Tode, Crimestat, Raffinerie und Blueprints. Die Kacheln dahinter sind Beispieldaten.",
-        "textLinked": "Die App ist verbunden. Sobald du spielst, füllen sich aUEC, Missionen, Tode, Crimestat, Raffinerie und Blueprints. Die Kacheln dahinter sind Beispieldaten."
+        "text": "So sieht es aus, sobald die App beim Spielen mitliest: aUEC, Missionen, Abschlussquote, Tode, Crimestat, Raffinerie, Blueprints, Strafen und Treibstoff-Warnungen. Die Kacheln dahinter sind Beispieldaten.",
+        "textLinked": "Die App ist verbunden. Sobald du spielst, füllen sich aUEC, Missionen, Tode, Crimestat, Raffinerie, Blueprints, Strafen und Treibstoff-Warnungen. Die Kacheln dahinter sind Beispieldaten."
       },
       "events": {
         "title": "Erledigte Events",
@@ -7471,6 +7793,26 @@
       "auec": "aUEC-Bilanz",
       "losses": "Verluste",
       "lossesSub": "{{deaths}} Tode · {{ships}} Schiffe zerstört · {{claims}} Versicherungsfälle",
+      "costs": {
+        "label": "Kosten",
+        "fines": {
+          "one": "{{n}} Strafe",
+          "other": "{{n}} Strafen"
+        },
+        "fineAmount": "{{fines}} ({{amount}} aUEC)",
+        "injuries": {
+          "one": "{{n}} Verletzung",
+          "other": "{{n}} Verletzungen"
+        },
+        "medbeds": {
+          "one": "{{n}} Medbed-Behandlung",
+          "other": "{{n}} Medbed-Behandlungen"
+        },
+        "claimRequests": {
+          "one": "{{n}} Versicherungsanfrage",
+          "other": "{{n}} Versicherungsanfragen"
+        }
+      },
       "end": {
         "noQuit": "Ohne Beenden zu Ende (Absturz oder App geschlossen)",
         "live": "Läuft gerade"
@@ -8207,7 +8549,6 @@
     },
     "search": {
       "label": "Suche",
-      "open": "Suche öffnen",
       "clear": "Eingabe löschen",
       "dropContext": "Kontext entfernen — überall suchen",
       "places": "Seiten",

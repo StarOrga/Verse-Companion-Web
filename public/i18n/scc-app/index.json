@@ -11,43 +11,55 @@
       "keys": 3311
     },
     "fr": {
-      "packVersion": "2026.11.15-1456",
+      "packVersion": "2026.11.22-0031",
       "keys": 3311
     },
     "es": {
-      "packVersion": "2026.11.15-1456",
+      "packVersion": "2026.11.22-0031",
+      "keys": 3311
+    },
+    "es-419": {
+      "packVersion": "2026.11.22-0119",
       "keys": 3311
     },
     "it": {
-      "packVersion": "2026.11.15-1456",
+      "packVersion": "2026.11.22-0026",
       "keys": 3311
     },
     "pt-BR": {
-      "packVersion": "2026.11.15-1456",
+      "packVersion": "2026.11.22-0026",
       "keys": 3311
     },
     "pl": {
-      "packVersion": "2026.11.15-1456",
+      "packVersion": "2026.11.22-0026",
       "keys": 3311
     },
     "ru": {
-      "packVersion": "2026.11.15-1456",
+      "packVersion": "2026.11.22-0026",
       "keys": 3311
     },
     "zh-CN": {
-      "packVersion": "2026.11.15-1456",
+      "packVersion": "2026.11.22-0030",
+      "keys": 3311
+    },
+    "zh-TW": {
+      "packVersion": "2026.11.22-0030",
       "keys": 3311
     },
     "ja": {
-      "packVersion": "2026.11.15-1456",
+      "packVersion": "2026.11.22-0035",
       "keys": 3311
     },
     "hi": {
-      "packVersion": "2026.11.15-1456",
+      "packVersion": "2026.11.22-0030",
       "keys": 3311
     },
     "ko": {
-      "packVersion": "2026.11.15-1456",
+      "packVersion": "2026.11.22-0035",
+      "keys": 3311
+    },
+    "tr": {
+      "packVersion": "2026.11.22-0030",
       "keys": 3311
     }
   }

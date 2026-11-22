@@ -139,6 +139,8 @@ export const EVENTS = {
 
   // --- news --------------------------------------------------------------
   'news:article_open': ev('news', 'Ein News-Artikel wurde geöffnet (kein Titel, keine ID).'),
+  'news:filter_select': ev<{ filter: 'all' | 'comm-link' | 'youtube' | 'spectrum' | 'patch' | 'events' | 'saved' }>('news', 'In Verse News wurde eine Kategorie gewählt (Quelle, Events oder Gesammelt).'),
+  'news:event_open': ev<{ surface: 'news_top' | 'news_bottom' | 'hub'; phase: 'running' | 'upcoming' }>('news', 'Ein Ingame-Event aus einem Event-Teaser wurde geöffnet (Verse News oben/unten oder Verse-Hub).'),
 
   // --- social ------------------------------------------------------------
   'social:invite_create': ev('social', 'Ein persönlicher Freundes-Einladungslink wurde erzeugt (nie der Token).'),
@@ -162,6 +164,13 @@ export const EVENTS = {
   // --- admin -------------------------------------------------------------
   'admin:tool_open': ev<{ tool: string }>('admin', 'Ein Admin-Werkzeug wurde geöffnet (Rolle steht als Person-Eigenschaft).'),
   'admin:user_accept': ev<{ source: 'people_list' }>('admin', 'Ein Admin hat ein selbst registriertes, nie freigeschaltetes Konto in der Personenliste freigeschaltet (nie E-Mail oder Id).'),
+  'admin:translation_deck_start': ev<{ lang: string; cards: number }>('admin', 'Ein Admin hat einen Karteikarten-Stapel aufgedeckt (Sprache, Karten im Stapel).'),
+  'admin:translation_card_submit': ev<{ kind: 'convention' | 'term' | 'wording'; choice: 'a' | 'b' | 'own'; exception: boolean; input: 'tap' | 'key' | 'swipe' }>('admin', 'Eine Übersetzungs-Karte wurde beantwortet (Kartenart, linke/rechte Variante oder eigener Text, mit Sprach-Ausnahme, per Tippen/Taste/Wischen).'),
+  'admin:translation_card_release': ev<{ kind: 'convention' | 'term' | 'wording'; input: 'tap' | 'key' | 'swipe' }>('admin', 'Eine Karte wurde mit „Nicht meine Entscheidung“ an die KI abgegeben.'),
+  'admin:translation_answer_remove': ev<{ via: 'toast' | 'key' }>('admin', 'Eine Karten-Antwort wurde rückgängig gemacht (Rückgängig-Hinweis oder Strg+Z).'),
+  'admin:translation_veto_submit': ev<{ verdict: 'wrong' | 'ok' | 'own' | 'all'; unsure: boolean; input: 'tap' | 'key' | 'swipe' }>('admin', 'Eine KI-Entscheidung wurde geprüft: „Sieht falsch aus“, „Passt“, eigener Text oder „Rest übernehmen“.'),
+  'admin:translation_langs_change': ev<{ judged: number; ki: number }>('admin', 'Ein Admin hat gespeichert, welche Sprachen er selbst als Karten beurteilt (Anzahl „Dein Stapel“ und „KI + Veto“).'),
+  'admin:translation_deck_finish': ev<{ lang: string; cards: number; points: number }>('admin', 'Ein Karteikarten-Stapel wurde bis zur letzten Karte durchgespielt (beantwortete Karten, Punkte).'),
 } as const;
 
 export type EventName = keyof typeof EVENTS;
