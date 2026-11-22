@@ -90,7 +90,7 @@ export const IDLE_SHOW_MS = 5000;
     @if (roles.isAdmin()) {
       @let adName = 'verse.hub.admin' | translate;
       @let adValue = 'verse.hub.adminValue' | translate;
-      <a class="adm-l" routerLink="/admin" [class.idle]="idle()" [attr.aria-label]="adName + ' · ' + adValue + ' · ' + ('verse.hub.adminHint' | translate)">
+      <a class="adm-l" routerLink="/admin/hub" [class.idle]="idle()" [attr.aria-label]="adName + ' · ' + adValue + ' · ' + ('verse.hub.adminHint' | translate)">
         <span class="sat" aria-hidden="true"><sc-briefing-station /></span>
         <span class="lab hot" aria-hidden="true">
           <span class="lab-n">@for (ch of chars(adName); track ch.i) {<i [style.--n]="ch.i">{{ ch.c }}</i>}</span>
