@@ -1,7 +1,39 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.297.3",
+  "current": "0.298.0",
   "releases": [
+    {
+      "version": "0.298.0",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Collaborators can review the AI translation flash cards on their own page (/collab/translations): pick the languages they speak, answer cards, judge single KI decisions and see the weekly board. Taking over a whole language at once stays with admins."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.297.4",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The Admin station on /verse opens the admin hub instead of user management."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.297.3",
       "date": "2026-11-22",

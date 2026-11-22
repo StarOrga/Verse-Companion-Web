@@ -1,4 +1,6 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { RoleService } from '../../../auth/role.service';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { TranslateService, provideTranslateService } from '@ngx-translate/core';
@@ -44,7 +46,7 @@ function backend(cards: TranslationCard[] = [conventionCard(), termCard()], extr
   };
 }
 
-async function mount(answer: Answer, url = '/admin/translations?tab=cards') {
+async function mount(answer: Answer, url = '/admin/translations?tab=cards', role: 'admin' | 'collaborator' = 'admin') {
   const fake = fakeSupabase({ answer });
   const track = vi.fn();
   const prompt = vi.fn().mockResolvedValue('Mein Text');
@@ -56,6 +58,7 @@ async function mount(answer: Answer, url = '/admin/translations?tab=cards') {
       provideRouter([{ path: 'admin/translations', component: TranslationCardsComponent }, { path: '**', children: [] }]),
       { provide: AnalyticsService, useValue: { track } },
       { provide: ScConfirmService, useValue: { prompt, confirm } },
+      { provide: RoleService, useValue: { isAdmin: signal(role === 'admin'), isCollaborator: signal(true) } },
     ],
   });
   // Only the quote frame is a real string: the KI text and the moment's hero live inside it.
@@ -228,6 +231,16 @@ describe('TranslationCardsComponent (Karteikarten v2)', () => {
     cmp.endMoment();
     harness.detectChanges();
     expect(q(el, '[data-test=veto-empty]')).not.toBeNull();
+  });
+
+  it('„Rest übernehmen“ (a whole language at once) is an admin call: a collaborator judges single decisions only', async () => {
+    const admin = await mount(backend(), '/admin/translations?tab=cards&lang=it');
+    expect(q(admin.el, '[data-test=act-accept-all]')).not.toBeNull();
+    TestBed.resetTestingModule();
+    const collab = await mount(backend(), '/admin/translations?tab=cards&lang=it', 'collaborator');
+    expect(collab.cmp.vetoMode()).toBe(true);
+    expect(q(collab.el, '[data-test=veto-ok]')).not.toBeNull();
+    expect(q(collab.el, '[data-test=act-accept-all]')).toBeNull();
   });
 
   it('language rows are real anchors: a click opens that language, the KI row is the last row and has no extra button', async () => {
