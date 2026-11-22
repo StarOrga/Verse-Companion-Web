@@ -57,10 +57,10 @@ describe('bothOrders (position bias guard)', () => {
     assert.ok(v.winsForward && v.winsReverse);
     assert.equal(v.agreed, 'challenger');
   });
-  it('the model followed the position (A both times) -> card with full doubt', () => {
+  it('the model followed the position (A both times) -> card, doubt from both confidences (P5)', () => {
     const v = bothOrders({ w: 'A', c: 0.9 }, { w: 'A', c: 0.9 });
     assert.equal(v.outcome, 'card');
-    assert.equal(v.doubt, 1);
+    assert.equal(v.doubt, 0.95);
     assert.equal(v.agreed, null);
   });
   it('challenger wins both but unsure -> card; incumbent preferred or ties -> keep, no card', () => {
@@ -219,19 +219,18 @@ describe('judge term corrections (C5)', () => {
 });
 
 describe('cards (D1)', () => {
-  it('reach by key prefix and D2 order: spread, reach, kind, doubt, fresh; skipped last', () => {
+  it('reach by key prefix and deck order: kind (convention > term > wording), spread, reach, doubt, fresh', () => {
     assert.ok(reachOf('ui_hud_x') > reachOf('item_NameX') && reachOf('item_NameX') > reachOf('pu_mission_desc'));
     const base = { spread: 1, reach: 1, kind: 'wording', doubt: 0.5, fresh: false, status: 'open' };
     const list = [
-      { ...base, id: 'skipped', spread: 99, status: 'skipped' },
-      { ...base, id: 'style', kind: 'style' },
       { ...base, id: 'meta', kind: 'meta' },
+      { ...base, id: 'conv', kind: 'convention' },
       { ...base, id: 'wide', spread: 5 },
       { ...base, id: 'visible', reach: 3 },
       { ...base, id: 'unsure', doubt: 0.9 },
       { ...base, id: 'fresh', fresh: true },
     ];
-    assert.deepEqual(list.sort(compareCards).map((c) => c.id), ['wide', 'visible', 'meta', 'unsure', 'fresh', 'style', 'skipped']);
+    assert.deepEqual(list.sort(compareCards).map((c) => c.id), ['conv', 'meta', 'wide', 'visible', 'unsure', 'fresh']);
   });
   it('tm and term cards carry spread, reach, doubt, fresh, kind and a dedupe key', () => {
     const c = tmCard({ lang: 'de', key: 'ui_a', keys: ['ui_a', 'item_b'], h: 'abc', en: 'Open', a: ai('Öffnen'), b: com('Auf'), doubt: 1.4, fresh: true, why: 'x' });
