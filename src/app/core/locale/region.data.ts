@@ -49,6 +49,7 @@ const REGION_FOR_LANGUAGE: Readonly<Record<AppLanguage, RegionCode>> = {
   es: 'ES',
   'es-419': 'MX',
   fr: 'FR',
+  hi: 'IN',
   it: 'IT',
   ja: 'JP',
   ko: 'KR',
@@ -204,7 +205,7 @@ const LATAM_SPANISH_REGIONS: ReadonlySet<string> = new Set([
 const TRADITIONAL_CHINESE_SUBTAGS: ReadonlySet<string> = new Set(['HANT', 'TW', 'HK', 'MO']);
 
 /** Languages whose primary subtag alone picks the file. */
-const PLAIN_LANGUAGES: ReadonlySet<string> = new Set(['de', 'en', 'fr', 'it', 'ja', 'ko', 'pl', 'ru', 'tr']);
+const PLAIN_LANGUAGES: ReadonlySet<string> = new Set(['de', 'en', 'fr', 'hi', 'it', 'ja', 'ko', 'pl', 'ru', 'tr']);
 
 /**
  * The supported UI language a raw BCP-47 tag maps onto, or `null`. Accepts the

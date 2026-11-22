@@ -24,6 +24,7 @@ export const APP_LANGUAGES = [
   'es',
   'es-419',
   'fr',
+  'hi',
   'it',
   'ja',
   'ko',

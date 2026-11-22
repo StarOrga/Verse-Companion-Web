@@ -20,6 +20,8 @@ describe('normalizeLanguage', () => {
     expect(normalizeLanguage('zh-CN')).toBe('zh-Hans');
     expect(normalizeLanguage('zh-Hans-CN')).toBe('zh-Hans');
     expect(normalizeLanguage('zh-TW')).toBe('zh-Hant');
+    expect(normalizeLanguage('hi-IN')).toBe('hi');
+    expect(normalizeLanguage('hi')).toBe('hi');
     expect(normalizeLanguage('zh-HK')).toBe('zh-Hant');
     expect(normalizeLanguage('zh-Hant')).toBe('zh-Hant');
     expect(normalizeLanguage('tr-TR')).toBe('tr');

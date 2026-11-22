@@ -5,6 +5,7 @@ import es419 from '../../../../public/i18n/es-419.json';
 import fr from '../../../../public/i18n/fr.json';
 import it_ from '../../../../public/i18n/it.json';
 import ja from '../../../../public/i18n/ja.json';
+import hi from '../../../../public/i18n/hi.json';
 import ko from '../../../../public/i18n/ko.json';
 import pl from '../../../../public/i18n/pl.json';
 import ptBR from '../../../../public/i18n/pt-BR.json';
@@ -22,7 +23,7 @@ import { APP_LANGUAGES, type AppLanguage } from './locale.types';
  * every interpolation and markup token of the English text.
  */
 const TABLES: Record<AppLanguage, unknown> = {
-  de, en, es, 'es-419': es419, fr, it: it_, ja, ko, pl, 'pt-BR': ptBR, ru, tr, 'zh-Hans': zhHans, 'zh-Hant': zhHant,
+  de, en, es, 'es-419': es419, fr, hi, it: it_, ja, ko, pl, 'pt-BR': ptBR, ru, tr, 'zh-Hans': zhHans, 'zh-Hant': zhHant,
 };
 
 const TOKEN = /\{\{\s*[^}]*?\s*\}\}|<\/?[a-zA-Z][^>]*>/g;
