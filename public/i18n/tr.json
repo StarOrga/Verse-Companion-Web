@@ -4607,7 +4607,228 @@
       },
       "cards": {
         "title": "Bilgi kartları",
-        "next": "Sonraki kart"
+        "next": "Sonraki kart",
+        "cardAria": "Kart {{n}} / {{total}}",
+        "count": "{{n}} / {{total}}",
+        "affectsOne": "1 metni etkiler",
+        "affects": "{{count}} metni etkiler",
+        "cardsN": "{{count}} kart",
+        "cardsNOne": "1 kart",
+        "textsN": "{{count}} metin",
+        "when": "sonraki öğrenme işleminden itibaren",
+        "allLangs": "{{n}} dilin tümü",
+        "votes": "{{votes}}×",
+        "quoted": "“{{text}}”",
+        "forSubject": "“{{en}}” için",
+        "notMine": "Benim kararım değil",
+        "goalCap": "Günlük hedef",
+        "goalOf": "{{done}} / {{target}}",
+        "goalShort": "{{done}}/{{target}}",
+        "goalToday": "bugünkü kart",
+        "goalDone": "tamamlandı",
+        "goalStep": "Günlük hedef {{done}} / {{target}}",
+        "plusPoints": "+{{points}} puan",
+        "plusBonus": "+{{points}} bonus",
+        "unifiedOne": "1 metin birleştirildi",
+        "unified": "{{count}} metin birleştirildi",
+        "hud": {
+          "aria": "Durumun",
+          "points": "Puan",
+          "place": "Sıra",
+          "streak": "Seri"
+        },
+        "box": {
+          "goal": "Günlük hedef ve diller",
+          "goalAria": "Günlük hedef ve diller",
+          "langs": "Diller",
+          "stats": "İstatistikler",
+          "statsAria": "İstatistikler",
+          "board": "Sıralama",
+          "week": "bu hafta"
+        },
+        "row": {
+          "deck": "desten · {{count}} açık",
+          "clear": "desten · hepsi çözüldü",
+          "ki": "yapay zekâdan {{count}}",
+          "unsure": "{{count}} belirsiz",
+          "kiSummary": "Yapay zekâ {{count}} tanesine karar verdi",
+          "waitingOne": "1 tanesi seni bekliyor",
+          "auto": "{{count}} otomatik",
+          "autoHint": "Otomatik kararları gözden geçir ve geri al",
+          "waiting": "{{count}} tanesi seni bekliyor"
+        },
+        "stats": {
+          "place": "{{place}}. sıra",
+          "gapOne": "{{place}}. sıraya 1 puan kaldı",
+          "gap": "{{place}}. sıraya {{points}} puan kaldı",
+          "leadOne": "2. sıranın 1 puan önünde",
+          "lead": "2. sıranın {{points}} puan önünde",
+          "alone": "bu hafta henüz başka kimse yok",
+          "you": "Sen",
+          "unnamed": "İsimsiz yönetici",
+          "weekNote": "Bu haftanın puanları, pazartesi sıfırdan başlar",
+          "streak": "Seri",
+          "daysOne": "1 gün",
+          "days": "{{days}} gün",
+          "day0": "Pzt",
+          "day1": "Sal",
+          "day2": "Çar",
+          "day3": "Per",
+          "day4": "Cum",
+          "day5": "Cmt",
+          "day6": "Paz"
+        },
+        "cover": {
+          "titleOne": "{{lang}} · 1 kart",
+          "title": "{{lang}} · {{count}} kart",
+          "subOne": "≈ {{min}} dk · 1 metni etkiler",
+          "sub": "≈ {{min}} dk · {{count}} metni etkiler",
+          "hint": "{{open}} açık karttan önceden ayıklandı, destenin bir sonu var. Her kart: solda bir seçenek, sağda diğeri.",
+          "goKeys": "Dokun veya",
+          "goKeysAfter": "ile çevir",
+          "goTouch": "Çevirmek için dokun"
+        },
+        "q": {
+          "case_upper": "İngilizcenin normal yazdığı yerde büyük harf mi, normal mi?",
+          "case_title": "İlk kelimeden sonraki her kelime büyük harfle mi başlasın, yoksa hayır mı?",
+          "compound": "Bitişik mi, ayrı mı yazılsın?",
+          "verb_form": "Düğmelerde emir kipi mi, mastar mı?",
+          "abbr": "Kısaltma mı, açık yazım mı?",
+          "term": "“{{term}}” her yerde nasıl adlandırılsın?",
+          "wording": "“{{en}}” için hangi çeviri uygun?",
+          "short": "Yazım kuralı"
+        },
+        "opt": {
+          "case_upper": {
+            "a": "Normal",
+            "b": "BÜYÜK HARF"
+          },
+          "case_title": {
+            "a": "Cümle düzeni",
+            "b": "Her Kelime Büyük Harfle"
+          },
+          "compound": {
+            "a": "Bitişik",
+            "b": "Ayrı / tireli"
+          },
+          "verb_form": {
+            "a": "Emir kipi (Annulla)",
+            "b": "Mastar (Annullare)"
+          },
+          "abbr": {
+            "a": "Kısaltma",
+            "b": "Açık yazım"
+          }
+        },
+        "reason": {
+          "majority": "Çoğunluk {{a}} : {{b}}",
+          "community": "Topluluk paketinden metin",
+          "ai": "Yapay zekâ metni, topluluk metni yok",
+          "votes": "Daha çok oy ({{a}} : {{b}}), net çoğunluk yok",
+          "bracket": "Yabancı parantez notu kaldırıldı",
+          "whitespace": "Yalnızca boşluklar düzeltildi",
+          "casing_source": "İngilizcedeki gibi yazım",
+          "convention": "Yazım kuralına göre",
+          "only_left": "Diğer seçenek yanlış olarak işaretlendi"
+        },
+        "own": {
+          "both": "İkisi de yanlış, kendim yazayım",
+          "short": "Kendi metnin",
+          "title": "Kendi metnin",
+          "text": "“{{en}}” için metnin – sonraki öğrenme işleminden itibaren geçerli olur.",
+          "label": "Metnin",
+          "confirm": "Uygula"
+        },
+        "exception": {
+          "action": "Bir dil için istisna",
+          "title": "Bir dil için istisna",
+          "text": "Hangi dil diğer seçeneği alsın? Ardından diğer tüm diller için seçeneği belirle.",
+          "none": "İstisna yok",
+          "chip": "İstisna: {{lang}} diğerini alır"
+        },
+        "swipe": {
+          "left": "← sol: {{label}}",
+          "right": "→ sağ: {{label}}",
+          "up": "↑ yukarı: Benim kararım değil"
+        },
+        "keys": {
+          "title": "Tuşlar",
+          "pick": "sol / sağ cevap (ayrıca 1 / 2)",
+          "own": "kendi metnin",
+          "notMine": "Benim kararım değil",
+          "exception": "Bir dil için istisna",
+          "turn": "Desteyi çevir, sonraki kart",
+          "undo": "Geri al",
+          "sheet": "bu genel bakış"
+        },
+        "undo": {
+          "answered": "“{{en}}” için “{{text}}” seçildi",
+          "answeredRule": "“{{text}}” kural olarak seçildi",
+          "notMine": "“{{text}}” yapay zekâya bırakıldı",
+          "wrong": "“{{text}}” yanlış olarak işaretlendi",
+          "ok": "“{{text}}” korundu",
+          "detailOne": "1 metin · Ctrl+Z ile de",
+          "detail": "{{count}} metin · Ctrl+Z ile de",
+          "detailTouchOne": "1 metin",
+          "detailTouch": "{{count}} metin",
+          "detailShort": "Ctrl+Z ile de"
+        },
+        "veto": {
+          "headUnsure": "önce belirsizler",
+          "headAllOne": "1 bekliyor",
+          "headAuto": "{{count}} otomatik karara bağlandı",
+          "headAll": "{{count}} bekliyor",
+          "headNote": "hiçbir şey yapmamak kabul etmek demektir",
+          "source": "İngilizce “{{en}}”",
+          "unsure": "belirsiz",
+          "meaning": "Almancası",
+          "meaningPending": "Almanca anlamı geliyor",
+          "wrong": "Yanlış görünüyor",
+          "ok": "Uygun",
+          "reviewWrongHint": "Kart destene geri döner ve sen karar verirsin",
+          "wrongHint": "Yapay zekâ sonraki öğrenme işleminde yeniden karar verir; bu seçenek artık kazanmaz",
+          "okHint": "Yapay zekâ metni kalır, ardından sonraki yapay zekâ kartı gelir",
+          "acceptAll": "Kalanı kabul et",
+          "acceptAllTitle": "Kalanı kabul et?",
+          "acceptAllTextOne": "{{lang}} için kalan yapay zekâ kararı sonraki öğrenme işleminden itibaren geçerli olur. Bu puan kazandırmaz ve geri alınamaz.",
+          "acceptAllText": "{{lang}} için kalan {{count}} yapay zekâ kararı sonraki öğrenme işleminden itibaren geçerli olur. Bu puan kazandırmaz ve geri alınamaz.",
+          "emptyTitle": "{{lang}} için kontrol edilecek bir şey yok",
+          "empty": "Bu dilin tüm yapay zekâ kararları kontrol edildi veya kabul edildi. Yenileri sonraki öğrenme işlemiyle gelir."
+        },
+        "finish": {
+          "title": "{{lang}} için her şey çözüldü",
+          "sum": "{{cards}} · {{texts}} birleştirildi",
+          "points": "puan",
+          "split": "{{cards}} için {{base}}, tam günlük hedef için {{bonus}} bonus",
+          "none": "Şu anda bu dil için açık kart yok.",
+          "when": "Sonraki öğrenme işleminde etkili olur (sonraki veri yüklemesi veya Kaynaklar sekmesinde “Öğren”).",
+          "restOne": "Kalan ≈ 1 kartı cevaplarınla yeniden kontrol eder.",
+          "rest": "Kalan ≈ {{count}} kartı cevaplarınla yeniden kontrol eder.",
+          "pair": "“{{en}}” → {{text}}",
+          "rule": "Yazım: {{label}}"
+        },
+        "langNames": {
+          "de": "Almanca",
+          "es": "İspanyolca",
+          "fr": "Fransızca",
+          "it": "İtalyanca",
+          "ja": "Japonca",
+          "ko": "Korece",
+          "pl": "Lehçe",
+          "pt-BR": "Portekizce",
+          "ru": "Rusça",
+          "zh-Hans": "Çince (basitleştirilmiş)",
+          "zh-Hant": "Çince (geleneksel)"
+        },
+        "langs": {
+          "open": "Diller: desten mi, yapay zekâ mı",
+          "title": "Hangi dili kim değerlendiriyor?",
+          "text": "“Desten”: dile kartlarla sen karar verirsin. “Yapay zekâ + veto”: yapay zekâ karar verir, sen gözden geçirip itiraz edersin.",
+          "mine": "Desten",
+          "ki": "Yapay zekâ + veto",
+          "save": "Kaydet",
+          "cancel": "İptal"
+        }
       },
       "sources": {
         "title": "Kaynaklar",
@@ -4749,6 +4970,11 @@
         "editLabel": "Yeni metin",
         "saveEdit": "Metni kaydet",
         "resolved": "Uyarı çözüldü."
+      },
+      "crumb": "Yönetici",
+      "rail": {
+        "label": "Yapay zekâ çevirisi: bölümler",
+        "goto": "{{page}} bölümüne git"
       }
     }
   },
@@ -6225,7 +6451,15 @@
     "rankTierTooLow": "Bu, 5. seviyeden itibaren açılır.",
     "rankIdeaInvalid": "Bir fikir 3 ila 280 karakter olmalıdır.",
     "rankIdeaLimit": "Zaten 3 açık fikrin var.",
-    "rankIdeaGone": "Bu fikir artık yok veya arşivlendi."
+    "rankIdeaGone": "Bu fikir artık yok veya arşivlendi.",
+    "translation": {
+      "cards": {
+        "forbidden": "Bilgi kartlarını yalnızca yöneticiler cevaplayabilir.",
+        "invalid": "Bu cevap karta uymuyor. Lütfen girdiğin bilgileri kontrol et.",
+        "gone": "Bu kart zaten çözüldü. Deste yeniden yüklendi.",
+        "applied": "Öğrenme işlemi bu cevabı zaten uyguladı; artık geri alınamaz."
+      }
+    }
   },
   "pageHeader": {
     "crumbsAria": "Sayfa yolu",

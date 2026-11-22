@@ -4607,7 +4607,228 @@
       },
       "cards": {
         "title": "플래시카드",
-        "next": "다음 카드"
+        "next": "다음 카드",
+        "cardAria": "{{total}}장 중 {{n}}번째 카드",
+        "count": "{{n}} / {{total}}",
+        "affectsOne": "텍스트 1개에 영향",
+        "affects": "텍스트 {{count}}개에 영향",
+        "cardsN": "카드 {{count}}장",
+        "cardsNOne": "카드 1장",
+        "textsN": "텍스트 {{count}}개",
+        "when": "다음 학습 실행부터",
+        "allLangs": "전체 {{n}}개 언어",
+        "votes": "{{votes}}×",
+        "quoted": "“{{text}}”",
+        "forSubject": "“{{en}}”에 대해",
+        "notMine": "판단 넘기기",
+        "goalCap": "일일 목표",
+        "goalOf": "{{done}} / {{target}}",
+        "goalShort": "{{done}}/{{target}}",
+        "goalToday": "오늘 카드",
+        "goalDone": "달성",
+        "goalStep": "일일 목표 {{done}} / {{target}}",
+        "plusPoints": "+{{points}}점",
+        "plusBonus": "+{{points}} 보너스",
+        "unifiedOne": "텍스트 1개 통일",
+        "unified": "텍스트 {{count}}개 통일",
+        "hud": {
+          "aria": "내 현황",
+          "points": "점수",
+          "place": "순위",
+          "streak": "연속 기록"
+        },
+        "box": {
+          "goal": "일일 목표 및 언어",
+          "goalAria": "일일 목표 및 언어",
+          "langs": "언어",
+          "stats": "통계",
+          "statsAria": "통계",
+          "board": "순위표",
+          "week": "이번 주"
+        },
+        "row": {
+          "deck": "내 덱 · {{count}}장 남음",
+          "clear": "내 덱 · 모두 해결",
+          "ki": "AI가 {{count}}개",
+          "unsure": "불확실 {{count}}개",
+          "kiSummary": "AI가 {{count}}개를 결정했어요",
+          "waitingOne": "1개가 기다리고 있어요",
+          "auto": "자동 {{count}}개",
+          "autoHint": "자동으로 결정된 텍스트를 검토하고 되돌려요",
+          "waiting": "{{count}}개가 기다리고 있어요"
+        },
+        "stats": {
+          "place": "{{place}}위",
+          "gapOne": "{{place}}위까지 1점 남았어요",
+          "gap": "{{place}}위까지 {{points}}점 남았어요",
+          "leadOne": "2위보다 1점 앞서요",
+          "lead": "2위보다 {{points}}점 앞서요",
+          "alone": "이번 주에는 아직 다른 사람이 없어요",
+          "you": "나",
+          "unnamed": "이름 없는 관리자",
+          "weekNote": "이번 주 점수예요. 월요일에 새로 시작해요",
+          "streak": "연속 기록",
+          "daysOne": "1일",
+          "days": "{{days}}일",
+          "day0": "월",
+          "day1": "화",
+          "day2": "수",
+          "day3": "목",
+          "day4": "금",
+          "day5": "토",
+          "day6": "일"
+        },
+        "cover": {
+          "titleOne": "{{lang}} · 카드 1장",
+          "title": "{{lang}} · 카드 {{count}}장",
+          "subOne": "약 {{min}}분 · 텍스트 1개에 영향",
+          "sub": "약 {{min}}분 · 텍스트 {{count}}개에 영향",
+          "hint": "남은 카드 {{open}}장에서 미리 골라 둔 덱이라 끝이 있어요. 모든 카드는 왼쪽에 한 가지 선택지, 오른쪽에 다른 선택지가 있어요.",
+          "goKeys": "탭하거나",
+          "goKeysAfter": "키로 뒤집기",
+          "goTouch": "탭해서 뒤집기"
+        },
+        "q": {
+          "case_upper": "영어가 일반 표기로 쓰는 곳에서 대문자로 쓸까요, 일반 표기로 쓸까요?",
+          "case_title": "첫 단어 다음의 모든 단어를 대문자로 시작할까요?",
+          "compound": "붙여 쓸까요, 띄어 쓸까요?",
+          "verb_form": "버튼에는 명령형과 부정사 중 무엇을 쓸까요?",
+          "abbr": "약어로 쓸까요, 풀어 쓸까요?",
+          "term": "“{{term}}”을(를) 어디서나 뭐라고 부를까요?",
+          "wording": "“{{en}}”에 맞는 번역은 무엇인가요?",
+          "short": "표기 규칙"
+        },
+        "opt": {
+          "case_upper": {
+            "a": "일반",
+            "b": "모두 대문자"
+          },
+          "case_title": {
+            "a": "문장 첫 글자만 대문자",
+            "b": "모든 단어 첫 글자 대문자"
+          },
+          "compound": {
+            "a": "붙여 쓰기",
+            "b": "띄어 쓰기 / 하이픈"
+          },
+          "verb_form": {
+            "a": "명령형 (Annulla)",
+            "b": "부정사 (Annullare)"
+          },
+          "abbr": {
+            "a": "약어",
+            "b": "풀어 쓰기"
+          }
+        },
+        "reason": {
+          "majority": "다수 {{a}} : {{b}}",
+          "community": "커뮤니티 팩의 텍스트",
+          "ai": "AI 텍스트, 커뮤니티 텍스트 없음",
+          "votes": "더 많은 표 ({{a}} : {{b}}), 뚜렷한 다수 없음",
+          "bracket": "외부 괄호 메모 제거",
+          "whitespace": "공백만 정리",
+          "casing_source": "영어와 같은 표기",
+          "convention": "정한 표기 규칙에 따름",
+          "only_left": "다른 선택지가 틀림으로 표시됐어요"
+        },
+        "own": {
+          "both": "둘 다 틀려요, 직접 쓸게요",
+          "short": "직접 쓴 텍스트",
+          "title": "직접 쓴 텍스트",
+          "text": "“{{en}}”에 대한 내 텍스트 – 다음 학습 실행부터 적용돼요.",
+          "label": "내 텍스트",
+          "confirm": "적용"
+        },
+        "exception": {
+          "action": "한 언어만 예외",
+          "title": "한 언어만 예외",
+          "text": "어떤 언어가 다른 선택지를 쓰나요? 그다음 나머지 모든 언어의 선택지를 골라요.",
+          "none": "예외 없음",
+          "chip": "예외: {{lang}}은(는) 다른 선택지"
+        },
+        "swipe": {
+          "left": "← 왼쪽: {{label}}",
+          "right": "→ 오른쪽: {{label}}",
+          "up": "↑ 위: 판단 넘기기"
+        },
+        "keys": {
+          "title": "키",
+          "pick": "왼쪽 / 오른쪽 답변 (1 / 2도 가능)",
+          "own": "직접 쓴 텍스트",
+          "notMine": "판단 넘기기",
+          "exception": "한 언어만 예외",
+          "turn": "덱 뒤집기, 다음 카드",
+          "undo": "되돌리기",
+          "sheet": "이 개요"
+        },
+        "undo": {
+          "answered": "“{{en}}”에 “{{text}}”을(를) 골랐어요",
+          "answeredRule": "“{{text}}”을(를) 규칙으로 골랐어요",
+          "notMine": "“{{text}}”을(를) AI에게 넘겼어요",
+          "wrong": "“{{text}}”을(를) 틀림으로 표시했어요",
+          "ok": "“{{text}}”을(를) 유지했어요",
+          "detailOne": "텍스트 1개 · Ctrl+Z로도 가능",
+          "detail": "텍스트 {{count}}개 · Ctrl+Z로도 가능",
+          "detailTouchOne": "텍스트 1개",
+          "detailTouch": "텍스트 {{count}}개",
+          "detailShort": "Ctrl+Z로도 가능"
+        },
+        "veto": {
+          "headUnsure": "불확실한 것 먼저",
+          "headAllOne": "1개 대기 중",
+          "headAuto": "{{count}}개 자동 결정",
+          "headAll": "{{count}}개 대기 중",
+          "headNote": "아무것도 안 하면 수락돼요",
+          "source": "영어 “{{en}}”",
+          "unsure": "불확실",
+          "meaning": "독일어로",
+          "meaningPending": "독일어 의미 준비 중",
+          "wrong": "틀려 보여요",
+          "ok": "괜찮아요",
+          "reviewWrongHint": "카드가 내 덱으로 돌아가고, 직접 결정해요",
+          "wrongHint": "다음 학습 실행에서 AI가 다시 결정하고, 이 선택지는 더 이상 채택되지 않아요",
+          "okHint": "AI 텍스트가 유지되고, 다음 AI 카드로 넘어가요",
+          "acceptAll": "나머지 수락",
+          "acceptAllTitle": "나머지를 수락할까요?",
+          "acceptAllTextOne": "{{lang}}의 남은 AI 결정 1개가 다음 학습 실행부터 적용돼요. 점수는 없고 되돌릴 수도 없어요.",
+          "acceptAllText": "{{lang}}의 남은 AI 결정 {{count}}개가 다음 학습 실행부터 적용돼요. 점수는 없고 되돌릴 수도 없어요.",
+          "emptyTitle": "{{lang}}에서 확인할 항목이 없어요",
+          "empty": "이 언어의 모든 AI 결정을 확인했거나 수락했어요. 새 결정은 다음 학습 실행과 함께 와요."
+        },
+        "finish": {
+          "title": "{{lang}} 모두 해결했어요",
+          "sum": "{{cards}} · {{texts}} 통일",
+          "points": "점",
+          "split": "{{cards}}에 {{base}}, 일일 목표 달성 보너스 {{bonus}}",
+          "none": "지금은 이 언어에 남은 카드가 없어요.",
+          "when": "다음 학습 실행(다음 데이터 업로드 또는 소스 탭의 “학습”) 때 적용돼요.",
+          "restOne": "남은 약 1장의 카드를 내 답변으로 다시 확인해요.",
+          "rest": "남은 약 {{count}}장의 카드를 내 답변으로 다시 확인해요.",
+          "pair": "“{{en}}” → {{text}}",
+          "rule": "표기: {{label}}"
+        },
+        "langNames": {
+          "de": "독일어",
+          "es": "스페인어",
+          "fr": "프랑스어",
+          "it": "이탈리아어",
+          "ja": "일본어",
+          "ko": "한국어",
+          "pl": "폴란드어",
+          "pt-BR": "포르투갈어",
+          "ru": "러시아어",
+          "zh-Hans": "중국어(간체)",
+          "zh-Hant": "중국어(번체)"
+        },
+        "langs": {
+          "open": "언어: 덱 또는 AI",
+          "title": "어떤 언어를 누가 판단하나요?",
+          "text": "“내 덱”: 해당 언어를 카드로 직접 결정해요. “AI + 거부권”: AI가 결정하고, 내가 검토해서 이의를 제기해요.",
+          "mine": "내 덱",
+          "ki": "AI + 거부권",
+          "save": "저장",
+          "cancel": "취소"
+        }
       },
       "sources": {
         "title": "출처",
@@ -4749,6 +4970,11 @@
         "editLabel": "새 텍스트",
         "saveEdit": "텍스트 저장",
         "resolved": "알림을 처리했어요."
+      },
+      "crumb": "관리자",
+      "rail": {
+        "label": "AI 번역: 섹션",
+        "goto": "{{page}}(으)로 이동"
       }
     }
   },
@@ -6225,7 +6451,15 @@
     "rankTierTooLow": "5단계부터 가능해요.",
     "rankIdeaInvalid": "아이디어는 3~280자여야 해요.",
     "rankIdeaLimit": "이미 진행 중인 아이디어가 3개 있어요.",
-    "rankIdeaGone": "이 아이디어는 더 이상 없거나 보관됐어요."
+    "rankIdeaGone": "이 아이디어는 더 이상 없거나 보관됐어요.",
+    "translation": {
+      "cards": {
+        "forbidden": "관리자만 플래시카드에 답할 수 있어요.",
+        "invalid": "이 답변은 카드에 맞지 않아요. 입력 내용을 확인하세요.",
+        "gone": "이 카드는 이미 해결됐어요. 덱을 다시 불러왔어요.",
+        "applied": "학습 실행이 이미 이 답변을 적용해서 더 이상 되돌릴 수 없어요."
+      }
+    }
   },
   "pageHeader": {
     "crumbsAria": "이동 경로",

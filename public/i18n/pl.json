@@ -4607,7 +4607,228 @@
       },
       "cards": {
         "title": "Fiszki",
-        "next": "Następna fiszka"
+        "next": "Następna fiszka",
+        "cardAria": "Fiszka {{n}} z {{total}}",
+        "count": "{{n}} z {{total}}",
+        "affectsOne": "dotyczy 1 tekstu",
+        "affects": "dotyczy tekstów: {{count}}",
+        "cardsN": "fiszki: {{count}}",
+        "cardsNOne": "1 fiszka",
+        "textsN": "teksty: {{count}}",
+        "when": "od następnego przebiegu uczenia",
+        "allLangs": "wszystkie języki ({{n}})",
+        "votes": "{{votes}}×",
+        "quoted": "„{{text}}”",
+        "forSubject": "dla „{{en}}”",
+        "notMine": "Nie moja decyzja",
+        "goalCap": "Cel dzienny",
+        "goalOf": "{{done}} / {{target}}",
+        "goalShort": "{{done}}/{{target}}",
+        "goalToday": "fiszek dziś",
+        "goalDone": "gotowe",
+        "goalStep": "Cel dzienny {{done}} / {{target}}",
+        "plusPoints": "+{{points}} pkt",
+        "plusBonus": "+{{points}} pkt bonusu",
+        "unifiedOne": "ujednolicono 1 tekst",
+        "unified": "ujednolicono tekstów: {{count}}",
+        "hud": {
+          "aria": "Twoja pozycja",
+          "points": "Punkty",
+          "place": "Miejsce",
+          "streak": "Seria"
+        },
+        "box": {
+          "goal": "Cel dzienny i języki",
+          "goalAria": "Cel dzienny i języki",
+          "langs": "Języki",
+          "stats": "Statystyki",
+          "statsAria": "Statystyki",
+          "board": "Ranking",
+          "week": "w tym tygodniu"
+        },
+        "row": {
+          "deck": "twoja talia · otwarte: {{count}}",
+          "clear": "twoja talia · wszystko rozstrzygnięte",
+          "ki": "od AI: {{count}}",
+          "unsure": "niepewne: {{count}}",
+          "kiSummary": "AI rozstrzygnęło: {{count}}",
+          "waitingOne": "1 czeka na ciebie",
+          "auto": "automatycznie: {{count}}",
+          "autoHint": "Przejrzyj i cofnij automatyczne decyzje",
+          "waiting": "czeka na ciebie: {{count}}"
+        },
+        "stats": {
+          "place": "Miejsce {{place}}",
+          "gapOne": "1 punkt do miejsca {{place}}",
+          "gap": "{{points}} pkt do miejsca {{place}}",
+          "leadOne": "1 punkt przewagi nad miejscem 2",
+          "lead": "{{points}} pkt przewagi nad miejscem 2",
+          "alone": "w tym tygodniu jeszcze nikogo więcej",
+          "you": "Ty",
+          "unnamed": "Admin bez nazwy",
+          "weekNote": "Punkty z tego tygodnia, w poniedziałek liczenie od nowa",
+          "streak": "Seria",
+          "daysOne": "1 dzień",
+          "days": "dni: {{days}}",
+          "day0": "Pn",
+          "day1": "Wt",
+          "day2": "Śr",
+          "day3": "Cz",
+          "day4": "Pt",
+          "day5": "So",
+          "day6": "Nd"
+        },
+        "cover": {
+          "titleOne": "{{lang}} · 1 fiszka",
+          "title": "{{lang}} · fiszki: {{count}}",
+          "subOne": "≈ {{min}} min · dotyczy 1 tekstu",
+          "sub": "≈ {{min}} min · dotyczy tekstów: {{count}}",
+          "hint": "Wstępnie wybrane spośród otwartych fiszek ({{open}}), talia ma koniec. Każda fiszka: jedna opcja po lewej, druga po prawej.",
+          "goKeys": "Stuknij lub",
+          "goKeysAfter": "aby odkryć",
+          "goTouch": "Stuknij, aby odkryć"
+        },
+        "q": {
+          "case_upper": "Wielkie litery czy normalnie tam, gdzie angielski pisze normalnie?",
+          "case_title": "Wielka litera w każdym słowie po pierwszym czy nie?",
+          "compound": "Pisać łącznie czy osobno?",
+          "verb_form": "Tryb rozkazujący czy bezokolicznik na przyciskach?",
+          "abbr": "Skrót czy pełna forma?",
+          "term": "Jak „{{term}}” ma się nazywać wszędzie?",
+          "wording": "Które tłumaczenie pasuje do „{{en}}”?",
+          "short": "Reguła pisowni"
+        },
+        "opt": {
+          "case_upper": {
+            "a": "Normalnie",
+            "b": "WIELKIE LITERY"
+          },
+          "case_title": {
+            "a": "Jak w zdaniu",
+            "b": "Każde Słowo Wielką Literą"
+          },
+          "compound": {
+            "a": "Łącznie",
+            "b": "Osobno / z łącznikiem"
+          },
+          "verb_form": {
+            "a": "Tryb rozkazujący (Annulla)",
+            "b": "Bezokolicznik (Annullare)"
+          },
+          "abbr": {
+            "a": "Skrót",
+            "b": "Pełna forma"
+          }
+        },
+        "reason": {
+          "majority": "Większość {{a}} : {{b}}",
+          "community": "Tekst z paczki społeczności",
+          "ai": "Tekst AI, brak tekstu społeczności",
+          "votes": "Więcej głosów ({{a}} : {{b}}), brak wyraźnej większości",
+          "bracket": "Usunięto obcy dopisek w nawiasie",
+          "whitespace": "Poprawiono tylko białe znaki",
+          "casing_source": "Pisownia jak w angielskim",
+          "convention": "Zgodnie z twoją regułą pisowni",
+          "only_left": "Druga opcja została oznaczona jako błędna"
+        },
+        "own": {
+          "both": "Obie błędne, napiszę własny",
+          "short": "Własny tekst",
+          "title": "Własny tekst",
+          "text": "Twój tekst dla „{{en}}” – obowiązuje od następnego przebiegu uczenia.",
+          "label": "Twój tekst",
+          "confirm": "Zastosuj"
+        },
+        "exception": {
+          "action": "Wyjątek dla jednego języka",
+          "title": "Wyjątek dla jednego języka",
+          "text": "Który język bierze drugą opcję? Potem wybierz opcję dla wszystkich pozostałych.",
+          "none": "Bez wyjątku",
+          "chip": "Wyjątek: {{lang}} bierze drugą"
+        },
+        "swipe": {
+          "left": "← w lewo: {{label}}",
+          "right": "→ w prawo: {{label}}",
+          "up": "↑ w górę: Nie moja decyzja"
+        },
+        "keys": {
+          "title": "Klawisze",
+          "pick": "lewa / prawa odpowiedź (także 1 / 2)",
+          "own": "własny tekst",
+          "notMine": "Nie moja decyzja",
+          "exception": "Wyjątek dla jednego języka",
+          "turn": "Odkryj talię, następna fiszka",
+          "undo": "Cofnij",
+          "sheet": "ten przegląd"
+        },
+        "undo": {
+          "answered": "Wybrano „{{text}}” dla „{{en}}”",
+          "answeredRule": "Wybrano „{{text}}” jako regułę",
+          "notMine": "Przekazano „{{text}}” do AI",
+          "wrong": "Oznaczono „{{text}}” jako błędne",
+          "ok": "Zachowano „{{text}}”",
+          "detailOne": "1 tekst · także przez Ctrl+Z",
+          "detail": "teksty: {{count}} · także przez Ctrl+Z",
+          "detailTouchOne": "1 tekst",
+          "detailTouch": "teksty: {{count}}",
+          "detailShort": "także przez Ctrl+Z"
+        },
+        "veto": {
+          "headUnsure": "najpierw niepewne",
+          "headAllOne": "1 czeka",
+          "headAuto": "rozstrzygnięte automatycznie: {{count}}",
+          "headAll": "czeka: {{count}}",
+          "headNote": "brak działania oznacza akceptację",
+          "source": "Angielski „{{en}}”",
+          "unsure": "niepewne",
+          "meaning": "po niemiecku",
+          "meaningPending": "Znaczenie po niemiecku wkrótce",
+          "wrong": "Wygląda na błąd",
+          "ok": "Pasuje",
+          "reviewWrongHint": "Fiszka wraca do twojej talii, a ty decydujesz",
+          "wrongHint": "AI rozstrzygnie ponownie przy następnym przebiegu uczenia; ta opcja już nie wygra",
+          "okHint": "Tekst AI zostaje, potem przychodzi następna fiszka AI",
+          "acceptAll": "Zaakceptuj resztę",
+          "acceptAllTitle": "Zaakceptować resztę?",
+          "acceptAllTextOne": "Pozostała decyzja AI dla {{lang}} obowiązuje od następnego przebiegu uczenia. Nie daje to punktów i nie można tego cofnąć.",
+          "acceptAllText": "Pozostałe decyzje AI dla {{lang}} ({{count}}) obowiązują od następnego przebiegu uczenia. Nie daje to punktów i nie można tego cofnąć.",
+          "emptyTitle": "Nic do sprawdzenia dla {{lang}}",
+          "empty": "Każda decyzja AI dla tego języka jest sprawdzona lub zaakceptowana. Nowe pojawią się z następnym przebiegiem uczenia."
+        },
+        "finish": {
+          "title": "Wszystko rozstrzygnięte dla {{lang}}",
+          "sum": "{{cards}} · ujednolicono {{texts}}",
+          "points": "pkt",
+          "split": "{{base}} za {{cards}}, {{bonus}} bonusu za pełny cel dzienny",
+          "none": "Obecnie brak otwartych fiszek dla tego języka.",
+          "when": "Działa przy następnym przebiegu uczenia (następny upload danych lub „Ucz się” w zakładce Źródła).",
+          "restOne": "Sprawdzi on ponownie pozostałą ≈ 1 fiszkę z twoimi odpowiedziami.",
+          "rest": "Sprawdzi on ponownie pozostałe fiszki (≈ {{count}}) z twoimi odpowiedziami.",
+          "pair": "„{{en}}” → {{text}}",
+          "rule": "Pisownia: {{label}}"
+        },
+        "langNames": {
+          "de": "Niemiecki",
+          "es": "Hiszpański",
+          "fr": "Francuski",
+          "it": "Włoski",
+          "ja": "Japoński",
+          "ko": "Koreański",
+          "pl": "Polski",
+          "pt-BR": "Portugalski",
+          "ru": "Rosyjski",
+          "zh-Hans": "Chiński (uproszczony)",
+          "zh-Hant": "Chiński (tradycyjny)"
+        },
+        "langs": {
+          "open": "Języki: twoja talia czy AI",
+          "title": "Kto ocenia który język?",
+          "text": "„Twoja talia”: decydujesz o języku za pomocą fiszek. „AI + weto”: AI decyduje, ty sprawdzasz i zgłaszasz sprzeciw.",
+          "mine": "Twoja talia",
+          "ki": "AI + weto",
+          "save": "Zapisz",
+          "cancel": "Anuluj"
+        }
       },
       "sources": {
         "title": "Źródła",
@@ -4749,6 +4970,11 @@
         "editLabel": "Nowy tekst",
         "saveEdit": "Zapisz tekst",
         "resolved": "Alert rozwiązany."
+      },
+      "crumb": "Admin",
+      "rail": {
+        "label": "Tłumaczenie AI: sekcje",
+        "goto": "Przejdź do: {{page}}"
       }
     }
   },
@@ -6225,7 +6451,15 @@
     "rankTierTooLow": "To odblokowuje się od poziomu 5.",
     "rankIdeaInvalid": "Pomysł musi mieć od 3 do 280 znaków.",
     "rankIdeaLimit": "Masz już 3 otwarte pomysły.",
-    "rankIdeaGone": "Tego pomysłu już nie ma lub jest zarchiwizowany."
+    "rankIdeaGone": "Tego pomysłu już nie ma lub jest zarchiwizowany.",
+    "translation": {
+      "cards": {
+        "forbidden": "Tylko admini mogą odpowiadać na fiszki.",
+        "invalid": "Ta odpowiedź nie pasuje do fiszki. Sprawdź wprowadzone dane.",
+        "gone": "Ta fiszka jest już rozstrzygnięta. Talia została wczytana ponownie.",
+        "applied": "Przebieg uczenia już zastosował tę odpowiedź; nie można jej już cofnąć."
+      }
+    }
   },
   "pageHeader": {
     "crumbsAria": "Ścieżka nawigacji",

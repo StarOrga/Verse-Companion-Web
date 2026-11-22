@@ -4607,7 +4607,228 @@
       },
       "cards": {
         "title": "闪卡",
-        "next": "下一张卡片"
+        "next": "下一张卡片",
+        "cardAria": "第 {{n}} 张卡片，共 {{total}} 张",
+        "count": "{{n}} / {{total}}",
+        "affectsOne": "影响 1 条文本",
+        "affects": "影响 {{count}} 条文本",
+        "cardsN": "{{count}} 张卡片",
+        "cardsNOne": "1 张卡片",
+        "textsN": "{{count}} 条文本",
+        "when": "从下次学习运行起",
+        "allLangs": "全部 {{n}} 种语言",
+        "votes": "{{votes}}×",
+        "quoted": "“{{text}}”",
+        "forSubject": "针对“{{en}}”",
+        "notMine": "不由我决定",
+        "goalCap": "每日目标",
+        "goalOf": "{{done}} / {{target}}",
+        "goalShort": "{{done}}/{{target}}",
+        "goalToday": "今日卡片",
+        "goalDone": "已完成",
+        "goalStep": "每日目标 {{done}} / {{target}}",
+        "plusPoints": "+{{points}} 分",
+        "plusBonus": "+{{points}} 奖励",
+        "unifiedOne": "已统一 1 条文本",
+        "unified": "已统一 {{count}} 条文本",
+        "hud": {
+          "aria": "你的进度",
+          "points": "积分",
+          "place": "名次",
+          "streak": "连续天数"
+        },
+        "box": {
+          "goal": "每日目标与语言",
+          "goalAria": "每日目标与语言",
+          "langs": "语言",
+          "stats": "统计",
+          "statsAria": "统计",
+          "board": "排行榜",
+          "week": "本周"
+        },
+        "row": {
+          "deck": "你的卡组 · {{count}} 张待处理",
+          "clear": "你的卡组 · 已全部处理",
+          "ki": "AI 处理 {{count}} 条",
+          "unsure": "{{count}} 条不确定",
+          "kiSummary": "AI 已决定 {{count}} 条",
+          "waitingOne": "1 条等你处理",
+          "auto": "{{count}} 条自动",
+          "autoHint": "检查并撤销自动决定的文本",
+          "waiting": "{{count}} 条等你处理"
+        },
+        "stats": {
+          "place": "第 {{place}} 名",
+          "gapOne": "距第 {{place}} 名还差 1 分",
+          "gap": "距第 {{place}} 名还差 {{points}} 分",
+          "leadOne": "领先第 2 名 1 分",
+          "lead": "领先第 2 名 {{points}} 分",
+          "alone": "本周还没有其他人",
+          "you": "你",
+          "unnamed": "未命名管理员",
+          "weekNote": "本周积分，每周一重新开始",
+          "streak": "连续天数",
+          "daysOne": "1 天",
+          "days": "{{days}} 天",
+          "day0": "一",
+          "day1": "二",
+          "day2": "三",
+          "day3": "四",
+          "day4": "五",
+          "day5": "六",
+          "day6": "日"
+        },
+        "cover": {
+          "titleOne": "{{lang}} · 1 张卡片",
+          "title": "{{lang}} · {{count}} 张卡片",
+          "subOne": "约 {{min}} 分钟 · 影响 1 条文本",
+          "sub": "约 {{min}} 分钟 · 影响 {{count}} 条文本",
+          "hint": "从 {{open}} 张待处理卡片中预先挑选，卡组有尽头。每张卡片：左边一个选项，右边另一个选项。",
+          "goKeys": "点按或",
+          "goKeysAfter": "翻开",
+          "goTouch": "点按翻开"
+        },
+        "q": {
+          "case_upper": "英文用常规写法的地方，用大写还是常规写法？",
+          "case_title": "首个单词之后的每个单词都首字母大写吗？",
+          "compound": "连写还是分开写？",
+          "verb_form": "按钮上用命令式还是不定式？",
+          "abbr": "用缩写还是全称？",
+          "term": "“{{term}}”在各处应统一叫什么？",
+          "wording": "哪个译文适合“{{en}}”？",
+          "short": "书写规则"
+        },
+        "opt": {
+          "case_upper": {
+            "a": "常规",
+            "b": "全大写"
+          },
+          "case_title": {
+            "a": "仅句首大写",
+            "b": "每个单词首字母大写"
+          },
+          "compound": {
+            "a": "连写",
+            "b": "分开 / 加连字符"
+          },
+          "verb_form": {
+            "a": "命令式（Annulla）",
+            "b": "不定式（Annullare）"
+          },
+          "abbr": {
+            "a": "缩写",
+            "b": "全称"
+          }
+        },
+        "reason": {
+          "majority": "多数 {{a}} : {{b}}",
+          "community": "来自社区语言包的文本",
+          "ai": "AI 文本，没有社区文本",
+          "votes": "票数更多（{{a}} : {{b}}），但无明显多数",
+          "bracket": "已移除外来括注",
+          "whitespace": "仅清理了空白",
+          "casing_source": "与英文写法一致",
+          "convention": "遵循你们的书写规则",
+          "only_left": "另一个选项已被标记为错误"
+        },
+        "own": {
+          "both": "两个都不对，自己写",
+          "short": "自定义文本",
+          "title": "自定义文本",
+          "text": "你为“{{en}}”写的文本，从下次学习运行起生效。",
+          "label": "你的文本",
+          "confirm": "应用"
+        },
+        "exception": {
+          "action": "单个语言例外",
+          "title": "单个语言例外",
+          "text": "哪种语言采用另一个选项？然后为其余所有语言选择选项。",
+          "none": "无例外",
+          "chip": "例外：{{lang}} 采用另一个"
+        },
+        "swipe": {
+          "left": "← 左：{{label}}",
+          "right": "→ 右：{{label}}",
+          "up": "↑ 上：不由我决定"
+        },
+        "keys": {
+          "title": "按键",
+          "pick": "左 / 右答案（也可用 1 / 2）",
+          "own": "自定义文本",
+          "notMine": "不由我决定",
+          "exception": "单个语言例外",
+          "turn": "翻开卡组，下一张卡片",
+          "undo": "撤销",
+          "sheet": "此概览"
+        },
+        "undo": {
+          "answered": "已为“{{en}}”选择“{{text}}”",
+          "answeredRule": "已将“{{text}}”选为规则",
+          "notMine": "已将“{{text}}”交给 AI",
+          "wrong": "已将“{{text}}”标记为错误",
+          "ok": "已保留“{{text}}”",
+          "detailOne": "1 条文本 · 也可按 Ctrl+Z",
+          "detail": "{{count}} 条文本 · 也可按 Ctrl+Z",
+          "detailTouchOne": "1 条文本",
+          "detailTouch": "{{count}} 条文本",
+          "detailShort": "也可按 Ctrl+Z"
+        },
+        "veto": {
+          "headUnsure": "不确定的优先",
+          "headAllOne": "1 条待处理",
+          "headAuto": "{{count}} 条已自动决定",
+          "headAll": "{{count}} 条待处理",
+          "headNote": "不操作即视为接受",
+          "source": "英文“{{en}}”",
+          "unsure": "不确定",
+          "meaning": "德语含义",
+          "meaningPending": "德语含义即将提供",
+          "wrong": "看起来不对",
+          "ok": "没问题",
+          "reviewWrongHint": "卡片回到你的卡组，由你决定",
+          "wrongHint": "AI 会在下次学习运行时重新决定，此选项不再胜出",
+          "okHint": "保留 AI 文本，接着显示下一张 AI 卡片",
+          "acceptAll": "接受其余",
+          "acceptAllTitle": "接受其余全部？",
+          "acceptAllTextOne": "{{lang}} 剩余的 1 条 AI 决定将从下次学习运行起生效。此操作不得分，且无法撤销。",
+          "acceptAllText": "{{lang}} 剩余的 {{count}} 条 AI 决定将从下次学习运行起生效。此操作不得分，且无法撤销。",
+          "emptyTitle": "{{lang}} 没有需要检查的内容",
+          "empty": "此语言的所有 AI 决定都已检查或接受。新的决定会随下次学习运行到来。"
+        },
+        "finish": {
+          "title": "{{lang}} 已全部处理",
+          "sum": "{{cards}} · 已统一 {{texts}}",
+          "points": "积分",
+          "split": "{{cards}} 得 {{base}}，完成每日目标奖励 {{bonus}}",
+          "none": "此语言目前没有待处理的卡片。",
+          "when": "在下次学习运行时生效（下次数据上传，或在“来源”标签页中点击“学习”）。",
+          "restOne": "它会根据你的答案重新检查剩余约 1 张卡片。",
+          "rest": "它会根据你的答案重新检查剩余约 {{count}} 张卡片。",
+          "pair": "“{{en}}” → {{text}}",
+          "rule": "书写方式：{{label}}"
+        },
+        "langNames": {
+          "de": "德语",
+          "es": "西班牙语",
+          "fr": "法语",
+          "it": "意大利语",
+          "ja": "日语",
+          "ko": "韩语",
+          "pl": "波兰语",
+          "pt-BR": "葡萄牙语",
+          "ru": "俄语",
+          "zh-Hans": "中文（简体）",
+          "zh-Hant": "中文（繁体）"
+        },
+        "langs": {
+          "open": "语言：卡组还是 AI",
+          "title": "谁来评判哪种语言？",
+          "text": "“你的卡组”：你以卡片形式决定该语言。“AI + 否决”：由 AI 决定，你来检查并提出异议。",
+          "mine": "你的卡组",
+          "ki": "AI + 否决",
+          "save": "保存",
+          "cancel": "取消"
+        }
       },
       "sources": {
         "title": "来源",
@@ -4749,6 +4970,11 @@
         "editLabel": "新文本",
         "saveEdit": "保存文本",
         "resolved": "提醒已处理。"
+      },
+      "crumb": "管理员",
+      "rail": {
+        "label": "AI 翻译：分区",
+        "goto": "前往 {{page}}"
       }
     }
   },
@@ -6225,7 +6451,15 @@
     "rankTierTooLow": "需要达到 5 级才能使用。",
     "rankIdeaInvalid": "创意需要 3 到 280 个字符。",
     "rankIdeaLimit": "你已经有 3 个未处理的创意了。",
-    "rankIdeaGone": "此创意已不存在或已归档。"
+    "rankIdeaGone": "此创意已不存在或已归档。",
+    "translation": {
+      "cards": {
+        "forbidden": "只有管理员可以回答闪卡。",
+        "invalid": "此答案与卡片不符。请检查你的输入。",
+        "gone": "此卡片已处理。卡组已重新加载。",
+        "applied": "学习运行已应用此答案，无法再撤销。"
+      }
+    }
   },
   "pageHeader": {
     "crumbsAria": "路径导航",

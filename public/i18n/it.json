@@ -4607,7 +4607,228 @@
       },
       "cards": {
         "title": "Flashcard",
-        "next": "Prossima carta"
+        "next": "Prossima carta",
+        "cardAria": "Carta {{n}} di {{total}}",
+        "count": "{{n}} di {{total}}",
+        "affectsOne": "riguarda 1 testo",
+        "affects": "riguarda {{count}} testi",
+        "cardsN": "{{count}} carte",
+        "cardsNOne": "1 carta",
+        "textsN": "{{count}} testi",
+        "when": "dalla prossima fase di apprendimento",
+        "allLangs": "tutte le {{n}} lingue",
+        "votes": "{{votes}}×",
+        "quoted": "«{{text}}»",
+        "forSubject": "per «{{en}}»",
+        "notMine": "Non spetta a me",
+        "goalCap": "Obiettivo giornaliero",
+        "goalOf": "{{done}} / {{target}}",
+        "goalShort": "{{done}}/{{target}}",
+        "goalToday": "carte oggi",
+        "goalDone": "raggiunto",
+        "goalStep": "Obiettivo giornaliero {{done}} / {{target}}",
+        "plusPoints": "+{{points}} punti",
+        "plusBonus": "+{{points}} di bonus",
+        "unifiedOne": "1 testo uniformato",
+        "unified": "{{count}} testi uniformati",
+        "hud": {
+          "aria": "La tua posizione",
+          "points": "Punti",
+          "place": "Posizione",
+          "streak": "Serie"
+        },
+        "box": {
+          "goal": "Obiettivo giornaliero & lingue",
+          "goalAria": "Obiettivo giornaliero e lingue",
+          "langs": "Lingue",
+          "stats": "Statistiche",
+          "statsAria": "Statistiche",
+          "board": "Classifica",
+          "week": "questa settimana"
+        },
+        "row": {
+          "deck": "il tuo mazzo · {{count}} aperte",
+          "clear": "il tuo mazzo · tutto risolto",
+          "ki": "{{count}} dall'IA",
+          "unsure": "{{count}} incerte",
+          "kiSummary": "L'IA ne ha decise {{count}}",
+          "waitingOne": "1 ti aspetta",
+          "auto": "{{count}} automatiche",
+          "autoHint": "Controlla e annulla le decisioni automatiche",
+          "waiting": "{{count}} ti aspettano"
+        },
+        "stats": {
+          "place": "Posizione {{place}}",
+          "gapOne": "1 punto alla posizione {{place}}",
+          "gap": "{{points}} punti alla posizione {{place}}",
+          "leadOne": "1 punto di vantaggio sulla posizione 2",
+          "lead": "{{points}} punti di vantaggio sulla posizione 2",
+          "alone": "ancora nessun altro questa settimana",
+          "you": "Tu",
+          "unnamed": "Admin senza nome",
+          "weekNote": "Punti di questa settimana, il lunedì si riparte da zero",
+          "streak": "Serie",
+          "daysOne": "1 giorno",
+          "days": "{{days}} giorni",
+          "day0": "Lu",
+          "day1": "Ma",
+          "day2": "Me",
+          "day3": "Gi",
+          "day4": "Ve",
+          "day5": "Sa",
+          "day6": "Do"
+        },
+        "cover": {
+          "titleOne": "{{lang}} · 1 carta",
+          "title": "{{lang}} · {{count}} carte",
+          "subOne": "≈ {{min}} min · riguarda 1 testo",
+          "sub": "≈ {{min}} min · riguarda {{count}} testi",
+          "hint": "Preselezionato tra {{open}} carte aperte, il mazzo ha una fine. Ogni carta: un'opzione a sinistra, l'altra a destra.",
+          "goKeys": "Tocca o",
+          "goKeysAfter": "per girare",
+          "goTouch": "Tocca per girare"
+        },
+        "q": {
+          "case_upper": "Maiuscolo o normale dove l'inglese scrive normale?",
+          "case_title": "Maiuscola su ogni parola dopo la prima, o no?",
+          "compound": "Scritto unito o separato?",
+          "verb_form": "Imperativo o infinito sui pulsanti?",
+          "abbr": "Abbreviazione o per esteso?",
+          "term": "Come deve chiamarsi «{{term}}» ovunque?",
+          "wording": "Quale traduzione si adatta a «{{en}}»?",
+          "short": "Regola di scrittura"
+        },
+        "opt": {
+          "case_upper": {
+            "a": "Normale",
+            "b": "MAIUSCOLO"
+          },
+          "case_title": {
+            "a": "Come una frase",
+            "b": "Ogni Parola Maiuscola"
+          },
+          "compound": {
+            "a": "Unito",
+            "b": "Separato / con trattino"
+          },
+          "verb_form": {
+            "a": "Imperativo (Annulla)",
+            "b": "Infinito (Annullare)"
+          },
+          "abbr": {
+            "a": "Abbreviazione",
+            "b": "Per esteso"
+          }
+        },
+        "reason": {
+          "majority": "Maggioranza {{a}} : {{b}}",
+          "community": "Testo dal pacchetto della community",
+          "ai": "Testo IA, nessun testo della community disponibile",
+          "votes": "Più voti ({{a}} : {{b}}), nessuna maggioranza chiara",
+          "bracket": "Nota estranea tra parentesi rimossa",
+          "whitespace": "Ripuliti solo gli spazi",
+          "casing_source": "Scrittura come in inglese",
+          "convention": "Secondo la tua regola di scrittura",
+          "only_left": "L'altra opzione è stata segnata come sbagliata"
+        },
+        "own": {
+          "both": "Entrambe sbagliate, scrivo la mia",
+          "short": "Testo personale",
+          "title": "Testo personale",
+          "text": "Il tuo testo per «{{en}}» – vale dalla prossima fase di apprendimento.",
+          "label": "Il tuo testo",
+          "confirm": "Applica"
+        },
+        "exception": {
+          "action": "Eccezione per una lingua",
+          "title": "Eccezione per una lingua",
+          "text": "Quale lingua prende l'altra opzione? Poi scegli l'opzione per tutte le altre.",
+          "none": "Nessuna eccezione",
+          "chip": "Eccezione: {{lang}} prende l'altra"
+        },
+        "swipe": {
+          "left": "← sinistra: {{label}}",
+          "right": "→ destra: {{label}}",
+          "up": "↑ su: Non spetta a me"
+        },
+        "keys": {
+          "title": "Tasti",
+          "pick": "risposta sinistra / destra (anche 1 / 2)",
+          "own": "testo personale",
+          "notMine": "Non spetta a me",
+          "exception": "Eccezione per una lingua",
+          "turn": "Gira il mazzo, carta successiva",
+          "undo": "Annulla",
+          "sheet": "questa panoramica"
+        },
+        "undo": {
+          "answered": "Scelto «{{text}}» per «{{en}}»",
+          "answeredRule": "Scelto «{{text}}» come regola",
+          "notMine": "«{{text}}» affidato all'IA",
+          "wrong": "«{{text}}» segnato come sbagliato",
+          "ok": "«{{text}}» mantenuto",
+          "detailOne": "1 testo · anche con Ctrl+Z",
+          "detail": "{{count}} testi · anche con Ctrl+Z",
+          "detailTouchOne": "1 testo",
+          "detailTouch": "{{count}} testi",
+          "detailShort": "anche con Ctrl+Z"
+        },
+        "veto": {
+          "headUnsure": "prima le incerte",
+          "headAllOne": "1 in attesa",
+          "headAuto": "{{count}} decise automaticamente",
+          "headAll": "{{count}} in attesa",
+          "headNote": "non fare nulla equivale ad accettare",
+          "source": "Inglese «{{en}}»",
+          "unsure": "incerta",
+          "meaning": "in tedesco",
+          "meaningPending": "Significato in tedesco in arrivo",
+          "wrong": "Sembra sbagliato",
+          "ok": "Va bene",
+          "reviewWrongHint": "La carta torna nel tuo mazzo e decidi tu",
+          "wrongHint": "L'IA decide di nuovo alla prossima fase di apprendimento; questa opzione non vince più",
+          "okHint": "Il testo IA resta, poi arriva la prossima carta IA",
+          "acceptAll": "Accetta il resto",
+          "acceptAllTitle": "Accettare il resto?",
+          "acceptAllTextOne": "La decisione IA rimanente per {{lang}} vale dalla prossima fase di apprendimento. Non dà punti e non si può annullare.",
+          "acceptAllText": "Le {{count}} decisioni IA rimanenti per {{lang}} valgono dalla prossima fase di apprendimento. Non danno punti e non si possono annullare.",
+          "emptyTitle": "Niente da controllare per {{lang}}",
+          "empty": "Tutte le decisioni IA di questa lingua sono controllate o accettate. Le nuove arrivano con la prossima fase di apprendimento."
+        },
+        "finish": {
+          "title": "Tutto risolto per {{lang}}",
+          "sum": "{{cards}} · {{texts}} uniformati",
+          "points": "punti",
+          "split": "{{base}} per {{cards}}, {{bonus}} di bonus per l'obiettivo giornaliero completo",
+          "none": "Al momento nessuna carta aperta per questa lingua.",
+          "when": "Ha effetto alla prossima fase di apprendimento (prossimo upload dei dati o «Apprendi» nella scheda Fonti).",
+          "restOne": "Ricontrolla la ≈ 1 carta rimanente con le tue risposte.",
+          "rest": "Ricontrolla le ≈ {{count}} carte rimanenti con le tue risposte.",
+          "pair": "«{{en}}» → {{text}}",
+          "rule": "Scrittura: {{label}}"
+        },
+        "langNames": {
+          "de": "Tedesco",
+          "es": "Spagnolo",
+          "fr": "Francese",
+          "it": "Italiano",
+          "ja": "Giapponese",
+          "ko": "Coreano",
+          "pl": "Polacco",
+          "pt-BR": "Portoghese",
+          "ru": "Russo",
+          "zh-Hans": "Cinese (semplificato)",
+          "zh-Hant": "Cinese (tradizionale)"
+        },
+        "langs": {
+          "open": "Lingue: il tuo mazzo o l'IA",
+          "title": "Chi valuta quale lingua?",
+          "text": "«Il tuo mazzo»: decidi tu la lingua come carte. «IA + veto»: l'IA decide, tu controlli e ti opponi.",
+          "mine": "Il tuo mazzo",
+          "ki": "IA + veto",
+          "save": "Salva",
+          "cancel": "Annulla"
+        }
       },
       "sources": {
         "title": "Fonti",
@@ -4749,6 +4970,11 @@
         "editLabel": "Nuovo testo",
         "saveEdit": "Salva testo",
         "resolved": "Avviso risolto."
+      },
+      "crumb": "Admin",
+      "rail": {
+        "label": "Traduzione IA: sezioni",
+        "goto": "Vai a {{page}}"
       }
     }
   },
@@ -6225,7 +6451,15 @@
     "rankTierTooLow": "Disponibile dal livello 5.",
     "rankIdeaInvalid": "Un'idea richiede da 3 a 280 caratteri.",
     "rankIdeaLimit": "Hai già 3 idee aperte.",
-    "rankIdeaGone": "Questa idea non esiste più o è archiviata."
+    "rankIdeaGone": "Questa idea non esiste più o è archiviata.",
+    "translation": {
+      "cards": {
+        "forbidden": "Solo gli admin possono rispondere alle carte.",
+        "invalid": "Questa risposta non è adatta alla carta. Controlla quanto inserito.",
+        "gone": "Questa carta è già risolta. Il mazzo è stato ricaricato.",
+        "applied": "La fase di apprendimento ha già applicato questa risposta; non si può più annullare."
+      }
+    }
   },
   "pageHeader": {
     "crumbsAria": "Percorso di navigazione",

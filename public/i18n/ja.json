@@ -4607,7 +4607,228 @@
       },
       "cards": {
         "title": "フラッシュカード",
-        "next": "次のカード"
+        "next": "次のカード",
+        "cardAria": "{{total}} 枚中 {{n}} 枚目のカード",
+        "count": "{{n}} / {{total}}",
+        "affectsOne": "1 件のテキストに影響",
+        "affects": "{{count}} 件のテキストに影響",
+        "cardsN": "{{count}} 枚のカード",
+        "cardsNOne": "1 枚のカード",
+        "textsN": "{{count}} 件のテキスト",
+        "when": "次回の学習実行から",
+        "allLangs": "全 {{n}} 言語",
+        "votes": "{{votes}}×",
+        "quoted": "「{{text}}」",
+        "forSubject": "「{{en}}」について",
+        "notMine": "自分では判断しない",
+        "goalCap": "1日の目標",
+        "goalOf": "{{done}} / {{target}}",
+        "goalShort": "{{done}}/{{target}}",
+        "goalToday": "今日のカード",
+        "goalDone": "達成",
+        "goalStep": "1日の目標 {{done}} / {{target}}",
+        "plusPoints": "+{{points}} ポイント",
+        "plusBonus": "+{{points}} ボーナス",
+        "unifiedOne": "1 件のテキストを統一",
+        "unified": "{{count}} 件のテキストを統一",
+        "hud": {
+          "aria": "あなたの状況",
+          "points": "ポイント",
+          "place": "順位",
+          "streak": "連続記録"
+        },
+        "box": {
+          "goal": "1日の目標と言語",
+          "goalAria": "1日の目標と言語",
+          "langs": "言語",
+          "stats": "統計",
+          "statsAria": "統計",
+          "board": "ランキング",
+          "week": "今週"
+        },
+        "row": {
+          "deck": "あなたのデッキ · 未解決 {{count}} 枚",
+          "clear": "あなたのデッキ · すべて解決済み",
+          "ki": "AI による {{count}} 件",
+          "unsure": "不確か {{count}} 件",
+          "kiSummary": "AI が {{count}} 件を判断",
+          "waitingOne": "1 件があなたを待っています",
+          "auto": "自動 {{count}} 件",
+          "autoHint": "自動で決定されたテキストを確認して取り消す",
+          "waiting": "{{count}} 件があなたを待っています"
+        },
+        "stats": {
+          "place": "{{place}} 位",
+          "gapOne": "{{place}} 位まであと 1 ポイント",
+          "gap": "{{place}} 位まであと {{points}} ポイント",
+          "leadOne": "2 位より 1 ポイント上",
+          "lead": "2 位より {{points}} ポイント上",
+          "alone": "今週はまだ他に誰もいません",
+          "you": "あなた",
+          "unnamed": "名前のない管理者",
+          "weekNote": "今週のポイント。月曜日にリセットされます",
+          "streak": "連続記録",
+          "daysOne": "1 日",
+          "days": "{{days}} 日",
+          "day0": "月",
+          "day1": "火",
+          "day2": "水",
+          "day3": "木",
+          "day4": "金",
+          "day5": "土",
+          "day6": "日"
+        },
+        "cover": {
+          "titleOne": "{{lang}} · 1 枚",
+          "title": "{{lang}} · {{count}} 枚",
+          "subOne": "約 {{min}} 分 · 1 件のテキストに影響",
+          "sub": "約 {{min}} 分 · {{count}} 件のテキストに影響",
+          "hint": "未解決の {{open}} 枚から事前に選別済みなので、デッキには終わりがあります。どのカードも、左に一方の選択肢、右にもう一方の選択肢があります。",
+          "goKeys": "タップまたは",
+          "goKeysAfter": "でめくる",
+          "goTouch": "タップしてめくる"
+        },
+        "q": {
+          "case_upper": "英語が通常の表記をする箇所は、大文字にしますか、それとも通常の表記にしますか？",
+          "case_title": "最初の単語より後もすべての単語を大文字で始めますか？",
+          "compound": "1 語で書きますか、それとも分けて書きますか？",
+          "verb_form": "ボタンは命令形と不定詞のどちらにしますか？",
+          "abbr": "略語にしますか、それとも省略せずに書きますか？",
+          "term": "「{{term}}」はどこでも何と呼びますか？",
+          "wording": "「{{en}}」に合う翻訳はどれですか？",
+          "short": "表記ルール"
+        },
+        "opt": {
+          "case_upper": {
+            "a": "通常",
+            "b": "すべて大文字"
+          },
+          "case_title": {
+            "a": "文頭のみ大文字",
+            "b": "各単語の先頭を大文字"
+          },
+          "compound": {
+            "a": "1 語",
+            "b": "分けて書く／ハイフン"
+          },
+          "verb_form": {
+            "a": "命令形（Annulla）",
+            "b": "不定詞（Annullare）"
+          },
+          "abbr": {
+            "a": "略語",
+            "b": "省略なし"
+          }
+        },
+        "reason": {
+          "majority": "多数 {{a}} : {{b}}",
+          "community": "コミュニティパッケージのテキスト",
+          "ai": "AI テキスト（コミュニティのテキストなし）",
+          "votes": "票数が多い（{{a}} : {{b}}）が、明確な多数ではない",
+          "bracket": "外部の括弧書きを削除",
+          "whitespace": "空白のみを整理",
+          "casing_source": "英語と同じ表記",
+          "convention": "設定した表記ルールに従う",
+          "only_left": "もう一方の選択肢は誤りとマークされました"
+        },
+        "own": {
+          "both": "どちらも誤り、自分で書く",
+          "short": "独自のテキスト",
+          "title": "独自のテキスト",
+          "text": "「{{en}}」に対するあなたのテキスト。次回の学習実行から適用されます。",
+          "label": "あなたのテキスト",
+          "confirm": "適用"
+        },
+        "exception": {
+          "action": "1 言語だけ例外にする",
+          "title": "1 言語だけの例外",
+          "text": "もう一方の選択肢を使う言語はどれですか？その後、残りのすべての言語の選択肢を選びます。",
+          "none": "例外なし",
+          "chip": "例外：{{lang}} はもう一方"
+        },
+        "swipe": {
+          "left": "← 左：{{label}}",
+          "right": "→ 右：{{label}}",
+          "up": "↑ 上：自分では判断しない"
+        },
+        "keys": {
+          "title": "キー",
+          "pick": "左／右の回答（1／2 も可）",
+          "own": "独自のテキスト",
+          "notMine": "自分では判断しない",
+          "exception": "1 言語だけ例外にする",
+          "turn": "デッキをめくって次のカードへ",
+          "undo": "元に戻す",
+          "sheet": "この一覧"
+        },
+        "undo": {
+          "answered": "「{{en}}」に「{{text}}」を選択しました",
+          "answeredRule": "「{{text}}」をルールとして選択しました",
+          "notMine": "「{{text}}」を AI に任せました",
+          "wrong": "「{{text}}」を誤りとしてマークしました",
+          "ok": "「{{text}}」を採用しました",
+          "detailOne": "1 件のテキスト · Ctrl+Z でも可",
+          "detail": "{{count}} 件のテキスト · Ctrl+Z でも可",
+          "detailTouchOne": "1 件のテキスト",
+          "detailTouch": "{{count}} 件のテキスト",
+          "detailShort": "Ctrl+Z でも可"
+        },
+        "veto": {
+          "headUnsure": "不確かなものから",
+          "headAllOne": "1 件待機中",
+          "headAuto": "{{count}} 件を自動で決定",
+          "headAll": "{{count}} 件待機中",
+          "headNote": "何もしなければ採用されます",
+          "source": "英語「{{en}}」",
+          "unsure": "不確か",
+          "meaning": "ドイツ語で",
+          "meaningPending": "ドイツ語の意味は準備中",
+          "wrong": "誤りに見える",
+          "ok": "問題なし",
+          "reviewWrongHint": "カードはあなたのデッキに戻り、あなたが判断します",
+          "wrongHint": "次回の学習実行で AI が判断し直し、この選択肢はもう採用されません",
+          "okHint": "AI テキストはそのまま残り、次の AI カードに進みます",
+          "acceptAll": "残りを採用",
+          "acceptAllTitle": "残りを採用しますか？",
+          "acceptAllTextOne": "{{lang}} の残り 1 件の AI 判断は、次回の学習実行から適用されます。ポイントは付与されず、元に戻すこともできません。",
+          "acceptAllText": "{{lang}} の残り {{count}} 件の AI 判断は、次回の学習実行から適用されます。ポイントは付与されず、元に戻すこともできません。",
+          "emptyTitle": "{{lang}} で確認するものはありません",
+          "empty": "この言語の AI 判断はすべて確認済みか採用済みです。新しいものは次回の学習実行で届きます。"
+        },
+        "finish": {
+          "title": "{{lang}} はすべて解決しました",
+          "sum": "{{cards}} · {{texts}} を統一",
+          "points": "ポイント",
+          "split": "{{cards}} で {{base}}、1日の目標達成で {{bonus}} ボーナス",
+          "none": "現在、この言語の未解決カードはありません。",
+          "when": "次回の学習実行（次のデータアップロード、または「ソース」タブの「学習」）で反映されます。",
+          "restOne": "残りの約 1 枚のカードを、あなたの回答をもとに再確認します。",
+          "rest": "残りの約 {{count}} 枚のカードを、あなたの回答をもとに再確認します。",
+          "pair": "「{{en}}」→ {{text}}",
+          "rule": "表記：{{label}}"
+        },
+        "langNames": {
+          "de": "ドイツ語",
+          "es": "スペイン語",
+          "fr": "フランス語",
+          "it": "イタリア語",
+          "ja": "日本語",
+          "ko": "韓国語",
+          "pl": "ポーランド語",
+          "pt-BR": "ポルトガル語",
+          "ru": "ロシア語",
+          "zh-Hans": "中国語（簡体字）",
+          "zh-Hant": "中国語（繁体字）"
+        },
+        "langs": {
+          "open": "言語：デッキか AI か",
+          "title": "どの言語を誰が判断しますか？",
+          "text": "「あなたのデッキ」：その言語をカードで自分で判断します。「AI + 拒否権」：AI が判断し、あなたが確認して異議を出します。",
+          "mine": "あなたのデッキ",
+          "ki": "AI + 拒否権",
+          "save": "保存",
+          "cancel": "キャンセル"
+        }
       },
       "sources": {
         "title": "ソース",
@@ -4749,6 +4970,11 @@
         "editLabel": "新しいテキスト",
         "saveEdit": "テキストを保存",
         "resolved": "アラートを解決しました。"
+      },
+      "crumb": "管理者",
+      "rail": {
+        "label": "AI翻訳：セクション",
+        "goto": "{{page}} へ移動"
       }
     }
   },
@@ -6225,7 +6451,15 @@
     "rankTierTooLow": "これはTier 5から利用できます。",
     "rankIdeaInvalid": "アイデアは3〜280文字で入力してください。",
     "rankIdeaLimit": "未処理のアイデアがすでに3件あります。",
-    "rankIdeaGone": "このアイデアは存在しないか、アーカイブされています。"
+    "rankIdeaGone": "このアイデアは存在しないか、アーカイブされています。",
+    "translation": {
+      "cards": {
+        "forbidden": "フラッシュカードに回答できるのは管理者のみです。",
+        "invalid": "この回答はカードに合いません。入力内容を確認してください。",
+        "gone": "このカードはすでに解決済みです。デッキを再読み込みしました。",
+        "applied": "学習実行がこの回答をすでに適用したため、元に戻せません。"
+      }
+    }
   },
   "pageHeader": {
     "crumbsAria": "パンくずリスト",
