@@ -20,8 +20,8 @@ const EN = {
     vote: {
       title: 'Community verdict', loading: 'Loading', tooFew: 'Not enough votes ({{n}} of {{min}})', tooFewSub: 'collecting',
       applied: 'Applied {{c}} ({{n}} votes, range {{hw}})', split: 'Split', splitSub: 'differs', confirmed: 'Confirmed', confirmedSub: 'in range',
-      sum: '{{n}} votes, {{c}}', yours: 'your verdict', blindTitle: 'Your verdict first', ask: 'How stable is {{line}}?', mine: 'Your verdict:',
-      changeFrom: 'changeable from {{time}}', hint: { stabil: 'a', wackelig: 'b', instabil: 'c' }, cannotJudge: 'Cannot judge', showNumber: 'Show number',
+      sum: '{{n}} votes, {{c}}', yours: 'your verdict', ask: 'How is {{line}} running for you?', mine: 'Your verdict:',
+      changeFrom: 'changeable from {{time}}', hint: { stabil: 'a', wackelig: 'b', instabil: 'c' },
       tooSoon: 'Wait {{h}} h', rules: 'rules', rulesBuild: 'build rules {{n}}', dailyCap: 'Cap {{n}} reached', buildClosed: 'Build closed', signedOut: 'Sign in to vote.', signIn: 'Sign in',
     },
   },
@@ -30,35 +30,30 @@ const EN = {
 describe('CommunityVerdictComponent', () => {
   const agg = signal<VoteAggregate | null>(AGG);
   const error = signal<string | null>(null);
-  const blind = signal(false);
   const user = signal<{ id: string } | null>({ id: 'u1' });
   const saving = signal(false);
   let castResult: CastResult = 'ok';
-  const calls = { cast: [] as string[], load: 0, reveal: 0 };
+  const calls = { cast: [] as string[], load: 0 };
 
   const votes = {
     line: signal('4.3'),
     aggregate: agg.asReadonly(),
     error: error.asReadonly(),
     saving: saving.asReadonly(),
-    blind,
     own: () => ({ verdict: agg()?.ownVerdict ?? null, nextChangeAt: agg()?.ownNextChangeAt ?? null }),
     correctionFor: (s: number) => (agg() ? communityCorrection(s, agg() as VoteAggregate) : null),
     ensure: () => undefined,
     load: async () => { calls.load++; },
-    reveal: () => { calls.reveal++; blind.set(false); },
     castVote: async (_line: string, w: string) => { calls.cast.push(w); return castResult; },
   };
 
   beforeEach(() => {
     agg.set(AGG);
     error.set(null);
-    blind.set(false);
     user.set({ id: 'u1' });
     castResult = 'ok';
     calls.cast = [];
     calls.load = 0;
-    calls.reveal = 0;
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -86,25 +81,19 @@ describe('CommunityVerdictComponent', () => {
   const buttons = (el: HTMLElement) => Array.from(el.querySelectorAll<HTMLButtonElement>('.vb'))
     .sort((x, y) => SCALE.indexOf(x.dataset['word']!) - SCALE.indexOf(y.dataset['word']!));
 
-  it('blind: only the vote entry shows, with the escape hatches, and the distribution stays hidden', () => {
-    blind.set(true);
+  it('open: the distribution and the one-line question show together, with no reveal step', () => {
     const { el } = render();
-    expect(el.querySelector('.bar')).toBeNull();
-    expect(el.textContent).toContain('Your verdict first');
+    expect(el.querySelector('.bar')).not.toBeNull();
+    expect(el.querySelector('.ask')!.textContent).toContain('How is');
+    expect(el.querySelector('.lnk')).toBeNull();
     expect(buttons(el).map((b) => b.querySelector('b')!.textContent)).toEqual(['Stable', 'Shaky', 'Unstable']);
-    const links = Array.from(el.querySelectorAll<HTMLButtonElement>('.lnk'));
-    expect(links.map((b) => b.textContent!.trim())).toEqual(['Cannot judge', 'Show number']);
-    links[1].click();
-    expect(calls.reveal).toBe(1);
   });
 
   it('casts a vote through the service when a button is pressed', async () => {
-    blind.set(true);
     const { el, fixture } = render();
     buttons(el)[1].click();
     await fixture.whenStable();
     expect(calls.cast).toEqual(['wackelig']);
-    expect(calls.reveal).toBe(1);
   });
 
   it('after the vote: own verdict, change lock time, own entry marked, correction visible', () => {
@@ -173,10 +162,8 @@ describe('CommunityVerdictComponent', () => {
       aggregate: buildAgg.asReadonly(),
       error: signal<string | null>(null).asReadonly(),
       saving: signal(false).asReadonly(),
-      blind: signal(false).asReadonly(),
       own: () => ({ verdict: buildAgg()?.ownVerdict ?? null, nextChangeAt: buildAgg()?.ownNextChangeAt ?? null }),
       correctionFor: (s: number) => (buildAgg() ? communityCorrection(s, buildAgg() as VoteAggregate) : null),
-      reveal: () => undefined,
       retry: () => undefined,
       cast: async (w: string) => { buildCasts.push(w); return buildResult; },
     };
@@ -198,7 +185,7 @@ describe('CommunityVerdictComponent', () => {
 
     it('reads and writes the build, never the LIVE line', async () => {
       const { el, fixture } = renderBuild();
-      expect(el.textContent).toContain('How stable is 4.4.0 PTU?');
+      expect(el.textContent).toContain('How is 4.4.0 PTU running for you?');
       expect(el.textContent).toContain('build rules 3');
       buttons(el)[2].click();
       await fixture.whenStable();

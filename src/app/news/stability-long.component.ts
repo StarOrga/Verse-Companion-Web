@@ -20,10 +20,6 @@ const DAY_MS = 86_400_000;
  * the previous patch, the deduction sum including the Community-Urteil, a
  * two-line Datenbasis, the calm daily history, what the community reports and
  * the Community-Urteil card. First section of the dossier (`id="stabilitaet"`).
- *
- * BLIND: for a signed-in user without a vote on the LIVE line, everything that
- * would reveal the number is blurred and inert until they voted, abstained or
- * asked for it; the vote entry then leads the section instead.
  */
 @Component({
   selector: 'sc-stability-long',
@@ -32,10 +28,7 @@ const DAY_MS = 86_400_000;
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (verdict(); as v) {
-      @if (blind()) {
-        <sc-community-verdict [line]="v.line" [stability]="v.stability" />
-      }
-      <div class="calc" [class.blind]="blind()" [attr.inert]="blind() ? '' : null" [attr.aria-hidden]="blind() ? 'true' : null">
+      <div class="calc">
         @if (v.insufficient) {
           <p class="muted">{{ 'news.patch.stability.insufficient' | translate }}</p>
         } @else {
@@ -153,7 +146,7 @@ const DAY_MS = 86_400_000;
         </div>
       }
 
-      @if (votable() && !blind()) {
+      @if (votable() && withVote()) {
         <sc-community-verdict [line]="v.line" [stability]="v.stability" />
       }
     }
@@ -163,8 +156,7 @@ const DAY_MS = 86_400_000;
     p, h4 { margin: 0; }
     h4 { font-size: max(0.72rem, var(--sc-fs-floor)); letter-spacing: 0.08em; text-transform: uppercase; color: var(--sc-fg-2); }
     .muted { color: var(--sc-fg-2); font-size: max(0.76rem, var(--sc-fs-floor)); }
-    .calc { display: flex; flex-direction: column; gap: 14px; transition: filter 0.2s ease; }
-    .calc.blind { filter: blur(9px); user-select: none; pointer-events: none; }
+    .calc { display: flex; flex-direction: column; gap: 14px; }
 
     .head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; --c: var(--sc-success); color: var(--c); }
     .head[data-word='wackelig'], .head[data-word='instabil'] { --c: var(--sc-warning); }
@@ -263,7 +255,8 @@ export class StabilityLongComponent {
 
   /** Community judging applies to a LIVE line with a number. */
   readonly votable = computed(() => this.live() && !!this.verdict() && !this.verdict()?.insufficient);
-  readonly blind = computed(() => this.votable() && this.votes.line() === this.verdict()?.line && this.votes.blind());
+  /** The dossier lists the Community-Urteil and the user's own vote as sections of their own and passes false. */
+  readonly withVote = input(true);
 
   private readonly ensure = effect(() => {
     const v = this.verdict();
