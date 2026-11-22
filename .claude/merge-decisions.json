@@ -192,6 +192,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›counts›value": [
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map)",
+        "decided": true,
+        "at": "2026-11-22T09:59:12.074Z",
+        "hunks": [
+          "5c17599da85f"
+        ]
+      }
+    ],
     ".claude/project-map.md›data-uploader/python/tests›count": [
       {
         "ship": "claude/ship-data-extraction-validation-8d0c76",
